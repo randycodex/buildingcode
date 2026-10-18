@@ -46963,15 +46963,38 @@ var WW = pF({
 	},
 	content: "none"
 }, {
-	render: ({ inlineContent: e }) => _.createElement("button", {
-		type: "button",
-		className: "notebook-reference-chip",
-		"data-permitext-reference": "true",
-		"data-reference-kind": e.props.referenceKind,
-		"data-reference-id": e.props.referenceID,
-		"data-reference-label": e.props.label,
-		"aria-label": `Open ${e.props.label}`
-	}, ...UW(e.props.referenceKind, e.props.label)),
+	render: ({ inlineContent: e }) => {
+		if (e.props.referenceKind === "selectedPassage") {
+			let t = HW(e.props.referenceKind, e.props.label);
+			return _.createElement("span", {
+				className: "notebook-reference-chip",
+				"data-permitext-reference": "true",
+				"data-reference-kind": e.props.referenceKind,
+				"data-reference-id": e.props.referenceID,
+				"data-reference-label": e.props.label
+			}, _.createElement("button", {
+				type: "button",
+				className: "notebook-reference-meta notebook-passage-source",
+				"aria-label": `Open ${e.props.label}`,
+				title: "Open source in Reader"
+			}, t.meta), _.createElement("button", {
+				type: "button",
+				className: "notebook-reference-title notebook-passage-toggle",
+				"data-notebook-passage-toggle": "true",
+				"aria-expanded": "true",
+				"aria-label": `Collapse passage: ${e.props.label}`
+			}, t.title));
+		}
+		return _.createElement("button", {
+			type: "button",
+			className: "notebook-reference-chip",
+			"data-permitext-reference": "true",
+			"data-reference-kind": e.props.referenceKind,
+			"data-reference-id": e.props.referenceID,
+			"data-reference-label": e.props.label,
+			"aria-label": `Open ${e.props.label}`
+		}, ...UW(e.props.referenceKind, e.props.label));
+	},
 	toExternalHTML: ({ inlineContent: e }) => _.createElement("span", {
 		className: "notebook-reference-chip",
 		"data-permitext-reference": "true",

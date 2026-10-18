@@ -14581,6 +14581,17 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   background: transparent;
 }
 
+.notebook-reference-chip > :is(.notebook-passage-source, .notebook-passage-toggle) {
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
 .notebook-reference-meta {
   color: var(--text-tertiary);
   font-size: 0.78em;
@@ -14612,6 +14623,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .notebook-reference-chip:focus-visible,
+.notebook-passage-source:focus-visible,
+.notebook-passage-toggle:focus-visible,
 .notebook-card-tile:focus-visible,
 .notebook-card-delete:focus-visible,
 .notebook-toolbar button:focus-visible,

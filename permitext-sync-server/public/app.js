@@ -1,4 +1,5 @@
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=2";
+import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
@@ -6,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-note-body-only-v1181";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-fold-note-passages-v1182";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -126,7 +127,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-note-body-only-v1181";
+} from "./offline-storage.js?v=20261018-fold-note-passages-v1182";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -159,7 +160,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-note-body-only-v1181";
+} from "./workspace-state.js?v=20261018-fold-note-passages-v1182";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -332,7 +333,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261018-note-passage-text-v33";
+const notebookClientVersion = "20261018-fold-note-passages-v34";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -27737,6 +27738,7 @@ async function renderProjectNotebook(project, options = {}) {
   panel.append(header, shell);
 
   let editorMount = null;
+  let passageDisclosure = null;
   const notebookEditingPositions = new Map();
   const returnScrollContext = { generation: accountRuntimeGeneration, userID: accountUserID, workspaceID: activeWorkspaceID, projectID };
   let captureNotebookReturnScroll = () => {};
@@ -27907,6 +27909,8 @@ async function renderProjectNotebook(project, options = {}) {
         window.cancelIdleCallback(notebookIdlePrefetchHandle);
       }
       editorRenderSequence += 1;
+      passageDisclosure?.destroy();
+      passageDisclosure = null;
       editorMount?.destroy?.();
       editorMount = null;
       notebookObjectURLs.forEach((url) => URL.revokeObjectURL(url));
@@ -28582,6 +28586,8 @@ async function renderProjectNotebook(project, options = {}) {
       refreshNotebookReportStatus = async () => false;
       noteMenu.titleAction.replaceChildren();
       const replaceFocusedContent = (...children) => {
+        passageDisclosure?.destroy();
+        passageDisclosure = null;
         editorMount?.destroy?.();
         editorMount = null;
         notebookObjectURLs.forEach((url) => URL.revokeObjectURL(url));
@@ -28810,7 +28816,13 @@ async function renderProjectNotebook(project, options = {}) {
 
       const editorElement = document.createElement("div");
       editorElement.className = "notebook-editor-surface";
-      const activateFocusedReference = (referenceElement) => {
+      let focusedPassageDisclosure = null;
+      const activateFocusedReference = (referenceElement, togglePassage = false) => {
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
+        if (togglePassage) {
+          focusedPassageDisclosure?.toggle(referenceElement);
+          return;
+        }
         const referenceID = referenceElement.dataset.referenceId;
         void openNotebookReference(identity, foundation, {
           referenceKind: referenceElement.dataset.referenceKind,
@@ -28824,7 +28836,7 @@ async function renderProjectNotebook(project, options = {}) {
         if (!referenceElement) return;
         event.preventDefault();
         event.stopPropagation();
-        activateFocusedReference(referenceElement);
+        activateFocusedReference(referenceElement, Boolean(event.target.closest?.("[data-notebook-passage-toggle]")));
       }, true);
       editorElement.addEventListener("keydown", (event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
@@ -28832,7 +28844,7 @@ async function renderProjectNotebook(project, options = {}) {
         if (!referenceElement) return;
         event.preventDefault();
         event.stopPropagation();
-        activateFocusedReference(referenceElement);
+        activateFocusedReference(referenceElement, Boolean(event.target.closest?.("[data-notebook-passage-toggle]")));
       }, true);
       const footer = document.createElement("div");
       footer.className = "notebook-card-footer";
@@ -28963,6 +28975,12 @@ async function renderProjectNotebook(project, options = {}) {
         },
         onOpenReference: null
       });
+      const focusedEditor = editorMount;
+      focusedPassageDisclosure = createNotebookPassageDisclosure(editorElement, {
+        getDocument: () => focusedEditor.getDocument(),
+        getEvidenceLinks: () => activeCard?.evidenceLinks || []
+      });
+      passageDisclosure = focusedPassageDisclosure;
       if (!notebookReadOnly && !activeCard.id) {
         noteMenu.editTitle();
       }

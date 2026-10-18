@@ -101,7 +101,23 @@ const PermitextReference = createReactInlineContentSpec(
     content: "none"
   },
   {
-    render: ({ inlineContent }) => React.createElement(
+    render: ({ inlineContent }) => {
+      if (inlineContent.props.referenceKind === "selectedPassage") {
+        const parts = notebookReferenceParts(inlineContent.props.referenceKind, inlineContent.props.label);
+        return React.createElement("span", {
+          className: "notebook-reference-chip",
+          "data-permitext-reference": "true",
+          "data-reference-kind": inlineContent.props.referenceKind,
+          "data-reference-id": inlineContent.props.referenceID,
+          "data-reference-label": inlineContent.props.label
+        },
+        React.createElement("button", { type: "button", className: "notebook-reference-meta notebook-passage-source",
+          "aria-label": `Open ${inlineContent.props.label}`, title: "Open source in Reader" }, parts.meta),
+        React.createElement("button", { type: "button", className: "notebook-reference-title notebook-passage-toggle",
+          "data-notebook-passage-toggle": "true", "aria-expanded": "true",
+          "aria-label": `Collapse passage: ${inlineContent.props.label}` }, parts.title));
+      }
+      return React.createElement(
       "button",
       {
         type: "button",
@@ -113,7 +129,8 @@ const PermitextReference = createReactInlineContentSpec(
         "aria-label": `Open ${inlineContent.props.label}`
       },
       ...notebookReferenceChildren(inlineContent.props.referenceKind, inlineContent.props.label)
-    ),
+      );
+    },
     toExternalHTML: ({ inlineContent }) => React.createElement(
       "span",
       {
