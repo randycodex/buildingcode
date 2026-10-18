@@ -1,3 +1,4 @@
+import { recentViewProjectID, limitRecentViewsByProject } from "./public/recent-view-scope.js";
 import { syncCodeVersion } from "./public/sync-identity.js";
 import { mergeGroupCatalogs } from "./public/group-catalog.js";
 import { mergeWorkspaceCatalogs } from "./public/workspace-catalog.js";
@@ -75,7 +76,8 @@ function recentViewIdentity(entry) {
     `category:${String(entry?.codeSectionID || entry?.codeSectionName || "unknown").trim().toLocaleLowerCase("en-US")}`;
   const version = String(entry?.codeVersion || entry?.sourceVersion || "").trim();
   // AuthoredCodeStore indexes sectionID across a whole edition, matching native historyIdentity.
-  return version ? JSON.stringify([syncCodeVersion(version), sectionID]) : JSON.stringify(["legacy", codePrefix, sectionID]);
+  const projectID = recentViewProjectID(entry);
+  return version ? JSON.stringify([projectID, syncCodeVersion(version), sectionID]) : JSON.stringify([projectID, "legacy", codePrefix, sectionID]);
 }
 
 function preferredRecentView(left, right) {
@@ -116,14 +118,13 @@ function mergedRecentViews(records, clearedAt) {
       bySectionID.set(identity, existing ? preferredRecentView(existing, entry) : entry);
     });
   });
-  return [...bySectionID.values()]
+  return limitRecentViewsByProject([...bySectionID.values()]
     .filter((entry) => viewedAtTimestamp(entry) > clearedAt)
     .sort((left, right) => {
       const timestampDifference = viewedAtTimestamp(right) - viewedAtTimestamp(left);
       if (timestampDifference !== 0) return timestampDifference;
       return recentViewIdentity(left).localeCompare(recentViewIdentity(right));
-    })
-    .slice(0, recentViewLimit);
+    }), recentViewLimit);
 }
 
 function searchIdentity(query) {

@@ -1,3 +1,4 @@
+import * as recentViewScope from "../public/recent-view-scope.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
@@ -96,20 +97,21 @@ assert.equal(
 );
 
 const recentState = {
-  recentlyViewedSections: [{ identity: "local", previewText: "", viewedAt: 10 }]
+  recentlyViewedSections: [{ sectionID: 1, identity: "local", previewText: "", viewedAt: 10 }]
 };
 let recentStateSaveCount = 0;
 const mergeRecentlyViewedDetails = new Function(
   "state",
   "recentViewIdentity",
   "recentViewLimit",
+  "limitRecentViewsByProject",
   "saveWorkspaceState",
   `${functionSource(appSource, "mergeRecentlyViewedDetails")};\nreturn mergeRecentlyViewedDetails;`
-)(recentState, (entry) => entry.identity || "", 50, () => { recentStateSaveCount += 1; });
+)(recentState, (entry) => entry.identity || "", 50, recentViewScope.limitRecentViewsByProject, () => { recentStateSaveCount += 1; });
 assert.equal(
   mergeRecentlyViewedDetails([
-    { identity: "local", previewText: "Cached enacted text", viewedAt: 20 },
-    { identity: "synced-only", previewText: "Synced enacted text", viewedAt: 30 }
+    { sectionID: 1, identity: "local", previewText: "Cached enacted text", viewedAt: 20 },
+    { sectionID: 2, identity: "synced-only", previewText: "Synced enacted text", viewedAt: 30 }
   ]),
   true,
   "Hydrated Recently Viewed details should change the local cache."
@@ -117,8 +119,8 @@ assert.equal(
 assert.deepEqual(
   recentState.recentlyViewedSections,
   [
-    { identity: "local", previewText: "Cached enacted text", viewedAt: 10 },
-    { identity: "synced-only", previewText: "Synced enacted text", viewedAt: 30 }
+    { sectionID: 1, identity: "local", previewText: "Cached enacted text", viewedAt: 10 },
+    { sectionID: 2, identity: "synced-only", previewText: "Synced enacted text", viewedAt: 30 }
   ],
   "Hydration should enrich existing views and retain synced-only views for the next Search open."
 );
@@ -892,6 +894,7 @@ assert.match(appSource, /paneID === "utility:search" \|\| paneID\.startsWith\("u
 assert.match(appSource, /return Math\.max\(defaultCodeDecisionPaneWidth, minimumWidthForPaneRole\(parsed\?\.paneRole\) \|\| 0\);/);
 assert.match(appSource, /paneID === "utility:analysis" \|\| paneID\.startsWith\("utility:analysis:"\) \|\| paneID\.startsWith\("research:conversation:"\)\) return defaultResearchPaneWidth;/);
 const migrateReaderWidth = new Function([
+  'const currentColumnWorkflowView = () => "notebook"; const defaultPaneWidthForID = () => 600;',
   appSource.match(/const defaultReaderPaneWidth = [^;]+;/)[0],
   ...["minimumPaneWidthForID", "maximumPaneWidthForID", "constrainPaneWidth", "migrateLegacyPaneWidth"]
     .map(name => functionSource(appSource, name)),
@@ -917,25 +920,8 @@ assert.match(appSource, /typeLabel\.textContent = folderTypeLabel\(project\)/, "
 assert.match(appSource, /folderRecordCountLabel\(selectedProjects\)/, "Selected-record deletion must name the exact Project and saved-collection mix.");
 assert.match(indexSource, /<button[^>]*class="[^"]*settings-project-clear-all[^"]*"[^>]*>Move all to Trash<\/button>/,
   "Settings keeps its compact visible bulk-action label.");
-const settingsFolderSetupStart = appSource.indexOf("  const settingsProjects = visibleProjectRecords(");
-const settingsFolderSetupEnd = appSource.indexOf("  const selectedProjectIDs = new Set();", settingsFolderSetupStart);
-assert(settingsFolderSetupStart >= 0 && settingsFolderSetupEnd > settingsFolderSetupStart);
-const renderSettingsFolderLabels = new Function("currentContentSummary", "visibleProjectRecords", "projectIsArchived", "panel", "projectList", "projectClearAll", [
-  functionSource(appSource, "folderType"), functionSource(appSource, "folderIsProject"),
-  appSource.slice(settingsFolderSetupStart, settingsFolderSetupEnd)
-].join("\n"));
-for (const mixed of [false, true]) {
-  const title = {}, list = {}, action = {};
-  const projects = [{folderType:"project"}, ...(mixed ? [{folderType:"reference"}] : [])];
-  renderSettingsFolderLabels(() => ({projects}), records => records, () => false,
-    {querySelector: selector => {assert.equal(selector,"#settings-projects-title");return title;}},
-    {setAttribute: (name,value) => {list[name]=value;}},
-    {setAttribute: (name,value) => {action[name]=value;}});
-  assert.equal(title.textContent, mixed ? "Projects & collections" : "Projects");
-  assert.equal(list["aria-label"], mixed ? "Projects and saved collections" : "Projects");
-  assert.equal(action["aria-label"], mixed ? "Move all projects and saved collections to Trash" : "Move all projects to Trash",
-    "The rendered bulk action must identify whether saved collections are included.");
-}
+// Exercise the live Settings refresh path instead of an obsolete one-time snapshot.
+await import("./settings-content-management-contract.mjs");
 assert.match(
   appSource,
   /function projectOverviewRefreshPaneIDs\([\s\S]*?state\.utilities\.settings \? "utility:settings" : ""/,

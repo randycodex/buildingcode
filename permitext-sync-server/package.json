@@ -10,6 +10,7 @@
     "test:smooth-performance:browser": "node tests/research-progressive-history-browser.mjs",
     "test:pinned-research-columns:browser": "node tests/pinned-research-columns-browser.mjs",
     "test:research-specialty-sources": "python3 scripts/repair-specialty-afci-boundary.py && node tests/research-specialty-sources-contract.mjs",
+    "test:recent-views": "node tests/recent-view-project-scope.mjs && node tests/recent-view-source-integrity.mjs && node tests/continuity-merge-contract.mjs && node tests/recent-view-project-scope-http.mjs",
     "test:assistant-context": "node tests/assistant-context-contract.mjs && node tests/research-conversation-in-place-contract.mjs && node tests/research-column-replacement-contract.mjs && node tests/research-workspace-continuity.mjs && node tests/research-draft-refresh-isolation.mjs && node tests/research-project-workspace-contract.mjs && node tests/research-notebook-navigation-contract.mjs && node tests/workspace-state-contract.mjs && npm run test:reader-tables && node tests/web-shell-cache-contract.mjs",
     "test:research-latency": "node tests/research-latency-contract.mjs && node tests/research-open-investigation-http-contract.mjs",
     "test:research-context-speed": "node tests/research-special-district-retrieval-contract.mjs && node tests/research-project-scope-contract.mjs && node tests/research-project-scope-http-contract.mjs && node tests/research-semantic-passages-contract.mjs && npm run test:research-open-investigation && npm run test:workflow-views",

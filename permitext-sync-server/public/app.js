@@ -1,10 +1,11 @@
+import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-assistant-project-context-v1174";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-project-recent-views-v1175";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -124,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-assistant-project-context-v1174";
+} from "./offline-storage.js?v=20261018-project-recent-views-v1175";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -157,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-assistant-project-context-v1174";
+} from "./workspace-state.js?v=20261018-project-recent-views-v1175";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -845,11 +846,7 @@ function loadWorkspaceState(accountOverride) {
       recentSearchHistory: normalizeRecentSearchHistory(saved.recentSearchHistory, recentSearchLimit),
       recentActivityUpdatedAt: saved.recentActivityUpdatedAt || null,
       pinnedSearches: normalizeSearchHistory(saved.pinnedSearches),
-      recentlyViewedSections: Array.isArray(saved.recentlyViewedSections)
-        ? saved.recentlyViewedSections
-          .filter((item) => item && Number(item.sectionID) > 0)
-          .slice(0, recentViewLimit)
-        : [],
+      recentlyViewedSections: limitRecentViewsByProject(saved.recentlyViewedSections, recentViewLimit),
       localProjects: Array.isArray(saved.localProjects) ? saved.localProjects.filter((project) => project && typeof project === "object") : [],
       localSavedItems: Array.isArray(saved.localSavedItems) ? saved.localSavedItems.filter((item) => item && typeof item === "object") : [],
       localProjectSections: Array.isArray(saved.localProjectSections) ? saved.localProjectSections.filter((item) => item && typeof item === "object") : [],
@@ -11887,14 +11884,19 @@ function recentViewSourceLabel(entry) {
   return `${prefix || "Code source"} · ${version ? "Source details unavailable" : "Edition not recorded"}`;
 }
 
+function activeRecentViewProjectID() {
+  return String(activeWorkspaceRecord()?.projectID || "").trim();
+}
+
 function recentViewIdentity(entry) {
   const sectionID = Number(entry?.sectionID);
   if (!Number.isSafeInteger(sectionID) || sectionID <= 0) return "";
   const version = recentViewSourceVersion(entry);
   // Section IDs are library-wide within an edition, as in native historyIdentity.
-  if (version) return JSON.stringify([version, sectionID]);
+  const projectID = recentViewProjectID(entry);
+  if (version) return JSON.stringify([projectID, version, sectionID]);
   const category = recentViewCodePrefix(entry) || `category:${String(entry?.codeSectionID || entry?.codeSectionName || "unknown").trim().toLocaleLowerCase("en-US")}`;
-  return JSON.stringify(["legacy", category, sectionID]);
+  return JSON.stringify([projectID, "legacy", category, sectionID]);
 }
 
 function recentViewEntryForReader(reader, chapter = null) {
@@ -11907,6 +11909,7 @@ function recentViewEntryForReader(reader, chapter = null) {
     String(item.id) === String(reader.chapterID || "") && matchesEdition(item));
   const codeOption = codeOptionFor(reader.codePrefix || resolvedChapter?.codePrefix || "BC", codeVersion);
   const entry = {
+    projectID: activeRecentViewProjectID(),
     codeVersion,
     sourceVersion: codeVersion,
     sectionID,
@@ -11952,7 +11955,7 @@ function mergeRecentlyViewedDetails(entries, options = {}) {
     mergedIdentities.add(identity);
     changed = true;
   });
-  state.recentlyViewedSections = mergedEntries.slice(0, recentViewLimit);
+  state.recentlyViewedSections = limitRecentViewsByProject(mergedEntries, recentViewLimit);
   if (changed && options.persist !== false) saveWorkspaceState();
   return changed;
 }
@@ -12027,10 +12030,10 @@ function recordRecentlyViewedReader(reader) {
   const entry = recentViewEntryForReader(reader, chapter);
   if (!entry) return;
   const identity = recentViewIdentity(entry);
-  state.recentlyViewedSections = [
+  state.recentlyViewedSections = limitRecentViewsByProject([
     entry,
     ...(state.recentlyViewedSections || []).filter((item) => recentViewIdentity(item) !== identity)
-  ].slice(0, recentViewLimit);
+  ], recentViewLimit);
   state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
 }
@@ -12056,9 +12059,7 @@ function continuityValuesForReader(reader, options = {}) {
       0,
       recentEntries.length,
       entry,
-      ...recentEntries
-        .filter((item) => recentViewIdentity(item) !== identity)
-        .slice(0, recentViewLimit - 1)
+      ...recentEntries.filter((item) => recentViewIdentity(item) !== identity)
     );
   }
   const recentSearches = normalizeSearchHistory(state.recentSearches, recentSearchLimit);
@@ -12073,7 +12074,7 @@ function continuityValuesForReader(reader, options = {}) {
     lastOpenedChapterID: reader.chapterID
       ? String(reader.chapterID)
       : existing.lastOpenedChapterID || "",
-    recentlyViewedSectionsJSON: JSON.stringify(recentEntries.slice(0, recentViewLimit)),
+    recentlyViewedSectionsJSON: JSON.stringify(limitRecentViewsByProject(recentEntries, recentViewLimit)),
     recentSearchesJSON: JSON.stringify(recentSearches),
     recentSearchHistoryJSON: JSON.stringify(recentSearchHistory)
   };
@@ -12083,8 +12084,11 @@ function scheduleContinuitySync(reader) {
   recordRecentlyViewedReader(reader);
   const account = activeAccount();
   if (!account || !reader?.chapterID) return;
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
   clearTimeout(continuityPushTimer);
   continuityPushTimer = window.setTimeout(() => {
+    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID) return;
     const updatedAt = new Date().toISOString();
     const mutation = {
       continuity: {
@@ -12103,8 +12107,11 @@ function scheduleContinuitySync(reader) {
 function scheduleRecentSearchContinuitySync(sourceReader = null) {
   const account = activeAccount();
   if (!account) return;
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
   clearTimeout(continuityPushTimer);
   continuityPushTimer = window.setTimeout(() => {
+    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID) return;
     const updatedAt = new Date().toISOString();
     const reader = sourceReader || state.readers[0] || {};
     state.continuityAppliedAt = updatedAt;
@@ -12138,7 +12145,7 @@ async function applyRemoteContinuityIfNewer() {
         .filter((entry) => String(entry.previewText || "").trim())
         .map((entry) => [recentViewIdentity(entry), entry])
     );
-    state.recentlyViewedSections = remoteRecentEntries.slice(0, recentViewLimit).map((entry) => {
+    state.recentlyViewedSections = limitRecentViewsByProject(remoteRecentEntries, recentViewLimit).map((entry) => {
       const local = localDetails.get(recentViewIdentity(entry));
       return !entry.previewText && local?.previewText
         ? { ...entry, previewText: local.previewText }
@@ -18560,8 +18567,9 @@ function searchRecentlyViewedEntries() {
   syncedEntries.forEach((entry) => {
     if (!entries.some((candidate) => recentViewIdentity(candidate) === recentViewIdentity(entry))) entries.push(entry);
   });
+  const projectID = activeRecentViewProjectID();
   return entries
-    .filter((entry) => Number(entry?.sectionID) > 0)
+    .filter((entry) => Number(entry?.sectionID) > 0 && recentViewBelongsToProject(entry, projectID))
     .map((entry) => ({ ...entry, codePrefix: recentViewCodePrefix(entry) }))
     .slice(0, recentViewLimit);
 }
@@ -18689,12 +18697,13 @@ async function hydrateSearchRecentlyViewedEntries(entries, options = {}) {
           snippet: previewSource
         })).replace(/\s+/g, " ").trim().slice(0, 360)
       };
-      options.onEntry?.(hydratedEntry);
+      if (!options.isCurrent || options.isCurrent()) options.onEntry?.(hydratedEntry);
       return hydratedEntry;
     } catch {
       return entry;
     }
   }));
+  if (options.isCurrent && !options.isCurrent()) return [];
   const changed = mergeRecentlyViewedDetails(hydratedEntries);
   if (changed) scheduleRecentSearchContinuitySync();
   return hydratedEntries;
@@ -18809,13 +18818,19 @@ async function renderSearchHistory(panel, instance, options = {}) {
     renderSearchPlaceholder(results, { title: "Search code text", body: "Enter a word or section number to search." });
     return;
   }
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const projectID = activeRecentViewProjectID();
+  const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    activeRecentViewProjectID() === projectID;
   const recentEntries = searchRecentlyViewedEntries();
   const recentSections = options.hydrate === false
     ? recentEntries
     : await hydrateSearchRecentlyViewedEntries(recentEntries, {
+      isCurrent: current,
       onEntry: (entry) => updateVisibleSearchHistoryEntry(panel, entry)
     });
-  if (String(instance?.query || "").trim()) return;
+  if (!current() || String(instance?.query || "").trim()) return;
   clear(results);
   results.classList.add("is-history");
   results.classList.remove("is-split");

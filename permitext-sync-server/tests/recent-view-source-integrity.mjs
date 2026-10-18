@@ -1,3 +1,4 @@
+import * as recentViewScope from "../public/recent-view-scope.js";
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
@@ -11,7 +12,7 @@ function actual(name) {
 }
 const opened = [];
 const options = [{ prefix: 'AC', label: '2022 Administrative', codeVersion: current }, { prefix: 'AC', label: '2014 Administrative', codeVersion: historical }, { prefix: 'BC', label: 'Building Code' }];
-const c = vm.createContext({ syncCodeVersion, defaultSyncCodeVersion: current, historicalConstructionSyncCodeVersion: historical, codeOptions: options,
+const c = vm.createContext({ ...recentViewScope, activeRecentViewProjectID:()=>"", syncCodeVersion, defaultSyncCodeVersion: current, historicalConstructionSyncCodeVersion: historical, codeOptions: options,
   chapters: [{ id: 1, codePrefix: 'AC', codeSectionID: 3, codeVersion: current, title: 'Wrong edition chapter' }],
   state: { recentlyViewedSections: [] }, swiftReferenceDateSeconds: () => 123,
   codeOptionVersion: option => syncCodeVersion(option.codeVersion),
