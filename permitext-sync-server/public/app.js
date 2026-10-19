@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-note-menu-titles-only-v1211";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-research-only-pin-v1212";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
@@ -130,7 +130,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-note-menu-titles-only-v1211";
+} from "./offline-storage.js?v=20261019-research-only-pin-v1212";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -163,7 +163,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-note-menu-titles-only-v1211";
+} from "./workspace-state.js?v=20261019-research-only-pin-v1212";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -41941,8 +41941,8 @@ function orderWithPaneStepped(paneID, direction) {
 }
 
 function activePinnedPaneID() {
-  // Retain the saved Pro preference, but never apply it to a Free layout.
-  if (!isProAccount()) return "";
+  // Retain the Research preference without applying it to other working views.
+  if (!isProAccount() || currentColumnWorkflowView() !== "research") return "";
   const paneID = state.pinnedPaneID || "";
   // Pin a saved detail through its Evidence anchor so the pair cannot split.
   return paneID.startsWith("section:detail:")
@@ -41951,7 +41951,7 @@ function activePinnedPaneID() {
 }
 
 function togglePinnedPane(panel) {
-  if (!isProAccount()) return;
+  if (!isProAccount() || currentColumnWorkflowView() !== "research") return;
   const selectedPaneID = panel.dataset.paneId;
   const paneID = selectedPaneID.startsWith("section:detail:")
     ? savedEvidenceColumnGroup(selectedPaneID, activePaneIDs())[0] || selectedPaneID
@@ -42098,7 +42098,9 @@ function openColumnGroupMenu(panel, anchor) {
   const pinTarget = panel.dataset.paneId.startsWith("section:detail:")
     ? savedEvidenceColumnGroup(panel.dataset.paneId, activePaneIDs())[0] || panel.dataset.paneId
     : panel.dataset.paneId;
-  if (isProAccount()) add(activePinnedPaneID() === pinTarget ? 'Unpin' : 'Pin', () => togglePinnedPane(panel));
+  if (isProAccount() && currentColumnWorkflowView() === "research") {
+    add(activePinnedPaneID() === pinTarget ? 'Unpin' : 'Pin', () => togglePinnedPane(panel));
+  }
   separate();
   add('Move Left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
   add('Move Right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));

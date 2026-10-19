@@ -33,7 +33,7 @@ const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHyd
  applyPaneWeight:noop,ensureWorkspacePanelAccessibleName:noop,preparePaneCollapse:noop,bindPaneDragging:noop,refreshColumnGroupPresentation:noop,refreshPinnedPaneDivider:noop,
  updateCollapsedPaneDividers:noop,bindReaderScrollIndicator:noop,updateReaderScrollIndicator:noop,enhanceSelect:noop,restoreReaderScrollPositions:noop,
  notifyWorkspaceLayoutChange:noop,disposeUnpublishedWorkspacePane:noop,maskUnverifiedWorkspacePane:noop,
- workflowPaneIsVisible:()=>true,pendingWorkspacePaneRevealID:""
+ workflowPaneIsVisible:()=>true,currentColumnWorkflowView:()=>"research",pendingWorkspacePaneRevealID:""
 });
 const names=["activePinnedPaneID","workspacePrivatePresentationAllowed","finishWorkspacePaneReady","whenWorkspacePaneReady","workspaceAccessGateForRender","workspacePaneRenderContext","workspacePaneContextIsCurrent","getWorkspacePaneHydrator","mountWorkspacePanesIndependently","renderWorkspace","renderUtilityWorkspace"];
 vm.runInContext(`let workspacePaneHydrator=null;let workspaceAccessState=null;const workspacePaneReadyWaiters=new Set();${names.map(actual).join("\n")}`,sandbox);

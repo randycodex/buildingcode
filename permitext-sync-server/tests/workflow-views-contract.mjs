@@ -190,7 +190,7 @@ const layoutContext = vm.createContext({
   defaultActivePaneIDs: () => [], activePaneIDs: () => ['reader:one', 'project:notebook:a'],
   workflowPaneIsVisible: id => id === 'reader:one', defaultPaneWidthForID: () => 600,
   resetReportColumnWidths: panel => {assert.equal(panel, reportPanel); reportResets++;},
-  syncReferenceReaderLayout() {}, state: layoutState, track: layoutTrack,
+  syncReferenceReaderLayout() {}, syncResearchColumnLayout() {}, workspaceColumnExpansion: null, state: layoutState, track: layoutTrack,
   saveWorkspaceState: () => savedLayouts++, transitionWorkspace: async () => workspaceTransitions++, requestAnimationFrame: callback => callback()
 });
 vm.runInContext([actual('updateWorkspaceLayoutControls'), actual('resetVisibleColumnWidths')].join('\n'), layoutContext);

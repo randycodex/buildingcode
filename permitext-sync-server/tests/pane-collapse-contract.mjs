@@ -173,6 +173,7 @@ orderState.paneOrder = JSON.parse(JSON.stringify(restoredPairOrder));
 assert.deepEqual(Array.from(orderContext.activePaneIDs()), restoredPairOrder);
 // A stored detail pin resolves to Evidence, and the rendered order pairs the detail after that pin.
 orderContext.isProAccount = () => true;
+orderContext.currentColumnWorkflowView = () => 'research';
 vm.runInContext(actual('activePinnedPaneID'), orderContext);
 orderState.pinnedPaneID = detailID;
 assert.equal(orderContext.activePinnedPaneID(), savedID);
@@ -219,7 +220,7 @@ console.log('Saved, Notebook and Report are excluded from active and persisted c
 const resetState = { paneWeights: { a: 950, b: 820 }, collapsedPaneIDs: ['a'], columnGroups: [{ id: 'g', paneIDs: ['b'], collapsed: true }] };
 const resetContext = vm.createContext({
   state: resetState, track: { scrollLeft: 0, scrollWidth: 1200, clientWidth: 1000, querySelectorAll: () => [] },
-  reportScreen: null, workflowPaneIsVisible:()=>true,
+  reportScreen: null, workflowPaneIsVisible:()=>true, workspaceColumnExpansion: null, syncResearchColumnLayout() {},
   activePaneIDs: () => ['a', 'b'], defaultPaneWidthForID: () => 600,
   saveWorkspaceState() {}, async transitionWorkspace() {}, requestAnimationFrame: fn => fn()
 });
@@ -325,6 +326,19 @@ assert.equal(menuState.pinnedPaneID,'reader:one','Free cannot change a pin throu
 assert.equal(menuSaves,0);
 menuPro=true;
 assert.equal(menuContext.activePinnedPaneID(),'reader:one','The original pin preference remains available to Pro.');
+for (const view of ['notebook', 'report', 'project-details']) {
+  menuContext.currentColumnWorkflowView = () => view;
+  menuContext.openColumnGroupMenu(menuPanel,anchor);
+  assert(!menuItems().some(item => ['Pin','Unpin'].includes(item.textContent)), `${view} menus omit pin actions.`);
+  assert.equal(menuContext.activePinnedPaneID(),'', `A saved Research pin is inactive in ${view}.`);
+  menuContext.togglePinnedPane(menuPanel);
+  assert.equal(menuState.pinnedPaneID,'reader:one', `A stale action in ${view} cannot change the Research pin.`);
+  assert.equal(menuSaves,0);
+}
+menuContext.currentColumnWorkflowView = () => 'research';
+assert.equal(menuContext.activePinnedPaneID(),'reader:one','Returning to Research restores its pin.');
+menuContext.openColumnGroupMenu(menuPanel,anchor);
+assert(menuItems().some(item => item.textContent === 'Unpin'), 'Research retains the Unpin action.');
 menuState.pinnedPaneID='';
 menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert.equal(menu.attrs['aria-label'],'Column options');assert.equal(anchor.attrs['aria-expanded'],'true');
