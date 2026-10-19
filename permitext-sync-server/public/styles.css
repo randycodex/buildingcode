@@ -14610,6 +14610,11 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   line-height: 1.2;
 }
 
+.notebook-reference-chip > .notebook-passage-source:hover {
+  background: var(--menu-highlight);
+  color: var(--text-primary);
+}
+
 .notebook-reference-title {
   color: var(--text-primary);
   font-size: 0.9em;
