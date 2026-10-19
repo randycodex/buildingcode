@@ -1,4 +1,4 @@
-export function createNotebookNoteMenu({ onSelect, onTitleChange, keepMenuVisible = false, selectCurrent = false }) {
+export function createNotebookNoteMenu({ onSelect, onTitleChange, keepMenuVisible = false, selectCurrent = false, includeArchived = false }) {
   const element = document.createElement('div');
   element.className = 'notebook-title-control';
   const title = document.createElement('button');
@@ -116,7 +116,7 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange, keepMenuVisibl
     toggle.setAttribute('aria-label', showingArchivedCards ? 'Choose archived note' : 'Choose note');
     createButton.disabled = readOnly;
     list.replaceChildren();
-    const visibleCards = cards.filter(card => Boolean(card.archivedAt) === showingArchivedCards &&
+    const visibleCards = cards.filter(card => (includeArchived || Boolean(card.archivedAt) === showingArchivedCards) &&
       !(activeCard && !activeCard.id && !card.id));
     if (!showingArchivedCards && activeCard && !activeCard.id) visibleCards.unshift(activeCard);
     if (showingArchivedCards && !visibleCards.length) {
@@ -157,10 +157,10 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange, keepMenuVisibl
 }
 
 // The toolbar owns the project-wide list; the Note editors remain mounted.
-export function createNotebookToolbarMenu({ onOpen, onCreate, onArchive, onTrash, icons, getActiveCardID, readOnly = false }) {
-  let cards = [], archived = false, selecting = false, busy = false;
+export function createNotebookToolbarMenu({ onOpen, onCreate, onTrash, icons, getActiveCardID, readOnly = false }) {
+  let cards = [], selecting = false, busy = false;
   const selected = new Set();
-  const notes = createNotebookNoteMenu({keepMenuVisible:true, selectCurrent:true, onTitleChange() {},
+  const notes = createNotebookNoteMenu({keepMenuVisible:true, selectCurrent:true, includeArchived:true, onTitleChange() {},
     onSelect(card) {
       if (selecting) {
         selected.has(card.id) ? selected.delete(card.id) : selected.add(card.id);
@@ -173,16 +173,13 @@ export function createNotebookToolbarMenu({ onOpen, onCreate, onArchive, onTrash
     button.title = label; button.setAttribute('aria-label',label);
     button.innerHTML = content; return button;
   };
-  const archive = action('notebook-card-archive-action','Show archived notes',icons.archive);
   const select = action('notebook-card-select-action','Select notes',icons.select);
   const cancel = action('notebook-card-selection-cancel','Cancel selection','Cancel');
-  const archiveSelected = action('notebook-card-selection-action','Archive selected notes',icons.archive);
   const trash = action('notebook-card-selection-action','Move selected notes to Trash',icons.trash);
-  notes.management.append(cancel,archive,archiveSelected,trash,select);
+  notes.management.append(cancel,trash,select);
   notes.menu.classList.add('notebook-toolbar-note-manager');
   notes.toggle.hidden = true;
   notes.createButton.addEventListener('click',onCreate);
-  archive.addEventListener('click',() => { archived = !archived; selecting = false; selected.clear(); render(cards); });
   select.addEventListener('click',() => { selecting = !selecting; selected.clear(); render(cards); });
   cancel.addEventListener('click',() => { selecting = false; selected.clear(); render(cards); select.focus({preventScroll:true}); });
   const mutate = async callback => {
@@ -193,31 +190,21 @@ export function createNotebookToolbarMenu({ onOpen, onCreate, onArchive, onTrash
     try { if (await callback(targets) !== false) { selecting = false; selected.clear(); } }
     finally { busy = false; render(cards); }
   };
-  archiveSelected.addEventListener('click',() => void mutate(targets => onArchive(targets,!archived)));
   trash.addEventListener('click',() => void mutate(onTrash));
   function render(nextCards) {
     cards = nextCards.filter(card => !card.deletedAt);
-    const visible = cards.filter(card => Boolean(card.archivedAt) === archived);
-    for (const id of selected) if (!visible.some(card => card.id === id)) selected.delete(id);
-    notes.render({cards,activeCard:cards.find(card => card.id === getActiveCardID()),showingArchivedCards:archived,
+    for (const id of selected) if (!cards.some(card => card.id === id)) selected.delete(id);
+    notes.render({cards,activeCard:cards.find(card => card.id === getActiveCardID()),
       selectingCards:selecting,selectedCardIDs:selected,readOnly:readOnly || busy});
     notes.list.querySelectorAll('button').forEach(button => { button.disabled = busy; });
     notes.menu.classList.toggle('is-selecting-cards',selecting);
-    notes.menu.classList.toggle('is-showing-archived-cards',archived);
-    notes.createButton.hidden = selecting || archived;
-    archive.hidden = selecting;
-    archive.title = archived ? 'Show active notes' : 'Show archived notes';
-    archive.setAttribute('aria-label',archive.title); archive.setAttribute('aria-pressed',String(archived));
-    archive.innerHTML = archived ? icons.active : icons.archive;
-    select.hidden = !visible.length; select.disabled = readOnly || busy;
+    notes.createButton.hidden = selecting;
+    select.hidden = !cards.length; select.disabled = readOnly || busy;
     select.setAttribute('aria-pressed',String(selecting));
-    cancel.hidden = archiveSelected.hidden = trash.hidden = !selecting;
-    cancel.disabled = archive.disabled = busy;
-    archiveSelected.disabled = trash.disabled = readOnly || busy || !selected.size;
-    archiveSelected.title = archived ? 'Restore selected notes' : 'Archive selected notes';
-    archiveSelected.setAttribute('aria-label',archiveSelected.title);
-    archiveSelected.innerHTML = archived ? icons.restore : icons.archive;
-    if (!visible.length && !archived) {
+    cancel.hidden = trash.hidden = !selecting;
+    cancel.disabled = busy;
+    trash.disabled = readOnly || busy || !selected.size;
+    if (!cards.length) {
       const empty = document.createElement('p'); empty.className = 'notebook-card-list-empty';
       empty.textContent = 'No notes yet.'; notes.list.append(empty);
     }

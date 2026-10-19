@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-evidence-toggle-collapse-v1229";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-notes-trash-only-v1230";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -131,7 +131,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-evidence-toggle-collapse-v1229";
+} from "./offline-storage.js?v=20261019-notes-trash-only-v1230";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -164,7 +164,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-evidence-toggle-collapse-v1229";
+} from "./workspace-state.js?v=20261019-notes-trash-only-v1230";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2837,7 +2837,6 @@ function syncNotebookNoteTabs() {
   notes.sort((a, b) => rank(a) - rank(b));
   notebookTabs.replaceChildren();
   for (const card of notes) {
-    if (card.archivedAt) continue;
     const column = card.column || columns.find(item => item.cardID === card.id && item.open);
     if (!column?.open) continue;
     const button = document.createElement('button');
@@ -2869,11 +2868,9 @@ function openClosedNotebookNotesMenu() {
   const manager = createNotebookToolbarMenu({
     getActiveCardID: () => notebookMounts.get(projectID)?.activeCardID?.() || '',
     readOnly: project.sharedRole === 'viewer',
-    icons: {archive:archiveIconSVG(), active:activeProjectsIconSVG(), restore:archiveRestoreIconSVG(),
-      select:selectionModeIconSVG(), trash:trashIconSVG()},
+    icons: {select:selectionModeIconSVG(), trash:trashIconSVG()},
     onOpen(card) { close(false); void openNotebookNoteColumn(project,card).catch(error => showWebNotice('Note not opened',error.message)); },
     onCreate() { close(false); void createNotebookNoteColumn(project); },
-    onArchive: (cards,archived) => mutateNotebookNotesFromMenu(project,cards,{archived}),
     onTrash: cards => mutateNotebookNotesFromMenu(project,cards,{trash:true})
   });
   const menu = manager.menu;

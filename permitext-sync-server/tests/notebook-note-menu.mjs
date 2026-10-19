@@ -240,17 +240,18 @@ assert.equal(closedEscape.prevented,false,'A closed Insert does not consume anot
 assert.equal(insertUpdates,4); assert.equal(insertSaves,4);
 console.log('Notebook Insert dismissal passed: outside clicks, nested choices, immediate Escape from button/menu/editor, focus retention and closed-menu pass-through.');
 
-// The toolbar reuses the full menu: all Notes, creation, Archive and recoverable Trash.
+// The toolbar lists all Notes, with recoverable Trash as its removal action.
 const toolbarCalls=[];
-const toolbarMenu=createNotebookToolbarMenu({getActiveCardID:()=> 'a',icons:{archive:'archive',active:'active',restore:'restore',select:'select',trash:'trash'},
+const toolbarMenu=createNotebookToolbarMenu({getActiveCardID:()=> 'a',icons:{select:'select',trash:'trash'},
   onOpen:card=>toolbarCalls.push(['open',card.id]),onCreate:()=>toolbarCalls.push(['create']),
-  onArchive:async(cards,archived)=>{toolbarCalls.push(['archive',cards.map(card=>card.id),archived]);},
   onTrash:async cards=>{toolbarCalls.push(['trash',cards.map(card=>card.id)]);}});
 const toolbarCards=[{id:'a',title:'Open Note'},{id:'b',title:'Closed Note'},{id:'c',title:'Archived Note',archivedAt:'2026-10-19'},{id:'d',title:'Deleted Note',deletedAt:'2026-10-19'}];
 const toolbarAction=label=>toolbarMenu.menu.all().find(node=>node.getAttribute('aria-label')===label);
 const toolbarTitles=()=>toolbarMenu.menu.querySelectorAll('.notebook-card-tile').map(button=>button.children[0].textContent);
 toolbarMenu.render(toolbarCards);
-assert.deepEqual(toolbarTitles(),['Open Note','Closed Note']);
+assert.deepEqual(toolbarTitles(),['Open Note','Closed Note','Archived Note'],'Previously archived Notes remain available in the regular list.');
+assert.equal(toolbarAction('Show archived notes'),undefined);
+assert.equal(toolbarAction('Archive selected notes'),undefined);
 toolbarAction('Open note: Open Note').click();
 assert.deepEqual(toolbarCalls.pop(),['open','a'],'Choosing an already open Note focuses its column.');
 toolbarAction('New Note').click();assert.deepEqual(toolbarCalls.pop(),['create']);
@@ -260,11 +261,9 @@ assert.equal(toolbarAction('Move selected notes to Trash').disabled,false);
 toolbarAction('Move selected notes to Trash').click();
 await Promise.resolve();await Promise.resolve();
 assert.deepEqual(toolbarCalls.pop(),['trash',['a','b']]);
-toolbarAction('Show archived notes').click();
-assert.deepEqual(toolbarTitles(),['Archived Note']);
 toolbarAction('Select notes').click();toolbarAction('Select note: Archived Note').click();
-toolbarAction('Restore selected notes').click();
+toolbarAction('Move selected notes to Trash').click();
 await Promise.resolve();await Promise.resolve();
-assert.deepEqual(toolbarCalls.pop(),['archive',['c'],false]);
+assert.deepEqual(toolbarCalls.pop(),['trash',['c']]);
 toolbarMenu.render([]);assert.equal(toolbarMenu.menu.hidden,false,'An empty Notes menu still offers New note.');
-console.log('Toolbar Notes menu passed: full list, focus/open, creation, Archive, selection and recoverable Trash callbacks.');
+console.log('Toolbar Notes menu passed: full list, retained archived Notes, focus/open, creation, selection and recoverable Trash without Archive controls.');
