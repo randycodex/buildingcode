@@ -70,13 +70,14 @@ assert.equal(registry.mounts.size,1);assert.equal(registry.mounts.get(a.panel.da
 assert.equal(state.notebookColumns.find(item=>item.cardID==='b').open,false);
 await context.createNotebookNoteColumn(project);await context.createNotebookNoteColumn(project);
 assert.equal(requests,2);assert.equal(registry.mounts.size,3);
-assert.deepEqual(Array.from(catalog.get('project').slice(-2),card=>card.title),['Note 1','Note 2']);
+assert.deepEqual(Array.from(catalog.get('project').slice(-2),card=>card.title),['Untitled','Untitled']);
 assert.equal(new Set(state.notebookColumns.filter(item=>item.open).map(notebookColumnPaneID)).size,3);
 assert.equal(a.body,'Unsaved text a','Creating notes cannot replace an existing editor.');
 context.navigator.onLine=false;
 await context.createNotebookNoteColumn(project);
 const offlineColumn=state.notebookColumns.find(item=>item.newNote);
 assert(offlineColumn,'Offline creation opens a separate pending Note column.');
+assert.equal(offlineColumn.title,'Untitled');
 assert.equal(requests,2,'Offline Note creation does not require a server request.');
 assert.equal(registry.mounts.size,4);
 await context.createNotebookNoteColumn(project);

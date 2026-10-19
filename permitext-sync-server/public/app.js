@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-evidence-column-width-v1225";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-untitled-notes-v1226";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -131,7 +131,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-evidence-column-width-v1225";
+} from "./offline-storage.js?v=20261019-untitled-notes-v1226";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -164,7 +164,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-evidence-column-width-v1225";
+} from "./workspace-state.js?v=20261019-untitled-notes-v1226";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2810,7 +2810,7 @@ function publishNotebookColumn(projectID, paneID, card, cards) {
   const panel = notebookColumnMounts.get(paneID)?.panel;
   if (panel && card) {
     panel.dataset.noteId = card.id || '';
-    panel.querySelector('.notebook-heading .panel-kind').textContent = card.title || 'Untitled Note';
+    panel.querySelector('.notebook-heading .panel-kind').textContent = card.title || 'Untitled';
   }
   syncNotebookNoteTabs();
 }
@@ -2826,7 +2826,7 @@ function syncNotebookNoteTabs() {
     const live = notebookColumnMounts.get(notebookColumnPaneID(column))?.summary?.();
     const note = notes.find(card => card.id === (live?.id || column.cardID));
     if (note && live) note.title = live.title;
-    if (column.open && !note) notes.push({id: live?.id || column.cardID || '', title: live?.title || column.title || 'New Note', column});
+    if (column.open && !note) notes.push({id: live?.id || column.cardID || '', title: live?.title || column.title || 'Untitled', column});
   }
   const paneOrder = new Map((state.paneOrder || []).map((id, index) => [id, index]));
   const rank = card => {
@@ -2841,7 +2841,7 @@ function syncNotebookNoteTabs() {
     if (!column?.open) { closedNotes.push(card); continue; }
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'toolbar-button notebook-note-tab';
-    button.textContent = card.title || 'Untitled Note';
+    button.textContent = card.title || 'Untitled';
     button.title = button.textContent;
     button.setAttribute('aria-label', `Open note: ${button.textContent}`);
     button.setAttribute('aria-pressed', String(Boolean(column?.open)));
@@ -2890,14 +2890,14 @@ function openClosedNotebookNotesMenu() {
     for (const card of notes) {
       const row = document.createElement('div'); row.className = 'notebook-closed-note-row'; row.setAttribute('role','none');
       const open = document.createElement('button'); open.type = 'button'; open.className = 'workspace-menu-option';
-      open.setAttribute('role','menuitem'); open.setAttribute('aria-label', `Open note: ${card.title || 'Untitled Note'}`);
-      open.textContent = card.title || 'Untitled Note';
+      open.setAttribute('role','menuitem'); open.setAttribute('aria-label', `Open note: ${card.title || 'Untitled'}`);
+      open.textContent = card.title || 'Untitled';
       open.addEventListener('click', () => {
         close(false);
         void openNotebookNoteColumn(project, card).catch(error => showWebNotice('Note not opened', error.message));
       });
       const trash = document.createElement('button'); trash.type = 'button'; trash.className = 'notebook-closed-note-trash';
-      trash.setAttribute('role','menuitem'); trash.setAttribute('aria-label', `Move ${card.title || 'Untitled Note'} to Trash`);
+      trash.setAttribute('role','menuitem'); trash.setAttribute('aria-label', `Move ${card.title || 'Untitled'} to Trash`);
       trash.title = 'Move to Trash'; trash.innerHTML = trashIconSVG();
       trash.addEventListener('click', () => { close(); void moveClosedNotebookNoteToTrash(project, card); });
       row.append(open, trash); menu.append(row);
@@ -2939,7 +2939,7 @@ async function moveClosedNotebookNoteToTrash(project, card) {
     if (draft?.document) throw new Error('Open and sync this Note before moving it to Trash. Your device draft is preserved.');
     const payload = await postResearch('/notebook/cards/get', {projectID, cardID:card.id});
     if (!current()) return;
-    const confirmed = await confirmWebWarning('Move Note to Trash?', `“${payload.card.title || 'Untitled Note'}” will move to Trash. You can restore it from Settings for 30 days.`, {confirmLabel:'Move to Trash'});
+    const confirmed = await confirmWebWarning('Move Note to Trash?', `“${payload.card.title || 'Untitled'}” will move to Trash. You can restore it from Settings for 30 days.`, {confirmLabel:'Move to Trash'});
     if (!confirmed || !current() || notebookColumnsForProject(project).some(column => column.open && column.cardID === card.id)) return;
     await postResearch('/notebook/cards/delete', {projectID, cardID:card.id, expectedVersion:payload.card.version, recoverable:true});
     requireCurrentAccountRequest(requestIdentity);
@@ -3044,13 +3044,12 @@ async function createNotebookNoteColumn(project = workspaceProject()) {
   try {
     if (navigator.onLine === false) {
       const column = notebookColumnsForProject(project).find(item => item.newNote && !item.cardID);
-      await openNotebookNoteColumn(project, {id:'', title:column?.title || 'New Note', newNote:true, column});
+      await openNotebookNoteColumn(project, {id:'', title:column?.title || 'Untitled', newNote:true, column});
       return;
     }
     const catalog = notebookCatalogs.get(projectID) || [];
-    let number = 1; while (catalog.some(card => card.title === `Note ${number}`)) number++;
     const payload = await postResearch('/notebook/cards/save', {projectID, clientMutationID: crypto.randomUUID(),
-      expectedVersion: 0, cardType: 'finding', title: `Note ${number}`, document: emptyNotebookDocument(), evidenceLinks: []});
+      expectedVersion: 0, cardType: 'finding', title: 'Untitled', document: emptyNotebookDocument(), evidenceLinks: []});
     if (!current()) return;
     notebookCatalogs.set(projectID, [...catalog.filter(card => card.id !== payload.card.id), payload.card]);
     const opened = await openNotebookNoteColumn(project, payload.card);
@@ -8904,7 +8903,7 @@ async function pendingSyncItems(identity = captureAccountRequest()) {
     }),
     ...drafts.filter(draft => draft.accountUserID === identity.userID).map(draft => ({
       kind: "draft", id: draft.cardID || "new", projectID: draft.projectID, scope: draft.scope,
-      title: draft.title || (draft.scope === "collaboration-note" ? "Project information" : "Untitled Note"),
+      title: draft.title || (draft.scope === "collaboration-note" ? "Project information" : "Untitled"),
       project: projectLabel(draft.projectID), reason: pendingNotebookDraftReason(draft)
     }))
   ];
@@ -27998,7 +27997,7 @@ async function appendNotebookDeviceRecovery(container, projectID, identity) {
     for (const draft of drafts) {
       const details = document.createElement("details");
       const summary = document.createElement("summary");
-      summary.textContent = draft.title || (draft.scope === "collaboration-note" ? "Project information draft" : "Untitled Note");
+      summary.textContent = draft.title || (draft.scope === "collaboration-note" ? "Project information draft" : "Untitled");
       const text = document.createElement("pre");
       text.textContent = [notebookRecoveryPlainText(draft.document), notebookQuestionsText(draft.openQuestions || [])].filter(Boolean).join("\n\n") || "This draft contains images or structured content. Download the recovery file to preserve all of it.";
       details.append(summary, text);
@@ -29498,7 +29497,7 @@ async function renderProjectNotebook(project, options = {}) {
         id: "",
         version: 0,
         cardType: "finding",
-        title: "",
+        title: "Untitled",
         plainText: "",
         references: [],
         evidenceLinks: []

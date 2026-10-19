@@ -44,7 +44,7 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
   element.append(title, titleEditor, titleAction, menu);
   let state = { activeCard: null, readOnly: false, selectingCards: false };
   const finishTitleEditing = () => {
-    title.textContent = state.activeCard?.title || 'Untitled Note';
+    title.textContent = state.activeCard?.title || 'Untitled';
     titleEditor.hidden = true;
     title.hidden = !state.activeCard;
   };
@@ -60,7 +60,7 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
   titleEditor.addEventListener('input', () => {
     if (!state.activeCard || state.readOnly) return;
     onTitleChange(titleEditor.value);
-    title.textContent = titleEditor.value || 'Untitled Note';
+    title.textContent = titleEditor.value || 'Untitled';
     const currentTitle = list.querySelector('[aria-current="true"] > span');
     if (currentTitle) currentTitle.textContent = title.textContent;
   });
@@ -103,7 +103,7 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
     const hasNotes = cards.length > 0 || Boolean(activeCard);
     element.hidden = menu.hidden = !hasNotes;
     if (!hasNotes) menu.open = false;
-    title.textContent = activeCard?.title || 'Untitled Note';
+    title.textContent = activeCard?.title || 'Untitled';
     title.disabled = titleEditor.disabled = readOnly;
     titleEditor.dataset.cardId = activeCard?.id || '';
     if (!keepTitleEditing) {
@@ -134,11 +134,11 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
       const choice = document.createElement('button');
       choice.type = 'button';
       choice.className = 'notebook-card-tile workspace-menu-option';
-      choice.setAttribute('aria-label', `${selectingCards ? 'Select' : 'Open'} note: ${card.title || 'Untitled Note'}`);
+      choice.setAttribute('aria-label', `${selectingCards ? 'Select' : 'Open'} note: ${card.title || 'Untitled'}`);
       if (current) choice.setAttribute('aria-current', 'true');
       if (selectingCards) choice.setAttribute('aria-pressed', String(selectedCardIDs.has(card.id)));
       const name = document.createElement('span');
-      name.textContent = (current ? activeCard.title : card.title) || 'Untitled Note';
+      name.textContent = (current ? activeCard.title : card.title) || 'Untitled';
       choice.append(name);
       choice.addEventListener('click', () => {
         if (!state.selectingCards) {
