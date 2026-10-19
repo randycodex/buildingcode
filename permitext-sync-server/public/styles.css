@@ -19863,17 +19863,18 @@ dialog.report-screen {
 .notebook-note-menu > summary::-webkit-details-marker { display: none; }
 .notebook-note-menu > summary::before { content: ''; width: 5px; height: 5px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(45deg); margin-top: -3px; }
 .notebook-note-menu:is([open], :hover) > summary { color: var(--text-primary); }
-.notebook-note-menu-items { position: absolute; top: calc(100% + 8px); right: 0; z-index: 10; width: min(320px, calc(100vw - 48px)); max-height: min(360px, calc(100dvh - 160px)); overflow-y: auto; gap: 0; }
-.notebook-note-menu .notebook-card-list { display: block; padding: 0; background: transparent; overflow: visible; }
+.notebook-note-menu-items { position: absolute; top: calc(100% + 8px); right: 0; z-index: 10; grid-template-columns: minmax(0, 1fr); width: min(320px, calc(100vw - 48px)); max-height: min(360px, calc(100dvh - 160px)); overflow-x: hidden; overflow-y: auto; gap: 0; }
+.notebook-note-menu .notebook-card-list { display: block; min-width: 0; padding: 0; background: transparent; overflow: visible; }
 .notebook-note-menu .notebook-card-tile { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 8px 10px; border: 0; border-radius: 8px; color: var(--text-primary); font: inherit; }
-.notebook-note-menu .notebook-card-tile > span { min-width: 0; overflow-wrap: anywhere; }
+.notebook-note-menu .notebook-card-tile > span { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
 .notebook-note-menu .notebook-card-tile[aria-current='true'] { background: var(--menu-highlight); font-weight: 600; }
-.notebook-note-menu .notebook-card-tile small { font-size: 11px; white-space: nowrap; }
+.notebook-note-menu .notebook-card-tile small { flex: 0 0 auto; font-size: 11px; white-space: nowrap; }
 .notebook-note-menu .notebook-card-tile:is(:hover, :focus-visible), .notebook-note-menu .notebook-card-row.is-selected .notebook-card-tile { background: var(--menu-highlight); }
-.notebook-note-menu-footer { display: flex; align-items: center; margin-top: 0; border: 0; }
-.notebook-note-menu-footer .notebook-card-add-action { flex: 1; min-height: 0; height: auto; padding: 8px 10px; border: 0; border-radius: 8px; color: var(--text-primary); font: inherit; }
+.notebook-note-menu-footer { display: flex; flex-wrap: wrap; align-items: center; min-width: 0; margin-top: 0; border: 0; }
+.notebook-note-menu-footer .notebook-card-add-action { flex: 1 1 auto; min-width: 0; width: auto; min-height: 0; height: auto; padding: 8px 10px; border: 0; border-radius: 8px; color: var(--text-primary); font: inherit; white-space: normal; }
 .notebook-note-menu-footer .notebook-card-add-action:hover { background: var(--menu-highlight); }
-.notebook-note-menu .notebook-card-rail-actions { position: static; display: flex; margin-left: auto; gap: 6px; transform: none; }
+.notebook-note-menu .notebook-card-rail-actions { position: static; display: flex; flex-wrap: wrap; min-width: 0; margin-left: auto; gap: 6px; transform: none; }
+.notebook-note-menu .notebook-card-rail-actions > button { flex: 0 0 auto; }
 body .panel-track > article.workspace-panel.notebook-panel .notebook-title-control :is(.notebook-title-text, .notebook-title-editor) { font-size: 26px !important; }
 body .panel-track > article.workspace-panel.notebook-panel .notebook-note-menu > summary,
 body .panel-track > article.workspace-panel.notebook-panel .notebook-add-to-report { font-size: 12px !important; }
