@@ -11836,6 +11836,10 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   margin-top: var(--space-2);
 }
 
+.saved-panel .saved-content > .saved-code-group.is-collapsed:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
 .saved-panel .saved-code-group .saved-row {
   padding: var(--space-2) 0;
   border-bottom: 1px solid var(--border);
