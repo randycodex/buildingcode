@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-reset-reader-layout-v1207";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-repeat-reader-reference-v1208";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
@@ -130,7 +130,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-reset-reader-layout-v1207";
+} from "./offline-storage.js?v=20261019-repeat-reader-reference-v1208";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -163,7 +163,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-reset-reader-layout-v1207";
+} from "./workspace-state.js?v=20261019-repeat-reader-reference-v1208";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -17718,6 +17718,27 @@ async function resolveInlineCodeSection(codePrefix, sectionNumber, codeVersion =
   return inlineReferenceSearchResult(payload.results, codePrefix, sectionNumber);
 }
 
+function readerAlreadyAtReferenceTarget(reader, detail) {
+  const destination = readerFieldsForSectionDetail(detail);
+  if (!destination.sectionID || ["codePrefix", "codeVersion", "chapterID", "sectionID"].some(key =>
+    String(reader[key] || "") !== String(destination[key] || ""))) return false;
+  const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"]`);
+  if (!panel?.isConnected || panel.dataset.workspacePaneLoading ||
+      ["is-collapsed", "is-workflow-hidden", "is-group-hidden", "is-column-strip", "is-column-tab-hidden"].some(name => panel.classList.contains(name)) ||
+      panel.dataset.readerContentKey !== readerContentScrollKey(reader) ||
+      panel.dataset.readerPublicCorpusGeneration !== String(publicCodeRevision.generation)) return false;
+  const content = panel.querySelector(".reader-content");
+  if (!content || content.classList.contains("is-searching-reader")) return false;
+  const title = readerSectionTitleNode(savedReaderTarget(content, destination));
+  if (!title?.isConnected) return false;
+  const titleBounds = title.getBoundingClientRect();
+  const headerOffset = Number.parseFloat(getComputedStyle(panel, "::before").height);
+  const headerBottom = panel.getBoundingClientRect().top + headerOffset;
+  return titleBounds.height > 0 && Number.isFinite(headerBottom) &&
+    Math.abs(titleBounds.top - headerBottom) <= 4 &&
+    titleBounds.top < content.getBoundingClientRect().bottom;
+}
+
 async function openReferenceInAdjacentReader(sourceReader, detail) {
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
@@ -17747,6 +17768,11 @@ async function openReferenceInAdjacentReader(sourceReader, detail) {
     reader.id !== sourceReader.id &&
     reader.referenceSourceReaderID === sourceReader.id
   );
+  if (targetReader && readerAlreadyAtReferenceTarget(targetReader, detail)) {
+    updateBrowserSectionURL(targetReader.sectionID);
+    scrollPaneIntoView(paneIDForReader(targetReader));
+    return;
+  }
   const canAddReader = isProAccount() || state.readers.length < 2;
   if (!targetReader && canAddReader) {
     targetReader = newReaderState({
