@@ -140,11 +140,6 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
       const name = document.createElement('span');
       name.textContent = (current ? activeCard.title : card.title) || 'Untitled Note';
       choice.append(name);
-      if (current) {
-        const status = document.createElement('small');
-        status.textContent = 'Current';
-        choice.append(status);
-      }
       choice.addEventListener('click', () => {
         if (!state.selectingCards) {
           menu.open = false;
