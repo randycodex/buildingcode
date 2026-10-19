@@ -36,7 +36,7 @@ c.rememberNotebookReturnCard(identity, "stale");
 assert.equal(c.positions.size, 100);
 assert.equal(c.readNotebookReturnCard({ ...identity, projectID: "100" }, cards), "");
 
-const branchStart = source.indexOf("      const pendingCardID = pendingNotebookCardByProject.get(projectID);", source.indexOf("async function renderProjectNotebook("));
+const branchStart = source.indexOf("      const pendingCardID = column.cardID || pendingNotebookCardByProject.get(projectID);", source.indexOf("async function renderProjectNotebook("));
 const branchEnd = source.indexOf("\n    } else {\n      await renderFocusedCard();", branchStart);
 assert.ok(branchStart >= 0 && branchEnd > branchStart);
 const branch = source.slice(branchStart, branchEnd);
@@ -50,14 +50,14 @@ async function scenario({ status = null, explicit = false, stale = "", onlyRemem
     cards: onlyRemembered ? [{ id: "remembered" }] : [...cards],
     pendingNotebookCardByProject: new Map(explicit ? [["project", "first"]] : []),
     disposed: false, requestIdentity: 1, isCurrentAccountRequest: () => true,
-    activeWorkspaceID: "a", notebookMounts: new Map([["project", mountState]]), mountState,
+    activeWorkspaceID: "a", paneID: "notebook", column: {}, notebookColumnMounts: new Map([["notebook", mountState]]), mountState, publishNotebookColumn(){},
     activeCard: { id: "remembered" },
     async loadCard(id) {
       calls.push(id);
       if (calls.length !== 1 || status === null) return;
       if (stale === "account") f.isCurrentAccountRequest = () => false;
       if (stale === "workspace") f.activeWorkspaceID = "b";
-      if (stale === "mount") f.notebookMounts.set("project", {});
+      if (stale === "mount") f.notebookColumnMounts.set("notebook", {});
       if (stale === "disposed") f.disposed = true;
       throw error;
     },

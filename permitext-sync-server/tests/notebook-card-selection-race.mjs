@@ -12,8 +12,8 @@ const identityStart = source.indexOf('  const notebookCardIdentities = new WeakM
 const identityEnd = source.indexOf('  let cards = [];', identityStart);
 assert.ok(identityStart > 0 && identityEnd > identityStart);
 const identityImplementation = source.slice(identityStart, identityEnd);
-const newStart = source.indexOf('    newButton.addEventListener("click", async () => {', end);
-const newEnd = source.indexOf('\n\n    renderCardList();', newStart);
+const newStart = source.indexOf('    const createLocalNotebookNote = async () => {', end);
+const newEnd = source.indexOf('    mountState.createLocalNote =', newStart);
 assert.ok(newStart > end && newEnd > newStart);
 const newImplementation = source.slice(newStart, newEnd);
 const plain = value => JSON.parse(JSON.stringify(value));
@@ -75,7 +75,7 @@ function harness() {
     confirmWebWarning: async () => true
   });
   vm.runInContext(identityImplementation + implementation + '\nglobalThis.load = loadCard;', c);
-  vm.runInContext(newImplementation, c);
+  vm.runInContext(newImplementation+'\nglobalThis.createNew=createLocalNotebookNote;', c);
   return {c, calls, drafts, responses, published, saved, scheduled, statuses,
     hold(stage, id, occurrence = 1) {
       let release;

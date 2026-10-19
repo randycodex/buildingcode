@@ -1,4 +1,5 @@
 import { normalizeVisitedWorkflowViews } from "./minimal-workflow.js";
+import { normalizeNotebookColumns } from "./notebook-columns.js?v=2";
 import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=9";
 const workspaceRegistryVersion = 3;
 const defaultWorkspaceName = "General";
@@ -29,6 +30,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "researchViewState",
   "workboards",
   "notebooks",
+  "notebookColumns",
   "reportDrafts",
   "coordinations",
   "coordinationThreads",
@@ -262,6 +264,7 @@ export function emptyWorkspaceLayout() {
     researchConversationID: "",
     workboards: [],
     notebooks: [],
+    notebookColumns: [],
     reportDrafts: [],
     coordinations: [],
     coordinationThreads: [],
@@ -362,6 +365,7 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.projectFactsOpen = Boolean(activeProject && source.projectFactsOpen === true);
   layout.workboards = genericWorkboardState(source.workboards);
   layout.notebooks = openProjectToolState(source.notebooks, layout.projectDetails);
+  layout.notebookColumns = normalizeNotebookColumns(source.notebookColumns);
   layout.reportDrafts = openProjectToolState(source.reportDrafts, layout.projectDetails);
   layout.coordinations = openProjectToolState(source.coordinations, layout.projectDetails);
   layout.coordinationThreads = Array.isArray(source.coordinationThreads)

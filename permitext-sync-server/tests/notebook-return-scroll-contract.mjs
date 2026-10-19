@@ -47,13 +47,13 @@ function fixture() {
   const frames = [], writes = [], focusRestores = [];
   const panel = element(), editorElement = element(), shell = element(), mountState = {};
   const context = vm.createContext({
-    panel, editorElement, shell, mountState, projectID: "project-a", disposed: false,
+    toolbar: element(), draftStatus: element(), panel, editorElement, shell, mountState, projectID: "project-a", disposed: false,
     requestIdentity: 1, isCurrentAccountRequest: identity => identity === 1,
     renderSequence: 1, editorRenderSequence: 1, activeCard: { id: "card-a" }, focusedCardID: "card-a",
-    notebookMounts: new Map([["project-a", mountState]]), returnScrollContext: {},
+    paneID: "notebook-a", notebookColumnMounts: new Map([["notebook-a", mountState]]), returnScrollContext: {},
     rememberNotebookReturnScroll: (...args) => writes.push(args),
     releaseNotebookReturnScroll() {}, captureNotebookReturnScroll: null,
-    draftDocument: {}, notebookReadOnly: false, notebookObjectURLs: new Set(), notebookEditingPositions: new Map(),
+    createNotebookPassageDisclosure:()=>({dispose(){}}), focusedPassageDisclosure: null, passageDisclosure: null, draftDocument: {}, notebookReadOnly: false, notebookObjectURLs: new Set(), notebookEditingPositions: new Map(),
     readNotebookReturnScroll: () => ({ scrollTop: 321, shellScrollTop: 45 }),
     window: { requestAnimationFrame: callback => frames.push(callback) }, editorMount: null,
     module: { mountPermitextNotebookEditor(_element, options) {
@@ -77,7 +77,7 @@ function fixture() {
   f.editorElement.scrollTop = 400;
   f.context.captureNotebookReturnScroll();
   assert.equal(f.writes.length, 1);
-  f.context.notebookMounts.set("project-a", {});
+  f.context.notebookColumnMounts.set("notebook-a", {});
   f.context.captureNotebookReturnScroll();
   assert.equal(f.writes.length, 1, "Replaced mount cannot capture scroll");
   f.context.releaseNotebookReturnScroll();
@@ -90,7 +90,7 @@ for (const invalidate of [
   f => { f.context.activeCard = { id: "another-card" }; },
   f => { f.context.isCurrentAccountRequest = () => false; },
   f => { f.panel.isConnected = false; },
-  f => { f.context.notebookMounts.set("project-a", {}); }
+  f => { f.context.notebookColumnMounts.set("notebook-a", {}); }
 ]) {
   const f = fixture();
   f.context.options.onReady();

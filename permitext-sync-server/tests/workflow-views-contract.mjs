@@ -64,7 +64,7 @@ let reportOpen=false, detailsOpen=false;
 const c=vm.createContext({columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){reportOpen=false;}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){detailsOpen=false;}},toggleSettingsButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
   document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
-  syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){},schedulePaneDividerAddControls(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
+  syncNotebookNoteTabs(){},ensureNotebookTabCatalog:async()=>{},syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){},schedulePaneDividerAddControls(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
   defaultActivePaneIDs:()=>panes.map(p=>p.dataset.paneId),
   appendPaneSequence(actualPanes){actualPanes.forEach((p,i)=>assert.equal(p,panes[i]));for(const p of actualPanes){p.hidden=!c.workflowPaneIsVisible(p.dataset.paneId);p.scrollTop=0;}},
   projectHasOpenNotebook:()=>panes.includes(notebook),savedPaneIDs:()=>[],placeEvidenceBeforeNotebook(){},
@@ -104,7 +104,7 @@ vm.runInContext(actual('closeAllColumns'),c);
 await c.closeAllColumns();
 assert.deepEqual(closed,['project:notebook:a'],'Close all only closes this view');
 
-// Research stays empty; Notebook keeps Notes available on entry.
+// Closed columns remain closed; the Notebook toolbar can reopen individual Notes.
 needProject=false;
 c.workspacePaneDescriptors=()=>panes.map(p=>({id:p.dataset.paneId,close:async()=>{
   panes.splice(panes.indexOf(p),1);
@@ -127,19 +127,19 @@ for (const view of ['research','notebook']) {
   await c.switchWorkflowView(view);
   await c.switchWorkflowView(view);
   assert.equal(afterOther,before,'Switching to a retained screen keeps its existing columns');
-  assert.equal(constructions,afterOther+(view==='notebook'?1:0),'Only Notes reopens when returning to an empty screen');
-  assert.equal(panes.length,view==='notebook'?2:1,'Research remains empty while Notebook restores Notes');
+  assert.equal(constructions,afterOther,'Switching views does not reopen deliberately closed Note columns');
+  assert.equal(panes.length,1,'Both views retain deliberate empty layouts');
 }
 panes.length=0;
 state.workflowVisitedViews=[];
 const beforeFresh=constructions;
 await c.switchWorkflowView('research');
 assert.equal(constructions,beforeFresh+1,'First empty Research visit still opens Search');
-console.log('Closed view regression passed: Research stays empty, Notes returns in Notebook, retained editors and saved layouts survive.');
+console.log('Closed view regression passed: Deliberately closed columns stay closed, retained editors and saved layouts survive.');
 
 const evidenceState={paneOrder:['reader:research','project:notebook:a','utility:saved:one','utility:saved:two']};
 const evidenceContext=vm.createContext({state:evidenceState,workspaceProject:()=>({id:'a'}),
-  projectHasOpenNotebook:()=>true,paneIDForProjectNotebook:()=> 'project:notebook:a',
+  projectHasOpenNotebook:()=>true,notebookPaneIDsForProject:()=> ['project:notebook:a'],paneIDForProjectNotebook:()=> 'project:notebook:a',
   defaultActivePaneIDs:()=>['reader:research','project:notebook:a','utility:saved:one','utility:saved:two']});
 vm.runInContext(actual('placePaneBefore')+'\n'+actual('placeEvidenceBeforeNotebook'),evidenceContext);
 for (const id of ['utility:saved:one','utility:saved:two']) {

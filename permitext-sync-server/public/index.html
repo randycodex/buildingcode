@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261019-note-title-writing-width-v1217">
+    <link rel="stylesheet" href="/web/styles.css?v=20261019-notebook-note-columns-v1220">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -91,7 +91,7 @@
             <span>Calculator</span>
           </button></div><div data-workflow-tools="notebook" hidden><button class="toolbar-button" id="toggle-saved" type="button" aria-label="Evidence" title="Evidence" aria-pressed="false" data-mobile-label="Evidence" data-workspace-icon="list-check">
             <span>Evidence</span>
-          </button><button class="toolbar-button" id="toggle-notebook" type="button" aria-label="Notes" title="Choose a Project to open Notebook" aria-pressed="false" disabled data-workspace-icon="sticky-notes">
+          </button><div id="notebook-note-tabs" class="notebook-note-tabs" role="group" aria-label="Project notes"></div><button class="toolbar-button notebook-new-note" id="new-notebook-note" type="button" aria-label="New Note" title="New Note" disabled>+</button></div><div hidden><button class="toolbar-button" id="toggle-notebook" type="button" aria-label="Notes" title="Choose a Project to open Notebook" aria-pressed="false" disabled data-workspace-icon="sticky-notes">
             <span>Notes</span>
           </button></div><div hidden><button class="toolbar-button" id="toggle-context" type="button" aria-label="Context" title="Choose a Project to open Context" aria-pressed="false" disabled>
             <span>Context</span>
@@ -582,6 +582,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261019-note-title-writing-width-v1217" type="module"></script>
+    <script src="/web/app.js?v=20261019-notebook-note-columns-v1220" type="module"></script>
   </body>
 </html>

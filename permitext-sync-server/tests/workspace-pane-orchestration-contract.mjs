@@ -162,7 +162,7 @@ const descriptorContext=vm.createContext({
   genericWorkboardIsOpen:()=>true,genericWorkboardIdentity:{id:'board'},
   paneIDForProjectWorkboard:()=> 'workboard',workboardProjectID:p=>p.id,renderProjectWorkboard:()=>buildEditor('workboard','projects'),closeGenericWorkboard:noop,
   openProjectDetails:()=>[{id:'project'}],projectDetailKey:p=>p.id,
-  projectHasOpenNotebook:()=>true,paneIDForProjectNotebook:()=> 'notebook',renderProjectNotebook:()=>buildEditor('notebook','notebook'),closeProjectNotebook:noop,
+  notebookColumnsForProject:()=>[{id:'primary',projectID:'project',open:true}],notebookColumnPaneID:()=> 'notebook',closeNotebookNoteColumn:noop,projectHasOpenNotebook:()=>true,paneIDForProjectNotebook:()=> 'notebook',renderProjectNotebook:()=>buildEditor('notebook','notebook'),closeProjectNotebook:noop,
   projectHasOpenReportDraft:()=>true,paneIDForProjectReportDraft:()=> 'report',renderProjectReportDraft:()=>buildEditor('report','professional-exports'),closeProjectReportDraft:noop,
   releaseSurfaceVisibility:{coordination:false},openCodeQuestionPaneIDs:()=>[],researchConversationPaneIsOpen:()=>false,supplementalResearchConversationIDs:[]
 });

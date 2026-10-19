@@ -7,7 +7,8 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-note-title-writing-width-v1217";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-notebook-note-columns-v1220";
+import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
@@ -130,7 +131,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-note-title-writing-width-v1217";
+} from "./offline-storage.js?v=20261019-notebook-note-columns-v1220";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -163,7 +164,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-note-title-writing-width-v1217";
+} from "./workspace-state.js?v=20261019-notebook-note-columns-v1220";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -357,6 +358,8 @@ const toggleSavedButton = document.querySelector("#toggle-saved");
 const toggleContextButton = document.querySelector("#toggle-context");
 const toggleFactsButton = document.querySelector("#toggle-facts");
 const toggleNotebookButton = document.querySelector("#toggle-notebook");
+const notebookTabs = document.querySelector("#notebook-note-tabs");
+const newNotebookNoteButton = document.querySelector("#new-notebook-note");
 const toggleReportButton = document.querySelector("#toggle-report");
 let projectToolTogglePending = false;
 const projectInformationMounts = new Map();
@@ -649,6 +652,14 @@ const workboardMounts = new Map();
 let notebookModulePromise = null;
 let notebookStylesPromise = null;
 const notebookMounts = new Map();
+const notebookCatalogs = new Map();
+const notebookCatalogRequests = new Map();
+const notebookColumnRegistry = createNotebookMountRegistry(notebookMounts, {openCard: async (projectID, cardID) => {
+  const project = workspaceProject();
+  if (!project || projectDetailKey(project) !== projectID) return false;
+  return openNotebookNoteColumn(project, {id: cardID});
+}});
+const notebookColumnMounts = notebookColumnRegistry.mounts;
 // Numeric reading positions only; private document/selection data stays within its mount.
 const notebookReturnScrollPositions = new Map();
 function notebookReturnScrollKey(context, cardID) {
@@ -932,6 +943,7 @@ function loadWorkspaceState(accountOverride) {
       notebooks: activeProjectDetail && savedNotebooks.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
+      notebookColumns: normalizeNotebookColumns(saved.notebookColumns),
       reportDrafts: activeProjectDetail && savedReportDrafts.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
@@ -1023,6 +1035,7 @@ function loadWorkspaceState(accountOverride) {
       researchEvidenceSplitRatios: {},
       workboards: [],
       notebooks: [],
+      notebookColumns: [],
       reportDrafts: [],
       coordinations: [],
       coordinationThreads: [],
@@ -2720,12 +2733,15 @@ async function openProjectCodeDecisions(project) {
 
 async function closeProjectNotebook(project) {
   if (!(await confirmNotebookDiscard(project))) return false;
-  const notebookID = paneIDForProjectNotebook(project);
+  const notebookIDs = notebookPaneIDsForProject(project);
   // Closing ends the explicit Research opt-in; Notebook can reopen at home.
-  if (state.workflowMembership) delete state.workflowMembership[notebookID];
+  for (const id of notebookIDs) {
+    if (state.workflowMembership) delete state.workflowMembership[id];
+    delete state.paneWeights[id];
+  }
+  notebookColumnsForProject(project).forEach(column => { column.open = false; });
   state.notebooks = openNotebooks().filter((item) => !projectDetailMatches(project, item));
-  delete state.paneWeights[notebookID];
-  state.paneOrder = (state.paneOrder || []).filter((id) => id !== notebookID);
+  state.paneOrder = (state.paneOrder || []).filter((id) => !notebookIDs.includes(id));
   syncProjectToolButtonStates(project);
   saveWorkspaceState();
   await transitionWorkspace("utility");
@@ -2743,7 +2759,9 @@ async function openProjectNotebook(project) {
     ...openNotebooks().filter((item) => !projectDetailMatches(identity, item)),
     identity
   ];
-  const notebookID = paneIDForProjectNotebook(identity);
+  const columns = notebookColumnsForProject(identity);
+  if (!columns.some(column => column.open)) columns[0].open = true;
+  const notebookID = notebookColumnPaneID(columns.find(column => column.open));
   state.paneWeights[notebookID] ||= defaultNotebookPaneWidth;
   if (!wasOpen) placeProjectToolPaneInControlOrder(identity);
   savedPaneIDs().forEach((paneID) => placeEvidenceBeforeNotebook(paneID, identity));
@@ -2753,6 +2771,181 @@ async function openProjectNotebook(project) {
   scrollPaneIntoView(notebookID);
   startProjectArtifactCheckpointLoop({ immediate: true });
   return true;
+}
+
+function notebookColumnsForProject(project) {
+  const projectID = projectDetailKey(project);
+  state.notebookColumns = normalizeNotebookColumns(state.notebookColumns);
+  let columns = state.notebookColumns.filter(column => column.projectID === projectID);
+  if (!columns.length && projectHasOpenNotebook(project)) {
+    const column = {id: 'primary', projectID, cardID: '', title: '', open: true};
+    state.notebookColumns.push(column); columns = [column];
+  }
+  return columns;
+}
+
+function notebookPaneIDsForProject(project) {
+  return notebookColumnsForProject(project).filter(column => column.open).map(notebookColumnPaneID);
+}
+
+function publishNotebookColumn(projectID, paneID, card, cards) {
+  if (cards) notebookCatalogs.set(projectID, cards.map(item => ({...item})));
+  const column = state.notebookColumns?.find(item => notebookColumnPaneID(item) === paneID);
+  if (column && card) {
+    const changed = column.cardID !== card.id || column.title !== card.title;
+    column.cardID = card.id || ''; column.title = card.title || '';
+    if (card.id) delete column.newNote;
+    if (changed) saveWorkspaceState();
+    const catalog = notebookCatalogs.get(projectID) || [];
+    if (card.id) {
+      const summary = catalog.find(item => item.id === card.id);
+      if (summary) Object.assign(summary, {title: card.title});
+      else catalog.push({...card});
+      notebookCatalogs.set(projectID, catalog);
+    }
+  }
+  const panel = notebookColumnMounts.get(paneID)?.panel;
+  if (panel && card) {
+    panel.dataset.noteId = card.id || '';
+    panel.querySelector('.notebook-heading .panel-kind').textContent = card.title || 'Untitled Note';
+  }
+  syncNotebookNoteTabs();
+}
+
+function syncNotebookNoteTabs() {
+  if (!notebookTabs || !newNotebookNoteButton) return;
+  const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
+  const projectID = project ? projectDetailKey(project) : '';
+  const catalog = notebookCatalogs.get(projectID) || [];
+  const columns = project ? notebookColumnsForProject(project) : [];
+  const notes = catalog.filter(card => !card.deletedAt && !card.archivedAt).map(card => ({...card}));
+  for (const column of columns) {
+    const live = notebookColumnMounts.get(notebookColumnPaneID(column))?.summary?.();
+    const note = notes.find(card => card.id === (live?.id || column.cardID));
+    if (note && live) note.title = live.title;
+    if (column.open && !column.cardID) notes.push({id: '', title: live?.title || column.title || 'New Note', column});
+  }
+  notebookTabs.replaceChildren();
+  for (const card of notes) {
+    const column = card.column || columns.find(item => item.cardID === card.id && item.open);
+    const button = document.createElement('button');
+    button.type = 'button'; button.className = 'toolbar-button notebook-note-tab';
+    button.textContent = card.title || 'Untitled Note';
+    button.title = button.textContent;
+    button.setAttribute('aria-label', `Open note: ${button.textContent}`);
+    button.setAttribute('aria-pressed', String(Boolean(column?.open)));
+    button.addEventListener('click', () => {
+      void openNotebookNoteColumn(project, card).catch(error => showWebNotice('Note not opened', error.message));
+    });
+    notebookTabs.append(button);
+  }
+  newNotebookNoteButton.disabled = !project || !hasCapability('notebook') || projectToolTogglePending;
+}
+
+async function ensureNotebookTabCatalog() {
+  const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
+  if (!project || !hasCapability('notebook')) return;
+  const projectID = projectDetailKey(project), identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  if (notebookCatalogs.has(projectID) || notebookCatalogRequests.has(projectID)) return;
+  const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID;
+  const request = postResearch('/notebook/cards/list', {projectID}).catch(async error => {
+    if (!privateCacheFallbackAllowed(error)) throw error;
+    const cached = await loadNotebookProjectSnapshot(identity.userID, projectID).catch(() => null);
+    return cached?.cardPayload || {cards:[]};
+  }).then(payload => {
+    if (!current()) return;
+    notebookCatalogs.set(projectID, payload.cards || []); syncNotebookNoteTabs();
+  }).catch(() => {}).finally(() => {
+    if (notebookCatalogRequests.get(projectID) === request) notebookCatalogRequests.delete(projectID);
+  });
+  notebookCatalogRequests.set(projectID, request);
+  await request;
+}
+
+async function openNotebookNoteColumn(project, card) {
+  const projectID = projectDetailKey(project), requestIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const navigationGeneration = state.workflowNavigationGeneration || 0;
+  const current = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    navigationGeneration === (state.workflowNavigationGeneration || 0) && projectDetailKey(workspaceProject()) === projectID;
+  if (!current() || !hasCapability('notebook')) return false;
+  let columns = notebookColumnsForProject(project);
+  let column = columns.find(item => item.open && card.id && item.cardID === card.id) ||
+    columns.find(item => item.id === card.column?.id) || columns.find(item => card.id && item.cardID === card.id);
+  if (!column) column = columns.find(item => item.open && !item.cardID && !notebookColumnMounts.get(notebookColumnPaneID(item))?.insertionTarget?.());
+  if (!column) {
+    column = {id: columns.length ? crypto.randomUUID() : 'primary', projectID, cardID: card.id || '', title: card.title || '', open: true};
+    state.notebookColumns ||= []; state.notebookColumns.push(column);
+  }
+  column.open = true; column.cardID = card.id || column.cardID; column.title = card.title || column.title;
+  if (card.newNote && !column.cardID) column.newNote = true;
+  const paneID = notebookColumnPaneID(column);
+  if (!projectHasOpenNotebook(project)) state.notebooks = [...openNotebooks(), projectIdentity(project)];
+  const view = currentColumnWorkflowView();
+  state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, view === 'research' ? 'research' : 'notebook');
+  state.paneWeights[paneID] ||= defaultNotebookPaneWidth;
+  const previous = columns.filter(item => item.open && notebookColumnPaneID(item) !== paneID).at(-1);
+  if (!(state.paneOrder || []).includes(paneID) && previous) placePaneAfter(notebookColumnPaneID(previous), paneID);
+  savedPaneIDs().forEach(id => placeEvidenceBeforeNotebook(id, project));
+  saveWorkspaceState();
+  await transitionWorkspace('utility');
+  if (!current() || !await whenWorkspacePaneReady(paneID) || !current()) return false;
+  const mount = notebookColumnMounts.get(paneID);
+  if (card.id && mount?.activeCardID() !== card.id) await mount?.focusCard?.(card.id);
+  if (!current()) return false;
+  notebookColumnRegistry.activate(paneID);
+  const panel = mount?.panel;
+  if (panel && paneIsCollapsed(paneID)) setPaneCollapsed(panel, false);
+  scrollPaneIntoView(paneID); syncNotebookNoteTabs();
+  return true;
+}
+
+async function closeNotebookNoteColumn(project, paneID) {
+  const requestIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  if (await notebookColumnMounts.get(paneID)?.confirmDiscardIfNeeded?.() === false) return false;
+  if (!isCurrentAccountRequest(requestIdentity) || workspaceID !== activeWorkspaceID) return false;
+  const column = notebookColumnsForProject(project).find(item => notebookColumnPaneID(item) === paneID);
+  if (column) column.open = false;
+  if (!notebookColumnsForProject(project).some(item => item.open)) state.notebooks = openNotebooks().filter(item => !projectDetailMatches(item, project));
+  if (state.workflowMembership) delete state.workflowMembership[paneID];
+  state.paneOrder = (state.paneOrder || []).filter(id => id !== paneID);
+  saveWorkspaceState(); await transitionWorkspace('utility'); syncNotebookNoteTabs();
+  return true;
+}
+
+async function retireNotebookNoteColumns(project, cardID) {
+  const columns = notebookColumnsForProject(project);
+  columns.filter(column => column.cardID === cardID).forEach(column => { column.open = false; });
+  if (!columns.some(column => column.open)) state.notebooks = openNotebooks().filter(item => !projectDetailMatches(item, project));
+  saveWorkspaceState(); await transitionWorkspace('utility'); syncNotebookNoteTabs();
+}
+
+async function createNotebookNoteColumn(project = workspaceProject()) {
+  if (!project || projectToolTogglePending || !hasCapability('notebook')) return;
+  const requestIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID, projectID = projectDetailKey(project);
+  const navigationGeneration = state.workflowNavigationGeneration || 0;
+  const current = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    navigationGeneration === (state.workflowNavigationGeneration || 0) && projectDetailKey(workspaceProject()) === projectID;
+  projectToolTogglePending = true; syncNotebookNoteTabs();
+  try {
+    if (navigator.onLine === false) {
+      const column = notebookColumnsForProject(project).find(item => item.newNote && !item.cardID);
+      await openNotebookNoteColumn(project, {id:'', title:column?.title || 'New Note', newNote:true, column});
+      return;
+    }
+    const catalog = notebookCatalogs.get(projectID) || [];
+    let number = 1; while (catalog.some(card => card.title === `Note ${number}`)) number++;
+    const payload = await postResearch('/notebook/cards/save', {projectID, clientMutationID: crypto.randomUUID(),
+      expectedVersion: 0, cardType: 'finding', title: `Note ${number}`, document: emptyNotebookDocument(), evidenceLinks: []});
+    if (!current()) return;
+    notebookCatalogs.set(projectID, [...catalog.filter(card => card.id !== payload.card.id), payload.card]);
+    const opened = await openNotebookNoteColumn(project, payload.card);
+    if (opened && current()) {
+      const column = notebookColumnsForProject(project).find(item => item.open && item.cardID === payload.card.id);
+      if (column) notebookColumnMounts.get(notebookColumnPaneID(column))?.editTitle?.();
+    }
+  } catch (error) {
+    if (current()) await showWebNotice('Note not created', error.message);
+  } finally { projectToolTogglePending = false; syncNotebookNoteTabs(); }
 }
 
 async function closeProjectReportDraft(project) {
@@ -3010,14 +3203,12 @@ function cleanupInactiveWorkboardMounts(panes) {
 }
 
 function cleanupInactiveNotebookMounts(panes) {
-  const activeProjectIDs = new Set(panes
+  const activePaneIDs = new Set(panes
     .filter((pane) => pane.classList.contains("notebook-panel"))
-    .map((pane) => pane.dataset.projectId)
+    .map((pane) => pane.dataset.paneId)
     .filter(Boolean));
-  notebookMounts.forEach((mounted, projectID) => {
-    if (activeProjectIDs.has(projectID)) return;
-    mounted.dispose?.();
-    notebookMounts.delete(projectID);
+  notebookColumnMounts.forEach((_mounted, paneID) => {
+    if (!activePaneIDs.has(paneID)) notebookColumnRegistry.remove(paneID);
   });
 }
 
@@ -4526,13 +4717,15 @@ function syncWorkflowNavigation() {
   updateWorkspaceLayoutControls();
   syncResearchColumnLayout();
   schedulePaneDividerAddControls();
+  syncNotebookNoteTabs();
+  if (view === 'notebook') void ensureNotebookTabCatalog();
 }
 async function switchWorkflowView(view) {
   closeSharedWorkspaceViews();
   if (notifyProjectRequiredForColumn()) return false;
   view = normalizeWorkflowView(view);
   const visitedViews = state.workflowVisitedViews || [];
-  const initializeNotebook = view === "notebook" && !projectHasOpenNotebook(workspaceProject());
+  const initializeNotebook = view === "notebook" && !visitedViews.includes(view) && !projectHasOpenNotebook(workspaceProject());
   if (view !== currentWorkflowView()) {
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     state.workflowView = view;
@@ -4559,7 +4752,7 @@ function defaultActivePaneIDs() {
   const ids = [];
   if (genericWorkboardIsOpen()) ids.push(paneIDForProjectWorkboard(genericWorkboardIdentity));
   openProjectDetails().forEach((detail) => {
-    if (projectHasOpenNotebook(detail)) ids.push(paneIDForProjectNotebook(detail));
+    if (projectHasOpenNotebook(detail)) ids.push(...notebookPaneIDsForProject(detail));
     if (projectHasOpenCoordination(detail)) {
       ids.push(paneIDForProjectCoordination(detail));
       const thread = openCoordinationThreadForProject(detail);
@@ -4586,7 +4779,7 @@ function defaultActivePaneIDs() {
 
 function projectWorkspacePaneIDs(detail) {
   const activeIDs = [
-    ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
+    ...notebookPaneIDsForProject(detail),
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
     ...(openCoordinationThreadForProject(detail)
       ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
@@ -4604,7 +4797,7 @@ function projectToolPaneIDs(detail) {
   return [
     paneIDForProjectInformation(detail, "context"),
     paneIDForProjectInformation(detail, "facts"),
-    paneIDForProjectNotebook(detail),
+    ...notebookPaneIDsForProject(detail),
     paneIDForProjectReportDraft(detail),
     paneIDForProjectCoordination(detail),
     ...(openCoordinationThreadForProject(detail)
@@ -4892,7 +5085,8 @@ function placePaneBefore(anchorPaneID, paneID) {
 
 function placeEvidenceBeforeNotebook(paneID, project = workspaceProject()) {
   if (!project || !projectHasOpenNotebook(project)) return false;
-  const notebookID = paneIDForProjectNotebook(project);
+  const notebookID = notebookPaneIDsForProject(project)[0];
+  if (!notebookID) return false;
   const order = state.paneOrder || [];
   if (order.indexOf(paneID) >= 0 && order.indexOf(paneID) < order.indexOf(notebookID)) return false;
   placePaneBefore(notebookID, paneID);
@@ -5077,6 +5271,7 @@ function syncTopbarProjectToolStates() {
       : sharedReport ? "Report editing is unavailable for shared-only Projects."
       : `${opened ? (["Notes", "Report"].includes(label) ? "Focus" : "Close") : "Open"} ${label} · ${identity.name}`;
   });
+  syncNotebookNoteTabs();
 }
 
 async function toggleProjectTool(tool) {
@@ -5300,7 +5495,7 @@ function placeArchiveAfterProjectsStack() {
   const projectIndex = ordered.indexOf(primarySavedPaneID());
   const projectStackIDs = openProjectDetails().flatMap((detail) => [
     paneIDForProjectDetail(detail),
-    ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
+    ...notebookPaneIDsForProject(detail),
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
     ...(openCoordinationThreadForProject(detail)
       ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
@@ -5317,7 +5512,7 @@ function placeArchiveAfterProjectsStack() {
 function restoreProjectsStackOrder(sourcePaneID = "") {
   const detailIDs = openProjectDetails().flatMap((detail) => [
     paneIDForProjectDetail(detail),
-    ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
+    ...notebookPaneIDsForProject(detail),
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
     ...(openCoordinationThreadForProject(detail)
       ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
@@ -8435,6 +8630,8 @@ function replaceActiveAccount(nextAccount, options = {}) {
   document.querySelectorAll(".command-palette-backdrop, .project-sheet-overlay").forEach((node) => node.remove());
   notebookMounts.forEach((mount) => mount.dispose());
   notebookMounts.clear();
+  notebookCatalogs.clear();
+  notebookCatalogRequests.clear();
   projectInformationMounts.clear();
   reportDraftMounts.forEach((mount) => mount.dispose());
   reportDraftMounts.clear();
@@ -11608,8 +11805,7 @@ async function flushPendingNotebookDrafts() {
       requireCurrentAccountRequest(requestIdentity);
       if (draft.recoveryConflict || (draft.scope && draft.scope !== "notebook-card")) continue;
       const mount = notebookMounts.get(draft.projectID);
-      if (mount?.activeCardID?.() === (draft.cardID || "")) {
-        await mount.syncDraft?.();
+      if (await mount?.syncCard?.(draft.cardID || "")) {
         continue;
       }
       try { await synchronizeNotebookDraft(draft, requestIdentity); }
@@ -16527,9 +16723,9 @@ async function openCalculationNotebook(project, card) {
   pendingNotebookCardByProject.set(projectID, card.id);
   try {
     if (!await openProjectNotebook(project) || !current()) return;
-    const paneID = paneIDForProjectNotebook(project);
-    if (!await whenWorkspacePaneReady(paneID) || !current()) return;
     const mount = notebookMounts.get(projectID);
+    const paneID = mount?.panel?.dataset.paneId || paneIDForProjectNotebook(project);
+    if (!await whenWorkspacePaneReady(paneID) || !current()) return;
     await mount?.refreshCards?.();
     if (!current()) return;
     await mount?.focusCard?.(card.id);
@@ -25980,8 +26176,9 @@ function renderResearchNotebookHandoff(conversation, message) {
         destinationWorkflowGeneration === (state.workflowNavigationGeneration || 0);
       if (originWorkspaceID === activeWorkspaceID) requestLinkedPanePlacement(originPaneID, paneIDForProjectNotebook(project));
       if (!await openProjectNotebook(project)) return;
-      if (!destinationIsCurrent() || !await whenWorkspacePaneReady(paneIDForProjectNotebook(project)) || !destinationIsCurrent()) return;
       const mount = notebookMounts.get(researchProjectID(project));
+      const notebookID = mount?.panel?.dataset.paneId || paneIDForProjectNotebook(project);
+      if (!destinationIsCurrent() || !await whenWorkspacePaneReady(notebookID) || !destinationIsCurrent()) return;
       await mount?.refreshCards?.();
       if (!destinationIsCurrent()) return;
       if (mount?.activeCardID?.() !== savedCard.id) await mount?.focusCard?.(savedCard.id);
@@ -27725,7 +27922,7 @@ async function appendNotebookDeviceRecovery(container, projectID, identity) {
 }
 
 async function renderProjectNotebook(project, options = {}) {
-  if (!hasCapability("notebook")) return renderProLockedPane(paneIDForProjectNotebook(project), "Notes");
+  if (!hasCapability("notebook")) return renderProLockedPane(options.column ? notebookColumnPaneID(options.column) : paneIDForProjectNotebook(project), "Notes");
   const requestIdentity = captureAccountRequest();
   const accountUserID = requestIdentity.userID;
   const notebookRequest = (path, values) => {
@@ -27734,8 +27931,9 @@ async function renderProjectNotebook(project, options = {}) {
   };
   const identity = projectIdentity(project);
   const projectID = projectDetailKey(identity);
-  const paneID = paneIDForProjectNotebook(identity);
-  notebookMounts.get(projectID)?.dispose?.();
+  const column = options.column || notebookColumnsForProject(identity).find(item => item.open) || {id:'primary', projectID, cardID:''};
+  const paneID = notebookColumnPaneID(column);
+  notebookColumnRegistry.remove(paneID);
 
   const panel = document.createElement("article");
   panel.className = "workspace-panel notebook-panel";
@@ -27760,7 +27958,7 @@ async function renderProjectNotebook(project, options = {}) {
   closeButton.setAttribute("aria-label", "Close notes");
   closeButton.innerHTML = circleXIconSVG();
   closeButton.addEventListener("click", () => {
-    void closeProjectNotebook(identity);
+    void closeNotebookNoteColumn(identity, paneID);
   });
   header.append(heading, closeButton, dragHandle);
 
@@ -27912,10 +28110,15 @@ async function renderProjectNotebook(project, options = {}) {
 
   const mountState = {
     panel,
+    summary: () => activeCard,
     persistDraft: persistFocusedDraft,
     async syncDraft() { return flushNotebookAutosave(); },
     activeCardID() {
       return activeCard?.id || "";
+    },
+    async prepareCardMutation() {
+      if (dirty && !await flushNotebookAutosave()) return null;
+      return activeCard;
     },
     async confirmDiscardIfNeeded() {
       if (!dirty || !activeCard) return true;
@@ -27955,7 +28158,10 @@ async function renderProjectNotebook(project, options = {}) {
       window.removeEventListener("permitext:notebook-image-uploaded", notebookImageUploaded);
     }
   };
-  notebookMounts.set(projectID, mountState);
+  notebookColumnRegistry.register(projectID, paneID, mountState);
+  const focusThisColumn = () => notebookColumnRegistry.activate(paneID);
+  panel.addEventListener('pointerdown', focusThisColumn, {capture:true});
+  panel.addEventListener('focusin', focusThisColumn);
 
   if (!activeAccount()) {
     status.textContent = "Sign in from Account to use the private Project Notebook.";
@@ -28023,11 +28229,12 @@ async function renderProjectNotebook(project, options = {}) {
           updateNotebookCardManagement();
           return;
         }
-        void loadCard(card.id).catch((error) => showWebNotice("Note not opened", error.message));
+        void openNotebookNoteColumn(identity, card).catch((error) => showWebNotice("Note not opened", error.message));
       },
       onTitleChange(value) {
         if (disposed || notebookReadOnly || !isCurrentAccountRequest(requestIdentity) || !activeCard) return;
         activeCard.title = value;
+        publishNotebookColumn(projectID, paneID, activeCard);
         const summary = cards.find((card) => card.id && card.id === activeCard.id);
         if (summary) summary.title = value;
         markNotebookDirty();
@@ -28036,6 +28243,15 @@ async function renderProjectNotebook(project, options = {}) {
     const rail = noteMenu.menu;
     const railHeader = noteMenu.footer;
     const railLabel = noteMenu.label;
+    noteMenu.element.classList.add('has-note-columns');
+    noteMenu.toggle.hidden = true;
+    noteMenu.menu.classList.add('notebook-column-note-manager');
+    header.append(noteMenu.menu);
+    mountState.editTitle = () => noteMenu.editTitle();
+    mountState.openNoteManager = () => {
+      noteMenu.menu.open = true;
+      noteMenu.list.querySelector('button')?.focus({preventScroll:true});
+    };
     const newButton = noteMenu.createButton;
     const cardList = noteMenu.list;
     const archiveButton = document.createElement("button");
@@ -28443,6 +28659,11 @@ async function renderProjectNotebook(project, options = {}) {
 
     async function deleteNotebookCard(card, trigger, options = {}) {
       let target = card;
+      const openMount = [...notebookColumnMounts.values()].find(mount => mount.panel.dataset.projectId === projectID && mount.activeCardID() === card.id);
+      if (openMount) {
+        target = await openMount.prepareCardMutation();
+        if (!target) return false;
+      }
       if (activeCard?.id === card.id) {
         if (dirty && !(await flushNotebookAutosave())) return;
         target = activeCard;
@@ -28483,6 +28704,7 @@ async function renderProjectNotebook(project, options = {}) {
           renderCardList();
         }
         await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
+        await retireNotebookNoteColumns(identity, target.id);
         return true;
       } catch (error) {
         if (trigger) trigger.disabled = false;
@@ -28492,12 +28714,14 @@ async function renderProjectNotebook(project, options = {}) {
     }
 
     async function setNotebookCardArchived(card, archived) {
-      if (activeCard?.id === card.id && dirty && !(await flushNotebookAutosave())) return false;
+      const openMount = [...notebookColumnMounts.values()].find(mount => mount.panel.dataset.projectId === projectID && mount.activeCardID() === card.id);
+      const currentCard = openMount ? await openMount.prepareCardMutation() : card;
+      if (!currentCard) return false;
       try {
         const payload = await notebookRequest("/notebook/cards/archive", {
           projectID,
           cardID: card.id,
-          expectedVersion: activeCard?.id === card.id ? activeCard.version : card.version,
+          expectedVersion: currentCard.version,
           archived
         });
         const summary = notebookSummaryForCard(payload.card, payload.card);
@@ -28514,7 +28738,9 @@ async function renderProjectNotebook(project, options = {}) {
           foundation,
           cardPayload: { cards, access: { readOnly: notebookReadOnly } }
         }).catch(() => {});
+        renderCardList();
         await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
+        if (archived) await retireNotebookNoteColumns(identity, card.id);
         return true;
       } catch (error) {
         await showWebNotice(archived ? "Note not archived" : "Note not restored", error.message);
@@ -28556,6 +28782,7 @@ async function renderProjectNotebook(project, options = {}) {
     };
 
     function renderCardList() {
+      publishNotebookColumn(projectID, paneID, activeCard, cards);
       noteMenu.render({ cards, activeCard, showingArchivedCards, selectingCards, selectedCardIDs,
         readOnly: notebookReadOnly });
       updateNotebookCardManagement();
@@ -28597,10 +28824,11 @@ async function renderProjectNotebook(project, options = {}) {
         cardPayload: { cards, access: { readOnly: notebookReadOnly } }
       }).catch(() => {});
       if (dirty || !focusedCardID) return true;
-      if (!focusedSummary) {
+      if (!focusedSummary || focusedSummary.archivedAt || focusedSummary.deletedAt) {
         activeCard = null;
         draftDocument = emptyNotebookDocument();
         await renderFocusedCard();
+        await retireNotebookNoteColumns(identity, focusedCardID);
         return true;
       }
       if (
@@ -28614,7 +28842,7 @@ async function renderProjectNotebook(project, options = {}) {
 
     async function renderFocusedCard() {
       if (!disposed && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === returnScrollContext.workspaceID &&
-          notebookMounts.get(projectID) === mountState) {
+          notebookColumnMounts.get(paneID) === mountState) {
         rememberNotebookReturnCard(returnScrollContext, activeCard?.id || "");
       }
       editorRenderSequence += 1;
@@ -28866,7 +29094,7 @@ async function renderProjectNotebook(project, options = {}) {
           referenceID,
           label: referenceElement.dataset.referenceLabel || referenceElement.textContent || "Linked item",
           evidenceLink: (activeCard.evidenceLinks || []).find((link) => link.id === referenceID) || null
-        }, loadCard, paneID, projectID).catch((error) => showWebNotice("Linked item not opened", error.message));
+        }, cardID => openNotebookNoteColumn(identity, {id:cardID}), paneID, projectID).catch((error) => showWebNotice("Linked item not opened", error.message));
       };
       editorElement.addEventListener("click", (event) => {
         const referenceElement = event.target.closest?.("[data-permitext-reference]");
@@ -28962,7 +29190,7 @@ async function renderProjectNotebook(project, options = {}) {
       let scrollCaptureReady = false;
       const captureReturnScroll = () => {
         if (!scrollCaptureReady || disposed || !panel.isConnected || !editorElement.isConnected ||
-            !isCurrentAccountRequest(requestIdentity) || notebookMounts.get(projectID) !== mountState ||
+            !isCurrentAccountRequest(requestIdentity) || notebookColumnMounts.get(paneID) !== mountState ||
             renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
         rememberNotebookReturnScroll(returnScrollContext, focusedCardID, {
           scrollTop: editorElement.scrollTop, shellScrollTop: shell.scrollTop
@@ -29000,7 +29228,7 @@ async function renderProjectNotebook(project, options = {}) {
           const localPosition = notebookEditingPositions.get(focusedCardID);
           const position = localPosition || readNotebookReturnScroll(returnScrollContext, focusedCardID);
           window.requestAnimationFrame(() => {
-            if (disposed || !panel.isConnected || !editorElement.isConnected || notebookMounts.get(projectID) !== mountState ||
+            if (disposed || !panel.isConnected || !editorElement.isConnected || notebookColumnMounts.get(paneID) !== mountState ||
                 !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
             if (localPosition?.selection) editorMount?.restoreEditingPosition?.(localPosition.selection);
             if (position) {
@@ -29091,7 +29319,7 @@ async function renderProjectNotebook(project, options = {}) {
       selectButton.focus({ preventScroll: true });
     });
 
-    newButton.addEventListener("click", async () => {
+    const createLocalNotebookNote = async () => {
       const loadGeneration = ++notebookCardLoadGeneration;
       const workspaceID = activeWorkspaceID;
       const isCurrent = () => loadGeneration === notebookCardLoadGeneration && !disposed &&
@@ -29165,10 +29393,12 @@ async function renderProjectNotebook(project, options = {}) {
       dirty = false;
       renderCardList();
       await renderFocusedCard();
-    });
+    };
+    mountState.createLocalNote = createLocalNotebookNote;
+    newButton.addEventListener('click', () => void createNotebookNoteColumn(identity));
 
     renderCardList();
-    const unsavedDraft = await loadNotebookDraft(accountUserID, projectID, "").catch(() => null);
+    const unsavedDraft = column.cardID ? null : await loadNotebookDraft(accountUserID, projectID, "").catch(() => null);
     requireCurrentAccountRequest(requestIdentity);
     if (unsavedDraft?.document) {
       activeCard = {
@@ -29190,13 +29420,16 @@ async function renderProjectNotebook(project, options = {}) {
       renderCardList();
       await renderFocusedCard();
       scheduleNotebookAutosave();
-    } else if (cards.some(card => !card.deletedAt && !card.archivedAt)) {
-      const pendingCardID = pendingNotebookCardByProject.get(projectID);
+    } else if (column.newNote) {
+      await createLocalNotebookNote();
+    } else if (column.cardID || cards.some(card => !card.deletedAt && !card.archivedAt)) {
+      const pendingCardID = column.cardID || pendingNotebookCardByProject.get(projectID);
       const returnCardID = readNotebookReturnCard(returnScrollContext, cards);
-      const explicitCard = cards.find((card) => card.id === pendingCardID);
+      const explicitCard = cards.find((card) => card.id === pendingCardID) || (column.cardID ? {id: column.cardID, title: column.title} : null);
       const initialCard = explicitCard || cards.find((card) => card.id === returnCardID) ||
         cards.find(card => !card.deletedAt && !card.archivedAt);
       pendingNotebookCardByProject.delete(projectID);
+      publishNotebookColumn(projectID, paneID, initialCard);
       try {
         await loadCard(initialCard.id);
       } catch (error) {
@@ -29205,7 +29438,7 @@ async function renderProjectNotebook(project, options = {}) {
         const fallback = cards.find((card) => card.id !== initialCard.id && !card.deletedAt && !card.archivedAt);
         if (explicitCard || initialCard.id !== returnCardID || !unavailable || disposed ||
             !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== returnScrollContext.workspaceID ||
-            notebookMounts.get(projectID) !== mountState) throw error;
+            notebookColumnMounts.get(paneID) !== mountState) throw error;
         rememberNotebookReturnCard(returnScrollContext, "");
         cards = cards.filter((card) => card.id !== initialCard.id);
         if (fallback) await loadCard(fallback.id);
@@ -32536,10 +32769,8 @@ async function openCoordinationTarget(identity, foundation, thread) {
   if (thread.targetKind === "notebookCard") {
     pendingNotebookCardByProject.set(projectDetailKey(identity), thread.targetID);
     await openProjectNotebook(identity);
-    await transitionWorkspace("utility", {
-      refreshPaneIDs: [paneIDForProjectNotebook(identity)]
-    });
-    scrollPaneIntoView(paneIDForProjectNotebook(identity));
+    await notebookMounts.get(projectDetailKey(identity))?.focusCard?.(thread.targetID);
+    pendingNotebookCardByProject.delete(projectDetailKey(identity));
     return;
   }
   if (thread.targetKind === "reportDraft") {
@@ -42041,6 +42272,10 @@ function openColumnGroupMenu(panel, anchor) {
   });
   const factEditor = panel.classList.contains("project-facts-panel") ? projectInformationMounts.get(panel.dataset.paneId) : null;
   if (factEditor?.refreshZoLa) add("Refresh ZoLa data", factEditor.refreshZoLa, factEditor.isRefreshing());
+  if (panel.classList.contains('notebook-panel')) {
+    const note = notebookColumnMounts.get(panel.dataset.paneId);
+    if (note?.openNoteManager) add('Manage notes…', () => note.openNoteManager());
+  }
   if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
   if (panel.classList.contains("research-list-panel")) add("New research column", () => void openNewResearchColumn());
   separate();
@@ -46140,6 +46375,10 @@ function disposeUnpublishedWorkspacePane(pane) {
   if (!pane || pane.isConnected) return;
   cancelSearchPanelRequest(pane);
   disposeWorkspaceNodeAccess(pane);
+  if (notebookColumnMounts.get(pane.dataset.paneId)?.panel === pane) {
+    notebookColumnRegistry.remove(pane.dataset.paneId);
+    return;
+  }
   for (const mounts of [notebookMounts, reportDraftMounts, workboardMounts, projectInformationMounts]) {
     for (const [id, mounted] of mounts) {
       // A late result must never dispose a newer controller with the same ID.
@@ -46331,9 +46570,12 @@ function workspacePaneDescriptors(options = {}) {
   for (const project of openProjectDetails()) {
     const projectID = projectDetailKey(project);
     if (projectHasOpenNotebook(project)) {
-      foundationScope.register(paneIDForProjectNotebook(project));
-      add(paneIDForProjectNotebook(project), "Notes", () => renderProjectNotebook(project, { foundationScope }),
-        () => closeProjectNotebook(project), { foundationScope, ownerClass: "notebook-panel", projectID, accessCapabilities: ["notebook"] });
+      for (const column of notebookColumnsForProject(project).filter(item => item.open)) {
+        const paneID = notebookColumnPaneID(column);
+        foundationScope.register(paneID);
+        add(paneID, column.title || 'Notes', () => renderProjectNotebook(project, {foundationScope, column}),
+          () => closeNotebookNoteColumn(project, paneID), {foundationScope, ownerClass: 'notebook-panel', projectID, accessCapabilities: ['notebook']});
+      }
     }
     // Report owns a separate screen; never insert it into the column track.
     if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(project)) {
@@ -46918,6 +47160,10 @@ function bindImmediateUtilityControls() {
       void (["context", "facts"].includes(tool) ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ? openProjectReportDraft(workspaceProject()) : toggleProjectTool(tool));
     });
   });
+  if (newNotebookNoteButton && newNotebookNoteButton.dataset.coldStartBound !== 'true') {
+    newNotebookNoteButton.dataset.coldStartBound = 'true';
+    newNotebookNoteButton.addEventListener('click', () => void createNotebookNoteColumn());
+  }
   if (track.dataset.utilityFocusBound !== "true") {
     track.dataset.utilityFocusBound = "true";
     const remember = (event) => {

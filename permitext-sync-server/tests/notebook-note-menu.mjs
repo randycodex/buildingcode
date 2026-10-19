@@ -7,7 +7,7 @@ class Element {
   constructor(tag) {
     this.tagName = tag; this.children = []; this.attributes = {}; this.events = {};
     this.dataset = {}; this.hidden = false; this.disabled = false; this.open = false; this.value = '';
-    this.classList = { toggle: (name, on) => {
+    this.classList = { add: name => this.classList.toggle(name,true), toggle: (name, on) => {
       const names = new Set((this.className || '').split(' ').filter(Boolean));
       if (on) names.add(name); else names.delete(name);
       this.className = [...names].join(' ');
@@ -158,11 +158,12 @@ assert(setupStart>0 && setupEnd>setupStart && managementStart>setupEnd && manage
 const appCards=[{id:'a',title:'First Note',version:2},{id:'b',title:'Second Note',version:1},
   {id:'archived',title:'Archived Note',version:1,archivedAt:'2026-10-12'}];
 const c=vm.createContext({ createNotebookNoteMenu, notebookReadOnly:false, document,
-  shell:new Element('div'),panel:new Element('article'),draftStatus:new Element('p'),
+  shell:new Element('div'),panel:new Element('article'),header:new Element('header'),draftStatus:new Element('p'),mountState:{},
+  identity:{id:'project'},projectID:'project',paneID:'note-a',publishNotebookColumn(){},
   cards:appCards,activeCard:appCards[0],disposed:false,requestIdentity:'account',
   isCurrentAccountRequest:()=>true,dirtyWrites:0,opened:[],
   markNotebookDirty:()=>{c.dirtyWrites++},
-  loadCard:async id=>{c.opened.push(id)},showWebNotice:()=>{},
+  loadCard:async id=>{c.opened.push(id)},openNotebookNoteColumn:async(_project,card)=>{c.opened.push(card.id)},showWebNotice:()=>{},
   archiveIconSVG:()=>'',selectionModeIconSVG:()=>'',trashIconSVG:()=>'',activeProjectsIconSVG:()=>'',archiveRestoreIconSVG:()=>'' });
 vm.runInContext(source.slice(setupStart,setupEnd)+source.slice(managementStart,managementEnd)+
   '\nglobalThis.controls={noteMenu,render:renderCardList,selectButton,newButton,archiveButton,selectMode(){selectingCards=true;renderCardList()},archiveMode(){showingArchivedCards=true;selectingCards=false;renderCardList()}};',c);
