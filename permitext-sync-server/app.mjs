@@ -30,6 +30,7 @@ import { searchIndexedReaderChapter, ReaderSearchIndexError } from "./reader-sea
 import { chapterBodyContractResponse, publicCodeCorpusRevision } from "./chapter-body-contract.mjs";
 import { reportEvidenceEdition, reportResearchPlainText, reportEvidenceDisplayText } from "./report-presentation.mjs";
 import { researchFailureRecovery, researchRecoveryRequestDescription, researchRecoveryHumanContext } from "./public/research-failure-recovery.js";
+import { assistantScopeMode, assistantScopeVersion, emptyAssistantScope, isConversationOnly, assistantFactChoices, assistantProjectInformation, assistantEvidencePackage, assistantScopePrompt, assistantSuppliedText, assistantEmptyMaterialAnswer, assistantScopeInstruction, assistantUserMaterialInstruction, assistantScopeRetainsPreviousMaterial } from "./assistant-conversation-scope.mjs";
 import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
@@ -10869,6 +10870,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
         evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
       }
     : { ...baseConfiguration, promptVersion: `${researchWriterPolicyVersion}:compact-v3` };
+  if (options.conversationScope) configuration.promptVersion = assistantScopeVersion;
   const model = configuration.model;
   const luna6 = /^gpt-6-luna(?:-|$)/.test(model);
   const passageEvidence = evidence.map((section) => ({
@@ -11176,7 +11178,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
   // It cannot inherit a concurrent caller mutation or revise the answer.
   evidence = structuredClone(evidence);
   interpretation = structuredClone(interpretation);
-  options = { ...options, mappedScopeReview: structuredClone(options.mappedScopeReview),
+  options = { ...options, conversationScope: structuredClone(options.conversationScope), mappedScopeReview: structuredClone(options.mappedScopeReview),
     messages: structuredClone(options.messages), projectContextFacts: structuredClone(options.projectContextFacts),
     calculatorWorkFacts: structuredClone(options.calculatorWorkFacts),
     conversationFactContext: structuredClone(options.conversationFactContext),
@@ -11285,8 +11287,9 @@ export async function openAIResearchVerification(question, evidence, interpretat
       researchRulePacketInstruction,
       "For every failed claim, identify the affected claim and exact supplied passage or missing dependency in the issue detail. Distinguish a missing legal source from a missing project fact. Preserve independently supported conclusions; request a narrow correction to the defective clause rather than discarding unrelated supported explanation. A missing reference is only a defect when it can change the requested conclusion. Do not fail an answer merely because the completeness audit lists an unrelated dependency.",
       options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
-        researchSuppliedTextPrompt(options.suppliedText),
-        researchPriorSuppliedTextPrompt(options.priorSuppliedText),
+      assistantScopeInstruction(options.conversationScope),
+      options.conversationScope && options.suppliedText ? assistantUserMaterialInstruction : researchSuppliedTextPrompt(options.suppliedText),
+      researchPriorSuppliedTextPrompt(options.priorSuppliedText),
       "Evaluate every exception against ALL established project facts before requesting it. A building containing both retail and community-facility space cannot be treated as exclusively a school or house of worship merely because the community-facility subtype is unknown. Do not demand unresolved treatment of an exception whose necessary condition is contradicted by an established fact. Distinguish whole-building conditions from conditions applying only to one space.",
       "For an explanation of an ordinary or typical rule, judge the scoped answer requested. Do not fail a correct baseline merely because it omits a catalogue of special occupancies, equipment or configurations not proposed. A brief statement that special cases differ is sufficient unless an established fact activates a different rule. Still reject incorrect thresholds, invented applicability, or an unqualified universal claim contradicted by the evidence. Prefer removing an unnecessary ancillary claim to expanding the answer into unrelated exceptions.",
       "Report all material findings on the first review, including material scope conditions and exceptions. Evaluate relevance and source binding together: if a wrongly bound secondary claim is unnecessary to the answer, request its removal immediately instead of directing the writer to expand it or add citations and then rejecting that expansion as irrelevant on the next review. If the claim materially qualifies the result, request the precise missing binding and preserve its concise scope. Do not defer a finding to a later revision when it is already visible in the current answer and evidence.",
@@ -11333,6 +11336,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     ].join(" "),
     input: [
       `QUESTION\n${question}`,
+      assistantScopePrompt(options.conversationScope),
       options.codeBasis
         ? `RESEARCH CODE BASIS — DO NOT CLAIM ANOTHER EDITION WAS RETRIEVED\n${JSON.stringify(options.codeBasis)}`
         : "",
@@ -12427,7 +12431,7 @@ async function currentResearchEvidence(conversation) {
       .filter(Boolean)
   ));
   const relatedSectionIDs = Array.from(new Set(
-    (conversation.sources || [])
+    (isConversationOnly(conversation) ? [] : conversation.sources || [])
       .filter((source) => source.kind === "related" && !selectedSectionIDs.includes(source.sectionID))
       .map((source) => source.sectionID)
       .filter(Boolean)
@@ -18078,11 +18082,82 @@ async function handleResearchConversationList(request, response) {
   });
 }
 
+async function ensureAssistantConversationScope(userID, conversation) {
+  if (isConversationOnly(conversation)) return;
+  conversation.assistantScope = { ...emptyAssistantScope(), projectID: conversation.primaryProjectID || null };
+  conversation.projectContextReviewRequired = false;
+  Object.assign(conversation, resetResearchActiveContext(conversation, new Date().toISOString()));
+  conversation.updatedAt = new Date().toISOString();
+  await saveStoredResearchConversation(userID, conversation);
+}
+
+async function handleAssistantConversationMaterial(request, response) {
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
+  if (!context) return;
+  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
+  if (!conversation) return;
+  await ensureAssistantConversationScope(context.userID, conversation);
+  const access = conversation.primaryProjectID
+    ? await projectAccessForUser(context.userID, conversation.primaryProjectID) : null;
+  if (conversation.primaryProjectID && !access) { sendError(response, 404, "Project unavailable."); return; }
+  const information = access ? researchProjectInformation(access.projectID, access.project) : null;
+  const facts = assistantFactChoices(information);
+  const notes = access ? await notebookCardSummariesForProject(access.storageOwnerUserID, access.projectID) : [];
+  const scope = structuredClone(conversation.assistantScope);
+  if (context.body.action === "update") {
+    if (Number(context.body.expectedRevision) !== researchConversationRevision(conversation)) {
+      sendJSON(response, 409, { error: "The conversation changed. Reopen Included material and try again.", code: "RESEARCH_CONTEXT_CHANGED" }); return;
+    }
+    const fail = message => { sendError(response, 400, message); };
+    const ids = value => Array.isArray(value) && value.length <= 200 && value.every(id => typeof id === "string" && id.length <= 256);
+    if (!ids(context.body.factIDs) || !ids(context.body.noteIDs)) { fail("Choose valid facts and notes."); return; }
+    const chosenFacts = new Set(context.body.factIDs), chosenNotes = new Set(context.body.noteIDs);
+    if ([...chosenFacts].some(id => !facts.some(fact => fact.id === id)) ||
+        [...chosenNotes].some(id => !notes.some(note => note.id === id))) { fail("A selected fact or note is unavailable in this Project."); return; }
+    scope.includeProjectContext = context.body.includeProjectContext === true;
+    if (scope.includeProjectContext && !information) { fail("Choose a Project before including its context."); return; }
+    scope.projectContext = scope.includeProjectContext ? { address: information.address, description: information.description,
+      capturedAt: new Date().toISOString() } : null;
+    scope.facts = facts.filter(fact => chosenFacts.has(fact.id));
+    const existingNotes = new Map(scope.materials.filter(item => item.kind === "note").map(item => [item.cardID, item]));
+    scope.materials = scope.materials.filter(item => item.kind !== "note" && item.id !== context.body.removeMaterialID);
+    for (const noteID of chosenNotes) {
+      const note = await ownedNotebookArtifact(access.storageOwnerUserID, noteID);
+      if (!note) { fail("A selected note is unavailable."); return; }
+      const old = existingNotes.get(noteID);
+      const text = note.payload.document ? notebookPlainText(note.payload.document) : note.payload.plainText || "";
+      if (text.length > 30_000) { fail("This note is too long to include. Add a shorter excerpt as a comment."); return; }
+      scope.materials.push(old?.version === note.envelope.version ? old : { id: `note:${noteID}`, cardID: noteID,
+        kind: "note", title: note.payload.title || "Untitled", text, version: note.envelope.version,
+        capturedAt: new Date().toISOString() });
+    }
+    if (context.body.comment !== undefined) {
+      if (typeof context.body.comment !== "string" || context.body.comment.length > 12_000) { fail("A comment can contain up to 12,000 characters."); return; }
+      const text = context.body.comment.trim();
+      if (text) scope.materials.push({ id: randomUUID(), kind: "comment", title: "Comment", text, capturedAt: new Date().toISOString() });
+    }
+    if (scope.materials.length > 24 || JSON.stringify(scope).length > 120_000) { fail("Too much material is included. Remove an item before adding more."); return; }
+    const removeSources = new Set(Array.isArray(context.body.removeSourceIDs) ? context.body.removeSourceIDs : []);
+    const removedPassage = (conversation.sources || []).some(source => source.kind === "selection" && removeSources.has(source.id));
+    const retainsHistory = !removedPassage && assistantScopeRetainsPreviousMaterial(conversation.assistantScope, scope);
+    conversation.sources = (conversation.sources || []).filter(source => !removeSources.has(source.id));
+    conversation.assistantScope = scope;
+    conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
+    if (!retainsHistory) Object.assign(conversation, resetResearchActiveContext(conversation, new Date().toISOString()));
+    conversation.updatedAt = new Date().toISOString();
+    await saveStoredResearchConversation(context.userID, conversation);
+  }
+  sendJSON(response, 200, { conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+    choices: { facts, notes: notes.map(note => ({ id: note.id, title: note.title || "Untitled", version: note.version })),
+      projectContext: information ? { address: information.address, description: information.description } : null } });
+}
+
 async function handleResearchConversationGet(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
+  if (context.body.analysisMode === assistantScopeMode) await ensureAssistantConversationScope(context.userID, conversation);
   const projectLink = await researchConversationProjectLink(context.userID, conversation);
   const feedbackByAnswerID = new Map(
     (await listStoredResearchFeedback(context.userID)).map((feedback) => [feedback.answerID, feedback])
@@ -18490,6 +18565,7 @@ async function handleResearchConversationAssignProject(request, response) {
     updatedAt: now
   } : null;
   conversation.projectContextReviewRequired = false;
+  if (isConversationOnly(conversation)) conversation.assistantScope = { ...emptyAssistantScope(), projectID: targetProjectID };
   conversation.movedFromProjectID = currentProjectID;
   conversation.movedAt = now;
   Object.assign(conversation, resetResearchActiveContext(conversation, now));
@@ -18747,10 +18823,11 @@ function normalizedResearchConversationCreateRequestID(value) {
   return requestID;
 }
 
-function researchConversationCreateFingerprint({ projectID, selections, originSurface }) {
+function researchConversationCreateFingerprint({ projectID, selections, originSurface, analysisMode }) {
   const payload = {
     projectID: String(projectID || "").trim() || null,
     originSurface: normalizedResearchText(originSurface, 40),
+    ...(analysisMode === assistantScopeMode ? { analysisMode } : {}),
     selections: selections.map((selection) => ({
       sectionID: String(selection.sectionID || "").trim(),
       ...(selection.selectionMode === "section_reference" ? { selectionMode: "section_reference" } : {}),
@@ -18800,7 +18877,8 @@ async function handleResearchConversationCreate(request, response) {
       ? researchConversationCreateFingerprint({
           projectID,
           selections,
-          originSurface: context.body.originSurface
+          originSurface: context.body.originSurface,
+          analysisMode: context.body.analysisMode
         })
       : "";
     const lockKey = requestID ? `${context.userID}:${requestID}` : randomUUID();
@@ -18864,6 +18942,7 @@ async function handleResearchConversationCreate(request, response) {
           updatedAt: now
         } : null,
         projectContextReviewRequired: false,
+        ...(context.body.analysisMode === assistantScopeMode ? { assistantScope: { ...emptyAssistantScope(), projectID } } : {}),
         origin: selections.length
           ? researchOriginForSelections(selections, context.body.originSurface)
           : { kind: "chat" },
@@ -20075,13 +20154,13 @@ async function commitProjectContextOnlyResearchMessage({
 }
 
 async function commitMissingDocumentClarification({ context, conversation, originalConversation, question,
-  researchRequestID, progressResponse, evidenceSnapshots, clarificationReason = null, requestDescription = null, recoveryHumanContext = [] }) {
+  researchRequestID, progressResponse, evidenceSnapshots, clarificationReason = null, requestDescription = null, recoveryHumanContext = [], conversationScopeEmpty = false }) {
   const now = new Date().toISOString();
   const identity = researchRequestID ? researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID) : randomUUID();
   const common = { contextRevision: researchContextRevision(conversation), createdAt: now,
     ...(researchRequestID ? { researchRequestID } : {}) };
   const userMessage = { ...common, id: `${identity}:question`, role: "user", question };
-  const answer = clarificationReason ? researchClarificationAnswer(question, clarificationReason, { requestID: researchRequestID, requestDescription, humanContext: recoveryHumanContext })
+  const answer = conversationScopeEmpty ? assistantEmptyMaterialAnswer() : clarificationReason ? researchClarificationAnswer(question, clarificationReason, { requestID: researchRequestID, requestDescription, humanContext: recoveryHumanContext })
     : { ...researchEvidenceBoundaryInterpretation(question), mode: "evidence_boundary",
     model: "permitext-deterministic-evidence-boundary", authorityStatus: "evidence_boundary",
     authorityLabel: "Document needed — no determination", verification: { status: "evidence_boundary",
@@ -20120,6 +20199,12 @@ async function handleResearchConversationMessage(request, response) {
   if (!context) return;
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
+  if (context.body.analysisMode === assistantScopeMode) await ensureAssistantConversationScope(context.userID, conversation);
+  const conversationOnly = isConversationOnly(conversation);
+  const conversationScope = conversationOnly ? conversation.assistantScope : null;
+  if (conversationOnly && conversation.primaryProjectID && !await projectAccessForUser(context.userID, conversation.primaryProjectID)) {
+    sendJSON(response, 409, { error: "The conversation's Project is unavailable. Restore access before asking another question.", code: "RESEARCH_PROJECT_REVIEW_REQUIRED" }); return;
+  }
   const originalConversation = structuredClone(conversation);
   const activeMessages = activeResearchMessages(conversation);
   let topicContext = activeResearchTopicContext(conversation);
@@ -20191,6 +20276,9 @@ async function handleResearchConversationMessage(request, response) {
       code: "RESEARCH_REQUEST_ID_CONFLICT"
     });
     return;
+  }
+  if (conversationOnly && priorRequestMessage && Number(priorRequestMessage.contextRevision || 0) !== researchContextRevision(conversation)) {
+    progressResponse.json(409, { error: "Included material changed. Ask your question again using the current material.", code: "RESEARCH_CONTEXT_CHANGED" }); return;
   }
   const replayedAnswer = requestMessages.assistant;
   if (replayedAnswer) {
@@ -20348,7 +20436,7 @@ async function handleResearchConversationMessage(request, response) {
     const selections = (conversation.sources || []).filter((source) => source.kind === "selection");
     const projectLink = await researchConversationProjectLink(context.userID, conversation);
     const decisionLink = researchCodeDecisionLink(projectLink);
-    if (decisionLink && selections.length === 0) {
+    if (decisionLink && selections.length === 0 && !conversationOnly) {
       researchOperation.failureCode = "RESEARCH_EVIDENCE_REQUIRED";
       progressResponse.json(422, {
         error: "Add approved enacted evidence before using Research from a Code Decision.",
@@ -20357,10 +20445,8 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     const pinnedEvidence = selectedResearchEvidence(conversation, current.evidence);
-    const projectInformation = await currentResearchProjectInformation(
-      context.userID,
-      conversation.primaryProjectID
-    );
+    const projectInformation = conversationOnly ? assistantProjectInformation(conversationScope)
+      : await currentResearchProjectInformation(context.userID, conversation.primaryProjectID);
     if (projectInformation?.projectID && isAmbiguousResearchProjectCorrection(question)) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "project_scope" });
@@ -20369,9 +20455,15 @@ async function handleResearchConversationMessage(request, response) {
         projectLinked: true, preparationMilliseconds: Math.round(performance.now() - preparationStartedAt) });
       return;
     }
-    const manualProjectFacts = conversation.projectContext?.facts || [];
+    const manualProjectFacts = conversationOnly ? [] : conversation.projectContext?.facts || [];
     const combinedProjectFacts = combinedResearchProjectFacts(projectInformation, manualProjectFacts);
-    if (researchProjectContextOnlyEligibility({ question, projectInformation })) {
+    if (conversationOnly && !pinnedEvidence.length && !conversationScope.materials.length && !combinedProjectFacts.length) {
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+        researchRequestID, progressResponse, evidenceSnapshots: [], conversationScopeEmpty: true });
+      Object.assign(researchOperation, { status: "completed", mode: "evidence_boundary", charged: false });
+      return;
+    }
+    if (!conversationOnly && researchProjectContextOnlyEligibility({ question, projectInformation })) {
       await commitProjectContextOnlyResearchMessage({
         context,
         conversation,
@@ -20394,7 +20486,7 @@ async function handleResearchConversationMessage(request, response) {
       });
       return;
     }
-    const propertyResearch = mockMode ? null : await researchPropertyContext({ question, messages: activeMessages, projectInformation });
+    const propertyResearch = mockMode || conversationOnly ? null : await researchPropertyContext({ question, messages: activeMessages, projectInformation });
     const corpusPlan = await researchCorpusPlanForTurn({
       question,
       messages: activeMessages,
@@ -20403,7 +20495,7 @@ async function handleResearchConversationMessage(request, response) {
       projectFacts: combinedProjectFacts,
       pinnedEvidence
     });
-    if (corpusPlan.unavailable?.some(corpus => corpus.id === "nyc-zoning-resolution")) {
+    if (!conversationOnly && corpusPlan.unavailable?.some(corpus => corpus.id === "nyc-zoning-resolution")) {
       researchOperation.failureCode = "RESEARCH_ZONING_SOURCE_UNAVAILABLE";
       progressResponse.json(422, {
         code: "RESEARCH_ZONING_SOURCE_UNAVAILABLE",
@@ -20412,7 +20504,7 @@ async function handleResearchConversationMessage(request, response) {
       });
       return;
     }
-    const zoningTurn = researchCorpusPlanRequestsCorpus(corpusPlan, "nyc-zoning-resolution");
+    const zoningTurn = !conversationOnly && researchCorpusPlanRequestsCorpus(corpusPlan, "nyc-zoning-resolution");
     const initialZoningPlan = zoningTurn
       ? planZoningResearchQuestion({ question, projectFacts: combinedProjectFacts, topicContext })
       : null;
@@ -20427,7 +20519,9 @@ async function handleResearchConversationMessage(request, response) {
     const retrievalStartedAt = performance.now();
     researchOperation.retrievalTimings = [];
     const recordRetrievalTiming = timing => researchOperation.retrievalTimings.push(timing);
-    const assembleForZoningPlan = (questionPlan) => assembledResearchEvidenceForTurn({
+    const assembleForZoningPlan = (questionPlan) => conversationOnly
+      ? assistantEvidencePackage({ question, pinnedEvidence, messages: activeMessages, topicContext, projectFacts: combinedProjectFacts })
+      : assembledResearchEvidenceForTurn({
       question,
       messages: activeMessages,
       pinnedEvidence,
@@ -20450,7 +20544,7 @@ async function handleResearchConversationMessage(request, response) {
       onTiming: recordRetrievalTiming
     });
     let evidencePackage = await assembleForZoningPlan(initialZoningPlan);
-    const openInvestigation = !mockMode && openInvestigationEnabled({ pinnedEvidence, decisionLink,
+    const openInvestigation = !conversationOnly && !mockMode && openInvestigationEnabled({ pinnedEvidence, decisionLink,
       suppliedText: researchSuppliedText(question, activeMessages),
       conversationRecall: researchQuestionIsConversationRecall(question),
       practicalNextStep: isResearchPracticalNextStep(question, activeMessages)
@@ -20568,7 +20662,7 @@ async function handleResearchConversationMessage(request, response) {
       ...(evidencePackage.limitations || []),
       ...(answerCodeBasis.limitation ? [{ code: "RESEARCH_CORPUS_LIMITATION", text: answerCodeBasis.limitation }] : [])
     ];
-    const boundedCitationCandidate = researchQuestionIsBoundedCitationLookup(question) && pinnedEvidence.length === 0;
+    const boundedCitationCandidate = !conversationOnly && researchQuestionIsBoundedCitationLookup(question) && pinnedEvidence.length === 0;
     const boundedCitationEvidence = boundedCitationCandidate
       ? researchEvidenceForBoundedCitationLookup(question, evidencePackage.sources || [])
       : [];
@@ -20622,7 +20716,7 @@ async function handleResearchConversationMessage(request, response) {
         failureCode: "RESEARCH_ZONING_PREREQUISITES_REQUIRED" });
       return;
     }
-    if (!assembledEvidence.length && !openInvestigation) {
+    if (!assembledEvidence.length && !openInvestigation && !conversationOnly) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence_unavailable" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
@@ -20661,7 +20755,7 @@ async function handleResearchConversationMessage(request, response) {
       evidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
       sourceLibraryVersion: source.codeVersion || conversation.codeVersion
     }));
-    if (!openInvestigation && explicitlyMissingResearchDocument(question) && !/[“”\"]/.test(question) && !zoningPlan &&
+    if (!conversationOnly && !openInvestigation && explicitlyMissingResearchDocument(question) && !/[“”\"]/.test(question) && !zoningPlan &&
         requiredResearchClaimsFromEvidence(assembledEvidence).length === 0 &&
         !assembledEvidence.some(source => source.evidencePriority?.evidenceRole === "governing")) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
@@ -20673,7 +20767,10 @@ async function handleResearchConversationMessage(request, response) {
     }
     progressResponse.progress("checking_citation_support", "active");
     const priorSuppliedText = researchQuotedContext(question, activeMessages);
-    const suppliedText = !zoningPlan ? researchSuppliedText(question, activeMessages) : null;
+    const quotedReading = !zoningPlan ? researchSuppliedText(question, activeMessages) : null;
+    const suppliedText = conversationOnly && (!assembledEvidence.length || quotedReading)
+      ? assistantSuppliedText(conversationScope, question)
+      : quotedReading;
     const practicalNextStep = !suppliedText && !zoningPlan && isResearchPracticalNextStep(question, activeMessages);
     const practicalNextStepQuestion = practicalNextStep ? researchPracticalNextStepTarget(activeMessages) : "";
     const conversationRecall = activeMessages.length > 0 && researchQuestionIsConversationRecall(question);
@@ -20710,7 +20807,7 @@ async function handleResearchConversationMessage(request, response) {
         };
       }
     }
-    const webSupportPolicyDecision = suppliedText || practicalNextStep || conversationRecall || boundedCitationLookup || conditionalZoningExplanation
+    const webSupportPolicyDecision = conversationOnly || suppliedText || practicalNextStep || conversationRecall || boundedCitationLookup || conditionalZoningExplanation
       ? { useWeb: false, reasons: [] }
       : researchWebSupportTrigger({
           question,
@@ -20775,7 +20872,7 @@ async function handleResearchConversationMessage(request, response) {
       ? mockResearchWebSupportFixture(question)
       : null;
     let evidenceAnalysisEscalated = false;
-    const useModelEvidenceAnalysis = !openInvestigation && !conditionalZoningExplanation &&
+    const useModelEvidenceAnalysis = !conversationOnly && !openInvestigation && !conditionalZoningExplanation &&
       String(process.env.PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS || "").trim() === "1";
     const evidenceAnalysisPromise = mockMode
       ? Promise.resolve({
@@ -20893,8 +20990,9 @@ async function handleResearchConversationMessage(request, response) {
     progressResponse.progress("preparing_conclusion", "active");
     let answerEscalated = false;
     const interpretationOptions = {
+      conversationScope,
       calculatorWorkFacts: [...manualProjectFacts],
-      allowEvidenceGapOnly: openInvestigation,
+      allowEvidenceGapOnly: openInvestigation || conversationOnly,
       corpusPlan,
       sourceAvailability: evidencePackage.sourceAvailability,
       priorSuppliedText,
@@ -20940,7 +21038,12 @@ async function handleResearchConversationMessage(request, response) {
     let result = mockMode
       ? {
           interpretation: validateResearchInterpretation(
-            mockWebSupport
+            conversationOnly && suppliedText
+              ? { ...researchEvidenceBoundaryInterpretation(question),
+                  answerText: "This test response reviews only the included conversation material.",
+                  conclusion: "Included conversation material", explanation: "No additional sources were retrieved.",
+                  followUpQuestions: [] }
+              : mockWebSupport
               ? mockResearchWebInterpretation(question, assembledEvidence, webSupport, {
                   responseStyle: "conversational",
                   requiredClaims
@@ -20951,7 +21054,7 @@ async function handleResearchConversationMessage(request, response) {
                 }),
             assembledEvidence,
             webSupport.sources,
-            { allowOfficialGuidanceOnly }
+            { allowOfficialGuidanceOnly, ...(conversationOnly ? { suppliedText, allowEvidenceGapOnly: true } : {}) }
           ),
           model: "permitext-mock",
           configuration: {
@@ -21371,6 +21474,7 @@ async function handleResearchConversationMessage(request, response) {
         const verification = await openAIResearchVerification(
           question, assembledEvidence, result.interpretation, context.userID, {
             verificationEnvelopeRetryState,
+            conversationScope,
             sourceAvailability: evidencePackage.sourceAvailability,
             applicabilityFactContext,
             propertyResearch,
@@ -21492,6 +21596,7 @@ async function handleResearchConversationMessage(request, response) {
           context.userID,
           {
             verificationEnvelopeRetryState,
+            conversationScope,
             sourceAvailability: evidencePackage.sourceAvailability,
             applicabilityFactContext,
             propertyResearch,
@@ -21560,7 +21665,7 @@ async function handleResearchConversationMessage(request, response) {
       }
     } else {
       const recoverRepairEvidence = async recovery => {
-        if (suppliedText || practicalNextStep || conversationRecall || boundedCitationLookup || zoningPlan || pinnedEvidence.length) return;
+        if (conversationOnly || suppliedText || practicalNextStep || conversationRecall || boundedCitationLookup || zoningPlan || pinnedEvidence.length) return;
         const { catalog } = await researchCorpusResources(corpusPlan);
         const recovered = await recoverResearchEvidenceBeforeRepair({
           evidencePackage, ...recovery, signal: progressResponse.signal,
@@ -21751,6 +21856,7 @@ async function handleResearchConversationMessage(request, response) {
           context.userID,
           {
             verificationEnvelopeRetryState,
+            conversationScope,
             sourceAvailability: evidencePackage.sourceAvailability,
             applicabilityFactContext,
             propertyResearch,
@@ -22007,7 +22113,7 @@ async function handleResearchConversationMessage(request, response) {
           status: evidenceBoundaryFallback ? "evidence_boundary" : "passed",
           pass: !evidenceBoundaryFallback,
           ...(investigatedEvidenceGapOnly ? { scope: "investigated_evidence_gap" } : {}),
-          ...(conversationRecall ? { scope: "conversation_recall" } : suppliedText ? { scope: "user_supplied_text" } : practicalNextStep ? { scope: "practical_next_step" } : {}),
+          ...(conversationRecall ? { scope: "conversation_recall" } : suppliedText ? { scope: "user_supplied_text" } : practicalNextStep ? { scope: "practical_next_step" } : conversationOnly && !result.interpretation.citations.length ? { scope: "conversation_evidence_gap" } : {}),
           ...(evidenceBoundaryFallback ? { reason: "NO_GOVERNING_EVIDENCE" } : {}),
           attempts: verificationAttempts.length,
           regenerated: answerRegenerated,
@@ -22046,6 +22152,7 @@ async function handleResearchConversationMessage(request, response) {
     };
     const answerRecord = {
       ...immutableResearchAnswer({
+        assistantScopeSnapshot: conversationScope,
         id: assistantMessage.id,
         owner: ownerScope(context.userID),
         conversationID: conversation.id,
@@ -22067,6 +22174,7 @@ async function handleResearchConversationMessage(request, response) {
       }),
       operationID: researchOperation.id,
       officialEvidenceSnapshot: webSupport.sources,
+      assistantScopeSnapshot: conversationScope ? structuredClone(conversationScope) : null,
       projectContextSnapshot: {
         projectID: conversation.primaryProjectID || null,
         projectInformation,
@@ -33857,6 +33965,7 @@ const handlers = {
   "research/conversations/create": handleResearchConversationCreate,
   "research/conversations/evidence": handleResearchConversationEvidence,
   "research/conversations/refresh": handleResearchConversationRefresh,
+  "research/conversations/material": handleAssistantConversationMaterial,
   "research/conversations/message": handleResearchConversationMessage,
   "research/conversations/retain-interrupted-question": handleRetainInterruptedResearchQuestion,
   "research/conversations/assign-project": handleResearchConversationAssignProject,

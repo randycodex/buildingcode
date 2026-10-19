@@ -96,7 +96,10 @@
         hypothetical conversation facts, structured evidence analysis, and any separately identified
         supporting official-web context needed to generate and verify the answer. When selected official
         evidence includes an image, that image is also sent to OpenAI for analysis. Private notes are not
-        included. Permitext uses the Responses API with <code>store: false</code>, so the generated
+        included automatically. In the web Assistant, you choose the passages, notes, comments,
+        project context and individual Project facts to include in each conversation. Adding material
+        does not request an AI answer. The included material is sent only when you submit a question;
+        the Assistant does not automatically search for additional sources or include other Project data. Permitext uses the Responses API with <code>store: false</code>, so the generated
         response is not stored for later API retrieval. OpenAI's default API policy states that API
         data is not used to train its models unless the API account owner opts in, and that abuse-
         monitoring logs may be retained for up to 30 days unless longer retention is legally required.
@@ -115,8 +118,8 @@
       </p>
       <p>
         For Research, Permitext grounds code conclusions in applicable enacted text and cites the
-        sources used. Supporting sources are identified separately, and private notes are excluded
-        from Research evidence sent for generation.
+        sources used. Supporting sources are identified separately. Notes and comments you explicitly
+        include are user-authored context, not enacted code evidence.
       </p>
       <p>
         When Research requests an official-web search, Permitext attempts to remove obvious identifiers

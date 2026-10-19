@@ -1,3 +1,4 @@
+import { assistantScopeInstruction, assistantUserMaterialInstruction } from "./assistant-conversation-scope.mjs";
 import { researchProjectScopeInstruction } from "./research-project-scope.mjs";
 import { researchQuestionIsConversationRecall, researchConversationRecallInstruction } from "./research-question-intent.mjs";
 import { researchSuppliedTextPrompt, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
@@ -27,7 +28,8 @@ export function researchWriterInstructions({ question, options = {} } = {}) {
     options.occupantLoadDraft ? occupantLoadDraftInstruction : "",
     options.conversationRecall || researchQuestionIsConversationRecall(question)
       ? researchConversationRecallInstruction : "",
-    researchSuppliedTextPrompt(options.suppliedText),
+    assistantScopeInstruction(options.conversationScope),
+    options.conversationScope && options.suppliedText ? assistantUserMaterialInstruction : researchSuppliedTextPrompt(options.suppliedText),
     researchPriorSuppliedTextPrompt(options.priorSuppliedText),
     options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
     options.allowOfficialGuidanceOnly
@@ -45,6 +47,7 @@ export function researchWriterInstructions({ question, options = {} } = {}) {
 
 export function researchWriterContext({ question, sources, options = {}, earlierUserStatements = "" } = {}) {
   const context = {
+    conversationScope: options.conversationScope,
     codeBasis: options.codeBasis,
     projectFacts: options.projectContextFacts,
     calculatorWorkFacts: options.calculatorWorkFacts,

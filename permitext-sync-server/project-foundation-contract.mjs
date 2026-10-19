@@ -1,3 +1,4 @@
+import { assistantScopeVersion, assistantSuppliedText, isAssistantEmptyMaterialAnswer } from "./assistant-conversation-scope.mjs";
 import { isCanonicalResearchClarification } from "./research-conversation-continuity.mjs";
 import { researchSuppliedText } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
@@ -612,6 +613,7 @@ export function immutableEvidenceSnapshot({
 }
 
 export function immutableResearchAnswer({
+  assistantScopeSnapshot = null,
   id = randomUUID(),
   owner,
   conversationID,
@@ -646,8 +648,12 @@ export function immutableResearchAnswer({
       Array.isArray(answer?.[key]) && answer[key].length === 0) &&
     ["evidenceLimitations", "additionalEvidenceNeeded"].every(key =>
       Array.isArray(answer?.[key]) && answer[key].some(value => typeof value === "string" && value.trim()));
-  const canonicalSuppliedText = researchSuppliedText(question, [{role:"assistant",answer:{suppliedText:answer?.suppliedText}}]);
-  const suppliedTextAnswer = answer?.mode === "openai" && Boolean(canonicalSuppliedText) &&
+  const canonicalSuppliedText = assistantScopeSnapshot?.version === assistantScopeVersion
+    ? assistantSuppliedText(assistantScopeSnapshot, question)
+    : researchSuppliedText(question, [{role:"assistant",answer:{suppliedText:answer?.suppliedText}}]);
+  const scopeMaterialMock = process.env.NODE_ENV === "test" && process.env.PERMITEXT_TEST_RESEARCH_MOCK === "1" &&
+    assistantScopeSnapshot?.version === assistantScopeVersion && answer?.mode === "mock" && model === "permitext-mock";
+  const suppliedTextAnswer = (answer?.mode === "openai" || scopeMaterialMock) && Boolean(canonicalSuppliedText) &&
     JSON.stringify(answer?.suppliedText) === JSON.stringify(canonicalSuppliedText) &&
     answer?.verification?.scope === "user_supplied_text" && answer?.verification?.status === "passed" &&
     answer?.verification?.pass === true && answer?.verification?.history?.at(-1)?.pass === true &&
@@ -761,10 +767,17 @@ export function immutableResearchAnswer({
     canonicalGuidanceSources &&
     emptyStructuredGuidanceAnalysis &&
     emptyGuidanceFactUsage;
-  const clarificationAnswer = model === "permitext-conversation-clarification" &&
+  const conversationEvidenceGap = assistantScopeSnapshot?.version === assistantScopeVersion &&
+    answer?.mode === "openai" && answer?.authorityStatus === "insufficient_evidence" &&
+    answer?.verification?.scope === "conversation_evidence_gap" && answer?.verification?.status === "passed" &&
+    answer?.verification?.pass === true && answer?.verification?.history?.at(-1)?.pass === true &&
+    researchCitations.length === 0 &&
+    ["supportedPoints", "citations", "supportingSources", "supportingSourceUses"].every(key => Array.isArray(answer?.[key]) && answer[key].length === 0) &&
+    ["evidenceLimitations", "additionalEvidenceNeeded"].every(key => Array.isArray(answer?.[key]) && answer[key].some(value => typeof value === "string" && value.trim()));
+  const clarificationAnswer = isAssistantEmptyMaterialAnswer(answer) || model === "permitext-conversation-clarification" &&
     researchCitations.length === 0 && isCanonicalResearchClarification(question, answer) &&
     (answer?.verification?.reason !== "project_scope" || Boolean(projectID));
-  if (researchEvidence.length < 1 && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer) {
+  if (researchEvidence.length < 1 && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer && !(assistantScopeSnapshot?.version === assistantScopeVersion && suppliedTextAnswer)) {
     throw new Error("Research answers require evidence.");
   }
   const canonicalBoundary = researchEvidenceBoundaryInterpretation(question);
@@ -790,7 +803,8 @@ export function immutableResearchAnswer({
     !practicalGuidanceAnswer &&
     !conversationRecallAnswer &&
     !suppliedTextAnswer &&
-    !investigatedEvidenceGapAnswer
+    !investigatedEvidenceGapAnswer &&
+    !conversationEvidenceGap
   ) {
     throw new Error("Research answers require citations.");
   }

@@ -251,7 +251,8 @@
     "test:workflow-views": "node tests/notebook-columns.mjs && node tests/workflow-views-contract.mjs && node tests/workflow-navigation-race-contract.mjs && node tests/research-notebook-navigation-contract.mjs && node tests/linked-column-placement-contract.mjs && node tests/search-reader-reuse-contract.mjs && node tests/workspace-pane-orchestration-contract.mjs && node tests/project-workspaces-contract.mjs",
     "test:native-project-cache": "python3 tests/native-project-hub-cache-worker-contract.py",
     "test:native-notebook-visibility": "python3 tests/native-notebook-release-visibility-contract.py",
-    "test:research-prepared-retrieval": "node tests/research-prepared-passages-contract.mjs && node tests/research-source-body-cache-contract.mjs && node scripts/build-prepared-research-passages.mjs && node scripts/benchmark-research-prepared-passages.mjs"
+    "test:research-prepared-retrieval": "node tests/research-prepared-passages-contract.mjs && node tests/research-source-body-cache-contract.mjs && node scripts/build-prepared-research-passages.mjs && node scripts/benchmark-research-prepared-passages.mjs",
+    "test:assistant-scope": "node --check assistant-conversation-scope.mjs && node --check public/assistant-materials.js && node tests/assistant-conversation-scope-http.mjs && node tests/assistant-material-provider-http.mjs"
   },
   "dependencies": {
     "@blocknote/core": "^0.54.0",

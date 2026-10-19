@@ -1,3 +1,4 @@
+import { createAssistantMaterials } from "./assistant-materials.js?v=2";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=2";
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
@@ -7,7 +8,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-notes-trash-only-v1230";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-assistant-conversation-scope-v1233";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -131,7 +132,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-notes-trash-only-v1230";
+} from "./offline-storage.js?v=20261019-assistant-conversation-scope-v1233";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -164,7 +165,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-notes-trash-only-v1230";
+} from "./workspace-state.js?v=20261019-assistant-conversation-scope-v1233";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -22155,6 +22156,7 @@ function researchRequestBody(values = {}) {
   const account = activeAccount();
   return {
     auth: { accountUserID: account?.userID || "" },
+    analysisMode: "conversation_only",
     ...values
   };
 }
@@ -22186,6 +22188,7 @@ async function postResearch(path, values = {}) {
   const identity = captureAccountRequest();
   if (!account) throw new Error("Sign in from Account to use private research conversations.");
   const creationWorkspaceID = activeWorkspaceID;
+  if (["/research/conversations/create", "/research/conversations/get"].includes(path)) values = { ...values, analysisMode: "conversation_only" };
   if (path === "/research/conversations/create") {
     values = { ...values, projectID: researchCreationProjectID(values.projectID) };
     if (values.projectID) await ensureResearchProjectSynced(values.projectID, account);
@@ -22719,6 +22722,12 @@ async function refreshResearchConversationInPlace(paneID, conversationID, instan
   if (!current()) return "stale";
   // Publish a complete conversation in one swap; history, filters and focus stay mounted.
   body.replaceChildren(conversation);
+  const materialList = conversation.querySelector?.(".assistant-materials");
+  const historyRail = panel.querySelector(":scope > .assistant-history-rail");
+  if (materialList && historyRail) {
+    historyRail.querySelector(":scope > .assistant-materials")?.remove();
+    historyRail.prepend(materialList);
+  }
   track.querySelectorAll(".occupant-load-card").forEach(card=>card.dispatchEvent(new Event("calculation-assessment-refreshed")));
   body.hidden = false;
   panel.classList.remove("has-research-composer", "is-new-research-chat", "is-history-only");
@@ -23763,7 +23772,7 @@ function renderEvidenceDiscovery(container) {
         visualReviewConfirmation.append(visualReviewCheckbox, visualReviewCopy);
         const visualProviderDisclosure = document.createElement("p");
         visualProviderDisclosure.className = "evidence-visual-provider-disclosure";
-        visualProviderDisclosure.textContent = "Selected official images are sent to OpenAI for analysis. Private notes are not included.";
+        visualProviderDisclosure.textContent = "Selected official images are sent to OpenAI for analysis. Other material is included only when you choose it for this conversation.";
         visualSourcesDetails.append(
           visualSourcesToggle,
           visualSourcesGallery,
@@ -24556,7 +24565,7 @@ function researchComposerDisclosure() {
   const disclosure = document.createElement("p");
   disclosure.className = "research-composer-disclosure";
   disclosure.append(document.createTextNode(
-    "AI-assisted—not an official interpretation. Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential, regulated, or sensitive personal information. Ordinary property information may be included when needed. "
+    "AI-assisted—not an official interpretation. Assistant sends your question, active conversation, and explicitly included passages, notes, comments, project context and facts to OpenAI. Project material is excluded until you choose it for this conversation. Do not include confidential, regulated, or sensitive personal information. Only property information you include is sent. "
   ));
   const privacyLink = document.createElement("a");
   privacyLink.href = "/privacy";
@@ -24567,40 +24576,10 @@ function researchComposerDisclosure() {
   return disclosure;
 }
 
-function researchProjectContextPreview(projectID, projectInformation = null) {
-  const preview = document.createElement("p");
-  preview.className = "research-project-context-preview";
-  const update = (nextProjectID = projectID, nextInformation = projectInformation) => {
-    const normalizedProjectID = String(nextProjectID || "").trim();
-    if (!normalizedProjectID) {
-      preview.textContent = "Unassigned: no saved Project facts will be sent. Private notes are not included.";
-      return;
-    }
-    const localProject = visibleProjectRecords(currentContentSummary().projects || [])
-      .find((project) => researchProjectID(project) === normalizedProjectID) || null;
-    const information = nextInformation || localProject || {};
-    const usableFacts = projectStructuredFacts(information).filter((fact) =>
-      fact.key !== "floor-affected" && ["stated", "confirmed", "sourced"].includes(fact.status)
-    );
-    const address = String(information.address || localProject?.address || "").trim();
-    const labels = [
-      ...(address ? [`Address: ${address}`] : []),
-      ...usableFacts
-        .filter((fact) => fact.key !== "address" || !address)
-        .map((fact) => `${fact.label}: ${fact.value}`)
-    ];
-    const visible = labels.slice(0, 3);
-    const remainder = Math.max(0, labels.length - visible.length);
-    const hasDescription = Boolean(String(information.description || localProject?.description || "").trim());
-    preview.textContent = [
-      visible.length ? `Project context sent: ${visible.join(" · ")}` : "Assigned Project has no saved structured facts",
-      remainder ? `+${remainder} more saved ${remainder === 1 ? "fact" : "facts"}` : "",
-      hasDescription ? "Saved Project description is also included" : "",
-      "Private notes are not included"
-    ].filter(Boolean).join(". ");
-  };
-  preview.updateResearchProject = update;
-  update(projectID, projectInformation);
+function researchProjectContextPreview() {
+  const preview = document.createElement("p"); preview.className = "research-project-context-preview";
+  preview.textContent = "Only the material listed in Included material and your conversation messages is sent. Project context and facts are optional.";
+  preview.updateResearchProject = () => {};
   return preview;
 }
 
@@ -24735,8 +24714,8 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   container.querySelector(".research-chat-welcome")?.append(information);
   if (researchEnabled) {
     input.placeholder = currentProject?.name
-      ? `Start a new question about ${currentProject.name}…`
-      : "Start a new research question…";
+      ? "Ask about the material you include…"
+      : "Ask about the material you include…";
   }
   form.append(composerBox, status);
   container.append(form);
@@ -24807,6 +24786,16 @@ async function renderResearch(paneID = "utility:analysis") {
   assistantBody.setAttribute("aria-label", "Assistant conversation");
   assistantBody.hidden = !chatVisible;
   panel.append(historyRail, assistantBody);
+  if (draftShowing) historyRail.prepend(createAssistantMaterials({ conversation: null, create: async () => {
+    const workspaceID = activeWorkspaceID, identity = captureAccountRequest();
+    const created = await postResearch("/research/conversations/create", {});
+    if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return;
+    const id = created.conversation.id;
+    const key = instance ? paneIDForUtilityInstance(instance) : "utility:analysis";
+    const draft = researchNewChatDrafts.get(key);
+    if (draft) researchNewChatDrafts.set(`followup:${id}`, draft);
+    await openResearchConversation(id, { refreshList: true, instance });
+  } }));
   content.addEventListener("scroll", () => {
     historyState.historyScrollTop = content.scrollTop;
     scheduleResearchDraftPersistence();
@@ -24830,6 +24819,8 @@ async function renderResearch(paneID = "utility:analysis") {
     if (draftShowing) requestAnimationFrame(() => assistantBody.querySelector(".research-question-input")?.focus({ preventScroll: true }));
   }
 
+  const materialList = assistantBody.querySelector(".assistant-materials");
+  if (materialList) historyRail.prepend(materialList);
   const historyHeading = document.createElement("h3");
   historyHeading.className = "assistant-history-heading";
   historyHeading.textContent = "Conversations";
@@ -26755,6 +26746,19 @@ async function renderResearchConversation(conversationID, options = {}) {
     content.append(evidencePane, divider, dialoguePane);
   }
 
+  const materialWorkspaceID = activeWorkspaceID, materialIdentity = captureAccountRequest();
+  const materialList = createAssistantMaterials({ conversation,
+    load: () => postResearch("/research/conversations/material", { conversationID }),
+    save: change => postResearch("/research/conversations/material", { conversationID, action: "update", ...change }),
+    updated: next => {
+      if (materialWorkspaceID !== activeWorkspaceID || !isCurrentAccountRequest(materialIdentity)) return;
+      Object.assign(conversation, next);
+      if (supplemental) supplementalResearchConversations.set(conversationID, next);
+      else activeResearchConversation = next;
+      researchConversationList = researchConversationList.map(item => item.id === conversationID ? next : item);
+    }
+  });
+  (embedded ? panel : evidenceScroll).prepend(materialList);
   const projectContextSection = renderResearchProjectContext(evidenceScroll, conversation);
   const sources = document.createElement("section");
   sources.className = "research-sources";
@@ -26775,6 +26779,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   sourceList.className = "research-source-list";
   displayedSources.forEach((source) => sourceList.append(renderResearchSource(source)));
   sources.append(sourceToggle, sourceList);
+  sources.hidden = true;
   projectContextSection.prepend(sources);
   sourceList.querySelectorAll(".research-source-card").forEach((card) =>
     setResearchSourceCardExpanded(card, true, { instant: true })
@@ -26924,9 +26929,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   input.className = "research-question-input";
   input.rows = 3;
   input.maxLength = 2000;
-  const starterAnalysisQuestion = conversation.messages.length === 0
-    ? conversation.starterQuestion || ""
-    : "";
+  const starterAnalysisQuestion = "";
   input.placeholder = conversation.messages.length ? "Ask a follow-up…" : displayedSources.length ? "Ask about this evidence…" : "Ask a question…";
   const followUpDraftKey = `followup:${conversationID}`;
   input.dataset.researchDraftKey = followUpDraftKey;
@@ -27026,6 +27029,14 @@ async function renderResearchConversation(conversationID, options = {}) {
   input.rows = 1;
   composer.append(composerBox, status);
   dialoguePane.append(composer);
+  const syncMaterialSendState = () => {
+    sendButton.disabled = !researchEnabled || researchRequestActive || conversation.sourceStatus === "changed" ||
+      projectContextBlocked || input.disabled || input.value.trim().length < 3 ||
+      materialList.dataset.dirty === "true" || materialList.dataset.busy === "true";
+  };
+  materialList.addEventListener("assistant-material-state", syncMaterialSendState);
+  input.addEventListener("input", syncMaterialSendState);
+  syncMaterialSendState();
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
     bindResearchEvidenceDivider(content, divider, conversation.id);
   }
