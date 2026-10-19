@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-unlimited-reader-width-v1205";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-reader-drag-scroll-v1206";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
@@ -130,7 +130,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-unlimited-reader-width-v1205";
+} from "./offline-storage.js?v=20261019-reader-drag-scroll-v1206";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -163,7 +163,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-unlimited-reader-width-v1205";
+} from "./workspace-state.js?v=20261019-reader-drag-scroll-v1206";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -41579,7 +41579,12 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   const resizeHandle = event.currentTarget;
   resizeHandle?.setPointerCapture?.(event.pointerId);
   const startX = event.clientX;
-  const startWidth = pane.getBoundingClientRect().width;
+  const startBounds = pane.getBoundingClientRect();
+  const startWidth = startBounds.width;
+  // The outside grip is sticky, so its rectangle never moves offscreen.
+  // Follow the column's added width while preserving any existing overflow.
+  const initialRightOverflow = edgeSide === "right"
+    ? Math.max(0, startBounds.right - Math.min(track.getBoundingClientRect().right, window.innerWidth)) : 0;
   let resizeStarted = false;
   const isReferenceResize = ["report", "project-details"].includes(currentColumnWorkflowView());
   const edgeAutoResizeThreshold = 32;
@@ -41602,10 +41607,9 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
     resizeHandle?.setAttribute("aria-valuetext", `Column width ${Math.round(nextWidth)} pixels`);
     lastAppliedWidth = nextWidth;
     if (edgeSide === "right") {
-      const handleRect = resizeHandle.getBoundingClientRect();
-      const trackRect = track.getBoundingClientRect();
-      const overflow = handleRect.right - trackRect.right;
-      if (overflow > 0) track.scrollLeft = Math.min(track.scrollLeft + overflow, track.scrollWidth - track.clientWidth);
+      const visibleRight = Math.min(track.getBoundingClientRect().right, window.innerWidth);
+      const overflow = pane.getBoundingClientRect().right - visibleRight - initialRightOverflow;
+      if (overflow > 0) track.scrollLeft = Math.min(track.scrollLeft + overflow, Math.max(0, track.scrollWidth - track.clientWidth));
     }
     scheduleVisibleReaderScrollIndicatorUpdates();
   };

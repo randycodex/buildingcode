@@ -31,7 +31,8 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
   };
   const panes = ids.map(makePane);
   const track = {
-    dataset: {}, clientWidth: availableWidth, scrollWidth: availableWidth, scrollLeft: 0,
+    dataset: {}, clientWidth: availableWidth, scrollLeft: 0,
+    get scrollWidth() { return Math.max(availableWidth, 1 + panes.reduce((sum, pane) => sum + paneWidth(pane) + 1, 0)); },
     classList: { add: name => classes.add(name), remove: name => classes.delete(name) },
     querySelectorAll: selector => selector.includes('.pane-divider')
       ? Array.from({ length: panes.length + 1 }, () => ({ getBoundingClientRect: () => ({ width: 1 }) })) : panes,
@@ -63,13 +64,13 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     'applyPaneWeight', 'syncResearchColumnLayout', 'capturePaneResizeWidths', 'singleExpandedDividerEdge', 'startPaneResize', 'startPaneEdgeResize'].map(actual).join('\n'), context);
   context.syncResearchColumnLayout();
   return {
-    context, state, track, panes, handlers, frames, classes, makePane,
+    context, state, track, panes, handlers, frames, classes, makePane, handle,
     get saves() { return saves; }, get layouts() { return layouts; },
     set workflow(value) { workflow = value; },
     event: (clientX, button = 0) => ({ clientX, button, pointerId: 7, currentTarget: handle, preventDefault() {} }),
     widths: () => panes.map(p => p.getBoundingClientRect().width),
     move(clientX, pointerId = 7) { handlers.get('pointermove')({ clientX, pointerId }); },
-    frame() { const pending = [...frames.values()]; frames.clear(); pending.forEach(fn => fn(16)); },
+    frame(time = 16) { const pending = [...frames.values()]; frames.clear(); pending.forEach(fn => fn(time)); },
     finish(clientX, type = 'pointerup') { handlers.get(type)({ clientX, pointerId: 7 }); }
   };
 }
@@ -144,4 +145,36 @@ assert.equal(leftTarget().paneID, 'reader:two', 'The left grip follows the leadi
 assert.equal(rightTarget().paneID, 'reader:four');
 overflow.panes[0].classList.add('is-pinned');
 assert.equal(leftTarget().paneID, 'reader:one', 'A pinned surface owns the outside left grip above scrolling columns');
-console.log('Research divider pointer behavior passed: click/jitter stability, collapsed neighbors, wider fitted drags, adjacent pairs, cancellation, unrelated panes and overflow bounds.');
+
+// The outside grip stays sticky at the viewport edge. Its position never
+// reveals the growing column's overflow, so scrolling must follow the column.
+for (const [ids, initialScroll] of [
+  [['reader:0'], 0],
+  [['reader:0','reader:1','reader:2'], 0],
+  [['reader:0','reader:1','reader:2'], 100],
+  [['reader:0','utility:calculator'], 0]
+]) {
+  const availableWidth = 1605;
+  const held = fixture(ids, availableWidth);
+  held.track.scrollLeft = initialScroll;
+  const paneID = ids.at(-1);
+  const pane = held.panes.at(-1);
+  held.handle.getBoundingClientRect = () => ({left: availableWidth - 1, right: availableWidth});
+  const initialHiddenWidth = Math.max(0, pane.getBoundingClientRect().right - availableWidth);
+  const initialWidth = pane.getBoundingClientRect().width;
+  held.context.startPaneEdgeResize(held.event(availableWidth - 1), paneID, 'right');
+  held.move(availableWidth - 9); held.frame(16);
+  for (const time of [32,48,64,80,96]) held.frame(time);
+  assert(pane.getBoundingClientRect().width > initialWidth, 'Holding near the edge widens the column before release');
+  assert(held.track.scrollLeft > initialScroll, 'The workspace follows the widening column while the pointer is still held');
+  assert(held.track.scrollLeft - initialScroll <= pane.getBoundingClientRect().width - initialWidth + 1,
+    'A partially hidden column does not jump to its previously offscreen end');
+  assert(pane.getBoundingClientRect().right - availableWidth <= initialHiddenWidth + 1,
+    'The newly added width stays visible instead of accumulating offscreen');
+  assert.equal(held.saves, 0, 'The live preview does not persist intermediate frames');
+  const scrolledBeforeRelease = held.track.scrollLeft;
+  held.finish(availableWidth - 9);
+  assert.equal(held.track.scrollLeft, scrolledBeforeRelease, 'Release does not cause an extra scroll jump');
+  assert.equal(held.frames.size, 0); assert.equal(held.handlers.size, 0);
+}
+console.log('Research divider pointer behavior passed: click/jitter stability, adjacent pairs, cancellation, sticky-edge live scrolling, partly hidden columns and overflow bounds.');
