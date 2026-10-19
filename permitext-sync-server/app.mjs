@@ -36,6 +36,7 @@ export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boun
 import { isResearchPracticalNextStep, researchPracticalNextStepPrompt, researchPracticalNextStepTarget } from "./research-practical-next-step.mjs";
 import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation, researchQuestionIsConversationRecall } from "./research-question-intent.mjs";
 import { captureTrash, restoreTrash, trashSummary, trashContents } from "./trash-recovery.mjs";
+import {notebookTrashMetadata, isNotebookTrashArtifact, notebookTrashSummary, notebookTrashContents, planNotebookTrashMutation} from './notebook-trash.mjs';
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
 import { buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction } from "./research-claim-applicability-review.mjs";
@@ -15884,7 +15885,7 @@ async function handleProjectFoundationUnlink(request, response) {
 }
 
 function notebookCardForClient(artifact, projectIDs = []) {
-  const { _saveReceipt, ...payload } = artifact.payload;
+  const { _saveReceipt, _notebookTrash, ...payload } = artifact.payload;
   return {
     id: artifact.envelope.id,
     version: artifact.envelope.version,
@@ -16015,7 +16016,7 @@ async function deleteOrphanedNotebookImageAssets(userID, projectID, candidateIDs
   if (!candidates.size) return;
   const artifacts = await listStoredFoundationArtifacts(userID);
   for (const artifact of artifacts) {
-    if (!['notebookCard', 'projectNote'].includes(artifact.envelope?.type) || artifact.envelope?.deletedAt) continue;
+    if (!['notebookCard', 'projectNote'].includes(artifact.envelope?.type) || artifact.envelope?.deletedAt && !isNotebookTrashArtifact(artifact)) continue;
     for (const identity of artifact.payload?.imageAssets || []) candidates.delete(identity);
   }
   const now = new Date().toISOString();
@@ -16346,6 +16347,10 @@ async function handleNotebookCardDelete(request, response) {
     organizationPermissions.projectEdit
   );
   if (!access) return;
+  if (context.body.recoverable === true && access.storageOwnerUserID !== context.userID) {
+    sendError(response, 403, 'Move to Trash is available from the Project owner’s account.');
+    return;
+  }
   const artifact = await ownedNotebookArtifact(
     access.storageOwnerUserID,
     context.body.cardID
@@ -16394,6 +16399,11 @@ async function handleNotebookCardDelete(request, response) {
       return;
     }
   }
+  if (context.body.recoverable === true) {
+    deletedArtifact.payload = {...artifact.payload,
+      plainText: artifact.payload.document ? notebookPlainText(artifact.payload.document) : artifact.payload.plainText || '',
+      _notebookTrash: notebookTrashMetadata(activeLinks, new Date(now))};
+  }
   const deletedLinks = [];
   const deleteEvents = [];
   for (const existingLink of activeLinks) {
@@ -16421,7 +16431,7 @@ async function handleNotebookCardDelete(request, response) {
     artifact: deletedArtifact, expectedVersion, links: deletedLinks,
     expectedLinks: activeLinks, events: deleteEvents
   });
-  await cleanupCommittedNotebookImageAssets(
+  if (context.body.recoverable !== true) await cleanupCommittedNotebookImageAssets(
     access.storageOwnerUserID, access.projectID, artifact.payload?.imageAssets || []
   );
   const artifactRevisions = await bumpCommittedNotebookArtifactRevisions(access.storageOwnerUserID, {
@@ -27858,7 +27868,7 @@ async function handleNotebookAssetDelete(request, response) {
   const artifacts = await listStoredFoundationArtifacts(access.storageOwnerUserID);
   const referenced = artifacts.some((artifact) =>
     ["notebookCard", "projectNote"].includes(artifact.envelope?.type) &&
-    !artifact.envelope?.deletedAt &&
+    (!artifact.envelope?.deletedAt || isNotebookTrashArtifact(artifact)) &&
     (artifact.payload?.imageAssets || []).includes(assetID)
   );
   if (referenced) {
@@ -28164,8 +28174,40 @@ async function handleContentTrash(request, response) {
   if (["purge","empty"].includes(action) && body.confirmation !== "DELETE") return sendError(response,400,"Type DELETE to permanently remove content from Trash.");
   if (["inspect","restore","purge"].includes(action) && typeof body.id !== "string") return sendError(response,400,"Choose a Trash entry.");
   try {
-    const result = await (await storeAdapter()).trashAction(userID,action,body.id);
-    if (action === "inspect") await enrichTrashContents(result.entry);
+    const adapter = await storeAdapter();
+    const notes = (await listStoredFoundationArtifacts(userID)).filter(artifact => isNotebookTrashArtifact(artifact));
+    const noteID = typeof body.id === 'string' && body.id.startsWith('notebook:');
+    const note = noteID ? notes.find(artifact => notebookTrashSummary(artifact).id === body.id) : null;
+    if (noteID && !note) throw new Error('This Note is unavailable or its Trash entry has expired.');
+    if (note && action === 'inspect') {
+      sendJSON(response, 200, {entry: notebookTrashContents(note)});
+      return;
+    }
+    const result = await adapter.trashAction(userID, noteID ? 'list' : action, noteID ? undefined : body.id);
+    for (const target of action === 'empty' ? notes : note && ['restore','purge'].includes(action) ? [note] : []) {
+      const restoring = action === 'restore';
+      const projectIDs = [...new Set(target.payload._notebookTrash.links.map(link => link.projectID))];
+      if (restoring) for (const projectID of projectIDs) {
+        const access = await projectAccessForUser(userID, projectID);
+        if (!access?.permissions.includes(organizationPermissions.projectEdit)) {
+          throw new Error('Restore the Note’s linked Project and its editing access before restoring this Note.');
+        }
+      }
+      const mutation = planNotebookTrashMutation(target, await listStoredProjectLinks(userID), restoring ? 'restore' : 'purge');
+      if (restoring) mutation.events = projectIDs.map(projectID => activityEvent({owner: target.envelope.owner,
+        projectID, actorUserID: userID, action: 'notebook-card.restored', objectKind: 'notebookCard',
+        objectID: target.envelope.id, previousStatus: 'deleted', newStatus: 'active'}));
+      await commitStoredNotebookCardMutation(userID, mutation);
+      if (!restoring) await cleanupCommittedNotebookImageAssets(userID, projectIDs[0], target.payload.imageAssets || []);
+      await bumpCommittedNotebookArtifactRevisions(userID, {projects: projectIDs.map(projectID => ({projectID, domains: ['notebook','foundation','activity']}))});
+      if (restoring) result.restoredCount = 1;
+    }
+    if (action === 'inspect') await enrichTrashContents(result.entry);
+    else {
+      const remaining = (await listStoredFoundationArtifacts(userID)).filter(artifact => isNotebookTrashArtifact(artifact));
+      result.entries = [...result.entries, ...remaining.map(notebookTrashSummary)]
+        .sort((a,b) => Date.parse(b.deletedAt) - Date.parse(a.deletedAt));
+    }
     sendJSON(response,200,result);
   } catch (error) { sendError(response,409,error.message || "Trash could not be updated. Please retry."); }
 }

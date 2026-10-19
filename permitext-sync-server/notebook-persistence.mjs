@@ -23,7 +23,7 @@ export function notebookVersionConflict(artifactType = "notebookCard") {
 }
 
 export function applyNotebookCardMutation(store, userID, {
-  artifact, expectedVersion, links = [], expectedLinks = [], events = [], requireEmptyProjectNoteProjectID = null
+  artifact, expectedVersion, expectedDeletedAt = null, links = [], expectedLinks = [], events = [], requireEmptyProjectNoteProjectID = null
 }) {
   const artifactType = artifact.envelope.type;
   const artifacts = store.foundationArtifactsByUserID?.[userID] || [];
@@ -31,7 +31,7 @@ export function applyNotebookCardMutation(store, userID, {
   const existing = artifacts[index];
   if (!Number.isSafeInteger(expectedVersion) || expectedVersion < 0 ||
       !["notebookCard", "projectNote"].includes(artifactType) ||
-      (existing && (existing.envelope.type !== artifactType || existing.envelope.deletedAt)) ||
+      (existing && (existing.envelope.type !== artifactType || (existing.envelope.deletedAt || null) !== expectedDeletedAt)) ||
       Number(existing?.envelope.version || 0) !== expectedVersion ||
       artifact.envelope.version !== expectedVersion + 1) throw notebookVersionConflict(artifactType);
   const storedLinks = store.projectLinksByUserID?.[userID] || [];
@@ -66,7 +66,7 @@ export function applyNotebookCardMutation(store, userID, {
 }
 
 export async function commitPostgresNotebookCardMutation(sql, userID, {
-  artifact, expectedVersion, links = [], expectedLinks = [], events = [], requireEmptyProjectNoteProjectID = null
+  artifact, expectedVersion, expectedDeletedAt = null, links = [], expectedLinks = [], events = [], requireEmptyProjectNoteProjectID = null
 }) {
   const artifactType = artifact.envelope.type;
   if (!Number.isSafeInteger(expectedVersion) || expectedVersion < 0 ||
@@ -95,7 +95,8 @@ export async function commitPostgresNotebookCardMutation(sql, userID, {
       SET envelope = ${JSON.stringify(envelope)}::jsonb, payload = ${JSON.stringify(artifact.payload)}::jsonb,
         updated_at = ${envelope.updatedAt}::timestamptz, archived_at = ${envelope.archivedAt}::timestamptz,
         deleted_at = ${envelope.deletedAt}::timestamptz
-      WHERE id = ${envelope.id} AND user_id = ${userID} AND artifact_type = ${artifactType} AND deleted_at IS NULL
+      WHERE id = ${envelope.id} AND user_id = ${userID} AND artifact_type = ${artifactType}
+        AND deleted_at IS NOT DISTINCT FROM ${expectedDeletedAt}::timestamptz
         AND (envelope->>'version')::bigint = ${expectedVersion}
       RETURNING id
     ) SELECT 1 / COUNT(*)::int AS notebook_version_guard FROM changed

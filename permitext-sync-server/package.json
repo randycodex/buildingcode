@@ -246,6 +246,7 @@
     "eval:typesafe-intent": "node scripts/eval-typesafe-intent.mjs",
     "build:report-preview": "node scripts/build-report-preview.mjs",
     "test:report-screen": "node tests/report-screen-contract.mjs && node tests/report-export-review-contract.mjs && node tests/report-fact-presentation.mjs",
+    "test:notebook-trash": "node tests/notebook-trash-http.mjs && node tests/notebook-columns.mjs && node tests/research-context-persistence-contract.mjs",
     "test:notebook-columns": "node tests/notebook-columns.mjs && node tests/notebook-card-selection-race.mjs && node tests/notebook-return-card-contract.mjs && node tests/notebook-return-scroll-contract.mjs",
     "test:workflow-views": "node tests/notebook-columns.mjs && node tests/workflow-views-contract.mjs && node tests/workflow-navigation-race-contract.mjs && node tests/research-notebook-navigation-contract.mjs && node tests/linked-column-placement-contract.mjs && node tests/search-reader-reuse-contract.mjs && node tests/workspace-pane-orchestration-contract.mjs && node tests/project-workspaces-contract.mjs",
     "test:native-project-cache": "python3 tests/native-project-hub-cache-worker-contract.py",

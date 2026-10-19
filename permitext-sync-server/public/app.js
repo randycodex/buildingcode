@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-notebook-menu-layer-v1223";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-notebook-closed-notes-v1224";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -131,7 +131,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-notebook-menu-layer-v1223";
+} from "./offline-storage.js?v=20261019-notebook-closed-notes-v1224";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -164,7 +164,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-notebook-menu-layer-v1223";
+} from "./workspace-state.js?v=20261019-notebook-closed-notes-v1224";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -360,6 +360,9 @@ const toggleFactsButton = document.querySelector("#toggle-facts");
 const toggleNotebookButton = document.querySelector("#toggle-notebook");
 const notebookTabs = document.querySelector("#notebook-note-tabs");
 const newNotebookNoteButton = document.querySelector("#new-notebook-note");
+const closedNotebookNotesButton = document.querySelector('#closed-notebook-notes');
+let closedNotebookNoteChoices = {projectID: '', notes: []};
+let notebookClosedMenu = null;
 const toggleReportButton = document.querySelector("#toggle-report");
 let projectToolTogglePending = false;
 const projectInformationMounts = new Map();
@@ -2832,8 +2835,10 @@ function syncNotebookNoteTabs() {
   };
   notes.sort((a, b) => rank(a) - rank(b));
   notebookTabs.replaceChildren();
+  const closedNotes = [];
   for (const card of notes) {
     const column = card.column || columns.find(item => item.cardID === card.id && item.open);
+    if (!column?.open) { closedNotes.push(card); continue; }
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'toolbar-button notebook-note-tab';
     button.textContent = card.title || 'Untitled Note';
@@ -2846,6 +2851,110 @@ function syncNotebookNoteTabs() {
     notebookTabs.append(button);
   }
   newNotebookNoteButton.disabled = !project || !hasCapability('notebook') || projectToolTogglePending;
+  closedNotebookNoteChoices = {projectID, notes: closedNotes};
+  if (closedNotebookNotesButton) closedNotebookNotesButton.disabled = !project || !hasCapability('notebook');
+  if (notebookClosedMenu) {
+    if (!project || notebookClosedMenu.dataset.projectId !== projectID || currentColumnWorkflowView() !== 'notebook') notebookClosedMenu._close(false);
+    else notebookClosedMenu._render(closedNotes);
+  }
+}
+
+function openClosedNotebookNotesMenu() {
+  if (notebookClosedMenu) { notebookClosedMenu._close(); return; }
+  const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
+  if (!project || !hasCapability('notebook') || !closedNotebookNotesButton) return;
+  syncNotebookNoteTabs();
+  const projectID = projectDetailKey(project), anchor = closedNotebookNotesButton;
+  const menu = document.createElement('div');
+  menu.id = 'notebook-closed-notes-menu';
+  menu.className = 'workspace-menu notebook-closed-notes-menu';
+  menu.dataset.projectId = projectID;
+  menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', 'Closed notes');
+  const controller = new AbortController();
+  const close = (restoreFocus = true) => {
+    controller.abort(); menu.remove();
+    if (notebookClosedMenu === menu) notebookClosedMenu = null;
+    anchor.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) anchor.focus({preventScroll:true});
+  };
+  menu._close = close;
+  let signature = '';
+  menu._render = notes => {
+    const next = JSON.stringify(notes.map(card => [card.id, card.title, card.version]));
+    if (next === signature) return;
+    signature = next; menu.replaceChildren();
+    if (!notes.length) {
+      const empty = document.createElement('p'); empty.textContent = 'No closed notes';
+      empty.className = 'notebook-closed-notes-empty'; menu.append(empty);
+    }
+    for (const card of notes) {
+      const row = document.createElement('div'); row.className = 'notebook-closed-note-row'; row.setAttribute('role','none');
+      const open = document.createElement('button'); open.type = 'button'; open.className = 'workspace-menu-option';
+      open.setAttribute('role','menuitem'); open.setAttribute('aria-label', `Open note: ${card.title || 'Untitled Note'}`);
+      open.textContent = card.title || 'Untitled Note';
+      open.addEventListener('click', () => {
+        close(false);
+        void openNotebookNoteColumn(project, card).catch(error => showWebNotice('Note not opened', error.message));
+      });
+      const trash = document.createElement('button'); trash.type = 'button'; trash.className = 'notebook-closed-note-trash';
+      trash.setAttribute('role','menuitem'); trash.setAttribute('aria-label', `Move ${card.title || 'Untitled Note'} to Trash`);
+      trash.title = 'Move to Trash'; trash.innerHTML = trashIconSVG();
+      trash.addEventListener('click', () => { close(); void moveClosedNotebookNoteToTrash(project, card); });
+      row.append(open, trash); menu.append(row);
+    }
+  };
+  menu._render(closedNotebookNoteChoices.notes);
+  notebookClosedMenu = menu; document.body.append(menu);
+  anchor.setAttribute('aria-expanded','true');
+  const rect = anchor.getBoundingClientRect();
+  menu.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - menu.offsetWidth - 8))}px`;
+  menu.style.top = `${rect.bottom + 6}px`;
+  menu.style.maxHeight = `${Math.max(100, Math.min(360, window.innerHeight - rect.bottom - 14))}px`;
+  menu.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); close(); return; }
+    if (event.key === 'Tab') { close(); return; }
+    if (!['ArrowDown','ArrowUp','Home','End'].includes(event.key)) return;
+    event.preventDefault();
+    const buttons = [...menu.querySelectorAll('button:not(:disabled)')];
+    const index = buttons.indexOf(document.activeElement);
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 :
+      (index + (event.key === 'ArrowUp' ? -1 : 1) + buttons.length) % buttons.length;
+    buttons[next]?.focus({preventScroll:true});
+  });
+  document.addEventListener('pointerdown', event => { if (!menu.contains(event.target) && !anchor.contains(event.target)) close(false); }, {signal:controller.signal});
+  document.addEventListener('scroll', event => { if (!menu.contains(event.target)) close(false); }, {capture:true,signal:controller.signal});
+  window.addEventListener('resize', () => close(false), {signal:controller.signal});
+  menu.querySelector('button')?.focus({preventScroll:true});
+}
+
+async function moveClosedNotebookNoteToTrash(project, card) {
+  const requestIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const projectID = projectDetailKey(project), navigationGeneration = state.workflowNavigationGeneration || 0;
+  const current = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    navigationGeneration === (state.workflowNavigationGeneration || 0) && projectDetailKey(workspaceProject()) === projectID;
+  try {
+    if (!current() || notebookColumnsForProject(project).some(column => column.open && column.cardID === card.id)) return;
+    const draft = await loadNotebookDraft(requestIdentity.userID, projectID, card.id);
+    if (!current()) return;
+    if (draft?.document) throw new Error('Open and sync this Note before moving it to Trash. Your device draft is preserved.');
+    const payload = await postResearch('/notebook/cards/get', {projectID, cardID:card.id});
+    if (!current()) return;
+    const confirmed = await confirmWebWarning('Move Note to Trash?', `“${payload.card.title || 'Untitled Note'}” will move to Trash. You can restore it from Settings for 30 days.`, {confirmLabel:'Move to Trash'});
+    if (!confirmed || !current() || notebookColumnsForProject(project).some(column => column.open && column.cardID === card.id)) return;
+    await postResearch('/notebook/cards/delete', {projectID, cardID:card.id, expectedVersion:payload.card.version, recoverable:true});
+    requireCurrentAccountRequest(requestIdentity);
+    await Promise.all([deleteNotebookDraft(requestIdentity.userID,projectID,card.id).catch(() => {}), deleteNotebookCardSnapshot(requestIdentity.userID,projectID,card.id).catch(() => {})]);
+    const cached = await loadNotebookProjectSnapshot(requestIdentity.userID, projectID).catch(() => null);
+    if (cached?.cardPayload) await saveNotebookProjectSnapshot({...cached, cardPayload: {...cached.cardPayload, cards: (cached.cardPayload.cards || []).filter(item => item.id !== card.id)}}).catch(() => {});
+    if (!current()) return;
+    notebookCatalogs.set(projectID, (notebookCatalogs.get(projectID) || []).filter(item => item.id !== card.id));
+    state.notebookColumns = (state.notebookColumns || []).filter(column => column.projectID !== projectID || column.cardID !== card.id);
+    invalidateInitialProjectFoundation(projectID); saveWorkspaceState(); syncNotebookNoteTabs();
+    await notebookMounts.get(projectID)?.refreshCards?.();
+    await reportDraftMounts.get(projectID)?.refreshSources?.();
+  } catch (error) {
+    if (current()) await showWebNotice('Note not moved to Trash', error.message);
+  }
 }
 
 async function ensureNotebookTabCatalog() {
@@ -38194,6 +38303,7 @@ function attachSettingsTrash(panel) {
       const result = await postResearch("/content/trash", {action, id, confirmation});
       if (!isCurrentAccountRequest(identity)) return;
       if (action === "restore") {
+        if (id?.startsWith("notebook:")) notebookCatalogs.clear();
         await loadSyncedContent({force: true, skipOutbox: true});
         requireCurrentAccountRequest(identity);
         openTrashAfterSettingsDeletion = true;
@@ -38269,7 +38379,7 @@ function attachSettingsTrash(panel) {
             for (const item of detail.entry.items) {
               const row = document.createElement("li");
               const kind = item.kind === "project" ? (item.folderType === "reference" ? "Saved collection" : "Project")
-                : item.kind === "annotation" ? "Note" : item.kind === "projectSection" ? "Project evidence" : "Saved passage";
+                : ["annotation", "notebookCard"].includes(item.kind) ? "Note" : item.kind === "projectSection" ? "Project evidence" : "Saved passage";
               const meta = document.createElement("p");
               meta.className = "settings-trash-item-meta";
               meta.textContent = [kind, item.codeLabel, item.editionLabel].filter(Boolean).join(" · ");
@@ -38280,7 +38390,7 @@ function attachSettingsTrash(panel) {
               if (item.kind !== "project") {
                 const excerpt = document.createElement("p");
                 excerpt.className = "settings-trash-item-excerpt";
-                excerpt.textContent = item.excerpt || (item.kind === "annotation" ? "Note text unavailable for this entry." : "Passage text unavailable for this entry.");
+                excerpt.textContent = item.excerpt || (["annotation", "notebookCard"].includes(item.kind) ? "Note text unavailable for this entry." : "Passage text unavailable for this entry.");
                 row.append(excerpt);
               }
               items.append(row);
@@ -47177,6 +47287,10 @@ function bindImmediateUtilityControls() {
   if (newNotebookNoteButton && newNotebookNoteButton.dataset.coldStartBound !== 'true') {
     newNotebookNoteButton.dataset.coldStartBound = 'true';
     newNotebookNoteButton.addEventListener('click', () => void createNotebookNoteColumn());
+  }
+  if (closedNotebookNotesButton && closedNotebookNotesButton.dataset.coldStartBound !== 'true') {
+    closedNotebookNotesButton.dataset.coldStartBound = 'true';
+    closedNotebookNotesButton.addEventListener('click', openClosedNotebookNotesMenu);
   }
   if (track.dataset.utilityFocusBound !== "true") {
     track.dataset.utilityFocusBound = "true";

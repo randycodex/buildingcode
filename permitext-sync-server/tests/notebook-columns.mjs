@@ -105,7 +105,7 @@ const tabColumns=[...initial.map(column=>({...column,open:true})),
   {id:'recently-saved',projectID:'project',cardID:'recent',title:'Recently saved Note',open:true}];
 const tabs={children:[],replaceChildren(){this.children=[];},append(button){this.children.push(button);}};
 const tabState={paneOrder:[notebookColumnPaneID(tabColumns[1]),notebookColumnPaneID(tabColumns[2]),notebookColumnPaneID(tabColumns[0])]};
-const tabContext=vm.createContext({state:tabState,notebookTabs:tabs,newNotebookNoteButton:{},
+const tabContext=vm.createContext({state:tabState,notebookTabs:tabs,newNotebookNoteButton:{},closedNotebookNotesButton:{},closedNotebookNoteChoices:null,notebookClosedMenu:null,
   workspacePrivatePresentationAllowed:()=>true,workspaceProject:()=>project,projectDetailKey:p=>p.id,
   notebookCatalogs:new Map([['project',[{id:'a',title:'Note A'},{id:'closed',title:'Closed Note'},{id:'b',title:'Note B'}]]]),
   notebookColumnsForProject:()=>tabColumns,notebookColumnPaneID,notebookColumnMounts:new Map(),
@@ -114,12 +114,19 @@ const tabContext=vm.createContext({state:tabState,notebookTabs:tabs,newNotebookN
 });
 vm.runInContext(actual('syncNotebookNoteTabs'),tabContext);
 tabContext.syncNotebookNoteTabs();
-assert.deepEqual(tabs.children.map(button=>button.textContent),['Note B','Pending Note','Note A','Recently saved Note','Closed Note']);
+assert.deepEqual(tabs.children.map(button=>button.textContent),['Note B','Pending Note','Note A','Recently saved Note']);
 tabState.paneOrder.reverse();
 tabContext.syncNotebookNoteTabs();
-assert.deepEqual(tabs.children.map(button=>button.textContent),['Note A','Pending Note','Note B','Recently saved Note','Closed Note'],
-  'Reordering mounted columns immediately updates their toolbar buttons, with closed Notes after open columns.');
-assert.deepEqual(tabs.children.map(button=>button.attrs['aria-pressed']),['true','true','true','true','false']);
+assert.deepEqual(tabs.children.map(button=>button.textContent),['Note A','Pending Note','Note B','Recently saved Note'],
+  'Reordering mounted columns immediately updates their toolbar buttons, with closed Notes in the overflow menu.');
+assert.deepEqual(tabs.children.map(button=>button.attrs['aria-pressed']),['true','true','true','true']);
+assert.deepEqual(Array.from(tabContext.closedNotebookNoteChoices.notes,card=>card.title),['Closed Note']);
+tabColumns[0].open=false;tabContext.syncNotebookNoteTabs();
+assert(!tabs.children.some(button=>button.textContent==='Note A'));
+assert(tabContext.closedNotebookNoteChoices.notes.some(card=>card.id==='a'),'Closing a Note moves its button into the overflow menu.');
+tabColumns[0].open=true;tabContext.syncNotebookNoteTabs();
+assert(tabs.children.some(button=>button.textContent==='Note A'));
+assert(!tabContext.closedNotebookNoteChoices.notes.some(card=>card.id==='a'),'Reopening a Note removes it from the overflow menu.');
 
 let view='notebook',evidenceID='evidence',visible=true;
 const pinState={pinnedPaneID:'reader:research'};
@@ -142,3 +149,29 @@ assert.equal(pinContext.orderWithPaneStepped('evidence',1),null,'Evidence cannot
 assert.equal(pinContext.orderWithPaneStepped('note:a',-1),null,'Notes cannot move before fixed Evidence.');
 assert.deepEqual(Array.from(pinContext.orderWithPaneStepped('note:b',-1)),['evidence','note:b','note:a']);
 console.log('Notebook layout passed: Evidence auto-pin, closed/hidden release, retained Research preference and Note buttons in live column order.');
+
+// Closed-note deletion is recoverable and fenced against navigation or local drafts.
+for (const mode of ['saved','cancel','navigate','pending-draft']) {
+  let workspaceID='workspace';const requests=[],notices=[];
+  const closedProject={id:'project'},closedCard={id:'closed',title:'Closed Note'};
+  const closedState={workflowNavigationGeneration:0,notebookColumns:[{id:'closed-column',projectID:'project',cardID:'closed',open:false},{id:'other-column',projectID:'other',cardID:'other',open:false}]};
+  const catalog=new Map([['project',[closedCard,{id:'keep',title:'Retained Note'}]]]);
+  const t=vm.createContext({state:closedState,notebookCatalogs:catalog,notebookMounts:new Map(),reportDraftMounts:new Map(),
+    captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,get activeWorkspaceID(){return workspaceID;},
+    projectDetailKey:p=>p?.id||'',workspaceProject:()=>closedProject,notebookColumnsForProject:()=>closedState.notebookColumns,
+    loadNotebookDraft:async()=>mode==='pending-draft'?{document:{}}:null,
+    async postResearch(path,body){requests.push({path,body});return path.endsWith('/get')?{card:{...closedCard,version:7}}:{};},
+    async confirmWebWarning(){if(mode==='navigate')workspaceID='other';return mode!=='cancel';},
+    requireCurrentAccountRequest(){},deleteNotebookDraft:async()=>{},deleteNotebookCardSnapshot:async()=>{},loadNotebookProjectSnapshot:async()=>null,
+    invalidateInitialProjectFoundation(){},saveWorkspaceState(){},syncNotebookNoteTabs(){},showWebNotice:async(...args)=>notices.push(args)});
+  vm.runInContext('async '+actual('moveClosedNotebookNoteToTrash'),t);
+  await t.moveClosedNotebookNoteToTrash(closedProject,closedCard);
+  const deletion=requests.find(item=>item.path.endsWith('/delete'));
+  if(mode==='saved'){
+    assert.equal(deletion.body.recoverable,true);assert.equal(deletion.body.expectedVersion,7);
+    assert.equal(closedState.notebookColumns.length,1);assert.equal(closedState.notebookColumns[0].projectID,'other');
+    assert.deepEqual(catalog.get('project').map(card=>card.id),['keep']);
+  } else assert(!deletion,`${mode} cannot delete a Note.`);
+  if(mode==='pending-draft')assert.match(notices[0][1],/draft is preserved/);
+}
+console.log('Closed-note Trash action passed: current version, recoverable deletion, preserved other Notes, cancelled/stale navigation and pending-draft rejection.');
