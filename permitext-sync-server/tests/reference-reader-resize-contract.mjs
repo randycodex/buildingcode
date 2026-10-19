@@ -82,13 +82,13 @@ for (const [view, sourcesWidth] of [['project-details', 0]]) {
   const originalReportWidth = f.reportWidth();
   f.context.startPaneEdgeResize(f.event(startX), 'reader:0', 'left');
   f.move(startX - 160); f.frame();
-  assert.equal(f.panes[0].width, 900);
-  assert.equal(f.dockWidth(), 903, `${view}: the reference dock grows while the mouse is held`);
-  assert.equal(f.reportWidth(), originalReportWidth - 100, `${view}: the document gives up the same width immediately`);
+  assert.equal(f.panes[0].width, 960);
+  assert.equal(f.dockWidth(), 963, `${view}: the reference dock grows while the mouse is held`);
+  assert.equal(f.reportWidth(), originalReportWidth - 160, `${view}: the document gives up the same width immediately`);
   assert.equal(f.saves, 0, 'Pointer frames do not persist every intermediate width');
   assert.ok(f.trackClasses.has('is-resizing'));
   assert.equal(f.frames.size, 0, 'Stopping at the moving divider must not trigger automatic growth');
-  f.frame(32); assert.equal(f.panes[0].width, 900);
+  f.frame(32); assert.equal(f.panes[0].width, 960);
   f.move(startX + 600); f.frame(48);
   assert.equal(f.panes[0].width, 400, 'Dragging right retains the Reader minimum');
   assert.equal(f.dockWidth(), 403, 'The dock contracts before release too');
@@ -98,7 +98,7 @@ for (const [view, sourcesWidth] of [['project-details', 0]]) {
   assert.equal(f.trackClasses.has('is-resizing'), false);
 }
 
-// Adjacent Readers keep their chosen widths within both bounds.
+// Adjacent Readers keep the neighbor's minimum width.
 const report = fixture('report', [800]);
 assert.equal(report.dockWidth(), 0, 'Report keeps existing Readers hidden while retaining their state');
 assert.equal(report.panes[0].width, 800);
@@ -108,7 +108,7 @@ pair.move(1140); pair.frame();
 assert.deepEqual(pair.panes.map(pane => pane.width), [440, 860]);
 assert.equal(pair.dockWidth(), 1304, 'Adjacent resizing updates the dock during the drag when a minimum is reached');
 pair.move(2300); pair.frame();
-assert.deepEqual(pair.panes.map(pane => pane.width), [900,400], 'Pointer resizing respects the Reader maximum and minimum together');
+assert.deepEqual(pair.panes.map(pane => pane.width), [900,400], 'Pointer resizing retains the neighboring Reader minimum');
 pair.finish('pointerup', 2300);
 assert.equal(pair.saves, 1); assert.equal(pair.handlers.size, 0);
 
@@ -117,7 +117,9 @@ shared.state.paneWeights = {'reader:0':600,'reader:1':600,'reader:2':600};
 shared.context.startPaneResize(shared.event(800), 'reader:0', 'reader:1');
 shared.move(900); shared.frame();
 assert.deepEqual(shared.panes.map(pane => pane.width), [900,700,800], 'Pointer resizing changes only the selected pair, preserving previously shared space.');
-shared.finish('pointerup',900);
+shared.move(1200); shared.frame();
+assert.deepEqual(shared.panes.map(pane => pane.width), [1200,400,800], 'A Reader can grow beyond 900px while preserving its neighbor and the untouched column.');
+shared.finish('pointerup',1200);
 assert.equal(shared.state.paneWeights['reader:2'],800,'The untouched rendered width also survives saving.');
 
 // Preserve edge-driven growth for ordinary workspace columns at the viewport edge.

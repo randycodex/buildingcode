@@ -1759,7 +1759,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 
 .reader-panel {
   --pane-min-width: 400px;
-  max-width: 900px;
+  max-width: none;
   --reader-header-overlay-height: calc(var(--panel-control-row-top) + 40px);
   --reader-scrollbar-rail-width: 0px;
   --reader-scrollbar-track-top: calc(var(--reader-header-overlay-height) + var(--panel-padding));

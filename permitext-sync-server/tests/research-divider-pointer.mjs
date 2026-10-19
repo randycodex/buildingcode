@@ -101,7 +101,7 @@ assert.deepEqual(edge.widths(), [1784, 48, 48, 400], 'The chosen width survives 
 assert.equal(edge.saves, 1); assert.equal(edge.classes.has('is-resizing'), false);
 assert.equal(edge.track.dataset.researchColumnSizing, 'manual');
 edge.workflow = 'project-details';
-assert.equal(edge.context.maximumPaneWidthForID('reader:one'), 900, 'Research fitting bounds cannot leak into reference Readers');
+assert.equal(edge.context.maximumPaneWidthForID('reader:one'), Infinity, 'Reference Readers have no maximum width');
 
 // Two fitted expanded panes must share their existing space without snapping.
 const pair = fixture(['utility:search:one', 'reader:one']);
@@ -117,6 +117,12 @@ pair.panes.push(pair.makePane('reader:two'), pair.makePane('reader:three'));
 pair.context.syncResearchColumnLayout();
 assert.deepEqual(pair.widths(), [600, 600, 600, 600], 'Adding columns restores the existing 600px overflow layout');
 assert.equal(pair.context.maximumPaneWidthForID('utility:search:one'), 900, 'Overflow retains the 900px maximum');
+
+const unlimited = fixture(['reader:one', 'reader:two']);
+unlimited.context.startPaneResize(unlimited.event(1201), 'reader:one', 'reader:two');
+unlimited.move(1801); unlimited.frame(); unlimited.finish(1801);
+assert.deepEqual(unlimited.widths(), [1800,600], 'Reader resizing is not capped by the fitted layout maximum');
+assert.equal(unlimited.context.maximumPaneWidthForID('reader:one'), Infinity);
 
 const unrelated = fixture(['reader:one', 'reader:two', 'reader:three'], 2404);
 unrelated.context.startPaneResize(unrelated.event(801), 'reader:one', 'reader:two');

@@ -9,6 +9,7 @@ assert.deepEqual(researchColumnsLayout([900, 900, 600], 2404, 0, 4), { fits: tru
 assert.deepEqual(researchColumnsLayout([900, 900, 900, 600], 2405, 0, 5), { fits: true, widths: [600, 600, 600, 600] });
 assert.deepEqual(researchColumnsLayout([400, 1400, 700, 600], 2404, 0, 5), { fits: false, widths: [600, 900, 700, 600] });
 assert.deepEqual(researchColumnsLayout([900, 600], 2203, 1000, 3), { fits: true, widths: [600, 600] });
+assert.deepEqual(researchColumnsLayout([1800, 1400], 1103, 0, 3, [Infinity, 900]), { fits: false, widths: [1800, 900] });
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 function actual(name) {
@@ -45,10 +46,16 @@ context.syncResearchColumnLayout();
 assert.deepEqual(sizes(), [600,600,600,600], 'Adding a fourth column crosses into horizontal scrolling at the minimum');
 assert.equal(track.dataset.researchColumnSizing, 'overflow');
 assert.equal(panels[0].style.maxWidth, '900px');
+assert.equal(panels[1].style.maxWidth, 'none', 'Overflow Readers have no CSS maximum');
+state.paneWeights['reader:one'] = 1800;
+delete track._researchColumnLayout;
+context.syncResearchColumnLayout();
+assert.deepEqual(sizes(), [600,1800,600,600], 'Stored Reader widths remain uncapped in overflow');
 context.capturePaneResizeWidths();
 state.paneWeights['utility:search:one'] = 850;
+state.paneWeights['reader:one'] = 1800;
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [850,600,600,600], 'Manual overflow widths survive hydration/layout notifications');
+assert.deepEqual(sizes(), [850,1800,600,600], 'Manual Reader widths beyond 900px survive layout notifications');
 track.clientWidth = 3605;
 context.syncResearchColumnLayout({reset:true});
 assert.deepEqual(sizes(), [900,900,900,900], 'A viewport change restores equal sharing');
@@ -73,9 +80,10 @@ context.syncResearchColumnLayout();
 assert.equal(track.dataset.researchColumnSizing, undefined, 'Phone paging keeps its viewport width');
 assert.equal(context.minimumPaneWidthForID('reader:one'), 600);
 assert.equal(context.maximumPaneWidthForID('utility:search:one'), 900);
+assert.equal(context.maximumPaneWidthForID('reader:one'), Infinity);
 workflow = 'project-details';
 assert.equal(context.minimumPaneWidthForID('reader:one'), 400, 'Project reference Reader bounds stay intact');
-console.log('Research columns passed: equal one/two/three-column fit, 600px overflow, 900px resize limit, manual persistence, collapse, hidden views and phone isolation.');
+console.log('Research columns passed: equal fit, minimum widths, unlimited Readers, bounded Search, manual persistence, collapse and phone isolation.');
 
 // Chapter/code refreshes prepare the live header again. That reapplies the
 // stored width, so the Research layout must be restored before publishing.
@@ -103,7 +111,7 @@ for (const count of [1, 2]) {
   await context.refreshReaderContent(readerPanel, {chapterID: 'any-chapter'});
   assert.deepEqual(sizes(), before, `Changing chapters keeps the fitted width with ${count} columns`);
   context.capturePaneResizeWidths();
-  state.paneWeights['reader:one'] = 900;
+  state.paneWeights['reader:one'] = 1800;
   context.syncResearchColumnLayout();
   const resized = sizes();
   await context.refreshReaderContent(readerPanel, {chapterID: 'another-code-chapter'});

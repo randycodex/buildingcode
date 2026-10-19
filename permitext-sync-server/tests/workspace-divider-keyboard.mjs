@@ -93,7 +93,7 @@ press(historyEdge,'ArrowRight');
 assert.equal(panes.get('right').width,historyWidth);
 console.log('Workspace divider keyboard: expanded pairs, minimums, scroll compensation, Shift steps, collapsed neighbors and outer edges passed.');
 
-// Reader limits apply equally to keyboard pairs and outer edges.
+// Reader minimums apply to both paths; neither path imposes a maximum.
 for (const id of ['reader:left','reader:right']) panes.set(id,{dataset:{paneId:id},width:600,getBoundingClientRect(){return {width:this.width};}});
 const readerDivider=context.createDivider('reader:left','reader:right');
 context.resizeAdjacentPanesBy('reader:left','reader:right',1000,readerDivider);
@@ -101,10 +101,13 @@ assert.equal(panes.get('reader:left').width,800); assert.equal(panes.get('reader
 context.resizeAdjacentPanesBy('reader:left','reader:right',-2000,readerDivider);
 assert.equal(panes.get('reader:left').width,400); assert.equal(panes.get('reader:right').width,800);
 const readerEdge=context.createDivider('','reader:left'); readerEdge.handlers.focus();
-assert.equal(readerEdge.attrs['aria-valuemin'],'400'); assert.equal(readerEdge.attrs['aria-valuemax'],'900');
-context.resizePaneEdgeBy('reader:left',10000,readerEdge); assert.equal(panes.get('reader:left').width,900);
+assert.equal(readerEdge.attrs['aria-valuemin'],'400'); assert.equal(readerEdge.attrs['aria-valuemax'],undefined);
+context.resizePaneEdgeBy('reader:left',10000,readerEdge); assert.equal(panes.get('reader:left').width,10400);
 context.resizePaneEdgeBy('reader:left',-10000,readerEdge); assert.equal(panes.get('reader:left').width,400);
-console.log('Reader keyboard limits passed: 400px minimum, 900px maximum, adjacent and outer edges, accessible bounds.');
+panes.get('reader:left').width=1600; panes.get('reader:right').width=1600;
+context.resizeAdjacentPanesBy('reader:left','reader:right',1000,readerDivider);
+assert.equal(panes.get('reader:left').width,2600); assert.equal(panes.get('reader:right').width,600);
+console.log('Reader keyboard resizing passed: unlimited growth, minimum widths, adjacent and outer edges, accessible bounds.');
 
 state.readers=[{id:'one'},{id:'two'}];
 context.syncReaderDividerButton(add);
