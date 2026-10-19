@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-notebook-note-columns-v1220";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-notebook-evidence-pin-v1222";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -131,7 +131,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-notebook-note-columns-v1220";
+} from "./offline-storage.js?v=20261019-notebook-evidence-pin-v1222";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -164,7 +164,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-notebook-note-columns-v1220";
+} from "./workspace-state.js?v=20261019-notebook-evidence-pin-v1222";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2823,8 +2823,14 @@ function syncNotebookNoteTabs() {
     const live = notebookColumnMounts.get(notebookColumnPaneID(column))?.summary?.();
     const note = notes.find(card => card.id === (live?.id || column.cardID));
     if (note && live) note.title = live.title;
-    if (column.open && !column.cardID) notes.push({id: '', title: live?.title || column.title || 'New Note', column});
+    if (column.open && !note) notes.push({id: live?.id || column.cardID || '', title: live?.title || column.title || 'New Note', column});
   }
+  const paneOrder = new Map((state.paneOrder || []).map((id, index) => [id, index]));
+  const rank = card => {
+    const column = card.column || columns.find(item => item.open && item.cardID === card.id);
+    return column ? paneOrder.get(notebookColumnPaneID(column)) ?? paneOrder.size + columns.indexOf(column) : Number.MAX_SAFE_INTEGER;
+  };
+  notes.sort((a, b) => rank(a) - rank(b));
   notebookTabs.replaceChildren();
   for (const card of notes) {
     const column = card.column || columns.find(item => item.cardID === card.id && item.open);
@@ -42104,12 +42110,14 @@ function setColumnGroupCollapsed(group, collapsed) {
 
 function orderWithPaneStepped(paneID, direction) {
   const order = activePaneIDs();
+  if (currentColumnWorkflowView() === 'notebook' && paneID === activePinnedPaneID()) return null;
   const unit = paneGroupForMove(paneID, order);
   const indexes = unit.map((id) => order.indexOf(id)).filter((index) => index >= 0);
   if (!indexes.length) return null;
   const targetIndex = direction < 0 ? Math.min(...indexes) - 1 : Math.max(...indexes) + 1;
   const target = order[targetIndex];
   if (!target) return null;
+  if (currentColumnWorkflowView() === 'notebook' && target === activePinnedPaneID() && direction < 0) return null;
   const codeQuestionIDs = openCodeQuestionPaneIDs();
   if (codeQuestionIDs.length) {
     // These legacy workflow surfaces are re-anchored by activePaneIDs. Do not
@@ -42126,8 +42134,14 @@ function orderWithPaneStepped(paneID, direction) {
 }
 
 function activePinnedPaneID() {
-  // Retain the Research preference without applying it to other working views.
-  if (!isProAccount() || currentColumnWorkflowView() !== "research") return "";
+  if (!isProAccount()) return "";
+  const view = currentColumnWorkflowView();
+  // Notebook Evidence stays at the left edge independently of the Research pin.
+  if (view === 'notebook') {
+    const evidenceID = primarySavedPaneID();
+    return evidenceID && workflowPaneIsVisible(evidenceID) ? evidenceID : '';
+  }
+  if (view !== "research") return "";
   const paneID = state.pinnedPaneID || "";
   // Pin a saved detail through its Evidence anchor so the pair cannot split.
   return paneID.startsWith("section:detail:")

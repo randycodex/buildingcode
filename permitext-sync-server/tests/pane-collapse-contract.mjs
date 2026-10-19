@@ -123,7 +123,7 @@ const detailID = 'section:detail:evidence';
 const orderState = { utilities: {}, utilityInstances: [], paneOrder: ['reader:one', notebookID, savedID, reportID], collapsedPaneIDs: [notebookID] };
 const orderContext = vm.createContext({
   applyLinkedPanePlacements: ids => ids, requestLinkedPanePlacement() {},
-  state: orderState, Set, normalizeColumnGroups, orderColumnGroups, canGroupColumn,
+  state: orderState, currentColumnWorkflowView:()=> 'research', Set, normalizeColumnGroups, orderColumnGroups, canGroupColumn,
   defaultActivePaneIDs: () => [savedID, notebookID, reportID, 'reader:one'],
   savedPaneIDs: () => [savedID], primarySavedPaneID: () => savedID,
   savedItemDetailIDsForPane: () => [], paneIDForSectionDetail: id => `section:detail:${id}`,
@@ -303,7 +303,7 @@ const peerPanel={dataset:{paneId:'reader:two'}};
 let menuOrder=['reader:one','reader:two'], menuPro=false;
 const menuState={paneOrder:menuOrder,columnGroups:[]};
 const menuItems = () => menu.children.filter(item => item.tag === 'button');
-const menuContext=vm.createContext({state:menuState,AbortController,isProAccount:()=>menuPro,currentColumnWorkflowView:()=> 'research',workflowPaneIsVisible:()=>true,
+const menuContext=vm.createContext({state:menuState,primarySavedPaneID:()=>'',AbortController,isProAccount:()=>menuPro,currentColumnWorkflowView:()=> 'research',workflowPaneIsVisible:()=>true,
   document:{querySelector:()=>null,createElement:tag=>menuNode(tag),body:{append:n=>{menu=n;}},addEventListener(){},get activeElement(){return focused;}},
   window:{innerWidth:1200,innerHeight:800},
   track:{querySelectorAll:()=>[menuPanel,peerPanel]},

@@ -98,3 +98,47 @@ const closing=context.closeNotebookNoteColumn(project,a.panel.dataset.paneId);wo
 assert.equal(await closing,false);assert.equal(state.notebookColumns[0].open,true,'A workspace switch fences a late close.');
 facade.dispose();assert.equal(registry.mounts.size,0);assert.equal(projects.size,0);
 console.log('Independent Notebook columns passed: persisted identities, focus/insert routing, background saves, duplicate prevention, close/reopen, separate new Notes, retained edits/scroll and workspace fencing.');
+
+// The toolbar reflects the actual column order, including an unsaved Note.
+const tabColumns=[...initial.map(column=>({...column,open:true})),
+  {id:'pending',projectID:'project',cardID:'',title:'Pending Note',open:true},
+  {id:'recently-saved',projectID:'project',cardID:'recent',title:'Recently saved Note',open:true}];
+const tabs={children:[],replaceChildren(){this.children=[];},append(button){this.children.push(button);}};
+const tabState={paneOrder:[notebookColumnPaneID(tabColumns[1]),notebookColumnPaneID(tabColumns[2]),notebookColumnPaneID(tabColumns[0])]};
+const tabContext=vm.createContext({state:tabState,notebookTabs:tabs,newNotebookNoteButton:{},
+  workspacePrivatePresentationAllowed:()=>true,workspaceProject:()=>project,projectDetailKey:p=>p.id,
+  notebookCatalogs:new Map([['project',[{id:'a',title:'Note A'},{id:'closed',title:'Closed Note'},{id:'b',title:'Note B'}]]]),
+  notebookColumnsForProject:()=>tabColumns,notebookColumnPaneID,notebookColumnMounts:new Map(),
+  hasCapability:()=>true,projectToolTogglePending:false,
+  document:{createElement(){return {attrs:{},setAttribute(key,value){this.attrs[key]=value;},addEventListener(){}};}}
+});
+vm.runInContext(actual('syncNotebookNoteTabs'),tabContext);
+tabContext.syncNotebookNoteTabs();
+assert.deepEqual(tabs.children.map(button=>button.textContent),['Note B','Pending Note','Note A','Recently saved Note','Closed Note']);
+tabState.paneOrder.reverse();
+tabContext.syncNotebookNoteTabs();
+assert.deepEqual(tabs.children.map(button=>button.textContent),['Note A','Pending Note','Note B','Recently saved Note','Closed Note'],
+  'Reordering mounted columns immediately updates their toolbar buttons, with closed Notes after open columns.');
+assert.deepEqual(tabs.children.map(button=>button.attrs['aria-pressed']),['true','true','true','true','false']);
+
+let view='notebook',evidenceID='evidence',visible=true;
+const pinState={pinnedPaneID:'reader:research'};
+const pinContext=vm.createContext({state:pinState,isProAccount:()=>true,currentColumnWorkflowView:()=>view,
+  primarySavedPaneID:()=>evidenceID,workflowPaneIsVisible:()=>visible,savedEvidenceColumnGroup:()=>[]});
+vm.runInContext(actual('activePinnedPaneID'),pinContext);
+assert.equal(pinContext.activePinnedPaneID(),'evidence','Open Notebook Evidence is automatically pinned.');
+assert.equal(pinState.pinnedPaneID,'reader:research','The automatic Evidence pin preserves the separate Research preference.');
+evidenceID='';assert.equal(pinContext.activePinnedPaneID(),'','Closing Evidence releases the fixed column.');
+evidenceID='evidence';visible=false;assert.equal(pinContext.activePinnedPaneID(),'','A hidden Evidence column cannot cover another view.');
+visible=true;view='research';assert.equal(pinContext.activePinnedPaneID(),'reader:research');
+view='report';assert.equal(pinContext.activePinnedPaneID(),'');
+view='notebook';
+pinContext.activePaneIDs=()=>['evidence','note:a','note:b'];
+pinContext.paneGroupForMove=id=>[id];
+pinContext.openCodeQuestionPaneIDs=()=>[];
+pinContext.orderWithPaneMoved=()=>['evidence','note:b','note:a'];
+vm.runInContext(actual('orderWithPaneStepped'),pinContext);
+assert.equal(pinContext.orderWithPaneStepped('evidence',1),null,'Evidence cannot be moved away from the fixed left edge.');
+assert.equal(pinContext.orderWithPaneStepped('note:a',-1),null,'Notes cannot move before fixed Evidence.');
+assert.deepEqual(Array.from(pinContext.orderWithPaneStepped('note:b',-1)),['evidence','note:b','note:a']);
+console.log('Notebook layout passed: Evidence auto-pin, closed/hidden release, retained Research preference and Note buttons in live column order.');

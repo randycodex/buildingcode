@@ -19360,6 +19360,9 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-draft-cla
 
 /* Keep the mounted column in the same track to preserve editor/reader state. */
 @media (min-width: 761px) {
+  .panel-track:has(> .workspace-panel.is-pinned:not(.is-workflow-hidden)) > .pane-left-edge-resizer {
+    order: -3;
+  }
   .panel-track > .workspace-panel.is-pinned {
     position: sticky;
     left: 0;
