@@ -139,9 +139,12 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
       if (selectingCards) choice.setAttribute('aria-pressed', String(selectedCardIDs.has(card.id)));
       const name = document.createElement('span');
       name.textContent = (current ? activeCard.title : card.title) || 'Untitled Note';
-      const revision = document.createElement('small');
-      revision.textContent = current ? 'Current' : `Revision ${card.version || 1}`;
-      choice.append(name, revision);
+      choice.append(name);
+      if (current) {
+        const status = document.createElement('small');
+        status.textContent = 'Current';
+        choice.append(status);
+      }
       choice.addEventListener('click', () => {
         if (!state.selectingCards) {
           menu.open = false;

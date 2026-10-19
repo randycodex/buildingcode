@@ -49,7 +49,7 @@ assert.equal(menu.menu.open,false,'Notes starts as a compact closed dropdown');
 assert.equal(menu.menu.hidden,false,'Existing Notes expose the picker');
 assert.equal(menu.list.children.length,2,'Archive entries stay outside the active list');
 const choices = () => menu.list.querySelectorAll('button');
-assert.equal(choices()[0].children[1].textContent,'Revision 1');
+assert.equal(choices()[0].children.length,1,'Inactive Notes show only their title, without a revision label');
 assert.equal(choices()[1].children[1].textContent,'Current');
 assert.equal(choices()[1].getAttribute('aria-current'),'true');
 menu.menu.open = true;
@@ -145,7 +145,7 @@ assert.equal(menu.menu.hidden,false,'A new unsaved Note exposes the picker again
 assert.equal(menu.element.hidden,false);
 menu.render({cards:[cards[2]],activeCard:null});
 assert.equal(menu.menu.hidden,false,'Archived Notes remain reachable even when there are no active Notes');
-console.log('Notebook Notes menu passed: current/revision rows, switching/new action, keyboard/close behavior, live title editing, first-save continuity, archive/selection and read-only access.');
+console.log('Notebook Notes menu passed: title/current rows, switching/new action, keyboard/close behavior, live title editing, first-save continuity, archive/selection and read-only access.');
 
 // Run the actual app's control setup and list renderer so integration state,
 // title autosave callbacks and management controls are checked together.
