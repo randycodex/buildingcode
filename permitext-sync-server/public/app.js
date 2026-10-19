@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-untitled-notes-v1226";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-notebook-toolbar-collapse-v1228";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -131,7 +131,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-untitled-notes-v1226";
+} from "./offline-storage.js?v=20261019-notebook-toolbar-collapse-v1228";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -164,7 +164,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-untitled-notes-v1226";
+} from "./workspace-state.js?v=20261019-notebook-toolbar-collapse-v1228";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2811,6 +2811,7 @@ function publishNotebookColumn(projectID, paneID, card, cards) {
   if (panel && card) {
     panel.dataset.noteId = card.id || '';
     panel.querySelector('.notebook-heading .panel-kind').textContent = card.title || 'Untitled';
+    preparePaneCollapse(panel);
   }
   syncNotebookNoteTabs();
 }
@@ -2821,7 +2822,7 @@ function syncNotebookNoteTabs() {
   const projectID = project ? projectDetailKey(project) : '';
   const catalog = notebookCatalogs.get(projectID) || [];
   const columns = project ? notebookColumnsForProject(project) : [];
-  const notes = catalog.filter(card => !card.deletedAt && !card.archivedAt).map(card => ({...card}));
+  const notes = catalog.filter(card => !card.deletedAt).map(card => ({...card}));
   for (const column of columns) {
     const live = notebookColumnMounts.get(notebookColumnPaneID(column))?.summary?.();
     const note = notes.find(card => card.id === (live?.id || column.cardID));
@@ -2835,10 +2836,10 @@ function syncNotebookNoteTabs() {
   };
   notes.sort((a, b) => rank(a) - rank(b));
   notebookTabs.replaceChildren();
-  const closedNotes = [];
   for (const card of notes) {
+    if (card.archivedAt) continue;
     const column = card.column || columns.find(item => item.cardID === card.id && item.open);
-    if (!column?.open) { closedNotes.push(card); continue; }
+    if (!column?.open) continue;
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'toolbar-button notebook-note-tab';
     button.textContent = card.title || 'Untitled';
@@ -2851,11 +2852,11 @@ function syncNotebookNoteTabs() {
     notebookTabs.append(button);
   }
   newNotebookNoteButton.disabled = !project || !hasCapability('notebook') || projectToolTogglePending;
-  closedNotebookNoteChoices = {projectID, notes: closedNotes};
+  closedNotebookNoteChoices = {projectID, notes};
   if (closedNotebookNotesButton) closedNotebookNotesButton.disabled = !project || !hasCapability('notebook');
   if (notebookClosedMenu) {
     if (!project || notebookClosedMenu.dataset.projectId !== projectID || currentColumnWorkflowView() !== 'notebook') notebookClosedMenu._close(false);
-    else notebookClosedMenu._render(closedNotes);
+    else notebookClosedMenu._render(notes);
   }
 }
 
@@ -2865,11 +2866,21 @@ function openClosedNotebookNotesMenu() {
   if (!project || !hasCapability('notebook') || !closedNotebookNotesButton) return;
   syncNotebookNoteTabs();
   const projectID = projectDetailKey(project), anchor = closedNotebookNotesButton;
-  const menu = document.createElement('div');
+  const manager = createNotebookToolbarMenu({
+    getActiveCardID: () => notebookMounts.get(projectID)?.activeCardID?.() || '',
+    readOnly: project.sharedRole === 'viewer',
+    icons: {archive:archiveIconSVG(), active:activeProjectsIconSVG(), restore:archiveRestoreIconSVG(),
+      select:selectionModeIconSVG(), trash:trashIconSVG()},
+    onOpen(card) { close(false); void openNotebookNoteColumn(project,card).catch(error => showWebNotice('Note not opened',error.message)); },
+    onCreate() { close(false); void createNotebookNoteColumn(project); },
+    onArchive: (cards,archived) => mutateNotebookNotesFromMenu(project,cards,{archived}),
+    onTrash: cards => mutateNotebookNotesFromMenu(project,cards,{trash:true})
+  });
+  const menu = manager.menu;
   menu.id = 'notebook-closed-notes-menu';
-  menu.className = 'workspace-menu notebook-closed-notes-menu';
+  menu.classList.add('notebook-closed-notes-menu');
   menu.dataset.projectId = projectID;
-  menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', 'Closed notes');
+  menu.setAttribute('aria-label','Notes');
   const controller = new AbortController();
   const close = (restoreFocus = true) => {
     controller.abort(); menu.remove();
@@ -2878,32 +2889,10 @@ function openClosedNotebookNotesMenu() {
     if (restoreFocus) anchor.focus({preventScroll:true});
   };
   menu._close = close;
-  let signature = '';
-  menu._render = notes => {
-    const next = JSON.stringify(notes.map(card => [card.id, card.title, card.version]));
-    if (next === signature) return;
-    signature = next; menu.replaceChildren();
-    if (!notes.length) {
-      const empty = document.createElement('p'); empty.textContent = 'No closed notes';
-      empty.className = 'notebook-closed-notes-empty'; menu.append(empty);
-    }
-    for (const card of notes) {
-      const row = document.createElement('div'); row.className = 'notebook-closed-note-row'; row.setAttribute('role','none');
-      const open = document.createElement('button'); open.type = 'button'; open.className = 'workspace-menu-option';
-      open.setAttribute('role','menuitem'); open.setAttribute('aria-label', `Open note: ${card.title || 'Untitled'}`);
-      open.textContent = card.title || 'Untitled';
-      open.addEventListener('click', () => {
-        close(false);
-        void openNotebookNoteColumn(project, card).catch(error => showWebNotice('Note not opened', error.message));
-      });
-      const trash = document.createElement('button'); trash.type = 'button'; trash.className = 'notebook-closed-note-trash';
-      trash.setAttribute('role','menuitem'); trash.setAttribute('aria-label', `Move ${card.title || 'Untitled'} to Trash`);
-      trash.title = 'Move to Trash'; trash.innerHTML = trashIconSVG();
-      trash.addEventListener('click', () => { close(); void moveClosedNotebookNoteToTrash(project, card); });
-      row.append(open, trash); menu.append(row);
-    }
-  };
+  menu._render = manager.render;
   menu._render(closedNotebookNoteChoices.notes);
+  menu.open = true;
+  menu.addEventListener('toggle',() => { if (!menu.open) close(); },{signal:controller.signal});
   notebookClosedMenu = menu; document.body.append(menu);
   anchor.setAttribute('aria-expanded','true');
   const rect = anchor.getBoundingClientRect();
@@ -2913,13 +2902,6 @@ function openClosedNotebookNotesMenu() {
   menu.addEventListener('keydown', event => {
     if (event.key === 'Escape') { event.preventDefault(); close(); return; }
     if (event.key === 'Tab') { close(); return; }
-    if (!['ArrowDown','ArrowUp','Home','End'].includes(event.key)) return;
-    event.preventDefault();
-    const buttons = [...menu.querySelectorAll('button:not(:disabled)')];
-    const index = buttons.indexOf(document.activeElement);
-    const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 :
-      (index + (event.key === 'ArrowUp' ? -1 : 1) + buttons.length) % buttons.length;
-    buttons[next]?.focus({preventScroll:true});
   });
   document.addEventListener('pointerdown', event => { if (!menu.contains(event.target) && !anchor.contains(event.target)) close(false); }, {signal:controller.signal});
   document.addEventListener('scroll', event => { if (!menu.contains(event.target)) close(false); }, {capture:true,signal:controller.signal});
@@ -2927,20 +2909,27 @@ function openClosedNotebookNotesMenu() {
   menu.querySelector('button')?.focus({preventScroll:true});
 }
 
-async function moveClosedNotebookNoteToTrash(project, card) {
+async function moveClosedNotebookNoteToTrash(project, card, {allowOpen = false, skipConfirmation = false} = {}) {
   const requestIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   const projectID = projectDetailKey(project), navigationGeneration = state.workflowNavigationGeneration || 0;
   const current = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
     navigationGeneration === (state.workflowNavigationGeneration || 0) && projectDetailKey(workspaceProject()) === projectID;
   try {
-    if (!current() || notebookColumnsForProject(project).some(column => column.open && column.cardID === card.id)) return;
+    if (!current() || !allowOpen && notebookColumnsForProject(project).some(column => column.open && column.cardID === card.id)) return false;
+    const openMount = allowOpen ? [...notebookColumnMounts.values()].find(mount => mount.panel.dataset.projectId === projectID && mount.activeCardID() === card.id) : null;
+    if (openMount && !await openMount.prepareCardMutation()) throw new Error('Save this Note before moving it to Trash. Your edits are preserved.');
     const draft = await loadNotebookDraft(requestIdentity.userID, projectID, card.id);
-    if (!current()) return;
+    if (!current()) return false;
     if (draft?.document) throw new Error('Open and sync this Note before moving it to Trash. Your device draft is preserved.');
     const payload = await postResearch('/notebook/cards/get', {projectID, cardID:card.id});
-    if (!current()) return;
-    const confirmed = await confirmWebWarning('Move Note to Trash?', `“${payload.card.title || 'Untitled'}” will move to Trash. You can restore it from Settings for 30 days.`, {confirmLabel:'Move to Trash'});
-    if (!confirmed || !current() || notebookColumnsForProject(project).some(column => column.open && column.cardID === card.id)) return;
+    if (!current()) return false;
+    const confirmed = skipConfirmation || await confirmWebWarning('Move Note to Trash?', `“${payload.card.title || 'Untitled'}” will move to Trash. You can restore it from Settings for 30 days.`, {confirmLabel:'Move to Trash'});
+    if (!confirmed || !current() || !allowOpen && notebookColumnsForProject(project).some(column => column.open && column.cardID === card.id)) return false;
+    if (openMount) {
+      const latest = await openMount.prepareCardMutation();
+      if (!latest || latest.version !== payload.card.version) throw new Error('This Note changed. Your edits are preserved; try moving it to Trash again.');
+    }
+    if (!current()) return false;
     await postResearch('/notebook/cards/delete', {projectID, cardID:card.id, expectedVersion:payload.card.version, recoverable:true});
     requireCurrentAccountRequest(requestIdentity);
     await Promise.all([deleteNotebookDraft(requestIdentity.userID,projectID,card.id).catch(() => {}), deleteNotebookCardSnapshot(requestIdentity.userID,projectID,card.id).catch(() => {})]);
@@ -2948,12 +2937,64 @@ async function moveClosedNotebookNoteToTrash(project, card) {
     if (cached?.cardPayload) await saveNotebookProjectSnapshot({...cached, cardPayload: {...cached.cardPayload, cards: (cached.cardPayload.cards || []).filter(item => item.id !== card.id)}}).catch(() => {});
     if (!current()) return;
     notebookCatalogs.set(projectID, (notebookCatalogs.get(projectID) || []).filter(item => item.id !== card.id));
+    if (openMount) await retireNotebookNoteColumns(project, card.id);
     state.notebookColumns = (state.notebookColumns || []).filter(column => column.projectID !== projectID || column.cardID !== card.id);
     invalidateInitialProjectFoundation(projectID); saveWorkspaceState(); syncNotebookNoteTabs();
     await notebookMounts.get(projectID)?.refreshCards?.();
     await reportDraftMounts.get(projectID)?.refreshSources?.();
+    return true;
   } catch (error) {
     if (current()) await showWebNotice('Note not moved to Trash', error.message);
+    return false;
+  }
+}
+
+async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archived = false} = {}) {
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID, projectID = projectDetailKey(project);
+  const navigationGeneration = state.workflowNavigationGeneration || 0;
+  const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    navigationGeneration === (state.workflowNavigationGeneration || 0) && projectDetailKey(workspaceProject()) === projectID;
+  try {
+    if (!current()) return false;
+    if (trash && !await confirmWebWarning('Move selected Notes to Trash?',
+      `${cards.length} ${cards.length === 1 ? 'Note' : 'Notes'} will move to Trash. You can restore ${cards.length === 1 ? 'it' : 'them'} from Settings for 30 days.`,{confirmLabel:'Move to Trash'})) return false;
+    for (const card of cards) {
+      if (!current()) return false;
+      if (trash) {
+        if (!await moveClosedNotebookNoteToTrash(project,card,{allowOpen:true,skipConfirmation:true})) return false;
+        continue;
+      }
+      const mount = [...notebookColumnMounts.values()].find(item => item.panel.dataset.projectId === projectID && item.activeCardID() === card.id);
+      if (mount && !await mount.prepareCardMutation()) throw new Error('Save this Note before archiving it. Your edits are preserved.');
+      const draft = await loadNotebookDraft(identity.userID,projectID,card.id);
+      if (draft?.document) throw new Error('Open and sync this Note first. Your device draft is preserved.');
+      if (!current()) return false;
+      const latest = await postResearch('/notebook/cards/get',{projectID,cardID:card.id});
+      if (!current()) return false;
+      if (mount) {
+        const saved = await mount.prepareCardMutation();
+        if (!saved || saved.version !== latest.card.version) throw new Error('This Note changed. Your edits are preserved; try again.');
+      }
+      if (!current()) return false;
+      const payload = await postResearch('/notebook/cards/archive',{projectID,cardID:card.id,expectedVersion:latest.card.version,archived});
+      requireCurrentAccountRequest(identity);
+      if (!current()) return false;
+      notebookCatalogs.set(projectID,(notebookCatalogs.get(projectID) || []).map(item => item.id === card.id ? payload.card : item));
+      const cached = await loadNotebookProjectSnapshot(identity.userID,projectID).catch(() => null);
+      if (cached?.cardPayload) await saveNotebookProjectSnapshot({...cached,cardPayload:{...cached.cardPayload,
+        cards:(cached.cardPayload.cards || []).map(item => item.id === card.id ? payload.card : item)}}).catch(() => {});
+      if (!current()) return false;
+      if (archived) await retireNotebookNoteColumns(project,card.id);
+      syncNotebookNoteTabs();
+    }
+    if (current()) {
+      await notebookMounts.get(projectID)?.refreshCards?.();
+      await reportDraftMounts.get(projectID)?.refreshSources?.();
+    }
+    return true;
+  } catch (error) {
+    if (current()) await showWebNotice('Notes not updated',error.message);
+    return false;
   }
 }
 
@@ -28231,6 +28272,7 @@ async function renderProjectNotebook(project, options = {}) {
     },
     async prepareCardMutation() {
       if (dirty && !await flushNotebookAutosave()) return null;
+      if (dirty || saveConflict) return null;
       return activeCard;
     },
     async confirmDiscardIfNeeded() {
@@ -28358,13 +28400,8 @@ async function renderProjectNotebook(project, options = {}) {
     const railLabel = noteMenu.label;
     noteMenu.element.classList.add('has-note-columns');
     noteMenu.toggle.hidden = true;
-    noteMenu.menu.classList.add('notebook-column-note-manager');
-    header.append(noteMenu.menu);
+    noteMenu.menu.remove();
     mountState.editTitle = () => noteMenu.editTitle();
-    mountState.openNoteManager = () => {
-      noteMenu.menu.open = true;
-      noteMenu.list.querySelector('button')?.focus({preventScroll:true});
-    };
     const newButton = noteMenu.createButton;
     const cardList = noteMenu.list;
     const archiveButton = document.createElement("button");
@@ -42295,6 +42332,11 @@ function focusColumnGroupControl(group) {
 }
 
 function prepareColumnGroupControls(panel, header, group) {
+  if (panel.classList.contains('notebook-panel')) {
+    header.querySelector('.column-group-menu-button')?.remove();
+    panel.querySelector('.column-group-collapsed-menu')?.remove();
+    return;
+  }
   if (!workspacePrivatePresentationAllowed() || !canGroupWorkspaceColumn(panel.dataset.paneId)) group = null;
   let menuButton = header.querySelector('.column-group-menu-button');
   if (!menuButton) {
@@ -42394,10 +42436,6 @@ function openColumnGroupMenu(panel, anchor) {
   });
   const factEditor = panel.classList.contains("project-facts-panel") ? projectInformationMounts.get(panel.dataset.paneId) : null;
   if (factEditor?.refreshZoLa) add("Refresh ZoLa data", factEditor.refreshZoLa, factEditor.isRefreshing());
-  if (panel.classList.contains('notebook-panel')) {
-    const note = notebookColumnMounts.get(panel.dataset.paneId);
-    if (note?.openNoteManager) add('Manage notes…', () => note.openNoteManager());
-  }
   if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
   if (panel.classList.contains("research-list-panel")) add("New research column", () => void openNewResearchColumn());
   separate();
@@ -42599,7 +42637,7 @@ function openColumnGroupEditor(panel, existing = null) {
 
 // Collapse keeps the live column DOM (including unsaved editors) in place.
 function paneCanCollapse(paneID) {
-  return currentColumnWorkflowView() !== "notebook" || paneID.startsWith("reader:");
+  return currentColumnWorkflowView() !== "notebook" || paneID.startsWith("reader:") || paneID.startsWith("project:notebook:");
 }
 
 function columnGroupCanCollapse(group) {

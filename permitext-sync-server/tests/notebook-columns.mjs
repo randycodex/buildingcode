@@ -121,13 +121,13 @@ tabContext.syncNotebookNoteTabs();
 assert.deepEqual(tabs.children.map(button=>button.textContent),['Note A','Pending Note','Note B','Recently saved Note'],
   'Reordering mounted columns immediately updates their toolbar buttons, with closed Notes in the overflow menu.');
 assert.deepEqual(tabs.children.map(button=>button.attrs['aria-pressed']),['true','true','true','true']);
-assert.deepEqual(Array.from(tabContext.closedNotebookNoteChoices.notes,card=>card.title),['Closed Note']);
+assert.deepEqual(Array.from(tabContext.closedNotebookNoteChoices.notes,card=>card.title),['Note A','Pending Note','Note B','Recently saved Note','Closed Note']);
 tabColumns[0].open=false;tabContext.syncNotebookNoteTabs();
 assert(!tabs.children.some(button=>button.textContent==='Note A'));
 assert(tabContext.closedNotebookNoteChoices.notes.some(card=>card.id==='a'),'Closing a Note moves its button into the overflow menu.');
 tabColumns[0].open=true;tabContext.syncNotebookNoteTabs();
 assert(tabs.children.some(button=>button.textContent==='Note A'));
-assert(!tabContext.closedNotebookNoteChoices.notes.some(card=>card.id==='a'),'Reopening a Note removes it from the overflow menu.');
+assert(tabContext.closedNotebookNoteChoices.notes.some(card=>card.id==='a'),'The full Notes menu includes open and closed Notes.');
 
 let view='notebook',evidenceID='evidence',visible=true;
 const pinState={pinnedPaneID:'reader:research'};
@@ -152,23 +152,27 @@ assert.deepEqual(Array.from(pinContext.orderWithPaneStepped('note:b',-1)),['evid
 console.log('Notebook layout passed: Evidence auto-pin, closed/hidden release, retained Research preference and Note buttons in live column order.');
 
 // Closed-note deletion is recoverable and fenced against navigation or local drafts.
-for (const mode of ['saved','cancel','navigate','pending-draft']) {
+for (const mode of ['saved','cancel','navigate','pending-draft','open-saved','open-unsaved','open-changed','open-draft']) {
   let workspaceID='workspace';const requests=[],notices=[];
+  const open = mode.startsWith('open-'); let preparations=0;
   const closedProject={id:'project'},closedCard={id:'closed',title:'Closed Note'};
-  const closedState={workflowNavigationGeneration:0,notebookColumns:[{id:'closed-column',projectID:'project',cardID:'closed',open:false},{id:'other-column',projectID:'other',cardID:'other',open:false}]};
+  const closedState={workflowNavigationGeneration:0,notebookColumns:[{id:'closed-column',projectID:'project',cardID:'closed',open},{id:'other-column',projectID:'other',cardID:'other',open:false}]};
   const catalog=new Map([['project',[closedCard,{id:'keep',title:'Retained Note'}]]]);
   const t=vm.createContext({state:closedState,notebookCatalogs:catalog,notebookMounts:new Map(),reportDraftMounts:new Map(),
     captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,get activeWorkspaceID(){return workspaceID;},
     projectDetailKey:p=>p?.id||'',workspaceProject:()=>closedProject,notebookColumnsForProject:()=>closedState.notebookColumns,
-    loadNotebookDraft:async()=>mode==='pending-draft'?{document:{}}:null,
+    notebookColumnMounts:new Map(open ? [['open',{panel:{dataset:{projectId:'project'}},activeCardID:()=> 'closed',
+      async prepareCardMutation(){preparations++;return mode==='open-unsaved'?null:{...closedCard,version:mode==='open-changed'&&preparations>1?8:7};}}]] : []),
+    async retireNotebookNoteColumns(){closedState.notebookColumns[0].open=false;},
+    loadNotebookDraft:async()=>['pending-draft','open-draft'].includes(mode)?{document:{}}:null,
     async postResearch(path,body){requests.push({path,body});return path.endsWith('/get')?{card:{...closedCard,version:7}}:{};},
     async confirmWebWarning(){if(mode==='navigate')workspaceID='other';return mode!=='cancel';},
     requireCurrentAccountRequest(){},deleteNotebookDraft:async()=>{},deleteNotebookCardSnapshot:async()=>{},loadNotebookProjectSnapshot:async()=>null,
     invalidateInitialProjectFoundation(){},saveWorkspaceState(){},syncNotebookNoteTabs(){},showWebNotice:async(...args)=>notices.push(args)});
   vm.runInContext('async '+actual('moveClosedNotebookNoteToTrash'),t);
-  await t.moveClosedNotebookNoteToTrash(closedProject,closedCard);
+  await t.moveClosedNotebookNoteToTrash(closedProject,closedCard,{allowOpen:open});
   const deletion=requests.find(item=>item.path.endsWith('/delete'));
-  if(mode==='saved'){
+  if(mode==='saved'||mode==='open-saved'){
     assert.equal(deletion.body.recoverable,true);assert.equal(deletion.body.expectedVersion,7);
     assert.equal(closedState.notebookColumns.length,1);assert.equal(closedState.notebookColumns[0].projectID,'other');
     assert.deepEqual(catalog.get('project').map(card=>card.id),['keep']);
@@ -176,3 +180,33 @@ for (const mode of ['saved','cancel','navigate','pending-draft']) {
   if(mode==='pending-draft')assert.match(notices[0][1],/draft is preserved/);
 }
 console.log('Closed-note Trash action passed: current version, recoverable deletion, preserved other Notes, cancelled/stale navigation and pending-draft rejection.');
+
+// Toolbar batch actions keep one recoverable-delete confirmation and preserve version checks.
+for(const action of ['trash','cancel','navigate','archive','restore']) {
+  const calls=[];let workspaceID='workspace';const currentProject={id:'project'};
+  const selected=[{id:'a',title:'A',version:1},{id:'b',title:'B',version:2}];
+  const catalog=new Map([['project',[...selected,{id:'keep',title:'Keep',version:3}]]]);
+  const t=vm.createContext({state:{workflowNavigationGeneration:0},notebookCatalogs:catalog,notebookColumnMounts:new Map(),notebookMounts:new Map(),reportDraftMounts:new Map(),
+    captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,get activeWorkspaceID(){return workspaceID;},projectDetailKey:p=>p?.id||'',workspaceProject:()=>currentProject,
+    async confirmWebWarning(){calls.push(['confirm']);if(action==='navigate')workspaceID='other';return action!=='cancel';},
+    async moveClosedNotebookNoteToTrash(project,card,options){calls.push(['trash',card.id,options]);return true;},
+    loadNotebookDraft:async()=>null,loadNotebookProjectSnapshot:async()=>null,
+    async postResearch(path,body){calls.push([path,body]);return {card:{...selected.find(card=>card.id===body.cardID),version:7,archivedAt:body.archived?'2026-10-19':null}};},
+    requireCurrentAccountRequest(){},async retireNotebookNoteColumns(project,cardID){calls.push(['retire',cardID]);},syncNotebookNoteTabs(){},showWebNotice:async(...args)=>assert.fail(args.join(': '))});
+  vm.runInContext('async '+actual('mutateNotebookNotesFromMenu'),t);
+  const result=await t.mutateNotebookNotesFromMenu(currentProject,selected,{trash:['trash','cancel','navigate'].includes(action),archived:action==='archive'});
+  if(action==='cancel'||action==='navigate') {assert.equal(result,false);assert.equal(calls.length,1);continue;}
+  assert.equal(result,true);
+  if(action==='trash') {
+    assert.equal(calls.filter(call=>call[0]==='confirm').length,1);
+    const deleted=calls.filter(call=>call[0]==='trash');assert.deepEqual(deleted.map(call=>call[1]),['a','b']);
+    assert(deleted.every(call=>call[2].allowOpen&&call[2].skipConfirmation));
+  } else {
+    const mutations=calls.filter(call=>call[0]==='/notebook/cards/archive');
+    assert.deepEqual(mutations.map(call=>call[1].cardID),['a','b']);
+    assert(mutations.every(call=>call[1].expectedVersion===7&&call[1].archived===(action==='archive')));
+    assert.equal(calls.filter(call=>call[0]==='retire').length,action==='archive'?2:0);
+    assert.equal(catalog.get('project').find(card=>card.id==='keep').version,3);
+  }
+}
+console.log('Toolbar Note mutations passed: single Trash confirmation, cancel/navigation fences, archive/restore versions and unrelated Note retention.');

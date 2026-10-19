@@ -412,3 +412,11 @@ assert.equal(menuContext.orderWithPaneStepped('cq:record',1),null);
 assert.equal(menuContext.orderWithPaneStepped('reader:one',-1),null,'Cannot move across anchored target');
 assert.ok(menuContext.orderWithPaneStepped('reader:one',1),'Unrelated neighboring columns remain movable');
 console.log('Code Decisions legacy anchors disable only affected move units/targets; unrelated columns remain movable.');
+
+const notebookCollapseContext=vm.createContext({currentColumnWorkflowView:()=> 'notebook'});
+vm.runInContext(actual('paneCanCollapse'),notebookCollapseContext);
+assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project:note:a'),true);
+assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project'),true);
+assert.equal(notebookCollapseContext.paneCanCollapse('reader:a'),true);
+assert.equal(notebookCollapseContext.paneCanCollapse('utility:saved:a'),false,'Pinned Notebook Evidence keeps its existing behavior.');
+console.log('Notebook Note columns can collapse independently, including primary and additional Notes.');
