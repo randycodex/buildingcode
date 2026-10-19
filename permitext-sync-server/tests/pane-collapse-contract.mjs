@@ -362,7 +362,7 @@ assert.equal(expandedPanel,menuPanel);assert.equal(menuPanel.editor,retainedEdit
 menuContext.openColumnGroupMenu(menuPanel,anchor);assert.equal(menuItems()[0].textContent,'Restore width');menuItems()[0].listeners.click();assert.equal(expandedPanel,null);
 menuContext.currentColumnWorkflowView=()=> 'notebook';
 menuPanel.dataset.paneId='utility:saved:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert(!menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Evidence menus do not offer collapse.');
+assert(menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Evidence menus offer collapse.');
 assert(menu.children.some(item=>item.textContent==='Expand'), 'Notebook Evidence retains the shared expansion control.');
 menuPanel.dataset.paneId='reader:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert(menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Reader menus retain collapse.');
@@ -418,5 +418,5 @@ vm.runInContext(actual('paneCanCollapse'),notebookCollapseContext);
 assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project:note:a'),true);
 assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project'),true);
 assert.equal(notebookCollapseContext.paneCanCollapse('reader:a'),true);
-assert.equal(notebookCollapseContext.paneCanCollapse('utility:saved:a'),false,'Pinned Notebook Evidence keeps its existing behavior.');
+assert.equal(notebookCollapseContext.paneCanCollapse('utility:saved:a'),true,'Pinned Notebook Evidence can collapse.');
 console.log('Notebook Note columns can collapse independently, including primary and additional Notes.');

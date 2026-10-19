@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-notebook-toolbar-collapse-v1228";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-evidence-toggle-collapse-v1229";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -131,7 +131,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-notebook-toolbar-collapse-v1228";
+} from "./offline-storage.js?v=20261019-evidence-toggle-collapse-v1229";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -164,7 +164,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-notebook-toolbar-collapse-v1228";
+} from "./workspace-state.js?v=20261019-evidence-toggle-collapse-v1229";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -42637,7 +42637,7 @@ function openColumnGroupEditor(panel, existing = null) {
 
 // Collapse keeps the live column DOM (including unsaved editors) in place.
 function paneCanCollapse(paneID) {
-  return currentColumnWorkflowView() !== "notebook" || paneID.startsWith("reader:") || paneID.startsWith("project:notebook:");
+  return currentColumnWorkflowView() !== "notebook" || /^(?:reader:|project:notebook:|utility:saved(?::|$))/.test(paneID);
 }
 
 function columnGroupCanCollapse(group) {
@@ -47365,7 +47365,7 @@ function bindImmediateUtilityControls() {
   toggleSavedButton.dataset.coldStartBound = "true";
   toggleSavedButton.addEventListener("click", () => {
     if (notifyProjectRequiredForColumn()) return;
-    void focusRecentUtilityColumn("saved");
+    void toggleProjectsColumns();
   });
 }
 
