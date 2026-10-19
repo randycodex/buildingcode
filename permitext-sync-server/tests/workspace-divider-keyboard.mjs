@@ -18,7 +18,8 @@ let restoreWidths=null;
 const readerPickers=[];
 const track = {scrollLeft:0, querySelectorAll(){return [...panes.values()];}, querySelector(selector){return panes.get(selector.match(/data-pane-id="([^"]+)"/)?.[1]);}};
 const context = vm.createContext({state, track, adjacentColumnWidths, workspaceColumnExpansion:{restore(){expansionRestores++;restoreWidths?.();}}, CSS:{escape:x=>x},isProAccount:()=>false,
-  paneIsCollapsed:id=>collapsed.has(id), assistantHistoryOnlyPane:id=>historyOnly.has(id), defaultPaneWidthForID:()=>600, minimumPaneWidthForID:id=>id.startsWith('reader:')?400:600,
+  paneIsCollapsed:id=>collapsed.has(id), assistantHistoryOnlyPane:id=>historyOnly.has(id), defaultPaneWidthForID:()=>600,
+  currentColumnWorkflowView:()=> 'notebook', assistantHistoryWidth:400,
   applyPaneWeight:(pane,id)=>{pane.width=state.paneWeights[id];},
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
   scheduleVisibleReaderScrollIndicatorUpdates:()=>indicators++,
@@ -26,7 +27,7 @@ const context = vm.createContext({state, track, adjacentColumnWidths, workspaceC
   document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, children:[], classList:{add(){},toggle(){}}, append(child){this.children.push(child);},
     setAttribute(k,v){this.attrs[k]=v;}, removeAttribute(k){delete this.attrs[k];}, addEventListener(k,v){this.handlers[k]=v;}};}}
 });
-vm.runInContext(['syncReaderDividerButton','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
+vm.runInContext(['syncReaderDividerButton','minimumPaneWidthForID','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
 const divider=context.createDivider('left','right');
 const add=divider.children[0];
 assert.equal(add.textContent,'+');
@@ -126,3 +127,18 @@ restoreWidths=()=>{restoredLeft.width=680;restoredRight.width=640;restoreWidths=
 context.resizeAdjacentPanesBy('left','right',24,divider);
 assert.deepEqual([restoredLeft.width,restoredRight.width],[704,616]);
 console.log('Expanded-column keyboard resizing measures restored widths before applying the delta.');
+
+const evidenceID='utility:saved:one';
+panes.set(evidenceID,{dataset:{paneId:evidenceID},width:450,getBoundingClientRect(){return {width:this.width};}});
+const evidenceEdge=context.createDivider(evidenceID,'');
+context.resizePaneEdgeBy(evidenceID,-1000,evidenceEdge);
+assert.equal(panes.get(evidenceID).width,300);
+assert.equal(evidenceEdge.attrs['aria-valuemin'],'300');
+assert.equal(evidenceEdge.attrs['aria-valuemax'],'600');
+context.resizePaneEdgeBy(evidenceID,1000,evidenceEdge);
+assert.equal(panes.get(evidenceID).width,600);
+press(evidenceEdge,'ArrowRight',true);
+assert.equal(panes.get(evidenceID).width,600);
+press(evidenceEdge,'ArrowLeft');
+assert.equal(panes.get(evidenceID).width,576);
+console.log('Evidence keyboard resizing and accessible bounds stay within 300–600 pixels.');

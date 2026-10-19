@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-notebook-closed-notes-v1224";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-evidence-column-width-v1225";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -131,7 +131,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-notebook-closed-notes-v1224";
+} from "./offline-storage.js?v=20261019-evidence-column-width-v1225";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -164,7 +164,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-notebook-closed-notes-v1224";
+} from "./workspace-state.js?v=20261019-evidence-column-width-v1225";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -4539,12 +4539,14 @@ function assistantHistoryOnlyPane(paneID) {
 
 function minimumPaneWidthForID(paneID) {
   if (paneID?.startsWith("reader:")) return currentColumnWorkflowView() === "research" ? 600 : 400;
+  if (/^utility:saved(?::|$)/.test(paneID || "")) return 300;
   if (assistantHistoryOnlyPane(paneID)) return assistantHistoryWidth;
   if (paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") || paneID?.startsWith("research:conversation:")) return assistantHistoryWidth + 600;
   return 600;
 }
 
 function maximumPaneWidthForID(paneID) {
+  if (/^utility:saved(?::|$)/.test(paneID || "")) return 600;
   if (!/^utility:search(?::|$)/.test(paneID || "")) return Infinity;
   const layout = typeof track === "undefined" ? null : track._researchColumnLayout;
   const resizeMaximum = layout && currentColumnWorkflowView() === "research" ? layout.resizeMaximums?.[paneID] : 0;
@@ -4556,15 +4558,12 @@ function constrainPaneWidth(paneID, width) {
 }
 
 function migrateLegacyPaneWidth(paneID, value) {
-  if (/^(?:reader:|utility:search(?::|$))/.test(paneID || "")) {
+  if (/^(?:reader:|utility:(?:search|saved)(?::|$))/.test(paneID || "")) {
     return Number.isFinite(value) && value > 40 ? constrainPaneWidth(paneID, value) : defaultPaneWidthForID(paneID);
   }
   const minimumWidth = minimumPaneWidthForID(paneID);
   if (minimumWidth > 0 && value < minimumWidth) return minimumWidth;
   if (paneID.startsWith("utility:analysis:") && value === defaultUtilityPaneWidth) return defaultResearchPaneWidth;
-  if ((paneID === "utility:saved" || paneID.startsWith("utility:saved:")) && value === defaultUtilityPaneWidth) {
-    return defaultSavedPaneWidth;
-  }
   if (isProjectCoordinationPaneID(paneID) && value === legacyCoordinationPaneWidth) {
     return defaultCoordinationPaneWidth;
   }
@@ -5736,7 +5735,7 @@ function applyPaneWeight(panel, paneID) {
   panel.style.setProperty("--pane-default-min-width", `${minimumWidth}px`);
   // A divider's chosen width must survive an overflowing workspace. Allowing
   // flex shrink here silently pulled resized columns back to their minimum.
-  panel.style.flex = `${isFlexibleReaderPaneID(paneID) || /^(?:utility:search)(?::|$)/.test(paneID) ? 0 : 1} 0 ${width}px`;
+  panel.style.flex = `${isFlexibleReaderPaneID(paneID) || /^utility:(?:search|saved)(?::|$)/.test(paneID) ? 0 : 1} 0 ${width}px`;
 }
 
 function syncResearchColumnLayout({ reset = false } = {}) {

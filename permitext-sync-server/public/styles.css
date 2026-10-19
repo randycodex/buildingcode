@@ -10084,6 +10084,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .saved-panel {
   --saved-font-size: var(--reader-font-size);
   position: relative;
+  max-width: 600px;
   grid-template-rows: auto minmax(0, 1fr);
 }
 
@@ -20663,6 +20664,10 @@ dialog.report-export-review {
 .has-expanded-column .is-column-expanded {
   position: relative !important; left: auto !important; flex: 1 1 0 !important;
   width: auto !important; min-width: 0 !important; max-width: none !important;
+}
+.has-expanded-column > .saved-panel.is-column-expanded {
+  min-width: 300px !important;
+  max-width: 600px !important;
 }
 .has-expanded-column .is-column-expanded.is-collapsed { display: grid; padding: var(--panel-padding); }
 .has-expanded-column .is-column-expanded.is-collapsed > :not(.pane-collapsed-tab):not(.pane-collapsed-close):not(.column-restore-strip) { display: revert !important; }
