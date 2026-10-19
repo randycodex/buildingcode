@@ -125,6 +125,40 @@ unlimited.move(1801); unlimited.frame(); unlimited.finish(1801);
 assert.deepEqual(unlimited.widths(), [1800,600], 'Reader resizing is not capped by the fitted layout maximum');
 assert.equal(unlimited.context.maximumPaneWidthForID('reader:one'), Infinity);
 
+// Shared dividers must not impose the old combined-width cap. This is the
+// common four-Reader layout where every neighboring column starts at 600px.
+const minimumPair = fixture(['reader:one', 'reader:two', 'reader:three', 'reader:four'], 2405);
+minimumPair.context.startPaneResize(minimumPair.event(601), 'reader:one', 'reader:two');
+minimumPair.move(1801); minimumPair.frame();
+assert.deepEqual(minimumPair.widths(), [1800, 600, 600, 600], 'The Reader follows the drag even when its neighbor cannot shrink');
+minimumPair.finish(1801);
+assert.deepEqual(minimumPair.widths(), [1800, 600, 600, 600], 'The wider Reader survives release and layout synchronization');
+assert.equal(minimumPair.state.paneWeights['reader:one'], 1800);
+assert.equal(minimumPair.saves, 1);
+minimumPair.context.startPaneResize(minimumPair.event(1801), 'reader:one', 'reader:two');
+minimumPair.move(-199); minimumPair.frame(); minimumPair.finish(-199);
+assert.deepEqual(minimumPair.widths(), [600, 2600, 600, 600], 'Dragging the other direction can expand the right Reader beyond the pair total');
+
+for (const direction of ['right', 'left']) {
+  const heldPair = fixture(['reader:one', 'reader:two', 'reader:three', 'reader:four'], 1605);
+  const targetX = direction === 'right' ? 1604 : 1;
+  const growingIndex = direction === 'right' ? 0 : 1;
+  heldPair.context.startPaneResize(heldPair.event(601), 'reader:one', 'reader:two');
+  heldPair.move(targetX); heldPair.frame(16);
+  const firstWidth = heldPair.widths()[growingIndex];
+  for (const time of [32, 48, 64, 80, 96]) heldPair.frame(time);
+  assert(heldPair.widths()[growingIndex] > firstWidth, 'Holding a shared Reader divider at either screen edge keeps expanding it');
+  assert(heldPair.track.scrollLeft > 0, 'Newly added Reader width becomes visible before release');
+  assert.equal(heldPair.widths()[1 - growingIndex], 600, 'The neighboring Reader retains its minimum');
+  assert.deepEqual(heldPair.widths().slice(2), [600, 600], 'Unrelated Readers retain their widths during edge growth');
+  const beforeRelease = heldPair.widths();
+  const scrollBeforeRelease = heldPair.track.scrollLeft;
+  heldPair.finish(targetX);
+  assert.deepEqual(heldPair.widths(), beforeRelease, 'Release retains the accumulated edge expansion');
+  assert.equal(heldPair.track.scrollLeft, scrollBeforeRelease);
+  assert.equal(heldPair.frames.size, 0); assert.equal(heldPair.handlers.size, 0);
+}
+
 const unrelated = fixture(['reader:one', 'reader:two', 'reader:three'], 2404);
 unrelated.context.startPaneResize(unrelated.event(801), 'reader:one', 'reader:two');
 unrelated.move(861); unrelated.frame(); unrelated.finish(861, 'pointercancel');

@@ -24,7 +24,10 @@ function fixture(view, widths = [800], sourcesWidth = 0) {
   const reportWidth = () => Math.max(Number(properties.get('--reference-document-min-width')?.replace('px', '') || 600), availableWidth - dockWidth());
   const panes = widths.map((width, i) => ({
     dataset: { paneId: `reader:${i}` }, width,
-    getBoundingClientRect() { return { width: this.width }; }
+    getBoundingClientRect() {
+      const left = reportWidth() + 1 + panes.slice(0, panes.indexOf(this)).reduce((sum, pane) => sum + pane.width + 1, 0) - track.scrollLeft;
+      return { width: this.width, left, right: left + this.width };
+    }
   }));
   const trackClasses = new Set();
   const track = {
@@ -108,7 +111,8 @@ pair.move(1140); pair.frame();
 assert.deepEqual(pair.panes.map(pane => pane.width), [440, 860]);
 assert.equal(pair.dockWidth(), 1304, 'Adjacent resizing updates the dock during the drag when a minimum is reached');
 pair.move(2300); pair.frame();
-assert.deepEqual(pair.panes.map(pane => pane.width), [900,400], 'Pointer resizing retains the neighboring Reader minimum');
+assert.deepEqual(pair.panes.map(pane => pane.width), [1600,400], 'Pointer resizing keeps widening the Reader beyond its neighboring minimum');
+assert.equal(pair.dockWidth(), 1320, 'The reference dock uses the available viewport while retaining room for the Project document');
 pair.finish('pointerup', 2300);
 assert.equal(pair.saves, 1); assert.equal(pair.handlers.size, 0);
 

@@ -98,9 +98,9 @@ console.log('Workspace divider keyboard: expanded pairs, minimums, scroll compen
 for (const id of ['reader:left','reader:right']) panes.set(id,{dataset:{paneId:id},width:600,getBoundingClientRect(){return {width:this.width};}});
 const readerDivider=context.createDivider('reader:left','reader:right');
 context.resizeAdjacentPanesBy('reader:left','reader:right',1000,readerDivider);
-assert.equal(panes.get('reader:left').width,800); assert.equal(panes.get('reader:right').width,400);
+assert.equal(panes.get('reader:left').width,1600); assert.equal(panes.get('reader:right').width,400);
 context.resizeAdjacentPanesBy('reader:left','reader:right',-2000,readerDivider);
-assert.equal(panes.get('reader:left').width,400); assert.equal(panes.get('reader:right').width,800);
+assert.equal(panes.get('reader:left').width,400); assert.equal(panes.get('reader:right').width,2400);
 const readerEdge=context.createDivider('','reader:left'); readerEdge.handlers.focus();
 assert.equal(readerEdge.attrs['aria-valuemin'],'400'); assert.equal(readerEdge.attrs['aria-valuemax'],undefined);
 context.resizePaneEdgeBy('reader:left',10000,readerEdge); assert.equal(panes.get('reader:left').width,10400);
@@ -108,6 +108,10 @@ context.resizePaneEdgeBy('reader:left',-10000,readerEdge); assert.equal(panes.ge
 panes.get('reader:left').width=1600; panes.get('reader:right').width=1600;
 context.resizeAdjacentPanesBy('reader:left','reader:right',1000,readerDivider);
 assert.equal(panes.get('reader:left').width,2600); assert.equal(panes.get('reader:right').width,600);
+panes.get('reader:right').width=400;
+press(readerDivider,'ArrowRight');
+assert.equal(panes.get('reader:left').width,2624,'Arrow keys keep widening a Reader after its neighbor reaches the minimum');
+assert.equal(panes.get('reader:right').width,400);
 console.log('Reader keyboard resizing passed: unlimited growth, minimum widths, adjacent and outer edges, accessible bounds.');
 
 state.readers=[{id:'one'},{id:'two'}];

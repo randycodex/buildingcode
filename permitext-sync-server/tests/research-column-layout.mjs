@@ -119,6 +119,20 @@ for (const count of [1, 2]) {
 }
 console.log('Reader navigation preserves fitted and manually resized widths for one and multiple columns.');
 
+// A fresh page has no track._researchColumnLayout. Restore the saved sizing
+// mode rather than replacing manually chosen widths with equal shares.
+for (const widths of [[1800, 600], [730, 600]]) {
+  panels = ['reader:one', 'reader:two'].map(makePane);
+  state.paneWeights = Object.fromEntries(panels.map((panel, index) => [panel.dataset.paneId, widths[index]]));
+  state.researchColumnWidthsManual = true;
+  delete track._researchColumnLayout;
+  context.syncResearchColumnLayout();
+  assert.deepEqual(sizes(), widths, 'Reloading restores selected Reader widths even when equal columns could fit');
+  assert.equal(track.dataset.researchColumnSizing, 'manual');
+}
+context.syncResearchColumnLayout({reset:true});
+assert.equal(state.researchColumnWidthsManual, false, 'An explicit layout reset returns to automatic sizing');
+
 // Reset layout must leave manual sizing and fill the desk again. Retain the
 // collapsed rails and widths saved in other views, including grouped columns.
 vm.runInContext(actual('resetVisibleColumnWidths'), context);

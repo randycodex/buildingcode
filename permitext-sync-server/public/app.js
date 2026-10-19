@@ -3,12 +3,12 @@ import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
-import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
+import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=5";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-assistant-conversation-scope-v1233";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-reader-unlimited-divider-width-v1236";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -132,7 +132,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-assistant-conversation-scope-v1233";
+} from "./offline-storage.js?v=20261019-reader-unlimited-divider-width-v1236";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -165,7 +165,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-assistant-conversation-scope-v1233";
+} from "./workspace-state.js?v=20261019-reader-unlimited-divider-width-v1236";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -908,6 +908,7 @@ function loadWorkspaceState(accountOverride) {
       browserCredentialID: typeof saved.browserCredentialID === "string" ? saved.browserCredentialID : "",
       workflowPaneWeights: saved.workflowPaneWeights || {},
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
+      researchColumnWidthsManual: saved.researchColumnWidthsManual === true,
       pinnedPaneID: typeof saved.pinnedPaneID === "string" ? saved.pinnedPaneID : "",
       columnGroups: normalizeColumnGroups(saved.columnGroups),
       collapsedPaneIDs: Array.isArray(saved.collapsedPaneIDs) ? saved.collapsedPaneIDs.filter((id) => typeof id === "string") : [],
@@ -5810,12 +5811,13 @@ function syncResearchColumnLayout({ reset = false } = {}) {
   let layout = researchColumnsLayout(requested, track.clientWidth, fixedWidth, dividerWidth,
     balanced.map(panel => panel.dataset.paneId.startsWith("reader:") ? Infinity : 900));
   const resetWidths = reset || changed || previous?.fits && !layout.fits;
-  const manual = previous?.manual && !resetWidths;
+  const manual = (previous?.manual || state.researchColumnWidthsManual === true) && !resetWidths;
+  state.researchColumnWidthsManual = Boolean(manual);
   if (manual) layout = { fits: false, widths: requested };
   else if (!layout.fits && resetWidths) layout.widths.fill(600);
   // A fitted layout can be wider than the overflow limit. Reserve its shared
   // space for manual resizing so the first drag starts from the visible width.
-  const resizeMaximums = manual ? previous.resizeMaximums : layout.fits
+  const resizeMaximums = manual ? previous?.resizeMaximums : layout.fits
     ? Object.fromEntries(balanced.map(panel => [panel.dataset.paneId,
       Math.max(900, layout.widths.reduce((sum, width) => sum + width, 0) - 600 * (balanced.length - 1))]))
     : undefined;
@@ -41281,6 +41283,7 @@ function capturePaneResizeWidths() {
     track._researchColumnLayout.manual = true;
     track.dataset.researchColumnSizing = "manual";
   }
+  if (currentColumnWorkflowView() === "research") state.researchColumnWidthsManual = true;
   // Freeze the currently shared space before changing a pair. Otherwise spare
   // flex space is redistributed into unrelated columns during the drag.
   panes.forEach(({ id, pane, startWidth }) => {
@@ -41304,7 +41307,8 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
   const scrollLeft = track.scrollLeft;
   const widths = adjacentColumnWidths(previousWidth, nextWidth, delta,
     minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
-    maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID));
+    maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID),
+    { expandLeft: previousPaneID.startsWith("reader:"), expandRight: nextPaneID.startsWith("reader:") });
   state.paneWeights[previousPaneID] = widths[0];
   state.paneWeights[nextPaneID] = widths[1];
   applyPaneWeight(previousPane, previousPaneID);
@@ -41856,8 +41860,15 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   let previousIndex;
   let nextIndex;
   let lastAppliedWidths;
-  let pendingClientX = startX;
+  let previousStartRight;
+  let nextStartRight;
+  let pointerClientX = startX;
+  let virtualClientX = startX;
+  let previousFrameTime = null;
   let resizeFrame = null;
+  let isDragging = true;
+  const expandLeft = previousPaneID.startsWith("reader:");
+  const expandRight = nextPaneID.startsWith("reader:");
 
   const applyResizeAt = (clientX) => {
     const delta = clientX - startX;
@@ -41865,7 +41876,8 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
     [widths[previousIndex], widths[nextIndex]] = adjacentColumnWidths(
       paneData[previousIndex].startWidth, paneData[nextIndex].startWidth, delta,
       minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
-      maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID));
+      maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID),
+      { expandLeft, expandRight });
     [previousIndex, nextIndex].forEach((index) => {
       if (Math.abs(widths[index] - lastAppliedWidths[index]) < 0.25) return;
       const pane = paneData[index];
@@ -41875,13 +41887,41 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
     });
     syncReferenceReaderLayout();
     updateAdjacentDividerValue(resizeHandle, widths[previousIndex], widths[nextIndex]);
-    track.scrollLeft = startScrollLeft;
+    const visibleRight = Math.min(track.getBoundingClientRect().right, window.innerWidth);
+    const startRight = delta > 0 && expandLeft ? previousStartRight : nextStartRight;
+    const addedWidth = delta > 0 && expandLeft
+      ? widths[previousIndex] - paneData[previousIndex].startWidth
+      : delta < 0 && expandRight
+        ? widths[previousIndex] + widths[nextIndex] - paneData[previousIndex].startWidth - paneData[nextIndex].startWidth
+        : 0;
+    const originalOverflow = Math.max(0, startRight - visibleRight);
+    track.scrollLeft = Math.min(startScrollLeft + Math.max(0, startRight + addedWidth - visibleRight - originalOverflow),
+      Math.max(0, track.scrollWidth - track.clientWidth));
     scheduleVisibleReaderScrollIndicatorUpdates();
   };
 
-  const applyPendingResize = () => {
+  const resizeVelocity = () => {
+    const bounds = track.getBoundingClientRect();
+    if (expandLeft && virtualClientX >= startX) {
+      const edge = Math.min(bounds.right, window.innerWidth) - 33;
+      if (pointerClientX > edge) return 640 * Math.min(1, (pointerClientX - edge) / 32);
+    }
+    if (expandRight && virtualClientX <= startX) {
+      const edge = Math.max(bounds.left, 0) + 33;
+      if (pointerClientX < edge) return -640 * Math.min(1, (edge - pointerClientX) / 32);
+    }
+    return 0;
+  };
+
+  const applyPendingResize = (frameTime) => {
     resizeFrame = null;
-    applyResizeAt(pendingClientX);
+    if (!isDragging) return;
+    const elapsed = previousFrameTime === null ? 0 : Math.min(32, Math.max(0, frameTime - previousFrameTime));
+    previousFrameTime = frameTime;
+    const velocity = resizeVelocity();
+    virtualClientX += velocity * elapsed / 1000;
+    applyResizeAt(virtualClientX);
+    if (velocity !== 0) resizeFrame = window.requestAnimationFrame(applyPendingResize);
   };
 
   const onMove = (moveEvent) => {
@@ -41893,21 +41933,25 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
       nextIndex = paneData.findIndex((pane) => pane.id === nextPaneID);
       lastAppliedWidths = paneData.map((pane) => pane.startWidth);
       if (previousIndex === -1 || nextIndex === -1) { paneData = null; return; }
+      previousStartRight = previousPane.getBoundingClientRect().right;
+      nextStartRight = nextPane.getBoundingClientRect().right;
       track.classList.add("is-resizing");
     }
-    pendingClientX = moveEvent.clientX;
+    virtualClientX += moveEvent.clientX - pointerClientX;
+    pointerClientX = moveEvent.clientX;
     if (resizeFrame === null) resizeFrame = window.requestAnimationFrame(applyPendingResize);
   };
 
   const onUp = (upEvent) => {
     if (upEvent.pointerId !== undefined && upEvent.pointerId !== event.pointerId) return;
+    isDragging = false;
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
     window.removeEventListener("pointercancel", onUp);
     if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
     if (paneData) {
-      pendingClientX = Number.isFinite(upEvent.clientX) ? upEvent.clientX : pendingClientX;
-      applyResizeAt(pendingClientX);
+      if (Number.isFinite(upEvent.clientX)) virtualClientX += upEvent.clientX - pointerClientX;
+      applyResizeAt(virtualClientX);
     }
     if (resizeHandle?.hasPointerCapture?.(upEvent.pointerId)) {
       resizeHandle.releasePointerCapture(upEvent.pointerId);
@@ -47030,6 +47074,7 @@ async function resetVisibleColumnWidths() {
   });
   const currentLeft = track.scrollLeft;
   for (const id of paneIDs) state.paneWeights[id] = defaultPaneWidthForID(id);
+  if (currentColumnWorkflowView() === "research") state.researchColumnWidthsManual = false;
   saveWorkspaceState();
   await transitionWorkspace("utility");
   syncResearchColumnLayout({ reset: true });

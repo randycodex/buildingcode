@@ -1,8 +1,11 @@
-export function adjacentColumnWidths(left, right, delta, leftMin, rightMin, leftMax = Infinity, rightMax = Infinity) {
-  const lower = Math.max(leftMin - left, right - rightMax);
-  const upper = Math.min(right - rightMin, leftMax - left);
+export function adjacentColumnWidths(left, right, delta, leftMin, rightMin, leftMax = Infinity, rightMax = Infinity,
+  { expandLeft = false, expandRight = false } = {}) {
+  // Readers can add workspace width after their neighbor reaches its minimum.
+  // Other columns keep transferring only the space available in the pair.
+  const lower = Math.max(expandRight ? -Infinity : leftMin - left, right - rightMax);
+  const upper = Math.min(expandLeft ? Infinity : right - rightMin, leftMax - left);
   const change = Math.max(lower, Math.min(upper, delta));
-  return [left + change, right - change];
+  return [Math.max(leftMin, left + change), Math.max(rightMin, right - change)];
 }
 
 // Presentation-only expansion: live editors and their saved widths stay mounted.
