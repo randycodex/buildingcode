@@ -19874,7 +19874,8 @@ dialog.report-screen {
 .notebook-title-action { grid-column: 2; grid-row: 1; display: flex; align-items: center; }
 .notebook-title-action:empty { display: none; }
 .notebook-title-control.has-note-columns { grid-template-columns: minmax(0, 1fr) auto; }
-.notebook-column-note-manager { position: absolute; top: 100%; right: 0; margin: 0; }
+.notebook-panel > .notebook-header:has(> .notebook-column-note-manager[open]) { z-index: 10; }
+.notebook-header > .notebook-column-note-manager { position: absolute; top: 100%; right: 0; margin: 0; }
 .notebook-column-note-manager > summary[hidden] { display: none; }
 .notebook-note-tabs { display: flex; flex: 0 0 auto; align-items: center; gap: var(--workspace-menu-gap); min-width: 0; }
 .workflow-toolbar .toolbar-button.notebook-note-tab { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: none; }
