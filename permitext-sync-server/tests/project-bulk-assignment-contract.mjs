@@ -39,7 +39,7 @@ panel.append(select, remove, cancel);
 const context = vm.createContext({
   document: { createElement: tag => new Element(tag) }, Option: function(label, value) { return { label, value }; },
   activeFolderRecords: items => items, folderIsProject: item => item.folderType === "project",
-  currentContentSummary: () => ({ projects: [project] }), projectRecordID: item => item.id,
+  currentContentSummary: () => ({ projects: [project] }), projectRecordID: item => item.id, hasCapability: () => true,
   workspaceProject: () => ({ id: "active-project" }), activeWorkspaceID: "project:active", identity: "A",
   captureAccountRequest: () => context.identity,
   requireCurrentAccountRequest: identity => { if (context.identity !== identity) throw Error("Account changed"); },
@@ -57,9 +57,11 @@ const context = vm.createContext({
 vm.runInContext(["savedItemSelectionID", "sortSavedItems", "createSavedBulkSelectionController"].map(actual).join("\n"), context);
 assert.deepEqual(Array.from(context.sortSavedItems(records, "recentlySaved"), item => item.id), ["current", "note", "old"],
   "Sort before pagination across editions, including note-only records");
-controller = context.createSavedBulkSelectionController(panel, records, { allowProjectAssignment: true, inbox: true });
+controller = context.createSavedBulkSelectionController(panel, records, { allowProjectAssignment: true, inbox: true, reportProject: project });
+assert.equal(panel.querySelector('.saved-evidence-add-report-selection'),null,'Evidence selection has no Report insertion shortcut.');
 select.events.click();
 controller.toggle(oldEdition); controller.toggle(currentEdition); controller.toggle(noteOnly);
+assert.equal(panel.querySelector('.saved-evidence-add-report-selection'),null,'Selecting passages cannot expose a Report insertion shortcut.');
 const assign = panel.querySelector(".saved-inbox-assign-selection");
 assert.equal(assign.hidden, false, "Inbox bulk assignment is available beside an active Project");
 assign.events.click();

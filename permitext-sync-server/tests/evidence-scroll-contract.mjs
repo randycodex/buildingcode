@@ -22,7 +22,7 @@ const populateProjectEvidence = new Function(
 )(
   folder => folder.id,
   () => ({ heading: projectEvidenceHeading, title: projectEvidenceTitle }),
-  { createElement: evidenceElement }, value => value, () => true, () => false,
+  { createElement: evidenceElement }, value => value, () => true, () => true,
   () => { throw new Error("Project evidence must not use the old collapse control."); }
 );
 const projectEvidenceSection = evidenceElement();
@@ -32,6 +32,7 @@ populateProjectEvidence(projectEvidenceSection, {
 }, { id: "project" }, projectEvidenceContent);
 assert(projectEvidenceSection.classes.has("is-open"), "Always-visible Project evidence must enable its constrained, scrollable body.");
 assert.equal(projectEvidenceTitle.removed, true);
+assert.doesNotMatch(savedEvidenceSectionSource,/reportMembershipIndicator/,'The Evidence header has no Report destination.');
 assert.equal(projectEvidenceSection.children[1].children[0], projectEvidenceContent, "Opening the scroll viewport must retain the original evidence list.");
 
 console.log("Project evidence scrolling state passed, including persisted collapsed folders and retained content.");

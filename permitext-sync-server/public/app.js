@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-evidence-collapse-dividers-v1215";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-report-sources-only-evidence-v1216";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
@@ -130,7 +130,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-evidence-collapse-dividers-v1215";
+} from "./offline-storage.js?v=20261019-report-sources-only-evidence-v1216";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -163,7 +163,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-evidence-collapse-dividers-v1215";
+} from "./workspace-state.js?v=20261019-report-sources-only-evidence-v1216";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -29420,18 +29420,6 @@ function reportAdditionFeedback(button, draft) {
 
 }
 
-async function addSavedEvidenceToReport(project, items, options = {}) {
-  return addProjectSourcesToReport(project, sources => items.map(item => {
-    const blockID = item.scope === "section" ? "" : String(item.blockID || "").trim();
-    const source = sources.find(source => source.kind === "evidence" &&
-      String(source.sectionID) === String(item.sectionID) &&
-      source.sourceLibraryVersion === syncCodeVersion(item.codeVersion) &&
-      String(source.selectionBlockID || "") === blockID);
-    if (!source) throw new Error("A selected passage is not available for this Project's Report. Sync the evidence and try again.");
-    return source;
-  }), options);
-}
-
 async function promoteNotebookCardToReport(project, card, options = {}) {
   if (!String(card.plainText || "").trim() && !(card.references || []).length) {
     throw new Error("Write the Note or link a source before adding it to a Report.");
@@ -34510,11 +34498,6 @@ function populateSavedEvidenceSection(section, savedInstance, folder, ...childre
     // This section stays expanded; its open state also constrains the scroll body.
     section.classList.add("is-open");
     title.remove();
-    if (!folder.sharedOnly && hasCapability("professional-exports")) {
-      const destination = reportMembershipIndicator(projectDetailKey(projectIdentity(folder)), "destination", {});
-      destination.classList.add("evidence-report-destination");
-      heading.prepend(destination);
-    }
     body.append(...children);
     section.append(heading, body);
     return;
@@ -36915,22 +36898,6 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
   const removeButton = panel.querySelector(".saved-evidence-delete-selection");
   const cancelButton = panel.querySelector(".saved-evidence-cancel-selection");
   if (!selectButton || !removeButton || !cancelButton) return null;
-  const reportButton = document.createElement("button");
-  reportButton.type = "button";
-  reportButton.className = "saved-evidence-add-report-selection";
-  reportButton.textContent = "Add to Report";
-  reportButton.hidden = true;
-  if (options.reportProject && !options.reportProject.sharedOnly && hasCapability("professional-exports")) cancelButton.before(reportButton);
-  reportButton.addEventListener("click", async () => {
-    if (busy || !selectedIDs.size) return;
-    busy = true;
-    update();
-    try {
-      const draft = await addSavedEvidenceToReport(options.reportProject, [...selectedIDs].map(id => recordByID.get(id)), { container: panel });
-      reportAdditionFeedback(reportButton, draft);
-    } catch (error) { await showWebNotice("Could not add to Report", error.message); }
-    finally { busy = false; update(); }
-  });
   const researchButton = document.createElement("button");
   researchButton.type = "button";
   researchButton.className = "saved-evidence-research-selection";
@@ -37019,8 +36986,6 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     const selectedCount = selectedIDs.size;
     researchButton.hidden = selectedCount === 0;
     researchButton.disabled = busy || selectedCount === 0;
-    reportButton.hidden = selectedCount === 0;
-    reportButton.disabled = busy || selectedCount === 0;
     projectPicker.hidden = options.inbox || !options.allowProjectAssignment || selectedCount === 0;
     assignButton.hidden = !options.inbox || selectedCount === 0;
     assignButton.disabled = busy;
@@ -37278,18 +37243,6 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
       }
     });
     actions.append(researchButton);
-    if (options.reportProject && !options.reportProject.sharedOnly && hasCapability("professional-exports")) {
-      const reportButton = reportMembershipIndicator(projectDetailKey(projectIdentity(options.reportProject)), "evidence", item, "action");
-      reportButton.className = "saved-add-to-report workflow-action workflow-action-secondary";
-      reportButton.textContent = "Add to Report";
-      reportButton.addEventListener("click", async () => {
-        reportButton.disabled = true;
-        try { reportAdditionFeedback(reportButton, await addSavedEvidenceToReport(options.reportProject, [item], { container: row })); }
-        catch (error) { await showWebNotice("Could not add to Report", error.message); }
-        finally { if (reportButton.isConnected) reportButton.disabled = false; }
-      });
-      actions.append(reportButton);
-    }
     if (options.reportProject && !options.reportProject.sharedOnly && hasCapability("notebook")) {
       const noteButton = document.createElement("button");
       noteButton.type = "button";

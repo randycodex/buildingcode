@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
+import {reportsContainingSource} from '../public/project-workflow.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const helper=source.slice(source.indexOf('async function addSavedEvidenceToNotebook('),source.indexOf('\nfunction appendSavedEvidenceRow('));
 const exact='The full saved paragraph, including every condition. '+ 'Preserve the complete historical source. '.repeat(12);
@@ -45,8 +46,9 @@ const body=element('section'),project={id:'project'};
 const c=vm.createContext({document:{createElement:element},window:{getSelection:()=>''},
  codeTheme:()=> 'building',savedEvidenceKey:()=> 'saved',normalizeAnnotationBlockID:value=>String(value||''),
  sectionTitleWithoutNumber:()=> 'Scope',savedEvidenceEdition:()=> '2014',annotationForTarget:()=>({}),markResearchSelectable(){},
- projectIdentity:p=>p,projectDetailKey:p=>p.id,hasCapability:()=>true,reportMembershipIndicator:()=>element('button'),
- startFocusedResearchFromSavedItem:async()=>calls.push('research'),addSavedEvidenceToReport:async()=>{calls.push('report');return {};},reportAdditionFeedback(){},
+ projectIdentity:p=>p,projectDetailKey:p=>p.id,hasCapability:()=>true,
+ reportMembershipIndicator:()=>assert.fail('Evidence rows cannot offer Report actions'),
+ startFocusedResearchFromSavedItem:async()=>calls.push('research'),
  addSavedEvidenceToNotebook:async(_anchor,_item,id)=>{assert.equal(id,'project');calls.push('note');},
  animateSavedRowRemoval:async()=>{},persistSectionBookmark:async(_item,saved)=>{assert.equal(saved,false);calls.push('remove');return true;},
  showWebNotice:()=>assert.fail('Unexpected notice'),refreshOpenSavedPanes:async()=>{}});
@@ -54,11 +56,42 @@ vm.runInContext(source.slice(source.indexOf('function appendSavedEvidenceRow('),
 c.appendSavedEvidenceRow(body,{id:'bookmark',sectionID:'source',sectionNumber:'1010.2',codeVersion:'2014',savedColumnKind:'bookmark',previewText:'Short preview'},'evidence',
  {reportProject:project,researchProjectID:'project',showProjectContext:false},{});
 const actions=body.children[0].children.find(node=>node.className==='saved-row-actions');
-assert.deepEqual(actions.children.map(node=>node.textContent),['Research','Add to Report','Add to note','Remove']);
+assert.deepEqual(actions.children.map(node=>node.textContent),['Research','Add to note','Remove']);
 assert.equal(nodes.filter(node=>node.tag==='details').length,0,'Remove is a direct row action, with no three-dot disclosure.');
 for(const button of actions.children)await button.click();
-assert.deepEqual(calls,['research','report','note','remove']);
+assert.deepEqual(calls,['research','note','remove']);
 const styles=await readFile(new URL('../public/styles.css',import.meta.url),'utf8');
-assert.doesNotMatch(styles,/\.saved-row-actions \.saved-add-to-report\s*\{[^}]*opacity:\s*1/,'Report follows the same hover visibility as Research.');
 assert.match(styles,/\.saved-section-row:hover \.saved-row-actions button,[\s\S]*?\.saved-section-row:focus-within \.saved-row-actions button\s*\{\s*opacity: 1/);
-console.log('Evidence actions passed: four direct actions, shared hover/focus visibility, complete exact-edition Note capture, missing-paragraph rejection and stale account/Project/Note guards.');
+console.log('Evidence actions passed: Research, Add to note and Remove without Report insertion, shared hover/focus visibility, complete exact-edition Note capture, missing-paragraph rejection and stale account/Project/Note guards.');
+
+// Saved passages enter the Report through its Sources column, using the exact
+// source identity so two editions of the same paragraph stay distinct.
+const paletteStart=source.indexOf('  function renderSourcePalette(');
+const paletteEnd=source.indexOf('\n  }',paletteStart)+4;
+assert(paletteStart>=0&&paletteEnd>paletteStart);
+const paletteSources=['2022','2014'].map(edition=>({kind:'evidence',id:`passage-${edition}`,
+ label:`BC ${edition} · 1010.2`,sourceClassification:'published-code'}));
+const activeDraft={blocks:[{id:'existing',kind:'paragraph',text:'Keep Report edits'}]};
+let dirtyChanges=0,renders=0;
+const paletteContext=vm.createContext({document:{createElement:element},panel:{querySelector:()=>null},
+ sources:paletteSources,activeDraft,reportsContainingSource,crypto:{randomUUID:()=>`block-${dirtyChanges}`},
+ reportSectionExpanded:()=>true,wireProjectSectionMotion(){},persistReportSectionExpanded(){},
+ setDirty:()=>dirtyChanges++,renderWorkspaceContent:()=>renders++});
+vm.runInContext(source.slice(paletteStart,paletteEnd),paletteContext);
+const evidenceSourceButtons=()=>{
+ const container=element('section');paletteContext.renderSourcePalette(container);
+ const group=container.children.find(section=>section.children[0].children[0].textContent==='Evidence');
+ return group.children[1].children.map(row=>row.children[1]);
+};
+let sourceButtons=evidenceSourceButtons();
+assert.equal(sourceButtons.length,2);
+sourceButtons[0].click();
+sourceButtons=evidenceSourceButtons();
+assert.equal(sourceButtons[0].disabled,true,'An included passage cannot be added twice from Sources.');
+assert.equal(sourceButtons[0].textContent,'Added');
+assert.equal(sourceButtons[1].disabled,false,'The other edition remains separately available.');
+sourceButtons[1].click();
+assert.deepEqual(activeDraft.blocks.map(block=>block.sourceID||block.id),['existing','passage-2022','passage-2014']);
+assert.equal(activeDraft.blocks[0].text,'Keep Report edits');
+assert.equal(dirtyChanges,2);assert.equal(renders,2);
+console.log('Report Sources insertion passed: exact passage/edition identities, duplicate prevention, retained Report edits and save scheduling.');

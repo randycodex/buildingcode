@@ -79,17 +79,7 @@ const mounted = fixture({ mount: { getDraftSnapshot: () => draft, hasUnsavedChan
 await mounted.run();
 assert.equal(mountedAdds, 1, 'Open drafts append through their editor to retain unsaved changes.');
 assert.equal(mounted.saved.length, 0, 'Never overwrite a mounted draft with an older server snapshot.');
-const evidenceColumn = { isConnected: true };
-const batch = fixture({ drafts: [draft, { ...draft, id: 'report-b' }] });
-await batch.c.addSavedEvidenceToReport(project, [
-  { sectionID: 'section-a', codeVersion: '2022', blockID: 'paragraph-a' },
-  { sectionID: 'section-a', codeVersion: '2014', blockID: 'paragraph-a' }
-], { container: evidenceColumn });
-assert.equal(batch.dialogs[0].container, evidenceColumn, 'Evidence report selection uses its own source column too');
-assert.deepEqual(batch.saved[0].blocks.slice(1).map(block => block.sourceID), ['passage-a', 'historical']);
-const unavailable = fixture();
-await assert.rejects(unavailable.c.addSavedEvidenceToReport(project, [{ sectionID: 'section-a', codeVersion: '2022', blockID: 'different' }]), /not available/);
-assert.equal(unavailable.saved.length, 0, 'Never expand an unavailable paragraph into its full section.');
+assert.equal(single.c.addSavedEvidenceToReport,undefined,'Evidence insertion belongs only to the Report Sources column.');
 let resolve;
 const changed = fixture({ gate: new Promise(r => resolve = r) });
 const pending = changed.run(); changed.switchAccount(); resolve();
@@ -99,4 +89,4 @@ const palette = app.slice(app.indexOf('  function renderSourcePalette('), app.in
 assert(!palette.includes('appendSourceGroup("Saved evidence"'));
 assert(!palette.includes('appendSourceGroup("Notebook notes"'));
 assert(!app.slice(start, end).includes('openProjectReportDraft('), 'Adding must leave the source column in place.');
-console.log('Report source handoff passed: destinations, cancellation, first draft, deduplication, mounted edits, exact passages and editions, account fence, no column navigation.');
+console.log('Note Report handoff passed: destinations, cancellation, first draft, deduplication, mounted edits, account fence, no column navigation, no Evidence shortcut.');
