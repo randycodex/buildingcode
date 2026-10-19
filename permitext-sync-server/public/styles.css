@@ -19855,7 +19855,17 @@ dialog.report-screen {
 .report-screen .report-draft-menu-items .report-draft-version-option.is-create { margin-top: 6px; border-top: 1px solid var(--border); border-radius: 0; color: var(--text-primary); }
 .report-screen .report-draft-picker .report-draft-version-list[hidden],
 .report-screen .report-draft-menu-items .report-draft-version-option[hidden] { display: none; }
-.notebook-title-control { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px; flex: 0 0 auto; margin: 0 var(--panel-padding) var(--space-3); margin-inline-end: calc(var(--panel-padding) + (var(--panel-title-control-size) - var(--panel-title-icon-size)) / 2); }
+.notebook-title-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+  width: calc(100% - (2 * var(--space-4)));
+  max-width: var(--workspace-content-max-width);
+  margin: 0 auto var(--space-3);
+  padding-inline: 24px;
+}
 .notebook-title-control :is(.notebook-title-text, .notebook-title-editor) { grid-column: 1; grid-row: 1; width: 100%; min-width: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--text-primary); font-size: 26px; line-height: 1.3; font-weight: 650; text-align: left; overflow-wrap: anywhere; }
 .notebook-title-control :is(.notebook-title-text, .notebook-title-editor)[hidden] { display: none; }
 .notebook-title-action { grid-column: 2; grid-row: 1; display: flex; align-items: center; }
