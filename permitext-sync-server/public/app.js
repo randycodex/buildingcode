@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-reader-drag-scroll-v1206";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261019-reset-reader-layout-v1207";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
@@ -130,7 +130,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-reader-drag-scroll-v1206";
+} from "./offline-storage.js?v=20261019-reset-reader-layout-v1207";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -163,7 +163,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-reader-drag-scroll-v1206";
+} from "./workspace-state.js?v=20261019-reset-reader-layout-v1207";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -46628,6 +46628,7 @@ async function resetVisibleColumnWidths() {
     if (panel?.querySelector(".report-workspace-columns")) resetReportColumnWidths(panel, syncReferenceReaderLayout);
     return;
   }
+  workspaceColumnExpansion?.restore();
   const paneIDs = new Set(activePaneIDs().filter(workflowPaneIsVisible));
   for (const group of state.columnGroups || []) {
     for (const [id, column] of Object.entries(group.columns || {})) if (paneIDs.has(id)) column.width = defaultPaneWidthForID(id);
@@ -46639,6 +46640,7 @@ async function resetVisibleColumnWidths() {
   for (const id of paneIDs) state.paneWeights[id] = defaultPaneWidthForID(id);
   saveWorkspaceState();
   await transitionWorkspace("utility");
+  syncResearchColumnLayout({ reset: true });
   requestAnimationFrame(() => { track.scrollLeft = Math.min(currentLeft, Math.max(0, track.scrollWidth - track.clientWidth)); });
 }
 

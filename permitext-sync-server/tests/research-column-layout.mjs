@@ -22,7 +22,7 @@ const makePane = id => {
   const classes = new Set();
   return { dataset: { paneId: id }, style: { setProperty(name, value) { this[name] = value; } },
     classList: { contains: name => classes.has(name), add: name => classes.add(name), remove: name => classes.delete(name) },
-    getBoundingClientRect() { return { width: Number(this.style.flex?.split(' ').at(-1)?.replace('px', '')) || 600 }; } };
+    getBoundingClientRect() { return { width: classes.has('is-workflow-hidden') ? 0 : Number(this.style.flex?.split(' ').at(-1)?.replace('px', '')) || 600 }; } };
 };
 let panels = [makePane('utility:search:one'), makePane('reader:one')];
 const state = { paneWeights: { 'utility:search:one': 1400, 'reader:one': 400 } };
@@ -118,3 +118,50 @@ for (const count of [1, 2]) {
   assert.deepEqual(sizes(), resized, 'Changing chapters also preserves manual widths');
 }
 console.log('Reader navigation preserves fitted and manually resized widths for one and multiple columns.');
+
+// Reset layout must leave manual sizing and fill the desk again. Retain the
+// collapsed rails and widths saved in other views, including grouped columns.
+vm.runInContext(actual('resetVisibleColumnWidths'), context);
+Object.assign(context, {
+  reportScreen: null,
+  activePaneIDs: () => panels.map(panel => panel.dataset.paneId),
+  workflowPaneIsVisible: id => id !== 'reader:hidden',
+  saveWorkspaceState() {},
+  async transitionWorkspace() {
+    panels.filter(panel => panel.dataset.paneId !== 'reader:hidden').forEach(panel => context.applyPaneWeight(panel, panel.dataset.paneId));
+    context.syncResearchColumnLayout();
+  }
+});
+const resetFrames = [];
+context.requestAnimationFrame = callback => resetFrames.push(callback);
+Object.defineProperty(track, 'scrollWidth', {get: () => Math.max(track.clientWidth,
+  panels.filter(panel => panel.dataset.paneId !== 'reader:hidden')
+    .reduce((total, panel) => total + panel.getBoundingClientRect().width + 1, 1))});
+for (const available of [2428,1600]) {
+  panels = ['reader:one','utility:analysis','utility:search:one','utility:calculator','reader:two','reader:three','reader:hidden'].map(makePane);
+  panels.at(-1).classList.add('is-workflow-hidden');
+  collapsed.clear();
+  ['utility:analysis','utility:search:one','utility:calculator'].forEach(id => collapsed.add(id));
+  state.paneWeights = Object.fromEntries(panels.map(panel => [panel.dataset.paneId, 1800]));
+  state.columnGroups = [{columns: {'reader:one': {width:1800}, 'reader:hidden': {width:1800}}}];
+  workflow = 'research';
+  context.window.innerWidth = track.clientWidth = available;
+  delete track._researchColumnLayout;
+  context.syncResearchColumnLayout();
+  context.capturePaneResizeWidths();
+  state.paneWeights['reader:one'] = 1800;
+  context.syncResearchColumnLayout();
+  track.scrollLeft = 300;
+  await context.resetVisibleColumnWidths();
+  resetFrames.splice(0).forEach(callback => callback());
+  const readerWidth = available === 2428 ? 759 : 600;
+  assert.deepEqual(sizes().slice(0,6), [readerWidth,48,48,48,readerWidth,readerWidth]);
+  assert.equal(track.dataset.researchColumnSizing, available === 2428 ? 'fit' : 'overflow');
+  assert.equal(state.paneWeights['reader:hidden'], 1800);
+  assert.equal(state.columnGroups[0].columns['reader:hidden'].width,1800);
+  assert.equal(state.columnGroups[0].columns['reader:one'].width,600);
+  assert.equal(track.scrollLeft, available === 2428 ? 0 : 300);
+  context.syncResearchColumnLayout();
+  assert.equal(track.dataset.researchColumnSizing, available === 2428 ? 'fit' : 'overflow', 'Later hydration keeps the reset layout');
+}
+console.log('Reset layout passed: clears manual widths, fills available space, retains collapsed rails and hidden views, and preserves minimums in overflow.');
