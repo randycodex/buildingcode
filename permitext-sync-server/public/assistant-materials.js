@@ -18,7 +18,7 @@ export function createAssistantMaterials({ conversation, load, save, create, upd
       (current?.assistantScope?.materials || []).length + (current?.assistantScope?.facts || []).length +
       (current?.assistantScope?.includeProjectContext ? 1 : 0));
     root.replaceChildren(); state();
-    const heading = document.createElement("h3"); heading.textContent = "Conversation sources";
+    const heading = document.createElement("h3"); heading.textContent = "Included material";
     root.append(heading);
     const help = document.createElement("p"); help.className = "assistant-material-help";
     help.textContent = "Assistant uses only the material included here and your messages. Add material, then ask a question.";

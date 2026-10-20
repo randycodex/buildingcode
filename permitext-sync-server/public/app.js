@@ -1,5 +1,4 @@
-import { createAssistantMaterials } from "./assistant-materials.js?v=3";
-import { mountAssistantColumn } from "./assistant-column.js?v=2";
+import { createAssistantMaterials } from "./assistant-materials.js?v=4";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=2";
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
@@ -9,7 +8,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-project-menu-cleanup-v1243";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-assistant-sidebar-restore-v1244";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261019-project-workflow-v2";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -133,7 +132,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-project-menu-cleanup-v1243";
+} from "./offline-storage.js?v=20261019-assistant-sidebar-restore-v1244";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -166,7 +165,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-project-menu-cleanup-v1243";
+} from "./workspace-state.js?v=20261019-assistant-sidebar-restore-v1244";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -476,7 +475,7 @@ const defaultCoordinationPaneWidth = 600;
 const defaultCoordinationThreadPaneWidth = 520;
 const defaultSettingsPaneWidth = 600;
 const assistantHistoryWidth = 320;
-const defaultResearchPaneWidth = 680;
+const defaultResearchPaneWidth = assistantHistoryWidth + 600;
 const defaultCodeDecisionPaneWidth = 600;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
@@ -1213,7 +1212,6 @@ function newUtilityInstance(key, overrides = {}) {
     instance.historyQuery = String(overrides.historyQuery || "");
     instance.historyScrollTop = Math.max(0, Number(overrides.historyScrollTop) || 0);
     instance.historyProjectID = overrides.historyProjectID === undefined ? null : overrides.historyProjectID;
-    instance.assistantView = overrides.assistantView === "conversation" ? "conversation" : "sources";
   } else if (key === "search") {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
     instance.matchMode = overrides.matchMode === "exact" ? "exact" : "words";
@@ -1313,7 +1311,6 @@ function normalizeUtilityInstances(saved = {}) {
       id: String(pane?.id || crypto.randomUUID()),
       conversationID: pane?.conversationID,
       historyShowing: pane?.historyShowing,
-      assistantView: pane?.assistantView,
       draft: pane?.draft,
       historyQuery: pane?.historyQuery,
       historyProjectID: pane?.historyProjectID,
@@ -4696,7 +4693,7 @@ function minimumPaneWidthForID(paneID) {
   if (paneID?.startsWith("reader:")) return currentColumnWorkflowView() === "research" ? 600 : 400;
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 300;
   if (assistantHistoryOnlyPane(paneID)) return assistantHistoryWidth;
-  if (paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") || paneID?.startsWith("research:conversation:")) return 600;
+  if (paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") || paneID?.startsWith("research:conversation:")) return assistantHistoryWidth + 600;
   return 600;
 }
 
@@ -22846,16 +22843,19 @@ async function refreshResearchConversationInPlace(paneID, conversationID, instan
   // Publish a complete conversation in one swap; history, filters and focus stay mounted.
   body.replaceChildren(conversation);
   const materialList = conversation.querySelector?.(".assistant-materials");
-  if (materialList) panel._assistantColumn?.setMaterials(materialList);
+  const historyRail = panel.querySelector(":scope > .assistant-history-rail");
+  if (materialList && historyRail) {
+    historyRail.querySelector(":scope > .assistant-materials")?.remove();
+    historyRail.prepend(materialList);
+  }
   track.querySelectorAll(".occupant-load-card").forEach(card=>card.dispatchEvent(new Event("calculation-assessment-refreshed")));
-  if (panel._assistantColumn) panel._assistantColumn.show(panel.dataset.assistantView);
-  else body.hidden = false;
+  body.hidden = false;
   panel.classList.remove("has-research-composer", "is-new-research-chat", "is-history-only");
   panel.classList.add("has-inline-conversation");
   applyPaneWeight(panel, paneID);
   notifyWorkspaceLayoutChange();
   panel.dataset.workspacePaneIdentity = researchAssistantContentIdentity(instance);
-  panel.querySelectorAll(".assistant-history-menu .research-conversation-row").forEach(row => {
+  panel.querySelectorAll(".assistant-history-rail .research-conversation-row").forEach(row => {
     const selected = row.dataset.conversationId === conversationID;
     row.classList.toggle("is-active", selected);
     const button = row.querySelector(".research-conversation-open");
@@ -24850,7 +24850,7 @@ async function renderResearch(paneID = "utility:analysis") {
   const draftShowing = researchDraftPaneIDs.has(paneID) || !conversationOpen;
   if (draftShowing) researchDraftPaneIDs.add(paneID);
   const chatVisible = conversationOpen || draftShowing;
-  // History is available in the header without competing with conversation sources.
+  // History is always available beside this Assistant, including while composing.
   const historyShowing = true;
   const panel = renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel", "research-list-panel");
@@ -24907,9 +24907,7 @@ async function renderResearch(paneID = "utility:analysis") {
   assistantBody.setAttribute("aria-label", "Assistant conversation");
   assistantBody.hidden = !chatVisible;
   panel.append(historyRail, assistantBody);
-  panel._assistantColumn = mountAssistantColumn({panel, history: historyRail, body: assistantBody, state: historyState,
-    changed: scheduleResearchDraftPersistence});
-  if (draftShowing) panel._assistantColumn.setMaterials(createAssistantMaterials({ conversation: null, create: async () => {
+  if (draftShowing) historyRail.prepend(createAssistantMaterials({ conversation: null, create: async () => {
     const workspaceID = activeWorkspaceID, identity = captureAccountRequest();
     const created = await postResearch("/research/conversations/create", {});
     if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return;
@@ -24943,7 +24941,7 @@ async function renderResearch(paneID = "utility:analysis") {
   }
 
   const materialList = assistantBody.querySelector(".assistant-materials");
-  if (materialList) panel._assistantColumn.setMaterials(materialList);
+  if (materialList) historyRail.prepend(materialList);
   const historyHeading = document.createElement("h3");
   historyHeading.className = "assistant-history-heading";
   historyHeading.textContent = "Conversations";
@@ -25333,7 +25331,6 @@ async function renderResearch(paneID = "utility:analysis") {
           return;
         }
         if (!instance) researchConversationPaneOpened = true;
-        panel._assistantColumn?.show("conversation");
         void openResearchHistoryConversation(conversation, instance)
           .catch((error) => { if (isCurrent()) void showWebNotice("Research not opened", error.message); });
       });
@@ -25623,7 +25620,7 @@ async function renderResearch(paneID = "utility:analysis") {
     list.append(group);
   });
   content.append(list);
-  requestAnimationFrame(() => { if (isCurrent()) content.scrollTop = Math.max(0, Number(historyState.historyScrollTop) || 0); });
+  requestAnimationFrame(() => { if (isCurrent()) panel.querySelector(".assistant-history-rail > .analysis-content").scrollTop = Math.max(0, Number(historyState.historyScrollTop) || 0); });
   if (historyCursor) {
     const more = document.createElement("button");
     more.type = "button";
