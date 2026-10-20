@@ -52,7 +52,7 @@ const workspaceShell = element('main'), workflowToolbar = element('nav'), track 
 workspaceShell.className = 'workspace-shell'; workflowToolbar.className = 'workflow-toolbar';
 body.append(workspaceShell); workspaceShell.append(workflowToolbar, track);
 track.inert = false; workflowToolbar.inert = false;
-const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
+const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}}), appendProjectOpenQuestions() {}, renderProjectSavedWork: async () => {}, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
   currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
   saveWorkspaceResumeForRefresh() {},
@@ -86,14 +86,15 @@ const contextPanel = mounts.get('project:context:alpha').panel;
 const factsPanel = mounts.get('project:facts:alpha').panel;
 const screenElement = find(workspaceShell, node => node.className.includes('project-details-screen'));
 assert.ok(screenElement, 'Project details mounts in the workspace screen wrapper');
-assert.equal(find(screenElement, node => node.attributes.role === 'alert'), undefined, 'Screen hydration must finish without a hidden harness error');
+const screenError = find(screenElement, node => node.attributes.role === 'alert');
+assert.equal(Boolean(screenError), false, `Screen hydration must finish without a hidden harness error: ${screenError?.textContent}`);
 assert.equal(screenElement.open, true); assert.equal(screenElement.hidden, false);
 assert.equal(track.inert, true); assert.equal(workflowToolbar.inert, true);
 assert.equal(workspaceShell.inert, undefined, 'Cover the underlying controls, not the active details screen');
 assert.equal(contextPanel.hidden, false); assert.equal(factsPanel.hidden, false);
 const columns = find(screenElement, node => node.className === 'project-details-columns');
-assert.equal(columns.children.length, 3, 'Overview, Facts, and Records are mounted side by side');
-for (const label of ['Overview', 'Facts', 'Records']) {
+assert.equal(columns.children.length, 3, 'Context, Facts, and Saved work are mounted side by side');
+for (const label of ['Context', 'Facts', 'Saved work']) {
   assert.ok(find(columns, node => node.tag === 'h2' && node.textContent === label));
 }
 assert.equal(find(screenElement, node => node.className === 'project-details-tabs'), undefined);
@@ -203,7 +204,7 @@ assert.match(styles, /\.project-facts-panel\s*\{\s*--pane-min-width: 600px;/);
 // Execute the actual split editors: Context patches only description; Facts patches only fact fields.
 function element(tag) {
   const e = { tag, children: [], attributes: {}, handlers: {}, dataset: {}, value: "", isConnected: true,
-    className: "", classList: { add() {}, remove() {} },
+    className: "", classList: { add() {}, remove() {}, contains: name => e.className.split(/\s+/).includes(name) },
     append(...values) { values.forEach(value => { if (value.parent) value.parent.children = value.parent.children.filter(child => child !== value); value.parent = this; this.children.push(value); }); },
     prepend(value) { value.parent = this; this.children.unshift(value); },
     replaceChildren(...values) { this.children=[]; this.append(...values); },

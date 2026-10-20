@@ -1,4 +1,4 @@
-import { normalizeProjectDetailsWidths } from './project-details-columns.js?v=20261015-project-details-resize-v1';
+import { normalizeProjectDetailsWidths } from './project-details-columns.js?v=20261019-project-workflow-v2';
 
 const views = ['research', 'notebook', 'report', 'project-details', 'account'];
 export const reportResumeFlags = ['libraryOpen', 'outlineHidden', 'comparisonOpen', 'versionsCollapsed'];

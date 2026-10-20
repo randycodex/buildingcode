@@ -73,7 +73,9 @@ assert(
 assert(
   webClient.includes('uploadNotebookAsset(projectID, file, cardID = "", requestIdentity = captureAccountRequest())') &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL, requestIdentity = captureAccountRequest())") &&
-    /const notebookClientVersion = "[0-9]{8}-(?:[a-z]+-)*notebook(?:-[a-z]+)*-v[0-9]+";/.test(webClient),
+    webClient.includes("import(`/web/notebook-assets/notebook.js?v=${notebookClientVersion}`)") &&
+    webClient.includes("`/web/notebook-assets/notebook.css?v=${notebookClientVersion}`") &&
+    /const notebookClientVersion = "[0-9]{8}-(?:[a-z]+-)+v[0-9]+";/.test(webClient),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 

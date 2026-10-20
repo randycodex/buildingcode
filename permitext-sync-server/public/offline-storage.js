@@ -22,14 +22,14 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1813";
-const shellAssetVersion = "20261019-reader-unlimited-divider-width-v1236";
+const shellCacheName = "permitext-pro-shell-v1819";
+const shellAssetVersion = "20261019-project-workflow-layout-v1242";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
   "/web/settings-columns.js?v=1",
-  "/web/project-details-columns.js?v=20261015-project-details-resize-v1",
+  "/web/project-details-columns.js?v=20261019-project-workflow-v2",
   "/web/workspace-button-icons.js?v=20261017-calculator-column-v1",
   "/web/minimal-workflow.js",
   "/web/notebook-questions.js",
@@ -51,11 +51,11 @@ const shellURLs = [
   "/web/reader-search-match.js?v=20261015-reader-search-preview-v3",
   "/web/report-autosave.js?v=1",
   "/web/report-undo.js?v=2",
-  "/web/scroll-edge-fades.js?v=4",
+  "/web/scroll-edge-fades.js?v=5",
   "/web/report-outline.js?v=20261018-pinned-outline-v12",
   "/web/report-export-review.js?v=20261012-report-export-v13",
   "/web/report-comparison.js?v=20261012-comparison-v20",
-  "/web/workspace-resume.js?v=20261015-account-columns-v4",
+  "/web/workspace-resume.js?v=20261019-project-workflow-v5",
   "/web/reader-navigation-tree.js?v=20261010-contents-v1",
   "/web/reader-chapter-extent.js?v=20261010-chapter-extent-v2",
   "/web/sync-identity.js",
@@ -77,23 +77,24 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261019-reader-unlimited-divider-width-v1236",
+  "/web/styles.css?v=20261019-project-workflow-layout-v1242",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/assistant-materials.js?v=2",
-  "/web/app.js?v=20261019-reader-unlimited-divider-width-v1236",
+  "/web/assistant-materials.js?v=3",
+  "/web/assistant-column.js?v=2",
+  "/web/app.js?v=20261019-project-workflow-layout-v1242",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261019-reader-unlimited-divider-width-v1236",
+  "/web/offline-storage.js?v=20261019-project-workflow-layout-v1242",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=5",
-  "/web/workspace-state.js?v=20261019-reader-unlimited-divider-width-v1236",
+  "/web/workspace-state.js?v=20261019-project-workflow-layout-v1242",
   "/web/recent-view-scope.js?v=1",
   "/web/recent-search-scope.js?v=1",
   "/web/workspace-state.js?v=20261012-workflow-views-v18",
@@ -114,7 +115,7 @@ const shellURLs = [
   "/web/workflow-views.js?v=10",
   "/web/report-screen.js?v=20261011-shared-shell-v6",
   "/web/report-library.js?v=20261012-sidebar-width-v8",
-  "/web/notebook-note-menu.js?v=20261019-reader-unlimited-divider-width-v1236",
+  "/web/notebook-note-menu.js?v=20261019-project-workflow-layout-v1242",
   "/web/notebook-columns.js?v=2",
   "/web/reader-render-batches.js?v=20261012-reader-batches-v1",
   "/web/search-query-session.js?v=20261012-search-session-v2",

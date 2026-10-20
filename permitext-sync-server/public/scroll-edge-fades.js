@@ -2,7 +2,7 @@
 // a painted color so tinted panels and both system appearances stay correct.
 const viewports = [
   '.reader-content', '.section-detail-content', '.saved-column-scroll', '.saved-content',
-  '.analysis-content', '.projects-content', '.project-detail-content',
+  '.analysis-content', '.assistant-materials', '.projects-content', '.project-detail-content',
   '.workspace-issue', '.mobile-more-sheet', '.reader-trust-details',
   '.section-save-project-sheet', '.reader-notes-project-options', '.section-detail-project-menu',
   '.search-results', '.search-jump-list', '.search-history-list', '.search-history-scroll-list',

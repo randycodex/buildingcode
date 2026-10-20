@@ -61,7 +61,7 @@ const panes=[reader,notebook], state={workflowVisitedViews:['research','notebook
 const track={scrollLeft:110,querySelectorAll:()=>panes};
 let constructions=0, needProject=false, dividerUpdates=0;
 let reportOpen=false, detailsOpen=false;
-const c=vm.createContext({columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){reportOpen=false;}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){detailsOpen=false;}},toggleSettingsButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
+const c=vm.createContext({columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){reportOpen=false;}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){detailsOpen=false;}},toggleSettingsButton:null,toggleReportButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
   document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
   syncNotebookNoteTabs(){},ensureNotebookTabCatalog:async()=>{},syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){},schedulePaneDividerAddControls(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
@@ -95,6 +95,20 @@ for (const view of ['project-details']) {
   await c.switchWorkflowView('notebook');
 }
 needProject=true; assert.equal(await c.switchWorkflowView('research'),false); assert.equal(state.workflowView,'notebook');
+const beforeExplicit = constructions;
+needProject = false;
+c.projectHasOpenNotebook = () => false;
+c.defaultActivePaneIDs = () => [];
+state.workflowVisitedViews = [];
+await c.switchWorkflowView('research', {initialize: false});
+await c.switchWorkflowView('notebook', {initialize: false});
+assert.equal(constructions, beforeExplicit, 'An explicit saved-work destination opens only the requested column.');
+assert.equal(state.workflowView, 'notebook');
+let projectOpens = 0; c.openProjectDetailsScreen = async () => { projectOpens++; return true; };
+assert.equal(await c.switchWorkflowView('project'), true); assert.equal(projectOpens, 1);
+c.projectHasOpenNotebook = () => panes.includes(notebook);
+c.defaultActivePaneIDs = () => panes.map(p => p.dataset.paneId);
+state.workflowVisitedViews = ['research', 'notebook'];
 console.log('Workflow views passed: independent visibility, linked destinations, layout persistence, retained editors, nested scroll and project guard.');
 
 const closed=[];
@@ -183,7 +197,7 @@ const fit = {}, closeColumns = {}, workspaceOnly = [{}, {}, {}];
 const layoutTrack = {scrollLeft: 220, scrollWidth: 1000, clientWidth: 700, querySelectorAll: () => []};
 const reportPanel = {querySelector: () => reportReady ? {} : null};
 const layoutState = {paneWeights: {'reader:one': 900, 'project:notebook:a': 730}, columnGroups: []};
-const layoutContext = vm.createContext({
+const layoutContext = vm.createContext({ currentColumnWorkflowView: () => menuReportOpen ? "report" : "research",
   reportScreen: {isOpen: () => menuReportOpen}, fitColumnsButton: fit, collapseReadersButton: closeColumns,
   document: {querySelector: selector => selector.endsWith('.report-draft-panel') ? reportPanel : reportReady ? {} : null,
     querySelectorAll: () => workspaceOnly},

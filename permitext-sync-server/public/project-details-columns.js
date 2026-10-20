@@ -52,7 +52,7 @@ export function createProjectDetailsColumnResizers(columns, panels, onResize = (
     divider.tabIndex = 0;
     divider.setAttribute('role', 'separator');
     divider.setAttribute('aria-orientation', 'vertical');
-    divider.setAttribute('aria-label', index === 0 ? 'Resize Overview and Facts' : 'Resize Facts and Records');
+    divider.setAttribute('aria-label', index === 0 ? 'Resize Context and Facts' : 'Resize Facts and Saved work');
     divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to balance columns';
     divider.addEventListener('focus', update);
     divider.addEventListener('dblclick', () => { apply(null); onResize(); });
