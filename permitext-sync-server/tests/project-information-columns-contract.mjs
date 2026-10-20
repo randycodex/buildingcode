@@ -22,8 +22,8 @@ const alpha = { id: "alpha", name: "Alpha", description: "Original context", add
 assert.match(shell, /id="toggle-saved"[^>]*aria-label="Evidence"/);
 assert.doesNotMatch(actual("renderSavedFolderContext"), /appendSavedProjectFactEditor|saved-project-summary/);
 assert.doesNotMatch(shell, /id="open-project-details"/);
-assert.match(actual("openWorkspaceContextMenu"), /label: "Project details"[\s\S]*?run: \(\) => void openProjectDetailsScreen\(\)/,
-  "Project details opens from the current Project menu");
+assert.doesNotMatch(actual("openWorkspaceContextMenu"), /label: "Project details"/,
+  "The Project tab replaces the redundant Project details menu action");
 
 // Visibility is scoped to each Project layout; legacy layouts start closed.
 assert.equal(emptyWorkspaceLayout().projectContextOpen, false);

@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-project-workflow-layout-v1242";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261019-project-menu-cleanup-v1243";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261019-project-workflow-v2";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -133,7 +133,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261019-project-workflow-layout-v1242";
+} from "./offline-storage.js?v=20261019-project-menu-cleanup-v1243";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -166,7 +166,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261019-project-workflow-layout-v1242";
+} from "./workspace-state.js?v=20261019-project-menu-cleanup-v1243";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2294,9 +2294,6 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   const heading = document.createElement("strong");
   heading.className = "workspace-context-heading";
   heading.textContent = "Projects";
-  if (projectsAvailable && workspaceProject()) {
-    appendMenuAction(projectSection, { label: "Project details", icon: "layout-list", disabled: !hasCapability("projects"), run: () => void openProjectDetailsScreen() });
-  }
   projectSection.append(heading);
   workspaces.forEach((candidate) => {
     const button = document.createElement("button");
