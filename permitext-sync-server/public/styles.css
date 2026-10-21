@@ -20076,7 +20076,7 @@ dialog.report-export-review {
 .project-details-screen .project-information-panel { max-width: 1080px; margin-inline: auto; }
 .project-details-screen .project-details-columns {
   display: grid;
-  grid-template-columns: minmax(400px, 1fr) 1px minmax(400px, 1fr) 1px minmax(400px, 1fr);
+  grid-template-columns: minmax(400px, 1fr) 1px minmax(400px, 1fr);
   flex: 1;
   min-height: 0;
   min-width: 0;
@@ -20881,3 +20881,21 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 @media (min-width: 761px) and (max-width: 900px) {
   .topbar .topbar-brand { display: none; }
 }
+
+/* Keep saved passage state visible when its hover actions are idle. */
+.annotated-code-block > .inline-comment.has-saved-section { opacity: 1; pointer-events: auto; }
+.annotated-code-block:not(:hover):not(:focus-within) > .inline-comment.has-saved-section > :not(.inline-bookmark-toggle) { visibility: hidden; }
+.reader-content .is-navigation-target {
+  background: color-mix(in srgb, var(--reader-notes-active-text) 12%, transparent);
+  box-shadow: inset 3px 0 var(--reader-notes-active-text);
+}
+.reader-content .is-navigation-target :where(.section-block, .section-html, p, li, td, th, h3) {
+  color: var(--reader-notes-active-text);
+}
+.project-details-screen .project-details-columns .saved-project-structured-fact { padding-block: 16px; row-gap: 8px; }
+.project-open-question-list { display: grid; gap: 24px; padding-left: 24px; margin: 18px 0; }
+.project-open-question-list li::marker { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.project-open-question-list textarea { display: block; width: 100%; resize: vertical; padding: 10px; margin-bottom: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-primary); font: inherit; line-height: 1.5; }
+.project-open-questions [role="status"]:empty { display: none; }
+.search-source-bulk-actions { display: flex; gap: 12px; padding: 4px 0 12px; border-bottom: 1px solid var(--border); }
+.search-source-bulk-actions button { font-size: 12px; padding: 4px 6px; }

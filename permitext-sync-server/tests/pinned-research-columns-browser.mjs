@@ -6,6 +6,7 @@ import { normalizeWorkspaceLayout, captureWorkspaceLayout } from '../public/work
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE_PATH || 'playwright');
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const styles = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
+const workflowSource = await readFile(new URL('../public/workflow-views.js', import.meta.url), 'utf8');
 function actual(name) {
   const start = source.search(new RegExp(`(?:async )?function ${name}\\(`));
   assert.ok(start >= 0, name);
@@ -28,6 +29,7 @@ try {
   await page.setContent('<main class="panel-track" id="panel-track" style="height:700px;width:100%"></main><div id="feedback" role="status"></div>');
   await page.addStyleTag({ content: styles });
   await page.addScriptTag({ content: `
+    ${workflowSource.replace(/^export /gm, '')}
     const track = document.querySelector('#panel-track');
     let state = { paneOrder: ['reader:one','reader:two','reader:three','utility:analysis','research:conversation:b'], paneWeights: {}, collapsedPaneIDs: [], pinnedPaneID: '', utilities: {analysis:true}, utilityInstances: [], researchConversationID: 'a', columnGroups: [{id:'group',name:'Sources',paneIDs:['reader:one','reader:two','reader:three'],collapsed:false}] };
     let activeWorkspaceID = 'workspace', identity = 'account', localWelcomePreviewPending = false, firstUseWelcomeActive = false, detachedProjectWindow = false, pinnedPaneResizeObserver = null, pendingWorkspacePaneRevealID = '', researchConversationPaneOpened = true;

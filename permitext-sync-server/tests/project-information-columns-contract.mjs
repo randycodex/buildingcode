@@ -46,13 +46,13 @@ for (const kind of ["context", "facts"]) assert.equal(canGroupColumn(`project:${
 let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, tickScreen, inlineOptions;
 const mounts = new Map(), issues = [], renderedInformation = [];
 const state = { projectContextOpen: false, projectFactsOpen: false, paneWeights: {}, paneOrder: [] };
-let detailsWidths = [640,640,640], disposedResizers = 0;
+let detailsWidths = [640,640], disposedResizers = 0;
 const body = element('body');
 const workspaceShell = element('main'), workflowToolbar = element('nav'), track = element('section');
 workspaceShell.className = 'workspace-shell'; workflowToolbar.className = 'workflow-toolbar';
 body.append(workspaceShell); workspaceShell.append(workflowToolbar, track);
 track.inert = false; workflowToolbar.inert = false;
-const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}}), appendProjectOpenQuestions() {}, renderProjectSavedWork: async () => {}, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
+const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}}), appendProjectOpenQuestions() { return {flush:async()=>{}}; }, renderProjectSavedWork: async () => {}, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
   currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
   saveWorkspaceResumeForRefresh() {},
@@ -93,18 +93,14 @@ assert.equal(track.inert, true); assert.equal(workflowToolbar.inert, true);
 assert.equal(workspaceShell.inert, undefined, 'Cover the underlying controls, not the active details screen');
 assert.equal(contextPanel.hidden, false); assert.equal(factsPanel.hidden, false);
 const columns = find(screenElement, node => node.className === 'project-details-columns');
-assert.equal(columns.children.length, 3, 'Context, Facts, and Saved work are mounted side by side');
-for (const label of ['Context', 'Facts', 'Saved work']) {
+assert.equal(columns.children.length, 2, 'Context and Facts are mounted side by side');
+for (const label of ['Context', 'Facts']) {
   assert.ok(find(columns, node => node.tag === 'h2' && node.textContent === label));
 }
 assert.equal(find(screenElement, node => node.className === 'project-details-tabs'), undefined);
-const recordsPanel = find(screenElement, node => node.className.includes('project-records-panel'));
-assert.ok(find(recordsPanel, node => node.className === 'project-records-checklist'), 'Records retains the existing checklist in its dedicated section');
-assert.equal(find(contextPanel, node => node.className === 'project-records-checklist'), undefined, 'The checklist is moved rather than duplicated');
-assert.equal(recordsPanel.hidden, false);
+assert.ok(find(contextPanel, node => node.className === 'project-records-checklist'), 'Checklist stays in Context');
 const contextBody = contextPanel.querySelector('.project-details-column-body');
 const factsBody = factsPanel.querySelector('.project-details-column-body');
-const recordsBody = recordsPanel.querySelector('.project-details-column-body');
 const editButton = find(contextPanel, node => node.className === 'project-overview-edit');
 await editButton.handlers.click();
 assert.equal(inlineOptions.inline,true,'Overview expands the existing complete editor in place.');
@@ -119,17 +115,17 @@ assert.equal(overviewInput.inert, originalInert, 'Restore context editing after 
 await editButton.handlers.click();
 assert.equal(editButton.attributes['aria-expanded'],'false','The same button can collapse the draft without saving.');
 contextPanel.draft='Retained edit'; contextBody.scrollTop=320;
-factsBody.scrollTop=210; recordsBody.scrollTop=140; columns.scrollLeft=80;
+factsBody.scrollTop=210; columns.scrollLeft=80;
 const presentation = vm.runInContext('projectDetailsScreen.getPresentationState()',c);
-assert.deepEqual(copy(presentation.columnScrolls), {context:320,facts:210,records:140});
+assert.deepEqual(copy(presentation.columnScrolls), {context:320,facts:210});
 assert.equal(presentation.scrollLeft,80);
-assert.deepEqual(copy(presentation.columnWidths),[640,640,640]);
-presentation.columnWidths=[400,700,820];
-contextBody.scrollTop=0; factsBody.scrollTop=0; recordsBody.scrollTop=0; columns.scrollLeft=0;
+assert.deepEqual(copy(presentation.columnWidths),[640,640]);
+presentation.columnWidths=[400,700];
+contextBody.scrollTop=0; factsBody.scrollTop=0; columns.scrollLeft=0;
 c.presentation=presentation; vm.runInContext('projectDetailsScreen.restorePresentation(presentation)',c);
-assert.equal(contextBody.scrollTop,320); assert.equal(factsBody.scrollTop,210); assert.equal(recordsBody.scrollTop,140);
+assert.equal(contextBody.scrollTop,320); assert.equal(factsBody.scrollTop,210);
 assert.equal(columns.scrollLeft,80);
-assert.deepEqual(detailsWidths,[400,700,820],'Resized widths are restored alongside the independent scroll positions');
+assert.deepEqual(detailsWidths,[400,700],'Resized widths are restored alongside the independent scroll positions');
 vm.runInContext('projectDetailsScreen.close()',c);
 assert.equal(screenElement.hidden, true); assert.equal(screenElement.open, false);
 assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);
@@ -137,14 +133,14 @@ assert.equal(mounts.size, 2, 'Closing retains both mounted editors and their dra
 await c.toggleProjectInformation('facts');
 assert.equal(mounts.get('project:context:alpha').panel,contextPanel);
 assert.equal(contextPanel.draft,'Retained edit'); assert.equal(contextBody.scrollTop,320);
-assert.equal(contextPanel.hidden,false); assert.equal(factsPanel.hidden,false); assert.equal(recordsPanel.hidden,false);
+assert.equal(contextPanel.hidden,false); assert.equal(factsPanel.hidden,false);
 assert.equal(renderedInformation.length, 2, 'Switching sections must reuse both original editors');
 assert.equal(vm.runInContext('projectDetailsScreen.getPresentationState().section',c),'facts');
 vm.runInContext('projectDetailsScreen.close()',c);
 await c.openProjectDetailsScreen();
 assert.equal(factsPanel.hidden,false,'Reopening keeps every column visible');
-vm.runInContext('projectDetailsScreen.restorePresentation({section:"records",contentScroll:90})',c);
-assert.equal(recordsBody.scrollTop,90,'A previous tab-based snapshot restores into its matching column');
+vm.runInContext('projectDetailsScreen.restorePresentation({section:"facts",contentScroll:90})',c);
+assert.equal(factsBody.scrollTop,90,'A previous tab-based snapshot restores into its matching column');
 allowed=false; tickScreen(); assert.equal(mounts.size,0,'Revoked access releases retained editor mounts');
 assert.equal(disposedResizers,1,'Removing the screen disposes its resize observer');
 assert.equal(screenElement.isConnected, false, 'Revoking access removes the whole private screen');

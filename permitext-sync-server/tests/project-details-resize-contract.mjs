@@ -10,7 +10,7 @@ for (const index of [0,1]) for (const delta of [-10000,-300,0,300,10000]) {
   assert.deepEqual(original,[640,640,640]);
 }
 assert.deepEqual(normalizeProjectDetailsWidths([400,600,800]),[400,600,800]);
-for (const invalid of [null,[],[399,600,800],[400,Infinity,800],[400,600]]) assert.equal(normalizeProjectDetailsWidths(invalid),null);
+for (const invalid of [null,[],[399,600,800],[400,Infinity,800]]) assert.equal(normalizeProjectDetailsWidths(invalid),null);
 
 const node = () => ({
   attributes:{},handlers:{},captured:new Set(),
@@ -36,7 +36,7 @@ assert.equal(columns.children.length,5);
 const [left, right]=[columns.children[1],columns.children[3]];
 assert.equal(columns.children[0],panels[0]); assert.equal(columns.children[4],panels[2]);
 assert.equal(left.attributes['aria-label'],'Resize Context and Facts');
-assert.equal(right.attributes['aria-label'],'Resize Facts and Saved work');
+assert.equal(right.attributes['aria-label'],'Resize Context and Facts');
 assert.equal(left.attributes['aria-valuemin'],'400');
 const event=overrides=>({preventDefault(){},button:0,pointerId:7,clientX:640,...overrides});
 left.handlers.pointerdown(event());
@@ -60,3 +60,9 @@ left.handlers.pointerdown(event()); left.handlers.pointercancel(event());
 assert.equal(classes.has('is-resizing'),false); assert.equal(left.hasPointerCapture(7),false);
 controls.dispose();
 console.log('Project details resizing passed: two internal dividers, adjacent-only resizing, 400px limits, keyboard controls, reset, pointer cleanup and restored widths.');
+
+assert.deepEqual(normalizeProjectDetailsWidths([400,600]),[400,600]);
+const twoPanels=panels.slice(0,2);columns.children=[...twoPanels];template='';
+const two=createProjectDetailsColumnResizers(columns,twoPanels);
+assert.equal(columns.children.length,3,'Two columns have exactly one divider');
+two.setWidths([500,700,800]);assert.equal(two.getWidths().length,2,'Legacy third width is ignored');two.dispose();

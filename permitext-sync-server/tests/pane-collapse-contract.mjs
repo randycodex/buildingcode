@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { normalizeColumnGroups, orderColumnGroups, normalizeWorkspaceLayout, canGroupColumn } from '../public/workspace-state.js';
+import { capturePaneScrollPositions } from '../public/workflow-views.js';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const actual = name => {
@@ -37,7 +38,7 @@ const context = vm.createContext({
   track: { querySelectorAll: () => [] },
   window: { matchMedia: () => ({ matches: reducedMotion }) },
   getComputedStyle: () => ({ paddingInline: '24px' }),
-  captureReaderScrollPositions: () => new Map(), restoreReaderScrollPositions() {},
+  capturePaneScrollPositions, captureReaderScrollPositions: () => new Map(), restoreReaderScrollPositions() {},
   applyPaneWeight() {}, closeActiveCustomSelect() {}, notifyWorkspaceLayoutChange() {},
   saveWorkspaceState: () => saves++
 });
@@ -220,7 +221,7 @@ console.log('Saved, Notebook and Report are excluded from active and persisted c
 const resetState = { paneWeights: { a: 950, b: 820 }, collapsedPaneIDs: ['a'], columnGroups: [{ id: 'g', paneIDs: ['b'], collapsed: true }] };
 const resetContext = vm.createContext({
   state: resetState, track: { scrollLeft: 0, scrollWidth: 1200, clientWidth: 1000, querySelectorAll: () => [] },
-  reportScreen: null, workflowPaneIsVisible:()=>true, workspaceColumnExpansion: null, syncResearchColumnLayout() {},
+  reportScreen: null, workflowPaneIsVisible:()=>true, currentColumnWorkflowView:()=> 'research', workspaceColumnExpansion: null, syncResearchColumnLayout() {},
   activePaneIDs: () => ['a', 'b'], defaultPaneWidthForID: () => 600,
   saveWorkspaceState() {}, async transitionWorkspace() {}, requestAnimationFrame: fn => fn()
 });

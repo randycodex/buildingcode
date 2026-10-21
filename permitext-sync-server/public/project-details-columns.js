@@ -1,7 +1,7 @@
 export const projectDetailsMinimumWidth = 400;
 
 export function normalizeProjectDetailsWidths(value) {
-  return Array.isArray(value) && value.length === 3 &&
+  return Array.isArray(value) && value.length >= 2 && value.length <= 3 &&
     value.every(width => Number.isFinite(Number(width)) && Number(width) >= projectDetailsMinimumWidth)
     ? value.map(Number) : null;
 }
@@ -15,7 +15,7 @@ export function resizeProjectDetailsPair(widths, index, delta) {
 }
 
 export function createProjectDetailsColumnResizers(columns, panels, onResize = () => {}) {
-  let lastWidths = [400, 400, 400];
+  let lastWidths = panels.map(() => projectDetailsMinimumWidth);
   let drag = null;
   const dividers = [];
   const widths = () => {
@@ -33,7 +33,7 @@ export function createProjectDetailsColumnResizers(columns, panels, onResize = (
     });
   };
   const apply = value => {
-    const normalized = normalizeProjectDetailsWidths(value);
+    const normalized = normalizeProjectDetailsWidths(value)?.slice(0, panels.length);
     if (normalized) {
       lastWidths = normalized;
       columns.style.gridTemplateColumns = normalized.map(width => `minmax(400px, ${width}fr)`).join(' 1px ');
@@ -46,13 +46,13 @@ export function createProjectDetailsColumnResizers(columns, panels, onResize = (
     columns.classList.remove('is-resizing');
     if (previous?.divider.hasPointerCapture?.(previous.pointerID)) previous.divider.releasePointerCapture(previous.pointerID);
   };
-  for (let index = 0; index < 2; index += 1) {
+  for (let index = 0; index < panels.length - 1; index += 1) {
     const divider = columns.ownerDocument.createElement('div');
     divider.className = 'project-details-divider';
     divider.tabIndex = 0;
     divider.setAttribute('role', 'separator');
     divider.setAttribute('aria-orientation', 'vertical');
-    divider.setAttribute('aria-label', index === 0 ? 'Resize Context and Facts' : 'Resize Facts and Saved work');
+    divider.setAttribute('aria-label', 'Resize Context and Facts');
     divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to balance columns';
     divider.addEventListener('focus', update);
     divider.addEventListener('dblclick', () => { apply(null); onResize(); });

@@ -1,3 +1,15 @@
+export function normalizeProjectQuestions(value = []) {
+  if (!Array.isArray(value) || value.length > 100) throw new Error('Use no more than 100 Project questions.');
+  const seen = new Set();
+  return value.map(item => {
+    if (!item || typeof item.id !== 'string' || !item.id || item.id.length > 100 || seen.has(item.id) ||
+        typeof item.question !== 'string' || item.question.length > 2000 ||
+        typeof item.answer !== 'string' || item.answer.length > 8000) throw new Error('A Project question is invalid.');
+    seen.add(item.id);
+    return {id: item.id, question: item.question, answer: item.answer};
+  });
+}
+
 // Shared, serializable workflow data. Checklists are research tasks, never facts.
 export const recordStatuses = ['needed', 'requested', 'received', 'reviewed', 'not-applicable'];
 export function normalizeRecordsChecklist(value = []) {

@@ -4,7 +4,7 @@ import { loadPreparedPassages } from "./research-prepared-passages.mjs";
 import { isAmbiguousResearchProjectCorrection } from "./research-project-scope.mjs";
 import { planSavedEvidenceDelete, validateSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
 import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
-import { normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
+import { normalizeProjectQuestions, normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
 import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet } from "./public/search-words.js";
 import { researchWriterInstructions, researchWriterContext, researchWriterPolicyVersion } from "./research-writer-policy.mjs";
 import { occupantLoadDraftSchema, normalizeOccupantLoadDraft, occupantLoadDraftReviewInstruction } from "./research-occupant-load-draft.mjs";
@@ -26307,6 +26307,10 @@ function validateMutation(mutation, userID) {
   ) {
     return validationError("Folder type must be project or reference.");
   }
+  if (kind === "project" && record.openQuestions !== undefined) {
+    try { normalizeProjectQuestions(record.openQuestions); }
+    catch (error) { return validationError(error.message); }
+  }
   if (kind === "project" && record.recordsChecklist !== undefined) {
     try { normalizeRecordsChecklist(record.recordsChecklist); }
     catch (error) { return validationError(error.message); }
@@ -26385,6 +26389,9 @@ function mergeMutations(existing, incoming) {
       }
       if (existingProject?.recordsChecklist !== undefined && incomingProject?.recordsChecklist === undefined) {
         mergedIncomingProject = { ...mergedIncomingProject, recordsChecklist: existingProject.recordsChecklist };
+      }
+      if (existingProject?.openQuestions !== undefined && incomingProject?.openQuestions === undefined) {
+        mergedIncomingProject = { ...mergedIncomingProject, openQuestions: existingProject.openQuestions };
       }
       acceptedMutation = { project: mergedIncomingProject };
     }

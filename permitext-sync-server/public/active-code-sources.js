@@ -67,6 +67,12 @@ export function createActiveCodeSourcePreferences(storage, prefix = 'permitext.a
   const load = accountID => decodeActiveCodeSources(storage.getItem(storageKey(accountID)));
   return Object.freeze({
     load,
+    updateMany(accountID, sources, enabled) {
+      let preference = load(accountID);
+      for (const source of sources) preference = preference.withEnabled(source, enabled);
+      storage.setItem(storageKey(accountID), preference.serialize());
+      return preference;
+    },
     update(accountID, source, enabled) {
       const preference = load(accountID).withEnabled(source, enabled);
       // Publish only after storage accepts the write. Never reset malformed data.

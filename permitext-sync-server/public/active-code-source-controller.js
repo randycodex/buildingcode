@@ -1,4 +1,4 @@
-import {createActiveCodeSourcePreferences, codeSourceIdentity, codeSourceKey, ActiveCodeSourcesError} from './active-code-sources.js';
+import {createActiveCodeSourcePreferences, codeSourceIdentity, codeSourceKey, ActiveCodeSourcesError} from './active-code-sources.js?v=2';
 
 // No DOM or network policy: caller supplies storage, catalog transport and cancellation.
 export function createActiveCodeSourceController({storage, loadCatalog, onInvalidate = () => {}}) {
@@ -51,28 +51,20 @@ export function createActiveCodeSourceController({storage, loadCatalog, onInvali
     notify('context');
     return state();
   }
-  function update(source, enabled, token) {
+  function updateMany(sources, enabled, token) {
     if (!isCurrent(token)) throw new ActiveCodeSourcesError('Source context changed');
-    // Validate against a known installed catalog, never manufacture an enabled source.
-    const key = codeSourceKey(source);
-    if (!catalog || !catalog.some(entry => codeSourceKey(entry) === key)) {
+    if (!Array.isArray(sources) || !catalog || sources.some(source =>
+      !catalog.some(entry => codeSourceKey(entry) === codeSourceKey(source)))) {
       throw new ActiveCodeSourcesError('Source catalog is unavailable or source is not installed');
     }
     try {
-      const next = preferencesStore.update(accountID, source, enabled);
-      preferences = next; error = null;
-      invalidate();
-      notify('update');
-      return state();
+      preferences = preferencesStore.updateMany(accountID, sources, enabled); error = null;
+      invalidate(); notify('update'); return state();
     } catch (failure) {
-      error = failure;
-      invalidate();
-      readPreferences();
-      error = failure;
-      notify('update-failed');
-      throw failure;
+      invalidate(); readPreferences(); error = failure; notify('update-failed'); throw failure;
     }
   }
+  function update(source, enabled, token) { return updateMany([source], enabled, token); }
   function ensureCatalog() {
     if (!initialized) return Promise.reject(new ActiveCodeSourcesError('Source context is unavailable'));
     if (catalog) return Promise.resolve(catalog);
@@ -113,6 +105,6 @@ export function createActiveCodeSourceController({storage, loadCatalog, onInvali
     if (!catalog) throw new ActiveCodeSourcesError('Source catalog is unavailable');
     return JSON.stringify({version: 1, enabledSources: preferences.enabledSources(catalog)});
   }
-  return Object.freeze({setContext, captureContext, isCurrent, reload, update, ensureCatalog, invalidateCatalog, requestScope,
+  return Object.freeze({setContext, captureContext, isCurrent, reload, update, updateMany, ensureCatalog, invalidateCatalog, requestScope,
     get state() { return state(); }});
 }

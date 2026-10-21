@@ -55,6 +55,7 @@ const context = vm.createContext({
   annotationTargetForSection: value => ({ sectionID: value.id, codeVersion: reader.codeVersion, blockID: "" }),
   annotationTargetForBlock: (value, block) => ({ sectionID: value.id, codeVersion: reader.codeVersion, blockID: block.id }),
   renderCodeBlock(block) { const node = new Node("p"); node.textContent = block.plainText; return node; },
+  renderOccupantLoadCalculation() { return null; }, readerPassagePayload() { return {}; },
   linkInlineCodeReferences() {}, decorateReaderDefinitions() {}, hasCapability: () => true,
   bookmarkIconSVG: saved => saved ? "saved" : "save", bookmarkActionLabel: saved => saved ? "Remove passage" : "Save passage",
   researchActionIconSVG: () => "research", noteAddIconSVG: () => "note",

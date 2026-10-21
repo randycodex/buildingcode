@@ -58,13 +58,32 @@ export function reportColumnsLayout(availableWidth, libraryWidth = 0, requestedO
 }
 // Keep scroll snapshots per DOM node, not indexes: asynchronous hydration may
 // replace a loading shell while the other view is active.
+// Capture scroll events without inspecting every source paragraph or forcing
+// content-visibility layout. Weak ownership lets closed columns be collected.
+const scrolledNodesByPane = new WeakMap();
+if (typeof document !== 'undefined') document.addEventListener('scroll', event => {
+  const node = event.target;
+  const pane = node?.closest?.('.workspace-panel');
+  if (!pane) return;
+  let nodes = scrolledNodesByPane.get(pane);
+  if (!nodes) { nodes = new Set(); scrolledNodesByPane.set(pane, nodes); }
+  nodes.add(node);
+}, {capture: true, passive: true});
+
+export function capturePaneScrollPositions(pane) {
+  const selector = '.reader-content, .search-results, .search-jump-list, .saved-column-scroll, .research-thread, .research-history-list, .notebook-shell, .notebook-focus, .bn-editor, .report-document, .report-history, .project-information-content, .project-details-column-body, .analysis-content, .research-messages, .assistant-messages, .calculator-column-content, .section-detail-content, .report-source-picker, textarea, .code-table';
+  const tracked = scrolledNodesByPane.get(pane) || new Set();
+  for (const node of tracked) if (!pane.contains(node)) tracked.delete(node);
+  return [...new Set([pane, ...pane.querySelectorAll(selector), ...tracked])]
+    .filter(node => node.scrollTop || node.scrollLeft)
+    .map(node => ({node, top: node.scrollTop, left: node.scrollLeft}));
+}
 export function createWorkflowScrollStore() {
   const snapshots = new WeakMap();
   return {
     capture(panes) {
       for (const pane of panes) snapshots.set(pane,
-        [pane, ...pane.querySelectorAll('*')].filter(node => node.scrollTop || node.scrollLeft)
-          .map(node => ({node, top: node.scrollTop, left: node.scrollLeft})));
+        capturePaneScrollPositions(pane));
     },
     restore(panes) {
       for (const pane of panes) for (const {node, top, left} of snapshots.get(pane) || []) {

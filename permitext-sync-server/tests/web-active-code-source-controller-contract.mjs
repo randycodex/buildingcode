@@ -70,3 +70,20 @@ corpus.invalidateCatalog();corpusResponse=deferred();const restoredCorpus=corpus
 assert.equal(JSON.parse(corpus.requestScope()).enabledSources.length,1,'Returning disabled source remains excluded');
 assert.equal(corpus.state.accountID,'corpus');
 console.log('Browser source lifecycle controller contracts passed');
+
+// Bulk changes are one durable write and one invalidation, including all-off.
+{
+  let writes=0, notifications=0; const entries=new Map();
+  const bulk=createActiveCodeSourceController({storage:{getItem:key=>entries.get(key)??null,setItem(key,value){writes++;entries.set(key,value);}},loadCatalog:async()=>[a,b],onInvalidate(){notifications++;}});
+  bulk.setContext({accountID:'bulk-test',sessionID:'one'});await bulk.ensureCatalog();
+  const before=notifications, token=bulk.captureContext();
+  bulk.updateMany([a,b],false,token);
+  assert.equal(writes,1);assert.equal(notifications,before+1);
+  assert.deepEqual(JSON.parse(bulk.requestScope()).enabledSources,[]);
+  assert.throws(()=>bulk.updateMany([a,b],true,token));
+  bulk.updateMany([a,b],true,bulk.captureContext());
+  assert.equal(writes,2);assert.equal(bulk.requestScope(),undefined);
+  assert.throws(()=>bulk.updateMany([{...a,categoryID:999}],false,bulk.captureContext()));
+  assert.equal(writes,2);
+}
+console.log('Bulk source selection: atomic persistence, one refresh, all-off, all-on and stale-context rejection passed.');
