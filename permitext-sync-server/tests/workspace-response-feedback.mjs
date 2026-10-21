@@ -28,7 +28,7 @@ assert.equal(capturePaneScrollPositions(pane)[0].node,scroller);
   }};
   moving.parentNode = track;
   const start = source.indexOf('  nodes.forEach((node, index) => {', source.indexOf('function appendPaneSequence('));
-  const end = source.indexOf('\n  refreshColumnGroupPresentation();', start);
+  const end = source.indexOf('\n  // Finish ordering and group visibility', start);
   assert.ok(start > 0 && end > start);
   vm.runInNewContext(source.slice(start, end), {track, nodes: [moving], capturePaneScrollPositions});
   assert.equal(moving.scrollTop, 10);
@@ -43,12 +43,14 @@ console.log('Workspace feedback: durable local save paints before network; scrol
   const document=documentFixture();
   const base=document.createElement;
   document.createElement=tag=>{const node=base(tag);node.removeAttribute=key=>delete node.attributes[key];return node;};
-  let observeCallback, observed=[], paints=0, reads=0, allowed=false;
+  let observeCallback, observed=[], paints=0, reads=0, snapshots=0, allowed=false, currentSavedKeys=new Set();
+  const paintOptions = [];
   const panel=document.createElement('article');
   class Observer {constructor(callback){observeCallback=callback;}observe(node){observed.push(node);}unobserve(node){observed=observed.filter(n=>n!==node);}}
   const lazy=vm.createContext({document,IntersectionObserver:Observer,readerPrivateContentAllowed:()=>allowed,
-    isSectionSaved(){reads++;return true;},renderCodeBlock(){const n=document.createElement('p');n.textContent='Complete source passage';return n;},
-    renderInlineCommentBox(){paints++;const n=document.createElement('div');n.className='inline-comment';return n;}});
+    workspaceSavedEvidenceKeys(){snapshots++;return currentSavedKeys;},
+    isSectionSaved(target,_version,keys){reads++;return (keys || currentSavedKeys).has(target.blockID);},renderCodeBlock(){const n=document.createElement('p');n.textContent='Complete source passage';return n;},
+    renderInlineCommentBox(_section,_reader,_target,options){paints++;paintOptions.push(options);const n=document.createElement('div');n.className='inline-comment';return n;}});
   const begin=source.indexOf('function renderAnnotatedCodeBlock(');
   vm.runInContext(source.slice(begin,source.indexOf('\n}',begin)+2),lazy);
   const wrapper=lazy.renderAnnotatedCodeBlock({}, {}, {},{sectionID:'s',blockID:'p'},{lazyControls:true,panel});
@@ -56,9 +58,25 @@ console.log('Workspace feedback: durable local save paints before network; scrol
   assert.equal(paints,0);assert.equal(observed.length,1);
   observeCallback([{target:wrapper,isIntersecting:true}]);
   assert.equal(paints,1);assert.equal(reads,0,'Deferred actions must not read private state while access is pending');
+  assert.equal(snapshots,0);
   assert.equal(observed.length,0);
   wrapper.dispatch('focusin');assert.equal(paints,1,'Keyboard focus must not duplicate controls');
   const saved=lazy.renderAnnotatedCodeBlock({}, {}, {},{sectionID:'s',blockID:'saved'},{lazyControls:true,showBookmark:true,panel});
   assert.equal(saved.children.length,2,'Saved indicators are available immediately, even offscreen');
+  allowed=true;
+  const first=lazy.renderAnnotatedCodeBlock({}, {}, {},{sectionID:'s',blockID:'one'},{lazyControls:true,panel});
+  const second=lazy.renderAnnotatedCodeBlock({}, {}, {},{sectionID:'s',blockID:'two'},{lazyControls:true,panel});
+  currentSavedKeys=new Set(['two']);
+  observeCallback([{target:first,isIntersecting:true},{target:second,isIntersecting:true}]);
+  assert.equal(snapshots,1,'One current saved-key index serves the whole visible batch');
+  assert.equal(reads,2);
+  assert.deepEqual(paintOptions.slice(-2).map(options=>options.showBookmark),[false,true]);
+  assert.ok(paintOptions.slice(-2).every(options=>options.bookmarkStateResolved),'Eager control/subscription paint must reuse the fresh resolved state');
+  observeCallback([{target:first,isIntersecting:true},{target:second,isIntersecting:false}]);
+  assert.equal(snapshots,1,'Already mounted or nonintersecting blocks do not read workspace data');
+  const keyboard=lazy.renderAnnotatedCodeBlock({}, {}, {},{sectionID:'s',blockID:'three'},{lazyControls:true,panel});
+  currentSavedKeys=new Set(['three']);
+  keyboard.dispatch('focusin');
+  assert.equal(paintOptions.at(-1).showBookmark,true,'Later keyboard mounting reads fresh saved state');
 }
 console.log('Large Reader: source text is immediate, offscreen actions are deferred, saved icons stay mounted and privacy gates hold.');

@@ -62,7 +62,7 @@ function harness(overrides = {}) {
     deletedSavedMutationForSection: (item) => ({ savedItem: { ...c.savedRecordForSection(item, c.activeAccount()?.userID || "local-web"), deletedAt: "now" } }),
     savedSectionRecord: () => null, isSectionSaved: () => false, isProAccount: () => true, hasCapability: () => true,
     folderIsProject: () => true, syncCodeVersion: (value) => value, defaultSyncCodeVersion: "synthetic-edition",
-    setLocalSectionSaved() {}, normalizeAnnotationBlockID: (value) => value || "", syncReaderNoteBookmarkButtons() {},
+    setLocalSectionSaved() {}, normalizeAnnotationBlockID: (value) => value || "", syncReaderNoteBookmarkButtons() {}, syncSearchResultBookmarkButtons() {},
     workspaceProject: () => project, activeWorkspaceID: "synthetic-workspace",
     document: { activeElement: null }, primarySavedPaneID: () => "saved", showBookmarkUndo() {},
     currentContentSummary: () => ({ projects: [project], projectSections: [] }),

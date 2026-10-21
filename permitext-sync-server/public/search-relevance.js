@@ -1,7 +1,16 @@
-import { searchWords, matchesSearchWords } from './search-words.js?v=20261015-search-word-completion-v1082';
+import { searchWords, searchWordPattern } from './search-words.js?v=20261015-search-word-completion-v1082';
 
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const normalized = value => searchWords(value).map(word => word.replace(/(?<!s)s$/, '')).join(' ');
+export function prepareSearchRelevance(query) {
+  const words = searchWords(query);
+  return {raw: String(query).trim().toLowerCase(), words, patterns: words.map(searchWordPattern),
+    needle: words.map(word => word.replace(/(?<!s)s$/, '')).join(' ')};
+}
+function preparedWordsMatch(values, prepared) {
+  const text = (Array.isArray(values) ? values : [values]).filter(Boolean).join(' ');
+  return prepared.patterns.length > 0 && prepared.patterns.every(pattern => pattern.test(text));
+}
 export function searchHeading(value, number = '') {
   let title = String(value || '').trim();
   if (number) title = title.replace(new RegExp(`^(?:SECTION\\s+)?(?:[A-Z]+\\s+)?${escape(String(number))}(?:[.:]\\s*|\\s+)`, 'i'), '');
@@ -10,9 +19,9 @@ export function searchHeading(value, number = '') {
 export function isSearchDefinitionSection(section) {
   return /\bdefinitions?\b/i.test(`${section.title || ''} ${section.headingLine || ''}`);
 }
-export function matchingSearchDefinition(section, query, plainText = section.plainText || '') {
+export function matchingSearchDefinition(section, query, plainText = section.plainText || '', prepared = null) {
   if (!isSearchDefinitionSection(section)) return '';
-  const needle = normalized(query);
+  const needle = prepared?.needle ?? normalized(query);
   for (const match of String(plainText).matchAll(/(?:^|[.?!]\s+|\n)\s*[“"]?([A-Z][A-Z\d ()/,‐‑–—-]{1,100}?)[”"]?\s*\.\s+/g)) {
     const term = match[1].trim();
     if (!term) continue;
@@ -23,26 +32,26 @@ export function matchingSearchDefinition(section, query, plainText = section.pla
 }
 // Ranking changes discovery order only. Matching and canonical source identities
 // still come from the corpus and the existing exact/all-words checks.
-export function searchRelevanceRank(section, query, matchMode = 'exact', plainText = section.plainText || '') {
+export function searchRelevanceRank(section, query, matchMode = 'exact', plainText = section.plainText || '', prepared = null) {
   const number = String(section.sectionNumber || '').toLowerCase();
-  const raw = String(query).trim().toLowerCase();
+  const raw = prepared?.raw ?? String(query).trim().toLowerCase();
   if (number === raw) return 0;
   if (/^[a-z]?\d/i.test(raw) && number.startsWith(raw)) return 0.5;
-  const words = searchWords(query);
-  const needle = normalized(query);
+  prepared ||= prepareSearchRelevance(query);
+  const {words, needle, patterns} = prepared;
   const title = searchHeading(section.title, section.sectionNumber);
   const context = searchHeading(section.headingLine);
   const concise = title.length <= 120 && searchWords(title).length <= 16;
   const depth = (number.match(/\./g) || []).length;
-  if (concise && normalized(context) === needle && matchesSearchWords(title, query)) return 1 + Math.min(depth, 8) * 0.03;
-  if (matchingSearchDefinition(section, query, plainText)) return 1.05;
+  if (concise && normalized(context) === needle && preparedWordsMatch(title, prepared)) return 1 + Math.min(depth, 8) * 0.03;
+  if (matchingSearchDefinition(section, query, plainText, prepared)) return 1.05;
   if (concise && normalized(title) === needle) return 1.3 + depth * 0.02;
-  if (concise && matchesSearchWords([title, context], query)) {
-    const overlap = words.filter(word => matchesSearchWords(title, word)).length / Math.max(1, words.length);
+  if (concise && preparedWordsMatch([title, context], prepared)) {
+    const overlap = patterns.filter(pattern => pattern.test(title)).length / Math.max(1, words.length);
     return 2 - overlap * 0.4 + Math.min(depth, 8) * 0.03;
   }
-  if (concise && (matchMode === 'words' ? matchesSearchWords(title, query) : title.toLowerCase().includes(raw))) return 2.2;
-  const overlap = concise ? words.filter(word => matchesSearchWords(title, word)).length / Math.max(1, words.length) : 0;
+  if (concise && (matchMode === 'words' ? preparedWordsMatch(title, prepared) : title.toLowerCase().includes(raw))) return 2.2;
+  const overlap = concise ? patterns.filter(pattern => pattern.test(title)).length / Math.max(1, words.length) : 0;
   return 4 - overlap + Math.min(depth, 8) * 0.12;
 }
 

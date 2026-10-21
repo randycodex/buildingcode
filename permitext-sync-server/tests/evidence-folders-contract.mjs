@@ -446,7 +446,7 @@ assert.match(
 );
 assert.match(
   functionSource(appSource, "refreshVisibleSyncedDerivedState"),
-  /syncReaderNoteControls[\s\S]*?syncReaderNoteBookmarkButtons[\s\S]*?refreshOpenAnnotationProjectEditors/,
+  /syncReaderNoteBookmarkButtons[\s\S]*?detailNoteValueForTarget[\s\S]*?refreshOpenAnnotationProjectEditors/,
   "Background sync must update visible notes and bookmarks without rebuilding readers or editors."
 );
 assert.match(syncedRefreshSource, /refreshBlankSearchHistoryPanes\(\)/);

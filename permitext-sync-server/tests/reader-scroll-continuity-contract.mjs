@@ -27,10 +27,12 @@ function panel(id, reader, scrollTop = 0) {
   return p;
 }
 function sectionNode(content, section) {
+  let measured = false;
   const node = { style: {}, dataset: { sectionId: section.id }, querySelectorAll: () => [], querySelector: () => null,
     // Match Chrome's initially skipped text: 600px intrinsic placeholder,
-    // replaced by its real 200px layout when the repair makes it measurable.
-    get height() { return node.style.contentVisibility === "visible" ? 200 : 600; },
+    // replaced by remembered 200px geometry after it is measured. CSS uses
+    // contain-intrinsic-size:auto, so restoring auto does not forget that size.
+    get height() { if (node.style.contentVisibility === "visible") measured = true; return measured ? 200 : 600; },
     getBoundingClientRect() {
       const top = content.children.slice(0, content.children.indexOf(node))
         .reduce((height, child) => height + child.height, 0) - content.scrollTop;

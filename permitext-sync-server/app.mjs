@@ -1,4 +1,4 @@
-import { searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
+import { prepareSearchRelevance, searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
 import { createResearchSourceBodyReader } from "./research-source-body-cache.mjs";
 import { loadPreparedPassages } from "./research-prepared-passages.mjs";
 import { isAmbiguousResearchProjectCorrection } from "./research-project-scope.mjs";
@@ -7962,7 +7962,7 @@ function normalizeChapterNumber(value) {
   return String(value || "").trim().toUpperCase();
 }
 
-function compareChapterNumbers(left, right) {
+function compareChapterNumbers(left, right, collator = null) {
   const leftNumber = normalizeChapterNumber(left);
   const rightNumber = normalizeChapterNumber(right);
   const leftNumeric = /^\d+$/.test(leftNumber);
@@ -7974,7 +7974,8 @@ function compareChapterNumbers(left, right) {
   if (leftNumeric && rightNumeric) {
     return Number.parseInt(leftNumber, 10) - Number.parseInt(rightNumber, 10);
   }
-  return leftNumber.localeCompare(rightNumber, undefined, { numeric: true, sensitivity: "base" });
+  return collator ? collator.compare(leftNumber, rightNumber)
+    : leftNumber.localeCompare(rightNumber, undefined, { numeric: true, sensitivity: "base" });
 }
 
 async function chapterManifest() {
@@ -24161,20 +24162,19 @@ async function handleCodeSearch(request, response) {
   }
   const spellingSuggestions = () => searchSpellingSuggestions(query, searchVocabulary(spellingSections));
   const hits = timePublicCodePhase("ranking", () => {
+    const prepared = prepareSearchRelevance(query);
+    const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: "base"});
     const hits = candidates.filter(section => !resultSource ||
       (section.codePrefix === resultSource.codePrefix &&
         codeSearchSectionVersion(section) === resultSource.codeVersion)).map((section) => {
       const plainText = definitionBodies.get(section);
-      const rank = searchRelevanceRank(section, query, matchMode, plainText);
+      const rank = searchRelevanceRank(section, query, matchMode, plainText, prepared);
       return { section, rank, ...(plainText === undefined ? {} : {plainText}) };
     });
     hits.sort((left, right) =>
       left.rank - right.rank ||
-      compareChapterNumbers(left.section.chapterNumber, right.section.chapterNumber) ||
-      String(left.section.sectionNumber).localeCompare(String(right.section.sectionNumber), undefined, {
-        numeric: true,
-        sensitivity: "base"
-      }) ||
+      compareChapterNumbers(left.section.chapterNumber, right.section.chapterNumber, collator) ||
+      collator.compare(String(left.section.sectionNumber), String(right.section.sectionNumber)) ||
       Number(left.section.codeSectionID || 0) - Number(right.section.codeSectionID || 0) ||
       Number(left.section.id) - Number(right.section.id)
     );

@@ -1,3 +1,5 @@
+import { capturePaneScrollPositions } from './workflow-views.js?v=12';
+
 export function adjacentColumnWidths(left, right, delta, leftMin, rightMin, leftMax = Infinity, rightMax = Infinity,
   { expandLeft = false, expandRight = false } = {}) {
   // Readers can add workspace width after their neighbor reaches its minimum.
@@ -43,8 +45,7 @@ export function createColumnExpansion({ host, columns, label, key = node => node
     const position = changed ? capturePosition() : null;
     if (changed) for (const node of columns()) {
       if (!node.classList.contains('is-column-strip') && !node.classList.contains('is-column-tab-hidden')) {
-        scrollPositions.set(node, [node, ...node.querySelectorAll('*')].filter(child => child.scrollTop || child.scrollLeft)
-          .map(child => ({ child, top: child.scrollTop, left: child.scrollLeft })));
+        scrollPositions.set(node, capturePaneScrollPositions(node));
       }
     }
     layoutSignature = nextLayout;
@@ -88,7 +89,7 @@ export function createColumnExpansion({ host, columns, label, key = node => node
     if (menu) prepareMenus();
     if (changed) {
       for (const node of panes) if (!target || node === target) {
-        for (const { child, top, left } of scrollPositions.get(node) || []) { child.scrollTop = top; child.scrollLeft = left; }
+        for (const { node: child, top, left } of scrollPositions.get(node) || []) { child.scrollTop = top; child.scrollLeft = left; }
       }
       restorePosition(position);
     }

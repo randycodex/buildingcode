@@ -3,12 +3,12 @@ import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
-import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=5";
+import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=6";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-workspace-responsive-v1247";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-workspace-performance-v1249";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -29,6 +29,7 @@ import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navi
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js?v=2";
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
+import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20261015-reader-search-preview-v3";
@@ -132,7 +133,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261021-workspace-responsive-v1247";
+} from "./offline-storage.js?v=20261021-workspace-performance-v1249";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -165,7 +166,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261021-workspace-responsive-v1247";
+} from "./workspace-state.js?v=20261021-workspace-performance-v1249";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -623,7 +624,7 @@ let draggedPaneID = "";
 let dragPreviewOrder = [];
 let activeCustomSelect = null;
 const chapterListCache = new Map();
-const chapterCache = new Map();
+const chapterCache = createPublicContentCache();
 const sectionSummaryCache = new Map();
 const publicCodeRevision = createPublicCodeRevisionController({
   async fetchRevision() {
@@ -4887,7 +4888,8 @@ function syncReferenceReaderLayout() {
 function syncWorkflowColumnPresentation() {
   const view = currentColumnWorkflowView();
   const panes = [...track.querySelectorAll(':scope > .workspace-panel')];
-  if (view !== presentedColumnWorkflowView) {
+  const changedView = view !== presentedColumnWorkflowView;
+  if (changedView) {
     state.workflowPaneWeights ||= {};
     state.workflowPaneWeights[presentedColumnWorkflowView] = { ...state.paneWeights };
     state.paneWeights = { ...(state.workflowPaneWeights[view] || state.paneWeights) };
@@ -4914,7 +4916,7 @@ function syncWorkflowColumnPresentation() {
     if (shell) shell.scrollLeft = referenceWorkspaceScroll.get(`${activeWorkspaceID}:${view}`) || 0;
   }
   columnExpansionController().refresh();
-  syncWorkflowNavigation();
+  if (!changedView) syncWorkflowNavigation();
 }
 function closeSharedWorkspaceViews(except = "") {
   if (except !== "report") reportScreen?.close();
@@ -12978,51 +12980,51 @@ function refreshVisibleSyncedDerivedState() {
   const targets = new Map();
   const addTarget = (target) => {
     if (!target?.sectionID) return;
-    targets.set(visibleSyncedTargetKey(target), {
+    const sectionTarget = {
       ...target,
       codeVersion: syncCodeVersion(target.codeVersion || defaultSyncCodeVersion),
-      blockID: normalizeAnnotationBlockID(target.blockID)
-    });
+      blockID: ""
+    };
+    targets.set(visibleSyncedTargetKey(sectionTarget), sectionTarget);
   };
 
   track.querySelectorAll(".inline-comment[data-comment-section-id]").forEach((wrapper) => {
+    if (!readerPrivateContentAllowed(wrapper.closest(".reader-panel"))) return;
     addTarget({
       sectionID: wrapper.dataset.commentSectionId,
-      blockID: wrapper.dataset.commentBlockId,
       codeVersion: wrapper.dataset.commentCodeVersion
     });
   });
   track.querySelectorAll(".section-detail-panel").forEach((element) => {
-    addTarget(element.__annotationTarget);
+    if (readerPrivateContentAllowed(element)) addTarget(element.__annotationTarget);
   });
 
   const focusedElement = document.activeElement;
-  targets.forEach((target) => {
-    syncReaderNoteControls(
-      target.sectionID,
-      target.blockID,
-      noteValueForTarget(target),
-      { source: focusedElement, target }
-    );
-  });
-
-  const visibleReaderSections = new Map();
   track.querySelectorAll(".reader-panel .chapter-section[data-section-id]").forEach((section) => {
-    const target = {
+    if (!readerPrivateContentAllowed(section.closest(".reader-panel"))) return;
+    addTarget({
       sectionID: section.dataset.sectionId,
       codeVersion: section.dataset.codeVersion || defaultSyncCodeVersion
-    };
-    visibleReaderSections.set(visibleSyncedTargetKey(target), target);
+    });
   });
-  visibleReaderSections.forEach((target) => {
+  // A Reader refresh paints the entire section. Repeating it for each passage
+  // made a single sync quadratic in the number of blocks in a large section.
+  const summary = targets.size ? currentContentSummary() : null;
+  const savedState = summary ? {
+    savedKeys: workspaceSavedEvidenceKeys(summary),
+    project: workspaceProject(summary.projects || [])
+  } : null;
+  targets.forEach((target) => {
     syncReaderNoteBookmarkButtons(
       target.sectionID,
-      isSectionSaved(target),
-      target.codeVersion
+      false,
+      target.codeVersion,
+      savedState
     );
   });
 
   track.querySelectorAll(".section-detail-panel").forEach((panel) => {
+    if (!readerPrivateContentAllowed(panel)) return;
     const target = panel.__annotationTarget;
     const sectionPayload = panel.__sectionPayload;
     if (!target?.sectionID || !sectionPayload?.sectionID) return;
@@ -14729,9 +14731,8 @@ async function chooseProjectForSaving() {
   return choice;
 }
 
-function bookmarkActionLabel(saved) {
+function bookmarkActionLabel(saved, project = saved ? workspaceProject() : null) {
   if (!saved) return "Save passage";
-  const project = workspaceProject();
   return project
     ? `Remove from project: ${project.name || project.title || "Untitled project"}`
     : "Remove from Evidence";
@@ -16836,11 +16837,11 @@ function renderAnnotatedCodeBlock(block, section, reader, target, options = {}) 
   wrapper.dataset.blockId = target.blockID || "";
   wrapper.dataset.blockLabel = target.blockLabel || "";
   wrapper.append(renderCodeBlock(block));
-  const mount = () => {
+  const mount = (snapshot = null) => {
     if (wrapper.querySelector(":scope > .inline-comment")) return;
     wrapper.append(renderInlineCommentBox(section, reader, target, {
-      ...options, bookmarkStateResolved: false,
-      showBookmark: readerPrivateContentAllowed(options.panel) && Boolean(isSectionSaved({sectionID: target.sectionID, codeVersion: target.codeVersion, blockID: target.blockID}))
+      ...options, bookmarkStateResolved: true,
+      showBookmark: readerPrivateContentAllowed(options.panel) && Boolean(isSectionSaved({sectionID: target.sectionID, codeVersion: target.codeVersion, blockID: target.blockID}, "", snapshot?.savedKeys))
     }));
     wrapper.removeAttribute("tabindex");
     delete wrapper._mountReaderActions;
@@ -16853,7 +16854,12 @@ function renderAnnotatedCodeBlock(block, section, reader, target, options = {}) 
     wrapper.addEventListener("focusin", mount, { once: true });
     const panel = options.panel;
     panel._readerActionsObserver ||= new IntersectionObserver(entries => {
-      for (const entry of entries) if (entry.isIntersecting) entry.target._mountReaderActions?.();
+      const visible = entries.filter(entry => entry.isIntersecting && entry.target._mountReaderActions);
+      if (!visible.length) return;
+      // One fresh index for this synchronous delivery; subsequent access
+      // notifications and user actions still read current workspace state.
+      const snapshot = { savedKeys: readerPrivateContentAllowed(panel) ? workspaceSavedEvidenceKeys() : null };
+      for (const entry of visible) entry.target._mountReaderActions(snapshot);
     }, { root: panel.querySelector(".reader-content"), rootMargin: "300px" });
     panel._readerActionsObserver.observe(wrapper);
   } else {
@@ -17783,10 +17789,19 @@ function showReaderNotesProjectPicker(sheet, sectionPayload, options = {}) {
   });
 }
 
-function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSyncCodeVersion) {
+function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSyncCodeVersion, savedState = null) {
   const sectionKey = sectionNoteKey(sectionID);
   if (!sectionKey) return;
   const exactCodeVersion = syncCodeVersion(codeVersion);
+  let savedKeys = null, project = null;
+  const snapshot = () => {
+    if (!savedKeys) {
+      const current = savedState ? null : currentContentSummary();
+      savedKeys = savedState?.savedKeys || workspaceSavedEvidenceKeys(current);
+      project = savedState ? savedState.project : workspaceProject(current.projects || []);
+    }
+    return savedKeys;
+  };
   const wrappers = Array.from(track.querySelectorAll(`.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"]`))
     .filter((wrapper) => wrapper.dataset.commentCodeVersion === exactCodeVersion);
   wrappers.forEach((wrapper) => {
@@ -17796,15 +17811,12 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
       sectionID,
       codeVersion: exactCodeVersion,
       blockID: wrapperBlockID
-    });
+    }, "", snapshot());
     const button = wrapper.querySelector(".inline-bookmark-toggle");
     const showBookmark = Boolean(savedRecord);
     wrapper.classList.toggle("has-saved-section", showBookmark);
     if (!button) return;
-    button.classList.toggle("is-saved", showBookmark);
-    button.setAttribute("aria-label", bookmarkActionLabel(showBookmark));
-    button.innerHTML = bookmarkIconSVG(showBookmark);
-    button.title = bookmarkActionLabel(showBookmark);
+    syncImmediateBookmarkButton(button, showBookmark, bookmarkActionLabel(showBookmark, project));
   });
   track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`).forEach((section) => {
     if (section.dataset.codeVersion !== exactCodeVersion || !readerPrivateContentAllowed(section.closest(".reader-panel"))) return;
@@ -17814,8 +17826,8 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
       sectionID,
       codeVersion: exactCodeVersion,
       blockID: ""
-    }));
-    syncImmediateBookmarkButton(marker, showSectionMarker);
+    }, "", snapshot()));
+    syncImmediateBookmarkButton(marker, showSectionMarker, bookmarkActionLabel(showSectionMarker, project));
     marker.setAttribute("aria-label", showSectionMarker ? "Remove section from Evidence" : "Save section");
     marker.title = showSectionMarker ? "Remove section from Evidence" : "Save section";
   });
@@ -19518,12 +19530,14 @@ function createSearchResultSaveButton(panel, detail, options = {}) {
       void refreshOpenSavedPanes().catch(() => {});
       syncReaderNoteBookmarkButtons(detail.sectionID, !shouldRemove, detail.codeVersion);
       syncSearchResultBookmarkButtons(detail, !shouldRemove);
+      syncSectionDetailBookmarkState(detail, !shouldRemove);
       if (!shouldRemove) {
         showReaderSaveConfirmation(panel, detail, {
           focusTarget: saveButton
         });
       }
-      refreshVisibleSyncedDerivedState();
+      refreshVisiblePlanUsage();
+      updateConnectionStatus();
     } catch (error) {
       saveButton.classList.add("has-error");
       await showWebNotice(
@@ -19810,12 +19824,13 @@ function updateSearchCodeFilterStates(filterRail, instance) {
   });
 }
 
-function syncImmediateBookmarkButton(button, saved) {
+function syncImmediateBookmarkButton(button, saved, label = null) {
   if (!button) return;
+  label ??= bookmarkActionLabel(saved);
   button.classList.toggle("is-saved", Boolean(saved));
   button.setAttribute("aria-pressed", String(Boolean(saved)));
-  button.setAttribute("aria-label", bookmarkActionLabel(saved));
-  button.title = bookmarkActionLabel(saved);
+  button.setAttribute("aria-label", label);
+  button.title = label;
   button.innerHTML = bookmarkIconSVG(Boolean(saved));
 }
 
@@ -19827,6 +19842,17 @@ function syncSearchResultBookmarkButtons(sectionPayload, saved) {
     if (button.dataset.savedEvidenceKey === sectionKey) {
       syncImmediateBookmarkButton(button, saved);
     }
+  });
+}
+
+function syncSectionDetailBookmarkState(sectionPayload, saved) {
+  const key = savedEvidenceKey(sectionPayload);
+  track.querySelectorAll(".section-detail-panel").forEach(panel => {
+    if (!readerPrivateContentAllowed(panel) || savedEvidenceKey(panel.__sectionPayload) !== key) return;
+    panel.querySelector(".section-detail-notes")?.dispatchEvent(new CustomEvent("permitext-folder-save", {detail: {saved}}));
+    const target = panel.__annotationTarget;
+    const projects = panel.querySelector(".section-detail-projects");
+    if (target?.sectionID && projects) renderAnnotationProjectEditor(projects, target, panel.__sectionPayload);
   });
 }
 
@@ -42378,7 +42404,7 @@ function columnPaneLabel(panel) {
     : panel.querySelector(':scope > header .panel-kind, :scope > header h2')?.textContent?.trim() || 'Column';
 }
 
-function refreshColumnGroupPresentation({ preparePanels = true } = {}) {
+function refreshColumnGroupPresentation({ preparePanels = true, refreshDividers = true } = {}) {
   const panels = [...track.querySelectorAll(':scope > .workspace-panel')];
   panels.forEach((panel) => panel.classList.remove('is-group-hidden'));
   if (preparePanels) panels.forEach(preparePaneCollapse);
@@ -42391,7 +42417,7 @@ function refreshColumnGroupPresentation({ preparePanels = true } = {}) {
   track.querySelectorAll(':scope > .pane-divider').forEach((divider) => {
     divider.classList.toggle('is-group-hidden', hidden.has(divider.dataset.nextPaneId));
   });
-  updateCollapsedPaneDividers();
+  if (refreshDividers) updateCollapsedPaneDividers();
 }
 
 function setColumnGroupCollapsed(group, collapsed) {
@@ -43114,7 +43140,6 @@ function appendPaneSequence(panes) {
   const visiblePanes = orderedPanes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId));
   orderedPanes.forEach(pane => pane.classList.toggle('is-workflow-hidden', !visiblePanes.includes(pane)));
   presentedColumnWorkflowView = currentColumnWorkflowView();
-  syncWorkflowNavigation();
   if (visiblePanes.length) {
     const firstPaneID = visiblePanes[0].dataset.paneId;
     nodes.push(existingDividers.get(dividerKey("", firstPaneID)) || createDivider("", firstPaneID));
@@ -43155,7 +43180,11 @@ function appendPaneSequence(panes) {
       scrolls.forEach(({ node: item, top, left }) => { item.scrollTop = top; item.scrollLeft = left; });
     }
   });
-  refreshColumnGroupPresentation();
+  // Finish ordering and group visibility before layout reads. Each panel was
+  // already prepared above; repeating that work resets its fitted width again.
+  refreshColumnGroupPresentation({ preparePanels: false, refreshDividers: false });
+  syncWorkflowNavigation();
+  updateCollapsedPaneDividers();
   refreshPinnedPaneDivider();
   const activeSelectMenus = new Set(
     Array.from(track.querySelectorAll("select.native-select-hidden"))
@@ -43229,6 +43258,30 @@ function readerScrollPositionFor(reader, position, sections) {
 
 function captureReaderScrollPositions() {
   const positions = new Map();
+  // Sections and their passage blocks are ordered vertically. Find the first
+  // visible anchor without measuring every earlier offscreen passage, which
+  // would force content-visibility layout in long sections such as Definitions.
+  const firstBelow = (nodes, top) => {
+    // Measuring skipped content can update its remembered intrinsic size.
+    // Recheck the boundary and allow two bounded retries if layout changed.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      let start = 0, end = nodes.length;
+      while (start < end) {
+        const index = Math.floor((start + end) / 2);
+        if (nodes[index].getBoundingClientRect().bottom > top) end = index;
+        else start = index + 1;
+      }
+      if (start === nodes.length) {
+        if (!start || nodes[start - 1].getBoundingClientRect().bottom <= top) return null;
+        continue;
+      }
+      const node = nodes[start], bounds = node.getBoundingClientRect();
+      if (bounds.bottom > top && (!start || nodes[start - 1].getBoundingClientRect().bottom <= top)) {
+        return { node, bounds };
+      }
+    }
+    return null;
+  };
   track.querySelectorAll('.workspace-panel[data-pane-id^="reader:"]').forEach((panel) => {
     if (panel.classList.contains("is-workflow-hidden")) {
       if (panel._workflowReaderPosition) positions.set(panel.dataset.paneId, panel._workflowReaderPosition);
@@ -43244,18 +43297,17 @@ function captureReaderScrollPositions() {
     const reservedPosition = content._readerChapterExtent?.unloadedScrollPosition(contentKey);
     if (reservedPosition) { positions.set(panel.dataset.paneId, reservedPosition); return; }
     const top = content.getBoundingClientRect().top;
-    const section = Array.from(content.querySelectorAll(".chapter-section[data-section-id]"))
-      .find((node) => node.getBoundingClientRect().bottom > top);
-    if (!section) return;
-    const block = Array.from(section.querySelectorAll(".annotated-code-block[data-block-id]"))
-      .find((node) => node.getBoundingClientRect().bottom > top);
-    const anchor = block || section;
+    const sectionMatch = firstBelow(content.querySelectorAll(".chapter-section[data-section-id]"), top);
+    if (!sectionMatch) return;
+    const section = sectionMatch.node;
+    const blockMatch = firstBelow(section.querySelectorAll(".annotated-code-block[data-block-id]"), top);
+    const block = blockMatch?.node;
     positions.set(panel.dataset.paneId, {
       contentKey,
       sectionID: section.dataset.sectionId,
       blockID: block?.dataset.blockId || "",
-      anchorOffset: anchor.getBoundingClientRect().top - top,
-      sectionOffset: section.getBoundingClientRect().top - top
+      anchorOffset: (blockMatch || sectionMatch).bounds.top - top,
+      sectionOffset: sectionMatch.bounds.top - top
     });
   });
   return positions;
@@ -43302,22 +43354,30 @@ function applyReaderScrollPosition(panel, position) {
     cancelReaderScrollRestore(content);
     return;
   }
-  // Only the small restored body window is loaded here. Measure its real text
-  // instead of content-visibility's off-screen intrinsic placeholders.
-  content.querySelectorAll(".chapter-section").forEach((node) => {
-    node.style.contentVisibility = "visible";
-  });
   const section = content.querySelector(`.chapter-section[data-section-id="${CSS.escape(position.sectionID)}"]`);
   if (!section) { cancelReaderScrollRestore(content); return; }
   const block = position.blockID
     ? section.querySelector(`.annotated-code-block[data-block-id="${CSS.escape(position.blockID)}"]`)
     : null;
   const anchor = block || section;
-  const offset = block ? position.anchorOffset : Number.isFinite(position.estimatedFraction)
-    ? -position.estimatedFraction * section.getBoundingClientRect().height : position.sectionOffset;
-  const targetTop = Math.max(0, content.scrollTop + anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset);
-  const maximumTop = Math.max(0, content.scrollHeight - content.clientHeight);
-  content.scrollTop = Math.min(targetTop, maximumTop);
+  // A fresh Reader starts with five nearby sections. Measure that bounded
+  // neighborhood so intrinsic placeholders cannot hide a short scroll range,
+  // then restore containment instead of permanently laying out the chapter.
+  const sections = Array.from(content.querySelectorAll(".chapter-section"));
+  const sectionIndex = sections.indexOf(section);
+  const measured = sections.slice(Math.max(0, sectionIndex - 2), sectionIndex + 3)
+    .map(node => ({ node, visibility: node.style.contentVisibility }));
+  let targetTop, maximumTop;
+  measured.forEach(({ node }) => { node.style.contentVisibility = "visible"; });
+  try {
+    const offset = block ? position.anchorOffset : Number.isFinite(position.estimatedFraction)
+      ? -position.estimatedFraction * section.getBoundingClientRect().height : position.sectionOffset;
+    targetTop = Math.max(0, content.scrollTop + anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset);
+    maximumTop = Math.max(0, content.scrollHeight - content.clientHeight);
+    content.scrollTop = Math.min(targetTop, maximumTop);
+  } finally {
+    measured.forEach(({ node, visibility }) => { node.style.contentVisibility = visibility; });
+  }
   if (targetTop > maximumTop + 1 && content.dataset.chapterFullyLoaded !== "true") {
     // The first small window may be shorter than the viewport. Retry after
     // nearby sections hydrate, but give control back as soon as the user acts.
