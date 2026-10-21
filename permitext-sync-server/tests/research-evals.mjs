@@ -7,7 +7,7 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { approvedEvaluationCases, validateEvaluationDataset } from "../evals/evaluation-schema.mjs";
-import { assertResearchEvaluationReferencesCurrent } from "../evals/research-answer-key-reconciliation.mjs";
+import { assertResearchEvaluationReferencesCurrent, validateReconciledAnswerKey, reconciledAnswerKeyURL } from "../evals/research-answer-key-reconciliation.mjs";
 import {
   adaptZoningEvaluationDataset,
   zoningAnswerKeySectionNumbers
@@ -3413,6 +3413,13 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
         conversationID = await createEvaluationConversation(baseURL, account, testCase);
         awaitingOperationTelemetry = true;
         const { answer, answerTimeMilliseconds, answeredAt } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
+        if (answer.mode === "clarification") {
+          const operationMetric = await terminalEvaluationOperation(baseURL, account, seenOperationIDs);
+          seenOperationIDs.add(operationMetric.id);
+          awaitingOperationTelemetry = false;
+          Object.assign(result, { conversationID, answeredAt, answerTimeMilliseconds, answer, operationMetric });
+          throw Object.assign(new Error("Research returned an uncharged clarification instead of a substantive answer."), { code: "RESEARCH_VERIFICATION_FAILED" });
+        }
         const operationMetric = await completedEvaluationOperation(
           baseURL,
           account,
@@ -4757,6 +4764,7 @@ async function main() {
     console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor; the versioned confirmations and Architecture V1/V2 confirmations use that same frozen cohort through distinct confirmation authorizations. None is baseline-eligible.");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
+    console.log("Development rubrics: --reconciled-development --include-drafts applies recorded corrections only; never baseline-eligible.");
     console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3 | --zoning-successor-remediation-3-v8-confirmation | --zoning-successor-remediation-3-v9-confirmation | --zoning-successor-remediation-3-v11-confirmation | --zoning-successor-remediation-3-v12-confirmation | --zoning-successor-remediation-3-v13-confirmation | --zoning-successor-remediation-3-v14-confirmation | --zoning-successor-remediation-3-v15-confirmation | --zoning-successor-remediation-3-v16-confirmation | --zoning-successor-remediation-3-v17-confirmation | --zoning-successor-remediation-3-v17-full-cohort) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
     console.log("No-cost successor advisory: --zoning-successor --zoning-successor-evidence-budget-advisory (compares disabled 24000 candidate with 48000 across only the canonically ready cases while the full gate stays blocked)");
     console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error | --stop-on-execution-error | --continue-after-verified-research-failure] [--run-id UUID]");
@@ -4819,6 +4827,25 @@ async function main() {
       sectionSummaryReader: zoningSectionSummary,
       paidExecution: liveMode && !zoningSuccessorFamilyMode
     });
+  }
+  const reconciledDevelopment = process.argv.includes("--reconciled-development");
+  if (reconciledDevelopment) {
+    assert(!zoningMode && process.argv.includes("--include-drafts"),
+      "Reconciled development diagnostics require construction cases and --include-drafts; they are never an approved baseline.");
+    const reconciled = JSON.parse(await readFile(reconciledAnswerKeyURL, "utf8"));
+    await validateReconciledAnswerKey(reconciled);
+    dataset = structuredClone(dataset);
+    for (const testCase of dataset.cases) {
+      const corrected = reconciled.cases.find(item => item.sourceDataset === "research-cases.json" && item.sourceCaseID === testCase.id && item.developmentAmendmentID);
+      if (!corrected) continue;
+      // Amend evaluator-only fields; never leak reference answers into prompts.
+      for (const field of ["expectedAnswer", "requiredConcepts", "forbiddenClaims", "missingFacts"])
+        if (corrected[field] !== undefined) testCase[field] = structuredClone(corrected[field]);
+      testCase.status = "draft";
+      testCase.developmentAmendmentID = corrected.developmentAmendmentID;
+      testCase.reconciliationStatus = corrected.reconciliationStatus;
+    }
+    datasetText = JSON.stringify(dataset);
   }
   validateDataset(dataset);
   if (process.argv.includes("--list")) {
@@ -4906,7 +4933,7 @@ async function main() {
     );
   }
   assert(selectedCases.length > 0, "No approved evaluation cases match the requested filters.");
-  if (liveMode && (!zoningMode || (!zoningExpandedMode && !zoningSuccessorFamilyMode))) {
+  if (liveMode && !reconciledDevelopment && (!zoningMode || (!zoningExpandedMode && !zoningSuccessorFamilyMode))) {
     await assertResearchEvaluationReferencesCurrent(selectedCases.map((testCase) => testCase.id),
       zoningMode ? "zoning-cases.json" : "research-cases.json");
   }
