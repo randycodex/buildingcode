@@ -20640,14 +20640,17 @@ dialog.report-export-review {
 
 .saved-project-structured-fact[hidden], .saved-project-structured-group[hidden] { display: none; }
 
-/* The writing page takes the available height above one standard action row. */
+/* The writing page fills the column, reserving a row only for available actions. */
 .workspace-panel.notebook-panel { padding-bottom: 0; }
 .notebook-panel > .notebook-shell { margin-bottom: 0; }
 .notebook-panel .notebook-focus {
   position: relative;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(220px, 1fr) 42px;
+  grid-template-rows: minmax(220px, 1fr);
   row-gap: 0;
+}
+.notebook-panel .notebook-focus:has(> .notebook-card-footer) {
+  grid-template-rows: minmax(220px, 1fr) 42px;
 }
 .notebook-panel .notebook-card-footer {
   position: relative;

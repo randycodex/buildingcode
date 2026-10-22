@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-note-questions-removed-v1265";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-note-report-status-removed-v1266";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -135,7 +135,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261022-note-questions-removed-v1265";
+} from "./offline-storage.js?v=20261022-note-report-status-removed-v1266";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -168,7 +168,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261022-note-questions-removed-v1265";
+} from "./workspace-state.js?v=20261022-note-report-status-removed-v1266";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -29527,21 +29527,11 @@ async function renderProjectNotebook(project, options = {}) {
       footerActions.append(researchButton, coordinateButton);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      // The indicator paints connected hosts on the next frame. Schedule it
-      // only after loading the editor, immediately before attaching the footer.
-      const reportMembership = reportMembershipIndicator(projectID, "notebookCard", activeCard);
-      refreshNotebookReportStatus = async () => {
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence ||
-            notebookCardIdentity(activeCard) !== focusedCardIdentity) return false;
-        reportMembership.dataset.reportSourceId = activeCard.id || "";
-        await refreshProjectReportMembership(projectID);
-        return true;
-      };
       noteMenu.titleAction.append(reportButton);
-      footer.append(reportMembership, footerActions);
+      footer.append(footerActions);
       const focusedContent = [editorElement];
       if (notebookReadOnly) panel.append(draftStatus);
-      focusedContent.push(footer);
+      if (!researchButton.hidden || !coordinateButton.hidden) focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 
       let scrollCaptureReady = false;
