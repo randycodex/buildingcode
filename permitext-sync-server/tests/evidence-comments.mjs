@@ -45,7 +45,8 @@ console.log('Reader comment index: one read per batch, exact edition and fresh s
 class CommentElement {
   constructor(tag) { this.tagName=tag; this.children=[]; this.listeners={}; this.attributes={}; this.value=''; }
   append(...children) { children.forEach(child => { child.parentElement=this; this.children.push(child); }); }
-  remove() { this.parentElement.children=this.parentElement.children.filter(child=>child!==this); }
+  remove() { this.parentElement.children=this.parentElement.children.filter(child=>child!==this); this.parentElement=null; }
+  insertBefore(child,before) { const index=before ? this.children.indexOf(before) : this.children.length; child.parentElement=this; this.children.splice(index,0,child); }
   replaceChildren() { this.children=[]; }
   setAttribute(name,value) { this.attributes[name]=value; }
   querySelectorAll(selector) { return this.children.flatMap(child => [
@@ -89,5 +90,46 @@ try {
   assert.equal(editor.children.length,0,'Sync does not recreate a just-deleted comment');
   editor.addComment();
   assert.equal(editor.querySelectorAll('button')[0].attributes['aria-label'],'Delete comment 1');
+
+  const recovery=createEvidenceCommentsEditor(serializeEvidenceComments(['First','Middle','Last']),'Passage comment');
+  let recoverySaves=0;
+  recovery.addEventListener('input',()=>recoverySaves++);
+  const undo=recovery.undoNotice.querySelector('button');
+  const click=button=>button.dispatchEvent(new Event('click'));
+  click(recovery.querySelectorAll('button')[1]);
+  assert.equal(recovery.undoNotice.hidden,false);
+  recovery.value=recovery.value;
+  assert.equal(recovery.undoNotice.hidden,false,'A matching sync acknowledgement preserves Undo');
+  recovery.querySelectorAll('textarea')[0].value='First edited after deletion';
+  recovery.querySelectorAll('textarea')[1].value='Last edited after deletion';
+  recovery.addComment();
+  recovery.querySelectorAll('textarea')[2].value='New after deletion';
+  recovery.readOnly=true;
+  assert.equal(undo.disabled,true);
+  click(undo);
+  assert.equal(recovery.querySelectorAll('textarea').length,3,'Read-only Undo cannot mutate comments');
+  recovery.readOnly=false;
+  click(undo);
+  assert.deepEqual(evidenceComments(recovery.value),['First edited after deletion','Middle','Last edited after deletion','New after deletion']);
+  assert.equal(document.activeElement,recovery.querySelectorAll('textarea')[1]);
+  assert.equal(recovery.undoNotice.hidden,true);
+  assert.equal(recoverySaves,3,'Delete, add and Undo all autosave');
+  click(recovery.querySelectorAll('button')[1]);
+  click(recovery.querySelectorAll('button')[1]);
+  click(undo);
+  click(undo);
+  assert.deepEqual(evidenceComments(recovery.value),['First edited after deletion','Middle','Last edited after deletion','New after deletion'],'Repeated Undo restores original order');
+  const lastOnly=createEvidenceCommentsEditor('Only comment','Passage comment');
+  click(lastOnly.querySelector('button'));
+  assert.equal(lastOnly.value,'');
+  click(lastOnly.undoNotice.querySelector('button'));
+  assert.equal(lastOnly.value,'Only comment','Undo restores the final deleted comment');
+  click(recovery.querySelectorAll('button')[1]);
+  recovery.value='Changed from another client';
+  assert.equal(recovery.undoNotice.hidden,true,'A replacement source value invalidates stale Undo');
+  click(undo);
+  assert.equal(recovery.value,'Changed from another client');
 } finally { globalThis.document=priorDocument; }
 console.log('Individual comment deletion: middle/first/last, surviving drafts, renumbering, reload, focus, autosave and read-only guards passed');
+
+console.log('Comment Undo passed: original position, newer edits, new comments, repeated deletions, final comment, autosave, sync acknowledgements and read-only/stale guards');

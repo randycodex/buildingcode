@@ -1,4 +1,4 @@
-import { evidenceCommentBlocks } from "./evidence-comments.js?v=3";
+import { evidenceCommentBlocks } from "./evidence-comments.js?v=4";
 export function notebookReferenceBlocks(reference, passages = [], comments = []) {
   return [
     { type: "paragraph", content: [{ type: "permitextReference", props: { ...reference } }] },

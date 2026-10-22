@@ -30,6 +30,23 @@ export function createEvidenceCommentsEditor(value, label) {
   editor.className = 'section-detail-comments-editor';
   let readOnly = false;
   let initialized = false;
+  const deletions = [];
+  const undoNotice = document.createElement('div');
+  undoNotice.className = 'section-detail-comment-undo';
+  undoNotice.hidden = true;
+  undoNotice.setAttribute('role', 'status');
+  const undoMessage = document.createElement('span');
+  undoMessage.textContent = 'Comment deleted.';
+  const undo = document.createElement('button');
+  undo.type = 'button';
+  undo.textContent = 'Undo';
+  undo.setAttribute('aria-label', 'Undo comment deletion');
+  undoNotice.append(undoMessage, undo);
+  editor.undoNotice = undoNotice;
+  const refreshUndo = () => {
+    undoNotice.hidden = deletions.length === 0;
+    undo.disabled = readOnly || deletions.length === 0;
+  };
   const renumber = () => {
     [...editor.children].forEach((box, index) => {
       const number = index + 1;
@@ -40,6 +57,16 @@ export function createEvidenceCommentsEditor(value, label) {
       remove.title = `Delete comment ${number}`;
     });
   };
+  undo.addEventListener('click', () => {
+    if (readOnly || !deletions.length) return;
+    const { box, index, next } = deletions.pop();
+    const before = next?.parentElement === editor ? next : editor.children[Math.min(index, editor.children.length)] || null;
+    editor.insertBefore(box, before);
+    renumber();
+    refreshUndo();
+    box.querySelector('textarea').focus();
+    editor.dispatchEvent(new Event('input', { bubbles: true }));
+  });
   const add = text => {
     const box = document.createElement('div');
     box.className = 'section-detail-note-box';
@@ -62,9 +89,12 @@ export function createEvidenceCommentsEditor(value, label) {
     remove.title = `Delete comment ${number}`;
     remove.disabled = readOnly;
     remove.addEventListener('click', () => {
-      if (readOnly) return;
+      if (readOnly || box.parentElement !== editor) return;
       const index = [...editor.children].indexOf(box);
+      deletions.push({ box, index, next: editor.children[index + 1] || null });
+      if (deletions.length > 50) deletions.shift();
       box.remove();
+      refreshUndo();
       renumber();
       const remaining = editor.querySelectorAll('textarea');
       const next = remaining[Math.min(index, remaining.length - 1)];
@@ -82,6 +112,8 @@ export function createEvidenceCommentsEditor(value, label) {
       set: next => {
         if (initialized && next === editor.value) return;
         initialized = true;
+        deletions.length = 0;
+        refreshUndo();
         editor.replaceChildren();
         const comments = evidenceComments(next);
         (comments.length ? comments : ['']).forEach(add);
@@ -90,6 +122,7 @@ export function createEvidenceCommentsEditor(value, label) {
       readOnly = next;
       editor.querySelectorAll('textarea').forEach(input => { input.readOnly = next; });
       editor.querySelectorAll('button').forEach(button => { button.disabled = next; });
+      refreshUndo();
     } }
   });
   editor.addComment = () => {

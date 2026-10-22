@@ -20921,3 +20921,8 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .section-detail-comment-delete { padding: 2px 0 2px var(--space-2); border: 0; background: transparent; color: var(--text-secondary); font-family: var(--ui-font-family); font-size: var(--chrome-font-size) !important; cursor: pointer; }
 .section-detail-comment-delete:hover, .section-detail-comment-delete:focus-visible { color: var(--text-primary); }
 .section-detail-comment-delete:disabled { opacity: 0.5; cursor: default; }
+
+.section-detail-comment-undo { display: flex; align-items: center; gap: var(--space-3); color: var(--text-secondary); font-family: var(--ui-font-family); font-size: var(--chrome-font-size) !important; }
+.section-detail-comment-undo[hidden] { display: none !important; }
+.section-detail-comment-undo button { border: 0; padding: 2px 0; background: transparent; color: var(--text-primary); font: inherit; cursor: pointer; }
+.section-detail-comment-undo button:disabled { opacity: 0.5; cursor: default; }

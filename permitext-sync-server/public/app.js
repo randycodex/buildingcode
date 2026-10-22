@@ -1,6 +1,6 @@
-import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=3";
+import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=4";
 import { createAssistantMaterials } from "./assistant-materials.js?v=4";
-import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=4";
+import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=5";
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-comment-delete-v1254";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-comment-undo-v1255";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -134,7 +134,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261021-comment-delete-v1254";
+} from "./offline-storage.js?v=20261021-comment-undo-v1255";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -167,7 +167,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261021-comment-delete-v1254";
+} from "./workspace-state.js?v=20261021-comment-undo-v1255";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -342,7 +342,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261021-comment-delete-v45";
+const notebookClientVersion = "20261021-comment-undo-v46";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -21091,7 +21091,7 @@ async function renderSectionDetail(searchID, detail) {
   saveState.setAttribute("role", "status");
   notesHeader.append(notesTitle, saveState);
   const textarea = createEvidenceCommentsEditor(noteBody, `${commentScope} for ${sectionDisplayTitle(sectionPayload.sectionNumber, sectionPayload.title)}`);
-  notes.append(notesHeader, textarea);
+  notes.append(notesHeader, textarea.undoNotice, textarea);
   panel.__annotationTarget = sectionTarget;
   panel.__sectionPayload = sectionPayload;
   const syncDetailBookmark = (event) => {
