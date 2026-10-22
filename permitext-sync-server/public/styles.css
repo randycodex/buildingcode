@@ -3715,6 +3715,7 @@ select option:checked {
   pointer-events: auto;
 }
 
+.inline-comment-toggle,
 .inline-bookmark-toggle,
 .inline-research-toggle,
 .inline-note-toggle {
@@ -3737,17 +3738,20 @@ select option:checked {
   box-shadow: none;
 }
 
+.inline-comment-toggle,
 .inline-bookmark-toggle,
 .inline-research-toggle,
 .inline-note-toggle {
   flex: 0 0 28px;
 }
 
+.inline-comment-toggle:disabled,
 .inline-research-toggle:disabled,
 .inline-note-toggle:disabled {
   opacity: 0.64;
 }
 
+.inline-comment-toggle svg,
 .inline-bookmark-toggle svg,
 .inline-research-toggle svg,
 .inline-note-toggle svg {
@@ -3755,6 +3759,8 @@ select option:checked {
   height: 15px;
 }
 
+.inline-comment-toggle:hover,
+.inline-comment-toggle:focus-visible,
 .inline-bookmark-toggle:hover,
 .inline-bookmark-toggle:focus-visible,
 .inline-bookmark-toggle.is-saved,
@@ -20908,7 +20914,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .annotated-code-block > .inline-comment.has-passage-comments { opacity: 1; pointer-events: auto; }
 .annotated-code-block:not(:hover):not(:focus-within) > .inline-comment.has-passage-comments > :not(.inline-comment-toggle):not(.inline-bookmark-toggle) { visibility: hidden; }
 .annotated-code-block:not(:hover):not(:focus-within) > .inline-comment.has-saved-section > .inline-comment-toggle:not([hidden]) { visibility: visible; }
-.inline-comment-toggle svg { width: 16px; height: 16px; }
 .reader-content .notebook-evidence-highlight { background: transparent; color: var(--reader-notes-active-text); border-radius: 0; }
 .report-project-source-section > summary { padding: var(--space-3) 0; cursor: pointer; }
 .report-project-source-section > .report-source-card { margin-left: var(--space-3); }
