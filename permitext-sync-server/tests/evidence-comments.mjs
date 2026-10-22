@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { evidenceComments, serializeEvidenceComments, evidenceCommentBlocks } from '../public/evidence-comments.js';
+import { evidenceComments, serializeEvidenceComments, evidenceCommentBlocks, createEvidenceCommentsEditor } from '../public/evidence-comments.js';
 import { notebookReferenceBlocks } from '../public/notebook-passage-blocks.js';
 for (const values of [['Existing comment'], ['First', 'Second'], ['Text\n\n', '### Comment 2\nLiteral heading\n\\text', ''], ['## Passage comments\n\n### Comment 1\nLiteral']]) {
   assert.deepEqual(evidenceComments(serializeEvidenceComments(values)), values);
@@ -40,3 +40,54 @@ record.noteBody=''; scheduled();
 assert.equal(runtime.readerCommentCount(record),0);
 assert.equal(reads,2);
 console.log('Reader comment index: one read per batch, exact edition and fresh subsequent edits passed');
+
+
+class CommentElement {
+  constructor(tag) { this.tagName=tag; this.children=[]; this.listeners={}; this.attributes={}; this.value=''; }
+  append(...children) { children.forEach(child => { child.parentElement=this; this.children.push(child); }); }
+  remove() { this.parentElement.children=this.parentElement.children.filter(child=>child!==this); }
+  replaceChildren() { this.children=[]; }
+  setAttribute(name,value) { this.attributes[name]=value; }
+  querySelectorAll(selector) { return this.children.flatMap(child => [
+    ...(selector.startsWith('.') ? child.className===selector.slice(1) : child.tagName===selector) ? [child] : [],
+    ...child.querySelectorAll(selector)
+  ]); }
+  querySelector(selector) { return this.querySelectorAll(selector)[0] || null; }
+  closest() { return null; }
+  addEventListener(name,listener) { (this.listeners[name] ||= []).push(listener); }
+  dispatchEvent(event) { (this.listeners[event.type] || []).forEach(listener=>listener(event)); }
+  focus() { document.activeElement=this; }
+}
+const priorDocument=globalThis.document;
+globalThis.document={createElement:tag=>new CommentElement(tag)};
+try {
+  const original=['Keep first\nwith its line break','Delete only this one','Keep last exactly'];
+  const editor=createEvidenceCommentsEditor(serializeEvidenceComments(original),'Passage comment');
+  let saves=0;
+  editor.addEventListener('input',()=>saves++);
+  const first=editor.querySelectorAll('textarea')[0],last=editor.querySelectorAll('textarea')[2];
+  editor.querySelectorAll('button')[1].dispatchEvent(new Event('click'));
+  assert.deepEqual(evidenceComments(editor.value),[original[0],original[2]]);
+  assert.deepEqual(editor.querySelectorAll('textarea'),[first,last], 'Surviving editors retain their values and nodes');
+  assert.equal(document.activeElement,last,'Focus moves to the next surviving comment');
+  assert.deepEqual(editor.querySelectorAll('.section-detail-comment-number').map(node=>node.textContent),['1.','2.']);
+  assert.equal(editor.querySelectorAll('button')[1].attributes['aria-label'],'Delete comment 2');
+  assert.equal(saves,1,'Deletion uses the existing autosave input event');
+  const restored=createEvidenceCommentsEditor(editor.value,'Passage comment');
+  assert.deepEqual(restored.querySelectorAll('textarea').map(node=>node.value),[original[0],original[2]]);
+  editor.readOnly=true;
+  assert.ok(editor.querySelectorAll('button').every(button=>button.disabled));
+  editor.querySelectorAll('button')[0].dispatchEvent(new Event('click'));
+  assert.equal(saves,1,'Read-only comments cannot be deleted');
+  editor.readOnly=false;
+  editor.querySelectorAll('button')[0].dispatchEvent(new Event('click'));
+  assert.deepEqual(evidenceComments(editor.value),[original[2]]);
+  editor.querySelectorAll('button')[0].dispatchEvent(new Event('click'));
+  assert.equal(editor.value,'');
+  assert.equal(editor.children.length,0);
+  editor.value='';
+  assert.equal(editor.children.length,0,'Sync does not recreate a just-deleted comment');
+  editor.addComment();
+  assert.equal(editor.querySelectorAll('button')[0].attributes['aria-label'],'Delete comment 1');
+} finally { globalThis.document=priorDocument; }
+console.log('Individual comment deletion: middle/first/last, surviving drafts, renumbering, reload, focus, autosave and read-only guards passed');

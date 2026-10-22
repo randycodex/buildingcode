@@ -29,8 +29,19 @@ export function createEvidenceCommentsEditor(value, label) {
   const editor = document.createElement('div');
   editor.className = 'section-detail-comments-editor';
   let readOnly = false;
+  let initialized = false;
+  const renumber = () => {
+    [...editor.children].forEach((box, index) => {
+      const number = index + 1;
+      box.querySelector('.section-detail-comment-number').textContent = `${number}.`;
+      box.querySelector('textarea').setAttribute('aria-label', `${label} ${number}`);
+      const remove = box.querySelector('button');
+      remove.setAttribute('aria-label', `Delete comment ${number}`);
+      remove.title = `Delete comment ${number}`;
+    });
+  };
   const add = text => {
-    const box = document.createElement('label');
+    const box = document.createElement('div');
     box.className = 'section-detail-note-box';
     const number = editor.children.length + 1;
     const marker = document.createElement('span');
@@ -41,14 +52,36 @@ export function createEvidenceCommentsEditor(value, label) {
     input.placeholder = 'Add a comment';
     input.setAttribute('aria-label', `${label} ${number}`);
     input.readOnly = readOnly;
-    box.append(marker, input);
+    const header = document.createElement('div');
+    header.className = 'section-detail-comment-header';
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'section-detail-comment-delete';
+    remove.textContent = 'Delete';
+    remove.setAttribute('aria-label', `Delete comment ${number}`);
+    remove.title = `Delete comment ${number}`;
+    remove.disabled = readOnly;
+    remove.addEventListener('click', () => {
+      if (readOnly) return;
+      const index = [...editor.children].indexOf(box);
+      box.remove();
+      renumber();
+      const remaining = editor.querySelectorAll('textarea');
+      const next = remaining[Math.min(index, remaining.length - 1)];
+      if (next) next.focus();
+      else editor.closest('.section-detail-panel')?.querySelector('.section-detail-add-comment')?.focus();
+      editor.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    header.append(marker, remove);
+    box.append(header, input);
     editor.append(box);
     return input;
   };
   Object.defineProperties(editor, {
     value: { get: () => serializeEvidenceComments([...editor.querySelectorAll('textarea')].map(input => input.value)),
       set: next => {
-        if (next === editor.value && editor.children.length) return;
+        if (initialized && next === editor.value) return;
+        initialized = true;
         editor.replaceChildren();
         const comments = evidenceComments(next);
         (comments.length ? comments : ['']).forEach(add);
@@ -56,6 +89,7 @@ export function createEvidenceCommentsEditor(value, label) {
     readOnly: { get: () => readOnly, set: next => {
       readOnly = next;
       editor.querySelectorAll('textarea').forEach(input => { input.readOnly = next; });
+      editor.querySelectorAll('button').forEach(button => { button.disabled = next; });
     } }
   });
   editor.addComment = () => {

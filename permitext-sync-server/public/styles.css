@@ -20915,3 +20915,9 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .report-source-card .report-source-comment { margin-top: var(--space-3); padding-left: var(--space-3); white-space: pre-wrap; -webkit-line-clamp: unset; overflow: visible; }
 .reader-section-heading-row > .reader-section-actions { margin: 0; align-self: center; opacity: 1; pointer-events: auto; }
 .inline-comment-toggle[hidden] { display: none !important; }
+
+.section-detail-comment-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-2); }
+.section-detail-comment-header .section-detail-comment-number { margin-bottom: 0; }
+.section-detail-comment-delete { padding: 2px 0 2px var(--space-2); border: 0; background: transparent; color: var(--text-secondary); font-family: var(--ui-font-family); font-size: var(--chrome-font-size) !important; cursor: pointer; }
+.section-detail-comment-delete:hover, .section-detail-comment-delete:focus-visible { color: var(--text-primary); }
+.section-detail-comment-delete:disabled { opacity: 0.5; cursor: default; }
