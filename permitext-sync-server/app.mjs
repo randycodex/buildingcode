@@ -23894,10 +23894,13 @@ async function exactSearchHits(hits, query, matchMode = "exact") {
 
 async function exactSearchPage(hits, query, candidateOffset, resultLimit, matchMode = "exact") {
   const matches = [];
-  for (let index = candidateOffset; index < hits.length; index += exactSearchConcurrency) {
+  for (let index = candidateOffset; index < hits.length;) {
     const batchStart = index;
+    // Read only the remaining page plus one lookahead match. Tiny source
+    // previews should not eagerly read a full batch of eight section bodies.
+    const batchSize = Math.min(exactSearchConcurrency, resultLimit - matches.length + 1);
     const batch = await Promise.all(
-      hits.slice(index, index + exactSearchConcurrency).map(async (hit) => {
+      hits.slice(index, index + batchSize).map(async (hit) => {
         const plainText = await searchableSectionPlainText(hit.section);
         const matchesQuery = (matchMode === "words" ? matchesSearchWords : searchTextMatchesExactQuery)([
           hit.section.sectionNumber,
@@ -23920,6 +23923,7 @@ async function exactSearchPage(hits, query, candidateOffset, resultLimit, matchM
       }
       matches.push(hit);
     }
+    index += batchSize;
   }
   return {
     hits: matches,

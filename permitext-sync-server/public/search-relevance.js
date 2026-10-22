@@ -55,7 +55,10 @@ export function searchRelevanceRank(section, query, matchMode = 'exact', plainTe
   return 4 - overlap + Math.min(depth, 8) * 0.12;
 }
 
-export const initialSearchGroupLimit = (sourceCount, limit = 25) => Math.min(limit, sourceCount === 1 ? 12 : 8);
+// Share the initial preview budget across codebooks instead of multiplying it
+// by every matching edition. Keep at least one result in each source.
+export const initialSearchGroupLimit = (sourceCount, limit = 25) => Math.min(limit,
+  sourceCount === 1 ? 12 : Math.min(8, Math.max(1, Math.floor(limit / Math.max(1, sourceCount)))));
 
 export function searchVocabulary(sections) {
   const terms = new Set();
