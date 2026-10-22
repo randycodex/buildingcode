@@ -19376,7 +19376,8 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-draft-cla
     order: -2;
     /* Ordinary dividers use z-index 12 and must remain behind this surface. */
     z-index: 40;
-    box-shadow: 2px 0 0 var(--border), 6px 0 12px rgba(0, 0, 0, 0.08);
+    /* The adjacent pane-divider supplies the single 1px boundary. */
+    box-shadow: none;
   }
   .panel-track > .pane-divider.is-pinned-divider {
     position: sticky;
