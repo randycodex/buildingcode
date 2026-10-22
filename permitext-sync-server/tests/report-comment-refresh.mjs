@@ -20,7 +20,7 @@ row.className='report-draft-block';row.dataset.blockId='b';host.dataset.reportCo
 palette.className='report-source-palette';row.append(host);panel.append(row,palette);
 const draft={title:'Unsaved title',blocks:[{id:'b',kind:'evidence',sourceID:'s',excludedCommentKeys:['p']}]};
 const original=structuredClone(draft);
-const c=vm.createContext({evidenceCommentsText,panel,activeDraft:draft,sources:[{id:'s',kind:'evidence',sectionID:1,notes:[{body:'Old comment'}]}],
+const c=vm.createContext({reportSourcesRefreshGeneration:0,evidenceCommentsText,panel,activeDraft:draft,sources:[{id:'s',kind:'evidence',sectionID:1,notes:[{body:'Old comment'}]}],
  document:{createElement:()=>new Element(),createTextNode:text=>Object.assign(new Element(),{textContent:text})},
  reportCommentPresentation,reportCommentKey,disposed:false,requestIdentity:'a',projectID:'p',sourceWarnings:[],
  isCurrentAccountRequest:()=>true,setDirty:()=>{},renderSourcePalette:()=>{},
@@ -38,6 +38,42 @@ assert.equal(host.children.length,1);
 assert.deepEqual(draft,original,'Refreshing source comments must preserve the unsaved draft and exclusions');
 assert.equal(panel.children[0],row,'Keep the editor node and scroll container mounted');
 console.log('Live Report comment refresh passed: new source text and options, retained disclosure, exclusions and unsaved draft.');
+
+// An earlier deletion response must not overwrite a later Undo response.
+const pendingSources=[];
+c.reportRequest=()=>new Promise(resolve=>pendingSources.push(resolve));
+const beforeUndo=c.refreshReportSources();
+const afterUndo=c.refreshReportSources();
+pendingSources[1]({sources:[{id:'s',kind:'evidence',sectionID:1,notes:[{body:'Restored by Undo'}]}]});
+await afterUndo;
+pendingSources[0]({sources:[{id:'s',kind:'evidence',sectionID:1,notes:[]}]});
+await beforeUndo;
+assert.equal(c.sources[0].notes[0]?.body,'Restored by Undo','A delayed deletion response must not remove the restored comment');
+assert.deepEqual(draft,original,'Out-of-order refreshes preserve the unsaved Report draft');
+console.log('Report comment delete/Undo refreshes retain the newest response when requests finish out of order.');
+
+// A slower full Report refresh must also preserve a newer comment refresh.
+c.deletingReport=false;c.deletingVersionID=null;c.historyMutationGeneration=0;c.dirty=true;
+vm.runInContext(source.slice(source.indexOf('  refreshReportArtifacts = async'),source.indexOf('\n  try {',source.indexOf('  refreshReportArtifacts = async'))),c);
+const artifactResponses=[];
+c.reportRequest=()=>new Promise(resolve=>artifactResponses.push(resolve));
+const olderArtifacts=c.refreshReportArtifacts();
+const newerComments=c.refreshReportSources();
+artifactResponses[3]({sources:[{id:'s',kind:'evidence',sectionID:1,notes:[{body:'Newest restored comment'}]}]});
+await newerComments;
+artifactResponses[0]({drafts:[]});artifactResponses[1]({sources:[{id:'s',kind:'evidence',sectionID:1,notes:[]}]});artifactResponses[2]({reports:[]});
+await olderArtifacts;
+assert.equal(c.sources[0].notes[0]?.body,'Newest restored comment');
+assert.deepEqual(draft,original);
+c.reportRequest=async()=>({sources:[{id:'s',kind:'evidence',sectionID:1,notes:[]}]});
+await c.refreshReportSources();
+assert.equal(host.children.length,0,'Deleting the last comment clears the included comment preview');
+assert.equal(row.querySelector('.report-comment-options'),undefined,'No stale comment inclusion options remain');
+c.reportRequest=async()=>({sources:[{id:'s',kind:'evidence',sectionID:1,notes:[{body:'Restored final comment'}]}]});
+await c.refreshReportSources();
+assert.equal(host.children[0].children[1].textContent,'Restored final comment');
+assert.deepEqual(draft,original);
+console.log('Full-refresh ordering and final-comment deletion/Undo retain current comments without changing the Report draft.');
 
 const activation=source.slice(source.indexOf('async function openProjectReportDraft('),source.indexOf('\nasync function closeProjectCoordination('));
 const events=[];

@@ -26,7 +26,7 @@ const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8')
 const actual = name => { const start = app.indexOf(`function ${name}(`); return app.slice(start, app.indexOf('\n}', start) + 2); };
 let reads = 0, scheduled;
 const record = {sectionID:'section',codeVersion:'2022',blockID:'paragraph',noteBody:serializeEvidenceComments(['One','Two'])};
-const runtime = vm.createContext({ evidenceComments,
+const runtime = vm.createContext({ evidenceComments, state: {localAnnotations: []},
   currentContentSummary: () => { reads++; return {annotations:[record]}; },
   consolidatedSavedAnnotations: records => records,
   visibleSyncedTargetKey: target => [target.codeVersion,target.sectionID,target.blockID].join(':'),

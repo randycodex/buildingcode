@@ -12,7 +12,7 @@ assert.match(visibility,/versionsToggle.hidden/);
 let remoteHistory=[];
 const draft={id:'draft',title:'Unsaved writing',blocks:[{text:'Do not replace'}]};
 const historyBody={scrollTop:92,replaceChildren(){}};
-const c=vm.createContext({disposed:false,deletingReport:false,deletingVersionID:null,historyMutationGeneration:0,
+const c=vm.createContext({reportSourcesRefreshGeneration:0,disposed:false,deletingReport:false,deletingVersionID:null,historyMutationGeneration:0,
  requestIdentity:'owner',projectID:'project',isCurrentAccountRequest:()=>true,
  reportRequest:async path=>path.includes('/history/')?{reports:remoteHistory}:{},
  dirty:true,activeDraft:draft,drafts:[],sources:[],sourceWarnings:[],history:[],versionsToggle:{hidden:true},

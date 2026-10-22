@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-comment-undo-v1256";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-comment-sync-v1257";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -134,7 +134,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261021-comment-undo-v1256";
+} from "./offline-storage.js?v=20261021-comment-sync-v1257";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -167,7 +167,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261021-comment-undo-v1256";
+} from "./workspace-state.js?v=20261021-comment-sync-v1257";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -17246,7 +17246,10 @@ let readerCommentIndex = null;
 function readerCommentCount(target, snapshot = null) {
   if (!readerCommentIndex) {
     const summary = snapshot || currentContentSummary();
-    const records = consolidatedSavedAnnotations(summary.annotations || [], summary);
+    // Pending deletions may use a local ID while the server still has its
+    // canonical record. Preserve those tombstones when merging by passage.
+    const annotations = [...(summary.annotations || []), ...(state.localAnnotations || [])];
+    const records = consolidatedSavedAnnotations(annotations, { ...summary, annotations });
     readerCommentIndex = new Map(records.map(record => [visibleSyncedTargetKey(record), evidenceComments(record.noteBody).filter(text => text.trim()).length]));
     queueMicrotask(() => { readerCommentIndex = null; });
   }
@@ -30080,6 +30083,7 @@ async function renderProjectReportDraft(project, resume = null) {
   const reportUndo = createReportUndo();
   let dirty = false;
   let disposed = false;
+  let reportSourcesRefreshGeneration = 0;
   let refreshReportSources = async () => false;
   let refreshReportArtifacts = async () => false;
   let draggedReportBlock = null;
@@ -31585,8 +31589,9 @@ async function renderProjectReportDraft(project, resume = null) {
 
   refreshReportSources = async () => {
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
+    const generation = ++reportSourcesRefreshGeneration;
     const payload = await reportRequest("/reports/sources/list", { projectID });
-    if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
+    if (disposed || generation !== reportSourcesRefreshGeneration || !isCurrentAccountRequest(requestIdentity)) return false;
     sources = payload.sources || [];
     sourceWarnings = payload.warnings || [];
     refreshIncludedReportComments();
@@ -31600,6 +31605,7 @@ async function renderProjectReportDraft(project, resume = null) {
   refreshReportArtifacts = async (options = {}) => {
     if (disposed || deletingReport || deletingVersionID || !isCurrentAccountRequest(requestIdentity)) return false;
     const historyGeneration = historyMutationGeneration;
+    const sourcesGeneration = ++reportSourcesRefreshGeneration;
     const [draftPayload, sourcePayload, historyPayload] = await Promise.all([
       reportRequest("/reports/drafts/list", { projectID }),
       reportRequest("/reports/sources/list", { projectID }),
@@ -31607,8 +31613,10 @@ async function renderProjectReportDraft(project, resume = null) {
     ]);
     if (disposed || deletingVersionID || historyGeneration !== historyMutationGeneration || !isCurrentAccountRequest(requestIdentity)) return false;
     drafts = draftPayload.drafts || [];
-    sources = sourcePayload.sources || [];
-    sourceWarnings = sourcePayload.warnings || [];
+    if (sourcesGeneration === reportSourcesRefreshGeneration) {
+      sources = sourcePayload.sources || [];
+      sourceWarnings = sourcePayload.warnings || [];
+    }
     history = historyPayload.reports || [];
     if (dirty) {
       refreshIncludedReportComments();
