@@ -95,4 +95,12 @@ assert.equal(restoredContent.scrollTop, 420);
 assert.deepEqual([...new Set(changes)], [61, 62, 63, 64, 65]);
 assert.equal(changes.length, 10, 'Each temporary override is restored');
 restoredSections.forEach((section, index) => assert.equal(section.style.contentVisibility, index === 61 ? 'auto' : ''));
+// A retained Reader already at the requested passage avoids all temporary
+// containment writes; a genuinely shifted anchor above still takes the full path.
+changes.length=0;
+restoring.applyReaderScrollPosition({isConnected:true,classList:{contains:()=>false},
+ dataset:{readerContentKey:'same'},querySelector:()=>restoredContent},
+ {contentKey:'same',sectionID:'s63',sectionOffset:25});
+assert.equal(changes.length,0,'An aligned retained passage must not relayout its five neighboring sections.');
+assert.equal(restoredContent.scrollTop,420,'An aligned retained passage keeps its native scroll position.');
 console.log(`Reader anchor performance passed: exact deep/boundary anchors with at most ${maximumReads} geometry reads across 128 sections and 1,238 passages; restoration contains its five-section measurement window.`);

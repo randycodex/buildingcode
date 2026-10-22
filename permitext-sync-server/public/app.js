@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-workflow-switch-v1262";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-retained-reader-v1263";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -135,7 +135,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261021-workflow-switch-v1262";
+} from "./offline-storage.js?v=20261021-retained-reader-v1263";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -168,7 +168,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261021-workflow-switch-v1262";
+} from "./workspace-state.js?v=20261021-retained-reader-v1263";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -43451,6 +43451,16 @@ function applyReaderScrollPosition(panel, position) {
     ? section.querySelector(`.annotated-code-block[data-block-id="${CSS.escape(position.blockID)}"]`)
     : null;
   const anchor = block || section;
+  // Retained workflow columns usually keep their native scroll position.
+  // Verify the visible anchor before forcing neighboring offscreen sections
+  // through layout again. Changed widths/content still use the full restore.
+  const retainedOffset = block ? position.anchorOffset : position.sectionOffset;
+  if (position.estimatedFraction === undefined && Number.isFinite(retainedOffset) && content.clientHeight > 0 &&
+      Math.abs(anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - retainedOffset) <= 1) {
+    cancelReaderScrollRestore(content);
+    updateReaderScrollIndicator(panel);
+    return;
+  }
   // A fresh Reader starts with five nearby sections. Measure that bounded
   // neighborhood so intrinsic placeholders cannot hide a short scroll range,
   // then restore containment instead of permanently laying out the chapter.
