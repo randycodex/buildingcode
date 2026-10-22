@@ -477,11 +477,11 @@ export function mountPermitextNotebookEditor(element, options = {}) {
       ]);
       return true;
     },
-    appendReference(reference, passages = []) {
+    appendReference(reference, passages = [], comments = []) {
       const editor = controllerRef.current;
       const lastBlock = editor?.document.at(-1);
       if (!editor || !lastBlock) return false;
-      const added = editor.insertBlocks(notebookReferenceBlocks(normalizedReference(reference), passages), lastBlock, "after");
+      const added = editor.insertBlocks(notebookReferenceBlocks(normalizedReference(reference), passages, comments), lastBlock, "after");
       editor.setTextCursorPosition(added.at(-1), "end");
       editor.focus();
       return true;

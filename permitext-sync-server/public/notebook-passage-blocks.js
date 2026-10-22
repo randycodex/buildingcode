@@ -1,10 +1,12 @@
-export function notebookReferenceBlocks(reference, passages = []) {
+import { evidenceCommentBlocks } from "./evidence-comments.js?v=2";
+export function notebookReferenceBlocks(reference, passages = [], comments = []) {
   return [
     { type: "paragraph", content: [{ type: "permitextReference", props: { ...reference } }] },
     ...(Array.isArray(passages) ? passages : []).flatMap(passage => {
       const text = String(passage?.exact || "").trim();
       return text ? [{ type: "paragraph", content: [{ type: "text", text, styles: {} }] }] : [];
-    })
+    }),
+    ...evidenceCommentBlocks(comments)
   ];
 }
 

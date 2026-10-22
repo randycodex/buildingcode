@@ -16637,6 +16637,7 @@ function reportSourceClientSummary(source) {
       previewText: source.previewText || "",
       notes: source.notes || []
     } : {}),
+    ...(source.kind === "projectFacts" ? { projectSection: source.projectSection || "facts", hiddenFromPicker: source.hiddenFromPicker === true } : {}),
     ...(source.kind === "notebookCard" ? { openQuestions: source.openQuestions || [], version: source.version } : {}),
     sourceClassification: source.sourceClassification,
     updatedAt: source.updatedAt || null
@@ -16686,19 +16687,26 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
   const warnings = [];
 
   const project = (await projectAccessForUser(userID, projectID))?.project || null;
-  const factProjection = projectFactProjection(project);
+  const factProjection = projectFactProjection({ ...project, description: "" });
+  if (project?.description?.trim()) {
+    sources.push({ id: `${projectID}:context`, kind: "projectFacts", projectSection: "context", label: "Project Context",
+      summary: project.description, sourceClassification: "project-material", updatedAt: project.updatedAt || null,
+      manifestItem: { kind: "projectFacts", sourceID: `${projectID}:context`, title: "Project Context",
+        address: "", facts: project.description, structuredFacts: [], projectionVersion: factProjection.projectionVersion } });
+  }
   if (factProjection.reportFacts) {
     const facts = factProjection.reportFacts;
     sources.push({
-      id: projectID,
+      id: `${projectID}:facts`,
       kind: "projectFacts",
       label: "Project Facts",
+      projectSection: "facts",
       summary: [project.address, facts].filter(Boolean).join(" · ").slice(0, 500),
       sourceClassification: "project-material",
       updatedAt: project.updatedAt || null,
       manifestItem: {
         kind: "projectFacts",
-        sourceID: projectID,
+        sourceID: `${projectID}:facts`,
         title: project.name || project.title || "Project facts",
         address: factProjection.address,
         facts,
@@ -16707,6 +16715,17 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
       }
     });
   }
+
+  // Existing Reports keep their original combined Project source. New picks
+  // use independent Context and Facts without rewriting prior draft content.
+  const legacyFacts = projectFactProjection(project);
+  if (legacyFacts.reportFacts) sources.push({
+    id: projectID, kind: "projectFacts", hiddenFromPicker: true, label: "Project Facts",
+    summary: legacyFacts.reportFacts.slice(0, 500), sourceClassification: "project-material", updatedAt: project.updatedAt || null,
+    manifestItem: { kind: "projectFacts", sourceID: projectID, title: project.name || project.title || "Project facts",
+      address: legacyFacts.address, facts: legacyFacts.reportFacts, structuredFacts: legacyFacts.structuredFacts,
+      projectionVersion: legacyFacts.projectionVersion }
+  });
 
   const mutations = latestContentMutationsByID(await userContentMutations(userID));
   const currentProjectSections = await currentProjectSectionRecords(userID, projectID, mutations);

@@ -34,6 +34,7 @@ const marker = node();
 const section = {dataset: {sectionId: 'section', codeVersion: '2022'}, closest: () => panel, querySelector: () => marker};
 const draft = {value: 'Unsaved note text'};
 const c = vm.createContext({
+  readerCommentCount: () => 0, updateReaderCommentIndicator() {},
   track: {querySelectorAll: selector => selector.includes('.inline-comment') ? wrappers : selector.includes('.chapter-section') ? [section] : []},
   document: {activeElement: draft}, CSS: {escape: value => value},
   currentContentSummary() {reads++; return {projects: [project], projectSections: links};},

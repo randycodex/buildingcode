@@ -20901,3 +20901,17 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .project-open-questions [role="status"]:empty { display: none; }
 .search-source-bulk-actions { display: flex; gap: 12px; padding: 4px 0 12px; border-bottom: 1px solid var(--border); }
 .search-source-bulk-actions button { font-size: 12px; padding: 4px 6px; }
+
+.section-detail-comments-editor { display: grid; gap: var(--space-5); }
+.section-detail-comment-number { margin-bottom: var(--space-2); color: var(--text-secondary); font-family: var(--ui-font-family); font-size: var(--reader-font-size) !important; line-height: 1.4; }
+.section-detail-add-comment { display: block; margin: var(--space-2) auto; justify-self: center; }
+.annotated-code-block > .inline-comment.has-passage-comments { opacity: 1; pointer-events: auto; }
+.annotated-code-block:not(:hover):not(:focus-within) > .inline-comment.has-passage-comments > :not(.inline-comment-toggle):not(.inline-bookmark-toggle) { visibility: hidden; }
+.annotated-code-block:not(:hover):not(:focus-within) > .inline-comment.has-saved-section > .inline-comment-toggle:not([hidden]) { visibility: visible; }
+.inline-comment-toggle svg { width: 16px; height: 16px; }
+.reader-content .notebook-evidence-highlight { background: transparent; color: var(--reader-notes-active-text); border-radius: 0; }
+.report-project-source-section > summary { padding: var(--space-3) 0; cursor: pointer; }
+.report-project-source-section > .report-source-card { margin-left: var(--space-3); }
+.report-source-card .report-source-comment { margin-top: var(--space-3); padding-left: var(--space-3); white-space: pre-wrap; -webkit-line-clamp: unset; overflow: visible; }
+.reader-section-heading-row > .reader-section-actions { margin: 0; align-self: center; opacity: 1; pointer-events: auto; }
+.inline-comment-toggle[hidden] { display: none !important; }

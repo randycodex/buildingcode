@@ -1,3 +1,4 @@
+import { evidenceComments, serializeEvidenceComments } from "../public/evidence-comments.js";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
@@ -53,7 +54,7 @@ try {
     await post("/sync/push", { batch: { user: { id: userID }, mutations } });
   }
   const recordsChecklist = [{id:"plans",label:"Approved plans",status:"requested",note:"Request pending"}];
-  await push([{ project: { recordsChecklist, id: "synthetic-project-record", userID, clientID: projectID, name: "Export review Project",
+  await push([{ project: { recordsChecklist, id: "synthetic-project-record", userID, clientID: projectID, name: "Export review Project", description: "Synthetic proposed work context", address: "Synthetic site",
     codeVersion: defaultSyncCodeVersion, colorHex: "#334455", sortOrder: 0, updatedAt } },
     ...savedRecords.map((record, index) => ({ projectSection: { ...record, id: `saved-project-${index}`, userID, updatedAt } })),
     { annotation: { id: "scope-note", userID, sectionID: String(current.id), codeVersion: defaultSyncCodeVersion, blockID: "", noteBody: "Original scope note.", updatedAt } },
@@ -72,6 +73,12 @@ try {
   let palette = await post("/reports/sources/list", { projectID });
   assert.equal(palette.sources.filter(source => source.kind === "evidence").length, 4);
   assert.equal(palette.warnings.length, 0);
+  const contextSource = palette.sources.find(source => source.projectSection === "context");
+  assert.equal(contextSource.id, `${projectID}:context`);
+  assert.equal(contextSource.summary, "Synthetic proposed work context");
+  assert.ok(!palette.sources.find(source => source.projectSection === "facts").summary.includes("Synthetic proposed work context"));
+  const contextPreview = await post('/reports/sources/preview', {projectID, kind: 'projectFacts', sourceID: contextSource.id});
+  assert.ok(JSON.stringify(contextPreview).includes("Synthetic proposed work context"));
   for (const [index, section] of [current, historical, table, deadEnd].entries()) {
     const source = palette.sources.find(source => source.id === reportSavedSourceID(savedRecords[index]));
     assert.equal(source.sectionID, String(section.id));
@@ -200,6 +207,13 @@ try {
   assert.equal(excludedReport.manifest.items.find(item=>item.kind === "evidence").passageText,paragraphEvidence.passageText,
     "Excluding a comment must never alter the enacted passage");
   assert(paragraphReport.manifest.items.some(item=>item.text === "Only the selected final exception."), "Prior export remains immutable");
+  const multipleComments = serializeEvidenceComments(["First review comment", "Second review comment"]);
+  await push([{ annotation: {id:"scope-note",userID,sectionID:String(current.id),codeVersion:defaultSyncCodeVersion,blockID:"",noteBody:multipleComments,updatedAt:"2026-10-21T22:00:00.000Z"} }]);
+  const restored = (await post("/sync/pull", {})).mutations.find(m => m.annotation?.noteBody === multipleComments).annotation;
+  assert.deepEqual(evidenceComments(restored.noteBody), ["First review comment", "Second review comment"]);
+  const multiPreview = await post('/reports/sources/preview', {projectID,kind:'evidence',sourceID:blocks[0].sourceID});
+  assert.ok(JSON.stringify(multiPreview).includes("Second review comment"));
+  assert.ok(!JSON.stringify(multiPreview).includes("## Passage comments"), "Export presentation hides storage formatting");
   // Keep a real owned Project when testing a downgrade; Free cannot create Projects.
   await post("/admin/lifetime-grants/revoke", { userID }, 200, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   await post("/reports/drafts/save", { projectID, expectedVersion: 0, title: "Free report", reportDate: "2026-10-10", blocks: [] }, 403);

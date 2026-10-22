@@ -1,5 +1,6 @@
+import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=2";
 import { createAssistantMaterials } from "./assistant-materials.js?v=4";
-import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=2";
+import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=3";
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
@@ -8,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-reader-text-highlight-v1250";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-evidence-comments-v1253";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -133,7 +134,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261021-reader-text-highlight-v1250";
+} from "./offline-storage.js?v=20261021-evidence-comments-v1253";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -166,7 +167,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261021-reader-text-highlight-v1250";
+} from "./workspace-state.js?v=20261021-evidence-comments-v1253";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -341,7 +342,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261018-light-scroll-fades-v43";
+const notebookClientVersion = "20261021-evidence-comments-v44";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -13011,6 +13012,7 @@ function refreshVisibleSyncedDerivedState() {
   // made a single sync quadratic in the number of blocks in a large section.
   const summary = targets.size ? currentContentSummary() : null;
   const savedState = summary ? {
+    summary,
     savedKeys: workspaceSavedEvidenceKeys(summary),
     project: workspaceProject(summary.projects || [])
   } : null;
@@ -13032,8 +13034,8 @@ function refreshVisibleSyncedDerivedState() {
     notes?.dispatchEvent(new CustomEvent("permitext-folder-save", {
       detail: { saved: isSectionSaved(sectionPayload) }
     }));
-    const textarea = notes?.querySelector("textarea");
-    if (textarea && textarea !== focusedElement) textarea.value = detailNoteValueForTarget(target);
+    const textarea = notes?.querySelector(".section-detail-comments-editor");
+    if (textarea && !textarea.contains(focusedElement)) textarea.value = detailNoteValueForTarget(target);
   });
 
   openProjectDetails().forEach((detail) => {
@@ -15426,6 +15428,7 @@ function setAnnotationNoteValue(target, value, onStatus = () => {}) {
     deletedAt: deleteEmptyAnnotation ? new Date().toISOString() : null
   });
   upsertLocalAnnotation(record);
+  readerCommentIndex = null;
   scheduleAnnotationPush(record, onStatus);
   refreshVisiblePlanUsage();
   return true;
@@ -16298,13 +16301,16 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
     blockID: ""
   }, "", savedKeys);
   const savedSection = Boolean(savedWholeSectionRecord);
-  const savedMarker = renderInlineCommentBox(section, reader, annotationTargetForSection(section, reader), {
+  const sectionControls = renderInlineCommentBox(section, reader, annotationTargetForSection(section, reader), {
     showBookmark: savedSection, bookmarkStateResolved: true, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true
-  }).querySelector('.inline-bookmark-toggle');
+  });
+  sectionControls.classList.add("reader-section-actions");
+  sectionControls.querySelectorAll(".inline-research-toggle, .inline-note-toggle").forEach(button => button.remove());
+  const savedMarker = sectionControls.querySelector(".inline-bookmark-toggle");
   savedMarker.classList.add('reader-section-saved-marker');
   savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Evidence' : 'Save section');
   savedMarker.title = savedSection ? 'Remove section from Evidence' : 'Save section';
-  headingRow.append(sectionHeading, savedMarker);
+  headingRow.append(sectionHeading, sectionControls);
   sectionWrapper.append(headingRow);
 
   if (privateContentAllowed) {
@@ -17206,6 +17212,15 @@ async function addPassageToNotebook(anchor, source, exact) {
     confirmLabel: "Add to note", choiceLabel: "Destination Note", container: anchor.closest(".workspace-panel"),
     choices: [{ value: "new", label: "New Note" }] });
   if (!destination || !current()) return;
+  const availableComments = evidenceComments(detailNoteValueForTarget(source)).filter(comment => comment.trim());
+  let comments = [];
+  if (availableComments.length) {
+    const choice = await openWebWarning({ title: "Include comments?", message: "Choose whether to copy the passage comments into the Note.",
+      confirmLabel: "Add to note", choiceLabel: "Comments", container: anchor.closest(".workspace-panel"),
+      choices: [{ value: "include", label: "Include comments" }, { value: "omit", label: "Passage only" }] });
+    if (!choice || !current()) return;
+    if (choice === "include") comments = availableComments;
+  }
   const label = `${source.codePrefix} · ${researchCodeEdition(source)} · § ${source.sectionNumber} · ${source.title}`;
   const link = { id: crypto.randomUUID(), label, relationshipRole: "context", projectID, noteTextVersion: 1,
     source: { ...source, sourceID: String(source.sectionID), sectionID: String(source.sectionID),
@@ -17213,18 +17228,37 @@ async function addPassageToNotebook(anchor, source, exact) {
     passages: [{ exact: String(exact).trim() }], createdAt: new Date().toISOString() };
   const reference = { referenceKind: "selectedPassage", referenceID: link.id, label };
   if (destination === "current") {
-    await mount.insertLinkedReference(target.id, reference, link);
+    await mount.insertLinkedReference(target.id, reference, link, comments);
     return;
   }
   if (navigator.onLine === false) throw new Error("Reconnect to create a Note.");
   const document = emptyNotebookDocument();
-  document.document = notebookReferenceBlocks(reference, link.passages);
+  document.document = notebookReferenceBlocks(reference, link.passages, comments);
   const payload = await postResearch("/notebook/cards/save", { projectID, clientMutationID: `passage-note:${link.id}`,
     expectedVersion: 0, cardType: "finding", title: source.title.slice(0, 300), document, evidenceLinks: [link] });
   requireCurrentAccountRequest(identity);
   await saveNotebookCardSnapshot(identity.userID, projectID, payload.card);
   if (!current()) return;
   showNotebookSavedLink(anchor, project, payload.card);
+}
+
+let readerCommentIndex = null;
+function readerCommentCount(target, snapshot = null) {
+  if (!readerCommentIndex) {
+    const summary = snapshot || currentContentSummary();
+    const records = consolidatedSavedAnnotations(summary.annotations || [], summary);
+    readerCommentIndex = new Map(records.map(record => [visibleSyncedTargetKey(record), evidenceComments(record.noteBody).filter(text => text.trim()).length]));
+    queueMicrotask(() => { readerCommentIndex = null; });
+  }
+  return readerCommentIndex.get(visibleSyncedTargetKey(target)) || 0;
+}
+function updateReaderCommentIndicator(wrapper, count) {
+  const button = wrapper.querySelector(".inline-comment-toggle");
+  if (!button) return;
+  button.hidden = !count;
+  button.setAttribute("aria-label", `Open ${count} ${count === 1 ? "comment" : "comments"} in Evidence detail`);
+  button.title = button.getAttribute("aria-label");
+  wrapper.classList.toggle("has-passage-comments", Boolean(count));
 }
 
 function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader), options = {}) {
@@ -17264,6 +17298,19 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       if (allowed()) await showWebNotice("Passage not added", error.message);
     } finally { noteButton.disabled = !allowed(); }
   });
+  const commentButton = document.createElement("button");
+  commentButton.type = "button";
+  commentButton.className = "inline-comment-toggle icon-button";
+  commentButton.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-6 4v-4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h7"/></svg>';
+  commentButton.addEventListener("click", async () => {
+    if (!allowed() || commentButton.disabled) return;
+    commentButton.disabled = true;
+    try {
+      await openSavedItemInReader(readerPassagePayload(section, reader, target), paneIDForReader(reader));
+    } catch (error) { if (allowed()) presentWorkspaceIssue(error.message); }
+    finally { commentButton.disabled = !allowed(); }
+  });
+  wrapper.append(commentButton);
   const updateResearchControl = () => {
     if (!allowed()) return;
     researchButton.innerHTML = researchActionIconSVG();
@@ -17281,6 +17328,8 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     bookmarkButton.disabled = !permitted;
     researchButton.hidden = !permitted;
     researchButton.disabled = !permitted;
+    commentButton.disabled = !permitted;
+    updateReaderCommentIndicator(wrapper, permitted ? readerCommentCount(target) : 0);
     if (!permitted) return;
     const saved = gate && !(options.bookmarkStateResolved && (initialRender === true || subscribingToAccess)) ? Boolean(isSectionSaved({
       sectionID: target.sectionID || section.id,
@@ -17807,6 +17856,7 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
   wrappers.forEach((wrapper) => {
     if (!readerPrivateContentAllowed(wrapper.closest(".reader-panel"))) return;
     const wrapperBlockID = normalizeAnnotationBlockID(wrapper.dataset.commentBlockId);
+    updateReaderCommentIndicator(wrapper, readerCommentCount({ sectionID, codeVersion: exactCodeVersion, blockID: wrapperBlockID }, savedState?.summary));
     const savedRecord = isSectionSaved({
       sectionID,
       codeVersion: exactCodeVersion,
@@ -21035,50 +21085,13 @@ async function renderSectionDetail(searchID, detail) {
   notesHeader.className = "section-detail-notes-header";
   const commentScope = sectionTarget.blockID ? "Passage comment" : "Section comment";
   const notesTitle = document.createElement("h3");
-  notesTitle.textContent = commentScope;
+  notesTitle.textContent = `${commentScope}s`;
   const saveState = document.createElement("span");
   saveState.className = "section-detail-note-state";
   saveState.setAttribute("role", "status");
   notesHeader.append(notesTitle, saveState);
-  const textareaWrap = document.createElement("label");
-  textareaWrap.className = "section-detail-note-box";
-  const textarea = document.createElement("textarea");
-  textarea.value = noteBody;
-  textarea.placeholder = sectionTarget.blockID ? "Add a comment on the highlighted passage" : "Add a comment on this section";
-  textarea.setAttribute("aria-label", `${commentScope} for ${sectionDisplayTitle(sectionPayload.sectionNumber, sectionPayload.title)}`);
-  const noteResizeHandle = document.createElement("div");
-  noteResizeHandle.className = "section-detail-note-resize-handle";
-  noteResizeHandle.setAttribute("role", "separator");
-  noteResizeHandle.setAttribute("aria-label", "Resize comment");
-  noteResizeHandle.setAttribute("aria-orientation", "horizontal");
-  noteResizeHandle.tabIndex = 0;
-  const resizeNoteTo = (height) => {
-    const maximumHeight = Math.min(window.innerHeight * 0.7, 760);
-    textarea.style.height = `${Math.max(118, Math.min(maximumHeight, height))}px`;
-  };
-  noteResizeHandle.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    const startY = event.clientY;
-    const startHeight = textarea.getBoundingClientRect().height;
-    noteResizeHandle.setPointerCapture(event.pointerId);
-    const resize = (moveEvent) => resizeNoteTo(startHeight + moveEvent.clientY - startY);
-    const finish = () => {
-      window.removeEventListener("pointermove", resize);
-      window.removeEventListener("pointerup", finish);
-      window.removeEventListener("pointercancel", finish);
-    };
-    window.addEventListener("pointermove", resize);
-    window.addEventListener("pointerup", finish);
-    window.addEventListener("pointercancel", finish);
-  });
-  noteResizeHandle.addEventListener("keydown", (event) => {
-    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
-    event.preventDefault();
-    const direction = event.key === "ArrowDown" ? 1 : -1;
-    resizeNoteTo(textarea.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16));
-  });
-  textareaWrap.append(textarea, noteResizeHandle);
-  notes.append(notesHeader, textareaWrap);
+  const textarea = createEvidenceCommentsEditor(noteBody, `${commentScope} for ${sectionDisplayTitle(sectionPayload.sectionNumber, sectionPayload.title)}`);
+  notes.append(notesHeader, textarea);
   panel.__annotationTarget = sectionTarget;
   panel.__sectionPayload = sectionPayload;
   const syncDetailBookmark = (event) => {
@@ -21239,7 +21252,7 @@ async function renderSectionDetail(searchID, detail) {
       saveState.textContent = "Couldn’t save on this device";
     }
   };
-  textarea.addEventListener("focus", () => {
+  textarea.addEventListener("focusin", () => {
     if (!workspaceProject()) void chooseProjectForSaving();
   });
   textarea.addEventListener("input", persistNote);
@@ -21263,7 +21276,15 @@ async function renderSectionDetail(searchID, detail) {
       if (panel.isConnected && readerPrivateContentAllowed(panel)) await showWebNotice("Passage not added", error.message);
     } finally { addNote.disabled = false; }
   });
-  content.append(codeLabelElement, chapterLabel, heading, chapterTitle, body, addNote, notes);
+  const addComment = document.createElement("button");
+  addComment.type = "button";
+  addComment.className = "workflow-action workflow-action-secondary section-detail-add-comment";
+  addComment.textContent = "Add comment";
+  addComment.hidden = notes.hidden;
+  addComment.addEventListener("click", () => {
+    if (readerPrivateContentAllowed(panel)) textarea.addComment();
+  });
+  content.append(codeLabelElement, chapterLabel, heading, chapterTitle, body, addNote, addComment, notes);
   panel.append(chrome, content);
   return panel;
 }
@@ -28894,7 +28915,7 @@ async function renderProjectNotebook(project, options = {}) {
     mountState.focusCard = loadCard;
     mountState.insertionTarget = () => !disposed && !notebookReadOnly && !saveConflict && activeCard && editorMount
       ? { id: activeCard.id, title: activeCard.title, identity: notebookCardIdentity(activeCard) } : null;
-    mountState.insertLinkedReference = async (cardID, reference, evidenceLink = null) => {
+    mountState.insertLinkedReference = async (cardID, reference, evidenceLink = null, comments = []) => {
       requireCurrentAccountRequest(requestIdentity);
       if (disposed || notebookReadOnly || saveConflict || activeCard?.id !== cardID || !editorMount) {
         throw new Error("The destination Note changed or is unavailable. Choose it again.");
@@ -28902,7 +28923,7 @@ async function renderProjectNotebook(project, options = {}) {
       const previousLinks = activeCard.evidenceLinks || [];
       if (evidenceLink) activeCard.evidenceLinks = [...previousLinks, evidenceLink];
       try {
-        if (editorMount.appendReference(reference, evidenceLink?.passages) === false) throw new Error("The Note editor is still loading. Try again.");
+        if (editorMount.appendReference(reference, evidenceLink?.passages, comments) === false) throw new Error("The Note editor is still loading. Try again.");
       } catch (error) {
         activeCard.evidenceLinks = previousLinks;
         throw error;
@@ -30425,7 +30446,7 @@ async function renderProjectReportDraft(project, resume = null) {
         const key = reportCommentKey(note);
         checkbox.checked = !(block.excludedCommentKeys || []).includes(key);
         const text = document.createElement("span");
-        text.textContent = `${note.blockID ? "Passage comment" : "Section comment"}: ${note.body}`;
+        text.textContent = `${note.blockID ? "Passage comment" : "Section comment"}: ${evidenceCommentsText(note.body)}`;
         checkbox.addEventListener("change", () => {
           const excluded = new Set(block.excludedCommentKeys || []);
           if (checkbox.checked) excluded.delete(key); else excluded.add(key);
@@ -30785,6 +30806,15 @@ async function renderProjectReportDraft(project, resume = null) {
       const summary = document.createElement("p");
       summary.textContent = source.summary || "Project source";
       copy.append(heading, summary);
+      if (source.kind === "evidence") {
+        const comments = (source.notes || []).flatMap(note => evidenceComments(note.body)).filter(text => text.trim());
+        comments.forEach((text, index) => {
+          const comment = document.createElement("p");
+          comment.className = "report-source-comment";
+          comment.textContent = `Comment ${index + 1}: ${text}`;
+          copy.append(comment);
+        });
+      }
       const add = document.createElement("button");
       add.type = "button";
       add.textContent = "Add";
@@ -30806,9 +30836,19 @@ async function renderProjectReportDraft(project, resume = null) {
       container.append(row);
     };
 
-    const projectFactsSources = sources.filter((source) => source.kind === "projectFacts");
-    appendSourceGroup("Project facts", "", (groupBody) => {
-      projectFactsSources.forEach((source) => appendSourceCard(groupBody, source));
+    const projectFactsSources = sources.filter((source) => source.kind === "projectFacts" && !source.hiddenFromPicker);
+    appendSourceGroup("Project", "", (groupBody) => {
+      for (const [section, label] of [["context", "Context"], ["facts", "Facts"]]) {
+        const group = document.createElement("details");
+        group.className = "report-project-source-section";
+        const title = document.createElement("summary");
+        title.textContent = label;
+        group.append(title);
+        const items = projectFactsSources.filter(source => (source.projectSection || (source.id.endsWith(":context") ? "context" : "facts")) === section);
+        items.forEach(source => appendSourceCard(group, source));
+        if (!items.length) { const empty = document.createElement("p"); empty.textContent = `No ${label.toLowerCase()} added yet.`; group.append(empty); }
+        groupBody.append(group);
+      }
     });
 
     for (const [kind, label] of [["evidence", "Evidence"], ["notebookCard", "Notes"]]) {
@@ -37189,7 +37229,7 @@ function annotationEvidenceIsVisible(annotation) {
   return Boolean(note) || tags.some((tag) => String(tag || "").trim());
 }
 
-function consolidatedSavedAnnotations(annotations = []) {
+function consolidatedSavedAnnotations(annotations = [], summary = null) {
   if (!annotations.length) return [];
   // This is one synchronous render pass. Read authoritative overlays once, then
   // index by edition, section and passage; never retain this snapshot across edits.
@@ -37203,7 +37243,7 @@ function consolidatedSavedAnnotations(annotations = []) {
     String(annotation?.sectionID || ""),
     normalizeAnnotationBlockID(annotation?.blockID || annotation?.anchorID || annotation?.contentBlockID)
   ].join(":");
-  (currentContentSummary().annotations || []).forEach((annotation) => {
+  ((summary || currentContentSummary()).annotations || []).forEach((annotation) => {
     const key = targetKey(annotation);
     if (!recordsByTarget.has(key)) recordsByTarget.set(key, []);
     recordsByTarget.get(key).push(annotation);
@@ -37688,7 +37728,7 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
   meta.textContent += ` · ${savedEvidenceEdition(item)}`;
   if (options.inbox) meta.textContent = `${item.codePrefix || item.code || "BC"} · ${savedEvidenceEdition(item)} · § ${sectionNumber}`;
   const annotation = annotationForTarget(item, "", "", annotationSnapshot);
-  const notePreview = String(item.noteBody || annotation.noteBody || "").trim();
+  const notePreview = evidenceCommentsText(item.noteBody || annotation.noteBody || "");
   const title = document.createElement(item.isNestedListParagraph ? "span" : "strong");
   title.className = "saved-section-title";
   title.textContent = titleText;

@@ -1,3 +1,4 @@
+import { evidenceComments, serializeEvidenceComments } from "../public/evidence-comments.js";
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
@@ -6,12 +7,12 @@ import {notebookReferenceBlocks} from '../public/notebook-passage-blocks.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const start=source.indexOf('async function addPassageToNotebook(');
 const code=source.slice(start,source.indexOf('\nfunction renderInlineCommentBox(',start));
-for(const mode of ['current','unsaved','new','cancel','changed','account','detached','other-project']) {
+for(const mode of ['current','unsaved','new','cancel','changed','account','detached','other-project','include','omit','comment-cancel']) {
  const calls=[]; let complete;
  const pending=new Promise(resolve=>complete=resolve);
- const hasOpenNote=['current','unsaved','account','detached'].includes(mode);
+ const hasOpenNote=['current','unsaved','account','detached','include','omit','comment-cancel'].includes(mode);
  const mount={insertionTarget:()=>({id:mode==='unsaved'?'':'note',title:'Existing writing'}),insertLinkedReference:async(...args)=>calls.push(['insert',...args])};
- const context=vm.createContext({window:{requestAnimationFrame:()=>{}},workspaceProject:()=>({id:'p'}),captureAccountRequest:()=>({userID:'u'}),
+ const context=vm.createContext({evidenceComments,detailNoteValueForTarget:()=>['include','omit','comment-cancel'].includes(mode)?serializeEvidenceComments(['First comment','Second comment']):'',window:{requestAnimationFrame:()=>{}},workspaceProject:()=>({id:'p'}),captureAccountRequest:()=>({userID:'u'}),
  isCurrentAccountRequest:()=>mode!=='account',requireCurrentAccountRequest(){},activeWorkspaceID:'w',state:{workflowNavigationGeneration:0},
  researchProjectID:p=>p.id,notebookMounts:new Map(hasOpenNote?[['p',mount]]:mode==='other-project'?[['other',mount]]:[]),
  openWebWarning:options=>{calls.push(['choose',options]);return pending;},
@@ -22,15 +23,17 @@ for(const mode of ['current','unsaved','new','cancel','changed','account','detac
  const action=context.addPassageToNotebook({isConnected:mode!=='detached',closest:()=>({dataset:{paneId:'reader'}})},
  {sectionID:'123',sectionNumber:'1020.4',title:'Dead ends',codePrefix:'BC',codeVersion:'historical/2014'},'Exact paragraph including its exception.');
  if(mode==='changed')context.activeWorkspaceID='different';
- complete(mode==='cancel'?false:'new');await action;
+ complete(['cancel','comment-cancel'].includes(mode)?false:mode==='include'?'include':mode==='omit'?'omit':'new');await action;
  const mutations=calls.filter(call=>['insert','save','saved'].includes(call[0]));
- if(['cancel','changed','account','detached'].includes(mode)){assert.equal(mutations.length,0);continue;}
+ if(['cancel','comment-cancel','changed','account','detached'].includes(mode)){assert.equal(mutations.length,0);continue;}
+ if(mode==='include')assert.deepEqual(Array.from(mutations[0][4]),['First comment','Second comment']);
+ if(mode==='omit')assert.equal(mutations[0][4].length,0);
  const link=hasOpenNote?mutations[0][3]:mutations[0][1].evidenceLinks[0];
  const normalized=normalizeNotebookEvidenceLinks([link])[0];
  assert.equal(normalized.passages[0].exact,'Exact paragraph including its exception.');
  assert.equal(normalized.source.codeVersion,'historical/2014');assert.equal(normalized.source.codeEdition,'2014');
  assert.equal(normalized.source.sectionID,'123');
- if(hasOpenNote){assert.equal(calls.length,1,'An open Note inserts directly without a dialog or new Note.');assert.equal(calls[0][1],mode==='unsaved'?'':'note');assert.equal(calls[0][2].referenceKind,'selectedPassage');}
+ if(hasOpenNote){assert.equal(calls.length,['include','omit'].includes(mode)?2:1,'Only comments introduce an optional transfer choice.');assert.equal(mutations[0][1],mode==='unsaved'?'':'note');assert.equal(mutations[0][2].referenceKind,'selectedPassage');}
  else {assert.equal(calls[0][0],'choose');assert.equal(mutations[0][0],'save');assert.equal(mutations[0][1].projectID,'p');assert.equal(mutations[1][0],'saved');assert.equal(mutations[0][1].document.document[0].content[0].props.referenceID,link.id);assert.equal(mutations[0][1].document.document[1].content[0].text,link.passages[0].exact);}
 }
 const mountStart=source.indexOf('    mountState.insertLinkedReference = async');

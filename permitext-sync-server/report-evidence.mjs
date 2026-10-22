@@ -1,3 +1,4 @@
+import { evidenceCommentsText } from "./public/evidence-comments.js";
 import { reportCommentKey } from "./public/project-workflow.js";
 import { createHash } from "node:crypto";
 import { parseFragment } from "parse5";
@@ -241,7 +242,7 @@ export async function prepareSavedEvidenceItems({ selections, resolveSource }) {
       notes.add(key);
       items.push({ id: `note-label-${sourceIndex}-${index}`, kind: "heading",
         reportCommentKey: reportCommentKey(note), presentationRole: "comment", text: `Your comment · ${section.codePrefix} § ${section.sectionNumber}${note.label ? ` · ${note.label}` : ""}` });
-      items.push({ id: `note-${sourceIndex}-${index}`, kind: "paragraph", reportCommentKey: reportCommentKey(note), text: note.body });
+      items.push({ id: `note-${sourceIndex}-${index}`, kind: "paragraph", reportCommentKey: reportCommentKey(note), text: evidenceCommentsText(note.body) });
     });
   }
   return { items, sources };

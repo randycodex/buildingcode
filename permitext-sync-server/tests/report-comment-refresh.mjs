@@ -1,3 +1,4 @@
+import { evidenceCommentsText } from "../public/evidence-comments.js";
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
@@ -19,7 +20,7 @@ row.className='report-draft-block';row.dataset.blockId='b';host.dataset.reportCo
 palette.className='report-source-palette';row.append(host);panel.append(row,palette);
 const draft={title:'Unsaved title',blocks:[{id:'b',kind:'evidence',sourceID:'s',excludedCommentKeys:['p']}]};
 const original=structuredClone(draft);
-const c=vm.createContext({panel,activeDraft:draft,sources:[{id:'s',kind:'evidence',sectionID:1,notes:[{body:'Old comment'}]}],
+const c=vm.createContext({evidenceCommentsText,panel,activeDraft:draft,sources:[{id:'s',kind:'evidence',sectionID:1,notes:[{body:'Old comment'}]}],
  document:{createElement:()=>new Element(),createTextNode:text=>Object.assign(new Element(),{textContent:text})},
  reportCommentPresentation,reportCommentKey,disposed:false,requestIdentity:'a',projectID:'p',sourceWarnings:[],
  isCurrentAccountRequest:()=>true,setDirty:()=>{},renderSourcePalette:()=>{},

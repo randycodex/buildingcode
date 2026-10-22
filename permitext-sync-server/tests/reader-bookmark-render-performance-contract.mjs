@@ -25,6 +25,8 @@ class Node {
   querySelectorAll(selector) { return this.children.flatMap(node=>[...(node.matches(selector)?[node]:[]),...node.querySelectorAll(selector)]); }
   closest(selector) {return this.matches(selector)?this:this.parentNode?.closest(selector)||null;}
   setAttribute(name,value){this.attrs[name]=value;}
+  getAttribute(name){return this.attrs[name];}
+  remove(){if(this.parentNode)this.parentNode.children=this.parentNode.children.filter(n=>n!==this);}
   addEventListener(name,fn){this.events[name]=fn;}
   async click(){await this.events.click?.();}
   get isConnected(){return Boolean(this.parentNode)||this.connected===true;}
@@ -47,6 +49,7 @@ const context = vm.createContext({
   activeAccount: () => ({ userID: "a" }), ensureSyncedContentForRender: async () => context.syncedContent,
   loadSyncedContent: async () => context.syncedContent, reconcileProjectWorkspaces() {}, closeDeletedProjectDetails() {}, scopeSavedInstanceToWorkspace() {},
   enforceReaderPlanLimit() {}, renderUtilityWorkspace: async () => {},
+  readerCommentCount: () => 0, updateReaderCommentIndicator() {},
   document: { createElement: tag => new Node(tag) }, syncCodeVersion, defaultSyncCodeVersion, renderReaderBlockBatches,
   currentContentSummary() { reads++; return structuredClone({ projects: [project], projectSections: links }); },
   workspaceProject: projects => projects.find(item => item.id === selected) || null,
@@ -68,7 +71,7 @@ await gate.ready;
 panel.__workspaceAccessGate = gate;
 const previousSaved = target => links.some(link => context.savedEvidenceKey(link) === context.savedEvidenceKey(target) && context.projectSectionBelongsToProject(link, selected === "p1" ? project : null));
 function checkRendered(rendered) {
-  const bookmarks = [rendered.querySelector(".reader-section-saved-marker"), ...rendered.querySelectorAll(".inline-comment").map(node => node.querySelector(".inline-bookmark-toggle"))];
+  const bookmarks = [rendered.querySelector(".reader-section-saved-marker"), ...rendered.querySelectorAll(".inline-comment").filter(node => !node.classList.contains("reader-section-actions")).map(node => node.querySelector(".inline-bookmark-toggle"))];
   const targets = [{ sectionID: section.id, codeVersion: reader.codeVersion, blockID: "" }, ...section.blocks.map(block => ({ sectionID: section.id, codeVersion: reader.codeVersion, blockID: block.id }))];
   assert.equal(bookmarks.length, 501);
   assert.deepEqual(bookmarks.map(button => button.classList.contains("is-saved")), targets.map(previousSaved), "Every bookmark exactly matches prior Project, edition and block membership semantics");

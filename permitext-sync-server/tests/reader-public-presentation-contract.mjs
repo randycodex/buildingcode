@@ -22,6 +22,8 @@ class Node {
   querySelectorAll(selector) { return this.children.flatMap(node=>[...(node.matches(selector)?[node]:[]),...node.querySelectorAll(selector)]); }
   closest(selector) {return this.matches(selector)?this:this.parentNode?.closest(selector)||null;}
   setAttribute(name,value){this.attrs[name]=value;}
+  getAttribute(name){return this.attrs[name];}
+  remove(){if(this.parentNode)this.parentNode.children=this.parentNode.children.filter(n=>n!==this);}
   addEventListener(name,fn){this.events[name]=fn;}
   async click(){await this.events.click?.();}
   get isConnected(){return Boolean(this.parentNode)||this.connected===true;}
@@ -33,7 +35,7 @@ const reader={id:"reader",codePrefix:"BC",codeVersion:"2022",chapterID:"chapter"
 const section={id:"section",sectionNumber:"1",title:"Public heading",readerAliasSectionIDs:[],blocks:[{id:"paragraph",plainText:"Complete public enacted text"}]};
 const target={sectionID:"section",codeVersion:"2022",blockID:"paragraph"};
 const context=vm.createContext({
-  hasCapability:()=>true,
+  hasCapability:()=>true, readerCommentCount:()=>0, updateReaderCommentIndicator(){},
   document:{createElement:tag=>new Node(tag)}, window:{setTimeout:fn=>fn()},
   syncCodeVersion:value=>value, syncCodeVersionForPrefix:()=>"2022", markResearchSelectable(){},
   sectionDisplayTitle:(_number,title)=>title, annotatedBlocksForSection:value=>value.blocks,
@@ -55,12 +57,12 @@ vm.runInContext(subscriptionLifecycle + ["noteAddIconSVG","readerPrivateContentA
 const rendered=context.renderReaderChapterSection(panel,reader,section,new Map());panel.append(rendered);
 const body=rendered.querySelector(".annotated-code-block").children[0];
 const bookmark=rendered.querySelector(".reader-section-saved-marker");
-const inline=rendered.querySelector(".inline-comment");const research=inline.querySelector(".inline-research-toggle");
+const inline=rendered.querySelector(".annotated-code-block").querySelector(".inline-comment");const research=inline.querySelector(".inline-research-toggle");
 const addNote=inline.querySelector(".inline-note-toggle");
 assert.equal(addNote.hidden,true);
 assert.equal(reads,0,"Pending Reader construction must not read saved records or private Research labels.");
 assert.equal(body.textContent,"Complete public enacted text");assert.equal(bookmark.hidden,true);assert.equal(research.hidden,true);
-assert.equal(bookmark.parentNode,rendered.querySelector(".reader-section-heading-row"),"Whole-section extraction retains a real stable bookmark node.");
+assert.equal(bookmark.parentNode.parentNode,rendered.querySelector(".reader-section-heading-row"),"Whole-section extraction retains a real stable bookmark node.");
 const host=new Node("div");panel.append(host);context.renderReaderSectionProjectContext(host,section,reader,panel);
 assert.equal(reads,0,"Project context must not read Project membership, names or note presence while pending.");assert.equal(host.hidden,true);
 await bookmark.click();await research.click();assert.equal(writes,0);
