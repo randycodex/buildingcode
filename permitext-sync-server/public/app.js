@@ -6,10 +6,10 @@ import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSear
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=6";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
-import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
+import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-pinned-divider-v1264";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-note-questions-removed-v1265";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -135,7 +135,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261022-pinned-divider-v1264";
+} from "./offline-storage.js?v=20261022-note-questions-removed-v1265";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -168,7 +168,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261022-pinned-divider-v1264";
+} from "./workspace-state.js?v=20261022-note-questions-removed-v1265";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -17203,8 +17203,7 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       const submission = savePayloads.get(fingerprint) || {projectID: researchProjectID(project), expectedVersion: 0,
         clientMutationID: `occupant-load:${crypto.randomUUID()}`, cardType: "finding",
         title: `Occupant load${calculation.input.factorMode === 'custom' ? ' · Custom factor' : ''} · ${calculation.input.spaceFunction}`.slice(0, 300), document: notebookDocument, evidenceLinks: [link],
-        openQuestions: [{id: crypto.randomUUID(), text: "Review cumulative occupant loads and any applicable exceptions before using this result for egress design.",
-          why: "This snapshot calculates one space only; it does not determine exit count or establish compliance.", status: "open", resolution: ""}]};
+        openQuestions: []};
       savePayloads.set(fingerprint, submission);
       const saved = await postResearch("/notebook/cards/save", submission);
       requireCurrentAccountRequest(identity);
@@ -29541,14 +29540,6 @@ async function renderProjectNotebook(project, options = {}) {
       noteMenu.titleAction.append(reportButton);
       footer.append(reportMembership, footerActions);
       const focusedContent = [editorElement];
-      if (activeCard.openQuestions?.length) {
-        focusedContent.push(createNotebookQuestionsEditor({questions: activeCard.openQuestions, readOnly: notebookReadOnly,
-          onChange(questions) {
-            if (notebookReadOnly || disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-            activeCard.openQuestions = questions;
-            markNotebookDirty();
-          }}));
-      }
       if (notebookReadOnly) panel.append(draftStatus);
       focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
