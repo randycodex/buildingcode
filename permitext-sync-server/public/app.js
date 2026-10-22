@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-incremental-fades-v1261";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-workflow-switch-v1262";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -135,7 +135,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261021-incremental-fades-v1261";
+} from "./offline-storage.js?v=20261021-workflow-switch-v1262";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -168,7 +168,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261021-incremental-fades-v1261";
+} from "./workspace-state.js?v=20261021-workflow-switch-v1262";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -4890,6 +4890,7 @@ function syncReferenceReaderLayout() {
   track.inert = accountOpen || view === "report" || screenOpen && !visibleIDs.length;
 }
 function syncWorkflowColumnPresentation() {
+  if (state.workflowPresentationDeferred) return;
   const view = currentColumnWorkflowView();
   const panes = [...track.querySelectorAll(':scope > .workspace-panel')];
   const changedView = view !== presentedColumnWorkflowView;
@@ -4949,8 +4950,17 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
     if (!workspaceProject()) { await openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton); return false; }
     return openProjectDetailsScreen();
   }
-  closeSharedWorkspaceViews();
-  if (notifyProjectRequiredForColumn()) return false;
+  // A retained Report/Project close callback also presents columns. Defer it
+  // until the requested destination is known, avoiding an intermediate render
+  // of the previously underlying workflow and a second scroll/layout pass.
+  const wasDeferred = state.workflowPresentationDeferred;
+  state.workflowPresentationDeferred = true;
+  try { closeSharedWorkspaceViews(); }
+  finally {
+    if (wasDeferred === undefined) delete state.workflowPresentationDeferred;
+    else state.workflowPresentationDeferred = wasDeferred;
+  }
+  if (notifyProjectRequiredForColumn()) { syncWorkflowColumnPresentation(); return false; }
   view = normalizeWorkflowView(view);
   const visitedViews = state.workflowVisitedViews || [];
   const initializeNotebook = view === "notebook" && !visitedViews.includes(view) && !projectHasOpenNotebook(workspaceProject());

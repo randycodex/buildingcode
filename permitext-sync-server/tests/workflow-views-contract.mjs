@@ -61,7 +61,7 @@ const panes=[reader,notebook], state={workflowVisitedViews:['research','notebook
 const track={scrollLeft:110,querySelectorAll:()=>panes};
 let constructions=0, needProject=false, dividerUpdates=0;
 let reportOpen=false, detailsOpen=false;
-const c=vm.createContext({columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){reportOpen=false;}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){detailsOpen=false;}},toggleSettingsButton:null,toggleReportButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
+const c=vm.createContext({columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){if(reportOpen){reportOpen=false;c.syncWorkflowColumnPresentation();}}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){if(detailsOpen){detailsOpen=false;c.syncWorkflowColumnPresentation();}}},toggleSettingsButton:null,toggleReportButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
   document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
   syncNotebookNoteTabs(){},ensureNotebookTabCatalog:async()=>{},syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){},schedulePaneDividerAddControls(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
@@ -109,6 +109,16 @@ assert.equal(await c.switchWorkflowView('project'), true); assert.equal(projectO
 c.projectHasOpenNotebook = () => panes.includes(notebook);
 c.defaultActivePaneIDs = () => panes.map(p => p.dataset.paneId);
 state.workflowVisitedViews = ['research', 'notebook'];
+// Real mounted screen close callbacks present the underlying view. A switch
+// must not lay that intermediate view out before showing the requested one.
+for (const screen of ['report','project-details']) {
+ state.workflowView='research';reportOpen=screen==='report';detailsOpen=screen==='project-details';
+ c.syncWorkflowColumnPresentation();const before=dividerUpdates;
+ await c.switchWorkflowView('notebook');
+ assert.equal(dividerUpdates,before+1,'A mounted screen-to-Notebook switch presents only its final destination.');
+ assert.equal(state.workflowPresentationDeferred,undefined,'Deferral never leaks into saved workspace state.');
+ assert.equal(notebook.draft,'Unsaved text');assert.equal(notebook.scrollTop,450);
+}
 console.log('Workflow views passed: independent visibility, linked destinations, layout persistence, retained editors, nested scroll and project guard.');
 
 const closed=[];
