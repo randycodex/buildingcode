@@ -129,7 +129,34 @@ try {
   assert.equal(recovery.undoNotice.hidden,true,'A replacement source value invalidates stale Undo');
   click(undo);
   assert.equal(recovery.value,'Changed from another client');
+  const retainedHistory={};
+  const priorMount=createEvidenceCommentsEditor(serializeEvidenceComments(['A','Recover B','C']),'Passage comment',retainedHistory);
+  click(priorMount.querySelectorAll('button')[1]);
+  const nextMount=createEvidenceCommentsEditor(priorMount.value,'Passage comment',retainedHistory);
+  assert.equal(nextMount.undoNotice.hidden,false,'Undo survives a sync-triggered editor remount');
+  click(nextMount.undoNotice.querySelector('button'));
+  assert.deepEqual(evidenceComments(nextMount.value),['A','Recover B','C']);
+  click(nextMount.querySelectorAll('button')[1]);
+  const changedMount=createEvidenceCommentsEditor('Different remote value','Passage comment',retainedHistory);
+  assert.equal(changedMount.undoNotice.hidden,true,'A changed remote value invalidates remounted Undo');
 } finally { globalThis.document=priorDocument; }
 console.log('Individual comment deletion: middle/first/last, surviving drafts, renumbering, reload, focus, autosave and read-only guards passed');
 
 console.log('Comment Undo passed: original position, newer edits, new comments, repeated deletions, final comment, autosave, sync acknowledgements and read-only/stale guards');
+
+// Retained recovery text is scoped to the current account, workspace and exact
+// passage; changing one scope cannot offer another scope's deleted comment.
+const scopedRuntime=vm.createContext({accountRuntimeGeneration:1,activeWorkspaceID:'workspace-a',userID:'account-a',
+  activeAccount:()=>({userID:scopedRuntime.userID}),visibleSyncedTargetKey:target=>[target.codeVersion,target.sectionID,target.blockID].join(':')});
+vm.runInContext('const evidenceCommentUndoStates=new Map();let evidenceCommentUndoScope="";\n'+actual('evidenceCommentUndoState'),scopedRuntime);
+const target={sectionID:'section',codeVersion:'2022',blockID:'paragraph'};
+const history=scopedRuntime.evidenceCommentUndoState(target);
+history.deletions=[{text:'Private recovery text',index:0}];
+assert.equal(scopedRuntime.evidenceCommentUndoState(target),history);
+assert.equal(scopedRuntime.evidenceCommentUndoState({...target,codeVersion:'2014'}).deletions,undefined);
+assert.equal(scopedRuntime.evidenceCommentUndoState({...target,blockID:'another'}).deletions,undefined);
+scopedRuntime.activeWorkspaceID='workspace-b';
+assert.equal(scopedRuntime.evidenceCommentUndoState(target).deletions,undefined);
+scopedRuntime.userID='account-b';
+assert.equal(scopedRuntime.evidenceCommentUndoState(target).deletions,undefined);
+console.log('Retained comment Undo: exact passage/edition, account and workspace isolation passed');

@@ -25,12 +25,12 @@ export function evidenceCommentBlocks(comments = []) {
     type: 'paragraph', content: [{ type: 'text', text: `Comment ${index + 1}: ${text}`, styles: {} }]
   }));
 }
-export function createEvidenceCommentsEditor(value, label) {
+export function createEvidenceCommentsEditor(value, label, history = {}) {
   const editor = document.createElement('div');
   editor.className = 'section-detail-comments-editor';
   let readOnly = false;
   let initialized = false;
-  const deletions = [];
+  const deletions = history.deletions ||= [];
   const undoNotice = document.createElement('div');
   undoNotice.className = 'section-detail-comment-undo';
   undoNotice.hidden = true;
@@ -59,15 +59,15 @@ export function createEvidenceCommentsEditor(value, label) {
   };
   undo.addEventListener('click', () => {
     if (readOnly || !deletions.length) return;
-    const { box, index, next } = deletions.pop();
-    const before = next?.parentElement === editor ? next : editor.children[Math.min(index, editor.children.length)] || null;
-    editor.insertBefore(box, before);
+    const { text, index } = deletions.pop();
+    const before = editor.children[Math.min(index, editor.children.length)] || null;
+    const input = add(text, before);
     renumber();
     refreshUndo();
-    box.querySelector('textarea').focus();
+    input.focus();
     editor.dispatchEvent(new Event('input', { bubbles: true }));
   });
-  const add = text => {
+  const add = (text, before = null) => {
     const box = document.createElement('div');
     box.className = 'section-detail-note-box';
     const number = editor.children.length + 1;
@@ -91,7 +91,7 @@ export function createEvidenceCommentsEditor(value, label) {
     remove.addEventListener('click', () => {
       if (readOnly || box.parentElement !== editor) return;
       const index = [...editor.children].indexOf(box);
-      deletions.push({ box, index, next: editor.children[index + 1] || null });
+      deletions.push({ text: input.value, index });
       if (deletions.length > 50) deletions.shift();
       box.remove();
       refreshUndo();
@@ -104,7 +104,7 @@ export function createEvidenceCommentsEditor(value, label) {
     });
     header.append(marker, remove);
     box.append(header, input);
-    editor.append(box);
+    editor.insertBefore(box, before);
     return input;
   };
   Object.defineProperties(editor, {
@@ -112,11 +112,12 @@ export function createEvidenceCommentsEditor(value, label) {
       set: next => {
         if (initialized && next === editor.value) return;
         initialized = true;
-        deletions.length = 0;
+        if (next !== history.value) deletions.length = 0;
+        history.value = next;
         refreshUndo();
         editor.replaceChildren();
         const comments = evidenceComments(next);
-        (comments.length ? comments : ['']).forEach(add);
+        (comments.length ? comments : ['']).forEach(text => add(text));
       } },
     readOnly: { get: () => readOnly, set: next => {
       readOnly = next;
@@ -130,6 +131,7 @@ export function createEvidenceCommentsEditor(value, label) {
     add('').focus();
     editor.dispatchEvent(new Event('input', { bubbles: true }));
   };
+  editor.addEventListener('input', () => { history.value = editor.value; });
   editor.value = value;
   return editor;
 }
