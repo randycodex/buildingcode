@@ -3,7 +3,7 @@ import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {evidenceComments,serializeEvidenceComments} from '../public/evidence-comments.js';
 import {syncCodeVersion,defaultSyncCodeVersion,historicalConstructionSyncCodeVersion} from '../public/sync-identity.js';
-import {bulkClearTimestamp} from '../public/sync-state.js';
+import {bulkClearTimestamp,indexBulkClears} from '../public/sync-state.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.indexOf(`function ${name}(`);assert.ok(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
 const target={sectionID:101,codeVersion:defaultSyncCodeVersion,blockID:'paragraph'};
@@ -12,7 +12,7 @@ const remote=[{...target,id:'server-normalized-id',noteBody:body,tags:[],updated
   {...target,id:'other-passage',blockID:'other',noteBody:'Unchanged other passage',tags:[],updatedAt:'2026-10-21T18:00:00Z'}];
 const state={localAnnotations:[{...target,id:'web-local-id',noteBody:'',tags:[],deletedAt:'2026-10-21T18:01:00Z',updatedAt:'2026-10-21T18:01:00Z'}]};
 let reads=0,flush;
-const c=vm.createContext({state,evidenceComments,syncCodeVersion,defaultSyncCodeVersion,bulkClearTimestamp,
+const c=vm.createContext({state,evidenceComments,syncCodeVersion,defaultSyncCodeVersion,bulkClearTimestamp,indexBulkClears,
  currentBulkClearRecords:()=>[],queueMicrotask:fn=>{flush=fn;},
  // The UI summary intentionally omits deleted records; the pending tombstone
  // still needs to suppress an older server record with a different ID.

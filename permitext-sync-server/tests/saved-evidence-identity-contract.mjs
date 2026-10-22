@@ -6,7 +6,7 @@ import {
   historicalConstructionSyncCodeVersion,
   syncCodeVersion
 } from "../public/sync-identity.js";
-import { bulkClearTimestamp } from "../public/sync-state.js";
+import { bulkClearTimestamp, indexBulkClears } from "../public/sync-state.js";
 
 const appSource = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 
@@ -84,6 +84,7 @@ const savedIdentity = new Function(
   "syncCodeVersion",
   "defaultSyncCodeVersion",
   "bulkClearTimestamp",
+  "indexBulkClears",
   "state",
   "currentContentSummary",
   "currentBulkClearRecords",
@@ -105,6 +106,7 @@ const savedIdentity = new Function(
   syncCodeVersion,
   defaultSyncCodeVersion,
   bulkClearTimestamp,
+  indexBulkClears,
   state,
   currentContentSummary,
   currentBulkClearRecords,

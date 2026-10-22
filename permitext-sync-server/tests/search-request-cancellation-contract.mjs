@@ -20,6 +20,7 @@ function fixture(){
  renderSearchHistory:async()=>{},searchResultMatchesExactQuery:()=>true,appendSearchResultGroups:()=>paints.push("rows"),saveWorkspaceState(){},
  api(path,options){const d=defer();requests.push({...d,path,signal:options.signal});return d.promise;}
  });
+ c.fetchCodeSearch=c.api;
  vm.runInContext(["normalizeSearchResultSources","applyInitialSearchGroupExpansion","cancelSearchPanelRequest","renderSearchResults","appendSearchLoadMore"].map(actual).join("\n"),c);
  return{c,requests,paints,statuses,panel,results,instance,switchAccount(){generation++;}};
 }

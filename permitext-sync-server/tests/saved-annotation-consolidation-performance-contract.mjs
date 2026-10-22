@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { performance } from "node:perf_hooks";
 import vm from "node:vm";
 import { defaultSyncCodeVersion, historicalConstructionSyncCodeVersion, syncCodeVersion } from "../public/sync-identity.js";
-import { annotationAfterBulkClears, bulkClearKey, bulkClearTimestamp, mergeNewestRecord, recordSurvivesBulkClear } from "../public/sync-state.js";
+import { annotationAfterBulkClears, bulkClearKey, bulkClearTimestamp, indexBulkClears, mergeNewestRecord, recordSurvivesBulkClear } from "../public/sync-state.js";
 
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 function actual(name) {
@@ -37,7 +37,7 @@ const state = { localAnnotations: [], localSavedItems: [], localProjectSections:
 let annotations = [], clears = [], summaryReads = 0;
 const context = vm.createContext({
   state, defaultSyncCodeVersion, syncCodeVersion,
-  annotationAfterBulkClears, bulkClearKey, bulkClearTimestamp, mergeNewestRecord, recordSurvivesBulkClear,
+  annotationAfterBulkClears, bulkClearKey, bulkClearTimestamp, indexBulkClears, mergeNewestRecord, recordSurvivesBulkClear,
   activeAccount: () => ({ userID: "synthetic-a" }),
   syncedContent: { userID: "synthetic-a", summary: {} },
   currentContentSummary() { summaryReads++; return { annotations }; },

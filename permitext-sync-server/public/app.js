@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-comment-button-v1258";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261021-signed-in-performance-v1259";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -86,18 +86,19 @@ import {
   syncCodeVersionForPrefix,
   syncProjectIdentity,
   syncMutationRecordID
-} from "./sync-identity.js?v=20260901-2014-code-v7";
+} from "./sync-identity.js?v=20261021-identity-fast-path-v8";
 import {
   annotationAfterBulkClears,
   bulkClearKey,
   bulkClearTimestamp,
+  indexBulkClears,
   foregroundSyncDelay,
   foregroundSyncSchedule,
   mergeNewestRecord,
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260924-empty-clears-v3";
+} from "./sync-state.js?v=20261021-bulk-clear-index-v4";
 import {
   acknowledgeNotebookDraft,
   saveReportDraftRecovery,
@@ -134,7 +135,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261021-comment-button-v1258";
+} from "./offline-storage.js?v=20261021-signed-in-performance-v1259";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -167,7 +168,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261021-comment-button-v1258";
+} from "./workspace-state.js?v=20261021-signed-in-performance-v1259";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -626,6 +627,7 @@ let dragPreviewOrder = [];
 let activeCustomSelect = null;
 const chapterListCache = new Map();
 const chapterCache = createPublicContentCache();
+const searchResultCache = createPublicContentCache({ maxBytes: 4 * 1024 * 1024, maxEntries: 24 });
 const sectionSummaryCache = new Map();
 const publicCodeRevision = createPublicCodeRevisionController({
   async fetchRevision() {
@@ -643,6 +645,7 @@ const publicCodeRevision = createPublicCodeRevisionController({
     if (previous) activeCodeSourcesController?.invalidateCatalog();
     chapterListCache.clear();
     chapterCache.clear();
+    searchResultCache.clear();
     sectionSummaryCache.clear();
   }
 });
@@ -6605,6 +6608,15 @@ function reportClientError(kind, error, details = {}) {
   }).catch(() => {});
 }
 
+async function fetchCodeSearch(path, options = {}) {
+  // These responses contain public code only. The complete URL preserves every
+  // source, edition, match mode and pagination choice; corpus changes clear them.
+  const key = `${publicCodeRevision.generation}:${path}`;
+  const payload = await cacheRetryablePromise(searchResultCache, key,
+    signal => api(path, { signal }), { signal: options.signal });
+  return structuredClone(payload);
+}
+
 async function fetchChapterList(codePrefix = "BC", codeVersion = "", options = {}) {
   const prefix = codePrefix || "BC";
   const version = syncCodeVersion(codeVersion || syncCodeVersionForPrefix(prefix));
@@ -11449,7 +11461,7 @@ function summarizeMutations(mutations = []) {
 function currentContentSummary() {
   const summary = syncedContent?.userID === activeAccount()?.userID
     ? syncedContent?.summary || summarizeMutations([]) : summarizeMutations([]);
-  const clearRecords = currentBulkClearRecords();
+  const clearRecords = indexBulkClears(currentBulkClearRecords());
   // Always apply every durable clear to the cached remote summary. Incremental
   // pulls can refresh one clear scope without rebuilding the other scopes, so
   // trusting the cached summary here could resurrect records cleared moments
@@ -14331,7 +14343,7 @@ function visibleProjectRecords(syncedProjects = []) {
     const identity = projectDetailKey(project);
     if (identity) byIdentity.set(identity, project);
   });
-  const clearRecords = currentBulkClearRecords();
+  const clearRecords = indexBulkClears(currentBulkClearRecords());
   (state.localProjects || [])
     .filter((project) => recordSurvivesBulkClear(project, clearRecords, ["folders"]))
     .forEach((project) => {
@@ -15226,7 +15238,7 @@ function annotationForTarget(target, blockID = "", codeVersion = "", snapshot = 
   let tags = [];
   let noteResolved = false;
   let tagsResolved = false;
-  const clearRecords = snapshot?.clearRecords ?? currentBulkClearRecords();
+  const clearRecords = snapshot?.clearRecords ?? indexBulkClears(currentBulkClearRecords());
 
   for (const record of records) {
     const updatedAt = Date.parse(record.updatedAt || "");
@@ -19639,8 +19651,13 @@ function installSearchQueryInputHandlers(panel, searchInstance, input, paneID) {
   input.addEventListener("keydown", (event) => {
     if (!current() || composing || event.isComposing || event.keyCode === 229) return;
     if (event.key === "Enter") {
+      event.preventDefault?.();
+      clearTimeout(searchTimers.get(paneID));
       flushSearchQueryPersistence();
       recordRecentSearch(searchInstance.query);
+      const alreadySearching = panel.__searchRequestController &&
+        panel.querySelector(".search-results")?.dataset.restoringSearch === "true";
+      if (panel.isConnected && !alreadySearching) void renderSearchResults(panel, searchInstance);
     }
     if (event.key === "Escape") {
       event.preventDefault();
@@ -19979,7 +19996,7 @@ async function renderSearchResults(panel, instance) {
       results.append(manage);
       return;
     }
-    payload = await api(
+    payload = await fetchCodeSearch(
       `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=${matchMode}&readerSourceMetadata=1&limit=${searchResultPageSize}&offset=0&candidateOffset=0&grouped=true${sourceScope.querySuffix}`, { signal: controller.signal }
     );
   } catch (error) {
@@ -20352,7 +20369,7 @@ function appendSearchGroupLoadMore(results, page, options) {
     status.hidden = true;
     try {
       const source = encodeURIComponent(JSON.stringify({ codePrefix: page.codePrefix, codeVersion: page.codeVersion }));
-      const payload = await api(`/code/search?q=${encodeURIComponent(options.query)}` +
+      const payload = await fetchCodeSearch(`/code/search?q=${encodeURIComponent(options.query)}` +
         `&code=${encodeURIComponent(page.codePrefix)}&version=all&resultSource=${source}&match=${options.matchMode || "exact"}` +
         `&readerSourceMetadata=1&limit=${searchResultPageSize}&offset=${page.nextOffset}` +
         `${page.cursorKind === "candidate" ? `&candidateOffset=${page.candidateOffset}` : ""}${options.sourceScope.querySuffix}`,
@@ -20423,7 +20440,7 @@ function appendSearchLoadMore(results, options) {
       ? `&code=${encodeURIComponent(options.selectedPrefixes.join(","))}`
       : "";
     try {
-      const payload = await api(
+      const payload = await fetchCodeSearch(
         `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.edition)}&match=${options.matchMode || "exact"}` +
         `&readerSourceMetadata=1&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}` +
         `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}${options.sourceScope.querySuffix}`,
@@ -37259,7 +37276,7 @@ function consolidatedSavedAnnotations(annotations = [], summary = null) {
   // index by edition, section and passage; never retain this snapshot across edits.
   const annotationSnapshot = {
     localIDs: new Set((state.localAnnotations || []).map((annotation) => String(annotation?.id || ""))),
-    clearRecords: currentBulkClearRecords()
+    clearRecords: indexBulkClears(currentBulkClearRecords())
   };
   const recordsByTarget = new Map();
   const targetKey = (annotation) => [

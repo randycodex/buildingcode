@@ -27,4 +27,11 @@ assert.equal(JSON.parse(stored.get('a')).utilityInstances[0].query,'','Saved lay
 assert.match(actual('replaceActiveAccount'),/flushSearchQueryPersistence\(\)/);
 assert.match(actual('switchWorkspace'),/saveWorkspaceState\(\);\s*activeWorkspaceID = workspaceID/);
 assert.match(source,/addEventListener\("pagehide", flushSearchQueryPersistence\)/);
-console.log('Search query persistence passed: real write counts, final snapshot, idle/blur/durable flush, account/workspace safety and IME.');
+c.activeWorkspaceID='a';
+input.value='water supply';listeners.input({});
+const beforeEnter=searches;listeners.keydown({key:'Enter'});
+assert.equal(searches,beforeEnter+1,'Enter starts the current query without waiting for the typing debounce.');
+advance(400);assert.equal(searches,beforeEnter+1,'The cleared debounce must not submit the query twice.');
+panel.__searchRequestController=new AbortController();panel.querySelector=()=>({dataset:{restoringSearch:'true'}});
+listeners.keydown({key:'Enter'});assert.equal(searches,beforeEnter+1,'Enter preserves an in-flight request instead of canceling and restarting it.');
+console.log('Search query persistence passed: real write counts, final snapshot, idle/blur/durable flush, account/workspace safety, IME and immediate Enter without duplicate submission or restarting in-flight searches.');

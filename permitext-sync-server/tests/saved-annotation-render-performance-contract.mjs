@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import { defaultSyncCodeVersion, historicalConstructionSyncCodeVersion, syncCodeVersion } from "../public/sync-identity.js";
-import { bulkClearTimestamp } from "../public/sync-state.js";
+import { bulkClearTimestamp, indexBulkClears } from "../public/sync-state.js";
+import { evidenceCommentsText } from "../public/evidence-comments.js";
 
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 function actual(name) {
@@ -24,7 +25,7 @@ class Element {
 let annotations = [], clears = [], summaryReads = 0;
 const state = { localAnnotations: [] };
 const context = vm.createContext({
-  state, defaultSyncCodeVersion, syncCodeVersion, bulkClearTimestamp,
+  state, defaultSyncCodeVersion, syncCodeVersion, bulkClearTimestamp, indexBulkClears, evidenceCommentsText,
   currentContentSummary() { summaryReads++; return { annotations }; },
   currentBulkClearRecords: () => clears,
   document: { createElement: () => new Element() },

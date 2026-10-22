@@ -12,46 +12,30 @@ const enactedAdministrativePrefixes = new Set([
   "T24", "T25", "T26", "BC68", "HMC", "T28", "FC", "LL"
 ]);
 const specialtyCodePrefixes = new Set(["ECC", "EC"]);
+const canonicalSyncCodeVersions = new Set([
+  defaultSyncCodeVersion, historicalConstructionSyncCodeVersion, zoningSyncCodeVersion,
+  existingBuildingSyncCodeVersion, enactedAdministrativeSyncCodeVersion, specialtyCodesSyncCodeVersion
+]);
+const syncCodeVersionAliases = new Map([
+  [defaultSyncCodeVersion, ["nyc-2022", "2022 construction codes"]],
+  [historicalConstructionSyncCodeVersion, ["nyc-2014", "2014 construction codes", "2014 nyc construction codes"]],
+  [zoningSyncCodeVersion, ["nyc-zoning-resolution", "nyc zoning resolution"]],
+  [existingBuildingSyncCodeVersion, ["nyc-existing-building-code", "nyc existing building code", "nyc existing building code - enacted 2026-01-17; effective 2027-07-17"]],
+  [enactedAdministrativeSyncCodeVersion, ["nyc-enacted-administrative-code", "nyc enacted administrative code"]],
+  [specialtyCodesSyncCodeVersion, ["nyc-2025-specialty-codes", "2025 nyc energy conservation and electrical codes"]]
+].flatMap(([canonical, aliases]) => [canonical.toLocaleLowerCase("en-US"), ...aliases].map(alias => [alias, canonical])));
 
 export function syncCodeVersion(value) {
   const candidate = String(value || "").trim();
+  // Most records already carry the exact canonical identity. Avoid repeated
+  // locale conversion while comparing every saved record against durable clears.
+  if (!candidate) return defaultSyncCodeVersion;
+  if (canonicalSyncCodeVersions.has(candidate)) return candidate;
+  const exactAlias = syncCodeVersionAliases.get(candidate);
+  if (exactAlias) return exactAlias;
   const normalized = candidate.toLocaleLowerCase("en-US");
-  if (
-    !candidate ||
-    normalized === "nyc-2022" ||
-    normalized === "2022 construction codes" ||
-    normalized === defaultSyncCodeVersion.toLocaleLowerCase("en-US")
-  ) return defaultSyncCodeVersion;
-  if (
-    normalized === "nyc-2014" ||
-    normalized === "2014 construction codes" ||
-    normalized === "2014 nyc construction codes" ||
-    normalized === historicalConstructionSyncCodeVersion.toLocaleLowerCase("en-US")
-  ) return historicalConstructionSyncCodeVersion;
-  if (
-    normalized === "nyc-zoning-resolution" ||
-    normalized === "nyc zoning resolution" ||
-    normalized.startsWith("nyc zoning resolution — text through ") ||
-    normalized === zoningSyncCodeVersion.toLocaleLowerCase("en-US")
-  ) return zoningSyncCodeVersion;
-  if (
-    normalized === "nyc-existing-building-code" ||
-    normalized === "nyc existing building code" ||
-    normalized ===
-      "nyc existing building code - enacted 2026-01-17; effective 2027-07-17" ||
-    normalized === existingBuildingSyncCodeVersion.toLocaleLowerCase("en-US")
-  ) return existingBuildingSyncCodeVersion;
-  if (
-    normalized === "nyc-enacted-administrative-code" ||
-    normalized === "nyc enacted administrative code" ||
-    normalized === enactedAdministrativeSyncCodeVersion.toLocaleLowerCase("en-US")
-  ) return enactedAdministrativeSyncCodeVersion;
-  if (
-    normalized === "nyc-2025-specialty-codes" ||
-    normalized === "2025 nyc energy conservation and electrical codes" ||
-    normalized === specialtyCodesSyncCodeVersion.toLocaleLowerCase("en-US")
-  ) return specialtyCodesSyncCodeVersion;
-  return candidate;
+  return syncCodeVersionAliases.get(normalized) ||
+    (normalized.startsWith("nyc zoning resolution — text through ") ? zoningSyncCodeVersion : candidate);
 }
 
 export function syncCodeVersionForPrefix(prefix) {

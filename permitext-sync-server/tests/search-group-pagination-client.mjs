@@ -44,6 +44,7 @@ const make = () => {
     saveWorkspaceState: () => saves.push(JSON.stringify(instance)),
     api: async (path, options) => { requests.push({ url: new URL(path, "http://local"), signal: options.signal }); return responder(); }
   });
+  c.fetchCodeSearch=c.api;
   vm.runInContext(["searchResultPositionKey", "searchPositionState", "appendSearchGroupLoadMore"].map(actual).join("\n"), c);
   c.searchPositionState(instance).groupPages = {};
   const options = { query: "concrete", searchInstance: instance, panel: {}, sourceScope: { querySuffix: "&sourceScope=enabled-only" },

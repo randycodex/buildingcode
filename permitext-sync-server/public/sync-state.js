@@ -66,6 +66,26 @@ export function bulkClearKey(record) {
   return [syncCodeVersion(record.codeVersion), scope].join(":");
 }
 
+// Build once for a synchronous content snapshot. Both ordering axes matter:
+// the newest edit timestamp and highest server event may be different records.
+export function indexBulkClears(records = []) {
+  if (records instanceof Map) return records;
+  const index = new Map();
+  for (const record of records || []) {
+    const key = bulkClearKey(record);
+    if (!key) continue;
+    const current = index.get(key) || { updatedAt: "", serverEventID: 0 };
+    const timestamp = Date.parse(record?.updatedAt || "");
+    const eventID = Number(record?.serverEventID || 0);
+    index.set(key, {
+      updatedAt: Number.isFinite(timestamp) && timestamp > (Date.parse(current.updatedAt) || 0)
+        ? record.updatedAt : current.updatedAt,
+      serverEventID: Number.isSafeInteger(eventID) ? Math.max(current.serverEventID, eventID) : current.serverEventID
+    });
+  }
+  return index;
+}
+
 export function bulkClearTimestamp(clearRecords, codeVersion, scope) {
   const key = [syncCodeVersion(codeVersion), scope].join(":");
   const matchingRecords = clearRecords instanceof Map

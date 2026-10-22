@@ -49,6 +49,7 @@ console.log('Search position survives application normalization and resets on qu
     normalizeSearchCodeFilters:x=>x,searchResultPageSize:25,
     searchResultMatchesExactQuery:()=>true,appendSearchResultGroups(){},updateSearchDock(){},saveWorkspaceState(){},
   });
+  pageContext.fetchCodeSearch=pageContext.api;
   vm.runInContext(['normalizeSearchResultSources','applyInitialSearchGroupExpansion','searchPositionState','appendSearchLoadMore'].map(extract).join('\n'),pageContext);
   pageContext.appendSearchLoadMore(results,{...requestContext,query:'concrete',selectedPrefixes:[],searchInstance:instance,renderToken:'current',nextOffset:25,candidateOffset:25,totalResults:50,hasMore:true,panel:{}});
   const retry=results.searchLoadMore;
