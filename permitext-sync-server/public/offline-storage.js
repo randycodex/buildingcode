@@ -1,5 +1,6 @@
-import { searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./search-relevance.js?v=20261023-column-search-v1290";
-import { searchWords, matchesSearchWords, searchWordsSnippet } from "./search-words.js?v=20261023-column-search-v1290";
+import {downloadedLibraryStatus, readDownloadedLibrary, removeDownloadedLibrary} from './downloaded-library.js?v=3';
+import { searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./search-relevance.js?v=20261023-downloaded-library-v1293";
+import { searchWords, matchesSearchWords, searchWordsSnippet } from "./search-words.js?v=20261023-downloaded-library-v1293";
 import { parseActiveCodeSearchScope } from "./active-code-search-scope.js";
 import { codeSourceIdentity, codeSourceKey } from "./active-code-sources.js?v=2";
 import { withCodeAssetRevision } from "./code-asset-identity.js?v=20260923-asset-identity-v1";
@@ -22,24 +23,30 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1865";
-const shellAssetVersion = "20261023-column-search-v1290";
+const shellCacheName = "permitext-pro-shell-v1868";
+const shellAssetVersion = "20261023-downloaded-library-v1293";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
+  "/web/project-details-columns.js?v=20261019-project-workflow-v2",
+  "/web/workflow-views.js?v=9",
+  "/web/active-code-sources.js",
+  "/web/downloaded-library.js?v=3",
+  "/web/downloaded-library-worker.js?v=3",
+  "/web/downloaded-library-core.js?v=3",
   "/web/settings-columns.js?v=1",
   "/web/project-details-columns.js?v=20261021-project-columns-v3",
   "/web/workspace-button-icons.js?v=20261017-calculator-column-v1",
   "/web/minimal-workflow.js",
   "/web/notebook-questions.js",
   "/web/project-workflow.js?v=20261021-project-questions-v8",
-  "/web/search-relevance.js?v=20261023-column-search-v1290",
+  "/web/search-relevance.js?v=20261023-downloaded-library-v1293",
   "/web/occupant-load-calculation.js?v=23",
   "/web/notebook-passage-blocks.js?v=6",
   "/web/evidence-comments.js?v=5",
   "/web/notebook-passage-disclosure.js?v=1",
-  "/web/search-words.js?v=20261023-column-search-v1290",
+  "/web/search-words.js?v=20261023-downloaded-library-v1293",
   "/web/nyc-property-facts.js?v=20261004-zola-facts-v1",
   "/web/active-code-sources.js?v=2",
   "/web/active-code-search-scope.js",
@@ -78,23 +85,23 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261023-column-search-v1290",
+  "/web/styles.css?v=20261023-downloaded-library-v1293",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
   "/web/assistant-materials.js?v=4",
-  "/web/app.js?v=20261023-column-search-v1290",
+  "/web/app.js?v=20261023-downloaded-library-v1293",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261023-column-search-v1290",
+  "/web/offline-storage.js?v=20261023-downloaded-library-v1293",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",
-  "/web/workspace-state.js?v=20261023-column-search-v1290",
+  "/web/workspace-state.js?v=20261023-downloaded-library-v1293",
   "/web/recent-view-scope.js?v=1",
   "/web/recent-search-scope.js?v=1",
   "/web/workspace-state.js?v=20261012-workflow-views-v18",
@@ -116,7 +123,7 @@ const shellURLs = [
   "/web/public-content-cache.js?v=1",
   "/web/report-screen.js?v=20261011-shared-shell-v6",
   "/web/report-library.js?v=20261012-sidebar-width-v8",
-  "/web/notebook-note-menu.js?v=20261023-column-search-v1290",
+  "/web/notebook-note-menu.js?v=20261023-downloaded-library-v1293",
   "/web/notebook-columns.js?v=2",
   "/web/reader-block-window.js?v=9",
   "/web/reader-section-visibility.js?v=4",
@@ -1192,12 +1199,16 @@ export async function downloadOfflineLibrary(options = {}) {
 }
 
 export async function offlineLibraryStatus() {
+  const managed = await downloadedLibraryStatus().catch(() => null);
+  if (managed?.available) return managed;
   const record = await metadataRecord();
   if (!record?.installID) {
-    return { available: false, supported: typeof indexedDB !== "undefined" };
+    return { available: false, supported: managed?.supported ?? typeof indexedDB !== "undefined", pending: managed?.pending };
   }
   return {
     ...record,
+    pending: managed?.pending,
+    downloadSupported: managed?.supported ?? true,
     available: true,
     supported: true
   };
@@ -1206,7 +1217,7 @@ export async function offlineLibraryStatus() {
 export async function saveOfflineSyncSnapshot(userID, content) {
   const normalizedUserID = String(userID || "").trim();
   if (!normalizedUserID || !content || typeof indexedDB === "undefined") return false;
-  const library = await metadataRecord();
+  const library = await offlineLibraryStatus();
   if (!library?.installID) return false;
   return withOfflineStore(syncSnapshotsStoreName, "readwrite", (store) => {
     store.put({
@@ -1228,7 +1239,7 @@ export async function saveOfflineSyncSnapshot(userID, content) {
 export async function loadOfflineSyncSnapshot(userID) {
   const normalizedUserID = String(userID || "").trim();
   if (!normalizedUserID || typeof indexedDB === "undefined") return null;
-  const library = await metadataRecord();
+  const library = await offlineLibraryStatus();
   if (!library?.installID) return null;
   return withOfflineStore(syncSnapshotsStoreName, "readonly", async (store) => {
     const record = await requestResult(store.get(normalizedUserID), "Could not read the offline account snapshot.");
@@ -1237,6 +1248,7 @@ export async function loadOfflineSyncSnapshot(userID) {
 }
 
 export async function removeOfflineLibrary() {
+  await removeDownloadedLibrary();
   if (typeof indexedDB !== "undefined") {
     const database = await openDatabase();
     try {
@@ -1254,6 +1266,22 @@ export async function removeOfflineLibrary() {
       .filter((name) => name.startsWith("permitext-pro-"))
       .map((name) => caches.delete(name)));
   }
+}
+
+// Run only after the new public library is fully active. Keep private drafts,
+// image queues, account snapshots and the coherent app shell untouched.
+export async function retireLegacyOfflineLibrary() {
+  const record = await metadataRecord();
+  if (!record?.installID) return;
+  await deleteInstall(record.installID);
+  const database = await openDatabase();
+  try {
+    const tx = database.transaction(metadataStoreName, 'readwrite'), done = transactionComplete(tx);
+    const store = tx.objectStore(metadataStoreName);
+    const current = await requestResult(store.get(activeLibraryKey));
+    if (current?.installID === record.installID) store.delete(activeLibraryKey);
+    await done;
+  } finally { database.close(); }
 }
 
 // Only confirmed account deletion may erase private local work. Sign-out,
@@ -1683,6 +1711,8 @@ async function offlineSearch(metadata, url) {
 }
 
 export async function offlineAPI(path) {
+  const managed = await readDownloadedLibrary(path, {force: true});
+  if (managed) return managed.payload;
   const metadata = await metadataRecord();
   if (!metadata?.installID) return null;
   const url = new URL(path, window.location.origin);

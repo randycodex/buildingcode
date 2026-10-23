@@ -9,8 +9,9 @@ assert.equal(isPublicCodePath('/code/sections/resolve?include=metadata'),true);
 assert.equal(isPublicCodePath('/account/sections/resolve'),false);
 const A='a'.repeat(64),B='b'.repeat(64);let revision=A,offline=false,chapterRequests=0,revisionRequests=0;
 const context=vm.createContext({AbortController,setTimeout,clearTimeout,createPublicCodeRevisionController,isPublicCodePath,cacheRetryablePromise,URLSearchParams,
- activeCodeSourcesController:{invalidateCatalog(){}},chapterCache:new Map(),chapterListCache:new Map(),sectionSummaryCache:new Map(),searchResultCache:new Map(),codeSectionCache:new Map(),serverReachable:true,structuredClone,
+ activeCodeSourcesController:{invalidateCatalog(){}},chapterCache:new Map(),chapterListCache:new Map(),sectionSummaryCache:new Map(),searchResultCache:new Map(),codeSectionCache:new Map(),serverReachable:true,structuredClone,Response,
  updateConnectionStatus(){},hasCapability:()=>true,shouldUseOfflineFallback:status=>status>=500,
+ readDownloadedLibrary:async()=>null,
  offlineAPI:async()=>({chapter:{id:'A',offline:true}}),
  fetch:async path=>{
    if(offline)throw Error('offline');
@@ -37,3 +38,17 @@ assert.equal((await context.fetchChapter('offline-chapter')).offline,true);
 offline=false;await context.revisions.probe({force:true,reconnect:true});assert.equal(context.chapterCache.size,0,'reconnect discards cached offline fallback even unchanged digest');
 assert.equal((await context.fetchChapter('offline-chapter')).revision,A);
 console.log('Public client invalidation passed: actual api/chapter cache wiring, warm no-network reopen, all dependent cache eviction, rollback, failed probe preservation and offline reconnect.');
+
+// An enabled, coherent public download resolves through the real api wrapper
+// without fetching, changing connection state or entering legacy fallback.
+const beforeDownloaded = chapterRequests;
+context.readDownloadedLibrary = async () => ({corpusRevision:A,payload:{chapter:{id:"local",downloaded:true}}});
+assert.equal((await context.api("/code/chapters/local")).chapter.downloaded,true);
+assert.equal(chapterRequests,beforeDownloaded);
+const localAbort = new AbortController(); let releaseLocal;
+context.readDownloadedLibrary = () => new Promise(resolve=>{releaseLocal=resolve;});
+const canceledLocal = context.api("/code/chapters/canceled-local",{signal:localAbort.signal});
+await new Promise(resolve=>setImmediate(resolve)); localAbort.abort(); releaseLocal({payload:{chapter:{id:"stale"}}});
+await assert.rejects(canceledLocal,{name:"AbortError"});
+assert.equal(chapterRequests,beforeDownloaded);
+console.log("Downloaded public api passed: coherent local transport, zero network requests, unchanged connection state and canceled-read suppression.");

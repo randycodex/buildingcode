@@ -10,3 +10,7 @@ prepared/research-passages/
 
 # Built from canonical source chapters before production verification.
 generated/search-catalogs/
+
+# Content-addressed public download packages rebuilt from the canonical corpus.
+public/downloaded-library/
+public/.library-build-*/

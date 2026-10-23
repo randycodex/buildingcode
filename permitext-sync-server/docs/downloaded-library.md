@@ -1,0 +1,105 @@
+# Optional downloaded library
+
+Settings → Library & offline → Offline exposes the optional Pro download.
+Downloading enables **Use downloaded library for readers and search**. Turning
+that preference off returns online reading/search to the server while retaining
+the complete download for offline fallback. Removal affects public library data,
+not private Notes, drafts, image queues or account snapshots.
+
+The download includes all 578 navigation chapters (32,552 catalog sections),
+referenced figures, the canonical global Search text/postings, and the exact
+Reader Find projections. Existing reader windowing and offscreen suspension
+continue to apply. There is no limit on the number of open readers.
+
+## Storage and recovery
+
+- A dedicated worker stores rich bodies once, separately from compact chapter
+  manifests. Search processes small document batches; completed result metadata
+  and snippets have a 3 MiB / four-query budget. The worker terminates after
+  30 seconds without requests.
+- Complete chapters and verified index parts have durable checkpoints. A pause,
+  tab close, network failure or browser restart leaves them available to resume.
+  A chapter interrupted before its transaction completes is downloaded again.
+- Browser storage is checked before staging a new generation. The UI recommends
+  about 400 MB for an installed library and room for a second copy during an
+  update. Browser estimates include implementation overhead and can lag deletion.
+- Web Locks exclude concurrent installers/removal across tabs. Readers hold a
+  shared generation lock; activation waits for their current reads to finish.
+- Every chapter window pins both the public and chapter revisions. Every index
+  part has a content-addressed name, byte count and SHA-256 digest. Final revision
+  and manifest checks happen before one atomic active-pointer transaction.
+- Failed updates leave the complete active library available. A changed package
+  restarts only its staging generation; it cannot mix old and new source text.
+- Retired public generations are collected in small transactions. Figure caches
+  retain the current and previous revisions for already-rendered passages.
+  Legacy public chapter storage is retired only after successful activation.
+- Online requests pinned to a newer server corpus bypass an older download.
+  Offline use retains the installed source identities and trust metadata.
+
+The app checks for updates in Settings; users explicitly choose Update library.
+An interrupted update presents Resume download. App-shell updates retain the
+existing natural service-worker waiting policy so an old tab never acquires a
+partial replacement shell.
+
+Requires module workers, IndexedDB, Web Locks, Web Crypto, CacheStorage and gzip
+DecompressionStream. Supported WebKit and Chrome flows are checked locally;
+unsupported browsers retain online operation. Real phone acceptance is separate.
+
+## Build and verification
+
+`build:production` derives content-addressed public packages from the same
+prepared catalogs, exact text, postings and Reader indexes used online. Generated
+packages are ignored in Git and copied into the normal deployable static output.
+The mutable download manifest is excluded from service-worker cache-first rules.
+
+Focused checks:
+
+```sh
+npm run test:downloaded-library
+npm run test:offline
+npm run test:search-interaction-performance
+npm run test:search-group-pagination
+node tests/public-code-client-invalidation-contract.mjs
+node tests/offline-notebook-durability-contract.mjs
+node tests/workspace-bundle-contract.mjs
+node tests/reader-search-projection-contract.mjs
+npm run build:production
+```
+
+The real-Chrome synthetic suite covers reload recovery without re-fetching
+completed chapters, corrupt index/figure rejection, final deployment drift,
+atomic update/resume, bounded retired generations, concurrent tabs, insufficient
+storage, edition/scope filtering, independent cached pages, Reader Find,
+cancellation, opt-out and private-draft preservation.
+
+The isolated full-corpus browser harness is:
+
+```sh
+node tests/downloaded-library-full-corpus.mjs
+# Or verify deployed modules and public data:
+node tests/downloaded-library-full-corpus.mjs --port 8797 \
+  --source https://permitext.com --deployed --output /tmp/permitext-library-production.json
+```
+
+It compares all result IDs/order for six queries, five chapters' rich body windows
+and Reader Find targets, then performs 25 repeated searches and 25 reader reads.
+Memory is page-plus-worker memory where the browser supplies it, with a bounded
+measurement timeout; it is not Chrome's native process footprint. Timing is public
+transport time, not keyboard-to-render latency. A comparison to localhost does
+not measure the production network benefit.
+
+## Baseline test limitations
+
+On the starting `b32a4ae1a` checkout, broad suites have stale expectations unrelated
+to the download implementation. Their affected production functions/styles were
+compared against HEAD and remain unchanged:
+
+- `npm run check` precheck: Research progress button CSS expectation.
+- The main `check` body: Evidence folder test expects bookmark code in the former
+  Reader wrapper, now delegated to `buildReaderChapterSection`.
+- `test:public-code-cache`: progressive Reader VM fixture lacks
+  `readerPanelIntersectsTrack`.
+- `test:web-active-code-sources`: Settings VM fixture lacks `list.before`.
+
+Focused download/offline/search/durability checks and the production build are
+reported separately from those pre-existing broad-suite failures.

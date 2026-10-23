@@ -54,7 +54,7 @@ for(const change of ["query","edition","prefix","account","workspace","closed","
 for(const phase of ["fetch","json","fallback"]){
  const gate=defer();let offlineCalls=0,updates=0;const controller=new AbortController();
  const c=vm.createContext({isPublicCodePath,publicCodeRevision:createPublicCodeRevisionController({fetchRevision:async()=>{throw Error("offline");},onInvalidate(){}}),serverReachable:true,fetch:()=>phase==="fetch"?gate.promise:Promise.resolve({ok:phase==="json",status:503,json:()=>gate.promise}),
- hasCapability:()=>true,shouldUseOfflineFallback:()=>true,offlineAPI:()=>{offlineCalls++;return gate.promise;},updateConnectionStatus(){updates++;}});
+ readDownloadedLibrary:async()=>null,hasCapability:()=>true,shouldUseOfflineFallback:()=>true,offlineAPI:()=>{offlineCalls++;return gate.promise;},updateConnectionStatus(){updates++;}});
  vm.runInContext(actual("api"),c);const pending=c.api("/code/search",{signal:controller.signal});await tick();controller.abort();gate.resolve(phase==="fetch"?{ok:true,json:async()=>({})}:{});
  await assert.rejects(pending,{name:"AbortError"});assert.equal(updates,0);assert.equal(c.serverReachable,true);assert.equal(offlineCalls,phase==="fallback"?1:0);
 }

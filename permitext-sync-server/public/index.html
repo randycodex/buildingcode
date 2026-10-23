@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261023-column-search-v1290">
+    <link rel="stylesheet" href="/web/styles.css?v=20261023-downloaded-library-v1293">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -504,9 +504,11 @@
           </div>
           <p class="settings-card-copy settings-offline-copy">Download the complete searchable enacted-code library and the Permitext app for use without internet.</p>
           <div class="settings-offline-status" role="status">Checking offline storage…</div>
+          <label class="settings-offline-preference" hidden><input class="settings-offline-use" type="checkbox"> Use downloaded library for readers and search</label>
           <progress class="settings-offline-progress" max="100" value="0" hidden></progress>
           <div class="connector-actions settings-offline-actions">
             <button class="settings-primary-button settings-offline-download" type="button">Download for Offline Use</button>
+            <button class="settings-link-button settings-offline-pause" type="button" hidden>Pause download</button>
             <button class="settings-link-button settings-offline-remove" type="button" hidden>Remove Download</button>
           </div>
         </section>
@@ -583,6 +585,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261023-column-search-v1290" type="module"></script>
+    <script src="/web/app.js?v=20261023-downloaded-library-v1293" type="module"></script>
   </body>
 </html>

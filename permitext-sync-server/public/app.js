@@ -1,3 +1,4 @@
+import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=3';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=5";
 import { createAssistantMaterials } from "./assistant-materials.js?v=4";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=6";
@@ -9,7 +10,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-column-search-v1290";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-downloaded-library-v1293";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -114,7 +115,8 @@ import {
   deleteNotebookCardSnapshot,
   deleteLocalNotebookImage,
   deleteNotebookDraft,
-  downloadOfflineLibrary,
+  prepareOfflineShell,
+  retireLegacyOfflineLibrary,
   finalizeNotebookImagesForDocument,
   loadNotebookDraft,
   loadNotebookProjectSnapshot,
@@ -137,7 +139,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-column-search-v1290";
+} from "./offline-storage.js?v=20261023-downloaded-library-v1293";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -170,7 +172,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261023-column-search-v1290";
+} from "./workspace-state.js?v=20261023-downloaded-library-v1293";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -640,6 +642,10 @@ const publicCodeRevision = createPublicCodeRevisionController({
       const response = await fetch("/code/revision", { cache: "no-cache", signal: controller.signal });
       if (!response.ok) throw new Error("Code revision unavailable");
       return await response.json();
+    } catch (error) {
+      const downloaded = await readDownloadedLibrary("/code/revision", {force: true});
+      if (downloaded) return downloaded.payload;
+      throw error;
     } finally {
       clearTimeout(timeout);
     }
@@ -652,6 +658,10 @@ const publicCodeRevision = createPublicCodeRevisionController({
     codeSectionCache.clear();
     sectionSummaryCache.clear();
   }
+});
+window.addEventListener("permitext:downloaded-library-changed", () => {
+  chapterListCache.clear(); chapterCache.clear(); searchResultCache.clear(); codeSectionCache.clear(); sectionSummaryCache.clear();
+  void publicCodeRevision.probe({force: true, reconnect: true});
 });
 const annotationPushTimers = new Map();
 let appleWebConfigPromise = null;
@@ -6536,6 +6546,14 @@ async function api(path, options = {}) {
   }
   const signal = options.signal;
   signal?.throwIfAborted();
+  if (hasCapability("offline-access") && isPublicCodePath(path)) {
+    const downloaded = await readDownloadedLibrary(path, {signal});
+    signal?.throwIfAborted();
+    if (downloaded) {
+      options.onPublicResponse?.(new Response(null, {headers: {"x-permitext-corpus-revision": downloaded.corpusRevision}}));
+      return downloaded.payload;
+    }
+  }
   let response;
   try {
     response = await fetch(path, signal ? { signal } : undefined);
@@ -40693,6 +40711,12 @@ function renderSettings({ upgrade = false } = {}) {
   const offlineProgress = panel.querySelector(".settings-offline-progress");
   const offlineDownload = panel.querySelector(".settings-offline-download");
   const offlineRemove = panel.querySelector(".settings-offline-remove");
+  const offlinePause = panel.querySelector(".settings-offline-pause");
+  const offlineUse = panel.querySelector(".settings-offline-use");
+  let libraryDownloadController = null;
+  let libraryDownloadError = "";
+  offlineUse.addEventListener("change", () => useDownloadedLibrary(offlineUse.checked));
+  offlinePause.addEventListener("click", () => libraryDownloadController?.abort(new DOMException("Download paused. Resume whenever you are ready.", "AbortError")));
   const projectList = panel.querySelector(".settings-project-list");
   const projectEmpty = panel.querySelector(".settings-projects-empty");
   const projectSelectAll = panel.querySelector(".settings-project-select-all");
@@ -40982,43 +41006,44 @@ function renderSettings({ upgrade = false } = {}) {
   });
   const renderOfflineState = async () => {
     const pro = hasCapability("offline-access");
-    const library = await offlineLibraryStatus().catch(() => ({ available: false, supported: false }));
+    let library = await offlineLibraryStatus().catch(() => ({available: false, supported: false}));
+    if (libraryDownloadController) return;
+    if (pro && navigator.onLine && (library.available || library.pending)) {
+      library = {...library, ...await checkDownloadedLibraryUpdate().catch(() => ({updateCheckFailed: true}))};
+    }
     offlineProgress.hidden = true;
+    offlinePause.hidden = true;
     offlineDownload.hidden = !pro;
     offlineDownload.disabled = false;
-    offlineRemove.hidden = !library.available;
+    offlineRemove.hidden = !library.available && !library.pending;
+    offlineRemove.disabled = false;
+    offlineUse.closest("label").hidden = !pro || library.librarySchemaVersion !== 4;
+    offlineUse.checked = usesDownloadedLibrary();
     if (!pro) {
       offlineCopy.textContent = "Download the complete searchable code library for use without an internet connection.";
       offlineStatus.textContent = "Available with Pro.";
       return;
     }
-    offlineCopy.textContent = `Keep the app and the complete searchable enacted-code library on this device. Estimated download: ${offlineFeatureMetadata.estimatedDownload}.`;
-    if (!library.supported) {
-      offlineStatus.textContent = "This browser does not provide the storage required for offline codes.";
-      offlineDownload.textContent = "Offline Storage Unavailable";
-      offlineDownload.disabled = true;
-      return;
+    offlineCopy.textContent = "Optional: keep the complete searchable enacted-code library on this device for faster readers and search, and access without internet. Allow about 400 MB; an update temporarily needs room for a second copy. Projects and Notes continue to sync normally.";
+    if (!library.supported || library.downloadSupported === false) {
+      offlineStatus.textContent = library.available ? "Your existing offline package remains available. This browser cannot install the new library." : "This browser does not provide the storage required for downloaded codes.";
+      offlineDownload.textContent = "Download unavailable"; offlineDownload.disabled = true; return;
     }
-    if (!library.available) {
-      offlineStatus.textContent = navigator.onLine ? "" : "Connect to the internet to download.";
-      offlineDownload.textContent = "Download for Offline Use";
-      offlineDownload.disabled = navigator.onLine === false;
-      return;
+    const offline = navigator.onLine === false;
+    offlineDownload.disabled = offline;
+    if (library.pending) {
+      offlineDownload.textContent = "Resume download";
+      offlineStatus.textContent = `Download paused · ${library.pending.completed} of ${library.pending.total} chapters saved. ${library.available ? "Your complete library remains available." : "Resume to finish preparing readers and search."}`;
+    } else if (!library.available) {
+      offlineDownload.textContent = "Download library";
+      offlineStatus.textContent = offline ? "Connect to the internet to download." : "Nothing downloaded. Online readers and search work normally.";
+    } else if (library.librarySchemaVersion !== 4 || library.updateAvailable) {
+      offlineDownload.textContent = "Update library";
+      offlineStatus.textContent = "An updated library is available. Your current download stays available until the update finishes.";
+    } else {
+      offlineDownload.textContent = "Check for updates";
+      offlineStatus.textContent = `Downloaded ${new Date(library.downloadedAt).toLocaleDateString()} · ${library.chapterCount} chapters. ${offline ? "Available offline." : library.updateCheckFailed ? "Could not check updates. Your downloaded library remains available." : "Library is up to date."}`;
     }
-    if (
-      library.librarySchemaVersion !== offlineFeatureMetadata.librarySchemaVersion ||
-      library.assetVersion !== offlineFeatureMetadata.assetVersion
-    ) {
-      offlineStatus.textContent = navigator.onLine
-        ? "An updated offline code package is available."
-        : "Your offline package works, but must be updated when you reconnect.";
-      offlineDownload.textContent = "Update Offline Codes";
-      offlineDownload.disabled = navigator.onLine === false;
-      return;
-    }
-    offlineStatus.textContent = "";
-    offlineDownload.textContent = "Downloaded for Offline Use";
-    offlineDownload.disabled = true;
   };
 
   const syncAccountState = () => {
@@ -41534,7 +41559,11 @@ function renderSettings({ upgrade = false } = {}) {
       checkoutButton.click();
       return;
     }
+    if (libraryDownloadController) return;
+    libraryDownloadController = new AbortController();
+    libraryDownloadError = "";
     offlineDownload.disabled = true;
+    offlinePause.hidden = false;
     offlineRemove.hidden = true;
     offlineProgress.hidden = false;
     offlineProgress.value = 0;
@@ -41545,7 +41574,14 @@ function renderSettings({ upgrade = false } = {}) {
         await disableOfflineFeature();
         throw new Error("An active Pro plan is required for offline access.");
       }
-      await downloadOfflineLibrary({
+      const current = await checkDownloadedLibraryUpdate().catch(() => null);
+      if (current?.available && current.librarySchemaVersion === 4 && !current.updateAvailable && !current.pending) {
+        offlineStatus.textContent = "Library is up to date.";
+        return;
+      }
+      await prepareOfflineShell();
+      await downloadLocalLibrary({
+        signal: libraryDownloadController.signal,
         codeVersion: defaultSyncCodeVersion,
         onProgress(progress) {
           offlineProgress.value = progress.percent || 0;
@@ -41554,16 +41590,19 @@ function renderSettings({ upgrade = false } = {}) {
             : progress.phase;
         }
       });
+      await retireLegacyOfflineLibrary().catch(() => {});
       if (syncedContent?.status === "connected" && account.userID === syncedContent.userID) {
         await saveOfflineSyncSnapshot(account.userID, syncedContent);
       }
-      offlineStatus.textContent = "Offline access is ready.";
-      await renderOfflineState();
+      offlineStatus.textContent = "Downloaded library is ready.";
     } catch (error) {
       const message = error.message || "Could not download offline codes.";
       offlineProgress.hidden = true;
+      libraryDownloadError = message;
+    } finally {
+      libraryDownloadController = null;
       await renderOfflineState();
-      offlineStatus.textContent = message;
+      if (libraryDownloadError) offlineStatus.textContent = libraryDownloadError;
     }
   });
   offlineRemove.addEventListener("click", async () => {
