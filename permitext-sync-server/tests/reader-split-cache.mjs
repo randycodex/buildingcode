@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import {readFile} from 'node:fs/promises';
+const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+const start=source.indexOf('const readerSplitHTMLCache'),end=source.indexOf('\n// Selector resolution',start);
+let parses=0;
+const context=vm.createContext({rewriteCodeHTML:html=>html,document:{createElement(){return {set innerHTML(value){parses++;this.value=value;},querySelectorAll(selector){return selector.startsWith('.Normal')?[{id:'stable-id',textContent:this.value,outerHTML:this.value,querySelector:()=>null}]:[];}};}}});
+vm.runInContext(source.slice(start,end),context);
+const block={kind:'html',id:'s1',html:'<p>Exact enacted text</p>',assetRevision:'rev1'};
+const first=context.splitAnnotatedCodeBlock(block);first[0].plainText='caller mutation';
+const second=context.splitAnnotatedCodeBlock({...block});assert.equal(parses,1);assert.equal(second[0].plainText,block.html,'Cached public fragments are not mutable through returned blocks');
+context.splitAnnotatedCodeBlock({...block,assetRevision:'rev2'});assert.equal(parses,2,'Asset revision invalidates parsed fragments');
+for(let i=0;i<12;i++)context.splitAnnotatedCodeBlock({...block,html:`<p>Other source ${i}</p>`});
+context.splitAnnotatedCodeBlock(block);assert.equal(parses,15,'LRU drops old sources instead of retaining them for every Reader');
+console.log('Public split cache: exact fragment identity, isolated returned objects, corpus asset revision and bounded LRU passed.');

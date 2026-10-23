@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import { createReaderBlockWindow } from '../public/reader-block-window.js';
+let frame, intersection, resize, offscreen=false, mounts=0, releases=0;
+const doc={activeElement:null,getSelection:()=>({isCollapsed:true}),addEventListener(){},removeEventListener(){}};
+const content={scrollTop:0,clientWidth:600,getBoundingClientRect:()=>({top:0,bottom:600}),addEventListener(){},removeEventListener(){}};
+const root={ownerDocument:doc,children:[],isConnected:true,getBoundingClientRect:()=>({top:-content.scrollTop,bottom:1e9}),contains:()=>false,append(n){n.parent=this;this.children.push(n);}};
+function node(height=52){return {contains:()=>false,classList:{contains:()=>false,add(){}},style:{height:`${height}px`},dataset:{},setAttribute(){},getBoundingClientRect(){const top=root.children.slice(0,root.children.indexOf(this)).reduce((sum,n)=>sum+parseFloat(n.style.height),0)-content.scrollTop;return {top,bottom:top+parseFloat(this.style.height),height:parseFloat(this.style.height)};},replaceWith(n){const i=root.children.indexOf(this);assert.ok(i>=0);root.children[i]=n;n.parent=root;}};}
+doc.createElement=()=>node();
+globalThis.window={innerWidth:1200};
+globalThis.requestAnimationFrame=fn=>{frame=fn;return 1;};globalThis.cancelAnimationFrame=()=>{frame=null;};
+globalThis.IntersectionObserver=class{constructor(fn){intersection=fn;}observe(){}disconnect(){}};
+globalThis.ResizeObserver=class{constructor(fn){resize=fn;}observe(){}disconnect(){}};
+const panel={isConnected:true,classList:{contains:()=>false},getBoundingClientRect:()=>({width:600,left:offscreen?1400:0,right:offscreen?2000:600})};
+const blocks=Array.from({length:1319},(_,i)=>({id:`b${i}`,plainText:`Original authoritative passage ${i}`}));
+const controller=createReaderBlockWindow({root,content,panel,blocks,blockID:b=>b.id,render(b){mounts++;const n=node();n.textContent=b.plainText;n.dataset.blockId=b.id;return n;},release(){releases++;},beforeMount(){},isCurrent:()=>true});
+const flush=()=>{const fn=frame;frame=null;fn?.();};flush();
+assert.equal(root.children.filter(n=>n.textContent).length,40);
+assert.equal(root.children.length,1319);
+assert.equal(controller.ensure('b1200').textContent,blocks[1200].plainText);
+assert.equal(root.children.filter(n=>n.textContent).length,40,'Exact navigation cannot accumulate old source bodies');
+assert.ok(releases>=40);
+assert.equal(controller.ensureText('passage 1318').textContent,blocks[1318].plainText,'End-of-section text remains addressable');
+content.scrollTop=root.children.slice(0,1300).reduce((sum,n)=>sum+parseFloat(n.style.height),0)+12;
+intersection();flush();const before=root.children[1300].getBoundingClientRect().top;
+content.clientWidth=400;resize();flush();assert.equal(root.children[1300].getBoundingClientRect().top,before,'Resize preserves the visible passage offset');
+offscreen=true;intersection();flush();assert.equal(root.children.filter(n=>n.textContent).length,0,'Offscreen Reader releases passage DOM');
+offscreen=false;intersection();flush();assert.equal(root.children.filter(n=>n.textContent).length,40);assert.ok(root.children[1300].textContent,'Returning restores the same passage');
+// A focused or highlighted passage may remain alongside the ordinary window.
+const held=controller.ensure('b1300');held.classList.contains=name=>name==='is-navigation-target';
+offscreen=true;intersection();flush();assert.equal(root.children.filter(n=>n.textContent).length,1,'Only the explicit destination survives offscreen suspension');
+offscreen=false;intersection();flush();assert.ok(root.children.filter(n=>n.textContent).length<=41);
+controller.dispose();const previous=mounts;controller.ensure('b2');assert.equal(mounts,previous,'Disposed Readers cannot recreate detached passages');
+console.log('Passage windows: 1319 identities, at most 40 bodies, exact/text/end jumps, resize anchor, offscreen suspension/resume and disposal passed.');

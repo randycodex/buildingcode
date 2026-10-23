@@ -113,11 +113,11 @@ try {
     const request = new Promise((resolve, fail) => { finish = resolve; reject = fail; });
     const status = new Node(); status.parent = new Node();
     const scroller = {clientWidth:600,clientHeight:600,append(){},addEventListener(){},removeEventListener(){}};
-    const panel = {isConnected:true,dataset:{readerRenderToken:"initial"}};
+    const panel = {classList:{contains:()=>false},isConnected:true,dataset:{readerRenderToken:"initial"}};
     const frames = [];
     let next = {start:60,end:72};
     const calls = [];
-    const context = vm.createContext({AbortController,document:{createElement:()=>status},
+    const context = vm.createContext({AbortController,readerPanelIntersectsTrack:()=>true,document:{createElement:()=>status},
       ResizeObserver:class {observe(){} disconnect(){disconnects++;}},
       window:{setTimeout,clearTimeout},requestAnimationFrame:fn=>{frames.push(fn);return frames.length;},cancelAnimationFrame(){},
       createReaderChapterExtent:()=>({loadedCount:5,nextWindow:()=>next,replace(){replaced++;next=null;}}),

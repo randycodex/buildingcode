@@ -12,7 +12,7 @@ function actual(name) {
 let cleanupCalls = 0, cancelledRestores = 0, releasedAccess = 0;
 function panel(id) {
   const controller = new AbortController(), search = new AbortController(), progressive = new AbortController();
-  const content = { _readerProgressiveCleanup() { cleanupCalls++; progressive.abort(); } };
+  const content = { querySelectorAll: () => [], _readerProgressiveCleanup() { cleanupCalls++; progressive.abort(); } };
   return { id, dataset: { readerNavigationToken: 'original', readerRenderToken: 'original', readerSearchToken: 'original' },
     _readerNavigationAbort: controller, _readerSearchAbort: search, progressive, content,
     querySelector: () => content };

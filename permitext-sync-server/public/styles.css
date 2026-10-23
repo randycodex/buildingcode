@@ -20956,3 +20956,11 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   content-visibility: auto;
   contain-intrinsic-size: auto 600px auto 800px;
 }
+
+/* The passage window already bounds layout to 40 bodies. Empty slots retain
+   the full section's scroll range without source DOM or action subscriptions. */
+.reader-windowed-section > .annotated-code-block { content-visibility: visible; }
+.reader-block-placeholder { grid-column: 1 / -1; pointer-events: none; overflow-anchor: none; }
+.reader-content:has(.reader-windowed-section) { overflow-anchor: none; }
+
+.reader-windowed-section { content-visibility: visible !important; contain-intrinsic-size: none !important; }
