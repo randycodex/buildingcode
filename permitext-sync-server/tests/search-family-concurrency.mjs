@@ -8,6 +8,7 @@ const end=source.indexOf('  const definitionBodies =',start);
 const pending=new Map(), started=[], candidates=[];
 const families=['construction','historical2014','zoning','existingBuilding','enacted'];
 const context={activeScope:null,candidates, familyEnabled:()=>true,rememberSpellingSections(){},allowedIDs:()=>null,
+ preparedSearchRuntime:{index:(_family,loader)=>loader()},
  codeFilter:new Set(),queryTokens:[],normalizedQuery:'water',query:'water',matchMode:'words',
  timePublicCodePhase:(_name,fn)=>fn(),candidateSectionIDs:()=>new Set([1,2,3,4,5]),
  includeConstruction:true,includeHistorical2014:true,includeZoning:true,includeExistingBuilding:true,includeEnacted:true};

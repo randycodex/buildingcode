@@ -1,5 +1,6 @@
 import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
 import {preparedSearchText} from "./prepared-search-text.mjs";
+import {preparedSearchRuntime} from "./prepared-search-runtime.mjs";
 import { prepareSearchRelevance, searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
 import { createResearchSourceBodyReader } from "./research-source-body-cache.mjs";
 import { loadPreparedPassages } from "./research-prepared-passages.mjs";
@@ -23765,6 +23766,13 @@ export async function publicSearchCatalogs() {
     .map((family, index) => [family, catalogs[index]]));
 }
 
+export async function publicSearchIndexes() {
+  const indexes = await Promise.all([shippedSearchIndex(), historicalConstructionSearchIndex(),
+    zoningSearchIndex(), existingBuildingSearchIndex(), enactedSearchIndex()]);
+  return Object.fromEntries(["construction", "historical2014", "zoning", "existingBuilding", "enacted"]
+    .map((family, index) => [family, indexes[index]]));
+}
+
 export async function allSectionCatalogByID() {
   if (cachedAllSectionCatalogByID) {
     return cachedAllSectionCatalogByID;
@@ -24140,10 +24148,11 @@ async function handleCodeSearch(request, response) {
   };
   const familySearches = [];
   const loadSearchFamily = async (catalogLoader, indexLoader, family) => {
+    const loadIndex = () => preparedSearchRuntime.index(family, indexLoader);
     if (activeScope === null) {
       const [catalog, index] = await Promise.all([
         timePublicCodePhase("catalog_load", catalogLoader),
-        timePublicCodePhase("index_load", indexLoader)
+        timePublicCodePhase("index_load", loadIndex)
       ]);
       return [catalog, index, null];
     }
@@ -24151,7 +24160,7 @@ async function handleCodeSearch(request, response) {
     // an index load merely because other editions in that family are enabled.
     const catalog = await timePublicCodePhase("catalog_load", catalogLoader);
     const permitted = allowedIDs(catalog, family);
-    const index = permitted?.size === 0 ? new Map() : await timePublicCodePhase("index_load", indexLoader);
+    const index = permitted?.size === 0 ? new Map() : await timePublicCodePhase("index_load", loadIndex);
     return [catalog, index, permitted];
   };
   if (includeConstruction && familyEnabled("construction")) {

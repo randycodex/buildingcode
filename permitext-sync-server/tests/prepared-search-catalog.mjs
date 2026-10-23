@@ -27,7 +27,7 @@ try {
   let count = 0;
   for (const [family, sections] of Object.entries(source)) {
     const prepared = await loadPreparedSearchCatalog(family, () => assert.fail('Built catalog must not read rich chapters'), {sourceOnly:false});
-    assert.deepEqual(prepared, JSON.parse(JSON.stringify(sections)), `${family}: preserve every field, identity, navigation target, and ordering`);
+    assert.deepEqual(JSON.parse(JSON.stringify(prepared)), JSON.parse(JSON.stringify(sections)), `${family}: preserve every field, identity, navigation target, and ordering`);
     for (let start = 0; start < sections.length; start += 16) {
       await Promise.all(sections.slice(start, start + 16).map(async section => {
         assert.equal(await readText(section, () => assert.fail('Prepared Search must not read rich passage files')),

@@ -44,7 +44,7 @@ export function intersectCandidateIDsWithPosting(candidateIDs, posting) {
     }
     return intersection;
   }
-  const sortedPosting = Array.isArray(posting)
+  const sortedPosting = Array.isArray(posting) || posting instanceof Uint32Array
     ? posting
     : normalizedSortedPostingList(posting);
   for (const value of candidateIDs) {

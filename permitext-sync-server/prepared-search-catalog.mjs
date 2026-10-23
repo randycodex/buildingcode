@@ -1,4 +1,5 @@
 import {readFile} from 'node:fs/promises';
+import {preparedSearchRuntime} from './prepared-search-runtime.mjs';
 
 const catalogDirectory = new URL('./generated/search-catalogs/', import.meta.url);
 
@@ -9,6 +10,10 @@ export async function loadPreparedSearchCatalog(family, sourceLoader, {
   sourceOnly = process.env.PERMITEXT_BUILD_SEARCH_CATALOGS === '1'
 } = {}) {
   if (sourceOnly) return sourceLoader();
+  if (directory === catalogDirectory) {
+    const compiled = await preparedSearchRuntime.catalog(family);
+    if (compiled) return compiled;
+  }
   let payload;
   try {
     payload = JSON.parse(await readFile(new URL(`${family}.json`, directory), 'utf8'));

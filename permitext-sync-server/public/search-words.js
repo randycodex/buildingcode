@@ -27,9 +27,8 @@ export function matchesSearchWords(values, query) {
   return words.length > 0 && words.every(word => searchWordPattern(word).test(text));
 }
 
-export function searchWordPosting(index, word) {
-  // Reuse one sorted vocabulary per loaded index. Prefix searches inspect only
-  // the matching range instead of scanning every token on each keystroke.
+export function prepareSearchWordIndex(index, prepared) {
+  if (prepared) wordIndexes.set(index, prepared);
   if (!wordIndexes.has(index)) {
     const aliases = new Map();
     for (const [token, ids] of index) {
@@ -41,7 +40,13 @@ export function searchWordPosting(index, word) {
     }
     wordIndexes.set(index, { aliases, vocabulary: [...new Set([...index.keys(), ...aliases.keys()])].sort() });
   }
-  const { aliases, vocabulary } = wordIndexes.get(index);
+  return wordIndexes.get(index);
+}
+
+export function searchWordPosting(index, word) {
+  // Online builds can prepare the same aliases/vocabulary ahead of time.
+  // Offline callers retain the identical lazy preparation path.
+  const { aliases, vocabulary } = prepareSearchWordIndex(index);
   const sectionIDs = new Set();
   const collect = token => {
     for (const id of index.get(token) || []) sectionIDs.add(id);
