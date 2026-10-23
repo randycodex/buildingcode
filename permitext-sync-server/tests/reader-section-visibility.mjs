@@ -81,7 +81,11 @@ hidden = false; intersection(); flush();
 assert.equal(mounts, 50);
 assert.ok(roots.every(root => root.children[0].comments === comments), 'Edited comments are rebuilt fresh on return');
 offscreen = true; intersection(); flush(); controller.dispose(); expire(); flush();
-assert.equal(releases, 51, 'Closing or navigating cancels pending eviction');
+assert.equal(releases, 76, 'Closing cancels pending eviction and releases each live section controller');
+const lateDisposedRoot = {...roots[0], children: [{text: 'Late section'}]};
+controller.add(lateDisposedRoot, {});
+assert.equal(releases, 77, 'A late detached section is released instead of being registered after disposal');
+controller.dispose(); assert.equal(releases, 77, 'Disposal is idempotent');
 assert.equal(listeners.size, 0); assert.equal(controller.suspendedPosition, null);
 globalThis.document = doc;
 const templateController = createReaderSectionVisibility({panel: {...panel, ownerDocument: {defaultView: null}}, content,

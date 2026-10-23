@@ -9,12 +9,12 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-reader-memory-v1287";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-project-memory-v1288";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
 import { createReaderBlockWindow } from "./reader-block-window.js?v=9";
-import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=3";
+import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=4";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
@@ -137,7 +137,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-reader-memory-v1287";
+} from "./offline-storage.js?v=20261023-project-memory-v1288";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -170,7 +170,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261023-reader-memory-v1287";
+} from "./workspace-state.js?v=20261023-project-memory-v1288";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -8932,6 +8932,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   }
   loadCodeQuestionAccountStateIntoWorkspace(nextAccount?.userID || "");
   track.querySelectorAll(".search-panel").forEach(cancelSearchPanelRequest);
+  track.querySelectorAll(".reader-panel").forEach(cancelReaderPanelRequests);
   clear(track);
   saveWorkspaceState();
   return previous;
@@ -16496,6 +16497,8 @@ function stopReaderProgressiveHydration(content) {
   content?.querySelectorAll(".chapter-section").forEach(section => section._readerBlockWindow?.dispose());
   content?._readerProgressiveCleanup?.();
   if (content) {
+    const panel = content.closest?.(".reader-panel");
+    if (panel && panel._readerSectionVisibility === content._readerSectionVisibility) delete panel._readerSectionVisibility;
     delete content._readerSectionVisibility;
     delete content._readerProgressiveCleanup;
     cancelReaderScrollRestore(content);
@@ -18953,7 +18956,9 @@ function isHeaderLikeTableRow(row) {
 async function renderReader(reader, options = {}) {
   options = { ...options, scrollPosition: options.scrollPosition || pendingGroupReaderPositions.get(reader.id) };
   pendingGroupReaderPositions.delete(reader.id);
-  const panel = readerTemplate.content.firstElementChild.cloneNode(true);
+  // Import before wiring observers. A template clone belongs to its inert
+  // document; observing it there before adoption can retain disposed Readers.
+  const panel = document.importNode(readerTemplate.content.firstElementChild, true);
   panel.__workspaceAccessGate = options.accessGate || null;
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
@@ -19797,7 +19802,7 @@ async function renderSearch(instance, options = {}) {
   searchInstance.codeFilterMenuOpen = false;
   if (hadRetiredFilters) saveWorkspaceState();
   const paneID = paneIDForUtilityInstance(searchInstance);
-  const panel = searchTemplate.content.firstElementChild.cloneNode(true);
+  const panel = document.importNode(searchTemplate.content.firstElementChild, true);
   panel.__workspaceAccessGate = options.accessGate || null;
   const input = panel.querySelector(".search-input");
   const matchControl = panel.querySelector(".search-match-control");
@@ -21445,7 +21450,7 @@ async function renderSectionDetail(searchID, detail) {
 }
 
 function renderTemplate(template) {
-  return template.content.firstElementChild.cloneNode(true);
+  return document.importNode(template.content.firstElementChild, true);
 }
 
 function renderUtility(template, paneID) {
@@ -48150,6 +48155,7 @@ async function start() {
 
 function renderWorkspaceLoadError(error) {
   track.querySelectorAll(".search-panel").forEach(cancelSearchPanelRequest);
+  track.querySelectorAll(".reader-panel").forEach(cancelReaderPanelRequests);
   clear(track);
   const panel = document.createElement("article");
   panel.className = "workspace-panel workspace-load-error";

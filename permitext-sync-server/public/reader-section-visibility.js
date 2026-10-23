@@ -39,7 +39,7 @@ export function createReaderSectionVisibility({ panel, content, render, release,
     frame = 0;
     if (stopped || !panel.isConnected) return;
     // Progressive alias consolidation may have removed a registered root.
-    for (const root of records.keys()) if (!content.contains(root)) { resize.unobserve(root); records.delete(root); }
+    for (const root of records.keys()) if (!content.contains(root)) { if (records.get(root).live) release(root); resize.unobserve(root); records.delete(root); }
     if (!visible()) {
       if (!timer && [...records.values()].some(record => record.live)) timer = view.setTimeout(suspend, delay);
       return;
@@ -70,11 +70,13 @@ export function createReaderSectionVisibility({ panel, content, render, release,
   for (const event of ['scroll', 'focusout', 'selectionchange']) doc.addEventListener(event, schedule, { passive: true, capture: true });
   doc.addEventListener('permitext:workspace-layout-change', schedule);
   const controller = {
-    add(root, data) { records.set(root, { data, live: true, height: 0, markers: [] }); resize.observe(root); schedule(); },
+    add(root, data) { if (stopped) { release(root); return; } records.set(root, { data, live: true, height: 0, markers: [] }); resize.observe(root); schedule(); },
     get suspendedPosition() { return !stopped && suspended ? position : null; },
     dispose() {
       stopped = true; view.cancelAnimationFrame(frame); view.clearTimeout(timer);
-      intersection.disconnect(); resize.disconnect(); records.clear(); position = null;
+      intersection.disconnect(); resize.disconnect();
+      for (const [root, record] of records) if (record.live) release(root);
+      records.clear(); position = null;
       for (const event of ['scroll', 'focusout', 'selectionchange']) doc.removeEventListener(event, schedule, true);
       doc.removeEventListener('permitext:workspace-layout-change', schedule);
       delete content.dataset.readerSuspended;
