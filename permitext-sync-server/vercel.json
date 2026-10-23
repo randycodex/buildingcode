@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "node scripts/build-search-catalogs.mjs && npm run verify:deploy-content && node scripts/verify-prepared-research-assets.mjs && node scripts/build-prepared-research-passages.mjs && node scripts/verify-production-deploy.mjs && npm run build:clients && node scripts/build-public-entry.mjs",
+  "buildCommand": "npm run build:production",
   "outputDirectory": "deployment-public",
   "functions": {
     "api/index.mjs": {

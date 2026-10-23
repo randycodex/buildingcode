@@ -8,8 +8,11 @@ import {loadPreparedSearchCatalog} from '../prepared-search-catalog.mjs';
 const deployment = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
 const included = deployment.functions['api/index.mjs'].includeFiles;
 assert.ok(included.length <= 256, 'Vercel includeFiles must fit its schema limit');
+assert.ok(deployment.buildCommand.length <= 256, 'Vercel buildCommand must fit its schema limit');
 assert.ok(included.includes('generated/search-catalogs/**'), 'Prepared catalogs must ship with the function');
-assert.ok(deployment.buildCommand.startsWith('node scripts/build-search-catalogs.mjs &&'), 'Every deployment rebuilds catalogs from authoritative sources');
+const scripts = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')).scripts;
+assert.equal(deployment.buildCommand, 'npm run build:production');
+assert.ok(scripts['build:production'].startsWith('node scripts/build-search-catalogs.mjs &&'), 'Every deployment rebuilds catalogs from authoritative sources');
 
 const temporary = await mkdtemp(join(tmpdir(), 'permitext-search-catalog-test-'));
 process.env.PERMITEXT_SYNC_DATA_PATH = join(temporary, 'sync.json');
