@@ -1,0 +1,92 @@
+{
+  "firstUseSearch": {
+    "onlineMS": 618.3,
+    "localMS": 468.8,
+    "pairs": 15
+  },
+  "initialReader": {
+    "onlineMS": 922.95,
+    "localMS": 436.9,
+    "pairs": 4
+  },
+  "warmSearch": {
+    "onlineMS": 385.3,
+    "localMS": 374.6,
+    "pairs": 15
+  },
+  "readerReopen": {
+    "onlineMS": 699.5,
+    "localMS": 684.7,
+    "pairs": 5
+  },
+  "finalMemory": {
+    "onlineBytes": 42410924,
+    "localBytes": 50586019
+  },
+  "storage": {
+    "onlineBytes": 7552,
+    "localBytes": 268670953
+  },
+  "counts": {
+    "onlineSearch": 35,
+    "localSearch": 35,
+    "onlineReader": 10,
+    "localReader": 10
+  },
+  "parity": [
+    {
+      "query": "dead end corridor",
+      "networkCount": 43,
+      "localCount": 43,
+      "common": 43,
+      "sameOrder": true,
+      "missing": [],
+      "extra": []
+    },
+    {
+      "query": "water supply",
+      "networkCount": 642,
+      "localCount": 642,
+      "common": 642,
+      "sameOrder": true,
+      "missing": [],
+      "extra": []
+    },
+    {
+      "query": "occupant load",
+      "networkCount": 415,
+      "localCount": 415,
+      "common": 415,
+      "sameOrder": true,
+      "missing": [],
+      "extra": []
+    },
+    {
+      "query": "fire resistance",
+      "networkCount": 1183,
+      "localCount": 1183,
+      "common": 1183,
+      "sameOrder": true,
+      "missing": [],
+      "extra": []
+    },
+    {
+      "query": "egress",
+      "networkCount": 1049,
+      "localCount": 1049,
+      "common": 1049,
+      "sameOrder": true,
+      "missing": [],
+      "extra": []
+    },
+    {
+      "query": "101.4.3",
+      "networkCount": 3,
+      "localCount": 3,
+      "common": 3,
+      "sameOrder": true,
+      "missing": [],
+      "extra": []
+    }
+  ]
+}

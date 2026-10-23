@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+const code=await readFile(new URL('./public/library-worker.js',import.meta.url),'utf8');
+const reader=code.slice(code.indexOf('async function read('),code.indexOf('\nconst jobs='));
+const current='current-2022',historical='historical-2014';
+const metadata={indexRevision:3,revision:{corpusRevision:'a'.repeat(64)},libraries:{libraries:[{id:'nyc-2022-construction-codes',syncCodeVersion:current},{id:'nyc-2014-construction-codes',syncCodeVersion:historical}]},catalog:[{id:1,codePrefix:'BC'},{id:2,codePrefix:'BC',codeVersion:historical},{id:3,codePrefix:'PC',codeVersion:current}]};
+const context=vm.createContext({URL,Error,self:{location:{origin:'https://prototype.invalid'}},active:async()=>metadata});
+vm.runInContext(reader+';this.reader=read;',context);
+const ids=async query=>Array.from((await context.reader('/code/chapters?'+query)).payload.chapters,c=>c.id);
+assert.deepEqual(await ids('code=BC&version='+current),[1]);
+assert.deepEqual(await ids('code=BC&version='+historical),[2],'A historical chapter chooser must never include unversioned current summaries.');
+assert.deepEqual(await ids('code=BC'),[1]);
+assert.deepEqual(await ids('code=BC&version=all'),[1,2]);
+assert.equal((await context.reader('/code/chapters?expectedPublicCorpusRevision='+'b'.repeat(64))).status,409);
+metadata.indexRevision=0;await assert.rejects(context.reader('/code/search?q=water'),/incomplete/);
+console.log('Prototype reader protocol: current/historical/default edition isolation, revision mismatch and incomplete index refusal passed.');
