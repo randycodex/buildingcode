@@ -9,11 +9,11 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-passage-window-v1280";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-passage-window-v1283";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
-import { createReaderBlockWindow } from "./reader-block-window.js?v=7";
+import { createReaderBlockWindow } from "./reader-block-window.js?v=9";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
@@ -136,7 +136,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261022-passage-window-v1280";
+} from "./offline-storage.js?v=20261022-passage-window-v1283";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -169,7 +169,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261022-passage-window-v1280";
+} from "./workspace-state.js?v=20261022-passage-window-v1283";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -16342,6 +16342,7 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   headingRow.className = "reader-section-heading-row";
   headingRow.dataset.researchSelectionExclude = "true";
   const blocks = readerAnnotatedBlocksForSection(section);
+  const windowed = blocks.length > 96 && typeof IntersectionObserver === "function" && typeof ResizeObserver === "function";
   // This render is synchronous. Share one fresh snapshot across its controls,
   // without retaining private state for later access-gate or bookmark updates.
   let privateContentAllowed = readerPrivateContentAllowed(panel);
@@ -16377,14 +16378,15 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
       blockID: target.blockID
     }, "", savedKeys);
     const node = renderAnnotatedCodeBlock(block, section, reader, target, {
-      showBookmark: Boolean(savedBlockRecord), bookmarkStateResolved: true, lazyControls: true, lazyDecorations: blocks.length > 96, panel, accessGate: panel.__workspaceAccessGate
+      showBookmark: Boolean(savedBlockRecord), bookmarkStateResolved: true, lazyControls: !windowed, lazyDecorations: blocks.length > 96 && !windowed, panel, accessGate: panel.__workspaceAccessGate
     });
+    if (windowed) { linkInlineCodeReferences(node, panel, reader); decorateReaderDefinitions(node, reader); }
     return node;
   };
   const appendBlock = (block, index) => sectionWrapper.append(createBlock(block, index));
   if (blocks.length > 96) {
     sectionWrapper.classList.add("reader-large-section");
-    if (typeof IntersectionObserver === "function" && typeof ResizeObserver === "function") {
+    if (windowed) {
       sectionWrapper.classList.add("reader-windowed-section");
       const content = panel.querySelector(".reader-content");
       sectionWrapper._readerBlockWindow = createReaderBlockWindow({

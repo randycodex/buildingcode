@@ -2,9 +2,11 @@
 // Empty slots reserve scroll space; exact block IDs survive eviction/recreation.
 export function createReaderBlockWindow({root, content, panel, blocks, blockID, render, release, beforeMount, isCurrent, initialBlockID = ''}) {
   const doc = root.ownerDocument;
+  const nodeIndexes = new WeakMap();
   const slots = [], mounted = new Set(), heights = new Map(), presentation = new Map();
   const ids = new Map(blocks.map((block, index) => [blockID(block, index), index]));
   const windowSize = 40;
+  let lastAnchor = null, suspended = false;
   let frame = 0, stopped = false, center = Math.max(0, ids.get(initialBlockID) ?? 0), width = content.clientWidth || 600;
   const estimate = index => Math.max(52, Math.ceil((blocks[index].plainText || '').length / Math.max(20, width / 8)) * 24 + 20);
   const placeholder = index => {
@@ -27,6 +29,7 @@ export function createReaderBlockWindow({root, content, panel, blocks, blockID, 
     const node = slots[index];
     // Do not measure offscreen descendants while suspending a whole Reader.
     presentation.set(index, ["is-source-target", "is-navigation-target"].filter(name => node.classList.contains(name)));
+    resize.unobserve(node);
     release(node);
     const empty = placeholder(index);
     node.replaceWith(empty); slots[index] = empty; mounted.delete(index);
@@ -44,6 +47,7 @@ export function createReaderBlockWindow({root, content, panel, blocks, blockID, 
       const node = render(blocks[next], next);
       for (const name of presentation.get(next) || []) node.classList.add(name);
       slots[next].replaceWith(node); slots[next] = node; mounted.add(next);
+      nodeIndexes.set(node, next); resize.observe(node);
     }
     // Measure just this bounded window, never the other 1,000+ source bodies.
     if (root.isConnected && visible()) for (const next of mounted) heights.set(next, slots[next].getBoundingClientRect().height);
@@ -59,6 +63,7 @@ export function createReaderBlockWindow({root, content, panel, blocks, blockID, 
     frame = 0;
     if (stopped || !isCurrent()) return;
     if (!visible()) {
+      suspended = true;
       for (const index of [...mounted]) if (!protectedNode(slots[index])) evict(index);
       return;
     }
@@ -74,20 +79,32 @@ export function createReaderBlockWindow({root, content, panel, blocks, blockID, 
       if (slots[middle].getBoundingClientRect().bottom <= top) lower = middle + 1;
       else upper = middle;
     }
-    const index = Math.min(lower, slots.length - 1);
-    const previousTop = slots[index].getBoundingClientRect().top;
+    const index = suspended && lastAnchor ? lastAnchor.index : Math.min(lower, slots.length - 1);
+    const previousTop = suspended && lastAnchor ? viewport.top + lastAnchor.offset : slots[index].getBoundingClientRect().top;
     const nextWidth = content.clientWidth;
     if (nextWidth !== width) {
       width = nextWidth; heights.clear();
       for (let index = 0; index < slots.length; index++) if (!mounted.has(index)) slots[index].style.height = `${estimate(index)}px`;
     }
-    range(index);
+    range(index, false);
     content.scrollTop += slots[index].getBoundingClientRect().top - previousTop;
+    suspended = false;
+    lastAnchor = {index, offset: slots[index].getBoundingClientRect().top - viewport.top};
   };
   const schedule = () => {if (!stopped && !frame) frame = requestAnimationFrame(update);};
   const observer = new IntersectionObserver(schedule);
   observer.observe(panel);
-  const resize = new ResizeObserver(schedule); resize.observe(content);
+  const resize = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      const index = nodeIndexes.get(entry.target);
+      const height = entry.borderBoxSize?.[0]?.blockSize;
+      // Action buttons and inline definitions can change wrapping after mount.
+      // Retain the latest real row height; hidden zero-size deliveries must not
+      // overwrite the reading-position reservation used on return.
+      if (index !== undefined && height > 0) heights.set(index, height);
+    }
+    schedule();
+  }); resize.observe(content);
   content.addEventListener('scroll', schedule, {passive:true});
   const track = doc; // Pane construction may precede its attachment to the track.
   // Scroll events do not bubble; observe the workspace track directly as well.
