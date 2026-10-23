@@ -15,6 +15,7 @@ function routeFamily(request) {
   return match[2] ? `${match[1]}_detail` : match[1];
 }
 function tracePhase(context, name, stage, duration) {
+  if (!context.logPhases) return;
   if (context.traceEvents >= 64) { context.traceEventsDropped++; return; }
   context.traceEvents++;
   console.log(JSON.stringify({ event: "permitext.public-code-phase", requestID: context.requestID,
@@ -48,11 +49,12 @@ export function countPublicCodeEvent(name, amount = 1) {
   context.counters[name] = Math.min(1_000_000, (context.counters[name] || 0) + Math.floor(amount));
 }
 
-/** Opt-in public-only telemetry. Never captures URL parameters, account data or errors. */
+/** Public Search gets quiet timing headers; detailed public-only logs are opt-in. */
 export function runPublicCodeTiming(request, response, operation) {
-  const route = process.env.PERMITEXT_PUBLIC_PERFORMANCE === "1" ? routeFamily(request) : null;
-  if (!route) return operation();
-  const context = { requestID: randomUUID(), route, start: performance.now(), phases: {}, counters: {}, traceEvents: 0, traceEventsDropped: 0 };
+  const logPhases = process.env.PERMITEXT_PUBLIC_PERFORMANCE === "1";
+  const route = routeFamily(request);
+  if (!route || (!logPhases && route !== "search")) return operation();
+  const context = { requestID: randomUUID(), route, logPhases, start: performance.now(), phases: {}, counters: {}, traceEvents: 0, traceEventsDropped: 0 };
   const originalWriteHead = response.writeHead;
   response.writeHead = function (...args) {
     const phaseSnapshot = { ...context.phases, total: boundedNumber(performance.now() - context.start) };
@@ -85,7 +87,7 @@ export function runPublicCodeTiming(request, response, operation) {
     this.setHeader("Server-Timing", existing ? `${existing}, ${measured}` : measured);
     return originalWriteHead.apply(this, args);
   };
-  response.once("finish", () => {
+  if (logPhases) response.once("finish", () => {
     console.log(JSON.stringify({ event: "permitext.public-code-timing", requestID: context.requestID, route: context.route,
       status: response.statusCode, errorStatus: response.statusCode >= 400,
       totalElapsed: Number(boundedNumber(performance.now() - context.start).toFixed(2)),

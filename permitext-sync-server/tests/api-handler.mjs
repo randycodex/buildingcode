@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import {createAPIHandler} from '../api-handler.mjs';
+
+const response = () => ({headers:{}, getHeader(name){return this.headers[name];}, setHeader(name,value){this.headers[name]=value;}});
+let loads=0, release;
+const barrier=new Promise(resolve=>release=resolve);
+const calls=[];
+const handler=createAPIHandler(async()=>{loads++;await barrier;return {handleRequest:async request=>calls.push(request.url)};});
+const a=response(), b=response();
+const first=handler({method:'GET',url:'/code/search?q=PRIVATE'},a);
+const second=handler({method:'GET',url:'/account'},b);
+await Promise.resolve();assert.equal(loads,1,'Concurrent requests share module initialization');
+release();await Promise.all([first,second]);
+assert.match(a.headers['Server-Timing'],/^app_load;dur=\d+\.\d{2}$/);
+assert.deepEqual(b.headers,{},'Private routes do not expose timing');
+assert.doesNotMatch(JSON.stringify(a.headers),/PRIVATE/);
+const warm=response();warm.headers['Server-Timing']='prior;dur=2';
+await handler({method:'GET',url:'/code/search'},warm);assert.equal(loads,1);
+assert.match(warm.headers['Server-Timing'],/^prior;dur=2, app_load/);
+let attempts=0;const failure=new Error('module unavailable');
+const retry=createAPIHandler(async()=>{if(++attempts===1)throw failure;return {handleRequest:()=>{}};});
+await assert.rejects(retry({method:'GET',url:'/code/search'},response()),error=>error===failure);
+await retry({method:'GET',url:'/code/search'},response());assert.equal(attempts,2);
+console.log('API startup timing: shared initialization, warm reuse, retry, header preservation and private-route isolation passed.');

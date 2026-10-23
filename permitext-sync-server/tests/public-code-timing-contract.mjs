@@ -5,7 +5,8 @@ class Response extends EventEmitter {constructor(){super();this.headers={};this.
 const prior=process.env.PERMITEXT_PUBLIC_PERFORMANCE;const log=console.log;const logs=[],traces=[];console.log=value=>{const parsed=JSON.parse(value);(parsed.event==='permitext.public-code-phase'?traces:logs).push(parsed);};
 try{
  delete process.env.PERMITEXT_PUBLIC_PERFORMANCE;
- const disabled=new Response();assert.equal(runPublicCodeTiming({method:'GET',url:'/code/search?q=secret'},disabled,()=>23),23);disabled.writeHead(200).finish();assert.deepEqual(disabled.headers,{});assert.equal(logs.length,0);
+ const quiet=new Response();assert.equal(runPublicCodeTiming({method:'GET',url:'/code/search?q=secret'},quiet,()=>timePublicCodePhase('index_load',()=>23)),23);quiet.writeHead(200).finish();assert.match(quiet.headers['Server-Timing'],/index_load;dur=/);assert.doesNotMatch(JSON.stringify(quiet.headers),/secret/);assert.equal(logs.length,0);assert.equal(traces.length,0);
+ const disabled=new Response();runPublicCodeTiming({method:'GET',url:'/code/chapters'},disabled,()=>disabled.writeHead(200).finish());assert.deepEqual(disabled.headers,{});
  process.env.PERMITEXT_PUBLIC_PERFORMANCE='1';
  for(const [method,url] of [['POST','/code/search'],['GET','/account'],['GET','/projects/foundation/state'],['GET','/code/assets/private.png'],['GET','/code/search/extra']]){const r=new Response();runPublicCodeTiming({method,url},r,()=>r.writeHead(403).finish());assert.deepEqual(r.headers,{});}assert.equal(logs.length,0);
  let release;const barrier=new Promise(r=>release=r);const a=new Response(),b=new Response();

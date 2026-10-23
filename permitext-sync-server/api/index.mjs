@@ -1,5 +1,3 @@
-import { handleRequest } from "../app.mjs";
+import {createAPIHandler} from '../api-handler.mjs';
 
-export default async function handler(request, response) {
-  await handleRequest(request, response);
-}
+export default createAPIHandler();
