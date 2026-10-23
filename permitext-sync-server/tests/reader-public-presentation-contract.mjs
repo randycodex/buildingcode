@@ -53,7 +53,7 @@ const context=vm.createContext({
   readerProjectsForSection(){reads++;return [];},isSectionSaved(){reads++;return true;},readerSectionHasNote(){reads++;return false;}
 });
 const subscriptionLifecycle = source.slice(source.indexOf("const workspaceNodeAccessRecords"), source.indexOf("function readerPrivateContentAllowed"));
-vm.runInContext(subscriptionLifecycle + ["noteAddIconSVG","readerPrivateContentAllowed","renderReaderChapterSection","renderAnnotatedCodeBlock","renderInlineCommentBox","renderReaderSectionProjectContext"].map(actual).join("\n"),context);
+vm.runInContext(subscriptionLifecycle + ["noteAddIconSVG","readerPrivateContentAllowed","renderReaderChapterSection", "buildReaderChapterSection","renderAnnotatedCodeBlock","renderInlineCommentBox","renderReaderSectionProjectContext"].map(actual).join("\n"),context);
 const rendered=context.renderReaderChapterSection(panel,reader,section,new Map());panel.append(rendered);
 const body=rendered.querySelector(".annotated-code-block").children[0];
 const bookmark=rendered.querySelector(".reader-section-saved-marker");

@@ -25,7 +25,7 @@ function harness() {
   const context = vm.createContext({ readerSearchMatch, snippetForMatch, readerSearchResultHeading, crypto: { randomUUID }, document: { createElement: element },
     annotatedBlocksForSection: section => section.blocks || [],
     annotationTargetForBlock: (_section, block, _reader, index) => ({blockID: block.id || `block-${index}`}),
-    stopReaderProgressiveHydration() {}, clear: node => {node.children = [];},
+    stopReaderProgressiveHydration() {}, startReaderSectionVisibility() {}, clear: node => {node.children = [];},
     emptyReader: (node,title,message) => {node.children = [title,message];},
     renderSectionContent: restore, readerSearchTimers: new Map(), clearTimeout,
     AbortController, captureReaderScrollPositions: () => new Map(),
@@ -85,7 +85,7 @@ function harness() {
   assert.equal(t.opened[0].pendingSearchHighlightBlockID,"paragraph-2");
   assert.equal(t.opened[0].options.expectedCorpusRevision,"b".repeat(64));
 }
-assert.match(source.slice(source.indexOf("async function renderSectionContent("),source.indexOf("async function renderSectionContent(")+220),/readerSearchToken/);
+assert.match(source.slice(source.indexOf("async function renderSectionContent("), source.indexOf("\n}", source.indexOf("async function renderSectionContent("))),/readerSearchToken/);
 
 // A saved citation fetch failure must resolve to visible recovery, remove only
 // its abandoned detail pane, and retain the exact citation for another attempt.

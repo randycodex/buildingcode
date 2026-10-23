@@ -65,7 +65,7 @@ const context = vm.createContext({
 });
 const subscriptionLifecycle = source.slice(source.indexOf("const workspaceNodeAccessRecords"), source.indexOf("function readerPrivateContentAllowed"));
 vm.runInContext(subscriptionLifecycle + ["workspaceAccessGateForRender", "normalizeAnnotationBlockID", "savedEvidenceKey", "projectSectionBelongsToProject", "workspaceSavedEvidenceKeys", "isSectionSaved",
-  "readerPrivateContentAllowed", "renderReaderChapterSection", "renderAnnotatedCodeBlock", "renderInlineCommentBox"].map(actual).join("\n"), context);
+  "readerPrivateContentAllowed", "renderReaderChapterSection", "buildReaderChapterSection", "renderAnnotatedCodeBlock", "renderInlineCommentBox"].map(actual).join("\n"), context);
 const gate = context.workspaceAccessGateForRender();
 await gate.ready;
 panel.__workspaceAccessGate = gate;

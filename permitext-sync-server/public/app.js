@@ -9,11 +9,12 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-search-runtime-v1284";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-reader-memory-v1287";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
 import { createReaderBlockWindow } from "./reader-block-window.js?v=9";
+import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=3";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
@@ -136,7 +137,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261022-search-runtime-v1284";
+} from "./offline-storage.js?v=20261023-reader-memory-v1287";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -169,7 +170,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261022-search-runtime-v1284";
+} from "./workspace-state.js?v=20261023-reader-memory-v1287";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -16305,9 +16306,47 @@ function openResearchDestinationMenu(anchor, selection) {
   menu.querySelector('button')?.focus();
 }
 
+function startReaderSectionVisibility(panel, reader, content) {
+  if (typeof IntersectionObserver !== "function" || typeof ResizeObserver !== "function") return;
+  const controller = createReaderSectionVisibility({
+    panel, content,
+    capturePosition: () => {
+      const pending = panel._workflowPendingReaderTarget;
+      const section = pending?.closest('.chapter-section');
+      if (section && content.contains(pending)) return {
+        contentKey: readerContentScrollKey(reader), sectionID: section.dataset.sectionId,
+        blockID: pending.closest('[data-block-id]')?.dataset.blockId || '', anchorOffset: 0, sectionOffset: 0
+      };
+      return captureReaderScrollPositions(panel).get(panel.dataset.paneId) || panel._readerAnchorSnapshot?.position || panel._workflowReaderPosition || panel._collapsedReaderPosition;
+    },
+    restorePosition: position => {
+      delete panel._readerAnchorSnapshot;
+      if (position) restoreReaderScrollPositions(new Map([[panel.dataset.paneId, position]]));
+    },
+    release: root => {
+      if (root.contains(panel._workflowPendingReaderTarget)) delete panel._workflowPendingReaderTarget;
+      root._readerBlockWindow?.dispose();
+      delete root._readerBlockWindow;
+      delete root._readerBlocksReady;
+      root.querySelectorAll('.annotated-code-block').forEach(node => panel._readerActionsObserver?.unobserve(node));
+      disposeWorkspaceNodeAccess(root);
+    },
+    render: (root, data, position, highlightedBlocks) => buildReaderChapterSection(panel, reader, data.section, data.groupLabels, {
+      ...data.options, host: root, scrollPosition: position, highlightedBlocks
+    })
+  });
+  panel._readerSectionVisibility = content._readerSectionVisibility = controller;
+}
+
 function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSection, options = {}) {
-  const sectionWrapper = document.createElement("section");
-  sectionWrapper.className = "chapter-section";
+  const root = buildReaderChapterSection(panel, reader, section, groupLabelsByFirstSection, options);
+  panel._readerSectionVisibility?.add(root, {section, groupLabels: groupLabelsByFirstSection, options});
+  return root;
+}
+
+function buildReaderChapterSection(panel, reader, section, groupLabelsByFirstSection, options = {}) {
+  const sectionWrapper = options.host || document.createElement("section");
+  sectionWrapper.classList.add("chapter-section");
   sectionWrapper.dataset.sectionId = String(section.id);
   sectionWrapper.dataset.codeVersion = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix));
   sectionWrapper.dataset.sectionNumber = String(section.sectionNumber || "");
@@ -16380,6 +16419,8 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
     const node = renderAnnotatedCodeBlock(block, section, reader, target, {
       showBookmark: Boolean(savedBlockRecord), bookmarkStateResolved: true, lazyControls: !windowed, lazyDecorations: blocks.length > 96 && !windowed, panel, accessGate: panel.__workspaceAccessGate
     });
+    const marker = options.highlightedBlocks?.find(item => item.id === target.blockID);
+    if (marker) marker.classes.forEach(name => node.classList.add(name));
     if (windowed) { linkInlineCodeReferences(node, panel, reader); decorateReaderDefinitions(node, reader); }
     return node;
   };
@@ -16451,9 +16492,11 @@ function collapseRepeatedReaderCatalogAliases(content) {
 }
 
 function stopReaderProgressiveHydration(content) {
+  content?._readerSectionVisibility?.dispose();
   content?.querySelectorAll(".chapter-section").forEach(section => section._readerBlockWindow?.dispose());
   content?._readerProgressiveCleanup?.();
   if (content) {
+    delete content._readerSectionVisibility;
     delete content._readerProgressiveCleanup;
     cancelReaderScrollRestore(content);
   }
@@ -16726,6 +16769,7 @@ async function renderSectionContent(panel, reader, options = {}) {
   const acceptedPublicGeneration = publicCodeRevision.generation;
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
   clear(content);
+  startReaderSectionVisibility(panel, reader, content);
   const initialSections = sections.slice(initialStart, initialEnd).map((section) =>
     readerSectionWithWindowBody(section, initialChapter)
   );
@@ -43395,7 +43439,7 @@ function readerScrollPositionFor(reader, position, sections) {
   return sectionIndex < 0 ? null : { ...position, sectionIndex };
 }
 
-function captureReaderScrollPositions() {
+function captureReaderScrollPositions(onlyPanel = null) {
   const positions = new Map();
   // Sections and their passage blocks are ordered vertically. Find the first
   // visible anchor without measuring every earlier offscreen passage, which
@@ -43421,7 +43465,9 @@ function captureReaderScrollPositions() {
     }
     return null;
   };
-  track.querySelectorAll('.workspace-panel[data-pane-id^="reader:"]').forEach((panel) => {
+  (onlyPanel ? [onlyPanel] : track.querySelectorAll('.workspace-panel[data-pane-id^="reader:"]')).forEach((panel) => {
+    const suspendedPosition = panel._readerSectionVisibility?.suspendedPosition;
+    if (suspendedPosition) { positions.set(panel.dataset.paneId, suspendedPosition); return; }
     if (panel.classList.contains("is-workflow-hidden")) {
       if (panel._workflowReaderPosition) positions.set(panel.dataset.paneId, panel._workflowReaderPosition);
       return;

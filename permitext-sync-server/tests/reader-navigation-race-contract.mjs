@@ -40,7 +40,7 @@ function harness({ delayChapters = false } = {}) {
     AbortController, crypto: { randomUUID }, document: { createElement: node },
     clear: element => { element.children = []; },
     blankReader: element => { element.children = ["Select a chapter"]; },
-    stopReaderProgressiveHydration() {}, applyCodeTheme() {}, renderReaderTrust() {},
+    stopReaderProgressiveHydration() {}, startReaderSectionVisibility() {}, applyCodeTheme() {}, renderReaderTrust() {},
     populateCodeSelect() {}, resetEnhancedSelects() {}, enhanceSelect() {}, preparePaneCollapse() { panel.headerTitle = panel.title; },
     syncResearchColumnLayout() {},
     setReaderDefinitionContext() {}, syncCodeVersion: value => value,
