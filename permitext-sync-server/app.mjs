@@ -1,3 +1,4 @@
+import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
 import { prepareSearchRelevance, searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
 import { createResearchSourceBodyReader } from "./research-source-body-cache.mjs";
 import { loadPreparedPassages } from "./research-prepared-passages.mjs";
@@ -8251,7 +8252,7 @@ async function sectionCatalog() {
   if (cachedSectionCatalogPromise) {
     return cachedSectionCatalogPromise;
   }
-  cachedSectionCatalogPromise = buildSectionCatalog();
+  cachedSectionCatalogPromise = loadPreparedSearchCatalog("construction", buildSectionCatalog);
   try {
     cachedSectionCatalog = await cachedSectionCatalogPromise;
     return cachedSectionCatalog;
@@ -23753,6 +23754,13 @@ async function handleCodeSections(request, response) {
   });
 }
 
+export async function publicSearchCatalogs() {
+  const catalogs = await Promise.all([sectionCatalog(), historicalConstructionSectionCatalog(),
+    zoningSectionCatalog(), existingBuildingSectionCatalog(), enactedSectionCatalog()]);
+  return Object.fromEntries(["construction", "historical2014", "zoning", "existingBuilding", "enacted"]
+    .map((family, index) => [family, catalogs[index]]));
+}
+
 export async function allSectionCatalogByID() {
   if (cachedAllSectionCatalogByID) {
     return cachedAllSectionCatalogByID;
@@ -23978,13 +23986,16 @@ async function groupedCodeSearchPage(hits, query, resultLimit, matchMode = "exac
   const entries = [...sources.values()];
   const pages = new Array(entries.length);
   let next = 0;
-  // Preview a few matches in every edition without reading every matching body.
-  // Two workers keep aggregate content-read concurrency bounded at sixteen.
-  await Promise.all(Array.from({ length: Math.min(2, entries.length) }, async () => {
+  // Keep at most sixteen body reads in flight. With one preview per edition,
+  // each worker reads two bodies (one result + lookahead), so eight editions
+  // can progress together instead of serializing eleven pairs of previews.
+  const groupLimit = initialSearchGroupLimit(entries.length, resultLimit);
+  const workers = Math.min(entries.length, Math.max(1, Math.floor(16 / Math.min(exactSearchConcurrency, groupLimit + 1))));
+  await Promise.all(Array.from({ length: workers }, async () => {
     while (next < entries.length) {
       const index = next++;
       const source = entries[index];
-      const page = await exactSearchPage(source.hits, query, 0, initialSearchGroupLimit(entries.length, resultLimit), matchMode);
+      const page = await exactSearchPage(source.hits, query, 0, groupLimit, matchMode);
       pages[index] = { codePrefix: source.codePrefix, codeVersion: source.codeVersion, ...page };
     }
   }));
@@ -24120,13 +24131,26 @@ async function handleCodeSearch(request, response) {
       (!resultSource || section.codePrefix === resultSource.codePrefix && codeSearchSectionVersion(section) === resultSource.codeVersion)));
   };
   const familySearches = [];
+  const loadSearchFamily = async (catalogLoader, indexLoader, family) => {
+    if (activeScope === null) {
+      const [catalog, index] = await Promise.all([
+        timePublicCodePhase("catalog_load", catalogLoader),
+        timePublicCodePhase("index_load", indexLoader)
+      ]);
+      return [catalog, index, null];
+    }
+    // Resolve a restricted catalog first: disabled sources must never trigger
+    // an index load merely because other editions in that family are enabled.
+    const catalog = await timePublicCodePhase("catalog_load", catalogLoader);
+    const permitted = allowedIDs(catalog, family);
+    const index = permitted?.size === 0 ? new Map() : await timePublicCodePhase("index_load", indexLoader);
+    return [catalog, index, permitted];
+  };
   if (includeConstruction && familyEnabled("construction")) {
     familySearches.push((async () => {
       const candidates = [];
-      const scopedCatalog = await timePublicCodePhase("catalog_load", () => sectionCatalog());
+      const [scopedCatalog, index, allowedSectionIDs] = await loadSearchFamily(sectionCatalog, shippedSearchIndex, "construction");
       rememberSpellingSections(scopedCatalog, "construction");
-      const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "construction");
-      const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => shippedSearchIndex());
       const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
       candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => sectionCatalog())).filter((section) =>
         candidateIDs.has(section.id) &&
@@ -24138,10 +24162,8 @@ async function handleCodeSearch(request, response) {
   if (includeHistorical2014 && familyEnabled("historical2014")) {
     familySearches.push((async () => {
       const candidates = [];
-      const scopedCatalog = await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog());
+      const [scopedCatalog, index, allowedSectionIDs] = await loadSearchFamily(historicalConstructionSectionCatalog, historicalConstructionSearchIndex, "historical2014");
       rememberSpellingSections(scopedCatalog, "historical2014");
-      const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "historical2014");
-      const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => historicalConstructionSearchIndex());
       const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
       candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog())).filter((section) =>
         candidateIDs.has(section.id) &&
@@ -24153,10 +24175,8 @@ async function handleCodeSearch(request, response) {
   if (includeZoning && familyEnabled("zoning")) {
     familySearches.push((async () => {
       const candidates = [];
-      const scopedCatalog = await timePublicCodePhase("catalog_load", () => zoningSectionCatalog());
+      const [scopedCatalog, index, allowedSectionIDs] = await loadSearchFamily(zoningSectionCatalog, zoningSearchIndex, "zoning");
       rememberSpellingSections(scopedCatalog, "zoning");
-      const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "zoning");
-      const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => zoningSearchIndex());
       const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
       candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => zoningSectionCatalog())).filter((section) => candidateIDs.has(section.id)));
       return candidates;
@@ -24165,10 +24185,8 @@ async function handleCodeSearch(request, response) {
   if (includeExistingBuilding && familyEnabled("existingBuilding")) {
     familySearches.push((async () => {
       const candidates = [];
-      const scopedCatalog = await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog());
+      const [scopedCatalog, index, allowedSectionIDs] = await loadSearchFamily(existingBuildingSectionCatalog, existingBuildingSearchIndex, "existingBuilding");
       rememberSpellingSections(scopedCatalog, "existingBuilding");
-      const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "existingBuilding");
-      const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => existingBuildingSearchIndex());
       const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
       candidates.push(
         ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog())).filter((section) =>
@@ -24181,10 +24199,8 @@ async function handleCodeSearch(request, response) {
   if (includeEnacted && familyEnabled("enacted")) {
     familySearches.push((async () => {
       const candidates = [];
-      const scopedCatalog = await timePublicCodePhase("catalog_load", () => enactedSectionCatalog());
+      const [scopedCatalog, index, allowedSectionIDs] = await loadSearchFamily(enactedSectionCatalog, enactedSearchIndex, "enacted");
       rememberSpellingSections(scopedCatalog, "enacted");
-      const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "enacted");
-      const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => enactedSearchIndex());
       const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
       candidates.push(
         ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => enactedSectionCatalog())).filter((section) =>

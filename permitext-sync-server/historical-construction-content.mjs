@@ -1,3 +1,4 @@
+import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
 import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -123,7 +124,7 @@ function flattenedSections(chapter) {
   );
 }
 
-export const historicalConstructionSectionCatalog = createRetryableLazyLoader(async () => {
+export const historicalConstructionSectionCatalog = createRetryableLazyLoader(() => loadPreparedSearchCatalog("historical2014", async () => {
   const chapters = await historicalConstructionChapterIndex();
   const result = [];
   for (const chapterSummary of chapters) {
@@ -145,7 +146,7 @@ export const historicalConstructionSectionCatalog = createRetryableLazyLoader(as
     }
   }
   return result;
-});
+}));
 
 export async function historicalConstructionSectionSummary(sectionID) {
   const key = String(sectionID || "").trim();

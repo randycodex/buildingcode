@@ -1,3 +1,4 @@
+import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -300,7 +301,7 @@ async function rawEnactedSectionCatalog() {
 export async function enactedSectionCatalog() {
   if (cachedDecoratedCatalog) return cachedDecoratedCatalog;
   if (cachedDecoratedCatalogPromise) return cachedDecoratedCatalogPromise;
-  cachedDecoratedCatalogPromise = (async () => {
+  cachedDecoratedCatalogPromise = loadPreparedSearchCatalog("enacted", async () => {
     const [raw, navigationIndex, sourceChapters] = await Promise.all([
       rawEnactedSectionCatalog(),
       enactedNavigationChapterIndex(),
@@ -319,13 +320,14 @@ export async function enactedSectionCatalog() {
       sourceByID.get(String(section.chapterID))
     ));
     return cachedDecoratedCatalog;
-  })().catch((error) => {
+  }).catch((error) => {
     cachedDecoratedCatalogPromise = null;
     cachedDecoratedCatalog = null;
     throw error;
   });
   try {
-    return await cachedDecoratedCatalogPromise;
+    cachedDecoratedCatalog = await cachedDecoratedCatalogPromise;
+    return cachedDecoratedCatalog;
   } finally {
     cachedDecoratedCatalogPromise = null;
   }

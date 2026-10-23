@@ -1,3 +1,4 @@
+import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
 import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -127,7 +128,7 @@ function flattenedChapterSections(chapter) {
   );
 }
 
-export const zoningSectionCatalog = createRetryableLazyLoader(async () => {
+export const zoningSectionCatalog = createRetryableLazyLoader(() => loadPreparedSearchCatalog("zoning", async () => {
   const chapters = await zoningChapterIndex();
   const summaries = [];
   for (const summary of chapters) {
@@ -148,7 +149,7 @@ export const zoningSectionCatalog = createRetryableLazyLoader(async () => {
     }
   }
   return summaries;
-});
+}));
 
 export async function zoningSectionSummary(sectionID) {
   const key = String(sectionID || "").trim();
