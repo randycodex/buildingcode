@@ -45,18 +45,22 @@ console.log('Workspace feedback: durable local save paints before network; scrol
   document.createElement=tag=>{const node=base(tag);node.removeAttribute=key=>delete node.attributes[key];return node;};
   let observeCallback, observed=[], paints=0, reads=0, snapshots=0, allowed=false, currentSavedKeys=new Set();
   const paintOptions = [];
+  let linkPasses=0, definitionPasses=0;
   const panel=document.createElement('article');
   class Observer {constructor(callback){observeCallback=callback;}observe(node){observed.push(node);}unobserve(node){observed=observed.filter(n=>n!==node);}}
-  const lazy=vm.createContext({document,IntersectionObserver:Observer,readerPrivateContentAllowed:()=>allowed,
+  const lazy=vm.createContext({document,IntersectionObserver:Observer,
+    linkInlineCodeReferences(){linkPasses++;},decorateReaderDefinitions(){definitionPasses++;},readerPrivateContentAllowed:()=>allowed,
     workspaceSavedEvidenceKeys(){snapshots++;return currentSavedKeys;},
     isSectionSaved(target,_version,keys){reads++;return (keys || currentSavedKeys).has(target.blockID);},renderCodeBlock(){const n=document.createElement('p');n.textContent='Complete source passage';return n;},
     renderInlineCommentBox(_section,_reader,_target,options){paints++;paintOptions.push(options);const n=document.createElement('div');n.className='inline-comment';return n;}});
   const begin=source.indexOf('function renderAnnotatedCodeBlock(');
   vm.runInContext(source.slice(begin,source.indexOf('\n}',begin)+2),lazy);
-  const wrapper=lazy.renderAnnotatedCodeBlock({}, {}, {},{sectionID:'s',blockID:'p'},{lazyControls:true,panel});
+  const wrapper=lazy.renderAnnotatedCodeBlock({}, {}, {},{sectionID:'s',blockID:'p'},{lazyControls:true,lazyDecorations:true,panel});
+  assert.equal(linkPasses+definitionPasses,0,'Offscreen source text does not build interactive term/reference wrappers');
   assert.equal(wrapper.textContent,'');assert.equal(wrapper.children[0].textContent,'Complete source passage');
   assert.equal(paints,0);assert.equal(observed.length,1);
   observeCallback([{target:wrapper,isIntersecting:true}]);
+  assert.equal(linkPasses,1);assert.equal(definitionPasses,1,'Visible text gains both reference and definition navigation');
   assert.equal(paints,1);assert.equal(reads,0,'Deferred actions must not read private state while access is pending');
   assert.equal(snapshots,0);
   assert.equal(observed.length,0);

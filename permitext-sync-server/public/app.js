@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-column-rendering-v1267";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-reader-decoration-v1268";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -135,7 +135,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261022-column-rendering-v1267";
+} from "./offline-storage.js?v=20261022-reader-decoration-v1268";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -168,7 +168,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261022-column-rendering-v1267";
+} from "./workspace-state.js?v=20261022-reader-decoration-v1268";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -16347,13 +16347,9 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
       blockID: target.blockID
     }, "", savedKeys);
     const node = renderAnnotatedCodeBlock(block, section, reader, target, {
-      showBookmark: Boolean(savedBlockRecord), bookmarkStateResolved: true, lazyControls: true, panel, accessGate: panel.__workspaceAccessGate
+      showBookmark: Boolean(savedBlockRecord), bookmarkStateResolved: true, lazyControls: true, lazyDecorations: blocks.length > 96, panel, accessGate: panel.__workspaceAccessGate
     });
     sectionWrapper.append(node);
-    if (blocks.length > 96) {
-      linkInlineCodeReferences(node, panel, reader);
-      decorateReaderDefinitions(node, reader);
-    }
   };
   if (blocks.length > 96) {
     sectionWrapper.classList.add("reader-large-section");
@@ -16866,6 +16862,10 @@ function renderAnnotatedCodeBlock(block, section, reader, target, options = {}) 
   wrapper.append(renderCodeBlock(block));
   const mount = (snapshot = null) => {
     if (wrapper.querySelector(":scope > .inline-comment")) return;
+    if (options.lazyDecorations) {
+      linkInlineCodeReferences(wrapper, options.panel, reader);
+      decorateReaderDefinitions(wrapper, reader);
+    }
     wrapper.append(renderInlineCommentBox(section, reader, target, {
       ...options, bookmarkStateResolved: true,
       showBookmark: readerPrivateContentAllowed(options.panel) && Boolean(isSectionSaved({sectionID: target.sectionID, codeVersion: target.codeVersion, blockID: target.blockID}, "", snapshot?.savedKeys))
@@ -16892,6 +16892,10 @@ function renderAnnotatedCodeBlock(block, section, reader, target, options = {}) 
     }, { root: panel.querySelector(".reader-content"), rootMargin: "300px" });
     panel._readerActionsObserver.observe(wrapper);
   } else {
+    if (options.lazyDecorations) {
+      linkInlineCodeReferences(wrapper, options.panel, reader);
+      decorateReaderDefinitions(wrapper, reader);
+    }
     wrapper.append(renderInlineCommentBox(section, reader, target, options));
   }
   return wrapper;
