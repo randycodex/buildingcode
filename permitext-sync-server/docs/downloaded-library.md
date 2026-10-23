@@ -163,3 +163,8 @@ selection, undo history or background saves. The actual mount/publication test
 failed before the correction and now covers deferred construction, unused lease
 release, first reveal and controller retention across hide/reveal. Account,
 workflow navigation and Notebook durability checks are reported separately.
+The workflow-switch fast path explicitly reconciles newly visible deferred slots
+and fences its continuation by account, workspace and navigation identity. A
+real-app synthetic browser check covers Research reload → deferred Note →
+Notebook reveal → repeated hide/reveal with unchanged text. This complements
+the mount-coordinator tests, which alone do not exercise the view-switch path.

@@ -1,4 +1,4 @@
-import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=7';
+import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=8';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=5";
 import { createAssistantMaterials } from "./assistant-materials.js?v=4";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=6";
@@ -10,7 +10,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-deferred-notes-v1297";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -139,7 +139,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-deferred-notes-v1297";
+} from "./offline-storage.js?v=20261023-notes-reveal-v1298";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -172,7 +172,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261023-deferred-notes-v1297";
+} from "./workspace-state.js?v=20261023-notes-reveal-v1298";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -4984,6 +4984,15 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
   }
   if (view === "notebook") savedPaneIDs().forEach((paneID) => placeEvidenceBeforeNotebook(paneID));
   syncWorkflowColumnPresentation();
+  if ([...track.querySelectorAll(':scope > .workspace-panel')].some(pane =>
+    pane.dataset.workspacePaneDeferred === "true" && workflowPaneIsVisible(pane.dataset.paneId)
+  )) {
+    const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+    const navigation = state.workflowNavigationGeneration || 0;
+    await transitionWorkspace("utility");
+    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
+        (state.workflowNavigationGeneration || 0) !== navigation || view !== currentWorkflowView()) return false;
+  }
   if (initialize && (initializeNotebook || (!visitedViews.includes(view) && !defaultActivePaneIDs().some(workflowPaneIsVisible)))) {
     if (view === 'notebook') await openProjectNotebook(workspaceProject());
     else await focusRecentUtilityColumn('search');

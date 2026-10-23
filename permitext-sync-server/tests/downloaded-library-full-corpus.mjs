@@ -21,7 +21,7 @@ const headers = {
 };
 const root = new URL("../public/", import.meta.url);
 async function runner() {
-  const library = await import("/web/downloaded-library.js?v=7");
+  const library = await import("/web/downloaded-library.js?v=8");
   const status = document.querySelector("#status"),
     output = document.querySelector("#output");
   const report = {

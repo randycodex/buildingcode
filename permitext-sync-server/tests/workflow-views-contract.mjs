@@ -121,6 +121,31 @@ for (const screen of ['report','project-details']) {
 }
 console.log('Workflow views passed: independent visibility, linked destinations, layout persistence, retained editors, nested scroll and project guard.');
 
+// The real view-switch fast path must start an existing deferred slot rather
+// than treating its placeholder as a healthy, already-mounted editor.
+let deferredHydrations=0;
+c.activeWorkspaceID='workspace';c.captureAccountRequest=()=>({});c.isCurrentAccountRequest=()=>true;
+c.transitionWorkspace=async mode=>{
+ assert.equal(mode,'utility');deferredHydrations++;
+ delete notebook.dataset.workspacePaneDeferred;delete notebook.dataset.workspacePaneLoading;
+};
+notebook.dataset.workspacePaneDeferred='true';notebook.dataset.workspacePaneLoading='true';
+await c.switchWorkflowView('research');assert.equal(deferredHydrations,0);
+await c.switchWorkflowView('notebook');assert.equal(deferredHydrations,1,'Revealing a deferred Note must reconcile its real loader');
+await c.switchWorkflowView('research');await c.switchWorkflowView('notebook');
+assert.equal(deferredHydrations,1,'An already mounted Note retains its controller without another hydration');
+assert.equal(notebook.draft,'Unsaved text');
+
+let releaseDeferred;
+c.transitionWorkspace=()=>new Promise(resolve=>{releaseDeferred=resolve;});
+notebook.dataset.workspacePaneDeferred='true';
+const lateReveal=c.switchWorkflowView('notebook');
+state.workflowView='research';state.workflowNavigationGeneration++;
+releaseDeferred();assert.equal(await lateReveal,false,'A delayed reveal must not finish against a subsequently selected view');
+delete notebook.dataset.workspacePaneDeferred;
+await c.switchWorkflowView('notebook');
+console.log('Deferred Notes view reveal passed: starts once through the real view switch, retains mounted editors and fences late navigation.');
+
 const closed=[];
 c.activeWorkspaceID='a'; c.captureAccountRequest=()=>({}); c.isCurrentAccountRequest=()=>true;
 c.workspacePaneDescriptors=()=>panes.map(p=>({id:p.dataset.paneId,close:async()=>{closed.push(p.dataset.paneId);}}));

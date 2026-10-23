@@ -1,4 +1,4 @@
-import { searchWords, searchWordPattern } from './search-words.js?v=20261023-deferred-notes-v1297';
+import { searchWords, searchWordPattern } from './search-words.js?v=20261023-notes-reveal-v1298';
 
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const normalized = value => searchWords(value).map(word => word.replace(/(?<!s)s$/, '')).join(' ');
