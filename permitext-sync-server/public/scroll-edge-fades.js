@@ -70,8 +70,20 @@ export function installScrollEdgeFades() {
     // Read layout before writing masks, including when a column is resized or
     // a sticky editing toolbar reaches the top of its scrolling viewport.
     const states = [];
+    const panelVisibility = new Map();
     for (const element of tracked) {
       if (!element.isConnected) {tracked.delete(element); resize.unobserve(element); continue;}
+      // Measure only the outer containment box of horizontally offscreen
+      // columns. Reading a descendant's clientHeight would force its skipped
+      // Reader tree back through layout on every unrelated DOM mutation.
+      const panel = element.closest?.('.workspace-panel');
+      if (panel) {
+        if (!panelVisibility.has(panel)) {
+          const bounds = panel.getBoundingClientRect();
+          panelVisibility.set(panel, bounds.width > 0 && bounds.right > 0 && bounds.left < window.innerWidth);
+        }
+        if (!panelVisibility.get(panel)) continue;
+      }
       // Hidden retained workflow columns have no viewport to fade. Avoid
       // querying their source text or forcing their scroll/style measurements.
       if (!element.clientHeight) {states.push({element, top:false, bottom:false, header:0}); continue;}

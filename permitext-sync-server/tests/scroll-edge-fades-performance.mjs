@@ -19,7 +19,7 @@ const header=new Element('.notebook-format-toolbar'),popup=new Element('.noteboo
 const visible=new Element('.notebook-shell',[header,popup]),hidden=new Element('.reader-content');hidden.clientHeight=0;
 const body=new Element('body',[visible,hidden]);
 const document={body,contains:node=>body.contains(node),querySelectorAll(selector){documentScans++;return body.querySelectorAll(selector);},addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:name=>listeners.delete(name),fonts:{addEventListener(){},removeEventListener(){}}};
-const c=vm.createContext({document,window:{addEventListener:(name,fn)=>listeners.set('window:'+name,fn),removeEventListener:name=>listeners.delete('window:'+name)},
+const c=vm.createContext({document,window:{innerWidth:1200,addEventListener:(name,fn)=>listeners.set('window:'+name,fn),removeEventListener:name=>listeners.delete('window:'+name)},
  requestAnimationFrame:fn=>{frame=fn;return 1;},cancelAnimationFrame:()=>{frame=null;},
  getComputedStyle:element=>({overflowY:'auto',position:element===header?'sticky':'static'}),
  ResizeObserver:class{constructor(fn){resizeUpdate=fn;}observe(e){observed.add(e);}unobserve(e){unobserved.add(e);}disconnect(){observed.clear();}},
@@ -37,6 +37,12 @@ assert.equal(visible.attrs.has('data-scroll-fade'),false,'Open editor popups rem
 popup.open=false;mutate([{type:'attributes',attributeName:'open',target:popup}]);flush();assert.equal(visible.attrs.has('data-scroll-fade'),true);
 hidden.clientHeight=500;resizeUpdate();flush();assert.equal(hidden.styles.get('--scroll-fade-top-size'),'0px','Reader retains its existing top fade.');assert.equal(hidden.styles.get('--scroll-fade-bottom-size'),'24px');
 const added=new Element('.search-results');body.children.push(added);mutate([{type:'childList',target:body,addedNodes:[added]}]);flush();assert.ok(observed.has(added));assert.equal(added.attrs.has('data-scroll-fade'),true);assert.equal(documentScans,1);
+const offscreenPanel={getBoundingClientRect:()=>({width:600,left:1400,right:2000})};
+added.closest=()=>offscreenPanel;
+Object.defineProperty(added,'clientHeight',{get(){throw new Error('Offscreen descendants must not force layout');},configurable:true});
+resizeUpdate();flush();
+Object.defineProperty(added,'clientHeight',{value:500,configurable:true});
+added.closest=()=>null;
 visible.scrollTop=0;listeners.get('scroll')();flush();assert.equal(visible.styles.get('--scroll-fade-top-size'),'0px');assert.equal(visible.styles.get('--scroll-fade-bottom-size'),'24px');
 added.isConnected=false;mutate([{type:'childList',target:body,addedNodes:[]}]);flush();assert.ok(unobserved.has(added));
 cleanup();assert.equal(observed.size,0);assert.equal(visible.attrs.has('data-scroll-fade'),false);assert.equal(listeners.size,0);assert.equal(frame,null);
