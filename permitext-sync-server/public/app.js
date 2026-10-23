@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-viewport-fades-v1270";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-reader-close-v1271";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -135,7 +135,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261022-viewport-fades-v1270";
+} from "./offline-storage.js?v=20261022-reader-close-v1271";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -168,7 +168,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261022-viewport-fades-v1270";
+} from "./workspace-state.js?v=20261022-reader-close-v1271";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -19031,7 +19031,10 @@ async function renderReader(reader, options = {}) {
   });
 
   closeButton.addEventListener("click", () => {
-    beginReaderNavigation(panel);
+    // Closing has no next chapter to render. Stop pending work and detach the
+    // source immediately instead of clearing it into a loading placeholder.
+    cancelReaderPanelRequests(panel);
+    panel.remove();
     if (options.isSearchResult) {
       state.searchResultReader = null;
       state.sectionDetail = null;
@@ -19045,8 +19048,7 @@ async function renderReader(reader, options = {}) {
         if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
       });
     }
-    saveWorkspaceState();
-    void transitionWorkspace("utility");
+    void transitionWorkspace("utility", { deferStateSave: true });
   });
 
   chapterSelect.addEventListener("change", async () => {

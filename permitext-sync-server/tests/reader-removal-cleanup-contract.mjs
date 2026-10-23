@@ -50,3 +50,21 @@ c.cancelReaderPanelRequests(removed);
 assert.equal(cleanupCalls, 1, 'A repeated disposal cannot run progressive teardown twice');
 assert.match(actual('disposeUnpublishedWorkspacePane'), /cancelReaderPanelRequests\(pane\)/, 'Late unpublished Readers use the same immediate teardown');
 console.log('Reader removal passed: immediate navigation/search/progressive abort, render-token invalidation, scroll/access cleanup, retained workflow panes, same-ID replacement isolation and idempotent progressive teardown.');
+
+// Execute the actual close handler: cleanup and removal precede persistence or
+// pane reconciliation, and closing cannot construct another loading chapter.
+const closeStart=source.indexOf('  closeButton.addEventListener("click", () => {\n    // Closing');
+assert.ok(closeStart>=0);
+const closeBody=source.slice(closeStart,source.indexOf('\n  chapterSelect.addEventListener',closeStart));
+const order=[];
+const closed={id:'closed',referenceSourceReaderID:''},neighbor={id:'neighbor',referenceSourceReaderID:'closed'};
+const closing=vm.createContext({closeButton:{addEventListener(_event,handler){this.close=handler;}},
+ panel:{remove(){order.push('remove');}},reader:closed,options:{},
+ state:{readers:[closed,neighbor],searchLinkedReaders:{search:'closed'}},
+ cancelReaderPanelRequests(){order.push('cancel');},searchLinkedReadersBySearch(){return closing.state.searchLinkedReaders;},
+ transitionWorkspace(mode,opts){assert.equal(mode,'utility');assert.equal(opts.deferStateSave,true);order.push('reconcile');}
+});
+vm.runInContext(closeBody,closing);closing.closeButton.close();
+assert.deepEqual(order,['cancel','remove','reconcile']);
+assert.equal(closing.state.readers.length,1);assert.equal(neighbor.referenceSourceReaderID,'');
+assert.equal(closing.state.searchLinkedReaders.search,undefined);
