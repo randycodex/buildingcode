@@ -4,7 +4,7 @@
   "outputDirectory": "deployment-public",
   "functions": {
     "api/index.mjs": {
-      "includeFiles": "{generated/search-catalogs/**,research-official-pdf-worker.mjs,node_modules/pdfjs-dist/legacy/build/*.mjs,node_modules/@napi-rs/canvas*/**,prepared/research-semantic/current-vectors.bin,prepared/research-semantic/current-vectors-manifest.json,prepared/research-passages/**}"
+      "includeFiles": "{generated/search-catalogs/**,research-official-pdf-worker.mjs,node_modules/pdfjs-dist/legacy/build/*.mjs,node_modules/@napi-rs/canvas*/**,prepared/research-semantic/current-vectors*,prepared/research-passages/**}"
     }
   },
   "headers": [
