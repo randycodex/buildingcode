@@ -42,8 +42,9 @@ existing natural service-worker waiting policy so an old tab never acquires a
 partial replacement shell.
 
 Requires module workers, IndexedDB, Web Locks, Web Crypto, CacheStorage and gzip
-DecompressionStream. Supported WebKit and Chrome flows are checked locally;
-unsupported browsers retain online operation. Real phone acceptance is separate.
+DecompressionStream. Current Chrome and the in-app Chromium browser were checked;
+unsupported browsers retain online operation. Safari and physical mobile browser
+acceptance have not been performed.
 
 ## Build and verification
 
