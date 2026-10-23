@@ -20935,3 +20935,17 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .section-detail-comment-undo[hidden] { display: none !important; }
 .section-detail-comment-undo button { border: 0; padding: 2px 0; background: transparent; color: var(--text-primary); font: inherit; cursor: pointer; }
 .section-detail-comment-undo button:disabled { opacity: 0.5; cursor: default; }
+
+/* Bound the Reader edge treatment to 24px. Masking a long scrolling source
+   creates a composited surface for its contents during column relayout. */
+.reader-content[data-scroll-fade] { -webkit-mask-image: none; mask-image: none; }
+.reader-body { position: relative; }
+.reader-body:has(> .reader-content[data-scroll-fade])::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 24px;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--reader-controls-surface));
+}

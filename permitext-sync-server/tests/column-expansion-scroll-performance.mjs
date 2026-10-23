@@ -37,11 +37,14 @@ const frames=[];
 globalThis.document=document;
 globalThis.requestAnimationFrame=fn=>frames.push(fn);
 globalThis.matchMedia=()=>({matches:true});
-globalThis.MutationObserver=class {observe(){}disconnect(){}};
+const observations=[];
+globalThis.MutationObserver=class {observe(node,options){observations.push({node,options});}disconnect(){}};
 globalThis.ResizeObserver=class {observe(){}disconnect(){}};
 try {
   const controller=createColumnExpansion({host,columns:()=>panes,label:node=>node.dataset.paneId,menu:false,
     capturePosition:()=>({anchor:'source'}),restorePosition:position=>{assert.equal(position.anchor,'source');restoredAnchors++;}});
+  assert.ok(observations.every(({options})=>!options.subtree),'Layout observation must never subscribe to thousands of nested passage mutations');
+  assert.deepEqual(observations.map(({node})=>node),[host,...panes],'Observe host membership and only direct pane layout attributes');
   assert.equal(paragraphReads,0,'Initial expansion setup cannot read scroll geometry from 10,000 non-scrolling paragraphs');
   assert.ok(scrollerReads<=12,'Only the two actual scrolling containers are measured');
   controller.expand(panes[0]);

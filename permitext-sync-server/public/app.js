@@ -4,12 +4,12 @@ import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
-import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=6";
+import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-note-report-status-removed-v1266";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-column-rendering-v1267";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -135,7 +135,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261022-note-report-status-removed-v1266";
+} from "./offline-storage.js?v=20261022-column-rendering-v1267";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -168,7 +168,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261022-note-report-status-removed-v1266";
+} from "./workspace-state.js?v=20261022-column-rendering-v1267";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -4970,7 +4970,6 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
   }
   if (view === "notebook") savedPaneIDs().forEach((paneID) => placeEvidenceBeforeNotebook(paneID));
   syncWorkflowColumnPresentation();
-  saveWorkspaceState();
   if (initialize && (initializeNotebook || (!visitedViews.includes(view) && !defaultActivePaneIDs().some(workflowPaneIsVisible)))) {
     if (view === 'notebook') await openProjectNotebook(workspaceProject());
     else await focusRecentUtilityColumn('search');
@@ -16348,7 +16347,7 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
       blockID: target.blockID
     }, "", savedKeys);
     const node = renderAnnotatedCodeBlock(block, section, reader, target, {
-      showBookmark: Boolean(savedBlockRecord), bookmarkStateResolved: true, lazyControls: blocks.length > 96, panel, accessGate: panel.__workspaceAccessGate
+      showBookmark: Boolean(savedBlockRecord), bookmarkStateResolved: true, lazyControls: true, panel, accessGate: panel.__workspaceAccessGate
     });
     sectionWrapper.append(node);
     if (blocks.length > 96) {
@@ -16871,6 +16870,8 @@ function renderAnnotatedCodeBlock(block, section, reader, target, options = {}) 
       ...options, bookmarkStateResolved: true,
       showBookmark: readerPrivateContentAllowed(options.panel) && Boolean(isSectionSaved({sectionID: target.sectionID, codeVersion: target.codeVersion, blockID: target.blockID}, "", snapshot?.savedKeys))
     }));
+    wrapper.removeEventListener("pointerenter", mount);
+    wrapper.removeEventListener("focusin", mount);
     wrapper.removeAttribute("tabindex");
     delete wrapper._mountReaderActions;
     options.panel?._readerActionsObserver?.unobserve(wrapper);
@@ -43124,7 +43125,7 @@ function preparePaneCollapse(panel) {
       });
       panel.append(collapsedClose);
     }
-    collapsedClose.innerHTML = headerClose.innerHTML;
+    if (collapsedClose.innerHTML !== headerClose.innerHTML) collapsedClose.innerHTML = headerClose.innerHTML;
     collapsedClose.setAttribute("aria-label", headerClose.getAttribute("aria-label") || `Close ${label}`);
     collapsedClose.title = collapsedClose.getAttribute("aria-label");
     collapsedClose.disabled = headerClose.disabled;
@@ -43136,7 +43137,8 @@ function preparePaneCollapse(panel) {
     rail.title = `Expand group ${group.name}`;
     rail.setAttribute("aria-label", rail.title);
   }
-  rail.querySelector("span").textContent = columnGroupIsCollapsed(group) ? `${group.name} · ${group.paneIDs.length}` : label;
+  const railLabel = columnGroupIsCollapsed(group) ? `${group.name} · ${group.paneIDs.length}` : label;
+  if (rail.querySelector("span").textContent !== railLabel) rail.querySelector("span").textContent = railLabel;
   prepareColumnGroupControls(panel, header, group);
   applyPaneCollapsedState(panel);
 }

@@ -68,7 +68,7 @@ export function createColumnExpansion({ host, columns, label, key = node => node
         rails.set(node, rail);
       }
       if (rail.parentElement !== node) node.append(rail);
-      rail.textContent = label(node);
+      if (rail.textContent !== label(node)) rail.textContent = label(node);
       rail.setAttribute('aria-label', `Restore ${label(node)} column`);
       rail.hidden = !aside || narrow;
     }
@@ -114,10 +114,20 @@ export function createColumnExpansion({ host, columns, label, key = node => node
     const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + buttons.length) % buttons.length;
     event.preventDefault(); buttons[next]?.click();
   });
+  // Observe the layout boundary, not every paragraph/link/control mutation in
+  // retained Readers. Rebind direct children when the host sequence changes.
+  const observeColumns = () => {
+    observer.disconnect();
+    observer.observe(host, { childList: true });
+    for (const node of columns()) observer.observe(node, {
+      childList: menu, attributes: true, attributeFilter: ['hidden', 'class']
+    });
+  };
   const observer = new MutationObserver(records => {
-    if (records.some(record => record.type === 'childList' && (record.target === host || menu && columns().includes(record.target)) || record.type === 'attributes' && ['hidden', 'class'].includes(record.attributeName) && columns().includes(record.target))) schedule();
+    if (records.some(record => record.type === 'childList' && record.target === host)) observeColumns();
+    schedule();
   });
-  observer.observe(host, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden', 'class'] });
+  observeColumns();
   const resize = new ResizeObserver(schedule);
   resize.observe(host);
   const api = { refresh: schedule, restore,

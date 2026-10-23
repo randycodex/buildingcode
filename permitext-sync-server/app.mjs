@@ -24119,61 +24119,83 @@ async function handleCodeSearch(request, response) {
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix)) &&
       (!resultSource || section.codePrefix === resultSource.codePrefix && codeSearchSectionVersion(section) === resultSource.codeVersion)));
   };
+  const familySearches = [];
   if (includeConstruction && familyEnabled("construction")) {
-    const scopedCatalog = await timePublicCodePhase("catalog_load", () => sectionCatalog());
-    rememberSpellingSections(scopedCatalog, "construction");
-    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "construction");
-    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => shippedSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
-    candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => sectionCatalog())).filter((section) =>
-      candidateIDs.has(section.id) &&
-      (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
-    ));
-  }
-  if (includeHistorical2014 && familyEnabled("historical2014")) {
-    const scopedCatalog = await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog());
-    rememberSpellingSections(scopedCatalog, "historical2014");
-    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "historical2014");
-    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => historicalConstructionSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
-    candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog())).filter((section) =>
-      candidateIDs.has(section.id) &&
-      (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
-    ));
-  }
-  if (includeZoning && familyEnabled("zoning")) {
-    const scopedCatalog = await timePublicCodePhase("catalog_load", () => zoningSectionCatalog());
-    rememberSpellingSections(scopedCatalog, "zoning");
-    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "zoning");
-    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => zoningSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
-    candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => zoningSectionCatalog())).filter((section) => candidateIDs.has(section.id)));
-  }
-  if (includeExistingBuilding && familyEnabled("existingBuilding")) {
-    const scopedCatalog = await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog());
-    rememberSpellingSections(scopedCatalog, "existingBuilding");
-    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "existingBuilding");
-    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => existingBuildingSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
-    candidates.push(
-      ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog())).filter((section) =>
-        candidateIDs.has(section.id)
-      )
-    );
-  }
-  if (includeEnacted && familyEnabled("enacted")) {
-    const scopedCatalog = await timePublicCodePhase("catalog_load", () => enactedSectionCatalog());
-    rememberSpellingSections(scopedCatalog, "enacted");
-    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "enacted");
-    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => enactedSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
-    candidates.push(
-      ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => enactedSectionCatalog())).filter((section) =>
+    familySearches.push((async () => {
+      const candidates = [];
+      const scopedCatalog = await timePublicCodePhase("catalog_load", () => sectionCatalog());
+      rememberSpellingSections(scopedCatalog, "construction");
+      const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "construction");
+      const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => shippedSearchIndex());
+      const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
+      candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => sectionCatalog())).filter((section) =>
         candidateIDs.has(section.id) &&
         (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
-      )
-    );
+      ));
+      return candidates;
+    })());
   }
+  if (includeHistorical2014 && familyEnabled("historical2014")) {
+    familySearches.push((async () => {
+      const candidates = [];
+      const scopedCatalog = await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog());
+      rememberSpellingSections(scopedCatalog, "historical2014");
+      const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "historical2014");
+      const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => historicalConstructionSearchIndex());
+      const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
+      candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog())).filter((section) =>
+        candidateIDs.has(section.id) &&
+        (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
+      ));
+      return candidates;
+    })());
+  }
+  if (includeZoning && familyEnabled("zoning")) {
+    familySearches.push((async () => {
+      const candidates = [];
+      const scopedCatalog = await timePublicCodePhase("catalog_load", () => zoningSectionCatalog());
+      rememberSpellingSections(scopedCatalog, "zoning");
+      const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "zoning");
+      const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => zoningSearchIndex());
+      const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
+      candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => zoningSectionCatalog())).filter((section) => candidateIDs.has(section.id)));
+      return candidates;
+    })());
+  }
+  if (includeExistingBuilding && familyEnabled("existingBuilding")) {
+    familySearches.push((async () => {
+      const candidates = [];
+      const scopedCatalog = await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog());
+      rememberSpellingSections(scopedCatalog, "existingBuilding");
+      const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "existingBuilding");
+      const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => existingBuildingSearchIndex());
+      const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
+      candidates.push(
+        ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog())).filter((section) =>
+          candidateIDs.has(section.id)
+        )
+      );
+      return candidates;
+    })());
+  }
+  if (includeEnacted && familyEnabled("enacted")) {
+    familySearches.push((async () => {
+      const candidates = [];
+      const scopedCatalog = await timePublicCodePhase("catalog_load", () => enactedSectionCatalog());
+      rememberSpellingSections(scopedCatalog, "enacted");
+      const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "enacted");
+      const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => enactedSearchIndex());
+      const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
+      candidates.push(
+        ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => enactedSectionCatalog())).filter((section) =>
+          candidateIDs.has(section.id) &&
+          (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
+        )
+      );
+      return candidates;
+    })());
+  }
+  for (const familyCandidates of await Promise.all(familySearches)) candidates.push(...familyCandidates);
   const definitionBodies = new Map();
   const definitionCandidates = candidates.filter(section => isSearchDefinitionSection(section) &&
     (!resultSource || section.codePrefix === resultSource.codePrefix && codeSearchSectionVersion(section) === resultSource.codeVersion));

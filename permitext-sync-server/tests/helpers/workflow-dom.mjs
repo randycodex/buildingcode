@@ -17,6 +17,7 @@ export function documentFixture() {
       closest(selector) {return matches(this, selector) ? this : this.parentNode?.closest(selector);},
       contains(target) {return target === this || this.children.some(child => child.contains(target));},
       addEventListener(type, action) {(this.handlers[type] ||= []).push(action);},
+      removeEventListener(type, action) {this.handlers[type] = (this.handlers[type] || []).filter(handler => handler !== action);},
       dispatch(type, event = {}) {event.target ||= this; for (const action of this.handlers[type] || []) action(event); if (event.bubbles) this.parentNode?.dispatch(type, event);},
       focus() {doc.activeElement = this;}
     };
