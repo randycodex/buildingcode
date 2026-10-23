@@ -1,4 +1,4 @@
-import { searchSpellingSuggestions } from "./search-relevance.js?v=20261023-downloaded-library-v1294";
+import { searchSpellingSuggestions } from "./search-relevance.js?v=20261023-downloaded-library-v1295";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import {
   searchWords,
@@ -10,11 +10,11 @@ import {
   localSearchPermits,
   finishLocalSearch,
   offlineSectionMetadata,
-} from "./downloaded-library-core.js?v=4";
+} from "./downloaded-library-core.js?v=5";
 import {
   offlineAssetNamesForChapter,
   resolveOfflineSectionMetadata,
-} from "./offline-storage.js?v=20261023-downloaded-library-v1294";
+} from "./offline-storage.js?v=20261023-downloaded-library-v1295";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20261015-reader-search-preview-v3";
 import {
   defaultSyncCodeVersion,

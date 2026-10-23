@@ -147,7 +147,7 @@ function packageData() {
   return { manifest, parts };
 }
 async function browserRun() {
-  const library = await import("/web/downloaded-library.js?v=4");
+  const library = await import("/web/downloaded-library.js?v=5");
   const check = (yes, label) => {
     if (!yes) throw Error(label);
   };
@@ -160,7 +160,7 @@ async function browserRun() {
   const checkRead = async (letter) => {
     const response = await api("/code/sections/1");
     if (!response) {
-      const w = new Worker("/web/downloaded-library-worker.js?v=4", {
+      const w = new Worker("/web/downloaded-library-worker.js?v=5", {
         type: "module",
       });
       const diagnostic = await new Promise((resolve) => {
@@ -431,7 +431,7 @@ async function browserRun() {
     .downloadLocalLibrary({ signal: pause.signal })
     .catch(() => {});
   await new Promise((resolve) => setTimeout(resolve, 250));
-  const other = new Worker("/web/downloaded-library-worker.js?v=4", {
+  const other = new Worker("/web/downloaded-library-worker.js?v=5", {
     type: "module",
   });
   const busy = await new Promise((resolve) => {
@@ -532,7 +532,7 @@ const server = createServer(async (req, res) => {
     if (url.pathname === "/quota-worker.js") {
       res.setHeader("content-type", "text/javascript");
       return res.end(
-        'navigator.storage.estimate=async()=>({quota:1,usage:1});await import("/web/downloaded-library-worker.js?v=4");postMessage({ready:true});',
+        'navigator.storage.estimate=async()=>({quota:1,usage:1});await import("/web/downloaded-library-worker.js?v=5");postMessage({ready:true});',
       );
     }
     if (url.pathname === "/runner.js") {
