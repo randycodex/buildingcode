@@ -47,6 +47,20 @@ for (const [s, b, inside] of [[0, 0, 0], [37, 620, 7], [127, 1237, 3], [90, 1, 0
   assert.ok(reads <= 24, `Anchor capture measured ${reads} nodes instead of a bounded binary search`);
   maximumReads = Math.max(maximumReads, reads);
 }
+// Retained columns with unchanged scroll/width/extent reuse the exact anchor.
+Object.defineProperty(content,'scrollTop',{get:()=>scrollTop,configurable:true});
+content.clientWidth=600;content.scrollHeight=sectionCount*sectionHeight;content.childElementCount=sectionCount;
+context.captureReaderScrollPositions();reads=0;
+const retained=context.captureReaderScrollPositions().get('reader:long');
+assert.equal(reads,0,'Unchanged retained Readers do not measure skipped paragraphs again');
+content.clientWidth=700;context.captureReaderScrollPositions();assert.ok(reads>0,'Resizing invalidates the cached anchor');
+reads=0;panel.dataset.readerRenderToken='new-render';context.captureReaderScrollPositions();assert.ok(reads>0,'Re-rendering the same chapter invalidates the cached anchor');
+delete content.scrollTop;delete content.clientWidth;delete content.scrollHeight;delete content.childElementCount;
+// Horizontal overflow must not force a large offscreen Reader through layout.
+const offscreen={...panel,getBoundingClientRect:()=>({left:1500,right:2100}),querySelector(){throw new Error('Offscreen contents measured');}};
+const offscreenContext=vm.createContext({track:{getBoundingClientRect:()=>({left:0,right:1200}),querySelectorAll:()=>[offscreen]},Map});
+vm.runInContext(actual('captureReaderScrollPositions'),offscreenContext);
+offscreenContext.captureReaderScrollPositions();
 // At a shared boundary, the previous node has ended and must not be selected.
 scrollTop = sectionHeight;
 assert.equal(context.captureReaderScrollPositions().get('reader:long').sectionID, 's1');

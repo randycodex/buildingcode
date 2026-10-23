@@ -20949,3 +20949,10 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   pointer-events: none;
   background: linear-gradient(to bottom, transparent, var(--reader-controls-surface));
 }
+
+/* Keep horizontally offscreen Readers mounted without laying out/rasterizing
+   their full source trees whenever an adjacent column opens or closes. */
+.reader-panel {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px auto 800px;
+}

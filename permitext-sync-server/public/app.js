@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-reader-decoration-v1268";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-retained-reader-v1269";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -135,7 +135,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261022-reader-decoration-v1268";
+} from "./offline-storage.js?v=20261022-retained-reader-v1269";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -168,7 +168,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261022-reader-decoration-v1268";
+} from "./workspace-state.js?v=20261022-retained-reader-v1269";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -43369,9 +43369,27 @@ function captureReaderScrollPositions() {
       if (panel._collapsedReaderPosition) positions.set(panel.dataset.paneId, panel._collapsedReaderPosition);
       return;
     }
+    // Horizontal overflow is common with several Readers. Measuring their
+    // passages would defeat viewport containment and rasterize unseen columns.
+    if (panel.getBoundingClientRect && track.getBoundingClientRect) {
+      const viewport = track.getBoundingClientRect(), bounds = panel.getBoundingClientRect();
+      if (bounds.right <= viewport.left || bounds.left >= viewport.right) {
+        const saved = panel._readerAnchorSnapshot?.position || panel._workflowReaderPosition;
+        if (saved) positions.set(panel.dataset.paneId, saved);
+        return;
+      }
+    }
     const content = panel.querySelector(".reader-content");
     const contentKey = panel.dataset.readerContentKey || "";
     if (!content || !contentKey || content.classList.contains("is-searching-reader")) return;
+    const metrics = [content.scrollTop, content.clientWidth, content.scrollHeight, content.childElementCount];
+    const canReuseAnchor = metrics.every(Number.isFinite);
+    const snapshot = panel._readerAnchorSnapshot;
+    if (canReuseAnchor && snapshot?.contentKey === contentKey && snapshot.renderToken === panel.dataset.readerRenderToken &&
+        metrics.every((value, index) => value === snapshot.metrics[index])) {
+      positions.set(panel.dataset.paneId, snapshot.position);
+      return;
+    }
     const reservedPosition = content._readerChapterExtent?.unloadedScrollPosition(contentKey);
     if (reservedPosition) { positions.set(panel.dataset.paneId, reservedPosition); return; }
     const top = content.getBoundingClientRect().top;
@@ -43387,6 +43405,13 @@ function captureReaderScrollPositions() {
       anchorOffset: (blockMatch || sectionMatch).bounds.top - top,
       sectionOffset: sectionMatch.bounds.top - top
     });
+    // Repeated workflow switches must not force skipped paragraphs through
+    // layout again. Scroll, width, extent or a new render invalidates the anchor.
+    if (canReuseAnchor) panel._readerAnchorSnapshot = {
+      contentKey, renderToken: panel.dataset.readerRenderToken,
+      metrics: [content.scrollTop, content.clientWidth, content.scrollHeight, content.childElementCount],
+      position: positions.get(panel.dataset.paneId)
+    };
   });
   return positions;
 }
@@ -43429,6 +43454,13 @@ function applyReaderScrollPosition(panel, position) {
   if (panel?.classList.contains("is-workflow-hidden")) { panel._workflowReaderPosition = position; return; }
   const content = panel?.querySelector(".reader-content");
   if (!content || !panel.isConnected || panel.dataset.readerContentKey !== position?.contentKey) {
+    cancelReaderScrollRestore(content);
+    return;
+  }
+  const snapshot = panel._readerAnchorSnapshot;
+  if (snapshot?.position === position && snapshot.renderToken === panel.dataset.readerRenderToken &&
+      [content.scrollTop, content.clientWidth, content.scrollHeight, content.childElementCount]
+        .every((value, index) => value === snapshot.metrics[index])) {
     cancelReaderScrollRestore(content);
     return;
   }

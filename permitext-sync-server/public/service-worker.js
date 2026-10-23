@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v1844";
+const shellCacheName = "permitext-pro-shell-v1845";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -52,23 +52,23 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261022-reader-decoration-v1268",
+  "/web/styles.css?v=20261022-retained-reader-v1269",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
   "/web/assistant-materials.js?v=4",
-  "/web/app.js?v=20261022-reader-decoration-v1268",
+  "/web/app.js?v=20261022-retained-reader-v1269",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261022-reader-decoration-v1268",
+  "/web/offline-storage.js?v=20261022-retained-reader-v1269",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",
-  "/web/workspace-state.js?v=20261022-reader-decoration-v1268",
+  "/web/workspace-state.js?v=20261022-retained-reader-v1269",
   "/web/recent-view-scope.js?v=1",
   "/web/recent-search-scope.js?v=1",
   "/web/workspace-state.js?v=20261012-workflow-views-v18",
@@ -90,7 +90,7 @@ const shellURLs = [
   "/web/public-content-cache.js?v=1",
   "/web/report-screen.js?v=20261011-shared-shell-v6",
   "/web/report-library.js?v=20261012-sidebar-width-v8",
-  "/web/notebook-note-menu.js?v=20261022-reader-decoration-v1268",
+  "/web/notebook-note-menu.js?v=20261022-retained-reader-v1269",
   "/web/notebook-columns.js?v=2",
   "/web/reader-render-batches.js?v=20261012-reader-batches-v1",
   "/web/search-query-session.js?v=20261012-search-session-v2",
