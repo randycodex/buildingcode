@@ -38,7 +38,7 @@ const context=vm.createContext({
   hasCapability:()=>true, readerCommentCount:()=>0, updateReaderCommentIndicator(){},
   document:{createElement:tag=>new Node(tag)}, window:{setTimeout:fn=>fn()},
   syncCodeVersion:value=>value, syncCodeVersionForPrefix:()=>"2022", markResearchSelectable(){},
-  sectionDisplayTitle:(_number,title)=>title, annotatedBlocksForSection:value=>value.blocks,
+  sectionDisplayTitle:(_number,title)=>title, readerAnnotatedBlocksForSection:value=>value.blocks,
   annotationTargetForSection:()=>({...target,blockID:""}), annotationTargetForBlock:()=>target,
   renderCodeBlock(block){const node=new Node("p");node.textContent=block.plainText;return node;},
   linkInlineCodeReferences(){},decorateReaderDefinitions(){},

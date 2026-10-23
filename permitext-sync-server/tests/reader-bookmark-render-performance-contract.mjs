@@ -53,7 +53,7 @@ const context = vm.createContext({
   document: { createElement: tag => new Node(tag) }, syncCodeVersion, defaultSyncCodeVersion, renderReaderBlockBatches,
   currentContentSummary() { reads++; return structuredClone({ projects: [project], projectSections: links }); },
   workspaceProject: projects => projects.find(item => item.id === selected) || null,
-  syncCodeVersionForPrefix: () => defaultSyncCodeVersion, markResearchSelectable() {},
+  readerAnnotatedBlocksForSection: section=>section.blocks, syncCodeVersionForPrefix: () => defaultSyncCodeVersion, markResearchSelectable() {},
   sectionDisplayTitle: (_number, title) => title, annotatedBlocksForSection: value => value.blocks,
   annotationTargetForSection: value => ({ sectionID: value.id, codeVersion: reader.codeVersion, blockID: "" }),
   annotationTargetForBlock: (value, block) => ({ sectionID: value.id, codeVersion: reader.codeVersion, blockID: block.id }),

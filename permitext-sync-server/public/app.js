@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-passage-window-v1279";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261022-passage-window-v1280";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -136,7 +136,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261022-passage-window-v1279";
+} from "./offline-storage.js?v=20261022-passage-window-v1280";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -169,7 +169,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261022-passage-window-v1279";
+} from "./workspace-state.js?v=20261022-passage-window-v1280";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -15830,16 +15830,35 @@ function codeBlockHasVisibleContent(block) {
   );
 }
 
-// Public source fragments only; bound retained strings independently of Reader count.
+// Cache only large public source projections; search indexes retain the exact
+// uncached projection contract below. No private workspace data enters this LRU.
 const readerSplitHTMLCache = new Map();
 let readerSplitHTMLCharacters = 0;
+function readerAnnotatedBlocksForSection(section) {
+  const source = section.blocks?.length === 1 ? section.blocks[0] : null;
+  if (!source?.html || source.html.length < 40_000) return annotatedBlocksForSection(section);
+  const identity = JSON.stringify([section.id, section.codePrefix, section.sectionNumber, section.title, source.id, source.assetRevision]);
+  const cached = readerSplitHTMLCache.get(source.html);
+  if (cached?.identity === identity) {
+    readerSplitHTMLCache.delete(source.html); readerSplitHTMLCache.set(source.html, cached);
+    return cached.blocks.map(block => ({...block}));
+  }
+  const blocks = annotatedBlocksForSection(section);
+  const characters = source.html.length + blocks.reduce((sum, block) => sum + (block.html || '').length + (block.plainText || '').length, 0);
+  if (cached) {readerSplitHTMLCharacters -= cached.characters; readerSplitHTMLCache.delete(source.html);}
+  if (characters <= 2_000_000) {
+    readerSplitHTMLCache.set(source.html, {identity, blocks, characters});
+    readerSplitHTMLCharacters += characters;
+    while (readerSplitHTMLCache.size > 8 || readerSplitHTMLCharacters > 2_000_000) {
+      const key = readerSplitHTMLCache.keys().next().value;
+      readerSplitHTMLCharacters -= readerSplitHTMLCache.get(key).characters; readerSplitHTMLCache.delete(key);
+    }
+  }
+  return blocks.map(block => ({...block}));
+}
+
 function splitAnnotatedCodeBlock(block, blockIndex = 0) {
   if (block?.kind !== "html" || !block.html || typeof document === "undefined") return [block];
-  const cached = readerSplitHTMLCache.get(block.html);
-  if (cached && cached.id === block.id && cached.assetRevision === block.assetRevision) {
-    readerSplitHTMLCache.delete(block.html); readerSplitHTMLCache.set(block.html, cached);
-    return cached.fragments.map(fragment => ({...block, ...fragment}));
-  }
   const wrapper = document.createElement("div");
   wrapper.innerHTML = rewriteCodeHTML(block.html);
   const hasReadableCodeNodeContent = (node) => Boolean(
@@ -15852,22 +15871,12 @@ function splitAnnotatedCodeBlock(block, blockIndex = 0) {
     : Array.from(wrapper.querySelectorAll(".rbox[id]"))
       .filter(hasReadableCodeNodeContent);
   if (noteBlocks.length === 0) return [block];
-  const fragments = noteBlocks.map((node, nodeIndex) => ({
+  return noteBlocks.map((node, nodeIndex) => ({
+    ...block,
     id: node.id || `${block.id || `block-${blockIndex + 1}`}-${nodeIndex + 1}`,
     html: node.outerHTML,
     plainText: String(node.textContent || "").replace(/\s+/g, " ").trim()
   }));
-  const characters = block.html.length + fragments.reduce((sum, fragment) => sum + fragment.html.length + fragment.plainText.length, 0);
-  if (cached) { readerSplitHTMLCharacters -= cached.characters; readerSplitHTMLCache.delete(block.html); }
-  if (characters <= 2_000_000) {
-    readerSplitHTMLCache.set(block.html, {id: block.id, assetRevision: block.assetRevision, fragments, characters});
-    readerSplitHTMLCharacters += characters;
-    while (readerSplitHTMLCache.size > 8 || readerSplitHTMLCharacters > 2_000_000) {
-      const key = readerSplitHTMLCache.keys().next().value;
-      readerSplitHTMLCharacters -= readerSplitHTMLCache.get(key).characters; readerSplitHTMLCache.delete(key);
-    }
-  }
-  return fragments.map(fragment => ({...block, ...fragment}));
 }
 
 // Selector resolution fills an omitted chapter or maps a source chapter to its
@@ -16332,7 +16341,7 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   const headingRow = document.createElement("div");
   headingRow.className = "reader-section-heading-row";
   headingRow.dataset.researchSelectionExclude = "true";
-  const blocks = annotatedBlocksForSection(section);
+  const blocks = readerAnnotatedBlocksForSection(section);
   // This render is synchronous. Share one fresh snapshot across its controls,
   // without retaining private state for later access-gate or bookmark updates.
   let privateContentAllowed = readerPrivateContentAllowed(panel);
