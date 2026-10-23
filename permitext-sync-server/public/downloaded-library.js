@@ -52,7 +52,7 @@ function call(action, data = {}, { signal, onProgress } = {}) {
   signal?.throwIfAborted();
   clearTimeout(timer);
   if (!worker) {
-    worker = new Worker("/web/downloaded-library-worker.js?v=5", {
+    worker = new Worker("/web/downloaded-library-worker.js?v=6", {
       type: "module",
     });
     worker.onmessage = ({ data }) => {
@@ -163,14 +163,10 @@ export async function checkDownloadedLibraryUpdate({ signal } = {}) {
 }
 if (typeof window !== "undefined")
   window.addEventListener("storage", (event) => {
-    if (
-      [preferenceKey, "permitext.downloaded-library.change.v1"].includes(
-        event.key,
-      )
-    )
-      localStorage.setItem(
-        "permitext.downloaded-library.change.v1",
-        String(Date.now()) + Math.random(),
-      );
+    if (![null, preferenceKey, "permitext.downloaded-library.change.v1"].includes(event.key))
+      return;
+    // Storage events already came from another tab. Re-broadcasting here makes
+    // two open tabs echo forever; unrelated private sync must not evict code.
+    memoryPreference = usesDownloadedLibrary();
     window.dispatchEvent(new Event("permitext:downloaded-library-changed"));
   });

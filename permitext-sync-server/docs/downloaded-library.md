@@ -104,3 +104,43 @@ compared against HEAD and remain unchanged:
 
 Focused download/offline/search/durability checks and the production build are
 reported separately from those pre-existing broad-suite failures.
+
+## Signed-in production comparison (2026-10-23)
+
+Release `65ce04b2b394` was exercised in the user's Chrome session with the
+installed library switched off and on, the same five construction sources, and
+two existing Projects retaining six and three Readers. Each mode ran 22 searches,
+14 Project switches and three search-result Reader openings. No private content
+was edited or removed. Chrome's caches were not cleared and garbage collection
+was not forced. This is a small sequential sample, not a controlled cold-network
+or long-tail benchmark; browser-control overhead is included in visible-DOM
+timings. A failed initial status probe and a focus-through-Search pilot are
+excluded from the reported samples.
+
+| Observed median | Online | Downloaded |
+| --- | ---: | ---: |
+| Search first page visible (22 samples) | 455 ms | 481 ms |
+| Selected Reader heading visible (3 samples) | 1,270 ms | 768 ms |
+| Project's first Reader restored (14 samples) | 1,126 ms | 1,189 ms |
+| Direct existing-column keyboard focus (6 samples) | 62 ms | 35 ms |
+
+Downloaded reading helped the sampled source openings. Warm search and Project
+restoration were broadly similar; downloading is not a general UI or RAM fix.
+Native Chrome Task Manager Memory Footprint, including grouped Permitext workers,
+briefly reached 496 MB online and 571 MB downloaded during rapid switching, then
+fell naturally to 237 MB and 265 MB while idle. These are sampled values, not a
+continuous peak capture or proof of a long-term leak's absence. Separate
+service-worker rows were recorded when Chrome placed them in another process;
+shared Browser/GPU processes and unrelated sites are not attributed to Permitext.
+The six-Reader Project later settled at 282 MB with 0% CPU and no network traffic.
+Three additional previously unused queries were run in reverse mode order after
+idle: online took 1,337/818/521 ms and downloaded took 840/545/593 ms. None of the
+25 queries per mode reproduced a three-second search spike.
+
+The comparison identified a separate cross-tab invalidation bug: the library
+storage listener echoed received signals indefinitely between two tabs and also
+invalidated public caches for unrelated private workspace writes. The correction
+only handles library preference/invalidation keys (or storage clearing), notifies
+the receiving tab without writing back, and has a two-realm queue regression
+test that fails on the original implementation. Offline shell/module versions
+are advanced together; the installed corpus requires no re-download.
