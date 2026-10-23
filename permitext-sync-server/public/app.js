@@ -1,4 +1,4 @@
-import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=3';
+import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=4';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=5";
 import { createAssistantMaterials } from "./assistant-materials.js?v=4";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=6";
@@ -10,7 +10,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-downloaded-library-v1293";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-downloaded-library-v1294";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -139,7 +139,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-downloaded-library-v1293";
+} from "./offline-storage.js?v=20261023-downloaded-library-v1294";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -172,7 +172,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261023-downloaded-library-v1293";
+} from "./workspace-state.js?v=20261023-downloaded-library-v1294";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -40162,6 +40162,8 @@ function mountAccountScreenContent(dialog, panel) {
   panel.style.removeProperty("flex");
   panel.querySelector(".panel-header")?.remove();
   dialog._disposeSettingsColumns?.();
+  dialog._disposeLibraryDownloadProgress?.();
+  dialog._disposeLibraryDownloadProgress = panel._disposeLibraryDownloadProgress;
   dialog._disposeSettingsColumns = organizeAccountSettings(panel);
   const header = document.createElement("header");
   header.className = "account-screen-header";
@@ -40200,6 +40202,7 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
     dialog.open = false;
     dialog._disposeSettingsColumns?.();
+    dialog._disposeLibraryDownloadProgress?.();
     dialog.remove();
     coveredState.forEach((inert, element) => { element.inert = inert; });
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
@@ -40480,6 +40483,11 @@ function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = fa
   void refresh();
 }
 
+let libraryDownloadController = null;
+let libraryDownloadError = "";
+let libraryDownloadProgress = null;
+const libraryDownloadProgressEvent = "permitext:library-download-progress";
+
 function renderSettings({ upgrade = false } = {}) {
   const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
@@ -40713,8 +40721,6 @@ function renderSettings({ upgrade = false } = {}) {
   const offlineRemove = panel.querySelector(".settings-offline-remove");
   const offlinePause = panel.querySelector(".settings-offline-pause");
   const offlineUse = panel.querySelector(".settings-offline-use");
-  let libraryDownloadController = null;
-  let libraryDownloadError = "";
   offlineUse.addEventListener("change", () => useDownloadedLibrary(offlineUse.checked));
   offlinePause.addEventListener("click", () => libraryDownloadController?.abort(new DOMException("Download paused. Resume whenever you are ready.", "AbortError")));
   const projectList = panel.querySelector(".settings-project-list");
@@ -41004,13 +41010,35 @@ function renderSettings({ upgrade = false } = {}) {
       projectClearAll.disabled = false;
     }
   });
+  const paintLibraryDownloadProgress = () => {
+    if (!libraryDownloadController || !panel.isConnected) return false;
+    offlineDownload.hidden = !hasCapability("offline-access");
+    offlineDownload.disabled = true;
+    offlineDownload.textContent = "Downloading library…";
+    offlineRemove.hidden = true;
+    offlinePause.hidden = false;
+    offlineProgress.hidden = false;
+    const progress = libraryDownloadProgress || {phase: "Preparing download",total:1,completed:0};
+    offlineProgress.value = progress.percent || 0;
+    offlineStatus.textContent = progress.total > 1
+      ? `${progress.phase} · ${progress.completed} of ${progress.total} ${progress.unit || "items"}${progress.detail ? ` · ${progress.detail}` : ""}`
+      : progress.phase;
+    return true;
+  };
+  const downloadProgressChanged = () => {
+    if (!panel.isConnected) { window.removeEventListener(libraryDownloadProgressEvent, downloadProgressChanged); return; }
+    if (!paintLibraryDownloadProgress()) void renderOfflineState();
+  };
+  window.addEventListener(libraryDownloadProgressEvent, downloadProgressChanged);
+  panel._disposeLibraryDownloadProgress = () => window.removeEventListener(libraryDownloadProgressEvent, downloadProgressChanged);
   const renderOfflineState = async () => {
     const pro = hasCapability("offline-access");
     let library = await offlineLibraryStatus().catch(() => ({available: false, supported: false}));
-    if (libraryDownloadController) return;
+    if (paintLibraryDownloadProgress()) return;
     if (pro && navigator.onLine && (library.available || library.pending)) {
       library = {...library, ...await checkDownloadedLibraryUpdate().catch(() => ({updateCheckFailed: true}))};
     }
+    if (paintLibraryDownloadProgress()) return;
     offlineProgress.hidden = true;
     offlinePause.hidden = true;
     offlineDownload.hidden = !pro;
@@ -41033,7 +41061,7 @@ function renderSettings({ upgrade = false } = {}) {
     offlineDownload.disabled = offline;
     if (library.pending) {
       offlineDownload.textContent = "Resume download";
-      offlineStatus.textContent = `Download paused · ${library.pending.completed} of ${library.pending.total} chapters saved. ${library.available ? "Your complete library remains available." : "Resume to finish preparing readers and search."}`;
+      offlineStatus.textContent = `Download saved · ${library.pending.completed} of ${library.pending.total} chapters saved. ${library.available ? "Your complete library remains available." : "Resume to finish preparing readers and search."}`;
     } else if (!library.available) {
       offlineDownload.textContent = "Download library";
       offlineStatus.textContent = offline ? "Connect to the internet to download." : "Nothing downloaded. Online readers and search work normally.";
@@ -41562,6 +41590,7 @@ function renderSettings({ upgrade = false } = {}) {
     if (libraryDownloadController) return;
     libraryDownloadController = new AbortController();
     libraryDownloadError = "";
+    libraryDownloadProgress = {phase: "Confirming Pro access…",total:1,completed:0};
     offlineDownload.disabled = true;
     offlinePause.hidden = false;
     offlineRemove.hidden = true;
@@ -41584,10 +41613,8 @@ function renderSettings({ upgrade = false } = {}) {
         signal: libraryDownloadController.signal,
         codeVersion: defaultSyncCodeVersion,
         onProgress(progress) {
-          offlineProgress.value = progress.percent || 0;
-          offlineStatus.textContent = progress.total > 1
-            ? `${progress.phase} · ${progress.completed} of ${progress.total} ${progress.unit || "items"}${progress.detail ? ` · ${progress.detail}` : ""}`
-            : progress.phase;
+          libraryDownloadProgress = progress;
+          window.dispatchEvent(new Event(libraryDownloadProgressEvent));
         }
       });
       await retireLegacyOfflineLibrary().catch(() => {});
@@ -41601,6 +41628,8 @@ function renderSettings({ upgrade = false } = {}) {
       libraryDownloadError = message;
     } finally {
       libraryDownloadController = null;
+      libraryDownloadProgress = null;
+      window.dispatchEvent(new Event(libraryDownloadProgressEvent));
       await renderOfflineState();
       if (libraryDownloadError) offlineStatus.textContent = libraryDownloadError;
     }

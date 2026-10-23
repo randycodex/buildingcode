@@ -4,17 +4,17 @@ import {
   searchWordForms,
   matchesSearchWords,
   searchWordsSnippet,
-} from "./search-words.js?v=20261023-downloaded-library-v1293";
+} from "./search-words.js?v=20261023-downloaded-library-v1294";
 import {
   searchRelevanceRank,
   matchingSearchDefinition,
   initialSearchGroupLimit,
   prepareSearchRelevance,
-} from "./search-relevance.js?v=20261023-downloaded-library-v1293";
+} from "./search-relevance.js?v=20261023-downloaded-library-v1294";
 import {
   offlineSourceScope,
   offlineSectionMetadata,
-} from "./offline-storage.js?v=20261023-downloaded-library-v1293";
+} from "./offline-storage.js?v=20261023-downloaded-library-v1294";
 export { searchWords, searchWordForms, offlineSectionMetadata };
 export function intersect(lists) {
   if (!lists.length) return [];
