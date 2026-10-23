@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-column-search-v1289";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-column-search-v1290";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -137,7 +137,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-column-search-v1289";
+} from "./offline-storage.js?v=20261023-column-search-v1290";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -170,7 +170,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261023-column-search-v1289";
+} from "./workspace-state.js?v=20261023-column-search-v1290";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -28684,7 +28684,7 @@ async function renderProjectNotebook(project, options = {}) {
       } else {
         [foundationPayload, cardPayload] = await Promise.all([
           options.foundationScope ? options.foundationScope.read(identity) : loadInitialProjectFoundation(identity),
-          notebookRequest("/notebook/cards/list", { projectID })
+          loadInitialNotebookCardList(identity)
         ]);
       }
       await saveNotebookProjectSnapshot({
@@ -35906,6 +35906,33 @@ function invalidateInitialProjectFoundation(projectID) {
 }
 
 const initialProjectFoundationReads = new Map();
+const initialNotebookCardListReads = new Map();
+
+async function loadInitialNotebookCardList(project) {
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const projectID = projectDetailKey(project);
+  const check = () => {
+    requireCurrentAccountRequest(identity);
+    if (workspaceID !== activeWorkspaceID) throw accountContextChangedError();
+  };
+  const key = JSON.stringify([identity.userID, identity.sessionToken, identity.generation,
+    workspaceID, projectID, String(project.sharedOrganizationID || "")]);
+  let request = initialNotebookCardListReads.get(key);
+  if (!request) {
+    request = Promise.resolve().then(() => {
+      check();
+      return postResearch("/notebook/cards/list", {projectID});
+    }).finally(() => {
+      if (initialNotebookCardListReads.get(key) === request) initialNotebookCardListReads.delete(key);
+    });
+    initialNotebookCardListReads.set(key, request);
+  }
+  const payload = await request;
+  check();
+  // Only simultaneous initial loads share a flight. Later opens always read
+  // current private metadata, and one column cannot mutate another's payload.
+  return structuredClone(payload);
+}
 
 function loadInitialProjectFoundation(project) {
   const requestIdentity = captureAccountRequest();

@@ -35,7 +35,7 @@ requests[5].resolve({id:"old-private"});requests[6].resolve({id:"new-private"});
 const beforeSwitch=c.loadInitialProjectFoundation({id:"p"});const cancelled=assert.rejects(beforeSwitch,/Workspace changed/);await tick();
 c.activeWorkspaceID="workspace-b";const afterSwitch=c.loadInitialProjectFoundation({id:"p"});await tick();assert.equal(requests.length,9);
 requests[7].resolve({});requests[8].resolve({});await cancelled;await afterSwitch;
-assert.match(source,/loadInitialProjectFoundation\(identity\),\s*notebookRequest\("\/notebook\/cards\/list"/);
+assert.match(source,/loadInitialProjectFoundation\(identity\),\s*loadInitialNotebookCardList\(identity\)/);
 assert.match(source,/options.foundationScope \? options.foundationScope.read\(identity\) : loadInitialProjectFoundation\(identity\)/);
 console.log("Project foundation flights passed: initial consumer sharing, project/shared/account/workspace isolation and fresh reads after success/failure.");
 const scope=c.createInitialProjectFoundationScope();scope.register("notebook");scope.register("saved");
