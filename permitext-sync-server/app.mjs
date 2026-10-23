@@ -1,4 +1,5 @@
 import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
+import {preparedSearchText} from "./prepared-search-text.mjs";
 import { prepareSearchRelevance, searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
 import { createResearchSourceBodyReader } from "./research-source-body-cache.mjs";
 import { loadPreparedPassages } from "./research-prepared-passages.mjs";
@@ -8228,8 +8229,10 @@ const chapterIndex = createRetryableLazyLoader(async () => {
   );
   // Publish projections only after the entire load succeeds. A transient read
   // failure can retry without exposing an incomplete or stale catalog.
-  for (const chapter of chapters) {
-    cachedConstructionChapterSections.set(String(chapter.id), sectionsByChapter.get(String(chapter.id)));
+  if (!cachedSectionCatalog) {
+    for (const chapter of chapters) {
+      cachedConstructionChapterSections.set(String(chapter.id), sectionsByChapter.get(String(chapter.id)));
+    }
   }
   return chapters;
 });
@@ -8255,6 +8258,7 @@ async function sectionCatalog() {
   cachedSectionCatalogPromise = loadPreparedSearchCatalog("construction", buildSectionCatalog);
   try {
     cachedSectionCatalog = await cachedSectionCatalogPromise;
+    cachedConstructionChapterSections.clear();
     return cachedSectionCatalog;
   } finally {
     cachedSectionCatalogPromise = null;
@@ -23864,8 +23868,7 @@ function searchableSectionPlainText(section) {
       maxSearchableSectionPlainTextCacheEntries
     );
   }
-  const pending = timePublicCodePhase("content_read", () => searchableSectionBody(section))
-    .then((body) => body.blocks?.map((block) => block.plainText || "").join("\n\n") || "")
+  const pending = timePublicCodePhase("content_read", () => preparedSearchText(section, () => publicSearchSectionText(section)))
     .catch((error) => {
       searchableSectionPlainTextCache.delete(cacheKey);
       throw error;
@@ -23876,6 +23879,11 @@ function searchableSectionPlainText(section) {
     pending,
     maxSearchableSectionPlainTextCacheEntries
   );
+}
+
+export async function publicSearchSectionText(section) {
+  const body = await searchableSectionBody(section);
+  return body.blocks?.map(block => block.plainText || "").join("\n\n") || "";
 }
 
 const exactSearchConcurrency = 8;
