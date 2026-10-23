@@ -9,7 +9,7 @@ assert.equal(isPublicCodePath('/code/sections/resolve?include=metadata'),true);
 assert.equal(isPublicCodePath('/account/sections/resolve'),false);
 const A='a'.repeat(64),B='b'.repeat(64);let revision=A,offline=false,chapterRequests=0,revisionRequests=0;
 const context=vm.createContext({AbortController,setTimeout,clearTimeout,createPublicCodeRevisionController,isPublicCodePath,cacheRetryablePromise,URLSearchParams,
- activeCodeSourcesController:{invalidateCatalog(){}},chapterCache:new Map(),chapterListCache:new Map(),sectionSummaryCache:new Map(),serverReachable:true,
+ activeCodeSourcesController:{invalidateCatalog(){}},chapterCache:new Map(),chapterListCache:new Map(),sectionSummaryCache:new Map(),searchResultCache:new Map(),codeSectionCache:new Map(),serverReachable:true,structuredClone,
  updateConnectionStatus(){},hasCapability:()=>true,shouldUseOfflineFallback:status=>status>=500,
  offlineAPI:async()=>({chapter:{id:'A',offline:true}}),
  fetch:async path=>{
@@ -27,9 +27,9 @@ await context.revisions.probe();
 assert.equal((await context.fetchChapter('A')).revision,A);assert.equal(chapterRequests,1);
 await context.fetchChapter('A');assert.equal(chapterRequests,1,'settled chapter opens have no network barrier');
 assert.equal(revisionRequests,1);
-context.chapterListCache.set('catalog',{});context.sectionSummaryCache.set('section',{});
+context.chapterListCache.set('catalog',{});context.sectionSummaryCache.set('section',{});context.codeSectionCache.set('public-section',{});
 revision=B;await context.revisions.probe({force:true});
-assert.equal(context.chapterCache.size,0);assert.equal(context.chapterListCache.size,0);assert.equal(context.sectionSummaryCache.size,0);
+assert.equal(context.chapterCache.size,0);assert.equal(context.chapterListCache.size,0);assert.equal(context.sectionSummaryCache.size,0);assert.equal(context.codeSectionCache.size,0);
 assert.equal((await context.fetchChapter('A')).revision,B);assert.equal(chapterRequests,2);
 revision=A;await context.revisions.probe({force:true});assert.equal((await context.fetchChapter('A')).revision,A);
 offline=true;await context.revisions.probe({force:true});assert.equal(context.revisions.revision,A);assert.equal(context.chapterCache.size,1,'failed background check preserves warm content');

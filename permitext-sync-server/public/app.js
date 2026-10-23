@@ -9,7 +9,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-project-memory-v1288";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-column-search-v1289";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -37,7 +37,7 @@ import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20261015-reader-search-preview-v3";
 import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey } from "./reader-navigation-tree.js?v=20261010-contents-v1";
-import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261010-chapter-extent-v2";
+import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
@@ -137,7 +137,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-project-memory-v1288";
+} from "./offline-storage.js?v=20261023-column-search-v1289";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -170,7 +170,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261023-project-memory-v1288";
+} from "./workspace-state.js?v=20261023-column-search-v1289";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -630,6 +630,7 @@ let activeCustomSelect = null;
 const chapterListCache = new Map();
 const chapterCache = createPublicContentCache();
 const searchResultCache = createPublicContentCache({ maxBytes: 4 * 1024 * 1024, maxEntries: 24 });
+const codeSectionCache = createPublicContentCache({ maxBytes: 4 * 1024 * 1024, maxEntries: 64 });
 const sectionSummaryCache = new Map();
 const publicCodeRevision = createPublicCodeRevisionController({
   async fetchRevision() {
@@ -648,6 +649,7 @@ const publicCodeRevision = createPublicCodeRevisionController({
     chapterListCache.clear();
     chapterCache.clear();
     searchResultCache.clear();
+    codeSectionCache.clear();
     sectionSummaryCache.clear();
   }
 });
@@ -6515,6 +6517,18 @@ function wireResearchDetailsMotion(details, body) {
 }
 
 async function api(path, options = {}) {
+  if (!options.publicRevisionAttempt && /^\/code\/sections\/(?:\d+|resolve)(?:\?|$)/.test(path)) {
+    // Source details and metadata are public. Reopened Notes, Evidence and
+    // Readers can share these exact edition/query requests across projects.
+    // Cache decoded data only, within a fixed budget; every consumer owns its
+    // clone and cancellation, and corpus invalidation clears the cache.
+    const key = `${publicCodeRevision.generation}:${path}`;
+    const payload = await cacheRetryablePromise(codeSectionCache, key, signal =>
+      publicCodeRevision.read(path, {...options, signal}, (requestPath, onPublicResponse) =>
+        api(requestPath, {...options, signal, publicRevisionAttempt: true, onPublicResponse})),
+      {signal: options.signal});
+    return structuredClone(payload);
+  }
   if (!options.publicRevisionAttempt && isPublicCodePath(path)) {
     return publicCodeRevision.read(path, options, (requestPath, onPublicResponse) =>
       api(requestPath, { ...options, publicRevisionAttempt: true, onPublicResponse })

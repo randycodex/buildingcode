@@ -3,9 +3,12 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import { createReaderChapterExtent, readerExtentWindow } from "../public/reader-chapter-extent.js";
 
+let layoutDirty = false, layoutFlushes = 0;
 class Node {
   constructor(height = 0, sectionID = null) {
-    this.height = height; this.style = {}; this.dataset = {}; this.parent = null; this.children = [];
+    this.height = height;
+    this.style = new Proxy({}, {set(target, key, value) { layoutDirty = true; target[key] = value; return true; }});
+    this.dataset = {}; this.parent = null; this.children = [];
     this.className = sectionID === null ? "" : "chapter-section";
     if (sectionID !== null) this.dataset.sectionId = String(sectionID);
   }
@@ -31,6 +34,7 @@ class Node {
       : this.querySelectorAll(selector)[0] || null;
   }
   getBoundingClientRect() {
+    if (layoutDirty) { layoutFlushes++; layoutDirty = false; }
     if (!this.parent) return { top: 0, bottom: this.clientHeight, height: this.clientHeight };
     const top = this.parent.children.slice(0, this.parent.children.indexOf(this)).reduce((sum, node) => sum + node.size, 0) - this.parent.scrollTop;
     return { top, bottom: top + this.size, height: this.size };
@@ -66,7 +70,9 @@ try {
   assert.ok(jumped.start <= 70 && jumped.end > 70);
   assert.equal(jumped.end - jumped.start, 12, "A thumb jump loads a bounded window near the destination");
   assert.ok(jumped.start > 5, "Intermediate sections are not fetched just to reach the destination");
+  layoutDirty = false; layoutFlushes = 0;
   extent.replace(jumped.start, sections.slice(jumped.start, jumped.end).map(section => new Node(300, section.id)), () => {});
+  assert.ok(layoutFlushes <= 2, `Twelve hydrated sections need one measurement pass and one anchor restore, not a flush per section (${layoutFlushes})`);
   const target = content.children.find(node => node.dataset.sectionId === "70");
   assert.equal(target.getBoundingClientRect().top, -75, "Landing within estimated space retains its proportional position when text arrives");
   const anchorBefore = target.getBoundingClientRect().top;

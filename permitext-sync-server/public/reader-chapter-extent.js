@@ -53,15 +53,22 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
     const offset = saved.fraction === null ? saved.offset : -saved.fraction * rect.height;
     content.scrollTop += rect.top - content.getBoundingClientRect().top - offset;
   };
-  const remember = (node, index) => {
-    if (!node?.isConnected) { heights.set(String(sections[index].id), 0); return; }
-    // A newly rendered batch is small. Measure it now, then let the browser
-    // skip its off-screen layout using this actual intrinsic height.
-    node.style.contentVisibility = "visible";
-    const height = node.getBoundingClientRect().height;
-    heights.set(String(sections[index].id), height);
-    node.style.containIntrinsicSize = `auto ${Math.max(0, height)}px`;
-    node.style.contentVisibility = "auto";
+  const rememberBatch = items => {
+    const connected = items.filter(({node, index}) => {
+      if (node?.isConnected) return true;
+      heights.set(String(sections[index].id), 0);
+      return false;
+    });
+    // Reveal the bounded batch together, read its geometry, then restore
+    // containment together. Interleaving these writes and reads forces a fresh
+    // style/layout pass for every section when opening or resuming a Reader.
+    connected.forEach(({node}) => { node.style.contentVisibility = "visible"; });
+    const measured = connected.map(item => ({...item, height: item.node.getBoundingClientRect().height}));
+    measured.forEach(({node, index, height}) => {
+      heights.set(String(sections[index].id), height);
+      node.style.containIntrinsicSize = `auto ${Math.max(0, height)}px`;
+      node.style.contentVisibility = "auto";
+    });
   };
   const refreshLayout = () => {
     const next = signature();
@@ -75,7 +82,7 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
     // Sample a bounded number of already loaded sections. Never materialize
     // all skipped text during a column resize.
     const sample = live.filter(item => loaded[item.index]).slice(0, 12);
-    sample.forEach(({ node, index }) => remember(node, index));
+    rememberBatch(sample);
     slots.forEach((node, index) => {
       if (loaded[index] && !node?.isConnected) heights.set(String(sections[index].id), 0);
     });
@@ -153,7 +160,7 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
         loaded[index] = true;
       });
       collapseAliases();
-      nodes.forEach((_node, offset) => remember(slots[start + offset], start + offset));
+      rememberBatch(nodes.map((_node, offset) => ({node: slots[start + offset], index: start + offset})));
       refreshLive();
       restore(saved);
     }
