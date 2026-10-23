@@ -1,4 +1,4 @@
-import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=6';
+import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=7';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=5";
 import { createAssistantMaterials } from "./assistant-materials.js?v=4";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=6";
@@ -10,7 +10,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-library-cross-tab-v1296";
+import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-deferred-notes-v1297";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
@@ -139,7 +139,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-library-cross-tab-v1296";
+} from "./offline-storage.js?v=20261023-deferred-notes-v1297";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -172,7 +172,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261023-library-cross-tab-v1296";
+} from "./workspace-state.js?v=20261023-deferred-notes-v1297";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -47315,7 +47315,7 @@ function workspacePaneDescriptors(options = {}) {
         const paneID = notebookColumnPaneID(column);
         foundationScope.register(paneID);
         add(paneID, column.title || 'Notes', () => renderProjectNotebook(project, {foundationScope, column}),
-          () => closeNotebookNoteColumn(project, paneID), {foundationScope, ownerClass: 'notebook-panel', projectID, accessCapabilities: ['notebook']});
+          () => closeNotebookNoteColumn(project, paneID), {foundationScope, ownerClass: 'notebook-panel', projectID, accessCapabilities: ['notebook'], deferWhileHidden: true});
       }
     }
     // Report owns a separate screen; never insert it into the column track.
@@ -47414,7 +47414,18 @@ async function mountWorkspacePanesIndependently(context, options = {}) {
   const hydrator = getWorkspacePaneHydrator();
   for (const id of refresh) hydrator.cancel(id);
   // reconcile schedules loads on microtasks, after every desired shell is mounted.
-  const runnable = descriptors.filter((descriptor) => descriptor.publicContent || !options.accessGate || options.accessGate.allowed);
+  // A Project can restore Notes into a different workflow. Keep their sized
+  // slots, but do not construct unseen editors. Healthy mounted controllers
+  // stay retained when hidden, preserving drafts, selections and undo history.
+  const runnable = descriptors.filter((descriptor) =>
+    (descriptor.publicContent || !options.accessGate || options.accessGate.allowed) &&
+    (!descriptor.deferWhileHidden || workflowPaneIsVisible(descriptor.id) || descriptor.existing)
+  );
+  for (const descriptor of runnable) {
+    if (!descriptor.placeholder.dataset.workspacePaneDeferred) continue;
+    delete descriptor.placeholder.dataset.workspacePaneDeferred;
+    descriptor.placeholder.setAttribute("aria-busy", "true");
+  }
   hydrator.reconcile(runnable, context);
   // Retained jobs do not invoke this render's descriptor loader. Release their
   // unused leases after newly scheduled loader microtasks have started.
@@ -47427,6 +47438,11 @@ async function mountWorkspacePanesIndependently(context, options = {}) {
     if (runnable.includes(descriptor)) continue;
     descriptor.foundationScope?.release(descriptor.id);
     const shell = descriptor.placeholder;
+    if (descriptor.deferWhileHidden && !workflowPaneIsVisible(descriptor.id)) {
+      shell.dataset.workspacePaneDeferred = "true";
+      shell.setAttribute("aria-busy", "false");
+      continue;
+    }
     const unavailable = options.accessGate.phase !== "pending";
     shell.dataset.workspacePaneUnavailable = String(unavailable);
     shell.setAttribute("aria-busy", String(!unavailable));

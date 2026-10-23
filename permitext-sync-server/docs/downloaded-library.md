@@ -101,6 +101,8 @@ compared against HEAD and remain unchanged:
 - `test:public-code-cache`: progressive Reader VM fixture lacks
   `readerPanelIntersectsTrack`.
 - `test:web-active-code-sources`: Settings VM fixture lacks `list.before`.
+- `notebook-collapse-contract`: its isolated VM lacks the existing imported
+  `capturePaneScrollPositions`; the affected collapse function is unchanged.
 
 Focused download/offline/search/durability checks and the production build are
 reported separately from those pre-existing broad-suite failures.
@@ -144,3 +146,20 @@ only handles library preference/invalidation keys (or storage clearing), notifie
 the receiving tab without writing back, and has a two-realm queue regression
 test that fails on the original implementation. Offline shell/module versions
 are advanced together; the installed corpus requires no re-download.
+
+Extended verification of the cross-tab correction exercised two real production
+tabs. Preferences propagated both ways and neither tab reported console errors.
+The process briefly reached 699 MB and fell naturally to 367 MB after closing the
+extra tab. A further unchanged-passage round exposed 3–4.7 second Project
+restoration samples. Server sync processing in that interval was mostly
+51–145 ms, so it did not establish a multi-second server-processing bottleneck.
+
+A native Chrome Performance trace also showed Notebook editor constructors
+running while Research was selected. Notes descriptors now retain their hidden
+slots without initially constructing editors or requesting their foundation.
+Selecting Notebook starts their normal gated hydration. Already mounted editors
+remain retained when hidden, so this change does not discard draft text,
+selection, undo history or background saves. The actual mount/publication test
+failed before the correction and now covers deferred construction, unused lease
+release, first reveal and controller retention across hide/reveal. Account,
+workflow navigation and Notebook durability checks are reported separately.

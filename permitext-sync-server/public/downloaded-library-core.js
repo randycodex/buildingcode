@@ -4,17 +4,17 @@ import {
   searchWordForms,
   matchesSearchWords,
   searchWordsSnippet,
-} from "./search-words.js?v=20261023-library-cross-tab-v1296";
+} from "./search-words.js?v=20261023-deferred-notes-v1297";
 import {
   searchRelevanceRank,
   matchingSearchDefinition,
   initialSearchGroupLimit,
   prepareSearchRelevance,
-} from "./search-relevance.js?v=20261023-library-cross-tab-v1296";
+} from "./search-relevance.js?v=20261023-deferred-notes-v1297";
 import {
   offlineSourceScope,
   offlineSectionMetadata,
-} from "./offline-storage.js?v=20261023-library-cross-tab-v1296";
+} from "./offline-storage.js?v=20261023-deferred-notes-v1297";
 export { searchWords, searchWordForms, offlineSectionMetadata };
 export function intersect(lists) {
   if (!lists.length) return [];

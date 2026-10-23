@@ -1,4 +1,4 @@
-import { searchSpellingSuggestions } from "./search-relevance.js?v=20261023-library-cross-tab-v1296";
+import { searchSpellingSuggestions } from "./search-relevance.js?v=20261023-deferred-notes-v1297";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import {
   searchWords,
@@ -10,11 +10,11 @@ import {
   localSearchPermits,
   finishLocalSearch,
   offlineSectionMetadata,
-} from "./downloaded-library-core.js?v=6";
+} from "./downloaded-library-core.js?v=7";
 import {
   offlineAssetNamesForChapter,
   resolveOfflineSectionMetadata,
-} from "./offline-storage.js?v=20261023-library-cross-tab-v1296";
+} from "./offline-storage.js?v=20261023-deferred-notes-v1297";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20261015-reader-search-preview-v3";
 import {
   defaultSyncCodeVersion,

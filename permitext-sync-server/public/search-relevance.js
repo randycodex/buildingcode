@@ -1,4 +1,4 @@
-import { searchWords, searchWordPattern } from './search-words.js?v=20261023-library-cross-tab-v1296';
+import { searchWords, searchWordPattern } from './search-words.js?v=20261023-deferred-notes-v1297';
 
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const normalized = value => searchWords(value).map(word => word.replace(/(?<!s)s$/, '')).join(' ');

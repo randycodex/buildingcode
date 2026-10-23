@@ -168,6 +168,7 @@ const descriptorContext=vm.createContext({
 });
 vm.runInContext('const initialProjectFoundationScopes=new Set();'+actual('createInitialProjectFoundationScope')+actual('projectInformationStateKey')+actual('restoreAssistantConversationOwners')+actual('workspacePaneDescriptors'),descriptorContext);
 descriptors=descriptorContext.workspacePaneDescriptors();generation++;await mountAndSettle(context());
+assert.equal(descriptors.find(item=>item.id==='notebook').deferWhileHidden,true,'Actual Notes descriptors opt into deferral');
 assert.ok(!descriptors.some(item=>item.paneID === "report"), "Report is a separate screen; its access fence is tested in report-screen-contract");
 const liveEditors=new Map(track.children.map(node=>[node.dataset.paneId,node]));
 for(const [id,node] of liveEditors) node.draft=`Unsaved ${id} text`;
@@ -188,6 +189,32 @@ for(const [id,required] of [['notebook','notebook'],['workboard','projects']]) {
  const locked=track.children.find(node=>node.dataset.paneId===id);
  assert.notEqual(locked,prior);assert.equal(locked.privateContent,null);assert.equal(editorBuilds.get(id),2);
 }
+
+// An editor belonging to an unopened workflow keeps its slot without building
+// the editor or requesting its foundation. Once opened, hiding must retain the
+// same controller, unsaved text, selection and undo history.
+let noteVisible=false, lazyBuilds=0, releases=0;
+const lazyNote=pane('lazy-note'); lazyNote.undo=['prior edit'];
+sandbox.workflowPaneIsVisible=id=>id!=='lazy-note'||noteVisible;
+descriptors=[{...descriptor('lazy-note',()=>{lazyBuilds++;return lazyNote;}),deferWhileHidden:true,
+  foundationScope:{release(){releases++;}}}, {...descriptor('public-reader',()=>pane('public-reader')),publicContent:true}];
+generation++;await mountAndSettle(context());
+assert.equal(lazyBuilds,0,'Research must not construct a hidden Notes editor');
+assert.equal(track.children[0].dataset.workspacePaneDeferred,'true');
+assert.equal(track.children[1].dataset.workspacePaneLoading,undefined,'Public Reader still publishes');
+assert(releases>0,'Deferred editor releases its unused foundation lease');
+generation++;await mountAndSettle(context());assert.equal(lazyBuilds,0,'Unrelated refreshes cannot wake the hidden editor');
+const deferredShell=track.children[0];
+noteVisible=true;generation++;await mountAndSettle(context());
+assert.equal(lazyBuilds,1);assert.equal(track.children[0],lazyNote);
+assert.equal(deferredShell.dataset.workspacePaneDeferred,undefined,'Opening the workflow clears deferred loading state');
+lazyNote.draft='still unsaved';lazyNote.selection=[2,8];const undo=lazyNote.undo;
+noteVisible=false;generation++;await mountAndSettle(context());
+assert.equal(track.children[0],lazyNote,'A mounted editor survives hiding');
+noteVisible=true;generation++;await mountAndSettle(context());
+assert.equal(lazyBuilds,1);assert.equal(track.children[0],lazyNote);
+assert.equal(lazyNote.draft,'still unsaved');assert.deepEqual(lazyNote.selection,[2,8]);assert.equal(lazyNote.undo,undo);
+sandbox.workflowPaneIsVisible=()=>true;
 
 // Account invalidation blocks stale publication.
 const privateLoad=deferred(); descriptors=[descriptor("private",()=>privateLoad.promise)]; generation++;
