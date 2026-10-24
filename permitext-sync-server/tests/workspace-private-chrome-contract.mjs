@@ -13,13 +13,14 @@ class Element {
  focus(){}
 }
 let allowed=false,privateReads=0,authority='unavailable',current=true,account={userID:'owner'};
+const opened=[];
 const label={textContent:'Old private title'},container={hidden:false};
 const button=new Element('button');
 Object.assign(button,{disabled:false,title:'Old private title',closest:()=>container,querySelector:()=>label});
 const body=new Element('body');
 const layoutControl=new Element('button');layoutControl.textContent='Reset layout';
 const state={get columnGroups(){privateReads++;return [{name:'Private group'}];}};
-const context=vm.createContext({workspaceActionsButton:button,detachedProjectWindow:false,workspacePrivatePresentationAllowed:()=>allowed,
+const context=vm.createContext({renderProjectUpdateBadge(){},switchWorkflowView:view=>opened.push(view),toggleUtilityPane:key=>opened.push(key),workspaceActionsButton:button,detachedProjectWindow:false,workspacePrivatePresentationAllowed:()=>allowed,
  captureAccountRequest:()=>({userID:account?.userID}),isCurrentAccountRequest:()=>current,activeAccount:()=>account,
  ensureSyncedContentForRender:async()=>({userID:account?.userID,workspacePresentationAccess:authority}),
  loadSyncedContent:async()=>({userID:account?.userID,workspacePresentationAccess:authority}),showWebNotice:async()=>{},
@@ -46,7 +47,13 @@ assert.ok(labels().includes('Sign in for Projects'));assert.ok(labels().includes
 account={userID:'owner'};authority='verified';allowed=true;
 context.renderWorkspaceTabs();assert.equal(label.textContent,'Private Project');assert.equal(button.disabled,false);
 await context.openWorkspaceContextMenu('project',button);
-assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(!labels().includes('Manage Projects…'));assert.ok(labels().includes('Project details'));
+assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(!labels().includes('Manage Projects…'));assert.ok(labels().includes('CONTEXT'));assert.ok(labels().includes('SETTINGS'));
+const visit=node=>[node,...node.children.flatMap(visit)];
+const contextAction=visit(body).find(node=>node.textContent==='CONTEXT');
+const settingsAction=visit(body).find(node=>node.textContent==='SETTINGS');
+assert.equal(contextAction.disabled,false);
+contextAction.listeners.click();settingsAction.listeners.click();
+assert.deepEqual(opened,['project','settings'],'The consolidated entries invoke their original screen actions');
 const readsBefore=privateReads;body.children=[];current=false;
 await context.openWorkspaceContextMenu('project',button);
 assert.equal(body.children.length,0,'a stale account request cannot mount its menu');assert.equal(privateReads,readsBefore);

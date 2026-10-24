@@ -9,7 +9,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-project-sync-menu-v1313";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-project-menu-consolidated-v1314";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
@@ -141,7 +141,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-project-sync-menu-v1313";
+} from "./offline-storage.js?v=20261023-project-menu-consolidated-v1314";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -389,7 +389,6 @@ const toggleAnalysisButton = document.querySelector("#toggle-analysis") || (() =
   return button;
 })();
 const toggleWorkboardButton = null;
-const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
 const mobileMoreButton = document.querySelector("#mobile-more");
@@ -2589,6 +2588,19 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     appendMenuAction(projectSection, { label: activeAccount() ? "Account & project access" : "Sign in for Projects", run: () => toggleAccountDialog() });
   }
   menu.append(projectSection);
+  const navigationActions = document.createElement("div");
+  navigationActions.className = "workspace-view-options";
+  navigationActions.setAttribute("role", "group");
+  navigationActions.setAttribute("aria-label", "Project and settings");
+  appendMenuAction(navigationActions, {
+    label: "CONTEXT", icon: "book-a",
+    disabled: !projectsAvailable || !workspaceProject() || !hasCapability("projects"),
+    run: () => void switchWorkflowView("project")
+  });
+  appendMenuAction(navigationActions, {
+    label: "SETTINGS", icon: "user-round", run: () => toggleUtilityPane("settings")
+  });
+  menu.append(navigationActions);
   const viewOptions = document.createElement("div");
   viewOptions.className = "workspace-view-options";
   const layoutActions = document.createElement("div");
@@ -5200,7 +5212,6 @@ function closeSharedWorkspaceViews(except = "") {
 function syncWorkflowNavigation() {
   const accountOpen = Boolean(document.querySelector(".account-screen[open]"));
   const view = accountOpen ? "account" : projectDetailsScreen?.isOpen() ? "project-details" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
-  toggleSettingsButton?.setAttribute("aria-pressed", String(accountOpen));
   toggleReportButton?.setAttribute("aria-pressed", String(view === "report"));
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     button.setAttribute('aria-pressed', String(button.dataset.workflowView === (view === 'project-details' ? 'project' : view)));
@@ -6217,7 +6228,6 @@ function setUtilityButtonStates() {
   toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis || activeRepeatableKeys.has("analysis")));
   toggleCalculatorButton?.setAttribute("aria-pressed", String(Boolean(state.utilities.calculator)));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
-  toggleSettingsButton.setAttribute("aria-pressed", String(Boolean(document.querySelector(".account-screen[open]"))));
   syncTopbarProjectToolStates();
 }
 
@@ -40511,8 +40521,7 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     coveredState.forEach((inert, element) => { element.inert = inert; });
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     syncWorkflowNavigation();
-    if (closedWithKeyboard) (document.querySelector("#workspace-menu-button") || toggleSettingsButton).focus({ preventScroll: true });
-    else toggleSettingsButton.blur();
+    if (closedWithKeyboard) workspaceActionsButton?.focus({ preventScroll: true });
   };
   dialog.addEventListener("keydown", (event) => {
     if (event.defaultPrevented || event.key !== "Escape") return;
@@ -48206,36 +48215,7 @@ function bindWorkspaceKeyboardNavigation() {
   });
 }
 
-function bindWorkspaceMainMenu() {
-  const menu = document.querySelector("#workspace-main-menu");
-  const trigger = document.querySelector("#workspace-menu-button");
-  if (!menu || menu.dataset.bound) return;
-  menu.dataset.bound = "true";
-  const items = () => Array.from(menu.querySelectorAll("button:not(:disabled)"));
-  menu.addEventListener("click", event => {
-    if (event.target.closest("button")) menu.open = false;
-  });
-  menu.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
-      menu.open = false;
-      trigger.focus();
-      event.preventDefault();
-    } else if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
-      event.preventDefault();
-      menu.open = true;
-      const buttons = items();
-      const index = buttons.indexOf(document.activeElement);
-      const next = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1
-        : (index + (event.key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length;
-      buttons[next]?.focus();
-    }
-  });
-  document.addEventListener("pointerdown", event => { if (!menu.contains(event.target)) menu.open = false; });
-  menu.addEventListener("focusout", () => queueMicrotask(() => { if (!menu.contains(document.activeElement)) menu.open = false; }));
-}
-
 function bindImmediateUtilityControls() {
-  bindWorkspaceMainMenu();
   const updateBadge = document.querySelector("#project-update-badge");
   if (updateBadge && !updateBadge.dataset.bound) {
     updateBadge.dataset.bound = "true";
@@ -48560,9 +48540,6 @@ async function start() {
   document.querySelectorAll('[data-open-reader]').forEach(bindReaderToolbarButton);
   toggleArchiveButton?.addEventListener("click", () => {
     toggleUtilityPane("archive");
-  });
-  toggleSettingsButton.addEventListener("click", () => {
-    toggleUtilityPane("settings");
   });
   workspaceActionsButton?.addEventListener("click", () => {
     if (workspaceContextMenu) {
