@@ -9,7 +9,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-project-menu-titlecase-v1315";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-layout-toolbar-v1316";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
@@ -141,7 +141,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-project-menu-titlecase-v1315";
+} from "./offline-storage.js?v=20261023-layout-toolbar-v1316";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2606,19 +2606,11 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   const layoutActions = document.createElement("div");
   layoutActions.setAttribute("role", "group");
   layoutActions.setAttribute("aria-label", "View options");
-  updateWorkspaceLayoutControls();
-  for (const id of ["fit-columns", "collapse-all-columns", "expand-all-columns", "collapse-readers"]) {
-    const control = document.getElementById(id);
-    if (control && !control.hidden) appendMenuAction(layoutActions, {
-      label: control.textContent, disabled: control.disabled,
-      dangerOnHover: id === "collapse-readers", run: () => control.click()
-    });
-  }
   if (projectsAvailable && state.columnGroups?.length) appendMenuAction(layoutActions, {
     label: "Saved groups…", run: () => openSavedColumnGroupsMenu(workspaceActionsButton)
   });
   viewOptions.append(layoutActions);
-  if (!["notebook", "report"].includes(currentColumnWorkflowView())) menu.append(viewOptions);
+  if (layoutActions.childElementCount && !["notebook", "report"].includes(currentColumnWorkflowView())) menu.append(viewOptions);
   document.body.append(menu);
   workspaceContextMenu = menu;
   workspaceActionsButton?.setAttribute("aria-expanded", "true");
@@ -2670,14 +2662,14 @@ function renderWorkspaceTabs() {
 function updateWorkspaceLayoutControls() {
   const inReport = Boolean(reportScreen?.isOpen());
   const reportReady = Boolean(document.querySelector(".report-workspace-view:not([hidden]) .report-workspace-columns"));
-  const hasColumns = defaultActivePaneIDs().length > 0;
-  fitColumnsButton.hidden = !inReport && !hasColumns;
+  const hasColumns = defaultActivePaneIDs().some(workflowPaneIsVisible);
+  fitColumnsButton.hidden = false;
   fitColumnsButton.disabled = inReport ? !reportReady : !hasColumns;
   fitColumnsButton.title = inReport ? "Restore default Report column widths" : "Restore default panel widths";
-  collapseReadersButton.hidden = inReport || !hasColumns;
+  collapseReadersButton.hidden = inReport;
   collapseReadersButton.disabled = inReport || !hasColumns;
-  document.querySelectorAll("#open-column-groups, #collapse-all-columns, #expand-all-columns")
-    .forEach(button => { button.hidden = inReport; });
+  document.querySelectorAll("#collapse-all-columns, #expand-all-columns")
+    .forEach(button => { button.hidden = inReport; button.disabled = inReport || !hasColumns; });
 }
 
 function normalizeProjectIdentities(value, legacyWorkboard = null) {
@@ -48552,7 +48544,6 @@ async function start() {
   window.matchMedia("(max-width: 760px)").addEventListener("change", (event) => {
     if (!event.matches) closeMobileMoreSheet({ restoreFocus: false });
   });
-  document.querySelector("#open-column-groups")?.addEventListener("click", () => openSavedColumnGroupsMenu());
   fitColumnsButton.addEventListener("click", () => {
     resetVisibleColumnWidths();
   });

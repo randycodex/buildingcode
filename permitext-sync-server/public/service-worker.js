@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v1890";
+const shellCacheName = "permitext-pro-shell-v1891";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -10,7 +10,7 @@ const shellURLs = [
   "/web/downloaded-library-core.js?v=8",
   "/web/settings-columns.js?v=1",
   "/web/project-details-columns.js?v=20261021-project-columns-v3",
-  "/web/workspace-button-icons.js?v=20261023-project-menu-titlecase-v1315",
+  "/web/workspace-button-icons.js?v=20261023-layout-toolbar-v1316",
   "/web/minimal-workflow.js",
   "/web/notebook-questions.js",
   "/web/project-workflow.js?v=20261021-project-questions-v8",
@@ -60,19 +60,19 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261023-project-menu-titlecase-v1315",
+  "/web/styles.css?v=20261023-layout-toolbar-v1316",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
   "/web/assistant-materials.js?v=4",
-  "/web/app.js?v=20261023-project-menu-titlecase-v1315",
+  "/web/app.js?v=20261023-layout-toolbar-v1316",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261023-project-menu-titlecase-v1315",
+  "/web/offline-storage.js?v=20261023-layout-toolbar-v1316",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",

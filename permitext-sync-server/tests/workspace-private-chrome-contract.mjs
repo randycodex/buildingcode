@@ -6,6 +6,7 @@ function actual(name){const start=source.search(new RegExp(`(?:async )?function 
 class Element {
  constructor(tag='div'){this.tag=tag;this.children=[];this.style={};this.classList={add(){},toggle(){}};this.listeners={};}
  append(...children){this.children.push(...children);}
+ get childElementCount(){return this.children.length;}
  setAttribute(key,value){this[key]=value;}
  addEventListener(key,callback){this.listeners[key]=callback;}
  getBoundingClientRect(){return {left:0,bottom:40,width:240,height:240};}
@@ -40,10 +41,10 @@ assert.equal(privateReads,0,'unverified private-only menus may not read saved pr
 await context.openWorkspaceContextMenu('project',button);
 const labels=()=>{const visit=node=>[node.textContent,...node.children.flatMap(visit)];return visit(body).filter(Boolean);};
 assert.equal(privateReads,0,'public menu must not inspect private project names or saved groups');
-assert.ok(!labels().includes('View options'));assert.ok(labels().includes('Reset layout'));
+assert.ok(!labels().includes('View options'));assert.ok(!labels().includes('Reset layout'));
 assert.ok(labels().includes('Account & project access'));assert.ok(!labels().includes('Saved groups…'));
 account=null;await context.openWorkspaceContextMenu('project',button);
-assert.ok(labels().includes('Sign in for Projects'));assert.ok(labels().includes('Reset layout'));assert.equal(privateReads,0);
+assert.ok(labels().includes('Sign in for Projects'));assert.ok(!labels().includes('Reset layout'));assert.equal(privateReads,0);
 account={userID:'owner'};authority='verified';allowed=true;
 context.renderWorkspaceTabs();assert.equal(label.textContent,'Private Project');assert.equal(button.disabled,false);
 await context.openWorkspaceContextMenu('project',button);

@@ -20980,3 +20980,10 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 /* Keep every header control centered inside the shared 35px bar. */
 .workspace-shell > .topbar { grid-template-rows: minmax(0, 1fr); align-items: center; }
 .topbar .project-update-badge { height: var(--workspace-menu-height); min-height: 0; }
+
+/* Column actions sit below the project selector, beside the current view tools. */
+.workflow-toolbar { padding-inline-end: 24px; }
+.workflow-toolbar > [data-workflow-tools] { min-width: 0; }
+.workflow-toolbar > .workflow-layout-actions { margin-inline-start: auto; flex: 0 0 auto; gap: 2px; padding-inline-start: 12px; }
+.workflow-layout-actions > .toolbar-button { width: 30px; flex: 0 0 30px; padding: 0; }
+.workflow-layout-actions > .toolbar-button:disabled { opacity: .35; cursor: default; }

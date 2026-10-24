@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261023-project-menu-titlecase-v1315">
+    <link rel="stylesheet" href="/web/styles.css?v=20261023-layout-toolbar-v1316">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -55,18 +55,6 @@
 </nav>
         <div class="topbar-end">
           <span class="connection-status" id="connection-status" role="status" aria-live="polite" data-state="clean"><span class="connection-status-label">Online</span></span>
-          <div class="topbar-layout-actions" aria-label="Column layout" hidden>
-            <details class="topbar-layout-menu">
-              <summary class="toolbar-button">Layout</summary>
-              <div class="topbar-layout-menu-items workspace-menu">
-                <button id="open-column-groups" type="button" aria-haspopup="menu">Groups</button>
-                <button id="fit-columns" type="button" title="Restore default panel widths">Reset layout</button>
-                <button id="collapse-all-columns" type="button">Collapse all</button>
-                <button id="expand-all-columns" type="button">Expand all</button>
-                <button id="collapse-readers" type="button" title="Close columns in this working view">Close all</button>
-              </div>
-            </details>
-          </div>
           <button class="project-update-badge" id="project-update-badge" type="button" hidden aria-label="Updated elsewhere" data-workspace-icon="refresh-ccw">
             <span class="sr-only">Updated elsewhere <time></time></span>
           </button>
@@ -99,7 +87,12 @@
             <span>Context</span>
           </button><button class="toolbar-button" id="toggle-facts" type="button" aria-label="Facts" title="Choose a Project to open Facts" aria-pressed="false" disabled>
             <span>Facts</span>
-          </button></div></nav>
+          </button></div><div class="workflow-layout-actions" role="group" aria-label="Column layout">
+            <button class="toolbar-button" id="collapse-all-columns" type="button" aria-label="Collapse all" title="Collapse all columns" data-workspace-icon="panel-left-close"></button>
+            <button class="toolbar-button" id="expand-all-columns" type="button" aria-label="Expand all" title="Expand all columns" data-workspace-icon="panel-left-open"></button>
+            <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset layout" title="Restore default panel widths" data-workspace-icon="rotate-ccw"></button>
+            <button class="toolbar-button" id="collapse-readers" type="button" aria-label="Close all" title="Close columns in this working view" data-workspace-icon="minimize"></button>
+          </div></nav>
       <aside class="workspace-issue" id="workspace-issue" role="alert" hidden>
         <p class="workspace-issue-copy"></p>
         <div class="workspace-issue-actions">
@@ -586,6 +579,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261023-project-menu-titlecase-v1315" type="module"></script>
+    <script src="/web/app.js?v=20261023-layout-toolbar-v1316" type="module"></script>
   </body>
 </html>

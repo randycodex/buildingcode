@@ -75,8 +75,8 @@ assert.match(clientSource, /function unassignedSavedEvidenceKeys[\s\S]*?activePr
 assert.match(clientSource, /typeLabel\.textContent = folderTypeLabel\(project\)/);
 assert.match(clientSource, /folderRecordCountLabel\(selectedProjects\)/);
 assert.match(indexSource, /id="add-reader"[^>]*aria-label="Reader"[^>]*title="Reader"[\s\S]*?<span>Reader<\/span>/);
-assert.match(indexSource, /id="open-column-groups"[^>]*aria-haspopup="menu">Groups<\/button>/);
-assert.match(indexSource, /<summary class="toolbar-button">Layout<\/summary>[\s\S]*?id="fit-columns"[^>]*title="Restore default panel widths">Reset layout<\/button>[\s\S]*?id="collapse-readers"[^>]*title="Close columns in this working view">Close all<\/button>/);
+assert.match(indexSource, /class="workflow-layout-actions"[^>]*aria-label="Column layout"/);
+assert.match(indexSource, /id="collapse-all-columns"[^>]*data-workspace-icon="panel-left-close"[\s\S]*?id="expand-all-columns"[^>]*data-workspace-icon="panel-left-open"[\s\S]*?id="fit-columns"[^>]*data-workspace-icon="rotate-ccw"[\s\S]*?id="collapse-readers"[^>]*data-workspace-icon="minimize"/);
 assert.match(indexSource, /settings-project-clear-all[\s\S]*?Move all projects to Trash/);
 assert.match(indexSource, /<summary>Trash<\/summary>/);
 assert.match(indexSource, /Restore deleted items for 30 days across synced devices\. Newer work is kept\./);

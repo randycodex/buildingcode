@@ -52,7 +52,7 @@ account='other';await c.focusRecentUtilityColumn('search');assert.equal(focused.
 state.utilityInstances=[];await c.focusRecentUtilityColumn('search');assert.equal(opened,1,'First click opens a column when none exists');
 assert.match(actual('openColumnGroupMenu'),/New search column/);assert.match(actual('openColumnGroupMenu'),/New research column/);
 const binding=actual('bindImmediateUtilityControls');assert.match(binding,/focusRecentUtilityColumn\("search"\)/);assert.match(binding,/focusRecentUtilityColumn\("analysis"\)/);
-const html=await readFile(new URL('../public/index.html',import.meta.url),'utf8');assert.match(html,/<details class="topbar-layout-menu">[\s\S]*?id="open-column-groups"[\s\S]*?<\/details>/);
+const html=await readFile(new URL('../public/index.html',import.meta.url),'utf8');assert.match(html,/class="workflow-layout-actions"/);assert.match(source,/label: "Saved groups…", run: \(\) => openSavedColumnGroupsMenu/);
 
 // History navigation uses the Project record ID to locate the workspace, not its client ID.
 let activeProject='a',switched=[],targetInstance;
