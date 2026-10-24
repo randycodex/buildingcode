@@ -40,7 +40,7 @@ function layout(id, ids, storedWidth = 600, linked = false, collapsed = false) {
 }
 for (const storedWidth of [350, 400, 520, 600, 900, 1000]) {
   for (const linked of [false, true]) {
-    assert.equal(layout('reader:a', ['reader:a'], storedWidth, linked).flex, `0 0 ${Math.min(900, Math.max(600, storedWidth))}px`, 'A Reader retains its selected overflow width within the limits, including source-linked Readers');
+    assert.equal(layout('reader:a', ['reader:a'], storedWidth, linked).flex, `0 0 ${Math.max(600, storedWidth)}px`, 'Readers retain manual widths above 900px, including source-linked Readers');
   }
 }
 for (const ids of [['reader:a','reader:b'], ['reader:a','reader:b','reader:c'], ['reader:a','utility:search']]) {
@@ -62,12 +62,15 @@ const mainPaneIDs = [
 ];
 for (const id of mainPaneIDs) {
   const reader = id.startsWith('reader:');
-  const bounded = reader || /^utility:search(?::|$)/.test(id);
-  const minimum = /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
+  const search = /^utility:search(?::|$)/.test(id);
+  const evidence = /^utility:saved(?::|$)/.test(id);
+  const fixedBasis = reader || search || evidence;
+  const minimum = evidence ? 300 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
+  const maximum = evidence ? 600 : search ? 900 : Infinity;
   for (const count of [1, 2, 3, 4, 8]) {
     const ids = [id, ...Array.from({ length: count - 1 }, (_, index) => `reader:other-${index}`)];
     for (const restoredWidth of [350, 400, 520, 550, 600, 850, 900, 1200]) {
-      const expectedWidth = Math.min(bounded ? 900 : Infinity, Math.max(minimum, restoredWidth));
+      const expectedWidth = Math.min(maximum, Math.max(minimum, restoredWidth));
       context.paneIDs = ids;
       context.state.paneWeights = { [id]: restoredWidth };
       context.normalizePaneWeights(ids);
@@ -76,7 +79,7 @@ for (const id of mainPaneIDs) {
       assert.equal(style['--pane-default-min-width'], `${minimum}px`, `${id} enforces its rendered minimum`);
       assert.equal(context.state.paneWeights[id], expectedWidth, `${id} also clamps widths when mounted directly`);
       const basis = expectedWidth;
-      assert.equal(style.flex, `${bounded ? 0 : 1} 0 ${basis}px`, `${id} keeps the intended sizing with ${count} columns`);
+      assert.equal(style.flex, `${fixedBasis ? 0 : 1} 0 ${basis}px`, `${id} keeps the intended sizing with ${count} columns`);
     }
   }
   assert.equal(layout(id, [id], 600, false, true).flex, '0 0 48px', `${id} keeps its collapsed width`);
@@ -108,7 +111,7 @@ for (const invalidWidth of [NaN, 0, -1]) {
 }
 assert.equal(context.defaultPaneWidthForID('reader:a'),600);
 const css = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
-assert.match(css, /\.reader-panel\s*\{\s*--pane-min-width: 400px;\s*max-width: 900px;/, 'CSS enforces the Reader limits before and after mounting');
+assert.match(css, /\.reader-panel\s*\{\s*--pane-min-width: 400px;\s*max-width: none;/, 'CSS preserves manually resized Readers above 900px before and after mounting');
 assert.match(css, /--assistant-sidebar-width: 320px;[\s\S]*?grid-template-columns: var\(--assistant-sidebar-width\) minmax\(600px, 1fr\);/, 'The Assistant keeps its 320px conversation sidebar beside a flexible 600px-minimum conversation');
 assert.match(css, /--workspace-content-max-width: 800px;/, 'Workspace reading content retains the 800px measure');
 assert.match(css, /\.reader-content > \*[^{}]*\{[^}]*max-width: var\(--workspace-content-max-width\);[^}]*margin-right: auto;[^}]*margin-left: auto;/, 'Panel expansion must retain the shared centered text measure');
