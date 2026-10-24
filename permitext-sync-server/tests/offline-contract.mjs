@@ -309,15 +309,32 @@ for (const path of [...serviceWorker.slice(serviceWorker.indexOf("const shellURL
 }
 
 const cachedShellURLs = new Set([...serviceWorker.slice(serviceWorker.indexOf("const shellURLs"), serviceWorker.indexOf("self.addEventListener")).matchAll(/"(\/[^"\n]+)"/g)].map(match => match[1]));
+const cachedModuleImports = new Map();
 for (const url of cachedShellURLs) {
   if (!url.startsWith("/web/") || !url.split("?")[0].endsWith(".js")) continue;
   const path = url.split("?")[0];
   const moduleSource = await readFile(new URL(`../public${path.replace(/^\/web\//, "/")}`, import.meta.url), "utf8")
     .catch(() => readFile(new URL(`../public${path}`, import.meta.url), "utf8"));
+  const dependencies = [];
   for (const match of moduleSource.matchAll(/(?:from\s*|import\s*)["'](\.\/[^"']+)["']/g)) {
     const dependency = new URL(match[1], `https://offline.test${url}`);
     assert(cachedShellURLs.has(dependency.pathname + dependency.search), `Offline shell omitted static dependency ${dependency.pathname + dependency.search}`);
+    dependencies.push(dependency.pathname + dependency.search);
   }
+  cachedModuleImports.set(url, dependencies);
+}
+// A public download worker must not pull the app-release-specific account
+// storage module into its graph. That cycle caused missing offline imports on
+// unrelated app releases and loaded private storage code in the public worker.
+const downloadWorkerURL = [...cachedModuleImports.keys()].find(url => url.startsWith('/web/downloaded-library-worker.js?'));
+assert(downloadWorkerURL, 'Offline shell includes the download worker');
+const pendingWorkerImports = [downloadWorkerURL], visitedWorkerImports = new Set();
+while (pendingWorkerImports.length) {
+  const url = pendingWorkerImports.pop();
+  if (visitedWorkerImports.has(url)) continue;
+  visitedWorkerImports.add(url);
+  assert(!url.startsWith('/web/offline-storage.js'), 'Download worker metadata must remain independent of app/account storage');
+  pendingWorkerImports.push(...(cachedModuleImports.get(url) || []));
 }
 
 const preparationSource = offlineStorage.slice(offlineStorage.indexOf("export async function prepareOfflineShell()"), offlineStorage.indexOf("export async function downloadOfflineLibrary(")).replace("export ", "");

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
+import { withoutWorkspaceLayoutSync } from '../public/workspace-layout-sync.js';
 import { accountContextChangedError, accountRequestIdentity, accountRequestIsCurrent,
   accountLinkRecoverySources, confirmedAccountLinkRecovery, recordConfirmedAccountLinkRecovery,
   privateWorkspacePrefix, privateWorkspaceRecoverySnapshot } from "../public/private-workspace-state.js";
@@ -41,8 +42,11 @@ function workspace(account) {
   return { account, localProjects: [], localSavedItems: [], localProjectSections: [], localAnnotations: [], syncOutbox: [], syncConflicts: [], archivedProjectIDs: [], utilities: {} };
 }
 function harness(overrides = {}) {
-  const calls = [], saves = [], callbacks = [];
+  const calls = [], saves = [], callbacks = [], projectUpdateObservations = [];
   const c = {
+    withoutWorkspaceLayoutSync,
+    projectUpdateBrowserID: () => 'synthetic-browser',
+    observeSyncedProjectUpdates: mutations => projectUpdateObservations.push(clone(mutations)),
     state: workspace(A), accountRuntimeGeneration: 1, accountLinkWriteFence: null, accountContextChangedError, accountRequestIdentity, accountRequestIsCurrent,
     notebookMounts: new Map(), reportDraftMounts: new Map(), workspaceRestoreError: null, activeResearchProgress: new Map(), pendingNotebookDrafts: async () => [], pendingNotebookImages: async () => [],
     persistCodeQuestionAccountState() {}, sessionAccountLinkRecoveries: new Map(), accountLinkRecoverySources, privateWorkspaceRecoverySnapshot,
@@ -84,7 +88,7 @@ function harness(overrides = {}) {
   };
   vm.createContext(c);
   vm.runInContext(names.map(extract).join("\n"), c);
-  return { c, calls, saves, callbacks, switchTo(account = B) { c.state = workspace(account); c.accountRuntimeGeneration += 1; } };
+  return { c, calls, saves, callbacks, projectUpdateObservations, switchTo(account = B) { c.state = workspace(account); c.accountRuntimeGeneration += 1; } };
 }
 const isAbort = (error) => error?.name === "AbortError";
 
@@ -165,6 +169,7 @@ for (const failure of [false, true]) {
   await assert.rejects(h.c.pushMutation(mutation), isAbort);
   assert.equal(h.c.state.syncOutbox.length, 0);
   assert.equal(h.saves.length, 0);
+  assert.equal(h.projectUpdateObservations.length, 0, 'Wrong-owner operations cannot publish local Project update observations');
 }
 for (const name of ["pushMutation", "pushMutationBatch"]) {
   const gate = deferred();

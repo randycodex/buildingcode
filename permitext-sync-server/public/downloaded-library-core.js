@@ -14,7 +14,7 @@ import {
 import {
   offlineSourceScope,
   offlineSectionMetadata,
-} from "./offline-storage.js?v=20261023-notes-reveal-v1298";
+} from "./offline-code-metadata.js?v=1";
 export { searchWords, searchWordForms, offlineSectionMetadata };
 export function intersect(lists) {
   if (!lists.length) return [];

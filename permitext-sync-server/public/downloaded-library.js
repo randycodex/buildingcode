@@ -52,7 +52,7 @@ function call(action, data = {}, { signal, onProgress } = {}) {
   signal?.throwIfAborted();
   clearTimeout(timer);
   if (!worker) {
-    worker = new Worker("/web/downloaded-library-worker.js?v=8", {
+    worker = new Worker("/web/downloaded-library-worker.js?v=9", {
       type: "module",
     });
     worker.onmessage = ({ data }) => {

@@ -192,7 +192,8 @@ assert.deepEqual(
   "A retained collection link must not hide an otherwise Unassigned passage."
 );
 
-const readerChapterSectionSource = functionSource(appSource, "renderReaderChapterSection");
+assert.match(functionSource(appSource, 'renderReaderChapterSection'), /buildReaderChapterSection\(panel, reader, section, groupLabelsByFirstSection, options\)/, 'Reader rendering delegates to the section builder');
+const readerChapterSectionSource = functionSource(appSource, "buildReaderChapterSection");
 assert.match(
   readerChapterSectionSource,
   /privateContentAllowed && isSectionSaved\(\{[\s\S]*?sectionID: target\.sectionID,[\s\S]*?codeVersion: target\.codeVersion,[\s\S]*?blockID: target\.blockID[\s\S]*?\}, "", savedKeys\)/,
@@ -240,7 +241,7 @@ assert.match(sectionDetailSource, /heading\.addEventListener\("click"[\s\S]*?ope
   "Source Detail must provide an explicit path to its exact enacted source in Reader.");
 assert.match(
   sectionDetailSource,
-  /textarea\.placeholder = sectionTarget\.blockID \? "Add a comment on the highlighted passage" : "Add a comment on this section"/,
+  /const commentScope = sectionTarget\.blockID \? "Passage comment" : "Section comment";[\s\S]*?createEvidenceCommentsEditor\(noteBody, `\$\{commentScope\} for/,
   "Evidence detail must distinguish passage comments from section comments."
 );
 const setAnnotationNoteValueSource = functionSource(appSource, "setAnnotationNoteValue");
@@ -441,8 +442,8 @@ assert.match(
 );
 assert.match(
   syncedRefreshSource,
-  /refreshSavedPanelInPlace\(paneID, \{ reconcileProjectStudio: false \}\)/,
-  "Background sync must hydrate Saved in place without steering or closing the active Project."
+  /refreshSavedPanelInPlace\(paneID,\s*\{[\s\S]*?reconcileProjectStudio:\s*false[\s\S]*?preserveProjectChrome:\s*true[\s\S]*?reuseVerifiedSync:\s*true/,
+  "Sync must hydrate Saved in place using the verified snapshot without steering or closing the active Project."
 );
 assert.match(
   functionSource(appSource, "refreshVisibleSyncedDerivedState"),
@@ -455,7 +456,7 @@ assert.match(functionSource(appSource, "updateOpenProjectSyncWarning"), /Project
 assert.match(functionSource(appSource, "handleForegroundSyncSignal"), /refreshSyncedWorkspaceInPlace/);
 assert.match(functionSource(appSource, "flushPendingSyncAndRender"), /refreshSyncedWorkspaceInPlace/);
 const foregroundSyncSource = functionSource(appSource, "performForegroundSync");
-assert.match(foregroundSyncSource, /refreshSyncedWorkspaceInPlace\(\{ accountUserID \}\)/);
+assert.match(foregroundSyncSource, /refreshSyncedWorkspaceInPlace\(\{\s*accountUserID,\s*shouldApply:\s*options\.shouldApply\s*\}\)/);
 assert.equal(
   (foregroundSyncSource.match(/renderWorkspace\(\)/g) || []).length,
   0,
@@ -805,7 +806,7 @@ assert.match(stylesSource, /\.saved-panel \.saved-content\[hidden\] \{[\s\S]*?di
 assert.match(stylesSource, /\.saved-project-fact-description \{[^}]*field-sizing: content;[^}]*height: auto;[^}]*min-height: 0;[^}]*max-height: none;[^}]*overflow: hidden;[^}]*resize: none;/);
 assert.doesNotMatch(appSource, /descriptionResizeHandle/);
 assert.doesNotMatch(stylesSource, /\.saved-project-fact-resize-handle/);
-assert.match(appSource, /noteResizeHandle\.className = "section-detail-note-resize-handle"[\s\S]*?noteResizeHandle\.setPointerCapture\(event\.pointerId\)[\s\S]*?event\.key !== "ArrowUp" && event\.key !== "ArrowDown"/);
+assert.match(sectionDetailSource, /createEvidenceCommentsEditor\(noteBody,[\s\S]*?evidenceCommentUndoState\(sectionTarget\)\)/, 'Evidence detail uses the shared comment editor with target-specific undo history');
 assert.match(stylesSource, /\.section-detail-note-box textarea \{[\s\S]*?max-height: min\(70vh, 760px\);[\s\S]*?resize: none;/);
 assert.match(stylesSource, /\.section-detail-note-resize-handle::after \{[\s\S]*?left: 50%;[\s\S]*?width: 36px;[\s\S]*?height: 2px;[\s\S]*?transform: translateX\(-50%\);/);
 assert.doesNotMatch(functionSource(appSource, "renderReaderChapterSection"), /reader-section-project-context|renderReaderSectionProjectContext/);
@@ -861,7 +862,7 @@ assert.match(stylesSource, /\.notebook-reference-chip \{[\s\S]*?display: inline-
 assert.match(stylesSource, /\.notebook-card-row\.is-active-title \{[^}]*grid-template-columns: minmax\(0, 1fr\) auto;[^}]*align-items: center;[\s\S]*?\.notebook-card-list-title-editor \{[^}]*width: 100%;[^}]*background: transparent;[^}]*font-weight: 400;/, "The selected Notebook Note title must remain editable in the Notes list.");
 assert.match(stylesSource, /\.notebook-reference-meta \{[\s\S]*?color: var\(--text-tertiary\);[\s\S]*?\.notebook-reference-title \{[\s\S]*?font-weight: 700;[\s\S]*?\.notebook-reference-preview \{[\s\S]*?-webkit-line-clamp: 2;/, "Notebook references must expose a compact source, title, and preview hierarchy.");
 assert.match(stylesSource, /\.notebook-card-tile:hover strong,[\s\S]*?\.notebook-card-tile\[aria-pressed="true"\] strong \{[^}]*color: color-mix\(in srgb, var\(--project-color\) 35%, var\(--text-primary\)\);/, "Notebook card hover must keep a readable Project tint on its title.");
-assert.match(stylesSource, /\.notebook-card-row\.is-selected \.notebook-card-tile strong \{[^}]*color: color-mix\(in srgb, var\(--project-color\) 72%, #fff\);/, "Notebook card selection must highlight only the selected Note title.");
+assert.match(stylesSource, /\.notebook-card-row\.is-selected \.notebook-card-tile strong \{[^}]*color: light-dark\(color-mix\(in srgb, var\(--project-color\) 35%, var\(--text-primary\)\), color-mix\(in srgb, var\(--project-color\) 72%, #fff\)\);/, "Notebook card selection must keep a readable Project tint in both themes.");
 assert.match(stylesSource, /\.notebook-card-row\.is-selected \{[\s\S]*?background: transparent;/, "Notebook card selection must not use a filled row highlight.");
 assert.match(stylesSource, /\.notebook-focus \{[^}]*grid-template-rows: auto minmax\(220px, 1fr\);[^}]*padding: var\(--space-2\) var\(--space-4\) var\(--space-3\);/, "Notebook content must use the same bottom inset as Report without an empty status row.");
 assert.match(stylesSource, /\.notebook-draft-status \{[^}]*position: absolute;[^}]*bottom: 0;[\s\S]*?\.notebook-draft-status:empty \{ display: none; \}/, "Notebook sync status must overlay the column footer without reserving content height.");
@@ -900,9 +901,9 @@ const migrateReaderWidth = new Function([
     .map(name => functionSource(appSource, name)),
   "return migrateLegacyPaneWidth;"
 ].join("\n"))();
-for (const [stored, expected] of [[350,400], [400,400], [520,520], [600,600], [900,900], [1000,900], [40,600], [0,600], [NaN,600]]) {
+for (const [stored, expected] of [[350,400], [400,400], [520,520], [600,600], [900,900], [1000,1000], [1600,1600], [40,600], [0,600], [NaN,600]]) {
   assert.equal(migrateReaderWidth("reader:fixture", stored), expected,
-    "Restored Reader widths must preserve the user's choice within 400–900px and default invalid/strip widths to 600px.");
+    "Restored Reader widths preserve manual choices above the 400px minimum and default invalid/strip widths to 600px.");
 }
 assert.match(appSource, /if \(isProjectCoordinationPaneID\(paneID\) && value === legacyCoordinationPaneWidth\) \{[\s\S]*?return defaultCoordinationPaneWidth;/);
 assert.match(appSource, /projectsMenuToggle\.onclick = \(\) => \{[\s\S]*?if \(instance\.projectsMenuOpen \|\| !showingArchived\) return;[\s\S]*?instance\.projectsArchiveMode = false;/);

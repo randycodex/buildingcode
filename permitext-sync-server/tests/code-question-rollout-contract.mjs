@@ -378,7 +378,7 @@ assert.match(workspaceScript, /research-feedback-details/);
 assert.match(workspaceScript, /void saveFeedback\("helpful"/);
 assert.match(workspaceStyles, /\.research-feedback-icon \{/);
 assert.match(workspaceStyles, /\.research-feedback-details\[hidden\]/);
-assert.match(workspaceStyles, /\.research-message\.is-user \{[\s\S]*?background: rgb\(246 244 241 \/ 10%\);[\s\S]*?color: #fff;/);
+assert.match(workspaceStyles, /\.research-message\.is-user \{[\s\S]*?background: light-dark\(var\(--toolbar-active\), rgb\(246 244 241 \/ 10%\)\);[\s\S]*?color: var\(--text-primary\);/);
 assert.match(workspaceStyles, /\.research-answer-review-row \{[\s\S]*?align-items: flex-start;/);
 assert.match(workspaceScript, /evidenceReviewedSummary\.setAttribute\("aria-label", "Sources & details"\)/);
 assert.match(workspaceScript, /detailsBody\.append\(metadata\)/);

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { automaticContentUpdatesEnabled } from '../public/project-update-policy.js';
 import {
   cacheRetryablePromise,
   clientValuesMatch,
@@ -78,7 +79,7 @@ assert(
     syncReconciliation.includes("skipDeletedProjectCleanup: true") &&
     syncReconciliation.includes("await refreshBlankSearchHistoryPanes()") &&
     syncReconciliation.includes("workspacePaneHasFocusedEditor(paneID)") &&
-    syncReconciliation.includes("refreshSavedPanelInPlace(paneID, { reconcileProjectStudio: false })") &&
+    /refreshSavedPanelInPlace\(paneID,\s*\{[\s\S]*?reconcileProjectStudio:\s*false[\s\S]*?preserveProjectChrome:\s*true[\s\S]*?reuseVerifiedSync:\s*true/.test(syncReconciliation) &&
     syncReconciliation.includes("refreshMountedProjectChrome(projectReconciliation.detail)") &&
     syncReconciliation.includes("updateOpenProjectSyncWarning(projectReconciliation)"),
   "Foreground sync must reconcile safe surfaces without replacing mounted Project editors."
@@ -89,7 +90,9 @@ const foregroundSignalHandlerSource = functionSource(
   "function ensureForegroundSyncChannel()"
 );
 let refreshedAfterMissingSnapshot = false;
+let foregroundSnapshotReads = 0;
 const foregroundSignalHarness = new Function(
+  "automaticContentUpdatesEnabled",
   "activeAccount",
   "isForegroundSyncLeader",
   "loadOfflineSyncSnapshot",
@@ -115,9 +118,10 @@ const foregroundSignalHarness = new Function(
     };
   `
 )(
+  automaticContentUpdatesEnabled,
   () => ({ userID: "deleted-user" }),
   () => false,
-  async () => null,
+  async () => { foregroundSnapshotReads++; return null; },
   async () => {
     refreshedAfterMissingSnapshot = true;
   }
@@ -137,6 +141,7 @@ assert.equal(
 );
 assert.equal(foregroundSignalHarness.content()?.contentMapVersion, 2);
 assert.equal(foregroundSignalHarness.lastFullPullAt(), 0);
+assert.equal(foregroundSnapshotReads, 0, 'Manual sync must not read shared snapshots in response to cross-tab signals');
 
 const utilityReconciliation = functionSource(
   "async function renderUtilityWorkspace(options = {})",

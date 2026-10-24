@@ -33,17 +33,19 @@ import { codeSourceIdentity, codeSourceKey } from "../public/active-code-sources
 import {linkPaneToView} from "../public/workflow-views.js";
 import { withCodeAssetRevision } from "../public/code-asset-identity.js";
 import { parseActiveCodeSearchScope } from "../public/active-code-search-scope.js";
+import { isConversationOnly } from '../assistant-conversation-scope.mjs';
 const sourceCatalog = await activeCodeSourceCatalog();
 function withSource(section) {
   if (!section) return section;
   return {...section, codeSource: sourceCatalog.find(source => source.canonicalEdition === section.codeVersion && source.codePrefix === section.codePrefix)};
 }
-const [clientSource, serverSource, historicalCatalog, currentCatalogText, offlineSource] = await Promise.all([
+const [clientSource, serverSource, historicalCatalog, currentCatalogText, offlineSource, offlineMetadataSource] = await Promise.all([
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
   readFile(new URL("../app.mjs", import.meta.url), "utf8"),
   historicalConstructionSectionCatalog(),
   readFile(new URL("../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapterCatalog.json", import.meta.url), "utf8"),
-  readFile(new URL("../public/offline-storage.js", import.meta.url), "utf8")
+  readFile(new URL("../public/offline-storage.js", import.meta.url), "utf8"),
+  readFile(new URL("../public/offline-code-metadata.js", import.meta.url), "utf8")
 ]);
 
 function between(source, startText, endText) {
@@ -253,7 +255,8 @@ assert.deepEqual(alias.requests, [`/code/sections/999999?${new URLSearchParams({
 // user library, network, or provider is touched.
 const offlineFunctions = [
   between(offlineSource, "function sectionIdentityValues(", "async function writeDownloadedChapter("),
-  between(offlineSource, "export function validatedOfflineCodeSources(", "async function matchingOfflineSearchResults(").replace(/^export /gm, ""),
+  offlineMetadataSource.slice(offlineMetadataSource.indexOf("export function validatedOfflineCodeSources(")).replace(/^export /gm, ""),
+  between(offlineSource, "async function offlineSectionMetadataRecords(", "async function matchingOfflineSearchResults("),
   between(offlineSource, "async function matchingOfflineSearchResults(", "async function sectionByIdentity("),
   between(offlineSource, "function sectionSummary(", "function tokenizeSearchText("),
   between(offlineSource, "function tokenizeSearchText(", "export async function offlineAPI(")
@@ -274,6 +277,7 @@ function offlineHarness(records, chapters, metadata = installMetadata) {
     IDBKeyRange: { only: (value) => value },
     window: { location: { origin: "https://example.test" } },
     metadataRecord: async () => metadata,
+    readDownloadedLibrary: async () => null, // Exercise the retained legacy-install fallback.
     sectionByIdentity: async (_installID, id) => records.find((record) =>
       [record.id, record.sectionID, record.webSectionID].map(String).includes(String(id))) || null,
     requestResult: async (value) => value,
@@ -409,9 +413,9 @@ const downloadContext = vm.createContext({
   offlineLibraryStatus: async () => activatedDownload, deleteInstall: async () => {}
 });
 vm.runInContext([
-  between(offlineSource, "export function validatedOfflineCodeSources(", "export function offlineSourceIdentity(").replace(/^export /gm, ""),
+  between(offlineMetadataSource, "export function validatedOfflineCodeSources(", "export function offlineSourceIdentity(").replace(/^export /gm, ""),
   between(offlineSource, "function offlineSectionCodeVersion(", "function chapterSectionRecord("),
-  between(offlineSource, "async function downloadOfflineChapter(", "function normalizedOfflineAssetName("),
+  between(offlineSource, "async function downloadOfflineChapter(", "function offlineAssetURL("),
   between(offlineSource, "export async function downloadOfflineLibrary(", "export async function offlineLibraryStatus(")
     .replace("export async function", "async function")
 ].join("\n"), downloadContext);
@@ -445,7 +449,7 @@ for (const canonical of [
   let response;
   let saves = 0;
   const context = vm.createContext({
-    defaultSyncCodeVersion, canonicalCodeVersion: syncCodeVersion,
+    defaultSyncCodeVersion, canonicalCodeVersion: syncCodeVersion, isConversationOnly,
     researchEvidenceForSectionIDs: async () => [canonical],
     matchingCanonicalResearchSelection: (selection, text) => text.includes(selection),
     authenticatedResearchBody: async () => ({ userID: "probe-user", body: { conversationID: "probe" } }),

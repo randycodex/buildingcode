@@ -13,7 +13,7 @@ function between(start, end) {
 }
 const functions = [
   between("function offlineSectionCodeVersion(", "function chapterSectionRecord("),
-  between("const offlineChapterBodyLimit", "function normalizedOfflineAssetName("),
+  between("const offlineChapterBodyLimit", "function offlineAssetURL("),
   between("export async function downloadOfflineLibrary(", "export async function offlineLibraryStatus(")
 ].join("\n");
 const deferred = () => {

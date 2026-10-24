@@ -1,4 +1,4 @@
-import { createPublicCodeRevisionController } from "../public/public-code-revision.js";
+import { createPublicCodeRevisionController, bindPublicCodeRevisionChecks } from "../public/public-code-revision.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { performance } from "node:perf_hooks";
@@ -30,8 +30,9 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     detachedWorkboardRoute: false, detachedProjectWindow: false,
     workspaceMigrationError: null, workspaceRestoreError: null, initialPersistedAccount: null,
     state: { readers: [], utilities: {}, trackScrollLeft: 0 }, track: node(),
-    document: { addEventListener: noop, querySelector: (selector) => ["#collapse-all-columns", "#expand-all-columns"].includes(selector) ? node() : null, querySelectorAll: () => [] },
-    window: { setInterval(callback, delay) { assert.equal(typeof callback, "function"); assert.equal(delay, 60000); return 1; }, addEventListener: noop, matchMedia: () => ({ addEventListener: noop }) },
+    document: { visibilityState:'visible', addEventListener: noop, querySelector: (selector) => ["#collapse-all-columns", "#expand-all-columns"].includes(selector) ? node() : null, querySelectorAll: () => [] },
+    window: { navigator:{onLine:true}, setInterval() { assert.fail('Startup must not restore idle version polling'); }, addEventListener: noop, matchMedia: () => ({ addEventListener: noop }) },
+    bindPublicCodeRevisionChecks, projectUpdateEditingActivity:noop, retireWorkspaceLayoutSyncState:noop,
     localStorage: { getItem: () => null, removeItem: noop },
     api: async (path) => { catalogLoads += 1; await delay(path.includes("libraries") ? trustMs : chapterMs); if (failCatalogs) throw new Error("Synthetic public catalog failure"); return { chapters: [{ id: "chapter", codePrefix: "BC" }], codeTrustProfiles: [{ codePrefix: "BC" }] }; },
     bindImmediateUtilityControls: () => events.push("bind"),

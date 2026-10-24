@@ -10,11 +10,11 @@ import {
   localSearchPermits,
   finishLocalSearch,
   offlineSectionMetadata,
-} from "./downloaded-library-core.js?v=8";
+} from "./downloaded-library-core.js?v=9";
 import {
   offlineAssetNamesForChapter,
   resolveOfflineSectionMetadata,
-} from "./offline-storage.js?v=20261023-notes-reveal-v1298";
+} from "./offline-code-metadata.js?v=1";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20261015-reader-search-preview-v3";
 import {
   defaultSyncCodeVersion,
