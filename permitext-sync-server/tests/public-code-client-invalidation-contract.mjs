@@ -9,6 +9,7 @@ assert.equal(isPublicCodePath('/code/sections/resolve?include=metadata'),true);
 assert.equal(isPublicCodePath('/account/sections/resolve'),false);
 const A='a'.repeat(64),B='b'.repeat(64);let revision=A,offline=false,chapterRequests=0,revisionRequests=0;
 const context=vm.createContext({AbortController,setTimeout,clearTimeout,createPublicCodeRevisionController,isPublicCodePath,cacheRetryablePromise,URLSearchParams,
+ webAppUpdates:{observe(){}},
  activeCodeSourcesController:{invalidateCatalog(){}},chapterCache:new Map(),chapterListCache:new Map(),sectionSummaryCache:new Map(),searchResultCache:new Map(),codeSectionCache:new Map(),serverReachable:true,structuredClone,Response,
  updateConnectionStatus(){},hasCapability:()=>true,shouldUseOfflineFallback:status=>status>=500,
  readDownloadedLibrary:async()=>null,

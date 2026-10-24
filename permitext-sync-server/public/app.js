@@ -1,3 +1,5 @@
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-web-update-guard-v1328";
+import {createWebAppUpdatePrompt} from "./web-app-update.js?v=1";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
 import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=7";
@@ -11,7 +13,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-button-states-v1327";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-web-update-guard-v1328";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -143,7 +145,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-button-states-v1327";
+} from "./offline-storage.js?v=20261024-web-update-guard-v1328";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -643,6 +645,7 @@ const chapterCache = createPublicContentCache();
 const searchResultCache = createPublicContentCache({ maxBytes: 4 * 1024 * 1024, maxEntries: 24 });
 const codeSectionCache = createPublicContentCache({ maxBytes: 4 * 1024 * 1024, maxEntries: 64 });
 const sectionSummaryCache = new Map();
+const webAppUpdates = createWebAppUpdatePrompt({document, serviceWorker:navigator.serviceWorker, location:window.location, currentVersion:webAppVersion, prepareReload:prepareWebAppReload});
 const publicCodeRevision = createPublicCodeRevisionController({
   async fetchRevision() {
     const controller = new AbortController();
@@ -650,7 +653,9 @@ const publicCodeRevision = createPublicCodeRevisionController({
     try {
       const response = await fetch("/code/revision", { cache: "no-cache", signal: controller.signal });
       if (!response.ok) throw new Error("Code revision unavailable");
-      return await response.json();
+      const payload = await response.json();
+      webAppUpdates.observe(payload.webAppVersion);
+      return payload;
     } catch (error) {
       const downloaded = await readDownloadedLibrary("/code/revision", {force: true});
       if (downloaded) return downloaded.payload;
@@ -1942,6 +1947,24 @@ async function confirmWorkspaceTransition() {
     if (reportDraftMounts.has(projectDetailKey(project)) && !(await confirmReportDraftDiscard(project))) return false;
   }
   return true;
+}
+
+async function prepareWebAppReload() {
+  const identity = captureAccountRequest(), editingGeneration = projectUpdateEditingGeneration;
+  const blocked = () => ({message:"Finish saving or review pending changes, then reload. Your work stays on this device."});
+  if (workspaceRestoreError || workspaceMigrationError || activeResearchProgress.size) return blocked();
+  try {
+    await Promise.all([...notebookColumnMounts.values()].map(mount => mount.persistDraft?.()));
+    flushSearchQueryPersistence(); flushResearchDraftPersistence(); saveWorkspaceState();
+    if (identity.userID) {
+      persistCodeQuestionAccountState(identity.userID);
+      const [drafts, images] = await Promise.all([pendingNotebookDrafts(identity.userID), pendingNotebookImages(identity.userID)]);
+      if (drafts.length || images.length) return blocked();
+    }
+    if (!isCurrentAccountRequest(identity) || editingGeneration !== projectUpdateEditingGeneration) return blocked();
+    if (identity.userID && ["review", "busy", "unavailable"].includes(projectUpdateAutoApplyBlocker())) return blocked();
+    return true;
+  } catch { return blocked(); }
 }
 
 function workspaceTransitionPaneLabel(paneID) {
@@ -7034,7 +7057,7 @@ async function postJSON(path, body, options = {}) {
   const identity = captureAccountRequest();
   if (body?.auth?.accountUserID && (body.auth.accountUserID !== identity.userID ||
       options.token !== identity.sessionToken)) throw accountContextChangedError();
-  const headers = { "Content-Type": "application/json" };
+  const headers = { "Content-Type": "application/json", [webSyncProtocolHeader]:webSyncProtocol };
   if (options.token) {
     headers.Authorization = `Bearer ${options.token}`;
   }
@@ -7056,6 +7079,7 @@ async function postJSON(path, body, options = {}) {
   updateConnectionStatus();
   const payload = await response.json().catch(() => ({}));
   requireCurrentAccountRequest(identity);
+  if (payload.code === webUpdateRequiredCode) webAppUpdates.requireReload(payload.webAppVersion);
   if (!response.ok) {
     const error = new Error(payload.error || `Request failed: ${response.status}`);
     error.status = response.status;

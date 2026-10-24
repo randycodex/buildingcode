@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:web-update-safety": "node tests/web-sync-guard.mjs && node tests/web-sync-guard-no-database.mjs && node tests/web-sync-guard-http.mjs && node tests/web-app-update.mjs",
     "test:report-note-review": "node tests/report-note-review.mjs && node tests/notebook-report-promotion-contract.mjs",
     "test:project-update-notices": "node tests/project-update-notices.mjs && node tests/project-update-auto-apply.mjs && node tests/project-update-manual.mjs && node tests/workspace-layout-sync-client.mjs",
     "test:workspace-layout-sync": "node tests/workspace-layout-sync.mjs && node tests/workspace-layout-sync-client.mjs && node tests/research-column-layout.mjs && node tests/continuity-merge-contract.mjs && node tests/workspace-sync-access-contract.mjs && node tests/web-account-isolation-contract.mjs && node tests/workspace-startup-restore-contract.mjs && node tests/offline-shell-coherence.mjs",

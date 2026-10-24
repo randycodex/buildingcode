@@ -20977,6 +20977,13 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workspace-shell > .topbar { grid-template-rows: minmax(0, 1fr); align-items: center; }
 .topbar .project-update-badge { height: var(--workspace-menu-height); min-height: 0; }
 
+.web-app-update-notice { position: fixed; inset-inline: 16px; bottom: 18px; z-index: 10000; display: flex; align-items: center; justify-content: center; gap: 12px; width: fit-content; max-width: calc(100% - 32px); margin-inline: auto; padding: 10px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--menu-surface); color: var(--text-primary); box-shadow: 0 6px 24px #0005; font-size: 13px; font-weight: 300; }
+.web-app-update-notice[hidden] { display: none; }
+.web-app-update-notice > span { max-width: 580px; }
+.web-app-update-notice > button { flex-shrink: 0; padding: 6px 12px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-secondary); font: inherit; }
+.web-app-update-notice > button:not(:disabled):hover { background: var(--workspace-menu-highlight); color: var(--text-primary); }
+.web-app-update-notice > button:disabled { opacity: .5; }
+
 /* Column actions sit below the project selector, beside the current view tools. */
 .workflow-toolbar { padding-inline-end: 24px; }
 .workflow-toolbar > [data-workflow-tools] { min-width: 0; }

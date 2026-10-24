@@ -2,10 +2,19 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import assert from 'node:assert/strict';
+import {publicCodeCorpusRevision} from '../chapter-body-contract.mjs';
+import {codeAssetRevision} from '../code-asset-manifest.mjs';
 export async function createRolloutFixture({ baselineDir, currentDir, capability }) {
   const names = ['index.html', 'app.js', 'offline-storage.js', 'service-worker.js'];
   const load = async dir => Object.fromEntries(await Promise.all(names.map(async name => [name, await readFile(join(dir, name))])));
   const baseline = await load(baselineDir), current = await load(currentDir);
+  // Optional current-app metadata lets the real reload prompt participate in
+  // rollout acceptance. Older minimal four-file fixtures retain their behavior.
+  for (const [files,dir] of [[baseline,baselineDir],[current,currentDir]]) {
+    const versionFile = await readFile(join(dir,'web-client-version.js')).catch(error => {if(error.code==='ENOENT')return null;throw error;});
+    if (versionFile) files['web-client-version.js'] = versionFile;
+  }
+  if (baseline['web-client-version.js'] && current['web-client-version.js']) names.push('web-client-version.js');
   const assetVersion = files => files['index.html'].toString().match(/\/web\/app\.js\?v=([^"\s]+)/)?.[1];
   const versions = { baseline: assetVersion(baseline), current: assetVersion(current) };
   assert.ok(versions.baseline && versions.current && versions.baseline !== versions.current, 'Distinct baseline/current asset versions required');
@@ -44,6 +53,12 @@ export async function createRolloutFixture({ baselineDir, currentDir, capability
     // Keep fixture controls reachable during a simulated application transport outage.
     if (url.pathname.startsWith('/fixture/')) return false;
     if (networkOff && req.method === 'GET') { res.destroy(); return true; }
+    if (url.pathname === '/code/revision' && names.includes('web-client-version.js')) {
+      const files = phase === 'baseline' ? baseline : current;
+      const webAppVersion = files['web-client-version.js'].toString().match(/webAppVersion\s*=\s*["']([^"']+)/)?.[1];
+      send(res, 200, 'application/json', JSON.stringify({corpusRevision:await publicCodeCorpusRevision(),assetRevision:await codeAssetRevision(),cacheContract:1,webAppVersion}));
+      return true;
+    }
     const notebookAsset = notebookAssets.get(url.pathname + url.search);
     if (notebookAsset) { send(res, 200, notebookAsset.type, notebookAsset.bytes); return true; }
     let name = url.pathname === '/workspace' ? 'index.html' : url.pathname === '/service-worker.js' ? 'service-worker.js' : url.pathname.startsWith('/web/') ? url.pathname.slice(5) : '';

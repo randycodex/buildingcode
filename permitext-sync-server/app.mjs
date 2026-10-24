@@ -1,3 +1,5 @@
+import {applyWebSyncSafeguard} from "./web-sync-guard.mjs";
+import {webAppVersion} from "./public/web-client-version.js";
 import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
 import {preparedSearchText} from "./prepared-search-text.mjs";
 import {preparedSearchRuntime} from "./prepared-search-runtime.mjs";
@@ -34265,7 +34267,7 @@ async function handleRequestUnlocked(request, response) {
       }
       if (serveCachedPublicCode(request, response)) return;
       if (path === "code/revision") {
-        sendPublicCodeJSON(request, response, { corpusRevision: currentPublicCodeRevision, assetRevision: currentPublicAssetRevision, cacheContract: 1 });
+        sendPublicCodeJSON(request, response, { corpusRevision: currentPublicCodeRevision, assetRevision: currentPublicAssetRevision, cacheContract: 1, webAppVersion });
         return;
       }
     }
@@ -34469,6 +34471,7 @@ function observeVercelRequest(request, response) {
 
 async function handleRequestWithStoreLock(request, response) {
   observeVercelRequest(request, response);
+  if (applyWebSyncSafeguard(request, response, normalizePath(request.url))) return;
   if (!requestMutatesFileStore(request)) {
     await handleRequestUnlocked(request, response);
     return;

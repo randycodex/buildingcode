@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v1902";
+const shellCacheName = "permitext-pro-shell-v1903";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -10,7 +10,7 @@ const shellURLs = [
   "/web/downloaded-library-core.js?v=8",
   "/web/settings-columns.js?v=1",
   "/web/project-details-columns.js?v=20261021-project-columns-v3",
-  "/web/workspace-button-icons.js?v=20261024-button-states-v1327",
+  "/web/workspace-button-icons.js?v=20261024-web-update-guard-v1328",
   "/web/minimal-workflow.js",
   "/web/notebook-questions.js",
   "/web/project-workflow.js?v=20261021-project-questions-v8",
@@ -57,25 +57,27 @@ const shellURLs = [
   "/web/workspace-layout-sync.js?v=3",
   "/web/project-update-notices.js?v=7",
   "/web/project-update-policy.js?v=2",
+  "/web/web-client-version.js?v=20261024-web-update-guard-v1328",
+  "/web/web-app-update.js?v=1",
   "/workspace",
   "/",
   "/marketing/home.js?v=20260921-theme-switch-v1",
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261024-button-states-v1327",
+  "/web/styles.css?v=20261024-web-update-guard-v1328",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
   "/web/assistant-materials.js?v=4",
-  "/web/app.js?v=20261024-button-states-v1327",
+  "/web/app.js?v=20261024-web-update-guard-v1328",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261024-button-states-v1327",
+  "/web/offline-storage.js?v=20261024-web-update-guard-v1328",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",
@@ -163,6 +165,21 @@ self.addEventListener("activate", (event) => {
         .map((name) => caches.delete(name))
     ))
   );
+});
+
+// Explicit user action only. Never replace a worker underneath another open
+// tab, and never activate automatically during install or claim existing pages.
+self.addEventListener("message", (event) => {
+  if (event.data?.type !== "PERMITEXT_ACTIVATE_UPDATE" || !event.ports?.[0] || !event.source?.id) return;
+  event.waitUntil((async () => {
+    const clients = await self.clients.matchAll({type:"window", includeUncontrolled:true});
+    if (clients.some(client => client.id !== event.source.id)) {
+      event.ports[0].postMessage({ready:false, reason:"other-tabs"});
+      return;
+    }
+    event.ports[0].postMessage({ready:true});
+    await self.skipWaiting();
+  })());
 });
 
 async function networkFirstNavigation(request) {

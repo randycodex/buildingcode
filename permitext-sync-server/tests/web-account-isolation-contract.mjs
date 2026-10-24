@@ -193,6 +193,7 @@ function harness(overrides = {}) {
   const effects = { connectionUpdates: 0, expired: 0, saved: [], entitlements: [], broadcasts: [], repairs: [], offlineLoads: [], recovery: [], continuity: 0, catalogs: [] };
   const state = { account: { ...accountA } };
   const sandbox = {
+    webSyncProtocolHeader:"X-Permitext-Web-Sync", webSyncProtocol:"manual-sync-v1", webUpdateRequiredCode:"WEB_APP_UPDATE_REQUIRED", webAppUpdates:{requireReload(){}},
     state, accountRequestIdentity, accountRequestIsCurrent, accountContextChangedError,
     permitextSyncSchemaVersion: 1, permitextClientCapabilities: {},
     fetch(path, options) {
