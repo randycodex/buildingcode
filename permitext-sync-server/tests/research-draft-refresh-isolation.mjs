@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 function extract(name,async=false){const start=source.indexOf(`${async?'async ':''}function ${name}(`);const end=source.indexOf('\n}',start);assert.ok(start>=0&&end>start);return source.slice(start,end+2);}
 function harness() {
- const drafts=new Map(), panes=new Map();let snapshot;let owner={userID:'owner',sessionToken:'session'};let focused=null;let afterTransition=()=>{};
+ const drafts=new Map(), panes=new Map();let snapshot;let owner={userID:'owner',sessionToken:'session'};let focused=null;let afterTransition=()=>{};let refreshIDs=[],invalidations=0;
  const state={researchConversationID:'named',utilityInstances:[],researchViewState:null};
  const find=selector=>{const id=selector.match(/data-pane-id="([^"]+)"/)?.[1];const pane=panes.get(id);if(!pane)return null;if(selector.includes('.research-question-input'))return pane.input;if(selector.includes('.research-conversation-panel')&&!pane.input)return null;return pane;};
  const context=vm.createContext({state,Map,Set,Object,String,Event:class{},CSS:{escape:x=>x},
@@ -14,9 +14,12 @@ function harness() {
   researchConversationPaneIsOpen:()=>Boolean(panes.get('utility:analysis')?.input),
   paneIDForResearchConversation:id=>!id||id===state.researchConversationID?'utility:analysis':`research:conversation:${id}`,
   fetchAuthoritativeResearchConversation:async id=>({id,messages:[]}),
-  track:{querySelector:find,querySelectorAll:()=>[...panes.values()].map(p=>p.input).filter(Boolean)},
+  readResearchConversationList:{invalidate(){invalidations++;}},researchHistoryPageReaders:new Map([['project-page',{invalidate(){invalidations++;}}]]),
+  track:{querySelector:find,querySelectorAll:selector=>selector === '.research-list-panel[data-pane-id]'
+   ? [...panes.values()].filter(p=>p.id.startsWith('utility:analysis')).map(p=>({dataset:{paneId:p.id}}))
+   : [...panes.values()].map(p=>p.input).filter(Boolean)},
   document:{get activeElement(){return focused;}},
-  transitionWorkspace:async()=>{for(const pane of panes.values())if(pane.input)mount(pane.id,pane.conversationID);await afterTransition();}
+  transitionWorkspace:async(_,{refreshPaneIDs})=>{refreshIDs=[...refreshPaneIDs];for(const pane of panes.values())if(pane.input)mount(pane.id,pane.conversationID);await afterTransition();}
  });
  vm.runInContext(['restoreResearchWorkspaceState','captureResearchWorkspaceState'].map(x=>extract(x)).join('\n')+'\n'+extract('refreshVisibleResearchArtifactConsumers',true),context);
  context.scheduleResearchDraftPersistence=()=>context.saveWorkspaceState();
@@ -40,7 +43,7 @@ function harness() {
  }
  return {context,state,drafts,panes,mount,setFocused:x=>{focused=x;},focused:()=>focused,
   reload:()=>{state.researchViewState=JSON.parse(snapshot);context.restoredResearchViewState=null;context.researchQuestionDraft='';vm.runInContext('restoreResearchWorkspaceState()',context);},
-  refresh:()=>vm.runInContext('refreshVisibleResearchArtifactConsumers()',context),
+  refresh:()=>vm.runInContext('refreshVisibleResearchArtifactConsumers()',context),refreshIDs:()=>refreshIDs,invalidations:()=>invalidations,
   after:fn=>{afterTransition=fn;},changeOwner:()=>{owner={userID:'other',sessionToken:'other-session'};},snapshot:()=>snapshot};
 }
 // Real input persistence + capture/restore functions reproduce the observed path.
@@ -74,6 +77,19 @@ moved.after(()=>{moved.state.researchConversationID='selected';moved.mount('util
 await moved.refresh();assert.equal(moved.focused(),old,'refresh cannot move focus into another conversation reusing the pane');
 const switched=harness();switched.mount('utility:analysis','named');switched.after(()=>{switched.context.activeWorkspaceID='other-workspace';});
 assert.equal(await switched.refresh(),false);
+// Instance Assistants have UUID pane IDs, with no legacy utility:analysis pane.
+// A manual artifact refresh must reach both and retire their cached pages.
+const instances=harness();instances.state.researchConversationID='';
+instances.mount('utility:analysis:column-a','one');instances.mount('utility:analysis:column-b','two');
+instances.drafts.set('followup:one','Keep the first draft');instances.drafts.set('followup:two','Keep the second draft');
+assert.equal(await instances.refresh(),true);
+assert.deepEqual(instances.refreshIDs(),['utility:analysis:column-a','utility:analysis:column-b']);
+assert.equal(instances.invalidations(),2,'Refresh invalidates both recent summaries and shared history pages');
+assert.equal(instances.panes.get('utility:analysis:column-a').input.value,'Keep the first draft');
+assert.equal(instances.panes.get('utility:analysis:column-b').input.value,'Keep the second draft');
+const guarded=harness();guarded.mount('utility:analysis:guarded','one');
+assert.equal(await vm.runInContext('refreshVisibleResearchArtifactConsumers({shouldApply:()=>false})',guarded.context),false);
+assert.equal(guarded.invalidations(),0,'A stale or canceled manual sync must not invalidate another context');
 assert.match(source,/input\.dataset\.researchDraftKey = draftKey/,'new-chat composers keep their own focus identity');
 assert.match(source,/input\.dataset\.researchDraftKey = followUpDraftKey/,'conversation composers use their durable draft key');
 console.log('PASS actual Research refresh/capture/restore/input behavior: per-conversation drafts survive history, supplementary promotion, reload, explicit clearing and account transition.');

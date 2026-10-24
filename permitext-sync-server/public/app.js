@@ -1,4 +1,4 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-conversation-deletion-v1340";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-research-history-refresh-v1341";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
@@ -14,7 +14,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-conversation-deletion-v1340";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-research-history-refresh-v1341";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -146,7 +146,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-conversation-deletion-v1340";
+} from "./offline-storage.js?v=20261024-research-history-refresh-v1341";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -13758,10 +13758,8 @@ async function refreshVisibleResearchArtifactConsumers(options = {}) {
   if (options.shouldApply && !options.shouldApply()) return false;
   const account = activeAccount();
   const workspaceID = activeWorkspaceID;
-  const paneIDs = [];
-  if (track.querySelector('.research-list-panel[data-pane-id="utility:analysis"]')) {
-    paneIDs.push("utility:analysis");
-  }
+  const paneIDs = Array.from(track.querySelectorAll(".research-list-panel[data-pane-id]"),
+    panel => panel.dataset.paneId);
   const conversationIDs = [];
   if (
     researchConversationPaneIsOpen() &&
@@ -13812,6 +13810,10 @@ async function refreshVisibleResearchArtifactConsumers(options = {}) {
     ? [focusedDraftInput.selectionStart, focusedDraftInput.selectionEnd]
     : null;
   const focusedDraftKey = focusedDraftInput?.dataset.researchDraftKey || "";
+  // An explicit revision refresh must replace cached history in every Assistant,
+  // including instance columns. Concurrent columns still share bounded pages.
+  readResearchConversationList.invalidate();
+  researchHistoryPageReaders.forEach(read => read.invalidate());
   await transitionWorkspace("utility", { refreshPaneIDs: paneIDs });
   if (activeAccount()?.userID !== account.userID ||
       activeAccount()?.sessionToken !== account.sessionToken ||
