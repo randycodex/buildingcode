@@ -1,6 +1,7 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-research-workflow-v1348";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-related-provisions-v1350";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
+import {createRelatedProvisionReview} from "./research-related-provisions.js?v=1";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
 import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=7";
@@ -13,7 +14,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=24";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-research-workflow-v1348";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-related-provisions-v1350";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -145,7 +146,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-research-workflow-v1348";
+} from "./offline-storage.js?v=20261024-related-provisions-v1350";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -25360,7 +25361,7 @@ function researchPassageEntryActions() {
   return actions;
 }
 
-function renderResearchIncludedPassages(conversation, paneID, { busy = false } = {}) {
+function renderResearchIncludedPassages(conversation, paneID, { busy = false, onFindRelated = null } = {}) {
   // Do not collapse overlapping selections: every removable item is an exact saved source.
   const selected = (conversation.sources || []).filter(source => source.kind === "selection");
   const region = document.createElement("section");
@@ -25426,6 +25427,12 @@ function renderResearchIncludedPassages(conversation, paneID, { busy = false } =
     chips.append(chip);
   });
   region.append(details, add, chips);
+  if (onFindRelated) {
+    const find = researchWorkflowButton("Find related provisions", onFindRelated);
+    find.classList.add("research-find-related");
+    find.disabled = busy || !selected.length || !hasCapability("research");
+    region.append(find);
+  }
   return region;
 }
 
@@ -27872,7 +27879,39 @@ async function renderResearchConversation(conversationID, options = {}) {
     button.disabled = passageRequired || researchRequestActive || !researchEnabled;
     starters.append(button);
   }
-  composer.append(renderResearchIncludedPassages(conversation, paneID, { busy: researchRequestActive }),
+  const relatedIdentity = captureAccountRequest(), relatedWorkspaceID = activeWorkspaceID;
+  const relatedGeneration = state.workflowNavigationGeneration || 0;
+  const relatedIsCurrent = () => isCurrentAccountRequest(relatedIdentity) && activeWorkspaceID === relatedWorkspaceID &&
+    relatedGeneration === (state.workflowNavigationGeneration || 0);
+  const relatedReview = createRelatedProvisionReview({
+    isCurrent: relatedIsCurrent,
+    question: () => input.value.trim(),
+    find: question => postResearch("/research/conversations/related", {
+      conversationID: conversation.id, question, expectedRevision: Number(conversation.revision || 0),
+      expectedEvidenceSetVersion: Number(conversation.evidenceSetVersion || 1)
+    }),
+    review: candidate => postResearch("/research/selections/review", {
+      sectionID: candidate.sectionID, codeVersion: candidate.codeVersion, reviewMode: "whole_section"
+    }),
+    openReader: async candidate => {
+      const reader = await openSourceInReader(candidate, paneID);
+      return relatedIsCurrent() && reader && String(reader.sectionID) === candidate.sectionID && reader.codeVersion === candidate.codeVersion;
+    },
+    include: async (passages, context) => {
+      if (!relatedIsCurrent() || ["active", "retrying"].includes(reconciledResearchProgressSession(conversation)?.status)) {
+        throw new Error("Wait for the current answer before changing passages.");
+      }
+      await addResearchSelectionToCurrent({ passages, relatedReview: context }, conversation.id);
+    },
+    onVisibility: open => {
+      thread.hidden = open; composer.hidden = open;
+      dialoguePane.classList.toggle("is-finding-related", open);
+    }
+  });
+  dialoguePane.append(relatedReview.element);
+  composer.append(renderResearchIncludedPassages(conversation, paneID, {
+    busy: researchRequestActive, onFindRelated: () => relatedReview.open()
+  }),
     starters, composerBox, status, passageScope);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
@@ -28143,10 +28182,14 @@ async function addResearchSelectionToCurrent(selection, destinationConversationI
   const passages = selection.passages || [selection];
   const payload = await postResearch("/research/conversations/evidence", {
     conversationID,
-    selections: passages.map(({ sectionID, selectedText, savedItemID }) => ({
+    ...(selection.relatedReview ? { action: "add_related",
+      expectedRevision: selection.relatedReview.expectedRevision,
+      expectedEvidenceSetVersion: selection.relatedReview.expectedEvidenceSetVersion } : {}),
+    selections: passages.map(({ sectionID, selectedText, savedItemID, codeVersion, reviewedSectionHash }) => ({
       sectionID,
       selectedText,
-      savedItemID
+      savedItemID,
+      ...(selection.relatedReview ? { codeVersion, reviewedSectionHash } : {})
     }))
   });
   if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return null;

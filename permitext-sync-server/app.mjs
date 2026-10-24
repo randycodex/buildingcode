@@ -1,6 +1,7 @@
 import {applyWebSyncSafeguard} from "./web-sync-guard.mjs";
 import {webAppVersion} from "./public/web-client-version.js";
 import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
+import { findRelatedProvisions, assertRelatedProvisionContext, validateRelatedProvisionSelections } from "./research-related-provisions.mjs";
 import {preparedSearchText} from "./prepared-search-text.mjs";
 import {preparedSearchRuntime} from "./prepared-search-runtime.mjs";
 import { prepareSearchRelevance, searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
@@ -8558,7 +8559,7 @@ function mergedResearchSearchIndex(indexes) {
 
 export async function researchCorpusResources(corpusPlan) {
   const selected = Array.isArray(corpusPlan?.selected) ? corpusPlan.selected : [];
-  const passageSearch = process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH === "1";
+  const passageSearch = corpusPlan?.passageSearch !== false && process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH === "1";
   const cacheKey = selected.map((corpus) => `${corpus.id}:${corpus.codeVersion}`).sort().join(":") + `:passages=${passageSearch}`;
   if (cachedResearchCorpusResources.has(cacheKey)) {
     const cached = cachedResearchCorpusResources.get(cacheKey);
@@ -18285,6 +18286,8 @@ async function handleResearchSelectionReview(request, response) {
     sendJSON(response, 200, {
       selection: {
         sectionID: primary.sectionID,
+        codeVersion: primary.codeVersion,
+        sectionTextHash: primary.sectionTextHash,
         selectedText: canonicalSelection,
         codePrefix: primary.codePrefix,
         sectionNumber: primary.sectionNumber,
@@ -18320,6 +18323,26 @@ async function handleResearchSelectionReview(request, response) {
       });
       return;
     }
+    throw error;
+  }
+}
+
+async function handleResearchRelatedProvisions(request, response) {
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
+  if (!context) return;
+  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
+  if (!conversation) return;
+  try {
+    assertRelatedProvisionContext(conversation, context.body);
+    const result = await findRelatedProvisions({
+      conversation, question: context.body.question ?? "", registry: await currentResearchCorpusRegistry(),
+      resources: researchCorpusResources,
+      discover: options => discoverRelevantEvidence({ ...options,
+        readSectionBody: cachedResearchSourceBody, resolveVisualSource: constructionVisualSourceMetadata })
+    });
+    sendJSON(response, 200, result);
+  } catch (error) {
+    if (error.statusCode) { sendJSON(response, error.statusCode, { error: error.message, code: error.code }); return; }
     throw error;
   }
 }
@@ -19131,10 +19154,15 @@ async function handleResearchConversationEvidence(request, response) {
       sendJSON(response, 200, { conversation: await researchConversationForClient(conversation, { userID: context.userID }), artifactRevisions });
       return;
     }
-    if (context.body.action !== undefined && context.body.action !== "add") {
+    if (context.body.action !== undefined && !["add", "add_related"].includes(context.body.action)) {
       sendError(response, 400, "Unknown evidence action."); return;
     }
     const selections = requestedResearchSelections(context.body);
+    if (context.body.action === "add_related") {
+      assertRelatedProvisionContext(conversation, context.body);
+      // Validate the exact text, edition and hash that were displayed for review.
+      await validateRelatedProvisionSelections(context.body.selections || [], researchSelectionReview);
+    }
     await validateResearchSavedSelections(context.userID, selections);
     const resolved = await researchSourcesForSelections(
       selections,
@@ -19174,6 +19202,7 @@ async function handleResearchConversationEvidence(request, response) {
       artifactRevisions
     });
   } catch (error) {
+    if (error.statusCode) { sendJSON(response, error.statusCode, { error: error.message, code: error.code }); return; }
     if ([
       "INVALID_RESEARCH_SELECTION",
       "INVALID_RESEARCH_SECTION",
@@ -34198,6 +34227,7 @@ const handlers = {
   "research/conversations/rename": handleResearchConversationRename,
   "research/conversations/create": handleResearchConversationCreate,
   "research/conversations/evidence": handleResearchConversationEvidence,
+  "research/conversations/related": handleResearchRelatedProvisions,
   "research/conversations/refresh": handleResearchConversationRefresh,
   "research/conversations/material": handleAssistantConversationMaterial,
   "research/conversations/message": handleResearchConversationMessage,
@@ -34564,6 +34594,7 @@ function requestMutatesFileStore(request) {
     path === "research/conversations/message" ||
     path === "research/conversations/refresh" ||
     path === "research/conversations/evidence" ||
+    path === "research/conversations/related" ||
     path === "research/selections/review" ||
     path === "research/evidence/discover" ||
     path === "billing/stripe/webhook" ||

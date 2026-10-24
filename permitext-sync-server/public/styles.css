@@ -21034,3 +21034,22 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .research-included-passages > .ghost-button { align-self: start; justify-self: end; }
 .research-included-review article > strong { font-size: 12px; font-weight: 500; }
 .research-included-review-label::before { content: " · "; }
+.research-find-related { grid-column: 1 / -1; justify-self: start; }
+.research-dialogue-pane.is-finding-related { grid-template-rows: minmax(0, 1fr); }
+.research-dialogue-pane.is-finding-related > [hidden], .research-related-panel[hidden] { display: none !important; }
+.research-related-panel { display: flex; flex-direction: column; min-height: 0; overflow: hidden; padding-top: 16px; }
+.research-related-heading, .research-related-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.research-related-heading h3 { margin: 0; font-size: 15px; font-weight: 500; }
+.research-related-panel > details { margin-top: 12px; }
+.research-related-panel summary { cursor: pointer; font-size: 12px; }
+.research-related-query { display: flex; flex-direction: column; align-items: start; gap: 8px; padding: 8px 0; }
+.research-related-query textarea { width: 100%; min-height: 64px; padding: 8px; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border); font: inherit; resize: vertical; }
+.research-related-results { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.research-related-candidate { padding: 14px 0; border-top: 1px solid var(--border); }
+.research-related-candidate h4 { margin: 0; font-size: 14px; font-weight: 500; }
+.research-related-candidate .research-passage-actions { align-items: center; justify-content: space-between; }
+.research-related-kind { font-size: 11px; color: var(--text-secondary); padding: 3px 6px; border-radius: 4px; background: var(--workspace-menu-highlight); }
+.research-related-select { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; text-transform: none; letter-spacing: normal; font-weight: 400; }
+.research-related-reviewed { margin-top: 12px; }
+.research-related-reviewed blockquote { margin: 10px 0; padding: 0 12px; max-height: 230px; overflow: auto; border-left: 2px solid var(--border); font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.research-related-footer { padding: 12px 0 0; border-top: 1px solid var(--border); }
