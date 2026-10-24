@@ -20971,7 +20971,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 
 .project-update-badge { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: auto; height: 30px; padding: 0 14px; border: 0; border-radius: var(--radius-pill); background: transparent; color: #6aa9ff; font-size: 12px; font-weight: 500; cursor: pointer; }
 .workspace-shell .topbar .project-update-badge[hidden] { display: none !important; }
-.workspace-shell .topbar .project-update-badge:not(:disabled):hover { background: #6aa9ff; color: #fff; }
+.workspace-shell .topbar .project-update-badge:not(:disabled):hover { background: var(--workspace-menu-highlight); }
 
 /* Keep every header control centered inside the shared 35px bar. */
 .workspace-shell > .topbar { grid-template-rows: minmax(0, 1fr); align-items: center; }
