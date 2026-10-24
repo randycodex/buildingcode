@@ -15,7 +15,7 @@ const event=(n,extra={})=>({projectID:'p',domain:'artifacts',version:n,updatedAt
 const baseline=observeProjectUpdate({},event(1,{local:true}),'here');
 function harness(scenario='idle') {
  let stored=observeProjectUpdate(baseline,event(2),'here'),current=true,blocker='';const calls=[];
- const c=vm.createContext({projectUpdatesApplying:new Set(),projectUpdateAutoGuards:new Map(),projectUpdateReviewRequired:new Set(),projectUpdateEditingGeneration:0,
+ const c=vm.createContext({automaticContentUpdatesEnabled:true,projectUpdatesApplying:new Set(),projectUpdateAutoGuards:new Map(),projectUpdateReviewRequired:new Set(),projectUpdateEditingGeneration:0,
   activeWorkspaceID:'w',activeWorkspaceRecord:()=>({projectID:'p'}),canonicalUpdateProjectID:x=>x,projectUpdateRuntimeKey:()=> 'u:p',
   captureAccountRequest:()=>({userID:'u'}),isCurrentAccountRequest:()=>current,projectUpdateAutoApplyBlocker:()=>blocker,
   pendingProjectUpdate:()=>projectUpdateNotice(stored,'p'),projectUpdateRecords:()=>stored,writeProjectUpdateRecords:next=>stored=next,
@@ -56,7 +56,7 @@ const cancelled=harness('cancel');await cancelled.c.applyPendingProjectUpdates()
 // create no timer and therefore no repeated consumer requests or extra polling.
 {
  const timers=new Map();let sequence=0,applied=0,pending=true,blocked='';
- const c=vm.createContext({projectUpdateAutoApplyReady:true,projectUpdateAutoApplyTimer:null,projectUpdateReviewRequired:new Set(),projectUpdatesApplying:new Set(),activeWorkspaceID:'w',
+ const c=vm.createContext({automaticContentUpdatesEnabled:true,projectUpdateAutoApplyReady:true,projectUpdateAutoApplyTimer:null,projectUpdateReviewRequired:new Set(),projectUpdatesApplying:new Set(),activeWorkspaceID:'w',
   pendingProjectUpdate:()=>pending?{domains:{artifacts:{}}}:null,projectUpdateRuntimeKey:()=> 'u:p',projectUpdateAutoApplyBlocker:()=>blocked,
   captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,setTimeout:fn=>{timers.set(++sequence,fn);return sequence;},clearTimeout:id=>timers.delete(id),
   applyPendingProjectUpdates:async()=>{applied++;pending=false;}});

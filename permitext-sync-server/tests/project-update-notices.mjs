@@ -30,7 +30,7 @@ const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
 for(const scenario of ['success','cancel','failure','newer','account']) {
   let stored=observeProjectUpdate({},event(2),'here');const calls=[];let current=true;
-  const c=vm.createContext({projectUpdatesApplying:new Set(),projectUpdateAutoGuards:new Map(),projectUpdateReviewRequired:new Set(),projectUpdateEditingGeneration:0,projectUpdateRuntimeKey:()=>"u:p",requirePendingProjectUpdateReview(){},activeWorkspaceID:'project:p',activeWorkspaceRecord:()=>({projectID:'p'}),canonicalUpdateProjectID:x=>x,
+  const c=vm.createContext({canRunForegroundSync:()=>true,performForegroundSync:async()=>({status:"ready"}),checkVisibleProjectArtifactRevisions:async()=>{},projectUpdatesApplying:new Set(),projectUpdateAutoGuards:new Map(),projectUpdateReviewRequired:new Set(),projectUpdateEditingGeneration:0,projectUpdateRuntimeKey:()=>"u:p",requirePendingProjectUpdateReview(){},activeWorkspaceID:'project:p',activeWorkspaceRecord:()=>({projectID:'p'}),canonicalUpdateProjectID:x=>x,
     activeAccount:()=>({userID:'u'}),captureAccountRequest:()=>({userID:'u'}),isCurrentAccountRequest:()=>current,
     requireCurrentAccountRequest:()=>{if(!current)throw Error('Account changed');},
     projectUpdateIsApplying:()=>false,pendingProjectUpdate:()=>projectUpdateNotice(stored,'p'),projectUpdateRecords:()=>stored,
@@ -47,18 +47,18 @@ for(const scenario of ['success','cancel','failure','newer','account']) {
 // pending indicator must still follow the selected account/project metadata.
 {
   const button={hidden:true,setAttribute(){},querySelector:()=>null};
-  let selected='p',capable=true;
+  let selected='p',capable=true,signedIn=true;
   const pending=observeProjectUpdate({},event(2),'here');
-  const c=vm.createContext({document:{querySelector:()=>button},
+  const c=vm.createContext({automaticContentUpdatesEnabled:false,activeAccount:()=>signedIn?{}:null,detachedProjectWindow:false,navigator:{onLine:true},document:{querySelector:()=>button},
     activeWorkspaceRecord:()=>({projectID:selected,name:'Project'}),
     hasCapability:()=>capable,pendingProjectUpdate:id=>projectUpdateNotice(pending,id),
     projectUpdateIsApplying:()=>false,projectUpdateRuntimeKey:()=>selected,projectUpdateAutoApplyBlocker:()=>"editing",projectUpdateReviewRequired:new Set(),projectUpdatesApplying:new Set(),workspacePrivatePresentationAllowed:()=>false});
   vm.runInContext(actual('renderProjectUpdateBadge'),c);
   c.renderProjectUpdateBadge();assert.equal(button.hidden,false);
-  assert.match(button.title,/updated elsewhere/);
-  selected='other';c.renderProjectUpdateBadge();assert.equal(button.hidden,true);
+  assert.match(button.title,/changes awaiting review/);
+  selected='other';c.renderProjectUpdateBadge();assert.equal(button.hidden,false,'Manual UPDATE stays available without a pending notice');
   selected='p';c.renderProjectUpdateBadge();assert.equal(button.hidden,false);
-  capable=false;c.renderProjectUpdateBadge();assert.equal(button.hidden,true);
+  capable=false;c.renderProjectUpdateBadge();assert.equal(button.hidden,false);signedIn=false;c.renderProjectUpdateBadge();assert.equal(button.hidden,true);
 }
 console.log('Project update notices passed: per-project pending state, timestamps, own-write receipts, legacy baselines, explicit apply, failures, cancellation, account fences, and newer-during-apply preservation.');
 

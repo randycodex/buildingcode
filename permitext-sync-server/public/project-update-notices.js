@@ -7,16 +7,16 @@ export function readProjectUpdateNotices(storage, key) {
 }
 const timestamp = value => Date.parse(value || '') || 0;
 export function observeProjectUpdate(notices, event, browserID) {
-  const {projectID, domain, version, updatedAt, sourceClientID, local = false, details, project, previousProject} = event;
+  const {projectID, domain, version, updatedAt, sourceClientID, local = false, manual = false, details, project, previousProject} = event;
   if (!projectID || !['project', 'artifacts'].includes(domain) || !Number.isFinite(version) || !timestamp(updatedAt)) return notices;
   const current = notices[projectID] || {domains: {}};
   const prior = current.domains?.[domain];
-  if (prior && version <= prior.version) return notices;
+  if (prior && (version < prior.version || version === prior.version && (!manual || prior.pending))) return notices;
   // Establish unknown legacy records as a baseline. Layout-only events from
   // older browsers cannot create an update notice.
   // A local save can advance the same Project revision while other remote
   // changes remain unapplied. Its receipt must not acknowledge those changes.
-  const pending = Boolean(prior?.pending) || !local && sourceClientID !== browserID && (Boolean(prior) || domain === 'project' && Boolean(previousProject) && Boolean(sourceClientID));
+  const pending = Boolean(prior?.pending) || !local && sourceClientID !== browserID && (manual || Boolean(prior) || domain === 'project' && Boolean(previousProject) && Boolean(sourceClientID));
   const pendingDetails = pending ? [...new Set([...(prior?.pending ? prior.details || [] : []), ...(details || [])])] : details;
   const next = {version, updatedAt, pending, ...(pendingDetails ? {details:pendingDetails} : {})};
   const domains = {...current.domains, [domain]: next};

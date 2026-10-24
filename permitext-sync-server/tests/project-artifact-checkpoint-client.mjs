@@ -138,10 +138,10 @@ assert.equal(late.refreshes.length, 0, "a late response cannot refresh stale dom
 const appSource = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 assert.match(appSource, /postResearch\("\/projects\/artifacts\/checkpoint", \{[\s\S]*?includeAccountResearch: scope\.researchVisible/);
 assert.match(appSource, /\(!projectIDs\.length && !scope\.researchVisible\)/);
-const researchRefresh = appSource.slice(appSource.indexOf("async function refreshVisibleResearchArtifactConsumers()"), appSource.indexOf("async function applyAccountArtifactRevisionEnvelope("));
+const researchRefresh = appSource.slice(appSource.indexOf("async function refreshVisibleResearchArtifactConsumers("), appSource.indexOf("async function applyAccountArtifactRevisionEnvelope("));
 assert.doesNotMatch(researchRefresh, /input\.value =|dispatchEvent|researchQuestionDraft =/, "Artifact refresh must not overwrite or broadcast composer drafts");
 assert.match(researchRefresh, /nextInput\?\.dataset\.researchDraftKey === focusedDraftKey/, "Focus restoration must retain conversation identity");
-assert.match(appSource, /const accountResult = payload\.account[\s\S]*?applyAccountArtifactRevisionEnvelope\(payload\.account\)[\s\S]*?const projectResult = await applyProjectArtifactRevisionEnvelopes/, "one checkpoint must apply account Research once before Project-domain refreshes");
+assert.match(appSource, /const accountResult = payload\.account[\s\S]*?applyAccountArtifactRevisionEnvelope\(payload\.account, options\)[\s\S]*?const projectResult = await applyProjectArtifactRevisionEnvelopes/, "one checkpoint must apply account Research once before Project-domain refreshes");
 assert.match(appSource, /projectArtifactCheckpointDelay\(\{ lastActivityAt: foregroundSyncLastActivityAt \}\)/, "artifact checkpoints must not inherit the slower full foreground-sync cadence");
 assert.match(appSource, /async function refreshResearchProjectAssignmentConsumers[\s\S]*?refreshProjectSourceConsumers\(visibleProjectIDs,[\s\S]*?refreshVisibleProjectArtifactSummaries\(projectID\)/, "same-tab Research assignment must refresh both mounted Project sources and its visible summary");
 assert.equal((appSource.match(/refreshResearchProjectAssignmentConsumers\(\[previousProjectID, targetProjectID\]\)/g) || []).length, 2, "both Research assignment controls must refresh visible Project consumers");

@@ -31,7 +31,7 @@ vm.runInContext(actual('enqueueSyncMutation'),enqueue);assert.equal(enqueue.enqu
 const refresh=vm.createContext({activeAccount:()=>({userID:'u'}),syncedContent:{layoutOnly:true},hasCapability:()=>true,pendingProjectUpdate:()=>null,
  renderWorkspace:()=>assert.fail('Full render forbidden'),renderUtilityWorkspace:()=>assert.fail('Local layout must remain intact'),currentContentSummary:()=>assert.fail('Project download forbidden')});
 vm.runInContext(actual('refreshSyncedWorkspaceInPlace'),refresh);assert.equal(await refresh.refreshSyncedWorkspaceInPlace({accountUserID:'u'}),true);
-const signal=vm.createContext({captureAccountRequest:()=>1,activeAccount:()=>({userID:'u'}),foregroundSyncTabID:'this',renderUtilityWorkspace:()=>assert.fail('Old-tab layouts cannot apply')});
+const signal=vm.createContext({automaticContentUpdatesEnabled:false,captureAccountRequest:()=>1,activeAccount:()=>({userID:'u'}),foregroundSyncTabID:'this',renderUtilityWorkspace:()=>assert.fail('Old-tab layouts cannot apply')});
 vm.runInContext(actual('handleForegroundSyncSignal'),signal);await signal.handleForegroundSyncSignal({accountUserID:'u',sourceTabID:'old',type:'workspace-layouts'});
 for(const name of ['recordWorkspaceLayoutChange','queueWorkspaceLayoutSync','applyPendingWorkspaceLayout','reconcileWorkspaceLayouts']) assert.doesNotMatch(source,new RegExp(`\\b${name}\\(`));
 assert.match(actual('applyStoredWorkspaceLayout'),/delete track\._researchColumnLayout/,'Keep the width restoration fix for local project switches');
