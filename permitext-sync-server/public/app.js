@@ -1,5 +1,6 @@
+import { projectUpdateApplyBlocker } from "./project-update-policy.js?v=1";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
-import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates } from "./project-update-notices.js?v=3";
+import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=5";
 import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=8';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=5";
 import { createAssistantMaterials } from "./assistant-materials.js?v=4";
@@ -10,10 +11,10 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-local-layout-note-review-v1319";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-auto-content-update-v1323";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
-import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
+import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
 import { createReaderBlockWindow } from "./reader-block-window.js?v=9";
@@ -142,7 +143,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-local-layout-note-review-v1319";
+} from "./offline-storage.js?v=20261023-auto-content-update-v1323";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -606,6 +607,11 @@ const searchTimers = new Map();
 const readerSearchTimers = new Map();
 let syncedContent = null;
 const projectUpdatesApplying = new Set();
+const projectUpdateAutoGuards = new Map();
+const projectUpdateReviewRequired = new Set();
+let projectUpdateAutoApplyTimer = null;
+let projectUpdateEditingGeneration = 0;
+var projectUpdateAutoApplyReady = false;
 let syncLoadPromise = null;
 let organizationWorkspace = null;
 let organizationLoadPromise = null;
@@ -1407,8 +1413,58 @@ function pendingProjectUpdate(projectID = activeWorkspaceRecord()?.projectID) {
   if (!activeAccount() || !projectID || detachedProjectWindow) return null;
   return projectUpdateNotice(projectUpdateRecords(), canonicalUpdateProjectID(projectID));
 }
+function requirePendingProjectUpdateReview() {
+  const projectID = canonicalUpdateProjectID(activeWorkspaceRecord()?.projectID);
+  projectUpdateReviewRequired.add(projectUpdateRuntimeKey(projectID));
+  const records = projectUpdateRecords();
+  const next = requireProjectUpdateReview(records, projectID);
+  if (next !== records) writeProjectUpdateRecords(next);
+}
+function projectUpdateRuntimeKey(projectID = activeWorkspaceRecord()?.projectID) {
+  return `${activeAccount()?.userID}:${canonicalUpdateProjectID(projectID)}`;
+}
 function projectUpdateIsApplying(projectID = activeWorkspaceRecord()?.projectID) {
-  return projectUpdatesApplying.has(`${activeAccount()?.userID}:${canonicalUpdateProjectID(projectID)}`);
+  const key = projectUpdateRuntimeKey(projectID);
+  return projectUpdatesApplying.has(key) && (projectUpdateAutoGuards.get(key)?.() ?? true);
+}
+function projectUpdateAutoApplyBlocker() {
+  const accountUserID = activeAccount()?.userID;
+  const owned = entry => entry.accountUserID === accountUserID;
+  return projectUpdateApplyBlocker({
+    ready: projectUpdateAutoApplyReady && Boolean(accountUserID) && workspacePrivatePresentationAllowed(),
+    visible: document.visibilityState === "visible", online: navigator.onLine !== false,
+    focusedEditor: Boolean(document.activeElement?.matches?.('input, textarea, select, [contenteditable="true"]')),
+    dirtyEditor: [...notebookColumnMounts.values(), ...reportDraftMounts.values()].some(mount => mount.hasPendingEdits?.() || mount.hasUnsavedChanges?.()) ||
+      [...document.querySelectorAll('[data-project-editing-state]')].some(node => node._projectHasPendingEdits?.()),
+    pendingWrites: notebookPendingDraftCount > 0 || (state.syncOutbox || []).some(owned) || (state.codeQuestionOutbox || []).length > 0,
+    conflict: (state.syncConflicts || []).some(owned) || (state.codeQuestionConflicts || []).length > 0,
+    dialogOpen: [...document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog[open]')].some(node => node.getClientRects().length && !node.hidden) ||
+      Boolean(document.querySelector('.project-overview-edit[aria-expanded="true"]')),
+    interacting: track.classList.contains("is-resizing") || Boolean(track.querySelector('.workspace-panel.is-dragging'))
+  });
+}
+function scheduleProjectUpdateAutoApply() {
+  if (!projectUpdateAutoApplyReady || !pendingProjectUpdate()) return;
+  const key = projectUpdateRuntimeKey();
+  if (projectUpdateReviewRequired.has(key) || projectUpdatesApplying.has(key) || projectUpdateAutoApplyBlocker()) return;
+  clearTimeout(projectUpdateAutoApplyTimer);
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  projectUpdateAutoApplyTimer = setTimeout(() => {
+    projectUpdateAutoApplyTimer = null;
+    if (isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID) void applyPendingProjectUpdates({automatic:true});
+  }, 200);
+}
+function projectUpdateEditingActivity(event) {
+  if (!projectUpdateAutoApplyReady) return;
+  // Let pointer/keyboard focus reach UPDATE before deciding to resume an idle refresh.
+  if (event.type === "focusout") { setTimeout(() => renderProjectUpdateBadge(), 0); return; }
+  if (event.type === "focusin" && event.target?.closest?.("#project-update-badge") && pendingProjectUpdate()) requirePendingProjectUpdateReview();
+  const editor = event.target?.closest?.('input, textarea, select, [contenteditable="true"]');
+  if (editor && ["input", "change", "focusin"].includes(event.type)) {
+    projectUpdateEditingGeneration += 1;
+    if (event.type !== "focusin" && pendingProjectUpdate()) requirePendingProjectUpdateReview();
+  }
+  if (pendingProjectUpdate()) renderProjectUpdateBadge();
 }
 function renderProjectUpdateBadge() {
   const button = document.querySelector("#project-update-badge");
@@ -1417,14 +1473,21 @@ function renderProjectUpdateBadge() {
   // The indicator reads account-scoped local metadata; pane access is verified separately.
   const notice = hasCapability("projects") ? pendingProjectUpdate(project?.projectID) : null;
   button.hidden = !notice;
-  if (!notice) return;
+  const key = projectUpdateRuntimeKey(project?.projectID);
+  if (!notice) { projectUpdateReviewRequired.delete(key); return; }
+  const blocker = projectUpdateAutoApplyBlocker();
+  if (blocker === "review") requirePendingProjectUpdateReview();
+  if (notice.reviewRequired) projectUpdateReviewRequired.add(key);
+  const automatic = !blocker && !projectUpdateReviewRequired.has(key);
+  button.hidden = automatic;
+  if (automatic) scheduleProjectUpdateAutoApply();
   const formatted = new Date(notice.updatedAt).toLocaleString(undefined, {year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZoneName:"short"});
-  const description = `${project?.name || "Project"} updated elsewhere · ${formatted}. Click to apply updates.`;
+  const description = `Update ${project?.name || "Project"} · updated elsewhere · ${formatted}. Click to review and apply updates.`;
   button.title = description;
   button.setAttribute("aria-label", description);
   const time = button.querySelector("time");
   if (time) { time.dateTime = notice.updatedAt; time.textContent = formatted; }
-  button.disabled = projectUpdateIsApplying(project?.projectID);
+  button.disabled = projectUpdatesApplying.has(key);
 }
 function observeSyncedProjectUpdates(mutations, previous = [], {local = false} = {}) {
   for (const mutation of mutations || []) {
@@ -1448,36 +1511,55 @@ function projectSummaryWithPendingUpdates(summary) {
   })};
 }
 async function applyProjectUpdatesFromBadge() {
+  return applyPendingProjectUpdates();
+}
+async function applyPendingProjectUpdates({automatic = false} = {}) {
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const projectID = canonicalUpdateProjectID(activeWorkspaceRecord()?.projectID);
-  const pending = pendingProjectUpdate(projectID);
-  if (!pending || projectUpdateIsApplying(projectID)) return;
-  if (!(await confirmWorkspaceTransition()) || !isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) return;
-  const key = `${identity.userID}:${projectID}`;
+  const pending = pendingProjectUpdate(projectID), key = projectUpdateRuntimeKey(projectID);
+  if (!pending || projectUpdatesApplying.has(key)) return false;
+  if (automatic && (pending.reviewRequired || projectUpdateReviewRequired.has(key) || projectUpdateAutoApplyBlocker())) return false;
+  const editingGeneration = projectUpdateEditingGeneration;
+  const shouldApply = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID &&
+    (!automatic || editingGeneration === projectUpdateEditingGeneration && !pendingProjectUpdate(projectID)?.reviewRequired && !projectUpdateReviewRequired.has(key) && !projectUpdateAutoApplyBlocker());
   projectUpdatesApplying.add(key);
+  if (automatic) projectUpdateAutoGuards.set(key, shouldApply);
   renderProjectUpdateBadge();
   try {
-    await refreshSyncedWorkspaceInPlace({accountUserID:identity.userID,forceProjectUpdate:true});
-    requireCurrentAccountRequest(identity);
-    if (workspaceID !== activeWorkspaceID) return;
+    if (!automatic && !await confirmWorkspaceTransition()) {
+      if (isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID) requirePendingProjectUpdateReview();
+      return false;
+    }
+    if (!shouldApply()) return false;
+    if (pending.domains.project) {
+      await refreshSyncedWorkspaceInPlace({accountUserID:identity.userID,forceProjectUpdate:true,shouldApply});
+    }
+    if (!shouldApply()) return false;
     const project = workspaceProject();
     if (pending.domains.artifacts && project) {
-      await refreshProjectArtifactConsumers(projectDetailKey(project), pending.domains.artifacts.details || []);
+      await refreshProjectArtifactConsumers(projectDetailKey(project), pending.domains.artifacts.details || [], {shouldApply,strict:true});
     }
-    requireCurrentAccountRequest(identity);
-    if (workspaceID !== activeWorkspaceID) return;
+    if (!shouldApply()) return false;
     if (pending.domains.project && projectDetailsScreen?.isOpen()) {
+      const presentation = projectDetailsScreen.getPresentationState();
       projectDetailsScreen.dispose(); projectDetailsScreen = null;
-      await openProjectDetailsScreen();
+      await openProjectDetailsScreen(null, {shouldApply});
+      if (shouldApply()) projectDetailsScreen?.restorePresentation(presentation);
     }
-    requireCurrentAccountRequest(identity);
-    if (workspaceID !== activeWorkspaceID) return;
+    if (!shouldApply()) return false;
     writeProjectUpdateRecords(acknowledgeProjectUpdates(projectUpdateRecords(), projectID, pending.domains));
+    projectUpdateReviewRequired.delete(key);
     saveWorkspaceState();
+    return true;
   } catch (error) {
-    if (isCurrentAccountRequest(identity)) await showWebNotice("Project updates could not be applied", error.message || "Your current work is preserved. Try again.");
+    if (isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID) {
+      requirePendingProjectUpdateReview();
+      if (!automatic) await showWebNotice("Project updates could not be applied", error.message || "Your current work is preserved. Try again.");
+    }
+    return false;
   } finally {
+    projectUpdateAutoGuards.delete(key);
     projectUpdatesApplying.delete(key);
     if (isCurrentAccountRequest(identity)) renderProjectUpdateBadge();
   }
@@ -4190,6 +4272,8 @@ function appendProjectOpenQuestions(container, project) {
   let saved = JSON.stringify(items), pending = null;
   const section = document.createElement("section");
   section.className = "project-open-questions workflow-section";
+  section.dataset.projectEditingState = "true";
+  section._projectHasPendingEdits = () => Boolean(pending) || saved !== JSON.stringify(items);
   const heading = document.createElement("h3"); heading.textContent = "Open questions";
   const list = document.createElement("ol"); list.className = "project-open-question-list";
   const status = document.createElement("p"); status.className = "workflow-help"; status.setAttribute("role", "status");
@@ -4242,7 +4326,7 @@ function appendProjectOpenQuestions(container, project) {
   return { flush: save };
 }
 
-async function openProjectDetailsScreen(section = null) {
+async function openProjectDetailsScreen(section = null, options = {}) {
   if (notifyProjectRequiredForColumn() || !workspacePrivatePresentationAllowed() || !hasCapability("projects")) return false;
   const project = workspaceProject();
   if (!project) return false;
@@ -4280,6 +4364,8 @@ async function openProjectDetailsScreen(section = null) {
   let expansionControls = null;
   let unexpandedWidths = null;
   let selectedSection = "context";
+  let applyingUpdate = Boolean(options.shouldApply);
+  let updateLoaded = false;
   const selectSection = (kind) => {
     if (!panels.has(kind)) return;
     selectedSection = kind;
@@ -4292,7 +4378,7 @@ async function openProjectDetailsScreen(section = null) {
     onOpen: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
     backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
-      projectDetailMatches(workspaceProject(), identity) && hasCapability("projects"),
+      projectDetailMatches(workspaceProject(), identity) && hasCapability("projects") && (!applyingUpdate || options.shouldApply()),
     load: async () => {
       content.replaceChildren(header, columns);
       columns.replaceChildren();
@@ -4413,6 +4499,9 @@ async function openProjectDetailsScreen(section = null) {
         capturePosition: () => { if (!columns.classList.contains('has-expanded-column')) unexpandedWidths = resizeControls.getWidths(); }
       });
       selectSection(section || "context");
+      if (options.shouldApply && !options.shouldApply()) return content;
+      updateLoaded = true;
+      applyingUpdate = false;
       return content;
     },
     onClose: () => { resizeControls?.cancel(); state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
@@ -4445,7 +4534,8 @@ async function openProjectDetailsScreen(section = null) {
   };
   projectDetailsScreen = screen;
   await screen.open();
-  return true;
+  if (options.shouldApply && !updateLoaded && screen.isCurrent()) throw new Error("Project information could not be refreshed. Your update is still waiting for review.");
+  return screen.isCurrent();
 }
 
 function isProjectDetailPaneID(paneID) {
@@ -5746,6 +5836,7 @@ async function refreshProjectMembershipPanes(project) {
 }
 
 async function refreshProjectSourceConsumers(projects = [], options = {}) {
+  if (options.shouldApply && !options.shouldApply()) return false;
   const requestedProjects = (Array.isArray(projects) ? projects : [projects]).filter(Boolean);
   const projectIDs = new Set(
     requestedProjects.map((project) => typeof project === "string"
@@ -5761,24 +5852,24 @@ async function refreshProjectSourceConsumers(projects = [], options = {}) {
     invalidateInitialProjectFoundation(projectID);
     const notebook = notebookMounts.get(projectID);
     if (options.refreshNotebookCards === true && typeof notebook?.refreshCards === "function") {
-      refreshes.push(notebook.refreshCards());
+      refreshes.push(notebook.refreshCards(options));
     }
     if (options.refreshNotebookReferences !== false && typeof notebook?.refreshReferenceSources === "function") {
       refreshes.push(notebook.refreshReferenceSources({
-        refreshFoundation: options.refreshNotebookFoundation === true
+        refreshFoundation: options.refreshNotebookFoundation === true, shouldApply: options.shouldApply
       }));
     }
     if (options.refreshNotebookReportStatus === true && typeof notebook?.refreshReportStatus === "function") {
-      refreshes.push(notebook.refreshReportStatus());
+      refreshes.push(notebook.refreshReportStatus(options));
     }
     const report = reportDraftMounts.get(projectID);
     if (options.refreshReportArtifacts === true && typeof report?.refreshArtifacts === "function") {
-      refreshes.push(report.refreshArtifacts());
+      refreshes.push(report.refreshArtifacts(options));
     } else if (options.refreshReportSources !== false && typeof report?.refreshSources === "function") {
-      refreshes.push(report.refreshSources());
+      refreshes.push(report.refreshSources(options));
     }
   });
-  await Promise.all(refreshes.map((refresh) => Promise.resolve(refresh).catch(() => false)));
+  await Promise.all(refreshes.map(refresh => options.strict ? refresh : Promise.resolve(refresh).catch(() => false)));
 }
 
 async function refreshVisibleProjectArtifactSummaries(projectID) {
@@ -9192,6 +9283,7 @@ function updateConnectionStatus() {
     connectionStatus.setAttribute("aria-label", `Sync status: ${connectionStatus.textContent}`);
   }
   updateTopbarPlanBadge();
+  if (projectUpdateAutoApplyReady) renderProjectUpdateBadge();
 }
 
 function pendingNotebookDraftReason(draft) {
@@ -13452,6 +13544,7 @@ async function refreshBlankSearchHistoryPanes() {
 }
 
 async function refreshSyncedWorkspaceInPlace(options = {}) {
+  if (options.shouldApply && !options.shouldApply()) return false;
   const expectedAccountUserID = options.accountUserID ?? activeAccount()?.userID ?? "";
   if ((activeAccount()?.userID || "") !== expectedAccountUserID) {
     await renderWorkspace();
@@ -13472,6 +13565,7 @@ async function refreshSyncedWorkspaceInPlace(options = {}) {
     await renderWorkspace();
     return false;
   }
+  if (options.shouldApply && !options.shouldApply()) return false;
   const projectReconciliation = reconcileOpenProjectIdentityAfterSync(accessibleProjects);
   renderCodeQuestionShellChrome();
   const refreshPaneIDs = [
@@ -13493,7 +13587,7 @@ async function refreshSyncedWorkspaceInPlace(options = {}) {
   await refreshBlankSearchHistoryPanes();
   await Promise.all(savedPaneIDs().map(async (paneID) => {
     if (workspacePaneHasFocusedEditor(paneID)) return false;
-    return refreshSavedPanelInPlace(paneID, { reconcileProjectStudio: false }).catch(() => false);
+    return refreshSavedPanelInPlace(paneID, {reconcileProjectStudio:false,preserveProjectChrome:true,reuseVerifiedSync:true,shouldApply:options.shouldApply}).catch(error => { if (options.shouldApply) throw error; return false; });
   }));
   if ((activeAccount()?.userID || "") !== expectedAccountUserID) {
     await renderWorkspace();
@@ -13721,16 +13815,20 @@ function enqueueProjectArtifactConsumerRefresh(refresh) {
   return task;
 }
 
-async function refreshProjectArtifactConsumers(projectID, domains) {
+async function refreshProjectArtifactConsumers(projectID, domains, options = {}) {
+  if (options.shouldApply && !options.shouldApply()) return false;
   invalidateInitialProjectFoundation(projectID);
   const plan = projectArtifactRefreshPlan(domains);
   if (projectTransitionHubMatches(projectTransitionHubEntry, projectID)) {
     projectTransitionHubEntry = null;
   }
   if (plan.notebookCards) {
-    await notebookMounts.get(projectID)?.refreshCards?.().catch(() => false);
+    const refresh = notebookMounts.get(projectID)?.refreshCards?.(options);
+    await (options.strict ? refresh : refresh?.catch(() => false));
   }
+  if (options.shouldApply && !options.shouldApply()) return false;
   await refreshProjectSourceConsumers([projectID], {
+    ...options,
     refreshNotebookCards: false,
     refreshNotebookReferences: plan.notebookReferences,
     refreshNotebookFoundation: plan.notebookFoundation,
@@ -13738,6 +13836,7 @@ async function refreshProjectArtifactConsumers(projectID, domains) {
     refreshReportArtifacts: plan.reportArtifacts,
     refreshReportSources: plan.reportSources
   });
+  if (options.shouldApply && !options.shouldApply()) return false;
   if (plan.notebookFoundation || plan.summaries) {
     refreshMountedResearchProjectContext(projectID);
   }
@@ -13767,7 +13866,7 @@ async function applyProjectArtifactRevisionEnvelopes(envelopes = [], options = {
   // not a per-revision delta. Refreshes can therefore include an older domain,
   // but remain bounded to connected consumers for the affected Project.
   await enqueueProjectArtifactConsumerRefresh(() => Promise.all(
-    result.refreshes.filter(({projectID}) => !pendingProjectUpdate(projectID) || projectUpdateIsApplying(projectID)).map(({ projectID, domains }) =>
+    result.refreshes.filter(({projectID}) => !pendingProjectUpdate(projectID)).map(({ projectID, domains }) =>
       refreshProjectArtifactConsumers(projectID, domains).catch(() => false)
     )
   ));
@@ -28805,6 +28904,7 @@ async function renderProjectNotebook(project, options = {}) {
   const mountState = {
     panel,
     summary: () => activeCard,
+    hasPendingEdits: () => dirty || saveConflict,
     persistDraft: persistFocusedDraft,
     async syncDraft() { return flushNotebookAutosave(); },
     activeCardID() {
@@ -28827,8 +28927,8 @@ async function renderProjectNotebook(project, options = {}) {
     async refreshReferenceSources(options = {}) {
       return refreshNotebookReferenceSources(options);
     },
-    async refreshCards() {
-      return refreshNotebookCards();
+    async refreshCards(options = {}) {
+      return refreshNotebookCards(options);
     },
     async refreshReportStatus() {
       return refreshNotebookReportStatus();
@@ -29175,11 +29275,11 @@ async function renderProjectNotebook(project, options = {}) {
       catch { return false; }
     };
 
-    async function loadCard(cardID) {
+    async function loadCard(cardID, options = {}) {
       const loadGeneration = ++notebookCardLoadGeneration;
       const workspaceID = activeWorkspaceID;
       const isCurrent = () => loadGeneration === notebookCardLoadGeneration && !disposed &&
-        isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID;
+        isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID && (!options.shouldApply || options.shouldApply());
       if (!isCurrent()) return;
       captureNotebookReturnScroll();
       if (activeCard?.id && editorMount) {
@@ -29220,6 +29320,7 @@ async function renderProjectNotebook(project, options = {}) {
         if (!isCurrent()) return;
       } catch (networkError) {
         if (!isCurrent()) return;
+        if (options.shouldApply) throw networkError;
         requireCurrentAccountRequest(requestIdentity);
         if (!privateCacheFallbackAllowed(networkError)) throw networkError;
         const cached = await loadNotebookProjectSnapshot(
@@ -29478,10 +29579,10 @@ async function renderProjectNotebook(project, options = {}) {
       updateNotebookCardManagement();
     }
 
-    refreshNotebookCards = async () => {
-      if (disposed) return false;
+    refreshNotebookCards = async (options = {}) => {
+      if (disposed || options.shouldApply && !options.shouldApply()) return false;
       const payload = await notebookRequest("/notebook/cards/list", { projectID });
-      if (disposed) return false;
+      if (disposed || options.shouldApply && !options.shouldApply()) return false;
       let nextCards = payload.cards || [];
       notebookReadOnly = payload.access?.readOnly === true;
       const focusedCardID = activeCard?.id || "";
@@ -29513,6 +29614,7 @@ async function renderProjectNotebook(project, options = {}) {
         foundation,
         cardPayload: { cards, access: { readOnly: notebookReadOnly } }
       }).catch(() => {});
+      if (options.shouldApply && !options.shouldApply()) return false;
       if (dirty || !focusedCardID) return true;
       if (!focusedSummary || focusedSummary.archivedAt || focusedSummary.deletedAt) {
         activeCard = null;
@@ -29525,7 +29627,7 @@ async function renderProjectNotebook(project, options = {}) {
         Number(focusedSummary.version || 0) !== Number(activeCard?.version || 0) ||
         String(focusedSummary.updatedAt || "") !== String(activeCard?.updatedAt || "")
       ) {
-        await loadCard(focusedCardID);
+        await loadCard(focusedCardID, options);
       }
       return true;
     };
@@ -29748,8 +29850,8 @@ async function renderProjectNotebook(project, options = {}) {
           control.disabled = true;
         });
       }
-      refreshNotebookReferenceSources = async ({ refreshFoundation = false } = {}) => {
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
+      refreshNotebookReferenceSources = async ({ refreshFoundation = false, shouldApply } = {}) => {
+        if (shouldApply && !shouldApply() || disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
         if (refreshFoundation) {
           foundation = identity.sharedOrganizationID
             ? await notebookRequest("/organizations/projects/snapshot", { projectID })
@@ -29761,7 +29863,7 @@ async function renderProjectNotebook(project, options = {}) {
             reference.referenceKind !== "notebookCard" ||
             reference.referenceID !== focusedCardID
           );
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
+        if (shouldApply && !shouldApply() || disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
         candidates = nextCandidates;
         renderReferenceOptions();
         referenceToggle.disabled = notebookReadOnly;
@@ -30439,6 +30541,8 @@ async function renderProjectReportDraft(project, resume = null) {
     panel.addEventListener(event, () => { reportPresentationInteraction += 1; }, {passive: true});
   }
   let autosave = null;
+  let generatingReport = false;
+  let deletingReport = false;
   let recoveryEditorID = crypto.randomUUID();
   let recoveredDrafts = [];
   let restoredRecovery = null;
@@ -30483,6 +30587,7 @@ async function renderProjectReportDraft(project, resume = null) {
         navigate: () => restoreReportResumeScroll(panel, snapshot)});
     },
     hasUnsavedChanges: () => dirty,
+    hasPendingEdits: () => dirty || autosave?.isSaving() || generatingReport || deletingReport,
     getDraftSnapshot: () => structuredClone(activeDraft),
     async addSources(draftID, selectedSources) {
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) throw accountContextChangedError();
@@ -30503,8 +30608,8 @@ async function renderProjectReportDraft(project, resume = null) {
         { confirmLabel: retained ? "Leave Report" : "Discard changes" }
       );
     },
-    async refreshSources() {
-      return refreshReportSources();
+    async refreshSources(options = {}) {
+      return refreshReportSources(options);
     },
     async refreshArtifacts(options = {}) {
       return refreshReportArtifacts(options);
@@ -30587,6 +30692,7 @@ async function renderProjectReportDraft(project, resume = null) {
       if (next.state === "error") showStatusError(`${next.error?.message || "Report could not be saved."} ${next.recoverable ? "A recovery copy is saved on this device." : "Keep this tab open to retain your edits."} Use Retry to save.`);
       else clearStatus();
       paintReportSaveState();
+      renderProjectUpdateBadge();
     }
   });
   const setDirty = (editGroup = null) => {
@@ -30653,8 +30759,6 @@ async function renderProjectReportDraft(project, resume = null) {
     }, {toggle: true});
   };
 
-  let generatingReport = false;
-  let deletingReport = false;
   let deletingVersionID = null;
   let historyMutationGeneration = 0;
   const paintExportState = () => {
@@ -31943,11 +32047,11 @@ async function renderProjectReportDraft(project, resume = null) {
     if (panel.isConnected) syncReferenceReaderLayout();
   }
 
-  refreshReportSources = async () => {
-    if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
+  refreshReportSources = async (options = {}) => {
+    if (options.shouldApply && !options.shouldApply() || disposed || !isCurrentAccountRequest(requestIdentity)) return false;
     const generation = ++reportSourcesRefreshGeneration;
     const payload = await reportRequest("/reports/sources/list", { projectID });
-    if (disposed || generation !== reportSourcesRefreshGeneration || !isCurrentAccountRequest(requestIdentity)) return false;
+    if (options.shouldApply && !options.shouldApply() || disposed || generation !== reportSourcesRefreshGeneration || !isCurrentAccountRequest(requestIdentity)) return false;
     sources = payload.sources || [];
     sourceWarnings = payload.warnings || [];
     refreshIncludedReportComments();
@@ -31959,7 +32063,7 @@ async function renderProjectReportDraft(project, resume = null) {
   };
 
   refreshReportArtifacts = async (options = {}) => {
-    if (disposed || deletingReport || deletingVersionID || !isCurrentAccountRequest(requestIdentity)) return false;
+    if (options.shouldApply && !options.shouldApply() || disposed || deletingReport || deletingVersionID || !isCurrentAccountRequest(requestIdentity)) return false;
     const historyGeneration = historyMutationGeneration;
     const sourcesGeneration = ++reportSourcesRefreshGeneration;
     const [draftPayload, sourcePayload, historyPayload] = await Promise.all([
@@ -31967,7 +32071,7 @@ async function renderProjectReportDraft(project, resume = null) {
       reportRequest("/reports/sources/list", { projectID }),
       reportRequest("/reports/history/list", { projectID })
     ]);
-    if (disposed || deletingVersionID || historyGeneration !== historyMutationGeneration || !isCurrentAccountRequest(requestIdentity)) return false;
+    if (options.shouldApply && !options.shouldApply() || disposed || deletingVersionID || historyGeneration !== historyMutationGeneration || !isCurrentAccountRequest(requestIdentity)) return false;
     drafts = draftPayload.drafts || [];
     if (sourcesGeneration === reportSourcesRefreshGeneration) {
       sources = sourcePayload.sources || [];
@@ -35487,6 +35591,8 @@ function appendProjectRecordsChecklist(container, project, identity) {
   const current = () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID;
   const section = document.createElement("section");
   section.className = "project-records-checklist workflow-section";
+  section.dataset.projectEditingState = "true";
+  section._projectHasPendingEdits = () => Boolean(pending) || saved !== JSON.stringify(items);
   const heading = document.createElement("h3");
   heading.textContent = "Records checklist";
   const copy = document.createElement("p");
@@ -35660,6 +35766,11 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
   };
   let saveSequence = Promise.resolve();
   let submitted = null;
+  container.dataset.projectEditingState = "true";
+  container._projectHasPendingEdits = () => Boolean(submitted) ||
+    (!factsOnly && description.value.trim() !== saved.description.trim()) ||
+    (!contextOnly && (address.value.trim() !== saved.address.trim() ||
+      JSON.stringify(projectStructuredFacts({structuredFacts})) !== JSON.stringify(migratedProjectStructuredFacts({structuredFacts:saved.structuredFacts}))));
   const save = ({ reportFailure = false } = {}) => {
     if (!isCurrentAccountRequest(requestIdentity) || workspaceID !== activeWorkspaceID) return Promise.resolve();
     const next = {
@@ -36532,27 +36643,29 @@ function animateSavedMembershipUpdate(content, previousHeight) {
 }
 
 async function performSavedPanelHydration(panel, savedInstance, paneID, options = {}) {
+  if (options.shouldApply && !options.shouldApply()) return;
+  let initialRefresh = true;
   const content = panel.querySelector(".saved-content");
   // Initial mounting follows the workspace access gate's completed sync.
   // Explicit refreshes retain their fresh pull instead of reusing this snapshot.
   const data = await (options.reuseVerifiedSync
     ? ensureSyncedContentForRender()
     : loadSyncedContent());
-  if (!panel.isConnected) return;
+  if (!panel.isConnected || options.shouldApply && !options.shouldApply()) return;
   const summary = currentContentSummary();
   const workspaceProjects = await projectsWithOrganizationAccess(summary.projects || []);
-  if (!panel.isConnected) return;
+  if (!panel.isConnected || options.shouldApply && !options.shouldApply()) return;
   if (options.reconcileProjectStudio !== false) {
     await reconcileProjectStudioWithSavedFolders(workspaceProjects);
   }
-  if (!panel.isConnected) return;
+  if (!panel.isConnected || options.shouldApply && !options.shouldApply()) return;
   const preserveProjectChrome = options.preserveProjectChrome === true;
   const selectedFolder = preserveProjectChrome
     ? workspaceProjects.find((project) =>
         projectRecordID(project) === String(savedInstance.selectedFolderID || "")
       ) || null
     : await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
-  if (!panel.isConnected) return;
+  if (!panel.isConnected || options.shouldApply && !options.shouldApply()) return;
   const annotatedItems = consolidatedSavedAnnotations(summary.annotations || []);
   if (preserveProjectChrome) {
     panel.querySelectorAll(".saved-project-tile[data-project-id]").forEach((tile) => {
@@ -36668,7 +36781,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     ? folderHydrationItems.filter((item) => !item.chapterNumber || !item.sectionNumber)
     : [];
   const resolvedSortMetadata = await hydrateItems(missingSortMetadata);
-  if (!panel.isConnected) return;
+  if (!panel.isConnected || options.shouldApply && !options.shouldApply()) return;
   const resolvedSortItems = new Map(missingSortMetadata.map((item, index) => [item, resolvedSortMetadata[index]]));
   resolvedSortMetadata.forEach((item) => hydratedItemPromises.set(item, Promise.resolve(item)));
   const savedCandidates = sortSavedItems(folderHydrationItems.map((item) => resolvedSortItems.get(item) || item),
@@ -36744,12 +36857,12 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       hydrateItems,
       matchesItem: (item) => matchesView(item),
       normalizeMatches: mergeEquivalentSavedColumnRows,
-      shouldContinue: () => generation === viewGeneration && panel.isConnected
+      shouldContinue: () => generation === viewGeneration && panel.isConnected && (!initialRefresh || !options.shouldApply || options.shouldApply())
     });
     if (page.cancelled) return;
     const resolvedItems = page.items;
     const hasMore = page.hasMore;
-    if (generation !== viewGeneration || !panel.isConnected) return;
+    if (generation !== viewGeneration || !panel.isConnected || initialRefresh && options.shouldApply && !options.shouldApply()) return;
     const filteredItems = resolvedItems.filter((item) => matchesView(item));
     const orderedItems = sortSavedItems(filteredItems, showingUnassigned ? "recentlySaved" : "codeOrder");
     const inboxCount = panel.querySelector(".saved-inbox-count");
@@ -36859,7 +36972,9 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     content.setAttribute("aria-busy", "true");
     void applySavedView();
   });
+  if (options.shouldApply && !options.shouldApply()) return;
   await applySavedView();
+  initialRefresh = false;
   panel.__refreshProjectMembership = () => refreshSavedPanelInPlace(paneID, {
     reconcileProjectStudio: false,
     preserveProjectChrome: true,
@@ -48104,6 +48219,7 @@ function bindImmediateUtilityControls() {
   const updateBadge = document.querySelector("#project-update-badge");
   if (updateBadge && !updateBadge.dataset.bound) {
     updateBadge.dataset.bound = "true";
+    updateBadge.addEventListener("pointerdown", () => { if (pendingProjectUpdate()) requirePendingProjectUpdateReview(); });
     updateBadge.addEventListener("click", () => void applyProjectUpdatesFromBadge());
   }
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
@@ -48205,6 +48321,8 @@ function loadStartupCatalogs() {
 }
 
 async function start() {
+  projectUpdateAutoApplyReady = true;
+  for (const event of ["input", "change", "focusin", "focusout"]) document.addEventListener(event, projectUpdateEditingActivity, true);
   retireWorkspaceLayoutSyncState();
   void publicCodeRevision.probe();
   window.setInterval(() => { if (document.visibilityState === "visible") void publicCodeRevision.probe(); }, 60000);

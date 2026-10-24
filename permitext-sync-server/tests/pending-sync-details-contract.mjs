@@ -73,7 +73,7 @@ const badge = { ...element("span"), style: {}, classList: { toggle() {} },
   get textContent() { return label.textContent; }
 };
 let now = Date.parse("2026-10-14T18:00:00Z"), scheduledAttention = null;
-Object.assign(context, { connectionStatus: badge, activeAccount: () => ({ userID: "owner" }),
+Object.assign(context, { projectUpdateAutoApplyReady:false, connectionStatus: badge, activeAccount: () => ({ userID: "owner" }),
   notebookPendingDraftCount: 0, notebookPendingDraftAttentionAt: Infinity, connectionStatusAttentionTimer: null,
   Date: { now: () => now, parse: Date.parse },
   window: { setTimeout(callback, delay) { scheduledAttention = { callback, delay }; return 1; } },

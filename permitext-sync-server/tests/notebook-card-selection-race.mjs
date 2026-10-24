@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {restoreNotebookPassageText} from '../public/notebook-passage-blocks.js';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
-const start = source.indexOf('    async function loadCard(cardID) {');
+const start = source.indexOf('    async function loadCard(cardID, options = {}) {');
 const end = source.indexOf('    mountState.focusCard = loadCard;', start);
 assert.ok(start > 0 && end > start);
 const implementation = source.slice(start, end);

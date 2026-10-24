@@ -30,7 +30,7 @@ const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
 for(const scenario of ['success','cancel','failure','newer','account']) {
   let stored=observeProjectUpdate({},event(2),'here');const calls=[];let current=true;
-  const c=vm.createContext({projectUpdatesApplying:new Set(),activeWorkspaceID:'project:p',activeWorkspaceRecord:()=>({projectID:'p'}),canonicalUpdateProjectID:x=>x,
+  const c=vm.createContext({projectUpdatesApplying:new Set(),projectUpdateAutoGuards:new Map(),projectUpdateReviewRequired:new Set(),projectUpdateEditingGeneration:0,projectUpdateRuntimeKey:()=>"u:p",requirePendingProjectUpdateReview(){},activeWorkspaceID:'project:p',activeWorkspaceRecord:()=>({projectID:'p'}),canonicalUpdateProjectID:x=>x,
     activeAccount:()=>({userID:'u'}),captureAccountRequest:()=>({userID:'u'}),isCurrentAccountRequest:()=>current,
     requireCurrentAccountRequest:()=>{if(!current)throw Error('Account changed');},
     projectUpdateIsApplying:()=>false,pendingProjectUpdate:()=>projectUpdateNotice(stored,'p'),projectUpdateRecords:()=>stored,
@@ -38,7 +38,7 @@ for(const scenario of ['success','cancel','failure','newer','account']) {
     refreshSyncedWorkspaceInPlace:async()=>{calls.push('render');if(scenario==='failure')throw Error('Offline');if(scenario==='account')current=false;if(scenario==='newer')stored=observeProjectUpdate(stored,event(3),'here');},
     workspaceProject:()=>({id:'p'}),projectDetailsScreen:null,writeProjectUpdateRecords:value=>stored=value,acknowledgeProjectUpdates,
     saveWorkspaceState:()=>calls.push('save'),showWebNotice:async()=>calls.push('error')});
-  vm.runInContext(actual('applyProjectUpdatesFromBadge'),c);await c.applyProjectUpdatesFromBadge();
+  vm.runInContext(actual('applyPendingProjectUpdates')+'\n'+actual('applyProjectUpdatesFromBadge'),c);await c.applyProjectUpdatesFromBadge();
   if(scenario==='success')assert.equal(projectUpdateNotice(stored,'p'),null);
   else assert(projectUpdateNotice(stored,'p'),scenario);
   if(scenario==='cancel')assert.deepEqual(calls,[]);
@@ -52,7 +52,7 @@ for(const scenario of ['success','cancel','failure','newer','account']) {
   const c=vm.createContext({document:{querySelector:()=>button},
     activeWorkspaceRecord:()=>({projectID:selected,name:'Project'}),
     hasCapability:()=>capable,pendingProjectUpdate:id=>projectUpdateNotice(pending,id),
-    projectUpdateIsApplying:()=>false,workspacePrivatePresentationAllowed:()=>false});
+    projectUpdateIsApplying:()=>false,projectUpdateRuntimeKey:()=>selected,projectUpdateAutoApplyBlocker:()=>"editing",projectUpdateReviewRequired:new Set(),projectUpdatesApplying:new Set(),workspacePrivatePresentationAllowed:()=>false});
   vm.runInContext(actual('renderProjectUpdateBadge'),c);
   c.renderProjectUpdateBadge();assert.equal(button.hidden,false);
   assert.match(button.title,/updated elsewhere/);

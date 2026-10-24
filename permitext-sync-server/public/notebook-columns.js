@@ -56,7 +56,7 @@ export function createNotebookMountRegistry(projects, {openCard}) {
         if (!match) return false;
         await match.syncDraft?.(); return true;
       },
-      refreshCards: () => all(projectID, 'refreshCards'),
+      refreshCards: options => all(projectID, 'refreshCards', options),
       refreshReferenceSources: options => all(projectID, 'refreshReferenceSources', options),
       refreshReportStatus: () => all(projectID, 'refreshReportStatus'),
       async confirmDiscardIfNeeded() {
