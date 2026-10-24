@@ -96,8 +96,10 @@ assert.doesNotMatch(iosSaved, /projectHubSection\(title: "Exports"|Create & Save
 assert.match(iosOrganizationHub, /label: "Reports"/);
 assert.match(iosOrganizationHub, /projectSection\(title: "Reports"/);
 
-assert.match(webClient, /function renderNewResearchComposer[\s\S]*?const currentProject = workspaceProject\(\)[\s\S]*?const initialProjectID = currentProject \? projectDetailKey\(currentProject\) : ""/);
-assert.match(webClient, /postResearch\("\/research\/conversations\/create", \{[\s\S]*?projectID: initialProjectID/);
+const readerCreationSource = webClient.slice(webClient.indexOf("async function startNewResearchFromSelection("),
+  webClient.indexOf("async function addResearchSelectionToCurrent("));
+assert.match(readerCreationSource, /postResearch\("\/research\/conversations\/create", \{[\s\S]*?selections: passages\.map/);
+assert.match(readerCreationSource, /projectID: selection\.projectID \|\| ""/, "Passage-based Research retains the Project association.");
 assert.match(webClient, /function researchProjectChoices[\s\S]*?activeProjectRecords\(currentContentSummary\(\)\.projects \|\| \[\]\)/);
 assert.doesNotMatch(webClient, /folders\.filter\(\(folder\) => !folderIsProject\(folder\)\)\.forEach/);
 assert.match(webClient, /const exactSource = answerSources\.find[\s\S]*?openSourceInReader\(exactSource/);

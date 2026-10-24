@@ -297,7 +297,11 @@ const newResearchComposerStart = clientSource.indexOf("function renderNewResearc
 const newResearchComposerEnd = clientSource.indexOf("\nasync function renderResearch(", newResearchComposerStart);
 const newResearchComposerSource = clientSource.slice(newResearchComposerStart, newResearchComposerEnd);
 assert.ok(newResearchComposerStart >= 0 && newResearchComposerEnd > newResearchComposerStart, "New Research composer source was not found.");
-assert.match(newResearchComposerSource, /const currentProject = workspaceProject\(\);[\s\S]*?const initialProjectID = currentProject \? projectDetailKey\(currentProject\) : "";[\s\S]*?projectID: initialProjectID/, "New Research does not inherit the active workspace Project context.");
+assert.doesNotMatch(newResearchComposerSource, /postResearch\(/, "An empty composer cannot create Research without a selected passage.");
+assert.match(newResearchComposerSource, /Select a passage in Reader/, "The empty composer explains how to start passage-based Research.");
+const readerCreationSource = functionSource(clientSource, "startNewResearchFromSelection");
+assert.match(readerCreationSource, /selections: passages\.map/, "Reader Research must submit the selected passages.");
+assert.match(readerCreationSource, /projectID: selection\.projectID \|\| ""/, "Reader Research retains its originating Project identity.");
 assert.doesNotMatch(newResearchComposerSource, /createResearchProjectSelect|research-start-project/, "New Research still exposes the removed per-composer Project selector instead of following the active workspace.");
 const researchProjectChoicesSource = functionSource(clientSource, "researchProjectChoices");
 assert.match(researchProjectChoicesSource, /activeProjectRecords\(currentContentSummary\(\)\.projects \|\| \[\]\)/, "Research Project controls must include only true Projects.");
@@ -768,8 +772,8 @@ assert.match(clientSource, /reportRequest\("\/reports\/drafts\/save"[\s\S]*?note
 assert.match(functionSource(clientSource, "deleteResearchConversationFromList"), /refreshProjectSourceConsumers\(\[conversation\.primaryProjectID\][\s\S]*?refreshNotebookFoundation: true[\s\S]*?refreshPaneIDs: \["utility:analysis", \.\.\.projectPaneIDs\]/, "Deleting Research must update its Project, Notebook references, and Report sources together.");
 assert.match(functionSource(clientSource, "refreshResearchProjectAssignmentConsumers"), /refreshProjectSourceConsumers\(visibleProjectIDs,[\s\S]*?refreshNotebookFoundation: true[\s\S]*?refreshVisibleProjectArtifactSummaries\(projectID\)/, "Moving Research must invalidate both its old and new Project source consumers and refresh their visible summaries.");
 assert.equal((clientSource.match(/refreshResearchProjectAssignmentConsumers\(\[previousProjectID, targetProjectID\]\)/g) || []).length, 2, "Both Research Project assignment controls must refresh the old and new Project consumers.");
-assert.match(functionSource(clientSource, "renderNewResearchComposer"), /runResearchProgressSession\(progress, recoveredResearchProgressCallbacks\(conversationID, \{ supplemental: Boolean\(instance\) \}\)\)/,
-  "New Research must use the shared answer propagation handler.");
+assert.doesNotMatch(newResearchComposerSource, /runResearchProgressSession\(/,
+  "An unsourced draft cannot generate an answer before a Reader passage starts Research.");
 assert.match(functionSource(clientSource, "renderResearchConversation"), /pendingProgress\.retry = \(\) => void runResearchProgressSession\([\s\S]*?callbacks[\s\S]*?await runResearchProgressSession\(progress, recoveredResearchProgressCallbacks/,
   "Existing and recovered Research must use the shared answer propagation handler.");
 // Execute that handler's propagation and navigation assertions; don't require
