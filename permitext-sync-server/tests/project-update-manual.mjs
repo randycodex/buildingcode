@@ -11,6 +11,19 @@ const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
 const event=n=>({projectID:'p',domain:'artifacts',version:n,updatedAt:`2026-10-24T04:00:0${n}Z`,details:['notebook'],manual:true});
 
+// Busy feedback follows the actual in-flight operation and clears afterward.
+for(const [syncing,online] of [[false,true],[true,true],[false,false]]) {
+ const attributes={},classes=new Set();
+ const button={setAttribute:(key,value)=>attributes[key]=value,querySelector:()=>null,classList:{toggle:(name,on)=>on?classes.add(name):classes.delete(name)}};
+ const c=vm.createContext({automaticContentUpdatesEnabled,document:{querySelector:()=>button},navigator:{onLine:online},
+  activeWorkspaceRecord:()=>({projectID:'p',name:'Test project'}),hasCapability:()=>false,activeAccount:()=>({userID:'u'}),detachedProjectWindow:false,
+  projectUpdateRuntimeKey:()=> 'u:p',projectUpdatesApplying:new Set(syncing?['u:p']:[])});
+ vm.runInContext(actual('renderProjectUpdateBadge'),c);c.renderProjectUpdateBadge();
+ assert.equal(button.hidden,false);assert.equal(button.disabled,syncing||!online);
+ assert.equal(classes.has('is-syncing'),syncing);assert.equal(attributes['aria-busy'],String(syncing));
+ assert.equal(button.title,!online?'Connect to the internet to sync':`${syncing?'Syncing':'Sync project changes'} · Test project`);
+}
+
 // Even an old open tab must use the cheap checkpoint before downloading a full
 // sync snapshot. Unchanged data needs no full pull; changed data still does.
 for(const changed of [false,true]) {

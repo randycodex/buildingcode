@@ -46,7 +46,7 @@ for(const scenario of ['success','cancel','failure','newer','account']) {
 // Switching projects can temporarily replace the content access gate. The local
 // pending indicator must still follow the selected account/project metadata.
 {
-  const button={hidden:true,setAttribute(){},querySelector:()=>null};
+  const button={hidden:true,setAttribute(){},querySelector:()=>null,classList:{toggle(){}}};
   let selected='p',capable=true,signedIn=true;
   const pending=observeProjectUpdate({},event(2),'here');
   const c=vm.createContext({automaticContentUpdatesEnabled:false,activeAccount:()=>signedIn?{}:null,detachedProjectWindow:false,navigator:{onLine:true},document:{querySelector:()=>button},

@@ -1,5 +1,5 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-web-update-guard-v1328";
-import {createWebAppUpdatePrompt} from "./web-app-update.js?v=1";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-sync-app-update-v1329";
+import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
 import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=7";
@@ -13,7 +13,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-web-update-guard-v1328";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-sync-app-update-v1329";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -145,7 +145,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-web-update-guard-v1328";
+} from "./offline-storage.js?v=20261024-sync-app-update-v1329";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -1481,9 +1481,12 @@ function renderProjectUpdateBadge() {
   if (!automaticContentUpdatesEnabled) {
     button.hidden = !activeAccount() || Boolean(detachedProjectWindow);
     const key = projectUpdateRuntimeKey(project?.projectID);
-    button.disabled = projectUpdatesApplying.has(key) || navigator.onLine === false;
-    const description = navigator.onLine === false ? "Connect to the internet to update" :
-      `Check for and load updates${project?.name ? ` · ${project.name}` : ""}${notice ? " · changes awaiting review" : ""}`;
+    const syncing = projectUpdatesApplying.has(key);
+    button.disabled = syncing || navigator.onLine === false;
+    button.classList.toggle("is-syncing", syncing);
+    button.setAttribute("aria-busy", String(syncing));
+    const description = navigator.onLine === false ? "Connect to the internet to sync" :
+      `${syncing ? "Syncing" : "Sync project changes"}${project?.name ? ` · ${project.name}` : ""}${notice && !syncing ? " · changes awaiting review" : ""}`;
     button.title = description;
     button.setAttribute("aria-label", description);
     const time = button.querySelector("time");
@@ -1951,7 +1954,7 @@ async function confirmWorkspaceTransition() {
 
 async function prepareWebAppReload() {
   const identity = captureAccountRequest(), editingGeneration = projectUpdateEditingGeneration;
-  const blocked = () => ({message:"Finish saving or review pending changes, then reload. Your work stays on this device."});
+  const blocked = () => ({message:"Finish saving or review pending work, then try again."});
   if (workspaceRestoreError || workspaceMigrationError || activeResearchProgress.size) return blocked();
   try {
     await Promise.all([...notebookColumnMounts.values()].map(mount => mount.persistDraft?.()));

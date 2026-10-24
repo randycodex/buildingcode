@@ -20976,6 +20976,10 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 /* Keep every header control centered inside the shared 35px bar. */
 .workspace-shell > .topbar { grid-template-rows: minmax(0, 1fr); align-items: center; }
 .topbar .project-update-badge { height: var(--workspace-menu-height); min-height: 0; }
+.topbar .web-app-update-button { color: #71cf98; width: 30px; padding: 0; }
+.project-update-badge.is-syncing { animation: project-sync-glow 1.4s ease-in-out .35s infinite; }
+@keyframes project-sync-glow { 0%, 100% { box-shadow: 0 0 0 0 #6aa9ff00; } 50% { box-shadow: 0 0 9px 1px #6aa9ff55; } }
+@media (prefers-reduced-motion: reduce) { .project-update-badge.is-syncing { animation: none; } }
 
 .web-app-update-notice { position: fixed; inset-inline: 16px; bottom: 18px; z-index: 10000; display: flex; align-items: center; justify-content: center; gap: 12px; width: fit-content; max-width: calc(100% - 32px); margin-inline: auto; padding: 10px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--menu-surface); color: var(--text-primary); box-shadow: 0 6px 24px #0005; font-size: 13px; font-weight: 300; }
 .web-app-update-notice[hidden] { display: none; }

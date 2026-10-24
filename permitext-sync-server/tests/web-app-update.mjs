@@ -3,23 +3,30 @@ import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {createWebAppUpdatePrompt,activateWebAppUpdate} from '../public/web-app-update.js';
 import {webAppVersion,webSyncProtocol,webSyncProtocolHeader,webUpdateRequiredCode} from '../public/web-client-version.js';
-class Element {constructor(tag){this.tag=tag;this.children=[];this.events={};this.hidden=false;}setAttribute(){}append(...children){this.children.push(...children);}addEventListener(type,callback){this.events[type]=callback;}}
+class Element {constructor(tag){this.tag=tag;this.children=[];this.events={};this.hidden=false;this.attributes={};}setAttribute(key,value){this.attributes[key]=value;}append(...children){this.children.push(...children);}addEventListener(type,callback){this.events[type]=callback;}}
 function harness() {
- const body=new Element('body');body.inert=false;let ready=true,activations=0,reloads=0,fail=false;
- const controller=createWebAppUpdatePrompt({document:{body,createElement:tag=>new Element(tag)},currentVersion:'current',
-  prepareReload:async()=>ready,activate:async()=>{activations++;assert.equal(body.inert,true);if(fail)throw Error('Close other Permitext tabs');},location:{reload:()=>reloads++}});
- return {controller,body,setReady:value=>ready=value,setFailure:()=>fail=true,counts:()=>({activations,reloads}),notice:()=>body.children[0]};
+ const body=new Element('body'),button=new Element('button');body.inert=false;button.hidden=true;let ready=true,activations=0,reloads=0,fail;
+ const controller=createWebAppUpdatePrompt({document:{body,createElement:tag=>new Element(tag)},button,currentVersion:'current',
+  prepareReload:async()=>ready,activate:async()=>{activations++;assert.equal(body.inert,true);if(fail)throw fail;},location:{reload:()=>reloads++}});
+ return {controller,body,button,setReady:value=>ready=value,setFailure:error=>fail=error,counts:()=>({activations,reloads}),notice:()=>body.children[0]};
 }
 {
- const h=harness();h.controller.observe('current');assert.equal(h.body.children.length,0);
- h.controller.observe('next');assert.equal(h.notice().hidden,false);
- h.notice().children[2].events.click();h.controller.observe('next');assert.equal(h.notice().hidden,true,'Later does not nag on every version probe');
- h.controller.requireReload('next');assert.equal(h.notice().hidden,false);
+ const h=harness();h.controller.observe('current');assert.equal(h.button.hidden,true);
+ h.controller.observe('next');assert.equal(h.button.hidden,false);assert.equal(h.body.children.length,0,'An available update only reveals the toolbar icon');
+ h.controller.requireReload('next');assert.equal(h.button.hidden,false);
  h.setReady({message:'Save first'});assert.equal(await h.controller.reload(),false);assert.equal(h.notice().children[0].textContent,'Save first');assert.deepEqual(h.counts(),{activations:0,reloads:0});assert.equal(h.body.inert,false);
+ h.notice().children[1].events.click();h.controller.observe('next');assert.equal(h.notice().hidden,true,'Version checks do not reopen a dismissed error');assert.equal(h.button.hidden,false);
  h.setReady(true);assert.equal(await h.controller.reload(),true);assert.deepEqual(h.counts(),{activations:1,reloads:1});
 }
+for(const error of [Object.assign(Error('Close other Permitext tabs, then try again.'),{code:'OTHER_TABS'}),Error('Technical browser error')]) {
+ const h=harness();h.controller.observe('next');h.setFailure(error);assert.equal(await h.controller.reload(),false);assert.equal(h.body.inert,false);assert.equal(h.counts().reloads,0);
+ assert.equal(h.notice().children[0].textContent,error.code==='OTHER_TABS'?error.message:'Couldn’t update Permitext. Try again.');assert.equal(h.button.disabled,false);
+}
 {
- const h=harness();h.controller.observe('next');h.setFailure();assert.equal(await h.controller.reload(),false);assert.equal(h.body.inert,false);assert.equal(h.counts().reloads,0);assert.match(h.notice().children[0].textContent,/other Permitext tabs/);
+ const h=harness();let finish;h.setReady(new Promise(resolve=>finish=resolve));h.controller.observe('next');
+ const reload=h.controller.reload();assert.equal(h.button.disabled,true);assert.equal(h.button.attributes['aria-busy'],'true');
+ assert.equal(await h.controller.reload(),false,'Repeated clicks cannot activate or reload twice');
+ finish(true);await reload;assert.deepEqual(h.counts(),{activations:1,reloads:1});assert.equal(h.body.children.length,0);
 }
 class Channel {constructor(){this.port1={close(){}};this.port2={close(){},postMessage:data=>this.port1.onmessage?.({data})};}}
 for(const otherTabs of [false,true]) {
@@ -43,6 +50,9 @@ const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const entry=await readFile(new URL('../public/index.html',import.meta.url),'utf8');
 assert(entry.includes(`/web/app.js?v=${webAppVersion}`),'Server release metadata must match the shipped app');
 assert(source.includes(`./web-client-version.js?v=${webAppVersion}`),'The app must import its own immutable release metadata');
+assert(entry.indexOf('id="web-app-update-button"')<entry.indexOf('id="project-update-badge"'),'The app update action sits to the left of project sync');
+assert(entry.includes('data-workspace-icon="arrow-down-to-line"'));
+assert(entry.includes('<span>SYNC</span>'));
 // Exercise the real client transport, including the version response. A stale
 // response must still pass the account fence before displaying a reload prompt.
 {
@@ -73,4 +83,4 @@ for(const scenario of ['clean','draft','image','dirty','research','race','storag
  vm.runInContext(source.slice(first,last),c);const result=await c.prepareWebAppReload();
  if(['clean','anonymous'].includes(scenario))assert.equal(result,true);else assert.equal(typeof result.message,'string',scenario);
 }
-console.log('App reload passed: prompt/dismissal, pending work and storage failures, images, active Research, editing races, explicit worker activation, other-tab refusal, preserved input and no automatic reload.');
+console.log('App update button passed: pending-only visibility, no announcement banner, one click and duplicate prevention, short errors, pending work/storage/images/Research/race guards, explicit worker activation and other-tab refusal.');
