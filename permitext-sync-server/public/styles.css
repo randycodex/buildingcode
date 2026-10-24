@@ -20296,6 +20296,16 @@ dialog.report-export-review {
   color: var(--text-primary);
 }
 
+/* Selected working views retain a light-blue identity without heavier text. */
+.topbar .topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] {
+  color: #6aa9ff;
+  background: rgb(106 169 255 / 10%) !important;
+}
+.topbar .topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"]:not(:disabled):hover {
+  background: var(--workspace-menu-highlight) !important;
+  color: var(--text-primary);
+}
+
 /* Keep the Account disclaimer on the screen centerline within a 42px footer. */
 .account-workspace-view .settings-panel .settings-footer {
   position: relative; height: 42px; min-height: 42px; box-sizing: border-box;

@@ -1,4 +1,4 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-sync-app-update-v1330";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-view-selection-v1332";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
@@ -13,7 +13,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-sync-app-update-v1330";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-view-selection-v1332";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -145,7 +145,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-sync-app-update-v1330";
+} from "./offline-storage.js?v=20261024-view-selection-v1332";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -9479,7 +9479,7 @@ function syncReaderToolbarButton(button) {
   const requiresProject = workspaceColumnsRequireProject();
   const limitReached = !isProAccount() && state.readers.length >= 2;
   const readerLabel = "Reader";
-  button.querySelector("span").textContent = readerLabel;
+  button.querySelector("span").textContent = `+ ${readerLabel}`;
   button.dataset.mobileLabel = readerLabel;
   button.hidden = false;
   button.disabled = !requiresProject && limitReached;
