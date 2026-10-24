@@ -9,7 +9,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-project-menu-consolidated-v1314";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-project-menu-titlecase-v1315";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
@@ -141,7 +141,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-project-menu-consolidated-v1314";
+} from "./offline-storage.js?v=20261023-project-menu-titlecase-v1315";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2593,12 +2593,12 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   navigationActions.setAttribute("role", "group");
   navigationActions.setAttribute("aria-label", "Project and settings");
   appendMenuAction(navigationActions, {
-    label: "CONTEXT", icon: "book-a",
+    label: "Context", icon: "book-a",
     disabled: !projectsAvailable || !workspaceProject() || !hasCapability("projects"),
     run: () => void switchWorkflowView("project")
   });
   appendMenuAction(navigationActions, {
-    label: "SETTINGS", icon: "user-round", run: () => toggleUtilityPane("settings")
+    label: "Settings", icon: "user-round", run: () => toggleUtilityPane("settings")
   });
   menu.append(navigationActions);
   const viewOptions = document.createElement("div");

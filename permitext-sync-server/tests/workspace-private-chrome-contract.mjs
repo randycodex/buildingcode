@@ -47,10 +47,10 @@ assert.ok(labels().includes('Sign in for Projects'));assert.ok(labels().includes
 account={userID:'owner'};authority='verified';allowed=true;
 context.renderWorkspaceTabs();assert.equal(label.textContent,'Private Project');assert.equal(button.disabled,false);
 await context.openWorkspaceContextMenu('project',button);
-assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(!labels().includes('Manage Projects…'));assert.ok(labels().includes('CONTEXT'));assert.ok(labels().includes('SETTINGS'));
+assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(!labels().includes('Manage Projects…'));assert.ok(labels().includes('Context'));assert.ok(labels().includes('Settings'));
 const visit=node=>[node,...node.children.flatMap(visit)];
-const contextAction=visit(body).find(node=>node.textContent==='CONTEXT');
-const settingsAction=visit(body).find(node=>node.textContent==='SETTINGS');
+const contextAction=visit(body).find(node=>node.textContent==='Context');
+const settingsAction=visit(body).find(node=>node.textContent==='Settings');
 assert.equal(contextAction.disabled,false);
 contextAction.listeners.click();settingsAction.listeners.click();
 assert.deepEqual(opened,['project','settings'],'The consolidated entries invoke their original screen actions');
