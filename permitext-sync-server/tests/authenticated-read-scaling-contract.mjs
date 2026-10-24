@@ -56,6 +56,8 @@ const sandbox = vm.createContext({
   storedResearchConversation: async () => null,
   researchEvidenceForSectionIDs: async ids => ids[0] === "section" ? [{ id: "section" }] : [],
   storeAdapter: async () => ({
+    hasResearchSelection: async (userID, sourceID) =>
+      record("selectionExists", userID === owner && sourceID === "passage" ? [true] : []).length > 0,
     listFoundationMigrationMutations: async userID => record("migrationMutations", (userID === owner ? mutations : []).filter(item => item.project || item.projectSection || item.workboard)),
     listOwnedProjectMutations: async userID => record("projects", (userID === owner ? mutations : []).filter(item => item.project))
   }),
