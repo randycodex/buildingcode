@@ -22,15 +22,17 @@ Object.assign(process.env, {
 });
 const nativeFetch = globalThis.fetch;
 const calls=[];
-const comment='The selected comment says the proposed lobby is on the first floor. This is an observation, not an approved project fact.';
-const question='Summarize the comment I added.';
-let responseText={answerText:'Your comment describes a proposed first-floor lobby. This is your observation and does not establish an approved project fact or code compliance.',supportedPoints:[],citations:[],supportingSourceUses:[],assumptions:[],missingFacts:[],followUpQuestions:[],evidenceLimitations:['Only the attached user comment was reviewed.'],additionalEvidenceNeeded:[]};
+const passage='The slope of other pedestrian ramps shall not be steeper than one unit vertical in eight units horizontal (12.5-percent slope).';
+const question='What does our unprovided lender rider require? Use only the selected passage.';
+const responseText={answerText:'The lender rider is not included in this conversation. The selected code passage does not establish what that rider requires.',
+  supportedPoints:[],citations:[],supportingSourceUses:[],assumptions:[],missingFacts:[],followUpQuestions:[],
+  evidenceLimitations:['The requested lender rider is absent from the selected passage.'],additionalEvidenceNeeded:['Select the relevant source passage in Reader.']};
 globalThis.fetch=async(url,options)=>{
  assert.equal(String(url),'https://api.openai.com/v1/responses','No retrieval or property HTTP request is allowed.');
  const body=JSON.parse(options.body); const phase=body.text.format.name;calls.push({phase,body});
  assert.match(body.instructions,/CONVERSATION-ONLY SCOPE/);
- assert.ok(!body.instructions.includes(comment),"Untrusted attachment content belongs in input data, not provider instructions.");
- assert.match(JSON.stringify(body),/proposed lobby is on the first floor/);
+ assert.ok(!body.instructions.includes(passage),"Passages belong in input data, not provider instructions.");
+ assert.ok(JSON.stringify(body).includes(passage));
  assert.doesNotMatch(JSON.stringify(body),/SECRET_UNSELECTED/);
  assert.equal(body.tools,undefined);
  const value=phase==='permitext_code_interpretation'?responseText:{pass:true,issues:[],missingFactsOnly:false,unnecessaryMissingFactIndices:[],materialScopeReview:syntheticMaterialScopeReview(body)};
@@ -46,9 +48,16 @@ try {
  const account=signed.body.account,token=account.backendSessionToken,auth={accountUserID:account.appUserID};
  await request('/admin/lifetime-grants/grant',{userID:account.appUserID},process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
  let conversation=(await request('/research/conversations/create',{auth,analysisMode:'conversation_only'},token)).body.conversation;
- const loaded=await request('/research/conversations/material',{auth,conversationID:conversation.id,action:'update',expectedRevision:conversation.revision,
-   includeProjectContext:false,factIDs:[],noteIDs:[],comment},token);
- assert.equal(loaded.status,200,JSON.stringify(loaded.body));conversation=loaded.body.conversation;assert.equal(calls.length,0);
+ const retired=await request('/research/conversations/material',{auth,conversationID:conversation.id,action:'update',
+   includeProjectContext:true,factIDs:['old-fact'],noteIDs:['old-note'],comment:'SECRET_UNSELECTED_COMMENT'},token);
+ assert.equal(retired.status,410);assert.equal(calls.length,0);
+ const adapter=createFileStoreAdapter();
+ const raw=(await adapter.read()).researchConversationsByUserID[account.appUserID].find(item=>item.id===conversation.id);
+ raw.assistantScope={...raw.assistantScope,includeProjectContext:true,projectContext:{address:'SECRET_UNSELECTED_ADDRESS'},
+   facts:[{id:'old-fact',text:'SECRET_UNSELECTED_FACT'}],materials:[{id:'old-note',kind:'note',text:'SECRET_UNSELECTED_NOTE'}]};
+ await adapter.saveResearchConversation(account.appUserID,raw,raw.revision);
+ const sourceAdded=await request('/research/conversations/evidence',{auth,conversationID:conversation.id,sectionID:'41009495',selectedText:passage},token);
+ assert.equal(sourceAdded.status,200,JSON.stringify(sourceAdded.body));assert.equal(calls.length,0);
  const result=await request('/research/conversations/message',{auth,conversationID:conversation.id,question,requestID:randomUUID()},token);
  assert.equal(result.status,200,JSON.stringify(result.body));
  const answer=result.body.conversation.messages.at(-1).answer;
@@ -56,16 +65,12 @@ try {
  assert.equal(calls.filter(item=>item.phase==='permitext_code_interpretation').length,1);
  assert.equal(calls.filter(item=>item.phase==='permitext_research_verification').length,1);
  const stored=await createFileStoreAdapter().read();const record=stored.researchAnswersByUserID[account.appUserID][0];
- assert.equal(record.evidence.length,0);assert.equal(record.assistantScopeSnapshot.materials[0].text,comment);
- assert.throws(()=>immutableResearchAnswer({...record,assistantScopeSnapshot:{...record.assistantScopeSnapshot,materials:[]}}),/evidence|citations/);
- const sourceAdded=await request('/research/conversations/evidence',{auth,conversationID:conversation.id,sectionID:'41009495',
-   selectedText:'The slope of other pedestrian ramps shall not be steeper than one unit vertical in eight units horizontal (12.5-percent slope).'},token);
- assert.equal(sourceAdded.status,200,JSON.stringify(sourceAdded.body));
- responseText={...responseText,answerText:'The lender rider is not included in this conversation. The selected code passage and comment do not establish what that rider requires. Add its exact wording to review it.',
-   evidenceLimitations:['The requested lender rider is absent from the included material.'],additionalEvidenceNeeded:['Add the lender rider text.']};
- const gap=await request('/research/conversations/message',{auth,conversationID:conversation.id,question:'What does our unprovided lender rider require? Use only the conversation material.',requestID:randomUUID()},token);
- assert.equal(gap.status,200,JSON.stringify(gap.body));const gapAnswer=gap.body.conversation.messages.at(-1).answer;
- assert.equal(gapAnswer.verification.pass,true);assert.equal(gapAnswer.verification.scope,'conversation_evidence_gap');
- assert.equal(gapAnswer.authorityStatus,'insufficient_evidence');assert.deepEqual(gapAnswer.citations,[]);
- console.log('Assistant provider-double HTTP checks passed: exact supplied material, independent verification, no search, immutable notes and bounded missing-evidence answers.');
+ assert.equal(record.evidence.length,1);assert.equal(record.evidence[0].passageText,passage);
+ assert.equal(record.assistantScopeSnapshot.inputMode,'reader_passages');
+ assert.deepEqual(record.assistantScopeSnapshot.materials,[]);assert.deepEqual(record.assistantScopeSnapshot.facts,[]);
+ assert.equal(record.assistantScopeSnapshot.projectContext,null);
+ assert.doesNotThrow(()=>immutableResearchAnswer(record));
+ assert.equal(answer.verification.scope,'conversation_evidence_gap');assert.equal(answer.authorityStatus,'insufficient_evidence');
+ assert.deepEqual(stored.researchConversationsByUserID[account.appUserID].find(item=>item.id===conversation.id).assistantScope,raw.assistantScope);
+ console.log('Reader-only provider-double checks passed: exact passage delivery, legacy material excluded, independent verification and immutable provenance retained.');
 }finally{globalThis.fetch=nativeFetch;if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}await rm(scratch,{recursive:true,force:true});}

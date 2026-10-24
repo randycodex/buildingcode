@@ -30,62 +30,55 @@ try {
   assert.equal(conversation.messages.length,0);assert.equal(conversation.assistantScope.includeProjectContext,false);assert.deepEqual(conversation.assistantScope.facts,[]);
   assert.equal(assistantProjectInformation(conversation.assistantScope),null);
   const empty=await request('/research/conversations/message',{conversationID:conversation.id,question:'What is required here?',requestID:'scope-empty'});
-  assert.match(empty.conversation.messages.at(-1).answer.answerText,/Add passages, notes, comments/);
+  assert.match(empty.conversation.messages.at(-1).answer.answerText,/Select a passage in Reader/);
   conversation=empty.conversation;
-  let loaded=await request('/research/conversations/material',{conversationID:conversation.id});
-  assert.equal(loaded.choices.facts.length,2);assert.equal(loaded.conversation.messages.length,2);
-  const update=async (change,status=200)=>request('/research/conversations/material',{conversationID:conversation.id,action:'update',expectedRevision:conversation.revision,
-    includeProjectContext:false,factIDs:[],noteIDs:[],...change},status);
-  await update({factIDs:['other-project-fact']},400);
-  let selected=await update({factIDs:['scope-fact-two'],comment:'My comment: compare these supplied passages only.'});
-  conversation=selected.conversation;
-  assert.equal(conversation.messages.length,2,'Adding material must not add assistant or user messages.');
-  assert.equal(conversation.assistantScope.materials.length,1);
-  const info=assistantProjectInformation(conversation.assistantScope);
-  assert.equal(info.address,'');assert.equal(info.description,'');assert.equal(info.structuredFacts.length,1);
-  assert.match(JSON.stringify(info),/Only the cellar/);assert.doesNotMatch(JSON.stringify(info),/private address|private description|Stories Above Grade|SECRET_UNSELECTED/);
-  const notesOnly=await request('/research/conversations/message',{conversationID:conversation.id,question:'Summarize the comment I included.',requestID:'scope-comment'});
-  conversation=notesOnly.conversation;
-  assert.equal(conversation.messages.at(-1).answer.verification.pass,true);
-  const contextOn=await update({includeProjectContext:true,factIDs:['scope-fact-one','scope-fact-two']});
-  conversation=contextOn.conversation;
-  assert.equal(conversation.assistantScope.facts.length,2);
-  assert.equal(assistantProjectInformation(conversation.assistantScope).address,'Unselected private address');
-  conversation=(await update({includeProjectContext:false,factIDs:['scope-fact-two']})).conversation;
-  assert.equal(assistantProjectInformation(conversation.assistantScope).address,'');
-  const firstContextRevision=conversation.contextRevision;
-  const staleRevision=conversation.revision;
-  const note=(await request('/notebook/cards/save',{projectID,clientMutationID:'scope-note-create',expectedVersion:0,cardType:'finding',title:'Scope note',
-    document:{schema:'permitext-notebook-card',schemaVersion:2,format:'blocknote-json',document:[{type:'paragraph',content:[{type:'text',text:'The note contains an observation, not a legal requirement.',styles:{}}]}]},evidenceLinks:[]},201)).card;
-  selected=await update({factIDs:['scope-fact-two'],noteIDs:[note.id]});conversation=selected.conversation;
-  assert.equal(conversation.messages.length,4);assert.equal(conversation.contextRevision,firstContextRevision);
-  assert.match(conversation.assistantScope.materials.find(item=>item.kind==='note').text,/an observation/);
-  await update({expectedRevision:staleRevision},409);
-  await update({noteIDs:['foreign-project-note']},400);
+  const adapter=createFileStoreAdapter();
+  for (const extra of [{}, {action:'update',includeProjectContext:true,factIDs:['scope-fact-one'],noteIDs:['note'],comment:'Blocked comment'}]) {
+    const blocked=await request('/research/conversations/material',{conversationID:conversation.id,...extra},410);
+    assert.equal(blocked.code,'ASSISTANT_PASSAGES_ONLY');
+  }
+  const blockedContext=await request('/research/conversations/project-context',{
+    conversationID:conversation.id,projectID,facts:['Blocked additional fact']},410);
+  assert.equal(blockedContext.code,'ASSISTANT_PASSAGES_ONLY');
+  // Retained legacy inputs stay stored; future requests must exclude them.
+  const raw=(await adapter.read()).researchConversationsByUserID[userID].find(item=>item.id===conversation.id);
+  const legacyScope={...raw.assistantScope,includeProjectContext:true,
+    projectContext:{address:'SECRET_OLD_ADDRESS',description:'SECRET_OLD_CONTEXT'},
+    facts:[{id:'old-fact',text:'SECRET_OLD_FACT'}],
+    materials:[{id:'old-note',kind:'note',text:'SECRET_OLD_NOTE'}]};
+  raw.assistantScope=structuredClone(legacyScope);
+  await adapter.saveResearchConversation(userID,raw,raw.revision);
+  conversation=(await request('/research/conversations/get',{conversationID:raw.id,analysisMode:'conversation_only'})).conversation;
+  assert.deepEqual(conversation.assistantScope,legacyScope,'Opening Research preserves previous material.');
   const passage='Ramps used as part of a means of egress or part of an accessible route shall have a running slope not steeper than one unit vertical in 12 units horizontal (8-percent slope). The slope of other pedestrian ramps shall not be steeper than one unit vertical in eight units horizontal (12.5-percent slope).';
   conversation=(await request('/research/conversations/evidence',{conversationID:conversation.id,sectionID:'41009495',selectedText:passage})).conversation;
-  assert.equal(conversation.messages.length,4);
+  assert.equal(conversation.messages.length,2,'Adding a passage does not generate an answer.');
   const result=await request('/research/conversations/message',{conversationID:conversation.id,question:'Explain the selected ramp passage and its stated conditions. Search for any other applicable law too.',requestID:'scope-passage'});
   conversation=result.conversation;const answer=conversation.messages.at(-1).answer;
   assert.equal(answer.retrieval.webSupportRequested,false);assert.equal(answer.retrieval.webSupportSearched,false);
   assert.equal(answer.sourceSummary.permitextDiscoveredCount,0);assert.equal(answer.sourceSummary.crossReferenceCount,0);
   assert.deepEqual(answer.evidenceSectionIDs,['41009495']);assert.equal(answer.sourceSummary.userPinnedCount,1);
-  assert.doesNotMatch(JSON.stringify(answer.factUsage),/private address|private description|Stories Above Grade|SECRET_UNSELECTED/);
-  const stored=await createFileStoreAdapter().read();const record=stored.researchAnswersByUserID[userID].find(item=>item.id===conversation.messages.at(-1).id);
+  assert.doesNotMatch(JSON.stringify(answer.factUsage),/SECRET_|private address|private description|Stories Above Grade/);
+  const stored=await adapter.read();const record=stored.researchAnswersByUserID[userID].find(item=>item.id===conversation.messages.at(-1).id);
   assert.equal(record.evidence.length,1);assert.equal(record.evidence[0].passageText,passage);
-  assert.equal(record.assistantScopeSnapshot.materials.length,2);
-  const sourceID=conversation.sources.find(source=>source.kind==='selection').id;
-  conversation=(await update({removeSourceIDs:[sourceID],factIDs:[],noteIDs:[],removeMaterialID:conversation.assistantScope.materials.find(item=>item.kind==='comment').id})).conversation;
-  assert.equal(conversation.sources.filter(source=>source.kind==='selection').length,0);assert.deepEqual(conversation.assistantScope.materials,[]);
-  const cleared=await request('/research/conversations/message',{conversationID:conversation.id,question:'What is the ramp rule now?',requestID:'scope-after-clear'});
-  assert.match(cleared.conversation.messages.at(-1).answer.answerText,/Add passages/);
-  await request('/research/conversations/message',{conversationID:conversation.id,question:'Explain the selected ramp passage and its stated conditions. Search for any other applicable law too.',requestID:'scope-passage'},409);
-  const reopened=(await request('/research/conversations/get',{conversationID:conversation.id,analysisMode:'conversation_only'})).conversation;
-  assert.deepEqual(reopened.assistantScope.facts,[]);assert.deepEqual(reopened.assistantScope.materials,[]);
+  assert.equal(record.assistantScopeSnapshot.inputMode,'reader_passages');
+  assert.deepEqual(record.assistantScopeSnapshot.materials,[]);assert.deepEqual(record.assistantScopeSnapshot.facts,[]);
+  assert.equal(record.assistantScopeSnapshot.projectContext,null);
+  assert.deepEqual(stored.researchConversationsByUserID[userID].find(item=>item.id===conversation.id).assistantScope,legacyScope);
+  // The existing native create/evidence API remains available without web scope conversion.
+  const native=(await request('/research/conversations/create',{projectID,selections:[{sectionID:'41009495',selectedText:passage}]},201)).conversation;
+  assert.equal(native.assistantScope,undefined);assert.equal(native.sources.filter(source=>source.kind==='selection').length,1);
+  const {immutableResearchAnswer}=await import('../project-foundation-contract.mjs');
+  assert.doesNotThrow(()=>immutableResearchAnswer(record));
+  const emptyRecord=stored.researchAnswersByUserID[userID].find(item=>item.id===empty.conversation.messages.at(-1).id);
+  const legacyAnswer={...emptyRecord.answer,
+    answerText:'Add passages, notes, comments, or selected project context and facts to this conversation, then ask your question. I only use the material you include.',
+    conclusion:'Add material to this conversation',additionalEvidenceNeeded:['Add the material you want me to discuss.']};
+  assert.doesNotThrow(()=>immutableResearchAnswer({...emptyRecord,answer:legacyAnswer}),'Historical empty-scope answers remain valid.');
   // Canonical neighboring text must not enter either evidence or prompt.
   const pkg=assistantEvidencePackage({question:'Explain',pinnedEvidence:[{sectionID:'x',sourceID:'pin',text:'Selected words.',canonicalText:'SECRET NEIGHBOR',body:{text:'SECRET BODY'},richSources:[{text:'SECRET TABLE'}]}]});
   assert.doesNotMatch(JSON.stringify(pkg),/SECRET/);assert.equal(pkg.discovery.searchedSectionCount,0);
   assert.match(assistantScopePrompt(conversation.assistantScope),/No external search/);
   assert.equal(externalRequests,0);
-  console.log('Assistant conversation-only HTTP checks passed: explicit inputs, no calls on add, no retrieval, exact selections, persisted choices, removal isolation.');
+  console.log('Reader-only Research HTTP checks passed: retired material API, exact passages, no retrieval, legacy material/history preserved, native create retained.');
 } finally {globalThis.fetch=originalFetch;server.closeAllConnections();await new Promise(resolve=>server.close(resolve));await rm(temporary,{recursive:true,force:true});}

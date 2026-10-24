@@ -25,8 +25,7 @@ assert.doesNotMatch(styles, /assistant-context-toolbar|assistant-context-details
 assert.match(styles, /\.assistant-workspace > \.assistant-history-rail \{[^}]*grid-template-rows: minmax\(0, 1fr\) auto;/,
   'History fills the space vacated by the Work editor.');
 
-// Start actual main and supplemental composers with a retained legacy draft.
-// Only Project identity is submitted; the server owns current Context and Facts.
+// An unsourced main or supplemental draft cannot start a paid Research turn.
 for (const supplemental of [false, true]) {
   const elements = [], requests = [], turns = [];
   const element = tag => {
@@ -57,11 +56,10 @@ for (const supplemental of [false, true]) {
   const input = elements.find(node=>node.tag==='textarea');
   input.value='What applies to the project?';input.listeners.input();
   await elements.find(node=>node.tag==='form').listeners.submit({preventDefault(){}});
-  assert.equal(requests.length,1,'New chat does not send an extra per-conversation Work context request.');
-  assert.equal(requests[0].path,'/research/conversations/create');
-  assert.equal(requests[0].body.projectID,'project-a');
-  assert.equal(Object.hasOwn(requests[0].body,'facts'),false);
-  assert.deepEqual(turns,['new-chat']);
+  assert.equal(elements.find(node=>node.tag==='button').disabled,true);
+  assert.equal(requests.length,0,'Research starts from a selected Reader passage, not an unsourced draft.');
+  assert.deepEqual(turns,[]);
+  assert.equal(context.researchNewChatDrafts.get(paneID),'What applies to the project?','The draft remains recoverable.');
 }
 
 // Saved Project Context and Facts remain live; no editor draft is needed.

@@ -122,8 +122,8 @@ assert.match(server, /sourceAsOf: answerCodeBasis\.resolvedAt/);
 assert.match(server, /Verify cited text, source status, and Project facts before relying/);
 
 assert.match(web, /function researchComposerDisclosure\(\)/);
-assert.match(web, /explicitly included passages, notes, comments, project context and facts to OpenAI/);
-assert.match(web, /Project material is excluded until you choose it for this conversation/);
+assert.match(web, /the passages you select to OpenAI/);
+assert.doesNotMatch(web, /createAssistantMaterials|Included material|assistant-material-dialog/);
 assert.match(
   web,
   /Selected official images are sent to OpenAI for analysis\. Other material is included only when you choose it for this conversation\./,
@@ -132,8 +132,7 @@ assert.match(
 assert.match(web, /AI-assisted—not an official interpretation/);
 assert.match(web, /const researchDisclosureAcknowledgmentVersion = "2026-08-27-v1"/);
 assert.doesNotMatch(web, /ensureResearchDisclosureAcknowledged|Before your first Research question/);
-assert.match(web, /Project context and facts are optional/);
-assert.match(web, /Only the material listed in Included material and your conversation messages is sent/);
+assert.match(web, /Only selected passages and your conversation messages are sent/);
 assert.match(web, /function researchAnswerCopyText\(result, question = ""\)/);
 assert.match(web, /function researchCorpusMetadataLines\(codeBasis\)/);
 assert.match(web, /Edition: \$\{corpus\.codeEdition\}/);

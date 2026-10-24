@@ -37,7 +37,7 @@ function harness() {
    addEventListener:(name,fn)=>callbacks[name]=fn,dispatchEvent:()=>callbacks.input(),matches:()=>true,
    closest:()=>({dataset:{paneId:id}}),focus:()=>{focused=input;},setSelectionRange:(a,b)=>{input.selectionStart=a;input.selectionEnd=b;}};
   pane.input=input;panes.set(id,pane);
-  const scope=vm.createContext({...context,input,followUpDraftKey:`followup:${conversationID}`,ownerInstance:null,resizeComposerInput:()=>{},sendButton:{},researchEnabled:true,researchRequestActive:false,conversation:{sourceStatus:'current'},projectContextBlocked:false,starterAnalysisQuestion:''});
+  const scope=vm.createContext({...context,input,followUpDraftKey:`followup:${conversationID}`,ownerInstance:null,resizeComposerInput:()=>{},sendButton:{},researchEnabled:true,researchRequestActive:false,conversation:{sourceStatus:'current'},projectContextBlocked:false,passageRequired:false,starterAnalysisQuestion:''});
   vm.runInContext(handler,scope);
   return input;
  }

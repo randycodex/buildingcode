@@ -36,7 +36,7 @@ import { searchIndexedReaderChapter, ReaderSearchIndexError } from "./reader-sea
 import { chapterBodyContractResponse, publicCodeCorpusRevision } from "./chapter-body-contract.mjs";
 import { reportEvidenceEdition, reportResearchPlainText, reportEvidenceDisplayText } from "./report-presentation.mjs";
 import { researchFailureRecovery, researchRecoveryRequestDescription, researchRecoveryHumanContext } from "./public/research-failure-recovery.js";
-import { assistantScopeMode, assistantScopeVersion, emptyAssistantScope, isConversationOnly, assistantFactChoices, assistantProjectInformation, assistantEvidencePackage, assistantScopePrompt, assistantSuppliedText, assistantEmptyMaterialAnswer, assistantScopeInstruction, assistantUserMaterialInstruction, assistantScopeRetainsPreviousMaterial } from "./assistant-conversation-scope.mjs";
+import { assistantScopeMode, assistantScopeVersion, emptyAssistantScope, isConversationOnly, assistantPassageScope, assistantProjectInformation, assistantEvidencePackage, assistantScopePrompt, assistantSuppliedText, assistantEmptyMaterialAnswer, assistantScopeInstruction, assistantUserMaterialInstruction } from "./assistant-conversation-scope.mjs";
 import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
@@ -18226,62 +18226,10 @@ async function ensureAssistantConversationScope(userID, conversation) {
 async function handleAssistantConversationMaterial(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
-  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
-  if (!conversation) return;
-  await ensureAssistantConversationScope(context.userID, conversation);
-  const access = conversation.primaryProjectID
-    ? await projectAccessForUser(context.userID, conversation.primaryProjectID) : null;
-  if (conversation.primaryProjectID && !access) { sendError(response, 404, "Project unavailable."); return; }
-  const information = access ? researchProjectInformation(access.projectID, access.project) : null;
-  const facts = assistantFactChoices(information);
-  const notes = access ? await notebookCardSummariesForProject(access.storageOwnerUserID, access.projectID) : [];
-  const scope = structuredClone(conversation.assistantScope);
-  if (context.body.action === "update") {
-    if (Number(context.body.expectedRevision) !== researchConversationRevision(conversation)) {
-      sendJSON(response, 409, { error: "The conversation changed. Reopen Included material and try again.", code: "RESEARCH_CONTEXT_CHANGED" }); return;
-    }
-    const fail = message => { sendError(response, 400, message); };
-    const ids = value => Array.isArray(value) && value.length <= 200 && value.every(id => typeof id === "string" && id.length <= 256);
-    if (!ids(context.body.factIDs) || !ids(context.body.noteIDs)) { fail("Choose valid facts and notes."); return; }
-    const chosenFacts = new Set(context.body.factIDs), chosenNotes = new Set(context.body.noteIDs);
-    if ([...chosenFacts].some(id => !facts.some(fact => fact.id === id)) ||
-        [...chosenNotes].some(id => !notes.some(note => note.id === id))) { fail("A selected fact or note is unavailable in this Project."); return; }
-    scope.includeProjectContext = context.body.includeProjectContext === true;
-    if (scope.includeProjectContext && !information) { fail("Choose a Project before including its context."); return; }
-    scope.projectContext = scope.includeProjectContext ? { address: information.address, description: information.description,
-      capturedAt: new Date().toISOString() } : null;
-    scope.facts = facts.filter(fact => chosenFacts.has(fact.id));
-    const existingNotes = new Map(scope.materials.filter(item => item.kind === "note").map(item => [item.cardID, item]));
-    scope.materials = scope.materials.filter(item => item.kind !== "note" && item.id !== context.body.removeMaterialID);
-    for (const noteID of chosenNotes) {
-      const note = await ownedNotebookArtifact(access.storageOwnerUserID, noteID);
-      if (!note) { fail("A selected note is unavailable."); return; }
-      const old = existingNotes.get(noteID);
-      const text = note.payload.document ? notebookPlainText(note.payload.document) : note.payload.plainText || "";
-      if (text.length > 30_000) { fail("This note is too long to include. Add a shorter excerpt as a comment."); return; }
-      scope.materials.push(old?.version === note.envelope.version ? old : { id: `note:${noteID}`, cardID: noteID,
-        kind: "note", title: note.payload.title || "Untitled", text, version: note.envelope.version,
-        capturedAt: new Date().toISOString() });
-    }
-    if (context.body.comment !== undefined) {
-      if (typeof context.body.comment !== "string" || context.body.comment.length > 12_000) { fail("A comment can contain up to 12,000 characters."); return; }
-      const text = context.body.comment.trim();
-      if (text) scope.materials.push({ id: randomUUID(), kind: "comment", title: "Comment", text, capturedAt: new Date().toISOString() });
-    }
-    if (scope.materials.length > 24 || JSON.stringify(scope).length > 120_000) { fail("Too much material is included. Remove an item before adding more."); return; }
-    const removeSources = new Set(Array.isArray(context.body.removeSourceIDs) ? context.body.removeSourceIDs : []);
-    const removedPassage = (conversation.sources || []).some(source => source.kind === "selection" && removeSources.has(source.id));
-    const retainsHistory = !removedPassage && assistantScopeRetainsPreviousMaterial(conversation.assistantScope, scope);
-    conversation.sources = (conversation.sources || []).filter(source => !removeSources.has(source.id));
-    conversation.assistantScope = scope;
-    conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
-    if (!retainsHistory) Object.assign(conversation, resetResearchActiveContext(conversation, new Date().toISOString()));
-    conversation.updatedAt = new Date().toISOString();
-    await saveStoredResearchConversation(context.userID, conversation);
-  }
-  sendJSON(response, 200, { conversation: await researchConversationForClient(conversation, { userID: context.userID }),
-    choices: { facts, notes: notes.map(note => ({ id: note.id, title: note.title || "Untitled", version: note.version })),
-      projectContext: information ? { address: information.address, description: information.description } : null } });
+  sendJSON(response, 410, {
+    error: "Only Reader passages can be added to Research. Select a passage in Reader and choose Research.",
+    code: "ASSISTANT_PASSAGES_ONLY"
+  });
 }
 
 async function handleResearchConversationGet(request, response) {
@@ -18747,6 +18695,13 @@ async function handleResearchConversationProjectContext(request, response) {
     context.body.conversationID
   );
   if (!conversation) return;
+  if (isConversationOnly(conversation)) {
+    sendJSON(response, 410, {
+      error: "Only Reader passages can be added to Research.",
+      code: "ASSISTANT_PASSAGES_ONLY"
+    });
+    return;
+  }
   const projectID = String(context.body.projectID || "").trim();
   if (!projectID || conversation.primaryProjectID !== projectID) {
     sendError(response, 409, "Review the context for the conversation's current Project.");
@@ -20322,7 +20277,7 @@ async function handleResearchConversationMessage(request, response) {
   if (!conversation) return;
   if (context.body.analysisMode === assistantScopeMode) await ensureAssistantConversationScope(context.userID, conversation);
   const conversationOnly = isConversationOnly(conversation);
-  const conversationScope = conversationOnly ? conversation.assistantScope : null;
+  const conversationScope = conversationOnly ? assistantPassageScope(conversation) : null;
   if (conversationOnly && conversation.primaryProjectID && !await projectAccessForUser(context.userID, conversation.primaryProjectID)) {
     sendJSON(response, 409, { error: "The conversation's Project is unavailable. Restore access before asking another question.", code: "RESEARCH_PROJECT_REVIEW_REQUIRED" }); return;
   }
@@ -20399,7 +20354,7 @@ async function handleResearchConversationMessage(request, response) {
     return;
   }
   if (conversationOnly && priorRequestMessage && Number(priorRequestMessage.contextRevision || 0) !== researchContextRevision(conversation)) {
-    progressResponse.json(409, { error: "Included material changed. Ask your question again using the current material.", code: "RESEARCH_CONTEXT_CHANGED" }); return;
+    progressResponse.json(409, { error: "The selected passages changed. Ask your question again using the current passages.", code: "RESEARCH_CONTEXT_CHANGED" }); return;
   }
   const replayedAnswer = requestMessages.assistant;
   if (replayedAnswer) {
@@ -20578,7 +20533,7 @@ async function handleResearchConversationMessage(request, response) {
     }
     const manualProjectFacts = conversationOnly ? [] : conversation.projectContext?.facts || [];
     const combinedProjectFacts = combinedResearchProjectFacts(projectInformation, manualProjectFacts);
-    if (conversationOnly && !pinnedEvidence.length && !conversationScope.materials.length && !combinedProjectFacts.length) {
+    if (conversationOnly && !pinnedEvidence.length) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
         researchRequestID, progressResponse, evidenceSnapshots: [], conversationScopeEmpty: true });
       Object.assign(researchOperation, { status: "completed", mode: "evidence_boundary", charged: false });
