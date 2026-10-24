@@ -8,7 +8,7 @@ export function readProjectUpdateNotices(storage, key) {
 const timestamp = value => Date.parse(value || '') || 0;
 export function observeProjectUpdate(notices, event, browserID) {
   const {projectID, domain, version, updatedAt, sourceClientID, local = false, manual = false, details, project, previousProject} = event;
-  if (!projectID || !['project', 'artifacts'].includes(domain) || !Number.isFinite(version) || !timestamp(updatedAt)) return notices;
+  if (!projectID || !['project', 'artifacts', 'sync', 'research'].includes(domain) || !Number.isFinite(version) || !timestamp(updatedAt)) return notices;
   const current = notices[projectID] || {domains: {}};
   const prior = current.domains?.[domain];
   if (prior && (version < prior.version || version === prior.version && (!manual || prior.pending))) return notices;
@@ -27,7 +27,7 @@ export function observeProjectUpdate(notices, event, browserID) {
 }
 export function projectUpdateNotice(notices, projectID) {
   const domains = notices[projectID]?.domains || {};
-  const pending = Object.fromEntries(Object.entries(domains).filter(([domain,value]) => ['project', 'artifacts'].includes(domain) && value?.pending));
+  const pending = Object.fromEntries(Object.entries(domains).filter(([domain,value]) => ['project', 'artifacts', 'sync', 'research'].includes(domain) && value?.pending));
   const updatedAt = Object.values(pending).map(value => value.updatedAt).sort((a,b)=>timestamp(b)-timestamp(a))[0];
   return updatedAt ? {updatedAt, domains: pending, reviewRequired: notices[projectID]?.reviewRequired === true} : null;
 }

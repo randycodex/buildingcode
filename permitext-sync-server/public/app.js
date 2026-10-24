@@ -1,10 +1,11 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-related-provisions-v1350";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-return-sync-v1351";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=1";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
+import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
-import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=7";
+import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=8";
 import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=9';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=5";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=6";
@@ -14,7 +15,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=24";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-related-provisions-v1350";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-return-sync-v1351";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -146,7 +147,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-related-provisions-v1350";
+} from "./offline-storage.js?v=20261024-return-sync-v1351";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -636,6 +637,9 @@ let projectArtifactCheckpointPromise = null;
 let projectArtifactCheckpointPending = false;
 const projectArtifactRevisions = new Map();
 const accountArtifactRevisions = new Map();
+const returnSyncArtifactRevisions = new Map();
+const returnSyncContentReceipts = new Map();
+let returnSyncCheckPromise = null;
 let projectArtifactConsumerRefreshQueue = Promise.resolve();
 let continuityPushTimer = null;
 let draggedPaneID = "";
@@ -1404,7 +1408,7 @@ function writeProjectUpdateRecords(records) {
 function canonicalUpdateProjectID(projectID) {
   const project = (syncedContent?.summary?.projects || []).find(item =>
     [item.id, item.clientID, item.localFolderID].map(String).includes(String(projectID)));
-  return project ? projectRecordID(project) : String(projectID || "");
+  return project ? projectRecordID(project) : String(projectID || "__account__");
 }
 function rememberProjectUpdate(event) {
   if (!activeAccount() || detachedProjectWindow) return;
@@ -1416,7 +1420,7 @@ function rememberProjectUpdate(event) {
   } catch (error) { console.warn("Project update indicator could not be saved.", error?.name || "Error"); }
 }
 function pendingProjectUpdate(projectID = activeWorkspaceRecord()?.projectID) {
-  if (!activeAccount() || !projectID || detachedProjectWindow) return null;
+  if (!activeAccount() || detachedProjectWindow) return null;
   return projectUpdateNotice(projectUpdateRecords(), canonicalUpdateProjectID(projectID));
 }
 function requirePendingProjectUpdateReview() {
@@ -1480,9 +1484,9 @@ function renderProjectUpdateBadge() {
   // The indicator reads account-scoped local metadata; pane access is verified separately.
   const notice = hasCapability("projects") ? pendingProjectUpdate(project?.projectID) : null;
   if (!automaticContentUpdatesEnabled) {
-    button.hidden = !activeAccount() || Boolean(detachedProjectWindow);
     const key = projectUpdateRuntimeKey(project?.projectID);
     const syncing = projectUpdatesApplying.has(key);
+    button.hidden = !activeAccount() || Boolean(detachedProjectWindow) || !notice && !syncing;
     button.disabled = syncing || navigator.onLine === false;
     button.classList.toggle("is-syncing", syncing);
     button.setAttribute("aria-busy", String(syncing));
@@ -1577,6 +1581,10 @@ async function applyPendingProjectUpdates({automatic = false, checkForUpdates = 
     if (pending.domains.artifacts && project) {
       await refreshProjectArtifactConsumers(projectDetailKey(project), pending.domains.artifacts.details || [], {shouldApply,strict:true});
     }
+    if (pending.domains.research) {
+      await refreshVisibleResearchArtifactConsumers({shouldApply});
+    }
+    if (pending.domains.sync && Number(syncedContent?.latestEventID || 0) < pending.domains.sync.version) return false;
     if (!shouldApply()) return false;
     if (pending.domains.project && projectDetailsScreen?.isOpen()) {
       const presentation = projectDetailsScreen.getPresentationState();
@@ -1586,6 +1594,7 @@ async function applyPendingProjectUpdates({automatic = false, checkForUpdates = 
     }
     if (!shouldApply()) return false;
     writeProjectUpdateRecords(acknowledgeProjectUpdates(projectUpdateRecords(), projectID, pending.domains));
+    acknowledgeReturnSyncRevisions(pending, projectID);
     projectUpdateReviewRequired.delete(key);
     saveWorkspaceState();
     return true;
@@ -9228,7 +9237,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   workboardMounts.clear();
   [legacyHydrationByProject, coordinationComposerDraftByProject, pendingNotebookCardByProject,
     pendingReportDraftByProject, reportDraftFocusResultByProject,
-    projectArtifactRevisions, accountArtifactRevisions, projectSelectionControllers].forEach((map) => map.clear());
+    projectArtifactRevisions, accountArtifactRevisions, returnSyncArtifactRevisions, returnSyncContentReceipts, projectSelectionControllers].forEach((map) => map.clear());
   annotationPushTimers.forEach((timer) => clearTimeout(timer));
   annotationPushTimers.clear();
   clearTimeout(continuityPushTimer);
@@ -9236,6 +9245,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   syncLoadPromise = null;
   syncFlushPromise = null;
   foregroundSyncPromise = null;
+  returnSyncCheckPromise = null;
   notebookDraftSyncPromise = null;
   notebookPendingDraftCount = 0;
   notebookPendingDraftAttentionAt = Infinity;
@@ -13246,6 +13256,12 @@ async function flushSyncOutbox(options = {}) {
         }, { token: account.sessionToken });
         latestPayload = payload;
         const accepted = new Set(payload.acceptedMutationIDs || []);
+        for (const item of entries.filter(item => accepted.has(item.recordID))) {
+          const record = Object.values(item.mutation)[0];
+          returnSyncContentReceipts.set(record?.id || item.recordID, {
+            updatedAt:record?.updatedAt, eventID:Number(payload.latestEventID || 0)
+          });
+        }
         const rejected = new Set(payload.rejectedMutationIDs || []);
         acceptedMutationIDs.push(...accepted);
         rejectedMutationIDs.push(...rejected);
@@ -13671,6 +13687,86 @@ function markForegroundSyncActivity() {
   foregroundSyncLastActivityAt = Date.now();
 }
 
+function returnSyncRevisionKey(envelope) {
+  return [activeAccount()?.userID, activeWorkspaceID, envelope.storageOwnerUserID,
+    envelope.projectID || "account"].join("::");
+}
+
+function rememberReturnSyncRevision(envelope, options = {}) {
+  if (!envelope?.storageOwnerUserID) return;
+  const key = returnSyncRevisionKey(envelope);
+  returnSyncArtifactRevisions.set(key, observeReturnRevision(returnSyncArtifactRevisions.get(key), envelope.revision, options));
+}
+
+function hasNewReturnArtifact(envelope) {
+  const key = returnSyncRevisionKey(envelope);
+  const prior = returnSyncArtifactRevisions.get(key);
+  // A first-seen revision predating our initial server snapshot is a baseline,
+  // not evidence of an edit made elsewhere since this view was opened.
+  if (!prior && Date.parse(envelope.updatedAt || "") <= Date.parse(syncedContent?.pulledAt || "")) {
+    rememberReturnSyncRevision(envelope);
+    return false;
+  }
+  return returnRevisionIsNewer(prior, envelope.revision);
+}
+
+function acknowledgeReturnSyncRevisions(pending, projectID) {
+  for (const [key, revision] of returnSyncArtifactRevisions) {
+    if (!key.startsWith(`${activeAccount()?.userID}::${activeWorkspaceID}::`)) continue;
+    const projectKey = key.endsWith(`::${projectID}`);
+    const version = projectKey ? pending.domains.artifacts?.version : key.endsWith("::account") ? pending.domains.research?.version : null;
+    if (version !== undefined && version !== null) returnSyncArtifactRevisions.set(key, acknowledgeReturnRevision(revision, version));
+  }
+}
+
+async function checkUpdatesOnReturn() {
+  if (!canRunForegroundSync() || !["connected", "offline"].includes(syncedContent?.status)) return false;
+  if (returnSyncCheckPromise) return returnSyncCheckPromise;
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const projectID = canonicalUpdateProjectID(activeWorkspaceRecord()?.projectID);
+  const shouldApply = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID && canRunForegroundSync();
+  const request = (async () => {
+    // Pending uploads may finish normally. Detection itself never saves, pulls,
+    // opens a dialog, or replaces an editor.
+    if (syncFlushPromise) await syncFlushPromise.catch(() => {});
+    if (syncLoadPromise) await syncLoadPromise.catch(() => {});
+    if (!shouldApply()) return false;
+    const scope = currentProjectArtifactScope();
+    const ids = [...new Set([...scope.visibleProjectIDs,
+      ...(activeWorkspaceRecord()?.projectID ? [activeWorkspaceRecord().projectID] : [])])];
+    const payload = await postResearch("/projects/artifacts/checkpoint", {
+      projectIDs:ids, includeAccountResearch:scope.researchVisible,
+      includeContentChanges:true, sinceEventID:Number(syncedContent?.latestEventID || 0)
+    });
+    if (!shouldApply()) return false;
+    const known = new Map((syncedContent?.mutations || []).map(mutation => {
+      const record = Object.values(mutation)[0];
+      return [record?.id || syncMutationRecordID(mutation), record?.updatedAt];
+    }));
+    for (const [key, receipt] of returnSyncContentReceipts) {
+      if (receipt.eventID > Number(syncedContent?.latestEventID || 0)) known.set(key, receipt.updatedAt);
+    }
+    if (hasNewReturnContent(payload.contentChanges, known)) {
+      rememberProjectUpdate({projectID, domain:"sync", version:payload.contentChanges.latestEventID,
+        updatedAt:payload.checkedAt, manual:true});
+    }
+    for (const envelope of payload.projects || []) {
+      if (!ids.includes(envelope.projectID)) continue;
+      if (hasNewReturnArtifact(envelope)) {
+        rememberProjectUpdate({projectID:envelope.projectID, domain:"artifacts", version:envelope.revision,
+          updatedAt:envelope.updatedAt, details:envelope.domains, manual:true});
+      }
+    }
+    if (scope.researchVisible && payload.account && hasNewReturnArtifact(payload.account)) {
+      rememberProjectUpdate({projectID, domain:"research", version:payload.account.revision,
+        updatedAt:payload.account.updatedAt, manual:true});
+    }
+    return true;
+  })().catch(() => false).finally(() => { if (returnSyncCheckPromise === request) returnSyncCheckPromise = null; });
+  returnSyncCheckPromise = request;
+  return request;
+}
+
 function foregroundSyncLeaseKey(accountUserID = activeAccount()?.userID || "") {
   return `${foregroundSyncLeaseKeyPrefix}${accountUserID}`;
 }
@@ -13849,7 +13945,10 @@ async function applyAccountArtifactRevisionEnvelope(envelope, options = {}) {
     scope
   });
   if (!result.accepted) return result;
-  if (result.refreshResearch) {
+  if (result.refreshResearch && options.manual) {
+    rememberProjectUpdate({projectID:activeWorkspaceRecord()?.projectID, domain:"research",
+      version:result.accepted.revision, updatedAt:result.accepted.updatedAt, manual:true});
+  } else if (result.refreshResearch) {
     await enqueueProjectArtifactConsumerRefresh(
       () => refreshVisibleResearchArtifactConsumers(options)
     );
@@ -13938,7 +14037,7 @@ async function applyProjectArtifactRevisionEnvelopes(envelopes = [], options = {
   return result;
 }
 
-function observeLocalProjectArtifactRevisions(payload) {
+function observeLocalProjectArtifactRevisions(payload, options = {}) {
   const projects = payload?.projects;
   const scope = currentProjectArtifactScope();
   const accountEnvelope = payload?.account
@@ -13948,6 +14047,7 @@ function observeLocalProjectArtifactRevisions(payload) {
       }, scope)
     : null;
   if (accountEnvelope?.storageOwnerUserID) {
+    rememberReturnSyncRevision(accountEnvelope, options);
     const key = accountArtifactRevisionKey(accountEnvelope);
     const previous = accountArtifactRevisions.get(key);
     if (automaticContentUpdatesEnabled && (!previous || accountEnvelope.revision > Number(previous.revision || 0))) {
@@ -13959,6 +14059,7 @@ function observeLocalProjectArtifactRevisions(payload) {
     storageOwnerUserID: project.storageOwnerUserID || payload.storageOwnerUserID
   }, scope));
   envelopes.forEach((envelope) => {
+    rememberReturnSyncRevision(envelope, options);
     rememberProjectUpdate({projectID:envelope.projectID,domain:"artifacts",version:envelope.revision,updatedAt:envelope.updatedAt,local:true,details:envelope.domains});
     if (!envelope.storageOwnerUserID || !envelope.projectID) return;
     const key = [
@@ -22958,7 +23059,9 @@ async function postResearch(path, values = {}) {
     researchHistoryPageReaders.forEach((read) => read.invalidate());
     refreshResearchUsage.invalidate();
   }
-  if (payload?.artifactRevisions) observeLocalProjectArtifactRevisions(payload.artifactRevisions);
+  if (payload?.artifactRevisions) observeLocalProjectArtifactRevisions(payload.artifactRevisions, {
+    write:!['get', 'list', 'hub', 'bootstrap', 'checkpoint'].includes(path.split('/').at(-1))
+  });
   return payload;
 }
 
@@ -48811,6 +48914,9 @@ async function start() {
   void flushPendingSyncAndRender().catch(() => {});
   void flushCodeQuestionOutbox().catch(() => {});
   startForegroundSyncLoop();
+  bindReturnSyncChecks({window, document, check:checkUpdatesOnReturn,
+    context:() => `${activeAccount()?.userID || ""}:${accountRuntimeGeneration}:${activeWorkspaceID}`,
+    eligible:() => canRunForegroundSync() && ["connected", "offline"].includes(syncedContent?.status)});
   await refreshEntitlementAfterCheckoutReturn();
   await setupAccountProfile().catch(error => console.warn("Profile setup unavailable", error));
   await resumePendingResearchIntent();

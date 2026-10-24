@@ -19,7 +19,7 @@ for(const [syncing,online] of [[false,true],[true,true],[false,false]]) {
   activeWorkspaceRecord:()=>({projectID:'p',name:'Test project'}),hasCapability:()=>false,activeAccount:()=>({userID:'u'}),detachedProjectWindow:false,
   projectUpdateRuntimeKey:()=> 'u:p',projectUpdatesApplying:new Set(syncing?['u:p']:[])});
  vm.runInContext(actual('renderProjectUpdateBadge'),c);c.renderProjectUpdateBadge();
- assert.equal(button.hidden,false);assert.equal(button.disabled,syncing||!online);
+ assert.equal(button.hidden,!syncing);assert.equal(button.disabled,syncing||!online);
  assert.equal(classes.has('is-syncing'),syncing);assert.equal(attributes['aria-busy'],String(syncing));
  assert.equal(button.title,!online?'Connect to the internet to sync':`${syncing?'Syncing':'Sync project changes'} · Test project`);
 }
@@ -29,7 +29,7 @@ for(const [syncing,online] of [[false,true],[true,true],[false,false]]) {
 for(const changed of [false,true]) {
  const calls=[];
  const content={status:'ready',latestEventID:7,contentMapVersion:9,entitlementFingerprint:'pro'};
- const c=vm.createContext({canRunForegroundSync:()=>true,foregroundSyncPromise:null,
+ const c=vm.createContext({publicCodeRevision:{probe(){}},canRunForegroundSync:()=>true,foregroundSyncPromise:null,
   captureAccountRequest:()=>1,requireCurrentAccountRequest(){},isCurrentAccountRequest:()=>true,activeAccount:()=>({userID:'u',sessionToken:'token'}),
   syncedContent:content,syncLoadPromise:null,foregroundSyncLastFullPullAt:0,foregroundSyncSchedule,syncCheckpointRequiresFullPull,
   flushPendingNotebookImages:async()=>{},flushPendingNotebookDrafts:async()=>{},flushSyncOutbox:async()=>({}),syncResultChangesWorkspace:()=>false,
@@ -47,7 +47,7 @@ for(const changed of [false,true]) {
  const envelope=revision=>normalizeProjectArtifactRevisionEnvelope({projectID:'p',storageOwnerUserID:'u',revision,domains:['notebook'],updatedAt:`2026-10-24T04:00:0${revision}Z`},scope);
  let stored=observeProjectUpdate({}, {...event(1),local:true}, 'here');
  const revisions=new Map([[projectArtifactRevisionKey(envelope(1)),envelope(1)]]);
- const c=vm.createContext({automaticContentUpdatesEnabled,projectArtifactRevisions:revisions,accountArtifactRevisions:new Map(),
+ const c=vm.createContext({rememberReturnSyncRevision(){},automaticContentUpdatesEnabled,projectArtifactRevisions:revisions,accountArtifactRevisions:new Map(),
   currentProjectArtifactScope:()=>scope,normalizeProjectArtifactRevisionEnvelope,normalizeAccountArtifactRevisionEnvelope,accountArtifactRevisionKey,reduceProjectArtifactRevisions,
   broadcastForegroundSyncSignal(){},pendingProjectUpdate:()=>projectUpdateNotice(stored,'p'),
   rememberProjectUpdate:change=>stored=observeProjectUpdate(stored,change,'here'),
@@ -91,7 +91,7 @@ function harness(scenario='changed') {
   activeWorkspaceID:'w',activeWorkspaceRecord:()=>({projectID:'p'}),canonicalUpdateProjectID:x=>x,projectUpdateRuntimeKey:()=> 'u:p',
   captureAccountRequest:()=>({userID:'u'}),isCurrentAccountRequest:()=>current,canRunForegroundSync:()=>scenario!=='offline',
   pendingProjectUpdate:()=>projectUpdateNotice(stored,'p'),projectUpdateRecords:()=>stored,writeProjectUpdateRecords:next=>stored=next,
-  acknowledgeProjectUpdates,renderProjectUpdateBadge(){},workspaceProject:()=>({id:'p'}),projectDetailKey:p=>p.id,projectDetailsScreen:null,
+  acknowledgeProjectUpdates,acknowledgeReturnSyncRevisions(){},renderProjectUpdateBadge(){},workspaceProject:()=>({id:'p'}),projectDetailKey:p=>p.id,projectDetailsScreen:null,
   requirePendingProjectUpdateReview(){stored=requireProjectUpdateReview(stored,'p');},
   confirmWorkspaceTransition:async()=>{calls.push('confirm');return scenario!=='cancel';},
   performForegroundSync:async options=>{calls.push('sync-check');assert(options.shouldApply());

@@ -35,6 +35,9 @@ const researchWorkflowEnabled = researchWorkflowOption === "true";
 const auditObserverOption = option("--audit-observer", "false");
 assert.ok(["true", "false"].includes(auditObserverOption));
 const auditObserverEnabled = auditObserverOption === "true";
+const recordRequestsOption = option("--record-requests", "false");
+assert.ok(["true", "false"].includes(recordRequestsOption));
+const recordRequestsEnabled = recordRequestsOption === "true";
 const auditSamples = [];
 const outageSelfTest = option("--self-test-outage", "false");
 assert.ok(["true", "false"].includes(outageSelfTest));
@@ -303,7 +306,7 @@ const server = createServer(async (request, response) => {
       return json(response, 403, { error: "Research disabled in performance fixture" });
     }
     const started = performance.now();
-    if (ready && (controlledRoutes.has(url.pathname) || auditObserverEnabled)) {
+    if (ready && (controlledRoutes.has(url.pathname) || auditObserverEnabled || recordRequestsEnabled)) {
       response.once("finish", () => {
         timings.push({ route: url.pathname, status: response.statusCode, milliseconds: Number((performance.now() - started).toFixed(2)) });
         if (timings.length > 500) timings.shift();

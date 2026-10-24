@@ -1,4 +1,4 @@
-// Content is downloaded on opening a view or explicitly clicking UPDATE.
+// Content is downloaded on opening a view or explicitly clicking SYNC.
 // Saving local edits remains automatic; no recurring update checks are scheduled.
 export const automaticContentUpdatesEnabled = false;
 

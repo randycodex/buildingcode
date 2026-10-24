@@ -19,7 +19,7 @@ function harness(scenario='idle') {
   activeWorkspaceID:'w',activeWorkspaceRecord:()=>({projectID:'p'}),canonicalUpdateProjectID:x=>x,projectUpdateRuntimeKey:()=> 'u:p',
   captureAccountRequest:()=>({userID:'u'}),isCurrentAccountRequest:()=>current,projectUpdateAutoApplyBlocker:()=>blocker,
   pendingProjectUpdate:()=>projectUpdateNotice(stored,'p'),projectUpdateRecords:()=>stored,writeProjectUpdateRecords:next=>stored=next,
-  acknowledgeProjectUpdates,renderProjectUpdateBadge(){},workspaceProject:()=>({id:'p'}),projectDetailKey:p=>p.id,projectDetailsScreen:null,
+  acknowledgeProjectUpdates,acknowledgeReturnSyncRevisions(){},renderProjectUpdateBadge(){},workspaceProject:()=>({id:'p'}),projectDetailKey:p=>p.id,projectDetailsScreen:null,
   requirePendingProjectUpdateReview(){c.projectUpdateReviewRequired.add('u:p');stored=requireProjectUpdateReview(stored,'p');},
   confirmWorkspaceTransition:async()=>{calls.push('confirm');return scenario!=='cancel';},
   refreshSyncedWorkspaceInPlace:()=>assert.fail('Note-only updates must not refresh the whole Project'),

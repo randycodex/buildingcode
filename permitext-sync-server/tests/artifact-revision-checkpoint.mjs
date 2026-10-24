@@ -207,6 +207,22 @@ async function main() {
       assert.deepEqual(checkpoint.json.projects[0].domains, ["activity", "foundation", "notebook"]);
     }
 
+    const returnCheck = await request("/projects/artifacts/checkpoint", {
+      token: owner.token,
+      body: authenticated(owner, {projectIDs:[projectID], includeContentChanges:true, sinceEventID:0})
+    });
+    assert.equal(returnCheck.response.status,200);
+    assert.equal(returnCheck.json.projects[0].revision,1);
+    assert(returnCheck.json.contentChanges.records.length > 0);
+    for (const record of returnCheck.json.contentChanges.records) {
+      assert.deepEqual(Object.keys(record).sort(),['recordID','updatedAt']);
+    }
+    const invalidReturnCheck = await request("/projects/artifacts/checkpoint", {
+      token: owner.token,
+      body: authenticated(owner, {projectIDs:[projectID], includeContentChanges:true, sinceEventID:-1})
+    });
+    assert.equal(invalidReturnCheck.response.status,400);
+
     const staleSave = await request("/notebook/cards/save", {
       token: editor.token,
       body: authenticated(editor, {

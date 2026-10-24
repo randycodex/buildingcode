@@ -1253,6 +1253,17 @@ export function createFileStoreAdapter() {
       const store = await this.read();
       return Number(store.syncRevisionsByUserID?.[userID] || 0);
     },
+    async contentChangeVersions(userID, sinceEventID) {
+      const store = await this.read();
+      const latestEventID = Number(store.syncRevisionsByUserID?.[userID] || 0);
+      // The file adapter has an account cursor, rather than per-record events.
+      // Return compact stamps; the client compares them with its loaded records.
+      const records = latestEventID <= sinceEventID ? [] : (store.mutationsByUserID?.[userID] || [])
+        .filter(mutation => !mutation.continuity && !mutation.workboard)
+        .map(mutation => ({recordID:normalizedMutationRecordID(mutation),
+          updatedAt:mutationKindAndRecord(mutation).record.updatedAt}));
+      return {latestEventID, records};
+    },
     async accountExists(userID) {
       const store = await this.read();
       return Boolean(store.users?.[userID]);
@@ -3998,6 +4009,27 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
       return latestEventID(userID);
+    },
+    async contentChangeVersions(userID, sinceEventID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      // Project/Note bodies and history never leave the database for this check.
+      // The existing user/event and user/record/event indexes bound the lookup.
+      const rows = await sql`
+        SELECT records.record_id, records.updated_at
+        FROM permitext_user_content_records AS records
+        WHERE records.user_id = ${userID}
+          AND records.entity_kind NOT IN ('continuity', 'workboard')
+          AND EXISTS (
+            SELECT 1 FROM permitext_sync_events AS events
+            WHERE events.user_id = ${userID} AND events.record_id = records.record_id
+              AND events.event_id > ${sinceEventID}
+          )
+        ORDER BY records.record_id
+      `;
+      return {latestEventID:await latestEventID(userID), records:rows.map(row => ({
+        recordID:row.record_id, updatedAt:new Date(row.updated_at).toISOString()
+      }))};
     },
     async mutationsAfterEventID(userID, sinceEventID) {
       await ensureSchema();
@@ -17855,12 +17887,18 @@ async function handleProjectArtifactCheckpoint(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
   const includeAccountResearch = context.body.includeAccountResearch === true;
+  const includeContentChanges = context.body.includeContentChanges === true;
+  const sinceEventID = Number(context.body.sinceEventID);
+  if (includeContentChanges && (!Number.isSafeInteger(sinceEventID) || sinceEventID < 0)) {
+    sendError(response, 400, "Provide a valid content event cursor.");
+    return;
+  }
   const projectIDs = Array.from(new Set((Array.isArray(context.body.projectIDs)
     ? context.body.projectIDs
     : [context.body.projectID])
     .map((value) => String(value || "").trim())
     .filter(Boolean)));
-  if ((!projectIDs.length && !includeAccountResearch) || projectIDs.length > 50) {
+  if ((!projectIDs.length && !includeAccountResearch && !includeContentChanges) || projectIDs.length > 50) {
     sendError(response, 400, "Provide between 1 and 50 Project IDs, or request the account Research revision.");
     return;
   }
@@ -17881,12 +17919,15 @@ async function handleProjectArtifactCheckpoint(request, response) {
       access.projectID
     ]);
   }
-  const [states, accountState] = await Promise.all([
+  const [states, accountState, contentChanges] = await Promise.all([
     Promise.all(Array.from(projectIDsByStorageOwner, ([storageOwnerUserID, ids]) =>
       storedArtifactRevisionState(storageOwnerUserID, { projectIDs: ids })
     )),
     includeAccountResearch
       ? storedArtifactRevisionState(context.userID, { account: true })
+      : Promise.resolve(null),
+    includeContentChanges
+      ? (await storeAdapter()).contentChangeVersions(context.userID, sinceEventID)
       : Promise.resolve(null)
   ]);
   const revisionsByProjectID = new Map(states.flatMap((state) =>
@@ -17898,6 +17939,7 @@ async function handleProjectArtifactCheckpoint(request, response) {
   sendJSON(response, 200, {
     schemaVersion: 1,
     checkedAt: new Date().toISOString(),
+    ...(includeContentChanges ? {contentChanges} : {}),
     ...(includeAccountResearch ? {
       account: accountState?.account
         ? { ...accountState.account, storageOwnerUserID: context.userID }
