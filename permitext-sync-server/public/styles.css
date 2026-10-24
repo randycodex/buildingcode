@@ -21010,6 +21010,20 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workflow-layout-actions > .toolbar-button:disabled { opacity: .35; cursor: default; }
 
 .report-note-update-status { padding: 3px 8px; border-radius: var(--radius-pill); background: var(--toolbar-active); color: var(--text-primary); font-size: 11px; }
+.settings-conversation-controls { display: grid; gap: 12px; padding-block: 12px; }
+.settings-conversation-controls :is(select, input[type="search"]) { box-sizing: border-box; width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text-primary); font: inherit; font-size: 12px; }
+.settings-conversation-chooser { display: grid; gap: 8px; }
+.settings-conversation-chooser[hidden] { display: none; }
+.settings-conversation-list { display: grid; max-height: 280px; overflow-y: auto; gap: 0; }
+.settings-conversation-choice { display: flex; gap: 8px; align-items: start; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 300; }
+.settings-conversation-choice input { flex: 0 0 auto; margin-top: 2px; }
+.settings-conversation-choice small { color: var(--text-secondary); }
+.settings-conversation-delete-status { margin: 0; font-size: 12px; color: var(--text-secondary); }
+.settings-conversation-controls button { font-weight: 300; }
+.settings-conversation-selection-tools { display: flex; flex-wrap: wrap; gap: 12px; }
+.research-deletion-confirmation .web-warning-message { white-space: pre-line; font-size: 13px; }
+.research-deletion-confirmation .web-warning-button { font-weight: 300; }
+.web-warning-backdrop.is-column-scoped > .web-warning-dialog.research-deletion-confirmation { width: min(550px, 100%); }
 .report-note-update-status[hidden] { display: none; }
 .web-warning-dialog:has(.report-note-comparison) { width: min(960px, 100%); }
 .report-note-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-block: 20px; }

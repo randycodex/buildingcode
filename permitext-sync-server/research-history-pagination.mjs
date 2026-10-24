@@ -5,7 +5,8 @@ function invalidHistory(message, code = "INVALID_RESEARCH_HISTORY_QUERY") {
 }
 
 export function researchHistoryOptions(body, userID) {
-  if (!["limit", "cursor", "q", "projectID"].some(key => Object.hasOwn(body, key))) return null;
+  if (!["limit", "cursor", "q", "projectID", "includeHidden"].some(key => Object.hasOwn(body, key))) return null;
+  if (body.includeHidden !== undefined && typeof body.includeHidden !== 'boolean') throw invalidHistory('Choose whether to include hidden conversations.');
   const limit = body.limit === undefined ? 30 : body.limit;
   if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
     throw invalidHistory("History page size must be an integer from 1 to 100.");
@@ -21,8 +22,9 @@ export function researchHistoryOptions(body, userID) {
   const projectID = projectFiltered ? body.projectID.trim() : null;
   // This cursor is a position, never an authorization token. Every query still
   // requires the authenticated owner. Hash the scope to avoid exposing its ID.
-  const scope = createHash("sha256").update(JSON.stringify([1, userID, q, projectID])).digest("base64url");
-  const options = { limit, q, projectID, scope, after: null };
+  const includeHidden = body.includeHidden === true;
+  const scope = createHash("sha256").update(JSON.stringify([1, userID, q, projectID, ...(includeHidden ? [true] : [])])).digest("base64url");
+  const options = { limit, q, projectID, scope, after: null, includeHidden };
   if (body.cursor !== undefined && body.cursor !== null && body.cursor !== "") {
     try {
       if (typeof body.cursor !== "string" || body.cursor.length > 2048 || !/^[A-Za-z0-9_-]+$/.test(body.cursor)) throw Error();
@@ -49,7 +51,7 @@ function originalQuestion(conversation) {
 
 export function researchHistoryFileRows(conversations, options, projectSummary) {
   return conversations
-    .filter(conversation => !conversation.historyHiddenAt &&
+    .filter(conversation => (options.includeHidden || !conversation.historyHiddenAt) &&
       (options.projectID === null || String(conversation.primaryProjectID || "") === options.projectID) &&
       (!options.q || [conversation.title || "", originalQuestion(conversation)].some(value => String(value).toLowerCase().includes(options.q))))
     .map(conversation => ({ conversation, sortDate: new Date(Number.isFinite(Date.parse(conversation.createdAt)) ? conversation.createdAt : 0).toISOString() }))
@@ -66,7 +68,7 @@ export function researchHistoryFileRows(conversations, options, projectSummary) 
 export function researchHistoryPageQuery(userID, options) {
   const values = [userID];
   const bind = value => { values.push(value); return `$${values.length}`; };
-  const conditions = ["user_id = $1", "COALESCE(conversation->>'historyHiddenAt', '') = ''"];
+  const conditions = ["user_id = $1", ...(options.includeHidden ? [] : ["COALESCE(conversation->>'historyHiddenAt', '') = ''"])];
   if (options.projectID !== null) conditions.push(`COALESCE(conversation->>'primaryProjectID', '') = ${bind(options.projectID)}`);
   const questionSQL = `COALESCE(NULLIF(BTRIM(conversation->>'starterQuestion'), ''), (
     SELECT NULLIF(BTRIM(message->>'question'), '') FROM jsonb_array_elements(

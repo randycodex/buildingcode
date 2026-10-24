@@ -1,5 +1,6 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-research-history-v1336";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-conversation-deletion-v1340";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
+import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
 import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=7";
@@ -13,7 +14,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-research-history-v1336";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-conversation-deletion-v1340";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -145,7 +146,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-research-history-v1336";
+} from "./offline-storage.js?v=20261024-conversation-deletion-v1340";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -7326,6 +7327,7 @@ function openWebWarning({
   container = null,
   scope = null,
   content = null,
+  className = '',
   choices = [],
   choiceLabel = "Destination Report"
 }) {
@@ -7337,6 +7339,7 @@ function openWebWarning({
   backdrop.className = "web-warning-backdrop";
   const dialog = document.createElement("section");
   dialog.className = "web-warning-dialog";
+  if (className) dialog.classList.add(className);
   if (choices.length) dialog.classList.add("is-report-destination");
   dialog.tabIndex = -1;
   dialog.setAttribute("role", "alertdialog");
@@ -22911,7 +22914,7 @@ async function postResearch(path, values = {}) {
   requireCurrentAccountRequest(identity);
   const payload = await postJSON(path, { ...values, auth: { accountUserID: account.userID } }, { token: account.sessionToken });
   requireCurrentAccountRequest(identity);
-  if (path.startsWith("/research/conversations/") && !["/research/conversations/list", "/research/conversations/get"].includes(path)) {
+  if (path.startsWith("/research/conversations/") && !["/research/conversations/list", "/research/conversations/get", "/research/conversations/delete-preview"].includes(path)) {
     readResearchConversationList.invalidate();
     researchHistoryPageReaders.forEach((read) => read.invalidate());
     refreshResearchUsage.invalidate();
@@ -40549,7 +40552,8 @@ function organizeAccountSettings(panel) {
   const trash = data?.querySelector(".settings-trash");
   const projects = data?.querySelector(".settings-project-management");
   const deleteContent = data?.querySelector(".settings-delete-content");
-  data?.append(...[projects, deleteContent, trash].filter(Boolean));
+  const conversations = data?.querySelector('.settings-conversations');
+  data?.append(...[projects, deleteContent, conversations, trash].filter(Boolean));
   scroll.replaceChildren(account, library, recovery);
   columnResizers = createSettingsColumnResizers(scroll, [account, library, recovery], state.settingsColumnWidths, (widths) => {
     state.settingsColumnWidths = widths;
@@ -40888,11 +40892,83 @@ let libraryDownloadError = "";
 let libraryDownloadProgress = null;
 const libraryDownloadProgressEvent = "permitext:library-download-progress";
 
+async function refreshAfterResearchDeletion(result, identity) {
+  requireCurrentAccountRequest(identity);
+  const ids = new Set(result.conversationIDs);
+  const refreshPaneIDs = ['utility:analysis'];
+  researchOpenGeneration += 1;
+  for (const id of ids) {
+    activeResearchProgress.get(id)?.controller?.abort();
+    activeResearchProgress.delete(id);
+    removeResearchRequestRecovery(localStorage, {accountUserID:identity.userID, conversationID:id});
+    supplementalResearchConversations.delete(id);
+    const paneID = paneIDForResearchConversation(id);
+    researchNewChatDrafts.delete(paneID);
+    researchNewChatDrafts.delete(`followup:${id}`);
+    state.paneOrder = (state.paneOrder || []).filter(value => value !== paneID);
+    delete state.paneWeights[paneID];
+    if (state.researchEvidenceSplitRatios) delete state.researchEvidenceSplitRatios[id];
+  }
+  supplementalResearchConversationIDs.splice(0, supplementalResearchConversationIDs.length,
+    ...supplementalResearchConversationIDs.filter(id => !ids.has(id)));
+  if (ids.has(state.researchConversationID)) {
+    state.researchConversationID = '';
+    activeResearchConversation = null;
+    researchQuestionDraft = '';
+    researchNewChatDrafts.delete('utility:analysis');
+  }
+  for (const instance of state.utilityInstances || []) {
+    if (instance.key !== 'analysis' || !ids.has(instance.conversationID)) continue;
+    instance.conversationID = '';
+    instance.draft = '';
+    const paneID = paneIDForUtilityInstance(instance);
+    researchNewChatDrafts.delete(paneID);
+    researchDraftPaneIDs.add(paneID);
+    refreshPaneIDs.push(paneID);
+  }
+  for (const group of state.columnGroups || []) {
+    for (const [paneID, column] of Object.entries(group.columns || {})) {
+      if (!ids.has(column.value?.conversationID) || !['research','utility'].includes(column.kind)) continue;
+      delete group.columns[paneID];
+      group.paneIDs = (group.paneIDs || []).filter(value => value !== paneID);
+    }
+  }
+  researchConversationList = researchConversationList.filter(row => !ids.has(row.id));
+  readResearchConversationList.invalidate();
+  researchHistoryPageReaders.clear();
+  saveWorkspaceState();
+  await refreshResearchConversationList();
+  requireCurrentAccountRequest(identity);
+  await refreshResearchProjectAssignmentConsumers(result.projectIDs);
+  requireCurrentAccountRequest(identity);
+  await transitionWorkspace('utility', {refreshPaneIDs});
+}
+
 function renderSettings({ upgrade = false } = {}) {
   const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
   wireSettingsActiveCodeSources(panel, { enabled: true, collapsibleGroups: true });
   applyPaneWeight(panel, "utility:settings");
+  const conversations = panel.querySelector('.settings-conversations');
+  conversations?.addEventListener('toggle', () => {
+    if (!conversations.open || conversations.dataset.mounted) return;
+    const root = conversations.querySelector('.settings-conversation-controls');
+    if (!activeAccount() || !isCurrentAccountRequest(settingsIdentity) || !workspacePrivatePresentationAllowed()) {
+      root.textContent = 'Sign in to manage your conversations.';
+      return;
+    }
+    conversations.dataset.mounted = 'true';
+    const project = workspaceProject();
+    mountResearchDeleteControls(root, {
+      request:postResearch,
+      confirm:(title, message, options) => confirmWebWarning(title, message, {...options, container:panel}),
+      isCurrent:() => panel.isConnected && isCurrentAccountRequest(settingsIdentity) && workspacePrivatePresentationAllowed(),
+      project:project ? {id:projectDetailKey(project), name:project.name} : null,
+      currentProjectID:researchWorkspaceProjectID,
+      beforeDelete:ids => ids.forEach(id => activeResearchProgress.get(id)?.controller?.abort()),
+      onDeleted:result => refreshAfterResearchDeletion(result, settingsIdentity)
+    });
+  });
   const manageProjects = panel.querySelector(".settings-project-management");
   manageProjects?.addEventListener("toggle", () => {
     if (!manageProjects.open) return;

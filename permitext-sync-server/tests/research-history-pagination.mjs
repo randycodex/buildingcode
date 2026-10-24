@@ -54,6 +54,9 @@ try {
   const legacy = await list();
   assert.deepEqual(Object.keys(legacy), ["conversations"], "Unmodified callers keep the original response shape");
   assert.deepEqual(ids(legacy), ["a", "b", "c", "d", "e"]);
+  const hidden = await list({limit:2, includeHidden:true});
+  assert.deepEqual(ids(hidden), ['hidden','a'], 'Settings can page through hidden conversations too');
+  assert.equal((await list({limit:2, cursor:hidden.nextCursor},0,400)).code, 'INVALID_RESEARCH_HISTORY_CURSOR');
   const first = await list({ limit: 2 });
   assert.deepEqual(ids(first), ["a", "b"]);
   assert.equal(first.hasMore, true); assert.equal(typeof first.nextCursor, "string");

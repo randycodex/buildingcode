@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:research-bulk-delete:postgres": "node tests/research-bulk-delete-postgres.mjs",
+    "test:research-bulk-delete": "node tests/research-bulk-delete.mjs && node tests/research-delete-controls.mjs && node tests/research-conversation-deletion-contract.mjs && node tests/research-history-pagination.mjs && node tests/offline-shell-coherence.mjs",
     "test:research-history-scale": "node tests/research-history-scale.mjs && node tests/research-history-pagination.mjs && node tests/research-artifact-revisions.mjs && node tests/authenticated-read-scaling-contract.mjs",
     "test:web-update-safety": "node tests/web-sync-guard.mjs && node tests/web-sync-guard-no-database.mjs && node tests/web-sync-guard-http.mjs && node tests/web-app-update.mjs",
     "test:report-note-review": "node tests/report-note-review.mjs && node tests/notebook-report-promotion-contract.mjs",

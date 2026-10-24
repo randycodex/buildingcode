@@ -14,6 +14,7 @@ import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet 
 import { researchWriterInstructions, researchWriterContext, researchWriterPolicyVersion } from "./research-writer-policy.mjs";
 import { occupantLoadDraftSchema, normalizeOccupantLoadDraft, occupantLoadDraftReviewInstruction } from "./research-occupant-load-draft.mjs";
 import { researchHistoryOptions, researchHistoryCursor, researchHistoryFileRows, researchHistoryPageQuery } from "./research-history-pagination.mjs";
+import { researchDeleteScope, researchDeleteTargetsForStore, researchDeleteConfirmation, researchDeleteConflict, researchDeleteTargetsQuery, researchBulkDeleteQuery } from "./research-bulk-delete.mjs";
 import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction, researchTargetedRevisionEligible } from "./research-targeted-revision.mjs";
 import { researchCitationBindingTargets, researchCitationBindingRepairSchema, applyResearchCitationBindingRepair,
   researchCitationBindingRepairEligible, researchCitationBindingRepairInstruction } from "./research-citation-binding-repair.mjs";
@@ -1545,6 +1546,24 @@ export function createFileStoreAdapter() {
       return this.withMutation((store) =>
         applyResearchConversationDeletion(store, userID, conversationID, options)
       );
+    },
+    async researchDeletionTargets(userID, scope) {
+      return researchDeleteTargetsForStore(await this.read(), userID, scope);
+    },
+    async deleteResearchConversations(userID, targets, options = {}) {
+      return this.withMutation(store => {
+        const current = researchDeleteTargetsForStore(store, userID, {kind:'selected', ids:targets.map(row => row.id)});
+        if (canonicalJSONString(current) !== canonicalJSONString(targets)) throw researchDeleteConflict();
+        const result = {deletedCount:0, deletedAnswerCount:0, deletedEvidenceSnapshotCount:0, deletedFeedbackCount:0};
+        const projects = new Set();
+        for (const target of targets) {
+          const removed = applyResearchConversationDeletion(store, userID, target.id, options);
+          result.deletedCount += Number(removed.deleted);
+          for (const key of ['deletedAnswerCount','deletedEvidenceSnapshotCount','deletedFeedbackCount']) result[key] += removed[key];
+          removed.projectIDs.forEach(id => projects.add(id));
+        }
+        return {...result, projectIDs:[...projects].sort()};
+      });
     },
     async listFoundationArtifacts(userID, options = {}) {
       const store = await this.read();
@@ -4654,6 +4673,25 @@ async function createPostgresStoreAdapter() {
         deletedActivityCount: Number(result.deleted_activity_count || 0),
         projectIDs: Array.isArray(result.project_ids) ? result.project_ids.map(String) : []
       };
+    },
+    async researchDeletionTargets(userID, scope) {
+      await ensureSchema();
+      const query = researchDeleteTargetsQuery(userID, scope);
+      return sql.query(query.text, query.values);
+    },
+    async deleteResearchConversations(userID, targets, options = {}) {
+      await ensureSchema();
+      const activityUsers = [...new Set([userID, ...(options.activityStorageUserIDs || [])])];
+      const query = researchBulkDeleteQuery(userID, targets, activityUsers);
+      let rows;
+      try {
+        [rows] = await sql.transaction([sql.query(query.text, query.values)], {isolationLevel:'Serializable'});
+      } catch (error) {
+        if (['40001','40P01'].includes(error.code)) throw researchDeleteConflict();
+        throw error;
+      }
+      if (!rows[0]?.confirmed) throw researchDeleteConflict();
+      return rows[0];
     },
     async listFoundationArtifacts(userID, options = {}) {
       await ensureSchema();
@@ -22682,6 +22720,72 @@ async function handleResearchConversationMessage(request, response) {
   }
 }
 
+async function researchDeletionPlan(context, response) {
+  let scope;
+  try { scope = researchDeleteScope(context.body); }
+  catch (error) { sendError(response, 400, error.message); return null; }
+  const adapter = await storeAdapter();
+  const targets = await adapter.researchDeletionTargets(context.userID, scope);
+  if (scope.kind === 'selected' && targets.length !== scope.ids.length) {
+    sendJSON(response, 409, {error:'Some selected conversations are unavailable. Refresh the list before deleting.', code:'RESEARCH_DELETE_CHANGED'});
+    return null;
+  }
+  return {scope, targets, confirmationToken:researchDeleteConfirmation(context.userID, scope, targets)};
+}
+
+async function handleResearchConversationDeletePreview(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const plan = await researchDeletionPlan(context, response);
+  if (!plan) return;
+  sendJSON(response, 200, {count:plan.targets.length, confirmationToken:plan.confirmationToken,
+    conversationIDs:plan.targets.map(row => row.id)});
+}
+
+async function handleResearchConversationDeleteMany(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  if (context.body.confirmPermanentDeletion !== true || typeof context.body.confirmationToken !== 'string') {
+    sendJSON(response, 400, {error:'Review and confirm permanent deletion first.', code:'RESEARCH_DELETE_CONFIRMATION_REQUIRED'});
+    return;
+  }
+  const plan = await researchDeletionPlan(context, response);
+  if (!plan) return;
+  if (!plan.targets.length || context.body.confirmationToken !== plan.confirmationToken) {
+    const error = researchDeleteConflict();
+    sendJSON(response, error.status, {error:error.message, code:error.code});
+    return;
+  }
+  const activityStorageUserIDs = new Set([context.userID]);
+  const projectAccesses = new Map();
+  const projectIDs = [...new Set(plan.targets.map(row => row.projectID).filter(Boolean))];
+  for (let offset = 0; offset < projectIDs.length; offset += 8) {
+    const batch = projectIDs.slice(offset, offset + 8);
+    const access = await Promise.all(batch.map(id => projectAccessForUser(context.userID, id)));
+    access.forEach((value, index) => {
+      projectAccesses.set(batch[index], value);
+      if (value?.storageOwnerUserID) activityStorageUserIDs.add(value.storageOwnerUserID);
+    });
+  }
+  let deletion;
+  try {
+    deletion = await (await storeAdapter()).deleteResearchConversations(context.userID, plan.targets, {
+      activityStorageUserIDs:[...activityStorageUserIDs]
+    });
+  } catch (error) {
+    if (error.code !== 'RESEARCH_DELETE_CHANGED') throw error;
+    sendJSON(response, 409, {error:error.message, code:error.code});
+    return;
+  }
+  for (const id of deletion.projectIDs) {
+    if (!projectAccesses.has(id)) projectAccesses.set(id, await projectAccessForUser(context.userID, id));
+  }
+  const artifactRevisions = await bumpCommittedResearchArtifactRevisions(context.userID,
+    deletion.projectIDs.filter(id => projectAccesses.get(id)?.permissions.includes(organizationPermissions.projectView))
+      .map(projectID => ({projectID, domains:['research','foundation','activity']})));
+  sendJSON(response, 200, {...deletion, conversationIDs:plan.targets.map(row => row.id), artifactRevisions});
+}
+
 async function handleResearchConversationDelete(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
@@ -34112,6 +34216,8 @@ const handlers = {
   "research/conversations/project-context": handleResearchConversationProjectContext,
   "research/conversations/reuse-evidence": handleResearchConversationReuseEvidence,
   "research/conversations/delete": handleResearchConversationDelete,
+  "research/conversations/delete-preview": handleResearchConversationDeletePreview,
+  "research/conversations/delete-many": handleResearchConversationDeleteMany,
   "research/conversations/clear-history": handleResearchConversationClearHistory,
   "research/answers/list": handleResearchAnswerList,
   "research/answers/get": handleResearchAnswerGet,
