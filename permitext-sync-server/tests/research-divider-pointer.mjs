@@ -47,6 +47,7 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
   const context = vm.createContext({ workspaceColumnExpansion: undefined, adjacentColumnWidths,
     state, track, activeWorkspaceID: 'test', CSS: { escape: value => value }, researchColumnsLayout,
     currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400,
+    defaultUtilityPaneWidth: 400, defaultResearchPaneWidth: 920,
     assistantHistoryOnlyPane: id => id === 'utility:analysis', paneIsCollapsed: id => collapsed.has(id),
     defaultPaneWidthForID: () => 600, isFlexibleReaderPaneID: id => id.startsWith('reader:'),
     activePinnedPaneID: () => '',
@@ -116,8 +117,22 @@ assert.deepEqual(pair.widths(), [1260, 1140], 'Dragging transfers the requested 
 assert.equal(pair.saves, 1); assert.equal(pair.handlers.size, 0);
 pair.panes.push(pair.makePane('reader:two'), pair.makePane('reader:three'));
 pair.context.syncResearchColumnLayout();
-assert.deepEqual(pair.widths(), [600, 600, 600, 600], 'Adding columns restores the existing 600px overflow layout');
+assert.deepEqual(pair.widths(), [1260, 1140, 600, 600], 'Adding columns preserves manually resized widths');
+pair.context.syncResearchColumnLayout({reset:true});
+assert.deepEqual(pair.widths(), [600, 600, 600, 600], 'Explicit reset restores the 600px overflow layout');
 assert.equal(pair.context.maximumPaneWidthForID('utility:search:one'), 900, 'Overflow retains the 900px maximum');
+
+const assistantPair = fixture(['utility:analysis:one', 'reader:one']);
+assistantPair.context.assistantHistoryWidth = 320;
+assistantPair.context.startPaneResize(assistantPair.event(1201), 'utility:analysis:one', 'reader:one');
+assistantPair.move(1401); assistantPair.frame(); assistantPair.finish(1401);
+assert.deepEqual(assistantPair.widths(), [1400,1000], 'Assistant divider transfers width from an equal split');
+assert.equal(assistantPair.state.researchColumnWidthsManual, true);
+delete assistantPair.track._researchColumnLayout;
+assistantPair.context.syncResearchColumnLayout();
+assert.deepEqual(assistantPair.widths(), [1400,1000], 'The resized Assistant survives a fresh layout instance');
+assistantPair.context.syncResearchColumnLayout({reset:true});
+assert.deepEqual(assistantPair.widths(), [1200,1200], 'Reset returns Assistant to an equal split');
 
 const unlimited = fixture(['reader:one', 'reader:two']);
 unlimited.context.startPaneResize(unlimited.event(1201), 'reader:one', 'reader:two');

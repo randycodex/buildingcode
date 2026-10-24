@@ -1,4 +1,4 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-report-pills-v1334";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-assistant-layout-v1335";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
@@ -13,7 +13,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-report-pills-v1334";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-assistant-layout-v1335";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -27,7 +27,7 @@ import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarg
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=2";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261022-viewport-v7";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=12";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=13";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
@@ -145,7 +145,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-report-pills-v1334";
+} from "./offline-storage.js?v=20261024-assistant-layout-v1335";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -6168,7 +6168,7 @@ function syncResearchColumnLayout({ reset = false } = {}) {
   const panels = [...track.querySelectorAll(":scope > .workspace-panel")];
   const active = currentColumnWorkflowView() === "research" && window.innerWidth > 760 && !track.inert;
   const visible = active ? panels.filter(panel => !panel.classList.contains("is-workflow-hidden") && !panel.classList.contains("is-group-hidden")) : [];
-  const balanced = visible.filter(panel => /^(?:reader:|utility:search(?::|$))/.test(panel.dataset.paneId) && !paneIsCollapsed(panel.dataset.paneId));
+  const balanced = visible.filter(panel => /^(?:reader:|utility:(?:search|analysis)(?::|$)|research:conversation:)/.test(panel.dataset.paneId) && !paneIsCollapsed(panel.dataset.paneId) && !assistantHistoryOnlyPane(panel.dataset.paneId));
   const balancedSet = new Set(balanced);
   const managed = new Set(balanced.length ? visible : []);
   panels.filter(panel => panel.dataset.researchSized && (!managed.has(panel) || panel.dataset.researchSized === "balanced" && !balancedSet.has(panel))).forEach(panel => {
@@ -6198,20 +6198,21 @@ function syncResearchColumnLayout({ reset = false } = {}) {
     ? track._researchColumnLayout : null;
   const changed = previous && previous.signature !== signature;
   const requested = balanced.map(preferredWidth);
+  const minimumWidths = balanced.map(panel => minimumPaneWidthForID(panel.dataset.paneId));
   let layout = researchColumnsLayout(requested, track.clientWidth, fixedWidth, dividerWidth,
-    balanced.map(panel => panel.dataset.paneId.startsWith("reader:") ? Infinity : 900));
+    balanced.map(panel => /^utility:search(?::|$)/.test(panel.dataset.paneId) ? 900 : Infinity), minimumWidths);
   const resetWidths = reset || changed || previous?.fits && !layout.fits;
   // Restored/user-selected widths remain authoritative through reordering and
   // staged hydration. Only the explicit Reset layout action leaves manual mode.
   const manual = state.researchColumnWidthsManual === true && !reset;
   state.researchColumnWidthsManual = Boolean(manual);
   if (manual) layout = { fits: false, widths: requested };
-  else if (!layout.fits && resetWidths) layout.widths.fill(600);
+  else if (!layout.fits && resetWidths) layout.widths = [...minimumWidths];
   // A fitted layout can be wider than the overflow limit. Reserve its shared
   // space for manual resizing so the first drag starts from the visible width.
   const resizeMaximums = manual ? previous?.resizeMaximums : layout.fits
-    ? Object.fromEntries(balanced.map(panel => [panel.dataset.paneId,
-      Math.max(900, layout.widths.reduce((sum, width) => sum + width, 0) - 600 * (balanced.length - 1))]))
+    ? Object.fromEntries(balanced.map((panel, index) => [panel.dataset.paneId,
+      Math.max(900, layout.widths.reduce((sum, width) => sum + width, 0) - minimumWidths.reduce((sum, width) => sum + width, 0) + minimumWidths[index])]))
     : undefined;
   fixed.forEach(panel => {
     applyPaneWeight(panel, panel.dataset.paneId);
@@ -6221,7 +6222,7 @@ function syncResearchColumnLayout({ reset = false } = {}) {
   balanced.forEach((panel, index) => {
     const width = layout.widths[index];
     panel.dataset.researchSized = "balanced";
-    panel.style.setProperty("--pane-default-min-width", "600px");
+    panel.style.setProperty("--pane-default-min-width", `${minimumWidths[index]}px`);
     const maximumWidth = maximumPaneWidthForID(panel.dataset.paneId);
     panel.style.maxWidth = layout.fits || !Number.isFinite(maximumWidth) ? "none" : `${manual ? maximumWidth : 900}px`;
     panel.style.flex = `0 0 ${width}px`;

@@ -10,6 +10,9 @@ assert.deepEqual(researchColumnsLayout([900, 900, 900, 600], 2405, 0, 5), { fits
 assert.deepEqual(researchColumnsLayout([400, 1400, 700, 600], 2404, 0, 5), { fits: false, widths: [600, 900, 700, 600] });
 assert.deepEqual(researchColumnsLayout([900, 600], 2203, 1000, 3), { fits: true, widths: [600, 600] });
 assert.deepEqual(researchColumnsLayout([1800, 1400], 1103, 0, 3, [Infinity, 900]), { fits: false, widths: [1800, 900] });
+assert.deepEqual(researchColumnsLayout([920, 600], 2403, 0, 3, [Infinity, Infinity], [920, 600]), { fits: true, widths: [1200, 1200] });
+assert.deepEqual(researchColumnsLayout([920, 600], 1843, 0, 3, [Infinity, Infinity], [920, 600]), { fits: true, widths: [920, 920] });
+assert.deepEqual(researchColumnsLayout([920, 600], 1842, 0, 3, [Infinity, Infinity], [920, 600]), { fits: false, widths: [920, 600] });
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 function actual(name) {
@@ -223,3 +226,46 @@ state.paneWeights['reader:staged']=710;
 context.syncResearchColumnLayout();
 assert.deepEqual(sizes(),[648,629,710], 'Staged hydration keeps saved widths rather than resetting every pane');
 console.log('Reordering and staged hydration preserve the manual preference for subsequent cross-browser sync.');
+
+// Cold Assistant restoration uses the same equal-share layout as Reader/Search,
+// while its history + composer minimum remains intact on narrower desktops.
+context.assistantHistoryWidth = 320;
+collapsed.clear();
+for (const assistantID of ['utility:analysis', 'utility:analysis:one', 'research:conversation:one']) {
+  for (const available of [2403, 1843, 1842, 1280]) {
+    panels = [assistantID, 'reader:one'].map(makePane);
+    state.paneWeights = {[assistantID]:920, 'reader:one':600};
+    state.researchColumnWidthsManual = false;
+    context.window.innerWidth = track.clientWidth = available;
+    delete track._researchColumnLayout;
+    context.syncResearchColumnLayout();
+    assert.deepEqual(sizes(), available >= 1843 ? [(available-3)/2, (available-3)/2] : [920,600], 'Cold Assistant shares space only when its full minimum fits');
+    assert.equal(panels[0].style['--pane-default-min-width'], '920px');
+    assert.equal(panels[0].style.maxWidth, 'none', 'Assistant has no Search-style maximum');
+  }
+  context.window.innerWidth = track.clientWidth = 2403;
+  state.paneWeights = {[assistantID]:1400, 'reader:one':1000};
+  state.researchColumnWidthsManual = true;
+  delete track._researchColumnLayout;
+  context.syncResearchColumnLayout();
+  assert.deepEqual(sizes(), [1400,1000], 'Cold restoration retains manually resized Assistant and Reader widths');
+  panels.reverse();
+  context.syncResearchColumnLayout();
+  assert.deepEqual(sizes(), [1000,1400], 'Reordering keeps resized Assistant widths');
+  context.syncResearchColumnLayout({reset:true});
+  assert.deepEqual(sizes(), [1200,1200], 'Reset restores equal Assistant shares');
+  context.window.innerWidth = track.clientWidth = 1280;
+  context.syncResearchColumnLayout();
+  assert.deepEqual(sizes(), [600,920], 'Shrinking the viewport preserves Assistant history and composer minimum');
+}
+panels = ['utility:search:one', 'utility:analysis:one', 'reader:one'].map(makePane);
+state.paneWeights = {'utility:search:one':600, 'utility:analysis:one':920, 'reader:one':600};
+state.researchColumnWidthsManual = false;
+context.window.innerWidth = track.clientWidth = 3004;
+delete track._researchColumnLayout;
+context.syncResearchColumnLayout();
+assert.deepEqual(sizes(), [1000,1000,1000], 'Search, Assistant and Reader share three equal columns');
+collapsed.add('utility:analysis:one');
+context.syncResearchColumnLayout();
+assert.deepEqual(sizes(), [1476,48,1476], 'A collapsed Assistant reserves only its rail');
+console.log('Assistant layout passed: cold equal sharing, 920px minimum, manual restoration, reset, reorder and collapsed rails.');
