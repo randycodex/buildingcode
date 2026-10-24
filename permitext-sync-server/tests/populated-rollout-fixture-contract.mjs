@@ -4,6 +4,7 @@ import { mkdtemp, writeFile, mkdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createRolloutFixture } from './populated-rollout-fixture.mjs';
+import { buildPublicCodeRevision } from '../scripts/build-public-code-revision.mjs';
 const root = await mkdtemp(join(tmpdir(), 'rollout-contract-'));
 let server;
 try {
@@ -17,7 +18,9 @@ try {
     await mkdir(join(root,version,'notebook-assets'));
     await writeFile(join(root,version,'app.js'), `const notebookClientVersion = "notebook-${version}";`);
     for (const ext of ['js','css']) await writeFile(join(root,version,'notebook-assets',`notebook.${ext}`), `${version}:notebook.${ext}`);
+    await writeFile(join(root,version,'web-client-version.js'), `export const webAppVersion = "${version}";`);
   }
+  const staticManifest = await buildPublicCodeRevision(join(root,'current'));
   const fixture = await createRolloutFixture({baselineDir:join(root,'baseline'),currentDir:join(root,'current'),capability:'secret'});
   server = createServer(async (req,res) => { if (!await fixture.handle(req,res,new URL(req.url,'http://localhost'))) res.writeHead(418).end('ordinary'); });
   await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
@@ -67,5 +70,10 @@ try {
   await control({networkOff:false,phase:'current'});
   assert.equal(await (await get('/web/app.js?v=current')).text(),'const notebookClientVersion = "notebook-current";');
   assert.equal(await (await get('/web/offline-storage.js?v=baseline')).text(),'baseline:offline-storage.js');
+  const browser = {'user-agent':'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/155.0.0.0 Safari/537.36'};
+  assert.deepEqual(await (await fetch(base+'/code/revision',{headers:browser})).json(),staticManifest);
+  assert.equal((await fetch(base+'/code/revision?expectedPublicCorpusRevision=wrong',{headers:browser})).status,418,'Pinned reads pass through to the ordinary handler');
+  assert.equal((await get('/code/revision')).status,418,'Non-browser reads pass through to the ordinary handler');
+  assert.deepEqual(fixture.state().revisionEvents.map(event=>event.transport),['static','application','application']);
   console.log('Rollout HTTP contract passed: capability, strict controls, immutable old assets, failed installation, transport failure, recovery.');
 } finally { if (server) {server.closeAllConnections(); await new Promise(resolve=>server.close(resolve));} await rm(root,{recursive:true,force:true}); }

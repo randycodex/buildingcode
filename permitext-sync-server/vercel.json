@@ -123,6 +123,29 @@
       ]
     },
     {
+      "source": "/code-revision.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/code/revision",
+      "has": [{ "type": "header", "key": "user-agent", "value": "Mozilla/.*" }],
+      "missing": [
+        { "type": "query", "key": "contentRevision" },
+        { "type": "query", "key": "expectedPublicCorpusRevision" }
+      ],
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
       "source": "/service-worker.js",
       "headers": [
         {
@@ -251,6 +274,15 @@
     {
       "source": "/billing/:path*",
       "destination": "/api/index"
+    },
+    {
+      "source": "/code/revision",
+      "has": [{ "type": "header", "key": "user-agent", "value": "Mozilla/.*" }],
+      "missing": [
+        { "type": "query", "key": "contentRevision" },
+        { "type": "query", "key": "expectedPublicCorpusRevision" }
+      ],
+      "destination": "/code-revision.json"
     },
     {
       "source": "/code/:path*",

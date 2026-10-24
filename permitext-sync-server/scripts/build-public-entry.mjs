@@ -1,6 +1,7 @@
 import { cp, copyFile, mkdir, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { buildWorkspaceEntry } from './build-workspace-entry.mjs';
+import { buildPublicCodeRevision } from './build-public-code-revision.mjs';
 
 export async function buildPublicEntry(source, output) {
   await rm(output, { recursive: true, force: true });
@@ -8,6 +9,7 @@ export async function buildPublicEntry(source, output) {
   await cp(source, output, { recursive: true });
   await copyFile(`${source}/index.html`, `${output}/workspace.html`);
   await copyFile(`${source}/home.html`, `${output}/index.html`);
+  await buildPublicCodeRevision(output);
 }
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const source = fileURLToPath(new URL('../public', import.meta.url));

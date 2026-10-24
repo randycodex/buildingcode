@@ -4,10 +4,15 @@ import { join } from 'node:path';
 import assert from 'node:assert/strict';
 import {publicCodeCorpusRevision} from '../chapter-body-contract.mjs';
 import {codeAssetRevision} from '../code-asset-manifest.mjs';
+import { serveStaticCodeRevision } from './static-code-revision-routing.mjs';
 export async function createRolloutFixture({ baselineDir, currentDir, capability }) {
   const names = ['index.html', 'app.js', 'offline-storage.js', 'service-worker.js'];
   const load = async dir => Object.fromEntries(await Promise.all(names.map(async name => [name, await readFile(join(dir, name))])));
   const baseline = await load(baselineDir), current = await load(currentDir);
+  const staticRevision = await readFile(join(currentDir, 'code-revision.json')).then(() => true).catch(error => {
+    if (error.code === 'ENOENT') return false;
+    throw error;
+  });
   // Optional current-app metadata lets the real reload prompt participate in
   // rollout acceptance. Older minimal four-file fixtures retain their behavior.
   for (const [files,dir] of [[baseline,baselineDir],[current,currentDir]]) {
@@ -32,7 +37,13 @@ export async function createRolloutFixture({ baselineDir, currentDir, capability
     }
   }
   let phase = 'baseline', networkOff = false, revisionRequests = 0;
-  const state = () => ({ phase, networkOff, versions, revisionRequests });
+  const revisionEvents = [];
+  const recordRevision = (req, transport) => {
+    revisionRequests++;
+    revisionEvents.push({at:new Date().toISOString(), transport, userAgent:req.headers['user-agent'] || ''});
+    if (revisionEvents.length > 1000) revisionEvents.shift();
+  };
+  const state = () => ({ phase, networkOff, versions, revisionRequests, revisionEvents });
   const send = (res, status, type, bytes) => res.writeHead(status, {'content-type': type, 'cache-control': 'no-store', 'service-worker-allowed': '/', 'x-content-type-options': 'nosniff'}).end(bytes);
   return { state, async handle(req, res, url) {
     if (url.pathname.startsWith('/fixture/rollout')) {
@@ -53,8 +64,16 @@ export async function createRolloutFixture({ baselineDir, currentDir, capability
     // Keep fixture controls reachable during a simulated application transport outage.
     if (url.pathname.startsWith('/fixture/')) return false;
     if (networkOff && req.method === 'GET') { res.destroy(); return true; }
+    if (staticRevision && phase !== 'baseline' && (url.pathname === '/code/revision' || url.pathname === '/code-revision.json')) {
+      if (await serveStaticCodeRevision(req, res, url, currentDir)) {
+        recordRevision(req, 'static');
+        return true;
+      }
+      recordRevision(req, 'application');
+      return false; // Native and pinned reads exercise the unchanged real handler.
+    }
     if (url.pathname === '/code/revision' && names.includes('web-client-version.js')) {
-      revisionRequests++;
+      recordRevision(req, 'fixture-dynamic');
       const files = phase === 'baseline' ? baseline : current;
       const webAppVersion = files['web-client-version.js'].toString().match(/webAppVersion\s*=\s*["']([^"']+)/)?.[1];
       send(res, 200, 'application/json', JSON.stringify({corpusRevision:await publicCodeCorpusRevision(),assetRevision:await codeAssetRevision(),cacheContract:1,webAppVersion}));

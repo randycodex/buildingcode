@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { getTransformedRoutes } from "@vercel/routing-utils";
 import { handleRequest, webStaticCacheControl } from "../app.mjs";
+import { matchesRouteCondition } from './static-code-revision-routing.mjs';
 
 const config = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8"));
 const { routes, error } = getTransformedRoutes({ headers: config.headers });
@@ -10,16 +11,13 @@ assert.equal(error, null, "Vercel's route compiler must accept the header config
 
 // Match the actual Vercel-compiled paths and query conditions in declaration
 // order. The hosted preview header matrix separately checks platform behavior.
-export function compiledCacheControl(path) {
+export function compiledCacheControl(path, headers = {}) {
   const url = new URL(path, "https://permitext.test");
   let cacheControl;
   for (const route of routes) {
     if (!new RegExp(route.src).test(url.pathname)) continue;
-    if (route.has?.some((condition) => {
-      assert.equal(condition.type, "query");
-      const value = url.searchParams.get(condition.key);
-      return value === null || (condition.value && !new RegExp(`^(?:${condition.value})$`).test(value));
-    })) continue;
+    if (route.has?.some(condition => !matchesRouteCondition(condition, url, headers))) continue;
+    if (route.missing?.some(condition => matchesRouteCondition(condition, url, headers))) continue;
     for (const [key, value] of Object.entries(route.headers || {})) {
       if (key.toLowerCase() === "cache-control") cacheControl = value;
     }
@@ -43,6 +41,12 @@ for (const asset of ["app.js", "styles.css", "icons/permitext-192.png", "manifes
 }
 assert.equal(webStaticCacheControl("index.html", "release-55"), revalidate);
 assert.equal(compiledCacheControl("/service-worker.js"), "no-cache");
+assert.equal(compiledCacheControl('/code-revision.json'), revalidate);
+assert.equal(compiledCacheControl('/code/revision', {'user-agent':'Mozilla/5.0'}), revalidate);
+for (const query of ['?contentRevision=hash', '?contentRevision=', '?expectedPublicCorpusRevision=hash']) {
+  assert.equal(compiledCacheControl('/code/revision' + query, {'user-agent':'Mozilla/5.0'}), undefined, 'Pinned API cache semantics must not be overridden');
+}
+assert.equal(compiledCacheControl('/code/revision', {'user-agent':'permitext/1 CFNetwork/1'}), undefined, 'Native API headers remain unchanged');
 assert.equal(compiledCacheControl("/account/data/export"), undefined, "Do not override private account caching");
 assert.equal(compiledCacheControl("/notebook/assets/read?v=anything"), undefined, "Version-looking private URLs are not public assets");
 
