@@ -84,6 +84,21 @@ try {
   await b.page.evaluate(()=>{for(let i=0;i<5;i++)layoutTest.saveWorkspaceState();});
   await b.page.waitForTimeout(1800);
   assert.equal(b.requests.slice(unchanged).filter(r=>r.path==='/sync/push').length,0,'Unchanged saves send no layout traffic');
+  // Warm a fitted layout in a different Project before returning. This is
+  // the production case missed by a fresh-profile restore-only test.
+  for (const session of [a,b]) {
+    await session.page.evaluate(async()=>{
+      const target=layoutTest.activeWorkspace();
+      const other=layoutTest.registry().workspaces.find(item=>item.projectID && item.id!==target);
+      await layoutTest.switchWorkspace(other.id);
+      if(!layoutTest.state().utilityInstances.some(item=>item.key==='search')) await layoutTest.toggleUtilityPane('search');
+      await layoutTest.switchWorkspace(target);
+      await layoutTest.switchWorkspace(other.id);
+      await layoutTest.switchWorkspace(target);
+    });
+    const restoredWidth=await session.page.locator(`[data-pane-id="${searchID}"]`).first().evaluate(element=>element.getBoundingClientRect().width);
+    assert(Math.abs(restoredWidth-expected.paneWeights[searchID])<2,'Project switching preserves the rendered preferred Search width');
+  }
   // Local drafts survive an incoming presentation record; content never enters its payload.
   await b.page.evaluate(()=>{layoutTest.setDraft('local','Do not upload this draft');layoutTest.saveWorkspaceState();});
   await a.page.evaluate(()=>layoutTest.toggleUtilityPane('calculator'));
@@ -104,7 +119,7 @@ try {
   assert.equal(await b.page.evaluate(()=>layoutTest.state().syncOutbox.length),0);
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({passed:true,layoutPushes:pushes.length,resizeEvents:8,layoutPushBytes:Buffer.byteLength(JSON.stringify(pushes[0].body)),contentPullsAfterResize:0,projectDownloadsAfterResize:0,
-    checks:['independent browser restore','open columns/order/rendered width','unchanged suppression','remote close','local draft preservation','offline retry'],screenshot:'/tmp/permitext-layout-sync-restored.png'},null,2));
+    checks:['independent browser restore','open columns/order/rendered width','repeated Project switching in both profiles','unchanged suppression','remote close','local draft preservation','offline retry'],screenshot:'/tmp/permitext-layout-sync-restored.png'},null,2));
 } finally {
   await browser?.close();fixture.kill('SIGTERM');
 }

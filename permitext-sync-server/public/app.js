@@ -140,7 +140,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-layout-sync-v1299";
+} from "./offline-storage.js?v=20261023-layout-width-restore-v1301";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -1486,6 +1486,9 @@ function applyPendingWorkspaceLayout({force = false} = {}) {
   if (!project) return false;
   const next = applySharedWorkspaceLayout(state, record, project);
   Object.assign(state, next);
+  // This is a restored preference, not a local column-add/remove operation.
+  // Reconcile from the incoming manual sizing mode instead of stale DOM state.
+  delete track._researchColumnLayout;
   state.utilityInstances = normalizeUtilityInstances(state);
   restoreResearchWorkspaceState();
   workspaceLayoutApplied.set(key, record.updatedAt);
@@ -1887,6 +1890,7 @@ function waitForWorkspaceTransitionPaint() {
 
 function applyStoredWorkspaceLayout(layout) {
   projectStudioTransitionGeneration += 1;
+  delete track._researchColumnLayout;
   applyWorkspaceLayout(state, restoreSearchQuerySession(sessionStorage, tabWorkspaceKey, activeWorkspaceID,
     retireUnassignedLayout(workspaceLayoutWithoutCodeQuestionData(layout))));
   loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
@@ -6039,13 +6043,18 @@ function syncResearchColumnLayout({ reset = false } = {}) {
   const dividerWidth = [...track.querySelectorAll(":scope > .pane-divider")]
     .reduce((sum, divider) => sum + divider.getBoundingClientRect().width, 0);
   const signature = [activeWorkspaceID, ...visible.map(panel => `${panel.dataset.paneId}:${paneIsCollapsed(panel.dataset.paneId)}`)].join("|");
-  const previous = track._researchColumnLayout;
+  // The previous Project's fitted geometry must not reset this Project's
+  // restored manual widths (or carry its manual mode into an automatic layout).
+  const previous = track._researchColumnLayout?.workspaceID === activeWorkspaceID
+    ? track._researchColumnLayout : null;
   const changed = previous && previous.signature !== signature;
   const requested = balanced.map(preferredWidth);
   let layout = researchColumnsLayout(requested, track.clientWidth, fixedWidth, dividerWidth,
     balanced.map(panel => panel.dataset.paneId.startsWith("reader:") ? Infinity : 900));
   const resetWidths = reset || changed || previous?.fits && !layout.fits;
-  const manual = (previous?.manual || state.researchColumnWidthsManual === true) && !resetWidths;
+  // Restored/user-selected widths remain authoritative through reordering and
+  // staged hydration. Only the explicit Reset layout action leaves manual mode.
+  const manual = state.researchColumnWidthsManual === true && !reset;
   state.researchColumnWidthsManual = Boolean(manual);
   if (manual) layout = { fits: false, widths: requested };
   else if (!layout.fits && resetWidths) layout.widths.fill(600);
@@ -6070,7 +6079,7 @@ function syncResearchColumnLayout({ reset = false } = {}) {
     if (!layout.fits) state.paneWeights[panel.dataset.paneId] = width;
   });
   track.dataset.researchColumnSizing = manual ? "manual" : layout.fits ? "fit" : "overflow";
-  track._researchColumnLayout = { signature, fits: layout.fits, manual, resizeMaximums };
+  track._researchColumnLayout = { workspaceID: activeWorkspaceID, signature, fits: layout.fits, manual, resizeMaximums };
 }
 
 function setUtilityButtonStates() {

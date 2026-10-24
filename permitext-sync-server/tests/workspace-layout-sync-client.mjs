@@ -75,8 +75,9 @@ function harness() {
   const old=c.workspaceLayoutCatalog()[0];
   const remote={...copy(old),updatedAt:new Date(Date.parse(old.updatedAt)+1000).toISOString(),layout:{...copy(old.layout),utilities:{calculator:true}}};
   c.syncedContent.summary.latestContinuity={values:{workspaceLayoutsJSON:JSON.stringify([remote])}};
-  c.reconcileWorkspaceLayouts();c.focused=true;assert.equal(c.applyPendingWorkspaceLayout(),false);
+  c.reconcileWorkspaceLayouts();c.track._researchColumnLayout={manual:false,signature:'previous-column-set'};c.focused=true;assert.equal(c.applyPendingWorkspaceLayout(),false);
   c.focused=false;assert.equal(c.applyPendingWorkspaceLayout(),true,'Deferred layout applies when editor is safe');
+  assert.equal(c.track._researchColumnLayout,undefined,'Incoming layout invalidates old same-Project geometry');
   assert.equal(c.state.utilities.calculator,true);assert.equal(c.state.researchViewState.drafts.local,'Keep draft');
   assert.equal(c.applyPendingWorkspaceLayout(),false,'Remote layout is applied once');
 }

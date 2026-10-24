@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test:workspace-layout-sync": "node tests/workspace-layout-sync.mjs && node tests/workspace-layout-sync-client.mjs && node tests/continuity-merge-contract.mjs && node tests/workspace-sync-access-contract.mjs && node tests/web-account-isolation-contract.mjs && node tests/workspace-startup-restore-contract.mjs && node tests/offline-shell-coherence.mjs",
+    "test:workspace-layout-sync": "node tests/workspace-layout-sync.mjs && node tests/workspace-layout-sync-client.mjs && node tests/research-column-layout.mjs && node tests/continuity-merge-contract.mjs && node tests/workspace-sync-access-contract.mjs && node tests/web-account-isolation-contract.mjs && node tests/workspace-startup-restore-contract.mjs && node tests/offline-shell-coherence.mjs",
     "test:workspace-layout-sync:postgres": "node tests/workspace-layout-sync-postgres.mjs",
     "test:workspace-layout-sync:browser": "node tests/workspace-layout-sync-browser.mjs",
     "test:calculation-evidence": "node tests/occupant-load-calculation.mjs && node tests/occupant-load-table.mjs && node tests/research-occupant-load-draft.mjs && node tests/research-calculator-footnotes.mjs && node tests/calculation-handoff-client.mjs && node tests/calculator-column-contract.mjs && node tests/notebook-evidence-text-map.mjs && node tests/calculation-notebook-http.mjs",

@@ -35,3 +35,11 @@ Measured with local synthetic data:
 - Account isolation, continuity merging, startup restoration, workspace state, pane orchestration, Reader continuity, Research column sizing and offline shell/cache checks passed locally.
 
 The broader `evidence-folders-contract.mjs` currently fails its bookmark assertion against `renderReaderChapterSection`, whose implementation delegates to `buildReaderChapterSection`. The same assertion fails against the unchanged baseline app source; it is unrelated to this change. No production billing or hosted deployment was measured.
+
+## Width-restoration follow-up
+
+Production verification found that the previous Project's cached column geometry and changes to the rendered column signature could clear manual sizing. A saved Search width could arrive correctly as 629 px but render at 1,029 px after switching Projects. The fix scopes cached geometry to its Project, discards stale geometry when applying a saved/shared layout, and retains manual mode through reorder and staged hydration. Only the explicit Reset layout action returns a manual layout to automatic sizing.
+
+Regression checks cover both desktop sizes, automatic/manual Project isolation, same-Project reordering, staged column mounts, incoming-layout cache invalidation, and repeated Project switching. Real Chrome and in-app browser checks against the local synthetic fixture both retained the selected 629 px Search and 648 px Calculator widths after switching away and back.
+
+Successful sync currently has no persistent per-Project change-history indicator. Pending, offline and conflict statuses describe outstanding sync problems; they do not identify which Project changed in another browser. A last-updated/updated-elsewhere indicator would be a separate UI feature.

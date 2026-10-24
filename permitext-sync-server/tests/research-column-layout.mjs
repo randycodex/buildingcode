@@ -179,3 +179,47 @@ for (const available of [2428,1600]) {
   assert.equal(track.dataset.researchColumnSizing, available === 2428 ? 'fit' : 'overflow', 'Later hydration keeps the reset layout');
 }
 console.log('Reset layout passed: clears manual widths, fills available space, retains collapsed rails and hidden views, and preserves minimums in overflow.');
+
+// Production regression: switching from a fitted Project to a restored manual
+// layout must not treat the previous Project's column signature as a reset.
+for (const available of [1280, 1680]) {
+  collapsed.clear();
+  context.window.innerWidth = track.clientWidth = available;
+  context.activeWorkspaceID = 'project:other';
+  panels = ['reader:other'].map(makePane);
+  state.paneWeights = {'reader:other':600};
+  state.researchColumnWidthsManual = false;
+  context.syncResearchColumnLayout();
+  context.activeWorkspaceID = 'project:restored';
+  panels = ['utility:calculator','utility:search:restored'].map(makePane);
+  state.paneWeights = {'utility:calculator':672,'utility:search:restored':621};
+  state.researchColumnWidthsManual = true;
+  context.syncResearchColumnLayout();
+  assert.deepEqual(sizes(), [672,621], 'Switching Projects restores preferred widths on different desktop sizes');
+  assert.equal(state.researchColumnWidthsManual, true);
+  assert.equal(track.dataset.researchColumnSizing, 'manual');
+  context.activeWorkspaceID = 'project:auto';
+  state.researchColumnWidthsManual = false;
+  context.syncResearchColumnLayout();
+  assert.equal(track.dataset.researchColumnSizing, 'fit', 'Manual sizing does not leak into a different Project');
+}
+console.log('Project switching preserves restored manual widths and isolates automatic/manual sizing between Projects.');
+
+// A reorder or staged mount changes the DOM signature inside the same Project.
+// It must not clear the preference before it can be synchronized elsewhere.
+context.activeWorkspaceID = 'project:manual';
+context.window.innerWidth = track.clientWidth = 1680;
+collapsed.clear();
+panels = ['utility:search:manual','utility:calculator'].map(makePane);
+state.paneWeights = {'utility:calculator':648,'utility:search:manual':629};
+state.researchColumnWidthsManual = true;
+context.syncResearchColumnLayout();
+panels.reverse();
+context.syncResearchColumnLayout();
+assert.deepEqual(sizes(),[648,629], 'Reordering preserves the manually selected widths');
+assert.equal(state.researchColumnWidthsManual,true,'Reordering does not upload an automatic sizing mode');
+panels.push(makePane('reader:staged'));
+state.paneWeights['reader:staged']=710;
+context.syncResearchColumnLayout();
+assert.deepEqual(sizes(),[648,629,710], 'Staged hydration keeps saved widths rather than resetting every pane');
+console.log('Reordering and staged hydration preserve the manual preference for subsequent cross-browser sync.');
