@@ -31,8 +31,8 @@ export async function createRolloutFixture({ baselineDir, currentDir, capability
       notebookAssets.set(url, {bytes, type: ext === 'css' ? 'text/css' : 'text/javascript'});
     }
   }
-  let phase = 'baseline', networkOff = false;
-  const state = () => ({ phase, networkOff, versions });
+  let phase = 'baseline', networkOff = false, revisionRequests = 0;
+  const state = () => ({ phase, networkOff, versions, revisionRequests });
   const send = (res, status, type, bytes) => res.writeHead(status, {'content-type': type, 'cache-control': 'no-store', 'service-worker-allowed': '/', 'x-content-type-options': 'nosniff'}).end(bytes);
   return { state, async handle(req, res, url) {
     if (url.pathname.startsWith('/fixture/rollout')) {
@@ -54,6 +54,7 @@ export async function createRolloutFixture({ baselineDir, currentDir, capability
     if (url.pathname.startsWith('/fixture/')) return false;
     if (networkOff && req.method === 'GET') { res.destroy(); return true; }
     if (url.pathname === '/code/revision' && names.includes('web-client-version.js')) {
+      revisionRequests++;
       const files = phase === 'baseline' ? baseline : current;
       const webAppVersion = files['web-client-version.js'].toString().match(/webAppVersion\s*=\s*["']([^"']+)/)?.[1];
       send(res, 200, 'application/json', JSON.stringify({corpusRevision:await publicCodeCorpusRevision(),assetRevision:await codeAssetRevision(),cacheContract:1,webAppVersion}));

@@ -1,4 +1,4 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-research-history-refresh-v1341";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-event-version-checks-v1342";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
@@ -14,7 +14,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-research-history-refresh-v1341";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-event-version-checks-v1342";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -38,7 +38,7 @@ import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js?v=2";
-import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
+import { bindPublicCodeRevisionChecks, createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20261024-event-revision-v4";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
@@ -146,7 +146,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-research-history-refresh-v1341";
+} from "./offline-storage.js?v=20261024-event-version-checks-v1342";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -1560,6 +1560,7 @@ async function applyPendingProjectUpdates({automatic = false, checkForUpdates = 
     editingGeneration = projectUpdateEditingGeneration;
     if (!shouldApply()) return false;
     if (checkForUpdates) {
+      void publicCodeRevision.probe({force: true});
       const content = await performForegroundSync({manual:true,shouldApply});
       if (content?.status === "error") throw new Error(content.message || "Updates could not be checked. Try again.");
       if (!shouldApply()) return false;
@@ -48487,8 +48488,7 @@ async function start() {
   projectUpdateAutoApplyReady = true;
   for (const event of ["input", "change", "focusin", "focusout"]) document.addEventListener(event, projectUpdateEditingActivity, true);
   retireWorkspaceLayoutSyncState();
-  void publicCodeRevision.probe();
-  window.setInterval(() => { if (document.visibilityState === "visible") void publicCodeRevision.probe(); }, 60000);
+  bindPublicCodeRevisionChecks({window, document, probe:options => publicCodeRevision.probe(options)});
   if (detachedWorkboardRoute && !detachedProjectWindow) {
     throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
   }
@@ -48616,7 +48616,6 @@ async function start() {
     }
   });
   window.addEventListener("online", () => {
-    void publicCodeRevision.probe({ force: true, reconnect: true });
     serverReachable = true;
     updateConnectionStatus();
     startForegroundSyncLoop({ immediate: true });
@@ -48634,7 +48633,6 @@ async function start() {
       flushResearchDraftPersistence();
     }
     if (document.visibilityState === "visible") {
-      void publicCodeRevision.probe();
       startForegroundSyncLoop({ immediate: true });
     } else {
       stopForegroundSyncLoop();

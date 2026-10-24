@@ -4,6 +4,26 @@ export function isPublicCodePath(path) {
   return /^\/code\/(?:libraries|chapters(?:\/[a-zA-Z0-9_-]+)?|sections(?:\/(?:\d+|resolve))?|search)$/.test(url.pathname);
 }
 
+// Discover app/code releases on navigation and return, without an idle timer.
+// The controller coalesces focus/pageshow/visibility events and throttles them.
+export function bindPublicCodeRevisionChecks({window, document, probe}) {
+  const returned = () => {
+    if (document.visibilityState === "visible" && window.navigator.onLine !== false) void probe();
+  };
+  const reconnected = () => { void probe({force: true, reconnect: true}); };
+  window.addEventListener("focus", returned);
+  window.addEventListener("pageshow", returned);
+  window.addEventListener("online", reconnected);
+  document.addEventListener("visibilitychange", returned);
+  returned();
+  return () => {
+    window.removeEventListener("focus", returned);
+    window.removeEventListener("pageshow", returned);
+    window.removeEventListener("online", reconnected);
+    document.removeEventListener("visibilitychange", returned);
+  };
+}
+
 function waitForProbe(promise, signal) {
   if (!signal) return promise;
   signal.throwIfAborted();

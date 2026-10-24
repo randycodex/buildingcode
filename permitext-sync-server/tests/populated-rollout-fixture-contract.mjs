@@ -60,7 +60,9 @@ try {
   await assert.rejects(get(probe.notebook.js));
   await assert.rejects(get(probe.notebook.css));
   await assert.rejects(get('/web/app.js?v=baseline'));
-  assert.equal((await get('/fixture/rollout-state?key=secret')).status,200);
+  const stateResponse=await get('/fixture/rollout-state?key=secret');
+  assert.equal(stateResponse.status,200);
+  assert.equal((await stateResponse.json()).revisionRequests,0,'Rollout diagnostics count only public revision checks');
   assert.equal((await get('/fixture/rollout?key=secret')).status,200);
   await control({networkOff:false,phase:'current'});
   assert.equal(await (await get('/web/app.js?v=current')).text(),'const notebookClientVersion = "notebook-current";');

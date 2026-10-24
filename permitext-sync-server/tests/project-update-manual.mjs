@@ -84,9 +84,10 @@ for(const changed of [false,true]) {
 }
 
 function harness(scenario='changed') {
- let stored={},current=true;const calls=[];
+ let stored={},current=true,publicProbes=0;const calls=[];
  const c=vm.createContext({automaticContentUpdatesEnabled,
   projectUpdatesApplying:new Set(),projectUpdateAutoGuards:new Map(),projectUpdateReviewRequired:new Set(),projectUpdateEditingGeneration:0,
+  publicCodeRevision:{probe:options=>{assert.equal(options.force,true);publicProbes++;return new Promise(()=>{});}},
   activeWorkspaceID:'w',activeWorkspaceRecord:()=>({projectID:'p'}),canonicalUpdateProjectID:x=>x,projectUpdateRuntimeKey:()=> 'u:p',
   captureAccountRequest:()=>({userID:'u'}),isCurrentAccountRequest:()=>current,canRunForegroundSync:()=>scenario!=='offline',
   pendingProjectUpdate:()=>projectUpdateNotice(stored,'p'),projectUpdateRecords:()=>stored,writeProjectUpdateRecords:next=>stored=next,
@@ -112,10 +113,11 @@ function harness(scenario='changed') {
    if(options.shouldApply())calls.push('render');
   },saveWorkspaceState:()=>calls.push('save'),showWebNotice:async()=>calls.push('error')});
  vm.runInContext(actual('applyPendingProjectUpdates')+'\n'+actual('applyProjectUpdatesFromBadge'),c);
- return {c,calls,notice:()=>projectUpdateNotice(stored,'p')};
+ return {c,calls,publicProbes:()=>publicProbes,notice:()=>projectUpdateNotice(stored,'p')};
 }
 for(const scenario of ['changed','unchanged','offline','cancel','editing','editing-during-read','account','workspace','check-failure','read-failure','newer']) {
  const h=harness(scenario);const applied=await h.c.applyProjectUpdatesFromBadge();
+ assert.equal(h.publicProbes(),['offline','cancel'].includes(scenario)?0:1,'Only an eligible explicit SYNC checks the app version, once, without waiting for discovery');
  if(scenario==='changed') {assert.equal(applied,true);assert.equal(h.notice(),null);assert(h.calls.includes('render'));}
  if(scenario==='unchanged') {assert.equal(applied,true);assert.deepEqual(h.calls,['confirm','sync-check','artifact-check']);}
  if(scenario==='offline')assert.deepEqual(h.calls,[]);
