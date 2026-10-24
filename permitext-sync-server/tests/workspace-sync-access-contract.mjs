@@ -1,3 +1,4 @@
+import { onlyWorkspaceLayoutsChanged } from "../public/workspace-layout-sync.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
@@ -9,7 +10,7 @@ function fixture({ snapshot = null, baseline = null } = {}) {
   const network = deferred(), chain = deferred();
   let generation = 1;
   const c = vm.createContext({
-    syncedContent: baseline, syncLoadPromise: null, foregroundSyncLastFullPullAt: 0,
+    reconcileWorkspaceLayouts() {}, onlyWorkspaceLayoutsChanged, syncedContent: baseline, syncLoadPromise: null, foregroundSyncLastFullPullAt: 0,
     Date, navigator: { onLine: true }, serverReachable: true,
     permitextSyncSchemaVersion: 1, permitextClientCapabilities: [],
     activeAccount: () => ({ userID: "a", sessionToken: "token" }),

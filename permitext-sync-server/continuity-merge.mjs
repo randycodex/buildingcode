@@ -1,3 +1,4 @@
+import { mergeWorkspaceLayouts, workspaceLayoutsKey, isWorkspaceLayoutOnlyMutation } from "./public/workspace-layout-sync.js";
 import { migrateProjectSearchHistory, normalizeProjectSearchHistory, projectRecentSearchQueries } from "./public/recent-search-scope.js";
 import { recentViewProjectID, limitRecentViewsByProject } from "./public/recent-view-scope.js";
 import { syncCodeVersion } from "./public/sync-identity.js";
@@ -151,6 +152,8 @@ export function mergeContinuityRecords(left, right, { mergedAt } = {}) {
 
   const preferred = preferredSnapshot(left, right);
   const records = [left, right];
+  const presentationOnly = isWorkspaceLayoutOnlyMutation({continuity: preferred});
+  const contentPreferred = presentationOnly ? (preferred === left ? right : left) : preferred;
   const viewsClearedAt = mergedClearTimestamp(records, "views");
   const searchesClearedAt = mergedClearTimestamp(records, "searches");
   const views = mergedRecentViews(records, viewsClearedAt);
@@ -167,7 +170,8 @@ export function mergeContinuityRecords(left, right, { mergedAt } = {}) {
   return {
     ...preferred,
     values: {
-      ...(preferred.values || {}),
+      ...(contentPreferred.values || {}),
+      [workspaceLayoutsKey]: JSON.stringify(mergeWorkspaceLayouts(left.values?.[workspaceLayoutsKey], right.values?.[workspaceLayoutsKey])),
       workspaceGroupsJSON: JSON.stringify(mergeGroupCatalogs(left.values?.workspaceGroupsJSON, right.values?.workspaceGroupsJSON)),
       workspaceCatalogJSON: JSON.stringify(mergeWorkspaceCatalogs(left.values?.workspaceCatalogJSON, right.values?.workspaceCatalogJSON)),
       recentlyViewedSectionsJSON: JSON.stringify(views),

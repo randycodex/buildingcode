@@ -1,3 +1,4 @@
+import { onlyWorkspaceLayoutsChanged } from "../public/workspace-layout-sync.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
@@ -208,6 +209,7 @@ function harness(overrides = {}) {
     },
     async convergeServerNewerSyncConflicts(account) { return overrides.converge?.(account); },
     recoverVerifiedLegacyWorkspace(identity) { effects.recovery.push(identity.userID); },
+    reconcileWorkspaceLayouts() {}, onlyWorkspaceLayoutsChanged,
     reconcileSharedWorkspaceCatalog() { effects.catalogs.push(state.account?.userID); },
     async applyRemoteContinuityIfNewer() { effects.continuity += 1; },
     async saveOfflineSyncSnapshot(userID, content) { effects.saved.push({ userID, content: structuredClone(content) }); },

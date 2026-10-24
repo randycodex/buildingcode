@@ -23,8 +23,8 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1873";
-const shellAssetVersion = "20261023-notes-reveal-v1298";
+const shellCacheName = "permitext-pro-shell-v1874";
+const shellAssetVersion = "20261023-layout-sync-v1299";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -79,6 +79,7 @@ const shellURLs = [
   "/web/reader-definition-registry.json?v=20260917-definitions-v87",
   "/web/group-catalog.js?v=20260914-v1",
   "/web/workspace-catalog.js?v=20260914-v1",
+  "/web/workspace-layout-sync.js?v=1",
   "/workspace",
   "/",
   "/marketing/home.js?v=20260921-theme-switch-v1",
@@ -91,13 +92,13 @@ const shellURLs = [
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
   "/web/assistant-materials.js?v=4",
-  "/web/app.js?v=20261023-notes-reveal-v1298",
+  "/web/app.js?v=20261023-layout-sync-v1299",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261023-notes-reveal-v1298",
+  "/web/offline-storage.js?v=20261023-layout-sync-v1299",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",

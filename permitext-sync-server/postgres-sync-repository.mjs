@@ -648,8 +648,9 @@ export function createPostgresSyncRepository(sql) {
   }
 
   async function pull(userID, { since, sinceEventID }) {
+    const hasEventCursor = Number.isSafeInteger(sinceEventID) && sinceEventID >= 0;
     let filteredQuery;
-    if (Number.isSafeInteger(sinceEventID) && sinceEventID >= 0) {
+    if (hasEventCursor) {
       filteredQuery = sql`
         SELECT records.mutation,
           (
@@ -709,6 +710,32 @@ export function createPostgresSyncRepository(sql) {
         FROM permitext_user_content_records AS records
         WHERE records.user_id = ${userID}
           AND records.entity_kind = 'project'
+          AND EXISTS (
+            SELECT 1 FROM permitext_user_content_records AS sections
+            WHERE sections.user_id = ${userID}
+              AND sections.entity_kind = 'projectSection'
+              AND sections.code_version IS NOT DISTINCT FROM records.code_version
+              AND (
+                (sections.mutation->'projectSection'->>'folderClientID') IN
+                  (records.mutation->'project'->>'clientID', records.mutation->'project'->>'id')
+                OR (
+                  sections.mutation->'projectSection'->>'localFolderID' IS NOT NULL
+                  AND sections.mutation->'projectSection'->'localFolderID' = records.mutation->'project'->'localFolderID'
+                )
+              )
+              AND (
+                (${hasEventCursor} AND EXISTS (
+                  SELECT 1 FROM permitext_sync_events AS changed
+                  WHERE changed.user_id = ${userID}
+                    AND changed.record_id = sections.record_id
+                    AND changed.event_id > ${Number.isSafeInteger(sinceEventID) ? sinceEventID : 0}
+                ))
+                OR (
+                  ${!hasEventCursor && Number.isFinite(since)}
+                  AND sections.updated_at > ${Number.isFinite(since) ? new Date(since).toISOString() : '1970-01-01T00:00:00.000Z'}::timestamptz
+                )
+              )
+          )
         ORDER BY records.record_id
       `,
       sql`
@@ -722,9 +749,8 @@ export function createPostgresSyncRepository(sql) {
 
     return {
       mutations: filteredRows.map((row) => mutationWithServerEventID(safeJSON(row.mutation, {}), row.server_event_id)),
-      // Incremental pulls only need project records to resolve a changed
-      // projectSection's parent. Avoid re-reading every saved record on each
-      // foreground poll as a user's library grows.
+      // Resolve only parents of changed projectSections. Metadata-only pulls
+      // return no dependency rows, including no full Project records.
       allMutations: [...filteredRows, ...dependencyRows]
         .map((row) => mutationWithServerEventID(safeJSON(row.mutation, {}), row.server_event_id)),
       latestEventID: Number(latestRows[0]?.latest_event_id || 0),
