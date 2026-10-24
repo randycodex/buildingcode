@@ -1,4 +1,5 @@
-import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates } from "./project-update-notices.js?v=2";
+import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
+import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates } from "./project-update-notices.js?v=3";
 import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=8';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=5";
 import { createAssistantMaterials } from "./assistant-materials.js?v=4";
@@ -9,7 +10,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-layout-toolbar-v1316";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-local-layout-note-review-v1319";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
@@ -42,7 +43,7 @@ import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsC
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
-import { sharedWorkspaceLayout, workspaceLayoutFingerprint, mergeWorkspaceLayouts, applySharedWorkspaceLayout, isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, workspaceLayoutsKey, workspaceLayoutSyncDelay } from "./workspace-layout-sync.js?v=2";
+import { isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, withoutWorkspaceLayoutSync, retireWorkspaceLayoutSyncEntries } from "./workspace-layout-sync.js?v=3";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
 import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20261012-workflow-cache-v5";
 import {
@@ -141,7 +142,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-layout-toolbar-v1316";
+} from "./offline-storage.js?v=20261023-local-layout-note-review-v1319";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -604,10 +605,6 @@ if (detachedProjectWindow && detachedProject) initializeDetachedProjectState(det
 const searchTimers = new Map();
 const readerSearchTimers = new Map();
 let syncedContent = null;
-let workspaceLayoutSyncTimer = null;
-let workspaceLayoutSyncAccount = "";
-const workspaceLayoutBaselines = new Map();
-const workspaceLayoutApplied = new Map();
 const projectUpdatesApplying = new Set();
 let syncLoadPromise = null;
 let organizationWorkspace = null;
@@ -1461,10 +1458,7 @@ async function applyProjectUpdatesFromBadge() {
   projectUpdatesApplying.add(key);
   renderProjectUpdateBadge();
   try {
-    const isLayoutOnly = Object.keys(pending.domains).every(domain => domain === "layout");
-    applyPendingWorkspaceLayout({force:true, allowRemote:true});
-    if (isLayoutOnly) await renderUtilityWorkspace({persist:false,skipDeletedProjectCleanup:true});
-    else await refreshSyncedWorkspaceInPlace({accountUserID:identity.userID,forceProjectUpdate:true});
+    await refreshSyncedWorkspaceInPlace({accountUserID:identity.userID,forceProjectUpdate:true});
     requireCurrentAccountRequest(identity);
     if (workspaceID !== activeWorkspaceID) return;
     const project = workspaceProject();
@@ -1489,133 +1483,19 @@ async function applyProjectUpdatesFromBadge() {
   }
 }
 
-// Layouts share the existing account-scoped continuity record and durable outbox.
-// These helpers never pull content or introduce another polling loop.
-function workspaceLayoutCatalog() {
-  return mergeWorkspaceLayouts(localStorage.getItem(`${workspaceRegistryKey}:layouts`));
-}
-
-function writeWorkspaceLayoutCatalog(records) {
-  const key = `${workspaceRegistryKey}:layouts`;
-  const serialized = JSON.stringify(records);
-  if (localStorage.getItem(key) !== serialized) localStorage.setItem(key, serialized);
-}
-
-function workspaceLayoutRuntimeKey() {
-  return `${activeAccount()?.userID || ""}:${activeWorkspaceID}`;
-}
-
-function scheduleWorkspaceLayoutSync() {
-  clearTimeout(workspaceLayoutSyncTimer);
-  const identity = captureAccountRequest();
-  workspaceLayoutSyncTimer = setTimeout(() => {
-    workspaceLayoutSyncTimer = null;
-    if (!isCurrentAccountRequest(identity)) return;
-    const queued = queueWorkspaceLayoutSync();
-    if (queued && navigator.onLine !== false) void flushSyncOutbox({ refresh: false }).catch(() => {});
-  }, workspaceLayoutSyncDelay);
-}
-
-function recordWorkspaceLayoutChange() {
-  const account = activeAccount();
-  const workspace = activeWorkspaceRecord();
-  if (!account || workspaceLayoutSyncAccount !== account.userID || !workspace?.projectID ||
-      detachedProjectWindow || workspaceRestoreError) return;
-  const layout = sharedWorkspaceLayout(state);
-  const serialized = workspaceLayoutFingerprint(layout);
-  const key = workspaceLayoutRuntimeKey();
-  const records = workspaceLayoutCatalog();
-  const prior = records.find(record => record.id === activeWorkspaceID);
-  const baseline = workspaceLayoutBaselines.get(key);
-  workspaceLayoutBaselines.set(key, serialized);
-  // Rendering the retained local layout must not publish over an unapplied remote update.
-  if (pendingProjectUpdate(workspace.projectID)?.domains.layout) return;
-  // Observe hydration without publishing a default over another device's layout.
-  if (baseline === undefined && prior) return;
-  if (baseline === serialized || prior && workspaceLayoutFingerprint(prior.layout) === serialized) return;
-  const updatedAt = new Date(Math.max(Date.now(), (Date.parse(prior?.updatedAt) || 0) + 1)).toISOString();
-  const record = {id: activeWorkspaceID, projectID: workspace.projectID, updatedAt, layout, sourceClientID:projectUpdateBrowserID()};
-  const merged = mergeWorkspaceLayouts(records, [record]);
-  if (!merged.some(item => item.id === record.id && item.updatedAt === updatedAt)) return;
-  writeWorkspaceLayoutCatalog(merged);
-  rememberProjectUpdate({projectID:workspace.projectID,domain:"layout",version:Date.parse(updatedAt),updatedAt,local:true});
-  workspaceLayoutApplied.set(key, updatedAt);
-  scheduleWorkspaceLayoutSync();
-}
-
-function queueWorkspaceLayoutSync() {
-  clearTimeout(workspaceLayoutSyncTimer);
-  workspaceLayoutSyncTimer = null;
-  const account = activeAccount();
-  if (!account || workspaceLayoutSyncAccount !== account.userID || detachedProjectWindow || workspaceRestoreError) return;
-  const remote = mergeWorkspaceLayouts(syncedContent?.summary?.latestContinuity?.values?.[workspaceLayoutsKey]);
-  const pending = (state.syncOutbox || []).find(entry => entry.accountUserID === account.userID && entry.mutation?.continuity);
-  const known = mergeWorkspaceLayouts(remote, pending?.mutation.continuity.values?.[workspaceLayoutsKey],
-    localStorage.getItem(`${workspaceRegistryKey}:layouts-uploaded`));
-  const changed = workspaceLayoutCatalog().filter(record => {
-    const prior = known.find(item => item.id === record.id);
-    return !prior || record.updatedAt > prior.updatedAt || record.updatedAt === prior.updatedAt && JSON.stringify(record) !== JSON.stringify(prior);
-  });
-  if (!changed.length) return;
-  const values = {...pending?.mutation.continuity.values,
-    [workspaceLayoutsKey]: JSON.stringify(mergeWorkspaceLayouts(pending?.mutation.continuity.values?.[workspaceLayoutsKey], changed))};
-  enqueueSyncMutation({continuity: {userID: account.userID, codeVersion: defaultSyncCodeVersion,
-    values, updatedAt: new Date().toISOString()}}, account);
-  return true;
-}
-
-function acknowledgeWorkspaceLayoutSync(entries, accepted) {
-  const layouts = entries.filter(entry => accepted.has(entry.recordID))
-    .flatMap(entry => mergeWorkspaceLayouts(entry.mutation?.continuity?.values?.[workspaceLayoutsKey]));
-  if (!layouts.length) return;
-  const key = `${workspaceRegistryKey}:layouts-uploaded`;
-  const serialized = JSON.stringify(mergeWorkspaceLayouts(localStorage.getItem(key), layouts));
-  if (localStorage.getItem(key) !== serialized) localStorage.setItem(key, serialized);
-}
-
-function reconcileWorkspaceLayouts() {
-  const account = activeAccount();
-  if (!account || detachedProjectWindow || workspaceRestoreError) return;
-  workspaceLayoutSyncAccount = account.userID;
-  const local = workspaceLayoutCatalog();
-  const remote = mergeWorkspaceLayouts(syncedContent?.summary?.latestContinuity?.values?.[workspaceLayoutsKey]);
-  remote.forEach(record => rememberProjectUpdate({projectID:record.projectID,domain:"layout",version:Date.parse(record.updatedAt),
-    updatedAt:record.updatedAt,sourceClientID:record.sourceClientID}));
-  writeWorkspaceLayoutCatalog(mergeWorkspaceLayouts(local, remote));
-  if (JSON.stringify(mergeWorkspaceLayouts(local, remote)) !== JSON.stringify(remote)) scheduleWorkspaceLayoutSync();
-}
-
-function applyPendingWorkspaceLayout({force = false, allowRemote = false} = {}) {
-  const account = activeAccount();
-  const workspace = activeWorkspaceRecord();
-  if (!account || workspaceLayoutSyncAccount !== account.userID || !workspace?.projectID || detachedProjectWindow) return false;
-  if (!allowRemote && pendingProjectUpdate(workspace.projectID)?.domains.layout) return false;
-  const record = workspaceLayoutCatalog().find(item => item.id === activeWorkspaceID && item.projectID === workspace.projectID);
-  const key = workspaceLayoutRuntimeKey();
-  if (!record || !force && workspaceLayoutApplied.get(key) === record.updatedAt) return false;
-  // A background pull must never close an editor with a local unsaved draft.
-  if (!force && (track?.classList.contains("is-resizing") || track?.querySelector(".workspace-panel.is-dragging") ||
-      track?.contains(document.activeElement) && document.activeElement?.matches?.('input, textarea, select, [contenteditable="true"]') ||
-      notebookPendingDraftCount > 0 || Array.from(reportDraftMounts.values()).some(mount => mount.hasUnsavedChanges?.()))) return false;
-  const baseline = workspaceLayoutBaselines.get(key);
-  if (!force && baseline !== undefined && workspaceLayoutFingerprint(state) !== baseline) {
-    recordWorkspaceLayoutChange();
-    return false;
+// Retire queued layout metadata without touching local workspace snapshots or
+// unrelated content/group mutations. Re-run before a flush for restored accounts.
+function retireWorkspaceLayoutSyncState() {
+  const accountUserID = state.account?.userID;
+  if (!accountUserID) return false;
+  let changed = false;
+  for (const key of ["syncOutbox", "syncConflicts"]) {
+    const entries = state[key] || [];
+    const next = retireWorkspaceLayoutSyncEntries(entries, accountUserID);
+    if (next !== entries) { state[key] = next; changed = true; }
   }
-  const project = (state.projectDetails || []).find(detail =>
-    [detail.id, detail.clientID, detail.localFolderID].includes(record.projectID));
-  if (!project) return false;
-  const next = applySharedWorkspaceLayout(state, record, project);
-  Object.assign(state, next);
-  // This is a restored preference, not a local column-add/remove operation.
-  // Reconcile from the incoming manual sizing mode instead of stale DOM state.
-  delete track._researchColumnLayout;
-  state.utilityInstances = normalizeUtilityInstances(state);
-  restoreResearchWorkspaceState();
-  workspaceLayoutApplied.set(key, record.updatedAt);
-  workspaceLayoutBaselines.set(key, workspaceLayoutFingerprint(state));
-  persistCodeQuestionAccountState();
-  return true;
+  if (changed) saveWorkspaceState();
+  return changed;
 }
 
 function workspaceSnapshotKey(workspaceID) {
@@ -1874,7 +1754,6 @@ function saveWorkspaceState() {
     const globalState = Object.fromEntries(globalWorkspaceStateKeys.map((key) => [key, state[key]]));
     localStorage.setItem(baseWorkspaceKey, JSON.stringify(withoutPersistentSearchQueries(globalState)));
     sessionStorage.removeItem(tabWorkspaceKey);
-    recordWorkspaceLayoutChange();
     updateConnectionStatus();
     return;
   }
@@ -2015,7 +1894,6 @@ function applyStoredWorkspaceLayout(layout) {
   applyWorkspaceLayout(state, restoreSearchQuerySession(sessionStorage, tabWorkspaceKey, activeWorkspaceID,
     retireUnassignedLayout(workspaceLayoutWithoutCodeQuestionData(layout))));
   loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
-  applyPendingWorkspaceLayout({force: true});
   state.utilityInstances = normalizeUtilityInstances(state);
   setOpenProjectDetails(state.projectDetails);
   state.workboards = normalizeProjectIdentities(state.workboards);
@@ -11900,7 +11778,6 @@ async function loadSyncedContent(options = {}) {
       await convergeServerNewerSyncConflicts(account);
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       observeSyncedProjectUpdates(payload.mutations || [], baseline?.mutations || []);
-      reconcileWorkspaceLayouts();
       reconcileSharedWorkspaceCatalog();
       await applyRemoteContinuityIfNewer();
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
@@ -11942,7 +11819,6 @@ async function loadSyncedContent(options = {}) {
         mutations,
         summary: summarizeMutations(mutations)
       };
-      if (workspacePresentationAccess === "permitted-offline") reconcileWorkspaceLayouts();
       return syncedContent;
     })
     .finally(() => {
@@ -12805,7 +12681,7 @@ function continuityValuesForReader(reader, options = {}) {
     .filter((entry) => !account || entry.accountUserID === account.userID)
     .map((entry) => mutationKindAndRecord(entry.mutation))
     .find(({ kind }) => kind === "continuity")?.record;
-  const existing = {...syncedContent?.summary?.latestContinuity?.values, ...pendingRecord?.values};
+  const {workspaceLayoutsJSON: retiredLayout, ...existing} = {...syncedContent?.summary?.latestContinuity?.values, ...pendingRecord?.values};
   const chapter = chapters.find((item) => String(item.id) === String(reader.chapterID || ""));
   const sectionID = Number(reader.sectionID || 0);
   const syncedRecentEntries = continuityRecentEntries(existing);
@@ -12927,6 +12803,8 @@ async function applyRemoteContinuityIfNewer() {
 
 function enqueueSyncMutation(mutation, account, options = {}) {
   requirePrivateWorkspaceWritable();
+  mutation = withoutWorkspaceLayoutSync(mutation);
+  if (!mutation) return null;
   const currentAccount = activeAccount();
   const { record } = mutationKindAndRecord(mutation);
   if (!account || currentAccount?.userID !== account.userID ||
@@ -12995,6 +12873,7 @@ function recoverQueuedWorkboardProjectID(record = {}) {
 }
 
 function prepareSyncOutboxForFlush(account) {
+  retireWorkspaceLayoutSyncState();
   const repairedEntries = [];
   const quarantinedEntries = [];
   let changed = false;
@@ -13256,7 +13135,6 @@ async function flushSyncOutbox(options = {}) {
           }))
         ];
         absorbBulkClearConflicts();
-        acknowledgeWorkspaceLayoutSync(entries, accepted);
         saveWorkspaceState();
         storeAccountEntitlement(payload.entitlement || null);
       } catch (error) {
@@ -13584,7 +13462,6 @@ async function refreshSyncedWorkspaceInPlace(options = {}) {
       (syncedContent?.summary?.projects || []).some(project => projectRecordID(project) === activeWorkspaceRecord()?.projectID &&
         !project.deletedAt && !projectIsArchived(project))) { renderProjectUpdateBadge(); return true; }
   if (syncedContent?.layoutOnly && !options.forceProjectUpdate) {
-    if (applyPendingWorkspaceLayout()) await renderUtilityWorkspace({persist: false, skipDeletedProjectCleanup: true});
     return true;
   }
   const syncedProjects = currentContentSummary().projects || [];
@@ -14048,7 +13925,6 @@ async function handleForegroundSyncSignal(message) {
     message.sourceTabID === foregroundSyncTabID
   ) return;
   if (message.type === "workspace-layouts") {
-    if (applyPendingWorkspaceLayout()) await renderUtilityWorkspace({persist: false, skipDeletedProjectCleanup: true});
     return;
   }
   if (message.type === "project-artifact-revisions") {
@@ -14082,7 +13958,6 @@ async function handleForegroundSyncSignal(message) {
   ) return;
   syncedContent = snapshot;
   observeSyncedProjectUpdates(snapshot.mutations || []);
-  reconcileWorkspaceLayouts();
   foregroundSyncLastFullPullAt = Date.parse(snapshot.pulledAt || "") || Date.now();
   await refreshSyncedWorkspaceInPlace({ accountUserID });
 }
@@ -14167,9 +14042,6 @@ async function performForegroundSync(options = {}) {
     }
 
     requireCurrentAccountRequest(requestIdentity);
-    // A layout deferred while an editor was focused can apply on a later
-    // existing checkpoint, even when there are no further server changes.
-    if (applyPendingWorkspaceLayout()) await renderUtilityWorkspace({persist: false, skipDeletedProjectCleanup: true});
     const nextEventID = Number(content?.latestEventID || 0);
     if (
       syncResultChangesWorkspace(pushResult) ||
@@ -30531,6 +30403,13 @@ async function renderProjectReportDraft(project, resume = null) {
 
   let drafts = [];
   let sources = [];
+  const openReportSourceNote = async note => {
+    const current = () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
+    if (!current() || !await confirmWorkspaceTransition() || !current()) return;
+    if (await switchWorkflowView("notebook", {initialize:false}) && current()) {
+      await openNotebookNoteColumn(identity, note);
+    }
+  };
   const sourcePreviewRequests = new Map();
   let sourceWarnings = [];
   let history = [];
@@ -31052,28 +30931,40 @@ async function renderProjectReportDraft(project, resume = null) {
           provenanceLabel.textContent = `Snapshot of Note: ${block.derivedFrom.title}`;
           provenance.append(provenanceLabel);
           let latestSource;
+          const sourceStatus = document.createElement("span");
+          sourceStatus.className = "report-note-update-status";
+          sourceStatus.textContent = "Source Note updated";
+          sourceStatus.setAttribute("role", "status");
+          const openNote = document.createElement("button"); openNote.type = "button";
+          openNote.textContent = "Open source Note";
+          openNote.addEventListener("click", () => {
+            void openReportSourceNote(block.derivedFrom).catch(error => { if (isCurrentAccountRequest(requestIdentity)) showStatusError(error.message); });
+          });
           const updateNote = document.createElement("button");
           updateNote.type = "button";
           row.refreshLinkedNoteState = () => {
             latestSource = sources.find(source => source.kind === "notebookCard" && source.id === block.derivedFrom.id);
-            updateNote.textContent = latestSource?.version > block.derivedFrom.version ? "Review updated Note" : "Review linked Note";
-            updateNote.disabled = !latestSource;
+            const changed = reportNoteSourceChanged(block, latestSource);
+            sourceStatus.hidden = !changed;
+            sourceStatus.title = changed ? `Report snapshot: version ${block.derivedFrom.version || "unknown"} · latest Note: version ${latestSource.version}` : "";
+            updateNote.textContent = changed ? "Review updated Note" : "Review linked Note";
+            updateNote.disabled = openNote.disabled = !latestSource;
           };
           row.refreshLinkedNoteState();
           updateNote.addEventListener("click", async () => {
             updateNote.disabled = true;
             const draftID = activeDraft.id;
             try {
-              const { card } = await postResearch("/notebook/cards/get", { projectID, cardID: block.derivedFrom.id });
-              requireCurrentAccountRequest(requestIdentity);
-              if (disposed || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
-              const text = card.plainText || "";
-              if (text.length > 20000) throw new Error("This Note is too long for one Report paragraph. Keep the linked source or split the Note before updating this paragraph.");
-              const accepted = await confirmWebWarning("Update this Report paragraph?",
-                `Latest Note: ${card.title} · version ${card.version}\n\n${text}\n\nThis replaces this paragraph’s report-specific text. Saved PDF versions stay unchanged.`,
-                { confirmLabel: "Replace with reviewed Note" });
-              if (!accepted || disposed || !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
-              block.text = text;
+              const card = await reviewReportNoteSnapshot(block, {
+                loadNote: async cardID => (await postResearch("/notebook/cards/get", {projectID, cardID})).card,
+                isCurrent: () => !disposed && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === requestWorkspaceID && activeDraft.id === draftID && activeDraft.blocks.includes(block),
+                confirm: ({block: snapshot, card}) => confirmWebWarning("Review source Note", "Compare your current Report text with the latest Note before replacing it. Saved PDF versions stay unchanged.", {
+                  confirmLabel: "Replace with reviewed Note", cancelLabel: "Keep Report text",
+                  content: createReportNoteComparison(snapshot, card)
+                })
+              });
+              if (!card) return;
+              block.text = card.plainText || "";
               delete block.richText;
               delete block.sourceFormatting;
               block.kind = "paragraph";
@@ -31085,9 +30976,9 @@ async function renderProjectReportDraft(project, resume = null) {
               block.evidenceLinks = structuredClone(card.evidenceLinks || []);
               setDirty(); renderWorkspaceContent();
             } catch (error) { if (isCurrentAccountRequest(requestIdentity)) showStatusError(error.message); }
-            finally { updateNote.disabled = !latestSource; }
+            finally { row.refreshLinkedNoteState(); }
           });
-          provenance.append(updateNote);
+          provenance.append(sourceStatus, openNote, updateNote);
           (block.evidenceLinks || []).forEach((evidenceLink) => {
             const sourceButton = document.createElement("button");
             sourceButton.type = "button";
@@ -31127,6 +31018,10 @@ async function renderProjectReportDraft(project, resume = null) {
         if (!sourceTitle.parentElement) row.append(sourceTitle);
         if (source) {
           if (block.kind === "notebookCard") {
+            const openNote = document.createElement("button"); openNote.type = "button";
+            openNote.textContent = "Open source Note";
+            openNote.addEventListener("click", () => { void openReportSourceNote({id:block.sourceID, title:source.title || source.label}).catch(error => { if (isCurrentAccountRequest(requestIdentity)) showStatusError(error.message); }); });
+            row.append(openNote);
             const explanation = document.createElement("p");
             explanation.className = "report-workflow-help";
             explanation.textContent = "Linked Note uses its latest saved content. Create an editable snapshot to keep report-specific wording.";
@@ -39257,7 +39152,7 @@ async function performSettingsClearAction(action) {
         .filter((entry) => entry.accountUserID === account.userID)
         .map((entry) => mutationKindAndRecord(entry.mutation))
         .find(({ kind }) => kind === "continuity")?.record;
-      const existing = {...syncedContent?.summary?.latestContinuity?.values, ...pendingRecord?.values};
+      const {workspaceLayoutsJSON: retiredLayout, ...existing} = {...syncedContent?.summary?.latestContinuity?.values, ...pendingRecord?.values};
       const updatedAt = new Date().toISOString();
       enqueueSyncMutation({
         continuity: {
@@ -47776,7 +47671,6 @@ async function renderWorkspace(options = {}) {
   const readerScrollPositions = suppressReaderScrollRestore ? new Map() : captureReaderScrollPositions();
   if (accessGate.allowed) {
     reconcileProjectWorkspaces();
-    applyPendingWorkspaceLayout();
     accessGate = workspaceAccessGateForRender();
     enforceProjectRequiredWorkspace();
     (state.utilityInstances || []).filter((item) => item.key === "saved").forEach(scopeSavedInstanceToWorkspace);
@@ -47801,7 +47695,6 @@ async function renderUtilityWorkspace(options = {}) {
   let accessGate = workspaceAccessGateForRender();
   if (accessGate.allowed) {
     if (!options.skipDeletedProjectCleanup || workspaceColumnsRequireProject()) reconcileProjectWorkspaces();
-    applyPendingWorkspaceLayout();
     accessGate = workspaceAccessGateForRender();
     enforceProjectRequiredWorkspace();
     enforceReaderPlanLimit();
@@ -48312,6 +48205,7 @@ function loadStartupCatalogs() {
 }
 
 async function start() {
+  retireWorkspaceLayoutSyncState();
   void publicCodeRevision.probe();
   window.setInterval(() => { if (document.visibilityState === "visible") void publicCodeRevision.probe(); }, 60000);
   if (detachedWorkboardRoute && !detachedProjectWindow) {
@@ -48457,7 +48351,6 @@ async function start() {
     if (document.visibilityState !== "visible") {
       flushSearchQueryPersistence();
       flushResearchDraftPersistence();
-      queueWorkspaceLayoutSync();
     }
     if (document.visibilityState === "visible") {
       void publicCodeRevision.probe();
@@ -48466,7 +48359,6 @@ async function start() {
       stopForegroundSyncLoop();
     }
   });
-  window.addEventListener("pagehide", queueWorkspaceLayoutSync);
   window.addEventListener("pagehide", flushSearchQueryPersistence);
   window.addEventListener("pagehide", flushResearchDraftPersistence);
   window.addEventListener("pagehide", stopForegroundSyncLoop);
@@ -48632,21 +48524,6 @@ start().catch((error) => {
   console.error(error);
   reportClientError("startup", error);
   renderWorkspaceLoadError(error);
-});
-
-// Dismiss the Layout popover after an action, outside click, or Escape.
-const layoutMenu = document.querySelector(".topbar-layout-menu");
-layoutMenu.addEventListener("click", (event) => {
-  if (event.target.closest("button")) layoutMenu.open = false;
-});
-document.addEventListener("click", (event) => {
-  if (!layoutMenu.contains(event.target)) layoutMenu.open = false;
-});
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && layoutMenu.open) {
-    layoutMenu.open = false;
-    layoutMenu.querySelector("summary").focus();
-  }
 });
 
 // Close workspace disclosures when clicking elsewhere.

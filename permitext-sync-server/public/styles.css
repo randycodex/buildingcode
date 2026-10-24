@@ -20987,3 +20987,13 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workflow-toolbar > .workflow-layout-actions { margin-inline-start: auto; flex: 0 0 auto; gap: 2px; padding-inline-start: 12px; }
 .workflow-layout-actions > .toolbar-button { width: 30px; flex: 0 0 30px; padding: 0; }
 .workflow-layout-actions > .toolbar-button:disabled { opacity: .35; cursor: default; }
+
+.report-note-update-status { padding: 3px 8px; border-radius: var(--radius-pill); background: var(--toolbar-active); color: var(--text-primary); font-size: 11px; }
+.report-note-update-status[hidden] { display: none; }
+.web-warning-dialog:has(.report-note-comparison) { width: min(960px, 100%); }
+.report-note-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-block: 20px; }
+.report-note-comparison > section { min-width: 0; }
+.report-note-comparison h3 { margin: 0 0 8px; font-size: 14px; }
+.report-note-comparison-version { margin: 0 0 12px; color: var(--text-secondary); font-size: 12px; }
+.report-note-comparison-text { max-height: min(45dvh, 360px); overflow: auto; padding: 12px; border: 1px solid var(--border); border-radius: 6px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; }
+@media (max-width: 700px) { .report-note-comparison { grid-template-columns: 1fr; gap: 16px; } }

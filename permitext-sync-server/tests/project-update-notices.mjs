@@ -3,7 +3,7 @@ import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
 import {observeProjectUpdate,projectUpdateNotice,acknowledgeProjectUpdates,readProjectUpdateNotices} from '../public/project-update-notices.js';
 const time=n=>`2026-10-23T20:00:0${n}.000Z`;
-const event=(n,extra={})=>({projectID:'p',domain:'layout',version:n,updatedAt:time(n),sourceClientID:'other',...extra});
+const event=(n,extra={})=>({projectID:'p',domain:'project',previousProject:{name:'Old'},version:n,updatedAt:time(n),sourceClientID:'other',...extra});
 let records=observeProjectUpdate({},event(1),'here');
 assert.equal(projectUpdateNotice(records,'p').updatedAt,time(1));
 assert.equal(projectUpdateNotice(records,'other-project'),null);
@@ -35,8 +35,7 @@ for(const scenario of ['success','cancel','failure','newer','account']) {
     requireCurrentAccountRequest:()=>{if(!current)throw Error('Account changed');},
     projectUpdateIsApplying:()=>false,pendingProjectUpdate:()=>projectUpdateNotice(stored,'p'),projectUpdateRecords:()=>stored,
     renderProjectUpdateBadge(){},confirmWorkspaceTransition:async()=>scenario!=='cancel',
-    applyPendingWorkspaceLayout:options=>{assert.equal(options.allowRemote,true);calls.push('layout');},
-    renderUtilityWorkspace:async()=>{calls.push('render');if(scenario==='failure')throw Error('Offline');if(scenario==='account')current=false;if(scenario==='newer')stored=observeProjectUpdate(stored,event(3),'here');},
+    refreshSyncedWorkspaceInPlace:async()=>{calls.push('render');if(scenario==='failure')throw Error('Offline');if(scenario==='account')current=false;if(scenario==='newer')stored=observeProjectUpdate(stored,event(3),'here');},
     workspaceProject:()=>({id:'p'}),projectDetailsScreen:null,writeProjectUpdateRecords:value=>stored=value,acknowledgeProjectUpdates,
     saveWorkspaceState:()=>calls.push('save'),showWebNotice:async()=>calls.push('error')});
   vm.runInContext(actual('applyProjectUpdatesFromBadge'),c);await c.applyProjectUpdatesFromBadge();
@@ -62,3 +61,7 @@ for(const scenario of ['success','cancel','failure','newer','account']) {
   capable=false;c.renderProjectUpdateBadge();assert.equal(button.hidden,true);
 }
 console.log('Project update notices passed: per-project pending state, timestamps, own-write receipts, legacy baselines, explicit apply, failures, cancellation, account fences, and newer-during-apply preservation.');
+
+const oldLayoutNotice={p:{domains:{layout:{pending:true,version:9,updatedAt:time(9)}}}};
+assert.equal(projectUpdateNotice(oldLayoutNotice,'p'),null,'Retired layout notices cannot show the red refresh icon');
+assert.equal(observeProjectUpdate(oldLayoutNotice,event(10,{domain:'layout'}),'here'),oldLayoutNotice,'Ignore old-browser layout events');

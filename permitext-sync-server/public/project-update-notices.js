@@ -8,13 +8,13 @@ export function readProjectUpdateNotices(storage, key) {
 const timestamp = value => Date.parse(value || '') || 0;
 export function observeProjectUpdate(notices, event, browserID) {
   const {projectID, domain, version, updatedAt, sourceClientID, local = false, details, project, previousProject} = event;
-  if (!projectID || !domain || !Number.isFinite(version) || !timestamp(updatedAt)) return notices;
+  if (!projectID || !['project', 'artifacts'].includes(domain) || !Number.isFinite(version) || !timestamp(updatedAt)) return notices;
   const current = notices[projectID] || {domains: {}};
   const prior = current.domains?.[domain];
   if (prior && version <= prior.version) return notices;
-  // Establish unknown legacy records as a baseline. A writer ID lets a new
-  // browser distinguish a new remote layout from its own successful upload.
-  const pending = !local && sourceClientID !== browserID && (Boolean(prior) || domain === 'layout' && Boolean(sourceClientID) || domain === 'project' && Boolean(previousProject) && Boolean(sourceClientID));
+  // Establish unknown legacy records as a baseline. Layout-only events from
+  // older browsers cannot create an update notice.
+  const pending = !local && sourceClientID !== browserID && (Boolean(prior) || domain === 'project' && Boolean(previousProject) && Boolean(sourceClientID));
   const next = {version, updatedAt, pending, ...(details ? {details} : {})};
   return {...notices, [projectID]: {...current, domains: {...current.domains, [domain]: next},
     ...(domain === 'project' && project ? pending
@@ -23,7 +23,7 @@ export function observeProjectUpdate(notices, event, browserID) {
 }
 export function projectUpdateNotice(notices, projectID) {
   const domains = notices[projectID]?.domains || {};
-  const pending = Object.fromEntries(Object.entries(domains).filter(([,value]) => value?.pending));
+  const pending = Object.fromEntries(Object.entries(domains).filter(([domain,value]) => ['project', 'artifacts'].includes(domain) && value?.pending));
   const updatedAt = Object.values(pending).map(value => value.updatedAt).sort((a,b)=>timestamp(b)-timestamp(a))[0];
   return updatedAt ? {updatedAt, domains: pending} : null;
 }

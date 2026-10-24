@@ -130,3 +130,25 @@ export function onlyWorkspaceLayoutsChanged(previous = [], incoming = []) {
     return JSON.stringify(withoutLayout(prior)) === JSON.stringify(withoutLayout(mutation));
   });
 }
+
+// Compatibility with queues written by the retired cross-browser layout feature.
+// Keep its server merge and delta detection for browsers still running old code.
+export function withoutWorkspaceLayoutSync(mutation) {
+  if (!Object.hasOwn(mutation?.continuity?.values || {}, workspaceLayoutsKey)) return mutation;
+  if (isWorkspaceLayoutOnlyMutation(mutation)) return null;
+  const {[workspaceLayoutsKey]: retired, ...values} = mutation.continuity.values;
+  const {continuity, ...rest} = mutation;
+  return {...rest, ...(Object.keys(values).length ? {continuity: {...continuity, values}} : {})};
+}
+
+export function retireWorkspaceLayoutSyncEntries(entries, accountUserID) {
+  let changed = false;
+  const next = entries.flatMap(entry => {
+    if (entry.accountUserID !== accountUserID) return [entry];
+    const mutation = withoutWorkspaceLayoutSync(entry.mutation);
+    if (mutation === entry.mutation) return [entry];
+    changed = true;
+    return mutation ? [{...entry, mutation}] : [];
+  });
+  return changed ? next : entries;
+}
