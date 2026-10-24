@@ -19954,7 +19954,7 @@ dialog.report-export-review {
 .project-details-content { display: flex; flex-direction: column; height: 100%; max-width: 1080px; margin: 0 auto; }
 .project-details-tabs { display: flex; gap: 24px; padding: 20px 32px; border-bottom: 1px solid var(--border); }
 .project-details-tabs button { background: none; border: 0; color: var(--text-secondary); padding: 8px 0; }
-.project-details-tabs button[aria-pressed="true"] { color: var(--text-primary); font-weight: 600; }
+.project-details-tabs button[aria-pressed="true"] { color: var(--text-primary); }
 .project-details-screen .project-information-panel { flex: 1; min-height: 0; min-width: 0; width: 100%; max-width: none; border: 0; overflow-y: auto; padding: 24px 32px; }
 .project-details-screen .project-information-panel[hidden] { display: none; }
 .project-details-screen .project-information-panel > header { display: none; }
@@ -20008,7 +20008,7 @@ dialog.report-export-review {
 }
 .workflow-toolbar .toolbar-button:hover { color: var(--text); }
 .topbar-actions > :is([data-workflow-view], #toggle-report) { color: var(--text-secondary); }
-.topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text); font-weight: 700; }
+.topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text); }
 @media (min-width:761px) {
   :root { --header-height: var(--workspace-bar-height); }
   .topbar { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-rows: 1fr; gap: 12px; padding: 0 24px; }
@@ -20241,7 +20241,7 @@ dialog.report-export-review {
 }
 :is(.account-workspace-view .account-screen-header, .project-details-screen-header) h1 { font-size: 13px; color: var(--text-secondary); font-weight: 500; letter-spacing: normal; }
 :is(.account-workspace-view .account-screen-close, .project-details-screen-close) { --panel-title-control-size: 32px; }
-.topbar #toggle-settings[aria-pressed="true"] { color: var(--text-primary); font-weight: 700; }
+.topbar #toggle-settings[aria-pressed="true"] { color: var(--text-primary); }
 
 /* Keep menu pills clear of the shared bar dividers. */
 .topbar-actions, .topbar-end, .workflow-toolbar > div, .project-details-screen .project-details-tabs { gap: var(--workspace-menu-gap); }
@@ -20271,7 +20271,7 @@ dialog.report-export-review {
 .project-details-screen .project-details-tabs button,
 .report-workspace-view .report-draft-shell .report-draft-primary-actions > button {
   font-size: 12px !important;
-  font-weight: var(--top-menu-font-weight, 300) !important;
+  font-weight: 300 !important;
   text-transform: uppercase;
 }
 
@@ -20283,7 +20283,7 @@ dialog.report-export-review {
 .report-workspace-view [data-open-reader].has-open-reader,
 .project-details-screen .project-details-tabs button[aria-pressed="true"],
 .report-workspace-view .report-draft-shell .report-draft-primary-actions > button:is([aria-expanded="true"], [aria-pressed="true"]) {
-  --top-menu-font-weight: 700;
+  color: var(--text-primary);
 }
 
 /* All navigation bars share the same hover highlight. */
@@ -20969,9 +20969,9 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .settings-offline-card .settings-offline-preference input[type="checkbox"] { flex: 0 0 18px; width: 18px; min-width: 18px; max-width: 18px; height: 18px; min-height: 18px; margin: 0; padding: 0; }
 .settings-offline-preference[hidden] { display: none; }
 
-.project-update-badge { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: auto; height: 30px; padding: 0 14px; border: 0; border-radius: var(--radius-pill); background: transparent; color: #6aa9ff; font-size: 12px; font-weight: 500; cursor: pointer; }
+.project-update-badge { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: auto; height: 30px; padding: 0 14px; border: 0; border-radius: var(--radius-pill); background: transparent; color: #6aa9ff; font-size: 12px; font-weight: 300; cursor: pointer; }
 .workspace-shell .topbar .project-update-badge[hidden] { display: none !important; }
-.workspace-shell .topbar .project-update-badge:not(:disabled):hover { background: var(--workspace-menu-highlight); }
+.workspace-shell .topbar .project-update-badge:not(:disabled):hover { background: var(--workspace-menu-highlight); color: #fff; }
 
 /* Keep every header control centered inside the shared 35px bar. */
 .workspace-shell > .topbar { grid-template-rows: minmax(0, 1fr); align-items: center; }
