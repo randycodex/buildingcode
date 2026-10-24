@@ -20258,6 +20258,10 @@ dialog.report-export-review {
   background: transparent !important;
   white-space: nowrap;
 }
+/* Report's document-action hover rules must not square the navigation pills. */
+.report-workspace-view .workspace-panel.report-draft-panel .report-draft-shell .report-draft-primary-actions > button {
+  border-radius: var(--radius-pill);
+}
 .topbar .topbar-actions > .toolbar-button { width: auto; flex: 0 0 auto; padding-inline: 14px; }
 .report-workspace-view .report-draft-shell .report-draft-primary-actions { gap: var(--workspace-menu-gap); }
 :is(.account-workspace-view .account-screen-close, .project-details-screen-close) {
