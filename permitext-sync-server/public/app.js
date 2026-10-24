@@ -1,3 +1,4 @@
+import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates } from "./project-update-notices.js?v=2";
 import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=8';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=5";
 import { createAssistantMaterials } from "./assistant-materials.js?v=4";
@@ -8,7 +9,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261023-project-sync-menu-v1313";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=2";
@@ -41,7 +42,7 @@ import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsC
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
-import { sharedWorkspaceLayout, workspaceLayoutFingerprint, mergeWorkspaceLayouts, applySharedWorkspaceLayout, isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, workspaceLayoutsKey, workspaceLayoutSyncDelay } from "./workspace-layout-sync.js?v=1";
+import { sharedWorkspaceLayout, workspaceLayoutFingerprint, mergeWorkspaceLayouts, applySharedWorkspaceLayout, isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, workspaceLayoutsKey, workspaceLayoutSyncDelay } from "./workspace-layout-sync.js?v=2";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
 import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20261012-workflow-cache-v5";
 import {
@@ -140,7 +141,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261023-layout-width-restore-v1301";
+} from "./offline-storage.js?v=20261023-project-sync-menu-v1313";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -608,6 +609,7 @@ let workspaceLayoutSyncTimer = null;
 let workspaceLayoutSyncAccount = "";
 const workspaceLayoutBaselines = new Map();
 const workspaceLayoutApplied = new Map();
+const projectUpdatesApplying = new Set();
 let syncLoadPromise = null;
 let organizationWorkspace = null;
 let organizationLoadPromise = null;
@@ -1374,6 +1376,120 @@ function normalizeUtilityInstances(saved = {}) {
   return instances;
 }
 
+function projectUpdateStorageKey() {
+  return `${workspaceRegistryKey}:project-updates`;
+}
+function projectUpdateBrowserID() {
+  const key = `${workspaceRegistryKey}:browser-id`;
+  let id = localStorage.getItem(key);
+  if (!id) { id = crypto.randomUUID(); localStorage.setItem(key, id); }
+  return id;
+}
+function projectUpdateRecords() {
+  return readProjectUpdateNotices(localStorage, projectUpdateStorageKey());
+}
+function writeProjectUpdateRecords(records) {
+  const key = projectUpdateStorageKey();
+  const text = JSON.stringify(records);
+  if (localStorage.getItem(key) !== text) localStorage.setItem(key, text);
+}
+function canonicalUpdateProjectID(projectID) {
+  const project = (syncedContent?.summary?.projects || []).find(item =>
+    [item.id, item.clientID, item.localFolderID].map(String).includes(String(projectID)));
+  return project ? projectRecordID(project) : String(projectID || "");
+}
+function rememberProjectUpdate(event) {
+  if (!activeAccount() || detachedProjectWindow) return;
+  try {
+    const records = projectUpdateRecords();
+    const next = observeProjectUpdate(records, {...event, projectID: canonicalUpdateProjectID(event.projectID)}, projectUpdateBrowserID());
+    if (next !== records) writeProjectUpdateRecords(next);
+    renderProjectUpdateBadge();
+  } catch (error) { console.warn("Project update indicator could not be saved.", error?.name || "Error"); }
+}
+function pendingProjectUpdate(projectID = activeWorkspaceRecord()?.projectID) {
+  if (!activeAccount() || !projectID || detachedProjectWindow) return null;
+  return projectUpdateNotice(projectUpdateRecords(), canonicalUpdateProjectID(projectID));
+}
+function projectUpdateIsApplying(projectID = activeWorkspaceRecord()?.projectID) {
+  return projectUpdatesApplying.has(`${activeAccount()?.userID}:${canonicalUpdateProjectID(projectID)}`);
+}
+function renderProjectUpdateBadge() {
+  const button = document.querySelector("#project-update-badge");
+  if (!button) return;
+  const project = activeWorkspaceRecord();
+  // The indicator reads account-scoped local metadata; pane access is verified separately.
+  const notice = hasCapability("projects") ? pendingProjectUpdate(project?.projectID) : null;
+  button.hidden = !notice;
+  if (!notice) return;
+  const formatted = new Date(notice.updatedAt).toLocaleString(undefined, {year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZoneName:"short"});
+  const description = `${project?.name || "Project"} updated elsewhere · ${formatted}. Click to apply updates.`;
+  button.title = description;
+  button.setAttribute("aria-label", description);
+  const time = button.querySelector("time");
+  if (time) { time.dateTime = notice.updatedAt; time.textContent = formatted; }
+  button.disabled = projectUpdateIsApplying(project?.projectID);
+}
+function observeSyncedProjectUpdates(mutations, previous = [], {local = false} = {}) {
+  for (const mutation of mutations || []) {
+    const project = mutation.project;
+    if (!project || project.deletedAt || projectIsArchived(project)) continue;
+    const prior = previous.find(item => item.project?.id === project.id)?.project;
+    rememberProjectUpdate({projectID:project.id,domain:"project",version:Date.parse(project.updatedAt),updatedAt:project.updatedAt,
+      sourceClientID:project.sourceClientID,local,project,previousProject:prior});
+  }
+}
+function projectSummaryWithPendingUpdates(summary) {
+  if (!activeAccount()) return summary;
+  const records = projectUpdateRecords();
+  return {...summary, projects: (summary.projects || []).map(project => {
+    const pending = records[projectRecordID(project)];
+    // Deletions, access changes, and account changes must never be hidden.
+    return !project.deletedAt && !projectIsArchived(project) && pending?.domains?.project?.pending &&
+      pending.project && !projectUpdateIsApplying(projectRecordID(project))
+        ? {...project, ...Object.fromEntries(["name", "title", "address", "description", "colorHex", "structuredFacts", "recordsChecklist", "openQuestions"]
+            .filter(key => Object.hasOwn(pending.project, key)).map(key => [key,pending.project[key]]))} : project;
+  })};
+}
+async function applyProjectUpdatesFromBadge() {
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const projectID = canonicalUpdateProjectID(activeWorkspaceRecord()?.projectID);
+  const pending = pendingProjectUpdate(projectID);
+  if (!pending || projectUpdateIsApplying(projectID)) return;
+  if (!(await confirmWorkspaceTransition()) || !isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) return;
+  const key = `${identity.userID}:${projectID}`;
+  projectUpdatesApplying.add(key);
+  renderProjectUpdateBadge();
+  try {
+    const isLayoutOnly = Object.keys(pending.domains).every(domain => domain === "layout");
+    applyPendingWorkspaceLayout({force:true, allowRemote:true});
+    if (isLayoutOnly) await renderUtilityWorkspace({persist:false,skipDeletedProjectCleanup:true});
+    else await refreshSyncedWorkspaceInPlace({accountUserID:identity.userID,forceProjectUpdate:true});
+    requireCurrentAccountRequest(identity);
+    if (workspaceID !== activeWorkspaceID) return;
+    const project = workspaceProject();
+    if (pending.domains.artifacts && project) {
+      await refreshProjectArtifactConsumers(projectDetailKey(project), pending.domains.artifacts.details || []);
+    }
+    requireCurrentAccountRequest(identity);
+    if (workspaceID !== activeWorkspaceID) return;
+    if (pending.domains.project && projectDetailsScreen?.isOpen()) {
+      projectDetailsScreen.dispose(); projectDetailsScreen = null;
+      await openProjectDetailsScreen();
+    }
+    requireCurrentAccountRequest(identity);
+    if (workspaceID !== activeWorkspaceID) return;
+    writeProjectUpdateRecords(acknowledgeProjectUpdates(projectUpdateRecords(), projectID, pending.domains));
+    saveWorkspaceState();
+  } catch (error) {
+    if (isCurrentAccountRequest(identity)) await showWebNotice("Project updates could not be applied", error.message || "Your current work is preserved. Try again.");
+  } finally {
+    projectUpdatesApplying.delete(key);
+    if (isCurrentAccountRequest(identity)) renderProjectUpdateBadge();
+  }
+}
+
 // Layouts share the existing account-scoped continuity record and durable outbox.
 // These helpers never pull content or introduce another polling loop.
 function workspaceLayoutCatalog() {
@@ -1413,14 +1529,17 @@ function recordWorkspaceLayoutChange() {
   const prior = records.find(record => record.id === activeWorkspaceID);
   const baseline = workspaceLayoutBaselines.get(key);
   workspaceLayoutBaselines.set(key, serialized);
+  // Rendering the retained local layout must not publish over an unapplied remote update.
+  if (pendingProjectUpdate(workspace.projectID)?.domains.layout) return;
   // Observe hydration without publishing a default over another device's layout.
   if (baseline === undefined && prior) return;
   if (baseline === serialized || prior && workspaceLayoutFingerprint(prior.layout) === serialized) return;
   const updatedAt = new Date(Math.max(Date.now(), (Date.parse(prior?.updatedAt) || 0) + 1)).toISOString();
-  const record = {id: activeWorkspaceID, projectID: workspace.projectID, updatedAt, layout};
+  const record = {id: activeWorkspaceID, projectID: workspace.projectID, updatedAt, layout, sourceClientID:projectUpdateBrowserID()};
   const merged = mergeWorkspaceLayouts(records, [record]);
   if (!merged.some(item => item.id === record.id && item.updatedAt === updatedAt)) return;
   writeWorkspaceLayoutCatalog(merged);
+  rememberProjectUpdate({projectID:workspace.projectID,domain:"layout",version:Date.parse(updatedAt),updatedAt,local:true});
   workspaceLayoutApplied.set(key, updatedAt);
   scheduleWorkspaceLayoutSync();
 }
@@ -1461,14 +1580,17 @@ function reconcileWorkspaceLayouts() {
   workspaceLayoutSyncAccount = account.userID;
   const local = workspaceLayoutCatalog();
   const remote = mergeWorkspaceLayouts(syncedContent?.summary?.latestContinuity?.values?.[workspaceLayoutsKey]);
+  remote.forEach(record => rememberProjectUpdate({projectID:record.projectID,domain:"layout",version:Date.parse(record.updatedAt),
+    updatedAt:record.updatedAt,sourceClientID:record.sourceClientID}));
   writeWorkspaceLayoutCatalog(mergeWorkspaceLayouts(local, remote));
   if (JSON.stringify(mergeWorkspaceLayouts(local, remote)) !== JSON.stringify(remote)) scheduleWorkspaceLayoutSync();
 }
 
-function applyPendingWorkspaceLayout({force = false} = {}) {
+function applyPendingWorkspaceLayout({force = false, allowRemote = false} = {}) {
   const account = activeAccount();
   const workspace = activeWorkspaceRecord();
   if (!account || workspaceLayoutSyncAccount !== account.userID || !workspace?.projectID || detachedProjectWindow) return false;
+  if (!allowRemote && pendingProjectUpdate(workspace.projectID)?.domains.layout) return false;
   const record = workspaceLayoutCatalog().find(item => item.id === activeWorkspaceID && item.projectID === workspace.projectID);
   const key = workspaceLayoutRuntimeKey();
   if (!record || !force && workspaceLayoutApplied.get(key) === record.updatedAt) return false;
@@ -1949,6 +2071,7 @@ async function switchWorkspace(workspaceID, options = {}) {
   } finally {
     suppressReaderScrollRestore = false;
     track.removeAttribute("aria-busy");
+    renderProjectUpdateBadge();
   }
   const scrollLeft = Number(state.trackScrollLeft) || 0;
   track.scrollLeft = Math.min(scrollLeft, Math.max(0, track.scrollWidth - track.clientWidth));
@@ -2506,6 +2629,7 @@ function focusActiveWorkspaceTab() {
 }
 
 function renderWorkspaceTabs() {
+  renderProjectUpdateBadge();
   const container = workspaceActionsButton?.closest(".topbar-workspaces");
   if (!workspaceActionsButton || !container) return;
   container.hidden = detachedProjectWindow;
@@ -11650,8 +11774,8 @@ function summarizeMutations(mutations = []) {
 }
 
 function currentContentSummary() {
-  const summary = syncedContent?.userID === activeAccount()?.userID
-    ? syncedContent?.summary || summarizeMutations([]) : summarizeMutations([]);
+  const summary = projectSummaryWithPendingUpdates(syncedContent?.userID === activeAccount()?.userID
+    ? syncedContent?.summary || summarizeMutations([]) : summarizeMutations([]));
   const clearRecords = indexBulkClears(currentBulkClearRecords());
   // Always apply every durable clear to the cached remote summary. Incremental
   // pulls can refresh one clear scope without rebuilding the other scopes, so
@@ -11773,6 +11897,7 @@ async function loadSyncedContent(options = {}) {
       };
       await convergeServerNewerSyncConflicts(account);
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
+      observeSyncedProjectUpdates(payload.mutations || [], baseline?.mutations || []);
       reconcileWorkspaceLayouts();
       reconcileSharedWorkspaceCatalog();
       await applyRemoteContinuityIfNewer();
@@ -12807,6 +12932,10 @@ function enqueueSyncMutation(mutation, account, options = {}) {
       (record?.userID && record.userID !== account.userID)) {
     throw accountContextChangedError();
   }
+  if (mutation.project) {
+    mutation = {project:{...mutation.project,sourceClientID:projectUpdateBrowserID()}};
+    observeSyncedProjectUpdates([mutation], [], {local:true});
+  }
   const recordID = syncMutationRecordID(mutation);
   if (!recordID) throw new Error("Could not queue a sync record without an ID.");
   const entry = {
@@ -13449,7 +13578,10 @@ async function refreshSyncedWorkspaceInPlace(options = {}) {
     return false;
   }
 
-  if (syncedContent?.layoutOnly) {
+  if (!options.forceProjectUpdate && hasCapability("projects") && pendingProjectUpdate() &&
+      (syncedContent?.summary?.projects || []).some(project => projectRecordID(project) === activeWorkspaceRecord()?.projectID &&
+        !project.deletedAt && !projectIsArchived(project))) { renderProjectUpdateBadge(); return true; }
+  if (syncedContent?.layoutOnly && !options.forceProjectUpdate) {
     if (applyPendingWorkspaceLayout()) await renderUtilityWorkspace({persist: false, skipDeletedProjectCleanup: true});
     return true;
   }
@@ -13742,6 +13874,8 @@ async function applyProjectArtifactRevisionEnvelopes(envelopes = [], options = {
     revisions: projectArtifactRevisions,
     scope
   });
+  result.accepted.forEach(envelope => rememberProjectUpdate({projectID:envelope.projectID,domain:"artifacts",version:envelope.revision,
+    updatedAt:envelope.updatedAt,details:envelope.domains}));
   projectArtifactRevisions.clear();
   result.nextRevisions.forEach((value, key) => projectArtifactRevisions.set(key, value));
   if (options.broadcast === true && result.accepted.length) {
@@ -13754,7 +13888,7 @@ async function applyProjectArtifactRevisionEnvelopes(envelopes = [], options = {
   // not a per-revision delta. Refreshes can therefore include an older domain,
   // but remain bounded to connected consumers for the affected Project.
   await enqueueProjectArtifactConsumerRefresh(() => Promise.all(
-    result.refreshes.map(({ projectID, domains }) =>
+    result.refreshes.filter(({projectID}) => !pendingProjectUpdate(projectID) || projectUpdateIsApplying(projectID)).map(({ projectID, domains }) =>
       refreshProjectArtifactConsumers(projectID, domains).catch(() => false)
     )
   ));
@@ -13782,6 +13916,7 @@ function observeLocalProjectArtifactRevisions(payload) {
     storageOwnerUserID: project.storageOwnerUserID || payload.storageOwnerUserID
   }, scope));
   envelopes.forEach((envelope) => {
+    rememberProjectUpdate({projectID:envelope.projectID,domain:"artifacts",version:envelope.revision,updatedAt:envelope.updatedAt,local:true,details:envelope.domains});
     if (!envelope.storageOwnerUserID || !envelope.projectID) return;
     const key = [
       envelope.accountUserID,
@@ -13944,6 +14079,7 @@ async function handleForegroundSyncSignal(message) {
     Number(snapshot?.latestEventID || 0) < Number(message.latestEventID || 0)
   ) return;
   syncedContent = snapshot;
+  observeSyncedProjectUpdates(snapshot.mutations || []);
   reconcileWorkspaceLayouts();
   foregroundSyncLastFullPullAt = Date.parse(snapshot.pulledAt || "") || Date.now();
   await refreshSyncedWorkspaceInPlace({ accountUserID });
@@ -40375,7 +40511,7 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     coveredState.forEach((inert, element) => { element.inert = inert; });
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     syncWorkflowNavigation();
-    if (closedWithKeyboard) toggleSettingsButton.focus({ preventScroll: true });
+    if (closedWithKeyboard) (document.querySelector("#workspace-menu-button") || toggleSettingsButton).focus({ preventScroll: true });
     else toggleSettingsButton.blur();
   };
   dialog.addEventListener("keydown", (event) => {
@@ -47237,6 +47373,7 @@ function workspaceAccessGateForRender() {
     void attempt.ready.then(() => {
       if (entry.currentGate !== attempt || workspaceAccessState !== entry || !isCurrentAccountRequest(identity)) return;
       notifyAll();
+      renderProjectUpdateBadge();
       // Recompute desired private descriptors only after completed verification.
       void renderUtilityWorkspace({ skipDeletedProjectCleanup: true, persist: false }).catch((error) => {
         console.warn("Workspace presentation could not refresh.", error);
@@ -48069,7 +48206,41 @@ function bindWorkspaceKeyboardNavigation() {
   });
 }
 
+function bindWorkspaceMainMenu() {
+  const menu = document.querySelector("#workspace-main-menu");
+  const trigger = document.querySelector("#workspace-menu-button");
+  if (!menu || menu.dataset.bound) return;
+  menu.dataset.bound = "true";
+  const items = () => Array.from(menu.querySelectorAll("button:not(:disabled)"));
+  menu.addEventListener("click", event => {
+    if (event.target.closest("button")) menu.open = false;
+  });
+  menu.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      menu.open = false;
+      trigger.focus();
+      event.preventDefault();
+    } else if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+      event.preventDefault();
+      menu.open = true;
+      const buttons = items();
+      const index = buttons.indexOf(document.activeElement);
+      const next = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1
+        : (index + (event.key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length;
+      buttons[next]?.focus();
+    }
+  });
+  document.addEventListener("pointerdown", event => { if (!menu.contains(event.target)) menu.open = false; });
+  menu.addEventListener("focusout", () => queueMicrotask(() => { if (!menu.contains(document.activeElement)) menu.open = false; }));
+}
+
 function bindImmediateUtilityControls() {
+  bindWorkspaceMainMenu();
+  const updateBadge = document.querySelector("#project-update-badge");
+  if (updateBadge && !updateBadge.dataset.bound) {
+    updateBadge.dataset.bound = "true";
+    updateBadge.addEventListener("click", () => void applyProjectUpdatesFromBadge());
+  }
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     if (button.dataset.bound) return;
     button.dataset.bound = 'true';

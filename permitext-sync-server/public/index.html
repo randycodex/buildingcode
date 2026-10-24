@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261023-notes-reveal-v1298">
+    <link rel="stylesheet" href="/web/styles.css?v=20261023-project-sync-menu-v1313">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -40,7 +40,6 @@
     <main class="workspace-shell">
       <header class="topbar">
         <nav class="topbar-actions" aria-label="Working views">
-<button class="toolbar-button" id="project-workflow" type="button" data-workflow-view="project" aria-pressed="false" data-workspace-icon="folder">Project</button>
 <button class="toolbar-button" type="button" data-workflow-view="research" aria-pressed="true" data-workspace-icon="book-open">Research</button>
 <button class="toolbar-button" type="button" data-workflow-view="notebook" aria-pressed="false" data-workspace-icon="notepad-text">Notebook</button>
 <button class="toolbar-button" id="toggle-report" type="button" aria-label="Report" title="Choose a Project to open Report" aria-pressed="false" disabled data-workspace-icon="summary">
@@ -68,12 +67,21 @@
               </div>
             </details>
           </div>
+          <button class="project-update-badge" id="project-update-badge" type="button" hidden aria-label="Updated elsewhere" data-workspace-icon="refresh-ccw">
+            <span class="sr-only">Updated elsewhere <time></time></span>
+          </button>
           <div class="topbar-workspaces" aria-label="Projects">
             <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Choose Project" title="Projects" aria-haspopup="menu" aria-expanded="false" data-workspace-icon="folder">
               <span class="workspace-current-name">Projects</span>
             </button>
           </div>
-          <button class="topbar-settings-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-pressed="false" data-workspace-icon="user-round">Settings</button>
+          <details class="topbar-main-menu" id="workspace-main-menu">
+            <summary class="topbar-menu-button" id="workspace-menu-button" aria-label="Menu" title="Menu" data-workspace-icon="menu"></summary>
+            <div class="workspace-menu topbar-main-menu-items" aria-label="Menu">
+              <button class="toolbar-button" id="project-workflow" type="button" data-workflow-view="project" aria-pressed="false" data-workspace-icon="book-a">CONTEXT</button>
+              <button class="topbar-settings-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-pressed="false" data-workspace-icon="user-round">SETTINGS</button>
+            </div>
+          </details>
         </div>
         <div class="topbar-account-state">
           <div class="topbar-brand" aria-label="permitext">
@@ -585,6 +593,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261023-layout-width-restore-v1301" type="module"></script>
+    <script src="/web/app.js?v=20261023-project-sync-menu-v1313" type="module"></script>
   </body>
 </html>

@@ -209,7 +209,7 @@ function harness(overrides = {}) {
     },
     async convergeServerNewerSyncConflicts(account) { return overrides.converge?.(account); },
     recoverVerifiedLegacyWorkspace(identity) { effects.recovery.push(identity.userID); },
-    reconcileWorkspaceLayouts() {}, onlyWorkspaceLayoutsChanged,
+    observeSyncedProjectUpdates() {}, reconcileWorkspaceLayouts() {}, onlyWorkspaceLayoutsChanged,
     reconcileSharedWorkspaceCatalog() { effects.catalogs.push(state.account?.userID); },
     async applyRemoteContinuityIfNewer() { effects.continuity += 1; },
     async saveOfflineSyncSnapshot(userID, content) { effects.saved.push({ userID, content: structuredClone(content) }); },

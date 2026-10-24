@@ -70,7 +70,8 @@ export function mergeWorkspaceLayouts(...catalogs) {
           !item.layout || typeof item.layout !== 'object' || Array.isArray(item.layout)) continue;
       const layout = sharedWorkspaceLayout(item.layout);
       if (JSON.stringify(layout).length > 48000) continue;
-      const record = {id: item.id, projectID: text(item.projectID), updatedAt: new Date(item.updatedAt).toISOString(), layout};
+      const record = {id: item.id, projectID: text(item.projectID), updatedAt: new Date(item.updatedAt).toISOString(), layout,
+        ...(text(item.sourceClientID) ? {sourceClientID: text(item.sourceClientID)} : {})};
       const prior = records.get(record.id);
       if (!prior || record.updatedAt > prior.updatedAt || record.updatedAt === prior.updatedAt && JSON.stringify(record) > JSON.stringify(prior)) records.set(record.id, record);
     }

@@ -39,6 +39,7 @@ try {
     await page.waitForFunction(()=>window.layoutTest?.registry()?.workspaces?.some(item=>item.projectID)).catch(async error=>{console.error('Browser state:',await page.locator('body').innerText());throw error;});
     await page.evaluate(()=>layoutTest.switchWorkspace(layoutTest.registry().workspaces.find(item=>item.projectID).id));
     await page.waitForFunction(()=>document.querySelector('.workspace-panel[data-pane-id]'));
+    if(await page.locator("#project-update-badge").isVisible()) await page.locator("#project-update-badge").click();
     return {context,page,requests};
   }
   const a=await profile();
@@ -106,6 +107,8 @@ try {
   // Explicit pull uses the fixture's file-store implementation; production SQL
   // delta shape is tested separately with the actual repository.
   await b.page.evaluate(async()=>{await layoutTest.loadSyncedContent({force:true});await layoutTest.refreshSyncedWorkspaceInPlace({accountUserID:layoutTest.state().account.userID});});
+  assert(await b.page.locator('#project-update-badge').isVisible(),'Remote changes wait for the red cloud-sync action');
+  await b.page.locator('#project-update-badge').click();
   const remote=await b.page.evaluate(()=>({calculator:layoutTest.state().utilities.calculator,draft:layoutTest.state().researchViewState.drafts.local}));
   assert.equal(remote.calculator,false,'Remote closing is applied');
   assert.equal(remote.draft,'Do not upload this draft');

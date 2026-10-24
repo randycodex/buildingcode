@@ -10,7 +10,7 @@ function fixture({ snapshot = null, baseline = null } = {}) {
   const network = deferred(), chain = deferred();
   let generation = 1;
   const c = vm.createContext({
-    reconcileWorkspaceLayouts() {}, onlyWorkspaceLayoutsChanged, syncedContent: baseline, syncLoadPromise: null, foregroundSyncLastFullPullAt: 0,
+    observeSyncedProjectUpdates() {}, reconcileWorkspaceLayouts() {}, onlyWorkspaceLayoutsChanged, syncedContent: baseline, syncLoadPromise: null, foregroundSyncLastFullPullAt: 0,
     Date, navigator: { onLine: true }, serverReachable: true,
     permitextSyncSchemaVersion: 1, permitextClientCapabilities: [],
     activeAccount: () => ({ userID: "a", sessionToken: "token" }),

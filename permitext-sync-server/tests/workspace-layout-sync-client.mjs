@@ -9,7 +9,7 @@ const copy=value=>JSON.parse(JSON.stringify(value));
 function harness() {
   const storage=new Map(),timers=new Map(),requests=[],broadcasts=[],project={id:'p',clientID:'p',name:'Project'};
   let sequence=0;
-  const c=vm.createContext({...layout,Date,Set,Map,Promise,console,
+  const c=vm.createContext({...layout,Date,Set,Map,Promise,console, projectUpdateBrowserID:()=>"browser-a", rememberProjectUpdate() {}, pendingProjectUpdate:()=>null,
     account:{userID:'u',sessionToken:'token'},generation:1,workspaceRegistryKey:'private:u:registry',activeWorkspaceID:'project:p',
     workspaceLayoutSyncAccount:'u',workspaceLayoutSyncTimer:null,workspaceLayoutBaselines:new Map(),workspaceLayoutApplied:new Map(),
     detachedProjectWindow:false,workspaceRestoreError:null,defaultSyncCodeVersion:'v',permitextSyncSchemaVersion:2,permitextClientCapabilities:[],
@@ -91,10 +91,20 @@ function harness() {
 }
 // Metadata pulls use a dedicated mount reconciliation, without a project or library refresh.
 {
-  const calls=[];const c=vm.createContext({activeAccount:()=>({userID:'u'}),syncedContent:{layoutOnly:true},applyPendingWorkspaceLayout:()=>true,
+  const calls=[];const c=vm.createContext({activeAccount:()=>({userID:'u'}),syncedContent:{layoutOnly:true},hasCapability:()=>true,pendingProjectUpdate:()=>null,applyPendingWorkspaceLayout:()=>true,
     renderUtilityWorkspace:async options=>calls.push(options),renderWorkspace:()=>{throw Error('Full workspace render forbidden');},currentContentSummary:()=>{throw Error('Project refresh forbidden');}});
   vm.runInContext(actual('refreshSyncedWorkspaceInPlace'),c);
   await c.refreshSyncedWorkspaceInPlace({accountUserID:'u'});
   assert.equal(calls.length,1);assert.equal(calls[0].persist,false);
 }
 console.log('Workspace layout client passed: batching, deduplication/acknowledgement, mixed content, account fencing, offline retry, deferred edits and metadata-only refresh.');
+
+{
+  const h=harness(),{c}=h;c.recordWorkspaceLayoutChange();
+  const original=JSON.stringify(c.workspaceLayoutCatalog());
+  c.pendingProjectUpdate=()=>({domains:{layout:{version:2}}});
+  c.state.utilities.calculator=true;
+  c.recordWorkspaceLayoutChange();
+  assert.equal(JSON.stringify(c.workspaceLayoutCatalog()),original,'Retained local layout cannot overwrite a pending remote layout during render');
+  assert.equal(c.applyPendingWorkspaceLayout({force:true}),false,'Project switches cannot bypass explicit apply');
+}
