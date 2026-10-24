@@ -18265,10 +18265,23 @@ async function handleResearchSelectionReview(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   try {
-    const { primary, canonicalSelection } = await researchSelectionReview(
-      context.body.sectionID,
-      context.body.selectedText
-    );
+    let reviewed;
+    if (context.body.reviewMode === "whole_section") {
+      // A preview is not a selection. The client must display this exact text and
+      // obtain an explicit inclusion action before creating or updating evidence.
+      const [primary] = await researchEvidenceForSectionIDs([context.body.sectionID], { allowOptInCorpora: true });
+      if (!context.body.codeVersion || primary.codeVersion !== context.body.codeVersion) {
+        sendError(response, 409, "The source edition changed. Reopen the source in Reader."); return;
+      }
+      const text = readableResearchSelectionText(primary.canonicalText, maximumResearchSelectionCharacters + 1);
+      if (text.length > maximumResearchSelectionCharacters) {
+        sendError(response, 422, "This section is too long to include in full. Select the table and its footnotes in Reader."); return;
+      }
+      reviewed = await researchSelectionReview(context.body.sectionID, text);
+    } else {
+      reviewed = await researchSelectionReview(context.body.sectionID, context.body.selectedText);
+    }
+    const { primary, canonicalSelection } = reviewed;
     sendJSON(response, 200, {
       selection: {
         sectionID: primary.sectionID,
@@ -19099,6 +19112,28 @@ async function handleResearchConversationEvidence(request, response) {
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
   try {
+    if (context.body.action === "remove") {
+      if (!Number.isInteger(context.body.expectedEvidenceSetVersion) ||
+          context.body.expectedEvidenceSetVersion !== Number(conversation.evidenceSetVersion || 1) ||
+          context.body.expectedRevision !== researchConversationRevision(conversation)) {
+        sendError(response, 409, "The included passages changed. Reopen the conversation before removing a passage.");
+        return;
+      }
+      const source = (conversation.sources || []).find(item => item.id === context.body.sourceID && item.kind === "selection");
+      if (!source) { sendError(response, 404, "This selected passage is no longer included."); return; }
+      // Stored answers own immutable evidence snapshots. Only future request scope changes.
+      conversation.sources = conversation.sources.filter(item => item.id !== source.id);
+      conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
+      conversation.updatedAt = new Date().toISOString();
+      await saveStoredResearchConversation(context.userID, conversation);
+      const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+        conversation.primaryProjectID ? [{ projectID: conversation.primaryProjectID, domains: ["foundation", "research"] }] : []);
+      sendJSON(response, 200, { conversation: await researchConversationForClient(conversation, { userID: context.userID }), artifactRevisions });
+      return;
+    }
+    if (context.body.action !== undefined && context.body.action !== "add") {
+      sendError(response, 400, "Unknown evidence action."); return;
+    }
     const selections = requestedResearchSelections(context.body);
     await validateResearchSavedSelections(context.userID, selections);
     const resolved = await researchSourcesForSelections(

@@ -206,7 +206,7 @@ export function occupantLoadFootnoteQuestion(input) {
       `The user selected a custom factor of ${input.factor} ft²/person; the BC table factor remains ${input.tableFactor} ${input.areaBasis} ft²/person.`,
       `User-provided reason/reference: ${input.customReason || '(not entered)'}. Treat this as user input, not enacted text or proof of approval.`
     ] : []),
-    'Use the existing conversation and current Work facts, respecting later corrections and the specific space. The selected code row does not establish how the area was measured. Ask only for genuinely missing information that could affect the calculation or its applicability. Do not infer approvals, deduct area automatically or declare overall compliance.'
+    'Use the included passages and facts stated in this conversation, respecting later corrections and the specific space. Saved Project Context and Facts are not included. The selected code row does not establish how the area was measured. Ask only for genuinely missing information that could affect the calculation or its applicability. Do not infer approvals, deduct area automatically or declare overall compliance.'
   ].join('\n');
 }
 

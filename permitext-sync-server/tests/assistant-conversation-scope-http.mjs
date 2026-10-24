@@ -65,6 +65,40 @@ try {
   assert.deepEqual(record.assistantScopeSnapshot.materials,[]);assert.deepEqual(record.assistantScopeSnapshot.facts,[]);
   assert.equal(record.assistantScopeSnapshot.projectContext,null);
   assert.deepEqual(stored.researchConversationsByUserID[userID].find(item=>item.id===conversation.id).assistantScope,legacyScope);
+  // Calculator previews use server canonical text, then the ordinary exact-selection API.
+  const tablePreview=await request('/research/selections/review',{sectionID:'2152',codeVersion,reviewMode:'whole_section'});
+  const tableText=tablePreview.selection.selectedText;
+  assert.match(tableText,/1004\.1\.3/);assert.match(tableText,/Business areas/);
+  assert.match(tableText,/permanent fixtures and amenities/);assert.match(tableText,/Place of Assembly/);
+  await request('/research/selections/review',{sectionID:'2152',codeVersion:'wrong-edition',reviewMode:'whole_section'},409);
+  const tableConversation=(await request('/research/conversations/create',{projectID,analysisMode:'conversation_only',selections:[{sectionID:'2152',selectedText:tableText}]},201)).conversation;
+  assert.equal(tableConversation.messages.length,0,'Review and inclusion do not submit a paid question.');
+  assert.equal(tableConversation.sources.find(item=>item.kind==='selection').selectedText,tableText);
+  // Removal changes only future evidence. Stale versions and foreign source IDs fail closed.
+  const selectedSource=conversation.sources.find(source=>source.kind==='selection');
+  const version=Number(conversation.evidenceSetVersion||1);
+  const remove={conversationID:conversation.id,action:'remove',sourceID:selectedSource.id,expectedEvidenceSetVersion:version,expectedRevision:conversation.revision};
+  await request('/research/conversations/evidence',{...remove,expectedEvidenceSetVersion:version-1},409);
+  await request('/research/conversations/evidence',{...remove,sourceID:'foreign-source'},404);
+  await request('/research/conversations/evidence',{...remove,expectedRevision:conversation.revision-1},409);
+  const otherID='apple:synthetic-scope-other';
+  await request('/admin/lifetime-grants/grant',{userID:otherID},200,process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
+  const otherToken=(await request('/account/sign-in',{credential:{provider:'apple',providerUserID:'synthetic-scope-other',email:'other@example.test',displayName:'Other scope test'}})).account.backendSessionToken;
+  await request('/research/conversations/evidence',{...remove,auth:{accountUserID:otherID}},404,otherToken);
+  const messagesBefore=structuredClone(conversation.messages);
+  conversation=(await request('/research/conversations/evidence',remove)).conversation;
+  assert.equal(conversation.sources.filter(source=>source.kind==='selection').length,0);
+  assert.equal(conversation.evidenceSetVersion,version+1);
+  assert.deepEqual(conversation.messages,messagesBefore,'Removing a passage preserves old messages.');
+  const afterRemoval=await adapter.read();
+  assert.deepEqual(afterRemoval.researchAnswersByUserID[userID].find(item=>item.id===record.id),record,
+    'The exact saved answer and its evidence snapshot remain unchanged.');
+  await request('/research/conversations/evidence',remove,409);
+  const noSources=await request('/research/conversations/message',{conversationID:conversation.id,question:'Explain again.',requestID:'scope-removed'});
+  assert.equal(noSources.conversation.messages.at(-1).answer.charged,false);
+  assert.equal(noSources.conversation.messages.at(-1).answer.verification.reason,'CONVERSATION_MATERIAL_REQUIRED');
+  conversation=(await request('/research/conversations/evidence',{conversationID:conversation.id,sectionID:'41009495',selectedText:passage})).conversation;
+  assert.equal(conversation.sources.filter(source=>source.kind==='selection').length,1,'A removed passage can be added again.');
   // The existing native create/evidence API remains available without web scope conversion.
   const native=(await request('/research/conversations/create',{projectID,selections:[{sectionID:'41009495',selectedText:passage}]},201)).conversation;
   assert.equal(native.assistantScope,undefined);assert.equal(native.sources.filter(source=>source.kind==='selection').length,1);

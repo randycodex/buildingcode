@@ -81,7 +81,7 @@ assert(reviewer.input.includes(JSON.stringify(answer)));assert(reviewer.input.in
 assert(reviewer.instructions.includes('Review every footnoteChecks item'));assert(reviewer.instructions.includes('every numeric comparison'));
 const client=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const helperStart=client.indexOf('function calculatorConversationForPane('),helperEnd=client.indexOf('function renderOccupantLoadCalculation(',helperStart);
-let submitted=0,focused=0;
+let submitted=0,focused=0,confirmed=true,attachments=[];
 const conversation={id:'conversation',primaryProjectID:'project',codeVersion,contextRevision:2,projectContext:{facts:[]},messages:[{id:'answer',role:'assistant',contextRevision:2,answer:{...answer,citations}}]};
 const composer={requestSubmit(){submitted++;},querySelector:()=>({disabled:false})};
 const textInput={value:'',disabled:false,closest:()=>composer,focus(){focused++;},dispatchEvent(){}};
@@ -90,7 +90,14 @@ const runtime=vm.createContext({occupantLoadSource,occupantLoadFootnoteAssessmen
  researchConversationInWorkspace:()=>true,reconciledResearchProgressSession:()=>null,
  captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,workspaceProject:()=>({id:'project'}),researchProjectID:()=> 'project',
  openResearchConversation:async()=>conversation,paneIDForResearchConversation:()=> 'assistant-pane',whenWorkspacePaneReady:async()=>true,
- track:{querySelector:()=>({querySelector:()=>textInput})},CSS:{escape:v=>v},Event:class{}});
+ track:{querySelector:selector=>selector.endsWith('.research-question-input')?textInput:{querySelector:()=>textInput}},CSS:{escape:v=>v},Event:class{},
+ researchNewChatDrafts:new Map(), resolveReaderSource:async()=>source,
+ postResearch:async(_path,body)=>{assert.equal(body.reviewMode,'whole_section');assert.equal(body.codeVersion,codeVersion);return {selection:{selectedText:source.text}};},
+ document:{createElement:()=>({children:[],append(...nodes){this.children.push(...nodes);}})},
+ renderCodeBlock:block=>block,notebookEvidenceTextMap:()=>({text:source.text}),
+ researchAnswerSourceCitation:()=> 'BC 1004.1.3',researchCodeEdition:()=> '2022',
+ confirmWebWarning:async(_title,_message,options)=>{assert(options.content);return confirmed;},
+ addResearchSelectionToCurrent:async selection=>{attachments.push(selection);return conversation;}});
 vm.runInContext(client.slice(helperStart,helperEnd),runtime);
 assert(runtime.calculatorFootnoteAssessmentFor(source,conversation,'answer'));
 conversation.projectContext.facts=['The current proposed use has changed.'];
@@ -98,14 +105,22 @@ assert.equal(runtime.calculatorFootnoteAssessmentFor(source,conversation,'answer
 assert.equal(runtime.calculatorFootnoteAssessmentFor(source,conversation,'earlier-answer'),null);
 conversation.messages.push({role:'user',question:'Actually the room is outdoors.'});
 assert.equal(runtime.calculatorFootnoteAssessmentFor(source,conversation),null);conversation.messages.pop();
-await runtime.askCalculatorFootnotes(source,input,{conversationID:'conversation'});assert.equal(submitted,1);assert(textInput.value.includes('Function of space:'));
+await runtime.askCalculatorFootnotes(source,input,{conversationID:'conversation'});assert.equal(submitted,0,'Review prepares a question without sending it.');assert(textInput.value.includes('Function of space:'));
+assert.equal(attachments.length,1);assert.equal(attachments[0].selectedText,source.text);
 textInput.value='My existing unsent draft';
-await assert.rejects(runtime.askCalculatorFootnotes(source,input,{conversationID:'conversation'}),/current Assistant draft/);assert.equal(textInput.value,'My existing unsent draft');assert.equal(submitted,1);
-await runtime.askCalculatorFootnotes(source,input,{conversationID:'conversation',reply:true});assert.equal(focused,1);assert.equal(submitted,1);
+await assert.rejects(runtime.askCalculatorFootnotes(source,input,{conversationID:'conversation'}),/current Assistant draft/);assert.equal(textInput.value,'My existing unsent draft');assert.equal(submitted,0);
+await runtime.askCalculatorFootnotes(source,input,{conversationID:'conversation',reply:true});assert.equal(focused,2);assert.equal(submitted,0);
 let createdSelection;
 runtime.activeResearchConversation=null;
 runtime.startNewResearchFromSelection=async selection=>{createdSelection=selection;return {id:'new-conversation'};};
 textInput.value='';
 await runtime.askCalculatorFootnotes(source,input);
-assert.equal(createdSelection.sectionID,'2152');assert.equal(createdSelection.selectedText,'','A new conversation pins the real whole section, never a fabricated table excerpt.');
+assert.equal(createdSelection.sectionID,'2152');assert.equal(createdSelection.selectedText,source.text,'A fresh conversation includes exact canonical table and footnote text.');
+textInput.value='';createdSelection=null;confirmed=false;
+await runtime.askCalculatorFootnotes(source,input);
+assert.equal(createdSelection,null,'Cancel does not create or change a conversation.');assert.equal(textInput.value,'');
+confirmed=true;runtime.postResearch=async()=>{throw Error('The source edition changed.');};
+await assert.rejects(runtime.askCalculatorFootnotes(source,input),/edition changed/);
+assert.equal(createdSelection,null,'Wrong editions never attach.');
+
 console.log('Footnotes: real BC source/row bindings, current quoted facts, missing questions, corrections, stale UI inputs, unchanged arithmetic and full Luna review envelopes passed. Zero provider calls.');

@@ -21003,3 +21003,34 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .report-note-comparison-version { margin: 0 0 12px; color: var(--text-secondary); font-size: 12px; }
 .report-note-comparison-text { max-height: min(45dvh, 360px); overflow: auto; padding: 12px; border: 1px solid var(--border); border-radius: 6px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; }
 @media (max-width: 700px) { .report-note-comparison { grid-template-columns: 1fr; gap: 16px; } }
+
+/* Explicit passage workflow: source scope stays next to the question it governs. */
+.research-chat-welcome .research-passage-actions { justify-content: center; margin: 20px 0; }
+.research-passage-actions, .research-passage-starters { display: flex; flex-wrap: wrap; gap: 8px; }
+.research-passage-actions .ghost-button, .research-passage-starters .ghost-button { width: auto; white-space: normal; }
+.research-passage-scope { color: var(--text-secondary); font-size: 12px; line-height: 1.5; margin: 8px 0; }
+.research-included-passages { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; border-top: 1px solid var(--border); padding: 12px 0; text-align: left; }
+.research-included-passages > details { min-width: 0; }
+.research-included-passages > details > summary { cursor: pointer; font-size: 12px; color: var(--text-primary); }
+.research-included-review-label { margin-left: 12px; color: var(--text-secondary); font-weight: 400; }
+.research-included-review { max-height: 260px; overflow-y: auto; overscroll-behavior: contain; }
+.research-included-review article { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.research-included-review blockquote, .research-calculator-review blockquote { white-space: pre-wrap; overflow-wrap: anywhere; margin: 12px 0; padding: 0 12px; border-left: 2px solid var(--border); font-size: 13px; line-height: 1.6; }
+.research-included-chips { display: flex; flex-wrap: wrap; gap: 6px; grid-column: 1 / -1; max-height: 64px; overflow-y: auto; }
+.research-included-chips span { padding: 3px 7px; border-radius: 4px; background: var(--workspace-menu-highlight); color: var(--text-secondary); font-size: 11px; overflow-wrap: anywhere; }
+.research-passage-starters { margin-bottom: 10px; }
+.research-passage-starters .ghost-button { font-size: 12px; padding: 5px 8px; }
+.research-missing-evidence { border-left: 2px solid var(--border); padding: 12px 16px; margin: 16px 0; }
+.research-missing-evidence h4 { margin: 0 0 8px; }
+.research-calculator-review { max-height: 50vh; overflow-y: auto; text-align: left; }
+@media (max-width: 600px) {
+  .research-included-passages { grid-template-columns: minmax(0, 1fr); }
+  .research-included-passages > .ghost-button { justify-self: start; }
+  .research-included-review { max-height: 180px; }
+}
+.research-compact-composer:has(> .research-included-passages) { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+.research-compact-composer > .research-included-passages, .research-compact-composer > .research-passage-starters, .research-compact-composer > .research-passage-scope { flex: 0 0 auto; }
+.research-included-passages > details[open] { grid-column: 1 / -1; }
+.research-included-passages > .ghost-button { align-self: start; justify-self: end; }
+.research-included-review article > strong { font-size: 12px; font-weight: 500; }
+.research-included-review-label::before { content: " · "; }

@@ -1,4 +1,4 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-reader-passages-v1346";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-research-workflow-v1348";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
@@ -11,9 +11,9 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=24";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-reader-passages-v1346";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-research-workflow-v1348";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -145,7 +145,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-reader-passages-v1346";
+} from "./offline-storage.js?v=20261024-research-workflow-v1348";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -17625,24 +17625,60 @@ function calculatorFootnoteAssessmentFor(source, conversation, answerID = "") {
 
 async function askCalculatorFootnotes(source, draft, {conversationID="", anchorPaneID="", reply=false}={}) {
   const identity=captureAccountRequest(),workspaceID=activeWorkspaceID,project=workspaceProject();
-  const current=()=>isCurrentAccountRequest(identity) && activeWorkspaceID===workspaceID;
+  const generation = state.workflowNavigationGeneration || 0;
+  const current=()=>isCurrentAccountRequest(identity) && activeWorkspaceID===workspaceID &&
+    generation === (state.workflowNavigationGeneration || 0);
   if(!project) throw new Error("Open a Project before checking footnotes.");
   let conversation=conversationID ? (activeResearchConversation?.id===conversationID?activeResearchConversation:supplementalResearchConversations.get(conversationID)) : calculatorConversationForPane();
-  if(!conversation || conversation.primaryProjectID!==researchProjectID(project) || conversation.codeVersion!==(source.codeVersion||source.sourceLibraryVersion)) {
-    conversation=await startNewResearchFromSelection({sectionID:source.sectionID||source.id,
-      selectedText:"",projectID:researchProjectID(project),originSurface:"reader",originPaneID:anchorPaneID});
-  } else if(!track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneIDForResearchConversation(conversation.id))}"] .research-question-input`)) await openResearchConversation(conversation.id,{anchorPaneID,instance:(state.utilityInstances||[]).find(item=>item.key==="analysis" && item.conversationID===conversation.id)});
+  const existingInput = conversation && track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneIDForResearchConversation(conversation.id))}"] .research-question-input`);
+  if (!reply && (existingInput?.value.trim() || researchNewChatDrafts.get(`followup:${conversation?.id}`)?.trim())) {
+    throw new Error("Send or clear your current Assistant draft before checking footnotes.");
+  }
+  if (conversation && ["active", "retrying"].includes(reconciledResearchProgressSession(conversation)?.status)) {
+    throw new Error("Wait for the current Research request before continuing.");
+  }
+  if (!reply) {
+    const resolved = await resolveReaderSource(source, {isCurrent: current});
+    if (!current() || !resolved) return;
+    const payload = await postResearch("/research/selections/review", {
+      sectionID: resolved.sectionID || resolved.id, codeVersion: resolved.codeVersion, reviewMode: "whole_section"
+    });
+    if (!current()) return;
+    if (payload.requiresVisualReview) throw new Error("This source includes visual evidence. Review and select it in Reader before asking.");
+    const selectedText = payload.selection?.selectedText || "";
+    if (!selectedText.trim()) throw new Error("The table and footnotes are unavailable. Select them in Reader before asking.");
+    const review = document.createElement("section");
+    review.className = "research-calculator-review";
+    const label = document.createElement("strong");
+    label.textContent = `${researchAnswerSourceCitation(source)} · ${researchCodeEdition(source)}`;
+    const quote = document.createElement("blockquote");
+    quote.textContent = selectedText;
+    const question = document.createElement("p");
+    question.textContent = occupantLoadFootnoteQuestion(draft);
+    review.append(label, quote, question);
+    if (!await confirmWebWarning("Review before asking", "Include this table section and its footnotes, together with the calculation inputs shown below. Review the prepared question before sending.",
+      { content: review, confirmLabel: "Include and prepare question", container: track.querySelector(`[data-pane-id="${CSS.escape(anchorPaneID)}"]`) }) || !current()) return;
+    const selection = { sectionID: resolved.sectionID || resolved.id, selectedText,
+      projectID: researchProjectID(project), originSurface: "reader", originPaneID: anchorPaneID };
+    if(!conversation || conversation.primaryProjectID!==researchProjectID(project) || conversation.codeVersion!==(source.codeVersion||source.sourceLibraryVersion)) {
+      conversation=await startNewResearchFromSelection(selection);
+    } else {
+      conversation=await addResearchSelectionToCurrent(selection, conversation.id);
+    }
+  }
   if(!current() || !conversation) return;
   const paneID=paneIDForResearchConversation(conversation.id);
+  if (!track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneID)}"] .research-question-input`)) {
+    await openResearchConversation(conversation.id,{anchorPaneID,instance:(state.utilityInstances||[]).find(item=>item.key==="analysis" && item.conversationID===conversation.id)});
+  }
   if(!await whenWorkspacePaneReady(paneID) || !current()) return;
   const pane=track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
-  const input=pane?.querySelector(".research-question-input"),composer=input?.closest("form"),send=composer?.querySelector('button[type="submit"]');
+  const input=pane?.querySelector(".research-question-input");
   if(!input || input.disabled) throw new Error("Wait for the current Research request before continuing.");
   if(reply) {input.focus();return;}
-  if(input.value.trim()) throw new Error("Send or clear your current Assistant draft before checking footnotes.");
+  if(input.value.trim()) throw new Error("Your passages were added. Send or clear the current draft before checking footnotes.");
   input.value=occupantLoadFootnoteQuestion(draft);input.dispatchEvent(new Event("input",{bubbles:true}));
-  if(!send || send.disabled) throw new Error(composer.querySelector(".research-composer-status")?.textContent || "Review the conversation context before continuing.");
-  composer.requestSubmit();
+  input.focus();
 }
 
 function renderOccupantLoadCalculation(source, {anchor, conversationID = "", answerID = "", answer = null, conversation = null, getConversation = null, calculatorID = ""} = {}) {
@@ -25300,6 +25336,149 @@ function researchFailureMessage(error, question = "") {
   return researchFailureRecovery(error, question).text;
 }
 
+function researchWorkflowButton(label, action) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "ghost-button";
+  button.textContent = label;
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    try { await action(button); }
+    catch (error) { await showWebNotice("Research action not completed", error.message); }
+    finally { if (button.isConnected) button.disabled = false; }
+  });
+  return button;
+}
+
+function researchPassageEntryActions() {
+  const actions = document.createElement("div");
+  actions.className = "research-passage-actions";
+  actions.append(
+    researchWorkflowButton("Open Reader", button => openReaderFromToolbar(button)),
+    researchWorkflowButton("Choose Saved Evidence", () => focusUtility("saved"))
+  );
+  return actions;
+}
+
+function renderResearchIncludedPassages(conversation, paneID, { busy = false } = {}) {
+  // Do not collapse overlapping selections: every removable item is an exact saved source.
+  const selected = (conversation.sources || []).filter(source => source.kind === "selection");
+  const region = document.createElement("section");
+  region.className = "research-included-passages";
+  region.setAttribute("aria-label", "Included passages");
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = `Included passages · ${selected.length}`;
+  const hint = document.createElement("span");
+  hint.className = "research-included-review-label";
+  hint.textContent = "Review passages";
+  summary.append(hint);
+  const review = document.createElement("div");
+  review.className = "research-included-review";
+  const explanation = document.createElement("p");
+  explanation.className = "research-passage-scope";
+  explanation.textContent = "These exact passages are included in your next question. Removing one keeps previous messages and their saved sources unchanged.";
+  review.append(explanation);
+  selected.forEach(source => {
+    const item = document.createElement("article");
+    const label = document.createElement("strong");
+    label.textContent = researchAnswerSourceCitation(source);
+    const edition = document.createElement("p");
+    edition.className = "research-passage-scope";
+    edition.textContent = researchCodeEdition(source);
+    const quote = document.createElement("blockquote");
+    quote.textContent = source.selectedText || "No exact passage is attached. Select text in Reader before asking.";
+    const actions = document.createElement("div");
+    actions.className = "research-passage-actions";
+    const open = researchWorkflowButton("Open in Reader", () => openSourceInReader(source, paneID));
+    const remove = researchWorkflowButton("Remove passage", async () => {
+      if (["active", "retrying"].includes(reconciledResearchProgressSession(conversation)?.status)) {
+        throw new Error("Wait for the current answer before changing its passages.");
+      }
+      const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+      const result = await postResearch("/research/conversations/evidence", {
+        conversationID: conversation.id, action: "remove", sourceID: source.id,
+        expectedEvidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
+        expectedRevision: Number(conversation.revision || 0)
+      });
+      if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) return;
+      if (activeResearchConversation?.id === conversation.id) activeResearchConversation = result.conversation;
+      supplementalResearchConversations.set(conversation.id, result.conversation);
+      await refreshResearchConversationList();
+      if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) return;
+      await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+    });
+    remove.disabled = busy;
+    if (busy) remove.title = "Wait for the current answer before changing passages";
+    actions.append(open, remove);
+    item.append(label, edition, quote, actions);
+    review.append(item);
+  });
+  if (!selected.length) review.append(researchPassageEntryActions());
+  details.append(summary, review);
+  const add = researchWorkflowButton("＋ Add passages", button => openReaderFromToolbar(button));
+  add.disabled = busy;
+  const chips = document.createElement("div");
+  chips.className = "research-included-chips";
+  selected.forEach(source => {
+    const chip = document.createElement("span");
+    chip.textContent = `${source.codePrefix || "Code"} § ${source.sectionNumber} · ${researchCodeEdition(source)}`;
+    chips.append(chip);
+  });
+  region.append(details, add, chips);
+  return region;
+}
+
+function renderResearchMissingEvidence(conversation, message, paneID) {
+  const needed = researchDisplayList(message.answer?.additionalEvidenceNeeded);
+  if (!needed.length) return null;
+  const region = document.createElement("section");
+  region.className = "research-missing-evidence";
+  const heading = document.createElement("h4");
+  heading.textContent = "Sources still needed";
+  region.append(heading);
+  const list = document.createElement("ul");
+  needed.forEach(text => { const item = document.createElement("li"); item.textContent = text; list.append(item); });
+  region.append(list);
+  const explanation = document.createElement("p");
+  explanation.className = "research-passage-scope";
+  explanation.textContent = "Review the missing text in Reader, then choose Research to add it to this conversation.";
+  region.append(explanation);
+  // Links are offered only for references present in the saved evidence for this answer.
+  // Model-generated section numbers never become unverified navigation targets.
+  const referenced = new Map();
+  for (const source of researchSourcesForAnswer(conversation, message)) {
+    for (const phrase of inlineCodeReferencePhrases(source.selectedText || source.passageText || source.userSelectedText || "")) {
+      const prefix = phrase.codePrefix || source.codePrefix;
+      if (!prefix || prefix !== source.codePrefix || !source.codeVersion) continue;
+      for (const target of phrase.references) {
+        const number = target.sectionNumber;
+        if (!needed.some(text => inlineCodeReferencePhrases(text).some(p =>
+          (!p.codePrefix || p.codePrefix === prefix) && p.references.some(r => r.sectionNumber === number)))) continue;
+        referenced.set(`${prefix}:${source.codeVersion}:${number}`, { prefix, number, source });
+      }
+    }
+  }
+  const actions = document.createElement("div");
+  actions.className = "research-passage-actions";
+  for (const {prefix, number, source} of referenced.values()) {
+    actions.append(researchWorkflowButton(`Open ${prefix} § ${number} in Reader`, async () => {
+      const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+      const target = await resolveInlineCodeSection(prefix, number, source.codeVersion);
+      if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID || !region.isConnected) return;
+      if (!target || !(target.codeVersion || target.sourceLibraryVersion) ||
+          normalizedInlineSectionNumber(target.sectionNumber) !== normalizedInlineSectionNumber(number) ||
+          !sectionRecordMatchesRequestedEdition(source, target)) {
+        throw new Error("The exact referenced provision could not be resolved in this edition. Open Reader to locate and review it.");
+      }
+      await openSourceInReader(target, paneID);
+    }));
+  }
+  if (!referenced.size) actions.append(researchWorkflowButton("Open Reader", button => openReaderFromToolbar(button)));
+  region.append(actions);
+  return region;
+}
+
 function renderNewResearchComposer(container, researchEnabled, instance = null) {
   const draftKey = instance ? paneIDForUtilityInstance(instance) : "utility:analysis";
   const form = document.createElement("form");
@@ -25327,7 +25506,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
     // A conversation starts from an explicit Reader passage, never an empty question.
     sendButton.disabled = true;
   };
-  status.textContent = "Select a passage in Reader, then choose Research to start a conversation.";
+  status.textContent = "Only included passages and this conversation are used. Other Readers and Project details are excluded.";
   input.addEventListener("input", () => {
     researchNewChatDrafts.set(draftKey, input.value);
     scheduleResearchDraftPersistence();
@@ -25461,8 +25640,13 @@ async function renderResearch(paneID = "utility:analysis") {
     const welcome = document.createElement("div");
     welcome.className = "research-chat-welcome";
     const heading = document.createElement("h3");
-    heading.textContent = "New conversation";
-    welcome.append(heading);
+    heading.textContent = "Ask about code passages";
+    const introduction = document.createElement("p");
+    introduction.textContent = "Add passages from Reader or Saved Evidence, then ask a question.";
+    const examples = document.createElement("p");
+    examples.className = "research-passage-scope";
+    examples.textContent = "Explain a passage, compare provisions, or clarify their conditions and exceptions.";
+    welcome.append(heading, introduction, researchPassageEntryActions(), examples);
     const progress = document.createElement("div");
     progress.className = "analysis-content assistant-start-progress";
     assistantBody.append(welcome, progress);
@@ -27512,6 +27696,8 @@ async function renderResearchConversation(conversationID, options = {}) {
       anchorPaneID: paneID
     });
     if (savedProgress) bubble.prepend(renderResearchProgressCard(savedProgress, { completed: true }));
+    const missingEvidence = renderResearchMissingEvidence(conversation, message, paneID);
+    if (missingEvidence) bubble.append(missingEvidence);
     const answerSources = renderResearchAnswerSources(conversation, message, paneID);
     if (answerSources) {
       const evidenceReviewedBody = bubble.querySelector(".research-evidence-reviewed-body");
@@ -27668,7 +27854,26 @@ async function renderResearchConversation(conversationID, options = {}) {
   });
   composerBox.append(input, sendButton);
   input.rows = 1;
-  composer.append(composerBox, status);
+  const passageScope = document.createElement("p");
+  passageScope.className = "research-passage-scope";
+  passageScope.textContent = "Only included passages and this conversation are used. Other Readers and Project details are excluded.";
+  const starters = document.createElement("div");
+  starters.className = "research-passage-starters";
+  for (const [label, question] of [["Explain", "Explain the included passages."],
+    ["Compare", "Compare the conditions and exceptions in these passages."],
+    ["Identify missing information", "What additional information does this text require?"]]) {
+    const button = researchWorkflowButton(label, () => {
+      if (input.disabled) return;
+      // Keep an existing draft; suggestions never replace the user's writing.
+      input.value = input.value.trim() ? `${input.value.trim()}\n${question}` : question;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.focus();
+    });
+    button.disabled = passageRequired || researchRequestActive || !researchEnabled;
+    starters.append(button);
+  }
+  composer.append(renderResearchIncludedPassages(conversation, paneID, { busy: researchRequestActive }),
+    starters, composerBox, status, passageScope);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
     bindResearchEvidenceDivider(content, divider, conversation.id);

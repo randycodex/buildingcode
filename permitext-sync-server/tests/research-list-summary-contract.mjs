@@ -298,7 +298,7 @@ const newResearchComposerEnd = clientSource.indexOf("\nasync function renderRese
 const newResearchComposerSource = clientSource.slice(newResearchComposerStart, newResearchComposerEnd);
 assert.ok(newResearchComposerStart >= 0 && newResearchComposerEnd > newResearchComposerStart, "New Research composer source was not found.");
 assert.doesNotMatch(newResearchComposerSource, /postResearch\(/, "An empty composer cannot create Research without a selected passage.");
-assert.match(newResearchComposerSource, /Select a passage in Reader/, "The empty composer explains how to start passage-based Research.");
+assert.match(newResearchComposerSource, /Only included passages and this conversation are used/, "The empty composer explains how to start passage-based Research.");
 const readerCreationSource = functionSource(clientSource, "startNewResearchFromSelection");
 assert.match(readerCreationSource, /selections: passages\.map/, "Reader Research must submit the selected passages.");
 assert.match(readerCreationSource, /projectID: selection\.projectID \|\| ""/, "Reader Research retains its originating Project identity.");
