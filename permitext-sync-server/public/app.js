@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-release-blockers-v1360";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-release-blockers-v1361";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=27";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-release-blockers-v1360";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-release-blockers-v1361";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-release-blockers-v1360";
+} from "./offline-storage.js?v=20261024-release-blockers-v1361";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -17779,8 +17779,9 @@ function renderCalculatorColumn() {
 
 function calculatorConversationForPane(paneID = "") {
   const conversations=[activeResearchConversation,...supplementalResearchConversations.values()].filter(Boolean);
-  if(paneID) return conversations.find(item=>paneIDForResearchConversation(item.id)===paneID) || null;
+  if(paneID) return researchDraftPaneIDs.has(paneID) ? null : conversations.find(item=>paneIDForResearchConversation(item.id)===paneID) || null;
   const visible=conversations.filter(item=>researchConversationInWorkspace(item) &&
+    !researchDraftPaneIDs.has(paneIDForResearchConversation(item.id)) &&
     track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneIDForResearchConversation(item.id))}"]`));
   const unique=[...new Map(visible.map(item=>[item.id,item])).values()];
   return unique.length===1?unique[0]:null;
@@ -17808,6 +17809,10 @@ async function askCalculatorFootnotes(source, draft, {conversationID="", anchorP
     generation === (state.workflowNavigationGeneration || 0);
   if(!project) throw new Error("Open a Project before checking footnotes.");
   let conversation=conversationID ? (activeResearchConversation?.id===conversationID?activeResearchConversation:supplementalResearchConversations.get(conversationID)) : calculatorConversationForPane();
+  if (!reply && conversation && researchDraftPaneIDs.has(paneIDForResearchConversation(conversation.id))) conversation = null;
+  const emptyConversationInput = !conversation && researchDraftPaneIDs.has("utility:analysis")
+    ? track.querySelector('.assistant-workspace[data-pane-id="utility:analysis"] .research-question-input') : null;
+  if (!reply && emptyConversationInput?.value.trim()) throw new Error("Clear your current Assistant draft before checking footnotes. Your draft has been preserved.");
   const existingInput = conversation && track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneIDForResearchConversation(conversation.id))}"] .research-question-input`);
   if (!reply && (existingInput?.value.trim() || researchNewChatDrafts.get(`followup:${conversation?.id}`)?.trim())) {
     throw new Error("Send or clear your current Assistant draft before checking footnotes.");

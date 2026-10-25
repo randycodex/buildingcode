@@ -92,10 +92,10 @@ const conversation={id:'conversation',primaryProjectID:'project',codeVersion,con
 const composer={requestSubmit(){submitted++;},querySelector:()=>({disabled:false})};
 const textInput={value:'',disabled:false,closest:()=>composer,focus(){focused++;},dispatchEvent(){}};
 const runtime=vm.createContext({occupantLoadSource,occupantLoadFootnoteAssessment,occupantLoadFootnoteQuestion,
- state:{utilityInstances:[]},paneIDForResearchConversation:()=> 'assistant-pane',activeResearchConversation:conversation,supplementalResearchConversations:new Map(),activeWorkspaceID:'workspace',
+ state:{utilityInstances:[]},researchDraftPaneIDs:new Set(),paneIDForResearchConversation:()=> 'utility:analysis',activeResearchConversation:conversation,supplementalResearchConversations:new Map(),activeWorkspaceID:'workspace',
  researchConversationInWorkspace:()=>true,reconciledResearchProgressSession:()=>null,
  captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,workspaceProject:()=>({id:'project'}),researchProjectID:()=> 'project',
- openResearchConversation:async()=>conversation,paneIDForResearchConversation:()=> 'assistant-pane',whenWorkspacePaneReady:async()=>true,
+ openResearchConversation:async()=>conversation,paneIDForResearchConversation:()=> 'utility:analysis',whenWorkspacePaneReady:async()=>true,
  track:{querySelector:selector=>selector.endsWith('.research-question-input')?textInput:{querySelector:()=>textInput}},CSS:{escape:v=>v},Event:class{},
  researchNewChatDrafts:new Map(), resolveReaderSource:async()=>source,
  postResearch:async(_path,body)=>{assert.equal(body.reviewMode,'whole_section');assert.equal(body.codeVersion,codeVersion);return {selection:{selectedText:source.text}};},
@@ -122,6 +122,16 @@ runtime.startNewResearchFromSelection=async selection=>{createdSelection=selecti
 textInput.value='';
 await runtime.askCalculatorFootnotes(source,input);
 assert.equal(createdSelection.sectionID,'2152');assert.equal(createdSelection.selectedText,source.text,'A fresh conversation includes exact canonical table and footnote text.');
+runtime.activeResearchConversation=conversation;runtime.researchDraftPaneIDs.add('utility:analysis');
+assert.equal(runtime.calculatorConversationForPane(),null,'New conversation must not reuse the hidden prior answer as a destination.');
+assert.equal(runtime.calculatorConversationForPane('utility:analysis'),null);
+textInput.value='My new unsent question';createdSelection=null;
+await assert.rejects(runtime.askCalculatorFootnotes(source,input),/current Assistant draft/);
+assert.equal(textInput.value,'My new unsent question');assert.equal(createdSelection,null);
+textInput.value='';const priorAttachments=attachments.length;
+await runtime.askCalculatorFootnotes(source,input);
+assert.equal(createdSelection.sectionID,'2152');assert.equal(attachments.length,priorAttachments,'A fresh draft never adds Calculator passages to the hidden previous conversation.');
+runtime.researchDraftPaneIDs.clear();runtime.activeResearchConversation=null;
 textInput.value='';createdSelection=null;confirmed=false;
 await runtime.askCalculatorFootnotes(source,input);
 assert.equal(createdSelection,null,'Cancel does not create or change a conversation.');assert.equal(textInput.value,'');
