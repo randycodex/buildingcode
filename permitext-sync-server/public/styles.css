@@ -5361,6 +5361,7 @@ select option:checked {
   width: 40px;
   height: 40px;
   align-items: start;
+  padding-top: 4px;
   border: 0;
 }
 .result-row .result-heading { padding-inline-end: calc(40px + var(--space-2)); }
