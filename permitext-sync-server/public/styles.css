@@ -5372,16 +5372,16 @@ select option:checked {
 }
 .result-row-header .search-row-actions button {
   min-height: 24px;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--text-tertiary);
+  padding: 3px 7px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  color: var(--text-secondary);
   white-space: nowrap;
   text-decoration: none;
 }
 .result-row-header .search-row-actions button:is(:hover, :focus-visible) {
-  background: transparent;
-  color: var(--text-tertiary);
+  background: color-mix(in srgb, var(--text-primary) 16%, transparent);
+  color: var(--text-primary);
   text-decoration: none;
 }
 
