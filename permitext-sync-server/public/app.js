@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-ux-live-v1359";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-release-blockers-v1360";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -14,9 +14,9 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=26";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=27";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-ux-live-v1359";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-release-blockers-v1360";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-ux-live-v1359";
+} from "./offline-storage.js?v=20261024-release-blockers-v1360";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -27070,19 +27070,18 @@ function researchSourcesForAnswer(conversation, message) {
 
 function renderResearchAnswerSources(conversation, message, anchorPaneID) {
   const answerSources = researchSourcesForAnswer(conversation, message);
+  const incomplete = researchAnswerHasVerificationRecovery(message?.answer);
   if (!answerSources.length && !message?.id) return null;
   const details = document.createElement("details");
   details.className = "research-answer-source-text";
   const summary = document.createElement("summary");
-  const sourceCount = Math.max(
-    answerSources.length,
-    message?.answer?.evidenceSourceIDs?.length || 0,
-    message?.answer?.citations?.length || 0
-  );
-  const evidenceEconomy = message?.answer?.answerQuality?.evidenceEconomy || {};
-  const citedSourceCount = Number(evidenceEconomy.citedSourceCount || 0);
-  const reviewedOnlySourceCount = Number(evidenceEconomy.reviewedOnlySourceCount || 0);
-  const sourceSummaryText = () => citedSourceCount
+  const sourceSummaryText = (sources = answerSources, answer = message?.answer || {}) => {
+    const sourceCount = Math.max(sources.length, answer.evidenceSourceIDs?.length || 0, answer.citations?.length || 0);
+    if (incomplete) return `${sources.length} ${sources.length === 1 ? "source reference" : "source references"} available · No answer completed`;
+    const evidenceEconomy = answer.answerQuality?.evidenceEconomy || {};
+    const citedSourceCount = Number(evidenceEconomy.citedSourceCount || 0);
+    const reviewedOnlySourceCount = Number(evidenceEconomy.reviewedOnlySourceCount || 0);
+    return citedSourceCount
     ? [
         `${citedSourceCount} ${citedSourceCount === 1 ? "source" : "sources"} cited`,
         reviewedOnlySourceCount
@@ -27092,6 +27091,7 @@ function renderResearchAnswerSources(conversation, message, anchorPaneID) {
     : sourceCount
       ? `${sourceCount} ${sourceCount === 1 ? "source" : "sources"} used`
       : "Sources used";
+  };
   summary.textContent = sourceSummaryText();
   const list = document.createElement("section");
   list.className = "research-answer-source-list";
@@ -27124,6 +27124,10 @@ function renderResearchAnswerSources(conversation, message, anchorPaneID) {
   };
   const renderSourceGroups = ({ cited = [], reviewed = [] }) => {
     clear(list);
+    if (incomplete) {
+      renderSourceGroup("Available references — no answer completed", [...cited, ...reviewed], "is-reviewed");
+      return;
+    }
     renderSourceGroup("Cited in this answer", cited, "is-cited");
     renderSourceGroup("Reviewed for context — not cited", reviewed, "is-reviewed");
   };
@@ -27187,7 +27191,7 @@ function renderResearchAnswerSources(conversation, message, anchorPaneID) {
       if (exactSources.length) {
         const exactAnswer = answerRecord.answer || {};
         renderSourceGroups(splitSourcesByCitation(exactSources, exactAnswer));
-        summary.textContent = sourceSummaryText();
+        summary.textContent = sourceSummaryText(exactSources, exactAnswer);
       } else {
         renderSourceGroups({ cited: answerSources });
         if (!answerSources.length) list.textContent = "The exact source record is unavailable.";

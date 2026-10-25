@@ -69,8 +69,21 @@ try {
   assert.deepEqual(syncedProject.recordsChecklist,recordsChecklist);
   await post("/sync/push", {batch:{user:{id:userID},mutations:[{project:{...syncedProject,updatedAt:"2026-10-10T15:02:00.000Z",recordsChecklist:[{...recordsChecklist[0],status:"verified-fact"}]}}]}},400);
   const adapter = createFileStoreAdapter();
+  const {researchClarificationAnswer} = await import('../research-conversation-continuity.mjs');
+  const failedAnswer = {id:'failed-verification-attempt',conversationID:'failed-conversation',projectID,
+    question:'Synthetic failed request',createdAt:updatedAt,answer:researchClarificationAnswer('Synthetic failed request','verification_incomplete'),evidence:[],citations:[]};
+  await adapter.saveResearchAnswer(userID,failedAnswer);
+  const successfulAnswer = {id:'completed-research-answer',conversationID:'completed-conversation',projectID,
+    question:'Synthetic completed request',createdAt:updatedAt,answer:{mode:'answer',model:'synthetic',conclusion:'Completed answer',verification:{pass:true}},evidence:[],citations:[]};
+  await adapter.saveResearchAnswer(userID,successfulAnswer);
   assert(!(await adapter.listProjectLinks(userID)).some(link => link.targetKind === "canonicalSection"), "Fixture proves Report works before a foundation link has been materialized.");
   let palette = await post("/reports/sources/list", { projectID });
+  assert.equal(palette.sources.find(source=>source.id===failedAnswer.id)?.isRecovery,true,'Compact list and client summary preserve unsuccessful-attempt status.');
+  assert.equal(palette.sources.find(source=>source.id===successfulAnswer.id)?.isRecovery,false,'Completed answers remain eligible.');
+  await post('/reports/sources/preview',{projectID,kind:'researchAnswer',sourceID:failedAnswer.id},400);
+  await post('/reports/drafts/save',{projectID,expectedVersion:0,title:'Cannot include failed attempt',blocks:[
+    {id:'failed-block',kind:'researchAnswer',sourceID:failedAnswer.id,label:'Failed attempt'}]},400);
+  assert.deepEqual((await adapter.listResearchAnswers(userID)).find(answer=>answer.id===failedAnswer.id),failedAnswer,'Presentation and report eligibility do not rewrite the immutable failure.');
   assert.equal(palette.sources.filter(source => source.kind === "evidence").length, 4);
   assert.equal(palette.warnings.length, 0);
   const contextSource = palette.sources.find(source => source.projectSection === "context");

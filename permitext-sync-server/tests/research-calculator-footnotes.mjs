@@ -58,6 +58,12 @@ assert.equal(occupantLoadFootnoteState(assessment,table,row,input).filter(n=>n.c
 for(const change of [{area:'1600'},{seating:'fixed-seating'},{userMeasurementBasis:''}]) assert.equal(occupantLoadFootnoteState(assessment,table,row,{...input,...change}),null);
 assert.equal(occupantLoadFootnoteState(assessment,table,row,{...input,factorMode:'custom'}),null,'BC-bound footnote checks must not appear to validate a custom factor.');
 const customQuestion=occupantLoadFootnoteQuestion({...input,factorMode:'custom',factor:'50',tableFactor:'100',customReason:'Synthetic alternate reference'});
+const enteredQuestion=occupantLoadFootnoteQuestion({...input,spaceName:'Level 2 interior office'});
+assert.match(enteredQuestion,/User-entered space \/ room name: Level 2 interior office/);
+assert.match(enteredQuestion,/entered area without any additional optional fixture or amenity deduction/);
+assert.match(enteredQuestion,/fixture dimensions are not requested for this as-entered calculation/);
+assert.match(enteredQuestion,/missing facts that affect mandatory conditions or applicability/);
+assert.match(enteredQuestion,/does not establish.*indoors, a rooftop or a terrace/,'The selected row cannot manufacture a location fact.');
 assert.match(customQuestion,/custom factor of 50 ft²\/person/);assert.match(customQuestion,/BC table factor remains 100 gross/);
 assert.match(customQuestion,/Synthetic alternate reference/);assert.match(customQuestion,/not enacted text or proof of approval/);
 assert.equal(occupantLoadFootnoteState(assessment,table,table.rows[0],input),null);

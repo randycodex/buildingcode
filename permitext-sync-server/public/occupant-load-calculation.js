@@ -198,7 +198,8 @@ export function occupantLoadFootnoteState(assessment, table, row, input) {
 }
 
 export function occupantLoadFootnoteQuestion(input) {
-  return ['Check which footnotes of 2022 NYC BC Table 1004.1.3 apply to this selected calculation.',
+  return ['Explain this calculation and the relevant footnotes of 2022 NYC BC Table 1004.1.3 using the entered area as-is.',
+    ...(input.spaceName?.trim() ? [`User-entered space / room name: ${input.spaceName.trim()}.`] : []),
     `Function of space: ${input.spaceFunction}.`,
     input.area?`The calculator floor area is ${input.area} square feet${input.userMeasurementBasis?` of ${input.userMeasurementBasis} area`:''}.`:'The calculator area is blank; reuse earlier stated values only if their measurement basis is established.',
     input.seating==='without-fixed-seating'?'This space has no fixed seating.':input.seating==='fixed-seating'?'This space has fixed seating.':'The seating condition has not been entered.',
@@ -206,7 +207,8 @@ export function occupantLoadFootnoteQuestion(input) {
       `The user selected a custom factor of ${input.factor} ft²/person; the BC table factor remains ${input.tableFactor} ${input.areaBasis} ft²/person.`,
       `User-provided reason/reference: ${input.customReason || '(not entered)'}. Treat this as user input, not enacted text or proof of approval.`
     ] : []),
-    'Use the included passages and facts stated in this conversation, respecting later corrections and the specific space. Saved Project Context and Facts are not included. The selected code row does not establish how the area was measured. Ask only for genuinely missing information that could affect the calculation or its applicability. Do not infer approvals, deduct area automatically or declare overall compliance.'
+    'This calculation uses the entered area without any additional optional fixture or amenity deduction. Explain any optional deduction separately; fixture dimensions are not requested for this as-entered calculation. If the user wants to evaluate a deduction, ask for the relevant details then.',
+    'Use the included passages and facts stated in this conversation, respecting later corrections and the specific space. Saved Project Context and Facts are not included. The selected code row does not establish how the area was measured or whether the space is indoors, a rooftop or a terrace. Identify genuinely missing facts that affect mandatory conditions or applicability. Do not infer approvals, deduct area automatically or declare overall compliance.'
   ].join('\n');
 }
 

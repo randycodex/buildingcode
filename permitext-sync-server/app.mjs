@@ -5213,7 +5213,10 @@ async function createPostgresStoreAdapter() {
             'question', answer->'question', 'reviewStatus', answer->'reviewStatus',
             'createdAt', answer->'createdAt',
             'answer', jsonb_build_object('conclusion', answer#>'{answer,conclusion}',
-              'answerText', LEFT(answer#>>'{answer,answerText}', 500)),
+              'answerText', LEFT(answer#>>'{answer,answerText}', 500),
+              'mode', answer#>'{answer,mode}', 'model', answer#>'{answer,model}',
+              'verification', jsonb_build_object('pass', answer#>'{answer,verification,pass}',
+                'status', answer#>'{answer,verification,status}', 'reason', answer#>'{answer,verification,reason}')),
             'evidenceCount', jsonb_array_length(COALESCE(answer->'evidence', '[]'::jsonb)),
             'sectionIDs', COALESCE((SELECT jsonb_agg(section_id ORDER BY first_ordinal) FROM (
               SELECT BTRIM(evidence->>'sectionID') AS section_id, MIN(ordinal) AS first_ordinal
@@ -13505,7 +13508,10 @@ export function projectResearchAnswerForList(answer) {
   return {
     id: answer.id, conversationID: answer.conversationID, projectID: answer.projectID || null,
     question: answer.question, reviewStatus: answer.reviewStatus, createdAt: answer.createdAt,
-    answer: { conclusion: answer.answer?.conclusion || "", answerText: answer.answer?.answerText?.slice(0, 500) || "" },
+    answer: { conclusion: answer.answer?.conclusion || "", answerText: answer.answer?.answerText?.slice(0, 500) || "",
+      mode: answer.answer?.mode, model: answer.answer?.model,
+      verification: {pass: answer.answer?.verification?.pass, status: answer.answer?.verification?.status,
+        reason: answer.answer?.verification?.reason} },
     evidenceCount: answer.evidence?.length || 0,
     sectionIDs: Array.from(new Set((answer.evidence || []).map((item) => String(item.sectionID || "").trim()).filter(Boolean)))
   };
@@ -16785,6 +16791,7 @@ function reportSourceClientSummary(source) {
     } : {}),
     ...(source.kind === "projectFacts" ? { projectSection: source.projectSection || "facts", hiddenFromPicker: source.hiddenFromPicker === true } : {}),
     ...(source.kind === "notebookCard" ? { openQuestions: source.openQuestions || [], version: source.version } : {}),
+    ...(source.kind === "researchAnswer" ? { isRecovery: source.isRecovery === true } : {}),
     sourceClassification: source.sourceClassification,
     updatedAt: source.updatedAt || null
   };
@@ -17068,6 +17075,7 @@ async function handleReportSourcePreview(request, response) {
   });
   const source = sources.find(item => item.kind === kind && item.id === sourceID);
   if (!source) return sendError(response, 404, "This Report source is no longer available.");
+  if (source.isRecovery) return sendError(response, 400, "This Research attempt did not complete an answer and cannot be added to a Report.");
   const items = source.manifestItems || [source.manifestItem];
   const { reportItemPreview } = await import("./report-presentation.mjs");
   sendJSON(response, 200, { items, preview: items.filter(item => !item.reportCommentKey).flatMap(reportItemPreview) });
@@ -17189,7 +17197,7 @@ async function handleReportDraftGet(request, response) {
 
 async function validateReportDraftSources(userID, projectID, draft) {
   const { sources } = await reportSourcesForProject(userID, projectID, { summaryOnly: true });
-  const sourceKeys = new Set(sources.map((source) => `${source.kind}:${source.id}`));
+  const sourceKeys = new Set(sources.filter(source => !source.isRecovery).map((source) => `${source.kind}:${source.id}`));
   for (const block of draft.blocks) {
     if (["heading", "paragraph", "list"].includes(block.kind)) continue;
     if (!sourceKeys.has(`${block.kind}:${block.sourceID}`)) {
@@ -17373,6 +17381,7 @@ function reportManifestItemForDraftBlock(block, sourcesByKey) {
   if (["heading", "paragraph", "list"].includes(block.kind)) return block;
   const source = sourcesByKey.get(`${block.kind}:${block.sourceID}`);
   if (!source) throw new Error(`Report source is unavailable: ${block.label}`);
+  if (source.isRecovery) throw new Error("This Research attempt did not complete an answer and cannot be added to a Report.");
   return { ...source.manifestItem, id: block.id,
     ...(block.reportTitle !== undefined ? { reportTitle: block.reportTitle } : {}),
     ...(block.kind === "researchAnswer" && typeof block.includeResearchMetadata === "boolean"

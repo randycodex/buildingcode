@@ -158,10 +158,6 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
   ensureVerticalSpace(document, calculationHeight && calculationHeight < pageSpace ? calculationHeight : Math.max(105, titleHeight + 65));
   const startX = document.x;
   const contentWidth = document.page.width - document.page.margins.left - document.page.margins.right;
-  const top = document.y;
-  document.save();
-  document.roundedRect(startX - 10, top - 10, contentWidth + 20, 1, 7).fill(colors.paper);
-  document.restore();
   if (showClassification) drawClassification(document, item.sourceClassification);
 
   const formatted = annotatedSourceParts(item);
@@ -450,11 +446,14 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
         .fontSize(10)
         .text(item.text, { lineGap: 2, paragraphGap: 10 });
       if (item.derivedFrom?.kind === "notebookCard" && item.evidenceLinks?.length) {
+        const evidenceHeading = `Evidence linked to ${item.derivedFrom.title}`;
+        const firstCitation = item.evidenceLinks.find(link => link.label || link.source?.sectionNumber);
+        reserveHeading(document, evidenceHeading, firstCitation?.label || firstCitation?.source?.sectionNumber || "", {size: 8, gap: 3, bodySize: 8});
         document
           .fillColor(colors.muted)
           .font("Report-Bold")
           .fontSize(8)
-          .text(`Evidence linked to ${item.derivedFrom.title}`, { paragraphGap: 3 });
+          .text(evidenceHeading, { paragraphGap: 3 });
         item.evidenceLinks.forEach((link) => {
           const citation = link.label || [
             link.source?.codePrefix,

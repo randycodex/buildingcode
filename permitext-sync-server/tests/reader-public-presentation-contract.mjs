@@ -71,7 +71,7 @@ permitted=true;listeners.forEach(fn=>fn());
 assert.equal(rendered.querySelector(".annotated-code-block").children[0],body,"Upgrade retains the exact enacted-text node.");
 assert.equal(rendered.querySelector(".reader-section-saved-marker"),bookmark,"Upgrade retains the extracted bookmark node.");
 assert.equal(bookmark.hidden,false);assert.equal(bookmark.disabled,false);assert.equal(bookmark.attrs["aria-label"],"Remove section from Evidence");
-assert.equal(research.hidden,false);assert.match(research.title,/open conversation/);assert.equal(host.hidden,false);
+assert.equal(research.hidden,false);assert.match(research.title,/new or existing conversation/);assert.equal(host.hidden,false);
 assert.equal(addNote.hidden,false);assert.equal(addNote.attrs['aria-label'],'Add to note');
 assert.equal(body.textContent,"Complete public enacted text");
 currentLabel="";await research.click();assert.ok(researchOptions.passage,"Research invocation opens the destination picker with the selected passage.");
