@@ -21078,15 +21078,30 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .research-related-filters label { display: grid; gap: 4px; font-size: 12px; }
 .research-related-filters input { width: 100%; padding: 8px; background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); font: inherit; }
 .research-related-group > summary { padding: 12px 0; font-weight: 600; }
-.search-scope-dialog { width: min(520px, calc(100vw - 24px)); max-height: 85dvh; padding: 22px; overflow: auto; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
-.search-scope-dialog::backdrop { background: rgb(0 0 0 / .55); }
-.search-scope-dialog h2 { margin: 0 0 12px; font-size: 18px; }
-.search-scope-dialog p { font-size: 13px; line-height: 1.5; }
-.search-scope-choices { display: grid; gap: 10px; margin: 18px 0; }
-.search-scope-choices label { display: flex; align-items: start; gap: 10px; font-size: 13px; }
-.search-scope-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.search-scope-actions button, .search-scope-library { padding: 8px 12px; background: transparent; color: inherit; border: 1px solid var(--border); border-radius: 6px; font: inherit; cursor: pointer; }
-.search-scope-library { margin-top: 18px; }
+.search-panel > .search-scope-dialog[open] {
+  position: absolute; top: var(--search-scope-top); inset-inline: var(--panel-padding); bottom: var(--panel-padding);
+  z-index: 12; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto; gap: 12px;
+  width: auto; max-width: none; height: auto; min-height: 0; max-height: none; margin: 0; padding: 16px; overflow: hidden;
+  color: var(--text-primary); background: var(--menu-surface); border: 1px solid var(--border); border-radius: var(--radius-control);
+  font-family: var(--ui-font-family); font-size: 13px; line-height: 1.45;
+}
+.search-scope-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.search-scope-header h2 { margin: 0; font-size: 14px; font-weight: 600; }
+.search-scope-close { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 28px; width: 28px; height: 28px; padding: 0; border: 0; background: transparent; color: var(--text-secondary); }
+.search-scope-close svg { width: 16px; height: 16px; }
+.search-scope-dialog > p { margin: 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.search-scope-selection-actions { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.search-scope-selection-actions button, .search-scope-library { min-height: 24px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--text-secondary); font: inherit; text-align: left; }
+.search-scope-selection-actions button:hover, .search-scope-library:hover, .search-scope-close:hover { color: var(--text-primary); }
+.search-scope-choices { min-height: 0; margin: 0; padding-right: 6px; overflow-y: auto; scrollbar-width: thin; }
+.search-scope-choices label { display: grid; grid-template-columns: 16px minmax(0, 1fr); align-items: start; gap: 10px; width: 100%; margin: 0; padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--text-primary); font-size: 13px; line-height: 1.45; text-align: left; text-transform: none; letter-spacing: normal; }
+.search-scope-choices label:last-child { border-bottom: 0; }
+.search-scope-choices input[type="checkbox"] { position: static; display: block; appearance: auto; width: 16px; min-width: 16px; height: 16px; min-height: 16px; margin: 2px 0 0; padding: 0; accent-color: var(--text-primary); }
+.search-scope-choices label > span { min-width: 0; font: inherit; text-align: left; text-transform: none; }
+.search-scope-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.search-scope-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-inline-start: auto; }
+.search-scope-actions button { min-height: 34px; padding: 6px 12px; background: transparent; color: inherit; border: 1px solid var(--border); border-radius: 6px; font: inherit; }
+.search-scope-actions .search-scope-apply { background: var(--toolbar-active); }
 .calculation-draft-tools { display: grid; gap: 10px; margin: 12px 0; }
 .calculation-draft-tools label { display: grid; gap: 6px; font-size: 12px; }
 .calculation-draft-tools select { width: 100%; min-width: 0; }

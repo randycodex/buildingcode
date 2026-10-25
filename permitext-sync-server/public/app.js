@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1369";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1370";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1369";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1370";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261025-workspace-chrome-v1369";
+} from "./offline-storage.js?v=20261025-workspace-chrome-v1370";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41250,7 +41250,11 @@ function toggleAccountDialog({ upgrade = false } = {}) {
 
 async function openSearchCodeSourceSettings(panel) {
   const existing = document.querySelector(".search-scope-dialog");
-  if (existing) { existing._close(); return; }
+  if (existing) {
+    const samePanel = existing.closest(".search-panel") === panel;
+    existing._close();
+    if (samePanel) return;
+  }
   document.querySelector(".column-group-menu")?._close?.();
   const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   const instance = state.utilityInstances.find(item => paneIDForUtilityInstance(item) === panel.dataset.paneId);
@@ -41264,6 +41268,7 @@ async function openSearchCodeSourceSettings(panel) {
     const trigger = panel.querySelector(".search-scope-summary");
     const dialog = document.createElement("dialog"); dialog.className = "search-scope-dialog";
     dialog.setAttribute("aria-label", "Search within codebooks and editions");
+    const header = document.createElement("div"); header.className = "search-scope-header";
     const heading = document.createElement("h2"); heading.textContent = "Search within";
     const copy = document.createElement("p"); copy.textContent = "Choose sources for this search column. This filter does not enable or disable books in your browsing library.";
     const choices = document.createElement("div"); choices.className = "search-scope-choices";
@@ -41276,24 +41281,56 @@ async function openSearchCodeSourceSettings(panel) {
       check.addEventListener("change", () => { check.checked ? selected.add(codeSourceKey(row.source)) : selected.delete(codeSourceKey(row.source)); });
       label.append(check, name); choices.append(label); controls.push({check, source: row.source});
     }
-    const actions = document.createElement("div"); actions.className = "search-scope-actions";
     const button = (label, action) => { const node = document.createElement("button"); node.type = "button"; node.textContent = label; node.addEventListener("click", action); return node; };
-    const close = () => { observer.disconnect(); dialog.close(); dialog.remove(); trigger?.setAttribute("aria-expanded", "false"); if (trigger?.isConnected) trigger.focus({preventScroll:true}); };
     const current = () => panel.isConnected && isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID;
-    const observer = new MutationObserver(() => { if (!current()) close(); });
-    actions.append(button("Clear selection", () => {selected.clear(); for (const {check} of controls) check.checked = false;}),
-      button("Use all enabled sources", () => { selected.clear(); for (const {check, source} of controls) {check.checked=true;selected.add(codeSourceKey(source));} }),
-      button("Cancel", close), button("Apply to this search", () => {
+    let closed = false;
+    const close = () => {
+      if (closed) return;
+      closed = true;
+      observer.disconnect(); resize?.disconnect(); dialog.close(); dialog.remove();
+      trigger?.setAttribute("aria-expanded", "false");
+      if (trigger?.isConnected && current()) trigger.focus({preventScroll:true});
+    };
+    const position = () => {
+      if (closed) return;
+      if (!current()) { close(); return; }
+      const panelRect = panel.getBoundingClientRect();
+      const anchorRect = (trigger || panel.querySelector(".search-dock") || panel).getBoundingClientRect();
+      dialog.style.setProperty("--search-scope-top", `${Math.max(0, anchorRect.bottom - panelRect.top + 8)}px`);
+    };
+    const observer = new MutationObserver(() => { if (!current() || !dialog.isConnected) close(); });
+    const resize = typeof ResizeObserver === "function" ? new ResizeObserver(position) : null;
+    const closeButton = button("", close);
+    closeButton.className = "search-scope-close"; closeButton.innerHTML = circleXIconSVG();
+    closeButton.setAttribute("aria-label", "Close search scope"); closeButton.title = "Close search scope";
+    header.append(heading, closeButton);
+    const selectionActions = document.createElement("div"); selectionActions.className = "search-scope-selection-actions";
+    selectionActions.append(button("Clear selection", () => {selected.clear(); for (const {check} of controls) check.checked = false;}),
+      button("Use all enabled sources", () => { selected.clear(); for (const {check, source} of controls) {check.checked=true;selected.add(codeSourceKey(source));} }));
+    const actions = document.createElement("div"); actions.className = "search-scope-actions";
+    const apply = button("Apply to this search", () => {
         if (!current()) {close();return;}
         instance.querySourceKeys = selected.size === enabled.length ? null : [...selected];
         const position = searchPositionState(instance); position.loadedPages=1;position.scrollTop=0;position.groupPages={};position.groupScope="";
         close(); saveWorkspaceState(); updateSearchScopeSummary(panel, instance); void renderSearchResults(panel, instance);
-      }));
+      });
+    apply.className = "search-scope-apply";
+    actions.append(button("Cancel", close), apply);
     const library = button("Manage browsing library…", () => {close(); if(current())openActiveCodeSourceSettings();});
     library.className = "search-scope-library";
-    dialog.append(heading, copy, choices, actions, library);
+    const footer = document.createElement("div"); footer.className = "search-scope-footer";
+    footer.append(library, actions);
+    dialog.append(header, copy, selectionActions, choices, footer);
     dialog._close=close;dialog.addEventListener("cancel",event=>{event.preventDefault();close();});
-    observer.observe(track,{childList:true,subtree:true});document.body.append(dialog);trigger?.setAttribute("aria-expanded","true");dialog.showModal();
+    dialog.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      event.preventDefault(); event.stopPropagation(); close();
+    });
+    panel.append(dialog); position();
+    observer.observe(track,{childList:true,subtree:true});
+    resize?.observe(panel);
+    const dock = panel.querySelector(".search-dock"); if (dock) resize?.observe(dock);
+    trigger?.setAttribute("aria-expanded","true"); dialog.show();
   } catch(error) { if(isCurrentAccountRequest(identity)&&workspaceID===activeWorkspaceID) await showWebNotice("Search sources unavailable",error.message); }
 }
 
