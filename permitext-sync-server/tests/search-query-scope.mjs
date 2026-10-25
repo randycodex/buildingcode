@@ -31,6 +31,9 @@ c.normalizeSearchHistorySplitRatio=()=>0.5;
 c.normalizeSearchResultSources=value=>Array.isArray(value)?value:[];
 c.repeatableUtilityKeys=new Set(['search','saved']);
 vm.runInContext(['newUtilityInstance','normalizeUtilityInstances','normalizeSearchInstance'].map(actual).join('\n'),c);
+assert.equal(c.newUtilityInstance('search',{id:'default-search'}).matchMode,'words','New Search columns default to all words.');
+assert.equal(c.normalizeSearchInstance({}).matchMode,'words','Restoring a missing search mode defaults to all words.');
+assert.equal(c.normalizeSearchInstance(null).matchMode,'words','An absent Search instance also defaults to all words.');
 for(const selection of [query.querySourceKeys,[],null]) {
  const saved=JSON.parse(JSON.stringify({utilityInstances:[{id:'search-id',key:'search',query:'business areas',matchMode:'exact',querySourceKeys:selection}]}));
  const restored=c.normalizeUtilityInstances(saved)[0];

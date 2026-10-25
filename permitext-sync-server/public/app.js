@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1370";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1371";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1370";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1371";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261025-workspace-chrome-v1370";
+} from "./offline-storage.js?v=20261025-workspace-chrome-v1371";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3920,7 +3920,7 @@ function normalizeSavedInstance(instance) {
 }
 
 function searchPositionState(instance) {
-  const key = JSON.stringify([String(instance.query || "").trim(), normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all", instance.matchMode || "exact"]);
+  const key = JSON.stringify([String(instance.query || "").trim(), normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all", instance.matchMode || "words"]);
   if (!instance.searchPosition || instance.searchPosition.key !== key) {
     instance.searchPosition = { key, scrollTop: 0, loadedPages: 1, selectedResult: "" };
   }
@@ -3934,7 +3934,7 @@ function searchResultPositionKey(result) {
 
 function normalizeSearchInstance(instance) {
   if (!instance || typeof instance !== "object") {
-    return { query: "", codeFilters: [], expandedResultSources: [], collapsedResultCodePrefixes: [] };
+    return { query: "", matchMode: "words", codeFilters: [], expandedResultSources: [], collapsedResultCodePrefixes: [] };
   }
   instance.query = typeof instance.query === "string" ? instance.query : "";
   instance.matchMode = instance.matchMode === "exact" ? "exact" : "words";
@@ -19993,7 +19993,10 @@ function updateSearchScopeSummary(panel, instance) {
   button.setAttribute('aria-label', summary);
   button.title = [summary, 'Applies to this search only. Your browsing library stays unchanged.', ...labels].join('\n');
   const mode = panel.querySelector('.search-visible-match-mode');
-  if (mode) mode.textContent = instance?.matchMode === 'exact' ? 'Exact phrase' : 'All words';
+  if (mode) {
+    mode.hidden = instance?.matchMode !== 'exact';
+    mode.textContent = mode.hidden ? '' : 'Exact phrase';
+  }
 }
 
 function updateSearchDock(panel, instance, resultCount = null, options = {}) {
@@ -20744,7 +20747,7 @@ async function renderSearchResults(panel, instance) {
   const searchInstance = normalizeSearchInstance(instance);
   const results = panel.querySelector(".search-results");
   const query = searchInstance.query.trim();
-  const matchMode = searchInstance.matchMode || "exact";
+  const matchMode = searchInstance.matchMode || "words";
   const selectedPrefixes = normalizeSearchCodeFilters(searchInstance.codeFilters);
   const position = searchPositionState(searchInstance);
   const restorePages = (Number.isSafeInteger(position.loadedPages) && position.loadedPages > 0 ? Math.min(position.loadedPages, 1000) : 1);
@@ -20760,7 +20763,7 @@ async function renderSearchResults(panel, instance) {
   const isCurrent = () => (sourceScope === null || isCurrentActiveCodeSourceContext(sourceScope.token)) && !controller.signal.aborted && panel.isConnected &&
     panel.__searchRequestController === controller && isCurrentAccountRequest(identity) &&
     activeWorkspaceID === workspaceID && results.dataset.searchRenderToken === renderToken &&
-    searchInstance.query.trim() === query && (searchInstance.matchMode || "exact") === matchMode && (searchInstance.searchEdition || "all") === edition &&
+    searchInstance.query.trim() === query && (searchInstance.matchMode || "words") === matchMode && (searchInstance.searchEdition || "all") === edition &&
     normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") === selectedPrefixes.join(",") && JSON.stringify(searchInstance.querySourceKeys) === queryScopeKey;
   results.dataset.searchRenderToken = renderToken;
   results.dataset.restoringSearch = "true";
@@ -21172,7 +21175,7 @@ function appendSearchGroupLoadMore(results, page, options) {
     try {
       const source = encodeURIComponent(JSON.stringify({ codePrefix: page.codePrefix, codeVersion: page.codeVersion }));
       const payload = await fetchCodeSearch(`/code/search?q=${encodeURIComponent(options.query)}` +
-        `&code=${encodeURIComponent(page.codePrefix)}&version=all&resultSource=${source}&match=${options.matchMode || "exact"}` +
+        `&code=${encodeURIComponent(page.codePrefix)}&version=all&resultSource=${source}&match=${options.matchMode || "words"}` +
         `&readerSourceMetadata=1&limit=${searchResultPageSize}&offset=${page.nextOffset}` +
         `${page.cursorKind === "candidate" ? `&candidateOffset=${page.candidateOffset}` : ""}${options.sourceScope.querySuffix}`,
         { signal: options.controller.signal });
@@ -21243,7 +21246,7 @@ function appendSearchLoadMore(results, options) {
       : "";
     try {
       const payload = await fetchCodeSearch(
-        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.edition)}&match=${options.matchMode || "exact"}` +
+        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.edition)}&match=${options.matchMode || "words"}` +
         `&readerSourceMetadata=1&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}` +
         `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}${options.sourceScope.querySuffix}`,
         { signal: options.controller.signal }
