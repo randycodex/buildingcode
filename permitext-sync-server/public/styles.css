@@ -4595,6 +4595,7 @@ select option:checked {
 }
 
 .authored-section-label {
+  position: relative;
   display: block;
   grid-column: 1 / -1;
   margin: var(--space-5) 0 var(--space-3);
@@ -4608,6 +4609,16 @@ select option:checked {
   line-height: 1.2;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.reader-panel .authored-section-label::before {
+  position: absolute;
+  top: calc(-1 * var(--space-2));
+  right: 0;
+  left: 0;
+  border-top: 1px solid var(--border);
+  content: "";
+  pointer-events: none;
 }
 
 .code-table {
