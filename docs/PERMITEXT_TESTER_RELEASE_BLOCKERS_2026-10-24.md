@@ -8,6 +8,8 @@ The editable footnote draft now includes the user-entered room name and explicit
 
 The live retest also exposed a destination defect after New conversation: the Calculator could reuse the prior conversation hidden behind the empty composer, placing a question in a draft that still could not send. Draft-only panes are now excluded as existing destinations. A fresh Calculator handoff creates a conversation with its exact included source, and an existing unsent blank-composer question is preserved rather than replaced. This is client routing, not an answer-generation change.
 
+The first final live request still failed verification around the roof/terrace condition. Calculator now offers an explicit Space location field, defaulting to Not stated. A user-selected interior-only, rooftop, terrace or mixed location is carried into the editable question and any newly saved calculation Note. A room name alone never becomes a location fact. Location changes invalidate incompatible displayed footnote checks; they do not change arithmetic, table factors or original Notes.
+
 ## Failed-attempt presentation and Report eligibility
 
 The compact answer projections in both file and PostgreSQL storage had dropped mode, model and verification status. The Report client summary also dropped the existing isRecovery flag. Those projections now preserve the small status fields needed to identify a failed attempt without loading private review details or changing the immutable answer.
@@ -31,6 +33,6 @@ The PDF regression check inspects graphics and text together: ordinary text extr
 - Footnote tests preserve citation/source binding, current facts, corrections, custom-factor limits, unsent drafts and zero automatic sends.
 - Two stale UI-copy expectations in existing test harnesses were aligned with the already-shipped passage prerequisite and conversation chooser; no corresponding runtime behavior changed.
 - All 94 protected Research modules have identical before/after SHA-256 hashes. The app.mjs changes concern compact answer metadata and Report eligibility only.
-- Client version: `20261024-release-blockers-v1361`; Calculator module v27; shell generation `permitext-pro-shell-v1936`.
+- Client version: `20261025-release-blockers-v1362`; Calculator module v28; shell generation `permitext-pro-shell-v1937`.
 
 Live deployment, first-use account results, screenshots and final issued-PDF checks are recorded in the task's external evidence directory. Local tests are not represented as proof of production account signup or model success.

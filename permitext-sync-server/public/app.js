@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-release-blockers-v1361";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-release-blockers-v1362";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -14,9 +14,9 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=27";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-release-blockers-v1361";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-release-blockers-v1362";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-release-blockers-v1361";
+} from "./offline-storage.js?v=20261025-release-blockers-v1362";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -17959,9 +17959,9 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
           sectionTitle: resolved.title, codeEdition: researchCodeEdition(resolved), sourceLibraryVersion: resolved.codeVersion},
         passages: [{exact}], createdAt: new Date().toISOString()};
       const notebookDocument = emptyNotebookDocument();
-      notebookDocument.document = calculationNoteBlocks(calculation, [link], answerID);
+      notebookDocument.document = calculationNoteBlocks(calculation, [link], answerID, draft.spaceLocation);
       if (spaceName) notebookDocument.document.unshift({type: "paragraph", content: [{type: "text", text: `Space / room: ${spaceName}`, styles: {}}]});
-      const fingerprint = JSON.stringify({spaceName, input: calculation.input});
+      const fingerprint = JSON.stringify({spaceName, ...(draft.spaceLocation ? {spaceLocation: draft.spaceLocation} : {}), input: calculation.input});
       const submission = savePayloads.get(fingerprint) || {projectID: researchProjectID(project), expectedVersion: 0,
         clientMutationID: `occupant-load:${crypto.randomUUID()}`, cardType: "finding",
         title: `${spaceName ? `${spaceName} · ` : ""}Occupant load${calculation.input.factorMode === 'custom' ? ' · Custom factor' : ''} · ${calculation.input.spaceFunction}`.slice(0, 300), document: notebookDocument, evidenceLinks: [link],

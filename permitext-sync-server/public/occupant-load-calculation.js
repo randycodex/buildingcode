@@ -186,10 +186,21 @@ export function occupantLoadFootnoteAssessment(answer, source) {
     workFacts:answer.occupantLoadDraft.footnoteWorkFacts||[]};
 }
 
+const occupantLoadSpaceLocations = Object.freeze({
+  interior: 'This calculation is entirely for an interior space; no rooftop or terrace area is included.',
+  rooftop: 'This calculation is for a rooftop area.',
+  terrace: 'This calculation is for a terrace area.',
+  mixed: 'The location is mixed or other; an interior-only calculation has not been established.'
+});
+const occupantLoadSpaceLocationText = value => Object.hasOwn(occupantLoadSpaceLocations, value) ? occupantLoadSpaceLocations[value] : '';
+
 export function occupantLoadFootnoteState(assessment, table, row, input) {
   if (input.factorMode === 'custom' || !assessment || !row || occupantLoadSuggestedRow(assessment.selection,table)?.id!==row.id ||
     ['area','seating'].some(key=>String(assessment.selection[key]||'')!==String(input[key]||'')) ||
     String(assessment.selection.areaBasis||'')!==String(input.userMeasurementBasis||'')) return null;
+  const location = occupantLoadSpaceLocationText(input.spaceLocation);
+  const locationChecks = assessment.checks.filter(check => ['c', 'd'].includes(check.marker));
+  if (location && locationChecks.length && !locationChecks.some(check => check.factQuotes?.some(fact => compact(fact.quote).includes(compact(location))))) return null;
   return row.footnotes.map(note=>{
     const check=assessment.checks.find(check=>check.sourceID===assessment.sourceID && check.marker===note.marker && compact(check.footnoteText)===compact(note.text) &&
       ['applies','not_applicable','needs_information'].includes(check.status));
@@ -203,6 +214,7 @@ export function occupantLoadFootnoteQuestion(input) {
     `Function of space: ${input.spaceFunction}.`,
     input.area?`The calculator floor area is ${input.area} square feet${input.userMeasurementBasis?` of ${input.userMeasurementBasis} area`:''}.`:'The calculator area is blank; reuse earlier stated values only if their measurement basis is established.',
     input.seating==='without-fixed-seating'?'This space has no fixed seating.':input.seating==='fixed-seating'?'This space has fixed seating.':'The seating condition has not been entered.',
+    ...(occupantLoadSpaceLocationText(input.spaceLocation) ? [occupantLoadSpaceLocationText(input.spaceLocation)] : []),
     ...(input.factorMode === 'custom' ? [
       `The user selected a custom factor of ${input.factor} ft²/person; the BC table factor remains ${input.tableFactor} ${input.areaBasis} ft²/person.`,
       `User-provided reason/reference: ${input.customReason || '(not entered)'}. Treat this as user input, not enacted text or proof of approval.`
@@ -212,11 +224,12 @@ export function occupantLoadFootnoteQuestion(input) {
   ].join('\n');
 }
 
-export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '') {
+export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '', spaceLocation = '') {
   if (!calculation?.valid || !evidenceLinks?.length) throw new Error('Complete the calculation and link its governing source first.');
   const c = calculation.input;
   const paragraph = text => ({type: 'paragraph', content: [{type: 'text', text, styles: {}}]});
   const blocks = [
+    ...(occupantLoadSpaceLocationText(spaceLocation) ? [paragraph(`User-stated location: ${occupantLoadSpaceLocationText(spaceLocation)}`)] : []),
     {type: 'heading', props: {level: 2}, content: [{type: 'text', text: 'Occupant load calculation', styles: {}}]},
     paragraph(`Needs review · ${c.factorMode === 'custom' ? 'Custom factor · ' : ''}calculation snapshot · ${c.spaceFunction}`),
     paragraph(`${c.area} ft² (${c.areaBasis}) ÷ ${c.factor} ft²/person = ${calculation.people} people (rounded up to a whole person).`),
@@ -269,6 +282,7 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
   const fields = {};
   for (const [key, label, options] of [
     ['spaceName', 'Space / room name (optional)', null],
+    ['spaceLocation', 'Space location (for footnotes)', [['', 'Not stated'], ['interior', 'Interior only — no rooftop or terrace'], ['rooftop', 'Rooftop'], ['terrace', 'Terrace'], ['mixed', 'Mixed / other — describe in question']]],
     ['spaceFunction', 'Function of space', [['', 'Select a BC table function']]], ['area', 'Floor area · ft²', null],
     ['areaBasis', 'Area basis', null],
     ['factor', 'Occupant-load factor · ft²/person', null],
@@ -334,13 +348,14 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
   let staleDraft = false;
   let busy = false, savedCard = savedNote, savedFingerprint = savedInputFingerprint;
   open.hidden = !savedCard;
-  const fingerprint = calculation => JSON.stringify({spaceName: draft.spaceName || '', input: calculation.input});
+  const fingerprint = calculation => JSON.stringify({spaceName: draft.spaceName || '', ...(draft.spaceLocation ? {spaceLocation: draft.spaceLocation} : {}), input: calculation.input});
   root.markDraftChanged = () => {
     staleDraft = true; reloadDraft.hidden = false;
     Object.values(fields).forEach(field => field.disabled = true);
     update();
   };
   const values = () => occupantLoadTableInput({area: fields.area.value, seating: fields.seating.value,
+    spaceLocation: Object.hasOwn(occupantLoadSpaceLocations, fields.spaceLocation.value) ? fields.spaceLocation.value : '',
     factorMode: fields.factorMode.value, customFactor, customReason: reason.value,
     areaMeasurementBasis,userMeasurementBasis}, table, fields.spaceFunction.value);
   const update = () => {
@@ -413,6 +428,7 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
     return calculation;
   };
   const handleInput = event => {
+    if (event.target === fields.spaceLocation) invalidatedAnswerID=(getAssessment?.()||assessment)?.answerID||'';
     if (event.target === fields.spaceFunction) {
       const next = table?.rows.find(row => row.id === fields.spaceFunction.value);
       if (fields.spaceFunction.value !== selectedRowID) {

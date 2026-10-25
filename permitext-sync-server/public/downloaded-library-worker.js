@@ -1,4 +1,4 @@
-import { searchSpellingSuggestions } from "./search-relevance.js?v=20261024-release-blockers-v1361";
+import { searchSpellingSuggestions } from "./search-relevance.js?v=20261025-release-blockers-v1362";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import {
   searchWords,

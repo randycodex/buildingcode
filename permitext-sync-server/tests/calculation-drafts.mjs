@@ -5,9 +5,10 @@ const storage = {getItem: key => values.get(key) ?? null, setItem: (key,value) =
 const store = calculationDraftStore(storage, 'private-account-A:calculator-drafts:v1');
 const context = JSON.stringify(['projectA','2152','2022','manual']);
 let first = store.open(context, {area:'300',spaceName:'Meeting room'});
-first = store.update(first, {...first.input,area:'600'});
+first = store.update(first, {...first.input,area:'600',spaceLocation:'interior'});
 const reloaded = calculationDraftStore(storage,'private-account-A:calculator-drafts:v1');
 assert.equal(reloaded.open(context).input.area,'600');
+assert.equal(reloaded.open(context).input.spaceLocation,'interior','An explicitly stated location survives reload and entry-point changes.');
 assert.equal(reloaded.open(context).id,first.id,'Reader and toolbar share the active manual calculation');
 const stale = reloaded.open(context);
 first = store.update(first,{...first.input,area:'900'});
