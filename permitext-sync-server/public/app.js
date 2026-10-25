@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1372";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1373";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1372";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1373";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261025-workspace-chrome-v1372";
+} from "./offline-storage.js?v=20261025-workspace-chrome-v1373";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41272,7 +41272,6 @@ async function openSearchCodeSourceSettings(panel) {
     const dialog = document.createElement("dialog"); dialog.className = "search-scope-dialog";
     dialog.setAttribute("aria-label", "Search within codebooks and editions");
     const header = document.createElement("div"); header.className = "search-scope-header";
-    const heading = document.createElement("h2"); heading.textContent = "Search within";
     const choices = document.createElement("div"); choices.className = "search-scope-choices";
     const controls = [];
     for (const row of activeCodeSourceMenuRows(enabled)) {
@@ -41305,10 +41304,11 @@ async function openSearchCodeSourceSettings(panel) {
     const closeButton = button("", close);
     closeButton.className = "search-scope-close"; closeButton.innerHTML = circleXIconSVG();
     closeButton.setAttribute("aria-label", "Close search scope"); closeButton.title = "Close search scope";
-    header.append(heading, closeButton);
+    closeButton.autofocus = true;
     const selectionActions = document.createElement("div"); selectionActions.className = "search-scope-selection-actions";
     selectionActions.append(button("Clear selection", () => {selected.clear(); for (const {check} of controls) check.checked = false;}),
       button("Use all enabled sources", () => { selected.clear(); for (const {check, source} of controls) {check.checked=true;selected.add(codeSourceKey(source));} }));
+    header.append(selectionActions, closeButton);
     const actions = document.createElement("div"); actions.className = "search-scope-actions";
     const apply = button("Apply to this search", () => {
         if (!current()) {close();return;}
@@ -41318,11 +41318,9 @@ async function openSearchCodeSourceSettings(panel) {
       });
     apply.className = "search-scope-apply";
     actions.append(button("Cancel", close), apply);
-    const library = button("Manage browsing library…", () => {close(); if(current())openActiveCodeSourceSettings();});
-    library.className = "search-scope-library";
     const footer = document.createElement("div"); footer.className = "search-scope-footer";
-    footer.append(library, actions);
-    dialog.append(header, selectionActions, choices, footer);
+    footer.append(actions);
+    dialog.append(header, choices, footer);
     dialog._close=close;dialog.addEventListener("cancel",event=>{event.preventDefault();close();});
     dialog.addEventListener("keydown", event => {
       if (event.key !== "Escape") return;
