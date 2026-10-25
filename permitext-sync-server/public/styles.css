@@ -19128,7 +19128,7 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-draft-cla
 
 /* Search mirrors the native family cards, with an accordion for each edition. */
 .search-family-card {
-  margin: 0 var(--panel-padding) 12px;
+  margin: 0 0 12px;
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 22px;
