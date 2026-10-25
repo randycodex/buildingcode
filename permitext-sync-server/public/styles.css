@@ -5217,7 +5217,7 @@ select option:checked {
   margin: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 48px 0 0;
+  padding: 4px 0 0;
   font-family: var(--ui-font-family);
   font-size: var(--chrome-font-size) !important;
   line-height: 1.45;
