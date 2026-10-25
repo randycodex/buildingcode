@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1374";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1375";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1374";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1375";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -46,6 +46,7 @@ import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20261015-reader-search-preview-v3";
+import { searchWords, searchWordPattern } from "./search-words.js?v=20261025-workspace-chrome-v1375";
 import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey } from "./reader-navigation-tree.js?v=20261010-contents-v1";
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
@@ -149,7 +150,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261025-workspace-chrome-v1374";
+} from "./offline-storage.js?v=20261025-workspace-chrome-v1375";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -5759,6 +5760,7 @@ function searchResultDetail(result) {
     title: result.title || result.headingLine || "Section",
     blockID: normalizeAnnotationBlockID(result.blockID || result.annotationBlockID || result.contentBlockID),
     blockLabel: result.blockLabel || "",
+    definitionTerm: result.definitionTerm || "",
     headerLine: result.headerLine || "",
     headingLine: result.headingLine || ""
   };
@@ -20085,9 +20087,7 @@ function updateVisibleSearchHistoryEntry(panel, entry) {
 async function openRecentlyViewedInReader(searchInstance, entry) {
   if (!searchInstance?.id || !entry) return;
   try {
-    await openSourceInReader(recentViewNavigationSource(entry), paneIDForUtilityInstance(searchInstance), {
-      sourceSurface: "search"
-    });
+    await openSearchResultDetail(recentViewNavigationSource(entry), searchInstance);
   } catch (error) {
     console.warn("Could not open recently viewed section.", error);
     presentWorkspaceIssue(error?.message || "This section could not be loaded. Try opening it again.");
@@ -20433,11 +20433,6 @@ function installSearchQueryInputHandlers(panel, searchInstance, input, paneID) {
     scheduleSearchQueryPersistence();
     updateSearchDock(panel, searchInstance);
     if (composing || event.isComposing) return;
-    const details = sectionDetailsBySearch();
-    if (!searchInstance.query.trim() && details[searchInstance.id]) {
-      delete details[searchInstance.id];
-      void transitionWorkspace("utility");
-    }
     searchTimers.set(paneID, setTimeout(() => {
       if (current() && panel.isConnected) void renderSearchResults(panel, searchInstance);
     }, 250));
@@ -21101,9 +21096,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         mainButton.setAttribute("aria-current", "true");
         saveWorkspaceState();
         recordRecentSearch(query);
-        void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance), {
-          sourceSurface: "search"
-        });
+        void openSearchResultDetail(detail, searchInstance);
       });
 
       const saveButton = createSearchResultSaveButton(panel, detail, {
@@ -21302,6 +21295,38 @@ function appendSearchLoadMore(results, options) {
 }
 
 const sectionDetailOpeningAttempts = new Map();
+const sectionDetailSearchContexts = new WeakMap();
+
+async function openSearchResultDetail(item, searchInstance) {
+  if (workspaceColumnsRequireProject() || searchInstance?.key !== "search") return null;
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const workflowGeneration = state.workflowNavigationGeneration || 0;
+  const query = String(searchInstance.query || "");
+  const paneID = paneIDForUtilityInstance(searchInstance);
+  const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    workflowGeneration === (state.workflowNavigationGeneration || 0) &&
+    state.utilityInstances.includes(searchInstance) && workflowPaneIsVisible(paneID) &&
+    String(searchInstance.query || "") === query;
+  try {
+    const detail = await openSectionDetail(searchInstance.id, item, {
+      isCurrent, anchorPaneID: paneID, updateURL: false, updateLinkedReader: false,
+      searchQuery: query, searchMatchMode: searchInstance.matchMode,
+      evidenceAnchor: item.evidenceAnchor || null
+    });
+    if (!detail || !isCurrent() || sectionDetailsBySearch()[searchInstance.id] !== detail) return null;
+    const detailID = paneIDForSectionDetail(searchInstance.id);
+    if (!await whenWorkspacePaneReady(detailID) || !isCurrent() || sectionDetailsBySearch()[searchInstance.id] !== detail) return null;
+    const panel = track.querySelector(`.section-detail-panel[data-pane-id="${CSS.escape(detailID)}"]`);
+    if (panel && paneIsCollapsed(detailID)) setPaneCollapsed(panel, false);
+    columnExpansionController().reveal(panel);
+    scrollPaneIntoView(detailID);
+    return detail;
+  } catch (error) {
+    if (isCurrent()) await showWebNotice("Source could not be opened", error.message || "The exact source is unavailable.");
+    return null;
+  }
+}
 
 async function openSectionDetail(searchID, section, options = {}) {
   const attempt = {};
@@ -21330,10 +21355,16 @@ async function openSectionDetail(searchID, section, options = {}) {
     title: section.title || "Section",
     blockID: normalizeAnnotationBlockID(section.blockID || section.annotationBlockID || section.contentBlockID),
     blockLabel: section.blockLabel || "",
+    definitionTerm: section.definitionTerm || "",
     headerLine: section.headerLine || "",
     headingLine: section.headingLine || "",
     evidenceAnchor: options.evidenceAnchor || null
   };
+  // Live query text stays out of durable workspace layouts.
+  if (options.searchQuery !== undefined) sectionDetailSearchContexts.set(publishedDetail, {
+    searchQuery: String(options.searchQuery || ""),
+    searchMatchMode: options.searchMatchMode === "exact" ? "exact" : "words"
+  });
   if (options.anchorPaneID) {
     anchors[searchID] = options.anchorPaneID;
   } else {
@@ -21365,6 +21396,7 @@ async function openSectionDetail(searchID, section, options = {}) {
       isCurrent() && details[searchID] === publishedDetail && isCurrentActiveCodeSourceContext(resolved.__activeCodeSourceContext)) {
     revealReaderSourceTarget(linkedReader, details[searchID], options.evidenceAnchor);
   }
+  return publishedDetail;
   } finally {
     if (sectionDetailOpeningAttempts.get(searchID) === attempt) sectionDetailOpeningAttempts.delete(searchID);
   }
@@ -21782,7 +21814,10 @@ async function renderSectionDetail(searchID, detail) {
   panel.classList.add(`code-theme-${codeTheme(detail.codePrefix || "BC")}`);
   const detailOwner = (state.utilityInstances || []).find((instance) => instance.id === searchID);
   const isSavedEvidenceDetail = detailOwner?.key === "sdc";
+  const isSearchEvidenceDetail = detailOwner?.key === "search";
+  const searchTargetDetail = { ...detail, ...sectionDetailSearchContexts.get(detail) };
   panel.classList.toggle("is-saved-evidence-detail", isSavedEvidenceDetail);
+  panel.classList.toggle("is-search-evidence-detail", isSearchEvidenceDetail);
   panel.dataset.projectId = String(detailOwner?.projectID || "");
   applyProjectDerivedPaneTheme(panel, detailOwner?.projectID);
   applyPaneWeight(panel, paneIDForSectionDetail(searchID));
@@ -21811,10 +21846,10 @@ async function renderSectionDetail(searchID, detail) {
   chrome.className = "panel-header section-detail-chrome";
   const detailTitle = document.createElement("p");
   detailTitle.className = "eyebrow panel-kind";
-  detailTitle.textContent = isSavedEvidenceDetail ? "Evidence detail" : "Section detail";
+  detailTitle.textContent = isSavedEvidenceDetail || isSearchEvidenceDetail ? "Evidence detail" : "Section detail";
   const backButton = appendDetailIconButton(chrome, {
     title: "Close",
-    label: "Close saved item",
+    label: isSearchEvidenceDetail ? "Close Evidence detail" : "Close saved item",
     className: "section-detail-icon section-detail-close workflow-action-icon",
     svg: circleXIconSVG()
   });
@@ -21990,6 +22025,15 @@ async function renderSectionDetail(searchID, detail) {
   });
 
   heading.addEventListener("click", async () => {
+    if (isSearchEvidenceDetail) {
+      const target = searchDetailPassageBlock(body, searchTargetDetail);
+      await openSourceInReader({ ...detail, blockID: detail.blockID || target?.dataset.annotationBlockId || "" },
+        paneIDForSectionDetail(searchID), {
+          sourceSurface: "search-detail", evidenceAnchor: detail.evidenceAnchor,
+          isCurrent: () => panel.isConnected && sectionDetailsBySearch()[searchID] === detail
+        });
+      return;
+    }
     const reader = await openOrUpdateLinkedReaderForSearch(searchID, detail, {
       chapterID: detail.chapterID || chapter?.id || "",
       sectionNumber: sectionPayload.sectionNumber,
@@ -22145,7 +22189,34 @@ async function renderSectionDetail(searchID, detail) {
   } else savedScope.hidden = true;
   content.append(codeLabelElement, chapterLabel, heading, chapterTitle, savedScope, body, addNote, addComment, notes);
   panel.append(chrome, content);
+  if (isSearchEvidenceDetail && !detail.evidenceAnchor && !sectionTarget.blockID) {
+    requestAnimationFrame(() => {
+      if (!panel.isConnected) return;
+      const target = searchDetailPassageBlock(body, searchTargetDetail);
+      if (!target) return;
+      const exact = normalizedPassageAnchorText(target.textContent);
+      const marks = exact ? markNotebookEvidenceRange(target, { exact }) : [];
+      if (marks.length) marks[0].scrollIntoView({ block: "center", behavior: "auto" });
+    });
+  }
   return panel;
+}
+
+function searchDetailPassageBlock(body, detail) {
+  const blocks = Array.from(body.children);
+  const blockID = normalizeAnnotationBlockID(detail.blockID);
+  if (blockID) return blocks.find(block => block.dataset.annotationBlockId === blockID) || null;
+  const normalized = value => String(value || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
+  const label = normalized(detail.definitionTerm || detail.title).replace(/^\d+(?:\.\d+)*\.?\s+/, "");
+  const titled = label.length >= 4 && blocks.find(block => normalized(block.textContent)
+    .replace(/^[“"\s]+/, "").startsWith(label));
+  if (titled) return titled;
+  const query = normalized(detail.searchQuery);
+  if (!query) return null;
+  const patterns = searchWords(query).map(searchWordPattern);
+  return blocks.find(block => detail.searchMatchMode === "exact"
+    ? normalized(block.textContent).includes(query)
+    : patterns.length && patterns.every(pattern => pattern.test(block.textContent))) || null;
 }
 
 function renderTemplate(template) {
@@ -39488,6 +39559,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (searchOpening) searchReaderOpeningAttempts.set(anchorPaneID, openingAttempt);
   let navigationItem;
   const navigationIsCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === sourceWorkspaceID &&
+    (options.isCurrent?.() ?? true) &&
     !workspaceColumnsRequireProject() && workflowGeneration === (state.workflowNavigationGeneration || 0) &&
     (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext)) &&
     (!searchOpening || searchReaderOpeningAttempts.get(anchorPaneID) === openingAttempt);
@@ -39556,12 +39628,13 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   const destinationPanel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (destinationPanel && paneIsCollapsed(paneID)) setPaneCollapsed(destinationPanel, false);
   columnExpansionController().reveal(destinationPanel);
-  revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {preferPassage: fromSearch});
+  revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {preferPassage: fromSearch || options.sourceSurface === "search-detail"});
   scrollPaneIntoView(paneID);
   return reader;
 }
 
 function removeSectionDetail(searchID) {
+  sectionDetailOpeningAttempts.delete(searchID);
   closeLinkedReaderForSearch(searchID);
   delete sectionDetailsBySearch()[searchID];
   delete sectionDetailAnchorsBySearch()[searchID];
@@ -48441,9 +48514,9 @@ function workspacePaneDescriptors(options = {}) {
         ? researchAssistantContentIdentity(instance) : JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
     if (instance.key === "search" || instance.key === "sdc") {
       const detail = sectionDetailsBySearch()[instance.id];
-      if (detail) add(paneIDForSectionDetail(instance.id), instance.key === "sdc" ? "Evidence detail" : "Section detail", () => renderSectionDetail(instance.id, detail),
+      if (detail) add(paneIDForSectionDetail(instance.id), "Evidence detail", () => renderSectionDetail(instance.id, detail),
         closeAndRender(() => removeSectionDetail(instance.id)), {
-          ownerClass: `section-detail-panel${instance.key === "sdc" ? " is-saved-evidence-detail" : ""}`,
+          ownerClass: `section-detail-panel${instance.key === "sdc" ? " is-saved-evidence-detail" : " is-search-evidence-detail"}`,
           identity: JSON.stringify(detail)
         });
     }

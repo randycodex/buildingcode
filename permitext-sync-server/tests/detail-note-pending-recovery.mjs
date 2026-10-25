@@ -14,6 +14,7 @@ class Element {
  addEventListener(event,callback){this.events[event]=callback;}
  setAttribute(){}
  querySelectorAll(){return this.children.filter(x=>typeof x==='object');}
+ contains(target){return target===this||this.children.some(child=>child?.contains?.(target));}
 }
 function harness({error='Socket closed',entryOverrides={},rejected=false,displayedBody}={}){
  const annotation={id:'original-annotation',userID:'owner',codeVersion:'1968',sectionID:598,blockID:null,noteBody:'Retained original draft',updatedAt:'2026-09-16T12:00:00Z'};
@@ -92,7 +93,7 @@ for(const fails of [false,true])test(`Account conflict resolution ${fails?'failu
   syncConflictsCard:card,syncConflictsSummary:summary,syncConflictsList:list,document:{createElement:()=>new Element()},
   mutationKindAndRecord:m=>({kind:'annotation',record:m.annotation}),setStatus:()=>{},resolveSyncConflict:async()=>{if(fails)throw Error('Offline');state.syncConflicts=[];}});
  const start=source.indexOf('  const renderSyncConflictReview = () => {');
- vm.runInContext(source.slice(start,source.indexOf('\n  const settingsProjects',start))+'\nrenderSyncConflictReview();',c);
+ vm.runInContext(source.slice(start,source.indexOf('\n  let settingsProjects',start))+'\nrenderSyncConflictReview();',c);
  const actions=list.children[0].children.at(-1),button=actions.children[0];await button.events.click();
  if(fails){assert.equal(card.hidden,false);assert.equal(list.children.length,1);assert.ok(actions.children.every(b=>!b.disabled));}
  else{assert.equal(card.hidden,true);assert.equal(list.children.length,0);assert.equal(summary.textContent,'');}
@@ -106,7 +107,7 @@ test('Real unfocused Detail refresh preserves recovery text until explicit resol
  const notes={dispatchEvent:()=>{},querySelector:()=>h.textarea};
  const panel={__annotationTarget:target,__sectionPayload:target,querySelector:()=>notes};
  const c=vm.createContext({state:h.state,activeAccount:()=>({userID:'owner'}),syncCodeVersion:v=>v,normalizeAnnotationBlockID:v=>v||'',noteValueForTarget:()=> 'Server copy',
- track:{querySelectorAll:()=>[panel]},focusedElement:null,isSectionSaved:()=>true,CustomEvent:class{}});
+ track:{querySelectorAll:()=>[panel]},focusedElement:null,isSectionSaved:()=>true,readerPrivateContentAllowed:()=>true,CustomEvent:class{}});
  vm.runInContext(helper+'\n'+snippet,c);assert.equal(h.textarea.value,'Retained original draft');
  h.state.syncConflicts=[];h.state.syncOutbox=[h.entry];vm.runInContext(snippet,c);assert.equal(h.textarea.value,'Retained original draft');
  h.state.syncOutbox=[];vm.runInContext(snippet,c);assert.equal(h.textarea.value,'Server copy');

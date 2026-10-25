@@ -18117,11 +18117,11 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: color-mix(in srgb, #67b7ff 8%, var(--background));
 }
 
-.section-detail-panel:not(.is-saved-evidence-detail) {
+.section-detail-panel:not(.is-saved-evidence-detail):not(.is-search-evidence-detail) {
   background: color-mix(in srgb, #67b7ff 8%, var(--background));
 }
 
-.section-detail-panel.is-saved-evidence-detail {
+.section-detail-panel:is(.is-saved-evidence-detail, .is-search-evidence-detail) {
   background: var(--background);
 }
 

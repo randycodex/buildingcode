@@ -19,7 +19,7 @@ const c = vm.createContext({ ...recentViewScope, activeRecentViewProjectID:()=>"
   recentViewLimit: 50, saveWorkspaceState() {},
   codeOptionFor: (prefix, version) => options.find(o => o.prefix === prefix && o.codeVersion === version),
   codeDisplayLabel: (prefix, version) => `${prefix} ${version === historical ? '2014' : '2022'}`,
-  paneIDForUtilityInstance: i => i.id, openSourceInReader: async (...args) => opened.push(args),
+  paneIDForUtilityInstance: i => i.id, openSearchResultDetail: async (...args) => opened.push(args),
   recentlyViewedPreviewHasEnactedText: () => false,
   resolveSectionDetail: async () => { throw new Error('Legacy hydration must not guess a source'); },
   mergeRecentlyViewedDetails: () => false,
