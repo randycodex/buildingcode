@@ -21081,7 +21081,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .research-related-group > summary { padding: 12px 0; font-weight: 600; }
 .search-panel > .search-scope-dialog[open] {
   position: absolute; top: var(--search-scope-top); inset-inline: var(--panel-padding); bottom: var(--panel-padding);
-  z-index: 12; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto; gap: 12px;
+  z-index: 12; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 12px;
   width: auto; max-width: none; height: auto; min-height: 0; max-height: none; margin: 0; padding: 16px; overflow: hidden;
   color: var(--text-primary); background: var(--menu-surface); border: 1px solid var(--border); border-radius: var(--radius-control);
   font-family: var(--ui-font-family); font-size: 13px; line-height: 1.45;
@@ -21090,7 +21090,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .search-scope-header h2 { margin: 0; font-size: 14px; font-weight: 600; }
 .search-scope-close { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 28px; width: 28px; height: 28px; padding: 0; border: 0; background: transparent; color: var(--text-secondary); }
 .search-scope-close svg { width: 16px; height: 16px; }
-.search-scope-dialog > p { margin: 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
 .search-scope-selection-actions { display: flex; flex-wrap: wrap; gap: 8px 16px; }
 .search-scope-selection-actions button, .search-scope-library { min-height: 24px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--text-secondary); font: inherit; text-align: left; }
 .search-scope-selection-actions button:hover, .search-scope-library:hover, .search-scope-close:hover { color: var(--text-primary); }

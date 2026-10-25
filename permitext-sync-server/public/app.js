@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1371";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1372";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1371";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1372";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261025-workspace-chrome-v1371";
+} from "./offline-storage.js?v=20261025-workspace-chrome-v1372";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41273,7 +41273,6 @@ async function openSearchCodeSourceSettings(panel) {
     dialog.setAttribute("aria-label", "Search within codebooks and editions");
     const header = document.createElement("div"); header.className = "search-scope-header";
     const heading = document.createElement("h2"); heading.textContent = "Search within";
-    const copy = document.createElement("p"); copy.textContent = "Choose sources for this search column. This filter does not enable or disable books in your browsing library.";
     const choices = document.createElement("div"); choices.className = "search-scope-choices";
     const controls = [];
     for (const row of activeCodeSourceMenuRows(enabled)) {
@@ -41323,7 +41322,7 @@ async function openSearchCodeSourceSettings(panel) {
     library.className = "search-scope-library";
     const footer = document.createElement("div"); footer.className = "search-scope-footer";
     footer.append(library, actions);
-    dialog.append(header, copy, selectionActions, choices, footer);
+    dialog.append(header, selectionActions, choices, footer);
     dialog._close=close;dialog.addEventListener("cancel",event=>{event.preventDefault();close();});
     dialog.addEventListener("keydown", event => {
       if (event.key !== "Escape") return;
