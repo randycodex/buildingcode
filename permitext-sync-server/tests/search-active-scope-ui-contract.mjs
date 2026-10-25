@@ -12,7 +12,7 @@ function fixture(){
  const results=element(),panel={isConnected:true,querySelector:()=>results};
  const instance={id:"search",query:"concrete",codeFilters:[],searchEdition:"all",position:{loadedPages:1}};
  const c=vm.createContext({defaultSyncCodeVersion:"2022",AbortController,Promise,Date,encodeURIComponent,crypto:{randomUUID:()=>String(Math.random())},activeWorkspaceID:"a",
- prepareActiveCodeSearchScope:async()=>{if(scopeError)throw scopeError;return {token:scopeToken,querySuffix:"&sourceScope=scope"+scopeToken};},isCurrentActiveCodeSourceContext:token=>token===scopeToken,
+ prepareSearchPanelScope:async()=>{if(scopeError)throw scopeError;return {token:scopeToken,querySuffix:"&sourceScope=scope"+scopeToken};},isCurrentActiveCodeSourceContext:token=>token===scopeToken,
  captureAccountRequest:()=>generation,isCurrentAccountRequest:g=>g===generation,
  normalizeSearchInstance:i=>i,normalizeSearchCodeFilters:f=>f,searchPositionState:i=>i.position,searchResultPageSize:25,
  document:{createElement:element},requestAnimationFrame:fn=>fn(),clear:()=>paints.push("clear"),

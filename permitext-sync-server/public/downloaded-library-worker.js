@@ -1,4 +1,4 @@
-import { searchSpellingSuggestions } from "./search-relevance.js?v=20261024-ux-release-v1356";
+import { searchSpellingSuggestions } from "./search-relevance.js?v=20261024-ux-remaining-v1358";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import {
   searchWords,

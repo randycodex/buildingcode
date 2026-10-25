@@ -21054,6 +21054,34 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .research-related-reviewed { margin-top: 12px; }
 .research-related-reviewed blockquote { margin: 10px 0; padding: 0 12px; max-height: 230px; overflow: auto; border-left: 2px solid var(--border); font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
 .research-related-footer { padding: 12px 0 0; border-top: 1px solid var(--border); }
+.research-related-filters { display: grid; gap: 8px; margin: 12px 0; }
+.research-related-filters label { display: grid; gap: 4px; font-size: 12px; }
+.research-related-filters input { width: 100%; padding: 8px; background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); font: inherit; }
+.research-related-group > summary { padding: 12px 0; font-weight: 600; }
+.search-scope-dialog { width: min(520px, calc(100vw - 24px)); max-height: 85dvh; padding: 22px; overflow: auto; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+.search-scope-dialog::backdrop { background: rgb(0 0 0 / .55); }
+.search-scope-dialog h2 { margin: 0 0 12px; font-size: 18px; }
+.search-scope-dialog p { font-size: 13px; line-height: 1.5; }
+.search-scope-choices { display: grid; gap: 10px; margin: 18px 0; }
+.search-scope-choices label { display: flex; align-items: start; gap: 10px; font-size: 13px; }
+.search-scope-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.search-scope-actions button, .search-scope-library { padding: 8px 12px; background: transparent; color: inherit; border: 1px solid var(--border); border-radius: 6px; font: inherit; cursor: pointer; }
+.search-scope-library { margin-top: 18px; }
+.calculation-draft-tools { display: grid; gap: 10px; margin: 12px 0; }
+.calculation-draft-tools label { display: grid; gap: 6px; font-size: 12px; }
+.calculation-draft-tools select { width: 100%; min-width: 0; }
+.calculation-draft-state, .project-property-help { font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
+.project-property-help { display: block; text-transform: none; letter-spacing: normal; }
+.project-property-help + button { align-self: flex-start; font-size: 12px; white-space: normal; text-align: left; }
+.project-fact-group-count { color: var(--text-secondary); font-weight: 400; margin-left: auto; font-size: 11px; }
+.project-facts-panel details.saved-project-structured-group > summary { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 0; }
+.project-facts-panel details.saved-project-structured-group > summary::before { content: '▾'; }
+.project-facts-panel details.saved-project-structured-group:not([open]) > summary::before { content: '▸'; }
+.workspace-context-switch > span:first-child { white-space: normal; overflow-wrap: anywhere; text-align: left; }
+.project-getting-started { max-width: 600px; margin: auto; padding: 32px; }
+.project-getting-started h2 { font-size: 20px; }
+.project-getting-started p { line-height: 1.6; }
+.project-getting-started > div { display: flex; flex-wrap: wrap; gap: 10px; }
 
 /* Release audit: transient confirmations stay outside the toolbar layout. */
 .workspace-success-notice {

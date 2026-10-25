@@ -4,13 +4,13 @@ import {
   searchWordForms,
   matchesSearchWords,
   searchWordsSnippet,
-} from "./search-words.js?v=20261024-ux-release-v1356";
+} from "./search-words.js?v=20261024-ux-remaining-v1358";
 import {
   searchRelevanceRank,
   matchingSearchDefinition,
   initialSearchGroupLimit,
   prepareSearchRelevance,
-} from "./search-relevance.js?v=20261024-ux-release-v1356";
+} from "./search-relevance.js?v=20261024-ux-remaining-v1358";
 import {
   offlineSourceScope,
   offlineSectionMetadata,

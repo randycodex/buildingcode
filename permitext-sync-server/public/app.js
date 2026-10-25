@@ -1,7 +1,8 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-ux-release-v1356";
+import { calculationDraftStore } from "./calculation-drafts.js?v=2";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-ux-remaining-v1358";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
-import {createRelatedProvisionReview} from "./research-related-provisions.js?v=1";
+import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
@@ -13,9 +14,9 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=24";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=26";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-ux-release-v1356";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-ux-remaining-v1358";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -39,6 +40,7 @@ import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js?v=2";
+import { codeSourceKey, codeSourceIdentity } from "./active-code-sources.js";
 import { bindPublicCodeRevisionChecks, createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20261024-event-revision-v4";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
@@ -147,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-ux-release-v1356";
+} from "./offline-storage.js?v=20261024-ux-remaining-v1358";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -820,6 +822,22 @@ async function prepareActiveCodeSearchScope() {
   const scope = activeCodeSourcesController.requestScope();
   return { token, querySuffix: scope === undefined ? "" : `&sourceScope=${encodeURIComponent(scope)}`,
     enabledSourceCount: scope === undefined ? null : JSON.parse(scope).enabledSources.length };
+}
+
+function searchPanelSources(instance, catalog, preferences) {
+  const chosen = Array.isArray(instance?.querySourceKeys) ? new Set(instance.querySourceKeys) : null;
+  return (catalog || []).filter(source => preferences?.isEnabled(source) && (!chosen || chosen.has(codeSourceKey(source))));
+}
+
+async function prepareSearchPanelScope(instance) {
+  if (!Array.isArray(instance.querySourceKeys)) return prepareActiveCodeSearchScope();
+  const token = activeCodeSourcesController.captureContext();
+  await activeCodeSourcesController.ensureCatalog();
+  if (!activeCodeSourcesController.isCurrent(token)) throw accountContextChangedError();
+  const { catalog, preferences } = activeCodeSourcesController.state;
+  const enabledSources = searchPanelSources(instance, catalog, preferences).map(codeSourceIdentity);
+  return { token, queryScoped: true, enabledSourceCount: enabledSources.length,
+    querySuffix: `&sourceScope=${encodeURIComponent(JSON.stringify({version: 1, enabledSources}))}` };
 }
 
 function isCurrentActiveCodeSourceContext(token) {
@@ -1641,14 +1659,12 @@ function isTechnicalFallbackWorkspace(workspace) {
 }
 
 function visibleWorkspaceRecords() {
-  const availableProjectIDs = new Set(
-    activeFolderRecords(
-      mergeProjectsWithOrganizationAccess(currentContentSummary().projects || [])
-    ).map(projectRecordID)
-  );
+  const projects = activeFolderRecords(mergeProjectsWithOrganizationAccess(currentContentSummary().projects || []));
+  const availableProjectIDs = new Set(projects.map(projectRecordID));
   return (workspaceRegistry?.workspaces || []).filter((workspace) =>
     workspace.projectID && availableProjectIDs.has(workspace.projectID)
-  );
+  ).map(workspace => ({ ...workspace,
+    name: projects.find(project => projectRecordID(project) === workspace.projectID)?.name || workspace.name }));
 }
 
 function persistWorkspaceRegistry() {
@@ -3878,6 +3894,8 @@ function normalizeSavedInstance(instance) {
     };
   }
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
+  instance.querySourceKeys = Array.isArray(instance.querySourceKeys)
+    ? [...new Set(instance.querySourceKeys.filter(value => typeof value === "string" && value.length < 1000))].slice(0, 128) : null;
   instance.sortMode = normalizeSavedSortMode(instance.sortMode);
   instance.projectsMenuOpen = Boolean(instance.projectsMenuOpen);
   instance.collapsedEvidenceFolderIDs = Array.from(new Set(
@@ -16778,7 +16796,7 @@ function openResearchDestinationMenu(anchor, selection) {
   const menu = document.createElement('div');
   menu.className = 'column-group-menu research-destination-menu';
   menu.setAttribute('role', 'menu');
-  menu.setAttribute('aria-label', 'Research this passage');
+  menu.setAttribute('aria-label', 'Ask Assistant about this passage');
   const controller = new AbortController();
   anchor.setAttribute('aria-haspopup', 'menu');
   anchor.setAttribute('aria-expanded', 'true');
@@ -16828,12 +16846,12 @@ function openResearchDestinationMenu(anchor, selection) {
     });
     menu.append(button);
   };
-  add('＋ Start new research');
+  add('＋ Start new conversation');
   const destinations = openResearchSelectionDestinations();
   if (destinations.length) {
     const heading = document.createElement('div');
     heading.className = 'research-destination-heading';
-    heading.textContent = 'Add to existing research';
+    heading.textContent = 'Add to existing conversation';
     menu.append(heading);
     destinations.forEach(({ id, title }, index) => {
       const duplicates = destinations.filter((item) => item.title === title).length > 1;
@@ -17671,7 +17689,7 @@ async function saveReaderPassage(panel, section, reader, target, options = {}) {
   return true;
 }
 
-const occupantLoadDrafts = new Map();
+const calculationDraftViews = new Set();
 
 async function openCalculationNotebook(project, card) {
   if (!card?.id) return;
@@ -17811,7 +17829,13 @@ async function askCalculatorFootnotes(source, draft, {conversationID="", anchorP
     quote.textContent = selectedText;
     const question = document.createElement("p");
     question.textContent = occupantLoadFootnoteQuestion(draft);
-    review.append(label, quote, question);
+    const inputs = document.createElement("p");
+    inputs.textContent = [draft.spaceName, draft.spaceFunction, `${draft.area || "—"} ${draft.areaBasis || ""} ft²`, `Factor ${draft.factor || "—"} ft²/person`].filter(Boolean).join(" · ");
+    const notes = document.createElement("p"); notes.textContent = draft.factorBasis || "Review the selected row and its footnotes.";
+    const full = document.createElement("details");
+    const fullLabel = document.createElement("summary"); fullLabel.textContent = "Full section included · review exact text";
+    full.append(fullLabel, quote);
+    review.append(label, inputs, notes, question, full);
     if (!await confirmWebWarning("Review before asking", "Include this table section and its footnotes, together with the calculation inputs shown below. Review the prepared question before sending.",
       { content: review, confirmLabel: "Include and prepare question", container: track.querySelector(`[data-pane-id="${CSS.escape(anchorPaneID)}"]`) }) || !current()) return;
     const selection = { sectionID: resolved.sectionID || resolved.id, selectedText,
@@ -17843,10 +17867,19 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
   const workspaceID = activeWorkspaceID;
   const project = workspaceProject();
   const sourceLabel = `${source.codePrefix || source.codeBook} § ${source.sectionNumber} · ${researchCodeEdition(source)}`;
-  const key = `${identity.userID}:${workspaceID}:${conversationID}:${answerID}:${source.sectionID || source.id}:${source.codeVersion || source.sourceLibraryVersion}${calculatorID ? `:${calculatorID}` : ""}`;
-  if (!occupantLoadDrafts.has(key)) occupantLoadDrafts.set(key, occupantLoadPrefill(answer, source));
-  // Drafts live only in memory; saved Notes use the durable Notebook contract.
-  if (occupantLoadDrafts.size > 60) occupantLoadDrafts.delete(occupantLoadDrafts.keys().next().value);
+  const context = JSON.stringify([project ? researchProjectID(project) : workspaceID, String(source.sectionID || source.id), source.codeVersion || source.sourceLibraryVersion, answerID ? `answer:${answerID}` : "manual"]);
+  const store = calculationDraftStore(localStorage, `${privateWorkspaceKeys(identity.userID).baseWorkspaceKey}:calculator-drafts:v1`);
+  let record, storageError = null;
+  try { record = store.open(context, occupantLoadPrefill(answer, source)); }
+  catch (error) { storageError = error; record = {id: "", input: occupantLoadPrefill(answer, source)}; }
+  const draft = {...record.input};
+  const replaceDraftView = action => {
+    try {
+      action();
+      const next = renderOccupantLoadCalculation(source, {anchor, conversationID, answerID, answer, conversation, getConversation, calculatorID});
+      if (next) {next.open = card.open; card.replaceWith(next);}
+    } catch (error) {void showWebNotice("Calculation draft unavailable", error.message);}
+  };
   let card;
   const savePayloads = new Map();
   const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID &&
@@ -17863,11 +17896,28 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
     return {resolved, section: payload.section};
   };
   const currentConversation=()=>getConversation ? getConversation() : (conversationID ? [activeResearchConversation,...supplementalResearchConversations.values()].find(item=>item?.id===conversationID) : conversation || calculatorConversationForPane());
-  card = createOccupantLoadCard({draft: occupantLoadDrafts.get(key), sourceLabel, canSave: Boolean(project),
+  card = createOccupantLoadCard({draft, sourceLabel, canSave: Boolean(project),
+    savedNote: record.savedNote, savedInputFingerprint: record.savedFingerprint,
+    recentDrafts: storageError ? [] : store.list(context), activeDraftID: record.id,
+    onChooseDraft: id => replaceDraftView(() => store.open(context, {}, id)),
+    onNewDraft: () => replaceDraftView(() => store.create(context)),
+    onReloadDraft: () => replaceDraftView(() => store.open(context, {}, record.id)),
+    onDraftChange: input => {
+      if (storageError) throw storageError;
+      record = store.update(record, input);
+      for (const view of calculationDraftViews) if (view.card === card) view.revision = record.revision;
+      for (const view of calculationDraftViews) {
+        if (!view.card.isConnected) {calculationDraftViews.delete(view); continue;}
+        if (view.context === context && view.userID === identity.userID) {
+          view.refresh();
+          if (view.card !== card && view.recordID === record.id && view.revision !== record.revision) view.card.markDraftChanged?.();
+        }
+      }
+    },
     ...(calculatorID ? {savedMessage: "Saved to Notebook · needs review."} : {}),
     getAssessment: () => calculatorFootnoteAssessmentFor(source,currentConversation(),answerID),
     onCheckFootnotes: draft => askCalculatorFootnotes(source,draft,{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId}),
-    onReplyFootnotes: () => askCalculatorFootnotes(source,occupantLoadDrafts.get(key),{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId,reply:true}),
+    onReplyFootnotes: () => askCalculatorFootnotes(source,draft,{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId,reply:true}),
     onLoadTable: async () => {const {resolved, section} = await loadSource(); return occupantLoadTable(section.blocks, resolved);},
     onControlsReady: form => form.querySelectorAll("select").forEach(enhanceSelect),
     onOpenSource: async ({exact}={}) => {
@@ -17877,6 +17927,7 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
     },
     onSave: async calculation => {
       assertCurrent();
+      const spaceName = String(draft.spaceName || "").trim();
       const generation = state.workflowNavigationGeneration || 0;
       const actionCurrent = () => current() && generation === (state.workflowNavigationGeneration || 0);
       const requireAction = () => {if (!actionCurrent()) throw new Error("The view changed. Reopen this calculation before saving.");};
@@ -17900,21 +17951,27 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
         passages: [{exact}], createdAt: new Date().toISOString()};
       const notebookDocument = emptyNotebookDocument();
       notebookDocument.document = calculationNoteBlocks(calculation, [link], answerID);
-      const fingerprint = JSON.stringify(calculation.input);
+      if (spaceName) notebookDocument.document.unshift({type: "paragraph", content: [{type: "text", text: `Space / room: ${spaceName}`, styles: {}}]});
+      const fingerprint = JSON.stringify({spaceName, input: calculation.input});
       const submission = savePayloads.get(fingerprint) || {projectID: researchProjectID(project), expectedVersion: 0,
         clientMutationID: `occupant-load:${crypto.randomUUID()}`, cardType: "finding",
-        title: `Occupant load${calculation.input.factorMode === 'custom' ? ' · Custom factor' : ''} · ${calculation.input.spaceFunction}`.slice(0, 300), document: notebookDocument, evidenceLinks: [link],
+        title: `${spaceName ? `${spaceName} · ` : ""}Occupant load${calculation.input.factorMode === 'custom' ? ' · Custom factor' : ''} · ${calculation.input.spaceFunction}`.slice(0, 300), document: notebookDocument, evidenceLinks: [link],
         openQuestions: []};
       savePayloads.set(fingerprint, submission);
       const saved = await postResearch("/notebook/cards/save", submission);
       requireCurrentAccountRequest(identity);
       await saveNotebookCardSnapshot(identity.userID, researchProjectID(project), saved.card);
       if (!actionCurrent()) return null;
+      if (!storageError) record = store.markSaved(record, saved.card, fingerprint);
       // Saving never opens Notes in Research or overwrites an existing author-edited Note.
       return saved.card;
     },
     onOpenNote: async saved => {assertCurrent(); await openCalculationNotebook(project, saved);}
   });
+  const refresh = () => card.refreshDraftChoices?.(store.list(context));
+  calculationDraftViews.add({card, context, recordID: record.id, revision: record.revision, userID: identity.userID, refresh});
+  card.addEventListener("focusin", () => {if (!storageError) refresh();});
+  if (storageError) card.querySelector(".calculation-status").textContent = `Device draft unavailable: ${storageError.message} Inputs are not being persisted.`;
   return card;
 }
 
@@ -18039,9 +18096,9 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   const updateResearchControl = () => {
     if (!allowed()) return;
     researchButton.innerHTML = researchActionIconSVG();
-    researchButton.setAttribute("aria-label", "Research this passage");
+    researchButton.setAttribute("aria-label", "Ask Assistant about this passage");
     researchButton.setAttribute("aria-haspopup", "menu");
-    researchButton.title = "Start research or add this passage to an open conversation";
+    researchButton.title = "Ask Assistant in a new or existing conversation";
     researchButton.disabled = false;
   };
   let subscribingToAccess = true;
@@ -19900,12 +19957,12 @@ function updateSearchScopeSummary(panel, instance) {
   const button = panel.querySelector(".search-scope-summary");
   if (!button) return;
   const {catalog, preferences, error} = activeCodeSourcesController.state;
-  const sources = catalog?.filter(source => preferences?.isEnabled(source));
+  const sources = catalog ? searchPanelSources(instance, catalog, preferences) : null;
   const labels = sources ? activeCodeSourceMenuRows(sources).map(row => row.label) : [];
-  button.textContent = error ? 'Source selection unavailable' : !catalog ? 'NYC · All codebooks & editions'
-    : !sources.length ? 'NYC · No code sources enabled' : sources.length === catalog.length ? `NYC · All ${sources.length} codebooks & editions`
-    : labels.length > 2 ? `NYC · ${labels.length} selected codebooks & editions` : `NYC · ${labels.join(' · ')}`;
-  button.title = labels.join('\n') || 'Choose code sources and editions';
+  button.textContent = error ? 'Search source selection unavailable' : !catalog ? 'Search within · enabled codebooks'
+    : !sources.length ? 'Search within · no sources selected' : !Array.isArray(instance?.querySourceKeys) ? `Search within · all ${sources.length} enabled codebooks`
+    : labels.length > 2 ? `Search within · ${labels.length} codebooks & editions` : `Search within · ${labels.join(' · ')}`;
+  button.title = ['Applies to this search only. Your browsing library stays unchanged.', ...labels].join('\n');
   const mode = panel.querySelector('.search-visible-match-mode');
   if (mode) mode.textContent = instance?.matchMode === 'exact' ? 'Exact phrase' : 'All words';
 }
@@ -20436,7 +20493,7 @@ async function renderSearch(instance, options = {}) {
   });
   const sourcesButton = panel.querySelector(".search-sources-button");
   sourcesButton.setAttribute("aria-expanded", "false");
-  sourcesButton.setAttribute("aria-haspopup", "menu");
+  sourcesButton.setAttribute("aria-haspopup", "dialog");
   sourcesButton.addEventListener("click", () => openSearchCodeSourceSettings(panel));
   panel.querySelector('.search-scope-summary')?.addEventListener('click', () => openSearchCodeSourceSettings(panel));
   const scopeToken = activeCodeSourcesController.captureContext();
@@ -20667,6 +20724,7 @@ async function renderSearchResults(panel, instance) {
   const controller = new AbortController();
   panel.__searchRequestController = controller;
   const edition = searchInstance.searchEdition || "all";
+  const queryScopeKey = JSON.stringify(searchInstance.querySourceKeys);
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   let sourceScope = null;
@@ -20674,7 +20732,7 @@ async function renderSearchResults(panel, instance) {
     panel.__searchRequestController === controller && isCurrentAccountRequest(identity) &&
     activeWorkspaceID === workspaceID && results.dataset.searchRenderToken === renderToken &&
     searchInstance.query.trim() === query && (searchInstance.matchMode || "exact") === matchMode && (searchInstance.searchEdition || "all") === edition &&
-    normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") === selectedPrefixes.join(",");
+    normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") === selectedPrefixes.join(",") && JSON.stringify(searchInstance.querySourceKeys) === queryScopeKey;
   results.dataset.searchRenderToken = renderToken;
   results.dataset.restoringSearch = "true";
   results.searchLoadMore = null;
@@ -20694,19 +20752,19 @@ async function renderSearchResults(panel, instance) {
   const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
   let payload;
   try {
-    sourceScope = await prepareActiveCodeSearchScope();
+    sourceScope = await prepareSearchPanelScope(searchInstance);
     if (!isCurrent()) return;
     if (sourceScope.enabledSourceCount === 0) {
       results.dataset.restoringSearch = "false";
       results.dataset.searchHasMore = "false";
       updateSearchDock(panel, searchInstance, 0, { hasMore: false });
-      renderSearchPlaceholder(results, { title: "All code sources are off",
-        body: "Enable a code source to search its text. Your query and search history are still here." });
+      renderSearchPlaceholder(results, { title: sourceScope.queryScoped ? "No sources selected for this search" : "All browsing-library sources are off",
+        body: "Choose sources to search their text. Your query and search history are still here." });
       const manage = document.createElement("button");
       manage.type = "button";
       manage.className = "ghost-button search-empty-action";
-      manage.textContent = "Manage code sources";
-      manage.addEventListener("click", () => { if (isCurrent()) openSearchCodeSourceSettings(panel); });
+      manage.textContent = sourceScope.queryScoped ? "Choose search sources" : "Manage browsing library";
+      manage.addEventListener("click", () => { if (isCurrent()) sourceScope.queryScoped ? openSearchCodeSourceSettings(panel) : openActiveCodeSourceSettings(); });
       results.append(manage);
       return;
     }
@@ -25715,7 +25773,7 @@ function renderResearchMissingEvidence(conversation, message, paneID) {
   region.append(list);
   const explanation = document.createElement("p");
   explanation.className = "research-passage-scope";
-  explanation.textContent = "Review the missing text in Reader, then choose Research to add it to this conversation.";
+  explanation.textContent = "Review the missing text in Reader, then choose Ask Assistant to add it to this conversation.";
   region.append(explanation);
   // Links are offered only for references present in the saved evidence for this answer.
   // Model-generated section numbers never become unverified navigation targets.
@@ -25915,7 +25973,7 @@ async function renderResearch(paneID = "utility:analysis") {
     const heading = document.createElement("h3");
     heading.textContent = "Start with a code passage";
     const introduction = document.createElement("p");
-    introduction.textContent = "Open Reader or Saved Evidence, choose the exact text, then use Research to include it. Review the included passages before asking.";
+    introduction.textContent = "Open Reader or Saved Evidence, choose the exact text, then use Ask Assistant to include it. Review the included passages before asking.";
     const examples = document.createElement("p");
     examples.className = "research-passage-scope";
     examples.textContent = "Explain a passage, compare provisions, or clarify their conditions and exceptions.";
@@ -26153,7 +26211,7 @@ async function renderResearch(paneID = "utility:analysis") {
     const decisionAction = document.createElement("button");
     decisionAction.type = "button";
     decisionAction.className = "ghost-button";
-    decisionAction.textContent = linkedConversationID ? "Resume linked Research" : "Start Research for this decision";
+    decisionAction.textContent = linkedConversationID ? "Resume linked conversation" : "Ask Assistant about this decision";
     const canEditDecision = ["owner", "editor"].includes(codeQuestionDefineRole());
     decisionAction.disabled = !researchEnabled || (!linkedConversationID && (!canEditDecision || !codeQuestionIsOnline()));
     if (!researchEnabled) decisionAction.title = "Pro required for Research";
@@ -26192,7 +26250,7 @@ async function renderResearch(paneID = "utility:analysis") {
     }
     decisionAction.addEventListener("click", async () => {
       decisionAction.disabled = true;
-      decisionStatus.textContent = linkedConversationID ? "Opening linked Research…" : "Starting linked Research…";
+      decisionStatus.textContent = linkedConversationID ? "Opening linked conversation…" : "Starting linked conversation…";
       try {
         if (linkedConversationID) {
           clearCodeDecisionResearchNotice(decisionProjectID, activeDecisionID);
@@ -27241,7 +27299,7 @@ function renderHistoricalResearchRecord(container, answerRecord) {
   const reuseButton = document.createElement("button");
   reuseButton.className = "ghost-button";
   reuseButton.type = "button";
-  reuseButton.textContent = "Start new Research";
+  reuseButton.textContent = "Ask Assistant in a new conversation";
   reuseButton.disabled = !hasCapability("research");
   if (reuseButton.disabled) reuseButton.title = "Pro required for Research";
   reuseButton.disabled = !projectSelect.value;
@@ -27526,6 +27584,7 @@ function renderResearchNotebookHandoff(conversation, message) {
       const workspaceID = activeWorkspaceID;
       reportButton.disabled = true;
       try {
+        if (await openIncludedSourceReport(reportButton, project)) return;
         const draft = await addProjectSourcesToReport(project, sources => {
           const source = sources.find(item => item.kind === "researchAnswer" && item.id === message.id);
           if (!source) throw new Error("Link this Assistant conversation to the selected Project before adding its answer to a Report.");
@@ -27533,8 +27592,7 @@ function renderResearchNotebookHandoff(conversation, message) {
         }, { container: region });
         if (!draft) return;
         if (isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID && reportButton.isConnected) {
-          reportButton.textContent = "In Report";
-          reportButton.title = `Included in ${draft.title || "Report"}`;
+          reportAdditionFeedback(reportButton, draft);
         }
       } catch (error) {
         if (isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID && region.isConnected) {
@@ -28289,7 +28347,7 @@ function selectedReaderResearchPassages() {
 const readerSelectionResearchAction = document.createElement("button");
 readerSelectionResearchAction.type = "button";
 readerSelectionResearchAction.className = "reader-selection-research-action";
-readerSelectionResearchAction.textContent = "Research selected text";
+readerSelectionResearchAction.textContent = "Ask Assistant about selected text";
 readerSelectionResearchAction.hidden = true;
 document.body.append(readerSelectionResearchAction);
 let selectedReaderResearchIntent = null;
@@ -30489,7 +30547,7 @@ async function renderProjectNotebook(project, options = {}) {
       const researchButton = document.createElement("button");
       researchButton.className = "notebook-secondary-action";
       researchButton.type = "button";
-      researchButton.textContent = "Start Research";
+      researchButton.textContent = "Ask Assistant";
       researchButton.title = "Use this card as the starting point for a new evidence-selected Research question";
       researchButton.hidden = true;
       const coordinateButton = document.createElement("button");
@@ -30515,6 +30573,12 @@ async function renderProjectNotebook(project, options = {}) {
       reportButton.type = "button";
       reportButton.className = "notebook-add-to-report";
       reportButton.textContent = "Add to Report";
+      reportButton.dataset.reportMembershipMode = "action";
+      reportButton.dataset.reportMembershipProject = projectID;
+      reportButton.dataset.reportSourceKind = "notebookCard";
+      reportButton.dataset.reportSourceId = activeCard.id || "";
+      refreshNotebookReportStatus = async () => refreshProjectReportMembership(projectID, true);
+      window.requestAnimationFrame(() => { if (reportButton.isConnected && activeCard.id) void refreshProjectReportMembership(projectID); });
       reportButton.disabled = notebookReadOnly;
       reportButton.addEventListener("click", async () => {
         const handoffRenderSequence = editorRenderSequence;
@@ -30524,6 +30588,8 @@ async function renderProjectNotebook(project, options = {}) {
           if (disposed || !isCurrentAccountRequest(requestIdentity) || handoffRenderSequence !== editorRenderSequence) return;
           if (!synchronized || dirty || saveConflict) throw new Error("Finish syncing this Note and resolve any save conflict before adding it to a Report. Your device draft is preserved.");
           if (!activeCard?.id) throw new Error("Save this Note before adding it to a Report.");
+          reportButton.dataset.reportSourceId = activeCard.id;
+          if (await openIncludedSourceReport(reportButton, identity)) return;
           const addedReport = await promoteNotebookCardToReport(identity, activeCard, { container: panel });
           reportAdditionFeedback(reportButton, addedReport);
         } catch (error) {
@@ -30937,6 +31003,8 @@ async function refreshProjectReportMembership(projectID, force = false) {
           String(source.selectionBlockID || "") === host.dataset.reportBlockId)?.id;
       }
       const included = sourceID ? reportsContainingSource(drafts,host.dataset.reportSourceKind,sourceID) : [];
+      host.dataset.reportResolvedSourceId = sourceID || "";
+      host.dataset.reportIncludedDraftIds = JSON.stringify(included.map(draft => draft.id).filter(Boolean));
       host.classList.toggle("is-in-report", included.length > 0);
       host.textContent = included.length
         ? included.length === 1 ? `In Report · ${included[0].title || "Untitled Report"}` : `In ${included.length} Reports`
@@ -30945,9 +31013,9 @@ async function refreshProjectReportMembership(projectID, force = false) {
       host.title = included.length ? included.map(draft => draft.title || "Untitled Report").join(", ") : host.textContent;
       host.setAttribute("aria-label", included.length ? `Included in ${host.title}` : host.textContent);
       if (host.dataset.reportMembershipMode === "action") {
-        host.textContent = included.length ? "In Report" : "Add to Report";
-        const sourceLabel = host.dataset.reportSourceKind === "researchAnswer" ? "Assistant answer" : "evidence";
-        host.setAttribute("aria-label", included.length ? `In Report: ${host.title}. Choose a Report to add this ${sourceLabel}.` : `Add ${sourceLabel} to Report`);
+        host.textContent = included.length ? "Included in Report · Open" : "Add to Report";
+        const sourceLabel = host.dataset.reportSourceKind === "researchAnswer" ? "Assistant answer" : host.dataset.reportSourceKind === "notebookCard" ? "Note" : "evidence";
+        host.setAttribute("aria-label", included.length ? `Included in Report: ${host.title}. Open Report.` : `Add ${sourceLabel} to Report`);
       }
     });
   };
@@ -31003,9 +31071,33 @@ function reportAdditionFeedback(button, draft) {
   button.dataset.reportActionLabel ||= button.textContent;
   window.clearTimeout(button.reportFeedbackTimer);
   button.setAttribute("aria-live", "polite");
-  button.textContent = button.dataset.reportActionLabel;
-  button.title = `Included in ${draft.title || "Report"}. Adding again will not duplicate it.`;
+  button.textContent = "Included in Report · Open";
+  button.dataset.reportIncludedDraftIds = JSON.stringify([draft.id].filter(Boolean));
+  button.title = `Included in ${draft.title || "Report"}. Open this Report.`;
 
+}
+
+async function openIncludedSourceReport(button, project) {
+  if (!button.dataset.reportIncludedDraftIds || button.dataset.reportIncludedDraftIds === "[]") return false;
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const projectID = projectDetailKey(projectIdentity(project));
+  const kind = button.dataset.reportSourceKind, sourceID = button.dataset.reportResolvedSourceId || button.dataset.reportSourceId;
+  const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID && button.isConnected;
+  const payload = await postResearch("/reports/drafts/list", {projectID});
+  if (!current()) return true;
+  const reports = reportsContainingSource(payload.drafts || [], kind, sourceID);
+  if (!reports.length) { await refreshProjectReportMembership(projectID, true); return false; }
+  let report = reports[0];
+  if (reports.length > 1) {
+    const selected = await openWebWarning({title: "Open included Report", message: "This source is included in more than one Report. Choose which one to open.",
+      confirmLabel: "Open Report", choices: reports.map(item => ({value:item.id,label:item.title || "Untitled Report"}))});
+    if (!selected || !current()) return true;
+    report = reports.find(item => item.id === selected); if (!report) return true;
+  }
+  pendingReportDraftByProject.set(projectID, report.id);
+  try { await openProjectReportDraft(project); }
+  finally { if (pendingReportDraftByProject.get(projectID) === report.id) pendingReportDraftByProject.delete(projectID); }
+  return true;
 }
 
 async function promoteNotebookCardToReport(project, card, options = {}) {
@@ -35529,7 +35621,16 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   propertyLookupStatus.className = "project-property-lookup-status";
   propertyLookupStatus.setAttribute("role", "status");
   propertyLookupStatus.setAttribute("aria-live", "polite");
-  addressLabel.append(addressInput, propertyLookupStatus);
+  const propertyImport = document.createElement("button");
+  propertyImport.type = "button"; propertyImport.className = "ghost-button";
+  propertyImport.textContent = "Import existing NYC property records (optional)";
+  const propertyHelp = document.createElement("span"); propertyHelp.className = "project-property-help";
+  propertyHelp.textContent = "Enter proposed-building facts manually in Project details. Imported records describe the existing lot and buildings; they do not describe your proposed design.";
+  propertyImport.addEventListener("click", async () => {
+    propertyImport.disabled = true;
+    try {await lookupPropertyContext();} finally {if (isCurrent()) propertyImport.disabled = false;}
+  });
+  addressLabel.append(addressInput, propertyHelp, propertyImport, propertyLookupStatus);
 
   const colorGroup = document.createElement("fieldset");
   colorGroup.className = "project-sheet-colors";
@@ -35606,13 +35707,17 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         const property = payload?.property || null;
         if (!property?.structuredFacts?.length) throw new Error("No property facts were returned.");
         propertyLookupResult = property;
-        addressInput.value = property.normalizedAddress || address;
+        property.enteredAddress = address;
+        // Preserve the building address supplied by the user. A tax-lot record
+        // can describe another entrance or an existing building on the same lot.
         propertyLookupAddress = addressInput.value.trim();
         const warnings = (Array.isArray(property.warnings) ? property.warnings : [])
           .map((warning) => String(warning || "").trim()).filter(Boolean);
         propertyLookupStatus.dataset.state = warnings.length ? "warning" : "success";
         propertyLookupStatus.textContent = [
-          `Imported ${property.structuredFacts.filter(fact => fact.status === "sourced").length} sourced facts from NYC Planning.`,
+          `Imported ${property.structuredFacts.filter(fact => fact.status === "sourced").length} existing-property facts from NYC Planning. Review their applicability before using them for proposed work.`,
+          property.normalizedAddress && property.normalizedAddress.toLowerCase() !== address.toLowerCase()
+            ? `The tax-lot record uses ${property.normalizedAddress}; your entered address was preserved.` : "",
           ...warnings
         ].join(" ");
         return property;
@@ -35621,7 +35726,8 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         if (requestID !== propertyLookupRequestID || !isCurrent()) return null;
         propertyLookupResult = null;
         propertyLookupStatus.dataset.state = "warning";
-        if (error?.code === "NYC_PROPERTY_NOT_FOUND" || error?.code === "NYC_PROPERTY_DATA_NOT_FOUND") {
+        const code = error?.payload?.code || error?.code;
+        if (code === "NYC_PROPERTY_NOT_FOUND" || code === "NYC_PROPERTY_DATA_NOT_FOUND") {
           propertyLookupStatus.textContent = "No NYC tax lot matched. The Project can still be saved with this address.";
         } else if (!activeAccount()) {
           propertyLookupStatus.textContent = "Sign in to import official NYC property facts. The Project can still be saved.";
@@ -35645,9 +35751,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
       resetPropertyLookup();
     }
   });
-  addressInput.addEventListener("blur", () => {
-    void lookupPropertyContext();
-  });
+
   const restoreSheetFocus = () => {
     if (previousFocus?.isConnected) {
       previousFocus.focus({ preventScroll: true });
@@ -35679,7 +35783,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     submitting = true;
     saveButton.disabled = true;
     saveStatus.hidden = true;
-    const fields = [nameInput, addressInput, ...(!inline ? [descriptionInput] : []), ...colorRail.querySelectorAll("button")];
+    const fields = [nameInput, addressInput, propertyImport, ...(!inline ? [descriptionInput] : []), ...colorRail.querySelectorAll("button")];
     fields.forEach(field => { field.disabled = true; });
     options.onSubmitting?.(true);
     try {
@@ -35689,13 +35793,13 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
       if (!isCurrent()) return;
       const submittedAddress = addressInput.value.trim();
       const addressChanged = isEditing && submittedAddress !== originalProjectAddress;
-      const property = selectedFolderType === "project" && submittedAddress && (!isEditing || addressChanged)
-        ? await lookupPropertyContext()
-        : null;
+      if (propertyLookupPromise) await propertyLookupPromise;
+      const property = selectedFolderType === "project" && propertyLookupAddress === addressInput.value.trim()
+        ? propertyLookupResult : null;
       if (!isCurrent()) return;
       const details = {
         name: nameInput.value,
-        address: selectedFolderType === "reference" ? "" : property?.normalizedAddress || addressInput.value,
+        address: selectedFolderType === "reference" ? "" : property?.enteredAddress || addressInput.value,
         color: selectedColor,
         folderType: selectedFolderType
       };
@@ -36394,7 +36498,7 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
   const factFilter = document.createElement("button");
   factFilter.type = "button";
   factFilter.className = "ghost-button project-facts-filter";
-  factFilter.textContent = "All facts";
+  factFilter.textContent = "Show all facts";
   factFilter.setAttribute("aria-pressed", "false");
   const applyFactVisibility = () => {
     if (!factsOnly) return;
@@ -36405,26 +36509,36 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
         const field = group.fields.find(field => field.key === row.dataset.factKey);
         row.hidden = !showProjectFact(field, factsByKey.get(field.key), {all: showAllFacts, address: address.value});
       }
-      list.closest(".saved-project-structured-group").hidden = ![...list.children].some(row => !row.hidden);
+      const groupElement = list.closest(".saved-project-structured-group");
+      groupElement.hidden = ![...list.children].some(row => !row.hidden);
+      const recorded = group.fields.map(field => factsByKey.get(field.key)).filter(Boolean);
+      const needsReview = recorded.filter(fact => ["unknown", "assumed", "stated"].includes(fact.status)).length;
+      const count = groupElement.querySelector(".project-fact-group-count");
+      if (count) count.textContent = `${recorded.length} recorded${needsReview ? ` · ${needsReview} need review` : ""}`;
     }
   };
   factFilter.addEventListener("click", () => {
     showAllFacts = !showAllFacts;
-    factFilter.textContent = showAllFacts ? "Recorded & core facts" : "All facts";
+    factFilter.textContent = showAllFacts ? "Show core & recorded facts" : "Show all facts";
     factFilter.setAttribute("aria-pressed", String(showAllFacts));
     applyFactVisibility();
   });
   if (factsOnly) structuredBody.prepend(factFilter);
   presentationGroups.forEach((group, groupIndex) => {
-    const groupSection = document.createElement("section");
+    const groupSection = document.createElement(factsOnly ? "details" : "section");
+    if (factsOnly) groupSection.open = true;
     groupSection.className = `saved-project-structured-group is-${group.key}`;
-    const groupHeading = document.createElement("div");
+    const groupHeading = document.createElement(factsOnly ? "summary" : "div");
     groupHeading.className = "saved-project-structured-group-heading";
     const groupToggle = document.createElement(factsOnly ? "h3" : "button");
     if (!factsOnly) groupToggle.type = "button";
     groupToggle.className = factsOnly ? "saved-project-structured-group-label" : "saved-project-structured-group-toggle section-label";
     groupToggle.textContent = group.label;
     groupHeading.append(groupToggle);
+    if (factsOnly) {
+      const count = document.createElement("small"); count.className = "project-fact-group-count";
+      groupHeading.append(count);
+    }
     const groupBody = document.createElement("section");
     groupBody.className = "saved-project-structured-group-body";
     const groupList = document.createElement("div");
@@ -38823,7 +38937,7 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
     actions.className = "saved-row-actions";
     const researchButton = document.createElement("button");
     researchButton.type = "button";
-    researchButton.textContent = "Research";
+    researchButton.textContent = "Ask Assistant";
     researchButton.addEventListener("click", async () => {
       researchButton.disabled = true;
       try {
@@ -38850,6 +38964,23 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
         finally { if (noteButton.isConnected) noteButton.disabled = false; }
       });
       actions.append(noteButton);
+    }
+    if (options.reportProject && !options.reportProject.sharedOnly && hasCapability("professional-exports")) {
+      const project = options.reportProject;
+      const projectID = projectDetailKey(projectIdentity(project));
+      const report = reportMembershipIndicator(projectID, "evidence", item, "action");
+      report.addEventListener("click", async () => {
+        report.disabled = true;
+        try {
+          if (await openIncludedSourceReport(report, project)) return;
+          const draft = await addProjectSourcesToReport(project, sources => sources.filter(source => source.kind === "evidence" &&
+            String(source.sectionID) === String(item.sectionID) && source.sourceLibraryVersion === syncCodeVersion(item.codeVersion) &&
+            String(source.selectionBlockID || "") === (item.scope === "section" ? "" : String(item.blockID || "").trim())), {container: row.closest(".workspace-panel")});
+          reportAdditionFeedback(report, draft);
+        } catch (error) {await showWebNotice("Report not opened", error.message);}
+        finally {if (report.isConnected) report.disabled = false;}
+      });
+      actions.append(report);
     }
     if (item.savedColumnKind === "bookmark") {
       const removeItemButton = document.createElement("button");
@@ -41049,85 +41180,53 @@ function toggleAccountDialog({ upgrade = false } = {}) {
   syncWorkflowNavigation();
 }
 
-function openSearchCodeSourceSettings(panel) {
-  const existing = panel.querySelector(".search-code-source-menu");
+async function openSearchCodeSourceSettings(panel) {
+  const existing = document.querySelector(".search-scope-dialog");
   if (existing) { existing._close(); return; }
   document.querySelector(".column-group-menu")?._close?.();
-  const trigger = panel.querySelector(".search-scope-summary") || panel.querySelector(".column-group-menu-button");
-  const menu = document.createElement("section");
-  menu.className = "column-group-menu search-code-source-menu";
-  menu.id = `search-code-sources-${crypto.randomUUID()}`;
-  menu.setAttribute("role", "menu");
-  menu.setAttribute("aria-label", "Code sources & editions");
-  const controller = new AbortController();
-  const identity = captureAccountRequest();
-  const workspaceID = activeWorkspaceID;
-  const observer = new MutationObserver(() => {
-    if (!panel.isConnected || !isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID) dismiss(false);
-  });
-  const card = settingsTemplate.content.querySelector(".settings-active-sources-card").cloneNode(true);
-  card.removeAttribute("aria-labelledby");
-  card.setAttribute("aria-label", "Code sources & editions");
-  card.querySelector(".settings-section-title").remove();
-  card.querySelectorAll(".settings-card-copy:not(.settings-active-sources-status)").forEach(copy => copy.remove());
-  card.querySelector(".settings-active-sources-retry").setAttribute("role", "menuitem");
-  const dismiss = (restoreFocus = true) => {
-    controller.abort();
-    observer.disconnect();
-    if (panel.__refreshActiveCodeSources === refresh) delete panel.__refreshActiveCodeSources;
-    menu.remove();
-    trigger.setAttribute("aria-expanded", "false");
-    trigger.removeAttribute("aria-controls");
-    if (restoreFocus && trigger.isConnected) trigger.focus({ preventScroll: true });
-  };
-  const items = () => [...menu.querySelectorAll('input:not(:disabled), button:not(:disabled)')]
-    .filter(item => !item.hidden && item.getClientRects().length > 0);
-  const onKeydown = event => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      dismiss();
-    } else if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
-      const options = items();
-      if (!options.length) return;
-      event.preventDefault();
-      const index = options.indexOf(document.activeElement);
-      const next = event.key === "Home" ? 0 : event.key === "End" ? options.length - 1
-        : event.key === "ArrowDown" ? (index + 1) % options.length
-        : index <= 0 ? options.length - 1 : index - 1;
-      options[next].focus();
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const instance = state.utilityInstances.find(item => paneIDForUtilityInstance(item) === panel.dataset.paneId);
+  if (!instance) return;
+  try {
+    await activeCodeSourcesController.ensureCatalog();
+    if (!panel.isConnected || !isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) return;
+    const {catalog, preferences} = activeCodeSourcesController.state;
+    const enabled = (catalog || []).filter(source => preferences?.isEnabled(source));
+    const selected = new Set(searchPanelSources(instance, catalog, preferences).map(codeSourceKey));
+    const trigger = panel.querySelector(".search-scope-summary");
+    const dialog = document.createElement("dialog"); dialog.className = "search-scope-dialog";
+    dialog.setAttribute("aria-label", "Search within codebooks and editions");
+    const heading = document.createElement("h2"); heading.textContent = "Search within";
+    const copy = document.createElement("p"); copy.textContent = "Choose sources for this search column. This filter does not enable or disable books in your browsing library.";
+    const choices = document.createElement("div"); choices.className = "search-scope-choices";
+    const controls = [];
+    for (const row of activeCodeSourceMenuRows(enabled)) {
+      const label = document.createElement("label");
+      const check = document.createElement("input"); check.type = "checkbox";
+      check.checked = selected.has(codeSourceKey(row.source));
+      const name = document.createElement("span"); name.textContent = row.label;
+      check.addEventListener("change", () => { check.checked ? selected.add(codeSourceKey(row.source)) : selected.delete(codeSourceKey(row.source)); });
+      label.append(check, name); choices.append(label); controls.push({check, source: row.source});
     }
-  };
-  const position = () => {
-    const rect = trigger.getBoundingClientRect();
-    const panelRect = panel.getBoundingClientRect();
-    const menuWidth = Math.min(360, panelRect.width - 16);
-    menu.style.top = `${rect.bottom - panelRect.top + 6}px`;
-    menu.style.left = `${Math.max(8, Math.min(rect.left - panelRect.left, panelRect.width - menuWidth - 8))}px`;
-    menu.style.right = 'auto';
-    menu.style.maxHeight = `${Math.max(0, Math.min(560, window.innerHeight - rect.bottom - 14, panelRect.bottom - rect.bottom - 14))}px`;
-  };
-  menu._close = dismiss;
-  menu.append(card);
-  panel.append(menu);
-  position();
-  trigger.setAttribute("aria-expanded", "true");
-  trigger.setAttribute("aria-controls", menu.id);
-  menu.addEventListener("keydown", onKeydown, { signal: controller.signal });
-  trigger.addEventListener("keydown", onKeydown, { signal: controller.signal });
-  menu.addEventListener("focusout", event => {
-    if (event.relatedTarget && !menu.contains(event.relatedTarget) && event.relatedTarget !== trigger) dismiss(false);
-  }, { signal: controller.signal });
-  document.addEventListener("pointerdown", event => {
-    if (!menu.contains(event.target) && !trigger.contains(event.target)) dismiss(false);
-  }, { signal: controller.signal, capture: true });
-  window.addEventListener("resize", position, { signal: controller.signal });
-  track.addEventListener("permitext:workspace-layout-change", position, { signal: controller.signal });
-  observer.observe(track, { childList: true, subtree: true });
-  wireSettingsActiveCodeSources(menu, { enabled: true, readerMenu: true });
-  const refresh = () => menu.__refreshActiveCodeSources?.();
-  panel.__refreshActiveCodeSources = refresh;
-  trigger.focus({ preventScroll: true });
+    const actions = document.createElement("div"); actions.className = "search-scope-actions";
+    const button = (label, action) => { const node = document.createElement("button"); node.type = "button"; node.textContent = label; node.addEventListener("click", action); return node; };
+    const close = () => { observer.disconnect(); dialog.close(); dialog.remove(); trigger?.setAttribute("aria-expanded", "false"); if (trigger?.isConnected) trigger.focus({preventScroll:true}); };
+    const current = () => panel.isConnected && isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID;
+    const observer = new MutationObserver(() => { if (!current()) close(); });
+    actions.append(button("Clear selection", () => {selected.clear(); for (const {check} of controls) check.checked = false;}),
+      button("Use all enabled sources", () => { selected.clear(); for (const {check, source} of controls) {check.checked=true;selected.add(codeSourceKey(source));} }),
+      button("Cancel", close), button("Apply to this search", () => {
+        if (!current()) {close();return;}
+        instance.querySourceKeys = selected.size === enabled.length ? null : [...selected];
+        const position = searchPositionState(instance); position.loadedPages=1;position.scrollTop=0;position.groupPages={};position.groupScope="";
+        close(); saveWorkspaceState(); updateSearchScopeSummary(panel, instance); void renderSearchResults(panel, instance);
+      }));
+    const library = button("Manage browsing library…", () => {close(); if(current())openActiveCodeSourceSettings();});
+    library.className = "search-scope-library";
+    dialog.append(heading, copy, choices, actions, library);
+    dialog._close=close;dialog.addEventListener("cancel",event=>{event.preventDefault();close();});
+    observer.observe(track,{childList:true,subtree:true});document.body.append(dialog);trigger?.setAttribute("aria-expanded","true");dialog.showModal();
+  } catch(error) { if(isCurrentAccountRequest(identity)&&workspaceID===activeWorkspaceID) await showWebNotice("Search sources unavailable",error.message); }
 }
 
 function openActiveCodeSourceSettings() {
@@ -41136,7 +41235,7 @@ function openActiveCodeSourceSettings() {
   const returnFocus = document.activeElement;
   const dialog = document.createElement("dialog");
   dialog.className = "account-dialog active-code-source-dialog";
-  dialog.setAttribute("aria-label", "Manage code sources");
+  dialog.setAttribute("aria-label", "Manage browsing library");
   dialog.style.maxHeight = "85vh";
   dialog.style.overflowY = "auto";
   const close = document.createElement("button");
@@ -43544,6 +43643,28 @@ function renderProjectRequiredWorkspace() {
   return welcome;
 }
 
+function renderProjectGettingStarted() {
+  const welcome = document.createElement("section");
+  welcome.className = "workspace-empty-state project-getting-started";
+  welcome.setAttribute("aria-label", "Project starting points");
+  const content = document.createElement("div");
+  const heading = document.createElement("h2"); heading.textContent = "Start your code research";
+  const copy = document.createElement("p");
+  copy.textContent = "Review proposed work and Project facts, find enacted text, then include the exact passages you want to ask about.";
+  const actions = document.createElement("div"); actions.className = "project-start-actions";
+  for (const [label, action] of [
+    ["Review context & facts", () => openProjectDetailsScreen("context")],
+    ["Find a provision", () => focusUtility("search")],
+    ["Open a codebook", button => openReaderFromToolbar(button)],
+    ["Choose Saved Evidence", () => focusUtility("saved")]
+  ]) {
+    const button = document.createElement("button"); button.type = "button"; button.textContent = label;
+    button.addEventListener("click", () => { void Promise.resolve(action(button)).catch(error => showWebNotice("Project action not completed", error.message)); });
+    actions.append(button);
+  }
+  content.append(heading, copy, actions); welcome.append(content); return welcome;
+}
+
 function renderFirstUseWelcome() {
   const welcome = document.createElement("section");
   welcome.className = "workspace-empty-state workspace-first-use";
@@ -44351,6 +44472,8 @@ function appendPaneSequence(panes) {
   }
   if (!orderedPanes.length && workspaceColumnsRequireProject()) {
     nodes.push(renderProjectRequiredWorkspace());
+  } else if (!visiblePanes.length && currentColumnWorkflowView() === "research" && workspaceProject() && !detachedProjectWindow) {
+    nodes.push(renderProjectGettingStarted());
   } else if (!orderedPanes.length && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
     nodes.push(renderFirstUseWelcome());
   }
@@ -45619,12 +45742,12 @@ async function createLocalCodeQuestionDraft(project, options = {}) {
   let questionText = String(options.questionText || "").replace(/\s+/g, " ").trim();
   if (!questionText) {
     questionText = await openWebTextPrompt({
-      title: "Start Research",
+      title: "Ask Assistant",
         message: "Ask the professional question naturally. Permitext will preserve your evidence and analysis alongside the investigation.",
       label: "What do you need to decide?",
       required: true,
       multiline: true,
-      confirmLabel: "Start Research"
+      confirmLabel: "Ask Assistant"
     });
   }
   if (!questionText) return null;

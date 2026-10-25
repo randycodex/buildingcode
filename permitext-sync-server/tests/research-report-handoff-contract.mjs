@@ -13,6 +13,7 @@ for(const mode of ['success','missing','switched','cancel']) {
  const c=vm.createContext({window:{requestAnimationFrame:()=>{}},document:{createElement:element},hasCapability:()=>true,researchAnswerHasVerificationRecovery:()=>false,researchProjects:()=>[project],
   researchProjectID:p=>p.id,readableProjectName:p=>p.name,crypto:{randomUUID:()=> 'mutation'},
   captureAccountRequest:()=> 'account',isCurrentAccountRequest:()=>true,activeWorkspaceID:'w',
+  openIncludedSourceReport:async()=>false,reportAdditionFeedback:button=>{button.textContent='Included in Report · Open';},
   showWebNotice:async(...args)=>notices.push(args),
   addProjectSourcesToReport:async(p,choose)=>{assert.equal(p,project);captured.push(...choose(mode==='missing'?[]:[{kind:'researchAnswer',id:'answer'},{kind:'researchAnswer',id:'other'}]));return mode==='switched'?gate:mode==='cancel'?null:{title:'Destination'};}
  });
@@ -22,6 +23,6 @@ for(const mode of ['success','missing','switched','cancel']) {
  if(mode==='switched'){c.activeWorkspaceID='different';finish({title:'Old Report'});}
  await pending;
  if(mode==='missing'){assert.equal(captured.length,0);assert.match(notices[0][1],/Link this Assistant conversation/);}
- else {assert.deepEqual(captured.map(s=>s.id),['answer']);assert.equal(notices.length,0);assert.equal(button.textContent,mode==='success'?'In Report':'Add to Report');}
+ else {assert.deepEqual(captured.map(s=>s.id),['answer']);assert.equal(notices.length,0);assert.equal(button.textContent,mode==='success'?'Included in Report · Open':'Add to Report');}
 }
 console.log('Assistant Report handoff passed: exact answer identity, selected Project, missing-source feedback and workspace-change guard.');

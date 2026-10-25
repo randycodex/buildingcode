@@ -234,7 +234,7 @@ export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '')
   return blocks;
 }
 
-export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
+export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = null, savedInputFingerprint = "", recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
   const initialDraft = {...draft};
   let areaMeasurementBasis = draft.areaMeasurementBasis || draft.areaBasis || '';
   let userMeasurementBasis = draft.userMeasurementBasis ?? draft.areaBasis ?? '';
@@ -247,8 +247,26 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
   const summary = document.createElement('summary'); summary.textContent = 'Occupant load calculation';
   const body = document.createElement('div'); body.className = 'occupant-load-body';
   const form = document.createElement('form'); form.className = 'occupant-load-form';
+  const draftTools = document.createElement('div'); draftTools.className = 'calculation-draft-tools';
+  const draftState = document.createElement('p'); draftState.className = 'calculation-draft-state';
+  draftState.textContent = 'Device draft · inputs are saved on this device';
+  const recentLabel = document.createElement('label'); recentLabel.textContent = 'Recent calculations';
+  const recent = document.createElement('select'); recent.setAttribute('aria-label', 'Recent calculations');
+  for (const item of recentDrafts) {
+    const option = document.createElement('option'); option.value = item.id;
+    option.textContent = `${item.input.spaceName || 'Unnamed space'} · ${item.savedNote ? 'has saved Note' : 'Device draft'}`;
+    recent.append(option);
+  }
+  recent.value = activeDraftID;
+  recent.addEventListener('change', () => onChooseDraft?.(recent.value));
+  const newDraft = document.createElement('button'); newDraft.type = 'button'; newDraft.className = 'ghost-button'; newDraft.textContent = 'New calculation';
+  newDraft.addEventListener('click', () => onNewDraft?.());
+  const reloadDraft = document.createElement('button'); reloadDraft.type = 'button'; reloadDraft.className = 'ghost-button'; reloadDraft.textContent = 'Reload device draft'; reloadDraft.hidden = true;
+  reloadDraft.addEventListener('click', () => onReloadDraft?.());
+  recentLabel.append(recent); draftTools.append(draftState, reloadDraft, recentLabel, newDraft);
   const fields = {};
   for (const [key, label, options] of [
+    ['spaceName', 'Space / room name (optional)', null],
     ['spaceFunction', 'Function of space', [['', 'Select a BC table function']]], ['area', 'Floor area · ft²', null],
     ['areaBasis', 'Area basis', null],
     ['factor', 'Occupant-load factor · ft²/person', null],
@@ -288,20 +306,38 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
   const formula = document.createElement('p'); formula.className = 'calculation-formula';
   const footnotes = document.createElement('section'); footnotes.className='calculation-footnote-checks';
   const checkNotes = document.createElement('button'); checkNotes.type='button';checkNotes.className='ghost-button';
-  checkNotes.textContent='Check footnotes in Assistant';
+  checkNotes.textContent='Ask Assistant about footnotes';
   checkNotes.addEventListener('click',async()=>{
     checkNotes.disabled=true;
     try {await onCheckFootnotes?.({...draft});} catch(error){status.textContent=error.message;}
     finally {update();}
   });
   let invalidatedAnswerID='';
+  root.refreshDraftChoices = items => {
+    const currentID = recent.value;
+    recent.replaceChildren();
+    for (const item of items) {
+      const option = document.createElement('option'); option.value = item.id;
+      option.textContent = `${item.input.spaceName || 'Unnamed space'} · ${item.savedNote ? 'has saved Note' : 'Device draft'}`;
+      recent.append(option);
+    }
+    recent.value = currentID;
+  };
   root.addEventListener('calculation-context-changed',()=>{invalidatedAnswerID=(getAssessment?.()||assessment)?.answerID||'';assessment=null;update();});
   root.addEventListener('calculation-assessment-refreshed',()=>update());
   const actions = document.createElement('div'); actions.className = 'calculation-actions';
   const save = document.createElement('button'); save.type = 'submit'; save.className = 'ghost-button'; save.textContent = 'Save calculation to Notebook';
   const open = document.createElement('button'); open.type = 'button'; open.className = 'ghost-button'; open.textContent = 'Open in Notebook'; open.hidden = true;
   open.addEventListener('click', async () => {try {await onOpenNote?.(savedCard);} catch (error) {status.textContent = error.message;}});
-  let busy = false, savedCard = null, savedFingerprint = '';
+  let staleDraft = false;
+  let busy = false, savedCard = savedNote, savedFingerprint = savedInputFingerprint;
+  open.hidden = !savedCard;
+  const fingerprint = calculation => JSON.stringify({spaceName: draft.spaceName || '', input: calculation.input});
+  root.markDraftChanged = () => {
+    staleDraft = true; reloadDraft.hidden = false;
+    Object.values(fields).forEach(field => field.disabled = true);
+    update();
+  };
   const values = () => occupantLoadTableInput({area: fields.area.value, seating: fields.seating.value,
     factorMode: fields.factorMode.value, customFactor, customReason: reason.value,
     areaMeasurementBasis,userMeasurementBasis}, table, fields.spaceFunction.value);
@@ -311,7 +347,7 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     const row = table?.rows.find(row => row.id === draft.tableRowID);
     const custom = draft.factorMode === 'custom';
     fields.factorMode.value = custom ? 'custom' : 'table';
-    fields.factorMode.disabled = busy || row?.method !== 'area';
+    fields.factorMode.disabled = staleDraft || busy || row?.method !== 'area';
     fields.factorMode._syncCustomSelect?.();
     fields.factor.readOnly = !custom;
     const factorLabel = custom ? 'Custom factor · ft²/person' : 'Occupant-load factor · ft²/person';
@@ -320,7 +356,7 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     fields.factor.value = draft.factor;
     tableReference.hidden = !custom;
     tableReference.textContent = custom ? `BC table: ${row.factor} ${row.areaBasis} ft²/person` : '';
-    reasonLabel.hidden = !custom; reason.required = custom; reason.disabled = busy || !custom;
+    reasonLabel.hidden = !custom; reason.required = custom; reason.disabled = staleDraft || busy || !custom;
     fields.areaBasis.value = draft.areaBasis ? draft.areaBasis[0].toUpperCase() + draft.areaBasis.slice(1) : '';
     tableNotes.textContent = draft.factorBasis;
     notesSection.hidden = !draft.factorBasis;
@@ -358,8 +394,8 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
       }
     }
     checkNotes.hidden=!onCheckFootnotes || !row || special;
-    checkNotes.disabled=busy || !table;
-    checkNotes.textContent=checks?'Recheck footnotes in Assistant':'Check footnotes in Assistant';
+    checkNotes.disabled=staleDraft || busy || !table;
+    checkNotes.textContent=checks?'Ask Assistant to recheck footnotes':'Ask Assistant about footnotes';
     if(!checkNotes.hidden) footnotes.append(checkNotes);
     result.classList.toggle('is-pending', !hasResult);
     result.textContent = hasResult ? `${calculation.previewPeople.toLocaleString()} people${custom ? ' · Custom factor' : ''}`
@@ -367,8 +403,9 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     formula.hidden = hasResult;
     formula.textContent = hasResult ? ''
       : special ? row.factorText : fixedSeating ? 'Fixed seating uses a separate calculation method.' : calculation.errors[0];
-    const changed = savedCard && JSON.stringify(calculation.input) !== savedFingerprint;
-    save.disabled = busy || !calculation.valid || !canSave;
+    const changed = savedCard && fingerprint(calculation) !== savedFingerprint;
+    draftState.textContent = staleDraft ? 'Updated in another view · reload this device draft to continue' : savedCard ? (changed ? 'Device draft · changes have not been saved to a new Note' : 'Saved snapshot in Notebook · editable device draft') : 'Device draft · inputs are saved on this device';
+    save.disabled = staleDraft || busy || !calculation.valid || !canSave;
     save.textContent = savedCard ? (changed ? 'Save revised calculation as new Note' : 'Saved to Notebook') : 'Save calculation to Notebook';
     if (savedCard && !changed) save.disabled = true;
     return calculation;
@@ -392,22 +429,24 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     }
     if (event.target === fields.factor && fields.factorMode.value === 'custom') customFactor = fields.factor.value;
     if (event.target === fields.area) {areaMeasurementBasis = table?.rows.find(row => row.id === fields.spaceFunction.value)?.areaBasis || '';userMeasurementBasis=areaMeasurementBasis;}
+    draft.spaceName = fields.spaceName.value.trim();
     status.textContent = ''; update();
+    if (table) { try {onDraftChange?.({...draft});} catch (error) {status.textContent = `Device draft not saved: ${error.message}`;} }
   };
   form.addEventListener('input', handleInput);
   form.addEventListener('change', handleInput);
   form.addEventListener('submit', async event => {
     event.preventDefault(); const calculation = update(); if (!calculation.valid || save.disabled) return;
-    busy = true; update(); status.textContent = 'Saving calculation and source snapshot…';
+    busy = true; root.setAttribute('aria-busy', 'true'); recent.disabled = true; newDraft.disabled = true; update(); status.textContent = 'Saving calculation and source snapshot…';
     // Lock inputs during the save so a delayed response cannot label newer inputs saved.
     Object.values(fields).forEach(field => field.disabled = true);
     try {
       const card = await onSave(calculation);
       if (!card) return;
-      savedCard = card; savedFingerprint = JSON.stringify(calculation.input); open.hidden = false;
+      savedCard = card; savedFingerprint = fingerprint(calculation); open.hidden = false;
       status.textContent = savedMessage;
     } catch (error) {status.textContent = error.message;}
-    finally {busy = false; Object.values(fields).forEach(field => field.disabled = false); fields.spaceFunction.disabled = !table; update();}
+    finally {busy = false; root.removeAttribute('aria-busy'); recent.disabled = false; newDraft.disabled = false; Object.values(fields).forEach(field => field.disabled = staleDraft); fields.spaceFunction.disabled = staleDraft || !table; update();}
   });
   root.addEventListener('toggle', async () => {
     if (!root.open || table || loading) return;
@@ -419,7 +458,7 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
         const option = document.createElement('option'); option.value = row.id; option.textContent = row.label;
         fields.spaceFunction.append(option);
       }
-      fields.spaceFunction.disabled = false;
+      fields.spaceFunction.disabled = staleDraft;
       fields.spaceFunction.value = selected?.id || '';
       selectedRowID = fields.spaceFunction.value;
       fields.factorMode.value = initialDraft.factorMode === 'custom' ? 'custom' : 'table';
@@ -434,6 +473,6 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
   });
   actions.append(save, open); form.append(result, formula, footnotes, actions);
   body.append(source);
-  body.append(form, status); root.append(summary, body); update();
+  body.append(draftTools, form, status); root.append(summary, body); update();
   return root;
 }

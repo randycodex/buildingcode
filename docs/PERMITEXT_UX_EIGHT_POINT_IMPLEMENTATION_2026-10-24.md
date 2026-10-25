@@ -75,3 +75,8 @@ Proof directory: `/Users/randy/.codex/visualizations/2026/10/24/01a17034-6a03-78
 - The real-address/property-import path remains an explicit audit gap. Manually entered fictional facts did not test it.
 - The other findings in the detailed audit remain observations, not implied completed fixes. This pass does not promise semantic summarization or remove distinct analysis merely because it sounds repetitive.
 - No existing production columns were closed. The separate local fixture contains only synthetic data and retains its columns and test state for review.
+
+
+## Remaining-five follow-up
+
+F06, F12, F14, F15 and F16 were subsequently completed locally, with 26 focused checks and rendered workflow verification. The user changed the address task to manual proposed-building facts; the production audit Project preserves that scenario and unknowns after reload. See [the follow-up record](PERMITEXT_REMAINING_UX_AND_ADDRESS_WALKTHROUGH_2026-10-24.md). No push or deployment was performed, and the Research engine remains unchanged.

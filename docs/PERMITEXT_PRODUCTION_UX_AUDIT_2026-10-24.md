@@ -1,5 +1,7 @@
 # Permitext production UX/UI audit — October 24, 2026
 
+> Follow-up status: the remaining five UX findings and the revised manual proposed-building walkthrough are documented in [the follow-up implementation record](PERMITEXT_REMAINING_UX_AND_ADDRESS_WALKTHROUGH_2026-10-24.md). Those fixes are local and tested, not deployed. The production observations below remain the original audit record.
+
 ## 1. Executive assessment
 
 **Recommendation:** resolve the report-provenance mismatch and investigate the calculator-to-Research failure before a broad tester invitation. Make selected-evidence scope and the role of Project Context explicit before asking new users to complete their first research task.
@@ -1127,3 +1129,12 @@ Evidence files are retained in the local audit directory. This Markdown document
 This file documents observed production behavior and proposed follow-up work. Its checklists are acceptance criteria for future changes, not claims that fixes have been implemented. The product has not been re-audited after any future changes through this document.
 
 The original HTML report contains 18 findings. This detailed Markdown report adds the confirmation banner as F19 and makes the real-address audit gap explicit. Treat this Markdown file as the consolidated written record for the walkthrough and subsequent user questions.
+
+
+## 14. Remaining-five follow-up and manual facts
+
+F06, F12, F14, F15 and F16 now have local implementations and verification. See [the detailed follow-up record](PERMITEXT_REMAINING_UX_AND_ADDRESS_WALKTHROUGH_2026-10-24.md) for behavior, acceptance evidence, 26 passing checks, preservation hashes and remaining release limits.
+
+The user's later instruction replaced the automatic property-import walkthrough with manually entered proposed-building facts. Production Project `web-project-mvn6enbj` preserves this fictional scenario, explicit unknowns and Stated provenance after reload. Existing ZoLa inventory was not imported as proposed-design data. All nine original production columns remain open.
+
+These local UX fixes do not establish a new production release or successful live model revalidation of the original generation failure.
