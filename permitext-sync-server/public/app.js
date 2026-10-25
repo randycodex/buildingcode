@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1368";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1369";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1368";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1369";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261025-workspace-chrome-v1368";
+} from "./offline-storage.js?v=20261025-workspace-chrome-v1369";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -19987,10 +19987,11 @@ function updateSearchScopeSummary(panel, instance) {
   const {catalog, preferences, error} = activeCodeSourcesController.state;
   const sources = catalog ? searchPanelSources(instance, catalog, preferences) : null;
   const labels = sources ? activeCodeSourceMenuRows(sources).map(row => row.label) : [];
-  button.textContent = error ? 'Search source selection unavailable' : !catalog ? 'Search within · enabled codebooks'
+  const summary = error ? 'Search source selection unavailable' : !catalog ? 'Search within · enabled codebooks'
     : !sources.length ? 'Search within · no sources selected' : !Array.isArray(instance?.querySourceKeys) ? `Search within · all ${sources.length} enabled codebooks`
     : labels.length > 2 ? `Search within · ${labels.length} codebooks & editions` : `Search within · ${labels.join(' · ')}`;
-  button.title = ['Applies to this search only. Your browsing library stays unchanged.', ...labels].join('\n');
+  button.setAttribute('aria-label', summary);
+  button.title = [summary, 'Applies to this search only. Your browsing library stays unchanged.', ...labels].join('\n');
   const mode = panel.querySelector('.search-visible-match-mode');
   if (mode) mode.textContent = instance?.matchMode === 'exact' ? 'Exact phrase' : 'All words';
 }

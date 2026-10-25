@@ -4,13 +4,13 @@ import {
   searchWordForms,
   matchesSearchWords,
   searchWordsSnippet,
-} from "./search-words.js?v=20261025-workspace-chrome-v1368";
+} from "./search-words.js?v=20261025-workspace-chrome-v1369";
 import {
   searchRelevanceRank,
   matchingSearchDefinition,
   initialSearchGroupLimit,
   prepareSearchRelevance,
-} from "./search-relevance.js?v=20261025-workspace-chrome-v1368";
+} from "./search-relevance.js?v=20261025-workspace-chrome-v1369";
 import {
   offlineSourceScope,
   offlineSectionMetadata,
