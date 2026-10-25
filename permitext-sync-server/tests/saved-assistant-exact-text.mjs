@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import {readFile} from 'node:fs/promises';
+const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+const start=app.indexOf('async function startFocusedResearchFromSavedItem('),end=app.indexOf('\n}',start);
+const full='The number of occupants shall be computed from the full saved paragraph. '.repeat(6)+'The final condition and exception must remain included.';
+let delivered;
+const c=vm.createContext({primarySavedPaneID:()=> 'saved-pane',startNewResearchFromSelection:async selection=>{delivered=selection;return selection;}});
+vm.runInContext(app.slice(start,end+2),c);
+await c.startFocusedResearchFromSavedItem({id:'bookmark',sectionID:'2152',savedColumnKind:'bookmark',previewText:full.slice(0,240),savedContentComparisonText:full},'project');
+assert.equal(delivered.selectedText,full);assert.equal(delivered.savedItemID,'bookmark');assert.equal(delivered.projectID,'project');assert.equal(delivered.originSurface,'saved');
+await c.startFocusedResearchFromSavedItem({sectionID:'2152',selectedText:'An explicitly selected shorter range.',savedContentComparisonText:full,previewText:'A card preview.'});
+assert.equal(delivered.selectedText,'An explicitly selected shorter range.','An explicit selection must not expand to a containing paragraph');
+await c.startFocusedResearchFromSavedItem({sectionID:'2152',previewText:'Exceptions:'});assert.equal(delivered.selectedText,'Exceptions:','Legacy heading-only evidence remains literal');
+await assert.rejects(c.startFocusedResearchFromSavedItem({sectionID:'2152'}),/enough source text/);
+console.log('Saved Evidence → Assistant: full saved passage beyond 240 characters, explicit shorter selection, legacy heading-only text, exact source ID and no-text guard passed.');

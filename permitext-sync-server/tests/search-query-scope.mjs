@@ -24,3 +24,17 @@ const layout=normalizeWorkspaceLayout({utilityInstances:[{id:'s',key:'search',..
 assert.deepEqual(captureWorkspaceLayout(layout).utilityInstances[0].querySourceKeys,query.querySourceKeys);
 c.activeCodeSourcesController.ensureCatalog=async()=>{token++;};await assert.rejects(c.prepareSearchPanelScope(query),/Changed account/);
 console.log('Temporary query scope: exact editions, global preference independence, disabled source intersection, explicit empty, reload persistence and stale account guard passed.');
+
+// Exercise the real app restore path, not only the generic layout copy.
+c.normalizeSearchCodeFilters=value=>Array.isArray(value)?value:[];
+c.normalizeSearchHistorySplitRatio=()=>0.5;
+c.normalizeSearchResultSources=value=>Array.isArray(value)?value:[];
+c.repeatableUtilityKeys=new Set(['search','saved']);
+vm.runInContext(['newUtilityInstance','normalizeUtilityInstances','normalizeSearchInstance'].map(actual).join('\n'),c);
+for(const selection of [query.querySourceKeys,[],null]) {
+ const saved=JSON.parse(JSON.stringify({utilityInstances:[{id:'search-id',key:'search',query:'business areas',matchMode:'exact',querySourceKeys:selection}]}));
+ const restored=c.normalizeUtilityInstances(saved)[0];
+ assert.equal(restored.id,'search-id');assert.equal(restored.matchMode,'exact');
+ assert.equal(JSON.stringify(c.normalizeSearchInstance(restored).querySourceKeys),JSON.stringify(selection),'Actual restore must retain exact, empty and all-enabled scope');
+}
+console.log('Actual utility-instance creation/restore preserves temporary Search scope, including explicit empty.');

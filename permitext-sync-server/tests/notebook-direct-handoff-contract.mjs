@@ -33,7 +33,7 @@ for(const mode of ['current','unsaved','new','cancel','changed','account','detac
  assert.equal(normalized.passages[0].exact,'Exact paragraph including its exception.');
  assert.equal(normalized.source.codeVersion,'historical/2014');assert.equal(normalized.source.codeEdition,'2014');
  assert.equal(normalized.source.sectionID,'123');
- if(hasOpenNote){assert.equal(calls.length,['include','omit'].includes(mode)?2:1,'Only comments introduce an optional transfer choice.');assert.equal(mutations[0][1],mode==='unsaved'?'':'note');assert.equal(mutations[0][2].referenceKind,'selectedPassage');}
+ if(hasOpenNote){assert.equal(calls.length,['include','omit'].includes(mode)?3:2,'The completed insertion names its destination without another choice.');assert.equal(mutations.at(-1)[0],'saved');assert.equal(mutations.at(-1)[3].title,'Existing writing');assert.equal(mutations.at(-1)[4].added,true);assert.equal(mutations[0][1],mode==='unsaved'?'':'note');assert.equal(mutations[0][2].referenceKind,'selectedPassage');}
  else {assert.equal(calls[0][0],'choose');assert.equal(mutations[0][0],'save');assert.equal(mutations[0][1].projectID,'p');assert.equal(mutations[1][0],'saved');assert.equal(mutations[0][1].document.document[0].content[0].props.referenceID,link.id);assert.equal(mutations[0][1].document.document[1].content[0].text,link.passages[0].exact);}
 }
 const mountStart=source.indexOf('    mountState.insertLinkedReference = async');

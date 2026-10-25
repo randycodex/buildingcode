@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-ux-remaining-v1358";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-ux-live-v1359";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=26";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-ux-remaining-v1358";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-ux-live-v1359";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-ux-remaining-v1358";
+} from "./offline-storage.js?v=20261024-ux-live-v1359";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -1272,6 +1272,8 @@ function newUtilityInstance(key, overrides = {}) {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
     instance.matchMode = overrides.matchMode === "exact" ? "exact" : "words";
     instance.searchEdition = typeof overrides.searchEdition === "string" ? overrides.searchEdition : "all";
+    instance.querySourceKeys = Array.isArray(overrides.querySourceKeys)
+      ? [...new Set(overrides.querySourceKeys.filter(value => typeof value === "string" && value.length < 1000))].slice(0, 128) : null;
     instance.expandedResultSources = normalizeSearchResultSources(
       overrides.expandedResultSources,
       overrides.expandedResultSource
@@ -1375,6 +1377,7 @@ function normalizeUtilityInstances(saved = {}) {
       searchExpansionDecisionKey: pane?.searchExpansionDecisionKey,
       defaultExpandedResultSource: pane?.defaultExpandedResultSource,
       searchEdition: pane?.searchEdition,
+      querySourceKeys: pane?.querySourceKeys,
       matchMode: pane?.matchMode,
       expandedResultSources: pane?.expandedResultSources,
       expandedResultSource: pane?.expandedResultSource,
@@ -3894,8 +3897,6 @@ function normalizeSavedInstance(instance) {
     };
   }
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
-  instance.querySourceKeys = Array.isArray(instance.querySourceKeys)
-    ? [...new Set(instance.querySourceKeys.filter(value => typeof value === "string" && value.length < 1000))].slice(0, 128) : null;
   instance.sortMode = normalizeSavedSortMode(instance.sortMode);
   instance.projectsMenuOpen = Boolean(instance.projectsMenuOpen);
   instance.collapsedEvidenceFolderIDs = Array.from(new Set(
@@ -3937,6 +3938,8 @@ function normalizeSearchInstance(instance) {
   }
   instance.query = typeof instance.query === "string" ? instance.query : "";
   instance.matchMode = instance.matchMode === "exact" ? "exact" : "words";
+  instance.querySourceKeys = Array.isArray(instance.querySourceKeys)
+    ? [...new Set(instance.querySourceKeys.filter(value => typeof value === "string" && value.length < 1000))].slice(0, 128) : null;
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
   instance.expandedResultSources = normalizeSearchResultSources(
     instance.expandedResultSources,
@@ -17714,13 +17717,14 @@ async function openCalculationNotebook(project, card) {
   }
 }
 
-function showNotebookSavedLink(anchor, project, card) {
+function showNotebookSavedLink(anchor, project, card, { added = false } = {}) {
   const container = anchor.closest(".inline-comment, .occupant-load-body") || anchor.parentElement;
   container.querySelector(".passage-notebook-saved")?.remove();
   const message = document.createElement("div"); message.className = "passage-notebook-saved";
-  const status = document.createElement("span"); status.setAttribute("role", "status"); status.textContent = "Saved to Notebook";
+  const status = document.createElement("span"); status.setAttribute("role", "status"); status.textContent = added ? `Added to Note: ${card.title || "Untitled Note"}` : "Saved to Notebook";
   const open = document.createElement("button"); open.type = "button"; open.className = "ghost-button"; open.textContent = "Open in Notebook";
   open.addEventListener("click", () => void openCalculationNotebook(project, card).catch(error => showWebNotice("Note not opened", error.message)));
+  open.hidden = !card?.id;
   message.append(status, open); container.append(message);
 }
 
@@ -18008,6 +18012,7 @@ async function addPassageToNotebook(anchor, source, exact) {
   const reference = { referenceKind: "selectedPassage", referenceID: link.id, label };
   if (destination === "current") {
     await mount.insertLinkedReference(target.id, reference, link, comments);
+    if (current()) showNotebookSavedLink(anchor, project, mount.insertionTarget?.() || target, {added: true});
     return;
   }
   if (navigator.onLine === false) throw new Error("Reconnect to create a Note.");
@@ -38619,7 +38624,7 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     try {
       const passages = [...selectedIDs].map(id => recordByID.get(id)).map(item => ({
         sectionID: String(item.sectionID),
-        selectedText: String(item.previewText || item.selectedText || item.title || "").trim(),
+        selectedText: String(item.selectedText || item.savedContentComparisonText || item.previewText || item.title || "").trim(),
         savedItemID: item.savedColumnKind === "bookmark" ? String(item.id || "") : ""
       }));
       if (passages.some(passage => !passage.selectedText)) throw new Error("A selected item has no source text. Open it before starting an Assistant conversation.");
@@ -39585,7 +39590,7 @@ async function openSavedItemInReader(item, savedPaneID) {
 
 async function startFocusedResearchFromSavedItem(item, projectID = "") {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
-  const selectedText = String(item?.previewText || item?.selectedText || item?.title || "").trim();
+  const selectedText = String(item?.selectedText || item?.savedContentComparisonText || item?.previewText || item?.title || "").trim();
   if (!sectionID || !selectedText) throw new Error("This saved passage does not have enough source text for Research.");
   const savedItemID = item?.savedColumnKind === "bookmark" ? String(item.id || "") : "";
   return startNewResearchFromSelection({

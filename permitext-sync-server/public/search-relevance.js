@@ -1,4 +1,4 @@
-import { searchWords, searchWordPattern } from './search-words.js?v=20261024-ux-remaining-v1358';
+import { searchWords, searchWordPattern } from './search-words.js?v=20261024-ux-live-v1359';
 
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const normalized = value => searchWords(value).map(word => word.replace(/(?<!s)s$/, '')).join(' ');
