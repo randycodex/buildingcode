@@ -4822,13 +4822,15 @@ select option:checked {
 }
 
 .search-results.is-history .search-jump-open {
+  padding-bottom: 0;
   padding-inline: max(calc(2 * var(--panel-padding)), calc((100% - var(--workspace-content-max-width)) / 2 + var(--panel-padding)));
 }
 
 .search-results.is-history .search-row-actions {
   align-items: center;
   justify-content: flex-start;
-  min-height: 36px;
+  /* Include the excerpt's former bottom padding so both action gaps are equal. */
+  min-height: calc(36px + var(--space-1) + 12px);
   margin-top: 0;
   padding-inline: max(calc(2 * var(--panel-padding)), calc((100% - var(--workspace-content-max-width)) / 2 + var(--panel-padding)));
 }
