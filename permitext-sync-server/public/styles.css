@@ -3310,6 +3310,7 @@ select option:checked {
 
 .section-detail-chrome .panel-kind {
   font-size: var(--chrome-font-size) !important;
+  visibility: hidden;
 }
 
 .section-detail-icon {
