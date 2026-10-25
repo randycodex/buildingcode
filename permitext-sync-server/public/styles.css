@@ -21080,10 +21080,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .project-facts-panel details.saved-project-structured-group > summary::before { content: '▾'; }
 .project-facts-panel details.saved-project-structured-group:not([open]) > summary::before { content: '▸'; }
 .workspace-context-switch > span:first-child { white-space: normal; overflow-wrap: anywhere; text-align: left; }
-.project-getting-started { max-width: 600px; margin: auto; padding: 32px; }
-.project-getting-started h2 { font-size: 20px; }
-.project-getting-started p { line-height: 1.6; }
-.project-getting-started > div { display: flex; flex-wrap: wrap; gap: 10px; }
 
 /* Release audit: transient confirmations stay outside the toolbar layout. */
 .workspace-success-notice {

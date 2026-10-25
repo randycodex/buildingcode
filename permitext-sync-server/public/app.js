@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1365";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1366";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1365";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1366";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261025-workspace-chrome-v1365";
+} from "./offline-storage.js?v=20261025-workspace-chrome-v1366";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -43692,28 +43692,6 @@ function renderProjectRequiredWorkspace() {
   return welcome;
 }
 
-function renderProjectGettingStarted() {
-  const welcome = document.createElement("section");
-  welcome.className = "workspace-empty-state project-getting-started";
-  welcome.setAttribute("aria-label", "Project starting points");
-  const content = document.createElement("div");
-  const heading = document.createElement("h2"); heading.textContent = "Start your code research";
-  const copy = document.createElement("p");
-  copy.textContent = "Review proposed work and Project facts, find enacted text, then include the exact passages you want to ask about.";
-  const actions = document.createElement("div"); actions.className = "project-start-actions";
-  for (const [label, action] of [
-    ["Review context & facts", () => openProjectDetailsScreen("context")],
-    ["Find a provision", () => focusUtility("search")],
-    ["Open a codebook", button => openReaderFromToolbar(button)],
-    ["Choose Saved Evidence", () => focusUtility("saved")]
-  ]) {
-    const button = document.createElement("button"); button.type = "button"; button.textContent = label;
-    button.addEventListener("click", () => { void Promise.resolve(action(button)).catch(error => showWebNotice("Project action not completed", error.message)); });
-    actions.append(button);
-  }
-  content.append(heading, copy, actions); welcome.append(content); return welcome;
-}
-
 function renderFirstUseWelcome() {
   const welcome = document.createElement("section");
   welcome.className = "workspace-empty-state workspace-first-use";
@@ -44521,8 +44499,6 @@ function appendPaneSequence(panes) {
   }
   if (!orderedPanes.length && workspaceColumnsRequireProject()) {
     nodes.push(renderProjectRequiredWorkspace());
-  } else if (!visiblePanes.length && currentColumnWorkflowView() === "research" && workspaceProject() && !detachedProjectWindow) {
-    nodes.push(renderProjectGettingStarted());
   } else if (!orderedPanes.length && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
     nodes.push(renderFirstUseWelcome());
   }
