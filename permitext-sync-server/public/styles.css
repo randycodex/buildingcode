@@ -5360,6 +5360,7 @@ select option:checked {
   right: 0;
   width: 40px;
   height: 40px;
+  align-items: start;
   border: 0;
 }
 .result-row .result-heading { padding-inline-end: calc(40px + var(--space-2)); }
@@ -5412,6 +5413,12 @@ select option:checked {
 .search-result-save svg {
   width: 18px;
   height: 18px;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.result-row:is(:hover, :focus-within) .search-result-save svg {
+  opacity: 1;
 }
 
 .search-result-save:hover svg,
