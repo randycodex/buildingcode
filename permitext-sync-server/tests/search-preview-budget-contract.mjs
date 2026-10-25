@@ -5,12 +5,15 @@ import {initialSearchGroupLimit} from '../public/search-relevance.js';
 
 for(const count of [1,2,3,4,8,21,40]) {
  const limit=initialSearchGroupLimit(count,25);
- assert.ok(limit>=1);
- assert.ok(count*limit<=Math.max(count,25),'The initial preview budget must not multiply by every codebook.');
+ assert.ok(limit>=5);
+ assert.ok(count*limit<=Math.max(count*5,25),'Initial previews stay within the shared budget or the five-match floor per edition.');
 }
 assert.equal(initialSearchGroupLimit(1),12);
 assert.equal(initialSearchGroupLimit(3),8);
-assert.equal(initialSearchGroupLimit(21),1);
+assert.equal(initialSearchGroupLimit(21),5);
+for (const limit of [1,2,4]) for (const count of [1,3,22]) {
+ assert.equal(initialSearchGroupLimit(count,limit),limit,'Explicit smaller page limits remain authoritative.');
+}
 const source=await readFile(new URL('../app.mjs',import.meta.url),'utf8');
 const start=source.indexOf('async function exactSearchPage(');
 const actual=source.slice(start,source.indexOf('\n}',start)+2);
@@ -38,4 +41,4 @@ await c.exactSearchPage(Array.from({length:90},(_,i)=>({section:{id:i,text:'matc
 assert.equal(reads,2,'A one-result preview reads only its result and lookahead.');
 assert.ok(peak<=8,'Content read concurrency stays bounded.');
 fail=true;await assert.rejects(c.exactSearchPage([{section:{text:'match'}}],'query',0,1),/Unavailable/);
-console.log('Search preview budget passed: all source groups visible, bounded initial rows/reads, exact and words parity, complete pagination, no skips/duplicates and preserved failures.');
+console.log('Search preview budget passed: five-match floor per edition, bounded rows/reads, exact and words parity, complete pagination, no skips/duplicates and preserved failures.');

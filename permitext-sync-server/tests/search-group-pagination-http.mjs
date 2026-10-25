@@ -20,6 +20,7 @@ try {
   for (const group of initial.groups) {
     const rows = initial.results.filter(row => row.codePrefix === group.codePrefix && row.codeVersion === group.codeVersion);
     assert(rows.length > 0 && rows.length <= 8, "Initial results stay bounded in each source.");
+    assert(rows.length >= 5 || !group.hasMore, "Each edition loads at least five matches unless it is exhausted.");
     assert.equal(rows.length, group.nextOffset);
     assert.equal(group.cursorKind, "candidate");
   }

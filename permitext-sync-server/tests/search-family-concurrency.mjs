@@ -9,6 +9,7 @@ const pending=new Map(), started=[], candidates=[];
 const families=['construction','historical2014','zoning','existingBuilding','enacted'];
 const context={activeScope:null,candidates, familyEnabled:()=>true,rememberSpellingSections(){},allowedIDs:()=>null,
  preparedSearchRuntime:{index:(_family,loader)=>loader()},
+ completePublicSearchIndex:(_family,_catalogLoader,indexLoader)=>indexLoader(),
  codeFilter:new Set(),queryTokens:[],normalizedQuery:'water',query:'water',matchMode:'words',
  timePublicCodePhase:(_name,fn)=>fn(),candidateSectionIDs:()=>new Set([1,2,3,4,5]),
  includeConstruction:true,includeHistorical2014:true,includeZoning:true,includeExistingBuilding:true,includeEnacted:true};
@@ -56,7 +57,10 @@ for (const editionCount of [1, 2, 22]) {
   const limit = initialSearchGroupLimit(editionCount, 25);
   assert.deepEqual(Array.from(result.results), hits.filter(hit=>hit.section.id % 100 < limit).map(hit=>hit.section.id));
   assert.ok(peak <= 16, `Body reads must stay bounded, got ${peak}`);
-  if (editionCount === 22) assert.equal(peak, 16, 'One-result previews should use the full bounded budget across editions');
+  if (editionCount === 22) {
+    assert.equal(limit,5,'Broad Search previews load five matches per edition.');
+    assert.equal(peak,12,'Five-result previews plus lookahead can load two editions concurrently.');
+  }
   assert.equal(result.groups.length, editionCount);
   assert.ok(result.groups.every(group=>group.hasMore && group.nextCandidateOffset === limit));
 }

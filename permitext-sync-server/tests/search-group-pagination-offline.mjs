@@ -1,4 +1,5 @@
 import { initialSearchGroupLimit, searchSpellingSuggestions, searchVocabulary } from "../public/search-relevance.js";
+import { finishLocalSearch } from "../public/downloaded-library-core.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
@@ -28,4 +29,34 @@ const historical = await get({ resultSource: JSON.stringify({ codePrefix: "BC", 
 assert.equal(historical.results.length, 1); assert.equal(historical.results[0].codeVersion, "2014");
 assert.equal(historical.results[0].id, 6); assert.equal(historical.hasMore, false);
 await assert.rejects(get({ resultSource: "null" }), /Invalid search result source/);
-console.log("Offline grouped Search passed: independent code/edition pages, known totals, exact phrase boundaries, exhausted controls, scoped match offsets and malformed-source rejection.");
+
+// Broad searches must not shrink an edition's preview below five available
+// matches in either offline storage path. Short editions stay exhausted.
+matches.splice(0, matches.length, ...Array.from({ length: 22 }, (_, edition) =>
+  Array.from({ length: edition === 21 ? 2 : 9 }, (_, n) => ({ rank: 2,
+    record: { codePrefix: `C${edition}`, codeVersion: "2022" },
+    result: { id: edition * 100 + n, codePrefix: `C${edition}`, codeVersion: "2022",
+      sectionNumber: String(n + 1), chapterNumber: "1", title: "Concrete" }
+  }))).flat());
+for (const mode of ["exact", "words"]) {
+  const params = { grouped: "true", match: mode };
+  const stored = await get(params);
+  const downloaded = finishLocalSearch(matches, new URL(`https://local/code/search?${new URLSearchParams(params)}`),
+    { query: "concrete", resultSource: null });
+  for (const page of [stored, downloaded]) {
+    assert.equal(page.groups.length, 22);
+    assert.equal(page.results.length, 107);
+    for (const group of page.groups) {
+      const exhausted = group.codePrefix === "C21";
+      const expected = exhausted ? 2 : 5;
+      assert.equal(page.results.filter(row => row.codePrefix === group.codePrefix).length, expected);
+      assert.equal(group.nextOffset, expected);
+      assert.equal(group.hasMore, !exhausted);
+    }
+  }
+  assert.deepEqual(Array.from(stored.results, row => row.id), downloaded.results.map(row => row.id));
+  const next = await get({ match: mode, resultSource: JSON.stringify({ codePrefix: "C0", codeVersion: "2022" }), offset: "5" });
+  assert.deepEqual(Array.from(next.results, row => row.id), [5, 6, 7, 8]);
+  assert.equal(next.hasMore, false);
+}
+console.log("Offline grouped Search passed: five-match previews in stored and downloaded libraries, exhausted short editions, independent pages, known totals, phrase boundaries, scoped offsets and malformed-source rejection.");

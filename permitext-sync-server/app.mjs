@@ -24376,9 +24376,8 @@ async function groupedCodeSearchPage(hits, query, resultLimit, matchMode = "exac
   const entries = [...sources.values()];
   const pages = new Array(entries.length);
   let next = 0;
-  // Keep at most sixteen body reads in flight. With one preview per edition,
-  // each worker reads two bodies (one result + lookahead), so eight editions
-  // can progress together instead of serializing eleven pairs of previews.
+  // Keep at most sixteen body reads in flight, including lookahead, as the
+  // per-edition preview size changes with the number of matching sources.
   const groupLimit = initialSearchGroupLimit(entries.length, resultLimit);
   const workers = Math.min(entries.length, Math.max(1, Math.floor(16 / Math.min(exactSearchConcurrency, groupLimit + 1))));
   await Promise.all(Array.from({ length: workers }, async () => {

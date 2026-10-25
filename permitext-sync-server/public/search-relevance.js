@@ -1,4 +1,4 @@
-import { searchWords, searchWordPattern } from './search-words.js?v=20261025-workspace-chrome-v1373';
+import { searchWords, searchWordPattern } from './search-words.js?v=20261025-workspace-chrome-v1374';
 
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const normalized = value => searchWords(value).map(word => word.replace(/(?<!s)s$/, '')).join(' ');
@@ -59,10 +59,10 @@ export function searchRelevanceRank(section, query, matchMode = 'exact', plainTe
   return 4 - overlap - contextOverlap * 0.9 + Math.min(depth, 8) * 0.05;
 }
 
-// Share the initial preview budget across codebooks instead of multiplying it
-// by every matching edition. Keep at least one result in each source.
+// Share the initial preview budget across sources, with at least five matches
+// per edition when available. Respect smaller explicit page limits.
 export const initialSearchGroupLimit = (sourceCount, limit = 25) => Math.min(limit,
-  sourceCount === 1 ? 12 : Math.min(8, Math.max(1, Math.floor(limit / Math.max(1, sourceCount)))));
+  sourceCount === 1 ? 12 : Math.min(8, Math.max(5, Math.floor(limit / Math.max(1, sourceCount)))));
 
 export function searchVocabulary(sections) {
   const terms = new Set();
