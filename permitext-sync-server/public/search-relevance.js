@@ -1,4 +1,4 @@
-import { searchWords, searchWordPattern } from './search-words.js?v=20261023-notes-reveal-v1298';
+import { searchWords, searchWordPattern } from './search-words.js?v=20261024-ux-release-v1356';
 
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const normalized = value => searchWords(value).map(word => word.replace(/(?<!s)s$/, '')).join(' ');
@@ -52,7 +52,11 @@ export function searchRelevanceRank(section, query, matchMode = 'exact', plainTe
   }
   if (concise && (matchMode === 'words' ? preparedWordsMatch(title, prepared) : title.toLowerCase().includes(raw))) return 2.2;
   const overlap = concise ? patterns.filter(pattern => pattern.test(title)).length / Math.max(1, words.length) : 0;
-  return 4 - overlap + Math.min(depth, 8) * 0.12;
+  // A function-specific table term may be in the body while the governing
+  // subject is its ancestor heading (e.g. OCCUPANT LOAD). Prefer that subject
+  // context over incidental words scattered through a definition chapter.
+  const contextOverlap = patterns.filter(pattern => pattern.test(context)).length / Math.max(1, words.length);
+  return 4 - overlap - contextOverlap * 0.9 + Math.min(depth, 8) * 0.05;
 }
 
 // Share the initial preview budget across codebooks instead of multiplying it

@@ -94,7 +94,7 @@ export function reportItemPreview(item) {
     add('',remaining);
   } else if (item.kind === 'researchAnswer') {
     add('Question',item.question);
-    add('Research basis',[item.authorityLabel || item.authorityStatus,item.codeEdition,item.sourceAsOf,
+    add('Research basis',[...(item.includeResearchMetadata === false ? [] : [item.authorityLabel || item.authorityStatus,item.codeEdition,item.sourceAsOf]),
       item.codeBasis?.disclosure,item.codeBasis?.limitation]);
     add('Corpus basis', [...(item.codeBasis?.searchedCorpora || []).map(corpus=>({kind:'Searched',corpus})),
       ...(item.codeBasis?.pinnedCorpora || []).map(corpus=>({kind:'Explicit evidence',corpus}))]
@@ -113,15 +113,23 @@ export function reportItemPreview(item) {
   } else if (item.kind === 'projectFacts') {
     add('Address',item.address);
     const facts = reportFactPresentation(item);
-    add('Project facts',facts.rows.map(row => [row.text,
+    add(item.title === 'Project Context' ? 'Project context' : 'Project facts',facts.rows.map(row => [row.text,
       ...[row.qualification,row.source].filter(Boolean).map(id => `[${id}]`)].join(' ')));
-    add('Fact qualifications and sources',facts.notes.map((note,index) => `[${index+1}] ${note.kind}: ${note.text}`));
+    add('Fact qualifications and sources',facts.notes.map((note,index) => `[${index+1}] ${note.kind}: ${note.displayText || note.text}`));
   } else {
     add('',item.plainText || item.text);
   }
-  return parts.map((part,index)=>({...part,key:part.kind === 'table'
+  const keyed = parts.map((part,index)=>({...part,key:part.kind === 'table'
     ? `${item.kind}:table:${index}:${createHash('sha256').update(JSON.stringify(part.rows)).digest('hex')}`
     : `${item.kind}:text:${item.reportCommentKey || ''}:${index}`}));
+  if (item.kind !== 'researchAnswer' || item.includeResearchMetadata !== false) return keyed;
+  const seen = new Set();
+  return keyed.filter(part => {
+    if (['Question', 'Corpus basis'].includes(part.label)) return false;
+    const comparable = part.text.replace(/\s+/g, ' ').trim();
+    if (seen.has(comparable)) return false;
+    seen.add(comparable); return true;
+  });
 }
 
 // Compact only the known fact-projection envelope. Unrecognized/legacy prose
@@ -131,7 +139,12 @@ export function reportFactPresentation(item) {
   const reference = (kind, value) => {
     if (!value) return null;
     let index = notes.findIndex(note => note.kind === kind && note.text === value);
-    if (index < 0) { index = notes.length; notes.push({ kind, text: value }); }
+    if (index < 0) {
+      index = notes.length;
+      const displayText = kind === 'Qualification' ? value.split(';').map(part => part.trim())
+        .filter(part => part !== 'preserve the stated negation, scope and uncertainty').join('; ') : value;
+      notes.push({ kind, text: value, ...(displayText !== value ? { displayText: displayText || 'Scope and uncertainty as stated' } : {}) });
+    }
     return index + 1;
   };
   const rows = String(item.facts || '').split(/\n\n/).map(original => {

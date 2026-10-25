@@ -9,7 +9,7 @@ function extract(name) {
   const start=source.indexOf(marker),end=source.indexOf("\n}",start);
   assert(start>=0&&end>start,name);return source.slice(start,end+2);
 }
-function element(){return {children:[],dataset:{},events:{},style:{setProperty(){}},setAttribute(){},append(...nodes){this.children.push(...nodes);},addEventListener(name,action){this.events[name]=action;}};}
+function element(){return {children:[],dataset:{},events:{},style:{setProperty(){}},setAttribute(){},append(...nodes){this.children.push(...nodes);},prepend(...nodes){this.children.unshift(...nodes);},addEventListener(name,action){this.events[name]=action;}};}
 function all(node){return [node,...node.children.flatMap(all)];}
 function deferred(){let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};}
 function harness(code){
@@ -31,7 +31,7 @@ function harness(code){
     toggleUtilityPane:key=>accounts.push(key),
     postResearchWithProgress(body){const value={body,...deferred()};requests.push(value);return value.promise;}
   });
-  vm.runInContext(["researchProgressFailureRecovery","openResearchProgressIssueReport","renderResearchProgressCard","runResearchProgressSession"].map(extract).join("\n"),context);
+  vm.runInContext(["researchWorkflowButton","researchProgressFailureRecovery","openResearchProgressIssueReport","renderResearchProgressCard","runResearchProgressSession"].map(extract).join("\n"),context);
   progress.retry=()=>context.runResearchProgressSession(progress,{}, {retrying:true});
   return {context,progress,requests,opens,reports,accounts,draft,render:()=>context.renderResearchProgressCard(progress),missing:()=>{saved=false;},hold:()=>{barrier=deferred();return barrier;},switchAccount:()=>{generation++;}};
 }
@@ -39,7 +39,7 @@ for(const code of ["RESEARCH_VERIFICATION_FAILED","INVALID_RESEARCH_VERIFICATION
   const test=harness(code),card=test.render(),buttons=all(card);
   assert(!buttons.some(node=>node.textContent==="Retry"));
   const recovery=test.context.researchProgressFailureRecovery(test.progress).text;
-  assert(recovery.includes("“Exact original question”"));
+  assert(buttons.some(node=>node.textContent==="Review question and passages"),"The exact original question is available in an explicit local review.");
   assert.doesNotMatch(recovery,/PRIVATE|saved|repeat|still here/i);
   const report=buttons.find(node=>node.textContent==="Report this issue");assert(report);
   await test.progress.retry();assert.equal(test.requests.length,0,"A stale retry callback cannot pay to repeat a semantic failure.");

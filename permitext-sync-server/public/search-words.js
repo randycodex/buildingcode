@@ -84,6 +84,29 @@ export function searchWordsSnippet(value, query) {
       left += 1;
     }
   }
+  // A table row can be far from the section's subject heading. One clipped
+  // window then hides the very term that made this a match. Show a few exact
+  // source excerpts rather than implying that distant words are adjacent.
+  if (best.end - best.start > 420) {
+    const seen = new Set(), groups = [];
+    for (const match of matches) {
+      if (match.index < best.start || match.index + match.length > best.end || seen.has(match.word)) continue;
+      seen.add(match.word);
+      const last = groups.at(-1);
+      if (last && match.index - last.end < 70) last.end = match.index + match.length;
+      else groups.push({ start: match.index, end: match.index + match.length });
+    }
+    const selected = groups.length > 3 ? [groups[0], groups[Math.floor(groups.length / 2)], groups.at(-1)] : groups;
+    const budget = Math.floor(220 / Math.max(1, selected.length));
+    return selected.map(group => {
+      let start = Math.max(0, group.start - 20);
+      let end = Math.min(text.length, Math.max(group.end + 45, start + budget));
+      end = Math.min(end, start + budget);
+      if (start) { const boundary = text.indexOf(' ', start); if (boundary < group.start) start = boundary + 1; }
+      if (end < text.length) { const boundary = text.lastIndexOf(' ', end); if (boundary >= group.end) end = boundary; }
+      return text.slice(start, end);
+    }).filter(Boolean).join(' … ').replace(/^/, '… ').replace(/$/, ' …');
+  }
   let start = Math.max(0, best.start - 60);
   if (start) { const boundary = text.indexOf(" ", start); if (boundary < best.start) start = boundary + 1; }
   let end = Math.min(text.length, Math.max(start + 220, Math.min(best.end + 80, start + 420)));

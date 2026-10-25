@@ -30,15 +30,19 @@ export function createPreparedSearchRuntime({directory = new URL('./generated/se
         try {bytes = await readFile(new URL(`${family}.runtime`, directory));}
         catch (error) {if (error.code === 'ENOENT' && !process.env.VERCEL) return null;throw error;}
         const payload = deserialize(bytes);
-        if (payload.schemaVersion !== 1 || payload.family !== family || endianness() !== 'LE' ||
+        const legacy = payload.schemaVersion === 1 && !process.env.VERCEL;
+        if ((!legacy && payload.schemaVersion !== 2) || payload.family !== family || endianness() !== 'LE' ||
             payload.buildCommit !== (process.env.VERCEL_GIT_COMMIT_SHA || null)) throw new Error('Invalid prepared Search runtime');
         const {catalog, ...indexMetadata} = payload;
-        return {...indexMetadata, catalog:unpackSearchCatalog(catalog)};
+        return {...indexMetadata, legacy, catalog:unpackSearchCatalog(catalog)};
       });
       const index = createRetryableLazyLoader(async () => {
         const [meta, bytes] = await Promise.all([metadata(), readFile(new URL(`${family}.postings`, directory))
           .catch(error => {if (error.code === 'ENOENT' && !process.env.VERCEL) return null;throw error;})]);
         if (!meta && !bytes) return null;
+        // Rebuild legacy local postings from source rather than silently
+        // retaining the old table omissions. Hosted builds must ship v2.
+        if (meta?.legacy) return null;
         if (!meta || !bytes) throw new Error('Incomplete prepared Search runtime');
         if (bytes.length !== meta.bytes || bytes.length % 4 || searchRuntimeDigest(bytes) !== meta.sha256) throw new Error('Corrupt prepared Search postings');
         // Buffers from file reads are normally aligned. Preserve correct views

@@ -1,6 +1,6 @@
 import PDFDocument from "pdfkit";
 import { fileURLToPath } from "node:url";
-import { reportEvidenceDisplayText, reportResearchPlainText, reportCitationLabel, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation, reportItemPreview, reportResearchDisplayText } from "./report-presentation.mjs";
+import { reportEvidenceDisplayText, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation, reportItemPreview } from "./report-presentation.mjs";
 import { reportBlockRuns, reportRunsLines } from "./public/report-rich-text.js";
 import { sourceFormattingRuns, sourceTextStyles } from "./public/report-source-formatting.js";
 
@@ -50,36 +50,6 @@ function stringList(value) {
     .filter(Boolean);
 }
 
-function researchDisplayText(value) {
-  return reportResearchDisplayText(value);
-}
-
-function researchDisplayList(value) {
-  return stringList(value).map(researchDisplayText).filter(Boolean);
-}
-
-function researchCorpusMetadataLines(codeBasis) {
-  const entries = [
-    ...(Array.isArray(codeBasis?.searchedCorpora) ? codeBasis.searchedCorpora : [])
-      .map((corpus) => ({ kind: "Searched", corpus })),
-    ...(Array.isArray(codeBasis?.pinnedCorpora) ? codeBasis.pinnedCorpora : [])
-      .map((corpus) => ({ kind: "Explicit evidence", corpus }))
-  ];
-  return entries.map(({ kind, corpus }) => [
-    kind,
-    corpus.label || corpus.id || "Research corpus",
-    corpus.codeEdition ? `Edition: ${corpus.codeEdition}` : "Edition not provided",
-    corpus.applicabilityStatus
-      ? `Applicability: ${String(corpus.applicabilityStatus).replace(/[-_]+/g, " ")}`
-      : "Applicability status not provided"
-  ].join(" · "));
-}
-
-function researchSourceDate(value) {
-  const date = new Date(value);
-  return Number.isFinite(date.getTime()) ? date.toISOString().slice(0, 10) : "";
-}
-
 function reportPresentation(manifest) {
   const accent = String(manifest.presentation?.branding?.accentColorHex || "").trim().toLowerCase();
   return {
@@ -96,6 +66,23 @@ function ensureVerticalSpace(document, height = 72) {
   document.addPage();
 }
 
+function reserveHeading(document, title, body = "", { size = 9, gap = 4, bodySize = 9.5 } = {}) {
+  const width = document.page.width - document.page.margins.left - document.page.margins.right;
+  document.font("Report-Bold").fontSize(size);
+  const heading = document.heightOfString(title, { width, paragraphGap: gap });
+  document.font("Report-Regular").fontSize(bodySize);
+  const firstParagraph = String(body || "").split(/\n\s*\n/)[0];
+  const first = document.heightOfString(firstParagraph || "Text", { width, lineGap: 2 });
+  ensureVerticalSpace(document, heading + gap + Math.min(80, Math.max(55, first)));
+}
+
+function drawTextSection(document, title, body) {
+  if (!String(body || "").trim()) return;
+  reserveHeading(document, title, body);
+  document.fillColor(colors.ink).font("Report-Bold").fontSize(9).text(title, { paragraphGap: 4 });
+  document.font("Report-Regular").fontSize(9.5).text(body, { lineGap: 2, paragraphGap: 8 });
+}
+
 function drawClassification(document, classification) {
   document.font("Report-Regular").fontSize(7.5).fillColor(colors.muted)
     .text((classificationLabels[classification] || "Project material").toUpperCase(), {paragraphGap:6});
@@ -104,7 +91,7 @@ function drawClassification(document, classification) {
 function drawList(document, title, values) {
   const items = stringList(values);
   if (!items.length) return;
-  ensureVerticalSpace(document, 50);
+  reserveHeading(document, title.toUpperCase(), items[0], { size: 8.5 });
   document
     .fillColor(colors.ink)
     .font("Report-Bold")
@@ -159,7 +146,16 @@ export function drawReportTable(document, table, startX, contentWidth) {
 }
 
 function drawSourceItem(document, item, projectMaterialBySourceID, presentation, showClassification = true) {
-  ensureVerticalSpace(document, 105);
+  const width = document.page.width - document.page.margins.left - document.page.margins.right;
+  document.font("Report-Bold").fontSize(12);
+  const sourceTitle = item.reportTitle || item.title || (item.kind === "researchAnswer" && item.question?.length > 96
+    ? `${item.question.slice(0, 95).trimEnd()}…` : item.question) || "Project content";
+  const titleHeight = document.heightOfString(sourceTitle, { width, paragraphGap: 7 });
+  document.font("Report-Regular").fontSize(9.5);
+  const calculationHeight = item.kind === "notebookCard" && item.cardType === "calculation"
+    ? document.heightOfString(item.plainText || "", { width, lineGap: 2, paragraphGap: 8 }) + titleHeight + 55 : 0;
+  const pageSpace = document.page.height - document.page.margins.top - document.page.margins.bottom;
+  ensureVerticalSpace(document, calculationHeight && calculationHeight < pageSpace ? calculationHeight : Math.max(105, titleHeight + 65));
   const startX = document.x;
   const contentWidth = document.page.width - document.page.margins.left - document.page.margins.right;
   const top = document.y;
@@ -171,18 +167,19 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
   const formatted = annotatedSourceParts(item);
   if (hasSourceMarks(formatted)) {
     const question = formatted.find(part=>part.label === 'Question');
-    const title = item.kind === 'evidence' ? `${item.codeBook} ${item.sectionNumber}: ${item.title}` : item.question || item.title || 'Project facts';
-    drawReportRichText(document,question?.runs || [{text:title}],{size:12,bold:true,paragraphGap:7});
+    const title = item.kind === 'evidence' ? `${item.codeBook} ${item.sectionNumber}: ${item.title}` : sourceTitle;
+    const questionIsTitle = title === item.question;
+    drawReportRichText(document,questionIsTitle && question ? question.runs : [{text:title}],{size:12,bold:true,paragraphGap:7});
     if (item.kind === 'evidence') document.font('Report-Regular').fontSize(9).fillColor(colors.muted)
       .text(`Edition: ${reportEvidenceEdition(item)}`,{paragraphGap:8});
     for (const part of formatted) {
-      if (part === question) continue;
+      if (part === question && questionIsTitle) continue;
       if (part.kind === 'table') {
         drawFormattedSourceTable(document,part,item.sourceFormatting,startX,contentWidth);
         document.moveDown(0.7);
       } else {
         if (part.label) {
-          ensureVerticalSpace(document,45);
+          reserveHeading(document, part.label, part.text);
           document.fillColor(colors.ink).font('Report-Bold').fontSize(9).text(part.label,{paragraphGap:4});
         }
         drawReportRichText(document,part.runs,{size:9.5,paragraphGap:8});
@@ -223,70 +220,11 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
         .text(item.plainText, { lineGap: 2, paragraphGap: 8 });
     }
   } else if (item.kind === "researchAnswer") {
-    document
-      .fillColor(colors.ink)
-      .font("Report-Bold")
-      .fontSize(12)
-      .text(item.question, { paragraphGap: 7 });
-    const sourceDate = researchSourceDate(item.sourceAsOf);
-    const boundary = [
-      item.authorityLabel || item.authorityStatus,
-      item.codeEdition ? `Edition: ${item.codeEdition}` : "",
-      sourceDate ? `Research basis captured ${sourceDate}` : ""
-    ].filter(Boolean).join(" · ");
-    if (boundary) {
-      document
-        .fillColor(colors.muted)
-        .font("Report-Regular")
-        .fontSize(8.5)
-        .text(boundary, { lineGap: 1, paragraphGap: 7 });
-    }
-    drawList(document, "Code basis", [
-      item.codeBasis?.disclosure,
-      item.codeBasis?.limitation
-    ].filter(Boolean));
-    drawList(document, "Corpus basis", researchCorpusMetadataLines(item.codeBasis));
-    document
-      .font("Report-Bold")
-      .fontSize(9.5)
-      .text("Supported conclusion", { paragraphGap: 3 });
-    document
-      .font("Report-Regular")
-      .fontSize(9.5)
-      .text(researchDisplayText(item.conclusion), { lineGap: 2, paragraphGap: 7 });
-    drawList(
-      document,
-      "What the selected evidence establishes",
-      (item.supportedPoints || []).map((point) =>
-        [researchDisplayText(point.heading), researchDisplayText(point.explanation)]
-          .filter(Boolean)
-          .join(": ")
-      )
-    );
-    if (item.explanation) {
-      document
-        .font("Report-Bold")
-        .fontSize(9.5)
-        .text(item.supportedPoints?.length ? "Practical application" : "Explanation", {
-          paragraphGap: 3
-        });
-      document
-        .font("Report-Regular")
-        .fontSize(9.5);
-      document.text(researchDisplayText(item.explanation), { lineGap: 2, paragraphGap: 7 });
-    }
-    drawList(document, "Assumptions", researchDisplayList(item.assumptions));
-    drawList(document, "Project facts to verify", researchDisplayList(item.missingFacts));
-    drawList(document, "Limits of this answer", researchDisplayList(item.limitations));
-    drawList(document, "Related evidence to add", researchDisplayList(item.additionalEvidenceNeeded));
-    drawList(
-      document,
-      "Citations",
-      [...new Set((item.citations || []).map((citation) =>
-        reportCitationLabel(citation, item.evidence || [], item.codeEdition)
-      ))]
-    );
-    drawList(document, "Professional-use notice", [item.disclaimer].filter(Boolean));
+    const title = item.reportTitle || (item.question.length > 96 ? `${item.question.slice(0, 95).trimEnd()}…` : item.question);
+    reserveHeading(document, title, item.conclusion, { size: 12, gap: 7 });
+    document.fillColor(colors.ink).font("Report-Bold").fontSize(12).text(title, { paragraphGap: 7 });
+    for (const part of reportItemPreview(item)) drawTextSection(document, part.label, part.text);
+
   } else {
     document
       .fillColor(colors.ink)
@@ -477,7 +415,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
   const presentation = reportPresentation(manifest);
   document.addPage();
   let previousSourceClassification = null;
-  (manifest.items || []).forEach((item) => {
+  (manifest.items || []).forEach((item, index, items) => {
     const sourceParts = annotatedSourceParts(item);
     const markedText = sourceParts.find(part=>part.kind === 'text' && part.runs.some(hasInlineStyle))?.runs;
     if (!["heading","paragraph","list"].includes(item.kind) && hasSourceMarks(sourceParts)) {
@@ -486,7 +424,8 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
       return;
     }
     if (item.kind === "heading") {
-      ensureVerticalSpace(document, 70);
+      const next = items[index + 1];
+      reserveHeading(document, item.text, next?.text || next?.plainText || next?.conclusion || "", { size: item.presentationRole === "comment" ? 9 : ({1:17,2:14,3:12}[item.headingLevel] || 17), gap: 10, bodySize: 10 });
       if (item.richText || markedText) {
         drawReportRichText(document, item.richText || markedText, {bold:true, size:item.presentationRole === "comment" ? 9 : ({1:17,2:14,3:12}[item.headingLevel] || 17), paragraphGap:item.presentationRole === "comment" ? 4 : 10});
         return;
@@ -499,7 +438,11 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
       return;
     }
     if (item.kind === "paragraph") {
-      ensureVerticalSpace(document, 55);
+      const noteTitle = item.reportTitle || (item.derivedFrom?.kind === "notebookCard" ? item.derivedFrom.title : "");
+      if (noteTitle) {
+        reserveHeading(document, noteTitle, item.text, { size: 12, gap: 7, bodySize: 10 });
+        document.fillColor(colors.ink).font("Report-Bold").fontSize(12).text(noteTitle, { paragraphGap: 7 });
+      } else ensureVerticalSpace(document, 55);
       if (item.richText || markedText) drawReportRichText(document, item.richText || markedText);
       else document
         .fillColor(colors.ink)
@@ -563,7 +506,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
         document.fillColor(colors.muted).font("Report-Bold").fontSize(9)
           .text("Fact qualifications and sources", { paragraphGap: 6 });
         facts.notes.forEach((note, index) => document.font("Report-Regular").fontSize(8)
-          .text(`[${index + 1}] ${note.kind}: ${note.text}`, { lineGap: 2, paragraphGap: 5 }));
+          .text(`[${index + 1}] ${note.kind}: ${note.displayText || note.text}`, { lineGap: 2, paragraphGap: 5 }));
       }
       document.moveDown(0.8);
       return;

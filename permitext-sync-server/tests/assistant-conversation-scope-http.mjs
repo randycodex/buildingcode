@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, readFile } from 'node:fs/promises';
+import vm from 'node:vm';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const temporary = await mkdtemp(join(tmpdir(), 'permitext-conversation-scope-'));
@@ -58,12 +59,45 @@ try {
   assert.equal(answer.retrieval.webSupportRequested,false);assert.equal(answer.retrieval.webSupportSearched,false);
   assert.equal(answer.sourceSummary.permitextDiscoveredCount,0);assert.equal(answer.sourceSummary.crossReferenceCount,0);
   assert.deepEqual(answer.evidenceSectionIDs,['41009495']);assert.equal(answer.sourceSummary.userPinnedCount,1);
+  assert.equal(answer.codeBasis.retrievalScope,'selected-evidence-only');
+  assert.deepEqual(answer.codeBasis.searchedCorpora,[],'Selected-only analysis does not run the ordinary corpus search.');
+  assert.deepEqual(answer.codeBasis.pinnedCorpora.map(corpus=>corpus.codeYear),[2014]);
+  assert.match(answer.codeBasis.disclosure,/no additional sources searched/);
+  assert.deepEqual(conversation.codeBasis,answer.codeBasis,'Conversation metadata matches the completed answer.');
   assert.doesNotMatch(JSON.stringify(answer.factUsage),/SECRET_|private address|private description|Stories Above Grade/);
   const stored=await adapter.read();const record=stored.researchAnswersByUserID[userID].find(item=>item.id===conversation.messages.at(-1).id);
   assert.equal(record.evidence.length,1);assert.equal(record.evidence[0].passageText,passage);
   assert.equal(record.assistantScopeSnapshot.inputMode,'reader_passages');
   assert.deepEqual(record.assistantScopeSnapshot.materials,[]);assert.deepEqual(record.assistantScopeSnapshot.facts,[]);
   assert.equal(record.assistantScopeSnapshot.projectContext,null);
+  assert.deepEqual(record.answer.codeBasis,answer.codeBasis,'The immutable answer captures the actual selected evidence basis.');
+  const {draft: reportDraft}=await request('/reports/drafts/save',{projectID,expectedVersion:0,
+    title:'Selected passage provenance',reportDate:'2026-10-24',
+    blocks:[{id:'selected-answer',kind:'researchAnswer',sourceID:record.id,label:'Selected ramp answer',reportTitle:'Ramp passage review',includeResearchMetadata:false}]},201);
+  const issued=await request('/reports/generate',{projectID,draftID:reportDraft.id,expectedVersion:reportDraft.version},201);
+  const reportAnswer=issued.manifest.items.find(item=>item.kind==='researchAnswer');
+  assert.deepEqual(reportAnswer.codeBasis,record.answer.codeBasis,'Report snapshot retains actual execution provenance.');
+  assert.deepEqual(reportAnswer.codeBasis.searchedCorpora,[]);
+  assert.equal(reportAnswer.reportTitle,'Ramp passage review');assert.equal(reportAnswer.includeResearchMetadata,false);
+  assert.equal(reportAnswer.question,record.question,'A short report title never replaces the original question.');
+  const issuedSnapshot=structuredClone(issued.manifest);
+  // Exercise the actual client handoff against the real CAS save route. The
+  // other Note is closed, so no active editor may become an implicit target.
+  const {card: destinationNote}=await request('/notebook/cards/save',{projectID,expectedVersion:0,
+    title:'Chosen existing Note',cardType:'finding',evidenceLinks:[],document:{schema:'permitext-notebook-card',
+      schemaVersion:2,format:'blocknote-json',document:[{type:'paragraph',content:[{type:'text',text:'Keep this existing analysis.'}]}]}},201);
+  const clientSource=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+  const appendSource=clientSource.slice(clientSource.indexOf('async function appendResearchReferenceToNote('),
+    clientSource.indexOf('\nfunction renderResearchNotebookHandoff('));
+  const handoff=vm.createContext({structuredClone,navigator:{onLine:true},notebookColumnMounts:new Map(),
+    researchProjectID:project=>project.id,requireCurrentAccountRequest(){},
+    postResearch:(path,body)=>request(path,body),saveNotebookCardSnapshot:async()=>{}});
+  vm.runInContext(appendSource,handoff);
+  const updatedNote=await handoff.appendResearchReferenceToNote({id:projectID},{kind:'saved',card:destinationNote},
+    {referenceKind:'researchAnswer',referenceID:record.id,label:'Research: saved ramp answer'},'chosen-note-insertion',{},()=>true);
+  assert.equal(updatedNote.id,destinationNote.id);assert.equal(updatedNote.version,destinationNote.version+1);
+  assert.match(updatedNote.plainText,/Keep this existing analysis/);
+  assert(updatedNote.references.some(reference=>reference.referenceID===record.id));
   assert.deepEqual(stored.researchConversationsByUserID[userID].find(item=>item.id===conversation.id).assistantScope,legacyScope);
   // Calculator previews use server canonical text, then the ordinary exact-selection API.
   const tablePreview=await request('/research/selections/review',{sectionID:'2152',codeVersion,reviewMode:'whole_section'});
@@ -93,6 +127,7 @@ try {
   const afterRemoval=await adapter.read();
   assert.deepEqual(afterRemoval.researchAnswersByUserID[userID].find(item=>item.id===record.id),record,
     'The exact saved answer and its evidence snapshot remain unchanged.');
+  assert.deepEqual(issued.manifest,issuedSnapshot,'Later passage removal does not change the issued report.');
   await request('/research/conversations/evidence',remove,409);
   const noSources=await request('/research/conversations/message',{conversationID:conversation.id,question:'Explain again.',requestID:'scope-removed'});
   assert.equal(noSources.conversation.messages.at(-1).answer.charged,false);

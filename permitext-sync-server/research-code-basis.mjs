@@ -35,6 +35,32 @@ function corpusSummary(corpora) {
   return corpora.map((corpus) => corpus.label || corpus.codeEdition).filter(Boolean).join(" · ");
 }
 
+// A selected-passage turn does not execute the ordinary corpus router or
+// search its results. Resolve only the editions of the evidence actually
+// included; never fall back to another edition sharing the same code prefix.
+export function selectedEvidenceCorpusPlan(evidence = [], registry = []) {
+  const included = new Map();
+  for (const source of evidence) {
+    const version = normalizedText(source?.codeVersion || source?.sourceLibraryVersion);
+    const prefix = normalizedText(source?.codePrefix).toUpperCase();
+    if (!version) continue;
+    const corpus = registry.find(candidate =>
+      candidate.codeVersion === version && (!prefix || candidate.codePrefixes?.includes(prefix)));
+    const record = corpus || {
+      id: `${prefix || "source"}:${version}`,
+      label: normalizedText(source.codeEdition) || version,
+      codeEdition: normalizedText(source.codeEdition) || "Edition not recorded",
+      codeVersion: version,
+      codeYear: Number.isSafeInteger(source.codeYear) ? source.codeYear : null,
+      codePrefixes: prefix ? [prefix] : [],
+      applicabilityStatus: "selected-edition-applicability-unverified"
+    };
+    included.set(record.id, { ...record, routeReason: "exact passages included by the user" });
+  }
+  return { routingMode: "selected-evidence-only", selected: [],
+    pinnedCorpora: [...included.values()], unavailable: [], excluded: [] };
+}
+
 export function resolveResearchCodeBasis({
   projectID = null,
   projectCodeVersion = null,
@@ -66,6 +92,7 @@ export function resolveResearchCodeBasis({
   const unavailableValues = Array.isArray(corpusPlan?.unavailable) ? corpusPlan.unavailable : [];
   const excludedValues = Array.isArray(corpusPlan?.excluded) ? corpusPlan.excluded : [];
   const selected = selectedValues.map(normalizedCorpus);
+  const selectedEvidenceOnly = corpusPlan?.routingMode === "selected-evidence-only";
   const pinned = pinnedValues.map(normalizedCorpus);
   const reviewed = [...selected, ...pinned].filter((corpus, index, values) =>
     values.findIndex((candidate) => candidate.id === corpus.id) === index
@@ -83,11 +110,11 @@ export function resolveResearchCodeBasis({
   const projectVersionSupported = configuredVersion
     ? Boolean(matchedProjectCorpus?.automaticResearchEligible)
     : null;
-  const projectDefaultApplied = Boolean(
+  const projectDefaultApplied = !selectedEvidenceOnly && Boolean(
     matchedProjectCorpus && reviewed.some((corpus) => corpus.id === matchedProjectCorpus.id)
   );
-  const unsupportedProjectVersion = projectVersionRecognized === false;
-  const unavailableProjectVersion = projectVersionRecognized === true &&
+  const unsupportedProjectVersion = !selectedEvidenceOnly && projectVersionRecognized === false;
+  const unavailableProjectVersion = !selectedEvidenceOnly && projectVersionRecognized === true &&
     projectVersionSupported === false &&
     !reviewed.some((corpus) => corpus.id === matchedProjectCorpus?.id);
   const searchedSummary = corpusSummary(selected);
@@ -113,7 +140,8 @@ export function resolveResearchCodeBasis({
     limitationParts.push(`${corpus.label} was not searched. ${corpus.blockedReason || "It requires an explicit applicability path."}`);
   }
   const disclosureParts = [
-    searchedSummary ? `Sources searched: ${searchedSummary}` : "No authorized corpus was searched",
+    selectedEvidenceOnly ? "Included passages only; no additional sources searched"
+      : searchedSummary ? `Sources searched: ${searchedSummary}` : "No authorized corpus was searched",
     pinnedSummary ? `Explicit evidence reviewed: ${pinnedSummary}` : "",
     unavailableSummary ? `${unavailableSummary} unavailable for Research` : "",
     excludedRequestedSummary ? `${excludedRequestedSummary} excluded from ordinary Research` : "",
@@ -125,19 +153,19 @@ export function resolveResearchCodeBasis({
     registryVersion: normalizedText(corpusPlan?.registryVersion) || null,
     jurisdiction: "New York City",
     codeYear: reviewed.length === 1 ? reviewed[0].codeYear : null,
-    codeEdition: reviewed.length === 1
+    codeEdition: selectedEvidenceOnly && !reviewed.length ? "No passages included" : reviewed.length === 1
       ? reviewed[0].codeEdition
       : reviewed.length > 1
-        ? "Routed New York City enacted sources"
+        ? selectedEvidenceOnly ? "Selected passages from multiple editions" : "Routed New York City enacted sources"
         : primary.codeEdition,
-    codeVersion: reviewed.length === 1
+    codeVersion: selectedEvidenceOnly && !reviewed.length ? "selected-evidence-only" : reviewed.length === 1
       ? reviewed[0].codeVersion
       : reviewed.length > 1
         ? "multiple-authorized-corpora"
         : primary.codeVersion,
-    retrievalScope: "routed-multi-corpus",
+    retrievalScope: selectedEvidenceOnly ? "selected-evidence-only" : "routed-multi-corpus",
     routingMode: normalizedText(corpusPlan?.routingMode) || "registered-authorized-corpora",
-    basisSource: projectDefaultApplied ? "project-default" : "permitext-router",
+    basisSource: selectedEvidenceOnly ? "user-selected-passages" : projectDefaultApplied ? "project-default" : "permitext-router",
     projectID: normalizedText(projectID) || null,
     projectCodeVersion: configuredVersion,
     projectCodeVersionRecognized: projectVersionRecognized,

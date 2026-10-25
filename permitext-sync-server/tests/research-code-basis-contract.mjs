@@ -3,7 +3,8 @@ import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { immutableEvidenceSnapshot, immutableResearchAnswer } from "../project-foundation-contract.mjs";
-import { resolveResearchCodeBasis } from "../research-code-basis.mjs";
+import { resolveResearchCodeBasis, selectedEvidenceCorpusPlan } from "../research-code-basis.mjs";
+import { reportItemPreview } from "../report-presentation.mjs";
 import {
   createResearchCorpusRegistry,
   routeResearchCorpora
@@ -13,6 +14,37 @@ const availableCodeVersion = "CodeContent/authored/new-york-city/2022-constructi
 const availableCodeEdition = "2022 New York City Construction Codes";
 const resolvedAt = "2026-08-10T12:00:00.000Z";
 const registry = createResearchCorpusRegistry();
+const selectedBasis = evidence => resolveResearchCodeBasis({ availableCorpora: registry,
+  corpusPlan: selectedEvidenceCorpusPlan(evidence, registry), resolvedAt });
+const selectedPassage = { codePrefix: "BC", codeVersion: availableCodeVersion,
+  codeEdition: availableCodeEdition, sectionNumber: "1020.1.2" };
+const onlyIncluded = selectedBasis([selectedPassage, { ...selectedPassage, sectionNumber: "1020.1" }]);
+assert.equal(onlyIncluded.retrievalScope, "selected-evidence-only");
+assert.equal(onlyIncluded.basisSource, "user-selected-passages");
+assert.deepEqual(onlyIncluded.searchedCorpora, []);
+assert.deepEqual(onlyIncluded.pinnedCorpora.map(corpus => corpus.id), ["nyc-2022-construction-codes"]);
+assert.match(onlyIncluded.disclosure, /Included passages only; no additional sources searched/);
+assert.doesNotMatch(onlyIncluded.disclosure, /Sources searched:|Fire Code|Energy|Electrical|Zoning/);
+const ignoredProjectDefault = resolveResearchCodeBasis({ projectCodeVersion: "unavailable-project-edition", availableCorpora: registry,
+  corpusPlan: selectedEvidenceCorpusPlan([selectedPassage], registry), resolvedAt });
+assert.doesNotMatch(ignoredProjectDefault.disclosure, /Project version unavailable|Project default applied/);
+assert.doesNotMatch(String(ignoredProjectDefault.limitation || ""), /Project.*configured version/,
+  "A selected-passage turn does not attempt the excluded Project default.");
+const historicalSelection = { ...selectedPassage,
+  codeVersion: "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1" };
+assert.deepEqual(selectedBasis([historicalSelection]).pinnedCorpora.map(corpus => corpus.codeYear), [2014]);
+assert.deepEqual(selectedBasis([selectedPassage, historicalSelection]).pinnedCorpora.map(corpus => corpus.codeYear), [2022, 2014]);
+const unknown = selectedBasis([{ ...selectedPassage, codeVersion: "unknown-edition", codeEdition: "Recorded source edition" }]);
+assert.equal(unknown.pinnedCorpora[0].codeEdition, "Recorded source edition");
+assert.doesNotMatch(unknown.disclosure, /2022 NYC/);
+const emptySelection = selectedBasis([]);
+assert.deepEqual(emptySelection.searchedCorpora, []);
+assert.equal(emptySelection.codeEdition, "No passages included");
+const preview = reportItemPreview({ kind: "researchAnswer", question: "Explain the included corridors.",
+  conclusion: "Review the included condition.", codeBasis: onlyIncluded });
+assert.match(JSON.stringify(preview), /no additional sources searched/);
+assert.doesNotMatch(JSON.stringify(preview), /Searched ·|Fire Code|Zoning Resolution/);
+
 const constructionPlan = routeResearchCorpora({
   question: "What does BC 101.1 require?",
   registry

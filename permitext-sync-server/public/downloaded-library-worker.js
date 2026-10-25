@@ -1,4 +1,4 @@
-import { searchSpellingSuggestions } from "./search-relevance.js?v=20261023-notes-reveal-v1298";
+import { searchSpellingSuggestions } from "./search-relevance.js?v=20261024-ux-release-v1356";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import {
   searchWords,
@@ -10,7 +10,7 @@ import {
   localSearchPermits,
   finishLocalSearch,
   offlineSectionMetadata,
-} from "./downloaded-library-core.js?v=9";
+} from "./downloaded-library-core.js?v=13";
 import {
   offlineAssetNamesForChapter,
   resolveOfflineSectionMetadata,

@@ -1,4 +1,4 @@
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-return-sync-v1351";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261024-ux-release-v1356";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=1";
@@ -6,7 +6,7 @@ import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./pro
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
 import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=8";
-import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=9';
+import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=13';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=5";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=6";
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
@@ -15,7 +15,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=24";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-return-sync-v1351";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261024-ux-release-v1356";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -147,7 +147,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261024-return-sync-v1351";
+} from "./offline-storage.js?v=20261024-ux-release-v1356";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2067,6 +2067,7 @@ async function switchWorkspace(workspaceID, options = {}) {
   }
   if (!isCurrentAccountRequest(requestIdentity)) return false;
   const nextLayout = loadWorkspaceSnapshot(workspaceID);
+  clearWorkspaceNotice();
   if (!nextLayout) {
     presentWorkspaceIssue("This saved workspace could not be opened. Its original data is preserved, and your current workspace is still open. Reload to retry; avoid clearing site data.");
     return false;
@@ -7968,9 +7969,18 @@ function setTitle(panel, reader) {
   const title = panel.querySelector(".panel-title");
   if (reader.sectionNumber) {
     title.textContent = sectionDisplayTitle(reader.sectionNumber, reader.title, "Reader");
-    return;
-  }
-  title.textContent = reader.title || "Reader";
+  } else title.textContent = reader.title || "Reader";
+  updateReaderLocationTitle(panel, reader);
+}
+
+function updateReaderLocationTitle(panel, reader) {
+  const button = panel.querySelector(".reader-collapse-title");
+  if (!button) return;
+  const code = readerCodeOptionLabel(codeOptionFor(reader.codePrefix || "BC", reader.codeVersion));
+  const location = reader.sectionNumber ? `§ ${reader.sectionNumber}` : "";
+  button.textContent = [code, location].filter(Boolean).join(" · ");
+  button.setAttribute("aria-label", `Collapse ${[code, sectionDisplayTitle(reader.sectionNumber, reader.title, "Reader")].join(" · ")}`);
+  button.title = [code, sectionDisplayTitle(reader.sectionNumber, reader.title, "Reader"), "Click to collapse column"].join(" · ");
 }
 
 function appendHighlighted(container, text, query) {
@@ -8131,7 +8141,9 @@ function searchResultPresentation(result, query = "") {
   if (heading && excerpt.toLocaleLowerCase().startsWith(heading.toLocaleLowerCase())) {
     excerpt = excerpt.slice(heading.length).replace(/^[\s.:;—–-]+/, "");
   }
-  const maxLength = 230;
+  // The server/offline matcher already bounds excerpts. Preserve separate
+  // windows that expose distant query terms, such as a row in a long table.
+  const maxLength = result.matchKind === "words" || excerpt.includes(" … ") ? 430 : 230;
   if (excerpt.length > maxLength) {
     const match = excerpt.toLocaleLowerCase().indexOf(clean(query).toLocaleLowerCase());
     let start = match > 100 ? match - 75 : 0;
@@ -8301,9 +8313,7 @@ function populateCodeSelect(panel, reader) {
     titleButton.addEventListener("click", () => setPaneCollapsed(panel, true, { focus: true }));
     codeSelect.closest(".reader-code-heading").prepend(titleButton);
   }
-  titleButton.textContent = readerCodeOptionLabel(selectedCode);
-  titleButton.setAttribute("aria-label", `Collapse ${readerCodeOptionLabel(selectedCode)}`);
-  titleButton.title = "Click to collapse column";
+  updateReaderLocationTitle(panel, reader);
 }
 
 function openReaderCodePicker(anchor, onSelect) {
@@ -9183,6 +9193,7 @@ async function requireAccountLinkWorkSaved(account, identity) {
 }
 
 function replaceActiveAccount(nextAccount, options = {}) {
+  clearWorkspaceNotice();
   flushSearchQueryPersistence();
   flushResearchDraftPersistence();
   releaseAccountLinkWriteFence();
@@ -10799,6 +10810,49 @@ function presentWorkspaceIssue(message, options = {}) {
     workspaceIssueAction.textContent = options.actionLabel || "Review";
   }
   workspaceIssue.hidden = false;
+}
+
+let workspaceNotice = null;
+function clearWorkspaceNotice() {
+  if (!workspaceNotice) return;
+  clearTimeout(workspaceNotice.timer);
+  workspaceNotice.element.remove();
+  workspaceNotice = null;
+}
+
+function presentWorkspaceNotice(message, { actionLabel = "", onAction = null } = {}) {
+  clearWorkspaceNotice();
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const notice = document.createElement("aside");
+  notice.className = "workspace-success-notice";
+  notice.setAttribute("aria-label", "Workspace confirmation");
+  const copy = document.createElement("span");
+  copy.setAttribute("role", "status");
+  copy.textContent = message;
+  notice.append(copy);
+  const entry = { element: notice, timer: null };
+  const dismiss = () => { if (workspaceNotice === entry) clearWorkspaceNotice(); };
+  if (actionLabel && typeof onAction === "function") {
+    const action = document.createElement("button");
+    action.type = "button"; action.textContent = actionLabel;
+    action.addEventListener("click", () => {
+      if (isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID) onAction();
+      dismiss();
+    });
+    notice.append(action);
+  }
+  const close = document.createElement("button");
+  close.type = "button"; close.textContent = "×"; close.setAttribute("aria-label", "Dismiss confirmation");
+  close.addEventListener("click", dismiss);
+  notice.append(close);
+  const schedule = () => { clearTimeout(entry.timer); entry.timer = setTimeout(dismiss, 8000); };
+  notice.addEventListener("pointerenter", () => clearTimeout(entry.timer));
+  notice.addEventListener("pointerleave", schedule);
+  notice.addEventListener("focusin", () => clearTimeout(entry.timer));
+  notice.addEventListener("focusout", event => { if (!notice.contains(event.relatedTarget)) schedule(); });
+  document.body.append(notice);
+  workspaceNotice = entry;
+  schedule();
 }
 
 function dismissWorkspaceIssue() {
@@ -16752,7 +16806,7 @@ function openResearchDestinationMenu(anchor, selection) {
           }
           const conversation = await addResearchSelectionToCurrent(selection, conversationID);
           if (conversation && workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity)) {
-            presentWorkspaceIssue(`Added to ${researchConversationTitle(conversation)}.`, {
+            presentWorkspaceNotice(`Passage added to ${researchConversationTitle(conversation)}.`, {
               actionLabel: 'View research',
               onAction: () => {
                 if (workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity)) {
@@ -20945,6 +20999,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       heading.append(title);
       const snippetText = presentation.excerpt;
       const snippet = document.createElement("p");
+      snippet.classList.toggle("has-separated-matches", snippetText.includes(" … "));
       appendHighlighted(snippet, snippetText, query);
       markResearchSelectable(snippet, detail);
       mainButton.append(heading);
@@ -21981,7 +22036,24 @@ async function renderSectionDetail(searchID, detail) {
   addComment.addEventListener("click", () => {
     if (readerPrivateContentAllowed(panel)) textarea.addComment();
   });
-  content.append(codeLabelElement, chapterLabel, heading, chapterTitle, body, addNote, addComment, notes);
+  const savedScope = document.createElement("section");
+  savedScope.className = "saved-passage-scope";
+  if (isSavedEvidenceDetail && sectionTarget.blockID) {
+    const exact = body.querySelector(`[data-annotation-block-id="${CSS.escape(sectionTarget.blockID)}"]`);
+    const label = document.createElement("strong"); label.textContent = "Saved passage · exact text";
+    const quote = document.createElement("blockquote");
+    quote.textContent = exact ? notebookEvidenceTextMap(exact, { literalInline: true }).text : "This saved passage could not be located in this edition. Review its source before using it.";
+    savedScope.append(label, quote);
+    const warning = researchPassageScopeWarning(quote.textContent);
+    if (warning) {
+      const notice = document.createElement("p"); notice.className = "research-passage-warning";
+      notice.textContent = warning; savedScope.append(notice);
+    }
+    const context = document.createElement("p");
+    context.textContent = "Containing section below · surrounding text is not part of this saved passage.";
+    savedScope.append(context);
+  } else savedScope.hidden = true;
+  content.append(codeLabelElement, chapterLabel, heading, chapterTitle, savedScope, body, addNote, addComment, notes);
   panel.append(chrome, content);
   return panel;
 }
@@ -22717,6 +22789,10 @@ function renderResearchInterpretation(container, result, options = {}) {
   }
   const reportMessage = options.message || options.recordMessage;
   appendResearchAnswerNarrative(card, result, recoveryQuestion, Boolean(reportMessage?.id && options.conversationID));
+  if (researchAnswerHasVerificationRecovery(result) && options.conversationID && recoveryQuestion) {
+    card.append(researchWorkflowButton("Review question and passages", () =>
+      reviewResearchFailedQuestion(options.conversationID, recoveryQuestion)));
+  }
   const nextQuestion = researchDisplayList(result.followUpQuestions)[0];
   if (!researchAnswerHasVerificationRecovery(result) && nextQuestion && !researchAnswerNarrativeText(result).includes(nextQuestion)) {
     const followUp = document.createElement("p");
@@ -25048,6 +25124,44 @@ function researchProgressFailureRecovery(progress) {
     status: progress.errorStatus, recoveryReason: progress.recoveryReason }, progress.question);
 }
 
+async function reviewResearchFailedQuestion(conversationID, question) {
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const generation = state.workflowNavigationGeneration || 0;
+  const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID &&
+    generation === (state.workflowNavigationGeneration || 0);
+  const conversation = await fetchAuthoritativeResearchConversation(conversationID);
+  if (!current() || !conversation) return;
+  const content = document.createElement("section");
+  content.className = "research-request-review";
+  const original = document.createElement("p");
+  original.textContent = question;
+  content.append(original);
+  const sources = (conversation.sources || []).filter(source => source.kind === "selection");
+  for (const source of sources) {
+    const label = document.createElement("strong");
+    label.textContent = `${researchAnswerSourceCitation(source)} · ${researchCodeEdition(source)}`;
+    const quote = document.createElement("blockquote");
+    quote.textContent = source.selectedText || "Exact passage unavailable";
+    content.append(label, quote);
+  }
+  const accepted = await confirmWebWarning("Review question and passages", "Review the original question and the passages currently included. You can edit the question or include more complete text before sending a new request.", {
+    content, confirmLabel: "Use question as draft"
+  });
+  if (!accepted || !current()) return;
+  const paneID = paneIDForResearchConversation(conversationID);
+  if (!track.querySelector(`[data-pane-id="${CSS.escape(paneID)}"] .research-question-input`)) {
+    await openSupplementalResearchConversation(conversationID);
+  }
+  if (!current()) return;
+  const input = track.querySelector(`[data-pane-id="${CSS.escape(paneID)}"] .research-question-input`);
+  if (!input || input.disabled) throw new Error("Wait for the current request before editing this question.");
+  if (input.value.trim()) throw new Error("Your unsent draft is still in the composer. Send or clear it before restoring this question.");
+  input.value = question;
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  scrollPaneIntoView(paneID);
+  input.focus();
+}
+
 async function openResearchProgressIssueReport(progress) {
   const identity = progress.requestIdentity || captureAccountRequest();
   if (!isCurrentAccountRequest(identity)) return;
@@ -25138,7 +25252,7 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
           requireCurrentAccountRequest(requestIdentity);
           if (!conversation) throw new Error("The current conversation is not available");
           progress.recoveryReviewed = true;
-          progress.error = "Research reloaded. Review its Project context and sources before continuing.";
+          progress.error = "Research reloaded. Review the question and included passages before continuing.";
           refreshResearchProgressCard(progress);
         } catch (error) {
           if (!isCurrentAccountRequest(requestIdentity)) return;
@@ -25181,6 +25295,11 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
       support.textContent = "Contact support";
       support.addEventListener("click", () => toggleUtilityPane("settings"));
       actions.append(support);
+    }
+    if (["failed", "cancelled"].includes(progress.status) && progress.question &&
+        ["report", "review_sources"].includes(researchProgressFailureRecovery(progress).action)) {
+      actions.prepend(researchWorkflowButton("Review question and passages", () =>
+        reviewResearchFailedQuestion(progress.conversationID, progress.question)));
     }
     card.append(actions);
   }
@@ -25454,6 +25573,33 @@ function researchWorkflowButton(label, action) {
   return button;
 }
 
+function researchPassageScopeWarning(value) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  return /^(?:exceptions?|notes?|conditions?|definitions?|scope|general|application)\s*[:.]?$/i.test(text)
+    ? "Heading only — this passage does not include the rule or the text below it." : "";
+}
+
+async function reviewResearchContainingSection(conversation, source, paneID, current) {
+  const payload = await postResearch("/research/selections/review", {
+    sectionID: source.sectionID, codeVersion: source.codeVersion, reviewMode: "whole_section"
+  });
+  if (!current()) return;
+  if (payload.requiresVisualReview) throw new Error("Open this section in Reader to review its visual evidence before selecting it.");
+  const selectedText = payload.selection?.selectedText;
+  if (!selectedText) throw new Error("The containing section could not be prepared. Open it in Reader to review and select the text.");
+  const content = document.createElement("blockquote");
+  content.className = "research-containing-section-preview";
+  content.textContent = selectedText;
+  const accepted = await confirmWebWarning("Review containing section", "This adds the exact section below to future questions. The original passage and previous answers stay unchanged.", {
+    content, confirmLabel: "Include this section", container: track.querySelector(`[data-pane-id="${CSS.escape(paneID)}"]`)
+  });
+  if (!accepted || !current()) return;
+  if (["active", "retrying"].includes(reconciledResearchProgressSession(conversation)?.status)) {
+    throw new Error("Wait for the current answer before changing passages.");
+  }
+  await addResearchSelectionToCurrent({ passages: [{ sectionID: source.sectionID, selectedText }] }, conversation.id);
+}
+
 function researchPassageEntryActions() {
   const actions = document.createElement("div");
   actions.className = "research-passage-actions";
@@ -25472,7 +25618,9 @@ function renderResearchIncludedPassages(conversation, paneID, { busy = false, on
   region.setAttribute("aria-label", "Included passages");
   const details = document.createElement("details");
   const summary = document.createElement("summary");
-  summary.textContent = `Included passages · ${selected.length}`;
+  const hasHeadingOnly = selected.some(source => researchPassageScopeWarning(source.selectedText));
+  summary.textContent = `Included passages · ${selected.length}${hasHeadingOnly ? " · Heading-only passage" : ""}`;
+  details.open = hasHeadingOnly;
   const hint = document.createElement("span");
   hint.className = "research-included-review-label";
   hint.textContent = "Review passages";
@@ -25495,6 +25643,21 @@ function renderResearchIncludedPassages(conversation, paneID, { busy = false, on
     const actions = document.createElement("div");
     actions.className = "research-passage-actions";
     const open = researchWorkflowButton("Open in Reader", () => openSourceInReader(source, paneID));
+    const warning = researchPassageScopeWarning(source.selectedText);
+    if (warning) {
+      const notice = document.createElement("p");
+      notice.className = "research-passage-warning";
+      notice.textContent = warning;
+      item.append(notice);
+      const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+      const generation = state.workflowNavigationGeneration || 0;
+      const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID &&
+        generation === (state.workflowNavigationGeneration || 0) && region.isConnected;
+      const containing = researchWorkflowButton("Review containing section…", () =>
+        reviewResearchContainingSection(conversation, source, paneID, current));
+      containing.disabled = busy;
+      actions.append(containing);
+    }
     const remove = researchWorkflowButton("Remove passage", async () => {
       if (["active", "retrying"].includes(reconciledResearchProgressSession(conversation)?.status)) {
         throw new Error("Wait for the current answer before changing its passages.");
@@ -25616,7 +25779,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
     // A conversation starts from an explicit Reader passage, never an empty question.
     sendButton.disabled = true;
   };
-  status.textContent = "Only included passages and this conversation are used. Other Readers and Project details are excluded.";
+  status.textContent = "First include a passage from Reader or Saved Evidence to enable Send. Project Context and Facts are not included automatically; state any relevant assumptions in your question.";
   input.addEventListener("input", () => {
     researchNewChatDrafts.set(draftKey, input.value);
     scheduleResearchDraftPersistence();
@@ -25750,9 +25913,9 @@ async function renderResearch(paneID = "utility:analysis") {
     const welcome = document.createElement("div");
     welcome.className = "research-chat-welcome";
     const heading = document.createElement("h3");
-    heading.textContent = "Ask about code passages";
+    heading.textContent = "Start with a code passage";
     const introduction = document.createElement("p");
-    introduction.textContent = "Add passages from Reader or Saved Evidence, then ask a question.";
+    introduction.textContent = "Open Reader or Saved Evidence, choose the exact text, then use Research to include it. Review the included passages before asking.";
     const examples = document.createElement("p");
     examples.className = "research-passage-scope";
     examples.textContent = "Explain a passage, compare provisions, or clarify their conditions and exceptions.";
@@ -27172,8 +27335,72 @@ function researchAnswerQuestion(conversation, message) {
   return String(question?.question || message.question || conversation.starterQuestion || researchConversationTitle(conversation)).trim();
 }
 
+async function chooseResearchNoteDestination(project, container, current) {
+  const projectID = researchProjectID(project);
+  const mount = notebookMounts.get(projectID);
+  const target = mount?.insertionTarget?.();
+  const payload = navigator.onLine === false
+    ? await loadNotebookProjectSnapshot(captureAccountRequest().userID, projectID) || { cards: [] }
+    : await loadInitialNotebookCardList(project);
+  if (!current()) return null;
+  if (payload.access?.readOnly) throw new Error("This Project's Notes are read-only.");
+  const cards = (payload.cards || []).filter(card => !card.deletedAt && !card.archivedAt);
+  const choices = [
+    ...(target ? [{ value: "current", label: `Current Note: ${target.title || "Untitled Note"}` }] : []),
+    { value: "new", label: "New Note" },
+    ...cards.filter(card => card.id !== target?.id).map(card => ({ value: `note:${card.id}`, label: card.title || "Untitled Note" }))
+  ];
+  const destination = await openWebWarning({ title: "Add Research to a Note",
+    message: `Project: ${readableProjectName(project)}. Choose where to keep the link to this exact saved answer and its sources.`,
+    choiceLabel: "Destination Note", choices, confirmLabel: "Add to selected Note", container });
+  if (!destination || !current()) return null;
+  if (destination === "new") return { kind: "new" };
+  if (destination === "current") {
+    const next = mount?.insertionTarget?.();
+    if (notebookMounts.get(projectID) !== mount || !next ||
+        (target.identity ? next.identity !== target.identity : next.id !== target.id)) {
+      throw new Error("The destination Note changed. Choose it again.");
+    }
+    return { kind: "open", mount, target };
+  }
+  const card = cards.find(item => `note:${item.id}` === destination);
+  if (!card) throw new Error("The selected Note is no longer available.");
+  return { kind: "saved", card };
+}
+
+async function appendResearchReferenceToNote(project, destination, reference, mutationID, identity, current) {
+  const projectID = researchProjectID(project);
+  const openMount = destination.kind === "open" ? destination.mount
+    : [...notebookColumnMounts.values()].find(mount => mount.panel.dataset.projectId === projectID &&
+        mount.activeCardID() === destination.card.id);
+  if (openMount) {
+    const target = openMount.insertionTarget?.();
+    const expected = destination.kind === "open" ? destination.target : destination.card;
+    if (!target || target.id !== expected.id || expected.identity && target.identity !== expected.identity) {
+      throw new Error("The selected Note has pending changes or is unavailable. Review it before adding this answer.");
+    }
+    if (!current()) return null;
+    await openMount.insertLinkedReference(target.id, reference);
+    return { ...expected, title: target.title || "Untitled Note" };
+  }
+  if (navigator.onLine === false) throw new Error("Reconnect to update this Note. The saved Research answer remains available.");
+  const { card } = await postResearch("/notebook/cards/get", { projectID, cardID: destination.card.id });
+  requireCurrentAccountRequest(identity);
+  if (!current()) return null;
+  // Get returns the normalized, current document. CAS rejects a concurrent
+  // update; do not replace an open editor or retry with a newer version blindly.
+  if (!Array.isArray(card.document?.document)) throw new Error("Open this Note to review its document before adding the answer.");
+  const document = structuredClone(card.document);
+  document.document.push({ type: "paragraph", content: [{ type: "permitextReference", props: reference }] });
+  const payload = await postResearch("/notebook/cards/save", { ...card, projectID, cardID: card.id,
+    expectedVersion: card.version, clientMutationID: mutationID, document });
+  requireCurrentAccountRequest(identity);
+  await saveNotebookCardSnapshot(identity.userID, projectID, payload.card);
+  return payload.card;
+}
+
 function renderResearchNotebookHandoff(conversation, message) {
-  if (!message.id || !message.answer || !hasCapability("notebook")) return null;
+  if (!message.id || !message.answer || researchAnswerHasVerificationRecovery(message.answer) || !hasCapability("notebook")) return null;
   const region = document.createElement("div");
   region.className = "research-notebook-handoff";
   const projects = researchProjects();
@@ -27189,11 +27416,12 @@ function renderResearchNotebookHandoff(conversation, message) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "ghost-button";
-  button.textContent = "Add to note";
+  button.textContent = "Add to note…";
   button.disabled = !choices.length;
   if (!choices.length) button.title = "Create or restore a Project to keep this Research reference in Notebook.";
   const mutationID = `research-reference:${crypto.randomUUID()}`;
   let savedCard = null;
+  let savedDestinationMount = null;
   button.addEventListener("click", async () => {
     const requestIdentity = captureAccountRequest();
     const originPaneID = region.closest(".workspace-panel")?.dataset.paneId;
@@ -27205,31 +27433,24 @@ function renderResearchNotebookHandoff(conversation, message) {
     const project = choices.find((item) => researchProjectID(item) === select.value);
     if (!project) return;
     const title = researchAnswerQuestion(conversation, message).slice(0, 300);
-    const currentMount = notebookMounts.get(researchProjectID(project));
-    const currentNote = currentMount?.insertionTarget?.();
-    if (!savedCard && currentNote) {
-      if (!originIsCurrent()) return;
-      button.disabled = true;
-      try {
-        await currentMount.insertLinkedReference(currentNote.id, {
-          referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${title}`
-        });
-        if (originIsCurrent()) button.textContent = "Added to note";
-      } catch (error) {
-        if (originIsCurrent()) await showWebNotice("Note not updated", error.message);
-      } finally {
-        if (originIsCurrent()) button.disabled = false;
-      }
-      return;
-    }
-    if (!savedCard && !currentNote && !await confirmWebWarning("Keep this Research reference in Notebook?",
-      `Project: ${readableProjectName(project)}\n\n${title}\n\nThe new Note links to the exact saved answer and its cited sources. Review the answer before writing your own conclusion.`,
-      { confirmLabel: "Create reference Note", container: region })) return;
     if (!originIsCurrent()) return;
     button.disabled = true;
     select.disabled = true;
     try {
       if (!savedCard) {
+        const destination = await chooseResearchNoteDestination(project, region, originIsCurrent);
+        if (!destination || !originIsCurrent()) return;
+        if (destination.kind !== "new") {
+          savedCard = await appendResearchReferenceToNote(project, destination, {
+            referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${title}`
+          }, mutationID, requestIdentity, originIsCurrent);
+          if (savedCard && destination.kind === "open") savedDestinationMount = destination.mount;
+          if (savedCard && originIsCurrent()) {
+            button.textContent = `Open Note: ${savedCard.title || "Untitled Note"}`;
+            button.title = `Added to ${savedCard.title || "Untitled Note"}`;
+          }
+          return;
+        }
         if (navigator.onLine === false) throw new Error("Reconnect to create this Note. The saved Research answer remains available.");
         const document = emptyNotebookDocument();
         document.document = [{ type: "paragraph", content: [{ type: "permitextReference", props: {
@@ -27242,11 +27463,15 @@ function renderResearchNotebookHandoff(conversation, message) {
         await saveNotebookCardSnapshot(requestIdentity.userID, researchProjectID(project), savedCard);
         // Saving a reference does not change the current view or pane membership.
         // A second, explicitly labelled action opens it beside Research.
-        if (originIsCurrent()) button.textContent = "Open note in Research";
+        if (originIsCurrent()) button.textContent = `Open Note: ${savedCard.title || "Untitled Note"}`;
         return;
       }
       requireCurrentAccountRequest(requestIdentity);
       if (!originIsCurrent()) return;
+      if (savedDestinationMount?.panel?.isConnected) {
+        scrollPaneIntoView(savedDestinationMount.panel.dataset.paneId);
+        return;
+      }
       pendingNotebookCardByProject.set(researchProjectID(project), savedCard.id);
       if (researchWorkspaceProjectID() !== researchProjectID(project)) {
         reconcileProjectWorkspaces();
@@ -27268,7 +27493,7 @@ function renderResearchNotebookHandoff(conversation, message) {
       if (!destinationIsCurrent()) return;
       if (mount?.activeCardID?.() !== savedCard.id) await mount?.focusCard?.(savedCard.id);
       if (mount?.activeCardID?.() === savedCard.id) pendingNotebookCardByProject.delete(researchProjectID(project));
-      button.textContent = "Open note in Research";
+      button.textContent = `Open Note: ${savedCard.title || "Untitled Note"}`;
     } catch (error) {
       if (originIsCurrent()) await showWebNotice("Notebook handoff not completed", error.message);
     } finally {
@@ -28204,7 +28429,7 @@ async function resumePendingResearchIntent() {
       anchorPaneID: intent.originPaneID
     });
     clearPendingResearchIntent(sessionStorage, intent.intentID);
-    presentWorkspaceIssue("Your Research action resumed after access was confirmed.");
+    presentWorkspaceNotice("Your Research action resumed after access was confirmed.");
     return true;
   })().catch((error) => {
     presentWorkspaceIssue(
@@ -28304,6 +28529,7 @@ async function addResearchSelectionToCurrent(selection, destinationConversationI
   // follow-up draft; adding evidence never submits a question or replaces another chat.
   const paneID = paneIDForResearchConversation(conversationID);
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  if (workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity)) scrollPaneIntoView(paneID);
   return payload.conversation;
 }
 
@@ -30618,7 +30844,8 @@ function appendUniqueReportSources(draft, sources) {
       continue;
     }
     draft.blocks.push({ id: crypto.randomUUID(), kind: source.kind, sourceID: source.id,
-      label: source.label, sourceClassification: source.sourceClassification });
+      label: source.label, sourceClassification: source.sourceClassification,
+      ...(source.kind === "researchAnswer" ? { includeResearchMetadata: false } : {}) });
   }
 }
 
@@ -30798,10 +31025,13 @@ function reportSourceClassificationLabel(value) {
 }
 
 function reportBlockTitle(block) {
+  if (block.reportTitle) return block.reportTitle;
+  if (block.derivedFrom?.kind === "notebookCard") return block.derivedFrom.title;
   if (block.kind === "heading") return block.text || "Heading";
   if (block.kind === "paragraph") return (block.text || "Paragraph").slice(0, 80);
   if (block.kind === "list") return `${block.items?.length || 0} list items`;
-  return block.label || block.title || block.kind;
+  const label = block.label || block.title || block.kind;
+  return block.kind === "researchAnswer" && label.length > 96 ? `${label.slice(0, 95).trimEnd()}…` : label;
 }
 
 function createReportPaneHeader(closeReport) {
@@ -31308,7 +31538,7 @@ async function renderProjectReportDraft(project, resume = null) {
           source.id === block.sourceID && source.kind === block.kind
         )?.sourceClassification)
       );
-      const kindLabel = ({ heading: "Heading", paragraph: block.derivedFrom?.kind === "notebookCard" ? "Notebook note" : "Paragraph", list: "List", evidence: "Code excerpt", notebookCard: "Notebook note", researchAnswer: "Research answer", projectFacts: "Project facts" })[block.kind] || "Source";
+      const kindLabel = ({ heading: "Heading", paragraph: block.derivedFrom?.kind === "notebookCard" ? "Notebook note" : "Paragraph", list: "List", evidence: "Code excerpt", notebookCard: "Notebook note", researchAnswer: "Research answer", projectFacts: block.sourceID?.endsWith(":context") ? "Project Context" : "Project facts" })[block.kind] || "Source";
       label.textContent = `${kindLabel} · ${label.textContent}`;
       const actions = document.createElement("div");
       actions.className = "report-draft-block-actions";
@@ -31379,6 +31609,26 @@ async function renderProjectReportDraft(project, resume = null) {
       actions.append(remove);
       top.append(label, actions);
       row.append(top);
+
+      if (block.kind === "researchAnswer" || block.derivedFrom?.kind === "notebookCard") {
+        const titleLabel = document.createElement("label");
+        titleLabel.className = "report-finding-title";
+        titleLabel.textContent = "Report title";
+        const titleInput = document.createElement("input");
+        titleInput.type = "text"; titleInput.maxLength = 240;
+        titleInput.value = reportBlockTitle(block);
+        titleInput.addEventListener("input", () => { block.reportTitle = titleInput.value; setDirty(); });
+        titleLabel.append(titleInput); row.append(titleLabel);
+      }
+      if (block.kind === "researchAnswer") {
+        const metadata = document.createElement("label");
+        metadata.className = "report-research-metadata-option";
+        const include = document.createElement("input"); include.type = "checkbox";
+        include.checked = block.includeResearchMetadata !== false;
+        include.addEventListener("change", () => { block.includeResearchMetadata = include.checked; setDirty(); });
+        metadata.append(include, document.createTextNode("Include full question and source details in PDF"));
+        row.append(metadata);
+      }
 
       if (["heading", "paragraph", "list"].includes(block.kind)) {
         row.append(reportFormatting.mount(block));
@@ -31462,7 +31712,7 @@ async function renderProjectReportDraft(project, resume = null) {
         }
         const sourceTitle = document.createElement("strong");
         sourceTitle.textContent = block.kind === "projectFacts"
-          ? "PROJECT FACTS"
+          ? (source?.projectSection === "context" ? "PROJECT CONTEXT" : "PROJECT FACTS")
           : block.kind === "evidence" && source
             ? [source.sectionNumber, stripLeadingSectionNumber(source.title || "", source.sectionNumber)].filter(Boolean).join(" ")
             : reportBlockTitle(block);
@@ -31473,7 +31723,7 @@ async function renderProjectReportDraft(project, resume = null) {
           row.append(sourceTitle, citation);
         }
         renderReportCommentOptions(row, block, source);
-        if (!sourceTitle.parentElement) row.append(sourceTitle);
+        if (!sourceTitle.parentElement && block.kind !== "researchAnswer") row.append(sourceTitle);
         if (source) {
           if (block.kind === "notebookCard") {
             const openNote = document.createElement("button"); openNote.type = "button";
@@ -31495,7 +31745,7 @@ async function renderProjectReportDraft(project, resume = null) {
                 const text = card.plainText || "";
                 if (text.length > 20000) throw new Error("This Note is too long for one Report paragraph. Keep the linked source or split the Note first.");
                 const richText = reportFormatting.sourceSnapshotRuns(block,text);
-                Object.assign(block, {kind: "paragraph", text, richText, derivedFrom: {kind: "notebookCard", id: card.id, title: card.title, version: card.version},
+                Object.assign(block, {kind: "paragraph", text, richText, reportTitle: block.reportTitle || card.title, derivedFrom: {kind: "notebookCard", id: card.id, title: card.title, version: card.version},
                   sourceSnapshotAt: new Date().toISOString(), evidenceLinks: structuredClone(card.evidenceLinks || [])});
                 delete block.sourceID;
                 delete block.sourceFormatting;
@@ -31512,7 +31762,7 @@ async function renderProjectReportDraft(project, resume = null) {
           }
           const preview = document.createElement("details");
           preview.className = "report-full-preview";
-          const toggle = document.createElement("summary"); toggle.textContent = "Source text";
+          const toggle = document.createElement("summary"); toggle.textContent = "Saved source text";
           const body = document.createElement("div"); body.className = "report-full-preview-body"; preview.append(toggle, body);
           preview.open = !reportEvidenceCoverage(activeDraft.blocks, sources).has(block.id);
           let loaded = false, loading = false;
@@ -31661,7 +31911,8 @@ async function renderProjectReportDraft(project, resume = null) {
           kind: source.kind,
           sourceID: source.id,
           label: source.label,
-          sourceClassification: source.sourceClassification
+          sourceClassification: source.sourceClassification,
+          ...(source.kind === "researchAnswer" ? { includeResearchMetadata: false } : {})
         });
         setDirty();
         renderWorkspaceContent();
@@ -31697,7 +31948,7 @@ async function renderProjectReportDraft(project, resume = null) {
         }
       });
     }
-    const researchSources = sources.filter((source) => source.kind === "researchAnswer");
+    const researchSources = sources.filter((source) => source.kind === "researchAnswer" && !source.isRecovery);
     appendSourceGroup("Research", "", (groupBody) => {
 
       researchSources.forEach((source) => appendSourceCard(groupBody, source));
@@ -32212,7 +32463,7 @@ async function renderProjectReportDraft(project, resume = null) {
           title: [source.sectionNumber, stripLeadingSectionNumber(source.title || "", source.sectionNumber)].filter(Boolean).join(" "),
           detail: [source.codePrefix || "Code", savedEvidenceEdition(source), source.selectionBlockID ? "Passage" : "Section"].filter(Boolean).join(" · ")
         };
-        return { title: reportBlockTitle(block), detail: ({ heading: "Heading", paragraph: block.derivedFrom?.kind === "notebookCard" ? "Notebook note" : "Paragraph", list: "List", notebookCard: "Notebook note", researchAnswer: "Research answer", projectFacts: "Project facts" })[block.kind] || "Source" };
+        return { title: reportBlockTitle(block), detail: ({ heading: "Heading", paragraph: block.derivedFrom?.kind === "notebookCard" ? "Notebook note" : "Paragraph", list: "List", notebookCard: "Notebook note", researchAnswer: "Research answer", projectFacts: block.sourceID?.endsWith(":context") ? "Project Context" : "Project facts" })[block.kind] || "Source" };
       },
       onNavigate: target => {
         if (target === metadata && introductionLabel.getAttribute("aria-expanded") === "false") introductionLabel.click();
@@ -43636,6 +43887,9 @@ function openColumnGroupMenu(panel, anchor) {
       refreshColumnGroupPresentation();
       saveWorkspaceState();
     });
+  } else if (workspacePrivatePresentationAllowed() && canGroupWorkspaceColumn(panel.dataset.paneId)) {
+    separate();
+    add('Group columns…', () => openColumnGroupEditor(panel));
   }
   document.body.append(menu);
   const position = () => {
@@ -43692,6 +43946,7 @@ function columnGroupChoiceDetails(pane, position, index) {
 function openColumnGroupEditor(panel, existing = null) {
   if (!workspacePrivatePresentationAllowed()) return;
   const workspaceID = activeWorkspaceID;
+  const identity = captureAccountRequest();
   document.querySelector('.column-group-dialog')?.remove();
   const dialog = document.createElement('dialog');
   dialog.className = 'column-group-dialog';
@@ -43752,7 +44007,7 @@ function openColumnGroupEditor(panel, existing = null) {
   dialog.addEventListener('cancel', () => { dialog.remove(); });
   dialog.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
-    if (workspaceID !== activeWorkspaceID) { close(); return; }
+    if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) { close(); return; }
     const members = new Set(choices.filter(({ input }) => input.checked).flatMap(({ unit }) => unit));
     if (members.size < (existing ? 1 : 2) || !name.value.trim()) {
       dialog.querySelector('.column-group-editor-error').textContent = existing ? 'Enter a name and select at least one column.' : 'Enter a name and select at least two columns.';
@@ -43916,7 +44171,8 @@ function preparePaneCollapse(panel) {
     ? ["Detail", panel.__sectionPayload?.sectionNumber].filter(Boolean).join(" · ")
     : "";
   const title = detailLabel || codeLabel || heading?.textContent?.trim() || "Column";
-  const label = codeLabel ? [codeLabel, chapterLabel].filter(Boolean).join(" · ") : title;
+  const readerLocation = panel.classList.contains("reader-panel") ? panel.querySelector(".panel-title")?.textContent?.trim() : "";
+  const label = codeLabel ? [codeLabel, readerLocation || chapterLabel].filter(Boolean).join(" · ") : title;
   header.tabIndex = -1;
   header.setAttribute("role", "group");
   header.setAttribute("aria-label", `${label} column header`);

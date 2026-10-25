@@ -354,7 +354,8 @@ import { validateGuidanceQualificationReview } from "./research-guidance-qualifi
 import { materializeGuidanceSourceResolutions, validateGuidanceSourceResolutions } from "./research-guidance-source-resolutions.mjs";
 import { repairGuidanceDeclaredActions } from "./research-guidance-action-repairs.mjs";
 import { bindResearchNarrativeSources } from "./research-narrative-source-bindings.mjs";
-import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
+import { resolveResearchCodeBasis, selectedEvidenceCorpusPlan } from "./research-code-basis.mjs";
+import { completeSearchTextIndex } from "./search-complete-index.mjs";
 import { researchFailedHumanMeasurementTopicContext } from "./research-measurement-subject.mjs";
 import { refreshZoningContextEvidence, zoningContextExcerptPrompt } from "./research-zoning-context-excerpts.mjs";
 import { isZoningConditionalExplanation, planZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
@@ -16954,6 +16955,9 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
         id: answer.id,
         kind: "researchAnswer",
         label: answer.question.length > 500 ? `${answer.question.slice(0, 499)}…` : answer.question,
+        isRecovery: answer.answer?.mode === "clarification" && answer.answer?.model === "permitext-conversation-clarification" &&
+          answer.answer?.verification?.pass === false && answer.answer?.verification?.status === "clarification" &&
+          ["verification_source", "verification_context", "verification_format", "verification_incomplete", "evidence_unavailable", "research_unresolved"].includes(answer.answer?.verification?.reason),
         summary: reportResearchPlainText(answer.answer?.answerText || answer.answer?.conclusion || "").slice(0, 500),
         sourceClassification: "ai-assisted",
         updatedAt: answer.createdAt,
@@ -17369,7 +17373,10 @@ function reportManifestItemForDraftBlock(block, sourcesByKey) {
   if (["heading", "paragraph", "list"].includes(block.kind)) return block;
   const source = sourcesByKey.get(`${block.kind}:${block.sourceID}`);
   if (!source) throw new Error(`Report source is unavailable: ${block.label}`);
-  return { ...source.manifestItem, id: block.id };
+  return { ...source.manifestItem, id: block.id,
+    ...(block.reportTitle !== undefined ? { reportTitle: block.reportTitle } : {}),
+    ...(block.kind === "researchAnswer" && typeof block.includeResearchMetadata === "boolean"
+      ? { includeResearchMetadata: block.includeResearchMetadata } : {}) };
 }
 
 function reportManifestItemsForDraftBlock(block, sourcesByKey) {
@@ -19086,7 +19093,10 @@ async function handleResearchConversationCreate(request, response) {
         createdAt: now,
         updatedAt: now,
         codeVersion: defaultSyncCodeVersion,
-        codeBasis: researchCodeBasis(projectID, projectInformation, now),
+        codeBasis: researchCodeBasis(projectID, projectInformation, now,
+          context.body.analysisMode === assistantScopeMode
+            ? selectedEvidenceCorpusPlan(sources.filter(source => source.kind === "selection"),
+              cachedResearchCorpusRegistry || createResearchCorpusRegistry()) : null),
         evidenceSetVersion: 1,
         primaryProjectID: projectID,
         projectContext: projectID ? {
@@ -20669,7 +20679,9 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     const propertyResearch = mockMode || conversationOnly ? null : await researchPropertyContext({ question, messages: activeMessages, projectInformation });
-    const corpusPlan = await researchCorpusPlanForTurn({
+    const corpusPlan = conversationOnly
+      ? selectedEvidenceCorpusPlan(pinnedEvidence, await currentResearchCorpusRegistry())
+      : await researchCorpusPlanForTurn({
       question,
       messages: activeMessages,
       topicContext,
@@ -20696,6 +20708,9 @@ async function handleResearchConversationMessage(request, response) {
       new Date().toISOString(),
       corpusPlan
     );
+    // This is the live conversation's next-turn basis. Saved answer records
+    // retain the immutable basis captured when their own turn completed.
+    conversation.codeBasis = structuredClone(answerCodeBasis);
     researchOperation.preparationMilliseconds = Math.round(performance.now() - preparationStartedAt);
     progressResponse.progress("preparing_question", "completed");
     const retrievalStartedAt = performance.now();
@@ -23990,10 +24005,26 @@ export async function publicSearchCatalogs() {
 }
 
 export async function publicSearchIndexes() {
-  const indexes = await Promise.all([shippedSearchIndex(), historicalConstructionSearchIndex(),
-    zoningSearchIndex(), existingBuildingSearchIndex(), enactedSearchIndex()]);
+  const families = ["construction", "historical2014", "zoning", "existingBuilding", "enacted"];
+  const catalogs = await publicSearchCatalogs();
+  const loaders = [shippedSearchIndex, historicalConstructionSearchIndex,
+    zoningSearchIndex, existingBuildingSearchIndex, enactedSearchIndex];
+  const indexes = await Promise.all(families.map((family, index) =>
+    completePublicSearchIndex(family, () => catalogs[family], loaders[index])));
   return Object.fromEntries(["construction", "historical2014", "zoning", "existingBuilding", "enacted"]
     .map((family, index) => [family, indexes[index]]));
+}
+
+const completedPublicSearchIndexes = new Map();
+function completePublicSearchIndex(family, catalogLoader, indexLoader) {
+  if (!completedPublicSearchIndexes.has(family)) {
+    const load = createRetryableLazyLoader(async () => {
+      const [catalog, index] = await Promise.all([catalogLoader(), indexLoader()]);
+      return completeSearchTextIndex(catalog, index, publicSearchSectionText);
+    });
+    completedPublicSearchIndexes.set(family, load);
+  }
+  return completedPublicSearchIndexes.get(family)();
 }
 
 export async function allSectionCatalogByID() {
@@ -24371,7 +24402,8 @@ async function handleCodeSearch(request, response) {
   };
   const familySearches = [];
   const loadSearchFamily = async (catalogLoader, indexLoader, family) => {
-    const loadIndex = () => preparedSearchRuntime.index(family, indexLoader);
+    const loadIndex = () => preparedSearchRuntime.index(family,
+      () => completePublicSearchIndex(family, catalogLoader, indexLoader));
     if (activeScope === null) {
       const [catalog, index] = await Promise.all([
         timePublicCodePhase("catalog_load", catalogLoader),

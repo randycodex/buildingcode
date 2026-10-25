@@ -185,6 +185,8 @@ export function normalizeReportDraftBlock(block, index = 0) {
     id: requiredText(block?.id || randomUUID(), "Report block ID", 256),
     kind,
     order: index,
+    ...(block.reportTitle !== undefined ? { reportTitle: optionalText(block.reportTitle, 240) } : {}),
+    ...(kind === "researchAnswer" && typeof block.includeResearchMetadata === "boolean" ? { includeResearchMetadata: block.includeResearchMetadata } : {}),
     ...(block.sourceFormatting !== undefined ? {sourceFormatting: normalizeSourceFormatting(block.sourceFormatting)} : {})
   };
   if (authoredBlockKinds.has(kind)) {
@@ -476,6 +478,8 @@ export function normalizeReportManifestItem(item, index = 0) {
     id: requiredText(item?.id || randomUUID(), "Report item ID", 256),
     kind,
     order: index,
+    ...(item.reportTitle !== undefined ? { reportTitle: optionalText(item.reportTitle, 240) } : {}),
+    ...(kind === "researchAnswer" && typeof item.includeResearchMetadata === "boolean" ? { includeResearchMetadata: item.includeResearchMetadata } : {}),
     sourceClassification: manifestSourceClassification(kind),
     ...(item.sourceFormatting !== undefined ? {sourceFormatting: normalizeSourceFormatting(item.sourceFormatting)} : {}),
     ...(item.reportCommentKey ? {reportCommentKey: requiredText(item.reportCommentKey,"Report comment key",256)} : {})

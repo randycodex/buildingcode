@@ -5456,6 +5456,7 @@ select option:checked {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
+.result-row-main p.has-separated-matches { -webkit-line-clamp: 4; }
 
 .search-result-summary {
   display: flex;
@@ -21053,3 +21054,34 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .research-related-reviewed { margin-top: 12px; }
 .research-related-reviewed blockquote { margin: 10px 0; padding: 0 12px; max-height: 230px; overflow: auto; border-left: 2px solid var(--border); font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
 .research-related-footer { padding: 12px 0 0; border-top: 1px solid var(--border); }
+
+/* Release audit: transient confirmations stay outside the toolbar layout. */
+.workspace-success-notice {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(560px, calc(100vw - 40px));
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 18%);
+  font-size: 13px;
+}
+.workspace-success-notice > span { overflow-wrap: anywhere; }
+.workspace-success-notice button { flex-shrink: 0; white-space: nowrap; }
+.research-passage-warning { color: var(--text-primary); border-left: 3px solid var(--code-accent, var(--text-secondary)); padding: 8px 12px; background: var(--surface-muted); font-size: 12px; line-height: 1.5; }
+.saved-passage-scope { margin: 16px 0; padding: 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; line-height: 1.5; }
+.saved-passage-scope blockquote { margin: 10px 0; white-space: pre-wrap; }
+.saved-passage-scope > p:last-child { color: var(--text-secondary); font-size: 12px; }
+.research-containing-section-preview, .research-request-review { max-height: 48vh; overflow: auto; white-space: pre-wrap; font-size: 13px; line-height: 1.5; }
+.research-request-review blockquote { margin: 8px 0 20px; }
+.report-finding-title { display: grid; gap: 6px; margin: 8px 0; font-size: 12px; color: var(--text-secondary); }
+.report-finding-title input { width: 100%; padding: 9px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text-primary); font: inherit; font-size: 14px; }
+.report-research-metadata-option { display: flex; align-items: center; gap: 8px; margin: 10px 0; font-size: 12px; line-height: 1.5; color: var(--text-secondary); text-transform: none; letter-spacing: normal; }
+.report-research-metadata-option input[type="checkbox"] { width: 18px; height: 18px; min-height: 18px; flex: 0 0 18px; padding: 0; margin: 0; accent-color: var(--text-link); }

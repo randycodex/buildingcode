@@ -5,6 +5,8 @@ const sw = await readFile(new URL('../public/service-worker.js', import.meta.url
 const storage = await readFile(new URL('../public/offline-storage.js', import.meta.url), 'utf8');
 const manifestURLs = source => JSON.parse(source.slice(source.indexOf('const shellURLs = ') + 'const shellURLs = '.length, source.indexOf('];', source.indexOf('const shellURLs')) + 1));
 assert.deepEqual(manifestURLs(storage), manifestURLs(sw), 'Manual preparation and service worker must cache the same complete shell');
+assert.equal(storage.match(/const shellCacheName = "([^"]+)"/)[1], sw.match(/const shellCacheName = "([^"]+)"/)[1],
+  'Manual preparation and the service worker must use the same shell cache generation');
 const expected = sw.match(/"(\/web\/app\.js\?[^"\n]+)"/)[1];
 const html = (src = expected) => `<html><script type="module" src="${src}"></script></html>`;
 function harness(source = sw, gateBodies = false) {

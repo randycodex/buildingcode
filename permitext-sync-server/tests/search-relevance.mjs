@@ -8,6 +8,8 @@ const query = 'accessible route';
 assert(searchRelevanceRank({sectionNumber:'1104.1',title:'1104.1 Accessible route.',headingLine:'ACCESSIBLE ROUTES'},query) <
   searchRelevanceRank({sectionNumber:'404.2.3',title:'An accessible route shall connect all spaces, including exceptions to this requirement and every associated entrance in this building.'},query));
 assert.equal(searchRelevanceRank({sectionNumber:'1104.1',title:'Accessible routes'},'1104.1'),0);
+assert(searchRelevanceRank({sectionNumber:'1004.1.3',title:'Areas without fixed seating',headingLine:'OCCUPANT LOAD'},'occupant load business','Business areas 100 gross') <
+  searchRelevanceRank({sectionNumber:'202',title:'Definitions',headingLine:'DEFINITIONS'},'occupant load business','Incidental occupant load and business definitions.'));
 const vocabulary = searchVocabulary([{title:'Fire separation distance'},{title:'Corridor walls'}]);
 assert.deepEqual(searchSpellingSuggestions('fire seperation',vocabulary),['fire separation']);
 assert.deepEqual(searchSpellingSuggestions('corrid',vocabulary),[]);

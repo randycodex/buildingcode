@@ -103,6 +103,7 @@ for (const operation of ["switchWorkspace", "duplicateNamedWorkspace", "removeNa
   context.confirmWorkspaceTransition = async () => true;
   context.confirmWebWarning = async () => true;
   context.presentWorkspaceIssue = (message) => issues.push(message);
+  context.clearWorkspaceNotice = () => {};
   context.renderWorkspaceTabs = () => {};
   context.focusActiveWorkspaceTab = () => {};
   const snapshot = declaration("loadWorkspaceSnapshot").text;

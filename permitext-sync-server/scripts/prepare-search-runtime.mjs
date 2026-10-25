@@ -42,7 +42,7 @@ export async function prepareSearchRuntime(family, catalog, index, directory) {
   };
   append(index, tokens, ends);append(lexical.aliases, aliasTokens, aliasEnds);
   const bytes = Buffer.concat(postings);
-  const metadata = serialize({schemaVersion:1, family, buildCommit:process.env.VERCEL_GIT_COMMIT_SHA || null,
+  const metadata = serialize({schemaVersion:2, family, buildCommit:process.env.VERCEL_GIT_COMMIT_SHA || null,
     bytes:bytes.length, sha256:searchRuntimeDigest(bytes), catalog:packSearchCatalog(catalog),
     tokens, ends, aliasTokens, aliasEnds, vocabulary:lexical.vocabulary});
   await writeFile(new URL(`${family}.runtime`, directory), metadata);

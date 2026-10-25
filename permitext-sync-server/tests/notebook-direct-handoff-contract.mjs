@@ -51,22 +51,26 @@ for(const changed of ['none','card','disposed','readonly','conflict','loading'])
 }
 console.log('Direct Note handoff: open saved/unsaved Note without dialog, exact edition/passage, same-Project destination, new Note fallback and editor guards passed.');
 const handoffStart=source.indexOf('function renderResearchNotebookHandoff(');
-const handoffCode=source.slice(handoffStart,source.indexOf('\nfunction renderResearchMessageCapture(',handoffStart));
+const handoffCode=source.slice(source.indexOf('async function chooseResearchNoteDestination('),source.indexOf('\nfunction renderResearchMessageCapture(',handoffStart));
 for(const changed of [false,true]){
  const nodes=[],insertions=[];let finish;
  const inserted=new Promise(resolve=>finish=resolve);
  const element=tag=>{const e={tag,children:[],isConnected:true,value:'',append(...children){this.children.push(...children);if(tag==='select')this.value=children[0].value;},setAttribute(){},addEventListener(type,fn){this[type]=fn;},closest:()=>({dataset:{paneId:'assistant'}})};nodes.push(e);return e;};
- const c=vm.createContext({window:{requestAnimationFrame:()=>{}},document:{createElement:element},hasCapability:()=>true,researchProjects:()=>[{id:'p'}],
+ const c=vm.createContext({window:{requestAnimationFrame:()=>{}},document:{createElement:element},hasCapability:()=>true,researchAnswerHasVerificationRecovery:()=>false,researchProjects:()=>[{id:'p'}],
  researchProjectID:p=>p.id,readableProjectName:()=> 'Project',crypto:{randomUUID:()=> 'mutation'},
  captureAccountRequest:()=>({userID:'u'}),isCurrentAccountRequest:()=>true,state:{workflowNavigationGeneration:0},activeWorkspaceID:'w',researchAnswerQuestion:()=> 'Question',
  notebookMounts:new Map([['p',{insertionTarget:()=>({id:'existing',title:'My writing'}),insertLinkedReference:async(...args)=>{insertions.push(args);await inserted;}}]]),
- openWebWarning:()=>assert.fail('An open Note must not show a destination dialog'),showWebNotice:async()=>assert.fail('Unexpected notice')});
+ navigator:{onLine:true},loadInitialNotebookCardList:async()=>({cards:[{id:'existing',title:'My writing'}]}),
+ pendingNotebookCardByProject:new Map(),
+ openWebWarning:async options=>{assert.equal(options.choiceLabel,'Destination Note');assert(options.choices.some(choice=>choice.label==='Current Note: My writing'));return 'current';},
+ showWebNotice:async()=>assert.fail('Unexpected notice')});
  vm.runInContext(handoffCode,c);c.renderResearchNotebookHandoff({primaryProjectID:'p'},{id:'answer',answer:{}});
- const pending=nodes.find(e=>e.textContent==='Add to note').click();
+ const pending=nodes.find(e=>e.textContent==='Add to note…').click();
+ await new Promise(resolve=>setImmediate(resolve));
  if(changed)c.state.workflowNavigationGeneration++;
  finish();await pending;
  assert.equal(insertions.length,1);
  assert.equal(insertions[0][0],'existing');assert.equal(insertions[0][1].referenceID,'answer');
- assert.equal(nodes.find(e=>e.tag==='button').textContent,changed?'Add to note':'Added to note','A stale completion must not update the new view.');
+ assert.equal(nodes.find(e=>e.tag==='button').textContent,changed?'Add to note…':'Open Note: My writing','A stale completion must not update the new view.');
 }
-console.log('Assistant insertion uses the open Note without a dialog and ignores stale completion UI.');
+console.log('Research insertion names and confirms the selected Note, and ignores stale completion UI.');

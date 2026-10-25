@@ -22,11 +22,11 @@ for (const delay of ['confirmation','save','ready','refresh','none']) {
     let activeCard = '';
     const c = vm.createContext({window:{requestAnimationFrame:()=>{}},
       state:{workflowNavigationGeneration:0},activeWorkspaceID:'w',
-      document:{createElement:element},hasCapability:()=>true,researchProjects:()=>[project],
+      document:{createElement:element},hasCapability:()=>true,researchAnswerHasVerificationRecovery:()=>false,researchProjects:()=>[project],
       researchProjectID:p=>p.id,readableProjectName:p=>p.name,crypto:{randomUUID:()=> 'test-id'},
       captureAccountRequest:()=>({userID:'local'}),isCurrentAccountRequest:()=>true,
       requireCurrentAccountRequest(){},researchAnswerQuestion:()=> 'Research question',
-      confirmWebWarning:()=>delay==='confirmation'?gate:Promise.resolve(true),navigator:{onLine:true},
+      chooseResearchNoteDestination:async()=>{if(delay==='confirmation')await gate;return {kind:'new'};},navigator:{onLine:true},
       emptyNotebookDocument:()=>({document:[]}),
       postResearch:async()=>{calls.push('saved');return delay==='save'?gate:{card:{id:'note'}};},
       saveNotebookCardSnapshot:async()=>{},pendingNotebookCardByProject:new Map(),
@@ -45,7 +45,7 @@ for (const delay of ['confirmation','save','ready','refresh','none']) {
     if (['ready','refresh'].includes(delay)) {
       await saveButton.click();
       assert.deepEqual(calls,['saved']);
-      assert.equal(saveButton.textContent,'Open note in Research');
+      assert.equal(saveButton.textContent,'Open Note: Untitled Note');
     }
     const pending = saveButton.click();
     await tick();
@@ -55,7 +55,7 @@ for (const delay of ['confirmation','save','ready','refresh','none']) {
     await pending;
     if(change==='none') {
       assert.deepEqual(calls,['saved'],'Saving a note must not open or link Notes into Research');
-      assert.equal(saveButton.textContent,'Open note in Research');
+      assert.equal(saveButton.textContent,'Open Note: Untitled Note');
       await saveButton.click();
       assert.deepEqual(calls,['saved',['placed','research:one','notebook:p'],'opened','focused']);
       assert.equal(c.pendingNotebookCardByProject.size,0);

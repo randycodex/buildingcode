@@ -184,7 +184,9 @@ assert.equal(readResearchRequestRecovery(storage,record,103).recoveryReason,"");
 assert.equal(readResearchRequestRecovery(storage,record,103).errorStatus,0);
 
 const app=await readFile(new URL("../app.mjs",import.meta.url),"utf8");
-assert.match(app,/if \(!assembledEvidence\.length\) \{[\s\S]*?clarificationReason: "evidence_unavailable"/);
+// The existing selected-passage/open-investigation branches have their own
+// evidence handling. Check the ordinary retrieval guard without broadening it.
+assert.match(app,/if \(!assembledEvidence\.length && !openInvestigation && !conversationOnly\) \{[\s\S]*?clarificationReason: "evidence_unavailable"/);
 assert.match(app,/!conditionalZoningExplanation\) \{[\s\S]*?clarificationReason: "research_unresolved"/);
 assert.match(app,/recoveryReason: failureRecovery\.reason/);
 const client=await readFile(new URL("../public/app.js",import.meta.url),"utf8");

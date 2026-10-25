@@ -28,6 +28,9 @@ assert.deepEqual(searchWordPosting(laundryIndex,'fa'),[], 'Short prefixes do not
 assert.deepEqual([...candidateSectionIDs(laundryIndex,searchWords('laundry facilit'),'laundry facilit','laundry facilit',new Set([1,4]),'words')],[1,4]);
 assert.match(searchWordsSnippet('Unrelated opening. '.repeat(30)+'Corridors with dead ends require review.', 'dead end corridor'), /Corridors with dead ends/);
 assert.match(searchWordsSnippet('Unrelated opening. '.repeat(30)+'Laundry facilities shall be provided.', 'laundry facilit'), /Laundry facilities/);
+const distantTable = searchWordsSnippet('Occupant load. '+ 'Unrelated table rows. '.repeat(50)+'Business areas 100 gross.', 'occupant load business');
+assert.match(distantTable,/Occupant load/);assert.match(distantTable,/Business areas/);
+assert.match(distantTable,/ … /,'Separate source excerpts must disclose the omitted intervening rows.');
 const server=createServer(handleRequest);
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const get=async params=>{const r=await fetch(`http://127.0.0.1:${server.address().port}/code/search?${new URLSearchParams({version:'all',code:'BC',match:'words',grouped:'true',limit:'25',...params})}`);assert.equal(r.status,200);return r.json();};
@@ -48,6 +51,13 @@ try {
  assert.equal(completeOnly.results.length,0, 'Exact phrase does not gain word completion');
  const numbered=await get({q:'1020.4'});
  assert(numbered.results.some(r=>r.sectionNumber==='1020.4'));
+ const business=await get({q:'occupant load business',version:'current'});
+ assert(business.results.some(r=>r.sectionNumber==='1004.1.3' && r.codeVersion.includes('/2022-')),
+  'The natural business occupant-load query must find the separate table in the real BC 2022 source.');
+ const businessTable=business.results.find(r=>r.sectionNumber==='1004.1.3');
+ assert.equal(business.results[0].sectionNumber,'1004.1.3','The governing subject heading should outrank incidental matches in Definitions.');
+ assert.match(businessTable.snippet,/Business areas/i,'The snippet must expose the matching table text.');
+ assert(businessTable.snippet.indexOf('Business areas')<180,'The matched row belongs in the visible excerpt, ahead of irrelevant table rows.');
  const empty=await get({q:'dead end corridor',sourceScope:JSON.stringify({version:1,enabledSources:[]})});assert.equal(empty.results.length,0);
  const none=await get({q:'qzxvnonexistent corridor'});assert.equal(none.results.length,0);
  const initial=await get({q:'concrete'});
