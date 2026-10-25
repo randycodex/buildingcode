@@ -42,7 +42,7 @@ assert.deepEqual(canonicalized[0].sourceChapterIDs, ["46", "47", "48", "49"]);
 assert.equal(canonicalized[0].sectionCount, 13);
 
 assert.match(clientSource, /&match=\$\{matchMode\}&readerSourceMetadata=1&limit=\$\{searchResultPageSize\}&offset=0&candidateOffset=0&grouped=true\$\{sourceScope\.querySuffix\}/);
-assert.match(clientSource, /&match=\$\{options\.matchMode \|\| "exact"\}` \+[\s\S]*?&candidateOffset=\$\{encodeURIComponent\(String\(options\.candidateOffset\)\)\}\$\{options\.sourceScope\.querySuffix\}/);
+assert.match(clientSource, /&match=\$\{options\.matchMode \|\| "words"\}` \+[\s\S]*?&candidateOffset=\$\{encodeURIComponent\(String\(options\.candidateOffset\)\)\}\$\{options\.sourceScope\.querySuffix\}/);
 assert.match(clientSource, /matchMode === "words" \|\| searchResultMatchesExactQuery\(result, query\)/, "Phrase mode must still exact-filter initial results.");
 assert.match(clientSource, /options\.matchMode === "words" \|\| searchResultMatchesExactQuery\(result, options\.query\)/, "Phrase mode must still exact-filter later pages.");
 assert.match(clientSource, /function renderWorkspaceLoadError\(error\)[\s\S]*?role", "alert"[\s\S]*?Try again[\s\S]*?window\.location\.reload\(\)/);
@@ -53,7 +53,7 @@ assert.match(stylesSource, /\.workspace-load-error \.toolbar-button \{[\s\S]*?bo
 assert.match(stylesSource, /\.workspace-panel:not\(\.reader-panel\),[\s\S]*?scrollbar-width: none;[\s\S]*?\.workspace-panel:not\(\.reader-panel\) \*::-webkit-scrollbar \{[\s\S]*?display: none;/);
 assert.doesNotMatch(stylesSource, /\.reader-content[^}]*scrollbar-width: none;/);
 assert.match(stylesSource, /\.reader-panel \.reader-content \{[^}]*margin-right: 0;[^}]*padding-inline: var\(--space-4\);[^}]*scrollbar-gutter: stable both-edges;[^}]*scrollbar-color: auto;[^}]*scrollbar-width: auto;/);
-assert.match(stylesSource, /\.reader-panel \.reader-content::\-webkit-scrollbar-track \{[\s\S]*?margin-top: calc\(var\(--reader-scrollbar-track-top\) - var\(--panel-padding\)\);/);
+assert.match(stylesSource, /\.reader-panel \.reader-content::\-webkit-scrollbar-track \{[\s\S]*?margin-top: calc\(var\(--reader-scrollbar-track-top\) \+ var\(--space-5\)\);/);
 assert.match(stylesSource, /\.reader-panel \.reader-body \{[^}]*grid-row: 1;[^}]*margin-bottom: 0;/, "Reader content must stop at the shared column bottom baseline.");
 assert.match(stylesSource, /\.search-panel \.search-box \{[^}]*height: 48px;[^}]*min-height: 48px;[^}]*border: 0;[^}]*border-radius: var\(--radius-pill\);/, "The main Search field must be 48 pixels high.");
 assert.match(stylesSource, /\.report-draft-add-controls button \{[^}]*width: auto;[^}]*height: 40px;[^}]*min-height: 40px;/, "Compact Report add controls must remain 40 pixels high.");
@@ -74,7 +74,7 @@ assert.doesNotMatch(clientSource, /const visibleProjects = visibleRecords\.filte
 assert.match(clientSource, /function unassignedSavedEvidenceKeys[\s\S]*?activeProjectRecords\(projects \|\| \[\]\)/);
 assert.match(clientSource, /typeLabel\.textContent = folderTypeLabel\(project\)/);
 assert.match(clientSource, /folderRecordCountLabel\(selectedProjects\)/);
-assert.match(indexSource, /id="add-reader"[^>]*aria-label="Reader"[^>]*title="Reader"[\s\S]*?<span>Reader<\/span>/);
+assert.match(indexSource, /id="add-reader"[^>]*aria-label="Reader"[^>]*title="Reader"[\s\S]*?<span>Reader<span aria-hidden="true"> \+<\/span><\/span>/);
 assert.match(indexSource, /class="workflow-layout-actions"[^>]*aria-label="Column layout"/);
 assert.match(indexSource, /id="collapse-all-columns"[^>]*data-workspace-icon="panel-left-close"[\s\S]*?id="expand-all-columns"[^>]*data-workspace-icon="panel-left-open"[\s\S]*?id="fit-columns"[^>]*data-workspace-icon="rotate-ccw"[\s\S]*?id="collapse-readers"[^>]*data-workspace-icon="minimize"/);
 assert.match(indexSource, /settings-project-clear-all[\s\S]*?Move all projects to Trash/);
