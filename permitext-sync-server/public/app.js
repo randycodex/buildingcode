@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-release-blockers-v1362";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-fast-research-v1363";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-release-blockers-v1362";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-fast-research-v1363";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261025-release-blockers-v1362";
+} from "./offline-storage.js?v=20261025-fast-research-v1363";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -22855,6 +22855,12 @@ function renderResearchInterpretation(container, result, options = {}) {
       : result.authorityLabel;
     metadata.append(authority);
   }
+  if (result.verification?.status === "unreviewed") {
+    const status = document.createElement("p");
+    status.className = "research-authority-status";
+    status.textContent = "Fast answer · Unreviewed";
+    card.append(status);
+  }
   const reportMessage = options.message || options.recordMessage;
   appendResearchAnswerNarrative(card, result, recoveryQuestion, Boolean(reportMessage?.id && options.conversationID));
   if (researchAnswerHasVerificationRecovery(result) && options.conversationID && recoveryQuestion) {
@@ -23231,7 +23237,7 @@ async function ensureResearchProjectSynced(projectID, account = activeAccount())
   saveWorkspaceState();
 }
 
-async function postResearchWithProgress(values, { signal, onProgress } = {}) {
+async function postResearchWithProgress(values, { signal, onProgress, onText } = {}) {
   const account = activeAccount();
   const identity = captureAccountRequest();
   if (!account) throw new Error("Sign in from Account to use private research conversations.");
@@ -23282,6 +23288,7 @@ async function postResearchWithProgress(values, { signal, onProgress } = {}) {
     requireCurrentAccountRequest(identity);
     if (!line.trim()) return;
     const event = JSON.parse(line);
+    if (event.type === "delta") { onText?.(event.text); return; }
     if (event.type === "progress") {
       onProgress?.(event.progress);
       return;
@@ -25082,6 +25089,7 @@ function persistResearchProgressSession(progress) {
   return writeResearchRequestRecovery(localStorage, {
     ...scope,
     question: progress.question,
+    answerMode: progress.answerMode || "fast",
     status: progress.status,
     startedAt: progress.startedAt,
     endedAt: progress.endedAt,
@@ -25128,6 +25136,7 @@ function restoreResearchProgressSession(conversation) {
     id: saved.requestID,
     conversationID,
     question: saved.question,
+    answerMode: saved.answerMode || "fast",
     startedAt: saved.startedAt,
     endedAt: saved.endedAt || Date.now(),
     status: interrupted ? "failed" : saved.status,
@@ -25272,6 +25281,17 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
   elapsed.textContent = researchProgressElapsed(progress.startedAt, progress.endedAt);
   loading.append(renderResearchPixelGrid(), label, elapsed);
   card.append(loading);
+  if (progress.partialText) {
+    const draft = document.createElement("div");
+    draft.className = "research-answer-narrative research-streamed-draft";
+    draft.style.whiteSpace = "pre-wrap";
+    draft.textContent = progress.partialText;
+    const state = document.createElement("p");
+    state.className = "research-authority-status";
+    state.textContent = ["failed", "cancelled"].includes(progress.status)
+      ? "Incomplete answer · Not saved" : "Fast answer · Unreviewed · Writing…";
+    card.append(state, draft);
+  }
 
   if (progress.error) {
     const error = document.createElement("p");
@@ -25488,6 +25508,7 @@ async function runResearchProgressSession(
       progress.stages = new Map(researchProgressStages.map((stage) => [stage.id, "pending"]));
       progress.stages.set("preparing_question", "retrying");
       progress.status = "retrying";
+      progress.partialText = "";
       progress.error = "";
       progress.errorCode = "";
       progress.errorStatus = 0;
@@ -25505,9 +25526,15 @@ async function runResearchProgressSession(
       const result = await postResearchWithProgress({
         conversationID: progress.conversationID,
         question: progress.question,
-        requestID: progress.id
+        requestID: progress.id,
+        answerMode: progress.answerMode || "fast"
       }, {
         signal: progress.controller.signal,
+        onText: text => {
+          if (!isCurrentAccountRequest(requestIdentity) || !researchProgressViewIsCurrent(view)) return;
+          progress.partialText = (progress.partialText || "") + text;
+          refreshResearchProgressCard(progress);
+        },
         onProgress: (event) => {
           if (isCurrentAccountRequest(requestIdentity)) updateResearchProgressSession(progress, event);
         }
@@ -28185,6 +28212,13 @@ async function renderResearchConversation(conversationID, options = {}) {
     input.disabled = true;
     if (!researchEnabled) input.placeholder = "Pro required to continue this Research conversation…";
   }
+  const answerMode = document.createElement("select");
+  answerMode.className = "research-answer-mode";
+  answerMode.setAttribute("aria-label", "Research answer mode");
+  for (const [value, label] of [["fast", "Fast answer"], ["verified", "Verified Research"]]) {
+    const option = document.createElement("option"); option.value = value; option.textContent = label; answerMode.append(option);
+  }
+  answerMode.disabled = researchRequestActive;
   const status = document.createElement("p");
   status.className = "research-composer-status";
   if (conversation.sourceStatus === "changed") {
@@ -28245,6 +28279,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     input.value = "";
     resizeComposerInput();
     const progress = createResearchProgressSession(conversationID, question);
+    progress.answerMode = answerMode.value;
     const pendingQuestion = document.createElement("article");
     pendingQuestion.className = "research-message is-user is-pending";
     const pendingQuestionText = document.createElement("p");
@@ -28312,7 +28347,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   composer.append(renderResearchIncludedPassages(conversation, paneID, {
     busy: researchRequestActive, onFindRelated: () => relatedReview.open()
   }),
-    starters, composerBox, status, passageScope);
+    starters, answerMode, composerBox, status, passageScope);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
     bindResearchEvidenceDivider(content, divider, conversation.id);

@@ -4,13 +4,13 @@ import {
   searchWordForms,
   matchesSearchWords,
   searchWordsSnippet,
-} from "./search-words.js?v=20261025-release-blockers-v1362";
+} from "./search-words.js?v=20261025-fast-research-v1363";
 import {
   searchRelevanceRank,
   matchingSearchDefinition,
   initialSearchGroupLimit,
   prepareSearchRelevance,
-} from "./search-relevance.js?v=20261025-release-blockers-v1362";
+} from "./search-relevance.js?v=20261025-fast-research-v1363";
 import {
   offlineSourceScope,
   offlineSectionMetadata,

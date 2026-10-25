@@ -780,6 +780,11 @@ export function immutableResearchAnswer({
   if (researchEvidence.length < 1 && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer && !(assistantScopeSnapshot?.version === assistantScopeVersion && suppliedTextAnswer)) {
     throw new Error("Research answers require evidence.");
   }
+  const fastUnreviewed = answer?.researchEngine === "fast-stream-v1" && answer?.mode === "openai" &&
+    answer?.verification?.status === "unreviewed" && answer?.verification?.pass === false &&
+    answer?.verification?.attempts === 0 && answer?.authorityStatus === "unreviewed" &&
+    model === "gpt-6-luna" && answer?.model === model && researchEvidence.length > 0 &&
+    typeof answer?.answerText === "string" && answer.answerText.trim().length > 0;
   const canonicalBoundary = researchEvidenceBoundaryInterpretation(question);
   const evidenceBoundaryAnswer =
     answer?.mode === "evidence_boundary" &&
@@ -804,7 +809,8 @@ export function immutableResearchAnswer({
     !conversationRecallAnswer &&
     !suppliedTextAnswer &&
     !investigatedEvidenceGapAnswer &&
-    !conversationEvidenceGap
+    !conversationEvidenceGap &&
+    !fastUnreviewed
   ) {
     throw new Error("Research answers require citations.");
   }

@@ -94,6 +94,7 @@ export function reportItemPreview(item) {
     add('',remaining);
   } else if (item.kind === 'researchAnswer') {
     add('Question',item.question);
+    if (item.authorityStatus === 'unreviewed') add('Answer status','Fast answer · Unreviewed');
     add('Research basis',[...(item.includeResearchMetadata === false ? [] : [item.authorityLabel || item.authorityStatus,item.codeEdition,item.sourceAsOf]),
       item.codeBasis?.disclosure,item.codeBasis?.limitation]);
     add('Corpus basis', [...(item.codeBasis?.searchedCorpora || []).map(corpus=>({kind:'Searched',corpus})),

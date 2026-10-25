@@ -75,7 +75,7 @@ async function baseline(input, signal) {
   if (sources.length !== 1) throw new Error('Baseline comparison currently requires exactly one selected passage.');
   const start = performance.now();
   const response = await request('/research/conversations/message', { auth: { accountUserID: userID },
-    conversationID: created.conversation.id, question: input.question, requestID: randomUUID() }, token);
+    conversationID: created.conversation.id, question: input.question, answerMode: 'verified', requestID: randomUUID() }, token);
   const answer = response.conversation.messages.findLast(m => m.role === 'assistant')?.answer;
   return { text: answer?.answerText || '', answer, sourceHash: sourceHash(sources), sources,
     status: answer?.verification?.pass ? 'completed_verified' : 'completed',

@@ -102,6 +102,7 @@ function normalizedResearchRequestRecovery(value) {
     conversationID,
     requestID,
     question,
+    answerMode: value.answerMode === "verified" ? "verified" : "fast",
     status,
     startedAt,
     endedAt: endedAt == null ? null : (Number.isFinite(endedAt) ? endedAt : null),

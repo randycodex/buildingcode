@@ -58,7 +58,7 @@ try {
  await adapter.saveResearchConversation(account.appUserID,raw,raw.revision);
  const sourceAdded=await request('/research/conversations/evidence',{auth,conversationID:conversation.id,sectionID:'41009495',selectedText:passage},token);
  assert.equal(sourceAdded.status,200,JSON.stringify(sourceAdded.body));assert.equal(calls.length,0);
- const result=await request('/research/conversations/message',{auth,conversationID:conversation.id,question,requestID:randomUUID()},token);
+ const result=await request('/research/conversations/message',{auth,conversationID:conversation.id,question,answerMode:"verified",requestID:randomUUID()},token);
  assert.equal(result.status,200,JSON.stringify(result.body));
  const answer=result.body.conversation.messages.at(-1).answer;
  assert.equal(answer.answerText,responseText.answerText);assert.deepEqual(answer.citations,[]);assert.equal(answer.verification.pass,true);

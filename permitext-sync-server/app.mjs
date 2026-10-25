@@ -1,3 +1,4 @@
+import { answerRequest as fastResearchRequest, fastResearchInterpretation } from "./research-fast-stream.mjs";
 import {applyWebSyncSafeguard} from "./web-sync-guard.mjs";
 import {webAppVersion} from "./public/web-client-version.js";
 import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
@@ -7517,6 +7518,7 @@ export function researchProgressResponder(request, response, enabled) {
   };
   return {
     enabled,
+    delta: text => { assertActive(); write({ type: "delta", text, status: "unreviewed" }); },
     signal: cancellationController.signal,
     startedAt,
     events,
@@ -20398,6 +20400,9 @@ async function commitMissingDocumentClarification({ context, conversation, origi
 async function handleResearchConversationMessage(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
+  if (context.body.answerMode != null && !["fast", "verified"].includes(context.body.answerMode)) {
+    sendError(response, 400, "Choose Fast answer or Verified Research."); return;
+  }
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
   if (context.body.analysisMode === assistantScopeMode) await ensureAssistantConversationScope(context.userID, conversation);
@@ -20717,6 +20722,112 @@ async function handleResearchConversationMessage(request, response) {
       new Date().toISOString(),
       corpusPlan
     );
+    if (!mockMode && context.body.answerMode !== "verified") {
+      if (!process.env.OPENAI_API_KEY) throw Object.assign(new Error("Research AI is not configured."), {code:"RESEARCH_NOT_CONFIGURED"});
+      // Reuse authorization, source freshness, idempotency and durable usage above.
+      // Fast delivery changes generation/review only; passage scope stays explicit.
+      const packageForFast = conversationOnly
+        ? assistantEvidencePackage({ question, pinnedEvidence, messages:activeMessages, topicContext, projectFacts:combinedProjectFacts })
+        : await assembledResearchEvidenceForTurn({ question, messages:activeMessages, pinnedEvidence,
+            originSurface:conversation.origin?.surface || "", projectFacts:combinedProjectFacts, topicContext, corpusPlan,
+            beforeSemanticRequest:async () => {
+              if (!(await ensureResearchTurnReservation())) throw Object.assign(new Error("Request handled."), {code:"RESEARCH_REQUEST_HANDLED"});
+            }, onStage:progressResponse.progress });
+      const evidence = packageForFast.sources || [];
+      if (!evidence.length) {
+        await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+          researchRequestID, progressResponse, evidenceSnapshots:[], clarificationReason:"evidence_unavailable" });
+        Object.assign(researchOperation, {status:"completed",mode:"clarification",charged:false});
+        return;
+      }
+      if (!(await ensureResearchTurnReservation())) return;
+      const now = new Date().toISOString();
+      const snapshots = evidence.map(source => immutableEvidenceSnapshot({ source, approvedAt:now,
+        evidenceSetVersion:Number(conversation.evidenceSetVersion || 1), sourceLibraryVersion:source.codeVersion || conversation.codeVersion }));
+      const sources = evidence.map((source,index) => ({ id:`S${index+1}`, sectionID:source.sectionID,
+        edition:source.codeEdition, authority:"enacted", title:[source.codePrefix,source.sectionNumber,source.title].filter(Boolean).join(" "),
+        text:source.text || source.selectedText || "" }));
+      const webDecision = conversationOnly ? {useWeb:false,reasons:[]} : researchWebSupportTrigger({question,
+        enactedEvidence:evidence,pinnedEvidenceCount:pinnedEvidence.length,projectFactsApplied:Boolean(combinedProjectFacts.length)});
+      let web = {sources:[],searched:false,usage:combinedResearchUsage()};
+      if (webDecision.useWeb) {
+        const workflow = webDecision.workflow;
+        const raw = workflow?.directDocumentRetrieval
+          ? {sources:workflow.sources,searched:true,usage:combinedResearchUsage()}
+          : await openAIResearchWebSupport(question,context.userID,{model:"gpt-6-luna",requireAttributableSources:true,signal:progressResponse.signal});
+        web = await bindResearchWebSupportToOfficialDocuments(raw,{question,
+          officialDomains:researchSourcePolicyConfiguration().officialDomains,
+          ...(workflow?.directDocumentRetrieval ? {requiredPassageTerms:workflow.passageTerms} : {}),
+          maximumSources:3,signal:progressResponse.signal});
+        if (!web.sources.length) throw Object.assign(new Error("Official source passages were unavailable."),{code:"INVALID_RESEARCH_WEB_CITATION"});
+        web.sources.forEach((source,index) => sources.push({id:`W${index+1}`,title:source.title,url:source.url,
+          edition:"Retrieved official guidance",authority:"supporting_guidance_not_enacted_code",
+          text:(source.attributedClaims || []).map(claim=>claim.verbatimText || claim.text || "").join("\n\n")}));
+      }
+      progressResponse.progress("preparing_question","completed");
+      progressResponse.progress("preparing_conclusion","active");
+      const body = fastResearchRequest(question,sources,combinedProjectFacts.join("\n"),activeMessages.slice(-6).map(message => ({
+        role:message.role,text:message.question || message.answer?.answerText || "" })));
+      body.safety_identifier = createHash("sha256").update(String(context.userID)).digest("hex");
+      const fastGenerationStartedAt = performance.now();
+      let firstTextMilliseconds = null;
+      const {payload} = await requestResearchProvider({apiKey:process.env.OPENAI_API_KEY, requestBody:body,
+        signal:progressResponse.signal,timeoutMilliseconds:120000,maximumAttempts:1,
+        failureMessage:"The fast Research answer could not complete.", onText:text => {
+          if (firstTextMilliseconds === null && text.trim()) firstTextMilliseconds = Math.round(performance.now()-researchOperationStartedAt);
+          progressResponse.delta(text);
+        },
+        reserveEvaluationSpend:reserveResearchEvaluationSpend,reserveProviderSpend:reserveResearchProviderSpend,
+        settleProviderSpend:settleResearchProviderSpend});
+      const text = outputTextFromResponse(payload);
+      const usage = combinedResearchUsage(researchEmbeddingUsage(),web.usage,researchUsageFromProviderPayload(payload,body.model));
+      const cost = estimatedResearchCostWithProviderAllowance(usage);
+      const answer = { ...fastResearchInterpretation(text,evidence,sources),mode:"openai",researchEngine:"fast-stream-v1",
+        model:body.model,requestedModel:body.model,promptVersion:"fast-stream-v1",evidenceVersion:"selected-or-retrieved-v1",
+        codeBasis:answerCodeBasis,codeVersion:answerCodeBasis.codeVersion,codeEdition:answerCodeBasis.codeEdition,
+        evidenceSectionIDs:[...new Set(evidence.map(source=>source.sectionID))],evidenceSourceIDs:evidence.map(source=>source.sourceID),
+        sourceAsOf:now,sourceSummary:{userPinnedCount:pinnedEvidence.length,permitextDiscoveredCount:conversationOnly?0:evidence.length-pinnedEvidence.length,crossReferenceCount:0},
+        factUsage:{projectContext:combinedProjectFacts,conversation:[],other:[]},
+        retrieval:{sourceMode:packageForFast.sourceMode,codeBasis:answerCodeBasis,webSupportRequested:webDecision.useWeb,webSupportSearched:web.searched},
+        routing:{mode:"fast",answerTier:"fast",verificationAttemptCount:0},
+        delivery:{mode:"streamed",firstTextMilliseconds,generationMilliseconds:Math.round(performance.now()-fastGenerationStartedAt)},
+        disclaimer:"AI-generated, unreviewed research assistance. Verify the cited text before relying on this answer." };
+      answer.supportingSources = web.sources.filter((source,index)=>answer.citationIdentity.cited.includes(`W${index+1}`))
+        .map(source=>({...source,authorityClass:"official_guidance",role:"supporting",controlling:false}));
+      const identity = researchRequestMessageIdentity(context.userID,conversation.id,researchRequestID);
+      const userMessage = {id:`${identity}:question`,role:"user",question,createdAt:now,
+        contextRevision:researchContextRevision(conversation),researchRequestID};
+      const assistantMessage = {id:`${identity}:answer`,role:"assistant",answer,createdAt:now,
+        contextRevision:researchContextRevision(conversation),researchRequestID};
+      const record = {...immutableResearchAnswer({assistantScopeSnapshot:conversationScope,id:assistantMessage.id,
+        owner:ownerScope(context.userID),conversationID:conversation.id,projectID:conversation.primaryProjectID || null,
+        question,answer,evidence:snapshots,citations:answer.citations,model:body.model,researchSystemVersion:"fast-stream-v1",createdAt:now}),
+        operationID:researchOperation.id,officialEvidenceSnapshot:web.sources,assistantScopeSnapshot:conversationScope,
+        projectContextSnapshot:{projectID:conversation.primaryProjectID || null,projectInformation,manualFacts:manualProjectFacts,
+          combinedFacts:combinedProjectFacts,capturedAt:now}};
+      conversation.codeBasis=structuredClone(answerCodeBasis); conversation.codeVersion=answerCodeBasis.codeVersion;
+      conversation.starterQuestion ||= question; refreshGeneratedResearchConversationTitle(conversation);
+      appendCompletedResearchExchange(conversation,userMessage,assistantMessage);
+      conversation.updatedAt=now; conversation.sourceStatus="current"; delete conversation.historyHiddenAt;
+      progressResponse.assertActive();
+      await commitResearchConversationMessage(context.userID,{recoveryBase:{conversation:originalConversation,requestID:researchRequestID,question},
+        reservationID:researchReservationID,usageEntry:{...usage,model:body.model,requestedModel:body.model,routingMode:"fast",answerTier:"fast",
+          verificationAttemptCount:0,mode:"openai",estimatedCostUSD:cost.estimatedUSD,pricingVersion:cost.pricingVersion,createdAt:researchReservationCreatedAt},
+        answer:record,conversation,events:conversation.primaryProjectID ? ["research.question.submitted","research.answer.generated"].map(action =>
+          activityEvent({owner:ownerScope(context.userID),projectID:conversation.primaryProjectID,actorUserID:context.userID,
+            action,objectKind:action.endsWith("submitted")?"researchConversation":"researchAnswer",
+            objectID:action.endsWith("submitted")?conversation.id:assistantMessage.id,newStatus:"generated",createdAt:now,
+            metadata:{answerID:assistantMessage.id,answerMode:"fast"}})) : []});
+      researchReservationCompleted=Boolean(researchReservationID);
+      Object.assign(researchOperation,{status:"completed",charged:researchReservationCompleted,mode:"openai",model:body.model,
+        routingMode:"fast",verificationAttemptCount:0,providerRequestCount:usage.providerRequestCount,estimatedCostUSD:cost.estimatedUSD});
+      const artifactRevisions=await bumpCommittedResearchArtifactRevisions(context.userID,conversation.primaryProjectID
+        ? [{projectID:conversation.primaryProjectID,domains:["activity","foundation","research"]}] : []);
+      progressResponse.progress("preparing_conclusion","completed");
+      progressResponse.json(200,{conversation:await researchConversationForClient(conversation,{userID:context.userID}),
+        usage:await researchUsageForClient(context.userID,context.authContext.entitlement),requestID:researchRequestID,artifactRevisions});
+      return;
+    }
     // This is the live conversation's next-turn basis. Saved answer records
     // retain the immutable basis captured when their own turn completed.
     conversation.codeBasis = structuredClone(answerCodeBasis);

@@ -1,3 +1,4 @@
+import { readResearchAnswerStream } from "./research-fast-stream.mjs";
 import { researchProviderCostEntry } from "./research-cost-usage.mjs";
 
 const transientProviderStatuses = new Set([408, 409, 425, 429, 500, 502, 503, 504]);
@@ -220,7 +221,8 @@ async function performResearchProviderRequest({
   reserveEvaluationSpend = () => {},
   settleEvaluationSpend = null,
   reserveProviderSpend = () => ({ active: false }),
-  settleProviderSpend = () => {}
+  settleProviderSpend = () => {},
+  onText = () => {}
 }, attemptTimings) {
   const attempts = Math.max(1, Math.min(2, Number(maximumAttempts) || 1));
   let aggregateUsage = emptyProviderUsage();
@@ -315,10 +317,15 @@ async function performResearchProviderRequest({
 
     let payload;
     let bodyReadFailed = false;
+    let streamError = null;
     const bodyStartedAt = performance.now();
     attemptTiming.bodyReadOutcome = "failed";
     try {
-      payload = await response.json().catch(() => {
+      payload = requestBody.stream && response.ok
+        ? await readResearchAnswerStream(response.body, { signal, onText }).catch(error => {
+            bodyReadFailed = true; if (!error.code) error.code = "RESEARCH_PROVIDER_ERROR"; streamError = error; return error.streamPayload || {};
+          })
+        : await response.json().catch(() => {
         bodyReadFailed = true;
         return {};
       });
@@ -352,6 +359,7 @@ async function performResearchProviderRequest({
       completedProviderAttempts,
       unreconciledProviderCostUSD
     );
+    if (streamError) throw attachProviderAccounting(streamError, aggregateUsage, completedProviderAttempts, unreconciledProviderCostUSD);
     if (response.ok) return { response, payload: accountedPayload, attempts: completedProviderAttempts };
     if (attempt < attempts && transientProviderStatuses.has(response.status)) {
       try {
