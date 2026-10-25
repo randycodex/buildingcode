@@ -21,7 +21,7 @@ function reader({ height = 600, contentTop = 70, fadeHeight = 126, matchY = 942,
   const section = { querySelector: () => title ? heading : null };
   const target = context.readerSearchMatchScrollTarget(content, section, match);
   context.scrollReaderContentToNode(content, target);
-  return { content, heading, match, target, fadeBottom: 70 + fadeHeight };
+  return { content, heading, match, section, panel, target, fadeBottom: 70 + fadeHeight };
 }
 
 for (const height of [240, 600, 1000]) {
@@ -37,4 +37,35 @@ const untitled = reader({ title: false });
 assert.equal(untitled.target, untitled.match, "Missing headings retain the exact match destination.");
 const earlierMatch = reader({ matchY: 880 });
 assert.equal(earlierMatch.target, earlierMatch.match, "A heading after the match cannot hide earlier matching text.");
-console.log("Reader search alignment passed: nearby headings clear the fade, matches stay visible at three viewport heights, and deep matches retain their exact target.");
+
+// Detail links highlight the exact passage while scrolling a nearby heading
+// clear of the fade. Both Search details and saved Evidence use this reveal.
+vm.runInContext(actual('revealReaderSourceTarget'), context);
+for (const preferPassage of [false, true]) for (const height of [240, 600, 1000]) {
+  const result = reader({height});
+  result.content.scrollTop = 0;
+  result.match.closest = () => result.section;
+  const highlighted = [];
+  result.match.classList = {add:name=>highlighted.push(name)};
+  result.content.querySelectorAll = () => [];
+  result.panel.querySelector = () => result.content;
+  Object.assign(context, {
+    paneIDForReader:()=> 'reader:test', crypto:{randomUUID:()=> 'reveal'}, CSS:{escape:value=>value},
+    window:{setTimeout:callback=>callback()}, track:{querySelector:()=>result.panel},
+    savedReaderTarget:()=>result.match,
+    stabilizeReaderSectionAtHeader:(content,target)=>context.scrollReaderContentToNode(content,target)
+  });
+  context.revealReaderSourceTarget({}, {}, null, {preferPassage});
+  assert.ok(result.heading.getBoundingClientRect().top >= result.fadeBottom, 'Open in Reader must keep the nearby section heading below the fade');
+  assert.ok(result.match.getBoundingClientRect().bottom <= result.content.getBoundingClientRect().bottom);
+  assert.deepEqual(highlighted,['is-source-target'],'Heading alignment must not change the exact highlighted passage');
+}
+{
+  const result = reader({matchY:2000}); result.content.scrollTop = 0;
+  result.match.closest=()=>result.section; result.match.classList={add(){}};
+  result.content.querySelectorAll=()=>[]; result.panel.querySelector=()=>result.content;
+  context.track={querySelector:()=>result.panel}; context.savedReaderTarget=()=>result.match;
+  context.revealReaderSourceTarget({}, {}, null, {preferPassage:true});
+  assert.equal(result.match.getBoundingClientRect().top,result.fadeBottom,'A deep passage remains the destination instead of jumping to a distant heading');
+}
+console.log("Reader alignment passed: Find and detail links keep nearby headings below the fade at three viewport heights, preserve exact passage highlighting, and retain deep-match destinations.");

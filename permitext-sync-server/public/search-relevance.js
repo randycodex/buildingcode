@@ -1,4 +1,4 @@
-import { searchWords, searchWordPattern } from './search-words.js?v=20261025-workspace-chrome-v1377';
+import { searchWords, searchWordPattern } from './search-words.js?v=20261025-workspace-chrome-v1378';
 
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const normalized = value => searchWords(value).map(word => word.replace(/(?<!s)s$/, '')).join(' ');
