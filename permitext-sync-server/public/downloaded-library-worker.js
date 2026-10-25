@@ -1,4 +1,4 @@
-import { searchSpellingSuggestions } from "./search-relevance.js?v=20261025-workspace-chrome-v1376";
+import { searchSpellingSuggestions } from "./search-relevance.js?v=20261025-workspace-chrome-v1377";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import {
   searchWords,
