@@ -3670,12 +3670,14 @@ select option:checked {
 .annotated-code-block {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
 }
 
-.annotated-code-block > :where(.section-block, .section-html, .code-table, .code-media) {
+.annotated-code-block > :is(.section-block, .section-html, .code-table, .code-media),
+.reader-panel.code-theme-zoning .annotated-code-block > .section-block {
   grid-column: 1;
+  margin-bottom: 0;
 }
 
 .annotated-code-block.is-source-target,
@@ -3708,6 +3710,17 @@ select option:checked {
 
 .reader-panel.code-theme-zoning .inline-comment {
   margin-bottom: var(--space-2);
+}
+
+/* Passage tools sit below the text without reserving a right-hand column. */
+.annotated-code-block > .inline-comment,
+.reader-panel.code-theme-zoning .annotated-code-block > .inline-comment {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  justify-content: flex-start;
+  margin: 0;
+  padding-left: 0;
 }
 
 .annotated-code-block:hover > .inline-comment,
