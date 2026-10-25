@@ -626,6 +626,7 @@ textarea:focus-visible {
 
 .topbar {
   position: relative;
+  background: var(--surface-raised);
   display: grid;
   grid-template-columns: max-content minmax(max-content, 1fr) max-content;
   align-items: center;
@@ -19987,7 +19988,7 @@ dialog.report-export-review {
 .workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: var(--workspace-bar-height) var(--workspace-bar-height) auto minmax(0, 1fr); }
 .workspace-shell > .topbar { grid-column: 1; grid-row: 1; height: var(--workspace-bar-height); min-height: var(--workspace-bar-height); box-sizing: border-box; }
 .workspace-shell > .topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button, .mobile-more-button) { height: var(--workspace-menu-height); min-height: var(--workspace-menu-height); }
-.workflow-toolbar { display: flex; align-items: center; height: var(--workspace-bar-height); min-height: var(--workspace-bar-height); box-sizing: border-box; padding: 0 clamp(22px, 3vw, 46px); border-bottom: 1px solid var(--border); }
+.workflow-toolbar { display: flex; align-items: center; height: var(--workspace-bar-height); min-height: var(--workspace-bar-height); box-sizing: border-box; padding: 0 clamp(22px, 3vw, 46px); border-bottom: 1px solid var(--border); background: var(--surface-raised); }
 .workflow-toolbar > div { display: flex; align-items: center; gap: 20px; }
 .workflow-toolbar > [hidden], .panel-track > .is-workflow-hidden { display: none !important; }
 .workflow-toolbar .toolbar-button { background: transparent; border: 0; border-radius: 0; padding: 4px 0; color: var(--text-secondary); font-size: 13px; }
@@ -20332,6 +20333,7 @@ dialog.report-export-review {
 /* Assistant conversation history stays beside the active chat. */
 .workspace-panel.assistant-workspace {
   --assistant-sidebar-width: 320px;
+  background: var(--surface-raised);
   display: grid;
   grid-template-columns: var(--assistant-sidebar-width) minmax(600px, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
