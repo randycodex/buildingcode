@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1367";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1368";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -16,7 +16,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1367";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1368";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -149,7 +149,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261025-workspace-chrome-v1367";
+} from "./offline-storage.js?v=20261025-workspace-chrome-v1368";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -8072,6 +8072,24 @@ function highlightReaderDestination(content, target) {
   target?.classList.add("is-navigation-target");
 }
 
+function readerSearchMatchScrollTarget(content, section, match) {
+  const title = section?.querySelector(".reader-section-title");
+  if (!content || !title || !match) return match;
+  const panel = content.closest(".reader-panel");
+  const contentRect = content.getBoundingClientRect();
+  const panelRect = panel?.getBoundingClientRect() || contentRect;
+  const headerHeight = panel ? Number.parseFloat(getComputedStyle(panel, "::before").height) : 0;
+  const headerBottom = panelRect.top + (Number.isFinite(headerHeight) ? headerHeight : 0);
+  const visibleHeight = Math.max(0, contentRect.bottom - Math.max(contentRect.top, headerBottom));
+  const titleRect = title.getBoundingClientRect();
+  const matchRect = match.getBoundingClientRect();
+  // Keep a nearby heading out of the fade when both it and the match fit.
+  // Long sections still scroll directly to a match farther down the text.
+  return titleRect.top <= matchRect.top && matchRect.bottom - titleRect.top <= visibleHeight
+    ? title
+    : match;
+}
+
 function flashSearchMatchInSection(content, sectionID, sectionNumber, query, blockID = "") {
   const needle = String(query || "").trim();
   if (!content || needle.length < 2) return;
@@ -8108,7 +8126,7 @@ function flashSearchMatchInSection(content, sectionID, sectionNumber, query, blo
       mark.dataset.flashCreatedAt = String(Date.now());
       range.surroundContents(mark);
       highlightReaderDestination(content, mark.closest(".annotated-code-block") || section);
-      stabilizeReaderSectionAtHeader(content, mark, "auto");
+      stabilizeReaderSectionAtHeader(content, readerSearchMatchScrollTarget(content, section, mark), "auto");
 
       window.setTimeout(() => {
         mark.replaceWith(textNode(mark.textContent || ""));
