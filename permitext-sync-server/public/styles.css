@@ -4826,7 +4826,11 @@ select option:checked {
 }
 
 .search-results.is-history .search-row-actions {
-  padding-inline: max(var(--panel-padding), calc((100% - var(--workspace-content-max-width)) / 2));
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 36px;
+  margin-top: 0;
+  padding-inline: max(calc(2 * var(--panel-padding)), calc((100% - var(--workspace-content-max-width)) / 2 + var(--panel-padding)));
 }
 
 .search-results-viewport {
