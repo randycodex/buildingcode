@@ -3,6 +3,7 @@ import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {calculateOccupantLoad,calculationNoteBlocks,occupantLoadSource,occupantLoadPrefill,occupantLoadTableInput,occupantLoadTable} from '../public/occupant-load-calculation.js';
 import {parseFragment} from 'parse5';
+import {calculationDraftStore} from '../public/calculation-drafts.js';
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const a=app.indexOf('function renderOccupantLoadCalculation('),b=app.indexOf('\nasync function addPassageToNotebook',a);
 const source={sectionID:'2152',sectionNumber:'1004.1.3',codePrefix:'BC',codeVersion:'CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1'};
@@ -12,13 +13,15 @@ const table=readTable(blocks,source);
 const row=table.rows.find(r=>r.label.startsWith('Business areas'));
 const calculation=calculateOccupantLoad(occupantLoadTableInput({area:'1200',seating:'without-fixed-seating'},table,row.id));
 for(const stale of [false,true]) {
+ const storageValues=new Map();
+ const localStorage={getItem:key=>storageValues.get(key)??null,setItem:(key,value)=>storageValues.set(key,value)};
  let options,resolve; const gate=new Promise(r=>resolve=r); const calls=[];
- const context=vm.createContext({occupantLoadSource,occupantLoadPrefill,occupantLoadTable:readTable,occupantLoadTableInput,calculateOccupantLoad,calculationNoteBlocks,occupantLoadDrafts:new Map(),
+ const context=vm.createContext({occupantLoadSource,occupantLoadPrefill,occupantLoadTable:readTable,occupantLoadTableInput,calculateOccupantLoad,calculationNoteBlocks,calculationDraftStore,localStorage,privateWorkspaceKeys:()=>({baseWorkspaceKey:"private-owner"}),calculationDraftViews:new Set(),
   calculatorFootnoteAssessmentFor:()=>null,calculatorConversationForPane:()=>null,supplementalResearchConversations:new Map(),activeResearchConversation:null,
   state:{workflowNavigationGeneration:0},activeWorkspaceID:'workspace',captureAccountRequest:()=>({userID:'owner'}),
   isCurrentAccountRequest:()=>true,hasCapability:()=>true,workspaceProject:()=>({id:'project'}),researchProjectID:()=> 'project',researchCodeEdition:()=> '2022',
   crypto:{randomUUID:()=> 'synthetic-id'},document:{createElement:()=>({blocks:[],append(block){this.blocks.push(block);}})},
-  createOccupantLoadCard:o=>{options=o;return {isConnected:true,closest:()=>({dataset:{paneId:'reader'}})};},
+  createOccupantLoadCard:o=>{options=o;return {isConnected:true,addEventListener(){},closest:()=>({dataset:{paneId:'reader'}})};},
   resolveReaderSource:async()=>source,api:async()=>{await gate;return {section:{...source,blocks}};},
   sectionRecordMatchesRequestedEdition:()=>true,renderCodeBlock:()=>({text:'Exact canonical text'}),
   notebookEvidenceTextMap:root=>({text:root.blocks.map(b=>b.text).join(' ')}),
@@ -30,16 +33,16 @@ for(const stale of [false,true]) {
  const answer={occupantLoadDraft:{sourceID:'synthetic-source',area:{value:'1500',quote:'My room is 1500 square feet.'}}};
  context.renderOccupantLoadCalculation(prefilledSource,{answerID:'prefill-answer',answer});
  assert.equal(options.draft.area,'1500'); assert.equal(options.draft.reviewed,false);
- options.draft.area='1400';
+ options.draft.area='1400';options.onDraftChange({...options.draft});
  context.renderOccupantLoadCalculation(prefilledSource,{answerID:'prefill-answer',answer});
  assert.equal(options.draft.area,'1400','Rendering an answer again must preserve the author edit instead of reapplying Luna suggestions.');
  const originalOptions=options;
  context.renderOccupantLoadCalculation(prefilledSource,{calculatorID:'utility:calculator'});
- assert.equal(options.draft.area,undefined,'Standalone inputs do not borrow a Reader or Assistant draft.');
- options.draft.area='1700';
+ assert.equal(options.draft.area,undefined,'Manual calculations do not borrow answer-specific prefill.');
+ options.draft.area='1700';options.onDraftChange({...options.draft});
  assert.equal(options.savedMessage,'Saved to Notebook · needs review.');
  context.renderOccupantLoadCalculation(prefilledSource,{calculatorID:'utility:calculator'});
- assert.equal(options.draft.area,'1700','Reopening the standalone calculator retains its own session draft.');
+ assert.equal(options.draft.area,'1700','Reopening the standalone calculator retains its device draft.');
  options=originalOptions;
  const save=options.onSave(calculation);await new Promise(r=>setImmediate(r));
  if(stale)context.state.workflowNavigationGeneration++;

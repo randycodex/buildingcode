@@ -107,7 +107,7 @@ const make = () => {
   Object.assign(f.c, { defaultSyncCodeVersion: "2022", AbortController, CSS: { escape: value => value },
     crypto: { randomUUID: () => "current" }, activeWorkspaceID: "workspace", captureAccountRequest: () => "account",
     isCurrentAccountRequest: () => true, isCurrentActiveCodeSourceContext: () => true, normalizeSearchInstance: value => value,
-    prepareActiveCodeSearchScope: async () => ({ token: {}, querySuffix: "&sourceScope=enabled-only", enabledSourceCount: 2 }),
+    prepareSearchPanelScope: async () => ({ token: {}, querySuffix: "&sourceScope=enabled-only", enabledSourceCount: 2 }),
     clear: element => { element.children = []; }, requestAnimationFrame: callback => callback(),
     renderSearchPlaceholder() {} });
   f.c.appendSearchResultGroups = (_results, rows) => {
@@ -143,7 +143,7 @@ const make = () => {
   assert.equal(f.results.querySelector('.search-result-group[data-source-key="BC|2022"]').querySelectorAll(".result-row").length, 7);
   assert.equal(f.results.querySelector('.search-result-group[data-source-key="BC|2014"]').querySelectorAll(".result-row").length, 6);
   const before = f.requests.length;
-  f.c.prepareActiveCodeSearchScope = async () => ({ token: {}, querySuffix: "&sourceScope=changed", enabledSourceCount: 2 });
+  f.c.prepareSearchPanelScope = async () => ({ token: {}, querySuffix: "&sourceScope=changed", enabledSourceCount: 2 });
   await f.c.renderSearchResults(panel, f.instance);
   assert.equal(f.requests.length, before + 1, "Changing enabled sources invalidates remembered group cursors.");
   assert.equal(position.groupPages["BC|2022"], 1); assert.equal(position.groupPages["BC|2014"], 1);
