@@ -19130,8 +19130,9 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-draft-cla
 .search-family-card {
   margin: 0 var(--panel-padding) 12px;
   padding: 16px;
+  border: 1px solid var(--border);
   border-radius: 22px;
-  background: color-mix(in srgb, var(--text-primary) 7%, var(--surface));
+  background: transparent;
 }
 .search-family-title {
   margin: 0 0 4px;
