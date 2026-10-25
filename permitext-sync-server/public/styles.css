@@ -5303,11 +5303,7 @@ select option:checked {
 }
 
 .search-result-group-meta {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--code-accent);
+  display: none;
 }
 
 .search-result-group-count {
