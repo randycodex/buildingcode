@@ -284,8 +284,8 @@
     "@vercel/blob": "^2.8.0",
     "pdfjs-dist": "5.4.149",
     "pdfkit": "^0.20.2",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   },
   "overrides": {
     "@tiptap/core": "3.30.5",
