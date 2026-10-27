@@ -1959,7 +1959,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
     z-index: 42;
   }
   .panel-track > .pane-left-edge-resizer { left: 0; }
-  .panel-track > .pane-right-edge-resizer { right: 0; margin-left: auto; }
+  .panel-track > .pane-right-edge-resizer { right: 0; margin-left: 0; }
   .panel-track > .pane-edge-resizer::after { width: 24px; }
 }
 
