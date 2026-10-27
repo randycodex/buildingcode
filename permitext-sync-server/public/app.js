@@ -2,7 +2,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=12";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-collapsed-divider-v1401";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-navigation-v1404";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -10,7 +10,7 @@ import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./pro
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
 import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=8";
-import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=14';
+import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=15';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=6";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=7";
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
@@ -25,7 +25,7 @@ import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-no
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
-import { createReaderBlockWindow } from "./reader-block-window.js?v=9";
+import { createReaderBlockWindow } from "./reader-block-window.js?v=10";
 import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=4";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -44,7 +44,7 @@ import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navi
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js?v=2";
 import { codeSourceKey, codeSourceIdentity } from "./active-code-sources.js";
-import { bindPublicCodeRevisionChecks, createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20261024-event-revision-v4";
+import { bindPublicCodeRevisionChecks, createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20261027-reference-metadata-v5";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
@@ -75,8 +75,9 @@ import {
 import {
   inlineCodeReferencePhrases,
   parseCodeJumpAnchor,
-  rewriteStructuredCodeLinks
-} from "./code-references.js?v=20260720-code-reference-links-v18";
+  rewriteStructuredCodeLinks,
+  readerCodeReferenceTarget
+} from "./code-references.js?v=20261027-code-reference-links-v19";
 import {
   settingsAccountSummary,
   settingsPlanCopy,
@@ -153,7 +154,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-collapsed-divider-v1401";
+} from "./offline-storage.js?v=20261027-research-navigation-v1404";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -8507,9 +8508,9 @@ async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = 
   if (!panel || !reader) return;
   const account = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
-  const original = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  const original = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? "")));
   const isCurrent = () => panel.isConnected && isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
-    JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]) === original;
+    JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? ""))) === original;
   const nextChapterID = String(chapterID || reader.chapterID || "");
   const restoreSelection = () => {
     if (!isCurrent()) return;
@@ -16951,6 +16952,8 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
 
 function buildReaderChapterSection(panel, reader, section, groupLabelsByFirstSection, options = {}) {
   const sectionWrapper = options.host || document.createElement("section");
+  // Offscreen suspension retains this root but discards its linked children.
+  delete sectionWrapper.dataset.inlineReferencesLinked;
   sectionWrapper.classList.add("chapter-section");
   sectionWrapper.dataset.sectionId = String(section.id);
   sectionWrapper.dataset.codeVersion = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix));
@@ -19008,8 +19011,10 @@ function linkInlineCodeReferences(root, panel, reader) {
     phrases.forEach((phrase) => {
       if (phrase.start > cursor) fragment.append(document.createTextNode(text.slice(cursor, phrase.start)));
       let phraseCursor = phrase.start;
-      const codePrefix = phrase.codePrefix || reader.codePrefix || "BC";
+
       phrase.references.forEach((target) => {
+        const codePrefix = phrase.codePrefix || (reader.codePrefix !== "ZR" && /^28-/.test(target.sectionNumber)
+          ? "AC" : reader.codePrefix || "BC");
         if (target.start > phraseCursor) {
           fragment.append(document.createTextNode(text.slice(phraseCursor, target.start)));
         }
@@ -19019,7 +19024,7 @@ function linkInlineCodeReferences(root, panel, reader) {
         reference.textContent = text.slice(target.start, target.end);
         reference.setAttribute("aria-label", `Open ${codePrefix} Section ${target.sectionNumber}`);
         reference.addEventListener("click", (event) => {
-          openInlineCodeReference(reader, codePrefix, target.sectionNumber, reference, { restoreFocus: event.detail === 0 });
+          openInlineCodeReference(reader, codePrefix, target.sectionNumber, reference, { restoreFocus: event.detail === 0, target });
         });
         fragment.append(reference);
         phraseCursor = target.end;
@@ -19038,34 +19043,42 @@ function normalizedInlineSectionNumber(value) {
   return String(value || "").replace(/^Section\s+/i, "").replace(/\([^)]+\)/g, "").trim().toLowerCase();
 }
 
-function inlineReferenceSearchResult(results, codePrefix, sectionNumber) {
-  const targetNumber = normalizedInlineSectionNumber(sectionNumber);
-  const codeResults = (results || []).filter((item) =>
-    String(item.codePrefix || "BC").toUpperCase() === codePrefix
-  );
-  const exact = codeResults.find((item) => normalizedInlineSectionNumber(item.sectionNumber) === targetNumber);
-  if (exact) return exact;
-  return codeResults
-    .filter((item) => normalizedInlineSectionNumber(item.sectionNumber).startsWith(`${targetNumber}.`))
-    .sort((left, right) =>
-      normalizedInlineSectionNumber(left.sectionNumber).length - normalizedInlineSectionNumber(right.sectionNumber).length ||
-      String(left.sectionNumber).localeCompare(String(right.sectionNumber), undefined, { numeric: true, sensitivity: "base" })
-    )[0] || null;
+async function resolveInlineCodeSection(codePrefix, sectionNumber, codeVersion = "") {
+  // Research follow-up actions require an exact provision, not a Reader's
+  // chapter/article entry-point fallback.
+  const params = new URLSearchParams({include: "metadata", code: codePrefix, sectionNumber,
+    version: syncCodeVersion(codeVersion || syncCodeVersionForPrefix(codePrefix))});
+  return (await api(`/code/sections/resolve?${params}`)).section;
 }
 
-async function resolveInlineCodeSection(codePrefix, sectionNumber, codeVersion = "") {
-  const params = new URLSearchParams({
-    q: sectionNumber,
-    code: codePrefix,
-    limit: "25",
-    version: syncCodeVersion(codeVersion || syncCodeVersionForPrefix(codePrefix))
-  });
-  const payload = await api(`/code/search?${params}`);
-  return inlineReferenceSearchResult(payload.results, codePrefix, sectionNumber);
+function readerReferenceCodeVersion(reader, codePrefix) {
+  const source = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix));
+  if (codePrefix === reader.codePrefix) return source;
+  const construction = ["BC", "PC", "MC", "FGC", "AC"];
+  if (construction.includes(codePrefix) && (construction.includes(reader.codePrefix) ||
+      [defaultSyncCodeVersion, historicalConstructionSyncCodeVersion].includes(source))) return source;
+  if (codePrefix === "AC" && source === enactedAdministrativeSyncCodeVersion &&
+      ["T24", "T25", "T26", "T28", "HMC", "LL"].includes(reader.codePrefix)) return source;
+  return syncCodeVersionForPrefix(codePrefix);
+}
+
+async function resolveReaderCodeReference(reader, target) {
+  const requestedPrefix = target.codePrefix || reader.codePrefix || "BC";
+  const codeVersion = readerReferenceCodeVersion(reader, requestedPrefix);
+  const codePrefix = requestedPrefix === "AC" && codeVersion === enactedAdministrativeSyncCodeVersion ? "T28" : requestedPrefix;
+  const params = new URLSearchParams({include: "metadata", code: codePrefix, version: codeVersion,
+    number: target.referenceNumber || target.sectionNumber || target.chapterNumber,
+    kind: target.targetKind || target.kind || "section"});
+  const {section} = await api(`/code/references/resolve?${params}`);
+  if (section.codePrefix !== codePrefix || syncCodeVersion(section.codeVersion) !== codeVersion) {
+    throw new Error("This reference could not be matched to its exact code and edition.");
+  }
+  return {...section, referenceTarget: {...section.referenceTarget, anchorID: target.anchorID || ""}};
 }
 
 function readerAlreadyAtReferenceTarget(reader, detail) {
   const destination = readerFieldsForSectionDetail(detail);
+  if (readerReferenceNeedsPassage(detail)) return false;
   if (!destination.sectionID || ["codePrefix", "codeVersion", "chapterID", "sectionID"].some(key =>
     String(reader[key] || "") !== String(destination[key] || ""))) return false;
   const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"]`);
@@ -19085,15 +19098,23 @@ function readerAlreadyAtReferenceTarget(reader, detail) {
     titleBounds.top < content.getBoundingClientRect().bottom;
 }
 
+const readerReferenceOpeningAttempts = new Map();
 async function openReferenceInAdjacentReader(sourceReader, detail) {
+  const attempt = Symbol();
+  readerReferenceOpeningAttempts.set(sourceReader.id, attempt);
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
-  const original = JSON.stringify([sourceReader.codePrefix, sourceReader.codeVersion, sourceReader.chapterID, sourceReader.sectionID]);
+  const original = JSON.stringify([sourceReader.codePrefix, sourceReader.codeVersion, sourceReader.chapterID, sourceReader.sectionID].map(value => String(value ?? "")));
   const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
-    state.readers.includes(sourceReader) &&
-    JSON.stringify([sourceReader.codePrefix, sourceReader.codeVersion, sourceReader.chapterID, sourceReader.sectionID]) === original;
+    readerReferenceOpeningAttempts.get(sourceReader.id) === attempt && state.readers.includes(sourceReader) &&
+    JSON.stringify([sourceReader.codePrefix, sourceReader.codeVersion, sourceReader.chapterID, sourceReader.sectionID].map(value => String(value ?? ""))) === original;
   let context;
   try {
+    if (detail.referenceRequest) {
+      const referenceContext = activeCodeSourcesController.captureContext();
+      detail = await resolveReaderCodeReference(sourceReader, detail.referenceRequest);
+      if (!isCurrent() || !activeCodeSourcesController.isCurrent(referenceContext)) return;
+    }
     if (detail.sectionID || detail.id || detail.sectionNumber) {
       const resolved = await resolveReaderSource(detail, {isCurrent});
       if (!resolved) return;
@@ -19116,7 +19137,7 @@ async function openReferenceInAdjacentReader(sourceReader, detail) {
   );
   if (targetReader && readerAlreadyAtReferenceTarget(targetReader, detail)) {
     updateBrowserSectionURL(targetReader.sectionID);
-    scrollPaneIntoView(paneIDForReader(targetReader));
+    scrollPaneIntoView(paneIDForReader(targetReader), "auto");
     return;
   }
   const canAddReader = isProAccount() || state.readers.length < 2;
@@ -19145,16 +19166,20 @@ async function openReferenceInAdjacentReader(sourceReader, detail) {
   if (targetReader.sectionID) updateBrowserSectionURL(targetReader.sectionID);
   scheduleContinuitySync(targetReader);
   saveWorkspaceState();
-  const targetIdentity = JSON.stringify([targetReader.codePrefix, targetReader.codeVersion, targetReader.chapterID, targetReader.sectionID]);
+  const targetIdentity = JSON.stringify([targetReader.codePrefix, targetReader.codeVersion, targetReader.chapterID, targetReader.sectionID].map(value => String(value ?? "")));
   const presentationIsCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     activeCodeSourcesController.isCurrent(context) && state.readers.includes(targetReader) &&
-    JSON.stringify([targetReader.codePrefix, targetReader.codeVersion, targetReader.chapterID, targetReader.sectionID]) === targetIdentity &&
+    JSON.stringify([targetReader.codePrefix, targetReader.codeVersion, targetReader.chapterID, targetReader.sectionID].map(value => String(value ?? ""))) === targetIdentity &&
     (targetReader === sourceReader || isCurrent());
   await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(targetReader)] });
   if (!presentationIsCurrent()) return;
-  if (!await whenWorkspacePaneReady(paneIDForReader(targetReader)) || !presentationIsCurrent()) return;
-  if (targetReader.sectionID) alignReaderSectionAfterLayout(targetReader);
-  scrollPaneIntoView(paneIDForReader(targetReader));
+  const referenceReady = await whenWorkspacePaneReady(paneIDForReader(targetReader));
+  if (!referenceReady || !presentationIsCurrent()) return;
+  scrollPaneIntoView(paneIDForReader(targetReader), "auto");
+  if (targetReader.sectionID) {
+    if (readerReferenceNeedsPassage(detail)) await revealReaderCodeReference(targetReader, detail, presentationIsCurrent);
+    else alignReaderSectionAfterLayout(targetReader);
+  }
 }
 
 function captureReferenceFocusRestoration(reader, trigger, enabled) {
@@ -19162,7 +19187,7 @@ function captureReferenceFocusRestoration(reader, trigger, enabled) {
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const sourceContext = activeCodeSourcesController.captureContext();
-  const readerIdentity = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  const readerIdentity = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? "")));
   let focusMoved = false;
   const observeFocus = (event) => {
     if (event.target !== trigger && event.target !== document.body) focusMoved = true;
@@ -19173,7 +19198,7 @@ function captureReferenceFocusRestoration(reader, trigger, enabled) {
     if (!focusMoved && trigger.isConnected && document.activeElement === document.body &&
         isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
         activeCodeSourcesController.isCurrent(sourceContext) && state.readers.includes(reader) &&
-        JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]) === readerIdentity) {
+        JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? ""))) === readerIdentity) {
       trigger.focus({ preventScroll: true });
     }
   };
@@ -19187,7 +19212,8 @@ async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigge
   trigger.setAttribute("aria-busy", "true");
   try {
     await openReferenceInAdjacentReader(reader, {
-      codePrefix: normalizedPrefix, codeVersion: reader.codeVersion, sectionNumber
+      referenceRequest: {codePrefix: normalizedPrefix, sectionNumber, ...options.target,
+        targetKind: options.target?.targetKind || options.target?.kind || "section"}
     });
   } finally {
     if (trigger.isConnected) {
@@ -19201,49 +19227,37 @@ async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigge
 async function openStructuredCodeReference(reader, anchor, trigger, options = {}) {
   const target = parseCodeJumpAnchor(anchor);
   if (!target || !trigger) return;
-  if (target.kind === "section") {
-    await openInlineCodeReference(reader, target.codePrefix, target.sectionNumber, trigger, options);
+  await openInlineCodeReference(reader, target.codePrefix, target.sectionNumber || target.chapterNumber,
+    trigger, {...options, target});
+}
+
+function readerReferenceNeedsPassage(detail) {
+  const target = detail.referenceTarget;
+  return Boolean(target && (["table", "figure"].includes(target.kind) || target.match === "containing-section"));
+}
+
+async function revealReaderCodeReference(reader, detail, isCurrent) {
+  // Horizontal reveal resumes offscreen sections on the next layout frame.
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"]`);
+  const content = panel?.querySelector(".reader-content");
+  if (!content || !isCurrent()) return;
+  const target = readerCodeReferenceTarget(content, detail);
+  if (!target) {
+    await showWebNotice("Referenced passage unavailable",
+      `${detail.codePrefix} ${detail.referenceTarget.kind} ${detail.referenceTarget.number} could not be located in this edition's Reader text. The containing section is open; no different numbered passage was substituted.`);
     return;
   }
-
-  const identity = captureAccountRequest();
-  const workspaceID = activeWorkspaceID;
-  const sourceContext = activeCodeSourcesController.captureContext();
-  const sourceVersion = reader.codeVersion;
-  const sourceChapterID = reader.chapterID;
-  const restoreFocus = captureReferenceFocusRestoration(reader, trigger, options.restoreFocus);
-  trigger.disabled = true;
-  trigger.setAttribute("aria-busy", "true");
-  try {
-    const referenceChapters = await fetchChapterList(target.codePrefix, sourceVersion);
-    const chapter = referenceChapters.find((item) =>
-      String(item.codePrefix || "").toUpperCase() === target.codePrefix &&
-      syncCodeVersion(item.codeVersion || syncCodeVersionForPrefix(target.codePrefix)) === syncCodeVersion(sourceVersion) &&
-      String(item.chapterNumber || "").trim().toUpperCase() === target.chapterNumber
-    );
-    if (!chapter) {
-      trigger.title = `${codeDisplayLabel(target.codePrefix)} ${target.targetKind === "appendix" ? "Appendix" : "Chapter"} ${target.chapterNumber} was not found.`;
-      return;
+  // Cancel the initial section-heading alignment before positioning a table.
+  (content.__sectionAlignmentTimers || []).forEach(timer => window.clearTimeout(timer));
+  highlightReaderDestination(content, target.closest(".annotated-code-block") || target);
+  scrollReaderContentToNode(content, target, "auto");
+  [90, 260, 700].forEach(delay => window.setTimeout(() => {
+    if (isCurrent() && target.isConnected) {
+      (content.__sectionAlignmentTimers || []).forEach(timer => window.clearTimeout(timer));
+      scrollReaderContentToNode(content, target, "auto");
     }
-    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
-        !activeCodeSourcesController.isCurrent(sourceContext) ||
-        reader.codeVersion !== sourceVersion || reader.chapterID !== sourceChapterID || !state.readers.includes(reader)) return;
-    await openReferenceInAdjacentReader(reader, {
-      codePrefix: target.codePrefix,
-      codeVersion: reader.codeVersion,
-      chapterID: chapter.id,
-      chapterNumber: chapter.chapterNumber,
-      sectionID: "",
-      sectionNumber: "",
-      title: chapter.fullTitle || chapter.displayTitle || chapter.title || "Reader"
-    });
-  } finally {
-    if (trigger.isConnected) {
-      trigger.disabled = false;
-      trigger.removeAttribute("aria-busy");
-    }
-    restoreFocus();
-  }
+  }, delay));
 }
 
 function plainTextFromHTML(html) {
@@ -23816,6 +23830,11 @@ function researchAssistantContentIdentity(instance = null) {
 }
 
 async function refreshResearchConversationInPlace(paneID, conversationID, instance = null) {
+  const v2Panel = track.querySelector(`.research-v2-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (v2Panel?._refreshResearchV2) {
+    const conversation = instance ? supplementalResearchConversations.get(conversationID) : activeResearchConversation;
+    return v2Panel._refreshResearchV2(conversation);
+  }
   const panel = track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneID)}"]`);
   const body = panel?.querySelector(":scope > .assistant-body");
   if (!body || panel.dataset.workspacePaneLoading || !hasCapability("research")) return "unavailable";
@@ -26046,8 +26065,8 @@ const researchV2Rollout = createResearchV2Rollout({
 function researchV2RolloutScopeMatches(owner){const account=activeAccount();return owner.key===`${account?.userID}:${account?.sessionToken}:${accountRuntimeGeneration}`;}
 function researchV2Enabled() { return researchV2Rollout.requested(); }
 
-async function renderResearchV2Pane(paneID, configuration = null) {
-  const panel = renderUtility(analysisTemplate, paneID);
+async function renderResearchV2Pane(paneID, configuration = null, retained = {}) {
+  const panel = retained.panel || renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel", "research-v2-panel");
   const content = panel.querySelector(".analysis-content");
   const instance = (state.utilityInstances || []).find(item => paneIDForUtilityInstance(item) === paneID) || null;
@@ -26059,11 +26078,11 @@ async function renderResearchV2Pane(paneID, configuration = null) {
   const draftKey = conversationID ? `followup:${conversationID}` : paneID;
   const draft = () => researchNewChatDrafts.get(draftKey) || "";
   const saveDraft = text => { if (!current()) return; researchNewChatDrafts.set(draftKey, text); if (currentInstance()) currentInstance().draft = text; scheduleResearchDraftPersistence(); };
-  showColumnLoadingStatus(content, "Loading Research…");
+  if (!retained.panel) showColumnLoadingStatus(content, "Loading Research…");
   try {
     const [listed, fetched, availability] = await Promise.all([
-      postResearch("/research/conversations/list", {limit:30,projectID:researchWorkspaceProjectID() || ""}),
-      conversationID ? postResearch("/research/conversations/get", { conversationID }) : null,
+      retained.listed || postResearch("/research/conversations/list", {limit:30,projectID:researchWorkspaceProjectID() || ""}),
+      retained.conversation ? {conversation:retained.conversation} : conversationID ? postResearch("/research/conversations/get", { conversationID }) : null,
       configuration || postResearch("/research/v2/config")
     ]);
     if (!current()) return panel;
@@ -26102,13 +26121,15 @@ async function renderResearchV2Pane(paneID, configuration = null) {
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
       projectControl,hasMore:listed.hasMore,
       onOriginal:()=>{const url=new URL(location.href);url.searchParams.set("research","legacy");location.assign(url.href);},
-      onLoadMore:async()=>{const page=await postResearch("/research/conversations/list",{limit:30,projectID:researchWorkspaceProjectID() || "",cursor:historyCursor});if(current())historyCursor=page.nextCursor;return page;},
+      onLoadMore:async()=>{const page=await postResearch("/research/conversations/list",{limit:30,projectID:researchWorkspaceProjectID() || "",cursor:historyCursor});
+        if(current()){historyCursor=page.nextCursor;listed.nextCursor=page.nextCursor;listed.hasMore=page.hasMore;
+          listed.conversations=[...listed.conversations,...(page.conversations||[])];}return page;},
       renderAnswerActions:message=>renderResearchNotebookHandoff(conversation,message,{linkForReport:true}),
       draftKey,initialDraft:draft(), onDraft:saveDraft, isCurrent:current,
       requestStore:{ read:() => { try { return JSON.parse(sessionStorage.getItem(recoveryKey)); } catch { return null; } },
         write:value => { if (value) sessionStorage.setItem(recoveryKey, JSON.stringify(value)); else sessionStorage.removeItem(recoveryKey); } },
       onNew:async () => { view.dispose(); const result = await postResearch("/research/conversations/create", {projectID:researchWorkspaceProjectID() || null,analysisMode:"conversation_only",requestID:crypto.randomUUID()}); await publish(result); },
-      onOpen:id => { view.dispose(); return open(id); },
+      onOpen:async id => {if(id===conversation?.id)return;try {await open(id);}catch(error){if(current())await showWebNotice("Could not open Research",error.message);}},
       onBrowse:() => openReaderFromToolbar(panel),
       onOpenReader:async source => {
         const reader=await openSourceInReader(source,paneID,{sourceSurface:"research",isCurrent:current});
@@ -26158,11 +26179,48 @@ async function renderResearchV2Pane(paneID, configuration = null) {
         if (current() && source) await openSourceInReader(source,paneID);
       }
     });
+    if (!current()) { view.dispose(); return panel; }
+    const previousRail = content.querySelector(".rv2-rail");
+    const historyScroll = previousRail?.scrollTop || 0;
+    const historyFocused = Boolean(previousRail?.contains(document.activeElement));
+    panel._researchV2View?.dispose();
+    panel._researchV2Observer?.disconnect();
     content.replaceChildren(view.element);
+    panel._researchV2View = view;
+    const nextRail = content.querySelector(".rv2-rail");
+    if (nextRail) {
+      nextRail.scrollTop = historyScroll;
+      if (historyFocused) nextRail.querySelector('[aria-current="page"]')?.focus({preventScroll:true});
+    }
+    // Switching an already mounted pane needs only the authoritative conversation
+    // read performed by openResearchConversation. Keep its header and shell.
+    panel._refreshResearchV2 = async nextConversation => {
+      if (!nextConversation || !Array.isArray(nextConversation.messages) || !Array.isArray(nextConversation.sources)) return "unavailable";
+      const expectedID = nextConversation.id;
+      const isOwner = () => panel.isConnected && panel.parentNode === track &&
+        isCurrentAccountRequest(accountIdentity) && workspaceID === activeWorkspaceID &&
+        selectedID() === expectedID && !researchDraftPaneIDs.has(paneID) && hasCapability("research");
+      if (!isOwner()) return "stale";
+      const nextListed = {...listed,conversations:[
+        ...listed.conversations.filter(item => item.id !== expectedID),nextConversation
+      ]};
+      // Preserve the numbered history order when replacing an existing entry.
+      const existingIndex = listed.conversations.findIndex(item => item.id === expectedID);
+      if (existingIndex >= 0) nextListed.conversations.splice(existingIndex,0,nextListed.conversations.pop());
+      await renderResearchV2Pane(paneID, availability, {panel,conversation:nextConversation,listed:nextListed});
+      if (!isOwner()) return "stale";
+      panel.dataset.workspacePaneIdentity = researchAssistantContentIdentity(currentInstance());
+      notifyWorkspaceLayoutChange();
+      return "updated";
+    };
     // Replacing a pane or changing accounts cancels its in-flight generation.
     const observer = new MutationObserver(() => { if (!panel.isConnected) { view.dispose(); observer.disconnect(); } });
+    panel._researchV2Observer = observer;
     requestAnimationFrame(() => { if (panel.isConnected) observer.observe(panel.parentNode, {childList:true}); });
-  } catch (error) { content.textContent = error.message; }
+  } catch (error) {
+    if (retained.panel) throw error;
+    content.textContent = error.message;
+  }
   return panel;
 }
 

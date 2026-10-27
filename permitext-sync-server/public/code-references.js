@@ -32,6 +32,7 @@ function sectionTarget(codePrefix, sectionNumber, anchor, targetKind = "section"
     kind: "section",
     codePrefix,
     sectionNumber: normalizedSectionNumber(sectionNumber),
+    referenceNumber: String(sectionNumber).toUpperCase(),
     anchorID: `JD_${anchor}`,
     targetKind
   };
@@ -107,6 +108,11 @@ export function parseCodeJumpAnchor(value) {
     };
   }
 
+  // Appendix parts (K1, K2) are chapter destinations; K101 is a section.
+  match = anchor.match(/^(BC|PC|MC|FGC)([A-Z]\d{1,2})$/i);
+  if (match) return {kind: "chapter", codePrefix: match[1].toUpperCase(),
+    chapterNumber: match[2].toUpperCase(), anchorID: `JD_${anchor}`, targetKind: "appendix"};
+
   match = anchor.match(/^(BC|PC|MC|FGC)([A-Z]?\d+(?:\.\d+)*(?:\([^)]+\))?)/i);
   if (match) return sectionTarget(match[1].toUpperCase(), match[2], anchor);
 
@@ -158,6 +164,7 @@ export function inlineCodeReferencePhrases(text, { includeFireCode = false } = {
           start: index === 0 ? phraseStart : numberStart,
           end: numberStart + numberMatch[0].length,
           sectionNumber: normalizedSectionNumber(numberMatch[0]),
+          referenceNumber: numberMatch[0],
           kind
         };
       });
@@ -183,4 +190,32 @@ export function inlineCodeReferencePhrases(text, { includeFireCode = false } = {
       seen.add(identity);
       return true;
     });
+}
+
+// Locate the authored destination, including numbered tables such as (1)/(2).
+// Looking across the loaded chapter also handles tables stored in a subsection
+// whose number differs from the table number.
+export function readerCodeReferenceTarget(content, detail) {
+  const target = detail.referenceTarget;
+  if (!content || !target) return null;
+  const compact = value => String(value || "").replace(/\s+/g, " ").replace(/\s+\(/g, "(").trim().toUpperCase();
+  const number = compact(target.number);
+  const anchor = target.anchorID || `JD_${detail.codePrefix}${target.kind === "table" ? "Table" : target.kind === "figure" ? "Figure" : ""}${number}`;
+  const escaped = anchor.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const anchorPattern = new RegExp(`(?:id|name)=["']${escaped}["']`, "i");
+  for (const section of content.querySelectorAll(".chapter-section")) {
+    section._readerBlockWindow?.ensureMatching(block => anchorPattern.test(block.html || ""));
+  }
+  const authored = [...content.querySelectorAll("[id],a[name]")].find(node =>
+    compact(node.id || node.getAttribute("name")) === compact(anchor));
+  if (authored) return authored.closest("caption,h2,h3,h4,h5,h6,p") || authored.parentElement;
+  const label = `${["table", "figure"].includes(target.kind) ? target.kind + " " : ""}${number}`;
+  const pattern = new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=$|\\s|[.:](?![0-9]))`, "i");
+  for (const section of content.querySelectorAll(".chapter-section")) {
+    section._readerBlockWindow?.ensureMatching(block => pattern.test(compact(block.plainText)));
+  }
+  const matches = [...content.querySelectorAll("caption,h2,h3,h4,h5,h6,p,strong,b,span,.section-block")]
+    .filter(node => !node.closest("button,a,.reader-section-title") && pattern.test(compact(node.textContent)));
+  const leaves = matches.filter(node => !matches.some(other => other !== node && node.contains(other)));
+  return leaves.length === 1 ? leaves[0] : null;
 }

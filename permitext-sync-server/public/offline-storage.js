@@ -1,6 +1,7 @@
 import { offlineAssetNamesForChapter, validatedOfflineCodeSources, offlineSourceIdentity, offlineSourceScope, offlineSectionMetadata, resolveOfflineSectionMetadata } from "./offline-code-metadata.js?v=1";
+import {codeReferenceRequest, resolveCodeReference} from "./code-reference-resolution.js?v=2";
 export { offlineAssetNamesForChapter, validatedOfflineCodeSources, offlineSourceIdentity, offlineSourceScope, offlineSectionMetadata, resolveOfflineSectionMetadata };
-import {downloadedLibraryStatus, readDownloadedLibrary, removeDownloadedLibrary} from './downloaded-library.js?v=14';
+import {downloadedLibraryStatus, readDownloadedLibrary, removeDownloadedLibrary} from './downloaded-library.js?v=15';
 import { searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./search-relevance.js?v=20261025-workspace-chrome-v1379";
 import { searchWords, matchesSearchWords, searchWordsSnippet } from "./search-words.js?v=20261025-workspace-chrome-v1379";
 import { withCodeAssetRevision } from "./code-asset-identity.js?v=20260923-asset-identity-v1";
@@ -23,7 +24,7 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1993";
+const shellCacheName = "permitext-pro-shell-v1996";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
@@ -33,8 +34,9 @@ const shellURLs = [
   "/web/workflow-views.js?v=9",
   "/web/active-code-sources.js",
   "/web/offline-code-metadata.js?v=1",
-  "/web/downloaded-library.js?v=14",
-  "/web/downloaded-library-worker.js?v=14",
+  "/web/code-reference-resolution.js?v=2",
+  "/web/downloaded-library.js?v=15",
+  "/web/downloaded-library-worker.js?v=15",
   "/web/downloaded-library-core.js?v=13",
   "/web/settings-columns.js?v=1",
   "/web/project-details-columns.js?v=20261021-project-columns-v3",
@@ -55,7 +57,7 @@ const shellURLs = [
   "/web/active-code-source-controller.js?v=2",
   "/web/active-code-source-navigation.js",
   "/web/code-asset-identity.js?v=20260923-asset-identity-v1",
-  "/web/public-code-revision.js?v=20261024-event-revision-v4",
+  "/web/public-code-revision.js?v=20261027-reference-metadata-v5",
   "/web/workspace-access-gate.js?v=20260923-public-panes-v1",
   "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
   "/web/reader-search-match.js?v=20261026-exact-section-v4",
@@ -87,7 +89,7 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261027-collapsed-divider-v1401",
+  "/web/web-client-version.js?v=20261027-research-navigation-v1404",
   "/web/web-app-update.js?v=2",
   "/web/research-delete-controls.js?v=2",
   "/web/research-related-provisions.js?v=3",
@@ -95,7 +97,7 @@ const shellURLs = [
   "/web/research-reader-target.js?v=3",
   "/web/research-discovery-query.js?v=2",
   "/web/research-v2-rollout.js?v=1",
-  "/web/research-v2.css?v=10",
+  "/web/research-v2.css?v=11",
   "/workspace",
   "/",
   "/marketing/home.js?v=20260921-theme-switch-v1",
@@ -107,13 +109,13 @@ const shellURLs = [
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261027-collapsed-divider-v1401",
+  "/web/app.js?v=20261027-research-navigation-v1404",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261027-collapsed-divider-v1401",
+  "/web/offline-storage.js?v=20261027-research-navigation-v1404",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",
@@ -130,7 +132,7 @@ const shellURLs = [
   "/web/code-question-evidence.js?v=20260807-code-question-phase5a-v1",
   "/web/code-question-analysis.js?v=20260817-adaptive-research-answer-v1",
   "/web/code-question-review.js?v=20260803-code-question-review-v1",
-  "/web/code-references.js?v=20260720-code-reference-links-v18",
+  "/web/code-references.js?v=20261027-code-reference-links-v19",
   "/web/sync-identity.js?v=20261021-identity-fast-path-v8",
   "/web/private-workspace-state.js?v=20260912-account-recovery-v8",
   "/web/legacy-workspace-restore.js?v=20261012-workflow-cache-v5",
@@ -143,7 +145,7 @@ const shellURLs = [
   "/web/notebook-note-menu.js?v=20261023-notes-reveal-v1298",
   "/web/notebook-columns.js?v=2",
   "/web/notebook-columns.js?v=3",
-  "/web/reader-block-window.js?v=9",
+  "/web/reader-block-window.js?v=10",
   "/web/reader-section-visibility.js?v=4",
   "/web/reader-render-batches.js?v=20261012-reader-batches-v1",
   "/web/search-query-session.js?v=20261012-search-session-v2",
@@ -1352,6 +1354,8 @@ async function offlineSectionMetadataRecords(installID) {
         if (!cursor) { resolve(records); return; }
         const record = cursor.value;
         records.push({ id: record.id, webSectionID: record.webSectionID, chapterID: record.chapterID,
+          sourceChapterNumber: record.sourceChapterNumber, navigationChapterID: record.navigationChapterID,
+          navigationChapterNumber: record.navigationChapterNumber,
           codePrefix: record.codePrefix, codeVersion: record.codeVersion, codeSectionID: record.codeSectionID,
           chapterNumber: record.chapterNumber, sectionNumber: record.sectionNumber, title: record.title });
         cursor.continue();
@@ -1695,6 +1699,13 @@ export async function offlineAPI(path) {
     return {
       sections: records.map((record, index) => sectionSummary(record, ids[index])).filter(Boolean)
     };
+  }
+  if (url.pathname === "/code/references/resolve") {
+    const target = codeReferenceRequest(url.searchParams);
+    const {section, referenceTarget} = resolveCodeReference(await offlineSectionMetadataRecords(metadata.installID), target);
+    return {section: {...offlineSectionMetadata(section, metadata, [target.version]),
+      navigationChapterID: section.navigationChapterID || section.chapterID,
+      referenceTarget}};
   }
   if (url.pathname === "/code/sections/resolve" && url.searchParams.get("include") === "metadata") {
     for (const key of ["code", "sectionNumber", "version"]) {

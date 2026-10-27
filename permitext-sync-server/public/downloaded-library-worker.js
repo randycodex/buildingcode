@@ -1,3 +1,4 @@
+import {codeReferenceRequest, resolveCodeReference} from "./code-reference-resolution.js?v=2";
 import { searchSpellingSuggestions } from "./search-relevance.js?v=20261025-workspace-chrome-v1379";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import {
@@ -860,6 +861,31 @@ async function readerFind(chapter, url, m, signal) {
     },
   };
 }
+async function referenceMetadataRecords(manifest, target) {
+  const db = await database();
+  try {
+    const range = IDBKeyRange.bound([manifest.generation, target.code, target.version, ""],
+      [manifest.generation, target.code, target.version, "\uffff"]);
+    const cursorRequest = db.transaction("sections").objectStore("sections").index("reference").openCursor(range);
+    return await new Promise((resolve, reject) => {
+      const records = [];
+      cursorRequest.onerror = () => reject(cursorRequest.error);
+      cursorRequest.onsuccess = () => {
+        const cursor = cursorRequest.result;
+        if (!cursor) { resolve(records); return; }
+        const section = cursor.value.value;
+        records.push({id: section.id, sectionID: section.sectionID, codePrefix: section.codePrefix,
+          codeVersion: section.codeVersion, codeSectionID: section.codeSectionID,
+          chapterID: section.chapterID, chapterNumber: section.chapterNumber,
+          sourceChapterNumber: section.sourceChapterNumber, navigationChapterID: section.navigationChapterID,
+          navigationChapterNumber: section.navigationChapterNumber, webSectionID: section.webSectionID,
+          sectionNumber: section.sectionNumber, title: section.title});
+        cursor.continue();
+      };
+    });
+  } finally { db.close(); }
+}
+
 async function read(path, offline, signal) {
   return navigator.locks.request(
     activeLock,
@@ -978,6 +1004,11 @@ async function read(path, offline, signal) {
             .filter(Boolean)
             .map((r) => offlineSectionMetadata(r.value, m.metadata)),
         };
+      } else if (url.pathname === "/code/references/resolve") {
+        const target = codeReferenceRequest(url.searchParams);
+        const {section, referenceTarget} = resolveCodeReference(await referenceMetadataRecords(m, target), target);
+        payload = {section: {...offlineSectionMetadata(section, m.metadata, [target.version]),
+          navigationChapterID: section.navigationChapterID || section.chapterID, referenceTarget}};
       } else if (url.pathname === "/code/sections/resolve") {
         const code = url.searchParams.get("code"),
           version = url.searchParams.get("version"),

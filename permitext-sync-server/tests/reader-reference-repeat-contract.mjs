@@ -27,7 +27,7 @@ function fixture() {
     querySelector:()=>content, getBoundingClientRect:()=>({top:84})};
   const state = {readers:[origin,target]};
   const context = vm.createContext({
-    state, activeWorkspaceID:'workspace', publicCodeRevision:{generation:1},
+    state, activeWorkspaceID:'workspace', publicCodeRevision:{generation:1}, readerReferenceOpeningAttempts:new Map(), readerReferenceNeedsPassage:()=>false,
     CSS:{escape:value=>value}, getComputedStyle:()=>({height:'126px'}),
     syncCodeVersion:value=>value, syncCodeVersionForPrefix:()=> 'edition-a',
     normalizeAnnotationBlockID:value=>value || '',
@@ -84,3 +84,29 @@ await disabled.open();
 assert.equal(disabled.calls.rendered,0); assert.equal(disabled.calls.revealed,0);
 assert.equal(disabled.content.scrollTop,4000, 'Declining source access leaves the visible Reader untouched');
 console.log('Repeated Reader references passed: preserve aligned exact-source content, tolerate pixel rounding, retain access checks and navigate moved/different/stale targets.');
+
+// Only the latest link clicked in a source Reader may publish after async metadata.
+const race=fixture(), pending=new Map();
+race.context.activeCodeSourcesController.captureContext=()=>({generation:1});
+race.context.resolveReaderCodeReference=(_reader,request)=>new Promise(resolve=>pending.set(request.number,resolve));
+const old=race.context.openReferenceInAdjacentReader(race.origin,{referenceRequest:{number:'old'}});
+const recent=race.context.openReferenceInAdjacentReader(race.origin,{referenceRequest:{number:'recent'}});
+pending.get('recent')(race.detail);await recent;
+pending.get('old')(race.detail);await old;
+assert.equal(race.calls.resolved,1,'Late metadata from an older click cannot reach source access or navigation');
+const switched=fixture();let finish;
+switched.context.activeCodeSourcesController.captureContext=()=>({generation:1});
+switched.context.resolveReaderCodeReference=()=>new Promise(resolve=>finish=resolve);
+const opening=switched.context.openReferenceInAdjacentReader(switched.origin,{referenceRequest:{number:'101'}});
+switched.context.activeWorkspaceID='elsewhere';finish(switched.detail);await opening;
+assert.equal(switched.calls.resolved,0);assert.equal(switched.calls.rendered,0);
+console.log('Reference request races passed: latest click wins, stale workspace cannot navigate.');
+
+// Select controls normalize numeric catalog chapter IDs to strings on hydration.
+// That changes representation, not the destination or navigation ownership.
+const normalized=fixture();normalized.offset=150;
+normalized.context.transitionWorkspace=async()=>{normalized.calls.rendered++;normalized.target.chapterID=10;};
+await normalized.open();
+assert.equal(normalized.calls.revealed,1,'Hydrated string/number IDs must not silently cancel the reveal');
+assert.equal(normalized.calls.aligned,1);
+console.log('Reader identity normalization passed: equivalent numeric/string chapter IDs still reveal and align.');

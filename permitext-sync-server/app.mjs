@@ -276,6 +276,7 @@ import {
 } from "./report-contract.mjs";
 import { codeMemoHTML, codeMemoStructuredJSON } from "./public/code-question-issue.js";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
+import { codeReferenceRequest, resolveCodeReference } from "./public/code-reference-resolution.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
 import { recordSurvivesBulkClear } from "./public/sync-state.js";
 import {
@@ -24001,7 +24002,21 @@ async function handleResolveCodeSectionMetadata(request, response) {
   await handleCodeSection(request, `code/sections/${matches[0].id}`, response);
 }
 
-async function handleCodeSection(request, path, response) {
+async function handleResolveCodeReference(request, response) {
+  try {
+    const target = codeReferenceRequest(requestURL(request).searchParams);
+    const records = [...(await allSectionCatalogByID()).values()].map(section => ({
+      ...applyVisibleSectionNumber(section), codeVersion: section.codeVersion || defaultSyncCodeVersion
+    }));
+    const {section, referenceTarget} = resolveCodeReference(records, target);
+    await handleCodeSection(request, `code/sections/${section.id}`, response, referenceTarget);
+  } catch (error) {
+    if (!error.statusCode) throw error;
+    sendError(response, error.statusCode, error.message);
+  }
+}
+
+async function handleCodeSection(request, path, response, referenceTarget = null) {
   const sectionID = path.split("/").at(-1);
   if (!/^\d+$/.test(sectionID || "")) {
     sendError(response, 400, "Invalid section ID.");
@@ -24038,7 +24053,8 @@ async function handleCodeSection(request, path, response) {
       codePrefix: summary.codePrefix, codeSectionID: summary.codeSectionID,
       codeVersion, codeSource,
       sectionNumber: applyVisibleSectionNumber(summary).sectionNumber,
-      title: summary.title
+      title: summary.title,
+      ...(referenceTarget ? {referenceTarget} : {})
     } });
     return;
   }
@@ -34730,7 +34746,7 @@ async function handleRequestUnlocked(request, response) {
       return;
     }
     if (request.method === "GET" && (
-      ["code/revision", "code/libraries", "code/chapters", "code/sections", "code/sections/resolve", "code/search"].includes(path) ||
+      ["code/revision", "code/libraries", "code/chapters", "code/sections", "code/sections/resolve", "code/references/resolve", "code/search"].includes(path) ||
       /^code\/chapters\/[a-zA-Z0-9_-]+$/.test(path) || /^code\/sections\/\d+$/.test(path)
     )) {
       currentPublicCodeRevision = await timePublicCodePhase("revision", () => publicCodeCorpusRevision());
@@ -34760,6 +34776,10 @@ async function handleRequestUnlocked(request, response) {
     }
     if (request.method === "GET" && path === "code/sections") {
       await handleCodeSections(request, response);
+      return;
+    }
+    if (request.method === "GET" && path === "code/references/resolve") {
+      await handleResolveCodeReference(request, response);
       return;
     }
     if (request.method === "GET" && path === "code/sections/resolve") {

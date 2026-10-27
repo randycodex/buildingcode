@@ -84,3 +84,23 @@ assert.equal(legacy.querySelector(".inline-bookmark-toggle").hidden,false);asser
 assert.equal(reads,legacyReads,"The destination picker does not read private Research state until invoked.");
 const readerSource=actual("renderReader");assert.ok(readerSource.indexOf("panel.__workspaceAccessGate = options.accessGate || null")<readerSource.indexOf("renderReaderTrust(panel, reader)"));
 console.log("Reader public presentation passed: no pending saved/research/project reads, complete public text, extracted bookmark identity, in-place private upgrade, dynamic Research target and revoked mutation guard.");
+
+// Run the actual linker after a suspended section is rebuilt in the SAME root.
+// The release step discards event-bearing children but retains root datasets.
+const priorMatches=Node.prototype.matches;
+Node.prototype.matches=function(selector){return selector==='[data-code-jump-anchor]'
+  ? Boolean(this.dataset.codeJumpAnchor) : priorMatches.call(this,selector);};
+Object.assign(context,{NodeFilter:{SHOW_TEXT:4,FILTER_REJECT:2,FILTER_ACCEPT:1},
+  inlineCodeReferencePhrases:()=>[],openStructuredCodeReference:(_reader,anchor)=>{context.clickedReference=anchor;}});
+context.document.createTreeWalker=()=>({nextNode:()=>false});
+context.renderCodeBlock=()=>{const body=new Node('div');const link=new Node('button');link.dataset.codeJumpAnchor='T28C001';body.append(link);return body;};
+vm.runInContext(actual('linkInlineCodeReferences'),context);
+for(let cycle=0;cycle<3;cycle++){
+  rendered.dataset.inlineReferencesLinked='true';rendered.children=[];
+  context.buildReaderChapterSection(panel,reader,section,new Map(),{host:rendered});
+  const link=rendered.querySelector('[data-code-jump-anchor]');
+  assert.equal(link.dataset.codeJumpBound,'true','Fresh links are rebound on the retained section root');
+  context.clickedReference='';await link.events.click({detail:1});
+  assert.equal(context.clickedReference,'T28C001','The restored link actually dispatches navigation');
+}
+console.log('Restored Reader link handlers passed across three suspend/rebuild cycles.');

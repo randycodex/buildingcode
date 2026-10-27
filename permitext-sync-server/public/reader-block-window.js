@@ -113,6 +113,10 @@ export function createReaderBlockWindow({root, content, panel, blocks, blockID, 
   const controller = {
     text: () => blocks.map(block => block.plainText || "").join(" "),
     ensure(id) {const index = ids.get(id); return index === undefined ? null : range(index);},
+    ensureMatching(predicate) {
+      const index = blocks.findIndex(predicate);
+      return index < 0 ? null : range(index);
+    },
     ensureText(text) {
       const needle = String(text || '').replace(/\s+/g, ' ').trim().toLowerCase();
       if (!needle) return null;

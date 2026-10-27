@@ -12,7 +12,7 @@ function setup() {
   controller.setContext({accountID:'a',sessionID:'s'});
   const reader={id:'reader',codePrefix:'BC68',codeVersion:'exact',chapterID:'old',sectionID:'previous'};
   let began=0, notices=0;
-  const c={activeCodeSourcesController:controller,createActiveCodeSourceNavigationGuard,
+  const c={activeCodeSourcesController:controller,createActiveCodeSourceNavigationGuard, readerReferenceOpeningAttempts:new Map(),
     syncCodeVersion:value=>value,syncCodeVersionForPrefix:()=> 'exact',fetchChapterList:async()=>[{id:'new',codePrefix:'BC68',codeVersion:'exact'}],
     confirmWebWarning:async()=>false,captureAccountRequest:()=> 'a',isCurrentAccountRequest:value=>value==='a',activeWorkspaceID:'w',
     state:{readers:[reader]},closeActiveCustomSelect(){},beginReaderNavigation(){began++;return 'nav';},
@@ -57,7 +57,7 @@ for (const accept of [false,true]) {
   vm.runInContext(extract('openInlineCodeReference','async function openStructuredCodeReference('),t.c);
   const trigger={isConnected:true,setAttribute(){},removeAttribute(){}};
   await t.c.openInlineCodeReference(t.reader,'BC68','27-1',trigger);
-  assert.equal(passed.sectionNumber,'27-1');assert.equal(passed.codeVersion,'exact');assert.equal(trigger.disabled,false);
+  assert.equal(passed.referenceRequest.sectionNumber,'27-1');assert.equal(passed.referenceRequest.codePrefix,'BC68');assert.equal(trigger.disabled,false);
 }
 {
   const t=setup();await t.controller.ensureCatalog();let reject,entered,refreshes=0;
@@ -84,13 +84,13 @@ for (const phase of ['transition','ready']) {
   assert.equal(aligned,0);assert.equal(scrolled,0);
 }
 {
-  const t=setup();let opened=0,version;
-  Object.assign(t.c,{parseCodeJumpAnchor:()=>({kind:'chapter',codePrefix:'BC68',chapterNumber:'1'}),codeDisplayLabel:value=>value,
-    fetchChapterList:async(_prefix,requested)=>{version=requested;return [{id:'wrong',codePrefix:'BC68',chapterNumber:'1',codeVersion:'other-edition'}];},
-    openReferenceInAdjacentReader:async()=>{opened++;}});
-  vm.runInContext(extract('openStructuredCodeReference','function plainTextFromHTML('),t.c);
+  const t=setup();let passed;
+  Object.assign(t.c,{parseCodeJumpAnchor:()=>({kind:'chapter',codePrefix:'BC68',chapterNumber:'1'}),
+    openReferenceInAdjacentReader:async(_reader,detail)=>{passed=detail;}});
+  vm.runInContext(extract('openInlineCodeReference','async function openStructuredCodeReference(')+extract('openStructuredCodeReference','function plainTextFromHTML('),t.c);
   await t.c.openStructuredCodeReference(t.reader,'anchor',{isConnected:true,setAttribute(){},removeAttribute(){}});
-  assert.equal(version,'exact');assert.equal(opened,0,'Structured references reject another edition');
+  assert.equal(passed.referenceRequest.chapterNumber,'1');
+  assert.equal(passed.referenceRequest.kind,'chapter');
 }
 // Exercise the real async wrappers and focus-restoration helper, including browser
 // disabling behavior and a user who focuses elsewhere before returning to BODY.

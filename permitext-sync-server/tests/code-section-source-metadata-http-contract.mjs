@@ -59,7 +59,7 @@ try {
   // Run the actual handler in an isolated context: metadata branch must succeed
   // even though every rich-body provider throws if reached.
   const text = await readFile(new URL('../app.mjs', import.meta.url), 'utf8');
-  const functionText = text.slice(text.indexOf('async function handleCodeSection(request, path, response) {'), text.indexOf('\nasync function handleCodeSections('));
+  const functionText = text.slice(text.indexOf('async function handleCodeSection(request, path, response, referenceTarget = null) {'), text.indexOf('\nasync function handleCodeSections('));
   const selected = sections.find(section => section.codePrefix === 'BC' && !section.codeVersion);
   let sent;
   const context = { requestURL: request => new URL(request.url, base),

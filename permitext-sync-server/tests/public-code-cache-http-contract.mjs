@@ -27,6 +27,10 @@ try{
   assert.equal(rejected.response.status,409);
   assert.equal(rejected.response.headers.get('cache-control'),'no-store');
  }
+ const referenceResolve='/code/references/resolve?include=metadata&code=AC&version='+encodeURIComponent('CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1')+'&number=28-103&kind=article-or-section';
+ const reference=await publicRepresentation(referenceResolve);
+ assert.equal(reference.value.section.sectionNumber,'28-103.1');
+ assert.equal((await request(referenceResolve+'&expectedPublicCorpusRevision=wrong')).response.status,409);
  const revision=await publicRepresentation('/code/revision');
  assert.equal(revision.value.cacheContract,1);
  assert.ok(revision.value.corpusRevision);

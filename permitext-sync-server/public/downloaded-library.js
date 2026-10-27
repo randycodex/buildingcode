@@ -52,7 +52,7 @@ function call(action, data = {}, { signal, onProgress } = {}) {
   signal?.throwIfAborted();
   clearTimeout(timer);
   if (!worker) {
-    worker = new Worker("/web/downloaded-library-worker.js?v=14", {
+    worker = new Worker("/web/downloaded-library-worker.js?v=15", {
       type: "module",
     });
     worker.onmessage = ({ data }) => {
@@ -125,7 +125,7 @@ export async function readDownloadedLibrary(
   if ((!force && !usesDownloadedLibrary()) || !downloadedLibrarySupported())
     return null;
   if (
-    !/^\/code\/(?:revision|libraries|chapters(?:\/[a-zA-Z0-9_-]+)?|sections(?:\/(?:\d+|resolve))?|search)(?:\?|$)/.test(
+    !/^\/code\/(?:revision|libraries|chapters(?:\/[a-zA-Z0-9_-]+)?|references\/resolve|sections(?:\/(?:\d+|resolve))?|search)(?:\?|$)/.test(
       path,
     )
   )
