@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {mkdtemp,rm} from 'node:fs/promises';
+import {mkdtemp,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createResearchV2Budget,createLunaV2Client,lunaUsageMicroUSD} from '../research-v2-budget.mjs';
@@ -16,6 +16,14 @@ try{
   const summary=await budget.summary();assert.equal(summary.uncertainOrReservedCalls,1);
   assert.equal(lunaUsageMicroUSD({usage:{input_tokens:1000,output_tokens:1000,input_tokens_details:{cached_tokens:500}}}),555);
   assert.deepEqual(await createResearchV2Budget({path,limitUSD:.02}).summary(),summary,'Restart cannot reset spending');
+  assert.equal((await createResearchV2Budget({path,limitUSD:7}).summary()).limitUSD,.02,'A new runner cannot enlarge an existing cap');
+  assert.equal(lunaUsageMicroUSD({usage:{input_tokens:100,output_tokens:20,input_tokens_details:{cache_write_tokens:-500}}}),null,'Malformed usage must retain the full reservation');
+  const corruptPath=join(scratch,'corrupt.json');
+  await writeFile(corruptPath,JSON.stringify({schema:1,limitMicroUSD:7000000,calls:[{status:'settled',reservedMicroUSD:100,chargedMicroUSD:-1000000}]}));
+  await assert.rejects(createResearchV2Budget({path:corruptPath}).reserve(body,'draft'),{code:'V2_BUDGET_INVALID'});
+  let transports=0;
+  const empty=createLunaV2Client({apiKey:'offline',budget:createResearchV2Budget({path:join(scratch,'tiny.json'),limitUSD:.000001}),transport:async()=>{transports++;}});
+  await assert.rejects(empty(body,{phase:'draft'}),{code:'V2_BUDGET_EXHAUSTED'});assert.equal(transports,0,'Budget rejection occurs before dispatch');
   const uncertain=createResearchV2Budget({path:join(scratch,'uncertain.json'),limitUSD:.02});
   const call=createLunaV2Client({apiKey:'offline',budget:uncertain,transport:async()=>{throw new Error('network interrupted');}});
   await assert.rejects(call(body,{phase:'draft'}),/interrupted/);

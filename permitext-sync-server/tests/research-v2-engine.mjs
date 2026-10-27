@@ -11,6 +11,11 @@ const input = {question:'Explain the exception.',sources:[source],projectContext
 const packet = freezeResearchV2Turn(input);
 assert(!JSON.stringify(packet).includes('never included'));
 assert.equal(packet.history[0].authority,'not_source_authority');
+const legacyPacket=freezeResearchV2Turn({...input,history:[{role:'assistant',answer:{conclusion:'Old conclusion.',explanation:'Essential qualification.'}}]});
+assert.equal(legacyPacket.history[0].text,'Old conclusion.\n\nEssential qualification.','Legacy context must not lose its qualification');
+const longPacket=freezeResearchV2Turn({...input,history:Array.from({length:120},(_,i)=>({role:'user',text:`Fact ${i}`}))});
+assert.equal(longPacket.history.length,120,'No silent conversation truncation');
+assert.throws(()=>freezeResearchV2Turn({...input,history:[{role:'user',text:'x'.repeat(130001)}]}),/too long/);
 source.text='Changed after capture';assert(packet.sources[0].text.includes('A and B'));source.text=packet.sources[0].text;
 let calls=[];
 let result=await runResearchV2(input,{call:async(body,meta)=>{

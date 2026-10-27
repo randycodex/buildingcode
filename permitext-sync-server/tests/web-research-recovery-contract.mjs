@@ -11,7 +11,7 @@ function extract(name, async = false) {
   return source.slice(start, end + 2);
 }
 function deferred() { let resolve; let reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { resolve, reject, promise }; }
-function element() { return { dataset: {}, children: [], style: { setProperty() {} }, callbacks: {}, setAttribute() {}, append(...items) { this.children.push(...items); }, addEventListener(event, action) { this.callbacks[event] = action; } }; }
+function element() { return { dataset: {}, children: [], style: { setProperty() {} }, callbacks: {}, setAttribute() {}, append(...items) { this.children.push(...items); }, prepend(...items) { this.children.unshift(...items); }, addEventListener(event, action) { this.callbacks[event] = action; } }; }
 function all(root) { return [root, ...root.children.flatMap(all)]; }
 function harness() {
   const requests = [], writes = [], paints = [], successes = [], failures = [], opens = [];
@@ -44,7 +44,7 @@ function harness() {
     async openResearchConversation(id) { opens.push(id); return returnConversation ? { id } : null; },
     async openSupplementalResearchConversation(id) { opens.push(id); return returnConversation ? { id } : null; }
   });
-  const helpers = ["researchProgressFailureRecovery", "researchConversationContainsCompletedRequest", "reconciledResearchProgressSession", "currentResearchProgressConversation", "captureResearchProgressView", "researchProgressViewIsCurrent", "researchProgressConversationConflict"].map(name => extract(name)).join("\n");
+  const helpers = ["researchWorkflowButton", "researchProgressFailureRecovery", "researchConversationContainsCompletedRequest", "reconciledResearchProgressSession", "currentResearchProgressConversation", "captureResearchProgressView", "researchProgressViewIsCurrent", "researchProgressConversationConflict"].map(name => extract(name)).join("\n");
   vm.runInContext(`${helpers}\n${extract("runResearchProgressSession", true)}\n${extract("renderResearchProgressCard")}\nglobalThis.run = runResearchProgressSession; globalThis.render = renderResearchProgressCard; globalThis.reconcile = reconciledResearchProgressSession;`, context);
   return { context, progress, requests, writes, paints, opens, successes, failures,
     run: () => context.run(progress, { onSuccess: (payload) => successes.push(payload), onFailure: (error) => failures.push(error) }),

@@ -16,6 +16,10 @@ export function lunaUsageMicroUSD(payload) {
   const usage = payload?.usage;
   if (!Number.isSafeInteger(usage?.input_tokens) || !Number.isSafeInteger(usage?.output_tokens) ||
       usage.input_tokens < 0 || usage.output_tokens < 0) return null;
+  for (const field of ['cached_tokens', 'cache_write_tokens']) {
+    const value = usage.input_tokens_details?.[field];
+    if (value != null && (!Number.isSafeInteger(value) || value < 0)) return null;
+  }
   const cached = Math.max(0, Math.min(usage.input_tokens, usage.input_tokens_details?.cached_tokens || 0));
   const writes = usage.input_tokens_details?.cache_write_tokens || 0;
   const multiplier = ['fast', 'priority'].includes(payload.service_tier) ? 2 : 1;
@@ -39,7 +43,12 @@ export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitU
       try { ledger = JSON.parse(await readFile(path, 'utf8')); }
       catch (cause) { if (cause.code !== 'ENOENT') throw cause; ledger = { schema: 1, limitMicroUSD: micros(limitUSD), calls: [] }; }
       if (ledger.schema !== 1 || !Array.isArray(ledger.calls) || !Number.isSafeInteger(ledger.limitMicroUSD) ||
-          ledger.limitMicroUSD > micros(researchV2BudgetLimitUSD)) throw error('Invalid evaluation budget ledger.', 'V2_BUDGET_INVALID');
+          ledger.limitMicroUSD <= 0 || ledger.limitMicroUSD > micros(researchV2BudgetLimitUSD) ||
+          ledger.calls.some(call => !['reserved','settled','uncertain'].includes(call.status) ||
+            !Number.isSafeInteger(call.reservedMicroUSD) || call.reservedMicroUSD < 0 ||
+            (call.status !== 'reserved' && call.chargedMicroUSD == null) ||
+            (call.chargedMicroUSD != null && (!Number.isSafeInteger(call.chargedMicroUSD) || call.chargedMicroUSD < 0))))
+        throw error('Invalid evaluation budget ledger.', 'V2_BUDGET_INVALID');
       // An existing ledger's limit may be reduced but never enlarged by a runner.
       ledger.limitMicroUSD = Math.min(ledger.limitMicroUSD, micros(limitUSD));
       const result = update(ledger);

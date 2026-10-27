@@ -1,6 +1,6 @@
-import { createResearchV2View } from "./research-v2.js?v=2";
+import { createResearchV2View, researchDiscoveryQuery } from "./research-v2.js?v=4";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261026-research-v2-v1385";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1387";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -151,7 +151,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261026-research-v2-v1385";
+} from "./offline-storage.js?v=20261027-research-v2-v1387";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -26082,13 +26082,14 @@ async function renderResearchV2Pane(paneID) {
         if (conversation?.sources?.some(source => source.kind === "selection")) {
           const result = await postResearch("/research/conversations/related", {conversationID:conversation.id,question,
             expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)});
-          return result.candidates || [];
+          return result;
         }
-        const parameters = new URLSearchParams({q:question.slice(0,200),match:"words",limit:"12"});
+        const searchQuery = researchDiscoveryQuery(question);
+        const parameters = new URLSearchParams({q:searchQuery,match:"words",limit:"12"});
         const response = await fetch(`/code/search?${parameters}`);
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || "Source search failed.");
-        return (result.results || []).map(item => ({...item,sectionID:String(item.sectionID || item.id)}));
+        return {searchQuery,candidates:(result.results || []).map(item => ({...item,sectionID:String(item.sectionID || item.id)}))};
       },
       onReview:candidate => postResearch("/research/selections/review", {sectionID:candidate.sectionID,
         codeVersion:candidate.codeVersion || defaultSyncCodeVersion,reviewMode:"whole_section"}),

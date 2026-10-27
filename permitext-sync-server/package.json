@@ -57,7 +57,7 @@
     "start:local-research": "zsh scripts/start-local-research.zsh",
     "start:research-v2": "node scripts/start-research-v2-local.mjs",
     "eval:research-v2": "node scripts/eval-research-v2.mjs",
-    "test:research-v2": "node tests/research-v2-engine.mjs && node tests/research-v2-budget.mjs && node tests/research-v2-http.mjs",
+    "test:research-v2": "node tests/research-v2-view.mjs && node tests/research-v2-engine.mjs && node tests/research-v2-budget.mjs && node tests/research-v2-http.mjs && node tests/research-v2-discovery.mjs",
     "start:local-pro": "node scripts/start-local-pro-preview.mjs",
     "test:local-pro-persistence": "node tests/local-pro-preview-persistence.mjs",
     "build:clients": "npm run build:notebook && npm run build:account-verification && npm run build:analytics && npm run build:report-preview",

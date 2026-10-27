@@ -14,7 +14,7 @@ Object.assign(process.env,{NODE_ENV:'test',OPENAI_API_KEY:'offline-double',PERMI
   PERMITEXT_RESEARCH_USER_DAILY_CAP_USD:'7',PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD:'7',PERMITEXT_RESEARCH_DAILY_CAP_USD:'7',PERMITEXT_RESEARCH_MONTHLY_CAP_USD:'7',
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS:'.1',PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS:'.01',
   PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS:'.5',PERMITEXT_RESEARCH_PRICING_VERSION:'offline-v2-test'});
-const nativeFetch=globalThis.fetch;let calls=0,broken=false,gap=false,server,userID,token,account;
+const nativeFetch=globalThis.fetch;let gate=null,dropResponse=false,lastHandled=Promise.resolve();let calls=0,broken=false,gap=false,server,userID,token,account;
 const passage='This code shall be known and may be cited as the "New York City Building Code," "NYCBC" or "BC". All section numbers in this code shall be deemed to be preceded by the designation "BC".';
 const draft={answerText:'The selected text calls this the New York City Building Code, NYCBC, or BC. [S1]',claims:[{text:'The selected text supplies these names.',sourceIDs:['S1']}],missingSources:[],missingFacts:[]};
 globalThis.fetch=async(url,options)=>{
@@ -23,6 +23,7 @@ globalThis.fetch=async(url,options)=>{
   assert.equal(body.model,'gpt-6-luna');assert.equal(body.service_tier,'default');assert.equal(body.store,false);assert(!body.tools);
   assert(!body.input.includes('SECRET_UNSELECTED'));
   const phase=body.text.format.name;
+  if(gate){const pending=gate;gate=null;pending.started();await pending.wait;}
   const output=phase==='permitext_v2_review'?{pass:!broken,issues:broken?[{code:'unsupported_claim',detail:'This proposed answer failed review.'}]:[]}:gap?{answerText:'The selected passage does not establish what the absent lender rider requires.',claims:[],missingSources:['The lender rider.'],missingFacts:[]}:draft;
   return Response.json({model:body.model,status:'completed',service_tier:'default',usage:{input_tokens:200,output_tokens:100},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(output)}]}]});
 };
@@ -35,11 +36,12 @@ try{
       response.writeHead(200,{'content-type':'text/html','cache-control':'no-store'});
       response.end(`<script>localStorage.setItem('permitext:webAccount:v1',${JSON.stringify(JSON.stringify(stored))});location.replace('/workspace?research=v2')</script>`);return;
     }
-    return handleRequest(request,response);
+    if(dropResponse&&request.url==='/research/conversations/message'){dropResponse=false;response.end=()=>{response.destroy();return response;};}
+    lastHandled=handleRequest(request,response);return lastHandled;
   });
   await new Promise(resolve=>server.listen(serve?8806:0,'127.0.0.1',resolve));
   const base=`http://127.0.0.1:${server.address().port}`;
-  const post=async(path,values={},bearer=token)=>{const response=await nativeFetch(base+path,{method:'POST',headers:{'content-type':'application/json',...(bearer?{authorization:`Bearer ${bearer}`}:{})},body:JSON.stringify({auth:{accountUserID:userID},...values})});return{status:response.status,body:await response.json()};};
+  const post=async(path,values={},bearer=token,signal)=>{const response=await nativeFetch(base+path,{method:'POST',signal,headers:{'content-type':'application/json',...(bearer?{authorization:`Bearer ${bearer}`}:{})},body:JSON.stringify({auth:{accountUserID:userID},...values})});return{status:response.status,body:await response.json()};};
   const providerID=randomUUID();
   account=(await post('/account/sign-in',{credential:{provider:'web',providerUserID:providerID,displayName:'Research v2 local test'}})).body.account;
   userID=account.appUserID;token=account.backendSessionToken;
@@ -74,9 +76,42 @@ try{
   const removed=await post('/research/conversations/evidence',{conversationID:current.id,action:'remove',sourceID:current.sources.find(s=>s.kind==='selection').id,expectedRevision:current.revision,expectedEvidenceSetVersion:current.evidenceSetVersion});
   assert.equal(removed.status,200,JSON.stringify(removed.body));
   assert.deepEqual((await adapter.read()).researchAnswersByUserID[userID][0],record,'Removing evidence cannot alter saved answers');
+  // Two tabs cannot execute the same paid turn twice, nor commit against
+  // evidence changed while a provider response was in flight.
+  const fresh=async()=> (await post('/research/conversations/create',{analysisMode:'conversation_only',selections:[{sectionID:'1',selectedText:passage}]})).body.conversation;
+  let race=await fresh(),release,started;
+  const begun=new Promise(resolve=>{started=resolve;});
+  gate={started,wait:new Promise(resolve=>{release=resolve;})};
+  const raceInput={...context(race),question:'What is this code called?',requestID:'two-tabs'};
+  const inFlight=post('/research/conversations/message',raceInput);
+  await begun;const callsAtGate=calls;
+  const duplicate=await post('/research/conversations/message',raceInput);
+  assert.equal(duplicate.status,409,JSON.stringify(duplicate));assert.equal(calls,callsAtGate,'Concurrent duplicate cannot call Luna');
+  const mutation=await post('/research/conversations/evidence',{conversationID:race.id,action:'remove',sourceID:race.sources.find(s=>s.kind==='selection').id,expectedRevision:race.revision,expectedEvidenceSetVersion:race.evidenceSetVersion});
+  assert.equal(mutation.status,200,JSON.stringify(mutation));release();
+  const staleCompletion=await inFlight;assert.equal(staleCompletion.status,409,JSON.stringify(staleCompletion));
+  assert(!(await adapter.read()).researchAnswersByUserID[userID].some(a=>a.conversationID===race.id),'Late completion cannot save an answer against changed evidence');
+  race=await fresh();const lostInput={...context(race),question:'What is this code called?',requestID:'lost-response'};
+  dropResponse=true;await assert.rejects(post('/research/conversations/message',lostInput));
+  const callsAfterLoss=calls;
+  const recovered=await post('/research/conversations/message',lostInput);
+  assert.equal(recovered.status,200,JSON.stringify(recovered));assert.equal(recovered.body.replayed,true);assert.equal(calls,callsAfterLoss,'Lost response recovery cannot rebill');
+  assert.equal((await adapter.read()).researchAnswersByUserID[userID].filter(a=>a.conversationID===race.id).length,1);
+  const cancelConversation=await fresh(),abort=new AbortController();
+  const cancelBegan=new Promise(resolve=>{started=resolve;});
+  gate={started,wait:new Promise(resolve=>{release=resolve;})};
+  const cancelRequest=post('/research/conversations/message',{...context(cancelConversation),question:'Explain this passage.',requestID:'cancelled-turn'},token,abort.signal);
+  await cancelBegan;const handling=lastHandled;abort.abort();await assert.rejects(cancelRequest,{name:'AbortError'});release();await handling;
+  assert(!(await adapter.read()).researchAnswersByUserID[userID].some(a=>a.conversationID===cancelConversation.id),'Cancelled turn cannot persist an answer');
+  // Unknown provider failures leave existing answers and user drafts recoverable.
+  const beforeFailure=structuredClone((await adapter.read()).researchAnswersByUserID[userID]);
+  const usualFetch=globalThis.fetch;globalThis.fetch=async()=>{throw new Error('offline provider failure');};
+  const failed=await post('/research/conversations/message',{...context(recovered.body.conversation),question:'Explain once more.',requestID:'provider-failure'});
+  assert(failed.status>=400);globalThis.fetch=usualFetch;
+  assert.deepEqual((await adapter.read()).researchAnswersByUserID[userID],beforeFailure);
   process.env.PERMITEXT_RESEARCH_V2='0';
   const disabled=await post('/research/conversations/message',{...context(removed.body.conversation),question:'Explain.',requestID:'disabled'});assert.equal(disabled.status,404);
   process.env.PERMITEXT_RESEARCH_V2='1';
-  console.log('Research v2 HTTP passed: real canonical selection, Luna draft/review, durable exact evidence, no rebilling on replay, stale revision/auth rejection, withheld failed draft, immutable history, local-only gate. No paid calls.');
+  console.log('Research v2 HTTP passed: real canonical selection, Luna draft/review, durable exact evidence, no rebilling on replay, stale revision/auth rejection, withheld failed draft, immutable history, local-only gate, two-tab exclusion, mid-turn evidence mutation, lost-response replay cancellation and provider failure recovery. No paid calls.');
   if(serve){console.log(JSON.stringify({preview:base+`/preview/${capability}`,offline:true,store:scratch}));await new Promise(()=>{});}
 }finally{globalThis.fetch=nativeFetch;if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}await rm(scratch,{recursive:true,force:true});}

@@ -6,7 +6,17 @@ const node = (tag, className = '', text = '') => {
 const action = (label, callback, className = '') => {
   const el = node('button', className, label); el.type = 'button'; el.addEventListener('click', callback); return el;
 };
-export const passageChipLabel = source => `${source.codePrefix || source.codeBook || 'Code'} § ${source.sectionNumber || source.sectionID} · ${String(source.codeEdition || source.edition || source.codeVersion || '').match(/(?:19|20)\d{2}/)?.[0] || 'Edition unavailable'}`;
+export const passageChipLabel = source => `${source.codePrefix || source.codeBook || 'Code'} § ${source.sectionNumber || source.sectionID} · ${String(source.codeEdition || source.edition || source.codeSource?.editionLabel || source.codeVersion || '').match(/(?:19|20)\d{2}/)?.[0] || 'Edition unavailable'}`;
+
+// Strip conversational framing only; do not infer code rules or applicability.
+export function researchDiscoveryQuery(question) {
+  const filler = new Set('what which how why when where does do did is are was were would could should can may must the a an me my i we our you your please explain tell show find affects affect about for of to in under according requirements requirement'.split(' '));
+  const terms = String(question).toLowerCase().match(/[a-z0-9]+(?:[.:-][a-z0-9]+)*/g) || [];
+  return terms.filter(term => !filler.has(term)).join(' ').slice(0,200) || String(question).slice(0,200);
+}
+
+export const researchAnswerText = message => message.answer?.answerText || [message.answer?.conclusion, message.answer?.explanation].filter(Boolean).join('\n\n') || message.failure?.message || 'This answer did not complete.';
+export const researchReviewLabel = answer => answer?.verification?.pass === true ? 'AI reviewed · Check cited text' : answer?.verification?.status === 'failed' || answer?.authorityStatus === 'incomplete' ? 'Incomplete' : 'Unreviewed';
 
 export function createResearchV2View(options) {
   const { conversation, history = [], initialDraft = '', onDraft, onNew, onOpen, onSend,
@@ -49,10 +59,10 @@ export function createResearchV2View(options) {
       const bubble=node('div','rv2-user',message.question||'');bubble.setAttribute('aria-label','Your question');thread.append(bubble);
     }else if(message.role==='assistant'){
       const bubble=node('article','rv2-answer');bubble.setAttribute('aria-label','Research answer');
-      const text=message.answer?.answerText||message.answer?.conclusion||message.answer?.explanation||message.failure?.message||'This answer did not complete.';
+      const text=researchAnswerText(message);
       for(const paragraph of text.split(/\n\s*\n/)){const p=node('p');paragraphText(p,paragraph,message);bubble.append(p);}
       const footer=node('div','rv2-answer-footer');
-      footer.append(node('span','',message.answer?.verification?.pass?'AI reviewed · Check cited text':message.answer?.verification?.status==='unreviewed'?'Unreviewed':'Incomplete'));
+      footer.append(node('span','',researchReviewLabel(message.answer)));
       footer.append(action('Sources used',()=>void showSnapshot(message),'rv2-text-action'));
       bubble.append(footer);thread.append(bubble);
     }
@@ -76,7 +86,7 @@ export function createResearchV2View(options) {
   const detailBody=node('div','rv2-detail-body');
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
   chat.append(mobileHistory,thread,detail,status,composer);root.append(rail,chat);
-  function update(){input.disabled=busy;attach.disabled=busy||includeBusy;send.disabled=busy||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy));}
+  function update(){input.disabled=busy;attach.disabled=busy||includeBusy;send.disabled=busy||includeBusy||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy));}
   function showDetail(){thread.hidden=true;detail.hidden=false;detailBody.replaceChildren();return detailBody;}
   function showPassage(source){const content=showDetail();content.append(node('h3','',passageChipLabel(source)),node('p','rv2-source-text',source.selectedText));
     content.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));
@@ -84,21 +94,25 @@ export function createResearchV2View(options) {
       if(busy)return;try{await onRemove(source);}catch(error){notice(error.message,true);}
     },'rv2-text-action'));
   }
-  async function showSnapshot(message){const attempt=++generation;notice('Loading original passages…');
+  async function showSnapshot(message){if(busy||includeBusy)return;const attempt=++generation;notice('Loading original passages…');
     try{const saved=await onSnapshot(message);if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','','Sources used by this answer'));
       for(const source of saved){content.append(node('h4','',passageChipLabel(source)),node('p','rv2-source-text',source.passageText||source.selectedText||source.text||''));
         content.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));}
     }catch(error){if(valid(attempt))notice(error.message,true);}}
   async function findPassages(){
-    if(busy)return;menu.hidden=true;attach.setAttribute('aria-expanded','false');const question=input.value.trim();
+    if(busy||includeBusy)return;menu.hidden=true;attach.setAttribute('aria-expanded','false');const question=input.value.trim();
     if(!question&&!passageSources.length){notice('Enter a topic to find passages, or choose From Reader.');return;}
     const attempt=++generation;notice('Finding passages…');
     try{const result=await onFind(question);if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','','Candidate passages'));
       content.append(node('p','rv2-detail-caption','Review the exact text before including it. Relevance does not establish applicability.'));
-      if(!result.length)content.append(node('p','','No passages were found. Try another term or browse Reader.'));
-      for(const candidate of result){const row=node('article','rv2-candidate');row.append(node('h4','',passageChipLabel(candidate)),node('p','',candidate.title||''));
+      const candidates=Array.isArray(result)?result:result.candidates||[];
+      if(result.searchQuery)content.append(node('p','rv2-detail-caption',`Search terms: ${result.searchQuery}`));
+      for(const missing of result.unresolvedReferences||[])content.append(node('p','rv2-detail-caption',`Unresolved reference: ${missing.title}. ${missing.reason||''}`));
+      for(const limitation of result.coverageLimitations||[])content.append(node('p','rv2-detail-caption',limitation));
+      if(!candidates.length)content.append(node('p','','No passages were found. Try another term or browse Reader.'));
+      for(const candidate of candidates){const row=node('article','rv2-candidate');row.append(node('h4','',passageChipLabel(candidate)),node('p','',candidate.title||''));
         row.append(action('Review in Reader',async()=>{
-          if(includeBusy)return;includeBusy=true;update();try{await options.onOpenReader(candidate);const preview=await onReview(candidate);if(!valid(attempt))return;
+          if(busy||includeBusy)return;includeBusy=true;update();try{await options.onOpenReader(candidate);const preview=await onReview(candidate);if(!valid(attempt))return;
             if(preview.requiresVisualReview){notice('Select this passage and review its visuals in Reader before attaching it.');return;}
             row.querySelector('.rv2-review')?.remove();const review=node('div','rv2-review');review.append(node('p','rv2-source-text',preview.selection.selectedText));
             const include=action('Include passage',async()=>{if(busy||includeBusy)return;includeBusy=true;update();try{await onInclude(preview.selection);}catch(error){notice(error.message,true);}finally{includeBusy=false;update();}});
@@ -108,12 +122,12 @@ export function createResearchV2View(options) {
     }catch(error){if(valid(attempt))notice(error.message,true);}
   }
   async function sendQuestion(){
-    if(busy||!input.value.trim())return;
+    if(busy||includeBusy||!input.value.trim())return;
     if(!passageSources.length){await findPassages();return;}
     const question=input.value.trim();
     if(!lastRequest||lastRequest.question!==question)lastRequest={question,requestID:crypto.randomUUID()};
     options.requestStore?.write(lastRequest);
-    const attempt=++generation;busy=true;controller=new AbortController();update();notice('Preparing your answer…');
+    const attempt=++generation;busy=true;detail.hidden=true;thread.hidden=false;controller=new AbortController();update();notice('Preparing your answer…');
     thread.querySelector('.rv2-welcome')?.setAttribute('hidden','');
     pendingBubble?.remove();pendingBubble=node('div','rv2-user',question);thread.append(pendingBubble);thread.scrollTop=thread.scrollHeight;
     try{await onSend({...lastRequest,signal:controller.signal,onProgress:event=>{
@@ -125,6 +139,9 @@ export function createResearchV2View(options) {
   composer.addEventListener('submit',event=>{event.preventDefault();void sendQuestion();});
   input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();void sendQuestion();}});
   update();
-  if(messages.length)requestAnimationFrame(()=>{thread.scrollTop=thread.scrollHeight;});
-  return {element:root,dispose(){generation++;controller?.abort();},focus(){input.focus({preventScroll:true});}};
+  // The workspace can mount this pane after an animation frame has already
+  // passed. Wait for its first real layout before revealing the latest answer.
+  let initialScroll=null;
+  if(messages.length){initialScroll=new ResizeObserver(()=>{if(root.isConnected&&thread.clientHeight>0){thread.scrollTop=thread.scrollHeight;initialScroll.disconnect();}});initialScroll.observe(thread);}
+  return {element:root,dispose(){generation++;controller?.abort();initialScroll?.disconnect();},focus(){input.focus({preventScroll:true});}};
 }
