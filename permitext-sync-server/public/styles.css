@@ -1423,6 +1423,10 @@ textarea:focus-visible {
 .workspace-panel:has(.column-loading-indicator) {
   position: relative;
 }
+body .workspace-panel:is([data-workspace-pane-loading="true"], :has(.column-loading-indicator)) > header :is(.column-group-menu-button, button[class*="close"]),
+body .workspace-panel:is([data-workspace-pane-loading="true"], :has(.column-loading-indicator)) > :is(.pane-collapsed-close, .column-group-collapsed-menu) {
+  display: none !important;
+}
 .workspace-panel[data-workspace-pane-loading] .workspace-pane-load-status,
 body .workspace-panel :has(> .column-loading-indicator) {
   position: static;
