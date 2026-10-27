@@ -1,3 +1,5 @@
+import { runResearchV2, researchV2AnswerMetadata, researchV2Version } from "./research-v2-engine.mjs";
+import { createResearchV2Budget, createLunaV2Client } from "./research-v2-budget.mjs";
 import { answerRequest as fastResearchRequest, fastResearchInterpretation } from "./research-fast-stream.mjs";
 import {applyWebSyncSafeguard} from "./web-sync-guard.mjs";
 import {webAppVersion} from "./public/web-client-version.js";
@@ -20400,12 +20402,16 @@ async function commitMissingDocumentClarification({ context, conversation, origi
 async function handleResearchConversationMessage(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
+  const requestedV2 = context.body.researchEngine === "v2";
+  if (requestedV2 && (process.env.PERMITEXT_RESEARCH_V2 !== "1" || process.env.VERCEL || process.env.NODE_ENV === "production")) {
+    sendJSON(response, 404, { error: "Research v2 is available only in the enabled local checkout.", code: "RESEARCH_V2_DISABLED" }); return;
+  }
   if (context.body.answerMode != null && !["fast", "verified"].includes(context.body.answerMode)) {
     sendError(response, 400, "Choose Fast answer or Verified Research."); return;
   }
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
-  if (context.body.analysisMode === assistantScopeMode) await ensureAssistantConversationScope(context.userID, conversation);
+  if (requestedV2 || context.body.analysisMode === assistantScopeMode) await ensureAssistantConversationScope(context.userID, conversation);
   const conversationOnly = isConversationOnly(conversation);
   const conversationScope = conversationOnly ? assistantPassageScope(conversation) : null;
   if (conversationOnly && conversation.primaryProjectID && !await projectAccessForUser(context.userID, conversation.primaryProjectID)) {
@@ -20517,6 +20523,10 @@ async function handleResearchConversationMessage(request, response) {
       replayed: true
     });
     return;
+  }
+  if (requestedV2 && (context.body.expectedRevision !== researchConversationRevision(conversation) ||
+      context.body.expectedEvidenceSetVersion !== Number(conversation.evidenceSetVersion || 1))) {
+    sendJSON(response, 409, { error: "The included passages changed. Reopen this conversation before asking.", code: "RESEARCH_CONTEXT_CHANGED" }); return;
   }
   // Presentation sidecar stays outside verdict history and operational logs.
   let recoveryRequestDescription = null, recoveryHumanContext = [];
@@ -20722,10 +20732,10 @@ async function handleResearchConversationMessage(request, response) {
       new Date().toISOString(),
       corpusPlan
     );
-    if (!mockMode && context.body.answerMode !== "verified") {
+    if ((!mockMode || requestedV2) && (context.body.answerMode !== "verified" || requestedV2)) {
       if (!process.env.OPENAI_API_KEY) throw Object.assign(new Error("Research AI is not configured."), {code:"RESEARCH_NOT_CONFIGURED"});
       // Reuse authorization, source freshness, idempotency and durable usage above.
-      // Fast delivery changes generation/review only; passage scope stays explicit.
+      // Both engines retain the same explicit passage scope and storage safeguards.
       const packageForFast = conversationOnly
         ? assistantEvidencePackage({ question, pinnedEvidence, messages:activeMessages, topicContext, projectFacts:combinedProjectFacts })
         : await assembledResearchEvidenceForTurn({ question, messages:activeMessages, pinnedEvidence,
@@ -20745,7 +20755,7 @@ async function handleResearchConversationMessage(request, response) {
       const snapshots = evidence.map(source => immutableEvidenceSnapshot({ source, approvedAt:now,
         evidenceSetVersion:Number(conversation.evidenceSetVersion || 1), sourceLibraryVersion:source.codeVersion || conversation.codeVersion }));
       const sources = evidence.map((source,index) => ({ id:`S${index+1}`, sectionID:source.sectionID,
-        edition:source.codeEdition, authority:"enacted", title:[source.codePrefix,source.sectionNumber,source.title].filter(Boolean).join(" "),
+        edition:source.codeEdition, ...(requestedV2 ? {codeVersion:source.codeVersion,jurisdiction:source.jurisdiction} : {}), authority:"enacted", title:[source.codePrefix,source.sectionNumber,source.title].filter(Boolean).join(" "),
         text:source.text || source.selectedText || "" }));
       const webDecision = conversationOnly ? {useWeb:false,reasons:[]} : researchWebSupportTrigger({question,
         enactedEvidence:evidence,pinnedEvidenceCount:pinnedEvidence.length,projectFactsApplied:Boolean(combinedProjectFacts.length)});
@@ -20770,17 +20780,39 @@ async function handleResearchConversationMessage(request, response) {
         role:message.role,text:message.question || message.answer?.answerText || "" })));
       body.safety_identifier = createHash("sha256").update(String(context.userID)).digest("hex");
       const fastGenerationStartedAt = performance.now();
-      let firstTextMilliseconds = null;
-      const {payload} = await requestResearchProvider({apiKey:process.env.OPENAI_API_KEY, requestBody:body,
-        signal:progressResponse.signal,timeoutMilliseconds:120000,maximumAttempts:1,
-        failureMessage:"The fast Research answer could not complete.", onText:text => {
-          if (firstTextMilliseconds === null && text.trim()) firstTextMilliseconds = Math.round(performance.now()-researchOperationStartedAt);
-          progressResponse.delta(text);
-        },
-        reserveEvaluationSpend:reserveResearchEvaluationSpend,reserveProviderSpend:reserveResearchProviderSpend,
-        settleProviderSpend:settleResearchProviderSpend});
-      const text = outputTextFromResponse(payload);
-      const usage = combinedResearchUsage(researchEmbeddingUsage(),web.usage,researchUsageFromProviderPayload(payload,body.model));
+      let firstTextMilliseconds = null, v2Result = null, providerPayloads;
+      if (requestedV2) {
+        const budget = createResearchV2Budget({ path: process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH });
+        const call = createLunaV2Client({ apiKey: process.env.OPENAI_API_KEY, budget,
+          transport: async (requestBody, signal) => {
+            requestBody.safety_identifier = body.safety_identifier;
+            const { payload } = await requestResearchProvider({ apiKey:process.env.OPENAI_API_KEY, requestBody,
+              signal, timeoutMilliseconds:120000, maximumAttempts:1,
+              failureMessage:"The Research v2 answer could not complete.",
+              reserveEvaluationSpend:reserveResearchEvaluationSpend, reserveProviderSpend:reserveResearchProviderSpend,
+              settleProviderSpend:settleResearchProviderSpend });
+            return payload;
+          } });
+        v2Result = await runResearchV2({ question, sources, history:activeMessages }, { call,
+          signal:progressResponse.signal, onStage:stage => {
+            progressResponse.progress(stage === "review" ? "checking_citation_support" : "preparing_conclusion", "active");
+          } });
+        if (v2Result.status === "review_failed") throw Object.assign(new Error(v2Result.draft.answerText), {code:"V2_REVIEW_FAILED",missingSources:v2Result.draft.missingSources,missingFacts:v2Result.draft.missingFacts});
+        providerPayloads = v2Result.payloads;
+      } else {
+        const {payload} = await requestResearchProvider({apiKey:process.env.OPENAI_API_KEY, requestBody:body,
+          signal:progressResponse.signal,timeoutMilliseconds:120000,maximumAttempts:1,
+          failureMessage:"The fast Research answer could not complete.", onText:text => {
+            if (firstTextMilliseconds === null && text.trim()) firstTextMilliseconds = Math.round(performance.now()-researchOperationStartedAt);
+            progressResponse.delta(text);
+          },
+          reserveEvaluationSpend:reserveResearchEvaluationSpend,reserveProviderSpend:reserveResearchProviderSpend,
+          settleProviderSpend:settleResearchProviderSpend});
+        providerPayloads = [payload];
+      }
+      const text = v2Result ? v2Result.draft.answerText : outputTextFromResponse(providerPayloads[0]);
+      const usage = combinedResearchUsage(researchEmbeddingUsage(),web.usage,
+        ...providerPayloads.map(payload => researchUsageFromProviderPayload(payload,body.model)));
       const cost = estimatedResearchCostWithProviderAllowance(usage);
       const answer = { ...fastResearchInterpretation(text,evidence,sources),mode:"openai",researchEngine:"fast-stream-v1",
         model:body.model,requestedModel:body.model,promptVersion:"fast-stream-v1",evidenceVersion:"selected-or-retrieved-v1",
@@ -20792,6 +20824,15 @@ async function handleResearchConversationMessage(request, response) {
         routing:{mode:"fast",answerTier:"fast",verificationAttemptCount:0},
         delivery:{mode:"streamed",firstTextMilliseconds,generationMilliseconds:Math.round(performance.now()-fastGenerationStartedAt)},
         disclaimer:"AI-generated, unreviewed research assistance. Verify the cited text before relying on this answer." };
+      if (v2Result) Object.assign(answer, researchV2AnswerMetadata(v2Result), {
+        promptVersion:researchV2Version, evidenceVersion:researchV2Version,
+        delivery:{mode:"reviewed",generationMilliseconds:v2Result.elapsedMilliseconds},
+        factUsage:{projectContext:[],conversation:activeMessages.filter(message=>message.role==="user").map(message=>message.question),other:[]}
+      });
+      if (v2Result) {
+        answer.citationIdentity.substantiveVerification = "ai_review_performed";
+        answer.citations = answer.citations.map(citation => ({...citation,relevance:"Cited exact selected passage; review its text and conditions."}));
+      }
       answer.supportingSources = web.sources.filter((source,index)=>answer.citationIdentity.cited.includes(`W${index+1}`))
         .map(source=>({...source,authorityClass:"official_guidance",role:"supporting",controlling:false}));
       const identity = researchRequestMessageIdentity(context.userID,conversation.id,researchRequestID);
@@ -20801,7 +20842,7 @@ async function handleResearchConversationMessage(request, response) {
         contextRevision:researchContextRevision(conversation),researchRequestID};
       const record = {...immutableResearchAnswer({assistantScopeSnapshot:conversationScope,id:assistantMessage.id,
         owner:ownerScope(context.userID),conversationID:conversation.id,projectID:conversation.primaryProjectID || null,
-        question,answer,evidence:snapshots,citations:answer.citations,model:body.model,researchSystemVersion:"fast-stream-v1",createdAt:now}),
+        question,answer,evidence:snapshots,citations:answer.citations,model:body.model,researchSystemVersion:requestedV2 ? researchV2Version : "fast-stream-v1",createdAt:now}),
         operationID:researchOperation.id,officialEvidenceSnapshot:web.sources,assistantScopeSnapshot:conversationScope,
         projectContextSnapshot:{projectID:conversation.primaryProjectID || null,projectInformation,manualFacts:manualProjectFacts,
           combinedFacts:combinedProjectFacts,capturedAt:now}};
@@ -20811,16 +20852,16 @@ async function handleResearchConversationMessage(request, response) {
       conversation.updatedAt=now; conversation.sourceStatus="current"; delete conversation.historyHiddenAt;
       progressResponse.assertActive();
       await commitResearchConversationMessage(context.userID,{recoveryBase:{conversation:originalConversation,requestID:researchRequestID,question},
-        reservationID:researchReservationID,usageEntry:{...usage,model:body.model,requestedModel:body.model,routingMode:"fast",answerTier:"fast",
-          verificationAttemptCount:0,mode:"openai",estimatedCostUSD:cost.estimatedUSD,pricingVersion:cost.pricingVersion,createdAt:researchReservationCreatedAt},
+        reservationID:researchReservationID,usageEntry:{...usage,model:body.model,requestedModel:body.model,routingMode:requestedV2 ? "research-v2" : "fast",answerTier:requestedV2 ? v2Result.status : "fast",
+          verificationAttemptCount:v2Result?.reviews.length || 0,mode:"openai",estimatedCostUSD:cost.estimatedUSD,pricingVersion:cost.pricingVersion,createdAt:researchReservationCreatedAt},
         answer:record,conversation,events:conversation.primaryProjectID ? ["research.question.submitted","research.answer.generated"].map(action =>
           activityEvent({owner:ownerScope(context.userID),projectID:conversation.primaryProjectID,actorUserID:context.userID,
             action,objectKind:action.endsWith("submitted")?"researchConversation":"researchAnswer",
             objectID:action.endsWith("submitted")?conversation.id:assistantMessage.id,newStatus:"generated",createdAt:now,
-            metadata:{answerID:assistantMessage.id,answerMode:"fast"}})) : []});
+            metadata:{answerID:assistantMessage.id,answerMode:requestedV2 ? "research-v2" : "fast"}})) : []});
       researchReservationCompleted=Boolean(researchReservationID);
       Object.assign(researchOperation,{status:"completed",charged:researchReservationCompleted,mode:"openai",model:body.model,
-        routingMode:"fast",verificationAttemptCount:0,providerRequestCount:usage.providerRequestCount,estimatedCostUSD:cost.estimatedUSD});
+        routingMode:requestedV2 ? "research-v2" : "fast",verificationAttemptCount:v2Result?.reviews.length || 0,providerRequestCount:usage.providerRequestCount,estimatedCostUSD:cost.estimatedUSD});
       const artifactRevisions=await bumpCommittedResearchArtifactRevisions(context.userID,conversation.primaryProjectID
         ? [{projectID:conversation.primaryProjectID,domains:["activity","foundation","research"]}] : []);
       progressResponse.progress("preparing_conclusion","completed");
@@ -22656,6 +22697,15 @@ async function handleResearchConversationMessage(request, response) {
   } catch (error) {
     if (error.code === "RESEARCH_REQUEST_HANDLED") return;
     const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
+    if (requestedV2 && String(failureCode).startsWith("V2_")) {
+      Object.assign(researchOperation,{status:"failed",failureCode,charged:false});
+      progressResponse.failActive("failed");
+      progressResponse.error(failureCode === "V2_BUDGET_EXHAUSTED" ? 429 : 422, error.message, {
+        code:failureCode, additionalEvidenceNeeded:error.missingSources || [], missingFacts:error.missingFacts || []
+      });
+      return;
+    }
+
     if (!researchReservationCompleted && ["RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_CITATION",
       "INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_VERIFICATION", "INVALID_RESEARCH_WEB_CITATION"].includes(failureCode)) {
       if (researchReservationID) {

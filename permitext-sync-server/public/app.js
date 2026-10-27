@@ -1,5 +1,6 @@
+import { createResearchV2View } from "./research-v2.js?v=2";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261026-report-undo-v1381";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261026-research-v2-v1385";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -150,7 +151,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261026-report-undo-v1381";
+} from "./offline-storage.js?v=20261026-research-v2-v1385";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -23292,7 +23293,7 @@ async function postResearch(path, values = {}) {
   const identity = captureAccountRequest();
   if (!account) throw new Error("Sign in from Account to use private research conversations.");
   const creationWorkspaceID = activeWorkspaceID;
-  if (["/research/conversations/create", "/research/conversations/get"].includes(path)) values = { ...values, analysisMode: "conversation_only" };
+  if (["/research/conversations/create", "/research/conversations/get"].includes(path) && !(researchV2Enabled() && path.endsWith("/get"))) values = { ...values, analysisMode: "conversation_only" };
   if (path === "/research/conversations/create") {
     values = { ...values, projectID: researchCreationProjectID(values.projectID) };
     if (values.projectID) await ensureResearchProjectSynced(values.projectID, account);
@@ -26027,8 +26028,109 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   requestAnimationFrame(resizeComposer);
 }
 
+function researchV2Enabled() {
+  if (!["localhost", "127.0.0.1", "[::1]"].includes(location.hostname)) return false;
+  const requested = new URLSearchParams(location.search).get("research");
+  if (requested === "v2") sessionStorage.setItem("permitext:local-research-v2", "1");
+  if (requested === "legacy") sessionStorage.removeItem("permitext:local-research-v2");
+  return sessionStorage.getItem("permitext:local-research-v2") === "1";
+}
+
+async function renderResearchV2Pane(paneID) {
+  const panel = renderUtility(analysisTemplate, paneID);
+  panel.classList.add("analysis-panel", "research-v2-panel");
+  const content = panel.querySelector(".analysis-content");
+  const instance = (state.utilityInstances || []).find(item => paneIDForUtilityInstance(item) === paneID) || null;
+  const currentInstance = () => instance ? (state.utilityInstances || []).find(item => item.key === "analysis" && item.id === instance.id) : null;
+  const selectedID = () => researchDraftPaneIDs.has(paneID) ? "" : (currentInstance()?.conversationID || state.researchConversationID || "");
+  const conversationID = selectedID();
+  const accountIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const current = () => isCurrentAccountRequest(accountIdentity) && workspaceID === activeWorkspaceID && selectedID() === conversationID;
+  const draftKey = conversationID ? `followup:${conversationID}` : paneID;
+  const draft = () => researchNewChatDrafts.get(draftKey) || "";
+  const saveDraft = text => { if (!current()) return; researchNewChatDrafts.set(draftKey, text); if (currentInstance()) currentInstance().draft = text; scheduleResearchDraftPersistence(); };
+  content.textContent = "Loading Research…";
+  try {
+    const [listed, fetched] = await Promise.all([
+      postResearch("/research/conversations/list"),
+      conversationID ? postResearch("/research/conversations/get", { conversationID }) : null
+    ]);
+    if (!current()) return panel;
+    const conversation = fetched?.conversation || null;
+    if (conversation) {
+      if (instance) supplementalResearchConversations.set(conversation.id, conversation);
+      else activeResearchConversation = conversation;
+    }
+    const open = id => openResearchConversation(id, { instance, refreshList:true });
+    let view;
+    const recoveryKey = `permitext:research-v2-request:${activeAccount()?.userID}:${workspaceID}:${conversationID || paneID}`;
+    const publish = async result => { if (!current()) return; await refreshResearchConversationList(); if (current()) await open(result.conversation.id); };
+    const snapshot = async message => {
+      const result = await postResearch("/research/answers/get", { answerID:message.id });
+      return (result.answer?.evidence || []).map(source => ({...source,codeVersion:source.sourceLibraryVersion,codePrefix:source.codeBook,selectedText:source.passageText}));
+    };
+    view = createResearchV2View({ conversation,
+      history:(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
+      initialDraft:draft(), onDraft:saveDraft, isCurrent:current,
+      requestStore:{ read:() => { try { return JSON.parse(sessionStorage.getItem(recoveryKey)); } catch { return null; } },
+        write:value => { if (value) sessionStorage.setItem(recoveryKey, JSON.stringify(value)); else sessionStorage.removeItem(recoveryKey); } },
+      onNew:async () => { view.dispose(); const result = await postResearch("/research/conversations/create", {requestID:crypto.randomUUID()}); await publish(result); },
+      onOpen:id => { view.dispose(); return open(id); },
+      onBrowse:() => openReaderFromToolbar(panel),
+      onOpenReader:source => openSourceInReader(source,paneID),
+      onFind:async question => {
+        if (conversation?.sources?.some(source => source.kind === "selection")) {
+          const result = await postResearch("/research/conversations/related", {conversationID:conversation.id,question,
+            expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)});
+          return result.candidates || [];
+        }
+        const parameters = new URLSearchParams({q:question.slice(0,200),match:"words",limit:"12"});
+        const response = await fetch(`/code/search?${parameters}`);
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Source search failed.");
+        return (result.results || []).map(item => ({...item,sectionID:String(item.sectionID || item.id)}));
+      },
+      onReview:candidate => postResearch("/research/selections/review", {sectionID:candidate.sectionID,
+        codeVersion:candidate.codeVersion || defaultSyncCodeVersion,reviewMode:"whole_section"}),
+      onInclude:async selection => {
+        const passage = {...selection,reviewedSectionHash:selection.sectionTextHash};
+        if (!conversation) {
+          const result = await postResearch("/research/conversations/create", {selections:[passage],requestID:crypto.randomUUID(),originSurface:"reader"});
+          researchNewChatDrafts.set(`followup:${result.conversation.id}`,draft());
+          await publish(result);
+        } else {
+          const result = await postResearch("/research/conversations/evidence", {conversationID:conversation.id,action:"add_related",
+            expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1),selections:[passage]});
+          await publish(result);
+        }
+      },
+      onRemove:async source => publish(await postResearch("/research/conversations/evidence", {conversationID:conversation.id,
+        action:"remove",sourceID:source.id,expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)})),
+      onSend:async ({question,requestID,signal,onProgress}) => {
+        const result = await postResearchWithProgress({conversationID:conversation.id,question,requestID,researchEngine:"v2",
+          analysisMode:"conversation_only",expectedRevision:Number(conversation.revision || 0),
+          expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)}, {signal,onProgress});
+        if (!current()) return;
+        researchNewChatDrafts.delete(draftKey); if (currentInstance()) currentInstance().draft = ""; sessionStorage.removeItem(recoveryKey);
+        await publish(result);
+      },
+      onSnapshot:snapshot,
+      onCitation:async (message,id) => {
+        const sources = await snapshot(message), source = sources[Number(id.slice(1))-1];
+        if (current() && source) await openSourceInReader(source,paneID);
+      }
+    });
+    content.replaceChildren(view.element);
+    // Replacing a pane or changing accounts cancels its in-flight generation.
+    const observer = new MutationObserver(() => { if (!panel.isConnected) { view.dispose(); observer.disconnect(); } });
+    requestAnimationFrame(() => { if (panel.isConnected) observer.observe(panel.parentNode, {childList:true}); });
+  } catch (error) { content.textContent = error.message; }
+  return panel;
+}
+
 async function renderResearch(paneID = "utility:analysis") {
   if (!hasCapability("research")) return renderProLockedPane(paneID, "Assistant");
+  if (researchV2Enabled()) return renderResearchV2Pane(paneID);
   const instance = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === paneID) || null;
   const conversationOpen = instance ? Boolean(instance.conversationID) : researchConversationPaneIsOpen();
   const draftShowing = researchDraftPaneIDs.has(paneID) || !conversationOpen;
@@ -28682,6 +28784,10 @@ async function startNewResearchFromSelection(selection) {
     originSurface: selection.originSurface || "reader"
   });
   if (!navigationIsCurrent()) return payload.conversation;
+  if (researchV2Enabled()) {
+    const draft = researchNewChatDrafts.get("utility:analysis");
+    if (draft) researchNewChatDrafts.set(`followup:${payload.conversation.id}`,draft);
+  }
   activeResearchConversation = payload.conversation;
   window.getSelection?.().removeAllRanges();
   await refreshResearchConversationList();
