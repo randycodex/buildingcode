@@ -1,7 +1,7 @@
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
-import { createResearchV2View, researchDiscoveryQuery, researchV2RetryContext } from "./research-v2.js?v=7";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=9";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1392";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1394";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -152,7 +152,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-research-v2-v1392";
+} from "./offline-storage.js?v=20261027-research-v2-v1394";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -26109,18 +26109,15 @@ async function renderResearchV2Pane(paneID, configuration = null) {
       onFind:async question => {
         if (conversation?.sources?.some(source => source.kind === "selection")) {
           const result = await postResearch("/research/conversations/related", {conversationID:conversation.id,question,
+            researchEngine:"v2",
             expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)});
           return result;
         }
-        const searchQuery = researchDiscoveryQuery(question);
-        const parameters = new URLSearchParams({q:searchQuery,match:"words",limit:"12"});
-        const response = await fetch(`/code/search?${parameters}`);
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || "Source search failed.");
-        return {searchQuery,candidates:(result.results || []).map(item => ({...item,sectionID:String(item.sectionID || item.id)}))};
+        return postResearch("/research/sources/discover", {question});
       },
       onReview:candidate => postResearch("/research/selections/review", {sectionID:candidate.sectionID,
-        codeVersion:candidate.codeVersion || defaultSyncCodeVersion,reviewMode:"whole_section"}),
+        codeVersion:candidate.codeVersion || defaultSyncCodeVersion,
+        ...(candidate.suggestedText ? {reviewMode:"passage",selectedText:candidate.suggestedText} : {reviewMode:"whole_section"})}),
       onInclude:async selection => {
         const passage = {...selection,reviewedSectionHash:selection.sectionTextHash};
         if (!conversation) {

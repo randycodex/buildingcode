@@ -8,6 +8,11 @@ import {
   researchSubscriberEconomicsReport
 } from "../research-economics.mjs";
 
+const passageMetric=createResearchOperationMetric({id:'passage-operation',createdAt:'2026-10-27T00:00:00Z',verificationAttemptDiagnostics:[{passageReview:{kind:'research_v2',pass:false,draftMilliseconds:1000,reviewMilliseconds:500,issueCodes:['OMITTED_CONDITION','omitted_condition','Private answer prose.'],detail:'Private source text'}},{passageReview:{kind:'research_v2',pass:true,draftMilliseconds:800,reviewMilliseconds:400,issueCodes:[]}}]});
+assert.deepEqual(passageMetric.verificationAttemptDiagnostics.map(a=>a.passageReview.issueCodes),[['omitted_condition'],[]]);
+assert.equal(passageMetric.verificationAttemptDiagnostics[1].passageReview.pass,true);
+assert(!JSON.stringify(passageMetric).includes('Private'));
+
 const privacySafeMetric = createResearchOperationMetric({
   id: "operation-1",
   createdAt: "2026-08-26T12:00:00.000Z",

@@ -489,6 +489,17 @@ function boundedRequiredTermEntry(entry, maximumCharacters) {
     : null;
 }
 
+// Nominate complete defined-term labels that actually occur in the question or
+// discovered text. The excerpt resolver still validates every complete entry.
+export function researchMentionedDefinitionLabels(section,question,context='',limit=3){
+  const normalized=value=>compactText(value).normalize('NFKC').toLowerCase().replace(/[‐‑–—-]/g,' ');
+  const current=normalized(question),related=normalized(context);
+  const matches=(text,label)=>new RegExp(`(?:^|[^a-z0-9])${normalized(label).replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s+')}s?(?=$|[^a-z0-9])`,'i').test(text);
+  return definitionEntries(section).map(entry=>({label:entry.label,score:matches(current,entry.label)?100+terms(entry.label).length:matches(related,entry.label)?terms(entry.label).length:0}))
+    .filter(entry=>entry.score>0&&entry.label.length>=4).sort((a,b)=>b.score-a.score||b.label.length-a.label.length)
+    .slice(0,Math.max(1,Math.min(6,limit))).map(entry=>entry.label);
+}
+
 export function targetedDefinitionExcerpt(section, query, options = {}) {
   if (section?.truncated === true) return null;
   const canonicalText = compactText(section?.canonicalText || section?.text ||

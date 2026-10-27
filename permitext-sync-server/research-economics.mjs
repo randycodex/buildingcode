@@ -116,8 +116,15 @@ function normalizedClaimApplicabilityDiagnostic(value) {
 export function createResearchVerificationAttemptDiagnostics(value) {
   return (Array.isArray(value) ? value : []).slice(0, 2).flatMap((attempt, index) => {
     const applicability = normalizedClaimApplicabilityDiagnostic(attempt?.claimApplicabilityReview);
-    const generic = applicability ? { claimApplicabilityReview: applicability } : {};
-    const genericAttempt = applicability ? [{ attempt: index + 1, ...generic }] : [];
+    const v2=attempt?.passageReview;
+    const passageReview=v2?.kind==='research_v2' ? {kind:'research_v2',pass:v2.pass===true,
+      draftMilliseconds:Math.min(240000,nonnegativeInteger(v2.draftMilliseconds)),
+      reviewMilliseconds:Math.min(240000,nonnegativeInteger(v2.reviewMilliseconds)),
+      issueCodes:[...new Set((Array.isArray(v2.issueCodes)?v2.issueCodes:[])
+        .map(code=>typeof code==='string'?code.toLowerCase():'')
+        .filter(code=>typeof code==='string'&&/^[a-z][a-z0-9_]{0,63}$/.test(code)))].slice(0,20)} : null;
+    const generic = {...(applicability ? { claimApplicabilityReview: applicability } : {}),...(passageReview?{passageReview}:{})};
+    const genericAttempt = applicability||passageReview ? [{ attempt: index + 1, ...generic }] : [];
     const zoning = attempt?.zoningSafety;
     if (zoning?.kind === "zoning_answer_scope") {
       const scope = normalizedZoningScopeDiagnostic(zoning);

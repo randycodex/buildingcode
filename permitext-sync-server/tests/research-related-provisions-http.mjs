@@ -53,6 +53,14 @@ try{
  assert.deepEqual((await adapter.read()).researchAnswersByUserID[userID],savedAnswers,'Previous answers and their immutable source snapshots are unchanged.');
  await post('/research/conversations/evidence',{...context(conversation),action:'add_related',selections:[selection]},409);
  conversation=added.conversation;
+ const enhanced=await post('/research/conversations/related',{...context(conversation),researchEngine:'v2',question:'Find the fire partition definition.'});
+ const definition=enhanced.candidates.find(candidate=>candidate.kind==='definition'&&candidate.definitionLabel==='FIRE PARTITION');assert(definition);
+ await post('/research/selections/review',{sectionID:definition.sectionID,codeVersion:'stale-edition',reviewMode:'passage',selectedText:definition.suggestedText},409);
+ const excerpt=(await post('/research/selections/review',{sectionID:definition.sectionID,codeVersion:definition.codeVersion,reviewMode:'passage',selectedText:definition.suggestedText})).selection;
+ assert.equal(excerpt.selectionMode,'passage');
+ const partial=await post('/research/conversations/evidence',{...context(conversation),action:'add_related',selections:[{...excerpt,reviewedSectionHash:excerpt.sectionTextHash}]});
+ assert.equal(partial.addedSelectionCount,1);assert.equal(partial.conversation.sources.at(-1).selectedText,excerpt.selectedText);
+ conversation=partial.conversation;
  const replay=await post('/research/conversations/evidence',{...context(conversation),action:'add_related',selections:[selection]});assert.equal(replay.addedSelectionCount,0);
  await post('/research/conversations/related',{...context(conversation),conversationID:'other-account-conversation',question:'medical gas'},404);
  const otherID='apple:related-other';
@@ -66,6 +74,8 @@ try{
  const historicConversation=(await post('/research/conversations/create',{analysisMode:'conversation_only',selections:[historicPreview]},201)).conversation;
  const historicFound=await post('/research/conversations/related',{...context(historicConversation),question:'Find related ramp landing requirements.'});
  assert(historicFound.candidates.length);assert(historicFound.candidates.every(item=>item.codeVersion===historicVersion),'A 2014 passage must not discover replacement 2022 provisions.');
+ const enhancedHistoric=await post('/research/conversations/related',{...context(historicConversation),researchEngine:'v2',question:'Find related ramp landing requirements.'});
+ assert(enhancedHistoric.candidates.length);assert(enhancedHistoric.candidates.every(item=>item.codeVersion===historicVersion));
  assert.equal(external,0);
  console.log('Related provisions: real parent/topic discovery, edition identity, unresolved references, read-only search, exact reviewed inclusion and stale revision guards passed. No provider calls.');
 }finally{globalThis.fetch=realFetch;await new Promise(resolve=>server.close(resolve));await rm(temporary,{recursive:true,force:true});}

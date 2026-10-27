@@ -72,7 +72,12 @@ try{
   assert.equal(completed.status,200,JSON.stringify(completed.body));conversation=completed.body.conversation;
   assert.equal(calls,2);assert.equal(conversation.messages.at(-1).answer.verification.pass,true);
   assert.match(conversation.messages.at(-1).answer.researchEngine,/research-v2/);
+  await lastHandled;
   const adapter=postgres||createFileStoreAdapter(),before=await adapter.read();
+  const firstOperation=postgres?(await postgres.sql`SELECT operation FROM permitext_research_operations WHERE user_id=${userID}`)[0].operation:
+    before.researchOperationsByUserID[userID].find(operation=>operation.status==='completed');
+  assert.equal(firstOperation.verificationAttemptDiagnostics[0].passageReview.kind,'research_v2');
+  assert.equal(firstOperation.verificationAttemptDiagnostics[0].passageReview.pass,true);
   const record=before.researchAnswersByUserID[userID][0];assert.equal(record.evidence[0].passageText,passage);
   const replay=await post('/research/conversations/message',input);
   assert.equal(replay.body.replayed,true);assert.equal(calls,2,'Replay makes no extra paid calls');

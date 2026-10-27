@@ -487,9 +487,9 @@ const topicRoutes = [
     targets: [{ codePrefix: "BC", sectionPrefix: "1010.1.2.2" }]
   },
   {
-    pattern: /\bcorridor\b.*\bfire[- ]resistance(?:[- ]rated)?\b|\bfire[- ]resistance\s+rating\b.*\bcorridor\b/i,
+    pattern: /\bcorridors?\b.*\bfire(?:[- ]resistance(?:[- ]rated)?|\s+rat(?:e[ds]?|ings?))\b|\bfire(?:[- ]resistance)?\s+ratings?\b.*\bcorridors?\b/i,
     label: "corridor construction and fire-resistance ratings",
-    targets: [{ codePrefix: "BC", sectionPrefix: "1020.1" }]
+    targets: [{ codePrefix: "BC", sectionPrefix: "1020.1", includeDescendants: true }]
   },
   {
     pattern: /^(?=[\s\S]*\b(?:hall|hallway|corridor)\b)(?=[\s\S]*\b(?:minimum|width|wide|fire\s+escape|exit)\b)(?=[\s\S]*\b(?:ADA|accessible|accessibility|fire\s+escape|exit)\b)/i,

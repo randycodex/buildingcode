@@ -27,6 +27,17 @@ assert.equal(researchV2RetryContext(prior,retry,'stable'),retry);
 assert.equal(researchV2RetryContext(prior,{...retry,evidenceSetVersion:2},'stable'),prior);
 assert.equal(researchV2RetryContext(prior,{...retry,messages:[{id:'other',role:'user',requestID:'other',failure:{}}]},'stable'),prior);
 const old={role:'assistant',answer:{conclusion:'Conclusion.',explanation:'Important qualification.'}};
+let gapQuery;
+const gapsView=createResearchV2View({conversation:{sources:[source],messages:[{role:'user',question:'What is the corridor rating?'},
+ {role:'assistant',answer:{answerText:'Applicability is unresolved. [S1]',additionalEvidenceNeeded:['Complete table and footnote c.'],missingFacts:['Whether sprinklers protect the building throughout.']}}]},
+ initialDraft:'My unsent follow-up',onDraft(){},onFind:async question=>{gapQuery=question;return {candidates:[],coverage:{candidateCount:20,shownCount:12,omittedCandidateCount:8},queryExpansions:['hallway → corridor']};}});
+const gapElements=()=>all(gapsView.element);
+assert(gapElements().some(x=>x.textContent==='Sources still needed'));assert(gapElements().some(x=>x.textContent==='Project facts still needed'));
+assert(gapElements().some(x=>x.textContent==='Whether sprinklers protect the building throughout.'));
+await gapElements().find(x=>x.textContent==='Find missing sources').handlers.click();await tick();
+assert.equal(gapQuery,'What is the corridor rating?');assert.equal(gapsView.element.querySelector('.rv2-input').value,'My unsent follow-up');
+assert(gapElements().some(x=>x.textContent==='Showing 12 of 20 candidates. Narrow the question to explore the others.'));
+gapsView.dispose();
 assert.equal(researchAnswerText(old),'Conclusion.\n\nImportant qualification.');
 assert.equal(researchReviewLabel(old.answer),'Unreviewed');
 const failedView=createResearchV2View({conversation:{sources:[],messages:[{role:'user',question:'Interrupted question.',requestID:'prior-request',failure:{message:'The provider failed.'}}]},onDraft(){},isCurrent:()=>true});

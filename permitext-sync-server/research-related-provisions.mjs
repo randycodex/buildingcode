@@ -1,6 +1,8 @@
 import { inlineCodeReferencePhrases } from './public/code-references.js';
+import { discoverResearchSources } from './research-source-discovery.mjs';
 
 const bookNames = [
+  ['BC', /\b(?:New York City|NYC) Building Code\b/i],
   ['PC', /\b(?:New York City|NYC) Plumbing Code\b/i],
   ['MC', /\b(?:New York City|NYC) Mechanical Code\b/i],
   ['FGC', /\b(?:New York City|NYC) Fuel Gas Code\b/i],
@@ -21,7 +23,7 @@ export function assertRelatedProvisionContext(conversation, body) {
 // Discovery never changes the conversation or calls a model. Each source keeps
 // its own corpus identity; a similarly numbered section in another edition is
 // never a substitute for a missing reference.
-export async function findRelatedProvisions({ conversation, question, registry, resources, discover }) {
+export async function findRelatedProvisions({ conversation, question, registry, resources, discover, enhanced = false, readSectionBody }) {
   const pinned = (conversation.sources || []).filter(source => source.kind === 'selection' && source.selectedText);
   if (!pinned.length) throw fail('Include a passage from Reader before finding related provisions.', 400);
   if (typeof question !== 'string' || question.length > 2000) throw fail('Keep the discovery question within 2,000 characters.', 400);
@@ -47,6 +49,12 @@ export async function findRelatedProvisions({ conversation, question, registry, 
         candidate.codeYear === origin.codeYear && candidate.automaticResearchEligible === true);
       if (corpus && !selected.includes(corpus)) selected.push(corpus);
     }
+  }
+  if (enhanced) {
+    const query = question.trim() || pinned.map(source => `${source.title}: ${source.selectedText}`).join('; ').slice(0, 2000);
+    return { ...await discoverResearchSources({ question: query, selected, pinned, resources, discover, readSectionBody,
+      unresolvedReferences: [...unresolved.values()] }),
+      expectedRevision: Number(conversation.revision || 0), expectedEvidenceSetVersion: Number(conversation.evidenceSetVersion || 1) };
   }
   const { catalog, invertedIndex, availableCodePrefixes } = await resources({ selected, passageSearch: false });
   const byKey = new Map(catalog.map(section => [key(section), section]));
@@ -118,7 +126,7 @@ export async function validateRelatedProvisionSelections(selections, review) {
     if (!selection.reviewedSectionHash || selection.reviewedSectionHash !== primary.sectionTextHash ||
         selection.selectionMode === 'section_reference' ||
         selection.codeVersion !== primary.codeVersion || canonicalSelection !== selection.selectedText ||
-        canonicalSelection !== primary.canonicalText) {
+        (selection.selectionMode !== 'passage' && canonicalSelection !== primary.canonicalText)) {
       throw fail('A reviewed passage or its edition changed. Open it in Reader and review it again.');
     }
   }

@@ -6,6 +6,7 @@ import {applyWebSyncSafeguard} from "./web-sync-guard.mjs";
 import {webAppVersion} from "./public/web-client-version.js";
 import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
 import { findRelatedProvisions, assertRelatedProvisionContext, validateRelatedProvisionSelections } from "./research-related-provisions.mjs";
+import { discoverResearchSources } from "./research-source-discovery.mjs";
 import {preparedSearchText} from "./prepared-search-text.mjs";
 import {preparedSearchRuntime} from "./prepared-search-runtime.mjs";
 import { prepareSearchRelevance, searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
@@ -8600,7 +8601,8 @@ function mergedResearchSearchIndex(indexes) {
 
 export async function researchCorpusResources(corpusPlan) {
   const selected = Array.isArray(corpusPlan?.selected) ? corpusPlan.selected : [];
-  const passageSearch = corpusPlan?.passageSearch !== false && process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH === "1";
+  const passageSearch = corpusPlan?.passageSearch === true ||
+    (corpusPlan?.passageSearch !== false && process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH === "1");
   const cacheKey = selected.map((corpus) => `${corpus.id}:${corpus.codeVersion}`).sort().join(":") + `:passages=${passageSearch}`;
   if (cachedResearchCorpusResources.has(cacheKey)) {
     const cached = cachedResearchCorpusResources.get(cacheKey);
@@ -18347,6 +18349,9 @@ async function handleResearchSelectionReview(request, response) {
       reviewed = await researchSelectionReview(context.body.sectionID, context.body.selectedText);
     }
     const { primary, canonicalSelection } = reviewed;
+    if (context.body.codeVersion && primary.codeVersion !== context.body.codeVersion) {
+      sendError(response, 409, "The source edition changed. Reopen the source in Reader."); return;
+    }
     sendJSON(response, 200, {
       selection: {
         sectionID: primary.sectionID,
@@ -18355,7 +18360,8 @@ async function handleResearchSelectionReview(request, response) {
         selectedText: canonicalSelection,
         codePrefix: primary.codePrefix,
         sectionNumber: primary.sectionNumber,
-        title: primary.title
+        title: primary.title,
+        ...(context.body.reviewMode === "passage" ? { selectionMode: "passage" } : {})
       },
       requiresVisualReview: primary.visualSources.length > 0,
       maximumVisualSelections: evidenceDiscoveryMaximumVisualSelections,
@@ -18391,6 +18397,22 @@ async function handleResearchSelectionReview(request, response) {
   }
 }
 
+async function handleResearchSourceDiscovery(request, response) {
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
+  if (!context) return;
+  if (!researchV2Availability(process.env, context.userID).available) { sendError(response, 503, "Research v2 is unavailable."); return; }
+  const question = context.body.question;
+  if (typeof question !== "string" || question.trim().length < 3 || question.length > 2000) {
+    sendError(response, 400, "Enter a discovery question of 3–2,000 characters."); return;
+  }
+  const plan = await researchCorpusPlanForTurn({ question });
+  const result = await discoverResearchSources({ question, selected: plan.selected, resources: researchCorpusResources,
+    readSectionBody: cachedResearchSourceBody,
+    discover: options => discoverRelevantEvidence({ ...options,
+      readSectionBody: cachedResearchSourceBody, resolveVisualSource: constructionVisualSourceMetadata }) });
+  sendJSON(response, 200, result);
+}
+
 async function handleResearchRelatedProvisions(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
@@ -18401,6 +18423,7 @@ async function handleResearchRelatedProvisions(request, response) {
     const result = await findRelatedProvisions({
       conversation, question: context.body.question ?? "", registry: await currentResearchCorpusRegistry(),
       resources: researchCorpusResources,
+      enhanced: context.body.researchEngine === "v2", readSectionBody: cachedResearchSourceBody,
       discover: options => discoverRelevantEvidence({ ...options,
         readSectionBody: cachedResearchSourceBody, resolveVisualSource: constructionVisualSourceMetadata })
     });
@@ -20809,6 +20832,14 @@ async function handleResearchConversationMessage(request, response) {
           signal:progressResponse.signal, onStage:stage => {
             progressResponse.progress(stage === "review" ? "checking_citation_support" : "preparing_conclusion", "active");
           } });
+        Object.assign(researchOperation,{
+          verificationAttemptCount:v2Result.reviews.length,
+          verificationIssueTypes:[...new Set(v2Result.reviews.flatMap(review=>review.issues.map(issue=>issue.code)))],
+          verificationAttemptDiagnostics:createResearchVerificationAttemptDiagnostics(v2Result.reviews.map(review=>({
+            passageReview:{kind:"research_v2",pass:review.pass,draftMilliseconds:review.draftMilliseconds,
+              reviewMilliseconds:review.reviewMilliseconds,issueCodes:review.issues.map(issue=>issue.code)}
+          })))
+        });
         if (v2Result.status === "review_failed") throw Object.assign(new Error(v2Result.draft.answerText), {code:"V2_REVIEW_FAILED",missingSources:v2Result.draft.missingSources,missingFacts:v2Result.draft.missingFacts});
         providerPayloads = v2Result.payloads;
       } else {
@@ -34483,6 +34514,7 @@ const handlers = {
   "research/conversations/list": handleResearchConversationList,
   "research/conversations/get": handleResearchConversationGet,
   "research/selections/review": handleResearchSelectionReview,
+  "research/sources/discover": handleResearchSourceDiscovery,
   "research/conversations/rename": handleResearchConversationRename,
   "research/conversations/create": handleResearchConversationCreate,
   "research/conversations/evidence": handleResearchConversationEvidence,
@@ -34855,6 +34887,7 @@ function requestMutatesFileStore(request) {
     path === "research/conversations/refresh" ||
     path === "research/conversations/evidence" ||
     path === "research/conversations/related" ||
+    path === "research/sources/discover" ||
     path === "research/selections/review" ||
     path === "research/evidence/discover" ||
     path === "billing/stripe/webhook" ||

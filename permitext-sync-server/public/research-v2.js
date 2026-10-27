@@ -8,12 +8,7 @@ const action = (label, callback, className = '') => {
 };
 export const passageChipLabel = source => `${source.codePrefix || source.codeBook || 'Code'} § ${source.sectionNumber || source.sectionID} · ${String(source.codeEdition || source.edition || source.codeSource?.editionLabel || source.codeVersion || '').match(/(?:19|20)\d{2}/)?.[0] || 'Edition unavailable'}`;
 
-// Strip conversational framing only; do not infer code rules or applicability.
-export function researchDiscoveryQuery(question) {
-  const filler = new Set('what which how why when where does do did is are was were would could should can may must the a an me my i we our you your please explain tell show find affects affect about for of to in under according requirements requirement'.split(' '));
-  const terms = String(question).toLowerCase().match(/[a-z0-9]+(?:[.:-][a-z0-9]+)*/g) || [];
-  return terms.filter(term => !filler.has(term)).join(' ').slice(0,200) || String(question).slice(0,200);
-}
+export {researchDiscoveryQuery} from './research-discovery-query.js?v=1';
 
 export const researchAnswerText = message => message.answer?.answerText || [message.answer?.conclusion, message.answer?.explanation].filter(Boolean).join('\n\n') || message.failure?.message || 'This answer did not complete.';
 export const researchReviewLabel = answer => answer?.verification?.pass === true ? 'AI reviewed · Check cited text' : answer?.verification?.status === 'failed' || answer?.authorityStatus === 'incomplete' ? 'Incomplete' : 'Unreviewed';
@@ -55,7 +50,8 @@ export function createResearchV2View(options) {
   const knownQuestions=new Set();
   function appendQuestions(items){items.forEach(item=>{
     if(knownQuestions.has(item.id))return;knownQuestions.add(item.id);
-    const li=node('li');const open=action(item.title||item.starterQuestion||'New question',()=>onOpen(item.id),'rv2-question-link');
+    const li=node('li');const title=item.title||item.starterQuestion||'New question';
+    const open=action('',()=>onOpen(item.id),'rv2-question-link');open.append(node('span','rv2-question-title',title));open.title=title;
     if(item.id===conversation?.id)open.setAttribute('aria-current','page');li.append(open);list.append(li);
   });}
   appendQuestions(history);
@@ -96,6 +92,17 @@ export function createResearchV2View(options) {
       const bubble=node('article','rv2-answer');bubble.setAttribute('aria-label','Research answer');
       const text=researchAnswerText(message);
       for(const paragraph of text.split(/\n\s*\n/)){const p=node('p');paragraphText(p,paragraph,message);bubble.append(p);}
+      const gapLists=[['Sources still needed',message.answer?.additionalEvidenceNeeded],['Project facts still needed',message.answer?.missingFacts]];
+      if(gapLists.some(([,items])=>Array.isArray(items)&&items.some(item=>typeof item==='string'&&item.trim()))){
+        const gaps=node('div','rv2-answer-gaps');gaps.setAttribute('aria-label','Unresolved information');
+        for(const [label,items] of gapLists){
+          const unique=[...new Set((Array.isArray(items)?items:[]).filter(item=>typeof item==='string'&&item.trim()))];
+          if(!unique.length)continue;gaps.append(node('h4','',label));const list=node('ul');
+          for(const item of unique){const li=node('li');paragraphText(li,item,message);list.append(li);}gaps.append(list);
+        }
+        if(onFind)gaps.append(action('Find missing sources',()=>void findPassages(message.question||messages[messages.indexOf(message)-1]?.question||''),'rv2-text-action'));
+        bubble.append(gaps);
+      }
       const footer=node('div','rv2-answer-footer');
       footer.append(node('span','',researchReviewLabel(message.answer)));
       footer.append(action('Sources used',()=>void showSnapshot(message),'rv2-text-action'));
@@ -146,20 +153,31 @@ export function createResearchV2View(options) {
       for(const source of saved){content.append(node('h4','',passageChipLabel(source)),node('p','rv2-source-text',source.passageText||source.selectedText||source.text||''));
         content.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));}
     }catch(error){if(valid(attempt))notice(error.message,true);}}
-  async function findPassages(){
-    if(busy||includeBusy)return;menu.hidden=true;attach.setAttribute('aria-expanded','false');const question=input.value.trim();
+  async function findPassages(discoveryQuestion){
+    if(busy||includeBusy)return;menu.hidden=true;attach.setAttribute('aria-expanded','false');const question=typeof discoveryQuestion==='string'?discoveryQuestion:input.value.trim();
     if(!question&&!passageSources.length){notice('Enter a topic to find passages, or choose From Reader.');return;}
     const attempt=++generation;notice('Finding passages…');
     try{const result=await onFind(question);if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','','Candidate passages'));
       content.append(node('p','rv2-detail-caption','Review the exact text before including it. Relevance does not establish applicability.'));
       const candidates=Array.isArray(result)?result:result.candidates||[];
       if(result.searchQuery)content.append(node('p','rv2-detail-caption',`Search terms: ${result.searchQuery}`));
-      for(const missing of result.unresolvedReferences||[])content.append(node('p','rv2-detail-caption',`Unresolved reference: ${missing.title}. ${missing.reason||''}`));
-      for(const limitation of result.coverageLimitations||[])content.append(node('p','rv2-detail-caption',limitation));
+      if(result.queryExpansions?.length)content.append(node('p','rv2-detail-caption',`Related terms: ${result.queryExpansions.join('; ')}`));
+      if(result.sourceEditions?.length)content.append(node('p','rv2-detail-caption',`Searched: ${[...new Set(result.sourceEditions.map(edition=>edition.codeEdition))].join('; ')}`));
+      if(result.coverage?.omittedCandidateCount>0)content.append(node('p','rv2-detail-caption',`Showing ${result.coverage.shownCount} of ${result.coverage.candidateCount} candidates. Narrow the question to explore the others.`));
+      if(result.unresolvedReferences?.length||result.coverageLimitations?.length){
+        const notes=node('details','rv2-discovery-notes');notes.append(node('summary','',`Search scope${result.unresolvedReferences?.length?` · ${result.unresolvedReferences.length} unresolved references`:''}`));
+        for(const missing of result.unresolvedReferences||[])notes.append(node('p','rv2-detail-caption',`Unresolved reference: ${missing.title}. ${missing.reason||''}`));
+        for(const limitation of result.coverageLimitations||[])notes.append(node('p','rv2-detail-caption',limitation));
+        content.append(notes);
+      }
       if(!candidates.length)content.append(node('p','','No passages were found. Try another term or browse Reader.'));
       for(const candidate of candidates){const row=node('article','rv2-candidate');row.append(node('h4','',passageChipLabel(candidate)),node('p','',candidate.title||''));
+        const kind={provision:'Provision',definition:'Definition',table:'Table and notes',scope:'Scope',reference:'Cross-reference'}[candidate.kind];
+        if(kind||candidate.reason)row.append(node('p','rv2-detail-caption',[kind,candidate.reason].filter(Boolean).join(' · ')));
         row.append(action('Review in Reader',async()=>{
-          if(busy||includeBusy)return;includeBusy=true;update();try{await options.onOpenReader(candidate);const preview=await onReview(candidate);if(!valid(attempt))return;
+          if(busy||includeBusy)return;includeBusy=true;update();try{await options.onOpenReader(candidate);
+            if(candidate.requiresReaderSelection){notice('Select the complete table and its footnotes in Reader before attaching it.');return;}
+            const preview=await onReview(candidate);if(!valid(attempt))return;
             if(preview.requiresVisualReview){notice('Select this passage and review its visuals in Reader before attaching it.');return;}
             row.querySelector('.rv2-review')?.remove();const review=node('div','rv2-review');review.append(node('p','rv2-source-text',preview.selection.selectedText));
             const include=action('Include passage',async()=>{if(busy||includeBusy)return;includeBusy=true;update();try{await onInclude(preview.selection);}catch(error){notice(error.message,true);}finally{includeBusy=false;update();}});
