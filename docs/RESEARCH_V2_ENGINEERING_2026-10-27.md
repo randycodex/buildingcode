@@ -4,6 +4,11 @@ Branch: `codex/research-rebuild`. This pass addresses the five engineering items
 requested after the first rebuild. Human review is deferred at the user's request.
 Nothing was pushed, deployed, or applied to production data.
 
+Later local configuration work is recorded in
+[Research v2 production configuration](RESEARCH_V2_PRODUCTION_CONFIG_2026-10-27.md).
+Its default-off hosted configuration supersedes the deployment block described
+in this earlier acceptance snapshot; neither pass deployed anything.
+
 ## 1. Product connections
 
 The v2 interface now exposes Project assignment in its question column and the

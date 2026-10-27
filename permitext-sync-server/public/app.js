@@ -1,6 +1,7 @@
+import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchDiscoveryQuery, researchV2RetryContext } from "./research-v2.js?v=6";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1390";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1391";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -151,7 +152,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-research-v2-v1390";
+} from "./offline-storage.js?v=20261027-research-v2-v1391";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -9729,6 +9730,7 @@ function linkedResearchDecisionDismissalKey(questionID, projectID = activeProjec
 }
 
 function clearResearchAccountRuntime() {
+  researchV2Rollout.clear();
   researchOpenGeneration += 1;
   activeResearchProgress.forEach((progress) => {
     clearInterval(progress.timer);
@@ -23293,6 +23295,7 @@ async function postResearch(path, values = {}) {
   const identity = captureAccountRequest();
   if (!account) throw new Error("Sign in from Account to use private research conversations.");
   const creationWorkspaceID = activeWorkspaceID;
+  if(path === "/research/conversations/get" && hasCapability("research"))await researchV2Rollout.refresh();
   if (["/research/conversations/create", "/research/conversations/get"].includes(path) && !(researchV2Enabled() && path.endsWith("/get"))) values = { ...values, analysisMode: "conversation_only" };
   if (path === "/research/conversations/create") {
     values = { ...values, projectID: researchCreationProjectID(values.projectID) };
@@ -26030,15 +26033,15 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   requestAnimationFrame(resizeComposer);
 }
 
-function researchV2Enabled() {
-  if (!["localhost", "127.0.0.1", "[::1]"].includes(location.hostname)) return false;
-  const requested = new URLSearchParams(location.search).get("research");
-  if (requested === "v2") sessionStorage.setItem("permitext:local-research-v2", "1");
-  if (requested === "legacy") sessionStorage.removeItem("permitext:local-research-v2");
-  return sessionStorage.getItem("permitext:local-research-v2") === "1";
-}
+const researchV2Rollout = createResearchV2Rollout({
+  scope:()=>{const account=activeAccount();return {userID:account?.userID,key:`${account?.userID}:${account?.sessionToken}:${accountRuntimeGeneration}`};},
+  isCurrent:owner=>researchV2RolloutScopeMatches(owner),
+  load:()=>postResearch("/research/v2/config"),storage:sessionStorage,url:()=>location.href
+});
+function researchV2RolloutScopeMatches(owner){const account=activeAccount();return owner.key===`${account?.userID}:${account?.sessionToken}:${accountRuntimeGeneration}`;}
+function researchV2Enabled() { return researchV2Rollout.requested(); }
 
-async function renderResearchV2Pane(paneID) {
+async function renderResearchV2Pane(paneID, configuration = null) {
   const panel = renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel", "research-v2-panel");
   const content = panel.querySelector(".analysis-content");
@@ -26056,7 +26059,7 @@ async function renderResearchV2Pane(paneID) {
     const [listed, fetched, availability] = await Promise.all([
       postResearch("/research/conversations/list", {limit:30,projectID:researchWorkspaceProjectID() || ""}),
       conversationID ? postResearch("/research/conversations/get", { conversationID }) : null,
-      postResearch("/research/v2/config")
+      configuration || postResearch("/research/v2/config")
     ]);
     if (!current()) return panel;
     if(!availability.available){
@@ -26159,7 +26162,10 @@ async function renderResearchV2Pane(paneID) {
 
 async function renderResearch(paneID = "utility:analysis") {
   if (!hasCapability("research")) return renderProLockedPane(paneID, "Assistant");
-  if (researchV2Enabled()) return renderResearchV2Pane(paneID);
+  const identity=captureAccountRequest(),workspaceID=activeWorkspaceID;
+  const configuration=await researchV2Rollout.refresh({force:true});
+  if(!isCurrentAccountRequest(identity)||workspaceID!==activeWorkspaceID)return null;
+  if (configuration.available && researchV2Rollout.enabled()) return renderResearchV2Pane(paneID, configuration);
   const instance = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === paneID) || null;
   const conversationOpen = instance ? Boolean(instance.conversationID) : researchConversationPaneIsOpen();
   const draftShowing = researchDraftPaneIDs.has(paneID) || !conversationOpen;

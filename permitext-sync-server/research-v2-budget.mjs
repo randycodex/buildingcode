@@ -27,6 +27,17 @@ export function lunaUsageMicroUSD(payload) {
     usage.output_tokens * lunaV2Pricing.output + writes * .25) * multiplier);
 }
 
+export function assertLunaV2Request(requestBody){
+  const bytes = Buffer.byteLength(JSON.stringify(requestBody), 'utf8');
+  if (bytes > 180_000 || !Number.isSafeInteger(requestBody.max_output_tokens) ||
+          requestBody.max_output_tokens < 1 || requestBody.max_output_tokens > 8192 ||
+          requestBody.model !== 'gpt-6-luna' || requestBody.service_tier !== 'default' ||
+          requestBody.store !== false || requestBody.tools?.length || requestBody.background) {
+    throw error('This request is outside the approved Luna request limits.', 'V2_REQUEST_LIMIT');
+  }
+  return bytes;
+}
+
 export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitUSD } = {}) {
   if (!path) throw error('Research v2 needs a durable evaluation budget ledger.', 'V2_BUDGET_REQUIRED');
   if (!(limitUSD > 0 && limitUSD <= researchV2BudgetLimitUSD)) throw error('The Research v2 budget cannot exceed $7.', 'V2_BUDGET_LIMIT');
@@ -61,13 +72,7 @@ export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitU
   const used = ledger => ledger.calls.reduce((sum, call) => sum + (call.chargedMicroUSD ?? call.reservedMicroUSD), 0);
   return {
     async reserve(requestBody, phase) {
-      const bytes = Buffer.byteLength(JSON.stringify(requestBody), 'utf8');
-      if (bytes > 180_000 || !Number.isSafeInteger(requestBody.max_output_tokens) ||
-          requestBody.max_output_tokens < 1 || requestBody.max_output_tokens > 8192 ||
-          requestBody.model !== 'gpt-6-luna' || requestBody.service_tier !== 'default' ||
-          requestBody.store !== false || requestBody.tools?.length || requestBody.background) {
-        throw error('This request is outside the approved Luna evaluation limits.', 'V2_REQUEST_LIMIT');
-      }
+      const bytes = assertLunaV2Request(requestBody);
       const reservedMicroUSD = Math.ceil((bytes + 8192) * lunaV2Pricing.reservationInput +
         requestBody.max_output_tokens * lunaV2Pricing.reservationOutput);
       return transaction(ledger => {

@@ -85,7 +85,7 @@ function nonnegativeNumber(value) {
   return Number.isFinite(number) && number >= 0 ? number : null;
 }
 
-function researchPricing(environment = process.env, model = null) {
+export function researchPricing(environment = process.env, model = null) {
   const base = {
     inputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS),
     cachedInputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS),

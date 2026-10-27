@@ -1,6 +1,6 @@
 import { runResearchV2, researchV2AnswerMetadata, researchV2Version } from "./research-v2-engine.mjs";
 import { createResearchV2Budget } from "./research-v2-budget.mjs";
-import { researchV2Availability, createResearchV2ApplicationCall } from "./research-v2-runtime.mjs";
+import { researchV2Configuration, researchV2Availability, createResearchV2ApplicationCall } from "./research-v2-runtime.mjs";
 import { answerRequest as fastResearchRequest, fastResearchInterpretation } from "./research-fast-stream.mjs";
 import {applyWebSyncSafeguard} from "./web-sync-guard.mjs";
 import {webAppVersion} from "./public/web-client-version.js";
@@ -20415,7 +20415,7 @@ async function handleResearchConversationMessage(request, response) {
     sendJSON(response,403,{error:"This local testing session supports Luna Fast answers and Research v2.",code:"LOCAL_LUNA_TESTS_ONLY"});return;
   }
   if (requestedV2 && !researchV2Availability(process.env,context.userID).available) {
-    sendJSON(response, 404, { error: "Research v2 is available only in the enabled local checkout.", code: "RESEARCH_V2_DISABLED" }); return;
+    sendJSON(response, 404, { error: "Research v2 is unavailable for this account or configuration.", code: "RESEARCH_V2_DISABLED" }); return;
   }
   if (context.body.answerMode != null && !["fast", "verified"].includes(context.body.answerMode)) {
     sendError(response, 400, "Choose Fast answer or Verified Research."); return;
@@ -20793,7 +20793,8 @@ async function handleResearchConversationMessage(request, response) {
       const fastGenerationStartedAt = performance.now();
       let firstTextMilliseconds = null, v2Result = null, providerPayloads;
       if (requestedV2) {
-        const budget = createResearchV2Budget({ path: process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH });
+        const configuration = researchV2Configuration(process.env);
+        const budget = configuration.spending === "evaluation" ? createResearchV2Budget({ path: configuration.evaluationBudgetPath }) : null;
         const call = createResearchV2ApplicationCall({ apiKey: process.env.OPENAI_API_KEY, evaluationBudget:budget,
           provider: async (requestBody, signal) => {
             requestBody.safety_identifier = body.safety_identifier;

@@ -5,7 +5,8 @@ import {mkdtemp,rm,readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 const serve=process.argv.includes('--serve');
-const postgres=process.argv.includes('--postgres')?await (await import('./research-v2-local-postgres.mjs')).startResearchV2Postgres():null;
+const production=process.argv.includes('--production');
+const postgres=(production||process.argv.includes('--postgres'))?await (await import('./research-v2-local-postgres.mjs')).startResearchV2Postgres():null;
 const scratch=await mkdtemp(join(tmpdir(),'permitext-v2-http-'));
 for(const key of Object.keys(process.env))if(/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$|BLOB_|CLERK_|STRIPE_|RESEND_|APPLE_.*(?:SECRET|KEY))/.test(key))delete process.env[key];
 Object.assign(process.env,{NODE_ENV:'test',OPENAI_API_KEY:'offline-double',PERMITEXT_SYNC_DATA_PATH:join(scratch,'store.json'),
@@ -16,7 +17,7 @@ Object.assign(process.env,{NODE_ENV:'test',OPENAI_API_KEY:'offline-double',PERMI
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS:'.1',PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS:'.01',
   PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS:'.5',PERMITEXT_RESEARCH_PRICING_VERSION:'offline-v2-test'});
 if(postgres)process.env.PERMITEXT_SYNC_DATABASE_URL=postgres.connectionString;
-const nativeFetch=globalThis.fetch;let gate=null,dropResponse=false,lastHandled=Promise.resolve();let calls=0,broken=false,gap=false,server,userID,token,account;
+const nativeFetch=globalThis.fetch;let gate=null,dropResponse=false,lastHandled=Promise.resolve(),lastClosed=Promise.resolve();let calls=0,broken=false,gap=false,server,userID,token,account;
 const passage='This code shall be known and may be cited as the "New York City Building Code," "NYCBC" or "BC". All section numbers in this code shall be deemed to be preceded by the designation "BC".';
 const draft={answerText:'The selected text calls this the New York City Building Code, NYCBC, or BC. [S1]',claims:[{text:'The selected text supplies these names.',sourceIDs:['S1']}],missingSources:[],missingFacts:[]};
 globalThis.fetch=async(url,options)=>{
@@ -32,6 +33,8 @@ globalThis.fetch=async(url,options)=>{
 };
 try{
   const {handleRequest,createFileStoreAdapter}=await import('../app.mjs');
+  const {createAPIHandler}=await import('../api-handler.mjs');
+  const handler=production?createAPIHandler(async()=>({handleRequest})):handleRequest;
   const capability=randomUUID();
   server=createServer((request,response)=>{
     if(serve&&request.url===`/preview/${capability}`){
@@ -40,10 +43,12 @@ try{
       response.end(`<script>localStorage.setItem('permitext:webAccount:v1',${JSON.stringify(JSON.stringify(stored))});location.replace('/workspace?research=v2')</script>`);return;
     }
     if(dropResponse&&request.url==='/research/conversations/message'){dropResponse=false;response.end=()=>{response.destroy();return response;};}
-    lastHandled=handleRequest(request,response);return lastHandled;
+    lastClosed=new Promise(resolve=>response.once('close',resolve));
+    lastHandled=handler(request,response);return lastHandled;
   });
   await new Promise(resolve=>server.listen(serve?8806:0,'127.0.0.1',resolve));
   const base=`http://127.0.0.1:${server.address().port}`;
+  console.log(JSON.stringify({mode:production?'production':'local',provider:'offline double',paidProviderRequests:0}));
   const post=async(path,values={},bearer=token,signal)=>{const response=await nativeFetch(base+path,{method:'POST',signal,headers:{'content-type':'application/json',...(bearer?{authorization:`Bearer ${bearer}`}:{})},body:JSON.stringify({auth:{accountUserID:userID},...values})});return{status:response.status,body:await response.json()};};
   const providerID=randomUUID();
   account=(await post('/account/sign-in',{credential:{provider:'web',providerUserID:providerID,displayName:'Research v2 local test'}})).body.account;
@@ -51,8 +56,16 @@ try{
   await post('/admin/lifetime-grants/grant',{userID},process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   account=(await post('/account/sign-in',{credential:{provider:'web',providerUserID:providerID,displayName:'Research v2 local test'}})).body.account||account;
   token=account.backendSessionToken;userID=account.appUserID;
-  let conversation=(await post('/research/conversations/create',{analysisMode:'conversation_only',selections:[{sectionID:'1',selectedText:passage}]})).body.conversation;
-  assert(conversation?.id);
+  const other=(await post('/account/sign-in',{credential:{provider:'web',providerUserID:randomUUID(),displayName:'Other local owner'}})).body.account;
+  await post('/admin/lifetime-grants/grant',{userID:other.appUserID},process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
+  const evaluationBudgetPath=process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH;
+  if(production){
+    Object.assign(process.env,{NODE_ENV:'production',VERCEL:'1',VERCEL_ENV:'preview',PERMITEXT_RESEARCH_V2_ROLLOUT:'allowlist',PERMITEXT_RESEARCH_V2_USERS:userID,PERMITEXT_RESEARCH_V2_DEFAULT:'v2'});
+    delete process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH;
+  }
+  const created=await post('/research/conversations/create',{analysisMode:'conversation_only',selections:[{sectionID:'1',selectedText:passage}]});
+  let conversation=created.body.conversation;
+  assert(conversation?.id,JSON.stringify(created));
   const context=c=>({conversationID:c.id,expectedRevision:Number(c.revision||0),expectedEvidenceSetVersion:Number(c.evidenceSetVersion||1),researchEngine:'v2',analysisMode:'conversation_only'});
   let input={...context(conversation),question:'What is this code called?',requestID:'v2-original'};
   const completed=await post('/research/conversations/message',input);
@@ -104,7 +117,7 @@ try{
   const cancelBegan=new Promise(resolve=>{started=resolve;});
   gate={started,wait:new Promise(resolve=>{release=resolve;})};
   const cancelRequest=post('/research/conversations/message',{...context(cancelConversation),question:'Explain this passage.',requestID:'cancelled-turn'},token,abort.signal);
-  await cancelBegan;const handling=lastHandled;abort.abort();await assert.rejects(cancelRequest,{name:'AbortError'});release();await handling;
+  await cancelBegan;const handling=lastHandled,closed=lastClosed;abort.abort();await assert.rejects(cancelRequest,{name:'AbortError'});await closed;release();await handling;
   assert(!(await adapter.read()).researchAnswersByUserID[userID].some(a=>a.conversationID===cancelConversation.id),'Cancelled turn cannot persist an answer');
   // Unknown provider failures leave existing answers and user drafts recoverable.
   const beforeFailure=structuredClone((await adapter.read()).researchAnswersByUserID[userID]);
@@ -151,18 +164,38 @@ try{
   assert.deepEqual((await post('/research/answers/get',{answerID})).body.answer,immutable,'Product handoffs cannot change original evidence or answer');
   const signedOut=await post('/research/answers/get',{answerID},'invalid');assert.equal(signedOut.status,401);
   const page=await post('/research/conversations/list',{limit:1,projectID:'v2-project-a'});assert.equal(page.status,200);assert.equal(page.body.conversations[0].id,linked.id);
-  const other=(await post('/account/sign-in',{credential:{provider:'web',providerUserID:randomUUID(),displayName:'Other local owner'}})).body.account;
-  await post('/admin/lifetime-grants/grant',{userID:other.appUserID},process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const foreignRead=await post('/research/answers/get',{auth:{accountUserID:other.appUserID},answerID},other.backendSessionToken);
   assert.equal(foreignRead.status,404,'A valid different account cannot read the answer');
   const foreignWrite=await post('/research/conversations/message',{...context(linked),auth:{accountUserID:other.appUserID},question:'Read another owner.',requestID:'foreign-owner'},other.backendSessionToken);
   assert.equal(foreignWrite.status,404);
-  const availability=await post('/research/v2/config');assert.equal(availability.body.available,true);assert.equal(availability.body.defaultEngine,'legacy');
+  const availability=await post('/research/v2/config');assert.equal(availability.body.available,true);assert.equal(availability.body.defaultEngine,production?'v2':'legacy');
+  assert.equal(availability.body.localOnly,!production);assert.equal(availability.body.spending,production?'application':'evaluation');
   process.env.PERMITEXT_RESEARCH_V2_USERS='other';assert.equal((await post('/research/v2/config')).body.available,false);
   const callsBeforeRollback=calls;
   assert.equal((await post('/research/conversations/message',{...context(follow.body.conversation),question:'Blocked by local rollout.',requestID:'rollback'})).status,404);
-  assert.equal(calls,callsBeforeRollback,'Switching off v2 prevents provider dispatch');delete process.env.PERMITEXT_RESEARCH_V2_USERS;
+  assert.equal(calls,callsBeforeRollback,'Switching off v2 prevents provider dispatch');if(production)process.env.PERMITEXT_RESEARCH_V2_USERS=userID;else delete process.env.PERMITEXT_RESEARCH_V2_USERS;
   assert.deepEqual((await post('/research/answers/get',{answerID})).body.answer,immutable,'Rollback preserves existing v2 answers');
+  if(production){
+    const beforeGuard=calls;
+    const priorCap=process.env.PERMITEXT_RESEARCH_MAX_REQUEST_USD;
+    process.env.PERMITEXT_RESEARCH_MAX_REQUEST_USD='.000001';
+    const capped=await post('/research/conversations/message',{...context(follow.body.conversation),question:'Explain the names.',requestID:'production-cap'});
+    assert(capped.status>=400,JSON.stringify(capped));assert.equal(calls,beforeGuard,'Application reservation stops an over-budget turn before dispatch');
+    process.env.PERMITEXT_RESEARCH_MAX_REQUEST_USD=priorCap;
+    for(const [key,value] of [['PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS','.01'],['PERMITEXT_RESEARCH_KILL_SWITCH','1'],['PERMITEXT_RESEARCH_V2_BUDGET_PATH',evaluationBudgetPath]]){
+      const previous=process.env[key];process.env[key]=value;
+      assert.equal((await post('/research/v2/config')).body.available,false);
+      const blocked=await post('/research/conversations/message',{...context(follow.body.conversation),question:'Must be blocked.',requestID:'production-misconfiguration-'+key});
+      assert.equal(blocked.status,404,JSON.stringify(blocked));assert.equal(calls,beforeGuard);
+      if(previous===undefined)delete process.env[key];else process.env[key]=previous;
+    }
+    process.env.PERMITEXT_RESEARCH_V2_ROLLOUT='all';delete process.env.PERMITEXT_RESEARCH_V2_USERS;
+    const all=await post('/research/v2/config',{auth:{accountUserID:other.appUserID}},other.backendSessionToken);assert.equal(all.body.available,true);
+    process.env.PERMITEXT_RESEARCH_V2_ROLLOUT='allowlist';process.env.PERMITEXT_RESEARCH_V2_USERS=userID;
+    assert.equal((await post('/research/v2/config',{auth:{accountUserID:other.appUserID}},other.backendSessionToken)).body.available,false);
+    await assert.rejects(readFile(evaluationBudgetPath),{code:'ENOENT'},'Production never opens a local evaluation ledger');
+    console.log('Production configuration passed: actual API entry, PostgreSQL usage, application spending cap, pricing/misconfiguration rejection, allowlist/all rollout, rollback and zero local-ledger writes.');
+  }else{
   const oldFast=await fresh(),budgetPath=process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH;
   const budgetCount=JSON.parse(await readFile(budgetPath)).calls.length;
   const fastReply=await post('/research/conversations/message',{...context(oldFast),researchEngine:'legacy',answerMode:'fast',question:'What is this code called?',requestID:'legacy-shared-budget'});
@@ -173,6 +206,7 @@ try{
   process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH=tinyPath;const beforeExhausted=calls;
   const exhausted=await post('/research/conversations/message',{...context(fastReply.body.conversation),researchEngine:'legacy',answerMode:'fast',question:'Explain once more.',requestID:'exhausted-fast'});
   assert.equal(exhausted.status,429,JSON.stringify(exhausted));assert.equal(exhausted.body.code,'V2_BUDGET_EXHAUSTED');assert.equal(calls,beforeExhausted);process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH=budgetPath;
+  }
   const legacy=await fresh();legacy.messages=[{id:'legacy-q',role:'user',question:'Legacy question.'},{id:'legacy-a',role:'assistant',answer:{conclusion:'Legacy conclusion.',explanation:'Legacy qualification.',verification:{status:'unreviewed',pass:false}}}];
   const legacyFixtures=Array.from({length:65},(_,i)=>({...legacy,id:'v2-legacy-'+String(i).padStart(2,'0'),title:'Legacy question '+i,createdAt:new Date(Date.now()-86400000-i*1000).toISOString()}));
   if(postgres){for(const c of legacyFixtures)await postgres.sql`INSERT INTO permitext_research_conversations(id,user_id,title,conversation,created_at) VALUES(${c.id},${userID},${c.title},${JSON.stringify(c)}::jsonb,${c.createdAt}::timestamptz)`;}
@@ -187,6 +221,6 @@ try{
   process.env.PERMITEXT_RESEARCH_V2='0';
   const disabled=await post('/research/conversations/message',{...context(removed.body.conversation),question:'Explain.',requestID:'disabled'});assert.equal(disabled.status,404);
   process.env.PERMITEXT_RESEARCH_V2='1';
-  console.log('Research v2 HTTP passed: real canonical selection, Luna draft/review, durable exact evidence, no rebilling on replay, stale revision/auth rejection, withheld failed draft, immutable history, local-only gate, two-tab exclusion, mid-turn evidence mutation, lost-response replay cancellation and provider failure recovery. No paid calls.');
+  console.log('Research v2 HTTP passed: real canonical selection, Luna draft/review, durable exact evidence, no rebilling on replay, stale revision/auth rejection, withheld failed draft, immutable history, server rollout gate, two-tab exclusion, mid-turn evidence mutation, lost-response replay cancellation and provider failure recovery. No paid calls.');
   if(serve){console.log(JSON.stringify({preview:base+`/preview/${capability}`,offline:true,store:scratch}));await new Promise(resolve=>{process.once('SIGTERM',resolve);process.once('SIGINT',resolve);});}
 }finally{globalThis.fetch=nativeFetch;if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}await rm(scratch,{recursive:true,force:true});await postgres?.close();}

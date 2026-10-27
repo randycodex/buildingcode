@@ -1,5 +1,6 @@
 import { researchModelConfiguration } from "../research-config.mjs";
 import { researchModelRoutingConfiguration } from "../research-model-routing.mjs";
+import { researchV2Configuration } from "../research-v2-runtime.mjs";
 import {
   beta1ConfigurationReadiness,
   verifyLiveStripeReadiness
@@ -10,6 +11,11 @@ import {
   productionReleaseReadiness
 } from "../operational-readiness.mjs";
 
+if (process.env.VERCEL_ENV) {
+  const v2=researchV2Configuration(process.env);
+  console.log("Research v2 deployment configuration:",JSON.stringify({enabled:v2.enabled,ready:v2.ready,rollout:v2.rollout,defaultEngine:v2.defaultEngine,spending:v2.spending,problems:v2.problems}));
+  if(!v2.ready)throw new Error(`Research v2 configuration is invalid: ${v2.problems.join(' ')}`);
+}
 if (process.env.VERCEL_ENV !== "production") {
   console.log("Permitext commercial readiness skipped outside Vercel Production.");
 } else {

@@ -5,8 +5,8 @@ import {mkdir} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {createResearchV2Budget} from '../research-v2-budget.mjs';
 
-// Explicit local launch only. Both the API and UI require the opt-in; Vercel and
-// production environments cannot enable the replacement through a URL flag.
+// Explicit local paid-test launcher. Hosted v2 uses separate application
+// spending controls; this launcher always retains the original $7 ledger.
 if(!process.argv.includes('--live'))throw new Error('Use --live to enable the user-authorized Luna evaluation budget.');
 if(process.env.VERCEL||process.env.NODE_ENV==='production')throw new Error('Research v2 cannot run in a deployed environment.');
 const apiKey=process.env.OPENAI_API_KEY||execFileSync('security',['find-generic-password','-a',process.env.USER,'-s','permitext-openai-api-key','-w'],{encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim();

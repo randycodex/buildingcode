@@ -4,6 +4,7 @@
   "outputDirectory": "deployment-public",
   "functions": {
     "api/index.mjs": {
+      "maxDuration": 300,
       "includeFiles": "{generated/search-catalogs/**,research-official-pdf-worker.mjs,node_modules/pdfjs-dist/legacy/build/*.mjs,node_modules/@napi-rs/canvas*/**,prepared/research-semantic/current-vectors*,prepared/research-passages/**}"
     }
   },

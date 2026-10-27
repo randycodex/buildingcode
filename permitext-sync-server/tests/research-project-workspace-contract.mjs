@@ -13,6 +13,7 @@ const context = vm.createContext({
   workspaceProject: () => project, projectDetailKey: value => value.id,
   activeWorkspaceRecord: () => project ? { projectID: project.id } : null,
   activeWorkspaceID: 'workspace-a',
+  researchV2Enabled: () => false, hasCapability: () => true, researchV2Rollout: {refresh: async () => ({available:false})},
   researchConversationList: [{ id: 'a', primaryProjectID: 'project-a' }, { id: 'b', primaryProjectID: 'project-b' }, { id: 'legacy', primaryProjectID: null }],
   activeAccount: () => ({ userID: 'owner', sessionToken: 'synthetic' }),
   captureAccountRequest: () => ({}), requireCurrentAccountRequest() {},
@@ -45,6 +46,13 @@ context.ensureResearchProjectSynced = async () => { context.activeWorkspaceID = 
 const count = requests.length;
 await assert.rejects(context.postResearch('/research/conversations/create', {}), /Workspace changed/);
 assert.equal(requests.length, count, 'Switching workspaces during sync must not create a chat.');
+context.researchV2Enabled=()=>true;
+await context.postResearch('/research/conversations/get',{conversationID:'retained-history'});
+assert(!('analysisMode' in requests.at(-1).body),'Opening v2 history must be a read without scope conversion');
+context.researchV2Enabled=()=>false;
+await context.postResearch('/research/conversations/get',{conversationID:'legacy-history'});
+assert.equal(requests.at(-1).body.analysisMode,'conversation_only','Original Research keeps its existing passage-only scope policy');
+
 const render = source.slice(source.indexOf('async function renderResearch(paneID'), source.indexOf('function visualEvidenceDataURL'));
 assert(render.includes('researchConversationHistoryGroups(visibleHistoryConversations())'));
 assert(render.includes('visibleHistoryConversations().forEach((conversation) => selectedConversationIDs.add(conversation.id))'));
