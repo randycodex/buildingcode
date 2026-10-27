@@ -1,7 +1,7 @@
 // Session history contains editable content only. Saving and undoing never
 // rewind the Report's server ID, revision, or issued versions.
-// Empty authoring placeholders contain no saved content. In particular,
-// undoing the first words in a new paragraph must remain a saveable draft.
+// Empty editor blocks remain in session history so insertion and removal are
+// undoable. Saving and export omit them through reportContentBlocks.
 export const reportContentBlocks = blocks => blocks.filter(block=>{
   const runs = (block.richText || []).some(run=>run.text?.trim());
   if (['heading','paragraph'].includes(block.kind)) return Boolean(block.text?.trim() || runs);
@@ -10,7 +10,7 @@ export const reportContentBlocks = blocks => blocks.filter(block=>{
 });
 const content = draft => JSON.stringify({title:String(draft.title || '').trim(),
   reportDate:Number.isFinite(Date.parse(draft.reportDate)) ? new Date(draft.reportDate).toISOString() : draft.reportDate,
-  introduction:String(draft.introduction || '').trim(), blocks:reportContentBlocks(draft.blocks).map(({order,sourceClassification,...block})=>{
+  introduction:String(draft.introduction || '').trim(), blocks:draft.blocks.map(({order,sourceClassification,...block})=>{
     if (typeof block.text === 'string') block.text = block.text.trim();
     if (typeof block.label === 'string') block.label = block.label.trim().slice(0,500);
     if (block.items) block.items = block.items.map(item=>item.trim()).filter(Boolean);

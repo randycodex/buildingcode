@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261026-focused-ux-v1380";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261026-report-undo-v1381";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -28,7 +28,7 @@ import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
 import { createReportAutosave } from "./report-autosave.js?v=1";
-import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=2";
+import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=3";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261024-passages-v8";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=13";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
@@ -150,7 +150,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261026-focused-ux-v1380";
+} from "./offline-storage.js?v=20261026-report-undo-v1381";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,

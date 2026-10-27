@@ -7,11 +7,31 @@ const apply=(draft,content)=>{assert(content); Object.assign(draft,content);};
 {
   const history=createReportUndo(),draft=make(); history.bind(draft);
   draft.blocks.push({id:'placeholder',kind:'paragraph',text:''});history.record(draft);
-  assert(!history.canUndo(draft),'An empty authoring placeholder has no saved content');
+  assert(history.canUndo(draft),'Inserting an empty editor block is an undoable action.');
   draft.blocks[1].text='First words';history.record(draft,'text:placeholder');
-  apply(draft,history.undo(draft));assert.equal(draft.blocks.length,1,'Undoing first text leaves a valid saveable draft');
+  apply(draft,history.undo(draft));assert.equal(draft.blocks[1].text,'','Undoing first text restores the empty editor block.');
+  assert.equal(reportContentBlocks(draft.blocks).length,1,'Empty editor blocks remain excluded from saved content.');
+  assert.doesNotThrow(()=>normalizeReportDraftPayload({...draft,blocks:reportContentBlocks(draft.blocks),createdBy:'qa',updatedBy:'qa'}));
   apply(draft,history.redo(draft));assert.equal(draft.blocks[1].text,'First words');
   assert.equal(reportContentBlocks([...draft.blocks,{id:'blank',kind:'list',items:['']}]).length,2);
+}
+for(const placeholder of [
+  {id:'empty-paragraph',kind:'paragraph',text:''},
+  {id:'empty-heading',kind:'heading',text:'   '},
+  {id:'empty-list',kind:'list',items:['']}
+]) {
+  const history=createReportUndo(),draft=make();
+  draft.blocks.push(placeholder);history.bind(draft);
+  draft.title='Keep this title';history.record(draft);
+  draft.blocks.pop();history.record(draft);
+  apply(draft,history.undo(draft));history.record(draft);
+  assert.equal(draft.title,'Keep this title','Undo restores the removed item before reverting an earlier title edit.');
+  assert.equal(draft.blocks[1].id,placeholder.id);
+  assert.equal(reportContentBlocks(draft.blocks).length,1,'Restored placeholders do not enter saved or exported content.');
+  apply(draft,history.redo(draft));history.record(draft);
+  assert.equal(draft.title,'Keep this title');assert.equal(draft.blocks.length,1);
+  apply(draft,history.undo(draft));
+  apply(draft,history.undo(draft));assert.equal(draft.title,'Report','A second Undo reaches the earlier title edit.');
 }
 {
   let time=0; const history=createReportUndo({now:()=>time}),draft=make();
