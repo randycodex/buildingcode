@@ -30,6 +30,12 @@ function pane(id, loading=false) {
 function element() {
   const node = pane("");
   node.children = [];
+  let ownText = "";
+  Object.defineProperty(node, "textContent", {
+    get: () => ownText + node.children.map(child => child.textContent || "").join(""),
+    set: value => { ownText = String(value); node.children = []; }
+  });
+  node.replaceChildren = (...children) => { ownText = ""; node.children = children; };
   node.listeners = new Map();
   node.append = (...children) => node.children.push(...children);
   node.addEventListener = (type, listener) => node.listeners.set(type, listener);
@@ -66,7 +72,7 @@ const sandbox = vm.createContext({
   refreshColumnGroupPresentation() {}, refreshPinnedPaneDivider() { pinnedDividerRefreshes++; }, updateCollapsedPaneDividers() {}, bindReaderScrollIndicator() {},
   updateReaderScrollIndicator() {}, enhanceSelect() {}, restoreReaderScrollPositions() {}, notifyWorkspaceLayoutChange() {}
 });
-vm.runInContext(`let workspacePaneHydrator=null; const workspacePaneReadyWaiters=new Set(); ${actual("activePinnedPaneID")}\n${actual("finishWorkspacePaneReady")}\n${actual("whenWorkspacePaneReady")}\n${actual("workspacePaneContextIsCurrent")}\n${actual("createReportPaneHeader")}\n${actual("createWorkspacePaneLoadingShell")}\n${actual("getWorkspacePaneHydrator")}\n${actual("mountWorkspacePanesIndependently")}\n globalThis.mount=(context, options={})=>mountWorkspacePanesIndependently(context,{...options,shellReady:true}); globalThis.whenReady=whenWorkspacePaneReady; globalThis.hydrator=()=>workspacePaneHydrator;`,sandbox);
+vm.runInContext(`let workspacePaneHydrator=null; const workspacePaneReadyWaiters=new Set(); ${actual("activePinnedPaneID")}\n${actual("finishWorkspacePaneReady")}\n${actual("whenWorkspacePaneReady")}\n${actual("workspacePaneContextIsCurrent")}\n${actual("createReportPaneHeader")}\n${actual("showColumnLoadingStatus")}\n${actual("createWorkspacePaneLoadingShell")}\n${actual("getWorkspacePaneHydrator")}\n${actual("mountWorkspacePanesIndependently")}\n globalThis.mount=(context, options={})=>mountWorkspacePanesIndependently(context,{...options,shellReady:true}); globalThis.whenReady=whenWorkspacePaneReady; globalThis.hydrator=()=>workspacePaneHydrator;`,sandbox);
 const context = () => ({ key:"account:workspace",workspaceID:"workspace",identity:{},generation });
 const mountAndSettle = async (context, options) => { await sandbox.mount(context, options); await sandbox.hydrator().settled(); };
 const descriptor = (id, load) => ({id,label:id,identity:id,load,close(){}, ...(id === "report" ? {ownerClass:"report-draft-panel"} : {})});
@@ -78,6 +84,10 @@ descriptors=[descriptor("notebook",()=>{throw Error("Healthy editor must not rec
 let settled=false;
 const first=sandbox.mount(context()).then(value=>{settled=true;return value;});
 assert.deepEqual(track.children.map(p=>p.dataset.paneId),["notebook","report","search"],"All sized shell slots publish synchronously in requested order.");
+const loadingIcon = track.children[1].querySelector('.column-loading-indicator');
+assert(loadingIcon, 'A pending column displays the shared loading icon.');
+assert.equal((loadingIcon.innerHTML.match(/<rect /g) || []).length, 12);
+assert.equal(loadingIcon.querySelector('.sr-only').textContent, 'Loading report…');
 const searchReady=sandbox.whenReady("search");
 let reportReady=false; const reportTarget=sandbox.whenReady("report").then(value=>{reportReady=value;return value;});
 await tick();
@@ -124,8 +134,9 @@ let attempts=0; const recovered=pane("failure");
 descriptors=[descriptor("notebook",()=>editor),descriptor("failure",()=>{ if (++attempts===1) throw Error("synthetic failure"); return recovered; })]; generation++;
 const failureMount=sandbox.mount(context()); const failedTarget=sandbox.whenReady("failure"); await failureMount; await sandbox.hydrator().settled(); assert.equal(await failedTarget,false); const failureShell=track.children[1];
 assert.equal(failureShell.querySelector("retry").hidden,false);
+assert.equal(failureShell.querySelector('.column-loading-indicator'),null,'A loading icon cannot mask a load error.');
 assert.equal(await sandbox.whenReady("failure"),false,"A late readiness subscriber sees terminal failure immediately.");
-failureShell.querySelector("retry").click(); assert.equal(failureShell.dataset.workspacePaneUnavailable,"false"); const retryTarget=sandbox.whenReady("failure"); await sandbox.hydrator().settled(); assert.equal(await retryTarget,true);
+failureShell.querySelector("retry").click(); assert.equal(failureShell.dataset.workspacePaneUnavailable,"false"); assert(failureShell.querySelector('.column-loading-indicator'),'Retry restores the loading icon.'); const retryTarget=sandbox.whenReady("failure"); await sandbox.hydrator().settled(); assert.equal(await retryTarget,true);
 assert.equal(track.children[1],recovered); assert.equal(track.children[0],editor);
 
 // Workspace transition placeholders are not healthy rendered panes.

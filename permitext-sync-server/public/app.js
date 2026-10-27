@@ -2,7 +2,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=12";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1397";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-column-loading-v1398";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -153,7 +153,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-research-v2-v1397";
+} from "./offline-storage.js?v=20261027-column-loading-v1398";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2043,7 +2043,7 @@ function renderWorkspaceTransitionState(workspaceName = "workspace") {
     header.textContent = label;
     const status = document.createElement("div");
     status.className = "workspace-switch-placeholder-status";
-    status.textContent = `Opening ${workspaceName}...`;
+    showColumnLoadingStatus(status, `Opening ${workspaceName}…`);
     panel.append(header, status);
     applyPaneWeight(panel, paneID);
     return panel;
@@ -3617,7 +3617,7 @@ function renderProjectWorkboard(project) {
     const root = document.createElement("div");
     root.className = "workboard-root";
     root.dataset.projectId = projectID;
-    root.textContent = "Loading workboard…";
+    showColumnLoadingStatus(root, "Loading workboard…");
     panel.append(root, createProjectToolDragHandle(identity));
     mounted = {
       panel,
@@ -8227,6 +8227,10 @@ function searchResultMatchesExactQuery(result, query) {
 
 function emptyReader(content, title = "Choose a chapter", message = "Pick a chapter to load the full text. Section is optional and only jumps within the chapter.") {
   clear(content);
+  if (title === "Loading section" || title === "Loading chapter") {
+    showColumnLoadingStatus(content, `${title}…`);
+    return;
+  }
   const wrapper = document.createElement("section");
   wrapper.className = "reader-empty";
   const heading = document.createElement("h3");
@@ -26055,7 +26059,7 @@ async function renderResearchV2Pane(paneID, configuration = null) {
   const draftKey = conversationID ? `followup:${conversationID}` : paneID;
   const draft = () => researchNewChatDrafts.get(draftKey) || "";
   const saveDraft = text => { if (!current()) return; researchNewChatDrafts.set(draftKey, text); if (currentInstance()) currentInstance().draft = text; scheduleResearchDraftPersistence(); };
-  content.textContent = "Loading Research…";
+  showColumnLoadingStatus(content, "Loading Research…");
   try {
     const [listed, fetched, availability] = await Promise.all([
       postResearch("/research/conversations/list", {limit:30,projectID:researchWorkspaceProjectID() || ""}),
@@ -29192,7 +29196,7 @@ function mountProjectOpeningPane(project, options = {}) {
   content.className = "project-detail-content";
   const loading = document.createElement("p");
   loading.className = "project-detail-loading-status";
-  loading.textContent = "Loading saved evidence, notes, and research history…";
+  showColumnLoadingStatus(loading, "Loading saved evidence, notes, and research history…");
   content.append(loading);
   panel.append(chrome, content);
 
@@ -29688,7 +29692,7 @@ async function renderProjectNotebook(project, options = {}) {
   const status = document.createElement("p");
   status.className = "notebook-status";
   status.setAttribute("role", "status");
-  status.textContent = "Loading Project Notebook…";
+  showColumnLoadingStatus(status, "Loading Project Notebook…");
   shell.append(status);
   panel.append(header, shell);
 
@@ -48459,6 +48463,18 @@ function disposeUnpublishedWorkspacePane(pane) {
   if (pane.classList.contains("reader-panel")) cancelReaderPanelRequests(pane);
 }
 
+function showColumnLoadingStatus(status, label) {
+  const indicator = document.createElement("span");
+  indicator.className = "column-loading-indicator";
+  indicator.setAttribute("role", "status");
+  indicator.innerHTML = `<svg class="column-loading-icon" viewBox="0 0 48 48" fill="currentColor" aria-hidden="true">${Array.from({length:12}, (_, index) => `<rect x="21.5" y="3" width="5" height="12" rx="2.5" opacity="${(12-index)/12}" transform="rotate(${index*30} 24 24)"/>`).join("")}</svg>`;
+  const accessibleLabel = document.createElement("span");
+  accessibleLabel.className = "sr-only";
+  accessibleLabel.textContent = label;
+  indicator.append(accessibleLabel);
+  status.replaceChildren(indicator);
+}
+
 function createWorkspacePaneLoadingShell(descriptor) {
   const panel = document.createElement("article");
   panel.className = `workspace-panel ${descriptor.ownerClass || ""}`;
@@ -48495,7 +48511,7 @@ function createWorkspacePaneLoadingShell(descriptor) {
   const status = document.createElement("p");
   status.className = `${isReport ? "report-draft-status" : isSectionDetail ? "section-detail-content" : "empty-state"} workspace-pane-load-status`;
   status.setAttribute("role", "status");
-  status.textContent = `Loading ${descriptor.label}…`;
+  showColumnLoadingStatus(status, `Loading ${descriptor.label}…`);
   const retry = document.createElement("button");
   retry.type = "button";
   retry.className = "workspace-pane-retry";
@@ -48508,7 +48524,7 @@ function createWorkspacePaneLoadingShell(descriptor) {
     retry.hidden = true;
     panel.dataset.workspacePaneUnavailable = "false";
     panel.setAttribute("aria-busy", "true");
-    status.textContent = `Loading ${descriptor.label}…`;
+    showColumnLoadingStatus(status, `Loading ${descriptor.label}…`);
   });
   panel.setAttribute("aria-busy", "true");
   if (isReport) {
@@ -48774,9 +48790,10 @@ async function mountWorkspacePanesIndependently(context, options = {}) {
     shell.dataset.workspacePaneUnavailable = String(unavailable);
     shell.setAttribute("aria-busy", String(!unavailable));
     const status = shell.querySelector(".workspace-pane-load-status");
-    if (status) status.textContent = unavailable
-      ? "Private workspace content is unavailable. Check your account or connection."
-      : "Checking workspace access…";
+    if (status) {
+      if (unavailable) status.textContent = "Private workspace content is unavailable. Check your account or connection.";
+      else showColumnLoadingStatus(status, "Checking workspace access…");
+    }
     const retry = shell.querySelector(".workspace-pane-retry");
     if (retry) retry.hidden = !unavailable;
     if (unavailable) finishWorkspacePaneReady(shell, false);

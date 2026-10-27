@@ -88,7 +88,7 @@ for (const ready of [true, false]) {
   };
   const c=vm.createContext({currentColumnWorkflowView:()=>"research",workflowPaneIsVisible:()=>true,state,track,CSS:{escape:id=>id},
     heading:{addEventListener(type,fn){assert.equal(type,'click');handler=fn;}},
-    searchID:'search-a',detail:{sectionID:42,chapterID:'target-chapter'},chapter:null,
+    searchID:'search-a',detail:{sectionID:42,chapterID:'target-chapter'},chapter:null,isSearchEvidenceDetail:false,
     sectionPayload:{sectionNumber:'403.2.3.3',title:'Concrete and masonry walls'},
     updateLinkedReaderForSearch:()=>null,isProAccount:()=>true,
     readerFieldsForSectionDetail:(detail,overrides)=>({...detail,...overrides}),

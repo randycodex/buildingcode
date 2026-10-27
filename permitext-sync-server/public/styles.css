@@ -1419,6 +1419,35 @@ textarea:focus-visible {
   font-size: calc(var(--chrome-font-size) * 0.94);
 }
 
+/* Keep column loading independent of header height and column width. */
+.workspace-panel:has(.column-loading-indicator) {
+  position: relative;
+}
+.workspace-panel[data-workspace-pane-loading] .workspace-pane-load-status,
+body .workspace-panel :has(> .column-loading-indicator) {
+  position: static;
+}
+.column-loading-indicator {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  color: var(--text-primary);
+}
+.column-loading-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  animation: column-loading-turn 1s steps(12, end) infinite;
+}
+@keyframes column-loading-turn {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .column-loading-icon { animation: none; }
+}
+
 .panel-track.is-resizing {
   cursor: col-resize;
   user-select: none;

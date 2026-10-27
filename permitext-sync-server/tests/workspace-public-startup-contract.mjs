@@ -15,7 +15,8 @@ let desired=[{id:"reader",publicContent:true,load:()=>reader},{id:"search",publi
 let syncResult=null,forceResult=null,forcePulls=0,summaryReads=0;
 let savedKeys=new Set(["before mutation"]);
 const noop=()=>{};
-const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHydrator,Map,Set,JSON,Promise,console,
+const showColumnLoadingStatus=(status,label)=>{status.textContent=label;};
+const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHydrator,showColumnLoadingStatus,Map,Set,JSON,Promise,console,
  track,activeWorkspaceID:"workspace",accountRuntimeGeneration:1,workspaceRenderGeneration:0,syncedContent:null,syncLoadPromise:null,
  state:{utilityInstances:[],utilities:{},readers:[]},suppressReaderScrollRestore:false,
  captureAccountRequest:()=>({account}),isCurrentAccountRequest:id=>id.account===account,activeAccount:()=>({userID:account}),
@@ -32,7 +33,7 @@ const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHyd
  appendPaneSequence(panes){track.children.forEach(n=>{n.isConnected=false;n.parentNode=null;});track.children=panes;panes.forEach(n=>{n.isConnected=true;n.parentNode=track;});},
  applyPaneWeight:noop,ensureWorkspacePanelAccessibleName:noop,preparePaneCollapse:noop,bindPaneDragging:noop,refreshColumnGroupPresentation:noop,refreshPinnedPaneDivider:noop,
  updateCollapsedPaneDividers:noop,bindReaderScrollIndicator:noop,updateReaderScrollIndicator:noop,enhanceSelect:noop,restoreReaderScrollPositions:noop,
- notifyWorkspaceLayoutChange:noop,disposeUnpublishedWorkspacePane:noop,maskUnverifiedWorkspacePane:noop,
+ notifyWorkspaceLayoutChange:noop,disposeUnpublishedWorkspacePane:noop,maskUnverifiedWorkspacePane:noop,renderProjectUpdateBadge:noop,
  workflowPaneIsVisible:()=>true,currentColumnWorkflowView:()=>"research",pendingWorkspacePaneRevealID:""
 });
 const names=["activePinnedPaneID","workspacePrivatePresentationAllowed","finishWorkspacePaneReady","whenWorkspacePaneReady","workspaceAccessGateForRender","workspacePaneRenderContext","workspacePaneContextIsCurrent","getWorkspacePaneHydrator","mountWorkspacePanesIndependently","renderWorkspace","renderUtilityWorkspace"];
