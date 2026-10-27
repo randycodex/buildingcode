@@ -18,6 +18,21 @@ export function researchDiscoveryQuery(question) {
 export const researchAnswerText = message => message.answer?.answerText || [message.answer?.conclusion, message.answer?.explanation].filter(Boolean).join('\n\n') || message.failure?.message || 'This answer did not complete.';
 export const researchReviewLabel = answer => answer?.verification?.pass === true ? 'AI reviewed · Check cited text' : answer?.verification?.status === 'failed' || answer?.authorityStatus === 'incomplete' ? 'Incomplete' : 'Unreviewed';
 
+export function researchAnswerTiming(message,{locale,timeZone}={}){
+  const date=message.createdAt?new Date(message.createdAt):null;
+  const validDate=date&&Number.isFinite(date.getTime());
+  const milliseconds=message.answer?.delivery?.generationMilliseconds;
+  const hasDuration=typeof milliseconds==='number'&&Number.isFinite(milliseconds)&&milliseconds>=0;
+  if(!validDate&&!hasDuration)return null;
+  const zone=timeZone?{timeZone}:{};
+  const seconds=hasDuration?Math.round(milliseconds/100)/10:null;
+  const rounded=hasDuration?Math.round(milliseconds/1000):null;
+  const duration=hasDuration?(seconds<1?'<1s':seconds<60?`${seconds}s`:`${Math.floor(rounded/60)}m${rounded%60?` ${rounded%60}s`:''}`):'';
+  const fullDate=validDate?date.toLocaleString(locale,{dateStyle:'medium',timeStyle:'long',...zone}):'';
+  return {dateTime:validDate?date.toISOString():'',clock:validDate?date.toLocaleTimeString(locale,{hour:'numeric',minute:'2-digit',...zone}):'',duration,
+    description:[fullDate,hasDuration?`Answer prepared in ${seconds} seconds`:''].filter(Boolean).join(' · ')};
+}
+
 export function researchV2RetryContext(previous,next,requestID){
   const identity=sources=>JSON.stringify((sources||[]).map(s=>[s.id,s.codeVersion,s.selectedText]));
   if(!next||previous.id!==next.id||Number(previous.evidenceSetVersion||1)!==Number(next.evidenceSetVersion||1)||
@@ -86,7 +101,17 @@ export function createResearchV2View(options) {
       footer.append(action('Sources used',()=>void showSnapshot(message),'rv2-text-action'));
       const actions=options.renderAnswerActions?.(message);
       if(actions){const disclosure=node('details','rv2-saved-actions');disclosure.append(node('summary','','Save or share'),actions);footer.append(disclosure);}
-      bubble.append(footer);thread.append(bubble);
+      bubble.append(footer);
+      const entry=node('div','rv2-answer-entry');entry.append(bubble);
+      const timing=researchAnswerTiming(message);
+      if(timing){
+        const stamp=node('div','rv2-answer-time');stamp.title=timing.description;stamp.setAttribute('aria-label',timing.description);
+        if(timing.clock){const clock=node('time','',timing.clock);clock.setAttribute('datetime',timing.dateTime);stamp.append(clock);}
+        if(timing.clock&&timing.duration){const separator=node('span','','·');separator.setAttribute('aria-hidden','true');stamp.append(separator);}
+        if(timing.duration)stamp.append(node('span','rv2-answer-duration',timing.duration));
+        entry.append(stamp);
+      }
+      thread.append(entry);
     }
   });
   const composer=node('form','rv2-composer');composer.setAttribute('aria-label','Research message');
