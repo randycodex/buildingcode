@@ -8,7 +8,7 @@ const action = (label, callback, className = '') => {
 };
 export const passageChipLabel = source => `${source.codePrefix || source.codeBook || 'Code'} § ${source.sectionNumber || source.sectionID} · ${String(source.codeEdition || source.edition || source.codeSource?.editionLabel || source.codeVersion || '').match(/(?:19|20)\d{2}/)?.[0] || 'Edition unavailable'}`;
 
-export {researchDiscoveryQuery} from './research-discovery-query.js?v=1';
+export {researchDiscoveryQuery} from './research-discovery-query.js?v=2';
 
 export const researchAnswerText = message => message.answer?.answerText || [message.answer?.conclusion, message.answer?.explanation].filter(Boolean).join('\n\n') || message.failure?.message || 'This answer did not complete.';
 export const researchReviewLabel = answer => answer?.verification?.pass === true ? 'AI reviewed · Check cited text' : answer?.verification?.status === 'failed' || answer?.authorityStatus === 'incomplete' ? 'Incomplete' : 'Unreviewed';
@@ -95,12 +95,17 @@ export function createResearchV2View(options) {
       const gapLists=[['Sources still needed',message.answer?.additionalEvidenceNeeded],['Project facts still needed',message.answer?.missingFacts]];
       if(gapLists.some(([,items])=>Array.isArray(items)&&items.some(item=>typeof item==='string'&&item.trim()))){
         const gaps=node('div','rv2-answer-gaps');gaps.setAttribute('aria-label','Unresolved information');
+        const originalQuestion=message.question||messages[messages.indexOf(message)-1]?.question||'';
         for(const [label,items] of gapLists){
           const unique=[...new Set((Array.isArray(items)?items:[]).filter(item=>typeof item==='string'&&item.trim()))];
           if(!unique.length)continue;gaps.append(node('h4','',label));const list=node('ul');
-          for(const item of unique){const li=node('li');paragraphText(li,item,message);list.append(li);}gaps.append(list);
+          for(const item of unique){const li=node('li');paragraphText(li,item,message);
+            const source=label==='Sources still needed';
+            if(source&&onFind){const find=action('Find source',()=>void findPassages(originalQuestion,{focus:item}),'rv2-text-action');find.setAttribute('aria-label',`Find source: ${item}`);li.append(find);}
+            if(!source){const respond=action('Add fact',()=>showFactEntry(item,originalQuestion),'rv2-text-action');respond.setAttribute('aria-label',`Add fact: ${item}`);li.append(respond);}
+            list.append(li);
+          }gaps.append(list);
         }
-        if(onFind)gaps.append(action('Find missing sources',()=>void findPassages(message.question||messages[messages.indexOf(message)-1]?.question||''),'rv2-text-action'));
         bubble.append(gaps);
       }
       const footer=node('div','rv2-answer-footer');
@@ -142,6 +147,20 @@ export function createResearchV2View(options) {
   chat.append(mobileHistory,thread,detail,status,composer);root.append(rail,chat);
   function update(){input.disabled=busy;attach.disabled=busy||includeBusy;send.disabled=busy||includeBusy||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy));}
   function showDetail(){thread.hidden=true;detail.hidden=false;detailBody.replaceChildren();return detailBody;}
+  function showFactEntry(fact,question){
+    if(busy||includeBusy)return;const attempt=++generation,content=showDetail();
+    content.append(node('h3','','Add a project fact'),node('p','',fact));
+    const response=node('textarea','rv2-fact-input');response.setAttribute('aria-label','Your response to the missing fact');response.rows=3;response.maxLength=1500;
+    content.append(response,node('p','rv2-detail-caption','State what you know, including any uncertainty. Your response will be added to the message draft.'));
+    content.append(action('Add to draft',()=>{
+      if(!valid(attempt)||busy||includeBusy)return;
+      if(!response.value.trim()){notice('Enter your response before adding it to the draft.');return;}
+      const addition=[question?`Regarding the earlier question: ${question}`:'',`Requested fact: ${fact}`,`My response: ${response.value.trim()}`].filter(Boolean).join('\n');
+      const draft=[input.value.trim(),addition].filter(Boolean).join('\n\n');
+      if(draft.length>input.maxLength){notice('This would exceed the message limit. Shorten the draft or your response; both are retained.',true);return;}
+      input.value=draft;lastRequest=null;onDraft(draft);detail.hidden=true;thread.hidden=false;update();notice('Fact added to your draft. Send the message when ready.');input.focus({preventScroll:true});
+    },'rv2-text-action'));response.focus({preventScroll:true});
+  }
   function showPassage(source){const content=showDetail();content.append(node('h3','',passageChipLabel(source)),node('p','rv2-source-text',source.selectedText));
     content.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));
     content.append(action('Remove from next question',async()=>{
@@ -153,14 +172,16 @@ export function createResearchV2View(options) {
       for(const source of saved){content.append(node('h4','',passageChipLabel(source)),node('p','rv2-source-text',source.passageText||source.selectedText||source.text||''));
         content.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));}
     }catch(error){if(valid(attempt))notice(error.message,true);}}
-  async function findPassages(discoveryQuestion){
+  async function findPassages(discoveryQuestion,{focus=''}={}){
     if(busy||includeBusy)return;menu.hidden=true;attach.setAttribute('aria-expanded','false');const question=typeof discoveryQuestion==='string'?discoveryQuestion:input.value.trim();
-    if(!question&&!passageSources.length){notice('Enter a topic to find passages, or choose From Reader.');return;}
+    if(!question&&!focus&&!passageSources.length){notice('Enter a topic to find passages, or choose From Reader.');return;}
     const attempt=++generation;notice('Finding passages…');
-    try{const result=await onFind(question);if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','','Candidate passages'));
+    try{const result=await onFind(question||focus,{focus});if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','','Candidate passages'));
+      if(focus)content.append(node('p','rv2-detail-caption',`Source needed: ${focus}`));
       content.append(node('p','rv2-detail-caption','Review the exact text before including it. Relevance does not establish applicability.'));
       const candidates=Array.isArray(result)?result:result.candidates||[];
-      if(result.coverage?.omittedCandidateCount>0)content.append(node('p','rv2-detail-caption',`Showing ${result.coverage.shownCount} of ${result.coverage.candidateCount} candidates. Narrow the question to explore the others.`));
+      const count=node('p','rv2-detail-caption');content.append(count);
+      const updateCount=page=>{count.textContent=page.coverage?`Showing ${page.coverage.shownCount} of ${page.coverage.candidateCount} candidates.`:'';count.hidden=!count.textContent;};updateCount(result);
       if(result.searchQuery||result.sourceEditions?.length||result.queryExpansions?.length||result.unresolvedReferences?.length||result.coverageLimitations?.length){
         const notes=node('details','rv2-discovery-notes');notes.append(node('summary','',`Search scope${result.unresolvedReferences?.length?` · ${result.unresolvedReferences.length} unresolved references`:''}`));
         if(result.searchQuery)notes.append(node('p','rv2-detail-caption',`Search terms: ${result.searchQuery}`));
@@ -171,11 +192,13 @@ export function createResearchV2View(options) {
         content.append(notes);
       }
       if(!candidates.length)content.append(node('p','','No passages were found. Try another term or browse Reader.'));
-      for(const candidate of candidates){const row=node('article','rv2-candidate');row.append(node('h4','',passageChipLabel(candidate)),node('p','',candidate.title||''));
+      const rows=node('div','rv2-candidates'),seen=new Set();content.append(rows);
+      function appendCandidates(items){for(const candidate of items){const identity=candidate.id||`${candidate.codeVersion}:${candidate.sectionID}:${candidate.suggestedText||''}`;if(seen.has(identity))continue;seen.add(identity);
+        const row=node('article','rv2-candidate');row.append(node('h4','',passageChipLabel(candidate)),node('p','',candidate.title||''));
         const kind={provision:'Provision',definition:'Definition',table:'Table and notes',scope:'Scope',reference:'Cross-reference'}[candidate.kind];
         if(kind||candidate.reason)row.append(node('p','rv2-detail-caption',[kind,candidate.reason].filter(Boolean).join(' · ')));
         row.append(action('Review in Reader',async()=>{
-          if(busy||includeBusy)return;includeBusy=true;update();try{await options.onOpenReader(candidate);
+          if(busy||includeBusy)return;includeBusy=true;update();try{await options.onOpenReader(candidate);if(!valid(attempt))return;
             if(candidate.requiresReaderSelection){notice('Select the complete table and its footnotes in Reader before attaching it.');return;}
             const preview=await onReview(candidate);if(!valid(attempt))return;
             if(preview.requiresVisualReview){notice('Select this passage and review its visuals in Reader before attaching it.');return;}
@@ -183,7 +206,15 @@ export function createResearchV2View(options) {
             const include=action('Include passage',async()=>{if(busy||includeBusy)return;includeBusy=true;update();try{await onInclude(preview.selection);}catch(error){notice(error.message,true);}finally{includeBusy=false;update();}});
             review.append(include);row.append(review);
           }catch(error){if(valid(attempt))notice(error.message,true);}finally{includeBusy=false;update();}
-        },'rv2-text-action'));content.append(row);}
+        },'rv2-text-action'));rows.append(row);}}
+      appendCandidates(candidates);
+      let nextCursor=result.nextCursor,loadingMore=false;
+      const more=action('More results',async()=>{
+        if(busy||includeBusy||loadingMore||!nextCursor)return;loadingMore=true;more.disabled=true;
+        try{const page=await onFind(question||focus,{focus,cursor:nextCursor});if(!valid(attempt))return;
+          appendCandidates(page.candidates||[]);updateCount(page);nextCursor=page.nextCursor;more.hidden=!nextCursor;
+        }catch(error){if(valid(attempt))notice(error.message,true);}finally{loadingMore=false;more.disabled=false;}
+      },'rv2-text-action');more.hidden=!nextCursor;content.append(more);
     }catch(error){if(valid(attempt))notice(error.message,true);}
   }
   async function sendQuestion(){

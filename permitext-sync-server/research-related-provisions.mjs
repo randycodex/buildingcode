@@ -23,7 +23,7 @@ export function assertRelatedProvisionContext(conversation, body) {
 // Discovery never changes the conversation or calls a model. Each source keeps
 // its own corpus identity; a similarly numbered section in another edition is
 // never a substitute for a missing reference.
-export async function findRelatedProvisions({ conversation, question, registry, resources, discover, enhanced = false, readSectionBody }) {
+export async function findRelatedProvisions({ conversation, question, registry, resources, discover, enhanced = false, readSectionBody, focus = '', cursor = null }) {
   const pinned = (conversation.sources || []).filter(source => source.kind === 'selection' && source.selectedText);
   if (!pinned.length) throw fail('Include a passage from Reader before finding related provisions.', 400);
   if (typeof question !== 'string' || question.length > 2000) throw fail('Keep the discovery question within 2,000 characters.', 400);
@@ -52,7 +52,7 @@ export async function findRelatedProvisions({ conversation, question, registry, 
   }
   if (enhanced) {
     const query = question.trim() || pinned.map(source => `${source.title}: ${source.selectedText}`).join('; ').slice(0, 2000);
-    return { ...await discoverResearchSources({ question: query, selected, pinned, resources, discover, readSectionBody,
+    return { ...await discoverResearchSources({ question: query, focus, cursor, selected, pinned, resources, discover, readSectionBody,
       unresolvedReferences: [...unresolved.values()] }),
       expectedRevision: Number(conversation.revision || 0), expectedEvidenceSetVersion: Number(conversation.evidenceSetVersion || 1) };
   }

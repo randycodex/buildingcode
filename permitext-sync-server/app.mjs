@@ -6,7 +6,7 @@ import {applyWebSyncSafeguard} from "./web-sync-guard.mjs";
 import {webAppVersion} from "./public/web-client-version.js";
 import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
 import { findRelatedProvisions, assertRelatedProvisionContext, validateRelatedProvisionSelections } from "./research-related-provisions.mjs";
-import { discoverResearchSources } from "./research-source-discovery.mjs";
+import { discoverResearchSources, researchDiscoveryOptions } from "./research-source-discovery.mjs";
 import {preparedSearchText} from "./prepared-search-text.mjs";
 import {preparedSearchRuntime} from "./prepared-search-runtime.mjs";
 import { prepareSearchRelevance, searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
@@ -18405,12 +18405,15 @@ async function handleResearchSourceDiscovery(request, response) {
   if (typeof question !== "string" || question.trim().length < 3 || question.length > 2000) {
     sendError(response, 400, "Enter a discovery question of 3–2,000 characters."); return;
   }
-  const plan = await researchCorpusPlanForTurn({ question });
-  const result = await discoverResearchSources({ question, selected: plan.selected, resources: researchCorpusResources,
-    readSectionBody: cachedResearchSourceBody,
-    discover: options => discoverRelevantEvidence({ ...options,
-      readSectionBody: cachedResearchSourceBody, resolveVisualSource: constructionVisualSourceMetadata }) });
-  sendJSON(response, 200, result);
+  try {
+    const discoveryOptions=researchDiscoveryOptions(context.body);
+    const plan = await researchCorpusPlanForTurn({ question:discoveryOptions.focus?`${question}\nSource needed: ${discoveryOptions.focus}`:question });
+    const result = await discoverResearchSources({ question, ...discoveryOptions, selected: plan.selected, resources: researchCorpusResources,
+      readSectionBody: cachedResearchSourceBody,
+      discover: options => discoverRelevantEvidence({ ...options,
+        readSectionBody: cachedResearchSourceBody, resolveVisualSource: constructionVisualSourceMetadata }) });
+    sendJSON(response, 200, result);
+  } catch(error) { if(error.statusCode){sendJSON(response,error.statusCode,{error:error.message,code:error.code});return;}throw error; }
 }
 
 async function handleResearchRelatedProvisions(request, response) {
@@ -18424,6 +18427,7 @@ async function handleResearchRelatedProvisions(request, response) {
       conversation, question: context.body.question ?? "", registry: await currentResearchCorpusRegistry(),
       resources: researchCorpusResources,
       enhanced: context.body.researchEngine === "v2", readSectionBody: cachedResearchSourceBody,
+      focus:context.body.focus??"",cursor:context.body.cursor??null,
       discover: options => discoverRelevantEvidence({ ...options,
         readSectionBody: cachedResearchSourceBody, resolveVisualSource: constructionVisualSourceMetadata })
     });

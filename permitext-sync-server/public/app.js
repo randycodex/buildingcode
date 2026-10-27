@@ -1,7 +1,8 @@
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=10";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=12";
+import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1395";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1397";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -152,7 +153,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-research-v2-v1395";
+} from "./offline-storage.js?v=20261027-research-v2-v1397";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -26105,15 +26106,19 @@ async function renderResearchV2Pane(paneID, configuration = null) {
       onNew:async () => { view.dispose(); const result = await postResearch("/research/conversations/create", {projectID:researchWorkspaceProjectID() || null,analysisMode:"conversation_only",requestID:crypto.randomUUID()}); await publish(result); },
       onOpen:id => { view.dispose(); return open(id); },
       onBrowse:() => openReaderFromToolbar(panel),
-      onOpenReader:source => openSourceInReader(source,paneID),
-      onFind:async question => {
+      onOpenReader:async source => {
+        const reader=await openSourceInReader(source,paneID,{sourceSurface:"research",isCurrent:current});
+        if(!reader&&current())throw new Error("The source was not opened. Open its exact edition in Reader before including it.");
+        return reader;
+      },
+      onFind:async (question,{focus="",cursor=null}={}) => {
         if (conversation?.sources?.some(source => source.kind === "selection")) {
           const result = await postResearch("/research/conversations/related", {conversationID:conversation.id,question,
-            researchEngine:"v2",
+            researchEngine:"v2",focus,cursor,
             expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)});
           return result;
         }
-        return postResearch("/research/sources/discover", {question});
+        return postResearch("/research/sources/discover", {question,focus,cursor});
       },
       onReview:candidate => postResearch("/research/selections/review", {sectionID:candidate.sectionID,
         codeVersion:candidate.codeVersion || defaultSyncCodeVersion,
@@ -39569,8 +39574,15 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null, options =
       if (reader.sourceRevealToken !== revealToken) return;
       const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"]`);
       const content = panel?.querySelector(".reader-content");
-      const target = savedReaderTarget(content, item, options);
+      let target = savedReaderTarget(content, item, options),precisePassage=false;
+      if(options.researchPassage&&target){
+        const section=target.closest?.(".chapter-section")||target;
+        const passage=researchReaderPassageTarget(section,item);
+        section.dataset.researchPassageLocated=String(Boolean(passage));
+        if(passage){target=passage;precisePassage=true;}
+      }
       if (!content || !target) return;
+      if(options.researchPassage&&!precisePassage&&delay<240)return;
       content.querySelectorAll(".is-source-target").forEach((candidate) => {
         candidate.classList.remove("is-source-target");
       });
@@ -39580,7 +39592,7 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null, options =
         revealNotebookEvidencePassages(target, evidenceAnchor);
       }
       const section = target.closest?.(".chapter-section");
-      const scrollTarget = section ? readerSearchMatchScrollTarget(content, section, target) : target;
+      const scrollTarget = options.researchPassage&&precisePassage?target:section ? readerSearchMatchScrollTarget(content, section, target) : target;
       if (options.preferPassage) stabilizeReaderSectionAtHeader(content, scrollTarget, "auto");
       else scrollReaderContentToNode(content, scrollTarget, "auto");
     }, delay);
@@ -39773,7 +39785,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   const destinationPanel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (destinationPanel && paneIsCollapsed(paneID)) setPaneCollapsed(destinationPanel, false);
   columnExpansionController().reveal(destinationPanel);
-  revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {preferPassage: fromSearch || options.sourceSurface === "search-detail"});
+  revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {preferPassage: fromSearch || options.sourceSurface === "search-detail" || options.sourceSurface === "research",researchPassage:options.sourceSurface === "research"});
   scrollPaneIntoView(paneID);
   return reader;
 }

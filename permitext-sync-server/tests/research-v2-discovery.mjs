@@ -62,5 +62,22 @@ try{
   assert(historic.candidates.length);assert(historic.candidates.every(c=>c.codeVersion.includes('/2014-')),'Explicit historic discovery retains its edition.');
   const unavailable=await post('/research/sources/discover',{question:'Explain BC Section 9999.99'});
   assert(unavailable.unresolvedReferences.some(c=>c.title==='BC § 9999.99'),'An unavailable exact requested citation remains explicit.');
+  const focused=await post('/research/sources/discover',{question:'What is the ramp slope?',focus:'BC Section 1014.2 handrail height'});
+  assert.equal(focused.candidates[0].sectionNumber,'1014.2','A missing source search follows the selected gap, not the old ramp topic.');
+  assert.match(focused.searchQuery,/handrail/);assert(!focused.searchQuery.includes('ramp'));
+  const naturalGap=await post('/research/sources/discover',{question:'What handrail height is required?',focus:'The applicable handrail-height code provision, including any scope or exceptions relevant to the ramp.'});
+  assert.equal(naturalGap.searchQuery,'handrail height');assert(naturalGap.candidates.some(c=>c.codePrefix==='BC'&&c.sectionNumber==='1014.2'));
+  const question='What affects corridor fire ratings?';
+  let page=await post('/research/sources/discover',{question}),cursor=page.nextCursor;assert(cursor);
+  const firstCursor=cursor,ids=new Set(page.candidates.map(c=>c.id));let pages=1;
+  while(cursor){page=await post('/research/sources/discover',{question,cursor});pages++;
+    for(const candidate of page.candidates){assert(!ids.has(candidate.id),'Pages do not repeat candidates.');ids.add(candidate.id);}cursor=page.nextCursor;
+    assert(pages<12,'Pagination is bounded.');
+  }
+  assert(pages>1);assert.equal(ids.size,page.coverage.candidateCount);assert.equal(page.coverage.omittedCandidateCount,0);
+  await post('/research/sources/discover',{question,focus:'A changed search',cursor:firstCursor},409);
+  await post('/research/sources/discover',{question,cursor:'not-a-page'},400);
+  await post('/research/sources/discover',{question,focus:{}},400);
+  const final=await adapter.read();assert.deepEqual(final.researchConversationsByUserID,after.researchConversationsByUserID);assert.deepEqual(final.researchAnswersByUserID,after.researchAnswersByUserID);
   console.log('Discovery: 13 developer-authored known-target checks passed. This does not measure complete regulatory coverage. No paid calls.');
 }finally{globalThis.fetch=nativeFetch;server.closeAllConnections();await new Promise(resolve=>server.close(resolve));await rm(scratch,{recursive:true,force:true});}

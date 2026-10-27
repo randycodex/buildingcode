@@ -24,6 +24,7 @@ let result=await runResearchV2(input,{call:async(body,meta)=>{
   assert(!body.tools);return payload(meta.phase==='review'?{pass:true,issues:[]}:draft);
 }});
 assert.deepEqual(calls.map(c=>c.phase),['draft','review']);assert.equal(result.status,'reviewed');
+assert.equal(calls[0].body.reasoning.effort,'low','Simple passages keep the lower drafting effort.');
 assert.equal(researchV2AnswerMetadata(result).verification.pass,true);
 assert.match(calls[1].body.instructions,/ENTIRE proposed answer/);
 calls=[];
@@ -35,6 +36,7 @@ result=await runResearchV2(input,{call:async(body,meta)=>{
 assert.deepEqual(calls.map(c=>c.phase),['draft','review','repair','review']);
 assert.equal(result.reviews[0].pass,false,'AI cannot override mechanical identity failure');
 assert.equal(result.reviews[1].pass,true);
+assert.match(calls[2].body.instructions,/Preserve the supported scope distinctions/,'Repair must preserve previously correct qualifications.');
 assert.equal(result.reviews[0].checkedPacketHash,result.reviews[1].checkedPacketHash,'Repair receives fresh review against identical evidence');
 result=await runResearchV2(input,{call:async(body,meta)=>payload(meta.phase==='review'?{pass:false,issues:[{code:'omitted_condition',detail:'Condition B was omitted.'}]}:draft)});
 assert.equal(result.status,'review_failed');assert(!result.draft.answerText.includes('[S1]'));
@@ -44,4 +46,9 @@ await assert.rejects(runResearchV2({...input,sources:[]},{call:()=>{throw Error(
 await assert.rejects(runResearchV2(input,{call:async()=>({status:'incomplete'})}),/completed response/);
 const cancelled=new AbortController();cancelled.abort();
 await assert.rejects(runResearchV2(input,{signal:cancelled.signal,call:()=>{throw Error('must not call');}}),{name:'AbortError'});
+let effort;
+await runResearchV2({...input,sources:[{...source,text:'The general rule applies. Exceptions: 1. Condition A. 2. Condition B.'}]},{call:async(body,meta)=>{
+ if(meta.phase==='draft')effort=body.reasoning.effort;return payload(meta.phase==='review'?{pass:true,issues:[]}:draft);
+}});
+assert.equal(effort,'medium','Several numbered exceptions receive additional drafting effort without bypassing review.');
 console.log('Research v2 engine: frozen passage-only inputs, Luna-only calls, citation identity gate, fresh repair review, bounded failure and cancellation passed.');
