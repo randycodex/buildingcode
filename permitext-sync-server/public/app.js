@@ -1,6 +1,6 @@
-import { createResearchV2View, researchDiscoveryQuery } from "./research-v2.js?v=4";
+import { createResearchV2View, researchDiscoveryQuery, researchV2RetryContext } from "./research-v2.js?v=6";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1387";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1390";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -151,7 +151,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-research-v2-v1387";
+} from "./offline-storage.js?v=20261027-research-v2-v1390";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -13931,8 +13931,8 @@ function visibleProjectArtifactIDs() {
 
 function researchArtifactConsumersVisible() {
   return Boolean(track.querySelector(
-    ".research-list-panel.is-connected, .research-conversation-panel.is-connected"
-  )) || Boolean(track.querySelector(".research-list-panel, .research-conversation-panel"));
+    ".research-list-panel.is-connected, .research-conversation-panel.is-connected, .research-v2-panel.is-connected"
+  )) || Boolean(track.querySelector(".research-list-panel, .research-conversation-panel, .research-v2-panel"));
 }
 
 function currentProjectArtifactScope() {
@@ -13951,7 +13951,7 @@ async function refreshVisibleResearchArtifactConsumers(options = {}) {
   if (options.shouldApply && !options.shouldApply()) return false;
   const account = activeAccount();
   const workspaceID = activeWorkspaceID;
-  const paneIDs = Array.from(track.querySelectorAll(".research-list-panel[data-pane-id]"),
+  const paneIDs = Array.from(track.querySelectorAll(".research-list-panel[data-pane-id], .research-v2-panel[data-pane-id]"),
     panel => panel.dataset.paneId);
   const conversationIDs = [];
   if (
@@ -13995,7 +13995,7 @@ async function refreshVisibleResearchArtifactConsumers(options = {}) {
       supplementalResearchConversations.delete(conversationID);
     }
   });
-  const focusedDraftInput = document.activeElement?.matches?.(".research-question-input")
+  const focusedDraftInput = document.activeElement?.matches?.(".research-question-input, .rv2-input")
     ? document.activeElement
     : null;
   const focusedDraftPaneID = focusedDraftInput?.closest(".workspace-panel")?.dataset.paneId || "";
@@ -14017,7 +14017,7 @@ async function refreshVisibleResearchArtifactConsumers(options = {}) {
 
   if (focusedDraftPaneID) {
     const nextInput = track.querySelector(
-      `.workspace-panel[data-pane-id="${CSS.escape(focusedDraftPaneID)}"] .research-question-input`
+      `.workspace-panel[data-pane-id="${CSS.escape(focusedDraftPaneID)}"] :is(.research-question-input, .rv2-input)`
     );
     if (focusedDraftKey && nextInput?.dataset.researchDraftKey === focusedDraftKey) {
       nextInput.focus({ preventScroll: true });
@@ -24196,8 +24196,10 @@ async function assignResearchConversationProject(conversation, targetProjectID, 
         ? `Move this conversation to ${targetProjectName}?`
         : `Remove this conversation from ${currentProjectName}?`,
       targetProjectID
-        ? `The entire conversation will move from ${currentProjectName} to ${targetProjectName}. Its existing answers and citations will not change. Future questions will use the current Project facts from ${targetProjectName}.`
-        : `The conversation will no longer appear in ${currentProjectName}. Its existing answers and citations will not change, but it will not use or add Project-specific facts until you assign it to another Project.`,
+        ? `The entire conversation will move from ${currentProjectName} to ${targetProjectName}. Its existing answers and citations will not change. ${options.passagesOnly ? "Future answers will use only explicitly included passages and conversation statements." : `Future questions will use the current Project facts from ${targetProjectName}.`}`
+        : options.passagesOnly
+          ? `The conversation will no longer appear in ${currentProjectName}. Its existing answers and citations will not change. Future answers will use only explicitly included passages and conversation statements.`
+          : `The conversation will no longer appear in ${currentProjectName}. Its existing answers and citations will not change, but it will not use or add Project-specific facts until you assign it to another Project.`,
       {
         confirmLabel: targetProjectID ? "Move conversation" : "Remove from Project",
         container: options.warningContainer
@@ -26051,30 +26053,53 @@ async function renderResearchV2Pane(paneID) {
   const saveDraft = text => { if (!current()) return; researchNewChatDrafts.set(draftKey, text); if (currentInstance()) currentInstance().draft = text; scheduleResearchDraftPersistence(); };
   content.textContent = "Loading Research…";
   try {
-    const [listed, fetched] = await Promise.all([
-      postResearch("/research/conversations/list"),
-      conversationID ? postResearch("/research/conversations/get", { conversationID }) : null
+    const [listed, fetched, availability] = await Promise.all([
+      postResearch("/research/conversations/list", {limit:30,projectID:researchWorkspaceProjectID() || ""}),
+      conversationID ? postResearch("/research/conversations/get", { conversationID }) : null,
+      postResearch("/research/v2/config")
     ]);
     if (!current()) return panel;
-    const conversation = fetched?.conversation || null;
+    if(!availability.available){
+      const notice=document.createElement("p");notice.textContent="Research v2 is unavailable. Your saved conversations are retained.";
+      const original=document.createElement("a");original.textContent="Open original Research";original.href="/workspace?research=legacy";
+      content.replaceChildren(notice,original);return panel;
+    }
+    let conversation = fetched?.conversation || null;
     if (conversation) {
+      if(conversation.primaryProjectID)panel.dataset.projectId=conversation.primaryProjectID;
       if (instance) supplementalResearchConversations.set(conversation.id, conversation);
       else activeResearchConversation = conversation;
     }
     const open = id => openResearchConversation(id, { instance, refreshList:true });
-    let view;
+    let view, retryingRequestID="";
     const recoveryKey = `permitext:research-v2-request:${activeAccount()?.userID}:${workspaceID}:${conversationID || paneID}`;
     const publish = async result => { if (!current()) return; await refreshResearchConversationList(); if (current()) await open(result.conversation.id); };
     const snapshot = async message => {
       const result = await postResearch("/research/answers/get", { answerID:message.id });
       return (result.answer?.evidence || []).map(source => ({...source,codeVersion:source.sourceLibraryVersion,codePrefix:source.codeBook,selectedText:source.passageText}));
     };
+    let historyCursor = listed.nextCursor;
+    const projectControl = conversation ? createResearchProjectSelect({value:conversation.primaryProjectID || "",unassignedLabel:"Unassigned",ariaLabel:"Project for this Research conversation"}) : null;
+    if(projectControl){
+      projectControl.title = "Organizes this conversation. Project facts are included only when explicitly attached.";
+      projectControl.addEventListener("change",async()=>{const before=conversation.primaryProjectID || "";projectControl.disabled=true;
+        try{const result=await assignResearchConversationProject(conversation,projectControl.value,{warningContainer:panel,passagesOnly:true});
+          if(result&&current()){await refreshResearchProjectAssignmentConsumers([before,projectControl.value]);await publish(result);}}
+        catch(error){if(current())await showWebNotice("Project not changed",error.message);}
+        finally{if(projectControl.isConnected){projectControl.disabled=false;projectControl.value=before;}}
+      });
+    }
     view = createResearchV2View({ conversation,
-      history:(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
-      initialDraft:draft(), onDraft:saveDraft, isCurrent:current,
+      history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
+        ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
+      projectControl,hasMore:listed.hasMore,
+      onOriginal:()=>{const url=new URL(location.href);url.searchParams.set("research","legacy");location.assign(url.href);},
+      onLoadMore:async()=>{const page=await postResearch("/research/conversations/list",{limit:30,projectID:researchWorkspaceProjectID() || "",cursor:historyCursor});if(current())historyCursor=page.nextCursor;return page;},
+      renderAnswerActions:message=>renderResearchNotebookHandoff(conversation,message,{linkForReport:true}),
+      draftKey,initialDraft:draft(), onDraft:saveDraft, isCurrent:current,
       requestStore:{ read:() => { try { return JSON.parse(sessionStorage.getItem(recoveryKey)); } catch { return null; } },
         write:value => { if (value) sessionStorage.setItem(recoveryKey, JSON.stringify(value)); else sessionStorage.removeItem(recoveryKey); } },
-      onNew:async () => { view.dispose(); const result = await postResearch("/research/conversations/create", {requestID:crypto.randomUUID()}); await publish(result); },
+      onNew:async () => { view.dispose(); const result = await postResearch("/research/conversations/create", {projectID:researchWorkspaceProjectID() || null,analysisMode:"conversation_only",requestID:crypto.randomUUID()}); await publish(result); },
       onOpen:id => { view.dispose(); return open(id); },
       onBrowse:() => openReaderFromToolbar(panel),
       onOpenReader:source => openSourceInReader(source,paneID),
@@ -26096,7 +26121,7 @@ async function renderResearchV2Pane(paneID) {
       onInclude:async selection => {
         const passage = {...selection,reviewedSectionHash:selection.sectionTextHash};
         if (!conversation) {
-          const result = await postResearch("/research/conversations/create", {selections:[passage],requestID:crypto.randomUUID(),originSurface:"reader"});
+          const result = await postResearch("/research/conversations/create", {projectID:researchWorkspaceProjectID() || null,analysisMode:"conversation_only",selections:[passage],requestID:crypto.randomUUID(),originSurface:"reader"});
           researchNewChatDrafts.set(`followup:${result.conversation.id}`,draft());
           await publish(result);
         } else {
@@ -26108,9 +26133,12 @@ async function renderResearchV2Pane(paneID) {
       onRemove:async source => publish(await postResearch("/research/conversations/evidence", {conversationID:conversation.id,
         action:"remove",sourceID:source.id,expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)})),
       onSend:async ({question,requestID,signal,onProgress}) => {
-        const result = await postResearchWithProgress({conversationID:conversation.id,question,requestID,researchEngine:"v2",
+        if(retryingRequestID===requestID){const fresh=await postResearch("/research/conversations/get",{conversationID:conversation.id});if(!current())return;conversation=researchV2RetryContext(conversation,fresh.conversation,requestID);}
+        let result;
+        try{result = await postResearchWithProgress({conversationID:conversation.id,question,requestID,researchEngine:"v2",
           analysisMode:"conversation_only",expectedRevision:Number(conversation.revision || 0),
-          expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)}, {signal,onProgress});
+          expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)}, {signal,onProgress});}
+        catch(error){retryingRequestID=requestID;throw error;}
         if (!current()) return;
         researchNewChatDrafts.delete(draftKey); if (currentInstance()) currentInstance().draft = ""; sessionStorage.removeItem(recoveryKey);
         await publish(result);
@@ -27698,7 +27726,7 @@ async function appendResearchReferenceToNote(project, destination, reference, mu
   return payload.card;
 }
 
-function renderResearchNotebookHandoff(conversation, message) {
+function renderResearchNotebookHandoff(conversation, message, {linkForReport=false} = {}) {
   if (!message.id || !message.answer || researchAnswerHasVerificationRecovery(message.answer) || !hasCapability("notebook")) return null;
   const region = document.createElement("div");
   region.className = "research-notebook-handoff";
@@ -27826,6 +27854,7 @@ function renderResearchNotebookHandoff(conversation, message) {
       reportButton.disabled = true;
       try {
         if (await openIncludedSourceReport(reportButton, project)) return;
+        if(linkForReport)await postResearch("/projects/foundation/link",{projectID:researchProjectID(project),targetKind:"researchAnswer",targetID:message.id,relationship:"primary"});
         const draft = await addProjectSourcesToReport(project, sources => {
           const source = sources.find(item => item.kind === "researchAnswer" && item.id === message.id);
           if (!source) throw new Error("Link this Assistant conversation to the selected Project before adding its answer to a Report.");

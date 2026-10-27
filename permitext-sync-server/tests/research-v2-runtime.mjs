@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {researchV2Availability,createResearchV2ApplicationCall} from '../research-v2-runtime.mjs';
+const env={PERMITEXT_RESEARCH_V2:'1',NODE_ENV:'test'};
+assert.equal(researchV2Availability(env,'owner').available,true);
+assert.equal(researchV2Availability({...env,PERMITEXT_RESEARCH_V2_USERS:'owner'},'other').available,false);
+assert.equal(researchV2Availability({...env,PERMITEXT_RESEARCH_V2_USERS:'owner'},'owner').available,true);
+for(const override of [{PERMITEXT_RESEARCH_V2:'0'},{VERCEL:'1'},{NODE_ENV:'production'}])assert.equal(researchV2Availability({...env,...override},'owner').available,false);
+assert.equal(researchV2Availability(env,'owner').defaultEngine,'legacy');
+let calls=0;
+const call=createResearchV2ApplicationCall({provider:async()=>{calls++;return {status:'completed'};}});
+const body={model:'gpt-6-luna',service_tier:'default',store:false};
+assert.equal((await call(body)).status,'completed');assert.equal(calls,1);
+await assert.rejects(call({...body,model:'gpt-6-sol'}));assert.equal(calls,1);
+const abort=new AbortController();abort.abort();await assert.rejects(call(body,{signal:abort.signal}),{name:'AbortError'});
+assert.equal(calls,1);
+console.log('V2 runtime: local switch, cohort restriction, deployment block, legacy default, application provider isolation from evaluation ledger and cancellation passed.');

@@ -18,6 +18,16 @@ export function researchDiscoveryQuery(question) {
 export const researchAnswerText = message => message.answer?.answerText || [message.answer?.conclusion, message.answer?.explanation].filter(Boolean).join('\n\n') || message.failure?.message || 'This answer did not complete.';
 export const researchReviewLabel = answer => answer?.verification?.pass === true ? 'AI reviewed · Check cited text' : answer?.verification?.status === 'failed' || answer?.authorityStatus === 'incomplete' ? 'Incomplete' : 'Unreviewed';
 
+export function researchV2RetryContext(previous,next,requestID){
+  const identity=sources=>JSON.stringify((sources||[]).map(s=>[s.id,s.codeVersion,s.selectedText]));
+  if(!next||previous.id!==next.id||Number(previous.evidenceSetVersion||1)!==Number(next.evidenceSetVersion||1)||
+    Number(previous.contextRevision||0)!==Number(next.contextRevision||0)||identity(previous.sources)!==identity(next.sources))return previous;
+  const before=previous.messages||[],after=next.messages||[];
+  if(!before.every((m,i)=>after[i]?.id===m.id))return previous;
+  const added=after.slice(before.length);
+  return added.length&&added.every(m=>m.role==='user'&&m.failure&&(m.requestID||m.researchRequestID)===requestID)?next:previous;
+}
+
 export function createResearchV2View(options) {
   const { conversation, history = [], initialDraft = '', onDraft, onNew, onOpen, onSend,
     onBrowse, onFind, onReview, onInclude, onRemove, onCitation, onSnapshot,
@@ -27,12 +37,19 @@ export function createResearchV2View(options) {
   const railHead=node('div','rv2-rail-head');railHead.append(node('span','rv2-label','Questions'),action('+',()=>onNew(),'rv2-new'));
   railHead.lastChild.setAttribute('aria-label','New research question');
   const list=node('ol','rv2-questions');
-  [...history].sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt))||a.id.localeCompare(b.id)).forEach(item=>{
+  const knownQuestions=new Set();
+  function appendQuestions(items){items.forEach(item=>{
+    if(knownQuestions.has(item.id))return;knownQuestions.add(item.id);
     const li=node('li');const open=action(item.title||item.starterQuestion||'New question',()=>onOpen(item.id),'rv2-question-link');
     if(item.id===conversation?.id)open.setAttribute('aria-current','page');li.append(open);list.append(li);
-  });
+  });}
+  appendQuestions(history);
   if(!history.length)list.append(node('li','rv2-empty-history','Your questions will appear here.'));
-  rail.append(railHead,list);
+  rail.append(railHead);
+  if(options.projectControl)rail.append(options.projectControl);
+  rail.append(list);
+  if(options.onOriginal)rail.append(action("Original Research",options.onOriginal,"rv2-text-action"));
+  if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
   const chat=node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');
   const mobileHistory=action('Questions',()=>{const expanded=root.classList.toggle('rv2-show-history');mobileHistory.setAttribute('aria-expanded',String(expanded));},'rv2-mobile-history');
   mobileHistory.setAttribute('aria-expanded','false');
@@ -57,6 +74,9 @@ export function createResearchV2View(options) {
   messages.forEach(message=>{
     if(message.role==='user'){
       const bubble=node('div','rv2-user',message.question||'');bubble.setAttribute('aria-label','Your question');thread.append(bubble);
+      if(message.failure){const failure=node('div','rv2-answer');failure.append(node('p','',message.failure.message||'This question did not complete.'));
+        const sameContext=Number(message.contextRevision||0)===Number(conversation.contextRevision||0);
+        failure.append(action(sameContext?'Retry question':'Ask again',()=>{if(busy||includeBusy)return;input.value=message.question||'';onDraft(input.value);lastRequest={question:input.value.trim(),requestID:sameContext&&(message.requestID||message.researchRequestID)||crypto.randomUUID()};update();void sendQuestion();},'rv2-text-action'));thread.append(failure);}
     }else if(message.role==='assistant'){
       const bubble=node('article','rv2-answer');bubble.setAttribute('aria-label','Research answer');
       const text=researchAnswerText(message);
@@ -64,6 +84,8 @@ export function createResearchV2View(options) {
       const footer=node('div','rv2-answer-footer');
       footer.append(node('span','',researchReviewLabel(message.answer)));
       footer.append(action('Sources used',()=>void showSnapshot(message),'rv2-text-action'));
+      const actions=options.renderAnswerActions?.(message);
+      if(actions){const disclosure=node('details','rv2-saved-actions');disclosure.append(node('summary','','Save or share'),actions);footer.append(disclosure);}
       bubble.append(footer);thread.append(bubble);
     }
   });
@@ -73,7 +95,7 @@ export function createResearchV2View(options) {
   passageSources.forEach(source=>{
     const chip=action(passageChipLabel(source),()=>showPassage(source),'rv2-passage-chip');chips.append(chip);
   });
-  const input=node('textarea','rv2-input');input.setAttribute('aria-label','Research question');input.placeholder='Message';input.rows=2;input.maxLength=2000;input.value=initialDraft;
+  const input=node('textarea','rv2-input');input.setAttribute('aria-label','Research question');input.dataset.researchDraftKey=options.draftKey||'';input.placeholder='Message';input.rows=2;input.maxLength=2000;input.value=initialDraft;
   input.addEventListener('input',()=>{lastRequest=null;onDraft(input.value);update();});
   const controls=node('div','rv2-composer-controls');
   const attach=action('+',()=>{menu.hidden=!menu.hidden;attach.setAttribute('aria-expanded',String(!menu.hidden));},'rv2-attach');attach.setAttribute('aria-label','Attach passages');attach.setAttribute('aria-expanded','false');

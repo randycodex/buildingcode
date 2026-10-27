@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import {createResearchV2View, researchAnswerText, researchReviewLabel, passageChipLabel} from '../public/research-v2.js';
+import {createResearchV2View, researchAnswerText, researchReviewLabel, passageChipLabel, researchV2RetryContext} from '../public/research-v2.js';
 
 // Minimal DOM for exercising the real asynchronous view handlers, without a
 // provider or browser dependency. Layout is verified separately in the browser.
 class Element {
-  constructor(tag){this.tagName=tag;this.children=[];this.handlers={};this.attributes={};this.className='';this.isConnected=true;this.hidden=false;}
+  constructor(tag){this.tagName=tag;this.children=[];this.handlers={};this.attributes={};this.dataset={};this.className='';this.isConnected=true;this.hidden=false;}
   get lastChild(){return this.children.at(-1);}
   append(...items){for(const item of items){item.parent=this;this.children.push(item);}}
   replaceChildren(...items){this.children=[];this.append(...items);}
@@ -22,13 +22,20 @@ let layoutCallback;globalThis.ResizeObserver=class{constructor(callback){layoutC
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};};
 const source={kind:'selection',sectionID:'2342',sectionNumber:'1012.2',codePrefix:'BC',codeEdition:'2022',selectedText:'Exact passage.'};
+const prior={id:'same',revision:1,sources:[source],messages:[]};const retry={...prior,revision:2,messages:[{id:'q',role:'user',requestID:'stable',failure:{status:'failed'}}]};
+assert.equal(researchV2RetryContext(prior,retry,'stable'),retry);
+assert.equal(researchV2RetryContext(prior,{...retry,evidenceSetVersion:2},'stable'),prior);
+assert.equal(researchV2RetryContext(prior,{...retry,messages:[{id:'other',role:'user',requestID:'other',failure:{}}]},'stable'),prior);
 const old={role:'assistant',answer:{conclusion:'Conclusion.',explanation:'Important qualification.'}};
 assert.equal(researchAnswerText(old),'Conclusion.\n\nImportant qualification.');
 assert.equal(researchReviewLabel(old.answer),'Unreviewed');
+const failedView=createResearchV2View({conversation:{sources:[],messages:[{role:'user',question:'Interrupted question.',requestID:'prior-request',failure:{message:'The provider failed.'}}]},onDraft(){},isCurrent:()=>true});
+assert(all(failedView.element).some(x=>x.textContent==='The provider failed.'));assert(all(failedView.element).some(x=>x.textContent==='Retry question'));failedView.dispose();
 assert.equal(passageChipLabel({codePrefix:'BC68',sectionNumber:'27-369',codeVersion:'2026-bundle',codeSource:{editionLabel:'1968 NYC Building Code'}}),'BC68 § 27-369 · 1968');
 let sent=[],draft='Explain this.',savedRequest=null,current=true,snapshots=0;
 let flight=deferred(),review=deferred();
-const view=createResearchV2View({conversation:{id:'test',sources:[source],messages:[old]},initialDraft:draft,
+const projectControl=document.createElement('select');projectControl.setAttribute('aria-label','Project');
+const view=createResearchV2View({projectControl,hasMore:true,history:[{id:'first',title:'First'}],onLoadMore:async()=>({conversations:[{id:'first',title:'First'},{id:'second',title:'Older question'}],hasMore:false}),renderAnswerActions:()=>Object.assign(document.createElement('button'),{textContent:'Add to note…'}),conversation:{id:'test',sources:[source],messages:[old]},initialDraft:draft,
   isCurrent:()=>current,onDraft:text=>{draft=text;},onFind:async()=>({candidates:[source],unresolvedReferences:[{title:'PC § 1',reason:'Not found in this edition.'}]}),
   onOpenReader:async()=>{},onReview:()=>review.promise,onInclude:async()=>{},onCitation:async()=>{},
   onSnapshot:async()=>{snapshots++;return [source];},
@@ -36,6 +43,8 @@ const view=createResearchV2View({conversation:{id:'test',sources:[source],messag
   onSend:args=>{sent.push(args);return flight.promise;}});
 const find=text=>all(view.element).find(x=>x.textContent===text);
 const thread=view.element.querySelector('.rv2-thread');thread.clientHeight=400;thread.scrollHeight=1200;layoutCallback();assert.equal(thread.scrollTop,1200,'A delayed pane mount reveals the latest answer');
+assert(find('Add to note…'));assert(find('Save or share'));
+find('More questions').handlers.click();await tick();assert.equal(all(view.element).filter(x=>x.textContent==='First').length,1);assert(find('Older question'));assert.equal(find('More questions').hidden,true);
 const input=view.element.querySelector('.rv2-input'),send=view.element.querySelector('.rv2-send');
 find('Find passages').handlers.click();await tick();
 assert(find('Unresolved reference: PC § 1. Not found in this edition.'));

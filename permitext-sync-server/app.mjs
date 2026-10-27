@@ -1,5 +1,6 @@
 import { runResearchV2, researchV2AnswerMetadata, researchV2Version } from "./research-v2-engine.mjs";
-import { createResearchV2Budget, createLunaV2Client } from "./research-v2-budget.mjs";
+import { createResearchV2Budget } from "./research-v2-budget.mjs";
+import { researchV2Availability, createResearchV2ApplicationCall } from "./research-v2-runtime.mjs";
 import { answerRequest as fastResearchRequest, fastResearchInterpretation } from "./research-fast-stream.mjs";
 import {applyWebSyncSafeguard} from "./web-sync-guard.mjs";
 import {webAppVersion} from "./public/web-client-version.js";
@@ -16957,10 +16958,11 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
       });
     });
 
+  const linkedAnswerIDs=links.filter(link=>link.targetKind==="researchAnswer").map(link=>link.targetID);
   (await listStoredResearchAnswers(userID, {
-    projectID, summaryOnly: Boolean(options.summaryOnly), ids: options.researchAnswerIDs
+    projectID, linkedAnswerIDs, summaryOnly: Boolean(options.summaryOnly), ids: options.researchAnswerIDs
   }))
-    .filter((answer) => answer.projectID === projectID)
+    .filter((answer) => answer.projectID === projectID || linkedAnswerIDs.includes(answer.id))
     .forEach((answer) => {
       sources.push({
         id: answer.id,
@@ -19468,6 +19470,12 @@ async function internalResearchSpendReport() {
   };
 }
 
+async function handleResearchV2Config(request,response){
+  const context=await authenticatedResearchBody(request,response,{requireResearch:true});
+  if(!context)return;
+  sendJSON(response,200,researchV2Availability(process.env,context.userID));
+}
+
 async function handleResearchUsage(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
@@ -20403,7 +20411,10 @@ async function handleResearchConversationMessage(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   const requestedV2 = context.body.researchEngine === "v2";
-  if (requestedV2 && (process.env.PERMITEXT_RESEARCH_V2 !== "1" || process.env.VERCEL || process.env.NODE_ENV === "production")) {
+  if(process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH&&!requestedV2&&context.body.answerMode==="verified"){
+    sendJSON(response,403,{error:"This local testing session supports Luna Fast answers and Research v2.",code:"LOCAL_LUNA_TESTS_ONLY"});return;
+  }
+  if (requestedV2 && !researchV2Availability(process.env,context.userID).available) {
     sendJSON(response, 404, { error: "Research v2 is available only in the enabled local checkout.", code: "RESEARCH_V2_DISABLED" }); return;
   }
   if (context.body.answerMode != null && !["fast", "verified"].includes(context.body.answerMode)) {
@@ -20783,8 +20794,8 @@ async function handleResearchConversationMessage(request, response) {
       let firstTextMilliseconds = null, v2Result = null, providerPayloads;
       if (requestedV2) {
         const budget = createResearchV2Budget({ path: process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH });
-        const call = createLunaV2Client({ apiKey: process.env.OPENAI_API_KEY, budget,
-          transport: async (requestBody, signal) => {
+        const call = createResearchV2ApplicationCall({ apiKey: process.env.OPENAI_API_KEY, evaluationBudget:budget,
+          provider: async (requestBody, signal) => {
             requestBody.safety_identifier = body.safety_identifier;
             const { payload } = await requestResearchProvider({ apiKey:process.env.OPENAI_API_KEY, requestBody,
               signal, timeoutMilliseconds:120000, maximumAttempts:1,
@@ -20800,14 +20811,18 @@ async function handleResearchConversationMessage(request, response) {
         if (v2Result.status === "review_failed") throw Object.assign(new Error(v2Result.draft.answerText), {code:"V2_REVIEW_FAILED",missingSources:v2Result.draft.missingSources,missingFacts:v2Result.draft.missingFacts});
         providerPayloads = v2Result.payloads;
       } else {
-        const {payload} = await requestResearchProvider({apiKey:process.env.OPENAI_API_KEY, requestBody:body,
-          signal:progressResponse.signal,timeoutMilliseconds:120000,maximumAttempts:1,
+        const generateFast=async(requestBody,signal)=>{const {payload}=await requestResearchProvider({apiKey:process.env.OPENAI_API_KEY, requestBody,
+          signal,timeoutMilliseconds:120000,maximumAttempts:1,
           failureMessage:"The fast Research answer could not complete.", onText:text => {
             if (firstTextMilliseconds === null && text.trim()) firstTextMilliseconds = Math.round(performance.now()-researchOperationStartedAt);
             progressResponse.delta(text);
           },
           reserveEvaluationSpend:reserveResearchEvaluationSpend,reserveProviderSpend:reserveResearchProviderSpend,
-          settleProviderSpend:settleResearchProviderSpend});
+          settleProviderSpend:settleResearchProviderSpend});return payload;};
+        const budgetPath=process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH;
+        const payload=budgetPath?await createResearchV2ApplicationCall({apiKey:process.env.OPENAI_API_KEY,
+          evaluationBudget:createResearchV2Budget({path:budgetPath}),provider:generateFast})(body,{phase:"legacy-fast",signal:progressResponse.signal})
+          :await generateFast(body,progressResponse.signal);
         providerPayloads = [payload];
       }
       const text = v2Result ? v2Result.draft.answerText : outputTextFromResponse(providerPayloads[0]);
@@ -22697,7 +22712,7 @@ async function handleResearchConversationMessage(request, response) {
   } catch (error) {
     if (error.code === "RESEARCH_REQUEST_HANDLED") return;
     const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
-    if (requestedV2 && String(failureCode).startsWith("V2_")) {
+    if ((requestedV2 || process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH) && String(failureCode).startsWith("V2_")) {
       Object.assign(researchOperation,{status:"failed",failureCode,charged:false});
       progressResponse.failActive("failed");
       progressResponse.error(failureCode === "V2_BUDGET_EXHAUSTED" ? 429 : 422, error.message, {
@@ -34485,6 +34500,7 @@ const handlers = {
   "research/answers/list": handleResearchAnswerList,
   "research/answers/get": handleResearchAnswerGet,
   "research/usage": handleResearchUsage,
+  "research/v2/config": handleResearchV2Config,
   "research/feedback": handleResearchFeedback,
   "research/evidence/discover": handleResearchEvidenceDiscover,
   "research/conversations/candidate-disposition": handleResearchCandidateDisposition,

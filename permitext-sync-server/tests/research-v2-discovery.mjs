@@ -19,16 +19,20 @@ const cases=[
   ['What is the door clear width?',['1010.1.1.1']],
   ['Explain stair riser height',['1011.5.2']],
   ['What is the handrail height?',['1014.2']],
-  ['What is ramp cross slope?',['1012.3']]
+  ['What is ramp cross slope?',['1012.3']],
+  ['What is the corridor sprinkler rating?',['1020.1.1','1020.1.2']],
+  ['Explain the occupant load table',['1004.1.3']],
+  ['Explain exhaust discharge',['501.3'],'MC'],
+  ['Find the fire partition definition',['202','702.1']]
 ];
 try{
-  for(const [question,expected] of cases){
+  for(const [question,expected,prefix='BC'] of cases){
     const query=researchDiscoveryQuery(question);
     const response=await fetch(base+'/code/search?'+new URLSearchParams({q:query,match:'words',limit:'12'}));
     assert.equal(response.status,200);const data=await response.json();
-    const actual=data.results.filter(s=>s.codePrefix==='BC'&&s.codeVersion.includes('/2022-')).map(s=>s.sectionNumber);
+    const actual=data.results.filter(s=>s.codePrefix===prefix&&s.codeVersion.includes('/2022-')).map(s=>s.sectionNumber);
     for(const number of expected)assert(actual.includes(number),`${question}: missing ${number} in first 12 results`);
     console.log(JSON.stringify({question,query,expected,passed:true}));
   }
-  console.log('Discovery: 8 developer-authored known-target checks passed. This does not measure complete regulatory coverage. No paid calls.');
+  console.log('Discovery: 12 developer-authored known-target checks passed. This does not measure complete regulatory coverage. No paid calls.');
 }finally{globalThis.fetch=nativeFetch;server.closeAllConnections();await new Promise(resolve=>server.close(resolve));await rm(scratch,{recursive:true,force:true});}

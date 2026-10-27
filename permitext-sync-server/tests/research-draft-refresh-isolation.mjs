@@ -15,7 +15,7 @@ function harness() {
   paneIDForResearchConversation:id=>!id||id===state.researchConversationID?'utility:analysis':`research:conversation:${id}`,
   fetchAuthoritativeResearchConversation:async id=>({id,messages:[]}),
   readResearchConversationList:{invalidate(){invalidations++;}},researchHistoryPageReaders:new Map([['project-page',{invalidate(){invalidations++;}}]]),
-  track:{querySelector:find,querySelectorAll:selector=>selector === '.research-list-panel[data-pane-id]'
+  track:{querySelector:find,querySelectorAll:selector=>selector.includes('.research-list-panel[data-pane-id]')
    ? [...panes.values()].filter(p=>p.id.startsWith('utility:analysis')).map(p=>({dataset:{paneId:p.id}}))
    : [...panes.values()].map(p=>p.input).filter(Boolean)},
   document:{get activeElement(){return focused;}},

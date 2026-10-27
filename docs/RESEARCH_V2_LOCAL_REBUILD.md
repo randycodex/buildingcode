@@ -1,6 +1,7 @@
 # Research v2: local rebuild
 
-Status: first working local version. Branch: `codex/research-rebuild`.
+Status: local engineering acceptance pass completed; see
+`RESEARCH_V2_ENGINEERING_2026-10-27.md` for verification and remaining limits. Branch: `codex/research-rebuild`.
 Base: `3e2d57c8c5de5c32e42b29333a80e1d8c30e867e`.
 The existing Research version remains the default. No push or deployment is authorized.
 
