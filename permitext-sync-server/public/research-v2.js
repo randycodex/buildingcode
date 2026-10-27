@@ -160,12 +160,12 @@ export function createResearchV2View(options) {
     try{const result=await onFind(question);if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','','Candidate passages'));
       content.append(node('p','rv2-detail-caption','Review the exact text before including it. Relevance does not establish applicability.'));
       const candidates=Array.isArray(result)?result:result.candidates||[];
-      if(result.searchQuery)content.append(node('p','rv2-detail-caption',`Search terms: ${result.searchQuery}`));
-      if(result.queryExpansions?.length)content.append(node('p','rv2-detail-caption',`Related terms: ${result.queryExpansions.join('; ')}`));
-      if(result.sourceEditions?.length)content.append(node('p','rv2-detail-caption',`Searched: ${[...new Set(result.sourceEditions.map(edition=>edition.codeEdition))].join('; ')}`));
       if(result.coverage?.omittedCandidateCount>0)content.append(node('p','rv2-detail-caption',`Showing ${result.coverage.shownCount} of ${result.coverage.candidateCount} candidates. Narrow the question to explore the others.`));
-      if(result.unresolvedReferences?.length||result.coverageLimitations?.length){
+      if(result.searchQuery||result.sourceEditions?.length||result.queryExpansions?.length||result.unresolvedReferences?.length||result.coverageLimitations?.length){
         const notes=node('details','rv2-discovery-notes');notes.append(node('summary','',`Search scope${result.unresolvedReferences?.length?` · ${result.unresolvedReferences.length} unresolved references`:''}`));
+        if(result.searchQuery)notes.append(node('p','rv2-detail-caption',`Search terms: ${result.searchQuery}`));
+        if(result.queryExpansions?.length)notes.append(node('p','rv2-detail-caption',`Related terms: ${result.queryExpansions.join('; ')}`));
+        if(result.sourceEditions?.length)notes.append(node('p','rv2-detail-caption',`Searched: ${[...new Set(result.sourceEditions.map(edition=>edition.codeEdition))].join('; ')}`));
         for(const missing of result.unresolvedReferences||[])notes.append(node('p','rv2-detail-caption',`Unresolved reference: ${missing.title}. ${missing.reason||''}`));
         for(const limitation of result.coverageLimitations||[])notes.append(node('p','rv2-detail-caption',limitation));
         content.append(notes);
