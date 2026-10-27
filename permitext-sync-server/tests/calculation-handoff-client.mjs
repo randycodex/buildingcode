@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import {calculateOccupantLoad,calculationNoteBlocks,occupantLoadSource,occupantLoadPrefill,occupantLoadTableInput,occupantLoadTable} from '../public/occupant-load-calculation.js';
 import {parseFragment} from 'parse5';
 import {calculationDraftStore} from '../public/calculation-drafts.js';
+import {restoreNotebookPassageText} from '../public/notebook-passage-blocks.js';
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const a=app.indexOf('function renderOccupantLoadCalculation('),b=app.indexOf('\nasync function addPassageToNotebook',a);
 const source={sectionID:'2152',sectionNumber:'1004.1.3',codePrefix:'BC',codeVersion:'CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1'};
@@ -49,6 +50,13 @@ for(const stale of [false,true]) {
  resolve();
  if(stale){await assert.rejects(save,/view changed/);assert.equal(calls.length,0);}
  else {assert.equal((await save).id,'note');assert.equal(calls.length,1);assert.equal(JSON.stringify(calls[0].openQuestions),'[]','Calculation Notes do not create an automatic question checklist.');assert.match(calls[0].evidenceLinks[0].passages[0].exact,/Exact canonical text/);assert.equal(calls[0].document.document[2].content[0].text.includes('12 people'),true);
+  assert.equal(calls[0].evidenceLinks[0].noteTextVersion,1);
+  const restored=restoreNotebookPassageText(calls[0].document,calls[0].evidenceLinks);
+  assert.equal(restored.changed,false,'Opening or restoring a calculation cannot append the full table to its body.');
+  assert.doesNotMatch(JSON.stringify(restored.document),/Exact canonical text/);
+  assert.match(restored.evidenceLinks[0].passages[0].exact,/Exact canonical text/,'The complete exact source remains attached.');
+  const sourceReference=restored.document.document.flatMap(block=>block.content).find(node=>node.props?.referenceKind==='selectedPassage');
+  assert.equal(sourceReference.props.referenceID,restored.evidenceLinks[0].id,'The source control still opens the exact attached evidence.');
   await assert.rejects(options.onSave({...calculation,input:{...calculation.input,factor:'1000'}}),/BC table changed/);assert.equal(calls.length,1,'A modified default table factor cannot be saved.');
   const custom=calculateOccupantLoad(occupantLoadTableInput({...calculation.input,factorMode:'custom',customFactor:'50',customReason:'Synthetic reference CALC-7'},table));
   await options.onSave({...custom,people:999});

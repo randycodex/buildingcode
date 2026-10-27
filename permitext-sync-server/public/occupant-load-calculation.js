@@ -232,7 +232,7 @@ export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '',
     ...(occupantLoadSpaceLocationText(spaceLocation) ? [paragraph(`User-stated location: ${occupantLoadSpaceLocationText(spaceLocation)}`)] : []),
     {type: 'heading', props: {level: 2}, content: [{type: 'text', text: 'Occupant load calculation', styles: {}}]},
     paragraph(`Needs review · ${c.factorMode === 'custom' ? 'Custom factor · ' : ''}calculation snapshot · ${c.spaceFunction}`),
-    paragraph(`${c.area} ft² (${c.areaBasis}) ÷ ${c.factor} ft²/person = ${calculation.people} people (rounded up to a whole person).`),
+    paragraph(`${c.area} ft² (${c.areaBasis}) ÷ ${c.factor} ft²/person = ${calculation.people} ${calculation.people === 1 ? 'person' : 'people'} (rounded up to a whole person).`),
     ...(c.factorMode === 'custom' ? [
       paragraph(`Custom factor (user-defined): ${c.factor} ft²/person. BC table factor: ${c.tableFactor} ft²/person (${c.areaBasis}).`),
       paragraph(`Reason/reference (user-provided): ${c.customReason}`)
@@ -415,7 +415,7 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
     checkNotes.textContent=checks?'Ask Assistant to recheck footnotes':'Ask Assistant about footnotes';
     if(!checkNotes.hidden) footnotes.append(checkNotes);
     result.classList.toggle('is-pending', !hasResult);
-    result.textContent = hasResult ? `${calculation.previewPeople.toLocaleString()} people${custom ? ' · Custom factor' : ''}`
+    result.textContent = hasResult ? `${calculation.previewPeople.toLocaleString()} ${calculation.previewPeople === 1 ? 'person' : 'people'}${custom ? ' · Custom factor' : ''}`
       : fixedSeating || special ? 'Separate method required' : 'Complete calculation inputs';
     formula.hidden = hasResult;
     formula.textContent = hasResult ? ''

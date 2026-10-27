@@ -49,6 +49,12 @@ try {
     assert.equal(conflict.status,409,'stale chapter identity remains fenced');
     console.log(`${code} ${version?'2014':'current'}: ${result.chapters.length} chapters, ${result.total} matches, ${ms} ms isolated localhost search`);
   }
+  const building=(await get('/code/chapters?code=BC')).chapters;
+  const egress=building.find(chapter=>String(chapter.chapterNumber)==='10');
+  const exact=(await get(`/code/chapters/${egress.id}?bodyContract=2&readerSearch=1005.3`)).readerSearch;
+  assert.equal(exact.results[0].sectionNumber,'1005.3','The actual egress provision precedes paragraphs citing its number.');
+  assert.equal(exact.results[0].blockID,'','An exact section targets its heading.');
+  assert.ok(exact.results.some(item=>item.sectionNumber==='1004.1.1.2.3'),'Citing paragraphs remain discoverable.');
   const plumbing=(await get('/code/chapters?code=PC')).chapters;
   const waterHeaters=plumbing.find(chapter=>String(chapter.chapterNumber)==='5');
   const outside=(await get(`/code/chapters/${waterHeaters.id}?readerScope=code&readerSearch=storm%20drainage`)).readerSearch;

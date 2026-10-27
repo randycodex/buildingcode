@@ -1,5 +1,5 @@
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261025-workspace-chrome-v1379";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261026-focused-ux-v1380";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -7,14 +7,14 @@ import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./pro
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
 import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=8";
-import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=13';
-import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=5";
-import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=6";
+import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=14';
+import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=6";
+import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=7";
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=28";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=29";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1379";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
@@ -45,7 +45,7 @@ import { bindPublicCodeRevisionChecks, createPublicCodeRevisionController, isPub
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
-import { searchReaderTextSections } from "./reader-search-match.js?v=20261015-reader-search-preview-v3";
+import { searchReaderTextSections, rankReaderSearchResults } from "./reader-search-match.js?v=20261026-exact-section-v4";
 import { searchWords, searchWordPattern } from "./search-words.js?v=20261025-workspace-chrome-v1379";
 import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey } from "./reader-navigation-tree.js?v=20261010-contents-v1";
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
@@ -150,7 +150,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261025-workspace-chrome-v1379";
+} from "./offline-storage.js?v=20261026-focused-ux-v1380";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -17977,7 +17977,10 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       const link = {id: crypto.randomUUID(), label: sourceLabel, relationshipRole: "context", projectID: researchProjectID(project),
         source: {...resolved, sourceID: String(resolved.sectionID), sectionID: String(resolved.sectionID),
           sectionTitle: resolved.title, codeEdition: researchCodeEdition(resolved), sourceLibraryVersion: resolved.codeVersion},
-        passages: [{exact}], createdAt: new Date().toISOString()};
+        // The calculation already includes its selected row and footnotes.
+        // Retain the full exact section as evidence without copying the raw
+        // table into the Note body when it is opened or restored.
+        passages: [{exact}], noteTextVersion: 1, createdAt: new Date().toISOString()};
       const notebookDocument = emptyNotebookDocument();
       notebookDocument.document = calculationNoteBlocks(calculation, [link], answerID, draft.spaceLocation);
       if (spaceName) notebookDocument.document.unshift({type: "paragraph", content: [{type: "text", text: `Space / room: ${spaceName}`, styles: {}}]});
@@ -19393,7 +19396,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
   emptyReader(content, "Searching this code", "Finding matches in this chapter and other chapters.");
   let matches;
   try {
-    matches = await fetchReaderChapterSearch(reader, query, controller.signal, { scope: "code" });
+    matches = rankReaderSearchResults(await fetchReaderChapterSearch(reader, query, controller.signal, { scope: "code" }), query);
   } catch {
     if (panel.isConnected && panel.dataset.readerSearchToken === searchToken) {
       emptyReader(content, "Search could not load", "Try again, or close find to return to the code text.");
@@ -19416,15 +19419,15 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
     return;
   }
 
-  let chapterID = String(reader.chapterID);
+  let chapterID = null;
   const chapterHeading = (title) => {
     const heading = document.createElement("h3");
     heading.className = "reader-internal-results-heading";
     heading.textContent = title;
     results.append(heading);
   };
-  chapterHeading("Current chapter");
-  if (!matches.some(result => String(result.chapterID) === chapterID)) {
+  if (!matches.some(result => String(result.chapterID) === String(reader.chapterID))) {
+    chapterHeading("Current chapter");
     const empty = document.createElement("p");
     empty.className = "reader-internal-results-empty";
     empty.textContent = "No matches in this chapter.";
@@ -19433,7 +19436,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
   matches.forEach((result) => {
     if (String(result.chapterID) !== chapterID) {
       chapterID = String(result.chapterID);
-      chapterHeading(result.chapterTitle);
+      chapterHeading(chapterID === String(reader.chapterID) ? "Current chapter" : result.chapterTitle);
     }
     const row = document.createElement("button");
     row.className = "reader-internal-result";
@@ -43955,11 +43958,8 @@ function orderWithPaneStepped(paneID, direction) {
 function activePinnedPaneID() {
   if (!isProAccount()) return "";
   const view = currentColumnWorkflowView();
-  // Notebook Evidence stays at the left edge independently of the Research pin.
-  if (view === 'notebook') {
-    const evidenceID = primarySavedPaneID();
-    return evidenceID && workflowPaneIsVisible(evidenceID) ? evidenceID : '';
-  }
+  // Notebook columns share one horizontal track. A sticky Evidence column
+  // covers the Notes scrolling beneath it, so only Research uses pinning.
   if (view !== "research") return "";
   const paneID = state.pinnedPaneID || "";
   // Pin a saved detail through its Evidence anchor so the pair cannot split.

@@ -45,7 +45,7 @@ try {
   const codeVersion="CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
   assert.equal((await request("/sync/push",{batch:{user:{id:userID},mutations:[{project:{id:"calc-project",userID,codeVersion,clientID:"calculation-project",name:"Synthetic calculation acceptance",colorHex:"#334455",sortOrder:0,updatedAt:new Date().toISOString()}}]}})).status,200);
   const calculation=calculateOccupantLoad({spaceFunction:"Synthetic test space",area:"1201",factor:"100",areaBasis:"gross",factorBasis:"Synthetic inputs",seating:"without-fixed-seating"});
-  const link={id:"calculation-source",label:"BC 2022 § 1004.1.3",relationshipRole:"context",projectID:"calculation-project",source:{codePrefix:"BC",codeVersion,codeEdition:"2022",sourceID:"2152",sectionID:"2152",sectionNumber:"1004.1.3",sectionTitle:"Areas without fixed seating",sourceLibraryVersion:codeVersion},passages:[{exact:"The number of occupants shall be computed at the rate of one occupant per unit of area as prescribed in Table 1004.1.3."}],createdAt:new Date().toISOString()};
+  const link={id:"calculation-source",label:"BC 2022 § 1004.1.3",relationshipRole:"context",projectID:"calculation-project",source:{codePrefix:"BC",codeVersion,codeEdition:"2022",sourceID:"2152",sectionID:"2152",sectionNumber:"1004.1.3",sectionTitle:"Areas without fixed seating",sourceLibraryVersion:codeVersion},passages:[{exact:"The number of occupants shall be computed at the rate of one occupant per unit of area as prescribed in Table 1004.1.3."}],noteTextVersion:1,createdAt:new Date().toISOString()};
   const document=emptyNotebookDocument();document.document=calculationNoteBlocks(calculation,[link]);
   const saveBody={projectID:"calculation-project",clientMutationID:"calculation-acceptance",expectedVersion:0,cardType:"finding",title:"Synthetic calculation",document,evidenceLinks:[link],openQuestions:[{id:"review",text:"Review cumulative loads and exceptions",status:"open",why:"Single-space calculation",resolution:""}]};
   const saved=await request("/notebook/cards/save",saveBody);assert.equal(saved.status,201,JSON.stringify(saved));
@@ -55,6 +55,12 @@ try {
   assert.doesNotMatch(get.json.card.plainText,/author confirmed/i);
   assert.equal(get.json.card.evidenceLinks[0].source.codeVersion,codeVersion);assert.equal(get.json.card.openQuestions[0].status,"open");
   assert.equal(get.json.card.sourceClassification,"user-authored");
+  assert.equal(get.json.card.evidenceLinks[0].noteTextVersion,1);
+  const {restoreNotebookPassageText}=await import('../public/notebook-passage-blocks.js');
+  const restored=restoreNotebookPassageText(get.json.card.document,get.json.card.evidenceLinks);
+  assert.equal(restored.changed,false,'A reloaded calculator Note retains its compact body.');
+  assert.equal(restored.evidenceLinks[0].passages[0].exact,link.passages[0].exact);
+  assert.doesNotMatch(get.json.card.plainText,/The number of occupants shall be computed/);
   const customCalculation=calculateOccupantLoad({...calculation.input,factorMode:"custom",factor:"50",tableFactor:"100",tableRowID:"synthetic-row",customReason:"Synthetic design reference CALC-7"});
   const customDocument=emptyNotebookDocument();customDocument.document=calculationNoteBlocks(customCalculation,[link]);
   const customBody={...saveBody,clientMutationID:"custom-calculation-acceptance",title:"Custom factor calculation",document:customDocument};

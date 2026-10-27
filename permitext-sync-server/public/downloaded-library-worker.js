@@ -15,7 +15,7 @@ import {
   offlineAssetNamesForChapter,
   resolveOfflineSectionMetadata,
 } from "./offline-code-metadata.js?v=1";
-import { searchReaderTextSections } from "./reader-search-match.js?v=20261015-reader-search-preview-v3";
+import { searchReaderTextSections } from "./reader-search-match.js?v=20261026-exact-section-v4";
 import {
   defaultSyncCodeVersion,
   historicalConstructionSyncCodeVersion,

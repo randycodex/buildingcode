@@ -42,6 +42,11 @@ assert.match(normalized.plainText,/12 people/); assert.match(normalized.plainTex
 assert.equal(normalized.evidenceLinks[0].source.codeVersion,source.codeVersion);
 assert.equal(normalized.references[0].referenceKind,'selectedPassage');
 assert.equal(normalized.sourceClassification,'user-authored','An arithmetic snapshot must never be classified as enacted or verified Research.');
+const single=normalizeNotebookCardPayload({cardType:'finding',title:'One occupant',
+  document:{...emptyNotebookDocument(),document:calculationNoteBlocks(calculateOccupantLoad({...input,area:'100'}),[link])},
+  evidenceLinks:[link],createdBy:'synthetic',updatedBy:'synthetic'});
+assert.match(single.plainText,/= 1 person \(rounded up/);
+assert.doesNotMatch(single.plainText,/1 people/);
 assert.doesNotMatch(normalized.plainText,/author confirmed|footnotes reviewed/i,'Removing the checkbox must not fabricate a review confirmation.');
 assert.throws(()=>calculationNoteBlocks(calculateOccupantLoad({area:'1500',factor:'100'}),[link]),'A preview with incomplete context cannot be saved.');
 assert.throws(()=>calculationNoteBlocks(calculateOccupantLoad(input),[]));

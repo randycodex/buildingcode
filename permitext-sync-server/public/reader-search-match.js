@@ -82,14 +82,29 @@ export function readerSearchResultHeading(title, blockMatch) {
   return definitionLabel || title;
 }
 
+function readerSectionNumber(value) {
+  return String(value || "").trim().match(/^(?:(?:section|§)\s*)?(\d+(?:[.-]\d+)*(?:\([a-z0-9]+\))*)\.?$/i)?.[1].toLowerCase() || "";
+}
+
+// Promote the provision itself ahead of paragraphs that merely cite it. Keep
+// the existing chapter/document order for every other match and text query.
+export function rankReaderSearchResults(results, query) {
+  const number = readerSectionNumber(query);
+  if (!number) return results;
+  return [...results.filter(result => readerSectionNumber(result.sectionNumber) === number),
+    ...results.filter(result => readerSectionNumber(result.sectionNumber) !== number)];
+}
+
 /** Search the complete ordered text projection; never only visible Reader rows. */
 export function searchReaderTextSections(sections, query) {
   const needle = String(query || "").trim().toLowerCase();
   if (needle.length < 2) return [];
+  const sectionQuery = readerSectionNumber(needle);
   const results = [];
   for (const section of sections || []) {
     const title = section.displayTitle;
-    const titleMatch = readerSearchMatch(title, needle);
+    const exactSection = Boolean(sectionQuery) && readerSectionNumber(section.sectionNumber) === sectionQuery;
+    const titleMatch = readerSearchMatch(title, exactSection ? section.sectionNumber : needle);
     const blockMatches = (section.blocks || []).flatMap((block, index) => {
       const text = String(block.text || "").replace(/\s+/g, " ").trim();
       const match = readerSearchMatch(text, needle);
@@ -105,7 +120,7 @@ export function searchReaderTextSections(sections, query) {
     const match = titleMatch || blockMatch?.match;
     if (!match) continue;
     const snippetMatch = blockMatch?.match || match;
-    const heading = readerSearchResultHeading(title, blockMatch);
+    const heading = exactSection ? title : readerSearchResultHeading(title, blockMatch);
     results.push({
       sectionID: section.id,
       sectionNumber: section.sectionNumber || "",
@@ -115,8 +130,8 @@ export function searchReaderTextSections(sections, query) {
       snippet: snippetForMatch(blockMatch?.text || section.title, snippetMatch, heading),
       snippetHighlight: snippetMatch.text,
       matchText: match.text,
-      blockID: blockMatch?.blockID || ""
+      blockID: exactSection ? "" : blockMatch?.blockID || ""
     });
   }
-  return results;
+  return rankReaderSearchResults(results, query);
 }

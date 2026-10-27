@@ -117,7 +117,7 @@ export function createEvidenceCommentsEditor(value, label, history = {}) {
         refreshUndo();
         editor.replaceChildren();
         const comments = evidenceComments(next);
-        (comments.length ? comments : ['']).forEach(text => add(text));
+        comments.forEach(text => add(text));
       } },
     readOnly: { get: () => readOnly, set: next => {
       readOnly = next;

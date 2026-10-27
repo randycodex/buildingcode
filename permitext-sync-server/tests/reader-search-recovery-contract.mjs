@@ -1,4 +1,4 @@
-import { readerSearchMatch, snippetForMatch, readerSearchResultHeading } from "../public/reader-search-match.js";
+import { readerSearchMatch, snippetForMatch, readerSearchResultHeading, rankReaderSearchResults } from "../public/reader-search-match.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
@@ -22,7 +22,7 @@ function harness() {
   const reader = { chapterID: "synthetic-chapter" };
   const opened = [];
   const restore = () => { panel.dataset.readerSearchToken = randomUUID(); content.classList.remove("is-searching-reader"); content.children = ["Original enacted provision"]; };
-  const context = vm.createContext({ readerSearchMatch, snippetForMatch, readerSearchResultHeading, crypto: { randomUUID }, document: { createElement: element },
+  const context = vm.createContext({ readerSearchMatch, snippetForMatch, readerSearchResultHeading, rankReaderSearchResults, crypto: { randomUUID }, document: { createElement: element },
     annotatedBlocksForSection: section => section.blocks || [],
     annotationTargetForBlock: (_section, block, _reader, index) => ({blockID: block.id || `block-${index}`}),
     stopReaderProgressiveHydration() {}, startReaderSectionVisibility() {}, clear: node => {node.children = [];},
@@ -87,6 +87,22 @@ function harness() {
 }
 assert.match(source.slice(source.indexOf("async function renderSectionContent("), source.indexOf("\n}", source.indexOf("async function renderSectionContent("))),/readerSearchToken/);
 
+// An exact provision outside the current chapter precedes local citations,
+// without labeling that result as belonging to the current chapter.
+{
+  const t=harness(), pending=t.run('1005.3');
+  t.requests[0].resolve([
+    {chapterID:'synthetic-chapter', sectionID:'citation', sectionNumber:'202', heading:'202 Definitions', snippet:'See 1005.3.'},
+    {chapterID:'other-chapter', chapterTitle:'Chapter 10', sectionID:'exact', sectionNumber:'1005.3', heading:'1005.3 Required capacity', snippet:''}
+  ]);
+  await pending;
+  const rows=t.content.children[0].children;
+  assert.equal(rows[0].textContent,'Chapter 10');
+  assert.equal(rows[1].children[0].textContent,'1005.3 Required capacity');
+  assert.equal(rows[2].textContent,'Current chapter');
+  assert.equal(rows[3].children[0].textContent,'202 Definitions');
+}
+
 // A saved citation fetch failure must resolve to visible recovery, remove only
 // its abandoned detail pane, and retain the exact citation for another attempt.
 const savedStart = source.indexOf("async function openSavedItemInReader(");
@@ -101,7 +117,7 @@ function savedHarness({ online = false } = {}) {
   let generation = 1, nextID = 0, saves = 0;
   const context = vm.createContext({
     state, navigator: { onLine: online },
-    savedItemOpeningAttempts: new Map(), activeWorkspaceID: "workspace",
+    savedItemOpeningAttempts: new Map(), sectionDetailOpeningAttempts: new Map(), activeWorkspaceID: "workspace",
     // Source authorization is covered separately; this fixture exercises detail
     // recovery after the current source has been resolved asynchronously.
     resolveReaderSource: async item => item,

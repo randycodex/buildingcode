@@ -134,8 +134,8 @@ const pinState={pinnedPaneID:'reader:research'};
 const pinContext=vm.createContext({state:pinState,isProAccount:()=>true,currentColumnWorkflowView:()=>view,
   primarySavedPaneID:()=>evidenceID,workflowPaneIsVisible:()=>visible,savedEvidenceColumnGroup:()=>[]});
 vm.runInContext(actual('activePinnedPaneID'),pinContext);
-assert.equal(pinContext.activePinnedPaneID(),'evidence','Open Notebook Evidence is automatically pinned.');
-assert.equal(pinState.pinnedPaneID,'reader:research','The automatic Evidence pin preserves the separate Research preference.');
+assert.equal(pinContext.activePinnedPaneID(),'','Notebook Evidence scrolls with Notes instead of covering them.');
+assert.equal(pinState.pinnedPaneID,'reader:research','Notebook leaves the separate Research pin preference intact.');
 evidenceID='';assert.equal(pinContext.activePinnedPaneID(),'','Closing Evidence releases the fixed column.');
 evidenceID='evidence';visible=false;assert.equal(pinContext.activePinnedPaneID(),'','A hidden Evidence column cannot cover another view.');
 visible=true;view='research';assert.equal(pinContext.activePinnedPaneID(),'reader:research');
@@ -144,12 +144,15 @@ view='notebook';
 pinContext.activePaneIDs=()=>['evidence','note:a','note:b'];
 pinContext.paneGroupForMove=id=>[id];
 pinContext.openCodeQuestionPaneIDs=()=>[];
-pinContext.orderWithPaneMoved=()=>['evidence','note:b','note:a'];
+pinContext.orderWithPaneMoved=(id,target,placement)=>{
+  const order=['evidence','note:a','note:b'].filter(item=>item!==id);
+  order.splice(order.indexOf(target)+(placement==='after'?1:0),0,id);return order;
+};
 vm.runInContext(actual('orderWithPaneStepped'),pinContext);
-assert.equal(pinContext.orderWithPaneStepped('evidence',1),null,'Evidence cannot be moved away from the fixed left edge.');
-assert.equal(pinContext.orderWithPaneStepped('note:a',-1),null,'Notes cannot move before fixed Evidence.');
+assert.deepEqual(Array.from(pinContext.orderWithPaneStepped('evidence',1)),['note:a','evidence','note:b']);
+assert.deepEqual(Array.from(pinContext.orderWithPaneStepped('note:a',-1)),['note:a','evidence','note:b']);
 assert.deepEqual(Array.from(pinContext.orderWithPaneStepped('note:b',-1)),['evidence','note:b','note:a']);
-console.log('Notebook layout passed: Evidence auto-pin, closed/hidden release, retained Research preference and Note buttons in live column order.');
+console.log('Notebook layout passed: scrolling Evidence, retained Research pin preference and Note buttons in live column order.');
 
 // Closed-note deletion is recoverable and fenced against navigation or local drafts.
 for (const mode of ['saved','cancel','navigate','pending-draft','open-saved','open-unsaved','open-changed','open-draft']) {

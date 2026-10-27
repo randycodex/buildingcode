@@ -62,6 +62,19 @@ class CommentElement {
 const priorDocument=globalThis.document;
 globalThis.document={createElement:tag=>new CommentElement(tag)};
 try {
+  const empty=createEvidenceCommentsEditor('', 'Passage comment');
+  assert.equal(empty.querySelectorAll('textarea').length,0,'No numbered row exists before Add comment.');
+  assert.equal(empty.querySelectorAll('button').length,0,'An empty passage offers no phantom Delete action.');
+  empty.addComment();
+  assert.equal(empty.querySelectorAll('textarea').length,1);
+  assert.equal(empty.querySelector('.section-detail-comment-number').textContent,'1.');
+  empty.querySelector('textarea').value='First authored comment';
+  empty.querySelector('textarea').dispatchEvent(new Event('input'));
+  assert.equal(empty.value,'First authored comment');
+  empty.querySelector('button').dispatchEvent(new Event('click'));
+  assert.equal(empty.querySelectorAll('textarea').length,0);
+  empty.value='';
+  assert.equal(empty.querySelectorAll('textarea').length,0,'A sync acknowledgement cannot recreate an empty row.');
   const original=['Keep first\nwith its line break','Delete only this one','Keep last exactly'];
   const editor=createEvidenceCommentsEditor(serializeEvidenceComments(original),'Passage comment');
   let saves=0;
