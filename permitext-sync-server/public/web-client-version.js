@@ -1,4 +1,4 @@
-export const webAppVersion = "20261027-question-rail-v1415";
+export const webAppVersion = "20261027-answer-no-background-v1416";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";
