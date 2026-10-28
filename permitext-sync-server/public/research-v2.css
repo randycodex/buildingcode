@@ -15,7 +15,8 @@
 .rv2-questions li{padding:0 0 9px 0}
 .research-v2 .rv2-question-link{display:inline-block;width:100%;font-size:13px;box-sizing:border-box;min-width:0;overflow-wrap:normal;vertical-align:middle;color:var(--text-primary)}
 .rv2-question-title{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rv2-question-link[aria-current=page]{background:var(--toolbar-active)}
+.research-v2 .rv2-question-link,.research-v2 .rv2-question-link:hover{background:transparent;border-radius:0;box-shadow:none}
+.research-v2 .rv2-question-link[aria-current=page]{font-weight:700}
 .rv2-empty-history{font-size:12px;list-style:none;margin-left:-18px}
 .rv2-chat{display:flex;flex-direction:column;min-height:0;min-width:0;padding:0 max(24px,calc((100% - 600px)/2));background:var(--surface)}
 .rv2-thread{flex:1;min-height:0;overflow:auto;padding:30px 0 20px;scroll-behavior:smooth;overflow-wrap:anywhere}
