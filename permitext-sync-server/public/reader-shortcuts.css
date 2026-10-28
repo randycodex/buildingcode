@@ -1,0 +1,21 @@
+/* Reader shortcuts share each code family's existing Reader accent. */
+.reader-toolbar-tools,.reader-shortcuts{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%}
+.reader-shortcuts[hidden]{display:none}
+.workflow-toolbar .reader-shortcut{appearance:none;flex:0 0 auto;box-sizing:border-box;border:0;outline:0;border-radius:var(--radius-pill);padding:4px 11px;min-height:26px;color:var(--code-accent);background:color-mix(in srgb,var(--code-accent) 10%,var(--surface));font:500 12px/18px var(--ui-font-family);white-space:nowrap;cursor:pointer;transition:background 160ms}
+.workflow-toolbar .reader-shortcut:is(:hover,:focus-visible){background:color-mix(in srgb,var(--code-accent) 19%,var(--surface))}
+.workflow-toolbar .reader-shortcut[aria-pressed=true]{background:color-mix(in srgb,var(--code-accent) 27%,var(--surface))}
+.workflow-toolbar .reader-shortcut[aria-pressed=true]:focus-visible{background:color-mix(in srgb,var(--code-accent) 35%,var(--surface))}
+.reader-shortcut-tooltip{position:fixed;z-index:1500;box-sizing:border-box;max-width:min(360px,calc(100vw - 16px));padding:8px 10px;border-radius:10px;background:var(--menu-surface);color:var(--text-primary);box-shadow:var(--shadow-panel);font:12px/1.5 var(--ui-font-family);overflow-wrap:anywhere;pointer-events:none}
+.reader-shortcut-tooltip[hidden]{display:none}
+
+/* Let the tools row grow when controls wrap, including with narrow column tabs. */
+.workspace-shell{grid-template-rows:var(--workspace-bar-height) auto minmax(0,1fr)}
+.workspace-shell:has(>.workspace-issue:not([hidden])){grid-template-rows:var(--workspace-bar-height) auto auto minmax(0,1fr)}
+.workspace-shell:has(>.workspace-column-tabs:not([hidden])){grid-template-rows:var(--workspace-bar-height) auto 42px minmax(0,1fr)}
+.workspace-shell:has(>.workspace-column-tabs:not([hidden])):has(>.workspace-issue:not([hidden])){grid-template-rows:var(--workspace-bar-height) auto auto 42px minmax(0,1fr)}
+.workspace-shell>.workflow-toolbar{height:auto;min-width:0;max-width:100%;flex-wrap:wrap;gap:3px 6px;padding-block:2px}
+.workflow-toolbar>[data-workflow-tools=research]{height:auto;min-height:var(--workspace-menu-height);flex:0 1 auto;flex-wrap:wrap;gap:4px 6px;max-width:100%}
+.workflow-toolbar>.workflow-layout-actions{height:auto;min-height:var(--workspace-menu-height)}
+@media(max-width:660px){.workspace-shell>.workflow-toolbar{padding-inline:12px}.reader-toolbar-tools{flex-basis:100%}.workflow-toolbar>[data-workflow-tools=research]{flex:1 1 100%}.workflow-toolbar>.workflow-layout-actions{padding-inline-start:0}}
+@media(pointer:coarse){.workflow-toolbar .reader-shortcut{min-height:44px;min-width:44px}}
+@media(prefers-reduced-motion:reduce){.workflow-toolbar .reader-shortcut{transition:none}}

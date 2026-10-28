@@ -83,3 +83,13 @@ dividers[0].height = 0;
 context.positionPaneDividerAddControls();
 assert.equal(dividers[0].button.hidden, true, 'Responsive layouts without dividers do not show controls');
 console.log('Divider picker: toolbar alignment, 40px radius, batched pointer work, viewport and pinned/overlay visibility passed.');
+
+// A floating insertion action must never cover an existing Reader shortcut.
+const priorQuery = context.document.querySelector;
+context.document.querySelector = selector => selector === '.reader-toolbar-tools'
+  ? {getBoundingClientRect:()=>({left:1450,right:1550,top:42,bottom:84,height:42})} : priorQuery(selector);
+context.positionPaneDividerAddControls();
+assert.equal(dividers[1].button.hidden,true,'Reader pills retain the entire hit area instead of being covered by the divider add button.');
+context.document.querySelector = priorQuery;
+context.positionPaneDividerAddControls();
+assert.equal(dividers[1].button.hidden,false,'Insertion remains available in unoccupied toolbar space.');

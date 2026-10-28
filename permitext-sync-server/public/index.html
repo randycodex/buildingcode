@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
     <link rel="stylesheet" href="/web/styles.css?v=20261027-collapsed-divider-v28">
     <link rel="stylesheet" href="/web/research-v2.css?v=13">
+    <link rel="stylesheet" href="/web/reader-shortcuts.css?v=2">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -74,9 +75,9 @@
           </div>
         </div>
       </header>
-<nav class="workflow-toolbar" aria-label="Tools for current view"><div data-workflow-tools="research"><button class="toolbar-button" id="add-reader" data-open-reader type="button" aria-label="Reader" title="Reader" data-mobile-label="Reader" data-workspace-icon="library-big">
+<nav class="workflow-toolbar" aria-label="Tools for current view"><div data-workflow-tools="research"><div class="reader-toolbar-tools"><button class="toolbar-button" id="add-reader" data-open-reader type="button" aria-label="Reader" title="Reader" data-mobile-label="Reader" data-workspace-icon="library-big">
             <span>Reader<span aria-hidden="true"> +</span></span>
-          </button><button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search" data-workspace-icon="search">
+          </button><div class="reader-shortcuts" id="reader-shortcuts" role="group" aria-label="Open Readers" hidden></div></div><button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search" data-workspace-icon="search">
             <span>Search</span>
           </button><button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Assistant" title="Assistant" aria-pressed="false" data-mobile-label="Assistant" data-workspace-icon="astroid">
             <span>Assistant</span>
@@ -586,6 +587,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261027-search-reveal-v1408" type="module"></script>
+    <script src="/web/app.js?v=20261027-reader-shortcuts-v1412" type="module"></script>
   </body>
 </html>

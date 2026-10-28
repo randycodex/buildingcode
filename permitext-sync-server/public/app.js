@@ -1,8 +1,9 @@
+import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=13";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-search-reveal-v1408";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-reader-shortcuts-v1412";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -154,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-search-reveal-v1408";
+} from "./offline-storage.js?v=20261027-reader-shortcuts-v1412";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -374,6 +375,8 @@ let workspaceKey = detachedProjectWindow
 const track = document.querySelector("#panel-track");
 const topbarActions = document.querySelector(".topbar-actions");
 const addReaderButton = document.querySelector("#add-reader");
+let readerShortcuts;
+let readerShortcutNavigationGeneration = 0;
 const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleCalculatorButton = document.querySelector("#toggle-calculator");
@@ -43245,6 +43248,7 @@ const paneDividerAddRevealRadius = 40;
 function positionPaneDividerAddControls() {
   const toolbar = document.querySelector(".workflow-toolbar");
   const toolbarBounds = toolbar?.getBoundingClientRect();
+  const shortcutBounds = document.querySelector(".reader-toolbar-tools")?.getBoundingClientRect();
   const trackBounds = track.getBoundingClientRect();
   const enabled = currentColumnWorkflowView() === "research" && toolbarBounds?.height > 0 && !track.inert && getComputedStyle(toolbar).visibility !== "hidden";
   const pinned = track.querySelector(":scope > .workspace-panel.is-pinned:not(.is-workflow-hidden)");
@@ -43255,13 +43259,15 @@ function positionPaneDividerAddControls() {
     const bounds = divider.getBoundingClientRect();
     const x = bounds.left + bounds.width / 2;
     const left = divider.classList.contains("is-pinned-divider") ? trackBounds.left : pinnedRight;
-    button.hidden = !enabled || !bounds.height || x < left + 14 || x > Math.min(trackBounds.right, window.innerWidth) - 14;
+    const y = toolbarBounds?.top + toolbarBounds?.height / 2;
+    const coversShortcuts = shortcutBounds?.height > 0 && x + 14 > shortcutBounds.left && x - 14 < shortcutBounds.right &&
+      y + 14 > shortcutBounds.top && y - 14 < shortcutBounds.bottom;
+    button.hidden = coversShortcuts || !enabled || !bounds.height || x < left + 14 || x > Math.min(trackBounds.right, window.innerWidth) - 14;
     if (button.hidden) {
       button._dividerAddCenter = null;
       if (button.getAttribute("aria-expanded") === "true") document.querySelector(".reader-open-code-menu")?._close?.();
       return;
     }
-    const y = toolbarBounds.top + toolbarBounds.height / 2;
     button.style.left = `${x}px`;
     button.style.top = `${y}px`;
     button._dividerAddCenter = { x, y };
@@ -44150,7 +44156,9 @@ function refreshColumnGroupPresentation({ preparePanels = true, refreshDividers 
 }
 
 function setColumnGroupCollapsed(group, collapsed) {
-  if (!columnGroupCanCollapse(group)) return;
+  // Ordering reconciliation may replace the object captured by an open menu.
+  group = (state.columnGroups || []).find(candidate => candidate.id === group?.id);
+  if (!group || !columnGroupCanCollapse(group)) return;
   const panels = [...track.querySelectorAll(':scope > .workspace-panel')]
     .filter((panel) => panel.dataset.paneId !== activePinnedPaneID() && group.paneIDs.includes(panel.dataset.paneId));
   panels.forEach((panel) => {
@@ -44928,6 +44936,53 @@ function appendPaneSequence(panes) {
   });
   track.scrollLeft = Math.min(previousScrollLeft, Math.max(0, track.scrollWidth - track.clientWidth));
   notifyWorkspaceLayoutChange();
+}
+
+function readerShortcutItems() {
+  const byID = new Map((state.readers || []).map(reader => [paneIDForReader(reader), reader]));
+  return [...track.querySelectorAll(":scope > .workspace-panel")].flatMap(panel => {
+    const id = panel.dataset.paneId;
+    const reader = byID.get(id);
+    if (!reader || !workflowPaneIsVisible(id)) return [];
+    const prefix = String(reader.codePrefix || "BC").toUpperCase();
+    const version = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(prefix));
+    const code = codeOptions.find(option => option.prefix === prefix && codeOptionVersion(option) === version);
+    const name = code ? readerCodeOptionLabel(code) : reader.codeName || prefix;
+    const edition = code ? researchCodeEdition({ codePrefix: prefix, codeVersion: version })
+      : String(reader.codeEdition || version.match(/\b(?:19|20)\d{2}\b/)?.[0] || "Current");
+    const chapter = panel.querySelector(".chapter-select")?.selectedOptions?.[0]?.textContent || "";
+    const section = reader.sectionNumber ? sectionDisplayTitle(reader.sectionNumber, reader.title, "") : reader.title;
+    return [{ id, prefix, edition, name, theme: code?.theme || "current-consolidation",
+      location: [...new Set([chapter, section].filter(value => value && value !== "Reader"))].join(" · ") }];
+  });
+}
+
+async function revealReaderShortcut(paneID) {
+  const generation = ++readerShortcutNavigationGeneration;
+  const workspaceID = activeWorkspaceID, view = currentColumnWorkflowView();
+  const identity = captureAccountRequest();
+  const current = () => generation === readerShortcutNavigationGeneration && workspaceID === activeWorkspaceID &&
+    view === currentColumnWorkflowView() && isCurrentAccountRequest(identity) && workflowPaneIsVisible(paneID) &&
+    readerShortcuts?.activePaneID() === paneID;
+  let panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (!panel || !current()) return;
+  const group = columnGroupForPane(paneID);
+  if (columnGroupIsCollapsed(group)) setColumnGroupCollapsed(group, false);
+  if (paneIsCollapsed(paneID)) setPaneCollapsed(panel, false);
+  if (panel.classList.contains("is-column-strip") || panel.classList.contains("is-column-tab-hidden")) {
+    columnExpansionController().reveal(panel);
+  }
+  const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? "instant" : "smooth";
+  scrollPaneIntoView(paneID, behavior);
+  const transitions = [...track.querySelectorAll(':scope > .workspace-panel')]
+    .filter(node => node === panel || group?.paneIDs.includes(node.dataset.paneId))
+    .map(node => node._collapseAnimation?.finished).filter(Boolean);
+  if (panel.dataset.workspacePaneLoading) transitions.push(whenWorkspacePaneReady(paneID));
+  if (!transitions.length) return;
+  await Promise.allSettled(transitions);
+  if (!current()) return;
+  panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (panel) scrollPaneIntoView(paneID, behavior);
 }
 
 let pendingWorkspacePaneRevealID = "";
@@ -49352,6 +49407,12 @@ function bindWorkspaceKeyboardNavigation() {
 }
 
 function bindImmediateUtilityControls() {
+  const shortcutHost = document.querySelector("#reader-shortcuts");
+  if (shortcutHost && !readerShortcuts) readerShortcuts = createReaderShortcuts({
+    host: shortcutHost, track, readers: readerShortcutItems,
+    context: () => `${accountRuntimeGeneration}:${activeWorkspaceID}:${currentColumnWorkflowView()}`,
+    reveal: revealReaderShortcut
+  });
   const updateBadge = document.querySelector("#project-update-badge");
   if (updateBadge && !updateBadge.dataset.bound) {
     updateBadge.dataset.bound = "true";
