@@ -21161,3 +21161,36 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .report-finding-title input { width: 100%; padding: 9px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text-primary); font: inherit; font-size: 14px; }
 .report-research-metadata-option { display: flex; align-items: center; gap: 8px; margin: 10px 0; font-size: 12px; line-height: 1.5; color: var(--text-secondary); text-transform: none; letter-spacing: normal; }
 .report-research-metadata-option input[type="checkbox"] { width: 18px; height: 18px; min-height: 18px; flex: 0 0 18px; padding: 0; margin: 0; accent-color: var(--text-link); }
+
+/* An empty account starts with one clear action and the existing plan branding. */
+.workspace-add-empty[hidden] { display: none; }
+.workspace-shell.has-no-workspace {
+  grid-template-rows: var(--workspace-bar-height) minmax(0, 1fr);
+}
+.workspace-shell.has-no-workspace > :is(.workflow-toolbar, .workspace-column-tabs, .panel-track, .workspace-issue) {
+  display: none !important;
+}
+.workspace-shell.has-no-workspace > .topbar :is(.topbar-actions, .topbar-end) {
+  display: none !important;
+}
+.workspace-shell.has-no-workspace > .topbar .topbar-account-state { display: contents; }
+.workspace-shell.has-no-workspace > .topbar .topbar-brand { display: flex; grid-column: 2; }
+.workspace-shell.has-no-workspace > .workspace-add-empty {
+  grid-row: 2;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: var(--space-5);
+}
+.workspace-add-button {
+  min-height: 44px;
+  padding: 12px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+.workspace-add-button:hover { background: var(--toolbar-active); }
+.workspace-add-button:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
