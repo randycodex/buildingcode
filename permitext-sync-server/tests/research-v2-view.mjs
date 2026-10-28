@@ -56,14 +56,14 @@ assert(all(failedView.element).some(x=>x.textContent==='The provider failed.'));
 assert.equal(passageChipLabel({codePrefix:'BC68',sectionNumber:'27-369',codeVersion:'2026-bundle',codeSource:{editionLabel:'1968 NYC Building Code'}}),'BC68 § 27-369 · 1968');
 let sent=[],draft='Explain this.',savedRequest=null,current=true,snapshots=0;
 let flight=deferred(),review=deferred();
-const projectControl=document.createElement('select');projectControl.setAttribute('aria-label','Project');
-const view=createResearchV2View({projectControl,hasMore:true,history:[{id:'first',title:'First'}],onLoadMore:async()=>({conversations:[{id:'first',title:'First'},{id:'second',title:'Older question'}],hasMore:false}),renderAnswerActions:()=>Object.assign(document.createElement('button'),{textContent:'Add to note…'}),conversation:{id:'test',sources:[source],messages:[old]},initialDraft:draft,
+const view=createResearchV2View({hasMore:true,history:[{id:'first',title:'First'}],onLoadMore:async()=>({conversations:[{id:'first',title:'First'},{id:'second',title:'Older question'}],hasMore:false}),renderAnswerActions:()=>Object.assign(document.createElement('button'),{textContent:'Add to note…'}),conversation:{id:'test',sources:[source],messages:[old]},initialDraft:draft,
   isCurrent:()=>current,onDraft:text=>{draft=text;},onFind:async()=>({candidates:[source],unresolvedReferences:[{title:'PC § 1',reason:'Not found in this edition.'}]}),
   onOpenReader:async()=>{},onReview:()=>review.promise,onInclude:async()=>{},onCitation:async()=>{},
   onSnapshot:async()=>{snapshots++;return [source];},
   requestStore:{read:()=>savedRequest,write:value=>{savedRequest=value;}},
   onSend:args=>{sent.push(args);return flight.promise;}});
 const find=text=>all(view.element).find(x=>x.textContent===text);
+assert(!all(view.element).some(x=>x.tagName==='select'),'The question list follows the workspace Project without a conversation Project selector.');
 const thread=view.element.querySelector('.rv2-thread');thread.clientHeight=400;thread.scrollHeight=1200;layoutCallback();assert.equal(thread.scrollTop,1200,'A delayed pane mount reveals the latest answer');
 assert(find('Add to note…'));assert(find('Save or share'));
 find('More questions').handlers.click();await tick();assert.equal(all(view.element).filter(x=>x.textContent==='First').length,1);assert(find('Older question'));assert.equal(find('More questions').hidden,true);

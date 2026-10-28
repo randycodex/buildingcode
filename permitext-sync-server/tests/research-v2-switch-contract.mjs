@@ -10,15 +10,15 @@ function harness(instanceMode=false){
  const instance=instanceMode?{id:'instance',key:'analysis',conversationID:'a'}:null;
  const state={researchConversationID:'a',utilityInstances:instance?[instance]:[],workflowNavigationGeneration:0};
  const track={querySelector:selector=>selector.includes('.research-v2-panel')?panel:null};panel.parentNode=track;
- const conversations={a:{id:'a',title:'Question A',messages:[],sources:[]},b:{id:'b',title:'Question B',messages:[],sources:[]}};
+ const conversations={a:{id:'a',primaryProjectID:'project-a',title:'Question A',messages:[],sources:[]},b:{id:'b',primaryProjectID:'project-a',title:'Question B',messages:[],sources:[]}};
  let accountCurrent=true, options;
  const context=vm.createContext({state,track,CSS:{escape:v=>v},researchDraftPaneIDs:new Set(),researchNewChatDrafts:new Map(),supplementalResearchConversations:new Map(),activeResearchConversation:conversations.a,
   researchHistoryShowing:false,researchConversationPaneOpened:true,activeWorkspaceID:'workspace',activeAccount:()=>({userID:'owner'}),captureAccountRequest:()=>1,isCurrentAccountRequest:()=>accountCurrent,
   paneIDForUtilityInstance:i=>'instance:'+i.id,renderUtility:()=>{calls.created++;return panel;},analysisTemplate:{},showColumnLoadingStatus(){calls.loading++;},
   postResearch:async(path,body)=>{calls.requests.push(path);if(path.endsWith('/list'))return{conversations:Object.values(conversations),nextCursor:null,hasMore:false};if(path.endsWith('/get'))return{conversation:conversations[body.conversationID]};throw Error(path);},
-  researchWorkspaceProjectID:()=>'',researchConversationInWorkspace:()=>true,createResearchProjectSelect:()=>null,
+  researchWorkspaceProjectID:()=> 'project-a',researchConversationInWorkspace:conversation=>conversation.primaryProjectID==='project-a',
   createResearchV2View(value){options=value;return{element:{id:value.conversation.id},dispose(){calls.disposed++;}};},
-  sessionStorage:{getItem:()=>null},document:{activeElement:null},MutationObserver:class{observe(){}disconnect(){}},requestAnimationFrame:fn=>fn(),
+  crypto:{randomUUID:()=> 'new-request'},sessionStorage:{getItem:()=>null},document:{activeElement:null},MutationObserver:class{observe(){}disconnect(){}},requestAnimationFrame:fn=>fn(),
   hasCapability:()=>true,scheduleResearchDraftPersistence(){},notifyWorkspaceLayoutChange(){calls.layout++;}
  });
  vm.runInContext([actual('researchAssistantContentIdentity'),actual('renderResearchV2Pane'),actual('refreshResearchConversationInPlace')].join('\n'),context);
@@ -95,7 +95,7 @@ console.log('Late completion passed: account, workspace and closed-pane changes 
 // Creating a new question in a repeated column must retire its former owner,
 // while retaining that former conversation's unsent draft for a later reopen.
 {
- const f=harness(true);const created={id:'created',title:'New question',messages:[],sources:[]};
+ const f=harness(true);const created={id:'created',primaryProjectID:'project-a',title:'New question',messages:[],sources:[]};
  f.state.paneOrder=['instance:instance','research:conversation:a'];f.state.paneWeights={'research:conversation:a':920};
  Object.assign(f.context,{crypto:{randomUUID:()=> 'new-request'},researchConversationList:[{id:'a'}],researchHistoryPageReaders:new Map(),
   readResearchConversationList:{invalidate(){}},refreshResearchUsage:{invalidate(){}},saveWorkspaceState(){},
@@ -103,7 +103,7 @@ console.log('Late completion passed: account, workspace and closed-pane changes 
  f.context.supplementalResearchConversations.set('a',f.conversations.a);
  await f.context.renderResearchV2Pane('instance:instance',{available:true});
  f.options.onDraft('Retain the former draft');
- f.context.postResearch=async path=>{assert.equal(path,'/research/conversations/create');return{conversation:created};};
+ f.context.postResearch=async (path,body)=>{assert.equal(path,'/research/conversations/create');assert.equal(body.projectID,'project-a');return{conversation:created};};
  await f.options.onNew();
  assert.equal(f.instance.conversationID,'created');assert.equal(f.instance.draft,'');
  assert.equal(f.context.researchNewChatDrafts.get('followup:a'),'Retain the former draft');
@@ -113,3 +113,38 @@ console.log('Late completion passed: account, workspace and closed-pane changes 
  assert.equal(f.calls.loading,1);assert.equal(f.options.history[0].id,'created');
 }
 console.log('New-question publication passed: retain the column, retire the former owner and keep its draft.');
+
+// Historical unassigned answers remain readable, but new work belongs to a Project.
+{
+ const f=harness();f.context.researchWorkspaceProjectID=()=>'';
+ f.conversations.a.primaryProjectID=null;f.conversations.b.primaryProjectID=null;
+ f.context.researchConversationInWorkspace=c=>!c.primaryProjectID;
+ let choices=0,sends=0;
+ Object.assign(f.context,{chooseProjectForSaving:async()=>{choices++;},postResearchWithProgress:async()=>{sends++;}});
+ await f.context.renderResearchV2Pane('utility:analysis',{available:true});
+ assert(!('projectControl' in f.options),'The workspace owns the project; the view cannot reassign it.');
+ f.options.onDraft('Keep this unsent historical follow-up');
+ const disposed=f.calls.disposed,requests=f.calls.requests.length;
+ await f.options.onNew();
+ assert.equal(choices,1);assert.equal(f.calls.requests.length,requests);
+ assert.equal(f.calls.disposed,disposed,'Choosing a Project cannot dispose the current view prematurely.');
+ await assert.rejects(f.options.onSend({question:'Keep this unsent historical follow-up',requestID:'unassigned'}),/Open a Project/);
+ assert.equal(sends,0,'An unassigned conversation cannot start a paid answer.');
+ assert.equal(f.context.researchNewChatDrafts.get('followup:a'),'Keep this unsent historical follow-up');
+}
+{
+ const f=harness();let notice='';
+ f.context.showWebNotice=async(_title,message)=>{notice=message;};
+ await f.context.renderResearchV2Pane('utility:analysis',{available:true});
+ f.options.onDraft('Preserve this draft');const disposed=f.calls.disposed;
+ f.context.postResearch=async()=>{throw Error('Project sync unavailable');};
+ await f.options.onNew();
+ assert.equal(f.calls.disposed,disposed);assert.equal(notice,'Project sync unavailable');
+ assert.equal(f.context.researchNewChatDrafts.get('followup:a'),'Preserve this draft');
+}
+{
+ const f=harness();f.conversations.a.primaryProjectID='another-project';
+ await f.context.renderResearchV2Pane('utility:analysis',{available:true});
+ assert.equal(f.options,undefined,'Restoring a stale pane must not reveal another project’s conversation.');
+}
+console.log('Workspace Project ownership passed: automatic creation scope, no selector, preserved historical answers/drafts, and no unassigned paid calls.');

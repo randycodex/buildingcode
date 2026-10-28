@@ -1,9 +1,9 @@
 import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=14";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=15";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-answer-no-background-v1416";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-workspace-project-v1417";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-answer-no-background-v1416";
+} from "./offline-storage.js?v=20261027-research-workspace-project-v1417";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -16761,7 +16761,7 @@ function readerSectionResearchSelection(sectionWrapper, passageElement = section
     end: normalizedPassageAnchorText(selectedText).length
   };
   const panel = sectionWrapper.closest(".workspace-panel");
-  const projectID = researchCreationProjectID(selectedOpenProjectID() || panel?.dataset.projectId);
+  const projectID = researchCreationProjectID();
   return {
     ...passage,
     passages: [passage],
@@ -23267,12 +23267,13 @@ function researchWorkspaceProjectID() {
   return project ? String(projectDetailKey(project) || "").trim() : "";
 }
 
-function researchCreationProjectID(requestedProjectID = "") {
+function researchCreationProjectID() {
   const projectID = researchWorkspaceProjectID();
   if (!projectID && activeWorkspaceRecord()?.projectID) {
     throw new Error("The workspace’s project is still loading. Try again once its project context is available.");
   }
-  return projectID || String(requestedProjectID || "").trim();
+  if (!projectID) throw new Error("Choose a Project from Projects before starting a Research conversation.");
+  return projectID;
 }
 
 function researchConversationInWorkspace(conversation, projectID = researchWorkspaceProjectID()) {
@@ -23292,7 +23293,7 @@ async function postResearch(path, values = {}) {
   if(path === "/research/conversations/get" && hasCapability("research"))await researchV2Rollout.refresh();
   if (["/research/conversations/create", "/research/conversations/get"].includes(path) && !(researchV2Enabled() && path.endsWith("/get"))) values = { ...values, analysisMode: "conversation_only" };
   if (path === "/research/conversations/create") {
-    values = { ...values, projectID: researchCreationProjectID(values.projectID) };
+    values = { ...values, projectID: researchCreationProjectID() };
     if (values.projectID) await ensureResearchProjectSynced(values.projectID, account);
     if (creationWorkspaceID !== activeWorkspaceID) throw codeQuestionContextChangedError();
   }
@@ -26068,6 +26069,9 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       content.replaceChildren(notice,original);return panel;
     }
     let conversation = fetched?.conversation || null;
+    if (conversation && !researchConversationInWorkspace(conversation)) {
+      throw new Error("Open this conversation in its project workspace. Its project assignment has not changed.");
+    }
     if (conversation) {
       if(conversation.primaryProjectID)panel.dataset.projectId=conversation.primaryProjectID;
       if (instance) supplementalResearchConversations.set(conversation.id, conversation);
@@ -26126,31 +26130,28 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       return (result.answer?.evidence || []).map(source => ({...source,codeVersion:source.sourceLibraryVersion,codePrefix:source.codeBook,selectedText:source.passageText}));
     };
     let historyCursor = listed.nextCursor;
-    const projectControl = conversation ? createResearchProjectSelect({value:conversation.primaryProjectID || "",unassignedLabel:"Unassigned",ariaLabel:"Project for this Research conversation"}) : null;
-    if(projectControl){
-      projectControl.title = "Organizes this conversation. Project facts are included only when explicitly attached.";
-      projectControl.addEventListener("change",async()=>{const before=conversation.primaryProjectID || "";projectControl.disabled=true;
-        try{const result=await assignResearchConversationProject(conversation,projectControl.value,{warningContainer:panel,passagesOnly:true});
-          if(result&&current()){await refreshResearchProjectAssignmentConsumers([before,projectControl.value]);await publish(result);}}
-        catch(error){if(current())await showWebNotice("Project not changed",error.message);}
-        finally{if(projectControl.isConnected){projectControl.disabled=false;projectControl.value=before;}}
-      });
-    }
     const railWidthKey = `permitext:research-question-width:${activeAccount()?.userID || "public"}:${workspaceID}:${paneID}`;
     view = createResearchV2View({ conversation,revealAnswerID:retained.revealAnswerID,
       railWidthStore:{read:()=>localStorage.getItem(railWidthKey),write:width=>{if(ownsPanel())localStorage.setItem(railWidthKey,String(width));}},
       history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
-      projectControl,hasMore:listed.hasMore,
+      hasMore:listed.hasMore,
       onOriginal:()=>{const url=new URL(location.href);url.searchParams.set("research","legacy");location.assign(url.href);},
       onLoadMore:async()=>{const page=await postResearch("/research/conversations/list",{limit:30,projectID:researchWorkspaceProjectID() || "",cursor:historyCursor});
         if(current()){historyCursor=page.nextCursor;listed.nextCursor=page.nextCursor;listed.hasMore=page.hasMore;
-          listed.conversations=[...listed.conversations,...(page.conversations||[])];}return page;},
+          listed.conversations=[...listed.conversations,...(page.conversations||[])];}
+        return {...page,conversations:(page.conversations||[]).filter(item=>researchConversationInWorkspace(item))};},
       renderAnswerActions:message=>renderResearchNotebookHandoff(conversation,message,{linkForReport:true}),
       draftKey,initialDraft:draft(), onDraft:saveDraft, isCurrent:current,
       requestStore:{ read:() => { try { return JSON.parse(sessionStorage.getItem(recoveryKey)); } catch { return null; } },
         write:value => { if (value) sessionStorage.setItem(recoveryKey, JSON.stringify(value)); else sessionStorage.removeItem(recoveryKey); } },
-      onNew:async () => { view.dispose(); const result = await postResearch("/research/conversations/create", {projectID:researchWorkspaceProjectID() || null,analysisMode:"conversation_only",requestID:crypto.randomUUID()}); await publish(result); },
+      onNew:async () => {
+        try {
+          if (!researchWorkspaceProjectID()) { await chooseProjectForSaving(); return; }
+          const result = await postResearch("/research/conversations/create", {projectID:researchWorkspaceProjectID(),analysisMode:"conversation_only",requestID:crypto.randomUUID()});
+          await publish(result);
+        } catch(error) { if(current())await showWebNotice("Could not start Research",error.message); }
+      },
       onOpen:async id => {if(id===conversation?.id)return;try {await open(id);}catch(error){if(current())await showWebNotice("Could not open Research",error.message);}},
       onBrowse:() => openReaderFromToolbar(panel),
       onOpenReader:async source => {
@@ -26185,6 +26186,9 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       onRemove:async source => publish(await postResearch("/research/conversations/evidence", {conversationID:conversation.id,
         action:"remove",sourceID:source.id,expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)})),
       onSend:async ({question,requestID,signal,onProgress}) => {
+        if (!researchWorkspaceProjectID() || !researchConversationInWorkspace(conversation)) {
+          throw new Error("Open a Project and start a conversation there to continue Research. This saved conversation and its answers are preserved.");
+        }
         if(retryingRequestID===requestID){const fresh=await postResearch("/research/conversations/get",{conversationID:conversation.id});if(!current())return;conversation=researchV2RetryContext(conversation,fresh.conversation,requestID);}
         let result;
         try{result = await postResearchWithProgress({conversationID:conversation.id,question,requestID,researchEngine:"v2",
@@ -28713,7 +28717,7 @@ function selectedReaderResearchPassages() {
   });
   if (!passages.length) return null;
   return { passages, originSurface: "reader", originPaneID: panel.dataset.paneId || "",
-    projectID: researchCreationProjectID(selectedOpenProjectID() || panel.dataset.projectId) };
+    projectID: researchCreationProjectID() };
 }
 
 const readerSelectionResearchAction = document.createElement("button");
@@ -28803,7 +28807,7 @@ function preservePendingResearchSelection(selection, kind, conversationID = "") 
   return writePendingResearchIntent(sessionStorage, {
     kind,
     workspaceID: activeWorkspaceID,
-    projectID: researchCreationProjectID(selection?.projectID),
+    projectID: researchCreationProjectID(),
     conversationID,
     originPaneID: selection?.originPaneID || "",
     originSurface: selection?.originSurface || "reader",

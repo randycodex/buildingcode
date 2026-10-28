@@ -59,7 +59,6 @@ export function createResearchV2View(options) {
   appendQuestions(history);
   if(!history.length)list.append(node('li','rv2-empty-history','Your questions will appear here.'));
   rail.append(railHead);
-  if(options.projectControl)rail.append(options.projectControl);
   rail.append(list);
   if(options.onOriginal)rail.append(action("Original Research",options.onOriginal,"rv2-text-action"));
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
