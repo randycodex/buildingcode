@@ -2,7 +2,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=12";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-v2-v1397";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261028-empty-workspace-v1398";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -153,7 +153,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-research-v2-v1397";
+} from "./offline-storage.js?v=20261028-empty-workspace-v1398";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2297,7 +2297,8 @@ async function createNewWorkspace() {
     return;
   }
   if (!(await confirmWorkspaceTransition())) return;
-  showProjectCreateSheet(track, null, { folderType: "project", workspaceProject: true,
+  const createHost = document.querySelector(".workspace-shell.has-no-workspace") || track;
+  showProjectCreateSheet(createHost, null, { folderType: "project", workspaceProject: true,
     onCreated: async (project) => {
       reconcileProjectWorkspaces();
       const syncedProject = activeFolderRecords(currentContentSummary().projects || []).find((item) => projectDetailMatches(item, project)) || project;
@@ -2682,6 +2683,14 @@ function focusActiveWorkspaceTab() {
 
 function renderWorkspaceTabs() {
   renderProjectUpdateBadge();
+  const shell = document.querySelector(".workspace-shell");
+  const empty = !detachedProjectWindow && visibleWorkspaceRecords().length === 0;
+  shell?.classList.toggle("has-no-workspace", empty);
+  const emptyState = shell?.querySelector(".workspace-add-empty");
+  if (emptyState) {
+    emptyState.hidden = !empty;
+    emptyState.querySelector("button").onclick = () => { void createNewWorkspace(); };
+  }
   const container = workspaceActionsButton?.closest(".topbar-workspaces");
   if (!workspaceActionsButton || !container) return;
   container.hidden = detachedProjectWindow;
