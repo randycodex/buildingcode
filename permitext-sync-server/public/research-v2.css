@@ -25,7 +25,9 @@
 .rv2-answer{background:var(--surface-muted);border-radius:18px;padding:16px 19px;margin:0 0 25px;max-width:680px;white-space:pre-wrap}
 .rv2-answer-entry{max-width:680px;margin:0 0 25px}
 .rv2-answer-entry>.rv2-answer{margin-bottom:0}
-.rv2-answer-time{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;margin-top:5px;padding:0 2px;color:var(--text-secondary);font-size:11px;line-height:1.4}
+.rv2-answer-time{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;margin-top:5px;padding:0 2px;color:var(--text-secondary);font-size:12px;line-height:1.4}
+/* Keep answer timing smaller than the workspace typography override. */
+#panel-track .research-v2 .rv2-answer-time,#panel-track .research-v2 .rv2-answer-time>*{font-size:12px!important}
 .rv2-answer p{margin:0 0 13px}.rv2-answer p:last-child{margin-bottom:0}
 .rv2-answer-gaps{margin-top:18px;white-space:normal;font-size:13px}
 .rv2-answer-gaps h4{font-size:12px;font-weight:500;color:var(--text-secondary);margin:12px 0 5px}
