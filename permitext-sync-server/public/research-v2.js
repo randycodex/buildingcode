@@ -41,13 +41,11 @@ export function researchV2RetryContext(previous,next,requestID){
 }
 
 export function createResearchV2View(options) {
-  const { conversation, history = [], initialDraft = '', onDraft, onNew, onOpen, onSend,
+  const { conversation, history = [], initialDraft = '', onDraft, onOpen, onSend,
     onBrowse, onFind, onReview, onInclude, onRemove, onCitation, onSnapshot,
     isCurrent = () => true, onStatus } = options;
   const root=node('section','research-v2');root.setAttribute('aria-label','Research');
   const rail=node('aside','rv2-rail');rail.setAttribute('aria-label','Numbered research questions');
-  const railHead=node('div','rv2-rail-head');railHead.append(node('span','rv2-label','Questions'),action('+',()=>onNew(),'rv2-new'));
-  railHead.lastChild.setAttribute('aria-label','New research question');
   const list=node('ol','rv2-questions');
   const knownQuestions=new Set();
   function appendQuestions(items){items.forEach(item=>{
@@ -58,7 +56,6 @@ export function createResearchV2View(options) {
   });}
   appendQuestions(history);
   if(!history.length)list.append(node('li','rv2-empty-history','Your questions will appear here.'));
-  rail.append(railHead);
   rail.append(list);
   if(options.onOriginal)rail.append(action("Original Research",options.onOriginal,"rv2-text-action"));
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}

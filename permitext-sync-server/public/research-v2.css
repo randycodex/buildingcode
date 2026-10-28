@@ -11,9 +11,6 @@
 .rv2-rail-divider::after{content:"";position:absolute;inset:0 -6px;cursor:col-resize}
 .rv2-rail-divider:focus-visible{outline:0;background:var(--text-secondary)}
 .research-v2.is-question-rail-resizing,.research-v2.is-question-rail-resizing *{cursor:col-resize!important;user-select:none}
-.rv2-rail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding:0 6px}
-.rv2-label{font-size:12px;color:var(--text-secondary)}
-.research-v2 .rv2-new{font-size:22px;padding:0 9px}
 .rv2-questions{padding-left:24px;margin:0;list-style:decimal;color:var(--text-secondary)}
 .rv2-questions li{padding:0 0 9px 0}
 .research-v2 .rv2-question-link{display:inline-block;width:100%;font-size:13px;box-sizing:border-box;min-width:0;overflow-wrap:normal;vertical-align:middle;color:var(--text-primary)}
