@@ -4,7 +4,7 @@ import {createResearchV2View, researchAnswerText, researchReviewLabel, passageCh
 // Minimal DOM for exercising the real asynchronous view handlers, without a
 // provider or browser dependency. Layout is verified separately in the browser.
 class Element {
-  constructor(tag){this.tagName=tag;this.children=[];this.handlers={};this.attributes={};this.dataset={};this.className='';this.isConnected=true;this.hidden=false;this.value='';}
+  constructor(tag){this.tagName=tag;this.children=[];this.handlers={};this.attributes={};this.dataset={};this.className='';this.isConnected=true;this.hidden=false;this.value='';this.style={setProperty(){}};}
   focus(){this.focused=true;}
   get lastChild(){return this.children.at(-1);}
   append(...items){for(const item of items){item.parent=this;this.children.push(item);}}
@@ -12,6 +12,7 @@ class Element {
   setAttribute(key,value){this.attributes[key]=value;}
   removeAttribute(key){delete this.attributes[key];}
   addEventListener(name,fn){this.handlers[name]=fn;}
+  removeEventListener(name){delete this.handlers[name];}
   remove(){this.parent.children=this.parent.children.filter(x=>x!==this);}
   get classList(){return {toggle:(name,on)=>{const set=new Set(this.className.split(' '));const active=on??!set.has(name);active?set.add(name):set.delete(name);this.className=[...set].join(' ');return active;}};}
   querySelector(selector){return all(this).find(x=>x!==this&&x.className.split(' ').includes(selector.slice(1)))||null;}

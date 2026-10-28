@@ -1,9 +1,9 @@
 import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=13";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=14";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-assistant-divider-v1414";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-question-rail-v1415";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-assistant-divider-v1414";
+} from "./offline-storage.js?v=20261027-question-rail-v1415";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -26136,7 +26136,9 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
         finally{if(projectControl.isConnected){projectControl.disabled=false;projectControl.value=before;}}
       });
     }
+    const railWidthKey = `permitext:research-question-width:${activeAccount()?.userID || "public"}:${workspaceID}:${paneID}`;
     view = createResearchV2View({ conversation,revealAnswerID:retained.revealAnswerID,
+      railWidthStore:{read:()=>localStorage.getItem(railWidthKey),write:width=>{if(ownsPanel())localStorage.setItem(railWidthKey,String(width));}},
       history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
       projectControl,hasMore:listed.hasMore,

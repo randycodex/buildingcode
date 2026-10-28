@@ -6,7 +6,7 @@ class Element {
  set textContent(value){this._text=value;}get textContent(){return this._text+this.children.map(child=>child.textContent).join('');}
  get lastChild(){return this.children.at(-1);}append(...items){for(const item of items){item.parent=this;this.children.push(item);}}
  replaceChildren(...items){this._text='';this.children=[];this.append(...items);}setAttribute(k,v){this.attributes[k]=v;}removeAttribute(k){delete this.attributes[k];}
- addEventListener(k,v){this.handlers[k]=v;}focus(){}
+ addEventListener(k,v){this.handlers[k]=v;}removeEventListener(k){delete this.handlers[k];}focus(){}
  get classList(){const values=()=>new Set(this.className.split(/\s+/).filter(Boolean));return{add:(...v)=>{this.className=[...new Set([...values(),...v])].join(' ');},remove:(...v)=>{this.className=[...values()].filter(x=>!v.includes(x)).join(' ');},contains:v=>values().has(v),toggle:(v,force)=>{const set=values(),active=force??!set.has(v);active?set.add(v):set.delete(v);this.className=[...set].join(' ');return active;}};}
  querySelector(selector){const matches=all(this).filter(n=>n!==this&&(selector.startsWith('.')?n.classList.contains(selector.slice(1)):n.tagName===selector.replace(':last-of-type','')));return selector.endsWith(':last-of-type')?matches.at(-1):matches[0]||null;}
 }

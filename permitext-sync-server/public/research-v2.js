@@ -1,3 +1,4 @@
+import {attachResearchQuestionRail} from "./research-question-rail.js?v=1";
 import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
 // A small view with injected workspace/Reader adapters. No provider calls or
 // evidence selection policy live in the presentation module.
@@ -62,6 +63,8 @@ export function createResearchV2View(options) {
   rail.append(list);
   if(options.onOriginal)rail.append(action("Original Research",options.onOriginal,"rv2-text-action"));
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
+  const divider=node('div','rv2-rail-divider');
+  const questionRail=attachResearchQuestionRail({root,divider,widthStore:options.railWidthStore});
   const chat=node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');
   const mobileHistory=action('Questions',()=>{const expanded=root.classList.toggle('rv2-show-history');mobileHistory.setAttribute('aria-expanded',String(expanded));},'rv2-mobile-history');
   mobileHistory.setAttribute('aria-expanded','false');
@@ -156,7 +159,7 @@ export function createResearchV2View(options) {
   const detail=node('section','rv2-detail');detail.hidden=true;detail.setAttribute('aria-label','Passage details');
   const detailBody=node('div','rv2-detail-body');
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
-  chat.append(mobileHistory,thread,detail,status,composer);root.append(rail,chat);
+  chat.append(mobileHistory,thread,detail,status,composer);root.append(rail,divider,chat);
   function update(){input.disabled=busy;attach.disabled=busy||includeBusy||revealBusy;send.disabled=busy||includeBusy||revealBusy||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy));}
   function showDetail(){thread.hidden=true;detail.hidden=false;detailBody.replaceChildren();return detailBody;}
   function showFactEntry(fact,question){
@@ -256,5 +259,5 @@ export function createResearchV2View(options) {
     initialScroll.disconnect();}});initialScroll.observe(thread);}
   if(revealEntry)revealController=revealResearchAnswer({entry:revealEntry,tokens:revealTokens,isCurrent,
     onDone:()=>{revealBusy=false;update();}});
-  return {element:root,dispose(){generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();},focus(){input.focus({preventScroll:true});}};
+  return {element:root,dispose(){generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();},focus(){input.focus({preventScroll:true});}};
 }
