@@ -12,7 +12,13 @@ function actual(name) {
 }
 const deferred = () => { let resolve, reject; const promise = new Promise((a,b) => { resolve=a; reject=b; }); return { promise, resolve, reject }; };
 const tick = async () => { for (let i=0;i<8;i++) await Promise.resolve(); };
-const track = { children: [], scrollLeft: 127, querySelectorAll() { return this.children; } };
+let trackScrollLeft = 127, scrollWrites = 0;
+const track = { children: [],
+  get scrollLeft() { return trackScrollLeft; },
+  set scrollLeft(value) { scrollWrites++; trackScrollLeft = value; },
+  querySelectorAll() { return this.children; }
+};
+const reveals = [];
 function pane(id, loading=false) {
   const status = { textContent: "Loading" }, retry = { hidden: true }, classes = new Set();
   return {
@@ -58,7 +64,8 @@ const sandbox = vm.createContext({
   createWorkspacePaneHydrator, Map, Set, JSON, Promise, track, state: {pinnedPaneID: "report"},
   get workspaceRenderGeneration() { return generation; },
   activeWorkspaceID: "workspace", captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
-  pendingWorkspacePaneRevealID: null, scrollPaneIntoView() {},
+  pendingWorkspacePaneRevealID: null, pendingWorkspacePaneRevealBehavior: "smooth",
+  scrollPaneIntoView(id, behavior) { reveals.push({id, behavior}); sandbox.pendingWorkspacePaneRevealID = ""; },
   workspacePaneDescriptors: () => descriptors.map(item => ({...item})), hasCapability: () => capability, isProAccount: () => capability,
   document: { createElement: element }, circleXIconSVG: () => "",
   appendPaneSequence(panes) {
@@ -90,7 +97,10 @@ assert.equal((loadingIcon.innerHTML.match(/<rect /g) || []).length, 12);
 assert.equal(loadingIcon.querySelector('.sr-only').textContent, 'Loading report…');
 const searchReady=sandbox.whenReady("search");
 let reportReady=false; const reportTarget=sandbox.whenReady("report").then(value=>{reportReady=value;return value;});
+sandbox.pendingWorkspacePaneRevealID = "search";
 await tick();
+assert.deepEqual(reveals, [{id: "search", behavior: "smooth"}], "Search becoming ready continues the requested smooth opening scroll.");
+assert.equal(scrollWrites, 0, "Hydration must not cancel scrolling by assigning the same track position.");
 assert.equal(await searchReady,true);
 assert.equal(reportReady,false,"Target readiness does not wait for unrelated panes.");
 assert.equal(track.children[2],search,"Search publishes while Report is held.");
@@ -100,13 +110,18 @@ assert.equal(appendCalls,1,"Completion must not republish the whole pane sequenc
 assert.equal(track.scrollLeft,127);
 const report=pane("report"); slow.resolve(report); await first; await sandbox.hydrator().settled(); assert.equal(await reportTarget,true);
 assert.equal(track.children[1],report); assert.equal(appendCalls,1);
+assert.equal(reveals.length, 1, "An unrelated column completion cannot take over the opening scroll.");
+assert.equal(scrollWrites, 0, "An unrelated column completion cannot stop the active smooth scroll.");
 assert.equal(report.classList.contains("is-pinned"),true,"Async hydration preserves the stored pin on the replacement pane");
 assert.equal(pinnedDividerRefreshes,1,"Only pinned hydration reconnects its width observer/divider");
 
 // Explicit refresh creates a fresh attempt even when persistent content identity matches.
 const refreshed=pane("search"); descriptors=[descriptor("notebook",()=>editor),descriptor("report",()=>report),descriptor("search",()=>refreshed)];
 generation++;
+sandbox.pendingWorkspacePaneRevealID = "search";
+sandbox.pendingWorkspacePaneRevealBehavior = "auto";
 await mountAndSettle(context(),{refreshPaneIDs:["search"]});
+assert.deepEqual(reveals.at(-1), {id: "search", behavior: "auto"}, "Explicit instant positioning also retains its requested behavior after hydration.");
 assert.equal(track.children[2],refreshed); assert.equal(track.children[0],editor);
 
 // Settings refresh restores its previous internal scroll without moving neighbors.

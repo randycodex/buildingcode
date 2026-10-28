@@ -2,7 +2,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=13";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-answer-time-v1407";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-search-reveal-v1408";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -154,7 +154,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-answer-time-v1407";
+} from "./offline-storage.js?v=20261027-search-reveal-v1408";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -44931,6 +44931,7 @@ function appendPaneSequence(panes) {
 }
 
 let pendingWorkspacePaneRevealID = "";
+let pendingWorkspacePaneRevealBehavior = "smooth";
 
 function scrollPaneIntoView(paneID, behavior = "smooth") {
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
@@ -44941,6 +44942,7 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
     saveWorkspaceState();
   }
   pendingWorkspacePaneRevealID = pane.dataset.workspacePaneLoading ? paneID : "";
+  pendingWorkspacePaneRevealBehavior = behavior;
   if (paneIsCollapsed(paneID)) setPaneCollapsed(pane, false);
   const paneRect = pane.getBoundingClientRect();
   const trackRect = track.getBoundingClientRect();
@@ -48678,12 +48680,13 @@ function getWorkspacePaneHydrator() {
         restoreReaderScrollPositions(new Map([[job.id, job.descriptor.scrollPosition]]));
       }
       if (job.descriptor.scrollTop != null) pane.scrollTop = job.descriptor.scrollTop;
-      track.scrollLeft = scrollLeft;
+      // Even a same-value assignment cancels an in-flight smooth scroll.
+      if (track.scrollLeft !== scrollLeft) track.scrollLeft = scrollLeft;
       notifyWorkspaceLayoutChange();
-      // Hydration can change column widths and cancel the shell's smooth scroll.
-      // Finish the explicit open action against the final column geometry.
+      // Retarget the opening scroll to the ready column's final geometry,
+      // preserving the caller's motion instead of snapping to the destination.
       if (pendingWorkspacePaneRevealID === job.id) {
-        scrollPaneIntoView(job.id, "auto");
+        scrollPaneIntoView(job.id, pendingWorkspacePaneRevealBehavior);
       }
       finishWorkspacePaneReady(shell, true);
     },
