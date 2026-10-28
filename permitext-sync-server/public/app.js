@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=13";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-reader-shortcuts-v1412";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-reader-toolbar-only-v1413";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-reader-shortcuts-v1412";
+} from "./offline-storage.js?v=20261027-reader-toolbar-only-v1413";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -5275,7 +5275,6 @@ function syncWorkflowNavigation() {
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   updateWorkspaceLayoutControls();
   syncResearchColumnLayout();
-  schedulePaneDividerAddControls();
   syncNotebookNoteTabs();
   if (view === 'notebook') void ensureNotebookTabCatalog();
 }
@@ -8414,17 +8413,9 @@ function openReaderCodePicker(anchor, onSelect) {
   menu.append(manage);
   document.body.append(menu);
   const bounds = anchor.getBoundingClientRect();
-  const dividerPicker = anchor.classList.contains("pane-divider-add");
-  const preferredLeft = dividerPicker ? bounds.left + (bounds.width - menu.offsetWidth) / 2 : bounds.left;
-  menu.style.left = `${Math.max(8, Math.min(preferredLeft, window.innerWidth - menu.offsetWidth - 8))}px`;
+  menu.style.left = `${Math.max(8, Math.min(bounds.left, window.innerWidth - menu.offsetWidth - 8))}px`;
   menu.style.top = `${bounds.bottom + 8}px`;
   menu.style.maxHeight = `${window.innerHeight - bounds.bottom - 24}px`;
-  if (dividerPicker) {
-    // A moved divider is a new location; do not leave a picker over the old one.
-    track.addEventListener("scroll", close, { passive: true, signal: controller.signal });
-    track.addEventListener("permitext:workspace-layout-change", close, { signal: controller.signal });
-    window.addEventListener("resize", close, { signal: controller.signal });
-  }
   document.addEventListener("pointerdown", (event) => {
     if (!menu.contains(event.target) && !anchor.contains(event.target)) close();
   }, { signal: controller.signal });
@@ -9569,14 +9560,8 @@ function syncReaderToolbarButton(button) {
   );
 }
 
-function syncReaderDividerButton(button) {
-  button.disabled = !isProAccount() && (state.readers || []).length >= 2;
-  button.title = button.disabled ? "Two Reader limit reached" : "Add Reader here";
-}
-
 function updateReaderPlanControls() {
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
-  document.querySelectorAll('.pane-divider-add').forEach(syncReaderDividerButton);
   collapseReadersButton.hidden = false;
   updateWorkspaceLayoutControls();
 }
@@ -9604,7 +9589,7 @@ function bindReaderToolbarButton(button) {
   button.addEventListener("click", () => void openReaderFromToolbar(button));
 }
 
-async function openReaderFromToolbar(button, { previousPaneID = "", nextPaneID = "" } = {}) {
+async function openReaderFromToolbar(button) {
   if (notifyProjectRequiredForColumn()) return false;
   if (!isProAccount() && state.readers.length >= 2) {
     enforceReaderPlanLimit();
@@ -9621,22 +9606,9 @@ async function openReaderFromToolbar(button, { previousPaneID = "", nextPaneID =
     if (!isCurrent() || workspaceColumnsRequireProject()) return;
     // Reserve a slot before asynchronous rendering, including late picker clicks.
     if (!isProAccount() && state.readers.length >= 2) return;
-    if (previousPaneID && nextPaneID) {
-      const visibleOrder = activePaneIDs().filter(workflowPaneIsVisible);
-      const previousIndex = visibleOrder.indexOf(previousPaneID);
-      // A picker left open during a column move/close cannot insert elsewhere.
-      if (previousIndex < 0 || visibleOrder[previousIndex + 1] !== nextPaneID) return;
-    }
     const reader = newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) });
     state.readers.push(reader);
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneIDForReader(reader), view);
-    if (previousPaneID && nextPaneID) {
-      const group = columnGroupForPane(previousPaneID);
-      if (group?.paneIDs.includes(nextPaneID)) {
-        group.paneIDs.splice(group.paneIDs.indexOf(previousPaneID) + 1, 0, paneIDForReader(reader));
-      }
-      placePaneAfter(previousPaneID, paneIDForReader(reader));
-    }
     saveWorkspaceState();
     await transitionWorkspace("utility");
     if (isCurrent()) scrollPaneIntoView(paneIDForReader(reader));
@@ -43240,60 +43212,6 @@ function refreshPaneDividerValue(divider) {
   }
 }
 
-let paneDividerAddPointer = null;
-let paneDividerAddFrame = 0;
-let paneDividerAddLayoutDirty = true;
-const paneDividerAddRevealRadius = 40;
-
-function positionPaneDividerAddControls() {
-  const toolbar = document.querySelector(".workflow-toolbar");
-  const toolbarBounds = toolbar?.getBoundingClientRect();
-  const shortcutBounds = document.querySelector(".reader-toolbar-tools")?.getBoundingClientRect();
-  const trackBounds = track.getBoundingClientRect();
-  const enabled = currentColumnWorkflowView() === "research" && toolbarBounds?.height > 0 && !track.inert && getComputedStyle(toolbar).visibility !== "hidden";
-  const pinned = track.querySelector(":scope > .workspace-panel.is-pinned:not(.is-workflow-hidden)");
-  const pinnedRight = pinned?.getBoundingClientRect().right || trackBounds.left;
-  track.querySelectorAll(":scope > .pane-divider").forEach(divider => {
-    const button = divider.querySelector(".pane-divider-add");
-    if (!button) { refreshPaneDividerValue(divider); return; }
-    const bounds = divider.getBoundingClientRect();
-    const x = bounds.left + bounds.width / 2;
-    const left = divider.classList.contains("is-pinned-divider") ? trackBounds.left : pinnedRight;
-    const y = toolbarBounds?.top + toolbarBounds?.height / 2;
-    const coversShortcuts = shortcutBounds?.height > 0 && x + 14 > shortcutBounds.left && x - 14 < shortcutBounds.right &&
-      y + 14 > shortcutBounds.top && y - 14 < shortcutBounds.bottom;
-    button.hidden = coversShortcuts || !enabled || !bounds.height || x < left + 14 || x > Math.min(trackBounds.right, window.innerWidth) - 14;
-    if (button.hidden) {
-      button._dividerAddCenter = null;
-      if (button.getAttribute("aria-expanded") === "true") document.querySelector(".reader-open-code-menu")?._close?.();
-      return;
-    }
-    button.style.left = `${x}px`;
-    button.style.top = `${y}px`;
-    button._dividerAddCenter = { x, y };
-  });
-}
-
-function revealNearbyPaneDividerAddControls() {
-  track.querySelectorAll(".pane-divider-add").forEach(button => {
-    const center = button._dividerAddCenter;
-    const nearby = Boolean(center && paneDividerAddPointer &&
-      Math.hypot(center.x - paneDividerAddPointer.x, center.y - paneDividerAddPointer.y) <= paneDividerAddRevealRadius);
-    button.classList.toggle("is-near-pointer", nearby);
-  });
-}
-
-function schedulePaneDividerAddControls(reposition = true) {
-  paneDividerAddLayoutDirty ||= reposition;
-  if (paneDividerAddFrame) return;
-  paneDividerAddFrame = requestAnimationFrame(() => {
-    paneDividerAddFrame = 0;
-    if (paneDividerAddLayoutDirty) positionPaneDividerAddControls();
-    paneDividerAddLayoutDirty = false;
-    revealNearbyPaneDividerAddControls();
-  });
-}
-
 function createDivider(previousPaneID, nextPaneID) {
   const isLeftEdge = !previousPaneID && Boolean(nextPaneID);
   const isRightEdge = Boolean(previousPaneID) && !nextPaneID;
@@ -43323,25 +43241,6 @@ function createDivider(previousPaneID, nextPaneID) {
     divider.setAttribute("aria-valuemin", String(Math.round(minimumPaneWidthForID(edgePaneID))));
     const maximumWidth = maximumPaneWidthForID(edgePaneID);
     if (Number.isFinite(maximumWidth)) divider.setAttribute("aria-valuemax", String(maximumWidth));
-  }
-  if (previousPaneID && nextPaneID) {
-    const add = document.createElement("button");
-    add.type = "button";
-    add.className = "pane-divider-add";
-    add.textContent = "+";
-    add.setAttribute("aria-label", "Add Reader here");
-    add.setAttribute("aria-haspopup", "dialog");
-    add.setAttribute("aria-expanded", "false");
-    syncReaderDividerButton(add);
-    // The picker control must never start a resize or reset column widths.
-    ["pointerdown", "dblclick", "keydown"].forEach(type => {
-      add.addEventListener(type, event => event.stopPropagation());
-    });
-    add.addEventListener("click", event => {
-      event.stopPropagation();
-      void openReaderFromToolbar(add, { previousPaneID, nextPaneID });
-    });
-    divider.append(add);
   }
   divider.addEventListener("focus", () => refreshPaneDividerValue(divider));
   divider.addEventListener("keydown", (event) => {
@@ -49678,18 +49577,7 @@ async function start() {
   window.addEventListener("beforeunload", saveWorkspaceResumeForRefresh);
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
-  track.addEventListener("scroll", () => schedulePaneDividerAddControls(), { passive: true });
-  track.addEventListener("permitext:workspace-layout-change", () => schedulePaneDividerAddControls());
   track.addEventListener("permitext:workspace-layout-change", () => syncResearchColumnLayout());
-  window.addEventListener("resize", () => schedulePaneDividerAddControls(), { passive: true });
-  document.addEventListener("pointermove", event => {
-    paneDividerAddPointer = event.pointerType === "touch" ? null : { x: event.clientX, y: event.clientY };
-    schedulePaneDividerAddControls(false);
-  }, { passive: true });
-  document.addEventListener("pointerleave", () => {
-    paneDividerAddPointer = null;
-    schedulePaneDividerAddControls(false);
-  });
   bindHorizontalWheelScroll(track);
   if (detachedProjectWindow) {
     if (!detachedProject) throw new Error("This detached Workboard no longer has a project session.");

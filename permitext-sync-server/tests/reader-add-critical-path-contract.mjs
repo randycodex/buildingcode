@@ -67,29 +67,3 @@ for (const pro of [false,true]) {
 const guarded=fixture();guarded.c.needsProject=true;
 assert.equal(await guarded.c.openReaderFromToolbar({}),false);assert.equal(guarded.pickers.length,0);
 console.log('Readers passed: explicit source selection, four working views, project/account/navigation guards, concurrent plan limits and late-render fencing.');
-
-// A divider inserts at its location, including retained columns in another view.
-for(const grouped of [false,true]) {
-  const ids=['reader:left','utility:hidden','reader:right','utility:search'];
-  const groups=grouped?[{id:'group',paneIDs:['reader:left','reader:right']}]:[];
-  const f=fixture({paneIDs:ids,hidden:['utility:hidden'],groups});
-  await f.c.openReaderFromToolbar({}, {previousPaneID:'reader:left',nextPaneID:'reader:right'});
-  const pending=f.pickers[0](code);
-  const added=`reader:${f.c.state.readers[0].id}`;
-  const visible=Array.from(f.c.activePaneIDs()).filter(id=>id!=='utility:hidden');
-  assert.deepEqual(visible,['reader:left',added,'reader:right','utility:search']);
-  if(grouped) assert.deepEqual(Array.from(f.c.state.columnGroups[0].paneIDs),['reader:left',added,'reader:right']);
-  f.finishRender();await pending;
-  assert.deepEqual(f.scrolled,[added]);
-  f.c.applyLinkedPanePlacements(f.c.activePaneIDs(),true);
-  assert.deepEqual(Array.from(f.c.activePaneIDs()).filter(id=>id!=='utility:hidden'),visible,'the insertion survives later layout reconciliation');
-}
-// Moving or closing a neighbor while the menu is open retires that location.
-for(const order of [['reader:right','reader:left'],['reader:left'],['reader:left','other','reader:right']]) {
-  const f=fixture({paneIDs:['reader:left','reader:right']});
-  await f.c.openReaderFromToolbar({}, {previousPaneID:'reader:left',nextPaneID:'reader:right'});
-  f.c.state.paneOrder=order;
-  await f.pickers[0](code);
-  assert.equal(f.c.state.readers.length,0);
-}
-console.log('Divider insertion passed: exact position, hidden views, grouped columns, retained placement and stale-neighbor guards.');

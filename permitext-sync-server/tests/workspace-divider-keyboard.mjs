@@ -15,7 +15,6 @@ const panes = new Map(['left', 'right'].map(id => [id, {dataset:{paneId:id}, wid
 const state = {paneWeights:{}};
 let saves=0, layouts=0, indicators=0, expansionRestores=0;
 let restoreWidths=null;
-const readerPickers=[];
 const track = {scrollLeft:0, querySelectorAll(){return [...panes.values()];}, querySelector(selector){return panes.get(selector.match(/data-pane-id="([^"]+)"/)?.[1]);}};
 const context = vm.createContext({state, track, adjacentColumnWidths, workspaceColumnExpansion:{restore(){expansionRestores++;restoreWidths?.();}}, CSS:{escape:x=>x},isProAccount:()=>false,
   paneIsCollapsed:id=>collapsed.has(id), assistantHistoryOnlyPane:id=>historyOnly.has(id), defaultPaneWidthForID:()=>600,
@@ -23,24 +22,12 @@ const context = vm.createContext({state, track, adjacentColumnWidths, workspaceC
   applyPaneWeight:(pane,id)=>{pane.width=state.paneWeights[id];},
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
   scheduleVisibleReaderScrollIndicatorUpdates:()=>indicators++,
-  openReaderFromToolbar:(button,location)=>readerPickers.push({button,location}),
   document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, children:[], classList:{add(){},toggle(){}}, append(child){this.children.push(child);},
     setAttribute(k,v){this.attrs[k]=v;}, removeAttribute(k){delete this.attrs[k];}, addEventListener(k,v){this.handlers[k]=v;}};}}
 });
-vm.runInContext(['syncReaderDividerButton','minimumPaneWidthForID','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
+vm.runInContext(['minimumPaneWidthForID','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
 const divider=context.createDivider('left','right');
-const add=divider.children[0];
-assert.equal(add.textContent,'+');
-assert.equal(add.attrs['aria-label'],'Add Reader here');
-assert.equal(add.attrs['aria-haspopup'],'dialog');
-for(const type of ['pointerdown','dblclick','keydown']) {
-  let stopped=false;add.handlers[type]({stopPropagation(){stopped=true;}});
-  assert.equal(stopped,true,`${type} on + must not resize/reset the divider`);
-}
-add.handlers.click({stopPropagation(){}});
-assert.equal(readerPickers.length,1);
-assert.equal(readerPickers[0].location.previousPaneID,'left');
-assert.equal(readerPickers[0].location.nextPaneID,'right');
+assert.equal(divider.children.length,0,'Column dividers only resize; Reader creation remains in the toolbar.');
 
 function press(handle,key,shiftKey=false){let prevented=false;handle.handlers.keydown({key,shiftKey,preventDefault(){prevented=true;}});return prevented;}
 function widths(){return [...panes.values()].map(p=>p.width);}
@@ -113,15 +100,6 @@ press(readerDivider,'ArrowRight');
 assert.equal(panes.get('reader:left').width,2624,'Arrow keys keep widening a Reader after its neighbor reaches the minimum');
 assert.equal(panes.get('reader:right').width,400);
 console.log('Reader keyboard resizing passed: unlimited growth, minimum widths, adjacent and outer edges, accessible bounds.');
-
-state.readers=[{id:'one'},{id:'two'}];
-context.syncReaderDividerButton(add);
-assert.equal(add.disabled,true,'Divider insertion observes the existing two-Reader free limit');
-assert.equal(add.title,'Two Reader limit reached');
-state.readers=[];
-context.syncReaderDividerButton(add);
-assert.equal(add.disabled,false);
-assert.equal(add.title,'Add Reader here');
 
 // Expanded and strip presentation sizes cannot become the resize bases.
 const restoredLeft=panes.get('left'), restoredRight=panes.get('right');
