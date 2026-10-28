@@ -1,3 +1,4 @@
+import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
 // A small view with injected workspace/Reader adapters. No provider calls or
 // evidence selection policy live in the presentation module.
 const node = (tag, className = '', text = '') => {
@@ -66,16 +67,24 @@ export function createResearchV2View(options) {
   mobileHistory.setAttribute('aria-expanded','false');
   const thread=node('div','rv2-thread');thread.setAttribute('aria-label','Conversation');
   const status=node('p','rv2-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.hidden=true;
-  let busy=false,controller=null,generation=0,lastRequest=options.requestStore?.read() || null,includeBusy=false,pendingBubble=null;
+  let busy=false,controller=null,generation=0,lastRequest=options.requestStore?.read() || null,includeBusy=false,pendingBubble=null,revealBusy=false,revealEntry=null,revealController=null;
+  const revealTokens=[];
   function notice(text,error=false){status.hidden=!text;status.textContent=text;status.classList.toggle('is-error',error);onStatus?.(text);}
   function valid(attempt){return attempt===generation&&isCurrent()&&root.isConnected;}
-  function paragraphText(parent,text,message){
+  function paragraphText(parent,text,message,{reveal=false}={}){
+    const appendText = value => {
+      if (!reveal) { parent.append(document.createTextNode(value)); return; }
+      for (const part of value.split(/(\s+)/).filter(Boolean)) {
+        if (/^\s+$/.test(part)) parent.append(document.createTextNode(part));
+        else { const word=node('span','rv2-reveal-token',part);parent.append(word);revealTokens.push(word); }
+      }
+    };
     const expression=/\[(S[1-9]\d*)\]/g;let offset=0;
     for(const match of text.matchAll(expression)){
-      parent.append(document.createTextNode(text.slice(offset,match.index)));
-      const cite=action(match[0],()=>void onCitation(message,match[1]),'rv2-citation');cite.setAttribute('aria-label',`Open citation ${match[1]}`);parent.append(cite);offset=match.index+match[0].length;
+      appendText(text.slice(offset,match.index));
+      const cite=action(match[0],()=>void onCitation(message,match[1]),'rv2-citation');cite.setAttribute('aria-label',`Open citation ${match[1]}`);if(reveal){cite.classList.add('rv2-reveal-token');revealTokens.push(cite);}parent.append(cite);offset=match.index+match[0].length;
     }
-    parent.append(document.createTextNode(text.slice(offset)));
+    appendText(text.slice(offset));
   }
   const messages=conversation?.messages||[];
   if(!messages.length){
@@ -91,7 +100,7 @@ export function createResearchV2View(options) {
     }else if(message.role==='assistant'){
       const bubble=node('article','rv2-answer');bubble.setAttribute('aria-label','Research answer');
       const text=researchAnswerText(message);
-      for(const paragraph of text.split(/\n\s*\n/)){const p=node('p');paragraphText(p,paragraph,message);bubble.append(p);}
+      for(const paragraph of text.split(/\n\s*\n/)){const p=node('p');paragraphText(p,paragraph,message,{reveal:Boolean(options.revealAnswerID&&message.id===options.revealAnswerID)});bubble.append(p);}
       const gapLists=[['Sources still needed',message.answer?.additionalEvidenceNeeded],['Project facts still needed',message.answer?.missingFacts]];
       if(gapLists.some(([,items])=>Array.isArray(items)&&items.some(item=>typeof item==='string'&&item.trim()))){
         const gaps=node('div','rv2-answer-gaps');gaps.setAttribute('aria-label','Unresolved information');
@@ -114,7 +123,10 @@ export function createResearchV2View(options) {
       const actions=options.renderAnswerActions?.(message);
       if(actions){const disclosure=node('details','rv2-saved-actions');disclosure.append(node('summary','','Save or share'),actions);footer.append(disclosure);}
       bubble.append(footer);
-      const entry=node('div','rv2-answer-entry');entry.append(bubble);
+      const entry=node('div','rv2-answer-entry');entry.dataset.answerId=message.id||'';entry.append(bubble);
+      if(options.revealAnswerID&&message.id===options.revealAnswerID){
+        revealEntry=entry;revealBusy=true;entry.setAttribute('aria-live','polite');entry.setAttribute('aria-atomic','true');
+      }
       const timing=researchAnswerTiming(message);
       if(timing){
         const stamp=node('div','rv2-answer-time');stamp.title=timing.description;stamp.setAttribute('aria-label',timing.description);
@@ -145,7 +157,7 @@ export function createResearchV2View(options) {
   const detailBody=node('div','rv2-detail-body');
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
   chat.append(mobileHistory,thread,detail,status,composer);root.append(rail,chat);
-  function update(){input.disabled=busy;attach.disabled=busy||includeBusy;send.disabled=busy||includeBusy||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy));}
+  function update(){input.disabled=busy;attach.disabled=busy||includeBusy||revealBusy;send.disabled=busy||includeBusy||revealBusy||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy));}
   function showDetail(){thread.hidden=true;detail.hidden=false;detailBody.replaceChildren();return detailBody;}
   function showFactEntry(fact,question){
     if(busy||includeBusy)return;const attempt=++generation,content=showDetail();
@@ -218,7 +230,7 @@ export function createResearchV2View(options) {
     }catch(error){if(valid(attempt))notice(error.message,true);}
   }
   async function sendQuestion(){
-    if(busy||includeBusy||!input.value.trim())return;
+    if(busy||includeBusy||revealBusy||!input.value.trim())return;
     if(!passageSources.length){await findPassages();return;}
     const question=input.value.trim();
     if(!lastRequest||lastRequest.question!==question)lastRequest={question,requestID:crypto.randomUUID()};
@@ -228,7 +240,7 @@ export function createResearchV2View(options) {
     pendingBubble?.remove();pendingBubble=node('div','rv2-user',question);thread.append(pendingBubble);thread.scrollTop=thread.scrollHeight;
     try{await onSend({...lastRequest,signal:controller.signal,onProgress:event=>{
       if(valid(attempt))notice(event.stage==='checking_citation_support'?'Checking the answer against your passages…':'Developing your answer…');
-    }});if(isCurrent()){onDraft('');lastRequest=null;options.requestStore?.write(null);}}
+    }});if(valid(attempt)){onDraft('');lastRequest=null;options.requestStore?.write(null);}}
     catch(error){if(valid(attempt)){pendingBubble?.remove();pendingBubble=null;thread.querySelector('.rv2-welcome')?.removeAttribute('hidden');notice(error.name==='AbortError'?'Stopped. Your draft and passages are retained.':error.message,true);}}
     finally{busy=false;controller=null;update();}
   }
@@ -238,6 +250,11 @@ export function createResearchV2View(options) {
   // The workspace can mount this pane after an animation frame has already
   // passed. Wait for its first real layout before revealing the latest answer.
   let initialScroll=null;
-  if(messages.length){initialScroll=new ResizeObserver(()=>{if(root.isConnected&&thread.clientHeight>0){thread.scrollTop=thread.scrollHeight;initialScroll.disconnect();}});initialScroll.observe(thread);}
-  return {element:root,dispose(){generation++;controller?.abort();initialScroll?.disconnect();},focus(){input.focus({preventScroll:true});}};
+  if(messages.length){initialScroll=new ResizeObserver(()=>{if(root.isConnected&&thread.clientHeight>0){
+    if(revealEntry)thread.scrollTop+=revealEntry.getBoundingClientRect().top-thread.getBoundingClientRect().top-70;
+    else thread.scrollTop=thread.scrollHeight;
+    initialScroll.disconnect();}});initialScroll.observe(thread);}
+  if(revealEntry)revealController=revealResearchAnswer({entry:revealEntry,tokens:revealTokens,isCurrent,
+    onDone:()=>{revealBusy=false;update();}});
+  return {element:root,dispose(){generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();},focus(){input.focus({preventScroll:true});}};
 }

@@ -24,7 +24,7 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1996";
+const shellCacheName = "permitext-pro-shell-v1998";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
@@ -89,15 +89,16 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261027-research-navigation-v1404",
+  "/web/web-client-version.js?v=20261027-answer-presentation-v1406",
   "/web/web-app-update.js?v=2",
   "/web/research-delete-controls.js?v=2",
   "/web/research-related-provisions.js?v=3",
-  "/web/research-v2.js?v=12",
+  "/web/research-v2.js?v=13",
+  "/web/research-answer-reveal.js?v=1",
   "/web/research-reader-target.js?v=3",
   "/web/research-discovery-query.js?v=2",
   "/web/research-v2-rollout.js?v=1",
-  "/web/research-v2.css?v=11",
+  "/web/research-v2.css?v=12",
   "/workspace",
   "/",
   "/marketing/home.js?v=20260921-theme-switch-v1",
@@ -109,13 +110,13 @@ const shellURLs = [
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261027-research-navigation-v1404",
+  "/web/app.js?v=20261027-answer-presentation-v1406",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261027-research-navigation-v1404",
+  "/web/offline-storage.js?v=20261027-answer-presentation-v1406",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",

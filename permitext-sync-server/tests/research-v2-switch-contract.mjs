@@ -49,3 +49,67 @@ for(const mode of [false,true]){
  assert.equal(f.calls.loading,1);
 }
 console.log('V2 switching passed: primary/repeated columns, no loading-shell rebuild, no redundant requests, stable history order, per-conversation drafts and stale-account rejection.');
+
+// A completed turn is published from its authoritative mutation response.
+// It must not reopen the pane or perform list/get/configuration reads.
+for(const mode of [false,true]){
+ const f=harness(mode),paneID=mode?'instance:instance':'utility:analysis';
+ let saved=0,invalidated=0;
+ const result={conversation:{...f.conversations.a,revision:2,messages:[
+  {id:'question-new',role:'user',question:'State the rule.'},
+  {id:'answer-new',role:'assistant',answer:{answerText:'The saved, checked answer. [S1]'}}
+ ],sources:[]},usage:{used:1}};
+ Object.assign(f.context,{postResearchWithProgress:async()=>result,
+  researchConversationList:[{id:'a',title:'Question A'}],researchHistoryPageReaders:new Map(),
+  readResearchConversationList:{invalidate(){invalidated++;}},refreshResearchUsage:{invalidate(){invalidated++;}},
+  saveWorkspaceState(){saved++;},supplementalResearchConversationIDs:[],sessionStorage:{getItem:()=>null,removeItem(){}}});
+ await f.context.renderResearchV2Pane(paneID,{available:true});
+ f.options.onDraft('State the rule.');
+ await f.options.onSend({question:'State the rule.',requestID:'unique-request',signal:new AbortController().signal});
+ assert.equal(f.calls.requests.length,2,'Completion does not refetch the history or the just-saved answer');
+ assert.equal(f.calls.loading,1,'Completion never restores the column loading screen');
+ assert.equal(f.calls.created,1,'The column and header survive the answer');
+ assert.equal(f.options.conversation.messages.at(-1).id,'answer-new');
+ assert.equal(f.options.revealAnswerID,'answer-new','Only the new saved answer receives the reveal animation');
+ assert.equal(f.options.initialDraft,'','The sent draft is cleared in the completed view');
+ assert.equal(saved,1);assert.equal(invalidated,2);
+ assert.ok(!('messages' in f.context.researchConversationList[0]),'History summaries do not retain whole conversations');
+}
+console.log('V2 completion passed: publish authoritative result in place, no reload/readback, cleared sent draft and targeted new-answer reveal.');
+
+for(const stale of ['account','workspace','closed-pane']){
+ const f=harness();let finish;
+ Object.assign(f.context,{postResearchWithProgress:()=>new Promise(resolve=>finish=resolve),sessionStorage:{getItem:()=>null,removeItem(){throw Error('Late response cleared recovery state');}}});
+ await f.context.renderResearchV2Pane('utility:analysis',{available:true});
+ f.options.onDraft('Keep my draft');
+ const pending=f.options.onSend({question:'Keep my draft',requestID:'stale-turn',signal:new AbortController().signal});
+ if(stale==='account')f.accountCurrent=false;
+ if(stale==='workspace')f.context.activeWorkspaceID='elsewhere';
+ if(stale==='closed-pane')f.panel.isConnected=false;
+ finish({conversation:{...f.conversations.a,messages:[{id:'late',role:'assistant'}]}});await pending;
+ assert.equal(f.context.researchNewChatDrafts.get('followup:a'),'Keep my draft',stale);
+ assert.equal(f.calls.loading,1);assert.equal(f.calls.created,1);
+}
+console.log('Late completion passed: account, workspace and closed-pane changes preserve drafts and recovery state.');
+
+// Creating a new question in a repeated column must retire its former owner,
+// while retaining that former conversation's unsent draft for a later reopen.
+{
+ const f=harness(true);const created={id:'created',title:'New question',messages:[],sources:[]};
+ f.state.paneOrder=['instance:instance','research:conversation:a'];f.state.paneWeights={'research:conversation:a':920};
+ Object.assign(f.context,{crypto:{randomUUID:()=> 'new-request'},researchConversationList:[{id:'a'}],researchHistoryPageReaders:new Map(),
+  readResearchConversationList:{invalidate(){}},refreshResearchUsage:{invalidate(){}},saveWorkspaceState(){},
+  supplementalResearchConversationIDs:['a'],researchConversationPaneIsOpen:()=>false});
+ f.context.supplementalResearchConversations.set('a',f.conversations.a);
+ await f.context.renderResearchV2Pane('instance:instance',{available:true});
+ f.options.onDraft('Retain the former draft');
+ f.context.postResearch=async path=>{assert.equal(path,'/research/conversations/create');return{conversation:created};};
+ await f.options.onNew();
+ assert.equal(f.instance.conversationID,'created');assert.equal(f.instance.draft,'');
+ assert.equal(f.context.researchNewChatDrafts.get('followup:a'),'Retain the former draft');
+ assert.deepEqual([...f.context.supplementalResearchConversationIDs],['created']);
+ assert.ok(!f.context.supplementalResearchConversations.has('a'));
+ assert.deepEqual([...f.state.paneOrder],['instance:instance']);assert.ok(!('research:conversation:a' in f.state.paneWeights));
+ assert.equal(f.calls.loading,1);assert.equal(f.options.history[0].id,'created');
+}
+console.log('New-question publication passed: retain the column, retire the former owner and keep its draft.');

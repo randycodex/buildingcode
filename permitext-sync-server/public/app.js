@@ -1,8 +1,8 @@
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=12";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=13";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-research-navigation-v1404";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261027-answer-presentation-v1406";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -154,7 +154,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261027-research-navigation-v1404";
+} from "./offline-storage.js?v=20261027-answer-presentation-v1406";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -26075,6 +26075,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
   const conversationID = selectedID();
   const accountIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   const current = () => isCurrentAccountRequest(accountIdentity) && workspaceID === activeWorkspaceID && selectedID() === conversationID;
+  const ownsPanel = () => current() && panel.isConnected && panel.parentNode === track && (!instance || currentInstance());
   const draftKey = conversationID ? `followup:${conversationID}` : paneID;
   const draft = () => researchNewChatDrafts.get(draftKey) || "";
   const saveDraft = text => { if (!current()) return; researchNewChatDrafts.set(draftKey, text); if (currentInstance()) currentInstance().draft = text; scheduleResearchDraftPersistence(); };
@@ -26100,7 +26101,51 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     const open = id => openResearchConversation(id, { instance, refreshList:true });
     let view, retryingRequestID="";
     const recoveryKey = `permitext:research-v2-request:${activeAccount()?.userID}:${workspaceID}:${conversationID || paneID}`;
-    const publish = async result => { if (!current()) return; await refreshResearchConversationList(); if (current()) await open(result.conversation.id); };
+    const publish = async (result, {revealAnswer = false} = {}) => {
+      if (!ownsPanel()) return;
+      const next = result?.conversation;
+      if (!next?.id || !Array.isArray(next.messages) || !Array.isArray(next.sources)) throw new Error("The completed conversation could not be displayed. Reopen it to recover its saved answer.");
+      const previousIDs = new Set((conversation?.messages || []).map(message => message.id));
+      const revealAnswerID = revealAnswer ? next.messages.filter(message => message.role === "assistant" && !previousIDs.has(message.id)).at(-1)?.id : "";
+      const owner = currentInstance();
+      if (owner) {
+        const previousID = owner.conversationID;
+        if (previousID && previousID !== next.id && owner.draft) researchNewChatDrafts.set(`followup:${previousID}`, owner.draft);
+        owner.conversationID = next.id;
+        owner.draft = researchNewChatDrafts.get(`followup:${next.id}`) || "";
+        owner.historyShowing = false;
+        if (previousID && previousID !== next.id &&
+            !(researchConversationPaneIsOpen() && state.researchConversationID === previousID) &&
+            !state.utilityInstances.some(item => item.key === "analysis" && item.conversationID === previousID)) {
+          const index = supplementalResearchConversationIDs.indexOf(previousID);
+          if (index >= 0) supplementalResearchConversationIDs.splice(index, 1);
+          supplementalResearchConversations.delete(previousID);
+          const previousPaneID = `research:conversation:${previousID}`;
+          state.paneOrder = (state.paneOrder || []).filter(id => id !== previousPaneID);
+          delete state.paneWeights[previousPaneID];
+        }
+        supplementalResearchConversations.set(next.id, next);
+        if (!supplementalResearchConversationIDs.includes(next.id)) supplementalResearchConversationIDs.push(next.id);
+      } else {
+        state.researchConversationID = next.id;
+        activeResearchConversation = next;
+        researchConversationPaneOpened = true;
+        researchHistoryShowing = false;
+      }
+      researchDraftPaneIDs.delete(paneID);
+      // The mutation response already contains the authoritative saved answer.
+      // Publishing it must not reopen the column or wait for list/get requests.
+      const refreshed = await panel._refreshResearchV2(next, {revealAnswerID});
+      if (refreshed !== "updated") return;
+      const summary = {...next};delete summary.messages;delete summary.sources;
+      researchConversationList = [...researchConversationList.filter(item => item.id !== next.id), summary];
+      readResearchConversationList.invalidate();
+      researchHistoryPageReaders.forEach(read => read.invalidate());
+      refreshResearchUsage.invalidate();
+      if (result.usage) researchUsage = result.usage;
+      if (result.artifactRevisions) observeLocalProjectArtifactRevisions(result.artifactRevisions, {write:true});
+      saveWorkspaceState();
+    };
     const snapshot = async message => {
       const result = await postResearch("/research/answers/get", { answerID:message.id });
       return (result.answer?.evidence || []).map(source => ({...source,codeVersion:source.sourceLibraryVersion,codePrefix:source.codeBook,selectedText:source.passageText}));
@@ -26116,7 +26161,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
         finally{if(projectControl.isConnected){projectControl.disabled=false;projectControl.value=before;}}
       });
     }
-    view = createResearchV2View({ conversation,
+    view = createResearchV2View({ conversation,revealAnswerID:retained.revealAnswerID,
       history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
       projectControl,hasMore:listed.hasMore,
@@ -26169,9 +26214,9 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
           analysisMode:"conversation_only",expectedRevision:Number(conversation.revision || 0),
           expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)}, {signal,onProgress});}
         catch(error){retryingRequestID=requestID;throw error;}
-        if (!current()) return;
+        if (!ownsPanel()) return;
         researchNewChatDrafts.delete(draftKey); if (currentInstance()) currentInstance().draft = ""; sessionStorage.removeItem(recoveryKey);
-        await publish(result);
+        await publish(result, {revealAnswer:true});
       },
       onSnapshot:snapshot,
       onCitation:async (message,id) => {
@@ -26194,20 +26239,22 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     }
     // Switching an already mounted pane needs only the authoritative conversation
     // read performed by openResearchConversation. Keep its header and shell.
-    panel._refreshResearchV2 = async nextConversation => {
+    panel._refreshResearchV2 = async (nextConversation, viewOptions = {}) => {
       if (!nextConversation || !Array.isArray(nextConversation.messages) || !Array.isArray(nextConversation.sources)) return "unavailable";
       const expectedID = nextConversation.id;
       const isOwner = () => panel.isConnected && panel.parentNode === track &&
         isCurrentAccountRequest(accountIdentity) && workspaceID === activeWorkspaceID &&
         selectedID() === expectedID && !researchDraftPaneIDs.has(paneID) && hasCapability("research");
       if (!isOwner()) return "stale";
+      const summary = {...nextConversation};delete summary.messages;delete summary.sources;
       const nextListed = {...listed,conversations:[
-        ...listed.conversations.filter(item => item.id !== expectedID),nextConversation
+        ...listed.conversations.filter(item => item.id !== expectedID),summary
       ]};
       // Preserve the numbered history order when replacing an existing entry.
       const existingIndex = listed.conversations.findIndex(item => item.id === expectedID);
       if (existingIndex >= 0) nextListed.conversations.splice(existingIndex,0,nextListed.conversations.pop());
-      await renderResearchV2Pane(paneID, availability, {panel,conversation:nextConversation,listed:nextListed});
+      else nextListed.conversations.unshift(nextListed.conversations.pop());
+      await renderResearchV2Pane(paneID, availability, {...viewOptions,panel,conversation:nextConversation,listed:nextListed});
       if (!isOwner()) return "stale";
       panel.dataset.workspacePaneIdentity = researchAssistantContentIdentity(currentInstance());
       notifyWorkspaceLayoutChange();
