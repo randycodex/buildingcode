@@ -61,7 +61,7 @@ const panes=[reader,notebook], state={workflowVisitedViews:['research','notebook
 const track={scrollLeft:110,querySelectorAll:()=>panes};
 let constructions=0, needProject=false, dividerUpdates=0;
 let reportOpen=false, detailsOpen=false;
-const c=vm.createContext({columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){if(reportOpen){reportOpen=false;c.syncWorkflowColumnPresentation();}}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){if(detailsOpen){detailsOpen=false;c.syncWorkflowColumnPresentation();}}},toggleSettingsButton:null,toggleReportButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
+const c=vm.createContext({isProAccount:()=>true,columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){if(reportOpen){reportOpen=false;c.syncWorkflowColumnPresentation();}}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){if(detailsOpen){detailsOpen=false;c.syncWorkflowColumnPresentation();}}},toggleSettingsButton:null,toggleReportButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
   document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
   syncNotebookNoteTabs(){},ensureNotebookTabCatalog:async()=>{},syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
@@ -187,7 +187,7 @@ assert.equal(constructions,beforeFresh+1,'First empty Research visit still opens
 console.log('Closed view regression passed: Deliberately closed columns stay closed, retained editors and saved layouts survive.');
 
 const evidenceState={paneOrder:['reader:research','project:notebook:a','utility:saved:one','utility:saved:two']};
-const evidenceContext=vm.createContext({state:evidenceState,workspaceProject:()=>({id:'a'}),
+const evidenceContext=vm.createContext({isProAccount:()=>true,state:evidenceState,workspaceProject:()=>({id:'a'}),
   projectHasOpenNotebook:()=>true,notebookPaneIDsForProject:()=> ['project:notebook:a'],paneIDForProjectNotebook:()=> 'project:notebook:a',
   defaultActivePaneIDs:()=>['reader:research','project:notebook:a','utility:saved:one','utility:saved:two']});
 vm.runInContext(actual('placePaneBefore')+'\n'+actual('placeEvidenceBeforeNotebook'),evidenceContext);
@@ -203,7 +203,7 @@ const referenceClasses=new Set(), referenceStyles=new Map();
 const referenceShell={clientWidth:1920,classList:{toggle(name,on){on?referenceClasses.add(name):referenceClasses.delete(name);}},style:{setProperty:(name,value)=>referenceStyles.set(name,value)}};
 const referencePanel={dataset:{libraryOpen:'true',libraryWidth:'640'}};
 const referenceTrack={};let referenceIDs=['reader:reference'],accountOpen=false;
-const referenceContext=vm.createContext({
+const referenceContext=vm.createContext({isProAccount:()=>true,
   document:{querySelector:selector=>selector==='.workspace-shell'?referenceShell:selector==='.account-screen[open]'?accountOpen?{}:null:referencePanel},
   state:{paneWeights:{'reader:reference':972}},track:referenceTrack,
   currentColumnWorkflowView:()=> 'report',defaultActivePaneIDs:()=>referenceIDs,
@@ -232,7 +232,7 @@ const fit = {}, closeColumns = {}, workspaceOnly = [{}, {}, {}];
 const layoutTrack = {scrollLeft: 220, scrollWidth: 1000, clientWidth: 700, querySelectorAll: () => []};
 const reportPanel = {querySelector: () => reportReady ? {} : null};
 const layoutState = {paneWeights: {'reader:one': 900, 'project:notebook:a': 730}, columnGroups: []};
-const layoutContext = vm.createContext({ currentColumnWorkflowView: () => menuReportOpen ? "report" : "research",
+const layoutContext = vm.createContext({isProAccount:()=>true, currentColumnWorkflowView: () => menuReportOpen ? "report" : "research",
   reportScreen: {isOpen: () => menuReportOpen}, fitColumnsButton: fit, collapseReadersButton: closeColumns,
   document: {querySelector: selector => selector.endsWith('.report-draft-panel') ? reportPanel : reportReady ? {} : null,
     querySelectorAll: () => workspaceOnly},

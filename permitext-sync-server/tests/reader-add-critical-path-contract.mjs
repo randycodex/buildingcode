@@ -59,7 +59,7 @@ for (const pro of [false,true]) {
   const f=fixture({pro});
   await Promise.all([f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({})]);
   const pending=f.pickers.map(pick=>pick(code));
-  assert.equal(f.c.state.readers.length,pro?3:2);
+  assert.equal(f.c.state.readers.length,pro?3:1);
   assert.equal(new Set(f.c.state.readers.map(r=>r.id)).size,f.c.state.readers.length);
   f.c.view='research';f.finishRender();await Promise.all(pending);
   assert.equal(f.scrolled.length,0,'Late rendering must not reveal a pane over another selected view');

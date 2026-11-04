@@ -11,6 +11,7 @@ const button = {};
 const classes = new Set();
 const shell = {classList: {toggle(name, enabled) { enabled ? classes.add(name) : classes.delete(name); }}, querySelector: () => prompt};
 const context = vm.createContext({
+  isProAccount: () => true,
   document: {querySelector: () => shell},
   renderProjectUpdateBadge() {}, detachedProjectWindow: false,
   workspacePrivatePresentationAllowed: () => allowed,

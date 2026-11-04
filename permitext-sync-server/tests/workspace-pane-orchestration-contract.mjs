@@ -59,7 +59,7 @@ function element() {
 }
 let descriptors = [], generation = 1, accountCurrent = true, appendCalls = 0, capability = true;
 const discarded = []; let pinnedDividerRefreshes = 0;
-const sandbox = vm.createContext({
+const sandbox = vm.createContext({isProAccount:()=>true,
   workflowPaneIsVisible: () => true, currentColumnWorkflowView: () => 'research',
   createWorkspacePaneHydrator, Map, Set, JSON, Promise, track, state: {pinnedPaneID: "report"},
   get workspaceRenderGeneration() { return generation; },
@@ -181,7 +181,7 @@ const buildEditor = (id, required) => {
   return result;
 };
 const noop=()=>{};
-const descriptorContext=vm.createContext({
+const descriptorContext=vm.createContext({isProAccount:()=>true,
   workspaceColumnsRequireProject:()=>false,
   captureAccountRequest:()=>({}), activeWorkspaceID:"workspace", isCurrentAccountRequest:()=>true,
   state:{utilities:{},utilityInstances:[],readers:[]},detachedProjectWindow:false,

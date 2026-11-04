@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261104-public-reading-workspace-v1422";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261104-free-reader-access-v1423";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261104-public-reading-workspace-v1422";
+} from "./offline-storage.js?v=20261104-free-reader-access-v1423";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2281,12 +2281,14 @@ async function closeActiveProject() {
 }
 
 async function createGeneralWorkspace() {
+  if (!isProAccount()) return false;
   closeWorkspaceContextMenu();
   const requestIdentity = captureAccountRequest();
   const name = await openWebTextPrompt({ title: "New workspace", label: "Workspace name", defaultValue: "", confirmLabel: "Create", required: true });
   if (!name || !isCurrentAccountRequest(requestIdentity)) return;
   if (!(await confirmWorkspaceTransition())) return;
   saveWorkspaceState();
+  if (!isProAccount()) return false;
   const created = createWorkspace(workspaceRegistry, { name });
   localStorage.setItem(workspaceSnapshotKey(created.workspace.id), JSON.stringify(workspaceLayoutWithoutCodeQuestionData(created.layout)));
   workspaceRegistry = { ...created.registry, activeWorkspaceID };
@@ -2351,6 +2353,7 @@ function beginWorkspaceRename(workspaceID) {
 }
 
 async function duplicateNamedWorkspace(workspaceID) {
+  if (!isProAccount()) return false;
   if (workspaceRegistry.workspaces.find((item) => item.id === workspaceID)?.projectID) return;
   const requestIdentity = captureAccountRequest();
   if (!(await confirmWorkspaceTransition())) return;
@@ -2515,7 +2518,7 @@ function openMobileMoreSheet() {
       () => void switchWorkspace(workspace.id, { focus: false }),
       { current: workspace.id === activeWorkspaceID }));
   });
-  projectList.append(mobileMoreAction("New Project", () => void createNewWorkspace()));
+  projectList.append(mobileMoreAction("New Project", () => void createNewWorkspace(), { disabled: !isProAccount() }));
   if (activeWorkspaceRecord()?.projectID) projectList.append(mobileMoreAction("Close Project", () => void closeActiveProject()));
   const project = workspaceProject();
   const identity = project ? projectIdentity(project) : null;
@@ -2698,6 +2701,7 @@ function renderWorkspaceTabs() {
     // out of the way as soon as a public column opens, including loading shells.
     emptyState.hidden = !empty || currentColumnWorkflowView() !== "research" ||
       defaultActivePaneIDs().some(workflowPaneIsVisible);
+    emptyState.querySelector("button").disabled = !isProAccount();
     emptyState.querySelector("button").onclick = () => { void createNewWorkspace(); };
   }
   const container = workspaceActionsButton?.closest(".topbar-workspaces");
@@ -2781,6 +2785,7 @@ async function closeGenericWorkboard() {
 }
 
 async function toggleGenericWorkboard() {
+  if (!isProAccount()) return false;
   return genericWorkboardIsOpen() ? closeGenericWorkboard() : openGenericWorkboard();
 }
 
@@ -5124,7 +5129,7 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
 
 const workflowScrollStore = createWorkflowScrollStore();
 const referenceWorkspaceScroll = new Map();
-function currentWorkflowView() { return normalizeWorkflowView(state.workflowView); }
+function currentWorkflowView() { return isProAccount() ? normalizeWorkflowView(state.workflowView) : "research"; }
 function workspaceResumeContext() {
   const project = workspaceProject();
   return {userID: state.account?.userID || "", workspaceID: activeWorkspaceID,
@@ -5212,6 +5217,7 @@ function workflowPaneAnchors() {
   return Object.fromEntries(Object.entries(sectionDetailAnchorsBySearch()).map(([id, anchor]) => [paneIDForSectionDetail(id), anchor]));
 }
 function workflowPaneIsVisible(paneID) {
+  if (!isProAccount()) return state.readers.slice(0, 1).some(reader => paneIDForReader(reader) === paneID);
   const view = currentColumnWorkflowView();
   return view !== "report" && (detachedProjectWindow || paneBelongsToView(paneID, view, state.workflowMembership, workflowPaneAnchors()));
 }
@@ -5281,6 +5287,7 @@ function syncWorkflowNavigation() {
   const view = accountOpen ? "account" : projectDetailsScreen?.isOpen() ? "project-details" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
   toggleReportButton?.setAttribute("aria-pressed", String(view === "report"));
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
+    button.disabled = !isProAccount() && button.dataset.workflowView !== 'research';
     button.setAttribute('aria-pressed', String(button.dataset.workflowView === (view === 'project-details' ? 'project' : view)));
   });
   document.querySelectorAll('[data-workflow-tools]').forEach(tools => { tools.hidden = tools.dataset.workflowTools !== view; });
@@ -5292,6 +5299,7 @@ function syncWorkflowNavigation() {
   if (view === 'notebook') void ensureNotebookTabCatalog();
 }
 async function switchWorkflowView(view, {initialize = true} = {}) {
+  if (!isProAccount() && view !== "research") return false;
   if (view === "project") {
     if (!workspaceProject()) { await openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton); return false; }
     return openProjectDetailsScreen();
@@ -5337,6 +5345,7 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
 }
 
 function defaultActivePaneIDs() {
+  if (!isProAccount()) return state.readers.slice(0, 1).map(paneIDForReader);
   if (workspaceColumnsRequireProject()) return [];
   if (detachedProjectWindow && detachedProject) {
     return [paneIDForProjectWorkboard(detachedProject)];
@@ -5698,7 +5707,7 @@ function updateLinkedReaderForSearch(searchID, detail, overrides = {}) {
 async function openOrUpdateLinkedReaderForSearch(searchID, detail, overrides = {}) {
   const existing = updateLinkedReaderForSearch(searchID, detail, overrides);
   if (existing) return existing;
-  if (!isProAccount() && state.readers.length >= 2) {
+  if (!isProAccount() && state.readers.length >= 1) {
     const reader = searchReaderReplacementCandidate(paneIDForSectionDetail(searchID));
     const confirmed = await confirmSearchReaderReplacement(
       reader,
@@ -6288,7 +6297,7 @@ function syncResearchColumnLayout({ reset = false } = {}) {
 
 function setUtilityButtonStates() {
   [toggleArchiveButton, toggleSearchButton, toggleSavedButton, toggleAnalysisButton, toggleCalculatorButton, toggleWorkboardButton]
-    .forEach((button) => { if (button) button.disabled = false; });
+    .forEach((button) => { if (button) button.disabled = !isProAccount(); });
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
@@ -9559,21 +9568,24 @@ function isProAccount() {
 
 function syncReaderToolbarButton(button) {
   const requiresProject = workspaceColumnsRequireProject();
-  const limitReached = !isProAccount() && state.readers.length >= 2;
+  const limitReached = !isProAccount() && state.readers.length >= 1;
   const readerLabel = "Reader";
   button.querySelector("span").textContent = `${readerLabel} +`;
   button.dataset.mobileLabel = readerLabel;
   button.hidden = false;
   button.disabled = !requiresProject && limitReached;
-  button.title = requiresProject ? "Create a Project first to open Reader" : limitReached ? "Two Reader limit reached" : "Open a Reader beside this view";
+  button.title = requiresProject ? "Create a Project first to open Reader" : limitReached ? "One Reader limit reached" : "Open a Reader beside this view";
   button.classList.toggle("has-open-reader", state.readers.length > 0);
   button.setAttribute(
     "aria-label",
-    !requiresProject && limitReached ? `${readerLabel}. Two Reader limit reached.` : readerLabel
+    !requiresProject && limitReached ? `${readerLabel}. One Reader limit reached.` : readerLabel
   );
 }
 
 function updateReaderPlanControls() {
+  document.querySelectorAll('[data-workflow-view]').forEach(button => {
+    button.disabled = !isProAccount() && button.dataset.workflowView !== "research";
+  });
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   collapseReadersButton.hidden = false;
   updateWorkspaceLayoutControls();
@@ -9604,7 +9616,7 @@ function bindReaderToolbarButton(button) {
 
 async function openReaderFromToolbar(button) {
   if (notifyProjectRequiredForColumn()) return false;
-  if (!isProAccount() && state.readers.length >= 2) {
+  if (!isProAccount() && state.readers.length >= 1) {
     enforceReaderPlanLimit();
     await transitionWorkspace("utility");
     return false;
@@ -9618,7 +9630,7 @@ async function openReaderFromToolbar(button) {
   openReaderCodePicker(button, async code => {
     if (!isCurrent() || workspaceColumnsRequireProject()) return;
     // Reserve a slot before asynchronous rendering, including late picker clicks.
-    if (!isProAccount() && state.readers.length >= 2) return;
+    if (!isProAccount() && state.readers.length >= 1) return;
     const reader = newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) });
     state.readers.push(reader);
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneIDForReader(reader), view);
@@ -9630,11 +9642,10 @@ async function openReaderFromToolbar(button) {
 }
 
 function enforceReaderPlanLimit() {
-  if (isProAccount() || state.readers.length <= 2) return false;
+  if (isProAccount() || state.readers.length <= 1) return false;
   const reader = state.readers[0] || newReaderState();
-  const secondReader = state.readers[1] || newReaderState();
-  const removedReaderIDs = new Set(state.readers.slice(2).map((item) => item.id));
-  state.readers = [reader, secondReader];
+  const removedReaderIDs = new Set(state.readers.slice(1).map((item) => item.id));
+  state.readers = [reader];
   Object.entries(searchLinkedReadersBySearch()).forEach(([searchID, readerID]) => {
     if (removedReaderIDs.has(readerID)) delete state.searchLinkedReaders[searchID];
   });
@@ -15264,6 +15275,7 @@ async function chooseProjectForSaving() {
   const create = document.createElement("button");
   create.type = "submit";
   create.textContent = "Create Project";
+  create.disabled = !isProAccount();
   form.append(input, create);
   const newProject = document.createElement("button");
   newProject.type = "button";
@@ -17756,6 +17768,7 @@ async function closeCalculatorColumn() {
 }
 
 async function openCalculatorColumn() {
+  if (!isProAccount()) return false;
   if (notifyProjectRequiredForColumn()) return;
   const paneID = "utility:calculator";
   if (!state.utilities.calculator) await toggleUtilityPane("calculator");
@@ -19128,7 +19141,7 @@ async function openReferenceInAdjacentReader(sourceReader, detail) {
     scrollPaneIntoView(paneIDForReader(targetReader), "auto");
     return;
   }
-  const canAddReader = isProAccount() || state.readers.length < 2;
+  const canAddReader = isProAccount() || state.readers.length < 1;
   if (!targetReader && canAddReader) {
     targetReader = newReaderState({
       ...readerFieldsForSectionDetail(detail),
@@ -35697,7 +35710,8 @@ async function openProjectSavedSection(project, item, anchorPaneID = primarySave
     shouldSmoothScrollToSection: false,
     projectSavedSourceKey: projectKey
   };
-  let reader = (state.readers || []).find((candidate) => candidate.projectSavedSourceKey === projectKey);
+  let reader = (state.readers || []).find((candidate) => candidate.projectSavedSourceKey === projectKey)
+    || (!isProAccount() ? state.readers[0] : null);
   if (reader) {
     Object.assign(reader, readerFields);
   } else {
@@ -35792,12 +35806,12 @@ function openWorkspaceManager() {
         const name = await openWebTextPrompt({ title: "Rename workspace", label: "Workspace name", defaultValue: workspace.name, confirmLabel: "Save", required: true });
         if (name !== null && isCurrentAccountRequest(identity)) commitWorkspaceRename(workspace.id, name);
       }), actions);
-      button("Duplicate", () => { close(); void duplicateNamedWorkspace(workspace.id); }, actions);
+      button("Duplicate", () => { close(); void duplicateNamedWorkspace(workspace.id); }, actions).disabled = !isProAccount();
       button("Delete", () => void run(() => removeNamedWorkspace(workspace.id)), actions).className = "is-danger";
       row.append(actions); list.append(row);
     });
     const footer = document.createElement("footer");
-    button("New workspace", () => void run(createGeneralWorkspace), footer);
+    button("New workspace", () => void run(createGeneralWorkspace), footer).disabled = !isProAccount();
     dialog.append(header, description, list, footer);
   };
   render();
@@ -39592,7 +39606,8 @@ async function openDeepLinkedSectionInReader(item) {
   navigationItem = await resolveReaderSource(item, {isCurrent});
   if (!navigationItem || !isCurrent()) return;
   const detail = searchResultDetail(navigationItem);
-  let reader = (state.readers || []).find((candidate) => candidate.codePrefix === detail.codePrefix);
+  let reader = (state.readers || []).find((candidate) => candidate.codePrefix === detail.codePrefix)
+    || (!isProAccount() ? state.readers[0] : null);
   if (!reader) {
     reader = newReaderState(readerFieldsForSectionDetail(detail, {
       shouldSmoothScrollToSection: false
@@ -39660,7 +39675,7 @@ async function confirmSearchReaderReplacement(reader, detail, anchorPaneID = "")
     : null;
   return confirmWebWarning(
     `Replace ${readerLabel}?`,
-    `Free includes two Readers and both are in use. Opening ${nextSource} will replace ${currentSource} in ${readerLabel}. The other Reader will stay unchanged.`,
+    `Free includes one Reader and it is in use. Opening ${nextSource} will replace ${currentSource} in ${readerLabel}.`,
     {
       confirmLabel: `Replace ${readerLabel}`,
       container
@@ -39851,7 +39866,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     reader = visibleReaders.find((candidate) => candidate.sourceAnchorPaneID === anchorPaneID);
   }
   if (!reader) {
-    if (isProAccount() || state.readers.length < 2) {
+    if (isProAccount() || state.readers.length < 1) {
       reader = newReaderState(sourceFields);
       state.readers.push(reader);
     } else if (options.sourceSurface === "search") {
@@ -43354,6 +43369,7 @@ async function restoreSavedColumnGroup(groupID) {
   for (const oldID of missing) {
     const column = JSON.parse(JSON.stringify(group.columns[oldID]));
     let id = oldID;
+    if (!isProAccount() && (column.kind !== 'reader' || state.readers.length >= 1)) continue;
     if (column.kind === 'reader') {
       state.readers.push(column.value);
       if (column.position) pendingGroupReaderPositions.set(column.value.id, column.position);
@@ -43999,6 +44015,7 @@ function renderProjectRequiredWorkspace() {
   const create = document.createElement("button");
   create.type = "button";
   create.textContent = "Create Project";
+  create.disabled = !isProAccount();
   create.addEventListener("click", () => { void createNewWorkspace(); });
   actions.append(create);
   const message = document.createElement("p");
@@ -48729,7 +48746,7 @@ function workspacePaneDescriptors(options = {}) {
   if (detachedProjectWindow && detachedProject) {
     addWorkboard(detachedProject, () => window.close());
     foundationScope.release("");
-    return descriptors;
+    return isProAccount() ? descriptors : descriptors.filter(item => state.readers.slice(0, 1).some(reader => paneIDForReader(reader) === item.id));
   }
   if (genericWorkboardIsOpen()) addWorkboard(genericWorkboardIdentity, closeGenericWorkboard);
   for (const project of openProjectDetails()) {
@@ -48795,7 +48812,7 @@ function workspacePaneDescriptors(options = {}) {
     });
   }
   foundationScope.release("");
-  return descriptors;
+  return isProAccount() ? descriptors : descriptors.filter(item => state.readers.slice(0, 1).some(reader => paneIDForReader(reader) === item.id));
 }
 
 async function mountWorkspacePanesIndependently(context, options = {}) {
@@ -48890,6 +48907,7 @@ async function mountWorkspacePanesIndependently(context, options = {}) {
 
 async function renderWorkspace(options = {}) {
   restoreResearchWorkspaceState();
+  enforceReaderPlanLimit();
   const renderGeneration = ++workspaceRenderGeneration;
   let accessGate = workspaceAccessGateForRender();
   const readerScrollPositions = suppressReaderScrollRestore ? new Map() : captureReaderScrollPositions();
@@ -48915,6 +48933,7 @@ async function renderWorkspace(options = {}) {
 
 async function renderUtilityWorkspace(options = {}) {
   restoreResearchWorkspaceState();
+  enforceReaderPlanLimit();
   const renderGeneration = ++workspaceRenderGeneration;
   let accessGate = workspaceAccessGateForRender();
   if (accessGate.allowed) {
@@ -48948,6 +48967,7 @@ async function transitionWorkspace(mode = "default", options = {}) {
 }
 
 async function toggleUtilityPane(key) {
+  if (!isProAccount() && key !== "settings") return false;
   if (key === "settings") { toggleAccountDialog(); return; }
   if (workspaceColumnsRequireProject()) return;
   if (key === "analysis" && state.utilities.analysis) {
@@ -49073,6 +49093,7 @@ async function closeAllColumns() {
 }
 
 async function focusUtility(key, selector = "") {
+  if (!isProAccount() && key !== "settings") return false;
   if (key === "settings") { if (!document.querySelector(".account-dialog")) toggleAccountDialog(); return; }
   if (workspaceColumnsRequireProject()) return;
   let paneID = "";
@@ -49100,6 +49121,7 @@ async function focusUtility(key, selector = "") {
 }
 
 async function openNewSearchColumn() {
+  if (!isProAccount()) return false;
   await toggleUtilityPane("search");
   const instance = (state.utilityInstances || []).filter((item) => item.key === "search").at(-1);
   if (!instance) return;
@@ -49117,6 +49139,7 @@ function rememberUtilityColumn(paneID) {
 }
 
 async function openNewResearchColumn() {
+  if (!isProAccount()) return false;
   if (workspaceColumnsRequireProject()) return;
   const instance = newUtilityInstance("analysis");
   state.utilityInstances.push(instance);
@@ -49129,6 +49152,7 @@ async function openNewResearchColumn() {
 }
 
 async function focusRecentUtilityColumn(key) {
+  if (!isProAccount() && key !== "settings") return false;
   if (workspaceColumnsRequireProject()) return;
   const instances = (state.utilityInstances || []).filter((item) => item.key === key);
   const recent = recentUtilityColumns.get(`${activeAccount()?.userID || "public"}:${activeWorkspaceID}:${key}`);
@@ -49171,6 +49195,13 @@ async function toggleProjectsColumns() {
 }
 
 function workspaceCommandDefinitions() {
+  if (!isProAccount()) return [
+    ...(state.readers.length < 1
+      ? [{ label: "New Reader", hint: "Open a code column", run: () => readerToolbarButtonForCurrentView().click() }]
+      : []),
+    { label: "Open Settings", hint: "Account and plan", run: () => focusUtility("settings") },
+    { label: "Reset Layout", hint: "Restore default panel widths", run: () => resetVisibleColumnWidths() }
+  ];
   if (workspaceColumnsRequireProject()) return [
     { label: "Create Project", hint: "Start a project workspace", run: () => createNewWorkspace() },
     { label: "Open Settings", hint: "Account, library, offline, and data recovery", run: () => focusUtility("settings") }
@@ -49179,7 +49210,7 @@ function workspaceCommandDefinitions() {
     { label: "Open Search", hint: "Find sections across all codes", run: () => openNewSearchColumn() },
     { label: "Open Research", hint: "Ask a cited building-code question", run: () => focusUtility("analysis", ".research-question-input") },
     { label: "Open Calculator", hint: "Calculate occupant load from the BC table", run: () => openCalculatorColumn() },
-    ...(isProAccount() || state.readers.length < 2
+    ...(isProAccount() || state.readers.length < 1
       ? [{ label: "New Reader", hint: "Open another code column", run: () => readerToolbarButtonForCurrentView().click() }]
       : []),
     { label: "Open Evidence and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },

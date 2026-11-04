@@ -155,13 +155,13 @@ const sourceOpening = sourceBetween(
 );
 assert.match(sourceOpening, /candidate.sourceAnchorPaneID === anchorPaneID\) && readerMatchesSource\(candidate, detail\)/);
 assert.match(sourceOpening, /find\(readerIsClearlyAvailable\)/);
-assert.match(sourceOpening, /if \(isProAccount\(\) \|\| state\.readers\.length < 2\)/);
+assert.match(sourceOpening, /if \(isProAccount\(\) \|\| state\.readers\.length < 1\)/);
 assert.match(sourceOpening, /options\.sourceSurface === "search"/);
 assert.match(sourceOpening, /confirmSearchReaderReplacement/);
 assert.match(sourceOpening, /const confirmed = await confirmSearchReaderReplacement[\s\S]*?if \(!confirmed \|\| !navigationIsCurrent\(\)\) return null;[\s\S]*?reader = replacement/,
   "Reader replacement must stop on either cancellation or a stale navigation before assignment.");
-assert.match(webClient, /Free includes two Readers and both are in use/);
-assert.match(webClient, /The other Reader will stay unchanged/);
+assert.match(webClient, /Free includes one Reader and it is in use/);
+assert.doesNotMatch(webClient, /The other Reader will stay unchanged/);
 assert.match(webClient, /function updateLinkedReaderForSearch[\s\S]*?if \(!reader\) return null;[\s\S]*?Object\.assign\(reader, readerFieldsForSectionDetail\(detail, overrides\)\)/);
 
 assert.match(cssRule(".section-save-project-sheet"), /border: 0;/);
@@ -170,9 +170,9 @@ assert.match(searchSaveCSS, /width: 40px;[\s\S]*?height: 40px;[\s\S]*?border: 0;
 assert.match(webStyles, /\.search-result-save:hover,[\s\S]*?\.search-result-save:focus-visible/);
 assert.doesNotMatch(searchSaveCSS, /border: 1px/);
 
-// Existing plan limits remain the authority: Free still has two Readers and
+// Existing plan limits remain the authority: Free has one Reader and
 // the existing saved-item limit is checked by the canonical persistence path.
-assert.match(webClient, /!isProAccount\(\) && state\.readers\.length >= 2/);
+assert.match(webClient, /!isProAccount\(\) && state\.readers\.length >= 1/);
 assert.match(webClient, /!hasCapability\("saved-work"\)/);
 
 console.log("UX/UI Reader and save Phase 4 web contract passed.");
