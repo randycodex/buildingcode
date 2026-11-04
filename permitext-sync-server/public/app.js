@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261028-empty-workspace-v1420";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261104-public-reading-workspace-v1422";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261028-empty-workspace-v1420";
+} from "./offline-storage.js?v=20261104-public-reading-workspace-v1422";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2688,18 +2688,23 @@ function focusActiveWorkspaceTab() {
 function renderWorkspaceTabs() {
   renderProjectUpdateBadge();
   const shell = document.querySelector(".workspace-shell");
-  const empty = !detachedProjectWindow && visibleWorkspaceRecords().length === 0;
+  const privateAllowed = workspacePrivatePresentationAllowed();
+  const visibleWorkspaces = privateAllowed ? visibleWorkspaceRecords() : [];
+  const empty = !detachedProjectWindow && privateAllowed && Boolean(activeAccount()) && visibleWorkspaces.length === 0;
   shell?.classList.toggle("has-no-workspace", empty);
   const emptyState = shell?.querySelector(".workspace-add-empty");
   if (emptyState) {
-    emptyState.hidden = !empty;
+    // Project creation is optional while reading. Keep its empty-state prompt
+    // out of the way as soon as a public column opens, including loading shells.
+    emptyState.hidden = !empty || currentColumnWorkflowView() !== "research" ||
+      defaultActivePaneIDs().some(workflowPaneIsVisible);
     emptyState.querySelector("button").onclick = () => { void createNewWorkspace(); };
   }
   const container = workspaceActionsButton?.closest(".topbar-workspaces");
   if (!workspaceActionsButton || !container) return;
   container.hidden = detachedProjectWindow;
   if (detachedProjectWindow) return;
-  if (!workspacePrivatePresentationAllowed()) {
+  if (!privateAllowed) {
     const label = workspaceActionsButton.querySelector(".workspace-current-name");
     if (label) label.textContent = "Workspace";
     workspaceActionsButton.title = "Workspace and view options";
@@ -2708,7 +2713,6 @@ function renderWorkspaceTabs() {
     return;
   }
   const workspace = activeWorkspaceRecord();
-  const visibleWorkspaces = visibleWorkspaceRecords();
   const activeVisibleWorkspace = visibleWorkspaces.find((candidate) => candidate.id === workspace?.id);
   const emptyLabel = "Projects";
   const label = workspaceActionsButton.querySelector(".workspace-current-name");

@@ -28,7 +28,7 @@ const context=vm.createContext({renderProjectUpdateBadge(){},switchWorkflowView:
  activeWorkspaceRecord(){privateReads++;return{id:'project'};},visibleWorkspaceRecords(){privateReads++;return[{id:'project',name:'Private Project'}];},
  workspaceProject(){privateReads++;return{id:'project'};},hasCapability:()=>true,prependWorkspaceButtonIcon(){},
  reconcileProjectWorkspaces(){privateReads++;},closeWorkspaceContextMenu(){body.children=[];},state,
- document:{createElement:tag=>new Element(tag),body,getElementById:id=>id==='fit-columns'?layoutControl:null},
+ document:{createElement:tag=>new Element(tag),body,querySelector:()=>null,getElementById:id=>id==='fit-columns'?layoutControl:null},
  window:{innerWidth:1000,innerHeight:800},workspaceContextMenu:null,activeWorkspaceID:'project',updateWorkspaceLayoutControls(){},
  toggleAccountDialog(){},createNewWorkspace(){},openProjectManager(){},switchWorkspace(){},currentColumnWorkflowView:()=> 'research'
 });
