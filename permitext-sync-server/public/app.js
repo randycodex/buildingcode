@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-real-account-sign-in-v1445";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-create-account-label-v1446";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261105-real-account-sign-in-v1445";
+} from "./offline-storage.js?v=20261105-create-account-label-v1446";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41485,7 +41485,7 @@ function renderProAccountEntry(dialog) {
     const name = account.email || account.displayName || "your Permitext account";
     panel.querySelector(".account-welcome-existing").textContent = `Continue with ${name}.`;
   } else {
-    panel.querySelector('[data-account-mode="signUp"]').textContent = "Create Pro account";
+    panel.querySelector('[data-account-mode="signUp"]').textContent = "Create account";
     panel.querySelector(".account-welcome-existing").remove();
   }
   return panel;
