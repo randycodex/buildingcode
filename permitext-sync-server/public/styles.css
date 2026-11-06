@@ -19162,6 +19162,7 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-draft-cla
 .pro-account-entry p.pro-account-price { margin: 20px 0 12px; color: var(--text-primary); font-size: 20px; font-weight: 600; }
 .pro-account-features { display: grid; gap: 8px; margin: 0 auto; padding: 0; list-style: none; color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
 .pro-account-entry .account-welcome-actions { margin-top: 28px; }
+.pro-account-entry .account-welcome-actions .primary { appearance: none; border: 0; box-shadow: none; }
 .pro-account-entry .account-welcome-actions [data-account-mode="signIn"] { appearance: none; background: transparent; color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 35%, transparent); box-shadow: none; }
 .pro-upgrade-screen .pro-checkout-panel > .settings-scroll { display: block !important; width: min(100%, 560px); margin: 0 auto; padding: 36px; box-sizing: border-box; overflow-y: auto; }
 .pro-upgrade-screen .pro-checkout-panel .settings-plan-card { border: 0; margin: 0; padding: 0; }
