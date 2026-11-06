@@ -23,7 +23,7 @@ const names = [
   "persistProjectOrder", "persistSectionBookmark", "persistSectionInProject", "persistSectionFolderSelection",
   "removeSectionFromAllProjects", "removeSectionFromProject", "scheduleAnnotationPush",
   "archiveProjects", "restoreArchivedProject", "deleteArchivedProjects", "deleteArchivedProjectData",
-  "completeClerkPermitextSignIn", "signInCurrentBrowser", "showHostedAccountFallback", "renderAccountWelcome", "deleteCapturedAccount", "clearDeletedAccountBrowserData",
+  "completeClerkPermitextSignIn", "signInCurrentBrowser", "startDirectClerkSignIn", "showHostedAccountFallback", "renderAccountWelcome", "deleteCapturedAccount", "clearDeletedAccountBrowserData",
   "openSupplementalResearchConversation",
   "requirePrivateWorkspaceWritable", "releaseAccountLinkWriteFence", "withAccountLinkWriteFence", "requireAccountLinkWorkSaved",
   "linkedAccountRecoverySources", "linkedAccountRecoveryBundle", "accountLocalRecoveryBundle"
@@ -306,6 +306,56 @@ for (const [hostname, code] of [['permitext.com','SIGN_IN_UNAVAILABLE'], ['local
   const local = harness({location:{hostname}});
   assert.equal(local.c.showHostedAccountFallback({}, {dataset:{}}, 'signIn', {code}), false);
 }
+
+// Welcome Sign in navigates directly to Clerk, without an account dialog or SDK.
+function directEntry({hostname='permitext.com',available=true,config}={}) {
+  const redirects=[],notices=[],listeners=new Map();
+  const button={disabled:false,isConnected:true,textContent:'Sign in',attributes:{},
+    setAttribute(key,value){this.attributes[key]=value;},removeAttribute(key){delete this.attributes[key];}};
+  const origin=hostname==='127.0.0.1'?'http://127.0.0.1:8786':`https://${hostname}`;
+  const h=harness({state:workspace(null),location:{hostname},
+    window:{location:{href:origin+'/workspace?intent=upgrade-pro#old',assign:url=>redirects.push(url)},
+      addEventListener:(event,callback,options)=>{assert.equal(options.once,true);listeners.set(event,callback);},removeEventListener:event=>listeners.delete(event)},
+    clerkWebSignInConfig:config||(async()=>({available,accountPortalSignInURL:'https://configured-clerk.example/sign-in'})),
+    showColumnLoadingStatus:target=>{target.textContent='loading icon';},showWebNotice:(...args)=>notices.push(args),
+    toggleAccountDialog:()=>assert.fail('Direct sign-in must not open the Permitext account dialog'),
+    loadClerkScript:()=>assert.fail('Clerk owns its sign-in screen; direct entry does not load the SDK')
+  });
+  return {...h,button,redirects,notices,listeners,run:()=>h.c.startDirectClerkSignIn(button)};
+}
+for(const [hostname,available,expectedOrigin,returnOrigin] of [
+  ['permitext.com',true,'https://configured-clerk.example','https://permitext.com'],
+  ['127.0.0.1',true,'https://configured-clerk.example','http://127.0.0.1:8786'],
+  ['127.0.0.1',false,'https://accounts.permitext.com','https://permitext.com']
+]) {
+  const t=directEntry({hostname,available});
+  assert.equal(await t.run(),true);
+  assert.equal(t.redirects.length,1);
+  const destination=new URL(t.redirects[0]);
+  assert.equal(destination.origin,expectedOrigin);assert.equal(destination.pathname,'/sign-in');
+  assert.equal(destination.searchParams.get('redirect_url'),returnOrigin+'/workspace?clerk_return=1');
+  assert.equal(t.button.disabled,true);assert.equal(t.notices.length,0);assert.equal(t.c.state.account,null);
+  t.listeners.get('pageshow')();
+  assert.equal(t.button.disabled,false);assert.equal(t.button.textContent,'Sign in');
+  assert.equal(t.button.attributes['aria-busy'],undefined,'Browser Back restores a usable button');
+}
+for(const options of [{available:false},{hostname:'127.0.0.1',config:async()=>{throw Error('Network failure');}}]) {
+  const t=directEntry(options);assert.equal(await t.run(),false);
+  assert.equal(t.redirects.length,0);assert.equal(t.notices.length,1);assert.equal(t.button.disabled,false);
+  assert.equal(t.button.textContent,'Sign in');
+}
+for(const cancel of ['account','navigation','detached']) {
+  const gate=deferred(),t=directEntry({config:()=>gate.promise});
+  const pending=t.run();
+  assert.equal(await t.run(),false,'Repeated clicks do not start another sign-in');
+  if(cancel==='account')t.switchTo();
+  if(cancel==='navigation')t.c.state.workflowNavigationGeneration=1;
+  if(cancel==='detached')t.button.isConnected=false;
+  gate.resolve({available:true,accountPortalSignInURL:'https://configured-clerk.example/sign-in'});
+  assert.equal(await pending,false);assert.equal(t.redirects.length,0);assert.equal(t.notices.length,0);
+  assert.equal(t.button.disabled,false);
+}
+console.log('Direct Clerk entry passed: configured redirect, explicit local hosted preview, workspace callback, no dialog/SDK, repeat-click suppression, Back recovery and stale navigation/account cancellation.');
 
 // SDK loading and token creation retain the original browser and Clerk identity.
 for (const stage of ["sdk", "token", "configuration"]) {

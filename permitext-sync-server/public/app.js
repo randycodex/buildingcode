@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-welcome-account-actions-v1476";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-direct-clerk-entry-v1477";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-welcome-account-actions-v1476";
+} from "./offline-storage.js?v=20261106-direct-clerk-entry-v1477";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -11737,6 +11737,45 @@ async function signInCurrentBrowser(mode = "signIn") {
   const error = new Error("Secure sign-in is not configured for this app yet.");
   error.code = "SIGN_IN_UNAVAILABLE";
   throw error;
+}
+
+async function startDirectClerkSignIn(button) {
+  if (button.disabled) return false;
+  const identity = captureAccountRequest();
+  const navigation = state.workflowNavigationGeneration || 0;
+  const reset = () => {
+    button.disabled = false;
+    button.removeAttribute("aria-busy");
+    button.textContent = "Sign in";
+  };
+  button.disabled = true;
+  button.setAttribute("aria-busy", "true");
+  showColumnLoadingStatus(button, "Sign in");
+  try {
+    const config = await clerkWebSignInConfig();
+    requireCurrentAccountRequest(identity);
+    if (!button.isConnected || navigation !== (state.workflowNavigationGeneration || 0)) {
+      reset();
+      return false;
+    }
+    const localPreview = ["localhost", "127.0.0.1", "[::1]", "::1"].includes(location.hostname);
+    const hostedPreview = localPreview && config?.available === false;
+    if (!config?.available && !hostedPreview) throw new Error("Secure sign-in is currently unavailable. Please try again.");
+    const destination = new URL(hostedPreview ? "https://accounts.permitext.com/sign-in" : config.accountPortalSignInURL);
+    const returnURL = new URL("/workspace?clerk_return=1", hostedPreview ? "https://permitext.com" : window.location.href);
+    destination.searchParams.set("redirect_url", returnURL.href);
+    // A browser Back restored from its page cache must offer a usable button.
+    window.addEventListener("pageshow", reset, { once: true });
+    window.location.assign(destination.href);
+    return true;
+  } catch (error) {
+    window.removeEventListener("pageshow", reset);
+    reset();
+    if (button.isConnected && isCurrentAccountRequest(identity)) {
+      void showWebNotice("Sign-in unavailable", error.message || "Please try again.");
+    }
+    return false;
+  }
 }
 
 function mutationKindAndRecord(mutation) {
@@ -44268,7 +44307,7 @@ function renderFirstUseWelcome() {
     signIn.textContent = "Sign in";
     signIn.addEventListener("click", () => {
       clearProUpgradeIntent();
-      toggleAccountDialog({ signIn: true });
+      void startDirectClerkSignIn(signIn);
     });
     actions.append(signIn);
   }
