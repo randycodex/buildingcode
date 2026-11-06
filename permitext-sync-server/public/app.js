@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-header-brand-centering-v1460";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-reader-search-scroll-stability-v1461";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261105-header-brand-centering-v1460";
+} from "./offline-storage.js?v=20261105-reader-search-scroll-stability-v1461";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -19337,6 +19337,10 @@ function cancelReaderInternalSearch(panel) {
 }
 
 async function restoreReaderAfterSearch(panel, reader) {
+  if (!panel.querySelector(".reader-content")?.classList.contains("is-searching-reader")) {
+    delete panel._readerSearchReturnPosition;
+    return;
+  }
   const scrollPosition = panel._readerSearchReturnPosition;
   await renderSectionContent(panel, reader, { scrollPosition });
   if (scrollPosition) restoreReaderScrollPositions(new Map([[paneIDForReader(reader), scrollPosition]]));
@@ -19854,16 +19858,12 @@ async function renderReader(reader, options = {}) {
 
   internalSearchButton.addEventListener("click", async () => {
     const willOpen = internalSearchButton.getAttribute("aria-pressed") !== "true";
-    if (willOpen && !internalSearchBox.dataset.readerSearchClosing &&
-        !panel.querySelector(".reader-content")?.classList.contains("is-searching-reader")) {
-      panel._readerSearchReturnPosition = captureReaderScrollPositions().get(panel.dataset.paneId);
-    }
     internalSearchButton.setAttribute("aria-pressed", String(willOpen));
     const visibility = setReaderSearchVisibility(internalSearchBox, willOpen);
     if (willOpen) {
       internalSearchInput.value = reader.internalSearchQuery || "";
       internalSearchClearButton.hidden = !internalSearchInput.value.trim();
-      internalSearchInput.focus();
+      internalSearchInput.focus({ preventScroll: true });
       await renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
       return;
     }

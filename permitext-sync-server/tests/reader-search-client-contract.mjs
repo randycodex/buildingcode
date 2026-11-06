@@ -90,7 +90,8 @@ for (const mismatch of [{ corpusRevision: undefined }, { corpusRevision: "invali
 {
   const t = harness(), controller = new AbortController();
   const position = { sectionID: "section-1", blockID: "paragraph-1", offset: 87 };
-  const panel = { dataset: { readerId: "reader" }, _readerSearchAbort: controller, _readerSearchReturnPosition: position };
+  const panel = { dataset: { readerId: "reader" }, _readerSearchAbort: controller, _readerSearchReturnPosition: position,
+    querySelector: () => ({classList: {contains: () => true}}) };
   t.context.cancel(panel);
   assert.equal(controller.signal.aborted, true);
   assert.equal(panel._readerSearchAbort, undefined);
@@ -100,6 +101,18 @@ for (const mismatch of [{ corpusRevision: undefined }, { corpusRevision: "invali
   await t.context.restore(panel, reader);
   assert.equal(t.scrollRestored[0].get("reader:pane"), position, "pixel restoration follows content mounting");
   assert.equal(t.restored[0][2].scrollPosition, position, "closing Find restores original captured Reader position");
+}
+{
+  const t = harness();
+  const paragraph = { textContent: "Keep this scrolled passage mounted" };
+  const content = { children: [paragraph], scrollTop: 1470, classList: {contains: () => false} };
+  const panel = { querySelector: () => content, _readerSearchReturnPosition: {sectionID: "old-position"} };
+  await t.context.restore(panel, reader);
+  assert.equal(t.restored.length, 0, "Closing an empty or cleared search must not rebuild the enacted text");
+  assert.equal(t.scrollRestored.length, 0, "A visibility toggle must not apply a stale reading anchor");
+  assert.equal(content.children[0], paragraph);
+  assert.equal(content.scrollTop, 1470);
+  assert.equal(panel._readerSearchReturnPosition, undefined);
 }
 console.log("Reader search client passed: complete offline fallback, edition/identity checks, abort propagation, and Find position restoration.");
 
