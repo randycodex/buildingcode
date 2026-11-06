@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-account-spinner-only-v1449";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-reserved-chapters-v1450";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -51,7 +51,7 @@ import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections, rankReaderSearchResults } from "./reader-search-match.js?v=20261026-exact-section-v4";
 import { searchWords, searchWordPattern } from "./search-words.js?v=20261025-workspace-chrome-v1379";
-import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey } from "./reader-navigation-tree.js?v=20261010-contents-v1";
+import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey, readerContentsNodeCanExpand } from "./reader-navigation-tree.js?v=20261105-reserved-chapters-v2";
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261105-account-spinner-only-v1449";
+} from "./offline-storage.js?v=20261105-reserved-chapters-v1450";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -8736,7 +8736,7 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
       item.dataset.navKey = node.key;
       item.dataset.chapterId = node.chapterID;
       if (node.sectionID) item.dataset.sectionId = node.sectionID;
-      const expandable = node.kind === "chapter" ? node.sectionCount !== 0 : node.children.length > 0;
+      const expandable = readerContentsNodeCanExpand(node);
       const isExpanded = expandable && expanded.has(node.key);
       if (expandable) item.setAttribute("aria-expanded", String(isExpanded));
       const row = document.createElement("div");
@@ -8809,7 +8809,7 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
       }
     });
   };
-  const openChapters = chapters.filter(chapter => expanded.has(chapter.key) && chapter.sectionCount !== 0);
+  const openChapters = chapters.filter(chapter => expanded.has(chapter.key) && readerContentsNodeCanExpand(chapter));
   openChapters.forEach(chapter => { chapter.loading = true; });
   renderTree();
   await Promise.all(openChapters.map(async node => {

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
-import { buildReaderChapterContents, readerContentsAncestorKeys } from "../public/reader-navigation-tree.js";
+import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsNodeCanExpand } from "../public/reader-navigation-tree.js";
 
 const [app, styles, html] = await Promise.all([
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
@@ -87,6 +87,20 @@ assert.equal(administrative[0].children[0].sectionID, "2");
 const parenthesized = buildReaderChapterContents({id: 3}, [section(1, "23-12"), section(2, "23-12(a)"), section(3, "23-12(a)(1)")], title);
 assert.equal(parenthesized[0].children[0].children[0].sectionID, "3");
 assert.deepEqual(buildReaderChapterContents(chapter, [], title), []);
+
+for (const title of ["Chapter 34: Reserved", "Appendix A: Reserved", "Appendix I Reserved",
+  "Appendix J Reserved", "Chapter 34 — Reserved", "Chapter 34: [Reserved]", "Reserved", "RESERVED."]) {
+  for (const sectionCount of [1, -1]) {
+    assert.equal(readerContentsNodeCanExpand({kind: "chapter", title, sectionCount}), false,
+      `${title} must not disclose catalog placeholders, including before sections load.`);
+  }
+}
+for (const title of ["Chapter 1: Administration", "Appendix U: Ancillary Dwelling Units", "Chapter 8: Reserved parking"]) {
+  assert.equal(readerContentsNodeCanExpand({kind: "chapter", title, sectionCount: 1}), true);
+}
+assert.equal(readerContentsNodeCanExpand({kind: "chapter", title: "Chapter 1: Administration", sectionCount: 0}), false);
+assert.equal(readerContentsNodeCanExpand({kind: "section", title: "Reserved", children: [{id: "child"}]}), true,
+  "The chapter restriction cannot hide authored subsection hierarchies.");
 
 function actual(name) {
   const start = app.search(new RegExp(`(?:async )?function ${name}\\(`));

@@ -28,6 +28,13 @@ export function readerContentsChapterKey(chapterID) {
   return `chapter:${chapterID}`;
 }
 
+export function readerContentsNodeCanExpand(node) {
+  if (node.kind !== "chapter") return (node.children || []).length > 0;
+  const title = compact(node.title).replace(/^(?:chapter|appendix)\s+[a-z\d]+(?:\s*[:.—–-]\s*|\s+)/i, "");
+  // Reserved chapters can contain a catalog placeholder, not nested provisions.
+  return node.sectionCount !== 0 && !/^(?:reserved|\[\s*reserved\s*\])\.?$/i.test(title);
+}
+
 // Build from chapter summaries only. Bodies, tables and definition decoration
 // never need to load just to browse the contents.
 export function buildReaderChapterContents(chapter, sections, displayTitle) {
