@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-reader-search-rules-v1455";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-welcome-reader-v1456";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261105-reader-search-rules-v1455";
+} from "./offline-storage.js?v=20261105-welcome-reader-v1456";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -9589,7 +9589,7 @@ function syncReaderToolbarButton(button) {
   const readerLabel = "Reader";
   button.querySelector("span").textContent = pro ? `${readerLabel} +` : readerLabel;
   button.dataset.mobileLabel = readerLabel;
-  button.hidden = button.id === "free-reader" ? pro : !pro;
+  button.hidden = button.id === "free-reader" ? pro || state.readers.length === 0 : !pro;
   button.disabled = false;
   button.title = requiresProject ? "Create a Project first to open Reader" : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader beside this view" : "Choose a code for Reader";
   button.classList.toggle("has-open-reader", state.readers.length > 0);
@@ -9599,7 +9599,7 @@ function syncReaderToolbarButton(button) {
 function updateReaderPlanControls() {
   const pro = isProAccount();
   document.querySelector(".workspace-shell")?.classList.toggle("is-free-account", !pro);
-  if (getProButton) getProButton.hidden = pro || detachedProjectWindow;
+  if (getProButton) getProButton.hidden = pro || detachedProjectWindow || state.readers.length === 0;
   document.querySelectorAll('[data-pro-only]').forEach(button => { button.hidden = !pro; });
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     button.disabled = !isProAccount() && button.dataset.workflowView !== "research";
@@ -44185,9 +44185,16 @@ function renderFirstUseWelcome() {
     rememberProUpgradeIntent();
     toggleAccountDialog({ upgrade: true });
   });
+  const reader = document.createElement("button");
+  reader.type = "button";
+  reader.className = "first-use-reader";
+  reader.textContent = "Reader";
+  reader.setAttribute("aria-haspopup", "dialog");
+  reader.setAttribute("aria-expanded", "false");
+  bindReaderToolbarButton(reader);
   const actions = document.createElement("div");
   actions.className = "first-use-actions";
-  actions.append(getPro);
+  actions.append(getPro, reader);
   content.append(heading, supporting, actions);
   welcome.append(content);
   return welcome;

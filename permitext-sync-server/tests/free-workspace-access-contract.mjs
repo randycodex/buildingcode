@@ -48,7 +48,30 @@ assert.equal(c.paneIsCollapsed('reader:first'), false, 'A restored Free Reader s
 state.readers = [];
 c.syncReaderToolbarButton(button);
 assert.equal(button.disabled, false);
+assert.equal(button.hidden, true, 'The welcome provides Reader access instead of the topbar');
+const planControls = vm.createContext({
+  state, isProAccount: () => pro, detachedProjectWindow: false,
+  getProButton: {}, collapseReadersButton: {}, updateWorkspaceLayoutControls() {},
+  syncReaderToolbarButton: target => c.syncReaderToolbarButton(target),
+  document: {
+    querySelector: () => ({classList: {toggle() {}}}),
+    querySelectorAll: selector => selector === '[data-open-reader]' ? [button] : []
+  }
+});
+vm.runInContext(actual('updateReaderPlanControls'), planControls);
+planControls.updateReaderPlanControls();
+assert.equal(planControls.getProButton.hidden, true, 'The welcome has no duplicate topbar Get Pro');
+state.readers = [{id:'first'}];
+planControls.updateReaderPlanControls();
+assert.equal(button.hidden, false);
+assert.equal(planControls.getProButton.hidden, false, 'Opening Reader restores both topbar actions');
+state.readers = [];
+planControls.updateReaderPlanControls();
+assert.equal(button.hidden, true);
+assert.equal(planControls.getProButton.hidden, true, 'Closing Reader hides both topbar actions again');
 pro = true;
+planControls.updateReaderPlanControls();
+assert.equal(planControls.getProButton.hidden, true, 'Pro never shows an upgrade button');
 c.currentColumnWorkflowView = () => 'research';
 assert.equal(c.paneCanCollapse('reader:first'), true);
 state.readers = [{id:'first'}, {id:'second'}, {id:'third'}];
