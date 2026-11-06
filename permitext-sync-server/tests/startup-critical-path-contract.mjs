@@ -17,11 +17,12 @@ const priorStart = actualStart.replace("void loadStartupCatalogs();", priorBlock
 assert.notEqual(priorStart, actualStart, "The shipped startup must launch optional catalog work without awaiting it.");
 function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 function node() { return { dataset: {}, scrollLeft: 0, scrollWidth: 100, clientWidth: 100, addEventListener() {}, querySelectorAll: () => [] }; }
-async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = false, failProfile = false, quarantined = false, dismissed = false } = {}) {
+async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = false, failProfile = false, quarantined = false, dismissed = false, pro = false, savedColumns = [] } = {}) {
   const events = [];
   const issues = [];
   let firstWorkspaceAt;
   let catalogLoads = 0;
+  let accessGate;
   const started = performance.now();
   const noop = () => {};
   const sandbox = {
@@ -29,18 +30,31 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     publicCodeRevision: createPublicCodeRevisionController({fetchRevision: async () => ({corpusRevision: "a".repeat(64)}), onInvalidate: noop}),
     detachedWorkboardRoute: false, detachedProjectWindow: false,
     workspaceMigrationError: null, workspaceRestoreError: null, initialPersistedAccount: null,
-    state: { readers: [], utilities: {}, trackScrollLeft: 0 }, track: node(),
+    state: { readers: pro ? ["retired-reader"] : [], utilities: {}, trackScrollLeft: 0 }, track: node(),
+    activeWorkspaceID: "workspace", workspaceAccessState: null,
+    isProAccount: () => pro, captureAccountRequest: () => ({userID:"owner"}), isCurrentAccountRequest: () => true,
+    workspaceAccessGateForRender(options) {
+      if (!accessGate) {
+        events.push("verify-start");
+        context.workspaceAccessState = {workspaceID:"workspace",deferInitialPresentation:options.deferInitialPresentation};
+        accessGate = {ready:delay(50).then(() => {
+          context.state.readers = savedColumns;
+          events.push("verify-complete");
+        })};
+      }
+      return accessGate;
+    },
     document: { visibilityState:'visible', addEventListener: noop, querySelector: (selector) => ["#collapse-all-columns", "#expand-all-columns"].includes(selector) ? node() : null, querySelectorAll: () => [] },
     window: { navigator:{onLine:true}, setInterval() { assert.fail('Startup must not restore idle version polling'); }, addEventListener: noop, matchMedia: () => ({ addEventListener: noop }) },
-    bindPublicCodeRevisionChecks, projectUpdateEditingActivity:noop, retireWorkspaceLayoutSyncState:noop,
+    bindPublicCodeRevisionChecks, bindReturnSyncChecks:noop, checkUpdatesOnReturn:noop, projectUpdateEditingActivity:noop, retireWorkspaceLayoutSyncState:noop,
     localStorage: { getItem: () => null, removeItem: noop },
     api: async (path) => { catalogLoads += 1; await delay(path.includes("libraries") ? trustMs : chapterMs); if (failCatalogs) throw new Error("Synthetic public catalog failure"); return { chapters: [{ id: "chapter", codePrefix: "BC" }], codeTrustProfiles: [{ codePrefix: "BC" }] }; },
     bindImmediateUtilityControls: () => events.push("bind"),
     resumeClerkSignInReturn: async () => { events.push("auth-start"); await delay(20); events.push("auth-complete"); },
-    renderWorkspace: async () => { assert.ok(events.includes("auth-complete"), "Clerk account restoration must finish before private rendering."); await delay(20); firstWorkspaceAt = performance.now() - started; events.push("workspace"); },
+    renderWorkspace: async () => { assert.ok(events.includes("auth-complete"), "Clerk account restoration must finish before private rendering."); if (pro) assert.deepEqual(context.state.readers,savedColumns,"The first Pro render must use the verified layout, including an empty layout."); await delay(20); firstWorkspaceAt = performance.now() - started; events.push("workspace"); },
     codeQuestionWorkspaceEnabled: () => false,
     deepLinkedSectionIDFromLocation: () => "", organizationInvitationTokenFromURL: () => "",
-    activeAccount: () => null,
+    activeAccount: () => pro ? {userID:"owner"} : null,
     privateWorkspaceMigrationStatus: () => ({ status: quarantined ? "quarantined" : "complete" }),
     legacyWorkspaceNoticeDismissed: () => dismissed,
     presentWorkspaceIssue: (message) => issues.push(message),
@@ -56,7 +70,7 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     resumeProUpgradeIntent: async () => { events.push("upgrade-resume"); }
   };
   for (const name of ["bindReaderToolbarButton", "saveWorkspaceResumeForRefresh", "restoreWorkspaceAfterRefresh", "syncReferenceReaderLayout", "flushSearchQueryPersistence", "flushResearchDraftPersistence", "openSavedColumnGroupsMenu", "updateConnectionStatus", "repositionActiveCustomSelect", "keepFocusedWorkspacePaneVisible", "scheduleVisibleReaderScrollIndicatorUpdates", "bindWorkspaceKeyboardNavigation", "stopForegroundSyncLoop", "startForegroundSyncLoop", "bindHorizontalWheelScroll", "openMobileMoreSheet", "consumeBrowserSectionURL", "renderReaderTrust"]) sandbox[name] = noop;
-  for (const name of ["addReaderButton", "toggleArchiveButton", "toggleSettingsButton", "workspaceActionsButton", "mobileMoreButton", "fitColumnsButton", "collapseReadersButton"]) sandbox[name] = node();
+  for (const name of ["addReaderButton", "toggleArchiveButton", "toggleSettingsButton", "workspaceActionsButton", "getProButton", "mobileMoreButton", "fitColumnsButton", "collapseReadersButton"]) sandbox[name] = node();
   const context = vm.createContext(sandbox);
   vm.runInContext(`let chapters = []; let codeTrustProfiles = []; let codeTrustProfilesStatus = "loading"; let startupCatalogPromise = null; ${catalogHelpers} ${start} globalThis.startTest = start; globalThis.catalogState = () => ({chapters,codeTrustProfiles,codeTrustProfilesStatus,startupCatalogPromise});`, context);
   await context.startTest();
@@ -85,6 +99,10 @@ const dismissedLegacy = await sample(actualStart, { quarantined: true, dismissed
 assert.equal(dismissedLegacy.issues.length, 0, "Dismissed legacy notices must not reappear at startup.");
 const failedProfile = await sample(actualStart, { failProfile: true });
 assert.deepEqual(failedProfile.events, expectedEvents, "Profile setup failure must not prevent pending intents from resuming after the workspace renders.");
+for (const savedColumns of [[],["saved-reader","saved-search"]]) {
+  const pro = await sample(actualStart,{pro:true,savedColumns});
+  assert.ok(pro.events.indexOf("verify-complete") < pro.events.indexOf("workspace"),"Pro startup settles workspace selection before its first render.");
+}
 
 // Verify actual neutral Reader trust rendering, including the retry affordance.
 const trustFunction = between("function renderReaderTrust(", "function searchCodeFilterPresentation(");
@@ -117,7 +135,7 @@ function selectNode() { return { closest: () => ({}), children: [], append(child
 const codeSelect = selectNode();
 const selectorContext = vm.createContext({ ...syncIdentity, Map,
   document: { createElement: selectNode }, panel: { querySelector: (selector) => selector === ".reader-collapse-title" ? selectNode() : codeSelect },
-  clear: (element) => { element.children = []; }, resizeCodeSelect() {} });
+  clear: (element) => { element.children = []; }, resizeCodeSelect() {}, updateReaderLocationTitle() {} });
 vm.runInContext(`${codeOptionsSource} ${optionHelpers} ${selector}
   globalThis.showCode = (prefix, version) => { populateCodeSelect(panel, {codePrefix:prefix, codeVersion:version}); return panel.querySelector().title; };`, selectorContext);
 assert.equal(selectorContext.showCode("BC", syncIdentity.defaultSyncCodeVersion), "Building Code (2022)");

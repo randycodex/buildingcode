@@ -48,7 +48,7 @@ const context = vm.createContext({
   state: { utilityInstances: [] }, captureAccountRequest: () => "a", isCurrentAccountRequest: () => permitted,
   activeAccount: () => ({ userID: "a" }), ensureSyncedContentForRender: async () => context.syncedContent,
   loadSyncedContent: async () => context.syncedContent, reconcileProjectWorkspaces() {}, closeDeletedProjectDetails() {}, scopeSavedInstanceToWorkspace() {},
-  enforceReaderPlanLimit() {}, renderUtilityWorkspace: async () => {},
+  enforceReaderPlanLimit() {}, renderProjectUpdateBadge() {}, renderUtilityWorkspace: async () => {},
   readerCommentCount: () => 0, updateReaderCommentIndicator() {},
   document: { createElement: tag => new Node(tag) }, syncCodeVersion, defaultSyncCodeVersion, renderReaderBlockBatches,
   currentContentSummary() { reads++; return structuredClone({ projects: [project], projectSections: links }); },

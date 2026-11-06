@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-empty-workspace-label-v1471";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-pro-refresh-layout-v1472";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-empty-workspace-label-v1471";
+} from "./offline-storage.js?v=20261106-pro-refresh-layout-v1472";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -48616,7 +48616,7 @@ function whenWorkspacePaneReady(paneID) {
   }));
 }
 
-function workspaceAccessGateForRender() {
+function workspaceAccessGateForRender(options = {}) {
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const key = `${accountRuntimeGeneration}:${workspaceID}`;
@@ -48624,11 +48624,13 @@ function workspaceAccessGateForRender() {
     ? syncedContent?.workspacePresentationAccess || "unavailable" : "unavailable";
   if (workspaceAccessState?.key === key && isCurrentAccountRequest(workspaceAccessState.identity)) {
     const entry = workspaceAccessState;
+    if (options.deferInitialPresentation) entry.deferInitialPresentation = true;
     if (entry.currentGate.phase !== "pending" && entry.observedAuthority !== authority()) entry.startAttempt(false);
     return entry.gate;
   }
   workspaceAccessState?.gate.dispose();
-  const entry = { key, identity, workspaceID, gate: null, currentGate: null, listeners: new Set(), observedAuthority: authority() };
+  const entry = { key, identity, workspaceID, gate: null, currentGate: null, listeners: new Set(), observedAuthority: authority(),
+    deferInitialPresentation: Boolean(options.deferInitialPresentation) };
   const current = () => workspaceAccessState === entry && workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity);
   const notify = (listener, notification) => {
     if (!current()) return;
@@ -48707,6 +48709,7 @@ function workspaceAccessGateForRender() {
       if (entry.currentGate !== attempt || workspaceAccessState !== entry || !isCurrentAccountRequest(identity)) return;
       notifyAll();
       renderProjectUpdateBadge();
+      if (entry.deferInitialPresentation) return;
       // Recompute desired private descriptors only after completed verification.
       void renderUtilityWorkspace({ skipDeletedProjectCleanup: true, persist: false }).catch((error) => {
         console.warn("Workspace presentation could not refresh.", error);
@@ -49116,6 +49119,7 @@ async function mountWorkspacePanesIndependently(context, options = {}) {
 }
 
 async function renderWorkspace(options = {}) {
+  if (workspaceAccessState?.deferInitialPresentation) return false;
   restoreResearchWorkspaceState();
   enforceReaderPlanLimit();
   const renderGeneration = ++workspaceRenderGeneration;
@@ -49142,6 +49146,7 @@ async function renderWorkspace(options = {}) {
 }
 
 async function renderUtilityWorkspace(options = {}) {
+  if (workspaceAccessState?.deferInitialPresentation) return false;
   restoreResearchWorkspaceState();
   enforceReaderPlanLimit();
   const renderGeneration = ++workspaceRenderGeneration;
@@ -49676,6 +49681,25 @@ function loadStartupCatalogs() {
   return request;
 }
 
+async function restoreInitialProWorkspace({ publicSection = false } = {}) {
+  if (detachedProjectWindow || publicSection || !activeAccount() || !isProAccount()) return;
+  const identity = captureAccountRequest();
+  const deferredEntries = new Set();
+  try {
+    // Cached columns may belong to a workspace that sync has retired. Resolve
+    // that selection before publishing shells or starting their content loads.
+    while (isCurrentAccountRequest(identity)) {
+      const gate = workspaceAccessGateForRender({ deferInitialPresentation: true });
+      const entry = workspaceAccessState;
+      deferredEntries.add(entry);
+      await gate.ready;
+      if (entry === workspaceAccessState && entry.workspaceID === activeWorkspaceID) break;
+    }
+  } finally {
+    deferredEntries.forEach(entry => { entry.deferInitialPresentation = false; });
+  }
+}
+
 async function start() {
   projectUpdateAutoApplyReady = true;
   for (const event of ["input", "change", "focusin", "focusout"]) document.addEventListener(event, projectUpdateEditingActivity, true);
@@ -49910,6 +49934,7 @@ async function start() {
     closeAllColumns();
   });
   const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
+  await restoreInitialProWorkspace({ publicSection: Boolean(deepLinkedSectionID) });
   consumeBrowserSectionURL();
   if (organizationInvitationTokenFromURL()) {
     state.utilities.settings = true;

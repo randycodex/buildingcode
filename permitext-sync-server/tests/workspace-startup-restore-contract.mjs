@@ -101,6 +101,7 @@ for (const operation of ["switchWorkspace", "duplicateNamedWorkspace", "removeNa
   context.captureAccountRequest = () => ({ generation: 1 });
   context.isCurrentAccountRequest = () => true;
   context.confirmWorkspaceTransition = async () => true;
+  context.isProAccount = () => true;
   context.confirmWebWarning = async () => true;
   context.presentWorkspaceIssue = (message) => issues.push(message);
   context.clearWorkspaceNotice = () => {};

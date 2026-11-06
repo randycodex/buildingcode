@@ -52,7 +52,7 @@ const c = vm.createContext({
   state: { utilityInstances: [] }, captureAccountRequest: () => "a", isCurrentAccountRequest: () => current,
   activeAccount: () => ({ userID: "a" }), ensureSyncedContentForRender: async () => c.syncedContent,
   loadSyncedContent: async () => c.syncedContent, reconcileProjectWorkspaces() {}, closeDeletedProjectDetails() {}, scopeSavedInstanceToWorkspace() {},
-  enforceReaderPlanLimit() {}, renderUtilityWorkspace: async () => {},
+  enforceReaderPlanLimit() {}, renderProjectUpdateBadge() {}, renderUtilityWorkspace: async () => {},
   document: { createElement: tag => new Node(tag) }, crypto: { randomUUID }, CSS: { escape: value => value },
   syncCodeVersion, defaultSyncCodeVersion, syncCodeVersionForPrefix: () => defaultSyncCodeVersion,
   currentContentSummary() { reads++; return structuredClone({ projects: [project], projectSections: links }); },

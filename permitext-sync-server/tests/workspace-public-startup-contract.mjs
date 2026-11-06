@@ -17,7 +17,7 @@ let savedKeys=new Set(["before mutation"]);
 const noop=()=>{};
 const showColumnLoadingStatus=(status,label)=>{status.textContent=label;};
 const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHydrator,showColumnLoadingStatus,Map,Set,JSON,Promise,console,
- track,activeWorkspaceID:"workspace",accountRuntimeGeneration:1,workspaceRenderGeneration:0,syncedContent:null,syncLoadPromise:null,
+ track,activeWorkspaceID:"workspace",accountRuntimeGeneration:1,workspaceRenderGeneration:0,syncedContent:null,syncLoadPromise:null,detachedProjectWindow:false,
  state:{utilityInstances:[],utilities:{},readers:[]},suppressReaderScrollRestore:false,
  captureAccountRequest:()=>({account}),isCurrentAccountRequest:id=>id.account===account,activeAccount:()=>({userID:account}),
  ensureSyncedContentForRender:async()=>{pulls++;if(!syncResult)await sync.promise;return syncResult;},
@@ -36,7 +36,7 @@ const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHyd
  notifyWorkspaceLayoutChange:noop,disposeUnpublishedWorkspacePane:noop,maskUnverifiedWorkspacePane:noop,renderProjectUpdateBadge:noop,
  workflowPaneIsVisible:()=>true,currentColumnWorkflowView:()=>"research",pendingWorkspacePaneRevealID:""
 });
-const names=["activePinnedPaneID","workspacePrivatePresentationAllowed","finishWorkspacePaneReady","whenWorkspacePaneReady","workspaceAccessGateForRender","workspacePaneRenderContext","workspacePaneContextIsCurrent","getWorkspacePaneHydrator","mountWorkspacePanesIndependently","renderWorkspace","renderUtilityWorkspace"];
+const names=["activePinnedPaneID","workspacePrivatePresentationAllowed","finishWorkspacePaneReady","whenWorkspacePaneReady","workspaceAccessGateForRender","workspacePaneRenderContext","workspacePaneContextIsCurrent","getWorkspacePaneHydrator","mountWorkspacePanesIndependently","renderWorkspace","renderUtilityWorkspace","restoreInitialProWorkspace"];
 vm.runInContext(`let workspacePaneHydrator=null;let workspaceAccessState=null;const workspacePaneReadyWaiters=new Set();${names.map(actual).join("\n")}`,sandbox);
 assert.equal(await sandbox.renderWorkspace(),true,"Startup resolves after shells, while sync remains held.");
 await tick();assert.equal(pulls,1);assert.equal(privateLoads,0);assert.equal(track.children[0],reader);assert.equal(track.children[1],search);
@@ -120,3 +120,50 @@ assert.equal(await sandbox.whenWorkspacePaneReady("missing"),false);
 const descriptors=actual("workspacePaneDescriptors");assert.match(descriptors,/renderUtilityInstance\(instance, \{ accessGate: options\.accessGate,/);assert.match(descriptors,/renderReader\(reader, \{ scrollPosition: options\.readerScrollPositions\?\.get\(id\), accessGate: options\.accessGate, signal \}\)/);
 console.log("Workspace public startup passed: held sync/public publication, shared gate, fresh private reconciliation, shell/target readiness, close cancellation, denial/retry and account isolation.");
 console.log("Workspace notification snapshots passed: lazy summary work, throw isolation, one read per dispatch, fresh mutations, immediate release and mid-dispatch account revocation.");
+
+// A Pro reload must resolve the selected workspace before publishing cached
+// public columns. Verification can replace the workspace, requiring a new gate.
+for (const result of ["empty", "saved", "offline"]) {
+  account=`refresh-${result}`;
+  sandbox.activeWorkspaceID=`cached-${result}`;
+  for (const node of track.children) { node.isConnected=false; node.parentNode=null; }
+  track.children=[];
+  const refresh=deferred();
+  let retiredLoads=0,selectedLoads=0,workspaceSaves=0;
+  const retired=pane("retired-reader"),selected=pane("selected-reader");
+  const selectedDescriptors=result==="empty"?[]:[{id:"selected-reader",publicContent:true,load:()=>{selectedLoads++;return selected;}}];
+  desired=[{id:"retired-reader",publicContent:true,load:()=>{retiredLoads++;return retired;}}];
+  sandbox.syncedContent=null;
+  sandbox.syncLoadPromise=null;
+  sandbox.ensureSyncedContentForRender=async()=>{pulls++;await refresh.promise;return sandbox.syncedContent;};
+  sandbox.reconcileProjectWorkspaces=()=>{
+    if (result!=="offline") sandbox.activeWorkspaceID=`selected-${result}`;
+    desired=selectedDescriptors;
+  };
+  sandbox.saveWorkspaceState=()=>{workspaceSaves++;};
+  const restoring=sandbox.restoreInitialProWorkspace();
+  await tick();
+  assert.equal(await sandbox.renderWorkspace(),false,"A concurrent full render cannot publish the retired layout during Pro restoration.");
+  assert.equal(await sandbox.renderUtilityWorkspace(),false,"A utility refresh cannot publish it either.");
+  assert.equal(track.children.length,0);
+  assert.equal(retiredLoads,0,"Retired Readers must not even start their content loads.");
+  assert.equal(workspaceSaves,0,"Restoration must not save the speculative arrangement.");
+  sandbox.syncedContent={userID:account,status:result==="offline"?"offline":"connected",workspacePresentationAccess:result==="offline"?"permitted-offline":"verified"};
+  refresh.resolve();
+  await restoring;await tick();
+  assert.equal(track.children.length,0,"Gate completion must not race startup by publishing columns itself.");
+  assert.equal(await sandbox.renderWorkspace(),true);
+  await tick();
+  assert.deepEqual(track.children.map(node=>node.dataset.paneId),result==="empty"?[]:["selected-reader"]);
+  assert.equal(retiredLoads,0);
+  assert.equal(selectedLoads,result==="empty"?0:1);
+}
+const pullsBeforeBypass=pulls;
+sandbox.isProAccount=()=>false;
+await sandbox.restoreInitialProWorkspace();
+sandbox.isProAccount=()=>true;
+await sandbox.restoreInitialProWorkspace({publicSection:true});
+sandbox.detachedProjectWindow=true;
+await sandbox.restoreInitialProWorkspace();
+assert.equal(pulls,pullsBeforeBypass,"Free, public section links and detached windows retain independent startup.");
+console.log("Pro startup presentation passed: no retired shells or requests, stable replacement selection, empty/saved/offline restoration and public startup bypasses.");
