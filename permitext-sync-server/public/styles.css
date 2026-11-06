@@ -18278,7 +18278,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   bottom: 0;
   z-index: 3;
   width: 1px;
-  background: var(--border);
+  /* The column border draws the line; this handle only captures resizing. */
+  background: transparent;
   cursor: col-resize;
   touch-action: none;
   outline: none;
