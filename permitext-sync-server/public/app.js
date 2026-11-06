@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-reader-search-width-v1453";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-reader-search-close-v1454";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261105-reader-search-width-v1453";
+} from "./offline-storage.js?v=20261105-reader-search-close-v1454";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -19287,6 +19287,43 @@ function plainTextForSearchBlock(block) {
 }
 
 
+async function setReaderSearchVisibility(box, open) {
+  const style = getComputedStyle(box);
+  const from = box.hidden ? { opacity: 0, transform: "translateY(-6px)" }
+    : { opacity: style.opacity, transform: style.transform };
+  const duration = parseFloat(style.getPropertyValue("--reader-search-reveal-duration")) || 0;
+  const previous = box._readerSearchVisibilityAnimation;
+  delete box._readerSearchVisibilityAnimation;
+  previous?.cancel();
+  delete box.dataset.readerSearchClosing;
+  box.inert = false;
+  if (!open && box.hidden) return true;
+  if (open) box.hidden = false;
+  else {
+    box.dataset.readerSearchClosing = "true";
+    box.inert = true;
+  }
+  if (!duration || typeof box.animate !== "function") {
+    box.hidden = !open;
+    box.inert = false;
+    delete box.dataset.readerSearchClosing;
+    return true;
+  }
+  const animation = box.animate([from, open
+    ? { opacity: 1, transform: "translateY(0)" }
+    : { opacity: 0, transform: "translateY(-6px)" }], {
+    duration, easing: "cubic-bezier(0.22, 1, 0.36, 1)"
+  });
+  box._readerSearchVisibilityAnimation = animation;
+  try { await animation.finished; } catch { return false; }
+  if (box._readerSearchVisibilityAnimation !== animation) return false;
+  delete box._readerSearchVisibilityAnimation;
+  if (!open) box.hidden = true;
+  box.inert = false;
+  delete box.dataset.readerSearchClosing;
+  return true;
+}
+
 function cancelReaderInternalSearch(panel) {
   panel._readerSearchAbort?.abort();
   delete panel._readerSearchAbort;
@@ -19812,10 +19849,13 @@ async function renderReader(reader, options = {}) {
   });
 
   internalSearchButton.addEventListener("click", async () => {
-    const willOpen = internalSearchBox.hidden;
-    if (willOpen) panel._readerSearchReturnPosition = captureReaderScrollPositions().get(panel.dataset.paneId);
-    internalSearchBox.hidden = !willOpen;
+    const willOpen = internalSearchButton.getAttribute("aria-pressed") !== "true";
+    if (willOpen && !internalSearchBox.dataset.readerSearchClosing &&
+        !panel.querySelector(".reader-content")?.classList.contains("is-searching-reader")) {
+      panel._readerSearchReturnPosition = captureReaderScrollPositions().get(panel.dataset.paneId);
+    }
     internalSearchButton.setAttribute("aria-pressed", String(willOpen));
+    const visibility = setReaderSearchVisibility(internalSearchBox, willOpen);
     if (willOpen) {
       internalSearchInput.value = reader.internalSearchQuery || "";
       internalSearchClearButton.hidden = !internalSearchInput.value.trim();
@@ -19823,11 +19863,18 @@ async function renderReader(reader, options = {}) {
       await renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
       return;
     }
+    cancelReaderInternalSearch(panel);
+    const requestIdentity = captureAccountRequest();
+    const workspaceID = activeWorkspaceID;
+    const readerIdentity = workspaceReaderContentIdentity(reader);
+    if (!await visibility || !panel.isConnected || !isCurrentAccountRequest(requestIdentity) ||
+        activeWorkspaceID !== workspaceID || workspaceReaderContentIdentity(reader) !== readerIdentity ||
+        internalSearchButton.getAttribute("aria-pressed") !== "false") return;
     await restoreReaderAfterSearch(panel, reader);
   });
 
   panel.addEventListener("keydown", (event) => {
-    if (event.defaultPrevented || event.key !== "Escape" || internalSearchBox.hidden) return;
+    if (event.defaultPrevented || event.key !== "Escape" || internalSearchButton.getAttribute("aria-pressed") !== "true") return;
     event.preventDefault();
     event.stopPropagation();
     internalSearchButton.click();

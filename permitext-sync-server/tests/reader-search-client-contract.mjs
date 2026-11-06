@@ -159,3 +159,67 @@ for (const mutate of [
   await assert.rejects(t.search("concrete",undefined,{scope:"code"}),/network failure/,"an incomplete sibling cannot masquerade as a full code search");
 }
 console.log("Reader code search client passed: chapter grouping identities, exact revisions, and complete offline code scope.");
+
+const visibilityStart = source.indexOf("async function setReaderSearchVisibility(");
+const visibilitySource = source.slice(visibilityStart, source.indexOf("\nfunction cancelReaderInternalSearch(", visibilityStart));
+function visibilityFixture({ duration = 200, supported = true } = {}) {
+  const box = { hidden: true, inert: false, dataset: {} }, animations = [];
+  const style = { opacity: "1", transform: "none", getPropertyValue: () => `${duration}ms` };
+  if (supported) box.animate = (frames, options) => {
+    let finish, reject;
+    const animation = { frames, options, finished: new Promise((yes, no) => { finish = yes; reject = no; }),
+      finish() { finish(); }, cancel() { reject(new Error("Animation cancelled")); } };
+    animations.push(animation);
+    return animation;
+  };
+  const context = vm.createContext({ getComputedStyle: () => style });
+  vm.runInContext(visibilitySource, context);
+  return { box, style, animations, show: open => context.setReaderSearchVisibility(box, open) };
+}
+{
+  const t = visibilityFixture(); t.box.hidden = false;
+  const closing = t.show(false);
+  assert.equal(t.box.hidden, false, "Closing remains visible until its fade finishes");
+  assert.equal(t.box.inert, true, "A closing field cannot take focus or input");
+  assert.equal(t.box.dataset.readerSearchClosing, "true");
+  assert.equal(t.animations[0].options.duration, 200);
+  t.animations[0].finish();
+  assert.equal(await closing, true);
+  assert.equal(t.box.hidden, true);
+  assert.equal(t.box.inert, false);
+  assert.equal(t.box.dataset.readerSearchClosing, undefined);
+}
+{
+  const t = visibilityFixture(); t.box.hidden = false;
+  const closing = t.show(false);
+  t.style.opacity = "0.4";
+  const reopening = t.show(true);
+  assert.equal(await closing, false, "A cancelled close must not restore stale Reader content");
+  assert.equal(t.box.hidden, false);
+  assert.equal(t.box.inert, false);
+  assert.equal(t.animations[1].frames[0].opacity, "0.4", "Reopening continues from the current fade");
+  t.animations[1].finish(); await reopening;
+  assert.equal(t.box.hidden, false, "An old close cannot hide the reopened field");
+}
+{
+  const t = visibilityFixture();
+  const opening = t.show(true), closing = t.show(false);
+  assert.equal(await opening, false);
+  t.animations[1].finish(); await closing;
+  assert.equal(t.box.hidden, true);
+}
+for (const options of [{ duration: 0 }, { supported: false }]) {
+  const t = visibilityFixture(options); t.box.hidden = false;
+  assert.equal(await t.show(false), true);
+  assert.equal(t.box.hidden, true);
+  await t.show(true);
+  assert.equal(t.box.hidden, false);
+  assert.equal(t.animations.length, 0, "Reduced motion and older engines complete immediately");
+}
+{
+  const t = visibilityFixture(), opening = t.show(true);
+  t.box.hidden = true; // Selecting a result can replace the Reader during the reveal.
+  t.animations[0].finish(); await opening;
+  assert.equal(t.box.hidden, true, "A completed reveal cannot reopen an externally closed field");
+}
+console.log("Reader search motion passed: delayed hiding, rapid reversal, input isolation, reduced motion, and replacement cleanup.");
