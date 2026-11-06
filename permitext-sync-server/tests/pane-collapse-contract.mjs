@@ -297,10 +297,11 @@ function menuNode(tag='button') {
 }
 const anchor=menuNode(), menuRail=menuNode();
 const retainedEditor={value:'Unsent live question',scrollTop:321};
+let menuReader=false;
 const menuPanel={dataset:{paneId:'reader:one'},editor:retainedEditor,
   getBoundingClientRect:anchor.getBoundingClientRect,
-  querySelector:selector=>selector.includes('pane-collapsed-tab')?menuRail:anchor,
-  classList:{contains:()=>false}};
+  querySelector:selector=>selector==='.reader-trust'?null:selector.includes('pane-collapsed-tab')?menuRail:anchor,
+  classList:{contains:name=>menuReader&&name==='reader-panel'}};
 const peerPanel={dataset:{paneId:'reader:two'}};
 let menuOrder=['reader:one','reader:two'], menuPro=false;
 const menuState={paneOrder:menuOrder,columnGroups:[]};
@@ -320,8 +321,10 @@ const menuContext=vm.createContext({state:menuState,primarySavedPaneID:()=>'',Ab
 });
 vm.runInContext(['paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','canGroupWorkspaceColumn','activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
 menuState.pinnedPaneID='reader:one';
+menuReader=true;
 menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert.deepEqual(menuItems().map(x=>x.textContent),['Expand','Move Left','Move Right'],'Free Reader menus omit Collapse, Pin and Unpin, even with a stored Pro pin.');
+assert.deepEqual(menuItems().map(x=>x.textContent),[], 'Free Reader menus omit layout and Change Code actions, even with a stored Pro pin.');
+menuReader=false;
 assert.equal(menuContext.activePinnedPaneID(),'','A stored Pro pin is inactive on Free.');
 menuContext.togglePinnedPane(menuPanel);
 assert.equal(menuState.pinnedPaneID,'reader:one','Free cannot change a pin through a stale action handler.');
@@ -369,6 +372,10 @@ assert(menu.children.some(item=>item.textContent==='Expand'), 'Notebook Evidence
 menuPanel.dataset.paneId='reader:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert(menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Reader menus retain collapse.');
 menuContext.currentColumnWorkflowView=()=> 'research';
+menuReader=true;
+menuContext.openColumnGroupMenu(menuPanel,anchor);
+assert(menuItems().some(item=>item.textContent==='Change Code'), 'Pro Reader menus retain Change Code.');
+menuReader=false;
 // Named-group focus restoration selects the first visible member, never hidden siblings.
 const groupRail=menuNode(),groupAnchor=menuNode();
 const groupPanel={dataset:{paneId:'a'},classList:{contains:()=>false},querySelector:s=>s.includes('pane-collapsed-tab')?groupRail:groupAnchor};

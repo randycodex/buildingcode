@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-reserved-chapters-v1450";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-free-reader-menu-v1451";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261105-reserved-chapters-v1450";
+} from "./offline-storage.js?v=20261105-free-reader-menu-v1451";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -44339,6 +44339,7 @@ function appendReaderMenuControls(menu, panel) {
 
 function openColumnGroupMenu(panel, anchor) {
   document.querySelector('.column-group-menu')?._close?.();
+  const pro = isProAccount();
   const group = workspacePrivatePresentationAllowed() && canGroupWorkspaceColumn(panel.dataset.paneId) ? columnGroupForPane(panel.dataset.paneId) : null;
   const menu = document.createElement('div');
   menu.className = 'column-group-menu';
@@ -44385,11 +44386,13 @@ function openColumnGroupMenu(panel, anchor) {
     button.addEventListener('click', () => { close(); action(); });
     menu.append(button);
   };
-  const expansion = columnExpansionController();
-  add(expansion.isExpanded(panel) ? 'Restore width' : 'Expand', () => {
-    if (expansion.isExpanded(panel)) expansion.restore();
-    else expansion.expand(panel);
-  });
+  if (pro) {
+    const expansion = columnExpansionController();
+    add(expansion.isExpanded(panel) ? 'Restore width' : 'Expand', () => {
+      if (expansion.isExpanded(panel)) expansion.restore();
+      else expansion.expand(panel);
+    });
+  }
   const factEditor = panel.classList.contains("project-facts-panel") ? projectInformationMounts.get(panel.dataset.paneId) : null;
   if (factEditor?.refreshZoLa) add("Refresh ZoLa data", factEditor.refreshZoLa, factEditor.isRefreshing());
   if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
@@ -44403,12 +44406,14 @@ function openColumnGroupMenu(panel, anchor) {
   const pinTarget = panel.dataset.paneId.startsWith("section:detail:")
     ? savedEvidenceColumnGroup(panel.dataset.paneId, activePaneIDs())[0] || panel.dataset.paneId
     : panel.dataset.paneId;
-  if (isProAccount() && currentColumnWorkflowView() === "research") {
+  if (pro && currentColumnWorkflowView() === "research") {
     add(activePinnedPaneID() === pinTarget ? 'Unpin' : 'Pin', () => togglePinnedPane(panel));
   }
-  separate();
-  add('Move Left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
-  add('Move Right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
+  if (pro) {
+    separate();
+    add('Move Left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
+    add('Move Right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
+  }
   if (searchOptions) {
     separate();
     matchControl.querySelector("summary").setAttribute("role", "menuitem");
@@ -44420,7 +44425,7 @@ function openColumnGroupMenu(panel, anchor) {
   }
   if (panel.classList.contains("reader-panel")) {
     separate();
-    add("Change Code", () => openReaderCodePicker(anchor, async (code) => {
+    if (pro) add("Change Code", () => openReaderCodePicker(anchor, async (code) => {
       const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
       if (reader && panel.isConnected) await changeReaderCode(panel, reader, code);
     }));
