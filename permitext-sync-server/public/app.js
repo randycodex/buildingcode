@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-flat-pro-button-v1478";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-direct-pro-signup-v1479";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-flat-pro-button-v1478";
+} from "./offline-storage.js?v=20261106-direct-pro-signup-v1479";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -11739,18 +11739,19 @@ async function signInCurrentBrowser(mode = "signIn") {
   throw error;
 }
 
-async function startDirectClerkSignIn(button) {
+async function startDirectClerkAccountEntry(button, { mode = "signIn", upgrade = false } = {}) {
   if (button.disabled) return false;
   const identity = captureAccountRequest();
   const navigation = state.workflowNavigationGeneration || 0;
+  const label = button.textContent;
   const reset = () => {
     button.disabled = false;
     button.removeAttribute("aria-busy");
-    button.textContent = "Sign in";
+    button.textContent = label;
   };
   button.disabled = true;
   button.setAttribute("aria-busy", "true");
-  showColumnLoadingStatus(button, "Sign in");
+  showColumnLoadingStatus(button, label);
   try {
     const config = await clerkWebSignInConfig();
     requireCurrentAccountRequest(identity);
@@ -11762,7 +11763,13 @@ async function startDirectClerkSignIn(button) {
     const hostedPreview = localPreview && config?.available === false;
     if (!config?.available && !hostedPreview) throw new Error("Secure sign-in is currently unavailable. Please try again.");
     const destination = new URL(hostedPreview ? "https://accounts.permitext.com/sign-in" : config.accountPortalSignInURL);
+    if (mode === "signUp") destination.pathname = destination.pathname.replace(/\/sign-in\/?$/, "/sign-up");
     const returnURL = new URL("/workspace?clerk_return=1", hostedPreview ? "https://permitext.com" : window.location.href);
+    if (upgrade) {
+      rememberProUpgradeIntent();
+      // Carry the intent across hosted authentication, including local previews.
+      returnURL.searchParams.set("intent", "upgrade-pro");
+    }
     destination.searchParams.set("redirect_url", returnURL.href);
     // A browser Back restored from its page cache must offer a usable button.
     window.addEventListener("pageshow", reset, { once: true });
@@ -41550,6 +41557,10 @@ function renderAccountWelcome(dialog) {
   const buttons = Array.from(panel.querySelectorAll("[data-account-mode]"));
   const status = panel.querySelector(".account-welcome-status");
   buttons.forEach(button => button.addEventListener("click", async () => {
+    if (buttons.some(item => item.disabled)) return;
+    if (dialog.dataset.proUpgrade === "true" && !activeAccount()) {
+      return startDirectClerkAccountEntry(button, { mode: button.dataset.accountMode, upgrade: true });
+    }
     buttons.forEach(item => { item.disabled = true; });
     showColumnLoadingStatus(status, "Loading");
     dialog.dataset.signingIn = "true";
@@ -44307,7 +44318,7 @@ function renderFirstUseWelcome() {
     signIn.textContent = "Sign in";
     signIn.addEventListener("click", () => {
       clearProUpgradeIntent();
-      void startDirectClerkSignIn(signIn);
+      void startDirectClerkAccountEntry(signIn);
     });
     actions.append(signIn);
   }
@@ -50019,7 +50030,10 @@ async function start() {
     context:() => `${activeAccount()?.userID || ""}:${accountRuntimeGeneration}:${activeWorkspaceID}`,
     eligible:() => canRunForegroundSync() && ["connected", "offline"].includes(syncedContent?.status)});
   await refreshEntitlementAfterCheckoutReturn();
-  await setupAccountProfile().catch(error => console.warn("Profile setup unavailable", error));
+  // An upgrade return goes to checkout review; profile details can be set later.
+  if (!incomingProUpgrade && !readProUpgradeIntent()) {
+    await setupAccountProfile().catch(error => console.warn("Profile setup unavailable", error));
+  }
   await resumePendingResearchIntent();
   await resumePendingProSave();
   await resumeProUpgradeIntent();

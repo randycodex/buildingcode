@@ -23,7 +23,7 @@ const names = [
   "persistProjectOrder", "persistSectionBookmark", "persistSectionInProject", "persistSectionFolderSelection",
   "removeSectionFromAllProjects", "removeSectionFromProject", "scheduleAnnotationPush",
   "archiveProjects", "restoreArchivedProject", "deleteArchivedProjects", "deleteArchivedProjectData",
-  "completeClerkPermitextSignIn", "signInCurrentBrowser", "startDirectClerkSignIn", "showHostedAccountFallback", "renderAccountWelcome", "deleteCapturedAccount", "clearDeletedAccountBrowserData",
+  "completeClerkPermitextSignIn", "signInCurrentBrowser", "startDirectClerkAccountEntry", "showHostedAccountFallback", "renderAccountWelcome", "deleteCapturedAccount", "clearDeletedAccountBrowserData",
   "openSupplementalResearchConversation",
   "requirePrivateWorkspaceWritable", "releaseAccountLinkWriteFence", "withAccountLinkWriteFence", "requireAccountLinkWorkSaved",
   "linkedAccountRecoverySources", "linkedAccountRecoveryBundle", "accountLocalRecoveryBundle"
@@ -261,7 +261,7 @@ for (const mode of ["signIn", "signUp"]) {
     querySelectorAll: () => buttons
   };
   let closed = false;
-  const dialog = { dataset: { proUpgrade: "true" }, close() { closed = true; } };
+  const dialog = { dataset: {}, close() { closed = true; } };
   const h = harness({
     state: workspace(null),
     document: { createElement: () => panel },
@@ -308,44 +308,53 @@ for (const [hostname, code] of [['permitext.com','SIGN_IN_UNAVAILABLE'], ['local
 }
 
 // Welcome Sign in navigates directly to Clerk, without an account dialog or SDK.
-function directEntry({hostname='permitext.com',available=true,config}={}) {
+function directEntry({hostname='permitext.com',available=true,config,upgrade=false,mode='signIn'}={}) {
   const redirects=[],notices=[],listeners=new Map();
-  const button={disabled:false,isConnected:true,textContent:'Sign in',attributes:{},
+  const label=mode==='signUp'?'Continue with Pro':'Sign in';
+  const button={disabled:false,isConnected:true,textContent:label,attributes:{},dataset:{accountMode:mode},
+    addEventListener(_event,callback){this.click=callback;},
     setAttribute(key,value){this.attributes[key]=value;},removeAttribute(key){delete this.attributes[key];}};
   const origin=hostname==='127.0.0.1'?'http://127.0.0.1:8786':`https://${hostname}`;
   const h=harness({state:workspace(null),location:{hostname},
     window:{location:{href:origin+'/workspace?intent=upgrade-pro#old',assign:url=>redirects.push(url)},
       addEventListener:(event,callback,options)=>{assert.equal(options.once,true);listeners.set(event,callback);},removeEventListener:event=>listeners.delete(event)},
     clerkWebSignInConfig:config||(async()=>({available,accountPortalSignInURL:'https://configured-clerk.example/sign-in'})),
+    rememberProUpgradeIntent:()=>h.calls.push('remember-upgrade'),
     showColumnLoadingStatus:target=>{target.textContent='loading icon';},showWebNotice:(...args)=>notices.push(args),
     toggleAccountDialog:()=>assert.fail('Direct sign-in must not open the Permitext account dialog'),
     loadClerkScript:()=>assert.fail('Clerk owns its sign-in screen; direct entry does not load the SDK')
   });
-  return {...h,button,redirects,notices,listeners,run:()=>h.c.startDirectClerkSignIn(button)};
+  return {...h,button,redirects,notices,listeners,run:()=>h.c.startDirectClerkAccountEntry(button,{mode,upgrade})};
 }
+for(const mode of ['signIn','signUp']) {
 for(const [hostname,available,expectedOrigin,returnOrigin] of [
   ['permitext.com',true,'https://configured-clerk.example','https://permitext.com'],
   ['127.0.0.1',true,'https://configured-clerk.example','http://127.0.0.1:8786'],
   ['127.0.0.1',false,'https://accounts.permitext.com','https://permitext.com']
 ]) {
-  const t=directEntry({hostname,available});
+  const upgrade=mode==='signUp';
+  const t=directEntry({hostname,available,mode,upgrade});
   assert.equal(await t.run(),true);
   assert.equal(t.redirects.length,1);
   const destination=new URL(t.redirects[0]);
-  assert.equal(destination.origin,expectedOrigin);assert.equal(destination.pathname,'/sign-in');
-  assert.equal(destination.searchParams.get('redirect_url'),returnOrigin+'/workspace?clerk_return=1');
+  assert.equal(destination.origin,expectedOrigin);assert.equal(destination.pathname,mode==='signUp'?'/sign-up':'/sign-in');
+  assert.equal(destination.searchParams.get('redirect_url'),returnOrigin+'/workspace?clerk_return=1'+(upgrade?'&intent=upgrade-pro':''));
+  assert.deepEqual(t.calls,upgrade?['remember-upgrade']:[]);
   assert.equal(t.button.disabled,true);assert.equal(t.notices.length,0);assert.equal(t.c.state.account,null);
   t.listeners.get('pageshow')();
-  assert.equal(t.button.disabled,false);assert.equal(t.button.textContent,'Sign in');
+  assert.equal(t.button.disabled,false);assert.equal(t.button.textContent,mode==='signUp'?'Continue with Pro':'Sign in');
   assert.equal(t.button.attributes['aria-busy'],undefined,'Browser Back restores a usable button');
 }
+}
+for(const mode of ['signIn','signUp']) {
 for(const options of [{available:false},{hostname:'127.0.0.1',config:async()=>{throw Error('Network failure');}}]) {
-  const t=directEntry(options);assert.equal(await t.run(),false);
+  const t=directEntry({...options,mode,upgrade:true});assert.equal(await t.run(),false);
   assert.equal(t.redirects.length,0);assert.equal(t.notices.length,1);assert.equal(t.button.disabled,false);
-  assert.equal(t.button.textContent,'Sign in');
+  assert.equal(t.button.textContent,mode==='signUp'?'Continue with Pro':'Sign in');
+  assert.deepEqual(t.calls,[],'A failed handoff does not create an upgrade intent');
 }
 for(const cancel of ['account','navigation','detached']) {
-  const gate=deferred(),t=directEntry({config:()=>gate.promise});
+  const gate=deferred(),t=directEntry({config:()=>gate.promise,mode,upgrade:true});
   const pending=t.run();
   assert.equal(await t.run(),false,'Repeated clicks do not start another sign-in');
   if(cancel==='account')t.switchTo();
@@ -354,8 +363,29 @@ for(const cancel of ['account','navigation','detached']) {
   gate.resolve({available:true,accountPortalSignInURL:'https://configured-clerk.example/sign-in'});
   assert.equal(await pending,false);assert.equal(t.redirects.length,0);assert.equal(t.notices.length,0);
   assert.equal(t.button.disabled,false);
+  assert.deepEqual(t.calls,[],'Canceled account/navigation handoffs do not create an upgrade intent');
 }
-console.log('Direct Clerk entry passed: configured redirect, explicit local hosted preview, workspace callback, no dialog/SDK, repeat-click suppression, Back recovery and stale navigation/account cancellation.');
+}
+// Exercise the real Pro entry button handler, including existing-account sign-in.
+for(const mode of ['signUp','signIn']) {
+  const gate=deferred(),t=directEntry({mode,config:()=>gate.promise});
+  const secondary={disabled:false,dataset:{accountMode:mode==='signUp'?'signIn':'signUp'},addEventListener(_event,callback){this.click=callback;}};
+  const status={textContent:''};
+  const panel={querySelector:selector=>selector==='.account-welcome-status'?status:{addEventListener(){}},querySelectorAll:()=>[t.button,secondary]};
+  t.c.document={createElement:()=>panel};
+  t.c.signInCurrentBrowser=()=>assert.fail('Pro entry must navigate directly to Clerk, without the SDK handoff');
+  t.c.renderAccountWelcome({dataset:{proUpgrade:'true'}});
+  const pending=t.button.click();
+  await secondary.click();
+  gate.resolve({available:true,accountPortalSignInURL:'https://configured-clerk.example/sign-in'});
+  assert.equal(await pending,true);
+  assert.equal(t.redirects.length,1,'Only one Pro auth navigation may be pending');
+  const destination=new URL(t.redirects[0]);
+  assert.equal(destination.pathname,mode==='signUp'?'/sign-up':'/sign-in');
+  assert.equal(new URL(destination.searchParams.get('redirect_url')).searchParams.get('intent'),'upgrade-pro');
+  assert.equal(status.textContent,'','No intermediate account status screen is shown');
+}
+console.log('Direct Clerk entry passed: signup/sign-in, Pro checkout return intent, explicit local hosted preview, no dialog/SDK, repeat-click suppression, Back recovery and stale navigation/account cancellation.');
 
 // SDK loading and token creation retain the original browser and Clerk identity.
 for (const stage of ["sdk", "token", "configuration"]) {

@@ -17,7 +17,7 @@ const priorStart = actualStart.replace("void loadStartupCatalogs();", priorBlock
 assert.notEqual(priorStart, actualStart, "The shipped startup must launch optional catalog work without awaiting it.");
 function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 function node() { return { dataset: {}, scrollLeft: 0, scrollWidth: 100, clientWidth: 100, addEventListener() {}, querySelectorAll: () => [] }; }
-async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = false, failProfile = false, quarantined = false, dismissed = false, pro = false, savedColumns = [] } = {}) {
+async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = false, failProfile = false, quarantined = false, dismissed = false, pro = false, savedColumns = [], upgradeReturn = false, retainedUpgrade = false } = {}) {
   const events = [];
   const issues = [];
   let firstWorkspaceAt;
@@ -60,6 +60,7 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     presentWorkspaceIssue: (message) => issues.push(message),
     flushPendingSyncAndRender: async () => {}, flushCodeQuestionOutbox: async () => {},
     refreshNotebookPendingStatus: async () => {}, refreshEntitlementAfterCheckoutReturn: async () => {},
+    incomingProUpgrade: upgradeReturn, readProUpgradeIntent: () => retainedUpgrade ? {} : null,
     setupAccountProfile: async () => {
       assert.ok(events.includes("workspace"), "Profile setup must follow usable workspace rendering.");
       events.push("profile");
@@ -99,6 +100,10 @@ const dismissedLegacy = await sample(actualStart, { quarantined: true, dismissed
 assert.equal(dismissedLegacy.issues.length, 0, "Dismissed legacy notices must not reappear at startup.");
 const failedProfile = await sample(actualStart, { failProfile: true });
 assert.deepEqual(failedProfile.events, expectedEvents, "Profile setup failure must not prevent pending intents from resuming after the workspace renders.");
+for (const intent of [{upgradeReturn:true},{retainedUpgrade:true}]) {
+  const upgrade = await sample(actualStart, intent);
+  assert.deepEqual(upgrade.events, expectedEvents.filter(event => event !== "profile"), "Authentication with a Pro intent proceeds to checkout review without a profile setup detour.");
+}
 for (const savedColumns of [[],["saved-reader","saved-search"]]) {
   const pro = await sample(actualStart,{pro:true,savedColumns});
   assert.ok(pro.events.indexOf("verify-complete") < pro.events.indexOf("workspace"),"Pro startup settles workspace selection before its first render.");
