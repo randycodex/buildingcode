@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-free-chapter-search-v1475";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-welcome-account-actions-v1476";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-free-chapter-search-v1475";
+} from "./offline-storage.js?v=20261106-welcome-account-actions-v1476";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -44254,14 +44254,13 @@ function renderFirstUseWelcome() {
   const reader = document.createElement("button");
   reader.type = "button";
   reader.className = "first-use-reader";
-  reader.textContent = "Reader";
+  reader.textContent = "Read NYC codes for free";
   reader.setAttribute("aria-haspopup", "dialog");
   reader.setAttribute("aria-expanded", "false");
   bindReaderToolbarButton(reader);
   const actions = document.createElement("div");
   actions.className = "first-use-actions";
-  actions.append(getPro, reader);
-  content.append(heading, supporting, actions);
+  actions.append(getPro);
   if (!activeAccount()) {
     const signIn = document.createElement("button");
     signIn.type = "button";
@@ -44271,8 +44270,9 @@ function renderFirstUseWelcome() {
       clearProUpgradeIntent();
       toggleAccountDialog({ signIn: true });
     });
-    content.append(signIn);
+    actions.append(signIn);
   }
+  content.append(heading, supporting, actions, reader);
   welcome.append(content);
   return welcome;
 }
