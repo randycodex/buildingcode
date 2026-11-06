@@ -1371,7 +1371,7 @@ body:has(> .reader-open-code-menu.is-centered) .workspace-first-use .first-use-c
 .first-use-actions button { min-height: 44px; padding: 10px 20px; }
 .first-use-actions .primary { background: #fff; color: #111; border: 0; border-radius: 999px; padding-inline: 28px; }
 .first-use-actions .first-use-reader { appearance: none; background: transparent; color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--radius-pill); padding-inline: 28px; box-shadow: none; }
-.first-use-sign-in { min-height: 44px; margin-top: 8px; padding: 8px 12px; border: 0; background: transparent; color: var(--text-secondary); box-shadow: none; text-decoration: underline; text-underline-offset: 3px; }
+.first-use-sign-in { min-height: 44px; margin-top: 8px; padding: 8px 12px; border: 0; background: transparent; color: var(--text-secondary); box-shadow: none; text-decoration: none; }
 .first-use-sign-in:hover { color: var(--text-primary); }
 .pro-locked-content {
   display: grid;
