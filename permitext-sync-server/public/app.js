@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-entry-flow-streamline-v1467";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-sign-in-notice-v1468";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261105-entry-flow-streamline-v1467";
+} from "./offline-storage.js?v=20261106-sign-in-notice-v1468";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -11341,10 +11341,7 @@ async function resumeClerkSignInReturn() {
     }
     const account = await completeClerkPermitextSignIn(config);
     if (!account) throw new Error("Secure sign-in did not create an active session.");
-    clerkSignInReturnNotice = {
-      message: "Signed in successfully.",
-      isError: false
-    };
+    clerkSignInReturnNotice = null;
     return account;
   } catch (error) {
     clerkSignInReturnNotice = {
