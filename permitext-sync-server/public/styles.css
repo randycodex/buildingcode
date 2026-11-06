@@ -21060,6 +21060,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 
 /* Keep every header control centered inside the shared 35px bar. */
 .workspace-shell > .topbar { grid-template-rows: minmax(0, 1fr); align-items: center; }
+.workspace-shell > .topbar .topbar-brand { align-self: start; align-items: center; height: var(--workspace-bar-height); line-height: 1; }
 .topbar .project-update-badge { height: var(--workspace-menu-height); min-height: 0; }
 .topbar .web-app-update-button { color: #71cf98; width: 30px; padding: 0; }
 .project-update-badge.is-syncing { animation: project-sync-glow 1.4s ease-in-out .35s infinite; }
