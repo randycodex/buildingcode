@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-welcome-actions-row-v1463";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-welcome-sign-in-v1464";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261105-welcome-actions-row-v1463";
+} from "./offline-storage.js?v=20261105-welcome-sign-in-v1464";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41658,17 +41658,18 @@ function mountAccountScreenContent(dialog, panel) {
   dialog._disposeLibraryDownloadProgress?.();
   dialog._disposeLibraryDownloadProgress = panel._disposeLibraryDownloadProgress;
   const upgrade = dialog.dataset.proUpgrade === "true";
+  const signIn = dialog.dataset.signIn === "true";
   dialog._disposeSettingsColumns = upgrade ? null : organizeAccountSettings(panel);
   const header = document.createElement("header");
   header.className = "account-screen-header";
   const title = document.createElement("h1");
   title.className = "eyebrow panel-kind";
-  title.textContent = upgrade ? "Get Pro" : "Settings";
+  title.textContent = upgrade ? "Get Pro" : signIn ? "Sign in" : "Settings";
   const close = document.createElement("button");
   close.type = "button";
   close.className = "icon-button utility-close account-screen-close";
   close.innerHTML = circleXIconSVG();
-  close.title = upgrade ? "Close Get Pro" : "Close Settings";
+  close.title = `Close ${title.textContent}`;
   close.setAttribute("aria-label", close.title);
   close.addEventListener("click", () => dialog.close());
   if (!upgrade) header.append(title);
@@ -41676,7 +41677,7 @@ function mountAccountScreenContent(dialog, panel) {
   dialog.replaceChildren(header, panel);
 }
 
-function toggleAccountDialog({ upgrade = false } = {}) {
+function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
   const existing = document.querySelector(".account-screen[open]");
   if (existing) {
     if (!upgrade || existing.dataset.proUpgrade === "true") return;
@@ -41686,6 +41687,8 @@ function toggleAccountDialog({ upgrade = false } = {}) {
   const dialog = document.createElement("section");
   dialog.className = "account-dialog account-screen";
   dialog.classList.add("account-workspace-view");
+  const directSignIn = signIn && !activeAccount();
+  if (directSignIn) dialog.dataset.signIn = "true";
   if (upgrade) {
     dialog.dataset.proUpgrade = "true";
     dialog.classList.add("pro-upgrade-screen");
@@ -41695,8 +41698,8 @@ function toggleAccountDialog({ upgrade = false } = {}) {
   const requestIdentity = captureAccountRequest();
   const coveredState = new Map();
   const contextCheck = setInterval(() => {
-    const signingInForPro = upgrade && !requestIdentity.userID && dialog.dataset.signingIn === "true";
-    if (!isCurrentAccountRequest(requestIdentity) && !signingInForPro) dialog.close();
+    const signingInFromEntry = (upgrade || directSignIn) && !requestIdentity.userID && dialog.dataset.signingIn === "true";
+    if (!isCurrentAccountRequest(requestIdentity) && !signingInFromEntry) dialog.close();
   }, 200);
   dialog.open = true;
   dialog.setAttribute("open", "");
@@ -41713,7 +41716,8 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     syncWorkflowNavigation();
     if (closedWithKeyboard) {
-      const returnFocus = document.querySelector("#get-pro:not([hidden])") || workspaceActionsButton;
+      const returnFocus = (directSignIn ? track.querySelector(".first-use-sign-in")
+        : document.querySelector("#get-pro:not([hidden])")) || workspaceActionsButton;
       returnFocus?.focus({ preventScroll: true });
     }
   };
@@ -41723,7 +41727,7 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     closedWithKeyboard = true;
     dialog.close();
   });
-  dialog.setAttribute("aria-label", upgrade ? "Get Pro" : "Settings workspace");
+  dialog.setAttribute("aria-label", upgrade ? "Get Pro" : directSignIn ? "Sign in" : "Settings workspace");
   const panel = upgrade ? renderProAccountEntry(dialog)
     : activeAccount() ? renderSettings() : renderAccountWelcome(dialog);
   mountAccountScreenContent(dialog, panel);
@@ -41733,6 +41737,7 @@ function toggleAccountDialog({ upgrade = false } = {}) {
   document.querySelector(".workspace-shell").append(dialog);
   state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
   syncWorkflowNavigation();
+  if (directSignIn) panel.querySelector('[data-account-mode="signIn"]')?.click();
 }
 
 async function openSearchCodeSourceSettings(panel) {
@@ -44200,6 +44205,17 @@ function renderFirstUseWelcome() {
   actions.className = "first-use-actions";
   actions.append(getPro, reader);
   content.append(heading, supporting, actions);
+  if (!activeAccount()) {
+    const signIn = document.createElement("button");
+    signIn.type = "button";
+    signIn.className = "first-use-sign-in";
+    signIn.textContent = "Sign in";
+    signIn.addEventListener("click", () => {
+      clearProUpgradeIntent();
+      toggleAccountDialog({ signIn: true });
+    });
+    content.append(signIn);
+  }
   welcome.append(content);
   return welcome;
 }

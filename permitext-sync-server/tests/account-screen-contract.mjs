@@ -11,7 +11,7 @@ function extract(name) {
 
 function harness(signedIn) {
   let currentDialog = null, focusReturns = 0, focusTraps = 0, contextCheck, accountCurrent = true;
-  const panels = [], transitions = [], toggleAttributes = {};
+  const panels = [], transitions = [], toggleAttributes = {}, signInStarts = [];
   function element() {
     return {
       children: [], listeners: {}, attributes: {}, dataset: {}, removedStyles: [],
@@ -52,8 +52,10 @@ function harness(signedIn) {
     const scroll = Object.assign(element(), { className: "settings-scroll", scrollTop: 0 });
     scroll.append(plan, profile, sources, conflicts, offline, data);
     const oldHeader = { remove() { result.headerRemoved = true; } };
+    const signInButton = { click() { signInStarts.push("signIn"); currentDialog.dataset.signingIn = "true"; } };
     const find = result.querySelector.bind(result);
-    result.querySelector = selector => selector === ".panel-header" ? oldHeader : find(selector);
+    result.querySelector = selector => selector === ".panel-header" ? oldHeader
+      : selector === '[data-account-mode="signIn"]' ? signInButton : find(selector);
     if (signedIn) result.append(scroll);
     result.__refreshActiveCodeSources = async () => { result.sourcesReady = true; };
     Object.assign(result, { scroll, profile, plan, sources, offline, data, conflicts, signOut, deleteAccount });
@@ -87,7 +89,7 @@ function harness(signedIn) {
     transitionWorkspace: async (kind, options) => transitions.push({ kind, options }), track
   });
   vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
-  return { context, track, panels, transitions, toggleAttributes,
+  return { context, track, panels, transitions, toggleAttributes, signInStarts,
     toolbar, revokeAccount() { accountCurrent = false; contextCheck(); },
     dialog: () => currentDialog, focusReturns: () => focusReturns, focusTraps: () => focusTraps };
 }
@@ -153,6 +155,22 @@ for (const signedIn of [false, true]) {
   }
 }
 console.log('Pro entry passed: focused heading, no Settings columns, guest sign-in handoff and existing-account isolation.');
+
+// The welcome shortcut starts the existing sign-in action without an upgrade.
+const directSignIn = harness(false);
+directSignIn.context.toggleAccountDialog({ signIn: true });
+assert.deepEqual(directSignIn.signInStarts, ["signIn"]);
+assert.equal(directSignIn.dialog().attributes['aria-label'], 'Sign in');
+assert.equal(directSignIn.dialog().dataset.proUpgrade, undefined);
+assert.equal(directSignIn.dialog().children[0].children[1].attributes['aria-label'], 'Close Sign in');
+directSignIn.revokeAccount();
+assert.equal(directSignIn.dialog().open, true, 'Expected authentication keeps the direct sign-in handoff open');
+delete directSignIn.dialog().dataset.signingIn;
+directSignIn.revokeAccount();
+assert.equal(directSignIn.dialog(), null, 'Unrelated account changes still discard the sign-in screen');
+const signedInShortcut = harness(true);
+signedInShortcut.context.toggleAccountDialog({ signIn: true });
+assert.deepEqual(signedInShortcut.signInStarts, [], 'An existing account must not start another authentication request');
 
 // Content recovery refreshes must retain the screen's close action and scroll location.
 const h = harness(true);
