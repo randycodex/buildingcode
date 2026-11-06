@@ -2596,8 +2596,8 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   left: var(--panel-padding);
   z-index: 9;
   width: auto;
-  max-width: none;
-  margin: 0;
+  max-width: var(--workspace-content-max-width);
+  margin: 0 auto;
   border-radius: var(--radius-pill);
 }
 
