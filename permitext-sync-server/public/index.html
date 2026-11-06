@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261104-public-reading-workspace-v31">
+    <link rel="stylesheet" href="/web/styles.css?v=20261105-free-reader-source-v42">
     <link rel="stylesheet" href="/web/research-v2.css?v=19">
     <link rel="stylesheet" href="/web/reader-shortcuts.css?v=2">
   </head>
@@ -42,9 +42,10 @@
     <main class="workspace-shell">
       <header class="topbar">
         <nav class="topbar-actions" aria-label="Working views">
-<button class="toolbar-button" type="button" data-workflow-view="research" aria-pressed="true" data-workspace-icon="book-open">Research</button>
-<button class="toolbar-button" type="button" data-workflow-view="notebook" aria-pressed="false" data-workspace-icon="notepad-text">Notebook</button>
-<button class="toolbar-button" id="toggle-report" type="button" aria-label="Report" title="Choose a Project to open Report" aria-pressed="false" disabled data-workspace-icon="summary">
+<button class="toolbar-button" id="free-reader" data-open-reader type="button" aria-label="Reader" aria-pressed="true" data-workspace-icon="library-big" hidden><span>Reader</span></button>
+<button class="toolbar-button" type="button" data-workflow-view="research" data-pro-only hidden aria-pressed="true" data-workspace-icon="book-open">Research</button>
+<button class="toolbar-button" type="button" data-workflow-view="notebook" data-pro-only hidden aria-pressed="false" data-workspace-icon="notepad-text">Notebook</button>
+<button class="toolbar-button" id="toggle-report" data-pro-only hidden type="button" aria-label="Report" title="Choose a Project to open Report" aria-pressed="false" disabled data-workspace-icon="summary">
             <span>Report</span>
           </button><button class="mobile-more-button" id="mobile-more" type="button" aria-label="More" title="More" aria-haspopup="dialog" aria-expanded="false" data-mobile-label="More">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
@@ -62,11 +63,12 @@
             <span>SYNC</span>
             <span class="sr-only"><time></time></span>
           </button>
-          <div class="topbar-workspaces" aria-label="Projects">
+          <div class="topbar-workspaces" aria-label="Projects" hidden>
             <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Choose Project" title="Projects" aria-haspopup="menu" aria-expanded="false" data-workspace-icon="folder">
               <span class="workspace-current-name">Projects</span>
             </button>
           </div>
+          <button class="workspace-actions-button get-pro-button" id="get-pro" type="button" hidden><span>Get Pro</span></button>
         </div>
         <div class="topbar-account-state">
           <div class="topbar-brand" aria-label="permitext">
@@ -77,11 +79,11 @@
       </header>
 <nav class="workflow-toolbar" aria-label="Tools for current view"><div data-workflow-tools="research"><div class="reader-toolbar-tools"><button class="toolbar-button" id="add-reader" data-open-reader type="button" aria-label="Reader" title="Reader" data-mobile-label="Reader" data-workspace-icon="library-big">
             <span>Reader<span aria-hidden="true"> +</span></span>
-          </button><div class="reader-shortcuts" id="reader-shortcuts" role="group" aria-label="Open Readers" hidden></div></div><button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search" data-workspace-icon="search">
+          </button><div class="reader-shortcuts" id="reader-shortcuts" role="group" aria-label="Open Readers" hidden></div></div><button class="toolbar-button" id="toggle-search" data-pro-only hidden type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search" data-workspace-icon="search">
             <span>Search</span>
-          </button><button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Assistant" title="Assistant" aria-pressed="false" data-mobile-label="Assistant" data-workspace-icon="astroid">
+          </button><button class="toolbar-button" id="toggle-analysis" data-pro-only hidden type="button" aria-label="Assistant" title="Assistant" aria-pressed="false" data-mobile-label="Assistant" data-workspace-icon="astroid">
             <span>Assistant</span>
-          </button><button class="toolbar-button" id="toggle-calculator" type="button" aria-label="Calculator" title="Calculator" aria-pressed="false" data-mobile-label="Calculator" data-workspace-icon="calculator">
+          </button><button class="toolbar-button" id="toggle-calculator" data-pro-only hidden type="button" aria-label="Calculator" title="Calculator" aria-pressed="false" data-mobile-label="Calculator" data-workspace-icon="calculator">
             <span>Calculator</span>
           </button></div><div data-workflow-tools="notebook" hidden><button class="toolbar-button" id="toggle-saved" type="button" aria-label="Evidence" title="Evidence" aria-pressed="false" data-mobile-label="Evidence" data-workspace-icon="list-check">
             <span>Evidence</span>
@@ -91,7 +93,7 @@
             <span>Context</span>
           </button><button class="toolbar-button" id="toggle-facts" type="button" aria-label="Facts" title="Choose a Project to open Facts" aria-pressed="false" disabled>
             <span>Facts</span>
-          </button></div><div class="workflow-layout-actions" role="group" aria-label="Column layout">
+          </button></div><div class="workflow-layout-actions" role="group" aria-label="Column layout" hidden>
             <button class="toolbar-button" id="collapse-all-columns" type="button" aria-label="Collapse all" title="Collapse all columns" data-workspace-icon="panel-left-close"></button>
             <button class="toolbar-button" id="expand-all-columns" type="button" aria-label="Expand all" title="Expand all columns" data-workspace-icon="panel-left-open"></button>
             <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset layout" title="Restore default panel widths" data-workspace-icon="rotate-ccw"></button>
@@ -590,6 +592,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261104-free-reader-access-v1423" type="module"></script>
+    <script src="/web/app.js?v=20261105-real-account-sign-in-v1445" type="module"></script>
   </body>
 </html>

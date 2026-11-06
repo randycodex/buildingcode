@@ -937,6 +937,13 @@ textarea:focus-visible {
   display: none;
 }
 
+.topbar [data-pro-only][hidden],
+.workflow-toolbar [data-pro-only][hidden],
+.topbar #free-reader[hidden],
+.topbar .get-pro-button[hidden] {
+  display: none !important;
+}
+
 .topbar-layout-actions {
   display: flex;
   flex: 0 0 auto;
@@ -1356,7 +1363,7 @@ textarea:focus-visible {
   margin-top: 28px;
 }
 .first-use-actions button { min-height: 44px; padding: 10px 20px; }
-.first-use-actions .primary { background: var(--text-primary); color: var(--surface); }
+.first-use-actions .primary { background: #fff; color: #111; border: 0; border-radius: 999px; padding-inline: 28px; }
 .pro-locked-content {
   display: grid;
   align-content: start;
@@ -19121,6 +19128,22 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-draft-cla
 .account-welcome-explore { align-self: center; min-height: 44px; margin-top: 16px; }
 .account-welcome-status:empty { display: none; }
 
+.pro-upgrade-screen > .pro-account-entry { width: min(100%, 520px); padding: 32px 36px; }
+.pro-upgrade-screen > .account-screen-header { justify-content: flex-end; }
+.pro-account-entry .account-welcome-brand { margin: 0 0 28px; }
+.pro-account-entry h1 { margin: 0 0 12px; }
+.pro-account-entry > h1 + p { align-self: center; width: max-content; max-width: calc(100vw - 72px); }
+.pro-account-entry p.pro-account-price { margin: 20px 0 12px; color: var(--text-primary); font-size: 20px; font-weight: 600; }
+.pro-account-features { display: grid; gap: 8px; margin: 0 auto; padding: 0; list-style: none; color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
+.pro-account-entry .account-welcome-actions { margin-top: 28px; }
+.pro-account-entry .account-welcome-actions [data-account-mode="signIn"] { appearance: none; background: transparent; color: var(--text-primary); border: 1px solid color-mix(in srgb, var(--text-primary) 35%, transparent); box-shadow: none; }
+.pro-upgrade-screen .pro-checkout-panel > .settings-scroll { display: block !important; width: min(100%, 560px); margin: 0 auto; padding: 36px; box-sizing: border-box; overflow-y: auto; }
+.pro-upgrade-screen .pro-checkout-panel .settings-plan-card { border: 0; margin: 0; padding: 0; }
+.pro-checkout-panel :is(.settings-plan-features, .settings-plan-usage, .settings-research-packs) { display: none !important; }
+.pro-upgrade-screen .pro-checkout-panel .account-checkout { width: 100%; min-height: 48px; margin-top: 20px; border-radius: var(--radius-pill); }
+.pro-upgrade-screen .pro-checkout-panel .settings-footer { display: flex; flex-direction: column; justify-content: center; gap: 12px; height: auto; min-height: 64px; padding: 16px 32px; border-top: 0; }
+.pro-upgrade-screen .pro-checkout-panel .settings-status-message:not(:empty) { position: static; max-width: 488px; padding: 0; background: transparent; border: 0; text-align: center; }
+
 .account-identity > div[hidden] { display: none; }
 .account-dialog.profile-dialog { height: fit-content; max-height: calc(100dvh - 48px); overflow: auto; }
 .profile-form { display: grid; gap: 14px; padding: 32px 40px; font-family: var(--ui-font-family); }
@@ -19311,6 +19334,7 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-draft-cla
   text-overflow: ellipsis;
   cursor: pointer;
 }
+span.reader-collapse-title { cursor: default; }
 .reader-open-code-menu {
   position: fixed;
   z-index: 1100;
@@ -20339,14 +20363,17 @@ dialog.report-export-review {
 }
 
 /* Selected working views retain a light-blue identity without heavier text. */
-.topbar .topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] {
+.topbar .topbar-actions > :is([data-workflow-view], #toggle-report, #free-reader)[aria-pressed="true"] {
   color: #6aa9ff;
   background: rgb(106 169 255 / 10%) !important;
 }
-.topbar .topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"]:not(:disabled):hover {
+.topbar .topbar-actions > :is([data-workflow-view], #toggle-report, #free-reader)[aria-pressed="true"]:not(:disabled):hover {
   background: var(--workspace-menu-highlight) !important;
   color: var(--text-primary);
 }
+
+.topbar #get-pro { color: #ff7b7b; background: rgb(255 123 123 / 10%) !important; }
+.topbar #get-pro:not(:disabled):is(:hover, :focus-visible) { color: #ff9494; background: rgb(255 123 123 / 18%) !important; }
 
 /* Keep the Account disclaimer on the screen centerline within a 42px footer. */
 .account-workspace-view .settings-panel .settings-footer {
@@ -21188,3 +21215,12 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 }
 .workspace-add-button:hover { background: var(--toolbar-active); }
 .workspace-add-button:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
+
+/* Free reading uses one navigation row and one Reader. */
+.workspace-shell.is-free-account { grid-template-rows: var(--workspace-bar-height) minmax(0, 1fr) !important; }
+.workspace-shell.is-free-account > :is(.workflow-toolbar, .workspace-column-tabs) { display: none !important; }
+.workspace-shell.is-free-account .reader-reference-source { display: none !important; }
+.workspace-shell.is-free-account > .panel-track { grid-row: 2 !important; }
+.workspace-shell.is-free-account > .workspace-issue { grid-row: 2; }
+.workspace-shell.is-free-account:has(> .workspace-issue:not([hidden])) { grid-template-rows: var(--workspace-bar-height) auto minmax(0, 1fr) !important; }
+.workspace-shell.is-free-account:has(> .workspace-issue:not([hidden])) > .panel-track { grid-row: 3 !important; }

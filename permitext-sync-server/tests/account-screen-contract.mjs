@@ -72,14 +72,15 @@ function harness(signedIn) {
       createElement: element,
       body: { append(dialog) { currentDialog = dialog; } }
     },
-    toggleSettingsButton: { setAttribute: (name, value) => { toggleAttributes[name] = value; },
+    workspaceActionsButton: { setAttribute: (name, value) => { toggleAttributes[name] = value; },
       focus: () => { focusReturns++; }, blur() {} },
     topbarBrand: { cloneNode: () => Object.assign(element(), { className: "topbar-brand" }) },
     activeAccount: () => signedIn ? { userID: "synthetic-account" } : null,
-    renderSettings: panel, renderAccountWelcome: panel,
+    renderSettings: panel, renderAccountWelcome: panel, renderProAccountEntry: panel,
     trapWebModalFocus: () => { focusTraps++; }, clearProUpgradeIntent() {},
     state: {}, saveWorkspaceState() {}, closeSharedWorkspaceViews() {},
-    captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
+    createSettingsColumnResizers: () => ({ refresh() {}, dispose() {} }),
+    captureAccountRequest: () => signedIn ? { userID: "synthetic-account" } : {}, isCurrentAccountRequest: () => accountCurrent,
     setInterval: cb => { contextCheck = cb; return 1; }, clearInterval() {},
     syncWorkflowNavigation() { toggleAttributes["aria-pressed"] = String(Boolean(currentDialog?.open)); },
     activePaneIDs: () => ["reader:one", "utility:settings", "utility:saved"],
@@ -125,6 +126,33 @@ for (const signedIn of [false, true]) {
   assert.equal(h.dialog(), null, "Account changes discard the private account view.");
   assert.equal(h.track.inert, false);
 }
+
+// Pro entry keeps signup separate from Settings and retains the expected auth handoff.
+const replaceSettings = harness(false);
+replaceSettings.context.toggleAccountDialog();
+const previousSettings = replaceSettings.dialog();
+replaceSettings.context.toggleAccountDialog({upgrade:true});
+assert.notEqual(replaceSettings.dialog(), previousSettings);
+assert.equal(replaceSettings.dialog().dataset.proUpgrade, 'true', 'Get Pro replaces an already open generic account screen');
+replaceSettings.dialog().children[0].children[0].listeners.click();
+for (const signedIn of [false, true]) {
+  const pro = harness(signedIn);
+  pro.context.toggleAccountDialog({ upgrade: true });
+  assert.equal(pro.dialog().attributes['aria-label'], 'Get Pro');
+  assert.equal(pro.dialog().children[0].children.length, 1, 'The Pro header contains only its close control');
+  assert.equal(pro.dialog().children[0].children[0].attributes['aria-label'], 'Close Get Pro');
+  assert.equal(pro.panels[0].scroll.children.length, 6, 'The Pro entry must not organize Settings columns');
+  pro.dialog().dataset.signingIn = 'true';
+  pro.revokeAccount();
+  if (signedIn) assert.equal(pro.dialog(), null, 'Account changes close an existing-account upgrade');
+  else {
+    assert.equal(pro.dialog().open, true, 'Expected guest authentication preserves the upgrade handoff');
+    delete pro.dialog().dataset.signingIn;
+    pro.revokeAccount();
+    assert.equal(pro.dialog(), null, 'An unrelated account change still closes the guest screen');
+  }
+}
+console.log('Pro entry passed: focused heading, no Settings columns, guest sign-in handoff and existing-account isolation.');
 
 // Content recovery refreshes must retain the screen's close action and scroll location.
 const h = harness(true);

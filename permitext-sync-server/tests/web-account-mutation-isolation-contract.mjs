@@ -23,7 +23,7 @@ const names = [
   "persistProjectOrder", "persistSectionBookmark", "persistSectionInProject", "persistSectionFolderSelection",
   "removeSectionFromAllProjects", "removeSectionFromProject", "scheduleAnnotationPush",
   "archiveProjects", "restoreArchivedProject", "deleteArchivedProjects", "deleteArchivedProjectData",
-  "completeClerkPermitextSignIn", "signInCurrentBrowser", "deleteCapturedAccount", "clearDeletedAccountBrowserData",
+  "completeClerkPermitextSignIn", "signInCurrentBrowser", "renderAccountWelcome", "deleteCapturedAccount", "clearDeletedAccountBrowserData",
   "openSupplementalResearchConversation",
   "requirePrivateWorkspaceWritable", "releaseAccountLinkWriteFence", "withAccountLinkWriteFence", "requireAccountLinkWorkSaved",
   "linkedAccountRecoverySources", "linkedAccountRecoveryBundle", "accountLocalRecoveryBundle"
@@ -226,6 +226,56 @@ for (const stage of ["confirmation", "flush"]) {
   await assert.rejects(pending, isAbort);
   assert.deepEqual(h.calls, []);
   assert.equal(h.c.state.localProjects.length, 0);
+}
+
+// Human account actions must never turn localhost's test-browser credentials
+// into a successful sign-in or signup when the real providers are unavailable.
+for (const mode of ["signIn", "signUp"]) {
+  for (const browserFallbackAllowed of [false, true]) {
+    const h = harness({
+      clerkWebSignInConfig: async () => ({ available: false }),
+      appleWebSignInConfig: async () => ({ available: false, browserFallbackAllowed }),
+      signInWithBrowserFallback: () => { throw new Error("Unexpected test-browser sign-in"); }
+    });
+    await assert.rejects(h.c.signInCurrentBrowser(mode), /Secure sign-in is not configured/);
+    assert.deepEqual(h.calls, [], "Unavailable sign-in cannot store an account or post a credential");
+    assert.equal(h.c.state.account.userID, A.userID);
+  }
+  const clerk = harness({ signInWithClerkWeb: (_config, value) => value });
+  assert.equal(await clerk.c.signInCurrentBrowser(mode), mode, "Clerk retains the requested sign-in/signup mode");
+  const apple = harness({
+    clerkWebSignInConfig: async () => ({ available: false }),
+    appleWebSignInConfig: async () => ({ available: true, browserFallbackAllowed: true }),
+    signInWithAppleWeb: () => "apple-sign-in"
+  });
+  assert.equal(await apple.c.signInCurrentBrowser(mode), "apple-sign-in");
+}
+for (const mode of ["signIn", "signUp"]) {
+  const buttons = ["signUp", "signIn"].map(accountMode => ({
+    dataset: { accountMode }, disabled: false,
+    addEventListener(_event, callback) { this.click = callback; }
+  }));
+  const status = { textContent: "" };
+  const panel = {
+    querySelector: selector => selector === ".account-welcome-status" ? status : { addEventListener() {} },
+    querySelectorAll: () => buttons
+  };
+  let closed = false;
+  const dialog = { dataset: { proUpgrade: "true" }, close() { closed = true; } };
+  const h = harness({
+    state: workspace(null),
+    document: { createElement: () => panel },
+    clerkWebSignInConfig: async () => ({ available: false }),
+    appleWebSignInConfig: async () => ({ available: false, browserFallbackAllowed: true })
+  });
+  h.c.renderAccountWelcome(dialog);
+  await buttons.find(button => button.dataset.accountMode === mode).click();
+  assert.equal(closed, false, "Unavailable account actions keep the account entry open");
+  assert.match(status.textContent, /Secure sign-in is not configured/);
+  assert(buttons.every(button => !button.disabled), "Both account actions remain usable after a failed attempt");
+  assert.equal(dialog.dataset.signingIn, undefined);
+  assert.equal(h.c.state.account, null);
+  assert.deepEqual(h.calls, []);
 }
 
 // SDK loading and token creation retain the original browser and Clerk identity.

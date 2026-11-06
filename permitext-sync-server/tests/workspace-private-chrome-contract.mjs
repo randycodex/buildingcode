@@ -22,7 +22,7 @@ const body=new Element('body');
 const layoutControl=new Element('button');layoutControl.textContent='Reset layout';
 const state={get columnGroups(){privateReads++;return [{name:'Private group'}];}};
 const context=vm.createContext({renderProjectUpdateBadge(){},switchWorkflowView:view=>opened.push(view),toggleUtilityPane:key=>opened.push(key),workspaceActionsButton:button,detachedProjectWindow:false,workspacePrivatePresentationAllowed:()=>allowed,
- captureAccountRequest:()=>({userID:account?.userID}),isCurrentAccountRequest:()=>current,activeAccount:()=>account,
+ captureAccountRequest:()=>({userID:account?.userID}),isCurrentAccountRequest:()=>current,activeAccount:()=>account,isProAccount:()=>true,
  ensureSyncedContentForRender:async()=>({userID:account?.userID,workspacePresentationAccess:authority}),
  loadSyncedContent:async()=>({userID:account?.userID,workspacePresentationAccess:authority}),showWebNotice:async()=>{},
  activeWorkspaceRecord(){privateReads++;return{id:'project'};},visibleWorkspaceRecords(){privateReads++;return[{id:'project',name:'Private Project'}];},

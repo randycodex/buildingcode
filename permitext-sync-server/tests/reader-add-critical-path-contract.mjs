@@ -66,4 +66,13 @@ for (const pro of [false,true]) {
 }
 const guarded=fixture();guarded.c.needsProject=true;
 assert.equal(await guarded.c.openReaderFromToolbar({}),false);assert.equal(guarded.pickers.length,0);
+const free=fixture({pro:false,view:'research'});
+await free.c.openReaderFromToolbar({});
+free.finishRender();await free.pickers[0](code);
+const readerID=free.c.state.readers[0].id;
+await free.c.openReaderFromToolbar({});
+await free.pickers[1]({prefix:'MC',version:'2022'});
+assert.equal(free.c.state.readers.length,1,'Switching codes reuses the single Free column');
+assert.equal(free.c.state.readers[0].id,readerID);
+assert.equal(free.c.state.readers[0].codePrefix,'MC');
 console.log('Readers passed: explicit source selection, four working views, project/account/navigation guards, concurrent plan limits and late-render fencing.');

@@ -85,6 +85,7 @@ grip.classList = { add() {} };
 dragPane.querySelectorAll = () => [grip, collapsedTab];
 const dragState = { collapsedPaneIDs: ['reader:drag'], paneOrder: ['reader:drag', 'reader:target'] };
 const dragContext = vm.createContext({
+  paneCanCollapse: () => true,
   state: dragState, Date, draggedPaneID: '', dragPreviewOrder: [],
   track: { querySelectorAll: () => [] }, saveWorkspaceState() {},
   transitionWorkspace() {},
@@ -243,7 +244,7 @@ const reopenState = {
     'utility:analysis:owned-research': { kind:'utility', value:{id:'owned-research',key:'analysis',conversationID:'conversation'},width:700 }
   }}]
 };
-const reopenContext = vm.createContext({state:reopenState, CSS:{escape:x=>x}, captureColumnGroupContents(){},
+const reopenContext = vm.createContext({state:reopenState, isProAccount:()=>true, CSS:{escape:x=>x}, captureColumnGroupContents(){},
   defaultActivePaneIDs:()=>[...reopenState.readers.map(r=>'reader:'+r.id),...reopenState.utilityInstances.map(i=>'utility:'+i.key+':'+i.id)],
   track:{querySelector:()=>null}, pendingGroupReaderPositions:new Map(), researchNewChatDrafts:new Map(), researchDraftPaneIDs:new Set(),
   paneIDForUtilityInstance:i=>'utility:'+i.key+':'+i.id, defaultPaneWidthForID:()=>600, saveWorkspaceState(){}, async transitionWorkspace(){}, showWebNotice(){throw Error('Unexpected missing snapshot');}
@@ -320,7 +321,7 @@ const menuContext=vm.createContext({state:menuState,primarySavedPaneID:()=>'',Ab
 vm.runInContext(['paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','canGroupWorkspaceColumn','activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
 menuState.pinnedPaneID='reader:one';
 menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert.deepEqual(menuItems().map(x=>x.textContent),['Expand','Collapse','Move Left','Move Right'],'Free menus omit both Pin and Unpin, even with a stored Pro pin.');
+assert.deepEqual(menuItems().map(x=>x.textContent),['Expand','Move Left','Move Right'],'Free Reader menus omit Collapse, Pin and Unpin, even with a stored Pro pin.');
 assert.equal(menuContext.activePinnedPaneID(),'','A stored Pro pin is inactive on Free.');
 menuContext.togglePinnedPane(menuPanel);
 assert.equal(menuState.pinnedPaneID,'reader:one','Free cannot change a pin through a stale action handler.');
@@ -414,7 +415,7 @@ assert.equal(menuContext.orderWithPaneStepped('reader:one',-1),null,'Cannot move
 assert.ok(menuContext.orderWithPaneStepped('reader:one',1),'Unrelated neighboring columns remain movable');
 console.log('Code Decisions legacy anchors disable only affected move units/targets; unrelated columns remain movable.');
 
-const notebookCollapseContext=vm.createContext({currentColumnWorkflowView:()=> 'notebook'});
+const notebookCollapseContext=vm.createContext({currentColumnWorkflowView:()=> 'notebook',isProAccount:()=>true});
 vm.runInContext(actual('paneCanCollapse'),notebookCollapseContext);
 assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project:note:a'),true);
 assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project'),true);

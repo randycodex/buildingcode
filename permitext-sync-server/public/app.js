@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261104-free-reader-access-v1423";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-real-account-sign-in-v1445";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261104-free-reader-access-v1423";
+} from "./offline-storage.js?v=20261105-real-account-sign-in-v1445";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -409,6 +409,7 @@ const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
 const mobileMoreButton = document.querySelector("#mobile-more");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
+const getProButton = document.querySelector("#get-pro");
 document.querySelectorAll("[data-workspace-icon]").forEach(button => {
   prependWorkspaceButtonIcon(button, button.dataset.workspaceIcon);
 });
@@ -2699,14 +2700,14 @@ function renderWorkspaceTabs() {
   if (emptyState) {
     // Project creation is optional while reading. Keep its empty-state prompt
     // out of the way as soon as a public column opens, including loading shells.
-    emptyState.hidden = !empty || currentColumnWorkflowView() !== "research" ||
+    emptyState.hidden = !isProAccount() || !empty || currentColumnWorkflowView() !== "research" ||
       defaultActivePaneIDs().some(workflowPaneIsVisible);
     emptyState.querySelector("button").disabled = !isProAccount();
     emptyState.querySelector("button").onclick = () => { void createNewWorkspace(); };
   }
   const container = workspaceActionsButton?.closest(".topbar-workspaces");
   if (!workspaceActionsButton || !container) return;
-  container.hidden = detachedProjectWindow;
+  container.hidden = detachedProjectWindow || !isProAccount();
   if (detachedProjectWindow) return;
   if (!privateAllowed) {
     const label = workspaceActionsButton.querySelector(".workspace-current-name");
@@ -2729,6 +2730,8 @@ function renderWorkspaceTabs() {
 }
 
 function updateWorkspaceLayoutControls() {
+  document.querySelectorAll(".workflow-layout-actions")
+    .forEach(group => { group.hidden = !isProAccount(); });
   const inReport = Boolean(reportScreen?.isOpen());
   const reportReady = Boolean(document.querySelector(".report-workspace-view:not([hidden]) .report-workspace-columns"));
   const hasColumns = defaultActivePaneIDs().some(workflowPaneIsVisible);
@@ -5285,6 +5288,7 @@ function closeSharedWorkspaceViews(except = "") {
 function syncWorkflowNavigation() {
   const accountOpen = Boolean(document.querySelector(".account-screen[open]"));
   const view = accountOpen ? "account" : projectDetailsScreen?.isOpen() ? "project-details" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
+  document.querySelector("#free-reader")?.setAttribute("aria-pressed", String(!isProAccount() && view === "research"));
   toggleReportButton?.setAttribute("aria-pressed", String(view === "report"));
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     button.disabled = !isProAccount() && button.dataset.workflowView !== 'research';
@@ -8025,13 +8029,25 @@ function setTitle(panel, reader) {
 }
 
 function updateReaderLocationTitle(panel, reader) {
-  const button = panel.querySelector(".reader-collapse-title");
+  let button = panel.querySelector(".reader-collapse-title");
   if (!button) return;
+  const collapsible = isProAccount();
+  if (button.tagName !== (collapsible ? "BUTTON" : "SPAN")) {
+    const title = document.createElement(collapsible ? "button" : "span");
+    title.className = "reader-collapse-title";
+    if (collapsible) {
+      title.type = "button";
+      title.addEventListener("click", () => setPaneCollapsed(panel, true, { focus: true }));
+    }
+    button.replaceWith(title);
+    button = title;
+  }
   const code = readerCodeOptionLabel(codeOptionFor(reader.codePrefix || "BC", reader.codeVersion));
   const location = reader.sectionNumber ? `§ ${reader.sectionNumber}` : "";
   button.textContent = [code, location].filter(Boolean).join(" · ");
-  button.setAttribute("aria-label", `Collapse ${[code, sectionDisplayTitle(reader.sectionNumber, reader.title, "Reader")].join(" · ")}`);
-  button.title = [code, sectionDisplayTitle(reader.sectionNumber, reader.title, "Reader"), "Click to collapse column"].join(" · ");
+  const label = [code, sectionDisplayTitle(reader.sectionNumber, reader.title, "Reader")].join(" · ");
+  button.setAttribute("aria-label", collapsible ? `Collapse ${label}` : label);
+  button.title = collapsible ? `${label} · Click to collapse column` : label;
 }
 
 function appendHighlighted(container, text, query) {
@@ -9567,22 +9583,24 @@ function isProAccount() {
 }
 
 function syncReaderToolbarButton(button) {
+  const pro = isProAccount();
   const requiresProject = workspaceColumnsRequireProject();
-  const limitReached = !isProAccount() && state.readers.length >= 1;
+  const replacesReader = !pro && state.readers.length >= 1;
   const readerLabel = "Reader";
-  button.querySelector("span").textContent = `${readerLabel} +`;
+  button.querySelector("span").textContent = pro ? `${readerLabel} +` : readerLabel;
   button.dataset.mobileLabel = readerLabel;
-  button.hidden = false;
-  button.disabled = !requiresProject && limitReached;
-  button.title = requiresProject ? "Create a Project first to open Reader" : limitReached ? "One Reader limit reached" : "Open a Reader beside this view";
+  button.hidden = button.id === "free-reader" ? pro : !pro;
+  button.disabled = false;
+  button.title = requiresProject ? "Create a Project first to open Reader" : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader beside this view" : "Choose a code for Reader";
   button.classList.toggle("has-open-reader", state.readers.length > 0);
-  button.setAttribute(
-    "aria-label",
-    !requiresProject && limitReached ? `${readerLabel}. One Reader limit reached.` : readerLabel
-  );
+  button.setAttribute("aria-label", readerLabel);
 }
 
 function updateReaderPlanControls() {
+  const pro = isProAccount();
+  document.querySelector(".workspace-shell")?.classList.toggle("is-free-account", !pro);
+  if (getProButton) getProButton.hidden = pro || detachedProjectWindow;
+  document.querySelectorAll('[data-pro-only]').forEach(button => { button.hidden = !pro; });
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     button.disabled = !isProAccount() && button.dataset.workflowView !== "research";
   });
@@ -9611,16 +9629,14 @@ function createReaderToolbarButton() {
 function bindReaderToolbarButton(button) {
   if (button.dataset.readerBound === "true") return;
   button.dataset.readerBound = "true";
-  button.addEventListener("click", () => void openReaderFromToolbar(button));
+  button.addEventListener("click", () => {
+    if (button.id === "free-reader") closeSharedWorkspaceViews();
+    void openReaderFromToolbar(button);
+  });
 }
 
 async function openReaderFromToolbar(button) {
   if (notifyProjectRequiredForColumn()) return false;
-  if (!isProAccount() && state.readers.length >= 1) {
-    enforceReaderPlanLimit();
-    await transitionWorkspace("utility");
-    return false;
-  }
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const view = currentColumnWorkflowView();
@@ -9629,13 +9645,18 @@ async function openReaderFromToolbar(button) {
     currentColumnWorkflowView() === view && (state.workflowNavigationGeneration || 0) === generation;
   openReaderCodePicker(button, async code => {
     if (!isCurrent() || workspaceColumnsRequireProject()) return;
-    // Reserve a slot before asynchronous rendering, including late picker clicks.
-    if (!isProAccount() && state.readers.length >= 1) return;
-    const reader = newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) });
-    state.readers.push(reader);
+    // Replace the free Reader synchronously, including overlapping picker clicks.
+    if (!isProAccount()) enforceReaderPlanLimit();
+    const previous = !isProAccount() ? state.readers[0] : null;
+    const reader = newReaderState({
+      codePrefix: code.prefix, codeVersion: codeOptionVersion(code),
+      ...(previous ? { id: previous.id } : {})
+    });
+    if (previous) state.readers = [reader];
+    else state.readers.push(reader);
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneIDForReader(reader), view);
     saveWorkspaceState();
-    await transitionWorkspace("utility");
+    await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
     if (isCurrent()) scrollPaneIntoView(paneIDForReader(reader));
   });
   return true;
@@ -10927,6 +10948,15 @@ const proUpgradeIntentKey = "permitext.proUpgradeIntent.v1";
 const incomingProUpgrade = new URLSearchParams(location.search).get("intent") === "upgrade-pro";
 let proUpgradeCaptured = false;
 
+function rememberProUpgradeIntent() {
+  try {
+    sessionStorage.setItem(proUpgradeIntentKey, JSON.stringify({
+      accountID: activeAccount()?.userID || null,
+      expiresAt: Date.now() + 30 * 60 * 1000
+    }));
+  } catch { /* The account screen can still be opened without session storage. */ }
+}
+
 function clearProUpgradeIntent() {
   try { sessionStorage.removeItem(proUpgradeIntentKey); } catch { /* No stored intent. */ }
 }
@@ -10947,12 +10977,7 @@ async function resumeProUpgradeIntent() {
   if (!proUpgradeCaptured) {
     proUpgradeCaptured = true;
     if (incomingProUpgrade) {
-      try {
-        sessionStorage.setItem(proUpgradeIntentKey, JSON.stringify({
-          accountID: activeAccount()?.userID || null,
-          expiresAt: Date.now() + 30 * 60 * 1000
-        }));
-      } catch { /* The account dialog can still be opened normally. */ }
+      rememberProUpgradeIntent();
       const url = new URL(location.href);
       url.searchParams.delete("intent");
       history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
@@ -10960,8 +10985,9 @@ async function resumeProUpgradeIntent() {
   }
   if (!readProUpgradeIntent()) return;
   const existing = document.querySelector(".account-dialog");
-  if (existing?.open) return;
-  existing?.remove();
+  if (existing?.open && existing.dataset?.proUpgrade === "true") return;
+  existing?.close?.();
+  existing?.remove?.();
   toggleAccountDialog({ upgrade: true });
 }
 
@@ -11686,18 +11712,6 @@ async function signInWithAppleWeb(config) {
   return new Promise(() => {});
 }
 
-async function signInWithBrowserFallback() {
-  const payload = await postJSON("/account/sign-in", {
-    credential: {
-      provider: "web",
-      providerUserID: browserCredentialID(),
-      displayName: "Web browser",
-      signedInAt: new Date().toISOString()
-    }
-  });
-  return storeSignedInAccount(payload, "Web browser");
-}
-
 async function signInCurrentBrowser(mode = "signIn") {
   const requestIdentity = captureAccountRequest();
   const clerkConfig = await clerkWebSignInConfig().catch(() => null);
@@ -11710,10 +11724,9 @@ async function signInCurrentBrowser(mode = "signIn") {
   if (config.available) {
     return signInWithAppleWeb(config);
   }
-  if (config.browserFallbackAllowed) {
-    return signInWithBrowserFallback();
-  }
-  throw new Error("Apple web sign-in is not configured yet.");
+  // Local browser credentials are test fixtures, not a user's account login.
+  // Keep the account screen open when no real sign-in provider is available.
+  throw new Error("Secure sign-in is not configured for this app yet.");
 }
 
 function mutationKindAndRecord(mutation) {
@@ -41414,6 +41427,7 @@ function renderAccountWelcome(dialog) {
   buttons.forEach(button => button.addEventListener("click", async () => {
     buttons.forEach(item => { item.disabled = true; });
     status.textContent = "Opening secure sign-in…";
+    dialog.dataset.signingIn = "true";
     saveWorkspaceState();
     try {
       await signInCurrentBrowser(button.dataset.accountMode);
@@ -41430,9 +41444,68 @@ function renderAccountWelcome(dialog) {
     } catch (error) {
       status.textContent = error.message || "Could not sign in. Please try again.";
       buttons.forEach(item => { item.disabled = false; });
+    } finally {
+      delete dialog.dataset.signingIn;
     }
   }));
   return panel;
+}
+
+function renderProAccountEntry(dialog) {
+  const account = activeAccount();
+  const panel = renderAccountWelcome(dialog);
+  panel.classList.add("pro-account-entry");
+  panel.querySelector(".account-welcome-explore").remove();
+  panel.querySelector("h1").textContent = "Your professional workspace.";
+  panel.querySelector("h1 + p").textContent = "Save your work, organize Projects, and research with the code beside you.";
+  const price = document.createElement("p");
+  price.className = "pro-account-price";
+  price.textContent = "$20/month plus applicable taxes";
+  const features = document.createElement("ul");
+  features.className = "pro-account-features";
+  for (const text of [
+    "Unlimited saved passages and notes",
+    "Projects, Notebook, Report, and professional exports",
+    "100 AI-assisted Research turns each month",
+    "Multiple Readers and a downloaded code library"
+  ]) {
+    const item = document.createElement("li");
+    item.textContent = text;
+    features.append(item);
+  }
+  const actions = panel.querySelector(".account-welcome-actions");
+  actions.before(price, features);
+  if (account) {
+    const upgrade = document.createElement("button");
+    upgrade.type = "button";
+    upgrade.className = "primary";
+    upgrade.textContent = isProAccount() ? "Manage Pro" : "Upgrade this account";
+    upgrade.addEventListener("click", () => showProAccountCheckout(dialog));
+    actions.replaceChildren(upgrade);
+    const name = account.email || account.displayName || "your Permitext account";
+    panel.querySelector(".account-welcome-existing").textContent = `Continue with ${name}.`;
+  } else {
+    panel.querySelector('[data-account-mode="signUp"]').textContent = "Create Pro account";
+    panel.querySelector(".account-welcome-existing").remove();
+  }
+  return panel;
+}
+
+function showProAccountCheckout(dialog) {
+  if (!dialog.isConnected || !activeAccount()) return;
+  const panel = renderSettings({ upgrade: true });
+  panel.classList.add("pro-checkout-panel");
+  const plan = panel.querySelector(".settings-plan-card");
+  plan.querySelector("h3").textContent = isProAccount() ? "Your Pro plan" : "Upgrade this account";
+  panel.querySelector(".settings-scroll").replaceChildren(plan);
+  const status = panel.querySelector(".settings-status-message");
+  const back = document.createElement("button");
+  back.type = "button";
+  back.className = "settings-link-button";
+  back.textContent = "Back";
+  back.addEventListener("click", () => mountAccountScreenContent(dialog, renderProAccountEntry(dialog)));
+  panel.querySelector(".settings-footer").replaceChildren(status, back);
+  mountAccountScreenContent(dialog, panel);
 }
 
 function organizeAccountSettings(panel) {
@@ -41533,35 +41606,47 @@ function mountAccountScreenContent(dialog, panel) {
   dialog._disposeSettingsColumns?.();
   dialog._disposeLibraryDownloadProgress?.();
   dialog._disposeLibraryDownloadProgress = panel._disposeLibraryDownloadProgress;
-  dialog._disposeSettingsColumns = organizeAccountSettings(panel);
+  const upgrade = dialog.dataset.proUpgrade === "true";
+  dialog._disposeSettingsColumns = upgrade ? null : organizeAccountSettings(panel);
   const header = document.createElement("header");
   header.className = "account-screen-header";
   const title = document.createElement("h1");
   title.className = "eyebrow panel-kind";
-  title.textContent = "Settings";
+  title.textContent = upgrade ? "Get Pro" : "Settings";
   const close = document.createElement("button");
   close.type = "button";
   close.className = "icon-button utility-close account-screen-close";
   close.innerHTML = circleXIconSVG();
-  close.title = "Close Settings";
-  close.setAttribute("aria-label", "Close Settings");
+  close.title = upgrade ? "Close Get Pro" : "Close Settings";
+  close.setAttribute("aria-label", close.title);
   close.addEventListener("click", () => dialog.close());
-  header.append(title, close);
+  if (!upgrade) header.append(title);
+  header.append(close);
   dialog.replaceChildren(header, panel);
 }
 
 function toggleAccountDialog({ upgrade = false } = {}) {
   const existing = document.querySelector(".account-screen[open]");
-  if (existing) return;
+  if (existing) {
+    if (!upgrade || existing.dataset.proUpgrade === "true") return;
+    existing.close();
+  }
   closeSharedWorkspaceViews("account");
   const dialog = document.createElement("section");
   dialog.className = "account-dialog account-screen";
   dialog.classList.add("account-workspace-view");
+  if (upgrade) {
+    dialog.dataset.proUpgrade = "true";
+    dialog.classList.add("pro-upgrade-screen");
+  }
   let closedWithKeyboard = false;
   let closed = false;
   const requestIdentity = captureAccountRequest();
   const coveredState = new Map();
-  const contextCheck = setInterval(() => { if (!isCurrentAccountRequest(requestIdentity)) dialog.close(); }, 200);
+  const contextCheck = setInterval(() => {
+    const signingInForPro = upgrade && !requestIdentity.userID && dialog.dataset.signingIn === "true";
+    if (!isCurrentAccountRequest(requestIdentity) && !signingInForPro) dialog.close();
+  }, 200);
   dialog.open = true;
   dialog.setAttribute("open", "");
   dialog.close = () => {
@@ -41576,7 +41661,10 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     coveredState.forEach((inert, element) => { element.inert = inert; });
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     syncWorkflowNavigation();
-    if (closedWithKeyboard) workspaceActionsButton?.focus({ preventScroll: true });
+    if (closedWithKeyboard) {
+      const returnFocus = document.querySelector("#get-pro:not([hidden])") || workspaceActionsButton;
+      returnFocus?.focus({ preventScroll: true });
+    }
   };
   dialog.addEventListener("keydown", (event) => {
     if (event.defaultPrevented || event.key !== "Escape") return;
@@ -41584,12 +41672,9 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     closedWithKeyboard = true;
     dialog.close();
   });
-  dialog.setAttribute("aria-label", "Settings workspace");
-  const panel = activeAccount() ? renderSettings({ upgrade }) : renderAccountWelcome(dialog);
-  if (upgrade && !activeAccount()) {
-    panel.querySelector("h1").textContent = "Continue to Pro.";
-    panel.querySelector("h1 + p").textContent = "Sign in or create an account to connect your subscription. Then continue to secure checkout.";
-  }
+  dialog.setAttribute("aria-label", upgrade ? "Get Pro" : "Settings workspace");
+  const panel = upgrade ? renderProAccountEntry(dialog)
+    : activeAccount() ? renderSettings() : renderAccountWelcome(dialog);
   mountAccountScreenContent(dialog, panel);
   [track, document.querySelector(".workflow-toolbar")].filter(Boolean).forEach(element => {
     coveredState.set(element, element.inert); element.inert = true;
@@ -41913,7 +41998,7 @@ async function refreshAfterResearchDeletion(result, identity) {
 function renderSettings({ upgrade = false } = {}) {
   const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
-  wireSettingsActiveCodeSources(panel, { enabled: true, collapsibleGroups: true });
+  if (!upgrade) wireSettingsActiveCodeSources(panel, { enabled: true, collapsibleGroups: true });
   applyPaneWeight(panel, "utility:settings");
   const conversations = panel.querySelector('.settings-conversations');
   conversations?.addEventListener('toggle', () => {
@@ -42474,6 +42559,7 @@ function renderSettings({ upgrade = false } = {}) {
   window.addEventListener(libraryDownloadProgressEvent, downloadProgressChanged);
   panel._disposeLibraryDownloadProgress = () => window.removeEventListener(libraryDownloadProgressEvent, downloadProgressChanged);
   const renderOfflineState = async () => {
+    if (upgrade) return;
     const pro = hasCapability("offline-access");
     let library = await offlineLibraryStatus().catch(() => ({available: false, supported: false}));
     if (paintLibraryDownloadProgress()) return;
@@ -42615,7 +42701,7 @@ function renderSettings({ upgrade = false } = {}) {
         setStatus(error.message || "Could not load the current purchase policies.", true);
       }
     });
-  wireSettingsCardCollapsing(panel);
+  if (!upgrade) wireSettingsCardCollapsing(panel);
   const researchUsageAccount = activeAccount();
   if (researchUsageAccount && hasCapability("research")) {
     void postJSON(
@@ -42654,8 +42740,8 @@ function renderSettings({ upgrade = false } = {}) {
     const account = activeAccount();
     if (account) return;
     signInButton.textContent = config.available ? "Sign in with Apple" : "Sign in";
-    signInButton.disabled = !config.available && !config.browserFallbackAllowed;
-    if (!config.available && !config.browserFallbackAllowed) accountCopy.textContent = "Apple web sign-in is not configured yet.";
+    signInButton.disabled = !config.available;
+    if (!config.available) accountCopy.textContent = "Secure sign-in is not configured for this app yet.";
   }).catch(() => {
     if (!activeAccount()) accountCopy.textContent = "Could not check sign-in configuration.";
   });
@@ -43089,7 +43175,7 @@ function renderSettings({ upgrade = false } = {}) {
     }
   });
 
-  attachSettingsTrash(panel);
+  if (!upgrade) attachSettingsTrash(panel);
   panel.querySelectorAll("[data-clear-action]").forEach((button) => {
     button.addEventListener("click", async () => {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
@@ -43578,7 +43664,7 @@ function bindPaneDragging(panes) {
     const header = pane.querySelector(":scope > header");
     if (header) {
       header.classList.add("pane-header-drag-area");
-      header.title = "Drag to move · Click title to collapse";
+      header.title = paneCanCollapse(pane.dataset.paneId) ? "Drag to move · Click title to collapse" : "Drag to move";
     }
     pane.querySelectorAll(".pane-header-drag-area, .pane-collapsed-tab, :scope > .pane-drag-handle").forEach((handle) => {
       if (handle.dataset.dragBound === "true") return;
@@ -43986,6 +44072,7 @@ function workspaceHasPriorUse() {
 
 function shouldShowFirstUseWelcome() {
   if (firstUseWelcomeActive) return true;
+  if (!isProAccount() && !detachedProjectWindow && state.readers.length === 0) return true;
   if (detachedProjectWindow || entryHasExternalIntent() || workspaceHasPriorUse()) return false;
   try {
     if (localStorage.getItem(firstUseWelcomeSeenKey)) return false;
@@ -44038,30 +44125,22 @@ function renderFirstUseWelcome() {
   content.className = "first-use-content";
   const heading = document.createElement("h1");
   heading.id = headingID;
-  heading.textContent = "Explore NYC construction codes and read the enacted text.";
+  heading.textContent = "Explore NYC construction codes.";
   const supporting = document.createElement("p");
   supporting.className = "first-use-supporting";
-  supporting.textContent = "Browse codes, follow references, and search. No account needed.";
+  supporting.textContent = "Read enacted text, follow references, and search for the provisions you need.";
 
-  const explore = document.createElement("button");
-  explore.type = "button";
-  explore.className = "primary";
-  explore.textContent = "Explore Permitext";
-  explore.addEventListener("click", async () => {
-    completeFirstUseWelcome();
-    if (!state.readers.length) state.readers.push(newReaderState());
-    await renderWorkspace();
-  });
-  const signIn = document.createElement("button");
-  signIn.type = "button";
-  signIn.textContent = "Sign in";
-  signIn.addEventListener("click", () => {
-    completeFirstUseWelcome();
-    void focusUtility("settings");
+  const getPro = document.createElement("button");
+  getPro.type = "button";
+  getPro.className = "primary";
+  getPro.textContent = "Get Pro";
+  getPro.addEventListener("click", () => {
+    rememberProUpgradeIntent();
+    toggleAccountDialog({ upgrade: true });
   });
   const actions = document.createElement("div");
   actions.className = "first-use-actions";
-  actions.append(explore, signIn);
+  actions.append(getPro);
   content.append(heading, supporting, actions);
   welcome.append(content);
   return welcome;
@@ -44518,6 +44597,7 @@ function openColumnGroupEditor(panel, existing = null) {
 
 // Collapse keeps the live column DOM (including unsaved editors) in place.
 function paneCanCollapse(paneID) {
+  if (paneID.startsWith("reader:") && !isProAccount()) return false;
   return currentColumnWorkflowView() !== "notebook" || /^(?:reader:|project:notebook:|utility:saved(?::|$))/.test(paneID);
 }
 
@@ -44641,6 +44721,10 @@ function setAllColumnsCollapsed(collapsed) {
 function preparePaneCollapse(panel) {
   const header = panel.querySelector(":scope > header");
   if (!header || detachedProjectWindow) return;
+  if (panel.classList.contains("reader-panel")) {
+    const reader = state.readers.find(item => paneIDForReader(item) === panel.dataset.paneId);
+    if (reader) updateReaderLocationTitle(panel, reader);
+  }
   if (!paneCanCollapse(panel.dataset.paneId)) {
     panel._collapseAnimation?.cancel();
     delete panel._collapseAnimation;
@@ -44874,6 +44958,7 @@ function appendPaneSequence(panes) {
 }
 
 function readerShortcutItems() {
+  if (!isProAccount()) return [];
   const byID = new Map((state.readers || []).map(reader => [paneIDForReader(reader), reader]));
   return [...track.querySelectorAll(":scope > .workspace-panel")].flatMap(panel => {
     const id = panel.dataset.paneId;
@@ -49681,6 +49766,11 @@ async function start() {
       return;
     }
     openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
+  });
+  getProButton?.addEventListener("click", () => {
+    if (isProAccount()) return;
+    rememberProUpgradeIntent();
+    toggleAccountDialog({ upgrade: true });
   });
   mobileMoreButton?.addEventListener("click", openMobileMoreSheet);
   window.matchMedia("(max-width: 760px)").addEventListener("change", (event) => {
