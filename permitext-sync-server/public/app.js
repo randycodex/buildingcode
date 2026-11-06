@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-sign-in-notice-v1468";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-add-workspace-menu-v1469";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-sign-in-notice-v1468";
+} from "./offline-storage.js?v=20261106-add-workspace-menu-v1469";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2519,7 +2519,7 @@ function openMobileMoreSheet() {
       () => void switchWorkspace(workspace.id, { focus: false }),
       { current: workspace.id === activeWorkspaceID }));
   });
-  projectList.append(mobileMoreAction("New Project", () => void createNewWorkspace(), { disabled: !isProAccount() }));
+  projectList.append(mobileMoreAction("add workspace", () => void createNewWorkspace(), { disabled: !isProAccount() }));
   if (activeWorkspaceRecord()?.projectID) projectList.append(mobileMoreAction("Close Project", () => void closeActiveProject()));
   const project = workspaceProject();
   const identity = project ? projectIdentity(project) : null;
@@ -2640,7 +2640,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     projectSection.append(button);
   });
   if (projectsAvailable) {
-    appendMenuAction(projectSection, { label: "New Project", run: () => void createNewWorkspace() });
+    appendMenuAction(projectSection, { label: "add workspace", run: () => void createNewWorkspace() });
   } else {
     appendMenuAction(projectSection, { label: activeAccount() ? "Account & project access" : "Sign in for Projects", run: () => toggleAccountDialog() });
   }
