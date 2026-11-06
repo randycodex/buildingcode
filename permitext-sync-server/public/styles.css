@@ -19129,6 +19129,11 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-draft-cla
 .account-welcome-explore { align-self: center; min-height: 44px; margin-top: 16px; }
 .account-welcome-status:empty { display: none; }
 .account-welcome-status > .column-loading-indicator { position: static; }
+.workspace-shell > .account-screen[data-signing-in="true"] { position: fixed; inset: 0; z-index: 2000; height: 100dvh; }
+.workspace-shell:has(> .account-screen[data-signing-in="true"]) > .topbar { visibility: hidden; }
+.account-screen[data-signing-in="true"] > .account-screen-header,
+.account-screen[data-signing-in="true"] .account-welcome > :not(.account-welcome-status) { display: none; }
+.account-screen[data-signing-in="true"] .account-welcome-status { margin: 0; }
 
 .pro-upgrade-screen > .pro-account-entry { width: min(100%, 520px); padding: 32px 36px; }
 .pro-upgrade-screen > .account-screen-header { justify-content: flex-end; }
