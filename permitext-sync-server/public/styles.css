@@ -1355,6 +1355,10 @@ textarea:focus-visible {
   width: min(100%, 90rem);
 }
 
+body:has(> .reader-open-code-menu.is-centered) .workspace-first-use .first-use-content {
+  visibility: hidden;
+}
+
 .first-use-actions {
   display: flex;
   flex-direction: column;
