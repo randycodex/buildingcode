@@ -15,7 +15,7 @@ function element() {
     querySelector() { return this; } };
 }
 function deferred() { let resolve, reject; const promise = new Promise((a,b) => {resolve=a; reject=b;}); return {promise,resolve,reject}; }
-function harness() {
+function harness({ pro = true } = {}) {
   const content = element(), requests = [];
   content.children = ["Original enacted provision"];
   const panel = { dataset: {}, isConnected: true, querySelector: () => content };
@@ -23,6 +23,7 @@ function harness() {
   const opened = [];
   const restore = () => { panel.dataset.readerSearchToken = randomUUID(); content.classList.remove("is-searching-reader"); content.children = ["Original enacted provision"]; };
   const context = vm.createContext({ readerSearchMatch, snippetForMatch, readerSearchResultHeading, rankReaderSearchResults, crypto: { randomUUID }, document: { createElement: element },
+    isProAccount: () => pro,
     annotatedBlocksForSection: section => section.blocks || [],
     annotationTargetForBlock: (_section, block, _reader, index) => ({blockID: block.id || `block-${index}`}),
     stopReaderProgressiveHydration() {}, startReaderSectionVisibility() {}, clear: node => {node.children = [];},
@@ -31,7 +32,7 @@ function harness() {
     AbortController, captureReaderScrollPositions: () => new Map(),
     refreshReaderContent: async (_panel, target, options) => opened.push({ ...target, options }),
     updateBrowserSectionURL() {}, scheduleContinuitySync() {}, saveWorkspaceState() {},
-    fetchReaderChapterSearch(_reader, _query, signal, options) { assert.equal(options.scope, "code"); const request = { ...deferred(), signal }; requests.push(request); return request.promise; },
+    fetchReaderChapterSearch(_reader, _query, signal, options) { assert.equal(options.scope, pro ? "code" : "chapter"); const request = { ...deferred(), signal }; requests.push(request); return request.promise; },
     sectionDisplayTitle: (number,title) => `${number} ${title}`, plainTextForSearchBlock: block => block.plainText,
     appendHighlighted: (node,value) => {node.textContent = value;}, snippetForMatch: value => value
   });
@@ -102,6 +103,26 @@ assert.match(source.slice(source.indexOf("async function renderSectionContent(")
   assert.equal(rows[2].textContent,'Current chapter');
   assert.equal(rows[3].children[0].textContent,'202 Definitions');
 }
+
+// Free find is scoped to the open chapter, including its recovery copy.
+{
+  const t=harness({pro:false}), pending=t.run("egress");
+  assert.equal(t.content.children[0],"Searching this chapter");
+  t.requests[0].resolve([{chapterID:"synthetic-chapter",sectionID:"107.5",heading:"107.5 Means of egress plans",snippet:"Egress analysis",corpusRevision:"a".repeat(64),matchText:"egress",blockID:"paragraph-1"}]);
+  await pending;
+  const rows=t.content.children[0].children;
+  assert.equal(rows[0].textContent,"Current chapter");
+  assert.equal(rows.filter(row=>row.className==="reader-internal-results-heading").length,1);
+  t.content.setAttribute=()=>{};
+  await rows[1].callbacks.click();
+  assert.equal(t.opened[0].chapterID,"synthetic-chapter");
+  assert.equal(t.opened[0].sectionID,"107.5");
+  assert.equal(t.opened[0].pendingSearchHighlightBlockID,"paragraph-1");
+  const noMatches=t.run("storm drainage");
+  t.requests[1].resolve([]);await noMatches;
+  assert.deepEqual(t.content.children,["No match in this chapter","Try a shorter phrase, or choose another chapter."]);
+}
+console.log("Free Reader search passed: chapter-only requests, matching scope copy, same-chapter exact passage navigation and chapter-only empty results.");
 
 // A saved citation fetch failure must resolve to visible recovery, remove only
 // its abandoned detail pane, and retain the exact citation for another attempt.

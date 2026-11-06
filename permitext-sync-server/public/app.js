@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-welcome-lowercase-v1474";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-free-chapter-search-v1475";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-welcome-lowercase-v1474";
+} from "./offline-storage.js?v=20261106-free-chapter-search-v1475";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -19416,7 +19416,8 @@ async function fetchReaderChapterSearch(reader, query, signal, { scope = "chapte
           }))
       }));
       matches.push(...searchReaderTextSections(sections, query).map(item => ({ ...item,
-        ...(scope === "code" ? { chapterID: chapter.id, chapterNumber: chapter.chapterNumber,
+        chapterID: chapter.id,
+        ...(scope === "code" ? { chapterNumber: chapter.chapterNumber,
           chapterTitle: chapter.fullTitle || chapter.displayTitle } : {}),
         ...(/^[a-f0-9]{64}$/.test(chapter.corpusRevision || "") ? { corpusRevision: chapter.corpusRevision } : {})
       })));
@@ -19456,12 +19457,17 @@ async function fetchReaderChapterSearch(reader, query, signal, { scope = "chapte
     }
     return result.results;
   }
-  return result.results.map(item => ({ ...item, corpusRevision: result.corpusRevision }));
+  if ((result.scope && result.scope !== "chapter") || result.results.some(item =>
+    item.chapterID != null && String(item.chapterID) !== String(reader.chapterID))) {
+    throw new Error("Chapter search identity mismatch");
+  }
+  return result.results.map(item => ({ ...item, chapterID: reader.chapterID, corpusRevision: result.corpusRevision }));
 }
 
 async function renderReaderInternalSearchResults(panel, reader, query) {
   const content = panel.querySelector(".reader-content");
   if (!content) return;
+  const chapterOnly = !isProAccount();
   cancelReaderInternalSearch(panel);
   const needle = query.trim().toLowerCase();
   const searchToken = `search:${crypto.randomUUID()}`;
@@ -19480,10 +19486,13 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
   clear(content);
   content.classList.add("is-searching-reader");
   content.scrollTop = 0;
-  emptyReader(content, "Searching this code", "Finding matches in this chapter and other chapters.");
+  emptyReader(content, chapterOnly ? "Searching this chapter" : "Searching this code", chapterOnly
+    ? "Finding matches in the open chapter." : "Finding matches in this chapter and other chapters.");
   let matches;
   try {
-    matches = rankReaderSearchResults(await fetchReaderChapterSearch(reader, query, controller.signal, { scope: "code" }), query);
+    matches = rankReaderSearchResults(await fetchReaderChapterSearch(reader, query, controller.signal, {
+      scope: chapterOnly ? "chapter" : "code"
+    }), query);
   } catch {
     if (panel.isConnected && panel.dataset.readerSearchToken === searchToken) {
       emptyReader(content, "Search could not load", "Try again, or close find to return to the code text.");
@@ -19502,7 +19511,8 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
   const results = document.createElement("section");
   results.className = "reader-internal-results";
   if (!matches.length) {
-    emptyReader(content, "No match in this code", "Try a shorter phrase, or use Search to look across codes.");
+    emptyReader(content, chapterOnly ? "No match in this chapter" : "No match in this code", chapterOnly
+      ? "Try a shorter phrase, or choose another chapter." : "Try a shorter phrase, or use Search to look across codes.");
     return;
   }
 
@@ -19735,6 +19745,7 @@ async function renderReader(reader, options = {}) {
   const internalSearchButton = panel.querySelector(".reader-internal-search-toggle");
   const internalSearchBox = panel.querySelector(".reader-internal-search");
   const internalSearchInput = panel.querySelector(".reader-internal-search-input");
+  internalSearchInput.placeholder = isProAccount() ? "Search this code" : "Search this chapter";
   const internalSearchClearButton = panel.querySelector(".reader-internal-search-clear");
   const codeSelect = panel.querySelector(".code-select");
   const chapterSelect = panel.querySelector(".chapter-select");

@@ -79,10 +79,12 @@ function response(overrides = {}) {
   const t = harness({ fetchImpl: async (path, options) => { url = path; signal = options.signal; return response(); } });
   assert.equal((await t.search(" concrete ")).length, 0);
   assert.equal(new URL(url, "https://test.local").searchParams.get("readerSearch"), "concrete");
+  assert.equal(new URL(url, "https://test.local").searchParams.has("readerScope"), false, "Chapter search must not request code-wide results");
   assert.ok(signal instanceof AbortSignal);
   assert.equal(t.offlineCalls, 0);
 }
-for (const mismatch of [{ corpusRevision: undefined }, { corpusRevision: "invalid" }, { chapterID: "other" }, { codeVersion: "2014" }, { query: "walls" }, { total: 1 }, { results: null }]) {
+for (const mismatch of [{ corpusRevision: undefined }, { corpusRevision: "invalid" }, { chapterID: "other" }, { codeVersion: "2014" }, { query: "walls" }, { total: 1 }, { results: null },
+  {scope:"code"}, {total:1,results:[{sectionID:"outside",chapterID:"another-chapter"}]}]) {
   const t = harness({ fetchImpl: async () => response(mismatch) });
   await assert.rejects(t.search(), /identity mismatch/);
   assert.equal(t.offlineCalls, 0, "invalid response does not silently fall back");
@@ -118,7 +120,9 @@ console.log("Reader search client passed: complete offline fallback, edition/ide
 
 {
  const t = harness({ fetchImpl: async () => response({ total: 1, results: [{ sectionID: "section-1" }] }) });
- assert.equal((await t.search())[0].corpusRevision, "a".repeat(64), "revision follows each result to Reader opening");
+ const results = await t.search();
+ assert.equal(results[0].corpusRevision, "a".repeat(64), "revision follows each result to Reader opening");
+ assert.equal(results[0].chapterID, reader.chapterID, "Chapter results retain the open chapter when selected");
 }
 
 for (const status of [400,401,403,404,409]) {
