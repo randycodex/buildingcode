@@ -2606,6 +2606,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   max-width: var(--workspace-content-max-width);
   margin: 0 auto;
   border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 10%, var(--reader-controls-surface));
 }
 
 .reader-internal-search[hidden] {
@@ -17141,6 +17142,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
 }
 .reader-panel:not(.is-collapsed):has(.reader-internal-search:not([hidden]))::before {
   transition: height var(--reader-search-reveal-duration) cubic-bezier(0.22, 1, 0.36, 1);
+  background: linear-gradient(to bottom,
+    var(--reader-controls-surface) 0,
+    var(--reader-controls-surface) calc(100% - var(--space-3)),
+    transparent 100%);
 }
 .reader-panel:not(.is-collapsed):has(.reader-internal-search:not([hidden]):not([data-reader-search-closing]))::before {
   height: calc(var(--reader-scrollbar-track-top) + var(--reader-internal-search-height) + var(--space-3));
