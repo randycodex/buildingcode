@@ -19128,6 +19128,7 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-draft-cla
 .account-welcome-existing { font-size: 13px; }
 .account-welcome-explore { align-self: center; min-height: 44px; margin-top: 16px; }
 .account-welcome-status:empty { display: none; }
+.account-welcome-status > .column-loading-indicator { position: static; }
 
 .pro-upgrade-screen > .pro-account-entry { width: min(100%, 520px); padding: 32px 36px; }
 .pro-upgrade-screen > .account-screen-header { justify-content: flex-end; }

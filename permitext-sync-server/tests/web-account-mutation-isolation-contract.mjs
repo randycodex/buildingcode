@@ -265,6 +265,7 @@ for (const mode of ["signIn", "signUp"]) {
   const h = harness({
     state: workspace(null),
     document: { createElement: () => panel },
+    showColumnLoadingStatus: (target, label) => { target.textContent = label; },
     clerkWebSignInConfig: async () => ({ available: false }),
     appleWebSignInConfig: async () => ({ available: false, browserFallbackAllowed: true })
   });
