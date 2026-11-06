@@ -1805,6 +1805,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   --reader-scrollbar-rail-width: 0px;
   --reader-scrollbar-track-top: calc(var(--reader-header-overlay-height) + var(--panel-padding));
   --reader-internal-search-height: 48px;
+  --reader-search-reveal-duration: 200ms;
   --reader-controls-surface: var(--surface);
   position: relative;
   grid-template-rows: minmax(0, 1fr);
@@ -2602,6 +2603,15 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 
 .reader-internal-search[hidden] {
   display: none;
+}
+
+.reader-internal-search:not([hidden]) {
+  animation: reader-search-reveal var(--reader-search-reveal-duration) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes reader-search-reveal {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .reader-internal-search-input:focus,
@@ -17129,6 +17139,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
 .project-section-motion-body[hidden] { display: none !important; }
 
 /* An open find field sits above the reading viewport, including while scrolling. */
+.reader-panel:has(.reader-internal-search:not([hidden])) :is(.reader-body, .reader-content) {
+  transition: padding-top var(--reader-search-reveal-duration) cubic-bezier(0.22, 1, 0.36, 1);
+}
 .reader-panel:has(.reader-internal-search:not([hidden])) .reader-body {
   padding-top: calc(var(--reader-scrollbar-track-top) + var(--reader-internal-search-height) + var(--space-3));
 }
@@ -17140,6 +17153,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
 }
 .reader-panel:not(.is-collapsed):has(.reader-internal-search:not([hidden]))::before {
   height: calc(var(--reader-scrollbar-track-top) + var(--reader-internal-search-height) + var(--space-3));
+  transition: height var(--reader-search-reveal-duration) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reader-panel { --reader-search-reveal-duration: 0ms; }
 }
 
 /* Tablet controls occupy two rows so workspace actions cannot overlap Research or the brand. */
