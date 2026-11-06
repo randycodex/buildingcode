@@ -21252,6 +21252,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 /* Free reading uses one navigation row and one Reader. */
 .workspace-shell.is-free-account { grid-template-rows: var(--workspace-bar-height) minmax(0, 1fr) !important; }
 .workspace-shell.is-free-account > :is(.workflow-toolbar, .workspace-column-tabs) { display: none !important; }
+.workspace-shell.is-free-account:not(:has(.reader-panel)) > .topbar { border-bottom-color: transparent; }
 .workspace-shell.is-free-account .reader-reference-source { display: none !important; }
 .workspace-shell.is-free-account > .panel-track { grid-row: 2 !important; }
 .workspace-shell.is-free-account > .workspace-issue { grid-row: 2; }
