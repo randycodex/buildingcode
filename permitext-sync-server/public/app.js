@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-add-workspace-menu-v1469";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-workspaces-heading-v1470";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-add-workspace-menu-v1469";
+} from "./offline-storage.js?v=20261106-workspaces-heading-v1470";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2511,7 +2511,7 @@ function openMobileMoreSheet() {
   projectSection.className = "mobile-more-section";
   const projectLabel = document.createElement("p");
   projectLabel.className = "mobile-more-section-label";
-  projectLabel.textContent = "Projects";
+  projectLabel.textContent = "Workspaces";
   const projectList = document.createElement("div");
   projectList.className = "mobile-more-workspaces";
   visibleWorkspaceRecords().forEach((workspace) => {
@@ -2584,7 +2584,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   const menu = document.createElement("div");
   menu.className = "workspace-context-menu";
   menu.setAttribute("role", "menu");
-  menu.setAttribute("aria-label", projectsAvailable ? "Project menu" : "Workspace menu");
+  menu.setAttribute("aria-label", "Workspace menu");
   const appendMenuAction = (section, action) => {
     if (action.separated) {
       const actionDivider = document.createElement("div");
@@ -2616,10 +2616,10 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   const projectSection = document.createElement("div");
   projectSection.className = "workspace-context-section";
   projectSection.setAttribute("role", "group");
-  projectSection.setAttribute("aria-label", "Projects");
+  projectSection.setAttribute("aria-label", "Workspaces");
   const heading = document.createElement("strong");
   heading.className = "workspace-context-heading";
-  heading.textContent = "Projects";
+  heading.textContent = "Workspaces";
   projectSection.append(heading);
   workspaces.forEach((candidate) => {
     const button = document.createElement("button");

@@ -1,4 +1,4 @@
-export const webAppVersion = "20261106-add-workspace-menu-v1469";
+export const webAppVersion = "20261106-workspaces-heading-v1470";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";
