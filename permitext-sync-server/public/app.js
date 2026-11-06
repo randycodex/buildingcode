@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-pro-refresh-layout-v1472";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-welcome-punctuation-v1473";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-pro-refresh-layout-v1472";
+} from "./offline-storage.js?v=20261106-welcome-punctuation-v1473";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -44227,10 +44227,10 @@ function renderFirstUseWelcome() {
   content.className = "first-use-content";
   const heading = document.createElement("h1");
   heading.id = headingID;
-  heading.textContent = "Explore NYC construction codes.";
+  heading.textContent = "Explore NYC construction codes";
   const supporting = document.createElement("p");
   supporting.className = "first-use-supporting";
-  supporting.textContent = "Read enacted text, follow references, and search for the provisions you need.";
+  supporting.textContent = "Read enacted text, follow references, and search for the provisions you need";
 
   const getPro = document.createElement("button");
   getPro.type = "button";
