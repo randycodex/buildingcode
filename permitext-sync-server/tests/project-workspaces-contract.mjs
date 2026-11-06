@@ -14,7 +14,7 @@ assert.match(app, /function visibleWorkspaceRecords\(\)[\s\S]*?workspace\.projec
 assert.doesNotMatch(chooser, /Unassigned saves/);
 assert.doesNotMatch(mobileChooser, /Unassigned saves/);
 assert.doesNotMatch(mobileChooser, /projectList\.append\(mobileMoreAction\("Unassigned saves"/);
-assert.match(app, /const emptyLabel = "Projects"/);
+assert.match(app, /const emptyLabel = "Workspace"/);
 const storage = new Map();
 const projects = [{id:'a', name:'Alpha', folderType:'project'}, {id:'b', name:'Beta', folderType:'project'}];
 const context = vm.createContext({

@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-workspaces-heading-v1470";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-empty-workspace-label-v1471";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-workspaces-heading-v1470";
+} from "./offline-storage.js?v=20261106-empty-workspace-label-v1471";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2719,13 +2719,13 @@ function renderWorkspaceTabs() {
   }
   const workspace = activeWorkspaceRecord();
   const activeVisibleWorkspace = visibleWorkspaces.find((candidate) => candidate.id === workspace?.id);
-  const emptyLabel = "Projects";
+  const emptyLabel = "Workspace";
   const label = workspaceActionsButton.querySelector(".workspace-current-name");
   if (label) label.textContent = activeVisibleWorkspace?.name || emptyLabel;
   workspaceActionsButton.title = activeVisibleWorkspace?.name || emptyLabel;
   workspaceActionsButton.setAttribute("aria-label", activeVisibleWorkspace
-    ? `Open ${activeVisibleWorkspace.name} Project menu`
-    : "Choose Project");
+    ? `Open ${activeVisibleWorkspace.name} Workspace menu`
+    : "Choose Workspace");
   workspaceActionsButton.disabled = false;
 }
 
