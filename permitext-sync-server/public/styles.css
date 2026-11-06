@@ -1361,7 +1361,7 @@ body:has(> .reader-open-code-menu.is-centered) .workspace-first-use .first-use-c
 
 .first-use-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   width: max-content;
   max-width: 100%;
