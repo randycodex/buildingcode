@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-sign-in-plain-text-v1465";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-entry-flow-streamline-v1467";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261105-sign-in-plain-text-v1465";
+} from "./offline-storage.js?v=20261105-entry-flow-streamline-v1467";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -5193,6 +5193,7 @@ async function restoreWorkspaceAfterRefresh(skip = false) {
         return true;
       },
       openAccount: async account => {
+        if (!activeAccount()) return false;
         state.workflowView = snapshot.workflowView;
         toggleAccountDialog();
         const dialog = document.querySelector(".account-screen[open]");
@@ -8446,11 +8447,13 @@ function openReaderCodePicker(anchor, onSelect) {
     });
     menu.append(button);
   });
-  const manage = document.createElement("button");
-  manage.type = "button";
-  manage.textContent = "Manage code sources";
-  manage.addEventListener("click", () => { close(); openActiveCodeSourceSettings(); });
-  menu.append(manage);
+  if (isProAccount()) {
+    const manage = document.createElement("button");
+    manage.type = "button";
+    manage.textContent = "Manage code sources";
+    manage.addEventListener("click", () => { close(); openActiveCodeSourceSettings(); });
+    menu.append(manage);
+  }
   document.body.append(menu);
   if (!centered) {
     const bounds = anchor.getBoundingClientRect();
@@ -10988,6 +10991,10 @@ async function resumeProUpgradeIntent() {
     }
   }
   if (!readProUpgradeIntent()) return;
+  if (activeAccount() && isProAccount()) {
+    clearProUpgradeIntent();
+    return;
+  }
   const existing = document.querySelector(".account-dialog");
   if (existing?.open && existing.dataset?.proUpgrade === "true") return;
   existing?.close?.();
@@ -11730,7 +11737,9 @@ async function signInCurrentBrowser(mode = "signIn") {
   }
   // Local browser credentials are test fixtures, not a user's account login.
   // Keep the account screen open when no real sign-in provider is available.
-  throw new Error("Secure sign-in is not configured for this app yet.");
+  const error = new Error("Secure sign-in is not configured for this app yet.");
+  error.code = "SIGN_IN_UNAVAILABLE";
+  throw error;
 }
 
 function mutationKindAndRecord(mutation) {
@@ -41458,6 +41467,23 @@ async function presentAccountProfile({ edit = false } = {}) {
   });
 }
 
+function showHostedAccountFallback(panel, dialog, mode, error) {
+  if (error?.code !== "SIGN_IN_UNAVAILABLE" ||
+      !["localhost", "127.0.0.1", "[::1]", "::1"].includes(location.hostname)) return false;
+  const link = panel.querySelector(".account-welcome-live-sign-in");
+  if (!link) return false;
+  const upgrade = dialog.dataset.proUpgrade === "true";
+  const destination = upgrade ? new URL("https://permitext.com/workspace?intent=upgrade-pro")
+    : new URL(mode === "signUp" ? "https://accounts.permitext.com/sign-up" : "https://accounts.permitext.com/sign-in");
+  if (!upgrade) destination.searchParams.set("redirect_url", "https://permitext.com/workspace?clerk_return=1");
+  link.href = destination.href;
+  link.textContent = upgrade ? "Get Pro on permitext.com" : mode === "signUp" ? "Create account on permitext.com" : "Sign in on permitext.com";
+  link.hidden = false;
+  panel.classList.add("has-hosted-auth-fallback");
+  panel.querySelector(".account-welcome-status").textContent = "Continue on permitext.com to access your account. This local preview will stay open.";
+  return true;
+}
+
 function renderAccountWelcome(dialog) {
   const panel = document.createElement("section");
   panel.className = "account-welcome";
@@ -41471,6 +41497,7 @@ function renderAccountWelcome(dialog) {
     </div>
     <p class="account-welcome-existing">Already have Pro? Sign in to your existing account.</p>
     <p class="account-welcome-status" role="status" aria-live="polite"></p>
+    <a class="account-welcome-live-sign-in" target="_blank" rel="noopener noreferrer" hidden></a>
     <button type="button" class="account-welcome-explore">Continue exploring</button>`;
   panel.querySelector(".account-welcome-explore").addEventListener("click", () => dialog.close());
   const buttons = Array.from(panel.querySelectorAll("[data-account-mode]"));
@@ -41493,12 +41520,29 @@ function renderAccountWelcome(dialog) {
       await resumeProUpgradeIntent();
       startForegroundSyncLoop({ immediate: true });
     } catch (error) {
-      status.textContent = error.message || "Could not sign in. Please try again.";
+      if (!showHostedAccountFallback(panel, dialog, button.dataset.accountMode, error)) {
+        status.textContent = error.message || "Could not sign in. Please try again.";
+      }
       buttons.forEach(item => { item.disabled = false; });
     } finally {
       delete dialog.dataset.signingIn;
+      if (dialog.isConnected) dialog.focus({ preventScroll: true });
     }
   }));
+  return panel;
+}
+
+function renderDirectSignInEntry(dialog) {
+  const panel = renderAccountWelcome(dialog);
+  panel.classList.add("direct-sign-in-entry");
+  panel.querySelector("h1").textContent = "Sign in to Permitext";
+  panel.querySelector("h1 + p").textContent = "Open your account and saved work.";
+  panel.querySelector('[data-account-mode="signUp"]').remove();
+  const retry = panel.querySelector('[data-account-mode="signIn"]');
+  retry.textContent = "Try again";
+  retry.classList.add("primary");
+  panel.querySelector(".account-welcome-existing").remove();
+  panel.querySelector(".account-welcome-explore").textContent = "Back";
   return panel;
 }
 
@@ -41530,13 +41574,13 @@ function renderProAccountEntry(dialog) {
     const upgrade = document.createElement("button");
     upgrade.type = "button";
     upgrade.className = "primary";
-    upgrade.textContent = isProAccount() ? "Manage Pro" : "Upgrade this account";
+    upgrade.textContent = isProAccount() ? "Manage Pro" : "Continue to checkout";
     upgrade.addEventListener("click", () => showProAccountCheckout(dialog));
     actions.replaceChildren(upgrade);
     const name = account.email || account.displayName || "your Permitext account";
     panel.querySelector(".account-welcome-existing").textContent = `Continue with ${name}.`;
   } else {
-    panel.querySelector('[data-account-mode="signUp"]').textContent = "Create account";
+    panel.querySelector('[data-account-mode="signUp"]').textContent = "Continue with Pro";
     panel.querySelector(".account-welcome-existing").remove();
   }
   return panel;
@@ -41686,6 +41730,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
   closeSharedWorkspaceViews("account");
   const dialog = document.createElement("section");
   dialog.className = "account-dialog account-screen";
+  dialog.tabIndex = -1;
   dialog.classList.add("account-workspace-view");
   const directSignIn = signIn && !activeAccount();
   if (directSignIn) dialog.dataset.signIn = "true";
@@ -41717,7 +41762,8 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
     syncWorkflowNavigation();
     if (closedWithKeyboard) {
       const returnFocus = (directSignIn ? track.querySelector(".first-use-sign-in")
-        : document.querySelector("#get-pro:not([hidden])")) || workspaceActionsButton;
+        : upgrade ? track.querySelector(".first-use-actions .primary") : null)
+        || document.querySelector("#get-pro:not([hidden])") || workspaceActionsButton;
       returnFocus?.focus({ preventScroll: true });
     }
   };
@@ -41729,6 +41775,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
   });
   dialog.setAttribute("aria-label", upgrade ? "Get Pro" : directSignIn ? "Sign in" : "Settings workspace");
   const panel = upgrade ? renderProAccountEntry(dialog)
+    : directSignIn ? renderDirectSignInEntry(dialog)
     : activeAccount() ? renderSettings() : renderAccountWelcome(dialog);
   mountAccountScreenContent(dialog, panel);
   [track, document.querySelector(".workflow-toolbar")].filter(Boolean).forEach(element => {
@@ -41737,7 +41784,9 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
   document.querySelector(".workspace-shell").append(dialog);
   state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
   syncWorkflowNavigation();
+  dialog.focus({ preventScroll: true });
   if (directSignIn) panel.querySelector('[data-account-mode="signIn"]')?.click();
+  else if (upgrade && activeAccount() && !isProAccount()) showProAccountCheckout(dialog);
 }
 
 async function openSearchCodeSourceSettings(panel) {
@@ -43126,7 +43175,7 @@ function renderSettings({ upgrade = false } = {}) {
         {
           auth: { accountUserID: account.userID },
           packageID: "pro",
-          ...(upgrade ? { cancelURL: new URL("/#plans", location.origin).href } : {})
+          ...(upgrade ? { cancelURL: new URL("/workspace?intent=upgrade-pro", location.origin).href } : {})
         },
         { token: account.sessionToken }
       );

@@ -9,9 +9,9 @@ function extract(name) {
   return source.slice(start, source.indexOf("\n}", start) + 2);
 }
 
-function harness(signedIn) {
+function harness(signedIn, pro = signedIn) {
   let currentDialog = null, focusReturns = 0, focusTraps = 0, contextCheck, accountCurrent = true;
-  const panels = [], transitions = [], toggleAttributes = {}, signInStarts = [];
+  const panels = [], transitions = [], toggleAttributes = {}, signInStarts = [], checkoutStarts = [];
   function element() {
     return {
       children: [], listeners: {}, attributes: {}, dataset: {}, removedStyles: [],
@@ -78,7 +78,9 @@ function harness(signedIn) {
       focus: () => { focusReturns++; }, blur() {} },
     topbarBrand: { cloneNode: () => Object.assign(element(), { className: "topbar-brand" }) },
     activeAccount: () => signedIn ? { userID: "synthetic-account" } : null,
-    renderSettings: panel, renderAccountWelcome: panel, renderProAccountEntry: panel,
+    isProAccount: () => pro,
+    renderSettings: panel, renderAccountWelcome: panel, renderProAccountEntry: panel, renderDirectSignInEntry: panel,
+    showProAccountCheckout: dialog => checkoutStarts.push(dialog),
     trapWebModalFocus: () => { focusTraps++; }, clearProUpgradeIntent() {},
     state: {}, saveWorkspaceState() {}, closeSharedWorkspaceViews() {},
     createSettingsColumnResizers: () => ({ refresh() {}, dispose() {} }),
@@ -89,7 +91,7 @@ function harness(signedIn) {
     transitionWorkspace: async (kind, options) => transitions.push({ kind, options }), track
   });
   vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
-  return { context, track, panels, transitions, toggleAttributes, signInStarts,
+  return { context, track, panels, transitions, toggleAttributes, signInStarts, checkoutStarts,
     toolbar, revokeAccount() { accountCurrent = false; contextCheck(); },
     dialog: () => currentDialog, focusReturns: () => focusReturns, focusTraps: () => focusTraps };
 }
@@ -171,6 +173,13 @@ assert.equal(directSignIn.dialog(), null, 'Unrelated account changes still disca
 const signedInShortcut = harness(true);
 signedInShortcut.context.toggleAccountDialog({ signIn: true });
 assert.deepEqual(signedInShortcut.signInStarts, [], 'An existing account must not start another authentication request');
+const freeUpgrade = harness(true, false);
+freeUpgrade.context.toggleAccountDialog({ upgrade: true });
+assert.equal(freeUpgrade.checkoutStarts.length, 1, 'A signed-in Free account goes straight to the checkout review');
+assert.equal(freeUpgrade.checkoutStarts[0], freeUpgrade.dialog());
+const guestUpgrade = harness(false);
+guestUpgrade.context.toggleAccountDialog({ upgrade: true });
+assert.equal(guestUpgrade.checkoutStarts.length, 0, 'Guests review Pro and authenticate before checkout');
 
 // Content recovery refreshes must retain the screen's close action and scroll location.
 const h = harness(true);

@@ -23,7 +23,7 @@ const names = [
   "persistProjectOrder", "persistSectionBookmark", "persistSectionInProject", "persistSectionFolderSelection",
   "removeSectionFromAllProjects", "removeSectionFromProject", "scheduleAnnotationPush",
   "archiveProjects", "restoreArchivedProject", "deleteArchivedProjects", "deleteArchivedProjectData",
-  "completeClerkPermitextSignIn", "signInCurrentBrowser", "renderAccountWelcome", "deleteCapturedAccount", "clearDeletedAccountBrowserData",
+  "completeClerkPermitextSignIn", "signInCurrentBrowser", "showHostedAccountFallback", "renderAccountWelcome", "deleteCapturedAccount", "clearDeletedAccountBrowserData",
   "openSupplementalResearchConversation",
   "requirePrivateWorkspaceWritable", "releaseAccountLinkWriteFence", "withAccountLinkWriteFence", "requireAccountLinkWorkSaved",
   "linkedAccountRecoverySources", "linkedAccountRecoveryBundle", "accountLocalRecoveryBundle"
@@ -50,7 +50,7 @@ function harness(overrides = {}) {
     state: workspace(A), accountRuntimeGeneration: 1, accountLinkWriteFence: null, accountContextChangedError, accountRequestIdentity, accountRequestIsCurrent,
     notebookMounts: new Map(), reportDraftMounts: new Map(), workspaceRestoreError: null, activeResearchProgress: new Map(), pendingNotebookDrafts: async () => [], pendingNotebookImages: async () => [],
     persistCodeQuestionAccountState() {}, sessionAccountLinkRecoveries: new Map(), accountLinkRecoverySources, privateWorkspaceRecoverySnapshot,
-    crypto: { randomUUID: () => "synthetic-operation" }, Date, Set, Map,
+    crypto: { randomUUID: () => "synthetic-operation" }, Date, Set, Map, URL, location: {hostname:'permitext.com'},
     saveWorkspaceState: () => saves.push(clone(c.state)), markForegroundSyncActivity() {},
     syncMutationRecordID: (mutation) => Object.values(mutation)[0]?.id || "synthetic-record",
     projectRecordID: (record) => record.id, projectIdentity: (record) => record, workboardProjectID: (record) => record.id,
@@ -277,6 +277,34 @@ for (const mode of ["signIn", "signUp"]) {
   assert.equal(dialog.dataset.signingIn, undefined);
   assert.equal(h.c.state.account, null);
   assert.deepEqual(h.calls, []);
+}
+
+// Only an unconfigured loopback preview offers an explicit hosted handoff.
+// Production/network failures must never silently switch auth environments.
+for (const mode of ["signIn", "signUp"]) {
+  for (const upgrade of [false, true]) {
+    const status = {}, link = {hidden: true}, classes = new Set();
+    const panel = {classList: {add: value => classes.add(value)},
+      querySelector: selector => selector === '.account-welcome-status' ? status : link};
+    const local = harness({location: {hostname:'127.0.0.1'}});
+    assert.equal(local.c.showHostedAccountFallback(panel, {dataset:{proUpgrade:String(upgrade)}}, mode, {code:'SIGN_IN_UNAVAILABLE'}), true);
+    const destination = new URL(link.href);
+    assert.equal(link.hidden, false);
+    assert.equal(classes.has('has-hosted-auth-fallback'), true);
+    assert.match(status.textContent, /local preview will stay open/);
+    if (upgrade) {
+      assert.equal(destination.origin, 'https://permitext.com');
+      assert.equal(destination.searchParams.get('intent'), 'upgrade-pro');
+    } else {
+      assert.equal(destination.origin, 'https://accounts.permitext.com');
+      assert.equal(destination.pathname, mode === 'signUp' ? '/sign-up' : '/sign-in');
+      assert.equal(destination.searchParams.get('redirect_url'), 'https://permitext.com/workspace?clerk_return=1');
+    }
+  }
+}
+for (const [hostname, code] of [['permitext.com','SIGN_IN_UNAVAILABLE'], ['localhost','NETWORK_ERROR']]) {
+  const local = harness({location:{hostname}});
+  assert.equal(local.c.showHostedAccountFallback({}, {dataset:{}}, 'signIn', {code}), false);
 }
 
 // SDK loading and token creation retain the original browser and Clerk identity.

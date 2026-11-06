@@ -111,7 +111,15 @@ const accountPanel={__refreshActiveCodeSources:async()=>{}};
 const accountDialog={isConnected:true,querySelector:selector=>selector==='.settings-panel'?accountPanel:accountScroll,
   querySelectorAll:selector=>selector==='.settings-source-group'?[edition]:[libraryColumn]};
 startup.toggleAccountDialog=()=>{};
+startup.activeAccount=()=>startup.state.account;
 startup.document={querySelector:()=>accountDialog};
 await startup.restoreWorkspaceAfterRefresh();
 assert.equal(libraryColumn.restoredScroll,425);
+// Guest authentication is a transient action, not a Settings screen to reopen.
+let guestAccountReopens=0;
+startup.state.account=null;
+startup.toggleAccountDialog=()=>{guestAccountReopens++;};
+writeWorkspaceResume(storage,'tab-one',{...context,userID:''},{view:'account',account:accountLayout});
+await startup.restoreWorkspaceAfterRefresh();
+assert.equal(guestAccountReopens,0,'Refreshing a failed guest sign-in returns to the welcome instead of the old account chooser');
 console.log('Workspace resume passed: per-tab/account/project boundaries, selected drafts and PDFs, layout and scroll, all screens, access fences and storage failure.');

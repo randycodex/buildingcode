@@ -14,6 +14,7 @@ function browser(search = '', store = new Map()) {
     history: { replaceState(_state, _title, url) { context.cleanedURL = url; } },
     sessionStorage: { getItem: key => store.get(key), setItem: (key, value) => store.set(key, value), removeItem: key => store.delete(key) },
     activeAccount: () => account,
+    isProAccount: () => account?.plan === 'pro',
     document: { querySelector: () => dialog },
     toggleAccountDialog: options => opened.push(options)
   });
@@ -48,6 +49,11 @@ assert.equal(returned.opened.length, 1, 'Resume after full-page authentication r
 vm.runInContext('clearProUpgradeIntent()', returned.context);
 await returned.run();
 assert.equal(returned.opened.length, 1, 'Canceled intent stays canceled');
+const existingPro = browser('?intent=upgrade-pro');
+existingPro.account({userID:'pro-account', plan:'pro'});
+await existingPro.run();
+assert.equal(existingPro.opened.length, 0, 'An existing Pro account returns to the workspace instead of an upgrade screen');
+assert.equal(existingPro.store.size, 0, 'An active Pro plan consumes the upgrade intent');
 for (const intent of [
   { expiresAt: Date.now() - 1 },
   { expiresAt: Date.now() + 10000, accountID: 'another-account' }
@@ -89,7 +95,7 @@ async function checkout({ pro = false, source = 'webSubscription', accepted = tr
 const free = await checkout();
 assert.equal(free.calls.filter(x => x.path === '/billing/web/checkout').length, 1, 'Double click must create only one checkout');
 assert.equal(free.calls[0].path, '/account/policy-acceptance');
-assert.equal(free.calls[1].body.cancelURL, 'https://permitext.com/#plans');
+assert.equal(free.calls[1].body.cancelURL, 'https://permitext.com/workspace?intent=upgrade-pro', 'Canceling checkout returns to the workspace upgrade review');
 assert.equal(free.ctx.window.location.href, 'https://checkout.stripe.com/test');
 const missingConsent = await checkout({ accepted: false });
 assert.equal(missingConsent.calls.length, 0, 'Never record acceptance or create checkout without consent');
