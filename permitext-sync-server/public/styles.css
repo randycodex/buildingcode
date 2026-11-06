@@ -19369,6 +19369,14 @@ span.reader-collapse-title { cursor: default; }
   background: var(--menu-surface);
   box-shadow: none;
 }
+.reader-open-code-menu.is-centered {
+  left: 50%;
+  top: 50%;
+  width: var(--workspace-content-max-width);
+  max-width: calc(100vw - 48px);
+  max-height: calc(100dvh - 96px);
+  transform: translate(-50%, -50%);
+}
 .reader-open-code-menu h3 { margin: 18px 0 8px; font-size: 16px; }
 .reader-open-code-menu h3:first-child { margin-top: 0; }
 .reader-open-code-menu > button {

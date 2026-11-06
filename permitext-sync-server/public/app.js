@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-welcome-reader-v1456";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261105-centered-reader-picker-v1457";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261105-welcome-reader-v1456";
+} from "./offline-storage.js?v=20261105-centered-reader-picker-v1457";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -8412,6 +8412,8 @@ function openReaderCodePicker(anchor, onSelect) {
   if (sameAnchor) return;
   const menu = document.createElement("div");
   menu.className = "reader-open-code-menu";
+  const centered = Boolean(anchor.closest(".workspace-first-use"));
+  menu.classList.toggle("is-centered", centered);
   menu._anchor = anchor;
   menu.setAttribute("role", "dialog");
   menu.setAttribute("aria-label", "Choose a code for Reader");
@@ -8450,10 +8452,12 @@ function openReaderCodePicker(anchor, onSelect) {
   manage.addEventListener("click", () => { close(); openActiveCodeSourceSettings(); });
   menu.append(manage);
   document.body.append(menu);
-  const bounds = anchor.getBoundingClientRect();
-  menu.style.left = `${Math.max(8, Math.min(bounds.left, window.innerWidth - menu.offsetWidth - 8))}px`;
-  menu.style.top = `${bounds.bottom + 8}px`;
-  menu.style.maxHeight = `${window.innerHeight - bounds.bottom - 24}px`;
+  if (!centered) {
+    const bounds = anchor.getBoundingClientRect();
+    menu.style.left = `${Math.max(8, Math.min(bounds.left, window.innerWidth - menu.offsetWidth - 8))}px`;
+    menu.style.top = `${bounds.bottom + 8}px`;
+    menu.style.maxHeight = `${window.innerHeight - bounds.bottom - 24}px`;
+  }
   document.addEventListener("pointerdown", (event) => {
     if (!menu.contains(event.target) && !anchor.contains(event.target)) close();
   }, { signal: controller.signal });
