@@ -81,7 +81,7 @@ assert.deepEqual(Array.from(after.context.restored.paneOrder), layout.paneOrder)
 assert.equal(after.context.restored.syncOutbox.length, 1);
 assert.equal(after.logs.length, 0);
 const settings = restore({ settingsCollapsedColumnIDs: ["library", "unknown", "library"] });
-assert.deepEqual(Array.from(settings.context.restored.settingsCollapsedColumnIDs), ["library"]);
+assert.equal(Object.hasOwn(settings.context.restored, "settingsCollapsedColumnIDs"), false, "Legacy collapsed Settings columns must not be restored.");
 
 // Corrupt persisted JSON must be visible and protected from later automatic saves.
 const corrupt = restore({ layoutJSON: '{"privateSyntheticMarker":' });

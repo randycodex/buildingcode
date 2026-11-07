@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-clerk-loading-screen-v1480";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-settings-columns-open-v1481";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -25,7 +25,7 @@ import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectF
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
-import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
+import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=2";
 import { createReaderBlockWindow } from "./reader-block-window.js?v=10";
 import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=4";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-clerk-loading-screen-v1480";
+} from "./offline-storage.js?v=20261106-settings-columns-open-v1481";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -547,7 +547,6 @@ const globalWorkspaceStateKeys = [
   "recentChaptersByCode",
   "readerSettings",
   "savedTextSize",
-  "settingsCollapsedColumnIDs",
   "settingsColumnWidths",
   "researchHistoryGroupExpansion",
   "projectSectionExpansion",
@@ -982,8 +981,6 @@ function loadWorkspaceState(accountOverride) {
       continuityAppliedAt: saved.continuityAppliedAt || null,
       readerSettings: normalizeReaderSettings(saved.readerSettings),
       savedTextSize: clampNumber(saved.savedTextSize, 10, 18, 10),
-      settingsCollapsedColumnIDs: Array.isArray(saved.settingsCollapsedColumnIDs)
-        ? [...new Set(saved.settingsCollapsedColumnIDs.filter((key) => ["account", "library", "recovery"].includes(key)))] : [],
       settingsColumnWidths: normalizeSettingsColumnWidths(saved.settingsColumnWidths),
       researchViewState: saved.researchViewState || null,
       researchConversationID: typeof saved.researchConversationID === "string" ? saved.researchConversationID : "",
@@ -1092,7 +1089,6 @@ function loadWorkspaceState(accountOverride) {
       paneOrder: [],
       pinnedPaneID: "",
       collapsedPaneIDs: [],
-      settingsCollapsedColumnIDs: [],
       settingsColumnWidths: null,
       columnGroups: [],
       recentChaptersByCode: {},
@@ -41692,7 +41688,6 @@ function organizeAccountSettings(panel) {
   const offline = scroll.querySelector(".settings-offline-card");
   const data = scroll.querySelector(".settings-data-card");
   const conflicts = scroll.querySelector(".settings-sync-conflicts-card");
-  let columnResizers;
   const column = (key, title, cards) => {
     const section = document.createElement("section");
     section.className = `settings-account-column settings-account-column-${key}`;
@@ -41702,50 +41697,6 @@ function organizeAccountSettings(panel) {
     heading.textContent = title;
     section.setAttribute("aria-labelledby", heading.id);
     section.append(heading, ...cards.filter(Boolean));
-    const rail = document.createElement("button");
-    rail.type = "button";
-    rail.className = "pane-collapsed-tab settings-column-restore";
-    rail.setAttribute("aria-label", `Expand ${title}`);
-    rail.setAttribute("aria-expanded", "false");
-    const railLabel = document.createElement("span");
-    railLabel.textContent = title;
-    rail.append(railLabel);
-    const paintCollapsed = (collapsed) => {
-      section.classList.toggle("is-collapsed", collapsed);
-      rail.hidden = !collapsed;
-      heading.setAttribute("aria-expanded", String(!collapsed));
-      scroll.style.setProperty(`--settings-${key}-width`, collapsed ? "48px" : key === "library" ? "minmax(480px, 1.5fr)" : "minmax(360px, 1fr)");
-      columnResizers?.refresh();
-    };
-    let scrollPositions = [];
-    const setCollapsed = (collapsed) => {
-      if (collapsed) scrollPositions = [section, ...section.querySelectorAll("*")]
-        .filter((node) => node.scrollTop || node.scrollLeft)
-        .map((node) => ({ node, top: node.scrollTop, left: node.scrollLeft }));
-      const ids = new Set(state.settingsCollapsedColumnIDs || []);
-      if (collapsed) ids.add(key);
-      else ids.delete(key);
-      state.settingsCollapsedColumnIDs = [...ids];
-      paintCollapsed(collapsed);
-      if (!collapsed) for (const { node, top, left } of scrollPositions) {
-        node.scrollTop = top; node.scrollLeft = left;
-      }
-      (collapsed ? rail : heading).focus({ preventScroll: true });
-      saveWorkspaceState();
-    };
-    heading.tabIndex = 0;
-    heading.setAttribute("role", "button");
-    heading.setAttribute("aria-label", `Collapse ${title}`);
-    heading.title = `Collapse ${title}`;
-    heading.addEventListener("click", () => setCollapsed(true));
-    heading.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      event.preventDefault();
-      setCollapsed(true);
-    });
-    rail.addEventListener("click", () => setCollapsed(false));
-    section.append(rail);
-    paintCollapsed((state.settingsCollapsedColumnIDs || []).includes(key));
     return section;
   };
   const account = column("account", "Account", [profile, plan]);
@@ -41767,7 +41718,7 @@ function organizeAccountSettings(panel) {
   const conversations = data?.querySelector('.settings-conversations');
   data?.append(...[projects, deleteContent, conversations, trash].filter(Boolean));
   scroll.replaceChildren(account, library, recovery);
-  columnResizers = createSettingsColumnResizers(scroll, [account, library, recovery], state.settingsColumnWidths, (widths) => {
+  const columnResizers = createSettingsColumnResizers(scroll, [account, library, recovery], state.settingsColumnWidths, (widths) => {
     state.settingsColumnWidths = widths;
     saveWorkspaceState();
   });

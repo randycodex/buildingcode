@@ -111,9 +111,9 @@ for (const signedIn of [false, true]) {
     const [account, library, recovery] = panel.scroll.children;
     assert.equal(panel.scroll.children.length, 3);
     assert.deepEqual(account.children.slice(1, 3), [panel.profile, panel.plan]);
-    assert.deepEqual(library.children.slice(1, -1), [panel.sources, panel.offline]);
+    assert.deepEqual(library.children.slice(1), [panel.sources, panel.offline]);
     assert.equal(recovery.children[0].textContent, "Data & recovery");
-    assert.deepEqual(recovery.children.slice(1, -1), [panel.conflicts, panel.data]);
+    assert.deepEqual(recovery.children.slice(1), [panel.conflicts, panel.data]);
     assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");
     assert.equal(account.children.at(-1).children[1], panel.deleteAccount, "One direct action keeps the original deletion confirmation handler.");
   }
@@ -203,31 +203,19 @@ h.dialog().children[0].children[1].listeners.click();
 assert.equal(h.dialog(), null);
 console.log("Account screen passed: signed-in/guest lifecycle, original controls, close/Escape, nested keyboard handling, and independent category scroll restoration.");
 
-const collapse = harness(true);
-collapse.context.toggleAccountDialog();
-const keys = ["account", "library", "recovery"];
-for (const [index, column] of collapse.panels[0].scroll.children.entries()) {
+const expanded = harness(true);
+expanded.context.state.settingsCollapsedColumnIDs = ["account", "library", "recovery"];
+expanded.context.toggleAccountDialog();
+for (const column of expanded.panels[0].scroll.children) {
   const heading = column.children[0];
-  const rail = column.children.find(node => node.className?.includes("settings-column-restore"));
-  const originalChildren = [...column.children];
-  column.scrollTop = 160 + index;
-  column.children[1].draft = "Retained editable content";
-  let prevented = false;
-  heading.listeners.keydown({key: index % 2 ? " " : "Enter", preventDefault() { prevented = true; }});
-  assert.equal(prevented, true);
-  assert.equal(column.classList.contains("is-collapsed"), true);
-  assert.equal(rail.hidden, false);
-  assert.equal(collapse.panels[0].scroll.style[`--settings-${keys[index]}-width`], "48px");
-  assert.deepEqual(column.children, originalChildren, "Collapsing preserves the original controls and inputs");
-  column.scrollTop = 0;
-  rail.listeners.click();
-  assert.equal(column.scrollTop, 160 + index, "Restoring a column returns to its scroll position");
-  assert.equal(column.children[1].draft, "Retained editable content");
-  assert.equal(heading.getAttribute("aria-expanded"), "true");
-  heading.listeners.click();
+  assert.equal(heading.getAttribute("role"), null);
+  assert.equal(heading.getAttribute("aria-expanded"), null);
+  assert.equal(heading.listeners.click, undefined);
+  assert.equal(heading.listeners.keydown, undefined);
+  assert.equal(column.classList.contains("is-collapsed"), false);
+  assert.equal(column.children.some(node => node.className?.includes("settings-column-restore")), false);
 }
-assert.deepEqual(Array.from(collapse.context.state.settingsCollapsedColumnIDs), keys);
-collapse.dialog().children[0].children[1].listeners.click();
-collapse.context.toggleAccountDialog();
-assert.ok(collapse.panels[1].scroll.children.every(column => column.classList.contains("is-collapsed")), "Reopening Settings retains all three collapsed columns");
-console.log("Settings collapse passed: all columns, keyboard controls, mounted content, restored scroll, and reopening state.");
+expanded.dialog().children[0].children[1].listeners.click();
+expanded.context.toggleAccountDialog();
+assert.ok(expanded.panels[1].scroll.children.every(column => !column.classList.contains("is-collapsed")), "Old collapsed preferences must not hide Settings columns when reopened");
+console.log("Settings columns remain expanded: ordinary headings, no collapse controls, and legacy collapsed preferences ignored.");

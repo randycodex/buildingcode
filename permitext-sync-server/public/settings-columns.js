@@ -21,17 +21,13 @@ export function createSettingsColumnResizers(columns, panels, savedWidths, onRes
   let preferred = normalizeSettingsColumnWidths(savedWidths);
   let drag = null;
   const dividers = [];
-  const collapsed = index => panels[index].classList.contains('is-collapsed');
-  const measured = () => panels.map((panel, index) => collapsed(index)
-    ? (preferred?.[index] || minimums[index]) : Math.max(minimums[index], panel.getBoundingClientRect().width));
-  const enabled = index => !collapsed(index) && !collapsed(index + 1);
+  const measured = () => panels.map((panel, index) => Math.max(minimums[index], panel.getBoundingClientRect().width));
   const update = () => {
     const bounds = columns.getBoundingClientRect();
     const current = measured();
     dividers.forEach((divider, index) => {
       divider.style.left = `${panels[index].getBoundingClientRect().right - bounds.left - 1}px`;
-      divider.tabIndex = enabled(index) ? 0 : -1;
-      divider.setAttribute('aria-disabled', String(!enabled(index)));
+      divider.tabIndex = 0;
       divider.setAttribute('aria-valuemin', String(minimums[index]));
       divider.setAttribute('aria-valuemax', String(Math.round(current[index] + current[index + 1] - minimums[index + 1])));
       divider.setAttribute('aria-valuenow', String(Math.round(current[index])));
@@ -39,8 +35,8 @@ export function createSettingsColumnResizers(columns, panels, savedWidths, onRes
     });
   };
   const paint = () => {
-    keys.forEach((key, index) => columns.style.setProperty(`--settings-${key}-width`, collapsed(index)
-      ? '48px' : `minmax(${minimums[index]}px, ${preferred?.[index] || defaultWeights[index]}fr)`));
+    keys.forEach((key, index) => columns.style.setProperty(`--settings-${key}-width`,
+      `minmax(${minimums[index]}px, ${preferred?.[index] || defaultWeights[index]}fr)`));
     update();
   };
   const apply = widths => { preferred = normalizeSettingsColumnWidths(widths); paint(); };
@@ -59,11 +55,10 @@ export function createSettingsColumnResizers(columns, panels, savedWidths, onRes
     divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to reset widths';
     divider.addEventListener('focus', update);
     divider.addEventListener('dblclick', () => {
-      if (!enabled(index)) return;
       finish(); apply(null); onResize(null);
     });
     divider.addEventListener('keydown', event => {
-      if (!enabled(index) || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
       event.preventDefault();
       const current = measured();
       const step = event.shiftKey ? 80 : 24;
@@ -74,7 +69,7 @@ export function createSettingsColumnResizers(columns, panels, savedWidths, onRes
       onResize([...preferred]);
     });
     divider.addEventListener('pointerdown', event => {
-      if (event.button !== 0 || !enabled(index)) return;
+      if (event.button !== 0) return;
       event.preventDefault();
       divider.focus({preventScroll: true});
       drag = {divider, pointerID: event.pointerId, x: event.clientX, widths: measured()};
