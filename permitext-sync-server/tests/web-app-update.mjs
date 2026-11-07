@@ -73,14 +73,30 @@ assert(entry.includes('<span>SYNC</span>'));
  assert.deepEqual(prompts,['next'],'An obsolete account response cannot open the update prompt');
 }
 const first=source.indexOf('async function prepareWebAppReload('),last=source.indexOf('\n}',first)+2;
-for(const scenario of ['clean','draft','image','dirty','research','race','storage','anonymous']) {
+for(const scenario of ['clean','no-workspace','background','offline','outbox','conflict','draft','image','dirty','project-editor','dialog','drag','research','race','storage','restore','account-change','anonymous']) {
+ const retainedState={syncOutbox:[{accountUserID:'owner',recordID:'retained-local-change'}],syncConflicts:[{recordID:'retained-conflict'}]};
+ const before=JSON.stringify(retainedState);let saves=0;
  const c=vm.createContext({captureAccountRequest:()=>({userID:scenario==='anonymous'?'':'owner'}),projectUpdateEditingGeneration:1,
-  workspaceRestoreError:null,workspaceMigrationError:null,activeResearchProgress:new Set(scenario==='research'?['pending']:[]),notebookColumnMounts:new Map([['note',{persistDraft:async()=>{if(scenario==='race')c.projectUpdateEditingGeneration++;}}]]),
-  flushSearchQueryPersistence(){},flushResearchDraftPersistence(){},saveWorkspaceState(){if(scenario==='storage')throw Error('Quota');},persistCodeQuestionAccountState(){},
-  pendingNotebookDrafts:async()=>scenario==='draft'?[{}]:[],pendingNotebookImages:async()=>scenario==='image'?[{}]:[],isCurrentAccountRequest:()=>true,
-  projectUpdateAutoApplyBlocker:()=>scenario==='dirty'?'review':scenario==='anonymous'?'unavailable':'',
+  workspaceRestoreError:scenario==='restore'?Error('Recovery required'):null,workspaceMigrationError:null,
+  activeResearchProgress:new Set(scenario==='research'?['pending']:[]),
+  notebookColumnMounts:new Map([['note',{persistDraft:async()=>{if(scenario==='race')c.projectUpdateEditingGeneration++;}}]]),
+  reportDraftMounts:new Map([['report',{hasPendingEdits:()=>scenario==='dirty'}]]),
+  document:{visibilityState:scenario==='background'?'hidden':'visible',querySelectorAll:selector=>selector==='[data-project-editing-state]'
+    ? [{_projectHasPendingEdits:()=>scenario==='project-editor'}]
+    : scenario==='dialog'?[{getClientRects:()=>[{}],hidden:false}]:[]},
+  track:{classList:{contains:()=>scenario==='drag'},querySelector:()=>null},
+  state:retainedState,flushSearchQueryPersistence(){},flushResearchDraftPersistence(){},saveWorkspaceState(){saves++;if(scenario==='storage')throw Error('Quota');},persistCodeQuestionAccountState(){},
+  pendingNotebookDrafts:async()=>scenario==='draft'?[{}]:[],pendingNotebookImages:async()=>scenario==='image'?[{}]:[],isCurrentAccountRequest:()=>scenario!=='account-change',
+  projectUpdateAutoApplyBlocker:()=>assert.fail('App updates must not depend on Project-sync eligibility'),
   confirmWorkspaceTransition:()=>assert.fail('Reload cannot discard edits'),fetch:()=>assert.fail('Reload preparation cannot poll')});
  vm.runInContext(source.slice(first,last),c);const result=await c.prepareWebAppReload();
- if(['clean','anonymous'].includes(scenario))assert.equal(result,true);else assert.equal(typeof result.message,'string',scenario);
+ if(['clean','no-workspace','background','offline','outbox','conflict','anonymous'].includes(scenario)) {
+  assert.equal(result,true,scenario);assert.equal(saves,1,'Persist workspace and outbox before permitting a reload');
+ } else {
+  assert.equal(typeof result.message,'string',scenario);
+  const reason={draft:/Note drafts/,image:/Note images/,dirty:/editor/, 'project-editor':/editor/,dialog:/dialog/,drag:/column/,research:/Assistant/,race:/changed/,storage:/could not save/,restore:/restore/, 'account-change':/changed/}[scenario];
+  assert.match(result.message,reason,scenario);
+ }
+ assert.equal(JSON.stringify(retainedState),before,'Update preparation cannot clear saved content, outbox entries or conflicts');
 }
-console.log('App update button passed: pending-only visibility, no announcement banner, one click and duplicate prevention, short errors, pending work/storage/images/Research/race guards, explicit worker activation and other-tab refusal.');
+console.log('App update button passed: pending-only visibility, no announcement banner, one click and duplicate prevention, short errors, specific editor/storage/images/Research/race guards and independent Project-sync availability, explicit worker activation and other-tab refusal.');

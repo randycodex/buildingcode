@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-settings-columns-open-v1481";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-app-update-safety-v1482";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-settings-columns-open-v1481";
+} from "./offline-storage.js?v=20261106-app-update-safety-v1482";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -1989,20 +1989,39 @@ async function confirmWorkspaceTransition() {
 
 async function prepareWebAppReload() {
   const identity = captureAccountRequest(), editingGeneration = projectUpdateEditingGeneration;
-  const blocked = () => ({message:"Finish saving or review pending work, then try again."});
-  if (workspaceRestoreError || workspaceMigrationError || activeResearchProgress.size) return blocked();
+  const blocked = message => ({ message });
+  if (workspaceRestoreError || workspaceMigrationError) {
+    return blocked("Permitext could not restore this workspace. Keep this tab open and resolve its recovery notice before updating.");
+  }
+  if (activeResearchProgress.size) return blocked("Wait for the Assistant to finish, then update Permitext.");
   try {
     await Promise.all([...notebookColumnMounts.values()].map(mount => mount.persistDraft?.()));
     flushSearchQueryPersistence(); flushResearchDraftPersistence(); saveWorkspaceState();
     if (identity.userID) {
       persistCodeQuestionAccountState(identity.userID);
       const [drafts, images] = await Promise.all([pendingNotebookDrafts(identity.userID), pendingNotebookImages(identity.userID)]);
-      if (drafts.length || images.length) return blocked();
+      if (images.length) return blocked("Note images are waiting to upload. Open Notes to finish uploading them before updating.");
+      if (drafts.length) return blocked("Note drafts are waiting to sync. Open Notes or review pending changes before updating.");
     }
-    if (!isCurrentAccountRequest(identity) || editingGeneration !== projectUpdateEditingGeneration) return blocked();
-    if (identity.userID && ["review", "busy", "unavailable"].includes(projectUpdateAutoApplyBlocker())) return blocked();
+    if (!isCurrentAccountRequest(identity) || editingGeneration !== projectUpdateEditingGeneration) {
+      return blocked("Your work or account changed while preparing the update. Try again.");
+    }
+    // App replacement is independent of Project-sync availability. No selected
+    // workspace, a background tab, and locally saved outbox entries are safe to
+    // reload; only live editor work or interactions need to finish first.
+    const dirtyEditor = [...notebookColumnMounts.values(), ...reportDraftMounts.values()]
+      .some(mount => mount.hasPendingEdits?.() || mount.hasUnsavedChanges?.()) ||
+      [...document.querySelectorAll('[data-project-editing-state]')].some(node => node._projectHasPendingEdits?.());
+    if (dirtyEditor) return blocked("Finish saving the open Note, Report, or Project editor before updating.");
+    if ([...document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog[open]')]
+      .some(node => node.getClientRects().length && !node.hidden)) {
+      return blocked("Close the open dialog, then update Permitext.");
+    }
+    if (track.classList.contains("is-resizing") || track.querySelector('.workspace-panel.is-dragging')) {
+      return blocked("Finish resizing or moving the column, then update Permitext.");
+    }
     return true;
-  } catch { return blocked(); }
+  } catch { return blocked("Permitext could not save your work on this device. Keep this tab open and try again before updating."); }
 }
 
 function workspaceTransitionPaneLabel(paneID) {
