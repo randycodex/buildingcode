@@ -27795,7 +27795,10 @@ async function handleProfileUpdate(request, response) {
     return;
   }
 
-  const publicUsername = normalizePublicUsername(body.publicUsername);
+  // Inline Settings editors submit only the field they changed.
+  const publicUsername = Object.hasOwn(body, "publicUsername")
+    ? normalizePublicUsername(body.publicUsername)
+    : context.account.publicUsername || null;
   const displayName = typeof body.displayName === "string" && body.displayName.trim().length
     ? body.displayName.trim()
     : null;
@@ -27804,13 +27807,17 @@ async function handleProfileUpdate(request, response) {
     sendError(response, 400, usernameValidationMessage);
     return;
   }
-  const professionalRole = typeof body.professionalRole === "string" ? body.professionalRole.trim() : "";
+  const professionalRole = Object.hasOwn(body, "professionalRole")
+    ? typeof body.professionalRole === "string" ? body.professionalRole.trim() : ""
+    : context.account.professionalRole || "";
   if (!researchFeedbackProfessionalRoles.has(professionalRole)) {
     sendError(response, 400, "Choose a valid optional professional role.");
     return;
   }
   const professionalRoleOther = professionalRole === "other"
-    ? String(body.professionalRoleOther || "").trim()
+    ? Object.hasOwn(body, "professionalRoleOther")
+      ? String(body.professionalRoleOther || "").trim()
+      : context.account.professionalRole === "other" ? context.account.professionalRoleOther || "" : ""
     : "";
   if (professionalRole === "other" && !professionalRoleOther) {
     sendError(response, 400, "Describe your professional role.");

@@ -37,10 +37,31 @@ try {
  assert.equal(saved.body.account.displayName,'Person');assert.equal(saved.body.account.publicUsername,'person');assert.equal(saved.body.account.email,'person@example.com');
  assert.equal(saved.body.account.professionalRole,'architect_designer');assert.equal(saved.body.account.productEmailOptIn,true);
  assert.equal(saved.body.account.onboardingCompleted,true);assert.equal(saved.body.account.policiesAccepted,true);
+ async function assertProfile(expected) {
+  const result=await post('/account/profile/read',{auth:{accountUserID:'a'}});
+  assert.equal(result.status,200);
+  for (const [key,value] of Object.entries(expected)) assert.equal(result.body.account[key],value,`Profile field ${key} changed unexpectedly.`);
+ }
+ for (const subscribed of [false,true]) {
+  assert.equal((await post('/account/profile',{auth:{accountUserID:'a'},productEmailOptIn:subscribed})).status,200);
+  await assertProfile({displayName:'Person',publicUsername:'person',professionalRole:'architect_designer',
+   professionalRoleOther:null,productEmailOptIn:subscribed,email:'person@example.com',onboardingCompleted:true,policiesAccepted:true});
+ }
  const customRole=await post('/account/profile',{auth:{accountUserID:'a'},displayName:'Person',publicUsername:'person',
   professionalRole:'other',professionalRoleOther:'Permit consultant',productEmailOptIn:true});
  assert.equal(customRole.status,200);
  const customSaved=await post('/account/profile/read',{auth:{accountUserID:'a'}});
  assert.equal(customSaved.body.account.professionalRole,'other');assert.equal(customSaved.body.account.professionalRoleOther,'Permit consultant');
- console.log('Account profile HTTP passed: authentication, isolation, safe read, username conflict, persistence, email preservation.');
+ for (const subscribed of [false,true]) {
+  assert.equal((await post('/account/profile',{auth:{accountUserID:'a'},productEmailOptIn:subscribed})).status,200);
+  await assertProfile({publicUsername:'person',professionalRole:'other',professionalRoleOther:'Permit consultant',productEmailOptIn:subscribed});
+ }
+ assert.equal((await post('/account/profile',{auth:{accountUserID:'a'},displayName:'New name'})).status,200);
+ await assertProfile({displayName:'New name',publicUsername:'person',professionalRole:'other',professionalRoleOther:'Permit consultant',productEmailOptIn:true});
+ assert.equal((await post('/account/profile',{auth:{accountUserID:'a'},publicUsername:'@New-Handle'})).status,200);
+ await assertProfile({displayName:'New name',publicUsername:'new-handle',professionalRole:'other',professionalRoleOther:'Permit consultant',productEmailOptIn:true});
+ assert.equal((await post('/account/profile',{auth:{accountUserID:'a'},professionalRoleOther:''})).status,400);
+ assert.equal((await post('/account/profile',{auth:{accountUserID:'a'},publicUsername:'',professionalRole:''})).status,200);
+ await assertProfile({displayName:'New name',publicUsername:null,professionalRole:null,professionalRoleOther:null,productEmailOptIn:true});
+ console.log('Account profile HTTP passed: authentication, isolation, safe read, validation, partial updates, email toggles, custom roles, and explicit clearing.');
 } finally {await new Promise(resolve=>server.close(resolve));await rm(dir,{recursive:true,force:true});}
