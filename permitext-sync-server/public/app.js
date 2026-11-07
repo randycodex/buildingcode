@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-direct-pro-signup-v1479";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-clerk-loading-screen-v1480";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-direct-pro-signup-v1479";
+} from "./offline-storage.js?v=20261106-clerk-loading-screen-v1480";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -11739,23 +11739,46 @@ async function signInCurrentBrowser(mode = "signIn") {
   throw error;
 }
 
+function showAccountRedirectLoading() {
+  const loading = document.createElement("div");
+  loading.className = "account-redirect-loading";
+  loading.tabIndex = -1;
+  showColumnLoadingStatus(loading, "Loading");
+  const covered = new Map(Array.from(document.body.children, element => [element, element.inert]));
+  covered.forEach((_inert, element) => { element.inert = true; });
+  document.body.classList.add("is-account-redirect-loading");
+  document.body.append(loading);
+  loading.focus({ preventScroll: true });
+  return () => {
+    loading.remove();
+    document.body.classList.remove("is-account-redirect-loading");
+    covered.forEach((inert, element) => { element.inert = inert; });
+  };
+}
+
 async function startDirectClerkAccountEntry(button, { mode = "signIn", upgrade = false } = {}) {
   if (button.disabled) return false;
   const identity = captureAccountRequest();
   const navigation = state.workflowNavigationGeneration || 0;
   const label = button.textContent;
+  let canceled = false;
+  const restoreLoading = showAccountRedirectLoading();
   const reset = () => {
+    canceled = true;
+    restoreLoading();
+    window.removeEventListener("pageshow", reset);
     button.disabled = false;
     button.removeAttribute("aria-busy");
     button.textContent = label;
   };
   button.disabled = true;
   button.setAttribute("aria-busy", "true");
-  showColumnLoadingStatus(button, label);
+  // Register before configuration loads so Back also recovers a pending request.
+  window.addEventListener("pageshow", reset, { once: true });
   try {
     const config = await clerkWebSignInConfig();
     requireCurrentAccountRequest(identity);
-    if (!button.isConnected || navigation !== (state.workflowNavigationGeneration || 0)) {
+    if (canceled || !button.isConnected || navigation !== (state.workflowNavigationGeneration || 0)) {
       reset();
       return false;
     }
@@ -11771,14 +11794,13 @@ async function startDirectClerkAccountEntry(button, { mode = "signIn", upgrade =
       returnURL.searchParams.set("intent", "upgrade-pro");
     }
     destination.searchParams.set("redirect_url", returnURL.href);
-    // A browser Back restored from its page cache must offer a usable button.
-    window.addEventListener("pageshow", reset, { once: true });
     window.location.assign(destination.href);
     return true;
   } catch (error) {
-    window.removeEventListener("pageshow", reset);
+    const showError = !canceled && button.isConnected && isCurrentAccountRequest(identity) &&
+      navigation === (state.workflowNavigationGeneration || 0);
     reset();
-    if (button.isConnected && isCurrentAccountRequest(identity)) {
+    if (showError) {
       void showWebNotice("Sign-in unavailable", error.message || "Please try again.");
     }
     return false;

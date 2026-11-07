@@ -19148,6 +19148,8 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-draft-cla
 .account-welcome.has-hosted-auth-fallback > .account-welcome-actions { display: none; }
 .direct-sign-in-entry .account-welcome-explore { border: 0; background: transparent; color: var(--text-secondary); box-shadow: none; }
 .account-welcome-status > .column-loading-indicator { position: static; }
+body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility: hidden; }
+.account-redirect-loading { position: fixed; inset: 0; z-index: 2000; background: var(--surface); outline: none; }
 .workspace-shell > .account-screen[data-signing-in="true"] { position: fixed; inset: 0; z-index: 2000; height: 100dvh; }
 .workspace-shell:has(> .account-screen[data-signing-in="true"]) > .topbar { visibility: hidden; }
 .account-screen[data-signing-in="true"] > .account-screen-header,
