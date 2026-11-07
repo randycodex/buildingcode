@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-settings-project-rename-v1484";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-account-without-username-v1485";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-settings-project-rename-v1484";
+} from "./offline-storage.js?v=20261107-account-without-username-v1485";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -40184,20 +40184,6 @@ async function startFocusedResearchFromSavedItem(item, projectID = "") {
   });
 }
 
-function normalizedPublicUsername(value) {
-  const trimmed = String(value || "").trim().replace(/^@/, "").toLowerCase();
-  return trimmed || null;
-}
-
-function publicUsernameValidationMessage(value) {
-  const username = normalizedPublicUsername(value);
-  if (!username) return "";
-  if (username.length < 3) return "Use at least 3 characters.";
-  if (username.length > 30) return "Use 30 characters or fewer.";
-  if (!/^[a-z0-9_-]+$/.test(username)) return "Use letters, numbers, hyphens, or underscores.";
-  return "";
-}
-
 function bookmarkRecordsForSettings() {
   return (currentContentSummary().savedItems || [])
     .filter((item) => item?.sectionID && !item.deletedAt);
@@ -41474,7 +41460,6 @@ async function presentAccountProfile({ edit = false } = {}) {
       <p>How should your name appear in Permitext?</p>
       <label>Name<input name="displayName" autocomplete="name" required maxlength="100"></label>
       <label>Email<input name="email" type="text" readonly></label>
-      <label>Username (optional)<input name="publicUsername" autocomplete="username" maxlength="30"></label>
       <label>Professional role (optional)<select name="professionalRole">
         <option value="">Select a role</option>
         <option value="architect_designer">Architect or designer</option>
@@ -41502,7 +41487,6 @@ async function presentAccountProfile({ edit = false } = {}) {
     const form = dialog.querySelector("form");
     form.elements.displayName.value = profileNeedsName(account) ? "" : account.displayName;
     form.elements.email.value = account.email || "Email unavailable";
-    form.elements.publicUsername.value = account.publicUsername || "";
     form.elements.professionalRole.value = account.professionalRole || "";
     form.elements.professionalRoleOther.value = account.professionalRoleOther || "";
     form.elements.productEmailOptIn.checked = account.productEmailOptIn === true;
@@ -41533,11 +41517,9 @@ async function presentAccountProfile({ edit = false } = {}) {
         if (requestedRole === "other" && !requestedOtherRole) {
           throw new Error("Describe your professional role.");
         }
-        const requestedUsername = form.elements.publicUsername.value.trim().replace(/^@/, "").toLowerCase();
         await postJSON("/account/profile", {
           auth: { accountUserID: account.userID },
           displayName,
-          publicUsername: requestedUsername,
           professionalRole: requestedRole,
           professionalRoleOther: requestedOtherRole,
           productEmailOptIn: form.elements.productEmailOptIn.checked,
@@ -41550,7 +41532,6 @@ async function presentAccountProfile({ edit = false } = {}) {
         requireCurrentAccountRequest(identity);
         if (
           savedAccount.displayName !== displayName ||
-          String(savedAccount.publicUsername || "") !== requestedUsername ||
           savedAccount.professionalRole !== (requestedRole || null) ||
           savedAccount.professionalRoleOther !== (requestedRole === "other" ? requestedOtherRole : null) ||
           savedAccount.productEmailOptIn !== form.elements.productEmailOptIn.checked ||
@@ -42254,24 +42235,22 @@ function renderSettings({ upgrade = false } = {}) {
     row.classList.add("is-editing");
     value.replaceChildren();
 
-    if (field === "displayName" || field === "publicUsername") {
+    if (field === "displayName") {
       const input = document.createElement("input");
       input.type = "text";
       input.className = "account-identity-inline-input";
-      input.maxLength = field === "displayName" ? 100 : 30;
-      input.value = field === "displayName" ? String(account.displayName || "") : String(account.publicUsername || "");
-      input.setAttribute("aria-label", field === "displayName" ? "Name" : "Username");
+      input.maxLength = 100;
+      input.value = String(account.displayName || "");
+      input.setAttribute("aria-label", "Name");
       const saveText = () => {
         const requested = input.value.trim();
-        if (field === "displayName" && !requested) {
+        if (!requested) {
           accountCopy.textContent = "Enter your name.";
           accountCopy.hidden = false;
           input.focus();
           return;
         }
-        void finish(field === "displayName"
-          ? { displayName: requested }
-          : { publicUsername: requested.replace(/^@/, "").toLowerCase() });
+        void finish({ displayName: requested });
       };
       input.addEventListener("keydown", (event) => {
         if (event.key === "Enter") { event.preventDefault(); saveText(); }
@@ -42378,8 +42357,6 @@ function renderSettings({ upgrade = false } = {}) {
   }).catch(() => {});
 
   const accountIdentityName = panel.querySelector(".account-identity-name");
-  const accountIdentityUsernameRow = panel.querySelector(".account-identity-username-row");
-  const accountIdentityUsername = panel.querySelector(".account-identity-username");
   const accountIdentityEmail = panel.querySelector(".account-identity-email");
   const accountIdentityRoleRow = panel.querySelector(".account-identity-role-row");
   const accountIdentityRole = panel.querySelector(".account-identity-role");
@@ -42821,9 +42798,6 @@ function renderSettings({ upgrade = false } = {}) {
     if (account) {
       accountIdentityName.textContent = account.displayName || "Permitext account";
       accountIdentityEmail.textContent = account.email || "Email unavailable";
-      const username = String(account.publicUsername || "").trim();
-      accountIdentityUsernameRow.hidden = false;
-      accountIdentityUsername.textContent = username ? (username.startsWith("@") ? username : `@${username}`) : "Add username";
       const roleLabel = professionalRoleLabel(account.professionalRole, account.professionalRoleOther);
       accountIdentityRoleRow.hidden = false;
       accountIdentityRole.textContent = roleLabel || "Add role";

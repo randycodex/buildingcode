@@ -2164,8 +2164,6 @@ private struct SharedAccountProfileView: View {
                     TextField("Name", text: textBinding(\.displayName))
                         .textContentType(.name)
                     Text(profile.email ?? "Email unavailable").foregroundStyle(.secondary)
-                    TextField("Username (optional)", text: textBinding(\.publicUsername))
-                        .textInputAutocapitalization(.never).autocorrectionDisabled()
                     Picker("Professional role", selection: textBinding(\.professionalRole)) {
                         ForEach(roles, id: \.0) { role in Text(role.1).tag(role.0) }
                     }
@@ -2186,7 +2184,6 @@ private struct SharedAccountProfileView: View {
                 } else {
                     Text(profile.displayName ?? "Your profile").font(.headline)
                     Text(profile.email ?? "Email unavailable").foregroundStyle(.secondary)
-                    if let username = profile.publicUsername, !username.isEmpty { Text("@\(username)") }
                     if let role = profile.professionalRole, !role.isEmpty {
                         Text(role == "other" ? (profile.professionalRoleOther ?? "Other") : (roles.first { $0.0 == role }?.1 ?? role))
                             .foregroundStyle(.secondary)
