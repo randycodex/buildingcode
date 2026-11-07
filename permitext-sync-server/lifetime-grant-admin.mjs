@@ -123,19 +123,6 @@ export async function verifiedClerkUserIdentity(
   };
 }
 
-function clerkInvitationRedirectURL(environment) {
-  const configured = String(environment.CLERK_ACCOUNT_PORTAL_URL || "").trim();
-  try {
-    const url = new URL(configured);
-    url.pathname = "/sign-up";
-    url.search = "";
-    url.hash = "";
-    return url.toString();
-  } catch {
-    return "https://accounts.permitext.com/sign-up";
-  }
-}
-
 export async function sendClerkLifetimeGrantInvitation(
   email,
   { environment = process.env, clerkClient = null } = {}
@@ -156,7 +143,10 @@ export async function sendClerkLifetimeGrantInvitation(
       expiresInDays: 30,
       ignoreExisting: true,
       notify: true,
-      redirectUrl: clerkInvitationRedirectURL(environment)
+      // Clerk handles the invitation ticket and chooses sign-in or sign-up.
+      // Both Account Portal fallbacks return to /workspace?clerk_return=1.
+      // This flag selects email copy only; verified email matching grants access.
+      publicMetadata: { permitextLifetimeProInvitation: true }
     });
   } catch {
     throw new LifetimeGrantAdminError(502, "Clerk could not send the invitation email. No Lifetime Pro invitation was saved.");

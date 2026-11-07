@@ -130,8 +130,12 @@ assert(sentInvitation.id === "inv_123", "The Clerk invitation ID was not retaine
 assert(invitationParams.notify === true, "The Lifetime Pro invitation did not request an email notification.");
 assert(invitationParams.ignoreExisting === true, "Existing Clerk identities could not receive the invitation email.");
 assert(
-  invitationParams.redirectUrl === "https://accounts.permitext.com/sign-up",
-  "The Clerk invitation did not return the recipient to the Permitext sign-up portal."
+  !Object.hasOwn(invitationParams, "redirectUrl"),
+  "The invitation overrode Clerk's choice between hosted sign-in and sign-up."
+);
+assert(
+  invitationParams.publicMetadata?.permitextLifetimeProInvitation === true,
+  "The invitation email could not distinguish complimentary Lifetime Pro access."
 );
 
 let revokedInvitationID = null;
