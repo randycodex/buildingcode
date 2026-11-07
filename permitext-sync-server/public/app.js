@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-settings-project-refresh-v1483";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-settings-project-rename-v1484";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-settings-project-refresh-v1483";
+} from "./offline-storage.js?v=20261106-settings-project-rename-v1484";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -15270,6 +15270,7 @@ async function updateProjectFolder(project, details = {}) {
   setOpenProjectDetails(openProjectDetails().map((detail) => projectDetailMatches(project, detail) ? projectIdentity(updated) : detail));
   saveWorkspaceState();
   refreshOpenProjectPaneTheme(updated);
+  refreshOpenSettingsWorkspace();
   let projectUpdatePersisted = !account;
 
   if (account) {
@@ -15279,6 +15280,7 @@ async function updateProjectFolder(project, details = {}) {
       state.localProjects = (state.localProjects || []).filter((item) =>
         projectRecordID(item) !== id || JSON.stringify(item) !== localRevision);
       saveWorkspaceState();
+      refreshOpenSettingsWorkspace();
       projectUpdatePersisted = true;
     } catch (error) {
       requireCurrentAccountRequest(requestIdentity);

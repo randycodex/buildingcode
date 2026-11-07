@@ -297,7 +297,7 @@ await contextEditor.flush();
 assert.equal(patches.at(-1).description, "Retry context");
 
 // Two editors retain one canonical Project; older acknowledgments cannot erase a newer local edit.
-const mutations = [], pending = [];
+const mutations = [], pending = [], settingsNames = [];
 let canonical = copy(alpha), identities = [copy(alpha)];
 const localState = { localProjects: [] };
 const u = vm.createContext({ state: localState,
@@ -310,6 +310,7 @@ const u = vm.createContext({ state: localState,
   openProjectDetails: () => identities, setOpenProjectDetails: value => { identities = value; },
   projectIdentity: value => ({ ...value }), projectDetailKey: value => value.id,
   saveWorkspaceState() {}, refreshOpenProjectPaneTheme() {}, visibleProjectArtifactIDs: () => [],
+  refreshOpenSettingsWorkspace() { settingsNames.push((localState.localProjects[0] || canonical).name); },
   projectMutationForRecord: value => copy(value),
   pushMutation: mutation => { mutations.push(mutation); const hold = deferred(); pending.push(hold); return hold.promise; },
   isSessionAuthenticationError: () => false
@@ -324,4 +325,9 @@ canonical = mutations[1]; pending[1].resolve(); await second;
 assert.equal(localState.localProjects.length, 0);
 assert.equal(canonical.description, "New narrative");
 assert.equal(canonical.structuredFacts[0].value, "R-2");
+const renamed = u.updateProjectFolder(alpha, { name: "Renamed workspace" });
+assert.equal(settingsNames.at(-1), "Renamed workspace", "Open Settings must show the rename before the server responds.");
+canonical = { ...mutations[2], name: "Canonical rename", title: "Canonical rename" };
+pending[2].resolve(); await renamed;
+assert.equal(settingsNames.at(-1), "Canonical rename", "Settings must also refresh after the rename is acknowledged.");
 console.log("Project details passed: retained sections, access revocation, stale loads, split editor patches and concurrent Project updates.");

@@ -131,8 +131,13 @@ assert.equal(live.nodes.get('[data-content-count="projects"]').textContent,'1 to
 assert.equal(live.panel,originalPanel);
 assert.equal(live.panel.profileDraft,'Unfinished profile edit');
 assert.equal(live.panel.scrollTop,245);
+live.content.projects[0].name = 'Renamed workspace';
+live.refreshWorkspace();
+assert.equal(live.controls.projectList.children[0].children[1].children[0].textContent,'Renamed workspace');
+assert.deepEqual(live.nodes.get('manager .settings-project-manager-content').projectNames,['Renamed workspace']);
+assert.equal(live.manageProjects.open,true);
 live.setCurrent(false);
 live.content.projects.push({id:'other-account',name:'Private other account'});
 live.refreshWorkspace();
-assert.deepEqual(live.nodes.get('manager .settings-project-manager-content').projectNames,['New workspace'],'A stale Settings screen cannot show another account\'s projects.');
+assert.deepEqual(live.nodes.get('manager .settings-project-manager-content').projectNames,['Renamed workspace'],'A stale Settings screen cannot show another account\'s projects.');
 console.log('Open Settings workspace refresh passed: newly created project, access transition, expanded section, mounted edits/scroll, and account isolation.');
