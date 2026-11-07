@@ -96,6 +96,13 @@ textarea, input, select { width: 100%; padding: 10px; border: 1px solid #3a3a3a;
 .spend-table th, .spend-table td { padding: 12px; border-bottom: 1px solid #303030; text-align: right; }
 .spend-table th:first-child, .spend-table td:first-child { text-align: left; }
 
+.email-subscribers .actions { margin: 20px 0; }
+.subscriber-results { overflow-x: auto; }
+.subscriber-table { width: 100%; border-collapse: collapse; }
+.subscriber-table th, .subscriber-table td { padding: 12px; border-bottom: 1px solid #303030; text-align: left; overflow-wrap: anywhere; }
+.subscriber-table th { color: #aaa69f; font-size: 13px; }
+.email-subscribers button:disabled { opacity: .5; cursor: wait; }
+
 .lifetime-grants { display: grid; gap: 18px; }
 .lifetime-grants > h2, .lifetime-grants > p { margin: 0; }
 .status.is-success { border: 0; background: #143426; color: #a8efca; }

@@ -51,6 +51,7 @@ import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation, r
 import { captureTrash, restoreTrash, trashSummary, trashContents } from "./trash-recovery.mjs";
 import {notebookTrashMetadata, isNotebookTrashArtifact, notebookTrashSummary, notebookTrashContents, planNotebookTrashMutation} from './notebook-trash.mjs';
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
+import { emailSubscribersFromAccounts, postgresEmailSubscribers, emailSubscribersCSV } from "./email-subscribers.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
 import { buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction } from "./research-claim-applicability-review.mjs";
 import { buildResearchMaterialScopeReviewPacket, researchMaterialScopeReviewSchema,
@@ -1274,6 +1275,10 @@ export function createFileStoreAdapter() {
     async accountExists(userID) {
       const store = await this.read();
       return Boolean(store.users?.[userID]);
+    },
+    async listEmailSubscribers() {
+      const store = await this.read();
+      return emailSubscribersFromAccounts(Object.values(store.users || {}));
     },
     async lifetimeGrantInvitation(emailHash) {
       const store = await this.read();
@@ -4069,6 +4074,11 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       const rows = await sql`SELECT id FROM permitext_users WHERE id = ${userID} LIMIT 1`;
       return rows.length > 0;
+    },
+    async listEmailSubscribers() {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return postgresEmailSubscribers(sql);
     },
     async lifetimeGrantInvitation(emailHash) {
       await ensureSchema();
@@ -30188,6 +30198,29 @@ function sendLifetimeGrantAdminError(response, error) {
   return false;
 }
 
+async function handleInternalEmailSubscribersData(request, response) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  const subscribers = await (await storeAdapter()).listEmailSubscribers();
+  sendJSON(response, 200, { subscribers });
+}
+
+async function handleInternalEmailSubscribersExport(request, response) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  // Re-read consent at export time rather than trusting the dashboard's old list.
+  const subscribers = await (await storeAdapter()).listEmailSubscribers();
+  const filename = `permitext-email-subscribers-${new Date().toISOString().slice(0, 10)}.csv`;
+  response.writeHead(200, {
+    ...securityHeaders(),
+    "content-type": "text/csv; charset=utf-8",
+    "content-disposition": `attachment; filename="${filename}"`,
+    "cache-control": "no-store",
+    "x-subscriber-count": String(subscribers.length)
+  });
+  response.end(emailSubscribersCSV(subscribers));
+}
+
 async function handleInternalLifetimeGrantData(request, response) {
   const context = await authenticatedInternalBody(request, response);
   if (!context) return;
@@ -34634,6 +34667,8 @@ const handlers = {
   "internal/evaluations/feedback/triage": handleInternalFeedbackTriage,
   "internal/evaluations/feedback/case": handleInternalFeedbackCase,
   "internal/lifetime-grants/data": handleInternalLifetimeGrantData,
+  "internal/email-subscribers/data": handleInternalEmailSubscribersData,
+  "internal/email-subscribers/export": handleInternalEmailSubscribersExport,
   "internal/lifetime-grants/lookup": handleInternalLifetimeGrantLookup,
   "internal/lifetime-grants/invite": handleInternalLifetimeGrantInvite,
   "internal/lifetime-grants/revoke": handleInternalLifetimeGrantRevoke,

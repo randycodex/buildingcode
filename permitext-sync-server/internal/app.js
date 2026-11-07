@@ -28,7 +28,7 @@ function account() {
   }
 }
 
-async function internalRequest(path, values = {}) {
+async function internalResponse(path, values = {}) {
   const current = account();
   if (!current) throw new Error("Sign in to Permitext in this browser before opening the owner console.");
   const response = await fetch(path, {
@@ -36,9 +36,19 @@ async function internalRequest(path, values = {}) {
     headers: { "content-type": "application/json", authorization: `Bearer ${current.sessionToken}` },
     body: JSON.stringify({ auth: { accountUserID: current.userID }, ...values })
   });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || `Request failed (${response.status}).`);
-  return payload;
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.error || `Request failed (${response.status}).`);
+  }
+  const latest = account();
+  if (latest?.userID !== current.userID || latest?.sessionToken !== current.sessionToken) {
+    throw new Error("Your account changed. Reload the owner console.");
+  }
+  return response;
+}
+
+async function internalRequest(path, values = {}) {
+  return (await internalResponse(path, values)).json();
 }
 
 function element(name, options = {}) {
@@ -1200,8 +1210,87 @@ function renderLifetimeGrants() {
   panels["lifetime-grants"].replaceChildren(section);
 }
 
+function renderEmailSubscribers() {
+  const section = element("section", { className: "card email-subscribers" });
+  section.append(element("h2", { text: "Email subscribers" }), element("p", {
+    className: "meta",
+    text: "Users currently subscribed to product updates, tips, and announcements. The CSV checks subscription status again when you export."
+  }));
+  const actions = element("div", { className: "actions" });
+  const refresh = element("button", { text: "Refresh list" });
+  const download = element("button", { text: "Export CSV" });
+  refresh.type = download.type = "button";
+  actions.append(refresh, download);
+  const status = element("p", { className: "meta" });
+  status.setAttribute("role", "status");
+  const results = element("div", { className: "subscriber-results" });
+  section.append(actions, status, results);
+  panels["email-subscribers"].replaceChildren(section);
+
+  async function refreshList() {
+    refresh.disabled = true;
+    status.textContent = "Loading subscribers…";
+    try {
+      const { subscribers } = await internalRequest("/internal/email-subscribers/data");
+      results.replaceChildren();
+      status.textContent = `${subscribers.length} currently subscribed ${subscribers.length === 1 ? "user" : "users"}`;
+      if (!subscribers.length) {
+        results.append(element("p", { text: "No email subscribers yet." }));
+        return;
+      }
+      const table = element("table", { className: "subscriber-table" });
+      const head = element("thead");
+      const headings = element("tr");
+      ["Name", "Email", "Opt-in date"].forEach(label => {
+        const cell = element("th", { text: label });
+        cell.scope = "col";
+        headings.append(cell);
+      });
+      head.append(headings);
+      const body = element("tbody");
+      subscribers.forEach(subscriber => {
+        const row = element("tr");
+        [subscriber.name || "—", subscriber.email,
+          subscriber.subscribedAt ? new Date(subscriber.subscribedAt).toLocaleString() : "Not recorded"
+        ].forEach(value => row.append(element("td", { text: value })));
+        body.append(row);
+      });
+      table.append(head, body);
+      results.append(table);
+    } catch (error) {
+      results.replaceChildren();
+      status.textContent = error.message;
+    } finally {
+      refresh.disabled = false;
+    }
+  }
+
+  refresh.addEventListener("click", () => void refreshList());
+  download.addEventListener("click", async () => {
+    download.disabled = true;
+    status.textContent = "Preparing CSV…";
+    try {
+      const response = await internalResponse("/internal/email-subscribers/export");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = element("a");
+      link.href = url;
+      link.download = response.headers.get("content-disposition")?.match(/filename="([^"]+)"/)?.[1] || "permitext-email-subscribers.csv";
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      status.textContent = `Exported ${response.headers.get("x-subscriber-count")} currently subscribed users`;
+    } catch (error) {
+      status.textContent = error.message;
+    } finally {
+      download.disabled = false;
+    }
+  });
+  void refreshList();
+}
+
 const tabRenderers = { cases: renderCases, retrieval: renderRetrievalCases, zoning: renderZoningCases,
-  runs: renderRuns, feedback: renderFeedback, spend: renderResearchSpend, "lifetime-grants": renderLifetimeGrants };
+  runs: renderRuns, feedback: renderFeedback, spend: renderResearchSpend, "lifetime-grants": renderLifetimeGrants,
+  "email-subscribers": renderEmailSubscribers };
 
 function renderActiveTab() {
   if (!renderedTabs.has(activeTab)) {
