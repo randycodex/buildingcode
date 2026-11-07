@@ -26,7 +26,7 @@ const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHyd
  reconcileProjectWorkspaces:noop,enforceProjectRequiredWorkspace:noop,workspaceColumnsRequireProject:()=>false,scopeSavedInstanceToWorkspace:noop,enforceReaderPlanLimit:noop,
  closeDeletedProjectDetails:()=>{if(removeNotebookOnVerify)desired=desired.filter(d=>d.id!=="notebook");},
  restoreResearchWorkspaceState:noop,captureReaderScrollPositions:()=>new Map(),updateReaderPlanControls:noop,
- renderWorkspaceTabs:noop,renderCodeQuestionShellChrome:noop,normalizePaneWeights:noop,activePaneIDs:()=>desired.map(d=>d.id),setUtilityButtonStates:noop,
+ renderWorkspaceTabs:noop,renderCodeQuestionShellChrome:noop,normalizePaneWeights:noop,activePaneIDs:()=>desired.map(d=>d.id),setUtilityButtonStates:noop,refreshOpenSettingsWorkspace:noop,
  saveWorkspaceState:noop,scheduleWorkspaceStateSaveAfterPaint:noop,startProjectArtifactCheckpointLoop:noop,hasCapability:()=>true,isProAccount:()=>true,
  workspacePaneDescriptors:options=>desired.map(d=>({...d,label:d.id,identity:d.id,accessGate:options.accessGate,close:noop})),
  createWorkspacePaneLoadingShell:descriptor=>{const node=pane(descriptor.id,true);node.dataset.workspacePaneIdentity=descriptor.contentIdentity;node.dataset.workspacePaneAccessIdentity=descriptor.accessIdentity;node.__workspaceAccessGate=descriptor.accessGate;return node;},

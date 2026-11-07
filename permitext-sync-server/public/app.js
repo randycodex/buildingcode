@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-app-update-safety-v1482";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261106-settings-project-refresh-v1483";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261106-app-update-safety-v1482";
+} from "./offline-storage.js?v=20261106-settings-project-refresh-v1483";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2319,7 +2319,8 @@ async function createNewWorkspace() {
     return;
   }
   if (!(await confirmWorkspaceTransition())) return;
-  const createHost = document.querySelector(".workspace-shell.has-no-workspace") || track;
+  const createHost = document.querySelector(".account-screen[open]") ||
+    document.querySelector(".workspace-shell.has-no-workspace") || track;
   showProjectCreateSheet(createHost, null, { folderType: "project", workspaceProject: true,
     onCreated: async (project) => {
       reconcileProjectWorkspaces();
@@ -41299,6 +41300,11 @@ function settingsPanelScrollTop(panel) {
   return (panel.querySelector(".settings-scroll") || panel).scrollTop;
 }
 
+function refreshOpenSettingsWorkspace() {
+  document.querySelectorAll(".account-screen[open] .settings-panel, #panel-track .settings-panel")
+    .forEach(panel => panel.__refreshSettingsWorkspace?.());
+}
+
 async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft) {
   const accountScreen = document.querySelector(".account-screen[open]");
   const categoryScrollTops = new Map(Array.from(accountScreen?.querySelectorAll(".settings-card, .settings-account-column") || [], card => [
@@ -42176,19 +42182,23 @@ function renderSettings({ upgrade = false } = {}) {
     });
   });
   const manageProjects = panel.querySelector(".settings-project-management");
-  manageProjects?.addEventListener("toggle", () => {
-    if (!manageProjects.open) return;
-    if (!isCurrentAccountRequest(settingsIdentity) || !workspacePrivatePresentationAllowed()) {
-      manageProjects.open = false;
-      return;
-    }
-    renderProjectManager(manageProjects.querySelector(".settings-project-manager-content"), {
+  const refreshProjectManagement = () => {
+    if (!isCurrentAccountRequest(settingsIdentity)) return;
+    const allowed = workspacePrivatePresentationAllowed();
+    manageProjects?.querySelector("summary")?.setAttribute("aria-disabled", String(!allowed));
+    if (!manageProjects) return;
+    const content = manageProjects.querySelector(".settings-project-manager-content");
+    content.hidden = !allowed;
+    content.inert = !allowed;
+    if (!allowed || !manageProjects.open) return;
+    renderProjectManager(content, {
       onChange: () => {
         refreshSettingsContent();
         panel.__refreshSettingsTrash?.();
       }
     });
-  });
+  };
+  manageProjects?.addEventListener("toggle", refreshProjectManagement);
 
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   const accountCopy = panel.querySelector(".account-status-copy");
@@ -42627,6 +42637,11 @@ function renderSettings({ upgrade = false } = {}) {
     updateProjectSelection();
   };
   panel.__refreshSettingsContent = refreshSettingsContent;
+  panel.__refreshSettingsWorkspace = () => {
+    if (upgrade || !isCurrentAccountRequest(settingsIdentity)) return;
+    refreshSettingsContent();
+    refreshProjectManagement();
+  };
   refreshSettingsContent();
   projectSelectAll.addEventListener("click", () => {
     if (selectedProjectIDs.size === settingsProjects.length) selectedProjectIDs.clear();
@@ -42760,7 +42775,7 @@ function renderSettings({ upgrade = false } = {}) {
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
-    manageProjects?.querySelector("summary")?.setAttribute("aria-disabled", String(!workspacePrivatePresentationAllowed()));
+    refreshProjectManagement();
     const source = currentEntitlement()?.source;
     const activePlanCopy = settingsPlanCopy({ pro, source });
     planRows.forEach((row) => {
@@ -49195,6 +49210,7 @@ async function renderWorkspace(options = {}) {
   if (state.utilities.settings) state.utilities.settings = false;
   if (!await mountWorkspacePanesIndependently(context, { ...options, readerScrollPositions, accessGate, shellReady: true })) return false;
   if (options.persist !== false) saveWorkspaceState();
+  refreshOpenSettingsWorkspace();
   return true;
 }
 
@@ -49223,6 +49239,7 @@ async function renderUtilityWorkspace(options = {}) {
     else saveWorkspaceState();
   }
   if (accessGate.allowed) startProjectArtifactCheckpointLoop();
+  refreshOpenSettingsWorkspace();
   return true;
 }
 

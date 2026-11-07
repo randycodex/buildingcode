@@ -27,7 +27,7 @@ function harness({ editing = false, inline = false, beforeSave } = {}) {
   background.className = "projects-content"; panel.append(background); body.append(panel);
   const lookup = deferred(), write = deferred(), created = [], updated = [], notices = [], callbacks = [];
   const c = vm.createContext({
-    document: { createElement: tag => new Element(tag), activeElement: new Element("button") }, HTMLElement: Element,
+    document: { createElement: tag => new Element(tag), activeElement: new Element("button"), querySelector: () => null }, HTMLElement: Element,
     activeWorkspaceID: "workspace", account: "owner", captureAccountRequest: () => c.account,
     isCurrentAccountRequest: identity => c.account === identity,
     activeAccount: () => ({userID: c.account}), projectIdentity: project => project, folderType: () => "project", folderTypeLabel: () => "Project",
@@ -48,6 +48,8 @@ function harness({ editing = false, inline = false, beforeSave } = {}) {
   name.value = "Typed project"; address.value = "Synthetic address";
   if (description) description.value = "Typed description";
   name.events.input();
+  // Property lookup is optional and starts only when the user requests import.
+  form.querySelectorAll("button").find(button => button.textContent === "Import existing NYC property records (optional)").events.click();
   return {c, panel, overlay, form, name, address, description, cancel, save, lookup, write, created, updated, notices, callbacks,
     submit: () => form.events.submit(event()),
     resolveLookup: () => lookup.resolve({property: {normalizedAddress: "Normalized address", structuredFacts: [{status: "sourced"}]}})
@@ -75,7 +77,7 @@ for (const options of [{editing:false},{editing:true},{editing:true,inline:true}
   h.resolveLookup(); await Promise.all([first, duplicate]);
   assert.equal(h.created.length + h.updated.length, 1, "Repeated submission writes one Project");
   const details = (options.editing ? h.updated : h.created)[0];
-  assert.equal(details.name, "Typed project"); assert.equal(details.address, "Normalized address");
+  assert.equal(details.name, "Typed project"); assert.equal(details.address, "Synthetic address", "Tax-lot lookup must preserve the entered building address");
   assert.equal(Object.hasOwn(details, 'description'), !options.inline, 'Inline identity saves preserve context owned by the separate editor.');
   assert.equal(h.overlay.isConnected, false);
   if (options.inline) assert.deepEqual(h.callbacks, ["saved"], "Inline saving refreshes its own screen without a background workspace transition.");

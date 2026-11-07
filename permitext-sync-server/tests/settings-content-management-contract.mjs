@@ -7,8 +7,12 @@ const settings = app.slice(app.indexOf('function renderSettings('));
 const start = settings.indexOf('  let settingsProjects =');
 const selectionSource = settings.slice(start, settings.indexOf('  projectSelectAll.addEventListener', start));
 const folderHelpers = app.slice(app.indexOf('function folderType('), app.indexOf('\nfunction readableProjectName('));
+const managerStart = settings.indexOf('  const refreshProjectManagement =');
+const managerSource = settings.slice(managerStart, settings.indexOf('  manageProjects?.addEventListener', managerStart));
+const notifyStart = app.indexOf('function refreshOpenSettingsWorkspace(');
+const notifySource = app.slice(notifyStart, app.indexOf('\n}', notifyStart) + 2);
 
-function harness({projects = [{id:'one'}, {id:'two'}], saved = [{}], links = [], annotations = []} = {}) {
+function harness({projects = [{id:'one'}, {id:'two'}], saved = [{}], links = [], annotations = [], allowed = true} = {}) {
   const node = () => ({hidden:false,disabled:false,textContent:'',attributes:{},children:[],events:{},
     style:{setProperty(){}},
     setAttribute(key,value){this.attributes[key]=value;},
@@ -18,19 +22,25 @@ function harness({projects = [{id:'one'}, {id:'two'}], saved = [{}], links = [],
   });
   const nodes = new Map();
   const panel = {querySelector(selector){if(!nodes.has(selector))nodes.set(selector,node());return nodes.get(selector);}};
+  const manageProjects = node();
+  manageProjects.open = true;
+  manageProjects.querySelector = selector => panel.querySelector(`manager ${selector}`);
   const controls = Object.fromEntries(['projectList','projectEmpty','projectSelectAll','projectDelete','projectClearAll','projectActions','projectSelectionStatus'].map(name=>[name,node()]));
   let current = true;
   const content = {projects, projectSections:links, annotations};
-  const context = vm.createContext({panel,...controls,settingsIdentity:'owner',
-    document:{createElement:node},isCurrentAccountRequest:()=>current,
+  const context = vm.createContext({panel,...controls,settingsIdentity:'owner',upgrade:false,manageProjects,
+    document:{createElement:node,querySelectorAll:()=>[panel]},isCurrentAccountRequest:()=>current,
+    workspacePrivatePresentationAllowed:()=>allowed,
+    renderProjectManager:container=>{container.projectNames=content.projects.map(project=>project.name || project.id);},
     bookmarkRecordsForSettings:()=>saved,currentContentSummary:()=>content,
     visibleProjectRecords:records=>records.filter(project=>!project.deletedAt),
     projectIsArchived:project=>Boolean(project.archivedAt),projectRecordID:project=>project.id,
     projectColor:()=>'',readableProjectName:project=>project.name || project.id
   });
-  vm.runInContext(folderHelpers+selectionSource,context);
-  return {nodes,controls,content,saved,panel,
+  vm.runInContext(folderHelpers+managerSource+selectionSource+notifySource,context);
+  return {nodes,controls,content,saved,panel,manageProjects,
     setCurrent(value){current=value;},refresh(){panel.__refreshSettingsContent();},
+    setAllowed(value){allowed=value;},refreshWorkspace(){context.refreshOpenSettingsWorkspace();},
     select(ids){vm.runInContext(`selectedProjectIDs.clear();${ids.map(id=>`selectedProjectIDs.add(${JSON.stringify(id)});`).join('')}updateProjectSelection();`,context);}
   };
 }
@@ -100,3 +110,29 @@ h.setCurrent(false);h.content.projects=[];h.refresh();
 assert.equal(h.controls.projectList.children.length,1,'A response from a previous account cannot change this Settings view.');
 assert.match(settings,/onChange: \(\) => \{\s*refreshSettingsContent\(\);\s*panel\.__refreshSettingsTrash\?\.\(\);/,'Inline project actions refresh Saved Content and open Trash.');
 console.log('Saved content management: selection, scope, live project removal and restore, counts, retained content and account fencing passed.');
+
+// A workspace can be created while the same Settings screen is still mounted.
+const live = harness({projects:[], allowed:false});
+const originalPanel = live.panel;
+live.panel.profileDraft = 'Unfinished profile edit';
+live.panel.scrollTop = 245;
+live.refreshWorkspace();
+assert.equal(live.nodes.get('manager summary').attributes['aria-disabled'],'true');
+assert.equal(live.nodes.get('manager .settings-project-manager-content').hidden,true);
+assert.equal(live.manageProjects.open,true,'Pending access must preserve the open Projects section.');
+live.content.projects.push({id:'created',name:'New workspace',folderType:'project'});
+live.setAllowed(true);
+live.refreshWorkspace();
+assert.equal(live.nodes.get('manager summary').attributes['aria-disabled'],'false');
+assert.equal(live.nodes.get('manager .settings-project-manager-content').hidden,false);
+assert.deepEqual(live.nodes.get('manager .settings-project-manager-content').projectNames,['New workspace']);
+assert.equal(live.controls.projectList.children.length,1);
+assert.equal(live.nodes.get('[data-content-count="projects"]').textContent,'1 total');
+assert.equal(live.panel,originalPanel);
+assert.equal(live.panel.profileDraft,'Unfinished profile edit');
+assert.equal(live.panel.scrollTop,245);
+live.setCurrent(false);
+live.content.projects.push({id:'other-account',name:'Private other account'});
+live.refreshWorkspace();
+assert.deepEqual(live.nodes.get('manager .settings-project-manager-content').projectNames,['New workspace'],'A stale Settings screen cannot show another account\'s projects.');
+console.log('Open Settings workspace refresh passed: newly created project, access transition, expanded section, mounted edits/scroll, and account isolation.');
