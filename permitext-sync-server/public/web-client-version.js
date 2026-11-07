@@ -1,4 +1,4 @@
-export const webAppVersion = "20261107-settings-project-actions-spacing-v1486";
+export const webAppVersion = "20261107-full-workspace-name-v1490";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";
