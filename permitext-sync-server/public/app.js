@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-full-workspace-name-v1490";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-floating-settings-context-v1492";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -20,11 +20,10 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=29";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261025-workspace-chrome-v1379";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261107-floating-settings-icon-v1380";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
-import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261021-project-columns-v3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=2";
 import { createReaderBlockWindow } from "./reader-block-window.js?v=10";
 import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=4";
@@ -35,7 +34,8 @@ import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=3";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261024-passages-v8";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=13";
-import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
+import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
+import { bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=2";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261019-project-workflow-v5";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-full-workspace-name-v1490";
+} from "./offline-storage.js?v=20261107-floating-settings-context-v1492";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -409,6 +409,8 @@ const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
 const mobileMoreButton = document.querySelector("#mobile-more");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
+const settingsButton = document.querySelector("#toggle-settings");
+let selectedSettingsTab = "account";
 const getProButton = document.querySelector("#get-pro");
 document.querySelectorAll("[data-workspace-icon]").forEach(button => {
   prependWorkspaceButtonIcon(button, button.dataset.workspaceIcon);
@@ -4462,7 +4464,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   const project = workspaceProject();
   if (!project) return false;
   const identity = projectIdentity(project);
-  closeSharedWorkspaceViews("project-details");
+  document.querySelector(".account-workspace-view[open]")?.close();
   const projectID = projectDetailKey(identity);
   if (projectDetailsScreen?.isCurrent()) {
     await projectDetailsScreen.open();
@@ -4483,30 +4485,29 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   close.type = "button";
   close.className = "icon-button utility-close project-details-screen-close";
   close.innerHTML = circleXIconSVG();
-  close.title = "Close Project";
-  close.setAttribute("aria-label", "Close Project");
+  close.title = "Close Context";
+  close.setAttribute("aria-label", "Close Context");
   close.addEventListener("click", () => screen.close());
   header.append(title, close);
   const columns = document.createElement("section");
   columns.className = "project-details-columns";
   columns.setAttribute("aria-label", "Project details columns");
   const panels = new Map();
-  let resizeControls = null;
-  let expansionControls = null;
-  let unexpandedWidths = null;
   let selectedSection = "context";
+  let panelTabs = null;
+  let floatingControls = null;
   let applyingUpdate = Boolean(options.shouldApply);
   let updateLoaded = false;
   const selectSection = (kind) => {
     if (!panels.has(kind)) return;
     selectedSection = kind;
-    panels.get(kind).scrollIntoView?.({block: "nearest", inline: "nearest"});
+    panelTabs?.select(kind);
   };
   const screen = createReportScreen({
-    screenTitle: "Project", screenClass: "project-details-screen", projectName: identity.name,
+    screenTitle: "Project", screenClass: "project-details-screen workspace-floating-panel", projectName: identity.name,
     mount: document.querySelector(".workspace-shell"),
-    coveredElements: [track, document.querySelector(".workflow-toolbar")].filter(Boolean),
-    onOpen: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
+    coveredElements: [], dismissOnEscape: false,
+    onOpen: () => { floatingControls?.position(); syncWorkflowNavigation(); },
     backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
       projectDetailMatches(workspaceProject(), identity) && hasCapability("projects") && (!applyingUpdate || options.shouldApply()),
@@ -4622,23 +4623,22 @@ async function openProjectDetailsScreen(section = null, options = {}) {
         panel.replaceChildren(columnHeader, columnBody);
         panels.set(kind, panel); columns.append(panel);
       }
-      resizeControls = createProjectDetailsColumnResizers(columns, [...panels.values()], saveWorkspaceResumeForRefresh);
-      expansionControls = createColumnExpansion({
-        host: columns, columns: () => [...panels.values()], minimumWidth: () => 400,
-        label: node => node.querySelector(':scope > header h2')?.textContent || 'Column',
-        key: node => node.getAttribute('aria-labelledby'),
-        capturePosition: () => { if (!columns.classList.contains('has-expanded-column')) unexpandedWidths = resizeControls.getWidths(); }
+      panelTabs = createFloatingWorkspaceTabs({
+        id: "project-details", label: "Project context categories", selected: section || selectedSection,
+        entries: [...panels].map(([id, panel]) => ({ id, label: id === "context" ? "Context" : "Facts", panel })),
+        onSelect: key => { selectedSection = key; }
       });
+      header.replaceChildren(panelTabs.element, close);
       selectSection(section || "context");
       if (options.shouldApply && !options.shouldApply()) return content;
       updateLoaded = true;
       applyingUpdate = false;
       return content;
     },
-    onClose: () => { resizeControls?.cancel(); state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
+    onClose: () => { syncWorkflowNavigation(); },
     onDispose: () => {
-      resizeControls?.dispose();
-      expansionControls?.dispose();
+      panelTabs?.dispose();
+      floatingControls?.dispose();
       for (const [kind, panel] of panels) {
         const key = paneIDForProjectInformation(identity, kind);
         if (projectInformationMounts.get(key)?.panel === panel) projectInformationMounts.delete(key);
@@ -4646,17 +4646,19 @@ async function openProjectDetailsScreen(section = null, options = {}) {
       if (projectDetailsScreen === screen) projectDetailsScreen = null;
     }
   });
+  screen.element.setAttribute("role", "dialog");
+  screen.element.setAttribute("aria-label", "Project context");
+  screen.element.setAttribute("aria-modal", "false");
+  floatingControls = bindFloatingWorkspacePanel(screen.element, {
+    anchor: workspaceActionsButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(), verticalAnchor: workspaceFloatingPanelReference
+  });
   screen.projectID = projectID;
   screen.selectSection = selectSection;
   screen.getPresentationState = () => ({section: selectedSection,
-    scrollLeft: columns.scrollLeft || 0,
-    columnWidths: columns.classList.contains("has-expanded-column") ? unexpandedWidths : resizeControls?.getWidths() || null,
     columnScrolls: Object.fromEntries([...panels].map(([kind, panel]) =>
       [kind, panel.querySelector(".project-details-column-body")?.scrollTop || 0]))});
   screen.restorePresentation = snapshot => {
-    if (snapshot.columnWidths) resizeControls?.setWidths(snapshot.columnWidths);
     selectSection(snapshot.section);
-    if (snapshot.columnScrolls) columns.scrollLeft = snapshot.scrollLeft || 0;
     for (const [kind, panel] of panels) {
       const body = panel.querySelector(".project-details-column-body");
       if (body) body.scrollTop = snapshot.columnScrolls?.[kind] ??
@@ -4665,6 +4667,8 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   };
   projectDetailsScreen = screen;
   await screen.open();
+  floatingControls.position();
+  screen.element.querySelector('[role="tab"][aria-selected="true"]')?.focus({ preventScroll: true });
   if (options.shouldApply && !updateLoaded && screen.isCurrent()) throw new Error("Project information could not be refreshed. Your update is still waiting for review.");
   return screen.isCurrent();
 }
@@ -5157,7 +5161,7 @@ function workspaceResumeContext() {
 function saveWorkspaceResumeForRefresh() {
   if (!workspaceResumeReady || workspaceRestoreError || detachedProjectWindow) return;
   const context = workspaceResumeContext();
-  const account = document.querySelector(".account-screen[open]");
+  const account = document.querySelector(".account-workspace-view[open]");
   const view = account ? "account" : currentColumnWorkflowView();
   const report = reportDraftMounts.get(context.projectID)?.getPresentationState?.();
   if (view === "report" && !report) return;
@@ -5230,7 +5234,7 @@ async function restoreWorkspaceAfterRefresh(skip = false) {
   } finally { workspaceResumeReady = true; }
 }
 function currentColumnWorkflowView() {
-  return projectDetailsScreen?.isOpen() ? "project-details" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
+  return reportScreen?.isOpen() ? "report" : currentWorkflowView();
 }
 let presentedColumnWorkflowView = currentWorkflowView();
 function workflowPaneAnchors() {
@@ -5245,7 +5249,7 @@ function syncReferenceReaderLayout() {
   const shell = document.querySelector(".workspace-shell");
   if (!shell) return;
   const view = currentColumnWorkflowView();
-  const accountOpen = Boolean(document.querySelector(".account-screen[open]"));
+  const accountOpen = Boolean(document.querySelector(".account-workspace-view[open]"));
   const screenOpen = view === "project-details";
   const visibleIDs = screenOpen ? defaultActivePaneIDs().filter(workflowPaneIsVisible) : [];
   const widths = visibleIDs.map(id => paneIsCollapsed(id) ? 48 : assistantHistoryOnlyPane(id) ? assistantHistoryWidth : constrainPaneWidth(id, state.paneWeights[id] || defaultPaneWidthForID(id)));
@@ -5300,11 +5304,11 @@ function syncWorkflowColumnPresentation() {
 function closeSharedWorkspaceViews(except = "") {
   if (except !== "report") reportScreen?.close();
   if (except !== "project-details") projectDetailsScreen?.close();
-  if (except !== "account") document.querySelector(".account-screen[open]")?.close();
+  if (except !== "account") document.querySelector(".account-workspace-view[open]")?.close();
 }
 function syncWorkflowNavigation() {
-  const accountOpen = Boolean(document.querySelector(".account-screen[open]"));
-  const view = accountOpen ? "account" : projectDetailsScreen?.isOpen() ? "project-details" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
+  const accountOpen = Boolean(document.querySelector(".account-workspace-view[open]"));
+  const view = accountOpen ? "account" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
   document.querySelector("#free-reader")?.setAttribute("aria-pressed", String(!isProAccount() && view === "research"));
   toggleReportButton?.setAttribute("aria-pressed", String(view === "report"));
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
@@ -41687,7 +41691,17 @@ function showProAccountCheckout(dialog) {
   mountAccountScreenContent(dialog, panel);
 }
 
-function organizeAccountSettings(panel) {
+function workspaceFloatingPanelReference() {
+  const reader = [...document.querySelectorAll('.topbar [data-open-reader], .workflow-toolbar [data-open-reader]')]
+    .map(button => button.getBoundingClientRect()).find(bounds => bounds.height > 0);
+  if (reader) return reader;
+  const toolbar = document.querySelector('.workflow-toolbar')?.getBoundingClientRect();
+  const bar = toolbar?.height ? toolbar : document.querySelector('.topbar').getBoundingClientRect();
+  const controlHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--workspace-menu-height')) || 30;
+  return { bottom: bar.bottom - Math.max(0, (bar.height - controlHeight) / 2) };
+}
+
+function organizeAccountSettings(panel, { floating = false, selected = "account", onSelect = () => {} } = {}) {
   const scroll = panel.querySelector(".settings-scroll");
   if (!scroll || scroll.querySelector(".settings-account-column")) return;
   const profile = scroll.querySelector(".account-connector");
@@ -41726,6 +41740,19 @@ function organizeAccountSettings(panel) {
   const conversations = data?.querySelector('.settings-conversations');
   data?.append(...[projects, deleteContent, conversations, trash].filter(Boolean));
   scroll.replaceChildren(account, library, recovery);
+  if (floating) {
+    const tabs = createFloatingWorkspaceTabs({
+      id: "settings", label: "Settings categories", selected, onSelect,
+      entries: [
+        { id: "account", label: "Account", panel: account },
+        { id: "library", label: "Library & Offline", panel: library },
+        { id: "recovery", label: "Data & Recovery", panel: recovery }
+      ]
+    });
+    panel.__settingsTabs = tabs;
+    scroll.before(tabs.element);
+    return tabs.dispose;
+  }
   const columnResizers = createSettingsColumnResizers(scroll, [account, library, recovery], state.settingsColumnWidths, (widths) => {
     state.settingsColumnWidths = widths;
     saveWorkspaceState();
@@ -41742,7 +41769,11 @@ function mountAccountScreenContent(dialog, panel) {
   dialog._disposeLibraryDownloadProgress = panel._disposeLibraryDownloadProgress;
   const upgrade = dialog.dataset.proUpgrade === "true";
   const signIn = dialog.dataset.signIn === "true";
-  dialog._disposeSettingsColumns = upgrade ? null : organizeAccountSettings(panel);
+  const floating = dialog.classList.contains("settings-floating-panel");
+  dialog._disposeSettingsColumns = upgrade ? null : organizeAccountSettings(panel, {
+    floating, selected: dialog.dataset.settingsTab || selectedSettingsTab,
+    onSelect: key => { dialog.dataset.settingsTab = key; selectedSettingsTab = key; }
+  });
   const header = document.createElement("header");
   header.className = "account-screen-header";
   const title = document.createElement("h1");
@@ -41755,23 +41786,33 @@ function mountAccountScreenContent(dialog, panel) {
   close.title = `Close ${title.textContent}`;
   close.setAttribute("aria-label", close.title);
   close.addEventListener("click", () => dialog.close());
-  if (!upgrade) header.append(title);
+  if (floating && panel.__settingsTabs) header.append(panel.__settingsTabs.element);
+  else if (!upgrade) header.append(title);
   header.append(close);
   dialog.replaceChildren(header, panel);
 }
 
 function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
-  const existing = document.querySelector(".account-screen[open]");
+  const directSignIn = signIn && !activeAccount();
+  const floating = !upgrade && !directSignIn;
+  const existing = document.querySelector(floating ? ".settings-floating-panel[open]" : ".account-workspace-view[open]");
   if (existing) {
     if (!upgrade || existing.dataset.proUpgrade === "true") return;
     existing.close();
   }
-  closeSharedWorkspaceViews("account");
+  if (!floating) {
+    document.querySelector(".settings-floating-panel[open]")?.close();
+    closeSharedWorkspaceViews("account");
+  }
   const dialog = document.createElement("section");
   dialog.className = "account-dialog account-screen";
   dialog.tabIndex = -1;
-  dialog.classList.add("account-workspace-view");
-  const directSignIn = signIn && !activeAccount();
+  dialog.classList.add(floating ? "settings-floating-panel" : "account-workspace-view");
+  if (floating) {
+    dialog.id = "settings-floating-panel";
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "false");
+  }
   if (directSignIn) dialog.dataset.signIn = "true";
   if (upgrade) {
     dialog.dataset.proUpgrade = "true";
@@ -41794,10 +41835,11 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
     if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
     dialog.open = false;
     dialog._disposeSettingsColumns?.();
+    dialog._floatingControls?.dispose();
     dialog._disposeLibraryDownloadProgress?.();
     dialog.remove();
     coveredState.forEach((inert, element) => { element.inert = inert; });
-    state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
+    if (!floating) state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     syncWorkflowNavigation();
     if (closedWithKeyboard) {
       const returnFocus = (directSignIn ? track.querySelector(".first-use-sign-in")
@@ -41807,23 +41849,27 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
     }
   };
   dialog.addEventListener("keydown", (event) => {
+    if (floating) return;
     if (event.defaultPrevented || event.key !== "Escape") return;
     event.preventDefault();
     closedWithKeyboard = true;
     dialog.close();
   });
-  dialog.setAttribute("aria-label", upgrade ? "Get Pro" : directSignIn ? "Sign in" : "Settings workspace");
+  dialog.setAttribute("aria-label", upgrade ? "Get Pro" : directSignIn ? "Sign in" : floating ? "Settings" : "Settings workspace");
   const panel = upgrade ? renderProAccountEntry(dialog)
     : directSignIn ? renderDirectSignInEntry(dialog)
-    : activeAccount() ? renderSettings() : renderAccountWelcome(dialog);
+    : renderSettings();
   mountAccountScreenContent(dialog, panel);
-  [track, document.querySelector(".workflow-toolbar")].filter(Boolean).forEach(element => {
+  (floating ? [] : [track, document.querySelector(".workflow-toolbar")]).filter(Boolean).forEach(element => {
     coveredState.set(element, element.inert); element.inert = true;
   });
   document.querySelector(".workspace-shell").append(dialog);
-  state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
+  if (floating) dialog._floatingControls = bindFloatingWorkspacePanel(dialog, {
+    anchor: settingsButton, dismiss: () => dialog.close(), manageAnchor: true, verticalAnchor: workspaceFloatingPanelReference
+  });
+  else state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
   syncWorkflowNavigation();
-  dialog.focus({ preventScroll: true });
+  (dialog.querySelector('[role="tab"][aria-selected="true"]') || dialog).focus({ preventScroll: true });
   if (directSignIn) panel.querySelector('[data-account-mode="signIn"]')?.click();
   else if (upgrade && activeAccount() && !isProAccount()) showProAccountCheckout(dialog);
 }
@@ -49961,6 +50007,11 @@ async function start() {
       return;
     }
     openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
+  });
+  settingsButton?.addEventListener("click", () => {
+    const panel = document.querySelector(".settings-floating-panel[open]");
+    if (panel) panel.close();
+    else toggleAccountDialog();
   });
   getProButton?.addEventListener("click", () => {
     if (isProAccount()) return;

@@ -1,6 +1,6 @@
 // Keep workspace columns and the draft mounted across view switches. A native
 // modal or embedded view keeps inactive editors inert without rebuilding them.
-export function createReportScreen({ projectName, load, isCurrent, onClose, onDispose, screenTitle = "Report", screenClass = "", mount = null, coveredElements = [], onOpen = () => {}, openProjectDetails, backLabel = () => "← Back to workspace" }) {
+export function createReportScreen({ projectName, load, isCurrent, onClose, onDispose, screenTitle = "Report", screenClass = "", mount = null, coveredElements = [], onOpen = () => {}, dismissOnEscape = true, openProjectDetails, backLabel = () => "← Back to workspace" }) {
   const dialog = document.createElement(mount ? "section" : "dialog");
   dialog.className = `report-screen ${mount ? "report-workspace-view" : ""} ${screenClass}`.trim();
   const coveredState = new Map();
@@ -8,7 +8,7 @@ export function createReportScreen({ projectName, load, isCurrent, onClose, onDi
     dialog.hidden = true;
     dialog.open = false;
     dialog.addEventListener("keydown", event => {
-      if (event.defaultPrevented || event.key !== "Escape") return;
+      if (!dismissOnEscape || event.defaultPrevented || event.key !== "Escape") return;
       event.preventDefault();
       dialog.close();
     });
@@ -82,6 +82,7 @@ export function createReportScreen({ projectName, load, isCurrent, onClose, onDi
   if (!mount) dialog.addEventListener("close", onClose);
   const contextCheck = setInterval(() => { if (!current()) dispose(); }, 200);
   return {
+    element: dialog,
     isCurrent: current,
     isOpen: () => current() && dialog.open,
     open() {

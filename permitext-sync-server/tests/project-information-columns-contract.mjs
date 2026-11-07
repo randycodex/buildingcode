@@ -42,7 +42,7 @@ assert.equal(restored.paneWeights["project:context:alpha"], 670);
 assert.ok(restored.collapsedPaneIDs.includes("project:facts:alpha"));
 for (const kind of ["context", "facts"]) assert.equal(canGroupColumn(`project:${kind}:alpha`), false);
 
-// All three columns share a retained screen; the same editors and save guards remain.
+// Floating Context retains both tab editors and their existing save guards.
 let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, tickScreen, inlineOptions;
 const mounts = new Map(), issues = [], renderedInformation = [];
 const state = { projectContextOpen: false, projectFactsOpen: false, paneWeights: {}, paneOrder: [] };
@@ -55,6 +55,15 @@ track.inert = false; workflowToolbar.inert = false;
 const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}}), appendProjectOpenQuestions() { return {flush:async()=>{}}; }, renderProjectSavedWork: async () => {}, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
   currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
+  workspaceActionsButton: element('button'),
+  workspaceFloatingPanelReference: () => ({bottom:70}),
+  bindFloatingWorkspacePanel: () => ({position(){},dispose(){disposedResizers++;}}),
+  createFloatingWorkspaceTabs({entries,selected,onSelect}) {
+    const nav = element('nav'); nav.className = 'floating-workspace-tabs';
+    const select = key => { entries.forEach(entry => { entry.panel.hidden = entry.id !== key; entry.panel.inert = entry.id !== key; }); onSelect(key); };
+    select(selected);
+    return {element:nav,select,dispose(){}};
+  },
   saveWorkspaceResumeForRefresh() {},
   safeAnnotationIDPart: value => value,
   showProjectCreateSheet: (_host, _project, options) => { inlineOptions = options; return {close:()=>options.onClose()}; },
@@ -89,11 +98,11 @@ assert.ok(screenElement, 'Project details mounts in the workspace screen wrapper
 const screenError = find(screenElement, node => node.attributes.role === 'alert');
 assert.equal(Boolean(screenError), false, `Screen hydration must finish without a hidden harness error: ${screenError?.textContent}`);
 assert.equal(screenElement.open, true); assert.equal(screenElement.hidden, false);
-assert.equal(track.inert, true); assert.equal(workflowToolbar.inert, true);
-assert.equal(workspaceShell.inert, undefined, 'Cover the underlying controls, not the active details screen');
-assert.equal(contextPanel.hidden, false); assert.equal(factsPanel.hidden, false);
+assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);
+assert.equal(workspaceShell.inert, undefined, 'The floating panel leaves the current workspace interactive');
+assert.equal(contextPanel.hidden, false); assert.equal(factsPanel.hidden, true);
 const columns = find(screenElement, node => node.className === 'project-details-columns');
-assert.equal(columns.children.length, 2, 'Context and Facts are mounted side by side');
+assert.equal(columns.children.length, 2, 'Both tab editors remain mounted');
 for (const label of ['Context', 'Facts']) {
   assert.ok(find(columns, node => node.tag === 'h2' && node.textContent === label));
 }
@@ -118,14 +127,9 @@ contextPanel.draft='Retained edit'; contextBody.scrollTop=320;
 factsBody.scrollTop=210; columns.scrollLeft=80;
 const presentation = vm.runInContext('projectDetailsScreen.getPresentationState()',c);
 assert.deepEqual(copy(presentation.columnScrolls), {context:320,facts:210});
-assert.equal(presentation.scrollLeft,80);
-assert.deepEqual(copy(presentation.columnWidths),[640,640]);
-presentation.columnWidths=[400,700];
 contextBody.scrollTop=0; factsBody.scrollTop=0; columns.scrollLeft=0;
 c.presentation=presentation; vm.runInContext('projectDetailsScreen.restorePresentation(presentation)',c);
 assert.equal(contextBody.scrollTop,320); assert.equal(factsBody.scrollTop,210);
-assert.equal(columns.scrollLeft,80);
-assert.deepEqual(detailsWidths,[400,700],'Resized widths are restored alongside the independent scroll positions');
 vm.runInContext('projectDetailsScreen.close()',c);
 assert.equal(screenElement.hidden, true); assert.equal(screenElement.open, false);
 assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);
@@ -133,16 +137,16 @@ assert.equal(mounts.size, 2, 'Closing retains both mounted editors and their dra
 await c.toggleProjectInformation('facts');
 assert.equal(mounts.get('project:context:alpha').panel,contextPanel);
 assert.equal(contextPanel.draft,'Retained edit'); assert.equal(contextBody.scrollTop,320);
-assert.equal(contextPanel.hidden,false); assert.equal(factsPanel.hidden,false);
+assert.equal(contextPanel.hidden,true); assert.equal(factsPanel.hidden,false);
 assert.equal(renderedInformation.length, 2, 'Switching sections must reuse both original editors');
 assert.equal(vm.runInContext('projectDetailsScreen.getPresentationState().section',c),'facts');
 vm.runInContext('projectDetailsScreen.close()',c);
 await c.openProjectDetailsScreen();
-assert.equal(factsPanel.hidden,false,'Reopening keeps every column visible');
+assert.equal(factsPanel.hidden,false,'Reopening retains the selected tab');
 vm.runInContext('projectDetailsScreen.restorePresentation({section:"facts",contentScroll:90})',c);
 assert.equal(factsBody.scrollTop,90,'A previous tab-based snapshot restores into its matching column');
 allowed=false; tickScreen(); assert.equal(mounts.size,0,'Revoked access releases retained editor mounts');
-assert.equal(disposedResizers,1,'Removing the screen disposes its resize observer');
+assert.equal(disposedResizers,1,'Removing the screen disposes its floating event handlers');
 assert.equal(screenElement.isConnected, false, 'Revoking access removes the whole private screen');
 assert.equal(contextPanel.isConnected, false); assert.equal(factsPanel.isConnected, false);
 assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);

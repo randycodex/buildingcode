@@ -13,14 +13,14 @@ function harness(signedIn, pro = signedIn) {
   let currentDialog = null, focusReturns = 0, focusTraps = 0, contextCheck, accountCurrent = true;
   const panels = [], transitions = [], toggleAttributes = {}, signInStarts = [], checkoutStarts = [];
   function element() {
-    return {
+    const node = {
       children: [], listeners: {}, attributes: {}, dataset: {}, removedStyles: [],
-      classList: { add() {}, toggle(name, on) { this[name] = on; }, contains(name) { return this[name] === true; } },
       style: { removeProperty(name) { this.owner.removedStyles.push(name); }, setProperty(name, value) { this[name] = value; } },
       focus() {},
       setAttribute(name, value) { this.attributes[name] = value; },
       getAttribute(name) { return this.attributes[name] ?? null; },
       append(...children) { for (const child of children) { child.parent?.removeChild(child); child.parent = this; this.children.push(child); } },
+      before(child) { this.parent?.append(child); },
       removeChild(child) { this.children = this.children.filter(item => item !== child); },
       replaceChildren(...children) { this.children = []; this.append(...children); },
       addEventListener(name, listener) { this.listeners[name] = listener; },
@@ -35,6 +35,12 @@ function harness(signedIn, pro = signedIn) {
         return [...(matches ? [child] : []), ...(child.querySelectorAll?.(selector) || [])];
       }); }
     };
+    node.classList = {
+      add(...names) { node.className = [...new Set([...(node.className || '').split(' ').filter(Boolean), ...names])].join(' '); },
+      toggle(name, on) { this[name] = on; },
+      contains(name) { return this[name] === true || (node.className || '').split(' ').includes(name); }
+    };
+    return node;
   }
   function panel() {
     const result = element();
@@ -56,7 +62,7 @@ function harness(signedIn, pro = signedIn) {
     const find = result.querySelector.bind(result);
     result.querySelector = selector => selector === ".panel-header" ? oldHeader
       : selector === '[data-account-mode="signIn"]' ? signInButton : find(selector);
-    if (signedIn) result.append(scroll);
+    result.append(scroll);
     result.__refreshActiveCodeSources = async () => { result.sourcesReady = true; };
     Object.assign(result, { scroll, profile, plan, sources, offline, data, conflicts, signOut, deleteAccount });
     panels.push(result);
@@ -69,6 +75,8 @@ function harness(signedIn, pro = signedIn) {
       querySelector: selector => {
         if (selector === ".workspace-shell") return { append(dialog) { currentDialog = dialog; } };
         if (selector === ".workflow-toolbar") return toolbar;
+        if (selector === '.settings-floating-panel[open]') return currentDialog?.classList.contains('settings-floating-panel') ? currentDialog : null;
+        if (selector === '.account-workspace-view[open]') return currentDialog?.classList.contains('account-workspace-view') ? currentDialog : null;
         return selector === ".account-dialog" || selector === ".account-screen[open]" ? currentDialog : null;
       },
       createElement: element,
@@ -76,6 +84,19 @@ function harness(signedIn, pro = signedIn) {
     },
     workspaceActionsButton: { setAttribute: (name, value) => { toggleAttributes[name] = value; },
       focus: () => { focusReturns++; }, blur() {} },
+    settingsButton: { setAttribute: (name,value) => { toggleAttributes[name] = value; }, focus: () => { focusReturns++; } },
+    selectedSettingsTab: 'account',
+    createFloatingWorkspaceTabs({entries,selected,onSelect}) {
+      const nav = Object.assign(element(), {className:'floating-workspace-tabs'});
+      const select = key => { entries.forEach(entry => { entry.panel.hidden = entry.id !== key; }); onSelect(key); };
+      select(selected);
+      return {element:nav,select,dispose(){}};
+    },
+    bindFloatingWorkspacePanel(dialog,{dismiss,anchor}) {
+      anchor.setAttribute('aria-expanded','true');
+      dialog.floatingEscape = () => {dismiss();anchor.focus();};
+      return {position(){},dispose(){anchor.setAttribute('aria-expanded','false');}};
+    },
     topbarBrand: { cloneNode: () => Object.assign(element(), { className: "topbar-brand" }) },
     activeAccount: () => signedIn ? { userID: "synthetic-account" } : null,
     isProAccount: () => pro,
@@ -90,7 +111,7 @@ function harness(signedIn, pro = signedIn) {
     activePaneIDs: () => ["reader:one", "utility:settings", "utility:saved"],
     transitionWorkspace: async (kind, options) => transitions.push({ kind, options }), track
   });
-  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
+  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "workspaceFloatingPanelReference", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
   return { context, track, panels, transitions, toggleAttributes, signInStarts, checkoutStarts,
     toolbar, revokeAccount() { accountCurrent = false; contextCheck(); },
     dialog: () => currentDialog, focusReturns: () => focusReturns, focusTraps: () => focusTraps };
@@ -100,9 +121,9 @@ for (const signedIn of [false, true]) {
   const h = harness(signedIn);
   h.context.toggleAccountDialog();
   const dialog = h.dialog(), panel = h.panels[0];
-  assert.equal(dialog.className, "account-dialog account-screen");
+  assert.equal(dialog.className, "account-dialog account-screen settings-floating-panel");
   assert.equal(dialog.open, true);
-  assert.equal(h.track.inert, true); assert.equal(h.toolbar.inert, true);
+  assert.equal(h.track.inert, false); assert.equal(h.toolbar.inert, false);
   assert.equal(dialog.children[0].children.length, 2, "The shared top menu already provides the brand.");
   assert.equal(dialog.children[1], panel, "Keep the original wired controls and their account fences.");
   assert.equal(panel.headerRemoved, true);
@@ -123,7 +144,7 @@ for (const signedIn of [false, true]) {
   assert.equal(h.dialog(), null);
   assert.equal(h.toggleAttributes["aria-pressed"], "false");
   h.context.toggleAccountDialog();
-  h.dialog().listeners.keydown({defaultPrevented:false,key:"Escape",preventDefault(){}});
+  h.dialog().floatingEscape();
   assert.equal(h.focusReturns(), 1, "Escape returns focus to the Account entry.");
   assert.equal(h.track.inert, false); assert.equal(h.toolbar.inert, false);
   h.context.toggleAccountDialog(); h.revokeAccount();
@@ -218,4 +239,4 @@ for (const column of expanded.panels[0].scroll.children) {
 expanded.dialog().children[0].children[1].listeners.click();
 expanded.context.toggleAccountDialog();
 assert.ok(expanded.panels[1].scroll.children.every(column => !column.classList.contains("is-collapsed")), "Old collapsed preferences must not hide Settings columns when reopened");
-console.log("Settings columns remain expanded: ordinary headings, no collapse controls, and legacy collapsed preferences ignored.");
+console.log("Settings tabs retain all category controls and ignore legacy column-collapse preferences.");
