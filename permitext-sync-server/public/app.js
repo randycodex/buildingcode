@@ -5,7 +5,7 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-reader-code-menu-no-fade-v1541";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-reader-picker-actions-v1542";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -157,7 +157,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-reader-code-menu-no-fade-v1541";
+} from "./offline-storage.js?v=20261108-reader-picker-actions-v1542";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -8461,13 +8461,6 @@ function openReaderCodePicker(anchor, onSelect) {
     });
     menu.append(button);
   });
-  if (isProAccount()) {
-    const manage = document.createElement("button");
-    manage.type = "button";
-    manage.textContent = "Manage code sources";
-    manage.addEventListener("click", () => { close(); openActiveCodeSourceSettings(); });
-    menu.append(manage);
-  }
   document.body.append(menu);
   if (!centered) {
     const position = () => {
