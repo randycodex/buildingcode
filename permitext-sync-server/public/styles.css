@@ -21248,6 +21248,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 /* Settings and Project context share the Reader's floating menu surface. */
 .account-dialog.account-screen.settings-floating-panel,
 .workspace-shell > .project-details-screen.workspace-floating-panel {
+  --workspace-floating-panel-gutter: 20px;
   position: fixed;
   inset: auto;
   z-index: 1100;
@@ -21260,7 +21261,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   min-width: 0;
   min-height: 0;
   margin: 0;
-  padding: 20px;
+  padding: var(--workspace-floating-panel-gutter);
   box-sizing: border-box;
   border: 1px solid var(--border);
   border-radius: var(--workspace-floating-menu-radius);
@@ -21349,6 +21350,9 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .project-details-screen.workspace-floating-panel .project-information-panel { width: 100%; min-width: 0; max-width: none; height: 100%; margin: 0; padding: 0; border: 0; background: transparent; }
 body .project-details-screen.workspace-floating-panel .project-information-panel > .project-details-column-header { display: none; }
 .workspace-floating-panel .project-details-column-body { height: 100%; min-height: 0; padding: 0; overflow-y: auto; }
+.workspace-floating-panel > .report-screen-host:has(.project-facts-panel:not([hidden])) { margin-inline: calc(-1 * var(--workspace-floating-panel-gutter)); }
+.workspace-floating-panel .project-details-content:has(.project-facts-panel:not([hidden])) > .project-details-screen-header { width: calc(100% - 2 * var(--workspace-floating-panel-gutter)); margin-inline: var(--workspace-floating-panel-gutter); }
+.workspace-floating-panel .project-facts-panel .project-details-column-body { padding-inline: var(--workspace-floating-panel-gutter); box-sizing: border-box; }
 :is(.settings-floating-panel .settings-account-column, .workspace-floating-panel .project-details-column-body, .workspace-context-menu) {
   scrollbar-width: none;
   scrollbar-gutter: auto;
