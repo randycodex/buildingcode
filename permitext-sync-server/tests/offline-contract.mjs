@@ -111,10 +111,13 @@ assert.equal(
   3,
   "Offline packages must identify complete paged bodies and the historical catalog."
 );
+const appShellURL = html.match(/<script src="([^\"]*\/app\.js\?v=[^\"]+)"/)?.[1];
+const styleShellURL = html.match(/<link rel="stylesheet" href="([^\"]*\/styles\.css\?v=[^\"]+)"/)?.[1];
+assert(appShellURL && styleShellURL,"The served shell must identify its versioned app and styles.");
+const appShellVersion = new URL(appShellURL, "https://offline.test").searchParams.get("v");
 assert(
-  html.includes(offlineFeatureMetadata.shellAssetVersion) &&
-    app.includes(`./offline-storage.js?v=${offlineFeatureMetadata.shellAssetVersion}`) &&
-    offlineStorage.includes(`/web/offline-storage.js?v=${offlineFeatureMetadata.shellAssetVersion}`),
+  app.includes(`./offline-storage.js?v=${appShellVersion}`) &&
+    offlineStorage.includes(`/web/offline-storage.js?v=${appShellVersion}`),
   "The served app shell does not consistently reference the active shell asset generation."
 );
 assert(
@@ -193,7 +196,7 @@ vm.runInNewContext(serviceWorker, {
       status: 200,
       headers: new Headers(),
       arrayBuffer: async () => new ArrayBuffer(0),
-      text: async () => `<script src="/web/app.js?v=${offlineFeatureMetadata.shellAssetVersion}"></script>`,
+      text: async () => `<script src="${appShellURL}"></script>`,
       source: options?.cache === "no-cache" ? "current-network-shell" : "older-immutable-http-shell",
       clone() {
         return this;
@@ -219,9 +222,9 @@ listeners.get("install")({
 await installCompletion;
 navigationCacheWrites.length = 0;
 navigationFetchOptions.length = 0;
-assert(shellPrecacheURLs.includes("/workspace") && shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes(`/web/app.js?v=${offlineFeatureMetadata.shellAssetVersion}`));
+assert(shellPrecacheURLs.includes("/workspace") && shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes(appShellURL));
 assert(shellPrecacheURLs.includes("/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3"));
-assert(shellPrecacheURLs.includes(`/web/styles.css?v=${offlineFeatureMetadata.shellAssetVersion}`));
+assert(shellPrecacheURLs.includes(styleShellURL));
 assert(shellPrecacheURLs.includes(`/web/${app.match(/"\.\/(research-intent-state\.js\?v=[^"\s]+)"/)[1]}`));
 assert(shellPrecacheURLs.includes(`/web/research-progress.js?v=${researchProgressVersion}`));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260923-request-cancellation-v2"));

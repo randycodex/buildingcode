@@ -1,7 +1,7 @@
-import {createActiveCodeSourcePreferences, codeSourceIdentity, codeSourceKey, ActiveCodeSourcesError} from './active-code-sources.js?v=2';
+import {createActiveCodeSources, createActiveCodeSourcePreferences, codeSourceIdentity, codeSourceKey, ActiveCodeSourcesError} from './active-code-sources.js?v=2';
 
 // No DOM or network policy: caller supplies storage, catalog transport and cancellation.
-export function createActiveCodeSourceController({storage, loadCatalog, onInvalidate = () => {}}) {
+export function createActiveCodeSourceController({storage, loadCatalog, onInvalidate = () => {}, respectSourcePreferences = true}) {
   const preferencesStore = createActiveCodeSourcePreferences(storage);
   let accountID = null, sessionID = null, initialized = false, revision = 0;
   let preferences = null, error = null, catalog = null, catalogStatus = 'unknown', pending = null;
@@ -23,7 +23,9 @@ export function createActiveCodeSourceController({storage, loadCatalog, onInvali
     try { onInvalidate(captureContext(), reason); } catch {}
   }
   function readPreferences() {
-    try { preferences = preferencesStore.load(accountID); error = null; }
+    // Search-only clients retain account/catalog fencing without reading or
+    // rewriting retired global filters, including corrupt stored preferences.
+    try { preferences = respectSourcePreferences ? preferencesStore.load(accountID) : createActiveCodeSources(); error = null; }
     catch (failure) { preferences = null; error = failure; }
   }
   function reload() {
@@ -53,6 +55,7 @@ export function createActiveCodeSourceController({storage, loadCatalog, onInvali
   }
   function updateMany(sources, enabled, token) {
     if (!isCurrent(token)) throw new ActiveCodeSourcesError('Source context changed');
+    if (!respectSourcePreferences) throw new ActiveCodeSourcesError('Choose sources within Search');
     if (!Array.isArray(sources) || !catalog || sources.some(source =>
       !catalog.some(entry => codeSourceKey(entry) === codeSourceKey(source)))) {
       throw new ActiveCodeSourcesError('Source catalog is unavailable or source is not installed');

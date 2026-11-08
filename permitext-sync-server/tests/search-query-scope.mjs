@@ -16,14 +16,14 @@ vm.runInContext(actual('searchPanelSources')+'\n'+actual('prepareSearchPanelScop
 const query={querySourceKeys:[codeSourceKey(old),codeSourceKey(plumbing)]};
 const before=JSON.stringify(preferences.disabledSources());
 const scope=await c.prepareSearchPanelScope(query);
-assert.equal(scope.enabledSourceCount,1);assert.deepEqual(JSON.parse(decodeURIComponent(scope.querySuffix.split('=')[1])).enabledSources,[old]);
-assert.equal(JSON.stringify(preferences.disabledSources()),before,'Temporary scope never mutates browsing preferences');
+assert.equal(scope.enabledSourceCount,2);assert.deepEqual(JSON.parse(decodeURIComponent(scope.querySuffix.split('=')[1])).enabledSources,[old,plumbing]);
+assert.equal(JSON.stringify(preferences.disabledSources()),before,'Search scope never mutates retired browsing preferences');
 assert.equal((await c.prepareSearchPanelScope({querySourceKeys:[]})).enabledSourceCount,0,'Explicit empty is not unrestricted');
 assert.equal((await c.prepareSearchPanelScope({})).querySuffix,'global');
 const layout=normalizeWorkspaceLayout({utilityInstances:[{id:'s',key:'search',...query}]});
 assert.deepEqual(captureWorkspaceLayout(layout).utilityInstances[0].querySourceKeys,query.querySourceKeys);
 c.activeCodeSourcesController.ensureCatalog=async()=>{token++;};await assert.rejects(c.prepareSearchPanelScope(query),/Changed account/);
-console.log('Temporary query scope: exact editions, global preference independence, disabled source intersection, explicit empty, reload persistence and stale account guard passed.');
+console.log('Search-only scope: exact editions, retired preference independence, explicit empty, reload persistence and stale account guard passed.');
 
 // Exercise the real app restore path, not only the generic layout copy.
 c.normalizeSearchCodeFilters=value=>Array.isArray(value)?value:[];

@@ -62,18 +62,18 @@ console.log("Web Search active scope passed: first/page URL binding, stale first
 
 // Actual app scope preparation with the real account-scoped controller.
 const { createActiveCodeSourceController } = await import("../public/active-code-source-controller.js");
-const { createActiveCodeSourcePreferences } = await import("../public/active-code-sources.js");
+const { createActiveCodeSourcePreferences, codeSourceKey, codeSourceIdentity } = await import("../public/active-code-sources.js");
 const sourceA = { canonicalEdition: "2022", jurisdictionID: 1, codeID: 1, categoryID: 1 };
 const sourceB = { ...sourceA, canonicalEdition: "2014" };
 function realFixture() {
   const values = new Map();
   const storage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
   const loads = [];
-  const controller = createActiveCodeSourceController({ storage, loadCatalog() { const gate = defer(); loads.push(gate); return gate.promise; } });
+  const controller = createActiveCodeSourceController({ storage, respectSourcePreferences:false, loadCatalog() { const gate = defer(); loads.push(gate); return gate.promise; } });
   controller.setContext({ accountID: null, sessionID: "one" });
-  const context = vm.createContext({ activeCodeSourcesController: controller, encodeURIComponent,
+  const context = vm.createContext({ activeCodeSourcesController: controller, encodeURIComponent, codeSourceKey, codeSourceIdentity,
     accountContextChangedError: () => new Error("Account context changed") });
-  vm.runInContext(["prepareActiveCodeSearchScope", "isCurrentActiveCodeSourceContext"].map(actual).join("\n"), context);
+  vm.runInContext(["prepareActiveCodeSearchScope", "searchPanelSources", "prepareSearchPanelScope", "isCurrentActiveCodeSourceContext"].map(actual).join("\n"), context);
   return { context, controller, values, storage, loads };
 }
 {
@@ -85,18 +85,15 @@ function realFixture() {
   createActiveCodeSourcePreferences(f.storage).update(null, sourceA, false);
   f.controller.reload();
   assert.equal(f.context.isCurrentActiveCodeSourceContext(result.token), false);
-  const pending = f.context.prepareActiveCodeSearchScope();
-  await tick();
-  assert.equal(f.loads.length, 1);
-  f.loads[0].resolve([sourceA, sourceB]);
-  const scoped = await pending;
-  assert.deepEqual(JSON.parse(decodeURIComponent(scoped.querySuffix.split("=")[1])).enabledSources, [sourceB]);
+  const unfiltered = await f.context.prepareActiveCodeSearchScope();
+  assert.equal(f.loads.length,0,"Retired library preferences cannot narrow or delay a default Search");
+  assert.equal(unfiltered.querySuffix,"");
 }
 {
   const f = realFixture();
   createActiveCodeSourcePreferences(f.storage).update(null, sourceA, false);
   f.controller.reload();
-  const pending = f.context.prepareActiveCodeSearchScope();
+  const pending = f.context.prepareSearchPanelScope({querySourceKeys:[codeSourceKey(sourceA)]});
   await tick();
   f.controller.setContext({ accountID: "other", sessionID: "two" });
   f.loads[0].resolve([sourceA, sourceB]);
@@ -107,8 +104,8 @@ function realFixture() {
   const f = realFixture();
   f.values.set("permitext.active-code-sources.v1.guest", "corrupt");
   f.controller.reload();
-  await assert.rejects(f.context.prepareActiveCodeSearchScope());
+  assert.equal((await f.context.prepareActiveCodeSearchScope()).querySuffix,"");
   assert.equal(f.loads.length, 0);
   assert.equal(f.values.get("permitext.active-code-sources.v1.guest"), "corrupt");
 }
-console.log("Actual app/controller scope helpers passed: lazy all-enabled, disabled scope, pending account switch, corrupt preferences preserved and rejected.");
+console.log("Actual app/controller scope helpers passed: all-code default, Search-only filters, pending account switch and corrupt legacy preferences ignored.");

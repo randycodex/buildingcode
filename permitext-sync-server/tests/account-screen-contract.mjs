@@ -51,23 +51,22 @@ function harness(signedIn, pro = signedIn) {
       card.setAttribute("aria-labelledby", id);
       return card;
     };
-    const profile = category("profile", "account-connector"), plan = category("plan", "settings-plan-card"), sources = category("sources", "settings-active-sources-card");
+    const profile = category("profile", "account-connector"), plan = category("plan", "settings-plan-card");
     const offline = category("offline", "settings-offline-card"), data = category("data", "settings-data-card"), conflicts = category("conflicts", "settings-sync-conflicts-card");
     const signOut = Object.assign(element(), { className: "account-clear" });
     const deleteAccount = Object.assign(element(), { className: "account-delete" });
     profile.append(signOut, deleteAccount);
     const scroll = Object.assign(element(), { className: "settings-scroll", scrollTop: 0 });
-    scroll.append(plan, profile, sources, conflicts, offline, data);
+    scroll.append(plan, profile, conflicts, offline, data);
     const oldHeader = { remove() { result.headerRemoved = true; } };
     const signInButton = { click() { signInStarts.push("signIn"); currentDialog.dataset.signingIn = "true"; } };
     const find = result.querySelector.bind(result);
     result.querySelector = selector => selector === ".panel-header" ? oldHeader
       : selector === '[data-account-mode="signIn"]' ? signInButton : find(selector);
     result.append(scroll);
-    result.__refreshActiveCodeSources = async () => { result.sourcesReady = true; };
     result.__refreshSettingsWorkspace = () => { result.workspaceRefreshes = (result.workspaceRefreshes || 0) + 1; };
     result.__refreshSettingsTrash = async () => { result.trashRefreshes = (result.trashRefreshes || 0) + 1; };
-    Object.assign(result, { scroll, profile, plan, sources, offline, data, conflicts, signOut, deleteAccount });
+    Object.assign(result, { scroll, profile, plan, offline, data, conflicts, signOut, deleteAccount });
     panels.push(result);
     return result;
   }
@@ -136,7 +135,8 @@ for (const signedIn of [false, true]) {
     const [account, library, recovery] = panel.scroll.children;
     assert.equal(panel.scroll.children.length, 3);
     assert.deepEqual(account.children.slice(1, 3), [panel.profile, panel.plan]);
-    assert.deepEqual(library.children.slice(1), [panel.sources, panel.offline]);
+    assert.deepEqual(library.children.slice(1), [panel.offline]);
+    assert.equal(library.children[0].textContent,"Offline");
     assert.equal(recovery.children[0].textContent, "Data & recovery");
     assert.deepEqual(recovery.children.slice(1), [panel.conflicts, panel.data]);
     assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");
@@ -174,7 +174,7 @@ for (const signedIn of [false, true]) {
   assert.equal(pro.dialog().attributes['aria-label'], 'Get Pro');
   assert.equal(pro.dialog().children[0].children.length, 1, 'The Pro header contains only its close control');
   assert.equal(pro.dialog().children[0].children[0].attributes['aria-label'], 'Close Get Pro');
-  assert.equal(pro.panels[0].scroll.children.length, 6, 'The Pro entry must not organize Settings columns');
+  assert.equal(pro.panels[0].scroll.children.length, 5, 'The Pro entry must not organize Settings columns');
   pro.dialog().dataset.signingIn = 'true';
   pro.revokeAccount();
   if (signedIn) assert.equal(pro.dialog(), null, 'Account changes close an existing-account upgrade');
@@ -215,7 +215,7 @@ const h = harness(true);
 h.context.toggleAccountDialog();
 h.panels[0].scroll.scrollTop = 240;
 h.panels[0].profile.scrollTop = 25;
-h.panels[0].sources.scrollTop = 360;
+h.panels[0].offline.scrollTop = 360;
 h.panels[0].scroll.children[1].scrollTop = 425;
 const projectsSection = h.context.document.createElement("details");
 projectsSection.open = true;
@@ -229,9 +229,8 @@ assert.equal(h.panels.length, 1, "Restoring content must not reconstruct Setting
 assert.equal(h.dialog().children[1], h.panels[0]);
 assert.equal(h.panels[0].scroll.scrollTop, 240);
 assert.equal(h.panels[0].profile.scrollTop, 25);
-assert.equal(h.panels[0].sources.scrollTop, 360);
-assert.equal(h.panels[0].scroll.children[1].scrollTop, 425, "Library column position survives a recovery refresh.");
-assert.equal(h.panels[0].sourcesReady, undefined, "Recovery does not reload unrelated source controls.");
+assert.equal(h.panels[0].offline.scrollTop, 360);
+assert.equal(h.panels[0].scroll.children[1].scrollTop, 425, "Offline column position survives a recovery refresh.");
 assert.equal(h.panels[0].workspaceRefreshes, 1);
 assert.equal(h.panels[0].trashRefreshes, 1);
 assert.equal(projectsSection.open, true);

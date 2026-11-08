@@ -12811,8 +12811,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 .settings-project-row input,
 .account-screen .settings-trash-checkbox,
-.account-screen .project-manager-row input[type="checkbox"],
-.account-screen .settings-active-source-row input[type="checkbox"] {
+.account-screen .project-manager-row input[type="checkbox"] {
   display: grid;
   width: 18px;
   height: 18px;
@@ -12827,8 +12826,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 .settings-project-row input::after,
 .account-screen .settings-trash-checkbox::after,
-.account-screen .project-manager-row input[type="checkbox"]::after,
-.account-screen .settings-active-source-row input[type="checkbox"]::after {
+.account-screen .project-manager-row input[type="checkbox"]::after {
   color: var(--surface);
   content: "✓";
   font-size: 8pt;
@@ -12838,21 +12836,18 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 .settings-project-row input:checked,
 .account-screen .settings-trash-checkbox:checked,
-.account-screen .project-manager-row input[type="checkbox"]:checked,
-.account-screen .settings-active-source-row input[type="checkbox"]:checked {
+.account-screen .project-manager-row input[type="checkbox"]:checked {
   border-color: var(--text-primary);
   background: var(--text-primary);
 }
 
 .settings-project-row input:checked::after,
 .account-screen .settings-trash-checkbox:checked::after,
-.account-screen .project-manager-row input[type="checkbox"]:checked::after,
-.account-screen .settings-active-source-row input[type="checkbox"]:checked::after {
+.account-screen .project-manager-row input[type="checkbox"]:checked::after {
   opacity: 1;
 }
 
-.settings-project-row input:focus-visible,
-.account-screen .settings-active-source-row input[type="checkbox"]:focus-visible {
+.settings-project-row input:focus-visible {
   outline: none;
   box-shadow: none;
 }
@@ -18395,7 +18390,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   font-weight: var(--settings-weight-medium);
   text-align: left;
 }
-.account-screen :is(.account-connector, .settings-active-sources-card, .settings-data-card) > .settings-section-title { display: none; }
+.account-screen :is(.account-connector, .settings-data-card) > .settings-section-title { display: none; }
 .account-screen .settings-account-actions {
   display: grid;
   justify-items: center;
@@ -18422,24 +18417,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: var(--destructive);
   color: #fff;
 }
-.account-screen .settings-source-group { margin-inline: calc(-1 * var(--account-category-gutter)); padding-inline: var(--account-category-gutter); border-bottom: 1px solid var(--border); }
-.account-screen .settings-source-group > summary {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 48px;
-  padding: 12px 0;
-  box-sizing: border-box;
-  color: var(--text-primary);
-  font-size: var(--settings-type-body);
-  font-weight: var(--settings-weight-medium);
-  line-height: 1.4;
-  list-style: none;
-  cursor: pointer;
-}
-.account-screen .settings-source-group > summary::-webkit-details-marker { display: none; }
-.account-screen .settings-source-group-content { padding: 0 0 12px 18px; }
-.account-screen .settings-active-sources-status:empty { display: none; }
 .account-screen .settings-data-card > :is(.settings-trash, .settings-delete-content) { margin-top: 0; }
 .account-screen .settings-data-card > details > summary {
   display: flex;
@@ -18630,8 +18607,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-plan-usage p + p { border-top-color: var(--border); }
 .account-screen .settings-danger-button,
 .account-screen .settings-trash-entry { padding-inline: var(--account-category-gutter); }
-.account-screen .settings-active-sources-list { gap: 0; }
-.account-screen .settings-active-source-row { min-height: 0; }
 .account-screen .settings-panel .settings-footer > .settings-status-message { grid-column: 1 / -1; padding: 0; }
 .account-screen .settings-status-message:empty { display: none; }
 .account-screen .settings-panel .settings-footer {
@@ -18682,11 +18657,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   font-size: var(--settings-type-emphasis) !important;
   font-weight: var(--settings-weight-medium);
   line-height: 1.3;
-}
-.account-screen .settings-active-source-row > span {
-  font-size: var(--settings-type-body);
-  font-weight: var(--settings-weight-regular);
-  line-height: 1.5;
 }
 .account-screen .settings-panel :is(.settings-primary-button, .account-clear, .account-profile-save) {
   font-size: var(--settings-type-support) !important;
@@ -19311,53 +19281,6 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
 .settings-trash-confirm label { display: grid; gap: 8px; }
 .settings-trash-confirm input { padding: 8px; background: transparent; color: inherit; border: 1px solid #888; border-radius: 6px; }
 
-/* Public source controls also appear outside the private Settings panel. */
-.settings-active-sources-list {
-  display: grid;
-  gap: 8px;
-}
-.settings-active-sources-list .settings-active-source-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 44px;
-  padding: 10px 0;
-  color: var(--text-primary);
-  font-size: 14px;
-  line-height: 1.45;
-  font-weight: 400;
-  text-transform: none;
-  cursor: pointer;
-}
-.settings-active-source-row input[type="checkbox"] {
-  flex: 0 0 auto;
-  width: 18px;
-  height: 18px;
-  margin: 0;
-}
-.settings-active-source-row > span {
-  flex: 1;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.account-dialog.active-code-source-dialog {
-  height: auto;
-  max-height: calc(100dvh - 48px);
-  padding: 20px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-.active-code-source-dialog .active-code-source-close {
-  display: block;
-  min-height: 44px;
-  margin: 0 0 8px auto;
-  padding: 8px 12px;
-}
-.active-code-source-dialog .settings-active-sources-card {
-  padding: 0;
-  background: transparent;
-}
-
 .research-conversation-start-time { display: block; margin-top: 3px; text-align: right; }
 
 .reader-selection-research-action {
@@ -19737,18 +19660,6 @@ html body .column-group-menu-button:focus-visible {
 .topbar .workspace-actions-button .workspace-current-name { color: var(--text-primary); font-weight: 550; }
 
 .search-panel .search-results[hidden] { display: none; }
-.search-code-source-menu {
-  position: absolute;
-  width: min(360px, calc(100% - 16px));
-  min-width: 0;
-  box-sizing: border-box;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  font-size: var(--chrome-font-size);
-}
-.search-code-source-menu [hidden] { display: none !important; }
-.search-code-source-menu .settings-active-sources-card { padding: 0; background: transparent; }
-
 .search-match-control { position: relative; }
 .search-match-mode { box-sizing: border-box; line-height: 1.4; min-height: 30px; padding: 4px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-secondary); font: inherit; cursor: pointer; }
 .search-match-mode { display: flex; align-items: center; list-style: none; }
@@ -19758,17 +19669,6 @@ html body .column-group-menu-button:focus-visible {
 .search-match-control:not([open]) .search-match-menu { display: none; }
 .column-group-menu .search-match-menu { position: static; margin: 0; padding: 0; background: transparent; box-shadow: none; }
 .search-match-mode:focus, .search-match-alternative:focus { outline: none; box-shadow: none; }
-
-.search-code-source-menu .settings-active-sources-list { gap: 0; }
-.search-code-source-menu .search-source-group-heading { margin: 6px 6px 0; padding: 12px 6px 6px; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 12px; font-weight: 600; line-height: 1.4; }
-.search-code-source-menu .search-source-group-heading:first-child { margin-top: 0; padding-top: 6px; border-top: 0; }
-.search-code-source-menu .settings-active-source-row { align-items: center; gap: 10px; min-height: 40px; padding: 10px 12px; border-radius: 6px; color: var(--text-primary); line-height: 1.4; box-sizing: border-box; }
-.search-code-source-menu .settings-active-source-row:hover, .search-code-source-menu .settings-active-source-row:has(input:focus-visible) { background: rgba(128,128,128,.16); }
-.search-code-source-menu .settings-active-source-row input[type="checkbox"] { appearance: none; -webkit-appearance: none; position: relative; width: 18px; height: 18px; margin: 0; padding: 0; border: 0; border-radius: 0; outline: none; box-shadow: none; background: transparent; color: inherit; cursor: pointer; }
-.search-code-source-menu .settings-active-source-row input:checked::before { content: ""; position: absolute; inset: 0; background: currentColor; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='m5 12 4 4L19 6'/%3E%3C/svg%3E") center / contain no-repeat; }
-.search-code-source-menu .settings-active-source-row input:disabled { opacity: 0.45; cursor: default; }
-.search-code-source-menu .settings-active-sources-status { padding: 6px 12px; font-size: 12px; }
-.search-code-source-menu .settings-active-sources-status:empty { display: none; }
 
 /* Standalone Project editors share the workspace column chrome. */
 .project-information-panel > .project-information-content {
@@ -21079,8 +20979,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .project-open-question-list li::marker { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 .project-open-question-list textarea { display: block; width: 100%; resize: vertical; padding: 10px; margin-bottom: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-primary); font: inherit; line-height: 1.5; }
 .project-open-questions [role="status"]:empty { display: none; }
-.search-source-bulk-actions { display: flex; gap: 12px; padding: 4px 0 12px; border-bottom: 1px solid var(--border); }
-.search-source-bulk-actions button { font-size: 12px; padding: 4px 6px; }
 
 .section-detail-comments-editor { display: grid; gap: var(--space-5); }
 .section-detail-comment-number { margin-bottom: var(--space-2); color: var(--text-secondary); font-family: var(--ui-font-family); font-size: var(--reader-font-size) !important; line-height: 1.4; }
@@ -21399,9 +21297,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .settings-floating-panel .settings-account-column { height: 100%; padding: 0; border: 0; overflow-y: auto; }
 .settings-floating-panel .settings-account-column-title { display: none; }
 .settings-floating-panel .settings-account-actions { padding-bottom: 4px; }
-.settings-floating-panel .settings-account-column > .settings-active-sources-card { row-gap: 0; }
-.settings-floating-panel .settings-active-sources-card > :is(.search-source-bulk-actions, .settings-active-sources-status:not(:empty), .settings-active-sources-retry) { margin-top: 20px; }
-.settings-floating-panel .search-source-bulk-actions { margin-inline: calc(-1 * var(--account-category-gutter)); padding-inline: var(--account-category-gutter); }
 .settings-floating-panel .settings-panel .settings-footer {
   display: flex;
   flex: 0 0 auto;

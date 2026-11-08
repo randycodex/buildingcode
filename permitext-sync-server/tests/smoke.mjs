@@ -459,17 +459,16 @@ async function main() {
     const settingsSectionOrder = [
       'id="settings-plan-title"',
       'id="settings-account-title"',
-      'id="settings-active-sources-title"',
       'id="settings-sync-conflicts-title"',
       'id="settings-offline-title"',
       'id="settings-data-title"'
     ].map((marker) => settingsTemplateSource.indexOf(marker));
     assert(
       settingsSectionOrder.every((index, position) => index >= 0 && (position === 0 || index > settingsSectionOrder[position - 1])),
-      "Account template groups no longer retain Plan, Profile, Library, Sync Conflicts, Offline and Data recovery order."
+      "Account template groups no longer retain Plan, Profile, Sync Conflicts, Offline and Data recovery order."
     );
     for (const [id, label] of [["settings-plan-title", "Plan"], ["settings-account-title", "Profile"],
-      ["settings-active-sources-title", "Library"], ["settings-sync-conflicts-title", "Sync Conflicts"],
+      ["settings-sync-conflicts-title", "Sync Conflicts"],
       ["settings-offline-title", "Offline"], ["settings-data-title", "Data recovery"]]) {
       assert(settingsTemplateSource.includes(`aria-labelledby="${id}"`) &&
         new RegExp(`<h3[^>]*id="${id}"[^>]*>${label}</h3>`).test(settingsTemplateSource),

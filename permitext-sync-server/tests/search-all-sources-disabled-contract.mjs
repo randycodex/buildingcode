@@ -13,7 +13,7 @@ function fixture(count,queryScoped=false){
  searchPositionState:()=>({}),searchResultPageSize:25,isCurrentActiveCodeSourceContext:()=>current,
  prepareSearchPanelScope:async()=>({token:{},querySuffix:'&sourceScope=scoped',enabledSourceCount:count,queryScoped}),
  updateSearchDock(){},renderSearchPlaceholder:(_results,message)=>messages.push(message),clear(){},searchResultMatchesExactQuery:()=>true,
- document:{createElement:()=>({addEventListener(_event,callback){this.click=callback;}})},openSearchCodeSourceSettings(){dialogs++;},openActiveCodeSourceSettings(){dialogs++;},
+ document:{createElement:()=>({addEventListener(_event,callback){this.click=callback;}})},openSearchCodeSourceSettings(){dialogs++;},
  api:async()=>{requests++;return {results:[],hasMore:false};}};
  context.fetchCodeSearch=context.api;
  vm.createContext(context);vm.runInContext(actual('cancelSearchPanelRequest')+'\n'+actual('renderSearchResults'),context);
@@ -21,9 +21,9 @@ function fixture(count,queryScoped=false){
 }
 {
  const f=fixture(0);await f.context.renderSearchResults(f.panel,f.instance);
- assert.equal(f.requests(),0);assert.equal(f.messages.at(-1).title,'All browsing-library sources are off');
+ assert.equal(f.requests(),0);assert.equal(f.messages.at(-1).title,'No sources selected for this search');
  assert.equal(f.instance.query,'concrete');assert.equal(f.results.dataset.restoringSearch,'false');assert.equal(f.results.dataset.searchHasMore,'false');
- assert.equal(f.buttons[0].textContent,'Manage browsing library');f.buttons[0].click();assert.equal(f.dialogs(),1);
+ assert.equal(f.buttons[0].textContent,'Choose search sources');f.buttons[0].click();assert.equal(f.dialogs(),1);
  f.stale();f.buttons[0].click();assert.equal(f.dialogs(),1);
 }
 {
