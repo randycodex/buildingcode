@@ -11520,6 +11520,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .project-manager nav,
+.project-manager-controls,
 .project-manager-toolbar,
 .project-manager footer,
 .project-manager-row {
@@ -11529,6 +11530,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .project-manager-toolbar { flex-wrap: wrap; }
+.project-manager-controls { justify-content: space-between; }
+.project-manager-selection { flex: 0 0 auto; margin-left: auto; }
 .project-manager button {
   padding: 8px 12px;
   border: 0;
@@ -18405,15 +18408,15 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-project-management .project-manager > footer:not(:empty) {
   padding-bottom: var(--space-4);
 }
-.account-screen .settings-project-management .project-manager > nav > button,
-.account-screen .settings-project-management .project-manager-toolbar > button:first-child {
+.account-screen .settings-project-management .project-manager-controls > nav > button,
+.account-screen .settings-project-management .project-manager .project-manager-selection {
   min-height: 30px;
   padding: 5px 12px;
   border-radius: var(--radius-pill);
   background: transparent;
 }
-.account-screen .settings-project-management .project-manager > nav > button[aria-pressed="true"],
-.account-screen .settings-project-management .project-manager-toolbar > button:first-child[aria-pressed="true"] {
+.account-screen .settings-project-management .project-manager-controls > nav > button[aria-pressed="true"],
+.account-screen .settings-project-management .project-manager .project-manager-selection[aria-pressed="true"] {
   background: var(--menu-highlight);
 }
 .account-screen .settings-data-card > details > :not(summary),

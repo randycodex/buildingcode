@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-centered-source-checks-v1501";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-project-select-alignment-v1503";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-centered-source-checks-v1501";
+} from "./offline-storage.js?v=20261107-project-select-alignment-v1503";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36020,11 +36020,15 @@ function renderProjectManager(container, { onChange = () => {} } = {}) {
       }, tabs);
       tab.setAttribute("aria-pressed", String(archived === value));
     });
+    const controls = document.createElement("div");
+    controls.className = "project-manager-controls";
+    controls.append(tabs);
     const toolbar = document.createElement("div");
     toolbar.className = "project-manager-toolbar";
     const selectionButton = button(selecting ? "Done" : "Select", () => {
       selecting = !selecting; selected.clear(); render();
-    }, toolbar, !records.length && !selecting);
+    }, controls, !records.length && !selecting);
+    selectionButton.className = "project-manager-selection";
     selectionButton.setAttribute("aria-pressed", String(selecting));
     if (selecting) {
       button(selected.size === records.length && records.length ? "Deselect All" : "Select All", () => {
@@ -36104,14 +36108,16 @@ function renderProjectManager(container, { onChange = () => {} } = {}) {
       } finally {
         busy = false; render();
         if (isCurrentAccountRequest(requestIdentity)) onChange();
-        dialog.querySelector(".project-manager-toolbar button")?.focus();
+        dialog.querySelector(".project-manager-selection")?.focus();
       }
     };
     if (selecting) {
       button(archived ? "Restore Selected" : "Archive Selected", () => void run("archive"), actions, !selected.size);
       button("Delete Selected", () => void run("delete"), actions, !selected.size).className = "is-danger";
     }
-    dialog.append(tabs, toolbar, list, actions);
+    dialog.append(controls);
+    if (selecting) dialog.append(toolbar);
+    dialog.append(list, actions);
   };
   const listFocus = (id) => {
     [...dialog.querySelectorAll("input[data-project-id]")].find((input) => input.dataset.projectId === id)?.focus();
