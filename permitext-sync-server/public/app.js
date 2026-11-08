@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-inline-project-questions-v1568";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-project-context-tabs-v1569";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-inline-project-questions-v1568";
+} from "./offline-storage.js?v=20261108-project-context-tabs-v1569";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4485,6 +4485,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   columns.className = "project-details-columns";
   columns.setAttribute("aria-label", "Project details columns");
   const panels = new Map();
+  const sections = [["context", "Context"], ["facts", "Facts"], ["questions", "Questions"], ["checklist", "Checklist"]];
   let selectedSection = "context";
   let panelTabs = null;
   let floatingControls = null;
@@ -4507,7 +4508,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
     load: async () => {
       content.replaceChildren(header, columns);
       columns.replaceChildren();
-      for (const [kind, label] of [["context", "Context"], ["facts", "Facts"]]) {
+      for (const [kind, label] of sections) {
         const panel = await renderProjectInformation(identity, kind);
         const columnBody = document.createElement("div");
         columnBody.className = "project-details-column-body";
@@ -4598,18 +4599,6 @@ async function openProjectDetailsScreen(section = null, options = {}) {
           overview.append(name, address, edit, editorHost);
           const information = panel.querySelector(".project-information-content");
           information?.prepend(overview);
-          if (information) {
-            const questions = appendProjectOpenQuestions(information, identity);
-            const mount = projectInformationMounts.get(paneIDForProjectInformation(identity, kind));
-            const flush = mount.flush;
-            mount.flush = async () => { await questions.flush(); await flush(); };
-            const checklist = information.querySelector(".project-records-checklist");
-            if (checklist) {
-              const disclosure = document.createElement("details"); disclosure.className = "project-records-disclosure";
-              const summary = document.createElement("summary"); summary.textContent = "Records checklist";
-              disclosure.append(summary, checklist); information.append(disclosure);
-            }
-          }
         }
         panel.querySelectorAll(".saved-project-structured-fact-value").forEach(input => { input.placeholder = "Not recorded"; });
         const information = panel.querySelector(".project-information-content");
@@ -4628,7 +4617,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
       }
       panelTabs = createFloatingWorkspaceTabs({
         id: "project-details", label: "Project context categories", selected: section || selectedSection,
-        entries: [...panels].map(([id, panel]) => ({ id, label: id === "context" ? "Context" : "Facts", panel })),
+        entries: sections.map(([id, label]) => ({ id, label, panel: panels.get(id) })),
         onSelect: key => { selectedSection = key; }
       });
       header.replaceChildren(panelTabs.element, close);
@@ -36727,7 +36716,7 @@ function appendProjectRecordsChecklist(container, project, identity) {
 async function renderProjectInformation(project, kind) {
   const identity = projectIdentity(project);
   const paneID = paneIDForProjectInformation(identity, kind);
-  const label = kind === "context" ? "Context" : "Facts";
+  const label = { context: "Context", facts: "Facts", questions: "Questions", checklist: "Checklist" }[kind];
   if (!hasCapability("projects")) return renderProLockedPane(paneID, label);
   const current = workspaceProject();
   if (!current || !projectDetailMatches(current, identity)) throw accountContextChangedError();
@@ -36753,9 +36742,10 @@ async function renderProjectInformation(project, kind) {
   header.append(title, actions);
   const content = document.createElement("section");
   content.className = "saved-project-summary project-information-content";
-  const editor = appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind });
-  const checklist = kind === "context" ? appendProjectRecordsChecklist(content, current, identity) : null;
-  projectInformationMounts.set(paneID, { panel, flush: async () => { await editor.flush(); await checklist?.flush(); } });
+  const editor = kind === "questions" ? appendProjectOpenQuestions(content, identity)
+    : kind === "checklist" ? appendProjectRecordsChecklist(content, current, identity)
+    : appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind });
+  projectInformationMounts.set(paneID, { panel, flush: () => editor.flush() });
   panel.append(header, content);
   applyPaneWeight(panel, paneID);
   return panel;

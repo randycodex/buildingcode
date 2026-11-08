@@ -20958,8 +20958,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   font-size: 12px; color: var(--text-secondary); white-space: pre-wrap;
 }
-.project-records-disclosure > summary { padding: 8px 0; cursor: pointer; color: var(--text-secondary); font-size: 13px; }
-.project-records-disclosure .project-records-checklist { padding-top: 16px; }
 /* Give four area buttons their own space before centering the brand on tablets. */
 @media (min-width: 761px) and (max-width: 1100px) {
   .workspace-shell > .topbar { grid-template-columns: max-content minmax(0, 1fr) max-content; }
@@ -21348,6 +21346,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 }
 .workspace-floating-panel .project-overview-identity { margin-top: 0; }
 .workspace-floating-panel .project-overview-identity h2 { overflow-wrap: anywhere; }
+.workspace-floating-panel .project-questions-panel .project-open-questions { margin-top: 0; padding-top: 0; border-top: 0; }
 
 /* Conversation cleanup stays beside the Assistant history it affects. */
 .assistant-history-header { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 8px; margin-bottom: 12px; }

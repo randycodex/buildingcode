@@ -41,9 +41,14 @@ assert.equal(restored.paneWeights["project:context:alpha"], 670);
 assert.ok(restored.collapsedPaneIDs.includes("project:facts:alpha"));
 for (const kind of ["context", "facts"]) assert.equal(canGroupColumn(`project:${kind}:alpha`), false);
 
-// Floating Context retains both tab editors and their existing save guards.
+// Floating Context retains each dedicated tab editor and its existing save guards.
 let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, tickScreen, inlineOptions;
 const mounts = new Map(), issues = [], renderedInformation = [];
+const flushedEditors = [];
+const mountEditor = (container, kind, className) => {
+  const section = element('section'); section.className = className; container.append(section);
+  return {flush:async()=>{flushedEditors.push(kind);}};
+};
 const state = { projectContextOpen: false, projectFactsOpen: false, paneWeights: {}, paneOrder: [] };
 let detailsWidths = [640,640], disposedResizers = 0;
 const body = element('body');
@@ -51,7 +56,13 @@ const workspaceShell = element('main'), workflowToolbar = element('nav'), track 
 workspaceShell.className = 'workspace-shell'; workflowToolbar.className = 'workflow-toolbar';
 body.append(workspaceShell); workspaceShell.append(workflowToolbar, track);
 track.inert = false; workflowToolbar.inert = false;
-const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}}), appendProjectOpenQuestions() { return {flush:async()=>{}}; }, renderProjectSavedWork: async () => {}, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
+const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}}),
+  appendProjectOpenQuestions: container => mountEditor(container, 'questions', 'project-open-questions'),
+  appendProjectRecordsChecklist: container => mountEditor(container, 'checklist', 'project-records-checklist'),
+  appendSavedProjectFactEditor: (container, _project, _identity, {section}) => mountEditor(container, section, section === 'context' ? 'project-overview-context' : 'saved-project-structured-facts'),
+  createProjectToolDragHandle: () => element('button'),
+  applyPaneWeight: panel => renderedInformation.push(panel),
+  renderProjectSavedWork: async () => {}, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
   currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
   workspaceActionsButton: element('button'),
@@ -74,25 +85,16 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
   projectDetailMatches: (a, b) => a?.id === b?.id,
   workspacePrivatePresentationAllowed: () => privateAllowed, hasCapability: () => allowed,
   notifyProjectRequiredForColumn: () => !current,
-  presentWorkspaceIssue: value => issues.push(value),
-  renderProjectInformation: async (identity, kind) => {
-    const panel = element('article'); panel.draft = `Draft ${kind}`;
-    const content = element('div'); content.className = 'project-information-content'; panel.append(content);
-    if (kind === 'context') {
-      const context = element('textarea'); context.className = 'project-overview-context'; content.append(context);
-      const records = element('section'); records.className = 'project-records-checklist'; content.append(records);
-    }
-    renderedInformation.push({ identity, kind, panel });
-    mounts.set(`project:${kind}:${identity.id}`, {panel, flush: async () => {}});
-    return panel;
-  }
+  presentWorkspaceIssue: value => issues.push(value)
 });
 vm.runInContext('let projectDetailsScreen=null, reportScreen=null;\n'+
   (await readFile(new URL('../public/report-screen.js',import.meta.url),'utf8')).replace('export function','function')+'\n'+
-  ["circleXIconSVG", "pencilIconSVG", "projectInformationStateKey", "paneIDForProjectInformation", "flushProjectInformationPanes", "openProjectDetailsScreen", "toggleProjectInformation"].map(actual).join('\n'),c);
+  ["circleXIconSVG", "pencilIconSVG", "projectInformationStateKey", "paneIDForProjectInformation", "flushProjectInformationPanes", "renderProjectInformation", "openProjectDetailsScreen", "toggleProjectInformation"].map(actual).join('\n'),c);
 await c.toggleProjectInformation('context');
 const contextPanel = mounts.get('project:context:alpha').panel;
 const factsPanel = mounts.get('project:facts:alpha').panel;
+const questionsPanel = mounts.get('project:questions:alpha').panel;
+const checklistPanel = mounts.get('project:checklist:alpha').panel;
 const screenElement = find(workspaceShell, node => node.className.includes('project-details-screen'));
 assert.ok(screenElement, 'Project details mounts in the workspace screen wrapper');
 const screenError = find(screenElement, node => node.attributes.role === 'alert');
@@ -102,12 +104,25 @@ assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);
 assert.equal(workspaceShell.inert, undefined, 'The floating panel leaves the current workspace interactive');
 assert.equal(contextPanel.hidden, false); assert.equal(factsPanel.hidden, true);
 const columns = find(screenElement, node => node.className === 'project-details-columns');
-assert.equal(columns.children.length, 2, 'Both tab editors remain mounted');
-for (const label of ['Context', 'Facts']) {
+assert.equal(columns.children.length, 4, 'All four tab editors remain mounted');
+for (const label of ['Context', 'Facts', 'Questions', 'Checklist']) {
   assert.ok(find(columns, node => node.tag === 'h2' && node.textContent === label));
 }
 assert.equal(find(screenElement, node => node.className === 'project-details-tabs'), undefined);
-assert.ok(find(contextPanel, node => node.className === 'project-records-checklist'), 'Checklist stays in Context');
+for (const className of ['project-records-checklist', 'project-open-questions']) {
+  assert.equal(find(contextPanel, node => node.className === className), undefined, 'Context does not duplicate the dedicated sections');
+}
+assert.ok(find(questionsPanel, node => node.className === 'project-open-questions'));
+assert.ok(find(checklistPanel, node => node.className === 'project-records-checklist'));
+await c.openProjectDetailsScreen('questions');
+assert.equal(questionsPanel.hidden, false); assert.equal(checklistPanel.hidden, true);
+questionsPanel.draft = 'Unsaved question';
+await c.openProjectDetailsScreen('checklist');
+assert.equal(questionsPanel.hidden, true); assert.equal(checklistPanel.hidden, false);
+checklistPanel.draft = 'Unsaved record';
+assert.equal(await c.flushProjectInformationPanes(), true);
+assert.deepEqual(flushedEditors, ['context', 'facts', 'questions', 'checklist'], 'Each mounted editor participates in guarded saves');
+await c.openProjectDetailsScreen('context');
 const contextBody = contextPanel.querySelector('.project-details-column-body');
 const factsBody = factsPanel.querySelector('.project-details-column-body');
 const editButton = find(contextPanel, node => node.className === 'project-overview-edit');
@@ -142,19 +157,20 @@ contextMount.flush = originalFlush;
 contextPanel.draft='Retained edit'; contextBody.scrollTop=320;
 factsBody.scrollTop=210; columns.scrollLeft=80;
 const presentation = vm.runInContext('projectDetailsScreen.getPresentationState()',c);
-assert.deepEqual(copy(presentation.columnScrolls), {context:320,facts:210});
+assert.deepEqual(copy(presentation.columnScrolls), {context:320,facts:210,questions:0,checklist:0});
 contextBody.scrollTop=0; factsBody.scrollTop=0; columns.scrollLeft=0;
 c.presentation=presentation; vm.runInContext('projectDetailsScreen.restorePresentation(presentation)',c);
 assert.equal(contextBody.scrollTop,320); assert.equal(factsBody.scrollTop,210);
 vm.runInContext('projectDetailsScreen.close()',c);
 assert.equal(screenElement.hidden, true); assert.equal(screenElement.open, false);
 assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);
-assert.equal(mounts.size, 2, 'Closing retains both mounted editors and their drafts');
+assert.equal(mounts.size, 4, 'Closing retains all mounted editors and their drafts');
 await c.toggleProjectInformation('facts');
 assert.equal(mounts.get('project:context:alpha').panel,contextPanel);
 assert.equal(contextPanel.draft,'Retained edit'); assert.equal(contextBody.scrollTop,320);
 assert.equal(contextPanel.hidden,true); assert.equal(factsPanel.hidden,false);
-assert.equal(renderedInformation.length, 2, 'Switching sections must reuse both original editors');
+assert.equal(renderedInformation.length, 4, 'Switching sections must reuse the original editors');
+assert.equal(questionsPanel.draft, 'Unsaved question'); assert.equal(checklistPanel.draft, 'Unsaved record');
 assert.equal(vm.runInContext('projectDetailsScreen.getPresentationState().section',c),'facts');
 vm.runInContext('projectDetailsScreen.close()',c);
 await c.openProjectDetailsScreen();
@@ -165,6 +181,7 @@ allowed=false; tickScreen(); assert.equal(mounts.size,0,'Revoked access releases
 assert.equal(disposedResizers,1,'Removing the screen disposes its floating event handlers');
 assert.equal(screenElement.isConnected, false, 'Revoking access removes the whole private screen');
 assert.equal(contextPanel.isConnected, false); assert.equal(factsPanel.isConnected, false);
+assert.equal(questionsPanel.isConnected, false); assert.equal(checklistPanel.isConnected, false);
 assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);
 assert.equal(await c.toggleProjectInformation('facts'),false);
 allowed=true; privateAllowed=false; assert.equal(await c.toggleProjectInformation('facts'),false);
