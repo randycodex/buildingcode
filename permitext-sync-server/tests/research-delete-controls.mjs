@@ -104,16 +104,24 @@ const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const start=source.indexOf('async function refreshAfterResearchDeletion(');
 const body=source.slice(start,source.indexOf('\n}',start)+2);
 let aborted=0;
+const transitions=[];
+const histories=new Map(['utility:analysis','utility:analysis:instance','utility:analysis:keep','utility:analysis:new-chat']
+  .map(paneID=>[paneID,['drop','keep']]));
 const state={researchConversationID:'drop',paneOrder:['research:conversation:drop','reader:keep'],paneWeights:{'research:conversation:drop':920,'reader:keep':900},
-  utilityInstances:[{id:'instance',key:'analysis',conversationID:'drop',draft:'Drop draft'},{id:'keep',key:'analysis',conversationID:'keep',draft:'Keep draft'}],
+  utilityInstances:[{id:'instance',key:'analysis',conversationID:'drop',draft:'Drop draft'},{id:'keep',key:'analysis',conversationID:'keep',draft:'Keep draft'},
+    {id:'new-chat',key:'analysis',conversationID:'',draft:'Unsent new conversation'},{id:'search',key:'search',query:'retained search'}],
   columnGroups:[{paneIDs:['utility:analysis:instance','reader:keep'],columns:{'utility:analysis:instance':{kind:'utility',value:{conversationID:'drop'},draft:'Drop draft'},'reader:keep':{kind:'reader',value:{id:'reader'}}}}]};
 const context=vm.createContext({state,valid:true,researchOpenGeneration:0,researchQuestionDraft:'Drop draft',activeResearchConversation:{id:'drop'},
   activeResearchProgress:new Map([['drop',{controller:{abort(){aborted++;}}}],['keep',{}]]),
   supplementalResearchConversations:new Map([['drop',{}],['keep',{}]]),supplementalResearchConversationIDs:['drop','keep'],
-  researchNewChatDrafts:new Map([['followup:drop','Drop draft'],['followup:keep','Keep draft'],['utility:analysis:instance','Drop draft']]),
+  researchNewChatDrafts:new Map([['followup:drop','Drop draft'],['followup:keep','Keep draft'],['utility:analysis:instance','Drop draft'],['utility:analysis:new-chat','Unsent new conversation']]),
   researchDraftPaneIDs:new Set(),researchConversationList:[{id:'drop'},{id:'keep'}],researchHistoryPageReaders:new Map(),
   localStorage:{},removeResearchRequestRecovery(){},paneIDForResearchConversation:id=>'research:conversation:'+id,paneIDForUtilityInstance:instance=>'utility:analysis:'+instance.id,
-  readResearchConversationList:{invalidate(){}},saveWorkspaceState(){},refreshResearchConversationList:async()=>{},refreshResearchProjectAssignmentConsumers:async()=>{},transitionWorkspace:async()=>{}});
+  readResearchConversationList:{invalidate(){}},saveWorkspaceState(){},refreshResearchConversationList:async()=>{},refreshResearchProjectAssignmentConsumers:async()=>{},
+  transitionWorkspace:async(mode,options)=>{
+    transitions.push({mode,...options});
+    options.refreshPaneIDs.forEach(paneID=>{if(histories.has(paneID))histories.set(paneID,Array.from(context.researchConversationList,row=>row.id));});
+  }});
 context.requireCurrentAccountRequest=()=>{if(!context.valid)throw Error('Account changed');};
 vm.runInContext(body,context);
 const before=JSON.stringify(state);context.valid=false;
@@ -124,8 +132,18 @@ assert.equal(aborted,1);assert(context.activeResearchProgress.has('keep'));
 assert(!context.researchNewChatDrafts.has('followup:drop'));assert.equal(context.researchNewChatDrafts.get('followup:keep'),'Keep draft');
 assert.equal(state.utilityInstances[0].conversationID,'');assert.equal(state.utilityInstances[0].draft,'');
 assert.equal(state.utilityInstances[1].draft,'Keep draft');
+assert.equal(state.utilityInstances[2].draft,'Unsent new conversation');
+assert.equal(context.researchNewChatDrafts.get('utility:analysis:new-chat'),'Unsent new conversation');
+assert.deepEqual(Array.from(transitions[0].refreshPaneIDs),['utility:analysis','utility:analysis:instance','utility:analysis:keep','utility:analysis:new-chat'],
+  'Deletion refreshes every Assistant History, even when its open conversation was not deleted or it only has a new draft.');
+assert.equal(state.utilityInstances[3].query,'retained search');
 assert.deepEqual(state.columnGroups[0].paneIDs,['reader:keep']);
 assert.equal(state.paneWeights['reader:keep'],900);
+assert([...histories.values()].every(ids=>ids.length===1&&ids[0]==='keep'),
+  'A deleted conversation disappears from every mounted Assistant History, not just the column that owned it.');
+await context.refreshAfterResearchDeletion({conversationIDs:['keep'],projectIDs:[]},{userID:'owner'});
+assert([...histories.values()].every(ids=>ids.length===0),'Removing the final conversation leaves all Assistant History lists empty.');
+assert.equal(state.utilityInstances[2].draft,'Unsent new conversation','Deleting every stored conversation preserves an unsent new chat.');
 const index=await readFile(new URL('../public/index.html',import.meta.url),'utf8');
 assert(!index.includes('settings-conversations'));assert(!source.includes('mountResearchDeleteControls'));
 assert(source.includes('historyManagement.bindRow(row, openButton, conversation, researchConversationTitle(conversation))'));

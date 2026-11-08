@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=17";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-assistant-history-management-v1516";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-assistant-history-refresh-v1517";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-assistant-history-management-v1516";
+} from "./offline-storage.js?v=20261108-assistant-history-refresh-v1517";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -42199,13 +42199,17 @@ async function refreshAfterResearchDeletion(result, identity) {
     researchNewChatDrafts.delete('utility:analysis');
   }
   for (const instance of state.utilityInstances || []) {
-    if (instance.key !== 'analysis' || !ids.has(instance.conversationID)) continue;
+    if (instance.key !== 'analysis') continue;
+    const paneID = paneIDForUtilityInstance(instance);
+    // Every Assistant owns a History list, including columns with a new draft
+    // or an unrelated open conversation. Their unchanged identity would retain
+    // deleted rows unless they are explicitly included in this refresh.
+    refreshPaneIDs.push(paneID);
+    if (!ids.has(instance.conversationID)) continue;
     instance.conversationID = '';
     instance.draft = '';
-    const paneID = paneIDForUtilityInstance(instance);
     researchNewChatDrafts.delete(paneID);
     researchDraftPaneIDs.add(paneID);
-    refreshPaneIDs.push(paneID);
   }
   for (const group of state.columnGroups || []) {
     for (const [paneID, column] of Object.entries(group.columns || {})) {
@@ -42222,7 +42226,7 @@ async function refreshAfterResearchDeletion(result, identity) {
   requireCurrentAccountRequest(identity);
   await refreshResearchProjectAssignmentConsumers(result.projectIDs);
   requireCurrentAccountRequest(identity);
-  await transitionWorkspace('utility', {refreshPaneIDs});
+  await transitionWorkspace('utility', {refreshPaneIDs:[...new Set(refreshPaneIDs)]});
 }
 
 function renderSettings({ upgrade = false } = {}) {
