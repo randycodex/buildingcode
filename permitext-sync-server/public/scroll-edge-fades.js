@@ -17,7 +17,7 @@ const viewports = [
   '.report-document', '.report-outline', '.report-source-picker', '.report-history', '.report-export-content',
   '.report-draft-shell',
   '.code-question-panel-body', '.code-question-index-list',
-  '.custom-select-menu', '.reader-open-code-menu', '.reader-definition-popover',
+  '.custom-select-menu:not(.reader-chapter-select-menu)', '.reader-open-code-menu', '.reader-definition-popover',
   '.search-code-source-menu', '.research-destination-menu', '.column-group-menu',
   '.saved-column-groups-menu', '.report-draft-menu-items', '.notebook-note-menu-items',
   '.command-palette-list', '.project-create-sheet', '.project-refresh-dialog',
