@@ -5,7 +5,7 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-reader-menu-height-v1538";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-chapter-menu-height-v1539";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -157,7 +157,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-reader-menu-height-v1538";
+} from "./offline-storage.js?v=20261108-chapter-menu-height-v1539";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -9066,12 +9066,11 @@ function enhanceSelect(select) {
       : null;
     const verticalAnchorRect = chapterTrigger?.getBoundingClientRect() || rect;
     const menuTop = verticalAnchorRect.bottom + menuOffset;
-    const menuBottomGap = readerChapterMenu ? menuTop : viewportPadding;
-    const availableBelow = Math.max(0, window.innerHeight - menuTop - menuBottomGap);
+    const availableBelow = Math.max(0, window.innerHeight - menuTop - viewportPadding);
     menu.style.setProperty("--select-menu-top", `${menuTop}px`);
     menu.style.setProperty("--select-menu-left", `${left}px`);
     menu.style.setProperty("--select-menu-width", `${menuWidth}px`);
-    menu.style.setProperty("--select-menu-max-height", `${availableBelow}px`);
+    menu.style.setProperty("--select-menu-max-height", readerChapterMenu ? "none" : `${availableBelow}px`);
   };
 
   if (!readerChapterMenu) {

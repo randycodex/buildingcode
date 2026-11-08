@@ -1,4 +1,4 @@
-export const webAppVersion = "20261108-reader-menu-height-v1538";
+export const webAppVersion = "20261108-chapter-menu-height-v1539";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

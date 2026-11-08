@@ -2755,6 +2755,7 @@ label {
 }
 
 .reader-chapter-select-menu {
+  bottom: var(--workspace-floating-menu-bottom-gap);
   scrollbar-width: none;
 }
 
