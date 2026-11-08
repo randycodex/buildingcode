@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-floating-settings-context-v1492";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-header-settings-only-v1493";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-floating-settings-context-v1492";
+} from "./offline-storage.js?v=20261107-header-settings-only-v1493";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2666,14 +2666,11 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   const navigationActions = document.createElement("div");
   navigationActions.className = "workspace-view-options";
   navigationActions.setAttribute("role", "group");
-  navigationActions.setAttribute("aria-label", "Project and settings");
+  navigationActions.setAttribute("aria-label", "Project context");
   appendMenuAction(navigationActions, {
     label: "Context", icon: "book-a",
     disabled: !projectsAvailable || !workspaceProject() || !hasCapability("projects"),
     run: () => void switchWorkflowView("project")
-  });
-  appendMenuAction(navigationActions, {
-    label: "Settings", icon: "user-round", run: () => toggleUtilityPane("settings")
   });
   menu.append(navigationActions);
   const viewOptions = document.createElement("div");
