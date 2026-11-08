@@ -18582,7 +18582,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-content-copy { min-width: 0; }
 .account-screen .settings-content-group h4 { margin: 0; color: var(--text-primary); font-size: var(--settings-type-body) !important; font-weight: var(--settings-weight-medium); line-height: 1.4; }
 .account-screen .settings-content-count, .account-screen .settings-project-selection-status { margin: 4px 0 0; color: var(--text-secondary); font-size: var(--settings-type-caption); line-height: 1.4; }
-.account-screen .settings-content-summary { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.account-screen .settings-content-summary { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
 .account-screen .settings-content-summary[aria-labelledby="settings-passages-title"] { flex-wrap: wrap; }
 .account-screen .settings-content-summary[aria-labelledby="settings-passages-title"] .settings-content-copy { flex: 1 1 250px; }
 .account-screen .settings-content-summary[aria-labelledby="settings-passages-title"] .settings-content-trash { flex: 0 0 auto; margin-inline-start: auto; }
