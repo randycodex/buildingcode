@@ -57,6 +57,7 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
   workspaceActionsButton: element('button'),
   workspaceFloatingPanelReference: () => ({bottom:70}),
   bindFloatingWorkspacePanel: () => ({position(){},dispose(){disposedResizers++;}}),
+  prependWorkspaceButtonIcon: button => button,
   createFloatingWorkspaceTabs({entries,selected,onSelect}) {
     const nav = element('nav'); nav.className = 'floating-workspace-tabs';
     const select = key => { entries.forEach(entry => { entry.panel.hidden = entry.id !== key; entry.panel.inert = entry.id !== key; }); onSelect(key); };
