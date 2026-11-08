@@ -98,22 +98,22 @@ assert.equal(openedReport.options.resume.draftID,'older-draft',
 assert.equal(restoredReport.scrolls.document,950);
 assert.equal(startup.workspaceResumeReady,true);
 
-// Offline keeps its scroll position while retired source-group state is ignored.
-const accountLayout={cards:[{id:'settings-column-library-title',scroll:425}],sourceGroups:['2022 Construction Codes',null,7],profile:'Private profile data'};
+// Data & Recovery keeps its scroll position while retired source-group state is ignored.
+const accountLayout={cards:[{id:'settings-column-recovery-title',scroll:425}],sourceGroups:['2022 Construction Codes',null,7],profile:'Private profile data'};
 assert.equal(writeWorkspaceResume(storage,'tab-one',context,{view:'account',account:accountLayout}),true);
 const savedAccount=readWorkspaceResume(storage,'tab-one',context).account;
 assert.deepEqual(savedAccount.sourceGroups,['2022 Construction Codes']);
 assert.ok(![...values.values()].join('').includes('Private profile data'));
 const edition={dataset:{sourceGroup:'2022 Construction Codes'},open:false};
-const libraryColumn={getAttribute:()=> 'settings-column-library-title',set scrollTop(value){this.restoredScroll=value;}};
+const recoveryColumn={getAttribute:()=> 'settings-column-recovery-title',set scrollTop(value){this.restoredScroll=value;}};
 const accountScroll={scrollTop:0};
 const accountDialog={isConnected:true,querySelector:()=>accountScroll,
-  querySelectorAll:selector=>selector==='.settings-source-group'?[edition]:[libraryColumn]};
+  querySelectorAll:selector=>selector==='.settings-source-group'?[edition]:[recoveryColumn]};
 startup.toggleAccountDialog=()=>{};
 startup.activeAccount=()=>startup.state.account;
 startup.document={querySelector:()=>accountDialog};
 await startup.restoreWorkspaceAfterRefresh();
-assert.equal(libraryColumn.restoredScroll,425);
+assert.equal(recoveryColumn.restoredScroll,425);
 assert.equal(edition.open,false,'The retired library selector is not reconstructed from a legacy refresh snapshot');
 // Guest authentication is a transient action, not a Settings screen to reopen.
 let guestAccountReopens=0;

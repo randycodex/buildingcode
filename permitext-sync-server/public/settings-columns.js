@@ -1,12 +1,13 @@
-const keys = ['account', 'library', 'recovery'];
-const titles = ['Account', 'Library & offline', 'Data & recovery'];
-const minimums = [360, 480, 360];
-const defaultWeights = [1, 1.5, 1];
+const keys = ['account', 'recovery'];
+const titles = ['Account', 'Data & recovery'];
+const minimums = [360, 360];
+const defaultWeights = [1, 1];
 
 export function normalizeSettingsColumnWidths(value) {
-  return Array.isArray(value) && value.length === 3 &&
-    value.every((width, index) => Number.isFinite(Number(width)) && Number(width) >= minimums[index])
-    ? value.map(Number) : null;
+  const widths = Array.isArray(value) && value.length === 3 ? [value[0], value[2]] : value;
+  return Array.isArray(widths) && widths.length === keys.length &&
+    widths.every((width, index) => Number.isFinite(Number(width)) && Number(width) >= minimums[index])
+    ? widths.map(Number) : null;
 }
 
 export function resizeSettingsColumnPair(widths, index, delta) {
@@ -46,7 +47,7 @@ export function createSettingsColumnResizers(columns, panels, savedWidths, onRes
     columns.classList.remove('is-resizing');
     if (previous?.divider.hasPointerCapture?.(previous.pointerID)) previous.divider.releasePointerCapture(previous.pointerID);
   };
-  for (let index = 0; index < 2; index += 1) {
+  for (let index = 0; index < panels.length - 1; index += 1) {
     const divider = columns.ownerDocument.createElement('div');
     divider.className = 'settings-column-divider';
     divider.setAttribute('role', 'separator');

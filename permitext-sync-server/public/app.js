@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-search-only-filters-v1556";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-offline-in-recovery-v1557";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -27,7 +27,7 @@ import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=202611
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
-import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=2";
+import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=3";
 import { createReaderBlockWindow } from "./reader-block-window.js?v=10";
 import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=4";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-search-only-filters-v1556";
+} from "./offline-storage.js?v=20261108-offline-in-recovery-v1557";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41683,7 +41683,6 @@ function organizeAccountSettings(panel, { floating = false, selected = "account"
     return section;
   };
   const account = column("account", "Account", [profile, plan]);
-  const library = column("library", "Offline", [offline]);
   const recovery = column("recovery", "Data & recovery", [conflicts, data]);
   const actions = document.createElement("div");
   actions.className = "settings-account-actions";
@@ -41698,14 +41697,13 @@ function organizeAccountSettings(panel, { floating = false, selected = "account"
   const trash = data?.querySelector(".settings-trash");
   const projects = data?.querySelector(".settings-project-management");
   const deleteContent = data?.querySelector(".settings-delete-content");
-  data?.append(...[projects, deleteContent, trash].filter(Boolean));
-  scroll.replaceChildren(account, library, recovery);
+  data?.append(...[projects, deleteContent, trash, offline].filter(Boolean));
+  scroll.replaceChildren(account, recovery);
   if (floating) {
     const tabs = createFloatingWorkspaceTabs({
-      id: "settings", label: "Settings categories", selected, onSelect,
+      id: "settings", label: "Settings categories", selected: selected === "library" ? "recovery" : selected, onSelect,
       entries: [
         { id: "account", label: "Account", panel: account },
-        { id: "library", label: "Offline", panel: library },
         { id: "recovery", label: "Data & Recovery", panel: recovery }
       ]
     });
@@ -41713,7 +41711,7 @@ function organizeAccountSettings(panel, { floating = false, selected = "account"
     scroll.before(tabs.element);
     return tabs.dispose;
   }
-  const columnResizers = createSettingsColumnResizers(scroll, [account, library, recovery], state.settingsColumnWidths, (widths) => {
+  const columnResizers = createSettingsColumnResizers(scroll, [account, recovery], state.settingsColumnWidths, (widths) => {
     state.settingsColumnWidths = widths;
     saveWorkspaceState();
   });

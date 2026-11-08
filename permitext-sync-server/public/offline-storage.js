@@ -24,7 +24,7 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v2148";
+const shellCacheName = "permitext-pro-shell-v2149";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
@@ -38,7 +38,7 @@ const shellURLs = [
   "/web/downloaded-library.js?v=15",
   "/web/downloaded-library-worker.js?v=15",
   "/web/downloaded-library-core.js?v=13",
-  "/web/settings-columns.js?v=2",
+  "/web/settings-columns.js?v=3",
   "/web/project-details-columns.js?v=20261021-project-columns-v3",
   "/web/workspace-button-icons.js?v=20261107-floating-settings-icon-v1380",
   "/web/minimal-workflow.js",
@@ -89,7 +89,7 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261108-search-only-filters-v1556",
+  "/web/web-client-version.js?v=20261108-offline-in-recovery-v1557",
   "/web/web-app-update.js?v=2",
   "/web/research-delete-controls.js?v=7",
   "/web/assistant-composer-hint.js?v=1",
@@ -109,18 +109,18 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261108-offline-settings-v119",
+  "/web/styles.css?v=20261108-offline-in-recovery-v120",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261108-search-only-filters-v1556",
+  "/web/app.js?v=20261108-offline-in-recovery-v1557",
   "/web/settings-copy.js?v=20261108-research-remaining-v7",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261108-search-only-filters-v1556",
+  "/web/offline-storage.js?v=20261108-offline-in-recovery-v1557",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",

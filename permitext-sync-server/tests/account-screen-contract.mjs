@@ -53,6 +53,10 @@ function harness(signedIn, pro = signedIn) {
     };
     const profile = category("profile", "account-connector"), plan = category("plan", "settings-plan-card");
     const offline = category("offline", "settings-offline-card"), data = category("data", "settings-data-card"), conflicts = category("conflicts", "settings-sync-conflicts-card");
+    const projects = Object.assign(element(), {className:"settings-project-management"});
+    const saved = Object.assign(element(), {className:"settings-delete-content"});
+    const trash = Object.assign(element(), {className:"settings-trash"});
+    data.append(projects, saved, trash);
     const signOut = Object.assign(element(), { className: "account-clear" });
     const deleteAccount = Object.assign(element(), { className: "account-delete" });
     profile.append(signOut, deleteAccount);
@@ -66,7 +70,7 @@ function harness(signedIn, pro = signedIn) {
     result.append(scroll);
     result.__refreshSettingsWorkspace = () => { result.workspaceRefreshes = (result.workspaceRefreshes || 0) + 1; };
     result.__refreshSettingsTrash = async () => { result.trashRefreshes = (result.trashRefreshes || 0) + 1; };
-    Object.assign(result, { scroll, profile, plan, offline, data, conflicts, signOut, deleteAccount });
+    Object.assign(result, { scroll, profile, plan, offline, data, projects, saved, trash, conflicts, signOut, deleteAccount });
     panels.push(result);
     return result;
   }
@@ -90,6 +94,7 @@ function harness(signedIn, pro = signedIn) {
     selectedSettingsTab: 'account',
     createFloatingWorkspaceTabs({entries,selected,onSelect}) {
       const nav = Object.assign(element(), {className:'floating-workspace-tabs'});
+      nav.labels = entries.map(entry=>entry.label);
       const select = key => { entries.forEach(entry => { entry.panel.hidden = entry.id !== key; }); onSelect(key); };
       select(selected);
       return {element:nav,select,dispose(){}};
@@ -132,13 +137,13 @@ for (const signedIn of [false, true]) {
   assert.equal(panel.headerRemoved, true);
   assert.deepEqual(panel.removedStyles, ["flex"], "Column size must not become the screen height.");
   if (signedIn) {
-    const [account, library, recovery] = panel.scroll.children;
-    assert.equal(panel.scroll.children.length, 3);
+    const [account, recovery] = panel.scroll.children;
+    assert.equal(panel.scroll.children.length, 2);
     assert.deepEqual(account.children.slice(1, 3), [panel.profile, panel.plan]);
-    assert.deepEqual(library.children.slice(1), [panel.offline]);
-    assert.equal(library.children[0].textContent,"Offline");
     assert.equal(recovery.children[0].textContent, "Data & recovery");
     assert.deepEqual(recovery.children.slice(1), [panel.conflicts, panel.data]);
+    assert.deepEqual(panel.data.children, [panel.projects, panel.saved, panel.trash, panel.offline],"Offline follows Trash within Data & Recovery");
+    assert.deepEqual(Array.from(panel.__settingsTabs.element.labels),["Account","Data & Recovery"],"Offline has no separate tab");
     assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");
     assert.equal(account.children.at(-1).children[1], panel.deleteAccount, "One direct action keeps the original deletion confirmation handler.");
   }
@@ -230,7 +235,7 @@ assert.equal(h.dialog().children[1], h.panels[0]);
 assert.equal(h.panels[0].scroll.scrollTop, 240);
 assert.equal(h.panels[0].profile.scrollTop, 25);
 assert.equal(h.panels[0].offline.scrollTop, 360);
-assert.equal(h.panels[0].scroll.children[1].scrollTop, 425, "Offline column position survives a recovery refresh.");
+assert.equal(h.panels[0].scroll.children[1].scrollTop, 425, "Data & Recovery position survives a recovery refresh.");
 assert.equal(h.panels[0].workspaceRefreshes, 1);
 assert.equal(h.panels[0].trashRefreshes, 1);
 assert.equal(projectsSection.open, true);
@@ -270,3 +275,8 @@ expanded.dialog().children[0].children[1].listeners.click();
 expanded.context.toggleAccountDialog();
 assert.ok(expanded.panels[1].scroll.children.every(column => !column.classList.contains("is-collapsed")), "Old collapsed preferences must not hide Settings columns when reopened");
 console.log("Settings tabs retain all category controls and ignore legacy column-collapse preferences.");
+
+const migrated = harness(true);
+migrated.context.selectedSettingsTab = 'library';
+migrated.context.toggleAccountDialog();
+assert.equal(migrated.dialog().dataset.settingsTab,'recovery','The retired Offline tab opens Data & Recovery');

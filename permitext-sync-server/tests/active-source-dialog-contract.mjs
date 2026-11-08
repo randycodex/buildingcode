@@ -6,6 +6,7 @@ const settings=html.slice(html.indexOf('<template id="settings-template"'),html.
 assert.doesNotMatch(settings,/settings-active-sources|Choose sources for Search and browsing/);
 assert.doesNotMatch(app,/function (?:openActiveCodeSourceSettings|wireSettingsActiveCodeSources)\(/);
 assert.doesNotMatch(app,/Manage code sources|Manage browsing library|Library & Offline/);
-assert.match(app,/{ id: "library", label: "Offline", panel: library }/);
+assert.doesNotMatch(app,/{ id: "library", label: "Offline"/);
+assert.match(app,/data\?\.append\(\.\.\.\[projects, deleteContent, trash, offline\]/);
 for(const control of ['settings-offline-download','settings-offline-pause','settings-offline-remove','settings-offline-use']) assert.ok(settings.includes(control),control);
-console.log('Offline-only Settings passed: no source selector or management dialog; Offline tab and download controls retained.');
+console.log('Settings passed: no source selector or management dialog; Offline download controls follow Trash within Data & Recovery.');
