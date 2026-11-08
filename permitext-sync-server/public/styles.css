@@ -11546,6 +11546,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 .project-manager button.is-danger { color: #f16e72; }
 .project-manager-list { min-height: 0; }
 .project-manager-row { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.project-manager-list > .project-manager-row:only-child { border-bottom: 0; }
 .project-manager-row label { display: flex; flex: 1; min-width: 0; gap: 12px; align-items: center; font-size: 14px; text-transform: none; color: var(--text-primary); }
 .project-manager-row input[type="checkbox"] { width: 16px; height: 16px; flex: 0 0 16px; }
 .project-manager-row strong,
