@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-header-settings-only-v1493";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-aligned-workspace-menu-v1494";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-header-settings-only-v1493";
+} from "./offline-storage.js?v=20261107-aligned-workspace-menu-v1494";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2692,7 +2692,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     Math.max(8, rect ? rect.left + (rect.width - menuRect.width) / 2 : (window.innerWidth - menuRect.width) / 2),
     window.innerWidth - menuRect.width - 8
   );
-  const top = Math.min((rect?.bottom || 0) + 6, window.innerHeight - menuRect.height - 8);
+  const top = Math.min(workspaceFloatingPanelReference().bottom + 8, window.innerHeight - menuRect.height - 8);
   menu.style.left = `${left}px`;
   menu.style.top = `${Math.max(8, top)}px`;
   menu.querySelector("button:not(:disabled)")?.focus();
