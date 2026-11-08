@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-search-scope-width-v1551";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-grouped-search-sources-v1552";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-search-scope-width-v1551";
+} from "./offline-storage.js?v=20261108-grouped-search-sources-v1552";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41911,7 +41911,15 @@ async function openSearchCodeSourceSettings(panel) {
     const header = document.createElement("div"); header.className = "search-scope-header";
     const choices = document.createElement("div"); choices.className = "search-scope-choices";
     const controls = [];
+    let currentGroup = "";
     for (const row of activeCodeSourceMenuRows(enabled)) {
+      const group = row.group || "Other installed sources";
+      if (group !== currentGroup) {
+        const heading = document.createElement("h3");
+        heading.textContent = group;
+        choices.append(heading);
+        currentGroup = group;
+      }
       const label = document.createElement("label");
       const check = document.createElement("input"); check.type = "checkbox";
       check.checked = selected.has(codeSourceKey(row.source));
