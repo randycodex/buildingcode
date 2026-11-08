@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-project-control-pills-v1497";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-active-project-pills-v1498";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-project-control-pills-v1497";
+} from "./offline-storage.js?v=20261107-active-project-pills-v1498";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36022,9 +36022,10 @@ function renderProjectManager(container, { onChange = () => {} } = {}) {
     });
     const toolbar = document.createElement("div");
     toolbar.className = "project-manager-toolbar";
-    button(selecting ? "Done" : "Select", () => {
+    const selectionButton = button(selecting ? "Done" : "Select", () => {
       selecting = !selecting; selected.clear(); render();
     }, toolbar, !records.length && !selecting);
+    selectionButton.setAttribute("aria-pressed", String(selecting));
     if (selecting) {
       button(selected.size === records.length && records.length ? "Deselect All" : "Select All", () => {
         if (selected.size === records.length) selected.clear();

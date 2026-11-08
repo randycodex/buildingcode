@@ -18420,11 +18420,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   min-height: 30px;
   padding: 5px 12px;
   border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+  background: transparent;
 }
 .account-screen .settings-project-management .project-manager > nav > button[aria-pressed="true"],
-.account-screen .settings-project-management .project-manager > nav > button:not(:disabled):hover,
-.account-screen .settings-project-management .project-manager-toolbar > button:first-child:not(:disabled):hover {
+.account-screen .settings-project-management .project-manager-toolbar > button:first-child[aria-pressed="true"] {
   background: var(--menu-highlight);
 }
 .account-screen .settings-data-card > details > :not(summary),
