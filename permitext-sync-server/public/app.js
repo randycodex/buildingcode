@@ -5,7 +5,7 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-role-none-label-v1537";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-reader-menu-height-v1538";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -157,7 +157,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-role-none-label-v1537";
+} from "./offline-storage.js?v=20261108-reader-menu-height-v1538";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -8470,10 +8470,13 @@ function openReaderCodePicker(anchor, onSelect) {
   }
   document.body.append(menu);
   if (!centered) {
-    const bounds = anchor.getBoundingClientRect();
-    menu.style.left = `${Math.max(8, Math.min(bounds.left, window.innerWidth - menu.offsetWidth - 8))}px`;
-    menu.style.top = `${bounds.bottom + 8}px`;
-    menu.style.maxHeight = `${window.innerHeight - bounds.bottom - 24}px`;
+    const position = () => {
+      const bounds = anchor.getBoundingClientRect();
+      menu.style.left = `${Math.max(8, Math.min(bounds.left, window.innerWidth - menu.offsetWidth - 8))}px`;
+      menu.style.top = `${bounds.bottom + 8}px`;
+    };
+    position();
+    window.addEventListener("resize", position, { signal: controller.signal });
   }
   document.addEventListener("pointerdown", (event) => {
     if (!menu.contains(event.target) && !anchor.contains(event.target)) close();

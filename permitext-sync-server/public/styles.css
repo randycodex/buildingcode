@@ -87,6 +87,7 @@
   --radius-control: 12px;
   --radius-pill: 999px;
   --workspace-floating-menu-radius: 16px;
+  --workspace-floating-menu-bottom-gap: 42px;
   --space-1: 6px;
   --space-2: 10px;
   --space-3: 14px;
@@ -19445,6 +19446,7 @@ span.reader-collapse-title { cursor: default; }
   max-height: calc(100dvh - 96px);
   transform: translate(-50%, -50%);
 }
+.reader-open-code-menu:not(.is-centered) { bottom: var(--workspace-floating-menu-bottom-gap); }
 .reader-open-code-menu h3 { margin: 18px 0 8px; font-size: 16px; }
 .reader-open-code-menu h3:first-child { margin-top: 0; }
 .reader-open-code-menu > button {
@@ -21341,7 +21343,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .settings-floating-panel .settings-account-column[hidden],
 .workspace-floating-panel .project-information-panel[hidden] { display: none !important; }
 .settings-floating-panel > .web-warning-backdrop.is-column-scoped { padding: 20px; border-radius: inherit; container-type: inline-size; }
-.account-dialog.account-screen.settings-floating-panel { height: auto; bottom: 42px; --account-category-gutter: 20px; --account-category-top-gutter: 0px; --account-scroll-fade-size: var(--space-3); --settings-disclosure-indent: 20px; }
+.account-dialog.account-screen.settings-floating-panel { height: auto; bottom: var(--workspace-floating-menu-bottom-gap); --account-category-gutter: 20px; --account-category-top-gutter: 0px; --account-scroll-fade-size: var(--space-3); --settings-disclosure-indent: 20px; }
 .settings-floating-panel .account-screen-header,
 .workspace-floating-panel .project-details-screen-header {
   display: flex;
