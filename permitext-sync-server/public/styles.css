@@ -5926,9 +5926,7 @@ mark {
   font-weight: inherit;
   line-height: inherit;
   text-align: inherit;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
+  text-decoration: none;
 }
 
 .inline-code-reference:hover,
@@ -18411,6 +18409,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   align-items: center;
   gap: 8px;
   list-style: none;
+  cursor: pointer;
   font-size: var(--settings-type-body);
   font-weight: var(--settings-weight-medium);
   line-height: 1.4;
