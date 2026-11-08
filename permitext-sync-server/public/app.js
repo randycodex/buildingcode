@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-context-edit-pencil-v1565";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-compact-context-edit-v1566";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-context-edit-pencil-v1565";
+} from "./offline-storage.js?v=20261108-compact-context-edit-v1566";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4427,7 +4427,7 @@ function appendProjectOpenQuestions(container, project) {
     items.forEach((item, index) => {
       const row = document.createElement("li");
       for (const [key, label] of [["question", "Question"], ["answer", "Answer"]]) {
-        const input = document.createElement("textarea"); input.rows = key === "question" ? 2 : 3;
+        const input = document.createElement("textarea"); input.rows = 1;
         input.value = item[key]; input.maxLength = key === "question" ? 2000 : 8000;
         input.placeholder = key === "question" ? "What needs to be answered?" : "Add an answer";
         input.setAttribute("aria-label", `${label} ${index + 1}`);
@@ -4487,6 +4487,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   let selectedSection = "context";
   let panelTabs = null;
   let floatingControls = null;
+  let closeProjectEditor = () => {};
   let applyingUpdate = Boolean(options.shouldApply);
   let updateLoaded = false;
   const selectSection = (kind) => {
@@ -4535,13 +4536,21 @@ async function openProjectDetailsScreen(section = null, options = {}) {
           edit.disabled = Boolean(workspaceProject()?.sharedOnly);
           let editor = null;
           let opening = false;
+          let editorRequestID = 0;
+          closeProjectEditor = () => {
+            editorRequestID += 1;
+            editorHost.hidden = true;
+            edit.setAttribute("aria-expanded", "false");
+            editor?.close({ restoreFocus: false });
+          };
           edit.addEventListener("click", async () => {
             if (editor) { editor.close(); return; }
             if (opening || !screen.isCurrent()) return;
             opening = true;
+            const requestID = ++editorRequestID;
             edit.disabled = true;
             try {
-              if (!(await flushProjectInformationPanes()) || !screen.isCurrent()) return;
+              if (!(await flushProjectInformationPanes()) || !screen.isCurrent() || !screen.isOpen() || requestID !== editorRequestID) return;
               const currentProject = workspaceProject();
               if (!currentProject || currentProject.sharedOnly) return;
               const coveredColumns = new Map();
@@ -4550,9 +4559,11 @@ async function openProjectDetailsScreen(section = null, options = {}) {
                 coveredColumns.clear();
               };
               edit.setAttribute("aria-expanded", "true");
+              editorHost.hidden = false;
               editor = showProjectCreateSheet(editorHost, currentProject, {
                 inline: true,
                 onSubmitting: submitting => {
+                  edit.disabled = submitting || Boolean(workspaceProject()?.sharedOnly);
                   for (const [columnKind, column] of panels) {
                     const target = columnKind === "context" ? column.querySelector(".project-overview-context") : column;
                     if (target && submitting) { coveredColumns.set(target, target.inert); target.inert = true; }
@@ -4626,7 +4637,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
       applyingUpdate = false;
       return content;
     },
-    onClose: () => { syncWorkflowNavigation(); },
+    onClose: () => { closeProjectEditor(); syncWorkflowNavigation(); },
     onDispose: () => {
       panelTabs?.dispose();
       floatingControls?.dispose();
@@ -36289,7 +36300,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   syncFolderTypeControls();
   if (options.workspaceProject) overlay.setAttribute("aria-label", "New Project");
   nameInput.focus();
-  return { close: () => { if (!mutationStarted) closeSheet(); } };
+  return { close: closeOptions => { if (!mutationStarted) closeSheet(closeOptions); } };
 }
 
 function appendProjectEmptyCard(content, title, message) {
