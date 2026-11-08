@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-search-card-dividers-v1558";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-property-import-sheet-v1561";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-search-card-dividers-v1558";
+} from "./offline-storage.js?v=20261108-property-import-sheet-v1561";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36048,15 +36048,13 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   propertyLookupStatus.setAttribute("role", "status");
   propertyLookupStatus.setAttribute("aria-live", "polite");
   const propertyImport = document.createElement("button");
-  propertyImport.type = "button"; propertyImport.className = "ghost-button";
-  propertyImport.textContent = "Import existing NYC property records (optional)";
-  const propertyHelp = document.createElement("span"); propertyHelp.className = "project-property-help";
-  propertyHelp.textContent = "Enter proposed-building facts manually in Project details. Imported records describe the existing lot and buildings; they do not describe your proposed design.";
+  propertyImport.type = "button"; propertyImport.className = "ghost-button project-property-import";
+  propertyImport.textContent = "Import ZOLA property records (Optional)";
   propertyImport.addEventListener("click", async () => {
     propertyImport.disabled = true;
     try {await lookupPropertyContext();} finally {if (isCurrent()) propertyImport.disabled = false;}
   });
-  addressLabel.append(addressInput, propertyHelp, propertyImport, propertyLookupStatus);
+  addressLabel.append(addressInput, propertyImport, propertyLookupStatus);
 
   const colorGroup = document.createElement("fieldset");
   colorGroup.className = "project-sheet-colors";

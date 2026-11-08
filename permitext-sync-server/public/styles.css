@@ -11710,12 +11710,24 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 .project-sheet-field .project-property-lookup-status,
 .project-create-sheet > .project-property-lookup-status {
   min-height: 1.2em;
-  padding: var(--space-1) var(--space-2) 0;
+  padding: var(--space-3) var(--space-2);
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.7) !important;
   font-weight: 450;
   line-height: 1.3;
   text-align: center;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.project-property-import {
+  margin-block-start: var(--space-3);
+  justify-content: center;
+  font-size: 12px;
+  white-space: normal;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .project-property-lookup-status:empty {
@@ -21160,9 +21172,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .calculation-draft-tools { display: grid; gap: 10px; margin: 12px 0; }
 .calculation-draft-tools label { display: grid; gap: 6px; font-size: 12px; }
 .calculation-draft-tools select { width: 100%; min-width: 0; }
-.calculation-draft-state, .project-property-help { font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
-.project-property-help { display: block; text-transform: none; letter-spacing: normal; }
-.project-property-help + button { align-self: flex-start; font-size: 12px; white-space: normal; text-align: left; }
+.calculation-draft-state { font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
 .project-fact-group-count { color: var(--text-secondary); font-weight: 400; margin-left: auto; font-size: 11px; }
 .project-facts-panel details.saved-project-structured-group > summary { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 0; }
 .project-facts-panel details.saved-project-structured-group > summary::before { content: '▾'; }

@@ -49,7 +49,7 @@ function harness({ editing = false, inline = false, beforeSave } = {}) {
   if (description) description.value = "Typed description";
   name.events.input();
   // Property lookup is optional and starts only when the user requests import.
-  form.querySelectorAll("button").find(button => button.textContent === "Import existing NYC property records (optional)").events.click();
+  form.querySelectorAll("button").find(button => button.textContent === "Import ZOLA property records (Optional)").events.click();
   return {c, panel, overlay, form, name, address, description, cancel, save, lookup, write, created, updated, notices, callbacks,
     submit: () => form.events.submit(event()),
     resolveLookup: () => lookup.resolve({property: {normalizedAddress: "Normalized address", structuredFacts: [{status: "sourced"}]}})
