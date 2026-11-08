@@ -12802,6 +12802,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .settings-project-row input,
+.account-screen .project-manager-row input[type="checkbox"],
 .account-screen .settings-active-source-row input[type="checkbox"] {
   display: grid;
   width: 18px;
@@ -12816,6 +12817,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .settings-project-row input::after,
+.account-screen .project-manager-row input[type="checkbox"]::after,
 .account-screen .settings-active-source-row input[type="checkbox"]::after {
   color: var(--surface);
   content: "✓";
@@ -12825,12 +12827,14 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .settings-project-row input:checked,
+.account-screen .project-manager-row input[type="checkbox"]:checked,
 .account-screen .settings-active-source-row input[type="checkbox"]:checked {
   border-color: var(--text-primary);
   background: var(--text-primary);
 }
 
 .settings-project-row input:checked::after,
+.account-screen .project-manager-row input[type="checkbox"]:checked::after,
 .account-screen .settings-active-source-row input[type="checkbox"]:checked::after {
   opacity: 1;
 }
@@ -12840,6 +12844,10 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   outline: none;
   box-shadow: none;
 }
+
+.account-screen .project-manager-row input[type="checkbox"] { flex: 0 0 18px; }
+.account-screen .project-manager-row input[type="checkbox"]:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.account-screen .project-manager-row input[type="checkbox"]:disabled { opacity: 0.4; cursor: default; }
 
 .settings-project-copy {
   display: grid;
