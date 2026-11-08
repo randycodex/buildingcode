@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261107-automatic-trash-updates-v87">
+    <link rel="stylesheet" href="/web/styles.css?v=20261107-data-recovery-scope-v89">
     <link rel="stylesheet" href="/web/research-v2.css?v=19">
     <link rel="stylesheet" href="/web/reader-shortcuts.css?v=2">
   </head>
@@ -517,8 +517,10 @@
         </section>
         <section class="settings-card settings-data-card" aria-labelledby="settings-data-title">
           <h3 id="settings-data-title" class="section-label settings-section-title">Data recovery</h3>
+          <p class="settings-recovery-scope">Projects and saved content cover your whole account, across workspaces and code editions.</p>
           <details class="settings-project-management">
             <summary>Projects</summary>
+            <p class="settings-recovery-help">Archiving keeps a Project. Moving it to Trash removes its passage links; saved passages and section notes stay.</p>
             <div class="settings-project-manager-content"></div>
           </details>
           <details class="settings-conversations">
@@ -527,7 +529,7 @@
           </details>
           <details class="settings-trash">
             <summary>Trash</summary>
-            <p class="settings-trash-help">Restore deleted items for 30 days across synced devices. Newer work is kept.</p>
+            <p class="settings-trash-help">Restore deleted items within 30 days. Each entry restores its included items together; newer work is kept. Use Select for permanent deletion.</p>
             <div class="settings-trash-toolbar"></div>
             <p class="settings-trash-status" role="status"></p>
             <div class="settings-trash-list"></div>
@@ -535,26 +537,26 @@
           <details class="settings-delete-content">
             <summary>Saved Content</summary>
             <div class="settings-content-groups">
-              <section class="settings-content-group settings-projects-card" aria-labelledby="settings-projects-title">
+              <section class="settings-content-group settings-projects-card settings-collections-card" aria-labelledby="settings-collections-title" hidden>
                 <div class="settings-projects-heading">
                   <div class="settings-content-copy">
-                    <h4 id="settings-projects-title">Projects</h4>
-                    <p class="settings-content-count" data-content-count="projects"></p>
+                    <h4 id="settings-collections-title">Saved collections</h4>
+                    <p class="settings-content-count" data-content-count="collections"></p>
                   </div>
                   <button class="settings-link-button settings-project-select-all" type="button">Select all</button>
                 </div>
-                <p class="settings-projects-empty" hidden>No Projects yet.</p>
-                <div class="settings-project-list" aria-label="Projects"></div>
+                <div class="settings-project-list" aria-label="Saved collections"></div>
                 <div class="settings-project-actions">
                   <p class="settings-project-selection-status" role="status" hidden></p>
                   <button class="settings-secondary-button settings-project-delete" type="button" hidden disabled>Move to Trash</button>
-                  <button class="settings-secondary-button settings-content-trash settings-project-clear-all" type="button" aria-label="Move all projects to Trash">Move all to Trash</button>
+                  <button class="settings-secondary-button settings-content-trash settings-project-clear-all" type="button" aria-label="Move all saved collections to Trash">Move all to Trash</button>
                 </div>
               </section>
               <section class="settings-content-group settings-content-summary" aria-labelledby="settings-passages-title">
                 <div class="settings-content-copy">
                   <h4 id="settings-passages-title">Saved passages</h4>
                   <p class="settings-content-count" data-content-count="bookmarks"></p>
+                  <p class="settings-content-count">Includes passage links in Projects; section notes stay.</p>
                 </div>
                 <button class="settings-secondary-button settings-content-trash" type="button" data-clear-action="bookmarks" aria-label="Move all saved passages to Trash">Move all to Trash</button>
               </section>
@@ -562,14 +564,16 @@
                 <div class="settings-content-copy">
                   <h4 id="settings-notes-title">Section notes</h4>
                   <p class="settings-content-count" data-content-count="notes"></p>
+                  <p class="settings-content-count">Notes on code sections. Notebook notes and tags stay.</p>
                 </div>
                 <button class="settings-secondary-button settings-content-trash" type="button" data-clear-action="notes" aria-label="Move all section notes to Trash">Move all to Trash</button>
               </section>
               <section class="settings-content-group settings-content-summary" aria-labelledby="settings-searches-title">
                 <div class="settings-content-copy">
-                  <h4 id="settings-searches-title">Recent searches</h4>
+                  <h4 id="settings-searches-title">Recent activity</h4>
+                  <p class="settings-content-count">Recent searches and Recently Viewed; pinned searches stay.</p>
                 </div>
-                <button class="settings-secondary-button settings-content-trash" type="button" data-clear-action="searches" aria-label="Clear Recent Searches">Clear</button>
+                <button class="settings-secondary-button settings-content-trash" type="button" data-clear-action="searches" aria-label="Clear recent activity">Clear</button>
               </section>
             </div>
           </details>
@@ -590,6 +594,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261107-automatic-trash-updates-v1510" type="module"></script>
+    <script src="/web/app.js?v=20261107-data-recovery-scope-v1512" type="module"></script>
   </body>
 </html>

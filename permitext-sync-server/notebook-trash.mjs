@@ -11,7 +11,7 @@ export function isNotebookTrashArtifact(artifact, now = new Date()) {
 
 export function notebookTrashSummary(artifact) {
   return {id: `notebook:${encodeURIComponent(artifact.envelope.id)}:${artifact.envelope.version}`,
-    title: `Note · ${artifact.payload.title || 'Untitled Note'}`, count: 1,
+    title: artifact.payload.title || 'Untitled Note', description: 'Notebook note', count: 1,
     deletedAt: artifact.envelope.deletedAt, expiresAt: artifact.payload._notebookTrash.expiresAt};
 }
 

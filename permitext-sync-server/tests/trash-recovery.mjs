@@ -31,3 +31,19 @@ console.log('Trash recovery: scopes, expiry, ownership, stale writes, newer cont
 
 const deletion={savedItem:{...existing[0].savedItem,updatedAt:now.toISOString(),deletedAt:now.toISOString()}};
 assert.equal(captureTrash('owner',existing,[deletion,{savedItem:{...existing[0].savedItem,updatedAt:'2020-01-01'}}],now).records.length,1,'A stale duplicate cannot hide an accepted deletion');
+
+// Recovery groups expose readable labels without changing which records restore together.
+const folders=captureTrash('owner',existing,[clear('folders')],now);
+assert.equal(trashSummary(folders).title,'Project');
+assert.equal(trashSummary(folders).description,'Project · 1 passage link');
+assert.equal(trashSummary(folders).count,2,'Included links remain in the same recovery group.');
+const collection={...folders,records:folders.records.map(item=>item.kind==='project'?{...item,record:{...item.record,name:'Old saved collection',folderType:'reference'}}:item)};
+assert.equal(trashSummary(collection).title,'Old saved collection');
+assert.equal(trashSummary(collection).description,'Saved collection · 1 passage link');
+assert.equal(trashSummary(notes).title,'1 section note');
+assert.equal(trashSummary(batch).title,'1 saved passage');
+const multiple={...folders,records:[...folders.records,{kind:'project',record:{...base,id:'second',name:'Second Project'}}]};
+assert.equal(trashSummary(multiple).title,'2 Projects');
+assert.equal(trashSummary(multiple).description,'Project, Second Project · 1 passage link');
+assert(!('userID' in trashSummary(multiple)));assert(!('records' in trashSummary(multiple)));
+console.log('Trash labels passed: Project names, saved collections, section notes, linked passages and grouped restoration scope.');

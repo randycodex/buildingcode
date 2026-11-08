@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-automatic-trash-updates-v1510";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-data-recovery-scope-v1512";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-automatic-trash-updates-v1510";
+} from "./offline-storage.js?v=20261107-data-recovery-scope-v1512";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -40288,22 +40288,20 @@ function attachSettingsTrash(panel) {
     retainedRows.forEach((row, id) => { if (!available.has(id)) retainedRows.delete(id); });
     selectAll = selectionCount = restoreSelected = deleteSelected = bulkActions = null;
     list.replaceChildren();
-    const permanent = (container, action, id) => {
+    const permanent = (container, ids) => {
+      if (!ids.length || busy || !isCurrentAccountRequest(identity)) return;
       if (container.querySelector(".settings-trash-confirm")) return;
       const form = document.createElement("div");
       form.className = "settings-trash-confirm";
       const copy = document.createElement("p");
-      copy.textContent = action === "empty"
-        ? "Permanently remove every recovery copy from this account’s Trash? This cannot be undone."
-        : Array.isArray(id) ? `Permanently remove ${id.length} selected recovery copies from this account? This cannot be undone.`
-        : "Permanently remove this recovery copy from the account? This cannot be undone.";
+      copy.textContent = `Permanently delete ${ids.length} selected Trash ${ids.length === 1 ? "entry and its" : "entries and their"} included items? This cannot be undone.`;
       const label = document.createElement("label");
       label.textContent = "Type DELETE to confirm";
       const input = document.createElement("input");
       input.autocomplete = "off";
       input.spellcheck = false;
       label.append(input);
-      const confirm = button("Delete Permanently", () => update(action, id, input.value), true);
+      const confirm = button("Delete Permanently", () => update("purge", ids, input.value), true);
       confirm.classList.add("settings-trash-confirm-button");
       confirm.disabled = true;
       input.addEventListener("input", () => { confirm.disabled = input.value !== "DELETE"; });
@@ -40331,12 +40329,12 @@ function attachSettingsTrash(panel) {
       bulkActions = document.createElement("div");
       bulkActions.className = "settings-trash-bulk-actions";
       restoreSelected = button("Restore Selected", () => update("restore", [...selected]));
-      deleteSelected = button("Delete Selected", () => permanent(bulkActions, "purge", [...selected]), true);
+      deleteSelected = button("Delete Selected", () => permanent(bulkActions, [...selected]), true);
       bulkActions.append(restoreSelected, deleteSelected);
     }
     for (const entry of entries) {
       const retained = retainedRows.get(entry.id);
-      if (retained && retained.selecting === selecting && retained.title === entry.title && retained.expiresAt === entry.expiresAt) {
+      if (retained && retained.selecting === selecting && retained.title === entry.title && retained.description === entry.description && retained.expiresAt === entry.expiresAt) {
         list.append(retained.row);
         continue;
       }
@@ -40388,7 +40386,7 @@ function attachSettingsTrash(panel) {
           for (const item of detail.entry.items) {
             const row = document.createElement("li");
             const kind = item.kind === "project" ? (item.folderType === "reference" ? "Saved collection" : "Project")
-              : ["annotation", "notebookCard"].includes(item.kind) ? "Note" : item.kind === "projectSection" ? "Project evidence" : "Saved passage";
+              : item.kind === "annotation" ? "Section note" : item.kind === "notebookCard" ? "Notebook note" : item.kind === "projectSection" ? "Project passage link" : "Saved passage";
             const meta = document.createElement("p");
             meta.className = "settings-trash-item-meta";
             meta.textContent = [kind, item.codeLabel, item.editionLabel].filter(Boolean).join(" · ");
@@ -40420,24 +40418,19 @@ function attachSettingsTrash(panel) {
         if (!contents.hidden && !loaded) return loadContents();
       });
       const date = document.createElement("p");
-      date.textContent = `Expires ${new Date(entry.expiresAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+      date.textContent = [entry.description, `Expires ${new Date(entry.expiresAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`].filter(Boolean).join(" · ");
       copy.append(title, date);
       const actions = document.createElement("div");
       actions.className = "settings-trash-actions";
-      actions.append(button("Restore", () => update("restore", entry.id)), button("Delete Permanently", () => permanent(row, "purge", entry.id), true));
+      actions.append(button("Restore", () => update("restore", entry.id)));
       row.append(copy);
       if (!selecting) row.append(actions);
       row.append(contents);
-      retainedRows.set(entry.id, {row, selecting, title: entry.title, expiresAt: entry.expiresAt});
+      retainedRows.set(entry.id, {row, selecting, title: entry.title, description: entry.description, expiresAt: entry.expiresAt});
       list.append(row);
     }
     if (selecting) list.append(bulkActions);
     syncSelection();
-    if (entries.length && !selecting) {
-      const empty = button("Empty Trash…", () => permanent(list, "empty"), true);
-      empty.classList.add("settings-trash-empty");
-      list.append(empty);
-    }
   };
   const update = async (action = "list", id, confirmation) => {
     if (busy || !isCurrentAccountRequest(identity)) return;
@@ -42573,13 +42566,13 @@ function renderSettings({ upgrade = false } = {}) {
   const offlineUse = panel.querySelector(".settings-offline-use");
   offlineUse.addEventListener("change", () => useDownloadedLibrary(offlineUse.checked));
   offlinePause.addEventListener("click", () => libraryDownloadController?.abort(new DOMException("Download paused. Resume whenever you are ready.", "AbortError")));
-  const projectList = panel.querySelector(".settings-project-list");
-  const projectEmpty = panel.querySelector(".settings-projects-empty");
-  const projectSelectAll = panel.querySelector(".settings-project-select-all");
-  const projectDelete = panel.querySelector(".settings-project-delete");
-  const projectClearAll = panel.querySelector(".settings-project-clear-all");
-  const projectActions = panel.querySelector(".settings-project-actions");
-  const projectSelectionStatus = panel.querySelector(".settings-project-selection-status");
+  const collectionsCard = panel.querySelector(".settings-collections-card");
+  const collectionList = panel.querySelector(".settings-project-list");
+  const collectionSelectAll = panel.querySelector(".settings-project-select-all");
+  const collectionDelete = panel.querySelector(".settings-project-delete");
+  const collectionClearAll = panel.querySelector(".settings-project-clear-all");
+  const collectionActions = panel.querySelector(".settings-project-actions");
+  const collectionSelectionStatus = panel.querySelector(".settings-project-selection-status");
   const status = panel.querySelector(".settings-status-message");
   wireOperationalSupport(panel);
   const setStatus = (message, isError = false) => {
@@ -42705,58 +42698,51 @@ function renderSettings({ upgrade = false } = {}) {
     });
   };
 
-  let settingsProjects = [];
-  let settingsProjectsIncludeCollections = false;
-  const selectedProjectIDs = new Set();
-  const projectCheckboxes = new Map();
-  const updateProjectSelection = () => {
-    const count = selectedProjectIDs.size;
-    projectSelectAll.textContent = count === settingsProjects.length && count > 0 ? "Clear selection" : "Select all";
-    projectSelectAll.disabled = settingsProjects.length === 0;
-    projectSelectAll.hidden = settingsProjects.length === 0;
-    projectDelete.disabled = count === 0;
-    projectDelete.hidden = count === 0;
-    projectDelete.setAttribute("aria-label", `Move ${count} selected ${count === 1 ? "item" : "items"} to Trash`);
-    projectClearAll.disabled = settingsProjects.length === 0;
-    projectClearAll.hidden = count > 0;
-    projectActions.hidden = settingsProjects.length === 0;
-    projectSelectionStatus.hidden = count === 0;
-    projectSelectionStatus.textContent = count > 0 ? `${count} selected` : "";
-    projectCheckboxes.forEach((checkbox, id) => {
-      checkbox.checked = selectedProjectIDs.has(id);
+  let savedCollections = [];
+  const selectedCollectionIDs = new Set();
+  const collectionCheckboxes = new Map();
+  const updateCollectionSelection = () => {
+    const count = selectedCollectionIDs.size;
+    collectionSelectAll.textContent = count === savedCollections.length && count > 0 ? "Clear selection" : "Select all";
+    collectionSelectAll.disabled = savedCollections.length === 0;
+    collectionSelectAll.hidden = savedCollections.length === 0;
+    collectionDelete.disabled = count === 0;
+    collectionDelete.hidden = count === 0;
+    collectionDelete.setAttribute("aria-label", `Move ${count} selected saved collection${count === 1 ? "" : "s"} to Trash`);
+    collectionClearAll.disabled = savedCollections.length === 0;
+    collectionClearAll.hidden = count > 0;
+    collectionActions.hidden = savedCollections.length === 0;
+    collectionSelectionStatus.hidden = count === 0;
+    collectionSelectionStatus.textContent = count > 0 ? `${count} selected` : "";
+    collectionCheckboxes.forEach((checkbox, id) => {
+      checkbox.checked = selectedCollectionIDs.has(id);
     });
   };
   const refreshSettingsContent = () => {
     if (!isCurrentAccountRequest(settingsIdentity)) return;
     const summary = currentContentSummary();
-    settingsProjects = visibleProjectRecords(summary.projects || [])
+    savedCollections = visibleProjectRecords(summary.projects || [])
+      .filter(project => !folderIsProject(project) && !project.sharedOnly)
       .map((project, sourceIndex) => ({ project, sourceIndex }))
       .sort((left, right) =>
         Number(projectIsArchived(left.project)) - Number(projectIsArchived(right.project)) ||
         left.sourceIndex - right.sourceIndex
       )
       .map(({ project }) => project);
-    const projectIDs = new Set(settingsProjects.map(projectRecordID));
-    selectedProjectIDs.forEach(id => { if (!projectIDs.has(id)) selectedProjectIDs.delete(id); });
-    settingsProjectsIncludeCollections = settingsProjects.some((project) => !folderIsProject(project));
-    panel.querySelector("#settings-projects-title").textContent = settingsProjectsIncludeCollections
-      ? "Projects & collections" : "Projects";
-    projectList.setAttribute("aria-label", settingsProjectsIncludeCollections
-      ? "Projects and saved collections" : "Projects");
-    projectClearAll.setAttribute("aria-label", settingsProjectsIncludeCollections
-      ? "Move all projects and saved collections to Trash" : "Move all projects to Trash");
-    panel.querySelector('[data-content-count="projects"]').textContent = `${settingsProjects.length} total`;
+    const collectionIDs = new Set(savedCollections.map(projectRecordID));
+    selectedCollectionIDs.forEach(id => { if (!collectionIDs.has(id)) selectedCollectionIDs.delete(id); });
+    collectionsCard.hidden = savedCollections.length === 0;
+    panel.querySelector('[data-content-count="collections"]').textContent = `${savedCollections.length} saved collection${savedCollections.length === 1 ? "" : "s"}`;
     const savedPassageCount = bookmarkRecordsForSettings().length;
     const savedProjectLinkCount = (summary.projectSections || []).filter(item => item?.sectionID && !item.deletedAt).length;
     const sectionNoteCount = (summary.annotations || []).filter(item => String(item.noteBody || "").trim()).length;
     panel.querySelector('[data-content-count="bookmarks"]').textContent = `${savedPassageCount} saved · ${savedProjectLinkCount} Project ${savedProjectLinkCount === 1 ? "link" : "links"}`;
-    panel.querySelector('[data-content-count="notes"]').textContent = `${sectionNoteCount} saved · Tags stay`;
+    panel.querySelector('[data-content-count="notes"]').textContent = `${sectionNoteCount} saved`;
     panel.querySelector('[data-clear-action="bookmarks"]').disabled = savedPassageCount === 0 && savedProjectLinkCount === 0;
     panel.querySelector('[data-clear-action="notes"]').disabled = sectionNoteCount === 0;
-    projectList.replaceChildren();
-    projectCheckboxes.clear();
-    projectEmpty.hidden = settingsProjects.length > 0;
-    settingsProjects.forEach((project) => {
+    collectionList.replaceChildren();
+    collectionCheckboxes.clear();
+    savedCollections.forEach((project) => {
       const id = projectRecordID(project);
       const row = document.createElement("label");
       row.className = "settings-project-row";
@@ -42785,14 +42771,14 @@ function renderSettings({ upgrade = false } = {}) {
         row.append(archivedLabel);
       }
       checkbox.addEventListener("change", () => {
-        if (checkbox.checked) selectedProjectIDs.add(id);
-        else selectedProjectIDs.delete(id);
-        updateProjectSelection();
+        if (checkbox.checked) selectedCollectionIDs.add(id);
+        else selectedCollectionIDs.delete(id);
+        updateCollectionSelection();
       });
-      projectCheckboxes.set(id, checkbox);
-      projectList.append(row);
+      collectionCheckboxes.set(id, checkbox);
+      collectionList.append(row);
     });
-    updateProjectSelection();
+    updateCollectionSelection();
   };
   panel.__refreshSettingsContent = refreshSettingsContent;
   panel.__refreshSettingsWorkspace = () => {
@@ -42802,28 +42788,28 @@ function renderSettings({ upgrade = false } = {}) {
     void panel.__refreshSettingsTrash?.();
   };
   refreshSettingsContent();
-  projectSelectAll.addEventListener("click", () => {
-    if (selectedProjectIDs.size === settingsProjects.length) selectedProjectIDs.clear();
-    else settingsProjects.forEach((project) => selectedProjectIDs.add(projectRecordID(project)));
-    updateProjectSelection();
+  collectionSelectAll.addEventListener("click", () => {
+    if (selectedCollectionIDs.size === savedCollections.length) selectedCollectionIDs.clear();
+    else savedCollections.forEach((project) => selectedCollectionIDs.add(projectRecordID(project)));
+    updateCollectionSelection();
   });
-  projectDelete.addEventListener("click", async () => {
+  collectionDelete.addEventListener("click", async () => {
     if (!isCurrentAccountRequest(settingsIdentity)) return;
-    const selectedProjects = settingsProjects.filter((project) => selectedProjectIDs.has(projectRecordID(project)));
-    const count = selectedProjects.length;
+    const selectedCollections = savedCollections.filter((project) => selectedCollectionIDs.has(projectRecordID(project)));
+    const count = selectedCollections.length;
     if (!count) return;
-    const recordLabel = folderRecordCountLabel(selectedProjects);
+    const recordLabel = folderRecordCountLabel(selectedCollections);
     const confirmed = await confirmWebWarning(
       `Move ${recordLabel} to Trash?`,
       `Move ${recordLabel} to Trash across synced devices. Restore within 30 days. Saved passages and notes remain.`,
-      { confirmLabel: "Move to Trash" }
+      { confirmLabel: "Move to Trash", container: panel.closest(".account-dialog") || panel }
     );
     if (!isCurrentAccountRequest(settingsIdentity)) return;
     if (!confirmed) return;
-    projectDelete.disabled = true;
+    collectionDelete.disabled = true;
     try {
       await prepareRecoverableDeletion();
-      for (const project of selectedProjects) {
+      for (const project of selectedCollections) {
         await deleteArchivedProjectData(project);
         requireCurrentAccountRequest(settingsIdentity);
       }
@@ -42834,25 +42820,25 @@ function renderSettings({ upgrade = false } = {}) {
     } catch (error) {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
       setStatus(error.message || `Could not delete ${recordLabel}.`, true);
-      projectDelete.disabled = false;
+      collectionDelete.disabled = false;
     }
   });
-  projectClearAll.addEventListener("click", async () => {
+  collectionClearAll.addEventListener("click", async () => {
     if (!isCurrentAccountRequest(settingsIdentity)) return;
-    const count = settingsProjects.length;
+    const count = savedCollections.length;
     if (!count) return;
-    const recordLabel = folderRecordCountLabel(settingsProjects);
+    const recordLabel = folderRecordCountLabel(savedCollections);
     const confirmed = await confirmWebWarning(
-      settingsProjectsIncludeCollections ? "Move all Projects and saved collections to Trash?" : "Move all Projects to Trash?",
+      "Move all saved collections to Trash?",
       `Move ${recordLabel}, including archived records, to Trash across synced devices. Restore within 30 days. Saved passages and notes remain.`,
-      { confirmLabel: "Move to Trash" }
+      { confirmLabel: "Move to Trash", container: panel.closest(".account-dialog") || panel }
     );
     if (!isCurrentAccountRequest(settingsIdentity)) return;
     if (!confirmed) return;
-    projectClearAll.disabled = true;
+    collectionClearAll.disabled = true;
     try {
       await prepareRecoverableDeletion();
-      for (const project of settingsProjects) {
+      for (const project of savedCollections) {
         await deleteArchivedProjectData(project);
         requireCurrentAccountRequest(settingsIdentity);
       }
@@ -42863,7 +42849,7 @@ function renderSettings({ upgrade = false } = {}) {
     } catch (error) {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
       setStatus(error.message || `Could not delete ${recordLabel}.`, true);
-      projectClearAll.disabled = false;
+      collectionClearAll.disabled = false;
     }
   });
   const paintLibraryDownloadProgress = () => {
@@ -43507,12 +43493,12 @@ function renderSettings({ upgrade = false } = {}) {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
       const action = button.dataset.clearAction;
       const clearActionCopy = {
-        searches: ["Clear recent searches", "This will remove recent searches and Recently Viewed sections from this account across synced devices. Pinned searches will remain. Are you sure?"],
-        bookmarks: ["Move Saved passages to Trash", `${bookmarkRecordsForSettings().length} saved passages and their Project memberships will move to Trash across synced devices. Restore within 30 days. Projects and notes remain.`],
-        notes: ["Move section notes to Trash", `${(currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length} section notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages and tags remain.`]
+        searches: ["Clear recent activity", "This will remove recent searches and Recently Viewed sections from this account across synced devices. Pinned searches will remain. This cannot be undone."],
+        bookmarks: ["Move saved passages and links to Trash", `${bookmarkRecordsForSettings().length} saved passages and ${(currentContentSummary().projectSections || []).filter(item => item?.sectionID && !item.deletedAt).length} passage links will move to Trash across synced devices. Restore within 30 days. Projects, saved collections, and notes remain.`],
+        notes: ["Move section notes to Trash", `${(currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length} section notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages, Notebook notes, and tags remain.`]
       };
       const [title, message] = clearActionCopy[action];
-      const confirmed = await confirmWebWarning(title, message, { confirmLabel: "Confirm" });
+      const confirmed = await confirmWebWarning(title, message, { confirmLabel: action === "searches" ? "Clear activity" : "Move to Trash", container: panel.closest(".account-dialog") || panel });
       if (!confirmed) return;
       const settingsScrollTop = settingsPanelScrollTop(panel);
       const workspaceScrollLeft = track.scrollLeft;
@@ -43522,7 +43508,7 @@ function renderSettings({ upgrade = false } = {}) {
         requireCurrentAccountRequest(settingsIdentity);
         const count = await performSettingsClearAction(action);
         if (action !== "searches") { await prepareRecoverableDeletion(); openTrashAfterSettingsDeletion = true; }
-        setStatus(action === "searches" ? "Recent searches cleared." : `${count} ${action} moved to Trash. Open Trash to undo.`);
+        setStatus(action === "searches" ? "Recent activity cleared." : `${action === "notes" ? `${count} section note${count === 1 ? "" : "s"}` : "Saved passages and passage links"} moved to Trash. Open Trash to restore.`);
         await refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft);
       } catch (error) {
         setStatus(error.message || `Could not clear ${action}.`, true);

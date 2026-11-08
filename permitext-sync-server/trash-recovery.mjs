@@ -48,12 +48,23 @@ export function captureTrash(userID, existing, accepted, now = new Date()) {
 export function trashSummary(batch) {
   const {records, userID, ...summary} = batch;
   const counts = {};
-  for (const {kind} of records) counts[kind] = (counts[kind] || 0) + 1;
-  const labels = [['project','Projects / collections'],['savedItem','saved passages'],['annotation','notes'],['projectSection','Project evidence']];
-  const names = records.filter(item => item.kind === 'project').map(item => String(item.record.name || '').slice(0,80)).filter(Boolean).slice(0,2);
-  const title = labels.filter(([kind]) => counts[kind]).map(([kind,label]) => `${counts[kind]} ${label}`).join(', ')
-    + (names.length ? ` — ${names.join(', ')}` : '');
-  return {...summary, title, count:records.length};
+  for (const {kind,record} of records) {
+    const type = kind === 'project' && record.folderType === 'reference' ? 'collection' : kind;
+    counts[type] = (counts[type] || 0) + 1;
+  }
+  const label = (count, singular, plural = `${singular}s`) => `${count} ${count === 1 ? singular : plural}`;
+  const labels = [['project','Project'],['collection','saved collection'],['savedItem','saved passage'],['annotation','section note']];
+  const folders = records.filter(item => item.kind === 'project');
+  const names = folders.map(item => String(item.record.name || item.record.title || '').replace(/\s+/g,' ').trim().slice(0,200)).filter(Boolean);
+  const oneFolder = folders.length === 1 && !counts.savedItem && !counts.annotation;
+  const title = oneFolder && names[0] ? names[0]
+    : labels.filter(([kind]) => counts[kind]).map(([kind,name]) => label(counts[kind],name)).join(', ')
+      || label(counts.projectSection || 0,'Project passage link');
+  const description = [
+    oneFolder ? (counts.collection ? 'Saved collection' : 'Project') : names.slice(0,2).join(', '),
+    counts.projectSection ? label(counts.projectSection,'passage link') : ''
+  ].filter(Boolean).join(' · ');
+  return {...summary, title, description, count:records.length};
 }
 
 // Only display fields leave storage; recovery records and account identifiers stay private.

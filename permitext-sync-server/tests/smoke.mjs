@@ -498,7 +498,7 @@ async function main() {
         !settingsTemplateSource.includes("All browser changes are synced."),
       "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
-    ["Move all projects to Trash", "Clear Recent Searches", "Move all saved passages to Trash", "Move all section notes to Trash"].forEach((label) => {
+    ["Move all saved collections to Trash", "Clear recent activity", "Move all saved passages to Trash", "Move all section notes to Trash"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
     assert(!settingsTemplateSource.includes("Clear All Tags"), "Web Settings still exposes tag management.");
