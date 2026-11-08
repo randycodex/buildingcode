@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-compact-context-edit-v1566";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-inline-project-questions-v1568";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-compact-context-edit-v1566";
+} from "./offline-storage.js?v=20261108-inline-project-questions-v1568";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4428,6 +4428,7 @@ function appendProjectOpenQuestions(container, project) {
       const row = document.createElement("li");
       for (const [key, label] of [["question", "Question"], ["answer", "Answer"]]) {
         const input = document.createElement("textarea"); input.rows = 1;
+        input.className = `project-open-${key}-input`;
         input.value = item[key]; input.maxLength = key === "question" ? 2000 : 8000;
         input.placeholder = key === "question" ? "What needs to be answered?" : "Add an answer";
         input.setAttribute("aria-label", `${label} ${index + 1}`);
