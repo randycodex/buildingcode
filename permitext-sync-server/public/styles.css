@@ -18510,7 +18510,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   font-weight: var(--settings-weight-medium);
   text-align: left;
 }
-.account-screen .settings-data-card > details > summary::before,
 .account-screen .legacy-workspace-review::before {
   content: "";
   width: 5px;
@@ -18520,7 +18519,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   border-bottom: 1px solid currentColor;
   transform: rotate(-45deg);
 }
-.account-screen .settings-data-card > details[open] > summary::before,
 .account-screen .legacy-workspace-review[aria-expanded="true"]::before { transform: rotate(45deg); }
 .account-screen .settings-data-card .legacy-workspace-recovery > div:not([hidden]) { padding-bottom: 12px; }
 .account-screen .settings-data-card .settings-projects-heading h4 { font-weight: var(--settings-weight-medium); }
