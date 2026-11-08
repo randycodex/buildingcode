@@ -20267,12 +20267,12 @@ dialog.report-export-review {
 .project-details-columns .project-facts-panel .saved-project-structured-group-heading { min-height: 24px; }
 .project-details-columns .project-facts-panel .saved-project-structured-group-label { font-size: 13px; }
 .project-details-columns .project-records-checklist {
+  width: 100%;
   max-width: var(--workspace-content-max-width);
   margin: 0 auto;
   padding: 0;
   border-top: 0;
 }
-.project-details-columns .project-records-checklist > h3 { margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600; }
 .project-details-columns .project-records-checklist > .workflow-help { margin: 0 0 var(--space-2); }
 .project-details-columns .project-records-checklist > [role="status"]:empty { display: none; }
 .project-details-columns .project-records-row {
@@ -21347,6 +21347,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   height: 0;
 }
 .workspace-floating-panel .project-questions-panel .project-open-questions { margin-top: 0; padding-top: 0; border-top: 0; }
+.workspace-floating-panel .project-checklist-help { flex: 0 0 auto; margin: 16px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
 
 /* Conversation cleanup stays beside the Assistant history it affects. */
 .assistant-history-header { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 8px; margin-bottom: 12px; }

@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-questions-heading-v1576";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-checklist-footer-v1578";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-questions-heading-v1576";
+} from "./offline-storage.js?v=20261108-checklist-footer-v1578";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4564,6 +4564,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
         }
         panel.querySelectorAll(".saved-project-structured-fact-value").forEach(input => { input.placeholder = "Not recorded"; });
         const information = panel.querySelector(".project-information-content");
+        const footer = kind === "checklist" ? information?.querySelector(".project-checklist-help") : null;
         if (information) columnBody.append(information);
         const columnHeader = document.createElement("header");
         columnHeader.className = "panel-header project-details-column-header";
@@ -4574,7 +4575,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
         columnHeader.append(columnTitle);
         panel.setAttribute("aria-labelledby", columnTitle.id);
         panel.hidden = false;
-        panel.replaceChildren(columnHeader, columnBody);
+        panel.replaceChildren(columnHeader, columnBody, ...(footer ? [footer] : []));
         panels.set(kind, panel); columns.append(panel);
       }
       panelTabs = createFloatingWorkspaceTabs({
@@ -36662,10 +36663,8 @@ function appendProjectRecordsChecklist(container, project, identity) {
   section.className = "project-records-checklist workflow-section";
   section.dataset.projectEditingState = "true";
   section._projectHasPendingEdits = () => Boolean(pending) || saved !== JSON.stringify(items);
-  const heading = document.createElement("h3");
-  heading.textContent = "Records checklist";
   const copy = document.createElement("p");
-  copy.className = "workflow-help";
+  copy.className = "workflow-help project-checklist-help";
   copy.textContent = "Track records to obtain and review. A reviewed record does not automatically confirm a Project fact.";
   const list = document.createElement("div");
   const status = document.createElement("p");
@@ -36747,7 +36746,7 @@ function appendProjectRecordsChecklist(container, project, identity) {
     }
     render(); autosave();
   });
-  section.append(heading,copy,list,add,suggested,status,retry); container.append(section); render();
+  section.append(list,add,suggested,status,retry,copy); container.append(section); render();
   return { flush: save };
 }
 
