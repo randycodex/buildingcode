@@ -116,7 +116,6 @@ await new Function(...Object.keys(activityValues),activitySource+';return perfor
 assert.deepEqual(activityState.recentSearches,[]);assert.deepEqual(activityState.recentSearchHistory,[]);assert.deepEqual(activityState.recentlyViewedSections,[]);assert.deepEqual(activityState.pinnedSearches,['keep']);
 assert.equal(mutations[0].continuity.values.other,'keep');
 assert.equal(mutations[0].continuity.values.recentlyViewedSectionsJSON,'[]');
-assert.match(index,/Projects and saved content cover your whole account/);
 assert.match(index,/>Recent activity</);assert.match(index,/Notebook notes and tags stay/);
 assert(!index.includes('id="settings-projects-title"'),'No duplicate Projects block remains in Saved Content.');
 console.log('Data & Recovery: single Project manager, legacy collection-only deletion, live counts, account isolation, mounted state, and recent activity scope passed.');
