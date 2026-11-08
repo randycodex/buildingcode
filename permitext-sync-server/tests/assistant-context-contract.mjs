@@ -42,6 +42,7 @@ for (const supplemental of [false, true]) {
     paneIDForUtilityInstance:()=>paneID,researchNewChatDrafts:new Map(),
     researchProjectContextPreview:()=>element('preview'), researchComposerDisclosure:()=>element('disclosure'),
     researchChatPlaceholder:'Ask a question', bindResearchSendShortcut(){}, requestAnimationFrame:fn=>fn(),
+    bindAssistantComposerHint(){},
     scheduleResearchDraftPersistence(){},flushResearchDraftPersistence(){},
     createResearchProgressSession:()=>({stages:new Map()}),renderResearchProgressCard:()=>element('progress'),
     startResearchProgressTimer(){},activeResearchProgress:new Map(),

@@ -5,7 +5,8 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-assistant-composer-cleanup-v1546";
+import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-assistant-contextual-hint-v1547";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -157,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-assistant-composer-cleanup-v1546";
+} from "./offline-storage.js?v=20261108-assistant-contextual-hint-v1547";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -26188,9 +26189,15 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
       informationToggle.focus();
     }
   });
-  container.querySelector(".research-chat-welcome")?.append(information);
   if (researchEnabled) input.placeholder = "Add a passage from Reader to begin…";
-  form.append(composerBox, status);
+  form.append(composerBox, status, information);
+  bindAssistantComposerHint({
+    form, composerBox, input,
+    hasReader: () => Boolean(track.querySelector(".reader-panel")),
+    openReader: () => openReaderFromToolbar(document.querySelector("[data-open-reader]") || input),
+    openSavedEvidence: () => focusUtility("saved"),
+    onError: error => showWebNotice("Assistant action not completed", error.message)
+  });
   container.append(form);
   requestAnimationFrame(resizeComposer);
 }
@@ -26485,19 +26492,9 @@ async function renderResearch(paneID = "utility:analysis") {
     }));
   } else if (draftShowing) {
     panel.classList.add("has-research-composer", "is-new-research-chat");
-    const welcome = document.createElement("div");
-    welcome.className = "research-chat-welcome";
-    const heading = document.createElement("h3");
-    heading.textContent = "Start with a code passage";
-    const introduction = document.createElement("p");
-    introduction.textContent = "Open Reader or Saved Evidence, choose the exact text, then use Ask Assistant to include it. Review the included passages before asking.";
-    const examples = document.createElement("p");
-    examples.className = "research-passage-scope";
-    examples.textContent = "Explain a passage, compare provisions, or clarify their conditions and exceptions.";
-    welcome.append(heading, introduction, researchPassageEntryActions(), examples);
     const progress = document.createElement("div");
     progress.className = "analysis-content assistant-start-progress";
-    assistantBody.append(welcome, progress);
+    assistantBody.append(progress);
     renderNewResearchComposer(assistantBody, true, instance);
     if (draftShowing) requestAnimationFrame(() => assistantBody.querySelector(".research-question-input")?.focus({ preventScroll: true }));
   }
@@ -28623,8 +28620,6 @@ async function renderResearchConversation(conversationID, options = {}) {
     status.textContent = "A pinned enacted source changed. Refresh it above before continuing this chat.";
   } else if (projectContextBlocked) {
     status.textContent = "Review the Project context in the Project column before analyzing.";
-  } else if (passageRequired) {
-    status.textContent = "Add a passage using Research in a Reader column before asking a question.";
   }
   const resizeComposerInput = () => {
     input.style.height = "auto";
@@ -28746,6 +28741,14 @@ async function renderResearchConversation(conversationID, options = {}) {
     busy: researchRequestActive, onFindRelated: () => relatedReview.open()
   }),
     starters, answerMode, composerBox, status, passageScope);
+  if (passageRequired) bindAssistantComposerHint({
+    form: composer, composerBox, input,
+    hasReader: () => Boolean(track.querySelector(".reader-panel")),
+    hasPassage: () => (conversation.sources || []).some(source => source.kind === "selection"),
+    openReader: () => openReaderFromToolbar(document.querySelector("[data-open-reader]") || input),
+    openSavedEvidence: () => focusUtility("saved"),
+    onError: error => showWebNotice("Assistant action not completed", error.message)
+  });
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
     bindResearchEvidenceDivider(content, divider, conversation.id);
