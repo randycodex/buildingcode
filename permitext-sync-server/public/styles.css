@@ -18394,19 +18394,23 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   padding: 24px var(--account-category-gutter) 0;
 }
 .account-screen .settings-offline-download,
-.account-screen .settings-account-actions .account-clear {
+.account-screen .settings-account-actions :is(.account-clear, .account-delete) {
   width: min(250px, 100%);
 }
 .account-screen .settings-account-actions .account-delete {
-  width: auto;
   min-width: 0;
   margin: 0;
   padding: 8px 12px;
-  border: 0;
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--destructive);
   font-size: var(--settings-type-support);
   font-weight: var(--settings-weight-regular);
+}
+.account-screen .settings-account-actions .account-delete:is(:hover, :focus-visible) {
+  background: var(--destructive);
+  color: #fff;
 }
 .account-screen .settings-source-group { margin-inline: calc(-1 * var(--account-category-gutter)); padding-inline: var(--account-category-gutter); border-bottom: 1px solid var(--border); }
 .account-screen .settings-source-group > summary {
@@ -21388,7 +21392,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   background: transparent;
 }
 .settings-floating-panel .settings-footer-links { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-left: auto; }
-.settings-floating-panel .settings-disclaimer { flex: 0 0 100%; margin: 0; white-space: normal; font-size: 11px; }
+.settings-floating-panel .settings-panel .settings-footer .settings-disclaimer { flex: 0 0 100%; margin: 0; white-space: normal; text-align: center; text-wrap: balance; font-size: 11px; }
 .workspace-floating-panel > .report-screen-host { display: flex; flex: 1; min-height: 0; padding: 0; overflow: hidden; }
 .workspace-floating-panel .project-details-content { width: 100%; height: 100%; min-height: 0; margin: 0; }
 .workspace-floating-panel .project-details-columns { display: block; flex: 1; min-height: 0; overflow: hidden; }
