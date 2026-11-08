@@ -11,7 +11,8 @@ const button = {};
 const classes = new Set();
 const shell = {classList: {toggle(name, enabled) { enabled ? classes.add(name) : classes.delete(name); }}, querySelector: () => prompt};
 const context = vm.createContext({
-  isProAccount: () => true,
+  isProAccount: () => Boolean(account),
+  workspaceColumnsRequireProject: () => Boolean(account) && projects.length === 0,
   document: {querySelector: () => shell},
   renderProjectUpdateBadge() {}, detachedProjectWindow: false,
   workspacePrivatePresentationAllowed: () => allowed,
@@ -46,18 +47,18 @@ assert.equal(privateReads, 0, 'Pending/denied private access must not expose cac
 assert.equal(prompt.hidden, true, 'Unverified private access is not proof of an empty account.');
 allowed = true;
 context.renderWorkspaceTabs();
-assert.equal(prompt.hidden, false, 'A verified account with zero Projects can still use the public reading workspace.');
+assert.equal(prompt.hidden, true, 'The workspace-required screen supplies the action without a duplicate overlay.');
 await button.onclick();
 assert.equal(created, 1, 'The optional workspace action remains usable for a verified empty account.');
 panes = [{id: 'reader:pro-loading', view: 'research'}];
 context.renderWorkspaceTabs();
-assert.equal(prompt.hidden, true, 'A Pro Reader also takes precedence over optional project creation.');
+assert.equal(prompt.hidden, true, 'The legacy add-workspace overlay stays out of Pro column gating.');
 panes = [];
 context.renderWorkspaceTabs();
-assert.equal(prompt.hidden, false, 'Closing the last Pro column can reveal the optional workspace action again.');
+assert.equal(prompt.hidden, true, 'The workspace-required screen keeps ownership of the empty state.');
 projects = [{id: 'project:p1', name: 'P1'}];
 context.renderWorkspaceTabs();
 assert.equal(classes.has('has-no-workspace'), false);
 assert.equal(prompt.hidden, true, 'An existing Project keeps its normal workspace navigation.');
 assert.deepEqual(projects, [{id: 'project:p1', name: 'P1'}]);
-console.log('General reading workspace passed: guest/Pro empty accounts, public loading columns, close/reopen, view isolation, private-access fencing and optional project creation.');
+console.log('General workspace shell passed: public Free welcome, no duplicate workspace-required overlay, view isolation and private-access fencing.');

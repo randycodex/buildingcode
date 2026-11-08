@@ -37,8 +37,10 @@ const c = vm.createContext({
   openNotebooks: () => state.notebooks, openReportDrafts: () => state.reportDrafts,
   projectHasOpenNotebook: value => state.notebooks.some(item => item.id === value.id),
   projectHasOpenReportDraft: () => reportOpen,
-  reportScreen: {get projectID(){return project?.id;},close(){reportOpen=false;}},
+  reportScreen: {get projectID(){return project?.id;},isOpen:()=>reportOpen,close(){reportOpen=false;}},
+  syncNotebookNoteTabs() {},
   paneIDForProjectNotebook: value => `notebook:${value.id}`,
+  notebookPaneIDsForProject: value => [`notebook:${value.id}`], notebookColumnsForProject: () => [],
   paneIDForProjectReportDraft: value => `report:${value.id}`,
   confirmNotebookDiscard: async () => discard, confirmReportDraftDiscard: async () => discard,
   syncProjectToolButtonStates: () => c.syncTopbarProjectToolStates(),
@@ -121,7 +123,7 @@ requiresProject = true; c.syncTopbarProjectToolStates();
 for (const [control, label] of [[contextButton, "Context"], [factsButton, "Facts"], [notebookButton, "Notes"], [reportButton, "Report"]]) {
   assert.equal(control.disabled, false, `${label} remains clickable to explain the Project requirement`);
   assert.equal(control.attributes["aria-pressed"], "false");
-  assert.equal(control.title, `Create a Project first to open ${label}`);
+  assert.equal(control.title, `Choose a workspace first to open ${label}`);
 }
 assert.equal(await c.toggleProjectTool("report"), false);
 assert.equal(calls.length, before, "Enabling the control cannot bypass Project ownership");

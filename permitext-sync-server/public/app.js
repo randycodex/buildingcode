@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-live-search-scope-v1553";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-workspace-required-v1555";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-live-search-scope-v1553";
+} from "./offline-storage.js?v=20261108-workspace-required-v1555";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2158,9 +2158,9 @@ function workspaceProject(projects = null) {
 }
 
 function workspaceColumnsRequireProject() {
-  // Reading and searching do not require a Project. Private actions retain
-  // their own project, account and capability checks at the point of use.
-  return false;
+  // Free reading is public. Pro columns belong to the selected workspace;
+  // having other Projects in the account does not select one implicitly.
+  return isProAccount() && !(detachedProjectWindow && detachedProject) && !workspaceProject();
 }
 
 function notifyProjectRequiredForColumn() {
@@ -2713,10 +2713,9 @@ function renderWorkspaceTabs() {
   shell?.classList.toggle("has-no-workspace", empty);
   const emptyState = shell?.querySelector(".workspace-add-empty");
   if (emptyState) {
-    // Project creation is optional while reading. Keep its empty-state prompt
-    // out of the way as soon as a public column opens, including loading shells.
+    // The workspace-required state provides its own choose/create action.
     emptyState.hidden = !isProAccount() || !empty || currentColumnWorkflowView() !== "research" ||
-      defaultActivePaneIDs().some(workflowPaneIsVisible);
+      workspaceColumnsRequireProject() || defaultActivePaneIDs().some(workflowPaneIsVisible);
     emptyState.querySelector("button").disabled = !isProAccount();
     emptyState.querySelector("button").onclick = () => { void createNewWorkspace(); };
   }
@@ -2782,6 +2781,7 @@ function genericWorkboardIsOpen() {
 
 async function openGenericWorkboard() {
   if (!releaseSurfaceVisibility.workboard && !detachedProjectWindow) return false;
+  if (notifyProjectRequiredForColumn()) return false;
   const paneID = paneIDForProjectWorkboard(genericWorkboardIdentity);
   state.workboards = [genericWorkboardIdentity];
   state.paneWeights[paneID] ||= defaultWorkboardPaneWidth;
@@ -5883,7 +5883,7 @@ function syncTopbarProjectToolStates() {
     const sharedReport = Boolean(label === "Report" && identity?.sharedOnly);
     button.disabled = projectToolTogglePending || (!requiresProject && (!identity || !hasCapability(capability) || sharedReport));
     button.setAttribute("aria-pressed", String(label === "Report" ? reportScreen?.isOpen() === true : opened));
-    button.title = requiresProject ? `Create a Project first to open ${label}`
+    button.title = requiresProject ? `Choose a workspace first to open ${label}`
       : !identity ? `Choose a Project to open ${label}`
       : !hasCapability(capability) ? `${label} requires Pro`
       : sharedReport ? "Report editing is unavailable for shared-only Projects."
@@ -9604,7 +9604,7 @@ function syncReaderToolbarButton(button) {
   button.dataset.mobileLabel = readerLabel;
   button.hidden = button.id === "free-reader" ? pro || state.readers.length === 0 : !pro;
   button.disabled = false;
-  button.title = requiresProject ? "Create a Project first to open Reader" : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader beside this view" : "Choose a code for Reader";
+  button.title = requiresProject ? "Choose a workspace first to open Reader" : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader beside this view" : "Choose a code for Reader";
   button.classList.toggle("has-open-reader", state.readers.length > 0);
   button.setAttribute("aria-label", readerLabel);
 }
@@ -44308,20 +44308,25 @@ function completeFirstUseWelcome() {
 function renderProjectRequiredWorkspace() {
   const welcome = document.createElement("section");
   welcome.className = "workspace-empty-state workspace-empty-guidance";
-  welcome.setAttribute("aria-label", "Project required");
+  welcome.setAttribute("aria-label", "Workspace required");
+  const canChoose = workspacePrivatePresentationAllowed() && visibleWorkspaceRecords().length > 0;
   const content = document.createElement("div");
   const actions = document.createElement("div");
   actions.className = "workspace-empty-actions";
   const create = document.createElement("button");
   create.type = "button";
-  create.textContent = "Create Project";
+  create.textContent = canChoose ? "Choose workspace" : "add workspace";
   create.disabled = !isProAccount();
-  create.addEventListener("click", () => { void createNewWorkspace(); });
+  create.addEventListener("click", event => {
+    event.stopPropagation();
+    if (canChoose) void openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
+    else void createNewWorkspace();
+  });
   actions.append(create);
   const message = document.createElement("p");
   message.className = "workspace-project-required-message";
   message.setAttribute("role", "alert");
-  message.textContent = "Create a Project first to open workspace columns.";
+  message.textContent = "Choose a workspace before opening columns.";
   message.hidden = !projectRequiredColumnNoticeVisible;
   content.append(actions, message);
   welcome.append(content);
@@ -49042,8 +49047,8 @@ function restoreAssistantConversationOwners() {
 }
 
 function workspacePaneDescriptors(options = {}) {
-  restoreAssistantConversationOwners();
   if (workspaceColumnsRequireProject()) return [];
+  restoreAssistantConversationOwners();
   const foundationScope = createInitialProjectFoundationScope();
   const descriptors = [];
   const add = (id, label, load, close, extra = {}) => descriptors.push({
@@ -49297,7 +49302,7 @@ async function transitionWorkspace(mode = "default", options = {}) {
 async function toggleUtilityPane(key) {
   if (!isProAccount() && key !== "settings") return false;
   if (key === "settings") { toggleAccountDialog(); return; }
-  if (workspaceColumnsRequireProject()) return;
+  if (notifyProjectRequiredForColumn()) return false;
   if (key === "analysis" && state.utilities.analysis) {
     await closeResearchWorkspace();
     return;
@@ -49423,7 +49428,7 @@ async function closeAllColumns() {
 async function focusUtility(key, selector = "") {
   if (!isProAccount() && key !== "settings") return false;
   if (key === "settings") { if (!document.querySelector(".account-dialog")) toggleAccountDialog(); return; }
-  if (workspaceColumnsRequireProject()) return;
+  if (notifyProjectRequiredForColumn()) return false;
   let paneID = "";
   if (repeatableUtilityKeys.has(key)) {
     let instance = (state.utilityInstances || []).find((item) => item.key === key &&
@@ -49450,6 +49455,7 @@ async function focusUtility(key, selector = "") {
 
 async function openNewSearchColumn() {
   if (!isProAccount()) return false;
+  if (notifyProjectRequiredForColumn()) return false;
   await toggleUtilityPane("search");
   const instance = (state.utilityInstances || []).filter((item) => item.key === "search").at(-1);
   if (!instance) return;
@@ -49468,7 +49474,7 @@ function rememberUtilityColumn(paneID) {
 
 async function openNewResearchColumn() {
   if (!isProAccount()) return false;
-  if (workspaceColumnsRequireProject()) return;
+  if (notifyProjectRequiredForColumn()) return false;
   const instance = newUtilityInstance("analysis");
   state.utilityInstances.push(instance);
   const paneID = paneIDForUtilityInstance(instance);
@@ -49481,7 +49487,7 @@ async function openNewResearchColumn() {
 
 async function focusRecentUtilityColumn(key) {
   if (!isProAccount() && key !== "settings") return false;
-  if (workspaceColumnsRequireProject()) return;
+  if (notifyProjectRequiredForColumn()) return false;
   const instances = (state.utilityInstances || []).filter((item) => item.key === key);
   const recent = recentUtilityColumns.get(`${activeAccount()?.userID || "public"}:${activeWorkspaceID}:${key}`);
   const instance = instances.find((item) => paneIDForUtilityInstance(item) === recent) || instances.at(-1);
@@ -49531,7 +49537,8 @@ function workspaceCommandDefinitions() {
     { label: "Reset Layout", hint: "Restore default panel widths", run: () => resetVisibleColumnWidths() }
   ];
   if (workspaceColumnsRequireProject()) return [
-    { label: "Create Project", hint: "Start a project workspace", run: () => createNewWorkspace() },
+    { label: "Choose workspace", hint: "Select a workspace before opening columns", run: () => openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton) },
+    { label: "add workspace", hint: "Create a new workspace", run: () => createNewWorkspace() },
     { label: "Open Settings", hint: "Account, library, offline, and data recovery", run: () => focusUtility("settings") }
   ];
   return [
