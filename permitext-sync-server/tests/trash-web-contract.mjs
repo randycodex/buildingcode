@@ -119,6 +119,9 @@ assert.equal(secondTitle.getAttribute('aria-expanded'),'true','A stale Account c
 await list.children[0].querySelector('.settings-trash-actions').children[0].fire('click');
 assert.equal(requests.length,requestCount,'A stale Account view cannot mutate recovery copies.');
 current=true;await nodes['.settings-trash-refresh'].fire('click');
+assert.equal(list.children[1].querySelector('.settings-trash-title'),secondTitle,'Refreshing retains the mounted row and its inspected contents.');
+entries[0]={...entries[0],title:'Fresh recovery copy'};
+await nodes['.settings-trash-refresh'].fire('click');
 holdInspection=true;
 const staleContents=list.children[0].querySelector('.settings-trash-contents');
 const pendingInspection=list.children[0].querySelector('.settings-trash-title').fire('click');

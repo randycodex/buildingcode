@@ -108,7 +108,7 @@ h.refresh();
 assert.equal(h.controls.projectList.children[0].children.length,2,'Restoring a project removes its Archived badge in place.');
 h.setCurrent(false);h.content.projects=[];h.refresh();
 assert.equal(h.controls.projectList.children.length,1,'A response from a previous account cannot change this Settings view.');
-assert.match(settings,/onChange: \(\) => \{\s*refreshSettingsContent\(\);\s*panel\.__refreshSettingsTrash\?\.\(\);/,'Inline project actions refresh Saved Content and open Trash.');
+assert.match(settings,/onChange: async \(\) => \{\s*refreshSettingsContent\(\);\s*await panel\.__refreshSettingsTrash\?\.\(\);/,'Inline project actions refresh Saved Content and await the open Trash update.');
 console.log('Saved content management: selection, scope, live project removal and restore, counts, retained content and account fencing passed.');
 
 // A workspace can be created while the same Settings screen is still mounted.

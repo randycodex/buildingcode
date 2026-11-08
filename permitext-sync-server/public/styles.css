@@ -18453,6 +18453,13 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   justify-self: start;
 }
 .account-screen .settings-data-card :is(.settings-secondary-button, .settings-link-button):not(.legacy-workspace-review):hover { background: var(--menu-highlight); }
+.account-screen .settings-data-card :is(.project-manager-selection, .settings-trash-select) {
+  min-height: 30px;
+  padding: 5px 12px;
+  font: inherit;
+  font-size: inherit !important;
+  line-height: normal;
+}
 .account-screen .settings-data-card .is-danger { color: var(--destructive); }
 .account-screen .settings-data-card .settings-project-delete { color: var(--text-secondary); }
 .account-screen .settings-data-card .settings-project-delete:not(:disabled):hover { color: var(--destructive); }

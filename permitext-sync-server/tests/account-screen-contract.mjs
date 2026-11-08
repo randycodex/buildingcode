@@ -44,6 +44,7 @@ function harness(signedIn, pro = signedIn) {
   }
   function panel() {
     const result = element();
+    result.className = "settings-panel";
     result.style.owner = result;
     const category = (id, className) => {
       const card = Object.assign(element(), { scrollTop: 0, className: `settings-card ${className}` });
@@ -64,6 +65,8 @@ function harness(signedIn, pro = signedIn) {
       : selector === '[data-account-mode="signIn"]' ? signInButton : find(selector);
     result.append(scroll);
     result.__refreshActiveCodeSources = async () => { result.sourcesReady = true; };
+    result.__refreshSettingsWorkspace = () => { result.workspaceRefreshes = (result.workspaceRefreshes || 0) + 1; };
+    result.__refreshSettingsTrash = async () => { result.trashRefreshes = (result.trashRefreshes || 0) + 1; };
     Object.assign(result, { scroll, profile, plan, sources, offline, data, conflicts, signOut, deleteAccount });
     panels.push(result);
     return result;
@@ -207,26 +210,49 @@ const guestUpgrade = harness(false);
 guestUpgrade.context.toggleAccountDialog({ upgrade: true });
 assert.equal(guestUpgrade.checkoutStarts.length, 0, 'Guests review Pro and authenticate before checkout');
 
-// Content recovery refreshes must retain the screen's close action and scroll location.
+// Content recovery updates keep the floating panel, disclosures, edits, and scroll mounted.
 const h = harness(true);
 h.context.toggleAccountDialog();
 h.panels[0].scroll.scrollTop = 240;
 h.panels[0].profile.scrollTop = 25;
 h.panels[0].sources.scrollTop = 360;
 h.panels[0].scroll.children[1].scrollTop = 425;
+const projectsSection = h.context.document.createElement("details");
+projectsSection.open = true;
+const trashSection = h.context.document.createElement("details");
+trashSection.open = true;
+h.panels[0].data.append(projectsSection, trashSection);
+h.panels[0].profile.unsavedDraft = "Keep this edit";
 assert.equal(h.context.settingsPanelScrollTop(h.panels[0]), 240);
 await h.context.refreshWorkspaceAfterSettingsClear(240, 350);
-assert.equal(h.dialog().children[1], h.panels[1]);
-assert.equal(h.panels[1].scroll.scrollTop, 240);
-assert.equal(h.panels[1].profile.scrollTop, 25);
-assert.equal(h.panels[1].sources.scrollTop, 360);
-assert.equal(h.panels[1].scroll.children[1].scrollTop, 425, "Library column position survives a recovery refresh.");
-assert.equal(h.panels[1].sourcesReady, true);
-assert.equal(h.panels[1].plan.scrollTop, 0);
+assert.equal(h.panels.length, 1, "Restoring content must not reconstruct Settings.");
+assert.equal(h.dialog().children[1], h.panels[0]);
+assert.equal(h.panels[0].scroll.scrollTop, 240);
+assert.equal(h.panels[0].profile.scrollTop, 25);
+assert.equal(h.panels[0].sources.scrollTop, 360);
+assert.equal(h.panels[0].scroll.children[1].scrollTop, 425, "Library column position survives a recovery refresh.");
+assert.equal(h.panels[0].sourcesReady, undefined, "Recovery does not reload unrelated source controls.");
+assert.equal(h.panels[0].workspaceRefreshes, 1);
+assert.equal(h.panels[0].trashRefreshes, 1);
+assert.equal(projectsSection.open, true);
+assert.equal(trashSection.open, true);
+assert.equal(h.panels[0].profile.unsavedDraft, "Keep this edit");
+assert.equal(h.panels[0].plan.scrollTop, 0);
 assert.equal(h.track.scrollLeft, 350);
 assert.equal(h.transitions[0].options.refreshPaneIDs.join(","), "reader:one,utility:saved");
 h.dialog().children[0].children[1].listeners.click();
 assert.equal(h.dialog(), null);
+const legacyRecovery = harness(true);
+legacyRecovery.context.toggleAccountDialog();
+legacyRecovery.dialog().className = "account-dialog account-screen account-workspace-view";
+await legacyRecovery.context.refreshWorkspaceAfterSettingsClear(0, 0);
+assert.equal(legacyRecovery.panels.length, 2, "The legacy full-screen recovery path remains available.");
+const revokedRecovery = harness(true);
+revokedRecovery.context.toggleAccountDialog();
+revokedRecovery.context.transitionWorkspace = async () => revokedRecovery.revokeAccount();
+await revokedRecovery.context.refreshWorkspaceAfterSettingsClear(0, 0);
+assert.equal(revokedRecovery.dialog(), null);
+assert.equal(revokedRecovery.panels.length, 1, "An account change cannot refresh a different user's Settings.");
 console.log("Account screen passed: signed-in/guest lifecycle, original controls, close/Escape, nested keyboard handling, and independent category scroll restoration.");
 
 const expanded = harness(true);

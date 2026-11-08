@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-trash-selection-v1507";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-retained-recovery-menu-v1508";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-trash-selection-v1507";
+} from "./offline-storage.js?v=20261107-retained-recovery-menu-v1508";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36086,6 +36086,8 @@ function renderProjectManager(container, { onChange = () => {} } = {}) {
     const run = async (kind) => {
       const chosen = records.filter((project) => selected.has(projectRecordID(project)));
       if (!chosen.length || busy) return;
+      const settingsScroller = dialog.closest?.(".settings-account-column");
+      const settingsScrollTop = settingsScroller?.scrollTop;
       busy = true; render();
       try {
         if (kind === "delete") {
@@ -36109,8 +36111,9 @@ function renderProjectManager(container, { onChange = () => {} } = {}) {
         if (isCurrentAccountRequest(requestIdentity)) await showWebNotice("Could not update projects", error.message);
       } finally {
         busy = false; render();
-        if (isCurrentAccountRequest(requestIdentity)) onChange();
-        dialog.querySelector(".project-manager-selection")?.focus();
+        if (isCurrentAccountRequest(requestIdentity)) await onChange();
+        if (settingsScroller?.isConnected) settingsScroller.scrollTop = settingsScrollTop;
+        dialog.querySelector(".project-manager-selection")?.focus({ preventScroll: true });
       }
     };
     if (selecting) {
@@ -40250,6 +40253,7 @@ function attachSettingsTrash(panel) {
   const identity = captureAccountRequest();
   let busy = false, selecting = false, entries = [];
   const selected = new Set();
+  const retainedRows = new Map();
   let selectAll, selectionCount, restoreSelected, deleteSelected, bulkActions;
   const button = (label, click, danger = false) => {
     const element = document.createElement("button");
@@ -40282,6 +40286,7 @@ function attachSettingsTrash(panel) {
   const render = () => {
     const available = new Set(entries.map(entry => entry.id));
     selected.forEach(id => { if (!available.has(id)) selected.delete(id); });
+    retainedRows.forEach((row, id) => { if (!available.has(id)) retainedRows.delete(id); });
     selectAll = selectionCount = restoreSelected = deleteSelected = bulkActions = null;
     list.replaceChildren();
     const permanent = (container, action, id) => {
@@ -40331,6 +40336,11 @@ function attachSettingsTrash(panel) {
       bulkActions.append(restoreSelected, deleteSelected);
     }
     for (const entry of entries) {
+      const retained = retainedRows.get(entry.id);
+      if (retained && retained.selecting === selecting && retained.title === entry.title && retained.expiresAt === entry.expiresAt) {
+        list.append(retained.row);
+        continue;
+      }
       const row = document.createElement("div");
       row.className = `settings-trash-entry${selecting ? " is-selecting" : ""}`;
       if (selecting) {
@@ -40419,6 +40429,7 @@ function attachSettingsTrash(panel) {
       row.append(copy);
       if (!selecting) row.append(actions);
       row.append(contents);
+      retainedRows.set(entry.id, {row, selecting, title: entry.title, expiresAt: entry.expiresAt});
       list.append(row);
     }
     if (selecting) list.append(bulkActions);
@@ -40431,6 +40442,8 @@ function attachSettingsTrash(panel) {
   };
   const update = async (action = "list", id, confirmation) => {
     if (busy || !isCurrentAccountRequest(identity)) return;
+    const settingsScroller = details.closest?.(".settings-account-column");
+    const settingsScrollTop = settingsScroller?.scrollTop;
     busy = true;
     refresh.disabled = selection.disabled = true;
     list.querySelectorAll("button, input").forEach(control => { control.disabled = true; });
@@ -40448,18 +40461,17 @@ function attachSettingsTrash(panel) {
       }
       if (!result) return;
       entries = result.entries;
+      status.textContent = entries.length ? "" : "Trash is empty.";
       if (action !== "list") { selecting = false; selected.clear(); }
       if (action === "restore") {
         render();
         if (ids.some(entryID => entryID?.startsWith("notebook:"))) notebookCatalogs.clear();
         await loadSyncedContent({force: true, skipOutbox: true});
         requireCurrentAccountRequest(identity);
-        openTrashAfterSettingsDeletion = true;
         await refreshWorkspaceAfterSettingsClear(settingsPanelScrollTop(panel), track.scrollLeft);
         return;
       }
       panel.__refreshSettingsContent?.();
-      status.textContent = entries.length ? "" : "Trash is empty.";
       render();
     } catch (error) {
       if (!isCurrentAccountRequest(identity)) return;
@@ -40479,6 +40491,7 @@ function attachSettingsTrash(panel) {
       // A retry must not enable an unconfirmed permanent deletion.
       list.querySelectorAll("button, input").forEach(control => { if (!control.classList.contains("settings-trash-confirm-button")) control.disabled = false; });
       syncSelection();
+      if (settingsScroller?.isConnected) settingsScroller.scrollTop = settingsScrollTop;
     }
   };
   syncSelection();
@@ -41392,7 +41405,10 @@ function refreshOpenSettingsWorkspace() {
 }
 
 async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft) {
+  const identity = captureAccountRequest();
   const accountScreen = document.querySelector(".account-screen[open]");
+  const mountedPanel = accountScreen?.classList.contains("settings-floating-panel")
+    ? accountScreen.querySelector(".settings-panel") : null;
   const categoryScrollTops = new Map(Array.from(accountScreen?.querySelectorAll(".settings-card, .settings-account-column") || [], card => [
     card.getAttribute("aria-labelledby"), card.scrollTop
   ]));
@@ -41401,6 +41417,7 @@ async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceSc
   ]));
   const refreshPaneIDs = activePaneIDs().filter((paneID) => paneID !== "utility:settings");
   await transitionWorkspace("utility", { refreshPaneIDs });
+  if (!isCurrentAccountRequest(identity)) return;
   const settingsPanel = track.querySelector('.workspace-panel[data-pane-id="utility:settings"]');
   const settingsScroller = settingsPanel?.querySelector(".settings-scroll") || settingsPanel;
   if (settingsScroller) settingsScroller.scrollTop = Math.min(
@@ -41411,6 +41428,16 @@ async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceSc
     workspaceScrollLeft,
     Math.max(0, track.scrollWidth - track.clientWidth)
   );
+  if (mountedPanel && document.querySelector(".account-screen[open]") === accountScreen) {
+    mountedPanel.__refreshSettingsWorkspace?.();
+    await mountedPanel.__refreshSettingsTrash?.();
+    if (!isCurrentAccountRequest(identity) || document.querySelector(".account-screen[open]") !== accountScreen) return;
+    mountedPanel.querySelector(".settings-scroll").scrollTop = settingsScrollTop;
+    mountedPanel.querySelectorAll(".settings-card, .settings-account-column").forEach(card => {
+      card.scrollTop = categoryScrollTops.get(card.getAttribute("aria-labelledby")) || 0;
+    });
+    return;
+  }
   const dialog = document.querySelector(".account-screen[open]");
   if (dialog && activeAccount()) {
     const refreshed = renderSettings();
@@ -42317,9 +42344,9 @@ function renderSettings({ upgrade = false } = {}) {
     content.inert = !allowed;
     if (!allowed || !manageProjects.open) return;
     renderProjectManager(content, {
-      onChange: () => {
+      onChange: async () => {
         refreshSettingsContent();
-        panel.__refreshSettingsTrash?.();
+        await panel.__refreshSettingsTrash?.();
       }
     });
   };
