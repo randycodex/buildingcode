@@ -3,7 +3,8 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=17";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-settings-source-row-spacing-v1521";
+import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=2";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-email-updates-menu-v1523";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +156,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-settings-source-row-spacing-v1521";
+} from "./offline-storage.js?v=20261108-email-updates-menu-v1523";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41805,13 +41806,15 @@ function mountAccountScreenContent(dialog, panel) {
   panel.querySelector(".panel-header")?.remove();
   dialog._disposeSettingsColumns?.();
   dialog._disposeLibraryDownloadProgress?.();
+  dialog._disposeInlineProfileEditor?.();
+  dialog._disposeInlineProfileEditor = panel._disposeInlineProfileEditor;
   dialog._disposeLibraryDownloadProgress = panel._disposeLibraryDownloadProgress;
   const upgrade = dialog.dataset.proUpgrade === "true";
   const signIn = dialog.dataset.signIn === "true";
   const floating = dialog.classList.contains("settings-floating-panel");
   dialog._disposeSettingsColumns = upgrade ? null : organizeAccountSettings(panel, {
     floating, selected: dialog.dataset.settingsTab || selectedSettingsTab,
-    onSelect: key => { dialog.dataset.settingsTab = key; selectedSettingsTab = key; }
+    onSelect: key => { panel._disposeInlineProfileEditor?.(); dialog.dataset.settingsTab = key; selectedSettingsTab = key; }
   });
   const header = document.createElement("header");
   header.className = "account-screen-header";
@@ -41877,6 +41880,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
     dialog._disposeSettingsColumns?.();
     dialog._floatingControls?.dispose();
     dialog._disposeLibraryDownloadProgress?.();
+    dialog._disposeInlineProfileEditor?.();
     dialog.remove();
     coveredState.forEach((inert, element) => { element.inert = inert; });
     if (!floating) state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
@@ -42271,38 +42275,63 @@ function renderSettings({ upgrade = false } = {}) {
     requireCurrentAccountRequest(settingsIdentity);
   };
   const beginInlineProfileEdit = (row) => {
-    if (!profileSetupSupported() || activeInlineProfileEditor?.row === row) return;
+    if (!profileSetupSupported()) return;
+    if (activeInlineProfileEditor?.row === row) {
+      if (row.dataset.profileEdit === "productEmailOptIn") activeInlineProfileEditor.cancel();
+      return;
+    }
     activeInlineProfileEditor?.cancel();
     const account = activeAccount();
     const value = row.querySelector("dd");
     if (!account || !value) return;
     const field = row.dataset.profileEdit;
     let settled = false;
-    const cancel = () => {
+    let preferenceMenu = null;
+    const cancel = ({ refresh = true } = {}) => {
       if (settled) return;
       settled = true;
+      preferenceMenu?.destroy();
       activeInlineProfileEditor = null;
       row.classList.remove("is-editing", "is-saving");
-      syncAccountState();
+      if (refresh) syncAccountState();
     };
     const finish = async (patch) => {
       if (settled) return;
       settled = true;
+      preferenceMenu?.destroy();
+      let failure = null;
       try {
         await saveInlineProfilePatch(row, patch);
         accountCopy.textContent = "";
         accountCopy.hidden = true;
       } catch (error) {
-        accountCopy.textContent = error.message || "Could not save your profile.";
-        accountCopy.hidden = false;
+        failure = error.message || "Could not save your profile.";
       } finally {
         activeInlineProfileEditor = null;
         row.classList.remove("is-editing", "is-saving");
-        if (isCurrentAccountRequest(settingsIdentity)) syncAccountState();
+        if (isCurrentAccountRequest(settingsIdentity)) {
+          syncAccountState();
+          if (failure) { accountCopy.textContent = failure; accountCopy.hidden = false; }
+        }
       }
     };
     activeInlineProfileEditor = { row, cancel };
     row.classList.add("is-editing");
+    if (field === "productEmailOptIn") {
+      closeActiveCustomSelect();
+      preferenceMenu = openProfilePreferenceMenu({
+        trigger: row, anchor: value, label: row.querySelector("dt").textContent,
+        value: account.productEmailOptIn === true,
+        options: [{ label: "Subscribed", value: true }, { label: "Off", value: false }],
+        onSelect: subscribed => {
+          if (subscribed === (account.productEmailOptIn === true)) cancel();
+          else void finish({ productEmailOptIn: subscribed });
+        },
+        onDismiss: cancel,
+        onTab: backward => focusAdjacentDocumentControl(row, backward)
+      });
+      return;
+    }
     value.replaceChildren();
 
     if (field === "displayName") {
@@ -42393,30 +42422,23 @@ function renderSettings({ upgrade = false } = {}) {
       return;
     }
 
-    const select = document.createElement("select");
-    select.className = "account-identity-inline-select";
-    select.setAttribute("aria-label", "Product emails");
-    select.add(new Option("Subscribed", "true"));
-    select.add(new Option("Off", "false"));
-    select.value = account.productEmailOptIn === true ? "true" : "false";
-    select.addEventListener("change", () => void finish({ productEmailOptIn: select.value === "true" }));
-    select.addEventListener("blur", cancel);
-    select.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") { event.preventDefault(); cancel(); }
-    });
-    value.append(select);
-    select.focus();
   };
+  panel._disposeInlineProfileEditor = () => activeInlineProfileEditor?.cancel({ refresh: false });
   editableAccountRows.forEach((row) => {
     if (!profileSetupSupported()) return;
     row.setAttribute("role", "button");
     row.tabIndex = 0;
+    if (row.dataset.profileEdit === "productEmailOptIn") {
+      row.setAttribute("aria-haspopup", "listbox");
+      row.setAttribute("aria-expanded", "false");
+    }
     row.addEventListener("click", (event) => {
       if (event.target.closest("input, select")) return;
       beginInlineProfileEdit(row);
     });
     row.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
+      const preferenceArrow = row.dataset.profileEdit === "productEmailOptIn" && ["ArrowDown", "ArrowUp"].includes(event.key);
+      if (event.key !== "Enter" && event.key !== " " && !preferenceArrow) return;
       if (event.target.closest("input, select")) return;
       event.preventDefault();
       beginInlineProfileEdit(row);

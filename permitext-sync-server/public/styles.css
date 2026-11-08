@@ -13068,6 +13068,29 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   margin-top: 6px;
 }
 
+.profile-preference-menu {
+  z-index: 1800;
+  width: min(220px, calc(100vw - 16px));
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: var(--workspace-floating-menu-radius);
+  background: var(--menu-surface);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+.profile-preference-menu .custom-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: inherit;
+}
+.profile-preference-menu .custom-select-option[aria-selected="true"]::after { content: "✓"; }
+.profile-preference-menu .custom-select-option:is(:hover, :focus-visible) { background: var(--menu-highlight); }
+
 .account-identity dt,
 .account-identity dd {
   margin: 0;
