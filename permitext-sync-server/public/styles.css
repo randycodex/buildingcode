@@ -20574,7 +20574,19 @@ dialog.report-export-review {
   background: var(--border);
   pointer-events: none;
 }
-.project-details-columns .saved-project-structured-fact + .saved-project-structured-fact::before { right: auto; left: 50%; width: 100cqw; transform: translateX(-50%); }
+.project-details-columns .project-facts-panel .saved-project-structured-fact + .saved-project-structured-fact::before { content: none; }
+.project-details-columns .project-facts-panel .saved-project-structured-group + .saved-project-structured-group { position: relative; }
+.project-details-columns .project-facts-panel .saved-project-structured-group + .saved-project-structured-group::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100cqw;
+  height: 1px;
+  transform: translateX(-50%);
+  background: var(--border);
+  pointer-events: none;
+}
 .report-draft-blocks.is-open.is-settled,
 .report-draft-blocks.is-open.is-settled > .report-draft-blocks-body { overflow: visible; }
 
