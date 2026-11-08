@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-fact-row-labels-v1563";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-all-project-facts-v1564";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -24,7 +24,7 @@ import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=29";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261107-floating-settings-icon-v1380";
-import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
+import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-fact-row-labels-v1563";
+} from "./offline-storage.js?v=20261108-all-project-facts-v1564";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36918,36 +36918,18 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
 
   const groupLists = new Map();
   const presentationGroups = factsOnly ? projectFactPresentationGroups() : projectStructuredFactGroups;
-  let showAllFacts = false;
-  const factFilter = document.createElement("button");
-  factFilter.type = "button";
-  factFilter.className = "ghost-button project-facts-filter";
-  factFilter.textContent = "Show all facts";
-  factFilter.setAttribute("aria-pressed", "false");
-  const applyFactVisibility = () => {
+  const updateFactGroupCounts = () => {
     if (!factsOnly) return;
     const factsByKey = new Map(structuredFacts.map(fact => [fact.key, fact]));
     for (const group of presentationGroups) {
       const list = groupLists.get(group.key);
-      for (const row of list.children) {
-        const field = group.fields.find(field => field.key === row.dataset.factKey);
-        row.hidden = !showProjectFact(field, factsByKey.get(field.key), {all: showAllFacts, address: address.value});
-      }
       const groupElement = list.closest(".saved-project-structured-group");
-      groupElement.hidden = ![...list.children].some(row => !row.hidden);
       const recorded = group.fields.map(field => factsByKey.get(field.key)).filter(Boolean);
       const needsReview = recorded.filter(fact => ["unknown", "assumed", "stated"].includes(fact.status)).length;
       const count = groupElement.querySelector(".project-fact-group-count");
       if (count) count.textContent = `${recorded.length} recorded${needsReview ? ` · ${needsReview} need review` : ""}`;
     }
   };
-  factFilter.addEventListener("click", () => {
-    showAllFacts = !showAllFacts;
-    factFilter.textContent = showAllFacts ? "Show core & recorded facts" : "Show all facts";
-    factFilter.setAttribute("aria-pressed", String(showAllFacts));
-    applyFactVisibility();
-  });
-  if (factsOnly) structuredBody.prepend(factFilter);
   presentationGroups.forEach((group, groupIndex) => {
     const groupSection = document.createElement(factsOnly ? "details" : "section");
     if (factsOnly) groupSection.open = true;
@@ -37000,7 +36982,7 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
       group.fields.filter(field => field.key !== "transit-zone" || factsByKey.has(field.key))
         .forEach((field) => appendDefaultFactField(groupLists.get(group.key), field, factsByKey));
     });
-    applyFactVisibility();
+    updateFactGroupCounts();
   };
   renderStructuredFacts();
   let refreshFacts = null;

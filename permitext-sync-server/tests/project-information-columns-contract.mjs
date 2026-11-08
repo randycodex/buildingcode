@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import { emptyWorkspaceLayout, captureWorkspaceLayout, applyWorkspaceLayout, canGroupColumn } from "../public/workspace-state.js";
-import { showProjectFact } from "../public/minimal-workflow.js";
 
 const app = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const shell = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
@@ -226,7 +225,7 @@ function find(root, predicate) {
 let editorCurrent = true, failWrite = false;
 const factMotionCalls = [];
 const patches = [];
-const e = vm.createContext({ activeWorkspaceID: "alpha-workspace", document: { createElement: element }, showProjectFact,
+const e = vm.createContext({ activeWorkspaceID: "alpha-workspace", document: { createElement: element },
   captureAccountRequest: () => ({}), isCurrentAccountRequest: () => editorCurrent,
   projectStructuredFacts: project => copy(project.structuredFacts || []), migratedProjectStructuredFacts: project => copy(project.structuredFacts),
   normalizeProjectStructuredFact: value => value.value ? value : null,
@@ -261,16 +260,13 @@ assert.equal(find(sharedRoot,node=>node.tag==='textarea').disabled, true, 'Share
 const occupancy = find(factsRoot, node => node.attributes["aria-label"] === "Occupancy");
 const zoningRow = find(factsRoot, node => node.dataset.factKey === "zoning-districts");
 const allFacts = find(factsRoot, node => node.className === "ghost-button project-facts-filter");
-assert.equal(zoningRow.hidden, true, 'Unrecorded optional facts start hidden');
-allFacts.handlers.click();
-assert.equal(zoningRow.hidden, false); assert.equal(allFacts.attributes['aria-pressed'], 'true');
+assert.equal(allFacts, undefined, 'Facts has no visibility toggle.');
+assert.notEqual(zoningRow.hidden, true, 'Unrecorded optional facts are always visible.');
 narrative.value = "Changed context";
 narrative.handlers.blur();
 await contextEditor.flush();
 occupancy.value = "R-2"; occupancy.handlers.input();
-allFacts.handlers.click();
-assert.equal(occupancy.value, 'R-2', 'Changing the fact presentation cannot rebuild away typed values');
-assert.equal(zoningRow.hidden, true);
+assert.notEqual(zoningRow.hidden, true, 'Editing a fact does not hide other fields.');
 await factsEditor.flush();
 assert.deepEqual(patches[0], { description: "Changed context" });
 assert.deepEqual(Object.keys(patches[1]).sort(), ["address", "structuredFacts"]);

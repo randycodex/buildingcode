@@ -20266,15 +20266,6 @@ dialog.report-export-review {
 .project-details-columns .project-facts-panel .saved-project-structured-groups { gap: var(--space-2); }
 .project-details-columns .project-facts-panel .saved-project-structured-group-heading { min-height: 24px; }
 .project-details-columns .project-facts-panel .saved-project-structured-group-label { font-size: 13px; }
-.project-details-columns .project-facts-panel .project-facts-filter {
-  justify-self: end;
-  min-height: 28px;
-  margin: 0 0 var(--space-1);
-  padding: var(--space-1) 0;
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--text-secondary);
-}
 .project-details-columns .project-records-checklist {
   max-width: var(--workspace-content-max-width);
   margin: 0 auto;
@@ -20718,7 +20709,6 @@ dialog.report-export-review {
 
 /* Supporting note and project controls use the existing workspace hierarchy. */
 .workspace-view-options { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
-.project-facts-filter { margin: 0 0 12px; }
 
 /* Legacy layout controls remain mounted for saved layouts and keyboard commands. */
 .topbar-layout-actions[hidden] { display: none; }
