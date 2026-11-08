@@ -21346,6 +21346,8 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .settings-floating-panel .settings-account-column { height: 100%; padding: 0; border: 0; overflow-y: auto; }
 .settings-floating-panel .settings-account-column-title { display: none; }
 .settings-floating-panel .settings-account-actions { padding-bottom: 4px; }
+.settings-floating-panel .settings-account-column > .settings-active-sources-card { row-gap: 0; }
+.settings-floating-panel .settings-active-sources-card > :is(.search-source-bulk-actions, .settings-active-sources-status:not(:empty), .settings-active-sources-retry) { margin-top: 20px; }
 .settings-floating-panel .search-source-bulk-actions { margin-inline: calc(-1 * var(--account-category-gutter)); padding-inline: var(--account-category-gutter); }
 .settings-floating-panel .settings-panel .settings-footer {
   display: flex;
