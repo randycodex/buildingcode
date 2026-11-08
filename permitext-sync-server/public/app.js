@@ -4,7 +4,8 @@ import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-research-remaining-v1528";
+import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-settings-disclosures-v1529";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -156,7 +157,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-research-remaining-v1528";
+} from "./offline-storage.js?v=20261108-settings-disclosures-v1529";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41784,6 +41785,9 @@ function mountAccountScreenContent(dialog, panel) {
   dialog._disposeLibraryDownloadProgress?.();
   dialog._disposeInlineProfileEditor?.();
   dialog._disposeInlineProfileEditor = panel._disposeInlineProfileEditor;
+  dialog._settingsDisclosures?.dispose();
+  dialog._settingsDisclosures = panel.__settingsDisclosures;
+  dialog._settingsDisclosures?.restore();
   dialog._disposeLibraryDownloadProgress = panel._disposeLibraryDownloadProgress;
   const upgrade = dialog.dataset.proUpgrade === "true";
   const signIn = dialog.dataset.signIn === "true";
@@ -41857,6 +41861,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
     dialog._floatingControls?.dispose();
     dialog._disposeLibraryDownloadProgress?.();
     dialog._disposeInlineProfileEditor?.();
+    dialog._settingsDisclosures?.dispose();
     dialog.remove();
     coveredState.forEach((inert, element) => { element.inert = inert; });
     if (!floating) state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
@@ -43383,7 +43388,10 @@ function renderSettings({ upgrade = false } = {}) {
     }
   });
 
-  if (!upgrade) attachSettingsTrash(panel);
+  if (!upgrade) {
+    attachSettingsTrash(panel);
+    panel.__settingsDisclosures = bindSettingsDisclosureState(panel, { accountID: settingsIdentity.userID });
+  }
   panel.querySelectorAll("[data-clear-action]").forEach((button) => {
     button.addEventListener("click", async () => {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
