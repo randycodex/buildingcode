@@ -5,7 +5,7 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-assistant-menu-border-v1545";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-assistant-composer-cleanup-v1546";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -157,7 +157,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-assistant-menu-border-v1545";
+} from "./offline-storage.js?v=20261108-assistant-composer-cleanup-v1546";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -26140,7 +26140,6 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
     // A conversation starts from an explicit Reader passage, never an empty question.
     sendButton.disabled = true;
   };
-  status.textContent = "First include a passage from Reader or Saved Evidence to enable Send. Project Context and Facts are not included automatically; state any relevant assumptions in your question.";
   input.addEventListener("input", () => {
     researchNewChatDrafts.set(draftKey, input.value);
     scheduleResearchDraftPersistence();
