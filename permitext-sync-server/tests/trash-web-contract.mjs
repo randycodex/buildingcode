@@ -48,16 +48,18 @@ class Element {
   ...node.querySelectorAll(selector)
  ]);}
 }
-const nodes=Object.fromEntries(['settings-trash','settings-trash-list','settings-trash-status','settings-trash-refresh','settings-trash-toolbar'].map(name=>[`.${name}`,new Element()]));
+const nodes=Object.fromEntries(['settings-trash','settings-trash-list','settings-trash-status','settings-trash-toolbar'].map(name=>[`.${name}`,new Element()]));
 let contentRefreshes=0;
 const panel={querySelector:selector=>nodes[selector],__refreshSettingsContent:()=>{contentRefreshes++;}};
 const entries=[{id:'copy-one',title:'Synthetic note',expiresAt:'2026-11-01T12:00:00Z'},{id:'copy-two',title:'Synthetic evidence',expiresAt:'2026-11-02T12:00:00Z'}];
-const requests=[];let current=true,preflights=0,refreshes=0,failNextRequest=false,holdInspection=false,finishInspection,mutateEntries=false,failOnID;
+nodes['.settings-trash'].open=true;
+const requests=[];let current=true,preflights=0,refreshes=0,failNextRequest=false,holdInspection=false,finishInspection,mutateEntries=false,failOnID,holdList=false,finishList;
 const trashValues={document:{createElement:tag=>new Element(tag)},captureAccountRequest:()=> 'owner',isCurrentAccountRequest:()=>current,
  stripLeadingSectionNumber:value=>value,
  prepareRecoverableDeletion:async()=>{preflights++;},requireCurrentAccountRequest(){assert(current);},
  postResearch:async(path,body)=>{
   requests.push({path,...body});
+  if(holdList&&body.action==='list')return new Promise(resolve=>{finishList=resolve;});
   if(holdInspection&&body.action==='inspect')return new Promise(resolve=>{finishInspection=resolve;});
   if(failNextRequest||body.id===failOnID&&failOnID){failNextRequest=false;failOnID=undefined;throw Error('Synthetic retry failure');}
   if(mutateEntries&&['restore','purge'].includes(body.action)){const index=entries.findIndex(entry=>entry.id===body.id);if(index>=0)entries.splice(index,1);}
@@ -65,7 +67,7 @@ const trashValues={document:{createElement:tag=>new Element(tag)},captureAccount
  },
  loadSyncedContent:async()=>{},refreshWorkspaceAfterSettingsClear:async()=>{refreshes++;},settingsPanelScrollTop:()=>0,track:{scrollLeft:0},openTrashAfterSettingsDeletion:false};
 new Function(...Object.keys(trashValues),'panel',between('function attachSettingsTrash(', 'async function clearSettingsBookmarks(')+';attachSettingsTrash(panel);')(...Object.values(trashValues),panel);
-await nodes['.settings-trash-refresh'].fire('click');
+await panel.__refreshSettingsTrash();
 assert.equal(contentRefreshes,1,'Reading Trash refreshes the open Saved Content counters.');
 const list=nodes['.settings-trash-list'],row=list.children[0],actions=row.querySelector('.settings-trash-actions');
 assert.deepEqual(actions.children.map(button=>button.textContent),['Restore','Delete Permanently']);
@@ -104,7 +106,7 @@ await list.children[1].querySelector('.settings-trash-actions').children[0].fire
 assert.equal(requests.at(-1).action,'restore');assert.equal(requests.at(-1).id,'copy-two');assert.equal(refreshes,1);
 list.children[0].querySelector('.settings-trash-actions').children[1].fire('click');
 const pendingConfirmation=list.children[0].querySelector('.settings-trash-confirm').querySelector('button');
-failNextRequest=true;await nodes['.settings-trash-refresh'].fire('click');
+failNextRequest=true;await panel.__refreshSettingsTrash();
 assert.equal(list.children[0].querySelector('.settings-trash-actions').children[1].disabled,false,'A failed refresh restores the row Delete action even when it shares the confirmation label.');
 assert.equal(pendingConfirmation.disabled,true,'Retry does not enable an unconfirmed permanent deletion.');
 const secondTitle=list.children[1].querySelector('.settings-trash-title');
@@ -118,10 +120,10 @@ await secondTitle.fire('click');
 assert.equal(secondTitle.getAttribute('aria-expanded'),'true','A stale Account cannot reveal different recovery contents.');
 await list.children[0].querySelector('.settings-trash-actions').children[0].fire('click');
 assert.equal(requests.length,requestCount,'A stale Account view cannot mutate recovery copies.');
-current=true;await nodes['.settings-trash-refresh'].fire('click');
+current=true;await panel.__refreshSettingsTrash();
 assert.equal(list.children[1].querySelector('.settings-trash-title'),secondTitle,'Refreshing retains the mounted row and its inspected contents.');
 entries[0]={...entries[0],title:'Fresh recovery copy'};
-await nodes['.settings-trash-refresh'].fire('click');
+await panel.__refreshSettingsTrash();
 holdInspection=true;
 const staleContents=list.children[0].querySelector('.settings-trash-contents');
 const pendingInspection=list.children[0].querySelector('.settings-trash-title').fire('click');
@@ -131,7 +133,7 @@ assert.equal(staleContents.querySelector('ol'),null,'An inspection completed aft
 console.log('Compact Trash actions passed: adjacent controls, exact copy identity, typed confirmation, cancel, restore and account fencing.');
 
 current=true;holdInspection=false;
-await nodes['.settings-trash-refresh'].fire('click');
+await panel.__refreshSettingsTrash();
 const selection=nodes['.settings-trash-toolbar'].querySelector('.settings-trash-select');
 const findButton=(root,text)=>root.querySelectorAll('button').find(button=>button.textContent===text);
 const beforeSelection=requests.length;
@@ -175,3 +177,21 @@ assert.equal(entries.length,0);
 assert.equal(selection.textContent,'Select');
 assert.equal(selection.disabled,true,'Empty Trash has no selectable copies.');
 console.log('Trash selection passed: Select/Done, exact selected IDs, typed bulk purge, cancellation, partial restore recovery and empty state.');
+
+nodes['.settings-trash'].open=false;
+const closedRequests=requests.length;
+await panel.__refreshSettingsTrash();
+assert.equal(requests.length,closedRequests,'Automatic updates do not fetch a collapsed Trash section.');
+nodes['.settings-trash'].open=true;
+const beforeAutomatic=requests.length;
+holdList=true;
+const loading=panel.__refreshSettingsTrash();
+panel.__refreshSettingsTrash();panel.__refreshSettingsTrash();
+entries.push({id:'remote-copy',title:'Copy added by another client',expiresAt:'2026-11-02T12:00:00Z'});
+holdList=false;finishList({entries:[]});
+await loading;
+await new Promise(resolve=>setImmediate(resolve));
+assert.equal(requests.length-beforeAutomatic,2,'Concurrent update signals coalesce into one follow-up read.');
+assert.equal(list.querySelector('.settings-trash-title').textContent,'Copy added by another client','A change received during an in-flight read appears without a Refresh button.');
+assert.equal(selection.disabled,false);
+console.log('Automatic Trash updates passed: collapsed guard, coalesced reads, and changes arriving during an in-flight request.');

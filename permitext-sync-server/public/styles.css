@@ -18469,7 +18469,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-data-card .settings-content-trash:not(:disabled):hover { color: var(--destructive); }
 .account-screen .settings-data-card .settings-content-trash:disabled:hover { background: transparent; }
 .account-screen .settings-data-card .settings-trash-help { margin: 0 0 6px; color: var(--text-secondary); font-size: var(--settings-type-support); line-height: 1.5; }
-.account-screen .settings-trash-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.account-screen .settings-trash-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
 .account-screen .settings-data-card .settings-trash-select[aria-pressed="true"] { background: var(--menu-highlight); }
 .account-screen .settings-data-card .settings-trash-toolbar .settings-trash-select:not([aria-pressed="true"]) { background: transparent; }
 .account-screen .settings-trash-selection-toolbar,

@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-single-project-divider-v1509";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-automatic-trash-updates-v1510";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-single-project-divider-v1509";
+} from "./offline-storage.js?v=20261107-automatic-trash-updates-v1510";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -40248,10 +40248,9 @@ function attachSettingsTrash(panel) {
   const details = panel.querySelector(".settings-trash");
   const list = panel.querySelector(".settings-trash-list");
   const status = panel.querySelector(".settings-trash-status");
-  const refresh = panel.querySelector(".settings-trash-refresh");
   const toolbar = panel.querySelector(".settings-trash-toolbar");
   const identity = captureAccountRequest();
-  let busy = false, selecting = false, entries = [];
+  let busy = false, selecting = false, refreshPending = false, entries = [];
   const selected = new Set();
   const retainedRows = new Map();
   let selectAll, selectionCount, restoreSelected, deleteSelected, bulkActions;
@@ -40445,9 +40444,9 @@ function attachSettingsTrash(panel) {
     const settingsScroller = details.closest?.(".settings-account-column");
     const settingsScrollTop = settingsScroller?.scrollTop;
     busy = true;
-    refresh.disabled = selection.disabled = true;
+    selection.disabled = true;
     list.querySelectorAll("button, input").forEach(control => { control.disabled = true; });
-    status.textContent = "Loading Trash…";
+    if (!entries.length || action !== "list") status.textContent = "Loading Trash…";
     let changed = false;
     try {
       if (action !== "list") await prepareRecoverableDeletion();
@@ -40487,17 +40486,23 @@ function attachSettingsTrash(panel) {
       status.textContent = error.message || "Trash is unavailable. Please reconnect and retry.";
     } finally {
       busy = false;
-      refresh.disabled = false;
       // A retry must not enable an unconfirmed permanent deletion.
       list.querySelectorAll("button, input").forEach(control => { if (!control.classList.contains("settings-trash-confirm-button")) control.disabled = false; });
       syncSelection();
       if (settingsScroller?.isConnected) settingsScroller.scrollTop = settingsScrollTop;
+      if (refreshPending) {
+        refreshPending = false;
+        if (details.open && panel.isConnected !== false && isCurrentAccountRequest(identity)) void update();
+      }
     }
   };
   syncSelection();
-  panel.__refreshSettingsTrash = () => { if (details.open) return update(); };
+  panel.__refreshSettingsTrash = () => {
+    if (!details.open) return;
+    if (busy) { refreshPending = true; return; }
+    return update();
+  };
   details.addEventListener("toggle", panel.__refreshSettingsTrash);
-  refresh.addEventListener("click", () => update());
 }
 
 async function clearSettingsBookmarks() {
@@ -41402,6 +41407,11 @@ function settingsPanelScrollTop(panel) {
 function refreshOpenSettingsWorkspace() {
   document.querySelectorAll(".account-screen[open] .settings-panel, #panel-track .settings-panel")
     .forEach(panel => panel.__refreshSettingsWorkspace?.());
+}
+
+function refreshOpenSettingsTrash() {
+  document.querySelectorAll(".account-screen[open] .settings-panel, #panel-track .settings-panel")
+    .forEach(panel => panel.__refreshSettingsTrash?.());
 }
 
 async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft) {
@@ -42789,6 +42799,7 @@ function renderSettings({ upgrade = false } = {}) {
     if (upgrade || !isCurrentAccountRequest(settingsIdentity)) return;
     refreshSettingsContent();
     refreshProjectManagement();
+    void panel.__refreshSettingsTrash?.();
   };
   refreshSettingsContent();
   projectSelectAll.addEventListener("click", () => {
@@ -50052,7 +50063,9 @@ async function start() {
     startForegroundSyncLoop({ immediate: true });
     void flushCodeQuestionOutbox();
     void flushPendingNotebookImages();
+    refreshOpenSettingsTrash();
   });
+  window.addEventListener("focus", refreshOpenSettingsTrash);
   window.addEventListener("offline", () => {
     serverReachable = false;
     updateConnectionStatus();
@@ -50065,6 +50078,7 @@ async function start() {
     }
     if (document.visibilityState === "visible") {
       startForegroundSyncLoop({ immediate: true });
+      refreshOpenSettingsTrash();
     } else {
       stopForegroundSyncLoop();
     }
