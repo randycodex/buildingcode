@@ -5,9 +5,9 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-reader-picker-actions-v1542";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-assistant-history-options-v1544";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
-import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
+import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
@@ -157,7 +157,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-reader-picker-actions-v1542";
+} from "./offline-storage.js?v=20261108-assistant-history-options-v1544";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -26503,11 +26503,6 @@ async function renderResearch(paneID = "utility:analysis") {
     if (draftShowing) requestAnimationFrame(() => assistantBody.querySelector(".research-question-input")?.focus({ preventScroll: true }));
   }
 
-  const historyHeading = document.createElement("h3");
-  historyHeading.className = "assistant-history-heading";
-  historyHeading.textContent = "Conversations";
-  content.prepend(historyHeading);
-
   if (!activeAccount()) {
     const empty = document.createElement("article");
     empty.className = "analysis-card research-empty-state";
@@ -26579,8 +26574,8 @@ async function renderResearch(paneID = "utility:analysis") {
   });
   const historyHeader = document.createElement("div");
   historyHeader.className = "assistant-history-header";
-  historyHeading.replaceWith(historyHeader);
-  historyHeader.append(historyHeading,historyManagement.element);
+  content.prepend(historyHeader);
+  historyHeader.append(historyManagement.element);
   historyRail.addEventListener("keydown",historyManagement.handleKeyDown);
   projectFilter.addEventListener("change", refreshFilters);
   filters.append(projectFilter);

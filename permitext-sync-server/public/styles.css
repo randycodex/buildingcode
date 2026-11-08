@@ -20520,9 +20520,8 @@ dialog.report-export-review {
   border-radius: var(--radius-pill); background: var(--workspace-menu-highlight);
   font-size: 12px; text-align: center;
 }
-.assistant-history-heading { margin: 0 0 16px; color: var(--text-secondary); font-size: 11px; font-weight: 500; }
 .assistant-history-rail > .analysis-content { display: block; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 18px 18px 12px; margin: 0; width: auto; }
-.assistant-history-rail :is(.assistant-history-heading, .research-history-group-label) { text-transform: none; letter-spacing: normal; }
+.assistant-history-rail .research-history-group-label { text-transform: none; letter-spacing: normal; }
 .assistant-history-rail .research-history-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin: 0 0 12px; padding: 0; }
 .assistant-history-rail .research-history-filters[hidden] { display: none; }
 .assistant-history-rail .research-history-filters > * { min-width: 0; width: 100%; max-width: 100%; }
@@ -21429,8 +21428,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .workspace-floating-panel .project-overview-identity h2 { overflow-wrap: anywhere; }
 
 /* Conversation cleanup stays beside the Assistant history it affects. */
-.assistant-history-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; margin-bottom: 12px; }
-.assistant-history-header .assistant-history-heading { margin: 0; }
+.assistant-history-header { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 8px; margin-bottom: 12px; }
 .assistant-history-header > .assistant-history-management { display: contents; }
 .assistant-history-management { display: grid; gap: 8px; margin-bottom: 12px; }
 .assistant-history-management-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
@@ -21438,6 +21436,8 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .assistant-history-management button, .assistant-history-row-menu { min-height: 28px; width: auto; padding: 4px 10px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-secondary); box-shadow: none; }
 .assistant-history-management button:hover, .assistant-history-row-menu:hover { color: var(--text-primary); background: var(--menu-highlight); }
 .assistant-history-management .assistant-history-select[aria-pressed="true"] { background: var(--menu-highlight); color: var(--text-primary); }
+.assistant-history-management .assistant-history-more { display: inline-flex; align-items: center; justify-content: center; width: 28px; min-width: 28px; height: 28px; padding: 0; line-height: 1; }
+.assistant-history-more svg { display: block; width: 18px; height: 18px; flex: 0 0 18px; pointer-events: none; }
 .assistant-history-selection-tools { grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
 .assistant-history-selection-tools[hidden] { display: none; }
 .assistant-history-selection-tools .is-danger { margin-left: auto; color: var(--destructive); }

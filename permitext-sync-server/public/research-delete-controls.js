@@ -32,13 +32,14 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
     menu = node('div','assistant-history-menu'); menu.setAttribute('role','menu');
     for (const item of items) {
       const button = action(item.label, () => {closeMenu(); if (current()) return item.run();}, item.danger ? 'is-danger' : '');
+      button.disabled = Boolean(item.disabled);
       button.setAttribute('role', item.checked === undefined ? 'menuitem' : 'menuitemcheckbox');
       if (item.checked !== undefined) button.setAttribute('aria-checked',String(item.checked));
       menu.append(button);
     }
     document.body.append(menu);
     menu.addEventListener('keydown', event => {
-      const buttons = [...menu.querySelectorAll('button')];
+      const buttons = [...menu.children].filter(button => !button.disabled);
       const index = buttons.indexOf(document.activeElement);
       const next = event.key === 'ArrowDown' ? (index + 1) % buttons.length
         : event.key === 'ArrowUp' ? (index + buttons.length - 1) % buttons.length
@@ -47,13 +48,14 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
       event.preventDefault(); buttons[next]?.focus({preventScroll:true});
     });
     menuBinding = bindFloatingWorkspacePanel(menu, {anchor, dismiss:closeMenu, manageAnchor:true});
-    menu.querySelector('button')?.focus({preventScroll:true});
+    [...menu.children].find(button => !button.disabled)?.focus({preventScroll:true});
   };
   const paint = () => {
     select.textContent = selecting ? 'Done' : 'Select';
     select.setAttribute('aria-pressed',String(selecting));
     select.setAttribute('aria-label',selecting ? 'Done selecting conversations' : 'Select conversations');
     select.disabled = busy || (!conversations.length && !selecting);
+    select.hidden = !selecting;
     more.disabled = busy;
     selectionTools.hidden = !selecting;
     all.textContent = selected.size && selected.size === conversations.length ? 'Deselect all' : 'Select all shown';
@@ -103,14 +105,17 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
       if (current()) {paint(); onBusy?.(false);}
     }
   };
-  const select = action('Select', () => {
-    if (busy || !current()) return;
+  const toggleSelection = () => {
+    if (busy || !current() || (!selecting && !conversations.length)) return;
     selecting = !selecting; selected.clear(); closeMenu(); status.textContent = ''; paint();
-  },'assistant-history-select');
+    (selecting ? select : more).focus({preventScroll:true});
+  };
+  const select = action('Done', toggleSelection,'assistant-history-select');
   select.setAttribute('aria-label','Select conversations');
-  const more = action('…', () => {
+  const more = action('', () => {
     const activeProject = project();
     showMenu(more, [
+      {label:selecting ? 'Done selecting conversations' : 'Select conversations',disabled:!conversations.length && !selecting,run:toggleSelection},
       {label:'Include hidden conversations',checked:includeHidden,run:async() => {
         includeHidden = !includeHidden; selected.clear(); selecting = false; paint();
         try {await onIncludeHidden?.(includeHidden);} catch(error) {if(current())status.textContent=error.message || 'History could not be loaded.';}
@@ -120,6 +125,7 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
       {label:'Delete all conversations…',danger:true,run:() => deleteConversations({scope:'all'})}
     ]);
   },'assistant-history-more');
+  more.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>';
   more.setAttribute('aria-label','Conversation history options'); more.setAttribute('aria-haspopup','menu'); more.setAttribute('aria-expanded','false');
   const all = action('Select all shown', () => {
     if (busy || !current()) return;
@@ -132,7 +138,7 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
   toolbar.append(select,more); selectionTools.append(all,count,remove); element.append(toolbar,selectionTools,status);
   const handleKeyDown = event => {
     if (event.key !== 'Escape' || !selecting || busy || event.defaultPrevented) return;
-    event.preventDefault(); selecting = false; selected.clear(); paint(); select.focus({preventScroll:true});
+    event.preventDefault(); selecting = false; selected.clear(); paint(); more.focus({preventScroll:true});
   };
   paint();
   return {

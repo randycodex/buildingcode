@@ -48,8 +48,11 @@ async function fixture(mode,scopeValue='selected') {
   assert.equal(rows[0].children[0].hidden,true);
   assert.equal(byClass(rows[1],'assistant-history-hidden-label').textContent,'Hidden from History');
   if(scopeValue==='selected') {
-    find(root,'Select').listeners.click();
+    assert.equal(byClass(root,'assistant-history-select').hidden,true,'Select stays inside the options menu until selection starts.');
+    byClass(root,'assistant-history-more').listeners.click();
+    find(document.body,'Select conversations').listeners.click();
     assert.equal(find(root,'Done').attributes['aria-label'],'Done selecting conversations');
+    assert.equal(find(root,'Done').hidden,false,'Done stays available while selecting.');
     assert(rows.every(row=>!row.children[0].hidden));
     assert.equal(find(root,'Delete selected').disabled,true);
     assert.equal(management.selectConversation('one'),true);
@@ -96,9 +99,18 @@ byClass(row,'assistant-history-row-menu').listeners.click();await find(document.
 assert.deepEqual(requests.map(row=>row.body.conversationIDs),[['one'],['one']]);
 byClass(manager.element,'assistant-history-more').listeners.click();await find(document.body,'Include hidden conversations').listeners.click();
 assert.deepEqual(included,[true]);assert.equal(requests.length,2,'Showing hidden chats delegates to History pagination, not deletion.');
-find(manager.element,'Select').listeners.click();manager.selectConversation('one');manager.setConversations([history[1]]);
+byClass(manager.element,'assistant-history-more').listeners.click();find(document.body,'Select conversations').listeners.click();
+manager.selectConversation('one');manager.setConversations([history[1]]);
 assert.equal(find(manager.element,'Delete selected').disabled,true,'Removed rows cannot remain selected after a refresh.');
 manager.handleKeyDown({key:'Escape',preventDefault(){}});assert.equal(find(manager.element,'Select').attributes['aria-pressed'],'false');
+assert.equal(find(manager.element,'Select').hidden,true);
+assert.equal(document.activeElement,byClass(manager.element,'assistant-history-more'),'Escape returns focus to the visible options button.');
+manager.setConversations([]);byClass(manager.element,'assistant-history-more').listeners.click();
+assert.equal(find(document.body,'Select conversations').disabled,true,'Empty History cannot enter selection mode.');
+assert.equal(document.activeElement.textContent,'Include hidden conversations','Opening skips the disabled selection action.');
+byClass(document.body,'assistant-history-menu').listeners.keydown({key:'ArrowUp',preventDefault(){}});
+assert.equal(document.activeElement.textContent,'Delete all conversations…','Keyboard navigation skips disabled menu items.');
+manager.reset();
 current=false;byClass(row,'assistant-history-row-menu').listeners.click();assert.equal(byClass(document.body,'assistant-history-menu'),undefined,'A stale account cannot open management menus.');manager.dispose();
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const start=source.indexOf('async function refreshAfterResearchDeletion(');
