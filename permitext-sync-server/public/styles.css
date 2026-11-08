@@ -21310,7 +21310,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .settings-floating-panel .settings-account-column[hidden],
 .workspace-floating-panel .project-information-panel[hidden] { display: none !important; }
 .settings-floating-panel > .web-warning-backdrop.is-column-scoped { padding: 20px; border-radius: inherit; container-type: inline-size; }
-.account-dialog.account-screen.settings-floating-panel { height: auto; bottom: 42px; --account-category-gutter: 0px; --account-category-top-gutter: 0px; --settings-disclosure-indent: 20px; }
+.account-dialog.account-screen.settings-floating-panel { height: auto; bottom: 42px; --account-category-gutter: 20px; --account-category-top-gutter: 0px; --account-scroll-fade-size: var(--space-3); --settings-disclosure-indent: 20px; }
 .settings-floating-panel .account-screen-header,
 .workspace-floating-panel .project-details-screen-header {
   display: flex;
@@ -21342,11 +21342,12 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .floating-workspace-tabs > button:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 .topbar #toggle-settings { width: 30px; min-width: 30px; padding: 0; flex: 0 0 30px; }
 .topbar #toggle-settings[aria-expanded="true"] { background: var(--workspace-menu-highlight); }
-.settings-floating-panel > .settings-panel { display: flex; flex-direction: column; flex: 1 !important; min-height: 0; background: transparent; }
-.settings-floating-panel > .settings-panel > .settings-scroll { display: block; flex: 1; min-height: 0; overflow: hidden; }
+.settings-floating-panel > .settings-panel { display: flex; flex-direction: column; flex: 1 !important; min-height: 0; background: transparent; overflow: visible; }
+.settings-floating-panel > .settings-panel > .settings-scroll { display: block; flex: 1; min-height: 0; margin-inline: calc(-1 * var(--account-category-gutter)); overflow: hidden; }
 .settings-floating-panel .settings-account-column { height: 100%; padding: 0; border: 0; overflow-y: auto; }
 .settings-floating-panel .settings-account-column-title { display: none; }
 .settings-floating-panel .settings-account-actions { padding-bottom: 4px; }
+.settings-floating-panel .search-source-bulk-actions { margin-inline: calc(-1 * var(--account-category-gutter)); padding-inline: var(--account-category-gutter); }
 .settings-floating-panel .settings-panel .settings-footer {
   display: flex;
   flex: 0 0 auto;
@@ -21356,7 +21357,8 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   height: auto;
   min-height: 0;
   margin-top: 14px;
-  padding: 12px 0 0;
+  margin-inline: calc(-1 * var(--account-category-gutter));
+  padding: 12px var(--account-category-gutter) 0;
   font-size: 11px;
   line-height: 1.4;
   background: transparent;
