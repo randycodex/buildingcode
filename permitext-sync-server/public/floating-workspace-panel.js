@@ -9,14 +9,14 @@ export function floatingWorkspacePanelBounds(anchor, width, viewportWidth, viewp
   };
 }
 
-export function bindFloatingWorkspacePanel(panel, { anchor, dismiss, verticalAnchor, isOpen = () => panel.isConnected, manageAnchor = false }) {
+export function bindFloatingWorkspacePanel(panel, { anchor, dismiss, alignmentReference, isOpen = () => panel.isConnected, manageAnchor = false }) {
   const controller = new AbortController();
   const { signal } = controller;
   const position = () => {
     if (!isOpen() || !anchor?.isConnected) return;
     const anchorBounds = anchor.getBoundingClientRect();
-    const reference = typeof verticalAnchor === 'function' ? verticalAnchor() : verticalAnchor;
-    const bounds = floatingWorkspacePanelBounds({ right: anchorBounds.right, bottom: reference?.bottom ?? anchorBounds.bottom }, panel.offsetWidth, window.innerWidth, window.innerHeight);
+    const reference = typeof alignmentReference === 'function' ? alignmentReference() : alignmentReference;
+    const bounds = floatingWorkspacePanelBounds({ right: reference?.right ?? anchorBounds.right, bottom: reference?.bottom ?? anchorBounds.bottom }, panel.offsetWidth, window.innerWidth, window.innerHeight);
     panel.style.left = `${bounds.left}px`;
     panel.style.top = `${bounds.top}px`;
     panel.style.maxHeight = `${bounds.maxHeight}px`;

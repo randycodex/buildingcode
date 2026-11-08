@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-aligned-workspace-menu-v1494";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-aligned-menu-edges-v1495";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -35,7 +35,7 @@ import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=3";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261024-passages-v8";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=13";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
-import { bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=2";
+import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=3";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261019-project-workflow-v5";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-aligned-workspace-menu-v1494";
+} from "./offline-storage.js?v=20261107-aligned-menu-edges-v1495";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2686,15 +2686,10 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   document.body.append(menu);
   workspaceContextMenu = menu;
   workspaceActionsButton?.setAttribute("aria-expanded", "true");
-  const rect = anchor?.getBoundingClientRect?.() || workspaceActionsButton?.getBoundingClientRect();
-  const menuRect = menu.getBoundingClientRect();
-  const left = Math.min(
-    Math.max(8, rect ? rect.left + (rect.width - menuRect.width) / 2 : (window.innerWidth - menuRect.width) / 2),
-    window.innerWidth - menuRect.width - 8
-  );
-  const top = Math.min(workspaceFloatingPanelReference().bottom + 8, window.innerHeight - menuRect.height - 8);
-  menu.style.left = `${left}px`;
-  menu.style.top = `${Math.max(8, top)}px`;
+  const bounds = floatingWorkspacePanelBounds(workspaceFloatingPanelReference(), menu.offsetWidth, window.innerWidth, window.innerHeight);
+  menu.style.left = `${bounds.left}px`;
+  menu.style.top = `${bounds.top}px`;
+  menu.style.maxHeight = `${bounds.maxHeight}px`;
   menu.querySelector("button:not(:disabled)")?.focus();
 }
 
@@ -4647,7 +4642,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   screen.element.setAttribute("aria-label", "Project context");
   screen.element.setAttribute("aria-modal", "false");
   floatingControls = bindFloatingWorkspacePanel(screen.element, {
-    anchor: workspaceActionsButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(), verticalAnchor: workspaceFloatingPanelReference
+    anchor: workspaceActionsButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(), alignmentReference: workspaceFloatingPanelReference
   });
   screen.projectID = projectID;
   screen.selectSection = selectSection;
@@ -41689,13 +41684,14 @@ function showProAccountCheckout(dialog) {
 }
 
 function workspaceFloatingPanelReference() {
+  const right = settingsButton?.getBoundingClientRect?.().right ?? window.innerWidth - 24;
   const reader = [...document.querySelectorAll('.topbar [data-open-reader], .workflow-toolbar [data-open-reader]')]
     .map(button => button.getBoundingClientRect()).find(bounds => bounds.height > 0);
-  if (reader) return reader;
+  if (reader) return { right, bottom: reader.bottom };
   const toolbar = document.querySelector('.workflow-toolbar')?.getBoundingClientRect();
   const bar = toolbar?.height ? toolbar : document.querySelector('.topbar').getBoundingClientRect();
   const controlHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--workspace-menu-height')) || 30;
-  return { bottom: bar.bottom - Math.max(0, (bar.height - controlHeight) / 2) };
+  return { right, bottom: bar.bottom - Math.max(0, (bar.height - controlHeight) / 2) };
 }
 
 function organizeAccountSettings(panel, { floating = false, selected = "account", onSelect = () => {} } = {}) {
@@ -41862,7 +41858,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
   });
   document.querySelector(".workspace-shell").append(dialog);
   if (floating) dialog._floatingControls = bindFloatingWorkspacePanel(dialog, {
-    anchor: settingsButton, dismiss: () => dialog.close(), manageAnchor: true, verticalAnchor: workspaceFloatingPanelReference
+    anchor: settingsButton, dismiss: () => dialog.close(), manageAnchor: true, alignmentReference: workspaceFloatingPanelReference
   });
   else state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
   syncWorkflowNavigation();

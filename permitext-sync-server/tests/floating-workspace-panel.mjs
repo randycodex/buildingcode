@@ -41,9 +41,9 @@ try {
   const panel = new Element(), anchor = new Element('button'), input = new Element('input');
   panel.append(input);
   let open = true, dismissals = 0;
-  const controls = bindFloatingWorkspacePanel(panel, { anchor, verticalAnchor: () => ({ bottom: 67.5 }), manageAnchor: true, isOpen: () => open, dismiss() { open = false; dismissals++; } });
+  const controls = bindFloatingWorkspacePanel(panel, { anchor, alignmentReference: () => ({ right: window.innerWidth - 24, bottom: 67.5 }), manageAnchor: true, isOpen: () => open, dismiss() { open = false; dismissals++; } });
   assert.equal(anchor.attributes['aria-expanded'], 'true');
-  assert.equal(panel.style.left, '800px');
+  assert.equal(panel.style.left, '816px', 'Menus share a right edge even when their triggers differ.');
   assert.equal(panel.style.top, '75.5px', 'The panel can align to the Reader toolbar instead of its header trigger.');
   dispatch(document, 'pointerdown', { target: input });
   assert.equal(dismissals, 0, 'Editing inside the floating panel keeps it open.');
@@ -59,7 +59,7 @@ try {
   open = true; dispatch(document, 'keydown', { key: 'Escape' });
   assert.equal(dismissals, 2); assert.equal(document.activeElement, anchor);
   open = true; window.innerWidth = 1000; anchor.bounds = { right: 984, bottom: 35 }; dispatch(window, 'resize');
-  assert.equal(panel.style.left, '384px');
+  assert.equal(panel.style.left, '376px');
   controls.dispose(); assert.equal(anchor.attributes['aria-expanded'], 'false');
   dispatch(document, 'pointerdown', { target: new Element() }); assert.equal(dismissals, 2);
   console.log('Floating panels passed: retained tab drafts and scroll, keyboard navigation, nested controls, outside clicks, Escape/focus, bounds, and listener cleanup.');
