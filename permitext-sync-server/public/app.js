@@ -5,7 +5,7 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=2";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-recovery-copy-v1530";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-passage-link-action-v1531";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -157,7 +157,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-recovery-copy-v1530";
+} from "./offline-storage.js?v=20261108-passage-link-action-v1531";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -43398,7 +43398,7 @@ function renderSettings({ upgrade = false } = {}) {
       const action = button.dataset.clearAction;
       const clearActionCopy = {
         searches: ["Clear recent activity", "This will remove recent searches and Recently Viewed sections from this account across synced devices. Pinned searches will remain. This cannot be undone."],
-        bookmarks: ["Move saved passages and links to Trash", `${bookmarkRecordsForSettings().length} saved passages and ${(currentContentSummary().projectSections || []).filter(item => item?.sectionID && !item.deletedAt).length} passage links will move to Trash across synced devices. Restore within 30 days. Projects, saved collections, and notes remain.`],
+        bookmarks: ["Move saved passages and Project links to Trash", `${bookmarkRecordsForSettings().length} saved passages and ${(currentContentSummary().projectSections || []).filter(item => item?.sectionID && !item.deletedAt).length} Project passage links will move to Trash across synced devices. Restore within 30 days. Projects, saved collections, and notes remain.`],
         notes: ["Move section notes to Trash", `${(currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length} section notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages, Notebook notes, and tags remain.`]
       };
       const [title, message] = clearActionCopy[action];
