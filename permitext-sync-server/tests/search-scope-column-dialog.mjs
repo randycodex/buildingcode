@@ -42,7 +42,7 @@ function observerClass(collection) {
     disconnect() { this.connected = false; }
   };
 }
-let saves = 0, renders = 0;
+let saves = 0, renders = 0, savedInstances;
 const context = vm.createContext({ document, track,
   MutationObserver: observerClass(mutations), ResizeObserver: observerClass(resizes),
   state: { utilityInstances: instances }, activeWorkspaceID: "workspace",
@@ -57,7 +57,7 @@ const context = vm.createContext({ document, track,
   codeOptionVersion: code => code.canonicalEdition, readerCodeOptionLabel: code => code.label,
   codeSourceKey: item => item.key, circleXIconSVG: () => "<svg></svg>",
   searchPositionState: instance => instance.position ||= {},
-  saveWorkspaceState: () => { saves++; }, updateSearchScopeSummary() {},
+  saveWorkspaceState: () => { saves++; savedInstances = JSON.parse(JSON.stringify(instances)); }, updateSearchScopeSummary() {},
   renderSearchResults: async () => { renders++; },
   showWebNotice: async (_title, message) => { throw new Error(message); }, openActiveCodeSourceSettings() {}
 });
@@ -65,6 +65,7 @@ const rowsStart = source.indexOf("function activeCodeSourceMenuRows(");
 vm.runInContext(source.slice(rowsStart,source.indexOf("\n}",rowsStart)+2)+"\n"+implementation, context);
 const dialog = () => document.querySelector(".search-scope-dialog");
 const action = (node, label) => node.querySelectorAll("button").find(button => button.textContent === label).dispatch("click");
+const close = node => node.querySelectorAll("button").find(button => button.attributes["aria-label"] === "Close search scope").dispatch("click");
 
 await context.openSearchCodeSourceSettings(first);
 let picker = dialog();
@@ -75,33 +76,39 @@ assert.deepEqual(picker.querySelectorAll("h3").map(heading=>heading.textContent)
 assert.deepEqual(picker.querySelectorAll("label").map(label=>label.children[1].textContent),["Building Code (2022)","Plumbing Code (2014)"]);
 assert.equal(picker.style["--search-scope-width"],"800px");
 assert.equal(picker.style["--search-scope-left"],"198px","The menu accounts for the column border when aligning to Search");
+assert.deepEqual(picker.querySelectorAll("button").map(button=>button.textContent),["Select all","Deselect all",""],"Selection saves directly without Cancel or Apply controls");
+instances[0].position = { loadedPages: 3, scrollTop: 500, groupPages: { BC: 2 }, groupScope: "old" };
 picker.querySelectorAll("input")[0].checked = false;
 picker.querySelectorAll("input")[0].dispatch("change");
-action(picker, "Cancel");
-assert.equal(instances[0].querySourceKeys, null, "Cancel leaves the active source scope unchanged.");
-assert.equal(saves, 0);
+assert.deepEqual([...instances[0].querySourceKeys], ["plumbing"],"A checkbox change immediately updates this Search column");
+assert.equal(instances[1].querySourceKeys, null, "Changing one picker does not change another Search column.");
+assert.equal(saves, 1); assert.equal(renders, 1);
+assert.equal(dialog(), picker,"Changing sources keeps the menu open");
+assert.equal(JSON.stringify(instances[0].position),JSON.stringify({loadedPages:1,scrollTop:0,groupPages:{},groupScope:""}),"New source selection restarts results at the first page");
+close(picker);
 assert.equal(dialog(), null);
+assert.deepEqual([...instances[0].querySourceKeys], ["plumbing"],"Closing keeps the last selection");
 assert.ok(!mutations.at(-1).connected && !resizes.at(-1).connected, "Closing disposes positioning and lifecycle observers.");
 
+instances[0] = savedInstances[0];
 await context.openSearchCodeSourceSettings(first);
 picker = dialog();
-action(picker,"Clear selection");
+assert.deepEqual(picker.querySelectorAll("input").map(input=>input.checked),[false,true],"Reopening a restored workspace uses the saved selection");
+action(picker,"Deselect all");
 assert.ok(picker.querySelectorAll("input").every(input=>!input.checked));
-action(picker,"Use all enabled sources");
-assert.ok(picker.querySelectorAll("input").every(input=>input.checked),"Bulk actions include sources in every group");
-action(picker,"Cancel");
-assert.equal(instances[0].querySourceKeys,null);
-
+assert.deepEqual([...instances[0].querySourceKeys],[],"Deselect all persists an explicit empty scope instead of searching all sources");
+assert.equal(saves, 2); assert.equal(renders, 2);
+picker.dispatch("keydown", { key: "Escape", preventDefault() {}, stopPropagation() {} });
+assert.equal(dialog(),null);
+assert.deepEqual([...instances[0].querySourceKeys],[],"Escape dismisses without reverting selections");
 await context.openSearchCodeSourceSettings(first);
 picker = dialog();
-picker.querySelectorAll("input")[0].checked = false;
-picker.querySelectorAll("input")[0].dispatch("change");
-action(picker, "Apply to this search");
-assert.deepEqual([...instances[0].querySourceKeys], ["plumbing"]);
-assert.equal(instances[1].querySourceKeys, null, "Applying one picker does not change another Search column.");
-assert.equal(saves, 1); assert.equal(renders, 1);
+assert.ok(picker.querySelectorAll("input").every(input=>!input.checked),"An empty selection stays empty when reopened");
+action(picker,"Select all");
+assert.ok(picker.querySelectorAll("input").every(input=>input.checked),"Bulk actions include sources in every group");
+assert.equal(instances[0].querySourceKeys,null,"Select all immediately restores the all-enabled scope");
+assert.equal(saves, 3); assert.equal(renders, 3);
 
-await context.openSearchCodeSourceSettings(first);
 await context.openSearchCodeSourceSettings(second);
 assert.equal(dialog().parentNode, second, "Opening another column's picker closes the old picker and opens the requested one.");
 dialog().dispatch("keydown", { key: "Escape", preventDefault() {}, stopPropagation() {} });
@@ -109,7 +116,8 @@ assert.equal(dialog(), null);
 
 await context.openSearchCodeSourceSettings(first);
 picker = dialog(); context.activeWorkspaceID = "another-workspace";
-action(picker, "Apply to this search");
-assert.equal(saves, 1, "A stale workspace cannot apply a pending source selection.");
+action(picker, "Deselect all");
+assert.equal(saves, 3, "A stale workspace cannot save a source selection.");
+assert.equal(instances[0].querySourceKeys,null);
 assert.equal(dialog(), null);
-console.log("Search scope column dialog passed: column-local presentation, cancel/apply isolation, keyboard dismissal, observer cleanup, column switching and stale workspace guards.");
+console.log("Search scope column dialog passed: immediate selection persistence, refresh/reopen restoration, bulk selection, Search column isolation, keyboard dismissal, observer cleanup and stale workspace guards.");

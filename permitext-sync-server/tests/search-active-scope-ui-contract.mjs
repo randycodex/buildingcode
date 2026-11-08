@@ -43,6 +43,17 @@ function fixture(){
  assert.equal(f.paints.length,before);
 }
 {
+ const f=fixture();const first=f.c.renderSearchResults(f.panel,f.instance);await tick();
+ f.instance.querySourceKeys=['building'];
+ const latest=f.c.renderSearchResults(f.panel,f.instance);await tick();
+ assert.equal(f.requests[0].signal.aborted,true,'An immediate source change cancels the previous search');
+ const before=f.paints.length;
+ f.requests[0].resolve({results:[{}],hasMore:false});await first;
+ assert.equal(f.paints.length,before,'An earlier source selection cannot repaint the latest search');
+ f.requests[1].resolve({results:[{}],hasMore:false});await latest;
+ assert.equal(f.paints.at(-1),'rows');
+}
+{
  const f=fixture();f.failScope();await f.c.renderSearchResults(f.panel,f.instance);
  assert.equal(f.requests.length,0);assert.ok(f.paints.includes("Search unavailable"));
  assert.equal(f.instance.query,"concrete");assert.equal(f.instance.position.loadedPages,1);

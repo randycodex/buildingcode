@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-grouped-search-sources-v1552";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-live-search-scope-v1553";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-grouped-search-sources-v1552";
+} from "./offline-storage.js?v=20261108-live-search-scope-v1553";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41924,7 +41924,10 @@ async function openSearchCodeSourceSettings(panel) {
       const check = document.createElement("input"); check.type = "checkbox";
       check.checked = selected.has(codeSourceKey(row.source));
       const name = document.createElement("span"); name.textContent = row.label;
-      check.addEventListener("change", () => { check.checked ? selected.add(codeSourceKey(row.source)) : selected.delete(codeSourceKey(row.source)); });
+      check.addEventListener("change", () => {
+        check.checked ? selected.add(codeSourceKey(row.source)) : selected.delete(codeSourceKey(row.source));
+        saveSelection();
+      });
       label.append(check, name); choices.append(label); controls.push({check, source: row.source});
     }
     const button = (label, action) => { const node = document.createElement("button"); node.type = "button"; node.textContent = label; node.addEventListener("click", action); return node; };
@@ -41949,26 +41952,26 @@ async function openSearchCodeSourceSettings(panel) {
     };
     const observer = new MutationObserver(() => { if (!current() || !dialog.isConnected) close(); });
     const resize = typeof ResizeObserver === "function" ? new ResizeObserver(position) : null;
+    const saveSelection = () => {
+      if (closed || !current()) { close(); return; }
+      instance.querySourceKeys = selected.size === enabled.length ? null : [...selected];
+      const position = searchPositionState(instance); position.loadedPages=1;position.scrollTop=0;position.groupPages={};position.groupScope="";
+      saveWorkspaceState(); updateSearchScopeSummary(panel, instance); void renderSearchResults(panel, instance);
+    };
     const closeButton = button("", close);
     closeButton.className = "search-scope-close"; closeButton.innerHTML = circleXIconSVG();
     closeButton.setAttribute("aria-label", "Close search scope"); closeButton.title = "Close search scope";
     closeButton.autofocus = true;
     const selectionActions = document.createElement("div"); selectionActions.className = "search-scope-selection-actions";
-    selectionActions.append(button("Clear selection", () => {selected.clear(); for (const {check} of controls) check.checked = false;}),
-      button("Use all enabled sources", () => { selected.clear(); for (const {check, source} of controls) {check.checked=true;selected.add(codeSourceKey(source));} }));
+    selectionActions.append(button("Select all", () => {
+      selected.clear(); for (const {check, source} of controls) {check.checked=true;selected.add(codeSourceKey(source));}
+      saveSelection();
+    }), button("Deselect all", () => {
+      selected.clear(); for (const {check} of controls) check.checked = false;
+      saveSelection();
+    }));
     header.append(selectionActions, closeButton);
-    const actions = document.createElement("div"); actions.className = "search-scope-actions";
-    const apply = button("Apply to this search", () => {
-        if (!current()) {close();return;}
-        instance.querySourceKeys = selected.size === enabled.length ? null : [...selected];
-        const position = searchPositionState(instance); position.loadedPages=1;position.scrollTop=0;position.groupPages={};position.groupScope="";
-        close(); saveWorkspaceState(); updateSearchScopeSummary(panel, instance); void renderSearchResults(panel, instance);
-      });
-    apply.className = "search-scope-apply";
-    actions.append(button("Cancel", close), apply);
-    const footer = document.createElement("div"); footer.className = "search-scope-footer";
-    footer.append(actions);
-    dialog.append(header, choices, footer);
+    dialog.append(header, choices);
     dialog._close=close;dialog.addEventListener("cancel",event=>{event.preventDefault();close();});
     dialog.addEventListener("keydown", event => {
       if (event.key !== "Escape") return;
