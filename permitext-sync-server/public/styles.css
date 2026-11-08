@@ -18415,6 +18415,18 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-project-management .project-manager > footer:not(:empty) {
   padding-bottom: var(--space-4);
 }
+.account-screen .settings-project-management .project-manager > nav > button,
+.account-screen .settings-project-management .project-manager-toolbar > button:first-child {
+  min-height: 30px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+}
+.account-screen .settings-project-management .project-manager > nav > button[aria-pressed="true"],
+.account-screen .settings-project-management .project-manager > nav > button:not(:disabled):hover,
+.account-screen .settings-project-management .project-manager-toolbar > button:first-child:not(:disabled):hover {
+  background: var(--menu-highlight);
+}
 .account-screen .settings-data-card > details > :not(summary),
 .account-screen .settings-data-card .legacy-workspace-recovery > div {
   padding-inline-start: var(--settings-disclosure-indent);
