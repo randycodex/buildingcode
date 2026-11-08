@@ -18611,6 +18611,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   padding-inline: var(--account-category-gutter);
   border-radius: 0;
 }
+.account-screen .account-identity { border-block: 1px solid var(--border); }
 .account-screen .settings-plan-usage p { min-height: 48px; padding-inline: var(--account-category-gutter); }
 .account-screen .account-identity > div + div,
 .account-screen .settings-plan-usage p + p { border-top-color: var(--border); }
