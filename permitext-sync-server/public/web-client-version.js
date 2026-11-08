@@ -1,4 +1,4 @@
-export const webAppVersion = "20261108-settings-footer-divider-v1527";
+export const webAppVersion = "20261108-research-remaining-v1528";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

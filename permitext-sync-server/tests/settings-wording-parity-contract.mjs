@@ -73,14 +73,14 @@ assert.equal(lifetimePro.title, "Lifetime Pro");
 assert.equal(lifetimePro.summary, settingsCopy.lifetimePlanSummary);
 assert.equal(lifetimePro.details, null);
 
-assert.equal(settingsResearchAllowanceSummary(null), "100 turns included monthly");
+assert.equal(settingsResearchAllowanceSummary(null), "—/100");
 assert.equal(
   settingsResearchAllowanceSummary({
     includedRemaining: 100,
     purchasedRemaining: 0,
     totalRemaining: 100
   }),
-  "100 included turns remain this month."
+  "100/100"
 );
 assert.equal(
   settingsResearchAllowanceSummary({
@@ -88,7 +88,7 @@ assert.equal(
     purchasedRemaining: 25,
     totalRemaining: 25
   }),
-  "0 included + 25 additional"
+  "0/100"
 );
 assert.equal(
   settingsResearchAllowanceSummary({
@@ -96,8 +96,21 @@ assert.equal(
     purchasedRemaining: 0,
     totalRemaining: null
   }),
-  "12 included turns remain this month. Continued access is available."
+  "12/100"
 );
+assert.equal(settingsResearchAllowanceSummary({ includedRemaining: 99, includedLimit: 100 }), "99/100");
+assert.equal(settingsResearchAllowanceSummary({ includedRemaining: 87, includedLimit: 100 }), "87/100");
+assert.equal(settingsResearchAllowanceSummary({ includedRemaining: 187, includedLimit: 200 }), "187/200");
+assert.equal(settingsResearchAllowanceSummary({ includedRemaining: -1 }), "0/100");
+assert.equal(settingsResearchAllowanceSummary({ includedRemaining: 101 }), "100/100");
+assert.equal(settingsResearchAllowanceSummary({ includedRemaining: "invalid" }), "—/100");
+const planUsageBody = webApp.match(/function planUsageRows\(\) \{([\s\S]*?)\n\}/)?.[1];
+assert.ok(planUsageBody);
+const planRows = (pro, usage) => new Function("isProAccount", "researchUsage", "settingsResearchAllowanceSummary", planUsageBody)(
+  () => pro, usage, settingsResearchAllowanceSummary
+);
+assert.deepEqual(planRows(true, { includedRemaining: 87, includedLimit: 100 }), [{ label: "Research", value: "87/100" }]);
+assert.deepEqual(planRows(false, null), []);
 
 for (const copy of [
   settingsCopy.freePlanSummary,

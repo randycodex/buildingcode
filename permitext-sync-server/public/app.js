@@ -4,7 +4,7 @@ import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-settings-footer-divider-v1527";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-research-remaining-v1528";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -85,7 +85,7 @@ import {
   settingsPlanCopy,
   settingsResearchAllowanceSummary,
   webStripePriceDisclosure
-} from "./settings-copy.js?v=20260920-account-identity-v6";
+} from "./settings-copy.js?v=20261108-research-remaining-v7";
 import {
   clearResearchRequestRecoveries,
   readResearchRequestRecovery,
@@ -156,7 +156,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-settings-footer-divider-v1527";
+} from "./offline-storage.js?v=20261108-research-remaining-v1528";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -10811,33 +10811,8 @@ function webFreePlanUsage() {
 }
 
 function planUsageRows() {
-  const usage = webFreePlanUsage();
-  const rows = isProAccount()
-    ? [
-        { label: "Saved sections", value: "Unlimited" },
-        { label: "Notes", value: "Unlimited" }
-      ]
-    : [
-        {
-          label: "Saved sections",
-          value: "Requires Pro"
-        },
-        {
-          label: "Notes",
-          value: "Requires Pro"
-        }
-      ];
-  if (hasCapability("research")) {
-    rows.push({
-      label: "Research",
-      value: isProAccount()
-        ? settingsResearchAllowanceSummary(researchUsage)
-        : "Available with Pro"
-    });
-  } else if (isProAccount()) {
-    rows.push({ label: "Research", value: "100 turns included monthly" });
-  }
-  return rows;
+  if (!isProAccount()) return [];
+  return [{ label: "Research", value: settingsResearchAllowanceSummary(researchUsage) }];
 }
 
 function researchUsageCopy(usage) {
@@ -10860,7 +10835,8 @@ function hasAvailableWebResearchTurnPack(usage = researchUsage) {
 function renderPlanUsageRows(container) {
   if (!container) return;
   clear(container);
-  planUsageRows().forEach((row) => {
+  const rows = planUsageRows();
+  rows.forEach((row) => {
     const item = document.createElement("p");
     const label = document.createElement("span");
     label.textContent = row.label;
@@ -10869,8 +10845,8 @@ function renderPlanUsageRows(container) {
     item.append(label, value);
     container.append(item);
   });
-  container.hidden = false;
-  container.setAttribute("aria-hidden", "false");
+  container.hidden = rows.length === 0;
+  container.setAttribute("aria-hidden", String(container.hidden));
 }
 
 function renderSavedPlanUsage(container) {
