@@ -21272,17 +21272,24 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  height: auto;
-  min-height: 30px;
+  height: var(--workspace-menu-height);
+  min-height: var(--workspace-menu-height);
   margin: 0 0 20px;
   padding: 0;
   gap: 12px;
   border: 0;
 }
+.settings-floating-panel .account-screen-close,
+.workspace-floating-panel .project-details-screen-close {
+  --panel-title-control-size: var(--workspace-menu-height);
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
+  flex: 0 0 var(--panel-title-control-size);
+}
 .floating-workspace-tabs { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
 .floating-workspace-tabs > button {
   flex: 0 1 auto;
-  min-height: 30px;
+  min-height: var(--workspace-menu-height);
   padding: 5px 12px;
   border: 0;
   border-radius: var(--radius-pill);
