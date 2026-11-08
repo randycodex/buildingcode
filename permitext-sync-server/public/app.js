@@ -5,7 +5,7 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-role-preference-menu-v1536";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-role-none-label-v1537";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -157,7 +157,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-role-preference-menu-v1536";
+} from "./offline-storage.js?v=20261108-role-none-label-v1537";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -42377,7 +42377,7 @@ function renderSettings({ upgrade = false } = {}) {
         trigger: row, anchor: value, label: row.querySelector("dt").textContent,
         value: account.professionalRole || "", className: "profile-role-menu",
         options: [
-          { value: "", label: "Select a role" },
+          { value: "", label: "None" },
           { value: "architect_designer", label: "Architect or designer" },
           { value: "engineer", label: "Engineer" },
           { value: "code_zoning_consultant", label: "Code or zoning consultant" },
