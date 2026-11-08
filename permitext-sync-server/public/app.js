@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-no-default-columns-v1548";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-workspace-menu-width-v1549";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-no-default-columns-v1548";
+} from "./offline-storage.js?v=20261108-workspace-menu-width-v1549";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -571,6 +571,7 @@ let workspaceRegistry = null;
 let activeWorkspaceID = "";
 let suppressReaderScrollRestore = false;
 let workspaceContextMenu = null;
+let workspaceContextMenuBinding = null;
 let mobileMoreSheet = null;
 const codeQuestionListHydrationByProject = new Map();
 const codeQuestionStateHydrationByQuestion = new Map();
@@ -2473,6 +2474,8 @@ function moveNamedWorkspace(workspaceID, direction) {
 }
 
 function closeWorkspaceContextMenu() {
+  workspaceContextMenuBinding?.dispose();
+  workspaceContextMenuBinding = null;
   workspaceContextMenu?.remove();
   workspaceContextMenu = null;
   workspaceActionsButton?.setAttribute("aria-expanded", "false");
@@ -2600,7 +2603,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   closeWorkspaceContextMenu();
   const workspaces = projectsAvailable ? visibleWorkspaceRecords() : [];
   const menu = document.createElement("div");
-  menu.className = "workspace-context-menu";
+  menu.className = "workspace-context-menu workspace-chooser-menu";
   menu.setAttribute("role", "menu");
   menu.setAttribute("aria-label", "Workspace menu");
   const appendMenuAction = (section, action) => {
@@ -2685,11 +2688,13 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   if (layoutActions.childElementCount && !["notebook", "report"].includes(currentColumnWorkflowView())) menu.append(viewOptions);
   document.body.append(menu);
   workspaceContextMenu = menu;
-  workspaceActionsButton?.setAttribute("aria-expanded", "true");
-  const bounds = floatingWorkspacePanelBounds(workspaceFloatingPanelReference(), menu.offsetWidth, window.innerWidth, window.innerHeight);
-  menu.style.left = `${bounds.left}px`;
-  menu.style.top = `${bounds.top}px`;
-  menu.style.maxHeight = `${bounds.maxHeight}px`;
+  workspaceContextMenuBinding = bindFloatingWorkspacePanel(menu, {
+    anchor: anchor || workspaceActionsButton,
+    alignmentReference: workspaceFloatingPanelReference,
+    dismiss: closeWorkspaceContextMenu,
+    isOpen: () => workspaceContextMenu === menu,
+    manageAnchor: true
+  });
   menu.querySelector("button:not(:disabled)")?.focus();
 }
 

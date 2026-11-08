@@ -1110,6 +1110,13 @@ textarea:focus-visible {
   text-transform: uppercase;
 }
 
+.workspace-context-menu.workspace-chooser-menu {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: min(260px, calc(100vw - 48px));
+  max-width: calc(100vw - 48px);
+}
+
 .workspace-context-divider {
   height: 1px;
   margin: 6px -8px;

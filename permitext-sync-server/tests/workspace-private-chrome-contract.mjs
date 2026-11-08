@@ -29,7 +29,8 @@ const context=vm.createContext({renderProjectUpdateBadge(){},switchWorkflowView:
  workspaceProject(){privateReads++;return{id:'project'};},hasCapability:()=>true,prependWorkspaceButtonIcon(){},
  reconcileProjectWorkspaces(){privateReads++;},closeWorkspaceContextMenu(){body.children=[];},state,
  document:{createElement:tag=>new Element(tag),body,querySelector:()=>null,getElementById:id=>id==='fit-columns'?layoutControl:null},
- window:{innerWidth:1000,innerHeight:800},workspaceContextMenu:null,activeWorkspaceID:'project',updateWorkspaceLayoutControls(){},
+ window:{innerWidth:1000,innerHeight:800},workspaceContextMenu:null,workspaceContextMenuBinding:null,
+ workspaceFloatingPanelReference:()=>({right:976,bottom:67}),bindFloatingWorkspacePanel:()=>({dispose(){}}),activeWorkspaceID:'project',updateWorkspaceLayoutControls(){},
  toggleAccountDialog(){},createNewWorkspace(){},openProjectManager(){},switchWorkspace(){},currentColumnWorkflowView:()=> 'research'
 });
 const privateMenus=['openMobileMoreSheet','openWorkspaceManager','openSavedColumnGroupsMenu','openColumnGroupEditor'];
@@ -48,13 +49,12 @@ assert.ok(labels().includes('Sign in for Projects'));assert.ok(!labels().include
 account={userID:'owner'};authority='verified';allowed=true;
 context.renderWorkspaceTabs();assert.equal(label.textContent,'Private Project');assert.equal(button.disabled,false);
 await context.openWorkspaceContextMenu('project',button);
-assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(!labels().includes('Manage Projects…'));assert.ok(labels().includes('Context'));assert.ok(labels().includes('Settings'));
+assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(!labels().includes('Manage Projects…'));assert.ok(labels().includes('Context'));assert.ok(!labels().includes('Settings'),'Settings has its own toolbar button');
 const visit=node=>[node,...node.children.flatMap(visit)];
 const contextAction=visit(body).find(node=>node.textContent==='Context');
-const settingsAction=visit(body).find(node=>node.textContent==='Settings');
 assert.equal(contextAction.disabled,false);
-contextAction.listeners.click();settingsAction.listeners.click();
-assert.deepEqual(opened,['project','settings'],'The consolidated entries invoke their original screen actions');
+contextAction.listeners.click();
+assert.deepEqual(opened,['project'],'Context retains its existing entry point');
 const readsBefore=privateReads;body.children=[];current=false;
 await context.openWorkspaceContextMenu('project',button);
 assert.equal(body.children.length,0,'a stale account request cannot mount its menu');assert.equal(privateReads,readsBefore);

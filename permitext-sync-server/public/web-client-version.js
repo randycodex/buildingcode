@@ -1,4 +1,4 @@
-export const webAppVersion = "20261108-no-default-columns-v1548";
+export const webAppVersion = "20261108-workspace-menu-width-v1549";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";
