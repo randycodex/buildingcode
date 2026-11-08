@@ -20500,7 +20500,7 @@ dialog.report-export-review {
 }
 .project-overview-editor :is(.project-sheet-field, .project-sheet-colors) {
   display: grid;
-  grid-template-columns: minmax(72px, 28%) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: 0 var(--space-3);
   min-width: 0;
@@ -20510,14 +20510,6 @@ dialog.report-export-review {
   box-sizing: border-box;
   border: 0;
   border-bottom: 1px solid var(--border);
-}
-.project-overview-editor .project-editor-label {
-  color: var(--text-secondary);
-  font-size: 13px !important;
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: normal;
-  text-transform: none;
 }
 .project-overview-editor .project-sheet-field :is(input, textarea) {
   min-width: 0;
@@ -20530,21 +20522,22 @@ dialog.report-export-review {
   font-size: 14px !important;
   font-weight: 500;
   line-height: 1.5;
-  text-align: right;
+  text-align: left;
 }
-.project-overview-editor .project-property-lookup-status { grid-column: 1 / -1; text-align: right; }
+.project-overview-editor .project-property-lookup-status { grid-column: 1 / -1; text-align: left; }
 .project-overview-editor .project-color-rail {
   --project-swatch-size: 22px;
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 4px;
   min-width: 0;
   padding: 6px 0;
   border-radius: 0;
   background: transparent;
 }
-.project-overview-editor .project-color-swatch { flex: 0 0 var(--project-swatch-size); }
+.project-overview-editor .project-color-swatch { width: min(var(--project-swatch-size), 100%); height: auto; aspect-ratio: 1; }
 .project-overview-editor .project-sheet-header {
   position: static;
   display: flex;

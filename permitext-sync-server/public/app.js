@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-context-direct-fields-v1571";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-context-compact-fields-v1572";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-context-direct-fields-v1571";
+} from "./offline-storage.js?v=20261108-context-compact-fields-v1572";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36050,15 +36050,6 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   descriptionInput.rows = 3;
   if (identity) descriptionInput.value = identity.description;
   descriptionLabel.append(descriptionInput);
-  if (inline) {
-    for (const [row, text] of [[nameLabel, "Name"], [addressLabel, "Address"], [colorGroup, "Color"]]) {
-      const label = document.createElement("span");
-      label.className = "project-editor-label";
-      label.textContent = text;
-      row.prepend(label);
-    }
-  }
-
   let propertyLookupAddress = "";
   let propertyLookupResult = null;
   let propertyLookupPromise = null;
