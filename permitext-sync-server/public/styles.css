@@ -21382,7 +21382,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   flex: 0 0 auto;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 16px;
+  gap: 12px 16px;
   height: auto;
   min-height: 0;
   margin-top: 14px;
@@ -21393,7 +21393,16 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   background: transparent;
 }
 .settings-floating-panel .settings-footer-links { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-left: auto; }
-.settings-floating-panel .settings-panel .settings-footer .settings-disclaimer { flex: 0 0 100%; margin: 0; white-space: normal; text-align: center; text-wrap: balance; font-size: 11px; }
+.settings-floating-panel .settings-panel .settings-footer .settings-disclaimer {
+  flex: 0 0 calc(100% + 2 * var(--account-category-gutter));
+  margin: 0 calc(-1 * var(--account-category-gutter));
+  padding: 12px var(--account-category-gutter) 0;
+  border-top: 1px solid var(--border);
+  white-space: normal;
+  text-align: center;
+  text-wrap: balance;
+  font-size: 11px;
+}
 .workspace-floating-panel > .report-screen-host { display: flex; flex: 1; min-height: 0; padding: 0; overflow: hidden; }
 .workspace-floating-panel .project-details-content { width: 100%; height: 100%; min-height: 0; margin: 0; }
 .workspace-floating-panel .project-details-columns { display: block; flex: 1; min-height: 0; overflow: hidden; }

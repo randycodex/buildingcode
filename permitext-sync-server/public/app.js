@@ -4,7 +4,7 @@ import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-account-profile-dividers-v1526";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-settings-footer-divider-v1527";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -156,7 +156,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-account-profile-dividers-v1526";
+} from "./offline-storage.js?v=20261108-settings-footer-divider-v1527";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
