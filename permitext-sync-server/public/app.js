@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-zola-outline-pill-v1574";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-facts-static-groups-v1575";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-zola-outline-pill-v1574";
+} from "./offline-storage.js?v=20261108-facts-static-groups-v1575";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36972,10 +36972,9 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     }
   };
   presentationGroups.forEach((group, groupIndex) => {
-    const groupSection = document.createElement(factsOnly ? "details" : "section");
-    if (factsOnly) groupSection.open = true;
+    const groupSection = document.createElement("section");
     groupSection.className = `saved-project-structured-group is-${group.key}`;
-    const groupHeading = document.createElement(factsOnly ? "summary" : "div");
+    const groupHeading = document.createElement(factsOnly ? "header" : "div");
     groupHeading.className = "saved-project-structured-group-heading";
     const groupToggle = document.createElement(factsOnly ? "h3" : "button");
     if (!factsOnly) groupToggle.type = "button";

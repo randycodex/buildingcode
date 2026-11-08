@@ -21164,9 +21164,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .calculation-draft-tools select { width: 100%; min-width: 0; }
 .calculation-draft-state { font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
 .project-fact-group-count { color: var(--text-secondary); font-weight: 400; margin-left: auto; font-size: 11px; }
-.project-facts-panel details.saved-project-structured-group > summary { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 0; }
-.project-facts-panel details.saved-project-structured-group > summary::before { content: '▾'; }
-.project-facts-panel details.saved-project-structured-group:not([open]) > summary::before { content: '▸'; }
+.project-facts-panel .saved-project-structured-group-heading { gap: 10px; padding: 10px 0; }
 .workspace-context-switch > span:first-child { white-space: normal; overflow-wrap: anywhere; text-align: left; }
 
 /* Release audit: transient confirmations stay outside the toolbar layout. */

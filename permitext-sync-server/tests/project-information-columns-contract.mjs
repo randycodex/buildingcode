@@ -284,6 +284,7 @@ const factsEditor = e.appendSavedProjectFactEditor(factsRoot, alpha, alpha, { se
 await contextEditor.flush(); assert.equal(patches.length,0);
 assert.equal(find(factsRoot,node=>node.attributes['aria-label']==='Address').readOnly,true,'Address edits belong to the Overview editor.');
 assert.equal(factMotionCalls.length, 0, "Standalone Facts ignores stored collapsed state and has no accordions.");
+assert.equal(find(factsRoot,node=>node.tag==='details'||node.tag==='summary'),undefined,'Facts groups have no native collapse controls.');
 for (const label of ["Property", "Building", "Work & code basis", "Zoning", "Special designations"]) {
   assert.ok(find(factsRoot, node => node.tag === "h3" && node.textContent === label));
 }
