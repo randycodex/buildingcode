@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-facts-static-groups-v1575";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-questions-heading-v1576";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-facts-static-groups-v1575";
+} from "./offline-storage.js?v=20261108-questions-heading-v1576";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4397,7 +4397,6 @@ function appendProjectOpenQuestions(container, project) {
   section.className = "project-open-questions workflow-section";
   section.dataset.projectEditingState = "true";
   section._projectHasPendingEdits = () => Boolean(pending) || saved !== JSON.stringify(items);
-  const heading = document.createElement("h3"); heading.textContent = "Open questions";
   const list = document.createElement("ol"); list.className = "project-open-question-list";
   const status = document.createElement("p"); status.className = "workflow-help"; status.setAttribute("role", "status");
   const retry = document.createElement("button"); retry.type = "button"; retry.className = "ghost-button";
@@ -4446,7 +4445,7 @@ function appendProjectOpenQuestions(container, project) {
     items.push({ id: crypto.randomUUID(), question: "", answer: "" }); render(); autosave();
     list.lastElementChild?.querySelector("textarea")?.focus();
   });
-  section.append(heading, list, add, status, retry); container.append(section); render();
+  section.append(list, add, status, retry); container.append(section); render();
   return { flush: save };
 }
 
