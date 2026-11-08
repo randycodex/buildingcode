@@ -19258,6 +19258,9 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
   color: var(--text-primary) !important;
   -webkit-text-fill-color: currentColor;
 }
+.search-panel .search-family-card > .search-result-group:last-child > .search-group-label[aria-expanded="false"] {
+  border-bottom: 0;
+}
 .search-family-card .search-result-group-meta {
   color: var(--text-secondary);
 }
