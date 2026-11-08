@@ -58,6 +58,43 @@ assert.equal(requests.at(-1).body.analysisMode,'conversation_only','Original Res
 
 const render = source.slice(source.indexOf('async function renderResearch(paneID'), source.indexOf('function visualEvidenceDataURL'));
 assert(render.includes('researchConversationHistoryGroups(visibleHistoryConversations())'));
-assert(render.includes('visibleHistoryConversations().forEach((conversation) => selectedConversationIDs.add(conversation.id))'));
+assert(render.includes('historyManagement.setConversations(historyConversations)'));
 assert(!render.includes('researchConversationList.filter('), 'Bulk actions must use the scoped list.');
 console.log('Web Research project scope passed: all creation origins, per-project history, unassigned isolation, scoped bulk actions, and workspace-switch race.');
+
+// Reader actions preserve their exact evidence while using the active workspace's
+// Project, rather than an obsolete Project retained by a previously opened Reader.
+project = {id:'project-a'};
+context.activeWorkspaceRecord = () => project ? {projectID:project.id} : null;
+const paragraph = {textContent:'Exact enacted passage.\nWith a qualification.'};
+let rangedElement;
+const range = {selectNodeContents(element){rangedElement=element;}};
+context.document = {createRange:()=>range};
+context.researchSelectionTextFromRange = (_text,selectionRange) => {
+  assert.equal(selectionRange,range); return rangedElement.textContent;
+};
+context.normalizedPassageAnchorText = value => value.replace(/\s+/g,' ').trim();
+vm.runInContext(extract('readerSectionResearchSelection'),context);
+const wrapper = {dataset:{researchSectionId:'545',researchSectionNumber:'101.1',researchSectionTitle:'Scope',
+  researchCodePrefix:'BC',researchSavedItemId:'saved-passage',researchCodeEdition:'2014',
+  researchCodeVersion:'nyc-2014',researchSourceLibraryVersion:'library-2014'},
+  closest:()=>({dataset:{paneId:'reader:historical',sourceProjectId:'obsolete-project'}})};
+const selection = context.readerSectionResearchSelection(wrapper,paragraph);
+assert.equal(rangedElement,paragraph);
+assert.equal(selection.projectID,'project-a');
+assert.equal(selection.originPaneID,'reader:historical');
+assert.equal(selection.selectedText,paragraph.textContent);
+assert.equal(selection.passages.length,1);
+assert.equal(selection.passages[0].selectedText,paragraph.textContent);
+assert.equal(selection.passages[0].codeVersion,'nyc-2014');
+assert.equal(selection.passages[0].codeEdition,'2014');
+assert.equal(selection.passages[0].sourceLibraryVersion,'library-2014');
+assert.equal(selection.passages[0].savedItemID,'saved-passage');
+assert.equal(selection.passages[0].start,0);
+assert.equal(selection.passages[0].end,context.normalizedPassageAnchorText(paragraph.textContent).length);
+project = {id:'project-b'};
+assert.equal(context.readerSectionResearchSelection(wrapper,paragraph).projectID,'project-b');
+project = null;
+assert.throws(()=>context.readerSectionResearchSelection(wrapper,paragraph),/Choose a Project/);
+assert.equal(context.readerSectionResearchSelection(null),undefined);
+console.log('Reader Research selection passed: exact passage/edition identity, active workspace Project, retained origin and missing-Project guard.');

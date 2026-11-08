@@ -668,7 +668,9 @@ assert.match(clientSource, /renderResearchSource\(source, \{[\s\S]*?openInReader
 assert.match(clientSource, /openSourceInReader\(source, options\.anchorPaneID, \{ projectID: options\.projectID \}\)/, "Answer source rows do not use the Project-aware search-free Reader path.");
 assert.match(clientSource, /const exactSource = answerSources\.find[\s\S]*?openSourceInReader\(exactSource, options\.anchorPaneID \|\| "", \{[\s\S]*?projectID: options\.conversation\?\.primaryProjectID/, "Top citation chips do not open their exact Project-aware Reader source.");
 assert.match(clientSource, /openNotebookReference\(project, foundation, reference, selectCard, anchorPaneID, projectID\)[\s\S]*?openSourceInReader\([\s\S]*?anchorPaneID, \{ projectID/, "Notebook reference chips should open the Project-aware Reader without creating Search.");
-assert.match(clientSource, /async function openSourceInReader\(item, anchorPaneID = "", options = \{\}\)[\s\S]*?resolveReaderSource\(item, \{isCurrent: navigationIsCurrent\}\)[\s\S]*?readerMatchesSource\(candidate, detail\)[\s\S]*?placePaneAfter\(anchorPaneID, paneID\)[\s\S]*?revealReaderSourceTarget\(reader, navigationItem, options\.evidenceAnchor, \{preferPassage: fromSearch\}\)/, "Answer sources do not resolve, reuse, and highlight an adjacent Reader.");
+// Exercise the actual navigation flow instead of fixing its argument spelling
+// to one source surface. Research citations and Search details both reveal passages.
+await import("./search-reader-opening.mjs");
 assert.match(clientSource, /function researchCodeEdition\(source = \{\}\)[\s\S]*?codePrefix === "BC68"[\s\S]*?source\.codeVersion[\s\S]*?return "Current";/, "Notebook evidence does not derive the enacted source edition from the selected code family and version.");
 assert.doesNotMatch(clientSource, /bindResearchTextSelection|showResearchSelectionMenu|research-selection-menu|Link to Note|notebookEvidenceLinksFromSelection/, "The retired Reader selection card or direct-to-Note workflow is still reachable.");
 assert.doesNotMatch(stylesSource, /\.research-selection-(?:menu|actions|project|note|relationship|evidence)/, "Retired Reader selection-card styling is still shipped.");
@@ -721,7 +723,7 @@ assert.match(stylesSource, /\.workspace-tab \{[\s\S]*?font-size: 12px;/, "Worksp
 assert.match(stylesSource, /\.connection-status \{[\s\S]*?font-size: 12px;/, "Connection status labels are not 12px.");
 assert.match(stylesSource, /\.reader-nav-row \{[^}]*color: var\(--text-secondary\);[\s\S]*?\.reader-nav-label,[\s\S]*?background: transparent;/, "Reader chapter rows retain a persistent highlight instead of highlighting on hover.");
 assert.match(clientSource, /projectID: selection\.projectID \|\| ""/, "Unassigned Reader evidence is not submitted as an unassigned Research conversation.");
-assert.match(functionSource(clientSource, "readerSectionResearchSelection"), /selectedOpenProjectID\(\)[\s\S]*?passages: \[passage\],[\s\S]*?projectID/, "Reader passage Research does not preserve the passage and active Project context.");
+await import("./research-project-workspace-contract.mjs");
 assert.match(functionSource(clientSource, "renderInlineCommentBox"), /if \(!allowed\(\) \|\| researchButton\.disabled\) return;[\s\S]*?openResearchDestinationMenu\(researchButton, readerSectionResearchSelection\(sectionWrapper, passage\)\)/, "Reader Research must check access and open an explicit passage destination picker.");
 await import("./reader-public-presentation-contract.mjs");
 assert.doesNotMatch(clientSource, /newResearchButton|inline-new-research-toggle|Start new Research with this passage|createNew: true/, "The Reader still exposes a duplicate new-Research icon.");
@@ -777,7 +779,7 @@ assert.match(functionSource(clientSource, "renderResearchConversation"), /pendin
 // three duplicated source implementations of the same callback.
 await import("./research-client-context-recovery-contract.mjs");
 assert.match(clientSource, /async function clearResearchConversationHistory\(button,[\s\S]*?"Remove selected Research history\?"[\s\S]*?container: button\.closest\("\.workspace-panel"\)/, "Bulk Research-history removal must keep its confirmation inside the Research column.");
-assert.match(functionSource(clientSource, "renderSettings"), /manageProjects\?\.addEventListener\("toggle"[\s\S]*?renderProjectManager\(/, "Project management expands inside Settings.");
+await import("./settings-content-management-contract.mjs");
 assert.match(clientSource, /Saved passages and notes that are not assigned to a Project appear here\./, "Unassigned saves explains that the collection is saved evidence outside a Project.");
 assert.match(clientSource, /No unassigned saves match[\s\S]*?Clear the search to see every unassigned save\./, "A search that hides Unassigned saves must say the collection is unchanged.");
 assert.match(functionSource(clientSource, "applyProjectSelectionIntent"), /liveInstance\.organizeUnassigned = intent\.kind === "unassigned";[\s\S]*?transitionProjectSelection\(controller\.paneID\)/, "The serialized Project-selection controller does not open the filtered Unassigned Saved evidence view.");

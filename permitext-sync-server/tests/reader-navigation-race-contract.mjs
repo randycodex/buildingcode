@@ -11,8 +11,10 @@ function actual(name) {
   return source.slice(start, end + 2);
 }
 function node() {
-  return { children: [], dataset: {}, callbacks: {}, classList: { remove() {} },
+  return { children: [], dataset: {}, callbacks: {}, attributes: {}, classList: { remove() {} },
     append(...children) { this.children.push(...children); },
+    replaceChildren(...children) { this.children = children; },
+    setAttribute(name, value) { this.attributes[name] = value; },
     querySelector(selector) { return this.children.find(child => `.${child.className}` === selector); },
     addEventListener(name, callback) { this.callbacks[name] = callback; } };
 }
@@ -66,7 +68,7 @@ function harness({ delayChapters = false } = {}) {
     updateBrowserSectionURL() {}, navigateReaderToSection() {}
   });
   vm.runInContext("const readerResolvedWorkspaceIdentities = new WeakMap(); const resolvedReaderSourceNavigations = new WeakMap();\n" + [
-    "workspaceReaderContentIdentity", "setResolvedReaderChapter", "emptyReader", "resolveReaderNavigationChapterID", "beginReaderNavigation", "changeReaderCode", "refreshReaderContent",
+    "workspaceReaderContentIdentity", "setResolvedReaderChapter", "showColumnLoadingStatus", "emptyReader", "resolveReaderNavigationChapterID", "beginReaderNavigation", "changeReaderCode", "refreshReaderContent",
     "populateReaderSelectors", "renderSectionContent", "selectReaderNavigation", "readerContentScrollKey", "readerScrollPositionFor"
   ].map(actual).join("\n"), context);
   return { panel, reader, content, chapterSelect, sectionSelect, lists, chapters, bodies, persisted,
@@ -96,7 +98,10 @@ function assertCurrent(t, key) {
 {
   const t = harness();
   const old = t.run("BC", "2014");
-  assert.equal(t.content.querySelector(".reader-empty").children[0].textContent, "Loading chapter");
+  const loading = t.content.querySelector(".column-loading-indicator");
+  assert.equal(t.content.children.length, 1, "Previous edition text disappears before the catalog request completes.");
+  assert.equal(loading.attributes.role, "status");
+  assert.equal(loading.children[0].textContent, "Loading chapter…");
   const middle = t.run("FGC", "2022");
   const latest = t.run("BC", "2014");
   await complete(t); await latest;
