@@ -39,10 +39,10 @@ const layout = { ...workspace.emptyWorkspaceLayout(), workflowView:"notebook", w
   paneOrder: ["saved:saved-pane", "notebook:project", "search:search-pane"] };
 const registry = { version: 1, activeWorkspaceID: "workspace", workspaces: [{ id: "workspace", name: "Synthetic workspace", createdAt: "2026-09-04T00:00:00Z", updatedAt: "2026-09-04T00:00:00Z" }] };
 
-function restore({ layoutJSON = JSON.stringify(layout), regressOrder = false, storedColor = false, settingsCollapsedColumnIDs = [] } = {}) {
+function restore({ layoutJSON = JSON.stringify(layout), regressOrder = false, storedColor = false, settingsCollapsedColumnIDs = [], freshAccount = false } = {}) {
   const logs = [];
   const storedLayout = storedColor ? JSON.stringify({ ...layout, notebooks: layout.notebooks.map((p) => ({ ...p, structuredFacts: [], color: "#6674c8" })), projectDetails: layout.projectDetails.map((p) => ({ ...p, structuredFacts: [] })) }) : layoutJSON;
-  const records = new Map([["shared", JSON.stringify({ localProjects: [{ id: "project" }], syncOutbox: [{ accountUserID: "account", mutation: { id: "pending" } }], settingsCollapsedColumnIDs })], ["registry", JSON.stringify(registry)], ["layout:workspace", storedLayout]]);
+  const records = new Map(freshAccount ? [] : [["shared", JSON.stringify({ localProjects: [{ id: "project" }], syncOutbox: [{ accountUserID: "account", mutation: { id: "pending" } }], settingsCollapsedColumnIDs })], ["registry", JSON.stringify(registry)], ["layout:workspace", storedLayout]]);
   const initialRecords = JSON.stringify([...records]);
   const storage = { getItem: (key) => records.get(key) ?? null, setItem: (key, value) => records.set(key, value), removeItem: (key) => records.delete(key) };
   const context = vm.createContext({ ...recentSearchScope, ...recentViewScope, ...workspace, ...searchSession, normalizeNotebookColumns, normalizeSettingsColumnWidths, recordWorkspaceLayoutChange() {}, normalizeVisitedWorkflowViews, normalizeWorkflowView, normalizeWorkflowMembership, crypto: webcrypto,
@@ -80,6 +80,12 @@ assert.equal(after.context.restored.notebooks[0].structuredFacts[0].status, "con
 assert.deepEqual(Array.from(after.context.restored.paneOrder), layout.paneOrder);
 assert.equal(after.context.restored.syncOutbox.length, 1);
 assert.equal(after.logs.length, 0);
+const fresh = restore({ freshAccount: true });
+assert.equal(fresh.context.restoreFailure(),null);
+assert.deepEqual(Array.from(fresh.context.restored.readers),[],'A new account starts without Readers');
+assert.deepEqual(Array.from(fresh.context.restored.utilityInstances),[],'A new account starts without Search, Evidence or Assistant columns');
+assert.ok(Object.values(fresh.context.restored.utilities).every(value=>value===false),'A new account starts with all utilities closed');
+assert.deepEqual(Array.from(fresh.context.restored.notebooks),[],'A new account starts without Notes');
 const settings = restore({ settingsCollapsedColumnIDs: ["library", "unknown", "library"] });
 assert.equal(Object.hasOwn(settings.context.restored, "settingsCollapsedColumnIDs"), false, "Legacy collapsed Settings columns must not be restored.");
 

@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-assistant-contextual-hint-v1547";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-no-default-columns-v1548";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-assistant-contextual-hint-v1547";
+} from "./offline-storage.js?v=20261108-no-default-columns-v1548";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2215,11 +2215,8 @@ function reconcileProjectWorkspaces() {
       .map((item) => item.id === activeWorkspaceID ? captureWorkspaceLayout(state) : loadWorkspaceSnapshot(item.id))
       .find((layout) => layout && (layout.projectDetails || []).some((detail) => projectDetailMatches(detail, project)));
     const layout = legacyLayout || emptyWorkspaceLayout();
-    const saved = newUtilityInstance("saved", { selectedFolderID: projectID });
-    layout.utilityInstances = [...(layout.utilityInstances || []).filter((item) => item.key !== "saved"), saved];
     layout.projectDetails = [projectIdentity(project)];
     layout.projectDetail = projectIdentity(project);
-    layout.projectHostPaneID = paneIDForUtilityInstance(saved);
     // Write the layout before registering it; interrupted migration can safely retry.
     if (!localStorage.getItem(workspaceSnapshotKey(id))) {
       localStorage.setItem(workspaceSnapshotKey(id), JSON.stringify(workspaceLayoutWithoutCodeQuestionData(layout)));
@@ -5318,7 +5315,7 @@ function syncWorkflowNavigation() {
   syncNotebookNoteTabs();
   if (view === 'notebook') void ensureNotebookTabCatalog();
 }
-async function switchWorkflowView(view, {initialize = true} = {}) {
+async function switchWorkflowView(view) {
   if (!isProAccount() && view !== "research") return false;
   if (view === "project") {
     if (!workspaceProject()) { await openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton); return false; }
@@ -5336,8 +5333,6 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
   }
   if (notifyProjectRequiredForColumn()) { syncWorkflowColumnPresentation(); return false; }
   view = normalizeWorkflowView(view);
-  const visitedViews = state.workflowVisitedViews || [];
-  const initializeNotebook = view === "notebook" && !visitedViews.includes(view) && !projectHasOpenNotebook(workspaceProject());
   if (view !== currentWorkflowView()) {
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     state.workflowView = view;
@@ -5352,10 +5347,6 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
     await transitionWorkspace("utility");
     if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
         (state.workflowNavigationGeneration || 0) !== navigation || view !== currentWorkflowView()) return false;
-  }
-  if (initialize && (initializeNotebook || (!visitedViews.includes(view) && !defaultActivePaneIDs().some(workflowPaneIsVisible)))) {
-    if (view === 'notebook') await openProjectNotebook(workspaceProject());
-    else await focusRecentUtilityColumn('search');
   }
   if (view === currentWorkflowView() && defaultActivePaneIDs().some(workflowPaneIsVisible)) {
     state.workflowVisitedViews = [...new Set([...(state.workflowVisitedViews || []), view])];

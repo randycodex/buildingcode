@@ -79,21 +79,21 @@ assert.equal(reader.scrollTop,1700); assert.equal(track.scrollLeft,110);
 assert.equal(notebook.draft,'Unsaved text'); assert.equal(constructions,0);
 await c.switchWorkflowView('notebook'); assert.equal(notebook.scrollTop,450); assert.equal(track.scrollLeft,200);
 assert.equal(state.workflowNavigationGeneration,3,'Each actual view change invalidates pending navigation');
-for (const view of ['project-details']) {
-  const reference=pane(`reader:${view}`);panes.push(reference);
-  state.workflowMembership=linkPaneToView(state.workflowMembership,reference.dataset.paneId,view);
-  reportOpen=view==='report';detailsOpen=view==='project-details';
-  c.syncWorkflowColumnPresentation();
-  assert.equal(c.workflowPaneIsVisible(reference.dataset.paneId),true);
-  assert.equal(c.workflowPaneIsVisible(notebook.dataset.paneId),false);
-  reference.scrollTop=870;track.scrollLeft=250;
-  await c.switchWorkflowView('notebook');
-  assert.equal(notebook.scrollTop,450);assert.equal(track.scrollLeft,200);
-  reportOpen=view==='report';detailsOpen=view==='project-details';c.syncWorkflowColumnPresentation();
-  assert.equal(reference.scrollTop,870);assert.equal(track.scrollLeft,250);
-  assert.equal(reference.draft,'Unsaved text');
-  await c.switchWorkflowView('notebook');
-}
+// Floating Context does not replace the underlying Research/Notebook view.
+await c.switchWorkflowView('research');
+detailsOpen=true;
+c.syncWorkflowColumnPresentation();
+assert.equal(c.currentColumnWorkflowView(),'research');
+assert.equal(c.workflowPaneIsVisible(reader.dataset.paneId),true);
+assert.equal(c.workflowPaneIsVisible(notebook.dataset.paneId),false);
+const retainedReaderScroll=reader.scrollTop;
+await c.switchWorkflowView('notebook');
+assert.equal(detailsOpen,false);
+assert.equal(notebook.scrollTop,450);assert.equal(track.scrollLeft,200);
+await c.switchWorkflowView('research');
+assert.equal(reader.scrollTop,retainedReaderScroll);
+assert.equal(reader.draft,'Unsaved text');
+await c.switchWorkflowView('notebook');
 needProject=true; assert.equal(await c.switchWorkflowView('research'),false); assert.equal(state.workflowView,'notebook');
 const beforeExplicit = constructions;
 needProject = false;
@@ -179,11 +179,15 @@ for (const view of ['research','notebook']) {
   assert.equal(constructions,afterOther,'Switching views does not reopen deliberately closed Note columns');
   assert.equal(panes.length,1,'Both views retain deliberate empty layouts');
 }
-panes.length=0;
-state.workflowVisitedViews=[];
-const beforeFresh=constructions;
-await c.switchWorkflowView('research');
-assert.equal(constructions,beforeFresh+1,'First empty Research visit still opens Search');
+for (const view of ['research','notebook']) {
+  panes.length=0;
+  state.workflowVisitedViews=[];
+  const beforeFresh=constructions;
+  await c.switchWorkflowView(view);
+  await c.switchWorkflowView(view);
+  assert.equal(constructions,beforeFresh,`First empty ${view} visit must not open default columns`);
+  assert.equal(panes.length,0,'An empty workspace stays empty until a column is explicitly opened');
+}
 console.log('Closed view regression passed: Deliberately closed columns stay closed, retained editors and saved layouts survive.');
 
 const evidenceState={paneOrder:['reader:research','project:notebook:a','utility:saved:one','utility:saved:two']};

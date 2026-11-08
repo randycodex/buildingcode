@@ -39,12 +39,48 @@ context.activeWorkspaceID='project:a';
 assert.equal(vm.runInContext('scopeSavedInstanceToWorkspace({selectedFolderID:"b"}).selectedFolderID',context),'a');
 const alpha=JSON.parse(storage.get('project:a'));
 assert.equal(alpha.projectDetails[0].id,'a');
+assert.deepEqual(alpha.utilityInstances,[],'New Project workspaces do not seed Evidence or other default columns');
+assert.deepEqual(alpha.readers,[],'New Project workspaces do not seed Readers');
+assert.ok(Object.values(alpha.utilities).every(value=>value===false),'No utility opens by default');
 assert.equal(JSON.parse(storage.get('project:b')).projectDetails[0].id,'b');
 projects[0].name='Renamed';
 vm.runInContext('reconcileProjectWorkspaces()',context);
 assert.equal(context.workspaceRegistry.workspaces[1].name,'Renamed');
 assert.equal(normalizeWorkspaceRegistry(context.workspaceRegistry).workspaces[1].projectID,'a');
 assert.equal(storage.get('project:a'),JSON.stringify(alpha),'reconcile must preserve existing layouts');
+// A legacy workspace retains columns the user already opened during migration.
+const legacy={...emptyWorkspaceLayout(),projectDetails:[projects[1]],
+  readers:[{id:'reader-kept',codePrefix:'BC'}],
+  utilityInstances:[{key:'search',id:'search-kept',query:'ramps'},{key:'saved',id:'evidence-kept',selectedFolderID:'b'}],
+  paneOrder:['reader:reader-kept','utility:search:search-kept','utility:saved:evidence-kept']};
+storage.set('main',JSON.stringify(legacy));
+context.workspaceRegistry.workspaces=context.workspaceRegistry.workspaces.filter(workspace=>workspace.projectID!=='b');
+storage.delete('project:b');
+vm.runInContext('reconcileProjectWorkspaces()',context);
+const migrated=JSON.parse(storage.get('project:b'));
+assert.deepEqual(migrated.readers,legacy.readers);
+assert.deepEqual(migrated.utilityInstances,legacy.utilityInstances,'Migration preserves explicit Search and Evidence columns without replacing them');
+assert.deepEqual(migrated.paneOrder,legacy.paneOrder);
+// Exercise the actual add-workspace completion path, not only reconciliation.
+let creationOptions,createdWorkspaceID;
+Object.assign(context,{
+  closeWorkspaceContextMenu(){},hasCapability:()=>true,confirmWorkspaceTransition:async()=>true,
+  document:{querySelector:()=>null},track:{},
+  showProjectCreateSheet:(_host,_project,options)=>{creationOptions=options;},
+  switchWorkspace:async id=>{createdWorkspaceID=id;}
+});
+const createStart=app.indexOf('async function createNewWorkspace(');
+vm.runInContext(app.slice(createStart,app.indexOf('\n}',createStart)+2),context);
+await context.createNewWorkspace();
+assert.equal(creationOptions.workspaceProject,true);
+const createdProject={id:'new',name:'New workspace',folderType:'project'};
+projects.push(createdProject);
+await creationOptions.onCreated(createdProject);
+assert.equal(createdWorkspaceID,'project:new');
+const createdLayout=JSON.parse(storage.get(createdWorkspaceID));
+assert.deepEqual(createdLayout.utilityInstances,[],'Creating a workspace does not open Evidence or Search');
+assert.deepEqual(createdLayout.readers,[]);
+assert.deepEqual(createdLayout.notebooks,[]);
 console.log('Project workspace migration, binding, isolation, rename, and layout preservation passed.');
 context.syncedContent.status='connected';
 context.workspaceRegistry.workspaces.push({id:'stale',name:'Missing project',projectID:'missing'});
