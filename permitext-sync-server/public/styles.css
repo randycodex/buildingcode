@@ -19242,7 +19242,7 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
 }
 .settings-active-sources-list .settings-active-source-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   min-height: 44px;
   padding: 10px 0;
@@ -19257,7 +19257,7 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
   flex: 0 0 auto;
   width: 18px;
   height: 18px;
-  margin: 2px 0 0;
+  margin: 0;
 }
 .settings-active-source-row > span {
   flex: 1;
