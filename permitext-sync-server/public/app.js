@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-context-panel-height-v1562";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-fact-row-labels-v1563";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-context-panel-height-v1562";
+} from "./offline-storage.js?v=20261108-fact-row-labels-v1563";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36898,7 +36898,7 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     if (fact?.sourceText) value.title = fact.sourceText;
     label.htmlFor = value.id = `project-structured-${safeAnnotationIDPart(projectRecordID(folder))}-${key}`;
     row.append(label, value);
-    if (fact) {
+    if (fact && (fact.status !== "sourced" || fact.source !== "nyc-planning")) {
       const review = document.createElement("small");
       review.className = "project-fact-review-status";
       review.textContent = ({unknown: "Needs review", assumed: "Assumption", confirmed: "Confirmed", stated: "Stated", sourced: "Sourced", rejected: "Rejected"})[fact.status] || fact.status;
