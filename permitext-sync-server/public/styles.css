@@ -86,6 +86,7 @@
   --radius-card: 14px;
   --radius-control: 12px;
   --radius-pill: 999px;
+  --workspace-floating-menu-radius: 16px;
   --space-1: 6px;
   --space-2: 10px;
   --space-3: 14px;
@@ -1095,7 +1096,7 @@ textarea:focus-visible {
   width: min(260px, calc(100vw - 16px));
   padding: 8px;
   border: 0;
-  border-radius: var(--radius-card);
+  border-radius: var(--workspace-floating-menu-radius);
   background: var(--menu-surface);
   box-shadow: none;
 }
@@ -21274,7 +21275,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   padding: 20px;
   box-sizing: border-box;
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius: var(--workspace-floating-menu-radius);
   background: var(--menu-surface);
   color: var(--text-primary);
   box-shadow: none;
