@@ -20525,6 +20525,16 @@ dialog.report-export-review {
   text-align: left;
 }
 .project-overview-editor .project-property-lookup-status { grid-column: 1 / -1; text-align: left; }
+.project-overview-editor .project-property-import {
+  justify-self: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  box-shadow: none;
+}
 .project-overview-editor .project-color-rail {
   --project-swatch-size: 22px;
   display: grid;
