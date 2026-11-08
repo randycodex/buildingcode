@@ -21294,6 +21294,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workspace-floating-panel[hidden],
 .settings-floating-panel .settings-account-column[hidden],
 .workspace-floating-panel .project-information-panel[hidden] { display: none !important; }
+.settings-floating-panel > .web-warning-backdrop.is-column-scoped { padding: 20px; border-radius: inherit; container-type: inline-size; }
 .account-dialog.account-screen.settings-floating-panel { --account-category-gutter: 0px; --account-category-top-gutter: 0px; --settings-disclosure-indent: 20px; }
 .settings-floating-panel .account-screen-header,
 .workspace-floating-panel .project-details-screen-header {

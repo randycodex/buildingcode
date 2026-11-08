@@ -13,10 +13,14 @@ class Element {
   focus() {}
   querySelector() { return null; }
   querySelectorAll() { return []; }
+  closest(selector) { return selector === '.settings-floating-panel' && this.className === 'settings-floating-panel' ? this : this.parent?.closest(selector); }
 }
 const body = new Element('body');
 const container = new Element('div');
-body.append(container);
+const settingsPanel = new Element('section');
+settingsPanel.className = 'settings-floating-panel';
+body.append(settingsPanel);
+settingsPanel.append(container);
 const records = Array.from({ length: 30 }, (_, i) => ({ id: String(i), name: `Project ${i}`, archived: false }));
 records.push({ id: 'collection', collection: true }, { id: 'shared', sharedOnly: true });
 const calls = [];
@@ -35,6 +39,7 @@ const context = vm.createContext({
   archiveProjects: async projects => { calls.push(['archive', projects.length]); projects.forEach(p => p.archived = true); },
   restoreArchivedProject: async project => { project.archived = false; restored++; },
   deleteArchivedProjects: async (projects, options) => {
+    assert.equal(options.container, settingsPanel, 'Settings project confirmations stay in their floating panel.');
     calls.push(['delete', projects.length, options.includeNames]);
     if (allowDelete) projects.forEach(p => p.deleted = true);
     return allowDelete;

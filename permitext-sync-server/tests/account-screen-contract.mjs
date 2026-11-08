@@ -11,7 +11,7 @@ function extract(name) {
 
 function harness(signedIn, pro = signedIn) {
   let currentDialog = null, focusReturns = 0, focusTraps = 0, contextCheck, accountCurrent = true;
-  const panels = [], transitions = [], toggleAttributes = {}, signInStarts = [], checkoutStarts = [];
+  const panels = [], transitions = [], toggleAttributes = {}, signInStarts = [], checkoutStarts = [], warningClosures = [];
   function element() {
     const node = {
       children: [], listeners: {}, attributes: {}, dataset: {}, removedStyles: [],
@@ -103,6 +103,7 @@ function harness(signedIn, pro = signedIn) {
     renderSettings: panel, renderAccountWelcome: panel, renderProAccountEntry: panel, renderDirectSignInEntry: panel,
     showProAccountCheckout: dialog => checkoutStarts.push(dialog),
     trapWebModalFocus: () => { focusTraps++; }, clearProUpgradeIntent() {},
+    activeWebWarningClose: confirmed => warningClosures.push(confirmed),
     state: {}, saveWorkspaceState() {}, closeSharedWorkspaceViews() {},
     createSettingsColumnResizers: () => ({ refresh() {}, dispose() {} }),
     captureAccountRequest: () => signedIn ? { userID: "synthetic-account" } : {}, isCurrentAccountRequest: () => accountCurrent,
@@ -112,7 +113,7 @@ function harness(signedIn, pro = signedIn) {
     transitionWorkspace: async (kind, options) => transitions.push({ kind, options }), track
   });
   vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "workspaceFloatingPanelReference", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
-  return { context, track, panels, transitions, toggleAttributes, signInStarts, checkoutStarts,
+  return { context, track, panels, transitions, toggleAttributes, signInStarts, checkoutStarts, warningClosures,
     toolbar, revokeAccount() { accountCurrent = false; contextCheck(); },
     dialog: () => currentDialog, focusReturns: () => focusReturns, focusTraps: () => focusTraps };
 }
@@ -140,8 +141,12 @@ for (const signedIn of [false, true]) {
   }
   dialog.listeners.keydown({ defaultPrevented: true, key: "Tab" });
   assert.equal(h.focusTraps(), 0, "Nested dialogs and editors retain handled keyboard events.");
+  const warning = h.context.document.createElement("div");
+  warning.className = "web-warning-backdrop";
+  dialog.append(warning);
   dialog.children[0].children[1].listeners.click();
   assert.equal(h.dialog(), null);
+  assert.deepEqual(h.warningClosures, [false], "Closing Settings cancels its unanswered confirmation.");
   assert.equal(h.toggleAttributes["aria-pressed"], "false");
   h.context.toggleAccountDialog();
   h.dialog().floatingEscape();

@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-project-library-checkmarks-v1504";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-settings-project-confirmation-v1506";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-project-library-checkmarks-v1504";
+} from "./offline-storage.js?v=20261107-settings-project-confirmation-v1506";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -33642,6 +33642,7 @@ async function deleteArchivedProject(project) {
 
 async function deleteArchivedProjects(projects, options = {}) {
   const requestIdentity = captureAccountRequest();
+  const warningContainer = () => options.container?.isConnected ? options.container : document.body;
   const eligibleProjects = projects.filter((project) => projectRecordID(project));
   if (!eligibleProjects.length) return false;
   const count = eligibleProjects.length;
@@ -33652,7 +33653,7 @@ async function deleteArchivedProjects(projects, options = {}) {
   const confirmed = await confirmWebWarning(
     `Delete ${recordLabel}`,
     `Move ${recordLabel} to Trash? You can restore ${count === 1 ? "it" : "them"} from Account → Trash for 30 days. Saved bookmarks will remain.${names}`,
-    { confirmLabel: "Move to Trash", container: document.body }
+    { confirmLabel: "Move to Trash", container: warningContainer() }
   );
   requireCurrentAccountRequest(requestIdentity);
   if (!confirmed) return false;
@@ -33662,7 +33663,7 @@ async function deleteArchivedProjects(projects, options = {}) {
     requireCurrentAccountRequest(requestIdentity);
   } catch (error) {
     requireCurrentAccountRequest(requestIdentity);
-    await showWebNotice("Could not move to Trash", error.message, { container: document.body });
+    await showWebNotice("Could not move to Trash", error.message, { container: warningContainer() });
     return false;
   }
   let deletedCount = 0;
@@ -33679,7 +33680,7 @@ async function deleteArchivedProjects(projects, options = {}) {
       await showWebNotice(
         "Could not delete selected records",
         `${error.message || `The selected ${recordLabel} could not be deleted.`}${progress}`,
-        { container: document.body }
+        { container: warningContainer() }
       );
       requireCurrentAccountRequest(requestIdentity);
       break;
@@ -36088,7 +36089,7 @@ function renderProjectManager(container, { onChange = () => {} } = {}) {
       busy = true; render();
       try {
         if (kind === "delete") {
-          if (!(await deleteArchivedProjects(chosen, { includeNames: true }))) return;
+          if (!(await deleteArchivedProjects(chosen, { includeNames: true, container: dialog.closest?.(".settings-floating-panel") }))) return;
         } else if (archived) {
           for (const project of chosen) {
             requireCurrentAccountRequest(requestIdentity);
@@ -41832,6 +41833,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
     if (closed) return;
     closed = true;
     clearInterval(contextCheck);
+    if (dialog.querySelector(".web-warning-backdrop")) activeWebWarningClose?.(false);
     if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
     dialog.open = false;
     dialog._disposeSettingsColumns?.();
