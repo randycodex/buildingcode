@@ -22,7 +22,7 @@ class Element {
   querySelectorAll(selector) { const all = this.children.flatMap(item => [item, ...item.querySelectorAll("*")]); return selector === "*" ? all : all.filter(item => selector.split(/,\s*/).some(part => part.startsWith(".") ? item.className?.split(" ").includes(part.slice(1)) : item.tag === part)); }
   querySelector(selector) { return this.querySelectorAll(selector)[0] || null; }
 }
-function harness({ editing = false, inline = false, beforeSave } = {}) {
+function harness({ editing = false, inline = false, beforeSave, alwaysVisible = false, readOnly = false } = {}) {
   const body = new Element("body"), panel = new Element("section"), background = new Element("div");
   background.className = "projects-content"; panel.append(background); body.append(panel);
   const lookup = deferred(), write = deferred(), created = [], updated = [], notices = [], callbacks = [];
@@ -40,7 +40,8 @@ function harness({ editing = false, inline = false, beforeSave } = {}) {
   });
   vm.runInContext(source.slice(start, end), c);
   c.showProjectCreateSheet(panel, editing ? {id: "existing", name: "Existing", address: "Old address", description: "Original", color: "#334455"} : null,
-    {inline, beforeSave, onCreated: async () => callbacks.push("created"), onSaved: () => callbacks.push("saved")});
+    {inline, beforeSave, alwaysVisible, readOnly, onCancel: alwaysVisible ? () => callbacks.push("cancel") : undefined,
+      onCreated: async () => callbacks.push("created"), onSaved: () => callbacks.push("saved")});
   const overlay = panel.querySelector(".project-sheet-overlay"), form = panel.querySelector("form");
   const name = panel.querySelector(".project-name-input"), address = panel.querySelector(".project-address-input"), description = panel.querySelector(".project-description-input");
   const cancel = form.querySelectorAll("button").find(button => button.textContent === "Cancel");
@@ -93,6 +94,22 @@ for (const options of [{editing:false},{editing:true},{editing:true,inline:true}
   const pending = h.submit();
   h.cancel.events.click(); h.resolveLookup(); await pending;
   assert.equal(h.updated.length, 0, "Canceling a pending inline lookup cannot save the discarded draft.");
+}
+{
+  const h = harness({editing:true,inline:true,alwaysVisible:true});
+  assert.equal(h.name.focused, undefined, 'Visible Context fields do not steal focus from the top tabs.');
+  h.overlay.events.keydown(event('Escape'));
+  assert.equal(h.overlay.isConnected,true,'Escape bubbles to close the whole Context menu.');
+  h.cancel.events.click(); h.resolveLookup(); await tick();
+  assert.deepEqual(h.callbacks,['cancel'],'Cancel tells Context to reset the visible form.');
+  assert.equal(h.updated.length,0,'Cancel discards field changes without saving.');
+}
+{
+  const h = harness({editing:true,inline:true,alwaysVisible:true,readOnly:true});
+  assert.equal(h.name.disabled,true); assert.equal(h.address.disabled,true);
+  assert.equal(h.save.parent.hidden,true,'Shared Project identity stays visible without edit actions.');
+  h.resolveLookup(); await h.submit();
+  assert.equal(h.updated.length,0,'Read-only Context fields cannot submit changes.');
 }
 {
   const h = harness({editing:true,inline:true,beforeSave:async()=>false});

@@ -20477,18 +20477,12 @@ dialog.report-export-review {
 
 .report-library > .report-library-header { flex: 0 0 auto; }
 
-.project-overview-identity { display: grid; grid-template-columns: minmax(0, 1fr) 30px; align-items: center; gap: var(--space-2); margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
-.project-overview-identity h2 { grid-column: 1; grid-row: 1; min-width: 0; margin: 0; font-size: 18px; }
-.project-overview-identity p { grid-column: 1 / -1; grid-row: 2; margin: 0; color: var(--text-secondary); }
-.workspace-shell .project-overview-identity > .project-overview-edit { --workspace-button-icon-size: var(--panel-title-icon-size); grid-column: 2; grid-row: 1; justify-self: end; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; min-width: 30px; min-height: 30px; border: 0; border-radius: 0; background: transparent; padding: 0; color: var(--text-secondary); }
-.project-overview-identity > .project-overview-editor { grid-column: 1 / -1; }
-.project-overview-edit svg { width: var(--panel-title-icon-size); height: var(--panel-title-icon-size); }
-.project-overview-identity > .project-overview-edit:hover { background: transparent; color: var(--text-primary); }
+.project-overview-editor { margin-bottom: 24px; }
 .project-overview-editor:empty { display: none; }
 .project-overview-editor .project-sheet-overlay.is-inline {
   position: static;
   display: block;
-  margin-top: var(--space-3);
+  margin-top: 0;
   padding: 0;
   background: transparent;
 }
@@ -20559,12 +20553,13 @@ dialog.report-export-review {
   padding: var(--space-3) 0 0;
   background: transparent;
 }
+.project-overview-editor .project-sheet-header[hidden] { display: none; }
 .project-overview-editor .project-sheet-header button { padding: 4px 8px; border-radius: var(--radius-pill); font-size: 13px !important; }
 .project-overview-editor .project-sheet-header button:not(:disabled):hover { background: var(--menu-highlight); }
 .project-details-screen .project-overview-context { padding: 0; font-size: 14px; line-height: 1.5; }
 /* Span the column container while keeping the text measure and gutters intact. */
-.project-details-columns :is(.project-overview-identity, .project-records-row, .project-overview-editor .project-sheet-field, .project-overview-editor .project-sheet-colors) { position: relative; border-bottom: 0; }
-.project-details-columns :is(.project-overview-identity, .project-records-row, .project-overview-editor .project-sheet-field, .project-overview-editor .project-sheet-colors)::after {
+.project-details-columns :is(.project-records-row, .project-overview-editor .project-sheet-field, .project-overview-editor .project-sheet-colors) { position: relative; border-bottom: 0; }
+.project-details-columns :is(.project-records-row, .project-overview-editor .project-sheet-field, .project-overview-editor .project-sheet-colors)::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -21351,8 +21346,6 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   width: 0;
   height: 0;
 }
-.workspace-floating-panel .project-overview-identity { margin-top: 0; }
-.workspace-floating-panel .project-overview-identity h2 { overflow-wrap: anywhere; }
 .workspace-floating-panel .project-questions-panel .project-open-questions { margin-top: 0; padding-top: 0; border-top: 0; }
 
 /* Conversation cleanup stays beside the Assistant history it affects. */

@@ -45,6 +45,7 @@ for (const kind of ["context", "facts"]) assert.equal(canGroupColumn(`project:${
 let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, tickScreen, inlineOptions;
 const mounts = new Map(), issues = [], renderedInformation = [];
 const flushedEditors = [];
+let identityEditorCount = 0, closedIdentityEditors = 0, identityEditorController;
 const mountEditor = (container, kind, className) => {
   const section = element('section'); section.className = className; container.append(section);
   return {flush:async()=>{flushedEditors.push(kind);}};
@@ -77,7 +78,12 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
   },
   saveWorkspaceResumeForRefresh() {},
   safeAnnotationIDPart: value => value,
-  showProjectCreateSheet: (_host, _project, options) => { inlineOptions = options; return {close:()=>options.onClose()}; },
+  showProjectCreateSheet: (host, _project, options) => {
+    identityEditorCount++; inlineOptions = options;
+    const form = element('form'); host.append(form);
+    identityEditorController = {close:()=>{form.remove();closedIdentityEditors++;options.onClose();}};
+    return identityEditorController;
+  },
   document: { createElement: element, body, querySelector: selector => selector === '.workspace-shell' ? workspaceShell : selector === '.workflow-toolbar' ? workflowToolbar : null },
   setInterval: fn => { tickScreen = fn; return 1; }, clearInterval() {},
   captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
@@ -126,9 +132,12 @@ await c.openProjectDetailsScreen('context');
 const contextBody = contextPanel.querySelector('.project-details-column-body');
 const factsBody = factsPanel.querySelector('.project-details-column-body');
 const editButton = find(contextPanel, node => node.className === 'project-overview-edit');
-await editButton.handlers.click();
-assert.equal(inlineOptions.inline,true,'Overview expands the existing complete editor in place.');
-assert.equal(editButton.attributes['aria-expanded'],'true');
+assert.equal(editButton, undefined, 'Context fields do not require the pencil button.');
+assert.equal(identityEditorCount,1,'The complete identity form mounts as soon as Context opens.');
+assert.equal(inlineOptions.inline,true);
+assert.equal(inlineOptions.alwaysVisible,true,'Fields remain part of the Context view.');
+assert.equal(inlineOptions.readOnly,false);
+assert.ok(find(contextPanel.querySelector('.project-overview-editor'),node=>node.tag==='form'));
 const overviewInput = contextPanel.querySelector('.project-overview-context');
 const originalInert = overviewInput.inert;
 inlineOptions.onSubmitting(true);
@@ -136,24 +145,12 @@ assert.equal(overviewInput.inert, true, 'Freeze context while the identity edito
 assert.equal(factsPanel.inert, true);
 inlineOptions.onSubmitting(false);
 assert.equal(overviewInput.inert, originalInert, 'Restore context editing after identity submission.');
-await editButton.handlers.click();
-assert.equal(editButton.attributes['aria-expanded'],'false','The same button can collapse the draft without saving.');
-await editButton.handlers.click();
+identityEditorController.close(); inlineOptions.onCancel();
+assert.equal(identityEditorCount,2,'Cancel resets the identity form without hiding it.');
 vm.runInContext('projectDetailsScreen.close()',c);
-assert.equal(editButton.attributes['aria-expanded'],'false','Closing Context exits identity edit mode.');
-assert.equal(contextPanel.querySelector('.project-overview-editor').hidden,true);
+assert.equal(closedIdentityEditors,2,'Closing Context discards the unsaved identity form.');
 await c.openProjectDetailsScreen('context');
-assert.equal(editButton.attributes['aria-expanded'],'false','Reopening Context starts in view mode.');
-const contextMount = mounts.get('project:context:alpha');
-const originalFlush = contextMount.flush;
-const heldFlush = deferred();
-contextMount.flush = () => heldFlush.promise;
-const openingEdit = editButton.handlers.click();
-vm.runInContext('projectDetailsScreen.close()',c);
-await c.openProjectDetailsScreen('context');
-heldFlush.resolve(); await openingEdit;
-assert.equal(editButton.attributes['aria-expanded'],'false','A late flush cannot reopen edit mode after Context was closed.');
-contextMount.flush = originalFlush;
+assert.equal(identityEditorCount,3,'Reopening Context immediately restores the available identity fields.');
 contextPanel.draft='Retained edit'; contextBody.scrollTop=320;
 factsBody.scrollTop=210; columns.scrollLeft=80;
 const presentation = vm.runInContext('projectDetailsScreen.getPresentationState()',c);
