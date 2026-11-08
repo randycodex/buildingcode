@@ -105,3 +105,14 @@ const staleReviewFind=text=>all(staleReview.element).find(x=>x.textContent===tex
 staleReviewFind('Find passages').handlers.click();await tick();const reviewing=staleReviewFind('Review in Reader').handlers.click();await tick();staleReview.dispose();openingReader.resolve();await reviewing;
 assert.equal(staleReviews,0,'A stale Reader opening cannot start a review for a different account or conversation.');
 console.log('Research v2 view: legacy answer preservation, edition labels, attachment/send races, source-detail send, failure draft retention, stable retry identity and stale-context isolation passed.');
+
+// Both Assistant views expose the same history management without opening a chat while selecting.
+const historyBindings=[],historyPages=[];let selectingHistory=false,openedHistory='',disposedHistory=0;
+const historyManagement={element:new Element('div'),handleKeyDown(){},bindRow(row,button,item){historyBindings.push(item.id);},setConversations(items){historyPages.push(items.map(item=>item.id));},selectConversation(){return selectingHistory;},dispose(){disposedHistory++;}};
+const managedView=createResearchV2View({history:[{id:'one',title:'First chat'},{id:'two',title:'Second chat'}],historyManagement,onOpen:id=>{openedHistory=id;}});
+assert.deepEqual(historyBindings,['one','two']);assert.deepEqual(historyPages,[['one','two']]);
+const managedFirst=all(managedView.element).find(node=>node.className==='rv2-question-link');
+selectingHistory=true;managedFirst.handlers.click();assert.equal(openedHistory,'','Selection stays in History.');
+selectingHistory=false;managedFirst.handlers.click();assert.equal(openedHistory,'one');
+managedView.dispose();assert.equal(disposedHistory,1,'Closing the Assistant also closes its management menu.');
+console.log('Research v2 shared history management integration passed.');

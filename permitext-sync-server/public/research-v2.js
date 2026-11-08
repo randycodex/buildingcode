@@ -47,13 +47,15 @@ export function createResearchV2View(options) {
   const root=node('section','research-v2');root.setAttribute('aria-label','Research');
   const rail=node('aside','rv2-rail');rail.setAttribute('aria-label','Numbered research questions');
   const list=node('ol','rv2-questions');
+  const historyRecords=[];
+  if(options.historyManagement){rail.append(options.historyManagement.element);rail.addEventListener("keydown",options.historyManagement.handleKeyDown);}
   const knownQuestions=new Set();
   function appendQuestions(items){items.forEach(item=>{
-    if(knownQuestions.has(item.id))return;knownQuestions.add(item.id);
+    if(knownQuestions.has(item.id))return;knownQuestions.add(item.id);historyRecords.push(item);
     const li=node('li');const title=item.title||item.starterQuestion||'New question';
-    const open=action('',()=>onOpen(item.id),'rv2-question-link');open.append(node('span','rv2-question-title',title));open.title=title;
-    if(item.id===conversation?.id)open.setAttribute('aria-current','page');li.append(open);list.append(li);
-  });}
+    const open=action('',()=>{if(!options.historyManagement?.selectConversation(item.id))onOpen(item.id);},'rv2-question-link');open.append(node('span','rv2-question-title',title));open.title=title;
+    if(item.id===conversation?.id)open.setAttribute('aria-current','page');li.append(open);list.append(li);options.historyManagement?.bindRow(li,open,item);
+  });options.historyManagement?.setConversations(historyRecords);}
   appendQuestions(history);
   if(!history.length)list.append(node('li','rv2-empty-history','Your questions will appear here.'));
   rail.append(list);
@@ -255,5 +257,5 @@ export function createResearchV2View(options) {
     initialScroll.disconnect();}});initialScroll.observe(thread);}
   if(revealEntry)revealController=revealResearchAnswer({entry:revealEntry,tokens:revealTokens,isCurrent,
     onDone:()=>{revealBusy=false;update();}});
-  return {element:root,dispose(){generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();},focus(){input.focus({preventScroll:true});}};
+  return {element:root,dispose(){options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();},focus(){input.focus({preventScroll:true});}};
 }

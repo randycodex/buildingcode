@@ -295,7 +295,7 @@ assert.match(stylesSource, /\.research-history-group-label \{[\s\S]*?font-size: 
 assert.doesNotMatch(clientSource, /research-history-group-count|const groupCount =/, "Research history group headings should not display conversation counters.");
 const newResearchComposerStart = clientSource.indexOf("function renderNewResearchComposer(");
 const newResearchComposerEnd = clientSource.indexOf("\nasync function renderResearch(", newResearchComposerStart);
-const newResearchComposerSource = clientSource.slice(newResearchComposerStart, newResearchComposerEnd);
+const newResearchComposerSource = functionSource(clientSource, "renderNewResearchComposer");
 assert.ok(newResearchComposerStart >= 0 && newResearchComposerEnd > newResearchComposerStart, "New Research composer source was not found.");
 assert.doesNotMatch(newResearchComposerSource, /postResearch\(/, "An empty composer cannot create Research without a selected passage.");
 assert.match(newResearchComposerSource, /First include a passage from Reader or Saved Evidence[\s\S]*?Project Context and Facts are not included automatically/, "The empty composer explains the selected-passage prerequisite and excluded Project facts.");
@@ -350,9 +350,9 @@ assert.doesNotMatch(stylesSource, /\.reader-reading-progress/, "The removed hori
 assert.match(stylesSource, /\.research-conversation-panel \{[\s\S]*?--research-conversation-background: var\(--surface\);[\s\S]*?background: var\(--research-conversation-background\);/, "Standalone Research conversations must use the shared theme surface.");
 assert.match(stylesSource, /\.research-message\.is-user \{[\s\S]*?background: light-dark\(var\(--toolbar-active\), rgb\(246 244 241 \/ 10%\)\);[\s\S]*?opacity: 1;/, "Research user messages retain theme-aware fill at full opacity.");
 assert.match(stylesSource, /\.research-compact-composer \.research-composer-box:has\(\.research-question-input:focus-visible\)\s*\{[^}]*outline: none/, "The composer retains the requested borderless focus treatment.");
-assert.match(clientSource, /selectHistoryButton\.innerHTML = selectionModeIconSVG\(\)/, "Research history does not expose its selection icon.");
-assert.match(clientSource, /cancelSelectionButton\.textContent = "Cancel"[\s\S]*?selectAllButton\.textContent = "Select all"/, "Research selection mode is missing Cancel or Select all.");
-assert.match(clientSource, /if \(selectingConversations\)[\s\S]*?toggleConversationSelection\(conversation\.id\)/, "Conversation rows do not toggle selection instead of opening while selection mode is active.");
+assert.match(clientSource, /const historyManagement = assistantHistoryManagement\(panel, renderingIdentity, isCurrent/, "Assistant History owns its conversation selection and deletion controls.");
+assert.match(clientSource, /historyRail\.addEventListener\("keydown",historyManagement\.handleKeyDown\)/, "History supports Escape to exit selection.");
+assert.match(clientSource, /historyManagement\.selectConversation\(conversation\.id\)/, "Rows select instead of opening while selection is active.");
 assert.match(clientSource, /row\.classList\.toggle\("is-selected", selected\)/, "Selected Research rows do not receive a visible state hook.");
 assert.match(clientSource, /conversationIDs: conversations\.map\(\(conversation\) => conversation\.id\)/, "Research history removal does not send only the selected conversation IDs.");
 assert.match(
@@ -377,10 +377,7 @@ assert.match(
 );
 assert.match(stylesSource, /\.research-conversation-row\.is-selected \{[\s\S]*?background:/, "Selected Research rows do not visibly change color.");
 assert.match(stylesSource, /\.research-history-select-button,[\s\S]*?\.research-history-delete-button \{[\s\S]*?border: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/, "The Research selection and delete icons do not match Permitext's bare column-header controls.");
-assert.match(clientSource, /deleteSelectedButton\.className = "icon-button research-history-delete-button"[\s\S]*?deleteSelectedButton\.innerHTML = trashIconSVG\(\)/, "Research selection mode is missing its dedicated delete icon.");
-assert.match(clientSource, /panelActions\?\.prepend\(cancelSelectionButton, selectAllButton, deleteSelectedButton, selectHistoryButton\)/, "Research selection-mode actions are not ordered Cancel, Clear all, Delete.");
-assert.match(clientSource, /deleteSelectedButton\.hidden = !selectingConversations;[\s\S]*?selectHistoryButton\.hidden = !releaseSurfaceVisibility\.researchHistoryManagement \|\| selectingConversations/, "The checkmark remains visible instead of yielding to Delete during selection mode.");
-assert.match(clientSource, /deleteSelectedButton\.addEventListener\("click", async \(\) => \{[\s\S]*?clearResearchConversationHistory\(deleteSelectedButton, selectedConversations, \{[\s\S]*?rows: selectedConversations\.map/, "The dedicated delete icon does not remove the selected conversation rows in place.");
+assert.match(clientSource, /historyManagement\.bindRow\(row, openButton, conversation, researchConversationTitle\(conversation\)\)/, "Each Assistant History row exposes its own management menu.");
 assert.match(clientSource, /async function animateResearchConversationRows\(rows\)[\s\S]*?height: "0px"[\s\S]*?duration: 240[\s\S]*?connectedRows\.forEach\(\(row\) => row\.remove\(\)\)/, "Research history deletion must collapse and fade selected rows before removing them.");
 assert.match(clientSource, /await Promise\.all\(\[[\s\S]*?\/research\/conversations\/clear-history[\s\S]*?removalAnimation[\s\S]*?if \(typeof options\.onCleared === "function"\) options\.onCleared\(\);/, "Research history deletion must settle the server mutation and local row motion without rebuilding the column.");
 assert.match(stylesSource, /\.research-history-select-button\[hidden\],[\s\S]*?\.research-history-delete-button\[hidden\] \{[\s\S]*?display: none;/, "Hidden Research selection actions are still exposed by the shared icon-button display rule.");

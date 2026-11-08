@@ -1,11 +1,11 @@
 import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=17";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-hidden-menu-scrollbars-v1513";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-assistant-history-management-v1516";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
-import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
+import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-hidden-menu-scrollbars-v1513";
+} from "./offline-storage.js?v=20261107-assistant-history-management-v1516";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -23831,7 +23831,8 @@ function boundedResearchHistoryQuery(value) {
 function readResearchHistoryPage(filters, options = {}) {
   const values = { limit: 30, q: boundedResearchHistoryQuery(String(filters.q || "").trim()),
     ...(filters.projectID !== "*" ? { projectID: String(filters.projectID || "") } : {}),
-    ...(filters.cursor ? { cursor: filters.cursor } : {}) };
+    ...(filters.cursor ? { cursor: filters.cursor } : {}),
+    ...(filters.includeHidden ? { includeHidden:true } : {}) };
   const key = JSON.stringify(values);
   if (!researchHistoryPageReaders.has(key)) {
     if (researchHistoryPageReaders.size >= 40) researchHistoryPageReaders.delete(researchHistoryPageReaders.keys().next().value);
@@ -26247,7 +26248,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
   if (!retained.panel) showColumnLoadingStatus(content, "Loading Research…");
   try {
     const [listed, fetched, availability] = await Promise.all([
-      retained.listed || postResearch("/research/conversations/list", {limit:30,projectID:researchWorkspaceProjectID() || ""}),
+      retained.listed || postResearch("/research/conversations/list", {limit:30,projectID:researchWorkspaceProjectID() || "",...(retained.includeHidden ? {includeHidden:true} : {})}),
       retained.conversation ? {conversation:retained.conversation} : conversationID ? postResearch("/research/conversations/get", { conversationID }) : null,
       configuration || postResearch("/research/v2/config")
     ]);
@@ -26320,13 +26321,21 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     };
     let historyCursor = listed.nextCursor;
     const railWidthKey = `permitext:research-question-width:${activeAccount()?.userID || "public"}:${workspaceID}:${paneID}`;
-    view = createResearchV2View({ conversation,revealAnswerID:retained.revealAnswerID,
+    const historyManagement = assistantHistoryManagement(panel,accountIdentity,ownsPanel,{
+      project:() => researchWorkspaceProjectID() ? {id:researchWorkspaceProjectID(),name:researchProjectName(researchWorkspaceProjectID())} : null,
+      includeHidden:Boolean(retained.includeHidden),
+      onIncludeHidden:async includeHidden => {
+        const nextListed = await postResearch("/research/conversations/list",{limit:30,projectID:researchWorkspaceProjectID() || "",...(includeHidden ? {includeHidden:true} : {})});
+        if (ownsPanel()) await renderResearchV2Pane(paneID,availability,{...retained,panel,conversation,listed:nextListed,includeHidden});
+      }
+    });
+    view = createResearchV2View({ conversation,revealAnswerID:retained.revealAnswerID,historyManagement,
       railWidthStore:{read:()=>localStorage.getItem(railWidthKey),write:width=>{if(ownsPanel())localStorage.setItem(railWidthKey,String(width));}},
       history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
       hasMore:listed.hasMore,
       onOriginal:()=>{const url=new URL(location.href);url.searchParams.set("research","legacy");location.assign(url.href);},
-      onLoadMore:async()=>{const page=await postResearch("/research/conversations/list",{limit:30,projectID:researchWorkspaceProjectID() || "",cursor:historyCursor});
+      onLoadMore:async()=>{const page=await postResearch("/research/conversations/list",{limit:30,projectID:researchWorkspaceProjectID() || "",cursor:historyCursor,...(retained.includeHidden ? {includeHidden:true} : {})});
         if(current()){historyCursor=page.nextCursor;listed.nextCursor=page.nextCursor;listed.hasMore=page.hasMore;
           listed.conversations=[...listed.conversations,...(page.conversations||[])];}
         return {...page,conversations:(page.conversations||[]).filter(item=>researchConversationInWorkspace(item))};},
@@ -26441,6 +26450,20 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
   return panel;
 }
 
+function assistantHistoryManagement(panel, identity, isCurrent, options = {}) {
+  const management = createResearchHistoryManagement({
+    ...options, request:postResearch, isCurrent,
+    confirm:(title,message,settings) => confirmWebWarning(title,message,{...settings,container:panel}),
+    beforeDelete:ids => ids.forEach(id => activeResearchProgress.get(id)?.controller?.abort()),
+    onDeleted:result => refreshAfterResearchDeletion(result,identity)
+  });
+  const observer = new MutationObserver(() => {if (!panel.isConnected) management.dispose();});
+  const dispose = management.dispose;
+  management.dispose = () => {observer.disconnect(); dispose();};
+  requestAnimationFrame(() => {if (panel.isConnected) observer.observe(panel.parentNode,{childList:true});});
+  return management;
+}
+
 async function renderResearch(paneID = "utility:analysis") {
   if (!hasCapability("research")) return renderProLockedPane(paneID, "Assistant");
   const identity=captureAccountRequest(),workspaceID=activeWorkspaceID;
@@ -26460,42 +26483,12 @@ async function renderResearch(paneID = "utility:analysis") {
   panel.classList.toggle("is-project-scoped", projectScopedResearch);
   if (!instance) panel.querySelector(".utility-close")?.addEventListener("click", closeResearchWorkspace);
   const panelActions = panel.querySelector(".panel-actions");
-  const selectedConversationIDs = new Set();
-  const conversationRows = new Map();
   let historyConversations = [];
   const visibleHistoryConversations = () => historyConversations;
   const historyState = instance || (state.researchHistoryFilters ||= {});
   let historyGeneration = 0;
   let historyCursor = null;
   let historyTimer = null;
-  let selectingConversations = false;
-  let clearingSelectedConversations = false;
-  const cancelSelectionButton = document.createElement("button");
-  cancelSelectionButton.className = "ghost-button research-history-selection-link";
-  cancelSelectionButton.type = "button";
-  cancelSelectionButton.textContent = "Cancel";
-  cancelSelectionButton.hidden = true;
-  const selectAllButton = document.createElement("button");
-  selectAllButton.className = "ghost-button research-history-selection-link";
-  selectAllButton.type = "button";
-  selectAllButton.textContent = "Select all";
-  selectAllButton.hidden = true;
-  const selectHistoryButton = document.createElement("button");
-  selectHistoryButton.className = "icon-button research-history-select-button";
-  selectHistoryButton.type = "button";
-  selectHistoryButton.title = "Select Research conversations";
-  selectHistoryButton.setAttribute("aria-label", selectHistoryButton.title);
-  selectHistoryButton.setAttribute("aria-pressed", "false");
-  selectHistoryButton.innerHTML = selectionModeIconSVG();
-  selectHistoryButton.hidden = true;
-  const deleteSelectedButton = document.createElement("button");
-  deleteSelectedButton.className = "icon-button research-history-delete-button";
-  deleteSelectedButton.type = "button";
-  deleteSelectedButton.title = "Remove selected conversations from history";
-  deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
-  deleteSelectedButton.innerHTML = trashIconSVG();
-  deleteSelectedButton.hidden = true;
-  panelActions?.prepend(cancelSelectionButton, selectAllButton, deleteSelectedButton, selectHistoryButton);
   const content = panel.querySelector(".analysis-content");
 
   panel.classList.add("assistant-workspace", "research-clean-start", "is-history-open");
@@ -26541,88 +26534,6 @@ async function renderResearch(paneID = "utility:analysis") {
   historyHeading.className = "assistant-history-heading";
   historyHeading.textContent = "Conversations";
   content.prepend(historyHeading);
-
-  const updateConversationSelection = () => {
-    panel.classList.toggle("is-research-history-selecting", selectingConversations);
-    selectHistoryButton.setAttribute("aria-pressed", String(selectingConversations));
-    cancelSelectionButton.hidden = !selectingConversations;
-    selectAllButton.hidden = !selectingConversations;
-    deleteSelectedButton.hidden = !selectingConversations;
-    selectHistoryButton.hidden = !releaseSurfaceVisibility.researchHistoryManagement || selectingConversations || visibleHistoryConversations().length === 0;
-    const allSelected = visibleHistoryConversations().length > 0 &&
-      selectedConversationIDs.size === visibleHistoryConversations().length;
-    selectAllButton.textContent = allSelected ? "Clear all" : "Select all";
-    selectHistoryButton.title = "Select Research conversations";
-    selectHistoryButton.setAttribute("aria-label", selectHistoryButton.title);
-    selectHistoryButton.disabled = clearingSelectedConversations;
-    deleteSelectedButton.title = selectedConversationIDs.size
-      ? `Remove ${selectedConversationIDs.size} selected ${selectedConversationIDs.size === 1 ? "conversation" : "conversations"} from history`
-      : "Remove selected conversations from history";
-    deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
-    deleteSelectedButton.disabled = clearingSelectedConversations || selectedConversationIDs.size === 0;
-    cancelSelectionButton.disabled = clearingSelectedConversations;
-    selectAllButton.disabled = clearingSelectedConversations;
-    conversationRows.forEach((row, conversationID) => {
-      const selected = selectedConversationIDs.has(conversationID);
-      row.classList.toggle("is-selected", selected);
-      const openButton = row.querySelector(".research-conversation-open");
-      const selectionMark = row.querySelector(".research-conversation-selection-mark");
-      if (selectionMark) {
-        selectionMark.hidden = !selectingConversations;
-        selectionMark.textContent = selected ? "✓" : "○";
-      }
-      if (selectingConversations) openButton?.setAttribute("aria-pressed", String(selected));
-      else openButton?.removeAttribute("aria-pressed");
-    });
-  };
-  const setConversationSelectionActive = (active) => {
-    selectingConversations = Boolean(active);
-    selectedConversationIDs.clear();
-    updateConversationSelection();
-  };
-  const toggleConversationSelection = (conversationID) => {
-    if (!selectingConversations || clearingSelectedConversations) return;
-    if (selectedConversationIDs.has(conversationID)) selectedConversationIDs.delete(conversationID);
-    else selectedConversationIDs.add(conversationID);
-    updateConversationSelection();
-  };
-  selectHistoryButton.addEventListener("click", () => setConversationSelectionActive(true));
-  deleteSelectedButton.addEventListener("click", async () => {
-    const selectedConversations = visibleHistoryConversations().filter((conversation) =>
-      selectedConversationIDs.has(conversation.id)
-    );
-    if (!selectedConversations.length) return;
-    clearingSelectedConversations = true;
-    updateConversationSelection();
-    const cleared = await clearResearchConversationHistory(deleteSelectedButton, selectedConversations, {
-      rows: selectedConversations.map((conversation) => conversationRows.get(conversation.id)).filter(Boolean),
-      onCleared: () => {
-        selectedConversationIDs.clear();
-        selectingConversations = false;
-        clearingSelectedConversations = false;
-        updateConversationSelection();
-        // Start a fresh page generation so a pending older-page response cannot
-        // restore removed conversations from this column's accumulated history.
-        if (isCurrent()) void loadHistory(false);
-      }
-    });
-    if (!cleared && panel.isConnected) {
-      clearingSelectedConversations = false;
-      updateConversationSelection();
-    }
-  });
-  cancelSelectionButton.addEventListener("click", () => setConversationSelectionActive(false));
-  selectAllButton.addEventListener("click", () => {
-    if (selectedConversationIDs.size === visibleHistoryConversations().length) selectedConversationIDs.clear();
-    else visibleHistoryConversations().forEach((conversation) => selectedConversationIDs.add(conversation.id));
-    updateConversationSelection();
-  });
-  panel.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape" || !selectingConversations || clearingSelectedConversations) return;
-    event.preventDefault();
-    setConversationSelectionActive(false);
-    selectHistoryButton.focus({ preventScroll: true });
-  });
 
   if (!activeAccount()) {
     const empty = document.createElement("article");
@@ -26683,9 +26594,21 @@ async function renderResearch(paneID = "utility:analysis") {
     historyGeneration += 1;
     historyState.historyProjectID = projectFilter.value;
     scheduleResearchDraftPersistence();
-    selectedConversationIDs.clear();
+    historyManagement.reset();
     historyTimer = setTimeout(() => { if (isCurrent()) void loadHistory(false); }, 200);
   };
+  const historyManagement = assistantHistoryManagement(panel, renderingIdentity, isCurrent, {
+    project:() => projectFilter.value && projectFilter.value !== "*"
+      ? {id:projectFilter.value,name:researchProjectName(projectFilter.value)} : null,
+    includeHidden:Boolean(historyState.historyIncludeHidden),
+    onIncludeHidden:value => {historyState.historyIncludeHidden = value; refreshFilters();},
+    onBusy:value => {projectFilter.disabled = value;}
+  });
+  const historyHeader = document.createElement("div");
+  historyHeader.className = "assistant-history-header";
+  historyHeading.replaceWith(historyHeader);
+  historyHeader.append(historyHeading,historyManagement.element);
+  historyRail.addEventListener("keydown",historyManagement.handleKeyDown);
   projectFilter.addEventListener("change", refreshFilters);
   filters.append(projectFilter);
   content.append(filters, historyHost);
@@ -26703,6 +26626,7 @@ async function renderResearch(paneID = "utility:analysis") {
     if (!append) {
       historyCursor = null;
       historyConversations = [];
+      historyManagement.setConversations([]);
       clear(content);
       const status = document.createElement("p");
       status.className = "research-list-status";
@@ -26712,15 +26636,14 @@ async function renderResearch(paneID = "utility:analysis") {
     }
     try {
       const payload = await readResearchHistoryPage({ projectID: projectFilter.value,
-        cursor: append ? historyCursor : null }, { reuseRecent });
+        cursor: append ? historyCursor : null, includeHidden:Boolean(historyState.historyIncludeHidden) }, { reuseRecent });
       if (!current()) return;
       const byID = new Map((append ? historyConversations : []).map((item) => [item.id, item]));
       (payload.conversations || []).forEach((item) => byID.set(item.id, item));
       historyConversations = [...byID.values()];
       historyCursor = payload.hasMore ? payload.nextCursor : null;
       clear(content);
-      conversationRows.clear();
-      selectHistoryButton.hidden = !releaseSurfaceVisibility.researchHistoryManagement || visibleHistoryConversations().length === 0;
+      historyManagement.setConversations(historyConversations);
     } catch (error) {
       if (!current()) return;
       if (!append) clear(content);
@@ -26869,7 +26792,6 @@ async function renderResearch(paneID = "utility:analysis") {
     const row = document.createElement("article");
     row.className = "research-conversation-row";
     row.dataset.conversationId = conversation.id;
-    conversationRows.set(conversation.id, row);
     const renderRow = () => {
       clear(row);
       const selected = !researchDraftPaneIDs.has(paneID) && conversation.id === (instance?.conversationID || state.researchConversationID);
@@ -26914,23 +26836,16 @@ async function renderResearch(paneID = "utility:analysis") {
       preview.className = "research-conversation-preview";
       preview.textContent = String(conversation.starterQuestion || "").replace(/\s+/g, " ").trim();
       preview.hidden = !preview.textContent || preview.textContent === title.textContent;
-      const selectionMark = document.createElement("span");
-      selectionMark.className = "research-conversation-selection-mark";
-      selectionMark.setAttribute("aria-hidden", "true");
-      selectionMark.hidden = !selectingConversations;
-      selectionMark.textContent = selectedConversationIDs.has(conversation.id) ? "✓" : "○";
-      openButton.append(title, meta, projectPill, preview, selectionMark);
+      openButton.append(title, meta, projectPill, preview);
       openButton.addEventListener("click", () => {
-        if (selectingConversations) {
-          toggleConversationSelection(conversation.id);
-          return;
-        }
+        if (historyManagement.selectConversation(conversation.id)) return;
         if (!instance) researchConversationPaneOpened = true;
         void openResearchHistoryConversation(conversation, instance)
           .catch((error) => { if (isCurrent()) void showWebNotice("Research not opened", error.message); });
       });
       if (!releaseSurfaceVisibility.researchHistoryManagement) {
         row.append(openButton);
+        historyManagement.bindRow(row, openButton, conversation, researchConversationTitle(conversation));
         return;
       }
 
@@ -27182,6 +27097,7 @@ async function renderResearch(paneID = "utility:analysis") {
       deleteButton.addEventListener("click", () => deleteResearchConversationFromList(conversation, deleteButton));
       actions.append(deleteButton);
       row.append(openButton, actions);
+      historyManagement.bindRow(row, openButton, conversation, researchConversationTitle(conversation));
       if (!projectScopedResearch) row.append(projectSelectWrap);
     };
     renderRow();
@@ -27224,7 +27140,6 @@ async function renderResearch(paneID = "utility:analysis") {
     more.addEventListener("click", () => { more.disabled = true; more.textContent = "Loading…"; void loadHistory(true, true); });
     content.append(more);
   }
-  updateConversationSelection();
   };
   // Publish the column, including New chat, before either metadata request.
   requestAnimationFrame(() => {
@@ -41862,8 +41777,7 @@ function organizeAccountSettings(panel, { floating = false, selected = "account"
   const trash = data?.querySelector(".settings-trash");
   const projects = data?.querySelector(".settings-project-management");
   const deleteContent = data?.querySelector(".settings-delete-content");
-  const conversations = data?.querySelector('.settings-conversations');
-  data?.append(...[projects, deleteContent, conversations, trash].filter(Boolean));
+  data?.append(...[projects, deleteContent, trash].filter(Boolean));
   scroll.replaceChildren(account, library, recovery);
   if (floating) {
     const tabs = createFloatingWorkspaceTabs({
@@ -42316,26 +42230,6 @@ function renderSettings({ upgrade = false } = {}) {
   const panel = renderTemplate(settingsTemplate);
   if (!upgrade) wireSettingsActiveCodeSources(panel, { enabled: true, collapsibleGroups: true });
   applyPaneWeight(panel, "utility:settings");
-  const conversations = panel.querySelector('.settings-conversations');
-  conversations?.addEventListener('toggle', () => {
-    if (!conversations.open || conversations.dataset.mounted) return;
-    const root = conversations.querySelector('.settings-conversation-controls');
-    if (!activeAccount() || !isCurrentAccountRequest(settingsIdentity) || !workspacePrivatePresentationAllowed()) {
-      root.textContent = 'Sign in to manage your conversations.';
-      return;
-    }
-    conversations.dataset.mounted = 'true';
-    const project = workspaceProject();
-    mountResearchDeleteControls(root, {
-      request:postResearch,
-      confirm:(title, message, options) => confirmWebWarning(title, message, {...options, container:panel}),
-      isCurrent:() => panel.isConnected && isCurrentAccountRequest(settingsIdentity) && workspacePrivatePresentationAllowed(),
-      project:project ? {id:projectDetailKey(project), name:project.name} : null,
-      currentProjectID:researchWorkspaceProjectID,
-      beforeDelete:ids => ids.forEach(id => activeResearchProgress.get(id)?.controller?.abort()),
-      onDeleted:result => refreshAfterResearchDeletion(result, settingsIdentity)
-    });
-  });
   const manageProjects = panel.querySelector(".settings-project-management");
   const refreshProjectManagement = () => {
     if (!isCurrentAccountRequest(settingsIdentity)) return;

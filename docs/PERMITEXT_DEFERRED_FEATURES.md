@@ -41,10 +41,10 @@ separate entry documents a concrete technical reason for deletion.
 
 | Field | Decision |
 | --- | --- |
-| Status | Hidden and frozen |
+| Status | Deletion restored in Assistant History locally on 2026-11-07; other management remains hidden |
 | Deferred on | 2026-08-11 |
 | Product reason | The release-critical Previous chats list needs only the original question and creation date. Per-chat renaming, deletion, Project reassignment, and Code Decision linking add management choices before reopening Research. |
-| Web release surface | Show the original question and creation date as the single conversation entry point. Hide per-chat rename, delete, Project assignment, and active-decision linking controls. |
+| Web release surface | Assistant History provides per-chat deletion, selection for bulk deletion, and access to hidden conversations. Reviewed permanent deletion uses the existing preview/token endpoints and keeps saved copies in Notes and Reports. Data & Recovery no longer duplicates conversation management. Per-chat rename, Project assignment, and active-decision linking remain behind the release visibility boundary. |
 | Preserved implementation | Keep all existing rename, delete, Project assignment, and Code Decision linking handlers, routes, authorization, persistence, and UI construction behind the centralized release visibility boundary. |
 | Preserved data | Conversation titles, Project links, Code Decision links, messages, sources, and timestamps remain unchanged. Existing conversations derive their original question from the first user message when a stored starter question is absent. |
 | Restore | Set `releaseSurfaceVisibility.researchHistoryManagement` to `true`, then re-verify per-chat actions, Project assignment, Code Decision linking, keyboard focus, and narrow-column layout. |

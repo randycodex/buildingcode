@@ -302,7 +302,8 @@ const server = createServer(async (request, response) => {
       return response.end(clientEntry);
     }
     if (ready && !researchWorkflowEnabled && canonicalPath.startsWith("research/") && request.method === "POST" &&
-        !(researchHistoryEnabled && ["research/conversations/list", "research/conversations/get", "research/usage"].includes(canonicalPath))) {
+        !(researchHistoryEnabled && ["research/conversations/list", "research/conversations/get", "research/usage",
+          "research/conversations/delete-preview", "research/conversations/delete-many"].includes(canonicalPath))) {
       return json(response, 403, { error: "Research disabled in performance fixture" });
     }
     const started = performance.now();

@@ -17,6 +17,7 @@ function harness(instanceMode=false){
   paneIDForUtilityInstance:i=>'instance:'+i.id,renderUtility:()=>{calls.created++;return panel;},analysisTemplate:{},showColumnLoadingStatus(){calls.loading++;},
   postResearch:async(path,body)=>{calls.requests.push(path);if(path.endsWith('/list'))return{conversations:Object.values(conversations),nextCursor:null,hasMore:false};if(path.endsWith('/get'))return{conversation:conversations[body.conversationID]};throw Error(path);},
   researchWorkspaceProjectID:()=> 'project-a',researchConversationInWorkspace:conversation=>conversation.primaryProjectID==='project-a',
+  assistantHistoryManagement:()=>({dispose(){}}),
   createResearchV2View(value){options=value;return{element:{id:value.conversation.id},dispose(){calls.disposed++;}};},
   crypto:{randomUUID:()=> 'new-request'},sessionStorage:{getItem:()=>null},document:{activeElement:null},MutationObserver:class{observe(){}disconnect(){}},requestAnimationFrame:fn=>fn(),
   hasCapability:()=>true,scheduleResearchDraftPersistence(){},notifyWorkspaceLayoutChange(){calls.layout++;}
