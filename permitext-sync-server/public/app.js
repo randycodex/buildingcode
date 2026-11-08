@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-workspace-menu-width-v1549";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-search-scope-width-v1551";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-workspace-menu-width-v1549";
+} from "./offline-storage.js?v=20261108-search-scope-width-v1551";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41934,7 +41934,10 @@ async function openSearchCodeSourceSettings(panel) {
       if (!current()) { close(); return; }
       const panelRect = panel.getBoundingClientRect();
       const anchorRect = (trigger || panel.querySelector(".search-dock") || panel).getBoundingClientRect();
+      const contentRect = (panel.querySelector(".search-dock") || panel).getBoundingClientRect();
       dialog.style.setProperty("--search-scope-top", `${Math.max(0, anchorRect.bottom - panelRect.top + 8)}px`);
+      dialog.style.setProperty("--search-scope-left", `${contentRect.left - panelRect.left - panel.clientLeft}px`);
+      dialog.style.setProperty("--search-scope-width", `${contentRect.width}px`);
     };
     const observer = new MutationObserver(() => { if (!current() || !dialog.isConnected) close(); });
     const resize = typeof ResizeObserver === "function" ? new ResizeObserver(position) : null;
