@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-context-compact-fields-v1572";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-context-autosave-v1573";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-context-compact-fields-v1572";
+} from "./offline-storage.js?v=20261108-context-autosave-v1573";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4484,6 +4484,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   columns.className = "project-details-columns";
   columns.setAttribute("aria-label", "Project details columns");
   const panels = new Map();
+  const contentFlushes = new Map();
   const sections = [["context", "Context"], ["facts", "Facts"], ["questions", "Questions"], ["checklist", "Checklist"]];
   let selectedSection = "context";
   let panelTabs = null;
@@ -4510,6 +4511,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
       columns.replaceChildren();
       for (const [kind, label] of sections) {
         const panel = await renderProjectInformation(identity, kind);
+        contentFlushes.set(kind, projectInformationMounts.get(paneIDForProjectInformation(identity, kind))?.flush);
         const columnBody = document.createElement("div");
         columnBody.className = "project-details-column-body";
         if (!screen.isCurrent()) {
@@ -4524,7 +4526,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
           const information = panel.querySelector(".project-information-content");
           information?.prepend(editorHost);
           let editor = null;
-          closeProjectEditor = () => editor?.close({ restoreFocus: false });
+          closeProjectEditor = () => { void editor?.flush().catch(() => {}); };
           openProjectEditor = () => {
             if (editor || !screen.isCurrent() || !screen.isOpen()) return;
             const currentProject = workspaceProject();
@@ -4535,29 +4537,29 @@ async function openProjectDetailsScreen(section = null, options = {}) {
               coveredColumns.clear();
             };
             editor = showProjectCreateSheet(editorHost, currentProject, {
-              inline: true, alwaysVisible: true, readOnly: Boolean(currentProject.sharedOnly),
+              inline: true, alwaysVisible: true, autoSave: true, readOnly: Boolean(currentProject.sharedOnly),
               onSubmitting: submitting => {
                 for (const [columnKind, column] of panels) {
-                  const target = columnKind === "context" ? column.querySelector(".project-overview-context") : column;
+                  const target = column.querySelector(columnKind === "context" ? ".project-overview-context" : ".project-information-content");
                   if (target && submitting) { coveredColumns.set(target, target.inert); target.inert = true; }
                 }
                 if (!submitting) releaseColumns();
               },
-              beforeSave: () => flushProjectInformationPanes(),
+              beforeSave: async () => {
+                for (const flush of contentFlushes.values()) await flush?.();
+                return true;
+              },
               onClose: () => { releaseColumns(); editor = null; },
-              onCancel: () => openProjectEditor(),
-              onSaved: async () => {
+              onSaved: ({ factsChanged }) => {
                 if (!screen.isCurrent()) return;
-                const presentation = screen.getPresentationState();
-                const reopen = screen.isOpen();
-                screen.dispose();
                 reconcileProjectWorkspaces();
                 renderWorkspaceTabs();
-                if (!reopen) return;
-                await openProjectDetailsScreen("context");
-                if (projectDetailsScreen?.isCurrent()) projectDetailsScreen.restorePresentation(presentation);
+                refreshOpenAnnotationProjectEditors();
+                if (factsChanged) projectInformationMounts.get(paneIDForProjectInformation(identity, "facts"))?.refresh?.(workspaceProject());
               }
             });
+            const mount = projectInformationMounts.get(paneIDForProjectInformation(identity, kind));
+            mount.flush = async () => { await editor.flush(); await contentFlushes.get(kind)?.(); };
           };
           openProjectEditor();
         }
@@ -35947,6 +35949,8 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   let mutationStarted = false;
   const isEditing = Boolean(project);
   const inline = isEditing && options.inline === true;
+  const autoSave = inline && options.autoSave === true;
+  let saveAutomatic = () => Promise.resolve();
   const identity = isEditing ? projectIdentity(project) : null;
   const selectedFolderType = isEditing && folderType(project) === "reference" ? "reference" : "project";
   const overlay = document.createElement("section");
@@ -36014,7 +36018,11 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   propertyImport.textContent = "Import ZOLA property records (Optional)";
   propertyImport.addEventListener("click", async () => {
     propertyImport.disabled = true;
-    try {await lookupPropertyContext();} finally {if (isCurrent()) propertyImport.disabled = false;}
+    try {
+      const property = await lookupPropertyContext();
+      if (autoSave && property) await saveAutomatic();
+    } catch { /* Autosave keeps the draft and exposes Retry in the form. */ }
+    finally {if (isCurrent()) propertyImport.disabled = false;}
   });
   addressLabel.append(addressInput, propertyImport, propertyLookupStatus);
 
@@ -36036,6 +36044,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
       colorRail.querySelectorAll(".project-color-swatch").forEach((swatch) => {
         swatch.setAttribute("aria-pressed", String(swatch === button));
       });
+      if (autoSave) void saveAutomatic("color").catch(() => {});
     });
     colorRail.append(button);
   });
@@ -36066,7 +36075,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     if (
       selectedFolderType !== "project" ||
       !address ||
-      (isEditing && address === originalProjectAddress)
+      (isEditing && !autoSave && address === originalProjectAddress)
     ) {
       resetPropertyLookup();
       return null;
@@ -36105,11 +36114,11 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         propertyLookupStatus.dataset.state = "warning";
         const code = error?.payload?.code || error?.code;
         if (code === "NYC_PROPERTY_NOT_FOUND" || code === "NYC_PROPERTY_DATA_NOT_FOUND") {
-          propertyLookupStatus.textContent = "No NYC tax lot matched. The Project can still be saved with this address.";
+          propertyLookupStatus.textContent = autoSave ? "No NYC tax lot matched. You can enter facts manually." : "No NYC tax lot matched. The Project can still be saved with this address.";
         } else if (!activeAccount()) {
-          propertyLookupStatus.textContent = "Sign in to import official NYC property facts. The Project can still be saved.";
+          propertyLookupStatus.textContent = autoSave ? "Sign in to import official NYC property facts." : "Sign in to import official NYC property facts. The Project can still be saved.";
         } else {
-          propertyLookupStatus.textContent = "NYC property facts could not be imported. The Project can still be saved.";
+          propertyLookupStatus.textContent = autoSave ? "NYC property facts could not be imported. You can enter facts manually." : "NYC property facts could not be imported. The Project can still be saved.";
         }
         return null;
       })
@@ -36159,6 +36168,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   });
   sheet.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (autoSave) { await saveAutomatic().catch(() => {}); return; }
     if (submitting || options.readOnly || !isCurrent() || !nameInput.value.trim()) return;
     submitting = true;
     saveButton.disabled = true;
@@ -36238,7 +36248,77 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     }
   });
 
-  if (inline) sheet.append(saveStatus, nameLabel, addressLabel, colorGroup, header);
+  if (autoSave) {
+    let saved = { name: nameInput.value.trim(), address: addressInput.value.trim(), color: selectedColor };
+    let desired = { ...saved };
+    let savedProperty = null;
+    let pending = null;
+    const retry = document.createElement("button");
+    retry.type = "button"; retry.className = "ghost-button project-identity-retry";
+    retry.textContent = "Retry saving"; retry.hidden = true;
+    const propertyToSave = () => propertyLookupResult && propertyLookupAddress === desired.address && propertyLookupResult !== savedProperty ? propertyLookupResult : null;
+    const changed = () => Object.keys(saved).some(key => saved[key] !== desired[key]) || Boolean(propertyToSave());
+    const save = () => {
+      if (pending) return pending;
+      if (!isCurrent() || options.readOnly || !changed()) return Promise.resolve();
+      pending = (async () => {
+        while (isCurrent() && changed()) {
+          const snapshot = { ...desired };
+          const property = propertyToSave();
+          const addressChanged = snapshot.address !== saved.address;
+          const factsChanged = addressChanged || Boolean(property);
+          options.onSubmitting?.(true);
+          try {
+            if (factsChanged && options.beforeSave && !(await options.beforeSave())) throw new Error("Other Project changes could not be saved.");
+            if (!isCurrent()) return;
+            const details = Object.fromEntries(Object.keys(saved).filter(key => snapshot[key] !== saved[key]).map(key => [key, snapshot[key]]));
+            if (factsChanged) {
+              const existing = addressChanged ? [] : projectStructuredFacts(workspaceProject());
+              const imported = property?.structuredFacts || [];
+              const manualKeys = new Set(existing.filter(fact => fact.source !== "nyc-planning").map(fact => fact.key));
+              const importedKeys = new Set(imported.map(fact => fact.key));
+              details.structuredFacts = [...existing.filter(fact => manualKeys.has(fact.key) || !importedKeys.has(fact.key)), ...imported.filter(fact => !manualKeys.has(fact.key))];
+            }
+            mutationStarted = true;
+            const updated = await updateProjectFolder(project, details);
+            if (updated === false) throw new Error("Project changes could not be saved.");
+            if (!isCurrent()) return;
+            saved = snapshot;
+            if (property) savedProperty = property;
+            saveStatus.hidden = true; retry.hidden = true;
+            options.onSaved?.({ factsChanged });
+          } finally {
+            mutationStarted = false;
+            options.onSubmitting?.(false);
+          }
+        }
+      })().catch(error => {
+        if (isCurrent()) {
+          saveStatus.textContent = "Changes not saved. Your edits are still here.";
+          saveStatus.hidden = false; retry.hidden = false;
+        }
+        throw error;
+      }).finally(() => { pending = null; });
+      return pending;
+    };
+    saveAutomatic = (field = "all") => {
+      if (field === "all" || field === "name") {
+        if (!nameInput.value.trim()) nameInput.value = desired.name;
+        desired.name = nameInput.value.trim();
+      }
+      if (field === "all" || field === "address") desired.address = addressInput.value.trim();
+      if (field === "all" || field === "color") desired.color = selectedColor;
+      return save();
+    };
+    for (const [input, field] of [[nameInput, "name"], [addressInput, "address"]]) {
+      input.addEventListener("blur", () => { void saveAutomatic(field).catch(() => {}); });
+    }
+    retry.addEventListener("click", () => { void saveAutomatic().catch(() => {}); });
+    overlay.dataset.projectEditingState = "true";
+    overlay._projectHasPendingEdits = () => Boolean(pending) || changed() || nameInput.value.trim() !== desired.name || addressInput.value.trim() !== desired.address;
+    sheet.append(saveStatus, retry, nameLabel, addressLabel, colorGroup);
+  }
+  else if (inline) sheet.append(saveStatus, nameLabel, addressLabel, colorGroup, header);
   else sheet.append(header, saveStatus, nameLabel, addressLabel, descriptionLabel, colorGroup);
   overlay.append(sheet);
   panel.append(overlay);
@@ -36249,7 +36329,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   }
   if (options.workspaceProject) overlay.setAttribute("aria-label", "New Project");
   if (!options.alwaysVisible) nameInput.focus();
-  return { close: closeOptions => { if (!mutationStarted) closeSheet(closeOptions); } };
+  return { close: closeOptions => { if (!mutationStarted) closeSheet(closeOptions); }, flush: () => saveAutomatic() };
 }
 
 function appendProjectEmptyCard(content, title, message) {
@@ -36704,7 +36784,7 @@ async function renderProjectInformation(project, kind) {
   const editor = kind === "questions" ? appendProjectOpenQuestions(content, identity)
     : kind === "checklist" ? appendProjectRecordsChecklist(content, current, identity)
     : appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind });
-  projectInformationMounts.set(paneID, { panel, flush: () => editor.flush() });
+  projectInformationMounts.set(paneID, { panel, flush: () => editor.flush(), refresh: editor.refresh });
   panel.append(header, content);
   applyPaneWeight(panel, paneID);
   return panel;
@@ -37140,6 +37220,14 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     container.append(structuredSection);
     return {
       flush: () => save({ reportFailure: true }),
+      refresh: next => {
+        if (!isCurrentAccountRequest(requestIdentity) || workspaceID !== activeWorkspaceID || !projectDetailMatches(next, identity) || container._projectHasPendingEdits()) return false;
+        address.value = String(next.address || "");
+        structuredFacts = migratedProjectStructuredFacts({ structuredFacts: projectStructuredFacts(next) });
+        saved = { address: address.value, description: description.value, structuredFacts: projectStructuredFacts(next) };
+        renderStructuredFacts();
+        return true;
+      },
       refreshZoLa: refreshFacts ? () => refreshFacts.click() : null,
       isRefreshing: () => Boolean(refreshFacts?.disabled)
     };

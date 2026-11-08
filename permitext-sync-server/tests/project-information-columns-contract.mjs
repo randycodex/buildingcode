@@ -81,7 +81,7 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
   showProjectCreateSheet: (host, _project, options) => {
     identityEditorCount++; inlineOptions = options;
     const form = element('form'); host.append(form);
-    identityEditorController = {close:()=>{form.remove();closedIdentityEditors++;options.onClose();}};
+    identityEditorController = {flush:async()=>{flushedEditors.push('identity');},close:()=>{form.remove();closedIdentityEditors++;options.onClose();}};
     return identityEditorController;
   },
   document: { createElement: element, body, querySelector: selector => selector === '.workspace-shell' ? workspaceShell : selector === '.workflow-toolbar' ? workflowToolbar : null },
@@ -127,7 +127,7 @@ await c.openProjectDetailsScreen('checklist');
 assert.equal(questionsPanel.hidden, true); assert.equal(checklistPanel.hidden, false);
 checklistPanel.draft = 'Unsaved record';
 assert.equal(await c.flushProjectInformationPanes(), true);
-assert.deepEqual(flushedEditors, ['context', 'facts', 'questions', 'checklist'], 'Each mounted editor participates in guarded saves');
+assert.deepEqual(flushedEditors, ['identity', 'context', 'facts', 'questions', 'checklist'], 'Each mounted editor participates in guarded saves');
 await c.openProjectDetailsScreen('context');
 const contextBody = contextPanel.querySelector('.project-details-column-body');
 const factsBody = factsPanel.querySelector('.project-details-column-body');
@@ -136,21 +136,26 @@ assert.equal(editButton, undefined, 'Context fields do not require the pencil bu
 assert.equal(identityEditorCount,1,'The complete identity form mounts as soon as Context opens.');
 assert.equal(inlineOptions.inline,true);
 assert.equal(inlineOptions.alwaysVisible,true,'Fields remain part of the Context view.');
+assert.equal(inlineOptions.autoSave,true,'Context fields save without Save and Cancel actions.');
 assert.equal(inlineOptions.readOnly,false);
 assert.ok(find(contextPanel.querySelector('.project-overview-editor'),node=>node.tag==='form'));
 const overviewInput = contextPanel.querySelector('.project-overview-context');
 const originalInert = overviewInput.inert;
 inlineOptions.onSubmitting(true);
 assert.equal(overviewInput.inert, true, 'Freeze context while the identity editor flushes and saves.');
-assert.equal(factsPanel.inert, true);
+const factsContent=factsPanel.querySelector('.project-information-content');
+assert.equal(factsContent.inert, true);
+await c.openProjectDetailsScreen('facts');
+assert.equal(factsPanel.inert,false,'Tabs remain navigable during an automatic save.');
 inlineOptions.onSubmitting(false);
 assert.equal(overviewInput.inert, originalInert, 'Restore context editing after identity submission.');
-identityEditorController.close(); inlineOptions.onCancel();
-assert.equal(identityEditorCount,2,'Cancel resets the identity form without hiding it.');
-vm.runInContext('projectDetailsScreen.close()',c);
-assert.equal(closedIdentityEditors,2,'Closing Context discards the unsaved identity form.');
+assert.equal(factsPanel.inert,false,'Finishing a save keeps the selected tab interactive.');
+assert.equal(factsContent.inert,undefined);
 await c.openProjectDetailsScreen('context');
-assert.equal(identityEditorCount,3,'Reopening Context immediately restores the available identity fields.');
+vm.runInContext('projectDetailsScreen.close()',c);
+assert.equal(closedIdentityEditors,0,'Closing Context keeps pending automatic saves mounted.');
+await c.openProjectDetailsScreen('context');
+assert.equal(identityEditorCount,1,'Reopening Context retains the same fields and any failed save draft.');
 contextPanel.draft='Retained edit'; contextBody.scrollTop=320;
 factsBody.scrollTop=210; columns.scrollLeft=80;
 const presentation = vm.runInContext('projectDetailsScreen.getPresentationState()',c);
@@ -261,6 +266,7 @@ const e = vm.createContext({ activeWorkspaceID: "alpha-workspace", document: { c
   projectStructuredFacts: project => copy(project.structuredFacts || []), migratedProjectStructuredFacts: project => copy(project.structuredFacts),
   normalizeProjectStructuredFact: value => value.value ? value : null,
   projectRecordID: project => project.id, safeAnnotationIDPart: value => value,
+  projectDetailMatches: (a,b) => a?.id === b?.id,
   researchChevronIconsSVG: () => "", projectSectionExpanded: () => false,
   wireProjectSectionMotion(...args) { factMotionCalls.push(args); }, persistProjectSectionExpansion() {}, clear: node => { node.children = []; },
   window: { clearTimeout() {} }, showWebNotice() {},
@@ -304,6 +310,12 @@ assert.deepEqual(Object.keys(patches[1]).sort(), ["address", "structuredFacts"])
 assert.equal(patches[1].structuredFacts[0].value, "R-2");
 assert.equal(typeof factsEditor.refreshZoLa, "function");
 assert.equal(factsEditor.isRefreshing(), false);
+assert.equal(factsEditor.refresh({...alpha,address:'Updated address',structuredFacts:[]}),true,'Identity address changes refresh Facts in place.');
+assert.equal(find(factsRoot,node=>node.attributes['aria-label']==='Address').value,'Updated address');
+const refreshedOccupancy = find(factsRoot,node=>node.attributes['aria-label']==='Occupancy');
+refreshedOccupancy.value='R-3'; refreshedOccupancy.handlers.input();
+assert.equal(factsEditor.refresh({...alpha,address:'Do not overwrite'}),false,'A refresh preserves pending fact edits.');
+await factsEditor.flush();
 assert.equal(find(factsRoot, node => node.className === "saved-project-refresh-facts"), undefined);
 failWrite = true; narrative.value = "Retry context";
 await assert.rejects(contextEditor.flush(), /Write failed/);

@@ -20547,6 +20547,7 @@ dialog.report-export-review {
   background: transparent;
 }
 .project-overview-editor .project-sheet-header[hidden] { display: none; }
+.project-overview-editor .project-identity-retry[hidden] { display: none; }
 .project-overview-editor .project-sheet-header button { padding: 4px 8px; border-radius: var(--radius-pill); font-size: 13px !important; }
 .project-overview-editor .project-sheet-header button:not(:disabled):hover { background: var(--menu-highlight); }
 .project-details-screen .project-overview-context { padding: 0; font-size: 14px; line-height: 1.5; }

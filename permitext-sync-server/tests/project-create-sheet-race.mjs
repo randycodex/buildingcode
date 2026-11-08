@@ -22,10 +22,11 @@ class Element {
   querySelectorAll(selector) { const all = this.children.flatMap(item => [item, ...item.querySelectorAll("*")]); return selector === "*" ? all : all.filter(item => selector.split(/,\s*/).some(part => part.startsWith(".") ? item.className?.split(" ").includes(part.slice(1)) : item.tag === part)); }
   querySelector(selector) { return this.querySelectorAll(selector)[0] || null; }
 }
-function harness({ editing = false, inline = false, beforeSave, alwaysVisible = false, readOnly = false } = {}) {
+function harness({ editing = false, inline = false, beforeSave, alwaysVisible = false, readOnly = false, autoSave = false } = {}) {
   const body = new Element("body"), panel = new Element("section"), background = new Element("div");
   background.className = "projects-content"; panel.append(background); body.append(panel);
   const lookup = deferred(), write = deferred(), created = [], updated = [], notices = [], callbacks = [];
+  let record = {id:"existing",name:"Existing",address:"Old address",description:"Original",color:"#334455",structuredFacts:[{key:'occupancy',value:'R-2',source:'user'}]};
   const c = vm.createContext({
     document: { createElement: tag => new Element(tag), activeElement: new Element("button"), querySelector: () => null }, HTMLElement: Element,
     activeWorkspaceID: "workspace", account: "owner", captureAccountRequest: () => c.account,
@@ -34,26 +35,30 @@ function harness({ editing = false, inline = false, beforeSave, alwaysVisible = 
     projectColorOptions: ["#334455", "#556677"], trapWebModalFocus() { callbacks.push("trap"); },
     postResearch: () => lookup.promise,
     createProjectFolder: async details => { created.push(details); if (c.failWrite) throw Error("Storage unavailable"); if (c.holdWrite) await write.promise; return {id: "created"}; },
-    updateProjectFolder: async (project, details) => { updated.push(details); if (c.failWrite) throw Error("Storage unavailable"); if (c.holdWrite) await write.promise; return !c.rejectWrite; },
+    workspaceProject: () => record, projectStructuredFacts: project => project.structuredFacts || [],
+    updateProjectFolder: async (project, details) => { updated.push(details); if (c.failWrite) throw Error("Storage unavailable"); if (c.holdWrite) await write.promise; if(c.rejectWrite)return false; record={...record,...details}; return true; },
     transitionWorkspace: async () => { callbacks.push("transition"); }, projectOverviewRefreshPaneIDs: () => [], paneIDForProjectDetail: () => "",
     refreshOpenAnnotationProjectEditors() {}, appendMutedRow: (...args) => notices.push(args)
   });
   vm.runInContext(source.slice(start, end), c);
-  c.showProjectCreateSheet(panel, editing ? {id: "existing", name: "Existing", address: "Old address", description: "Original", color: "#334455"} : null,
-    {inline, beforeSave, alwaysVisible, readOnly, onCancel: alwaysVisible ? () => callbacks.push("cancel") : undefined,
+  const controller = c.showProjectCreateSheet(panel, editing ? record : null,
+    {inline, beforeSave, alwaysVisible, readOnly, autoSave, onCancel: alwaysVisible ? () => callbacks.push("cancel") : undefined,
       onCreated: async () => callbacks.push("created"), onSaved: () => callbacks.push("saved")});
   const overlay = panel.querySelector(".project-sheet-overlay"), form = panel.querySelector("form");
   const name = panel.querySelector(".project-name-input"), address = panel.querySelector(".project-address-input"), description = panel.querySelector(".project-description-input");
   const cancel = form.querySelectorAll("button").find(button => button.textContent === "Cancel");
   const save = form.querySelectorAll("button").find(button => button.textContent === "Save");
-  name.value = "Typed project"; address.value = "Synthetic address";
-  if (description) description.value = "Typed description";
-  name.events.input();
-  // Property lookup is optional and starts only when the user requests import.
-  form.querySelectorAll("button").find(button => button.textContent === "Import ZOLA property records (Optional)").events.click();
-  return {c, panel, overlay, form, name, address, description, cancel, save, lookup, write, created, updated, notices, callbacks,
+  const propertyImport = form.querySelectorAll("button").find(button => button.textContent === "Import ZOLA property records (Optional)");
+  if (!autoSave) {
+    name.value = "Typed project"; address.value = "Synthetic address";
+    if (description) description.value = "Typed description";
+    name.events.input();
+    // Property lookup is optional and starts only when the user requests import.
+    propertyImport.events.click();
+  }
+  return {c, panel, overlay, form, name, address, description, cancel, save, lookup, write, created, updated, notices, callbacks,controller,propertyImport,
     submit: () => form.events.submit(event()),
-    resolveLookup: () => lookup.resolve({property: {normalizedAddress: "Normalized address", structuredFacts: [{status: "sourced"}]}})
+    resolveLookup: (structuredFacts = [{key:'borough',value:'Manhattan',status:'sourced',source:'nyc-planning'}]) => lookup.resolve({property: {normalizedAddress: "Normalized address", structuredFacts}})
   };
 }
 
@@ -146,4 +151,69 @@ for (const options of [{editing:false},{editing:true},{editing:true,inline:true}
   h.write.resolve(); await pending;
   assert.equal(h.overlay.isConnected, false);
 }
-console.log("Project sheet passed: pending lookup cancellation/context fences, single submission, frozen input, write boundary, inline error retention and explicit retry.");
+const autoOptions = {editing:true,inline:true,alwaysVisible:true,autoSave:true};
+{
+  const h = harness(autoOptions);
+  assert.equal(h.cancel,undefined); assert.equal(h.save,undefined,'Context has no manual save controls.');
+  await h.controller.flush(); assert.equal(h.updated.length,0,'Opening or closing unchanged fields does not write.');
+  h.name.value='Renamed'; h.name.events.input(); await tick();
+  assert.equal(h.updated.length,0,'Typing waits for blur.');
+  h.name.events.blur(); await h.controller.flush();
+  assert.deepEqual(Object.keys(h.updated[0]),['name']); assert.equal(h.updated[0].name,'Renamed');
+  h.form.querySelectorAll('.project-color-swatch')[1].events.click(); await h.controller.flush();
+  assert.deepEqual(Object.keys(h.updated[1]),['color'],'Color changes preserve address, facts and narrative.');
+  assert.equal(h.overlay.isConnected,true,'Autosave keeps the same mounted form.');
+  assert.equal(h.callbacks.includes('transition'),false);
+  h.name.value=''; h.name.events.blur(); await h.controller.flush();
+  assert.equal(h.name.value,'Renamed','A blank required name restores the saved value.');
+  assert.equal(h.updated.length,2);
+}
+{
+  const h = harness(autoOptions); h.c.holdWrite=true;
+  h.name.value='First'; h.name.events.blur(); await tick();
+  h.name.value='Latest'; h.name.events.blur();
+  h.form.querySelectorAll('.project-color-swatch')[1].events.click();
+  assert.equal(h.name.disabled,false,'A pending save leaves fields editable.');
+  assert.equal(h.updated.length,1,'Saves are serialized.');
+  h.write.resolve(); await h.controller.flush();
+  assert.equal(h.updated.length,2); assert.equal(h.updated[1].name,'Latest'); assert.equal(h.updated[1].color,'#556677');
+}
+{
+  const h = harness(autoOptions); h.c.failWrite=true;
+  h.name.value='Retain this'; h.name.events.blur();
+  await assert.rejects(h.controller.flush(),/Storage unavailable/);
+  const retry=h.form.querySelector('.project-identity-retry');
+  assert.equal(retry.hidden,false); assert.equal(h.name.value,'Retain this');
+  h.c.failWrite=false; retry.events.click(); await h.controller.flush();
+  assert.equal(retry.hidden,true); assert.equal(h.updated.at(-1).name,'Retain this');
+}
+for (const action of ['account','workspace','detach']) {
+  const fence=deferred(), h=harness({...autoOptions,beforeSave:async()=>{await fence.promise;return true;}});
+  h.address.value='New address'; h.address.events.blur(); await tick();
+  if(action==='account')h.c.account='other';
+  if(action==='workspace')h.c.activeWorkspaceID='other';
+  if(action==='detach')h.panel.remove();
+  fence.resolve(); await h.controller.flush();
+  assert.equal(h.updated.length,0,`${action} fences a delayed address save.`);
+}
+{
+  let flushes=0;
+  const h=harness({...autoOptions,beforeSave:async()=>{flushes++;return true;}});
+  h.address.value='New address'; h.address.events.blur(); await h.controller.flush();
+  assert.equal(flushes,1); assert.equal(h.updated[0].address,'New address');
+  assert.deepEqual(Array.from(h.updated[0].structuredFacts),[],'A new address clears facts from the previous property.');
+}
+{
+  const h=harness(autoOptions), importing=h.propertyImport.events.click();
+  h.resolveLookup([{key:'occupancy',value:'R-3',status:'sourced',source:'nyc-planning'}, {key:'borough',value:'Manhattan',status:'sourced',source:'nyc-planning'}]);
+  await importing; await h.controller.flush();
+  assert.equal(h.updated.length,1,'Import works at the already-saved address and persists automatically.');
+  assert.equal(h.updated[0].structuredFacts.find(f=>f.key==='occupancy').value,'R-2','Import preserves manually entered facts.');
+  assert.equal(h.updated[0].structuredFacts.find(f=>f.key==='borough').value,'Manhattan');
+}
+{
+  const h=harness({...autoOptions,readOnly:true});
+  h.name.value='Blocked'; await h.controller.flush();
+  assert.equal(h.updated.length,0,'Shared read-only identity cannot autosave.');
+}
+console.log("Project sheet passed: manual saves, cancellation fences, Context autosave, queued edits, retry retention, property import and read-only access.");
