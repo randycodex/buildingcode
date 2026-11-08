@@ -12802,6 +12802,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .settings-project-row input,
+.account-screen .settings-trash-checkbox,
 .account-screen .project-manager-row input[type="checkbox"],
 .account-screen .settings-active-source-row input[type="checkbox"] {
   display: grid;
@@ -12817,6 +12818,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .settings-project-row input::after,
+.account-screen .settings-trash-checkbox::after,
 .account-screen .project-manager-row input[type="checkbox"]::after,
 .account-screen .settings-active-source-row input[type="checkbox"]::after {
   color: var(--surface);
@@ -12827,6 +12829,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .settings-project-row input:checked,
+.account-screen .settings-trash-checkbox:checked,
 .account-screen .project-manager-row input[type="checkbox"]:checked,
 .account-screen .settings-active-source-row input[type="checkbox"]:checked {
   border-color: var(--text-primary);
@@ -12834,6 +12837,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .settings-project-row input:checked::after,
+.account-screen .settings-trash-checkbox:checked::after,
 .account-screen .project-manager-row input[type="checkbox"]:checked::after,
 .account-screen .settings-active-source-row input[type="checkbox"]:checked::after {
   opacity: 1;
@@ -12846,8 +12850,10 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .account-screen .project-manager-row input[type="checkbox"] { flex: 0 0 18px; }
-.account-screen .project-manager-row input[type="checkbox"]:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
-.account-screen .project-manager-row input[type="checkbox"]:disabled { opacity: 0.4; cursor: default; }
+.account-screen .project-manager-row input[type="checkbox"]:focus-visible,
+.account-screen .settings-trash-checkbox:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.account-screen .project-manager-row input[type="checkbox"]:disabled,
+.account-screen .settings-trash-checkbox:disabled { opacity: 0.4; cursor: default; }
 
 .settings-project-copy {
   display: grid;
@@ -18455,7 +18461,17 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-data-card .settings-content-trash:not(:disabled):hover { color: var(--destructive); }
 .account-screen .settings-data-card .settings-content-trash:disabled:hover { background: transparent; }
 .account-screen .settings-data-card .settings-trash-help { margin: 0 0 6px; color: var(--text-secondary); font-size: var(--settings-type-support); line-height: 1.5; }
-.account-screen .settings-trash-toolbar { display: flex; justify-content: flex-end; }
+.account-screen .settings-trash-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.account-screen .settings-data-card .settings-trash-select[aria-pressed="true"] { background: var(--menu-highlight); }
+.account-screen .settings-data-card .settings-trash-toolbar .settings-trash-select:not([aria-pressed="true"]) { background: transparent; }
+.account-screen .settings-trash-selection-toolbar,
+.account-screen .settings-trash-bulk-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.account-screen .settings-trash-bulk-actions { padding-bottom: var(--space-4); }
+.account-screen .settings-trash-bulk-actions > .settings-trash-confirm { flex: 0 0 100%; }
+.account-screen .settings-trash-entry.is-selecting { grid-template-columns: 18px minmax(0, 1fr); column-gap: 12px; }
+.account-screen .settings-trash-checkbox { grid-column: 1; grid-row: 1 / span 2; align-self: center; }
+.account-screen .settings-trash-entry.is-selecting .settings-trash-title { grid-column: 2; max-width: none; }
+.account-screen .settings-trash-entry.is-selecting .settings-trash-copy p { grid-column: 2; }
 .account-screen .settings-trash-status { margin: 8px 0; color: var(--text-secondary); font-size: var(--settings-type-support); line-height: 1.5; }
 .account-screen .settings-trash-status:empty { display: none; }
 .account-screen .settings-trash-entry {

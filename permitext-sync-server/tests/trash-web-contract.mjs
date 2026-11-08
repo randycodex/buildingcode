@@ -32,7 +32,7 @@ console.log('Web Trash preflight and all-edition note cleanup passed.');
 
 // Exercise the rendered row actions with synthetic recovery copies and no backend.
 class Element {
- constructor(tag='div'){this.tagName=tag;this.children=[];this.events={};this.className='';this.value='';this.disabled=false;this.textContent='';}
+ constructor(tag='div'){this.tagName=tag;this.children=[];this.events={};this.className='';this.value='';this.disabled=false;this.textContent='';this.dataset={};}
  classList={add:name=>{this.className+=` ${name}`;},contains:name=>this.className.split(' ').includes(name)};
  setAttribute(name,value){(this.attributes ||= {})[name]=value;}
  getAttribute(name){return this.attributes?.[name] ?? null;}
@@ -48,15 +48,21 @@ class Element {
   ...node.querySelectorAll(selector)
  ]);}
 }
-const nodes=Object.fromEntries(['settings-trash','settings-trash-list','settings-trash-status','settings-trash-refresh'].map(name=>[`.${name}`,new Element()]));
+const nodes=Object.fromEntries(['settings-trash','settings-trash-list','settings-trash-status','settings-trash-refresh','settings-trash-toolbar'].map(name=>[`.${name}`,new Element()]));
 let contentRefreshes=0;
 const panel={querySelector:selector=>nodes[selector],__refreshSettingsContent:()=>{contentRefreshes++;}};
 const entries=[{id:'copy-one',title:'Synthetic note',expiresAt:'2026-11-01T12:00:00Z'},{id:'copy-two',title:'Synthetic evidence',expiresAt:'2026-11-02T12:00:00Z'}];
-const requests=[];let current=true,preflights=0,refreshes=0,failNextRequest=false,holdInspection=false,finishInspection;
+const requests=[];let current=true,preflights=0,refreshes=0,failNextRequest=false,holdInspection=false,finishInspection,mutateEntries=false,failOnID;
 const trashValues={document:{createElement:tag=>new Element(tag)},captureAccountRequest:()=> 'owner',isCurrentAccountRequest:()=>current,
  stripLeadingSectionNumber:value=>value,
  prepareRecoverableDeletion:async()=>{preflights++;},requireCurrentAccountRequest(){assert(current);},
- postResearch:async(path,body)=>{requests.push({path,...body});if(holdInspection&&body.action==='inspect')return new Promise(resolve=>{finishInspection=resolve;});if(failNextRequest){failNextRequest=false;throw Error('Synthetic retry failure');}return {entries,entry:{id:body.id,items:[{kind:'savedItem',codeLabel:'Building Code',editionLabel:'2022',sectionNumber:'1020.2',title:'Width and capacity.',excerpt:'Synthetic preserved passage <script>plain text</script>'}]}};},
+ postResearch:async(path,body)=>{
+  requests.push({path,...body});
+  if(holdInspection&&body.action==='inspect')return new Promise(resolve=>{finishInspection=resolve;});
+  if(failNextRequest||body.id===failOnID&&failOnID){failNextRequest=false;failOnID=undefined;throw Error('Synthetic retry failure');}
+  if(mutateEntries&&['restore','purge'].includes(body.action)){const index=entries.findIndex(entry=>entry.id===body.id);if(index>=0)entries.splice(index,1);}
+  return {entries,entry:{id:body.id,items:[{kind:'savedItem',codeLabel:'Building Code',editionLabel:'2022',sectionNumber:'1020.2',title:'Width and capacity.',excerpt:'Synthetic preserved passage <script>plain text</script>'}]}};
+ },
  loadSyncedContent:async()=>{},refreshWorkspaceAfterSettingsClear:async()=>{refreshes++;},settingsPanelScrollTop:()=>0,track:{scrollLeft:0},openTrashAfterSettingsDeletion:false};
 new Function(...Object.keys(trashValues),'panel',between('function attachSettingsTrash(', 'async function clearSettingsBookmarks(')+';attachSettingsTrash(panel);')(...Object.values(trashValues),panel);
 await nodes['.settings-trash-refresh'].fire('click');
@@ -120,3 +126,49 @@ current=false;finishInspection({entry:{id:'copy-one',items:[{kind:'annotation',e
 await pendingInspection;
 assert.equal(staleContents.querySelector('ol'),null,'An inspection completed after switching accounts cannot render private content.');
 console.log('Compact Trash actions passed: adjacent controls, exact copy identity, typed confirmation, cancel, restore and account fencing.');
+
+current=true;holdInspection=false;
+await nodes['.settings-trash-refresh'].fire('click');
+const selection=nodes['.settings-trash-toolbar'].querySelector('.settings-trash-select');
+const findButton=(root,text)=>root.querySelectorAll('button').find(button=>button.textContent===text);
+const beforeSelection=requests.length;
+selection.fire('click');
+assert.equal(selection.textContent,'Done');
+assert.equal(selection.getAttribute('aria-pressed'),'true');
+assert.equal(list.querySelectorAll('.settings-trash-checkbox').length,2);
+assert.equal(requests.length,beforeSelection,'Selecting copies does not refetch or mutate Trash.');
+let bulk=list.querySelector('.settings-trash-bulk-actions');
+assert.equal(findButton(bulk,'Restore Selected').disabled,true);
+const firstCheck=list.querySelector('.settings-trash-checkbox');
+firstCheck.checked=true;firstCheck.fire('change');
+assert.equal(findButton(bulk,'Restore Selected').disabled,false);
+findButton(bulk,'Delete Selected').fire('click');
+assert.match(bulk.querySelector('.settings-trash-confirm').querySelector('p').textContent,/1 selected/);
+assert.equal(bulk.querySelector('.settings-trash-confirm-button').disabled,true);
+firstCheck.checked=false;firstCheck.fire('change');
+assert.equal(bulk.querySelector('.settings-trash-confirm'),null,'Changing the selection cancels its pending permanent-deletion form.');
+assert.equal(requests.length,beforeSelection);
+findButton(list,'Select All').fire('click');
+assert(list.querySelectorAll('.settings-trash-checkbox').every(input=>input.checked));
+findButton(bulk,'Delete Selected').fire('click');
+form=bulk.querySelector('.settings-trash-confirm');
+form.querySelector('input').value='DELETE';form.querySelector('input').fire('input');
+await form.querySelector('.settings-trash-confirm-button').fire('click');
+assert.deepEqual(requests.slice(-2).map(request=>[request.action,request.id,request.confirmation]),[['purge','copy-one','DELETE'],['purge','copy-two','DELETE']]);
+assert.equal(selection.textContent,'Select','Successful selected-copy removal exits selection mode.');
+assert.equal(list.querySelectorAll('.settings-trash-checkbox').length,0);
+
+selection.fire('click');findButton(list,'Select All').fire('click');
+mutateEntries=true;failOnID='copy-two';
+await findButton(list,'Restore Selected').fire('click');
+assert.match(nodes['.settings-trash-status'].textContent,/Synthetic retry failure/);
+assert.equal(selection.textContent,'Done','An incomplete restore keeps the remaining selection available.');
+assert.equal(list.querySelectorAll('.settings-trash-checkbox').length,1,'A restored copy cannot remain selected after a partial failure.');
+assert.equal(list.querySelector('.settings-trash-checkbox').dataset.entryId,'copy-two');
+assert.equal(findButton(list,'Restore Selected').disabled,false);
+await findButton(list,'Restore Selected').fire('click');
+assert.equal(requests.at(-1).id,'copy-two','Retry restores only the remaining selected copy.');
+assert.equal(entries.length,0);
+assert.equal(selection.textContent,'Select');
+assert.equal(selection.disabled,true,'Empty Trash has no selectable copies.');
+console.log('Trash selection passed: Select/Done, exact selected IDs, typed bulk purge, cancellation, partial restore recovery and empty state.');

@@ -3,7 +3,7 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=16";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-settings-project-confirmation-v1506";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261107-trash-selection-v1507";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {mountResearchDeleteControls} from "./research-delete-controls.js?v=2";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -155,7 +155,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261107-settings-project-confirmation-v1506";
+} from "./offline-storage.js?v=20261107-trash-selection-v1507";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36090,6 +36090,7 @@ function renderProjectManager(container, { onChange = () => {} } = {}) {
       try {
         if (kind === "delete") {
           if (!(await deleteArchivedProjects(chosen, { includeNames: true, container: dialog.closest?.(".settings-floating-panel") }))) return;
+          selecting = false;
         } else if (archived) {
           for (const project of chosen) {
             requireCurrentAccountRequest(requestIdentity);
@@ -40245,20 +40246,212 @@ function attachSettingsTrash(panel) {
   const list = panel.querySelector(".settings-trash-list");
   const status = panel.querySelector(".settings-trash-status");
   const refresh = panel.querySelector(".settings-trash-refresh");
+  const toolbar = panel.querySelector(".settings-trash-toolbar");
   const identity = captureAccountRequest();
-  let busy = false;
+  let busy = false, selecting = false, entries = [];
+  const selected = new Set();
+  let selectAll, selectionCount, restoreSelected, deleteSelected, bulkActions;
+  const button = (label, click, danger = false) => {
+    const element = document.createElement("button");
+    element.type = "button";
+    element.className = `settings-secondary-button settings-trash-action${danger ? " is-danger" : ""}`;
+    element.textContent = label;
+    element.addEventListener("click", click);
+    return element;
+  };
+  const selection = button("Select", () => {
+    if (busy || !isCurrentAccountRequest(identity)) return;
+    selecting = !selecting;
+    selected.clear();
+    render();
+  });
+  selection.classList.add("settings-trash-select");
+  toolbar.append(selection);
+  const syncSelection = () => {
+    selection.textContent = selecting ? "Done" : "Select";
+    selection.setAttribute("aria-pressed", String(selecting));
+    selection.disabled = busy || (!entries.length && !selecting);
+    if (selectAll) {
+      selectAll.textContent = entries.length && selected.size === entries.length ? "Deselect All" : "Select All";
+      selectAll.disabled = busy || !entries.length;
+      selectionCount.textContent = `${selected.size} selected`;
+      restoreSelected.disabled = deleteSelected.disabled = busy || !selected.size;
+      list.querySelectorAll(".settings-trash-checkbox").forEach(input => { input.checked = selected.has(input.dataset.entryId); });
+    }
+  };
+  const render = () => {
+    const available = new Set(entries.map(entry => entry.id));
+    selected.forEach(id => { if (!available.has(id)) selected.delete(id); });
+    selectAll = selectionCount = restoreSelected = deleteSelected = bulkActions = null;
+    list.replaceChildren();
+    const permanent = (container, action, id) => {
+      if (container.querySelector(".settings-trash-confirm")) return;
+      const form = document.createElement("div");
+      form.className = "settings-trash-confirm";
+      const copy = document.createElement("p");
+      copy.textContent = action === "empty"
+        ? "Permanently remove every recovery copy from this account’s Trash? This cannot be undone."
+        : Array.isArray(id) ? `Permanently remove ${id.length} selected recovery copies from this account? This cannot be undone.`
+        : "Permanently remove this recovery copy from the account? This cannot be undone.";
+      const label = document.createElement("label");
+      label.textContent = "Type DELETE to confirm";
+      const input = document.createElement("input");
+      input.autocomplete = "off";
+      input.spellcheck = false;
+      label.append(input);
+      const confirm = button("Delete Permanently", () => update(action, id, input.value), true);
+      confirm.classList.add("settings-trash-confirm-button");
+      confirm.disabled = true;
+      input.addEventListener("input", () => { confirm.disabled = input.value !== "DELETE"; });
+      const actions = document.createElement("div");
+      actions.className = "settings-trash-actions";
+      actions.append(confirm, button("Cancel", () => form.remove()));
+      form.append(copy, label, actions);
+      container.append(form);
+      input.focus();
+    };
+    if (selecting) {
+      const toolbar = document.createElement("div");
+      toolbar.className = "settings-trash-selection-toolbar";
+      selectAll = button("Select All", () => {
+        if (busy || !isCurrentAccountRequest(identity)) return;
+        if (selected.size === entries.length) selected.clear();
+        else entries.forEach(entry => selected.add(entry.id));
+        bulkActions?.querySelector(".settings-trash-confirm")?.remove();
+        syncSelection();
+      });
+      selectionCount = document.createElement("span");
+      selectionCount.setAttribute("role", "status");
+      toolbar.append(selectAll, selectionCount);
+      list.append(toolbar);
+      bulkActions = document.createElement("div");
+      bulkActions.className = "settings-trash-bulk-actions";
+      restoreSelected = button("Restore Selected", () => update("restore", [...selected]));
+      deleteSelected = button("Delete Selected", () => permanent(bulkActions, "purge", [...selected]), true);
+      bulkActions.append(restoreSelected, deleteSelected);
+    }
+    for (const entry of entries) {
+      const row = document.createElement("div");
+      row.className = `settings-trash-entry${selecting ? " is-selecting" : ""}`;
+      if (selecting) {
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "settings-trash-checkbox";
+        checkbox.dataset.entryId = entry.id;
+        checkbox.checked = selected.has(entry.id);
+        checkbox.setAttribute("aria-label", `Select ${entry.title}`);
+        checkbox.addEventListener("change", () => {
+          if (busy || !isCurrentAccountRequest(identity)) return;
+          if (checkbox.checked) selected.add(entry.id);
+          else selected.delete(entry.id);
+          bulkActions?.querySelector(".settings-trash-confirm")?.remove();
+          syncSelection();
+        });
+        row.append(checkbox);
+      }
+      const copy = document.createElement("div");
+      copy.className = "settings-trash-copy";
+      const title = document.createElement("button");
+      title.type = "button";
+      title.className = "settings-trash-title";
+      title.textContent = entry.title;
+      title.setAttribute("aria-expanded", "false");
+      const contents = document.createElement("div");
+      contents.className = "settings-trash-contents";
+      contents.id = `settings-trash-contents-${entry.id}`;
+      contents.hidden = true;
+      contents.setAttribute("role", "region");
+      contents.setAttribute("aria-label", `Deleted contents: ${entry.title}`);
+      title.setAttribute("aria-controls", contents.id);
+      let loaded = false, loading = false;
+      const loadContents = async () => {
+        if (loading || !isCurrentAccountRequest(identity)) return;
+        loading = true;
+        const status = document.createElement("p");
+        status.setAttribute("role", "status");
+        status.textContent = "Loading deleted contents…";
+        contents.replaceChildren(status);
+        try {
+          const detail = await postResearch("/content/trash", {action: "inspect", id: entry.id});
+          if (!isCurrentAccountRequest(identity)) return;
+          if (detail.entry?.id !== entry.id || !Array.isArray(detail.entry.items)) throw new Error("Contents could not be verified. Refresh Trash and try again.");
+          const items = document.createElement("ol");
+          for (const item of detail.entry.items) {
+            const row = document.createElement("li");
+            const kind = item.kind === "project" ? (item.folderType === "reference" ? "Saved collection" : "Project")
+              : ["annotation", "notebookCard"].includes(item.kind) ? "Note" : item.kind === "projectSection" ? "Project evidence" : "Saved passage";
+            const meta = document.createElement("p");
+            meta.className = "settings-trash-item-meta";
+            meta.textContent = [kind, item.codeLabel, item.editionLabel].filter(Boolean).join(" · ");
+            const heading = document.createElement("strong");
+            heading.textContent = item.kind === "project" ? item.name || kind
+              : [item.sectionNumber ? `§ ${item.sectionNumber}` : "", stripLeadingSectionNumber(item.title, item.sectionNumber)].filter(Boolean).join(" · ") || "Section reference unavailable";
+            row.append(meta, heading);
+            if (item.kind !== "project") {
+              const excerpt = document.createElement("p");
+              excerpt.className = "settings-trash-item-excerpt";
+              excerpt.textContent = item.excerpt || (["annotation", "notebookCard"].includes(item.kind) ? "Note text unavailable for this entry." : "Passage text unavailable for this entry.");
+              row.append(excerpt);
+            }
+            items.append(row);
+          }
+          if (detail.entry.items.length) contents.replaceChildren(items);
+          else { status.textContent = "No item details are available for this entry."; contents.replaceChildren(status); }
+          loaded = true;
+        } catch (error) {
+          if (!isCurrentAccountRequest(identity)) return;
+          status.textContent = error.message || "Contents could not be loaded. Reconnect and try again.";
+          contents.append(button("Retry loading contents", loadContents));
+        } finally { loading = false; }
+      };
+      title.addEventListener("click", () => {
+        if (!isCurrentAccountRequest(identity)) return;
+        contents.hidden = !contents.hidden;
+        title.setAttribute("aria-expanded", String(!contents.hidden));
+        if (!contents.hidden && !loaded) return loadContents();
+      });
+      const date = document.createElement("p");
+      date.textContent = `Expires ${new Date(entry.expiresAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+      copy.append(title, date);
+      const actions = document.createElement("div");
+      actions.className = "settings-trash-actions";
+      actions.append(button("Restore", () => update("restore", entry.id)), button("Delete Permanently", () => permanent(row, "purge", entry.id), true));
+      row.append(copy);
+      if (!selecting) row.append(actions);
+      row.append(contents);
+      list.append(row);
+    }
+    if (selecting) list.append(bulkActions);
+    syncSelection();
+    if (entries.length && !selecting) {
+      const empty = button("Empty Trash…", () => permanent(list, "empty"), true);
+      empty.classList.add("settings-trash-empty");
+      list.append(empty);
+    }
+  };
   const update = async (action = "list", id, confirmation) => {
     if (busy || !isCurrentAccountRequest(identity)) return;
     busy = true;
-    refresh.disabled = true;
+    refresh.disabled = selection.disabled = true;
     list.querySelectorAll("button, input").forEach(control => { control.disabled = true; });
     status.textContent = "Loading Trash…";
+    let changed = false;
     try {
       if (action !== "list") await prepareRecoverableDeletion();
-      const result = await postResearch("/content/trash", {action, id, confirmation});
-      if (!isCurrentAccountRequest(identity)) return;
+      const ids = Array.isArray(id) ? id : [id];
+      let result;
+      for (const entryID of ids) {
+        requireCurrentAccountRequest(identity);
+        result = await postResearch("/content/trash", {action, id: entryID, confirmation});
+        if (!isCurrentAccountRequest(identity)) return;
+        if (action !== "list") changed = true;
+      }
+      if (!result) return;
+      entries = result.entries;
+      if (action !== "list") { selecting = false; selected.clear(); }
       if (action === "restore") {
-        if (id?.startsWith("notebook:")) notebookCatalogs.clear();
+        render();
+        if (ids.some(entryID => entryID?.startsWith("notebook:"))) notebookCatalogs.clear();
         await loadSyncedContent({force: true, skipOutbox: true});
         requireCurrentAccountRequest(identity);
         openTrashAfterSettingsDeletion = true;
@@ -40266,128 +40459,29 @@ function attachSettingsTrash(panel) {
         return;
       }
       panel.__refreshSettingsContent?.();
-      status.textContent = result.entries.length ? "" : "Trash is empty.";
-      list.replaceChildren();
-      const button = (label, click, danger = false) => {
-        const element = document.createElement("button");
-        element.type = "button";
-        element.className = `settings-secondary-button settings-trash-action${danger ? " is-danger" : ""}`;
-        element.textContent = label;
-        element.addEventListener("click", click);
-        return element;
-      };
-      const permanent = (container, action, id) => {
-        if (container.querySelector(".settings-trash-confirm")) return;
-        const form = document.createElement("div");
-        form.className = "settings-trash-confirm";
-        const copy = document.createElement("p");
-        copy.textContent = action === "empty"
-          ? "Permanently remove every recovery copy from this account’s Trash? This cannot be undone."
-          : "Permanently remove this recovery copy from the account? This cannot be undone.";
-        const label = document.createElement("label");
-        label.textContent = "Type DELETE to confirm";
-        const input = document.createElement("input");
-        input.autocomplete = "off";
-        input.spellcheck = false;
-        label.append(input);
-        const confirm = button("Delete Permanently", () => update(action, id, input.value), true);
-        confirm.classList.add("settings-trash-confirm-button");
-        confirm.disabled = true;
-        input.addEventListener("input", () => { confirm.disabled = input.value !== "DELETE"; });
-        const actions = document.createElement("div");
-        actions.className = "settings-trash-actions";
-        actions.append(confirm, button("Cancel", () => form.remove()));
-        form.append(copy, label, actions);
-        container.append(form);
-        input.focus();
-      };
-      for (const entry of result.entries) {
-        const row = document.createElement("div");
-        row.className = "settings-trash-entry";
-        const copy = document.createElement("div");
-        copy.className = "settings-trash-copy";
-        const title = document.createElement("button");
-        title.type = "button";
-        title.className = "settings-trash-title";
-        title.textContent = entry.title;
-        title.setAttribute("aria-expanded", "false");
-        const contents = document.createElement("div");
-        contents.className = "settings-trash-contents";
-        contents.id = `settings-trash-contents-${entry.id}`;
-        contents.hidden = true;
-        contents.setAttribute("role", "region");
-        contents.setAttribute("aria-label", `Deleted contents: ${entry.title}`);
-        title.setAttribute("aria-controls", contents.id);
-        let loaded = false, loading = false;
-        const loadContents = async () => {
-          if (loading || !isCurrentAccountRequest(identity)) return;
-          loading = true;
-          const status = document.createElement("p");
-          status.setAttribute("role", "status");
-          status.textContent = "Loading deleted contents…";
-          contents.replaceChildren(status);
-          try {
-            const detail = await postResearch("/content/trash", {action: "inspect", id: entry.id});
-            if (!isCurrentAccountRequest(identity)) return;
-            if (detail.entry?.id !== entry.id || !Array.isArray(detail.entry.items)) throw new Error("Contents could not be verified. Refresh Trash and try again.");
-            const items = document.createElement("ol");
-            for (const item of detail.entry.items) {
-              const row = document.createElement("li");
-              const kind = item.kind === "project" ? (item.folderType === "reference" ? "Saved collection" : "Project")
-                : ["annotation", "notebookCard"].includes(item.kind) ? "Note" : item.kind === "projectSection" ? "Project evidence" : "Saved passage";
-              const meta = document.createElement("p");
-              meta.className = "settings-trash-item-meta";
-              meta.textContent = [kind, item.codeLabel, item.editionLabel].filter(Boolean).join(" · ");
-              const heading = document.createElement("strong");
-              heading.textContent = item.kind === "project" ? item.name || kind
-                : [item.sectionNumber ? `§ ${item.sectionNumber}` : "", stripLeadingSectionNumber(item.title, item.sectionNumber)].filter(Boolean).join(" · ") || "Section reference unavailable";
-              row.append(meta, heading);
-              if (item.kind !== "project") {
-                const excerpt = document.createElement("p");
-                excerpt.className = "settings-trash-item-excerpt";
-                excerpt.textContent = item.excerpt || (["annotation", "notebookCard"].includes(item.kind) ? "Note text unavailable for this entry." : "Passage text unavailable for this entry.");
-                row.append(excerpt);
-              }
-              items.append(row);
-            }
-            if (detail.entry.items.length) contents.replaceChildren(items);
-            else { status.textContent = "No item details are available for this entry."; contents.replaceChildren(status); }
-            loaded = true;
-          } catch (error) {
-            if (!isCurrentAccountRequest(identity)) return;
-            status.textContent = error.message || "Contents could not be loaded. Reconnect and try again.";
-            contents.append(button("Retry loading contents", loadContents));
-          } finally { loading = false; }
-        };
-        title.addEventListener("click", () => {
-          if (!isCurrentAccountRequest(identity)) return;
-          contents.hidden = !contents.hidden;
-          title.setAttribute("aria-expanded", String(!contents.hidden));
-          if (!contents.hidden && !loaded) return loadContents();
-        });
-        const date = document.createElement("p");
-        date.textContent = `Expires ${new Date(entry.expiresAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
-        copy.append(title, date);
-        const actions = document.createElement("div");
-        actions.className = "settings-trash-actions";
-        actions.append(button("Restore", () => update("restore", entry.id)), button("Delete Permanently", () => permanent(row, "purge", entry.id), true));
-        row.append(copy, actions, contents);
-        list.append(row);
-      }
-      if (result.entries.length) {
-        const empty = button("Empty Trash…", () => permanent(list, "empty"), true);
-        empty.classList.add("settings-trash-empty");
-        list.append(empty);
-      }
+      status.textContent = entries.length ? "" : "Trash is empty.";
+      render();
     } catch (error) {
-      if (isCurrentAccountRequest(identity)) status.textContent = error.message || "Trash is unavailable. Please reconnect and retry.";
+      if (!isCurrentAccountRequest(identity)) return;
+      if (changed) {
+        if (action === "restore") await loadSyncedContent({force: true, skipOutbox: true}).catch(() => {});
+        if (!isCurrentAccountRequest(identity)) return;
+        const remaining = await postResearch("/content/trash", {action: "list"}).catch(() => null);
+        if (!isCurrentAccountRequest(identity)) return;
+        if (remaining) { entries = remaining.entries; render(); }
+        panel.__refreshSettingsContent?.();
+        if (action === "restore") panel.__refreshSettingsWorkspace?.();
+      }
+      status.textContent = error.message || "Trash is unavailable. Please reconnect and retry.";
     } finally {
       busy = false;
       refresh.disabled = false;
-      // Render again after failed mutations so disabled controls cannot get stranded.
+      // A retry must not enable an unconfirmed permanent deletion.
       list.querySelectorAll("button, input").forEach(control => { if (!control.classList.contains("settings-trash-confirm-button")) control.disabled = false; });
+      syncSelection();
     }
   };
+  syncSelection();
   panel.__refreshSettingsTrash = () => { if (details.open) return update(); };
   details.addEventListener("toggle", panel.__refreshSettingsTrash);
   refresh.addEventListener("click", () => update());
