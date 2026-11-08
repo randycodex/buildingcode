@@ -21379,5 +21379,14 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .project-details-screen.workspace-floating-panel .project-information-panel { width: 100%; min-width: 0; max-width: none; height: 100%; margin: 0; padding: 0; border: 0; background: transparent; }
 body .project-details-screen.workspace-floating-panel .project-information-panel > .project-details-column-header { display: none; }
 .workspace-floating-panel .project-details-column-body { height: 100%; min-height: 0; padding: 0; overflow-y: auto; }
+:is(.settings-floating-panel .settings-account-column, .workspace-floating-panel .project-details-column-body, .workspace-context-menu) {
+  scrollbar-width: none;
+  scrollbar-gutter: auto;
+}
+:is(.settings-floating-panel .settings-account-column, .workspace-floating-panel .project-details-column-body, .workspace-context-menu)::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
 .workspace-floating-panel .project-overview-identity { margin-top: 0; }
 .workspace-floating-panel .project-overview-identity h2 { overflow-wrap: anywhere; }

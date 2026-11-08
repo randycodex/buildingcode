@@ -1,4 +1,4 @@
-export const webAppVersion = "20261107-data-recovery-scope-v1512";
+export const webAppVersion = "20261107-hidden-menu-scrollbars-v1513";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";
