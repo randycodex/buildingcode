@@ -8,11 +8,11 @@ export function profilePreferenceMenuBounds(anchor, width, height, viewportWidth
   };
 }
 
-export function openProfilePreferenceMenu({ trigger, anchor = trigger, label, value, options, onSelect, onDismiss, onTab }) {
+export function openProfilePreferenceMenu({ trigger, anchor = trigger, label, value, options, className = '', onSelect, onDismiss, onTab }) {
   const controller = new AbortController();
   const { signal } = controller;
   const menu = document.createElement('div');
-  menu.className = 'custom-select-menu profile-preference-menu';
+  menu.className = `custom-select-menu profile-preference-menu ${className}`.trim();
   menu.id = `profile-preference-${crypto.randomUUID()}`;
   menu.setAttribute('role', 'listbox');
   menu.setAttribute('aria-label', `${label} options`);

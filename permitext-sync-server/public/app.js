@@ -3,9 +3,9 @@ import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=17";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
-import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=2";
+import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-trash-help-copy-v1535";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-role-preference-menu-v1536";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -157,7 +157,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-trash-help-copy-v1535";
+} from "./offline-storage.js?v=20261108-role-preference-menu-v1536";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -42259,7 +42259,7 @@ function renderSettings({ upgrade = false } = {}) {
   const beginInlineProfileEdit = (row) => {
     if (!profileSetupSupported()) return;
     if (activeInlineProfileEditor?.row === row) {
-      if (row.dataset.profileEdit === "productEmailOptIn") activeInlineProfileEditor.cancel();
+      if (["productEmailOptIn", "professionalRole"].includes(row.dataset.profileEdit)) activeInlineProfileEditor.cancel();
       return;
     }
     activeInlineProfileEditor?.cancel();
@@ -42314,9 +42314,8 @@ function renderSettings({ upgrade = false } = {}) {
       });
       return;
     }
-    value.replaceChildren();
-
     if (field === "displayName") {
+      value.replaceChildren();
       const input = document.createElement("input");
       input.type = "text";
       input.className = "account-identity-inline-input";
@@ -42345,33 +42344,14 @@ function renderSettings({ upgrade = false } = {}) {
     }
 
     if (field === "professionalRole") {
-      const select = document.createElement("select");
-      select.className = "account-identity-inline-select";
-      select.setAttribute("aria-label", "Professional role");
-      [
-        ["", "Select a role"],
-        ["architect_designer", "Architect or designer"],
-        ["engineer", "Engineer"],
-        ["code_zoning_consultant", "Code or zoning consultant"],
-        ["expeditor_filing_representative", "Expeditor or filing representative"],
-        ["contractor", "Contractor"],
-        ["owner_operator", "Owner or operator"],
-        ["student", "Student"],
-        ["other", "Other"]
-      ].forEach(([optionValue, label]) => select.add(new Option(label, optionValue)));
-      select.value = account.professionalRole || "";
-      value.append(select);
       const showOtherRole = () => {
-        value.querySelector(".account-identity-inline-other")?.remove();
-        if (select.value !== "other") {
-          void finish({ professionalRole: select.value, professionalRoleOther: "" });
-          return;
-        }
+        value.replaceChildren();
         const other = document.createElement("input");
         other.type = "text";
         other.className = "account-identity-inline-input account-identity-inline-other";
         other.maxLength = 80;
         other.placeholder = "Describe your role";
+        other.setAttribute("aria-label", "Describe your role");
         other.value = account.professionalRole === "other" ? String(account.professionalRoleOther || "") : "";
         const saveOther = () => {
           const requested = other.value.trim();
@@ -42392,15 +42372,29 @@ function renderSettings({ upgrade = false } = {}) {
         other.focus();
         other.setSelectionRange(other.value.length, other.value.length);
       };
-      select.addEventListener("change", showOtherRole);
-      select.addEventListener("blur", () => queueMicrotask(() => {
-        if (!value.contains(document.activeElement)) cancel();
-      }));
-      select.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") { event.preventDefault(); cancel(); }
+      closeActiveCustomSelect();
+      preferenceMenu = openProfilePreferenceMenu({
+        trigger: row, anchor: value, label: row.querySelector("dt").textContent,
+        value: account.professionalRole || "", className: "profile-role-menu",
+        options: [
+          { value: "", label: "Select a role" },
+          { value: "architect_designer", label: "Architect or designer" },
+          { value: "engineer", label: "Engineer" },
+          { value: "code_zoning_consultant", label: "Code or zoning consultant" },
+          { value: "expeditor_filing_representative", label: "Expeditor or filing representative" },
+          { value: "contractor", label: "Contractor" },
+          { value: "owner_operator", label: "Owner or operator" },
+          { value: "student", label: "Student" },
+          { value: "other", label: "Other" }
+        ],
+        onSelect: role => {
+          if (role === "other") showOtherRole();
+          else if (role === (account.professionalRole || "")) cancel();
+          else void finish({ professionalRole: role, professionalRoleOther: "" });
+        },
+        onDismiss: cancel,
+        onTab: backward => focusAdjacentDocumentControl(row, backward)
       });
-      if (select.value === "other") showOtherRole();
-      else select.focus();
       return;
     }
 
@@ -42410,7 +42404,7 @@ function renderSettings({ upgrade = false } = {}) {
     if (!profileSetupSupported()) return;
     row.setAttribute("role", "button");
     row.tabIndex = 0;
-    if (row.dataset.profileEdit === "productEmailOptIn") {
+    if (["productEmailOptIn", "professionalRole"].includes(row.dataset.profileEdit)) {
       row.setAttribute("aria-haspopup", "listbox");
       row.setAttribute("aria-expanded", "false");
     }
@@ -42419,7 +42413,7 @@ function renderSettings({ upgrade = false } = {}) {
       beginInlineProfileEdit(row);
     });
     row.addEventListener("keydown", (event) => {
-      const preferenceArrow = row.dataset.profileEdit === "productEmailOptIn" && ["ArrowDown", "ArrowUp"].includes(event.key);
+      const preferenceArrow = ["productEmailOptIn", "professionalRole"].includes(row.dataset.profileEdit) && ["ArrowDown", "ArrowUp"].includes(event.key);
       if (event.key !== "Enter" && event.key !== " " && !preferenceArrow) return;
       if (event.target.closest("input, select")) return;
       event.preventDefault();

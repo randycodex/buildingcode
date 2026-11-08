@@ -13088,6 +13088,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   border-radius: 8px;
   font-size: inherit;
 }
+.profile-preference-menu.profile-role-menu { width: min(320px, calc(100vw - 16px)); }
 .profile-preference-menu .custom-select-option[aria-selected="true"]::after { content: "✓"; }
 .profile-preference-menu .custom-select-option:is(:hover, :focus-visible) { background: var(--menu-highlight); }
 
