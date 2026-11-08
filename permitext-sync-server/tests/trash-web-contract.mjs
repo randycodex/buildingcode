@@ -108,7 +108,7 @@ entries[0]={...entries[0],title:'Fresh recovery copy'};
 await panel.__refreshSettingsTrash();
 entries[0]={...entries[0],description:'Project · 2 passage links'};
 await panel.__refreshSettingsTrash();
-assert.match(list.children[0].querySelector('p').textContent,/Project · 2 passage links · Expires /,'Readable type and included link count sit beside expiry.');
+assert.match(list.children[0].querySelector('p').textContent,/^2 passage links · Expires /,'Included link counts stay beside expiry without a redundant Project prefix.');
 holdInspection=true;
 const staleContents=list.children[0].querySelector('.settings-trash-contents');
 const pendingInspection=list.children[0].querySelector('.settings-trash-title').fire('click');

@@ -5,7 +5,7 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=2";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-trash-action-label-v1533";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-trash-expiry-label-v1534";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=5";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -157,7 +157,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-trash-action-label-v1533";
+} from "./offline-storage.js?v=20261108-trash-expiry-label-v1534";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -40311,7 +40311,8 @@ function attachSettingsTrash(panel) {
         if (!contents.hidden && !loaded) return loadContents();
       });
       const date = document.createElement("p");
-      date.textContent = [entry.description, `Expires ${new Date(entry.expiresAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`].filter(Boolean).join(" · ");
+      const description = String(entry.description || "").replace(/^Project(?: · |$)/, "");
+      date.textContent = [description, `Expires ${new Date(entry.expiresAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`].filter(Boolean).join(" · ");
       copy.append(title, date);
       const actions = document.createElement("div");
       actions.className = "settings-trash-actions";
