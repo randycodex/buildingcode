@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
+import {settingsSavedContentSnapshot} from '../public/settings-saved-content.js';
 
 const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const index = await readFile(new URL('../public/index.html', import.meta.url), 'utf8');
@@ -27,7 +28,10 @@ function harness({projects = [{id:'one'}, {id:'two'}], saved = [{}], links = [],
   const controls = Object.fromEntries(['collectionsCard','collectionList','collectionSelectAll','collectionDelete','collectionClearAll','collectionActions','collectionSelectionStatus'].map(name=>[name,node()]));
   let current = true;
   const deleted = [], confirmations = [];
-  const content = {projects, projectSections:links, annotations};
+  saved = saved.map((item, index) => ({sectionID: index + 1, ...item}));
+  links = links.map(item => ({folderClientID:'one', ...item}));
+  annotations = annotations.map((item,index) => ({sectionID: index + 1, ...item}));
+  const content = {projects, savedItems:saved, projectSections:links, annotations};
   const context = vm.createContext({panel,...controls,settingsIdentity:'owner',upgrade:false,manageProjects,
     document:{createElement:node,querySelectorAll:()=>[panel]},isCurrentAccountRequest:()=>current,
     workspacePrivatePresentationAllowed:()=>allowed,
@@ -35,6 +39,9 @@ function harness({projects = [{id:'one'}, {id:'two'}], saved = [{}], links = [],
     bookmarkRecordsForSettings:()=>saved,currentContentSummary:()=>content,
     visibleProjectRecords:records=>records.filter(project=>!project.deletedAt),
     projectIsArchived:project=>Boolean(project.archivedAt),projectRecordID:project=>project.id,
+    settingsSavedContentForSummary:summary=>settingsSavedContentSnapshot(summary), savedContentLibrary:{refresh(){}},
+    savedEvidenceKey:item=>`${item.codeVersion || 'nyc-2022'}:${item.sectionID}:${item.blockID || ''}`,
+    projectSectionBelongsToProject:(link,project)=>link.folderClientID===project.id,
     projectColor:()=>'',readableProjectName:project=>project.name || project.id,
     confirmWebWarning:async(...args)=>{confirmations.push(args);return true;},prepareRecoverableDeletion:async()=>{},
     deleteArchivedProjectData:async project=>{deleted.push(project.id);project.deletedAt='deleted';},
@@ -52,7 +59,7 @@ function harness({projects = [{id:'one'}, {id:'two'}], saved = [{}], links = [],
 const h = harness({saved:[{},{}],links:[{sectionID:545},{sectionID:546},{sectionID:547,deletedAt:'deleted'}],annotations:[{noteBody:'Kept note'},{noteBody:' '},{tags:['tag only']}]});
 assert.equal(h.controls.collectionsCard.hidden,true,'Ordinary Projects do not appear again in Saved Content.');
 assert.equal(h.controls.collectionList.children.length,0);
-assert.equal(h.nodes.get('[data-content-count="bookmarks"]').textContent,'2 saved · 2 Project links');
+assert.equal(h.nodes.get('[data-content-count="bookmarks"]').textContent,'4 saved · 2 Project links');
 assert.equal(h.nodes.get('[data-content-count="notes"]').textContent,'1 saved');
 await h.controls.collectionClearAll.events.click();
 assert.deepEqual(h.deleted,[],'A hidden collection action cannot delete regular Projects.');

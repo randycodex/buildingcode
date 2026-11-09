@@ -5,8 +5,9 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
+import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=3";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-quiet-activity-clear-v1596";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-saved-content-library-v1599";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +159,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-quiet-activity-clear-v1596";
+} from "./offline-storage.js?v=20261108-saved-content-library-v1599";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -40029,6 +40030,12 @@ async function startFocusedResearchFromSavedItem(item, projectID = "") {
   });
 }
 
+function settingsSavedContentForSummary(summary = currentContentSummary()) {
+  return settingsSavedContentSnapshot(summary, {
+    recordKey: savedEvidenceKey, projectID: projectRecordID, belongsToProject: projectSectionBelongsToProject
+  });
+}
+
 function bookmarkRecordsForSettings() {
   return (currentContentSummary().savedItems || [])
     .filter((item) => item?.sectionID && !item.deletedAt);
@@ -41722,6 +41729,8 @@ function mountAccountScreenContent(dialog, panel) {
   dialog._settingsDisclosures?.dispose();
   dialog._settingsDisclosures = panel.__settingsDisclosures;
   dialog._settingsDisclosures?.restore();
+  dialog._settingsSavedContent?.dispose();
+  dialog._settingsSavedContent = panel.__settingsSavedContent;
   dialog._disposeLibraryDownloadProgress = panel._disposeLibraryDownloadProgress;
   const upgrade = dialog.dataset.proUpgrade === "true";
   const signIn = dialog.dataset.signIn === "true";
@@ -41801,6 +41810,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
     dialog._disposeLibraryDownloadProgress?.();
     dialog._disposeInlineProfileEditor?.();
     dialog._settingsDisclosures?.dispose();
+    dialog._settingsSavedContent?.dispose();
     dialog.remove();
     coveredState.forEach((inert, element) => { element.inert = inert; });
     if (!floating) state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
@@ -42387,6 +42397,36 @@ function renderSettings({ upgrade = false } = {}) {
     });
   };
 
+  const savedContentLibrary = upgrade ? null : createSettingsSavedContent(panel, {
+    isCurrent: () => isCurrentAccountRequest(settingsIdentity),
+    hydrate: hydrateSavedColumnItems,
+    codeLabel: item => readerCodeOptionLabel(codeOptionFor(item.codePrefix, item.codeVersion)),
+    noteText: evidenceCommentsText,
+    projectID: projectRecordID,
+    projectName: readableProjectName,
+    availableProjects: () => activeFolderRecords(currentContentSummary().projects || [])
+      .filter(project => folderIsProject(project) && !project.sharedOnly),
+    onOpen: async item => {
+      requireCurrentAccountRequest(settingsIdentity);
+      if (workspaceColumnsRequireProject()) {
+        await chooseProjectForSaving();
+        requireCurrentAccountRequest(settingsIdentity);
+      }
+      if (workspaceColumnsRequireProject()) return;
+      await openDeepLinkedSectionInReader(item);
+    },
+    onAssign: async (project, item) => {
+      requirePrivateWorkspaceWritable();
+      requireCurrentAccountRequest(settingsIdentity);
+      const live = activeFolderRecords(currentContentSummary().projects || []).find(candidate =>
+        folderIsProject(candidate) && !candidate.sharedOnly && projectRecordID(candidate) === projectRecordID(project));
+      if (!live) throw new Error("This Project is no longer available.");
+      // Additive selection: existing links in every other Project are preserved.
+      return persistSectionFolderSelection(item, [live], [live]);
+    },
+    onRefresh: () => panel.__refreshSettingsContent?.()
+  });
+  panel.__settingsSavedContent = savedContentLibrary;
   let savedCollections = [];
   const selectedCollectionIDs = new Set();
   const collectionCheckboxes = new Map();
@@ -42422,13 +42462,15 @@ function renderSettings({ upgrade = false } = {}) {
     selectedCollectionIDs.forEach(id => { if (!collectionIDs.has(id)) selectedCollectionIDs.delete(id); });
     collectionsCard.hidden = savedCollections.length === 0;
     panel.querySelector('[data-content-count="collections"]').textContent = `${savedCollections.length} saved collection${savedCollections.length === 1 ? "" : "s"}`;
-    const savedPassageCount = bookmarkRecordsForSettings().length;
-    const savedProjectLinkCount = (summary.projectSections || []).filter(item => item?.sectionID && !item.deletedAt).length;
-    const sectionNoteCount = (summary.annotations || []).filter(item => String(item.noteBody || "").trim()).length;
+    const savedContent = settingsSavedContentForSummary(summary);
+    const savedPassageCount = savedContent.passages.length;
+    const savedProjectLinkCount = savedContent.projectLinkCount;
+    const sectionNoteCount = savedContent.notes.length;
     panel.querySelector('[data-content-count="bookmarks"]').textContent = `${savedPassageCount} saved · ${savedProjectLinkCount} Project ${savedProjectLinkCount === 1 ? "link" : "links"}`;
     panel.querySelector('[data-content-count="notes"]').textContent = `${sectionNoteCount} saved`;
     panel.querySelector('[data-clear-action="bookmarks"]').disabled = savedPassageCount === 0 && savedProjectLinkCount === 0;
     panel.querySelector('[data-clear-action="notes"]').disabled = sectionNoteCount === 0;
+    savedContentLibrary?.refresh(savedContent);
     collectionList.replaceChildren();
     collectionCheckboxes.clear();
     savedCollections.forEach((project) => {
@@ -43184,10 +43226,11 @@ function renderSettings({ upgrade = false } = {}) {
     button.addEventListener("click", async () => {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
       const action = button.dataset.clearAction;
+      const savedContent = settingsSavedContentForSummary();
       const clearActionCopy = {
         searches: ["Clear recent activity", "This will remove recent searches and Recently Viewed sections from this account across synced devices. Pinned searches will remain. This cannot be undone."],
-        bookmarks: ["Move saved passages and Project links to Trash", `${bookmarkRecordsForSettings().length} saved passages and ${(currentContentSummary().projectSections || []).filter(item => item?.sectionID && !item.deletedAt).length} Project passage links will move to Trash across synced devices. Restore within 30 days. Projects, saved collections, and notes remain.`],
-        notes: ["Move section notes to Trash", `${(currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length} section notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages, Notebook notes, and tags remain.`]
+        bookmarks: ["Move saved passages and Project links to Trash", `${savedContent.passages.length} saved passages and ${savedContent.projectLinkCount} Project passage links will move to Trash across synced devices. Restore within 30 days. Projects, saved collections, and notes remain.`],
+        notes: ["Move section notes to Trash", `${savedContent.notes.length} section notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages, Notebook notes, and tags remain.`]
       };
       const [title, message] = clearActionCopy[action];
       const confirmed = await confirmWebWarning(title, message, { confirmLabel: action === "searches" ? "Clear activity" : "Move to Trash", container: panel.closest(".account-dialog") || panel });
@@ -43198,7 +43241,8 @@ function renderSettings({ upgrade = false } = {}) {
       try {
         if (action !== "searches") await prepareRecoverableDeletion();
         requireCurrentAccountRequest(settingsIdentity);
-        const count = await performSettingsClearAction(action);
+        const count = settingsSavedContentForSummary().notes.length;
+        await performSettingsClearAction(action);
         if (action !== "searches") { await prepareRecoverableDeletion(); openTrashAfterSettingsDeletion = true; }
         setStatus(action === "searches" ? "" : `${action === "notes" ? `${count} section note${count === 1 ? "" : "s"}` : "Saved passages and passage links"} moved to Trash. Open Trash to restore.`);
         await refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft);

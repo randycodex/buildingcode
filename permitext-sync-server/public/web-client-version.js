@@ -1,4 +1,4 @@
-export const webAppVersion = "20261108-quiet-activity-clear-v1596";
+export const webAppVersion = "20261108-saved-content-library-v1599";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";
