@@ -18581,8 +18581,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-content-summary:has(.settings-content-browse) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 0 var(--space-2); }
 .account-screen .settings-content-summary .settings-content-browse { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 var(--space-2); align-items: baseline; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-primary); text-align: left; cursor: pointer; }
 .account-screen .settings-content-title { font-size: var(--settings-type-body); font-weight: var(--settings-weight-medium); line-height: 1.4; }
-.account-screen .settings-content-view-label { display: inline-flex; align-items: center; justify-content: center; min-height: 28px; box-sizing: border-box; padding: 4px var(--space-2); border-radius: var(--radius-pill); background: var(--menu-highlight); color: var(--text-primary); font-size: var(--settings-type-support); font-weight: var(--settings-weight-regular); line-height: 1.4; }
-.account-screen .settings-content-browse:hover .settings-content-view-label { color: var(--text-primary); }
+.account-screen .settings-content-view-label { display: inline-flex; align-items: center; justify-content: center; min-height: 28px; box-sizing: border-box; padding: 4px var(--space-2); border-radius: var(--radius-pill); background: transparent; color: var(--text-primary); font-size: var(--settings-type-support); font-weight: var(--settings-weight-regular); line-height: 1.4; }
+.account-screen .settings-content-browse:is(:hover, :focus-visible) .settings-content-view-label { background: var(--menu-highlight); }
 .account-screen .settings-content-browse > .settings-content-count { grid-column: 1 / -1; font-weight: var(--settings-weight-regular); }
 .account-screen .settings-content-help { grid-column: 1 / -1; }
 .account-screen .settings-library-list { grid-column: 1 / -1; margin-top: var(--space-3); min-width: 0; }
