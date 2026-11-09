@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-compact-facts-v1585";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-checklist-pill-actions-v1587";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-compact-facts-v1585";
+} from "./offline-storage.js?v=20261108-checklist-pill-actions-v1587";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36730,7 +36730,7 @@ function appendProjectRecordsChecklist(container, project, identity) {
     }
   };
   const add = document.createElement("button");
-  add.type = "button"; add.className = "workflow-action workflow-action-secondary";
+  add.type = "button"; add.className = "workflow-action workflow-action-secondary project-records-add-action";
   add.textContent = "Add record"; add.disabled = Boolean(identity.sharedOnly);
   add.addEventListener("click", () => {
     if (items.length >= 50) { status.textContent = "A checklist can contain up to 50 records."; return; }
@@ -36738,7 +36738,7 @@ function appendProjectRecordsChecklist(container, project, identity) {
     render(); autosave(); list.lastElementChild?.querySelector("input")?.focus();
   });
   const suggested = document.createElement("button");
-  suggested.type = "button"; suggested.className = "workflow-action workflow-action-secondary";
+  suggested.type = "button"; suggested.className = "workflow-action workflow-action-secondary project-records-add-action";
   suggested.textContent = "Add suggested records"; suggested.disabled = Boolean(identity.sharedOnly);
   suggested.addEventListener("click", () => {
     for (const label of suggestedRecords) if (items.length < 50 && !items.some(item => item.label === label)) {
