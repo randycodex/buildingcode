@@ -7,7 +7,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-workspace-recovery-v1615";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-context-add-actions-v1616";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -159,7 +159,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-workspace-recovery-v1615";
+} from "./offline-storage.js?v=20261108-context-add-actions-v1616";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4428,7 +4428,7 @@ function appendProjectOpenQuestions(container, project) {
       list.append(row);
     });
   };
-  const add = document.createElement("button"); add.type = "button"; add.className = "ghost-button";
+  const add = document.createElement("button"); add.type = "button"; add.className = "workflow-action workflow-action-secondary project-add-action";
   add.textContent = "Add question"; add.disabled = Boolean(project.sharedOnly);
   add.addEventListener("click", () => {
     if (!current() || items.length >= 100) return;
@@ -36685,7 +36685,7 @@ function appendProjectRecordsChecklist(container, project, identity) {
     }
   };
   const add = document.createElement("button");
-  add.type = "button"; add.className = "workflow-action workflow-action-secondary project-records-add-action";
+  add.type = "button"; add.className = "workflow-action workflow-action-secondary project-records-add-action project-add-action";
   add.textContent = "Add record"; add.disabled = Boolean(identity.sharedOnly);
   add.addEventListener("click", () => {
     if (items.length >= 50) { status.textContent = "A checklist can contain up to 50 records."; return; }
@@ -36693,7 +36693,7 @@ function appendProjectRecordsChecklist(container, project, identity) {
     render(); autosave(); list.lastElementChild?.querySelector("input")?.focus();
   });
   const suggested = document.createElement("button");
-  suggested.type = "button"; suggested.className = "workflow-action workflow-action-secondary project-records-add-action";
+  suggested.type = "button"; suggested.className = "workflow-action workflow-action-secondary project-records-add-action project-add-action";
   suggested.textContent = "Add suggested records"; suggested.disabled = Boolean(identity.sharedOnly);
   suggested.addEventListener("click", () => {
     for (const label of suggestedRecords) if (items.length < 50 && !items.some(item => item.label === label)) {

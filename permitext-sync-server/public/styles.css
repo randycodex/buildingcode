@@ -20327,9 +20327,9 @@ dialog.report-export-review {
 }
 .project-details-columns .project-records-row > button { grid-area: remove; justify-self: end; align-self: start; min-height: 28px; padding: 4px 8px; border-radius: var(--radius-pill); color: var(--text-secondary); font-size: 12px; }
 .project-details-columns .project-records-row > button:not(:disabled):hover { background: var(--menu-highlight); color: var(--destructive); }
-.project-details-columns .project-records-checklist > .workflow-action { min-height: 28px; padding: var(--space-1) var(--space-2); color: var(--text-secondary); }
-.project-records-checklist > .project-records-add-action { border-radius: var(--radius-pill); text-align: center; }
-.project-records-checklist > .project-records-add-action:not(:disabled):hover { background: transparent; box-shadow: inset 0 0 0 1px var(--border); }
+.project-details-columns :is(.project-records-checklist, .project-open-questions) > .workflow-action { min-height: 28px; padding: var(--space-1) var(--space-2); color: var(--text-secondary); }
+:is(.project-records-checklist, .project-open-questions) > .project-add-action { border-radius: var(--radius-pill); text-align: center; }
+:is(.project-records-checklist, .project-open-questions) > .project-add-action:not(:disabled):hover { background: transparent; box-shadow: inset 0 0 0 1px var(--border); }
 .workspace-shell > .account-workspace-view {
   grid-column: 1; grid-row: 2 / -1; z-index: 2;
   width: 100%; height: auto; min-width: 0; min-height: 0; margin: 0;
@@ -21014,6 +21014,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 }
 .project-details-screen .project-details-columns .saved-project-structured-fact { min-height: 0; padding-block: 0; row-gap: var(--project-fact-item-gap); }
 .project-open-question-list { display: grid; gap: 12px; padding-left: 24px; margin: 8px 0 10px; }
+.project-open-question-list:empty { display: none; }
 .project-open-question-list li::marker { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 .project-open-question-list textarea { display: block; box-sizing: border-box; width: 100%; min-width: 0; min-height: 1.5em; max-height: none; field-sizing: content; resize: none; overflow: hidden; padding: 0; margin: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-primary); font: inherit; font-size: 14px; line-height: 1.5; text-align: left; white-space: pre-wrap; overflow-wrap: anywhere; }
 .project-open-question-list .project-open-answer-input { margin-top: 4px; color: var(--text-secondary); }
@@ -21409,8 +21410,8 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .workspace-floating-panel .project-overview-editor .project-name-input { min-height: var(--project-details-first-line-height); line-height: var(--project-details-first-line-height); }
 .workspace-floating-panel .project-facts-panel .saved-project-structured-group:first-child > .saved-project-structured-group-heading { padding-top: 0; }
 .workspace-floating-panel .project-facts-panel .saved-project-structured-group:first-child .saved-project-structured-group-label { line-height: var(--project-details-first-line-height); }
-.workspace-floating-panel .project-records-checklist > .workflow-action:not([hidden]) { display: inline-flex; align-items: flex-start; vertical-align: top; padding-block: 0; line-height: var(--project-details-first-line-height); }
-.workspace-floating-panel .project-records-checklist > .project-records-add-action:not([hidden]) { align-items: center; justify-content: center; }
+.workspace-floating-panel :is(.project-records-checklist, .project-open-questions) > .workflow-action:not([hidden]) { display: inline-flex; align-items: flex-start; vertical-align: top; padding-block: 0; line-height: var(--project-details-first-line-height); }
+.workspace-floating-panel :is(.project-records-checklist, .project-open-questions) > .project-add-action:not([hidden]) { align-items: center; justify-content: center; }
 .workspace-floating-panel .project-records-row:first-child { padding-top: 0; align-items: start; }
 .workspace-floating-panel .project-records-row:first-child > input { min-height: var(--project-details-first-line-height); line-height: var(--project-details-first-line-height); }
 .workspace-floating-panel .project-checklist-help { flex: 0 0 auto; margin: 16px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; text-align: center; }
