@@ -617,8 +617,8 @@ struct SearchView: View {
                             }
                                 ToolbarItem(placement: .topBarTrailing) {
                                     Menu {
-                                        Button("Open in Reader 1") { handoffSearchPreview(prepared, to: .primary) }
-                                        Button("Open in Reader 2") { handoffSearchPreview(prepared, to: .secondary) }
+                                        Button(readerDestinationLabel(.primary)) { handoffSearchPreview(prepared, to: .primary) }
+                                        Button(readerDestinationLabel(.secondary)) { handoffSearchPreview(prepared, to: .secondary) }
                                     } label: {
                                         Image(systemName: "book").frame(width: 44, height: 44)
                                     }
@@ -649,6 +649,12 @@ struct SearchView: View {
 
     private var showsGroupedSearchResults: Bool {
         true
+    }
+
+    private func readerDestinationLabel(_ destination: BrowserContextID) -> String {
+        let reader = destination == .primary ? "Reader 1" : "Reader 2"
+        let source = BrowserContextID.rememberedSources()[destination]?.source ?? "Empty"
+        return "Open in \(reader) · \(source)"
     }
 
     private func handoffSearchPreview(_ prepared: PreparedSearchReaderDestination, to destination: BrowserContextID) {
@@ -848,7 +854,7 @@ struct SearchView: View {
             Spacer(minLength: 8)
 
             if !activeSearchFilterCodeSectionIDs.isEmpty {
-                Button("All Codes") {
+                Button("Clear book filter") {
                     searchFilterCodeSectionIDs.removeAll()
                 }
                 .font(.caption.weight(.semibold))

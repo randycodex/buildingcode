@@ -25,36 +25,36 @@ const make = (query = 'concrete', expanded = []) => context.newUtilityInstance('
 const keys = (instance) => Array.from(new Set([...instance.expandedResultSources, ...(instance.defaultExpandedResultSource ? [instance.defaultExpandedResultSource] : [])]));
 const reload = (instance) => context.normalizeUtilityInstances(JSON.parse(JSON.stringify({ utilityInstances: [instance] })))[0];
 
-// A section-number match does not silently select an edition from mixed results.
+// A section-number lookup previews the preferred edition with other editions available.
 const exact = make('403.2.3.3');
 assert.equal(apply(exact, [current, historical], all), true);
-assert.deepEqual(keys(exact), []);
-// Broad mixed-edition lookup leaves the choice to the user.
+assert.deepEqual(keys(exact), ['BC|2022']);
+// Broad mixed-edition lookups immediately preview the highest-ranked preferred-edition source.
 const broad = make();
 const matches = [mechanical, historical, current];
 const original = JSON.stringify(matches);
 apply(broad, matches, all);
-assert.deepEqual(keys(broad), []);
+assert.deepEqual(keys(broad), ['MC|2022']);
 assert.equal(JSON.stringify(matches), original);
-// An explicit edition or a complete single-source result can expand automatically.
+// Explicit editions and incomplete first pages also show matches immediately.
 const edition = make(); edition.searchEdition = '2022';
-apply(edition, [current], all, {hasMore: true});
+apply(edition, [current], all);
 assert.deepEqual(keys(edition), ['BC|2022']);
 const partial = make();
-apply(partial, [current], all, {hasMore: true});
-assert.deepEqual(keys(partial), [], 'A truncated first page cannot establish a single edition');
-assert.equal(apply(partial, [historical], all, {hasMore: true}), false);
+apply(partial, [current], all);
+assert.deepEqual(keys(partial), ['BC|2022'], 'Available passages are visible while more matches remain available');
+assert.equal(apply(partial, [historical], all), false);
 const enabledSource = make();
-apply(enabledSource, [current], {querySuffix:'&sourceScope=current-only',enabledSourceCount:1}, {hasMore:true});
+apply(enabledSource, [current], {querySuffix:'&sourceScope=current-only',enabledSourceCount:1});
 assert.deepEqual(keys(enabledSource), ['BC|2022'], 'An explicit single enabled source opens even when its results are paginated.');
 // Remembered represented choices take precedence, including multiple explicit expansions.
 const remembered = make('concrete', ['BC|2014', 'MC|2022']);
 apply(remembered, [current, historical, mechanical], all);
 assert.deepEqual(keys(remembered), ['BC|2014', 'MC|2022']);
-// Unrepresented remembered choices remain available without guessing a fallback.
+// Unrepresented remembered choices remain stored while available matches get a preview.
 const absent = make('concrete', ['PC|2014']);
 apply(absent, [current, historical], all);
-assert.deepEqual(keys(absent), ['PC|2014']);
+assert.deepEqual(keys(absent), ['PC|2014', 'BC|2022']);
 // User closes every group; same-query pagination, retry and persisted reload stay closed.
 broad.expandedResultSources = [];
 broad.defaultExpandedResultSource = "";
@@ -94,9 +94,22 @@ apply(legacy, [current, historical], all);
 assert.deepEqual(keys(legacy), ['BC|2014']);
 assert.equal(reload(legacy).searchExpansionDecisionKey, legacy.searchExpansionDecisionKey);
 // Both actual renderer entry points make the decision before group construction.
-assert.match(source, /applyInitialSearchGroupExpansion\(searchInstance, filteredResults, sourceScope, \{ hasMore: Boolean\(payload.hasMore\) \}\)[\s\S]{0,100}appendSearchResultGroups\(results, filteredResults/);
-assert.match(extract('appendSearchLoadMore'), /applyInitialSearchGroupExpansion\(options.searchInstance, nextResults, options.sourceScope, \{ hasMore: true \}\)[\s\S]{0,100}appendSearchResultGroups\(results, nextResults/);
+assert.match(source, /applyInitialSearchGroupExpansion\(searchInstance, filteredResults, sourceScope\)[\s\S]{0,100}appendSearchResultGroups\(results, filteredResults/);
+assert.match(extract('appendSearchLoadMore'), /applyInitialSearchGroupExpansion\(options.searchInstance, nextResults, options.sourceScope\)[\s\S]{0,100}appendSearchResultGroups\(results, nextResults/);
 // Previously guessed defaults are reevaluated under the new source-choice policy.
 const old = make();old.searchExpansionDecisionKey=JSON.stringify(['concrete', [], 'all', '']);old.defaultExpandedResultSource='BC|2022';
-apply(old, [current, historical], all);assert.deepEqual(keys(old), []);
-console.log('Search group defaults: explicit edition and complete single-source only, mixed/partial pages, remembered sources, collapse/reload, pagination, retry, scope changes and legacy persistence passed.');
+apply(old, [current, historical], all);assert.deepEqual(keys(old), ['BC|2022']);
+// Project edition preference changes only the preview, preserving the API's results.
+const projectScoped = make();
+apply(projectScoped, matches, {...all, preferredCodeVersion:'2014'});
+assert.deepEqual(keys(projectScoped), ['BC|2014']);
+assert.equal(JSON.stringify(matches), original);
+const fallback = make();
+apply(fallback, [mechanical, current], {...all, preferredCodeVersion:'2014'});
+assert.deepEqual(keys(fallback), ['MC|2022'], 'When the preferred edition has no matches, show the highest-ranked available source.');
+projectScoped.defaultExpandedResultSource='';
+assert.equal(apply(projectScoped,matches,{...all,preferredCodeVersion:'2014'}),false);
+projectScoped.matchMode='exact';
+assert.equal(apply(projectScoped,matches,{...all,preferredCodeVersion:'2014'}),true,'A changed matching mode gets a preview for its new results.');
+assert.deepEqual(keys(projectScoped), ['BC|2014']);
+console.log('Search previews passed: preferred Project edition, ranked fallback, mixed/partial results, remembered sources, collapse/reload, pagination/retry, scope/mode changes and legacy persistence.');

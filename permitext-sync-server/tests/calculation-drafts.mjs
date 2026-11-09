@@ -26,3 +26,19 @@ assert.equal(calculationDraftStore(storage,'private-account-B:calculator-drafts:
 values.set('broken','{bad');assert.throws(()=>calculationDraftStore(storage,'broken').open(context));assert.equal(values.get('broken'),'{bad');
 const quota=calculationDraftStore({getItem:()=>null,setItem(){throw Error('Quota exceeded');}},'quota');assert.throws(()=>quota.open(context),/Quota/);
 console.log('Calculation drafts: reload, shared entry points, named rooms, saved snapshots, new calculations, stale writes, project/edition/answer/account isolation and storage failures passed.');
+
+const blankStore = calculationDraftStore(storage, 'blank-drafts');
+const blank = blankStore.open(context);
+assert.equal(blankStore.create(context).id, blank.id);
+assert.equal(blankStore.create(context).id, blank.id);
+assert.equal(blankStore.list(context).length, 1);
+const editedBlank = blankStore.update(blank, {area: '450', factorMode: 'table'});
+const newBlank = blankStore.create(context);
+assert.notEqual(newBlank.id, editedBlank.id);
+assert.equal(blankStore.list(context).find(item => item.id === editedBlank.id).input.area, '450');
+const legacy = JSON.parse(values.get('blank-drafts'));
+legacy.records.push({...newBlank, id:'legacy-empty'});
+values.set('blank-drafts', JSON.stringify(legacy));
+assert.equal(blankStore.list(context).length, 2, 'Legacy duplicate empty drafts are consolidated in Recents while all device records remain stored');
+assert.equal(JSON.parse(values.get('blank-drafts')).records.length, 3);
+console.log('Blank calculation reuse passed, including meaningful inputs and legacy duplicate drafts.');

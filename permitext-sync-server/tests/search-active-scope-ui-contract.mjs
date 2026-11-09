@@ -1,3 +1,4 @@
+import {defaultSyncCodeVersion, syncCodeVersion} from '../public/sync-identity.js';
 import { createPublicCodeRevisionController, isPublicCodePath } from "../public/public-code-revision.js";
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
@@ -71,7 +72,7 @@ function realFixture() {
   const loads = [];
   const controller = createActiveCodeSourceController({ storage, respectSourcePreferences:false, loadCatalog() { const gate = defer(); loads.push(gate); return gate.promise; } });
   controller.setContext({ accountID: null, sessionID: "one" });
-  const context = vm.createContext({ activeCodeSourcesController: controller, encodeURIComponent, codeSourceKey, codeSourceIdentity,
+  const context = vm.createContext({ defaultSyncCodeVersion,syncCodeVersion,workspacePrivatePresentationAllowed:()=>false,activeCodeSourcesController: controller, encodeURIComponent, codeSourceKey, codeSourceIdentity,
     accountContextChangedError: () => new Error("Account context changed") });
   vm.runInContext(["prepareActiveCodeSearchScope", "searchPanelSources", "prepareSearchPanelScope", "isCurrentActiveCodeSourceContext"].map(actual).join("\n"), context);
   return { context, controller, values, storage, loads };

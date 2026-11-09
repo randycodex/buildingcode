@@ -249,6 +249,12 @@ export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '',
   return blocks;
 }
 
+function calculationDraftLabel(item) {
+  const input = item.input;
+  const description = [input.spaceFunction, input.area ? `${input.area} ft²` : ''].filter(Boolean).join(' · ');
+  return `${input.spaceName || description || 'New calculation'} · ${item.savedNote ? 'has saved Note' : 'Device draft'}`;
+}
+
 export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = null, savedInputFingerprint = "", recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
   const initialDraft = {...draft};
   let areaMeasurementBasis = draft.areaMeasurementBasis || draft.areaBasis || '';
@@ -269,7 +275,7 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
   const recent = document.createElement('select'); recent.setAttribute('aria-label', 'Recent calculations');
   for (const item of recentDrafts) {
     const option = document.createElement('option'); option.value = item.id;
-    option.textContent = `${item.input.spaceName || 'Unnamed space'} · ${item.savedNote ? 'has saved Note' : 'Device draft'}`;
+    option.textContent = calculationDraftLabel(item);
     recent.append(option);
   }
   recent.value = activeDraftID;
@@ -334,7 +340,7 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
     recent.replaceChildren();
     for (const item of items) {
       const option = document.createElement('option'); option.value = item.id;
-      option.textContent = `${item.input.spaceName || 'Unnamed space'} · ${item.savedNote ? 'has saved Note' : 'Device draft'}`;
+      option.textContent = calculationDraftLabel(item);
       recent.append(option);
     }
     recent.value = currentID;

@@ -2,12 +2,12 @@ import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=17";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
-import { calculationDraftStore } from "./calculation-drafts.js?v=2";
+import { calculationDraftStore } from "./calculation-drafts.js?v=3";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-settings-content-copy-v1617";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-workflow-actions-v1620";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -22,7 +22,7 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=29";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=30";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261108-floating-menu-pins-v1382";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
@@ -41,7 +41,7 @@ import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, 
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
-import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261109-comparison-v21";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261019-project-workflow-v5";
 import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261021-project-questions-v8";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -88,7 +88,7 @@ import {
   settingsPlanCopy,
   settingsResearchAllowanceSummary,
   webStripePriceDisclosure
-} from "./settings-copy.js?v=20261108-research-remaining-v7";
+} from "./settings-copy.js?v=20261109-plan-actions-v8";
 import {
   clearResearchRequestRecoveries,
   readResearchRequestRecovery,
@@ -159,7 +159,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-settings-content-copy-v1617";
+} from "./offline-storage.js?v=20261109-workflow-actions-v1620";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -410,7 +410,6 @@ const toggleAnalysisButton = document.querySelector("#toggle-analysis") || (() =
 })();
 const toggleWorkboardButton = null;
 const fitColumnsButton = document.querySelector("#fit-columns");
-const collapseReadersButton = document.querySelector("#collapse-readers");
 const mobileMoreButton = document.querySelector("#mobile-more");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
 const settingsButton = document.querySelector("#toggle-settings");
@@ -453,7 +452,7 @@ const codeOptions = [
     group: "Existing and Historical Building Codes"
   },
   { prefix: "BC68", label: "1968 Building Code (historical)", theme: "historical", group: "Existing and Historical Building Codes" },
-  { prefix: "FC", label: "Fire Code", theme: "fire", group: "Fire and Housing" },
+  { prefix: "FC", label: "Fire Code (2022)", theme: "fire", group: "Fire and Housing" },
   { prefix: "HMC", label: "Housing Maintenance Code", theme: "housing", group: "Fire and Housing" },
   { prefix: "T24", label: "Administrative Code Title 24 — Environmental Protection", theme: "environmental", group: "Administrative Code" },
   { prefix: "T25", label: "Administrative Code Title 25 — Land Use", theme: "land-use", group: "Administrative Code" },
@@ -839,13 +838,15 @@ function searchPanelSources(instance, catalog) {
 }
 
 async function prepareSearchPanelScope(instance) {
-  if (!Array.isArray(instance.querySourceKeys)) return prepareActiveCodeSearchScope();
+  const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
+  const preferredCodeVersion = syncCodeVersion(project?.codeVersion || defaultSyncCodeVersion);
+  if (!Array.isArray(instance.querySourceKeys)) return {...await prepareActiveCodeSearchScope(), preferredCodeVersion};
   const token = activeCodeSourcesController.captureContext();
   await activeCodeSourcesController.ensureCatalog();
   if (!activeCodeSourcesController.isCurrent(token)) throw accountContextChangedError();
   const { catalog } = activeCodeSourcesController.state;
   const enabledSources = searchPanelSources(instance, catalog).map(codeSourceIdentity);
-  return { token, queryScoped: true, enabledSourceCount: enabledSources.length,
+  return { token, queryScoped: true, enabledSourceCount: enabledSources.length, preferredCodeVersion,
     querySuffix: `&sourceScope=${encodeURIComponent(JSON.stringify({version: 1, enabledSources}))}` };
 }
 
@@ -2131,6 +2132,7 @@ async function switchWorkspace(workspaceID, options = {}) {
   persistWorkspaceRegistry();
   renderWorkspaceTransitionState(target.name);
   if (options.focus !== false) focusActiveWorkspaceTab();
+  const navigation = state.workflowNavigationGeneration || 0;
   await waitForWorkspaceTransitionPaint();
   suppressReaderScrollRestore = true;
   try {
@@ -2143,6 +2145,9 @@ async function switchWorkspace(workspaceID, options = {}) {
   const scrollLeft = Number(state.trackScrollLeft) || 0;
   track.scrollLeft = Math.min(scrollLeft, Math.max(0, track.scrollWidth - track.clientWidth));
   refreshOpenSettingsWorkspace();
+  if (options.onSelected) await workspaceAccessGateForRender().ready;
+  if (options.onSelected && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+      (state.workflowNavigationGeneration || 0) === navigation) await options.onSelected();
   return true;
 }
 
@@ -2310,7 +2315,7 @@ async function createGeneralWorkspace() {
   await switchWorkspace(created.workspace.id, { focus: false });
 }
 
-async function createNewWorkspace() {
+async function createNewWorkspace({onSelected = null} = {}) {
   closeWorkspaceContextMenu();
   if (!hasCapability("projects")) {
     await presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to create Projects. Reading and search remain free.");
@@ -2324,7 +2329,7 @@ async function createNewWorkspace() {
       reconcileProjectWorkspaces();
       const syncedProject = activeFolderRecords(currentContentSummary().projects || []).find((item) => projectDetailMatches(item, project)) || project;
       const linked = workspaceRegistry.workspaces.find((item) => item.projectID === projectRecordID(syncedProject));
-      if (linked) await switchWorkspace(linked.id, { focus: false });
+      if (linked) await switchWorkspace(linked.id, { focus: false, onSelected });
     }
   });
 }
@@ -2578,10 +2583,11 @@ function openMobileMoreSheet() {
   closeButton.focus({ preventScroll: true });
 }
 
-async function openWorkspaceContextMenu(workspaceID, anchor) {
+async function openWorkspaceContextMenu(workspaceID, anchor, {actionLabel = "", onSelected = null} = {}) {
   // The chooser belongs to the account, not to the workspace being replaced.
   // Validate the synced account snapshot without depending on a selected pane gate.
   const identity = captureAccountRequest();
+  const navigation = state.workflowNavigationGeneration || 0;
   let content = null;
   if (activeAccount()?.userID) {
     try {
@@ -2591,7 +2597,8 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
       }
     } catch { /* Public view controls remain available when private sync cannot load. */ }
   }
-  if (!isCurrentAccountRequest(identity)) return;
+  if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID ||
+      (state.workflowNavigationGeneration || 0) !== navigation) return;
   const projectsAvailable = Boolean(activeAccount()?.userID && content?.userID === activeAccount().userID &&
     ["verified", "permitted-offline"].includes(content?.workspacePresentationAccess));
   if (projectsAvailable) reconcileProjectWorkspaces();
@@ -2600,7 +2607,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   const menu = document.createElement("div");
   menu.className = "workspace-context-menu workspace-chooser-menu";
   menu.setAttribute("role", "menu");
-  menu.setAttribute("aria-label", "Workspace menu");
+  menu.setAttribute("aria-label", actionLabel ? `Choose a workspace for ${actionLabel}` : "Workspace menu");
   const appendMenuAction = (section, action) => {
     if (action.separated) {
       const actionDivider = document.createElement("div");
@@ -2635,7 +2642,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   projectSection.setAttribute("aria-label", "Workspaces");
   const heading = document.createElement("strong");
   heading.className = "workspace-context-heading";
-  heading.textContent = "Workspaces";
+  heading.textContent = actionLabel ? `Choose a workspace for ${actionLabel}` : "Workspaces";
   projectSection.append(heading);
   workspaces.forEach((candidate) => {
     const button = document.createElement("button");
@@ -2648,12 +2655,12 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     button.append(label);
     button.addEventListener("click", () => {
       closeWorkspaceContextMenu();
-      void switchWorkspace(candidate.id, { focus: false });
+      void switchWorkspace(candidate.id, { focus: false, onSelected });
     });
     projectSection.append(button);
   });
   if (projectsAvailable) {
-    appendMenuAction(projectSection, { label: "add workspace", run: () => void createNewWorkspace() });
+    appendMenuAction(projectSection, { label: "add workspace", run: () => void createNewWorkspace({onSelected}) });
     appendMenuAction(projectSection, { label: "Manage workspaces", separated: true, run: openWorkspaceManager });
   } else {
     appendMenuAction(projectSection, { label: activeAccount() ? "Account & project access" : "Sign in for Projects", run: () => toggleAccountDialog() });
@@ -2664,11 +2671,20 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   const layoutActions = document.createElement("div");
   layoutActions.setAttribute("role", "group");
   layoutActions.setAttribute("aria-label", "View options");
-  if (projectsAvailable && state.columnGroups?.length) appendMenuAction(layoutActions, {
+  if (projectsAvailable && state.columnGroups?.length && !["notebook", "report"].includes(currentColumnWorkflowView())) appendMenuAction(layoutActions, {
     label: "Saved groups…", run: () => openSavedColumnGroupsMenu(workspaceActionsButton)
   });
-  viewOptions.append(layoutActions);
-  if (layoutActions.childElementCount && !["notebook", "report"].includes(currentColumnWorkflowView())) menu.append(viewOptions);
+  if (projectsAvailable && ['research', 'notebook'].includes(currentColumnWorkflowView())) {
+    appendMenuAction(layoutActions, {label: 'Close all columns',
+      disabled: !defaultActivePaneIDs().some(workflowPaneIsVisible), run: () => void closeAllColumns()});
+  }
+  if (layoutActions.childElementCount) {
+    const label = document.createElement('strong');
+    label.className = 'workspace-context-heading';
+    label.textContent = 'View options';
+    viewOptions.append(label, layoutActions);
+    menu.append(viewOptions);
+  }
   document.body.append(menu);
   workspaceContextMenu = menu;
   workspaceContextMenuBinding = bindFloatingWorkspacePanel(menu, {
@@ -2735,8 +2751,6 @@ function updateWorkspaceLayoutControls() {
   fitColumnsButton.hidden = false;
   fitColumnsButton.disabled = inReport ? !reportReady : !hasColumns;
   fitColumnsButton.title = inReport ? "Restore default Report column widths" : "Restore default panel widths";
-  collapseReadersButton.hidden = inReport;
-  collapseReadersButton.disabled = inReport || !hasColumns;
   document.querySelectorAll("#collapse-all-columns, #expand-all-columns")
     .forEach(button => { button.hidden = inReport; button.disabled = inReport || !hasColumns; });
 }
@@ -3198,6 +3212,7 @@ function syncNotebookNoteTabs() {
     });
     notebookTabs.append(button);
   }
+  syncNotebookLanding();
   newNotebookNoteButton.disabled = !project || !hasCapability('notebook') || projectToolTogglePending;
   closedNotebookNoteChoices = {projectID, notes};
   if (closedNotebookNotesButton) closedNotebookNotesButton.disabled = !project || !hasCapability('notebook');
@@ -3343,6 +3358,69 @@ async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archi
   }
 }
 
+function syncNotebookLanding() {
+  let landing = track.querySelector('.notebook-landing');
+  const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
+  if (currentColumnWorkflowView() !== 'notebook' || !project || !hasCapability('notebook') ||
+      notebookColumnsForProject(project).some(column => column.open)) {
+    landing?.remove();
+    return;
+  }
+  const projectID = projectDetailKey(project);
+  const cards = (notebookCatalogs.get(projectID) || []).filter(card => !card.deletedAt);
+  const loading = notebookCatalogRequests.has(projectID);
+  const available = notebookCatalogs.has(projectID);
+  const key = JSON.stringify([projectID, available, loading, cards.map(card => [card.id, card.title])]);
+  if (landing?.dataset.catalogKey === key) return;
+  if (!landing) {
+    landing = document.createElement('section');
+    landing.className = 'notebook-landing';
+    landing.setAttribute('aria-label', 'Project notes');
+    track.append(landing);
+  }
+  landing.dataset.catalogKey = key;
+  const heading = document.createElement('h2');
+  heading.textContent = 'Notes';
+  landing.replaceChildren(heading);
+  if (cards.length) {
+    const list = document.createElement('ul');
+    for (const card of cards) {
+      const item = document.createElement('li');
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.textContent = card.title || 'Untitled';
+      open.addEventListener('click', () => {
+        void openNotebookNoteColumn(project, card).catch(error => showWebNotice('Note not opened', error.message));
+      });
+      item.append(open);
+      list.append(item);
+    }
+    landing.append(list);
+  } else {
+    const status = document.createElement('p');
+    status.setAttribute('role', 'status');
+    status.textContent = available ? 'No notes yet' : loading ? 'Loading notes…' : 'Notes could not be loaded.';
+    landing.append(status);
+  }
+  if (!available && !loading) {
+    const retry = document.createElement('button');
+    retry.type = 'button';
+    retry.textContent = 'Retry';
+    retry.addEventListener('click', () => {
+      void ensureNotebookTabCatalog();
+      syncNotebookLanding();
+    });
+    landing.append(retry);
+  }
+  if (project.sharedRole !== 'viewer') {
+    const create = document.createElement('button');
+    create.type = 'button';
+    create.textContent = 'New note';
+    create.addEventListener('click', () => void createNotebookNoteColumn(project));
+    landing.append(create);
+  }
+}
+
 async function ensureNotebookTabCatalog() {
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   if (!project || !hasCapability('notebook')) return;
@@ -3352,12 +3430,14 @@ async function ensureNotebookTabCatalog() {
   const request = postResearch('/notebook/cards/list', {projectID}).catch(async error => {
     if (!privateCacheFallbackAllowed(error)) throw error;
     const cached = await loadNotebookProjectSnapshot(identity.userID, projectID).catch(() => null);
-    return cached?.cardPayload || {cards:[]};
+    if (!cached?.cardPayload) throw error;
+    return cached.cardPayload;
   }).then(payload => {
     if (!current()) return;
     notebookCatalogs.set(projectID, payload.cards || []); syncNotebookNoteTabs();
   }).catch(() => {}).finally(() => {
     if (notebookCatalogRequests.get(projectID) === request) notebookCatalogRequests.delete(projectID);
+    if (current()) syncNotebookLanding();
   });
   notebookCatalogRequests.set(projectID, request);
   await request;
@@ -5258,12 +5338,26 @@ function syncWorkflowNavigation() {
   syncResearchColumnLayout();
   syncTopbarProjectToolStates();
   if (view === 'notebook') void ensureNotebookTabCatalog();
+  syncNotebookLanding();
+  syncResearchStart();
 }
 async function switchWorkflowView(view) {
   if (!isProAccount() && view !== "research") return false;
   if (view === "project") {
-    if (!workspaceProject()) { await openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton); return false; }
+    if (!workspaceProject()) {
+      await openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton, {
+        actionLabel: "Project details", onSelected: () => openProjectDetailsScreen()
+      });
+      return false;
+    }
     return openProjectDetailsScreen();
+  }
+  if (workspaceColumnsRequireProject()) {
+    await openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton, {
+      actionLabel: view === "notebook" ? "Notebook" : "Research",
+      onSelected: () => switchWorkflowView(view)
+    });
+    return false;
   }
   // A retained Report/Project close callback also presents columns. Defer it
   // until the requested destination is known, avoiding an intermediate render
@@ -8404,7 +8498,6 @@ function readerCodeOptionLabel(code) {
   if (["BC", "AC", "PC", "MC", "FGC"].includes(code.prefix) && codeOptionVersion(code) === defaultSyncCodeVersion && !/\b2022\b/.test(code.label)) {
     return `${code.label} (2022)`;
   }
-  if (code.prefix === "FC" && code.label === "Fire Code") return "Fire Code (2022)";
   return code.label;
 }
 
@@ -9533,7 +9626,6 @@ function updateReaderPlanControls() {
     button.disabled = !isProAccount() && button.dataset.workflowView !== "research";
   });
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
-  collapseReadersButton.hidden = false;
   updateWorkspaceLayoutControls();
 }
 
@@ -20988,7 +21080,7 @@ async function renderSearchResults(panel, instance) {
     hasMore: Boolean(payload.hasMore),
     totalResults
   });
-  if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope, { hasMore: Boolean(payload.hasMore) })) saveWorkspaceState();
+  if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope)) saveWorkspaceState();
   appendSearchResultGroups(results, filteredResults, query, searchInstance);
   if (Array.isArray(payload.groups)) {
     const options = { query, matchMode, searchInstance, panel, edition, controller, isCurrent, sourceScope };
@@ -21055,19 +21147,19 @@ async function renderSearchResults(panel, instance) {
 // Choose once from the first available matches, never from a later pagination update.
 // The request suffix describes the durable enabled-source scope; context tokens are
 // intentionally excluded because they change on reload without changing the scope.
-function applyInitialSearchGroupExpansion(instance, matches, sourceScope, { hasMore = false } = {}) {
-  const decisionKey = JSON.stringify(["explicit-edition-v2", String(instance.query || "").trim(),
+function applyInitialSearchGroupExpansion(instance, matches, sourceScope) {
+  const preferredCodeVersion = sourceScope?.preferredCodeVersion || defaultSyncCodeVersion;
+  const decisionKey = JSON.stringify(["visible-matches-v3", String(instance.query || "").trim(),
     normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all",
-    sourceScope?.querySuffix || ""]);
+    sourceScope?.querySuffix || "", preferredCodeVersion, instance.matchMode || "words"]);
   if (!matches.length || instance.searchExpansionDecisionKey === decisionKey) return false;
   instance.searchExpansionDecisionKey = decisionKey;
   instance.defaultExpandedResultSource = "";
   const sourceKey = (result) => `${result.codePrefix || "BC"}|${result.codeVersion || defaultSyncCodeVersion}`;
   const expanded = new Set(normalizeSearchResultSources(instance.expandedResultSources));
   if (!matches.some((result) => expanded.has(sourceKey(result)))) {
-    const explicitlyScopedEdition = instance.searchEdition && instance.searchEdition !== "all";
-    const completeSingleSource = !hasMore && new Set(matches.map(sourceKey)).size === 1;
-    if (explicitlyScopedEdition || sourceScope?.enabledSourceCount === 1 || completeSingleSource) instance.defaultExpandedResultSource = sourceKey(matches[0]);
+    const preferred = matches.find(result => (result.codeVersion || defaultSyncCodeVersion) === preferredCodeVersion);
+    instance.defaultExpandedResultSource = sourceKey(preferred || matches[0]);
   }
   return true;
 }
@@ -21227,13 +21319,19 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       count.textContent = searchGroupCountText(loadedGroupCount, results.dataset.searchHasMore === "true");
     }
   });
-  // Keep family/edition order stable as additional pages arrive.
+  // Keep the automatic preview first, then the usual family/edition order.
+  // Later pages retain the same preview source and never reopen collapsed groups.
+  const previewSource = searchInstance.defaultExpandedResultSource;
+  const previewPrefix = String(previewSource || "").split("|")[0];
+  const previewFamily = previewPrefix === "BC68" ? "BC" : previewPrefix;
   const familyOrder = ["BC", "EBC", "FGC", "MC", "PC", "ECC", "EC", "FC", "ZR", "HMC", "AC", "T24", "T25", "T26", "T28", "LL"];
   Array.from(results.querySelectorAll(".search-family-card"))
-    .sort((a, b) => familyOrder.indexOf(a.dataset.family) - familyOrder.indexOf(b.dataset.family))
+    .sort((a, b) => Number(b.dataset.family === previewFamily) - Number(a.dataset.family === previewFamily) ||
+      familyOrder.indexOf(a.dataset.family) - familyOrder.indexOf(b.dataset.family))
     .forEach((family) => {
       Array.from(family.querySelectorAll(".search-result-group"))
-        .sort((a, b) => Number.parseInt(researchCodeEdition({codePrefix:b.dataset.codePrefix, codeVersion:b.dataset.sourceVersion}), 10) - Number.parseInt(researchCodeEdition({codePrefix:a.dataset.codePrefix, codeVersion:a.dataset.sourceVersion}), 10))
+        .sort((a, b) => Number(b.dataset.sourceKey === previewSource) - Number(a.dataset.sourceKey === previewSource) ||
+          Number.parseInt(researchCodeEdition({codePrefix:b.dataset.codePrefix, codeVersion:b.dataset.sourceVersion}), 10) - Number.parseInt(researchCodeEdition({codePrefix:a.dataset.codePrefix, codeVersion:a.dataset.sourceVersion}), 10))
         .forEach((group) => family.append(group));
       results.append(family);
     });
@@ -21351,7 +21449,7 @@ function appendSearchLoadMore(results, options) {
       searchPositionState(options.searchInstance).loadedPages = loadedPages;
       footer.remove();
       results.dataset.searchHasMore = payload.hasMore ? "true" : "false";
-      if (applyInitialSearchGroupExpansion(options.searchInstance, nextResults, options.sourceScope, { hasMore: true })) saveWorkspaceState();
+      if (applyInitialSearchGroupExpansion(options.searchInstance, nextResults, options.sourceScope)) saveWorkspaceState();
       appendSearchResultGroups(results, nextResults, options.query, options.searchInstance);
       const nextVisibleCount = results.querySelectorAll(".result-row").length;
       const pageTotal = Number(payload.totalResults);
@@ -31830,7 +31928,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const button = panel.querySelector('[data-report-export]');
     if (!button) return;
     button.disabled = generatingReport;
-    button.textContent = generatingReport ? "Exporting PDF…" : "Export PDF version";
+    button.textContent = generatingReport ? "Creating PDF version…" : "Create PDF version";
   };
   const generateReport = async () => {
     if (generatingReport || deletingReport) return;
@@ -32901,7 +32999,7 @@ async function renderProjectReportDraft(project, resume = null) {
     generate.className = "workflow-action workflow-action-primary";
     generate.dataset.reportExport = "true";
     generate.disabled = generatingReport;
-    generate.textContent = generatingReport ? "Exporting PDF…" : "Export PDF version";
+    generate.textContent = generatingReport ? "Creating PDF version…" : "Create PDF version";
     generate.title = "Save current edits and create a fixed Report version for export";
     generate.addEventListener("click", () => {
       void generateReport();
@@ -42668,7 +42766,6 @@ function renderSettings({ upgrade = false } = {}) {
   syncAccountState();
   policyAcceptance.addEventListener("change", () => {
     syncAccountState();
-    if (upgrade && policyAcceptance.checked && !checkoutButton.disabled) checkoutButton.click();
   });
   void loadCurrentPolicyConfiguration()
     .then((configuration) => {
@@ -44092,6 +44189,34 @@ function completeFirstUseWelcome() {
   } catch {
     // No persisted dismissal is available in this browser session.
   }
+}
+
+function syncResearchStart() {
+  let start = track.querySelector('.research-start');
+  if (!isProAccount() || !workspacePrivatePresentationAllowed() || !workspaceProject() ||
+      currentColumnWorkflowView() !== 'research' || defaultActivePaneIDs().some(workflowPaneIsVisible)) {
+    start?.remove();
+    return;
+  }
+  if (start) return;
+  start = document.createElement('section');
+  start.className = 'workspace-empty-state research-start';
+  start.setAttribute('aria-label', 'Research tools');
+  const actions = document.createElement('div');
+  actions.className = 'workspace-empty-actions';
+  for (const [label, run] of [
+    ['Ask about this project', () => focusRecentUtilityColumn('analysis')],
+    ['Search codes', () => focusRecentUtilityColumn('search')],
+    ['Open a reader', () => openReaderFromToolbar(readerToolbarButtonForCurrentView())]
+  ]) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = label;
+    button.addEventListener('click', () => void run());
+    actions.append(button);
+  }
+  start.append(actions);
+  track.append(start);
 }
 
 function renderProjectRequiredWorkspace() {
@@ -49505,15 +49630,22 @@ function bindImmediateUtilityControls() {
   ].forEach(([button, tool]) => {
     if (!button || button.dataset.coldStartBound === "true") return;
     button.dataset.coldStartBound = "true";
-    button.addEventListener("click", () => {
-      if (notifyProjectRequiredForColumn()) return;
+    const openTool = () => {
+      if (workspaceColumnsRequireProject()) {
+        void openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton, {
+          actionLabel: tool === "report" ? "Report" : tool === "notebook" ? "Notebook" : tool === "facts" ? "Facts" : "Context",
+          onSelected: openTool
+        });
+        return;
+      }
       if (tool === "context") {
         if (projectDetailsScreen?.isOpen()) projectDetailsScreen.close();
         else void openProjectDetailsScreen();
         return;
       }
-      void (tool === "facts" ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ? openProjectReportDraft(workspaceProject()) : toggleProjectTool(tool));
-    });
+      return tool === "facts" ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ? openProjectReportDraft(workspaceProject()) : toggleProjectTool(tool);
+    };
+    button.addEventListener("click", () => void openTool());
   });
   if (newNotebookNoteButton && newNotebookNoteButton.dataset.coldStartBound !== 'true') {
     newNotebookNoteButton.dataset.coldStartBound = 'true';
@@ -49641,13 +49773,6 @@ async function start() {
     document.querySelectorAll(".reader-trust[open]").forEach((trust) => {
       if (!trust.contains(event.target)) trust.open = false;
     });
-    if (
-      workspaceContextMenu &&
-      !workspaceContextMenu.contains(event.target) &&
-      !event.target.closest(".workspace-tab, .workspace-actions-button")
-    ) {
-      closeWorkspaceContextMenu();
-    }
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
   window.addEventListener("resize", keepFocusedWorkspacePaneVisible, { passive: true });
@@ -49851,9 +49976,6 @@ async function start() {
   });
   document.querySelector("#collapse-all-columns").addEventListener("click", () => setAllColumnsCollapsed(true));
   document.querySelector("#expand-all-columns").addEventListener("click", () => setAllColumnsCollapsed(false));
-  collapseReadersButton.addEventListener("click", () => {
-    closeAllColumns();
-  });
   const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
   await restoreInitialProWorkspace({ publicSection: Boolean(deepLinkedSectionID) });
   consumeBrowserSectionURL();

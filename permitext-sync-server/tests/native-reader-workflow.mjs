@@ -28,8 +28,8 @@ assert.match(chapter,/if let sectionID, library.isBookmarked\(sectionID: section
  'Already saved passages retain deliberate additional Project assignment in the context menu');
 assert.match(chapter,/memberFolderIDs: Set\(library.folderMembership\[sectionID\] \?\? \[\]\)/, 'Secondary assignment retains current memberships');
 assert.match(browse,/ReaderProjectMenu\(\)/);
-assert.match(search,/Button\("Open in Reader 1"\)/);
-assert.match(search,/Button\("Open in Reader 2"\)/);
+assert.match(search,/Button\(readerDestinationLabel\(\.primary\)\)/);
+assert.match(search,/Button\(readerDestinationLabel\(\.secondary\)\)/);
 assert.match(browse,/rememberedSectionBinding\(for: target.chapter.id\).wrappedValue = target.section.id/);
 assert.match(browse,/persistVersionFileName\(library.selectedVersionFileName, for: browserContext\)/);
 assert.match(browse,/guard !Task.isCancelled, request.permits\(library.captureCodeSourceNavigationContext\(\)\)/);
@@ -40,11 +40,21 @@ for (const start of ['private func prepareAndOpenChapter(', 'private func select
  const method = browse.slice(browse.indexOf(start), browse.indexOf('\n    }',browse.indexOf(start)));
  assert.match(method,/readerHandoff.cancel\(in: browserContext\)/, 'Manual navigation supersedes pending explicit handoff');
 }
+const labelStart = search.indexOf('    private func readerDestinationLabel(');
+const readerLabel = search.slice(labelStart, search.indexOf('\n    }', labelStart) + 6).replace('private ', '');
+assert.ok(labelStart >= 0);
+assert.match(search, /Button\("Clear book filter"\) \{\s*searchFilterCodeSectionIDs.removeAll\(\)/);
 const fixture = `import Foundation
 import Combine
 ${destination}
 ${presentation}
-enum BrowserContextID: Hashable { case primary, secondary }
+enum BrowserContextID: Hashable {
+ case primary, secondary
+ @MainActor static var sources: [BrowserContextID: RememberedReaderSource] = [:]
+ @MainActor static func rememberedSources() -> [BrowserContextID: RememberedReaderSource] { sources }
+}
+struct RememberedReaderSource { let source: String }
+struct ReaderLabels { @MainActor ${readerLabel} }
 struct SearchReaderRoute { let sectionID: Int64; let sourceVersion: String? }
 struct CodeFolder { enum Kind { case project, folder }; var id:Int64; var clientID:String; var name:String; var folderType:Kind = .project; var deletedAt:String? }
 extension Notification.Name { static let permitextSavedWorkDidChange = Self("test.saved.changed") }
@@ -147,6 +157,12 @@ ${handoff}
   for ids in [[],["2014","2022"]] { precondition(NativeSearchGroupExpansion.automaticGroup(groupIDs:ids,isSearching:false,isPending:false) == nil) }
   precondition(NativeSearchGroupExpansion.automaticGroup(groupIDs:["2022"],isSearching:true,isPending:false) == nil)
   precondition(NativeSearchGroupExpansion.automaticGroup(groupIDs:["2022"],isSearching:false,isPending:true) == nil)
+  let labels = ReaderLabels()
+  precondition(labels.readerDestinationLabel(.primary) == "Open in Reader 1 · Empty")
+  BrowserContextID.sources = [.primary: RememberedReaderSource(source: "Building Code · 2022"),
+    .secondary: RememberedReaderSource(source: "Mechanical Code · 2014")]
+  precondition(labels.readerDestinationLabel(.primary) == "Open in Reader 1 · Building Code · 2022")
+  precondition(labels.readerDestinationLabel(.secondary) == "Open in Reader 2 · Mechanical Code · 2014")
   let handoffs=NativeReaderHandoff(), route=SearchReaderRoute(sectionID:42,sourceVersion:"2022")
   handoffs.open(route,in:.secondary,library:library)
   let first=handoffs.requests[.secondary]!

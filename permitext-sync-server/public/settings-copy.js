@@ -2,7 +2,7 @@ export const settingsCopy = Object.freeze({
   freePlanSummary: "Browse enacted codes, read the text, follow code references, and search. Saving, Projects, Research, Notebook, and Reports require Pro.",
   proPlanSummary: "Pro is active. Projects, Notebook, Report, professional exports, offline access, and AI-assisted Research are unlocked.",
   lifetimePlanSummary: "Lifetime Pro is active, including Research. This gifted account does not need an App Store subscription.",
-  freePlanDetails: "No trial. Renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.",
+  freePlanDetails: "Pro has no trial and renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.",
   signedOutAccountSummary: "Sign in to access your account. Saving, Projects, and synced work require Pro; reading and search are free.",
   signedInAccountSuffix: "Pro unlocks saved sections, notes, Projects, and sync across your devices."
 });

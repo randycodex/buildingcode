@@ -1,3 +1,4 @@
+import {defaultSyncCodeVersion, syncCodeVersion} from '../public/sync-identity.js';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
@@ -16,7 +17,7 @@ for(const accountID of [null,'account']) for(const corrupt of [false,true]) {
  legacy.updateMany(accountID,[current,historic],false);
  if(corrupt) for(const key of values.keys()) values.set(key,'corrupt legacy preference');
  const original=JSON.stringify([...values]); reads=0;writes=0;
- const c=vm.createContext({createActiveCodeSourceController,localStorage:storage,api:async()=>({codeSources:[current,historic]}),
+ const c=vm.createContext({defaultSyncCodeVersion,syncCodeVersion,workspacePrivatePresentationAllowed:()=>false,createActiveCodeSourceController,localStorage:storage,api:async()=>({codeSources:[current,historic]}),
   codeSourceIdentity,codeSourceKey,accountContextChangedError:()=>Error('Account changed')});
  const start=app.indexOf('activeCodeSourcesController = createActiveCodeSourceController({');
  vm.runInContext('let activeCodeSourcesController;'+app.slice(start,app.indexOf('\n});',start)+4)+

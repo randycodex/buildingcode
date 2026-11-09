@@ -643,8 +643,8 @@ async function main() {
         workspaceScript.text.includes("async function closeAllColumns()") &&
         workspaceScript.text.includes("fitColumnsButton.hidden = !inReport && !hasColumns") &&
         workspaceScript.text.includes("fitColumnsButton.disabled = inReport ? !reportReady : !hasColumns") &&
-        workspaceScript.text.includes("collapseReadersButton.hidden = inReport || !hasColumns") &&
-        workspaceScript.text.includes("collapseReadersButton.disabled = inReport || !hasColumns") &&
+        workspaceScript.text.includes("label: 'Close all columns'") &&
+        workspaceScript.text.includes("disabled: !defaultActivePaneIDs().some(workflowPaneIsVisible)") &&
         workspaceScript.text.includes("async function openDeepLinkedSectionInReader") &&
         workspaceStyles.text.match(/\.topbar-workspaces\s*\{[^}]*display:\s*flex;[^}]*flex:\s*0 1 auto;[^}]*margin-left:\s*auto;/) &&
         workspaceStyles.text.includes('.workspace-actions-button .workspace-current-name') &&
@@ -2000,7 +2000,7 @@ async function main() {
         !workspaceScript.text.includes("account-plan-detail") &&
         webRoot.text.includes("Browse enacted codes, read the text, follow code references, and search. Saving, Projects, Research, Notebook, and Reports require Pro.") &&
         webRoot.text.includes("Pro is active. Projects, Notebook, Report, professional exports, offline access, and AI-assisted Research are unlocked.") &&
-        webRoot.text.includes("No trial. Renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.") &&
+        webRoot.text.includes("Pro has no trial and renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.") &&
         workspaceScript.text.includes("Sign in to access your account. Saving, Projects, and synced work require Pro; reading and search are free.") &&
         workspaceScript.text.includes('accountIdentityName.textContent = account.displayName || "Permitext account"') &&
         workspaceScript.text.includes('accountIdentityEmail.textContent = account.email || "Email unavailable"') &&
@@ -2243,7 +2243,7 @@ async function main() {
         workspaceScript.text.includes("if (isProAccount() || state.readers.length <= 2) return false") &&
         workspaceScript.text.includes("button.disabled = !requiresProject && limitReached") &&
         workspaceScript.text.includes('button.title = requiresProject ? "Create a Project first to open Reader" : limitReached ? "Two Reader limit reached" : "Open a Reader beside this view"') &&
-        workspaceScript.text.includes("collapseReadersButton.disabled = inReport || !hasColumns") &&
+        workspaceScript.text.includes("disabled: !defaultActivePaneIDs().some(workflowPaneIsVisible)") &&
         workspaceScript.text.includes("const canAddReader = isProAccount() || state.readers.length < 2") &&
         workspaceScript.text.includes("isProAccount() || state.readers.length < 2") &&
         workspaceScript.text.includes("if (!isProAccount() && state.readers.length >= 2)"),

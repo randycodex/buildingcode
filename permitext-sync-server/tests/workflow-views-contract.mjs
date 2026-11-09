@@ -63,8 +63,8 @@ let constructions=0, needProject=false, dividerUpdates=0;
 let reportOpen=false, detailsOpen=false;
 const c=vm.createContext({isProAccount:()=>true,columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){if(reportOpen){reportOpen=false;c.syncWorkflowColumnPresentation();}}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){if(detailsOpen){detailsOpen=false;c.syncWorkflowColumnPresentation();}}},toggleSettingsButton:null,toggleReportButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
-  document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
-  syncTopbarProjectToolStates(){},ensureNotebookTabCatalog:async()=>{},syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
+  document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,workspaceColumnsRequireProject:()=>false,
+  syncTopbarProjectToolStates(){},syncNotebookLanding(){},syncResearchStart(){},ensureNotebookTabCatalog:async()=>{},syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
   defaultActivePaneIDs:()=>panes.map(p=>p.dataset.paneId),
   appendPaneSequence(actualPanes){actualPanes.forEach((p,i)=>assert.equal(p,panes[i]));for(const p of actualPanes){p.hidden=!c.workflowPaneIsVisible(p.dataset.paneId);p.scrollTop=0;}c.syncWorkflowNavigation();},
   projectHasOpenNotebook:()=>panes.includes(notebook),savedPaneIDs:()=>[],placeEvidenceBeforeNotebook(){},
@@ -235,12 +235,12 @@ console.log('Report constraints passed: 600px document minimum, expanded Sources
 
 // Layout follows the visible Report, never the retained Research/Notebook track.
 let menuReportOpen = true, reportReady = true, reportResets = 0, savedLayouts = 0, workspaceTransitions = 0;
-const fit = {}, closeColumns = {}, workspaceOnly = [{}, {}, {}];
+const fit = {}, workspaceOnly = [{}, {}, {}];
 const layoutTrack = {scrollLeft: 220, scrollWidth: 1000, clientWidth: 700, querySelectorAll: () => []};
 const reportPanel = {querySelector: () => reportReady ? {} : null};
 const layoutState = {paneWeights: {'reader:one': 900, 'project:notebook:a': 730}, columnGroups: []};
 const layoutContext = vm.createContext({isProAccount:()=>true, currentColumnWorkflowView: () => menuReportOpen ? "report" : "research",
-  reportScreen: {isOpen: () => menuReportOpen}, fitColumnsButton: fit, collapseReadersButton: closeColumns,
+  reportScreen: {isOpen: () => menuReportOpen}, fitColumnsButton: fit,
   document: {querySelector: selector => selector.endsWith('.report-draft-panel') ? reportPanel : reportReady ? {} : null,
     querySelectorAll: () => workspaceOnly},
   defaultActivePaneIDs: () => [], activePaneIDs: () => ['reader:one', 'project:notebook:a'],
@@ -255,7 +255,6 @@ assert.equal(fit.hidden, false, 'Report reset stays available even when no Resea
 assert.equal(fit.disabled, false);
 assert.equal(fit.title, 'Restore default Report column widths');
 assert.ok(workspaceOnly.every(button => button.hidden), 'Report does not expose actions that operate on another view');
-assert.equal(closeColumns.hidden, true);
 await layoutContext.resetVisibleColumnWidths();
 assert.equal(reportResets, 1);
 assert.equal(layoutState.paneWeights['reader:one'], 900);

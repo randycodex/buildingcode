@@ -124,3 +124,14 @@ assert.ok(pendingResults.querySelectorAll(".search-result-save").every(button =>
 assert.equal(reads, 1, "80 pending controls share current private state, including writes after public rendering");
 console.log(JSON.stringify({ results: 80, initialSummaryReads: 1, initialBookmarkPaints: 80, revalidationSummaryReads: 1, pendingUpgradeSummaryReads: 1, renderMS: +duration.toFixed(2) }));
 console.log("Search bookmark render passed: real eager and pending gates, one summary per append, fresh later pages/access updates, exact edition/block/Project identity, duplicate suppression, unchanged citation/title/target output, and revoked account/workspace privacy.");
+
+current = true; selected = "p1";
+const previewResults = new Node("div"); panel.append(previewResults);
+const mechanical = {...matches[0], codePrefix:"MC", id:"mechanical-preview"};
+instance.defaultExpandedResultSource = `MC|${defaultSyncCodeVersion}`;
+c.appendSearchResultGroups(previewResults, [...matches, mechanical], "means of egress", instance);
+assert.equal(previewResults.querySelector(".search-family-card").dataset.family, "MC", "The automatic preview's code family appears first");
+instance.defaultExpandedResultSource = `BC|${historicalConstructionSyncCodeVersion}`;
+c.appendSearchResultGroups(previewResults, [...matches, mechanical], "means of egress", instance);
+assert.equal(previewResults.querySelector(".search-result-group").dataset.sourceVersion, historicalConstructionSyncCodeVersion, "The preferred historical edition stays first after final sorting");
+console.log("Search preview order passed: preferred family/edition first, stable remaining groups and unchanged result identities.");

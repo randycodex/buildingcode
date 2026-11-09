@@ -9,9 +9,17 @@ export function calculationDraftStore(storage, key) {
       throw new Error("Calculation drafts could not be read. The original device data has been preserved.");
     return data;
   };
+  const hasInput = record => Boolean(record.savedNote) || record.input.factorMode === 'custom' ||
+    ['spaceName', 'spaceFunction', 'area', 'factor', 'spaceLocation', 'seating', 'customReason']
+      .some(key => String(record.input[key] ?? '').trim());
   const write = data => storage.setItem(key, JSON.stringify(data));
   return {
-    list(context) { return read().records.filter(record => record.context === context).sort((a,b) => b.updatedAt.localeCompare(a.updatedAt)); },
+    list(context) {
+      const data = read();
+      const records = data.records.filter(record => record.context === context).sort((a,b) => b.updatedAt.localeCompare(a.updatedAt));
+      const blank = records.find(record => record.id === data.active[context] && !hasInput(record)) || records.find(record => !hasInput(record));
+      return records.filter(record => hasInput(record) || record === blank);
+    },
     open(context, initial = {}, chosenID = null) {
       const data = read();
       const id = chosenID || data.active[context];
@@ -24,8 +32,11 @@ export function calculationDraftStore(storage, key) {
       return structuredClone(record);
     },
     create(context) {
-      const data = read(); delete data.active[context]; write(data);
-      return this.open(context);
+      const data = read();
+      const blank = data.records.find(record => record.context === context && !hasInput(record));
+      delete data.active[context];
+      write(data);
+      return this.open(context, {}, blank?.id);
     },
     update(record, input) {
       const data = read();

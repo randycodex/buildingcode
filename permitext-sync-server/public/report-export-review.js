@@ -113,7 +113,7 @@ export function openReportExportReview({ prepare, isCurrent, mount = null,
       if (!prepared.manifest?.items?.length || !prepared.pdfBlob) throw new Error("The stored Report PDF is unavailable. Please try again.");
       packet = prepared;
       const manifest = packet.manifest;
-      status.textContent = `${manifest.project.name} · Version ${manifest.reportVersion || 1}`;
+      status.textContent = `${manifest.project.name} · Version ${manifest.reportVersion || 1} saved`;
       download.disabled = false;
       disposePreview();
       disposePreview = await renderReportPDF(content, packet.pdfBlob, current);

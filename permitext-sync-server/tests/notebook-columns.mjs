@@ -110,7 +110,7 @@ const tabContext=vm.createContext({state:tabState,notebookTabs:tabs,newNotebookN
   workspacePrivatePresentationAllowed:()=>true,workspaceProject:()=>project,projectDetailKey:p=>p.id,
   notebookCatalogs:new Map([['project',[{id:'a',title:'Note A'},{id:'closed',title:'Closed Note'},{id:'b',title:'Note B'}]]]),
   notebookColumnsForProject:()=>tabColumns,notebookColumnPaneID,notebookColumnMounts:new Map(),
-  hasCapability:()=>true,projectToolTogglePending:false,
+  hasCapability:()=>true,projectToolTogglePending:false,syncNotebookLanding(){},
   document:{createElement(){return {attrs:{},setAttribute(key,value){this.attrs[key]=value;},addEventListener(){}};}}
 });
 vm.runInContext(actual('syncNotebookNoteTabs'),tabContext);
