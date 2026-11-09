@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-context-content-alignment-v1583";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-facts-no-counts-v1584";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-context-content-alignment-v1583";
+} from "./offline-storage.js?v=20261108-facts-no-counts-v1584";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36957,18 +36957,6 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
 
   const groupLists = new Map();
   const presentationGroups = factsOnly ? projectFactPresentationGroups() : projectStructuredFactGroups;
-  const updateFactGroupCounts = () => {
-    if (!factsOnly) return;
-    const factsByKey = new Map(structuredFacts.map(fact => [fact.key, fact]));
-    for (const group of presentationGroups) {
-      const list = groupLists.get(group.key);
-      const groupElement = list.closest(".saved-project-structured-group");
-      const recorded = group.fields.map(field => factsByKey.get(field.key)).filter(Boolean);
-      const needsReview = recorded.filter(fact => ["unknown", "assumed", "stated"].includes(fact.status)).length;
-      const count = groupElement.querySelector(".project-fact-group-count");
-      if (count) count.textContent = `${recorded.length} recorded${needsReview ? ` · ${needsReview} need review` : ""}`;
-    }
-  };
   presentationGroups.forEach((group, groupIndex) => {
     const groupSection = document.createElement("section");
     groupSection.className = `saved-project-structured-group is-${group.key}`;
@@ -36979,10 +36967,6 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     groupToggle.className = factsOnly ? "saved-project-structured-group-label" : "saved-project-structured-group-toggle section-label";
     groupToggle.textContent = group.label;
     groupHeading.append(groupToggle);
-    if (factsOnly) {
-      const count = document.createElement("small"); count.className = "project-fact-group-count";
-      groupHeading.append(count);
-    }
     const groupBody = document.createElement("section");
     groupBody.className = "saved-project-structured-group-body";
     const groupList = document.createElement("div");
@@ -37020,7 +37004,6 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
       group.fields.filter(field => field.key !== "transit-zone" || factsByKey.has(field.key))
         .forEach((field) => appendDefaultFactField(groupLists.get(group.key), field, factsByKey));
     });
-    updateFactGroupCounts();
   };
   renderStructuredFacts();
   let refreshFacts = null;
