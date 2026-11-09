@@ -66,7 +66,7 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
   renderProjectSavedWork: async () => {}, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
   currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
-  workspaceActionsButton: element('button'), toggleContextButton: element('button'),
+  workspaceActionsButton: element('button'), toggleContextButton: element('button'), pinnedProjectContextPanel: false,
   workspaceFloatingPanelReference: () => ({bottom:70}),
   bindFloatingWorkspacePanel: () => ({position(){},dispose(){disposedResizers++;}}),
   prependWorkspaceButtonIcon: button => button,
@@ -95,7 +95,7 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
 });
 vm.runInContext('let projectDetailsScreen=null, reportScreen=null;\n'+
   (await readFile(new URL('../public/report-screen.js',import.meta.url),'utf8')).replace('export function','function')+'\n'+
-  ["circleXIconSVG", "pencilIconSVG", "projectInformationStateKey", "paneIDForProjectInformation", "flushProjectInformationPanes", "renderProjectInformation", "openProjectDetailsScreen", "toggleProjectInformation"].map(actual).join('\n'),c);
+  ["circleXIconSVG", "createWorkspacePanelPin", "pencilIconSVG", "projectInformationStateKey", "paneIDForProjectInformation", "flushProjectInformationPanes", "renderProjectInformation", "openProjectDetailsScreen", "toggleProjectInformation"].map(actual).join('\n'),c);
 await c.toggleProjectInformation('context');
 const contextPanel = mounts.get('project:context:alpha').panel;
 const factsPanel = mounts.get('project:facts:alpha').panel;

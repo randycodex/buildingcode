@@ -9,7 +9,7 @@ export function floatingWorkspacePanelBounds(anchor, width, viewportWidth, viewp
   };
 }
 
-export function bindFloatingWorkspacePanel(panel, { anchor, dismiss, alignmentReference, isOpen = () => panel.isConnected, manageAnchor = false }) {
+export function bindFloatingWorkspacePanel(panel, { anchor, dismiss, alignmentReference, isOpen = () => panel.isConnected, isPinned = () => false, manageAnchor = false }) {
   const controller = new AbortController();
   const { signal } = controller;
   const position = () => {
@@ -27,7 +27,7 @@ export function bindFloatingWorkspacePanel(panel, { anchor, dismiss, alignmentRe
     dismiss();
   };
   document.addEventListener('pointerdown', event => {
-    if (!isOpen() || panel.contains(event.target) || anchor?.contains(event.target) || nestedOverlay(event.target)) return;
+    if (!isOpen() || isPinned() || panel.contains(event.target) || anchor?.contains(event.target) || nestedOverlay(event.target)) return;
     close();
   }, { signal });
   document.addEventListener('keydown', event => {

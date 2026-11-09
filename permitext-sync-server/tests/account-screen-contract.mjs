@@ -92,6 +92,7 @@ function harness(signedIn, pro = signedIn) {
       focus: () => { focusReturns++; }, blur() {} },
     settingsButton: { setAttribute: (name,value) => { toggleAttributes[name] = value; }, focus: () => { focusReturns++; } },
     selectedSettingsTab: 'account',
+    pinnedSettingsPanel: false, projectDetailsScreen: null, prependWorkspaceButtonIcon() {},
     createFloatingWorkspaceTabs({entries,selected,onSelect}) {
       const nav = Object.assign(element(), {className:'floating-workspace-tabs'});
       nav.labels = entries.map(entry=>entry.label);
@@ -119,7 +120,7 @@ function harness(signedIn, pro = signedIn) {
     activePaneIDs: () => ["reader:one", "utility:settings", "utility:saved"],
     transitionWorkspace: async (kind, options) => transitions.push({ kind, options }), track
   });
-  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "workspaceFloatingPanelReference", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
+  vm.runInContext(["circleXIconSVG", "createWorkspacePanelPin", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "workspaceFloatingPanelReference", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
   return { context, track, panels, transitions, toggleAttributes, signInStarts, checkoutStarts, warningClosures,
     toolbar, revokeAccount() { accountCurrent = false; contextCheck(); },
     dialog: () => currentDialog, focusReturns: () => focusReturns, focusTraps: () => focusTraps };
@@ -153,6 +154,10 @@ for (const signedIn of [false, true]) {
   warning.className = "web-warning-backdrop";
   dialog.append(warning);
   dialog.children[0].children[1].listeners.click();
+  assert.equal(dialog.children[0].children[1].attributes['aria-pressed'], 'true');
+  assert.equal(h.context.pinnedSettingsPanel, true, 'Pinning Settings keeps the menu mounted.');
+  assert.equal(h.dialog(), dialog);
+  dialog.close();
   assert.equal(h.dialog(), null);
   assert.deepEqual(h.warningClosures, [false], "Closing Settings cancels its unanswered confirmation.");
   assert.equal(h.toggleAttributes["aria-pressed"], "false");
@@ -244,7 +249,7 @@ assert.equal(h.panels[0].profile.unsavedDraft, "Keep this edit");
 assert.equal(h.panels[0].plan.scrollTop, 0);
 assert.equal(h.track.scrollLeft, 350);
 assert.equal(h.transitions[0].options.refreshPaneIDs.join(","), "reader:one,utility:saved");
-h.dialog().children[0].children[1].listeners.click();
+h.dialog().close();
 assert.equal(h.dialog(), null);
 const legacyRecovery = harness(true);
 legacyRecovery.context.toggleAccountDialog();
@@ -271,7 +276,7 @@ for (const column of expanded.panels[0].scroll.children) {
   assert.equal(column.classList.contains("is-collapsed"), false);
   assert.equal(column.children.some(node => node.className?.includes("settings-column-restore")), false);
 }
-expanded.dialog().children[0].children[1].listeners.click();
+expanded.dialog().close();
 expanded.context.toggleAccountDialog();
 assert.ok(expanded.panels[1].scroll.children.every(column => !column.classList.contains("is-collapsed")), "Old collapsed preferences must not hide Settings columns when reopened");
 console.log("Settings tabs retain all category controls and ignore legacy column-collapse preferences.");

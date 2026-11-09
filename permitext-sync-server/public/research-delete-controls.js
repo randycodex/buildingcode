@@ -1,4 +1,4 @@
-import {bindFloatingWorkspacePanel} from './floating-workspace-panel.js?v=3';
+import {bindFloatingWorkspacePanel} from './floating-workspace-panel.js?v=4';
 
 // Deletion belongs to the history list; the server still reviews and fences the exact IDs.
 export function createResearchHistoryManagement({request, confirm, isCurrent, project = () => null,

@@ -6,9 +6,9 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-topbar-context-v1590";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-floating-menu-pins-v1591";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
-import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
+import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
@@ -23,7 +23,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=29";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261108-context-edit-pencil-v1381";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261108-floating-menu-pins-v1382";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261023-notes-reveal-v1298";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=3";
@@ -38,7 +38,7 @@ import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=3";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=13";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
-import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=3";
+import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261019-project-workflow-v5";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-topbar-context-v1590";
+} from "./offline-storage.js?v=20261108-floating-menu-pins-v1591";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -414,6 +414,8 @@ const mobileMoreButton = document.querySelector("#mobile-more");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
 const settingsButton = document.querySelector("#toggle-settings");
 let selectedSettingsTab = "account";
+let pinnedSettingsPanel = false;
+let pinnedProjectContextPanel = false;
 const getProButton = document.querySelector("#get-pro");
 document.querySelectorAll("[data-workspace-icon]").forEach(button => {
   prependWorkspaceButtonIcon(button, button.dataset.workspaceIcon);
@@ -4445,6 +4447,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   if (!project) return false;
   const identity = projectIdentity(project);
   document.querySelector(".account-workspace-view[open]")?.close();
+  document.querySelector(".settings-floating-panel[open]")?.close();
   const projectID = projectDetailKey(identity);
   if (projectDetailsScreen?.isCurrent()) {
     await projectDetailsScreen.open();
@@ -4461,14 +4464,8 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   const title = document.createElement("h1");
   title.className = "eyebrow panel-kind";
   title.textContent = "Project";
-  const close = document.createElement("button");
-  close.type = "button";
-  close.className = "icon-button utility-close project-details-screen-close";
-  close.innerHTML = circleXIconSVG();
-  close.title = "Close Context";
-  close.setAttribute("aria-label", "Close Context");
-  close.addEventListener("click", () => screen.close());
-  header.append(title, close);
+  const pin = createWorkspacePanelPin("Context", () => pinnedProjectContextPanel, value => { pinnedProjectContextPanel = value; });
+  header.append(title, pin);
   const columns = document.createElement("section");
   columns.className = "project-details-columns";
   columns.setAttribute("aria-label", "Project details columns");
@@ -4573,7 +4570,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
         entries: sections.map(([id, label]) => ({ id, label, panel: panels.get(id) })),
         onSelect: key => { selectedSection = key; }
       });
-      header.replaceChildren(panelTabs.element, close);
+      header.replaceChildren(panelTabs.element, pin);
       selectSection(section || "context");
       if (options.shouldApply && !options.shouldApply()) return content;
       updateLoaded = true;
@@ -4596,7 +4593,8 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   screen.element.setAttribute("aria-label", "Project context");
   screen.element.setAttribute("aria-modal", "false");
   floatingControls = bindFloatingWorkspacePanel(screen.element, {
-    anchor: toggleContextButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(), alignmentReference: workspaceFloatingPanelReference
+    anchor: toggleContextButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(),
+    isPinned: () => pinnedProjectContextPanel, alignmentReference: workspaceFloatingPanelReference
   });
   screen.projectID = projectID;
   screen.selectSection = selectSection;
@@ -5243,7 +5241,7 @@ function syncWorkflowColumnPresentation() {
 }
 function closeSharedWorkspaceViews(except = "") {
   if (except !== "report") reportScreen?.close();
-  if (except !== "project-details") projectDetailsScreen?.close();
+  if (except !== "project-details" && (!pinnedProjectContextPanel || except === "account")) projectDetailsScreen?.close();
   if (except !== "account") document.querySelector(".account-workspace-view[open]")?.close();
 }
 function syncWorkflowNavigation() {
@@ -21592,6 +21590,22 @@ function circleXIconSVG() {
       <path d="m9 9 6 6"></path>
     </svg>
   `;
+}
+
+function createWorkspacePanelPin(label, isPinned, setPinned) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "icon-button workspace-panel-pin";
+  prependWorkspaceButtonIcon(button, "pin");
+  const update = () => {
+    const pinned = isPinned();
+    button.title = `${pinned ? "Unpin" : "Pin"} ${label}`;
+    button.setAttribute("aria-label", button.title);
+    button.setAttribute("aria-pressed", String(pinned));
+  };
+  button.addEventListener("click", () => { setPinned(!isPinned()); update(); });
+  update();
+  return button;
 }
 
 function researchThumbIconSVG(direction) {
@@ -41743,13 +41757,16 @@ function mountAccountScreenContent(dialog, panel) {
   const title = document.createElement("h1");
   title.className = "eyebrow panel-kind";
   title.textContent = upgrade ? "Get Pro" : signIn ? "Sign in" : "Settings";
-  const close = document.createElement("button");
-  close.type = "button";
-  close.className = "icon-button utility-close account-screen-close";
-  close.innerHTML = circleXIconSVG();
-  close.title = `Close ${title.textContent}`;
-  close.setAttribute("aria-label", close.title);
-  close.addEventListener("click", () => dialog.close());
+  const close = floating ? createWorkspacePanelPin("Settings", () => pinnedSettingsPanel, value => { pinnedSettingsPanel = value; })
+    : document.createElement("button");
+  if (!floating) {
+    close.type = "button";
+    close.className = "icon-button utility-close account-screen-close";
+    close.innerHTML = circleXIconSVG();
+    close.title = `Close ${title.textContent}`;
+    close.setAttribute("aria-label", close.title);
+    close.addEventListener("click", () => dialog.close());
+  }
   if (floating && panel.__settingsTabs) header.append(panel.__settingsTabs.element);
   else if (!upgrade) header.append(title);
   header.append(close);
@@ -41768,6 +41785,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
     document.querySelector(".settings-floating-panel[open]")?.close();
     closeSharedWorkspaceViews("account");
   }
+  else projectDetailsScreen?.close();
   const dialog = document.createElement("section");
   dialog.className = "account-dialog account-screen";
   dialog.tabIndex = -1;
@@ -41832,7 +41850,8 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
   });
   document.querySelector(".workspace-shell").append(dialog);
   if (floating) dialog._floatingControls = bindFloatingWorkspacePanel(dialog, {
-    anchor: settingsButton, dismiss: () => dialog.close(), manageAnchor: true, alignmentReference: workspaceFloatingPanelReference
+    anchor: settingsButton, dismiss: () => dialog.close(), isPinned: () => pinnedSettingsPanel,
+    manageAnchor: true, alignmentReference: workspaceFloatingPanelReference
   });
   else state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
   syncWorkflowNavigation();
