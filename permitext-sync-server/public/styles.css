@@ -1150,7 +1150,7 @@ textarea:focus-visible {
 
 .workspace-context-menu .workspace-context-switch {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: var(--space-3);
   overflow: hidden;
@@ -1161,15 +1161,6 @@ textarea:focus-visible {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.workspace-context-current {
-  flex: 0 0 auto;
-  color: var(--code-accent);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 .workspace-context-switch[aria-checked="true"] {
