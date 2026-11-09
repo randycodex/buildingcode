@@ -21376,7 +21376,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .workspace-floating-panel .project-records-checklist > .project-records-add-action:not([hidden]) { align-items: center; justify-content: center; }
 .workspace-floating-panel .project-records-row:first-child { padding-top: 0; align-items: start; }
 .workspace-floating-panel .project-records-row:first-child > input { min-height: var(--project-details-first-line-height); line-height: var(--project-details-first-line-height); }
-.workspace-floating-panel .project-checklist-help { flex: 0 0 auto; margin: 16px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.workspace-floating-panel .project-checklist-help { flex: 0 0 auto; margin: 16px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; text-align: center; }
 
 /* Conversation cleanup stays beside the Assistant history it affects. */
 .assistant-history-header { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 8px; margin-bottom: 12px; }
