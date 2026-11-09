@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-trash-heading-action-v1595";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-quiet-activity-clear-v1596";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-trash-heading-action-v1595";
+} from "./offline-storage.js?v=20261108-quiet-activity-clear-v1596";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -43200,7 +43200,7 @@ function renderSettings({ upgrade = false } = {}) {
         requireCurrentAccountRequest(settingsIdentity);
         const count = await performSettingsClearAction(action);
         if (action !== "searches") { await prepareRecoverableDeletion(); openTrashAfterSettingsDeletion = true; }
-        setStatus(action === "searches" ? "Recent activity cleared." : `${action === "notes" ? `${count} section note${count === 1 ? "" : "s"}` : "Saved passages and passage links"} moved to Trash. Open Trash to restore.`);
+        setStatus(action === "searches" ? "" : `${action === "notes" ? `${count} section note${count === 1 ? "" : "s"}` : "Saved passages and passage links"} moved to Trash. Open Trash to restore.`);
         await refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft);
       } catch (error) {
         setStatus(error.message || `Could not clear ${action}.`, true);
