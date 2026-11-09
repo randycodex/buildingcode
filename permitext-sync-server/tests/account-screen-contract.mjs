@@ -92,7 +92,7 @@ function harness(signedIn, pro = signedIn) {
       focus: () => { focusReturns++; }, blur() {} },
     settingsButton: { setAttribute: (name,value) => { toggleAttributes[name] = value; }, focus: () => { focusReturns++; } },
     selectedSettingsTab: 'account',
-    pinnedSettingsPanel: false, projectDetailsScreen: null, prependWorkspaceButtonIcon() {},
+    projectDetailsScreen: null,
     createFloatingWorkspaceTabs({entries,selected,onSelect}) {
       const nav = Object.assign(element(), {className:'floating-workspace-tabs'});
       nav.labels = entries.map(entry=>entry.label);
@@ -100,7 +100,8 @@ function harness(signedIn, pro = signedIn) {
       select(selected);
       return {element:nav,select,dispose(){}};
     },
-    bindFloatingWorkspacePanel(dialog,{dismiss,anchor}) {
+    bindFloatingWorkspacePanel(dialog,{dismiss,anchor,isPinned}) {
+      assert.equal(isPinned(), true, 'Settings stays open during outside clicks.');
       anchor.setAttribute('aria-expanded','true');
       dialog.floatingEscape = () => {dismiss();anchor.focus();};
       return {position(){},dispose(){anchor.setAttribute('aria-expanded','false');}};
@@ -120,7 +121,7 @@ function harness(signedIn, pro = signedIn) {
     activePaneIDs: () => ["reader:one", "utility:settings", "utility:saved"],
     transitionWorkspace: async (kind, options) => transitions.push({ kind, options }), track
   });
-  vm.runInContext(["circleXIconSVG", "createWorkspacePanelPin", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "workspaceFloatingPanelReference", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
+  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "workspaceFloatingPanelReference", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
   return { context, track, panels, transitions, toggleAttributes, signInStarts, checkoutStarts, warningClosures,
     toolbar, revokeAccount() { accountCurrent = false; contextCheck(); },
     dialog: () => currentDialog, focusReturns: () => focusReturns, focusTraps: () => focusTraps };
@@ -133,7 +134,7 @@ for (const signedIn of [false, true]) {
   assert.equal(dialog.className, "account-dialog account-screen settings-floating-panel");
   assert.equal(dialog.open, true);
   assert.equal(h.track.inert, false); assert.equal(h.toolbar.inert, false);
-  assert.equal(dialog.children[0].children.length, 2, "The shared top menu already provides the brand.");
+  assert.equal(dialog.children[0].children.length, 1, "Settings has only its category navigation in the header.");
   assert.equal(dialog.children[1], panel, "Keep the original wired controls and their account fences.");
   assert.equal(panel.headerRemoved, true);
   assert.deepEqual(panel.removedStyles, ["flex"], "Column size must not become the screen height.");
@@ -153,17 +154,11 @@ for (const signedIn of [false, true]) {
   const warning = h.context.document.createElement("div");
   warning.className = "web-warning-backdrop";
   dialog.append(warning);
-  assert.equal(dialog.children[0].children[1].attributes['aria-pressed'], 'true', 'Settings opens pinned.');
-  dialog.children[0].children[1].listeners.click();
-  assert.equal(dialog.children[0].children[1].attributes['aria-pressed'], 'false');
-  assert.equal(h.context.pinnedSettingsPanel, false, 'Unpinning Settings keeps the menu mounted.');
-  assert.equal(h.dialog(), dialog);
   dialog.close();
   assert.equal(h.dialog(), null);
   assert.deepEqual(h.warningClosures, [false], "Closing Settings cancels its unanswered confirmation.");
   assert.equal(h.toggleAttributes["aria-pressed"], "false");
   h.context.toggleAccountDialog();
-  assert.equal(h.dialog().children[0].children[1].attributes['aria-pressed'], 'true', 'Reopening Settings pins it again.');
   h.dialog().floatingEscape();
   assert.equal(h.focusReturns(), 1, "Escape returns focus to the Account entry.");
   assert.equal(h.track.inert, false); assert.equal(h.toolbar.inert, false);

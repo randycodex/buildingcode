@@ -62,7 +62,7 @@ const track={scrollLeft:110,querySelectorAll:()=>panes};
 let constructions=0, needProject=false, dividerUpdates=0;
 let reportOpen=false, detailsOpen=false;
 const c=vm.createContext({isProAccount:()=>true,columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){if(reportOpen){reportOpen=false;c.syncWorkflowColumnPresentation();}}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){if(detailsOpen){detailsOpen=false;c.syncWorkflowColumnPresentation();}}},toggleSettingsButton:null,toggleReportButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
-  detachedProjectWindow:false,pinnedProjectContextPanel:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
+  detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
   document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
   syncTopbarProjectToolStates(){},ensureNotebookTabCatalog:async()=>{},syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
   defaultActivePaneIDs:()=>panes.map(p=>p.dataset.paneId),
@@ -88,19 +88,14 @@ assert.equal(c.workflowPaneIsVisible(reader.dataset.paneId),true);
 assert.equal(c.workflowPaneIsVisible(notebook.dataset.paneId),false);
 const retainedReaderScroll=reader.scrollTop;
 await c.switchWorkflowView('notebook');
-assert.equal(detailsOpen,false);
+assert.equal(detailsOpen,true,'Context stays open when changing working views.');
 assert.equal(notebook.scrollTop,450);assert.equal(track.scrollLeft,200);
 await c.switchWorkflowView('research');
 assert.equal(reader.scrollTop,retainedReaderScroll);
 assert.equal(reader.draft,'Unsaved text');
-detailsOpen=true; c.pinnedProjectContextPanel=true;
-await c.switchWorkflowView('notebook');
-assert.equal(detailsOpen,true,'Pinned Context remains open while changing working views.');
-await c.switchWorkflowView('research');
 assert.equal(detailsOpen,true);
 c.closeSharedWorkspaceViews('account');
 assert.equal(detailsOpen,false,'Authentication screens still close private Context.');
-c.pinnedProjectContextPanel=false;
 await c.switchWorkflowView('notebook');
 needProject=true; assert.equal(await c.switchWorkflowView('research'),false); assert.equal(state.workflowView,'notebook');
 const beforeExplicit = constructions;

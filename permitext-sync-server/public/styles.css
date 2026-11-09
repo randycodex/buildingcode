@@ -21297,19 +21297,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   height: var(--panel-title-control-size);
   flex: 0 0 var(--panel-title-control-size);
 }
-.workspace-shell button.workspace-panel-pin {
-  --workspace-button-icon-size: 18px;
-  width: var(--workspace-menu-height);
-  height: var(--workspace-menu-height);
-  flex: 0 0 var(--workspace-menu-height);
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--text-secondary);
-}
-.workspace-shell .workspace-panel-pin:is(:hover, [aria-pressed="true"]) { background: var(--menu-highlight); color: var(--text-primary); }
-.workspace-shell .workspace-panel-pin:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 .floating-workspace-tabs { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
 .floating-workspace-tabs > button {
   flex: 0 1 auto;

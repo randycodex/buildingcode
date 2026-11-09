@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-menus-auto-pin-v1592";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-persistent-menus-v1593";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-menus-auto-pin-v1592";
+} from "./offline-storage.js?v=20261108-persistent-menus-v1593";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -414,8 +414,6 @@ const mobileMoreButton = document.querySelector("#mobile-more");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
 const settingsButton = document.querySelector("#toggle-settings");
 let selectedSettingsTab = "account";
-let pinnedSettingsPanel = false;
-let pinnedProjectContextPanel = false;
 const getProButton = document.querySelector("#get-pro");
 document.querySelectorAll("[data-workspace-icon]").forEach(button => {
   prependWorkspaceButtonIcon(button, button.dataset.workspaceIcon);
@@ -4464,8 +4462,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   const title = document.createElement("h1");
   title.className = "eyebrow panel-kind";
   title.textContent = "Project";
-  const pin = createWorkspacePanelPin("Context", () => pinnedProjectContextPanel, value => { pinnedProjectContextPanel = value; });
-  header.append(title, pin.element);
+  header.append(title);
   const columns = document.createElement("section");
   columns.className = "project-details-columns";
   columns.setAttribute("aria-label", "Project details columns");
@@ -4488,11 +4485,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
     screenTitle: "Project", screenClass: "project-details-screen workspace-floating-panel", projectName: identity.name,
     mount: document.querySelector(".workspace-shell"),
     coveredElements: [], dismissOnEscape: false,
-    onOpen: () => {
-      pinnedProjectContextPanel = true;
-      pin.refresh();
-      openProjectEditor(); floatingControls?.position(); syncWorkflowNavigation();
-    },
+    onOpen: () => { openProjectEditor(); floatingControls?.position(); syncWorkflowNavigation(); },
     backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
       projectDetailMatches(workspaceProject(), identity) && hasCapability("projects") && (!applyingUpdate || options.shouldApply()),
@@ -4574,7 +4567,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
         entries: sections.map(([id, label]) => ({ id, label, panel: panels.get(id) })),
         onSelect: key => { selectedSection = key; }
       });
-      header.replaceChildren(panelTabs.element, pin.element);
+      header.replaceChildren(panelTabs.element);
       selectSection(section || "context");
       if (options.shouldApply && !options.shouldApply()) return content;
       updateLoaded = true;
@@ -4598,7 +4591,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   screen.element.setAttribute("aria-modal", "false");
   floatingControls = bindFloatingWorkspacePanel(screen.element, {
     anchor: toggleContextButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(),
-    isPinned: () => pinnedProjectContextPanel, alignmentReference: workspaceFloatingPanelReference
+    isPinned: () => true, alignmentReference: workspaceFloatingPanelReference
   });
   screen.projectID = projectID;
   screen.selectSection = selectSection;
@@ -5245,7 +5238,7 @@ function syncWorkflowColumnPresentation() {
 }
 function closeSharedWorkspaceViews(except = "") {
   if (except !== "report") reportScreen?.close();
-  if (except !== "project-details" && (!pinnedProjectContextPanel || except === "account")) projectDetailsScreen?.close();
+  if (except === "account") projectDetailsScreen?.close();
   if (except !== "account") document.querySelector(".account-workspace-view[open]")?.close();
 }
 function syncWorkflowNavigation() {
@@ -21594,22 +21587,6 @@ function circleXIconSVG() {
       <path d="m9 9 6 6"></path>
     </svg>
   `;
-}
-
-function createWorkspacePanelPin(label, isPinned, setPinned) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "icon-button workspace-panel-pin";
-  prependWorkspaceButtonIcon(button, "pin");
-  const update = () => {
-    const pinned = isPinned();
-    button.title = `${pinned ? "Unpin" : "Pin"} ${label}`;
-    button.setAttribute("aria-label", button.title);
-    button.setAttribute("aria-pressed", String(pinned));
-  };
-  button.addEventListener("click", () => { setPinned(!isPinned()); update(); });
-  update();
-  return { element: button, refresh: update };
 }
 
 function researchThumbIconSVG(direction) {
@@ -41761,19 +41738,18 @@ function mountAccountScreenContent(dialog, panel) {
   const title = document.createElement("h1");
   title.className = "eyebrow panel-kind";
   title.textContent = upgrade ? "Get Pro" : signIn ? "Sign in" : "Settings";
-  const close = floating ? createWorkspacePanelPin("Settings", () => pinnedSettingsPanel, value => { pinnedSettingsPanel = value; }).element
-    : document.createElement("button");
+  if (floating && panel.__settingsTabs) header.append(panel.__settingsTabs.element);
+  else if (!upgrade) header.append(title);
   if (!floating) {
+    const close = document.createElement("button");
     close.type = "button";
     close.className = "icon-button utility-close account-screen-close";
     close.innerHTML = circleXIconSVG();
     close.title = `Close ${title.textContent}`;
     close.setAttribute("aria-label", close.title);
     close.addEventListener("click", () => dialog.close());
+    header.append(close);
   }
-  if (floating && panel.__settingsTabs) header.append(panel.__settingsTabs.element);
-  else if (!upgrade) header.append(title);
-  header.append(close);
   dialog.replaceChildren(header, panel);
 }
 
@@ -41790,7 +41766,6 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
     closeSharedWorkspaceViews("account");
   }
   else {
-    pinnedSettingsPanel = true;
     projectDetailsScreen?.close();
   }
   const dialog = document.createElement("section");
@@ -41857,7 +41832,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
   });
   document.querySelector(".workspace-shell").append(dialog);
   if (floating) dialog._floatingControls = bindFloatingWorkspacePanel(dialog, {
-    anchor: settingsButton, dismiss: () => dialog.close(), isPinned: () => pinnedSettingsPanel,
+    anchor: settingsButton, dismiss: () => dialog.close(), isPinned: () => true,
     manageAnchor: true, alignmentReference: workspaceFloatingPanelReference
   });
   else state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;

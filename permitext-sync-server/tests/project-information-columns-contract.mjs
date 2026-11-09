@@ -66,9 +66,9 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
   renderProjectSavedWork: async () => {}, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
   currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
-  workspaceActionsButton: element('button'), toggleContextButton: element('button'), pinnedProjectContextPanel: false,
+  workspaceActionsButton: element('button'), toggleContextButton: element('button'),
   workspaceFloatingPanelReference: () => ({bottom:70}),
-  bindFloatingWorkspacePanel: () => ({position(){},dispose(){disposedResizers++;}}),
+  bindFloatingWorkspacePanel: (_panel, {isPinned}) => { assert.equal(isPinned(),true); return {position(){},dispose(){disposedResizers++;}}; },
   prependWorkspaceButtonIcon: button => button,
   createFloatingWorkspaceTabs({entries,selected,onSelect}) {
     const nav = element('nav'); nav.className = 'floating-workspace-tabs';
@@ -95,7 +95,7 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
 });
 vm.runInContext('let projectDetailsScreen=null, reportScreen=null;\n'+
   (await readFile(new URL('../public/report-screen.js',import.meta.url),'utf8')).replace('export function','function')+'\n'+
-  ["circleXIconSVG", "createWorkspacePanelPin", "pencilIconSVG", "projectInformationStateKey", "paneIDForProjectInformation", "flushProjectInformationPanes", "renderProjectInformation", "openProjectDetailsScreen", "toggleProjectInformation"].map(actual).join('\n'),c);
+  ["circleXIconSVG", "pencilIconSVG", "projectInformationStateKey", "paneIDForProjectInformation", "flushProjectInformationPanes", "renderProjectInformation", "openProjectDetailsScreen", "toggleProjectInformation"].map(actual).join('\n'),c);
 await c.toggleProjectInformation('context');
 const contextPanel = mounts.get('project:context:alpha').panel;
 const factsPanel = mounts.get('project:facts:alpha').panel;
@@ -103,8 +103,7 @@ const questionsPanel = mounts.get('project:questions:alpha').panel;
 const checklistPanel = mounts.get('project:checklist:alpha').panel;
 const screenElement = find(workspaceShell, node => node.className.includes('project-details-screen'));
 assert.ok(screenElement, 'Project details mounts in the workspace screen wrapper');
-const contextPin = find(screenElement, node => node.className.includes('workspace-panel-pin'));
-assert.equal(contextPin.attributes['aria-pressed'], 'true', 'Context opens pinned.');
+assert.equal(find(screenElement, node => node.className.includes('workspace-panel-pin')), undefined, 'Context has no pin icon.');
 const screenError = find(screenElement, node => node.attributes.role === 'alert');
 assert.equal(Boolean(screenError), false, `Screen hydration must finish without a hidden harness error: ${screenError?.textContent}`);
 assert.equal(screenElement.open, true); assert.equal(screenElement.hidden, false);
@@ -154,13 +153,10 @@ assert.equal(overviewInput.inert, originalInert, 'Restore context editing after 
 assert.equal(factsPanel.inert,false,'Finishing a save keeps the selected tab interactive.');
 assert.equal(factsContent.inert,undefined);
 await c.openProjectDetailsScreen('context');
-contextPin.handlers.click();
-assert.equal(contextPin.attributes['aria-pressed'], 'false');
 vm.runInContext('projectDetailsScreen.close()',c);
 assert.equal(closedIdentityEditors,0,'Closing Context keeps pending automatic saves mounted.');
 await c.openProjectDetailsScreen('context');
 assert.equal(identityEditorCount,1,'Reopening Context retains the same fields and any failed save draft.');
-assert.equal(contextPin.attributes['aria-pressed'], 'true', 'Reopening the retained Context panel pins it again.');
 contextPanel.draft='Retained edit'; contextBody.scrollTop=320;
 factsBody.scrollTop=210; columns.scrollLeft=80;
 const presentation = vm.runInContext('projectDetailsScreen.getPresentationState()',c);
