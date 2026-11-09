@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261108-checklist-footer-center-v149">
+    <link rel="stylesheet" href="/web/styles.css?v=20261108-topbar-context-v150">
     <link rel="stylesheet" href="/web/research-v2.css?v=19">
     <link rel="stylesheet" href="/web/reader-shortcuts.css?v=2">
   </head>
@@ -69,6 +69,7 @@
             </button>
           </div>
           <button class="workspace-actions-button get-pro-button" id="get-pro" type="button" hidden><span>Get Pro</span></button>
+          <button class="topbar-settings-button" id="toggle-context" data-pro-only hidden type="button" aria-label="Context" title="Choose a workspace first to open Context" aria-haspopup="dialog" aria-expanded="false" aria-controls="project-context-floating-panel" disabled data-workspace-icon="book-a"></button>
           <button class="topbar-settings-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-floating-panel" data-workspace-icon="settings"></button>
         </div>
         <div class="topbar-account-state">
@@ -90,9 +91,7 @@
             <span>Evidence</span>
           </button><div id="notebook-note-tabs" class="notebook-note-tabs" role="group" aria-label="Project notes"></div><button class="toolbar-button notebook-new-note" id="new-notebook-note" type="button" aria-label="New Note" title="New Note" disabled>+</button><button class="toolbar-button notebook-closed-notes-button" id="closed-notebook-notes" type="button" aria-label="Notes menu" title="Notes menu" aria-haspopup="menu" aria-expanded="false" aria-controls="notebook-closed-notes-menu" disabled>⋯</button></div><div hidden><button class="toolbar-button" id="toggle-notebook" type="button" aria-label="Notes" title="Choose a Project to open Notebook" aria-pressed="false" disabled data-workspace-icon="sticky-notes">
             <span>Notes</span>
-          </button></div><div hidden><button class="toolbar-button" id="toggle-context" type="button" aria-label="Context" title="Choose a Project to open Context" aria-pressed="false" disabled>
-            <span>Context</span>
-          </button><button class="toolbar-button" id="toggle-facts" type="button" aria-label="Facts" title="Choose a Project to open Facts" aria-pressed="false" disabled>
+          </button></div><div hidden><button class="toolbar-button" id="toggle-facts" type="button" aria-label="Facts" title="Choose a Project to open Facts" aria-pressed="false" disabled>
             <span>Facts</span>
           </button></div><div class="workflow-layout-actions" role="group" aria-label="Column layout" hidden>
             <button class="toolbar-button" id="collapse-all-columns" type="button" aria-label="Collapse all" title="Collapse all columns" data-workspace-icon="panel-left-close"></button>
@@ -582,6 +581,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261108-checklist-footer-center-v1588" type="module"></script>
+    <script src="/web/app.js?v=20261108-topbar-context-v1590" type="module"></script>
   </body>
 </html>

@@ -13804,7 +13804,6 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   .topbar #fit-columns,
   .topbar #collapse-readers,
   .topbar #toggle-workboard,
-  .topbar #toggle-context,
   .topbar #toggle-facts,
   .topbar #toggle-notebook,
   .topbar #toggle-report {
@@ -20036,7 +20035,7 @@ dialog.report-export-review {
 .report-export-review[data-preview-theme="dark"] .report-pdf-page canvas { filter: invert(0.92) hue-rotate(180deg); }
 .report-pdf-accessible-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 /* Project-wide information has a single home, independent of column layouts. */
-#toggle-context, #toggle-facts { display: none !important; }
+#toggle-facts { display: none !important; }
 .report-screen-header .screen-project-details-link { justify-self: end; color: var(--text-secondary); font-size: 12px; }
 .project-details-content { display: flex; flex-direction: column; height: 100%; max-width: 1080px; margin: 0 auto; }
 .project-details-tabs { display: flex; gap: 24px; padding: 20px 32px; border-bottom: 1px solid var(--border); }
@@ -21315,8 +21314,9 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .floating-workspace-tabs > button[aria-selected="true"] { background: var(--menu-highlight); color: var(--text-primary); }
 .floating-workspace-tabs > button:hover { color: var(--text-primary); }
 .floating-workspace-tabs > button:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
-.topbar #toggle-settings { width: 30px; min-width: 30px; padding: 0; flex: 0 0 30px; }
-.topbar #toggle-settings[aria-expanded="true"] { background: var(--workspace-menu-highlight); }
+.topbar :is(#toggle-context, #toggle-settings) { width: 30px; min-width: 30px; padding: 0; flex: 0 0 30px; }
+.topbar :is(#toggle-context, #toggle-settings)[aria-expanded="true"] { background: var(--workspace-menu-highlight); }
+.topbar #toggle-context:disabled { opacity: .45; cursor: default; }
 .settings-floating-panel > .settings-panel { display: flex; flex-direction: column; flex: 1 !important; min-height: 0; background: transparent; overflow: visible; }
 .settings-floating-panel > .settings-panel > .settings-scroll { display: block; flex: 1; min-height: 0; margin-inline: calc(-1 * var(--account-category-gutter)); overflow: hidden; }
 .settings-floating-panel .settings-account-column { height: 100%; padding: 0; border: 0; overflow-y: auto; }

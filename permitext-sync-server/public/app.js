@@ -6,7 +6,7 @@ import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-checklist-footer-center-v1588";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-topbar-context-v1590";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=7";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -158,7 +158,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-checklist-footer-center-v1588";
+} from "./offline-storage.js?v=20261108-topbar-context-v1590";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2659,16 +2659,6 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     appendMenuAction(projectSection, { label: activeAccount() ? "Account & project access" : "Sign in for Projects", run: () => toggleAccountDialog() });
   }
   menu.append(projectSection);
-  const navigationActions = document.createElement("div");
-  navigationActions.className = "workspace-view-options";
-  navigationActions.setAttribute("role", "group");
-  navigationActions.setAttribute("aria-label", "Project context");
-  appendMenuAction(navigationActions, {
-    label: "Context", icon: "book-a",
-    disabled: !projectsAvailable || !workspaceProject() || !hasCapability("projects"),
-    run: () => void switchWorkflowView("project")
-  });
-  menu.append(navigationActions);
   const viewOptions = document.createElement("div");
   viewOptions.className = "workspace-view-options";
   const layoutActions = document.createElement("div");
@@ -4602,10 +4592,11 @@ async function openProjectDetailsScreen(section = null, options = {}) {
     }
   });
   screen.element.setAttribute("role", "dialog");
+  screen.element.id = "project-context-floating-panel";
   screen.element.setAttribute("aria-label", "Project context");
   screen.element.setAttribute("aria-modal", "false");
   floatingControls = bindFloatingWorkspacePanel(screen.element, {
-    anchor: workspaceActionsButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(), alignmentReference: workspaceFloatingPanelReference
+    anchor: toggleContextButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(), alignmentReference: workspaceFloatingPanelReference
   });
   screen.projectID = projectID;
   screen.selectSection = selectSection;
@@ -5269,7 +5260,7 @@ function syncWorkflowNavigation() {
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   updateWorkspaceLayoutControls();
   syncResearchColumnLayout();
-  syncNotebookNoteTabs();
+  syncTopbarProjectToolStates();
   if (view === 'notebook') void ensureNotebookTabCatalog();
 }
 async function switchWorkflowView(view) {
@@ -5825,7 +5816,7 @@ function syncTopbarProjectToolStates() {
   const identity = project ? projectIdentity(project) : null;
   const requiresProject = workspaceColumnsRequireProject();
   [
-    [toggleContextButton, "Context", "projects", () => Boolean(state.projectContextOpen)],
+    [toggleContextButton, "Context", "projects", () => projectDetailsScreen?.isOpen() === true],
     [toggleFactsButton, "Facts", "projects", () => Boolean(state.projectFactsOpen)],
     [toggleNotebookButton, "Notes", "notebook", projectHasOpenNotebook],
     [toggleReportButton, "Report", "professional-exports", projectHasOpenReportDraft]
@@ -5833,8 +5824,9 @@ function syncTopbarProjectToolStates() {
     if (!button) return;
     const opened = Boolean(identity && isOpen(identity));
     const sharedReport = Boolean(label === "Report" && identity?.sharedOnly);
-    button.disabled = projectToolTogglePending || (!requiresProject && (!identity || !hasCapability(capability) || sharedReport));
-    button.setAttribute("aria-pressed", String(label === "Report" ? reportScreen?.isOpen() === true : opened));
+    button.disabled = projectToolTogglePending || ((label === "Context" || !requiresProject) && (!identity || !hasCapability(capability) || sharedReport));
+    if (label === "Context") button.setAttribute("aria-expanded", String(opened));
+    else button.setAttribute("aria-pressed", String(label === "Report" ? reportScreen?.isOpen() === true : opened));
     button.title = requiresProject ? `Choose a workspace first to open ${label}`
       : !identity ? `Choose a Project to open ${label}`
       : !hasCapability(capability) ? `${label} requires Pro`
@@ -49519,7 +49511,12 @@ function bindImmediateUtilityControls() {
     button.dataset.coldStartBound = "true";
     button.addEventListener("click", () => {
       if (notifyProjectRequiredForColumn()) return;
-      void (["context", "facts"].includes(tool) ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ? openProjectReportDraft(workspaceProject()) : toggleProjectTool(tool));
+      if (tool === "context") {
+        if (projectDetailsScreen?.isOpen()) projectDetailsScreen.close();
+        else void openProjectDetailsScreen();
+        return;
+      }
+      void (tool === "facts" ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ? openProjectReportDraft(workspaceProject()) : toggleProjectTool(tool));
     });
   });
   if (newNotebookNoteButton && newNotebookNoteButton.dataset.coldStartBound !== 'true') {

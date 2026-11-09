@@ -66,7 +66,7 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
   renderProjectSavedWork: async () => {}, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
   currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
-  workspaceActionsButton: element('button'),
+  workspaceActionsButton: element('button'), toggleContextButton: element('button'),
   workspaceFloatingPanelReference: () => ({bottom:70}),
   bindFloatingWorkspacePanel: () => ({position(){},dispose(){disposedResizers++;}}),
   prependWorkspaceButtonIcon: button => button,

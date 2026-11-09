@@ -13,13 +13,15 @@ function actual(name) {
 const topNavigation = shell.match(/<nav class="topbar-actions"[\s\S]*?<\/nav>/)[0];
 assert.match(topNavigation,/data-workflow-view="research"[\s\S]*data-workflow-view="notebook"[\s\S]*id="toggle-report"/);
 assert.doesNotMatch(topNavigation,/id="toggle-(?:saved|search|analysis|notebook)"/);
+assert.match(shell, /id="toggle-context"[^>]*data-pro-only[^>]*aria-label="Context"[^>]*data-workspace-icon="book-a"><\/button>\s*<button[^>]*id="toggle-settings"/,
+  "The icon-only Context control sits immediately before Settings");
 assert.match(shell,/data-workflow-tools="research"[\s\S]*id="add-reader"[\s\S]*id="toggle-search"[\s\S]*id="toggle-analysis"/);
 assert.doesNotMatch(actual("renderSavedFolderContext"), /project-notebook-button|project-report-draft-button/);
 
 function button() {
   return { attributes: {}, disabled: false, setAttribute(key, value) { this.attributes[key] = value; } };
 }
-let reportOpen = false;
+let reportOpen = false, contextOpen = false;
 let project = { id: "a", name: "Alpha" };
 let allowed = true, privateAllowed = true, discard = true, heldOpen = null, requiresProject = false;
 const capabilities = new Set(["projects", "notebook", "professional-exports"]);
@@ -38,6 +40,7 @@ const c = vm.createContext({
   projectHasOpenNotebook: value => state.notebooks.some(item => item.id === value.id),
   projectHasOpenReportDraft: () => reportOpen,
   reportScreen: {get projectID(){return project?.id;},isOpen:()=>reportOpen,close(){reportOpen=false;}},
+  projectDetailsScreen: {isOpen:()=>contextOpen},
   syncNotebookNoteTabs() {},
   paneIDForProjectNotebook: value => `notebook:${value.id}`,
   notebookPaneIDsForProject: value => [`notebook:${value.id}`], notebookColumnsForProject: () => [],
@@ -53,13 +56,14 @@ vm.runInContext("let projectToolTogglePending = false;\n" + ["syncTopbarProjectT
 
 c.syncTopbarProjectToolStates();
 assert.equal(contextButton.disabled, false);
-assert.equal(contextButton.attributes["aria-pressed"], "false");
-state.projectContextOpen = true;
+assert.equal(contextButton.attributes["aria-expanded"], "false");
+contextOpen = true;
 c.syncTopbarProjectToolStates();
-assert.equal(contextButton.attributes["aria-pressed"], "true");
+assert.equal(contextButton.attributes["aria-expanded"], "true");
 assert.equal(contextButton.title, "Close Context · Alpha");
-state.projectContextOpen = false;
+contextOpen = false;
 c.syncTopbarProjectToolStates();
+assert.equal(contextButton.attributes["aria-expanded"], "false");
 assert.equal(factsButton.disabled, false);
 assert.equal(factsButton.attributes["aria-pressed"], "false");
 state.projectFactsOpen = true;
@@ -110,7 +114,7 @@ assert.equal(notebookButton.disabled, false);
 
 project = null; c.syncTopbarProjectToolStates();
 assert.equal(contextButton.disabled, true);
-assert.equal(contextButton.attributes["aria-pressed"], "false");
+assert.equal(contextButton.attributes["aria-expanded"], "false");
 assert.equal(factsButton.disabled, true);
 assert.equal(factsButton.attributes["aria-pressed"], "false");
 assert.equal(notebookButton.disabled, true);
@@ -120,7 +124,8 @@ const before = calls.length;
 assert.equal(await c.toggleProjectTool("report"), false);
 assert.equal(calls.length, before);
 requiresProject = true; c.syncTopbarProjectToolStates();
-for (const [control, label] of [[contextButton, "Context"], [factsButton, "Facts"], [notebookButton, "Notes"], [reportButton, "Report"]]) {
+assert.equal(contextButton.disabled, true, "Context requires a selected workspace");
+for (const [control, label] of [[factsButton, "Facts"], [notebookButton, "Notes"], [reportButton, "Report"]]) {
   assert.equal(control.disabled, false, `${label} remains clickable to explain the Project requirement`);
   assert.equal(control.attributes["aria-pressed"], "false");
   assert.equal(control.title, `Choose a workspace first to open ${label}`);

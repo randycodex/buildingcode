@@ -49,12 +49,9 @@ assert.ok(labels().includes('Sign in for Projects'));assert.ok(!labels().include
 account={userID:'owner'};authority='verified';allowed=true;
 context.renderWorkspaceTabs();assert.equal(label.textContent,'Private Project');assert.equal(button.disabled,false);
 await context.openWorkspaceContextMenu('project',button);
-assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(!labels().includes('Manage Projects…'));assert.ok(labels().includes('Context'));assert.ok(!labels().includes('Settings'),'Settings has its own toolbar button');
-const visit=node=>[node,...node.children.flatMap(visit)];
-const contextAction=visit(body).find(node=>node.textContent==='Context');
-assert.equal(contextAction.disabled,false);
-contextAction.listeners.click();
-assert.deepEqual(opened,['project'],'Context retains its existing entry point');
+assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(!labels().includes('Manage Projects…'));
+assert.ok(!labels().includes('Context'),'Context has its own toolbar button');
+assert.ok(!labels().includes('Settings'),'Settings has its own toolbar button');
 const readsBefore=privateReads;body.children=[];current=false;
 await context.openWorkspaceContextMenu('project',button);
 assert.equal(body.children.length,0,'a stale account request cannot mount its menu');assert.equal(privateReads,readsBefore);
