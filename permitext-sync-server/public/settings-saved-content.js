@@ -93,8 +93,11 @@ export function createSettingsSavedContent(root, {
         const batch = Promise.resolve().then(() => hydrate(missing.map(entry => entry.item)));
         missing.forEach((entry, index) => cache.set(keyFor(entry), batch.then(items => items[index])));
       }
+      const ordered = node('ol', 'settings-library-entries');
+      list.append(ordered);
       for (const entry of entries) {
-        const row = node('article', 'settings-library-row');
+        const row = node('li', 'settings-library-row');
+        const body = node('div', 'settings-library-body');
         const meta = node('p', 'settings-library-code', codeLabel(entry.item));
         const title = button(sectionTitle(entry.item), 'settings-library-open');
         title.setAttribute('aria-label', `Open ${sectionTitle(entry.item)} in Reader`);
@@ -160,8 +163,9 @@ export function createSettingsSavedContent(root, {
           picker.hidden = true; assign.setAttribute('aria-expanded', 'false'); assign.focus();
         });
         actions.append(membership, assign);
-        row.append(meta, title, preview, actions, picker, feedback);
-        list.append(row);
+        body.append(meta, title, preview, actions, picker, feedback);
+        row.append(body);
+        ordered.append(row);
         const cacheKey = keyFor(entry);
         cache.get(cacheKey).then(item => {
           if (!rowCurrent()) return;

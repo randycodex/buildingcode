@@ -1,4 +1,4 @@
-export const webAppVersion = "20261108-saved-content-alignment-v1600";
+export const webAppVersion = "20261108-saved-content-numbers-v1601";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

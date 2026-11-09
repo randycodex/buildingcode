@@ -18586,9 +18586,12 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-content-browse > .settings-content-count { grid-column: 1 / -1; font-weight: var(--settings-weight-regular); }
 .account-screen .settings-content-help { grid-column: 1 / -1; }
 .account-screen .settings-library-list { grid-column: 1 / -1; margin-top: var(--space-3); min-width: 0; }
-.account-screen .settings-library-row { display: grid; gap: var(--space-1); padding-block: var(--space-3); min-width: 0; }
+.account-screen .settings-library-entries { margin: 0; padding-inline-start: calc(2 * var(--space-3)); list-style: decimal outside; }
+.account-screen .settings-library-row { display: list-item; padding-block: var(--space-3); min-width: 0; }
+.account-screen .settings-library-row::marker { color: var(--text-secondary); font-size: var(--settings-type-caption); font-variant-numeric: tabular-nums; }
+.account-screen .settings-library-body { display: grid; gap: var(--space-1); min-width: 0; }
 .account-screen .settings-library-row + .settings-library-row { border-top: 1px solid var(--border); }
-.account-screen .settings-library-row > p { margin: 0; }
+.account-screen .settings-library-body > p { margin: 0; }
 .account-screen .settings-library-code { color: var(--text-secondary); font-size: var(--settings-type-caption); line-height: 1.4; }
 .account-screen .settings-library-open { display: block; width: fit-content; max-width: 100%; padding: 0; border: 0; background: transparent; border-radius: 0; color: var(--text-primary); font-size: var(--settings-type-body); font-weight: var(--settings-weight-medium); text-align: left; line-height: 1.5; overflow-wrap: anywhere; cursor: pointer; }
 .account-screen .settings-library-open:hover { color: var(--text-secondary); }
