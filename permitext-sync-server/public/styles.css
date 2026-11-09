@@ -21249,6 +21249,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .account-dialog.account-screen.settings-floating-panel,
 .workspace-shell > .project-details-screen.workspace-floating-panel {
   --workspace-floating-panel-gutter: 20px;
+  --project-details-first-line-height: 21px;
   position: fixed;
   inset: auto;
   z-index: 1100;
@@ -21347,7 +21348,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workspace-floating-panel > .report-screen-host { display: flex; flex: 1; min-height: 0; padding: 0; overflow: hidden; }
 .workspace-floating-panel .project-details-content { width: 100%; height: 100%; min-height: 0; margin: 0; }
 .workspace-floating-panel .project-details-columns { display: block; flex: 1; min-height: 0; overflow: hidden; }
-.project-details-screen.workspace-floating-panel .project-information-panel { width: 100%; min-width: 0; max-width: none; height: 100%; margin: 0; padding: 0; border: 0; background: transparent; }
+.project-details-screen.workspace-floating-panel .project-information-panel { --column-content-top-gap: var(--space-6); width: 100%; min-width: 0; max-width: none; height: 100%; margin: 0; padding: 0; border: 0; background: transparent; }
 body .project-details-screen.workspace-floating-panel .project-information-panel > .project-details-column-header { display: none; }
 .workspace-floating-panel .project-details-column-body { height: 100%; min-height: 0; padding: 0; overflow-y: auto; }
 .workspace-floating-panel > .report-screen-host:has(.project-facts-panel:not([hidden])) { margin-inline: calc(-1 * var(--workspace-floating-panel-gutter)); }
@@ -21363,6 +21364,14 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   height: 0;
 }
 .workspace-floating-panel .project-questions-panel .project-open-questions { margin-top: 0; padding-top: 0; border-top: 0; }
+.workspace-floating-panel .project-open-question-list { margin-top: 0; }
+.workspace-floating-panel .project-overview-editor .project-sheet-field:first-of-type { min-height: 0; padding-top: 0; }
+.workspace-floating-panel .project-overview-editor .project-name-input { min-height: var(--project-details-first-line-height); line-height: var(--project-details-first-line-height); }
+.workspace-floating-panel .project-facts-panel .saved-project-structured-group:first-child > .saved-project-structured-group-heading { padding-top: 0; }
+.workspace-floating-panel .project-facts-panel .saved-project-structured-group:first-child .saved-project-structured-group-label { line-height: var(--project-details-first-line-height); }
+.workspace-floating-panel .project-records-checklist > .workflow-action:not([hidden]) { display: inline-flex; align-items: flex-start; vertical-align: top; padding-block: 0; line-height: var(--project-details-first-line-height); }
+.workspace-floating-panel .project-records-row:first-child { padding-top: 0; align-items: start; }
+.workspace-floating-panel .project-records-row:first-child > input { min-height: var(--project-details-first-line-height); line-height: var(--project-details-first-line-height); }
 .workspace-floating-panel .project-checklist-help { flex: 0 0 auto; margin: 16px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
 
 /* Conversation cleanup stays beside the Assistant history it affects. */
