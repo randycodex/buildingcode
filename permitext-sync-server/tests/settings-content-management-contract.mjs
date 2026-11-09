@@ -21,7 +21,7 @@ function harness({projects = [{id:'one'}, {id:'two'}], saved = [{}], links = [],
     addEventListener(name,handler){this.events[name]=handler;}
   });
   const nodes = new Map();
-  const panel = {querySelector(selector){if(!nodes.has(selector))nodes.set(selector,node());return nodes.get(selector);},closest(){return panel;}};
+  const panel = {querySelector(selector){if(!nodes.has(selector))nodes.set(selector,node());return nodes.get(selector);},querySelectorAll:()=>[],closest(){return panel;}};
   const manageProjects = node();
   manageProjects.open = true;
   manageProjects.querySelector = selector => panel.querySelector(`manager ${selector}`);
@@ -39,7 +39,8 @@ function harness({projects = [{id:'one'}, {id:'two'}], saved = [{}], links = [],
     bookmarkRecordsForSettings:()=>saved,currentContentSummary:()=>content,
     visibleProjectRecords:records=>records.filter(project=>!project.deletedAt),
     projectIsArchived:project=>Boolean(project.archivedAt),projectRecordID:project=>project.id,
-    settingsSavedContentForSummary:summary=>settingsSavedContentSnapshot(summary), savedContentLibrary:{refresh(){}},
+    workspaceProject:()=>content.projects.find(project=>project.id==='one'&&!project.deletedAt) || null,
+    settingsSavedContentForSummary:summary=>settingsSavedContentSnapshot(summary,{workspace:content.projects.find(project=>project.id==='one'&&!project.deletedAt)||null}), savedContentLibrary:{refresh(){}},
     savedEvidenceKey:item=>`${item.codeVersion || 'nyc-2022'}:${item.sectionID}:${item.blockID || ''}`,
     projectSectionBelongsToProject:(link,project)=>link.folderClientID===project.id,
     projectColor:()=>'',readableProjectName:project=>project.name || project.id,
@@ -59,8 +60,8 @@ function harness({projects = [{id:'one'}, {id:'two'}], saved = [{}], links = [],
 const h = harness({saved:[{},{}],links:[{sectionID:545},{sectionID:546},{sectionID:547,deletedAt:'deleted'}],annotations:[{noteBody:'Kept note'},{noteBody:' '},{tags:['tag only']}]});
 assert.equal(h.controls.collectionsCard.hidden,true,'Ordinary Projects do not appear again in Saved Content.');
 assert.equal(h.controls.collectionList.children.length,0);
-assert.equal(h.nodes.get('[data-content-count="bookmarks"]').textContent,'4 saved · 2 Project links');
-assert.equal(h.nodes.get('[data-content-count="notes"]').textContent,'1 saved');
+assert.equal(h.nodes.get('[data-content-count="bookmarks"]').textContent,'2 saved');
+assert.equal(h.nodes.get('[data-content-count="notes"]').textContent,'0 saved','Unassigned notes do not appear in workspace recovery.');
 await h.controls.collectionClearAll.events.click();
 assert.deepEqual(h.deleted,[],'A hidden collection action cannot delete regular Projects.');
 const empty = harness({projects:[],saved:[]});
@@ -71,7 +72,7 @@ const linksOnly = harness({saved:[],links:[{sectionID:545}]});
 assert.equal(linksOnly.nodes.get('[data-clear-action="bookmarks"]').disabled,false,'Passage links remain manageable even without a standalone saved passage.');
 
 const legacy = harness({projects:[{id:'one'},{id:'old',folderType:'reference'},{id:'archived',folderType:'reference',archivedAt:'2026-10-01'},{id:'shared',folderType:'reference',sharedOnly:true}]});
-assert.equal(legacy.controls.collectionsCard.hidden,false);
+assert.equal(legacy.controls.collectionsCard.hidden,true,'Account-wide collection controls no longer appear in workspace recovery.');
 assert.equal(legacy.controls.collectionList.children.length,2,'Only owned legacy collections are offered here.');
 assert.equal(legacy.controls.collectionList.children.at(-1).children.at(-1).textContent,'Archived');
 legacy.select(['one','old']);legacy.refresh();
@@ -89,8 +90,8 @@ assert(legacy.confirmations.every(([,message,options])=>message.includes('across
 // Project changes refresh counts without reintroducing a second Project manager.
 h.content.projects[0].deletedAt='deleted';h.content.projectSections=[];h.refresh();
 assert.equal(h.controls.collectionList.children.length,0);
-assert.equal(h.nodes.get('[data-content-count="bookmarks"]').textContent,'2 saved · 0 Project links');
-assert.equal(h.nodes.get('[data-content-count="notes"]').textContent,'1 saved');
+assert.equal(h.nodes.get('[data-content-count="bookmarks"]').textContent,'0 saved');
+assert.equal(h.nodes.get('[data-content-count="notes"]').textContent,'0 saved');
 h.content.projects.push({id:'new-collection',folderType:'reference'});h.refresh();
 assert.equal(h.controls.collectionList.children.length,1);
 h.setCurrent(false);h.content.projects=[];h.refresh();

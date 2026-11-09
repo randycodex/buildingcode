@@ -14,6 +14,7 @@ import { createResearchSourceBodyReader } from "./research-source-body-cache.mjs
 import { loadPreparedPassages } from "./research-prepared-passages.mjs";
 import { isAmbiguousResearchProjectCorrection } from "./research-project-scope.mjs";
 import { planSavedEvidenceDelete, validateSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
+import {workspaceContentRetirements} from './workspace-content.mjs';
 import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { normalizeProjectQuestions, normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
 import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet } from "./public/search-words.js";
@@ -48,7 +49,7 @@ import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocume
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { isResearchPracticalNextStep, researchPracticalNextStepPrompt, researchPracticalNextStepTarget } from "./research-practical-next-step.mjs";
 import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation, researchQuestionIsConversationRecall } from "./research-question-intent.mjs";
-import { captureTrash, restoreTrash, trashSummary, trashContents } from "./trash-recovery.mjs";
+import { captureTrash, restoreTrash, trashSummary, trashContents, trashBatchForWorkspace, trashBatchWithoutWorkspace } from "./trash-recovery.mjs";
 import {notebookTrashMetadata, isNotebookTrashArtifact, notebookTrashSummary, notebookTrashContents, planNotebookTrashMutation} from './notebook-trash.mjs';
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import { emailSubscribersFromAccounts, postgresEmailSubscribers, emailSubscribersCSV } from "./email-subscribers.mjs";
@@ -1123,8 +1124,12 @@ export function createFileStoreAdapter() {
         const store = await readUnlocked();
         const existing = await canonicalizeMutations(store.mutationsByUserID[userID] || []);
         const plan = enforceFreePlanMutationBatch(existing, incoming, store.entitlements[userID] || null);
-        const merge = mergeMutations(existing, plan.acceptedMutations);
-        const accepted = plan.acceptedMutations.filter(m => merge.acceptedMutationIDs.includes(mutationRecordID(m)));
+        const initial = mergeMutations(existing, plan.acceptedMutations);
+        const submitted = plan.acceptedMutations.filter(m => initial.acceptedMutationIDs.includes(mutationRecordID(m)));
+        const cascade = workspaceContentRetirements(userID, existing, submitted);
+        const merge = mergeMutations(existing, [...submitted, ...cascade]);
+        merge.rejectedMutationIDs.push(...initial.rejectedMutationIDs);
+        const accepted = [...submitted, ...cascade].filter(m => merge.acceptedMutationIDs.includes(mutationRecordID(m)));
         const batch = captureTrash(userID, existing, accepted);
         store.trashByUserID ||= {};
         const entries = (store.trashByUserID[userID] || []).filter(b => Date.parse(b.expiresAt) > Date.now());
@@ -1155,19 +1160,21 @@ export function createFileStoreAdapter() {
         return {...plan, latestEventID: Number(store.syncRevisionsByUserID[userID] || 0)};
       });
     },
-    async trashAction(userID, action, id) {
+    async trashAction(userID, action, id, projectID = null) {
       return withFileStoreLock(dataPath, async () => {
         const store = await readUnlocked();
         store.trashByUserID ||= {};
         let batches = (store.trashByUserID[userID] || []).filter(b => Date.parse(b.expiresAt) > Date.now());
         if (action === "inspect") {
-          const batch = batches.find(b => b.id === id);
+          const storedBatch = batches.find(b => b.id === id);
+          const batch = storedBatch && trashBatchForWorkspace(storedBatch, projectID);
           if (!batch) throw new Error("Trash entry is unavailable or expired.");
           return {entry: trashContents(batch)};
         }
         let restoredCount = 0, skippedCount = 0;
         if (action === "restore") {
-          const batch = batches.find(b => b.id === id);
+          const originalBatch = batches.find(b => b.id === id);
+          const batch = originalBatch && trashBatchForWorkspace(originalBatch, projectID);
           if (!batch) throw new Error("Trash entry is unavailable or expired.");
           const existing = store.mutationsByUserID[userID] || [];
           const recovery = restoreTrash(batch,existing);
@@ -1177,12 +1184,14 @@ export function createFileStoreAdapter() {
           restoredCount = merge.acceptedMutationIDs.length;
           skippedCount = recovery.skipped;
           if (restoredCount) store.syncRevisionsByUserID[userID] = Number(store.syncRevisionsByUserID[userID] || 0) + 1;
-          batches = batches.filter(b => b.id !== id);
-        } else if (action === "purge") batches = batches.filter(b => b.id !== id);
-        else if (action === "empty") batches = [];
+          batches = batches.flatMap(b => b.id !== id ? [b] : [trashBatchWithoutWorkspace(b, projectID)].filter(Boolean));
+        } else if (action === "purge" || action === "empty") {
+          if (action === 'purge' && !batches.some(b => b.id === id && trashBatchForWorkspace(b, projectID))) throw new Error('Trash entry is unavailable or expired.');
+          batches = batches.flatMap(b => action === 'purge' && b.id !== id ? [b] : [trashBatchWithoutWorkspace(b, projectID)].filter(Boolean));
+        }
         store.trashByUserID[userID] = batches;
         await writeUnlocked(store);
-        return {entries:batches.map(trashSummary).reverse(),restoredCount,skippedCount};
+        return {entries:batches.map(b => trashBatchForWorkspace(b, projectID)).filter(Boolean).map(trashSummary).reverse(),restoredCount,skippedCount};
       });
     },
     async accountLifecycle() { return lifecycle; },
@@ -6370,9 +6379,9 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return syncRepository.deleteSavedEvidence(userID, input);
     },
-    async trashAction(userID, action, id) {
+    async trashAction(userID, action, id, projectID = null) {
       await ensureSchema();
-      return syncRepository.trashAction(userID, action, id);
+      return syncRepository.trashAction(userID, action, id, projectID);
     },
     async pushUserContent(userID, mutations) {
       await ensureSchema();
@@ -28870,13 +28879,16 @@ async function handleContentTrash(request, response) {
   const userID = body.auth?.accountUserID;
   if (!userID) return sendError(response,400,"Missing user ID.");
   if (!await authenticatedUserContext(request,response,userID)) return;
+  if (body.projectID != null && (typeof body.projectID !== 'string' || !body.projectID.trim() || body.projectID.length > 300)) return sendError(response,400,'Choose a valid workspace.');
+  const projectID = body.projectID ? syncProjectIdentity(body.projectID, userID) : null;
   const action = body.action || "list";
   if (!["list","inspect","restore","purge","empty"].includes(action)) return sendError(response,400,"Unknown Trash action.");
   if (["purge","empty"].includes(action) && body.confirmation !== "DELETE") return sendError(response,400,"Type DELETE to permanently remove content from Trash.");
   if (["inspect","restore","purge"].includes(action) && typeof body.id !== "string") return sendError(response,400,"Choose a Trash entry.");
   try {
     const adapter = await storeAdapter();
-    const notes = (await listStoredFoundationArtifacts(userID)).filter(artifact => isNotebookTrashArtifact(artifact));
+    const notes = (await listStoredFoundationArtifacts(userID)).filter(artifact => isNotebookTrashArtifact(artifact) &&
+      (!projectID || (artifact.payload._notebookTrash.links.length > 0 && artifact.payload._notebookTrash.links.every(link => syncProjectIdentity(link.projectID, userID) === projectID))));
     const noteID = typeof body.id === 'string' && body.id.startsWith('notebook:');
     const note = noteID ? notes.find(artifact => notebookTrashSummary(artifact).id === body.id) : null;
     if (noteID && !note) throw new Error('This Note is unavailable or its Trash entry has expired.');
@@ -28884,7 +28896,7 @@ async function handleContentTrash(request, response) {
       sendJSON(response, 200, {entry: notebookTrashContents(note)});
       return;
     }
-    const result = await adapter.trashAction(userID, noteID ? 'list' : action, noteID ? undefined : body.id);
+    const result = await adapter.trashAction(userID, noteID ? 'list' : action, noteID ? undefined : body.id, projectID);
     for (const target of action === 'empty' ? notes : note && ['restore','purge'].includes(action) ? [note] : []) {
       const restoring = action === 'restore';
       const projectIDs = [...new Set(target.payload._notebookTrash.links.map(link => link.projectID))];
@@ -28905,7 +28917,8 @@ async function handleContentTrash(request, response) {
     }
     if (action === 'inspect') await enrichTrashContents(result.entry);
     else {
-      const remaining = (await listStoredFoundationArtifacts(userID)).filter(artifact => isNotebookTrashArtifact(artifact));
+      const remaining = (await listStoredFoundationArtifacts(userID)).filter(artifact => isNotebookTrashArtifact(artifact) &&
+        (!projectID || (artifact.payload._notebookTrash.links.length > 0 && artifact.payload._notebookTrash.links.every(link => syncProjectIdentity(link.projectID, userID) === projectID))));
       result.entries = [...result.entries, ...remaining.map(notebookTrashSummary)]
         .sort((a,b) => Date.parse(b.deletedAt) - Date.parse(a.deletedAt));
     }

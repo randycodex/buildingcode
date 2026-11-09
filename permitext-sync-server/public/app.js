@@ -5,9 +5,9 @@ import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=2";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
-import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=4";
+import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-saved-content-hover-v1603";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261108-workspace-recovery-v1615";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -159,7 +159,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261108-saved-content-hover-v1603";
+} from "./offline-storage.js?v=20261108-workspace-recovery-v1615";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2142,6 +2142,7 @@ async function switchWorkspace(workspaceID, options = {}) {
   }
   const scrollLeft = Number(state.trackScrollLeft) || 0;
   track.scrollLeft = Math.min(scrollLeft, Math.max(0, track.scrollWidth - track.clientWidth));
+  refreshOpenSettingsWorkspace();
   return true;
 }
 
@@ -2653,6 +2654,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   });
   if (projectsAvailable) {
     appendMenuAction(projectSection, { label: "add workspace", run: () => void createNewWorkspace() });
+    appendMenuAction(projectSection, { label: "Manage workspaces", separated: true, run: openWorkspaceManager });
   } else {
     appendMenuAction(projectSection, { label: activeAccount() ? "Account & project access" : "Sign in for Projects", run: () => toggleAccountDialog() });
   }
@@ -4439,6 +4441,7 @@ function appendProjectOpenQuestions(container, project) {
 
 async function openProjectDetailsScreen(section = null, options = {}) {
   if (notifyProjectRequiredForColumn() || !workspacePrivatePresentationAllowed() || !hasCapability("projects")) return false;
+  document.querySelector('.workspace-manager-floating')?._close?.();
   const project = workspaceProject();
   if (!project) return false;
   const identity = projectIdentity(project);
@@ -15358,7 +15361,22 @@ function bookmarkActionLabel(saved, project = saved ? workspaceProject() : null)
     : "Remove from Evidence";
 }
 
-function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneID) {
+async function restoreBookmarkUndoNotes(notes, requestIdentity, workspaceID) {
+  const mutations = [];
+  for (const original of notes) {
+    requireCurrentAccountRequest(requestIdentity);
+    if (activeWorkspaceID !== workspaceID) throw new Error('The workspace changed.');
+    const latest = (currentContentSummary().annotations || []).find(record => record.id === original.id);
+    if (String(latest?.noteBody || '').trim()) continue;
+    const record = {...original, tags: latest?.tags || original.tags, deletedAt: null,
+      syncFields: ['noteBody'], updatedAt: new Date(Math.max(Date.now(), (Date.parse(latest?.updatedAt || '') || 0) + 1)).toISOString()};
+    upsertLocalAnnotation(record);
+    mutations.push(annotationMutationForRecord(record));
+  }
+  await pushMutationBatch(mutations);
+}
+
+function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneID, notes = []) {
   const panel = track.querySelector(`[data-pane-id="${CSS.escape(paneID || '')}"]`);
   if (!panel || panel.classList.contains("section-detail-panel")) return;
   const notice = document.createElement("div");
@@ -15380,6 +15398,7 @@ function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneI
         requireCurrentAccountRequest(requestIdentity);
         await persistSectionInProject(project, payload);
       }
+      await restoreBookmarkUndoNotes(notes, requestIdentity, workspaceID);
       syncReaderNoteBookmarkButtons(payload.sectionID, true, payload.codeVersion);
       await refreshOpenSavedPanes();
       notice.remove();
@@ -15407,7 +15426,9 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     (!targetProject || projectRecordID(project) === projectRecordID(targetProject)) &&
     (currentContentSummary().projectSections || []).some((link) =>
       savedEvidenceKey(link) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(link, project))) : [];
-  const offerUndo = () => showBookmarkUndo({ ...sectionPayload }, undoProjects, requestIdentity, undoWorkspaceID, undoPaneID);
+  const undoNotes = !saved ? (currentContentSummary().annotations || []).filter(record =>
+    savedEvidenceKey(record) === savedEvidenceKey(sectionPayload) && String(record.noteBody || '').trim()).map(record => ({...record})) : [];
+  const offerUndo = () => showBookmarkUndo({ ...sectionPayload }, undoProjects, requestIdentity, undoWorkspaceID, undoPaneID, undoNotes);
 
   if (!saved && targetProject) {
     const links = (currentContentSummary().projectSections || []).filter((item) =>
@@ -15703,7 +15724,7 @@ async function removeSectionFromProject(project, item, options = {}) {
   requireCurrentAccountRequest(requestIdentity);
 }
 
-async function deleteSavedEvidenceBatch(items, project = null, onProgress = () => {}) {
+async function deleteSavedEvidenceBatch(items, project = null, onProgress = () => {}, options = {}) {
   requirePrivateWorkspaceWritable();
   const requestIdentity = captureAccountRequest();
   const account = activeAccount();
@@ -15719,11 +15740,14 @@ async function deleteSavedEvidenceBatch(items, project = null, onProgress = () =
     (project.localFolderID == null ? null : `legacy-project-${project.localFolderID}`) : null;
   if (project && !projectID) throw new Error("Refresh the Project before deleting saved evidence.");
   let deletedCount = 0;
+  const workspaceID = activeWorkspaceID;
   for (let offset = 0; offset < items.length; offset += 200) {
     requireCurrentAccountRequest(requestIdentity);
+    if (options.scope && (workspaceID !== activeWorkspaceID || projectRecordID(workspaceProject() || {}) !== projectRecordID(project))) throw new Error('The workspace changed. Review its saved content before trying again.');
     const payload = await postJSON("/saved/evidence/delete-batch", {
       auth: { accountUserID: account.userID },
       projectID,
+      ...(options.scope ? {scope: options.scope} : {}),
       items: items.slice(offset, offset + 200).map(item => ({
         codeVersion: syncCodeVersion(item.codeVersion),
         sectionID: Number(item.sectionID),
@@ -15736,13 +15760,14 @@ async function deleteSavedEvidenceBatch(items, project = null, onProgress = () =
     syncedContent = { ...syncedContent, mutations, summary: summarizeMutations(mutations) };
     for (const mutation of payload.mutations || []) {
       const { kind, record } = mutationKindAndRecord(mutation);
-      const field = kind === "savedItem" ? "localSavedItems" : kind === "projectSection" ? "localProjectSections" : null;
+      const field = kind === "savedItem" ? "localSavedItems" : kind === "projectSection" ? "localProjectSections" : kind === 'annotation' ? 'localAnnotations' : null;
       if (field) state[field] = (state[field] || []).filter(local =>
         String(local.id) !== String(record.id) || Date.parse(local.updatedAt || 0) > Date.parse(record.updatedAt));
       if (kind === "savedItem") {
         setLocalSectionSaved(record, false, record.codeVersion);
         syncReaderNoteBookmarkButtons(record.sectionID, false, record.codeVersion);
       }
+      if (kind === 'annotation' && !record.blockID) delete state.sectionNotes?.[sectionNoteKey(record.sectionID)];
     }
     saveWorkspaceState();
     deletedCount += Number(payload.deletedCount || 0);
@@ -33411,7 +33436,7 @@ async function deleteArchivedProject(project) {
   const name = project.name || project.title || `this ${recordLabel.toLowerCase()}`;
   const confirmed = await confirmWebWarning(
     `Delete ${recordLabel}`,
-    `Move ${name} to Trash? You can restore it from Account → Trash for 30 days. Saved bookmarks will remain.`,
+    `Move ${name} to Trash with passages and section notes that are not used by another workspace? Restore it from Manage workspaces → Deleted workspaces within 30 days.`,
     { confirmLabel: "Move to Trash", container: document.body }
   );
   requireCurrentAccountRequest(requestIdentity);
@@ -33445,7 +33470,7 @@ async function deleteArchivedProjects(projects, options = {}) {
     : "";
   const confirmed = await confirmWebWarning(
     `Delete ${recordLabel}`,
-    `Move ${recordLabel} to Trash? You can restore ${count === 1 ? "it" : "them"} from Account → Trash for 30 days. Saved bookmarks will remain.${names}`,
+    `Move ${recordLabel} to Trash with passages and section notes that are not used by another workspace? Restore from Manage workspaces → Deleted workspaces within 30 days.${names}`,
     { confirmLabel: "Move to Trash", container: warningContainer() }
   );
   requireCurrentAccountRequest(requestIdentity);
@@ -33517,8 +33542,9 @@ async function deleteArchivedProjectData(project) {
   saveWorkspaceState();
   if (account) {
     try {
-      membershipTombstones.forEach((record) => enqueueSyncMutation({ projectSection: record }, account));
-      enqueueSyncMutation(deletedProjectMutationForRecord(project), account);
+      const operationGroupID = crypto.randomUUID();
+      membershipTombstones.forEach((record) => enqueueSyncMutation({ projectSection: record }, account, {operationGroupID}));
+      enqueueSyncMutation(deletedProjectMutationForRecord(project), account, {operationGroupID});
       await flushSyncOutbox({ refresh: true });
       requireCurrentAccountRequest(requestIdentity);
     } catch (error) {
@@ -35688,91 +35714,35 @@ async function openProjectSavedSection(project, item, anchorPaneID = primarySave
 function openWorkspaceManager() {
   if (!workspacePrivatePresentationAllowed()) return;
   closeWorkspaceContextMenu();
-  document.querySelector(".workspace-manager-backdrop")?.remove();
+  document.querySelector('.settings-floating-panel[open]')?.close();
+  projectDetailsScreen?.close();
+  document.querySelector(".workspace-manager-floating")?._close?.();
   const identity = captureAccountRequest();
-  const backdrop = document.createElement("div");
-  backdrop.className = "project-manager-backdrop workspace-manager-backdrop";
-  const dialog = document.createElement("section");
-  dialog.className = "project-manager workspace-manager";
-  dialog.setAttribute("role", "dialog");
-  dialog.setAttribute("aria-modal", "true");
-  dialog.setAttribute("aria-label", "Manage workspaces");
-  backdrop.append(dialog);
-  document.body.append(backdrop);
-  let busy = false;
-  const close = () => {
-    if (busy) return;
-    backdrop.remove();
-    document.querySelector("#workspace-actions")?.focus();
-  };
-  backdrop.addEventListener("keydown", (event) => {
-    if (busy) return;
-    if (event.key === "Escape") { event.preventDefault(); close(); }
-    else trapWebModalFocus(dialog, event);
-  });
-  const render = () => {
-    if (!isCurrentAccountRequest(identity)) { backdrop.remove(); return; }
-    dialog.replaceChildren();
-    const button = (label, action, parent) => {
-      const control = document.createElement("button");
-      control.type = "button";
-      control.textContent = label;
-      control.disabled = busy;
-      control.addEventListener("click", action);
-      parent.append(control);
-      return control;
-    };
-    const run = async (action) => {
-      if (busy) return;
-      busy = true; render();
-      try { await action(); }
-      catch (error) {
-        if (isCurrentAccountRequest(identity)) await showWebNotice("Could not update workspace", error.message);
-      } finally {
-        busy = false; render();
-        dialog.querySelector("header button")?.focus();
-      }
-    };
-    const header = document.createElement("header");
-    const title = document.createElement("h2");
-    title.textContent = "Manage workspaces";
-    header.append(title);
-    button("Close", close, header);
-    const description = document.createElement("p");
-    description.textContent = "Workspaces save your column arrangements. Deleting one keeps your projects, notes, saved evidence, and Research.";
-    const list = document.createElement("div");
-    list.className = "project-manager-list";
-    visibleWorkspaceRecords().filter((workspace) => !workspace.projectID).forEach((workspace) => {
-      const row = document.createElement("div");
-      row.className = "project-manager-row";
-      const copy = document.createElement("label");
-      const text = document.createElement("span");
-      const name = document.createElement("strong");
-      name.textContent = workspace.name;
-      text.append(name);
-      if (workspace.id === activeWorkspaceID) {
-        const current = document.createElement("small");
-        current.textContent = "Current";
-        text.append(current);
-      }
-      copy.append(text); row.append(copy);
-      const actions = document.createElement("div");
-      actions.className = "workspace-manager-actions";
-      button("Open", () => { close(); void switchWorkspace(workspace.id, { focus: false }); }, actions);
-      button("Rename", () => void run(async () => {
-        const name = await openWebTextPrompt({ title: "Rename workspace", label: "Workspace name", defaultValue: workspace.name, confirmLabel: "Save", required: true });
-        if (name !== null && isCurrentAccountRequest(identity)) commitWorkspaceRename(workspace.id, name);
-      }), actions);
-      button("Duplicate", () => { close(); void duplicateNamedWorkspace(workspace.id); }, actions).disabled = !isProAccount();
-      button("Delete", () => void run(() => removeNamedWorkspace(workspace.id)), actions).className = "is-danger";
-      row.append(actions); list.append(row);
-    });
-    const footer = document.createElement("footer");
-    button("New workspace", () => void run(createGeneralWorkspace), footer).disabled = !isProAccount();
-    dialog.append(header, description, list, footer);
-  };
-  render();
-  dialog.querySelector("header button")?.focus();
+  const panel = document.createElement("section");
+  panel.className = "workspace-manager-floating settings-floating-panel account-screen";
+  panel.setAttribute("role", "dialog");
+  panel.setAttribute("aria-label", "Manage workspaces");
+  panel.innerHTML = `<header class="workspace-manager-header"><h2>Workspaces</h2><button type="button" class="settings-secondary-button">Done</button></header>
+    <section class="settings-card settings-data-card workspace-manager-body settings-account-column">
+      <div class="settings-project-manager-content"></div>
+      <details class="settings-trash"><summary><span>Deleted workspaces</span><span class="settings-trash-toolbar"></span></summary>
+        <p class="settings-trash-help">Restore a workspace and its contents within 30 days.</p><p class="settings-trash-status" role="status"></p><div class="settings-trash-list"></div>
+      </details>
+    </section>`;
+  document.body.append(panel);
+  const host = panel.querySelector('.settings-project-manager-content');
+  const refresh = () => { host._refreshProjectManager?.(); refreshOpenSettingsWorkspace(); };
+  panel.__refreshSettingsContent = refresh;
+  panel.__refreshSettingsWorkspace = refresh;
+  renderProjectManager(host, {onChange: async () => { refresh(); await panel.__refreshSettingsTrash?.(); }});
+  attachSettingsTrash(panel, {global: true, workspacesOnly: true});
+  let binding;
+  const contextCheck = setInterval(() => { if (!isCurrentAccountRequest(identity)) close(); }, 200);
+  const close = () => { clearInterval(contextCheck); binding?.dispose(); panel.remove(); workspaceActionsButton?.focus({preventScroll: true}); };
+  panel._close = close;
+  panel.querySelector('.workspace-manager-header button').addEventListener('click', close);
+  binding = bindFloatingWorkspacePanel(panel, {anchor: workspaceActionsButton, alignmentReference: workspaceFloatingPanelReference, dismiss: close});
+  panel.querySelector('button')?.focus({preventScroll: true});
 }
 
 function renderProjectManager(container, { onChange = () => {} } = {}) {
@@ -40031,9 +40001,11 @@ async function startFocusedResearchFromSavedItem(item, projectID = "") {
 }
 
 function settingsSavedContentForSummary(summary = currentContentSummary()) {
-  return settingsSavedContentSnapshot(summary, {
-    recordKey: savedEvidenceKey, projectID: projectRecordID, belongsToProject: projectSectionBelongsToProject
-  });
+  const workspace = workspaceProject(summary.projects || []);
+  return {...settingsSavedContentSnapshot(summary, {
+    recordKey: savedEvidenceKey, projectID: projectRecordID, belongsToProject: projectSectionBelongsToProject,
+    workspace
+  }), workspaceKey: workspace ? projectRecordID(workspace) : ''};
 }
 
 function bookmarkRecordsForSettings() {
@@ -40088,12 +40060,15 @@ async function prepareRecoverableDeletion() {
   requireCurrentAccountRequest(identity);
 }
 
-function attachSettingsTrash(panel) {
+function attachSettingsTrash(panel, {global = false, workspacesOnly = false} = {}) {
   const details = panel.querySelector(".settings-trash");
   const list = panel.querySelector(".settings-trash-list");
   const status = panel.querySelector(".settings-trash-status");
   const toolbar = panel.querySelector(".settings-trash-toolbar");
   const identity = captureAccountRequest();
+  const scopeID = () => global ? null : syncProjectIdentity(workspaceProject()?.clientID || workspaceProject()?.id, activeAccount()?.userID);
+  let scope = scopeID();
+  const current = captured => isCurrentAccountRequest(identity) && captured === scopeID();
   let busy = false, selecting = false, refreshPending = false, entries = [];
   const selected = new Set();
   const retainedRows = new Map();
@@ -40127,6 +40102,7 @@ function attachSettingsTrash(panel) {
     }
   };
   const render = () => {
+    const renderedScope = scope;
     const available = new Set(entries.map(entry => entry.id));
     selected.forEach(id => { if (!available.has(id)) selected.delete(id); });
     retainedRows.forEach((row, id) => { if (!available.has(id)) retainedRows.delete(id); });
@@ -40145,7 +40121,7 @@ function attachSettingsTrash(panel) {
       input.autocomplete = "off";
       input.spellcheck = false;
       label.append(input);
-      const confirm = button("Delete Permanently", () => update("purge", ids, input.value), true);
+      const confirm = button("Delete Permanently", () => update("purge", ids, input.value, renderedScope), true);
       confirm.classList.add("settings-trash-confirm-button");
       confirm.disabled = true;
       input.addEventListener("input", () => { confirm.disabled = input.value !== "DELETE"; });
@@ -40172,7 +40148,7 @@ function attachSettingsTrash(panel) {
       list.append(toolbar);
       bulkActions = document.createElement("div");
       bulkActions.className = "settings-trash-bulk-actions";
-      restoreSelected = button("Restore Selected", () => update("restore", [...selected]));
+      restoreSelected = button("Restore Selected", () => update("restore", [...selected], undefined, renderedScope));
       deleteSelected = button("Delete Selected", () => permanent(bulkActions, [...selected]), true);
       bulkActions.append(restoreSelected, deleteSelected);
     }
@@ -40223,7 +40199,9 @@ function attachSettingsTrash(panel) {
         status.textContent = "Loading deleted contents…";
         contents.replaceChildren(status);
         try {
-          const detail = await postResearch("/content/trash", {action: "inspect", id: entry.id});
+          if (!current(renderedScope)) return;
+          const detail = await postResearch("/content/trash", {action: "inspect", id: entry.id, projectID: renderedScope});
+          if (!current(renderedScope)) return;
           if (!isCurrentAccountRequest(identity)) return;
           if (detail.entry?.id !== entry.id || !Array.isArray(detail.entry.items)) throw new Error("Contents could not be verified. Refresh Trash and try again.");
           const items = document.createElement("ol");
@@ -40267,7 +40245,7 @@ function attachSettingsTrash(panel) {
       copy.append(title, date);
       const actions = document.createElement("div");
       actions.className = "settings-trash-actions";
-      actions.append(button("Restore", () => update("restore", entry.id)));
+      actions.append(button("Restore", () => update("restore", entry.id, undefined, renderedScope)));
       row.append(copy);
       if (!selecting) row.append(actions);
       row.append(contents);
@@ -40277,8 +40255,12 @@ function attachSettingsTrash(panel) {
     if (selecting) list.append(bulkActions);
     syncSelection();
   };
-  const update = async (action = "list", id, confirmation) => {
+  const update = async (action = "list", id, confirmation, expectedScope = scopeID()) => {
     if (busy || !isCurrentAccountRequest(identity)) return;
+    if (!current(expectedScope)) return;
+    const capturedScope = scopeID();
+    if (scope !== capturedScope) { scope = capturedScope; entries = []; selected.clear(); selecting = false; retainedRows.clear(); }
+    if (!global && !capturedScope) { entries = []; status.textContent = ''; render(); return; }
     const settingsScroller = details.closest?.(".settings-account-column");
     const settingsScrollTop = settingsScroller?.scrollTop;
     busy = true;
@@ -40288,16 +40270,17 @@ function attachSettingsTrash(panel) {
     let changed = false;
     try {
       if (action !== "list") await prepareRecoverableDeletion();
+      if (!current(capturedScope)) return;
       const ids = Array.isArray(id) ? id : [id];
       let result;
       for (const entryID of ids) {
         requireCurrentAccountRequest(identity);
-        result = await postResearch("/content/trash", {action, id: entryID, confirmation});
-        if (!isCurrentAccountRequest(identity)) return;
+        result = await postResearch("/content/trash", {action, id: entryID, confirmation, projectID: capturedScope});
+        if (!current(capturedScope)) return;
         if (action !== "list") changed = true;
       }
       if (!result) return;
-      entries = result.entries;
+      entries = result.entries.filter(entry => !workspacesOnly || entry.containsWorkspaces);
       status.textContent = entries.length ? "" : "Trash is empty.";
       if (action !== "list") { selecting = false; selected.clear(); }
       if (action === "restore") {
@@ -40305,19 +40288,21 @@ function attachSettingsTrash(panel) {
         if (ids.some(entryID => entryID?.startsWith("notebook:"))) notebookCatalogs.clear();
         await loadSyncedContent({force: true, skipOutbox: true});
         requireCurrentAccountRequest(identity);
+        if (!current(capturedScope)) return;
+        panel.__refreshSettingsWorkspace?.();
         await refreshWorkspaceAfterSettingsClear(settingsPanelScrollTop(panel), track.scrollLeft);
         return;
       }
       panel.__refreshSettingsContent?.();
       render();
     } catch (error) {
-      if (!isCurrentAccountRequest(identity)) return;
+      if (!current(capturedScope)) return;
       if (changed) {
         if (action === "restore") await loadSyncedContent({force: true, skipOutbox: true}).catch(() => {});
         if (!isCurrentAccountRequest(identity)) return;
-        const remaining = await postResearch("/content/trash", {action: "list"}).catch(() => null);
-        if (!isCurrentAccountRequest(identity)) return;
-        if (remaining) { entries = remaining.entries; render(); }
+        const remaining = await postResearch("/content/trash", {action: "list", projectID: capturedScope}).catch(() => null);
+        if (!current(capturedScope)) return;
+        if (remaining) { entries = remaining.entries.filter(entry => !workspacesOnly || entry.containsWorkspaces); render(); }
         panel.__refreshSettingsContent?.();
         if (action === "restore") panel.__refreshSettingsWorkspace?.();
       }
@@ -40336,6 +40321,7 @@ function attachSettingsTrash(panel) {
   };
   syncSelection();
   panel.__refreshSettingsTrash = () => {
+    if (scope !== scopeID()) { scope = scopeID(); entries = []; selecting = false; selected.clear(); retainedRows.clear(); render(); }
     if (!details.open) return;
     if (busy) { refreshPending = true; return; }
     return update();
@@ -40343,73 +40329,22 @@ function attachSettingsTrash(panel) {
   details.addEventListener("toggle", panel.__refreshSettingsTrash);
 }
 
-async function clearSettingsBookmarks() {
+async function clearSettingsWorkspaceContent(scope) {
   requirePrivateWorkspaceWritable();
-  const requestIdentity = captureAccountRequest();
-  const summary = currentContentSummary();
-  const records = bookmarkRecordsForSettings();
-  const projectSections = (summary.projectSections || [])
-    .filter((item) => item?.sectionID && !item.deletedAt);
-  const folders = visibleProjectRecords(summary.projects || []);
-  const savedTombstones = records.map((record) =>
-    deletedSavedMutationForSection(record, record).savedItem
-  );
-  const membershipTombstones = projectSections.map((item) => {
-    const folder = folders.find((candidate) => projectSectionBelongsToProject(item, candidate)) || {
-      id: item.localFolderID || item.folderClientID,
-      clientID: item.folderClientID || item.localFolderID,
-      folderType: item.folderType || "project"
-    };
-    return deletedProjectSectionMutationForItem(folder, item).projectSection;
-  });
-  const account = activeAccount();
-  // Keep explicit tombstones locally and in the durable outbox. The bulk-clear
-  // marker prevents older offline records from returning, while the tombstones
-  // remove every known folder membership even if its timestamp is newer than
-  // the marker because it was echoed or edited by another device.
-  state.localSavedItems = savedTombstones;
-  state.localSavedSectionIDs = [];
-  state.localProjectSections = membershipTombstones;
-  const operationGroupID = crypto.randomUUID();
-  if (account) {
-    savedTombstones.forEach((record) => enqueueSyncMutation(
-      { savedItem: record },
-      account,
-      { operationGroupID }
-    ));
-    membershipTombstones.forEach((record) => enqueueSyncMutation(
-      { projectSection: record },
-      account,
-      { operationGroupID }
-    ));
-  }
-  enqueueSettingsClearForAllCodes("bookmarks", [...records, ...projectSections], { operationGroupID });
-  saveWorkspaceState();
-  if (account) await flushSyncOutbox({ refresh: true }).catch(() => {});
-  requireCurrentAccountRequest(requestIdentity);
-  return records.length;
+  const project = workspaceProject();
+  if (!project) throw new Error("Choose a workspace before changing saved content.");
+  const snapshot = settingsSavedContentForSummary();
+  const items = (scope === "notes" ? snapshot.notes : snapshot.passages).map(entry => entry.item);
+  if (!items.length) return 0;
+  return deleteSavedEvidenceBatch(items, project, () => {}, {scope});
+}
+
+async function clearSettingsBookmarks() {
+  return clearSettingsWorkspaceContent("bookmarks");
 }
 
 async function clearSettingsNotes() {
-  requirePrivateWorkspaceWritable();
-  const requestIdentity = captureAccountRequest();
-  const records = (currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim());
-  const uniqueTargets = new Map();
-  records.forEach((record) => {
-    const key = `${syncCodeVersion(record.codeVersion)}:${record.sectionID || ""}:${normalizeAnnotationBlockID(record.blockID)}`;
-    if (!uniqueTargets.has(key)) uniqueTargets.set(key, record);
-  });
-  uniqueTargets.forEach((record) => {
-    const localRecord = (state.localAnnotations || []).find((item) => String(item.id || "") === String(record.id || ""));
-    if (!localRecord) return;
-    localRecord.noteBody = "";
-  });
-  state.sectionNotes = {};
-  enqueueSettingsClearForAllCodes("notes", records, {operationGroupID: crypto.randomUUID()});
-  saveWorkspaceState();
-  if (activeAccount()) await flushSyncOutbox({ refresh: true }).catch(() => {});
-  requireCurrentAccountRequest(requestIdentity);
-  return uniqueTargets.size;
+  return clearSettingsWorkspaceContent("notes");
 }
 
 async function performSettingsClearAction(action) {
@@ -41682,8 +41617,10 @@ function organizeAccountSettings(panel, { floating = false, selected = "account"
     section.append(heading, ...cards.filter(Boolean));
     return section;
   };
-  const account = column("account", "Account", [profile, plan]);
-  const recovery = column("recovery", "Data & recovery", [conflicts, data]);
+  const activity = data?.querySelector('[aria-labelledby="settings-searches-title"]');
+  if (activity) { activity.classList.add('settings-card', 'settings-account-activity'); activity.querySelector('.settings-content-count').textContent = 'Recent searches and Recently Viewed across your account; pinned searches stay.'; }
+  const account = column("account", "Account", [profile, plan, offline, activity, conflicts]);
+  const recovery = column("recovery", "Data & recovery", [data]);
   const actions = document.createElement("div");
   actions.className = "settings-account-actions";
   const signOut = profile?.querySelector(".account-clear");
@@ -41697,11 +41634,12 @@ function organizeAccountSettings(panel, { floating = false, selected = "account"
   const trash = data?.querySelector(".settings-trash");
   const projects = data?.querySelector(".settings-project-management");
   const deleteContent = data?.querySelector(".settings-delete-content");
-  data?.append(...[projects, deleteContent, trash, offline].filter(Boolean));
+  projects?.remove();
+  data?.append(...[deleteContent, trash].filter(Boolean));
   scroll.replaceChildren(account, recovery);
   if (floating) {
     const tabs = createFloatingWorkspaceTabs({
-      id: "settings", label: "Settings categories", selected: selected === "library" ? "recovery" : selected, onSelect,
+      id: "settings", label: "Settings categories", selected: selected === "library" ? "account" : selected, onSelect,
       entries: [
         { id: "account", label: "Account", panel: account },
         { id: "recovery", label: "Data & Recovery", panel: recovery }
@@ -41760,6 +41698,7 @@ function mountAccountScreenContent(dialog, panel) {
 }
 
 function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
+  document.querySelector('.workspace-manager-floating')?._close?.();
   const directSignIn = signIn && !activeAccount();
   const floating = !upgrade && !directSignIn;
   const existing = document.querySelector(floating ? ".settings-floating-panel[open]" : ".account-workspace-view[open]");
@@ -42402,6 +42341,7 @@ function renderSettings({ upgrade = false } = {}) {
     hydrate: hydrateSavedColumnItems,
     codeLabel: item => readerCodeOptionLabel(codeOptionFor(item.codePrefix, item.codeVersion)),
     noteText: evidenceCommentsText,
+    workspaceScoped: true,
     projectID: projectRecordID,
     projectName: readableProjectName,
     availableProjects: () => activeFolderRecords(currentContentSummary().projects || [])
@@ -42450,6 +42390,10 @@ function renderSettings({ upgrade = false } = {}) {
   const refreshSettingsContent = () => {
     if (!isCurrentAccountRequest(settingsIdentity)) return;
     const summary = currentContentSummary();
+    const workspace = workspaceProject(summary.projects || []);
+    panel.querySelector('.settings-workspace-name').textContent = workspace ? readableProjectName(workspace) : 'Choose a workspace to view its data';
+    panel.querySelector('.settings-workspace-choose').hidden = Boolean(workspace);
+    panel.querySelectorAll('.settings-data-card > details').forEach(details => { details.hidden = !workspace; details.inert = !workspace; });
     savedCollections = visibleProjectRecords(summary.projects || [])
       .filter(project => !folderIsProject(project) && !project.sharedOnly)
       .map((project, sourceIndex) => ({ project, sourceIndex }))
@@ -42460,13 +42404,13 @@ function renderSettings({ upgrade = false } = {}) {
       .map(({ project }) => project);
     const collectionIDs = new Set(savedCollections.map(projectRecordID));
     selectedCollectionIDs.forEach(id => { if (!collectionIDs.has(id)) selectedCollectionIDs.delete(id); });
-    collectionsCard.hidden = savedCollections.length === 0;
+    collectionsCard.hidden = true;
     panel.querySelector('[data-content-count="collections"]').textContent = `${savedCollections.length} saved collection${savedCollections.length === 1 ? "" : "s"}`;
     const savedContent = settingsSavedContentForSummary(summary);
     const savedPassageCount = savedContent.passages.length;
     const savedProjectLinkCount = savedContent.projectLinkCount;
     const sectionNoteCount = savedContent.notes.length;
-    panel.querySelector('[data-content-count="bookmarks"]').textContent = `${savedPassageCount} saved · ${savedProjectLinkCount} Project ${savedProjectLinkCount === 1 ? "link" : "links"}`;
+    panel.querySelector('[data-content-count="bookmarks"]').textContent = `${savedPassageCount} saved`;
     panel.querySelector('[data-content-count="notes"]').textContent = `${sectionNoteCount} saved`;
     panel.querySelector('[data-clear-action="bookmarks"]').disabled = savedPassageCount === 0 && savedProjectLinkCount === 0;
     panel.querySelector('[data-clear-action="notes"]').disabled = sectionNoteCount === 0;
@@ -42512,6 +42456,10 @@ function renderSettings({ upgrade = false } = {}) {
     updateCollectionSelection();
   };
   panel.__refreshSettingsContent = refreshSettingsContent;
+  panel.querySelector('.settings-workspace-choose').addEventListener('click', event => {
+    event.stopPropagation();
+    void openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
+  });
   panel.__refreshSettingsWorkspace = () => {
     if (upgrade || !isCurrentAccountRequest(settingsIdentity)) return;
     refreshSettingsContent();
@@ -43226,21 +43174,27 @@ function renderSettings({ upgrade = false } = {}) {
     button.addEventListener("click", async () => {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
       const action = button.dataset.clearAction;
+      const workspaceID = activeWorkspaceID;
+      const project = workspaceProject();
+      if (action !== 'searches' && !project) return;
+      const workspaceCurrent = () => action === 'searches' || (activeWorkspaceID === workspaceID && projectRecordID(workspaceProject() || {}) === projectRecordID(project));
       const savedContent = settingsSavedContentForSummary();
       const clearActionCopy = {
         searches: ["Clear recent activity", "This will remove recent searches and Recently Viewed sections from this account across synced devices. Pinned searches will remain. This cannot be undone."],
-        bookmarks: ["Move saved passages and Project links to Trash", `${savedContent.passages.length} saved passages and ${savedContent.projectLinkCount} Project passage links will move to Trash across synced devices. Restore within 30 days. Projects, saved collections, and notes remain.`],
-        notes: ["Move section notes to Trash", `${savedContent.notes.length} section notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages, Notebook notes, and tags remain.`]
+        bookmarks: ["Move workspace passages to Trash", `${savedContent.passages.length} saved passage${savedContent.passages.length === 1 ? "" : "s"} will be removed from ${readableProjectName(project || {})}. Section notes with no remaining workspace will move with them. Content used by other workspaces stays. Restore within 30 days.`],
+        notes: ["Move workspace section notes to Trash", `${savedContent.notes.length} section note${savedContent.notes.length === 1 ? "" : "s"} in ${readableProjectName(project || {})} will move to Trash. Notes shared with another workspace cannot be cleared here. Saved passages, Notebook notes, and tags stay. Restore within 30 days.`]
       };
       const [title, message] = clearActionCopy[action];
       const confirmed = await confirmWebWarning(title, message, { confirmLabel: action === "searches" ? "Clear activity" : "Move to Trash", container: panel.closest(".account-dialog") || panel });
       if (!confirmed) return;
+      if (!workspaceCurrent()) return;
       const settingsScrollTop = settingsPanelScrollTop(panel);
       const workspaceScrollLeft = track.scrollLeft;
       button.disabled = true;
       try {
         if (action !== "searches") await prepareRecoverableDeletion();
         requireCurrentAccountRequest(settingsIdentity);
+        if (!workspaceCurrent()) throw new Error('The workspace changed. Review its saved content before trying again.');
         const count = settingsSavedContentForSummary().notes.length;
         await performSettingsClearAction(action);
         if (action !== "searches") { await prepareRecoverableDeletion(); openTrashAfterSettingsDeletion = true; }

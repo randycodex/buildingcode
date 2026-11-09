@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261108-saved-content-hover-v159">
+    <link rel="stylesheet" href="/web/styles.css?v=20261108-workspace-recovery-v161">
     <link rel="stylesheet" href="/web/research-v2.css?v=19">
     <link rel="stylesheet" href="/web/reader-shortcuts.css?v=2">
   </head>
@@ -509,9 +509,13 @@
         </section>
         <section class="settings-card settings-data-card" aria-labelledby="settings-data-title">
           <h3 id="settings-data-title" class="section-label settings-section-title">Data recovery</h3>
+          <header class="settings-workspace-scope">
+            <div><span>Workspace</span><h3 class="settings-workspace-name"></h3></div>
+            <button type="button" class="settings-secondary-button settings-workspace-choose">Choose workspace</button>
+          </header>
           <details class="settings-project-management">
             <summary>Projects</summary>
-            <p class="settings-recovery-help">Archiving keeps a Project. Moving it to Trash removes its passage links; saved passages and section notes stay.</p>
+            <p class="settings-recovery-help">Archiving keeps a workspace. Deleting it moves its unshared passages and section notes to Trash for 30 days.</p>
             <div class="settings-project-manager-content"></div>
           </details>
           <details class="settings-trash">
@@ -544,9 +548,9 @@
                   <span class="settings-content-view-label" aria-hidden="true">View</span>
                   <span class="settings-content-count" data-content-count="bookmarks"></span>
                 </button>
-                <button class="settings-secondary-button settings-content-trash" type="button" data-clear-action="bookmarks" aria-label="Move all saved passages and Project links to Trash">Move all to Trash</button>
-                <p class="settings-content-count settings-content-help">Includes passage links in every Project. Projects and notes stay.</p>
-                <div class="settings-library-list" id="settings-passages-list" aria-label="Saved passages across your account" hidden></div>
+                <button class="settings-secondary-button settings-content-trash" type="button" data-clear-action="bookmarks" aria-label="Move this workspace’s saved passages to Trash">Move all to Trash</button>
+                <p class="settings-content-count settings-content-help">Only this workspace. Content used elsewhere stays.</p>
+                <div class="settings-library-list" id="settings-passages-list" aria-label="Saved passages in this workspace" hidden></div>
               </section>
               <section class="settings-content-group settings-content-summary" aria-labelledby="settings-notes-title">
                 <button class="settings-content-copy settings-content-browse" type="button" data-browse-content="notes" aria-expanded="false" aria-controls="settings-notes-list">
@@ -556,7 +560,7 @@
                 </button>
                 <button class="settings-secondary-button settings-content-trash" type="button" data-clear-action="notes" aria-label="Move all section notes to Trash">Move all to Trash</button>
                 <p class="settings-content-count settings-content-help">Notes on code sections. Notebook notes and tags stay.</p>
-                <div class="settings-library-list" id="settings-notes-list" aria-label="Section notes across your account" hidden></div>
+                <div class="settings-library-list" id="settings-notes-list" aria-label="Section notes in this workspace" hidden></div>
               </section>
               <section class="settings-content-group settings-content-summary" aria-labelledby="settings-searches-title">
                 <div class="settings-content-copy">
@@ -584,6 +588,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261108-saved-content-hover-v1603" type="module"></script>
+    <script src="/web/app.js?v=20261108-workspace-recovery-v1615" type="module"></script>
   </body>
 </html>

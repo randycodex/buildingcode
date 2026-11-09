@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { recordSurvivesBulkClear } from './public/sync-state.js';
 import { syncCodeVersion } from './public/sync-identity.js';
+import {workspaceContentState, workspaceEvidenceKey, workspaceProjectKey, workspaceLinkKey} from './workspace-content.mjs';
 
 export const trashRetentionDays = 30;
 const kinds = new Set(['savedItem', 'annotation', 'project', 'projectSection']);
@@ -15,6 +16,7 @@ function active(kind, record, clears) {
 // Preserve the last visible value, never a previously deleted or cleared copy.
 // Capture only mutations accepted by the ordinary sync conflict rules.
 export function captureTrash(userID, existing, accepted, now = new Date()) {
+  const workspaceState = workspaceContentState(userID, existing);
   const clears = clearsFrom(existing);
   const incomingClears = clearsFrom(accepted);
   const incomingByID = new Map();
@@ -34,7 +36,10 @@ export function captureTrash(userID, existing, accepted, now = new Date()) {
     if (kind === 'annotation' && !String(record.noteBody || '').trim()) continue;
     const original = structuredClone(record);
     delete original.serverEventID;
-    records.push({kind, record:original, mode:kind === 'annotation' ? 'note' : 'record'});
+    const projectIDs = kind === 'project' ? [workspaceProjectKey(record, userID)]
+      : kind === 'projectSection' ? [workspaceLinkKey(record, userID)]
+      : workspaceState.links.filter(link => workspaceEvidenceKey(link) === workspaceEvidenceKey(record)).map(link => workspaceLinkKey(link, userID));
+    records.push({kind, record:original, mode:kind === 'annotation' ? 'note' : 'record', projectIDs: [...new Set(projectIDs.filter(Boolean))]});
   }
   if (!records.length) return null;
   const id = createHash('sha256').update(JSON.stringify([userID, accepted])).digest('hex');
@@ -64,7 +69,34 @@ export function trashSummary(batch) {
     oneFolder ? (counts.collection ? 'Saved collection' : 'Project') : names.slice(0,2).join(', '),
     counts.projectSection ? label(counts.projectSection,'passage link') : ''
   ].filter(Boolean).join(' · ');
-  return {...summary, title, description, count:records.length};
+  return {...summary, title, description, count:records.length, containsWorkspaces: folders.length > 0,
+    projectIDs: [...new Set(records.flatMap(item => trashRecordProjectIDs(item, batch)))]};
+}
+
+function trashRecordProjectIDs(item, batch) {
+  if (item.projectIDs?.length) return item.projectIDs;
+  if (item.kind === 'project') return [workspaceProjectKey(item.record, batch.userID)].filter(Boolean);
+  if (item.kind === 'projectSection') return [workspaceLinkKey(item.record, batch.userID)].filter(Boolean);
+  // Older recovery groups can still be scoped by their included passage links.
+  return [...new Set(batch.records.filter(candidate => candidate.kind === 'projectSection' &&
+    workspaceEvidenceKey(candidate.record) === workspaceEvidenceKey(item.record)).flatMap(candidate => trashRecordProjectIDs(candidate, batch)))];
+}
+
+export function trashBatchForWorkspace(batch, projectID) {
+  if (!projectID) return batch;
+  const records = batch.records.filter(item => trashRecordProjectIDs(item, batch).includes(projectID));
+  return records.length ? {...batch, records} : null;
+}
+
+export function trashBatchWithoutWorkspace(batch, projectID) {
+  if (!projectID) return null;
+  const records = batch.records.flatMap(item => {
+    const ids = trashRecordProjectIDs(item, batch);
+    if (!ids.includes(projectID)) return [item];
+    const remaining = ids.filter(id => id !== projectID);
+    return remaining.length ? [{...item, projectIDs: remaining}] : [];
+  });
+  return records.length ? {...batch, records} : null;
 }
 
 // Only display fields leave storage; recovery records and account identifiers stay private.

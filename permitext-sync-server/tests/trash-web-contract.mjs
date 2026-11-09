@@ -12,23 +12,23 @@ await assert.rejects(preflight({syncOutbox:[{accountUserID:'owner'}]}),/Finish s
 await assert.rejects(preflight({syncConflicts:[{accountUserID:'owner'}]}),/resolve sync conflicts/);
 await assert.rejects(preflight({},async()=>{throw new Error('Recovery service unavailable')}),/unavailable/);
 await preflight({syncOutbox:[{accountUserID:'other'}]});
-const allCodesSource=between('function enqueueSettingsClearForAllCodes(', 'let openTrashAfterSettingsDeletion');
-const notesSource=between('async function clearSettingsNotes()', 'async function performSettingsClearAction(');
-const annotations=[
- {id:'2022-note',sectionID:545,codeVersion:identity.defaultSyncCodeVersion,noteBody:'One',tags:['Keep']},
- {id:'2014-note',sectionID:545,codeVersion:identity.historicalConstructionSyncCodeVersion,noteBody:'Two',tags:['Keep']},
- {id:'tag-only',sectionID:2,codeVersion:identity.defaultSyncCodeVersion,noteBody:'',tags:['Keep']}
-];
-const state={localAnnotations:structuredClone(annotations),sectionNotes:{545:'One'}};
-const clears=[];
-const values={...identity,state,crypto,requirePrivateWorkspaceWritable(){},captureAccountRequest(){return 'owner'},requireCurrentAccountRequest(){},currentContentSummary(){return {annotations}},normalizeAnnotationBlockID:id=>id||'',enqueueSettingsBulkClear(scope,options){clears.push({scope,...options})},saveWorkspaceState(){},activeAccount(){return {userID:'owner'}},flushSyncOutbox:async()=>{}};
-const count=await new Function(...Object.keys(values),allCodesSource+notesSource+';return clearSettingsNotes();')(...Object.values(values));
-assert.equal(count,2,'Same section in two editions is two independent notes');
-assert.equal(new Set(clears.map(c=>c.codeVersion)).size,6);
-assert.equal(new Set(clears.map(c=>c.operationGroupID)).size,1,'One deletion stays in one sync operation');
-assert(state.localAnnotations.every(a=>a.noteBody===''));
-assert(state.localAnnotations.every(a=>a.tags[0]==='Keep'));
-console.log('Web Trash preflight and all-edition note cleanup passed.');
+const notesSource=between('async function clearSettingsWorkspaceContent(', 'async function performSettingsClearAction(');
+const project={id:'workspace-a'};
+const note={sectionID:545,codeVersion:identity.defaultSyncCodeVersion,noteBody:'Keep tags',tags:['Keep']};
+const requestsForClear=[];
+let chosenProject=project;
+const values={requirePrivateWorkspaceWritable(){},workspaceProject:()=>chosenProject,
+ settingsSavedContentForSummary:()=>({notes:[{item:note}],passages:[]}),
+ deleteSavedEvidenceBatch:async(...args)=>{requestsForClear.push(args);return 1;}};
+const clearNotes=new Function(...Object.keys(values),notesSource+';return clearSettingsNotes();');
+assert.equal(await clearNotes(...Object.values(values)),1);
+assert.equal(requestsForClear[0][1],project);
+assert.equal(requestsForClear[0][3].scope,'notes');
+assert.deepEqual(requestsForClear[0][0],[note]);
+chosenProject=null;
+await assert.rejects(clearNotes(...Object.values(values)),/Choose a workspace/);
+assert.equal(requestsForClear.length,1,'A missing workspace cannot send an account-wide clear.');
+console.log('Web Trash preflight and workspace-only note cleanup passed.');
 
 // Exercise the rendered row actions with synthetic recovery copies and no backend.
 class Element {
@@ -54,7 +54,8 @@ const panel={querySelector:selector=>nodes[selector],__refreshSettingsContent:()
 const entries=[{id:'copy-one',title:'Synthetic note',expiresAt:'2026-11-01T12:00:00Z'},{id:'copy-two',title:'Synthetic evidence',expiresAt:'2026-11-02T12:00:00Z'}];
 nodes['.settings-trash'].open=true;
 const requests=[];let current=true,preflights=0,refreshes=0,failNextRequest=false,holdInspection=false,finishInspection,mutateEntries=false,failOnID,holdList=false,finishList;
-const trashValues={document:{createElement:tag=>new Element(tag)},captureAccountRequest:()=> 'owner',isCurrentAccountRequest:()=>current,
+let chosenWorkspace={id:'project-one'};
+const trashValues={workspaceProject:()=>chosenWorkspace,activeAccount:()=>({userID:'owner'}),syncProjectIdentity:identity.syncProjectIdentity,document:{createElement:tag=>new Element(tag)},captureAccountRequest:()=> 'owner',isCurrentAccountRequest:()=>current,
  stripLeadingSectionNumber:value=>value,
  prepareRecoverableDeletion:async()=>{preflights++;},requireCurrentAccountRequest(){assert(current);},
  postResearch:async(path,body)=>{
@@ -79,7 +80,7 @@ await title.fire('click');
 assert.equal(contents.hidden,false);
 assert.equal(title.getAttribute('aria-expanded'),'true');
 assert.equal(contents.querySelector('ol').children.length,1,'Deleted contents use an ordered list.');
-assert.deepEqual(requests.at(-1),{path:'/content/trash',action:'inspect',id:'copy-one'});
+assert.deepEqual(requests.at(-1),{path:'/content/trash',action:'inspect',id:'copy-one',projectID:'project-one'});
 assert.equal(contents.querySelector('strong').textContent,'§ 1020.2 · Width and capacity.');
 assert.match(contents.querySelector('.settings-trash-item-meta').textContent,/Building Code · 2022/);
 assert.match(contents.querySelector('.settings-trash-item-excerpt').textContent,/<script>plain text<\/script>/,'Excerpts render as literal text.');
@@ -190,3 +191,24 @@ assert.equal(requests.length-beforeAutomatic,2,'Concurrent update signals coales
 assert.equal(list.querySelector('.settings-trash-title').textContent,'Copy added by another client','A change received during an in-flight read appears without a Refresh button.');
 assert.equal(selection.disabled,false);
 console.log('Automatic Trash updates passed: collapsed guard, coalesced reads, and changes arriving during an in-flight request.');
+
+// An old workspace response cannot leak into the newly selected workspace.
+holdList=true;
+const obsolete=panel.__refreshSettingsTrash();
+const oldRowRestore=findButton(list,'Restore');
+chosenWorkspace={id:'project-two'};
+panel.__refreshSettingsTrash();
+assert.equal(list.children.length,0,'Changing workspace clears the previous recovery rows immediately.');
+const beforeObsoleteClick=requests.length;
+await oldRowRestore.fire('click');
+assert.equal(requests.length,beforeObsoleteClick,'A detached action cannot restore into a newly selected workspace.');
+holdList=false; finishList({entries:[{id:'old-workspace',title:'Private old workspace',expiresAt:'2026-11-02'}]});
+await obsolete; await new Promise(resolve=>setImmediate(resolve));
+assert.equal(requests.at(-1).projectID,'project-two');
+assert(!list.querySelectorAll('.settings-trash-title').some(node=>node.textContent==='Private old workspace'));
+chosenWorkspace=null;
+const beforeNoWorkspace=requests.length;
+await panel.__refreshSettingsTrash();
+assert.equal(requests.length,beforeNoWorkspace,'No workspace never falls back to account-wide Trash.');
+assert.equal(list.children.length,0);
+console.log('Workspace Trash fencing passed: late responses, detached actions and no-workspace guard.');

@@ -1,5 +1,6 @@
 import { planSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
-import { captureTrash, restoreTrash, trashSummary, trashContents } from "./trash-recovery.mjs";
+import {workspaceContentRetirements} from './workspace-content.mjs';
+import { captureTrash, restoreTrash, trashSummary, trashContents, trashBatchForWorkspace, trashBatchWithoutWorkspace } from "./trash-recovery.mjs";
 import { freePlanMutationDecision } from "./entitlement-contract.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
 
@@ -161,7 +162,7 @@ export function createPostgresSyncRepository(sql) {
       WHERE permitext_user_content_records.user_id = EXCLUDED.user_id
         AND NOT (
           EXCLUDED.entity_kind = 'project'
-          AND permitext_user_content_records.mutation->'project'->>'folderType' = 'reference'
+          AND COALESCE(permitext_user_content_records.mutation->'project'->>'folderType', 'project') = 'reference'
           AND NOT (EXCLUDED.mutation->'project' ? 'folderType')
         )
         AND (
@@ -523,8 +524,9 @@ export function createPostgresSyncRepository(sql) {
     };
   }
 
-  async function push(userID, mutations, recoveryBatch = null, deleteInput = null) {
+  async function push(userID, mutations, recoveryBatch = null, deleteInput = null, recoveryRemainder = null, recoveryExpected = null) {
     let deletePlan = null;
+    let cascade = [];
     const needsRecovery = deleteInput || recoveryBatch || mutations.some(m => m.codeVersionClear || Object.values(m).some(r => r?.deletedAt || (m.annotation && !String(r?.noteBody || "").trim())));
     let original = [], expectedEvent = 0, captured = null, skipped = 0;
     if (needsRecovery) {
@@ -542,7 +544,12 @@ export function createPostgresSyncRepository(sql) {
         const plan = restoreTrash(recoveryBatch, original);
         mutations = plan.mutations;
         skipped = plan.skipped;
-      } else captured = captureTrash(userID,original,mutations);
+      } else {
+        cascade = workspaceContentRetirements(userID, original, mutations);
+        mutations = [...mutations, ...cascade];
+        if (deletePlan) deletePlan.mutations = mutations;
+        captured = captureTrash(userID,original,mutations);
+      }
     }
     const continuityMutations = mutations.filter(({ continuity }) => Boolean(continuity));
     const standardMutations = mutations.filter(({ continuity }) => !continuity);
@@ -551,13 +558,13 @@ export function createPostgresSyncRepository(sql) {
       queries.push(sql`SELECT 1 / CASE WHEN (SELECT COALESCE(MAX(event_id),0) FROM permitext_sync_events WHERE user_id = ${userID}) = ${expectedEvent} THEN 1 ELSE 0 END AS recovery_guard`);
     }
     if (recoveryBatch) {
-      queries.push(sql`SELECT 1 / CASE WHEN EXISTS(SELECT 1 FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${recoveryBatch.id} AND expires_at > CURRENT_TIMESTAMP) THEN 1 ELSE 0 END AS trash_guard`);
+      queries.push(sql`SELECT 1 / CASE WHEN EXISTS(SELECT 1 FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${recoveryBatch.id} AND expires_at > CURRENT_TIMESTAMP AND batch = ${JSON.stringify(recoveryExpected || recoveryBatch)}::jsonb) THEN 1 ELSE 0 END AS trash_guard`);
     }
     const acceptanceIndexes = [];
     const rejectionContextIndexes = [];
     for (const mutation of standardMutations) {
       acceptanceIndexes.push(queries.length);
-      queries.push(compatibilityQuery(userID, mutation, Boolean(recoveryBatch)));
+      queries.push(compatibilityQuery(userID, mutation, Boolean(recoveryBatch || deleteInput) || cascade.includes(mutation)));
       const recordQuery = domainQuery(userID, mutation);
       if (recordQuery) queries.push(recordQuery);
       queries.push(eventQuery(userID, mutation));
@@ -580,13 +587,16 @@ export function createPostgresSyncRepository(sql) {
           JOIN permitext_user_content_records accepted ON accepted.user_id = ${userID} AND accepted.mutation = trigger_mutation
         ) HAVING count(*) > 0 ON CONFLICT(id) DO NOTHING`);
     }
-    if (recoveryBatch || deleteInput) {
+    if (recoveryBatch || deleteInput || cascade.length) {
       // A rejected restore or batch deletion must roll back every write.
       for (const mutation of standardMutations) queries.push(sql`SELECT 1 / CASE WHEN EXISTS(
         SELECT 1 FROM permitext_user_content_records WHERE user_id = ${userID}
         AND record_id = ${mutationRecordID(mutation)} AND mutation = ${JSON.stringify(mutation)}::jsonb
       ) THEN 1 ELSE 0 END AS restore_guard`);
-      if (recoveryBatch) queries.push(sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${recoveryBatch.id}`);
+      if (recoveryBatch) {
+        if (recoveryRemainder) queries.push(sql`UPDATE permitext_content_trash SET batch = ${JSON.stringify(recoveryRemainder)}::jsonb WHERE user_id = ${userID} AND id = ${recoveryBatch.id}`);
+        else queries.push(sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${recoveryBatch.id}`);
+      }
     }
     if (needsRecovery) queries.push(sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND expires_at <= CURRENT_TIMESTAMP`);
     let results;
@@ -760,24 +770,44 @@ export function createPostgresSyncRepository(sql) {
     };
   }
 
-  async function trashAction(userID, action, id) {
+  async function trashAction(userID, action, id, projectID = null) {
     if (action === "inspect") {
       const rows = await sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${id} AND expires_at > CURRENT_TIMESTAMP`;
       if (!rows.length) throw new Error("Trash entry is unavailable or expired.");
-      return {entry: trashContents(safeJSON(rows[0].batch, {}))};
+      const batch = trashBatchForWorkspace(safeJSON(rows[0].batch, {}), projectID);
+      if (!batch) throw new Error('Trash entry is unavailable in this workspace.');
+      return {entry: trashContents(batch)};
     }
     let restoredCount = 0, skippedCount = 0;
     if (action === "restore") {
       const rows = await sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${id} AND expires_at > CURRENT_TIMESTAMP`;
       if (!rows.length) throw new Error("Trash entry is unavailable or expired.");
-      const result = await push(userID, [], safeJSON(rows[0].batch,null));
+      const originalBatch = safeJSON(rows[0].batch, null);
+      const batch = trashBatchForWorkspace(originalBatch, projectID);
+      if (!batch) throw new Error('Trash entry is unavailable in this workspace.');
+      const result = await push(userID, [], batch, null, trashBatchWithoutWorkspace(originalBatch, projectID), originalBatch);
       restoredCount = result.acceptedMutationIDs.length;
       skippedCount = result.skippedCount;
-    } else if (action === "purge") await sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${id}`;
-    else if (action === "empty") await sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID}`;
+    } else if (action === 'purge' || action === 'empty') {
+      const targets = action === 'purge'
+        ? await sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${id}`
+        : await sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID}`;
+      let found = false;
+      for (const row of targets) {
+        const batch = safeJSON(row.batch, {});
+        if (!trashBatchForWorkspace(batch, projectID)) continue;
+        found = true;
+        const remainder = trashBatchWithoutWorkspace(batch, projectID);
+        const result = remainder
+          ? await sql`UPDATE permitext_content_trash SET batch = ${JSON.stringify(remainder)}::jsonb WHERE user_id = ${userID} AND id = ${batch.id} AND batch = ${JSON.stringify(batch)}::jsonb RETURNING id`
+          : await sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${batch.id} AND batch = ${JSON.stringify(batch)}::jsonb RETURNING id`;
+        if (!result.length) throw new Error('Trash changed. Refresh and retry.');
+      }
+      if (action === 'purge' && !found) throw new Error('Trash entry is unavailable in this workspace.');
+    }
     await sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND expires_at <= CURRENT_TIMESTAMP`;
     const rows = await sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} ORDER BY expires_at DESC`;
-    return {entries:rows.map(row => trashSummary(safeJSON(row.batch,{}))),restoredCount,skippedCount};
+    return {entries:rows.map(row => trashBatchForWorkspace(safeJSON(row.batch,{}), projectID)).filter(Boolean).map(trashSummary),restoredCount,skippedCount};
   }
   async function deleteSavedEvidence(userID, input) {
     for (let attempt = 1; attempt <= 3; attempt += 1) {

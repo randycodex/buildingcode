@@ -26,7 +26,7 @@ function harness(signedIn, pro = signedIn) {
       addEventListener(name, listener) { this.listeners[name] = listener; },
       showModal() { this.open = true; },
       close() { this.open = false; this.listeners.close(); },
-      remove() { currentDialog = null; },
+      remove() { this.parent?.removeChild(this); if (currentDialog === this) currentDialog = null; },
       querySelector(selector) { return this.querySelectorAll(selector)[0] || null; },
       querySelectorAll(selector) { return this.children.flatMap(child => {
         const matches = selector.split(", ").some(part => part.startsWith(".")
@@ -143,8 +143,10 @@ for (const signedIn of [false, true]) {
     assert.equal(panel.scroll.children.length, 2);
     assert.deepEqual(account.children.slice(1, 3), [panel.profile, panel.plan]);
     assert.equal(recovery.children[0].textContent, "Data & recovery");
-    assert.deepEqual(recovery.children.slice(1), [panel.conflicts, panel.data]);
-    assert.deepEqual(panel.data.children, [panel.projects, panel.saved, panel.trash, panel.offline],"Offline follows Trash within Data & Recovery");
+    assert.deepEqual(recovery.children.slice(1), [panel.data]);
+    assert.deepEqual(account.children.slice(1, 5), [panel.profile, panel.plan, panel.offline, panel.conflicts], "Account keeps device-wide Offline and sync controls.");
+    assert.deepEqual(panel.data.children, [panel.saved, panel.trash], "Data & Recovery contains only workspace data.");
+    assert(!panel.data.children.includes(panel.projects), "Workspace management moves to the workspace menu.");
     assert.deepEqual(Array.from(panel.__settingsTabs.element.labels),["Account","Data & Recovery"],"Offline has no separate tab");
     assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");
     assert.equal(account.children.at(-1).children[1], panel.deleteAccount, "One direct action keeps the original deletion confirmation handler.");
@@ -281,4 +283,4 @@ console.log("Settings tabs retain all category controls and ignore legacy column
 const migrated = harness(true);
 migrated.context.selectedSettingsTab = 'library';
 migrated.context.toggleAccountDialog();
-assert.equal(migrated.dialog().dataset.settingsTab,'recovery','The retired Offline tab opens Data & Recovery');
+assert.equal(migrated.dialog().dataset.settingsTab,'account','The retired Offline tab opens Account');

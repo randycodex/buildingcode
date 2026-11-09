@@ -4,9 +4,10 @@ import vm from 'node:vm';
 import { emptyWorkspaceLayout, normalizeWorkspaceRegistry, captureWorkspaceLayout } from '../public/workspace-state.js';
 const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const chooser = app.slice(app.indexOf('async function openWorkspaceContextMenu('), app.indexOf('function focusActiveWorkspaceTab('));
+assert.match(chooser, /label: "Manage workspaces".*run: openWorkspaceManager/);
 const mobileChooser = app.slice(app.indexOf('function openMobileMoreSheet('), app.indexOf('async function openWorkspaceContextMenu('));
 for (const source of [chooser, mobileChooser]) {
-  assert.doesNotMatch(source, /New workspace|Manage workspaces|Rename workspace|Duplicate workspace|Delete workspace|Workspaces share/);
+  assert.doesNotMatch(source, /New workspace|Rename workspace|Duplicate workspace|Delete workspace|Workspaces share/);
   assert.match(source, /add workspace/);
   assert.doesNotMatch(source, /Manage Projects/, 'Project management belongs in Settings');
 }

@@ -67,5 +67,44 @@ try {
   assert.equal(trash.body.entries.length,1);assert.equal(trash.body.entries[0].count,201);
   const restored=await post("/content/trash",{auth,action:"restore",id:trash.body.entries[0].id},token);
   assert.equal(restored.status,200);assert.equal(restored.body.restoredCount,201);
-  console.log("Batch delete HTTP passed: 101 items, authenticated isolation, bounds, shared destination, notes, concurrent retries and Trash restore.");
+  // One recovery operation may contain multiple workspaces. Every scoped
+  // action must preserve the other workspace's records, including on retries.
+  const scopedItems = ['a', 'b'].flatMap((suffix, index) => [
+    wrap('project', {id:`scope-${suffix}`, clientID:`scope-${suffix}`, name:`Scope ${suffix}`}),
+    wrap('projectSection', {id:`scope-link-${suffix}`, folderClientID:`scope-${suffix}`, sectionID:12000+index}),
+    wrap('savedItem', {id:`scope-save-${suffix}`, sectionID:12000+index}),
+    wrap('annotation', {id:`scope-note-${suffix}`, sectionID:12000+index, noteBody:`Note ${suffix}`, tags:['keep']})
+  ]);
+  const pushed = await post('/sync/push', {auth,batch:{user:{id:userID},mutations:scopedItems}}, token);
+  assert.equal(pushed.status,200,JSON.stringify(pushed.body));
+  assert.deepEqual(pushed.body.rejectedMutationIDs,[]);
+  const deletedAt = new Date().toISOString();
+  const deleted = await post('/sync/push', {auth,batch:{user:{id:userID},mutations:scopedItems.filter(m=>m.project).map(m=>({project:{...m.project,updatedAt:deletedAt,deletedAt}}))}},token);
+  assert.equal(deleted.status,200,JSON.stringify(deleted.body));
+  const scopeList = projectID => post('/content/trash', {auth,action:'list',projectID},token);
+  const inA = await scopeList('scope-a'), inB = await scopeList('scope-b');
+  assert.equal(inA.body.entries.length,1); assert.equal(inA.body.entries[0].count,4);
+  assert.equal(inB.body.entries.length,1); assert.equal(inB.body.entries[0].count,4);
+  assert.equal((await scopeList('unrelated')).body.entries.length,0);
+  const recoveryID = inA.body.entries[0].id;
+  assert.equal((await post('/content/trash',{auth,action:'inspect',id:recoveryID,projectID:'unrelated'},token)).status,409);
+  assert.equal((await post('/content/trash',{auth,action:'purge',id:recoveryID,projectID:'unrelated',confirmation:'DELETE'},token)).status,409);
+  const inspection = await post('/content/trash',{auth,action:'inspect',id:recoveryID,projectID:'scope-a'},token);
+  assert.equal(inspection.body.entry.items.length,4);
+  const restoredA = await post('/content/trash',{auth,action:'restore',id:recoveryID,projectID:'scope-a'},token);
+  assert.equal(restoredA.status,200,JSON.stringify(restoredA.body)); assert.equal(restoredA.body.restoredCount,4);
+  assert.equal((await scopeList('scope-a')).body.entries.length,0);
+  assert.equal((await scopeList('scope-b')).body.entries[0].count,4);
+  const scopedPull = await post('/sync/pull',{auth},token);
+  for (const kind of ['project','projectSection','savedItem']) {
+    const record = scopedPull.body.mutations.find(m => kind === 'project' ? m.project?.clientID === 'scope-a' : m[kind]?.sectionID === 12000)?.[kind];
+    assert(record && !record.deletedAt, `${kind} in A was restored`);
+  }
+  assert(scopedPull.body.mutations.some(m=>m.annotation?.noteBody==='Note a'));
+  assert(scopedPull.body.mutations.some(m=>m.annotation?.sectionID===12001&&!m.annotation.noteBody));
+  await post('/content/trash',{auth,action:'empty',projectID:'scope-a',confirmation:'DELETE'},token);
+  assert.equal((await scopeList('scope-b')).body.entries.length,1);
+  await post('/content/trash',{auth,action:'purge',id:recoveryID,projectID:'scope-b',confirmation:'DELETE'},token);
+  assert.equal((await scopeList('scope-b')).body.entries.length,0);
+  console.log("Batch delete HTTP passed: 101 items, authenticated isolation, bounds, shared destination, notes, concurrent retries, cascaded workspace deletion and scoped inspect/restore/purge.");
 } finally { await new Promise(resolve=>server.close(resolve)); await rm(directory,{recursive:true,force:true}); }

@@ -84,5 +84,37 @@ const merged=(await db.query('SELECT batch FROM permitext_content_trash WHERE us
 assert.equal(merged.userID,'linked-owner');
 assert.equal(merged.records[0].record.userID,'linked-owner');
 assert.equal(merged.records[0].record.id,'linked-owner:project');
+// Workspace deletion and recovery must be atomic in the production SQL adapter.
+await db.query("UPDATE permitext_entitlements SET plan='pro' WHERE user_id=$1",[user]);
+const fresh=new Date(Date.now()+1000).toISOString();
+const record=(kind,values)=>({[kind]:{userID:user,codeVersion,updatedAt:fresh,...values}});
+const wa=record('project',{id:'ws-a',clientID:'ws-a',name:'Workspace A'}), wb=record('project',{id:'ws-b',clientID:'ws-b',name:'Workspace B'});
+const scopeSeed=[wa,wb,
+ record('projectSection',{id:'wa-link',folderClientID:'ws-a',sectionID:101}),
+ record('projectSection',{id:'wb-link',folderClientID:'ws-b',sectionID:202}),
+ record('savedItem',{id:'wa-save',sectionID:101}),record('savedItem',{id:'wb-save',sectionID:202}),
+ record('annotation',{id:'wa-note',sectionID:101,noteBody:'A only',tags:['keep']}),record('annotation',{id:'wb-note',sectionID:202,noteBody:'B only',tags:[]})];
+const seeded=await repo.push(user,scopeSeed);
+assert.equal(seeded.acceptedMutationIDs.length,8,JSON.stringify(seeded));
+const removedAt=new Date(Date.now()+2000).toISOString();
+const deleteBoth=[wa,wb].map(m=>({project:{...m.project,updatedAt:removedAt,deletedAt:removedAt}}));
+await db.query("UPDATE permitext_entitlements SET plan='free' WHERE user_id=$1",[user]);
+const deleting=await repo.push(user,deleteBoth);
+assert.equal(deleting.rejectedMutationIDs.length,0);
+assert.equal(deleting.acceptedMutationIDs.length,8,'Projects, passage links, saves and notes retire together.');
+const scopedA=(await repo.trashAction(user,'list',undefined,'ws-a')).entries;
+assert.equal(scopedA.length,1);assert.equal(scopedA[0].count,4);
+const inA=await repo.trashAction(user,'inspect',scopedA[0].id,'ws-a');
+assert.equal(inA.entry.items.length,4);assert(!inA.entry.items.some(item=>item.name==='Workspace B'||item.excerpt==='B only'));
+await assert.rejects(repo.trashAction(user,'restore',scopedA[0].id,'unknown'),/workspace/);
+assert.equal((await repo.trashAction(user,'restore',scopedA[0].id,'ws-a')).restoredCount,4);
+assert.equal((await db.query("SELECT mutation->'annotation'->>'noteBody' AS body FROM permitext_user_content_records WHERE record_id='wa-note'")).rows[0].body,'A only');
+assert.equal((await db.query("SELECT mutation->'annotation'->>'noteBody' AS body FROM permitext_user_content_records WHERE record_id='wb-note'")).rows[0].body,'','Restoring A cannot restore B.');
+const scopedB=(await repo.trashAction(user,'list',undefined,'ws-b')).entries;
+assert.equal(scopedB.length,1);assert.equal(scopedB[0].count,4);
+assert.equal((await repo.trashAction(user,'list',undefined,'ws-a')).entries.length,0);
+await repo.trashAction(user,'purge',scopedB[0].id,'ws-b');
+assert.equal((await repo.trashAction(user,'list',undefined,'ws-b')).entries.length,0);
+console.log('PostgreSQL workspace recovery passed: cascade, atomic scoped inspection/restore, unrelated workspace retained and scoped purge.');
 await db.close();
 console.log('PostgreSQL Trash: actual SQL delete/restore, typed-table updates, rollback on snapshot failure, ownership, Free restore, rejected writes, bulk notes, collection type and purge passed.');

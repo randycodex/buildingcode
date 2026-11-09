@@ -7,7 +7,8 @@ const defaultKey = record => [record.codeVersion || 'nyc-2022', record.sectionID
 // the same passage. The caller supplies its account-scoped, bulk-clear-aware summary.
 export function settingsSavedContentSnapshot(summary = {}, {
   recordKey = defaultKey, projectID = record => text(record.clientID || record.id),
-  belongsToProject = (link, project) => text(link.folderClientID || link.projectID) === projectID(project)
+  belongsToProject = (link, project) => text(link.folderClientID || link.projectID) === projectID(project),
+  workspace
 } = {}) {
   const valid = record => record && !record.deletedAt && Number(record.sectionID) > 0;
   const projects = (summary.projects || []).filter(project => !project.deletedAt);
@@ -37,12 +38,14 @@ export function settingsSavedContentSnapshot(summary = {}, {
     .filter(link => link.key === recordKey(entry.item)).map(link => link.project)});
   const ordered = entries => [...entries.values()].map(decorate)
     .sort((a, b) => timestamp(b.item) - timestamp(a.item) || a.key.localeCompare(b.key));
-  return {passages: ordered(passages), notes: ordered(notes), projectLinkCount: links.size};
+  const inWorkspace = entry => workspace === undefined || Boolean(workspace && entry.projects.some(project => projectID(project) === projectID(workspace)));
+  return {passages: ordered(passages).filter(inWorkspace), notes: ordered(notes).filter(inWorkspace),
+    projectLinkCount: [...links.values()].filter(link => workspace === undefined || Boolean(workspace && projectID(link.project) === projectID(workspace))).length};
 }
 
 export function createSettingsSavedContent(root, {
   isCurrent, hydrate, codeLabel, noteText = text, projectID, projectName, availableProjects,
-  onOpen, onAssign, onRefresh
+  onOpen, onAssign, onRefresh, workspaceScoped = false
 }) {
   const document = root.ownerDocument;
   const controller = new AbortController();
@@ -84,7 +87,7 @@ export function createSettingsSavedContent(root, {
       list.replaceChildren();
       if (!entries.length) {
         list.append(node('p', 'settings-library-empty', kind === 'bookmarks'
-          ? 'No saved passages in your account' : 'No section notes in your account'));
+          ? `No saved passages in ${workspaceScoped ? 'this workspace' : 'your account'}` : `No section notes in ${workspaceScoped ? 'this workspace' : 'your account'}`));
         continue;
       }
       const keyFor = entry => `${kind}:${entry.key}:${entry.item.updatedAt || ''}`;
@@ -162,7 +165,7 @@ export function createSettingsSavedContent(root, {
           event.preventDefault(); event.stopPropagation();
           picker.hidden = true; assign.setAttribute('aria-expanded', 'false'); assign.focus();
         });
-        actions.append(membership, assign);
+        if (!workspaceScoped) actions.append(membership, assign);
         body.append(meta, title, preview, actions, picker, feedback);
         row.append(body);
         ordered.append(row);
@@ -182,7 +185,7 @@ export function createSettingsSavedContent(root, {
     }
   }
   return {
-    refresh(value) { if (!current()) return; snapshot = value; if (expanded) render(); },
+    refresh(value) { if (!current()) return; if (snapshot.workspaceKey !== value.workspaceKey) expanded = ''; snapshot = value; render(); },
     dispose() { disposed = true; generation++; controller.abort(); cache.clear(); }
   };
 }

@@ -10,7 +10,7 @@ function actual(name) {
   return source.slice(start, source.indexOf('\n}', start) + 2);
 }
 assert.doesNotMatch(html, /id="open-unassigned"/);
-for (const name of ['renderReaderChapterSection','renderInlineCommentBox','syncReaderNoteBookmarkButtons']) {
+for (const name of ['buildReaderChapterSection','renderInlineCommentBox','syncReaderNoteBookmarkButtons']) {
   assert.doesNotMatch(actual(name), /savedSectionRecord\(/, 'Reader bookmark controls use current Project membership');
   assert.match(actual(name), /isSectionSaved\(/);
 }
@@ -119,6 +119,7 @@ class Element {
 let createCalls = 0, resolveCreate, identity = 'A';
 const body = new Element('body');
 const chooser = vm.createContext({ document: { createElement: tag => new Element(tag), body },
+  isProAccount: () => true,
   workspaceProject: () => chooser.active || null, hasCapability: () => true,
   captureAccountRequest: () => identity, requireCurrentAccountRequest: captured => { if (identity !== captured) throw Error('Account changed'); },
   isCurrentAccountRequest: captured => captured === identity,
@@ -131,6 +132,7 @@ const chooser = vm.createContext({ document: { createElement: tag => new Element
 });
 vm.runInContext('let pendingProjectChoice=null, cancelPendingProjectChoice=null;\n' + actual('chooseProjectForSaving'), chooser);
 let pending = chooser.chooseProjectForSaving();
+if (!body.children.length) await pending;
 const dialog = body.children[0].children[0];
 const form = dialog.children.find(item => item.tag === 'form');
 form.children[0].value = 'New test Project';

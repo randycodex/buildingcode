@@ -33,6 +33,12 @@ assert.deepEqual(result.passages.find(entry => entry.key === 'nyc-2022:101:scope
 assert(result.passages.some(entry => entry.key === 'nyc-2022:303:scope'));
 assert(!result.passages.some(entry => [202,404,505].includes(entry.item.sectionID)));
 assert.deepEqual(summary, before, 'Browsing and deduplication never mutate or delete original records.');
+const scoped = settingsSavedContentSnapshot(summary, {workspace: project});
+assert.equal(scoped.passages.length, 2, 'A workspace only includes its own exact passage links, including link-only records.');
+assert.equal(scoped.notes.length, 2, 'Distinct notes on its linked passage remain available.');
+assert.equal(scoped.projectLinkCount, 2);
+assert.deepEqual(settingsSavedContentSnapshot(summary, {workspace: null}), {passages: [], notes: [], projectLinkCount: 0}, 'No selected workspace cannot expose account-wide saves.');
+assert.equal(settingsSavedContentSnapshot(summary, {workspace: {id: 'unknown'}}).passages.length, 0);
 assert.deepEqual(settingsSavedContentSnapshot(), {passages: [], notes: [], projectLinkCount: 0});
 
 // The source adapter supplies the same edition/block normalization used by Reader.
@@ -115,4 +121,16 @@ browsing.refresh({passages:[],notes:[]});
 assert.equal(working.list('notes').querySelectorAll('.settings-library-row').length,0,'Cleared notes cannot remain in the expanded list.');
 assert.equal(working.list('notes').querySelector('.settings-library-empty').textContent,'No section notes in your account');
 browsing.dispose();
+const workspaceUI = host();
+const scopedControls = createSettingsSavedContent(workspaceUI.root, {
+  isCurrent:()=>true, hydrate:async items=>items, codeLabel:()=> 'Building Code (2022)',
+  projectID:p=>p.id, projectName:p=>p.name, workspaceScoped:true, onOpen:async()=>{}
+});
+scopedControls.refresh({...scoped, workspaceKey:'a'});
+workspaceUI.trigger('bookmarks').click(); await tick();
+assert.equal(workspaceUI.list('bookmarks').querySelectorAll('.settings-library-membership').length,0);
+assert.equal(workspaceUI.list('bookmarks').querySelectorAll('.settings-library-action').length,0, 'Workspace recovery does not present unassigned-item management.');
+scopedControls.refresh({passages:[], notes:[], workspaceKey:'b'});
+assert.equal(workspaceUI.list('bookmarks').hidden,true,'Changing workspace closes old lists and fences their async rows.');
+scopedControls.dispose();
 console.log('Saved Content controls passed: exact previews, additive Project selection, empty refresh, one expanded list, late-response isolation, and cleanup.');

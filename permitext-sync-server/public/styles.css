@@ -21269,6 +21269,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 
 /* Settings and Project context share the Reader's floating menu surface. */
 .account-dialog.account-screen.settings-floating-panel,
+.workspace-manager-floating.account-screen,
 .workspace-shell > .project-details-screen.workspace-floating-panel {
   --workspace-floating-panel-gutter: 20px;
   --project-details-first-line-height: 21px;
@@ -21298,6 +21299,22 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workspace-floating-panel .project-information-panel[hidden] { display: none !important; }
 .settings-floating-panel > .web-warning-backdrop.is-column-scoped { padding: 20px; border-radius: inherit; container-type: inline-size; }
 .account-dialog.account-screen.settings-floating-panel { --account-category-gutter: 20px; --account-category-top-gutter: 0px; --account-scroll-fade-size: var(--space-3); --settings-disclosure-indent: 20px; }
+.workspace-manager-floating.account-screen { --account-category-gutter: 20px; --settings-disclosure-indent: 20px; }
+.workspace-manager-floating .workspace-manager-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: var(--workspace-menu-height); margin-bottom: 20px; }
+.workspace-manager-header h2 { margin: 0; font-size: 14px; }
+.workspace-manager-floating .workspace-manager-body { flex: 1; min-height: 0; height: auto; margin: 0; background: transparent; }
+.workspace-manager-floating .settings-project-manager-content { padding-bottom: 20px; }
+.workspace-manager-floating .project-manager-controls { display: flex; align-items: center; justify-content: space-between; }
+.workspace-manager-floating :is(.project-manager-controls nav, .project-manager-toolbar) { display: flex; gap: 8px; }
+.workspace-manager-floating .project-manager-controls button { border: 0; border-radius: var(--radius-pill); background: transparent; padding: 5px 12px; min-height: 30px; }
+.workspace-manager-floating .project-manager-controls button[aria-pressed="true"] { background: var(--menu-highlight); }
+.workspace-manager-floating .project-manager-row:only-child { border-bottom: 0; }
+.workspace-manager-floating .workspace-manager-body > .settings-trash { margin-inline: -20px; padding-inline: 20px; border-top: 1px solid var(--border); }
+.account-screen .settings-workspace-scope { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.settings-workspace-scope span { display: block; color: var(--text-secondary); font-size: var(--settings-type-support); margin-bottom: 5px; }
+.settings-workspace-scope h3 { margin: 0; overflow-wrap: anywhere; font-size: var(--settings-type-body); line-height: 1.4; }
+.account-screen .settings-account-activity { border: 0; border-radius: 0; margin: 0; background: transparent; }
+.account-screen .settings-account-column-account > .settings-offline-card { margin-block: 20px; padding-top: 20px; border-top: 1px solid var(--border); border-radius: 0; background: transparent; }
 .settings-floating-panel .account-screen-header,
 .workspace-floating-panel .project-details-screen-header {
   display: flex;

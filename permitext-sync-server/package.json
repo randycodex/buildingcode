@@ -46,7 +46,7 @@
     "test:native-parent-context": "python3 tests/native-parent-section-context-contract.py",
     "test:search-session-persistence": "python3 tests/search-session-persistence-contract.py",
     "test:native-reader-integrity": "node tests/native-reader-source-integrity-contract.mjs && node tests/html-reader-visible-heading-contract.mjs",
-    "test:trash": "node tests/trash-recovery.mjs && node tests/trash-recovery-http.mjs && node tests/trash-web-contract.mjs && node tests/project-trash-confirmation.mjs && node tests/project-delete-retired-workboard.mjs",
+    "test:trash": "node tests/workspace-content.mjs && node tests/settings-saved-content.mjs && node tests/saved-evidence-delete-http.mjs && node tests/trash-recovery.mjs && node tests/trash-recovery-http.mjs && node tests/trash-web-contract.mjs && node tests/project-trash-confirmation.mjs && node tests/project-delete-retired-workboard.mjs",
     "test:trash:postgres": "node tests/trash-postgres.mjs",
     "test:notebook-historical-references": "node tests/notebook-historical-reference-http.mjs",
     "test:research-site-investigation": "node tests/research-site-investigation-contract.mjs && node tests/research-site-classification-retrieval-contract.mjs && node tests/research-site-investigation-http-contract.mjs && node tests/research-site-investigation-http-contract.mjs --rich-project && node tests/research-writer-policy-contract.mjs && node tests/research-answer-bounded-read-contract.mjs && node tests/research-record-navigation-contract.mjs",
