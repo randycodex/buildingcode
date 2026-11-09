@@ -18486,7 +18486,9 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-data-card .settings-content-trash:disabled:hover { background: transparent; }
 .account-screen .settings-data-card .settings-trash-help { margin: 0 0 6px; color: var(--text-secondary); font-size: var(--settings-type-support); line-height: 1.5; }
 .account-screen .settings-data-card :is(.settings-recovery-scope, .settings-recovery-help) { margin: 0 0 12px; color: var(--text-secondary); font-size: var(--settings-type-support); line-height: 1.5; }
-.account-screen .settings-trash-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.account-screen .settings-data-card > .settings-trash > summary { min-height: calc(1.4em + 2 * var(--space-3)); padding-block: var(--space-1); box-sizing: border-box; }
+.account-screen .settings-trash-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-left: auto; font-weight: var(--settings-weight-regular); }
+.account-screen .settings-trash:not([open]) .settings-trash-toolbar { display: none; }
 .account-screen .settings-data-card .settings-trash-select[aria-pressed="true"] { background: var(--menu-highlight); }
 .account-screen .settings-data-card .settings-trash-toolbar .settings-trash-select:not([aria-pressed="true"]) { background: transparent; }
 .account-screen .settings-trash-selection-toolbar,

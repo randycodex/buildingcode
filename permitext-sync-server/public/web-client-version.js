@@ -1,4 +1,4 @@
-export const webAppVersion = "20261108-workspace-highlight-only-v1594";
+export const webAppVersion = "20261108-trash-heading-action-v1595";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";
