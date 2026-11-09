@@ -19701,6 +19701,7 @@ html body .column-group-menu-button:focus-visible {
 .project-facts-panel {
   --pane-min-width: 600px;
 }
+.project-facts-panel { --project-fact-item-gap: 5px; }
 .project-facts-panel > .project-information-content {
   width: calc(100% + (2 * var(--panel-padding)));
   margin-inline: calc(-1 * var(--panel-padding));
@@ -19721,6 +19722,7 @@ html body .column-group-menu-button:focus-visible {
   gap: calc(2 * var(--space-2));
 }
 .project-facts-panel .saved-project-structured-facts-list {
+  gap: var(--project-fact-item-gap);
   width: 100%;
   margin-inline: 0;
 }
@@ -20989,7 +20991,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   animation: none;
   color: inherit;
 }
-.project-details-screen .project-details-columns .saved-project-structured-fact { padding-block: 16px; row-gap: 8px; }
+.project-details-screen .project-details-columns .saved-project-structured-fact { min-height: 0; padding-block: 0; row-gap: var(--project-fact-item-gap); }
 .project-open-question-list { display: grid; gap: 12px; padding-left: 24px; margin: 8px 0 10px; }
 .project-open-question-list li::marker { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 .project-open-question-list textarea { display: block; box-sizing: border-box; width: 100%; min-width: 0; min-height: 1.5em; max-height: none; field-sizing: content; resize: none; overflow: hidden; padding: 0; margin: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-primary); font: inherit; font-size: 14px; line-height: 1.5; text-align: left; white-space: pre-wrap; overflow-wrap: anywhere; }
