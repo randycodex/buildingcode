@@ -11,7 +11,9 @@ new-domain production acceptance or App Store release authorization.
 - Keep the existing Vercel project `permitext-sync` and its current database.
 - Keep the same Clerk application and production instance. The application
   name is now **per codes**, and its support email is `permitext@gmail.com`.
-  Both values were saved and verified after reload. The default verification
+  Both values were saved and verified after reload. Its old wordmark logo and
+  favicon were also replaced with the existing app icon and verified after a
+  fresh reload. The default verification
   email preview now renders per codes through `{{app.name}}`; its sending
   domain remains permitext.com until the coordinated domain change.
 - `per.codes` and `www.per.codes` are attached to that Vercel project. The www
@@ -242,3 +244,12 @@ Final homepage screenshot:
 `permitext-sync-server/public/marketing/workspace-per-codes.png`. This is a
 fresh screenshot of actual Reader/Search UI with synthetic local project data,
 not an AI-edited product screenshot. Old unused marketing captures are retained.
+
+
+Clerk asset closeout: uploaded the existing
+`public/icons/permitext-192.png` logo and `public/favicon-32.png` favicon to the
+same application. Native Chrome file dialogs completed both uploads; no browser
+permission setting was changed. The direct extension file-upload path requires
+“Allow access to file URLs,” so use the native picker if that option remains off.
+Updated evidence is in `clerk-branding.jpg`; the earlier name-only view is kept
+as `clerk-branding-before-logo.jpg` in the private evidence directory.
