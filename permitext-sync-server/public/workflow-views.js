@@ -14,7 +14,7 @@ export function normalizeWorkflowMembership(value) {
       !(isNotesPane(id) && view === 'research' && !views.includes(explicitNotesResearch))))]]));
 }
 export function workflowHome(paneID, anchors = {}) {
-  if (/^(?:project:notebook:|utility:saved(?::|$))/.test(paneID)) return 'notebook';
+  if (/^(?:project:(?:notebook|notes-index):|utility:saved(?::|$))/.test(paneID)) return 'notebook';
   const anchor = anchors[paneID];
   if (anchor && anchor !== paneID && /^(?:project:notebook:|utility:saved(?::|$))/.test(anchor)) return 'notebook';
   return 'research';

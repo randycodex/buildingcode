@@ -62,6 +62,9 @@ const track={scrollLeft:110,querySelectorAll:()=>panes};
 let constructions=0, needProject=false, dividerUpdates=0;
 let reportOpen=false, detailsOpen=false;
 const c=vm.createContext({isProAccount:()=>true,columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){if(reportOpen){reportOpen=false;c.syncWorkflowColumnPresentation();}}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){if(detailsOpen){detailsOpen=false;c.syncWorkflowColumnPresentation();}}},toggleSettingsButton:null,toggleReportButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
+  activeWorkspaceID:'workspace',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
+  prepareNotebookView:async()=>{},isProjectNotebookPaneID:id=>id.startsWith('project:notebook:'),
+  selectedNotebookColumn:()=>({id:'primary',projectID:'a'}),notebookColumnPaneID:()=>notebook.dataset.paneId,
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
   document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,workspaceColumnsRequireProject:()=>false,
   syncTopbarProjectToolStates(){},syncNotebookLanding(){},syncResearchStart(){},ensureNotebookTabCatalog:async()=>{},syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
@@ -143,6 +146,7 @@ let releaseDeferred;
 c.transitionWorkspace=()=>new Promise(resolve=>{releaseDeferred=resolve;});
 notebook.dataset.workspacePaneDeferred='true';
 const lateReveal=c.switchWorkflowView('notebook');
+await new Promise(resolve=>setImmediate(resolve));
 state.workflowView='research';state.workflowNavigationGeneration++;
 releaseDeferred();assert.equal(await lateReveal,false,'A delayed reveal must not finish against a subsequently selected view');
 delete notebook.dataset.workspacePaneDeferred;

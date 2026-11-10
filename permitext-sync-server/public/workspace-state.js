@@ -1,6 +1,6 @@
 import { normalizeVisitedWorkflowViews } from "./minimal-workflow.js";
-import { normalizeNotebookColumns } from "./notebook-columns.js?v=2";
-import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=9";
+import { normalizeNotebookColumns } from "./notebook-columns.js?v=4";
+import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=14";
 const workspaceRegistryVersion = 3;
 const defaultWorkspaceName = "General";
 const maximumWorkspaceNameLength = 40;
@@ -45,7 +45,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
 ]);
 
 export function canGroupColumn(id) {
-  return typeof id === "string" && !/^(?:utility:(?:saved|sdc)(?::|$)|project:(?:context|facts|notebook|report-draft):)/.test(id);
+  return typeof id === "string" && !/^(?:utility:(?:saved|sdc)(?::|$)|project:(?:context|facts|notebook|notes-index|report-draft):)/.test(id);
 }
 
 export function normalizeColumnGroups(value) {

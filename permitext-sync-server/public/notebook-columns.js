@@ -1,5 +1,5 @@
 export function normalizeNotebookColumns(value) {
-  const ids = new Set(), openCards = new Set();
+  const ids = new Set(), openCards = new Set(), selectedProjects = new Set();
   return (Array.isArray(value) ? value : []).flatMap(column => {
     if (!column || typeof column.id !== 'string' || !column.id ||
         typeof column.projectID !== 'string' || !column.projectID) return [];
@@ -9,9 +9,12 @@ export function normalizeNotebookColumns(value) {
     if (ids.has(key) || column.open !== false && cardID && openCards.has(cardKey)) return [];
     ids.add(key);
     if (column.open !== false && cardID) openCards.add(cardKey);
+    const selected = column.open !== false && column.selected === true && !selectedProjects.has(column.projectID);
+    if (selected) selectedProjects.add(column.projectID);
     return [{id: column.id, projectID: column.projectID, cardID,
       title: typeof column.title === 'string' ? column.title.slice(0, 300) : '', open: column.open !== false,
-      ...(column.newNote === true && !cardID ? {newNote: true} : {})}];
+      ...(column.newNote === true && !cardID ? {newNote: true} : {}),
+      ...(selected ? {selected: true} : {})}];
   });
 }
 

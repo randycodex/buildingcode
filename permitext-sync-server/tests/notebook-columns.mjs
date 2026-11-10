@@ -110,24 +110,21 @@ const tabContext=vm.createContext({state:tabState,notebookTabs:tabs,newNotebookN
   workspacePrivatePresentationAllowed:()=>true,workspaceProject:()=>project,projectDetailKey:p=>p.id,
   notebookCatalogs:new Map([['project',[{id:'a',title:'Note A'},{id:'closed',title:'Closed Note'},{id:'b',title:'Note B'}]]]),
   notebookColumnsForProject:()=>tabColumns,notebookColumnPaneID,notebookColumnMounts:new Map(),
-  hasCapability:()=>true,projectToolTogglePending:false,syncNotebookLanding(){},
+  hasCapability:()=>true,projectToolTogglePending:false,syncNotebookLanding(notes){tabContext.renderedNotes=notes;},
   document:{createElement(){return {attrs:{},setAttribute(key,value){this.attrs[key]=value;},addEventListener(){}};}}
 });
 vm.runInContext(actual('syncNotebookNoteTabs'),tabContext);
 tabContext.syncNotebookNoteTabs();
-assert.deepEqual(tabs.children.map(button=>button.textContent),['Note B','Pending Note','Note A','Recently saved Note']);
-tabState.paneOrder.reverse();
-tabContext.syncNotebookNoteTabs();
-assert.deepEqual(tabs.children.map(button=>button.textContent),['Note A','Pending Note','Note B','Recently saved Note'],
-  'Reordering mounted columns immediately updates their toolbar buttons, with closed Notes in the overflow menu.');
-assert.deepEqual(tabs.children.map(button=>button.attrs['aria-pressed']),['true','true','true','true']);
-assert.deepEqual(Array.from(tabContext.closedNotebookNoteChoices.notes,card=>card.title),['Note A','Pending Note','Note B','Recently saved Note','Closed Note']);
+assert.deepEqual(tabs.children, [], 'Open notes use the persistent list instead of duplicate toolbar tabs.');
+assert.equal(tabs.hidden, true);
+assert.deepEqual(Array.from(tabContext.renderedNotes, card=>card.title),['Note A','Closed Note','Note B','Pending Note','Recently saved Note']);
+tabState.paneOrder.reverse(); tabContext.syncNotebookNoteTabs();
+assert.deepEqual(Array.from(tabContext.renderedNotes, card=>card.title),['Note A','Closed Note','Note B','Pending Note','Recently saved Note'], 'Selecting or moving an editor keeps the note list order stable.');
 tabColumns[0].open=false;tabContext.syncNotebookNoteTabs();
-assert(!tabs.children.some(button=>button.textContent==='Note A'));
-assert(tabContext.closedNotebookNoteChoices.notes.some(card=>card.id==='a'),'Closing a Note moves its button into the overflow menu.');
-tabColumns[0].open=true;tabContext.syncNotebookNoteTabs();
-assert(tabs.children.some(button=>button.textContent==='Note A'));
-assert(tabContext.closedNotebookNoteChoices.notes.some(card=>card.id==='a'),'The full Notes menu includes open and closed Notes.');
+assert(tabContext.renderedNotes.some(card=>card.id==='a'), 'A closed note remains available in the list.');
+const selectedLayout=normalizeWorkspaceLayout({notebookColumns:[{...initial[0],selected:true}, {...initial[1],selected:true}]});
+assert.equal(selectedLayout.notebookColumns.filter(column=>column.selected).length,1);
+assert.equal(captureWorkspaceLayout(selectedLayout).notebookColumns[0].selected,true,'Selected note survives the workspace snapshot.');
 
 let view='notebook',evidenceID='evidence',visible=true;
 const pinState={pinnedPaneID:'reader:research'};

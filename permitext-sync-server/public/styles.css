@@ -1283,30 +1283,61 @@ textarea:focus-visible {
   overscroll-behavior-x: contain;
 }
 
-.notebook-landing {
-  flex: 1 0 320px;
-  min-width: 0;
-  max-width: 640px;
-  padding: 32px 24px;
-  overflow-y: auto;
-  color: var(--text-primary);
+.notebook-index-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-.notebook-landing h2 { margin: 0 0 16px; font-size: 18px; font-weight: 600; }
-.notebook-landing p { color: var(--text-secondary); }
-.notebook-landing ul { margin: 0 0 16px; padding: 0; list-style: none; }
-.notebook-landing li { border-bottom: 1px solid var(--border); }
-.notebook-landing button {
+.notebook-index-panel > .panel-header {
+  flex: 0 0 auto;
+  justify-content: space-between;
+}
+
+.notebook-index-panel :is([data-collapse-title-bound="true"], .notebook-index-collapse, .pane-collapsed-tab) {
+  cursor: pointer;
+}
+
+.notebook-index-body {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.notebook-index-body ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.notebook-index-body button {
+  display: block;
+  width: 100%;
   min-height: 44px;
   padding: 10px 12px;
   border: 0;
+  border-radius: 0;
   background: transparent;
   color: var(--text-primary);
   text-align: left;
   overflow-wrap: anywhere;
 }
-.notebook-landing li button { width: 100%; }
-.notebook-landing button:hover { background: var(--surface); }
+
+.notebook-index-body button:hover,
+.notebook-index-body button.is-selected {
+  background: var(--toolbar-active);
+}
+
+.notebook-index-body .notebook-index-create {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.notebook-index-body p {
+  padding: 8px 12px;
+  color: var(--text-secondary);
+}
 
 .workspace-empty-state {
   display: grid;
