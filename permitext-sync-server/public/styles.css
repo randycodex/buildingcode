@@ -1320,6 +1320,10 @@ textarea:focus-visible {
   overflow-wrap: anywhere;
 }
 
+.notebook-index-body li > button {
+  border-radius: var(--radius-control);
+}
+
 .notebook-index-body button:hover,
 .notebook-index-body button.is-selected {
   background: var(--toolbar-active);
