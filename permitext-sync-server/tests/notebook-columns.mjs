@@ -210,3 +210,10 @@ for(const action of ['trash','cancel','navigate','archive','restore']) {
   }
 }
 console.log('Toolbar Note mutations passed: single Trash confirmation, cancel/navigation fences, archive/restore versions and unrelated Note retention.');
+
+// Removing redundant toolbar actions must not stop Notes list updates.
+tabContext.newNotebookNoteButton=null;
+tabContext.closedNotebookNotesButton=null;
+tabContext.renderedNotes=null;
+tabContext.syncNotebookNoteTabs();
+assert.ok(tabContext.renderedNotes.some(card=>card.id==='a'));

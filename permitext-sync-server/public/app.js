@@ -7,7 +7,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-notebook-expanded-v1625";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-notebook-toolbar-v1626";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -159,7 +159,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261109-notebook-expanded-v1625";
+} from "./offline-storage.js?v=20261109-notebook-toolbar-v1626";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3225,7 +3225,7 @@ function publishNotebookColumn(projectID, paneID, card, cards) {
 }
 
 function syncNotebookNoteTabs() {
-  if (!notebookTabs || !newNotebookNoteButton) return;
+  if (!notebookTabs) return;
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const projectID = project ? projectDetailKey(project) : '';
   const catalog = notebookCatalogs.get(projectID) || [];
@@ -3240,7 +3240,7 @@ function syncNotebookNoteTabs() {
   notebookTabs.replaceChildren();
   notebookTabs.hidden = true;
   syncNotebookLanding(notes);
-  newNotebookNoteButton.disabled = !project || !hasCapability('notebook') || projectToolTogglePending;
+  if (newNotebookNoteButton) newNotebookNoteButton.disabled = !project || !hasCapability('notebook') || projectToolTogglePending;
   closedNotebookNoteChoices = {projectID, notes};
   if (closedNotebookNotesButton) closedNotebookNotesButton.disabled = !project || !hasCapability('notebook');
   if (notebookClosedMenu) {
