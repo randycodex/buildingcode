@@ -30,6 +30,14 @@ assert.equal(blankRegistry.activeWorkspaceID, blankRegistry.workspaces[0].id);
 assert.deepEqual(emptyWorkspaceLayout().readers, []);
 assert.equal(emptyWorkspaceLayout().projectHostPaneID, "");
 assert.equal(emptyWorkspaceLayout().paneWidthDefaultsVersion, 4);
+assert.equal(emptyWorkspaceLayout().notebookListHidden, false);
+const notesListLayout = captureWorkspaceLayout({notebookListHidden:true});
+assert.equal(notesListLayout.notebookListHidden, true);
+const restoredNotesList = {};
+applyWorkspaceLayout(restoredNotesList, notesListLayout);
+assert.equal(restoredNotesList.notebookListHidden, true);
+applyWorkspaceLayout(restoredNotesList, emptyWorkspaceLayout());
+assert.equal(restoredNotesList.notebookListHidden, false, 'A different workspace does not inherit a hidden Notes list.');
 assert.equal(workspaceLayoutHasVisiblePanes(emptyWorkspaceLayout()), false);
 
 const migratedQuestionIndexWidth = normalizeWorkspaceLayout({

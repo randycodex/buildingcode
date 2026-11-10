@@ -7,7 +7,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-notebook-selection-v1627";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-notebook-toggle-v1629";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -159,7 +159,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261109-notebook-selection-v1627";
+} from "./offline-storage.js?v=20261109-notebook-toggle-v1629";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -192,7 +192,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261109-notebook-desk-v1299";
+} from "./workspace-state.js?v=20261109-notebook-toggle-v1300";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -385,6 +385,7 @@ const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleCalculatorButton = document.querySelector("#toggle-calculator");
 const toggleSavedButton = document.querySelector("#toggle-saved");
+const toggleNotesListButton = document.querySelector("#toggle-notes-list");
 const toggleContextButton = document.querySelector("#toggle-context");
 const toggleFactsButton = document.querySelector("#toggle-facts");
 const toggleNotebookButton = document.querySelector("#toggle-notebook");
@@ -1013,6 +1014,7 @@ function loadWorkspaceState(accountOverride) {
         ? [projectIdentity(activeProjectDetail)]
         : [],
       notebookColumns: normalizeNotebookColumns(saved.notebookColumns),
+      notebookListHidden: saved.notebookListHidden === true,
       reportDrafts: activeProjectDetail && savedReportDrafts.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
@@ -1104,6 +1106,7 @@ function loadWorkspaceState(accountOverride) {
       workboards: [],
       notebooks: [],
       notebookColumns: [],
+      notebookListHidden: false,
       reportDrafts: [],
       coordinations: [],
       coordinationThreads: [],
@@ -3170,6 +3173,16 @@ function notebookIndexPaneID(project) {
   return `project:notes-index:${encodeURIComponent(projectDetailKey(project))}`;
 }
 
+async function toggleNotebookList() {
+  if (!workspacePrivatePresentationAllowed() || !hasCapability('notebook') ||
+      !workspaceProject() || currentWorkflowView() !== 'notebook') return false;
+  state.notebookListHidden = !state.notebookListHidden;
+  document.querySelector('.notebook-index-menu')?._close?.(false);
+  saveWorkspaceState();
+  await transitionWorkspace('utility');
+  return true;
+}
+
 function selectedNotebookColumn(project) {
   const columns = notebookColumnsForProject(project).filter(column => column.open);
   return columns.find(column => column.selected) || columns[0] || null;
@@ -3206,6 +3219,7 @@ function renderNotebookIndex(project) {
   body.setAttribute('aria-label', 'Project notes');
   body.setAttribute('role', 'region');
   panel.append(header, body);
+  syncNotebookLanding(null, panel);
   return panel;
 }
 
@@ -3488,9 +3502,8 @@ async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archi
   }
 }
 
-function syncNotebookLanding(notes = null) {
+function syncNotebookLanding(notes = null, panel = track.querySelector('.notebook-index-panel')) {
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
-  const panel = track.querySelector('.notebook-index-panel');
   const body = panel?.querySelector('.notebook-index-body');
   if (!body || !project || panel.dataset.projectId !== projectDetailKey(project)) return;
   const projectID = projectDetailKey(project);
@@ -5422,7 +5435,7 @@ function workflowPaneAnchors() {
 function workflowPaneIsVisible(paneID) {
   if (!isProAccount()) return state.readers.slice(0, 1).some(reader => paneIDForReader(reader) === paneID);
   const view = currentColumnWorkflowView();
-  if (paneID.startsWith('project:notes-index:')) return view === 'notebook';
+  if (paneID.startsWith('project:notes-index:')) return view === 'notebook' && !state.notebookListHidden;
   if (view === 'notebook' && isProjectNotebookPaneID(paneID)) {
     const project = workspaceProject();
     const selected = project && selectedNotebookColumn(project);
@@ -6084,6 +6097,12 @@ function syncTopbarProjectToolStates() {
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const identity = project ? projectIdentity(project) : null;
   const requiresProject = workspaceColumnsRequireProject();
+  if (toggleNotesListButton) {
+    const opened = Boolean(project && !state.notebookListHidden);
+    toggleNotesListButton.disabled = !project || !hasCapability('notebook') || projectToolTogglePending;
+    toggleNotesListButton.setAttribute('aria-pressed', String(opened));
+    toggleNotesListButton.title = `${opened ? 'Close' : 'Open'} Notes column`;
+  }
   [
     [toggleContextButton, "Context", "projects", () => projectDetailsScreen?.isOpen() === true],
     [toggleFactsButton, "Facts", "projects", () => Boolean(state.projectFactsOpen)],
@@ -49185,8 +49204,8 @@ function workspacePaneDescriptors(options = {}) {
   if (notebookProject && hasCapability('notebook')) {
     const id = notebookIndexPaneID(notebookProject);
     add(id, 'Notes', () => renderNotebookIndex(notebookProject), async () => {
-      const panel = track.querySelector('.notebook-index-panel');
-      if (panel) setPaneCollapsed(panel, true);
+      state.notebookListHidden = true;
+      document.querySelector('.notebook-index-menu')?._close?.(false);
     }, {ownerClass: 'notebook-index-panel', projectID: projectDetailKey(notebookProject),
       accessCapabilities: ['notebook'], deferWhileHidden: true});
   }
@@ -49804,6 +49823,10 @@ function bindWorkspaceKeyboardNavigation() {
 }
 
 function bindImmediateUtilityControls() {
+  if (toggleNotesListButton && toggleNotesListButton.dataset.coldStartBound !== 'true') {
+    toggleNotesListButton.dataset.coldStartBound = 'true';
+    toggleNotesListButton.addEventListener('click', () => void toggleNotebookList());
+  }
   const shortcutHost = document.querySelector("#reader-shortcuts");
   if (shortcutHost && !readerShortcuts) readerShortcuts = createReaderShortcuts({
     host: shortcutHost, track, readers: readerShortcutItems,

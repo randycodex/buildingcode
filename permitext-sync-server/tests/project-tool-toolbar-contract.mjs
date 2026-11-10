@@ -30,6 +30,7 @@ const contextButton = button(), factsButton = button(), notebookButton = button(
 const state = { notebooks: [], reportDrafts: [], paneOrder: [], paneWeights: {} };
 const c = vm.createContext({
   state, toggleContextButton: contextButton, toggleFactsButton: factsButton, toggleNotebookButton: notebookButton, toggleReportButton: reportButton,
+  toggleNotesListButton: button(),
   workspaceProject: () => project,
   workspacePrivatePresentationAllowed: () => privateAllowed,
   workspaceColumnsRequireProject: () => requiresProject,

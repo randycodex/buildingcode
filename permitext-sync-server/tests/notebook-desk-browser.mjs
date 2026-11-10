@@ -66,6 +66,16 @@ try {
   assert.ok(resized.width>listBounds.width+40,'The middle/editor divider increases the list width.');
   assert.ok((await selected.boundingBox()).width<editorBounds.width-40,'The editor shares the resize.');
   assert.ok(Math.abs((await evidence.boundingBox()).width-evidenceBounds.width)<2,'Resizing the list keeps Evidence in place.');
+  const listToggle=page.locator('#toggle-notes-list');
+  await listToggle.click();
+  await index.waitFor({state:'hidden'});
+  assert.equal(await listToggle.getAttribute('aria-pressed'),'false');
+  assert.equal(await editor.evaluate((node,retained)=>node===retained,editorNode),true,'Hiding the list retains the live note editor.');
+  assert.match(await editor.innerText(),/Notebook draft retention check/);
+  await listToggle.click();
+  await index.waitFor({state:'visible'});
+  assert.equal(await index.evaluate((node,retained)=>node===retained,indexNode),true,'Reopening retains the list and its selection.');
+  assert.ok(Math.abs((await index.boundingBox()).width-resized.width)<2,'Reopening restores the resized list width.');
   for (const panel of [evidence,index,selected]) {
     await panel.locator('.panel-kind').first().click();
     assert.equal(await panel.evaluate(node=>node.classList.contains('is-collapsed')),false);
@@ -79,8 +89,13 @@ try {
   await page.getByRole('button',{name:'Research',exact:true}).click();
   await page.getByRole('button',{name:'Notebook',exact:true}).click();
   assert.equal(await editor.evaluate((node,retained)=>node===retained,editorNode),true);
+  await listToggle.click();
   await page.reload();
   await selected.locator('.bn-editor').waitFor();
+  assert.equal(await listToggle.getAttribute('aria-pressed'),'false','Hidden Notes list survives refresh.');
+  assert.equal(await index.isVisible(),false);
+  await listToggle.click();
+  await list.getByRole('button',{name:'Synthetic Note 1',exact:true}).waitFor();
   assert.equal(await page.locator('.workspace-panel.is-collapsed:visible').count(),0);
   assert.match(await selected.locator('.bn-editor').innerText(),/Notebook draft retention check/);
   assert.equal(await list.locator('[aria-current=true]').innerText(),'Synthetic Note 1');

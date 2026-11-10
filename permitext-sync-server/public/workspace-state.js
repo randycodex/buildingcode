@@ -32,6 +32,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "workboards",
   "notebooks",
   "notebookColumns",
+  "notebookListHidden",
   "reportDrafts",
   "coordinations",
   "coordinationThreads",
@@ -267,6 +268,7 @@ export function emptyWorkspaceLayout() {
     workboards: [],
     notebooks: [],
     notebookColumns: [],
+    notebookListHidden: false,
     reportDrafts: [],
     coordinations: [],
     coordinationThreads: [],
@@ -368,6 +370,7 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.workboards = genericWorkboardState(source.workboards);
   layout.notebooks = openProjectToolState(source.notebooks, layout.projectDetails);
   layout.notebookColumns = normalizeNotebookColumns(source.notebookColumns);
+  layout.notebookListHidden = source.notebookListHidden === true;
   layout.reportDrafts = openProjectToolState(source.reportDrafts, layout.projectDetails);
   layout.coordinations = openProjectToolState(source.coordinations, layout.projectDetails);
   layout.coordinationThreads = Array.isArray(source.coordinationThreads)
