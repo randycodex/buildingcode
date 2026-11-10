@@ -1337,6 +1337,7 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   gap: 10px;
+  background: transparent;
 }
 
 .notebook-note-check {
@@ -1359,8 +1360,8 @@ textarea:focus-visible {
 .notebook-index-body .notebook-selection-status { margin: 0 0 4px; }
 .notebook-index-body button:disabled { opacity: .45; cursor: default; }
 
-.notebook-index-body button:hover,
-.notebook-index-body button.is-selected {
+.notebook-index-body button:not(.notebook-index-choice):hover,
+.notebook-index-body button.is-selected:not(.notebook-index-choice) {
   background: var(--toolbar-active);
 }
 
