@@ -4,7 +4,7 @@
 // undoable. Saving and export omit them through reportContentBlocks.
 export const reportContentBlocks = blocks => blocks.filter(block=>{
   const runs = (block.richText || []).some(run=>run.text?.trim());
-  if (['heading','paragraph'].includes(block.kind)) return Boolean(block.text?.trim() || runs);
+  if (['heading','paragraph'].includes(block.kind)) return Boolean(block.notebookDocument || block.text?.trim() || runs);
   if (block.kind === 'list') return Boolean((block.items || []).some(item=>item.trim()) || runs);
   return true;
 });

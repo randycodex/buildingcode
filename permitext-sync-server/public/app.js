@@ -1,28 +1,30 @@
 import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
+import { generatedNoteTitle } from "./notebook-titles.js?v=1";
+import { notebookContentText, notebookBlocksFromSourceElement } from "./notebook-content.js?v=2";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=17";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=18";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=3";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-evidence-search-menu-v1630";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-workflow-polish-v1647";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
-import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=2";
+import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=3";
 import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=8";
 import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=15';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=6";
-import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=7";
+import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=8";
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=30";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=31";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261108-floating-menu-pins-v1382";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
@@ -35,7 +37,7 @@ import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
 import { createReportAutosave } from "./report-autosave.js?v=1";
-import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=3";
+import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=14";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
@@ -159,7 +161,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261109-evidence-search-menu-v1630";
+} from "./offline-storage.js?v=20261110-workflow-polish-v1647";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -367,7 +369,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261021-comment-undo-v47";
+const notebookClientVersion = "20261110-rich-notes-v48";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -3551,7 +3553,11 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
         check.textContent = selection.ids.has(card.id) ? '✓' : '';
         open.append(check);
       }
-      const label = document.createElement('span'); label.textContent = card.title || 'Untitled'; open.append(label);
+      const label = document.createElement('span');
+      label.className = 'notebook-index-title';
+      label.textContent = card.title || 'Untitled';
+      open.title = label.textContent;
+      open.append(label);
       const active = card.id ? card.id === selectedID : card.column?.id === selected?.id;
       open.classList.toggle('is-selected', selection.enabled ? selection.ids.has(card.id) : active);
       if (active) open.setAttribute('aria-current', 'true');
@@ -3698,7 +3704,7 @@ async function createNotebookNoteColumn(project = workspaceProject()) {
     }
   } catch (error) {
     if (current()) await showWebNotice('Note not created', error.message);
-  } finally { projectToolTogglePending = false; syncNotebookNoteTabs(); }
+  } finally { projectToolTogglePending = false; syncTopbarProjectToolStates(); }
 }
 
 async function closeProjectReportDraft(project) {
@@ -8481,7 +8487,8 @@ function searchResultPresentation(result, query = "") {
     if (end < excerpt.length) { const boundary = excerpt.lastIndexOf(" ", end); if (boundary > start + 120) end = boundary; }
     excerpt = `${start ? "… " : ""}${excerpt.slice(start, end).trim()}${end < excerpt.length ? " …" : ""}`;
   }
-  return { citation, heading, excerpt };
+  const scope = parentTitle && parentTitle.toLowerCase() !== heading.toLowerCase() && !result.definitionTerm ? parentTitle : '';
+  return { citation, heading, excerpt, scope };
 }
 
 function recentlyViewedPreviewHasEnactedText(entry) {
@@ -17981,6 +17988,7 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
   const projectButton = document.createElement("button");
   projectButton.type = "button";
   projectButton.textContent = "Add to Project";
+  projectButton.title = `${sectionPayload.blockID ? 'Passage' : 'Section'} membership`;
   const project = workspaceProject();
   const savedInProject = project && (currentContentSummary().projectSections || []).some((link) =>
     savedEvidenceKey(link) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(link, project));
@@ -18301,7 +18309,7 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       const fingerprint = JSON.stringify({spaceName, ...(draft.spaceLocation ? {spaceLocation: draft.spaceLocation} : {}), input: calculation.input});
       const submission = savePayloads.get(fingerprint) || {projectID: researchProjectID(project), expectedVersion: 0,
         clientMutationID: `occupant-load:${crypto.randomUUID()}`, cardType: "finding",
-        title: `${spaceName ? `${spaceName} · ` : ""}Occupant load${calculation.input.factorMode === 'custom' ? ' · Custom factor' : ''} · ${calculation.input.spaceFunction}`.slice(0, 300), document: notebookDocument, evidenceLinks: [link],
+        title: generatedNoteTitle(`Occupant load · ${spaceName || calculation.input.spaceFunction}${calculation.input.factorMode === 'custom' ? ' · Custom factor' : ''}`), document: notebookDocument, evidenceLinks: [link],
         openQuestions: []};
       savePayloads.set(fingerprint, submission);
       const saved = await postResearch("/notebook/cards/save", submission);
@@ -18321,7 +18329,7 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
   return card;
 }
 
-async function addPassageToNotebook(anchor, source, exact) {
+async function addPassageToNotebook(anchor, source, exact, sourceBlocks = null) {
   const project = workspaceProject();
   if (!project) throw new Error("Create a Project before adding a passage to a Note.");
   if (!String(exact || "").trim()) throw new Error("The passage is still loading. Try again.");
@@ -18353,15 +18361,15 @@ async function addPassageToNotebook(anchor, source, exact) {
     passages: [{ exact: String(exact).trim() }], createdAt: new Date().toISOString() };
   const reference = { referenceKind: "selectedPassage", referenceID: link.id, label };
   if (destination === "current") {
-    await mount.insertLinkedReference(target.id, reference, link, comments);
+    await mount.insertLinkedReference(target.id, reference, link, comments, sourceBlocks);
     if (current()) showNotebookSavedLink(anchor, project, mount.insertionTarget?.() || target, {added: true});
     return;
   }
   if (navigator.onLine === false) throw new Error("Reconnect to create a Note.");
   const document = emptyNotebookDocument();
-  document.document = notebookReferenceBlocks(reference, link.passages, comments);
+  document.document = notebookReferenceBlocks(reference, link.passages, comments, sourceBlocks);
   const payload = await postResearch("/notebook/cards/save", { projectID, clientMutationID: `passage-note:${link.id}`,
-    expectedVersion: 0, cardType: "finding", title: source.title.slice(0, 300), document, evidenceLinks: [link] });
+    expectedVersion: 0, cardType: "finding", title: generatedNoteTitle(source.title), document, evidenceLinks: [link] });
   requireCurrentAccountRequest(identity);
   await saveNotebookCardSnapshot(identity.userID, projectID, payload.card);
   if (!current()) return;
@@ -18422,7 +18430,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       const passage = noteButton.closest(".annotated-code-block") || noteButton.closest(".chapter-section");
       const copy = passage?.cloneNode(true);
       copy?.querySelectorAll("[data-research-selection-exclude], .inline-bookmark-toggle").forEach(node => node.remove());
-      await addPassageToNotebook(noteButton, readerPassagePayload(section, reader, target), copy?.textContent);
+      await addPassageToNotebook(noteButton, readerPassagePayload(section, reader, target), copy?.textContent, copy ? notebookBlocksFromSourceElement(copy) : null);
     } catch (error) {
       if (allowed()) await showWebNotice("Passage not added", error.message);
     } finally { noteButton.disabled = !allowed(); }
@@ -18672,11 +18680,19 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
   const appendProject = (project) => {
     const button = document.createElement("button");
     button.type = "button";
-    if (options.menu) button.setAttribute("role", "menuitem");
+    const included = (currentContentSummary().projectSections || []).some(link =>
+      savedEvidenceKey(link) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(link, project));
+    const scope = sectionPayload.blockID ? 'passage' : 'section';
+    if (options.menu) {
+      button.setAttribute("role", "menuitemcheckbox");
+      button.setAttribute("aria-checked", String(included));
+    }
     button.className = "section-detail-project-option";
-    button.textContent = project.name || project.title || "Untitled Project";
-    button.setAttribute("aria-label", `Add passage to ${button.textContent}`);
-    button.addEventListener("click", () => { void addToProject(project); });
+    const name = project.name || project.title || "Untitled Project";
+    button.textContent = `${included ? '✓ ' : ''}${name}`;
+    button.setAttribute("aria-label", included ? `${scope === 'section' ? 'Section' : 'Passage'} already in ${name}` : `Add ${scope} to ${name}`);
+    button.title = included ? `This ${scope} is already included. Use its bookmark to remove it from the current Project.` : `Add this ${scope}`;
+    button.addEventListener("click", () => { if (!included) void addToProject(project); });
     projectList.append(button);
   };
   projects.forEach(appendProject);
@@ -21474,6 +21490,10 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       snippet.classList.toggle("has-separated-matches", snippetText.includes(" … "));
       appendHighlighted(snippet, snippetText, query);
       markResearchSelectable(snippet, detail);
+      if (presentation.scope) {
+        const scope = document.createElement('span'); scope.className = 'result-parent-scope';
+        scope.textContent = presentation.scope; mainButton.append(scope);
+      }
       mainButton.append(heading);
       if (snippetText) mainButton.append(snippet);
       mainButton.addEventListener("click", () => {
@@ -22258,7 +22278,8 @@ async function renderSectionDetail(searchID, detail) {
   const projectButton = document.createElement("button");
   projectButton.type = "button";
   projectButton.className = "section-detail-project-add";
-  projectButton.textContent = "Add to Project";
+  projectButton.textContent = saved ? "Project membership" : "Add to Project";
+  projectButton.title = `${sectionPayload.blockID ? 'Passage' : 'Section'} membership`;
   projectButton.setAttribute("aria-haspopup", "menu");
   projectButton.setAttribute("aria-expanded", "false");
   projectButton.hidden = !hasCapability("projects");
@@ -22550,7 +22571,7 @@ async function renderSectionDetail(searchID, detail) {
     try {
       const passage = sectionTarget.blockID
         ? body.querySelector(`[data-annotation-block-id="${CSS.escape(sectionTarget.blockID)}"]`) : body;
-      await addPassageToNotebook(addNote, sectionPayload, passage?.textContent);
+      await addPassageToNotebook(addNote, sectionPayload, passage?.textContent, passage ? notebookBlocksFromSourceElement(passage) : null);
     } catch (error) {
       if (panel.isConnected && readerPrivateContentAllowed(panel)) await showWebNotice("Passage not added", error.message);
     } finally { addNote.disabled = false; }
@@ -26141,7 +26162,7 @@ function researchComposerDisclosure() {
 
 function researchProjectContextPreview() {
   const preview = document.createElement("p"); preview.className = "research-project-context-preview";
-  preview.textContent = "Only selected passages and your conversation messages are sent.";
+  preview.textContent = "Included passages, conversation messages and explicitly reviewed Project snapshots are sent.";
   preview.updateResearchProject = () => {};
   return preview;
 }
@@ -26349,6 +26370,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   form.className = "research-composer research-start-composer";
   form.classList.add("research-compact-composer");
   const projectPreview = researchProjectContextPreview();
+  renderResearchProjectContext(form, {primaryProjectID:researchWorkspaceProjectID(),id:''});
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const input = document.createElement("textarea");
@@ -26548,6 +26570,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
           listed.conversations=[...listed.conversations,...(page.conversations||[])];}
         return {...page,conversations:(page.conversations||[]).filter(item=>researchConversationInWorkspace(item))};},
       renderAnswerActions:message=>renderResearchNotebookHandoff(conversation,message,{linkForReport:true}),
+      renderProjectContext:host=>renderResearchProjectContext(host, conversation || {primaryProjectID:researchWorkspaceProjectID(),id:''}, {onUpdated:publish}),
       draftKey,initialDraft:draft(), onDraft:saveDraft, isCurrent:current,
       requestStore:{ read:() => { try { return JSON.parse(sessionStorage.getItem(recoveryKey)); } catch { return null; } },
         write:value => { if (value) sessionStorage.setItem(recoveryKey, JSON.stringify(value)); else sessionStorage.removeItem(recoveryKey); } },
@@ -28031,9 +28054,59 @@ function renderHistoricalResearchControl(container, message) {
   container.append(details);
 }
 
-function renderResearchProjectContext(container, conversation) {
+function renderResearchProjectContext(container, conversation, {onUpdated = null} = {}) {
   const section = document.createElement("section");
   section.className = "research-project-context";
+  const publishContext = async result => {
+    if (onUpdated) return onUpdated(result);
+    const paneID = section.closest('.workspace-panel')?.dataset.paneId;
+    const instance = state.utilityInstances.find(item => item.key === 'analysis' && paneIDForUtilityInstance(item) === paneID);
+    return openResearchConversation(result.conversation.id, {refreshList:true, ...(instance ? {instance} : {})});
+  };
+  if (conversation.primaryProjectID) {
+    const snapshot = conversation.assistantScope?.includeProjectContext && conversation.assistantScope.projectContext;
+    const button = researchWorkflowButton(snapshot ? 'Review included Project context and facts' : 'Include Project context and facts…', async () => {
+      const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+      const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID && section.isConnected;
+      if (!current()) return;
+      const {snapshot:preview} = await postResearch('/research/conversations/project-context', {conversationID:conversation.id || undefined,
+        projectID:conversation.primaryProjectID, preview:true});
+      if (!current()) return;
+      const content = document.createElement('div'); content.className = 'research-context-review';
+      const info = preview.projectInformation;
+      const text = document.createElement('p'); text.style.whiteSpace = 'pre-wrap';
+      text.textContent = [info.address && `Address: ${info.address}`, info.description && `Context: ${info.description}`,
+        ...(info.facts || [])].filter(Boolean).join('\n\n');
+      content.append(text);
+      const accepted = await confirmWebWarning('Review Project context and facts',
+        'Include this snapshot in future answers in this conversation. Recorded fact status and sources are preserved. Review again to include later Project edits.',
+        {content, confirmLabel:'Include reviewed snapshot', container:section.closest('.workspace-panel')});
+      if (!accepted || !current()) return;
+      const pendingQuestion = section.closest('.workspace-panel')?.querySelector('.rv2-input, .research-question-input')?.value || '';
+      const target = conversation.id ? conversation : (await postResearch('/research/conversations/create', {
+        projectID:conversation.primaryProjectID, analysisMode:'conversation_only', requestID:crypto.randomUUID()})).conversation;
+      if (!current()) return;
+      if (!conversation.id && pendingQuestion) researchNewChatDrafts.set(`followup:${target.id}`, pendingQuestion);
+      const result = await postResearch('/research/conversations/project-context', {conversationID:target.id, snapshotHash:preview.contentHash});
+      if (current()) {
+        await publishContext(result);
+      }
+    });
+    button.disabled = ['active','retrying'].includes(reconciledResearchProgressSession(conversation)?.status);
+    section.append(button);
+    if (snapshot) {
+      const detail = document.createElement('details'), summary = document.createElement('summary');
+      summary.textContent = `Included Project snapshot · ${new Date(snapshot.reviewedAt).toLocaleString()}`;
+      const body = document.createElement('p'); body.style.whiteSpace = 'pre-wrap';
+      body.textContent = [snapshot.projectInformation?.description, ...(snapshot.projectInformation?.facts || [])].filter(Boolean).join('\n\n');
+      detail.append(summary, body); section.append(detail);
+      const remove = researchWorkflowButton('Exclude Project snapshot from future answers', async () => {
+        const result = await postResearch('/research/conversations/project-context', {conversationID:conversation.id, include:false});
+        await publishContext(result);
+      });
+      remove.disabled = button.disabled; section.append(remove);
+    }
+  }
   container.append(section);
   return section;
 }
@@ -28154,7 +28227,8 @@ function renderResearchNotebookHandoff(conversation, message, {linkForReport=fal
       originWorkflowGeneration === (state.workflowNavigationGeneration || 0);
     const project = choices.find((item) => researchProjectID(item) === select.value);
     if (!project) return;
-    const title = researchAnswerQuestion(conversation, message).slice(0, 300);
+    const fullQuestion = researchAnswerQuestion(conversation, message);
+    const title = generatedNoteTitle(fullQuestion, 'Assistant answer');
     if (!originIsCurrent()) return;
     button.disabled = true;
     select.disabled = true;
@@ -28164,7 +28238,7 @@ function renderResearchNotebookHandoff(conversation, message, {linkForReport=fal
         if (!destination || !originIsCurrent()) return;
         if (destination.kind !== "new") {
           savedCard = await appendResearchReferenceToNote(project, destination, {
-            referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${title}`
+            referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${fullQuestion}`
           }, mutationID, requestIdentity, originIsCurrent);
           if (savedCard && destination.kind === "open") savedDestinationMount = destination.mount;
           if (savedCard && originIsCurrent()) {
@@ -28176,7 +28250,7 @@ function renderResearchNotebookHandoff(conversation, message, {linkForReport=fal
         if (navigator.onLine === false) throw new Error("Reconnect to create this Note. The saved Research answer remains available.");
         const document = emptyNotebookDocument();
         document.document = [{ type: "paragraph", content: [{ type: "permitextReference", props: {
-          referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${title}`
+          referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${fullQuestion}`
         } }] }];
         const payload = await postResearch("/notebook/cards/save", { projectID: researchProjectID(project),
           clientMutationID: mutationID, expectedVersion: 0, cardType: "finding", title, document, evidenceLinks: [] });
@@ -28637,7 +28711,8 @@ async function renderResearchConversation(conversationID, options = {}) {
     content.append(evidencePane, divider, dialoguePane);
   }
 
-  const projectContextSection = renderResearchProjectContext(evidenceScroll, conversation);
+  const projectContextSection = document.createElement('section');
+  projectContextSection.className = 'research-project-context'; evidenceScroll.append(projectContextSection);
   const sources = document.createElement("section");
   sources.className = "research-sources";
   const sourceToggle = document.createElement("button");
@@ -28821,7 +28896,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const projectContextBlocked = Boolean(conversation.projectContextReviewRequired);
-  const passageRequired = selectedSources.length === 0;
+  const passageRequired = selectedSources.length === 0 && !conversation.assistantScope?.includeProjectContext;
   const researchEnabled = hasCapability("research");
   const researchRequestActive = Boolean(
     pendingProgress && ["active", "retrying"].includes(pendingProgress.status)
@@ -28920,7 +28995,9 @@ async function renderResearchConversation(conversationID, options = {}) {
   input.rows = 1;
   const passageScope = document.createElement("p");
   passageScope.className = "research-passage-scope";
-  passageScope.textContent = "Only included passages and this conversation are used. Other Readers and Project details are excluded.";
+  passageScope.textContent = conversation.assistantScope?.includeProjectContext
+    ? 'Included passages, this conversation and the reviewed Project snapshot are used.'
+    : 'Included passages and this conversation are used. Include a reviewed Project snapshot to use Context and Facts.';
   const starters = document.createElement("div");
   starters.className = "research-passage-starters";
   for (const [label, question] of [["Explain", "Explain the included passages."],
@@ -28966,6 +29043,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     }
   });
   dialoguePane.append(relatedReview.element);
+  renderResearchProjectContext(composer, conversation);
   composer.append(renderResearchIncludedPassages(conversation, paneID, {
     busy: researchRequestActive, onFindRelated: () => relatedReview.open()
   }),
@@ -30707,7 +30785,7 @@ async function renderProjectNotebook(project, options = {}) {
     mountState.focusCard = loadCard;
     mountState.insertionTarget = () => !disposed && !notebookReadOnly && !saveConflict && activeCard && editorMount
       ? { id: activeCard.id, title: activeCard.title, identity: notebookCardIdentity(activeCard) } : null;
-    mountState.insertLinkedReference = async (cardID, reference, evidenceLink = null, comments = []) => {
+    mountState.insertLinkedReference = async (cardID, reference, evidenceLink = null, comments = [], sourceBlocks = null) => {
       requireCurrentAccountRequest(requestIdentity);
       if (disposed || notebookReadOnly || saveConflict || activeCard?.id !== cardID || !editorMount) {
         throw new Error("The destination Note changed or is unavailable. Choose it again.");
@@ -30715,7 +30793,7 @@ async function renderProjectNotebook(project, options = {}) {
       const previousLinks = activeCard.evidenceLinks || [];
       if (evidenceLink) activeCard.evidenceLinks = [...previousLinks, evidenceLink];
       try {
-        if (editorMount.appendReference(reference, evidenceLink?.passages, comments) === false) throw new Error("The Note editor is still loading. Try again.");
+        if (editorMount.appendReference(reference, evidenceLink?.passages, comments, sourceBlocks) === false) throw new Error("The Note editor is still loading. Try again.");
       } catch (error) {
         activeCard.evidenceLinks = previousLinks;
         throw error;
@@ -31890,6 +31968,38 @@ async function renderProjectReportDraft(project, resume = null) {
   let draggedReportBlock = null;
   let reportFormatting = null;
   let reportFormattingModule = null;
+  const reportNoteEditors = new Set();
+  const reportNoteObjectURLs = new Set();
+  const disposeReportNoteEditors = () => {
+    for (const editor of reportNoteEditors) editor.destroy();
+    reportNoteEditors.clear();
+    for (const url of reportNoteObjectURLs) URL.revokeObjectURL(url);
+    reportNoteObjectURLs.clear();
+  };
+  const mountReportNoteEditor = (block, {document:noteDocument = block.notebookDocument, editable = true} = {}) => {
+    const host = document.createElement('div'); host.className = 'notebook-editor report-note-editor';
+    void loadNotebookModule().then(module => {
+      if (!host.isConnected || disposed || !isCurrentAccountRequest(requestIdentity)) return;
+      const editor = module.mountPermitextNotebookEditor(host, {document:noteDocument, editable, autofocus:false,
+        uploadFile:file => {
+          if (navigator.onLine === false) throw new Error('Reconnect to add an image to this Report snapshot.');
+          return uploadNotebookAsset(projectID, file, '', requestIdentity);
+        },
+        async resolveFileUrl(url) {
+          const resolved = await resolveNotebookAsset(projectID, url, requestIdentity);
+          if (resolved.startsWith('blob:')) reportNoteObjectURLs.add(resolved);
+          return resolved;
+        },
+        onChange(document) {
+          if (!editable || disposed || !host.isConnected || !activeDraft.blocks.includes(block) || !isCurrentAccountRequest(requestIdentity)) return;
+          block.notebookDocument = document; block.text = notebookContentText(document);
+          delete block.richText; setDirty();
+        }
+      });
+      reportNoteEditors.add(editor);
+    }).catch(error => { if (host.isConnected) showStatusError(error.message); });
+    return host;
+  };
   let outlineController = null;
   let comparisonController = null;
   const outlineSectionExpansion = new Map();
@@ -31977,6 +32087,7 @@ async function renderProjectReportDraft(project, resume = null) {
       disposed = true;
       reportUndo.clear();
       reportFormatting?.dispose();
+      disposeReportNoteEditors();
       panel._columnExpansion?.dispose();
       outlineController?.dispose();
       comparisonController?.dispose();
@@ -32406,7 +32517,7 @@ async function renderProjectReportDraft(project, resume = null) {
       }
 
       if (["heading", "paragraph", "list"].includes(block.kind)) {
-        row.append(reportFormatting.mount(block));
+        row.append(block.notebookDocument ? mountReportNoteEditor(block) : reportFormatting.mount(block));
         if (block.derivedFrom?.kind === "notebookCard") {
           const provenance = document.createElement("section");
           provenance.className = "report-note-provenance";
@@ -32448,6 +32559,8 @@ async function renderProjectReportDraft(project, resume = null) {
               });
               if (!card) return;
               block.text = card.plainText || "";
+              if (card.document) block.notebookDocument = structuredClone(card.document);
+              else delete block.notebookDocument;
               delete block.richText;
               delete block.sourceFormatting;
               block.kind = "paragraph";
@@ -32518,9 +32631,9 @@ async function renderProjectReportDraft(project, resume = null) {
                 requireCurrentAccountRequest(requestIdentity);
                 if (disposed || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
                 const text = card.plainText || "";
-                if (text.length > 20000) throw new Error("This Note is too long for one Report paragraph. Keep the linked source or split the Note first.");
-                const richText = reportFormatting.sourceSnapshotRuns(block,text);
-                Object.assign(block, {kind: "paragraph", text, richText, reportTitle: block.reportTitle || card.title, derivedFrom: {kind: "notebookCard", id: card.id, title: card.title, version: card.version},
+                if (!card.document && text.length > 20000) throw new Error("This Note is too long for one Report paragraph. Keep the linked source or split the Note first.");
+                const content = card.document ? {notebookDocument:structuredClone(card.document)} : {richText:reportFormatting.sourceSnapshotRuns(block,text)};
+                Object.assign(block, {kind: "paragraph", text, ...content, reportTitle: (block.reportTitle || card.title).slice(0,240), derivedFrom: {kind: "notebookCard", id: card.id, title: card.title, version: card.version},
                   sourceSnapshotAt: new Date().toISOString(), evidenceLinks: structuredClone(card.evidenceLinks || [])});
                 delete block.sourceID;
                 delete block.sourceFormatting;
@@ -32559,6 +32672,11 @@ async function renderProjectReportDraft(project, resume = null) {
               requireCurrentAccountRequest(identity);
               if (disposed || requestWorkspaceID !== activeWorkspaceID || revision !== previewRevision) return;
               body.replaceChildren();
+              const noteDocument = block.kind === 'notebookCard' && result.items?.find(item => item.kind === 'notebookCard')?.document;
+              if (noteDocument) {
+                body.append(mountReportNoteEditor(block, {document:noteDocument, editable:false}));
+                loaded = true; return;
+              }
               for (const part of result.preview || []) {
                 if (part.kind === "table") {
                   const scroll = document.createElement("div"); scroll.className = "report-preview-table";
@@ -32901,6 +33019,7 @@ async function renderProjectReportDraft(project, resume = null) {
     }
     renderedDraftKey = draftKey;
     reportFormatting?.dispose();
+    disposeReportNoteEditors();
     outlineController?.dispose();
     resetEnhancedSelects(shell);
     shell.querySelectorAll(":scope > :not(.report-draft-status)").forEach((element) => element.remove());
@@ -36321,7 +36440,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     propertyLookupStatus.textContent = "";
     propertyLookupStatus.dataset.state = "";
   };
-  const lookupPropertyContext = async () => {
+  const lookupPropertyContext = async (bbl = '') => {
     const address = addressInput.value.trim();
     if (
       selectedFolderType !== "project" ||
@@ -36331,14 +36450,14 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
       resetPropertyLookup();
       return null;
     }
-    if (propertyLookupResult && propertyLookupAddress === address) return propertyLookupResult;
-    if (propertyLookupPromise && propertyLookupAddress === address) return propertyLookupPromise;
+    if (!bbl && propertyLookupResult && propertyLookupAddress === address) return propertyLookupResult;
+    if (!bbl && propertyLookupPromise && propertyLookupAddress === address) return propertyLookupPromise;
     const requestID = ++propertyLookupRequestID;
     propertyLookupAddress = address;
     propertyLookupResult = null;
     propertyLookupStatus.dataset.state = "loading";
     propertyLookupStatus.textContent = "Looking up official NYC property data…";
-    propertyLookupPromise = postResearch("/projects/property/lookup", { address })
+    propertyLookupPromise = postResearch("/projects/property/lookup", { address, ...(bbl ? {bbl} : {}) })
       .then((payload) => {
         if (requestID !== propertyLookupRequestID || !isCurrent()) return null;
         const property = payload?.property || null;
@@ -36366,6 +36485,17 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         const code = error?.payload?.code || error?.code;
         if (code === "NYC_PROPERTY_NOT_FOUND" || code === "NYC_PROPERTY_DATA_NOT_FOUND") {
           propertyLookupStatus.textContent = autoSave ? "No NYC tax lot matched. You can enter facts manually." : "No NYC tax lot matched. The Project can still be saved with this address.";
+          const candidates = error?.payload?.candidates || [];
+          if (candidates.length) {
+            propertyLookupStatus.textContent = 'Choose the matching tax lot to import its facts:';
+            for (const candidate of candidates) {
+              const choice = document.createElement('button');
+              choice.type = 'button'; choice.className = 'ghost-button';
+              choice.textContent = `${candidate.label} · BBL ${candidate.bbl}`;
+              choice.addEventListener('click', () => { void lookupPropertyContext(candidate.bbl).then(() => { if (autoSave) void saveAutomatic().catch(() => {}); }); });
+              propertyLookupStatus.append(choice);
+            }
+          }
         } else if (!activeAccount()) {
           propertyLookupStatus.textContent = autoSave ? "Sign in to import official NYC property facts." : "Sign in to import official NYC property facts. The Project can still be saved.";
         } else {
@@ -39512,7 +39642,7 @@ async function addSavedEvidenceToNotebook(anchor, item, projectID = "") {
     sectionID: section.sectionID || section.id, sectionNumber: section.sectionNumber || detail.sectionNumber,
     title: section.title || detail.title, chapterID: chapter?.id || detail.chapterID || "",
     chapterNumber: chapter?.chapterNumber || detail.chapterNumber || "", blockID
-  }, exact);
+  }, exact, notebookBlocksFromSourceElement(capture));
 }
 
 function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnapshot) {
@@ -44869,7 +44999,9 @@ function openColumnGroupEditor(panel, existing = null) {
     <p class="column-group-editor-hint">Choose columns to keep together. Evidence, Context, Facts, Notebook and Report cannot be grouped.</p>
     <div class="column-group-choices"></div><p class="column-group-editor-error" role="status"></p>
     <div class="column-group-editor-actions"><button type="button" data-cancel>Cancel</button><button type="submit">${existing ? 'Save group' : 'Create group'}</button></div></form>`;
-  const ids = activePaneIDs();
+  const allIDs = activePaneIDs();
+  const visibleIDs = allIDs.filter(workflowPaneIsVisible);
+  const ids = visibleIDs.filter(canGroupWorkspaceColumn);
   const selected = new Set(existing?.paneIDs || (panel ? basePaneGroupForMove(panel.dataset.paneId, ids) : []));
   const seen = new Set();
   const choices = [];
@@ -44890,7 +45022,7 @@ function openColumnGroupEditor(panel, existing = null) {
     text.className = 'column-group-choice-details';
     const panes = unit.map((member) => track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(member)}"]`));
     unit.forEach((member, index) => {
-      columnGroupChoiceDetails(panes[index], positions.get(member), ids.indexOf(member)).forEach((line, lineIndex) => {
+      columnGroupChoiceDetails(panes[index], positions.get(member), visibleIDs.indexOf(member)).forEach((line, lineIndex) => {
         const detail = document.createElement(lineIndex === 0 ? 'strong' : 'small');
         detail.textContent = line;
         text.append(detail);
@@ -44922,11 +45054,13 @@ function openColumnGroupEditor(panel, existing = null) {
     event.preventDefault();
     if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) { close(); return; }
     const members = new Set(choices.filter(({ input }) => input.checked).flatMap(({ unit }) => unit));
+    // Editing one view must not silently ungroup members in another view.
+    for (const id of existing?.paneIDs || []) if (!ids.includes(id) && allIDs.includes(id)) members.add(id);
     if (members.size < (existing ? 1 : 2) || !name.value.trim()) {
       dialog.querySelector('.column-group-editor-error').textContent = existing ? 'Enter a name and select at least one column.' : 'Enter a name and select at least two columns.';
       return;
     }
-    const group = { id: existing?.id || crypto.randomUUID(), name: name.value.trim(), paneIDs: ids.filter((id) => members.has(id)), collapsed: existing?.collapsed || false, columns: existing?.columns || {} };
+    const group = { id: existing?.id || crypto.randomUUID(), name: name.value.trim(), paneIDs: allIDs.filter((id) => members.has(id)), collapsed: existing?.collapsed || false, columns: existing?.columns || {} };
     const keptReaderPaneIDs = [];
     for (const id of members) {
       const reader = state.readers.find((item) => `reader:${item.id}` === id);

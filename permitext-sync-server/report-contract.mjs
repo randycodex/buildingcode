@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import { normalizeNotebookEvidenceLinks } from "./notebook-contract.mjs";
+import { normalizeNotebookEvidenceLinks, validateNotebookDocument, notebookPlainText } from "./notebook-contract.mjs";
 import { normalizedResearchProjectStructuredFacts, projectFactProjectionVersion } from "./project-fact-projection.mjs";
 import { normalizeReportRuns } from "./public/report-rich-text.js";
 import { normalizeSourceFormatting } from "./public/report-source-formatting.js";
@@ -150,6 +150,11 @@ export function stableReportJSON(value) {
 }
 
 function normalizeAuthoredBlock(block, kind) {
+  if (block.notebookDocument) {
+    if (kind !== 'paragraph' || block.derivedFrom?.kind !== 'notebookCard') throw new Error('Rich Note snapshots require Note provenance.');
+    const notebookDocument = validateNotebookDocument(block.notebookDocument).document;
+    return {text:notebookPlainText(notebookDocument), notebookDocument, ...normalizePromotedNoteProvenance(block)};
+  }
   if (kind === "heading" && block.headingLevel !== undefined && ![1, 2, 3].includes(block.headingLevel)) {
     throw new Error("Invalid Report heading level.");
   }
@@ -410,6 +415,7 @@ function normalizeNotebookManifestItem(item, base) {
     cardType: requiredText(item.cardType, "Report Notebook card type", 64),
     title: requiredText(item.title, "Report Notebook title", 500),
     plainText: optionalText(item.plainText, 350_000),
+    ...(item.document ? {document:validateNotebookDocument(item.document).document} : {}),
     references: Array.isArray(item.references) ? structuredClone(item.references).slice(0, 100) : []
   };
 }

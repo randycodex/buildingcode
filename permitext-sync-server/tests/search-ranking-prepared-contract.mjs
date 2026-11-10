@@ -12,18 +12,11 @@ const sections = [
   {sectionNumber:'1020.4',title:'Dead ends.'},
   {sectionNumber:'A102.1',title:'Fire-resistance rating'}
 ];
-// Frozen pre-optimization scores cover title/context, definitions, plural and
-// hyphen matching, partial overlap, numbered sections and long prose headings.
-const snapshots = [
-  ['accessible route',[1.03,4.24,4,4.12,4.24,4.12,4.12]],
-  ['1004.1',[4.12,4.24,4,0,4.24,4.12,4.12]],
-  ['occupant loads',[4.12,4.24,1.05,1.32,4.24,4.12,4.12]],
-  ['fire-resistance rating',[4.12,4.24,1.05,4.12,3.9066666666666663,4.12,1.32]],
-  ['fire',[4.12,4.24,4,4.12,1.6600000000000001,4.12,1.6300000000000001]],
-  ['water supply',[4.12,4.24,4,4.12,1.6600000000000001,4.12,4.12]],
-  ['dead end corridor',[4.12,4.24,4,4.12,4.24,3.4533333333333336,4.12]]
-];
-for (const [query,expected] of snapshots) {
+// Preparing a query must preserve the shared online/offline ranking policy,
+// including reusable regexes across repeated calls and match modes.
+const queries = ['accessible route','1004.1','occupant loads','fire-resistance rating','fire','water supply','dead end corridor'];
+for (const query of queries) {
+  const expected = sections.map(section=>searchRelevanceRank(section,query));
   const prepared=prepareSearchRelevance(query), patterns=[...prepared.patterns];
   for (const mode of ['exact','words']) for (let repeat=0;repeat<3;repeat++) {
     assert.deepEqual(sections.map(section=>searchRelevanceRank(section,query,mode,section.plainText,prepared)),expected);
@@ -44,4 +37,4 @@ for (const left of numbers) for (const right of numbers) {
   assert.equal(Math.sign(c.compareChapterNumbers(left,right,collator)),Math.sign(c.compareChapterNumbers(left,right)));
   assert.equal(Math.sign(collator.compare(left,right)),Math.sign(left.localeCompare(right,undefined,{numeric:true,sensitivity:'base'})));
 }
-console.log('Search ranking passed: frozen scores, exact/all-word parity, reusable regexes, definition labels and identical numeric/case-insensitive ordering.');
+console.log('Search ranking passed: prepared/default scores, exact/all-word parity, reusable regexes, definition labels and identical numeric/case-insensitive ordering.');

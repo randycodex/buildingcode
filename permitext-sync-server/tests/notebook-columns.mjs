@@ -55,7 +55,7 @@ const context=vm.createContext({state,normalizeNotebookColumns,notebookColumnPan
       if(!column.open){registry.remove(id);continue;}
       if(!registry.mounts.has(id))registry.register('project',id,makeMount(id,column.cardID));
     }
-  },whenWorkspacePaneReady:async()=>true,paneIsCollapsed:()=>false,scrollPaneIntoView:id=>events.push(['scroll',id]),syncNotebookNoteTabs(){},
+  },whenWorkspacePaneReady:async()=>true,paneIsCollapsed:()=>false,scrollPaneIntoView:id=>events.push(['scroll',id]),syncNotebookNoteTabs(){},syncTopbarProjectToolStates(){assert.equal(context.projectToolTogglePending,false);events.push(['topbar']);},
   projectToolTogglePending:false,navigator:{onLine:true},emptyNotebookDocument:()=>({document:[]}),
   async postResearch(path,payload){assert.equal(path,'/notebook/cards/save');requests++;return {card:{id:`new-${requests}`,title:payload.title,document:payload.document}};},
   showWebNotice:async(...args)=>assert.fail(args.join(': '))});
@@ -70,6 +70,7 @@ assert.equal(registry.mounts.size,1);assert.equal(registry.mounts.get(a.panel.da
 assert.equal(state.notebookColumns.find(item=>item.cardID==='b').open,false);
 await context.createNotebookNoteColumn(project);await context.createNotebookNoteColumn(project);
 assert.equal(requests,2);assert.equal(registry.mounts.size,3);
+assert.equal(events.filter(event=>event[0]==='topbar').length,2,'Creation refreshes topbar buttons after clearing the pending state.');
 assert.deepEqual(Array.from(catalog.get('project').slice(-2),card=>card.title),['Untitled','Untitled']);
 assert.equal(new Set(state.notebookColumns.filter(item=>item.open).map(notebookColumnPaneID)).size,3);
 assert.equal(a.body,'Unsaved text a','Creating notes cannot replace an existing editor.');

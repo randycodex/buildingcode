@@ -43,6 +43,18 @@ export function searchRelevanceRank(section, query, matchMode = 'exact', plainTe
   const context = searchHeading(section.headingLine);
   const concise = title.length <= 120 && searchWords(title).length <= 16;
   const depth = (number.match(/\./g) || []).length;
+  const parentNumber = String(section.headerLine || '').match(/^(?:SECTION\s+)(?:[A-Z]+\s+)?([\d.]+)\b/i)?.[1];
+  const canonicalChild = !parentNumber || number === parentNumber || number.startsWith(`${parentNumber}.`);
+  // A subject's own section is the best starting point for a broad subject
+  // query. Identically named rules inside special occupancies remain visible
+  // with their parent scope, after the general subject.
+  if (canonicalChild && preparedWordsMatch(context, prepared)) {
+    if (/^(general|where required|scope|application)\b/i.test(title)) return 0.8 + Math.min(depth, 8) * 0.05;
+    return 1.1 + Math.min(depth, 8) * 0.12 - (normalized(context) === needle ? 0.12 : 0);
+  }
+  // Extracted numbered list items keep their source identity but should not
+  // outrank the containing subject's actual subsections.
+  if (!canonicalChild) return 5 + Math.min(depth, 8) * 0.03;
   if (concise && normalized(context) === needle && preparedWordsMatch(title, prepared)) return 1 + Math.min(depth, 8) * 0.03;
   if (matchingSearchDefinition(section, query, plainText, prepared)) return 1.05;
   if (concise && normalized(title) === needle) return 1.3 + depth * 0.02;

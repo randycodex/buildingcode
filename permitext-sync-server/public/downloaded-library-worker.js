@@ -1,5 +1,5 @@
 import {codeReferenceRequest, resolveCodeReference} from "./code-reference-resolution.js?v=2";
-import { searchSpellingSuggestions } from "./search-relevance.js?v=20261025-workspace-chrome-v1379";
+import { searchSpellingSuggestions } from "./search-relevance.js?v=20261110-general-provisions-v2";
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import {
   searchWords,

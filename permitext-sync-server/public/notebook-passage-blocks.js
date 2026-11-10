@@ -1,11 +1,11 @@
 import { evidenceCommentBlocks } from "./evidence-comments.js?v=6";
-export function notebookReferenceBlocks(reference, passages = [], comments = []) {
+export function notebookReferenceBlocks(reference, passages = [], comments = [], sourceBlocks = null) {
   return [
     { type: "paragraph", content: [{ type: "permitextReference", props: { ...reference } }] },
-    ...(Array.isArray(passages) ? passages : []).flatMap(passage => {
+    ...(sourceBlocks || (Array.isArray(passages) ? passages : []).flatMap(passage => {
       const text = String(passage?.exact || "").trim();
       return text ? [{ type: "paragraph", content: [{ type: "text", text, styles: {} }] }] : [];
-    }),
+    })),
     ...evidenceCommentBlocks(comments)
   ];
 }
@@ -20,7 +20,7 @@ export function restoreNotebookPassageText(document, evidenceLinks = []) {
   const normalized = text => String(text || "").replace(/\s+/g, " ").trim();
   const inlineText = content => (Array.isArray(content) ? content : []).map(node =>
     node.type === "text" ? node.text : node.type === "link" ? inlineText(node.content) : "").join("");
-  const hasReference = block => (block.content || []).some(node => node.type === "permitextReference") ||
+  const hasReference = block => (Array.isArray(block.content) ? block.content : []).some(node => node.type === "permitextReference") ||
     (block.children || []).some(hasReference);
   const blockText = block => [inlineText(block.content), ...(block.children || []).map(blockText)].join("\n");
   let addedText = false;

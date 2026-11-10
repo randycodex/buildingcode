@@ -1,4 +1,56 @@
 import PDFDocument from "pdfkit";
+import { notebookTableDisplayData } from './public/notebook-content.js';
+
+// Source indentation is presentation whitespace, never a printed control glyph.
+const printableNoteText = value => String(value || '').replace(/\r\n?/g, '\n')
+  .replace(/[\t\v\f\u00a0\u2007\u202f]+/g, ' ').replace(/[\u0000-\u0008\u000e-\u001f\u007f]/g, '')
+  .replace(/ {2,}/g, ' ');
+
+function noteRuns(content) {
+  return (Array.isArray(content) ? content : []).flatMap(node => node.type === 'link'
+    ? noteRuns(node.content).map(run => ({...run, href:node.href}))
+    : [{text:printableNoteText(node.type === 'permitextReference' ? node.props.label : node.text),
+      ...node.styles, ...(node.styles?.backgroundColor === 'yellow' ? {highlight:true} : {})}]);
+}
+
+function drawNotebookContent(document, notebookDocument, material) {
+  const left = document.page.margins.left, width = document.page.width - left - document.page.margins.right;
+  const draw = (block, depth = 0, number = 1) => {
+    document.x = left;
+    if (block.type === 'image' && block.props?.url) {
+      const image = material.get(block.props.url);
+      if (!image?.body) throw new Error('A Note image is unavailable for PDF export. Upload the image to this Project before exporting.');
+      const source = document.openImage(image.body);
+      const scale = Math.min(width / source.width, 430 / source.height, 1);
+      const height = source.height * scale;
+      ensureVerticalSpace(document, height + 25);
+      const top = document.y;
+      document.image(source, left, top, {width:source.width * scale});
+      document.y = top + height + 8;
+      if (block.props.caption) drawReportRichText(document, [{text:printableNoteText(block.props.caption)}], {size:9});
+    } else if (block.type === 'table') {
+      const table = notebookTableDisplayData(block.content);
+      table.rows = table.rows.map(row => row.map(printableNoteText));
+      document.font('Report-Regular').fontSize(8);
+      drawReportTable(document, table, left, width);
+      document.x = left; document.moveDown(0.7);
+    } else {
+      drawReportRichText(document, noteRuns(block.content), {size:block.type === 'heading' ? Math.max(11, 16 - (block.props?.level || 1)) : 9.5,
+        bold:block.type === 'heading', indent:Math.min(depth * 12, 60),
+        prefix:block.type === 'bulletListItem' ? '• ' : block.type === 'numberedListItem' ? `${number}. ` : ''});
+    }
+    drawBlocks(block.children || [], depth + 1);
+  };
+  const drawBlocks = (blocks, depth = 0) => {
+    let number = 0;
+    for (const block of blocks) {
+      number = block.type === 'numberedListItem' ? block.props?.start || number + 1 : 0;
+      draw(block, depth, number);
+    }
+  };
+  drawBlocks(notebookDocument.document);
+  document.x = left;
+}
 import { fileURLToPath } from "node:url";
 import { reportEvidenceDisplayText, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation, reportItemPreview } from "./report-presentation.mjs";
 import { reportBlockRuns, reportRunsLines } from "./public/report-rich-text.js";
@@ -209,11 +261,12 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
       .font("Report-Bold")
       .fontSize(12)
       .text(item.title, { paragraphGap: 7 });
-    if (item.plainText) {
+    if (item.document) drawNotebookContent(document, item.document, projectMaterialBySourceID);
+    else if (item.plainText) {
       document
         .font("Report-Regular")
         .fontSize(9.5)
-        .text(item.plainText, { lineGap: 2, paragraphGap: 8 });
+        .text(printableNoteText(item.plainText), startX, document.y, {width:contentWidth, lineGap: 2, paragraphGap: 8 });
     }
   } else if (item.kind === "researchAnswer") {
     const title = item.reportTitle || (item.question.length > 96 ? `${item.question.slice(0, 95).trimEnd()}…` : item.question);
@@ -357,7 +410,7 @@ export function drawReportRichText(document, runs, {size = 10, bold = false, par
   };
   if (prefix) append({text:prefix});
   for (const run of runs) {
-    const tokens = run.text.split(/(\n|[^\S\n]+)/u).filter(Boolean);
+    const tokens = printableNoteText(run.text).split(/(\n|[^\S\n]+)/u).filter(Boolean);
     for (const token of tokens) {
       if (token === "\n") flush(); else append({...run,text:token});
     }
@@ -439,12 +492,13 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
         reserveHeading(document, noteTitle, item.text, { size: 12, gap: 7, bodySize: 10 });
         document.fillColor(colors.ink).font("Report-Bold").fontSize(12).text(noteTitle, { paragraphGap: 7 });
       } else ensureVerticalSpace(document, 55);
-      if (item.richText || markedText) drawReportRichText(document, item.richText || markedText);
+      if (item.notebookDocument) drawNotebookContent(document, item.notebookDocument, projectMaterialBySourceID);
+      else if (item.richText || markedText) drawReportRichText(document, item.richText || markedText);
       else document
         .fillColor(colors.ink)
         .font("Report-Regular")
         .fontSize(10)
-        .text(item.text, { lineGap: 2, paragraphGap: 10 });
+        .text(printableNoteText(item.text), document.page.margins.left, document.y, {width:document.page.width - document.page.margins.left - document.page.margins.right, lineGap: 2, paragraphGap: 10 });
       if (item.derivedFrom?.kind === "notebookCard" && item.evidenceLinks?.length) {
         const evidenceHeading = `Evidence linked to ${item.derivedFrom.title}`;
         const firstCitation = item.evidenceLinks.find(link => link.label || link.source?.sectionNumber);

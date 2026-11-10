@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 
 export function answerRequest(question, sources, facts = '', history = []) {
   if (!question.trim() || question.length > 8000) throw new Error('Enter a question of 1–8,000 characters.');
-  if (!sources.length || sources.length > 40) throw new Error('Select between one and forty sources.');
+  if (!sources.length && !facts.trim() || sources.length > 40) throw new Error('Select between one and forty sources or include reviewed Project facts.');
   if (JSON.stringify(sources).length + facts.length + JSON.stringify(history).length > 180000) throw new Error('Fast Research supports up to 180,000 characters of context.');
   return {
     model: 'gpt-6-luna', reasoning: { effort: 'low' }, service_tier: 'default',

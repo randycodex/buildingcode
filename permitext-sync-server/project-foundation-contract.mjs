@@ -777,7 +777,15 @@ export function immutableResearchAnswer({
   const clarificationAnswer = isAssistantEmptyMaterialAnswer(answer) || model === "permitext-conversation-clarification" &&
     researchCitations.length === 0 && isCanonicalResearchClarification(question, answer) &&
     (answer?.verification?.reason !== "project_scope" || Boolean(projectID));
-  if (researchEvidence.length < 1 && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer && !(assistantScopeSnapshot?.version === assistantScopeVersion && suppliedTextAnswer)) {
+  const reviewedSnapshot = assistantScopeSnapshot?.includeProjectContext && assistantScopeSnapshot.projectContext;
+  const reviewedProjectContextAnswer = assistantScopeSnapshot?.version === assistantScopeVersion &&
+    reviewedSnapshot?.projectInformation?.projectID === projectID && Number.isFinite(Date.parse(reviewedSnapshot?.reviewedAt)) &&
+    /^[a-f0-9]{64}$/.test(reviewedSnapshot?.contentHash || '') &&
+    answer?.inputSnapshot?.projectContextSnapshot?.contentHash === reviewedSnapshot.contentHash &&
+    /^research-v2-/.test(answer?.researchEngine || '') && answer?.verification?.pass === true &&
+    researchEvidence.length === 0 && researchCitations.length === 0 &&
+    Array.isArray(answer?.claimBindings) && answer.claimBindings.length === 0;
+  if (researchEvidence.length < 1 && !reviewedProjectContextAnswer && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer && !(assistantScopeSnapshot?.version === assistantScopeVersion && suppliedTextAnswer)) {
     throw new Error("Research answers require evidence.");
   }
   const fastUnreviewed = answer?.researchEngine === "fast-stream-v1" && answer?.mode === "openai" &&
@@ -804,6 +812,7 @@ export function immutableResearchAnswer({
     !evidenceBoundaryAnswer &&
     !clarificationAnswer &&
     !projectContextAnswer &&
+    !reviewedProjectContextAnswer &&
     !officialSupportingGuidanceAnswer &&
     !practicalGuidanceAnswer &&
     !conversationRecallAnswer &&

@@ -21,13 +21,16 @@ try {
   assert(source);
   const scope=JSON.stringify({version:1,enabledSources:[codeSourceIdentity(source)]});
   const rows=[];
-  for (const q of ['dead end corridor','1005.3.2','occupant load','laundry room','corrid','fire seperation']) {
+  for (const q of ['dead end corridor','1005.3.2','occupant load','laundry room','corrid','fire seperation','number of exits','accessible route','automatic sprinkler']) {
     const params=new URLSearchParams({q,version:'all',match:'words',grouped:'true',limit:'25',sourceScope:scope});
     const response=await fetch(`http://127.0.0.1:${server.address().port}/code/search?${params}`);
     assert.equal(response.status,200);
     const payload=await response.json();
     assert(payload.results.every(r=>r.codePrefix==='BC'&&r.codeVersion===source.canonicalEdition));
     if(q==='1005.3.2') assert.equal(payload.results[0].sectionNumber,q);
+    if(q==='number of exits') assert.equal(payload.results[0].sectionNumber,'1006.1','The general exit section precedes special occupancies.');
+    if(q==='accessible route') assert(payload.results.slice(0,3).some(item => item.sectionNumber === '1104.1'),'The general route section stays beside the definition.');
+    if(q==='automatic sprinkler') assert(payload.results.slice(0,3).some(item => item.sectionNumber === '903.2'),'Where-required provisions must be in the initial results.');
     if(q==='dead end corridor') assert.equal(payload.results[0].sectionNumber,'1020.4');
     if(q==='occupant load') {
       assert(payload.results.findIndex(r=>r.sectionNumber==='1004.1')<3,'The general rule must be among the first three matches.');

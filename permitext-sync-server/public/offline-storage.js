@@ -2,7 +2,7 @@ import { offlineAssetNamesForChapter, validatedOfflineCodeSources, offlineSource
 import {codeReferenceRequest, resolveCodeReference} from "./code-reference-resolution.js?v=2";
 export { offlineAssetNamesForChapter, validatedOfflineCodeSources, offlineSourceIdentity, offlineSourceScope, offlineSectionMetadata, resolveOfflineSectionMetadata };
 import {downloadedLibraryStatus, readDownloadedLibrary, removeDownloadedLibrary} from './downloaded-library.js?v=15';
-import { searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./search-relevance.js?v=20261025-workspace-chrome-v1379";
+import { searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./search-relevance.js?v=20261110-general-provisions-v2";
 import { searchWords, matchesSearchWords, searchWordsSnippet } from "./search-words.js?v=20261025-workspace-chrome-v1379";
 import { withCodeAssetRevision } from "./code-asset-identity.js?v=20260923-asset-identity-v1";
 import {
@@ -24,12 +24,14 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v2217";
+const shellCacheName = "permitext-pro-shell-v2225";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
+  "/web/notebook-content.js?v=2",
+  "/web/notebook-titles.js?v=1",
   "/web/project-details-columns.js?v=20261019-project-workflow-v2",
   "/web/workflow-views.js?v=14",
   "/web/active-code-sources.js",
@@ -44,10 +46,10 @@ const shellURLs = [
   "/web/minimal-workflow.js",
   "/web/notebook-questions.js",
   "/web/project-workflow.js?v=20261021-project-questions-v8",
-  "/web/search-relevance.js?v=20261025-workspace-chrome-v1379",
-  "/web/occupant-load-calculation.js?v=30",
+  "/web/search-relevance.js?v=20261110-general-provisions-v2",
+  "/web/occupant-load-calculation.js?v=31",
   "/web/calculation-drafts.js?v=3",
-  "/web/notebook-passage-blocks.js?v=7",
+  "/web/notebook-passage-blocks.js?v=8",
   "/web/evidence-comments.js?v=6",
   "/web/notebook-passage-disclosure.js?v=1",
   "/web/search-words.js?v=20261025-workspace-chrome-v1379",
@@ -62,11 +64,11 @@ const shellURLs = [
   "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
   "/web/reader-search-match.js?v=20261026-exact-section-v4",
   "/web/report-autosave.js?v=1",
-  "/web/report-undo.js?v=3",
+  "/web/report-undo.js?v=4",
   "/web/scroll-edge-fades.js?v=20261108-reader-menus-v10",
   "/web/report-outline.js?v=20261018-pinned-outline-v12",
   "/web/report-export-review.js?v=20261109-report-export-v14",
-  "/web/report-note-review.js?v=2",
+  "/web/report-note-review.js?v=3",
   "/web/report-rich-text.js",
   "/web/report-comparison.js?v=20261109-comparison-v21",
   "/web/workspace-resume.js?v=20261019-project-workflow-v5",
@@ -89,12 +91,12 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261109-evidence-search-menu-v1630",
+  "/web/web-client-version.js?v=20261110-workflow-polish-v1647",
   "/web/web-app-update.js?v=2",
   "/web/research-delete-controls.js?v=8",
   "/web/assistant-composer-hint.js?v=1",
   "/web/research-related-provisions.js?v=3",
-  "/web/research-v2.js?v=17",
+  "/web/research-v2.js?v=18",
   "/web/research-answer-reveal.js?v=1",
   "/web/research-question-rail.js?v=1",
   "/web/research-reader-target.js?v=3",
@@ -109,18 +111,18 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261109-notebook-checks-v172",
+  "/web/styles.css?v=20261110-workflow-polish-v173",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261109-evidence-search-menu-v1630",
+  "/web/app.js?v=20261110-workflow-polish-v1647",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261109-evidence-search-menu-v1630",
+  "/web/offline-storage.js?v=20261110-workflow-polish-v1647",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",

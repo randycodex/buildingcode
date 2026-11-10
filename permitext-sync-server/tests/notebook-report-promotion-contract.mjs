@@ -88,5 +88,5 @@ assert.equal(changed.saved.length, 0);
 const palette = app.slice(app.indexOf('  function renderSourcePalette('), app.indexOf('  function renderHistory('));
 assert(!palette.includes('appendSourceGroup("Saved evidence"'));
 assert(!palette.includes('appendSourceGroup("Notebook notes"'));
-assert(!app.slice(start, end).includes('openProjectReportDraft('), 'Adding must leave the source column in place.');
+assert(!app.slice(app.indexOf('async function promoteNotebookCardToReport('), end).includes('openProjectReportDraft('), 'Adding must leave the source column in place.');
 console.log('Note Report handoff passed: destinations, cancellation, first draft, deduplication, mounted edits, account fence, no column navigation, no Evidence shortcut.');

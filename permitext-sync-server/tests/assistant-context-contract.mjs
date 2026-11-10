@@ -40,6 +40,7 @@ for (const supplemental of [false, true]) {
     document:{createElement:element},state:{researchViewState:{assistantViews:retiredViews}},
     workspaceProject:()=>({id:'project-a',name:'Current project'}),projectDetailKey:project=>project.id,
     paneIDForUtilityInstance:()=>paneID,researchNewChatDrafts:new Map(),
+    renderResearchProjectContext(){}, researchWorkspaceProjectID:()=> 'project-a',
     researchProjectContextPreview:()=>element('preview'), researchComposerDisclosure:()=>element('disclosure'),
     researchChatPlaceholder:'Ask a question', bindResearchSendShortcut(){}, requestAnimationFrame:fn=>fn(),
     bindAssistantComposerHint(){},

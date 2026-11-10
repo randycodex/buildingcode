@@ -65,12 +65,31 @@ LIMIT 1
 `;
 
 export class NYCPropertyLookupError extends Error {
-  constructor(message, { code = "NYC_PROPERTY_LOOKUP_FAILED", status = 502 } = {}) {
+  constructor(message, { code = "NYC_PROPERTY_LOOKUP_FAILED", status = 502, candidates = [] } = {}) {
     super(message);
     this.name = "NYCPropertyLookupError";
     this.code = code;
     this.status = status;
+    this.candidates = candidates;
   }
+}
+
+const streetOrdinals = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth',
+  'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth', 'twentieth'];
+const ordinalValues = {...Object.fromEntries(streetOrdinals.map((word, index) => [word,index+1])),
+  thirtieth:30,fortieth:40,fiftieth:50,sixtieth:60,seventieth:70,eightieth:80,ninetieth:90,hundredth:100};
+const cardinalValues = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,
+  twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+const ordinalStreetPattern = new RegExp(`\\b((?:(?:${Object.keys(cardinalValues).join('|')}|hundred|and)[ -]+){0,5}(?:${Object.keys(ordinalValues).join('|')}))(?=\\s+(?:avenue|ave|street|st)\\b)`, 'gi');
+export function normalizedNYCPropertySearch(value) {
+  return normalizedNYCPropertyAddress(value).replace(ordinalStreetPattern, phrase => {
+    let number = 0;
+    for (const word of phrase.toLowerCase().split(/[ -]+/)) number = ['hundred','hundredth'].includes(word)
+      ? (number || 1) * 100 : number + (ordinalValues[word] || cardinalValues[word] || 0);
+    return String(number);
+  })
+    .replace(/\b(\d+)(?:st|nd|rd|th)\b/gi, '$1')
+    .replace(/,\s*Manhattan\b/i, ', New York');
 }
 
 export function normalizedNYCPropertyAddress(value) {
@@ -125,7 +144,8 @@ function validBBL(value) {
 }
 
 function addressSearchKey(value) {
-  return String(value || "").split(",")[0].toUpperCase()
+  if (!String(value || '').trim()) return '';
+  return normalizedNYCPropertySearch(value).split(",")[0].toUpperCase()
     .replace(/\b(\d+)(?:ST|ND|RD|TH)\b/g, "$1")
     .replace(/\bE\b/g, "EAST").replace(/\bW\b/g, "WEST")
     .replace(/\bN\b/g, "NORTH").replace(/\bS\b/g, "SOUTH")
@@ -244,21 +264,26 @@ export function structuredFactsFromNYCPropertyData({ lot, specialDistricts = [],
 export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now = () => new Date(), bbl: requestedBBL = "", includeLotGeometry = false } = {}) {
   const savedBBL = validBBL(requestedBBL);
   if (requestedBBL && !savedBBL) throw new NYCPropertyLookupError("Invalid saved BBL.", { status: 400 });
-  const query = savedBBL ? String(address || "").trim() : normalizedNYCPropertyAddress(address);
+  const enteredAddress = savedBBL ? String(address || "").trim() : normalizedNYCPropertyAddress(address);
+  const query = savedBBL ? enteredAddress : normalizedNYCPropertySearch(enteredAddress);
   const searchURL = new URL(nycPlanningSearchURL);
   searchURL.searchParams.set("q", query);
   const searchPayload = savedBBL ? [{ type: "lot", bbl: savedBBL }] : await fetchJSON(searchURL, { fetchImpl });
-  const borough = query.match(/\b(Bronx|Brooklyn|Manhattan|Queens|Staten Island)\b/i)?.[1];
+  const borough = enteredAddress.match(/\b(Bronx|Brooklyn|Manhattan|Queens|Staten Island)\b/i)?.[1] || (/\bNew York\s*,?\s*(?:NY|100\d\d|101\d\d|102\d\d)\b/i.test(enteredAddress) ? 'Manhattan' : '');
+  const boroughCode = borough ? [...boroughNames].find(([code,name]) => /^\d$/.test(code) && name.toLowerCase() === borough.toLowerCase())?.[0] : '';
   const matches = (Array.isArray(searchPayload) ? searchPayload : [])
     .filter(item => item?.type === "lot" && validBBL(item?.bbl) && (savedBBL ||
       (addressSearchKey(item.label) === addressSearchKey(query) &&
-       (!borough || String(item.label).toLowerCase().includes(borough.toLowerCase())))));
+       (!boroughCode || validBBL(item.bbl).startsWith(boroughCode)))));
   const distinctMatches = [...new Map(matches.map(item => [validBBL(item.bbl), item])).values()];
   const searchMatch = distinctMatches.length === 1 ? distinctMatches[0] : null;
   if (!searchMatch) {
     throw new NYCPropertyLookupError("No unambiguous New York City tax lot matched this address.", {
       code: "NYC_PROPERTY_NOT_FOUND",
-      status: 404
+      status: 404,
+      candidates: [...new Map((Array.isArray(searchPayload) ? searchPayload : [])
+        .filter(item => item?.type === 'lot' && validBBL(item.bbl) && String(item.label || '').trim())
+        .map(item => [validBBL(item.bbl), {bbl: validBBL(item.bbl), label: String(item.label).slice(0, 300)}])).values()].slice(0, 8)
     });
   }
 

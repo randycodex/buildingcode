@@ -16,7 +16,7 @@ function harness() {
     drafts: [], dirty:false, disposed:false, deletingReport:false, projectID:'p', requestIdentity:'a', current:true,
     requestWorkspaceID:'w',activeWorkspaceID:'w',accountUserID:'a',recoveryEditorID:'editor',restoredRecovery:null,recoveredDrafts:[],
     autosave:null,savePresentation:{state:'saved'},shell:{querySelector:()=>null},
-    reportUndo:createReportUndo(),reportContentBlocks,reportFormatting:null,panel:{addEventListener:()=>{}},
+    reportUndo:createReportUndo(),reportContentBlocks,reportFormatting:null,renderProjectUpdateBadge(){},panel:{addEventListener:()=>{}},
     createReportAutosave:options=>createReportAutosave({...options,setTimer:()=>1,clearTimer:()=>{}}),
     saveReportDraftRecovery:async record=>record,deleteReportDraftRecovery:async()=>true,
     isCurrentAccountRequest:()=>context.current, calls:[], renders:0, message:'',

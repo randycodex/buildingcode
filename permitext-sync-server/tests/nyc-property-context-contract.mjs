@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import {
   lookupNYCPropertyContext,
   normalizedNYCPropertyAddress,
+  normalizedNYCPropertySearch,
   NYCPropertyLookupError
 } from "../nyc-property-context.mjs";
 
@@ -85,6 +86,18 @@ const fetchImpl = async (input) => {
 };
 
 assert.equal(normalizedNYCPropertyAddress("  1760\nJerome Avenue  "), "1760 Jerome Avenue");
+assert.equal(normalizedNYCPropertySearch('350 Fifth Avenue, Manhattan, NY'), '350 5 Avenue, New York, NY');
+assert.equal(normalizedNYCPropertySearch('350 5th Avenue, New York, NY 10118'), '350 5 Avenue, New York, NY 10118');
+assert.equal(normalizedNYCPropertySearch('123 West Forty-Second Street, Manhattan, NY'), '123 West 42 Street, New York, NY');
+assert.equal(normalizedNYCPropertySearch('123 East One Hundred Twenty First Street, Manhattan'), '123 East 121 Street, New York');
+assert.equal(normalizedNYCPropertyAddress('350 Fifth Avenue, Manhattan, NY'), '350 Fifth Avenue, Manhattan, NY', 'The entered address remains intact.');
+let ambiguousCalls = 0;
+await assert.rejects(lookupNYCPropertyContext('1760 Jerome Avenue, Bronx', {fetchImpl:async () => {
+  ambiguousCalls++; return {ok:true,json:async () => [
+    {type:'lot',bbl:'2028500003',label:'1760 JEROME AVENUE, Bronx, NY'},
+    {type:'lot',bbl:'2028500004',label:'1760 JEROME AVENUE, Bronx, NY'}]};
+}}), error => error.code === 'NYC_PROPERTY_NOT_FOUND' && error.candidates.length === 2);
+assert.equal(ambiguousCalls,1,'An ambiguous address offers candidates without importing either lot.');
 assert.throws(
   () => normalizedNYCPropertyAddress(""),
   (error) => error instanceof NYCPropertyLookupError && error.code === "NYC_PROPERTY_ADDRESS_REQUIRED"
@@ -152,10 +165,10 @@ const [serverSource, clientSource] = await Promise.all([
 ]);
 assert.match(serverSource, /"projects\/property\/lookup": handleProjectPropertyLookup/);
 assert.match(serverSource, /status === "sourced"/);
-assert.match(clientSource, /postResearch\("\/projects\/property\/lookup", \{ address \}\)/);
+assert.match(clientSource, /postResearch\("\/projects\/property\/lookup", \{ address,/);
 assert.match(clientSource, /const originalProjectAddress = String\(identity\?\.address \|\| ""\)\.trim\(\)/,
   "The web editor must distinguish an unchanged Project address from a new address lookup.");
-assert.match(clientSource, /\(isEditing && address === originalProjectAddress\)/,
+assert.match(clientSource, /\(isEditing && !autoSave && address === originalProjectAddress\)/,
   "An unchanged address must not trigger a redundant NYC Planning lookup.");
 assert.match(clientSource, /if \(selectedFolderType === "reference" \|\| !isEditing \|\| addressChanged\) \{[\s\S]*?details\.structuredFacts = property\?\.structuredFacts \|\| \[\]/,
   "Creation and address changes must replace facts, while ordinary Project edits preserve existing sourced facts.");

@@ -246,7 +246,7 @@ function canonicalBlockProps(type, props = {}) {
     textColor: "default",
     textAlignment: "left"
   });
-  if (type === "paragraph" || type === "bulletListItem") return common();
+  if (type === "paragraph" || type === "bulletListItem" || type === "table") return common();
   if (type === "numberedListItem") {
     const canonical = common();
     if (props.start !== undefined) {
@@ -307,6 +307,37 @@ function canonicalBlock(node, state, depth = 0) {
     state.imageAssets.push(block.props.url.slice("permitext-notebook-asset:".length));
   }
   if (inlineBlockTypes.has(node.type)) block.content = canonicalInlineContent(node.content, state);
+  if (node.type === 'table') {
+    const table = node.content;
+    if (table?.type !== 'tableContent' || !Array.isArray(table.rows) || !table.rows.length || table.rows.length > 500) throw new Error('Invalid Notebook table rows.');
+    const rows = table.rows.map(row => {
+      if (!Array.isArray(row.cells) || !row.cells.length || row.cells.length > 100) throw new Error('Invalid Notebook table columns.');
+      return {cells: row.cells.map(cell => {
+        if (Array.isArray(cell)) return canonicalInlineContent(cell, state);
+        if (cell?.type !== 'tableCell') throw new Error('Invalid Notebook table cell.');
+        const props = {backgroundColor:'default', textColor:'default', textAlignment:'left'};
+        for (const name of ['colspan', 'rowspan']) if (cell.props?.[name] !== undefined) {
+          const count = cell.props[name];
+          if (!Number.isInteger(count) || count < 1 || count > 100) throw new Error('Invalid Notebook table span.');
+          props[name] = count;
+        }
+        return {type:'tableCell', props, content:canonicalInlineContent(cell.content, state)};
+      })};
+    });
+    const columns = Math.max(...rows.map(row => row.cells.reduce((total, cell) => total + (cell.props?.colspan || 1), 0)));
+    if (columns > 100) throw new Error('Notebook table has too many columns.');
+    const columnWidths = Array.from({length:columns}, (_, index) => {
+      const value = table.columnWidths?.[index];
+      if (value == null) return undefined;
+      if (!Number.isFinite(value) || value < 32 || value > 4000) throw new Error('Invalid Notebook table width.');
+      return value;
+    });
+    block.content = {type:'tableContent', columnWidths, rows};
+    for (const name of ['headerRows', 'headerCols']) if (table[name] !== undefined) {
+      if (!Number.isInteger(table[name]) || table[name] < 0 || table[name] > (name === 'headerRows' ? rows.length : columns)) throw new Error('Invalid Notebook table headers.');
+      block.content[name] = table[name];
+    }
+  }
   return block;
 }
 
@@ -396,6 +427,8 @@ function blockPlainText(block, depth = 0) {
   let text = "";
   if (block.type === "image") {
     text = block.props.caption || block.props.name || "Image";
+  } else if (block.type === 'table') {
+    text = block.content.rows.map(row => row.cells.map(cell => inlinePlainText(Array.isArray(cell) ? cell : cell.content)).join(' | ')).join('\n');
   } else {
     text = inlinePlainText(block.content);
   }
@@ -439,6 +472,10 @@ function renderInlineHTML(content) {
 
 function renderBlockHTML(block) {
   const children = block.children.map(renderBlockHTML).join("");
+  if (block.type === 'table') return `<table>${block.content.rows.map((row, index) => `<tr>${row.cells.map(cell => {
+    const tag = index < (block.content.headerRows || 0) ? 'th' : 'td';
+    return `<${tag}${cell.props?.colspan ? ` colspan="${cell.props.colspan}"` : ''}${cell.props?.rowspan ? ` rowspan="${cell.props.rowspan}"` : ''}>${renderInlineHTML(Array.isArray(cell) ? cell : cell.content)}</${tag}>`;
+  }).join('')}</tr>`).join('')}</table>${children}`;
   const content = renderInlineHTML(block.content);
   if (block.type === "heading") return `<h${block.props.level}>${content}</h${block.props.level}>${children}`;
   if (block.type === "bulletListItem") return `<ul><li>${content}${children}</li></ul>`;
@@ -472,6 +509,7 @@ export function notebookManifestItem({ cardID, cardType, title, document }) {
     title: requiredText(title, "Notebook card title", 300),
     sourceClassification: "user-authored",
     plainText: notebookPlainText(validated.document),
+    document: validated.document,
     references: validated.references.map((reference) => ({
       ...reference,
       sourceClassification: ["canonicalSection", "selectedPassage"].includes(reference.referenceKind)

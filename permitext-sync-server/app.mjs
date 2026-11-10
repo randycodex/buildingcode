@@ -264,7 +264,8 @@ import { codeQuestionRolloutAccess } from "./code-question-rollout.mjs";
 import {
   notebookCardTypes,
   notebookPlainText,
-  normalizeNotebookCardPayload
+  normalizeNotebookCardPayload,
+  validateNotebookDocument
 } from "./notebook-contract.mjs";
 import { codeTrustProfilesForLibraries } from "./code-trust-contract.mjs";
 import {
@@ -13918,7 +13919,8 @@ async function handleProjectPropertyLookup(request, response) {
     if (error instanceof NYCPropertyLookupError) {
       sendJSON(response, error.status, {
         error: error.message,
-        code: error.code
+        code: error.code,
+        candidates: error.candidates
       });
       return;
     }
@@ -16972,6 +16974,7 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
           cardID: artifact.envelope.id,
           cardType: artifact.payload.cardType,
           title: artifact.payload.title,
+          ...(artifact.payload.document ? {document:artifact.payload.document} : {}),
           plainText: artifact.payload.document
             ? notebookPlainText(artifact.payload.document)
             : (artifact.payload.plainText || ""),
@@ -17487,14 +17490,28 @@ async function reportFilesForProject(userID, projectID) {
 }
 
 async function reportProjectMaterialBySourceID(userID, projectID, manifest) {
+  const material = new Map();
+  const assetIDs = new Set();
+  for (const item of manifest.items || []) {
+    const document = item.kind === 'notebookCard' ? item.document : item.notebookDocument;
+    if (document) for (const id of validateNotebookDocument(document).imageAssets) assetIDs.add(id);
+  }
+  for (const assetID of assetIDs) {
+    if (!await notebookImageAccessibleFromProject(userID, projectID, assetID)) throw new Error('A Report Note image is unavailable in this Project.');
+    const asset = await ownedNotebookImageAsset(userID, assetID);
+    const body = await readPrivateProjectAsset(asset.payload.storageKey);
+    if (!body || createHash('sha256').update(body).digest('hex') !== asset.payload.contentHash) throw new Error('A Report Note image no longer matches its immutable content hash.');
+    const imageBody = ['image/png','image/jpeg'].includes(asset.payload.contentType) ? body
+      : await (await import('sharp')).default(body, {limitInputPixels:40_000_000, animated:false}).rotate().png().toBuffer();
+    material.set(`permitext-notebook-asset:${assetID}`, {body:imageBody, contentType:asset.payload.contentType, contentHash:asset.payload.contentHash});
+  }
   const requestedIDs = new Set(
     (manifest.items || [])
       .filter((item) => item.kind === "workboardPreview")
       .map((item) => item.sourceID)
   );
-  if (!requestedIDs.size) return new Map();
+  if (!requestedIDs.size) return material;
   const artifacts = await listStoredFoundationArtifacts(userID, { ids: [...requestedIDs] });
-  const material = new Map();
   for (const artifact of artifacts) {
     if (
       !requestedIDs.has(artifact.envelope?.id) ||
@@ -18836,6 +18853,14 @@ async function handleResearchConversationAssignProject(request, response) {
 async function handleResearchConversationProjectContext(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
+  if (context.body.preview === true && !context.body.conversationID) {
+    const projectID = String(context.body.projectID || '').trim();
+    if (!await requireResearchProject(context, response, projectID)) return;
+    const information = await currentResearchProjectInformation(context.userID, projectID);
+    if (!information) { sendError(response, 404, 'Project context is unavailable.'); return; }
+    const contentHash = createHash('sha256').update(JSON.stringify(information)).digest('hex');
+    sendJSON(response, 200, {snapshot:{projectID, projectInformation:information, contentHash}}); return;
+  }
   const conversation = await requiredResearchConversation(
     response,
     context.userID,
@@ -18843,10 +18868,25 @@ async function handleResearchConversationProjectContext(request, response) {
   );
   if (!conversation) return;
   if (isConversationOnly(conversation)) {
-    sendJSON(response, 410, {
-      error: "Only Reader passages can be added to Research.",
-      code: "ASSISTANT_PASSAGES_ONLY"
-    });
+    const projectID = conversation.primaryProjectID;
+    if (!projectID) { sendError(response, 409, 'Choose a Project before including its context.'); return; }
+    if (!await requireResearchProject(context, response, projectID)) return;
+    const information = await currentResearchProjectInformation(context.userID, projectID);
+    if (!information) { sendError(response, 404, 'Project context is unavailable.'); return; }
+    const contentHash = createHash('sha256').update(JSON.stringify(information)).digest('hex');
+    if (context.body.preview === true) {
+      sendJSON(response, 200, {snapshot:{projectID, projectInformation:information, contentHash}}); return;
+    }
+    if (context.body.include !== false && context.body.snapshotHash !== contentHash) {
+      sendJSON(response, 409, {error:'Project information changed. Review it again before including it.',code:'RESEARCH_PROJECT_REVIEW_REQUIRED'}); return;
+    }
+    const now = new Date().toISOString();
+    conversation.assistantScope = {...emptyAssistantScope(), projectID,
+      ...(context.body.include !== false ? {includeProjectContext:true, projectContext:{projectID,
+        projectInformation:structuredClone(information), contentHash, reviewedAt:now}} : {})};
+    conversation.updatedAt = now;
+    await saveStoredResearchConversation(context.userID, conversation);
+    sendJSON(response, 200, {conversation:await researchConversationForClient(conversation, {userID:context.userID})});
     return;
   }
   const projectID = String(context.body.projectID || "").trim();
@@ -20731,13 +20771,14 @@ async function handleResearchConversationMessage(request, response) {
     }
     const manualProjectFacts = conversationOnly ? [] : conversation.projectContext?.facts || [];
     const combinedProjectFacts = combinedResearchProjectFacts(projectInformation, manualProjectFacts);
-    if (conversationOnly && !pinnedEvidence.length) {
+    if (conversationOnly && !pinnedEvidence.length && !conversationScope.includeProjectContext) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
         researchRequestID, progressResponse, evidenceSnapshots: [], conversationScopeEmpty: true });
       Object.assign(researchOperation, { status: "completed", mode: "evidence_boundary", charged: false });
       return;
     }
-    if (!conversationOnly && researchProjectContextOnlyEligibility({ question, projectInformation })) {
+    if ((!conversationOnly || (!requestedV2 && conversationScope?.includeProjectContext && !pinnedEvidence.length)) &&
+        researchProjectContextOnlyEligibility({ question, projectInformation })) {
       await commitProjectContextOnlyResearchMessage({
         context,
         conversation,
@@ -20759,6 +20800,11 @@ async function handleResearchConversationMessage(request, response) {
         charged: false
       });
       return;
+    }
+    if (!requestedV2 && conversationOnly && conversationScope.includeProjectContext && !pinnedEvidence.length) {
+      await commitMissingDocumentClarification({context, conversation, originalConversation, question, researchRequestID,
+        progressResponse, evidenceSnapshots:[]});
+      Object.assign(researchOperation,{status:'completed',mode:'clarification',charged:false}); return;
     }
     const propertyResearch = mockMode || conversationOnly ? null : await researchPropertyContext({ question, messages: activeMessages, projectInformation });
     const corpusPlan = conversationOnly
@@ -20802,7 +20848,7 @@ async function handleResearchConversationMessage(request, response) {
               if (!(await ensureResearchTurnReservation())) throw Object.assign(new Error("Request handled."), {code:"RESEARCH_REQUEST_HANDLED"});
             }, onStage:progressResponse.progress });
       const evidence = packageForFast.sources || [];
-      if (!evidence.length) {
+      if (!evidence.length && !conversationScope?.includeProjectContext) {
         await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
           researchRequestID, progressResponse, evidenceSnapshots:[], clarificationReason:"evidence_unavailable" });
         Object.assign(researchOperation, {status:"completed",mode:"clarification",charged:false});
@@ -20852,7 +20898,8 @@ async function handleResearchConversationMessage(request, response) {
               settleProviderSpend:settleResearchProviderSpend });
             return payload;
           } });
-        v2Result = await runResearchV2({ question, sources, history:activeMessages }, { call,
+        v2Result = await runResearchV2({ question, sources, history:activeMessages,
+          ...(conversationScope?.includeProjectContext ? {projectContextSnapshot:conversationScope.projectContext} : {}) }, { call,
           signal:progressResponse.signal, onStage:stage => {
             progressResponse.progress(stage === "review" ? "checking_citation_support" : "preparing_conclusion", "active");
           } });

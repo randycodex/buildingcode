@@ -17,7 +17,7 @@ export async function reviewReportNoteSnapshot(block, {loadNote, confirm, isCurr
   const card = await loadNote(block.derivedFrom.id);
   if (!current()) return null;
   if (!card || card.id !== block.derivedFrom.id) throw new Error('The source Note is unavailable.');
-  if ((card.plainText || '').length > 20000) throw new Error('This Note is too long for one Report paragraph. Keep the linked source or split the Note before updating this paragraph.');
+  if (!card.document && (card.plainText || '').length > 20000) throw new Error('This Note is too long for one Report paragraph. Keep the linked source or split the Note before updating this paragraph.');
   const accepted = await confirm({block: structuredClone(block), card});
   return accepted && current() ? card : null;
 }

@@ -42,7 +42,7 @@ result=await runResearchV2(input,{call:async(body,meta)=>payload(meta.phase==='r
 assert.equal(result.status,'review_failed');assert(!result.draft.answerText.includes('[S1]'));
 assert.deepEqual(result.draft.claims,[]);assert.equal(result.payloads.length,4);
 assert.equal(researchV2AnswerMetadata(result).verification.pass,false);
-await assert.rejects(runResearchV2({...input,sources:[]},{call:()=>{throw Error('must not be called');}}),/Include between/);
+await assert.rejects(runResearchV2({...input,sources:[]},{call:()=>{throw Error('must not be called');}}),/Include Reader passages/);
 await assert.rejects(runResearchV2(input,{call:async()=>({status:'incomplete'})}),/completed response/);
 const cancelled=new AbortController();cancelled.abort();
 await assert.rejects(runResearchV2(input,{signal:cancelled.signal,call:()=>{throw Error('must not call');}}),{name:'AbortError'});

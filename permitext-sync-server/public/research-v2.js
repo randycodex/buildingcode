@@ -154,11 +154,13 @@ export function createResearchV2View(options) {
   const send=action('↑',()=>void sendQuestion(),'rv2-send');send.setAttribute('aria-label','Send question');
   const cancel=action('Stop',()=>controller?.abort(),'rv2-text-action');cancel.hidden=true;
   controls.append(attach,cancel,send);composer.append(chips,input,controls,menu);
+  const projectContext = options.renderProjectContext?.(composer);
   const detail=node('section','rv2-detail');detail.hidden=true;detail.setAttribute('aria-label','Passage details');
   const detailBody=node('div','rv2-detail-body');
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
   chat.append(mobileHistory,thread,detail,status,composer);root.append(rail,divider,chat);
-  function update(){input.disabled=busy;attach.disabled=busy||includeBusy||revealBusy;send.disabled=busy||includeBusy||revealBusy||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy));}
+  function update(){input.disabled=busy;attach.disabled=busy||includeBusy||revealBusy;send.disabled=busy||includeBusy||revealBusy||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy));
+    projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy;});}
   function showDetail(){thread.hidden=true;detail.hidden=false;detailBody.replaceChildren();return detailBody;}
   function showFactEntry(fact,question){
     if(busy||includeBusy)return;const attempt=++generation,content=showDetail();

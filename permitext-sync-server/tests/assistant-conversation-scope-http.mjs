@@ -39,8 +39,8 @@ try {
     assert.equal(blocked.code,'ASSISTANT_PASSAGES_ONLY');
   }
   const blockedContext=await request('/research/conversations/project-context',{
-    conversationID:conversation.id,projectID,facts:['Blocked additional fact']},410);
-  assert.equal(blockedContext.code,'ASSISTANT_PASSAGES_ONLY');
+    conversationID:conversation.id,projectID,facts:['Blocked additional fact']},409);
+  assert.equal(blockedContext.code,'RESEARCH_PROJECT_REVIEW_REQUIRED');
   // Retained legacy inputs stay stored; future requests must exclude them.
   const raw=(await adapter.read()).researchConversationsByUserID[userID].find(item=>item.id===conversation.id);
   const legacyScope={...raw.assistantScope,includeProjectContext:true,

@@ -10,7 +10,7 @@ import {
   matchingSearchDefinition,
   initialSearchGroupLimit,
   prepareSearchRelevance,
-} from "./search-relevance.js?v=20261025-workspace-chrome-v1379";
+} from "./search-relevance.js?v=20261110-general-provisions-v2";
 import {
   offlineSourceScope,
   offlineSectionMetadata,

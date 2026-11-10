@@ -220,7 +220,7 @@ export function occupantLoadFootnoteQuestion(input) {
       `User-provided reason/reference: ${input.customReason || '(not entered)'}. Treat this as user input, not enacted text or proof of approval.`
     ] : []),
     'This calculation uses the entered area without any additional optional fixture or amenity deduction. Explain any optional deduction separately; fixture dimensions are not requested for this as-entered calculation. If the user wants to evaluate a deduction, ask for the relevant details then.',
-    'Use the included passages and facts stated in this conversation, respecting later corrections and the specific space. Saved Project Context and Facts are not included. The selected code row does not establish how the area was measured or whether the space is indoors, a rooftop or a terrace. Identify genuinely missing facts that affect mandatory conditions or applicability. Do not infer approvals, deduct area automatically or declare overall compliance.'
+    'Use the included passages and facts stated in this conversation, respecting later corrections and the specific space. Use Project Context and Facts only when an explicitly reviewed snapshot is included in this conversation. The selected code row does not establish how the area was measured or whether the space is indoors, a rooftop or a terrace. Identify genuinely missing facts that affect mandatory conditions or applicability. Do not infer approvals, deduct area automatically or declare overall compliance.'
   ].join('\n');
 }
 

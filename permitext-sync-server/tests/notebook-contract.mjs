@@ -213,7 +213,7 @@ assert.match(renderNotebookDocumentHTML(richValidated.document), /data-notebook-
 assert.match(renderNotebookDocumentHTML(richValidated.document), /<ul><li><em>Confirm rated wall<\/em><\/li><\/ul>/);
 assert.match(renderNotebookDocumentHTML(richValidated.document), /<a href="https:\/\/www\.nyc\.gov/);
 
-for (const unsupportedType of ["checkListItem", "toggleListItem", "quote", "codeBlock", "divider", "table"]) {
+for (const unsupportedType of ["checkListItem", "toggleListItem", "quote", "codeBlock", "divider"]) {
   assert.throws(
     () => validateNotebookDocument({
       ...emptyNotebookDocument(),

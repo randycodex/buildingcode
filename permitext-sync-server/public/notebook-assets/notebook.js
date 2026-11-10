@@ -46813,7 +46813,7 @@ var SW = (0, _.forwardRef)((e, t) => {
 };
 DW[2], DW[6], DW[2], DW[6], DW[2], DW[7], DW[2], DW[7], DW[2], DW[8], DW[5], DW[7], DW[8], DW[7], DW[4], OW.borderRadius, OW.fontFamily;
 //#endregion
-//#region public/evidence-comments.js?v=5
+//#region public/evidence-comments.js?v=6
 function kW(e = []) {
 	return e.filter((e) => String(e).trim()).map((e, t) => ({
 		type: "paragraph",
@@ -46826,7 +46826,7 @@ function kW(e = []) {
 }
 //#endregion
 //#region public/notebook-passage-blocks.js
-function AW(e, t = [], n = []) {
+function AW(e, t = [], n = [], r = null) {
 	return [
 		{
 			type: "paragraph",
@@ -46835,7 +46835,7 @@ function AW(e, t = [], n = []) {
 				props: { ...e }
 			}]
 		},
-		...(Array.isArray(t) ? t : []).flatMap((e) => {
+		...r || (Array.isArray(t) ? t : []).flatMap((e) => {
 			let t = String(e?.exact || "").trim();
 			return t ? [{
 				type: "paragraph",
@@ -47982,7 +47982,8 @@ var OG = "permitext-notebook-card", kG = "blocknote-json", AG = Object.freeze([
 	"heading",
 	"bulletListItem",
 	"numberedListItem",
-	"image"
+	"image",
+	"table"
 ]);
 function MG() {
 	return [{
@@ -48508,11 +48509,11 @@ function ZG(e, t = {}) {
 				props: qG(e)
 			}, " "]), !0) : !1;
 		},
-		appendReference(e, t = [], n = []) {
-			let i = r.current, a = i?.document.at(-1);
-			if (!i || !a) return !1;
-			let o = i.insertBlocks(AW(qG(e), t, n), a, "after");
-			return i.setTextCursorPosition(o.at(-1), "end"), i.focus(), !0;
+		appendReference(e, t = [], n = [], i = null) {
+			let a = r.current, o = a?.document.at(-1);
+			if (!a || !o) return !1;
+			let s = a.insertBlocks(AW(qG(e), t, n, i), o, "after");
+			return a.setTextCursorPosition(s.at(-1), "end"), a.focus(), !0;
 		},
 		replaceAssetURL(e, t) {
 			let n = r.current;

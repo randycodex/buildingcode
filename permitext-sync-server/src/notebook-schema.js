@@ -15,7 +15,8 @@ export const notebookBlockTypes = Object.freeze([
   "heading",
   "bulletListItem",
   "numberedListItem",
-  "image"
+  "image",
+  "table"
 ]);
 
 export function emptyBlockNoteContent() {
