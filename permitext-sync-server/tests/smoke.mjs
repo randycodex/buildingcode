@@ -1981,7 +1981,7 @@ async function main() {
         workspaceScript.text.includes("wireProjectSectionMotion(") &&
         workspaceScript.text.includes('title.className = "saved-evidence-section-toggle section-label"') &&
         !workspaceScript.text.includes("saved-evidence-collapse-toggle") &&
-        workspaceScript.text.includes('search.className = "saved-evidence-search-toggle"') &&
+        workspaceScript.text.includes("panel._savedEvidenceSearch = {") &&
         workspaceScript.text.includes("function savedEvidenceMatchesQuery(item, query)") &&
         workspaceScript.text.includes("instance.evidenceSearchOpen = true") &&
         workspaceScript.text.includes('searchInput.oninput = () => {') &&

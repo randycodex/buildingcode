@@ -353,7 +353,7 @@ const savedEvidenceSectionSource = functionSource(appSource, "populateSavedEvide
 assert.match(savedEvidenceHeadingSource, /saved-evidence-section-toggle section-label/);
 assert.doesNotMatch(savedEvidenceHeadingSource, /saved-evidence-collapse-toggle|researchChevronIconsSVG/);
 assert.match(savedEvidenceSectionSource, /aria-controls[\s\S]*?collapsedEvidenceFolderIDs[\s\S]*?wireProjectSectionMotion[\s\S]*?\[title\][\s\S]*?onChange: recordExpandedState/);
-assert.match(savedEvidenceSectionSource, /\[search, select\][\s\S]*?setExpanded\(true\)[\s\S]*?recordExpandedState\(true\)/);
+assert.match(savedEvidenceSectionSource, /select\.addEventListener[\s\S]*?setExpanded\(true\)[\s\S]*?recordExpandedState\(true\)/);
 assert.match(appSource, /instance\.collapsedEvidenceFolderIDs = Array\.from\(new Set/);
 [
   "openProjectNotebook",
@@ -729,7 +729,8 @@ assert.match(appSource, /function savedEvidenceKey[\s\S]*?return `\$\{version\}:
 assert.doesNotMatch(appSource, /if \(saved && blockID && normalizeAnnotationBlockID\(savedRecord\?\.blockID\) !== blockID\)/);
 assert.match(appSource, /item\.savedColumnKind === "bookmark" &&[\s\S]*?!normalizeAnnotationBlockID\(item\.blockID\)[\s\S]*?projectSavedScope: "section"/);
 assert.match(appSource, /if \(searchActive\) return;[\s\S]*?savedInstance\.collapsedCodePrefixes/);
-assert.match(appSource, /function createSavedEvidenceHeading\([\s\S]*?saved-evidence-search-toggle[\s\S]*?Search saved evidence/);
+assert.doesNotMatch(savedEvidenceHeadingSource, /saved-evidence-search-toggle/);
+assert.match(functionSource(appSource, "openColumnGroupMenu"), /_savedEvidenceSearch[\s\S]*?Search saved evidence/);
 assert.match(indexSource, /class="saved-evidence-search"[\s\S]*?class="saved-evidence-search-input"[\s\S]*?class="saved-evidence-search-close"/);
 assert.match(indexSource, /class="saved-projects-section[^>]*aria-label="Projects"/);
 assert.match(indexSource, /class="code-filter-menu-toggle saved-projects-menu-toggle"[^>]*aria-label="Expand Projects"/);

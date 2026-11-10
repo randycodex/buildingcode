@@ -7,7 +7,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-notebook-toggle-v1629";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-evidence-search-menu-v1630";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -159,7 +159,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261109-notebook-toggle-v1629";
+} from "./offline-storage.js?v=20261109-evidence-search-menu-v1630";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -36768,15 +36768,11 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   const searchForm = panel.querySelector(".saved-evidence-search");
   const searchInput = panel.querySelector(".saved-evidence-search-input");
   const searchCloseButton = panel.querySelector(".saved-evidence-search-close");
-  const searchToggle = panel.querySelector(".saved-evidence-search-toggle");
+  const searchToggle = () => panel.querySelector(".column-group-menu-button");
   instance.codeFilters = [];
   const syncEvidenceSearch = ({ focus = false } = {}) => {
     const open = Boolean(instance.evidenceSearchOpen);
     searchForm.hidden = !open;
-    searchToggle?.setAttribute("aria-expanded", String(open));
-    searchToggle?.setAttribute("aria-pressed", String(open));
-    searchToggle?.setAttribute("title", open ? "Close saved evidence search" : "Search saved evidence");
-    searchToggle?.setAttribute("aria-label", open ? "Close saved evidence search" : "Search saved evidence");
     if (open) {
       searchInput.value = instance.folderQuery;
       if (focus) requestAnimationFrame(() => searchInput.focus());
@@ -36792,10 +36788,10 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   };
   searchForm.onsubmit = (event) => event.preventDefault();
   searchForm.onfocusout = (event) => {
-    if (searchForm.contains(event.relatedTarget) || event.relatedTarget === searchToggle) return;
+    if (searchForm.contains(event.relatedTarget) || event.relatedTarget === searchToggle()) return;
     requestAnimationFrame(() => {
       if (instance.evidenceSearchOpen && !searchInput.value.trim() &&
-          !searchForm.contains(document.activeElement) && document.activeElement !== searchToggle) {
+          !searchForm.contains(document.activeElement) && document.activeElement !== searchToggle()) {
         closeEvidenceSearch();
       }
     });
@@ -36806,16 +36802,19 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
     saveWorkspaceState();
   };
   searchCloseButton.onclick = closeEvidenceSearch;
-  if (searchToggle) {
-    searchToggle.onclick = () => {
+  panel._savedEvidenceSearch = {
+    available: allItems.length > 0,
+    isOpen: () => Boolean(instance.evidenceSearchOpen),
+    toggle() {
       if (instance.evidenceSearchOpen) closeEvidenceSearch();
       else {
+        panel.querySelector('.saved-evidence-section-toggle[aria-expanded="false"]')?.click();
         instance.evidenceSearchOpen = true;
         syncEvidenceSearch({ focus: true });
         saveWorkspaceState();
       }
-    };
-  }
+    }
+  };
   syncEvidenceSearch();
   wrapper.hidden = allItems.length === 0;
 }
@@ -36828,14 +36827,6 @@ function createSavedEvidenceHeading() {
   title.className = "saved-evidence-section-toggle section-label";
   title.textContent = "Saved evidence";
   title.setAttribute("aria-expanded", "true");
-  const search = document.createElement("button");
-  search.type = "button";
-  search.className = "saved-evidence-search-toggle";
-  search.title = "Search saved evidence";
-  search.setAttribute("aria-label", "Search saved evidence");
-  search.setAttribute("aria-expanded", "false");
-  search.setAttribute("aria-pressed", "false");
-  search.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>';
   const actions = document.createElement("div");
   actions.className = "saved-evidence-heading-actions";
   const select = document.createElement("button");
@@ -36857,14 +36848,14 @@ function createSavedEvidenceHeading() {
   cancel.className = "saved-evidence-cancel-selection";
   cancel.textContent = "Cancel";
   cancel.hidden = true;
-  actions.append(search, select, remove, cancel);
+  actions.append(select, remove, cancel);
   heading.append(title, actions);
-  return { heading, title, search, select };
+  return { heading, title, select };
 }
 
 function populateSavedEvidenceSection(section, savedInstance, folder, ...children) {
   const folderID = projectRecordID(folder);
-  const { heading, title, search, select } = createSavedEvidenceHeading();
+  const { heading, title, select } = createSavedEvidenceHeading();
   const body = document.createElement("div");
   body.className = "saved-project-evidence-body";
   body.id = `saved-evidence-${safeAnnotationIDPart(folderID)}-${safeAnnotationIDPart(savedInstance.id)}`;
@@ -36896,11 +36887,11 @@ function populateSavedEvidenceSection(section, savedInstance, folder, ...childre
       onChange: recordExpandedState
     }
   );
-  [search, select].forEach((control) => control.addEventListener("click", () => {
+  select.addEventListener("click", () => {
     if (!collapsedFolderIDs.has(folderID)) return;
     setExpanded(true);
     recordExpandedState(true);
-  }, { capture: true }));
+  }, { capture: true });
 }
 
 function appendProjectRecordsChecklist(container, project, identity) {
@@ -44745,6 +44736,9 @@ function openColumnGroupMenu(panel, anchor) {
       else expansion.expand(panel);
     });
   }
+  const evidenceSearch = panel.classList.contains('saved-panel') ? panel._savedEvidenceSearch : null;
+  if (evidenceSearch) add(evidenceSearch.isOpen() ? 'Close saved evidence search' : 'Search saved evidence',
+    () => evidenceSearch.toggle(), !evidenceSearch.available);
   const factEditor = panel.classList.contains("project-facts-panel") ? projectInformationMounts.get(panel.dataset.paneId) : null;
   if (factEditor?.refreshZoLa) add("Refresh ZoLa data", factEditor.refreshZoLa, factEditor.isRefreshing());
   if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
