@@ -85,7 +85,7 @@ export function beta1ConfigurationReadiness(environment = process.env) {
         ? `Stripe automatic tax is enabled with ${stripeTax.taxBehavior} Price behavior.`
         : stripeTax.problems.join(" ")
     ),
-    check("public-base-url", publicBaseURL.startsWith("https://"), "Set the canonical HTTPS Permitext production URL."),
+    check("public-base-url", publicBaseURL.startsWith("https://"), "Set the canonical HTTPS per codes production URL."),
     check(
       "approved-policy-versions",
       policies.ready,

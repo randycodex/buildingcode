@@ -17,8 +17,24 @@ function productionEnvironment(environment) {
 }
 
 export const productionClerkAuthorizedParties = Object.freeze([
+  "https://per.codes",
+  "https://www.per.codes"
+]);
+
+export const legacyProductionClerkAuthorizedParties = Object.freeze([
   "https://permitext.com",
   "https://www.permitext.com"
+]);
+
+const productionOriginSets = [
+  productionClerkAuthorizedParties,
+  legacyProductionClerkAuthorizedParties,
+  [...productionClerkAuthorizedParties, ...legacyProductionClerkAuthorizedParties]
+];
+
+const productionClerkHosts = Object.freeze([
+  { frontend: "https://clerk.per.codes", portal: "https://accounts.per.codes" },
+  { frontend: "https://clerk.permitext.com", portal: "https://accounts.permitext.com" }
 ]);
 
 function normalizedPEM(value) {
@@ -105,11 +121,13 @@ export function clerkConfigurationStatus(environment = process.env) {
     if (publishableKeyMode === "test") problems.push("Production Clerk is still using a test publishable key.");
     if (!jwtKey && secretKeyMode === "test") problems.push("Production Clerk is still using a test secret key.");
     if (
-      authorizedParties.length !== productionClerkAuthorizedParties.length ||
-      !productionClerkAuthorizedParties.every((party) => authorizedParties.includes(party))
+      !productionOriginSets.some((parties) =>
+        authorizedParties.length === parties.length &&
+        parties.every((party) => authorizedParties.includes(party))
+      )
     ) {
       problems.push(
-        `Production CLERK_AUTHORIZED_PARTIES must contain only ${productionClerkAuthorizedParties.join(", ")}.`
+        "Production CLERK_AUTHORIZED_PARTIES must contain the exact per.codes pair, legacy permitext.com pair, or both pairs during migration."
       );
     }
   }
@@ -121,13 +139,16 @@ export function clerkConfigurationStatus(environment = process.env) {
   if (!frontendAPIURL) webProblems.push("CLERK_FRONTEND_API_URL must be an HTTPS origin.");
   if (!accountPortalSignInURL) webProblems.push("CLERK_ACCOUNT_PORTAL_URL must be the hosted HTTPS sign-in URL.");
   if (productionEnvironment(environment)) {
-    if (frontendAPIURL && frontendAPIURL !== "https://clerk.permitext.com") {
-      webProblems.push("Production CLERK_FRONTEND_API_URL must be https://clerk.permitext.com.");
+    if (frontendAPIURL && !productionClerkHosts.some((hosts) => hosts.frontend === frontendAPIURL)) {
+      webProblems.push("Production CLERK_FRONTEND_API_URL must use the per.codes or legacy permitext.com Clerk frontend.");
     }
     if (accountPortalSignInURL) {
       const accountPortalURL = new URL(accountPortalSignInURL);
-      if (accountPortalURL.origin !== "https://accounts.permitext.com" || accountPortalURL.pathname !== "/sign-in") {
-        webProblems.push("Production CLERK_ACCOUNT_PORTAL_URL must be https://accounts.permitext.com/sign-in.");
+      if (!productionClerkHosts.some((hosts) =>
+        hosts.frontend === frontendAPIURL && hosts.portal === accountPortalURL.origin &&
+        accountPortalURL.pathname === "/sign-in"
+      )) {
+        webProblems.push("Production CLERK_ACCOUNT_PORTAL_URL must use /sign-in on the Account Portal matching its Clerk frontend.");
       }
     }
   }

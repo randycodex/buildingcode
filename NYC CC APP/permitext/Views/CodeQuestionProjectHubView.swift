@@ -72,7 +72,7 @@ struct CodeQuestionProjectHubList: View {
                 }
             }
 
-            Text("Code Question review is read-only on iPhone. Define, Evidence, Analysis, Review, and Issue changes remain on Permitext Web until secure mobile mutation recovery is enabled.")
+            Text("Code Question review is read-only on iPhone. Define, Evidence, Analysis, Review, and Issue changes remain on per codes Web until secure mobile mutation recovery is enabled.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

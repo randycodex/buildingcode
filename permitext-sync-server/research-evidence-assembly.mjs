@@ -2914,7 +2914,7 @@ export async function assembleResearchEvidence({
   if (!sources.length) {
     limitations.push({
       kind: "no-enacted-evidence-found",
-      text: "Permitext did not locate enacted text in the authorized corpora routed for this question."
+      text: "per codes did not locate enacted text in the authorized corpora routed for this question."
     });
   }
 

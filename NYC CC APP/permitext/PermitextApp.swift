@@ -40,7 +40,7 @@ private struct PermitextClerkAuthenticationView: View {
                 VStack(spacing: 0) {
                     AuthView(mode: isCreatingAccount ? .signUp : .signIn)
                         .id(isCreatingAccount)
-                    Button(isCreatingAccount ? "Already have an account? Sign in" : "New to permitext? Create account") {
+                    Button(isCreatingAccount ? "Already have an account? Sign in" : "New to per codes? Create account") {
                         switchesAuthenticationMode.toggle()
                     }
                     .font(.subheadline.weight(.semibold))
@@ -88,7 +88,7 @@ private struct PermitextClerkAuthenticationView: View {
                 .accessibilityLabel("Close sign-in")
             }
             Spacer()
-            Text("permitext")
+            Text("per codes")
                 .font(.system(size: 38, weight: .semibold))
             if let message {
                 Text("Unable to start sign-in")
@@ -147,7 +147,7 @@ private struct PermitextClerkAuthenticationView: View {
         } catch {
             guard !Task.isCancelled else { return }
             preparationState = .failed(
-                "Permitext could not safely clear the previous sign-in. Check your connection and try again."
+                "per codes could not safely clear the previous sign-in. Check your connection and try again."
             )
         }
     }
@@ -1692,7 +1692,7 @@ private struct PermitextFirstUseSheet: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Text("permitext")
+                Text("per codes")
                     .font(.system(size: 38, weight: .semibold))
                     .foregroundStyle(.primary)
                 Text("Explore NYC construction codes and read the enacted text.")
@@ -1701,7 +1701,7 @@ private struct PermitextFirstUseSheet: View {
                 Text("Browse codes, follow references, and search. No account needed.")
                     .foregroundStyle(.secondary)
                 Button { onContinue(.reader) } label: {
-                    Text("Explore Permitext")
+                    Text("Explore per codes")
                         .font(.headline)
                         .frame(maxWidth: .infinity, minHeight: 48)
                         .foregroundStyle(Color(uiColor: .systemBackground))
@@ -1891,7 +1891,7 @@ private struct AppLaunchLoadingView: View {
     var body: some View {
         VStack(spacing: 22) {
             VStack(spacing: 8) {
-                Text("permitext")
+                Text("per codes")
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundStyle(.primary)
 

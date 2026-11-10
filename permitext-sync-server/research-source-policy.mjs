@@ -6,7 +6,7 @@ export const researchSourcePolicyVersion = "20260921-supporting-web-v23";
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
 export const researchOfficialGuidanceEnactedBoundary =
-  "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below.";
+  "The assembled enacted evidence did not establish the requested rule; per codes is reporting only the exact official supporting guidance attributed below.";
 
 export function canonicalResearchOfficialGuidanceLimitations(sources = []) {
   return [...new Set([

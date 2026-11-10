@@ -97,7 +97,7 @@ const PermitextReference = createReactInlineContentSpec(
         values: [...notebookReferenceKinds]
       },
       referenceID: { default: "" },
-      label: { default: "Linked Permitext item" }
+      label: { default: "Linked per codes item" }
     },
     content: "none"
   },

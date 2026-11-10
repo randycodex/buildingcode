@@ -299,7 +299,7 @@ export function organizationInvitationRecord({
   const normalizedEmail = optionalText(invitedEmail, 320)?.toLowerCase() || null;
   const normalizedInvitedUserID = optionalText(invitedUserID, 256);
   if (!normalizedEmail && !normalizedInvitedUserID) {
-    throw new Error("Invitation requires an email or Permitext user.");
+    throw new Error("Invitation requires an email or per codes user.");
   }
   const normalizedStatus = normalizedInvitationStatus(status);
   const normalizedExpiresAt = requiredISO(expiresAt, "invitation expiration date");

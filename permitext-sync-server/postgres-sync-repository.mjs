@@ -73,7 +73,7 @@ export function postgresMutationRejectionReason({ userID, mutation, context = {}
   if (existingUserID && existingUserID !== ownerUserID) {
     return {
       code: "RECORD_OWNERSHIP_MISMATCH",
-      message: "This sync record belongs to a different Permitext account."
+      message: "This sync record belongs to a different per codes account."
     };
   }
 
@@ -477,7 +477,7 @@ export function createPostgresSyncRepository(sql) {
           accepted: false,
           reason: {
             code: "RECORD_OWNERSHIP_MISMATCH",
-            message: "This sync record belongs to a different Permitext account."
+            message: "This sync record belongs to a different per codes account."
           }
         };
       }

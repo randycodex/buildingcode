@@ -72,7 +72,7 @@ struct OrganizationProjectHubView: View {
                 kind: "researchAnswer",
                 referenceID: answer.id,
                 label: answer.question,
-                detail: "Permitext Research",
+                detail: "per codes Research",
                 conversationID: answer.conversationID
             )
         }
@@ -475,7 +475,7 @@ struct OrganizationProjectHubView: View {
                     }
                     .projectHubRow(accent: projectAccent)
                 }
-                Text("Manage Coordination on Permitext Web.")
+                Text("Manage Coordination on per codes Web.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -597,7 +597,7 @@ struct OrganizationProjectHubView: View {
         if let userID = payload.createdByUserID, !userID.isEmpty {
             return userID
         }
-        return "Permitext professional"
+        return "per codes professional"
     }
 
     private func reviewKindLabel(_ kind: String?) -> String {

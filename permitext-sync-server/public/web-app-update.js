@@ -1,5 +1,5 @@
 const updateFailure = "Couldn’t update Permitext. Try again.";
-const otherTabsError = () => Object.assign(new Error("Close other Permitext tabs, then try again."), {code:"OTHER_TABS"});
+const otherTabsError = () => Object.assign(new Error("Close other per codes tabs, then try again."), {code:"OTHER_TABS"});
 
 function workerState(worker, states, timeoutMS) {
   if (states.includes(worker.state)) return Promise.resolve();
@@ -62,7 +62,7 @@ export function createWebAppUpdatePrompt({document, button = document.querySelec
     if (busy || !target) return false;
     busy = true; button.disabled = true;
     button.setAttribute("aria-busy", "true");
-    button.title = "Updating Permitext…"; button.setAttribute("aria-label", button.title);
+    button.title = "Updating per codes…"; button.setAttribute("aria-label", button.title);
     if (notice) notice.hidden = true;
     let previousInert = document.body.inert, locked = false, navigating = false;
     try {
@@ -82,7 +82,7 @@ export function createWebAppUpdatePrompt({document, button = document.querySelec
       if (!navigating && locked) document.body.inert = previousInert;
       if (!navigating) {
         busy = false; button.disabled = false; button.setAttribute("aria-busy", "false");
-        button.title = "Update Permitext"; button.setAttribute("aria-label", button.title);
+        button.title = "Update per codes"; button.setAttribute("aria-label", button.title);
       }
     }
   }

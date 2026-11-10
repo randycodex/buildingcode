@@ -41,7 +41,7 @@ export function settingsAccountSummary(account) {
   if (displayName) {
     return `Signed in as ${displayName}. ${settingsCopy.signedInAccountSuffix}`;
   }
-  const provider = String(account.authProvider || "Permitext").trim() || "Permitext";
+  const provider = String(account.authProvider || "per codes").trim() || "per codes";
   return `Signed in with ${provider}. ${settingsCopy.signedInAccountSuffix}`;
 }
 

@@ -28,8 +28,8 @@ export function researchEvidenceBoundaryInterpretation(question = "") {
       supportingSourceUses: [], supportingSources: [], citations: []
     };
   }
-  const conclusion = "The enacted evidence Permitext reviewed does not establish a requirement responsive to this question.";
-  const explanation = "Permitext cannot support a substantive code conclusion from this evidence set. The reviewed passages are not cited because they do not govern the question.";
+  const conclusion = "The enacted evidence per codes reviewed does not establish a requirement responsive to this question.";
+  const explanation = "per codes cannot support a substantive code conclusion from this evidence set. The reviewed passages are not cited because they do not govern the question.";
   return {
     answerText: `${conclusion}\n\n${explanation}`,
     conclusion,

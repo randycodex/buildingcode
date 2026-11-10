@@ -533,7 +533,7 @@ export function renderHierarchyAuditMatrix(audit) {
     ].join(" | ").replace(/^/, "| ").concat(" |"));
   }
   return [
-    "# Permitext code hierarchy audit",
+    "# per codes code hierarchy audit",
     "",
     `Generated ${audit.generatedAt}.`,
     "",

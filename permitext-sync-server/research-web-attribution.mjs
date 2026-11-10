@@ -307,7 +307,7 @@ export function researchWebAttributionRevisionIssues(result) {
   if (result.undisclosedUnavailableDocumentReferences?.length) {
     issues.push({
       type: "false_evidence_limitation",
-      detail: `Add a visible evidenceLimitations item stating that Permitext could not retrieve a source-specific attributable passage for ${result.undisclosedUnavailableDocumentReferences.join(", ")} and did not use that document. Do not infer its contents.`
+      detail: `Add a visible evidenceLimitations item stating that per codes could not retrieve a source-specific attributable passage for ${result.undisclosedUnavailableDocumentReferences.join(", ")} and did not use that document. Do not infer its contents.`
     });
   }
   if (result.undisclosedGenericLimitation) {

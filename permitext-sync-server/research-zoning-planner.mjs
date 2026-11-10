@@ -330,7 +330,7 @@ export function planZoningResearchQuestion({
       ? 4
       : repairEligible ? 3 : 1;
   const clarification = missingFacts.length
-    ? `Before Permitext can make the requested Zoning conclusion, provide ${missingFacts.map((item) => item.label).join(" and ")}.`
+    ? `Before per codes can make the requested Zoning conclusion, provide ${missingFacts.map((item) => item.label).join(" and ")}.`
     : null;
   const plan = {
     schemaVersion: 2,
@@ -1611,7 +1611,7 @@ export function zoningResearchBoundaryResponse({ plan, evidenceReadiness = null 
     schemaVersion: 1,
     path: plan?.path || null,
     status: missingFacts.length ? "missing_project_facts" : "missing_governing_evidence",
-    whatCanBeEstablished: "Permitext can preserve and cite the selected enacted material without converting it into an unsupported property or applicability conclusion.",
+    whatCanBeEstablished: "per codes can preserve and cite the selected enacted material without converting it into an unsupported property or applicability conclusion.",
     cannotConclude: plan?.clarification || evidenceIssues[0]?.detail ||
       "The requested Zoning conclusion is not supported by the currently selected governing evidence.",
     needed

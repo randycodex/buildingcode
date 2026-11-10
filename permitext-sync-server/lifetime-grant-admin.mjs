@@ -44,7 +44,7 @@ export function exactClerkUserForEmail(users, email) {
     userEmailAddresses(user).includes(normalizedEmail)
   );
   if (exact.length === 0) {
-    throw new LifetimeGrantAdminError(404, "No Permitext sign-in account uses that exact email address.");
+    throw new LifetimeGrantAdminError(404, "No per codes sign-in account uses that exact email address.");
   }
   if (exact.length > 1) {
     throw new LifetimeGrantAdminError(409, "More than one identity uses that email. Resolve it in Clerk before changing access.");

@@ -267,7 +267,7 @@ function canonicalBlockProps(type, props = {}) {
   if (type === "image") {
     const url = optionalText(props.url, "Notebook image URL", 2_500).trim();
     if (url && !url.startsWith("permitext-notebook-asset:") && !/^https:\/\//i.test(url)) {
-      throw new Error("Notebook images require a Permitext asset or HTTPS URL.");
+      throw new Error("Notebook images require a per codes asset or HTTPS URL.");
     }
     const canonical = {
       textAlignment: "left",

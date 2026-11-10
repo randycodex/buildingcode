@@ -58,7 +58,7 @@ export function auditProductionAuthentication({
       "server-environment",
       configuration.webReady,
       configuration.webReady
-        ? "Live Clerk keys, network verification, exact Permitext origins, and hosted web URLs are configured."
+        ? "Live Clerk keys, network verification, exact per codes origins, and hosted web URLs are configured."
         : configuration.webMessage
     ),
     check(
@@ -101,15 +101,16 @@ export function auditProductionAuthentication({
     ),
     check(
       "account-portal-paths",
-      displayConfig.sign_in_url === "https://accounts.permitext.com/sign-in" &&
-        displayConfig.sign_up_url === "https://accounts.permitext.com/sign-up" &&
-        displayConfig.home_url === "https://permitext.com",
-      "The public Clerk environment must publish Permitext's exact Account Portal and home URLs."
+      configuration.webReady &&
+        displayConfig.sign_in_url === environment.CLERK_ACCOUNT_PORTAL_URL &&
+        displayConfig.sign_up_url === new URL("/sign-up", environment.CLERK_ACCOUNT_PORTAL_URL).href &&
+        configuration.authorizedParties.includes(displayConfig.home_url),
+      "The public Clerk environment must publish per codes's exact Account Portal and home URLs."
     ),
     check(
       "apple-webcredentials",
       associatedApps.includes(productionAppleWebCredentialAppID),
-      "The Clerk AASA document must authorize the configured Permitext Apple team and bundle identifier."
+      "The Clerk AASA document must authorize the configured per codes Apple team and bundle identifier."
     )
   ];
 
@@ -129,7 +130,7 @@ export function auditProductionAuthentication({
     check(
       "account-export-deletion",
       acceptanceEvidence.accountExportDeletion === true,
-      "One dedicated Production-configured account export/deletion lifecycle must report provider and Permitext cleanup accurately."
+      "One dedicated Production-configured account export/deletion lifecycle must report provider and per codes cleanup accurately."
     )
   ];
 

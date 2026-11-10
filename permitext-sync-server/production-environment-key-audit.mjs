@@ -32,7 +32,7 @@ const productionKeyGroups = Object.freeze([
 const valueVerificationRequirements = Object.freeze([
   "Stripe secret is live or appropriately restricted, Price is the intended live $20 monthly Price, and webhook secret matches the live endpoint.",
   "Stripe tax mode is automatic and Price tax behavior is the owner-approved inclusive or exclusive value.",
-  "Public base URL is the canonical HTTPS Permitext URL.",
+  "Public base URL is the canonical HTTPS per codes URL.",
   "Terms, Privacy, and subscription/refund versions equal the exact owner-approved identifiers only after exact policy publication passes.",
   "Apple bundle ID, Pro product ID, and trusted root fingerprints equal the approved Production values.",
   "Clerk keys, authorized parties, frontend API, and account portal are Production values.",

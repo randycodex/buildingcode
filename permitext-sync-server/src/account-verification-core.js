@@ -9,7 +9,7 @@ export function captureClerkDeletionIdentity(account, clerk) {
     throw new Error("The original sign-in identity is unavailable. Sign in to that identity before deleting the account.");
   }
   if (user.deleteSelfEnabled === false) {
-    throw new Error("This sign-in identity cannot be deleted here. Contact support before deleting Permitext data.");
+    throw new Error("This sign-in identity cannot be deleted here. Contact support before deleting per codes data.");
   }
   return { clerk, userID: user.id, sessionID: session.id };
 }

@@ -85,7 +85,7 @@ enum ResearchProjectSyncError: LocalizedError {
     case projectNotSynced
 
     var errorDescription: String? {
-        "Permitext could not sync this Project before starting Research. Check your connection and try again."
+        "per codes could not sync this Project before starting Research. Check your connection and try again."
     }
 }
 
@@ -2136,7 +2136,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let section = detail.map { "Section \($0.sectionNumber): \($0.displayTitle)" } ?? "Section ID: \(sectionID)"
         let edition = selectedVersion?.codeVersion ?? "Edition unavailable"
         let release = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
-        return "\(section)\nEdition: \(edition)\nhttps://permitext.com/open/section/\(sectionID)\nApp version: \(release)"
+        return "\(section)\nEdition: \(edition)\nhttps://per.codes/open/section/\(sectionID)\nApp version: \(release)"
     }
 
     func imageURL(fileName: String) -> URL? {
@@ -2873,12 +2873,12 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     static func sharedSectionURL(sectionID: Int64) -> URL {
-        URL(string: "https://permitext.com/open/section/\(sectionID)")!
+        URL(string: "https://per.codes/open/section/\(sectionID)")!
     }
 
     private static func isAcceptedWebHost(_ host: String?) -> Bool {
         guard let host = host?.lowercased() else { return false }
-        return host == "permitext.com" || host == "permitext-sync.vercel.app"
+        return host == "per.codes" || host == "permitext.com" || host == "permitext-sync.vercel.app"
     }
 
     static func officialSectionCitation(
@@ -4341,7 +4341,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func requestProSubscriptionStore(clerk: Clerk? = nil) async {
         guard await requireSignedInBillingAccount(clerk: clerk, then: .purchasePro) else { return }
         guard currentPlan != .pro else {
-            statusMessage = "Pro is already active for this Permitext account."
+            statusMessage = "Pro is already active for this per codes account."
             return
         }
         guard !isStoreKitBusy else { return }
@@ -4377,7 +4377,7 @@ final class CodeLibraryViewModel: ObservableObject {
         acceptedPolicyVersions: BackendPolicyVersions?
     ) async {
         guard let purchasingAccount = signedInAccount else {
-            statusMessage = "Sign in or create a Permitext account before purchasing Pro."
+            statusMessage = "Sign in or create a per codes account before purchasing Pro."
             storeKitOperationMessage = statusMessage
             return
         }
@@ -4568,7 +4568,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 isProSubscriptionStorePresented = false
                 if isStoreKitTestTransaction {
                     if isStoreKitTestBackendLinked {
-                        statusMessage = "Pro (Test), including Research, was linked to this Permitext staging account. No real charge was made."
+                        statusMessage = "Pro (Test), including Research, was linked to this per codes staging account. No real charge was made."
                         storeKitOperationMessage = "Apple restored and linked Pro (Test) in isolated staging."
                     } else {
                         statusMessage = "Pro (Test), including Research, was restored on this device. Test purchases cannot activate production web access."
@@ -4581,8 +4581,8 @@ final class CodeLibraryViewModel: ObservableObject {
             } else if snapshot.plan != .pro {
                 statusMessage = "No active Pro subscription found."
                 storeKitOperationMessage = currentPlan == .pro
-                    ? "Your Permitext account already has Pro. No active Apple subscription was found, and your Pro access is unchanged."
-                    : "No active Apple subscription was found. Check that you are using the App Store account used to subscribe. If you subscribed on the web, sign in to that Permitext account."
+                    ? "Your per codes account already has Pro. No active Apple subscription was found, and your Pro access is unchanged."
+                    : "No active Apple subscription was found. Check that you are using the App Store account used to subscribe. If you subscribed on the web, sign in to that per codes account."
             }
         } catch {
             let message = Self.restoreFailureMessage(for: error)
@@ -4630,7 +4630,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func handleAppleRefundRequestStatus(_ status: StoreKit.Transaction.RefundRequestStatus) {
         switch status {
         case .success:
-            let message = "Apple received the refund request. Permitext will update access after Apple sends the result."
+            let message = "Apple received the refund request. per codes will update access after Apple sends the result."
             statusMessage = message
             storeKitOperationMessage = message
         case .userCancelled:
@@ -4638,7 +4638,7 @@ final class CodeLibraryViewModel: ObservableObject {
             statusMessage = message
             storeKitOperationMessage = message
         @unknown default:
-            let message = "Apple returned an unknown refund-request result. No Permitext access change was made."
+            let message = "Apple returned an unknown refund-request result. No per codes access change was made."
             statusMessage = message
             storeKitOperationMessage = message
         }
@@ -4651,7 +4651,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func handleAppleRefundRequestPresentationFailure() {
-        let message = "Apple's refund form could not open because Permitext could not find the active app window. Close and reopen Permitext, then try again."
+        let message = "Apple's refund form could not open because per codes could not find the active app window. Close and reopen per codes, then try again."
         statusMessage = message
         storeKitOperationMessage = message
     }
@@ -4681,7 +4681,7 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             guard identity == privateRequestIdentity, !Task.isCancelled else { return }
             if showsErrors {
-                researchTurnPurchaseMessage = "Permitext could not load Research turns: \(error.localizedDescription)"
+                researchTurnPurchaseMessage = "per codes could not load Research turns: \(error.localizedDescription)"
             }
         }
     }
@@ -4760,8 +4760,8 @@ final class CodeLibraryViewModel: ObservableObject {
             researchTurnAllowance = usage
             await storeKitResearchTurnService.finish(purchase)
             researchTurnPurchaseMessage = response.credited == true
-                ? "\(source) added Research turns to your Permitext account."
-                : "\(source) was already added to your Permitext account."
+                ? "\(source) added Research turns to your per codes account."
+                : "\(source) was already added to your per codes account."
         } catch is CancellationError {
             return
         } catch {
@@ -4769,13 +4769,13 @@ final class CodeLibraryViewModel: ObservableObject {
                backendError.statusCode == 409,
                backendError.serverCode == "RESEARCH_PURCHASE_ALREADY_LINKED" {
                 // The verified purchase was already fulfilled for another
-                // Permitext account. Do not leave it permanently in StoreKit's
+                // per codes account. Do not leave it permanently in StoreKit's
                 // unfinished queue, but never grant access to this account.
                 await storeKitResearchTurnService.finish(purchase)
-                researchTurnPurchaseMessage = "This Apple purchase is already linked to another Permitext account. Sign in to that account to use the turns."
+                researchTurnPurchaseMessage = "This Apple purchase is already linked to another per codes account. Sign in to that account to use the turns."
                 return
             }
-            researchTurnPurchaseMessage = "Apple confirmed the purchase, but Permitext could not add the turns yet: \(error.localizedDescription)"
+            researchTurnPurchaseMessage = "Apple confirmed the purchase, but per codes could not add the turns yet: \(error.localizedDescription)"
         }
     }
 
@@ -4792,12 +4792,12 @@ final class CodeLibraryViewModel: ObservableObject {
     ) async -> Bool {
         if signedInAccount != nil { return true }
         guard let clerk else {
-            statusMessage = "Sign in or create a Permitext account before purchasing or restoring Pro."
+            statusMessage = "Sign in or create a per codes account before purchasing or restoring Pro."
             return false
         }
 
         requestClerkAuthentication(then: action)
-        statusMessage = "Sign in or create a Permitext account to continue."
+        statusMessage = "Sign in or create a per codes account to continue."
         _ = clerk
         return false
     }
@@ -4871,7 +4871,7 @@ final class CodeLibraryViewModel: ObservableObject {
             accountMutationGeneration &+= 1
             clerkAuthenticationAttemptID = UUID()
             postClerkAuthenticationAction = .none
-            accountAuthenticationMessage = "Finishing Permitext sign-in..."
+            accountAuthenticationMessage = "Finishing per codes sign-in..."
         }
 
         do {
@@ -4931,7 +4931,7 @@ final class CodeLibraryViewModel: ObservableObject {
             try? await Task.sleep(for: .milliseconds(50))
         }
         guard !isAccountBusy, authenticationAttemptID == clerkAuthenticationAttemptID else {
-            statusMessage = "Permitext is still finishing an account operation. Select sign in and try again."
+            statusMessage = "per codes is still finishing an account operation. Select sign in and try again."
             postClerkAuthenticationAction = .none
             clerkAuthenticationAttemptID = nil
             return
@@ -4944,7 +4944,7 @@ final class CodeLibraryViewModel: ObservableObject {
             // Every completed sign-in exchanges the fresh provider session, including
             // reauthentication of an existing Clerk account.
             isAccountBusy = true
-            accountAuthenticationMessage = "Finishing Permitext sign-in..."
+            accountAuthenticationMessage = "Finishing per codes sign-in..."
             let sourceAccount = signedInAccount
             let expectedGeneration = accountMutationGeneration
 
@@ -4990,9 +4990,9 @@ final class CodeLibraryViewModel: ObservableObject {
               clerk.session != nil
         else { return }
 
-        // A locally signed-out Permitext account must stay signed out. Older
+        // A locally signed-out per codes account must stay signed out. Older
         // builds could leave a hydrated Clerk session behind; never turn that
-        // stale provider session back into a Permitext account automatically.
+        // stale provider session back into a per codes account automatically.
         do {
             do {
                 try await clerk.auth.signOut()
@@ -5384,7 +5384,7 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             guard session == privateSessionID else { return }
             contentTrashMessage = (error as? PermitextBackendHTTPError)?.statusCode == 404
-                ? "Trash will be available after the next Permitext update. Saved-content deletion is paused."
+                ? "Trash will be available after the next per codes update. Saved-content deletion is paused."
                 : "Trash could not be reached. Check your connection and try again. Nothing was permanently deleted."
         }
     }
@@ -5468,7 +5468,7 @@ final class CodeLibraryViewModel: ObservableObject {
         refreshPendingUserContentSyncCount()
     }
 
-    /// Activates the database belonging to the current Permitext account.
+    /// Activates the database belonging to the current per codes account.
     /// Injected repositories used by tests and previews intentionally retain
     /// their existing behavior.
     private func activateUserContentScope(
@@ -5855,7 +5855,7 @@ final class CodeLibraryViewModel: ObservableObject {
         refreshBookmarks()
         refreshPendingUserContentSyncCount()
         if deviceCleanupError == nil {
-            statusMessage = "Your Permitext account and synced data were deleted."
+            statusMessage = "Your per codes account and synced data were deleted."
         }
         return AccountDeletionExecutionResult(
             response: response,
@@ -5880,7 +5880,7 @@ final class CodeLibraryViewModel: ObservableObject {
             }
             return nil
         } catch {
-            let message = "Some Permitext data stored on this device could not be cleared: \(error.localizedDescription)"
+            let message = "Some per codes data stored on this device could not be cleared: \(error.localizedDescription)"
             if signedInAccount?.appUserID == accountID { statusMessage = message }
             return message
         }
@@ -6053,7 +6053,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         case .signInRequired:
             applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
-            statusMessage = "Sign in to the Permitext account that owns this Apple subscription, then select Restore Purchases."
+            statusMessage = "Sign in to the per codes account that owns this Apple subscription, then select Restore Purchases."
             return false
 
         case .authorizedLocalTest:
@@ -6073,14 +6073,14 @@ final class CodeLibraryViewModel: ObservableObject {
 
         case .explicitRestoreRequired:
             applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
-            let message = "Apple found an active test subscription. Select Restore Purchases while signed into the Permitext account that should own it."
+            let message = "Apple found an active test subscription. Select Restore Purchases while signed into the per codes account that should own it."
             statusMessage = message
             storeKitOperationMessage = message
             return false
 
         case .ownedByAnotherAccount:
             applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
-            let message = "This Apple test subscription is linked to a different Permitext account. Sign into that account to restore Pro."
+            let message = "This Apple test subscription is linked to a different per codes account. Sign into that account to restore Pro."
             statusMessage = message
             storeKitOperationMessage = message
             return false
@@ -6111,7 +6111,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 applyBackendEntitlement(entitlement)
                 guard let entitlement, entitlement.grantsPro() else {
                     applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
-                    let message = "Apple confirmed the transaction, but Pro is not active for this Permitext account."
+                    let message = "Apple confirmed the transaction, but Pro is not active for this per codes account."
                     statusMessage = message
                     storeKitOperationMessage = message
                     return false
@@ -6123,14 +6123,14 @@ final class CodeLibraryViewModel: ObservableObject {
                 if Self.isApplePurchaseOwnershipConflict(error) {
                     applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
                     await storeKitSubscriptionService.finishActiveProTransactions()
-                    let message = "This Apple subscription is already linked to another Permitext account. Sign into that account to use Pro."
+                    let message = "This Apple subscription is already linked to another per codes account. Sign into that account to use Pro."
                     statusMessage = message
                     storeKitOperationMessage = message
                     return false
                 }
                 if handleBackendSessionFailureIfNeeded(error) {
                     applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
-                    storeKitOperationMessage = "Permitext sign-in expired before the Apple transaction could be linked. Sign in and restore the subscription."
+                    storeKitOperationMessage = "per codes sign-in expired before the Apple transaction could be linked. Sign in and restore the subscription."
                     return false
                 }
                 if StoreKitBackendVerificationContinuityPolicy.preservesAuthorizedTestState(
@@ -6140,11 +6140,11 @@ final class CodeLibraryViewModel: ObservableObject {
                     backendEntitlementSource: currentEntitlementSource
                 ) {
                     applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: true)
-                    storeKitOperationMessage = "Permitext kept the verified Apple test subscription active while account verification retries automatically."
+                    storeKitOperationMessage = "per codes kept the verified Apple test subscription active while account verification retries automatically."
                     return true
                 }
                 applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
-                let message = "Apple confirmed the purchase, but Permitext could not link it yet: \(error.localizedDescription) Select Restore Purchases to retry."
+                let message = "Apple confirmed the purchase, but per codes could not link it yet: \(error.localizedDescription) Select Restore Purchases to retry."
                 statusMessage = message
                 storeKitOperationMessage = message
                 return false

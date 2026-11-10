@@ -498,7 +498,7 @@ extension ResearchAnswer {
     }
 
     func structuredCopyText(sourceStatus: String) -> String {
-        var sections: [String] = ["Permitext Research"]
+        var sections: [String] = ["per codes Research"]
         if let label = researchAuthorityLabel { sections.append(label) }
 
         let narrative = narrativeText
@@ -539,7 +539,7 @@ extension ResearchAnswer {
         }
 
         let warning = disclaimer?.trimmingCharacters(in: .whitespacesAndNewlines)
-        sections.append((warning?.isEmpty == false ? warning! + "\n" : "") + "Permitext is AI-assisted research, not an official interpretation. Verify the cited sources before filing, design, permitting, or construction reliance.")
+        sections.append((warning?.isEmpty == false ? warning! + "\n" : "") + "per codes is AI-assisted research, not an official interpretation. Verify the cited sources before filing, design, permitting, or construction reliance.")
         return sections.joined(separator: "\n\n")
     }
 
@@ -657,7 +657,7 @@ extension ResearchAnswer {
                 parts.append("\(pinned) pinned by you")
             }
             if let discovered = summary?.permitextDiscoveredCount, discovered > 0 {
-                parts.append("\(discovered) identified by Permitext")
+                parts.append("\(discovered) identified by per codes")
             }
             if let crossReferences = summary?.crossReferenceCount, crossReferences > 0 {
                 parts.append("\(crossReferences) cross-references reviewed")

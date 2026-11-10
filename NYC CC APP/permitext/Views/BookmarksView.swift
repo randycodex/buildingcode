@@ -1085,7 +1085,7 @@ struct ProjectView: View {
                 kind: "researchAnswer",
                 referenceID: answer.id,
                 label: answer.question,
-                detail: "Permitext Research",
+                detail: "per codes Research",
                 conversationID: answer.conversationID
             )
         }

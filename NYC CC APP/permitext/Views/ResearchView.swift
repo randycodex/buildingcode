@@ -83,11 +83,11 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
 
 enum ResearchTrustCopy {
     static let composerPrivacyDisclosure = "Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential, regulated, or sensitive personal information. Ordinary property information may be included when needed."
-    static let firstUseDisclosure = "Permitext sends your question, recent chat, selected or retrieved evidence, and assigned Project facts to OpenAI. Private notes are not included."
+    static let firstUseDisclosure = "per codes sends your question, recent chat, selected or retrieved evidence, and assigned Project facts to OpenAI. Private notes are not included."
     static let visualEvidenceDisclosure = "Selected official images are sent to OpenAI for analysis. Private notes are not included."
     static let copyAnswerAction = "Copy answer"
     static let reportProblemAction = "Report a problem"
-    static let nextStepGuidance = "Review the cited provision and Project facts, then record your own conclusion in a Project Note. Build Reports on Permitext Web."
+    static let nextStepGuidance = "Review the cited provision and Project facts, then record your own conclusion in a Project Note. Build Reports on per codes Web."
 }
 
 enum ResearchHistoryPresentation {
@@ -378,18 +378,18 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
             switch urlError.code {
             case .timedOut:
                 return retainedQuestion(
-                    "Research is taking longer than expected. Permitext checked for a completed answer but did not find one yet."
+                    "Research is taking longer than expected. per codes checked for a completed answer but did not find one yet."
                 )
             case .notConnectedToInternet, .networkConnectionLost:
                 return retainedQuestion("Research could not connect to the internet.")
             case .cancelled:
                 return retainedQuestion("Research was cancelled.")
             default:
-                return retainedQuestion("Permitext could not reach the Research service.")
+                return retainedQuestion("per codes could not reach the Research service.")
             }
         }
 
-        return retainedQuestion("Permitext could not reach the Research service.")
+        return retainedQuestion("per codes could not reach the Research service.")
     }
 
     private static func resolve(
@@ -425,11 +425,11 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
             return retainedQuestion("Research stopped before another model call could exceed its spending limit.")
         case "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE":
             return retainedQuestion(
-                "Permitext could not retrieve attributable official guidance from the approved sources."
+                "per codes could not retrieve attributable official guidance from the approved sources."
             )
         case "RESEARCH_EVIDENCE_NOT_FOUND":
             return retainedQuestion(
-                serverMessage ?? "Permitext could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation."
+                serverMessage ?? "per codes could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation."
             )
         case "RESEARCH_EVIDENCE_REQUIRED", "RESEARCH_SOURCE_CHANGED", "RESEARCH_REFUSAL":
             return retainedQuestion(serverMessage ?? "Research needs updated enacted evidence before it can answer.")
@@ -443,34 +443,34 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
             return retainedQuestion("Research was cancelled.")
         case let value? where verificationCodes.contains(value):
             return retainedQuestion(
-                "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there."
+                "per codes could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there."
             )
         case let value? where providerCodes.contains(value):
-            return retainedQuestion("Permitext's Research service is temporarily unavailable.")
+            return retainedQuestion("per codes's Research service is temporarily unavailable.")
         default:
             break
         }
 
         if error.isAuthenticationFailure {
-            return retainedQuestion("Your Permitext session no longer has access to Research. Sign in again and retry.")
+            return retainedQuestion("Your per codes session no longer has access to Research. Sign in again and retry.")
         }
 
         if error.statusCode == 502,
            serverMessage?.localizedCaseInsensitiveContains("verified") == true {
             return retainedQuestion(
-                "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there."
+                "per codes could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there."
             )
         }
 
         if let statusCode = error.statusCode, statusCode >= 500 {
-            return retainedQuestion("Permitext's Research service is temporarily unavailable.")
+            return retainedQuestion("per codes's Research service is temporarily unavailable.")
         }
 
         if let serverMessage, !serverMessage.isEmpty {
             return retainedQuestion(serverMessage)
         }
 
-        return retainedQuestion("Permitext could not reach the Research service.")
+        return retainedQuestion("per codes could not reach the Research service.")
     }
 
     private static func retainedQuestion(_ explanation: String) -> ResearchRequestFailurePresentation {
@@ -676,7 +676,7 @@ private struct ResearchSessionView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Permitext Research will use the destination Project’s current facts for future answers. Existing answers keep their original evidence and context.")
+                Text("per codes Research will use the destination Project’s current facts for future answers. Existing answers keep their original evidence and context.")
             }
             .alert(
                 pendingDeletion?.isMultiple == true ? "Delete selected Research conversations?" : "Delete Research conversation?",
@@ -1558,7 +1558,7 @@ private struct ResearchSessionView: View {
             HStack(spacing: 7) {
                 ProgressView()
                     .controlSize(.small)
-                Text("Permitext is researching…")
+                Text("per codes is researching…")
             }
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -2513,9 +2513,9 @@ private struct ResearchDisclosureAcknowledgementSheet: View {
                     .foregroundStyle(.secondary)
                 Label("How to rely on it", systemImage: "checkmark.shield")
                     .font(.headline)
-                Text("Permitext is AI-assisted research, not an official interpretation or professional opinion. Verify cited sources, source status, and Project facts before filing, design, permitting, or construction reliance.")
+                Text("per codes is AI-assisted research, not an official interpretation or professional opinion. Verify cited sources, source status, and Project facts before filing, design, permitting, or construction reliance.")
                     .foregroundStyle(.secondary)
-                Link("Read the Privacy Policy", destination: URL(string: "https://permitext.com/privacy")!)
+                Link("Read the Privacy Policy", destination: URL(string: "https://per.codes/privacy")!)
                 Spacer()
                 Button("Continue to Research", action: onContinue)
                     .buttonStyle(.borderedProminent)
@@ -2585,7 +2585,7 @@ private struct ResearchFeedbackSheet: View {
                 TextField("Supporting section or official source (optional)", text: $supportingReference)
                 TextField("Optional details", text: $comment, axis: .vertical)
                     .lineLimit(3...8)
-                Text("Reports help Permitext investigate and correct Research quality. Internal review notes are never shown here.")
+                Text("Reports help per codes investigate and correct Research quality. Internal review notes are never shown here.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -2617,7 +2617,7 @@ private struct ResearchVisualReviewSheet: View {
                     VStack(alignment: .leading, spacing: 7) {
                         Text("Review official visual evidence")
                             .font(.title2.weight(.bold))
-                        Text("This enacted section contains official visual material. Select only the images Permitext should analyze with your passage.")
+                        Text("This enacted section contains official visual material. Select only the images per codes should analyze with your passage.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Text("Select up to \(review.maximumVisualSelections) official images.")
@@ -2629,7 +2629,7 @@ private struct ResearchVisualReviewSheet: View {
                         visualSourceButton(source)
                     }
 
-                    Text("Permitext will preserve the exact selected image bytes and their integrity identity with the Research record.")
+                    Text("per codes will preserve the exact selected image bytes and their integrity identity with the Research record.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Text(ResearchTrustCopy.visualEvidenceDisclosure)

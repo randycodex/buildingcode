@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 export const firmControlsSchemaVersion = 1;
 
 export const permitextRequiredReportDisclaimers = Object.freeze([
-  "Permitext is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.",
+  "per codes is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.",
   "AI-assisted Research is limited to the approved evidence recorded in this report and may require additional Project facts or professional review."
 ]);
 
@@ -78,7 +78,7 @@ function normalizedTemplate(template, index, now) {
     name: requiredText(template?.name, "Report template name", 120),
     description: optionalText(template?.description, "Report template description", 1_000),
     coverLabel: requiredText(
-      template?.coverLabel || "Permitext Project Report",
+      template?.coverLabel || "per codes Project Report",
       "Report template cover label",
       160
     ),
@@ -112,9 +112,9 @@ export function defaultFirmControls({
     projectTagAssignments: {},
     reportTemplates: [{
       id: "permitext-standard",
-      name: "Permitext Standard",
-      description: "Permitext's professional-use report presentation.",
-      coverLabel: "Permitext Project Report",
+      name: "per codes Standard",
+      description: "per codes's professional-use report presentation.",
+      coverLabel: "per codes Project Report",
       disclaimers: [],
       status: "active",
       createdAt: now,

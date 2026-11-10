@@ -207,7 +207,7 @@ struct PreparedSearchReaderDestination: Identifiable {
     enum PreparationError: LocalizedError {
         case unavailable
         case requiresEnable(ActiveCodeSourceNavigationTarget)
-        var errorDescription: String? { "Permitext could not locate this section in its installed code edition." }
+        var errorDescription: String? { "per codes could not locate this section in its installed code edition." }
     }
 }
 

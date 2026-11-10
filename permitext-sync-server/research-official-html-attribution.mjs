@@ -273,7 +273,7 @@ export function researchOfficialHTMLSectionPassages(passages, sectionHeadings, s
 async function responseBodyWithinLimit(response, maximumBytes) {
   const declaredLength = Number(response.headers?.get?.("content-length") || 0);
   if (declaredLength > maximumBytes) {
-    const error = new Error("The official source exceeded Permitext's retrieval limit.");
+    const error = new Error("The official source exceeded per codes's retrieval limit.");
     error.code = "RESEARCH_OFFICIAL_SOURCE_TOO_LARGE";
     throw error;
   }
@@ -288,7 +288,7 @@ async function responseBodyWithinLimit(response, maximumBytes) {
       byteLength += value.byteLength;
       if (byteLength > maximumBytes) {
         await reader.cancel();
-        const error = new Error("The official source exceeded Permitext's retrieval limit.");
+        const error = new Error("The official source exceeded per codes's retrieval limit.");
         error.code = "RESEARCH_OFFICIAL_SOURCE_TOO_LARGE";
         throw error;
       }
@@ -303,7 +303,7 @@ async function responseBodyWithinLimit(response, maximumBytes) {
   } else {
     bytes = new Uint8Array(await response.arrayBuffer());
     if (bytes.byteLength > maximumBytes) {
-      const error = new Error("The official source exceeded Permitext's retrieval limit.");
+      const error = new Error("The official source exceeded per codes's retrieval limit.");
       error.code = "RESEARCH_OFFICIAL_SOURCE_TOO_LARGE";
       throw error;
     }
@@ -324,7 +324,7 @@ export async function fetchResearchOfficialDocumentPassages(sourceURL, options =
   if (!currentURL) {
     clearTimeout(timeout);
     options.signal?.removeEventListener?.("abort", abortFromParent);
-    const error = new Error("The official source URL is outside Permitext's approved domains.");
+    const error = new Error("The official source URL is outside per codes's approved domains.");
     error.code = "RESEARCH_OFFICIAL_SOURCE_DISALLOWED";
     throw error;
   }
@@ -347,7 +347,7 @@ export async function fetchResearchOfficialDocumentPassages(sourceURL, options =
           ? approvedOfficialURL(new URL(location, currentURL).toString(), officialDomains)
           : null;
         if (!redirectedURL || redirect === maximumRedirects) {
-          const error = new Error("The official source redirected outside Permitext's approved policy.");
+          const error = new Error("The official source redirected outside per codes's approved policy.");
           error.code = "RESEARCH_OFFICIAL_SOURCE_REDIRECT_REJECTED";
           throw error;
         }
@@ -484,7 +484,7 @@ export async function bindResearchWebSupportToOfficialDocuments(webSupport, opti
       failures: validationFailures
     },
     ...(sources.length === 0 ? {
-      limitation: "Permitext could not bind the guidance to readable text from an approved official HTML or PDF source; the guidance was not used."
+      limitation: "per codes could not bind the guidance to readable text from an approved official HTML or PDF source; the guidance was not used."
     } : validationFailures.length ? {
       limitation: [webSupport.limitation,
         `Some requested official documents could not be validated: ${validationFailures.map((failure) => `${failure.url} (${failure.code})`).join("; ")}. Their conditions and exceptions remain unverified; the retrieved passages do not establish what the missing documents say.`

@@ -60,6 +60,23 @@ const production = {
 };
 assert(clerkConfigurationStatus(production).ready, "A complete production Clerk configuration was rejected.");
 assert(clerkConfigurationStatus(production).webReady, "A complete Clerk web configuration was rejected.");
+const perCodesProduction = {
+  ...production,
+  CLERK_AUTHORIZED_PARTIES: "https://per.codes,https://www.per.codes",
+  CLERK_FRONTEND_API_URL: "https://clerk.per.codes",
+  CLERK_ACCOUNT_PORTAL_URL: "https://accounts.per.codes/sign-in"
+};
+assert(clerkConfigurationStatus(perCodesProduction).webReady, "The new per.codes production domains were rejected.");
+for (const configuration of [production, perCodesProduction]) {
+  assert(clerkConfigurationStatus({
+    ...configuration,
+    CLERK_AUTHORIZED_PARTIES: `${production.CLERK_AUTHORIZED_PARTIES},${perCodesProduction.CLERK_AUTHORIZED_PARTIES}`
+  }).webReady, "The migration must accept both known origin pairs with either matching Clerk domain pair.");
+}
+assert(!clerkConfigurationStatus({
+  ...perCodesProduction,
+  CLERK_ACCOUNT_PORTAL_URL: production.CLERK_ACCOUNT_PORTAL_URL
+}).webReady, "Migration accepted mismatched Clerk frontend and account-portal domains.");
 assert(
   !clerkConfigurationStatus({
     ...production,
@@ -69,7 +86,7 @@ assert(
 );
 assert(
   !clerkConfigurationStatus({ ...production, CLERK_FRONTEND_API_URL: "https://different.clerk.accounts.dev" }).webReady,
-  "Production Clerk web readiness accepted a frontend domain blocked by Permitext's CSP."
+  "Production Clerk web readiness accepted a frontend domain blocked by per codes's CSP."
 );
 assert(
   !clerkConfigurationStatus({ ...production, CLERK_ACCOUNT_PORTAL_URL: "https://accounts.permitext.com/user" }).webReady,
@@ -123,7 +140,7 @@ assert(
   !iosProject.includes("CLERK_PUBLISHABLE_KEY = pk_test_") &&
     iosProject.match(/CLERK_PUBLISHABLE_KEY = pk_live_/g)?.length === 2 &&
     iosApp.includes('PermitextBackendConfiguration.setDebugHTTPBaseURL("https://permitext-sync.vercel.app")'),
-  "iOS Debug can issue Clerk development tokens to the production Permitext backend."
+  "iOS Debug can issue Clerk development tokens to the production per codes backend."
 );
 assert(
   iosApp.includes("Clerk.configure(publishableKey:") &&
@@ -153,11 +170,11 @@ assert(
 assert(
   iosViewModel.includes("guard await requireSignedInBillingAccount(clerk: clerk, then: .purchasePro) else { return }") &&
     iosViewModel.includes("guard await requireSignedInBillingAccount(clerk: clerk, then: .restorePurchases) else { return }") &&
-    iosViewModel.includes("Sign in or create a Permitext account before purchasing or restoring Pro.") &&
+    iosViewModel.includes("Sign in or create a per codes account before purchasing or restoring Pro.") &&
     iosSettings.includes("requestProSubscriptionStore(clerk: clerk)") &&
     iosSettings.includes("restorePurchases(clerk: clerk)") &&
     iosApp.includes("requestProSubscriptionStore(clerk: clerk)"),
-  "iOS can start StoreKit purchase or restore before establishing its Permitext account."
+  "iOS can start StoreKit purchase or restore before establishing its per codes account."
 );
 assert(iosInfo.includes("PermitextClerkPublishableKey"), "iOS does not expose its Clerk publishable-key build setting.");
 assert(

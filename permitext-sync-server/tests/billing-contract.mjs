@@ -307,7 +307,7 @@ expectClientError(
     requestedUserID: "apple:different-user"
   }),
   403,
-  "different Permitext account"
+  "different per codes account"
 );
 expectClientError(
   () => validateStripeRestoreOwnership({
@@ -320,7 +320,7 @@ expectClientError(
     requestedUserID: "apple:owner"
   }),
   409,
-  "not linked to a Permitext account"
+  "not linked to a per codes account"
 );
 expectClientError(
   () => validateStripeRestoreOwnership({

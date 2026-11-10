@@ -21,10 +21,10 @@ for (const fileName of publicHTMLFiles) {
 
 for (const fileName of ["index.html", "privacy.html", "terms.html", "refunds.html", "support.html"]) {
   const html = await readFile(new URL(fileName, publicRoot), "utf8");
-  assert.match(html, /<link rel="canonical" href="https:\/\/permitext\.com\/[^"]*">/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/per\.codes\/[^"]*">/);
   assert.match(html, /<meta property="og:title" content="[^"]+">/);
   assert.match(html, /<meta property="og:description" content="[^"]+">/);
-  assert.match(html, /<meta property="og:image" content="https:\/\/permitext\.com\/og-image\.png">/);
+  assert.match(html, /<meta property="og:image" content="https:\/\/per\.codes\/og-image\.png">/);
   assert.match(html, /<meta property="og:image:width" content="1200">/);
   assert.match(html, /<meta property="og:image:height" content="630">/);
   assert.match(html, /<meta property="og:image:alt" content="[^"]+">/);
@@ -38,7 +38,7 @@ for (const fileName of ["404.html", "subscription-confirmation.html"]) {
 
 const notFound = await readFile(new URL("404.html", publicRoot), "utf8");
 assert.match(notFound, /Error 404/);
-assert.match(notFound, /href="\/">Return to Permitext<\/a>/);
+assert.match(notFound, /href="\/">Return to per codes<\/a>/);
 assert.match(notFound, /href="\/support">Contact support<\/a>/);
 
 const robots = await readFile(new URL("robots.txt", publicRoot), "utf8");
@@ -46,11 +46,11 @@ assert.match(robots, /^User-agent: \*$/m);
 assert.match(robots, /^Allow: \/$/m);
 assert.match(robots, /^Disallow: \/account\/$/m);
 assert.match(robots, /^Disallow: \/subscription-confirmation$/m);
-assert.match(robots, /^Sitemap: https:\/\/permitext\.com\/sitemap\.xml$/m);
+assert.match(robots, /^Sitemap: https:\/\/per\.codes\/sitemap\.xml$/m);
 
 const sitemap = await readFile(new URL("sitemap.xml", publicRoot), "utf8");
 for (const path of ["", "privacy", "terms", "refunds", "support"]) {
-  assert.match(sitemap, new RegExp(`<loc>https://permitext\\.com/${path}<\\/loc>`));
+  assert.match(sitemap, new RegExp(`<loc>https://per\\.codes/${path}<\\/loc>`));
 }
 assert.doesNotMatch(sitemap, /subscription-confirmation/);
 
@@ -121,4 +121,4 @@ assert.match(webClient, /const caption = image\.closest\("figure"\)\?\.querySele
 assert.match(webClient, /`Official code figure: \$\{sourceName\}`/);
 assert.doesNotMatch(webClient, /image\.alt = image\.alt \|\| "";/);
 
-console.log(`Permitext web launch surface passed (${publicHTMLFiles.length} HTML documents).`);
+console.log(`per codes web launch surface passed (${publicHTMLFiles.length} HTML documents).`);

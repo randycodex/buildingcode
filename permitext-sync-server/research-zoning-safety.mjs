@@ -491,7 +491,7 @@ function unresolvedWhetherBoundary(value) {
   const text = compactText(value).replace(/[.!?]$/, "");
   // The positive predicate inside an explicitly unresolved "whether" clause
   // is the question being withheld. Do not accept an appended assertion.
-  return /^(?:(?:we|Permitext)\s+)?cannot\s+(?:determine|confirm|establish|conclude)\s+whether\s+[^.!?;:]{1,300}\s+from\s+(?:the\s+)?(?:supplied|provided|available|stated)\s+facts$/i.test(text) &&
+  return /^(?:(?:we|per codes)\s+)?cannot\s+(?:determine|confirm|establish|conclude)\s+whether\s+[^.!?;:]{1,300}\s+from\s+(?:the\s+)?(?:supplied|provided|available|stated)\s+facts$/i.test(text) &&
     !/[,;:—–]|\b(?:but|yet|however|nevertheless|nonetheless|therefore|thus|so|although|while|and|plus|meaning)\b/i.test(text);
 }
 

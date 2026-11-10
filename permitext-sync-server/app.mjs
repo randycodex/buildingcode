@@ -7557,7 +7557,7 @@ export function researchProgressResponder(request, response, enabled) {
 }
 
 function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}) {
-  const clerkScriptSources = "https://*.clerk.accounts.dev https://clerk.permitext.com";
+  const clerkScriptSources = "https://*.clerk.accounts.dev https://clerk.permitext.com https://clerk.per.codes";
   const scriptPolicy = scriptNonce
     ? `'self' 'nonce-${scriptNonce}' https://appleid.cdn-apple.com ${clerkScriptSources}`
     : `'self' https://appleid.cdn-apple.com ${clerkScriptSources}`;
@@ -7570,7 +7570,7 @@ function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}
       `script-src ${scriptPolicy}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' blob: data:",
-      "connect-src 'self' https://*.clerk.accounts.dev https://clerk.permitext.com",
+      "connect-src 'self' https://*.clerk.accounts.dev https://clerk.permitext.com https://clerk.per.codes",
       "object-src 'none'",
       "base-uri 'none'",
       "frame-ancestors 'none'",
@@ -9442,7 +9442,7 @@ function mockResearchEvidenceAnalysis(evidence, projectFacts = [], retrievalLimi
     unresolvedProjectFacts: ["Confirm the project facts material to the cited conditions."],
     evidenceLimitations: retrievalLimitations.length
       ? retrievalLimitations.map((item) => item.text || String(item))
-      : ["Permitext searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
+      : ["per codes searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
     highValueFollowUpQuestions: ["Which project fact controls whether the cited condition applies?"]
   };
 }
@@ -9482,7 +9482,7 @@ export function deterministicResearchEvidenceAnalysisForBoundedCitation(
     // Keep retrieval diagnostics in answer.retrieval.limitations, as in the
     // general-turn path. Copying them here injects unrelated claims into both
     // the initial answer and its revision before substantive verification.
-    evidenceLimitations: ["Permitext limited this answer to the enacted section identified by the user's exact citation."],
+    evidenceLimitations: ["per codes limited this answer to the enacted section identified by the user's exact citation."],
     highValueFollowUpQuestions: []
   };
 }
@@ -9566,7 +9566,7 @@ export function deterministicResearchEvidenceAnalysisForTurn(
     // sibling cross-references are retained in answer.retrieval.limitations.
     // They are internal search-process metadata, not legal facts for the model
     // to repeat as user-facing evidence limitations.
-    evidenceLimitations: ["Permitext limited this answer to the enacted evidence assembled for the current question."],
+    evidenceLimitations: ["per codes limited this answer to the enacted evidence assembled for the current question."],
     highValueFollowUpQuestions: []
   };
 }
@@ -9583,7 +9583,7 @@ export function canonicalResearchBoundedCitationInterpretation(
     ...interpretation,
     evidenceLimitations: evidenceLimitations.length
       ? evidenceLimitations
-      : ["Permitext limited this answer to the enacted section identified by the user's exact citation."]
+      : ["per codes limited this answer to the enacted section identified by the user's exact citation."]
   };
 }
 
@@ -9774,7 +9774,7 @@ function mockResearchInterpretation(question, evidence, options = {}) {
   }, new Map()).values());
   const subject = answerEvidenceGroups.length === 1
     ? `the enacted provision, ${answerEvidenceGroups[0].section.sectionNumber || answerEvidenceGroups[0].section.title}`
-    : `the ${answerEvidenceGroups.length} enacted provisions Permitext assembled`;
+    : `the ${answerEvidenceGroups.length} enacted provisions per codes assembled`;
   const conversational = options.responseStyle === "conversational";
   const governingAncestorScopes = evidence.filter((section) =>
     /Governing ancestor scope for pinned/i.test(String(section?.relationship || ""))
@@ -9860,7 +9860,7 @@ function mockResearchInterpretation(question, evidence, options = {}) {
         : "Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."
     ],
     followUpQuestions: ["What project fact would determine whether the cited conditions apply?"],
-    evidenceLimitations: ["Permitext searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
+    evidenceLimitations: ["per codes searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
     additionalEvidenceNeeded: ["Confirm any referenced standard, agency rule, figure, or other authority outside the current enacted corpus before final reliance."],
     supportingSourceUses: [],
     citations: answerEvidenceGroups.slice(0, maximumResearchSupportedPoints).map(({ section, sourceIDs }) => ({
@@ -10139,14 +10139,14 @@ export function researchWebSupportRequestBody({
       type: "web_search",
       filters: { allowed_domains: allowedDomains }
     }],
-    // This request is constructed only after Permitext's source policy has
+    // This request is constructed only after per codes's source policy has
     // decided that official web support is required. Do not let the provider
     // skip the sole available tool and answer from model memory instead.
     tool_choice: "required",
     include: ["web_search_call.action.sources"],
     instructions: [
       "Find concise supporting information from the allowed official websites for a building-code research answer.",
-      "The enacted Permitext corpus remains the primary legal authority.",
+      "The enacted per codes corpus remains the primary legal authority.",
       "Do not make a project compliance determination and do not treat guidance as enacted law.",
       "Do not guess the identity of an unexplained acronym, agency, or program, and do not substitute a similarly named authority. Use a source only when it explicitly identifies the named authority and jurisdiction.",
       "Open each supplied candidate official page that corresponds to a named outside authority before broadening the search. If a candidate is only an official index or starting page and does not establish a substantive minimum, cite that page and state that limitation instead of inventing a rule.",
@@ -10299,11 +10299,11 @@ export async function openAIResearchWebSupport(question, userID, options = {}) {
   );
   const unattributedCandidateOfficialURLs = uncoveredCandidateURLs();
   const limitation = unattributedRequestedDocuments.length
-    ? `Permitext could not retrieve a source-specific attributable passage for ${unattributedRequestedDocuments.join(", ")}; that document was not used in this answer.`
+    ? `per codes could not retrieve a source-specific attributable passage for ${unattributedRequestedDocuments.join(", ")}; that document was not used in this answer.`
     : unattributedCandidateOfficialURLs.length
-      ? `Permitext could not retrieve an attributable passage from ${unattributedCandidateOfficialURLs.join(", ")}; the page remains only an official starting point and was not used as proof of a substantive requirement.`
+      ? `per codes could not retrieve an attributable passage from ${unattributedCandidateOfficialURLs.join(", ")}; the page remains only an official starting point and was not used as proof of a substantive requirement.`
     : sources.length === 0
-      ? "Permitext searched the approved official supporting web sources but could not retrieve an attributable passage; web guidance was not used in this answer."
+      ? "per codes searched the approved official supporting web sources but could not retrieve an attributable passage; web guidance was not used in this answer."
       : "";
   return {
     summary,
@@ -10825,7 +10825,7 @@ export function researchOfficialGuidanceOnlyInterpretation(webSupport = {}) {
     bindings.map((binding) => binding.text)
   );
   if (!narrative.claims.length) {
-    const error = new Error("Permitext could not bind the retrieved official guidance to attributable claims.");
+    const error = new Error("per codes could not bind the retrieved official guidance to attributable claims.");
     error.code = "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE";
     throw error;
   }
@@ -11818,7 +11818,7 @@ async function openAIResearchZoningRepair(
     deterministicContext: options.zoningDeterministicContext
   });
   if (!repairPacket.sources.length || repairPacket.incompleteAtomicSources.length) {
-    const error = new Error("Permitext could not bind the Zoning repair to a controlling source passage.");
+    const error = new Error("per codes could not bind the Zoning repair to a controlling source passage.");
     error.code = "RESEARCH_VERIFICATION_FAILED";
     throw error;
   }
@@ -12321,9 +12321,9 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     requestedRichSources.every((source) => source.kind === "table");
   if (primary.visualSources.length && !visualSourceIDs.length && !diagnosticStructuredTextOnly) {
     const error = new Error(
-      "Permitext detected official visual evidence elsewhere in this enacted section. " +
+      "per codes detected official visual evidence elsewhere in this enacted section. " +
       "Use Find Relevant Evidence to review and explicitly select any applicable visuals before analysis; " +
-      "Permitext will not silently include unselected visual material."
+      "per codes will not silently include unselected visual material."
     );
     error.code = "RESEARCH_VISUAL_REVIEW_REQUIRED";
     throw error;
@@ -14559,7 +14559,7 @@ async function handleOrganizationInvitationAccept(request, response) {
   }
   if (invitation.invitedUserID && invitation.invitedUserID !== context.userID) {
     sendJSON(response, 403, {
-      error: "This invitation belongs to a different Permitext account.",
+      error: "This invitation belongs to a different per codes account.",
       code: "ORGANIZATION_INVITATION_ACCOUNT_MISMATCH"
     });
     return;
@@ -15193,7 +15193,7 @@ function collaborationActorDisplayName(context) {
   return String(
     context.authContext.account?.displayName ||
     context.authContext.account?.publicUsername ||
-    "Permitext professional"
+    "per codes professional"
   ).trim();
 }
 
@@ -17120,7 +17120,7 @@ async function reportConfigurationForProject(userID, projectID) {
   const controls = access.organization
     ? normalizedOrganizationFirmControls(access.organization)
     : defaultFirmControls({
-        organizationName: "Permitext",
+        organizationName: "per codes",
         ownerUserID: userID,
         createdAt: access.project?.updatedAt || new Date().toISOString()
       });
@@ -17620,7 +17620,7 @@ async function handleReportGenerate(request, response) {
         userID: context.userID,
         displayName: context.authContext.account?.displayName ||
           context.authContext.account?.publicUsername ||
-          "Permitext user"
+          "per codes user"
       },
       codeEdition,
       items,
@@ -18249,7 +18249,7 @@ async function handleReportFileRead(request, response) {
     sendError(response, 409, "The stored Report PDF no longer matches its immutable content hash.");
     return;
   }
-  const safeTitle = String(artifact.payload.title || "Permitext Project Report")
+  const safeTitle = String(artifact.payload.title || "per codes Project Report")
     .replace(/[^a-z0-9]+/gi, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80) || "Permitext-Project-Report";
@@ -19903,7 +19903,7 @@ async function handleInternalFeedbackTriage(request, response) {
   const feedbackID = String(context.body.feedbackID || "").trim();
   const triageStatus = String(context.body.triageStatus || "").trim();
   const notes = normalizedResearchText(context.body.notes, 4_000);
-  const reviewer = normalizedResearchText(context.body.reviewer, 120) || "Permitext owner";
+  const reviewer = normalizedResearchText(context.body.reviewer, 120) || "per codes owner";
   if (!feedbackID || !researchFeedbackTriageStatuses.has(triageStatus)) {
     sendError(response, 400, "Provide a feedback record and valid triage status.");
     return;
@@ -19975,7 +19975,7 @@ async function handleInternalEvaluationReview(request, response) {
   const runID = String(context.body.runID || "").trim();
   const decision = String(context.body.decision || "").trim();
   const notes = normalizedResearchText(context.body.notes, 4_000);
-  const reviewer = normalizedResearchText(context.body.reviewer, 120) || "Permitext owner";
+  const reviewer = normalizedResearchText(context.body.reviewer, 120) || "per codes owner";
   const caseKinds = new Set(["case", "retrieval-case", "zoning-case"]);
   const allowedDecisions = kind === "run"
     ? new Set(["approved", "rejected"])
@@ -20822,7 +20822,7 @@ async function handleResearchConversationMessage(request, response) {
       progressResponse.json(422, {
         code: "RESEARCH_ZONING_SOURCE_UNAVAILABLE",
         charged: false,
-        error: "Zoning Research is not enabled for the available Zoning Resolution snapshot. Permitext cannot determine whether zoning allows this work using Construction Code excerpts. You can read the zoning text in the Reader; this Research attempt used no model calls or Research turns."
+        error: "Zoning Research is not enabled for the available Zoning Resolution snapshot. per codes cannot determine whether zoning allows this work using Construction Code excerpts. You can read the zoning text in the Reader; this Research attempt used no model calls or Research turns."
       });
       return;
     }
@@ -21146,7 +21146,7 @@ async function handleResearchConversationMessage(request, response) {
       researchOperation.failureCode = "RESEARCH_EVIDENCE_NOT_FOUND";
       progressResponse.progress("checking_citation_support", "active");
       progressResponse.json(422, {
-        error: "Permitext could not locate the exact current enacted Building Code section requested.",
+        error: "per codes could not locate the exact current enacted Building Code section requested.",
         code: "RESEARCH_EVIDENCE_NOT_FOUND",
         codeBasis: answerCodeBasis,
         retrieval: {
@@ -21692,7 +21692,7 @@ async function handleResearchConversationMessage(request, response) {
       // This scope promises a verified rule explanation. A rejected draft must
       // remain unsaved/uncharged, not become a generic successful boundary.
       if (suppliedText || practicalNextStep || conversationRecall || conditionalZoningExplanation) return false;
-      // Once Permitext has attributable official guidance for an explicit
+      // Once per codes has attributable official guidance for an explicit
       // guidance request, it must never replace that sourced material with a
       // charged generic enacted-evidence fallback. Revision may repair the
       // answer; otherwise the turn fails and its reservation is released.
@@ -22300,7 +22300,7 @@ async function handleResearchConversationMessage(request, response) {
           });
           if (applyEvidenceBoundaryFallback()) break;
           if (zoningPlan && !zoningPlan.callPolicy.allowFullAnswerRewrite) {
-            const error = new Error("The Zoning answer failed a deterministic gate; Permitext did not perform a full-answer rewrite.");
+            const error = new Error("The Zoning answer failed a deterministic gate; per codes did not perform a full-answer rewrite.");
             error.code = "RESEARCH_VERIFICATION_FAILED";
             error.verificationAttempts = verificationAttempts;
             throw error;
@@ -22399,7 +22399,7 @@ async function handleResearchConversationMessage(request, response) {
         if (contextualVerification.pass) break;
         if (applyEvidenceBoundaryFallback()) break;
         if (zoningPlan && !zoningPlan.callPolicy.allowFullAnswerRewrite) {
-          const error = new Error("The Zoning answer did not pass bounded verification; Permitext did not perform a full-answer rewrite.");
+          const error = new Error("The Zoning answer did not pass bounded verification; per codes did not perform a full-answer rewrite.");
           error.code = "RESEARCH_VERIFICATION_FAILED";
           error.verificationAttempts = verificationAttempts;
           throw error;
@@ -24895,7 +24895,7 @@ export function compatibilityAccountMergeAllowed(adapter) {
 }
 
 const accountEntitlementConflictMessage =
-  "Both accounts already have separate Pro entitlements. Nothing was changed. Contact support so Permitext can preserve the lifetime grant and resolve the duplicate purchase safely.";
+  "Both accounts already have separate Pro entitlements. Nothing was changed. Contact support so per codes can preserve the lifetime grant and resolve the duplicate purchase safely.";
 
 function accountMergeHasConflict(mergedAccount) {
   return mergedAccount?.entitlementConflict === true;
@@ -25561,7 +25561,7 @@ export function stripeConfigurationStatus(options = {}) {
     return {
       ready: false,
       mode,
-      message: "Stripe checkout requested an unsupported Permitext package."
+      message: "Stripe checkout requested an unsupported per codes package."
     };
   }
   if (!String(priceID || "").trim()) missing.push(stripePriceEnvironmentKey(packageID));
@@ -25657,6 +25657,12 @@ async function fulfillResearchCreditPurchase({
 }
 
 function configuredPublicBaseURL(request) {
+  // Keep checkout and policy returns on the new canonical host even while the
+  // legacy production environment is retained for installed clients.
+  const requestHost = String(request.headers.host || "").toLowerCase();
+  if (requestHost === "per.codes" || requestHost === "www.per.codes") {
+    return "https://per.codes";
+  }
   const explicitURL =
     process.env.PERMITEXT_PUBLIC_BASE_URL ||
     process.env.PERMITEXT_SYNC_PUBLIC_URL ||
@@ -25843,17 +25849,17 @@ export function validateStripeRestoreOwnership({
   if (distinctOwners.length > 1) {
     throw new ClientAuthError(
       409,
-      "Stripe subscription ownership records conflict. Contact Permitext support."
+      "Stripe subscription ownership records conflict. Contact per codes support."
     );
   }
   if (!distinctOwners.length) {
     throw new ClientAuthError(
       409,
-      "This Stripe subscription is not linked to a Permitext account. Contact Permitext support."
+      "This Stripe subscription is not linked to a per codes account. Contact per codes support."
     );
   }
   if (distinctOwners[0] !== requestedOwner) {
-    throw new ClientAuthError(403, "This Stripe subscription belongs to a different Permitext account.");
+    throw new ClientAuthError(403, "This Stripe subscription belongs to a different per codes account.");
   }
 
   return requestedOwner;
@@ -26103,7 +26109,7 @@ export async function cancelStripeSubscriptionsForAccount({
         method: "DELETE",
         body: encodedFormBody({
           cancellation_details: {
-            comment: "Permitext account deleted by customer"
+            comment: "per codes account deleted by customer"
           }
         })
       }
@@ -26132,7 +26138,7 @@ export async function cancelStripeSubscriptionAfterFullRefund({
   const normalizedSubscriptionID = stripeSubscriptionID(subscriptionID);
   const normalizedOwnerUserID = normalizedStripeAccountUserID(ownerUserID);
   if (!normalizedSubscriptionID || !normalizedOwnerUserID) {
-    throw new Error("A Stripe subscription and Permitext owner are required for refund cancellation.");
+    throw new Error("A Stripe subscription and per codes owner are required for refund cancellation.");
   }
   const subscription = await requestStripe(
     `/v1/subscriptions/${encodeURIComponent(normalizedSubscriptionID)}`
@@ -26151,7 +26157,7 @@ export async function cancelStripeSubscriptionAfterFullRefund({
       method: "DELETE",
       body: encodedFormBody({
         cancellation_details: {
-          comment: "Permitext web charge fully refunded"
+          comment: "per codes web charge fully refunded"
         }
       })
     }
@@ -28160,7 +28166,7 @@ async function handleAccountDelete(request, response) {
     } catch (error) {
       console.error("Account deletion stopped because Stripe cancellation failed.", error);
       sendJSON(response, 502, {
-        error: "Permitext could not confirm that Stripe billing was canceled. Your account and data were not deleted. Try again or manage the subscription from Settings.",
+        error: "per codes could not confirm that Stripe billing was canceled. Your account and data were not deleted. Try again or manage the subscription from Settings.",
         code: "STRIPE_CANCELLATION_FAILED",
         partial: false,
         stages: accountDeletionStages({ billingStatus: "failed" })
@@ -28177,8 +28183,8 @@ async function handleAccountDelete(request, response) {
       const ownershipUnresolved = ["PRIVATE_ASSET_OWNERSHIP_UNRESOLVED", "PRIVATE_ASSET_OWNER_CONFLICT"].includes(error?.code);
       sendJSON(response, 500, {
         error: ownershipUnresolved
-          ? "Permitext handled applicable billing, but could not verify ownership of older private files. Your private files, account, and remaining data were not deleted. Contact support to resolve file ownership before retrying cleanup."
-          : "Permitext handled applicable billing, but could not delete private images. Your Permitext account and remaining data were not deleted. Retry cleanup or contact support.",
+          ? "per codes handled applicable billing, but could not verify ownership of older private files. Your private files, account, and remaining data were not deleted. Contact support to resolve file ownership before retrying cleanup."
+          : "per codes handled applicable billing, but could not delete private images. Your per codes account and remaining data were not deleted. Retry cleanup or contact support.",
         code: "PRIVATE_ASSET_DELETION_FAILED",
         ...(ownershipUnresolved ? { causeCode: error.code } : {}),
         partial: billingCancellation.canceledSubscriptions.length > 0,
@@ -28199,7 +28205,7 @@ async function handleAccountDelete(request, response) {
     }
     if (!accountDeleted) {
       sendJSON(response, 500, {
-        error: "Permitext deleted private images but could not confirm deletion of the account and remaining data. Retry cleanup or contact support.",
+        error: "per codes deleted private images but could not confirm deletion of the account and remaining data. Retry cleanup or contact support.",
         code: "ACCOUNT_DATA_DELETION_FAILED",
         partial: privateAssets.length > 0 || billingCancellation.canceledSubscriptions.length > 0,
         stages: accountDeletionStages({
@@ -29147,12 +29153,12 @@ async function handleWebCheckout(request, response) {
   const body = await readJSON(request);
   const packageID = normalizedCommercialPackageID(body.packageID);
   if (!packageID) {
-    sendError(response, 400, "Choose a supported Permitext package.");
+    sendError(response, 400, "Choose a supported per codes package.");
     return;
   }
   if (packageID !== entitlementPackageIDs.pro) {
     sendJSON(response, 410, {
-      error: "Research is included with Permitext Pro and is no longer sold separately.",
+      error: "Research is included with per codes Pro and is no longer sold separately.",
       code: "PACKAGE_RETIRED"
     });
     return;
@@ -29222,7 +29228,7 @@ async function handleWebCheckout(request, response) {
   );
   const cancelURL = sameOriginAbsoluteURL(baseURL, body.cancelURL, "/?checkout=cancel");
   if (!successURL || !cancelURL) {
-    sendError(response, 400, "Checkout return URLs must use the Permitext origin.");
+    sendError(response, 400, "Checkout return URLs must use the per codes origin.");
     return;
   }
   const taxParameters = stripeCheckoutTaxParameters();
@@ -29284,7 +29290,7 @@ async function handleResearchCreditCheckout(request, response) {
   if (!accountContext) return;
   if (!hasActiveProEntitlement(accountContext.entitlement)) {
     sendJSON(response, 403, {
-      error: "Permitext Pro is required before buying additional Research turns.",
+      error: "per codes Pro is required before buying additional Research turns.",
       code: "PRO_REQUIRED_FOR_RESEARCH"
     });
     return;
@@ -29298,7 +29304,7 @@ async function handleResearchCreditCheckout(request, response) {
   );
   const cancelURL = sameOriginAbsoluteURL(baseURL, body.cancelURL, "/?checkout=cancel");
   if (!successURL || !cancelURL) {
-    sendError(response, 400, "Checkout return URLs must use the Permitext origin.");
+    sendError(response, 400, "Checkout return URLs must use the per codes origin.");
     return;
   }
   const purchaseMetadata = {
@@ -29444,7 +29450,7 @@ async function handleStripeRestore(request, response) {
 
   const packageID = stripePackageIDFromObject(subscription);
   if (!packageID) {
-    sendError(response, 422, "Stripe subscription has unsupported Permitext package metadata.");
+    sendError(response, 422, "Stripe subscription has unsupported per codes package metadata.");
     return;
   }
   if (
@@ -29808,7 +29814,7 @@ async function handleAppleTransactionVerify(request, response) {
     const acceptedAccountTokens = appleBillingAccountTokens(accountContext.account);
     const transactionAccountToken = String(payload.appAccountToken || "").toLowerCase();
     if (!transactionAccountToken || !acceptedAccountTokens.has(transactionAccountToken)) {
-      sendError(response, 403, "This Apple purchase is not linked to the signed-in Permitext account.");
+      sendError(response, 403, "This Apple purchase is not linked to the signed-in per codes account.");
       return;
     }
     if (!transactionID || Number(payload.quantity || 1) !== 1 || payload.revocationDate) {
@@ -29836,7 +29842,7 @@ async function handleAppleTransactionVerify(request, response) {
     });
     if (!result.created && result.ownerUserID !== userID) {
       sendJSON(response, 409, {
-        error: "This Apple purchase is already linked to another Permitext account.",
+        error: "This Apple purchase is already linked to another per codes account.",
         code: "RESEARCH_PURCHASE_ALREADY_LINKED"
       });
       return;
@@ -29855,7 +29861,7 @@ async function handleAppleTransactionVerify(request, response) {
     return;
   }
   if (!packageID) {
-    sendError(response, 422, "This Apple product is not a configured Permitext package.");
+    sendError(response, 422, "This Apple product is not a configured per codes package.");
     return;
   }
   const provider = {
@@ -29878,7 +29884,7 @@ async function handleAppleTransactionVerify(request, response) {
       notificationState
     });
     if (authoritativeState.ownershipConflict) {
-      sendError(response, 409, "This Apple purchase is already linked to another Permitext account.");
+      sendError(response, 409, "This Apple purchase is already linked to another per codes account.");
       return;
     }
     console.info("Apple transaction verification used newer notification state.", {
@@ -29958,7 +29964,7 @@ async function handleAppleTransactionVerify(request, response) {
         notificationState: currentNotificationState
       });
       if (authoritativeState.ownershipConflict) {
-        sendError(response, 409, "This Apple purchase is already linked to another Permitext account.");
+        sendError(response, 409, "This Apple purchase is already linked to another per codes account.");
         return;
       }
       sendJSON(response, 200, {
@@ -29971,7 +29977,7 @@ async function handleAppleTransactionVerify(request, response) {
       });
       return;
     }
-    sendError(response, 409, "This Apple purchase is already linked to another Permitext account.");
+    sendError(response, 409, "This Apple purchase is already linked to another per codes account.");
     return;
   }
   sendJSON(response, 200, {
@@ -30386,7 +30392,7 @@ async function handleInternalLifetimeGrantInvite(request, response) {
     }));
     sendJSON(response, 200, {
       message: status === "active"
-        ? "Lifetime Pro is active for this Permitext account."
+        ? "Lifetime Pro is active for this per codes account."
         : "Invitation email sent. Lifetime Pro will activate when this exact verified email first signs in to Permitext.",
       state: await lifetimeGrantConsoleState(email)
     });
@@ -34258,13 +34264,13 @@ async function handleCodeQuestionIssueComplete(request, response) {
       author: {
         userID: context.actorUserID,
         displayName: context.authContext.account?.displayName ||
-          context.authContext.account?.publicUsername || "Permitext professional"
+          context.authContext.account?.publicUsername || "per codes professional"
       },
       codeEdition: defaultResearchCodeEdition,
       items: codeMemoManifestItems(memoContext),
       disclaimers: [
         ...permitextRequiredReportDisclaimers,
-        "Permitext Issued Record — professional work product; not agency approval or a compliance certificate."
+        "per codes Issued Record — professional work product; not agency approval or a compliance certificate."
       ],
       reportVersion: pending.issueVersion,
       sourceVersions: {
@@ -34522,7 +34528,7 @@ async function handleCodeQuestionIssuedFileRead(request, response) {
     return;
   }
   const extension = format === "structured" ? "json" : format;
-  const safeTitle = String(generated.payload.title || "Permitext Code Memo")
+  const safeTitle = String(generated.payload.title || "per codes Code Memo")
     .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "Permitext-Code-Memo";
   response.writeHead(200, {
     ...securityHeaders(),

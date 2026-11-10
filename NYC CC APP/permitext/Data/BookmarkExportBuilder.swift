@@ -391,10 +391,10 @@ struct ProjectReportExportBuilder: Sendable {
             ?? UIColor(red: 0.66, green: 0.31, blue: 0.08, alpha: 1)
     }
     private var reportCoverLabel: String {
-        manifest.presentation?.template.coverLabel ?? "Permitext Project Report"
+        manifest.presentation?.template.coverLabel ?? "per codes Project Report"
     }
     private var reportBrandName: String {
-        manifest.presentation?.branding.displayName ?? "Permitext"
+        manifest.presentation?.branding.displayName ?? "per codes"
     }
 
     func build() throws -> URL {
@@ -410,8 +410,8 @@ struct ProjectReportExportBuilder: Sendable {
         format.documentInfo = [
             kCGPDFContextTitle as String: manifest.title,
             kCGPDFContextAuthor as String: manifest.author.displayName,
-            kCGPDFContextCreator as String: "Permitext iOS \(manifest.generatorVersion)",
-            kCGPDFContextSubject as String: "Immutable Permitext Project Report \(manifest.contentHash)"
+            kCGPDFContextCreator as String: "per codes iOS \(manifest.generatorVersion)",
+            kCGPDFContextSubject as String: "Immutable per codes Project Report \(manifest.contentHash)"
         ]
         let renderer = UIGraphicsPDFRenderer(
             bounds: CGRect(origin: .zero, size: pageSize),

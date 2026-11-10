@@ -83,7 +83,7 @@ export function updateFeedbackCase(feedback, body, now) {
   if (additionalSources.length > 10) fail("Use at most 10 additional sources.");
   const sources = [...feedbackSourceRecords(feedback), ...additionalSources.map(source => ({ ...source,
     key: `reviewer:${digest(source)}`, authority: "reviewer_supplied_official_source",
-    snapshotOrigin: "Reviewer-supplied excerpt; not fetched or independently validated by Permitext",
+    snapshotOrigin: "Reviewer-supplied excerpt; not fetched or independently validated by per codes",
     textSHA256: createHash("sha256").update(source.text).digest("hex") }))];
   const requiredSourceKeys = lines(draft.requiredSourceKeys || []);
   if (requiredSourceKeys.some(key => !sources.some(source => source.key === key))) fail("A required source is not in the preserved evidence.");

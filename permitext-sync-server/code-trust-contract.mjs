@@ -31,7 +31,7 @@ function constructionProfiles() {
     sourceLabel: "NYC 2022 Construction Codes",
     sourceURL: constructionCodesSourceURL,
     boundary:
-      "Permitext reproduces the published 2022 NYC edition. Later local laws, rules, bulletins, and project filing dates may affect applicability.",
+      "per codes reproduces the published 2022 NYC edition. Later local laws, rules, bulletins, and project filing dates may affect applicability.",
     verificationLabel: "Official source checked"
   };
   return [
@@ -123,7 +123,7 @@ export function codeTrustProfilesForLibraries(libraries = []) {
       basis: "2020 NFPA 70 with New York City amendments",
       boundary:
         specialty.extractionBoundary ||
-        "Permitext includes the New York City amendments only; the incorporated NFPA 70 text is not reproduced.",
+        "per codes includes the New York City amendments only; the incorporated NFPA 70 text is not reproduced.",
       verificationLabel: "Official source checked"
     }),
     trustProfile("EBC", {
@@ -201,7 +201,7 @@ export function codeTrustProfilesForLibraries(libraries = []) {
       sourceLabel: "NYC Zoning Resolution",
       sourceURL: zoning.sourceURL || "https://zr.planning.nyc.gov/",
       boundary:
-        "Zoning applicability can depend on maps, special districts, amendments, vesting, and project facts. Permitext does not provide an official project determination.",
+        "Zoning applicability can depend on maps, special districts, amendments, vesting, and project facts. per codes does not provide an official project determination.",
       verificationLabel: "Official source snapshot checked"
     })
   ];

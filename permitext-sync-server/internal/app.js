@@ -30,7 +30,7 @@ function account() {
 
 async function internalResponse(path, values = {}) {
   const current = account();
-  if (!current) throw new Error("Sign in to Permitext in this browser before opening the owner console.");
+  if (!current) throw new Error("Sign in to per codes in this browser before opening the owner console.");
   const response = await fetch(path, {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${current.sessionToken}` },
@@ -126,7 +126,7 @@ function reviewForm(testCase, options = {}) {
   }));
   const reviewer = element("input");
   reviewer.placeholder = "Reviewer";
-  reviewer.value = testCase.reviewer || "Permitext owner";
+  reviewer.value = testCase.reviewer || "per codes owner";
   const notes = element("textarea");
   notes.rows = 3;
   notes.placeholder = "Reviewer notes";
@@ -700,7 +700,7 @@ function renderFeedbackItem(feedback) {
   form.append(element("h3", { text: "Owner triage" }));
   const reviewer = element("input");
   reviewer.placeholder = "Reviewer";
-  reviewer.value = feedback.triagedBy || "Permitext owner";
+  reviewer.value = feedback.triagedBy || "per codes owner";
   const notes = element("textarea");
   notes.rows = 3;
   notes.placeholder = "What was checked, what remains uncertain, or why this report was closed";
@@ -1022,7 +1022,7 @@ function formattedConsoleDate(value) {
 }
 
 async function lookupLifetimeGrant(email, resultStatus) {
-  resultStatus.textContent = "Checking the exact email in Clerk and Permitext…";
+  resultStatus.textContent = "Checking the exact email in Clerk and per codes…";
   lifetimeGrantMessage = "";
   try {
     lifetimeGrantLookup = await internalRequest("/internal/lifetime-grants/lookup", { email });
@@ -1063,9 +1063,9 @@ function lifetimeGrantStateCopy(state) {
     return "Invitation pending. It will activate only after this exact verified email signs in.";
   }
   if (state.invitation?.status === "revoked") return "The previous Lifetime Pro invitation was revoked.";
-  if (state.permitextAccountExists) return "Permitext account found. Lifetime Pro can be activated now.";
-  if (state.clerkAccountExists) return "Clerk identity found, but it has not completed Permitext sign-in yet.";
-  return "No account exists yet. Permitext can email an invitation and hold Lifetime Pro pending.";
+  if (state.permitextAccountExists) return "per codes account found. Lifetime Pro can be activated now.";
+  if (state.clerkAccountExists) return "Clerk identity found, but it has not completed per codes sign-in yet.";
+  return "No account exists yet. per codes can email an invitation and hold Lifetime Pro pending.";
 }
 
 function renderLifetimeGrantResult(section) {
@@ -1080,10 +1080,10 @@ function renderLifetimeGrantResult(section) {
   const facts = element("dl", { className: "grant-facts" });
   [
     ["Clerk identity", state.clerkAccountExists ? "Found" : "Not created"],
-    ["Permitext account", state.permitextAccountExists ? "Signed in before" : "Not signed in yet"],
+    ["per codes account", state.permitextAccountExists ? "Signed in before" : "Not signed in yet"],
     ["Invitation", state.invitation?.status || "None"],
     ["Current access", state.entitlement ? `${state.entitlement.plan || "Pro"} · ${state.entitlement.source}` : "Free / no entitlement"],
-    ["Permitext user ID", state.target?.userID || "Assigned after sign-in"]
+    ["per codes user ID", state.target?.userID || "Assigned after sign-in"]
   ].forEach(([label, value]) => {
     facts.append(element("dt", { text: label }), element("dd", { text: value }));
   });
@@ -1128,7 +1128,7 @@ function renderLifetimeGrantResult(section) {
     actions,
     element("p", {
       className: "meta",
-      text: "Revoke removes only Permitext Lifetime Pro. Apple and Stripe subscriptions are never changed by this console."
+      text: "Revoke removes only per codes Lifetime Pro. Apple and Stripe subscriptions are never changed by this console."
     }),
     resultStatus
   );
@@ -1180,7 +1180,7 @@ function renderLifetimeGrants() {
     element("h2", { text: "Lifetime Pro invitations" }),
     element("p", {
       className: "meta",
-      text: "Enter one exact email. Existing Permitext accounts activate immediately; everyone else receives a Clerk invitation email and activates automatically after their first verified sign-in."
+      text: "Enter one exact email. Existing per codes accounts activate immediately; everyone else receives a Clerk invitation email and activates automatically after their first verified sign-in."
     })
   );
   if (lifetimeGrantMessage) {

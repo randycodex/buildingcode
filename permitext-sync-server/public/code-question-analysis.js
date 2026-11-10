@@ -275,7 +275,7 @@ export function useAnalysisAsStartingPoint(workspace, run) {
       assumptions: copy(run.answer.assumptions),
       unknowns: copy(run.answer.missingFacts),
       analysisRunID: run.id,
-      aiAssistanceDisclosure: "Started from bounded Permitext Research; reviewed and authored by the professional."
+      aiAssistanceDisclosure: "Started from bounded per codes Research; reviewed and authored by the professional."
     },
     updatedAt: new Date().toISOString()
   };

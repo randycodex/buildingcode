@@ -21,7 +21,7 @@ function requiredText(value, label, maximum = 512) {
 function actor(value = {}) {
   return {
     userID: requiredText(value.userID || "local-user", "review actor", 256),
-    displayName: String(value.displayName || value.userID || "Permitext professional").trim()
+    displayName: String(value.displayName || value.userID || "per codes professional").trim()
   };
 }
 

@@ -38,7 +38,7 @@ struct PermitextAccountEntryView: View {
     private var welcomeContent: some View {
         VStack(spacing: 0) {
             Spacer(minLength: 32)
-            Text("permitext")
+            Text("per codes")
                 .font(.system(size: 38, weight: .semibold))
                 .padding(.bottom, 28)
             Text("Your account, your workspace.")
@@ -125,9 +125,9 @@ private struct AccountDeletionStage: Identifiable {
 
     static let initial = [
         AccountDeletionStage(id: "billing", title: "Canceling Stripe billing"),
-        AccountDeletionStage(id: "data", title: "Deleting Permitext data"),
+        AccountDeletionStage(id: "data", title: "Deleting per codes data"),
         AccountDeletionStage(id: "device", title: "Clearing this device"),
-        AccountDeletionStage(id: "identity", title: "Removing Permitext sign-in identity")
+        AccountDeletionStage(id: "identity", title: "Removing per codes sign-in identity")
     ]
 }
 
@@ -168,10 +168,10 @@ struct SettingsView: View {
     @State private var pendingSyncConflictResolution: PendingSyncConflictResolution?
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
-    private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
-    private let termsURL = URL(string: "https://permitext.com/terms")!
-    private let refundsURL = URL(string: "https://permitext.com/refunds")!
-    private let supportURL = URL(string: "https://permitext.com/support")!
+    private let privacyPolicyURL = URL(string: "https://per.codes/privacy")!
+    private let termsURL = URL(string: "https://per.codes/terms")!
+    private let refundsURL = URL(string: "https://per.codes/refunds")!
+    private let supportURL = URL(string: "https://per.codes/support")!
     let initialSection: SettingsSection?
 
     init(initialSection: SettingsSection? = nil) {
@@ -308,7 +308,7 @@ struct SettingsView: View {
     private var appVersionLabel: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
-        return "Permitext \(version) (Build \(build))"
+        return "per codes \(version) (Build \(build))"
     }
 
     private var feedbackURL: URL {
@@ -316,7 +316,7 @@ struct SettingsView: View {
         components.scheme = "mailto"
         components.path = "permitext@gmail.com"
         components.queryItems = [
-            URLQueryItem(name: "subject", value: "Permitext feedback — \(appVersionLabel)"),
+            URLQueryItem(name: "subject", value: "per codes feedback — \(appVersionLabel)"),
             URLQueryItem(
                 name: "body",
                 value: "What happened?\n\nWhat did you expect?\n\n\(appVersionLabel)"
@@ -517,7 +517,7 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("By upgrading, you agree to the [Terms](https://permitext.com/terms) and [Subscription and Refund Policy](https://permitext.com/refunds).")
+                Text("By upgrading, you agree to the [Terms](https://per.codes/terms) and [Subscription and Refund Policy](https://per.codes/refunds).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -541,7 +541,7 @@ struct SettingsView: View {
             }
 
             if library.hasWebManagedBillingForAccountDeletion {
-                Link("Manage Subscription on web", destination: URL(string: "https://permitext.com/")!)
+                Link("Manage Subscription on web", destination: URL(string: "https://per.codes/")!)
                     .font(.footnote.weight(.semibold))
                     .frame(maxWidth: .infinity)
                 Text("Open Account on permitext.com to manage your web subscription.")
@@ -909,7 +909,7 @@ struct SettingsView: View {
     private var planSummaryText: String {
         if library.currentPlan == .pro {
             if library.isStoreKitTestBackendLinked {
-                return "Pro (Test) is linked to this Permitext account in isolated Apple Sandbox staging. No real charge was made."
+                return "Pro (Test) is linked to this per codes account in isolated Apple Sandbox staging. No real charge was made."
             }
             if library.isStoreKitTestProActive {
                 return "Pro (Test) is active only on this device. Use an account grant to test Pro across iOS and web."
@@ -1205,7 +1205,7 @@ struct SettingsView: View {
     private var accountDeletePopover: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Text(accountDeletionHasStarted ? "Deleting Permitext account" : "Delete Permitext account?")
+                Text(accountDeletionHasStarted ? "Deleting per codes account" : "Delete per codes account?")
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(.primary)
 
@@ -1226,10 +1226,10 @@ struct SettingsView: View {
     private var accountDeletionBillingMessage: String {
         if library.hasAppleManagedBillingForAccountDeletion &&
             library.hasWebManagedBillingForAccountDeletion {
-            return "Your Stripe subscription will be canceled first. Deleting Permitext does not cancel your App Store subscription; Apple may continue billing you."
+            return "Your Stripe subscription will be canceled first. Deleting per codes does not cancel your App Store subscription; Apple may continue billing you."
         }
         if library.hasAppleManagedBillingForAccountDeletion {
-            return "Deleting Permitext does not cancel your App Store subscription. Apple may continue billing you."
+            return "Deleting per codes does not cancel your App Store subscription. Apple may continue billing you."
         }
         if library.hasWebManagedBillingForAccountDeletion {
             return "Your Stripe subscription will be canceled first. If cancellation cannot be confirmed, nothing will be deleted."
@@ -1237,7 +1237,7 @@ struct SettingsView: View {
         if library.currentEntitlementSource == .lifetimeGrant {
             return "Your Lifetime Pro grant will be permanently removed."
         }
-        return "No recurring Permitext subscription is linked to this account."
+        return "No recurring per codes subscription is linked to this account."
     }
 
     @ViewBuilder
@@ -1251,15 +1251,15 @@ struct SettingsView: View {
             .font(.body.weight(.semibold))
             .foregroundStyle(.red)
 
-        accountDeletionDisclosure("Permitext will delete", items: [
-            "Your Permitext account and sign-in sessions",
+        accountDeletionDisclosure("per codes will delete", items: [
+            "Your per codes account and sign-in sessions",
             "Saved passages and notes",
             "Projects and their stored content",
             "Research history and reports",
             "Private images and synchronized data",
             "Unused additional Research turns (they are forfeited and are not automatically refunded)",
             "Entitlements and organizations you own",
-            "Permitext data stored on this device"
+            "per codes data stored on this device"
         ])
 
         VStack(alignment: .leading, spacing: 8) {
@@ -1279,7 +1279,7 @@ struct SettingsView: View {
                 .foregroundStyle(Color.appChrome)
 
                 Toggle(
-                    "I understand that deleting Permitext does not cancel App Store billing.",
+                    "I understand that deleting per codes does not cancel App Store billing.",
                     isOn: $accountDeletionAppleAcknowledged
                 )
                 .font(.footnote)
@@ -1289,7 +1289,7 @@ struct SettingsView: View {
         .padding(12)
         .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-        accountDeletionDisclosure("Permitext will not delete", items: [
+        accountDeletionDisclosure("per codes will not delete", items: [
             "Your Google/Gmail, Apple, or Microsoft account",
             "Records retained by Apple, Stripe, or Clerk for billing or legal purposes",
             "A minimal purchase-ownership record used to prevent fraud and restore qualifying purchases"
@@ -1487,10 +1487,10 @@ struct SettingsView: View {
                     ? (library.hasWebManagedBillingForAccountDeletion ? "Stripe cancellation completed before data deletion failed." : "No Stripe subscription was linked.")
                     : "Stripe cancellation was not confirmed or the deletion request did not finish."
             )
-            updateAccountDeletionStage("data", status: .failed, detail: library.statusMessage ?? "Permitext data deletion was not confirmed.")
+            updateAccountDeletionStage("data", status: .failed, detail: library.statusMessage ?? "per codes data deletion was not confirmed.")
             updateAccountDeletionStage("device", status: .skipped, detail: "Not started because server deletion did not finish.")
             updateAccountDeletionStage("identity", status: .skipped, detail: "Not started because server deletion did not finish.")
-            accountDeletionResultMessage = library.statusMessage ?? "Permitext could not complete account deletion. Nothing on this device was cleared."
+            accountDeletionResultMessage = library.statusMessage ?? "per codes could not complete account deletion. Nothing on this device was cleared."
             return
         }
 
@@ -1503,13 +1503,13 @@ struct SettingsView: View {
         updateAccountDeletionStage(
             "data",
             status: .complete,
-            detail: "Permitext data and \(result.response.deletedPrivateAssetCount) private images were deleted."
+            detail: "per codes data and \(result.response.deletedPrivateAssetCount) private images were deleted."
         )
         accountDeletionDeviceError = result.deviceCleanupError
         updateAccountDeletionStage(
             "device",
             status: result.deviceCleanupError == nil ? .complete : .failed,
-            detail: result.deviceCleanupError ?? library.deletedAccountDeviceCleanupNotice ?? "Account-scoped Permitext data stored on this device was cleared."
+            detail: result.deviceCleanupError ?? library.deletedAccountDeviceCleanupNotice ?? "Account-scoped per codes data stored on this device was cleared."
         )
 
         await removeAccountDeletionIdentity(account: account)
@@ -1563,7 +1563,7 @@ struct SettingsView: View {
                 try await user.delete()
             }
             accountDeletionIdentityError = nil
-            updateAccountDeletionStage("identity", status: .complete, detail: "The Permitext Clerk sign-in identity was removed.")
+            updateAccountDeletionStage("identity", status: .complete, detail: "The per codes Clerk sign-in identity was removed.")
         } catch {
             accountDeletionIdentityError = error.localizedDescription
             updateAccountDeletionStage("identity", status: .failed, detail: error.localizedDescription)
@@ -1581,7 +1581,7 @@ struct SettingsView: View {
             updateAccountDeletionStage(
                 "device",
                 status: accountDeletionDeviceError == nil ? .complete : .failed,
-                detail: accountDeletionDeviceError ?? library.deletedAccountDeviceCleanupNotice ?? "Account-scoped Permitext data stored on this device was cleared."
+                detail: accountDeletionDeviceError ?? library.deletedAccountDeviceCleanupNotice ?? "Account-scoped per codes data stored on this device was cleared."
             )
         }
         if accountDeletionIdentityError != nil {
@@ -1592,9 +1592,9 @@ struct SettingsView: View {
 
     private func finishAccountDeletionResult() {
         if accountDeletionDeviceError == nil && accountDeletionIdentityError == nil {
-            accountDeletionResultMessage = "Your Permitext account, synchronized data, device data, and Permitext sign-in identity were handled as shown above."
+            accountDeletionResultMessage = "Your per codes account, synchronized data, device data, and per codes sign-in identity were handled as shown above."
         } else {
-            accountDeletionResultMessage = "Permitext data was deleted, but the stages marked Needs attention remain. Retry cleanup or contact support."
+            accountDeletionResultMessage = "per codes data was deleted, but the stages marked Needs attention remain. Retry cleanup or contact support."
         }
     }
 
@@ -1762,8 +1762,8 @@ struct SettingsView: View {
                 .foregroundStyle(.primary)
 
             Text(request.keepLocal
-                ? "Permitext will retry this iPhone’s \(request.conflict.displayTitle.lowercased()) and replace the server copy if the server accepts it."
-                : "Permitext will discard this iPhone’s conflicting change and apply the current server copy. This local change cannot be recovered afterward."
+                ? "per codes will retry this iPhone’s \(request.conflict.displayTitle.lowercased()) and replace the server copy if the server accepts it."
+                : "per codes will discard this iPhone’s conflicting change and apply the current server copy. This local change cannot be recovered afterward."
             )
             .font(.body)
             .foregroundStyle(.secondary)
@@ -1889,9 +1889,9 @@ struct ProSubscriptionStoreView: View {
     @Environment(\.purchase) private var purchase
     @Environment(\.colorScheme) private var colorScheme
     @State private var policiesAccepted = false
-    private let defaultTermsURL = URL(string: "https://permitext.com/terms")!
-    private let defaultPrivacyPolicyURL = URL(string: "https://permitext.com/privacy")!
-    private let defaultRefundsURL = URL(string: "https://permitext.com/refunds")!
+    private let defaultTermsURL = URL(string: "https://per.codes/terms")!
+    private let defaultPrivacyPolicyURL = URL(string: "https://per.codes/privacy")!
+    private let defaultRefundsURL = URL(string: "https://per.codes/refunds")!
 
     private var termsURL: URL {
         URL(string: library.currentPolicyConfiguration?.documents?.terms.url ?? "") ?? defaultTermsURL
@@ -1909,7 +1909,7 @@ struct ProSubscriptionStoreView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
-                    Text("permitext")
+                    Text("per codes")
                         .font(.system(size: 38, weight: .semibold))
 
                     Text("Pro")

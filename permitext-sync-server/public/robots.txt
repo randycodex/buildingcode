@@ -13,4 +13,4 @@ Disallow: /subscription-confirmation
 Disallow: /sync/
 Disallow: /workboards/
 
-Sitemap: https://permitext.com/sitemap.xml
+Sitemap: https://per.codes/sitemap.xml

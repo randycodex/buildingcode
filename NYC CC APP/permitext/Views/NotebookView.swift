@@ -859,7 +859,7 @@ private struct NotebookCardEditorView: View {
                             Text("Latest saved Note · version \(latest.version)").font(.headline)
                             Text(latest.title).font(.title3)
                             NativeNotebookConflictPreview(projectID: projectID, document: latest.document, evidenceLinks: latest.evidenceLinks)
-                            Text("Saving your draft replaces this reviewed version. If it changes again, Permitext will ask you to review the conflict again.")
+                            Text("Saving your draft replaces this reviewed version. If it changes again, per codes will ask you to review the conflict again.")
                                 .font(.footnote).foregroundStyle(.secondary)
                             Button("Save my draft over version \(latest.version)") { resolveConflict(using: latest) }
                                 .buttonStyle(.bordered)

@@ -1,7 +1,7 @@
 import { auditProductionAuthentication } from "../production-auth-audit.mjs";
 
 const argumentsSet = new Set(process.argv.slice(2));
-const frontendAPIURL = "https://clerk.permitext.com";
+const frontendAPIURL = process.env.CLERK_FRONTEND_API_URL || "https://clerk.permitext.com";
 
 async function fetchJSON(url) {
   const response = await fetch(url, {

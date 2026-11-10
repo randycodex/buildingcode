@@ -8,6 +8,9 @@
 	</array>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
+		<string>applinks:per.codes</string>
+		<string>webcredentials:per.codes</string>
+		<string>webcredentials:clerk.per.codes</string>
 		<string>applinks:permitext.com</string>
 		<string>webcredentials:permitext.com</string>
 		<string>applinks:permitext-sync.vercel.app</string>

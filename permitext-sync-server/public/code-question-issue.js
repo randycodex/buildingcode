@@ -31,7 +31,7 @@ export function issueFingerprint(value) {
 function normalizedActor(value = {}) {
   return {
     userID: requiredText(value.userID || "local-user", "memo actor", 256),
-    displayName: String(value.displayName || value.userID || "Permitext professional").trim(),
+    displayName: String(value.displayName || value.userID || "per codes professional").trim(),
     role: String(value.role || "owner").trim().toLowerCase()
   };
 }
@@ -383,7 +383,7 @@ export function buildCodeMemoManifest(draft, approval, pending, options = {}) {
       successorID: null
     },
     disclaimers: [
-      "Permitext Issued Record — professional work product; not agency approval or a compliance certificate.",
+      "per codes Issued Record — professional work product; not agency approval or a compliance certificate.",
       "This record is bounded to the identified Project inputs and approved evidence snapshots."
     ],
     createdAt: issuedAt
@@ -461,11 +461,11 @@ export function codeMemoHTML(manifest) {
       if (item.kind === "evidence") return `<article aria-label="Approved evidence ${escapeHTML(item.sectionNumber)}"><h3>${escapeHTML(item.codeBook)} ${escapeHTML(item.sectionNumber)} · ${escapeHTML(item.title)}</h3><blockquote>${escapeHTML(item.passageText)}</blockquote></article>`;
       return "";
     }).join("");
-    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHTML(manifest.title)}</title></head><body><main><article aria-labelledby="memo-title"><header><p>Permitext Issued Record · Version ${manifest.issueLineage?.issueVersion || manifest.reportVersion}</p><h1 id="memo-title">${escapeHTML(manifest.title)}</h1><p>${escapeHTML(manifest.project?.name)} · ${escapeHTML(manifest.project?.address)}</p></header>${renderedItems}<footer>${(manifest.disclaimers || []).map((item) => `<p>${escapeHTML(item)}</p>`).join("")}</footer></article></main></body></html>`;
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHTML(manifest.title)}</title></head><body><main><article aria-labelledby="memo-title"><header><p>per codes Issued Record · Version ${manifest.issueLineage?.issueVersion || manifest.reportVersion}</p><h1 id="memo-title">${escapeHTML(manifest.title)}</h1><p>${escapeHTML(manifest.project?.name)} · ${escapeHTML(manifest.project?.address)}</p></header>${renderedItems}<footer>${(manifest.disclaimers || []).map((item) => `<p>${escapeHTML(item)}</p>`).join("")}</footer></article></main></body></html>`;
   }
   const inputs = (manifest.inputSnapshots || []).map((item) => `<li><strong>${escapeHTML(item.inputKind)}</strong>: ${escapeHTML(item.statement)}</li>`).join("");
   const evidence = (manifest.evidence || []).map((item) => `<li><strong>${escapeHTML(item.snapshot?.passageLocator || item.snapshotID)}</strong><p>${escapeHTML(item.snapshot?.quotedText || "")}</p></li>`).join("");
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHTML(manifest.title)}</title></head><body><main><article aria-labelledby="memo-title"><header><p>Permitext Issued Record · Version ${manifest.issueLineage.issueVersion}</p><h1 id="memo-title">${escapeHTML(manifest.title)}</h1><p>${escapeHTML(manifest.project.name)} · ${escapeHTML(manifest.project.address)}</p></header><section aria-labelledby="question"><h2 id="question">Question presented</h2><p>${escapeHTML(manifest.questionSnapshot.questionText)}</p></section><section aria-labelledby="inputs"><h2 id="inputs">Project inputs</h2><ul>${inputs}</ul></section><section aria-labelledby="evidence"><h2 id="evidence">Approved evidence</h2><ol>${evidence}</ol></section><section aria-labelledby="conclusion"><h2 id="conclusion">Professional conclusion</h2><p>${escapeHTML(manifest.conclusion?.conclusionText || "")}</p><p>${escapeHTML(manifest.conclusion?.reasoning || "")}</p></section><section aria-labelledby="narrative"><h2 id="narrative">Authored narrative</h2><p>${escapeHTML(manifest.authoredNarrative || "No additional narrative.")}</p></section><footer>${manifest.disclaimers.map((item) => `<p>${escapeHTML(item)}</p>`).join("")}</footer></article></main></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHTML(manifest.title)}</title></head><body><main><article aria-labelledby="memo-title"><header><p>per codes Issued Record · Version ${manifest.issueLineage.issueVersion}</p><h1 id="memo-title">${escapeHTML(manifest.title)}</h1><p>${escapeHTML(manifest.project.name)} · ${escapeHTML(manifest.project.address)}</p></header><section aria-labelledby="question"><h2 id="question">Question presented</h2><p>${escapeHTML(manifest.questionSnapshot.questionText)}</p></section><section aria-labelledby="inputs"><h2 id="inputs">Project inputs</h2><ul>${inputs}</ul></section><section aria-labelledby="evidence"><h2 id="evidence">Approved evidence</h2><ol>${evidence}</ol></section><section aria-labelledby="conclusion"><h2 id="conclusion">Professional conclusion</h2><p>${escapeHTML(manifest.conclusion?.conclusionText || "")}</p><p>${escapeHTML(manifest.conclusion?.reasoning || "")}</p></section><section aria-labelledby="narrative"><h2 id="narrative">Authored narrative</h2><p>${escapeHTML(manifest.authoredNarrative || "No additional narrative.")}</p></section><footer>${manifest.disclaimers.map((item) => `<p>${escapeHTML(item)}</p>`).join("")}</footer></article></main></body></html>`;
 }
 
 export function codeMemoStructuredJSON(manifest) {

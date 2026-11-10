@@ -65,6 +65,6 @@ export function applyWebSyncSafeguard(request, response, path, now = Date.now) {
   // Never return a fake empty sync snapshot: that could erase local content.
   response.writeHead(426, {"Content-Type":"application/json; charset=utf-8", "Cache-Control":"no-store", "X-Permitext-Update-Required":"1"});
   response.end(JSON.stringify({code:webUpdateRequiredCode, webAppVersion,
-    error:"A newer Permitext version is available. Your saves remain enabled. Finish saving, then reload Permitext to receive updates."}));
+    error:"A newer per codes version is available. Your saves remain enabled. Finish saving, then reload per codes to receive updates."}));
   return true;
 }

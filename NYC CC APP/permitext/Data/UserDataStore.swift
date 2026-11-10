@@ -81,7 +81,7 @@ struct SavedPassageRemoval: Equatable {
     }
 }
 
-/// Resolves an isolated on-device database for each Permitext account.
+/// Resolves an isolated on-device database for each per codes account.
 ///
 /// Account IDs are deliberately kept out of filesystem paths. A random profile
 /// identifier is persisted for each account instead, while signed-out work uses

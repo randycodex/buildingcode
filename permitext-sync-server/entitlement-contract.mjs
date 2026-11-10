@@ -141,7 +141,7 @@ export function entitlementWithPackage(
 ) {
   const normalizedPackageID = String(packageID || "").trim();
   if (!Object.values(entitlementPackageIDs).includes(normalizedPackageID)) {
-    throw new Error("Unsupported Permitext package.");
+    throw new Error("Unsupported per codes package.");
   }
   const updatedAt = now instanceof Date ? now.toISOString() : new Date(now).toISOString();
   const incomingPackageProvider = {

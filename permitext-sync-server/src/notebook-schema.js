@@ -57,7 +57,7 @@ function tiptapInlineToBlockNote(node) {
       props: {
         referenceKind: String(node.attrs?.referenceKind || ""),
         referenceID: String(node.attrs?.referenceID || ""),
-        label: String(node.attrs?.label || "Linked Permitext item")
+        label: String(node.attrs?.label || "Linked per codes item")
       }
     };
   }

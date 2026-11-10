@@ -1580,11 +1580,11 @@ struct BackendCurrentPoliciesResponse: Codable, Hashable, Sendable {
             policySetID: "local-development-policies",
             versions: versions,
             documents: BackendPolicyDocuments(
-                terms: BackendPolicyDocument(version: versions.terms, url: "https://permitext.com/terms"),
-                privacy: BackendPolicyDocument(version: versions.privacy, url: "https://permitext.com/privacy"),
+                terms: BackendPolicyDocument(version: versions.terms, url: "https://per.codes/terms"),
+                privacy: BackendPolicyDocument(version: versions.privacy, url: "https://per.codes/privacy"),
                 subscriptionsAndRefunds: BackendPolicyDocument(
                     version: versions.subscriptionsAndRefunds,
-                    url: "https://permitext.com/refunds"
+                    url: "https://per.codes/refunds"
                 )
             )
         )

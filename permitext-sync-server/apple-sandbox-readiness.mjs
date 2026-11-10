@@ -93,7 +93,7 @@ export function appleSandboxConfigurationReadiness(environment = process.env) {
     check(
       "staging-public-url",
       publicURL?.protocol === "https:" && !productionHosts.has(publicURL.hostname.toLowerCase()),
-      "Use a dedicated HTTPS staging hostname that is not a Permitext Production hostname."
+      "Use a dedicated HTTPS staging hostname that is not a per codes Production hostname."
     ),
     check(
       "durable-database",

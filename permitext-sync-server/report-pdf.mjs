@@ -105,8 +105,8 @@ function reportPresentation(manifest) {
   const accent = String(manifest.presentation?.branding?.accentColorHex || "").trim().toLowerCase();
   return {
     accent: /^#[0-9a-f]{6}$/.test(accent) ? accent : colors.accent,
-    coverLabel: manifest.presentation?.template?.coverLabel || "Permitext Project Report",
-    displayName: manifest.presentation?.branding?.displayName || "Permitext",
+    coverLabel: manifest.presentation?.template?.coverLabel || "per codes Project Report",
+    displayName: manifest.presentation?.branding?.displayName || "per codes",
     website: manifest.presentation?.branding?.website || "",
     footerText: manifest.presentation?.branding?.footerText || ""
   };
@@ -652,9 +652,9 @@ export async function renderReportPDF(manifest, { projectMaterialBySourceID = ne
     lang: "en-US",
     info: {
       Title: manifest.title,
-      Author: manifest.author?.displayName || "Permitext user",
+      Author: manifest.author?.displayName || "per codes user",
       Subject: `${manifest.project?.name || "Project"} code research report`,
-      Creator: manifest.generatorVersion || "Permitext",
+      Creator: manifest.generatorVersion || "per codes",
       CreationDate: new Date(manifest.createdAt),
       ModDate: new Date(manifest.createdAt)
     }

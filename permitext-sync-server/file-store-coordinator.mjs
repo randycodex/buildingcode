@@ -65,7 +65,7 @@ export async function withFileStoreLock(dataPath, operation, options = {}) {
       if (error?.code !== "EEXIST") throw error;
       if (await removeStaleLock(lockPath, staleMilliseconds, now)) continue;
       if (now() - startedAt >= timeoutMilliseconds) {
-        const timeoutError = new Error("Timed out waiting for the local Permitext data lock.");
+        const timeoutError = new Error("Timed out waiting for the local per codes data lock.");
         timeoutError.code = "FILE_STORE_LOCK_TIMEOUT";
         throw timeoutError;
       }

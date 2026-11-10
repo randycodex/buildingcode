@@ -16,7 +16,7 @@
         }
       ],
       "productID" : "com.randycodex.permitext.research.turns.25",
-      "referenceName" : "Permitext Research Turns 25 - Local Test",
+      "referenceName" : "per codes Research Turns 25 - Local Test",
       "type" : "Consumable"
     },
     {
@@ -31,7 +31,7 @@
         }
       ],
       "productID" : "com.randycodex.permitext.research.turns.100",
-      "referenceName" : "Permitext Research Turns 100 - Local Test",
+      "referenceName" : "per codes Research Turns 100 - Local Test",
       "type" : "Consumable"
     }
   ],
@@ -52,11 +52,11 @@
       "localizations" : [
         {
           "description" : "Unlock unlimited saved work, tags, PDF export, continuity, and cross-device sync.",
-          "displayName" : "Permitext Pro",
+          "displayName" : "per codes Pro",
           "locale" : "en_US"
         }
       ],
-      "name" : "Permitext Pro",
+      "name" : "per codes Pro",
       "subscriptions" : [
         {
           "adHocOffers" : [
@@ -73,13 +73,13 @@
           "localizations" : [
             {
               "description" : "Unlimited saved sections, notes, projects, tags, PDF export, continuity, and cross-device sync.",
-              "displayName" : "Permitext Pro Monthly",
+              "displayName" : "per codes Pro Monthly",
               "locale" : "en_US"
             }
           ],
           "productID" : "com.randycodex.permitext.pro.monthly",
           "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Permitext Pro Monthly",
+          "referenceName" : "per codes Pro Monthly",
           "subscriptionGroupID" : "3A08492E-C0C4-455D-9506-CAC386B21721",
           "type" : "RecurringSubscription"
         }

@@ -9,7 +9,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-table-cell-format-v1648";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-per-codes-v1649";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -161,7 +161,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261110-table-cell-format-v1648";
+} from "./offline-storage.js?v=20261110-per-codes-v1649";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -1997,7 +1997,7 @@ async function prepareWebAppReload() {
   const identity = captureAccountRequest(), editingGeneration = projectUpdateEditingGeneration;
   const blocked = message => ({ message });
   if (workspaceRestoreError || workspaceMigrationError) {
-    return blocked("Permitext could not restore this workspace. Keep this tab open and resolve its recovery notice before updating.");
+    return blocked("per codes could not restore this workspace. Keep this tab open and resolve its recovery notice before updating.");
   }
   if (activeResearchProgress.size) return blocked("Wait for the Assistant to finish, then update Permitext.");
   try {
@@ -2027,7 +2027,7 @@ async function prepareWebAppReload() {
       return blocked("Finish resizing or moving the column, then update Permitext.");
     }
     return true;
-  } catch { return blocked("Permitext could not save your work on this device. Keep this tab open and try again before updating."); }
+  } catch { return blocked("per codes could not save your work on this device. Keep this tab open and try again before updating."); }
 }
 
 function workspaceTransitionPaneLabel(paneID) {
@@ -3921,7 +3921,7 @@ function renderProjectWorkboard(project) {
   const isGeneric = projectDetailMatches(identity, genericWorkboardIdentity);
   const remoteRevision = isGeneric ? "" : syncedWorkboardForProject(projectID)?.updatedAt || "";
   const syncEnabled = !isGeneric && Boolean(activeAccount());
-  const projectName = isGeneric ? "Permitext" : identity.name || identity.title || "Project";
+  const projectName = isGeneric ? "per codes" : identity.name || identity.title || "Project";
   let heading = mounted.panel.querySelector(":scope > .panel-title");
   if (!heading) {
     heading = document.createElement("h2");
@@ -4035,7 +4035,7 @@ async function detachProjectWorkboard(project) {
   if (!popup) {
     await showWebNotice(
       "Workboard window blocked",
-      "Allow pop-ups for permitext, then try opening the Workboard again."
+      "Allow pop-ups for per codes, then try opening the Workboard again."
     );
     return;
   }
@@ -4396,7 +4396,7 @@ function updateBrowserSectionURL(sectionID) {
 function sharedSectionURL(sectionID) {
   const normalizedID = String(sectionID || "").trim();
   if (!/^\d+$/.test(normalizedID)) return "";
-  return `https://permitext.com/open/section/${normalizedID}`;
+  return `https://per.codes/open/section/${normalizedID}`;
 }
 
 function showShareButtonResult(button, message) {
@@ -6592,7 +6592,7 @@ function codeTrustProfile(prefix = "BC", codeVersion = "") {
       authority: "New York City Department of Buildings",
       sourceLabel: "official NYC 2014 Construction Codes",
       sourceURL: "https://www.nyc.gov/site/buildings/codes/2014-construction-codes.page",
-      boundary: "Applicability is project-specific and may depend on the application filing date. Permitext uses the official DOB consolidated archive and flags unresolved extraction discrepancies for review.",
+      boundary: "Applicability is project-specific and may depend on the application filing date. per codes uses the official DOB consolidated archive and flags unresolved extraction discrepancies for review.",
       verificationLabel: "Official source package checked",
       verifiedOn: "2026-09-01"
     };
@@ -7223,13 +7223,13 @@ function loadReleaseIdentity() {
 
 function feedbackURL(releaseID = "unknown") {
   const parameters = new URLSearchParams({
-    subject: `Permitext feedback — release ${releaseID}`,
+    subject: `per codes feedback — release ${releaseID}`,
     body: [
       "What happened?",
       "",
       "What did you expect?",
       "",
-      `Permitext release: ${releaseID}`
+      `per codes release: ${releaseID}`
     ].join("\n")
   });
   return `mailto:permitext@gmail.com?${parameters.toString()}`;
@@ -7469,7 +7469,7 @@ async function removePreparedAccountDeletionIdentity(prepared) {
     publishableKey,
     operation: () => verification.removeCapturedClerkIdentity(captured, () => {
       // The captured account's device cleanup signs it out first. A new active
-      // Permitext session must never be removed by an old cleanup continuation.
+      // per codes session must never be removed by an old cleanup continuation.
       if (activeAccount()) throw accountContextChangedError();
     })
   });
@@ -7736,16 +7736,16 @@ function showWebNotice(title, message, options = {}) {
 
 function accountDeletionBillingMessage({ appleManaged, stripeManaged, lifetimeGrant }) {
   if (appleManaged && stripeManaged) {
-    return "Your Stripe subscription will be canceled first. Deleting Permitext does not cancel your App Store subscription; Apple may continue billing you.";
+    return "Your Stripe subscription will be canceled first. Deleting per codes does not cancel your App Store subscription; Apple may continue billing you.";
   }
   if (appleManaged) {
-    return "Deleting Permitext does not cancel your App Store subscription. Apple may continue billing you.";
+    return "Deleting per codes does not cancel your App Store subscription. Apple may continue billing you.";
   }
   if (stripeManaged) {
     return "Your Stripe subscription will be canceled first. If cancellation cannot be confirmed, nothing will be deleted.";
   }
   if (lifetimeGrant) return "Your Lifetime Pro grant will be permanently removed.";
-  return "No recurring Permitext subscription is linked to this account.";
+  return "No recurring per codes subscription is linked to this account.";
 }
 
 function accountDeletionList(title, items) {
@@ -7780,20 +7780,20 @@ function confirmAccountDeletion({ appleManaged, stripeManaged, lifetimeGrant }) 
   const heading = document.createElement("h2");
   heading.className = "web-warning-title";
   heading.id = titleID;
-  heading.textContent = "Delete Permitext account?";
+  heading.textContent = "Delete per codes account?";
   const warning = document.createElement("p");
   warning.className = "account-deletion-permanent-warning";
   warning.id = descriptionID;
   warning.textContent = "This is permanent and cannot be undone.";
-  const deleteList = accountDeletionList("Permitext will delete", [
-    "Your Permitext account and sign-in sessions",
+  const deleteList = accountDeletionList("per codes will delete", [
+    "Your per codes account and sign-in sessions",
     "Saved passages and notes",
     "Projects and their stored content",
     "Research history and reports",
     "Private images and synchronized data",
     "Entitlements and organizations you own",
     "Unused additional Research turns (they are forfeited and are not automatically refunded)",
-    "Permitext data stored on this device"
+    "per codes data stored on this device"
   ]);
   const billing = document.createElement("section");
   billing.className = "account-deletion-disclosure account-deletion-billing";
@@ -7816,11 +7816,11 @@ function confirmAccountDeletion({ appleManaged, stripeManaged, lifetimeGrant }) 
     appleAcknowledgment = document.createElement("input");
     appleAcknowledgment.type = "checkbox";
     const acknowledgmentCopy = document.createElement("span");
-    acknowledgmentCopy.textContent = "I understand that deleting Permitext does not cancel App Store billing.";
+    acknowledgmentCopy.textContent = "I understand that deleting per codes does not cancel App Store billing.";
     acknowledgmentLabel.append(appleAcknowledgment, acknowledgmentCopy);
     billing.append(acknowledgmentLabel);
   }
-  const preserveList = accountDeletionList("Permitext will not delete", [
+  const preserveList = accountDeletionList("per codes will not delete", [
     "Your Google/Gmail, Apple, or Microsoft account",
     "Records retained by Apple, Stripe, or Clerk for billing or legal purposes",
     "A minimal purchase-ownership record used to prevent fraud and restore qualifying purchases"
@@ -7898,7 +7898,7 @@ function openAccountDeletionProgress() {
   const heading = document.createElement("h2");
   heading.className = "web-warning-title";
   heading.id = titleID;
-  heading.textContent = "Deleting Permitext account";
+  heading.textContent = "Deleting per codes account";
   const summary = document.createElement("p");
   summary.className = "web-warning-message account-deletion-result-summary";
   summary.textContent = "Keep this window open until every stage finishes.";
@@ -7907,9 +7907,9 @@ function openAccountDeletionProgress() {
   const stageRows = new Map();
   [
     ["billing", "Canceling Stripe billing"],
-    ["data", "Deleting Permitext data"],
+    ["data", "Deleting per codes data"],
     ["device", "Clearing this device"],
-    ["identity", "Removing Permitext sign-in identity"]
+    ["identity", "Removing per codes sign-in identity"]
   ].forEach(([key, label]) => {
     const row = document.createElement("li");
     row.dataset.status = "pending";
@@ -8090,7 +8090,7 @@ function openWebTextPrompt({
 
 function stripeRestoreIDError(value) {
   const restoreID = String(value || "").trim();
-  if (!restoreID) return "Enter the Stripe ID from your Permitext receipt.";
+  if (!restoreID) return "Enter the Stripe ID from your per codes receipt.";
   if (!/^(?:cs_|sub_)[A-Za-z0-9_]+$/.test(restoreID)) {
     return "Use a Stripe checkout session ID beginning with cs_ or a subscription ID beginning with sub_.";
   }
@@ -8118,7 +8118,7 @@ function openStripeRestoreDialog(onSubmit) {
   const body = document.createElement("p");
   body.className = "web-warning-message";
   body.id = messageID;
-  body.textContent = "Copy the checkout session or subscription ID from your Permitext Stripe receipt.";
+  body.textContent = "Copy the checkout session or subscription ID from your per codes Stripe receipt.";
   const label = document.createElement("label");
   label.className = "web-warning-field";
   label.htmlFor = inputID;
@@ -9800,7 +9800,7 @@ function updateTopbarPlanBadge() {
   const pro = currentPlan() === "pro";
   topbarBrandPlan.hidden = !pro;
   topbarBrandPlan.textContent = pro ? "PRO" : "";
-  topbarBrand.setAttribute("aria-label", pro ? "permitext Pro plan" : "permitext");
+  topbarBrand.setAttribute("aria-label", pro ? "per codes Pro plan" : "per codes");
   updateReaderPlanControls();
 }
 
@@ -11451,7 +11451,7 @@ async function completeClerkPermitextSignIn(config) {
   const linkFrom = existingAccount && existingAccount.userID !== targetUserID
     ? { accountUserID: existingAccount.userID, sessionToken: existingAccount.sessionToken }
     : undefined;
-  const displayName = clerkUser.fullName || clerkUser.firstName || "Permitext account";
+  const displayName = clerkUser.fullName || clerkUser.firstName || "per codes account";
   const completeSignIn = async () => {
     if (linkFrom) await requireAccountLinkWorkSaved(existingAccount, requestIdentity);
     requireCurrentAccountRequest(requestIdentity);
@@ -11474,7 +11474,7 @@ async function completeClerkPermitextSignIn(config) {
 async function signOutCapturedClerkSession(account, requestIdentity) {
   requireCurrentAccountRequest(requestIdentity);
   if (account?.authProvider !== "clerk" && !account?.userID?.startsWith("clerk:")) return;
-  // Reloaded workspaces restore the Permitext session before lazily loading
+  // Reloaded workspaces restore the per codes session before lazily loading
   // Clerk. An absent window.Clerk does not mean the provider is signed out.
   const config = await clerkWebSignInConfig();
   requireCurrentAccountRequest(requestIdentity);
@@ -11501,7 +11501,7 @@ async function signOutCapturedClerkSession(account, requestIdentity) {
     session = matching[0];
   }
   // Target only the captured provider session. The callback prevents provider
-  // navigation from interrupting Permitext's remaining sign-out cleanup.
+  // navigation from interrupting per codes's remaining sign-out cleanup.
   await clerk.signOut(() => {}, { sessionId: session.id });
   requireCurrentAccountRequest(requestIdentity);
   if (clerk.session?.id === session.id) {
@@ -23529,7 +23529,7 @@ function renderResearchInterpretation(container, result, options = {}) {
     ? [
         `Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`,
         sourceSummary.userPinnedCount ? `${sourceSummary.userPinnedCount} pinned by you` : "",
-        sourceSummary.permitextDiscoveredCount ? `${sourceSummary.permitextDiscoveredCount} identified by Permitext` : "",
+        sourceSummary.permitextDiscoveredCount ? `${sourceSummary.permitextDiscoveredCount} identified by per codes` : "",
         sourceSummary.crossReferenceCount ? `${sourceSummary.crossReferenceCount} cross-references reviewed` : ""
       ].filter(Boolean).join(" · ")
     : researchAnswerHasVerificationRecovery(result)
@@ -23943,7 +23943,7 @@ async function projectsWithOrganizationAccess(projects = []) {
   return mergeProjectsWithOrganizationAccess(projects, workspace);
 }
 
-async function readProjectReportFile(projectID, file, title = "Permitext Project Report") {
+async function readProjectReportFile(projectID, file, title = "per codes Project Report") {
   const requestIdentity = captureAccountRequest();
   const account = activeAccount();
   if (!account) throw new Error("Sign in from Account to download private Project Reports.");
@@ -23965,12 +23965,12 @@ async function readProjectReportFile(projectID, file, title = "Permitext Project
   }
   const blob = await response.blob();
   requireCurrentAccountRequest(requestIdentity);
-  const safeTitle = String(title || "Permitext Project Report")
+  const safeTitle = String(title || "per codes Project Report")
     .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "Permitext-Project-Report";
   return { pdfBlob: blob, filename: `${safeTitle}-v${file.reportVersion || 1}-${file.format || "report"}.pdf` };
 }
 
-async function downloadProjectReportFile(projectID, file, title = "Permitext Project Report") {
+async function downloadProjectReportFile(projectID, file, title = "per codes Project Report") {
   const packet = await readProjectReportFile(projectID, file, title);
   const url = URL.createObjectURL(packet.pdfBlob);
   const anchor = document.createElement("a");
@@ -24894,7 +24894,7 @@ async function persistResearchCandidateDisposition(candidate, disposition, quest
     const conversation = await startLinkedResearchForCodeDecision(questionID, { open: false });
     conversationID = String(conversation?.id || "").trim();
   }
-  if (!conversationID) throw new Error("Permitext could not open the linked Research conversation.");
+  if (!conversationID) throw new Error("per codes could not open the linked Research conversation.");
   state.researchConversationID = conversationID;
   const dispositionAccount = activeAccount();
   const dispositionContext = {
@@ -25217,7 +25217,7 @@ function renderEvidenceDiscovery(container) {
         const maximumSelections = Number(visualRequirement?.maximumSelections || 4);
         const selectedVisualSourceIDs = new Set(candidate.selectedVisualSourceIDs || []);
         const visualSourcesSummary = document.createElement("p");
-        visualSourcesSummary.textContent = `${candidate.visualSources.length}${visualRequirementCount ? ` of ${visualRequirementCount}` : ""} official assets verified by content hash. Select only the applicable image${maximumSelections === 1 ? "" : "s"} (up to ${maximumSelections}); Permitext will preserve the selected bytes with the Research record.`;
+        visualSourcesSummary.textContent = `${candidate.visualSources.length}${visualRequirementCount ? ` of ${visualRequirementCount}` : ""} official assets verified by content hash. Select only the applicable image${maximumSelections === 1 ? "" : "s"} (up to ${maximumSelections}); per codes will preserve the selected bytes with the Research record.`;
         const visualSourcesDetails = document.createElement("details");
         visualSourcesDetails.open = candidate.visualReviewOpen === true;
         visualSourcesDetails.addEventListener("toggle", () => {
@@ -25450,7 +25450,7 @@ function renderEvidenceDiscovery(container) {
           if (!researchOpenContextIsCurrent(prepareContext)) return;
           targetConversationID = String(linkedConversation?.id || "").trim();
           if (!targetConversationID) {
-            throw new Error("Permitext could not start the question’s linked Research conversation.");
+            throw new Error("per codes could not start the question’s linked Research conversation.");
           }
         }
         const selectedPassages = approved.map((candidate) => ({
@@ -26757,7 +26757,7 @@ async function renderResearch(paneID = "utility:analysis") {
     const heading = document.createElement("h3");
     heading.textContent = "Sign in to keep private research history";
     const copy = document.createElement("p");
-    copy.textContent = "Research conversations are stored with your Permitext account and stay separate from official code content.";
+    copy.textContent = "Research conversations are stored with your per codes account and stay separate from official code content.";
     const button = document.createElement("button");
     button.className = "ghost-button";
     button.type = "button";
@@ -31632,7 +31632,7 @@ async function renderProjectNotebook(project, options = {}) {
   } catch (error) {
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return panel;
     status.textContent = error.payload?.code === "PRO_REQUIRED_NOTEBOOK"
-      ? "The Project Notebook is included with Permitext Pro."
+      ? "The Project Notebook is included with per codes Pro."
       : `Notebook unavailable: ${error.message}`;
     await appendNotebookDeviceRecovery(shell, projectID, requestIdentity);
   }
@@ -31955,7 +31955,7 @@ async function renderProjectReportDraft(project, resume = null) {
   let reportOptions = {
     templates: [],
     defaultReportTemplateID: "permitext-standard",
-    branding: { displayName: "Permitext", accentColorHex: "#a65318" }
+    branding: { displayName: "per codes", accentColorHex: "#a65318" }
   };
   let selectedReportTemplateID = "permitext-standard";
   let activeDraft = emptyProjectReportDraft(identity);
@@ -33648,7 +33648,7 @@ async function renderProjectReportDraft(project, resume = null) {
   } catch (error) {
     if (disposed || !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== requestWorkspaceID) return panel;
     showStatusError(error.payload?.code === "PRO_REQUIRED_EXPORTS"
-      ? "Professional Project Reports are included with Permitext Pro."
+      ? "Professional Project Reports are included with per codes Pro."
       : `Report unavailable: ${error.message}`);
     const retry = document.createElement("button");
     retry.type = "button";
@@ -34273,7 +34273,7 @@ function projectCollaborationArtifacts(foundation, type) {
 function projectCollaborationActor(item, prefix = "createdBy") {
   const displayName = String(item?.[`${prefix}DisplayName`] || "").trim();
   const userID = String(item?.[`${prefix}UserID`] || "").trim();
-  return displayName || (userID === activeAccount()?.userID ? "You" : userID) || "Permitext professional";
+  return displayName || (userID === activeAccount()?.userID ? "You" : userID) || "per codes professional";
 }
 
 function projectCollaborationAccess(identity, permission) {
@@ -34706,7 +34706,7 @@ function coordinationActivityActor(event, foundation) {
     (foundation?.coordinationAssignees || [])
       .find((assignee) => assignee.userID === actorUserID)?.displayName ||
     (actorUserID === activeAccount()?.userID ? "You" : actorUserID) ||
-    "Permitext professional";
+    "per codes professional";
 }
 
 function coordinationCommentsByThread(foundation) {
@@ -35491,7 +35491,7 @@ function appendProjectReportExports(content, identity, foundation) {
     row.className = "project-report-export";
     const copy = document.createElement("div");
     const name = document.createElement("strong");
-    name.textContent = artifact.payload.title || "Permitext Project Report";
+    name.textContent = artifact.payload.title || "per codes Project Report";
     const meta = document.createElement("span");
     meta.textContent = [
       artifact.payload.reportVersion ? `Version ${artifact.payload.reportVersion}` : "",
@@ -41189,7 +41189,7 @@ function renderFirmStandardsEditor(organization, setFirmStatus) {
       : "Research usage will appear after this workspace refreshes.";
     const retentionNotice = document.createElement("p");
     retentionNotice.className = "settings-firm-muted";
-    retentionNotice.textContent = "Retention is policy metadata only. Permitext will not automatically delete Project data.";
+    retentionNotice.textContent = "Retention is policy metadata only. per codes will not automatically delete Project data.";
     const billingNotice = document.createElement("p");
     billingNotice.className = "settings-firm-muted";
     billingNotice.textContent = `${organization.billingIdentity.status} billing state · ${organization.billingIdentity.seatLimit} seats. Billing identifiers and subscription operations remain server-only.`;
@@ -41520,7 +41520,7 @@ async function renderFirmWorkspaceSettings(panel, settingsProjects, setStatus) {
             }
           });
           invitationResult.append(link, copyButton);
-          setFirmStatus("Invitation created. Permitext does not email it yet; send the private link directly.");
+          setFirmStatus("Invitation created. per codes does not email it yet; send the private link directly.");
         } catch (error) {
           setFirmStatus(error.message || "The invitation could not be created.", true);
           inviteButton.disabled = false;
@@ -41715,7 +41715,7 @@ function wireSettingsCardCollapsing(panel) {
 
 
 function profileNeedsName(account) {
-  return !String(account?.displayName || "").trim() || ["Permitext account", "Apple account", "Web browser"].includes(account.displayName);
+  return !String(account?.displayName || "").trim() || ["per codes account", "Apple account", "Web browser"].includes(account.displayName);
 }
 
 function profileNeedsSetup(account) {
@@ -41774,7 +41774,7 @@ async function presentAccountProfile({ edit = false } = {}) {
     dialog.setAttribute("aria-label", edit ? "Edit profile" : "Set up your account");
     dialog.innerHTML = `<form class="profile-form">
       <h1>${edit ? "Edit profile" : "Set up your account"}</h1>
-      <p>How should your name appear in Permitext?</p>
+      <p>How should your name appear in per codes?</p>
       <label>Name<input name="displayName" autocomplete="name" required maxlength="100"></label>
       <label>Email<input name="email" type="text" readonly></label>
       <label>Professional role (optional)<select name="professionalRole">
@@ -41936,7 +41936,7 @@ function renderAccountWelcome(dialog) {
 function renderDirectSignInEntry(dialog) {
   const panel = renderAccountWelcome(dialog);
   panel.classList.add("direct-sign-in-entry");
-  panel.querySelector("h1").textContent = "Sign in to Permitext";
+  panel.querySelector("h1").textContent = "Sign in to per codes";
   panel.querySelector("h1 + p").textContent = "Open your account and saved work.";
   panel.querySelector('[data-account-mode="signUp"]').remove();
   const retry = panel.querySelector('[data-account-mode="signIn"]');
@@ -41978,7 +41978,7 @@ function renderProAccountEntry(dialog) {
     upgrade.textContent = isProAccount() ? "Manage Pro" : "Continue to checkout";
     upgrade.addEventListener("click", () => showProAccountCheckout(dialog));
     actions.replaceChildren(upgrade);
-    const name = account.email || account.displayName || "your Permitext account";
+    const name = account.email || account.displayName || "your per codes account";
     panel.querySelector(".account-welcome-existing").textContent = `Continue with ${name}.`;
   } else {
     panel.querySelector('[data-account-mode="signUp"]').textContent = "Continue with Pro";
@@ -42694,7 +42694,7 @@ function renderSettings({ upgrade = false } = {}) {
       : [];
     syncConflictsCard.hidden = conflicts.length === 0;
     syncConflictsSummary.textContent = conflicts.length
-      ? `Permitext resolved every safe match automatically. ${conflicts.length} ${conflicts.length === 1 ? "change may" : "changes may"} contain unique edits and ${conflicts.length === 1 ? "needs" : "need"} your decision.`
+      ? `per codes resolved every safe match automatically. ${conflicts.length} ${conflicts.length === 1 ? "change may" : "changes may"} contain unique edits and ${conflicts.length === 1 ? "needs" : "need"} your decision.`
       : "";
     syncConflictsList.replaceChildren();
 
@@ -43058,7 +43058,7 @@ function renderSettings({ upgrade = false } = {}) {
     planSecondaryButton.textContent = "Restore Purchases";
     accountIdentity.hidden = !account;
     if (account) {
-      accountIdentityName.textContent = account.displayName || "Permitext account";
+      accountIdentityName.textContent = account.displayName || "per codes account";
       accountIdentityEmail.textContent = account.email || "Email unavailable";
       const roleLabel = professionalRoleLabel(account.professionalRole, account.professionalRoleOther);
       accountIdentityRoleRow.hidden = false;
@@ -43303,14 +43303,14 @@ function renderSettings({ upgrade = false } = {}) {
         "data",
         "failed",
         assetDeleted
-          ? "Private images were deleted, but deletion of the remaining Permitext data was not confirmed."
-          : error.payload?.error || error.message || "Permitext data deletion was not confirmed."
+          ? "Private images were deleted, but deletion of the remaining per codes data was not confirmed."
+          : error.payload?.error || error.message || "per codes data deletion was not confirmed."
       );
       progress.setStage("device", "skipped", "Not started because server deletion did not finish.");
       progress.setStage("identity", "skipped", "Not started because server deletion did not finish.");
       progress.finish({
         title: error.payload?.partial ? "Deletion incomplete" : "Deletion stopped",
-        message: error.payload?.error || error.message || "Permitext could not complete account deletion.",
+        message: error.payload?.error || error.message || "per codes could not complete account deletion.",
         retryLabel: isCurrentAccountRequest(deletionIdentity) ? "Retry deletion" : "",
         onRetry: () => {
           if (!isCurrentAccountRequest(deletionIdentity)) return;
@@ -43343,7 +43343,7 @@ function renderSettings({ upgrade = false } = {}) {
       progress.setStage(
         "data",
         "complete",
-        `Permitext data and ${payload.deletedPrivateAssetCount || 0} private image${payload.deletedPrivateAssetCount === 1 ? "" : "s"} were deleted.`
+        `per codes data and ${payload.deletedPrivateAssetCount || 0} private image${payload.deletedPrivateAssetCount === 1 ? "" : "s"} were deleted.`
       );
 
       progress.setStage("device", "active");
@@ -43362,7 +43362,7 @@ function renderSettings({ upgrade = false } = {}) {
           "identity",
           identityResult === "deleted" ? "complete" : "skipped",
           identityResult === "deleted"
-            ? "The Permitext Clerk sign-in identity was removed."
+            ? "The per codes Clerk sign-in identity was removed."
             : "No separate Clerk identity needed removal."
         );
       } catch (error) {
@@ -43380,7 +43380,7 @@ function renderSettings({ upgrade = false } = {}) {
       const finishCleanup = () => {
         const incomplete = deviceFailures.length > 0 || Boolean(identityError);
         progress.finish({
-          title: incomplete ? "Permitext data deleted; cleanup incomplete" : "Permitext account deleted",
+          title: incomplete ? "per codes data deleted; cleanup incomplete" : "per codes account deleted",
           message: incomplete
             ? "The stages marked Needs attention remain. Retry cleanup or contact support; the result above shows exactly what was completed."
             : "Your account and data were handled as shown above. Unattributed legacy browser data remains isolated for ownership review.",
@@ -43405,7 +43405,7 @@ function renderSettings({ upgrade = false } = {}) {
               try {
                 await removeClerkIdentity();
                 identityError = null;
-                progress.setStage("identity", "complete", "The Permitext Clerk sign-in identity was removed.");
+                progress.setStage("identity", "complete", "The per codes Clerk sign-in identity was removed.");
               } catch (error) {
                 identityError = error;
                 progress.setStage("identity", "failed", error.message || "The Clerk sign-in identity was not removed.");
@@ -46024,7 +46024,7 @@ async function linkLegacySourceToQuestion(project, source, questionID, options =
 async function createQuestionFromLegacySource(project, source) {
   const questionText = await openWebTextPrompt({
     title: "Create question from earlier work",
-    message: `${legacyGuidanceForSource(source.sourceKind)} Enter the precise question; Permitext will not infer it from the source.`,
+    message: `${legacyGuidanceForSource(source.sourceKind)} Enter the precise question; per codes will not infer it from the source.`,
     label: "Precise question",
     required: true,
     multiline: true,
@@ -46447,7 +46447,7 @@ function renderCodeDecisionResearchBody(_project, questionID) {
   intro.className = "code-decision-research-intro";
   intro.innerHTML = `
     <p class="code-question-pane-status">Research workspace updated</p>
-    <p>This compatibility column has been replaced by Permitext’s existing persisted Research workspace so conversations, evidence discovery, history, and Project assignment remain one system.</p>`;
+    <p>This compatibility column has been replaced by per codes’s existing persisted Research workspace so conversations, evidence discovery, history, and Project assignment remain one system.</p>`;
   wrap.appendChild(intro);
   const actions = document.createElement("div");
   actions.className = "code-decision-research-actions";
@@ -46728,7 +46728,7 @@ async function createLocalCodeQuestionDraft(project, options = {}) {
   if (!questionText) {
     questionText = await openWebTextPrompt({
       title: "Ask Assistant",
-        message: "Ask the professional question naturally. Permitext will preserve your evidence and analysis alongside the investigation.",
+        message: "Ask the professional question naturally. per codes will preserve your evidence and analysis alongside the investigation.",
       label: "What do you need to decide?",
       required: true,
       multiline: true,
@@ -50384,7 +50384,7 @@ function renderWorkspaceLoadError(error) {
   const message = document.createElement("p");
   message.textContent = detachedWorkboardRoute
     ? String(error?.message || "The Workboard could not be loaded.")
-    : `Permitext could not load this workspace. ${String(error?.message || "Please try again.")}`;
+    : `per codes could not load this workspace. ${String(error?.message || "Please try again.")}`;
   const retry = document.createElement("button");
   retry.type = "button";
   retry.className = "toolbar-button";

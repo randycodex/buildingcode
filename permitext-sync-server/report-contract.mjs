@@ -538,7 +538,7 @@ export function immutableReportManifest({
     reportDate: requiredISO(reportDate, "Report date"),
     author: {
       userID: requiredText(author?.userID, "Report author user ID", 256),
-      displayName: requiredText(author?.displayName || "Permitext user", "Report author", 500)
+      displayName: requiredText(author?.displayName || "per codes user", "Report author", 500)
     },
     codeEdition: requiredText(codeEdition, "Report code edition", 500),
     items: normalizedItems,
