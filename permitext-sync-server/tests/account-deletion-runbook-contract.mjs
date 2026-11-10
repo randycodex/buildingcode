@@ -146,7 +146,7 @@ assert.match(server, /"admin\/accounts\/export": handleAccountExport/);
 assert.match(server, /"account\/delete": handleAccountDelete/);
 assert.match(server, /body\.confirmation !== "DELETE"/);
 assert.match(server, /status: "userManaged"/);
-assert.match(web, /deleting Permitext does not cancel App Store billing/i);
+assert.match(web, /deleting per codes does not cancel App Store billing/i);
 assert.match(web, /confirmation: "DELETE"/);
 assert.match(web, /Retry cleanup/);
 assert.match(web, /const clearThisBrowser = \(\) => clearDeletedAccountBrowserData\(account, deletionIdentity\)/);
@@ -157,7 +157,7 @@ assert.match(accountCleanup, /removePrivateWorkspace\(sessionStorage, account\.u
 assert.doesNotMatch(accountCleanup, /deleteLocalWorkboard\(/,
   "Retired Project-only Workboard caches have no account ownership proof and must not be erased by another account's deletion.");
 assert.doesNotMatch(web, /\.\.\.\(state\.localProjects \|\| \[\]\)\.map\(\(project\) => workboardProjectID/);
-assert.match(ios, /deleting Permitext does not cancel App Store billing/i);
+assert.match(ios, /deleting per codes does not cancel App Store billing/i);
 assert.match(ios, /accountDeletionConfirmation[\s\S]*"DELETE"/);
 assert.match(ios, /Retry cleanup/);
 

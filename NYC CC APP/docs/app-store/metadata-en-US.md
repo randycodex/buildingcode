@@ -110,3 +110,10 @@ Use manual release for version 1.0 so approval does not publish the app before t
 Manual release was saved and verified after reload on September 7. No Add for
 Review, Submit for Review or public-release action has been performed. Final
 submission remains after the outstanding acceptance and reviewer-access work.
+
+
+## Remote draft receipt — November 10, 2026
+
+Saved to the existing App Store Connect app 6774385434: name **per codes**, the description and support/marketing/privacy URLs above, and rebranded review notes. Reviewer credentials and contact details were retained. The existing subscription group 22140923 now displays **per codes Pro**; subscription 6777744460 displays **per codes Pro Monthly**, retaining product ID `com.randycodex.permitext.pro.monthly`, duration and pricing.
+
+Production Server Notifications now use `https://per.codes/billing/apple/notifications`. The isolated sandbox notification URL is unchanged. The inspected iPhone screenshot slot contains no uploaded previews or screenshots. The app remains Prepare for Submission with manual release selected. No build was uploaded and no App Store submission or release was performed.

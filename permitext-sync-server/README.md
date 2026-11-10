@@ -69,7 +69,7 @@ Domain: per.codes
 Return URL: https://per.codes/account/apple/callback
 
 Domain: permitext.com
-Return URL: https://permitext.com/account/apple/callback
+Return URL: https://per.codes/account/apple/callback
 
 Domain: permitext-sync.vercel.app
 Return URL: https://permitext-sync.vercel.app/account/apple/callback
@@ -283,11 +283,11 @@ APPLE_BUNDLE_ID=com.randycodex.permitext \
 APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS=... \
 PERMITEXT_REQUIRE_APPLE_TRANSACTION_ROOT_PIN=1 \
 PERMITEXT_REQUIRE_PRODUCTION_APPLE_TRANSACTIONS=1 \
-PERMITEXT_PUBLIC_BASE_URL=https://permitext-sync.vercel.app \
+PERMITEXT_PUBLIC_BASE_URL=https://per.codes \
 node server.mjs
 ```
 
-Production checkout requires a live Stripe secret (`sk_live_...`) and a live recurring Price. The server rejects test credentials and test-mode webhook events when `VERCEL_ENV=production` or `PERMITEXT_REQUIRE_LIVE_STRIPE=1`, so a `cs_test_...` session can never appear to be a real purchase. Stripe uses different webhook signing secrets for test and live mode; configure the live endpoint at `https://permitext-sync.vercel.app/billing/stripe/webhook`.
+Production checkout requires a live Stripe secret (`sk_live_...`) and a live recurring Price. The server rejects test credentials and test-mode webhook events when `VERCEL_ENV=production` or `PERMITEXT_REQUIRE_LIVE_STRIPE=1`, so a `cs_test_...` session can never appear to be a real purchase. Stripe uses different webhook signing secrets for test and live mode; configure the live endpoint at `https://per.codes/billing/stripe/webhook`.
 
 During a domain migration, browser return URLs follow `PERMITEXT_PUBLIC_BASE_URL`,
 while `PERMITEXT_STRIPE_WEBHOOK_URL` can explicitly retain the existing signed
@@ -406,7 +406,7 @@ storage, account-repair, or evaluation admin routes.
 Storage summary verifies which persistence layer is live and returns table counts plus the latest sync event cursor:
 
 ```sh
-curl https://permitext-sync.vercel.app/admin/storage/summary \
+curl https://per.codes/admin/storage/summary \
   -H "Authorization: Bearer $PERMITEXT_SYNC_ADMIN_TOKEN"
 ```
 
@@ -450,14 +450,14 @@ The response includes `latestEventID`/`syncRevision`, `contentMapVersion`, and t
 Legacy passkey cleanup removes only accounts whose stored user ID starts with `passkey:`. It exists to clean records created before unlinked passkey sign-in was blocked:
 
 ```sh
-curl -X POST https://permitext-sync.vercel.app/admin/accounts/delete-legacy-passkey-users \
+curl -X POST https://per.codes/admin/accounts/delete-legacy-passkey-users \
   -H "Authorization: Bearer $PERMITEXT_SYNC_ADMIN_TOKEN"
 ```
 
 Restore checklist summarizes account restore readiness for one user:
 
 ```sh
-curl -X POST https://permitext-sync.vercel.app/admin/accounts/restore-checklist \
+curl -X POST https://per.codes/admin/accounts/restore-checklist \
   -H "Authorization: Bearer $PERMITEXT_SYNC_ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"userID":"apple:YOUR_APPLE_USER_ID"}'

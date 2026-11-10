@@ -151,7 +151,7 @@ try {
     acceptRevision = accepted; phases = []; doubleError = null;
     const created = await request('/research/conversations/create', { auth, projectID }, token);
     const conversationID = created.body.conversation.id;
-    const response = await request('/research/conversations/message', { auth, conversationID, question: fixture.questions[0], requestID: randomUUID() }, token);
+    const response = await request('/research/conversations/message', { answerMode: "verified", auth, conversationID, question: fixture.questions[0], requestID: randomUUID() }, token);
     if (doubleError) throw doubleError;
     assert.equal(response.status, 200, JSON.stringify(response.body));
     assert.deepEqual(phases, ['permitext_code_interpretation', 'permitext_research_verification', 'permitext_code_interpretation', 'permitext_research_verification']);

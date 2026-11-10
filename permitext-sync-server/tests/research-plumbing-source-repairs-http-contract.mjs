@@ -190,7 +190,7 @@ try {
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
     const authoredCase = activeRun.cases.find((item) => item.id === id) || activeRun.results.find(item => item.id === id);
-    const response = await request("/research/conversations/message", { auth, conversationID, question: authoredCase.question, requestID: randomUUID() }, token);
+    const response = await request("/research/conversations/message", { answerMode: "verified", auth, conversationID, question: authoredCase.question, requestID: randomUUID() }, token);
     if (providerDoubleError) throw providerDoubleError;
     assert.deepEqual(phases, accepted
       ? ["permitext_code_interpretation", "permitext_research_verification"]

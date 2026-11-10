@@ -105,7 +105,7 @@ try {
   for (scenario of ['accepted', 'needs-wording', 'rejected', 'invalid-patch']) {
     calls = []; failures = []; reviews = 0; initial = beforeRepair = afterRepair = correct = wrong = providerError = undefined;
     const created = await request('/research/conversations/create', { auth }, token), conversationID = created.body.conversation.id;
-    const response = await request('/research/conversations/message', { auth, conversationID, requestID: randomUUID(),
+    const response = await request('/research/conversations/message', { answerMode: "verified", auth, conversationID, requestID: randomUUID(),
       question: 'how do you determine the use group for this site?' }, token);
     if (providerError) throw providerError;
     assert.equal(response.status, 200, JSON.stringify(response.body));

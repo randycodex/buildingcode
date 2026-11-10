@@ -61,7 +61,7 @@ try {
  for(scenario of ['accepted','rejected']) {
   calls=[];draft=doubleError=undefined;
   const created=await request('/research/conversations/create',{auth},token),conversationID=created.body.conversation.id;
-  const response=await request('/research/conversations/message',{auth,conversationID,requestID:randomUUID(),question:'For our project under the 2022 NYC codes, what identification rule does MC 304.12 provide for installed equipment?'},token);
+  const response=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,requestID:randomUUID(),question:'For our project under the 2022 NYC codes, what identification rule does MC 304.12 provide for installed equipment?'},token);
   if(doubleError)throw doubleError;
   assert.equal(response.status,200,JSON.stringify(response.body));
   const expected=['permitext_research_investigation','permitext_research_investigation','permitext_code_interpretation','permitext_research_open_review','permitext_code_interpretation','permitext_research_open_review'];

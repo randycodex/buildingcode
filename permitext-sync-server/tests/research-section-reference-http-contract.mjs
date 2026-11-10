@@ -52,7 +52,7 @@ try {
   const account = signed.body.account, token = account.backendSessionToken, auth = { accountUserID: account.appUserID };
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const create = (selections, extra = {}) => request("/research/conversations/create", { auth, selections, ...extra }, token);
-  const ask = (conversationID, question) => request("/research/conversations/message", { auth, conversationID, question, requestID: randomUUID() }, token);
+  const ask = (conversationID, question) => request("/research/conversations/message", { auth, conversationID, question, answerMode: "verified", requestID: randomUUID() }, token);
   const reference = { sectionID: "20018523", selectionMode: "section_reference" };
   for (const selection of [
     { ...reference, selectedText: "Invented highlight" }, { ...reference, richSourceIDs: [] },

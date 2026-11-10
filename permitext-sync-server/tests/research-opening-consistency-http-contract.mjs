@@ -50,7 +50,7 @@ try{
   calls=0;providerError=null;
   const created=await post('/research/conversations/create',{auth},token);
   const conversationID=created.body.conversation.id;
-  const response=await post('/research/conversations/message',{auth,conversationID,question,requestID:randomUUID()},token);
+  const response=await post('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question,requestID:randomUUID()},token);
   if(providerError)throw providerError;
   assert.equal(response.status,200);
   const answer=response.body.conversation.messages.at(-1).answer;

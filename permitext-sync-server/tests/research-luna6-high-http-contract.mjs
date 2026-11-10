@@ -74,7 +74,7 @@ try {
   assert.equal(created.status, 201);
   const conversationID = created.body.conversation.id;
   for (const item of (factFollowup ? run.cases.slice(0,1) : run.cases)) {
-    const response = await request("/research/conversations/message", {auth, conversationID, question:item.question, requestID:randomUUID()}, token);
+    const response = await request("/research/conversations/message", { answerMode: "verified",auth, conversationID, question:item.question, requestID:randomUUID()}, token);
     assert.equal(response.status, 200, JSON.stringify(response.body));
     if (factFollowup) {
       const answer = response.body.conversation.messages.at(-1).answer;

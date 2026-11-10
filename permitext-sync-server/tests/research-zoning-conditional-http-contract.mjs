@@ -155,7 +155,7 @@ try {
       const created = await request("/research/conversations/create", { auth, ...(selections.length ? { selections } : {}), originSurface: surface }, token);
       assert.equal(created.status, 201, JSON.stringify(created.body));
       const conversationID = created.body.conversation.id;
-      const response = await request("/research/conversations/message", { auth, conversationID, question: input.question, requestID: randomUUID() }, token);
+      const response = await request("/research/conversations/message", { answerMode: "verified", auth, conversationID, question: input.question, requestID: randomUUID() }, token);
       if (doubleError) throw doubleError;
       if (["accept", "binding_accept"].includes(mode)) {
         assert.equal(response.status, 200, `${activeID}: ${JSON.stringify(response.body)}`);
@@ -238,7 +238,7 @@ try {
     phases = [];
     doubleError = null;
     const created = await request("/research/conversations/create", { auth }, token);
-    const boundary = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question, requestID: randomUUID() }, token);
+    const boundary = await request("/research/conversations/message", { answerMode: "verified", auth, conversationID: created.body.conversation.id, question, requestID: randomUUID() }, token);
     if (doubleError) throw doubleError;
     assert.equal(boundary.status, 200, `${question}: ${JSON.stringify(boundary.body)}`);
     const clarification = boundary.body.conversation.messages.at(-1).answer;
@@ -253,7 +253,7 @@ try {
   assert(currentRuleConversationID);
   phases = [];
   doubleError = null;
-  const followUp = await request("/research/conversations/message", { auth, conversationID: currentRuleConversationID,
+  const followUp = await request("/research/conversations/message", { answerMode: "verified", auth, conversationID: currentRuleConversationID,
     question: "What did it require on January 1, 2020?", requestID: randomUUID() }, token);
   if (doubleError) throw doubleError;
   assert.equal(followUp.status, 200, JSON.stringify(followUp.body));
@@ -268,7 +268,7 @@ try {
   const longInput = await ownerResearchScopeInput(key.cases.find(item => item.id === "ZR-13"), { original: true, zoningSummary: zoningSectionSummary });
   for (let index = 0; index < 101; index += 1) {
     phases = []; doubleError = null;
-    const continued = await request("/research/conversations/message", { auth,
+    const continued = await request("/research/conversations/message", { answerMode: "verified", auth,
       conversationID: longConversation.body.conversation.id,
       question: `Under the NYC Zoning Resolution: ${longInput.question}`, requestID: randomUUID() }, token);
     if (doubleError) throw doubleError;

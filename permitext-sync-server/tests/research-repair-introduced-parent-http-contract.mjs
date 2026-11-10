@@ -84,7 +84,7 @@ try {
   for (scenario of ["accepted", "rejected"]) {
     calls = []; draft = beforeRepair = doubleError = undefined;
     const created = await request("/research/conversations/create", { auth }, token), conversationID = created.body.conversation.id;
-    const response = await request("/research/conversations/message", { auth, conversationID, requestID: randomUUID(),
+    const response = await request("/research/conversations/message", { answerMode: "verified", auth, conversationID, requestID: randomUUID(),
       question: "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing." }, token);
     if (doubleError) throw doubleError;
     assert.equal(response.status, 200);

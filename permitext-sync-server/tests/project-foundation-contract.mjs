@@ -302,7 +302,7 @@ assert.deepEqual(immutableAnswer.passageToCitationMapping[0].evidenceSnapshotIDs
 const officialGuidanceClaim = "Registered low-pressure boilers listed by DOB require annual inspections.";
 const officialGuidanceAuthority = "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
 const officialGuidanceExplanation = `- ${officialGuidanceClaim}`;
-const officialGuidanceBoundary = "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below.";
+const officialGuidanceBoundary = "The assembled enacted evidence did not establish the requested rule; per codes is reporting only the exact official supporting guidance attributed below.";
 const emptyGuidanceAnalysis = {
   controllingProvisions: [],
   generalRules: [],

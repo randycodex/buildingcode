@@ -59,7 +59,7 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     legacyWorkspaceNoticeDismissed: () => dismissed,
     presentWorkspaceIssue: (message) => issues.push(message),
     flushPendingSyncAndRender: async () => {}, flushCodeQuestionOutbox: async () => {},
-    refreshNotebookPendingStatus: async () => {}, refreshEntitlementAfterCheckoutReturn: async () => {},
+    refreshNotebookPendingStatus: async () => {}, refreshEntitlementAfterCheckoutReturn: async () => {}, refreshOpenSettingsTrash: noop,
     incomingProUpgrade: upgradeReturn, readProUpgradeIntent: () => retainedUpgrade ? {} : null,
     setupAccountProfile: async () => {
       assert.ok(events.includes("workspace"), "Profile setup must follow usable workspace rendering.");
@@ -71,7 +71,7 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     resumeProUpgradeIntent: async () => { events.push("upgrade-resume"); }
   };
   for (const name of ["bindReaderToolbarButton", "saveWorkspaceResumeForRefresh", "restoreWorkspaceAfterRefresh", "syncReferenceReaderLayout", "flushSearchQueryPersistence", "flushResearchDraftPersistence", "openSavedColumnGroupsMenu", "updateConnectionStatus", "repositionActiveCustomSelect", "keepFocusedWorkspacePaneVisible", "scheduleVisibleReaderScrollIndicatorUpdates", "bindWorkspaceKeyboardNavigation", "stopForegroundSyncLoop", "startForegroundSyncLoop", "bindHorizontalWheelScroll", "openMobileMoreSheet", "consumeBrowserSectionURL", "renderReaderTrust"]) sandbox[name] = noop;
-  for (const name of ["addReaderButton", "toggleArchiveButton", "toggleSettingsButton", "workspaceActionsButton", "getProButton", "mobileMoreButton", "fitColumnsButton", "collapseReadersButton"]) sandbox[name] = node();
+  for (const name of ["addReaderButton", "toggleArchiveButton", "toggleSettingsButton", "workspaceActionsButton", "getProButton", "mobileMoreButton", "fitColumnsButton", "collapseReadersButton", "settingsButton"]) sandbox[name] = node();
   const context = vm.createContext(sandbox);
   vm.runInContext(`let chapters = []; let codeTrustProfiles = []; let codeTrustProfilesStatus = "loading"; let startupCatalogPromise = null; ${catalogHelpers} ${start} globalThis.startTest = start; globalThis.catalogState = () => ({chapters,codeTrustProfiles,codeTrustProfilesStatus,startupCatalogPromise});`, context);
   await context.startTest();

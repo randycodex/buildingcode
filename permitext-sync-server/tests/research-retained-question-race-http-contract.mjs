@@ -74,7 +74,7 @@ try {
   await request('/admin/lifetime-grants/grant', { userID: auth.accountUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const created = await request('/research/conversations/create', { auth }, token);
   const conversationID = created.body.conversation.id, requestID = randomUUID(), question = run.cases[0].question;
-  const inflight = request('/research/conversations/message', { auth, conversationID, requestID, question }, token);
+  const inflight = request('/research/conversations/message', { answerMode: "verified", auth, conversationID, requestID, question }, token);
   await started;
   const retained = await request('/research/conversations/retain-interrupted-question', { auth, conversationID, requestID, question, contextRevision: 0 }, token);
   assert.equal(retained.status, 200, JSON.stringify(retained.body));
@@ -89,7 +89,7 @@ try {
   const store = JSON.parse(await readFile(join(scratch, 'store.json'), 'utf8'));
   assert.equal(store.researchUsageByUserID[auth.accountUserID].filter(item => item.mode !== 'reservation').length, 1);
   const priorCalls = calls;
-  const replay = await request('/research/conversations/message', { auth, conversationID, requestID, question }, token);
+  const replay = await request('/research/conversations/message', { answerMode: "verified", auth, conversationID, requestID, question }, token);
   assert.equal(replay.body.replayed, true);
   assert.equal(calls, priorCalls);
   const after = JSON.parse(await readFile(join(scratch, 'store.json'), 'utf8'));

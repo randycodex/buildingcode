@@ -108,7 +108,7 @@ try {
     const conversationID = created.body.conversation.id;
     let response;
     for (const item of run.cases) {
-      response = await request("/research/conversations/message", { auth, conversationID, question: item.question, requestID: randomUUID() }, token);
+      response = await request("/research/conversations/message", { answerMode: "verified", auth, conversationID, question: item.question, requestID: randomUUID() }, token);
       if (item.id === "CC-03") assert.equal(response.status, 200, JSON.stringify(response.body));
     }
     assert.equal(callIndex, 8, "Reconciliation must also pass a fresh review.");

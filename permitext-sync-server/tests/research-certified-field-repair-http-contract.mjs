@@ -114,7 +114,7 @@ try {
     const created = await request("/research/conversations/create", { auth, ...(projectID ? { projectID } : {}) }, token);
     const conversationID = created.body.conversation.id;
     const requestID=randomUUID();
-    const response = await request("/research/conversations/message", { auth, conversationID, requestID,
+    const response = await request("/research/conversations/message", { answerMode: "verified", auth, conversationID, requestID,
       question: "For our project under the 2022 NYC codes, what identification rule does MC 304.12 provide for installed equipment?" }, token);
     if (doubleError) throw doubleError;
     assert.equal(response.status, 200, JSON.stringify(response.body));
@@ -155,13 +155,13 @@ try {
   const created=await request("/research/conversations/create",{auth},token), conversationID=created.body.conversation.id;
   const rootRequest=randomUUID();
   active={certificate:true,fieldOnly:true};phases=[];firstReviewed=finalReviewed=undefined;doubleError=undefined;
-  const root=await request("/research/conversations/message",{auth,conversationID,requestID:rootRequest,
+  const root=await request("/research/conversations/message",{ answerMode: "verified",auth,conversationID,requestID:rootRequest,
     question:"For our project under the 2022 NYC codes, what identification rule does MC 304.12 provide for installed equipment?"},token);
   if(doubleError)throw doubleError;assert.equal(root.status,200);assert.equal(root.body.conversation.messages.at(-1).answer.verification.pass,true);
   const rootHuman=root.body.conversation.messages.find(message=>message.role==="user"&&message.requestID===rootRequest);assert(rootHuman);
   active={certificate:true,fieldOnly:true,reject:true};phases=[];firstReviewed=finalReviewed=undefined;doubleError=undefined;
   const followupRequest=randomUUID(), question="Does that meet the minimum?";
-  const followup=await request("/research/conversations/message",{auth,conversationID,requestID:followupRequest,question},token);
+  const followup=await request("/research/conversations/message",{ answerMode: "verified",auth,conversationID,requestID:followupRequest,question},token);
   if(doubleError)throw doubleError;assert.equal(followup.status,200);
   const recovery=followup.body.conversation.messages.at(-1).answer;
   assert.equal(recovery.verification.pass,false);assert.equal(recovery.charged,false);

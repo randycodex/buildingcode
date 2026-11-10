@@ -515,7 +515,7 @@ assert.deepEqual(unsafeGuidanceOnly.missingFacts, []);
 assert.deepEqual(unsafeGuidanceOnly.followUpQuestions, []);
 assert.deepEqual(unsafeGuidanceOnly.additionalEvidenceNeeded, []);
 assert.deepEqual(unsafeGuidanceOnly.evidenceLimitations, [
-  "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below."
+  "The assembled enacted evidence did not establish the requested rule; per codes is reporting only the exact official supporting guidance attributed below."
 ]);
 assert.deepEqual(
   researchFollowUpQuestionsForResponse(
@@ -772,7 +772,7 @@ const unavailableWebSupport = {
   sources: [],
   requestedDocuments: ["Buildings Bulletin 2022-013"],
   unattributedRequestedDocuments: ["Buildings Bulletin 2022-013"],
-  limitation: "Permitext could not retrieve a source-specific attributable passage for Buildings Bulletin 2022-013; that document was not used in this answer."
+  limitation: "per codes could not retrieve a source-specific attributable passage for Buildings Bulletin 2022-013; that document was not used in this answer."
 };
 const undisclosedUnavailable = structuredClone(answer);
 undisclosedUnavailable.supportingSourceUses = [];

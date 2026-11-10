@@ -73,7 +73,7 @@ try {
   for (mode of ["bad-repair", "correct-repair", "correct-draft"]) {
     phases = []; doubleError = null;
     const created = await request("/research/conversations/create", { auth, selections, originSurface: "reader" }, token); assert.equal(created.status, 201);
-    const response = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question: record.question, requestID: randomUUID() }, token);
+    const response = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question: record.question, answerMode: "verified", requestID: randomUUID() }, token);
     if (doubleError) throw doubleError;
     // Temporal application is substantive: without a completed noncategorical
     // review it requires one full rewrite, followed by fresh verification.

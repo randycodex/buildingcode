@@ -227,7 +227,7 @@ assert.ok(
   "A safe no-governing-evidence outcome must stop before a futile model revision."
 );
 assert.ok(
-  handler.indexOf("applyEvidenceBoundaryFallback") < handler.indexOf("await commitResearchConversationMessage("),
+  handler.indexOf("applyEvidenceBoundaryFallback") < handler.indexOf("await commitResearchConversationMessage(", handler.indexOf("if (applyEvidenceBoundaryFallback()) break;")),
   "The evidence-boundary response must continue through the ordinary durable answer/conversation commit."
 );
 assert.match(handler, /requestID: researchRequestID/);

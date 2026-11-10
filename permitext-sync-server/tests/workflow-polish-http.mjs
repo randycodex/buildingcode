@@ -134,7 +134,7 @@ try {
   const packet = freezeResearchV2Turn({question:'Summarize the reviewed project context.',sources:[],projectContextSnapshot:included.assistantScope.projectContext});
   assert.equal(packet.projectContextSnapshot.projectInformation.description,project.description);
   const frozen = JSON.stringify(packet);
-  const response = await post('/research/conversations/message',{conversationID:included.id,question:'Summarize the reviewed project context.',requestID:'polish-context-answer',
+  const response = await post('/research/conversations/message',{ answerMode: "verified",conversationID:included.id,question:'Summarize the reviewed project context.',requestID:'polish-context-answer',
     researchEngine:'v2',analysisMode:'conversation_only',expectedRevision:included.revision,expectedEvidenceSetVersion:included.evidenceSetVersion || 1});
   const answer = response.conversation.messages.at(-1).answer;
   assert(answer.inputSnapshot, JSON.stringify({answer,providerCalls:providerPackets.length}).slice(0,2800));

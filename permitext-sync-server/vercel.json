@@ -340,6 +340,28 @@
   ],
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "permitext.com"
+        }
+      ],
+      "destination": "https://per.codes",
+      "permanent": true
+    },
+    {
+      "source": "/:page(terms|privacy|support|refunds|subscriptions)",
+      "has": [
+        {
+          "type": "host",
+          "value": "permitext.com"
+        }
+      ],
+      "destination": "https://per.codes/:page",
+      "permanent": true
+    },
+    {
       "source": "/web",
       "destination": "/workspace",
       "permanent": true

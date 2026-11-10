@@ -335,7 +335,7 @@ assert.throws(
     ...emptyNotebookDocument(),
     document: [{ type: "image", props: { url: "permitext-notebook-local:pending-image" } }]
   }),
-  /Permitext asset or HTTPS URL/,
+  /per codes asset or HTTPS URL/,
   "Temporary device-local image references reached the synchronized Notebook contract."
 );
 

@@ -491,7 +491,7 @@ assert.deepEqual(boundedCitationAnalysis.controllingProvisions, [{
 }]);
 assert.deepEqual(boundedCitationAnalysis.unresolvedProjectFacts, []);
 assert.deepEqual(boundedCitationAnalysis.highValueFollowUpQuestions, []);
-assert.deepEqual(boundedCitationAnalysis.evidenceLimitations, ["Permitext limited this answer to the enacted section identified by the user's exact citation."]);
+assert.deepEqual(boundedCitationAnalysis.evidenceLimitations, ["per codes limited this answer to the enacted section identified by the user's exact citation."]);
 // Replay the live failure's internal diagnostics through initial and revised
 // exact-citation formatting. Diagnostics must remain available to retrieval,
 // but cannot become claims in the user-facing answer.
@@ -567,7 +567,7 @@ assert.deepEqual(deterministicTurnAnalysis.unresolvedProjectFacts, [
 ]);
 assert.deepEqual(
   deterministicTurnAnalysis.evidenceLimitations,
-  ["Permitext limited this answer to the enacted evidence assembled for the current question."],
+  ["per codes limited this answer to the enacted evidence assembled for the current question."],
   "Internal retrieval diagnostics must not become model-visible legal evidence limitations."
 );
 assert.doesNotThrow(
@@ -626,7 +626,7 @@ assert.deepEqual(
   }, boundedCitationAnalysis),
   {
     answerText: "Section 101.1 supplies the requested title.",
-    evidenceLimitations: ["Permitext limited this answer to the enacted section identified by the user's exact citation."]
+    evidenceLimitations: ["per codes limited this answer to the enacted section identified by the user's exact citation."]
   },
   "An exact-citation answer must use the deterministic retrieval boundary instead of a model-invented limitation."
 );
@@ -796,7 +796,7 @@ assert.match(indexSource, /id="toggle-saved"[^>]*data-mobile-label="Evidence"/, 
 assert.match(indexSource, /id="mobile-more"[\s\S]*?aria-haspopup="dialog"[\s\S]*?data-mobile-label="More"/, "The mobile dock lacks its More action.");
 assert.match(stylesSource, /@media \(max-width: 760px\) \{[\s\S]*?grid-template-columns: repeat\(5, minmax\(0, 1fr\)\);[\s\S]*?#toggle-saved \{ order: 1; \}[\s\S]*?#mobile-more \{ order: 5; \}/, "The mobile dock is not a five-action layout.");
 assert.match(stylesSource, /\.topbar #fit-columns,[\s\S]*?\.topbar #collapse-readers,[\s\S]*?display: none !important;/, "Desktop column-layout controls remain visible in the mobile dock.");
-assert.match(clientSource, /function openMobileMoreSheet\(\)[\s\S]*?workspace\.name[\s\S]*?"New Project"[\s\S]*?"Rename workspace"[\s\S]*?"Account"/, "The mobile More sheet does not contain workspace switching and management controls.");
+assert.match(functionSource(clientSource, "openMobileMoreSheet"), /workspace\.name[\s\S]*?"add workspace"[\s\S]*?"Context" : "Facts"[\s\S]*?"Notebook"[\s\S]*?"Report"[\s\S]*?"Settings"/, "The mobile More sheet must expose workspace switching, project tools and Settings.");
 await import("./reader-navigation-menu-contract.mjs");
 assert.match(clientSource, /if \(!readerChapterMenu\) \{[\s\S]*?event\.key === "Escape"[\s\S]*?closeMenu\(\);[\s\S]*?trigger\.focus\(\{ preventScroll: true \}\)/, "Escape does not close an enhanced select and restore trigger focus.");
 

@@ -39,12 +39,12 @@ try{
  const created=await request('/research/conversations/create',{auth,projectID},token),conversationID=created.body.conversation.id;
  const questions=['how do you determine the use group for this site?','for this specific project, which use groups apply to it?','no no, this is a new project -'];
  for(const [index,question] of questions.entries()){
-  phases=[];const requestID=randomUUID();const r=await request('/research/conversations/message',{auth,conversationID,question,requestID},token);if(doubleError)throw doubleError;
+  phases=[];const requestID=randomUUID();const r=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question,requestID},token);if(doubleError)throw doubleError;
   assert.equal(r.status,200,JSON.stringify(r.body));assert.equal(r.body.conversation.primaryProjectID,projectID);
   const answer=r.body.conversation.messages.at(-1).answer;
   if(index<2){assert(phases.includes('permitext_research_open_review'));assert(answer.citations.length);assert.equal(answer.verification.pass,true);}
   else{assert.deepEqual(phases,[]);assert.equal(answer.verification.reason,'project_scope');assert.match(answer.answerText,/same property, or a different property/);
-   const repeat=await request('/research/conversations/message',{auth,conversationID,question,requestID},token);assert.equal(repeat.status,200);assert.equal(repeat.body.conversation.messages.length,6);assert.deepEqual(phases,[]);}
+   const repeat=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question,requestID},token);assert.equal(repeat.status,200);assert.equal(repeat.body.conversation.messages.length,6);assert.deepEqual(phases,[]);}
  }
  const reopened=await request('/research/conversations/get',{auth,conversationID},token);
  assert.equal(reopened.body.conversation.messages.length,6);assert.equal(reopened.body.conversation.primaryProjectID,projectID);

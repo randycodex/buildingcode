@@ -70,3 +70,43 @@ const headless = fixture({ existingHeadless: true });
 await assert.rejects(headless.run(), /needs to reload/);
 assert.equal(headless.loads.length, 0, "An already-loaded headless instance cannot claim UI readiness");
 console.log("Clerk loader passed: ordered UI initialization, shared callers, three retry paths, missing UI and headless guard.");
+
+// On a newly migrated origin, authentication can finish before the first
+// private pull. Startup must wait for that pull and remain account-fenced.
+const returnStart = source.indexOf("async function resumeClerkSignInReturn()");
+const returnSource = source.slice(returnStart, source.indexOf("\nfunction loadAppleIDScript", returnStart));
+assert.ok(returnStart >= 0 && returnSource.includes("return account;"));
+function returnFixture() {
+  const events = [];
+  let resolveSync, generation = 1;
+  const sync = new Promise(resolve => { resolveSync = resolve; });
+  const account = {userID: "synthetic-existing-owner"};
+  const context = vm.createContext({
+    URL, state: {utilities: {}}, console: {warn() {}},
+    window: {location: {href: "https://per.codes/workspace?clerk_return=1"}, history: {replaceState() {}}},
+    saveWorkspaceState() {},
+    clerkWebSignInConfig: async () => ({available: true}),
+    completeClerkPermitextSignIn: async () => { events.push("authenticated"); return account; },
+    captureAccountRequest: () => generation,
+    ensureSyncedContentForRender: () => { events.push("pull"); return sync; },
+    requireCurrentAccountRequest: captured => { if (captured !== generation) throw new Error("ACCOUNT_CONTEXT_CHANGED"); }
+  });
+  vm.runInContext(`let clerkSignInReturnNotice = null; ${returnSource}; globalThis.run = resumeClerkSignInReturn;
+    globalThis.notice = () => clerkSignInReturnNotice;`, context);
+  return {context, account, events, resolveSync, changeAccount: () => { generation += 1; }};
+}
+for (const accountChanges of [false, true]) {
+  const restore = returnFixture();
+  let settled = false;
+  const pending = restore.context.run().then(value => { settled = true; return value; });
+  await new Promise(setImmediate);
+  assert.deepEqual(restore.events, ["authenticated", "pull"]);
+  assert.equal(settled, false, "The Clerk return must not finish while private restoration is pending.");
+  if (accountChanges) restore.changeAccount();
+  restore.resolveSync();
+  const result = await pending;
+  assert.equal(result, accountChanges ? null : restore.account);
+  assert.equal(restore.context.notice()?.isError || false, accountChanges,
+    "A switched account cannot complete the previous owner's sign-in return.");
+}
+console.log("Clerk return passed: private restoration completes before startup, with account-switch fencing.");

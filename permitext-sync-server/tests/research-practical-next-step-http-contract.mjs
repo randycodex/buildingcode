@@ -70,17 +70,17 @@ try {
   await request('/admin/lifetime-grants/grant',{userID:account.appUserID},process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const zoningConversation = await request('/research/conversations/create',{auth},token);
   phases=[];
-  const zoning = await request('/research/conversations/message',{auth,conversationID:zoningConversation.body.conversation.id,question:'Does zoning allow our proposed interior alteration?',requestID:randomUUID()},token);
+  const zoning = await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID:zoningConversation.body.conversation.id,question:'Does zoning allow our proposed interior alteration?',requestID:randomUUID()},token);
   assert.equal(zoning.status,200); assert.equal(zoning.body.conversation.messages.at(-1).answer.mode,'clarification'); assert.equal(zoning.body.conversation.messages.at(-1).answer.charged,false); assert(phases.length > 0, 'Zoning now reaches ordinary Research.');
   for (const accepted of [true,false]) {
     practical=false; accept=accepted;
     const created=await request('/research/conversations/create',{auth},token); const conversationID=created.body.conversation.id;
-    const seed=await request('/research/conversations/message',{auth,conversationID,question:recorded.results.find(r=>r.id==='PC-04').question,requestID:randomUUID()},token);
+    const seed=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question:recorded.results.find(r=>r.id==='PC-04').question,requestID:randomUUID()},token);
     assert.equal(seed.status,200,JSON.stringify(seed.body));
     expectedTarget = researchPracticalNextStepTarget(seed.body.conversation.messages);
     assert(expectedTarget.length > 0);
     practical=true; phases=[];
-    const response=await request('/research/conversations/message',{auth,conversationID,question:accepted ? "I'm not sure." : "I'm not sure. What should I check first?",requestID:randomUUID()},token);
+    const response=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question:accepted ? "I'm not sure." : "I'm not sure. What should I check first?",requestID:randomUUID()},token);
     assert.equal(response.status,200,JSON.stringify(response.body));
     const reopened=await request('/research/conversations/get',{auth,conversationID},token);
     const answers=reopened.body.conversation.messages.filter(m=>m.role==='assistant');

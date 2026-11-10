@@ -94,7 +94,7 @@ try {
   mode="broad"; callIndex=0;
   const broadCreated=await request("/research/conversations/create",{auth},token);
   const broadID=broadCreated.body.conversation.id, broadRequestID=randomUUID();
-  const broad=await request("/research/conversations/message",{auth,conversationID:broadID,
+  const broad=await request("/research/conversations/message",{ answerMode: "verified",auth,conversationID:broadID,
     question:"What are the requirements for designing a ramp based on the bc 2022?",requestID:broadRequestID},token);
   assert.equal(broad.status,502,JSON.stringify(broad.body));
   assert.equal(broad.body.code,"INVALID_RESEARCH_RESPONSE");
@@ -110,7 +110,7 @@ try {
     const conversationID=created.body.conversation.id;
     let response;
     for (const item of run.cases) {
-      response=await request("/research/conversations/message",{auth,conversationID,question:item.question,requestID:randomUUID()},token);
+      response=await request("/research/conversations/message",{ answerMode: "verified",auth,conversationID,question:item.question,requestID:randomUUID()},token);
       if(item.id==="CC-03") assert.equal(response.status,200,JSON.stringify(response.body));
     }
     assert.equal(callIndex,mode==="recover"?7:6);

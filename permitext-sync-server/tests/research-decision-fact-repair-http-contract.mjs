@@ -201,7 +201,7 @@ try {
     providerDoubleError = undefined;
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
-    const response = await request("/research/conversations/message", { auth, conversationID, question: active.question, requestID: randomUUID() }, token);
+    const response = await request("/research/conversations/message", { answerMode: "verified", auth, conversationID, question: active.question, requestID: randomUUID() }, token);
     if (providerDoubleError) throw providerDoubleError;
     assert.deepEqual(phases, ["permitext_code_interpretation", "permitext_research_verification", "permitext_research_verification"]);
     if (accept) {

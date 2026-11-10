@@ -102,7 +102,7 @@ try {
  for(const question of fixture.questions){
   phases=[];
   replayID=randomUUID();
-  const response=await request('/research/conversations/message',{auth,conversationID,question,requestID:replayID},token);
+  const response=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question,requestID:replayID},token);
   if(doubleError)throw doubleError;
   assert.equal(response.status,200,JSON.stringify(response.body));
   assert.equal(response.body.conversation.primaryProjectID,projectID);
@@ -137,10 +137,10 @@ try {
   turn++;
  }
  const beforeReplay=embeddingCalls,phasesBeforeReplay=phases.length;
- const replay=await request('/research/conversations/message',{auth,conversationID,question:fixture.questions[1],requestID:replayID},token);
+ const replay=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question:fixture.questions[1],requestID:replayID},token);
  assert.equal(replay.status,200);assert(replay.body.replayed);
  assert.equal(embeddingCalls,beforeReplay);assert.equal(phases.length,phasesBeforeReplay);
- const failed=await request('/research/conversations/message',{auth,conversationID,question:'For this project, explain the retail frontage glazing requirements.',requestID:randomUUID()},token);
+ const failed=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question:'For this project, explain the retail frontage glazing requirements.',requestID:randomUUID()},token);
  if(doubleError)throw doubleError;
  assert.equal(failed.status,502,JSON.stringify(failed.body));
  const finalStore=JSON.parse(await readFile(join(temporary,'store.json')));
@@ -157,12 +157,12 @@ try {
  process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT='1';
  process.env.PERMITEXT_RESEARCH_PAID_TURNS_ENABLED='1';
  const callsBeforeRejected=embeddingCalls,phasesBeforeRejected=phases.length;
- const exhausted=await request('/research/conversations/message',{auth,conversationID,question:'How do glazing width and wall length affect the current storefront transparency calculation?',requestID:randomUUID()},token);
+ const exhausted=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question:'How do glazing width and wall length affect the current storefront transparency calculation?',requestID:randomUUID()},token);
  assert.equal(exhausted.status,402,JSON.stringify(exhausted.body));
  assert.equal(exhausted.body.code,'RESEARCH_TURNS_REQUIRED');
- const conflict=await request('/research/conversations/message',{auth,conversationID,question:'Different storefront question with the completed request ID',requestID:replayID},token);
+ const conflict=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question:'Different storefront question with the completed request ID',requestID:replayID},token);
  assert.equal(conflict.status,409);assert.equal(conflict.body.code,'RESEARCH_REQUEST_ID_CONFLICT');
- const unauthenticated=await request('/research/conversations/message',{auth,conversationID,question:'Unauthenticated storefront question',requestID:randomUUID()});
+ const unauthenticated=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question:'Unauthenticated storefront question',requestID:randomUUID()});
  assert.equal(unauthenticated.status,401);
  assert.equal(embeddingCalls,callsBeforeRejected);assert.equal(phases.length,phasesBeforeRejected);
  console.log('Semantic HTTP accounting passed: durable reserve before query dispatch, free and failed expense persistence, completed embedding billing, replay/credit/auth rejection without provider calls.');

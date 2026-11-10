@@ -111,7 +111,7 @@ try {
  for(scenario of ['investigation-format','review-format','truncated-review','repair-format','gap','empty-gap','rejected-gap','terminal-review','citation-rescue','citation-content-change','terminal-citation','energy-local-lookup','energy-thermal-referral','second-substantive']){
   calls=[];counts={};doubleError=undefined;
   const created=await request('/research/conversations/create',{auth},token),conversationID=created.body.conversation.id;
-  const result=await request('/research/conversations/message',{auth,conversationID,requestID:randomUUID(),
+  const result=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,requestID:randomUUID(),
    question:scenario==='empty-gap'?'Under the 2016 NYC Energy Code, explain roof insulation.':
      scenario==='energy-local-lookup'?'Under the 2025 NYC Energy Code, what roof-recover insulation rules are supplied?':
      scenario==='energy-thermal-referral'?'I need simple, flush, paint-grade wood exterior entrance doors, 10 feet high, without glass. How can they comply with NYC energy requirements? My old schedule lists U-factor 0.77, SHGC 0.4, and air leakage 0.2 cfm/ft².':

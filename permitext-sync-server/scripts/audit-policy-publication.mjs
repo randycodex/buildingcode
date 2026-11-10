@@ -6,7 +6,7 @@ import {
 } from "../policy-publication-audit.mjs";
 
 const argumentsSet = new Set(process.argv.slice(2));
-const publicBaseURL = String(process.env.PERMITEXT_PUBLIC_BASE_URL || "https://permitext.com")
+const publicBaseURL = String(process.env.PERMITEXT_PUBLIC_BASE_URL || "https://per.codes")
   .trim()
   .replace(/\/+$/, "");
 const normalizedPublicBaseURL = normalizePolicyPublicBaseURL(publicBaseURL);

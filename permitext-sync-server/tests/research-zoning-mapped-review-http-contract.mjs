@@ -114,7 +114,7 @@ try {
     const created = await request("/research/conversations/create", { auth, selections: ownerResearchHTTPSelections(input), originSurface: "chat" }, token);
     assert.equal(created.status, 201, JSON.stringify(created.body)); assert.equal(created.body.conversation.primaryProjectID, null);
     const conversationID = created.body.conversation.id;
-    const result = await request("/research/conversations/message", { auth, conversationID, question: input.question, requestID: randomUUID() }, token);
+    const result = await request("/research/conversations/message", { auth, conversationID, question: input.question, answerMode: "verified", requestID: randomUUID() }, token);
     if (doubleError) throw doubleError;
     assert.equal(result.status, 200, `${mode}: ${JSON.stringify(result.body)}`);
     if (mode === "accept") {

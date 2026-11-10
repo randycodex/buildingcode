@@ -91,7 +91,7 @@ try {
   const auth = { accountUserID: account.appUserID };
   const token = account.backendSessionToken;
   const { conversation } = await request("/research/conversations/create", { auth }, token);
-  const completed = await request("/research/conversations/message", { auth, conversationID: conversation.id, question, requestID: randomUUID() }, token);
+  const completed = await request("/research/conversations/message", { answerMode: "verified", auth, conversationID: conversation.id, question, requestID: randomUUID() }, token);
   const message = completed.conversation.messages.at(-1);
   assert.equal(message.role, "assistant");
   assert.match(message.answer.answerText, /40,000/);

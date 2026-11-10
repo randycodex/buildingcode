@@ -44,7 +44,7 @@ try {
 
  const missing=await request('/research/conversations/create',{auth},token);
  calls=[];
- const missingResponse=await request('/research/conversations/message',{auth,conversationID:missing.body.conversation.id,
+ const missingResponse=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID:missing.body.conversation.id,
   question:'Our lender has an accessibility rider that I have not provided. Does that rider require a vanity cabinet? I need the rider requirement, not Building Code minimums.',requestID:randomUUID()},token);
  assert.equal(missingResponse.status,200,JSON.stringify(missingResponse.body));
  assert.deepEqual(calls,[], 'Missing document clarification must not dispatch a provider request.');
@@ -54,7 +54,7 @@ try {
  for(const accepted of [true,false]) {
   accept=accepted;calls=[];
   const created=await request('/research/conversations/create',{auth},token);const conversationID=created.body.conversation.id;
-  const result=await request('/research/conversations/message',{auth,conversationID,question,requestID:randomUUID()},token);
+  const result=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question,requestID:randomUUID()},token);
   assert.equal(result.status,200,JSON.stringify(result.body));
   if(!accepted) { assert.equal(result.body.conversation.messages.at(-1).answer.mode,"clarification"); assert.equal(result.body.conversation.messages.at(-1).answer.charged,false); }
   const reopened=await request('/research/conversations/get',{auth,conversationID},token);
@@ -62,7 +62,7 @@ try {
   assert.equal(answers.length,1);
   assert.equal(calls.filter(c=>c==='permitext_research_verification').length,accepted?1:2);
   if(accepted){assert.equal(answers[0].answer.verification.scope,'user_supplied_text');assert.equal(answers[0].answer.suppliedText.text,'The cabinet may be omitted.');assert.deepEqual(answers[0].answer.citations,[]);
-   const follow=await request('/research/conversations/message',{auth,conversationID,question:'What does that mean?',requestID:randomUUID()},token);
+   const follow=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question:'What does that mean?',requestID:randomUUID()},token);
    assert.equal(follow.status,200,JSON.stringify(follow.body));
    assert.equal(follow.body.conversation.messages.at(-1).answer.suppliedText.text,'The cabinet may be omitted.');
   }

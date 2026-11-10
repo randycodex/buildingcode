@@ -77,7 +77,7 @@ try {
  const conversationID=created.body.conversation.id;
  for(const question of fixture.questions){
   phases=[];
-  const response=await request('/research/conversations/message',{auth,conversationID,question,requestID:randomUUID()},token);
+  const response=await request('/research/conversations/message',{ answerMode: "verified",auth,conversationID,question,requestID:randomUUID()},token);
   if(doubleError)throw doubleError;
   assert.equal(response.status,200,JSON.stringify(response.body));
   assert.equal(response.body.conversation.primaryProjectID,projectID);

@@ -85,6 +85,7 @@ let writes = 0;
 Object.assign(context, {
   document: { createElement: element }, workspaceProject: () => null,
   researchProjectContextPreview: () => element('preview'),
+  renderResearchProjectContext() {}, researchWorkspaceProjectID: () => '',
   researchComposerDisclosure: () => element('disclosure'),
   researchChatPlaceholder: 'Question', bindResearchSendShortcut() {},
   bindAssistantComposerHint() {},
