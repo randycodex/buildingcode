@@ -5,6 +5,7 @@ import {mkdtemp, rm, writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import sharp from 'sharp';
+import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
 import {emptyNotebookDocument, validateNotebookDocument} from '../notebook-contract.mjs';
 import {freezeResearchV2Turn} from '../research-v2-engine.mjs';
 import {assistantPassageScope, assistantProjectInformation} from '../assistant-conversation-scope.mjs';
@@ -57,8 +58,24 @@ try {
       {type:'paragraph',content:[{type:'text',text:'Review ',styles:{}},{type:'link',href:'https://www.nyc.gov/',content:[{type:'text',text:'official source',styles:{bold:true}}]}]},
       {type:'numberedListItem',props:{start:3},content:[{type:'text',text:'First ordered review item',styles:{}}]},
       {type:'numberedListItem',content:[{type:'text',text:'Second ordered review item',styles:{}}]},
-      {type:'table',content:{type:'tableContent',headerRows:1,rows:[{cells:[[{type:'text',text:'Occupancy',styles:{bold:true}}],[{type:'text',text:'Limit',styles:{bold:true}}]]},
-        {cells:[[{type:'text',text:'Business',styles:{}}],[{type:'text',text:`${index+1} exits`,styles:{}}]]}]}},
+      {type:'table',content:{type:'tableContent',headerRows:2,rows:[
+        {cells:[{type:'tableCell',props:{colspan:2},content:[{type:'link',href:`https://www.nyc.gov/?qa=header-${index}`,
+          content:[{type:'text',text:`Reviewed conditions ${index+1}`,styles:{bold:true,backgroundColor:'yellow'}}]}]},
+          [{type:'text',text:'References',styles:{bold:true}}]]},
+        {cells:[[{type:'text',text:'Function',styles:{bold:true}}],[{type:'text',text:'Review notes',styles:{italic:true}}],[{type:'text',text:'Source links',styles:{underline:true}}]]},
+        {cells:[[{type:'text',text:`Bold-cell-${index}`,styles:{bold:true}}],
+          [{type:'text',text:`Italic-cell-${index}`,styles:{italic:true}},{type:'text',text:'\n',styles:{}},
+           {type:'text',text:`Underline-cell-${index}`,styles:{underline:true}},{type:'text',text:'\n',styles:{}},
+           {type:'text',text:`Strike-cell-${index}`,styles:{strike:true}},{type:'text',text:'\n',styles:{}},
+           {type:'text',text:`Highlight-cell-${index}`,styles:{backgroundColor:'yellow'}}],
+          [{type:'link',href:`https://www.nyc.gov/site/buildings/index.page?qa=cell-${index}`,
+            content:[{type:'text',text:`Styled-cell-link-${index}`,styles:{bold:true,italic:true}}]},
+           {type:'text',text:'\n',styles:{}},{type:'link',href:`mailto:qa-${index}@example.test`,content:[{type:'text',text:`Email-cell-${index}`,styles:{}}]}]]},
+        ...(index === 0 ? Array.from({length:36},(_,row)=>({cells:[
+          [{type:'text',text:`Continuation-row-${String(row).padStart(2,'0')}`,styles:{}}],
+          [{type:'text',text:'Wrapped review text preserves the table across page breaks.',styles:{}}],
+          [{type:'link',href:`https://www.nyc.gov/?qa=row-${row}`,content:[{type:'text',text:'Continuation source',styles:{italic:true,underline:true}}]}]]})) : [])
+      ]}},
       {type:'paragraph',content:[{type:'text',text:'\t\t a. Footnote with inherited indentation. '.repeat(12),styles:{}}]},
       {type:'image',props:{url:`permitext-notebook-asset:${assetID}`,name:`image-${index}.png`,caption:`QA figure ${index+1}`}}
     ]};
@@ -81,6 +98,30 @@ try {
   const pdf = await readPDF();
   assert((pdf.toString('latin1').match(/\/Subtype \/Image\b/g) || []).length >= 5,'Five image objects must reach the PDF');
   assert((pdf.toString('latin1').match(/\/URI \(https:\/\/www.nyc.gov\//g) || []).length >= 5,'Links must remain interactive');
+  const parsedPDF = await getDocument({data:new Uint8Array(pdf),useSystemFonts:true}).promise;
+  const textItems = [], links = [];
+  for (let pageNumber=1;pageNumber<=parsedPDF.numPages;pageNumber++) {
+    const page = await parsedPDF.getPage(pageNumber);
+    await page.getOperatorList();
+    const content = await page.getTextContent();
+    for (const item of content.items) if ('str' in item) {
+      textItems.push({...item,font:page.commonObjs.get(item.fontName).name});
+      assert(item.transform[4] >= 53 && item.transform[4] + item.width <= 559,'Cell text stays within the PDF margins');
+    }
+    links.push(...(await page.getAnnotations()).filter(annotation=>annotation.subtype === 'Link'));
+  }
+  for (let index=0;index<5;index++) {
+    assert(textItems.some(item=>item.str.includes(`Bold-cell-${index}`) && /bold/i.test(item.font)),'Table cell bold is retained');
+    assert(textItems.some(item=>item.str.includes(`Italic-cell-${index}`) && Math.abs(item.transform[2]) > .1),'Table cell italics are retained');
+    assert(textItems.some(item=>item.str.includes(`Styled-cell-link-${index}`) && /bold/i.test(item.font) && Math.abs(item.transform[2]) > .1),'Links retain their text marks');
+    for (const marker of ['Underline-cell','Strike-cell','Highlight-cell']) assert(textItems.some(item=>item.str.includes(`${marker}-${index}`)));
+    for (const target of [`https://www.nyc.gov/?qa=header-${index}`,`https://www.nyc.gov/site/buildings/index.page?qa=cell-${index}`,`mailto:qa-${index}@example.test`]) {
+      assert(links.some(link=>(link.unsafeUrl || link.url) === target),`Clickable cell link retained: ${target}`);
+    }
+  }
+  assert(links.filter(link=>(link.unsafeUrl || link.url) === 'https://www.nyc.gov/?qa=header-0').length >= 4,'Styled merged headers and their links repeat on continuation pages');
+  for(let row=0;row<36;row++) assert.equal(textItems.filter(item=>item.str.includes(`Continuation-row-${String(row).padStart(2,'0')}`)).length,1,'Body rows are neither dropped nor repeated at page breaks');
+  await parsedPDF.destroy();
   if (process.env.PERMITEXT_POLISH_QA_PDF) { await writeFile(process.env.PERMITEXT_POLISH_QA_PDF,pdf); await writeFile(`${process.env.PERMITEXT_POLISH_QA_PDF}.json`,JSON.stringify(issued.manifest,null,2)); }
   await post('/notebook/cards/save',{...cards[0],projectID,cardID:cards[0].id,expectedVersion:cards[0].version,clientMutationID:'polish-later-edit',document:{...emptyNotebookDocument(),document:[{type:'paragraph',content:[{type:'text',text:'Later edit',styles:{}}]}]}});
   assert.deepEqual(await readPDF(),pdf,'Issued PDF bytes remain immutable after Note edits');

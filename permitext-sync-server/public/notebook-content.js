@@ -11,24 +11,30 @@ export function notebookContentText(document) {
   return (document?.document || []).map(text).filter(Boolean).join('\n\n');
 }
 
-export function notebookTableDisplayData(table) {
+export function notebookTableDisplayData(table, {preserveInlineContent = false} = {}) {
   const grid = [];
   table.rows.forEach((row, r) => {
     grid[r] ||= [];
     let column = 0;
     for (const cell of row.cells) {
       while (grid[r][column] !== undefined) column++;
-      const text = notebookInlineText(notebookCellContent(cell));
+      const value = preserveInlineContent ? notebookCellContent(cell) : notebookInlineText(notebookCellContent(cell));
       for (let dr = 0; dr < (cell.props?.rowspan || 1); dr++) for (let dc = 0; dc < (cell.props?.colspan || 1); dc++) {
-        grid[r + dr] ||= []; grid[r + dr][column + dc] = text;
+        grid[r + dr] ||= []; grid[r + dr][column + dc] = value;
       }
       column += cell.props?.colspan || 1;
     }
   });
   const columns = Math.max(...grid.map(row => row.length));
-  const rows = grid.map(row => Array.from({length:columns}, (_, c) => row[c] || ''));
+  const rows = grid.map(row => Array.from({length:columns}, (_, c) => row[c] ?? (preserveInlineContent ? [] : '')));
   const headers = table.headerRows || 0;
-  if (headers > 1) return {rows:[Array.from({length:columns}, (_, c) => [...new Set(rows.slice(0,headers).map(row => row[c]).filter(Boolean))].join('\n')),
+  const combinedHeader = column => {
+    if (!preserveInlineContent) return [...new Set(rows.slice(0,headers).map(row => row[column]).filter(Boolean))].join('\n');
+    const cells = [...new Map(rows.slice(0,headers).map(row => row[column]).filter(cell => cell.length)
+      .map(cell => [JSON.stringify(cell), cell])).values()];
+    return cells.flatMap((cell,index) => index ? [{type:'text',text:'\n',styles:{}}, ...cell] : cell);
+  };
+  if (headers > 1) return {rows:[Array.from({length:columns}, (_, c) => combinedHeader(c)),
     ...rows.slice(headers)], headerRowCount:1};
   return {rows, headerRowCount:headers};
 }

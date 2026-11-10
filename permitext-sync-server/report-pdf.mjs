@@ -29,10 +29,9 @@ function drawNotebookContent(document, notebookDocument, material) {
       document.y = top + height + 8;
       if (block.props.caption) drawReportRichText(document, [{text:printableNoteText(block.props.caption)}], {size:9});
     } else if (block.type === 'table') {
-      const table = notebookTableDisplayData(block.content);
-      table.rows = table.rows.map(row => row.map(printableNoteText));
-      document.font('Report-Regular').fontSize(8);
-      drawReportTable(document, table, left, width);
+      const table = notebookTableDisplayData(block.content, {preserveInlineContent:true});
+      table.rows = table.rows.map(row => row.map(noteRuns));
+      drawReportRichTable(document, table, left, width, {headerBold:true});
       document.x = left; document.moveDown(0.7);
     } else {
       drawReportRichText(document, noteRuns(block.content), {size:block.type === 'heading' ? Math.max(11, 16 - (block.props?.level || 1)) : 9.5,
@@ -430,19 +429,28 @@ function hasSourceMarks(parts) {
     sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text},part.formatting || []).some(hasInlineStyle))));
 }
 function drawFormattedSourceTable(document,part,formatting,startX,contentWidth) {
-  const columns = Math.max(...part.rows.map(row=>row.length)), width = contentWidth / columns;
+  const rows = part.rows.map((row,r)=>row.map((text,c)=>sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text},formatting)));
+  drawReportRichTable(document, {rows,headerRowCount:part.headerRowCount || 0}, startX, contentWidth);
+}
+
+// Measure and paint the same runs so cell marks and links survive wrapping,
+// repeated headers and page breaks in both Notes and formatted code tables.
+export function drawReportRichTable(document, table, startX, contentWidth, {headerBold = false} = {}) {
+  if (!table.rows?.length) return;
+  const columns = Math.max(...table.rows.map(row=>row.length)), width = contentWidth / columns;
+  if (width <= 10) throw new Error('This Report table has too many columns for the PDF page. Split it into smaller tables before exporting.');
   const size = 8, lineHeight = 10.4;
-  const runs = part.rows.map((row,r)=>row.map((text,c)=>sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text},formatting)));
-  const heights = runs.map(row=>Math.max(10.4,...row.map(cell=>drawReportRichText(document,cell,{size,width:width-10,lineHeight,paragraphGap:0,measureOnly:true})))+12);
-  const headers = part.headerRowCount || 0;
+  const runs = table.rows;
+  const headers = table.headerRowCount || 0;
+  const heights = runs.map((row,r)=>Math.max(lineHeight,...row.map(cell=>drawReportRichText(document,cell,{size,bold:headerBold && r < headers,width:width-10,lineHeight,paragraphGap:0,measureOnly:true})))+12);
   let position = headers;
-  while (position < part.rows.length || position === headers && position === part.rows.length) {
+  while (position < runs.length || position === headers && position === runs.length) {
     const bottom = document.page.height-document.page.margins.bottom-2;
     const headerHeight = heights.slice(0,headers).reduce((a,b)=>a+b,0);
     if (document.y+headerHeight+(heights[position] || 0)>bottom) document.addPage();
     const indices = Array.from({length:headers},(_,i)=>i); let height = headerHeight;
-    while (position < part.rows.length && document.y+height+heights[position]<=bottom) {indices.push(position); height+=heights[position++];}
-    if (indices.length === headers && position < part.rows.length) throw new Error('A Report table row is too tall for a PDF page. Narrow the selection before exporting.');
+    while (position < runs.length && document.y+height+heights[position]<=bottom) {indices.push(position); height+=heights[position++];}
+    if (indices.length === headers && position < runs.length) throw new Error('A Report table row is too tall for a PDF page. Narrow the selection before exporting.');
     for (const r of indices) {
       const top = document.y;
       for (let c=0;c<columns;c++) {
@@ -451,11 +459,11 @@ function drawFormattedSourceTable(document,part,formatting,startX,contentWidth) 
         if (r < headers) document.rect(x,top,width,heights[r]).fillAndStroke('#f0f0f0',colors.rule);
         else document.rect(x,top,width,heights[r]).stroke();
         document.restore(); document.y=top+5;
-        drawReportRichText(document,runs[r][c] || [],{size,left:x+5,width:width-10,lineHeight,paragraphGap:0,paginate:false});
+        drawReportRichText(document,runs[r][c] || [],{size,bold:headerBold && r < headers,left:x+5,width:width-10,lineHeight,paragraphGap:0,paginate:false});
       }
       document.x=startX; document.y=top+heights[r];
     }
-    if (position>=part.rows.length) break;
+    if (position>=runs.length) break;
     document.addPage();
   }
 }
