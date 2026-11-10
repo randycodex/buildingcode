@@ -7,7 +7,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-notebook-desk-v1622";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-notebook-desk-v1623";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -159,7 +159,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261109-notebook-desk-v1622";
+} from "./offline-storage.js?v=20261109-notebook-desk-v1623";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3185,14 +3185,7 @@ function renderNotebookIndex(project) {
   const heading = document.createElement('h2');
   heading.className = 'eyebrow panel-kind';
   heading.textContent = 'Notes';
-  const collapse = document.createElement('button');
-  collapse.type = 'button';
-  collapse.className = 'icon-button notebook-index-collapse';
-  collapse.setAttribute('aria-label', 'Collapse Notes list');
-  collapse.title = 'Collapse Notes list';
-  prependWorkspaceButtonIcon(collapse, 'panel-left-close');
-  collapse.addEventListener('click', () => setPaneCollapsed(panel, true, {focus: true}));
-  header.append(heading, collapse);
+  header.append(heading);
   const body = document.createElement('div');
   body.className = 'notebook-index-body';
   body.setAttribute('aria-label', 'Project notes');

@@ -1294,7 +1294,7 @@ textarea:focus-visible {
   justify-content: space-between;
 }
 
-.notebook-index-panel :is([data-collapse-title-bound="true"], .notebook-index-collapse, .pane-collapsed-tab) {
+.notebook-index-panel :is([data-collapse-title-bound="true"], .pane-collapsed-tab) {
   cursor: pointer;
 }
 

@@ -60,7 +60,7 @@ try {
   assert.ok(resized.width>listBounds.width+40,'The middle/editor divider increases the list width.');
   assert.ok((await selected.boundingBox()).width<editorBounds.width-40,'The editor shares the resize.');
   assert.ok(Math.abs((await evidence.boundingBox()).width-evidenceBounds.width)<2,'Resizing the list keeps Evidence in place.');
-  await index.getByRole('button',{name:'Collapse Notes list',exact:true}).click();
+  await index.getByRole('button',{name:'Collapse Notes',exact:true}).click();
   await index.locator('.pane-collapsed-tab').waitFor();
   assert.ok((await index.boundingBox()).width<=50);
   assert.match(await editor.innerText(),/Notebook draft retention check/);
@@ -70,7 +70,7 @@ try {
   await page.getByRole('button',{name:'Research',exact:true}).click();
   await page.getByRole('button',{name:'Notebook',exact:true}).click();
   assert.equal(await editor.evaluate((node,retained)=>node===retained,editorNode),true);
-  await index.getByRole('button',{name:'Collapse Notes list',exact:true}).click();
+  await index.getByRole('button',{name:'Collapse Notes',exact:true}).click();
   await page.reload();
   await index.locator('.pane-collapsed-tab').waitFor();
   assert.ok((await index.boundingBox()).width<=50,'Collapsed list survives refresh.');
