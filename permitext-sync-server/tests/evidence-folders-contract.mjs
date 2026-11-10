@@ -1,6 +1,7 @@
 import * as recentViewScope from "../public/recent-view-scope.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { settingsSavedContentSnapshot } from "../public/settings-saved-content.js";
 
 const [appSource, stylesSource, indexSource, serverSource, entitlementSource, swiftModelSource, swiftStoreSource] = await Promise.all([
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
@@ -318,11 +319,50 @@ assert.match(appSource, /confirmButton\.disabled = selected\.length === 0/);
 assert.match(appSource, /await persistSectionFolderSelection\(sectionPayload, selectedFolders, projects\)/);
 assert.match(appSource, /function unlinkEvidenceFromFolder\([\s\S]*?title: "Remove final destination\?"[\s\S]*?removeBookmark: true/);
 assert.match(appSource, /if \(options\.removeBookmark === true\)/);
-assert.match(
-  appSource,
-  /async function clearSettingsBookmarks\(\)[\s\S]*?deletedSavedMutationForSection[\s\S]*?deletedProjectSectionMutationForItem[\s\S]*?operationGroupID[\s\S]*?enqueueSettingsClearForAllCodes\("bookmarks", \[\.\.\.records, \.\.\.projectSections\], \{ operationGroupID \}\)/,
-  "Clear All Bookmarks must tombstone both canonical saved records and every Project membership in one queued operation group."
-);
+// Settings now clears the selected workspace through the recoverable batch API.
+// The HTTP deletion contract separately verifies shared records, memberships and Trash restore.
+{
+  let project = {id: "workspace-a"}, writable = true;
+  const calls = [];
+  const passage = {id: "saved-a", sectionID: 101, codeVersion: "nyc-2022"};
+  const otherPassage = {id: "saved-b", sectionID: 202, codeVersion: "nyc-2014"};
+  const note = {...passage, id: "note-a", noteBody: "Keep the source context"};
+  const summary = {
+    projects: [project, {id: "workspace-b"}], savedItems: [passage, otherPassage], annotations: [note],
+    projectSections: [
+      {...passage, folderClientID: "workspace-a"},
+      {...passage, folderClientID: "workspace-b"},
+      {...otherPassage, folderClientID: "workspace-b"}
+    ]
+  };
+  const clear = new Function("requirePrivateWorkspaceWritable", "workspaceProject", "settingsSavedContentForSummary", "deleteSavedEvidenceBatch",
+    `${functionSource(appSource, "clearSettingsWorkspaceContent")}\n` +
+    `${functionSource(appSource, "clearSettingsBookmarks")}\n` +
+    `${functionSource(appSource, "clearSettingsNotes")}\n` +
+    "return {bookmarks: clearSettingsBookmarks, notes: clearSettingsNotes};"
+  )(
+    () => { if (!writable) throw new Error("Read only"); },
+    () => project,
+    () => settingsSavedContentSnapshot(summary, {workspace: project}),
+    async (items, workspace, onProgress, options) => {
+      calls.push({items, workspace, options});
+      return items.length;
+    }
+  );
+  assert.equal(await clear.bookmarks(), 1);
+  assert.deepEqual(calls[0], {items: [passage], workspace: project, options: {scope: "bookmarks"}},
+    "Bookmark clearing must preserve edition identity and pass the selected workspace to the recoverable batch API.");
+  assert.equal(await clear.notes(), 1);
+  assert.deepEqual(calls[1], {items: [note], workspace: project, options: {scope: "notes"}});
+  project = {id: "empty-workspace"};
+  assert.equal(await clear.bookmarks(), 0);
+  project = null;
+  await assert.rejects(clear.bookmarks(), /Choose a workspace/);
+  project = summary.projects[0];
+  writable = false;
+  await assert.rejects(clear.bookmarks(), /Read only/);
+  assert.equal(calls.length, 2, "An empty, missing or read-only workspace must not submit a deletion.");
+}
 assert.match(
   appSource,
   /function retryRejectedDeletionConflictsOnce\(account\)[\s\S]*?\["savedItem", "projectSection"\][\s\S]*?codeVersionClear[\s\S]*?SYNC_MUTATION_REJECTED[\s\S]*?enqueueSyncMutation/,
@@ -482,7 +522,8 @@ foregroundAccountCurrent = false;
 continueForegroundImages();
 await assert.rejects(interruptedForegroundSync, /ACCOUNT_CONTEXT_CHANGED/);
 assert.equal(continuedDraftSyncs, 0, "The prior account's sync must stop before touching the next account's drafts.");
-assert.match(functionSource(appSource, "closeAllColumns"), /filter\(item => workflowPaneIsVisible\(item\.id\)\)[\s\S]*?await descriptor\.close\(\)/);
+assert.match(functionSource(appSource, "closeAllColumns"), /filter\(item => workflowPaneIsVisible\(item\.id\) \|\|\s*view === 'notebook' && isProjectNotebookPaneID\(item\.id\)\)[\s\S]*?await descriptor\.close\(\)/,
+  "Close All must close visible columns and the current Notebook host while retaining each column's unsaved-edit guard.");
 assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordinationFilters = \{\}/);
 assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
 const pinnedWorkflowSource = functionSource(appSource, "pinCriticalWorkflowPanesToLeft");
@@ -875,8 +916,10 @@ assert.doesNotMatch(appSource, /\["reference", "Saved collection", "Reusable res
 assert.match(appSource, /nameInput\.placeholder = isEditing && selectedFolderType === "reference" \? "Name" : "Project Name"/);
 assert.match(appSource, /addressLabel\.hidden = selectedFolderType === "reference"/);
 assert.match(appSource, /sheet\.classList\.toggle\("is-reference-folder", selectedFolderType === "reference"\)/);
-assert.match(appSource, /address: selectedFolderType === "reference" \? "" : property\?\.normalizedAddress \|\| addressInput\.value/);
-assert.match(appSource, /postResearch\("\/projects\/property\/lookup", \{ address \}\)/);
+assert.match(appSource, /address: selectedFolderType === "reference" \? "" : property\?\.enteredAddress \|\| addressInput\.value/,
+  "Project edits must retain the entered address rather than replacing it with the lookup's normalized address.");
+assert.match(appSource, /postResearch\("\/projects\/property\/lookup", \{ address, \.\.\.\(bbl \? \{bbl\} : \{\}\) \}\)/,
+  "Address lookup must retain its optional lot identity.");
 assert.match(appSource, /details\.structuredFacts = property\?\.structuredFacts \|\| \[\]/);
 assert.doesNotMatch(appSource, /colorGroup\.hidden = selectedFolderType === "reference"/);
 assert.match(stylesSource, /\.project-sheet-field\[hidden\] \{[\s\S]*?display: none;/);
@@ -919,7 +962,7 @@ assert.match(
   "Settings must mark only archived folders when active and archived folders share a name."
 );
 assert.match(appSource, /typeLabel\.textContent = folderTypeLabel\(project\)/, "Settings must identify each record as a Project or saved collection.");
-assert.match(appSource, /folderRecordCountLabel\(selectedProjects\)/, "Selected-record deletion must name the exact Project and saved-collection mix.");
+assert.match(appSource, /folderRecordCountLabel\(selectedCollections\)/, "Legacy collection deletion must name the selected collections and leave ordinary Projects out of that action.");
 assert.match(indexSource, /<button[^>]*class="[^"]*settings-project-clear-all[^"]*"[^>]*>Move all to Trash<\/button>/,
   "Settings keeps its compact visible bulk-action label.");
 // Exercise the live Settings refresh path instead of an obsolete one-time snapshot.

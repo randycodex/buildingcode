@@ -703,7 +703,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVybWl0ZXh0LmNvbSQ;
+				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVyLmNvZGVzJA;
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 413;
@@ -735,7 +735,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVybWl0ZXh0LmNvbSQ;
+				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVyLmNvZGVzJA;
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 413;

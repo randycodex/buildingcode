@@ -168,7 +168,7 @@ try {
     accept = accepted; invalidCitation = invalid; draftIndex = 0; calls = []; providerDoubleError = undefined;
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
-    const response = await request("/research/conversations/message", { auth, conversationID, question, requestID: randomUUID() }, token);
+    const response = await request("/research/conversations/message", { auth, conversationID, question, answerMode: "verified", requestID: randomUUID() }, token);
     if (providerDoubleError) throw providerDoubleError;
     assert.deepEqual(calls, invalid
       ? ["web_support", "permitext_code_interpretation", "permitext_code_interpretation"] : accepted

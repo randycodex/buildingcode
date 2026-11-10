@@ -1,3 +1,4 @@
+// This structured draft/revision replay explicitly requests verified mode rather than the default fast stream.
 import { syntheticMaterialScopeReview } from "./research-applicability-response-double.mjs";
 // Replay actual draft/revision records with explicit final-verifier doubles.
 // This verifies the delivery gate, not the legal correctness of the recorded answer.
@@ -132,7 +133,7 @@ try {
     const conversationID = created.body.conversation.id;
     let response;
     for (const item of run.cases) {
-      response = await request("/research/conversations/message", { auth, conversationID, question: item.question, requestID: randomUUID() }, token);
+      response = await request("/research/conversations/message", { auth, conversationID, question: item.question, answerMode: "verified", requestID: randomUUID() }, token);
       if (providerDoubleError) throw providerDoubleError;
       if (item.id === "CC-03") assert.equal(response.status, 200, JSON.stringify(response.body));
     }
