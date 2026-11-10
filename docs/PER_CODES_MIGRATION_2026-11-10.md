@@ -75,8 +75,11 @@ Clear All Bookmarks also fails on untouched production commit `fe0ffe9cc` in
 the original checkout. Do not weaken that deletion contract merely to clear a
 rebrand gate. `npm run check` advanced past the original failures and exposed
 an older structured scope-review fixture; its explicit-mode repair now passes
-its focused contract. Remaining full-suite stages must still be run and any failures
-reconciled before claiming complete-suite acceptance.
+its focused contract. The final full-check attempt then stopped in
+`tests/research-revision-verification-http-contract.mjs:92` at another legacy
+structured response double receiving a fast request. The same failure was
+reproduced on untouched `fe0ffe9cc`. Remaining stages must still be run and any
+failures reconciled before claiming complete-suite acceptance.
 
 ## Vercel configuration access
 
@@ -102,6 +105,7 @@ configuration, then build a new candidate:
 | PERMITEXT_TERMS_VERSION | terms-2026-11-10-rebrand |
 | PERMITEXT_PRIVACY_VERSION | privacy-2026-11-10-rebrand |
 | PERMITEXT_SUBSCRIPTION_POLICY_VERSION | subscriptions-2026-11-10-rebrand |
+| PERMITEXT_STRIPE_WEBHOOK_URL | Retain the exact verified existing legacy webhook URL |
 | CLERK_AUTHORIZED_PARTIES | https://per.codes,https://www.per.codes,https://permitext.com,https://www.permitext.com |
 | CLERK_FRONTEND_API_URL | https://clerk.per.codes, after Clerk verification |
 | CLERK_ACCOUNT_PORTAL_URL | https://accounts.per.codes/sign-in, after Clerk verification |
@@ -112,6 +116,22 @@ monitoring, product and purchase identifiers attached to their existing
 resources. Do not rotate credentials as part of a name change. The native
 Xcode publishable-key settings still target clerk.permitext.com and must be
 coordinated with domain compatibility before shipping a new binary.
+
+## Staged-deployment findings
+
+The first staged Production build used deployment-only new public/policy/origin
+values without assigning live domains. Its content checks passed, and the
+commercial configuration, Price, tax and monitoring checks were valid. The
+readiness gate rejected a missing release SHA and the missing new-domain Stripe
+webhook; it did not promote an incomplete build.
+
+The source now supports `PERMITEXT_STRIPE_WEBHOOK_URL` for an explicitly retained
+compatible endpoint, with exact provider endpoint/status/event verification
+preserved. Invalid hosts, credentials, queries, fragments, paths and ports fail
+before provider requests. Focused Beta 1, billing and operational-readiness
+contracts pass. Package and lockfile engines now pin Node 24.x, matching the
+existing project and local validation, rather than selecting a new Node major.
+CLI candidate retries supply their exact source SHA/release ID explicitly.
 
 ## Tonight's cutover sequence
 

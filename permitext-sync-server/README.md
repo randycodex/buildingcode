@@ -289,6 +289,15 @@ node server.mjs
 
 Production checkout requires a live Stripe secret (`sk_live_...`) and a live recurring Price. The server rejects test credentials and test-mode webhook events when `VERCEL_ENV=production` or `PERMITEXT_REQUIRE_LIVE_STRIPE=1`, so a `cs_test_...` session can never appear to be a real purchase. Stripe uses different webhook signing secrets for test and live mode; configure the live endpoint at `https://permitext-sync.vercel.app/billing/stripe/webhook`.
 
+During a domain migration, browser return URLs follow `PERMITEXT_PUBLIC_BASE_URL`,
+while `PERMITEXT_STRIPE_WEBHOOK_URL` can explicitly retain the existing signed
+webhook. Use the exact already configured HTTPS `/billing/stripe/webhook`
+endpoint on `per.codes`, `permitext.com`, or `permitext-sync.vercel.app`. With no
+override, the readiness audit expects the canonical public host. The audit still
+requires that exact endpoint to be enabled with all required events, plus the
+same live Price and tax checks. Keep its existing signing secret; a website
+rename does not require creating another endpoint or subscription.
+
 Stripe Checkout creates the web subscription session, and the successful return path plus signed Stripe webhook events grant or revoke the shared backend entitlement. Apple Pro access is granted only after the iOS app sends an App Store-signed StoreKit transaction JWS to the backend. Production requires the configured bundle ID and App Store root fingerprints, and accepts only App Store production transactions. Xcode StoreKit purchases remain device-only, while App Store Sandbox and TestFlight transactions may synchronize only through a non-production backend configured for billing tests. Apple original transaction IDs are permanently bound to the first per codes account that verifies them, preventing one purchase from being replayed across accounts.
 
 Production web Checkout also fails closed until Stripe tax presentation is explicit. Set `PERMITEXT_STRIPE_TAX_MODE=automatic` only after the required registrations and Product tax code have been reviewed, then set `PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=inclusive` or `exclusive` to match the resolved live Stripe Price behavior. A configured Checkout requests Stripe automatic tax and requires a billing address. The build-time live audit treats Stripe's documented USD `Default (inferred by currency)` behavior as exclusive; the environment variables do not create or prove a tax registration.

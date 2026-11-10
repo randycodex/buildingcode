@@ -57,6 +57,22 @@ function privateBlobStorageConfigured(environment) {
   );
 }
 
+function stripeWebhookConfiguration(environment) {
+  const explicitURL = String(environment.PERMITEXT_STRIPE_WEBHOOK_URL || "").trim();
+  const publicBaseURL = String(environment.PERMITEXT_PUBLIC_BASE_URL || "").trim().replace(/\/+$/, "");
+  try {
+    const url = new URL(explicitURL || `${publicBaseURL}/billing/stripe/webhook`);
+    const compatibleOrigins = ["https://per.codes", "https://permitext.com", "https://permitext-sync.vercel.app"];
+    if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash ||
+        url.pathname !== "/billing/stripe/webhook" || (explicitURL && !compatibleOrigins.includes(url.origin))) {
+      throw new Error("Invalid webhook URL");
+    }
+    return { ready: true, url: url.href };
+  } catch {
+    return { ready: false, url: null };
+  }
+}
+
 export function beta1ConfigurationReadiness(environment = process.env) {
   const publicBaseURL = String(environment.PERMITEXT_PUBLIC_BASE_URL || "").trim().replace(/\/+$/, "");
   const clerk = clerkConfigurationStatus(environment);
@@ -64,6 +80,7 @@ export function beta1ConfigurationReadiness(environment = process.env) {
   const research = researchSpendGuardrails(environment);
   const paidTurnsEnabled = paidResearchTurnsEnabled(environment);
   const stripeTax = stripeTaxConfiguration(environment);
+  const stripeWebhook = stripeWebhookConfiguration(environment);
   const stripeResearchPackPriceIDs = [
     environment.STRIPE_RESEARCH_TURNS_25_PRICE_ID,
     environment.STRIPE_RESEARCH_TURNS_100_PRICE_ID
@@ -78,6 +95,7 @@ export function beta1ConfigurationReadiness(environment = process.env) {
     check("stripe-live-secret", liveKey(environment.STRIPE_SECRET_KEY, "sk") || liveKey(environment.STRIPE_SECRET_KEY, "rk"), "Use a live Stripe secret or restricted key."),
     check("stripe-pro-price", String(environment.STRIPE_PRO_PRICE_ID || "").startsWith("price_"), "Configure the live recurring Pro Price ID."),
     check("stripe-webhook-secret", String(environment.STRIPE_WEBHOOK_SECRET || "").startsWith("whsec_"), "Configure the live endpoint signing secret."),
+    check("stripe-webhook-url", stripeWebhook.ready, "Use the canonical Stripe webhook URL, or explicitly retain its HTTPS per.codes, permitext.com or permitext-sync.vercel.app endpoint during migration."),
     check(
       "stripe-tax",
       stripeTax.ready,
@@ -132,7 +150,7 @@ export function beta1ConfigurationReadiness(environment = process.env) {
     ready: checks.every((item) => item.ready),
     checks,
     endpoints: publicBaseURL ? {
-      stripeWebhook: `${publicBaseURL}/billing/stripe/webhook`,
+      stripeWebhook: stripeWebhook.url,
       appleNotifications: `${publicBaseURL}/billing/apple/notifications`
     } : null,
     requiredStripeWebhookEvents: [...requiredStripeWebhookEvents]
@@ -156,8 +174,9 @@ export async function verifyLiveStripeReadiness(
 ) {
   const secretKey = String(environment.STRIPE_SECRET_KEY || "").trim();
   const priceID = String(environment.STRIPE_PRO_PRICE_ID || "").trim();
-  const baseURL = String(environment.PERMITEXT_PUBLIC_BASE_URL || "").trim().replace(/\/+$/, "");
   const stripeTax = stripeTaxConfiguration(environment);
+  const webhook = stripeWebhookConfiguration(environment);
+  if (!webhook.ready) throw new Error("The Stripe webhook URL must be a valid supported HTTPS webhook endpoint.");
   if (!liveKey(secretKey, "sk") && !liveKey(secretKey, "rk")) {
     throw new Error("Live Stripe verification requires a live secret or restricted key.");
   }
@@ -165,7 +184,9 @@ export async function verifyLiveStripeReadiness(
     stripeRequest(`/v1/prices/${encodeURIComponent(priceID)}`, secretKey, fetchImplementation),
     stripeRequest("/v1/webhook_endpoints?limit=100", secretKey, fetchImplementation)
   ]);
-  const expectedURL = `${baseURL}/billing/stripe/webhook`;
+  // Canonical browser returns can move before an existing signed webhook does.
+  // Still require this exact endpoint to be enabled with every required event.
+  const expectedURL = webhook.url;
   const endpoint = (endpointList.data || []).find((candidate) => candidate.url === expectedURL);
   const enabledEvents = new Set(endpoint?.enabled_events || []);
   const resolvedPriceTaxBehavior = resolvedStripePriceTaxBehavior(price);

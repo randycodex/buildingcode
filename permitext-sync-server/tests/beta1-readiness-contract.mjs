@@ -232,11 +232,58 @@ assert(
   "Live Stripe readiness accepted a Price tax behavior that differed from the explicit decision."
 );
 
+const migrationEnvironment = {
+  ...completeEnvironment,
+  PERMITEXT_PUBLIC_BASE_URL: "https://per.codes"
+};
+const migrationStripeFetch = (endpoint, status = "enabled", events = requiredStripeWebhookEvents) => async (url) =>
+  Response.json(url.includes("/v1/prices/") ? {
+    id: "price_contract", livemode: true, active: true, type: "recurring",
+    currency: "usd", unit_amount: 2000, recurring: { interval: "month" }, tax_behavior: "exclusive"
+  } : { data: [{ url: endpoint, status, enabled_events: events }] });
+for (const endpoint of [
+  "https://permitext.com/billing/stripe/webhook",
+  "https://permitext-sync.vercel.app/billing/stripe/webhook"
+]) {
+  const environment = { ...migrationEnvironment, PERMITEXT_STRIPE_WEBHOOK_URL: endpoint };
+  const configuration = beta1ConfigurationReadiness(environment);
+  assert(configuration.ready && configuration.endpoints.stripeWebhook === endpoint,
+    "Moving the public website must allow an explicitly retained compatible webhook.");
+  const result = await verifyLiveStripeReadiness(environment, { fetchImplementation: migrationStripeFetch(endpoint) });
+  assert(result.ready && result.webhook.url === endpoint,
+    "The retained webhook must still pass live endpoint and Price validation.");
+  for (const [status, events] of [["disabled", requiredStripeWebhookEvents], ["enabled", []]]) {
+    assert(!(await verifyLiveStripeReadiness(environment, {
+      fetchImplementation: migrationStripeFetch(endpoint, status, events)
+    })).ready, "Retaining an endpoint must not bypass enabled status or required events.");
+  }
+}
+for (const endpoint of [
+  "https://unexpected.example/billing/stripe/webhook",
+  "http://permitext.com/billing/stripe/webhook",
+  "https://permitext.com/other-path",
+  "https://permitext.com/billing/stripe/webhook?override=1",
+  "https://permitext.com/billing/stripe/webhook#fragment",
+  "https://user:password@permitext.com/billing/stripe/webhook",
+  "https://permitext.com:8443/billing/stripe/webhook"
+]) {
+  const environment = { ...migrationEnvironment, PERMITEXT_STRIPE_WEBHOOK_URL: endpoint };
+  assert(!beta1ConfigurationReadiness(environment).ready, "An unsupported webhook override was accepted.");
+  let rejected = false, called = false;
+  try {
+    await verifyLiveStripeReadiness(environment, { fetchImplementation: async () => { called = true; } });
+  } catch { rejected = true; }
+  assert(rejected && !called, "Invalid webhook configuration must fail before a provider request.");
+}
+
 const vercelConfiguration = JSON.parse(
   await readFile(new URL("../vercel.json", import.meta.url), "utf8")
 );
+const packageConfiguration = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+const productionBuildCommand = vercelConfiguration.buildCommand === "npm run build:production"
+  ? packageConfiguration.scripts["build:production"] : vercelConfiguration.buildCommand;
 assert(
-  vercelConfiguration.buildCommand?.includes("scripts/verify-production-deploy.mjs"),
+  productionBuildCommand?.includes("scripts/verify-production-deploy.mjs"),
   "Vercel Production can deploy without the commercial configuration and live Stripe gate."
 );
 const deployGate = await readFile(
