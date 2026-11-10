@@ -187,3 +187,58 @@ CLI candidate retries supply their exact source SHA/release ID explicitly.
 
 References: [Clerk domain changes](https://clerk.com/docs/guides/development/deployment/changing-domains)
 and [Clerk satellite domains](https://clerk.com/docs/guides/dashboard/dns-domains/satellite-domains).
+
+
+## Verified candidate receipt
+
+- Code commit: `50ab0abe0833d81d85d9c0178b84327c90e61b69` on
+  `codex/per-codes-rebrand` (following branding commit `77e2c61ec`).
+- Worktree: `/Users/randy/.codex/worktrees/per-codes-migration`.
+- Existing Vercel project, Production-targeted build, **not promoted**:
+  [deployment inspector](https://vercel.com/randycodexs-projects-b72fc111/permitext-sync/6KEWnuzRbbeYXAqVyB2Ue6ww5txk).
+- Protected candidate:
+  `https://permitext-sync-f9dlgen00-randycodexs-projects-b72fc111.vercel.app`.
+  This is an inspection candidate, not final new-domain authentication acceptance.
+- Vercel reports `READY` with no assigned aliases. The hosted production build
+  passed the commercial, retained live Stripe webhook/Price/tax, release identity
+  and monitoring gates on Node 24.x. No existing Stripe resources were modified.
+- Twelve authenticated-to-Vercel, read-only HTTP requests returned 200: home,
+  workspace, release, current policies, Clerk configuration, AASA, the three
+  policy documents, both new images and health. This bypasses Vercel deployment
+  protection for the owner and is not evidence that the candidate is public.
+- `/release` reports exactly `50ab0abe0833d81d85d9c0178b84327c90e61b69`.
+  All three served policy bodies match their approved SHA-256 hashes, versions
+  and per.codes URLs. Both image bodies match the committed assets. The workspace
+  uses web version `20261110-per-codes-v1650`.
+- Health reports `ok: true` and `storage: postgres`. AASA retains the exact
+  existing Apple app ID and `/open/section/*` association. No authenticated
+  customer sync, purchase/restore or identity acceptance is claimed.
+- Candidate Clerk configuration intentionally retains `clerk.permitext.com`
+  and `accounts.permitext.com/sign-in` until the coordinated coexistence work.
+  Rebuild after final Clerk settings; do not promote this candidate unchanged
+  as proof that per.codes sign-in works.
+- After the candidate became ready, both `https://permitext.com/release` and
+  `https://permitext-sync.vercel.app/release` still returned 200 and production
+  commit `fe0ffe9cc47aa9b5f1e7df399284d5947e500c99`. Public per.codes DNS still
+  returned the four Squarespace parking A records. No traffic cutover occurred.
+- Private screenshots, DNS snapshot and source-ID compatibility evidence are
+  retained outside Git in
+  `/Users/randy/Documents/Codex/migration-evidence/2026-11-10-per-codes/`.
+
+The source compatibility audit compared the production baseline with this
+branch: StoreKit product/subscription-group IDs, Xcode bundle/team/product
+identifiers, native callback schemes, web storage key literals and all legacy
+associated domains are unchanged; the new associated domain is added.
+
+### Asset generation receipt
+
+Final social asset: `permitext-sync-server/public/og-image.png`. Built-in image
+editing was used, followed by PNG compression to the existing size budget.
+Prompt:
+
+> Use case: text-localization. Edit target: the referenced Permitext social-sharing image. Change only the large wordmark text 'permitext' to exactly 'per codes' (all lowercase, a space between per and codes), preserving the existing white bold sans-serif style, baseline, and left alignment. Keep the red app icon, three colored stacked diamonds, dark background, rounded panel, subtitle 'NYC building code research workspace', and line 'Read • Search • Research • Report' unchanged. Preserve the 1200 by 630 social-image aspect ratio and sharp professional appearance. Do not introduce any extra text or new branding elements.
+
+Final homepage screenshot:
+`permitext-sync-server/public/marketing/workspace-per-codes.png`. This is a
+fresh screenshot of actual Reader/Search UI with synthetic local project data,
+not an AI-edited product screenshot. Old unused marketing captures are retained.
