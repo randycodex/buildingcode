@@ -1294,6 +1294,15 @@ textarea:focus-visible {
   justify-content: space-between;
 }
 
+.notebook-index-actions {
+  padding-inline-end: calc(var(--panel-title-control-size) + var(--space-2));
+}
+
+.notebook-index-actions > .notebook-index-menu-button {
+  width: var(--panel-title-control-size);
+  flex: 0 0 var(--panel-title-control-size);
+}
+
 .notebook-index-body {
   min-height: 0;
   flex: 1;
@@ -1323,6 +1332,32 @@ textarea:focus-visible {
 .notebook-index-body li > button {
   border-radius: var(--radius-control);
 }
+
+.notebook-index-body .notebook-index-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notebook-note-check {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--text-tertiary);
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.notebook-index-choice[aria-checked="true"] .notebook-note-check {
+  border-color: var(--text-primary);
+}
+
+.notebook-index-menu .is-destructive { color: var(--destructive); }
+.notebook-index-body .notebook-selection-status { margin: 0 0 4px; }
+.notebook-index-body button:disabled { opacity: .45; cursor: default; }
 
 .notebook-index-body button:hover,
 .notebook-index-body button.is-selected {
@@ -17910,7 +17945,7 @@ html body .research-compact-composer .research-question-input:focus-visible {
 
 /* Named column groups preserve their mounted content while folded away. */
 .panel-track > .is-group-hidden { display: none !important; }
-.column-group-menu-button, .column-group-collapsed-menu {
+.column-group-menu-button, .column-group-collapsed-menu, .notebook-index-menu-button {
   border: 0;
   box-shadow: none;
   color: var(--text-secondary);
