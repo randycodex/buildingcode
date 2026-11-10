@@ -105,7 +105,7 @@ export function auditProductionAuthentication({
         displayConfig.sign_in_url === environment.CLERK_ACCOUNT_PORTAL_URL &&
         displayConfig.sign_up_url === new URL("/sign-up", environment.CLERK_ACCOUNT_PORTAL_URL).href &&
         configuration.authorizedParties.includes(displayConfig.home_url),
-      "The public Clerk environment must publish per codes's exact Account Portal and home URLs."
+      "The public Clerk environment must publish per codes’ exact Account Portal and home URLs."
     ),
     check(
       "apple-webcredentials",

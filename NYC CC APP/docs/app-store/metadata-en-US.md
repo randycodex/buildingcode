@@ -1,26 +1,27 @@
-# Permitext App Store Metadata — English (U.S.)
+# per codes App Store Metadata — English (U.S.)
 
-Prepared for App Store version 1.0. On September 7, the listing text, subtitle,
-categories, Free app price, manual release setting, English subscription-group
-name and subscription description were saved and independently reread in App
-Store Connect under the owner's standing closeout authorization. The app and
-subscription remain Prepare for Submission. Reviewer-access instructions below
-are still preparation material and have not been entered as final review notes.
+Rebrand target metadata updated November 10, 2026. The remote listing must be verified separately; this file does not claim it has been updated. Bundle and product IDs remain unchanged. No submission or release is authorized by this metadata.
 
-September 3 preparation update: **do not submit or release**. The owner wants App Store submission and public release last. The reviewer-access section remains incomplete until a dedicated, independently verified access method is approved; do not paste an incomplete draft into Apple review fields.
+Prepared for App Store version 1.0. The prior `permitext` listing was saved in
+App Store Connect on September 7. Those historical checks do not establish that
+the rebranded listing, screenshots, native authentication, or reviewer path is
+ready. Reconcile the remote fields against this target before submission.
+
+Do not submit or release during this migration. Retain manual release and the
+existing bundle ID, subscription group, products, and account identities.
 
 ## Listing
 
-- Name: `permitext`
+- Name: `per codes`
 - Subtitle: `NYC Codes, Search & Projects`
 - Primary category: `Reference`
 - Secondary category: `Productivity`
 - App price: `Free`
 - Availability: `United States only`
 - Copyright: `2026 Higinio Jimenez Manzano`
-- Support URL: `https://permitext.com/support`
-- Marketing URL: `https://permitext.com`
-- Privacy Policy URL: `https://permitext.com/privacy`
+- Support URL: `https://per.codes/support`
+- Marketing URL: `https://per.codes`
+- Privacy Policy URL: `https://per.codes/privacy`
 
 ## Promotional text
 
@@ -32,7 +33,7 @@ NYC,building code,construction code,zoning,code search,projects,notes,bookmarks,
 
 ## Description
 
-Permitext is a professional workspace for reading, searching, and organizing New York City code references.
+per codes is a professional workspace for reading, searching, and organizing New York City code references.
 
 READ AND SEARCH FREE
 
@@ -42,21 +43,21 @@ SAVE THE SECTIONS THAT MATTER
 
 Save sections, add notes, and organize references around your Projects. Sign in with Apple, Google, Microsoft, or passwordless email to keep account-owned work separate and sync supported data across devices.
 
-UPGRADE TO PERMITEXT PRO
+UPGRADE TO PER CODES PRO
 
-Permitext Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 Research turns per UTC calendar month. Research answers use identified evidence and citations. A turn is counted when an answer is completed and saved. Requests that fail without a saved answer do not use an included turn.
+per codes Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 Research turns per UTC calendar month. Research answers use identified evidence and citations. A turn is counted when an answer is completed and saved. Requests that fail without a saved answer do not use an included turn.
 
 Pro is $20.00 per month. There is no trial. Payment is charged to your Apple Account when the purchase is confirmed. The subscription renews monthly unless canceled at least 24 hours before the end of the current billing period. You can manage or cancel the subscription in your Apple Account settings. Code reading and search remain free after cancellation.
 
 IMPORTANT SOURCE BOUNDARY
 
-Permitext is an independent product and is not affiliated with or endorsed by the City of New York or any government agency. Permitext provides code-research tools, not an official agency interpretation or legal advice. Always verify consequential decisions against the identified official source and current requirements.
+per codes is an independent product and is not affiliated with or endorsed by the City of New York or any government agency. per codes provides code-research tools, not an official agency interpretation or legal advice. Always verify consequential decisions against the identified official source and current requirements.
 
-Terms of Service: https://permitext.com/terms
+Terms of Service: https://per.codes/terms
 
-Privacy Policy: https://permitext.com/privacy
+Privacy Policy: https://per.codes/privacy
 
-Subscription and Refund Policy: https://permitext.com/refunds
+Subscription and Refund Policy: https://per.codes/refunds
 
 ## App Review notes
 
@@ -75,15 +76,15 @@ Subscription review flow to verify before submission:
 1. Open the account control and the Plan section.
 2. Sign in through the approved reviewer-access route.
 3. Open the Pro upgrade flow.
-4. Select Permitext Pro Monthly and confirm with the App Store test account supplied by Apple.
+4. Select per codes Pro Monthly and confirm with the App Store test account supplied by Apple.
 
-The iOS app uses StoreKit. Production transactions require Permitext backend verification and account binding. On the current Production-targeted build, Sandbox transactions bind to the signed-in account on the device; they do not create a Production backend Pro entitlement. A local Pro display therefore does not demonstrate access to backend Pro features. Sandbox backend verification is enabled only for the separately configured isolated staging host.
+The iOS app uses StoreKit. Production transactions require per codes backend verification and account binding. On the current Production-targeted build, Sandbox transactions bind to the signed-in account on the device; they do not create a Production backend Pro entitlement. A local Pro display therefore does not demonstrate access to backend Pro features. Sandbox backend verification is enabled only for the separately configured isolated staging host.
 
 **Internal submission blocker:** verify the reviewer subscription and backend-feature path on the actual final candidate. The supplied account's complimentary backend Pro grant is now explicit and disclosed in Apple notes; it is separate from a purchase. Do not describe a Sandbox purchase as activating Production backend Pro or weaken the transaction-environment guard. The completed staging Sandbox lifecycle does not establish this final-candidate path.
 
 Restore Subscription is available on the upgrade screen. Delete Account is available in the Account section and requires confirmation. Confirm these instructions on the final candidate before copying them to App Store Connect.
 
-Permitext Pro Monthly:
+per codes Pro Monthly:
 
 - Product ID: `com.randycodex.permitext.pro.monthly`
 - Price: `$20.00/month` in the United States
@@ -94,12 +95,12 @@ Support: `permitext@gmail.com`
 
 ## Subscription group localization
 
-- Subscription group display name: `Permitext Pro`
+- Subscription group display name: `per codes Pro`
 - App Name Display Options: `Use App Name`
 
 ## Subscription localization
 
-- Display name: `Permitext Pro Monthly`
+- Display name: `per codes Pro Monthly`
 - Description: `Pro workspace and up to 100 Research turns`
 
 ## Release control

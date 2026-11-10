@@ -701,8 +701,8 @@ private struct ResearchSessionView: View {
                 }
             } message: { pending in
                 Text(pending.isMultiple
-                     ? "\(pending.conversationIDs.count) conversations and their answers will be permanently deleted from Permitext. This cannot be undone."
-                     : "\u{201c}\(pending.title)\u{201d} will be permanently deleted from Permitext. This cannot be undone.")
+                     ? "\(pending.conversationIDs.count) conversations and their answers will be permanently deleted from per codes. This cannot be undone."
+                     : "\u{201c}\(pending.title)\u{201d} will be permanently deleted from per codes. This cannot be undone.")
             }
             .task(id: "\(library.privateSessionID):\(library.hasResearchAccess)") {
                 guard isCurrentOwner else { return }

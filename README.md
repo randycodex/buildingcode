@@ -1,6 +1,6 @@
-# Permitext
+# per codes
 
-Permitext is a local-first NYC code-research workspace for iPhone and web. It
+per codes is a local-first NYC code-research workspace for iPhone and web. It
 helps users research NYC code requirements and preserve the selected evidence
 behind project decisions. Search finds candidate material; Research works only
 from user-selected enacted passages and returns citations, uncertainty, missing

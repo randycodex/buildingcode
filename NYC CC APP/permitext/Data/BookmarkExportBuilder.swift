@@ -867,6 +867,6 @@ struct ProjectReportExportBuilder: Sendable {
             .unicodeScalars
             .map { allowed.contains($0) ? String($0) : "" }
             .joined()
-        return normalized.isEmpty ? "Permitext-Project-Report" : String(normalized.prefix(80))
+        return normalized.isEmpty ? "per-codes-Project-Report" : String(normalized.prefix(80))
     }
 }

@@ -10139,7 +10139,7 @@ export function researchWebSupportRequestBody({
       type: "web_search",
       filters: { allowed_domains: allowedDomains }
     }],
-    // This request is constructed only after per codes's source policy has
+    // This request is constructed only after per codes’ source policy has
     // decided that official web support is required. Do not let the provider
     // skip the sole available tool and answer from model memory instead.
     tool_choice: "required",
@@ -18252,7 +18252,7 @@ async function handleReportFileRead(request, response) {
   const safeTitle = String(artifact.payload.title || "per codes Project Report")
     .replace(/[^a-z0-9]+/gi, "-")
     .replace(/^-+|-+$/g, "")
-    .slice(0, 80) || "Permitext-Project-Report";
+    .slice(0, 80) || "per-codes-Project-Report";
   const filename = `${safeTitle}-v${artifact.payload.reportVersion}-${file.format}.pdf`;
   response.writeHead(200, {
     ...securityHeaders(),
@@ -25075,7 +25075,7 @@ async function verifiedCredentialIdentity(credential, options = {}) {
         verifiedEmails = identity.emails;
       } catch (error) {
         // A temporary Clerk Backend API failure must not lock a valid signed token
-        // out of Permitext. Pending Lifetime Pro invitations remain pending until a
+        // out of per codes. Pending Lifetime Pro invitations remain pending until a
         // later verified sign-in can resolve the account email.
         if (!(error instanceof LifetimeGrantAdminError)) throw error;
       }
@@ -30393,7 +30393,7 @@ async function handleInternalLifetimeGrantInvite(request, response) {
     sendJSON(response, 200, {
       message: status === "active"
         ? "Lifetime Pro is active for this per codes account."
-        : "Invitation email sent. Lifetime Pro will activate when this exact verified email first signs in to Permitext.",
+        : "Invitation email sent. Lifetime Pro will activate when this exact verified email first signs in to per codes.",
       state: await lifetimeGrantConsoleState(email)
     });
   } catch (error) {
@@ -34529,7 +34529,7 @@ async function handleCodeQuestionIssuedFileRead(request, response) {
   }
   const extension = format === "structured" ? "json" : format;
   const safeTitle = String(generated.payload.title || "per codes Code Memo")
-    .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "Permitext-Code-Memo";
+    .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "per-codes-Code-Memo";
   response.writeHead(200, {
     ...securityHeaders(),
     "cache-control": "private, no-store",

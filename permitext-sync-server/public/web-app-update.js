@@ -1,4 +1,4 @@
-const updateFailure = "Couldn’t update Permitext. Try again.";
+const updateFailure = "Couldn’t update per codes. Try again.";
 const otherTabsError = () => Object.assign(new Error("Close other per codes tabs, then try again."), {code:"OTHER_TABS"});
 
 function workerState(worker, states, timeoutMS) {

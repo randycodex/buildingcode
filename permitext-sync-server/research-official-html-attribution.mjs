@@ -338,7 +338,7 @@ export async function fetchResearchOfficialDocumentPassages(sourceURL, options =
         signal: controller.signal,
         headers: {
           accept: "text/html,application/xhtml+xml,application/pdf",
-          "user-agent": "Mozilla/5.0 (compatible; Permitext/1.0; +https://permitext.com)"
+          "user-agent": "Mozilla/5.0 (compatible; per-codes/1.0; +https://per.codes)"
         }
       });
       if (response.status >= 300 && response.status < 400) {

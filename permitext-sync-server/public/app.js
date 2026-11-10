@@ -9,8 +9,8 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-per-codes-v1649";
-import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-per-codes-v1650";
+import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
@@ -161,7 +161,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261110-per-codes-v1649";
+} from "./offline-storage.js?v=20261110-per-codes-v1650";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -369,7 +369,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261110-rich-notes-v48";
+const notebookClientVersion = "20261110-per-codes-notebook-v1";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -1999,7 +1999,7 @@ async function prepareWebAppReload() {
   if (workspaceRestoreError || workspaceMigrationError) {
     return blocked("per codes could not restore this workspace. Keep this tab open and resolve its recovery notice before updating.");
   }
-  if (activeResearchProgress.size) return blocked("Wait for the Assistant to finish, then update Permitext.");
+  if (activeResearchProgress.size) return blocked("Wait for the Assistant to finish, then update per codes.");
   try {
     await Promise.all([...notebookColumnMounts.values()].map(mount => mount.persistDraft?.()));
     flushSearchQueryPersistence(); flushResearchDraftPersistence(); saveWorkspaceState();
@@ -2021,10 +2021,10 @@ async function prepareWebAppReload() {
     if (dirtyEditor) return blocked("Finish saving the open Note, Report, or Project editor before updating.");
     if ([...document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog[open]')]
       .some(node => node.getClientRects().length && !node.hidden)) {
-      return blocked("Close the open dialog, then update Permitext.");
+      return blocked("Close the open dialog, then update per codes.");
     }
     if (track.classList.contains("is-resizing") || track.querySelector('.workspace-panel.is-dragging')) {
-      return blocked("Finish resizing or moving the column, then update Permitext.");
+      return blocked("Finish resizing or moving the column, then update per codes.");
     }
     return true;
   } catch { return blocked("per codes could not save your work on this device. Keep this tab open and try again before updating."); }
@@ -7434,7 +7434,7 @@ async function deleteCapturedAccount(account, identity) {
 }
 
 function loadAccountVerification() {
-  return import("/web/account-verification-assets/account-verification.js?v=20261005-account-dependencies-v4");
+  return import("/web/account-verification-assets/account-verification.js?v=20261110-per-codes-account-v5");
 }
 
 async function prepareAccountDeletionIdentity(account, identity) {
@@ -11979,9 +11979,9 @@ async function startDirectClerkAccountEntry(button, { mode = "signIn", upgrade =
     const localPreview = ["localhost", "127.0.0.1", "[::1]", "::1"].includes(location.hostname);
     const hostedPreview = localPreview && config?.available === false;
     if (!config?.available && !hostedPreview) throw new Error("Secure sign-in is currently unavailable. Please try again.");
-    const destination = new URL(hostedPreview ? "https://accounts.permitext.com/sign-in" : config.accountPortalSignInURL);
+    const destination = new URL(hostedPreview ? "https://accounts.per.codes/sign-in" : config.accountPortalSignInURL);
     if (mode === "signUp") destination.pathname = destination.pathname.replace(/\/sign-in\/?$/, "/sign-up");
-    const returnURL = new URL("/workspace?clerk_return=1", hostedPreview ? "https://permitext.com" : window.location.href);
+    const returnURL = new URL("/workspace?clerk_return=1", hostedPreview ? "https://per.codes" : window.location.href);
     if (upgrade) {
       rememberProUpgradeIntent();
       // Carry the intent across hosted authentication, including local previews.
@@ -23966,7 +23966,7 @@ async function readProjectReportFile(projectID, file, title = "per codes Project
   const blob = await response.blob();
   requireCurrentAccountRequest(requestIdentity);
   const safeTitle = String(title || "per codes Project Report")
-    .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "Permitext-Project-Report";
+    .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "per-codes-Project-Report";
   return { pdfBlob: blob, filename: `${safeTitle}-v${file.reportVersion || 1}-${file.format || "report"}.pdf` };
 }
 
@@ -41870,14 +41870,14 @@ function showHostedAccountFallback(panel, dialog, mode, error) {
   const link = panel.querySelector(".account-welcome-live-sign-in");
   if (!link) return false;
   const upgrade = dialog.dataset.proUpgrade === "true";
-  const destination = upgrade ? new URL("https://permitext.com/workspace?intent=upgrade-pro")
-    : new URL(mode === "signUp" ? "https://accounts.permitext.com/sign-up" : "https://accounts.permitext.com/sign-in");
-  if (!upgrade) destination.searchParams.set("redirect_url", "https://permitext.com/workspace?clerk_return=1");
+  const destination = upgrade ? new URL("https://per.codes/workspace?intent=upgrade-pro")
+    : new URL(mode === "signUp" ? "https://accounts.per.codes/sign-up" : "https://accounts.per.codes/sign-in");
+  if (!upgrade) destination.searchParams.set("redirect_url", "https://per.codes/workspace?clerk_return=1");
   link.href = destination.href;
-  link.textContent = upgrade ? "Get Pro on permitext.com" : mode === "signUp" ? "Create account on permitext.com" : "Sign in on permitext.com";
+  link.textContent = upgrade ? "Get Pro on per.codes" : mode === "signUp" ? "Create account on per.codes" : "Sign in on per.codes";
   link.hidden = false;
   panel.classList.add("has-hosted-auth-fallback");
-  panel.querySelector(".account-welcome-status").textContent = "Continue on permitext.com to access your account. This local preview will stay open.";
+  panel.querySelector(".account-welcome-status").textContent = "Continue on per.codes to access your account. This local preview will stay open.";
   return true;
 }
 
@@ -41885,7 +41885,7 @@ function renderAccountWelcome(dialog) {
   const panel = document.createElement("section");
   panel.className = "account-welcome";
   panel.innerHTML = `
-    <p class="account-welcome-brand">permitext</p>
+    <p class="account-welcome-brand">per codes</p>
     <h1>Your account, your workspace.</h1>
     <p>Read and search for free.<br>Saving, Projects, and Research require Pro.</p>
     <div class="account-welcome-actions">
@@ -48841,7 +48841,7 @@ function renderCodeMemoVersionsBody(project, questionID) {
     item.innerHTML = `<strong>Issued Record v${escapeHTML(String(record.issueVersion))} · ${escapeHTML(status.state)}</strong><p>${escapeHTML(record.issuedAt)} · ${escapeHTML(record.manifestHash)}</p>${status.successorID ? `<p>Superseded by ${escapeHTML(status.successorID)} · ${escapeHTML(status.reason)}</p>` : ""}`;
     const downloads = document.createElement("div");
     downloads.className = "code-memo-downloads";
-    const safe = `Permitext-Code-Memo-${context.question.displayID || context.qid}-v${record.issueVersion}`.replace(/[^a-z0-9-]+/gi, "-");
+    const safe = `per-codes-Code-Memo-${context.question.displayID || context.qid}-v${record.issueVersion}`.replace(/[^a-z0-9-]+/gi, "-");
     const json = document.createElement("button");
     json.type = "button";
     json.textContent = "Download structured manifest";

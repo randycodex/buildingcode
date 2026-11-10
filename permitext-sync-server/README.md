@@ -1,6 +1,6 @@
-# Permitext Sync Server
+# per codes Sync Server
 
-Backend service for Permitext's iPhone and web account, sync, Research, billing,
+Backend service for per codes’ iPhone and web account, sync, Research, billing,
 organization, and private-file contracts.
 
 It now supports two runtime shapes:
@@ -65,6 +65,9 @@ node server.mjs
 The web app uses Sign in with Apple JS when `APPLE_SERVICE_ID` is configured. During the domain transition, Apple Developer should allow both the new canonical domain/return URL and the legacy pair until installed apps and existing sessions have migrated:
 
 ```text
+Domain: per.codes
+Return URL: https://per.codes/account/apple/callback
+
 Domain: permitext.com
 Return URL: https://permitext.com/account/apple/callback
 
@@ -72,7 +75,7 @@ Domain: permitext-sync.vercel.app
 Return URL: https://permitext-sync.vercel.app/account/apple/callback
 ```
 
-`permitext.com` is attached to the production Vercel deployment and is the
+`per.codes` is attached to the production Vercel deployment and is the
 canonical public/share-link host. The native backend base remains
 `permitext-sync.vercel.app` during the staged identity migration. Verify AASA
 and installed-app universal links, the Apple Service ID return URL, account
@@ -94,7 +97,7 @@ The HTTP perimeter rejects request bodies larger than 1 MiB by default. `PERMITE
 
 Configured account, billing, Research, organization, owner, admin, sync, and private-file routes return HTTP `429` with `Retry-After` when a fixed-window burst limit is exceeded. PostgreSQL deployments increment hashed client, verified account, and verified administrator buckets atomically, so limits are shared across Node/Vercel instances. PostgreSQL limiter errors fail closed with HTTP `503`; the server never silently downgrades a configured PostgreSQL deployment to process-local enforcement.
 
-Pro includes 100 successful selected-evidence Research turns per UTC calendar month. A user question or follow-up consumes one turn only when Permitext saves the model-backed answer; canceled, failed, and idempotently replayed requests do not consume another turn. When paid continuation is enabled, non-expiring purchased turns are shared through the Permitext account and are used only after the monthly included turns. Request tokens, provider prices, and internal spend ceilings remain private and are available only in the owner-authenticated `/admin/` console under **Research spend** (`/internal/` remains a compatibility URL); hosted access requires the signed-in user ID to be listed in `PERMITEXT_INTERNAL_OWNER_USER_IDS`.
+Pro includes 100 successful selected-evidence Research turns per UTC calendar month. A user question or follow-up consumes one turn only when per codes saves the model-backed answer; canceled, failed, and idempotently replayed requests do not consume another turn. When paid continuation is enabled, non-expiring purchased turns are shared through the per codes account and are used only after the monthly included turns. Request tokens, provider prices, and internal spend ceilings remain private and are available only in the owner-authenticated `/admin/` console under **Research spend** (`/internal/` remains a compatibility URL); hosted access requires the signed-in user ID to be listed in `PERMITEXT_INTERNAL_OWNER_USER_IDS`.
 
 Paid continuation is fail-open until its provider catalog is complete: `PERMITEXT_RESEARCH_PAID_TURNS_ENABLED=1` activates customer enforcement, `STRIPE_RESEARCH_TURNS_25_PRICE_ID` and `STRIPE_RESEARCH_TURNS_100_PRICE_ID` enable the corresponding web packs, and `STOREKIT_RESEARCH_TURNS_25_PRODUCT_ID` and `STOREKIT_RESEARCH_TURNS_100_PRODUCT_ID` configure the iOS consumables. With the feature flag off, Research continues after the included counter instead of exposing an unfinished purchase path. Pack sizes and provider prices are server-owned and must never be accepted from a client request.
 
@@ -129,10 +132,10 @@ iPhone and web search both use the shipped `prepared/searchIndex.json` token map
 Canonical sections have a shared URL contract:
 
 ```text
-https://permitext.com/open/section/<canonical-section-id>
+https://per.codes/open/section/<canonical-section-id>
 ```
 
-The same URL loads the section-detail workspace in a browser and opens `ReaderView` in the installed iPhone app. The previous `https://permitext-sync.vercel.app/open/section/<canonical-section-id>` route remains compatible during the domain transition, but web share controls generate `permitext.com` links. The AASA response advertises `/open/section/*`, and the iOS target includes the associated domains. Opening a section on web replaces the current address with its shared route, and reader/detail share controls use the native share sheet when available with clipboard fallback. Private workspace state is never serialized into the link.
+The same URL loads the section-detail workspace in a browser and opens `ReaderView` in the installed iPhone app. The previous `https://permitext-sync.vercel.app/open/section/<canonical-section-id>` route remains compatible during the domain transition, but web share controls generate `per.codes` links. The AASA response advertises `/open/section/*`, and the iOS target includes the associated domains. Opening a section on web replaces the current address with its shared route, and reader/detail share controls use the native share sheet when available with clipboard fallback. Private workspace state is never serialized into the link.
 
 Signed-in web readers also publish the shared `continuity` record after chapter or section navigation and restore only a newer server record. Web updates preserve continuity values owned by iPhone, merge the canonical section into recent history, use the same Swift reference-date encoding, and stay in the durable outbox on network failure. A pending local continuity mutation prevents remote state from overwriting it; choosing the server copy during conflict resolution clears the local continuity checkpoint before pulling again.
 
@@ -187,7 +190,7 @@ Configure `PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS`,
 `PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS`,
 `PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS`, and
 `PERMITEXT_RESEARCH_FAST_PRICING_VERSION` to keep mixed-model cost telemetry
-accurate. If these are absent, Permitext deliberately uses the accurate-model
+accurate. If these are absent, per codes deliberately uses the accurate-model
 rates as a conservative estimate.
 
 For persistent localhost Research on macOS, store the server-only key in the login Keychain with service name `permitext-openai-api-key`, then run:
@@ -248,7 +251,7 @@ npm run eval:research
 
 The preflight intentionally blocks a live run when a section is missing, mapped to the wrong body, or missing required table text. Add or revise cases only in the dataset; the runner discovers every case and rubric item without case-specific code. See `evals/README.md` for the field contract and change process.
 
-After explicit spending approval, a full five-case run makes ten paid model requests: five Permitext answers plus five structured scoring calls. It requires an API key, the paid-run interlock, and explicit versioned token prices so cost scoring is reliable:
+After explicit spending approval, a full five-case run makes ten paid model requests: five per codes answers plus five structured scoring calls. It requires an API key, the paid-run interlock, and explicit versioned token prices so cost scoring is reliable:
 
 ```sh
 PERMITEXT_RUN_PAID_RESEARCH_EVALS=1 \
@@ -286,7 +289,7 @@ node server.mjs
 
 Production checkout requires a live Stripe secret (`sk_live_...`) and a live recurring Price. The server rejects test credentials and test-mode webhook events when `VERCEL_ENV=production` or `PERMITEXT_REQUIRE_LIVE_STRIPE=1`, so a `cs_test_...` session can never appear to be a real purchase. Stripe uses different webhook signing secrets for test and live mode; configure the live endpoint at `https://permitext-sync.vercel.app/billing/stripe/webhook`.
 
-Stripe Checkout creates the web subscription session, and the successful return path plus signed Stripe webhook events grant or revoke the shared backend entitlement. Apple Pro access is granted only after the iOS app sends an App Store-signed StoreKit transaction JWS to the backend. Production requires the configured bundle ID and App Store root fingerprints, and accepts only App Store production transactions. Xcode StoreKit purchases remain device-only, while App Store Sandbox and TestFlight transactions may synchronize only through a non-production backend configured for billing tests. Apple original transaction IDs are permanently bound to the first Permitext account that verifies them, preventing one purchase from being replayed across accounts.
+Stripe Checkout creates the web subscription session, and the successful return path plus signed Stripe webhook events grant or revoke the shared backend entitlement. Apple Pro access is granted only after the iOS app sends an App Store-signed StoreKit transaction JWS to the backend. Production requires the configured bundle ID and App Store root fingerprints, and accepts only App Store production transactions. Xcode StoreKit purchases remain device-only, while App Store Sandbox and TestFlight transactions may synchronize only through a non-production backend configured for billing tests. Apple original transaction IDs are permanently bound to the first per codes account that verifies them, preventing one purchase from being replayed across accounts.
 
 Production web Checkout also fails closed until Stripe tax presentation is explicit. Set `PERMITEXT_STRIPE_TAX_MODE=automatic` only after the required registrations and Product tax code have been reviewed, then set `PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=inclusive` or `exclusive` to match the resolved live Stripe Price behavior. A configured Checkout requests Stripe automatic tax and requires a billing address. The build-time live audit treats Stripe's documented USD `Default (inferred by currency)` behavior as exclusive; the environment variables do not create or prove a tax registration.
 

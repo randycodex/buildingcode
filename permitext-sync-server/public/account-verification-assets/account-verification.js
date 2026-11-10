@@ -13776,7 +13776,7 @@ j(({ clerk: e, children: t, ...n }) => {
 function Ta(e, t) {
 	let n = t?.user, r = t?.session;
 	if (e?.authProvider !== "clerk" || !n?.id || e.userID !== `clerk:${n.id}` || !r?.id || typeof n.delete != "function") throw Error("The original sign-in identity is unavailable. Sign in to that identity before deleting the account.");
-	if (n.deleteSelfEnabled === !1) throw Error("This sign-in identity cannot be deleted here. Contact support before deleting Permitext data.");
+	if (n.deleteSelfEnabled === !1) throw Error("This sign-in identity cannot be deleted here. Contact support before deleting per codes data.");
 	return {
 		clerk: t,
 		userID: n.id,

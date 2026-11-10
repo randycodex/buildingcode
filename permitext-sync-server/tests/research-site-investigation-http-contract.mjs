@@ -1,3 +1,4 @@
+// This structured provider fixture exercises verified mode explicitly; the default fast stream has a different wire format.
 // --live runs one isolated, bounded real-provider acceptance; default is offline.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
@@ -130,7 +131,7 @@ try {
   const created = await request("/research/conversations/create", { auth, projectID }, token);
   assert.equal(created.status, 201);
   const question = "based on the project address, is this a corner lot site?";
-  const response = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question, requestID: randomUUID() }, token);
+  const response = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question, answerMode: "verified", requestID: randomUUID() }, token);
   await writeFile(join(temporary, "result.json"), JSON.stringify({ live, calls, ...response }, null, 2));
   if (providerError) throw providerError;
   assert.equal(response.status, 200, JSON.stringify(response.body));

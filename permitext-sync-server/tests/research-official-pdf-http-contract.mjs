@@ -1,3 +1,4 @@
+// This structured provider fixture exercises verified mode explicitly; the default fast stream has a different wire format.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { randomUUID } from "node:crypto";
@@ -377,7 +378,7 @@ try {
   const auth = { accountUserID: account.appUserID };
   const ask = async () => {
     const created = await request("/research/conversations/create", { auth }, account.backendSessionToken);
-    return request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question, requestID: randomUUID() }, account.backendSessionToken);
+    return request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question, answerMode: "verified", requestID: randomUUID() }, account.backendSessionToken);
   };
   const response = await ask();
   assert.equal(response.status, 200, JSON.stringify(response.body));

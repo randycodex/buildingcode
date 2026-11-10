@@ -48012,7 +48012,7 @@ function PG(e) {
 		props: {
 			referenceKind: String(e.attrs?.referenceKind || ""),
 			referenceID: String(e.attrs?.referenceID || ""),
-			label: String(e.attrs?.label || "Linked Permitext item")
+			label: String(e.attrs?.label || "Linked per codes item")
 		}
 	} : null;
 }
@@ -48101,7 +48101,7 @@ var UG = mF({
 			values: [...AG]
 		},
 		referenceID: { default: "" },
-		label: { default: "Linked Permitext item" }
+		label: { default: "Linked per codes item" }
 	},
 	content: "none"
 }, {

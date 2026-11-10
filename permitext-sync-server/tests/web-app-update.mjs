@@ -18,9 +18,9 @@ function harness() {
  h.notice().children[1].events.click();h.controller.observe('next');assert.equal(h.notice().hidden,true,'Version checks do not reopen a dismissed error');assert.equal(h.button.hidden,false);
  h.setReady(true);assert.equal(await h.controller.reload(),true);assert.deepEqual(h.counts(),{activations:1,reloads:1});
 }
-for(const error of [Object.assign(Error('Close other Permitext tabs, then try again.'),{code:'OTHER_TABS'}),Error('Technical browser error')]) {
+for(const error of [Object.assign(Error('Close other per codes tabs, then try again.'),{code:'OTHER_TABS'}),Error('Technical browser error')]) {
  const h=harness();h.controller.observe('next');h.setFailure(error);assert.equal(await h.controller.reload(),false);assert.equal(h.body.inert,false);assert.equal(h.counts().reloads,0);
- assert.equal(h.notice().children[0].textContent,error.code==='OTHER_TABS'?error.message:'Couldn’t update Permitext. Try again.');assert.equal(h.button.disabled,false);
+ assert.equal(h.notice().children[0].textContent,error.code==='OTHER_TABS'?error.message:'Couldn’t update per codes. Try again.');assert.equal(h.button.disabled,false);
 }
 {
  const h=harness();let finish;h.setReady(new Promise(resolve=>finish=resolve));h.controller.observe('next');
@@ -33,7 +33,7 @@ for(const otherTabs of [false,true]) {
  const listeners=new Set();let checks=0;
  const worker={state:'installed',addEventListener:(name,fn)=>listeners.add(fn),removeEventListener:(name,fn)=>listeners.delete(fn),postMessage(message,ports){assert.equal(message.type,'PERMITEXT_ACTIVATE_UPDATE');ports[0].postMessage({ready:!otherTabs,reason:'other-tabs'});if(!otherTabs){this.state='activated';listeners.forEach(fn=>fn());}}};
  const pending=activateWebAppUpdate({serviceWorker:{getRegistration:async()=>({waiting:worker,update:async()=>checks++})},MessageChannelClass:Channel,timeoutMS:30});
- if(otherTabs)await assert.rejects(pending,/Close other Permitext tabs/);else await pending;
+ if(otherTabs)await assert.rejects(pending,/Close other per codes tabs/);else await pending;
  assert.equal(checks,1);
 }
 // Run the actual worker message handler, including the multi-tab refusal.

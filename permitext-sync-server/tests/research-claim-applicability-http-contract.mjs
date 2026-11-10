@@ -1,3 +1,4 @@
+// Structured scope-review fixtures exercise verified mode, independently of the default fast response stream.
 // Fictional user-supplied clause, never a code fixture or frozen acceptance
 // case. Intercepted ordinary scope verdicts exercise writer -> one bounded
 // revision -> full ordinary re-review -> persistence. No semantic proof claim.
@@ -84,7 +85,7 @@ try {
     phases = []; packets = []; writerCount = 0; providerError = null;
     const created = await request("/research/conversations/create", { auth }, token), conversationID = created.body.conversation.id;
     const requestID = randomUUID();
-    const result = await request("/research/conversations/message", { auth, conversationID, question, requestID }, token);
+    const result = await request("/research/conversations/message", { auth, conversationID, question, requestID, answerMode: "verified" }, token);
     if (providerError) throw providerError;
     assert.equal(result.status, 200, JSON.stringify(result.body));
     assert.deepEqual(phases, ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]);

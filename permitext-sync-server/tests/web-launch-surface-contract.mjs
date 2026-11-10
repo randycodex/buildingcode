@@ -75,11 +75,11 @@ assert.equal(favicon.readUInt16LE(2), 1);
 assert((await stat(new URL("favicon.ico", publicRoot))).size <= 12_000);
 
 const analyticsTag = /<script src="\/web\/analytics\.js\?v=20260918-privacy-analytics-v1" type="module"><\/script>/;
-for (const fileName of ["index.html", "privacy.html", "support.html", "404.html"]) {
+for (const fileName of ["home.html", "index.html", "support.html", "404.html"]) {
   const html = await readFile(new URL(fileName, publicRoot), "utf8");
   assert.match(html, analyticsTag, `${fileName} must load the privacy-safe page-view analytics bundle.`);
 }
-for (const fileName of ["terms.html", "refunds.html"]) {
+for (const fileName of ["privacy.html", "terms.html", "refunds.html"]) {
   const html = await readFile(new URL(fileName, publicRoot), "utf8");
   assert.doesNotMatch(html, /analytics\.js/, `${fileName} must remain byte-stable as an approved policy artifact.`);
 }

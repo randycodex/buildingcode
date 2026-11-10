@@ -4047,7 +4047,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 options: .regularExpression
             )
             .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
-        let fileName = safeName.isEmpty ? "Permitext-Project-Report" : String(safeName.prefix(80))
+        let fileName = safeName.isEmpty ? "per-codes-Project-Report" : String(safeName.prefix(80))
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("\(fileName)-\(file.format).pdf")
         try data.write(to: url, options: .atomic)
@@ -5737,7 +5737,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 do {
                     try await Clerk.clearAllKeychainItemsAndWait()
                 } catch {
-                    let message = "Signed out of Permitext. The previous provider session could not be cleared; reconnect and try again before signing into another account."
+                    let message = "Signed out of per codes. The previous provider session could not be cleared; reconnect and try again before signing into another account."
                     accountAuthenticationMessage = message
                     statusMessage = message
                     Self.accountAuthenticationLogger.error(

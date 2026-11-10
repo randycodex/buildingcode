@@ -20,7 +20,7 @@ assert.deepEqual(
   {
     claims: ["Same claim."],
     authorityStatement: "Official supporting guidance — noncontrolling and not an enacted-code conclusion.",
-    enactedBoundary: "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below.",
+    enactedBoundary: "The assembled enacted evidence did not establish the requested rule; per codes is reporting only the exact official supporting guidance attributed below.",
     explanation: "- Same claim.",
     answerText: "Official supporting guidance — noncontrolling and not an enacted-code conclusion.\n\n- Same claim."
   }
