@@ -60,23 +60,23 @@ try {
   assert.ok(resized.width>listBounds.width+40,'The middle/editor divider increases the list width.');
   assert.ok((await selected.boundingBox()).width<editorBounds.width-40,'The editor shares the resize.');
   assert.ok(Math.abs((await evidence.boundingBox()).width-evidenceBounds.width)<2,'Resizing the list keeps Evidence in place.');
-  await index.getByRole('button',{name:'Collapse Notes',exact:true}).click();
-  await index.locator('.pane-collapsed-tab').waitFor();
-  assert.ok((await index.boundingBox()).width<=50);
-  assert.match(await editor.innerText(),/Notebook draft retention check/);
-  await index.locator('.pane-collapsed-tab').click();
+  for (const panel of [evidence,index,selected]) {
+    await panel.locator('.panel-kind').first().click();
+    assert.equal(await panel.evaluate(node=>node.classList.contains('is-collapsed')),false);
+    assert.equal(await panel.locator(':scope > header').getByRole('button',{name:/^(Collapse|Expand) /}).count(),0);
+  }
+  assert.equal(await page.getByRole('button',{name:'Collapse all',exact:true}).isVisible(),false);
+  assert.equal(await page.getByRole('button',{name:'Expand all',exact:true}).isVisible(),false);
   assert.ok(Math.abs((await index.boundingBox()).width-resized.width)<2);
+  assert.match(await editor.innerText(),/Notebook draft retention check/);
   if (process.env.PERMITEXT_UX_SCREENSHOT) await page.screenshot({path:process.env.PERMITEXT_UX_SCREENSHOT});
   await page.getByRole('button',{name:'Research',exact:true}).click();
   await page.getByRole('button',{name:'Notebook',exact:true}).click();
   assert.equal(await editor.evaluate((node,retained)=>node===retained,editorNode),true);
-  await index.getByRole('button',{name:'Collapse Notes',exact:true}).click();
   await page.reload();
-  await index.locator('.pane-collapsed-tab').waitFor();
-  assert.ok((await index.boundingBox()).width<=50,'Collapsed list survives refresh.');
   await selected.locator('.bn-editor').waitFor();
+  assert.equal(await page.locator('.workspace-panel.is-collapsed:visible').count(),0);
   assert.match(await selected.locator('.bn-editor').innerText(),/Notebook draft retention check/);
-  await index.locator('.pane-collapsed-tab').click();
   assert.equal(await list.locator('[aria-current=true]').innerText(),'Synthetic Note 1');
   assert.ok(Math.abs((await index.boundingBox()).width-resized.width)<2,'Resized list width survives refresh.');
   await list.getByRole('button',{name:'New note',exact:true}).click();
@@ -86,5 +86,5 @@ try {
   await list.getByRole('button',{name:'Synthetic Note 1',exact:true}).click();
   assert.match(await selected.locator('.bn-editor').innerText(),/Notebook draft retention check/);
   assert.deepEqual(errors,[]);
-  console.log('Notebook desk passed: Evidence/list/editor order, selected note, retained editor/draft, independent collapse/restore, shared divider drag, persisted width/selection/collapse, working-view return and new-note action.');
+  console.log('Notebook desk passed: Evidence/list/editor order, selected note, retained editor/draft, noncollapsing columns, shared divider drag, persisted width/selection, working-view return and new-note action.');
 } finally {await browser.close();}

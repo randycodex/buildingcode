@@ -27,28 +27,52 @@ const context=vm.createContext({state,isProAccount:()=>pro,currentColumnWorkflow
   saveWorkspaceState(){saves++;},notifyWorkspaceLayoutChange(){}});
 vm.runInContext(['paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','paneIsCollapsed',
   'applyPaneCollapsedState','setPaneCollapsed','setAllColumnsCollapsed'].map(actual).join('\n'),context);
-assert.equal(context.paneCanCollapse(ids[3]),true);
-const editor=panels[2],index=panels[3];
-context.setPaneCollapsed(index,true);
-assert.equal(context.paneIsCollapsed(ids[3]),true);
-assert.equal(index.classList.contains('is-collapsed'),true);
-assert.equal(context.paneIsCollapsed(editor.dataset.paneId),false,'Collapsing the list leaves its editor open.');
-assert.equal(saves,1);
-context.setPaneCollapsed(index,false);
-assert.equal(context.paneIsCollapsed(ids[3]),false);
-assert.equal(context.paneCanCollapse(ids[4]),false);
-context.setPaneCollapsed(panels[4],true);
-assert.equal(context.paneIsCollapsed(ids[4]),false);
+for (const panel of panels) {
+  assert.equal(context.paneCanCollapse(panel.dataset.paneId),false);
+  context.setPaneCollapsed(panel,true);
+  assert.equal(context.paneIsCollapsed(panel.dataset.paneId),false);
+}
 context.setAllColumnsCollapsed(true);
-assert.ok(ids.slice(0,4).every(id=>context.paneIsCollapsed(id)));
-context.setAllColumnsCollapsed(false);
+assert.equal(saves,0,'Notebook collapse actions do not change persisted layout.');
 assert.deepEqual(Array.from(state.collapsedPaneIDs),[]);
+state.collapsedPaneIDs=[...ids];
+for (const panel of panels) {
+  panel.classList.toggle('is-collapsed',true);
+  context.applyPaneCollapsedState(panel);
+  assert.equal(panel.classList.contains('is-collapsed'),false,'Remembered collapsed columns expand in Notebook.');
+}
+context.setAllColumnsCollapsed(false);
+assert.deepEqual(Array.from(state.collapsedPaneIDs),ids,'Notebook preserves collapse choices for other views.');
 const mixed={paneIDs:[ids[3],ids[4]],collapsed:true};
 assert.equal(context.columnGroupCanCollapse(mixed),false);
 hidden.add(ids[4]);
-assert.equal(context.columnGroupCanCollapse(mixed),true);
+assert.equal(context.columnGroupCanCollapse(mixed),false);
 view='research';
-assert.equal(context.paneCanCollapse(ids[4]),true);
+assert.equal(context.columnGroupCanCollapse(mixed),true);
+assert.ok(ids.every(id=>context.paneIsCollapsed(id)),'Research retains its remembered collapsed layout.');
+context.setAllColumnsCollapsed(false);
+assert.ok(ids.slice(0,4).every(id=>!context.paneIsCollapsed(id)));
+context.setPaneCollapsed(panels[0],true);
+assert.equal(context.paneIsCollapsed(ids[0]),true);
 pro=false;
 assert.equal(context.paneCanCollapse(ids[0]),false);
-console.log('Notebook collapse passed: list/editor independence, restore, saved state, supported tools, bulk controls and cross-view guards.');
+// A Reader linked into Notebook must lose its separate collapse-title button.
+let readerTitle;
+const titleNode = tag => ({tagName:tag.toUpperCase(),attrs:{},
+  setAttribute(name,value){this.attrs[name]=value;},addEventListener(){},
+  replaceWith(node){readerTitle=node;}});
+readerTitle=titleNode('button');
+Object.assign(context,{document:{createElement:titleNode},
+  readerCodeOptionLabel:()=> '2022 BC',codeOptionFor:()=> ({}),
+  sectionDisplayTitle:()=> 'Reader'});
+vm.runInContext(actual('updateReaderLocationTitle'),context);
+const readerPanel={dataset:{paneId:ids[0]},querySelector:()=>readerTitle};
+pro=true;view='notebook';
+context.updateReaderLocationTitle(readerPanel,{});
+assert.equal(readerTitle.tagName,'SPAN');
+assert.doesNotMatch(readerTitle.attrs['aria-label'],/Collapse/);
+view='research';
+context.updateReaderLocationTitle(readerPanel,{});
+assert.equal(readerTitle.tagName,'BUTTON');
+assert.match(readerTitle.attrs['aria-label'],/^Collapse /);
+console.log('Notebook stays expanded: individual/bulk actions, saved collapse recovery, groups and retained Research collapse behavior passed.');

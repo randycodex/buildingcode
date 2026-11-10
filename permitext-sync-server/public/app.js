@@ -7,7 +7,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-notebook-desk-v1623";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261109-notebook-expanded-v1625";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=2";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -159,7 +159,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261109-notebook-desk-v1623";
+} from "./offline-storage.js?v=20261109-notebook-expanded-v1625";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2751,8 +2751,9 @@ function updateWorkspaceLayoutControls() {
   fitColumnsButton.hidden = false;
   fitColumnsButton.disabled = inReport ? !reportReady : !hasColumns;
   fitColumnsButton.title = inReport ? "Restore default Report column widths" : "Restore default panel widths";
+  const collapseUnavailable = inReport || currentColumnWorkflowView() === "notebook";
   document.querySelectorAll("#collapse-all-columns, #expand-all-columns")
-    .forEach(button => { button.hidden = inReport; button.disabled = inReport || !hasColumns; });
+    .forEach(button => { button.hidden = collapseUnavailable; button.disabled = collapseUnavailable || !hasColumns; });
 }
 
 function normalizeProjectIdentities(value, legacyWorkboard = null) {
@@ -8116,7 +8117,7 @@ function setTitle(panel, reader) {
 function updateReaderLocationTitle(panel, reader) {
   let button = panel.querySelector(".reader-collapse-title");
   if (!button) return;
-  const collapsible = isProAccount();
+  const collapsible = paneCanCollapse(panel.dataset.paneId);
   if (button.tagName !== (collapsible ? "BUTTON" : "SPAN")) {
     const title = document.createElement(collapsible ? "button" : "span");
     title.className = "reader-collapse-title";
@@ -43801,7 +43802,7 @@ function bindPaneDragging(panes) {
   panes.forEach((pane) => {
     const header = pane.querySelector(":scope > header");
     if (pane.classList.contains('notebook-index-panel')) {
-      if (header) header.title = 'Click title to collapse';
+      if (header) header.removeAttribute('title');
       return;
     }
     if (header) {
@@ -44796,13 +44797,11 @@ function openColumnGroupEditor(panel, existing = null) {
 // Collapse keeps the live column DOM (including unsaved editors) in place.
 function paneCanCollapse(paneID) {
   if (paneID.startsWith("reader:") && !isProAccount()) return false;
-  return currentColumnWorkflowView() !== "notebook" || /^(?:reader:|project:(?:notebook|notes-index):|utility:saved(?::|$))/.test(paneID);
+  return currentColumnWorkflowView() !== "notebook";
 }
 
 function columnGroupCanCollapse(group) {
-  if (currentColumnWorkflowView() !== "notebook") return true;
-  const visibleIDs = group.paneIDs.filter(workflowPaneIsVisible);
-  return visibleIDs.length > 0 && visibleIDs.every(paneCanCollapse);
+  return currentColumnWorkflowView() !== "notebook";
 }
 
 function columnGroupIsCollapsed(group) {
@@ -44840,9 +44839,9 @@ function applyPaneCollapsedState(panel) {
 }
 
 function setPaneCollapsed(panel, collapsed, { focus = false } = {}) {
-  workspaceColumnExpansion?.restore();
   const paneID = panel.dataset.paneId;
   if (!paneCanCollapse(paneID)) return;
+  workspaceColumnExpansion?.restore();
   const group = columnGroupForPane(paneID);
   if (!collapsed && columnGroupIsCollapsed(group)) setColumnGroupCollapsed(group, false);
   const startWidth = panel.getBoundingClientRect().width;

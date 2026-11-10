@@ -79,7 +79,7 @@ function eventNode() {
 }
 const grip = eventNode(), collapsedTab = eventNode(), dragPane = eventNode();
 dragPane.dataset.paneId = 'reader:drag';
-dragPane.classList = { add() {}, remove() {} };
+dragPane.classList = { add() {}, remove() {}, contains() { return false; } };
 dragPane.querySelector = () => grip;
 grip.classList = { add() {} };
 dragPane.querySelectorAll = () => [grip, collapsedTab];
@@ -367,10 +367,10 @@ assert.equal(expandedPanel,menuPanel);assert.equal(menuPanel.editor,retainedEdit
 menuContext.openColumnGroupMenu(menuPanel,anchor);assert.equal(menuItems()[0].textContent,'Restore width');menuItems()[0].listeners.click();assert.equal(expandedPanel,null);
 menuContext.currentColumnWorkflowView=()=> 'notebook';
 menuPanel.dataset.paneId='utility:saved:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert(menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Evidence menus offer collapse.');
+assert(!menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Evidence menus do not offer collapse.');
 assert(menu.children.some(item=>item.textContent==='Expand'), 'Notebook Evidence retains the shared expansion control.');
 menuPanel.dataset.paneId='reader:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert(menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Reader menus retain collapse.');
+assert(!menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Reader menus do not offer collapse.');
 menuContext.currentColumnWorkflowView=()=> 'research';
 menuReader=true;
 menuContext.openColumnGroupMenu(menuPanel,anchor);
@@ -424,8 +424,9 @@ console.log('Code Decisions legacy anchors disable only affected move units/targ
 
 const notebookCollapseContext=vm.createContext({currentColumnWorkflowView:()=> 'notebook',isProAccount:()=>true});
 vm.runInContext(actual('paneCanCollapse'),notebookCollapseContext);
-assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project:note:a'),true);
-assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project'),true);
-assert.equal(notebookCollapseContext.paneCanCollapse('reader:a'),true);
-assert.equal(notebookCollapseContext.paneCanCollapse('utility:saved:a'),true,'Pinned Notebook Evidence can collapse.');
-console.log('Notebook Note columns can collapse independently, including primary and additional Notes.');
+assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project:note:a'),false);
+assert.equal(notebookCollapseContext.paneCanCollapse('project:notebook:project'),false);
+assert.equal(notebookCollapseContext.paneCanCollapse('project:notes-index:project'),false);
+assert.equal(notebookCollapseContext.paneCanCollapse('reader:a'),false);
+assert.equal(notebookCollapseContext.paneCanCollapse('utility:saved:a'),false,'Notebook Evidence stays expanded.');
+console.log('All Notebook columns stay expanded, including Evidence, Readers, the Notes list and editor.');

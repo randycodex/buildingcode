@@ -1294,10 +1294,6 @@ textarea:focus-visible {
   justify-content: space-between;
 }
 
-.notebook-index-panel :is([data-collapse-title-bound="true"], .pane-collapsed-tab) {
-  cursor: pointer;
-}
-
 .notebook-index-body {
   min-height: 0;
   flex: 1;
@@ -19421,8 +19417,8 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
   padding-block: 0;
 }
 
-.pane-header-drag-area [data-collapse-title-bound="true"] { cursor: pointer; }
-.pane-header-drag-area [data-collapse-title-bound="true"]:focus-visible {
+.pane-header-drag-area [data-collapse-title-bound="true"][role="button"] { cursor: pointer; }
+.pane-header-drag-area [data-collapse-title-bound="true"][role="button"]:focus-visible {
   outline: none;
   border-radius: 2px;
   box-shadow: none;
@@ -21158,6 +21154,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workflow-toolbar > [data-workflow-tools] { min-width: 0; }
 .workflow-toolbar > .workflow-layout-actions { margin-inline-start: auto; flex: 0 0 auto; gap: 2px; padding-inline-start: 12px; }
 .workflow-layout-actions > .toolbar-button { width: 30px; flex: 0 0 30px; padding: 0; }
+.workflow-layout-actions > .toolbar-button[hidden] { display: none; }
 .workflow-layout-actions > .toolbar-button:disabled { opacity: .35; cursor: default; }
 
 .report-note-update-status { padding: 3px 8px; border-radius: var(--radius-pill); background: var(--toolbar-active); color: var(--text-primary); font-size: 11px; }
