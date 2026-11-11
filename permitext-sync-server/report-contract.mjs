@@ -3,6 +3,7 @@ import { normalizeNotebookEvidenceLinks, validateNotebookDocument, notebookPlain
 import { normalizedResearchProjectStructuredFacts, projectFactProjectionVersion } from "./project-fact-projection.mjs";
 import { normalizeReportRuns } from "./public/report-rich-text.js";
 import { normalizeSourceFormatting } from "./public/report-source-formatting.js";
+import { tableDisplayCells } from "./public/notebook-content.js";
 
 export const reportDraftSchemaVersion = 1;
 export const reportDraftSchemaVersionV2 = 2;
@@ -401,7 +402,16 @@ function normalizeEvidenceManifestItem(item, base) {
       if (!Number.isInteger(headerRowCount) || headerRowCount < 0 || headerRowCount > table.rows.length) {
         throw new Error("Invalid Report table header rows.");
       }
-      return {text, rows: structuredClone(table.rows), headerRowCount};
+      let cellSpans;
+      if (table.cellSpans !== undefined) {
+        if (!Array.isArray(table.cellSpans) || table.cellSpans.length > 10_000) throw new Error('Invalid Report table cell spans.');
+        cellSpans=table.cellSpans.map(({row,column,rowSpan,colSpan})=>({row,column,rowSpan,colSpan}));
+        tableDisplayCells(table.rows,cellSpans);
+        for(const span of cellSpans)for(let r=span.row;r<span.row+span.rowSpan;r++)for(let c=span.column;c<span.column+span.colSpan;c++){
+          if(table.rows[r]?.[c]!==table.rows[span.row][span.column])throw new Error('Report table span does not match its source cells.');
+        }
+      }
+      return {text, rows: structuredClone(table.rows), headerRowCount,...(cellSpans?.length?{cellSpans}:{})};
     }) } : {}),
     passageTextHash: requiredText(item.passageTextHash, "Report evidence hash", 256),
     sourceLibraryVersion: requiredText(item.sourceLibraryVersion, "Report evidence source version", 1_024)

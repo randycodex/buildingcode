@@ -24,13 +24,13 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v2236";
+const shellCacheName = "permitext-pro-shell-v2237";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
-  "/web/notebook-content.js?v=3",
+  "/web/notebook-content.js?v=4",
   "/web/notebook-titles.js?v=1",
   "/web/project-details-columns.js?v=20261019-project-workflow-v2",
   "/web/workflow-views.js?v=14",
@@ -91,16 +91,16 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261110-per-codes-v1658",
+  "/web/web-client-version.js?v=20261111-workflow-fixes-v1659",
   "/web/web-app-update.js?v=20261110-per-codes-v3",
   "/web/research-delete-controls.js?v=10",
   "/web/assistant-composer-hint.js?v=1",
   "/web/research-related-provisions.js?v=3",
-  "/web/research-v2.js?v=21",
+  "/web/research-v2.js?v=22",
   "/web/research-answer-reveal.js?v=1",
   "/web/research-question-rail.js?v=2",
   "/web/research-reader-target.js?v=3",
-  "/web/research-discovery-query.js?v=2",
+  "/web/research-discovery-query.js?v=3",
   "/web/research-v2-rollout.js?v=2",
   "/web/research-v2.css?v=23",
   "/web/reader-shortcuts.js?v=2",
@@ -116,13 +116,13 @@ const shellURLs = [
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261110-per-codes-v1658",
+  "/web/app.js?v=20261111-workflow-fixes-v1659",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261110-per-codes-v1658",
+  "/web/offline-storage.js?v=20261111-workflow-fixes-v1659",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",
@@ -534,6 +534,23 @@ export async function retireRejectedNotebookQuestionSave(accountUserID, projectI
   }, "Could not retain the rejected Notebook metadata.", accountUserID);
 }
 
+export async function recordNotebookDraftSaveError(accountUserID, projectID, cardID, revision, message, {rejected = false} = {}) {
+  return withOfflineStore(notebookDraftsStoreName, "readwrite", async store => {
+    const key = notebookDraftKey(accountUserID, projectID, cardID);
+    const current = await requestResult(store.get(key), "Could not read the pending Notebook save.");
+    if (!draftMatches(current, accountUserID, projectID, cardID) || current.pendingSave?.revision !== revision) return current;
+    if (!rejected) {
+      const next = {...current,lastError:message}; store.put(next); return next;
+    }
+    // Only a server-confirmed validation rejection can retire a receipt. Keep
+    // its exact content in recovery; a timeout must replay the original bytes.
+    store.put({...current,key:`${key}:save-recovery:${revision}`,scope:"notebook-save-recovery",rejectedAt:new Date().toISOString()});
+    const {pendingSave: _rejected, ...content} = current;
+    const next = {...content,lastError:message,revision:current.revision === revision ? crypto.randomUUID() : current.revision};
+    store.put(next); return next;
+  }, "Could not retain the Notebook save error.", accountUserID);
+}
+
 export async function acknowledgeNotebookDraft(accountUserID, projectID, oldCardID, submittedRevision, savedCard) {
   if (!submittedRevision || !savedCard?.id || !Number.isSafeInteger(savedCard.version) || savedCard.version < 1) {
     throw new Error("Acknowledging a Notebook draft requires its submitted revision and saved card version.");
@@ -619,7 +636,7 @@ export async function rebaseNotebookDraftAfterReview(accountUserID, projectID, c
 export async function pendingNotebookDrafts(accountUserID) {
   return withOfflineStore(notebookDraftsStoreName, "readonly", async (store) =>
     (await requestResult(store.getAll(), "Could not read saved Notebook drafts."))
-      .filter((draft) => draft.accountUserID === accountUserID && draft.scope !== "notebook-question-recovery").map((draft) => ({ ...draft, scope: draftScope(draft) })),
+      .filter((draft) => draft.accountUserID === accountUserID && !["notebook-question-recovery","notebook-save-recovery"].includes(draft.scope)).map((draft) => ({ ...draft, scope: draftScope(draft) })),
   "Could not read saved Notebook drafts.", accountUserID);
 }
 

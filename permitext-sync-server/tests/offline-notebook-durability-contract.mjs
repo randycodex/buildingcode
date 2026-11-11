@@ -393,6 +393,7 @@ const syncContext = vm.createContext({
   notebookDraftSaveTitle: offline.notebookDraftSaveTitle,
   beginNotebookDraftSave: offline.beginNotebookDraftSave,
   retireRejectedNotebookQuestionSave: offline.retireRejectedNotebookQuestionSave,
+  recordNotebookDraftSaveError: offline.recordNotebookDraftSaveError,
   acknowledgeNotebookDraft: offline.acknowledgeNotebookDraft,
   saveNotebookCardSnapshot: offline.saveNotebookCardSnapshot,
   refreshNotebookPendingStatus: async () => {},
@@ -400,7 +401,7 @@ const syncContext = vm.createContext({
     submitted.push(structuredClone(body));
     if (failure) throw Object.assign(new Error('Uncertain request'),{status:failure});
     try { normalizeNotebookQuestions(body.openQuestions); }
-    catch(error) { throw Object.assign(error,{status:400}); }
+    catch(error) { throw Object.assign(error,{status:400,payload:{rejectedBeforeSave:true}}); }
     return {card:{...body,id:'question-card',version:body.expectedVersion+1,openQuestions:body.openQuestions ?? [corrected]}};
   }
 });
@@ -453,4 +454,21 @@ database.failPut = null;
 await syncQuestions(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'));
 assert.equal(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'),null);
 console.log('Simple Notes metadata compatibility passed: hidden drafts retained, question updates omitted, valid receipts replayed, uncertainty preserved, rejected legacy receipt recovered.');
+
+// A definitive pre-save rejection retains its exact receipt in recovery while
+// allowing the editor to correct and resubmit. A newer edit always wins.
+let rejectedDraft = await offline.saveNotebookDraft({...input(questionOwner,'style-card'),baseVersion:1});
+const rejectedReceipt = await offline.beginNotebookDraftSave(questionOwner,projectID,'style-card',rejectedDraft.revision);
+const newer = await offline.saveNotebookDraft({...rejectedDraft,expectedRevision:rejectedDraft.revision,title:'Newer edit'});
+await offline.recordNotebookDraftSaveError(questionOwner,projectID,'style-card',rejectedReceipt.revision,'Unsupported highlight',{rejected:true});
+const recovered = await offline.loadNotebookDraft(questionOwner,projectID,'style-card');
+assert.equal(recovered.title,'Newer edit');assert.equal(recovered.revision,newer.revision);
+assert.equal(recovered.pendingSave,undefined);
+assert((await offline.offlineAccountRecoverySnapshot(questionOwner)).drafts.some(record=>record.scope==='notebook-save-recovery'&&record.pendingSave.revision===rejectedReceipt.revision));
+assert.equal((await offline.pendingNotebookDrafts(questionOwner)).filter(record=>record.cardID==='style-card').length,1);
+const nextReceipt=await offline.beginNotebookDraftSave(questionOwner,projectID,'style-card',recovered.revision);
+assert.notEqual(nextReceipt.revision,rejectedReceipt.revision);
+await offline.recordNotebookDraftSaveError(questionOwner,projectID,'style-card',nextReceipt.revision,'Network interrupted');
+assert.deepEqual((await offline.loadNotebookDraft(questionOwner,projectID,'style-card')).pendingSave,nextReceipt,'Uncertain saves keep the exact replay receipt');
+console.log('Rejected style saves: original receipt archived, newer edits retained, retry renewed and uncertain receipt preserved.');
 }

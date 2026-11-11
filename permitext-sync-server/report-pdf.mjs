@@ -1,5 +1,5 @@
 import PDFDocument from "pdfkit";
-import { notebookTableDisplayData } from './public/notebook-content.js';
+import { notebookTableDisplayData, tableDisplayCells } from './public/notebook-content.js';
 
 // Source indentation is presentation whitespace, never a printed control glyph.
 const printableNoteText = value => String(value || '').replace(/\r\n?/g, '\n')
@@ -29,7 +29,7 @@ function drawNotebookContent(document, notebookDocument, material) {
       document.y = top + height + 8;
       if (block.props.caption) drawReportRichText(document, [{text:printableNoteText(block.props.caption)}], {size:9});
     } else if (block.type === 'table') {
-      const table = notebookTableDisplayData(block.content, {preserveInlineContent:true});
+      const table = notebookTableDisplayData(block.content, {preserveInlineContent:true,preserveCellSpans:true});
       table.rows = table.rows.map(row => row.map(noteRuns));
       drawReportRichTable(document, table, left, width, {headerBold:true});
       document.x = left; document.moveDown(0.7);
@@ -164,6 +164,10 @@ function drawList(document, title, values) {
 export function drawReportTable(document, table, startX, contentWidth) {
   const rows = table.rows || [];
   if (!rows.length) return;
+  if (table.cellSpans?.length) {
+    drawReportRichTable(document,{...table,rows:rows.map(row=>row.map(text=>[{text}]))},startX,contentWidth,{headerBold:true});
+    return;
+  }
   const columns = Math.max(...rows.map(row => row.length));
   const width = contentWidth / columns;
   const headers = rows.slice(0, table.headerRowCount || 0);
@@ -430,7 +434,7 @@ function hasSourceMarks(parts) {
 }
 function drawFormattedSourceTable(document,part,formatting,startX,contentWidth) {
   const rows = part.rows.map((row,r)=>row.map((text,c)=>sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text},formatting)));
-  drawReportRichTable(document, {rows,headerRowCount:part.headerRowCount || 0}, startX, contentWidth);
+  drawReportRichTable(document, {rows,headerRowCount:part.headerRowCount || 0,cellSpans:part.cellSpans}, startX, contentWidth);
 }
 
 // Measure and paint the same runs so cell marks and links survive wrapping,
@@ -442,24 +446,43 @@ export function drawReportRichTable(document, table, startX, contentWidth, {head
   const size = 8, lineHeight = 10.4;
   const runs = table.rows;
   const headers = table.headerRowCount || 0;
-  const heights = runs.map((row,r)=>Math.max(lineHeight,...row.map(cell=>drawReportRichText(document,cell,{size,bold:headerBold && r < headers,width:width-10,lineHeight,paragraphGap:0,measureOnly:true})))+12);
+  const cells=tableDisplayCells(runs,table.cellSpans || []);
+  const measure=cell=>drawReportRichText(document,cell.content || [],{size,bold:headerBold && cell.row<headers,width:width*cell.colSpan-10,lineHeight,paragraphGap:0,measureOnly:true})+12;
+  const heights=cells.map(row=>Math.max(lineHeight+12,...row.filter(cell=>cell && cell.rowSpan===1).map(measure)));
+  for(const cell of cells.flat().filter(cell=>cell && cell.rowSpan>1)){
+    if(cell.row<headers && cell.row+cell.rowSpan>headers)throw new Error('A Report table cell crosses the header boundary. Review its header rows before exporting.');
+    const existing=heights.slice(cell.row,cell.row+cell.rowSpan).reduce((sum,h)=>sum+h,0);
+    heights[cell.row+cell.rowSpan-1]+=Math.max(0,measure(cell)-existing);
+  }
+  const groupEnd=start=>{
+    let end=start+1;
+    for(let row=start;row<end;row++)for(const cell of cells[row] || [])if(cell)end=Math.max(end,cell.row+cell.rowSpan);
+    return end;
+  };
+  const sum=(start,end)=>heights.slice(start,end).reduce((a,b)=>a+b,0);
   let position = headers;
   while (position < runs.length || position === headers && position === runs.length) {
     const bottom = document.page.height-document.page.margins.bottom-2;
-    const headerHeight = heights.slice(0,headers).reduce((a,b)=>a+b,0);
-    if (document.y+headerHeight+(heights[position] || 0)>bottom) document.addPage();
+    const headerHeight = sum(0,headers), nextEnd=position<runs.length?groupEnd(position):position;
+    if(headerHeight+sum(position,nextEnd)>bottom-document.page.margins.top)throw new Error('A Report table row group is too tall for a PDF page. Split it into a smaller table before exporting.');
+    if (document.y+headerHeight+sum(position,nextEnd)>bottom) document.addPage();
     const indices = Array.from({length:headers},(_,i)=>i); let height = headerHeight;
-    while (position < runs.length && document.y+height+heights[position]<=bottom) {indices.push(position); height+=heights[position++];}
+    while(position<runs.length){
+      const end=groupEnd(position),groupHeight=sum(position,end);
+      if(document.y+height+groupHeight>bottom)break;
+      for(let row=position;row<end;row++)indices.push(row);
+      height+=groupHeight;position=end;
+    }
     if (indices.length === headers && position < runs.length) throw new Error('A Report table row is too tall for a PDF page. Narrow the selection before exporting.');
     for (const r of indices) {
       const top = document.y;
-      for (let c=0;c<columns;c++) {
-        const x = startX+c*width;
+      for (const cell of cells[r].filter(Boolean)) {
+        const x = startX+cell.column*width,cellWidth=width*cell.colSpan,cellHeight=sum(r,r+cell.rowSpan);
         document.save().lineWidth(0.5).strokeColor(colors.rule);
-        if (r < headers) document.rect(x,top,width,heights[r]).fillAndStroke('#f0f0f0',colors.rule);
-        else document.rect(x,top,width,heights[r]).stroke();
+        if (r < headers) document.rect(x,top,cellWidth,cellHeight).fillAndStroke('#f0f0f0',colors.rule);
+        else document.rect(x,top,cellWidth,cellHeight).stroke();
         document.restore(); document.y=top+5;
-        drawReportRichText(document,runs[r][c] || [],{size,bold:headerBold && r < headers,left:x+5,width:width-10,lineHeight,paragraphGap:0,paginate:false});
+        drawReportRichText(document,cell.content || [],{size,bold:headerBold && r < headers,left:x+5,width:cellWidth-10,lineHeight,paragraphGap:0,paginate:false});
       }
       document.x=startX; document.y=top+heights[r];
     }

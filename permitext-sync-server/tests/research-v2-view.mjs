@@ -82,6 +82,16 @@ assert.equal(draft,'Explain this.');assert.match(view.element.querySelector('.rv
 const firstID=sent[0].requestID;flight=deferred();send.handlers.click();await tick();assert.equal(sent[1].requestID,firstID,'Retry preserves the request identity');
 current=false;flight.resolve();await tick();assert.equal(draft,'Explain this.','Late completion cannot clear a different account or conversation draft');
 view.dispose();
+const reviewAttempts=[];let persistedReviewRequest=null;
+const rejectedView=createResearchV2View({conversation:{id:'review-retry',sources:[source],messages:[]},initialDraft:'Explain the table.',onDraft(){},isCurrent:()=>true,
+ requestStore:{read:()=>persistedReviewRequest,write:value=>{persistedReviewRequest=value;}},
+ onSend:async args=>{reviewAttempts.push(args);throw Object.assign(Error('Check the table qualification and retry.'),{payload:{code:'V2_REVIEW_FAILED'}});}});
+all(rejectedView.element).find(x=>x.className==='rv2-send').handlers.click();await tick();
+assert.equal(persistedReviewRequest,null,'A definitive review rejection retires the completed request');
+assert.equal(rejectedView.element.querySelector('.rv2-input').value,'Explain the table.');
+all(rejectedView.element).find(x=>x.textContent==='Retry answer').handlers.click();await tick();
+assert.equal(reviewAttempts.length,2);assert.notEqual(reviewAttempts[0].requestID,reviewAttempts[1].requestID,'Retry after completed rejection gets a fresh reviewed attempt');
+rejectedView.dispose();
 let pages=[];const paged=createResearchV2View({conversation:{sources:[],messages:[]},initialDraft:'Find ramps',onDraft(){},
  onFind:async(question,options)=>{pages.push(options);return options.cursor?{candidates:[{...source,id:'a'},{...source,id:'b',title:'Second result'}],coverage:{candidateCount:2,shownCount:2},nextCursor:null}:{candidates:[{...source,id:'a',title:'First result'}],coverage:{candidateCount:2,shownCount:1},nextCursor:'next-page'};}});
 const pagedFind=text=>all(paged.element).find(x=>x.textContent===text);

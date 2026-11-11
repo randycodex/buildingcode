@@ -46850,13 +46850,58 @@ function AW(e, t = [], n = [], r = null) {
 	];
 }
 //#endregion
+//#region public/notebook-styles.js
+function jW(e) {
+	if (typeof e != "string") return e;
+	let t = e.trim().toLowerCase();
+	return [
+		"",
+		"default",
+		"transparent",
+		"none"
+	].includes(t) ? "default" : /^[a-z]+$/.test(t) || /^#[\da-f]{3,8}$/.test(t) || /^(?:rgb|hsl)a?\([\d\s.,%/+-]+\)$/.test(t) ? "yellow" : e;
+}
+function MW(e) {
+	if (!e || typeof e != "object" || Array.isArray(e)) return e;
+	let t = { ...e };
+	if (Object.hasOwn(t, "backgroundColor")) {
+		let e = jW(t.backgroundColor);
+		e === "default" ? delete t.backgroundColor : t.backgroundColor = e;
+	}
+	return t;
+}
+function NW(e) {
+	let t = (e) => Array.isArray(e) ? e.map((e) => ({
+		...e,
+		...e.styles ? { styles: MW(e.styles) } : {},
+		...Array.isArray(e.content) ? { content: t(e.content) } : {}
+	})) : e, n = (e) => e.map((e) => ({
+		...e,
+		...Array.isArray(e.content) ? { content: t(e.content) } : e.type === "table" && e.content?.rows ? { content: {
+			...e.content,
+			rows: e.content.rows.map((e) => ({
+				...e,
+				cells: e.cells.map((e) => Array.isArray(e) ? t(e) : {
+					...e,
+					content: t(e.content)
+				})
+			}))
+		} } : {},
+		...e.children ? { children: n(e.children) } : {}
+	}));
+	return {
+		...e,
+		document: n(e.document || [])
+	};
+}
+//#endregion
 //#region node_modules/prosemirror-dropcursor/dist/index.js
-function jW(e = {}) {
+function PW(e = {}) {
 	return new V({ view(t) {
-		return new MW(t, e);
+		return new FW(t, e);
 	} });
 }
-var MW = class {
+var FW = class {
 	constructor(e, t) {
 		this.editorView = e, this.cursorPos = null, this.element = null, this.timeout = -1, this.lastDragEvent = null, this.width = t.width ?? 1, this.color = t.color === !1 ? void 0 : t.color || "black", this.class = t.class, this.handlers = [
 			"dragover",
@@ -47028,7 +47073,7 @@ Zd.create({
 		};
 	},
 	addProseMirrorPlugins() {
-		return [jW(this.options)];
+		return [PW(this.options)];
 	}
 }), Zd.create({
 	name: "focus",
@@ -47073,8 +47118,8 @@ Zd.create({
 		})) ?? null };
 	}
 });
-var NW = "placeholder", PW = new Kn("tiptap__placeholder");
-function FW(e) {
+var IW = "placeholder", LW = new Kn("tiptap__placeholder");
+function RW(e) {
 	let { editor: t, placeholder: n, dataAttribute: r, pos: i, node: a, isEmptyDoc: o, hasAnchor: s, classes: { emptyNode: c, emptyEditor: l } } = e, u = [c];
 	return o && u.push(l), _s.node(i, i + a.nodeSize, {
 		class: u.join(" "),
@@ -47086,14 +47131,14 @@ function FW(e) {
 		}) : n
 	});
 }
-function IW(e, t) {
+function zW(e, t) {
 	return typeof e == "function" ? e(t) : e;
 }
-function LW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i, from: a, to: o }) {
+function BW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i, from: a, to: o }) {
 	let { anchor: s } = i, c = [], l = e.isEmpty;
 	return r.nodesBetween(a, o, (r, i) => {
 		let a = s >= i && s <= i + r.nodeSize, o = !r.isLeaf && Tu(r);
-		return r.type.isTextblock && (a || !t.showOnlyCurrent) && o && c.push(FW({
+		return r.type.isTextblock && (a || !t.showOnlyCurrent) && o && c.push(RW({
 			editor: e,
 			isEmptyDoc: l,
 			dataAttribute: n,
@@ -47101,7 +47146,7 @@ function LW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i, fro
 			placeholder: t.placeholder,
 			classes: {
 				emptyEditor: t.emptyEditorClass,
-				emptyNode: IW(t.emptyNodeClass, {
+				emptyNode: zW(t.emptyNodeClass, {
 					editor: e,
 					node: r,
 					pos: i,
@@ -47113,14 +47158,14 @@ function LW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i, fro
 		})), t.includeChildren;
 	}), c;
 }
-function RW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i }) {
+function VW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i }) {
 	if (!e.isEditable && t.showOnlyWhenEditable) return null;
 	let { anchor: a } = i, o = [], s = e.isEmpty;
 	if (t.showOnlyCurrent && !t.includeChildren) {
 		let i = r.resolve(a), c = i.depth > 0 ? i.node(1) : i.nodeAfter, l = i.depth > 0 ? i.before(1) : a;
 		if (c && c.type.isTextblock && Tu(c)) {
 			let r = a >= l && a <= l + c.nodeSize;
-			o.push(FW({
+			o.push(RW({
 				editor: e,
 				isEmptyDoc: s,
 				dataAttribute: n,
@@ -47128,7 +47173,7 @@ function RW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i }) {
 				placeholder: t.placeholder,
 				classes: {
 					emptyEditor: t.emptyEditorClass,
-					emptyNode: IW(t.emptyNodeClass, {
+					emptyNode: zW(t.emptyNodeClass, {
 						editor: e,
 						node: c,
 						pos: l,
@@ -47139,7 +47184,7 @@ function RW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i }) {
 				pos: l
 			}));
 		}
-	} else o.push(...LW({
+	} else o.push(...BW({
 		editor: e,
 		options: t,
 		dataAttribute: n,
@@ -47150,7 +47195,7 @@ function RW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i }) {
 	}));
 	return U.create(r, o);
 }
-function zW(e, t) {
+function HW(e, t) {
 	let n = e.resolve(t);
 	if (n.depth === 0) {
 		let e = n.nodeAfter ?? n.nodeBefore;
@@ -47170,13 +47215,13 @@ function zW(e, t) {
 		to: r + n.node(1).nodeSize
 	};
 }
-function BW(e, t) {
+function UW(e, t) {
 	return {
 		from: Math.max(0, t.from - 1),
 		to: Math.min(e.content.size, t.to - 1)
 	};
 }
-function VW(e, t, n) {
+function WW(e, t, n) {
 	let r = [];
 	return e.forEach((e, i) => {
 		let a = i, o = a + e.nodeSize, s = a + 1, c = o + 1;
@@ -47186,7 +47231,7 @@ function VW(e, t, n) {
 		});
 	}), r;
 }
-function HW(e) {
+function GW(e) {
 	if (e.length === 0) return [];
 	let t = [...e].sort((e, t) => e.from - t.from), n = [{ ...t[0] }];
 	for (let e = 1; e < t.length; e += 1) {
@@ -47195,31 +47240,31 @@ function HW(e) {
 	}
 	return n;
 }
-function UW(e, t) {
-	let n = VW(e, t.from, t.to);
-	return n.push(BW(e, zW(e, t.from))), t.to > t.from ? n.push(BW(e, zW(e, Math.min(t.to, e.content.size + 1) - 1))) : t.from < e.content.size + 1 && n.push(BW(e, zW(e, Math.min(t.from + 1, e.content.size)))), n;
+function KW(e, t) {
+	let n = WW(e, t.from, t.to);
+	return n.push(UW(e, HW(e, t.from))), t.to > t.from ? n.push(UW(e, HW(e, Math.min(t.to, e.content.size + 1) - 1))) : t.from < e.content.size + 1 && n.push(UW(e, HW(e, Math.min(t.from + 1, e.content.size)))), n;
 }
-function WW(e, t, n) {
+function qW(e, t, n) {
 	let r = [];
 	if (e.docChanged) {
 		let t = gu(e);
-		for (let e of t) r.push(...UW(n.doc, e.newRange));
+		for (let e of t) r.push(...KW(n.doc, e.newRange));
 	}
-	return e.selectionSet && (r.push(BW(n.doc, zW(n.doc, e.mapping.map(t.selection.anchor)))), r.push(BW(n.doc, zW(n.doc, n.selection.anchor)))), HW(r);
+	return e.selectionSet && (r.push(UW(n.doc, HW(n.doc, e.mapping.map(t.selection.anchor)))), r.push(UW(n.doc, HW(n.doc, n.selection.anchor)))), GW(r);
 }
-function GW(e, t, n) {
+function JW(e, t, n) {
 	let r = Math.max(0, Math.min(e, n.content.size));
 	return {
 		from: r,
 		to: Math.max(r, Math.min(t, n.content.size))
 	};
 }
-function KW({ decorations: e, ranges: t, editor: n, options: r, dataAttribute: i, doc: a, selection: o }) {
+function YW({ decorations: e, ranges: t, editor: n, options: r, dataAttribute: i, doc: a, selection: o }) {
 	let s = e;
 	for (let e of t) {
-		let { from: t, to: c } = GW(e.from, e.to, a), l = s.find(t, c).filter((e) => e.from >= t && e.to <= c);
+		let { from: t, to: c } = JW(e.from, e.to, a), l = s.find(t, c).filter((e) => e.from >= t && e.to <= c);
 		l.length && (s = s.remove(l));
-		let u = LW({
+		let u = BW({
 			editor: n,
 			options: r,
 			dataAttribute: i,
@@ -47232,10 +47277,10 @@ function KW({ decorations: e, ranges: t, editor: n, options: r, dataAttribute: i
 	}
 	return s;
 }
-function qW({ editor: e, options: t, dataAttribute: n }) {
+function XW({ editor: e, options: t, dataAttribute: n }) {
 	return {
 		init(r, i) {
-			return RW({
+			return VW({
 				editor: e,
 				options: t,
 				dataAttribute: n,
@@ -47244,9 +47289,9 @@ function qW({ editor: e, options: t, dataAttribute: n }) {
 			}) ?? U.empty;
 		},
 		apply(r, i, a, o) {
-			return !r.docChanged && !r.selectionSet ? i : KW({
+			return !r.docChanged && !r.selectionSet ? i : YW({
 				decorations: i.map(r.mapping, r.doc),
-				ranges: WW(r, a, o),
+				ranges: qW(r, a, o),
 				editor: e,
 				options: t,
 				dataAttribute: n,
@@ -47256,25 +47301,25 @@ function qW({ editor: e, options: t, dataAttribute: n }) {
 		}
 	};
 }
-function JW(e) {
+function ZW(e) {
 	return e.replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "").replace(/^[0-9-]+/, "").replace(/^-+/, "").toLowerCase();
 }
-function YW({ editor: e, options: t }) {
-	let n = t.dataAttribute ? `data-${JW(t.dataAttribute)}` : `data-${NW}`, r = t.showOnlyCurrent && !t.includeChildren;
+function QW({ editor: e, options: t }) {
+	let n = t.dataAttribute ? `data-${ZW(t.dataAttribute)}` : `data-${IW}`, r = t.showOnlyCurrent && !t.includeChildren;
 	return new V({
-		key: PW,
-		...r ? {} : { state: qW({
+		key: LW,
+		...r ? {} : { state: XW({
 			editor: e,
 			options: t,
 			dataAttribute: n
 		}) },
-		props: { decorations: r ? ({ doc: r, selection: i }) => RW({
+		props: { decorations: r ? ({ doc: r, selection: i }) => VW({
 			editor: e,
 			options: t,
 			dataAttribute: n,
 			doc: r,
 			selection: i
-		}) : (n) => t.showOnlyWhenEditable && !e.isEditable ? U.empty : PW.getState(n) ?? U.empty }
+		}) : (n) => t.showOnlyWhenEditable && !e.isEditable ? U.empty : LW.getState(n) ?? U.empty }
 	});
 }
 Zd.create({
@@ -47283,7 +47328,7 @@ Zd.create({
 		return {
 			emptyEditorClass: "is-editor-empty",
 			emptyNodeClass: "is-empty",
-			dataAttribute: NW,
+			dataAttribute: IW,
 			placeholder: "Write something …",
 			showOnlyWhenEditable: !0,
 			showOnlyCurrent: !0,
@@ -47291,23 +47336,23 @@ Zd.create({
 		};
 	},
 	addProseMirrorPlugins() {
-		return [YW({
+		return [QW({
 			editor: this.editor,
 			options: this.options
 		})];
 	}
 });
-function XW(e, t) {
+function $W(e, t) {
 	return !e.selection.empty && !Eu(e.selection) && t.isEditable;
 }
-function ZW(e, t) {
-	return XW(e, t) && !t.isFocused && !t.view.dragging;
+function eG(e, t) {
+	return $W(e, t) && !t.isFocused && !t.view.dragging;
 }
-function QW() {
+function tG() {
 	var e;
 	(e = window.getSelection()) == null || e.removeAllRanges();
 }
-function $W(e) {
+function nG(e) {
 	e.focus();
 }
 Zd.create({
@@ -47321,15 +47366,15 @@ Zd.create({
 			key: new Kn("selection"),
 			props: {
 				decorations(n) {
-					return ZW(n, e) ? U.create(n.doc, [_s.inline(n.selection.from, n.selection.to, { class: t.className })]) : null;
+					return eG(n, e) ? U.create(n.doc, [_s.inline(n.selection.from, n.selection.to, { class: t.className })]) : null;
 				},
 				handleDOMEvents: {
 					blur(t) {
-						return XW(t.state, e) && QW(), !1;
+						return $W(t.state, e) && tG(), !1;
 					},
 					focus(t) {
-						return XW(t.state, e) && requestAnimationFrame(() => {
-							!e.isDestroyed && t.hasFocus() && $W(t);
+						return $W(t.state, e) && requestAnimationFrame(() => {
+							!e.isDestroyed && t.hasFocus() && nG(t);
 						}), !1;
 					}
 				}
@@ -47337,7 +47382,7 @@ Zd.create({
 		})];
 	}
 });
-function eG({ types: e, node: t }) {
+function rG({ types: e, node: t }) {
 	return t && Array.isArray(e) && e.includes(t.type) || t?.type === e;
 }
 Zd.create({
@@ -47359,7 +47404,7 @@ Zd.create({
 			state: {
 				init: (e, t) => {
 					let r = t.tr.doc.lastChild;
-					return !eG({
+					return !rG({
 						node: r,
 						types: n
 					});
@@ -47367,7 +47412,7 @@ Zd.create({
 				apply: (e, t) => {
 					if (!e.docChanged || e.getMeta("__uniqueIDTransaction")) return t;
 					let r = e.doc.lastChild;
-					return !eG({
+					return !rG({
 						node: r,
 						types: n
 					});
@@ -47376,7 +47421,7 @@ Zd.create({
 		})];
 	}
 });
-var tG = Zd.create({
+var iG = Zd.create({
 	name: "undoRedo",
 	addOptions() {
 		return {
@@ -47405,7 +47450,7 @@ var tG = Zd.create({
 });
 //#endregion
 //#region public/report-rich-text.js
-function nG(e) {
+function aG(e) {
 	try {
 		let t = new URL(String(e || "").trim());
 		return [
@@ -47417,7 +47462,7 @@ function nG(e) {
 		return "";
 	}
 }
-var rG = (e) => (e || []).map((e) => e.text).join(""), iG = (e, t) => [
+var oG = (e) => (e || []).map((e) => e.text).join(""), sG = (e, t) => [
 	"bold",
 	"italic",
 	"underline",
@@ -47425,14 +47470,14 @@ var rG = (e) => (e || []).map((e) => e.text).join(""), iG = (e, t) => [
 	"highlight",
 	"href"
 ].every((n) => e[n] === t[n]);
-function aG(e) {
+function cG(e) {
 	let t = [];
-	for (let n of e) n.text && (t.length && iG(t.at(-1), n) ? t.at(-1).text += n.text : t.push({ ...n }));
+	for (let n of e) n.text && (t.length && sG(t.at(-1), n) ? t.at(-1).text += n.text : t.push({ ...n }));
 	return t;
 }
-function oG(e, t, n) {
+function lG(e, t, n) {
 	let r = 0;
-	return aG(e.flatMap((e) => {
+	return cG(e.flatMap((e) => {
 		let i = Math.max(0, t - r), a = Math.min(e.text.length, n - r);
 		return r += e.text.length, a > i ? [{
 			...e,
@@ -47440,18 +47485,18 @@ function oG(e, t, n) {
 		}] : [];
 	}));
 }
-function sG(e) {
-	let t = rG(e);
-	return oG(e, t.length - t.trimStart().length, t.trimEnd().length);
+function uG(e) {
+	let t = oG(e);
+	return lG(e, t.length - t.trimStart().length, t.trimEnd().length);
 }
-function cG(e) {
-	let t = rG(e), n = 0;
+function dG(e) {
+	let t = oG(e), n = 0;
 	return t.split("\n").map((t) => {
-		let r = oG(e, n, n + t.length);
+		let r = lG(e, n, n + t.length);
 		return n += t.length + 1, r;
 	});
 }
-function lG(e, { list: t = !1 } = {}) {
+function fG(e, { list: t = !1 } = {}) {
 	if (!Array.isArray(e) || e.length > 5e3) throw Error("Invalid Report formatting.");
 	let n = 0, r = e.map((e) => {
 		if (!e || typeof e.text != "string") throw Error("Invalid Report formatted text.");
@@ -47468,21 +47513,21 @@ function lG(e, { list: t = !1 } = {}) {
 			e[n] && (t[n] = !0);
 		}
 		if (e.href) {
-			if (typeof e.href != "string" || e.href.length > 2048 || !nG(e.href)) throw Error("Invalid Report link.");
-			t.href = nG(e.href);
+			if (typeof e.href != "string" || e.href.length > 2048 || !aG(e.href)) throw Error("Invalid Report link.");
+			t.href = aG(e.href);
 		}
 		return t;
 	});
-	return t && (r = cG(r).map(sG).filter((e) => rG(e)).flatMap((e, t) => t ? [{ text: "\n" }, ...e] : e)), aG(sG(r));
+	return t && (r = dG(r).map(uG).filter((e) => oG(e)).flatMap((e, t) => t ? [{ text: "\n" }, ...e] : e)), cG(uG(r));
 }
-function uG(e) {
+function pG(e) {
 	let t = e.kind === "list" ? (e.items || []).join("\n") : e.text || "";
 	return e.richText || [{ text: t }];
 }
-function dG(e) {
+function mG(e) {
 	return {
 		type: "doc",
-		content: cG(e).map((e) => ({
+		content: dG(e).map((e) => ({
 			type: "paragraph",
 			content: e.map((e) => ({
 				type: "text",
@@ -47501,8 +47546,8 @@ function dG(e) {
 		}))
 	};
 }
-function fG(e) {
-	return aG((e.content || []).flatMap((e, t) => [...t ? [{ text: "\n" }] : [], ...(e.content || []).map((e) => {
+function hG(e) {
+	return cG((e.content || []).flatMap((e, t) => [...t ? [{ text: "\n" }] : [], ...(e.content || []).map((e) => {
 		let t = { text: e.type === "hardBreak" ? "\n" : e.text || "" };
 		for (let n of e.marks || []) [
 			"bold",
@@ -47510,25 +47555,25 @@ function fG(e) {
 			"underline",
 			"strike",
 			"highlight"
-		].includes(n.type) && (t[n.type] = !0), n.type === "link" && nG(n.attrs?.href) && (t.href = nG(n.attrs.href));
+		].includes(n.type) && (t[n.type] = !0), n.type === "link" && aG(n.attrs?.href) && (t.href = aG(n.attrs.href));
 		return t;
 	})]));
 }
 //#endregion
 //#region public/report-source-formatting.js
-var pG = [
+var gG = [
 	"bold",
 	"italic",
 	"underline",
 	"strike",
 	"highlight"
 ];
-function mG(e) {
+function _G(e) {
 	let t = [];
 	for (let n of [...e].sort((e, t) => e[0] - t[0] || e[1] - t[1])) t.length && n[0] <= t.at(-1)[1] ? t.at(-1)[1] = Math.max(t.at(-1)[1], n[1]) : t.push([...n]);
 	return t;
 }
-function hG(e) {
+function vG(e) {
 	if (e === void 0) return [];
 	if (!Array.isArray(e) || e.length > 200) throw Error("Invalid Report source formatting.");
 	let t = /* @__PURE__ */ new Map(), n = 0, r = 0;
@@ -47543,17 +47588,17 @@ function hG(e) {
 		let a = i.formats || {};
 		if (!a || typeof a != "object" || Array.isArray(a)) throw Error("Invalid Report source styles.");
 		for (let [o, s] of Object.entries(a)) {
-			if (!pG.includes(o) || !Array.isArray(s)) throw Error("Invalid Report source style.");
+			if (!gG.includes(o) || !Array.isArray(s)) throw Error("Invalid Report source style.");
 			if (r += s.length, n > 5e5 || r > 1e3) throw Error("Too much Report source formatting.");
 			for (let e of s) if (!Array.isArray(e) || e.length !== 2 || !e.every(Number.isSafeInteger) || e[0] < 0 || e[1] <= e[0] || e[1] > i.text.length) throw Error("Invalid Report formatting range.");
-			let a = t.get(e).formats, c = mG([...a[o] || [], ...s]);
+			let a = t.get(e).formats, c = _G([...a[o] || [], ...s]);
 			c.length && (a[o] = c);
 		}
 	}
 	if (n > 5e5) throw Error("Too much Report source formatting.");
 	return [...t.values()].filter((e) => Object.keys(e.formats).length);
 }
-function gG(e, t = [], n = "highlight") {
+function yG(e, t = [], n = "highlight") {
 	let r = [];
 	for (let i of t) {
 		let t = i.formats?.[n] || [];
@@ -47563,10 +47608,10 @@ function gG(e, t = [], n = "highlight") {
 			n >= 0 && e.text.indexOf(i.text, n + 1) < 0 && r.push(...t.map(([e, t]) => [e + n, t + n]));
 		}
 	}
-	return mG(r);
+	return _G(r);
 }
-function _G(e, t = []) {
-	let n = new Map(pG.map((n) => [n, gG(e, t, n)])), r = [.../* @__PURE__ */ new Set([
+function bG(e, t = []) {
+	let n = new Map(gG.map((n) => [n, yG(e, t, n)])), r = [.../* @__PURE__ */ new Set([
 		0,
 		e.text.length,
 		...[...n.values()].flat(2)
@@ -47577,22 +47622,22 @@ function _G(e, t = []) {
 		return o;
 	}).filter((e) => e.text);
 }
-function vG(e, t, n, r, i = !1) {
-	if (!pG.includes(r)) throw Error("Invalid Report source style.");
+function xG(e, t, n, r, i = !1) {
+	if (!gG.includes(r)) throw Error("Invalid Report source style.");
 	let a = {};
-	for (let o of pG) {
-		let s = gG(t, e, o);
-		o === r && (s = i ? s.flatMap(([e, t]) => t <= n[0] || e >= n[1] ? [[e, t]] : [[e, Math.min(t, n[0])], [Math.max(e, n[1]), t]].filter(([e, t]) => t > e)) : mG([...s, n])), s.length && (a[o] = s);
+	for (let o of gG) {
+		let s = yG(t, e, o);
+		o === r && (s = i ? s.flatMap(([e, t]) => t <= n[0] || e >= n[1] ? [[e, t]] : [[e, Math.min(t, n[0])], [Math.max(e, n[1]), t]].filter(([e, t]) => t > e)) : _G([...s, n])), s.length && (a[o] = s);
 	}
-	return hG([...e.filter((e) => e.key !== t.key), {
+	return vG([...e.filter((e) => e.key !== t.key), {
 		key: t.key,
 		text: t.text,
 		formats: a
 	}]);
 }
-function yG({ onChange: e, isCurrent: t }) {
+function SG({ onChange: e, isCurrent: t }) {
 	let n = /* @__PURE__ */ new Set(), r = [], i = !1, a = (e) => !i && t() && e.element.isConnected && e.element.getClientRects().length > 0 && e.element.textContent === e.part.text, o = (e) => {
-		e.element.replaceChildren(..._G(e.part, e.block.sourceFormatting).map((e) => {
+		e.element.replaceChildren(...bG(e.part, e.block.sourceFormatting).map((e) => {
 			let t = document.createTextNode(e.text);
 			for (let [n, r] of [
 				["bold", "strong"],
@@ -47624,7 +47669,7 @@ function yG({ onChange: e, isCurrent: t }) {
 			}
 			r.sort((e, t) => e.entry.element.compareDocumentPosition(t.entry.element) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
 		}
-	}, c = (e, t) => gG(e.entry.part, e.entry.block.sourceFormatting, t).some(([t, n]) => t <= e.range[0] && n >= e.range[1]), l = (e, t) => {
+	}, c = (e, t) => yG(e.entry.part, e.entry.block.sourceFormatting, t).some(([t, n]) => t <= e.range[0] && n >= e.range[1]), l = (e, t) => {
 		let n = document.createTreeWalker(e, NodeFilter.SHOW_TEXT), r;
 		for (; r = n.nextNode();) {
 			if (t <= r.length) return [r, t];
@@ -47654,16 +47699,16 @@ function yG({ onChange: e, isCurrent: t }) {
 			r = r.filter((e) => n.has(e.entry));
 		},
 		capture: s,
-		snapshotRuns: (e, t) => _G([...n].find((n) => n.block === e && n.part.text === t)?.part || {
+		snapshotRuns: (e, t) => bG([...n].find((n) => n.block === e && n.part.text === t)?.part || {
 			key: `${e.kind}:text::0`,
 			text: t
 		}, e.sourceFormatting),
 		hasSelection: () => r.length > 0 && r.every((e) => a(e.entry)),
 		isActive: (e) => r.length > 0 && r.every((t) => c(t, e)),
 		toggle(t) {
-			if (!pG.includes(t) || !r.length || !r.every((e) => a(e.entry))) return;
+			if (!gG.includes(t) || !r.length || !r.every((e) => a(e.entry))) return;
 			let i = [...r], u = i.every((e) => c(e, t)), d = /* @__PURE__ */ new Map();
-			for (let { entry: e, range: n } of i) d.set(e.block, vG(d.get(e.block) || e.block.sourceFormatting || [], e.part, n, t, u));
+			for (let { entry: e, range: n } of i) d.set(e.block, xG(d.get(e.block) || e.block.sourceFormatting || [], e.part, n, t, u));
 			d.forEach((e, t) => {
 				e.length ? t.sourceFormatting = e : delete t.sourceFormatting;
 			});
@@ -47680,11 +47725,11 @@ function yG({ onChange: e, isCurrent: t }) {
 }
 //#endregion
 //#region src/report-text-editor.js
-var bG = _f.create({
+var CG = _f.create({
 	name: "doc",
 	topNode: !0,
 	content: "paragraph+"
-}), xG = _f.create({
+}), wG = _f.create({
 	name: "paragraph",
 	group: "block",
 	content: "inline*",
@@ -47697,7 +47742,7 @@ var bG = _f.create({
 		{ tag: "li" }
 	],
 	renderHTML: () => ["p", 0]
-}), SG = _f.create({
+}), TG = _f.create({
 	name: "hardBreak",
 	inline: !0,
 	group: "inline",
@@ -47707,35 +47752,35 @@ var bG = _f.create({
 	addKeyboardShortcuts() {
 		return { "Shift-Enter": () => this.editor.commands.insertContent({ type: "hardBreak" }) };
 	}
-}), CG = Ud.create({
+}), EG = Ud.create({
 	name: "highlight",
 	parseHTML: () => [{ tag: "mark" }],
 	renderHTML: () => ["mark", 0]
-}), wG = Ud.create({
+}), DG = Ud.create({
 	name: "link",
 	inclusive: !1,
 	addAttributes: () => ({ href: {
 		default: null,
-		parseHTML: (e) => nG(e.getAttribute("href")) || null
+		parseHTML: (e) => aG(e.getAttribute("href")) || null
 	} }),
 	parseHTML: () => [{
 		tag: "a[href]",
-		getAttrs: (e) => nG(e.getAttribute("href")) ? {} : !1
+		getAttrs: (e) => aG(e.getAttribute("href")) ? {} : !1
 	}],
 	renderHTML: ({ HTMLAttributes: e }) => [
 		"a",
 		Ql(e, { rel: "noopener noreferrer" }),
 		0
 	]
-}), TG = (e) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">${e.map((e) => `<path d="${e}"/>`).join("")}</svg>`, EG = TG([
+}), OG = (e) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">${e.map((e) => `<path d="${e}"/>`).join("")}</svg>`, kG = OG([
 	"M5 12l6-8 5 4-6 8-5-4Z",
 	"M5 12l-2 5h6",
 	"M2 19h15"
 ]);
-function DG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () => !1, canRedo: a = () => !1, onError: o = () => {}, isCurrent: s = () => !0 }) {
+function AG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () => !1, canRedo: a = () => !1, onError: o = () => {}, isCurrent: s = () => !0 }) {
 	let c = document.createElement("div");
 	c.className = "report-format-toolbar", c.setAttribute("role", "toolbar"), c.setAttribute("aria-label", "Report formatting");
-	let l = null, u = !1, d = null, f = /* @__PURE__ */ new Set(), p = [], m = yG({
+	let l = null, u = !1, d = null, f = /* @__PURE__ */ new Set(), p = [], m = SG({
 		onChange: e,
 		isCurrent: s
 	}), h = () => !u && s() && l && !l.editor.isDestroyed && l.element.isConnected, g = () => {
@@ -47752,9 +47797,9 @@ function DG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 		return i.type = "button", i.title = e, i.setAttribute("aria-label", e), i.innerHTML = t, i.addEventListener("mousedown", (e) => e.preventDefault()), i.addEventListener("click", () => {
 			!u && s() && (!r || h()) && n();
 		}), r && p.push(i), i;
-	}, v = /* @__PURE__ */ new Map(), y = _("Undo", TG(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"]), () => n?.(), !1);
+	}, v = /* @__PURE__ */ new Map(), y = _("Undo", OG(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"]), () => n?.(), !1);
 	y.className = "report-format-undo", y.title = "Undo (⌘Z / Ctrl+Z)", c.append(y);
-	let b = _("Redo", TG(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"]), () => r?.(), !1);
+	let b = _("Redo", OG(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"]), () => r?.(), !1);
 	b.className = "report-format-redo", b.title = "Redo (⌘⇧Z / Ctrl+Shift+Z)", c.append(b);
 	for (let [e, t, n] of [
 		[
@@ -47780,7 +47825,7 @@ function DG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 		[
 			"highlight",
 			"Highlight",
-			EG
+			kG
 		]
 	]) {
 		let r = _(t, n, () => {
@@ -47806,17 +47851,17 @@ function DG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 	let S = (e) => {
 		e.element.dataset.kind = e.block.kind, e.element.dataset.headingLevel = String(e.block.headingLevel || 1), e.element.dataset.listStyle = e.block.listStyle || "bullet", e.element.querySelector("[contenteditable]")?.setAttribute("aria-label", `Report ${e.block.kind === "list" ? "list items" : e.block.kind}`);
 	}, C = (t, n = !1) => {
-		let r = lG(fG(t.editor.getJSON()), { list: t.block.kind === "list" });
-		t.block.kind === "list" ? (t.block.items = rG(r).split("\n"), delete t.block.text) : (t.block.text = rG(r), delete t.block.items), t.block.richText = r, e(t.block, { group: n ? `text:${t.block.id}` : null }), g();
+		let r = fG(hG(t.editor.getJSON()), { list: t.block.kind === "list" });
+		t.block.kind === "list" ? (t.block.items = oG(r).split("\n"), delete t.block.text) : (t.block.text = oG(r), delete t.block.items), t.block.richText = r, e(t.block, { group: n ? `text:${t.block.id}` : null }), g();
 	}, w = (e, t = {}) => {
 		h() && (l.block.kind = e, delete l.block.headingLevel, delete l.block.listStyle, Object.assign(l.block, t), S(l), C(l), l.editor.commands.focus());
 	};
 	x.addEventListener("change", () => w(x.value.startsWith("heading") ? "heading" : "paragraph", x.value.startsWith("heading") ? { headingLevel: Number(x.value.slice(-1)) } : {})), p.push(x), c.append(x);
-	let T = _("Bulleted list", TG(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"]), () => w(l.block.kind === "list" && l.block.listStyle !== "ordered" ? "paragraph" : "list", { listStyle: "bullet" })), E = _("Numbered list", TG(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"]), () => w(l.block.kind === "list" && l.block.listStyle === "ordered" ? "paragraph" : "list", { listStyle: "ordered" }));
+	let T = _("Bulleted list", OG(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"]), () => w(l.block.kind === "list" && l.block.listStyle !== "ordered" ? "paragraph" : "list", { listStyle: "bullet" })), E = _("Numbered list", OG(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"]), () => w(l.block.kind === "list" && l.block.listStyle === "ordered" ? "paragraph" : "list", { listStyle: "ordered" }));
 	c.append(T, E);
 	let D = document.createElement("span");
 	D.className = "report-format-link";
-	let O = _("Link", TG(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"]), () => {
+	let O = _("Link", OG(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"]), () => {
 		if (d) {
 			N();
 			return;
@@ -47851,7 +47896,7 @@ function DG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 	}), !0);
 	k.addEventListener("submit", (e) => {
 		e.preventDefault();
-		let t = nG(A.value);
+		let t = aG(A.value);
 		if (!t) {
 			M.textContent = "Use an HTTP, HTTPS, or mailto URL.";
 			return;
@@ -47922,19 +47967,19 @@ function DG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 			return n.editor = new hf({
 				element: t,
 				extensions: [
-					bG,
-					xG,
+					CG,
+					wG,
 					Sx,
-					SG,
+					TG,
 					Dm,
 					Fm,
 					zm,
 					Rm,
-					CG,
-					wG,
-					tG
+					EG,
+					DG,
+					iG
 				],
-				content: dG(uG(e)),
+				content: mG(pG(e)),
 				editorProps: {
 					attributes: {
 						role: "textbox",
@@ -47971,13 +48016,13 @@ function DG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 }
 //#endregion
 //#region src/notebook-schema.js
-var OG = "permitext-notebook-card", kG = "blocknote-json", AG = Object.freeze([
+var jG = "permitext-notebook-card", MG = "blocknote-json", NG = Object.freeze([
 	"canonicalSection",
 	"selectedPassage",
 	"researchAnswer",
 	"notebookCard",
 	"attachment"
-]), jG = Object.freeze([
+]), PG = Object.freeze([
 	"paragraph",
 	"heading",
 	"bulletListItem",
@@ -47985,13 +48030,13 @@ var OG = "permitext-notebook-card", kG = "blocknote-json", AG = Object.freeze([
 	"image",
 	"table"
 ]);
-function MG() {
+function FG() {
 	return [{
 		type: "paragraph",
 		content: []
 	}];
 }
-function NG(e) {
+function IG(e) {
 	let t = {};
 	return (Array.isArray(e) ? e : []).forEach((e) => {
 		[
@@ -48002,11 +48047,11 @@ function NG(e) {
 		].includes(e?.type) && (t[e.type] = !0), e?.type === "backgroundColor" && e.attrs?.stringValue === "yellow" && (t.backgroundColor = "yellow");
 	}), t;
 }
-function PG(e) {
+function LG(e) {
 	return e?.type === "text" && typeof e.text == "string" ? {
 		type: "text",
 		text: e.text,
-		styles: NG(e.marks)
+		styles: IG(e.marks)
 	} : e?.type === "permitextReference" ? {
 		type: "permitextReference",
 		props: {
@@ -48016,17 +48061,17 @@ function PG(e) {
 		}
 	} : null;
 }
-function FG(e) {
+function RG(e) {
 	let t = (Array.isArray(e?.content) ? e.content : []).filter((e) => e?.type === "paragraph").map((e) => ({
 		type: "paragraph",
-		content: (Array.isArray(e.content) ? e.content : []).map(PG).filter(Boolean)
+		content: (Array.isArray(e.content) ? e.content : []).map(LG).filter(Boolean)
 	}));
-	return t.length ? t : MG();
+	return t.length ? t : FG();
 }
-function IG(e) {
-	return Array.isArray(e) ? e.length ? e : MG() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 2 && e?.format === "blocknote-json" && Array.isArray(e.document) ? e.document.length ? e.document : MG() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 1 && e?.format === "tiptap-json" ? FG(e.document) : e?.schemaVersion === 0 && typeof e.plainText == "string" ? LG(e.plainText) : MG();
+function zG(e) {
+	return Array.isArray(e) ? e.length ? e : FG() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 2 && e?.format === "blocknote-json" && Array.isArray(e.document) ? e.document.length ? e.document : FG() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 1 && e?.format === "tiptap-json" ? RG(e.document) : e?.schemaVersion === 0 && typeof e.plainText == "string" ? BG(e.plainText) : FG();
 }
-function LG(e) {
+function BG(e) {
 	let t = String(e || "").split(/\n{2,}/).map((e) => e.replace(/\s*\n\s*/g, " ").trim()).filter(Boolean).map((e) => ({
 		type: "paragraph",
 		content: [{
@@ -48035,11 +48080,11 @@ function LG(e) {
 			styles: {}
 		}]
 	}));
-	return t.length ? t : MG();
+	return t.length ? t : FG();
 }
 //#endregion
 //#region src/notebook-editor.js
-var RG = new Set(jG), zG = {
+var VG = new Set(PG), HG = {
 	BC: "Building Code",
 	EBC: "Existing Building Code",
 	BC68: "1968 Building Code",
@@ -48050,11 +48095,11 @@ var RG = new Set(jG), zG = {
 	AC: "Administrative Code",
 	ZR: "Zoning Resolution"
 };
-function BG(e) {
-	return String(e || "Linked item").trim().replace(/^([A-Z][A-Z0-9]{0,4})\s+(§\s*)/, (e, t, n) => `${zG[t] || t} · ${n}`);
+function UG(e) {
+	return String(e || "Linked item").trim().replace(/^([A-Z][A-Z0-9]{0,4})\s+(§\s*)/, (e, t, n) => `${HG[t] || t} · ${n}`);
 }
-function VG(e, t) {
-	let n = BG(t);
+function WG(e, t) {
+	let n = UG(t);
 	if (e === "researchAnswer") return {
 		meta: "Research",
 		title: "Research answer",
@@ -48076,8 +48121,8 @@ function VG(e, t) {
 		preview: ""
 	};
 }
-function HG(e, t) {
-	let n = VG(e, t);
+function GG(e, t) {
+	let n = WG(e, t);
 	return [
 		_.createElement("span", {
 			className: "notebook-reference-meta",
@@ -48093,12 +48138,12 @@ function HG(e, t) {
 		}, n.preview) : null
 	].filter(Boolean);
 }
-var UG = mF({
+var KG = mF({
 	type: "permitextReference",
 	propSchema: {
 		referenceKind: {
 			default: "canonicalSection",
-			values: [...AG]
+			values: [...NG]
 		},
 		referenceID: { default: "" },
 		label: { default: "Linked per codes item" }
@@ -48107,7 +48152,7 @@ var UG = mF({
 }, {
 	render: ({ inlineContent: e }) => {
 		if (e.props.referenceKind === "selectedPassage") {
-			let t = VG(e.props.referenceKind, e.props.label);
+			let t = WG(e.props.referenceKind, e.props.label);
 			return _.createElement("span", {
 				className: "notebook-reference-chip",
 				"data-permitext-reference": "true",
@@ -48135,7 +48180,7 @@ var UG = mF({
 			"data-reference-id": e.props.referenceID,
 			"data-reference-label": e.props.label,
 			"aria-label": `Open ${e.props.label}`
-		}, ...HG(e.props.referenceKind, e.props.label));
+		}, ...GG(e.props.referenceKind, e.props.label));
 	},
 	toExternalHTML: ({ inlineContent: e }) => _.createElement("span", {
 		className: "notebook-reference-chip",
@@ -48143,12 +48188,12 @@ var UG = mF({
 		"data-reference-kind": e.props.referenceKind,
 		"data-reference-id": e.props.referenceID,
 		"data-reference-label": e.props.label
-	}, ...HG(e.props.referenceKind, e.props.label))
-}), WG = Object.fromEntries(Object.entries(Sv).filter(([e]) => RG.has(e))), GG = Ov.create({
-	blockSpecs: WG,
+	}, ...GG(e.props.referenceKind, e.props.label))
+}), qG = Object.fromEntries(Object.entries(Sv).filter(([e]) => VG.has(e))), JG = Ov.create({
+	blockSpecs: qG,
 	inlineContentSpecs: {
 		...Ev,
-		permitextReference: UG
+		permitextReference: KG
 	},
 	styleSpecs: {
 		bold: Tv.bold,
@@ -48158,7 +48203,7 @@ var UG = mF({
 		backgroundColor: Tv.backgroundColor
 	}
 });
-function KG({ editor: e, options: t }) {
+function YG({ editor: e, options: t }) {
 	let [n, r] = (0, _.useState)(!1), [i, a] = (0, _.useState)(""), [o, s] = (0, _.useState)(""), [c, l] = (0, _.useState)(""), u = (0, _.useRef)(null), d = (0, _.useRef)(null), f = () => {
 		let t = e._tiptapEditor.state;
 		return {
@@ -48191,24 +48236,30 @@ function KG({ editor: e, options: t }) {
 		"heading",
 		"bulletListItem",
 		"numberedListItem"
-	].includes(e.type)), g = h[0], v = g?.type === "heading" ? `heading-${g.props.level}` : "paragraph", y = (t, n = {}) => {
+	].includes(e.type)), g = m.blocks.some((e) => [
+		"paragraph",
+		"heading",
+		"bulletListItem",
+		"numberedListItem",
+		"table"
+	].includes(e.type)), v = h[0], y = v?.type === "heading" ? `heading-${v.props.level}` : "paragraph", b = (t, n = {}) => {
 		e.focus(), e.transact(() => h.forEach((r) => e.updateBlock(r, {
 			type: t,
 			props: n
 		})));
-	}, b = (t, n, r) => _.createElement("button", {
+	}, x = (t, n, r) => _.createElement("button", {
 		key: t,
 		type: "button",
 		className: `notebook-format-button notebook-format-${t}`,
 		title: n,
 		"aria-label": n,
 		"aria-pressed": !!m.styles[t],
-		disabled: !m.editable || !h.length,
+		disabled: !m.editable || !g,
 		onMouseDown: (e) => e.preventDefault(),
 		onClick: () => {
 			e.focus(), e.toggleStyles({ [t]: !0 });
 		}
-	}, r), x = (e) => _.createElement("svg", {
+	}, r), S = (e) => _.createElement("svg", {
 		viewBox: "0 0 20 20",
 		width: 18,
 		height: 18,
@@ -48219,9 +48270,9 @@ function KG({ editor: e, options: t }) {
 	}, ...e.map((e, t) => _.createElement("path", {
 		key: t,
 		d: e
-	}))), S = () => {
+	}))), C = () => {
 		u.current = f(), a(e.getSelectedLinkUrl() || ""), s(e.getSelectedText()), l(""), r(!0);
-	}, C = (t) => {
+	}, w = (t) => {
 		t.preventDefault();
 		let n;
 		try {
@@ -48244,17 +48295,17 @@ function KG({ editor: e, options: t }) {
 		}
 		let a = u.current, s = o.trim();
 		e.focus(), e.createLink(n.href, a.from === a.to ? s || n.href : s && s !== a.text ? s : void 0), r(!1);
-	}, w = (e, t, n) => _.createElement("button", {
+	}, T = (e, t, n) => _.createElement("button", {
 		key: e,
 		type: "button",
 		className: "notebook-format-button",
 		title: t,
 		"aria-label": t,
-		"aria-pressed": g?.type === e,
+		"aria-pressed": v?.type === e,
 		disabled: !m.editable || !h.length,
 		onMouseDown: (e) => e.preventDefault(),
-		onClick: () => y(g?.type === e ? "paragraph" : e)
-	}, n), T = [
+		onClick: () => b(v?.type === e ? "paragraph" : e)
+	}, n), E = [
 		["evidence", "Evidence"],
 		["research", "Assistant answer"],
 		["image", "Image"],
@@ -48274,7 +48325,7 @@ function KG({ editor: e, options: t }) {
 		onClick: () => {
 			e.focus(), e.undo();
 		}
-	}, x(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"])), _.createElement("button", {
+	}, S(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"])), _.createElement("button", {
 		type: "button",
 		className: "notebook-format-button notebook-format-redo",
 		title: "Redo (⌘⇧Z / Ctrl+Shift+Z)",
@@ -48284,18 +48335,18 @@ function KG({ editor: e, options: t }) {
 		onClick: () => {
 			e.focus(), e.redo();
 		}
-	}, x(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"])), b("bold", "Bold", _.createElement("strong", null, "B")), b("italic", "Italic", _.createElement("em", null, "I")), b("underline", "Underline", _.createElement("u", null, "U")), b("strike", "Strikethrough", _.createElement("s", null, "S")), _.createElement("button", {
+	}, S(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"])), x("bold", "Bold", _.createElement("strong", null, "B")), x("italic", "Italic", _.createElement("em", null, "I")), x("underline", "Underline", _.createElement("u", null, "U")), x("strike", "Strikethrough", _.createElement("s", null, "S")), _.createElement("button", {
 		type: "button",
 		className: "notebook-format-button notebook-format-highlight",
 		title: "Highlight",
 		"aria-label": "Highlight",
 		"aria-pressed": m.styles.backgroundColor === "yellow",
-		disabled: !m.editable || !h.length,
+		disabled: !m.editable || !g,
 		onMouseDown: (e) => e.preventDefault(),
 		onClick: () => {
 			e.focus(), m.styles.backgroundColor === "yellow" ? e.removeStyles({ backgroundColor: "yellow" }) : e.addStyles({ backgroundColor: "yellow" });
 		}
-	}, x([
+	}, S([
 		"M5 12l6-8 5 4-6 8-5-4Z",
 		"M5 12l-2 5h6",
 		"M2 19h15"
@@ -48313,7 +48364,7 @@ function KG({ editor: e, options: t }) {
 		"aria-label": "Text style",
 		disabled: !m.editable || !h.length,
 		onMouseDown: (e) => e.preventDefault()
-	}, v.startsWith("heading-") ? `Heading ${v.slice(-1)}` : "Body", x(["M5 8l5 5 5-5"]))), _.createElement(PH.Dropdown, {
+	}, y.startsWith("heading-") ? `Heading ${y.slice(-1)}` : "Body", S(["M5 8l5 5 5-5"]))), _.createElement(PH.Dropdown, {
 		className: "notebook-format-style-menu",
 		"aria-label": "Text style",
 		onKeyDown: (e) => {
@@ -48327,20 +48378,20 @@ function KG({ editor: e, options: t }) {
 	].map(([e, t]) => _.createElement(PH.Item, {
 		key: e,
 		className: "notebook-format-style-option",
-		"aria-current": v === e ? "true" : void 0,
-		onClick: () => e.startsWith("heading-") ? y("heading", { level: Number(e.slice(-1)) }) : y("paragraph")
-	}, t)))), w("bulletListItem", "Bulleted list", x(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])), w("numberedListItem", "Numbered list", x(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])), _.createElement("span", { className: "notebook-format-link" }, _.createElement("button", {
+		"aria-current": y === e ? "true" : void 0,
+		onClick: () => e.startsWith("heading-") ? b("heading", { level: Number(e.slice(-1)) }) : b("paragraph")
+	}, t)))), T("bulletListItem", "Bulleted list", S(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])), T("numberedListItem", "Numbered list", S(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])), _.createElement("span", { className: "notebook-format-link" }, _.createElement("button", {
 		type: "button",
 		className: "notebook-format-button",
 		title: "Link",
 		"aria-label": "Link",
 		"aria-expanded": n,
-		disabled: !m.editable || !h.length,
+		disabled: !m.editable || !g,
 		onMouseDown: (e) => e.preventDefault(),
-		onClick: S
-	}, x(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"])), n && _.createElement("form", {
+		onClick: C
+	}, S(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"])), n && _.createElement("form", {
 		className: "notebook-format-link-form",
-		onSubmit: C,
+		onSubmit: w,
 		onKeyDown: (t) => {
 			t.key === "Escape" && (t.preventDefault(), r(!1), p(u.current) && e.focus());
 		}
@@ -48366,7 +48417,7 @@ function KG({ editor: e, options: t }) {
 		ref: (e) => {
 			e && t.toolbarInsertElement.parentElement !== e && e.append(t.toolbarInsertElement);
 		}
-	}) : t.onInsert && _.createElement("details", { className: "notebook-format-insert" }, _.createElement("summary", null, "Insert"), _.createElement("div", { className: "notebook-format-insert-menu" }, ...T.map(([e, n]) => _.createElement("button", {
+	}) : t.onInsert && _.createElement("details", { className: "notebook-format-insert" }, _.createElement("summary", null, "Insert"), _.createElement("div", { className: "notebook-format-insert-menu" }, ...E.map(([e, n]) => _.createElement("button", {
 		type: "button",
 		key: e,
 		disabled: !m.editable,
@@ -48382,30 +48433,30 @@ function KG({ editor: e, options: t }) {
 		}
 	}, t.toolbarStatusElement ? null : t.status || ""));
 }
-function qG(e) {
+function XG(e) {
 	let t = String(e?.referenceKind || "").trim(), n = String(e?.referenceID || "").trim(), r = String(e?.label || "").trim();
-	if (!AG.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
+	if (!NG.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
 	return {
 		referenceKind: t,
 		referenceID: n,
 		label: r
 	};
 }
-function JG(e) {
-	return {
-		schema: OG,
+function ZG(e) {
+	return NW({
+		schema: jG,
 		schemaVersion: 2,
-		format: kG,
+		format: MG,
 		document: e
-	};
+	});
 }
-function YG() {
+function QG() {
 	let e = document.documentElement.dataset.theme;
 	return e === "dark" || e === "light" ? e : window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
-function XG({ options: e, controllerRef: t }) {
-	let [n, r] = (0, _.useState)(YG), i = (0, _.useMemo)(() => IG(e.document), []), a = tj({
-		schema: GG,
+function $G({ options: e, controllerRef: t }) {
+	let [n, r] = (0, _.useState)(QG), i = (0, _.useMemo)(() => zG(e.document), []), a = tj({
+		schema: JG,
 		dictionary: {
 			...hx,
 			placeholders: {
@@ -48423,7 +48474,7 @@ function XG({ options: e, controllerRef: t }) {
 		resolveFileUrl: e.resolveFileUrl
 	}), o = (0, _.useRef)(e.document);
 	return (0, _.useEffect)(() => {
-		let e = () => r(YG()), t = new MutationObserver(e);
+		let e = () => r(QG()), t = new MutationObserver(e);
 		t.observe(document.documentElement, {
 			attributes: !0,
 			attributeFilter: ["class", "data-theme"]
@@ -48436,7 +48487,7 @@ function XG({ options: e, controllerRef: t }) {
 		t.current === a && (t.current = null);
 	}), [a]), (0, _.useEffect)(() => {
 		let t = e.document;
-		t && t !== o.current && (o.current = t, a.replaceBlocks(a.document, IG(t)));
+		t && t !== o.current && (o.current = t, a.replaceBlocks(a.document, zG(t)));
 	}, [a, e.document]), _.createElement(EW, {
 		editor: a,
 		className: "permitext-notebook-editor",
@@ -48446,14 +48497,14 @@ function XG({ options: e, controllerRef: t }) {
 		sideMenu: !1,
 		slashMenu: !1,
 		renderEditor: !1,
-		onChange: () => e.onChange?.(JG(a.document)),
+		onChange: () => e.onChange?.(ZG(a.document)),
 		"aria-label": e.ariaLabel || "Notebook card"
-	}, e.toolbar !== !1 && e.editable !== !1 && _.createElement(KG, {
+	}, e.toolbar !== !1 && e.editable !== !1 && _.createElement(YG, {
 		editor: a,
 		options: e
 	}), _.createElement(GP));
 }
-function ZG(e, t = {}) {
+function eK(e, t = {}) {
 	if (!(e instanceof HTMLElement)) throw Error("A Notebook editor mount element is required.");
 	let n = (e) => JSON.stringify(e.state.doc.toJSON(), (e, t) => e === "id" ? void 0 : t), r = { current: null }, i = (0, y.createRoot)(e), a = null, o = {
 		...t,
@@ -48461,7 +48512,7 @@ function ZG(e, t = {}) {
 			a = e;
 		}
 	};
-	return i.render(_.createElement(XG, {
+	return i.render(_.createElement($G, {
 		options: o,
 		controllerRef: r
 	})), {
@@ -48469,13 +48520,13 @@ function ZG(e, t = {}) {
 			o.status = String(e || ""), a && !t.toolbarStatusElement && (a.textContent = o.status);
 		},
 		setEditable(e) {
-			o.editable = !!e, r.current && (r.current.isEditable = o.editable), i.render(_.createElement(XG, {
+			o.editable = !!e, r.current && (r.current.isEditable = o.editable), i.render(_.createElement($G, {
 				options: { ...o },
 				controllerRef: r
 			}));
 		},
 		getDocument() {
-			return JG(r.current?.document || t.document?.document || []);
+			return ZG(r.current?.document || t.document?.document || []);
 		},
 		getEditingPosition() {
 			let e = r.current?._tiptapEditor, t = e?.state.selection;
@@ -48496,7 +48547,7 @@ function ZG(e, t = {}) {
 		},
 		setDocument(e) {
 			let t = r.current;
-			t && t.replaceBlocks(t.document, IG(e));
+			t && t.replaceBlocks(t.document, zG(e));
 		},
 		insertImage() {
 			let e = r.current;
@@ -48506,13 +48557,13 @@ function ZG(e, t = {}) {
 			let t = r.current;
 			return t ? (t.focus(), t.insertInlineContent([{
 				type: "permitextReference",
-				props: qG(e)
+				props: XG(e)
 			}, " "]), !0) : !1;
 		},
 		appendReference(e, t = [], n = [], i = null) {
 			let a = r.current, o = a?.document.at(-1);
 			if (!a || !o) return !1;
-			let s = a.insertBlocks(AW(qG(e), t, n, i), o, "after");
+			let s = a.insertBlocks(AW(XG(e), t, n, i), o, "after");
 			return a.setTextCursorPosition(s.at(-1), "end"), a.focus(), !0;
 		},
 		replaceAssetURL(e, t) {
@@ -48547,4 +48598,4 @@ function ZG(e, t = {}) {
 	};
 }
 //#endregion
-export { DG as createReportFormatting, ZG as mountPermitextNotebookEditor, GG as permitextNotebookSchema };
+export { AG as createReportFormatting, eK as mountPermitextNotebookEditor, JG as permitextNotebookSchema };

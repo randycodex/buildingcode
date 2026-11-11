@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-export const researchV2Version = 'research-v2-20261110-r4';
+export const researchV2Version = 'research-v2-20261111-r5';
 const fail = (message, code = 'V2_INVALID_INPUT') => Object.assign(new Error(message), { code });
 const stringList = { type: 'array', items: { type: 'string' } };
 export const researchV2DraftSchema = { type: 'object', additionalProperties: false,
@@ -65,10 +65,12 @@ export function researchV2IdentityIssues(draft, sources, {projectContextSnapshot
   return issues;
 }
 
+const scenarioInstruction = ` Explicitly stipulated hypothetical inputs define a scenario for explanation and arithmetic; they do not become verified Project facts. Keep a separate comparison space separate from the saved Project. Do not require independent proof of stipulated inputs merely to read a table row or explain the requested arithmetic. Label the inputs and any user-supplied rounding convention as assumptions, not code requirements. Reading a row, comparing factors or explaining arithmetic does not establish applicability or compliance. Resolve each supported part of the question even when a separate project determination remains unresolved. For tables, keep each function with its own factor, net/gross basis and actual footnote markers; do not transfer an adjacent row's qualifications. A general table note or an optional deduction is not automatically a missing project fact.`;
+
 function request(phase, instructions, input,effort) {
   return { model: 'gpt-6-luna', service_tier: 'default', store: false,
     reasoning: { effort: effort || (phase === 'draft' ? 'low' : 'medium') }, max_output_tokens: phase === 'review' ? 4096 : 6144,
-    instructions, input: JSON.stringify(input), text: { format: { type: 'json_schema',
+    instructions:instructions+scenarioInstruction, input: JSON.stringify(input), text: { format: { type: 'json_schema',
       name: phase === 'review' ? 'permitext_v2_review' : 'permitext_v2_answer', strict: true,
       schema: phase === 'review' ? researchV2ReviewSchema : researchV2DraftSchema } } };
 }
@@ -87,7 +89,7 @@ export async function runResearchV2(input, { call, signal, onStage = () => {}, m
   let draft = null, issues = [];
   // Allocate more drafting effort to passages with several numbered
   // exceptions. This controls computation, not which conditions legally apply.
-  const complex=packet.sources.some(source=>/\bexceptions?\s*:/i.test(source.text)&&
+  const complex=packet.sources.some(source=>/\btable\s+\d|\bfootnotes?\b|\b(?:net|gross)\b/i.test(source.text)||/\bexceptions?\s*:/i.test(source.text)&&
     (source.text.match(/(?:^|\s)[1-9]\d*\.\s/g)||[]).length>=2);
   for (let round = 0; round <= maxRepairRounds; round++) {
     combinedSignal.throwIfAborted();
@@ -118,9 +120,18 @@ export async function runResearchV2(input, { call, signal, onStage = () => {}, m
   }
   // Failed generated text is never published as a reviewed or supported answer.
   return { version: researchV2Version, packet, payloads, reviews, status: 'review_failed',
-    draft: { answerText: 'I could not complete a sufficiently supported answer from the included passages. Review the source text or add the missing evidence before trying again.',
+    draft: { answerText: researchV2FailureMessage(issues),
       claims: [], missingSources: draft?.missingSources || [], missingFacts: draft?.missingFacts || [] },
     rejectedDraft: draft, elapsedMilliseconds: Date.now()-startedAt };
+}
+
+export function researchV2FailureMessage(issues = []) {
+  const codes=issues.map(issue=>issue.code).join(' ');
+  const check=/citation|binding|identity|source_id/i.test(codes) ? 'match the draft’s citations to the included passages'
+    : /table|footnote|factor|arithmetic|calculation|unit/i.test(codes) ? 'verify the calculation, table interpretation and qualifications'
+    : /fact|scope|applicab|assumption/i.test(codes) ? 'keep the source rules separate from unverified project assumptions'
+    : 'verify every claim and qualification in the draft';
+  return `The answer check could not ${check}. Your question, passages and reviewed Project snapshot are retained. Retry the answer, or ask one part separately. No unchecked answer was saved.`;
 }
 
 export function researchV2AnswerMetadata(result) {

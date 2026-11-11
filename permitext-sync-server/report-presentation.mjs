@@ -88,7 +88,7 @@ export function reportItemPreview(item) {
       const position = remaining.indexOf(table.text);
       if (position < 0) continue;
       add('',remaining.slice(0,position));
-      parts.push({kind:'table',rows:table.rows,headerRowCount:table.headerRowCount || 0});
+      parts.push({kind:'table',rows:table.rows,headerRowCount:table.headerRowCount || 0,...(table.cellSpans?{cellSpans:table.cellSpans}:{})});
       remaining = remaining.slice(position + table.text.length);
     }
     add('',remaining);

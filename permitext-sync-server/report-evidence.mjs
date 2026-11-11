@@ -30,6 +30,7 @@ export function normalizeSavedExportSelections(items) {
 }
 
 const attributes = node => Object.fromEntries((node.attrs || []).map(attr => [attr.name, attr.value]));
+const inlineExportText = value => value.replace(/[ \t]+/g,' ').replace(/([a-zA-Z]) +(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/g,'$1').replace(/ +([),.;:!?])/g,'$1');
 function findNode(node, id) {
   if (attributes(node).id === id) return node;
   for (const child of node.childNodes || []) {
@@ -39,7 +40,7 @@ function findNode(node, id) {
   return null;
 }
 
-function tableGrid(table) {
+function tableGrid(table, {withSpans = false} = {}) {
   const rows = [];
   const collect = node => {
     if (node !== table && node.tagName === "table") throw new Error("Nested tables are not supported by this text export.");
@@ -48,6 +49,7 @@ function tableGrid(table) {
   };
   collect(table);
   const grid = [];
+  const spans = [];
   rows.forEach((row, rowIndex) => {
     grid[rowIndex] ||= [];
     let column = 0;
@@ -60,7 +62,8 @@ function tableGrid(table) {
       if (![columnSpan, rowSpan].every(value => Number.isInteger(value) && value >= 1 && value <= 100)) {
         throw new Error("This table layout is not supported by this text export.");
       }
-      const value = (cell.childNodes || []).map(nodeText).join("").replace(/\s+/g, " ").trim();
+      const value = inlineExportText((cell.childNodes || []).map(nodeText).join("").replace(/\s+/g, " ")).trim();
+      if(rowSpan>1||columnSpan>1)spans.push({row:rowIndex,column,rowSpan,colSpan:columnSpan});
       for (let r = rowIndex; r < rowIndex + rowSpan; r++) {
         grid[r] ||= [];
         for (let c = column; c < column + columnSpan; c++) grid[r][c] = value;
@@ -69,7 +72,10 @@ function tableGrid(table) {
     }
   });
   // Repeat spanning headers/cells so each text row retains its column basis.
-  return grid.map(row => row.map(value => value || "")).filter(row => row.some(Boolean));
+  const rowMap=new Map();
+  const result=grid.map(row=>row.map(value=>value||'')).filter((row,index)=>{if(!row.some(Boolean))return false;rowMap.set(index,rowMap.size);return true;});
+  return withSpans ? {rows:result,cellSpans:spans.filter(span=>rowMap.has(span.row)).map(span=>({...span,row:rowMap.get(span.row),
+    rowSpan:Array.from({length:span.rowSpan},(_,i)=>span.row+i).filter(row=>rowMap.has(row)).length}))} : result;
 }
 
 // Reader HTML may contain a separate sticky header copy. Omit it only when
@@ -114,8 +120,8 @@ function selectedTables(body, blockID) {
   const visit = node => {
     if (isRepeatedTableHeader(node)) return;
     if (node.tagName === "table") {
-      const rows = tableGrid(node);
-      tables.push({ text: rows.map(row => row.join(" | ")).join("\n"), rows, headerRowCount: tableHeaderRowCount(node, rows) });
+      const {rows,cellSpans} = tableGrid(node,{withSpans:true});
+      tables.push({ text: rows.map(row => row.join(" | ")).join("\n"), rows, headerRowCount: tableHeaderRowCount(node, rows), ...(cellSpans.length?{cellSpans}:{}) });
       return;
     }
     (node.childNodes || []).forEach(visit);
@@ -133,7 +139,10 @@ function selectedTables(body, blockID) {
 // values into an ambiguous single sentence. Never use a Saved preview here.
 function nodeText(node) {
   if (isRepeatedTableHeader(node)) return "";
-  if (node.nodeName === "#text") return node.value;
+  if (node.nodeName === "#text") {
+    for(let parent=node.parentNode;parent;parent=parent.parentNode)if(parent.tagName==='pre')return node.value;
+    return node.value.replace(/[\t\r\n\f ]+/g,' ');
+  }
   if (["script", "style"].includes(node.tagName)) return "";
   if (node.tagName === "img") {
     throw new Error("This selection contains a figure. Export its text separately; figures are not supported by this PDF export yet.");
@@ -143,7 +152,10 @@ function nodeText(node) {
   if (["td", "th"].includes(node.tagName)) return `${content.trim()} | `;
   if (["p", "div", "tr", "li", "table", "h1", "h2", "h3", "h4"].includes(node.tagName)) return `${content}\n`;
   if (node.tagName === "br") return "\n";
-  if (node.tagName === "sup") return ` ${content}`;
+  if (node.tagName === "sup" || /vertical-align\s*:\s*super/i.test(attributes(node).style || '')) {
+    const value=content.trim();
+    return /^\d+$/.test(value) ? value.replace(/\d/g,digit=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[Number(digit)]) : ` ${value}`;
+  }
   return content;
 }
 
@@ -168,6 +180,7 @@ function exportBlockText(block, blockID = "") {
       ? findNode(root, blockID) : root;
     if (!node) return null;
     return nodeText(node).replace(/[ \t]+/g, " ").replace(/ *\| *\n/g, "\n")
+      .replace(/([a-zA-Z]) +(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/g,'$1').replace(/ +([),.;:!?])/g,'$1')
       .replace(/ *\n */g, "\n").replace(/\n{3,}/g, "\n\n").trim();
   }
   return String(block.plainText || block.text || "").trim();

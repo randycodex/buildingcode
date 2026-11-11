@@ -24,6 +24,7 @@ const cases=[
   ['What is ramp cross slope?',['1012.3']],
   ['What is the corridor sprinkler rating?',['1020.1.1','1020.1.2']],
   ['Explain the occupant load table',['1004.1.3']],
+  ['RECHECK A1 — For this fictional office workflow, use the stated assumptions and reviewed snapshot to identify the occupant load factor for Business areas and compare a library reading room, including net versus gross area and the applicable table footnotes.',['1004.1.3']],
   ['Explain exhaust discharge',['501.3'],'MC'],
   ['Find the fire partition definition',['202']],
   ['Do hallway walls need a fire rating?',['1020.1.1','1020.1.2']]
@@ -79,5 +80,5 @@ try{
   await post('/research/sources/discover',{question,cursor:'not-a-page'},400);
   await post('/research/sources/discover',{question,focus:{}},400);
   const final=await adapter.read();assert.deepEqual(final.researchConversationsByUserID,after.researchConversationsByUserID);assert.deepEqual(final.researchAnswersByUserID,after.researchAnswersByUserID);
-  console.log('Discovery: 13 developer-authored known-target checks passed. This does not measure complete regulatory coverage. No paid calls.');
+  console.log(`Discovery: ${cases.length} known-target checks passed, including the long production audit question. No paid calls.`);
 }finally{globalThis.fetch=nativeFetch;server.closeAllConnections();await new Promise(resolve=>server.close(resolve));await rm(scratch,{recursive:true,force:true});}

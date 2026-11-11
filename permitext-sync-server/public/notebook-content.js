@@ -11,14 +11,16 @@ export function notebookContentText(document) {
   return (document?.document || []).map(text).filter(Boolean).join('\n\n');
 }
 
-export function notebookTableDisplayData(table, {preserveInlineContent = false} = {}) {
+export function notebookTableDisplayData(table, {preserveInlineContent = false, preserveCellSpans = false} = {}) {
   const grid = [];
+  const cellSpans = [];
   table.rows.forEach((row, r) => {
     grid[r] ||= [];
     let column = 0;
     for (const cell of row.cells) {
       while (grid[r][column] !== undefined) column++;
       const value = preserveInlineContent ? notebookCellContent(cell) : notebookInlineText(notebookCellContent(cell));
+      if ((cell.props?.rowspan || 1) > 1 || (cell.props?.colspan || 1) > 1) cellSpans.push({row:r,column,rowSpan:cell.props?.rowspan || 1,colSpan:cell.props?.colspan || 1});
       for (let dr = 0; dr < (cell.props?.rowspan || 1); dr++) for (let dc = 0; dc < (cell.props?.colspan || 1); dc++) {
         grid[r + dr] ||= []; grid[r + dr][column + dc] = value;
       }
@@ -28,6 +30,7 @@ export function notebookTableDisplayData(table, {preserveInlineContent = false} 
   const columns = Math.max(...grid.map(row => row.length));
   const rows = grid.map(row => Array.from({length:columns}, (_, c) => row[c] ?? (preserveInlineContent ? [] : '')));
   const headers = table.headerRows || 0;
+  if (preserveCellSpans) return {rows,headerRowCount:headers,cellSpans};
   const combinedHeader = column => {
     if (!preserveInlineContent) return [...new Set(rows.slice(0,headers).map(row => row[column]).filter(Boolean))].join('\n');
     const cells = [...new Map(rows.slice(0,headers).map(row => row[column]).filter(cell => cell.length)
@@ -37,6 +40,23 @@ export function notebookTableDisplayData(table, {preserveInlineContent = false} 
   if (headers > 1) return {rows:[Array.from({length:columns}, (_, c) => combinedHeader(c)),
     ...rows.slice(headers)], headerRowCount:1};
   return {rows, headerRowCount:headers};
+}
+
+// Keep the expanded grid as the stable text/citation basis. Display each
+// spanning cell once, at its original anchor, in HTML and PDF presentations.
+export function tableDisplayCells(rows, spans = []) {
+  const anchors = new Map(), covered = new Set(), occupied = new Set();
+  const columns = Math.max(0,...rows.map(row=>row.length));
+  for (const span of spans) {
+    const {row,column,rowSpan,colSpan}=span;
+    if (![row,column,rowSpan,colSpan].every(Number.isInteger) || row<0 || column<0 || rowSpan<1 || colSpan<1 || row+rowSpan>rows.length || column+colSpan>columns) throw new Error('Invalid Report table cell span.');
+    for(let r=row;r<row+rowSpan;r++)for(let c=column;c<column+colSpan;c++){
+      const key=`${r}:${c}`;if(occupied.has(key))throw new Error('Overlapping Report table cells.');occupied.add(key);
+      if(r!==row||c!==column)covered.add(key);
+    }
+    anchors.set(`${row}:${column}`,span);
+  }
+  return rows.map((row,r)=>Array.from({length:columns},(_,c)=>covered.has(`${r}:${c}`)?null:{row:r,column:c,rowSpan:1,colSpan:1,...anchors.get(`${r}:${c}`),content:row[c]}));
 }
 
 // The editable presentation copy stays separate from the exact evidence locator.

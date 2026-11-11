@@ -67,7 +67,7 @@ try {
           [{type:'text',text:`Italic-cell-${index}`,styles:{italic:true}},{type:'text',text:'\n',styles:{}},
            {type:'text',text:`Underline-cell-${index}`,styles:{underline:true}},{type:'text',text:'\n',styles:{}},
            {type:'text',text:`Strike-cell-${index}`,styles:{strike:true}},{type:'text',text:'\n',styles:{}},
-           {type:'text',text:`Highlight-cell-${index}`,styles:{backgroundColor:'yellow'}}],
+           {type:'text',text:`Highlight-cell-${index}`,styles:{backgroundColor:'rgb(255, 255, 0)'}}],
           [{type:'link',href:`https://www.nyc.gov/site/buildings/index.page?qa=cell-${index}`,
             content:[{type:'text',text:`Styled-cell-link-${index}`,styles:{bold:true,italic:true}}]},
            {type:'text',text:'\n',styles:{}},{type:'link',href:`mailto:qa-${index}@example.test`,content:[{type:'text',text:`Email-cell-${index}`,styles:{}}]}]]},

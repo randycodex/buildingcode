@@ -54,4 +54,11 @@ await runResearchV2({...input,sources:[{...source,text:'The general rule applies
  if(meta.phase==='draft')effort=body.reasoning.effort;return payload(meta.phase==='review'?{pass:true,issues:[]}:draft);
 }});
 assert.equal(effort,'medium','Several numbered exceptions receive additional drafting effort without bypassing review.');
+calls=[];
+await runResearchV2({...input,question:'For this hypothetical scenario, compare the table factors and net versus gross area.',sources:[{...source,text:'TABLE 1004.1.3 Business areas: 100 gross. Library reading rooms: 50 net. Footnote a applies.'}]},{call:async(body,meta)=>{
+ calls.push({body,phase:meta.phase});return payload(meta.phase==='review'?{pass:true,issues:[]}:draft);
+}});
+assert.equal(calls[0].body.reasoning.effort,'medium');
+for(const call of calls)assert.match(call.body.instructions,/hypothetical/i,'Both writer and reviewer distinguish stipulated inputs from verified Project facts');
+assert.match(result.draft.answerText,/retry|one part/i,'A rejected answer gives an actionable recovery without publishing unchecked claims');
 console.log('Research v2 engine: frozen passage-only inputs, Luna-only calls, citation identity gate, fresh repair review, bounded failure and cancellation passed.');

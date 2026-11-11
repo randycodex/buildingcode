@@ -21,11 +21,13 @@ function fixture({ drafts = [draft], choice = '0', mount, gate, container = null
     accountContextChangedError: () => new Error('Workspace changed'),
     projectIdentity: value => value, projectDetailKey: value => value.id,
     syncCodeVersion: value => value,
-    reportDraftMounts: new Map(mount ? [['project-a', mount]] : []), notebookMounts: new Map(),
+    reportDraftMounts: new Map(mount ? [['project-a', mount]] : []), notebookMounts: new Map(), notebookColumnMounts:new Map(),
+    loadNotebookDraft:async()=>null,
     emptyProjectReportDraft: () => ({ id: '', title: 'New Report', version: 0, blocks: [] }),
     openWebWarning: async options => { dialogs.push(options); return choice; },
     postResearch: async (path, body) => {
       calls.push(path);
+      if (path.endsWith('/notebook/cards/get')) return {card:note};
       if (path.endsWith('drafts/list')) { if (gate) await gate; return { drafts: structuredClone(drafts) }; }
       if (path.endsWith('sources/list')) return { sources: [source, evidence, { ...evidence, id: 'historical', sourceLibraryVersion: '2014' }] };
       if (path.endsWith('drafts/save')) { saved.push(structuredClone(body)); return { draft: { ...body, id: body.draftID || 'new-id', version: body.expectedVersion + 1 } }; }

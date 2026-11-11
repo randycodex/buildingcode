@@ -10,7 +10,7 @@ const action = (label, callback, className = '') => {
 };
 export const passageChipLabel = source => `${source.codePrefix || source.codeBook || 'Code'} § ${source.sectionNumber || source.sectionID} · ${String(source.codeEdition || source.edition || source.codeSource?.editionLabel || source.codeVersion || '').match(/(?:19|20)\d{2}/)?.[0] || 'Edition unavailable'}`;
 
-export {researchDiscoveryQuery} from './research-discovery-query.js?v=2';
+export {researchDiscoveryQuery} from './research-discovery-query.js?v=3';
 
 export const researchAnswerText = message => message.answer?.answerText || [message.answer?.conclusion, message.answer?.explanation].filter(Boolean).join('\n\n') || message.failure?.message || 'This answer did not complete.';
 export const researchReviewLabel = answer => answer?.verification?.pass === true ? 'AI reviewed · Check cited text' : answer?.verification?.status === 'failed' || answer?.authorityStatus === 'incomplete' ? 'Incomplete' : 'Unreviewed';
@@ -289,7 +289,15 @@ export function createResearchV2View(options) {
     try{await onSend({...lastRequest,signal:controller.signal,onProgress:event=>{
       if(valid(attempt))notice(event.stage==='checking_citation_support'?'Checking the answer against your passages…':'Developing your answer…');
     }});if(valid(attempt)){onDraft('');lastRequest=null;options.requestStore?.write(null);}}
-    catch(error){if(valid(attempt)){pendingBubble?.remove();pendingBubble=null;thread.querySelector('.rv2-welcome')?.removeAttribute('hidden');notice(error.name==='AbortError'?'Stopped. Your draft and passages are retained.':error.message,true);}}
+    catch(error){if(valid(attempt)){pendingBubble?.remove();pendingBubble=null;thread.querySelector('.rv2-welcome')?.removeAttribute('hidden');notice(error.name==='AbortError'?'Stopped. Your draft and passages are retained.':error.message,true);
+      if((error.payload?.code||error.code)==='V2_REVIEW_FAILED'){
+        // A definitive failed review is not an uncertain in-flight request.
+        // An explicit retry gets a new identity and the same visible inputs.
+        lastRequest=null;options.requestStore?.write(null);
+        const retry=action('Retry answer',()=>{retry.remove();void sendQuestion();},'rv2-text-action');
+        status.append(retry);
+      }
+    }}
     finally{busy=false;controller=null;update();}
   }
   composer.addEventListener('submit',event=>{event.preventDefault();void sendQuestion();});

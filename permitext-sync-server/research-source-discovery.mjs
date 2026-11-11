@@ -71,11 +71,24 @@ export async function discoverResearchSources({question,focus='',cursor=null,sel
     const item=add(section,'provision',result.signals?.exactReference?'Exact citation requested in the question.':'Related to the question; review its conditions and scope.',extra,canonical(section,body));
     if(item)primary.push({item,section,body,result});
   }
+  // Long project instructions can overwhelm body-text retrieval. Nominate
+  // matching section titles as well; every nomination still requires Reader
+  // review and can establish neither a rule nor project applicability.
+  const genericTitleWords=new Set(['code','section','table','provision','general','building']);
+  const titleMatches=section=>[...titleWords(section.title)].filter(word=>queryWords.has(word)&&!genericTitleWords.has(word)).length;
+  const prefix=primary[0]?.section.codePrefix;
+  const nominated=catalog.filter(section=>(!prefix||section.codePrefix===prefix)&&titleMatches(section)>=2)
+    .sort((a,b)=>titleScore(b)-titleScore(a)).slice(0,6);
+  for(const section of nominated){
+    if(primary.some(entry=>key(entry.section)===key(section)))continue;
+    const body=await read(section);if(!body)continue;
+    const item=add(section,'provision','Section title matches the research topic; review its conditions and scope.',{},canonical(section,body));
+    if(item)primary.push({item,section,body,result:{signals:{}}});
+  }
   // Rare subject words in titles outrank incidental mentions in long bodies.
   // Exact citations remain protected; ranking never establishes applicability.
   const relevanceOrder=(a,b)=>Number(Boolean(b.result.signals?.exactReference))-Number(Boolean(a.result.signals?.exactReference))||leadingScore(b)-leadingScore(a);
-  const leading=primary.slice(0,4).sort(relevanceOrder),remaining=primary.slice(4).sort(relevanceOrder);
-  primary.splice(0,primary.length,...leading,...remaining);
+  primary.sort(relevanceOrder);
   const seeds=[...pinned.map(source=>({section:byKey.get(key(source)),text:source.selectedText})),
     ...primary.slice(0,4).map(({section,body,result})=>({section,text:result.selectedText||canonical(section,body)}))].filter(seed=>seed.section);
   for(const {section,text} of seeds){

@@ -9,6 +9,9 @@ const c=vm.createContext({primarySavedPaneID:()=> 'saved-pane',startNewResearchF
 vm.runInContext(app.slice(start,end+2),c);
 await c.startFocusedResearchFromSavedItem({id:'bookmark',sectionID:'2152',savedColumnKind:'bookmark',previewText:full.slice(0,240),savedContentComparisonText:full},'project');
 assert.equal(delivered.selectedText,full);assert.equal(delivered.savedItemID,'bookmark');assert.equal(delivered.projectID,'project');assert.equal(delivered.originSurface,'saved');
+await c.startFocusedResearchFromSavedItem({id:'project-section',projectID:'project',sectionID:'2152',savedColumnKind:'bookmark',savedContentComparisonText:full},'project');
+assert.equal(delivered.savedItemID,'','Project sections must not masquerade as account Saved item IDs');
+assert.equal(delivered.selectedText,full);assert.equal(delivered.projectID,'project');
 await c.startFocusedResearchFromSavedItem({sectionID:'2152',selectedText:'An explicitly selected shorter range.',savedContentComparisonText:full,previewText:'A card preview.'});
 assert.equal(delivered.selectedText,'An explicitly selected shorter range.','An explicit selection must not expand to a containing paragraph');
 await c.startFocusedResearchFromSavedItem({sectionID:'2152',previewText:'Exceptions:'});assert.equal(delivered.selectedText,'Exceptions:','Legacy heading-only evidence remains literal');

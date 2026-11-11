@@ -11,6 +11,7 @@ import { Menu } from "@mantine/core";
 import "@blocknote/mantine/style.css";
 import "./notebook.css";
 import { notebookReferenceBlocks } from "../public/notebook-passage-blocks.js";
+import { normalizeNotebookDocumentStyles } from "../public/notebook-styles.js";
 export { createReportFormatting } from "./report-text-editor.js";
 import { en } from "@blocknote/core/locales";
 import {
@@ -198,6 +199,7 @@ function PermitextFormattingToolbar({ editor, options }) {
     }
   });
   const textBlocks = state.blocks.filter(block => ["paragraph", "heading", "bulletListItem", "numberedListItem"].includes(block.type));
+  const inlineSelection = state.blocks.some(block => ["paragraph", "heading", "bulletListItem", "numberedListItem", "table"].includes(block.type));
   const first = textBlocks[0];
   const type = first?.type === "heading" ? `heading-${first.props.level}` : "paragraph";
   const setBlockType = (type, props = {}) => {
@@ -207,7 +209,7 @@ function PermitextFormattingToolbar({ editor, options }) {
   const styleButton = (style, label, glyph) => React.createElement("button", {
     key: style, type: "button", className: `notebook-format-button notebook-format-${style}`,
     title: label, "aria-label": label, "aria-pressed": !!state.styles[style],
-    disabled: !state.editable || !textBlocks.length,
+    disabled: !state.editable || !inlineSelection,
     onMouseDown: event => event.preventDefault(),
     onClick: () => { editor.focus(); editor.toggleStyles({[style]: true}); }
   }, glyph);
@@ -263,7 +265,7 @@ function PermitextFormattingToolbar({ editor, options }) {
     React.createElement("button", {
       type: "button", className: "notebook-format-button notebook-format-highlight",
       title: "Highlight", "aria-label": "Highlight", "aria-pressed": state.styles.backgroundColor === "yellow",
-      disabled: !state.editable || !textBlocks.length,
+      disabled: !state.editable || !inlineSelection,
       onMouseDown: event => event.preventDefault(),
       onClick: () => {
         editor.focus();
@@ -292,7 +294,7 @@ function PermitextFormattingToolbar({ editor, options }) {
     listButton("numberedListItem", "Numbered list", icon(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])),
     React.createElement("span", {className:"notebook-format-link"},
       React.createElement("button", {type:"button", className:"notebook-format-button", title:"Link", "aria-label":"Link", "aria-expanded":linkOpen,
-        disabled:!state.editable || !textBlocks.length, onMouseDown:event=>event.preventDefault(), onClick:openLink},
+        disabled:!state.editable || !inlineSelection, onMouseDown:event=>event.preventDefault(), onClick:openLink},
         icon(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"])),
       linkOpen && React.createElement("form", {className:"notebook-format-link-form", onSubmit:submitLink,
         onKeyDown:event=>{if(event.key==="Escape"){event.preventDefault();setLinkOpen(false);if(restoreSelection(linkSelection.current)) editor.focus();}}},
@@ -331,12 +333,12 @@ function normalizedReference(reference) {
 }
 
 function wrappedDocument(blocks) {
-  return {
+  return normalizeNotebookDocumentStyles({
     schema: notebookSchemaName,
     schemaVersion: notebookSchemaVersion,
     format: notebookDocumentFormat,
     document: blocks
-  };
+  });
 }
 
 function preferredNotebookTheme() {

@@ -1,4 +1,5 @@
 import { normalizeNotebookQuestions } from "./public/notebook-questions.js";
+import { normalizeNotebookStyles } from "./public/notebook-styles.js";
 import {
   emptyNotebookDocument as emptyVersionedNotebookDocument,
   notebookBlockTypes,
@@ -158,7 +159,7 @@ function canonicalStyles(styles) {
     throw new Error("Notebook text styles are invalid.");
   }
   const canonical = {};
-  for (const [name, value] of Object.entries(styles)) {
+  for (const [name, value] of Object.entries(normalizeNotebookStyles(styles))) {
     if (name === "backgroundColor" && (value === "yellow" || value === "default")) {
       if (value === "yellow") canonical.backgroundColor = "yellow";
       continue;
