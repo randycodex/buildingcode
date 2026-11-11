@@ -4,7 +4,8 @@ import {
   BlockNoteSchema,
   defaultBlockSpecs,
   defaultInlineContentSpecs,
-  defaultStyleSpecs
+  defaultStyleSpecs,
+  createStyleSpec
 } from "@blocknote/core";
 import { BlockNoteView } from "@blocknote/mantine";
 import { Menu } from "@mantine/core";
@@ -151,6 +152,25 @@ const notebookBlockSpecs = Object.fromEntries(
   Object.entries(defaultBlockSpecs).filter(([type]) => allowedBlockTypeSet.has(type))
 );
 
+// Keep the normal color parser and renderer, and recognize semantic highlights
+// from copied HTML as the same supported yellow highlight used by the toolbar.
+const backgroundColorSpec = defaultStyleSpecs.backgroundColor;
+const notebookBackgroundColor = {...backgroundColorSpec, implementation: {
+  ...backgroundColorSpec.implementation,
+  mark: backgroundColorSpec.implementation.mark.extend({
+    parseHTML() {
+      return [{tag: "mark", getAttrs: () => ({stringValue: "yellow"})}, ...(this.parent?.() || [])];
+    }
+  })
+}};
+const notebookSuperscript = createStyleSpec({type: "superscript", propSchema: "boolean"}, {
+  render: () => {
+    const dom = document.createElement("sup");
+    return {dom, contentDOM: dom};
+  },
+  parse: element => element.tagName === "SUP" || element.style.verticalAlign === "super" ? true : undefined
+});
+
 export const permitextNotebookSchema = BlockNoteSchema.create({
   blockSpecs: notebookBlockSpecs,
   inlineContentSpecs: {
@@ -162,7 +182,8 @@ export const permitextNotebookSchema = BlockNoteSchema.create({
     italic: defaultStyleSpecs.italic,
     strike: defaultStyleSpecs.strike,
     underline: defaultStyleSpecs.underline,
-    backgroundColor: defaultStyleSpecs.backgroundColor
+    backgroundColor: notebookBackgroundColor,
+    superscript: notebookSuperscript
   }
 });
 

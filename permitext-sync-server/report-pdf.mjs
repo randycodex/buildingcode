@@ -382,7 +382,8 @@ export function drawReportRichText(document, runs, {size = 10, bold = false, par
   left = document.page.margins.left + indent, width = document.page.width - document.page.margins.right - left,
   lineHeight = size * 1.5, paginate = true, measureOnly = false} = {}) {
   let line = [], used = 0, measuredHeight = 0;
-  const measure = run => document.font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(size).widthOfString(run.text);
+  const runSize = run => run.superscript ? size * 0.7 : size;
+  const measure = run => document.font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(runSize(run)).widthOfString(run.text);
   const flush = () => {
     measuredHeight += lineHeight;
     if (measureOnly) {line = []; used = 0; return;}
@@ -392,8 +393,8 @@ export function drawReportRichText(document, runs, {size = 10, bold = false, par
     for (const run of line) {
       const runWidth = measure(run);
       if (run.highlight) document.save().fillColor("#f4d35e").fillOpacity(0.5).rect(x, top + 1, runWidth, size * 1.25).fill().restore();
-      document.fillColor(colors.ink).font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(size)
-        .text(run.text, x, top, {lineBreak:false, oblique:run.italic || false, strike:run.strike || false,
+      document.fillColor(colors.ink).font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(runSize(run))
+        .text(run.text, x, top - (run.superscript ? size * 0.15 : 0), {lineBreak:false, oblique:run.italic || false, strike:run.strike || false,
           underline:run.underline || Boolean(run.href), ...(run.href ? {link:run.href} : {})});
       x += runWidth;
     }

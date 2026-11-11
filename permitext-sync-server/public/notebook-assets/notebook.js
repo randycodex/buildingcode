@@ -48043,7 +48043,8 @@ function IG(e) {
 			"bold",
 			"italic",
 			"underline",
-			"strike"
+			"strike",
+			"superscript"
 		].includes(e?.type) && (t[e.type] = !0), e?.type === "backgroundColor" && e.attrs?.stringValue === "yellow" && (t.backgroundColor = "yellow");
 	}), t;
 }
@@ -48189,7 +48190,30 @@ var KG = mF({
 		"data-reference-id": e.props.referenceID,
 		"data-reference-label": e.props.label
 	}, ...GG(e.props.referenceKind, e.props.label))
-}), qG = Object.fromEntries(Object.entries(Sv).filter(([e]) => VG.has(e))), JG = Ov.create({
+}), qG = Object.fromEntries(Object.entries(Sv).filter(([e]) => VG.has(e))), JG = Tv.backgroundColor, YG = {
+	...JG,
+	implementation: {
+		...JG.implementation,
+		mark: JG.implementation.mark.extend({ parseHTML() {
+			return [{
+				tag: "mark",
+				getAttrs: () => ({ stringValue: "yellow" })
+			}, ...this.parent?.() || []];
+		} })
+	}
+}, XG = $h({
+	type: "superscript",
+	propSchema: "boolean"
+}, {
+	render: () => {
+		let e = document.createElement("sup");
+		return {
+			dom: e,
+			contentDOM: e
+		};
+	},
+	parse: (e) => e.tagName === "SUP" || e.style.verticalAlign === "super" || void 0
+}), ZG = Ov.create({
 	blockSpecs: qG,
 	inlineContentSpecs: {
 		...Ev,
@@ -48200,10 +48224,11 @@ var KG = mF({
 		italic: Tv.italic,
 		strike: Tv.strike,
 		underline: Tv.underline,
-		backgroundColor: Tv.backgroundColor
+		backgroundColor: YG,
+		superscript: XG
 	}
 });
-function YG({ editor: e, options: t }) {
+function QG({ editor: e, options: t }) {
 	let [n, r] = (0, _.useState)(!1), [i, a] = (0, _.useState)(""), [o, s] = (0, _.useState)(""), [c, l] = (0, _.useState)(""), u = (0, _.useRef)(null), d = (0, _.useRef)(null), f = () => {
 		let t = e._tiptapEditor.state;
 		return {
@@ -48433,7 +48458,7 @@ function YG({ editor: e, options: t }) {
 		}
 	}, t.toolbarStatusElement ? null : t.status || ""));
 }
-function XG(e) {
+function $G(e) {
 	let t = String(e?.referenceKind || "").trim(), n = String(e?.referenceID || "").trim(), r = String(e?.label || "").trim();
 	if (!NG.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
 	return {
@@ -48442,7 +48467,7 @@ function XG(e) {
 		label: r
 	};
 }
-function ZG(e) {
+function eK(e) {
 	return NW({
 		schema: jG,
 		schemaVersion: 2,
@@ -48450,13 +48475,13 @@ function ZG(e) {
 		document: e
 	});
 }
-function QG() {
+function tK() {
 	let e = document.documentElement.dataset.theme;
 	return e === "dark" || e === "light" ? e : window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
-function $G({ options: e, controllerRef: t }) {
-	let [n, r] = (0, _.useState)(QG), i = (0, _.useMemo)(() => zG(e.document), []), a = tj({
-		schema: JG,
+function nK({ options: e, controllerRef: t }) {
+	let [n, r] = (0, _.useState)(tK), i = (0, _.useMemo)(() => zG(e.document), []), a = tj({
+		schema: ZG,
 		dictionary: {
 			...hx,
 			placeholders: {
@@ -48474,7 +48499,7 @@ function $G({ options: e, controllerRef: t }) {
 		resolveFileUrl: e.resolveFileUrl
 	}), o = (0, _.useRef)(e.document);
 	return (0, _.useEffect)(() => {
-		let e = () => r(QG()), t = new MutationObserver(e);
+		let e = () => r(tK()), t = new MutationObserver(e);
 		t.observe(document.documentElement, {
 			attributes: !0,
 			attributeFilter: ["class", "data-theme"]
@@ -48497,14 +48522,14 @@ function $G({ options: e, controllerRef: t }) {
 		sideMenu: !1,
 		slashMenu: !1,
 		renderEditor: !1,
-		onChange: () => e.onChange?.(ZG(a.document)),
+		onChange: () => e.onChange?.(eK(a.document)),
 		"aria-label": e.ariaLabel || "Notebook card"
-	}, e.toolbar !== !1 && e.editable !== !1 && _.createElement(YG, {
+	}, e.toolbar !== !1 && e.editable !== !1 && _.createElement(QG, {
 		editor: a,
 		options: e
 	}), _.createElement(GP));
 }
-function eK(e, t = {}) {
+function rK(e, t = {}) {
 	if (!(e instanceof HTMLElement)) throw Error("A Notebook editor mount element is required.");
 	let n = (e) => JSON.stringify(e.state.doc.toJSON(), (e, t) => e === "id" ? void 0 : t), r = { current: null }, i = (0, y.createRoot)(e), a = null, o = {
 		...t,
@@ -48512,7 +48537,7 @@ function eK(e, t = {}) {
 			a = e;
 		}
 	};
-	return i.render(_.createElement($G, {
+	return i.render(_.createElement(nK, {
 		options: o,
 		controllerRef: r
 	})), {
@@ -48520,13 +48545,13 @@ function eK(e, t = {}) {
 			o.status = String(e || ""), a && !t.toolbarStatusElement && (a.textContent = o.status);
 		},
 		setEditable(e) {
-			o.editable = !!e, r.current && (r.current.isEditable = o.editable), i.render(_.createElement($G, {
+			o.editable = !!e, r.current && (r.current.isEditable = o.editable), i.render(_.createElement(nK, {
 				options: { ...o },
 				controllerRef: r
 			}));
 		},
 		getDocument() {
-			return ZG(r.current?.document || t.document?.document || []);
+			return eK(r.current?.document || t.document?.document || []);
 		},
 		getEditingPosition() {
 			let e = r.current?._tiptapEditor, t = e?.state.selection;
@@ -48557,13 +48582,13 @@ function eK(e, t = {}) {
 			let t = r.current;
 			return t ? (t.focus(), t.insertInlineContent([{
 				type: "permitextReference",
-				props: XG(e)
+				props: $G(e)
 			}, " "]), !0) : !1;
 		},
 		appendReference(e, t = [], n = [], i = null) {
 			let a = r.current, o = a?.document.at(-1);
 			if (!a || !o) return !1;
-			let s = a.insertBlocks(AW(XG(e), t, n, i), o, "after");
+			let s = a.insertBlocks(AW($G(e), t, n, i), o, "after");
 			return a.setTextCursorPosition(s.at(-1), "end"), a.focus(), !0;
 		},
 		replaceAssetURL(e, t) {
@@ -48598,4 +48623,4 @@ function eK(e, t = {}) {
 	};
 }
 //#endregion
-export { AG as createReportFormatting, eK as mountPermitextNotebookEditor, JG as permitextNotebookSchema };
+export { AG as createReportFormatting, rK as mountPermitextNotebookEditor, ZG as permitextNotebookSchema };

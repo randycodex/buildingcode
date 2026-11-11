@@ -1,6 +1,6 @@
 import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
-import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=5";
+import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=7";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=22";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
@@ -9,7 +9,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-nine-workflow-fixes-v1663";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-three-walkthrough-fixes-v1665";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=10";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -162,7 +162,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261111-nine-workflow-fixes-v1663";
+} from "./offline-storage.js?v=20261111-three-walkthrough-fixes-v1665";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -370,7 +370,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261111-workflow-fixes-notebook-v2";
+const notebookClientVersion = "20261111-inline-formats-notebook-v3";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -32179,6 +32179,7 @@ async function renderProjectReportDraft(project, resume = null) {
     persistProjectSectionExpansion(identity, `Report:${sectionName}`, expanded);
   };
   let sourceAddition = Promise.resolve();
+  let sourceAdditionDraft = null;
   const mountState = {
     panel,
     getPresentationState: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID && renderedDraftKey ? captureReportResume(panel, {
@@ -32205,25 +32206,34 @@ async function renderProjectReportDraft(project, resume = null) {
     hasPendingEdits: () => dirty || autosave?.isSaving() || generatingReport || deletingReport,
     getDraftSnapshot: () => structuredClone(activeDraft),
     addSources(draftID, selectedSources) {
+      if (generatingReport || deletingReport || activeDraft.id !== draftID) {
+        return Promise.reject(new Error("The Report has changed or is exporting. Choose its destination again."));
+      }
+      // The first save assigns an ID to this same draft. Track its object
+      // identity so that assigning that ID does not discard the first source.
+      const destinationDraft = activeDraft;
+      sourceAdditionDraft = destinationDraft;
       const sources = structuredClone(selectedSources);
       const add = async () => {
         const current = () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
         if (!current()) throw accountContextChangedError();
-        if (activeDraft.id !== draftID || generatingReport || deletingReport) throw new Error("The Report has changed. Choose its destination again.");
+        if (activeDraft !== destinationDraft || deletingReport) throw new Error("The Report has changed. Choose its destination again.");
         // Wait for the current save and preceding additions, keeping the user's
         // chosen destination and every requested source intact.
         if (!await saveDraft()) throw new Error("Save the Report with Retry before adding more sources. Your edits are preserved.");
-        if (!current() || activeDraft.id !== draftID) throw accountContextChangedError();
+        if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
         await prepareReportNoteSources(projectID, sources, requestIdentity);
-        if (!current() || activeDraft.id !== draftID) throw accountContextChangedError();
+        if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
         appendUniqueReportSources(activeDraft, sources);
         setDirty();
         renderWorkspaceContent();
         if (!await saveDraft()) throw new Error("The Report could not finish saving. Your added material and edits remain in the Report; use Retry to save them.");
         return structuredClone(activeDraft);
       };
-      const pending = sourceAddition.then(add);
-      sourceAddition = pending.catch(() => {});
+      const pending = sourceAddition.catch(() => {}).then(add);
+      sourceAddition = pending;
+      // Keep failures observable by export while allowing a later retry.
+      void pending.catch(() => {});
       return pending;
     },
     async confirmDiscardIfNeeded() {
@@ -32403,6 +32413,9 @@ async function renderProjectReportDraft(project, resume = null) {
     generatingReport = true;
     paintExportState();
     try {
+      // Already accepted source additions may still be preparing a Note or
+      // saving the draft. Export their completed version, never an earlier one.
+      if (sourceAdditionDraft === activeDraft) await sourceAddition;
       if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
       if (dirty) {
@@ -32440,6 +32453,10 @@ async function renderProjectReportDraft(project, resume = null) {
         showStatusError(error.message === "Report text is too long."
           ? "A Report item exceeds the supported text length. Shorten that item and try again."
           : error.message || "The Report could not be generated.");
+      }
+    } catch (error) {
+      if (!disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID) {
+        showStatusError(`The requested source could not be included. Add it again before exporting. ${error.message || ""}`);
       }
     } finally { generatingReport = false; paintExportState(); }
   };

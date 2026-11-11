@@ -65,8 +65,19 @@ export function notebookBlocksFromSourceElement(root) {
     if (node.nodeType === 3) return [{type:'text', text:node.textContent.replace(/[\t\r\n ]+/g, ' '), styles}];
     if (node.nodeType !== 1 || ['SCRIPT','STYLE'].includes(node.tagName) || node.matches('[data-research-selection-exclude], .inline-bookmark-toggle, .inline-note-toggle')) return [];
     if (node.tagName === 'BR') return [{type:'text', text:'\n', styles}];
-    const next = {...styles, ...(['B','STRONG'].includes(node.tagName) ? {bold:true} : {}), ...(['I','EM'].includes(node.tagName) ? {italic:true} : {})};
+    const next = {...styles, ...(['B','STRONG'].includes(node.tagName) ? {bold:true} : {}), ...(['I','EM'].includes(node.tagName) ? {italic:true} : {}),
+      ...(node.tagName === 'U' ? {underline:true} : {}), ...(['S','STRIKE','DEL'].includes(node.tagName) ? {strike:true} : {}),
+      ...(node.tagName === 'MARK' ? {backgroundColor:'yellow'} : {}),
+      ...(node.tagName === 'SUP' || node.style?.verticalAlign === 'super' ? {superscript:true} : {})};
     const content = [...node.childNodes].flatMap(child => inline(child, next));
+    // Source HTML indentation around an exponent is not a printed separator.
+    // Keep word spacing after footnotes, but attach exponents and punctuation.
+    content.forEach((run, index) => {
+      const previous = content[index - 1];
+      if (run.type !== 'text' || previous?.type !== 'text') return;
+      if (run.styles?.superscript && !previous.styles?.superscript) previous.text = previous.text.trimEnd();
+      if (previous.styles?.superscript && !run.styles?.superscript) run.text = run.text.replace(/^\s+(?=[.,;:!?)}\]])/, '');
+    });
     if (node.tagName === 'A' && /^(https?:|mailto:)/i.test(node.href)) return [{type:'link', href:node.href, content}];
     return content;
   };

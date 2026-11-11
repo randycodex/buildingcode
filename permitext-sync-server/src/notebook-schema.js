@@ -35,7 +35,7 @@ export function emptyNotebookDocument() {
 function tiptapMarksToBlockNoteStyles(marks) {
   const styles = {};
   (Array.isArray(marks) ? marks : []).forEach((mark) => {
-    if (["bold", "italic", "underline", "strike"].includes(mark?.type)) {
+    if (["bold", "italic", "underline", "strike", "superscript"].includes(mark?.type)) {
       styles[mark.type] = true;
     }
     if (mark?.type === "backgroundColor" && mark.attrs?.stringValue === "yellow") styles.backgroundColor = "yellow";
