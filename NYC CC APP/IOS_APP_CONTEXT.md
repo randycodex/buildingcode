@@ -1,4 +1,4 @@
-# Permitext iPhone app context
+# per codes iPhone app context
 
 Use this as the current handoff for iOS work in:
 
@@ -6,19 +6,25 @@ Use this as the current handoff for iOS work in:
 
 ## Product boundary
 
-Permitext is a local-first NYC code-research workspace. The iPhone app reads
+per codes is a local-first NYC code-research workspace. The iPhone app reads
 bundled Construction Code and Zoning Resolution content, stores personal work
-locally, and synchronizes supported records through the Permitext backend after
+locally, and synchronizes supported records through the per codes backend after
 sign-in.
 
-Search discovers candidate provisions. Research is a separate, selected-evidence
-workflow: it may use only the enacted passages the user selected and must expose
-citations, uncertainty, missing facts, and limitations.
+Search discovers candidate provisions. Research uses the same v2 engine as the web:
+one draft, a separate AI review, and at most one repair. It uses the selected Reader
+passages, recent conversation, and any Project snapshot the user explicitly reviews
+and includes. Preserve citations, uncertainty, missing facts, and limitations.
+Do not fall back to the retired Fast or Verified engines.
+
+History uses short summaries of the original asks, date groups, a final Drafts
+group, separators, and row menus. Full original questions and saved answers remain
+intact. Preserve manual titles and generated summary titles on follow-ups.
 
 Free includes reading, search, recent history, bounded saved sections and notes,
 continuity, and cross-device sync. Pro adds unlimited saved work, Projects,
 Notebook, Report Draft, professional exports, tags, and offline access. Research
-is a separate add-on that requires Pro.
+requires Pro and uses the account’s included or purchased Research turns.
 
 ## Project and build
 
@@ -99,7 +105,7 @@ structural/title-only entries may not have an independent body.
 - Continuity histories merge per entry on the server. Pending iOS continuity
   activity must upload so recent views and searches from multiple devices can
   converge.
-- Production phone-to-web proof uses `https://permitext-sync.vercel.app` with
+- Production phone-to-web proof uses `https://per.codes` with
   PostgreSQL. The local JSON adapter is development storage, not production sync
   proof.
 

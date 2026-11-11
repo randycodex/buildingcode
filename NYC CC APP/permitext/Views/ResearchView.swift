@@ -82,8 +82,8 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
 }
 
 enum ResearchTrustCopy {
-    static let composerPrivacyDisclosure = "Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential, regulated, or sensitive personal information. Ordinary property information may be included when needed."
-    static let firstUseDisclosure = "per codes sends your question, recent chat, selected or retrieved evidence, and assigned Project facts to OpenAI. Private notes are not included."
+    static let composerPrivacyDisclosure = "Research sends your question, recent chat, selected Reader passages, and any Project snapshot you explicitly review and include to OpenAI. Private notes are not included. Do not include confidential, regulated, or sensitive personal information. Only the material you include is used."
+    static let firstUseDisclosure = "per codes sends your question, recent chat, selected Reader passages, and any Project snapshot you explicitly review and include to OpenAI. Private notes are not included."
     static let visualEvidenceDisclosure = "Selected official images are sent to OpenAI for analysis. Private notes are not included."
     static let copyAnswerAction = "Copy answer"
     static let reportProblemAction = "Report a problem"
@@ -359,6 +359,7 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
         // These are explicit pre-commit rejections, not lost responses. Polling
         // four times cannot recover an answer and adds twelve seconds of delay.
         let terminalCodes: Set<String> = [
+            "V2_REVIEW_FAILED", "V2_INVALID_OUTPUT", "RESEARCH_V2_DISABLED", "RESEARCH_CONTEXT_CHANGED",
             "RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_VERIFICATION", "RESEARCH_SPEND_CAP",
             "RESEARCH_EVAL_SPEND_CAP", "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE",
             "RESEARCH_EVIDENCE_NOT_FOUND", "RESEARCH_EVIDENCE_REQUIRED",
@@ -399,6 +400,7 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
         let serverMessage = error.serverMessage?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let verificationCodes: Set<String> = [
+            "V2_REVIEW_FAILED", "V2_INVALID_OUTPUT",
             "INVALID_RESEARCH_RESPONSE",
             "INVALID_RESEARCH_CITATION",
             "INVALID_RESEARCH_WEB_CITATION",
@@ -446,7 +448,7 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
                 "per codes could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there."
             )
         case let value? where providerCodes.contains(value):
-            return retainedQuestion("per codes's Research service is temporarily unavailable.")
+            return retainedQuestion("The Research service is temporarily unavailable.")
         default:
             break
         }
@@ -463,7 +465,7 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
         }
 
         if let statusCode = error.statusCode, statusCode >= 500 {
-            return retainedQuestion("per codes's Research service is temporarily unavailable.")
+            return retainedQuestion("The Research service is temporarily unavailable.")
         }
 
         if let serverMessage, !serverMessage.isEmpty {
@@ -529,6 +531,11 @@ private struct ResearchSessionView: View {
     @State private var pendingVisualReview: PendingResearchVisualReview?
     @State private var showingRename = false
     @State private var draftTitle = ""
+    @State private var renameConversationID: String?
+    @State private var showingProjectSnapshot = false
+    @State private var projectSnapshot: ResearchProjectSnapshot?
+    @State private var projectSnapshotError: String?
+    @State private var isUpdatingProjectSnapshot = false
     @State private var pendingAssignmentProjectID: String?
     @State private var showingAssignmentConfirmation = false
     @State private var showingProjectCreator = false
@@ -638,6 +645,9 @@ private struct ResearchSessionView: View {
                 ResearchNotebookHandoffSheet(handoff: handoff, owner: owner)
                     .environmentObject(library)
             }
+            .sheet(isPresented: $showingProjectSnapshot) {
+                projectSnapshotSheet
+            }
             .sheet(isPresented: $showingProjectCreator) {
                 FolderEditorSheet(
                     existing: nil,
@@ -741,6 +751,11 @@ private struct ResearchSessionView: View {
                 pendingVisualReview = nil
                 pendingDeletion = nil
                 showingRename = false
+                renameConversationID = nil
+                showingProjectSnapshot = false
+                projectSnapshot = nil
+                projectSnapshotError = nil
+                isUpdatingProjectSnapshot = false
                 showingAssignmentConfirmation = false
                 question = ""
                 draftTitle = ""
@@ -872,6 +887,7 @@ private struct ResearchSessionView: View {
             if let conversation, !library.researchHistoryIsPresented {
                 Menu {
                     Button("Rename", systemImage: "pencil") {
+                        renameConversationID = conversation.id
                         draftTitle = conversation.title
                         showingRename = true
                     }
@@ -995,10 +1011,11 @@ private struct ResearchSessionView: View {
         let date = formatter.date(from: item.createdAt) ?? ISO8601DateFormatter().date(from: item.createdAt)
         guard let date else { return "Earlier" }
         let calendar = Calendar.current
-        if calendar.isDateInToday(date) { return "Today" }
-        if calendar.isDateInYesterday(date) { return "Yesterday" }
+        if let boundary = calendar.date(byAdding: .day, value: -7, to: Date()), date >= boundary {
+            return "7 days"
+        }
         if let boundary = calendar.date(byAdding: .day, value: -30, to: Date()), date >= boundary {
-            return "Previous 30 days"
+            return "30 days"
         }
         let label = DateFormatter()
         label.dateFormat = calendar.component(.year, from: date) == calendar.component(.year, from: Date()) ? "MMMM" : "MMMM yyyy"
@@ -1050,56 +1067,63 @@ private struct ResearchSessionView: View {
                 let startsDrafts = isDraft && (index == 0 || orderedSummaries[index - 1].messageCount != 0)
                 if startsDrafts || (!isDraft && (index == 0 || historyDateGroup(item) != historyDateGroup(orderedSummaries[index - 1]))) {
                     Text(startsDrafts ? "Drafts" : historyDateGroup(item))
-                        .font(.subheadline.weight(.medium))
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .padding(.top, index == 0 ? 0 : 20)
+                        .listRowInsets(EdgeInsets(top: 12, leading: 22, bottom: 8, trailing: 22))
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                 }
-                Button {
-                    if isSelectingHistory {
-                        if selectedHistoryIDs.contains(item.id) { selectedHistoryIDs.remove(item.id) }
-                        else { selectedHistoryIDs.insert(item.id) }
-                    } else {
-                        library.researchHistoryIsPresented = false
-                        library.activeResearchConversationID = item.id
-                    }
-                } label: {
-                    VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .top, spacing: 12) {
+                    Button {
+                        if isSelectingHistory {
+                            if selectedHistoryIDs.contains(item.id) { selectedHistoryIDs.remove(item.id) }
+                            else { selectedHistoryIDs.insert(item.id) }
+                        } else {
+                            library.researchHistoryIsPresented = false
+                            library.activeResearchConversationID = item.id
+                        }
+                    } label: {
                         HStack(alignment: .top, spacing: 12) {
                             if isSelectingHistory {
                                 Image(systemName: selectedHistoryIDs.contains(item.id) ? "checkmark.circle.fill" : "circle")
                             }
-                        Text(researchTitle(for: item))
-                            .font(.body.weight(.semibold))
-                            .foregroundStyle(.primary)
-                            .multilineTextAlignment(.leading)
-                            .lineLimit(2)
-                        }
-                        if let preview = (historyPreviews[item.id] ?? item.starterQuestion)?.trimmingCharacters(in: .whitespacesAndNewlines),
-                           !preview.isEmpty, preview != researchTitle(for: item) {
-                            Text(preview)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(3)
+                            Text(researchTitle(for: item))
+                                .font(.body)
+                                .foregroundStyle(.primary)
                                 .multilineTextAlignment(.leading)
+                                .lineLimit(3)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        if let projectID = item.primaryProjectID,
-                           let project = library.folder(forBackendProjectID: projectID) {
-                            Text(project.name)
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(.secondary)
-                        }
+                        .padding(.vertical, 14)
+                        .contentShape(Rectangle())
                     }
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .buttonStyle(.plain)
+                    .accessibilityValue(isSelectingHistory ? (selectedHistoryIDs.contains(item.id) ? "Selected" : "Not selected") : "")
+                    .accessibilityIdentifier("research-history-row")
+                    if !isSelectingHistory {
+                        Menu {
+                            Button("Rename conversation", systemImage: "pencil") {
+                                renameConversationID = item.id
+                                draftTitle = researchTitle(for: item)
+                                showingRename = true
+                            }
+                            Button("Delete conversation", systemImage: "trash", role: .destructive) {
+                                requestDeletion(id: item.id, title: researchTitle(for: item))
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                                .frame(width: 44, height: 48)
+                                .contentShape(Rectangle())
+                        }
+                        .accessibilityLabel("Options for \(researchTitle(for: item))")
+                        .accessibilityIdentifier("research-history-options-\(item.id)")
+                    }
                 }
-                .buttonStyle(.plain)
-                .disabled(deletingConversationID == item.id || isDeletingHistoryBatch)
-                .accessibilityValue(isSelectingHistory ? (selectedHistoryIDs.contains(item.id) ? "Selected" : "Not selected") : "")
-                .accessibilityIdentifier("research-history-row")
-                .task(id: item.updatedAt) { await loadHistoryPreview(item) }
-                .listRowInsets(EdgeInsets(top: 12, leading: 18, bottom: 12, trailing: 18))
+                .disabled(deletingConversationID == item.id || isDeletingHistoryBatch || isSending)
+                .listRowInsets(EdgeInsets(top: 0, leading: 22, bottom: 0, trailing: 10))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.visible, edges: .bottom)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -1236,7 +1260,7 @@ private struct ResearchSessionView: View {
                         if conversation.messages.isEmpty,
                            pendingQuestionAttempt == nil,
                            failedQuestionAttempt == nil {
-                            Text("Ask a question about the selected enacted text or the current Project.")
+                            Text("Ask a question or attach a passage from Reader.")
                                 .font(.body)
                                 .foregroundStyle(.secondary)
                                 .padding(.top, 36)
@@ -1270,7 +1294,7 @@ private struct ResearchSessionView: View {
                     .foregroundStyle(.secondary)
             }
             VStack(alignment: .trailing, spacing: CodeScreenMetrics.researchComposerRowSpacing) {
-                TextField("Ask", text: Binding(
+                TextField("Message", text: Binding(
                     get: { question },
                     set: { text in
                         question = text
@@ -1286,6 +1310,18 @@ private struct ResearchSessionView: View {
                     .disabled(isSending || researchSendIsBlocked)
                     .accessibilityIdentifier("research-composer")
                 HStack(spacing: 0) {
+                    Button {
+                        persistComposerDraft(question)
+                        library.selectedTab = .browse
+                    } label: {
+                        Image(systemName: "plus")
+                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isSending)
+                    .accessibilityLabel("Attach passage from Reader")
+                    .accessibilityIdentifier("research-attach-passage")
                     Spacer(minLength: 0)
                     if isSending {
                         Button {
@@ -1325,6 +1361,21 @@ private struct ResearchSessionView: View {
                 }
                 .padding(.trailing, 8)
                 .padding(.bottom, 8)
+                if conversation?.primaryProjectID != nil {
+                    Button(conversation?.assistantScope?.includeProjectContext == true
+                           ? "Review included Project context and facts"
+                           : "Include Project context and facts…") {
+                        showingProjectSnapshot = true
+                        Task { await loadProjectSnapshot() }
+                    }
+                    .font(.caption)
+                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, CodeScreenMetrics.cardPadding)
+                    .padding(.bottom, 12)
+                    .disabled(isSending)
+                    .accessibilityIdentifier("research-project-snapshot")
+                }
             }
             .codeLiquidGlassRoundedRectangle(cornerRadius: CodeScreenMetrics.researchComposerCornerRadius)
         }
@@ -1334,6 +1385,7 @@ private struct ResearchSessionView: View {
 
     private var researchSendIsBlocked: Bool {
         retainingInterruptedIdentities.contains(where: { $0 == requestIdentity() }) ||
+        isLoadingConversation || isUpdatingProjectSnapshot || showingProjectSnapshot ||
         library.researchTurnAllowance?.purchaseRequired == true ||
             conversation?.sourceStatus == "changed" ||
             conversation?.projectContextReviewRequired == true
@@ -1347,6 +1399,81 @@ private struct ResearchSessionView: View {
             return "Review the active Project above before asking another question."
         }
         return nil
+    }
+
+    private var projectSnapshotSheet: some View {
+        NavigationStack {
+            Form {
+                if let snapshot = projectSnapshot {
+                    Section("Project context and facts") {
+                        if let address = snapshot.projectInformation.address, !address.isEmpty { Text(address) }
+                        if let description = snapshot.projectInformation.description, !description.isEmpty { Text(description) }
+                        ForEach(Array((snapshot.projectInformation.facts ?? []).enumerated()), id: \.offset) { _, fact in
+                            Text(fact)
+                        }
+                    }
+                    Section {
+                        Button("Include reviewed snapshot") { Task { await updateProjectSnapshot(include: true) } }
+                            .accessibilityIdentifier("research-include-project-snapshot")
+                        if conversation?.assistantScope?.includeProjectContext == true {
+                            Button("Remove Project snapshot") { Task { await updateProjectSnapshot(include: false) } }
+                        }
+                    } footer: {
+                        Text("This snapshot is used in future answers in this conversation. Existing answers retain their original evidence and context.")
+                    }
+                    .disabled(isUpdatingProjectSnapshot)
+                } else if projectSnapshotError == nil {
+                    ProgressView("Loading Project…")
+                }
+                if let projectSnapshotError {
+                    Section {
+                        Text(projectSnapshotError)
+                        Button("Review again") { Task { await loadProjectSnapshot() } }
+                    }
+                }
+            }
+            .navigationTitle("Review Project context")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showingProjectSnapshot = false }
+                        .disabled(isUpdatingProjectSnapshot)
+                }
+            }
+        }
+    }
+
+    private func loadProjectSnapshot() async {
+        guard let identity = requestIdentity(), let id = identity.conversationID else { return }
+        projectSnapshot = nil
+        projectSnapshotError = nil
+        do {
+            let snapshot = try await library.researchProjectSnapshot(conversationID: id)
+            guard isCurrent(identity), showingProjectSnapshot else { return }
+            projectSnapshot = snapshot
+        } catch {
+            guard isCurrent(identity), showingProjectSnapshot else { return }
+            projectSnapshotError = error.localizedDescription
+        }
+    }
+
+    private func updateProjectSnapshot(include: Bool) async {
+        guard let identity = requestIdentity(), let id = identity.conversationID,
+              let snapshot = projectSnapshot, !isUpdatingProjectSnapshot else { return }
+        isUpdatingProjectSnapshot = true
+        defer { if isCurrent(identity) { isUpdatingProjectSnapshot = false } }
+        do {
+            let updated = try await library.updateResearchProjectSnapshot(
+                conversationID: id, include: include, snapshotHash: include ? snapshot.contentHash : nil
+            )
+            guard isCurrent(identity) else { return }
+            conversation = updated
+            cacheConversation(updated)
+            showingProjectSnapshot = false
+        } catch {
+            guard isCurrent(identity) else { return }
+            projectSnapshotError = error.localizedDescription
+        }
     }
 
     private func changedSourceWarning(_ conversation: ResearchConversation) -> some View {
@@ -1665,6 +1792,7 @@ private struct ResearchSessionView: View {
 
     private func researchTitle(for summary: ResearchConversationSummary) -> String {
         let title = summary.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        if ["manual", "summary"].contains(summary.titleSource ?? ""), !title.isEmpty { return title }
         let automaticTitle = title.isEmpty || title.range(of: #"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·"#, options: .regularExpression) != nil
         if !automaticTitle { return title }
         if let question = summary.starterQuestion?.trimmingCharacters(in: .whitespacesAndNewlines), !question.isEmpty { return question }
@@ -2137,7 +2265,9 @@ private struct ResearchSessionView: View {
             let updated = try await library.sendResearchMessage(
                 conversationID: id,
                 question: attempt.question,
-                requestID: attempt.id
+                requestID: attempt.id,
+                expectedRevision: conversation?.revision ?? 0,
+                expectedEvidenceSetVersion: conversation?.evidenceSetVersion ?? 1
             )
             try Task.checkCancellation()
             guard isCurrent(identity) else { return }
@@ -2250,22 +2380,19 @@ private struct ResearchSessionView: View {
     }
 
     private func renameConversation() async {
-        guard let identity = requestIdentity(), identity.conversationID == conversation?.id else { return }
-        guard let id = conversation?.id else { return }
+        guard isCurrentOwner, let id = renameConversationID else { return }
+        let title = draftTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else { return }
         do {
-            let updated = try await library.renameResearchConversation(id: id, title: draftTitle)
-            guard isCurrent(identity) else { return }
-            conversation = updated
+            let updated = try await library.renameResearchConversation(id: id, title: title)
+            guard isCurrentOwner, renameConversationID == id else { return }
+            if conversation?.id == id { conversation = updated }
             cacheConversation(updated)
             await loadHistory(forceNetwork: true)
-            guard isCurrent(identity) else { return }
+            guard isCurrentOwner else { return }
+            renameConversationID = nil
         } catch {
-            guard isCurrent(identity) else { return }
-            if let id = identity.conversationID, NativePrivateCachePolicy.requiresInvalidation(after: error) {
-                invalidateConversationIfRequired(error, id: id)
-                errorMessage = error.localizedDescription
-                return
-            }
+            guard isCurrentOwner, renameConversationID == id else { return }
             errorMessage = error.localizedDescription
         }
     }
@@ -2902,7 +3029,8 @@ private struct ResearchAnswerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if answer.authorityStatus != "supported_by_enacted_text",
+            if answer.researchEngine?.hasPrefix("research-v2") != true,
+               answer.authorityStatus != "supported_by_enacted_text",
                let authorityLabel = answer.researchAuthorityLabel,
                !authorityLabel.isEmpty {
                 Text(authorityLabel)
@@ -2926,6 +3054,12 @@ private struct ResearchAnswerView: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 .accessibilityIdentifier("research-next-question")
+            }
+            if answer.researchEngine?.hasPrefix("research-v2") == true {
+                Text(answer.verification?.pass == true ? "AI reviewed · Check cited text" : "Incomplete")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("research-review-status")
             }
             HStack(spacing: 14) {
                 Button {

@@ -534,16 +534,32 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         account: SignedInAccount,
         conversationID: String,
         question: String,
-        requestID: String
+        requestID: String,
+        expectedRevision: Int,
+        expectedEvidenceSetVersion: Int
     ) async throws -> ResearchConversation {
         try await transport.researchConversationMessage(
             ResearchConversationMessageRequest(
                 auth: authContext(for: account),
                 conversationID: conversationID,
                 question: question,
-                requestID: requestID
+                requestID: requestID,
+                expectedRevision: expectedRevision,
+                expectedEvidenceSetVersion: expectedEvidenceSetVersion
             )
         ).conversation
+    }
+
+    func researchProjectSnapshot(account: SignedInAccount, conversationID: String) async throws -> ResearchProjectSnapshot {
+        try await transport.researchProjectSnapshot(ResearchProjectSnapshotRequest(
+            auth: authContext(for: account), conversationID: conversationID
+        )).snapshot
+    }
+
+    func updateResearchProjectSnapshot(account: SignedInAccount, conversationID: String, include: Bool, snapshotHash: String?) async throws -> ResearchConversation {
+        try await transport.updateResearchProjectSnapshot(ResearchProjectSnapshotUpdateRequest(
+            auth: authContext(for: account), conversationID: conversationID, include: include, snapshotHash: snapshotHash
+        )).conversation
     }
 
     func saveResearchFeedback(

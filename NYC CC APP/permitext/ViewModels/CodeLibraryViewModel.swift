@@ -3705,7 +3705,9 @@ final class CodeLibraryViewModel: ObservableObject {
     func sendResearchMessage(
         conversationID: String,
         question: String,
-        requestID: String = UUID().uuidString
+        requestID: String = UUID().uuidString,
+        expectedRevision: Int,
+        expectedEvidenceSetVersion: Int
     ) async throws -> ResearchConversation {
         guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
         let identity = privateRequestIdentity
@@ -3714,7 +3716,9 @@ final class CodeLibraryViewModel: ObservableObject {
                 account: signedInAccount,
                 conversationID: conversationID,
                 question: question,
-                requestID: requestID
+                requestID: requestID,
+                expectedRevision: expectedRevision,
+                expectedEvidenceSetVersion: expectedEvidenceSetVersion
             )
             guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             await refreshResearchTurnAllowance(showsErrors: false)
@@ -3727,6 +3731,18 @@ final class CodeLibraryViewModel: ObservableObject {
                 await refreshResearchTurnAllowance(showsErrors: false)
             }
             throw error
+        }
+    }
+
+    func researchProjectSnapshot(conversationID: String) async throws -> ResearchProjectSnapshot {
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.researchProjectSnapshot(account: account, conversationID: conversationID)
+        }
+    }
+
+    func updateResearchProjectSnapshot(conversationID: String, include: Bool, snapshotHash: String?) async throws -> ResearchConversation {
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.updateResearchProjectSnapshot(account: account, conversationID: conversationID, include: include, snapshotHash: snapshotHash)
         }
     }
 

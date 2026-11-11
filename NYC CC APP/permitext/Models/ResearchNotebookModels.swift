@@ -29,6 +29,7 @@ struct ResearchRetainInterruptedResponse: Codable, Hashable, Sendable {
 struct ResearchConversationGetRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let conversationID: String
+    var analysisMode: String = "conversation_only"
 }
 
 struct ResearchConversationRefreshRequest: Codable, Hashable, Sendable {
@@ -93,6 +94,7 @@ struct ResearchConversationCreateRequest: Codable, Hashable, Sendable {
     let projectID: String?
     let selections: [ResearchSelectionRequest]?
     let originSurface: String
+    var analysisMode: String = "conversation_only"
 }
 
 struct ResearchConversationEvidenceRequest: Codable, Hashable, Sendable {
@@ -107,6 +109,39 @@ struct ResearchConversationMessageRequest: Codable, Hashable, Sendable {
     let conversationID: String
     let question: String
     let requestID: String
+    let expectedRevision: Int
+    let expectedEvidenceSetVersion: Int
+    var researchEngine: String = "v2"
+    var analysisMode: String = "conversation_only"
+}
+
+struct ResearchProjectSnapshotRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let conversationID: String
+    var preview: Bool = true
+}
+
+struct ResearchProjectSnapshot: Codable, Hashable, Sendable {
+    let projectID: String
+    let projectInformation: ResearchProjectInformation
+    let contentHash: String
+    var reviewedAt: String? = nil
+}
+
+struct ResearchProjectSnapshotResponse: Codable, Hashable, Sendable {
+    let snapshot: ResearchProjectSnapshot
+}
+
+struct ResearchProjectSnapshotUpdateRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let conversationID: String
+    let include: Bool
+    let snapshotHash: String?
+}
+
+struct ResearchAssistantScope: Codable, Hashable, Sendable {
+    var includeProjectContext: Bool = false
+    var projectContext: ResearchProjectSnapshot? = nil
 }
 
 struct ResearchFeedbackRequest: Codable, Hashable, Sendable {
@@ -253,6 +288,7 @@ struct ResearchConversationSummary: Codable, Hashable, Identifiable, Sendable {
     let title: String
     let createdAt: String
     let updatedAt: String
+    var titleSource: String? = nil
     var historyContentFacts: ResearchHistoryContentFacts? = nil
     var historyHiddenAt: String? = nil
     var sourceCount: Int = 0
@@ -269,6 +305,8 @@ struct ResearchConversation: Codable, Hashable, Identifiable, Sendable {
     var title: String
     let createdAt: String
     var updatedAt: String
+    var titleSource: String? = nil
+    var starterQuestion: String? = nil
     var primaryProjectID: String? = nil
     var projectContext: ResearchProjectContext? = nil
     var projectInformation: ResearchProjectInformation? = nil
@@ -277,6 +315,9 @@ struct ResearchConversation: Codable, Hashable, Identifiable, Sendable {
     var sources: [ResearchSource] = []
     var messages: [ResearchMessage] = []
     var contextRevision: Int? = nil
+    var revision: Int? = nil
+    var evidenceSetVersion: Int? = nil
+    var assistantScope: ResearchAssistantScope? = nil
 
     var summary: ResearchConversationSummary {
         ResearchConversationSummary(
@@ -284,11 +325,12 @@ struct ResearchConversation: Codable, Hashable, Identifiable, Sendable {
             title: title,
             createdAt: createdAt,
             updatedAt: updatedAt,
+            titleSource: titleSource,
             sourceCount: sources.filter { $0.kind == "selection" }.count,
             sourceSectionIDs: Array(Set(sources.compactMap(\.sectionID))).sorted(),
             messageCount: messages.count,
             primaryProjectID: primaryProjectID,
-            starterQuestion: messages.first(where: { $0.role == "user" })?.question,
+            starterQuestion: starterQuestion ?? messages.first(where: { $0.role == "user" })?.question,
             projectContextReviewRequired: projectContextReviewRequired,
             sourceStatus: sourceStatus
         )
@@ -382,6 +424,13 @@ struct ResearchAnswer: Codable, Hashable, Sendable {
     var supportingSources: [ResearchSupportingSource]? = nil
     var citations: [ResearchCitation] = []
     var disclaimer: String? = nil
+    var researchEngine: String? = nil
+    var verification: ResearchAnswerVerification? = nil
+}
+
+struct ResearchAnswerVerification: Codable, Hashable, Sendable {
+    var status: String? = nil
+    var pass: Bool? = nil
 }
 
 struct ResearchCodeBasis: Codable, Hashable, Sendable {

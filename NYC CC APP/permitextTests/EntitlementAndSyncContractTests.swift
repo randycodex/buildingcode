@@ -3314,15 +3314,15 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
 
         XCTAssertTrue(settingsSource.contains("This is permanent and cannot be undone."))
-        XCTAssertTrue(settingsSource.contains("Permitext will delete"))
-        XCTAssertTrue(settingsSource.contains("Permitext will not delete"))
+        XCTAssertTrue(settingsSource.contains("per codes will delete"))
+        XCTAssertTrue(settingsSource.contains("per codes will not delete"))
         XCTAssertTrue(settingsSource.contains("Type DELETE to confirm"))
         XCTAssertTrue(settingsSource.contains("Manage Apple Subscription"))
-        XCTAssertTrue(settingsSource.contains("I understand that deleting Permitext does not cancel App Store billing."))
+        XCTAssertTrue(settingsSource.contains("I understand that deleting per codes does not cancel App Store billing."))
         XCTAssertTrue(settingsSource.contains("Canceling Stripe billing"))
-        XCTAssertTrue(settingsSource.contains("Deleting Permitext data"))
+        XCTAssertTrue(settingsSource.contains("Deleting per codes data"))
         XCTAssertTrue(settingsSource.contains("Clearing this device"))
-        XCTAssertTrue(settingsSource.contains("Removing Permitext sign-in identity"))
+        XCTAssertTrue(settingsSource.contains("Removing per codes sign-in identity"))
         XCTAssertTrue(settingsSource.contains("Retry cleanup"))
         XCTAssertTrue(settingsSource.contains("Contact Support"))
         XCTAssertTrue(settingsSource.contains(".sheet(isPresented: $showsAccountDeleteWarning)"))
@@ -5927,6 +5927,86 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertNil(object["selections"])
         XCTAssertEqual(object["projectID"] as? String, "project-1")
         XCTAssertEqual(object["originSurface"] as? String, "ios-reader")
+        XCTAssertEqual(object["analysisMode"] as? String, "conversation_only")
+    }
+
+    func testNativeResearchV2RequestUsesObservedEvidenceRevisionAndPreservesFullAsk() async throws {
+        let host = "native-research-v2-\(UUID().uuidString.lowercased()).test"
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [ScopedPermitextURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        defer { ScopedPermitextURLProtocol.removeHandler(for: host); session.invalidateAndCancel() }
+        let originalAsk = "Explain the names assigned to this code using only the selected passage."
+        ScopedPermitextURLProtocol.install({ request in
+            XCTAssertEqual(request.url?.path, "/research/conversations/message")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer native-test-token")
+            let object = try XCTUnwrap(JSONSerialization.jsonObject(with: permitextRequestBody(request)) as? [String: Any])
+            XCTAssertEqual(object["researchEngine"] as? String, "v2")
+            XCTAssertEqual(object["analysisMode"] as? String, "conversation_only")
+            XCTAssertEqual(object["expectedRevision"] as? Int, 7)
+            XCTAssertEqual(object["expectedEvidenceSetVersion"] as? Int, 3)
+            XCTAssertEqual(object["question"] as? String, originalAsk)
+            XCTAssertEqual(object["requestID"] as? String, "same-retry-id")
+            XCTAssertNil(object["answerMode"], "The native app cannot choose the old Fast or Verified pipeline.")
+            let response: [String: Any] = ["conversation": [
+                "id": "native-chat", "title": "Names of the Building Code", "titleSource": "summary",
+                "starterQuestion": originalAsk, "revision": 8, "evidenceSetVersion": 3,
+                "createdAt": "2026-11-10T12:00:00Z", "updatedAt": "2026-11-10T12:01:00Z",
+                "projectContextReviewRequired": false, "sourceStatus": "current", "sources": [],
+                "messages": [["id": "question", "role": "user", "question": originalAsk, "requestID": "same-retry-id", "createdAt": "2026-11-10T12:00:00Z"],
+                             ["id": "answer", "role": "assistant", "requestID": "same-retry-id", "createdAt": "2026-11-10T12:01:00Z",
+                              "answer": ["answerText": "The selected code is called the New York City Building Code. [S1]", "conclusion": "", "explanation": "",
+                                         "researchEngine": "research-v2-20261110-r4", "verification": ["pass": true, "status": "passed"],
+                                         "supportedPoints": [], "assumptions": [], "missingFacts": [], "evidenceLimitations": [], "followUpQuestions": [], "additionalEvidenceNeeded": [], "citations": []]]
+                ]
+            ]]
+            return (200, try JSONSerialization.data(withJSONObject: response))
+        }, for: host)
+        let transport = PermitextBackendHTTPTransport(baseURL: try XCTUnwrap(URL(string: "https://\(host)/")), session: session)
+        let client = PermitextBackendClient(transport: transport)
+        let account = SignedInAccount(appUserID: "clerk:native-test", authProvider: .clerk, authProviderUserID: "native-test", appleUserID: "", displayName: "Native test", signedInAt: Date(), backendSessionToken: "native-test-token")
+        let conversation = try await client.sendResearchMessage(account: account, conversationID: "native-chat", question: originalAsk, requestID: "same-retry-id", expectedRevision: 7, expectedEvidenceSetVersion: 3)
+        XCTAssertEqual(conversation.title, "Names of the Building Code")
+        XCTAssertEqual(conversation.summary.titleSource, "summary")
+        XCTAssertEqual(conversation.summary.starterQuestion, originalAsk)
+        XCTAssertEqual(conversation.revision, 8)
+        XCTAssertEqual(conversation.evidenceSetVersion, 3)
+        XCTAssertEqual(conversation.messages.last?.answer?.verification?.pass, true)
+    }
+
+    func testNativeResearchV2RejectsStaleContextAndFailedReviewWithoutReconciliationDelay() {
+        for code in ["RESEARCH_CONTEXT_CHANGED", "RESEARCH_V2_DISABLED", "V2_REVIEW_FAILED"] {
+            let error = PermitextBackendHTTPError.serverStatus(409, "Reopen the conversation.", code: code)
+            XCTAssertFalse(ResearchRequestFailurePresentation.shouldReconcileCompletion(after: error))
+        }
+        XCTAssertTrue(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(422, nil, code: "V2_REVIEW_FAILED")).message.contains("has not shown the draft"))
+    }
+
+    func testNativeResearchProjectSnapshotRequiresTheReviewedHash() async throws {
+        let host = "native-project-snapshot-\(UUID().uuidString.lowercased()).test"
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [ScopedPermitextURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        defer { ScopedPermitextURLProtocol.removeHandler(for: host); session.invalidateAndCancel() }
+        let snapshot = ResearchProjectSnapshot(projectID: "project", projectInformation: ResearchProjectInformation(description: "Office renovation", facts: ["Occupancy: Group B (assumed)"]), contentHash: String(repeating: "a", count: 64))
+        ScopedPermitextURLProtocol.install({ request in
+            XCTAssertEqual(request.url?.path, "/research/conversations/project-context")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer native-test-token")
+            let object = try XCTUnwrap(JSONSerialization.jsonObject(with: permitextRequestBody(request)) as? [String: Any])
+            if object["preview"] as? Bool == true {
+                return (200, try JSONEncoder().encode(ResearchProjectSnapshotResponse(snapshot: snapshot)))
+            }
+            XCTAssertEqual(object["include"] as? Bool, true)
+            XCTAssertEqual(object["snapshotHash"] as? String, snapshot.contentHash)
+            let conversation = ResearchConversation(id: "chat", title: "Office renovation facts", createdAt: "before", updatedAt: "now", assistantScope: ResearchAssistantScope(includeProjectContext: true, projectContext: snapshot))
+            return (200, try JSONEncoder().encode(ResearchConversationResponse(conversation: conversation)))
+        }, for: host)
+        let client = PermitextBackendClient(transport: PermitextBackendHTTPTransport(baseURL: try XCTUnwrap(URL(string: "https://\(host)/")), session: session))
+        let account = SignedInAccount(appUserID: "clerk:native-test", authProvider: .clerk, authProviderUserID: "native-test", appleUserID: "", displayName: "Native test", signedInAt: Date(), backendSessionToken: "native-test-token")
+        let reviewed = try await client.researchProjectSnapshot(account: account, conversationID: "chat")
+        let updated = try await client.updateResearchProjectSnapshot(account: account, conversationID: "chat", include: true, snapshotHash: reviewed.contentHash)
+        XCTAssertEqual(updated.assistantScope?.projectContext?.projectInformation.facts, ["Occupancy: Group B (assumed)"])
+        XCTAssertEqual(updated.assistantScope?.includeProjectContext, true)
     }
 
     func testReviewedResearchSelectionEncodesExplicitVisualApproval() throws {
@@ -5984,7 +6064,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     func testResearchFailurePresentsInsufficientEvidenceOutcome() {
         let error = PermitextBackendHTTPError.serverStatus(
             422,
-            "Permitext could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation.",
+            "per codes could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation.",
             code: "RESEARCH_EVIDENCE_NOT_FOUND"
         )
 
@@ -5992,7 +6072,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(error.serverCode, "RESEARCH_EVIDENCE_NOT_FOUND")
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(error).message,
-            "Permitext could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation. Your question is still here."
+            "per codes could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation. Your question is still here."
         )
     }
 
@@ -6050,7 +6130,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     func testResearchGenerationAndEvidenceCheckFailuresUseDistinctCopy() {
         XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "INVALID_RESEARCH_RESPONSE")).message, "Research could not finish generating a complete answer. Your question is still here.")
         XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "INVALID_RESEARCH_VERIFICATION")).message, "Research could not complete its evidence check. Your question is still here.")
-        XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "RESEARCH_VERIFICATION_FAILED")).message, "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here.")
+        XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "RESEARCH_VERIFICATION_FAILED")).message, "per codes could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here.")
     }
 
     func testInterruptedResearchMigrationUsesAuthenticatedMetadataEndpoint() async throws {
@@ -6147,7 +6227,9 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                     account: account,
                     conversationID: conversationID,
                     question: "What changed?",
-                    requestID: "request-\(conversationID)"
+                    requestID: "request-\(conversationID)",
+                    expectedRevision: 4,
+                    expectedEvidenceSetVersion: 2
                 )
                 XCTFail("Expected the backend recovery response to remain a 409.")
             } catch let error as PermitextBackendHTTPError {
@@ -6638,26 +6720,26 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(verificationError).message,
-            "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here."
+            "per codes could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here."
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(providerError).message,
-            "Permitext's Research service is temporarily unavailable. Your question is still here."
+            "The Research service is temporarily unavailable. Your question is still here."
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(verifierProviderError).message,
-            "Permitext's Research service is temporarily unavailable. Your question is still here."
+            "The Research service is temporarily unavailable. Your question is still here."
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(officialGuidanceError).message,
-            "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here."
+            "per codes could not retrieve attributable official guidance from the approved sources. Your question is still here."
         )
     }
 
     func testResearchFailurePreservesQuestionAfterNetworkTimeout() {
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(URLError(.timedOut)).message,
-            "Research is taking longer than expected. Permitext checked for a completed answer but did not find one yet. Your question is still here."
+            "Research is taking longer than expected. per codes checked for a completed answer but did not find one yet. Your question is still here."
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(URLError(.cancelled)).message,
@@ -6711,7 +6793,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
 
         XCTAssertTrue(researchSource.contains("@State private var activeResearchRequestTask: Task<Void, Never>?"))
-        XCTAssertTrue(researchSource.contains("Button(\"Cancel\", systemImage: \"xmark\")"))
+        XCTAssertTrue(researchSource.contains(".accessibilityLabel(\"Cancel Research request\")"))
         XCTAssertTrue(researchSource.contains(".accessibilityIdentifier(\"research-cancel-request\")"))
         XCTAssertTrue(researchSource.contains("activeResearchRequestTask?.cancel()"))
         XCTAssertTrue(researchSource.contains("try Task.checkCancellation()"))
@@ -7188,7 +7270,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertLessThan(acknowledgement.lowerBound, finish.lowerBound)
         XCTAssertTrue(processingSource.contains("backendError.serverCode == \"RESEARCH_PURCHASE_ALREADY_LINKED\""))
         XCTAssertFalse(processingSource.contains("backendError.statusCode == 409 {"))
-        XCTAssertTrue(processingSource.contains("This Apple purchase is already linked to another Permitext account."))
+        XCTAssertTrue(processingSource.contains("This Apple purchase is already linked to another per codes account."))
 
         XCTAssertTrue(settingsSource.contains("Research turns"))
         XCTAssertTrue(settingsSource.contains("Need more Research? Additional turns do not expire and are used after the monthly included turns."))
@@ -9049,7 +9131,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertEqual(ResearchTrustCopy.copyAnswerAction, "Copy answer")
         XCTAssertEqual(ResearchTrustCopy.reportProblemAction, "Report a problem")
         XCTAssertTrue(ResearchTrustCopy.nextStepGuidance.contains("your own conclusion in a Project Note"))
-        XCTAssertTrue(ResearchTrustCopy.nextStepGuidance.contains("Build Reports on Permitext Web"))
+        XCTAssertTrue(ResearchTrustCopy.nextStepGuidance.contains("Build Reports on per codes Web"))
 
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("ResearchConversationCacheLifecycle.\(UUID().uuidString)", isDirectory: true)

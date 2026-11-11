@@ -2689,6 +2689,8 @@ protocol PermitextBackendTransport {
     func researchConversationCreate(_ request: ResearchConversationCreateRequest) async throws -> ResearchConversationResponse
     func researchConversationAddEvidence(_ request: ResearchConversationEvidenceRequest) async throws -> ResearchConversationEvidenceResponse
     func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse
+    func researchProjectSnapshot(_ request: ResearchProjectSnapshotRequest) async throws -> ResearchProjectSnapshotResponse
+    func updateResearchProjectSnapshot(_ request: ResearchProjectSnapshotUpdateRequest) async throws -> ResearchConversationResponse
     func researchFeedback(_ request: ResearchFeedbackRequest) async throws -> ResearchFeedbackResponse
     func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse
     func researchConversationAssignProject(_ request: ResearchConversationAssignProjectRequest) async throws -> ResearchConversationResponse
@@ -3049,7 +3051,7 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     }
 
     func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse {
-        // Verified Research may need substantially longer than an ordinary metadata read.
+        // The draft and independent review may take longer than a metadata read.
         // Keep the normal transport timeout tight, but do not abandon a valid
         // Research generation while the server is still working.
         try await post(
@@ -3058,6 +3060,14 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
             bearerToken: request.auth.bearerToken,
             timeoutInterval: max(requestTimeout, 300)
         )
+    }
+
+    func researchProjectSnapshot(_ request: ResearchProjectSnapshotRequest) async throws -> ResearchProjectSnapshotResponse {
+        try await post("research/conversations/project-context", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func updateResearchProjectSnapshot(_ request: ResearchProjectSnapshotUpdateRequest) async throws -> ResearchConversationResponse {
+        try await post("research/conversations/project-context", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func researchFeedback(_ request: ResearchFeedbackRequest) async throws -> ResearchFeedbackResponse {
@@ -5434,8 +5444,12 @@ protocol AccountBackendClient {
         account: SignedInAccount,
         conversationID: String,
         question: String,
-        requestID: String
+        requestID: String,
+        expectedRevision: Int,
+        expectedEvidenceSetVersion: Int
     ) async throws -> ResearchConversation
+    func researchProjectSnapshot(account: SignedInAccount, conversationID: String) async throws -> ResearchProjectSnapshot
+    func updateResearchProjectSnapshot(account: SignedInAccount, conversationID: String, include: Bool, snapshotHash: String?) async throws -> ResearchConversation
     func saveResearchFeedback(
         account: SignedInAccount,
         conversationID: String,
@@ -6642,6 +6656,8 @@ extension String {
 
 // Older local transports and mocks do not support server recovery migration.
 extension PermitextBackendTransport {
+    func researchProjectSnapshot(_ request: ResearchProjectSnapshotRequest) async throws -> ResearchProjectSnapshotResponse { throw URLError(.unsupportedURL) }
+    func updateResearchProjectSnapshot(_ request: ResearchProjectSnapshotUpdateRequest) async throws -> ResearchConversationResponse { throw URLError(.unsupportedURL) }
     func readProfile(_ request: BackendProfileReadRequest) async throws -> BackendProfileReadResponse { throw URLError(.unsupportedURL) }
     func researchRetainInterrupted(_ request: ResearchRetainInterruptedRequest) async throws -> ResearchRetainInterruptedResponse { throw URLError(.unsupportedURL) }
 }
