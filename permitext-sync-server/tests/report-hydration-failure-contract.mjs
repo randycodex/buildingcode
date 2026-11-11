@@ -37,7 +37,7 @@ async function check({stale=false,disposed=false,pro=false,workspaceChanged=fals
  assert.equal(await result,panel);
  if(stale||disposed||workspaceChanged){assert.deepEqual(status,{hidden:true,textContent:""});assert.equal(buttons.length,0);return;}
  assert.equal(status.hidden,false);
- assert.equal(status.textContent,pro?"Professional Project Reports are included with Permitext Pro.":"Report unavailable: Synthetic request failed");
+ assert.equal(status.textContent,pro?"Professional Project Reports are included with per codes Pro.":"Report unavailable: Synthetic request failed");
  assert.equal(buttons.length,1);const retry=buttons[0];assert.equal(retry.textContent,"Retry Report");
  // A detached result cannot start another request before publication.
  await retry.click();assert.equal(refreshes.length,0);

@@ -31,7 +31,8 @@ const context=vm.createContext({renderProjectUpdateBadge(){},switchWorkflowView:
  document:{createElement:tag=>new Element(tag),body,querySelector:()=>null,getElementById:id=>id==='fit-columns'?layoutControl:null},
  window:{innerWidth:1000,innerHeight:800},workspaceContextMenu:null,workspaceContextMenuBinding:null,
  workspaceFloatingPanelReference:()=>({right:976,bottom:67}),bindFloatingWorkspacePanel:()=>({dispose(){}}),activeWorkspaceID:'project',updateWorkspaceLayoutControls(){},
- toggleAccountDialog(){},createNewWorkspace(){},openProjectManager(){},switchWorkspace(){},currentColumnWorkflowView:()=> 'research'
+ toggleAccountDialog(){},createNewWorkspace(){},openProjectManager(){},switchWorkspace(){},currentColumnWorkflowView:()=> 'research',
+ defaultActivePaneIDs:()=>[],workflowPaneIsVisible:()=>false,closeAllColumns(){}
 });
 const privateMenus=['openMobileMoreSheet','openWorkspaceManager','openSavedColumnGroupsMenu','openColumnGroupEditor'];
 vm.runInContext(['renderWorkspaceTabs','openWorkspaceContextMenu',...privateMenus].map(actual).join('\n'),context);

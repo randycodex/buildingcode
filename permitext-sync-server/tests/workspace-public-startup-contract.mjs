@@ -167,3 +167,66 @@ sandbox.detachedProjectWindow=true;
 await sandbox.restoreInitialProWorkspace();
 assert.equal(pulls,pullsBeforeBypass,"Free, public section links and detached windows retain independent startup.");
 console.log("Pro startup presentation passed: no retired shells or requests, stable replacement selection, empty/saved/offline restoration and public startup bypasses.");
+
+// Sync can select a newly discovered Project while the presentation gate still
+// belongs to General. The chooser checks the new ID, but reselecting that row
+// must complete its gate/render rather than treating the screen as already open.
+vm.runInContext(actual("switchWorkspace"),sandbox);
+account="picker-owner";
+sandbox.detachedProjectWindow=false;
+sandbox.activeWorkspaceID="general";
+sandbox.workspaceRegistry={workspaces:[{id:"general"},{id:"project:picker",projectID:"picker",name:"Picker project"}]};
+sandbox.syncedContent={userID:account,workspacePresentationAccess:"verified"};
+sandbox.ensureSyncedContentForRender=async()=>sandbox.syncedContent;
+sandbox.reconcileProjectWorkspaces=noop;
+await sandbox.workspaceAccessGateForRender().ready;
+assert.equal(sandbox.workspacePrivatePresentationAllowed(),true);
+sandbox.activeWorkspaceID="project:picker";
+assert.equal(sandbox.workspacePrivatePresentationAllowed(),false,"A General gate cannot authorize the newly selected Project");
+for(const node of track.children){node.isConnected=false;node.parentNode=null;}
+track.children=[];
+const pickerReady=deferred();
+let pickerLoads=0,pickerSelections=0;
+const pickerPane=pane("picker-evidence");
+desired=[{id:"picker-evidence",load:()=>{pickerLoads++;return pickerPane;}}];
+sandbox.ensureSyncedContentForRender=async()=>{await pickerReady.promise;return sandbox.syncedContent;};
+sandbox.saveWorkspaceState=()=>assert.fail("Reselecting cannot overwrite the current layout");
+sandbox.loadWorkspaceSnapshot=()=>assert.fail("Reselecting cannot reload a saved layout over current drafts");
+sandbox.confirmWorkspaceTransition=()=>assert.fail("Reselecting does not leave the workspace");
+const selecting=sandbox.switchWorkspace("project:picker",{focus:false,onSelected:()=>{
+  assert.equal(sandbox.workspacePrivatePresentationAllowed(),true);
+  pickerSelections++;
+}});
+await tick();
+assert.equal(pickerLoads,0,"Private constructors remain blocked during reverification");
+assert.equal(pickerSelections,0,"The requested tool waits for the selected workspace's own gate");
+pickerReady.resolve();
+assert.equal(await selecting,true);
+await tick();
+assert.equal(sandbox.workspacePrivatePresentationAllowed(),true,"Reselecting must repair the obsolete gate");
+assert.equal(pickerLoads,1,"The selected workspace's pane must mount");
+assert.equal(pickerSelections,1,"Reselecting must complete the requested tool handoff");
+assert.deepEqual(track.children.map(node=>node.dataset.paneId),["picker-evidence"]);
+
+// A delayed selection must not open a private tool after identity/navigation
+// changes, and a denied authority must never be promoted by a chooser click.
+for(const change of ["account","workspace","navigation","denied"]){
+  account=`picker-${change}`;
+  sandbox.activeWorkspaceID="project:picker";
+  sandbox.state.workflowNavigationGeneration=0;
+  sandbox.syncedContent={userID:account,workspacePresentationAccess:change==="denied"?"unavailable":"verified"};
+  const held=deferred();
+  const owner=account;
+  sandbox.ensureSyncedContentForRender=async()=>{await held.promise;return {userID:owner,workspacePresentationAccess:change==="denied"?"unavailable":"verified"};};
+  let handedOff=0;
+  const pending=sandbox.switchWorkspace("project:picker",{focus:false,onSelected:()=>{handedOff++;}});
+  await tick();
+  if(change==="account")account="another-owner";
+  if(change==="workspace")sandbox.activeWorkspaceID="general";
+  if(change==="navigation")sandbox.state.workflowNavigationGeneration++;
+  held.resolve();
+  assert.equal(await pending,false,`${change} must cancel the pending selection`);
+  await tick();
+  assert.equal(handedOff,0,`${change} cannot open the requested private tool`);
+}
+console.log("Active-workspace selection passed: stale gate repair, verified pane publication, current drafts retained, requested handoff and account/workspace/navigation/denial fences.");
