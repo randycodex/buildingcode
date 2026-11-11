@@ -106,7 +106,16 @@ export function createResearchV2View(options) {
   if(!history.length)list.append(node('p','rv2-empty-history','Your questions will appear here.'));
   rail.append(list);
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
-  if(options.onNew)rail.append(action('+ New chat',()=>{if(isCurrent()&&root.isConnected)void options.onNew();},'rv2-new-chat'));
+  const newChat = options.onNew ? action('+ New chat',async()=>{
+    if(busy||includeBusy||revealBusy||chatTransitionPending||operationPending()||!isCurrent()||!root.isConnected)return;
+    // Lock synchronously, before the create request can yield. The old
+    // conversation must never accept input that a new mount will discard.
+    chatTransitionPending=true;update();
+    try{await options.onNew();}
+    catch(error){if(isCurrent()&&root.isConnected)notice(error.message||'Could not start Research',true);}
+    finally{chatTransitionPending=false;if(isCurrent()&&root.isConnected)update();}
+  },'rv2-new-chat') : null;
+  if(newChat)rail.append(newChat);
   const divider=node('div','rv2-rail-divider');
   const questionRail=attachResearchQuestionRail({root,divider,widthStore:options.railWidthStore});
   const chat=node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');
@@ -114,7 +123,7 @@ export function createResearchV2View(options) {
   mobileHistory.setAttribute('aria-expanded','false');
   const thread=node('div','rv2-thread');thread.setAttribute('aria-label','Conversation');
   const status=node('p','rv2-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.hidden=true;
-  let busy=false,controller=null,generation=0,lastRequest=options.requestStore?.read() || null,includeBusy=false,pendingBubble=null,revealBusy=false,revealEntry=null,revealController=null;
+  let busy=false,controller=null,generation=0,lastRequest=options.requestStore?.read() || null,includeBusy=false,pendingBubble=null,revealBusy=false,revealEntry=null,revealController=null,chatTransitionPending=false;
   const revealTokens=[];
   function notice(text,error=false){status.hidden=!text;status.textContent=text;status.classList.toggle('is-error',error);onStatus?.(text);}
   function valid(attempt){return attempt===generation&&isCurrent()&&root.isConnected;}
@@ -214,9 +223,10 @@ export function createResearchV2View(options) {
   const detailBody=node('div','rv2-detail-body');
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
   chat.append(mobileHistory,thread,detail,status,operationStatus,composer);root.append(rail,divider,chat);
-  const operationPending=()=>Boolean(options.operationGate?.status());
-  function update(){const pending=operationPending();input.disabled=busy;attach.disabled=busy||includeBusy||revealBusy||pending;send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||pending));
-    operationStatus.textContent=options.operationGate?.status() || '';operationStatus.hidden=!pending;
+  const operationPending=()=>chatTransitionPending||Boolean(options.operationGate?.status());
+  function update(){const pending=operationPending();input.disabled=busy||chatTransitionPending;attach.disabled=busy||includeBusy||revealBusy||pending;send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||pending));
+    if(newChat)newChat.disabled=busy||includeBusy||revealBusy||pending;
+    operationStatus.textContent=chatTransitionPending?'Starting new chat…':options.operationGate?.status() || '';operationStatus.hidden=!pending;
     projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});}
   const stopObservingOperations=options.operationGate?.subscribe(update);
   function showDetail(){thread.hidden=true;detail.hidden=false;detailBody.replaceChildren();return detailBody;}

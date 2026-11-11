@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
+import {createResearchOperationGate} from '../public/research-operation-gate.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
 function harness(instanceMode=false){
@@ -12,7 +13,7 @@ function harness(instanceMode=false){
  const track={querySelector:selector=>selector.includes('.research-v2-panel')?panel:null};panel.parentNode=track;
  const conversations={a:{id:'a',primaryProjectID:'project-a',title:'Question A',messages:[],sources:[]},b:{id:'b',primaryProjectID:'project-a',title:'Question B',messages:[],sources:[]}};
  let accountCurrent=true, options;
- const context=vm.createContext({state,track,CSS:{escape:v=>v},researchDraftPaneIDs:new Set(),researchNewChatDrafts:new Map(),supplementalResearchConversations:new Map(),activeResearchConversation:conversations.a,
+ const context=vm.createContext({state,track,CSS:{escape:v=>v},researchOperations:createResearchOperationGate(),researchOperationScope:()=> 'owner:workspace',researchDraftPaneIDs:new Set(),researchNewChatDrafts:new Map(),supplementalResearchConversations:new Map(),activeResearchConversation:conversations.a,
   researchHistoryShowing:false,researchConversationPaneOpened:true,activeWorkspaceID:'workspace',activeAccount:()=>({userID:'owner'}),captureAccountRequest:()=>1,isCurrentAccountRequest:()=>accountCurrent,
   paneIDForUtilityInstance:i=>'instance:'+i.id,renderUtility:()=>{calls.created++;return panel;},analysisTemplate:{},showColumnLoadingStatus(){calls.loading++;},
   postResearch:async(path,body)=>{calls.requests.push(path);if(path.endsWith('/list'))return{conversations:Object.values(conversations),nextCursor:null,hasMore:false};if(path.endsWith('/get'))return{conversation:conversations[body.conversationID]};throw Error(path);},

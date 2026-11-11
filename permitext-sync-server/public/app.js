@@ -2,8 +2,9 @@ import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=7";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=24";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=25";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=1";
+import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=3";
@@ -11,7 +12,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-five-production-fixes-v1668";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-three-workflow-fixes-v1670";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=10";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -164,7 +165,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261111-five-production-fixes-v1668";
+} from "./offline-storage.js?v=20261111-three-workflow-fixes-v1670";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3430,7 +3431,7 @@ function openClosedNotebookNotesMenu() {
   menu.querySelector('button')?.focus({preventScroll:true});
 }
 
-async function moveClosedNotebookNoteToTrash(project, card, {allowOpen = false, skipConfirmation = false} = {}) {
+async function moveClosedNotebookNoteToTrash(project, card, {allowOpen = false, skipConfirmation = false, deferRefresh = false, reportError = true} = {}) {
   const requestIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   const projectID = projectDetailKey(project), navigationGeneration = state.workflowNavigationGeneration || 0;
   const current = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
@@ -3461,10 +3462,14 @@ async function moveClosedNotebookNoteToTrash(project, card, {allowOpen = false, 
     if (openMount) await retireNotebookNoteColumns(project, card.id);
     state.notebookColumns = (state.notebookColumns || []).filter(column => column.projectID !== projectID || column.cardID !== card.id);
     invalidateInitialProjectFoundation(projectID); saveWorkspaceState(); syncNotebookNoteTabs();
-    await notebookMounts.get(projectID)?.refreshCards?.();
-    await reportDraftMounts.get(projectID)?.refreshSources?.();
+    if (!deferRefresh) {
+      await notebookMounts.get(projectID)?.refreshCards?.().catch(() => false);
+      await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
+      if (current()) refreshOpenSettingsTrash();
+    }
     return true;
   } catch (error) {
+    if (!reportError) throw error;
     if (current()) await showWebNotice('Note not moved to Trash', error.message);
     return false;
   }
@@ -3475,6 +3480,7 @@ async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archi
   const navigationGeneration = state.workflowNavigationGeneration || 0;
   const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     navigationGeneration === (state.workflowNavigationGeneration || 0) && projectDetailKey(workspaceProject()) === projectID;
+  const completed = [];
   try {
     if (!current()) return false;
     if (trash && !await confirmWebWarning('Move selected Notes to Trash?',
@@ -3482,7 +3488,10 @@ async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archi
     for (const card of cards) {
       if (!current()) return false;
       if (trash) {
-        if (!await moveClosedNotebookNoteToTrash(project,card,{allowOpen:true,skipConfirmation:true})) return false;
+        if (!await moveClosedNotebookNoteToTrash(project,card,{allowOpen:true,skipConfirmation:true,deferRefresh:true,reportError:false})) {
+          throw new Error('The next Note could not be moved. Remaining Notes are unchanged.');
+        }
+        completed.push(card.id);
         continue;
       }
       const mount = [...notebookColumnMounts.values()].find(item => item.panel.dataset.projectId === projectID && item.activeCardID() === card.id);
@@ -3508,14 +3517,20 @@ async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archi
       if (archived) await retireNotebookNoteColumns(project,card.id);
       syncNotebookNoteTabs();
     }
-    if (current()) {
-      await notebookMounts.get(projectID)?.refreshCards?.();
-      await reportDraftMounts.get(projectID)?.refreshSources?.();
-    }
     return true;
   } catch (error) {
-    if (current()) await showWebNotice('Notes not updated',error.message);
+    if (current()) {
+      const pending = cards.filter(card => !completed.includes(card.id));
+      await showWebNotice(trash ? `${completed.length} of ${cards.length} Notes moved to Trash` : 'Notes not updated',
+        trash ? `${pending.length} ${pending.length === 1 ? 'Note remains' : 'Notes remain'} unchanged: ${pending.map(card => card.title || 'Untitled').join(', ')}. ${error.message}` : error.message);
+    }
     return false;
+  } finally {
+    if (current() && (!trash || completed.length)) {
+      await notebookMounts.get(projectID)?.refreshCards?.().catch(() => false);
+      await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
+      if (current() && trash) refreshOpenSettingsTrash();
+    }
   }
 }
 
@@ -7399,11 +7414,14 @@ async function fetchChapterBodyWindow(chapterID, start, limit, chapter = null, o
   }
 }
 
+const requestRateLimit = createRequestRateLimit();
 async function postJSON(path, body, options = {}) {
   if (!["/account/sign-in", "/account/apple/start"].includes(path)) requirePrivateWorkspaceWritable();
   const identity = captureAccountRequest();
   if (body?.auth?.accountUserID && (body.auth.accountUserID !== identity.userID ||
       options.token !== identity.sessionToken)) throw accountContextChangedError();
+  const rateLimitKey = JSON.stringify([identity.userID, identity.generation, path]);
+  requestRateLimit.check(rateLimitKey);
   const headers = { "Content-Type": "application/json", [webSyncProtocolHeader]:webSyncProtocol };
   if (options.token) {
     headers.Authorization = `Bearer ${options.token}`;
@@ -7428,7 +7446,8 @@ async function postJSON(path, body, options = {}) {
   requireCurrentAccountRequest(identity);
   if (payload.code === webUpdateRequiredCode) webAppUpdates.requireReload(payload.webAppVersion);
   if (!response.ok) {
-    const error = new Error(payload.error || `Request failed: ${response.status}`);
+    const error = response.status === 429 ? requestRateLimit.rejected(rateLimitKey, response.headers.get('retry-after'))
+      : new Error(payload.error || `Request failed: ${response.status}`);
     error.status = response.status;
     error.payload = payload;
     throw error;

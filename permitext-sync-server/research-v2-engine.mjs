@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
+import {researchTableFootnotes, researchFootnoteScopeIssues, tableFootnoteInstruction} from './research-table-footnotes.mjs';
 
-export const researchV2Version = 'research-v2-20261111-r5';
+export const researchV2Version = 'research-v2-20261111-r6';
 const fail = (message, code = 'V2_INVALID_INPUT') => Object.assign(new Error(message), { code });
 const stringList = { type: 'array', items: { type: 'string' } };
 export const researchV2DraftSchema = { type: 'object', additionalProperties: false,
@@ -27,9 +28,11 @@ export function freezeResearchV2Turn({ question, sources, history = [], projectC
     if (!/^S[1-9]\d*$/.test(source.id) || ids.has(source.id) || typeof source.text !== 'string' ||
         !source.text.trim() || !source.edition || !source.sectionID) throw fail('Each passage needs exact text and a unique source identity and edition.');
     ids.add(source.id);
+    const tableFootnotes = researchTableFootnotes(source.text);
     return { id: source.id, sectionID: String(source.sectionID), edition: String(source.edition),
       codeVersion: String(source.codeVersion || ''), jurisdiction: source.jurisdiction || 'New York City',
       title: String(source.title || ''), text: source.text,
+      ...(tableFootnotes.length ? {tableFootnotes} : {}),
       textHash: createHash('sha256').update(source.text).digest('hex') };
   });
   if (selected.reduce((n,s) => n + s.text.length, 0) > 96000) throw fail('The included passages exceed the 96,000-character evidence limit.');
@@ -62,7 +65,7 @@ export function researchV2IdentityIssues(draft, sources, {projectContextSnapshot
     else if (claim.sourceIDs.some(id => !cited.includes(id)))
       issues.push({ code: 'uncited_claim_source', detail: 'The narrative must cite the sources claimed as its support.' });
   }
-  return issues;
+  return [...issues, ...researchFootnoteScopeIssues(draft, sources)];
 }
 
 const scenarioInstruction = ` Explicitly stipulated hypothetical inputs define a scenario for explanation and arithmetic; they do not become verified Project facts. Keep a separate comparison space separate from the saved Project. Do not require independent proof of stipulated inputs merely to read a table row or explain the requested arithmetic. Label the inputs and any user-supplied rounding convention as assumptions, not code requirements. Reading a row, comparing factors or explaining arithmetic does not establish applicability or compliance. Resolve each supported part of the question even when a separate project determination remains unresolved. For tables, keep each function with its own factor, net/gross basis and actual footnote markers; do not transfer an adjacent row's qualifications. A general table note or an optional deduction is not automatically a missing project fact.`;
@@ -70,7 +73,7 @@ const scenarioInstruction = ` Explicitly stipulated hypothetical inputs define a
 function request(phase, instructions, input,effort) {
   return { model: 'gpt-6-luna', service_tier: 'default', store: false,
     reasoning: { effort: effort || (phase === 'draft' ? 'low' : 'medium') }, max_output_tokens: phase === 'review' ? 4096 : 6144,
-    instructions:instructions+scenarioInstruction, input: JSON.stringify(input), text: { format: { type: 'json_schema',
+    instructions:instructions+scenarioInstruction+tableFootnoteInstruction, input: JSON.stringify(input), text: { format: { type: 'json_schema',
       name: phase === 'review' ? 'permitext_v2_review' : 'permitext_v2_answer', strict: true,
       schema: phase === 'review' ? researchV2ReviewSchema : researchV2DraftSchema } } };
 }

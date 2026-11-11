@@ -2,6 +2,11 @@ import { createHash } from "node:crypto";
 import { isIP } from "node:net";
 import { matchesConfiguredAdminToken } from "./admin-token-auth.mjs";
 
+// Interactive metadata and autosave use a bounded minute allowance, rather
+// than exhausting an hour budget during ordinary research-to-report work.
+// A new bucket version retires the previous hour-long cooldown on deployment.
+const workspacePolicy = limit => ({limit, windowMs:60_000, bucketVersion:2});
+
 export const rateLimitPolicies = new Map([
   ["account/sign-in", { limit: 30, windowMs: 5 * 60 * 1000 }],
   ["account/sign-out", { limit: 120, windowMs: 60 * 60 * 1000 }],
@@ -36,7 +41,7 @@ export const rateLimitPolicies = new Map([
   ["research/answers/get", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["research/usage", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["research/feedback", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["projects/foundation/state", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["projects/foundation/state", workspacePolicy(120)],
   ["projects/foundation/link", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["projects/foundation/unlink", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["projects/collaboration/notes/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
@@ -54,25 +59,26 @@ export const rateLimitPolicies = new Map([
   ["organizations/projects/transfer", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["organizations/projects/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["organizations/projects/snapshot", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["projects/hub/bootstrap", { limit: 240, windowMs: 60 * 60 * 1000 }],
+  ["projects/hub/bootstrap", workspacePolicy(240)],
   ["organizations/evidence/reviews/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["organizations/evidence/reviews/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["notebook/cards/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["notebook/cards/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["notebook/cards/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["notebook/cards/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["reports/sources/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["reports/options", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["reports/drafts/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["reports/drafts/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["reports/drafts/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["reports/drafts/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["notebook/cards/list", workspacePolicy(120)],
+  ["notebook/cards/get", workspacePolicy(240)],
+  ["notebook/cards/save", workspacePolicy(120)],
+  ["notebook/cards/delete", workspacePolicy(60)],
+  ["notebook/cards/archive", workspacePolicy(120)],
+  ["reports/sources/list", workspacePolicy(120)],
+  ["reports/options", workspacePolicy(120)],
+  ["reports/drafts/list", workspacePolicy(120)],
+  ["reports/drafts/get", workspacePolicy(240)],
+  ["reports/drafts/save", workspacePolicy(120)],
+  ["reports/drafts/delete", workspacePolicy(60)],
   ["reports/generate", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["reports/history/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["reports/history/list", workspacePolicy(120)],
   ["reports/history/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["reports/manifests/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
+  ["reports/manifests/get", workspacePolicy(240)],
   ["reports/files/upload", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["reports/files/read", { limit: 240, windowMs: 60 * 60 * 1000 }],
+  ["reports/files/read", workspacePolicy(240)],
   ["internal/evaluations/data", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/review", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/feedback/triage", { limit: 120, windowMs: 60 * 60 * 1000 }],
@@ -211,7 +217,7 @@ export async function consumeRateLimit({
   }
   const results = await Promise.all(uniquePrincipals.map((principal) =>
     repository.consume({
-      scope: path,
+      scope: policy.bucketVersion ? `${path}:v${policy.bucketVersion}` : path,
       principal,
       limit: policy.limit,
       windowMs: policy.windowMs,

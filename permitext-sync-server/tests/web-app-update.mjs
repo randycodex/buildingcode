@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
+import {createRequestRateLimit} from '../public/request-rate-limit.js';
 import {createWebAppUpdatePrompt,activateWebAppUpdate} from '../public/web-app-update.js';
 import {webAppVersion,webSyncProtocol,webSyncProtocolHeader,webUpdateRequiredCode} from '../public/web-client-version.js';
 class Element {constructor(tag){this.tag=tag;this.children=[];this.events={};this.hidden=false;this.attributes={};}setAttribute(key,value){this.attributes[key]=value;}append(...children){this.children.push(...children);}addEventListener(type,callback){this.events[type]=callback;}}
@@ -58,7 +59,7 @@ assert(entry.includes('<span>SYNC</span>'));
 {
  const prompts=[],requests=[];let current=true;
  const start=source.indexOf('async function postJSON('),end=source.indexOf('\n}',start)+2;
- const context=vm.createContext({webSyncProtocol,webSyncProtocolHeader,webUpdateRequiredCode,
+ const context=vm.createContext({webSyncProtocol,webSyncProtocolHeader,webUpdateRequiredCode,requestRateLimit:createRequestRateLimit(),
   webAppUpdates:{requireReload:version=>prompts.push(version)},serverReachable:true,
   requirePrivateWorkspaceWritable(){},captureAccountRequest:()=>({userID:'owner',sessionToken:'session'}),
   requireCurrentAccountRequest(){if(!current)throw Error('Account changed');},updateConnectionStatus(){},
