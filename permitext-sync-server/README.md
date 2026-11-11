@@ -62,14 +62,11 @@ PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1 \
 node server.mjs
 ```
 
-The web app uses Sign in with Apple JS when `APPLE_SERVICE_ID` is configured. During the domain transition, Apple Developer should allow both the new canonical domain/return URL and the legacy pair until installed apps and existing sessions have migrated:
+The web app uses Sign in with Apple JS when `APPLE_SERVICE_ID` is configured. Configure the canonical domain and return URL:
 
 ```text
 Domain: per.codes
 Return URL: https://per.codes/account/apple/callback
-
-Domain: permitext.com
-Return URL: https://permitext.com/account/apple/callback
 ```
 
 `per.codes` is attached to the production Vercel deployment and is the
@@ -79,11 +76,13 @@ instance on the new domain. The native Debug and Release backend now targets
 authenticated sync verified before replacing the former Vercel alias with
 `per-codes.vercel.app`. Verify AASA
 and installed-app universal links, the Apple Service ID return URL, account
-cookies, Stripe returns/webhooks, and production PostgreSQL through the apex;
-retain the old permitext.com workspace while browser recovery is still needed.
+cookies, Stripe returns/webhooks, and production PostgreSQL through the apex.
+The owner confirmed they are the sole user and no longer require old-domain
+recovery or redirects, so permitext.com and www.permitext.com were detached
+from this project. They no longer serve the app or its old workspace.
 The production verification scripts accept an explicit host through
 `PERMITEXT_SYNC_PRODUCTION_URL` (or `PERMITEXT_PRODUCTION_BASE_URL` for identity
-restore), so verify both hosts during the transition.
+restore).
 
 Without `APPLE_SERVICE_ID`, production web sign-in is disabled instead of creating a browser-only account that cannot match iOS. Localhost can still use the browser-local fallback for development, or set `PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN=1` to allow it explicitly.
 
@@ -289,11 +288,10 @@ node server.mjs
 
 Production checkout requires a live Stripe secret (`sk_live_...`) and a live recurring Price. The server rejects test credentials and test-mode webhook events when `VERCEL_ENV=production` or `PERMITEXT_REQUIRE_LIVE_STRIPE=1`, so a `cs_test_...` session can never appear to be a real purchase. Stripe uses different webhook signing secrets for test and live mode; configure the live endpoint at `https://per.codes/billing/stripe/webhook`.
 
-During a domain migration, browser return URLs follow `PERMITEXT_PUBLIC_BASE_URL`,
-while `PERMITEXT_STRIPE_WEBHOOK_URL` can explicitly retain the existing signed
-webhook. Use the exact already configured HTTPS `/billing/stripe/webhook`
-endpoint on `per.codes`, `permitext.com`, or `permitext-sync.vercel.app`. With no
-override, the readiness audit expects the canonical public host. The audit still
+Browser return URLs follow `PERMITEXT_PUBLIC_BASE_URL`.
+`PERMITEXT_STRIPE_WEBHOOK_URL` explicitly specifies the existing signed endpoint,
+now `https://per.codes/billing/stripe/webhook` in production. With no override,
+the readiness audit expects the canonical public host. The audit still
 requires that exact endpoint to be enabled with all required events, plus the
 same live Price and tax checks. Keep its existing signing secret; a website
 rename does not require creating another endpoint or subscription.
