@@ -351,7 +351,7 @@ assert.match(
 const privacyPolicy = await readFile(new URL("../public/privacy.html", import.meta.url), "utf8");
 assert.match(
   privacyPolicy,
-  /Research conversations and answers[\s\S]*?Until you remove the conversation or delete the account[\s\S]*?Removed from active Permitext storage with the selected conversation or account/,
+  /Research conversations and answers[\s\S]*?Until you remove the conversation or delete the account[\s\S]*?Removed from active per codes storage with the selected conversation or account/,
   "The published selected-conversation deletion promise changed without a matching contract update."
 );
 

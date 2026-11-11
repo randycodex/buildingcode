@@ -132,7 +132,7 @@ assert.match(
 assert.match(web, /AI-assisted—not an official interpretation/);
 assert.match(web, /const researchDisclosureAcknowledgmentVersion = "2026-08-27-v1"/);
 assert.doesNotMatch(web, /ensureResearchDisclosureAcknowledged|Before your first Research question/);
-assert.match(web, /Only selected passages and your conversation messages are sent/);
+assert.match(web, /Included passages, conversation messages and explicitly reviewed Project snapshots are sent\./);
 assert.match(web, /function researchAnswerCopyText\(result, question = ""\)/);
 assert.match(web, /function researchCorpusMetadataLines\(codeBasis\)/);
 assert.match(web, /Edition: \$\{corpus\.codeEdition\}/);

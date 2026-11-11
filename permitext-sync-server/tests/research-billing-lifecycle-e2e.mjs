@@ -205,7 +205,7 @@ async function main() {
       }
     });
     assert.equal(invalidReturn.response.status, 400);
-    assert.match(invalidReturn.json.error, /Permitext origin/);
+    assert.match(invalidReturn.json.error, /per codes origin/);
 
     await withFileStoreLock(dataPath, async () => {
       const storeBeforeUsage = JSON.parse(await readFile(dataPath, "utf8"));

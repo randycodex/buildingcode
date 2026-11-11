@@ -293,22 +293,22 @@ for (const mode of ["signIn", "signUp"]) {
     assert.equal(classes.has('has-hosted-auth-fallback'), true);
     assert.match(status.textContent, /local preview will stay open/);
     if (upgrade) {
-      assert.equal(destination.origin, 'https://permitext.com');
+      assert.equal(destination.origin, 'https://per.codes');
       assert.equal(destination.searchParams.get('intent'), 'upgrade-pro');
     } else {
-      assert.equal(destination.origin, 'https://accounts.permitext.com');
+      assert.equal(destination.origin, 'https://accounts.per.codes');
       assert.equal(destination.pathname, mode === 'signUp' ? '/sign-up' : '/sign-in');
-      assert.equal(destination.searchParams.get('redirect_url'), 'https://permitext.com/workspace?clerk_return=1');
+      assert.equal(destination.searchParams.get('redirect_url'), 'https://per.codes/workspace?clerk_return=1');
     }
   }
 }
-for (const [hostname, code] of [['permitext.com','SIGN_IN_UNAVAILABLE'], ['localhost','NETWORK_ERROR']]) {
+for (const [hostname, code] of [['per.codes','SIGN_IN_UNAVAILABLE'], ['permitext.com','SIGN_IN_UNAVAILABLE'], ['localhost','NETWORK_ERROR']]) {
   const local = harness({location:{hostname}});
   assert.equal(local.c.showHostedAccountFallback({}, {dataset:{}}, 'signIn', {code}), false);
 }
 
 // Welcome Sign in navigates directly to Clerk, without an account dialog or SDK.
-function directEntry({hostname='permitext.com',available=true,config,upgrade=false,mode='signIn'}={}) {
+function directEntry({hostname='per.codes',available=true,config,upgrade=false,mode='signIn'}={}) {
   const redirects=[],notices=[],listeners=new Map();
   const classes=new Set(),shell={inert:false},alreadyCovered={inert:true};
   const body={children:[shell,alreadyCovered],classList:{add:name=>classes.add(name),remove:name=>classes.delete(name)},append(node){this.children.push(node);}};
@@ -344,9 +344,10 @@ function directEntry({hostname='permitext.com',available=true,config,upgrade=fal
 }
 for(const mode of ['signIn','signUp']) {
 for(const [hostname,available,expectedOrigin,returnOrigin] of [
+  ['per.codes',true,'https://configured-clerk.example','https://per.codes'],
   ['permitext.com',true,'https://configured-clerk.example','https://permitext.com'],
   ['127.0.0.1',true,'https://configured-clerk.example','http://127.0.0.1:8786'],
-  ['127.0.0.1',false,'https://accounts.permitext.com','https://permitext.com']
+  ['127.0.0.1',false,'https://accounts.per.codes','https://per.codes']
 ]) {
   const upgrade=mode==='signUp';
   const t=directEntry({hostname,available,mode,upgrade});

@@ -103,7 +103,7 @@ function harness(options = {}) {
   const h = harness({ fresh: false });
   await h.run();
   assert.deepEqual(h.calls, ["verification", "server", "device", "identity"]);
-  assert.equal(h.progress.result.title, "Permitext account deleted");
+  assert.equal(h.progress.result.title, "per codes account deleted");
 }
 {
   const h = harness({ fresh: false, verify: async () => {
@@ -150,7 +150,7 @@ for (const unavailable of ["self-delete", "session", "verification-api"]) {
   } });
   await h.run();
   assert.deepEqual(h.calls, ["server", "device", "identity", "verification", "identity"]);
-  assert.equal(h.progress.result.title, "Permitext account deleted");
+  assert.equal(h.progress.result.title, "per codes account deleted");
 }
 {
   let attempts = 0;
@@ -162,7 +162,7 @@ for (const unavailable of ["self-delete", "session", "verification-api"]) {
   assert.equal(h.progress.result.retryLabel, "Retry cleanup");
   await h.progress.result.onRetry();
   assert.deepEqual(h.calls, ["server", "device", "identity", "reported-error", "identity"]);
-  assert.equal(h.progress.result.title, "Permitext account deleted");
+  assert.equal(h.progress.result.title, "per codes account deleted");
 }
 {
   const h = harness({ deleteIdentity: async () => { throw new Error("Synthetic provider unavailable"); } });

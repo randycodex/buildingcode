@@ -101,7 +101,7 @@ const providerWorkflowIndex = handler.indexOf("const evidenceAnalysisPromise = m
 const officialGuidanceFailureIndex = handler.indexOf(
   "allowOfficialGuidanceOnly && webSupport.sources.length === 0"
 );
-const durableCommitIndex = handler.indexOf("await commitResearchConversationMessage");
+const durableCommitIndex = handler.indexOf("await commitResearchConversationMessage", officialGuidanceFailureIndex);
 const duplicateIndex = handler.indexOf('reservation.reason === "duplicate"', reservationIndex);
 const paymentRequiredIndex = handler.indexOf("progressResponse.json(402", duplicateIndex);
 assert.ok(
