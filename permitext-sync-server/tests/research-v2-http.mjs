@@ -19,7 +19,7 @@ Object.assign(process.env,{NODE_ENV:'test',OPENAI_API_KEY:'offline-double',PERMI
 if(postgres)process.env.PERMITEXT_SYNC_DATABASE_URL=postgres.connectionString;
 const nativeFetch=globalThis.fetch;let gate=null,dropResponse=false,lastHandled=Promise.resolve(),lastClosed=Promise.resolve();let calls=0,broken=false,gap=false,server,userID,token,account;
 const passage='This code shall be known and may be cited as the "New York City Building Code," "NYCBC" or "BC". All section numbers in this code shall be deemed to be preceded by the designation "BC".';
-const draft={answerText:'The selected text calls this the New York City Building Code, NYCBC, or BC. [S1]',claims:[{text:'The selected text supplies these names.',sourceIDs:['S1']}],missingSources:[],missingFacts:[]};
+const draft={answerText:'The selected text calls this the New York City Building Code, NYCBC, or BC. [S1]',questionTitle:'Names of the Building Code',claims:[{text:'The selected text supplies these names.',sourceIDs:['S1']}],missingSources:[],missingFacts:[]};
 globalThis.fetch=async(url,options)=>{
   assert.equal(String(url),'https://api.openai.com/v1/responses','Research v2 cannot perform external retrieval');
   const body=JSON.parse(options.body);calls++;
@@ -71,6 +71,8 @@ try{
   const completed=await post('/research/conversations/message',input);
   assert.equal(completed.status,200,JSON.stringify(completed.body));conversation=completed.body.conversation;
   assert.equal(calls,2);assert.equal(conversation.messages.at(-1).answer.verification.pass,true);
+  assert.equal(conversation.title,'Names of the Building Code');assert.equal(conversation.titleSource,'summary');
+  assert.equal(conversation.starterQuestion,input.question,'The short title cannot replace the full original ask');
   assert.match(conversation.messages.at(-1).answer.researchEngine,/research-v2/);
   await lastHandled;
   const adapter=postgres||createFileStoreAdapter(),before=await adapter.read();
@@ -88,6 +90,7 @@ try{
   const gapAnswer=await post('/research/conversations/message',{...context(conversation),question:'What does the unprovided lender rider require?',requestID:'v2-evidence-gap'});
   assert.equal(gapAnswer.status,200,JSON.stringify(gapAnswer.body));
   assert.equal(gapAnswer.body.conversation.messages.at(-1).answer.authorityStatus,'insufficient_evidence');
+  assert.equal(gapAnswer.body.conversation.title,'Names of the Building Code','A follow-up cannot replace the original-ask summary');
   conversation=gapAnswer.body.conversation;gap=false;
   broken=true;
   const rejected=await post('/research/conversations/message',{...context(conversation),question:'Explain this passage again.',requestID:'v2-failed-review'});

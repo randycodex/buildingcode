@@ -116,3 +116,30 @@ selectingHistory=true;managedFirst.handlers.click();assert.equal(openedHistory,'
 selectingHistory=false;managedFirst.handlers.click();assert.equal(openedHistory,'one');
 managedView.dispose();assert.equal(disposedHistory,1,'Closing the Assistant also closes its management menu.');
 console.log('Research v2 shared history management integration passed.');
+
+const originalAsk='Calculate the occupant load of a library reading room with 1,405 net square feet.';
+const historyItem={id:'summary',title:'Library reading room occupant load',starterQuestion:originalAsk,messageCount:2};
+const historyDraft={id:'draft',title:'BC § 1004.1 — Design occupant load',messageCount:0};
+const renames=[];let renameControl,newChats=0;
+const grouped=createResearchV2View({history:[historyItem,historyDraft],initialDraft:'Keep my unsent follow-up',onDraft(){},onOpen(){},
+  onOriginal:()=>assert.fail('The retired interface cannot be opened'),
+  onNew:()=>{newChats++;},
+  historyGroups:items=>[{label:'7 days',conversations:items.filter(item=>item.messageCount>0)},{label:'Drafts',conversations:items.filter(item=>item.messageCount===0)}],
+  historyManagement:{element:new Element('div'),bindRow(_row,_open,item,title,controls){if(item.id==='summary')renameControl=controls.onRename;},setConversations(){},dispose(){}},
+  onRename:async(item,title)=>{renames.push([item.id,title]);return {...item,title,titleSource:'manual'};}
+});
+assert.deepEqual(all(grouped.element).filter(node=>node.className==='rv2-history-group-label').map(node=>node.textContent),['7 days','Drafts']);
+assert.equal(all(grouped.element).some(node=>node.tagName==='ol'),false,'The grouped history has no numbered list');
+assert.equal(all(grouped.element).some(node=>/Original Research/.test(node.textContent||'')),false);
+assert.equal(all(grouped.element).find(node=>node.className==='rv2-question-link').title,originalAsk,'The full ask stays available without becoming the visible title');
+renameControl();
+const renameInput=grouped.element.querySelector('.rv2-rename-input');renameInput.value='My reading room question';
+await grouped.element.querySelector('.rv2-rename-form').handlers.submit({preventDefault(){}});
+assert.deepEqual(renames,[['summary','My reading room question']]);
+assert.equal(historyItem.starterQuestion,originalAsk);
+assert.equal(grouped.element.querySelector('.rv2-input').value,'Keep my unsent follow-up');
+assert.ok(all(grouped.element).some(node=>node.textContent==='My reading room question'));
+all(grouped.element).find(node=>node.textContent==='+ New chat').handlers.click();
+assert.equal(newChats,1);assert.equal(grouped.element.querySelector('.rv2-input').value,'Keep my unsent follow-up');
+grouped.dispose();
+console.log('Grouped Research history passed: dates/Drafts, summary labels, full original ask, no legacy action, inline rename and draft preservation.');

@@ -4423,6 +4423,7 @@ async function createPostgresStoreAdapter() {
               SELECT jsonb_build_object(
                 'id', conversation->>'id',
                 'title', conversation->>'title',
+                'titleSource', conversation->>'titleSource',
                 'createdAt', conversation->>'createdAt',
                 'updatedAt', conversation->>'updatedAt',
                 'historyHiddenAt', conversation->>'historyHiddenAt',
@@ -4474,6 +4475,7 @@ async function createPostgresStoreAdapter() {
               SELECT jsonb_build_object(
                 'id', conversation->>'id',
                 'title', conversation->>'title',
+                'titleSource', conversation->>'titleSource',
                 'createdAt', conversation->>'createdAt',
                 'updatedAt', conversation->>'updatedAt',
                 'historyHiddenAt', conversation->>'historyHiddenAt',
@@ -11981,6 +11983,7 @@ export function projectResearchConversationForList(conversation) {
   return {
     id: conversation.id,
     title: researchConversationDisplayTitle(conversation),
+    titleSource: conversation.titleSource || null,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
     historyContentFacts: researchHistoryContentFacts(conversation),
@@ -12013,6 +12016,7 @@ function researchConversationSummary(conversation, projectLink = null) {
   return {
     id: conversation.id,
     title: researchConversationDisplayTitle(conversation),
+    titleSource: conversation.titleSource || null,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
     historyContentFacts: researchHistoryContentFacts(conversation),
@@ -12067,6 +12071,12 @@ function researchConversationPassageTitle(conversation) {
   const firstPassage = (Array.isArray(conversation?.sources) ? conversation.sources : [])
     .find((source) => source?.kind === "selection");
   if (!firstPassage) return "";
+  const heading = String(firstPassage.title || "").trim();
+  if (heading) {
+    const reference = [firstPassage.codePrefix, firstPassage.sectionNumber ? `§ ${firstPassage.sectionNumber}` : ""]
+      .filter(Boolean).join(" ");
+    return conciseResearchConversationTitle([reference, heading].filter(Boolean).join(" — "), 80);
+  }
   const selectedText = conciseResearchConversationTitle(firstPassage.selectedText);
   if (selectedText) return selectedText;
   const reference = [firstPassage.codePrefix, firstPassage.sectionNumber]
@@ -12081,7 +12091,7 @@ function researchConversationPassageTitle(conversation) {
 
 function researchConversationHasManualTitle(conversation) {
   if (conversation?.titleSource === "manual") return true;
-  if (["default", "passage", "question"].includes(conversation?.titleSource)) return false;
+  if (["default", "passage", "question", "summary"].includes(conversation?.titleSource)) return false;
   const storedTitle = String(conversation?.title || "").trim();
   if (!storedTitle) return false;
   const creationTitle = conversation?.createdAt
@@ -12092,6 +12102,7 @@ function researchConversationHasManualTitle(conversation) {
 
 export function researchConversationDisplayTitle(conversation) {
   const storedTitle = conciseResearchConversationTitle(conversation?.title);
+  if (conversation?.titleSource === "summary" && storedTitle) return storedTitle;
   if (researchConversationHasManualTitle(conversation)) return storedTitle;
   return conciseResearchConversationTitle(originalResearchQuestion(conversation)) ||
     researchConversationPassageTitle(conversation) ||
@@ -12101,6 +12112,7 @@ export function researchConversationDisplayTitle(conversation) {
 
 function refreshGeneratedResearchConversationTitle(conversation) {
   if (!conversation || researchConversationHasManualTitle(conversation)) return conversation;
+  if (conversation.titleSource === "summary" && String(conversation.title || "").trim()) return conversation;
   const questionTitle = conciseResearchConversationTitle(originalResearchQuestion(conversation));
   if (questionTitle) {
     conversation.title = questionTitle;
@@ -20965,7 +20977,17 @@ async function handleResearchConversationMessage(request, response) {
         projectContextSnapshot:{projectID:conversation.primaryProjectID || null,projectInformation,manualFacts:manualProjectFacts,
           combinedFacts:combinedProjectFacts,capturedAt:now}};
       conversation.codeBasis=structuredClone(answerCodeBasis); conversation.codeVersion=answerCodeBasis.codeVersion;
-      conversation.starterQuestion ||= question; refreshGeneratedResearchConversationTitle(conversation);
+      const firstQuestion = !originalResearchQuestion(conversation);
+      conversation.starterQuestion ||= question;
+      const questionTitle = typeof v2Result?.draft?.questionTitle === "string"
+        ? v2Result.draft.questionTitle.replace(/\s+/g, " ").replace(/^['"“”]+|['"“”]+$/g, "").trim() : "";
+      if (firstQuestion && questionTitle && questionTitle.length <= 80 &&
+          questionTitle.split(/\s+/).length >= 2 && questionTitle.split(/\s+/).length <= 10 &&
+          !researchConversationHasManualTitle(conversation)) {
+        conversation.title = questionTitle;
+        conversation.titleSource = "summary";
+      }
+      refreshGeneratedResearchConversationTitle(conversation);
       appendCompletedResearchExchange(conversation,userMessage,assistantMessage);
       conversation.updatedAt=now; conversation.sourceStatus="current"; delete conversation.historyHiddenAt;
       progressResponse.assertActive();

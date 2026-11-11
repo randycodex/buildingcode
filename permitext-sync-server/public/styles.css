@@ -21537,8 +21537,8 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .assistant-history-selected-count { color: var(--text-secondary); font-size: 11px; }
 .assistant-history-management-status { grid-column: 1 / -1; margin: 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
 .assistant-history-management-status:empty { display: none; }
-:is(.assistant-history-rail .research-conversation-row, .rv2-questions > li).has-history-management { display: grid; grid-template-columns: minmax(0, 1fr) 28px; align-items: center; gap: 8px; }
-:is(.assistant-history-rail .research-conversation-row, .rv2-questions > li).is-history-selecting { grid-template-columns: 18px minmax(0, 1fr); }
+:is(.assistant-history-rail .research-conversation-row, .rv2-question-row).has-history-management { display: grid; grid-template-columns: minmax(0, 1fr) 28px; align-items: center; gap: 8px; }
+:is(.assistant-history-rail .research-conversation-row, .rv2-question-row).is-history-selecting { grid-template-columns: 18px minmax(0, 1fr); }
 .has-history-management > :is(.research-conversation-open, .rv2-question-link) { min-width: 0; width: 100%; }
 .has-history-management > .assistant-history-row-menu { width: 28px; min-width: 28px; padding: 0; font-size: 18px; }
 .has-history-management > .assistant-history-checkbox { appearance: none; -webkit-appearance: none; position: relative; flex: 0 0 18px; width: 18px; min-width: 18px; height: 18px; margin: 0; padding: 0; border: 1px solid var(--text-secondary); border-radius: 50%; background: transparent; box-shadow: none; cursor: pointer; }

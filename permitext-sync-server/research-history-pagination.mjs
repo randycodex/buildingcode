@@ -91,7 +91,7 @@ export function researchHistoryPageQuery(userID, options) {
     ORDER BY created_at DESC, id COLLATE "C" ASC LIMIT ${limit}
   )
   SELECT to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS sort_date, jsonb_build_object(
-    'id', id, 'title', conversation->>'title',
+    'id', id, 'title', conversation->>'title', 'titleSource', conversation->>'titleSource',
     'createdAt', conversation->>'createdAt', 'updatedAt', conversation->>'updatedAt',
     'historyHiddenAt', conversation->>'historyHiddenAt',
     'primaryProjectID', conversation->>'primaryProjectID',

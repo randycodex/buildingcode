@@ -1,4 +1,4 @@
-import {attachResearchQuestionRail} from "./research-question-rail.js?v=1";
+import {attachResearchQuestionRail} from "./research-question-rail.js?v=2";
 import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
 // A small view with injected workspace/Reader adapters. No provider calls or
 // evidence selection policy live in the presentation module.
@@ -45,22 +45,61 @@ export function createResearchV2View(options) {
     onBrowse, onFind, onReview, onInclude, onRemove, onCitation, onSnapshot,
     isCurrent = () => true, onStatus } = options;
   const root=node('section','research-v2');root.setAttribute('aria-label','Research');
-  const rail=node('aside','rv2-rail');rail.setAttribute('aria-label','Numbered research questions');
-  const list=node('ol','rv2-questions');
+  const rail=node('aside','rv2-rail');rail.setAttribute('aria-label','Research history');
+  const list=node('div','rv2-questions');
   const historyRecords=[];
   if(options.historyManagement){rail.append(options.historyManagement.element);rail.addEventListener("keydown",options.historyManagement.handleKeyDown);}
   const knownQuestions=new Set();
+  function renderHistory(){
+    const scroll=rail.scrollTop;
+    list.replaceChildren();
+    const groups=options.historyGroups?.(historyRecords)||[{conversations:historyRecords}];
+    for(const group of groups){
+      const section=node('section','rv2-history-group');
+      if(group.label){section.setAttribute('aria-label',group.label);section.append(node('h3','rv2-history-group-label',group.label));}
+      const rows=node('ul','rv2-question-group-list');
+      for(const item of group.conversations){
+        const li=node('li','rv2-question-row');
+        const title=options.historyTitle?.(item)||item.title||item.starterQuestion||'New question';
+        const open=action('',()=>{if(!options.historyManagement?.selectConversation(item.id))onOpen(item.id);},'rv2-question-link');
+        open.append(node('span','rv2-question-title',title));open.title=item.starterQuestion||title;
+        if(item.id===conversation?.id)open.setAttribute('aria-current','page');
+        const rename=()=>{
+          const form=node('form','rv2-rename-form');
+          const input=node('input','rv2-rename-input');input.type='text';input.maxLength=120;input.value=title;input.setAttribute('aria-label','Research conversation name');
+          const save=action('Save',null),cancel=action('Cancel',()=>renderHistory());save.type='submit';
+          const message=node('span','rv2-rename-status');message.setAttribute('role','status');
+          form.append(input,save,cancel,message);li.replaceChildren(form);li.classList.add?.('is-renaming');input.focus();
+          form.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();renderHistory();}});
+          form.addEventListener('submit',async event=>{
+            event.preventDefault();if(!isCurrent()||!root.isConnected)return;
+            const next=input.value.replace(/\s+/g,' ').trim();
+            if(!next){message.textContent='Enter a conversation name.';return;}
+            input.disabled=save.disabled=cancel.disabled=true;message.textContent='Saving…';
+            try{
+              const updated=await options.onRename(item,next);
+              if(!isCurrent()||!root.isConnected||!updated)return;
+              Object.assign(item,updated);renderHistory();
+            }catch(error){if(isCurrent()&&root.isConnected)message.textContent=error.message||'The name could not be saved.';}
+            finally{input.disabled=save.disabled=cancel.disabled=false;}
+          });
+        };
+        li.append(open);rows.append(li);
+        options.historyManagement?.bindRow(li,open,item,title,options.onRename?{onRename:rename}:{});
+      }
+      section.append(rows);list.append(section);
+    }
+    options.historyManagement?.setConversations(historyRecords);
+    rail.scrollTop=scroll;
+  }
   function appendQuestions(items){items.forEach(item=>{
     if(knownQuestions.has(item.id))return;knownQuestions.add(item.id);historyRecords.push(item);
-    const li=node('li');const title=item.title||item.starterQuestion||'New question';
-    const open=action('',()=>{if(!options.historyManagement?.selectConversation(item.id))onOpen(item.id);},'rv2-question-link');open.append(node('span','rv2-question-title',title));open.title=title;
-    if(item.id===conversation?.id)open.setAttribute('aria-current','page');li.append(open);list.append(li);options.historyManagement?.bindRow(li,open,item);
-  });options.historyManagement?.setConversations(historyRecords);}
+  });renderHistory();}
   appendQuestions(history);
-  if(!history.length)list.append(node('li','rv2-empty-history','Your questions will appear here.'));
+  if(!history.length)list.append(node('p','rv2-empty-history','Your questions will appear here.'));
   rail.append(list);
-  if(options.onOriginal)rail.append(action("Original Research",options.onOriginal,"rv2-text-action"));
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
+  if(options.onNew)rail.append(action('+ New chat',()=>{if(isCurrent()&&root.isConnected)void options.onNew();},'rv2-new-chat'));
   const divider=node('div','rv2-rail-divider');
   const questionRail=attachResearchQuestionRail({root,divider,widthStore:options.railWidthStore});
   const chat=node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');

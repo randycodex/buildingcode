@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto';
 
-export const researchV2Version = 'research-v2-20261110-r3';
+export const researchV2Version = 'research-v2-20261110-r4';
 const fail = (message, code = 'V2_INVALID_INPUT') => Object.assign(new Error(message), { code });
 const stringList = { type: 'array', items: { type: 'string' } };
 export const researchV2DraftSchema = { type: 'object', additionalProperties: false,
-  required: ['answerText', 'claims', 'missingSources', 'missingFacts'], properties: {
+  required: ['answerText', 'claims', 'missingSources', 'missingFacts', 'questionTitle'], properties: {
+    questionTitle: { type: 'string', description: 'A short neutral title summarizing the question, not its answer.' },
     answerText: { type: 'string' }, missingSources: stringList, missingFacts: stringList,
     claims: { type: 'array', items: { type: 'object', additionalProperties: false,
       required: ['text', 'sourceIDs'], properties: { text: { type: 'string' }, sourceIDs: stringList } } }
@@ -91,7 +92,7 @@ export async function runResearchV2(input, { call, signal, onStage = () => {}, m
   for (let round = 0; round <= maxRepairRounds; round++) {
     combinedSignal.throwIfAborted();
     onStage(round ? 'repair' : 'draft');
-    const body = request(round ? 'repair' : 'draft', writer + (round ? ' Repair all reported issues and return a complete replacement answer. Preserve the supported scope distinctions and material qualifications already present in the previous draft. A repair must not drop a different applicable qualification while fixing the reported issue. Recheck the entire replacement against the evidence. Do not add evidence.' : ''),
+    const body = request(round ? 'repair' : 'draft', writer + ' Set questionTitle to a natural 3–8 word summary of the user question for the history list, in the question\'s language. Describe the ask, not an answer or compliance finding. Omit administrative or test prefixes, introductory instructions, and detailed input lists. Preserve the main subject and requested task. This title is presentation metadata, not a source claim.' + (round ? ' Repair all reported issues and return a complete replacement answer. Preserve the supported scope distinctions and material qualifications already present in the previous draft. A repair must not drop a different applicable qualification while fixing the reported issue. Recheck the entire replacement against the evidence. Do not add evidence.' : ''),
       round ? { evidence: packet, previousDraft: draft, issues } : packet,complex||round?'medium':'low');
     const draftStarted=Date.now();
     const drafted = await call(body, { phase: round ? 'repair' : 'draft', signal: combinedSignal });

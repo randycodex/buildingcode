@@ -22,7 +22,7 @@ function harness(instanceMode=false){
   crypto:{randomUUID:()=> 'new-request'},sessionStorage:{getItem:()=>null},document:{activeElement:null},MutationObserver:class{observe(){}disconnect(){}},requestAnimationFrame:fn=>fn(),
   hasCapability:()=>true,scheduleResearchDraftPersistence(){},notifyWorkspaceLayoutChange(){calls.layout++;}
  });
- vm.runInContext([actual('researchAssistantContentIdentity'),actual('renderResearchV2Pane'),actual('refreshResearchConversationInPlace')].join('\n'),context);
+ vm.runInContext([actual('researchHistoryDayIndex'),actual('researchConversationHistoryGroups'),actual('researchConversationTitle'),actual('researchAssistantContentIdentity'),actual('renderResearchV2Pane'),actual('refreshResearchConversationInPlace')].join('\n'),context);
  return{context,panel,header,calls,state,instance,conversations,get options(){return options;},get accountCurrent(){return accountCurrent;},set accountCurrent(v){accountCurrent=v;}};
 }
 for(const mode of [false,true]){

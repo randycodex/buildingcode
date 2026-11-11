@@ -28,6 +28,10 @@ assert.equal(drafts.id,'drafts');assert.equal(drafts.label,'Drafts');assert.equa
 assert.equal(context.researchConversationTitle(rows[0]),'Draft with selected evidence');
 assert.equal(context.researchConversationTitle(rows[2]),'Authored title');
 assert.equal(context.researchConversationTitle(rows[4]),'Research draft');
+const passageDraft={messageCount:0,titleSource:'passage',title:'Long copied passage text',sources:[{kind:'selection',codePrefix:'BC',sectionNumber:'1004.1',title:'Design occupant load',selectedText:'The full selected passage is retained.'}]};
+assert.equal(context.researchConversationTitle(passageDraft),'BC § 1004.1 — Design occupant load');
+assert.equal(context.researchConversationTitle({...passageDraft,titleSource:'manual',title:'My custom title'}),'My custom title');
+assert.equal(passageDraft.sources[0].selectedText,'The full selected passage is retained.');
 for (const count of [undefined,null,'0',false,NaN,Infinity,-1,0.5]) {
  const result=context.researchConversationHistoryGroups([{id:'unknown',messageCount:count,createdAt:date}],new Date(date));
  assert.ok(result.every(group=>group.id!=='drafts'),'missing/invalid/nonzero counts stay in date chronology');

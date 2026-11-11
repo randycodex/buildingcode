@@ -1687,7 +1687,6 @@ function evaluationProjectFacts(projectContext = {}) {
 
 async function createEvaluationConversation(baseURL, account, testCase) {
   const passages = selectedPassages(testCase);
-  const passageTitleSource = String(passages[0]?.selectedText || "").replace(/\s+/g, " ").trim();
   const projectFacts = evaluationProjectFacts(testCase.projectContext);
   const projectID = projectFacts.length ? `research-eval-project-${randomUUID()}` : null;
   if (projectID) {
@@ -1745,10 +1744,14 @@ async function createEvaluationConversation(baseURL, account, testCase) {
     `${testCase.id} did not preserve every passage supplied through the multi-selection request contract.`
   );
   if (passages.length) {
+    const firstSelection = created.conversation.sources.find(source => source.kind === "selection");
+    const passageTitleSource = firstSelection.title
+      ? [firstSelection.codePrefix, firstSelection.sectionNumber ? `§ ${firstSelection.sectionNumber}` : "", "—", firstSelection.title].filter(Boolean).join(" ")
+      : String(passages[0].selectedText || "").replace(/\s+/g, " ").trim();
     assert(
       created.conversation.title.length <= 120 &&
         passageTitleSource.startsWith(created.conversation.title.replace(/…$/, "")),
-      `${testCase.id} did not receive a title based on its first selected passage.`
+      `${testCase.id} did not receive a concise title from its selected section heading or passage fallback.`
     );
   } else {
     assert(

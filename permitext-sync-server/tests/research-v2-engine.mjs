@@ -26,6 +26,9 @@ let result=await runResearchV2(input,{call:async(body,meta)=>{
 assert.deepEqual(calls.map(c=>c.phase),['draft','review']);assert.equal(result.status,'reviewed');
 assert.equal(calls[0].body.reasoning.effort,'low','Simple passages keep the lower drafting effort.');
 assert.equal(researchV2AnswerMetadata(result).verification.pass,true);
+assert.ok(calls[0].body.text.format.schema.required.includes('questionTitle'));
+assert.match(calls[0].body.instructions,/summary of the user question/);
+assert.equal(calls[1].body.text.format.schema.properties.questionTitle,undefined,'Review remains focused on substantive answer support');
 assert.match(calls[1].body.instructions,/ENTIRE proposed answer/);
 calls=[];
 result=await runResearchV2(input,{call:async(body,meta)=>{

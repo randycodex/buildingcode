@@ -4344,11 +4344,14 @@ async function main() {
     });
     assert(createdConversation.response.status === 201, "Research conversation creation failed.");
     assert(createdConversation.json.conversation.messages.length === 0, "Creating research unexpectedly generated an AI message.");
-    const selectedPassageTitle = selectedResearchText.replace(/\s+/g, " ").trim();
+    const firstResearchSelection = createdConversation.json.conversation.sources[0];
+    const selectedPassageTitle = firstResearchSelection.title
+      ? [firstResearchSelection.codePrefix, firstResearchSelection.sectionNumber ? `§ ${firstResearchSelection.sectionNumber}` : "", "—", firstResearchSelection.title].filter(Boolean).join(" ")
+      : selectedResearchText.replace(/\s+/g, " ").trim();
     assert(
       createdConversation.json.conversation.title.length <= 120 &&
         selectedPassageTitle.startsWith(createdConversation.json.conversation.title.replace(/…$/, "")),
-      "New Research conversations should use their first selected passage as the title."
+      "Research drafts should use their section heading, with a passage fallback, while preserving the complete selected text."
     );
     assert(
         createdConversation.json.conversation.sources[0].selectedText === selectedResearchText &&

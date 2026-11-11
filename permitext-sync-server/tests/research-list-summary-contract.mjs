@@ -241,6 +241,10 @@ assert.equal(
   "What was asked first?",
   "The first Research question should become the automatic conversation title."
 );
+assert.equal(researchConversationDisplayTitle({title:'Library reading room occupant load',titleSource:'summary',starterQuestion:'Calculate the occupant load of a reading room with 1,405 net square feet.'}),
+  'Library reading room occupant load','A generated short summary stays separate from the complete original ask');
+assert.equal(researchConversationDisplayTitle({titleSource:'passage',sources:[{kind:'selection',codePrefix:'BC',sectionNumber:'1004.1',title:'Design occupant load',selectedText:'Long exact passage text that must remain intact.'}]}),
+  'BC § 1004.1 — Design occupant load','A passage-only draft uses its section heading rather than its body text');
 assert.equal(
   researchConversationDisplayTitle({
     title: "Aug 1, 2026 · 8:00 PM",
@@ -412,8 +416,9 @@ const supplementalDescriptors = [];
 const supplementalLoads = [];
 const supplementalCloses = [];
 const supplementalContext = vm.createContext({
-  supplementalResearchConversationIDs: ["first", "already-open", "second"],
-  state: { utilityInstances: [{ conversationID: "already-open" }] },
+  supplementalResearchConversationIDs: ["first", "primary", "already-open", "second"],
+  state: { researchConversationID: "primary", utilityInstances: [{ conversationID: "already-open" }] },
+  researchConversationPaneIsOpen: () => true,
   paneIDForResearchConversation: (id) => `research:${id}`,
   add: (id, label, load, close) => supplementalDescriptors.push({ id, label, load, close }),
   renderResearchConversation: (id, options) => { supplementalLoads.push({ id, supplemental: options.supplemental }); return id; },

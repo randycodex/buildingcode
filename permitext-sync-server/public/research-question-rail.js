@@ -1,4 +1,4 @@
-const minimum = 160, initial = 205, chatMinimum = 320;
+const minimum = 160, initial = 320, chatMinimum = 320;
 
 export function attachResearchQuestionRail({root, divider, widthStore}) {
   let preferred = initial;

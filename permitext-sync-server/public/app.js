@@ -1,17 +1,17 @@
 import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement } from "./notebook-content.js?v=3";
-import { createResearchV2Rollout } from "./research-v2-rollout.js?v=1";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=18";
+import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=20";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=3";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-per-codes-v1653";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-per-codes-v1654";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
-import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
+import {createResearchHistoryManagement} from "./research-delete-controls.js?v=9";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
@@ -161,7 +161,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261110-per-codes-v1653";
+} from "./offline-storage.js?v=20261110-per-codes-v1654";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -17124,7 +17124,13 @@ function readerSectionResearchSelection(sectionWrapper, passageElement = section
 function researchConversationTitle(conversation, fallback = "New Research") {
   const title = String(conversation?.title || "").trim();
   const question = String(conversation?.starterQuestion || "").replace(/\s+/g, " ").trim();
-  const automaticTitle = !title || /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·/.test(title);
+  if (conversation?.titleSource !== "manual" && !question && conversation?.messageCount === 0) {
+    const source = conversation.sources?.find(item => item.kind === "selection" && item.title);
+    if (source) return [source.codePrefix && source.sectionNumber ? `${source.codePrefix} § ${source.sectionNumber}` : "", source.title]
+      .filter(Boolean).join(" — ");
+  }
+  const automaticTitle = !title || (!["manual", "summary"].includes(conversation?.titleSource) &&
+    /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·/.test(title));
   if (automaticTitle && question) return question;
   if (automaticTitle && !(conversation?.messageCount || conversation?.messages?.length)) {
     return Number(conversation?.sourceCount || conversation?.sources?.length) > 0 ? "Draft with selected evidence" : "Research draft";
@@ -26473,7 +26479,8 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
 const researchV2Rollout = createResearchV2Rollout({
   scope:()=>{const account=activeAccount();return {userID:account?.userID,key:`${account?.userID}:${account?.sessionToken}:${accountRuntimeGeneration}`};},
   isCurrent:owner=>researchV2RolloutScopeMatches(owner),
-  load:()=>postResearch("/research/v2/config"),storage:sessionStorage,url:()=>location.href
+  load:()=>postResearch("/research/v2/config"),storage:sessionStorage,url:()=>location.href,
+  replaceURL:url=>history.replaceState(history.state,"",url)
 });
 function researchV2RolloutScopeMatches(owner){const account=activeAccount();return owner.key===`${account?.userID}:${account?.sessionToken}:${accountRuntimeGeneration}`;}
 function researchV2Enabled() { return researchV2Rollout.requested(); }
@@ -26502,8 +26509,9 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     if (!current()) return panel;
     if(!availability.available){
       const notice=document.createElement("p");notice.textContent="Research v2 is unavailable. Your saved conversations are retained.";
-      const original=document.createElement("a");original.textContent="Open original Research";original.href="/workspace?research=legacy";
-      content.replaceChildren(notice,original);return panel;
+      const retry=document.createElement("button");retry.type="button";retry.textContent="Retry Research";
+      retry.addEventListener("click",()=>{if(ownsPanel())void renderResearchV2Pane(paneID,null,{panel});});
+      content.replaceChildren(notice,retry);return panel;
     }
     let conversation = fetched?.conversation || null;
     if (conversation && !researchConversationInWorkspace(conversation)) {
@@ -26553,7 +26561,8 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       // Publishing it must not reopen the column or wait for list/get requests.
       const refreshed = await panel._refreshResearchV2(next, {revealAnswerID});
       if (refreshed !== "updated") return;
-      const summary = {...next};delete summary.messages;delete summary.sources;
+      const summary = {...next,messageCount:next.messages.length,
+        title:researchConversationTitle({...next,messageCount:next.messages.length})};delete summary.messages;delete summary.sources;
       researchConversationList = [...researchConversationList.filter(item => item.id !== next.id), summary];
       readResearchConversationList.invalidate();
       researchHistoryPageReaders.forEach(read => read.invalidate());
@@ -26577,11 +26586,22 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       }
     });
     view = createResearchV2View({ conversation,revealAnswerID:retained.revealAnswerID,historyManagement,
+      historyGroups:researchConversationHistoryGroups,historyTitle:researchConversationTitle,
       railWidthStore:{read:()=>localStorage.getItem(railWidthKey),write:width=>{if(ownsPanel())localStorage.setItem(railWidthKey,String(width));}},
       history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
       hasMore:listed.hasMore,
-      onOriginal:()=>{const url=new URL(location.href);url.searchParams.set("research","legacy");location.assign(url.href);},
+      onRename:async (item,title)=>{
+        if(!ownsPanel())return null;
+        const result=await postResearch("/research/conversations/rename",{conversationID:item.id,title});
+        if(!ownsPanel())return null;
+        const updated={...result.conversation,messageCount:result.conversation.messages?.length||0};
+        listed.conversations=listed.conversations.map(row=>row.id===updated.id?updated:row);
+        researchConversationList=researchConversationList.map(row=>row.id===updated.id?updated:row);
+        readResearchConversationList.invalidate();researchHistoryPageReaders.forEach(read=>read.invalidate());
+        if(conversation?.id===updated.id)await publish(result);
+        return updated;
+      },
       onLoadMore:async()=>{const page=await postResearch("/research/conversations/list",{limit:30,projectID:researchWorkspaceProjectID() || "",cursor:historyCursor,...(retained.includeHidden ? {includeHidden:true} : {})});
         if(current()){historyCursor=page.nextCursor;listed.nextCursor=page.nextCursor;listed.hasMore=page.hasMore;
           listed.conversations=[...listed.conversations,...(page.conversations||[])];}
@@ -26673,7 +26693,8 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
         isCurrentAccountRequest(accountIdentity) && workspaceID === activeWorkspaceID &&
         selectedID() === expectedID && !researchDraftPaneIDs.has(paneID) && hasCapability("research");
       if (!isOwner()) return "stale";
-      const summary = {...nextConversation};delete summary.messages;delete summary.sources;
+      const summary = {...nextConversation,messageCount:nextConversation.messages.length,
+        title:researchConversationTitle({...nextConversation,messageCount:nextConversation.messages.length})};delete summary.messages;delete summary.sources;
       const nextListed = {...listed,conversations:[
         ...listed.conversations.filter(item => item.id !== expectedID),summary
       ]};
@@ -26717,7 +26738,13 @@ async function renderResearch(paneID = "utility:analysis") {
   const identity=captureAccountRequest(),workspaceID=activeWorkspaceID;
   const configuration=await researchV2Rollout.refresh({force:true});
   if(!isCurrentAccountRequest(identity)||workspaceID!==activeWorkspaceID)return null;
-  if (configuration.available && researchV2Rollout.enabled()) return renderResearchV2Pane(paneID, configuration);
+  return renderResearchV2Pane(paneID, configuration);
+}
+
+// Retained presentation helpers can still read historical records. This
+// renderer has no UI entry point; live Assistant panes always use Research v2.
+async function renderLegacyResearch(paneID = "utility:analysis") {
+  const identity=captureAccountRequest(),workspaceID=activeWorkspaceID;
   const instance = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === paneID) || null;
   const conversationOpen = instance ? Boolean(instance.conversationID) : researchConversationPaneIsOpen();
   const draftShowing = researchDraftPaneIDs.has(paneID) || !conversationOpen;
@@ -49398,6 +49425,7 @@ function workspacePaneDescriptors(options = {}) {
   if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Assistant", () => renderResearch("utility:analysis"), closeResearchWorkspace,
     { identity: researchAssistantContentIdentity() });
   for (const id of supplementalResearchConversationIDs) {
+    if (researchConversationPaneIsOpen() && id === state.researchConversationID) continue;
     if ((state.utilityInstances || []).some((item) => item.conversationID === id)) continue;
     add(paneIDForResearchConversation(id), "Assistant", () => renderResearchConversation(id, { supplemental: true }), () => closeResearchConversation(id));
   }
