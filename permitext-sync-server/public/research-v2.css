@@ -12,6 +12,8 @@
 .rv2-rail-divider:focus-visible{outline:0;background:var(--text-secondary)}
 .research-v2.is-question-rail-resizing,.research-v2.is-question-rail-resizing *{cursor:col-resize!important;user-select:none}
 .rv2-questions{padding:0;margin:0;color:var(--text-secondary)}
+.research-v2 .assistant-history-management{display:contents}
+.research-v2 .assistant-history-management-toolbar{display:none}
 .rv2-history-group{margin:0 0 18px}
 .rv2-history-group-label{margin:0 0 12px;font-size:14px;font-weight:400;color:var(--text-secondary)}
 .rv2-question-group-list{padding:0;margin:0;list-style:none}
