@@ -17521,10 +17521,22 @@ async function reportFilesForProject(userID, projectID) {
 async function reportProjectMaterialBySourceID(userID, projectID, manifest) {
   const material = new Map();
   const assetIDs = new Set();
+  const publicImages = new Map();
+  const collectImages = blocks => {
+    for (const block of blocks || []) {
+      if (block.type === 'image' && /^https:\/\//i.test(block.props?.url || '')) publicImages.set(block.props.url,'');
+      collectImages(block.children);
+    }
+  };
   for (const item of manifest.items || []) {
     const document = item.kind === 'notebookCard' ? item.document : item.notebookDocument;
     if (document) for (const id of validateNotebookDocument(document).imageAssets) assetIDs.add(id);
+    if (document) collectImages(document.document);
+    for (const figure of item.figures || []) publicImages.set(figure.url,figure.contentHash);
   }
+  if (publicImages.size + assetIDs.size > 200) throw Error('This Report has too many images. Include fewer than 200 images.');
+  const {reportImageMaterial} = await import('./report-images.mjs');
+  for (const [url,hash] of publicImages) material.set(url,await reportImageMaterial(url,hash));
   for (const assetID of assetIDs) {
     if (!await notebookImageAccessibleFromProject(userID, projectID, assetID)) throw new Error('A Report Note image is unavailable in this Project.');
     const asset = await ownedNotebookImageAsset(userID, assetID);
@@ -17634,6 +17646,7 @@ async function handleReportGenerate(request, response) {
     ];
     const evidenceCharacters = items.reduce((sum, item) => sum + (item.passageText || item.text || "").length, 0);
     if (evidenceCharacters > 1_000_000) throw new Error("The Report is too large. Remove some sources and try again.");
+    const projectMaterialBySourceID = await reportProjectMaterialBySourceID(storageOwnerUserID, access.projectID, {items});
     const manifest = immutableReportManifest({
       id: manifestID,
       project: {
@@ -17670,16 +17683,12 @@ async function handleReportGenerate(request, response) {
         codeContent,
         draftVersion: draft.envelope.version,
         firmControlsVersion: reportConfiguration.controls.version,
-        selections: evidenceSnapshots
+        selections: evidenceSnapshots,
+        images: [...projectMaterialBySourceID].map(([url,image])=>({url,contentHash:image.contentHash}))
       },
       createdAt: now
     });
     const generatedReportID = randomUUID();
-    const projectMaterialBySourceID = await reportProjectMaterialBySourceID(
-      storageOwnerUserID,
-      access.projectID,
-      manifest
-    );
     const pdfBody = await renderReportPDFOnDemand(manifest, { projectMaterialBySourceID });
     if (!pdfBody.length || pdfBody.length > maxReportFileBytes) {
       throw new Error("The generated Report PDF exceeds the supported file size.");
@@ -28602,7 +28611,8 @@ async function handleNotebookAssetRead(request, response) {
   const projectID = String(body.projectID || "").trim();
   const assetID = String(body.assetID || "").trim();
   const legacyPathname = String(body.pathname || "").trim();
-  if (!userID || !projectID || (!assetID && !legacyPathname)) {
+  const publicURL = String(body.publicURL || '').trim();
+  if (!userID || !projectID || (!assetID && !legacyPathname && !publicURL)) {
     sendError(response, 400, "Missing Notebook image identity.");
     return;
   }
@@ -28614,6 +28624,16 @@ async function handleNotebookAssetRead(request, response) {
     organizationPermissions.projectView
   );
   if (!access) return;
+  if (publicURL) {
+    try {
+      if (publicURL.length > 2500) throw Error('The embedded image URL is too long.');
+      const {reportImageMaterial} = await import('./report-images.mjs');
+      const image = await reportImageMaterial(publicURL);
+      response.writeHead(200,{...securityHeaders(),'cache-control':'private, no-store','content-type':image.contentType,'content-length':String(image.body.length)});
+      response.end(image.body);
+    } catch (error) {sendError(response,400,error.message || 'This embedded image is unavailable. Upload its file instead.');}
+    return;
+  }
   const asset = assetID
     ? await ownedNotebookImageAsset(access.storageOwnerUserID, assetID)
     : await notebookImageWithStorageKey(access.storageOwnerUserID, legacyPathname);

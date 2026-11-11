@@ -391,6 +391,11 @@ function normalizeEvidenceManifestItem(item, base) {
     chapter: requiredText(item.chapter || "unknown", "Report evidence chapter", 256),
     title: requiredText(item.title, "Report evidence title", 1_000),
     passageText: requiredText(item.passageText, "Report evidence passage", 50_000),
+    ...(item.figures?.length ? {figures:item.figures.map(figure => {
+      if (!item.passageText.includes(figure.text) || !/^https:\/\/per\.codes\/code\/assets\/[a-zA-Z0-9._%-]+\?assetRevision=[a-f0-9]{64}$/.test(figure.url) ||
+          !/^[a-f0-9]{64}$/.test(figure.contentHash)) throw Error('Invalid Report source figure.');
+      return {text:requiredText(figure.text,'Report figure text',500),url:figure.url,contentHash:figure.contentHash,caption:optionalText(figure.caption,1000)};
+    })} : {}),
     ...(Array.isArray(item.tables) && item.tables.length ? { tables: item.tables.map(table => {
       if (!Array.isArray(table.rows) || !table.rows.length || table.rows.length > 1000 ||
           table.rows.some(row => !Array.isArray(row) || !row.length || row.length > 100 || row.some(cell => typeof cell !== "string"))) {

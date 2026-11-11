@@ -72,6 +72,16 @@ export function notebookBlocksFromSourceElement(root) {
   };
   const blocks = [];
   const visit = node => {
+    if (node.nodeType === 1 && node.tagName === 'IMG') {
+      const url = node.getAttribute('src') || '';
+      const imageURL = url ? new URL(url,root.ownerDocument?.baseURI || 'https://per.codes') : null;
+      if (imageURL?.pathname.startsWith('/code/assets/')) {
+        imageURL.protocol = 'https:'; imageURL.hostname = 'per.codes'; imageURL.port = '';
+      }
+      if (imageURL) blocks.push({type:'image',props:{url:imageURL.href,
+        name:node.alt || 'Code figure',caption:'',showPreview:true}});
+      return;
+    }
     if (node.nodeType === 1 && node.tagName === 'TABLE') {
       if (node.caption?.textContent.trim()) blocks.push({type:'paragraph',content:inline(node.caption)});
       const rows = [...node.rows].map(row => ({cells:[...row.cells].map(cell => ({type:'tableCell',
@@ -82,7 +92,7 @@ export function notebookBlocksFromSourceElement(root) {
         headerRows:node.tHead?.rows.length || (firstBody < 0 ? rows.length : firstBody) || Math.min(mergedHeaderRows, rows.length)}});
       return;
     }
-    if (node.nodeType === 1 && (node.querySelector('table') || !['P','LI','H1','H2','H3','H4','H5','H6'].includes(node.tagName) && [...node.children].some(child => /^(P|DIV|UL|OL|TABLE|H[1-6])$/.test(child.tagName)))) {
+    if (node.nodeType === 1 && (node.querySelector('table, img') || !['P','LI','H1','H2','H3','H4','H5','H6'].includes(node.tagName) && [...node.children].some(child => /^(P|DIV|UL|OL|TABLE|H[1-6])$/.test(child.tagName)))) {
       [...node.childNodes].forEach(visit); return;
     }
     const content = inline(node);

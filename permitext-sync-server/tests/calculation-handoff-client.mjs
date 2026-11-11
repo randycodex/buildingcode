@@ -29,7 +29,7 @@ for(const stale of [false,true]) {
   notebookEvidenceTextMap:root=>({text:root.blocks.map(b=>b.text).join(' ')}),
   emptyNotebookDocument:()=>({schema:'permitext-notebook-card',schemaVersion:2,format:'blocknote-json',document:[]}),
   postResearch:async(_path,body)=>{calls.push(body);return {card:{id:'note'}};},
-  requireCurrentAccountRequest(){},saveNotebookCardSnapshot:async()=>{},openCalculationNotebook:async()=>{}});
+  requireCurrentAccountRequest(){},saveNotebookCardSnapshot:async()=>{},publishSavedNotebookCard:()=>{},openCalculationNotebook:async()=>{}});
  vm.runInContext(app.slice(a,b),context);context.renderOccupantLoadCalculation(source);
  const prefilledSource={...source,sourceID:'synthetic-source'};
  const answer={occupantLoadDraft:{sourceID:'synthetic-source',area:{value:'1500',quote:'My room is 1500 square feet.'}}};

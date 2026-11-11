@@ -43,14 +43,14 @@ const editor = {
   getActiveStyles:()=>({...styleState}), getSelectedText:()=>selectedText, getSelectedLinkUrl:()=>'',
   toggleStyles:value=>{for(const style of Object.keys(value)) styleState[style]=!styleState[style];},
   createLink:(url,text)=>createdLinks.push({url,text}),
-  isEditable:true, getSelection:()=>({blocks:selected}),
+  isEditable:true, getSelection:()=>({blocks:selected}), getExtension:()=>null,
   focus:()=>{focusCount++;}, transact:callback=>{transactions++;callback();},
   updateBlock:(block,update)=>{updates.push({id:block.id,...update});}
 };
 const hookState = [], hookRefs = [];
 let stateIndex = 0, refIndex = 0;
 const context = vm.createContext({
-  URL,
+  URL, Menu:{Target:'menu-target',Dropdown:'menu-dropdown',Item:'menu-item'},
   useState:initial=>{const index=stateIndex++; if(!(index in hookState)) hookState[index]=initial; return [hookState[index],value=>{hookState[index]=value;}];},
   useRef:initial=>{const index=refIndex++; return hookRefs[index] ||= {current:initial};},
   React:{createElement:(type,props,...children)=>({type,props,children})},
@@ -60,8 +60,9 @@ const context = vm.createContext({
 vm.runInContext(toolbarSource,context);
 const renderToolbar = () => {stateIndex=0;refIndex=0;return context.PermitextFormattingToolbar({editor,options:{}});};
 const toolbar = renderToolbar();
-const styleSelect = toolbar.children.find(child=>child?.type==='select');
-styleSelect.props.onChange({target:{value:'heading-2'}});
+const menuItems = node => node && typeof node === 'object' ? [node,...(node.children || []).flatMap(menuItems)] : [];
+const headingOption = menuItems(toolbar).find(node=>node.type==='menu-item'&&node.children[0]==='Heading 2');
+headingOption.props.onClick();
 assert.equal(focusCount,1); assert.equal(transactions,1);
 assert.deepEqual(updates.map(update=>update.id),['heading','list'],'Images remain images');
 assert.ok(updates.every(update=>update.type==='heading' && update.props.level===2));

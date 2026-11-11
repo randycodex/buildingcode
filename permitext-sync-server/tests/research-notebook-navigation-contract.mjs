@@ -26,6 +26,7 @@ for (const delay of ['confirmation','save','ready','refresh','none']) {
       researchProjectID:p=>p.id,readableProjectName:p=>p.name,crypto:{randomUUID:()=> 'test-id'},
       captureAccountRequest:()=>({userID:'local'}),isCurrentAccountRequest:()=>true,
       requireCurrentAccountRequest(){},researchAnswerQuestion:()=> 'Research question',
+      generatedNoteTitle:text=>text,publishSavedNotebookCard(){},
       chooseResearchNoteDestination:async()=>{if(delay==='confirmation')await gate;return {kind:'new'};},navigator:{onLine:true},
       emptyNotebookDocument:()=>({document:[]}),
       postResearch:async()=>{calls.push('saved');return delay==='save'?gate:{card:{id:'note'}};},

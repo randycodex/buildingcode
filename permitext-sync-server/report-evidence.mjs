@@ -2,6 +2,8 @@ import { evidenceCommentsText } from "./public/evidence-comments.js";
 import { reportCommentKey } from "./public/project-workflow.js";
 import { createHash } from "node:crypto";
 import { parseFragment } from "parse5";
+import {codeFigureName} from './report-images.mjs';
+import {loadCodeAssetManifest} from './code-asset-manifest.mjs';
 
 function text(value, label, maximum = 1024, required = false) {
   const result = String(value ?? "").trim();
@@ -30,6 +32,22 @@ export function normalizeSavedExportSelections(items) {
 }
 
 const attributes = node => Object.fromEntries((node.attrs || []).map(attr => [attr.name, attr.value]));
+function figureText(node) {
+  const name = codeFigureName(attributes(node).src || '');
+  if (!name) throw Error('This source figure is unavailable. Reopen the source before exporting.');
+  return `[Figure: ${name}]`;
+}
+function selectedFigureNodes(body, blockID) {
+  const figures = [];
+  const visit = node => { if (node.tagName === 'img') figures.push(node); else (node.childNodes || []).forEach(visit); };
+  for (const block of body.blocks || []) {
+    if (!block.html) continue;
+    const root = parseFragment(block.html);
+    const node = blockID && String(block.id || block.imageID || block.tableID || '') !== blockID ? findNode(root,blockID) : root;
+    if (node) visit(node);
+  }
+  return figures;
+}
 const inlineExportText = value => value.replace(/[ \t]+/g,' ').replace(/([a-zA-Z]) +(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/g,'$1').replace(/ +([),.;:!?])/g,'$1');
 function findNode(node, id) {
   if (attributes(node).id === id) return node;
@@ -145,7 +163,7 @@ function nodeText(node) {
   }
   if (["script", "style"].includes(node.tagName)) return "";
   if (node.tagName === "img") {
-    throw new Error("This selection contains a figure. Export its text separately; figures are not supported by this PDF export yet.");
+    return `\n${figureText(node)}\n`;
   }
   if (node.tagName === "table") return `\n${tableText(node)}\n`;
   const content = (node.childNodes || []).map(nodeText).join("");
@@ -171,9 +189,7 @@ function selectedSourceHasTables(body, blockID) {
 
 function exportBlockText(block, blockID = "") {
   if (blockID && !block.html && String(block.id || block.tableID || block.imageID || "") !== blockID) return null;
-  if (block.kind === "image") {
-    throw new Error("This selection contains a figure. Export its text separately; figures are not supported by this PDF export yet.");
-  }
+  if (block.kind === "image" && !block.html) throw new Error('This source figure is unavailable. Reopen the source before exporting.');
   if (block.html) {
     const root = parseFragment(block.html);
     const node = blockID && String(block.id || block.tableID || "") !== blockID
@@ -236,6 +252,14 @@ export async function prepareSavedEvidenceItems({ selections, resolveSource }) {
     });
     const chunks = fullTextChunks(passageText);
     const tables = selectedTables(body, selection.blockID);
+    const figureNodes = selectedFigureNodes(body,selection.blockID);
+    const assets = figureNodes.length ? await loadCodeAssetManifest() : null;
+    const figures = figureNodes.map(node => {
+      const name = codeFigureName(attributes(node).src || ''), entry = assets.assets[name];
+      if (!entry) throw Error('This code figure is unavailable in the published source assets.');
+      return {text:figureText(node),url:`https://per.codes/code/assets/${encodeURIComponent(name)}?assetRevision=${assets.assetRevision}`,
+        contentHash:entry.sha256,caption:attributes(node).alt || ''};
+    });
     const sectionTitle = String(section.title || "Section");
     const titlePrefix = `${section.sectionNumber} `;
     const title = sectionTitle.startsWith(titlePrefix) ? sectionTitle.slice(titlePrefix.length) : sectionTitle;
@@ -246,6 +270,7 @@ export async function prepareSavedEvidenceItems({ selections, resolveSource }) {
       chapter: String(section.chapterNumber || "unknown"),
       title: `${title}${selection.blockID ? " · Selected paragraph" : ""}${chunks.length > 1 ? ` · Part ${index + 1} of ${chunks.length}` : ""}`,
       passageText: chunk, tables: tables.filter(table => chunk.includes(table.text)), passageTextHash: createHash("sha256").update(chunk).digest("hex"),
+      ...(figures.length ? {figures:figures.filter(figure=>chunk.includes(figure.text))} : {}),
       sourceLibraryVersion: selection.codeVersion
     }));
     const notes = new Set();

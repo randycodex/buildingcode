@@ -13,21 +13,25 @@ function noteRuns(content) {
       ...node.styles, ...(node.styles?.backgroundColor === 'yellow' ? {highlight:true} : {})}]);
 }
 
+function drawReportImage(document, url, caption, material) {
+  const image = material.get(url);
+  if (!image?.body) throw Error('A Report image is unavailable. Check its URL or upload the image before exporting.');
+  const source = document.openImage(image.body);
+  const left = document.page.margins.left, width = document.page.width-left-document.page.margins.right;
+  const scale = Math.min(width/source.width,430/source.height,1), height=source.height*scale;
+  ensureVerticalSpace(document,height+25);
+  const top = document.y;
+  document.image(source,left,top,{width:source.width*scale});
+  document.y = top+height+8;document.x=left;
+  if (caption) drawReportRichText(document,[{text:printableNoteText(caption)}],{size:9});
+}
+
 function drawNotebookContent(document, notebookDocument, material) {
   const left = document.page.margins.left, width = document.page.width - left - document.page.margins.right;
   const draw = (block, depth = 0, number = 1) => {
     document.x = left;
     if (block.type === 'image' && block.props?.url) {
-      const image = material.get(block.props.url);
-      if (!image?.body) throw new Error('A Note image is unavailable for PDF export. Upload the image to this Project before exporting.');
-      const source = document.openImage(image.body);
-      const scale = Math.min(width / source.width, 430 / source.height, 1);
-      const height = source.height * scale;
-      ensureVerticalSpace(document, height + 25);
-      const top = document.y;
-      document.image(source, left, top, {width:source.width * scale});
-      document.y = top + height + 8;
-      if (block.props.caption) drawReportRichText(document, [{text:printableNoteText(block.props.caption)}], {size:9});
+      drawReportImage(document,block.props.url,block.props.caption,material);
     } else if (block.type === 'table') {
       const table = notebookTableDisplayData(block.content, {preserveInlineContent:true,preserveCellSpans:true});
       table.rows = table.rows.map(row => row.map(noteRuns));
@@ -225,7 +229,9 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
       .text(`Edition: ${reportEvidenceEdition(item)}`,{paragraphGap:8});
     for (const part of formatted) {
       if (part === question && questionIsTitle) continue;
-      if (part.kind === 'table') {
+      if (part.kind === 'image') {
+        drawReportImage(document,part.url,part.caption,projectMaterialBySourceID);
+      } else if (part.kind === 'table') {
         drawFormattedSourceTable(document,part,item.sourceFormatting,startX,contentWidth);
         document.moveDown(0.7);
       } else {
@@ -245,19 +251,14 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
     document.font("Report-Regular").fontSize(9).fillColor(colors.muted)
       .text(`Edition: ${reportEvidenceEdition(item)}`, { paragraphGap: 8 });
     document.font("Report-Regular").fontSize(9.5).fillColor(colors.ink);
-    let remaining = item.passageText;
-    for (const table of item.tables || []) {
-      const index = remaining.indexOf(table.text);
-      if (index < 0) continue;
-      if (remaining.slice(0,index).trim()) document.text(reportEvidenceDisplayText(remaining.slice(0,index).trim()), {width:contentWidth,lineGap:2,paragraphGap:8});
-      ensureVerticalSpace(document, 90);
-      document.font("Report-Regular").fontSize(8);
-      drawReportTable(document, table, startX, contentWidth);
-      document.x = startX;
-      document.moveDown(0.7).font("Report-Regular").fontSize(9.5);
-      remaining = remaining.slice(index + table.text.length);
+    for (const part of reportItemPreview(item)) {
+      if (part.kind === 'image') drawReportImage(document,part.url,part.caption,projectMaterialBySourceID);
+      else if (part.kind === 'table') {
+        ensureVerticalSpace(document,90);document.font('Report-Regular').fontSize(8);
+        drawReportTable(document,part,startX,contentWidth);
+        document.x=startX;document.moveDown(0.7);
+      } else document.font('Report-Regular').fontSize(9.5).text(part.text,{width:contentWidth,lineGap:2,paragraphGap:8});
     }
-    if (remaining.trim()) document.text(reportEvidenceDisplayText(remaining.trim()), {width:contentWidth,lineGap:2,paragraphGap:8});
   } else if (item.kind === "notebookCard") {
     document
       .fillColor(colors.ink)
@@ -429,7 +430,7 @@ function annotatedSourceParts(item) {
 }
 const hasInlineStyle = run => sourceTextStyles.some(style=>run[style]);
 function hasSourceMarks(parts) {
-  return parts.some(part=>part.kind === 'text' ? part.runs.some(hasInlineStyle) : part.rows.some((row,r)=>row.some((text,c)=>
+  return parts.some(part=>part.kind === 'text' ? part.runs.some(hasInlineStyle) : part.kind === 'table' && part.rows.some((row,r)=>row.some((text,c)=>
     sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text},part.formatting || []).some(hasInlineStyle))));
 }
 function drawFormattedSourceTable(document,part,formatting,startX,contentWidth) {
@@ -600,6 +601,9 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
     previousSourceClassification = item.sourceClassification;
   });
 
+}
+
+function drawProfessionalNotice(document, manifest) {
   // Reserve the measured notice, not a fixed 130pt block that can force an
   // otherwise unnecessary final page for a short notice.
   document.font("Report-Bold").fontSize(10);
@@ -692,6 +696,7 @@ export async function renderReportPDF(manifest, { projectMaterialBySourceID = ne
   });
 
   drawCover(document, manifest);
+  drawProfessionalNotice(document, manifest);
   drawBody(document, manifest, projectMaterialBySourceID);
   drawPageFooters(document, manifest);
   document.end();

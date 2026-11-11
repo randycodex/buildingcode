@@ -20,6 +20,7 @@ for (const name of ['openSavedItemInReader', 'openResearchConversation', 'startN
       activeWorkspaceID: 'a', captureAccountRequest: () => 1, isCurrentAccountRequest: () => true,
       savedItemOpeningAttempts: new Map(), resolveReaderSource: () => gate,
       activeAccount: () => ({userID:'test',sessionToken:'local'}), hasCapability: () => true,
+      currentColumnWorkflowView: () => 'research',
       activeProjectIDForCodeQuestions: () => 'project', postResearch: () => gate,
       fetchAuthoritativeResearchConversation: () => gate,
       researchDraftPaneIDs: new Set(), paneIDForUtilityInstance: i => i.id,

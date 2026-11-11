@@ -109,7 +109,7 @@ const runtime=vm.createContext({occupantLoadSource,occupantLoadFootnoteAssessmen
  researchConversationInWorkspace:()=>true,reconciledResearchProgressSession:()=>null,
  captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,workspaceProject:()=>({id:'project'}),researchProjectID:()=> 'project',
  openResearchConversation:async()=>conversation,paneIDForResearchConversation:()=> 'utility:analysis',whenWorkspacePaneReady:async()=>true,
- track:{querySelector:selector=>selector.endsWith('.research-question-input')?textInput:{querySelector:()=>textInput}},CSS:{escape:v=>v},Event:class{},
+ track:{querySelector:selector=>selector.includes('.research-question-input')?textInput:{querySelector:()=>textInput}},CSS:{escape:v=>v},Event:class{},
  researchNewChatDrafts:new Map(), resolveReaderSource:async()=>source,
  postResearch:async(_path,body)=>{assert.equal(body.reviewMode,'whole_section');assert.equal(body.codeVersion,codeVersion);return {selection:{selectedText:source.text}};},
  document:{createElement:()=>({children:[],append(...nodes){this.children.push(...nodes);}})},

@@ -84,11 +84,14 @@ export function reportItemPreview(item) {
   };
   if (item.kind === 'evidence') {
     let remaining = item.passageText || '';
-    for (const table of item.tables || []) {
+    const visuals = [...(item.tables || []).map(table=>({...table,kind:'table'})),...(item.figures || []).map(figure=>({...figure,kind:'image'}))]
+      .sort((a,b)=>remaining.indexOf(a.text)-remaining.indexOf(b.text));
+    for (const table of visuals) {
       const position = remaining.indexOf(table.text);
       if (position < 0) continue;
       add('',remaining.slice(0,position));
-      parts.push({kind:'table',rows:table.rows,headerRowCount:table.headerRowCount || 0,...(table.cellSpans?{cellSpans:table.cellSpans}:{})});
+      parts.push(table.kind === 'image' ? {kind:'image',url:table.url,caption:table.caption} :
+        {kind:'table',rows:table.rows,headerRowCount:table.headerRowCount || 0,...(table.cellSpans?{cellSpans:table.cellSpans}:{})});
       remaining = remaining.slice(position + table.text.length);
     }
     add('',remaining);

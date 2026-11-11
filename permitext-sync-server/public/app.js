@@ -1,6 +1,6 @@
 import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
-import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=4";
+import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=5";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
 import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=22";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
@@ -9,7 +9,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-workflow-fixes-v1661";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-nine-workflow-fixes-v1663";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=10";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -162,7 +162,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261111-workflow-fixes-v1661";
+} from "./offline-storage.js?v=20261111-nine-workflow-fixes-v1663";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2340,7 +2340,7 @@ async function createNewWorkspace({onSelected = null} = {}) {
     return;
   }
   if (!(await confirmWorkspaceTransition())) return;
-  const createHost = document.querySelector(".account-screen[open]") ||
+  const createHost = (reportScreen?.isOpen() ? reportScreen.element : null) || document.querySelector(".account-screen[open]") ||
     document.querySelector(".workspace-shell.has-no-workspace") || track;
   showProjectCreateSheet(createHost, null, { folderType: "project", workspaceProject: true,
     onCreated: async (project) => {
@@ -3611,11 +3611,12 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
   }
 }
 
-async function ensureNotebookTabCatalog() {
+async function ensureNotebookTabCatalog({ refresh = false } = {}) {
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   if (!project || !hasCapability('notebook')) return;
   const projectID = projectDetailKey(project), identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
-  if (notebookCatalogs.has(projectID) || notebookCatalogRequests.has(projectID)) return;
+  if (notebookCatalogRequests.has(projectID)) return notebookCatalogRequests.get(projectID);
+  if (notebookCatalogs.has(projectID) && !refresh) return;
   const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID;
   const request = postResearch('/notebook/cards/list', {projectID}).catch(async error => {
     if (!privateCacheFallbackAllowed(error)) throw error;
@@ -3631,6 +3632,13 @@ async function ensureNotebookTabCatalog() {
   });
   notebookCatalogRequests.set(projectID, request);
   await request;
+}
+
+function publishSavedNotebookCard(projectID, card) {
+  if (!card?.id) return;
+  const cards = notebookCatalogs.get(projectID) || [];
+  notebookCatalogs.set(projectID, [card, ...cards.filter(item => item.id !== card.id)]);
+  syncNotebookNoteTabs();
 }
 
 async function openNotebookNoteColumn(project, card) {
@@ -5581,6 +5589,9 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
   if (view === 'notebook') {
     const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
     const navigation = state.workflowNavigationGeneration || 0;
+    await ensureNotebookTabCatalog({refresh:true});
+    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
+        (state.workflowNavigationGeneration || 0) !== navigation) return false;
     await prepareNotebookView({openNote: initialize});
     if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
         (state.workflowNavigationGeneration || 0) !== navigation || currentWorkflowView() !== view) return false;
@@ -12978,13 +12989,20 @@ async function uploadNotebookAsset(projectID, file, cardID = "", requestIdentity
 async function resolveNotebookAsset(projectID, assetURL, requestIdentity = captureAccountRequest()) {
   requireCurrentAccountRequest(requestIdentity);
   const value = String(assetURL || "");
+  const publicURL = /^https:\/\//i.test(value) ? value : '';
+  if (publicURL) {
+    const image = new URL(publicURL);
+    if (['per.codes','www.per.codes'].includes(image.hostname) && image.pathname.startsWith('/code/assets/') && !image.port && !image.username && !image.password) {
+      return `${image.pathname}${image.search}`;
+    }
+  }
   if (value.startsWith("permitext-notebook-local:")) {
     const local = await notebookImageRecord(value);
     requireCurrentAccountRequest(requestIdentity);
     if (local?.accountUserID !== requestIdentity.userID || local?.projectID !== projectID || !local?.blob) throw new Error("This offline Notebook image is no longer available on this device.");
     return URL.createObjectURL(local.blob);
   }
-  if (!value.startsWith("permitext-notebook-asset:")) return value;
+  if (!value.startsWith("permitext-notebook-asset:") && !publicURL) return value;
   const account = activeAccount();
   if (!account) throw new Error("Sign in to load this Notebook image.");
   const identity = value.slice("permitext-notebook-asset:".length);
@@ -13000,7 +13018,7 @@ async function resolveNotebookAsset(projectID, assetURL, requestIdentity = captu
     body: JSON.stringify({
       auth: { accountUserID: account.userID },
       projectID,
-      ...(legacyPathname ? { pathname: legacyPathname } : { assetID: identity })
+      ...(publicURL ? {publicURL} : legacyPathname ? { pathname: legacyPathname } : { assetID: identity })
     })
   });
   requireCurrentAccountRequest(requestIdentity);
@@ -18212,9 +18230,9 @@ async function askCalculatorFootnotes(source, draft, {conversationID="", anchorP
   let conversation=conversationID ? (activeResearchConversation?.id===conversationID?activeResearchConversation:supplementalResearchConversations.get(conversationID)) : calculatorConversationForPane();
   if (!reply && conversation && researchDraftPaneIDs.has(paneIDForResearchConversation(conversation.id))) conversation = null;
   const emptyConversationInput = !conversation && researchDraftPaneIDs.has("utility:analysis")
-    ? track.querySelector('.assistant-workspace[data-pane-id="utility:analysis"] .research-question-input') : null;
+    ? track.querySelector('.assistant-workspace[data-pane-id="utility:analysis"] :is(.rv2-input, .research-question-input)') : null;
   if (!reply && emptyConversationInput?.value.trim()) throw new Error("Clear your current Assistant draft before checking footnotes. Your draft has been preserved.");
-  const existingInput = conversation && track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneIDForResearchConversation(conversation.id))}"] .research-question-input`);
+  const existingInput = conversation && track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneIDForResearchConversation(conversation.id))}"] :is(.rv2-input, .research-question-input)`);
   if (!reply && (existingInput?.value.trim() || researchNewChatDrafts.get(`followup:${conversation?.id}`)?.trim())) {
     throw new Error("Send or clear your current Assistant draft before checking footnotes.");
   }
@@ -18258,12 +18276,12 @@ async function askCalculatorFootnotes(source, draft, {conversationID="", anchorP
   }
   if(!current() || !conversation) return;
   const paneID=paneIDForResearchConversation(conversation.id);
-  if (!track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneID)}"] .research-question-input`)) {
+  if (!track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneID)}"] :is(.rv2-input, .research-question-input)`)) {
     await openResearchConversation(conversation.id,{anchorPaneID,instance:(state.utilityInstances||[]).find(item=>item.key==="analysis" && item.conversationID===conversation.id)});
   }
   if(!await whenWorkspacePaneReady(paneID) || !current()) return;
   const pane=track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
-  const input=pane?.querySelector(".research-question-input");
+  const input=pane?.querySelector(":is(.rv2-input, .research-question-input)");
   if(!input || input.disabled) throw new Error("Wait for the current Research request before continuing.");
   if(reply) {input.focus();return;}
   if(input.value.trim()) throw new Error("Your passages were added. Send or clear the current draft before checking footnotes.");
@@ -18374,6 +18392,8 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       const saved = await postResearch("/notebook/cards/save", submission);
       requireCurrentAccountRequest(identity);
       await saveNotebookCardSnapshot(identity.userID, researchProjectID(project), saved.card);
+      requireCurrentAccountRequest(identity);
+      publishSavedNotebookCard(researchProjectID(project), saved.card);
       if (!actionCurrent()) return null;
       if (!storageError) record = store.markSaved(record, saved.card, fingerprint);
       // Saving never opens Notes in Research or overwrites an existing author-edited Note.
@@ -18431,6 +18451,8 @@ async function addPassageToNotebook(anchor, source, exact, sourceBlocks = null) 
     expectedVersion: 0, cardType: "finding", title: generatedNoteTitle(source.title), document, evidenceLinks: [link] });
   requireCurrentAccountRequest(identity);
   await saveNotebookCardSnapshot(identity.userID, projectID, payload.card);
+  requireCurrentAccountRequest(identity);
+  publishSavedNotebookCard(projectID, payload.card);
   if (!current()) return;
   showNotebookSavedLink(anchor, project, payload.card);
 }
@@ -28351,6 +28373,8 @@ function renderResearchNotebookHandoff(conversation, message, {linkForReport=fal
         requireCurrentAccountRequest(requestIdentity);
         savedCard = payload.card;
         await saveNotebookCardSnapshot(requestIdentity.userID, researchProjectID(project), savedCard);
+        requireCurrentAccountRequest(requestIdentity);
+        publishSavedNotebookCard(researchProjectID(project), savedCard);
         // Saving a reference does not change the current view or pane membership.
         // A second, explicitly labelled action opens it beside Research.
         if (originIsCurrent()) button.textContent = `Open Note: ${savedCard.title || "Untitled Note"}`;
@@ -32154,6 +32178,7 @@ async function renderProjectReportDraft(project, resume = null) {
     reportSourceGroupExpanded.set(sectionName, Boolean(expanded));
     persistProjectSectionExpansion(identity, `Report:${sectionName}`, expanded);
   };
+  let sourceAddition = Promise.resolve();
   const mountState = {
     panel,
     getPresentationState: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID && renderedDraftKey ? captureReportResume(panel, {
@@ -32179,16 +32204,27 @@ async function renderProjectReportDraft(project, resume = null) {
     hasUnsavedChanges: () => dirty,
     hasPendingEdits: () => dirty || autosave?.isSaving() || generatingReport || deletingReport,
     getDraftSnapshot: () => structuredClone(activeDraft),
-    async addSources(draftID, selectedSources) {
-      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) throw accountContextChangedError();
-      if (activeDraft.id !== draftID || generatingReport || deletingReport || autosave?.isSaving()) throw new Error("The Report is busy or has changed. Try adding again.");
-      await prepareReportNoteSources(projectID, selectedSources, requestIdentity);
-      if (disposed || activeDraft.id !== draftID || requestWorkspaceID !== activeWorkspaceID) throw accountContextChangedError();
-      appendUniqueReportSources(activeDraft, selectedSources);
-      setDirty();
-      renderWorkspaceContent();
-      if (!await saveDraft()) throw new Error("The Report could not finish saving. Your added material and edits remain in the Report; use Retry to save them.");
-      return structuredClone(activeDraft);
+    addSources(draftID, selectedSources) {
+      const sources = structuredClone(selectedSources);
+      const add = async () => {
+        const current = () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
+        if (!current()) throw accountContextChangedError();
+        if (activeDraft.id !== draftID || generatingReport || deletingReport) throw new Error("The Report has changed. Choose its destination again.");
+        // Wait for the current save and preceding additions, keeping the user's
+        // chosen destination and every requested source intact.
+        if (!await saveDraft()) throw new Error("Save the Report with Retry before adding more sources. Your edits are preserved.");
+        if (!current() || activeDraft.id !== draftID) throw accountContextChangedError();
+        await prepareReportNoteSources(projectID, sources, requestIdentity);
+        if (!current() || activeDraft.id !== draftID) throw accountContextChangedError();
+        appendUniqueReportSources(activeDraft, sources);
+        setDirty();
+        renderWorkspaceContent();
+        if (!await saveDraft()) throw new Error("The Report could not finish saving. Your added material and edits remain in the Report; use Retry to save them.");
+        return structuredClone(activeDraft);
+      };
+      const pending = sourceAddition.then(add);
+      sourceAddition = pending.catch(() => {});
+      return pending;
     },
     async confirmDiscardIfNeeded() {
       if (!dirty || await saveDraft()) return true;
@@ -32801,7 +32837,14 @@ async function renderProjectReportDraft(project, resume = null) {
                 loaded = true; return;
               }
               for (const part of result.preview || []) {
-                if (part.kind === "table") {
+                if (part.kind === 'image') {
+                  const figure = document.createElement('figure');
+                  const image = document.createElement('img');
+                  const sourceURL = new URL(part.url); image.src = `${sourceURL.pathname}${sourceURL.search}`; image.alt = part.caption || 'Published code figure';
+                  image.loading = 'lazy'; image.style.maxWidth = '100%'; figure.append(image);
+                  if (part.caption) {const caption=document.createElement('figcaption');caption.textContent=part.caption;figure.append(caption);}
+                  body.append(figure);
+                } else if (part.kind === "table") {
                   const scroll = document.createElement("div"); scroll.className = "report-preview-table";
                   const table = document.createElement("table");
                   for (const [rowIndex,cells] of tableDisplayCells(part.rows || [],part.cellSpans || []).entries()) {
@@ -44094,8 +44137,9 @@ function reconcileColumnGroups(paneIDs) {
       delete group.columns[id];
       return ownedID;
     });
+    // Explicit group membership is independent from the linked columns that
+    // move together by default. Reconciliation must not undo an edit.
     const members = new Set(group.paneIDs);
-    for (const id of [...members].filter((id) => active.has(id))) basePaneGroupForMove(id, paneIDs).forEach((member) => members.add(member));
     // Evidence details belong to their saved list, outside custom column groups.
     return { ...group, paneIDs: [...members].filter((id) => !savedEvidenceColumnGroup(id, paneIDs).length) };
   }));

@@ -66,7 +66,7 @@ assert.deepEqual(migrated.paneOrder,legacy.paneOrder);
 let creationOptions,createdWorkspaceID;
 Object.assign(context,{
   closeWorkspaceContextMenu(){},hasCapability:()=>true,confirmWorkspaceTransition:async()=>true,
-  document:{querySelector:()=>null},track:{},
+  document:{querySelector:()=>null},track:{},reportScreen:null,
   showProjectCreateSheet:(_host,_project,options)=>{creationOptions=options;},
   switchWorkspace:async id=>{createdWorkspaceID=id;}
 });
