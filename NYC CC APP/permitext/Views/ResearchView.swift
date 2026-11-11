@@ -94,7 +94,9 @@ enum ResearchHistoryPresentation {
     // Decoded summaries have a required Int messageCount. Only exact zero is a
     // draft; invalid negative counts stay in ordinary chronology. No records hide.
     static func ordered(_ summaries: [ResearchConversationSummary]) -> [ResearchConversationSummary] {
-        summaries.filter { $0.messageCount != 0 } + summaries.filter { $0.messageCount == 0 }
+        summaries.filter { $0.isPinned == true } +
+            summaries.filter { $0.isPinned != true && $0.messageCount != 0 } +
+            summaries.filter { $0.isPinned != true && $0.messageCount == 0 }
     }
 }
 
@@ -531,6 +533,7 @@ private struct ResearchSessionView: View {
     @State private var pendingVisualReview: PendingResearchVisualReview?
     @State private var showingRename = false
     @State private var draftTitle = ""
+    @State private var isUpdatingPin = false
     @State private var renameConversationID: String?
     @State private var showingProjectSnapshot = false
     @State private var projectSnapshot: ResearchProjectSnapshot?
@@ -891,6 +894,10 @@ private struct ResearchSessionView: View {
                         draftTitle = conversation.title
                         showingRename = true
                     }
+                    Button(conversation.isPinned == true ? "Unpin" : "Pin", systemImage: conversation.isPinned == true ? "pin.slash" : "pin") {
+                        Task { await pinConversation(id: conversation.id, isPinned: conversation.isPinned != true) }
+                    }
+                    .disabled(isSending || isUpdatingPin)
                     Button("Delete", systemImage: "trash", role: .destructive) {
                         requestDeletion(id: conversation.id, title: conversation.title)
                     }
@@ -1063,10 +1070,13 @@ private struct ResearchSessionView: View {
 
 
             ForEach(Array(orderedSummaries.enumerated()), id: \.element.id) { index, item in
-                let isDraft = item.messageCount == 0
-                let startsDrafts = isDraft && (index == 0 || orderedSummaries[index - 1].messageCount != 0)
-                if startsDrafts || (!isDraft && (index == 0 || historyDateGroup(item) != historyDateGroup(orderedSummaries[index - 1]))) {
-                    Text(startsDrafts ? "Drafts" : historyDateGroup(item))
+                let isPinned = item.isPinned == true
+                let isDraft = !isPinned && item.messageCount == 0
+                let previous = index > 0 ? orderedSummaries[index - 1] : nil
+                let startsPinned = isPinned && previous?.isPinned != true
+                let startsDrafts = isDraft && (previous == nil || previous?.isPinned == true || previous?.messageCount != 0)
+                if startsPinned || startsDrafts || (!isPinned && !isDraft && (previous == nil || previous?.isPinned == true || historyDateGroup(item) != historyDateGroup(orderedSummaries[index - 1]))) {
+                    Text(isPinned ? "Pinned" : startsDrafts ? "Drafts" : historyDateGroup(item))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .padding(.top, index == 0 ? 0 : 20)
@@ -1103,12 +1113,15 @@ private struct ResearchSessionView: View {
                     .accessibilityIdentifier("research-history-row")
                     if !isSelectingHistory {
                         Menu {
-                            Button("Rename conversation", systemImage: "pencil") {
+                            Button("Rename", systemImage: "pencil") {
                                 renameConversationID = item.id
                                 draftTitle = researchTitle(for: item)
                                 showingRename = true
                             }
-                            Button("Delete conversation", systemImage: "trash", role: .destructive) {
+                            Button(item.isPinned == true ? "Unpin" : "Pin", systemImage: item.isPinned == true ? "pin.slash" : "pin") {
+                                Task { await pinConversation(id: item.id, isPinned: item.isPinned != true) }
+                            }
+                            Button("Delete", systemImage: "trash", role: .destructive) {
                                 requestDeletion(id: item.id, title: researchTitle(for: item))
                             }
                         } label: {
@@ -1122,7 +1135,7 @@ private struct ResearchSessionView: View {
                         .accessibilityIdentifier("research-history-options-\(item.id)")
                     }
                 }
-                .disabled(deletingConversationID == item.id || isDeletingHistoryBatch || isSending)
+                .disabled(deletingConversationID == item.id || isDeletingHistoryBatch || isSending || isUpdatingPin)
                 .listRowInsets(EdgeInsets(top: 0, leading: 22, bottom: 0, trailing: 10))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.visible, edges: .bottom)
@@ -2377,6 +2390,22 @@ private struct ResearchSessionView: View {
             }
         }
         return nil
+    }
+
+    private func pinConversation(id: String, isPinned: Bool) async {
+        guard isCurrentOwner, !isUpdatingPin, !isSending else { return }
+        isUpdatingPin = true
+        defer { if isCurrentOwner { isUpdatingPin = false } }
+        do {
+            let updated = try await library.pinResearchConversation(id: id, isPinned: isPinned)
+            guard isCurrentOwner else { return }
+            if conversation?.id == id { conversation = updated }
+            cacheConversation(updated)
+            await loadHistory(forceNetwork: true)
+        } catch {
+            guard isCurrentOwner else { return }
+            errorMessage = error.localizedDescription
+        }
     }
 
     private func renameConversation() async {

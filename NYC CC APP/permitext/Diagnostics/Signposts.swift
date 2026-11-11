@@ -586,6 +586,12 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         ).feedback
     }
 
+    func pinResearchConversation(account: SignedInAccount, conversationID: String, isPinned: Bool) async throws -> ResearchConversation {
+        try await transport.researchConversationPin(ResearchConversationPinRequest(
+            auth: authContext(for: account), conversationID: conversationID, isPinned: isPinned
+        )).conversation
+    }
+
     func renameResearchConversation(
         account: SignedInAccount,
         conversationID: String,

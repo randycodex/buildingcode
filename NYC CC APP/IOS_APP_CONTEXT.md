@@ -18,7 +18,9 @@ and includes. Preserve citations, uncertainty, missing facts, and limitations.
 Do not fall back to the retired Fast or Verified engines.
 
 History uses short summaries of the original asks, date groups, a final Drafts
-group, separators, and row menus. Full original questions and saved answers remain
+group, separators, and row menus with Rename, Pin/Unpin, and Delete. Pin state
+is account-owned server metadata shared with the web; pinned chats precede date
+groups, including older chats beyond the first ordinary history page. Full original questions and saved answers remain
 intact. Preserve manual titles and generated summary titles on follow-ups.
 
 Free includes reading, search, recent history, bounded saved sections and notes,

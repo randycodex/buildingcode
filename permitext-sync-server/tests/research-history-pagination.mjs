@@ -96,6 +96,21 @@ try {
   });
   assert.deepEqual(ids(await list({ limit: 2, cursor: first.nextCursor })), ["c", "d"], "New insert, removed boundary and later messages do not shift the next page");
 
+  // A years-old pinned chat must be on the first bounded page; crossing from
+  // pinned to ordinary rows must not skip or duplicate equal-date records.
+  const beforePin = JSON.parse(JSON.stringify((await adapter.read()).researchConversationsByUserID[owners[0]].find(row=>row.id==='e')));
+  const pin = async (conversationID,isPinned,owner=0,status=200) => post('/research/conversations/pin',{auth:{accountUserID:owners[owner]},conversationID,isPinned},tokens[owner],status);
+  const pinned = await pin('e',true);
+  assert.equal(pinned.conversation.isPinned,true);
+  assert.deepEqual(pinned.conversation.messages,beforePin.messages);assert.deepEqual(pinned.conversation.sources,beforePin.sources);
+  const duplicatePin = await pin('e',true);
+  assert.equal(duplicatePin.conversation.revision,pinned.conversation.revision,'Same pin request is idempotent');
+  assert.equal((await pin('e','true',0,400)).error,'Choose whether to pin this conversation.');
+  await pin('e',true,1,404);
+  const firstPinned = await list({limit:1});assert.deepEqual(ids(firstPinned),['e']);
+  const rest = await list({limit:2,cursor:firstPinned.nextCursor});assert.deepEqual(ids(rest),['new','a']);
+  await pin('e',false);assert.deepEqual(ids(await list({limit:2})),['new','a']);
+
   // Execute the real PostgreSQL adapter methods with a query recorder. This
   // proves bounded/owned query construction, not a live database query plan.
   const source = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
@@ -116,7 +131,7 @@ try {
     assert.equal(query.values[0], owners[0]); assert.equal(query.values.at(-1), 3);
     assert.match(query.text, /WHERE user_id = \$1 AND COALESCE\(conversation->>'historyHiddenAt'/);
     assert.match(query.text, /WITH page AS MATERIALIZED/);
-    assert.match(query.text, /ORDER BY created_at DESC, id COLLATE "C" ASC LIMIT \$/);
+    assert.match(query.text, /ORDER BY is_pinned DESC, created_at DESC, id COLLATE "C" ASC LIMIT \$/);
     assert.match(query.text, /jsonb_build_object/); assert.doesNotMatch(query.text, /OFFSET|SELECT \*/);
     assert(!query.text.includes(options.q), "Search text must be bound as a value, never SQL syntax");
     assert(query.values.includes(options.q) && query.values.includes("project-a"));
@@ -130,7 +145,7 @@ try {
   assert.deepEqual(recorded.at(-1).values.slice(0, 2), [owners[0], ["a", "b"]]);
   assert.match(source, /permitext_research_conversations_visible_history_idx[\s\S]*?user_id, created_at DESC, id COLLATE "C" ASC/);
   assert.match(source, /permitext_research_conversations_visible_project_history_idx/);
-  const malformedDate = Buffer.from(JSON.stringify({ v: 1, s: options.scope, id: "a", d: "2026-02-30T12:00:00.000Z" })).toString("base64url");
+  const malformedDate = Buffer.from(JSON.stringify({ v: 2, p: false, s: options.scope, id: "a", d: "2026-02-30T12:00:00.000Z" })).toString("base64url");
   assert.throws(() => researchHistoryOptions({ limit: 2, q: options.q, projectID: options.projectID, cursor: malformedDate }, owners[0]), { code: "INVALID_RESEARCH_HISTORY_CURSOR" });
   console.log("Research history pagination passed: real HTTP legacy/page/filter/owner/cursor behavior, tied dates, concurrent insert/deletion, original-question-only search, compact summaries and bounded parameterized PostgreSQL/page-link queries. Zero external calls; no live DB claim.");
 } finally {

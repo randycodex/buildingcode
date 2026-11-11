@@ -2969,6 +2969,16 @@ async function createPostgresStoreAdapter() {
       WHERE COALESCE(conversation->>'historyHiddenAt', '') = ''
     `;
     await sql`
+      CREATE INDEX IF NOT EXISTS permitext_research_conversations_pinned_history_idx
+      ON permitext_research_conversations (user_id, (COALESCE(conversation->'isPinned' = 'true'::jsonb, false)) DESC, created_at DESC, id COLLATE "C" ASC)
+      WHERE COALESCE(conversation->>'historyHiddenAt', '') = ''
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_research_conversations_pinned_project_history_idx
+      ON permitext_research_conversations (user_id, (COALESCE(conversation->>'primaryProjectID', '')), (COALESCE(conversation->'isPinned' = 'true'::jsonb, false)) DESC, created_at DESC, id COLLATE "C" ASC)
+      WHERE COALESCE(conversation->>'historyHiddenAt', '') = ''
+    `;
+    await sql`
       CREATE TABLE IF NOT EXISTS permitext_foundation_artifacts (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
@@ -4424,6 +4434,7 @@ async function createPostgresStoreAdapter() {
                 'id', conversation->>'id',
                 'title', conversation->>'title',
                 'titleSource', conversation->>'titleSource',
+                'isPinned', COALESCE(conversation->'isPinned' = 'true'::jsonb, false),
                 'createdAt', conversation->>'createdAt',
                 'updatedAt', conversation->>'updatedAt',
                 'historyHiddenAt', conversation->>'historyHiddenAt',
@@ -4447,9 +4458,9 @@ async function createPostgresStoreAdapter() {
                        OR COALESCE(retained_source->'richSourceGrids' NOT IN ('null'::jsonb, '[]'::jsonb, '""'::jsonb), false)
                   ),
                   'hasRetainedContext', EXISTS (SELECT 1 FROM jsonb_object_keys(conversation) AS content_key
-                    WHERE content_key NOT IN ('id','title','titleSource','createdAt','updatedAt','historyHiddenAt','codeVersion','evidenceSetVersion','primaryProjectID','starterQuestion','projectContextReviewRequired','sourceStatus','sources','messages','origin','historyContentFacts') AND conversation->content_key <> 'null'::jsonb)
+                    WHERE content_key NOT IN ('id','title','titleSource','isPinned','createdAt','updatedAt','historyHiddenAt','codeVersion','evidenceSetVersion','primaryProjectID','starterQuestion','projectContextReviewRequired','sourceStatus','sources','messages','origin','historyContentFacts') AND conversation->content_key <> 'null'::jsonb)
                     OR (conversation->'origin' IS NOT NULL AND conversation->'origin' <> 'null'::jsonb AND conversation->'origin' <> '{"kind":"chat"}'::jsonb),
-                  'hasTitleIntent', COALESCE(conversation->>'titleSource', '') <> 'default'
+                  'hasTitleIntent', COALESCE(conversation->>'titleSource', '') <> 'default' OR COALESCE(conversation->'isPinned' = 'true'::jsonb, false)
                 ),
                 'messageCount', jsonb_array_length(COALESCE(conversation->'messages', '[]'::jsonb)),
                 'sources', COALESCE((
@@ -4476,6 +4487,7 @@ async function createPostgresStoreAdapter() {
                 'id', conversation->>'id',
                 'title', conversation->>'title',
                 'titleSource', conversation->>'titleSource',
+                'isPinned', COALESCE(conversation->'isPinned' = 'true'::jsonb, false),
                 'createdAt', conversation->>'createdAt',
                 'updatedAt', conversation->>'updatedAt',
                 'historyHiddenAt', conversation->>'historyHiddenAt',
@@ -4499,9 +4511,9 @@ async function createPostgresStoreAdapter() {
                        OR COALESCE(retained_source->'richSourceGrids' NOT IN ('null'::jsonb, '[]'::jsonb, '""'::jsonb), false)
                   ),
                   'hasRetainedContext', EXISTS (SELECT 1 FROM jsonb_object_keys(conversation) AS content_key
-                    WHERE content_key NOT IN ('id','title','titleSource','createdAt','updatedAt','historyHiddenAt','codeVersion','evidenceSetVersion','primaryProjectID','starterQuestion','projectContextReviewRequired','sourceStatus','sources','messages','origin','historyContentFacts') AND conversation->content_key <> 'null'::jsonb)
+                    WHERE content_key NOT IN ('id','title','titleSource','isPinned','createdAt','updatedAt','historyHiddenAt','codeVersion','evidenceSetVersion','primaryProjectID','starterQuestion','projectContextReviewRequired','sourceStatus','sources','messages','origin','historyContentFacts') AND conversation->content_key <> 'null'::jsonb)
                     OR (conversation->'origin' IS NOT NULL AND conversation->'origin' <> 'null'::jsonb AND conversation->'origin' <> '{"kind":"chat"}'::jsonb),
-                  'hasTitleIntent', COALESCE(conversation->>'titleSource', '') <> 'default'
+                  'hasTitleIntent', COALESCE(conversation->>'titleSource', '') <> 'default' OR COALESCE(conversation->'isPinned' = 'true'::jsonb, false)
                 ),
                 'messageCount', jsonb_array_length(COALESCE(conversation->'messages', '[]'::jsonb)),
                 'sources', COALESCE((
@@ -11984,6 +11996,7 @@ export function projectResearchConversationForList(conversation) {
     id: conversation.id,
     title: researchConversationDisplayTitle(conversation),
     titleSource: conversation.titleSource || null,
+    isPinned: conversation.isPinned === true,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
     historyContentFacts: researchHistoryContentFacts(conversation),
@@ -12017,6 +12030,7 @@ function researchConversationSummary(conversation, projectLink = null) {
     id: conversation.id,
     title: researchConversationDisplayTitle(conversation),
     titleSource: conversation.titleSource || null,
+    isPinned: conversation.isPinned === true,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
     historyContentFacts: researchHistoryContentFacts(conversation),
@@ -18320,7 +18334,7 @@ async function handleResearchConversationList(request, response) {
     conversations: conversations
       .filter((conversation) => !conversation.historyHiddenAt)
       .sort((left, right) =>
-        String(right.createdAt).localeCompare(String(left.createdAt)) ||
+        Number(right.isPinned === true) - Number(left.isPinned === true) || String(right.createdAt).localeCompare(String(left.createdAt)) ||
         String(left.id).localeCompare(String(right.id))
       )
       .map((conversation) => researchConversationSummary(
@@ -18485,6 +18499,26 @@ async function handleResearchRelatedProvisions(request, response) {
     if (error.statusCode) { sendJSON(response, error.statusCode, { error: error.message, code: error.code }); return; }
     throw error;
   }
+}
+
+async function handleResearchConversationPin(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  if (typeof context.body.isPinned !== "boolean") {
+    sendError(response, 400, "Choose whether to pin this conversation."); return;
+  }
+  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
+  if (!conversation) return;
+  let artifactRevisions;
+  if ((conversation.isPinned === true) !== context.body.isPinned) {
+    conversation.isPinned = context.body.isPinned;
+    conversation.updatedAt = new Date(Math.max(Date.now(), (Date.parse(conversation.updatedAt) || 0) + 1)).toISOString();
+    await saveStoredResearchConversation(context.userID, conversation);
+    artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+      conversation.primaryProjectID ? [{projectID:conversation.primaryProjectID,domains:["research"]}] : []);
+  }
+  sendJSON(response, 200, {conversation:await researchConversationForClient(conversation,{userID:context.userID}),
+    ...(artifactRevisions ? {artifactRevisions} : {})});
 }
 
 async function handleResearchConversationRename(request, response) {
@@ -34664,6 +34698,7 @@ const handlers = {
   "research/selections/review": handleResearchSelectionReview,
   "research/sources/discover": handleResearchSourceDiscovery,
   "research/conversations/rename": handleResearchConversationRename,
+  "research/conversations/pin": handleResearchConversationPin,
   "research/conversations/create": handleResearchConversationCreate,
   "research/conversations/evidence": handleResearchConversationEvidence,
   "research/conversations/related": handleResearchRelatedProvisions,

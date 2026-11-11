@@ -2693,6 +2693,7 @@ protocol PermitextBackendTransport {
     func updateResearchProjectSnapshot(_ request: ResearchProjectSnapshotUpdateRequest) async throws -> ResearchConversationResponse
     func researchFeedback(_ request: ResearchFeedbackRequest) async throws -> ResearchFeedbackResponse
     func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse
+    func researchConversationPin(_ request: ResearchConversationPinRequest) async throws -> ResearchConversationResponse
     func researchConversationAssignProject(_ request: ResearchConversationAssignProjectRequest) async throws -> ResearchConversationResponse
     func researchConversationDelete(_ request: ResearchConversationDeleteRequest) async throws -> ResearchConversationDeleteResponse
     func notebookCardList(_ request: NotebookCardListRequest) async throws -> NotebookCardListResponse
@@ -3072,6 +3073,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func researchFeedback(_ request: ResearchFeedbackRequest) async throws -> ResearchFeedbackResponse {
         try await post("research/feedback", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchConversationPin(_ request: ResearchConversationPinRequest) async throws -> ResearchConversationResponse {
+        try await post("research/conversations/pin", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse {
@@ -5460,6 +5465,7 @@ protocol AccountBackendClient {
         outsideChecking: String?,
         supportingReference: String?
     ) async throws -> ResearchFeedback
+    func pinResearchConversation(account: SignedInAccount, conversationID: String, isPinned: Bool) async throws -> ResearchConversation
     func renameResearchConversation(
         account: SignedInAccount,
         conversationID: String,
@@ -6656,6 +6662,7 @@ extension String {
 
 // Older local transports and mocks do not support server recovery migration.
 extension PermitextBackendTransport {
+    func researchConversationPin(_ request: ResearchConversationPinRequest) async throws -> ResearchConversationResponse { throw URLError(.unsupportedURL) }
     func researchProjectSnapshot(_ request: ResearchProjectSnapshotRequest) async throws -> ResearchProjectSnapshotResponse { throw URLError(.unsupportedURL) }
     func updateResearchProjectSnapshot(_ request: ResearchProjectSnapshotUpdateRequest) async throws -> ResearchConversationResponse { throw URLError(.unsupportedURL) }
     func readProfile(_ request: BackendProfileReadRequest) async throws -> BackendProfileReadResponse { throw URLError(.unsupportedURL) }

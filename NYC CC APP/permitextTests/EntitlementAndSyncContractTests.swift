@@ -5982,6 +5982,31 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(422, nil, code: "V2_REVIEW_FAILED")).message.contains("has not shown the draft"))
     }
 
+    func testNativeResearchPinRoundTripUsesOwnerAndPreservesHistoryMetadata() async throws {
+        let host = "research-pin-\(UUID().uuidString.lowercased()).test"
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [ScopedPermitextURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        defer { ScopedPermitextURLProtocol.removeHandler(for: host); session.invalidateAndCancel() }
+        ScopedPermitextURLProtocol.install({ request in
+            XCTAssertEqual(request.url?.path, "/research/conversations/pin")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer pin-token")
+            let object = try XCTUnwrap(JSONSerialization.jsonObject(with: permitextRequestBody(request)) as? [String: Any])
+            XCTAssertEqual(object["conversationID"] as? String, "older-chat")
+            let pinned = try XCTUnwrap(object["isPinned"] as? Bool)
+            let conversation = ResearchConversation(id: "older-chat", title: "Original short title", createdAt: "before", updatedAt: "now", titleSource: "summary", isPinned: pinned, starterQuestion: "The entire original question")
+            return (200, try JSONEncoder().encode(ResearchConversationResponse(conversation: conversation)))
+        }, for: host)
+        let client = PermitextBackendClient(transport: PermitextBackendHTTPTransport(baseURL: try XCTUnwrap(URL(string: "https://\(host)/")), session: session))
+        let account = SignedInAccount(appUserID: "clerk:pin", authProvider: .clerk, authProviderUserID: "pin", appleUserID: "", displayName: "Pin test", signedInAt: Date(), backendSessionToken: "pin-token")
+        for target in [true, false] {
+            let result = try await client.pinResearchConversation(account: account, conversationID: "older-chat", isPinned: target)
+            XCTAssertEqual(result.summary.isPinned, target)
+            XCTAssertEqual(result.summary.titleSource, "summary")
+            XCTAssertEqual(result.summary.starterQuestion, "The entire original question")
+        }
+    }
+
     func testNativeResearchProjectSnapshotRequiresTheReviewedHash() async throws {
         let host = "native-project-snapshot-\(UUID().uuidString.lowercased()).test"
         let configuration = URLSessionConfiguration.ephemeral

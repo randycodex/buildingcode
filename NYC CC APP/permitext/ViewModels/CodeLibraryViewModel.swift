@@ -3769,6 +3769,12 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func pinResearchConversation(id: String, isPinned: Bool) async throws -> ResearchConversation {
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.pinResearchConversation(account: account, conversationID: id, isPinned: isPinned)
+        }
+    }
+
     func renameResearchConversation(id: String, title: String) async throws -> ResearchConversation {
         try await performPrivateAccountRequest { account in
             try await accountBackendClient.renameResearchConversation(

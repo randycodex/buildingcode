@@ -3,7 +3,7 @@ import {validResearchHistoryContentFacts} from './public/research-history-conten
 // Keep in sync with the two database summary projections. Unrecognized server
 // fields are retained context, so future draft/recovery fields fail closed.
 const ordinaryKeys = [
-  'id', 'title', 'titleSource', 'createdAt', 'updatedAt', 'historyHiddenAt',
+  'id', 'title', 'titleSource', 'isPinned', 'createdAt', 'updatedAt', 'historyHiddenAt',
   'codeVersion', 'evidenceSetVersion', 'primaryProjectID', 'starterQuestion',
   'projectContextReviewRequired', 'sourceStatus', 'sources', 'messages', 'origin'
 ];
@@ -30,6 +30,6 @@ export function researchHistoryContentFacts(conversation) {
       !ordinaryKeys.includes(key) && key !== 'historyContentFacts' && value !== null && value !== undefined) ||
       (conversation.origin != null && JSON.stringify(conversation.origin) !== '{"kind":"chat"}'),
     // Only an explicitly generated default title can be proven unauthored.
-    hasTitleIntent: conversation.titleSource !== 'default'
+    hasTitleIntent: conversation.titleSource !== 'default' || conversation.isPinned === true
   };
 }

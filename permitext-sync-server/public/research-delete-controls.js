@@ -157,7 +157,7 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
       if (busy || !current()) return true;
       selected.has(id) ? selected.delete(id) : selected.add(id); paint(); return true;
     },
-    bindRow(row, open, conversation, title = conversation.title || 'Untitled conversation', {onRename} = {}) {
+    bindRow(row, open, conversation, title = conversation.title || 'Untitled conversation', {onRename,onPin} = {}) {
       row.classList.add('has-history-management');
       const checkbox = node('input','assistant-history-checkbox'); checkbox.type = 'checkbox';
       checkbox.setAttribute('aria-label',`Select ${title}`);
@@ -165,7 +165,7 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
         if (busy || !current()) return;
         checkbox.checked ? selected.add(conversation.id) : selected.delete(conversation.id); paint();
       });
-      const options = action('…', () => showMenu(options,[...(onRename ? [{label:'Rename conversation',run:onRename}] : []),{label:'Delete conversation…',danger:true,
+      const options = action('…', () => showMenu(options,[...(onRename ? [{label:'Rename',run:onRename}] : []),...(onPin ? [{label:conversation.isPinned === true?'Unpin':'Pin',run:onPin}] : []),{label:'Delete',danger:true,
         run:() => deleteConversations({scope:'selected',conversationIDs:[conversation.id]},title)}]),'assistant-history-row-menu');
       options.setAttribute('aria-label',`Options for ${title}`);
       options.setAttribute('aria-haspopup','menu'); options.setAttribute('aria-expanded','false');

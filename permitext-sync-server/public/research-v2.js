@@ -84,8 +84,14 @@ export function createResearchV2View(options) {
             finally{input.disabled=save.disabled=cancel.disabled=false;}
           });
         };
+        const pin=async()=>{
+          if(busy||!isCurrent()||!root.isConnected)return;
+          try{const updated=await options.onPin(item,item.isPinned!==true);
+            if(isCurrent()&&root.isConnected&&updated){Object.assign(item,updated);renderHistory();}
+          }catch(error){if(isCurrent()&&root.isConnected)notice(error.message||'The pin could not be updated.',true);}
+        };
         li.append(open);rows.append(li);
-        options.historyManagement?.bindRow(li,open,item,title,options.onRename?{onRename:rename}:{});
+        options.historyManagement?.bindRow(li,open,item,title,{...(options.onRename?{onRename:rename}:{}),...(options.onPin?{onPin:pin}:{})});
       }
       section.append(rows);list.append(section);
     }

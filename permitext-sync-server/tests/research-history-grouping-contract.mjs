@@ -36,13 +36,17 @@ for (const count of [undefined,null,'0',false,NaN,Infinity,-1,0.5]) {
  const result=context.researchConversationHistoryGroups([{id:'unknown',messageCount:count,createdAt:date}],new Date(date));
  assert.ok(result.every(group=>group.id!=='drafts'),'missing/invalid/nonzero counts stay in date chronology');
 }
+const pinnedDraft={...rows[0],isPinned:true};
+const pinnedGroups=context.researchConversationHistoryGroups([rows[1],pinnedDraft,rows[4]],new Date(date));
+assert.deepEqual(Array.from(pinnedGroups,x=>x.label),['Pinned','7 days','Drafts']);
+assert.deepEqual(Array.from(pinnedGroups[0].conversations,x=>x.id),['evidence']);
 assert.equal(context.researchConversationHistoryGroups([],new Date(date)).length,0);
 assert.equal(context.researchConversationHistoryGroups([rows[0]],new Date(date))[0].id,'drafts');
 const render=web.slice(web.indexOf('  researchConversationHistoryGroups(visibleHistoryConversations()).forEach'),web.indexOf('\nfunction visualEvidenceDataURL'));
 assert.match(render,/document.createElement\(historyGroup.collapsible === false \? "span" : "button"\)/);
 assert.match(render,/if \(historyGroup.collapsible !== false\) \{[\s\S]*?wireProjectSectionMotion/);
 assert.match(render,/groupBody.append\(row\)/);
-assert.match(native,/Text\(startsDrafts \? "Drafts" : historyDateGroup\(item\)\)/);
+assert.match(native,/Text\(isPinned \? "Pinned" : startsDrafts \? "Drafts" : historyDateGroup\(item\)\)/);
 assert.match(native,/ForEach\(Array\(orderedSummaries.enumerated\(\)\)/);
 assert.doesNotMatch(native,/"Empty draft"/);
 const helper=native.slice(native.indexOf('enum ResearchHistoryPresentation {'),native.indexOf('enum ResearchComposerDraftCache {'));
@@ -57,6 +61,8 @@ let input=try JSONDecoder().decode([ResearchConversationSummary].self,from:data)
 let ordered=ResearchHistoryPresentation.ordered(input)
 precondition(ordered.map(\\.id)==["answered","negative","old-question","evidence","custom-draft","pending-draft"])
 precondition(Set(ordered.map(\\.id))==Set(input.map(\\.id)))
+var pinned=input[0];pinned.isPinned=true
+precondition(ResearchHistoryPresentation.ordered([input[1],pinned,input[4]]).map(\\.id)==["evidence","answered","pending-draft"])
 precondition(ResearchHistoryPresentation.ordered([]).isEmpty)
 precondition(Titles.researchTitle(for:input[0])=="Draft with selected evidence")
 precondition(Titles.researchTitle(for:input[2])=="Authored title")

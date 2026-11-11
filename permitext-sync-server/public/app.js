@@ -2,16 +2,16 @@ import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement } from "./notebook-content.js?v=3";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=20";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=21";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=3";
 import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-per-codes-v1654";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-per-codes-v1655";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
-import {createResearchHistoryManagement} from "./research-delete-controls.js?v=9";
+import {createResearchHistoryManagement} from "./research-delete-controls.js?v=10";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
@@ -161,7 +161,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261110-per-codes-v1654";
+} from "./offline-storage.js?v=20261110-per-codes-v1655";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -24476,8 +24476,9 @@ function researchConversationHistoryGroups(conversations = [], now = new Date())
   const orderedConversations = [...conversations].sort((left, right) =>
     String(right.createdAt || "").localeCompare(String(left.createdAt || ""))
   );
-  const drafts = [];
+  const drafts = [], pinned = [];
   orderedConversations.forEach((conversation) => {
+    if (conversation.isPinned === true) { pinned.push(conversation); return; }
     // Group by known submission count, never infer that local text/evidence is empty.
     if (typeof conversation.messageCount === "number" && conversation.messageCount === 0) {
       drafts.push(conversation);
@@ -24515,6 +24516,7 @@ function researchConversationHistoryGroups(conversations = [], now = new Date())
     groups.get(id).conversations.push(conversation);
   });
   const result = Array.from(groups.values());
+  if (pinned.length) result.unshift({id:"pinned",label:"Pinned",defaultExpanded:true,collapsible:false,conversations:pinned});
   if (drafts.length) result.push({ id: "drafts", label: "Drafts", defaultExpanded: true, collapsible: false, conversations: drafts });
   return result;
 }
@@ -26591,6 +26593,18 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
       hasMore:listed.hasMore,
+      onPin:async (item,isPinned)=>{
+        if(!ownsPanel())return null;
+        const result=await postResearch("/research/conversations/pin",{conversationID:item.id,isPinned});
+        if(!ownsPanel())return null;
+        const page=await postResearch("/research/conversations/list",{limit:30,projectID:researchWorkspaceProjectID() || "",...(retained.includeHidden ? {includeHidden:true} : {})});
+        if(!ownsPanel())return null;
+        researchConversationList=researchConversationList.map(row=>row.id===item.id?{...row,isPinned:result.conversation.isPinned}:row);
+        readResearchConversationList.invalidate();researchHistoryPageReaders.forEach(read=>read.invalidate());
+        if(result.artifactRevisions)observeLocalProjectArtifactRevisions(result.artifactRevisions,{write:true});
+        await renderResearchV2Pane(paneID,availability,{panel,conversation:conversation?.id===item.id?result.conversation:conversation,listed:page,includeHidden:retained.includeHidden});
+        return result.conversation;
+      },
       onRename:async (item,title)=>{
         if(!ownsPanel())return null;
         const result=await postResearch("/research/conversations/rename",{conversationID:item.id,title});

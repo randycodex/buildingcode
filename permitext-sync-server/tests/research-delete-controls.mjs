@@ -95,7 +95,7 @@ await fixture('cancel');await fixture('failure');await fixture('account-during-p
 let current=true;const requests=[],included=[];
 const manager=createResearchHistoryManagement({isCurrent:()=>current,project:()=>null,request:async(path,body)=>{requests.push({path,body});return path.endsWith('delete-preview')?{count:1,conversationIDs:body.conversationIDs,confirmationToken:'single'}:{conversationIDs:body.conversationIDs};},confirm:async(title,message)=>{assert.match(title,/One/);return true;},onDeleted:async()=>{},onIncludeHidden:value=>included.push(value)});
 manager.setConversations(history);const row=new Node('article'),open=new Node('button');row.append(open);manager.bindRow(row,open,history[0]);
-byClass(row,'assistant-history-row-menu').listeners.click();await find(document.body,'Delete conversation…').listeners.click();
+byClass(row,'assistant-history-row-menu').listeners.click();await find(document.body,'Delete').listeners.click();
 assert.deepEqual(requests.map(row=>row.body.conversationIDs),[['one'],['one']]);
 byClass(manager.element,'assistant-history-more').listeners.click();await find(document.body,'Include hidden conversations').listeners.click();
 assert.deepEqual(included,[true]);assert.equal(requests.length,2,'Showing hidden chats delegates to History pagination, not deletion.');
@@ -162,3 +162,19 @@ assert(source.includes('historyManagement.bindRow(row, openButton, conversation,
 assert(source.includes('includeHidden:Boolean(historyState.historyIncludeHidden)'));
 assert(!source.slice(source.indexOf('async function renderResearch(paneID'),source.indexOf('function visualEvidenceDataURL')).includes('clearResearchConversationHistory('),'History deletion cannot call the old hide-from-history endpoint.');
 console.log('Assistant History management passed: individual/selected/project/account deletion, reviewed IDs and disclosure, cancellation, stale account/project fences, retry, hidden history, selection refresh, and Settings removal.');
+
+const pinItem={id:'pin-target',title:'Pinned question',isPinned:false};
+let renamed=0,pinToggles=0;
+const pinMenu=createResearchHistoryManagement({isCurrent:()=>true});
+const pinRow=new Node('article'),pinOpen=new Node('button');pinRow.append(pinOpen);
+pinMenu.setConversations([pinItem]);
+pinMenu.bindRow(pinRow,pinOpen,pinItem,pinItem.title,{onRename:()=>{renamed++;},onPin:()=>{pinItem.isPinned=!pinItem.isPinned;pinToggles++;}});
+byClass(pinRow,'assistant-history-row-menu').listeners.click();
+let exactMenu=byClass(document.body,'assistant-history-menu');
+assert.deepEqual(exactMenu.children.map(item=>item.textContent),['Rename','Pin','Delete']);
+find(exactMenu,'Pin').listeners.click();assert.equal(pinToggles,1);
+byClass(pinRow,'assistant-history-row-menu').listeners.click();
+exactMenu=byClass(document.body,'assistant-history-menu');
+assert.deepEqual(exactMenu.children.map(item=>item.textContent),['Rename','Unpin','Delete']);
+find(exactMenu,'Rename').listeners.click();assert.equal(renamed,1);pinMenu.dispose();
+console.log('Conversation menus expose exactly Rename, Pin/Unpin and Delete.');

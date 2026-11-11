@@ -160,6 +160,12 @@ struct ResearchFeedbackResponse: Codable, Hashable, Sendable {
     let feedback: ResearchFeedback
 }
 
+struct ResearchConversationPinRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let conversationID: String
+    let isPinned: Bool
+}
+
 struct ResearchConversationRenameRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let conversationID: String
@@ -289,6 +295,7 @@ struct ResearchConversationSummary: Codable, Hashable, Identifiable, Sendable {
     let createdAt: String
     let updatedAt: String
     var titleSource: String? = nil
+    var isPinned: Bool? = nil
     var historyContentFacts: ResearchHistoryContentFacts? = nil
     var historyHiddenAt: String? = nil
     var sourceCount: Int = 0
@@ -306,6 +313,7 @@ struct ResearchConversation: Codable, Hashable, Identifiable, Sendable {
     let createdAt: String
     var updatedAt: String
     var titleSource: String? = nil
+    var isPinned: Bool? = nil
     var starterQuestion: String? = nil
     var primaryProjectID: String? = nil
     var projectContext: ResearchProjectContext? = nil
@@ -326,6 +334,7 @@ struct ResearchConversation: Codable, Hashable, Identifiable, Sendable {
             createdAt: createdAt,
             updatedAt: updatedAt,
             titleSource: titleSource,
+            isPinned: isPinned,
             sourceCount: sources.filter { $0.kind == "selection" }.count,
             sourceSectionIDs: Array(Set(sources.compactMap(\.sectionID))).sorted(),
             messageCount: messages.count,
