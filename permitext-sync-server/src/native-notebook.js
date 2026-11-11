@@ -1,4 +1,5 @@
 import { mountPermitextNotebookEditor } from "./notebook-editor.js";
+import { nativeNotebookDocumentSnapshot } from "./native-notebook-state.js";
 import "./native-notebook.css";
 
 // The editor is shipped in the app. Networking, identity and persistence remain
@@ -57,7 +58,7 @@ function traceInput(event, details = {}) {
 
 function snapshot() {
   const styles = editor?.getActiveStyles() || {};
-  return { session, revision, document: controller.getDocument(), formatting: {
+  return { session, revision, document: nativeNotebookDocumentSnapshot(controller.getDocument()), formatting: {
     bold: !!styles.bold, italic: !!styles.italic, strike: !!styles.strike,
     blockType: editor?.getTextCursorPosition().block.type || "paragraph",
     selectedText: editor?.getSelectedText() || "", linkURL: editor?.getSelectedLinkUrl() || ""
@@ -117,7 +118,7 @@ function equivalentDocuments(left, right) {
   const stable = (value) => JSON.stringify(value, (_key, item) =>
     item && typeof item === "object" && !Array.isArray(item)
       ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b))) : item);
-  return stable(left) === stable(right);
+  return stable(nativeNotebookDocumentSnapshot(left)) === stable(nativeNotebookDocumentSnapshot(right));
 }
 
 function layoutDiagnostics() {

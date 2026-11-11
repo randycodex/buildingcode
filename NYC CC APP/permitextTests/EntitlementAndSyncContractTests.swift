@@ -1879,6 +1879,28 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(sanitized.migrationState, account.migrationState)
     }
 
+    func testCanonicalBackendMigrationPreservesExplicitDebugOverrides() {
+        for oldDefault in ["https://permitext-sync.vercel.app", " https://permitext-sync.vercel.app/ "] {
+            XCTAssertEqual(PermitextBackendConfiguration.resolvedAPIBaseURLString(
+                defaultsBaseURL: oldDefault,
+                bundleBaseURL: "https://per.codes",
+                allowsDebugOverride: true
+            ), "https://per.codes")
+        }
+        for explicit in ["http://localhost:8787", "https://permitext-apple-sandbox.vercel.app", "https://custom.example.test"] {
+            XCTAssertEqual(PermitextBackendConfiguration.resolvedAPIBaseURLString(
+                defaultsBaseURL: explicit,
+                bundleBaseURL: "https://per.codes",
+                allowsDebugOverride: true
+            ), explicit)
+        }
+        XCTAssertEqual(PermitextBackendConfiguration.resolvedAPIBaseURLString(
+            defaultsBaseURL: "https://permitext-sync.vercel.app",
+            bundleBaseURL: "https://per.codes",
+            allowsDebugOverride: false
+        ), "https://per.codes")
+    }
+
     func testReleaseBackendURLPolicyFailsClosed() {
         XCTAssertEqual(
             PermitextBackendConfiguration.resolvedAPIBaseURLString(
@@ -7022,6 +7044,30 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(decoded.document[1].content?[1].href, "https://example.com/source")
         XCTAssertEqual(decoded.document[3].content?.first?.props?.referenceKind, "canonicalSection")
         XCTAssertEqual(decoded.document[4].props.caption, "Existing condition")
+    }
+
+    func testNativeNotebookTableAndRichMarksRoundTripWithoutLosingCellData() throws {
+        let data = Data(#"""
+        {"schema":"permitext-notebook-card","schemaVersion":2,"format":"blocknote-json","document":[
+          {"id":"table-1","type":"table","props":{"backgroundColor":"default","textColor":"default"},"children":[],"content":{
+            "type":"tableContent","columnWidths":[240,null,180],"headerRows":1,"headerCols":0,
+            "rows":[{"cells":[{"type":"tableCell","props":{"colspan":2,"rowspan":1,"backgroundColor":"yellow","textAlignment":"right"},"content":[
+              {"type":"text","text":"Styled cell","styles":{"bold":true,"italic":true,"underline":true,"strike":true,"code":true,"textColor":"red"}},
+              {"type":"link","href":"https://per.codes/support","content":[{"type":"text","text":"Support","styles":{"italic":true}}]}
+            ]},[{"type":"text","text":"Plain cell","styles":{}}]]}]
+          }},
+          {"id":"paragraph-1","type":"paragraph","props":{},"children":[],"content":[{"type":"text","text":"Rich paragraph","styles":{"underline":true,"code":true,"textColor":"blue","backgroundColor":"yellow"}}]}
+        ]}
+        """#.utf8)
+        let decoded = try JSONDecoder().decode(NotebookDocument.self, from: data)
+        XCTAssertNotNil(decoded.document[0].tableContent)
+        XCTAssertNil(decoded.document[0].content)
+        let encoded = try JSONEncoder().encode(decoded)
+        XCTAssertEqual(try JSONSerialization.jsonObject(with: encoded) as? NSDictionary,
+                       try JSONSerialization.jsonObject(with: data) as? NSDictionary,
+                       "Native table open/save must preserve the complete existing web document")
+        let invalid = Data(#"{"id":"bad","type":"table","props":{},"children":[],"content":[]}"#.utf8)
+        XCTAssertThrowsError(try JSONDecoder().decode(NotebookBlock.self, from: invalid))
     }
 
     func testResearchTurnAllowanceDecodesServerContract() throws {

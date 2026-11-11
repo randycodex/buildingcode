@@ -201,7 +201,7 @@ struct PermitextApp: App {
             phase3ResearchConfiguration = nil
             physicalStressConfiguration = nil
             if UserDefaults.standard.string(forKey: PermitextBackendConfiguration.apiBaseURLDefaultsKey) == nil {
-                PermitextBackendConfiguration.setDebugHTTPBaseURL("https://permitext-sync.vercel.app")
+                PermitextBackendConfiguration.setDebugHTTPBaseURL("https://per.codes")
             }
             _library = StateObject(wrappedValue: CodeLibraryViewModel())
         }

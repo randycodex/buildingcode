@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
+import { nativeNotebookDocumentSnapshot } from "../src/native-notebook-state.js";
+import { validateNotebookDocument } from "../notebook-contract.mjs";
 
 // Execute the production bridge with a controlled editor adapter. The separate
 // continuous-editor test covers BlockNote schema round trips; this verifies the
@@ -58,6 +60,7 @@ const controller = {
   undo() {}, redo() {}
 };
 const environment = {
+  nativeNotebookDocumentSnapshot,
   window: {
     webkit: { messageHandlers: { permitextNotebook: { postMessage: (message) => messages.push(structuredClone(message)) } } },
     addEventListener: (name, callback) => events.set(name, callback),
@@ -93,6 +96,23 @@ const document = {
 assert.equal(messages[0].type, "loaded");
 const configured = await dispatch({ type: "configure", readOnly: false, bodyFontSize: 17, availableWidth: 366, document });
 assert.deepEqual(structuredClone(configured.document), document, "mount must retain rich runs, nesting, references and images");
+const renderedTable = {
+  ...document,
+  document: [{id:"table-1",type:"table",props:{textColor:"default"},children:[],content:{
+    type:"tableContent",columnWidths:[null],headerRows:1,
+    rows:[{cells:[{type:"tableCell",props:{colspan:1,rowspan:1,backgroundColor:"default",textColor:"default",textAlignment:"left"},
+      content:[{type:"text",text:"Rich table",styles:{bold:true,underline:true}}]}]}]
+  }}]
+};
+const savedTable = JSON.parse(JSON.stringify(validateNotebookDocument(renderedTable).document));
+note = structuredClone(renderedTable);
+const tableSnapshot = await dispatch({type:"snapshot"});
+assert.deepEqual(structuredClone(tableSnapshot.document), savedTable, "Native snapshots must match the real server's table defaults");
+assert.deepEqual(nativeNotebookDocumentSnapshot(savedTable), savedTable, "Normalization must be idempotent");
+await dispatch({type:"replace",document:savedTable,expectedRevision:tableSnapshot.revision});
+assert.equal(replacementCount,0,"A table save acknowledgement cannot replace the editor and start another autosave");
+assert.deepEqual(note,renderedTable,"Acknowledgement keeps the editor's rich table and selection intact");
+note = structuredClone(document);
 assert.equal(cssVariables.get("--native-note-body-size"), "17px");
 assert.equal(cssVariables.get("--native-note-width"), "366px");
 await dispatch({ type: "layout", availableWidth: 320 });

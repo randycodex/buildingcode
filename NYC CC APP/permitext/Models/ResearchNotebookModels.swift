@@ -886,6 +886,7 @@ struct NotebookBlock: Codable, Hashable, Identifiable, Sendable {
     var props: NotebookBlockProps
     var content: [NotebookInlineContent]?
     var children: [NotebookBlock]
+    var tableContent: NotebookJSONValue? = nil
 
     static func paragraph(_ text: String = "") -> NotebookBlock {
         NotebookBlock(
@@ -945,6 +946,73 @@ struct NotebookBlock: Codable, Hashable, Identifiable, Sendable {
     }
 }
 
+// BlockNote tables store an object rather than the inline-content array used
+// by text blocks. Keep the complete object so native open/save cannot flatten
+// rows or discard cell formatting, links, spans and column widths.
+indirect enum NotebookJSONValue: Codable, Hashable, Sendable {
+    case null
+    case bool(Bool)
+    case number(Decimal)
+    case string(String)
+    case array([NotebookJSONValue])
+    case object([String: NotebookJSONValue])
+
+    init(from decoder: Decoder) throws {
+        let value = try decoder.singleValueContainer()
+        if value.decodeNil() { self = .null }
+        else if let result = try? value.decode(Bool.self) { self = .bool(result) }
+        else if let result = try? value.decode(String.self) { self = .string(result) }
+        else if let result = try? value.decode(Decimal.self) { self = .number(result) }
+        else if let result = try? value.decode([NotebookJSONValue].self) { self = .array(result) }
+        else { self = .object(try value.decode([String: NotebookJSONValue].self)) }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var value = encoder.singleValueContainer()
+        switch self {
+        case .null: try value.encodeNil()
+        case .bool(let result): try value.encode(result)
+        case .number(let result): try value.encode(result)
+        case .string(let result): try value.encode(result)
+        case .array(let result): try value.encode(result)
+        case .object(let result): try value.encode(result)
+        }
+    }
+}
+
+extension NotebookBlock {
+    private enum CodingKeys: String, CodingKey { case id, type, props, content, children }
+
+    init(from decoder: Decoder) throws {
+        let fields = try decoder.container(keyedBy: CodingKeys.self)
+        id = try fields.decode(String.self, forKey: .id)
+        type = try fields.decode(String.self, forKey: .type)
+        props = try fields.decode(NotebookBlockProps.self, forKey: .props)
+        children = try fields.decode([NotebookBlock].self, forKey: .children)
+        if type == "table" {
+            let value = try fields.decode(NotebookJSONValue.self, forKey: .content)
+            guard case .object(let object) = value, object["type"] == .string("tableContent") else {
+                throw DecodingError.dataCorruptedError(forKey: .content, in: fields, debugDescription: "Expected BlockNote table content.")
+            }
+            tableContent = value
+            content = nil
+        } else {
+            tableContent = nil
+            content = try fields.decodeIfPresent([NotebookInlineContent].self, forKey: .content)
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var fields = encoder.container(keyedBy: CodingKeys.self)
+        try fields.encode(id, forKey: .id)
+        try fields.encode(type, forKey: .type)
+        try fields.encode(props, forKey: .props)
+        try fields.encode(children, forKey: .children)
+        if let tableContent { try fields.encode(tableContent, forKey: .content) }
+        else { try fields.encodeIfPresent(content, forKey: .content) }
+    }
+}
+
 struct NotebookBlockProps: Codable, Hashable, Sendable {
     var backgroundColor: String? = "default"
     var textColor: String? = "default"
@@ -982,6 +1050,10 @@ struct NotebookTextStyles: Codable, Hashable, Sendable {
     var strike: Bool? = nil
     var bold: Bool? = nil
     var italic: Bool? = nil
+    var underline: Bool? = nil
+    var code: Bool? = nil
+    var textColor: String? = nil
+    var backgroundColor: String? = nil
 }
 
 struct NotebookReferenceProps: Codable, Hashable, Sendable {

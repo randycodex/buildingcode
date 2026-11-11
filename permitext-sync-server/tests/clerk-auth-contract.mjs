@@ -139,7 +139,8 @@ assert(
 assert(
   !iosProject.includes("CLERK_PUBLISHABLE_KEY = pk_test_") &&
     iosProject.match(/CLERK_PUBLISHABLE_KEY = pk_live_/g)?.length === 2 &&
-    iosApp.includes('PermitextBackendConfiguration.setDebugHTTPBaseURL("https://permitext-sync.vercel.app")'),
+    iosApp.includes('PermitextBackendConfiguration.setDebugHTTPBaseURL("https://per.codes")') &&
+    iosProject.match(/PERMITEXT_BACKEND_API_BASE_URL = "https:\/\/per\.codes";/g)?.length === 2,
   "iOS Debug can issue Clerk development tokens to the production per codes backend."
 );
 assert(
@@ -179,7 +180,7 @@ assert(
 assert(iosInfo.includes("PermitextClerkPublishableKey"), "iOS does not expose its Clerk publishable-key build setting.");
 assert(
   iosInfo.includes("<string>$(PERMITEXT_BACKEND_API_BASE_URL)</string>") &&
-    iosProject.match(/PERMITEXT_BACKEND_API_BASE_URL = "https:\/\/permitext-sync\.vercel\.app";/g)?.length === 2,
+    iosProject.match(/PERMITEXT_BACKEND_API_BASE_URL = "https:\/\/per\.codes";/g)?.length === 2,
   "iOS does not keep Production as the default backend while allowing an explicit Sandbox/TestFlight archive override."
 );
 

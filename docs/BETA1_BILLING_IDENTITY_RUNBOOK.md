@@ -124,7 +124,7 @@ The permanent local signed-payload exercise and its strict evidence boundary are
 
 Apple documents that development-signed and TestFlight apps use the Sandbox environment, where test purchases do not charge real money. App Store Connect supports separate Production and Sandbox App Store Server Notification URLs. If the Sandbox URL is omitted, Apple sends Sandbox notifications to the Production URL; per codes must not use that fallback because the Production server intentionally rejects Sandbox transactions.
 
-The iOS backend URL now comes from the `PERMITEXT_BACKEND_API_BASE_URL` build setting. Release builds continue to default to `https://permitext-sync.vercel.app`, while an explicitly authorized TestFlight archive can override the setting with a dedicated staging URL.
+The iOS backend URL comes from the `PERMITEXT_BACKEND_API_BASE_URL` build setting. Debug and Release now default to `https://per.codes`, while an explicitly authorized TestFlight archive can override the setting with a dedicated staging URL. The production Debug build recognizes the owner's previously stored Vercel backend default and resolves it to per.codes; explicit local, custom and isolated Sandbox overrides remain unchanged.
 
 Before any staging deployment or App Store Connect change, run:
 

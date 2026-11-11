@@ -2763,6 +2763,14 @@ struct PermitextBackendConfiguration: Codable, Hashable, Sendable {
         let trimmedDefaultsBaseURL = defaultsBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedBundleBaseURL = bundleBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines)
         if allowsDebugOverride, trimmedDefaultsBaseURL?.isEmpty == false {
+            // The owner's existing Debug installation persisted the former
+            // production default. Move only that default with this production
+            // build; explicit local, custom and isolated Sandbox overrides stay.
+            if trimmedBundleBaseURL == "https://per.codes",
+               let stored = trimmedDefaultsBaseURL,
+               ["https://permitext-sync.vercel.app", "https://permitext-sync.vercel.app/"].contains(stored) {
+                return trimmedBundleBaseURL
+            }
             return trimmedDefaultsBaseURL
         }
         return trimmedBundleBaseURL?.isEmpty == false ? trimmedBundleBaseURL : nil

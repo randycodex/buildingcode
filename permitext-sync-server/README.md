@@ -70,18 +70,17 @@ Return URL: https://per.codes/account/apple/callback
 
 Domain: permitext.com
 Return URL: https://permitext.com/account/apple/callback
-
-Domain: permitext-sync.vercel.app
-Return URL: https://permitext-sync.vercel.app/account/apple/callback
 ```
 
 `per.codes` is attached to the production Vercel deployment and is the
 canonical public/share-link host. Authentication has moved to the same Clerk
-instance on the new domain. The native backend base remains
-`permitext-sync.vercel.app` for installed-client compatibility. Verify AASA
+instance on the new domain. The native Debug and Release backend now targets
+`per.codes`. The owner's sole installed build was updated in place and its
+authenticated sync verified before replacing the former Vercel alias with
+`per-codes.vercel.app`. Verify AASA
 and installed-app universal links, the Apple Service ID return URL, account
 cookies, Stripe returns/webhooks, and production PostgreSQL through the apex;
-keep the Vercel hostname accepted for existing installed apps and shared links.
+retain the old permitext.com workspace while browser recovery is still needed.
 The production verification scripts accept an explicit host through
 `PERMITEXT_SYNC_PRODUCTION_URL` (or `PERMITEXT_PRODUCTION_BASE_URL` for identity
 restore), so verify both hosts during the transition.
@@ -136,7 +135,7 @@ Canonical sections have a shared URL contract:
 https://per.codes/open/section/<canonical-section-id>
 ```
 
-The same URL loads the section-detail workspace in a browser and opens `ReaderView` in the installed iPhone app. The previous `https://permitext-sync.vercel.app/open/section/<canonical-section-id>` route remains compatible during the domain transition, but web share controls generate `per.codes` links. The AASA response advertises `/open/section/*`, and the iOS target includes the associated domains. Opening a section on web replaces the current address with its shared route, and reader/detail share controls use the native share sheet when available with clipboard fallback. Private workspace state is never serialized into the link.
+The same URL loads the section-detail workspace in a browser and opens `ReaderView` in the installed iPhone app. Web share controls generate `per.codes` links. The former `permitext-sync.vercel.app` alias was retired after updating the owner's sole iPhone installation; its old HTTP routes are no longer serving. The AASA response advertises `/open/section/*`, and the iOS target includes the associated domains. Opening a section on web replaces the current address with its shared route, and reader/detail share controls use the native share sheet when available with clipboard fallback. Private workspace state is never serialized into the link.
 
 Signed-in web readers also publish the shared `continuity` record after chapter or section navigation and restore only a newer server record. Web updates preserve continuity values owned by iPhone, merge the canonical section into recent history, use the same Swift reference-date encoding, and stay in the durable outbox on network failure. A pending local continuity mutation prevents remote state from overwriting it; choosing the server copy during conflict resolution clears the local continuity checkpoint before pulling again.
 
