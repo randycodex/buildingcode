@@ -20923,7 +20923,12 @@ async function handleResearchConversationMessage(request, response) {
         let tables = [];
         if (requestedV2 && /\btable\s+\d/i.test(text)) {
           const [canonical] = await researchEvidenceForSectionIDs([source.sectionID], {allowOptInCorpora:true});
-          if (canonical?.codeVersion === source.codeVersion) tables = researchSelectedTables(text, canonical.richSources);
+          if (canonical?.codeVersion === source.codeVersion) {
+            const tableBody = await researchBodyForCatalogSection({...canonical, id:canonical.sectionID});
+            tables = researchSelectedTables(text, structuredRichSources(tableBody, {
+              codePrefix:canonical.codePrefix, preserveCellLines:true
+            }));
+          }
         }
         return { id:`S${index+1}`, sectionID:source.sectionID,
           edition:source.codeEdition, ...(requestedV2 ? {codeVersion:source.codeVersion,jurisdiction:source.jurisdiction} : {}),

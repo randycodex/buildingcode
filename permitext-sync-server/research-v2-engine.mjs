@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import {researchTableFootnotes, researchSelectedTables, researchFootnoteScopeIssues, tableFootnoteInstruction} from './research-table-footnotes.mjs';
 
-export const researchV2Version = 'research-v2-20261111-r8';
+export const researchV2Version = 'research-v2-20261111-r9';
 const fail = (message, code = 'V2_INVALID_INPUT') => Object.assign(new Error(message), { code });
 const stringList = { type: 'array', items: { type: 'string' } };
 export const researchV2DraftSchema = { type: 'object', additionalProperties: false,
@@ -78,7 +78,9 @@ const scenarioInstruction = ` Explicitly stipulated hypothetical inputs define a
 function request(phase, instructions, input,effort) {
   return { model: 'gpt-6-luna', service_tier: 'default', store: false,
     reasoning: { effort: effort || (phase === 'draft' ? 'low' : 'medium') }, max_output_tokens: phase === 'review' ? 4096 : 6144,
-    instructions:instructions+scenarioInstruction+tableFootnoteInstruction, input: JSON.stringify(input), text: { format: { type: 'json_schema',
+    instructions:instructions+scenarioInstruction+tableFootnoteInstruction+
+      ' cells.lines preserves explicit line-break positions inside a canonical table cell, including empty category-header slots. Where cells in a row have the same number of line slots, compare corresponding slots to retain each subrow label, factor, basis and markers. Do not collapse all subrows into one row or transfer markers between them. If slot counts differ, retain the ambiguity instead of inventing an alignment.',
+    input: JSON.stringify(input), text: { format: { type: 'json_schema',
       name: phase === 'review' ? 'permitext_v2_review' : 'permitext_v2_answer', strict: true,
       schema: phase === 'review' ? researchV2ReviewSchema : researchV2DraftSchema } } };
 }

@@ -23,6 +23,11 @@ globalThis.fetch=async(url,options)=>{
   assert(source.tables?.length,'The real HTTP flow must deliver canonical selected table structure');
   const rows=source.tables.flatMap(t=>t.grids.flatMap(g=>g.rows));
   assert(rows.some(r=>r.cells[0].text.startsWith('Business areas')&&r.cells[1].text==='100 gross b, d'));
+  const library=rows.find(r=>r.cells[0].text.startsWith('Library'));
+  assert.deepEqual(library.cells.map(c=>c.lines),[['Library','Reading rooms','Stack area'],['','50 net','100 gross']]);
+  const residential=rows.find(r=>r.cells[0].text.startsWith('Residential'));
+  assert.equal(residential.cells[0].lines[2],'Rooftop and terrace accessory to Groups R-2 and R-3');
+  assert.equal(residential.cells[1].lines[2],'200 gross b, c, d','Empty first line preserves the canonical subrow/marker alignment');
   assert(source.tableFootnotes.find(n=>n.marker==='c').quote.includes('R-2'));
   assert(!source.tableFootnotes.find(n=>n.marker==='d').quote.includes('R-2'));
  }
@@ -82,5 +87,7 @@ try{
  assert.match(researchV2FailureMessage([{code:'unknown_citation'}]),/draft’s citations/,'Real citation failures retain their own explanation');
  const table={kind:'table',reference:'Synthetic table',text:'A | B',grids:[{rows:[{cells:[{text:'A'},{text:'B'}]}]}]};
  assert.equal(researchSelectedTables('A',[table]).length,0);assert.equal(researchSelectedTables('A | B',[{...table,grids:[{rows:[{cells:[{text:'UNSELECTED'}]}]}]}]).length,0);
+ const wrongLines={...table,grids:[{rows:[{cells:[{text:'A',lines:['UNSELECTED']},{text:'B',lines:['B']}]}]}]};
+ assert.equal(researchSelectedTables('A | B',[wrongLines])[0].grids[0].rows[0].cells[0].lines,undefined,'Line metadata cannot inject unselected text');
  console.log('Citation workflow fixes passed: 15 online/downloaded citation cases; exact, historical and disabled scope; five real HTTP Assistant flows, canonical table structure, fresh repair review, blocked wrong footnotes/unknown IDs, accurate failure copy, durable saved answers; zero live provider calls.');
 }finally{if(server){server.closeAllConnections();await new Promise(r=>server.close(r));}globalThis.fetch=nativeFetch;await rm(scratch,{recursive:true,force:true});}

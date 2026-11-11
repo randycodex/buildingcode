@@ -10,7 +10,9 @@ export function researchSelectedTables(text, richSources = []) {
     table.grids.every(grid => Array.isArray(grid?.rows) && grid.rows.every(row => Array.isArray(row?.cells) &&
       row.cells.every(cell => cell && typeof cell.text === 'string')))).flatMap(table => {
     const grids = table.grids.map(grid => ({rows: (grid.rows || []).map(row => ({cells: (row.cells || []).map(cell => ({
-      text: String(cell.text || ''), rowSpan: cell.rowSpan || 1, columnSpan: cell.columnSpan || 1
+      text: String(cell.text || ''), rowSpan: cell.rowSpan || 1, columnSpan: cell.columnSpan || 1,
+      ...(Array.isArray(cell.lines) && cell.lines.every(line => typeof line === 'string') &&
+        comparable(cell.lines.join(' ')) === comparable(cell.text) ? {lines: [...cell.lines]} : {})
     }))}))}));
     if (!grids.length || grids.some(grid => !grid.rows.length || grid.rows.some(row => !row.cells.length ||
         row.cells.some(cell => !comparable(table.text).includes(comparable(cell.text)))))) return [];

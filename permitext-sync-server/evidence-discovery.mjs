@@ -1172,7 +1172,7 @@ function positiveSpan(value) {
   return Number.isSafeInteger(parsed) && parsed > 1 ? parsed : 1;
 }
 
-function structuredRowsFromTableHTML(value) {
+function structuredRowsFromTableHTML(value, { preserveCellLines = false } = {}) {
   return Array.from(String(value || "").matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi))
     .map((rowMatch) => ({
       cells: Array.from(rowMatch[1].matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi))
@@ -1182,6 +1182,12 @@ function structuredRowsFromTableHTML(value) {
           const columnSpan = attributes.match(/\bcolspan=["']?(\d+)/i)?.[1];
           return {
             text: plainTextFromPublishedHTML(cellMatch[3]),
+            ...(preserveCellLines && /<br\b/i.test(cellMatch[3]) ? {
+              // Keep empty leading slots: a category label can occupy the
+              // first line while its factor cell starts with an empty line.
+              lines: cellMatch[3].split(/<br\s*\/?\s*>(?:\s*<\/br\s*>)?/gi)
+                .map(plainTextFromPublishedHTML)
+            } : {}),
             rowSpan: positiveSpan(rowSpan),
             columnSpan: positiveSpan(columnSpan)
           };
@@ -1289,7 +1295,7 @@ export function structuredRichSources(body, options = {}) {
       ].filter(Boolean).join("\n");
       const reference = tableReferenceFromHTML(sourceHTML);
       const grids = Array.from(tableMatch[0].matchAll(/<table\b[\s\S]*?<\/table>/gi))
-        .map((match) => ({ rows: structuredRowsFromTableHTML(match[0]) }))
+        .map((match) => ({ rows: structuredRowsFromTableHTML(match[0], options) }))
         .filter((grid) => grid.rows.length);
       const rowCount = grids.reduce((count, grid) => count + grid.rows.length, 0);
       const text = plainTextFromPublishedHTML(sourceHTML);
@@ -1340,7 +1346,7 @@ export function structuredRichSources(body, options = {}) {
       const detectedReference = tableReferenceFromHTML(sourceHTML);
       const reference = String(sourceTable?.caption || sourceTable?.sourceAnchor || "").trim() ||
         (detectedReference === "Official table" ? inferredReference : detectedReference);
-      const grids = [{ rows: structuredRowsFromTableHTML(tableMatch[0]) }]
+      const grids = [{ rows: structuredRowsFromTableHTML(tableMatch[0], options) }]
         .filter((grid) => grid.rows.length);
       const rowCount = grids.reduce((count, grid) => count + grid.rows.length, 0);
       const text = plainTextFromPublishedHTML(sourceHTML);
