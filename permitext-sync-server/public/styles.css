@@ -21546,7 +21546,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .has-history-management > .assistant-history-checkbox:checked::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--background); font-size: 12px; font-weight: 600; }
 .has-history-management > .assistant-history-checkbox:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
 .assistant-history-hidden-label { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 11px; font-weight: 400; }
-.assistant-history-menu { position: fixed; z-index: 1800; display: grid; gap: 2px; width: min(260px, calc(100vw - 16px)); padding: 8px; border: 1px solid var(--border); border-radius: var(--workspace-floating-menu-radius); background: var(--menu-surface); overflow-y: auto; scrollbar-width: none; }
+.assistant-history-menu { position: fixed; z-index: 1800; display: grid; gap: 2px; width: max-content; max-width: calc(100vw - 16px); padding: 8px; border: 1px solid var(--border); border-radius: var(--workspace-floating-menu-radius); background: var(--menu-surface); overflow-y: auto; scrollbar-width: none; }
 .assistant-history-menu::-webkit-scrollbar { display: none; }
 .assistant-history-menu button { width: 100%; min-height: 32px; padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--text-primary); text-align: left; overflow-wrap: anywhere; }
 .assistant-history-menu button:hover, .assistant-history-menu button:focus-visible { background: var(--menu-highlight); }
