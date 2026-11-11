@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
+import {createResearchOperationGate} from '../public/research-operation-gate.js';
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const start=app.indexOf('async function startFocusedResearchFromSavedItem('),end=app.indexOf('\n}',start);
 const full='The number of occupants shall be computed from the full saved paragraph. '.repeat(6)+'The final condition and exception must remain included.';
@@ -18,6 +19,7 @@ await c.startFocusedResearchFromSavedItem({sectionID:'2152',previewText:'Excepti
 await assert.rejects(c.startFocusedResearchFromSavedItem({sectionID:'2152'}),/enough source text/);
 const navigationState={workflowNavigationGeneration:0};let visibleView='notebook',opened='',created=0,allowSwitch=true;
 const n=vm.createContext({state:navigationState,activeAccount:()=>({}),hasCapability:()=>true,currentColumnWorkflowView:()=>visibleView,
+ researchOperations:createResearchOperationGate(),researchOperationScope:()=> 'owner:workspace',
  switchWorkflowView:async(view)=>{if(!allowSwitch)return false;visibleView=view;navigationState.workflowNavigationGeneration++;return true;},
  captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',
  postResearch:async()=>{assert.equal(visibleView,'research');created++;return {conversation:{id:'new-chat'}};},

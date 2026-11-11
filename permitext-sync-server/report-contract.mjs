@@ -416,7 +416,19 @@ function normalizeEvidenceManifestItem(item, base) {
           if(table.rows[r]?.[c]!==table.rows[span.row][span.column])throw new Error('Report table span does not match its source cells.');
         }
       }
-      return {text, rows: structuredClone(table.rows), headerRowCount,...(cellSpans?.length?{cellSpans}:{})};
+      let cellSuperscripts;
+      if (table.cellSuperscripts !== undefined) {
+        const seen=new Set();let count=0;
+        if (!Array.isArray(table.cellSuperscripts) || table.cellSuperscripts.length>10000) throw new Error('Invalid Report table superscripts.');
+        cellSuperscripts=table.cellSuperscripts.map(({row,column,ranges})=>{
+          const key=`${row}:${column}`,value=table.rows[row]?.[column];
+          if (!Number.isSafeInteger(row)||row<0||!Number.isSafeInteger(column)||column<0||typeof value!=='string'||seen.has(key)||!Array.isArray(ranges)) throw new Error('Invalid Report table superscripts.');
+          seen.add(key);count+=ranges.length;
+          if (count>10000||ranges.some(range=>!Array.isArray(range)||range.length!==2||!range.every(Number.isSafeInteger)||range[0]<0||range[1]<=range[0]||range[1]>value.length)) throw new Error('Invalid Report table superscripts.');
+          return {row,column,ranges:ranges.map(range=>[...range])};
+        });
+      }
+      return {text, rows: structuredClone(table.rows), headerRowCount,...(cellSpans?.length?{cellSpans}:{}),...(cellSuperscripts?.length?{cellSuperscripts}:{})};
     }) } : {}),
     passageTextHash: requiredText(item.passageTextHash, "Report evidence hash", 256),
     sourceLibraryVersion: requiredText(item.sourceLibraryVersion, "Report evidence source version", 1_024)

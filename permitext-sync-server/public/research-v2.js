@@ -1,5 +1,6 @@
 import {attachResearchQuestionRail} from "./research-question-rail.js?v=2";
 import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
+import {researchInlineRuns} from "./research-inline-format.js?v=1";
 // A small view with injected workspace/Reader adapters. No provider calls or
 // evidence selection policy live in the presentation module.
 const node = (tag, className = '', text = '') => {
@@ -118,19 +119,26 @@ export function createResearchV2View(options) {
   function notice(text,error=false){status.hidden=!text;status.textContent=text;status.classList.toggle('is-error',error);onStatus?.(text);}
   function valid(attempt){return attempt===generation&&isCurrent()&&root.isConnected;}
   function paragraphText(parent,text,message,{reveal=false}={}){
-    const appendText = value => {
-      if (!reveal) { parent.append(document.createTextNode(value)); return; }
+    const appendText = (target,value) => {
+      if (!reveal) { target.append(document.createTextNode(value)); return; }
       for (const part of value.split(/(\s+)/).filter(Boolean)) {
-        if (/^\s+$/.test(part)) parent.append(document.createTextNode(part));
-        else { const word=node('span','rv2-reveal-token',part);parent.append(word);revealTokens.push(word); }
+        if (/^\s+$/.test(part)) target.append(document.createTextNode(part));
+        else { const word=node('span','rv2-reveal-token',part);target.append(word);revealTokens.push(word); }
       }
     };
-    const expression=/\[(S[1-9]\d*)\]/g;let offset=0;
-    for(const match of text.matchAll(expression)){
-      appendText(text.slice(offset,match.index));
-      const cite=action(match[0],()=>void onCitation(message,match[1]),'rv2-citation');cite.setAttribute('aria-label',`Open citation ${match[1]}`);if(reveal){cite.classList.add('rv2-reveal-token');revealTokens.push(cite);}parent.append(cite);offset=match.index+match[0].length;
+    for (const run of researchInlineRuns(text)) {
+      let target = parent;
+      for (const [style,tag] of [['bold','strong'],['italic','em'],['code','code']]) {
+        if (run[style]) {const wrapper=node(tag);target.append(wrapper);target=wrapper;}
+      }
+      if (run.code) {appendText(target,run.text);continue;}
+      const expression=/\[(S[1-9]\d*)\]/g;let offset=0;
+      for(const match of run.text.matchAll(expression)){
+        appendText(target,run.text.slice(offset,match.index));
+        const cite=action(match[0],()=>void onCitation(message,match[1]),'rv2-citation');cite.setAttribute('aria-label',`Open citation ${match[1]}`);if(reveal){cite.classList.add('rv2-reveal-token');revealTokens.push(cite);}target.append(cite);offset=match.index+match[0].length;
+      }
+      appendText(target,run.text.slice(offset));
     }
-    appendText(text.slice(offset));
   }
   const messages=conversation?.messages||[];
   if(!messages.length){
@@ -145,6 +153,7 @@ export function createResearchV2View(options) {
         failure.append(action(sameContext?'Retry question':'Ask again',()=>{if(busy||includeBusy)return;input.value=message.question||'';onDraft(input.value);lastRequest={question:input.value.trim(),requestID:sameContext&&(message.requestID||message.researchRequestID)||crypto.randomUUID()};update();void sendQuestion();},'rv2-text-action'));thread.append(failure);}
     }else if(message.role==='assistant'){
       const bubble=node('article','rv2-answer');bubble.setAttribute('aria-label','Research answer');
+      bubble.dataset.messageId=message.id || '';
       const text=researchAnswerText(message);
       for(const paragraph of text.split(/\n\s*\n/)){const p=node('p');paragraphText(p,paragraph,message,{reveal:Boolean(options.revealAnswerID&&message.id===options.revealAnswerID)});bubble.append(p);}
       const gapLists=[['Sources still needed',message.answer?.additionalEvidenceNeeded],['Project facts still needed',message.answer?.missingFacts]];
@@ -200,12 +209,16 @@ export function createResearchV2View(options) {
   const cancel=action('Stop',()=>controller?.abort(),'rv2-text-action');cancel.hidden=true;
   controls.append(attach,cancel,send);composer.append(chips,input,controls,menu);
   const projectContext = options.renderProjectContext?.(composer);
+  const operationStatus=node('p','rv2-status');operationStatus.setAttribute('role','status');operationStatus.hidden=true;
   const detail=node('section','rv2-detail');detail.hidden=true;detail.setAttribute('aria-label','Passage details');
   const detailBody=node('div','rv2-detail-body');
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
-  chat.append(mobileHistory,thread,detail,status,composer);root.append(rail,divider,chat);
-  function update(){input.disabled=busy;attach.disabled=busy||includeBusy||revealBusy;send.disabled=busy||includeBusy||revealBusy||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy));
-    projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy;});}
+  chat.append(mobileHistory,thread,detail,status,operationStatus,composer);root.append(rail,divider,chat);
+  const operationPending=()=>Boolean(options.operationGate?.status());
+  function update(){const pending=operationPending();input.disabled=busy;attach.disabled=busy||includeBusy||revealBusy||pending;send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||pending));
+    operationStatus.textContent=options.operationGate?.status() || '';operationStatus.hidden=!pending;
+    projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});}
+  const stopObservingOperations=options.operationGate?.subscribe(update);
   function showDetail(){thread.hidden=true;detail.hidden=false;detailBody.replaceChildren();return detailBody;}
   function showFactEntry(fact,question){
     if(busy||includeBusy)return;const attempt=++generation,content=showDetail();
@@ -278,7 +291,7 @@ export function createResearchV2View(options) {
     }catch(error){if(valid(attempt))notice(error.message,true);}
   }
   async function sendQuestion(){
-    if(busy||includeBusy||revealBusy||!input.value.trim())return;
+    if(busy||includeBusy||revealBusy||operationPending()||!input.value.trim())return;
     if(!passageSources.length){await findPassages();return;}
     const question=input.value.trim();
     if(!lastRequest||lastRequest.question!==question)lastRequest={question,requestID:crypto.randomUUID()};
@@ -312,5 +325,11 @@ export function createResearchV2View(options) {
     initialScroll.disconnect();}});initialScroll.observe(thread);}
   if(revealEntry)revealController=revealResearchAnswer({entry:revealEntry,tokens:revealTokens,isCurrent,
     onDone:()=>{revealBusy=false;update();}});
-  return {element:root,dispose(){options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();},focus(){input.focus({preventScroll:true});}};
+  return {element:root,dispose(){stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();},focus(){input.focus({preventScroll:true});},
+    focusAnswer(answerID){
+      const answer=Array.from(thread.querySelectorAll('.rv2-answer')).find(entry=>entry.dataset.messageId===answerID);
+      if(!answer || !root.isConnected)return false;
+      // A saved-answer link takes precedence over the initial latest-message scroll.
+      initialScroll?.disconnect();answer.tabIndex=-1;answer.focus({preventScroll:true});answer.scrollIntoView({block:'center'});return true;
+    }};
 }

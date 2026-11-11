@@ -91,7 +91,7 @@ export function reportItemPreview(item) {
       if (position < 0) continue;
       add('',remaining.slice(0,position));
       parts.push(table.kind === 'image' ? {kind:'image',url:table.url,caption:table.caption} :
-        {kind:'table',rows:table.rows,headerRowCount:table.headerRowCount || 0,...(table.cellSpans?{cellSpans:table.cellSpans}:{})});
+        {kind:'table',rows:table.rows,headerRowCount:table.headerRowCount || 0,...(table.cellSpans?{cellSpans:table.cellSpans}:{}),...(table.cellSuperscripts?{cellSuperscripts:table.cellSuperscripts}:{})});
       remaining = remaining.slice(position + table.text.length);
     }
     add('',remaining);

@@ -31,14 +31,29 @@ export async function discoverResearchSources({question,focus='',cursor=null,sel
   const terms=researchDiscoveryTerms(subjectQuestion,{sourceNeed:Boolean(focus)});
   const resource=await resources({selected,passageSearch:true});
   const {catalog}=resource,byKey=new Map(catalog.map(section=>[key(section),section]));
-  const queryWords=titleWords(terms.query),frequencies=new Map();
-  const subjectWord=[...queryWords].find(word=>word.length>=4&&/^[a-z]+$/.test(word)&&!['section','table','definition','provision','code'].includes(word));
+  // Keep project quantities in retrieval, but rank by the research topic.
+  const factorQuery=/\b(?:factors?|allowances?)\b/i.test(subjectQuestion);
+  const incidental=new Set('section table definition provision code general building square foot feet sq ft gross net hypothetical fictional baseline project workflow use with without before after including applicable applicability unverified compliance and or not any all its their from remain declare'.split(' '));
+  const topicWords=words(terms.query).filter(word=>/^[a-z]+$/.test(word)&&!incidental.has(word));
+  const queryWords=factorQuery?new Set(topicWords):titleWords(terms.query),frequencies=new Map();
   for(const section of catalog)for(const word of titleWords(section.title))if(queryWords.has(word))frequencies.set(word,(frequencies.get(word)||0)+1);
+  const subjectWord=factorQuery?[...queryWords].filter(word=>word.length>=4&&frequencies.has(word))
+    .sort((a,b)=>frequencies.get(a)-frequencies.get(b))[0]:[...queryWords].find(word=>word.length>=4&&/^[a-z]+$/.test(word)&&!['section','table','definition','provision','code'].includes(word));
   const titleScore=section=>[...titleWords(section.title)].reduce((score,word)=>score+(queryWords.has(word)?Math.log(1+catalog.length/(frequencies.get(word)||1))*(word===subjectWord?3:1):0),0);
+  const phrases=[...new Set([2,3].flatMap(length=>topicWords.slice(0,1-length).map((_,index)=>topicWords.slice(index,index+length).join(' '))))];
+  const leadingText=entry=>entry.leadingText ??= ` ${words(canonical(entry.section,entry.body).slice(0,2500)).join(' ')} `;
+  const phraseScore=entry=>{
+    const leading=leadingText(entry);
+    return phrases.reduce((score,phrase)=>score+(leading.includes(` ${phrase} `)?phrase.split(' ').length**2*6:0),0);
+  };
+  const tableWanted=/\b(?:table|footnotes?)\b/i.test(subjectQuestion);
   const phrase=[...queryWords].filter(word=>!['bc','section','code','provision','table'].includes(word)&&/^[a-z]+$/.test(word)).slice(-2).join(' ');
-  const phraseWanted=phrase.includes(' '),tableWanted=/\b(?:table|footnotes?)\b/i.test(subjectQuestion);
-  const leadingScore=entry=>titleScore(entry.section)+
-    (phraseWanted&&words(canonical(entry.section,entry.body).slice(0,1000)).join(' ').includes(phrase)?25:0)+
+  const leadingScore=entry=>factorQuery?titleScore(entry.section)+
+    (titleWords(entry.section.title).has(subjectWord)?40:0)+
+    [...queryWords].filter(word=>leadingText(entry).includes(` ${word} `)).length*30+
+    phraseScore(entry)+
+    ((entry.hasTable ??= structuredRichSources(entry.body,{codePrefix:entry.section.codePrefix}).some(source=>source.kind==='table'))?80:0):
+    titleScore(entry.section)+(phrase.includes(' ')&&words(canonical(entry.section,entry.body).slice(0,1000)).join(' ').includes(phrase)?25:0)+
     (tableWanted&&entry.result.richSources?.some(source=>source.kind==='table')?25:0);
   const bodies=new Map(),unresolved=new Map(unresolvedReferences.map(item=>[item.id,item])),all=new Map(),unreadable=new Set();
   const read=async section=>{
@@ -77,12 +92,12 @@ export async function discoverResearchSources({question,focus='',cursor=null,sel
   const genericTitleWords=new Set(['code','section','table','provision','general','building']);
   const titleMatches=section=>[...titleWords(section.title)].filter(word=>queryWords.has(word)&&!genericTitleWords.has(word)).length;
   const prefix=primary[0]?.section.codePrefix;
-  const nominated=catalog.filter(section=>(!prefix||section.codePrefix===prefix)&&titleMatches(section)>=2)
+  const nominated=catalog.filter(section=>(!prefix||section.codePrefix===prefix)&&(titleMatches(section)>=2||factorQuery&&titleWords(section.title).has(subjectWord)))
     .sort((a,b)=>titleScore(b)-titleScore(a)).slice(0,6);
   for(const section of nominated){
     if(primary.some(entry=>key(entry.section)===key(section)))continue;
     const body=await read(section);if(!body)continue;
-    const item=add(section,'provision','Section title matches the research topic; review its conditions and scope.',{},canonical(section,body));
+    const item=add(section,'provision','Title contains search terms; review its relevance, conditions and scope.',{},canonical(section,body));
     if(item)primary.push({item,section,body,result:{signals:{}}});
   }
   // Rare subject words in titles outrank incidental mentions in long bodies.

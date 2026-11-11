@@ -1,5 +1,6 @@
 import PDFDocument from "pdfkit";
 import { notebookTableDisplayData, tableDisplayCells } from './public/notebook-content.js';
+import {researchAnswerURL} from './public/research-answer-links.js';
 
 // Source indentation is presentation whitespace, never a printed control glyph.
 const printableNoteText = value => String(value || '').replace(/\r\n?/g, '\n')
@@ -9,6 +10,9 @@ const printableNoteText = value => String(value || '').replace(/\r\n?/g, '\n')
 function noteRuns(content) {
   return (Array.isArray(content) ? content : []).flatMap(node => node.type === 'link'
     ? noteRuns(node.content).map(run => ({...run, href:node.href}))
+    : node.type === 'permitextReference' && node.props?.referenceKind === 'researchAnswer' && researchAnswerURL(node.props.referenceID)
+      ? [{text:printableNoteText(node.props.label),href:researchAnswerURL(node.props.referenceID)},
+        {text:`\nOpen saved Research answer: ${researchAnswerURL(node.props.referenceID)}`,href:researchAnswerURL(node.props.referenceID)}]
     : [{text:printableNoteText(node.type === 'permitextReference' ? node.props.label : node.text),
       ...node.styles, ...(node.styles?.backgroundColor === 'yellow' ? {highlight:true} : {})}]);
 }
@@ -168,8 +172,8 @@ function drawList(document, title, values) {
 export function drawReportTable(document, table, startX, contentWidth) {
   const rows = table.rows || [];
   if (!rows.length) return;
-  if (table.cellSpans?.length) {
-    drawReportRichTable(document,{...table,rows:rows.map(row=>row.map(text=>[{text}]))},startX,contentWidth,{headerBold:true});
+  if (table.cellSpans?.length || table.cellSuperscripts?.length) {
+    drawFormattedSourceTable(document,table,[],startX,contentWidth);
     return;
   }
   const columns = Math.max(...rows.map(row => row.length));
@@ -435,8 +439,9 @@ function hasSourceMarks(parts) {
     sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text},part.formatting || []).some(hasInlineStyle))));
 }
 function drawFormattedSourceTable(document,part,formatting,startX,contentWidth) {
-  const rows = part.rows.map((row,r)=>row.map((text,c)=>sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text},formatting)));
-  drawReportRichTable(document, {rows,headerRowCount:part.headerRowCount || 0,cellSpans:part.cellSpans}, startX, contentWidth);
+  const rows = part.rows.map((row,r)=>row.map((text,c)=>sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text,
+    superscriptRanges:part.cellSuperscripts?.find(mark=>mark.row===r&&mark.column===c)?.ranges},formatting)));
+  drawReportRichTable(document, {rows,headerRowCount:part.headerRowCount || 0,cellSpans:part.cellSpans}, startX, contentWidth,{headerBold:true});
 }
 
 // Measure and paint the same runs so cell marks and links survive wrapping,

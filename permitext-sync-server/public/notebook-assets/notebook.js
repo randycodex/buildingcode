@@ -47611,7 +47611,9 @@ function yG(e, t = [], n = "highlight") {
 	return _G(r);
 }
 function bG(e, t = []) {
-	let n = new Map(gG.map((n) => [n, yG(e, t, n)])), r = [.../* @__PURE__ */ new Set([
+	let n = new Map(gG.map((n) => [n, yG(e, t, n)]));
+	e.superscriptRanges?.length && n.set("superscript", e.superscriptRanges);
+	let r = [.../* @__PURE__ */ new Set([
 		0,
 		e.text.length,
 		...[...n.values()].flat(2)
@@ -47644,7 +47646,8 @@ function SG({ onChange: e, isCurrent: t }) {
 				["italic", "em"],
 				["underline", "u"],
 				["strike", "s"],
-				["highlight", "mark"]
+				["highlight", "mark"],
+				["superscript", "sup"]
 			]) if (e[n]) {
 				let e = document.createElement(r);
 				e.append(t), t = e;

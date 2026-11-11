@@ -14,6 +14,11 @@ globalThis.fetch=(url,options)=>{assert.equal(new URL(url).origin,base,'Discover
 let token;
 async function post(path,body,status=200,bearer=token){const response=await fetch(base+path,{method:'POST',headers:{'content-type':'application/json',...(bearer?{authorization:`Bearer ${bearer}`}:{})},body:JSON.stringify({auth:{accountUserID:'apple:discovery-test'},...body})});const data=await response.json();assert.equal(response.status,status,JSON.stringify(data));return data;}
 const cases=[
+  ['What is the baseline occupant load factor for a 4,500 gross square foot office with business use?',['1004.1.3']],
+  ['P3 RETRIEVAL — What passage sets the baseline occupant load factor for a hypothetical 4,500 gross square foot office? Find the relevant table before discussing exceptions. Occupancy and applicability remain unverified; do not declare compliance.',['1004.1.3']],
+  ['What occupant-load factor applies to a hypothetical 5,000 square foot office?',['1004.1.3']],
+  ['Find the Business areas occupant load table and its gross area basis for 4500 ft2.',['1004.1.3']],
+  ['For 1,405 net square feet of library reading room, find the occupant load factor and table footnotes.',['1004.1.3']],
   ['What affects corridor fire ratings?',['1020.1.1','1020.1.2']],
   ['What is the accessible ramp slope?',['1012.2']],
   ['Explain 1012.2',['1012.2']],
@@ -36,6 +41,7 @@ try{
   for(const [question,expected,prefix='BC'] of cases){
     const query=researchDiscoveryQuery(question);
     const data=await post('/research/sources/discover',{question});
+    if(cases.slice(0,5).some(([item])=>item===question))assert.equal(data.candidates[0]?.sectionNumber,'1004.1.3',`${question}: baseline table should lead: ${JSON.stringify(data.candidates.slice(0,5).map(item=>item.sectionNumber))}`);
     const actual=data.candidates.filter(s=>s.codePrefix===prefix&&s.codeVersion.includes('/2022-')).map(s=>s.sectionNumber);
     for(const number of expected)assert(actual.includes(number),`${question}: missing ${number} in first 12 results: ${JSON.stringify(data.candidates.map(c=>[c.sectionNumber,c.kind,c.title]))}`);
     console.log(JSON.stringify({question,query,expected,actual,roles:data.coverage.roles,passed:true}));
@@ -43,7 +49,7 @@ try{
     assert(data.candidates.every(s=>data.sourceEditions.some(e=>s.codeVersion===e.codeVersion)));
     if(question.includes('fire partition definition')){const definition=data.candidates.find(c=>c.kind==='definition'&&c.definitionLabel==='FIRE PARTITION');assert(definition);assert(definition.suggestedText.includes('FIRE PARTITION'));}
     assert(!data.unresolvedReferences.some(c=>c.codePrefix==='MC'&&c.title.includes('903.3.1.1')),'Named Building Code references must not become Mechanical Code references.');
-    if(question.includes('occupant load table')){
+    if(question==='Explain the occupant load table'){
       const table=data.candidates.find(c=>c.kind==='table'&&c.codePrefix==='BC'&&c.sectionNumber==='1004.1.3');assert(table,'Find the requested table, not an incidental table.');
       const preview=(await post('/research/selections/review',{sectionID:table.sectionID,codeVersion:table.codeVersion,reviewMode:'whole_section'})).selection;
       assert.match(preview.selectedText,/To be used only when/,'Keep final footnote e.');

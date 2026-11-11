@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
+import {createResearchOperationGate} from '../public/research-operation-gate.js';
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 function actual(name) {
   const start = source.indexOf(`async function ${name}(`);
@@ -16,6 +17,7 @@ for (const name of ['openSavedItemInReader', 'openResearchConversation', 'startN
     const gate = new Promise(resolve => {finish = resolve;});
     const calls = [];
     const c = vm.createContext({
+      researchOperations:createResearchOperationGate(),researchOperationScope:()=> 'owner:workspace',
       state: {utilityInstances: [], workflowNavigationGeneration: 0},
       activeWorkspaceID: 'a', captureAccountRequest: () => 1, isCurrentAccountRequest: () => true,
       savedItemOpeningAttempts: new Map(), resolveReaderSource: () => gate,

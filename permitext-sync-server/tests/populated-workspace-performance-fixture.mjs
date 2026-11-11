@@ -135,7 +135,8 @@ let transportOffUntil = 0;
 const transportFailures = [];
 const timings = [];
 const benchmarkSamples = [];
-const controlledRoutes = new Set(["/projects/property/lookup", "/notebook/cards/save", "/notebook/cards/list", "/notebook/cards/get", "/reports/drafts/get", "/reports/drafts/list", "/reports/history/list"]);
+const controlledRoutes = new Set(["/projects/property/lookup", "/notebook/cards/save", "/notebook/cards/list", "/notebook/cards/get", "/reports/drafts/get", "/reports/drafts/list", "/reports/history/list",
+  "/research/conversations/create", "/research/conversations/project-context"]);
 const json = (response, status, value) => response.writeHead(status, {
   "content-type": "application/json", "cache-control": "no-store"
 }).end(JSON.stringify(value));

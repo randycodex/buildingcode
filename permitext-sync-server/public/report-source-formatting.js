@@ -51,6 +51,7 @@ export function sourceFormattingRanges(part, formatting = [], style = 'highlight
 }
 export function sourceFormattingRuns(part, formatting = []) {
   const styles = new Map(sourceTextStyles.map(style=>[style,sourceFormattingRanges(part,formatting,style)]));
+  if (part.superscriptRanges?.length) styles.set('superscript',part.superscriptRanges);
   const boundaries = [...new Set([0,part.text.length,...[...styles.values()].flat(2)])].sort((a,b)=>a-b);
   return boundaries.slice(0,-1).map((start,index)=>{
     const end = boundaries[index+1], run = {text:part.text.slice(start,end)};
@@ -75,7 +76,7 @@ export function createReportSourceFormatting({onChange,isCurrent}) {
   const paint = entry => {
     entry.element.replaceChildren(...sourceFormattingRuns(entry.part,entry.block.sourceFormatting).map(run=>{
       let node = document.createTextNode(run.text);
-      for (const [style,tag] of [['bold','strong'],['italic','em'],['underline','u'],['strike','s'],['highlight','mark']]) {
+      for (const [style,tag] of [['bold','strong'],['italic','em'],['underline','u'],['strike','s'],['highlight','mark'],['superscript','sup']]) {
         if (run[style]) {const wrapper=document.createElement(tag); wrapper.append(node); node=wrapper;}
       }
       return node;

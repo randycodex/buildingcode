@@ -58,6 +58,23 @@ function findNode(node, id) {
   return null;
 }
 
+// Preserve letter-footnote positions without changing source text or its hash.
+// Numeric superscripts already have raised Unicode source text.
+function sourceCellText(node) {
+  const value=nodeText(node);
+  if (node.tagName==='sup' || /vertical-align\s*:\s*super/i.test(attributes(node).style || '')) {
+    const label=(node.childNodes || []).map(nodeText).join('').trim();
+    const start=value.indexOf(label);
+    return {text:value,ranges:label && !/^\d+$/.test(label) && start>=0 ? [[start,start+label.length]] : []};
+  }
+  let offset=0;const ranges=[];
+  for (const child of node.childNodes || []) {
+    const part=sourceCellText(child);
+    ranges.push(...part.ranges.map(([a,b])=>[a+offset,b+offset]));offset+=part.text.length;
+  }
+  return {text:value,ranges};
+}
+
 function tableGrid(table, {withSpans = false} = {}) {
   const rows = [];
   const collect = node => {
@@ -68,6 +85,7 @@ function tableGrid(table, {withSpans = false} = {}) {
   collect(table);
   const grid = [];
   const spans = [];
+  const superscripts = [];
   rows.forEach((row, rowIndex) => {
     grid[rowIndex] ||= [];
     let column = 0;
@@ -81,6 +99,12 @@ function tableGrid(table, {withSpans = false} = {}) {
         throw new Error("This table layout is not supported by this text export.");
       }
       const value = inlineExportText((cell.childNodes || []).map(nodeText).join("").replace(/\s+/g, " ")).trim();
+      if (withSpans) {
+        const marked=sourceCellText({childNodes:cell.childNodes});
+        const position=end=>inlineExportText(marked.text.slice(0,end).replace(/\s+/g,' ')).trimStart().length;
+        const ranges=marked.ranges.map(([a,b])=>[position(a),position(b)]).filter(([a,b])=>b>a&&b<=value.length);
+        if (ranges.length) superscripts.push({row:rowIndex,column,ranges});
+      }
       if(rowSpan>1||columnSpan>1)spans.push({row:rowIndex,column,rowSpan,colSpan:columnSpan});
       for (let r = rowIndex; r < rowIndex + rowSpan; r++) {
         grid[r] ||= [];
@@ -93,7 +117,8 @@ function tableGrid(table, {withSpans = false} = {}) {
   const rowMap=new Map();
   const result=grid.map(row=>row.map(value=>value||'')).filter((row,index)=>{if(!row.some(Boolean))return false;rowMap.set(index,rowMap.size);return true;});
   return withSpans ? {rows:result,cellSpans:spans.filter(span=>rowMap.has(span.row)).map(span=>({...span,row:rowMap.get(span.row),
-    rowSpan:Array.from({length:span.rowSpan},(_,i)=>span.row+i).filter(row=>rowMap.has(row)).length}))} : result;
+    rowSpan:Array.from({length:span.rowSpan},(_,i)=>span.row+i).filter(row=>rowMap.has(row)).length})),
+    cellSuperscripts:superscripts.filter(cell=>rowMap.has(cell.row)).map(cell=>({...cell,row:rowMap.get(cell.row)}))} : result;
 }
 
 // Reader HTML may contain a separate sticky header copy. Omit it only when
@@ -138,8 +163,8 @@ function selectedTables(body, blockID) {
   const visit = node => {
     if (isRepeatedTableHeader(node)) return;
     if (node.tagName === "table") {
-      const {rows,cellSpans} = tableGrid(node,{withSpans:true});
-      tables.push({ text: rows.map(row => row.join(" | ")).join("\n"), rows, headerRowCount: tableHeaderRowCount(node, rows), ...(cellSpans.length?{cellSpans}:{}) });
+      const {rows,cellSpans,cellSuperscripts} = tableGrid(node,{withSpans:true});
+      tables.push({ text: rows.map(row => row.join(" | ")).join("\n"), rows, headerRowCount: tableHeaderRowCount(node, rows), ...(cellSpans.length?{cellSpans}:{}),...(cellSuperscripts.length?{cellSuperscripts}:{}) });
       return;
     }
     (node.childNodes || []).forEach(visit);
