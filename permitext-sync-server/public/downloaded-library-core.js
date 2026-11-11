@@ -1,4 +1,5 @@
 import { historicalConstructionSyncCodeVersion } from "./sync-identity.js?v=20261021-identity-fast-path-v8";
+import { searchCitationQuery } from "./search-citation-query.js?v=1";
 import {
   searchWords,
   searchWordForms,
@@ -65,8 +66,9 @@ export function prepareLocalSearch(url, metadata) {
       : null;
   if (query.length > 200)
     throw new Error("Search queries are limited to 200 characters.");
-  const prepared = prepareSearchRelevance(query),
-    needle = query.replace(/\s+/g, " ");
+  const citation = searchCitationQuery(query), matchQuery = citation.query;
+  const prepared = prepareSearchRelevance(matchQuery),
+    needle = matchQuery.replace(/\s+/g, " ");
   const escaped = needle
     .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
     .split(" ")
@@ -77,6 +79,8 @@ export function prepareLocalSearch(url, metadata) {
   );
   return {
     query,
+    matchQuery,
+    citation,
     mode,
     scope,
     prefixes,
@@ -89,6 +93,7 @@ export function prepareLocalSearch(url, metadata) {
 export function localSearchPermits(record, context) {
   const { scope, prefixes, version, resultSource } = context;
   return !(
+    (context.citation?.codePrefix && context.citation.codePrefix !== record.codePrefix) ||
     (scope && !scope.permits(record)) ||
     (prefixes.size && !prefixes.has(record.codePrefix)) ||
     (record.codeVersion === historicalConstructionSyncCodeVersion
@@ -100,7 +105,7 @@ export function localSearchPermits(record, context) {
   );
 }
 export function matchLocalSearch(record, context, metadata) {
-  const { query, mode, prepared, phrase } = context;
+  const { matchQuery: query, mode, prepared, phrase } = context;
   if (!localSearchPermits(record, context)) return null;
   const text = [
     record.sectionNumber,

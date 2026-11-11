@@ -1,3 +1,4 @@
+import { researchSelectedTables } from "./research-table-footnotes.mjs";
 import { runResearchV2, researchV2AnswerMetadata, researchV2Version } from "./research-v2-engine.mjs";
 import { createResearchV2Budget } from "./research-v2-budget.mjs";
 import { researchV2Configuration, researchV2Availability, createResearchV2ApplicationCall } from "./research-v2-runtime.mjs";
@@ -9,6 +10,7 @@ import { findRelatedProvisions, assertRelatedProvisionContext, validateRelatedPr
 import { discoverResearchSources, researchDiscoveryOptions } from "./research-source-discovery.mjs";
 import {preparedSearchText} from "./prepared-search-text.mjs";
 import {preparedSearchRuntime} from "./prepared-search-runtime.mjs";
+import { searchCitationQuery } from "./public/search-citation-query.js";
 import { prepareSearchRelevance, searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
 import { createResearchSourceBodyReader } from "./research-source-body-cache.mjs";
 import { loadPreparedPassages } from "./research-prepared-passages.mjs";
@@ -20916,9 +20918,18 @@ async function handleResearchConversationMessage(request, response) {
       const now = new Date().toISOString();
       const snapshots = evidence.map(source => immutableEvidenceSnapshot({ source, approvedAt:now,
         evidenceSetVersion:Number(conversation.evidenceSetVersion || 1), sourceLibraryVersion:source.codeVersion || conversation.codeVersion }));
-      const sources = evidence.map((source,index) => ({ id:`S${index+1}`, sectionID:source.sectionID,
-        edition:source.codeEdition, ...(requestedV2 ? {codeVersion:source.codeVersion,jurisdiction:source.jurisdiction} : {}), authority:"enacted", title:[source.codePrefix,source.sectionNumber,source.title].filter(Boolean).join(" "),
-        text:source.text || source.selectedText || "" }));
+      const sources = await Promise.all(evidence.map(async (source,index) => {
+        const text = source.text || source.selectedText || "";
+        let tables = [];
+        if (requestedV2 && /\btable\s+\d/i.test(text)) {
+          const [canonical] = await researchEvidenceForSectionIDs([source.sectionID], {allowOptInCorpora:true});
+          if (canonical?.codeVersion === source.codeVersion) tables = researchSelectedTables(text, canonical.richSources);
+        }
+        return { id:`S${index+1}`, sectionID:source.sectionID,
+          edition:source.codeEdition, ...(requestedV2 ? {codeVersion:source.codeVersion,jurisdiction:source.jurisdiction} : {}),
+          authority:"enacted", title:[source.codePrefix,source.sectionNumber,source.title].filter(Boolean).join(" "),
+          text, ...(tables.length ? {tables} : {}) };
+      }));
       const webDecision = conversationOnly ? {useWeb:false,reasons:[]} : researchWebSupportTrigger({question,
         enactedEvidence:evidence,pinnedEvidenceCount:pinnedEvidence.length,projectFactsApplied:Boolean(combinedProjectFacts.length)});
       let web = {sources:[],searched:false,usage:combinedResearchUsage()};
@@ -24677,7 +24688,8 @@ async function handleCodeSearch(request, response) {
     return source && activeScope.isEnabled(source) &&
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix));
   }).map(section => section.id));
-  const query = url.searchParams.get("q")?.trim() || "";
+  const requestedQuery = url.searchParams.get("q")?.trim() || "";
+  const citation = searchCitationQuery(requestedQuery), query = citation.query;
   let resultSource = null;
   if (url.searchParams.has("resultSource")) {
     try {
@@ -24693,7 +24705,7 @@ async function handleCodeSearch(request, response) {
       return;
     }
   }
-  if (query.length > 200) {
+  if (requestedQuery.length > 200) {
     sendError(response, 400, "Search queries are limited to 200 characters.");
     return;
   }
@@ -24722,9 +24734,11 @@ async function handleCodeSearch(request, response) {
       .map((value) => value.trim().toUpperCase())
       .filter(Boolean)
   );
-  if (query.length < 2 || activeScope?.isEmpty) {
+  const conflictingPrefix = citation.codePrefix && codeFilter.size && !codeFilter.has(citation.codePrefix);
+  if (citation.codePrefix && !conflictingPrefix) { codeFilter.clear(); codeFilter.add(citation.codePrefix); }
+  if (query.length < 2 || activeScope?.isEmpty || conflictingPrefix) {
     sendPublicCodeJSON(request, response, {
-      query,
+      query: requestedQuery,
       results: [],
       totalResults: 0,
       offset: 0,
@@ -24738,7 +24752,7 @@ async function handleCodeSearch(request, response) {
   const queryTokens = matchMode === "words" ? searchWords(query).filter(word => word.length >= 2) : tokenizeSearchText(query);
   if (!queryTokens.length) {
     sendPublicCodeJSON(request, response, {
-      query,
+      query: requestedQuery,
       results: [],
       totalResults: 0,
       offset: 0,
@@ -24887,7 +24901,7 @@ async function handleCodeSearch(request, response) {
   if (exactMatch && url.searchParams.get("grouped") === "true" && !resultSource) {
     const page = await timePublicCodePhase("exact_match", () => groupedCodeSearchPage(hits, query, resultLimit, matchMode));
     if (!page.results.length && !page.hasMore) page.suggestions = spellingSuggestions();
-    sendPublicCodeJSON(request, response, page);
+    sendPublicCodeJSON(request, response, { ...page, query: requestedQuery });
     return;
   }
 
@@ -24909,7 +24923,7 @@ async function handleCodeSearch(request, response) {
   const hasMore = exactPage ? exactPage.hasMore : nextOffset < matchedHits.length;
   const totalResults = exactPage && hasMore ? null : exactPage ? nextOffset : matchedHits.length;
   sendPublicCodeJSON(request, response, {
-    query,
+    query: requestedQuery,
     results,
     totalResults,
     offset: resultOffset,

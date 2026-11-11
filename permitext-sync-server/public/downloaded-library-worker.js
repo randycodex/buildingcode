@@ -11,7 +11,7 @@ import {
   localSearchPermits,
   finishLocalSearch,
   offlineSectionMetadata,
-} from "./downloaded-library-core.js?v=13";
+} from "./downloaded-library-core.js?v=14";
 import {
   offlineAssetNamesForChapter,
   resolveOfflineSectionMetadata,
@@ -692,7 +692,7 @@ async function search(url, m, signal) {
     signal.throwIfAborted();
     return finishLocalSearch(matches, url, context);
   }
-  const words = searchWords(context.query).filter((word) => word.length >= 2);
+  const words = searchWords(context.matchQuery).filter((word) => word.length >= 2);
   if (context.query.length < 2 || !words.length)
     return { query: context.query, results: [], totalResults: 0 };
   const permittedSources = m.codeSources.filter((source) =>
@@ -746,7 +746,7 @@ async function search(url, m, signal) {
         posting(
           m.generation,
           word,
-          words.length === 1 && /^[A-Za-z]?\d/.test(context.query),
+          words.length === 1 && /^[A-Za-z]?\d/.test(context.matchQuery),
         ),
       ),
     ),

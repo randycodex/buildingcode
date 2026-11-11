@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
-import {researchTableFootnotes, researchFootnoteScopeIssues, tableFootnoteInstruction} from './research-table-footnotes.mjs';
+import {researchTableFootnotes, researchSelectedTables, researchFootnoteScopeIssues, tableFootnoteInstruction} from './research-table-footnotes.mjs';
 
-export const researchV2Version = 'research-v2-20261111-r6';
+export const researchV2Version = 'research-v2-20261111-r7';
 const fail = (message, code = 'V2_INVALID_INPUT') => Object.assign(new Error(message), { code });
 const stringList = { type: 'array', items: { type: 'string' } };
 export const researchV2DraftSchema = { type: 'object', additionalProperties: false,
@@ -29,10 +29,12 @@ export function freezeResearchV2Turn({ question, sources, history = [], projectC
         !source.text.trim() || !source.edition || !source.sectionID) throw fail('Each passage needs exact text and a unique source identity and edition.');
     ids.add(source.id);
     const tableFootnotes = researchTableFootnotes(source.text);
+    const tables = researchSelectedTables(source.text, source.tables);
     return { id: source.id, sectionID: String(source.sectionID), edition: String(source.edition),
       codeVersion: String(source.codeVersion || ''), jurisdiction: source.jurisdiction || 'New York City',
       title: String(source.title || ''), text: source.text,
       ...(tableFootnotes.length ? {tableFootnotes} : {}),
+      ...(tables.length ? {tables} : {}),
       textHash: createHash('sha256').update(source.text).digest('hex') };
   });
   if (selected.reduce((n,s) => n + s.text.length, 0) > 96000) throw fail('The included passages exceed the 96,000-character evidence limit.');
@@ -42,6 +44,9 @@ export function freezeResearchV2Turn({ question, sources, history = [], projectC
     authority: message.role === 'user' ? 'user_statement' : 'not_source_authority' }));
   const packet = { version: researchV2Version, question: question.trim(), sources: selected, history: previous };
   if (projectContextSnapshot) packet.projectContextSnapshot = structuredClone(projectContextSnapshot);
+  // Prefer the unchanged selected text and reviewed facts if optional table
+  // structure would push an otherwise valid turn over the existing budget.
+  if (Buffer.byteLength(JSON.stringify(packet)) > 130000) for (const source of packet.sources) delete source.tables;
   if (Buffer.byteLength(JSON.stringify(packet)) > 130000) throw fail('This conversation is too long for the current evidence budget. Start a new question with fewer passages.');
   return JSON.parse(JSON.stringify(packet));
 }
@@ -130,8 +135,8 @@ export async function runResearchV2(input, { call, signal, onStage = () => {}, m
 
 export function researchV2FailureMessage(issues = []) {
   const codes=issues.map(issue=>issue.code).join(' ');
-  const check=/citation|binding|identity|source_id/i.test(codes) ? 'match the draft’s citations to the included passages'
-    : /table|footnote|factor|arithmetic|calculation|unit/i.test(codes) ? 'verify the calculation, table interpretation and qualifications'
+  const check=/table|footnote|factor|arithmetic|calculation|unit/i.test(codes) ? 'verify the calculation, table interpretation and qualifications'
+    : /citation|binding|identity|source_id/i.test(codes) ? 'match the draft’s citations to the included passages'
     : /fact|scope|applicab|assumption/i.test(codes) ? 'keep the source rules separate from unverified project assumptions'
     : 'verify every claim and qualification in the draft';
   return `The answer check could not ${check}. Your question, passages and reviewed Project snapshot are retained. Retry the answer, or ask one part separately. No unchecked answer was saved.`;

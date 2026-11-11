@@ -1,4 +1,25 @@
 const compact = value => String(value || '').replace(/\s+/g, ' ').trim();
+const comparable = value => compact(value).normalize('NFKC').replace(/[‐‑–—−]/g, '-');
+
+// Only expose structure for an entire canonical table already contained in
+// the selected passage. A partial selection cannot import the other rows.
+export function researchSelectedTables(text, richSources = []) {
+  const selected = comparable(text);
+  return (Array.isArray(richSources) ? richSources : []).filter(table => table?.kind === 'table' && table.text &&
+    selected.includes(comparable(table.text)) && Array.isArray(table.grids) &&
+    table.grids.every(grid => Array.isArray(grid?.rows) && grid.rows.every(row => Array.isArray(row?.cells) &&
+      row.cells.every(cell => cell && typeof cell.text === 'string')))).flatMap(table => {
+    const grids = table.grids.map(grid => ({rows: (grid.rows || []).map(row => ({cells: (row.cells || []).map(cell => ({
+      text: String(cell.text || ''), rowSpan: cell.rowSpan || 1, columnSpan: cell.columnSpan || 1
+    }))}))}));
+    if (!grids.length || grids.some(grid => !grid.rows.length || grid.rows.some(row => !row.cells.length ||
+        row.cells.some(cell => !comparable(table.text).includes(comparable(cell.text)))))) return [];
+    const value = {kind: 'table', reference: table.reference, text: table.text, grids};
+    // This is optional structure, not permission to consume another evidence
+    // budget or silently truncate a large table. Its exact text stays intact.
+    return JSON.stringify(value).length <= 18000 ? [value] : [];
+  });
+}
 
 // Derived labels expose the boundaries already present in the exact passage.
 // They supply no new rules, applicability decisions, or neighboring text.
@@ -48,4 +69,4 @@ export function researchFootnoteScopeIssues(draft, sources) {
   return [...new Map(issues.map(issue => [issue.detail, issue])).values()];
 }
 
-export const tableFootnoteInstruction = ' Read every labeled table footnote independently. tableFootnotes contains quotes derived from the exact source text, not new authority. Bind each row to its actual markers, then read each named note separately. A note shared by several rows does not inherit the occupancy, use, location, or other limiting condition of a different footnote or one of those rows. Do not merge adjacent footnotes into one rule. Check these distinctions in the narrative, claims and missingFacts as well as arithmetic. If a marker or boundary is ambiguous, state that limit instead of guessing.';
+export const tableFootnoteInstruction = ' Read every labeled table footnote independently. tableFootnotes contains quotes derived from the exact source text, not new authority. tables preserves the canonical rows, cells and spans of complete tables already quoted in that same selected text; it never adds unselected rows. Use that structure instead of treating flattened neighboring cells as one rule. First identify the requested row, each factor and basis, and the literal footnote markers in its cells. Then explain each referenced note independently, preserving its complete trigger and consequence. A shared marker does not transfer another row\'s occupancy restriction into that note. Do not describe adjacent notes as sharing a limitation unless each note states it. Check these distinctions independently in the narrative, every claim and missingFacts as well as arithmetic. If a marker or boundary is ambiguous, state that limit instead of guessing.';

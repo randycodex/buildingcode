@@ -1,7 +1,8 @@
+import { searchCitationQuery } from "./search-citation-query.js?v=1";
 import { offlineAssetNamesForChapter, validatedOfflineCodeSources, offlineSourceIdentity, offlineSourceScope, offlineSectionMetadata, resolveOfflineSectionMetadata } from "./offline-code-metadata.js?v=1";
 import {codeReferenceRequest, resolveCodeReference} from "./code-reference-resolution.js?v=2";
 export { offlineAssetNamesForChapter, validatedOfflineCodeSources, offlineSourceIdentity, offlineSourceScope, offlineSectionMetadata, resolveOfflineSectionMetadata };
-import {downloadedLibraryStatus, readDownloadedLibrary, removeDownloadedLibrary} from './downloaded-library.js?v=15';
+import {downloadedLibraryStatus, readDownloadedLibrary, removeDownloadedLibrary} from './downloaded-library.js?v=16';
 import { searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./search-relevance.js?v=20261110-general-provisions-v2";
 import { searchWords, matchesSearchWords, searchWordsSnippet } from "./search-words.js?v=20261025-workspace-chrome-v1379";
 import { withCodeAssetRevision } from "./code-asset-identity.js?v=20260923-asset-identity-v1";
@@ -24,7 +25,7 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v2243";
+const shellCacheName = "permitext-pro-shell-v2244";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
@@ -37,9 +38,10 @@ const shellURLs = [
   "/web/active-code-sources.js",
   "/web/offline-code-metadata.js?v=1",
   "/web/code-reference-resolution.js?v=2",
-  "/web/downloaded-library.js?v=15",
-  "/web/downloaded-library-worker.js?v=15",
-  "/web/downloaded-library-core.js?v=13",
+  "/web/downloaded-library.js?v=16",
+  "/web/downloaded-library-worker.js?v=16",
+  "/web/downloaded-library-core.js?v=14",
+  "/web/search-citation-query.js?v=1",
   "/web/settings-columns.js?v=3",
   "/web/project-details-columns.js?v=20261021-project-columns-v3",
   "/web/workspace-button-icons.js?v=20261108-floating-menu-pins-v1382",
@@ -91,7 +93,7 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261111-three-workflow-fixes-v1671",
+  "/web/web-client-version.js?v=20261111-citation-workflow-fixes-v1672",
   "/web/web-app-update.js?v=20261110-per-codes-v3",
   "/web/research-delete-controls.js?v=10",
   "/web/assistant-composer-hint.js?v=1",
@@ -120,13 +122,13 @@ const shellURLs = [
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261111-three-workflow-fixes-v1671",
+  "/web/app.js?v=20261111-citation-workflow-fixes-v1672",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261111-three-workflow-fixes-v1671",
+  "/web/offline-storage.js?v=20261111-citation-workflow-fixes-v1672",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",
@@ -1577,17 +1579,22 @@ export function compareOfflineChapters(left, right) {
 
 async function offlineSearch(metadata, url) {
   const sourceScope = offlineSourceScope(metadata, url);
-  const query = url.searchParams.get("q")?.trim() || "";
-  if (sourceScope?.isEmpty) return { query, totalResults: 0, limited: false, results: [] };
-  if (query.length < 2) return { query, results: [] };
+  const requestedQuery = url.searchParams.get("q")?.trim() || "";
+  const citation = searchCitationQuery(requestedQuery), query = citation.query;
+  if (sourceScope?.isEmpty) return { query: requestedQuery, totalResults: 0, limited: false, results: [] };
+  if (query.length < 2) return { query: requestedQuery, results: [] };
   const tokens = tokenizeSearchText(query);
-  if (!tokens.length) return { query, results: [] };
+  if (!tokens.length) return { query: requestedQuery, results: [] };
   const codeFilter = new Set(
     (url.searchParams.get("code") || url.searchParams.get("codes") || "")
       .split(",")
       .map((value) => value.trim().toUpperCase())
       .filter(Boolean)
   );
+  if (citation.codePrefix) {
+    if (codeFilter.size && !codeFilter.has(citation.codePrefix)) return {query: requestedQuery, results: [], totalResults: 0, hasMore: false, limited: false};
+    codeFilter.clear(); codeFilter.add(citation.codePrefix);
+  }
   const requestedLimit = Number.parseInt(url.searchParams.get("limit") || "", 10);
   const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 500) : 0;
   const normalizedQuery = query.toLowerCase();
@@ -1652,14 +1659,14 @@ async function offlineSearch(metadata, url) {
         hasMore: page.length < group.length, totalResults: group.length });
     }
     const hasMore = groups.some(group => group.hasMore);
-    return { query, groups, results, hasMore, limited: hasMore, totalResults: matches.length, suggestions };
+    return { query: requestedQuery, groups, results, hasMore, limited: hasMore, totalResults: matches.length, suggestions };
   }
   const totalResults = matches.length;
   const selected = limit ? matches.slice(offset, offset + limit) : matches.slice(offset);
   const nextOffset = offset + selected.length;
   const hasMore = nextOffset < totalResults;
   return {
-    query,
+    query: requestedQuery,
     totalResults,
     offset, nextOffset, nextCandidateOffset: nextOffset, cursorKind: "offset", hasMore,
     limited: hasMore,

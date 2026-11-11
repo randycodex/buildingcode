@@ -1,5 +1,6 @@
 import { initialSearchGroupLimit, searchSpellingSuggestions, searchVocabulary } from "../public/search-relevance.js";
 import { finishLocalSearch } from "../public/downloaded-library-core.js";
+import { searchCitationQuery } from "../public/search-citation-query.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
@@ -9,10 +10,11 @@ const fn = source.slice(start, source.indexOf("\n}", start) + 2);
 const matches = [ ["BC", "2022", 8], ["BC", "2014", 6], ["MC", "2022", 3] ].flatMap(([codePrefix, codeVersion, count]) =>
   Array.from({ length: count }, (_, n) => ({ rank: 2, record: { codePrefix, codeVersion },
     result: { id: n + 1, codePrefix, sectionNumber: String(n + 1), title: "Concrete", chapterNumber: "1" } })));
-let exactPattern;
-const context = vm.createContext({initialSearchGroupLimit, searchSpellingSuggestions, searchVocabulary, offlineSourceScope: () => null, tokenizeSearchText: value => value.split(" "), syncCodeVersion: value => value,
+let exactPattern, matchedQuery;
+const context = vm.createContext({searchCitationQuery, initialSearchGroupLimit, searchSpellingSuggestions, searchVocabulary, offlineSourceScope: () => null, tokenizeSearchText: value => value.split(" "), syncCodeVersion: value => value,
   compareChapterNumbers: (left, right) => Number(left) - Number(right),
-  matchingOfflineSearchResults: async (_install, options) => { exactPattern = options.exactPattern; return matches; },
+  matchingOfflineSearchResults: async (_install, options) => { exactPattern = options.exactPattern; matchedQuery = options.query;
+    return matches.filter(match => !options.codeFilter.size || options.codeFilter.has(match.record.codePrefix)); },
   offlineSectionWithEdition: async record => record });
 vm.runInContext(fn, context);
 const get = params => context.offlineSearch({ installID: "offline" }, new URL(`https://local/code/search?${new URLSearchParams({ q: "concrete", version: "all", match: "exact", limit: "25", ...params })}`));
@@ -29,6 +31,12 @@ const historical = await get({ resultSource: JSON.stringify({ codePrefix: "BC", 
 assert.equal(historical.results.length, 1); assert.equal(historical.results[0].codeVersion, "2014");
 assert.equal(historical.results[0].id, 6); assert.equal(historical.hasMore, false);
 await assert.rejects(get({ resultSource: "null" }), /Invalid search result source/);
+for (const q of ['BC 1004.1.3', 'bc § 1004.1.3', 'Section BC 1004.1.3']) {
+  const page = await get({q, grouped:'true'});
+  assert.equal(page.query,q); assert.equal(matchedQuery,'1004.1.3');
+  assert(page.results.length && page.results.every(row=>row.codePrefix==='BC'));
+}
+assert.equal((await get({q:'BC 1004.1.3',codes:'MC'})).results.length,0);
 
 // Broad searches must not shrink an edition's preview below five available
 // matches in either offline storage path. Short editions stay exhausted.
