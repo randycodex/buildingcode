@@ -57,4 +57,19 @@ const cells=tableDisplayCells([['A','A','B'],['A','A','C']], [{row:0,column:0,ro
 assert.equal(cells.flat().filter(Boolean).length,3);assert.equal(cells[0][0].colSpan,2);assert.equal(cells[1][0],null);
 assert.throws(()=>tableDisplayCells([['A','B']],[{row:0,column:0,rowSpan:2,colSpan:1}]),/span/i);
 assert.match(app,/timeZoneName:\s*"short"/);
+let pendingList,flushed=false,openedNote,switchedWorkspace;
+const element=()=>({children:[],dataset:{},setAttribute(){},append(...nodes){this.children.push(...nodes);},addEventListener(name,fn){this[name]=fn;}});
+const pendingContext=vm.createContext({captureAccountRequest:()=>({userID:'owner'}),requireCurrentAccountRequest(){},isCurrentAccountRequest:()=>true,
+ pendingSyncItems:async()=>['one','two'].map(id=>({kind:'draft',id,projectID:'canonical-project',title:id,project:'Project',reason:'Waiting'})),
+ document:{createElement:element},showWebNotice:async(_title,_message,{content})=>{pendingList=content;},
+ flushPendingNotebookDrafts:async()=>{flushed=true;},loadNotebookDraft:async()=>flushed?null:{},pendingNotebookDraftReason:()=> 'Waiting',
+ activeWebWarningClose(){},currentContentSummary:()=>({projects:[{id:'raw-project',clientID:'canonical-project'}]}),researchProjectID:p=>p.clientID,
+ projectRecordID:p=>p.id,visibleWorkspaceRecords:()=>[{id:'workspace',projectID:'raw-project'}],activeWorkspaceID:'other',
+ switchWorkspace:async id=>{switchedWorkspace=id;return true;},switchWorkflowView:async()=>{},openNotebookNoteColumn:async(_project,note)=>{openedNote=note;}});
+vm.runInContext(extract('async function openPendingSyncDetails(','async function openConnectionStatusConflictReview('),pendingContext);
+await pendingContext.openPendingSyncDetails();
+await pendingList.children[0].children.find(node=>node.textContent==='Retry sync').click();
+assert(pendingList.children.every(row=>row.children.find(node=>node.textContent==='Synced')),'Retry refreshes every draft affected by the shared sync');
+await pendingList.children[0].children.find(node=>node.textContent==='Open Note').click();
+assert.equal(switchedWorkspace,'workspace');assert.equal(openedNote.id,'one');
 console.log('Production regressions passed: clipboard styles, shared Report source guard, explicit Note destination, recoverable property import, merged cell geometry and timezone.');

@@ -9,7 +9,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-workflow-fixes-v1659";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-workflow-fixes-v1660";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=10";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -162,7 +162,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261111-workflow-fixes-v1659";
+} from "./offline-storage.js?v=20261111-workflow-fixes-v1660";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -9736,6 +9736,7 @@ async function openPendingSyncDetails() {
     const list = document.createElement("div");
     list.className = "sync-pending-list";
     list.setAttribute("role", "list");
+    const draftRows = [];
     for (const item of items) {
       const row = document.createElement("article");
       row.className = "sync-pending-item";
@@ -9753,6 +9754,7 @@ async function openPendingSyncDetails() {
       reason.textContent = item.reason;
       row.append(title, project, reason);
       if (item.kind === "draft" && (!item.scope || item.scope === "notebook-card")) {
+        draftRows.push({item,reason});
         const open = document.createElement("button"); open.type = "button"; open.textContent = "Open Note";
         open.addEventListener("click", async () => {
           activeWebWarningClose?.(false);
@@ -9772,9 +9774,11 @@ async function openPendingSyncDetails() {
           try {
             requireCurrentAccountRequest(identity);
             await flushPendingNotebookDrafts();
-            const draft = await loadNotebookDraft(identity.userID,item.projectID,item.id === "new" ? "" : item.id);
-            requireCurrentAccountRequest(identity);
-            reason.textContent = draft ? pendingNotebookDraftReason(draft) : "Synced";
+            for (const entry of draftRows) {
+              const draft = await loadNotebookDraft(identity.userID,entry.item.projectID,entry.item.id === "new" ? "" : entry.item.id);
+              requireCurrentAccountRequest(identity);
+              entry.reason.textContent = draft ? pendingNotebookDraftReason(draft) : "Synced";
+            }
           } catch (error) { if (isCurrentAccountRequest(identity)) reason.textContent = error.message; }
           finally { if (isCurrentAccountRequest(identity)) retry.disabled = false; }
         });
