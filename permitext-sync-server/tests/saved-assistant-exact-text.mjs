@@ -16,4 +16,15 @@ await c.startFocusedResearchFromSavedItem({sectionID:'2152',selectedText:'An exp
 assert.equal(delivered.selectedText,'An explicitly selected shorter range.','An explicit selection must not expand to a containing paragraph');
 await c.startFocusedResearchFromSavedItem({sectionID:'2152',previewText:'Exceptions:'});assert.equal(delivered.selectedText,'Exceptions:','Legacy heading-only evidence remains literal');
 await assert.rejects(c.startFocusedResearchFromSavedItem({sectionID:'2152'}),/enough source text/);
+const navigationState={workflowNavigationGeneration:0};let visibleView='notebook',opened='',created=0,allowSwitch=true;
+const n=vm.createContext({state:navigationState,activeAccount:()=>({}),hasCapability:()=>true,currentColumnWorkflowView:()=>visibleView,
+ switchWorkflowView:async(view)=>{if(!allowSwitch)return false;visibleView=view;navigationState.workflowNavigationGeneration++;return true;},
+ captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',
+ postResearch:async()=>{assert.equal(visibleView,'research');created++;return {conversation:{id:'new-chat'}};},
+ researchV2Enabled:()=>false,window:{},refreshResearchConversationList:async()=>{},
+ openResearchConversation:async id=>{opened=id;}});
+vm.runInContext(app.slice(app.indexOf('async function startNewResearchFromSelection('),app.indexOf('async function addResearchSelectionToCurrent(')),n);
+await n.startNewResearchFromSelection({sectionID:'2152',selectedText:full,projectID:'project'});
+assert.equal(visibleView,'research');assert.equal(opened,'new-chat');assert.equal(created,1,'Notebook evidence reveals the Assistant before opening the new chat');
+visibleView='notebook';allowSwitch=false;await n.startNewResearchFromSelection({sectionID:'2152',selectedText:full});assert.equal(created,1,'Cancelled view changes do not create a hidden chat');
 console.log('Saved Evidence → Assistant: full saved passage beyond 240 characters, explicit shorter selection, legacy heading-only text, exact source ID and no-text guard passed.');
