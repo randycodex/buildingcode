@@ -67,7 +67,7 @@ assert.match(webClient, /clientRelease: release\?\.releaseID \|\| "web-unknown"/
 const webPolicyAcceptance = webClient.indexOf('"/account/policy-acceptance"');
 const webCheckout = webClient.indexOf('"/billing/web/checkout"', webPolicyAcceptance);
 assert(webPolicyAcceptance >= 0 && webCheckout > webPolicyAcceptance, "Web policy acceptance must precede Checkout creation.");
-assert.match(iosSettings, /Text\("Current plan"\)/);
+assert.match(iosSettings, /Text\(library\.currentPlan\.label\)/);
 assert.match(iosSettings, /By upgrading, you agree to the \[Terms\]/);
 assert.match(iosSettings, /Toggle\("I have reviewed and agree to the current policies\.", isOn: \$policiesAccepted\)/);
 assert.match(iosSettings, /acceptedPolicyVersions: policiesAccepted/);
@@ -87,7 +87,7 @@ for (const [name, document] of [["Terms", terms], ["Refund policy", refunds]]) {
 assert.match(terms, /\$20 per month/);
 assert.match(terms, /no free trial/i);
 assert.match(terms, /unofficial research and workspace tool/i);
-assert.match(terms, /at least 18 years old to use Permitext/i);
+assert.match(terms, /at least 18 years old to use per codes/i);
 assert.match(terms, /not approved for confidential, regulated, or sensitive personal\s+information/i);
 assert.match(privacy, /not approved for confidential, regulated, or sensitive personal\s+information/i);
 assert.match(terms, /Ordinary project information, including a property\s+address, may be submitted/i);
@@ -95,7 +95,7 @@ assert.match(privacy, /Ordinary project information, including a property\s+addr
 assert.match(privacy, /does not knowingly collect personal\s+information from anyone under 18/i);
 assert.match(webClient, /Do not include confidential, regulated, or sensitive personal information/);
 assert.match(iosResearch, /Do not include confidential, regulated, or sensitive personal information/);
-assert.match(webClient, /Ordinary property information may be included when needed/);
+assert.match(webClient, /Included passages, conversation messages and explicitly reviewed Project snapshots are sent\./, "The web data preview must identify included material and reviewed Project context.");
 assert.match(iosResearch, /Ordinary property information may be included when needed/);
 assert.match(refunds, /within 72 hours of that\s+charge/i);
 assert.match(refunds, /initial(?: subscription)? charge,?\s+(?:and )?every renewal\s+charge/i);
@@ -115,7 +115,7 @@ assert.match(subscriptionConfirmationClient, /session_id/);
 
 for (const path of ["/terms", "/privacy", "/refunds", "/support"]) {
   assert(webIndex.includes(`href="${path}"`), `Web Settings is missing ${path}.`);
-  assert(iosSettings.includes(`https://permitext.com${path}`), `iOS Settings is missing ${path}.`);
+  assert(iosSettings.includes(`https://per.codes${path}`), `iOS Settings is missing ${path}.`);
 }
 
 console.log("Beta 1 public surface contract passed");

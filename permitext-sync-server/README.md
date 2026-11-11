@@ -69,15 +69,16 @@ Domain: per.codes
 Return URL: https://per.codes/account/apple/callback
 
 Domain: permitext.com
-Return URL: https://per.codes/account/apple/callback
+Return URL: https://permitext.com/account/apple/callback
 
 Domain: permitext-sync.vercel.app
 Return URL: https://permitext-sync.vercel.app/account/apple/callback
 ```
 
 `per.codes` is attached to the production Vercel deployment and is the
-canonical public/share-link host. The native backend base remains
-`permitext-sync.vercel.app` during the staged identity migration. Verify AASA
+canonical public/share-link host. Authentication has moved to the same Clerk
+instance on the new domain. The native backend base remains
+`permitext-sync.vercel.app` for installed-client compatibility. Verify AASA
 and installed-app universal links, the Apple Service ID return URL, account
 cookies, Stripe returns/webhooks, and production PostgreSQL through the apex;
 keep the Vercel hostname accepted for existing installed apps and shared links.

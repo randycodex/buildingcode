@@ -23,4 +23,16 @@ assert.deepEqual(
   state.account,
   "The authenticated account view must preserve profile and entitlement fields"
 );
-console.log("Account profile client contract passed: authenticated identity preserves profile metadata.");
+const profileStart = source.indexOf("function profileNeedsName(account) {");
+const profileEnd = source.indexOf("\nfunction profileNeedsSetup", profileStart);
+assert(profileStart >= 0 && profileEnd > profileStart);
+vm.runInContext(source.slice(profileStart, profileEnd), context);
+for (const displayName of ["", "per codes account", "Permitext account", "Apple account", "Web browser"]) {
+  assert.equal(context.profileNeedsName({ displayName }), true, `${displayName || "Empty name"} must still require profile setup`);
+}
+for (const displayName of ["Randy R", "Permitext User", "per codes Studio"]) {
+  const account = { displayName, onboardingCompleted: true };
+  assert.equal(context.profileNeedsName(account), false, "Authored names must not be reclassified by the rebrand");
+  assert.equal(account.displayName, displayName, "Profile checks cannot rewrite existing names");
+}
+console.log("Account profile client contract passed: authenticated metadata, current/legacy placeholders and authored names preserved.");

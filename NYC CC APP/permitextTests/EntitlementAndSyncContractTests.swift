@@ -5079,7 +5079,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
     @MainActor
     func testPermitextUniversalLinksAcceptPrimaryAndLegacyHosts() throws {
-        for host in ["permitext.com", "permitext-sync.vercel.app"] {
+        for host in ["per.codes", "permitext.com", "permitext-sync.vercel.app"] {
             let invitationURL = try XCTUnwrap(
                 URL(string: "https://\(host)/?organizationInvite=private-token-123")
             )
@@ -5097,7 +5097,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         XCTAssertEqual(
             CodeLibraryViewModel.sharedSectionURL(sectionID: 101).absoluteString,
-            "https://permitext.com/open/section/101"
+            "https://per.codes/open/section/101"
         )
         XCTAssertNil(
             CodeLibraryViewModel.organizationInvitationToken(
@@ -5114,6 +5114,14 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 from: URL(string: "https://permitext-sync.vercel.app/open/section/101?organizationInvite=token")!
             )
         )
+        for host in ["per.codes.evil.example", "clerk.per.codes", "accounts.per.codes"] {
+            XCTAssertNil(CodeLibraryViewModel.deepLinkedSectionID(
+                from: URL(string: "https://\(host)/open/section/101")!
+            ))
+            XCTAssertNil(CodeLibraryViewModel.organizationInvitationToken(
+                from: URL(string: "https://\(host)/?organizationInvite=synthetic-token")!
+            ))
+        }
     }
 
     func testFirmCollaborationReleaseSurfaceIsDeferred() {

@@ -1,6 +1,6 @@
 # per codes App Store Metadata — English (U.S.)
 
-Rebrand target metadata updated November 10, 2026. The remote listing must be verified separately; this file does not claim it has been updated. Bundle and product IDs remain unchanged. No submission or release is authorized by this metadata.
+Rebrand metadata updated November 10, 2026. The remote draft fields saved during the migration are listed in the receipt below. Bundle and product IDs remain unchanged. No submission or release is authorized by this metadata.
 
 Prepared for App Store version 1.0. The prior `permitext` listing was saved in
 App Store Connect on September 7. Those historical checks do not establish that

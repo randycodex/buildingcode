@@ -1,18 +1,20 @@
-# Permitext Beta 1 billing and identity runbook
+# per codes Beta 1 billing and identity runbook
+
+Current domain and branding: **per.codes / per codes**. The November 10 migration retained the existing accounts, purchase IDs, database and legacy backend address. See [migration receipts](./PER_CODES_MIGRATION_2026-11-10.md). Earlier dated acceptance evidence keeps its original scope.
 
 This runbook is an evidence checklist. Passing unit tests does not authorize public billing; the provider-created records and production entitlement changes below must also be captured.
 
 ## Release architecture
 
-- Permitext Web sells Pro through Stripe Checkout and manages it through Stripe Billing Portal.
-- Permitext iOS sells Pro through StoreKit. It does not present a Stripe purchase path for digital access.
-- Both providers update the same Permitext entitlement record.
+- per codes Web sells Pro through Stripe Checkout and manages it through Stripe Billing Portal.
+- per codes iOS sells Pro through StoreKit. It does not present a Stripe purchase path for digital access.
+- Both providers update the same per codes entitlement record.
 - Beta 1 Pro is $20 per month, has no trial or annual plan, and includes 100 Research turns per UTC calendar month.
-- Optional Research turn packs are one-time, non-expiring consumables. They are shared through the Permitext account and are used only after the included monthly turns.
+- Optional Research turn packs are one-time, non-expiring consumables. They are shared through the per codes account and are used only after the included monthly turns.
 - Code reading and code search remain available without a Pro subscription.
 - Clerk is the canonical sign-in provider for Apple, Google, and Microsoft identities.
-- Web Checkout, web restore, iOS StoreKit purchase, and iOS StoreKit restore all require an authenticated Permitext account before provider billing begins. On iOS, the purchase or restore action starts the production Clerk sign-in flow first when needed.
-- An existing Permitext Apple account must be authenticated before it is linked into a Clerk identity. Never merge accounts from an email match alone.
+- Web Checkout, web restore, iOS StoreKit purchase, and iOS StoreKit restore all require an authenticated per codes account before provider billing begins. On iOS, the purchase or restore action starts the production Clerk sign-in flow first when needed.
+- An existing per codes Apple account must be authenticated before it is linked into a Clerk identity. Never merge accounts from an email match alone.
 - If both source and target accounts already have different Pro ownership records, stop the merge without modifying either account. Support must resolve the duplicate purchase while preserving any lifetime grant. Only equivalent lifetime grants or duplicate records for the same provider subscription may merge automatically.
 
 ## Required production configuration
@@ -39,7 +41,7 @@ Vercel variables marked Sensitive are intentionally unavailable to local environ
 Configure App Store Server Notifications V2 in App Store Connect with:
 
 ```text
-https://<production-domain>/billing/apple/notifications
+https://per.codes/billing/apple/notifications
 ```
 
 Production also requires `APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS` with the current Apple PKI App Store trust roots. The variable was added to Vercel Production only on 2026-08-21. Reconfirm the roots against Apple's certificate-authority page during credential rotation; a deployment is required before a changed value reaches the serving app.
@@ -47,19 +49,19 @@ Production also requires `APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS` with the cur
 Configure Stripe with:
 
 ```text
-https://<production-domain>/billing/stripe/webhook
+https://per.codes/billing/stripe/webhook
 ```
 
 Configure Clerk with live keys, `CLERK_AUTHORIZED_PARTIES`, and these hosted web-flow values:
 
 ```text
-CLERK_FRONTEND_API_URL=https://clerk.permitext.com
-CLERK_ACCOUNT_PORTAL_URL=https://accounts.permitext.com/sign-in
+CLERK_FRONTEND_API_URL=https://clerk.per.codes
+CLERK_ACCOUNT_PORTAL_URL=https://accounts.per.codes/sign-in
 ```
 
-The corresponding Clerk DNS records, Account Portal redirects, and Apple, Google, and Microsoft social connections must be active in the Clerk production instance. Permitext loads ClerkJS directly from the configured Frontend API, redirects to the hosted Account Portal, verifies the returned Clerk session token on the backend, and only then creates or links the Permitext account.
+The corresponding Clerk DNS records, Account Portal redirects, and Apple, Google, and Microsoft social connections must be active in the Clerk production instance. per codes loads ClerkJS directly from the configured Frontend API, redirects to the hosted Account Portal, verifies the returned Clerk session token on the backend, and only then creates or links the per codes account.
 
-For iOS, set the target build setting `CLERK_PUBLISHABLE_KEY` to the production publishable key, enable Clerk Native API, register `com.randycodex.permitext` as the Native Application, and confirm `webcredentials:clerk.permitext.com` resolves through the signed associated-domain configuration. Until that build setting exists, iOS deliberately retains the current native Sign in with Apple fallback instead of showing a nonfunctional multi-provider button.
+For iOS, set the target build setting `CLERK_PUBLISHABLE_KEY` to the production publishable key, enable Clerk Native API, register `com.randycodex.permitext` as the Native Application, and confirm `webcredentials:clerk.per.codes` resolves through the signed associated-domain configuration. Until that build setting exists, iOS deliberately retains the current native Sign in with Apple fallback instead of showing a nonfunctional multi-provider button.
 
 ## United States release boundary
 
@@ -72,13 +74,13 @@ For iOS, set the target build setting `CLERK_PUBLISHABLE_KEY` to the production 
 
 For an existing Apple account with saved work and Pro access:
 
-1. Record the Permitext user ID, entitlement source, and representative saved Project IDs before migration.
-2. Authenticate the existing Permitext session.
+1. Record the per codes user ID, entitlement source, and representative saved Project IDs before migration.
+2. Authenticate the existing per codes session.
 3. Sign in to Clerk with Apple and submit the Clerk session token using the authenticated linking path.
-4. Confirm one resulting Permitext account, the same Projects and saved records, and the same entitlement.
+4. Confirm one resulting per codes account, the same Projects and saved records, and the same entitlement.
 5. Sign out and sign in through Google, then Microsoft, after linking those verified identities in Clerk.
-6. Confirm every provider returns the same Clerk user and Permitext account.
-7. Attempt an unverified or mismatched link and confirm that Permitext rejects it without changing either account.
+6. Confirm every provider returns the same Clerk user and per codes account.
+7. Attempt an unverified or mismatched link and confirm that per codes rejects it without changing either account.
 8. Attempt to link two test accounts with distinct Pro ownership records and confirm a 409/support-resolution result while both accounts, purchases, and entitlements remain unchanged.
 
 Account linking also requires both accounts' other operations to finish.
@@ -92,15 +94,15 @@ metadata cannot authorize excluding another writer.
 
 ## Stripe lifecycle evidence
 
-The August 28, 2026 local provider-simulated test-mode exercise covers authenticated Checkout creation, signed-event-only fulfillment, duplicate delivery, renewal, scheduled cancellation, failed invoices, partial and full refunds, provider cancellation, and delayed webhook delivery with zero paid provider calls. It found and fixed a defect where deletion of a fully refunded entitlement also deleted the only stale-event timestamp, allowing an older active event to restore Pro. Permitext now retains a durable per-subscription lifecycle cursor separately from the entitlement; terminal events win same-second ties, older and duplicate events are ignored, and cursor ownership cannot move between accounts. `npm run test:billing` retains the regression.
+The August 28, 2026 local provider-simulated test-mode exercise covers authenticated Checkout creation, signed-event-only fulfillment, duplicate delivery, renewal, scheduled cancellation, failed invoices, partial and full refunds, provider cancellation, and delayed webhook delivery with zero paid provider calls. It found and fixed a defect where deletion of a fully refunded entitlement also deleted the only stale-event timestamp, allowing an older active event to restore Pro. per codes now retains a durable per-subscription lifecycle cursor separately from the entitlement; terminal events win same-second ties, older and duplicate events are ignored, and cursor ownership cannot move between accounts. `npm run test:billing` retains the regression.
 
-The provider-backed Stripe sandbox exercise on August 28, 2026 then covered a real sandbox Checkout, signed fulfillment, duplicate delivery, owner/mismatched-owner restore, scheduled and terminal cancellation, clock-driven renewal, failed invoice, partial and full refund behavior, and delayed-event recovery. It moved no real money and used only Stripe synthetic test data. The current Stripe `2026-06-24.dahlia` refund event omitted the older `charge.invoice` field; the first full-refund delivery therefore preserved Pro incorrectly. Permitext now resolves the invoice through the charge PaymentIntent and Stripe Invoice Payments API when the direct field is absent. Replaying the same signed provider event removed Pro and canceled the subscription. The contract suite retains that current event shape.
+The provider-backed Stripe sandbox exercise on August 28, 2026 then covered a real sandbox Checkout, signed fulfillment, duplicate delivery, owner/mismatched-owner restore, scheduled and terminal cancellation, clock-driven renewal, failed invoice, partial and full refund behavior, and delayed-event recovery. It moved no real money and used only Stripe synthetic test data. The current Stripe `2026-06-24.dahlia` refund event omitted the older `charge.invoice` field; the first full-refund delivery therefore preserved Pro incorrectly. per codes now resolves the invoice through the charge PaymentIntent and Stripe Invoice Payments API when the direct field is absent. Replaying the same signed provider event removed Pro and canceled the subscription. The contract suite retains that current event shape.
 
 Detailed provider IDs, before/after states, cleanup, and credential boundaries are retained in [PERMITEXT_STRIPE_PROVIDER_SANDBOX_EVIDENCE_2026-08-28.md](./PERMITEXT_STRIPE_PROVIDER_SANDBOX_EVIDENCE_2026-08-28.md). The four exercise customers and test clock were deleted, all created subscriptions ended canceled or incomplete-expired, and the temporary CLI session was revoked. This is provider-created sandbox evidence, not production evidence.
 
 For final provider evidence, use a dedicated production test account and a low-priced live test product approved for this exercise. Real charges and refunds require explicit approval immediately before execution.
 
-Capture the Stripe event ID, Permitext user ID, subscription ID, entitlement before/after, and timestamp for:
+Capture the Stripe event ID, per codes user ID, subscription ID, entitlement before/after, and timestamp for:
 
 1. New Checkout purchase grants Pro only after a signed provider event.
 2. A duplicate Checkout or subscription event is idempotent.
@@ -110,17 +112,17 @@ Capture the Stripe event ID, Permitext user ID, subscription ID, entitlement bef
 6. A failed invoice does not invent a paid renewal and produces an operational warning.
 7. A full refund removes the affected package; a partial refund does not automatically revoke it.
 8. A delayed event older than the stored provider event does not overwrite newer entitlement state.
-9. Restore succeeds only for the Permitext account that owns the Stripe subscription.
+9. Restore succeeds only for the per codes account that owns the Stripe subscription.
 
 ## Apple lifecycle evidence
 
-Perform Sandbox and TestFlight exercises first, then one controlled production purchase only after approval. Capture the Apple notification UUID, original transaction ID, product ID, environment, signed date, Permitext user ID, and entitlement before/after.
+Perform Sandbox and TestFlight exercises first, then one controlled production purchase only after approval. Capture the Apple notification UUID, original transaction ID, product ID, environment, signed date, per codes user ID, and entitlement before/after.
 
 The permanent local signed-payload exercise and its strict evidence boundary are recorded in [PERMITEXT_APPLE_LOCAL_LIFECYCLE_EVIDENCE_2026-08-28.md](./PERMITEXT_APPLE_LOCAL_LIFECYCLE_EVIDENCE_2026-08-28.md). It covers the same server routes with an ephemeral local trust chain and zero provider calls, but does not replace Apple-created Sandbox or TestFlight evidence.
 
 ### Prepared Sandbox/TestFlight staging guard
 
-Apple documents that development-signed and TestFlight apps use the Sandbox environment, where test purchases do not charge real money. App Store Connect supports separate Production and Sandbox App Store Server Notification URLs. If the Sandbox URL is omitted, Apple sends Sandbox notifications to the Production URL; Permitext must not use that fallback because the Production server intentionally rejects Sandbox transactions.
+Apple documents that development-signed and TestFlight apps use the Sandbox environment, where test purchases do not charge real money. App Store Connect supports separate Production and Sandbox App Store Server Notification URLs. If the Sandbox URL is omitted, Apple sends Sandbox notifications to the Production URL; per codes must not use that fallback because the Production server intentionally rejects Sandbox transactions.
 
 The iOS backend URL now comes from the `PERMITEXT_BACKEND_API_BASE_URL` build setting. Release builds continue to default to `https://permitext-sync.vercel.app`, while an explicitly authorized TestFlight archive can override the setting with a dedicated staging URL.
 
@@ -135,7 +137,7 @@ The verifier fails closed unless the environment is non-Production, Sandbox tran
 
 The existing Vercel Preview environment is not eligible because it shares the Production database. Preparing this guard did not deploy staging, change App Store Connect, upload a build, create a transaction, deliver a notification, or write to a provider.
 
-1. Purchase and restore bind the original transaction ID to exactly one Permitext account.
+1. Purchase and restore bind the original transaction ID to exactly one per codes account.
 2. `DID_RENEW` extends access.
 3. Turning off auto-renew does not remove prepaid access.
 4. `DID_FAIL_TO_RENEW` without `GRACE_PERIOD` removes access; with `GRACE_PERIOD`, it keeps access only through `gracePeriodExpiresDate`.
@@ -148,10 +150,10 @@ The existing Vercel Preview environment is not eligible because it shares the Pr
 
 ## Research turn-pack lifecycle evidence
 
-Keep `PERMITEXT_RESEARCH_PAID_TURNS_ENABLED` disabled until every configured Stripe Price and App Store consumable has passed the applicable checks below. Pack sizes come from Permitext's server catalog; clients never submit an arbitrary credit quantity.
+Keep `PERMITEXT_RESEARCH_PAID_TURNS_ENABLED` disabled until every configured Stripe Price and App Store consumable has passed the applicable checks below. Pack sizes come from per codes' server catalog; clients never submit an arbitrary credit quantity.
 
-1. A successful Stripe payment-mode Checkout or verified Apple consumable transaction credits the authenticated Permitext account exactly once.
-2. The Apple transaction's signed `appAccountToken` matches the stable token issued for that Permitext account.
+1. A successful Stripe payment-mode Checkout or verified Apple consumable transaction credits the authenticated per codes account exactly once.
+2. The Apple transaction's signed `appAccountToken` matches the stable token issued for that per codes account.
 3. Duplicate Stripe events, Apple transaction uploads, notification retries, and client recovery after a lost response do not grant duplicate turns.
 4. Included turns are reserved first; purchased turns are reserved only after the monthly included allowance is exhausted.
 5. A failed or canceled Research request releases its reservation. A completed answer debits a purchased turn exactly once in the same durable commit as the saved answer.
@@ -202,17 +204,17 @@ Do not enable the flag if either platform would show a pack that cannot be fulfi
 
 `PERMITEXT_RESEARCH_KILL_SWITCH=1` immediately prevents new paid Research requests. Each accepted turn atomically reserves its maximum exposure before a provider call, and every provider request consumes that reservation using its declared output-token ceiling.
 
-## Policy-version acceptance preparation
+## Policy-version acceptance
 
-Production readiness also remains closed until counsel-approved policy versions are assigned stable identifiers:
+The November 10 rebrand is deployed with these exact policy identifiers and the approved source hashes. Earlier owner review and activation records retain their original scope; the migration does not assert a new counsel review.
 
 ```text
-PERMITEXT_TERMS_VERSION=<approved version>
-PERMITEXT_PRIVACY_VERSION=<approved version>
-PERMITEXT_SUBSCRIPTION_POLICY_VERSION=<approved version>
+PERMITEXT_TERMS_VERSION=terms-2026-11-10-rebrand
+PERMITEXT_PRIVACY_VERSION=privacy-2026-11-10-rebrand
+PERMITEXT_SUBSCRIPTION_POLICY_VERSION=subscriptions-2026-11-10-rebrand
 ```
 
-Do not populate these variables with the current working drafts merely to pass readiness. The authenticated acceptance endpoint rejects stale versions, timestamps acceptance on the server, and preserves the accepted set in the Permitext account export. Final web/iOS consent presentation and activation remain release-stage work after counsel approval.
+Do not populate these variables with unreviewed drafts merely to pass readiness. The authenticated acceptance endpoint rejects stale versions, timestamps acceptance on the server, and preserves the accepted set in the per codes account export. Future substantive policy changes require their own review, exact artifacts and applicable consent acceptance; passing a configuration check does not establish completed purchase acceptance.
 
 ## Production account export/deletion acceptance
 
@@ -221,7 +223,7 @@ This section prepares the final manual acceptance exercise; it does not authoriz
 ### Safety boundary
 
 - Use a dedicated disposable Production acceptance account controlled by the operator. Never use the owner's primary account, an administrator account, a Lifetime Pro account, or a real customer account.
-- Prefer a free account with no provider-managed billing. A linked Stripe subscription may be included only as part of the separately authorized controlled Production Stripe exercise. Do not combine this exercise with an App Store production purchase: deleting Permitext does not cancel an App Store subscription.
+- Prefer a free account with no provider-managed billing. A linked Stripe subscription may be included only as part of the separately authorized controlled Production Stripe exercise. Do not combine this exercise with an App Store production purchase: deleting per codes does not cancel an App Store subscription.
 - Record the serving release ID, exact serving Git commit, deployment URL, platform/build, operator, timestamp, and a redacted or one-way-hashed test-account identifier before starting.
 - Confirm `/health`, `/release`, the strict Production readiness checks, and the final authentication checks all refer to that same serving deployment. Stop on any mismatch.
 - Keep the deletion progress window open until every stage finishes. Type `DELETE` only after reviewing the displayed scope. Deletion is permanent and cannot be rolled back.
@@ -234,26 +236,26 @@ This section prepares the final manual acceptance exercise; it does not authoriz
 4. Compare the export with the visible account state. Retain only the redacted counts and hashes needed for the acceptance record. Never commit an admin token, session token, raw account export, provider credential, email address, private image, or customer content. Securely remove the temporary raw export after the comparison is recorded.
 5. Record the expected billing result:
    - Free account: Stripe stage `notApplicable`.
-   - Authorized linked Stripe account: Stripe cancellation must be confirmed before Permitext deletes data.
-   - Apple-managed account: stop and use a different disposable account. Permitext deletion reports Apple billing as `userManaged`; it does not cancel Apple billing.
+   - Authorized linked Stripe account: Stripe cancellation must be confirmed before per codes deletes data.
+   - Apple-managed account: stop and use a different disposable account. per codes deletion reports Apple billing as `userManaged`; it does not cancel Apple billing.
    - Lifetime Pro: stop and use a different disposable account because deletion permanently removes the grant.
 
 ### Execute through the customer interface
 
 1. Open Account settings on the selected client and choose Delete Account. Do not call `DELETE /account/delete` manually for the acceptance exercise; the customer interface must prove the complete flow.
-2. Confirm that the warning distinguishes Permitext data deletion from Apple, Stripe, Clerk, Google/Gmail, and Microsoft records. If Apple-managed billing is detected, the interface must require the separate Apple-billing acknowledgment.
-3. Type `DELETE`, start deletion once, and retain the redacted stage result. The server first acquires its exclusive cleanup claim and checks legacy shared-data ownership. If those checks pass, it performs Stripe handling, private-asset deletion, and deletion of the Permitext account and remaining data. Device cleanup and Clerk-identity deletion happen afterward on the client.
+2. Confirm that the warning distinguishes per codes data deletion from Apple, Stripe, Clerk, Google/Gmail, and Microsoft records. If Apple-managed billing is detected, the interface must require the separate Apple-billing acknowledgment.
+3. Type `DELETE`, start deletion once, and retain the redacted stage result. The server first acquires its exclusive cleanup claim and checks legacy shared-data ownership. If those checks pass, it performs Stripe handling, private-asset deletion, and deletion of the per codes account and remaining data. Device cleanup and Clerk-identity deletion happen afterward on the client.
 4. A successful server result must report `deleted: true`, `partial: false`, `permitextData: deleted`, `privateAssets: deleted`, and either `stripeBilling: canceled` or `stripeBilling: notApplicable`. The client must then report the device stage complete and the Clerk identity stage complete or legitimately skipped.
 
 ### Stop conditions and partial results
 
 Do not improvise, recreate the account, or repeatedly restart the full deletion after a partial result. Preserve the redacted stage response and investigate the exact boundary first:
 
-- `STRIPE_CANCELLATION_FAILED`: billing cancellation was not confirmed and no Permitext account data was deleted.
+- `STRIPE_CANCELLATION_FAILED`: billing cancellation was not confirmed and no per codes account data was deleted.
 - `ACCOUNT_OPERATION_IN_PROGRESS`: deletion did not begin because an account request is still active. Let the request finish, then retry through the customer interface. Nonempty `records.accountLifecycle` entries in the operator export identify pending guard metadata. An old timestamp alone does not prove that a writer stopped; never expire or clear a guard solely on that basis. A crashed process or uncertain guard release needs support investigation before deletion can continue.
 - `ACCOUNT_DELETION_IN_PROGRESS`: another cleanup attempt holds the account claim. Keep the original progress window open; do not start a competing deletion, sign-in, or content mutation. If its result is unavailable, establish the original request's final state before any manual repair. Ordinary reported failures release their claim; an interrupted process may require support investigation.
 - `ACCOUNT_SHARED_DATA_REVIEW_REQUIRED`: cleanup stopped before billing, files, or account records changed. Review `deletionOwnershipReview`, `records.projectOwnerships`, organization dependency counts, and the explicit owner scopes on retained artifacts and links. The storage account and organization owner can both require review, including when a historical Project registry is incomplete. Preserve the records and referenced private files; identify all affected ownership scopes and prepare the exact authorized legacy recovery or disposal scope. Do not reassign metadata alone, delete another account, or restore retired firm administration to bypass this guard. A reviewed recovery/disposal workflow remains required; a blocked deletion is not completed account-deletion acceptance.
-- `PRIVATE_ASSET_DELETION_FAILED`: applicable Stripe cancellation may already be complete, while the Permitext account and remaining data still exist.
+- `PRIVATE_ASSET_DELETION_FAILED`: applicable Stripe cancellation may already be complete, while the per codes account and remaining data still exist.
   A `causeCode` of `PRIVATE_ASSET_OWNERSHIP_UNRESOLVED` or `PRIVATE_ASSET_OWNER_CONFLICT` means file ownership must be resolved through support before retrying. The inventory stops before deleting private files or account data in these cases. Do not bypass this check by editing authored text, guessing ownership from a Project ID, or deleting an entire shared Project directory. The normal inventory covers typed image/report metadata, pending Code Memo outputs, and new account-scoped Notebook upload directories; unknown historical files are not claimed removed.
 - `ACCOUNT_DATA_DELETION_FAILED`: applicable Stripe cancellation and private-image deletion may already be complete, while deletion of the remaining account data was not confirmed.
 - Server success followed by device or Clerk failure: do not repeat server deletion. Use only the client's **Retry cleanup** action for the unfinished local or identity stage.
@@ -262,11 +264,11 @@ Escalate a partial result using the support process before any new charge, new a
 
 ### Required post-deletion evidence
 
-1. Confirm the deleted session receives HTTP `401` on an authenticated Permitext request and cannot sync or recover the prior data.
+1. Confirm the deleted session receives HTTP `401` on an authenticated per codes request and cannot sync or recover the prior data.
 2. Capture a post-deletion `POST /admin/accounts/restore-checklist` result showing no active account, entitlement, session, passkey credential, mutation, Research history, artifact, Project link, or organization-owned record for the test account. Every value in `recordCounts`, including pending Code Question issuance, counters, and outbox entries, must be zero. A post-deletion `POST /admin/accounts/export` must return a null account and entitlement, `hasSession: false`, empty credentials and mutations, and an empty array for every `records` family. Independently inspect the documented retained billing/replay guards; they are not active customer content and must not be inferred absent from this snapshot.
 3. Confirm the private test image is unavailable, the client is signed out, and the representative local records are cleared from the tested device/browser.
-4. For a Clerk-backed account, confirm the Permitext Clerk identity was removed. Do not claim that Permitext deleted the external Apple, Google/Gmail, or Microsoft identity; it does not.
-5. Sign in again with the same external identity only after the deletion result is complete. It must create an empty Free Permitext account: no prior content, Pro entitlement, organization, or usable old session may return.
+4. For a Clerk-backed account, confirm the per codes Clerk identity was removed. Do not claim that per codes deleted the external Apple, Google/Gmail, or Microsoft identity; it does not.
+5. Sign in again with the same external identity only after the deletion result is complete. It must create an empty Free per codes account: no prior content, Pro entitlement, organization, or usable old session may return.
 6. If the exercise included an authorized Stripe subscription, confirm the subscription is canceled in Stripe and that delayed or duplicate provider events do not restore access. If a purchase existed, retain only redacted aggregate evidence that the minimal purchase-ownership tombstone remains to prevent replay; it is not active customer content or an entitlement.
 7. Record the cleanup of the recreated disposable account as a separate authorized destructive action. Do not leave a test account, test content, live subscription, or raw export behind.
 
@@ -279,7 +281,7 @@ For every exercise, record:
 - Release identifier and Git commit
 - Deployment URL
 - Provider environment and provider event identifiers
-- Test Permitext account
+- Test per codes account
 - Expected and observed entitlement transition
 - Cross-platform verification result
 - Database evidence with secrets and personal data redacted

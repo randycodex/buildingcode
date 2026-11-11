@@ -1,6 +1,10 @@
 # App Store Screenshot Package
 
-## Current local candidate
+## November 10 migration status
+
+The App Store draft is now **per codes**. The inspected iPhone screenshot slot has no uploaded screenshots or previews. The retained candidates below document older builds; recapture and inspect a set from the selected rebranded release candidate before a future submission. No screenshot package was uploaded or App Store release submitted during this migration.
+
+## Retained September 5 local candidate
 
 September 5: [build 58 candidate](./build58-candidate/provenance.json) contains
 four newly captured `1320 × 2868` Release Simulator images. PNG originals are in

@@ -1,4 +1,6 @@
-# Permitext Beta 1 operations runbook
+# per codes Beta 1 operations runbook
+
+Current domain and branding: **per.codes / per codes**. The November 10 migration retained the existing accounts, purchase IDs, database and legacy backend address. See [migration receipts](./PER_CODES_MIGRATION_2026-11-10.md). Earlier dated acceptance evidence keeps its original scope.
 
 This runbook defines the minimum operating loop for a public Beta 1. It separates code that is present from production monitoring that still has to be configured and exercised.
 
@@ -11,7 +13,7 @@ This runbook defines the minimum operating loop for a public Beta 1. It separate
 - Beta 1 support target: acknowledge account, billing, data-loss, and access reports within one business day; acknowledge other reports within two business days. This is an operating target, not a contractual service-level agreement.
 - Do not request passwords, session tokens, provider receipts, or full database records by email.
 
-Use the same operating loop for every report: acknowledge and set the next update time; collect platform, release/build, approximate time, expected behavior, and the minimum account identifier; classify scope and severity; use read-only Permitext/provider evidence first; contain a systemic failure before attempting repair; verify recovery; and record the customer update and next owner. An email assertion alone never authorizes an entitlement grant, refund, destructive data action, or official code interpretation.
+Use the same operating loop for every report: acknowledge and set the next update time; collect platform, release/build, approximate time, expected behavior, and the minimum account identifier; classify scope and severity; use read-only per codes/provider evidence first; contain a systemic failure before attempting repair; verify recovery; and record the customer update and next owner. An email assertion alone never authorizes an entitlement grant, refund, destructive data action, or official code interpretation.
 
 Before public Beta, complete the three synthetic scenarios in [BETA1_SUPPORT_TABLETOP_RECORD.md](./BETA1_SUPPORT_TABLETOP_RECORD.md). The document contract is automated, but only a timed operator-run record can confirm the process is operable.
 
@@ -53,7 +55,7 @@ For a persistent blocker or uncertain cleanup result:
    recovery procedure.
 5. Before any destructive retry or provider cleanup, present the exact account,
    records, private files, billing effects, retained shared/legacy data and backup
-   evidence for the required approval. A Permitext deletion response does not
+   evidence for the required approval. A per codes deletion response does not
    establish Clerk deletion, Apple subscription cancellation, or cleanup on an
    independent device. Verify each applicable outcome separately.
 6. For confirmed account linking, use the retained source-work recovery export
@@ -69,7 +71,7 @@ support tabletop is retained with its original scope.
 
 ## Monitoring baseline
 
-Permitext emits structured Vercel runtime events for:
+per codes emits structured Vercel runtime events for:
 
 - dynamic routes taking at least 2,000 ms by default (configurable with `PERMITEXT_SLOW_REQUEST_MS`);
 - every dynamic route returning a 5xx status;
@@ -98,13 +100,13 @@ Minimum alerts:
 
 The alert destination and named on-call owner must be recorded before opening the beta. Live Vercel integration changes require explicit operator authorization.
 
-On August 28, 2026, the owner authorized and live-verified two included, Permitext-scoped Vercel rules: production 5xx anomalies and infrastructure-usage anomalies. Owner email and web subscriptions are checked; SMS remains off. Custom thresholds for health, billing, 5xx rate, and Research p95 were not applied because Vercel reported a current limit of zero custom alerts. No paid add-on was enabled. Full evidence and retained threshold definitions are in [PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md](./PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md).
+On August 28, 2026, the owner authorized and live-verified two included, per codes-scoped Vercel rules: production 5xx anomalies and infrastructure-usage anomalies. Owner email and web subscriptions are checked; SMS remains off. Custom thresholds for health, billing, 5xx rate, and Research p95 were not applied because Vercel reported a current limit of zero custom alerts. No paid add-on was enabled. Full evidence and retained threshold definitions are in [PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md](./PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md).
 
 Until immediate warning-level delivery is separately approved, run this bounded review from the repository root at least daily and after every Production release or incident report:
 
 ```sh
 npx --yes vercel@latest logs \
-  --project permitext-sync \
+  --project per-codes \
   --environment production \
   --since 24h \
   --limit 1000 \
@@ -119,7 +121,7 @@ Exit `0` means the parsed window contained a health request and no covered actio
 
 ## Hosting plan and spend control
 
-- Public commercial Beta 1 must not run on Vercel Hobby. The owner upgraded the Permitext team to Vercel Pro on August 28, 2026 after personally approving and submitting the purchase.
+- Public commercial Beta 1 must not run on Vercel Hobby. The owner upgraded the per codes team to Vercel Pro on August 28, 2026 after personally approving and submitting the purchase.
 - The live plan has a fixed $20 monthly platform fee with $20 of included infrastructure credit. The billing cycle is August 28–September 28, 2026.
 - The owner selected **$20 of on-demand infrastructure spend beyond the included Pro credit per billing cycle**. Web/email spend notifications and automatic Production pause at 100% are on; SMS remains off. Vercel evaluates the threshold periodically, so treat approximately $40 plus tax and a possible small metering overrun—not an exact $40 ceiling—as the initial total monthly hosting exposure.
 - The Vercel platform fee, seats, integrations, and add-ons are outside that on-demand spend amount. Record them separately in the monthly operating-cost review.
@@ -131,11 +133,11 @@ Use [BETA1_SPEND_CONTROL_ACCEPTANCE_RECORD.md](./BETA1_SPEND_CONTROL_ACCEPTANCE_
 ## Identity credential rotation
 
 - Owner: Higinio Jimenez Manzano (`permitext@gmail.com`).
-- The active Microsoft OAuth client secret for **Permitext Clerk Production** expires on **February 17, 2027**.
-- Operator reminders are active in the Codex heartbeat **Permitext Microsoft OAuth rotation reminders** (`permitext-microsoft-rotation-30-days`) for January 18, February 3, and February 10, 2027 at 9:00 AM in the local automation time zone. Treat the 30-day reminder as the rotation deadline, not the expiration date.
-- Rotate by creating a replacement secret in the Permitext Microsoft Entra directory, updating Clerk production, and verifying a complete Microsoft sign-in before deleting or allowing the prior secret to expire.
-- The active Sign in with Apple key is **Permitext Clerk Production**, Key ID `X2UVYL4XC7`, under Team ID `57BY95X97H` and Services ID `com.randycodex.permitext.web`. Apple keys do not expire automatically; rotate immediately if exposure or unauthorized access is suspected.
-- Apple Private Email Relay has the SPF-verified source `bounces+113080807@clkmail.permitext.com`. Reverify it in Apple after changing Clerk email delivery or the `clkmail.permitext.com` DNS configuration.
+- The active Microsoft OAuth client secret for client `224c0519-a19d-4048-94c2-bc25508d54a7` expires on **February 17, 2027**.
+- The earlier operator record identifies reminder `permitext-microsoft-rotation-30-days` for January 18, February 3, and February 10, 2027 at 9:00 AM in the local automation time zone. This migration did not change or reverify that automation. Treat the 30-day reminder as the rotation deadline, not the expiration date.
+- Rotate by creating a replacement secret in the per codes Microsoft Entra directory, updating Clerk production, and verifying a complete Microsoft sign-in before deleting or allowing the prior secret to expire.
+- The active Sign in with Apple key is Key ID `X2UVYL4XC7`, under Team ID `57BY95X97H` and Services ID `com.randycodex.permitext.web`. Apple keys do not expire automatically; rotate immediately if exposure or unauthorized access is suspected.
+- Apple Private Email Relay has the new SPF-verified source `bounces+113080807@clkmail.per.codes`; the old-domain source remains registered for compatibility. Reverify it in Apple after changing Clerk email delivery or the `clkmail.per.codes` DNS configuration.
 - Rotate Apple credentials by creating a replacement Sign in with Apple key, updating Clerk production, verifying web and physical-device Apple sign-in, and only then revoking the prior Apple key. The one-time `.p8` download must not remain on operator storage after Clerk accepts it.
 - Never place an OAuth client secret or private key in source control, local documentation, support email, screenshots, or incident records. Record only the credential identifier, creation/expiration dates, operator, and verification result.
 - Recheck Google, Microsoft, Apple, and passwordless email sign-in after any Clerk production identity change.
@@ -202,7 +204,7 @@ The first provider-backed Neon/Blob restore acceptance passed on August 29, 2026
 
 Use `docs/BETA1_RESTORE_DRILL_RECORD.md` to record the first exercise. Neon history retention and Vercel deployment retention must be checked in the live dashboards because plan limits can change.
 
-On August 28–29, 2026, the owner-authorized provider exercise created and verified a point-in-time Neon child branch, matched 38 Permitext tables and 3,611 rows by content digest, and inventoried/retrieved all used private Blob asset classes. The follow-up acceptance deployed the exact serving Production commit only as an SSO-protected Preview against a fresh isolated Neon restore and separately copied all 124 private Blob objects / 5,248,939 bytes into an isolated namespace. Health, release, aggregate, representative-account, and byte-for-byte Blob checks passed; provider writes and Production resources remained untouched. Evidence: [PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md](./PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md).
+On August 28–29, 2026, the owner-authorized provider exercise created and verified a point-in-time Neon child branch, matched 38 per codes tables and 3,611 rows by content digest, and inventoried/retrieved all used private Blob asset classes. The follow-up acceptance deployed the exact serving Production commit only as an SSO-protected Preview against a fresh isolated Neon restore and separately copied all 124 private Blob objects / 5,248,939 bytes into an isolated namespace. Health, release, aggregate, representative-account, and byte-for-byte Blob checks passed; provider writes and Production resources remained untouched. Evidence: [PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md](./PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md).
 
 ## Incident record
 

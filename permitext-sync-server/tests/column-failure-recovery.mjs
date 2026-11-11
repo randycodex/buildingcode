@@ -8,7 +8,7 @@ assert(begin > 0 && end > begin);
 function lookupHarness() {
   const pending = [];
   let current = true;
-  const c = vm.createContext({ identity: null, selectedFolderType: 'project', isEditing: false,
+  const c = vm.createContext({ identity: null, selectedFolderType: 'project', isEditing: false, autoSave: false,
     isCurrent: () => current,
     addressInput: { value: 'Sample address' }, propertyLookupStatus: { dataset: {}, textContent: '' },
     activeAccount: () => ({ id: 'isolated' }),
@@ -22,9 +22,10 @@ function lookupHarness() {
   pending[0].resolve({property:{structuredFacts:[{value:'R8A',status:'sourced'},{value:'Unavailable',status:'unknown'}],warnings:['Mapped-area facts were unavailable.'],normalizedAddress:'Normalized address'}});
   await p;
   assert.equal(c.propertyLookupStatus.dataset.state,'warning');
-  assert.match(c.propertyLookupStatus.textContent,/Imported 1 sourced facts/);
+  assert.match(c.propertyLookupStatus.textContent,/Imported 1 existing-property facts from NYC Planning/);
   assert.match(c.propertyLookupStatus.textContent,/Mapped-area facts were unavailable/);
-  assert.equal(c.addressInput.value,'Normalized address');
+  assert.match(c.propertyLookupStatus.textContent,/tax-lot record uses Normalized address; your entered address was preserved/);
+  assert.equal(c.addressInput.value,'Sample address','A tax-lot address cannot replace the entered building address');
 }
 {
   const {c,pending}=lookupHarness(); const old=c.lookup();

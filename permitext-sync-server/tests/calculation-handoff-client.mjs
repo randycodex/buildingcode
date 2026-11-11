@@ -5,6 +5,7 @@ import {calculateOccupantLoad,calculationNoteBlocks,occupantLoadSource,occupantL
 import {parseFragment} from 'parse5';
 import {calculationDraftStore} from '../public/calculation-drafts.js';
 import {restoreNotebookPassageText} from '../public/notebook-passage-blocks.js';
+import {generatedNoteTitle} from '../public/notebook-titles.js';
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const a=app.indexOf('function renderOccupantLoadCalculation('),b=app.indexOf('\nasync function addPassageToNotebook',a);
 const source={sectionID:'2152',sectionNumber:'1004.1.3',codePrefix:'BC',codeVersion:'CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1'};
@@ -17,7 +18,7 @@ for(const stale of [false,true]) {
  const storageValues=new Map();
  const localStorage={getItem:key=>storageValues.get(key)??null,setItem:(key,value)=>storageValues.set(key,value)};
  let options,resolve; const gate=new Promise(r=>resolve=r); const calls=[];
- const context=vm.createContext({occupantLoadSource,occupantLoadPrefill,occupantLoadTable:readTable,occupantLoadTableInput,calculateOccupantLoad,calculationNoteBlocks,calculationDraftStore,localStorage,privateWorkspaceKeys:()=>({baseWorkspaceKey:"private-owner"}),calculationDraftViews:new Set(),
+ const context=vm.createContext({occupantLoadSource,occupantLoadPrefill,occupantLoadTable:readTable,occupantLoadTableInput,calculateOccupantLoad,calculationNoteBlocks,calculationDraftStore,generatedNoteTitle,localStorage,privateWorkspaceKeys:()=>({baseWorkspaceKey:"private-owner"}),calculationDraftViews:new Set(),
   calculatorFootnoteAssessmentFor:()=>null,calculatorConversationForPane:()=>null,supplementalResearchConversations:new Map(),activeResearchConversation:null,
   state:{workflowNavigationGeneration:0},activeWorkspaceID:'workspace',captureAccountRequest:()=>({userID:'owner'}),
   isCurrentAccountRequest:()=>true,hasCapability:()=>true,workspaceProject:()=>({id:'project'}),researchProjectID:()=> 'project',researchCodeEdition:()=> '2022',

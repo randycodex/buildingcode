@@ -1,4 +1,10 @@
-# Permitext App Store Review and Privacy Checklist
+# per codes App Store Review and Privacy Checklist
+
+## November 10 domain migration
+
+The current app brand is **per codes** and the canonical site is **https://per.codes**. Draft app/subscription names, description, review-note branding and support/marketing/privacy URLs were saved in the existing App Store Connect app. Production Server Notifications now use `https://per.codes/billing/apple/notifications`; bundle/product IDs and the isolated Sandbox backend are unchanged. See [current metadata and remote draft receipt](./metadata-en-US.md) and [migration verification](../../../docs/PER_CODES_MIGRATION_2026-11-10.md).
+
+No new binary was uploaded or submitted. Manual release remains selected. The owner accepted the updated Developer Program agreement directly; App Store Connect still shows a separate updated Paid Applications Schedule notice; this migration did not accept it. Earlier agreement, tax, privacy-questionnaire and TestFlight receipts below are historical evidence with their original dates and scope.
 
 This is the working checklist for App Store version 1.0. It separates preparation from public declarations and submission actions.
 

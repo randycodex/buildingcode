@@ -88,8 +88,8 @@ assert.equal(readPendingResearchIntent(storage, {
   allowedWorkspaceIDs: new Set(["workspace-main"])
 }), null);
 
-assert.match(appSource, /Explore NYC construction codes\./);
-assert.match(appSource, /Read enacted text, follow references, and search for the provisions you need\./);
+assert.match(appSource, /heading\.textContent = "explore NYC construction codes"/);
+assert.match(appSource, /supporting\.textContent = "read enacted text, follow references, and search for the provisions you need"/);
 assert.match(appSource, /getPro.textContent = "Get Pro"/);
 assert.doesNotMatch(appSource, /See How Research Works/);
 assert.doesNotMatch(appSource, /Illustrative Research example/);

@@ -90,9 +90,9 @@ assert.match(webClient, /projectButton\.textContent = "Add to Project"/);
 assert.match(webClient, /title\.textContent = "Reports"/);
 assert.doesNotMatch(webClient, /title\.textContent = "Report exports"/);
 // Web bulk deletion is recoverable Trash; native labels remain a separate contract.
-assert.match(webIndex, /data-clear-action="bookmarks"[^>]*aria-label="Move all saved passages to Trash"[^>]*>Move all to Trash/);
-assert.match(webIndex, /<summary>Trash<\/summary>/);
-assert.match(webIndex, /Restore deleted items for 30 days across synced devices\. Newer work is kept\./);
+assert.match(webIndex, /data-clear-action="bookmarks"[^>]*aria-label="Move this workspace’s saved passages to Trash"[^>]*>Move all to Trash/);
+assert.match(webIndex, /<summary aria-label="Trash"><span>Trash<\/span>/);
+assert.match(webIndex, /Restore deleted items within 30 days\./);
 assert.doesNotMatch(webIndex, /Clear All Bookmarks/);
 
 assert.match(permitextApp, /\.accessibilityLabel\("Saved"\)/);

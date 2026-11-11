@@ -138,7 +138,7 @@ for (const requiredFailureCode of [
 
 assert.match(runbook, /Server success followed by device or Clerk failure:[\s\S]*Retry cleanup/);
 assert.match(runbook, /deleted session receives HTTP `401`/);
-assert.match(runbook, /empty Free Permitext account/);
+assert.match(runbook, /empty Free per codes account/);
 assert.match(runbook, /minimal purchase-ownership tombstone remains to prevent replay/);
 
 assert.match(server, /"admin\/accounts\/restore-checklist": handleRestoreChecklist/);

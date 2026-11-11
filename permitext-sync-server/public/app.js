@@ -9,7 +9,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-per-codes-v1651";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261110-per-codes-v1652";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=8";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -161,7 +161,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261110-per-codes-v1651";
+} from "./offline-storage.js?v=20261110-per-codes-v1652";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -41720,7 +41720,8 @@ function wireSettingsCardCollapsing(panel) {
 
 
 function profileNeedsName(account) {
-  return !String(account?.displayName || "").trim() || ["per codes account", "Apple account", "Web browser"].includes(account.displayName);
+  // Existing accounts may still carry the former generated placeholder.
+  return !String(account?.displayName || "").trim() || ["per codes account", "Permitext account", "Apple account", "Web browser"].includes(account.displayName);
 }
 
 function profileNeedsSetup(account) {

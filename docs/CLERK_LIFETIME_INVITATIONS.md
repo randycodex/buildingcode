@@ -1,32 +1,34 @@
 # Lifetime Pro invitations
 
+Current domain and branding: **per.codes / per codes**. The November 10 migration retained the existing accounts, purchase IDs, database and legacy backend address. See [migration receipts](./PER_CODES_MIGRATION_2026-11-10.md). Earlier dated acceptance evidence keeps its original scope.
+
 The invitation button opens the branded Clerk Account Portal. Clerk chooses
-sign-up or sign-in for the invited email, then returns the user to the Permitext
+sign-up or sign-in for the invited email, then returns the user to the per codes
 workspace. Complimentary access does not enter the paid upgrade or checkout flow.
 
 In the production Clerk Dashboard, Account Portal → Redirects, both **After
 sign-up fallback** and **After sign-in fallback** must be:
 
 ```
-https://permitext.com/workspace?clerk_return=1
+https://per.codes/workspace?clerk_return=1
 ```
 
-These values were saved and confirmed after a dashboard reload on 2026-11-06.
-The `clerk_return` callback completes Permitext account sign-in and activates a
+The new-domain values were saved and confirmed after a dashboard reload on 2026-11-10, superseding the old-domain values recorded on November 6.
+The `clerk_return` callback completes per codes account sign-in and activates a
 pending Lifetime Pro grant by matching the account's verified email. Invitation
 metadata is only for choosing email wording; it does not authorize access.
 
 Do not set an invitation's `redirectUrl` to the workspace: that bypasses Clerk's
 hosted invitation-ticket handling. New invitations omit that override so Clerk
 can select the appropriate account screen. Existing invitations created by
-Permitext point at the hosted sign-up screen and use the same fallback after
+per codes point at the hosted sign-up screen and use the same fallback after
 authentication. Already delivered emails retain their original text.
 
 ## Approved email copy
 
-**Subject: Your complimentary Lifetime Pro access to Permitext**
+**Subject: Your complimentary Lifetime Pro access to per codes**
 
-You’ve been given complimentary lifetime access to Permitext Pro.
+You’ve been given complimentary lifetime access to per codes Pro.
 
 Create your account using this email address to activate your access. No
 subscription or payment is required.

@@ -93,7 +93,9 @@ for(const fails of [false,true])test(`Account conflict resolution ${fails?'failu
   syncConflictsCard:card,syncConflictsSummary:summary,syncConflictsList:list,document:{createElement:()=>new Element()},
   mutationKindAndRecord:m=>({kind:'annotation',record:m.annotation}),setStatus:()=>{},resolveSyncConflict:async()=>{if(fails)throw Error('Offline');state.syncConflicts=[];}});
  const start=source.indexOf('  const renderSyncConflictReview = () => {');
- vm.runInContext(source.slice(start,source.indexOf('\n  let settingsProjects',start))+'\nrenderSyncConflictReview();',c);
+ const end=source.indexOf('\n  const savedContentLibrary =',start);
+ assert(start>=0&&end>start,'Extract only the conflict-review renderer from Settings');
+ vm.runInContext(source.slice(start,end)+'\nrenderSyncConflictReview();',c);
  const actions=list.children[0].children.at(-1),button=actions.children[0];await button.events.click();
  if(fails){assert.equal(card.hidden,false);assert.equal(list.children.length,1);assert.ok(actions.children.every(b=>!b.disabled));}
  else{assert.equal(card.hidden,true);assert.equal(list.children.length,0);assert.equal(summary.textContent,'');}

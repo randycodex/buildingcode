@@ -3,10 +3,13 @@ import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {emptyWorkspaceLayout,normalizeWorkspaceLayout,captureWorkspaceLayout,applyWorkspaceLayout} from '../public/workspace-state.js';
 import {occupantLoadSource} from '../public/occupant-load-calculation.js';
+import {parse} from 'parse5';
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const html=await readFile(new URL('../public/index.html',import.meta.url),'utf8');
-const section=html.match(/data-workflow-tools="research"[\s\S]*?<\/div>/)[0];
-assert.deepEqual([...section.matchAll(/id="([^"]+)"/g)].map(m=>m[1]),['add-reader','toggle-search','toggle-analysis','toggle-calculator']);
+const elements=(node)=>[node,...(node.childNodes||[]).flatMap(elements)];
+const researchTools=elements(parse(html)).find(node=>node.attrs?.some(attr=>attr.name==='data-workflow-tools'&&attr.value==='research'));
+assert(researchTools,'Research toolbar must exist');
+assert.deepEqual(elements(researchTools).filter(node=>node.tagName==='button').map(node=>node.attrs.find(attr=>attr.name==='id')?.value),['add-reader','toggle-search','toggle-analysis','toggle-calculator']);
 assert.equal(emptyWorkspaceLayout().utilities.calculator,false);
 const original=normalizeWorkspaceLayout({utilities:{calculator:true,analysis:true},paneOrder:['utility:analysis','utility:calculator'],paneWeights:{'utility:calculator':720},collapsedPaneIDs:['utility:calculator']});
 const target={};applyWorkspaceLayout(target,captureWorkspaceLayout(original));
@@ -19,7 +22,7 @@ const sharedCard=node(),column=node();
 const runtime=vm.createContext({state:{utilities:{calculator:false},paneOrder:['reader:1','utility:calculator'],paneWeights:{}},
  document:{createElement:node},circleXIconSVG:()=>'<svg/>',applyPaneWeight(){},
  renderOccupantLoadCalculation(source,options){sharedSource=source;sharedOptions=options;return sharedCard;},
- notifyProjectRequiredForColumn:()=>false,whenWorkspacePaneReady:async()=>true,
+ isProAccount:()=>true,notifyProjectRequiredForColumn:()=>false,whenWorkspacePaneReady:async()=>true,
  toggleUtilityPane:async()=>{runtime.state.utilities.calculator=true;construction++;},
  track:{querySelector:()=>column},columnGroupForPane:()=>({collapsed:groupCollapsed}),setColumnGroupCollapsed(_g,v){groupCollapsed=v;},
  paneIsCollapsed:()=>collapsed,setPaneCollapsed(_p,v){collapsed=v;},scrollPaneIntoView(){reveals++;},

@@ -34,7 +34,7 @@ assert.equal(signedOut.account, settingsCopy.signedOutAccountSummary);
 
 const signedInFree = {
   plan: settingsPlanCopy({ pro: false }),
-  account: settingsAccountSummary({ email: "user@example.com", displayName: "Permitext User", authProvider: "clerk" })
+  account: settingsAccountSummary({ email: "user@example.com", displayName: "per codes User", authProvider: "clerk" })
 };
 assert.equal(signedInFree.plan.title, "Free");
 assert.equal(
@@ -44,7 +44,7 @@ assert.equal(
 
 const signedInPro = {
   plan: settingsPlanCopy({ pro: true, source: "webSubscription" }),
-  account: settingsAccountSummary({ email: "user@example.com", displayName: "Permitext User", authProvider: "clerk" })
+  account: settingsAccountSummary({ email: "user@example.com", displayName: "per codes User", authProvider: "clerk" })
 };
 assert.equal(signedInPro.plan.title, "Pro");
 assert.equal(signedInPro.plan.summary, settingsCopy.proPlanSummary);
@@ -56,7 +56,7 @@ assert(!webIndex.includes('data-profile-edit="publicUsername"'));
 assert(!webApp.includes('name="publicUsername"'));
 assert(!iosSettings.includes('TextField("Username'));
 assert(!iosSettings.includes('Text("@\\(username)")'));
-assert(webApp.includes('accountIdentityName.textContent = account.displayName || "Permitext account"'));
+assert(webApp.includes('accountIdentityName.textContent = account.displayName || "per codes account"'));
 assert(webApp.includes('accountIdentityEmail.textContent = account.email || "Email unavailable"'));
 assert(webApp.includes('accountCopy.textContent = account ? "" : settingsAccountSummary(null)'));
 assert(webApp.includes('replaceActiveAccount(null);\n      panel.closest(".account-dialog")?.close();'));
