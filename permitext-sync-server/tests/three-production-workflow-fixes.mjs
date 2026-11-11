@@ -4,6 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {parseFragment} from 'parse5';
 import {createRequestRateLimit} from '../public/request-rate-limit.js';
 import {createResearchV2View} from '../public/research-v2.js';
+import {createResearchOperationGate} from '../public/research-operation-gate.js';
 import {consumeRateLimit, createLocalRateLimitRepository, rateLimitPolicies} from '../rate-limit.mjs';
 import {freezeResearchV2Turn, runResearchV2} from '../research-v2-engine.mjs';
 import {researchFootnoteScopeIssues, researchTableFootnotes} from '../research-table-footnotes.mjs';
@@ -96,6 +97,21 @@ for(let n=0;n<5;n++) {
   const next=createResearchV2View({conversation:{id:'new',sources:[],messages:[]},onDraft:text=>draft=text});
   const nextInput=next.element.querySelector('.rv2-input');nextInput.value='New accepted question';nextInput.handlers.input();await tick();
   assert.equal(draft,'New accepted question');assert.equal(nextInput.value,draft);next.dispose();
+}
+// A replacement view observes the same pending creation. Context-review
+// operations may still accept draft typing; a new-chat transition may not.
+for(let n=0;n<5;n++) {
+  const gate=createResearchOperationGate(),scope='owner:workspace',other='different-owner:workspace';
+  const adapter={status:()=>gate.status(scope),blocksInput:()=>gate.blocksInput(scope),subscribe:fn=>gate.subscribe(scope,fn)};
+  const release=gate.begin(scope,'Starting new chat…',{blocksInput:true});
+  const make=()=>createResearchV2View({conversation:{id:'old',sources:[],messages:[]},initialDraft:'Retained',onDraft(){},operationGate:adapter});
+  let view=make();assert.equal(view.element.querySelector('.rv2-input').disabled,true);view.dispose();
+  view=make();assert.equal(view.element.querySelector('.rv2-input').disabled,true,'Remount cannot reopen the old composer');
+  assert.equal(gate.blocksInput(other),false,'Another account does not inherit the transition');
+  const releaseReview=gate.begin(scope,'Reviewing context…');release();
+  assert.equal(view.element.querySelector('.rv2-input').disabled,false,'Only the creation operation blocks typing');
+  assert.equal(view.element.querySelector('.rv2-send').disabled,true,'Remaining context review still blocks Send');
+  releaseReview();assert.equal(view.element.querySelector('.rv2-input').value,'Retained');view.dispose();
 }
 
 // Use the actual code passage, including its real table row markers and notes.

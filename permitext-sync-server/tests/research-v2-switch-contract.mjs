@@ -105,8 +105,15 @@ console.log('Late completion passed: account, workspace and closed-pane changes 
  f.context.supplementalResearchConversations.set('a',f.conversations.a);
  await f.context.renderResearchV2Pane('instance:instance',{available:true});
  f.options.onDraft('Retain the former draft');
- f.context.postResearch=async (path,body)=>{assert.equal(path,'/research/conversations/create');assert.equal(body.projectID,'project-a');return{conversation:created};};
- await f.options.onNew();
+ let finishCreate;
+ f.context.postResearch=async (path,body)=>{assert.equal(path,'/research/conversations/create');assert.equal(body.projectID,'project-a');return new Promise(resolve=>finishCreate=resolve);};
+ const starting=f.options.onNew();
+ assert.equal(f.options.operationGate.blocksInput(),true,'Creation is locked before yielding');
+ await f.context.renderResearchV2Pane('instance:instance',{available:true},{panel:f.panel,conversation:f.conversations.a,
+  listed:{conversations:[f.conversations.a],hasMore:false,nextCursor:null}});
+ assert.equal(f.options.operationGate.blocksInput(),true,'A remounted adapter retains the pending creation lock');
+ finishCreate({conversation:created});await starting;
+ assert.equal(f.options.operationGate.blocksInput(),false,'The lock releases only after publication');
  assert.equal(f.instance.conversationID,'created');assert.equal(f.instance.draft,'');
  assert.equal(f.context.researchNewChatDrafts.get('followup:a'),'Retain the former draft');
  assert.deepEqual([...f.context.supplementalResearchConversationIDs],['created']);

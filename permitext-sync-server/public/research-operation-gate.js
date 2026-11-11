@@ -11,13 +11,14 @@ export function createResearchOperationGate() {
     if (!state.operations.size && !state.listeners.size) scopes.delete(key);
   };
   return {
-    status:key => [...(scopes.get(key)?.operations.values() || [])].at(-1) || '',
+    status:key => [...(scopes.get(key)?.operations.values() || [])].at(-1)?.label || '',
+    blocksInput:key => [...(scopes.get(key)?.operations.values() || [])].some(operation => operation.blocksInput),
     subscribe(key, listener) {
       const state = entry(key); state.listeners.add(listener);
       return () => {state.listeners.delete(listener);notify(key,state);};
     },
-    begin(key, label) {
-      const state = entry(key), token = {}; state.operations.set(token,label);notify(key,state);
+    begin(key, label, {blocksInput = false} = {}) {
+      const state = entry(key), token = {}; state.operations.set(token,{label,blocksInput});notify(key,state);
       return () => {state.operations.delete(token);notify(key,state);};
     }
   };

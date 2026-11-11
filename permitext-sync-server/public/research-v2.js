@@ -224,7 +224,7 @@ export function createResearchV2View(options) {
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
   chat.append(mobileHistory,thread,detail,status,operationStatus,composer);root.append(rail,divider,chat);
   const operationPending=()=>chatTransitionPending||Boolean(options.operationGate?.status());
-  function update(){const pending=operationPending();input.disabled=busy||chatTransitionPending;attach.disabled=busy||includeBusy||revealBusy||pending;send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||pending));
+  function update(){const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());attach.disabled=busy||includeBusy||revealBusy||pending;send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||pending));
     if(newChat)newChat.disabled=busy||includeBusy||revealBusy||pending;
     operationStatus.textContent=chatTransitionPending?'Starting new chat…':options.operationGate?.status() || '';operationStatus.hidden=!pending;
     projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});}

@@ -2,8 +2,8 @@ import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=7";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=25";
-import {createResearchOperationGate} from "./research-operation-gate.js?v=1";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=26";
+import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
@@ -12,7 +12,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-three-workflow-fixes-v1670";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-three-workflow-fixes-v1671";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=10";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -165,7 +165,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261111-three-workflow-fixes-v1670";
+} from "./offline-storage.js?v=20261111-three-workflow-fixes-v1671";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -26730,16 +26730,19 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       renderAnswerActions:message=>renderResearchNotebookHandoff(conversation,message,{linkForReport:true}),
       renderProjectContext:host=>renderResearchProjectContext(host, conversation || {primaryProjectID:researchWorkspaceProjectID(),id:''}, {onUpdated:publish}),
       operationGate:{status:()=>researchOperations.status(researchOperationScope(accountIdentity,workspaceID)),
+        blocksInput:()=>researchOperations.blocksInput(researchOperationScope(accountIdentity,workspaceID)),
         subscribe:listener=>researchOperations.subscribe(researchOperationScope(accountIdentity,workspaceID),listener)},
       draftKey,initialDraft:draft(), onDraft:saveDraft, isCurrent:current,
       requestStore:{ read:() => { try { return JSON.parse(sessionStorage.getItem(recoveryKey)); } catch { return null; } },
         write:value => { if (value) sessionStorage.setItem(recoveryKey, JSON.stringify(value)); else sessionStorage.removeItem(recoveryKey); } },
       onNew:async () => {
+        const release = researchOperations.begin(researchOperationScope(accountIdentity,workspaceID),'Starting new chat…',{blocksInput:true});
         try {
           if (!researchWorkspaceProjectID()) { await chooseProjectForSaving(); return; }
           const result = await postResearch("/research/conversations/create", {projectID:researchWorkspaceProjectID(),analysisMode:"conversation_only",requestID:crypto.randomUUID()});
           await publish(result);
         } catch(error) { if(current())await showWebNotice("Could not start Research",error.message); }
+        finally { release(); }
       },
       onOpen:async id => {if(id===conversation?.id)return;try {await open(id);}catch(error){if(current())await showWebNotice("Could not open Research",error.message);}},
       onBrowse:() => openReaderFromToolbar(panel),
