@@ -56,10 +56,10 @@ assert.match(sectionDetailSave, /persistSectionBookmark\(sectionPayload, true/);
 assert.doesNotMatch(sectionDetailSave, /showReaderSaveConfirmation\(panel, sectionPayload/);
 assert.doesNotMatch(sectionDetailSave, /removeSectionDetail/,
   "Unbookmarking in Source Detail must leave the passage open for saving again.");
-assert.match(sectionDetail, /actions\.append\(saveButton, projectButton, backButton\)/,
-  "Source Detail keeps project assignment in its header before the menu and close controls.");
-assert.match(sectionDetail, /showSectionProjectAssignment\(panel, sectionPayload, projectButton, \{ chooseDestination: true \}\)/,
-  "The Source Detail header opens a destination picker for its exact passage.");
+assert.match(sectionDetail, /actions\.append\(saveButton, backButton\)/,
+  "Source Detail keeps its workspace-scoped bookmark and close controls without a separate assignment step.");
+assert.doesNotMatch(sectionDetail, /section-detail-project-add|showSectionProjectAssignment\(panel, sectionPayload/,
+  "The current workspace supplies the destination without another project picker.");
 assert.match(webClient, /if \(!panel \|\| panel\.classList\.contains\("section-detail-panel"\)\) return;/,
   "Source Detail does not show Undo because its bookmark remains available.");
 assert.doesNotMatch(sectionDetailSave, /confirmSectionBookmarkRemoval\(panel\)/);

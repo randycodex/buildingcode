@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-activity-clear-alignment-v1705";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-evidence-workspace-v1706";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-activity-clear-alignment-v1705";
+} from "./offline-storage.js?v=20261112-evidence-workspace-v1706";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -22681,15 +22681,7 @@ async function renderSectionDetail(searchID, detail) {
   syncImmediateBookmarkButton(saveButton, saved);
   const actions = document.createElement("div");
   actions.className = "panel-actions";
-  const projectButton = document.createElement("button");
-  projectButton.type = "button";
-  projectButton.className = "section-detail-project-add";
-  projectButton.textContent = saved ? "Project membership" : "Add to Project";
-  projectButton.title = `${sectionPayload.blockID ? 'Passage' : 'Section'} membership`;
-  projectButton.setAttribute("aria-haspopup", "menu");
-  projectButton.setAttribute("aria-expanded", "false");
-  projectButton.hidden = !hasCapability("projects");
-  actions.append(saveButton, projectButton, backButton);
+  actions.append(saveButton, backButton);
   chrome.append(detailTitle, actions);
 
   const content = document.createElement("section");
@@ -22797,10 +22789,6 @@ async function renderSectionDetail(searchID, detail) {
     syncSearchResultBookmarkButtons(sectionPayload, nextSaved);
   };
   notes.addEventListener("permitext-folder-save", syncDetailBookmark);
-  projectButton.addEventListener("click", () => {
-    showSectionProjectAssignment(panel, sectionPayload, projectButton, { chooseDestination: true });
-    panel.__sectionProjectMenu?.addEventListener("permitext-folder-save", syncDetailBookmark);
-  });
 
   backButton.addEventListener("click", () => {
     removeSectionDetail(searchID);
