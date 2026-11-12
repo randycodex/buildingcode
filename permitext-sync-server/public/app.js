@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-trash-heading-v1703";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-search-collapsed-v1704";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-trash-heading-v1703";
+} from "./offline-storage.js?v=20261112-search-collapsed-v1704";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -21780,23 +21780,15 @@ async function renderSearchResults(panel, instance) {
   });
 }
 
-// Choose once from the first available matches, never from a later pagination update.
-// The request suffix describes the durable enabled-source scope; context tokens are
-// intentionally excluded because they change on reload without changing the scope.
+// Retire automatic previews from older clients. Only explicit user expansions
+// open result groups; new results and later pages remain collapsed by default.
 function applyInitialSearchGroupExpansion(instance, matches, sourceScope) {
-  const preferredCodeVersion = sourceScope?.preferredCodeVersion || defaultSyncCodeVersion;
-  const decisionKey = JSON.stringify(["visible-matches-v3", String(instance.query || "").trim(),
+  const decisionKey = JSON.stringify(["collapsed-groups-v4", String(instance.query || "").trim(),
     normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all",
-    sourceScope?.querySuffix || "", preferredCodeVersion, instance.matchMode || "words"]);
+    sourceScope?.querySuffix || "", instance.matchMode || "words"]);
   if (!matches.length || instance.searchExpansionDecisionKey === decisionKey) return false;
   instance.searchExpansionDecisionKey = decisionKey;
   instance.defaultExpandedResultSource = "";
-  const sourceKey = (result) => `${result.codePrefix || "BC"}|${result.codeVersion || defaultSyncCodeVersion}`;
-  const expanded = new Set(normalizeSearchResultSources(instance.expandedResultSources));
-  if (!matches.some((result) => expanded.has(sourceKey(result)))) {
-    const preferred = matches.find(result => (result.codeVersion || defaultSyncCodeVersion) === preferredCodeVersion);
-    instance.defaultExpandedResultSource = sourceKey(preferred || matches[0]);
-  }
   return true;
 }
 
@@ -21859,15 +21851,13 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         count.className = "search-result-group-count";
         meta.append(count);
         label.append(meta);
-        const initiallyCollapsed = searchInstance.defaultExpandedResultSource !== sourceKey &&
-          !normalizeSearchResultSources(searchInstance.expandedResultSources).includes(sourceKey);
+        const initiallyCollapsed = !normalizeSearchResultSources(searchInstance.expandedResultSources).includes(sourceKey);
         const syncToggleLabel = (expanded) => {
           label.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} ${codeDisplayLabel(prefix, sourceVersion)} results`);
         };
         syncToggleLabel(!initiallyCollapsed);
         group.setSearchExpanded = wireProjectSectionMotion(group, groupBody, [label], codeDisplayLabel(prefix, sourceVersion), !initiallyCollapsed, {
           onChange: (expanded) => {
-            if (searchInstance.defaultExpandedResultSource === sourceKey) searchInstance.defaultExpandedResultSource = "";
             const expandedSources = new Set(normalizeSearchResultSources(searchInstance.expandedResultSources));
             if (expanded) expandedSources.add(sourceKey);
             else expandedSources.delete(sourceKey);
@@ -21959,19 +21949,13 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       count.textContent = searchGroupCountText(loadedGroupCount, results.dataset.searchHasMore === "true");
     }
   });
-  // Keep the automatic preview first, then the usual family/edition order.
-  // Later pages retain the same preview source and never reopen collapsed groups.
-  const previewSource = searchInstance.defaultExpandedResultSource;
-  const previewPrefix = String(previewSource || "").split("|")[0];
-  const previewFamily = previewPrefix === "BC68" ? "BC" : previewPrefix;
+  // Keep the usual family/edition order as later pages arrive.
   const familyOrder = ["BC", "EBC", "FGC", "MC", "PC", "ECC", "EC", "FC", "ZR", "HMC", "AC", "T24", "T25", "T26", "T28", "LL"];
   Array.from(results.querySelectorAll(".search-family-card"))
-    .sort((a, b) => Number(b.dataset.family === previewFamily) - Number(a.dataset.family === previewFamily) ||
-      familyOrder.indexOf(a.dataset.family) - familyOrder.indexOf(b.dataset.family))
+    .sort((a, b) => familyOrder.indexOf(a.dataset.family) - familyOrder.indexOf(b.dataset.family))
     .forEach((family) => {
       Array.from(family.querySelectorAll(".search-result-group"))
-        .sort((a, b) => Number(b.dataset.sourceKey === previewSource) - Number(a.dataset.sourceKey === previewSource) ||
-          Number.parseInt(researchCodeEdition({codePrefix:b.dataset.codePrefix, codeVersion:b.dataset.sourceVersion}), 10) - Number.parseInt(researchCodeEdition({codePrefix:a.dataset.codePrefix, codeVersion:a.dataset.sourceVersion}), 10))
+        .sort((a, b) => Number.parseInt(researchCodeEdition({codePrefix:b.dataset.codePrefix, codeVersion:b.dataset.sourceVersion}), 10) - Number.parseInt(researchCodeEdition({codePrefix:a.dataset.codePrefix, codeVersion:a.dataset.sourceVersion}), 10))
         .forEach((group) => family.append(group));
       results.append(family);
     });

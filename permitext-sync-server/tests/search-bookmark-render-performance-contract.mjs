@@ -126,12 +126,18 @@ console.log(JSON.stringify({ results: 80, initialSummaryReads: 1, initialBookmar
 console.log("Search bookmark render passed: real eager and pending gates, one summary per append, fresh later pages/access updates, exact edition/block/Project identity, duplicate suppression, unchanged citation/title/target output, and revoked account/workspace privacy.");
 
 current = true; selected = "p1";
-const previewResults = new Node("div"); panel.append(previewResults);
-const mechanical = {...matches[0], codePrefix:"MC", id:"mechanical-preview"};
+const collapsedResults = new Node("div"); panel.append(collapsedResults);
+const mechanical = {...matches[0], codePrefix:"MC", id:"mechanical-result"};
 instance.defaultExpandedResultSource = `MC|${defaultSyncCodeVersion}`;
-c.appendSearchResultGroups(previewResults, [...matches, mechanical], "means of egress", instance);
-assert.equal(previewResults.querySelector(".search-family-card").dataset.family, "MC", "The automatic preview's code family appears first");
+c.appendSearchResultGroups(collapsedResults, [...matches, mechanical], "means of egress", instance);
+assert.equal(collapsedResults.querySelector(".search-family-card").dataset.family, "BC", "Old automatic previews never reorder families");
+assert.ok(collapsedResults.querySelectorAll(".search-result-group-toggle").every(button => button.attrs["aria-label"].startsWith("Expand ")), "Old preview state cannot expand a group");
 instance.defaultExpandedResultSource = `BC|${historicalConstructionSyncCodeVersion}`;
-c.appendSearchResultGroups(previewResults, [...matches, mechanical], "means of egress", instance);
-assert.equal(previewResults.querySelector(".search-result-group").dataset.sourceVersion, historicalConstructionSyncCodeVersion, "The preferred historical edition stays first after final sorting");
-console.log("Search preview order passed: preferred family/edition first, stable remaining groups and unchanged result identities.");
+c.appendSearchResultGroups(collapsedResults, [...matches, mechanical], "means of egress", instance);
+assert.equal(collapsedResults.querySelector(".search-result-group").dataset.sourceVersion, defaultSyncCodeVersion, "Editions retain their usual order");
+const expandedResults = new Node("div"); panel.append(expandedResults);
+instance.expandedResultSources = [`MC|${defaultSyncCodeVersion}`];
+c.appendSearchResultGroups(expandedResults, [...matches, mechanical], "means of egress", instance);
+const group = expandedResults.querySelector(`.search-result-group[data-source-key="MC|${defaultSyncCodeVersion}"]`);
+assert.equal(group.querySelector(".search-result-group-toggle").attrs["aria-label"], "Collapse MC results", "Manual expansions remain open");
+console.log("Search group rendering passed: collapsed defaults, ignored legacy previews, explicit expansion and stable family/edition order.");
