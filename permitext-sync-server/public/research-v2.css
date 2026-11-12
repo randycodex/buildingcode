@@ -23,6 +23,8 @@
 .research-v2 .rv2-question-link{display:block;width:100%;padding:12px 0;font-size:14px;line-height:1.5;box-sizing:border-box;min-width:0;overflow-wrap:anywhere;vertical-align:middle;color:var(--text-primary)}
 .rv2-question-title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;white-space:normal;overflow:hidden}
 .research-v2 .rv2-question-link,.research-v2 .rv2-question-link:hover{background:transparent;border-radius:0;box-shadow:none}
+.research-v2 .assistant-history-row-menu{display:inline-flex;align-items:center;justify-content:center;padding:0}
+.research-v2 .assistant-history-row-menu svg{display:block;width:18px;height:18px;flex:0 0 18px;pointer-events:none}
 .research-v2 .assistant-history-row-menu,
 .research-v2 .assistant-history-row-menu:is(:hover,:active,[aria-expanded=true]){background:transparent;border-radius:0;box-shadow:none}
 .research-v2 .assistant-history-row-menu:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}

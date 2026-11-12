@@ -1,5 +1,7 @@
 import {bindFloatingWorkspacePanel} from './floating-workspace-panel.js?v=4';
 
+const historyMenuIcon = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>';
+
 // Deletion belongs to the history list; the server still reviews and fences the exact IDs.
 export function createResearchHistoryManagement({request, confirm, isCurrent, project = () => null,
   beforeDelete, onDeleted, onIncludeHidden, onBusy, includeHidden = false}) {
@@ -125,7 +127,7 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
       {label:'Delete all conversations…',danger:true,run:() => deleteConversations({scope:'all'})}
     ]);
   },'assistant-history-more');
-  more.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>';
+  more.innerHTML = historyMenuIcon;
   more.setAttribute('aria-label','Conversation history options'); more.setAttribute('aria-haspopup','menu'); more.setAttribute('aria-expanded','false');
   const all = action('Select all shown', () => {
     if (busy || !current()) return;
@@ -165,8 +167,9 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
         if (busy || !current()) return;
         checkbox.checked ? selected.add(conversation.id) : selected.delete(conversation.id); paint();
       });
-      const options = action('…', () => showMenu(options,[...(onRename ? [{label:'Rename',run:onRename}] : []),...(onPin ? [{label:conversation.isPinned === true?'Unpin':'Pin',run:onPin}] : []),{label:'Delete',danger:true,
+      const options = action('', () => showMenu(options,[...(onRename ? [{label:'Rename',run:onRename}] : []),...(onPin ? [{label:conversation.isPinned === true?'Unpin':'Pin',run:onPin}] : []),{label:'Delete',danger:true,
         run:() => deleteConversations({scope:'selected',conversationIDs:[conversation.id]},title)}]),'assistant-history-row-menu');
+      options.innerHTML = historyMenuIcon;
       options.setAttribute('aria-label',`Options for ${title}`);
       options.setAttribute('aria-haspopup','menu'); options.setAttribute('aria-expanded','false');
       if (conversation.historyHiddenAt) open.append(node('span','assistant-history-hidden-label','Hidden from History'));
