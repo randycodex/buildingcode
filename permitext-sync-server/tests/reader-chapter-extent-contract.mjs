@@ -44,7 +44,7 @@ class Node {
 }
 const originalDocument = globalThis.document, originalStyle = globalThis.getComputedStyle;
 globalThis.document = { createElement: () => new Node(), createDocumentFragment: () => Object.assign(new Node(), {fragment:true}) };
-globalThis.getComputedStyle = content => ({ paddingLeft:"0", paddingRight:"0", fontFamily:"serif", fontSize:"16px",
+globalThis.getComputedStyle = content => ({ height:content.headerHeight, paddingLeft:"0", paddingRight:"0", fontFamily:"serif", fontSize:"16px",
   getPropertyValue: () => String(content.clientWidth) });
 const sections = Array.from({length:100}, (_, id) => ({id}));
 function fixture(start = 0, end = 5, id = "chapter", revision = "a") {
@@ -104,6 +104,15 @@ try {
     "Reopening reuses measured heights without downloading the old body windows");
   assert.equal(fixture(0, 5, "cache", "changed").content.scrollHeight, 20000,
     "Another corpus revision must not reuse old measured extents");
+
+  const overlay = fixture(48, 53, 'fixed-header');
+  overlay.content.closest = () => ({headerHeight:'160px',getBoundingClientRect:()=>({top:0})});
+  const visiblePassage = overlay.content.querySelector('[data-section-id="48"]');
+  overlay.content.scrollTop -= 160;
+  const beforeHydration = visiblePassage.getBoundingClientRect().top;
+  overlay.extent.replace(36, sections.slice(36, 48).map(section => new Node(700, section.id)), () => {});
+  assert.equal(visiblePassage.getBoundingClientRect().top,beforeHydration,
+    'Loading a placeholder hidden beneath the fixed header cannot move the selected visible passage');
 
   // Exercise the actual asynchronous hydration function with a suspended fetch.
   const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");

@@ -7,7 +7,7 @@ function actual(name){const start=source.indexOf(`function ${name}(`);const end=
 const calls=[],requests=[],reveals=[],placements=[];
 const existing={id:'reader',codePrefix:'BC',codeVersion:'edition',chapterID:'2',sectionID:'114',searchPreviewPaneID:'search'};
 const untouched={id:'other',codePrefix:'PC',chapterID:'10',sectionID:'100'};
-const content={classList:{contains:()=>false},querySelectorAll:()=>[{dataset:{sectionId:'113',sectionAliases:'114 115'}}]};
+const content={classList:{contains:()=>false},querySelectorAll:()=>[{dataset:{sectionId:'113',sectionAliases:'114 115'},classList:{contains:()=>false}}]};
 const panel={dataset:{readerPublicCorpusGeneration:'1'},querySelector:name=>name==='.reader-content'?content:{value:''}};
 const c=vm.createContext({columnExpansionController:()=>({reveal:node=>visibleReaderReveals.push(node)}),paneIsCollapsed:()=>false,state:{readers:[existing,untouched],paneWeights:{}},activeWorkspaceID:'workspace',
   workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=> 'research',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
@@ -88,3 +88,57 @@ assert.deepEqual(c.state.readers.map(reader=>({...reader})),beforeLateSource,'A 
 assert.equal(reveals.length,beforeLateReveal);
 assert.equal(placements.length,beforeLatePlacement);
 console.log('Research, Search-detail and ordinary Reader links passed: exact resolution, adjacent reuse, Project/anchor retention, passage targeting and stale-account isolation.');
+
+// Result publication reserves its final chapter geometry and aligns once in
+// the same turn. No delayed section alignment can pull the passage elsewhere.
+{
+  const events=[],timers=[];
+  const target={classList:{add(){}},closest:()=>target};
+  const content={__sectionAlignmentTimers:[1,2],querySelectorAll:()=>[],_readerPrepareSourceNavigation:()=>events.push('extent')};
+  const pane={querySelector:()=>content};
+  const reader={id:'result'};
+  const publication=vm.createContext({crypto:{randomUUID:()=> 'reveal'},paneIDForReader:r=>r.id,
+    track:{querySelector:()=>pane},CSS:{escape:value=>value},savedReaderTarget:()=>target,
+    window:{setTimeout:callback=>timers.push(callback),clearTimeout:()=>{}},
+    readerSearchMatchScrollTarget:()=>target,readerSectionTitleNode:node=>node,
+    cancelReaderScrollRestore:()=>events.push('cancel-restore'),
+    positionReaderSourceBeforePaint:()=>events.push('align'),
+    watchReaderSourcePosition(){},
+    stabilizeReaderSectionAtHeader:()=>assert.fail('Result publication must not schedule repeated alignment')});
+  vm.runInContext(actual('revealReaderSourceTarget'),publication);
+  assert.equal(publication.revealReaderSourceTarget(reader,{sectionID:'result'},null,{preferPassage:true,immediate:true}),true);
+  assert.deepEqual(events,['extent','cancel-restore','align']);assert.equal(timers.length,0);
+  assert.equal(reader.sourceRevealToken,null);
+}
+console.log('Result publication passed: synchronous extent preparation, one exact alignment and no deferred repositioning.');
+{
+  const section={style:{contentVisibility:'auto'}};
+  let top=500,scrolls=0;
+  const target={closest:()=>section,getBoundingClientRect:()=>({top})};
+  const panel={getBoundingClientRect:()=>({top:0})};
+  const content={querySelectorAll:()=>[section],closest:()=>panel};
+  const c=vm.createContext({getComputedStyle:()=>({height:'100px'}),
+    scrollReaderContentToNode(){scrolls++;top=scrolls===1?120:100;}});
+  vm.runInContext(actual('positionReaderSourceBeforePaint'),c);
+  c.positionReaderSourceBeforePaint(content,target);
+  assert.equal(top,100);assert.equal(scrolls,2,'Skipped text settles synchronously before publication');
+  assert.equal(section.style.contentVisibility,'auto','Bounded measurement restores chapter containment');
+}
+{
+  let resized,mutated,top=100,alignments=0,disconnected=0;
+  const pane=Object.assign(new EventTarget(),{getBoundingClientRect:()=>({top:10})});
+  const target={isConnected:true,getBoundingClientRect:()=>({top})};
+  const content={isConnected:true,closest:()=>pane,querySelectorAll:()=>[{}]};
+  const c=vm.createContext({AbortController,getComputedStyle:()=>({height:'90px'}),
+    ResizeObserver:class {constructor(callback){resized=callback;}observe(){}disconnect(){disconnected++;}},
+    MutationObserver:class {constructor(callback){mutated=callback;}observe(){}disconnect(){disconnected++;}},
+    positionReaderSourceBeforePaint(){alignments++;top=100;}});
+  vm.runInContext(actual('watchReaderSourcePosition'),c);
+  c.watchReaderSourcePosition(content,target);
+  top=130;resized();assert.equal(top,100,'Layout delivery preserves the exact source before paint');
+  top=150;mutated();assert.equal(top,100,'New neighboring section windows preserve the selected source');
+  pane.dispatchEvent(new Event('wheel'));assert.equal(disconnected,2);
+  top=180;resized();assert.equal(top,180,'User scrolling wins over a queued layout delivery');
+  assert.equal(content._readerSourcePosition,undefined);assert.equal(alignments,2);
+}
+console.log('Source anchor lifecycle passed: layout changes retain the passage, user input releases it and queued observers stay cancelled.');

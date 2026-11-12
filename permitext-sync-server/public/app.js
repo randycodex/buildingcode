@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-reader-passage-actions-v1713";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-reader-source-stability-v1717";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -62,7 +62,7 @@ import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=202
 import { searchReaderTextSections, rankReaderSearchResults } from "./reader-search-match.js?v=20261026-exact-section-v4";
 import { searchWords, searchWordPattern } from "./search-words.js?v=20261025-workspace-chrome-v1379";
 import { buildReaderChapterContents, readerContentsLabel, readerContentsChapterKey, readerContentsNodeCanExpand } from "./reader-navigation-tree.js?v=20261112-label-case-v3";
-import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
+import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261112-visible-anchor-v3";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, withoutWorkspaceLayoutSync, retireWorkspaceLayoutSyncEntries } from "./workspace-layout-sync.js?v=5";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-reader-passage-actions-v1713";
+} from "./offline-storage.js?v=20261112-reader-source-stability-v1717";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -17821,6 +17821,7 @@ function collapseRepeatedReaderCatalogAliases(content) {
 }
 
 function stopReaderProgressiveHydration(content) {
+  content?._readerSourcePosition?.abort();
   content?._readerSectionVisibility?.dispose();
   content?.querySelectorAll(".chapter-section").forEach(section => section._readerBlockWindow?.dispose());
   content?._readerProgressiveCleanup?.();
@@ -17883,6 +17884,7 @@ async function progressivelyRenderReaderChapter(
     resizeObserver?.disconnect();
     viewportObserver?.disconnect();
     if (content._readerChapterExtent === extent) delete content._readerChapterExtent;
+    if (content._readerPrepareSourceNavigation === prepareSourceNavigation) delete content._readerPrepareSourceNavigation;
     status.remove();
     scrollFrame = 0;
     connectionTimer = 0;
@@ -17964,7 +17966,7 @@ async function progressivelyRenderReaderChapter(
     }
   };
 
-  const maybeHydrate = () => {
+  const maybeHydrate = (prepareSource = false) => {
     scrollFrame = 0;
     if (stopped) return;
     if (!panel.isConnected) {
@@ -17981,7 +17983,7 @@ async function progressivelyRenderReaderChapter(
       cleanup();
       return;
     }
-    if (!readerPanelIntersectsTrack(panel) || panel.classList.contains("is-workflow-hidden")) return;
+    if (!prepareSource && (!readerPanelIntersectsTrack(panel) || panel.classList.contains("is-workflow-hidden"))) return;
     if (!content.clientWidth || !content.clientHeight) return;
     if (!extent) {
       extent = createReaderChapterExtent(content, sections, initialStart, initialEnd, chapter);
@@ -17989,6 +17991,7 @@ async function progressivelyRenderReaderChapter(
       // Selected middle/end sections now have reserved space before them.
       // Their existing navigation/restoration callbacks align the actual text.
     }
+    if (prepareSource) return;
     if (hydrationInFlight) return;
     const threshold = Math.max(320, content.clientHeight * 0.6);
     const window = extent.nextWindow(readerProgressiveSectionBatchSize, threshold);
@@ -18002,8 +18005,13 @@ async function progressivelyRenderReaderChapter(
 
   function onScroll() {
     if (stopped || scrollFrame) return;
-    scrollFrame = requestAnimationFrame(maybeHydrate);
+    scrollFrame = requestAnimationFrame(() => maybeHydrate());
   }
+
+  // A staged Reader is laid out only after publication. Reserve and measure
+  // its chapter extent synchronously before positioning the incoming passage.
+  const prepareSourceNavigation = () => maybeHydrate(true);
+  content._readerPrepareSourceNavigation = prepareSourceNavigation;
 
   content.addEventListener("scroll", onScroll, { passive: true });
   // Retrying must also work at a scroll boundary where a wheel/touch gesture
@@ -18122,7 +18130,7 @@ async function renderSectionContent(panel, reader, options = {}) {
   panel.dataset.readerContentKey = readerContentScrollKey(reader);
   panel.dataset.readerPublicCorpusGeneration = String(acceptedPublicGeneration);
 
-  if (reader.sectionID && !scrollPosition) {
+  if (reader.sectionID && !scrollPosition && !options.sourceNavigation) {
     requestAnimationFrame(() => {
       if (panel.dataset.readerRenderToken !== renderToken) return;
       const behavior = reader.shouldSmoothScrollToSection ? "smooth" : "auto";
@@ -20554,11 +20562,12 @@ function isHeaderLikeTableRow(row) {
 }
 
 async function renderReader(reader, options = {}) {
-  options = { ...options, scrollPosition: options.scrollPosition || pendingGroupReaderPositions.get(reader.id) || reader.scrollPosition };
+  options = { ...options, scrollPosition: options.sourceNavigation ? undefined : options.scrollPosition || pendingGroupReaderPositions.get(reader.id) || reader.scrollPosition };
   pendingGroupReaderPositions.delete(reader.id);
   // Import before wiring observers. A template clone belongs to its inert
   // document; observing it there before adoption can retain disposed Readers.
   const panel = document.importNode(readerTemplate.content.firstElementChild, true);
+  panel._readerSourceNavigation = options.sourceNavigation || null;
   panel.__workspaceAccessGate = options.accessGate || null;
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
@@ -20802,7 +20811,7 @@ async function renderReader(reader, options = {}) {
     if (options.isSearchResult && !reader.sectionID) {
       blankReader(panel.querySelector(".reader-content"));
     } else {
-      await refreshReaderContent(panel, reader, { scrollPosition: options.scrollPosition });
+      await refreshReaderContent(panel, reader, { scrollPosition: options.scrollPosition, sourceNavigation: options.sourceNavigation });
     }
     if (reader.internalSearchOpen && !isRecentlyViewedLinkedReader) {
       internalSearchButton.setAttribute("aria-pressed", "true");
@@ -40798,15 +40807,69 @@ async function confirmSearchReaderReplacement(reader, detail, anchorPaneID = "")
   );
 }
 
+function watchReaderSourcePosition(content, target) {
+  content._readerSourcePosition?.abort();
+  if (typeof ResizeObserver !== 'function' || typeof MutationObserver !== 'function') return;
+  const controller = new AbortController();
+  content._readerSourcePosition = controller;
+  const align = () => {
+    if (controller.signal.aborted) return;
+    if (!content.isConnected || !target.isConnected) { controller.abort(); return; }
+    const panel = content.closest('.reader-panel');
+    const header = Number.parseFloat(getComputedStyle(panel, '::before').height) || 0;
+    if (Math.abs(target.getBoundingClientRect().top - panel.getBoundingClientRect().top - header) > 1) {
+      positionReaderSourceBeforePaint(content, target);
+    }
+  };
+  const resize = new ResizeObserver(align);
+  const observe = () => {
+    content.querySelectorAll(':scope > .chapter-section').forEach(section => resize.observe(section));
+    align();
+  };
+  const mutation = new MutationObserver(observe);
+  mutation.observe(content, {childList: true});
+  controller.signal.addEventListener('abort', () => {
+    resize.disconnect(); mutation.disconnect();
+    if (content._readerSourcePosition === controller) delete content._readerSourcePosition;
+  }, {once: true});
+  // Browser layout observers run before paint. User input immediately gives
+  // scrolling back to the user; background text hydration keeps its anchor.
+  for (const event of ['wheel', 'touchstart', 'pointerdown', 'keydown']) {
+    (content.closest('.reader-panel') || content).addEventListener(event, () => controller.abort(), {signal: controller.signal, passive: true});
+  }
+  observe();
+}
+
+function positionReaderSourceBeforePaint(content, target) {
+  const section = target.closest('.chapter-section');
+  const sections = Array.from(content.querySelectorAll('.chapter-section'));
+  const index = sections.indexOf(section);
+  const measured = sections.slice(Math.max(0, index - 2), index + 3)
+    .map(node => ({node, visibility: node.style.contentVisibility}));
+  measured.forEach(({node}) => { node.style.contentVisibility = 'visible'; });
+  try {
+    // Scrolling can materialize skipped text. Resolve that bounded layout in
+    // this turn, rather than correcting the Reader after it has been painted.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      scrollReaderContentToNode(content, target, 'auto');
+      const panel = content.closest('.reader-panel');
+      const header = Number.parseFloat(getComputedStyle(panel, '::before').height) || 0;
+      if (Math.abs(target.getBoundingClientRect().top - panel.getBoundingClientRect().top - header) <= 1) break;
+    }
+  } finally {
+    measured.forEach(({node, visibility}) => { node.style.contentVisibility = visibility; });
+  }
+}
+
 function revealReaderSourceTarget(reader, item, evidenceAnchor = null, options = {}) {
   const paneID = paneIDForReader(reader);
   const revealToken = crypto.randomUUID();
   reader.sourceRevealToken = revealToken;
-  [0, 90, 240].forEach((delay) => {
-    window.setTimeout(() => {
+  const reveal = (delay = 0) => {
       if (reader.sourceRevealToken !== revealToken) return;
       const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"]`);
       const content = panel?.querySelector(".reader-content");
+      if (options.immediate) content?._readerPrepareSourceNavigation?.();
       let target = savedReaderTarget(content, item, options),precisePassage=false;
       if (target && options.searchQuery && !normalizeAnnotationBlockID(item.blockID)) {
         const section = target.closest?.(".chapter-section") || target;
@@ -40822,7 +40885,7 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null, options =
         if(passage){target=passage;precisePassage=true;}
       }
       if (!content || !target) return;
-      if(options.researchPassage&&!precisePassage&&delay<240)return;
+      if(options.researchPassage&&!precisePassage&&delay<240&&!options.immediate)return;
       content.querySelectorAll(".is-source-target").forEach((candidate) => {
         candidate.classList.remove("is-source-target");
       });
@@ -40833,10 +40896,18 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null, options =
       }
       const section = target.closest?.(".chapter-section");
       const scrollTarget = options.researchPassage&&precisePassage?target:section ? readerSearchMatchScrollTarget(content, section, target) : target;
-      if (options.preferPassage) stabilizeReaderSectionAtHeader(content, scrollTarget, "auto");
+      if (options.immediate) {
+        (content.__sectionAlignmentTimers || []).forEach(timer => window.clearTimeout(timer));
+        content.__sectionAlignmentTimers = [];
+        cancelReaderScrollRestore(content);
+        positionReaderSourceBeforePaint(content, readerSectionTitleNode(scrollTarget));
+        watchReaderSourcePosition(content, readerSectionTitleNode(scrollTarget));
+      } else if (options.preferPassage) stabilizeReaderSectionAtHeader(content, scrollTarget, "auto");
       else scrollReaderContentToNode(content, scrollTarget, "auto");
-    }, delay);
-  });
+      return true;
+  };
+  if (options.immediate) return reveal();
+  [0, 90, 240].forEach(delay => window.setTimeout(() => reveal(delay), delay));
 }
 
 async function resolveReaderSourceMetadata({sectionID, codePrefix, sectionNumber, codeVersion, hasExplicitVersion}) {
@@ -40935,12 +41006,15 @@ function retainReaderForSource(reader, detail) {
       reader.codePrefix !== detail.codePrefix || reader.codeVersion !== detail.codeVersion) return null;
   const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"]`);
   const content = panel?.querySelector(".reader-content");
-  if (!content || panel.dataset.workspacePaneLoading || content.classList.contains("is-searching-reader") ||
+  if (!content || panel.dataset.workspacePaneLoading || panel.dataset.readerTabPending ||
+      panel.dataset.readerDisplayedTabId && panel.dataset.readerDisplayedTabId !== reader.activeTabID ||
+      content.classList.contains("is-searching-reader") ||
       panel.dataset.readerPublicCorpusGeneration !== String(publicCodeRevision.generation)) return null;
   const section = [...content.querySelectorAll(".chapter-section")].find(node =>
     node.dataset.sectionId === String(detail.sectionID) ||
     node.dataset.sectionAliases?.split(/\s+/).includes(String(detail.sectionID)));
-  return section && savedReaderTarget(content, detail, {preferPassage: true}) ? panel : null;
+  return section && !section.classList.contains('is-reader-suspended') &&
+    savedReaderTarget(content, detail, {preferPassage: true}) ? panel : null;
 }
 
 async function openSourceInReader(item, anchorPaneID = "", options = {}) {
@@ -41014,7 +41088,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
     allowNewColumn: !(fromSearch || fromSaved) || Boolean(options.forceNewReader)
   });
-  const retainedPanel = fromSearch && !options.forceNewReader ? retainReaderForSource(reader, detail) : null;
+  const retainedPanel = ownedSource && !options.forceNewReader ? retainReaderForSource(reader, detail) : null;
   Object.assign(reader, sourceFields);
   resolvedReaderSourceNavigations.set(reader, {chapterID: reader.chapterID, sectionID: reader.sectionID,
     sectionNumber: reader.sectionNumber, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion});
@@ -41023,6 +41097,11 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     reader.searchPreviewPaneID = "";
   }
   const paneID = paneIDForReader(reader);
+  const sourceNavigation = ownedSource ? {
+    paneID, reader, item: navigationItem, evidenceAnchor: options.evidenceAnchor,
+    isCurrent: navigationIsCurrent,
+    options: { preferPassage: true, searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode, immediate: true }
+  } : null;
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
   if (anchorPaneID && anchorPaneID !== paneID && (createdReader || options.forceNewReader || (!ownedSource && !Array.isArray(reader.tabs)))) placePaneAfter(anchorPaneID, paneID);
   else appendPaneIfMissing(paneID);
@@ -41035,16 +41114,21 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     retainedPanel.querySelector(".section-select").value = reader.sectionID || "";
     setTitle(retainedPanel, reader);
   }
-  await transitionWorkspace("utility", { refreshPaneIDs: retainedPanel ? [] : [paneID] });
+  await transitionWorkspace("utility", {
+    refreshPaneIDs: retainedPanel ? [] : [paneID],
+    ...(sourceNavigation ? { readerSourceNavigation: sourceNavigation,
+      readerTabSwitchPaneID: !retainedPanel && !createdReader && !options.forceNewReader ? paneID : "" } : {})
+  });
   if (!navigationIsCurrent() || !await whenWorkspacePaneReady(paneID) || !navigationIsCurrent()) return null;
   const destinationPanel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (destinationPanel && paneIsCollapsed(paneID)) setPaneCollapsed(destinationPanel, false);
   columnExpansionController().reveal(destinationPanel);
-  revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {
+  if (!sourceNavigation?.positioned) revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {
     preferPassage: fromSearch || fromSaved || options.sourceSurface === "search-detail" || options.sourceSurface === "research",
-    researchPassage: options.sourceSurface === "research", searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode
+    researchPassage: options.sourceSurface === "research", searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode,
+    immediate: ownedSource
   });
-  scrollPaneIntoView(paneID);
+  scrollPaneIntoView(paneID, createdReader || options.forceNewReader ? "smooth" : "auto");
   return reader;
 }
 
@@ -49969,6 +50053,12 @@ function getWorkspacePaneHydrator() {
         disposeUnpublishedWorkspacePane(pane);
         return;
       }
+      const sourceNavigation = pane._readerSourceNavigation || job.descriptor.sourceNavigation;
+      if (sourceNavigation && !sourceNavigation.isCurrent()) {
+        disposeUnpublishedWorkspacePane(pane);
+        finishWorkspacePaneReady(shell, false);
+        return;
+      }
       const scrollLeft = track.scrollLeft;
       pane.dataset.workspacePaneIdentity ||= job.descriptor.contentIdentity;
       pane.dataset.workspacePaneAccessIdentity = job.descriptor.accessIdentity;
@@ -49990,7 +50080,10 @@ function getWorkspacePaneHydrator() {
         updateReaderScrollIndicator(pane);
         pane.querySelectorAll("select").forEach(enhanceSelect);
       }
-      if (job.descriptor.scrollPosition) {
+      if (sourceNavigation) {
+        sourceNavigation.positioned = revealReaderSourceTarget(sourceNavigation.reader, sourceNavigation.item,
+          sourceNavigation.evidenceAnchor, sourceNavigation.options);
+      } else if (job.descriptor.scrollPosition) {
         restoreReaderScrollPositions(new Map([[job.id, job.descriptor.scrollPosition]]));
       }
       if (job.descriptor.scrollTop != null) pane.scrollTop = job.descriptor.scrollTop;
@@ -50011,7 +50104,9 @@ function getWorkspacePaneHydrator() {
       shell.dataset.workspacePaneUnavailable = "true";
       if (shell.dataset.readerTabPending) {
         finishWorkspacePaneReady(shell, false);
-        void showWebNotice('Reader could not open', 'Select the tab again to retry, or choose another tab.');
+        void showWebNotice('Reader could not open', job.descriptor.sourceNavigation
+          ? 'Select the result again to retry, or choose another result.'
+          : 'Select the tab again to retry, or choose another tab.');
         return;
       }
       shell.querySelector(".workspace-pane-load-status").textContent = `Could not load ${job.descriptor.label}. Retry when ready.`;
@@ -50131,8 +50226,10 @@ function workspacePaneDescriptors(options = {}) {
   for (const reader of state.readers) {
     initializeReaderTabs(reader);
     const id = paneIDForReader(reader);
+    const sourceNavigation = options.readerSourceNavigation?.paneID === id ? options.readerSourceNavigation : null;
     const scrollPosition = options.readerScrollPositions?.get(id) || reader.scrollPosition;
-    add(id, "Reader", (signal) => renderReader(reader, { scrollPosition, accessGate: options.accessGate, signal }), closeAndRender(() => {
+    add(id, "Reader", (signal) => renderReader(reader, { scrollPosition: sourceNavigation ? undefined : scrollPosition,
+      sourceNavigation, accessGate: options.accessGate, signal }), closeAndRender(() => {
       state.readers = state.readers.filter((item) => item.id !== reader.id);
       state.readers.forEach((item) => { if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = ""; });
       Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
@@ -50141,7 +50238,8 @@ function workspacePaneDescriptors(options = {}) {
     }), {
       publicContent: true,
       identity: workspaceReaderContentIdentity(reader),
-      scrollPosition
+      scrollPosition: sourceNavigation ? undefined : scrollPosition,
+      sourceNavigation
     });
   }
   foundationScope.release("");

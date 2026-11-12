@@ -164,6 +164,7 @@ function savedHarness() {
     showWebNotice:async(title,message)=>notices.push({title,message}),
     normalizeAnnotationBlockID:value=>value||"",transitionWorkspace:async()=>{},whenWorkspacePaneReady:async()=>true,
     resolvedReaderSourceNavigations:new WeakMap(),track:{querySelector:()=>null},CSS:{escape:value=>value},
+    retainReaderForSource:()=>null,
     paneIsCollapsed:()=>false,columnExpansionController:()=>({reveal(){}}),scrollPaneIntoView(){},
     revealReaderSourceTarget:(reader,item,anchor)=>opened.push({reader,item,anchor})
   });

@@ -16,6 +16,13 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
   const slots = sections.map(() => null);
   let live = [], layoutKey = "", heights, estimate = 600;
   const style = () => getComputedStyle(content);
+  const viewportTop = () => {
+    const top = content.getBoundingClientRect().top;
+    const panel = content.closest?.('.reader-panel');
+    if (!panel) return top;
+    const header = Number.parseFloat(getComputedStyle(panel, '::before').height) || 0;
+    return Math.max(top, panel.getBoundingClientRect().top + header);
+  };
   const signature = () => {
     const css = style();
     const width = Math.min(800, content.clientWidth - parseFloat(css.paddingLeft || 0) - parseFloat(css.paddingRight || 0));
@@ -34,8 +41,10 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
     }
     return live[lower];
   };
-  const anchor = () => {
-    const top = content.getBoundingClientRect().top;
+  const anchor = (belowHeader = true) => {
+    // Text beneath the fixed Reader header is not the visible scroll anchor.
+    // Preserve the passage below it when neighboring placeholders resolve.
+    const top = belowHeader ? viewportTop() : content.getBoundingClientRect().top;
     const item = firstAfter(top);
     if (!item) return null;
     const rect = item.node.getBoundingClientRect();
@@ -51,7 +60,7 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
     if (!node?.isConnected) return;
     const rect = node.getBoundingClientRect();
     const offset = saved.fraction === null ? saved.offset : -saved.fraction * rect.height;
-    content.scrollTop += rect.top - content.getBoundingClientRect().top - offset;
+    content.scrollTop += rect.top - viewportTop() - offset;
   };
   const rememberBatch = items => {
     const connected = items.filter(({node, index}) => {
@@ -125,14 +134,14 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
   return {
     get loadedCount() { return loaded.filter(Boolean).length; },
     unloadedScrollPosition(contentKey) {
-      const saved = anchor();
+      const saved = anchor(false);
       if (!saved || loaded[saved.index]) return null;
       return { contentKey, sectionID: String(sections[saved.index].id), blockID: "",
         anchorOffset: saved.offset, sectionOffset: saved.offset, estimatedFraction: saved.fraction };
     },
     nextWindow(limit, threshold) {
       refreshLayout();
-      const bounds = content.getBoundingClientRect();
+      const bounds = {top: viewportTop(), bottom: content.getBoundingClientRect().bottom};
       // Prefer missing text actually on screen before prefetching either side.
       const visible = firstAfter(bounds.top);
       let item = visible;

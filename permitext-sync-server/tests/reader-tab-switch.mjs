@@ -25,11 +25,12 @@ function harness() {
     querySelectorAll(){return this.children;},querySelector(){return this.children[0];}};
   original.parentNode=track;original.isConnected=true;
   const reader={id:'one',activeTabID:'B'}, state={readers:[reader]}, pending=new Map(), signals=new Map(), notices=[], releases=[], restores=[];
-  let wanted='B', generation=1, stopCount=0;
+  let wanted='B', generation=1, stopCount=0, sourceNavigation=null;
+  const reveals=[];
   const c=vm.createContext({state,track,CSS:{escape:value=>value},workspacePaneHydrator:null,createWorkspacePaneHydrator,
     workspacePaneReadyWaiters:new Set(),activeWorkspaceID:'workspace',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
     workspacePaneContextIsCurrent:context=>context.generation===generation,pendingWorkspacePaneRevealID:'',
-    workspacePaneDescriptors:()=>wanted?[{id:'reader:one',identity:wanted,publicContent:true,label:'Reader',scrollPosition:{top:425},
+    workspacePaneDescriptors:()=>wanted?[{id:'reader:one',identity:wanted,publicContent:true,label:'Reader',sourceNavigation,scrollPosition:sourceNavigation?undefined:{top:425},
       load(signal){signals.set(wanted,signal);return pending.get(wanted).promise;}}]:[],
     paneIDForReader:reader=>`reader:${reader.id}`,hasCapability:()=>true,activePinnedPaneID:()=>'',workflowPaneIsVisible:()=>true,
     applyPaneWeight(){},ensureWorkspacePanelAccessibleName(){},preparePaneCollapse(){},bindPaneDragging(){},
@@ -38,6 +39,10 @@ function harness() {
     cancelReaderPanelRequests(){stopCount++;},renderReaderTabs(pane,reader){pane.dataset.readerTabId=reader.activeTabID;},
     disposeUnpublishedWorkspacePane(pane){assert.equal(pane.isConnected,false);releases.push(pane);},
     restoreReaderScrollPositions(positions){restores.push(positions);track.children[0].body.scrollTop=positions.get('reader:one').top;},
+    revealReaderSourceTarget(reader,item,_anchor,options){
+      assert.equal(track.children[0].isConnected,true,'Source positioning runs after final column geometry is available.');
+      assert.equal(options.immediate,true);reveals.push(item.sectionID);track.children[0].body.scrollTop=940;return true;
+    },
     showWebNotice:async(...args)=>notices.push(args),
     appendPaneSequence(panes){
       for(const pane of track.children)if(!panes.includes(pane)){pane.isConnected=false;pane.parentNode=null;}
@@ -47,13 +52,32 @@ function harness() {
     createWorkspacePaneLoadingShell(){assert.fail('A tab switch must keep the existing Reader instead of a loading shell.');}
   });
   vm.runInContext(['retainReaderPaneForTabSwitch','finishWorkspacePaneReady','whenWorkspacePaneReady','getWorkspacePaneHydrator','mountWorkspacePanesIndependently'].map(actual).join('\n'),c);
-  const open=async(tab,{refresh=true}={})=>{
+  const open=async(tab,{refresh=true,source=false}={})=>{
     wanted=tab;reader.activeTabID=tab;generation++;
+    sourceNavigation=source?{reader,item:{sectionID:tab},options:{immediate:true},isCurrent:()=>wanted===tab}:null;
     pending.set(tab,pending.get(tab)||deferred());
     await c.mountWorkspacePanesIndependently({key:'account:workspace',generation},{shellReady:true,readerTabSwitchPaneID:'reader:one',refreshPaneIDs:refresh?['reader:one']:[]});
     await Promise.resolve();
   };
-  return {c,track,original,pending,signals,reader,notices,releases,restores,open,get stopCount(){return stopCount;}};
+  return {c,track,original,pending,signals,reader,notices,releases,restores,reveals,open,get stopCount(){return stopCount;},get sourceNavigation(){return sourceNavigation;}};
+}
+{
+  const h=harness();await h.open('B',{source:true});
+  assert.equal(h.track.children[0],h.original,'A result keeps the painted Reader while its passage loads.');
+  const incoming=panel('B','Exact incoming result');incoming._readerSourceNavigation=h.sourceNavigation;
+  await h.open('B',{refresh:false});
+  let publishedPosition;const ready=h.c.whenWorkspacePaneReady('reader:one').then(()=>{publishedPosition=h.track.children[0].body.scrollTop;});
+  h.pending.get('B').resolve(incoming);await h.c.workspacePaneHydrator.settled();await ready;
+  assert.equal(publishedPosition,940,'The incoming result is aligned before readiness is published, without a later scroll jump.');
+  assert.equal(h.restores.length,0,'Result navigation cannot restore the outgoing passage over the new result.');
+  assert.deepEqual(h.reveals,['B']);assert.equal(h.track.scrollLeft,17);
+}
+{
+  const h=harness();await h.open('B',{source:true});
+  const incoming=panel('B','Obsolete result');incoming._readerSourceNavigation={isCurrent:()=>false};
+  h.pending.get('B').resolve(incoming);await h.c.workspacePaneHydrator.settled();
+  assert.equal(h.track.children[0],h.original,'A superseded result cannot flash while the next result is still resolving.');
+  assert.deepEqual(h.reveals,[]);assert.deepEqual(h.releases,[incoming]);
 }
 {
   const h=harness();await h.open('B');

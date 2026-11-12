@@ -150,13 +150,17 @@ assert.equal(context.captureReaderScrollPositions().has("reader:a"), false, "Loa
 
 assert.match(actual("renderWorkspace"), /mountWorkspacePanesIndependently\(context, \{ \.\.\.options, readerScrollPositions, accessGate, shellReady: true \}\)/);
 assert.match(actual("workspacePaneDescriptors"), /const scrollPosition = options\.readerScrollPositions\?\.get\(id\) \|\| reader\.scrollPosition/);
-assert.match(actual("workspacePaneDescriptors"), /renderReader\(reader, \{ scrollPosition,/);
+assert.match(actual("workspacePaneDescriptors"), /renderReader\(reader, \{ scrollPosition: sourceNavigation \? undefined : scrollPosition,/);
 assert.match(actual("getWorkspacePaneHydrator"), /restoreReaderScrollPositions\(new Map\(\[\[job\.id, job\.descriptor\.scrollPosition\]\]\)\)/);
 assert.match(actual("renderReader"), /refreshReaderContent\(panel, reader,\s*\{\s*scrollPosition: options\.scrollPosition/);
 assert.match(actual("refreshReaderContent"), /renderSectionContent\(panel, reader, options\)/);
 assert.match(actual("beginReaderNavigation"), /delete panel\.dataset\.readerContentKey/);
 assert.match(actual("navigateReaderToSection"), /panel\.dataset\.readerContentKey = readerContentScrollKey\(reader\)/);
 console.log("Reader scroll continuity passed: independent progressive anchors, unchanged citations, edition/navigation guards and real render wiring.");
+
+frames.length = 0;
+await context.renderSectionContent(changed, a, {sourceNavigation: true});
+assert.equal(frames.length, 0, 'Explicit results skip the deferred section scroll; publication aligns the exact passage before paint.');
 
 // A hidden Reader retains its passage anchor while other columns rerender.
 const collapsed = panels[0];
