@@ -21466,7 +21466,8 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .settings-floating-panel > .settings-panel > .settings-scroll { display: block; flex: 1; min-height: 0; margin-inline: calc(-1 * var(--account-category-gutter)); overflow: hidden; }
 .settings-floating-panel .settings-account-column { height: 100%; padding: 0; border: 0; overflow-y: auto; }
 .settings-floating-panel .settings-account-column-title { display: none; }
-.settings-floating-panel .settings-account-actions { padding-bottom: 4px; }
+.settings-floating-panel .settings-account-actions { flex: 1 0 auto; align-content: center; margin-top: 0; padding-block: 20px; }
+.settings-floating-panel .settings-account-actions > button { margin: 0; }
 .settings-floating-panel .settings-panel .settings-footer {
   display: flex;
   flex: 0 0 auto;
@@ -21475,7 +21476,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   gap: 12px 16px;
   height: auto;
   min-height: 0;
-  margin-top: 14px;
+  margin-top: 0;
   margin-inline: calc(-1 * var(--account-category-gutter));
   padding: 12px var(--account-category-gutter) 0;
   font-size: 11px;
