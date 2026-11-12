@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-reader-source-stability-v1717";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-search-reader-name-v1718";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-reader-source-stability-v1717";
+} from "./offline-storage.js?v=20261112-search-reader-name-v1718";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -20589,8 +20589,9 @@ async function renderReader(reader, options = {}) {
   const referenceSourceReader = state.readers.find((item) => item.id === reader.referenceSourceReaderID);
   renderReaderTabs(panel, reader);
   panel.dataset.readerDisplayedTabId = reader.activeTabID;
-  closeButton.title = "Close Reader column";
-  closeButton.setAttribute("aria-label", "Close Reader column");
+  const columnLabel = readerPositionLabel(reader);
+  closeButton.title = columnLabel.startsWith("Search Reader") ? `Close ${columnLabel} column` : "Close Reader column";
+  closeButton.setAttribute("aria-label", closeButton.title);
   let tabScrollTimer;
   panel.querySelector('.reader-content').addEventListener('scroll', () => {
     clearTimeout(tabScrollTimer);
@@ -40774,7 +40775,11 @@ function readerIsClearlyAvailable(reader) {
 }
 
 function readerPositionLabel(reader) {
-  const index = (state.readers || []).findIndex((candidate) => candidate.id === reader?.id);
+  const fromSearch = candidate => /^utility:search(?::|$)/.test(String(candidate?.sourceOwnerPaneID || candidate?.searchPreviewPaneID || ""));
+  const searchReader = fromSearch(reader);
+  const readers = (state.readers || []).filter(candidate => fromSearch(candidate) === searchReader);
+  const index = readers.findIndex(candidate => candidate.id === reader?.id);
+  if (searchReader) return readers.length > 1 && index >= 0 ? `Search Reader ${index + 1}` : "Search Reader";
   return index >= 0 ? `Reader ${index + 1}` : "Reader";
 }
 
@@ -50228,7 +50233,7 @@ function workspacePaneDescriptors(options = {}) {
     const id = paneIDForReader(reader);
     const sourceNavigation = options.readerSourceNavigation?.paneID === id ? options.readerSourceNavigation : null;
     const scrollPosition = options.readerScrollPositions?.get(id) || reader.scrollPosition;
-    add(id, "Reader", (signal) => renderReader(reader, { scrollPosition: sourceNavigation ? undefined : scrollPosition,
+    add(id, readerPositionLabel(reader), (signal) => renderReader(reader, { scrollPosition: sourceNavigation ? undefined : scrollPosition,
       sourceNavigation, accessGate: options.accessGate, signal }), closeAndRender(() => {
       state.readers = state.readers.filter((item) => item.id !== reader.id);
       state.readers.forEach((item) => { if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = ""; });
