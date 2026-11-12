@@ -2,103 +2,93 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {searchWords, searchWordPattern} from '../public/search-words.js';
-
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const actual = name => {
-  const start = source.search(new RegExp(`(?:async )?function ${name}\\(`));
-  assert(start >= 0, name);
+  const start = source.search(new RegExp(`(?:async )?function ${name}\\(`)); assert(start >= 0, name);
   return source.slice(start, source.indexOf('\n}', start) + 2);
 };
 function fixture() {
-  const search = {key:'search', id:'a', query:'water', matchMode:'words'};
-  const other = {key:'search', id:'b', query:'water', matchMode:'exact'};
-  const readers = [{id:'manual', chapterID:'old', sectionID:'old', scrollTop:420}];
-  const details = {}, anchors = {}, placements = [], reveals = [], notices = [];
-  const panel = {dataset:{}, querySelector:()=>null};
-  let account = 1, sourceCurrent = true, serial = 0;
-  const c = vm.createContext({
-    state:{readers, utilityInstances:[search,other], paneWeights:{}, paneOrder:[], searchLinkedReaders:{}},
-    activeWorkspaceID:'workspace', sectionDetailOpeningAttempts:new Map(), sectionDetailSearchContexts:new WeakMap(),
-    captureAccountRequest:()=>account, isCurrentAccountRequest:value=>value===account,
-    isCurrentActiveCodeSourceContext:()=>sourceCurrent,
-    resolveReaderSource:async item=>({...item, __activeCodeSourceContext:{}}),
-    workspaceColumnsRequireProject:()=>false, workflowPaneIsVisible:()=>true,
-    sectionDetailsBySearch:()=>details, sectionDetailAnchorsBySearch:()=>anchors,
-    paneIDForUtilityInstance:i=>`utility:${i.key}:${i.id}`, paneIDForSectionDetail:id=>`section:detail:${id}`,
-    syncCodeVersion:value=>value, syncCodeVersionForPrefix:()=> '2022', normalizeAnnotationBlockID:value=>value||'',
-    placeSectionDetailAfterPane:(id,anchor)=>placements.push([id,anchor]),
-    updateBrowserSectionURL(){}, scheduleContinuitySync(){},
-    updateLinkedReaderForSearch:()=>{throw Error('Result click moved a Reader');},
-    newReaderState:value=>({id:`new-${++serial}`,...value}), readerFieldsForSectionDetail:(d,o)=>({...d,...o}),
-    saveWorkspaceState(){}, transitionWorkspace:async()=>{}, whenWorkspacePaneReady:async()=>true,
-    track:{querySelector:selector=>selector.startsWith('.section-detail-panel')?panel:null}, CSS:{escape:value=>value},
-    paneIsCollapsed:()=>false, columnExpansionController:()=>({reveal:()=>reveals.push('reveal')}),
-    scrollPaneIntoView:id=>reveals.push(id), showWebNotice:async(...args)=>notices.push(args),
-    currentColumnWorkflowView:()=> 'research', searchReaderOpeningAttempts:new Map(),
-    activeCodeSourcesController:{isCurrent:()=>sourceCurrent}, resolvedReaderSourceNavigations:new WeakMap(),
-    searchResultDetail:item=>item, readerMatchesSource:(r,d)=>r.sectionID===d.sectionID,
-    readerIsClearlyAvailable:()=>false, isProAccount:()=>true, paneIDForReader:r=>`reader:${r.id}`,
-    defaultPaneWidthForID:()=>600, placePaneAfter(){}, appendPaneIfMissing(){},
-    revealReaderSourceTarget(){}, closeLinkedReaderForSearch(){}, searchWords, searchWordPattern
+  const search={key:'search',id:'search',query:'water',matchMode:'words'};
+  const readers=[{id:'first',sectionID:'old',codeVersion:'2022'},{id:'active',sectionID:'other',codeVersion:'2022'}];
+  const reveals=[],details={},anchors={}; let account=1,serial=0;
+  const c=vm.createContext({state:{readers,utilityInstances:[search],paneWeights:{},paneOrder:[]},activeWorkspaceID:'workspace',
+    searchReaderOpeningAttempts:new Map(),savedItemOpeningAttempts:new Map(),sectionDetailOpeningAttempts:new Map(),
+    captureAccountRequest:()=>account,isCurrentAccountRequest:value=>value===account,
+    currentColumnWorkflowView:()=> 'research',workflowPaneIsVisible:()=>true,workspaceColumnsRequireProject:()=>false,
+    readerShortcuts:{activeReaderPaneID:()=> 'reader:active'},
+    resolveReaderSource:async item=>({...item,__activeCodeSourceContext:{}}),activeCodeSourcesController:{isCurrent:()=>true},
+    searchResultDetail:item=>item,readerFieldsForSectionDetail:(d,o)=>({...d,...o}),normalizeAnnotationBlockID:v=>v||'',
+    readerMatchesSource:()=>false,readerIsClearlyAvailable:()=>false,isProAccount:()=>true,
+    newReaderState:fields=>({id:`new-${++serial}`,...fields}),paneIDForReader:r=>`reader:${r.id}`,
+    paneIDForUtilityInstance:i=>`utility:${i.key}:${i.id}`,defaultPaneWidthForID:()=>630,placePaneAfter(){},appendPaneIfMissing(){},
+    updateBrowserSectionURL(){},scheduleContinuitySync(){},saveWorkspaceState(){},transitionWorkspace:async()=>{},
+    whenWorkspacePaneReady:async()=>true,retainReaderForSource:()=>null,resolvedReaderSourceNavigations:new WeakMap(),
+    track:{querySelector:()=>null},CSS:{escape:v=>v},paneIsCollapsed:()=>false,columnExpansionController:()=>({reveal(){}}),
+    revealReaderSourceTarget:(reader,item,anchor,options)=>reveals.push({reader,item,anchor,options}),scrollPaneIntoView(){},
+    showWebNotice:async()=>{},sectionDetailsBySearch:()=>details,sectionDetailAnchorsBySearch:()=>anchors,
+    searchWords,searchWordPattern
   });
-  vm.runInContext(['openSearchResultDetail','openSectionDetail','openSourceInReader','reusableSearchReader',
-    'retainReaderForSource','removeSectionDetail','searchDetailPassageBlock'].map(actual).join('\n'),c);
-  return {c, search, other, details, anchors, readers, placements, reveals, notices,
-    changeAccount(){account++;}, revoke(){sourceCurrent=false;}};
+  vm.runInContext(['reusableSearchReader','openSourceInReader','openSearchResultDetail','openSavedItemInReader',
+    'retireEvidenceDetailLayout','searchDetailPassageBlock'].map(actual).join('\n'),c);
+  return {c,search,readers,reveals,details,anchors,changeAccount(){account++;}};
 }
-const item = (sectionID, extra={}) => ({sectionID, codePrefix:'BC', codeVersion:'2022', chapterID:'chapter',
-  title:'Water', codeSource:{canonicalEdition:'2022'}, ...extra});
+const item=(id,extra={})=>({sectionID:id,codePrefix:'BC',codeVersion:'2022',chapterID:'chapter',title:'Water',...extra});
 {
-  const f=fixture(), original=JSON.stringify(f.readers);
-  for (const target of [item('1',{blockID:'paragraph'}),item('2',{codeVersion:'2014'}),item('1')]) {
-    const detail=await f.c.openSearchResultDetail(target,f.search);
-    assert.equal(detail.sectionID,target.sectionID);
-    assert.equal(detail.blockID,target.blockID||'');
-    assert.equal(detail.codeVersion,target.codeVersion);
-    assert.equal(detail.codeSource,target.codeSource);
-    assert.equal(Object.hasOwn(detail,'searchQuery'),false,'Live query text must not enter serialized workspace details');
-    assert.equal(Object.keys(f.details).length,1,'Clicks reuse one detail for a Search column');
-    assert.equal(JSON.stringify(f.readers),original,'Opening a result cannot mutate Readers');
+  const f=fixture(),untouched=JSON.stringify(f.readers[0]);
+  for(const target of [item('1',{blockID:'paragraph'}),item('2',{codeVersion:'2014'}),item('3')]) {
+    const reader=await f.c.openSearchResultDetail(target,f.search);
+    assert.equal(reader.id,'active'); assert.equal(reader.sectionID,target.sectionID);
+    assert.equal(reader.codeVersion,target.codeVersion); assert.equal(reader.sourceBlockID,target.blockID||'');
+    assert.equal(f.readers.length,2,'Search clicks reuse the current Reader without creating columns');
   }
-  await f.c.openSearchResultDetail(item('3'),f.other);
-  assert.equal(Object.keys(f.details).length,2,'Separate Search columns own separate details');
-  assert.equal(f.details.a.sectionID,'1'); assert.equal(f.c.sectionDetailSearchContexts.get(f.details.b).searchMatchMode,'exact');
-  assert.deepEqual(f.placements.at(-1),['b','utility:search:b']);
-  const reader=await f.c.openSourceInReader(item('1',{blockID:'paragraph'}),'section:detail:a',{sourceSurface:'search-detail'});
-  const retained=JSON.stringify(reader);
-  await f.c.openSearchResultDetail(item('9'),f.search);
-  assert.equal(JSON.stringify(reader),retained,'An explicitly opened Reader stays on its selected passage');
-  const reused=await f.c.openSourceInReader(item('9'),'section:detail:a',{sourceSurface:'search-detail'});
-  assert.equal(reused.id,reader.id,'Open in Reader reuses this detail\'s Reader only after an explicit click');
-  f.c.removeSectionDetail('a');
-  assert(f.readers.includes(reader),'Closing detail leaves its independently opened Reader available');
-  assert.equal(JSON.stringify(f.readers[0]),JSON.stringify(JSON.parse(original)[0]));
-}
-for (const mode of ['cancel','account','workspace','view','closed-search','query','source','closed-detail']) {
-  const f=fixture(); let resolve;
-  f.c.resolveReaderSource=()=>new Promise(done=>{resolve=done;});
-  const pending=f.c.openSearchResultDetail(item('late'),f.search);
-  if(mode==='account')f.changeAccount();
-  if(mode==='workspace')f.c.activeWorkspaceID='another';
-  if(mode==='view')f.c.state.workflowNavigationGeneration=1;
-  if(mode==='closed-search')f.c.state.utilityInstances=[];
-  if(mode==='query')f.search.query='concrete';
-  if(mode==='source')f.revoke();
-  if(mode==='closed-detail')f.c.removeSectionDetail('a');
-  resolve(mode==='cancel'?null:{...item('late'),__activeCodeSourceContext:{}});
-  assert.equal(await pending,null,mode);
-  assert.equal(Object.keys(f.details).length,0,mode);
-  assert.deepEqual(f.reveals,[],mode);
+  assert.equal(JSON.stringify(f.readers[0]),untouched);
+  assert.equal(f.reveals.at(-1).options.searchQuery,'water');
+  const anchor={passages:[{exact:'Original saved quote'}]};
+  const saved=await f.c.openSavedItemInReader(item('saved',{blockID:'exact',evidenceAnchor:anchor}),'utility:saved:list');
+  assert.equal(saved.id,'active');assert.equal(saved.sourceBlockID,'exact');
+  assert.equal(f.reveals.at(-1).anchor,anchor);assert.equal(f.reveals.at(-1).options.preferPassage,true);
+  assert.equal(Object.keys(f.details).length,0); assert.equal(f.c.state.utilityInstances.length,1);
+  const explicit=await f.c.openSourceInReader(item('new'),'utility:search:search',{sourceSurface:'search',forceNewReader:true});
+  assert.notEqual(explicit.id,'active');assert.equal(f.readers.length,3,'Only explicit New reader creates another column');
 }
 {
-  const f=fixture(), gates=[];
-  f.c.resolveReaderSource=()=>new Promise(resolve=>gates.push(resolve));
-  const first=f.c.openSearchResultDetail(item('first'),f.search);
-  const second=f.c.openSearchResultDetail(item('second'),f.search);
-  gates[1]({...item('second'),__activeCodeSourceContext:{}}); await second;
-  gates[0]({...item('first'),__activeCodeSourceContext:{}}); await first;
-  assert.equal(f.details.a.sectionID,'second','A late first click cannot overwrite the newest selection');
-  assert.equal(f.c.sectionDetailOpeningAttempts.size,0);
+  const f=fixture();f.c.state.readers.length=0;
+  const first=await f.c.openSearchResultDetail(item('first'),f.search);
+  const second=await f.c.openSavedItemInReader(item('second'),'evidence');
+  assert.equal(first.id,second.id);assert.equal(f.readers.length,1,'One Reader is created when none exists');
+}
+for(const surface of ['search','saved']) for(const change of ['account','workspace','view','query','closed-search','superseded']) {
+  if(surface==='saved' && ['query','closed-search'].includes(change)) continue;
+  const f=fixture(),gates=[];f.c.resolveReaderSource=target=>new Promise(resolve=>gates.push(()=>resolve(target)));
+  const before=JSON.stringify(f.readers);
+  const open=target=>surface==='search'?f.c.openSearchResultDetail(target,f.search):f.c.openSavedItemInReader(target,'evidence');
+  const pending=open(item('stale'));
+  if(change==='account')f.changeAccount();
+  if(change==='workspace')f.c.activeWorkspaceID='another';
+  if(change==='view')f.c.state.workflowNavigationGeneration=1;
+  if(change==='query')f.search.query='steel';
+  if(change==='closed-search')f.c.state.utilityInstances=[];
+  if(change==='superseded') {
+    const latest=open(item('latest'));gates[1]();await latest;
+    gates[0]();assert.equal(await pending,null);assert.equal(f.readers[1].sectionID,'latest');continue;
+  }
+  gates[0]();assert.equal(await pending,null,`${surface} ${change}`);
+  assert.equal(JSON.stringify(f.readers),before);assert.equal(f.reveals.length,0);
+}
+{
+  const f=fixture();
+  const records={localSavedItems:[{id:'bookmark',blockID:'exact'}],localAnnotations:[{noteBody:'Existing comments'}],
+    localProjects:[{id:'project'}],localProjectSections:[{id:'membership'}],syncOutbox:[{id:'queued'}],notebookDrafts:[{body:'draft'}],reports:[{body:'report'}]};
+  const layout={...records,readers:f.readers,utilityInstances:[f.search,{id:'detail',key:'sdc'}],
+    sectionDetails:{search:item('old')},sectionDetailAnchors:{search:'evidence'},
+    paneOrder:['reader:first','section:detail:search','utility:sdc:detail'],paneWeights:{'reader:first':630,'section:detail:search':600},
+    collapsedPaneIDs:['section:detail:search'],columnGroups:[{paneIDs:['reader:first','section:detail:search'],columns:{'reader:first':{kind:'reader'},'section:detail:search':{kind:'utility'}}}]};
+  const original=JSON.stringify(layout),migrated=f.c.retireEvidenceDetailLayout(layout);
+  assert.equal(JSON.stringify(layout),original,'Migration never mutates the source');
+  for(const [key,value] of Object.entries(records)) assert.equal(migrated[key],value,`Preserves ${key}`);
+  assert.equal(migrated.readers,f.readers);assert.equal(migrated.utilityInstances.length,1);
+  assert.deepEqual(Array.from(migrated.paneOrder),['reader:first']);assert.equal(Object.keys(migrated.sectionDetails).length,0);
+  assert.equal(f.c.retireEvidenceDetailLayout(migrated),migrated,'Retirement is idempotent');
 }
 {
   const f=fixture();
@@ -113,6 +103,6 @@ for (const mode of ['cancel','account','workspace','view','closed-search','query
   assert.equal(target({blockID:'missing',searchQuery:'water'}),undefined,'Explicit missing passages never fall back to another block');
   assert.equal(target({blockID:'table',searchQuery:'water'}),'table');
 }
-assert.match(actual('appendSearchResultGroups'),/openSearchResultDetail\(detail, searchInstance\)/);
-assert.match(actual('openRecentlyViewedInReader'),/openSearchResultDetail\(recentViewNavigationSource\(entry\), searchInstance\)/);
-console.log('Search Evidence detail passed: one detail per Search, exact source and passage targeting, explicit Reader reuse and preservation, stale click/account/view/close guards, and recent-result routing.');
+assert.doesNotMatch(actual('workspacePaneDescriptors'), /add\(paneIDForSectionDetail/);
+assert.doesNotMatch(actual('defaultActivePaneIDs'), /ids\.push\(paneIDForSectionDetail/);
+console.log('Direct Reader evidence passed: active Reader reuse, exact editions/passages, explicit new columns, stale navigation fences and data-preserving layout retirement.');

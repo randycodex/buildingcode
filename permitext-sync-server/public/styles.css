@@ -21130,6 +21130,11 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .project-open-questions [role="status"]:empty { display: none; }
 
 .section-detail-comments-editor { display: grid; gap: var(--space-5); }
+.reader-passage-comments { margin-block: var(--space-4); padding: var(--space-4); border-radius: var(--radius-card); background: var(--menu-surface); }
+.reader-passage-comments > header { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }
+.reader-passage-comments h3 { margin: 0; font: 500 13px var(--ui-font-family); color: var(--text-secondary); }
+.reader-passage-comments > header > .icon-button { flex: 0 0 28px; width: 28px; height: 28px; }
+.reader-passage-comments > header > .icon-button svg { width: 16px; height: 16px; }
 .section-detail-comment-number { margin-bottom: var(--space-2); color: var(--text-secondary); font-family: var(--ui-font-family); font-size: var(--reader-font-size) !important; line-height: 1.4; }
 .section-detail-add-comment { display: block; margin: var(--space-2) auto; justify-self: center; }
 .annotated-code-block > .inline-comment.has-passage-comments { opacity: 1; pointer-events: auto; }

@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-activity-heading-gap-v1709";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-direct-evidence-reader-v1711";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-activity-heading-gap-v1709";
+} from "./offline-storage.js?v=20261112-direct-evidence-reader-v1711";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -919,7 +919,7 @@ function loadWorkspaceState(accountOverride) {
       });
       sessionStorage.setItem(activeWorkspaceSessionKey, activeWorkspaceID);
     }
-    saved = restoreSearchQuerySession(sessionStorage, tabWorkspaceKey, activeWorkspaceID, retireUnassignedLayout(saved));
+    saved = restoreSearchQuerySession(sessionStorage, tabWorkspaceKey, activeWorkspaceID, retireEvidenceDetailLayout(retireUnassignedLayout(saved)));
     const utilityInstances = normalizeUtilityInstances(saved);
     const projectDetails = (Array.isArray(saved.projectDetails)
       ? saved.projectDetails.filter((detail) => detail && typeof detail === "object")
@@ -1376,6 +1376,27 @@ function retireUnassignedLayout(layout = {}) {
     columnGroups: (layout.columnGroups || []).map(group => ({ ...group,
       paneIDs: (group.paneIDs || []).filter(id => !removedPaneIDs.has(id)),
       columns: keepEntries(group.columns, ([id]) => !removedPaneIDs.has(id))
+    })).filter(group => group.paneIDs.length)
+  };
+}
+
+function retireEvidenceDetailLayout(layout = {}) {
+  const retired = id => /^(?:section:detail:|utility:sdc:)/.test(String(id || ""));
+  const panes = Array.isArray(layout.utilityInstances) ? layout.utilityInstances : [];
+  if (!panes.some(pane => pane.key === "sdc") && !Object.keys(layout.sectionDetails || {}).length &&
+      !layout.sectionDetail && !(layout.paneOrder || []).some(retired)) return layout;
+  const keep = value => Object.fromEntries(Object.entries(value || {}).filter(([id]) => !retired(id)));
+  // Only presentation state is retired. Readers and every user-content record
+  // (including pending mutations and drafts) remain untouched.
+  return { ...layout,
+    utilityInstances: panes.filter(pane => pane.key !== "sdc"),
+    sectionDetail: null, sectionDetails: {}, sectionDetailAnchors: {},
+    paneOrder: (layout.paneOrder || []).filter(id => !retired(id)),
+    paneWeights: keep(layout.paneWeights),
+    collapsedPaneIDs: (layout.collapsedPaneIDs || []).filter(id => !retired(id)),
+    pinnedPaneID: retired(layout.pinnedPaneID) ? "" : layout.pinnedPaneID,
+    columnGroups: (layout.columnGroups || []).map(group => ({ ...group,
+      paneIDs: (group.paneIDs || []).filter(id => !retired(id)), columns: keep(group.columns)
     })).filter(group => group.paneIDs.length)
   };
 }
@@ -2093,7 +2114,7 @@ function applyStoredWorkspaceLayout(layout) {
   projectStudioTransitionGeneration += 1;
   delete track._researchColumnLayout;
   applyWorkspaceLayout(state, restoreSearchQuerySession(sessionStorage, tabWorkspaceKey, activeWorkspaceID,
-    retireUnassignedLayout(workspaceLayoutWithoutCodeQuestionData(layout))));
+    retireEvidenceDetailLayout(retireUnassignedLayout(workspaceLayoutWithoutCodeQuestionData(layout)))));
   loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
   state.utilityInstances = normalizeUtilityInstances(state);
   setOpenProjectDetails(state.projectDetails);
@@ -4485,7 +4506,7 @@ function openReaderTabPicker(reader, anchor) {
   });
 }
 
-function prepareReaderSourceTab(reader, fields) {
+function prepareReaderSourceTab(reader, fields, { allowNewColumn = true } = {}) {
   if (!isProAccount() || !Array.isArray(reader.tabs)) return reader;
   const matches = tab => tab.codePrefix === fields.codePrefix && tab.codeVersion === fields.codeVersion &&
     String(tab.chapterID || '') === String(fields.chapterID || '') && String(tab.sectionID || '') === String(fields.sectionID || '');
@@ -4493,6 +4514,11 @@ function prepareReaderSourceTab(reader, fields) {
   const tabs = readerTabs(reader);
   const existing = tabs.find(matches) || tabs.find(tab => tab.codePrefix === fields.codePrefix && tab.codeVersion === fields.codeVersion);
   if (!existing && !canAddReaderTab(reader)) {
+    if (!allowNewColumn) {
+      rememberReaderTabPosition(reader);
+      retainReaderColumn(reader);
+      return reader;
+    }
     // Keep every existing session when a link needs a seventh code.
     const destination = newReaderState(fields);
     initializeReaderTabs(destination);
@@ -5941,9 +5967,6 @@ function defaultActivePaneIDs() {
   if (state.utilities.archive) ids.push("utility:archive");
   (state.utilityInstances || []).forEach((instance) => {
     if (instance.key !== "sdc") ids.push(paneIDForUtilityInstance(instance));
-    if ((instance.key === "search" || instance.key === "sdc") && sectionDetailsBySearch()[instance.id]) {
-      ids.push(paneIDForSectionDetail(instance.id));
-    }
   });
   if (state.utilities.analysis) {
     ids.push("utility:analysis");
@@ -14199,6 +14222,8 @@ function refreshVisibleSyncedDerivedState() {
     if (textarea && !textarea.contains(focusedElement)) textarea.value = detailNoteValueForTarget(target);
   });
 
+  track.querySelectorAll(".reader-passage-comments").forEach(region => region._refresh?.());
+
   openProjectDetails().forEach((detail) => {
     const currentProject = visibleProjectRecords(currentContentSummary().projects || [])
       .find((project) => projectDetailMatches(project, detail));
@@ -17702,7 +17727,7 @@ function buildReaderChapterSection(panel, reader, section, groupLabelsByFirstSec
     showBookmark: savedSection, bookmarkStateResolved: true, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true
   });
   sectionControls.classList.add("reader-section-actions");
-  sectionControls.querySelectorAll(".inline-research-toggle, .inline-note-toggle").forEach(button => button.remove());
+  sectionControls.querySelectorAll(".inline-research-toggle").forEach(button => button.remove());
   const savedMarker = sectionControls.querySelector(".inline-bookmark-toggle");
   savedMarker.classList.add('reader-section-saved-marker');
   savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Evidence' : 'Save section');
@@ -18785,10 +18810,113 @@ function readerCommentCount(target, snapshot = null) {
 function updateReaderCommentIndicator(wrapper, count) {
   const button = wrapper.querySelector(".inline-comment-toggle");
   if (!button) return;
-  button.hidden = !count;
-  button.setAttribute("aria-label", `Open ${count} ${count === 1 ? "comment" : "comments"} in Evidence detail`);
+  button.hidden = !hasCapability("notes");
+  button.setAttribute("aria-label", count ? `Open ${count} ${count === 1 ? "comment" : "comments"} in Reader` : "Add comment");
   button.title = button.getAttribute("aria-label");
   wrapper.classList.toggle("has-passage-comments", Boolean(count));
+}
+
+function openReaderPassageComments(panel, target, anchor) {
+  if (!panel || !readerPrivateContentAllowed(panel) || !hasCapability("notes")) return null;
+  const targetKey = visibleSyncedTargetKey(target);
+  const existing = panel.querySelector('.reader-passage-comments');
+  if (existing?.dataset.commentTarget === targetKey) {
+    existing.querySelector('textarea')?.focus();
+    return existing;
+  }
+  existing?.remove();
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const region = document.createElement('section');
+  region.className = 'reader-passage-comments';
+  region.dataset.commentTarget = targetKey;
+  region.dataset.researchSelectionExclude = 'true';
+  const scope = target.blockID ? 'Passage' : 'Section';
+  const title = `${scope} comments · ${target.sectionNumber || ''}`.trim();
+  region.setAttribute('aria-label', title);
+  region.__annotationTarget = target;
+  const header = document.createElement('header');
+  const heading = document.createElement('h3'); heading.textContent = title;
+  const status = document.createElement('span'); status.className = 'section-detail-note-state'; status.setAttribute('role', 'status');
+  const close = document.createElement('button'); close.type = 'button'; close.className = 'icon-button';
+  close.innerHTML = circleXIconSVG(); close.setAttribute('aria-label', 'Close comments');
+  header.append(heading, status, close);
+  const editor = createEvidenceCommentsEditor(detailNoteValueForTarget(target),
+    `${scope} comment for ${sectionDisplayTitle(target.sectionNumber, target.title)}`, evidenceCommentUndoState(target));
+  const add = document.createElement('button'); add.type = 'button';
+  add.className = 'workflow-action workflow-action-secondary section-detail-add-comment'; add.textContent = 'Add comment';
+  region.append(header, editor.undoNotice, editor, add);
+  const passage = anchor.closest('.annotated-code-block') || anchor.closest('.reader-section-heading-row');
+  if (!passage) return null;
+  passage.after(region);
+  const current = () => region.isConnected && panel.isConnected && activeWorkspaceID === workspaceID &&
+    isCurrentAccountRequest(identity) && readerPrivateContentAllowed(panel);
+  close.addEventListener('click', () => { region.remove(); if (anchor.isConnected) anchor.focus(); });
+  region.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.stopPropagation(); close.click(); }
+  });
+  add.addEventListener('click', () => { if (current()) editor.addComment(); });
+  let revision = 0;
+  const showStatus = (value, token = revision) => {
+    if (!current() || token !== revision) return;
+    status.replaceChildren();
+    const conflict = pendingAnnotationNoteForTarget(target, state.syncConflicts);
+    editor.readOnly = Boolean(conflict);
+    add.disabled = Boolean(conflict);
+    if (conflict) {
+      if (!editor.contains(document.activeElement)) editor.value = detailNoteValueForTarget(target);
+      status.append('Save conflict · ');
+      const review = document.createElement('button'); review.type = 'button'; review.textContent = 'Review conflict';
+      review.addEventListener('click', toggleAccountDialog); status.append(review);
+    } else if (value === 'error' || value === 'pending') {
+      status.append(value === 'error' ? 'Couldn’t sync · ' : 'Changes pending · ');
+      const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Retry';
+      retry.addEventListener('click', async () => {
+        if (!current()) return;
+        const pending = pendingAnnotationNoteForTarget(target);
+        if (!pending || pending.mutation.annotation.noteBody !== editor.value) { persist(); return; }
+        const token = ++revision; status.textContent = 'Saving…';
+        try {
+          await flushSyncOutbox({refresh: true});
+          if (!current() || token !== revision) return;
+          if (pendingAnnotationNoteForTarget(target)) { showStatus('error', token); return; }
+          const annotation = pending.mutation.annotation;
+          state.localAnnotations = (state.localAnnotations || []).filter(item =>
+            String(item.id || '') !== String(annotation.id || '') || item.updatedAt !== annotation.updatedAt);
+          saveWorkspaceState(); showStatus('synced', token);
+        } catch { showStatus('error', token); }
+      });
+      status.append(retry);
+    } else status.textContent = value === 'synced' ? 'Synced' : value === 'saving' ? 'Saving…' : 'Saved on this device';
+  };
+  const persist = () => {
+    if (!current()) { editor.readOnly = true; return; }
+    if (pendingAnnotationNoteForTarget(target, state.syncConflicts)) { showStatus('conflict'); return; }
+    if (!editor.value.trim() && !detailNoteValueForTarget(target).trim()) return;
+    const token = ++revision;
+    try {
+      if (!setAnnotationNoteValue(target, editor.value, value => showStatus(value, token))) return;
+      showStatus('saving', token);
+      syncReaderNoteControls(target.sectionID, target.blockID || '', editor.value, {source: editor, target});
+    } catch { if (current()) status.textContent = 'Couldn’t save on this device'; }
+  };
+  editor.addEventListener('input', () => {
+    persist();
+    if (!editor.querySelector('textarea')) add.focus();
+  });
+  region._refresh = () => {
+    if (!current()) { region.remove(); return; }
+    const conflict = pendingAnnotationNoteForTarget(target, state.syncConflicts);
+    if (conflict) showStatus('conflict');
+    else if (!editor.contains(document.activeElement)) {
+      editor.readOnly = false; add.disabled = false; editor.value = detailNoteValueForTarget(target);
+    }
+  };
+  const pending = pendingAnnotationNoteForTarget(target);
+  if (pendingAnnotationNoteForTarget(target, state.syncConflicts)) showStatus('conflict');
+  else if (pending) showStatus(pending.lastError ? 'error' : 'pending');
+  if (!editor.querySelector('textarea') && !editor.readOnly) editor.addComment();
+  else editor.querySelector('textarea')?.focus();
+  return region;
 }
 
 function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader), options = {}) {
@@ -18836,7 +18964,8 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     if (!allowed() || commentButton.disabled) return;
     commentButton.disabled = true;
     try {
-      await openSavedItemInReader(readerPassagePayload(section, reader, target), paneIDForReader(reader));
+      openReaderPassageComments(options.panel || commentButton.closest(".reader-panel"),
+        readerPassagePayload(section, reader, target), commentButton);
     } catch (error) { if (allowed()) presentWorkspaceIssue(error.message); }
     finally { commentButton.disabled = !allowed(); }
   });
@@ -18860,6 +18989,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     researchButton.disabled = !permitted;
     commentButton.disabled = !permitted;
     updateReaderCommentIndicator(wrapper, permitted ? readerCommentCount(target) : 0);
+    commentButton.hidden = !permitted || !hasCapability("notes");
     if (!permitted) return;
     const saved = gate && !(options.bookmarkStateResolved && (initialRender === true || subscribingToAccess)) ? Boolean(isSectionSaved({
       sectionID: target.sectionID || section.id,
@@ -22118,33 +22248,14 @@ const sectionDetailSearchContexts = new WeakMap();
 
 async function openSearchResultDetail(item, searchInstance) {
   if (workspaceColumnsRequireProject() || searchInstance?.key !== "search") return null;
-  const identity = captureAccountRequest();
-  const workspaceID = activeWorkspaceID;
-  const workflowGeneration = state.workflowNavigationGeneration || 0;
-  const query = String(searchInstance.query || "");
-  const paneID = paneIDForUtilityInstance(searchInstance);
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const generation = state.workflowNavigationGeneration || 0;
+  const query = String(searchInstance.query || ""), paneID = paneIDForUtilityInstance(searchInstance);
   const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
-    workflowGeneration === (state.workflowNavigationGeneration || 0) &&
-    state.utilityInstances.includes(searchInstance) && workflowPaneIsVisible(paneID) &&
-    String(searchInstance.query || "") === query;
-  try {
-    const detail = await openSectionDetail(searchInstance.id, item, {
-      isCurrent, anchorPaneID: paneID, updateURL: false, updateLinkedReader: false,
-      searchQuery: query, searchMatchMode: searchInstance.matchMode,
-      evidenceAnchor: item.evidenceAnchor || null
-    });
-    if (!detail || !isCurrent() || sectionDetailsBySearch()[searchInstance.id] !== detail) return null;
-    const detailID = paneIDForSectionDetail(searchInstance.id);
-    if (!await whenWorkspacePaneReady(detailID) || !isCurrent() || sectionDetailsBySearch()[searchInstance.id] !== detail) return null;
-    const panel = track.querySelector(`.section-detail-panel[data-pane-id="${CSS.escape(detailID)}"]`);
-    if (panel && paneIsCollapsed(detailID)) setPaneCollapsed(panel, false);
-    columnExpansionController().reveal(panel);
-    scrollPaneIntoView(detailID);
-    return detail;
-  } catch (error) {
-    if (isCurrent()) await showWebNotice("Source could not be opened", error.message || "The exact source is unavailable.");
-    return null;
-  }
+    generation === (state.workflowNavigationGeneration || 0) && state.utilityInstances.includes(searchInstance) &&
+    workflowPaneIsVisible(paneID) && String(searchInstance.query || "") === query;
+  return openSourceInReader(item, paneID, { sourceSurface: "search", isCurrent,
+    evidenceAnchor: item.evidenceAnchor || null, searchQuery: query, searchMatchMode: searchInstance.matchMode });
 }
 
 async function openSectionDetail(searchID, section, options = {}) {
@@ -40691,6 +40802,13 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null, options =
       const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"]`);
       const content = panel?.querySelector(".reader-content");
       let target = savedReaderTarget(content, item, options),precisePassage=false;
+      if (target && options.searchQuery && !normalizeAnnotationBlockID(item.blockID)) {
+        const section = target.closest?.(".chapter-section") || target;
+        const passage = searchDetailPassageBlock({ children: section.querySelectorAll(".annotated-code-block") }, {
+          ...item, searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode
+        });
+        if (passage) target = passage;
+      }
       if(options.researchPassage&&target){
         const section=target.closest?.(".chapter-section")||target;
         const passage=researchReaderPassageTarget(section,item);
@@ -40852,11 +40970,17 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     sourceBlockID: normalizeAnnotationBlockID(detail.blockID)
   });
   const fromSearch = options.sourceSurface === "search";
+  const fromSaved = options.sourceSurface === "saved";
   const visibleReaders = (state.readers || []).filter(candidate => workflowPaneIsVisible(paneIDForReader(candidate)));
   let reader = fromSearch
     ? reusableSearchReader(visibleReaders, anchorPaneID, options.forceNewReader)
     : visibleReaders.find((candidate) =>
       (!anchorPaneID || candidate.sourceAnchorPaneID === anchorPaneID) && readerMatchesSource(candidate, detail));
+  if ((fromSearch || fromSaved) && !options.forceNewReader) {
+    const activeID = typeof readerShortcuts !== "undefined"
+      ? readerShortcuts?.activeReaderPaneID?.() || readerShortcuts?.activePaneID?.() : "";
+    reader = visibleReaders.find(candidate => paneIDForReader(candidate) === activeID) || reader || visibleReaders[0] || null;
+  }
   if (!reader && !fromSearch) {
     reader = visibleReaders.find(readerIsClearlyAvailable) || null;
   }
@@ -40882,7 +41006,9 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
       reader = replacement;
     }
   }
-  if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields);
+  if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
+    allowNewColumn: !(fromSearch || fromSaved) || Boolean(options.forceNewReader)
+  });
   const retainedPanel = fromSearch && !options.forceNewReader ? retainReaderForSource(reader, detail) : null;
   Object.assign(reader, sourceFields);
   resolvedReaderSourceNavigations.set(reader, {chapterID: reader.chapterID, sectionID: reader.sectionID,
@@ -40890,7 +41016,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (fromSearch) reader.searchPreviewPaneID = options.forceNewReader ? "" : anchorPaneID;
   const paneID = paneIDForReader(reader);
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
-  if (anchorPaneID && anchorPaneID !== paneID && !Array.isArray(reader.tabs)) placePaneAfter(anchorPaneID, paneID);
+  if (anchorPaneID && anchorPaneID !== paneID && (!Array.isArray(reader.tabs) || options.forceNewReader)) placePaneAfter(anchorPaneID, paneID);
   else appendPaneIfMissing(paneID);
   if (reader.sectionID) updateBrowserSectionURL(reader.sectionID);
   scheduleContinuitySync(reader);
@@ -40906,7 +41032,10 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   const destinationPanel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (destinationPanel && paneIsCollapsed(paneID)) setPaneCollapsed(destinationPanel, false);
   columnExpansionController().reveal(destinationPanel);
-  revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {preferPassage: fromSearch || options.sourceSurface === "search-detail" || options.sourceSurface === "research",researchPassage:options.sourceSurface === "research"});
+  revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {
+    preferPassage: fromSearch || fromSaved || options.sourceSurface === "search-detail" || options.sourceSurface === "research",
+    researchPassage: options.sourceSurface === "research", searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode
+  });
   scrollPaneIntoView(paneID);
   return reader;
 }
@@ -40941,65 +41070,17 @@ function savedItemDetailIDsForPane(savedPaneID) {
 const savedItemOpeningAttempts = new Map();
 
 async function openSavedItemInReader(item, savedPaneID) {
+  if (!String(item?.sectionID || item?.id || "").trim()) return null;
   const attempt = {};
   savedItemOpeningAttempts.set(savedPaneID, attempt);
-  try {
-  const sectionID = String(item?.sectionID || item?.id || "").trim();
-  if (!sectionID) return;
-  const requestIdentity = captureAccountRequest();
-  const workspaceID = activeWorkspaceID;
-  const workflowGeneration = state.workflowNavigationGeneration || 0;
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const generation = state.workflowNavigationGeneration || 0;
   const isCurrent = () => savedItemOpeningAttempts.get(savedPaneID) === attempt &&
-    isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
-    workflowGeneration === (state.workflowNavigationGeneration || 0);
-  let navigationItem = {
-    ...item,
-    id: sectionID,
-    sectionID
-  };
+    isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    generation === (state.workflowNavigationGeneration || 0);
   try {
-    navigationItem = await resolveReaderSource(navigationItem, { isCurrent });
-  } catch (error) {
-    if (isCurrent()) await showWebNotice("Saved section unavailable", error.message || "This exact source could not be opened.");
-    return;
-  }
-  if (!navigationItem || !isCurrent() || !isCurrentActiveCodeSourceContext(navigationItem.__activeCodeSourceContext)) return;
-  const existingDetailID = Object.entries(sectionDetailAnchorsBySearch()).find(
-    ([id, anchor]) => anchor === savedPaneID && sectionDetailsBySearch()[id]
-  )?.[0];
-  const detailInstance = (state.utilityInstances || []).find(
-    (instance) => instance.id === existingDetailID && instance.key === "sdc"
-  ) || newUtilityInstance("sdc");
-  if (!(state.utilityInstances || []).includes(detailInstance)) {
-    state.utilityInstances = [...(state.utilityInstances || []), detailInstance];
-  }
-  let publishedDetail;
-  try {
-    const opening = openSectionDetail(detailInstance.id, navigationItem, {
-      isCurrent,
-      anchorPaneID: savedPaneID,
-      updateURL: false,
-      updateLinkedReader: false,
-      evidenceAnchor: item?.evidenceAnchor || null
-    });
-    publishedDetail = sectionDetailsBySearch()[detailInstance.id];
-    await opening;
-  } catch {
-    if (!isCurrent() || !isCurrentActiveCodeSourceContext(navigationItem.__activeCodeSourceContext) ||
-        !publishedDetail || sectionDetailsBySearch()[detailInstance.id] !== publishedDetail) return;
-    removeSectionDetail(detailInstance.id);
-    saveWorkspaceState();
-    await showWebNotice(
-      "Saved section unavailable",
-      navigator.onLine === false
-        ? "Connect to the internet, then open this saved section again. For offline reading, download the code library in Account while Pro is active."
-        : "This saved section could not be loaded. Check your connection, then open it again. Your saved item has not been removed."
-    );
-    return;
-  }
-  if (!isCurrent() || sectionDetailsBySearch()[detailInstance.id] !== publishedDetail || !isCurrentActiveCodeSourceContext(navigationItem.__activeCodeSourceContext)) return;
-
-  scrollPaneIntoView(paneIDForSectionDetail(detailInstance.id));
+    return await openSourceInReader(item, savedPaneID, { sourceSurface: "saved", isCurrent,
+      evidenceAnchor: item.evidenceAnchor || null });
   } finally {
     if (savedItemOpeningAttempts.get(savedPaneID) === attempt) savedItemOpeningAttempts.delete(savedPaneID);
   }
@@ -43376,7 +43457,7 @@ function renderSettings({ upgrade = false } = {}) {
         requireCurrentAccountRequest(settingsIdentity);
       }
       if (workspaceColumnsRequireProject()) return;
-      await openDeepLinkedSectionInReader(item);
+      await openSavedItemInReader(item, panel.dataset.paneId || "");
     },
     onAssign: async (project, item) => {
       requirePrivateWorkspaceWritable();
@@ -50029,14 +50110,6 @@ function workspacePaneDescriptors(options = {}) {
       (signal) => renderUtilityInstance(instance, { accessGate: options.accessGate, foundationScope: savedFoundationScope, signal }), () => closeUtilityInstance(instance),
       { foundationScope: savedFoundationScope, deferredFoundationRelease: Boolean(savedFoundationScope), publicContent: instance.key === "search", identity: instance.key === "analysis"
         ? researchAssistantContentIdentity(instance) : JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
-    if (instance.key === "search" || instance.key === "sdc") {
-      const detail = sectionDetailsBySearch()[instance.id];
-      if (detail) add(paneIDForSectionDetail(instance.id), "Evidence detail", () => renderSectionDetail(instance.id, detail),
-        closeAndRender(() => removeSectionDetail(instance.id)), {
-          ownerClass: `section-detail-panel${instance.key === "sdc" ? " is-saved-evidence-detail" : " is-search-evidence-detail"}`,
-          identity: JSON.stringify(detail)
-        });
-    }
   }
   if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Assistant", () => renderResearch("utility:analysis"), closeResearchWorkspace,
     { identity: researchAssistantContentIdentity() });

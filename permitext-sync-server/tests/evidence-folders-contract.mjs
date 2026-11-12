@@ -233,8 +233,8 @@ assert.match(
 const openSavedItemSource = functionSource(appSource, "openSavedItemInReader");
 assert.match(
   openSavedItemSource,
-  /newUtilityInstance\("sdc"\)[\s\S]*?openSectionDetail\([\s\S]*?anchorPaneID: savedPaneID[\s\S]*?scrollPaneIntoView\(paneIDForSectionDetail\(detailInstance\.id\)\)/,
-  "A saved passage must open its note-capable Source Detail."
+  /openSourceInReader\(item, savedPaneID, \{ sourceSurface: "saved", isCurrent,[\s\S]*?evidenceAnchor: item\.evidenceAnchor/,
+  "A saved passage opens its exact source directly in Reader."
 );
 assert.doesNotMatch(openSavedItemSource, /openOrUpdateLinkedReaderForSearch/,
   "Opening a saved passage must not create a Reader until the user explicitly opens the enacted source.");

@@ -733,7 +733,7 @@ await import("./reader-public-presentation-contract.mjs");
 assert.doesNotMatch(clientSource, /newResearchButton|inline-new-research-toggle|Start new Research with this passage|createNew: true/, "The Reader still exposes a duplicate new-Research icon.");
 assert.match(clientSource, /function researchActionIconSVG\(\)[\s\S]*?M12\.983 21\.186a1 1 0 0 1-1\.966 0/, "The Reader Research action does not use Lucide's Astroid icon.");
 assert.doesNotMatch(clientSource, /Link passage to Note|openReaderPassageNoteLinker/, "The removed Reader passage-linking card is still exposed.");
-assert.match(functionSource(clientSource, "renderInlineCommentBox"), /await openSavedItemInReader\(readerPassagePayload\(section, reader, target\), paneIDForReader\(reader\)\)/, "Reader comments open the linked saved passage.");
+assert.match(functionSource(clientSource, "renderInlineCommentBox"), /openReaderPassageComments\([\s\S]*?readerPassagePayload\(section, reader, target\), commentButton\)/, "Reader comments open in the existing Reader.");
 assert.doesNotMatch(functionSource(clientSource, "renderAnnotatedCodeBlock"), /wrapper\.addEventListener\(["'](?:click|keydown)["']/, "Reader paragraphs must not become activation targets.");
 assert.match(functionSource(clientSource, "renderAnnotatedCodeBlock"), /wrapper\.addEventListener\("focusin", mount, \{ once: true \}\)/, "Lazy Reader controls remain discoverable from keyboard focus.");
 assert.match(functionSource(clientSource, "renderAnnotatedCodeBlock"), /wrapper\.removeAttribute\("tabindex"\)/, "A lazy paragraph must stop being a temporary focus target after controls mount.");
