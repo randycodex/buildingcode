@@ -153,3 +153,18 @@ all(grouped.element).find(node=>node.textContent==='+ New chat').handlers.click(
 assert.equal(newChats,1);assert.equal(grouped.element.querySelector('.rv2-input').value,'Keep my unsent follow-up');
 grouped.dispose();
 console.log('Grouped Research history passed: dates/Drafts, summary labels, full original ask, no legacy action, inline rename and draft preservation.');
+
+// Project context permits a question without passage discovery; the snapshot
+// viewer reads only the answer's saved context, including status/provenance.
+{
+ let sends=0,finds=0;
+ const view=createResearchV2View({conversation:{sources:[],messages:[{id:'frozen',role:'assistant',answer:{answerText:'Saved answer.'}}]},
+  initialDraft:'Summarize my Project.',onDraft(){},onSend:async()=>sends++,onFind:async()=>{finds++;return[];},
+  renderProjectContext:host=>{const controller=document.createElement('section');controller.hidden=true;controller.querySelectorAll=()=>[];controller._projectContextOptions={enabled:()=>true};host.append(controller);return controller;},
+  onSnapshot:async()=>({sources:[],projectContextSnapshot:{capturedAt:'2026-11-12T12:00:00.000Z',projectInformation:{address:'Saved address',description:'Original proposal',facts:['Stories Above Grade: 3 (stated; user survey)']}}})});
+ view.element.querySelector('.rv2-send').handlers.click();await tick();assert.equal(sends,1);assert.equal(finds,0);
+ all(view.element).find(x=>x.textContent==='Sources used').handlers.click();await tick();
+ for(const expected of ['Project context for this answer','Original proposal','Saved address','Stories Above Grade: 3 (stated; user survey)'])assert(all(view.element).some(x=>x.textContent===expected));
+ view.dispose();
+}
+console.log('Default-context view passed: context-only send and saved answer Project snapshot inspection.');

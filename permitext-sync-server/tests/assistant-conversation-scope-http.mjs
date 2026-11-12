@@ -28,8 +28,9 @@ try {
     structuredFacts:[{id:'scope-fact-one',key:'stories-above-grade',label:'Stories Above Grade',value:'3',source:'user',status:'stated'},
       {id:'scope-fact-two',key:'sprinkler-protection',label:'Sprinkler Protection',value:'Only the cellar is sprinklered.',source:'user',status:'stated',sourceText:'SECRET_UNSELECTED carrier text'}]}}]}});
   let conversation=(await request('/research/conversations/create',{projectID,analysisMode:'conversation_only'},201)).conversation;
-  assert.equal(conversation.messages.length,0);assert.equal(conversation.assistantScope.includeProjectContext,false);assert.deepEqual(conversation.assistantScope.facts,[]);
+  assert.equal(conversation.messages.length,0);assert.equal(conversation.assistantScope.includeProjectContext,true);assert.deepEqual(conversation.assistantScope.facts,[]);
   assert.equal(assistantProjectInformation(conversation.assistantScope),null);
+  conversation=(await request('/research/conversations/project-context',{conversationID:conversation.id,include:false})).conversation;
   const empty=await request('/research/conversations/message',{conversationID:conversation.id,question:'What is required here?',requestID:'scope-empty'});
   assert.match(empty.conversation.messages.at(-1).answer.answerText,/Select a passage in Reader/);
   conversation=empty.conversation;

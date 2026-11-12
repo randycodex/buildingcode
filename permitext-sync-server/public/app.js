@@ -3,7 +3,7 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, remo
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=27";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=29";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-composer-actions-v1719";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-current-project-context-v1721";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-composer-actions-v1719";
+} from "./offline-storage.js?v=20261112-current-project-context-v1721";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -27012,11 +27012,11 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
   const instance = (state.utilityInstances || []).find(item => paneIDForUtilityInstance(item) === paneID) || null;
   const currentInstance = () => instance ? (state.utilityInstances || []).find(item => item.key === "analysis" && item.id === instance.id) : null;
   const selectedID = () => researchDraftPaneIDs.has(paneID) ? "" : (currentInstance()?.conversationID || state.researchConversationID || "");
-  const conversationID = selectedID();
+  let conversationID = selectedID();
   const accountIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   const current = () => isCurrentAccountRequest(accountIdentity) && workspaceID === activeWorkspaceID && selectedID() === conversationID;
   const ownsPanel = () => current() && panel.isConnected && panel.parentNode === track && (!instance || currentInstance());
-  const draftKey = conversationID ? `followup:${conversationID}` : paneID;
+  let draftKey = conversationID ? `followup:${conversationID}` : paneID;
   const draft = () => researchNewChatDrafts.get(draftKey) || "";
   const saveDraft = text => { if (!current()) return; researchNewChatDrafts.set(draftKey, text); if (currentInstance()) currentInstance().draft = text; scheduleResearchDraftPersistence(); };
   if (!retained.panel) showColumnLoadingStatus(content, "Loading Research…");
@@ -27044,7 +27044,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     }
     const open = id => openResearchConversation(id, { instance, refreshList:true });
     let view, retryingRequestID="";
-    const recoveryKey = `permitext:research-v2-request:${activeAccount()?.userID}:${workspaceID}:${conversationID || paneID}`;
+    let recoveryKey = `permitext:research-v2-request:${activeAccount()?.userID}:${workspaceID}:${conversationID || paneID}`;
     const publish = async (result, {revealAnswer = false} = {}) => {
       if (!ownsPanel()) return;
       const next = result?.conversation;
@@ -27093,7 +27093,10 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     };
     const snapshot = async message => {
       const result = await postResearch("/research/answers/get", { answerID:message.id });
-      return (result.answer?.evidence || []).map(source => ({...source,codeVersion:source.sourceLibraryVersion,codePrefix:source.codeBook,selectedText:source.passageText}));
+      return {
+        sources:(result.answer?.evidence || []).map(source => ({...source,codeVersion:source.sourceLibraryVersion,codePrefix:source.codeBook,selectedText:source.passageText})),
+        projectContextSnapshot:result.answer?.answer?.inputSnapshot?.projectContextSnapshot || result.answer?.assistantScopeSnapshot?.projectContext || result.answer?.projectContextSnapshot || null
+      };
     };
     let historyCursor = listed.nextCursor;
     const railWidthKey = `permitext:research-question-width:${activeAccount()?.userID || "public"}:${workspaceID}:${paneID}`;
@@ -27189,7 +27192,40 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
         action:"remove",sourceID:source.id,expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)})),
       onSend:async ({question,requestID,signal,onProgress}) => {
         if (researchOperations.status(researchOperationScope(accountIdentity,workspaceID))) throw new Error('Wait for the conversation update to finish before sending.');
-        if (!researchWorkspaceProjectID() || !researchConversationInWorkspace(conversation)) {
+        if (!researchWorkspaceProjectID()) throw new Error("Open a Project before asking a question.");
+        if (!conversation) {
+          // Adopt the new chat without remounting the view that owns this send.
+          // Retries retain both the created conversation and the question ID.
+          const created = await postResearch("/research/conversations/create", {projectID:researchWorkspaceProjectID(),analysisMode:"conversation_only",requestID:`chat:${requestID}`});
+          if (!ownsPanel()) return;
+          conversation = created.conversation;
+          const nextDraftKey = `followup:${conversation.id}`;
+          researchNewChatDrafts.set(nextDraftKey,draft());
+          researchNewChatDrafts.delete(draftKey);
+          draftKey = nextDraftKey;
+          const nextRecoveryKey = `permitext:research-v2-request:${activeAccount()?.userID}:${workspaceID}:${conversation.id}`;
+          const savedRequest = sessionStorage.getItem(recoveryKey);
+          if (savedRequest) sessionStorage.setItem(nextRecoveryKey,savedRequest);
+          sessionStorage.removeItem(recoveryKey);
+          recoveryKey = nextRecoveryKey;
+          const owner = currentInstance();
+          if (owner) {
+            owner.conversationID = conversation.id;
+            owner.historyShowing = false;
+            supplementalResearchConversations.set(conversation.id,conversation);
+            if (!supplementalResearchConversationIDs.includes(conversation.id)) supplementalResearchConversationIDs.push(conversation.id);
+          } else {
+            state.researchConversationID = conversation.id;
+            activeResearchConversation = conversation;
+            researchConversationPaneOpened = true;
+            researchHistoryShowing = false;
+          }
+          researchDraftPaneIDs.delete(paneID);
+          conversationID = conversation.id;
+          panel.dataset.workspacePaneIdentity = researchAssistantContentIdentity(owner);
+          saveWorkspaceState();
+        }
+        if (!researchConversationInWorkspace(conversation)) {
           throw new Error("Open a Project and start a conversation there to continue Research. This saved conversation and its answers are preserved.");
         }
         if(retryingRequestID===requestID){const fresh=await postResearch("/research/conversations/get",{conversationID:conversation.id});if(!current())return;conversation=researchV2RetryContext(conversation,fresh.conversation,requestID);}
@@ -27204,7 +27240,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       },
       onSnapshot:snapshot,
       onCitation:async (message,id) => {
-        const sources = await snapshot(message), source = sources[Number(id.slice(1))-1];
+        const saved = await snapshot(message), source = saved.sources[Number(id.slice(1))-1];
         if (current() && source) await openSourceInReader(source,paneID);
       }
     });
@@ -28638,74 +28674,39 @@ function renderHistoricalResearchControl(container, message) {
 function renderResearchProjectContext(container, conversation, {onUpdated = null} = {}) {
   const section = document.createElement("section");
   section.className = "research-project-context";
-  let originPaneID = '';
-  const publishContext = async result => {
-    if (onUpdated && section.isConnected) return onUpdated(result);
-    const paneID = section.closest('.workspace-panel')?.dataset.paneId || originPaneID;
-    const instance = state.utilityInstances.find(item => item.key === 'analysis' && paneIDForUtilityInstance(item) === paneID);
-    // A view can be replaced while the confirmed write is saving. Publish to
-    // its original conversation, and never reopen a different view or chat.
-    supplementalResearchConversations.set(result.conversation.id,result.conversation);
-    if (currentColumnWorkflowView() !== 'research' || (instance ? instance.conversationID : state.researchConversationID || '') !== (conversation.id || '')) return;
-    return openResearchConversation(result.conversation.id, {conversation:result.conversation,refreshList:true, ...(instance ? {instance} : {})});
-  };
-  if (conversation.primaryProjectID) {
-    const snapshot = conversation.assistantScope?.includeProjectContext && conversation.assistantScope.projectContext;
-    const button = researchWorkflowButton(snapshot ? 'Review included Project context and facts' : 'Include Project context and facts…', async () => {
-      const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
-      const scope = researchOperationScope(identity,workspaceID);
-      if (researchOperations.status(scope)) return;
-      originPaneID=section.closest('.workspace-panel')?.dataset.paneId || '';
-      const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID;
-      if (!current()) return;
-      const finish = researchOperations.begin(scope,'Updating Project context…');
+  section.hidden = true;
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const scope = researchOperationScope(identity, workspaceID);
+  const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID;
+  const enabled = () => Boolean(conversation.primaryProjectID) && conversation.assistantScope?.projectContextMode !== 'excluded';
+  const pending = () => Boolean(researchOperations.status(scope) ||
+    section.closest('.workspace-panel')?.querySelector('.research-v2[aria-busy="true"]') ||
+    ['active','retrying'].includes(reconciledResearchProgressSession(conversation)?.status));
+  section._projectContextOptions = {
+    available: Boolean(conversation.primaryProjectID), enabled, pending,
+    async setEnabled(include) {
+      if (!current() || !section.isConnected || pending()) return;
+      const originPaneID = section.closest('.workspace-panel')?.dataset.paneId || '';
+      const finish = researchOperations.begin(scope, 'Updating Project context…');
       try {
-        const {snapshot:preview} = await postResearch('/research/conversations/project-context', {conversationID:conversation.id || undefined,
-          projectID:conversation.primaryProjectID, preview:true});
-        if (!current() || !section.isConnected) return;
-        const content = document.createElement('div'); content.className = 'research-context-review';
-        const info = preview.projectInformation;
-        const text = document.createElement('p'); text.style.whiteSpace = 'pre-wrap';
-        text.textContent = [info.address && `Address: ${info.address}`, info.description && `Context: ${info.description}`,
-          ...(info.facts || [])].filter(Boolean).join('\n\n');
-        content.append(text);
-        const accepted = await confirmWebWarning('Review Project context and facts',
-          'Include this snapshot in future answers in this conversation. Recorded fact status and sources are preserved. Review again to include later Project edits.',
-          {content, confirmLabel:'Include reviewed snapshot', container:section.closest('.workspace-panel')});
-        if (!accepted || !current() || !section.isConnected) return;
         const pendingQuestion = section.closest('.workspace-panel')?.querySelector('.rv2-input, .research-question-input')?.value || '';
         const target = conversation.id ? conversation : (await postResearch('/research/conversations/create', {
-          projectID:conversation.primaryProjectID, analysisMode:'conversation_only', requestID:crypto.randomUUID()})).conversation;
+          projectID: conversation.primaryProjectID, analysisMode: 'conversation_only', requestID: crypto.randomUUID()
+        })).conversation;
         if (!current()) return;
         if (!conversation.id && pendingQuestion) researchNewChatDrafts.set(`followup:${target.id}`, pendingQuestion);
-        const result = await postResearch('/research/conversations/project-context', {conversationID:target.id, snapshotHash:preview.contentHash});
-        if (current()) {
-          await publishContext(result);
-        }
-      } finally {finish();}
-    });
-    button.disabled = ['active','retrying'].includes(reconciledResearchProgressSession(conversation)?.status);
-    section.append(button);
-    if (snapshot) {
-      const detail = document.createElement('details'), summary = document.createElement('summary');
-      summary.textContent = `Included Project snapshot · ${new Date(snapshot.reviewedAt).toLocaleString()}`;
-      const body = document.createElement('p'); body.style.whiteSpace = 'pre-wrap';
-      body.textContent = [snapshot.projectInformation?.description, ...(snapshot.projectInformation?.facts || [])].filter(Boolean).join('\n\n');
-      detail.append(summary, body); section.append(detail);
-      const remove = researchWorkflowButton('Exclude Project snapshot from future answers', async () => {
-        const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
-        const scope = researchOperationScope(identity,workspaceID);
-        if (researchOperations.status(scope)) return;
-        originPaneID=section.closest('.workspace-panel')?.dataset.paneId || '';
-        const finish = researchOperations.begin(scope,'Updating Project context…');
-        try {
-          const result = await postResearch('/research/conversations/project-context', {conversationID:conversation.id, include:false});
-          if (isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID) await publishContext(result);
-        } finally {finish();}
-      });
-      remove.disabled = button.disabled; section.append(remove);
+        const result = await postResearch('/research/conversations/project-context', {conversationID: target.id, include});
+        if (!current()) return;
+        if (onUpdated) return await onUpdated(result);
+        if (!section.isConnected) return;
+        const instance = state.utilityInstances.find(item => item.key === 'analysis' && paneIDForUtilityInstance(item) === originPaneID);
+        supplementalResearchConversations.set(result.conversation.id, result.conversation);
+        if (currentColumnWorkflowView() !== 'research' ||
+            (instance ? instance.conversationID : state.researchConversationID || '') !== (conversation.id || '')) return;
+        await openResearchConversation(result.conversation.id, {conversation: result.conversation, refreshList: true, ...(instance ? {instance} : {})});
+      } finally { finish(); }
     }
-  }
+  };
   container.append(section);
   return section;
 }
@@ -45664,6 +45665,22 @@ function openColumnGroupMenu(panel, anchor) {
   if (factEditor?.refreshZoLa) add("Refresh ZoLa data", factEditor.refreshZoLa, factEditor.isRefreshing());
   if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
   if (panel.classList.contains("research-list-panel")) add("New research column", () => void openNewResearchColumn());
+  const projectContext = panel.querySelector('.research-project-context')?._projectContextOptions;
+  if (projectContext?.available) {
+    separate();
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.setAttribute('role', 'menuitemcheckbox');
+    toggle.setAttribute('aria-label', 'Include Project context and facts');
+    toggle.setAttribute('aria-checked', String(projectContext.enabled()));
+    toggle.textContent = 'Include Project context and facts';
+    toggle.disabled = projectContext.pending();
+    toggle.addEventListener('click', () => {
+      close();
+      void projectContext.setEnabled(!projectContext.enabled()).catch(error => presentWorkspaceIssue(error.message));
+    });
+    menu.append(toggle);
+  }
   separate();
   if (paneCanCollapse(panel.dataset.paneId) && !columnGroupIsCollapsed(group)) {
     add(paneIsCollapsed(panel.dataset.paneId) ? 'Reopen column' : 'Collapse', () => {

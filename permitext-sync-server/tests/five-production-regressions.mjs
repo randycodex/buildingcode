@@ -20,15 +20,15 @@ const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=(start,end)=>app.slice(app.indexOf(start),app.indexOf(end,app.indexOf(start)));
 const source={kind:'selection',sectionID:'2152',selectedText:'Exact reviewed table.'};
 for(let n=0;n<5;n++){
-  const gate=createResearchOperationGate(),scope='owner:workspace',preview=deferred(),confirm=deferred(),saving=deferred(),publishing=deferred();
+  const gate=createResearchOperationGate(),scope='owner:workspace',saving=deferred(),publishing=deferred();
   let loaded=null,sends=0,applied=0;
   const c=vm.createContext({document,researchOperations:gate,researchOperationScope:()=>scope,activeWorkspaceID:'workspace',
     captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,
     state:{utilityInstances:[],researchConversationID:'chat'},supplementalResearchConversations:new Map(),
     currentColumnWorkflowView:()=> 'research',paneIDForUtilityInstance:()=> 'analysis',
     researchWorkflowButton:(label,fn)=>{const button=new Element('button');button.textContent=label;button.addEventListener('click',fn);return button;},
-    reconciledResearchProgressSession:()=>null,confirmWebWarning:()=>confirm.promise,
-    postResearch:async(_path,body)=>body.preview?preview.promise:(applied++,saving.promise),
+    reconciledResearchProgressSession:()=>null,
+    postResearch:async(_path,body)=>{assert.equal(body.include,true);applied++;return saving.promise;},
     openResearchConversation:async(_id,{conversation})=>{await publishing.promise;loaded=conversation;}
   });
   vm.runInContext(actual('function renderResearchProjectContext(','function researchEvidenceSplitRatio('),c);
@@ -42,10 +42,9 @@ for(let n=0;n<5;n++){
     });panel.append(view.element);return view;
   };
   let view=makeView();const context=view.element.querySelector('.research-project-context');
-  const pending=context.querySelector('button').handlers.click();
+  const pending=context._projectContextOptions.setEnabled(true);
   const attemptSend=async()=>{view.element.querySelector('.rv2-input').handlers.keydown({key:'Enter',preventDefault(){}});await tick();assert.equal(sends,0);assert.equal(view.element.querySelector('.rv2-send').disabled,true);assert.equal(view.element.querySelector('.rv2-input').value,'Keep my question');};
-  await attemptSend();preview.resolve({snapshot:{contentHash:'reviewed-hash',projectInformation:{description:'Unverified office assumption',facts:['Sprinklers unknown']}}});await tick();
-  confirm.resolve(true);await tick();assert.equal(applied,1);await attemptSend();
+  await attemptSend();assert.equal(applied,1);
   if(n%2){context.isConnected=false;view.dispose();view=makeView();await attemptSend();}
   saving.resolve({conversation:{id:'chat',messages:[],sources:[source],assistantScope:{includeProjectContext:true,projectContext:{contentHash:'reviewed-hash'}}}});await tick();await attemptSend();
   publishing.resolve();await pending;assert.equal(gate.status(scope),'');
@@ -119,4 +118,4 @@ assert(superscripts.length>=5,'Real PDF renders raised letter-footnote runs in d
 for(const ref of refs)assert(uris.has(researchAnswerURL(ref.props.referenceID)),'Each saved Research reference has a real PDF link annotation');
 assert.equal(printed.match(/Open\s+saved\s+Research\s+answer:/g)?.length,5,'Recipients also receive a printed URL');
 await parsed.destroy();
-console.log('Five production regressions passed: delayed context confirmation/send and remounts (5), safe live/history emphasis with citations, native table superscripts, validated ranges, and 5 clickable saved-answer PDF links.');
+console.log('Five production regressions passed: delayed context toggle/send and remounts (5), safe live/history emphasis with citations, native table superscripts, validated ranges, and 5 clickable saved-answer PDF links.');

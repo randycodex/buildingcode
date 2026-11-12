@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
+import {researchV2RetryContext} from '../public/research-v2.js';
 import {createResearchOperationGate} from '../public/research-operation-gate.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
@@ -13,13 +14,13 @@ function harness(instanceMode=false){
  const track={querySelector:selector=>selector.includes('.research-v2-panel')?panel:null};panel.parentNode=track;
  const conversations={a:{id:'a',primaryProjectID:'project-a',title:'Question A',messages:[],sources:[]},b:{id:'b',primaryProjectID:'project-a',title:'Question B',messages:[],sources:[]}};
  let accountCurrent=true, options;
- const context=vm.createContext({state,track,CSS:{escape:v=>v},researchOperations:createResearchOperationGate(),researchOperationScope:()=> 'owner:workspace',researchDraftPaneIDs:new Set(),researchNewChatDrafts:new Map(),supplementalResearchConversations:new Map(),activeResearchConversation:conversations.a,
+ const context=vm.createContext({researchV2RetryContext,state,track,CSS:{escape:v=>v},researchOperations:createResearchOperationGate(),researchOperationScope:()=> 'owner:workspace',researchDraftPaneIDs:new Set(),researchNewChatDrafts:new Map(),supplementalResearchConversations:new Map(),activeResearchConversation:conversations.a,
   researchHistoryShowing:false,researchConversationPaneOpened:true,activeWorkspaceID:'workspace',activeAccount:()=>({userID:'owner'}),captureAccountRequest:()=>1,isCurrentAccountRequest:()=>accountCurrent,
   paneIDForUtilityInstance:i=>'instance:'+i.id,renderUtility:()=>{calls.created++;return panel;},analysisTemplate:{},showColumnLoadingStatus(){calls.loading++;},
   postResearch:async(path,body)=>{calls.requests.push(path);if(path.endsWith('/list'))return{conversations:Object.values(conversations),nextCursor:null,hasMore:false};if(path.endsWith('/get'))return{conversation:conversations[body.conversationID]};throw Error(path);},
   researchWorkspaceProjectID:()=> 'project-a',researchConversationInWorkspace:conversation=>conversation.primaryProjectID==='project-a',
   assistantHistoryManagement:()=>({dispose(){}}),
-  createResearchV2View(value){options=value;return{element:{id:value.conversation.id},dispose(){calls.disposed++;}};},
+  createResearchV2View(value){options=value;return{element:{id:value.conversation?.id},dispose(){calls.disposed++;}};},
   crypto:{randomUUID:()=> 'new-request'},sessionStorage:{getItem:()=>null},document:{activeElement:null},MutationObserver:class{observe(){}disconnect(){}},requestAnimationFrame:fn=>fn(),
   hasCapability:()=>true,scheduleResearchDraftPersistence(){},notifyWorkspaceLayoutChange(){calls.layout++;}
  });
@@ -157,3 +158,47 @@ console.log('New-question publication passed: retain the column, retire the form
  assert.equal(f.options,undefined,'Restoring a stale pane must not reveal another project’s conversation.');
 }
 console.log('Workspace Project ownership passed: automatic creation scope, no selector, preserved historical answers/drafts, and no unassigned paid calls.');
+
+// A blank Project chat can submit once without a separate context-inclusion step.
+// Creation must not dispose the sending view or lose durable retry identity.
+for(const mode of [false,true]){
+ const f=harness(mode),paneID=mode?'instance:instance':'utility:analysis',store=new Map();
+ f.state.researchConversationID='';if(f.instance)f.instance.conversationID='';
+ let sends=0,creates=0,remountsDuringSend;
+ const created={id:'created-default',primaryProjectID:'project-a',revision:1,messages:[],sources:[]};
+ Object.assign(f.context,{supplementalResearchConversationIDs:[],researchConversationList:[],researchHistoryPageReaders:new Map(),
+  readResearchConversationList:{invalidate(){}},refreshResearchUsage:{invalidate(){}},saveWorkspaceState(){},
+  sessionStorage:{getItem:key=>store.get(key)||null,setItem:(key,value)=>store.set(key,value),removeItem:key=>store.delete(key)},
+  postResearchWithProgress:async args=>{sends++;assert.equal(args.conversationID,created.id);assert.equal(args.requestID,'stable-question');
+   remountsDuringSend=f.calls.disposed;if(sends===1)throw Error('Interrupted response');
+   return{conversation:{...created,messages:[{id:'saved',role:'assistant',answer:{answerText:'Recorded Project context.'}}]}};}
+ });
+ const post=f.context.postResearch;
+ f.context.postResearch=async(path,body)=>{
+  if(path.endsWith('/create')){creates++;assert.equal(body.projectID,'project-a');assert.equal(body.requestID,'chat:stable-question');return{conversation:created};}
+  if(path.endsWith('/get')&&body.conversationID===created.id)return{conversation:created};
+  return post(path,body);
+ };
+ await f.context.renderResearchV2Pane(paneID,{available:true});f.options.onDraft('Keep this question');
+ f.options.requestStore.write({requestID:'stable-question',question:'Keep this question'});
+ const send=()=>f.options.onSend({question:'Keep this question',requestID:'stable-question'});
+ await assert.rejects(send(),/Interrupted response/);
+ assert.equal(remountsDuringSend,0,'Creation must not abort the view that owns the request');
+ assert.equal(creates,1);assert.equal(f.context.researchNewChatDrafts.get('followup:created-default'),'Keep this question');
+ assert.equal(store.size,1);assert([...store.keys()][0].endsWith(':created-default'));
+ assert.equal(f.options.requestStore.read().requestID,'stable-question');
+ await send();assert.equal(creates,1,'Retry uses the already-created chat');assert.equal(sends,2);
+ assert.equal(store.size,0);assert.equal(f.options.conversation.id,created.id);assert.equal(f.options.initialDraft,'');
+}
+for(const stale of ['account','workspace','closed-pane']){
+ const f=harness();f.state.researchConversationID='';let resolve;
+ await f.context.renderResearchV2Pane('utility:analysis',{available:true});f.options.onDraft('Retain blank-chat draft');
+ f.context.postResearch=()=>new Promise(done=>resolve=done);
+ const pending=f.options.onSend({question:'Retain blank-chat draft',requestID:'late-create'});
+ if(stale==='account')f.accountCurrent=false;
+ if(stale==='workspace')f.context.activeWorkspaceID='another';
+ if(stale==='closed-pane')f.panel.isConnected=false;
+ resolve({conversation:{id:'late',primaryProjectID:'project-a'}});await pending;
+ assert.equal(f.state.researchConversationID,'');assert.equal(f.context.researchNewChatDrafts.get('utility:analysis'),'Retain blank-chat draft');
+}
+console.log('Default-context first send passed: blank primary/repeated chat, no premature remount, durable retry identity/draft and stale creation fences.');

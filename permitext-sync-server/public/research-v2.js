@@ -221,7 +221,7 @@ export function createResearchV2View(options) {
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
   chat.append(mobileHistory,thread,detail,status,operationStatus,composer);root.append(rail,divider,chat);
   const operationPending=()=>chatTransitionPending||Boolean(options.operationGate?.status());
-  function update(){const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||pending));
+  function update(){const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||includeBusy||revealBusy||pending));
     if(newChat)newChat.disabled=busy||includeBusy||revealBusy||pending;
     operationStatus.textContent=chatTransitionPending?'Starting new chat…':options.operationGate?.status() || '';operationStatus.hidden=!pending;
     projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});}
@@ -249,7 +249,18 @@ export function createResearchV2View(options) {
   }
   async function showSnapshot(message){if(busy||includeBusy)return;const attempt=++generation;notice('Loading original passages…');
     try{const saved=await onSnapshot(message);if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','','Sources used by this answer'));
-      for(const source of saved){content.append(node('h4','',passageChipLabel(source)),node('p','rv2-source-text',source.passageText||source.selectedText||source.text||''));
+      const sources=Array.isArray(saved)?saved:saved.sources||[];
+      const snapshot=saved.projectContextSnapshot,information=snapshot?.projectInformation;
+      if(information){
+        const context=node('section','rv2-project-snapshot');context.append(node('h4','','Project context for this answer'));
+        const capturedAt=snapshot.capturedAt||information.capturedAt||snapshot.reviewedAt||information.reviewedAt;
+        if(capturedAt)context.append(node('p','rv2-detail-caption',`Captured ${new Date(capturedAt).toLocaleString()}`));
+        if(information.address)context.append(node('p','rv2-source-text',information.address));
+        if(information.description)context.append(node('p','rv2-source-text',information.description));
+        for(const fact of information.facts||[])context.append(node('p','rv2-source-text',typeof fact==='string'?fact:JSON.stringify(fact)));
+        content.append(context);
+      }
+      for(const source of sources){content.append(node('h4','',passageChipLabel(source)),node('p','rv2-source-text',source.passageText||source.selectedText||source.text||''));
         content.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));}
     }catch(error){if(valid(attempt))notice(error.message,true);}}
   async function findPassages(discoveryQuestion,{focus=''}={}){
@@ -299,7 +310,7 @@ export function createResearchV2View(options) {
   }
   async function sendQuestion(){
     if(busy||includeBusy||revealBusy||operationPending()||!input.value.trim())return;
-    if(!passageSources.length){await findPassages();return;}
+    if(!passageSources.length&&!projectContext?._projectContextOptions?.enabled()){await findPassages();return;}
     const question=input.value.trim();
     if(!lastRequest||lastRequest.question!==question)lastRequest={question,requestID:crypto.randomUUID()};
     options.requestStore?.write(lastRequest);

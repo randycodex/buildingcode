@@ -8,7 +8,7 @@ import sharp from 'sharp';
 import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
 import {emptyNotebookDocument, validateNotebookDocument} from '../notebook-contract.mjs';
 import {freezeResearchV2Turn} from '../research-v2-engine.mjs';
-import {assistantPassageScope, assistantProjectInformation} from '../assistant-conversation-scope.mjs';
+import {assistantPassageScope, assistantProjectInformation, assistantProjectSnapshotHash} from '../assistant-conversation-scope.mjs';
 
 const directory = await mkdtemp(join(tmpdir(), 'permitext-workflow-polish-'));
 Object.assign(process.env, {NODE_ENV:'test', VERCEL:'', VERCEL_ENV:'',
@@ -130,21 +130,21 @@ try {
   await post('/research/conversations/project-context',{conversationID:conversation.id,snapshotHash:'stale'},409);
   const included = (await post('/research/conversations/project-context',{conversationID:conversation.id,snapshotHash:preview.contentHash})).conversation;
   assert.equal(included.assistantScope.includeProjectContext,true);
-  assert.equal(assistantProjectInformation(assistantPassageScope(included)).description, project.description);
-  const packet = freezeResearchV2Turn({question:'Summarize the reviewed project context.',sources:[],projectContextSnapshot:included.assistantScope.projectContext});
+  assert.equal(assistantProjectInformation(assistantPassageScope(included,{projectInformation:preview.projectInformation})).description, project.description);
+  const packet = freezeResearchV2Turn({question:'Summarize the reviewed project context.',sources:[],projectContextSnapshot:assistantPassageScope(included,{projectInformation:preview.projectInformation}).projectContext});
   assert.equal(packet.projectContextSnapshot.projectInformation.description,project.description);
   const frozen = JSON.stringify(packet);
   const response = await post('/research/conversations/message',{ answerMode: "verified",conversationID:included.id,question:'Summarize the reviewed project context.',requestID:'polish-context-answer',
     researchEngine:'v2',analysisMode:'conversation_only',expectedRevision:included.revision,expectedEvidenceSetVersion:included.evidenceSetVersion || 1});
   const answer = response.conversation.messages.at(-1).answer;
   assert(answer.inputSnapshot, JSON.stringify({answer,providerCalls:providerPackets.length}).slice(0,2800));
-  assert.equal(answer.inputSnapshot.projectContextSnapshot.contentHash,preview.contentHash);
+  assert.equal(answer.inputSnapshot.projectContextSnapshot.contentHash,assistantProjectSnapshotHash(preview.projectInformation));
   assert.equal(providerPackets.length,2,'A writer and a reviewer both receive the frozen context');
   assert(providerPackets.every(value => value.includes(project.description)));
   const frozenAnswer = JSON.stringify(answer);
   await post('/sync/push',{batch:{user:{id:userID},mutations:[{project:{...project,description:'Changed after review',updatedAt:new Date(Date.now()+1000).toISOString()}}]}});
   const reopened = (await post('/research/conversations/get',{conversationID:conversation.id})).conversation;
-  assert.equal(reopened.assistantScope.projectContext.projectInformation.description,project.description,'Project changes do not silently update reviewed snapshots');
+  assert.equal(reopened.assistantScope.projectContextMode,'current','New questions read current Project facts; existing answer snapshots remain frozen');
   await post('/research/conversations/project-context',{conversationID:conversation.id,include:false});
   assert.equal(JSON.stringify(packet),frozen,'Removing future context does not mutate captured packets');
   assert.equal(JSON.stringify((await post('/research/conversations/get',{conversationID:conversation.id})).conversation.messages.at(-1).answer),frozenAnswer,'Reviewed answers remain immutable after Project changes and exclusion');

@@ -1,4 +1,4 @@
-import { assistantScopeVersion, assistantSuppliedText, isAssistantEmptyMaterialAnswer } from "./assistant-conversation-scope.mjs";
+import { assistantScopeVersion, assistantProjectSnapshotHash, assistantSuppliedText, isAssistantEmptyMaterialAnswer } from "./assistant-conversation-scope.mjs";
 import { isCanonicalResearchClarification } from "./research-conversation-continuity.mjs";
 import { researchSuppliedText } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
@@ -779,7 +779,10 @@ export function immutableResearchAnswer({
     (answer?.verification?.reason !== "project_scope" || Boolean(projectID));
   const reviewedSnapshot = assistantScopeSnapshot?.includeProjectContext && assistantScopeSnapshot.projectContext;
   const reviewedProjectContextAnswer = assistantScopeSnapshot?.version === assistantScopeVersion &&
-    reviewedSnapshot?.projectInformation?.projectID === projectID && Number.isFinite(Date.parse(reviewedSnapshot?.reviewedAt)) &&
+    reviewedSnapshot?.projectInformation?.projectID === projectID && Number.isFinite(Date.parse(reviewedSnapshot?.capturedAt || reviewedSnapshot?.reviewedAt)) &&
+    (!reviewedSnapshot?.capturedAt || assistantScopeSnapshot.projectContextMode === "current" &&
+      reviewedSnapshot.contentHash === assistantProjectSnapshotHash(reviewedSnapshot.projectInformation) &&
+      assistantProjectSnapshotHash(answer?.inputSnapshot?.projectContextSnapshot || null) === assistantProjectSnapshotHash(reviewedSnapshot)) &&
     /^[a-f0-9]{64}$/.test(reviewedSnapshot?.contentHash || '') &&
     answer?.inputSnapshot?.projectContextSnapshot?.contentHash === reviewedSnapshot.contentHash &&
     /^research-v2-/.test(answer?.researchEngine || '') && answer?.verification?.pass === true &&

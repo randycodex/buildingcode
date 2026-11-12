@@ -18937,13 +18937,14 @@ async function handleResearchConversationProjectContext(request, response) {
     if (context.body.preview === true) {
       sendJSON(response, 200, {snapshot:{projectID, projectInformation:information, contentHash}}); return;
     }
-    if (context.body.include !== false && context.body.snapshotHash !== contentHash) {
+    if (typeof context.body.include !== 'boolean' && context.body.snapshotHash !== contentHash) {
       sendJSON(response, 409, {error:'Project information changed. Review it again before including it.',code:'RESEARCH_PROJECT_REVIEW_REQUIRED'}); return;
     }
     const now = new Date().toISOString();
-    conversation.assistantScope = {...emptyAssistantScope(), projectID,
-      ...(context.body.include !== false ? {includeProjectContext:true, projectContext:{projectID,
-        projectInformation:structuredClone(information), contentHash, reviewedAt:now}} : {})};
+    const includeProjectContext = context.body.include !== false;
+    conversation.assistantScope = {...emptyAssistantScope(), ...conversation.assistantScope, projectID,
+      includeProjectContext, projectContextMode: includeProjectContext ? 'current' : 'excluded'};
+    conversation.projectContextReviewRequired = false;
     conversation.updatedAt = now;
     await saveStoredResearchConversation(context.userID, conversation);
     sendJSON(response, 200, {conversation:await researchConversationForClient(conversation, {userID:context.userID})});
@@ -20514,7 +20515,7 @@ async function commitProjectContextOnlyResearchMessage({
 }
 
 async function commitMissingDocumentClarification({ context, conversation, originalConversation, question,
-  researchRequestID, progressResponse, evidenceSnapshots, clarificationReason = null, requestDescription = null, recoveryHumanContext = [], conversationScopeEmpty = false }) {
+  researchRequestID, progressResponse, evidenceSnapshots, clarificationReason = null, requestDescription = null, recoveryHumanContext = [], conversationScopeEmpty = false, conversationScope = null }) {
   const now = new Date().toISOString();
   const identity = researchRequestID ? researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID) : randomUUID();
   const common = { contextRevision: researchContextRevision(conversation), createdAt: now,
@@ -20530,10 +20531,14 @@ async function commitMissingDocumentClarification({ context, conversation, origi
   progressResponse.progress("preparing_conclusion", "completed");
   const assistantMessage = { ...common, id: `${identity}:answer`, role: "assistant", answer,
     researchProgress: progressResponse.summary(now) };
-  const answerRecord = immutableResearchAnswer({ id: assistantMessage.id, owner: ownerScope(context.userID),
+  const answerRecord = {...immutableResearchAnswer({ id: assistantMessage.id, owner: ownerScope(context.userID),
     conversationID: conversation.id, projectID: conversation.primaryProjectID || null, question, answer,
     evidence: evidenceSnapshots, citations: [], model: answer.model,
-    researchSystemVersion: clarificationReason ? "conversation-clarification-v2" : "missing-document-clarification-v1", createdAt: now });
+    assistantScopeSnapshot: conversationScope,
+    researchSystemVersion: clarificationReason ? "conversation-clarification-v2" : "missing-document-clarification-v1", createdAt: now }),
+    ...(conversationScope ? {assistantScopeSnapshot: conversationScope, projectContextSnapshot: {
+      projectID: conversation.primaryProjectID || null, projectInformation: assistantProjectInformation(conversationScope),
+      capturedAt: conversationScope.projectContext?.capturedAt || now}} : {})};
   conversation.starterQuestion ||= question;
   appendCompletedResearchExchange(conversation, userMessage, assistantMessage);
   conversation.updatedAt = now;
@@ -20571,7 +20576,7 @@ async function handleResearchConversationMessage(request, response) {
   if (!conversation) return;
   if (requestedV2 || context.body.analysisMode === assistantScopeMode) await ensureAssistantConversationScope(context.userID, conversation);
   const conversationOnly = isConversationOnly(conversation);
-  const conversationScope = conversationOnly ? assistantPassageScope(conversation) : null;
+  let conversationScope = conversationOnly ? assistantPassageScope(conversation) : null;
   if (conversationOnly && conversation.primaryProjectID && !await projectAccessForUser(context.userID, conversation.primaryProjectID)) {
     sendJSON(response, 409, { error: "The conversation's Project is unavailable. Restore access before asking another question.", code: "RESEARCH_PROJECT_REVIEW_REQUIRED" }); return;
   }
@@ -20584,7 +20589,7 @@ async function handleResearchConversationMessage(request, response) {
     return;
   }
   topicContext = researchFailedHumanMeasurementTopicContext({ conversation, question, topicContext });
-  if (conversation.projectContextReviewRequired) {
+  if (conversation.projectContextReviewRequired && !conversationOnly) {
     sendJSON(response, 409, {
       error: "Review the user-provided Project context before generating another answer.",
       code: "RESEARCH_PROJECT_REVIEW_REQUIRED",
@@ -20819,10 +20824,16 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     const pinnedEvidence = selectedResearchEvidence(conversation, current.evidence);
+    if (conversationScope?.includeProjectContext) {
+      const information = await currentResearchProjectInformation(context.userID, conversation.primaryProjectID);
+      if (!information) throw Object.assign(new Error('The conversation\'s Project context is unavailable. Restore access before asking another question.'),
+        {code:'RESEARCH_PROJECT_REVIEW_REQUIRED'});
+      conversationScope = assistantPassageScope(conversation, {projectInformation: information});
+    }
     const projectInformation = conversationOnly ? assistantProjectInformation(conversationScope)
       : await currentResearchProjectInformation(context.userID, conversation.primaryProjectID);
     if (projectInformation?.projectID && isAmbiguousResearchProjectCorrection(question)) {
-      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "project_scope" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification",
         model: "permitext-conversation-clarification", routingMode: "project_scope", charged: false,
@@ -20832,7 +20843,7 @@ async function handleResearchConversationMessage(request, response) {
     const manualProjectFacts = conversationOnly ? [] : conversation.projectContext?.facts || [];
     const combinedProjectFacts = combinedResearchProjectFacts(projectInformation, manualProjectFacts);
     if (conversationOnly && !pinnedEvidence.length && !conversationScope.includeProjectContext) {
-      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
         researchRequestID, progressResponse, evidenceSnapshots: [], conversationScopeEmpty: true });
       Object.assign(researchOperation, { status: "completed", mode: "evidence_boundary", charged: false });
       return;
@@ -20862,7 +20873,7 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     if (!requestedV2 && conversationOnly && conversationScope.includeProjectContext && !pinnedEvidence.length) {
-      await commitMissingDocumentClarification({context, conversation, originalConversation, question, researchRequestID,
+      await commitMissingDocumentClarification({context, conversation, originalConversation, question, conversationScope, researchRequestID,
         progressResponse, evidenceSnapshots:[]});
       Object.assign(researchOperation,{status:'completed',mode:'clarification',charged:false}); return;
     }
@@ -20909,7 +20920,7 @@ async function handleResearchConversationMessage(request, response) {
             }, onStage:progressResponse.progress });
       const evidence = packageForFast.sources || [];
       if (!evidence.length && !conversationScope?.includeProjectContext) {
-        await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+        await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
           researchRequestID, progressResponse, evidenceSnapshots:[], clarificationReason:"evidence_unavailable" });
         Object.assign(researchOperation, {status:"completed",mode:"clarification",charged:false});
         return;
@@ -21247,7 +21258,7 @@ async function handleResearchConversationMessage(request, response) {
       ? boundedCitationEvidence
       : evidencePackage.sources || [];
     if (zoningPlan && evidencePackage.zoningSelection?.pass === false) {
-      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence_unavailable" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode: "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED" });
@@ -21270,14 +21281,14 @@ async function handleResearchConversationMessage(request, response) {
     }
     const conditionalZoningExplanation = isZoningConditionalExplanation(zoningPlan);
     if (zoningPlan && zoningPlan.disposition !== zoningResearchDispositions.ready && !conditionalZoningExplanation) {
-      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "research_unresolved" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode: "RESEARCH_ZONING_PREREQUISITES_REQUIRED" });
       return;
     }
     if (!assembledEvidence.length && !openInvestigation && !conversationOnly) {
-      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence_unavailable" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode: "RESEARCH_EVIDENCE_NOT_FOUND" });
@@ -21301,7 +21312,7 @@ async function handleResearchConversationMessage(request, response) {
         })
       : { pass: true, issues: [] };
     if (zoningPlan && !zoningEvidenceReadiness.pass) {
-      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence_unavailable" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode: "RESEARCH_ZONING_EVIDENCE_REQUIRED" });
@@ -21318,7 +21329,7 @@ async function handleResearchConversationMessage(request, response) {
     if (!conversationOnly && !openInvestigation && explicitlyMissingResearchDocument(question) && !/[“”\"]/.test(question) && !zoningPlan &&
         requiredResearchClaimsFromEvidence(assembledEvidence).length === 0 &&
         !assembledEvidence.some(source => source.evidencePriority?.evidenceRole === "governing")) {
-      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
         researchRequestID, progressResponse, evidenceSnapshots });
       Object.assign(researchOperation, {status:"completed",mode:"evidence_boundary",
         model:"permitext-deterministic-evidence-boundary",requestedModel:"permitext-deterministic-evidence-boundary",
@@ -22922,7 +22933,7 @@ async function handleResearchConversationMessage(request, response) {
         ...(failureCode === "INVALID_RESEARCH_VERIFICATION" ? { failureStage: error.failureStage || null,
           providerStatus: error.providerStatus || null, providerUsage: error.providerUsage || null,
           ...(error.verificationOutputDiagnostics ? { verificationOutputDiagnostics: error.verificationOutputDiagnostics } : {}) } : {}) }));
-      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: researchVerificationFailureReason(error),
         requestDescription: recoveryRequestDescription, recoveryHumanContext });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,

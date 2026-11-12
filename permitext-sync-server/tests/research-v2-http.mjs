@@ -24,7 +24,7 @@ globalThis.fetch=async(url,options)=>{
   assert.equal(String(url),'https://api.openai.com/v1/responses','Research v2 cannot perform external retrieval');
   const body=JSON.parse(options.body);calls++;
   assert.equal(body.model,'gpt-6-luna');assert.equal(body.service_tier,'default');assert.equal(body.store,false);assert(!body.tools);
-  assert(!body.input.includes('SECRET_UNSELECTED'));assert(!body.input.includes('SECRET_PROJECT_SENTINEL'),'Project assignment cannot attach facts');
+  assert(!body.input.includes('SECRET_UNSELECTED'));assert(!body.input.includes('SECRET_PROJECT_SENTINEL'),'Explicitly excluded Project facts stay excluded');
   if(body.stream){const text=draft.answerText;const payload={model:body.model,status:'completed',service_tier:'default',usage:{input_tokens:200,output_tokens:100},output:[{type:'message',content:[{type:'output_text',text}]}]};return new Response('data: '+JSON.stringify({type:'response.output_text.delta',delta:text})+'\n\ndata: '+JSON.stringify({type:'response.completed',response:payload})+'\n\n',{headers:{'content-type':'text/event-stream'}});}
   const phase=body.text.format.name;
   if(gate){const pending=gate;gate=null;pending.started();await pending.wait;}
@@ -163,6 +163,7 @@ try{
   const assigned=await post('/research/conversations/assign-project',{conversationID:linked.id,projectID:'v2-project-a',confirmMove:true});
   assert.equal(assigned.status,200,JSON.stringify(assigned));linked=assigned.body.conversation;
   assert.equal(linked.primaryProjectID,'v2-project-a');
+  linked=(await post('/research/conversations/project-context',{conversationID:linked.id,include:false})).body.conversation;
   const beforeCheckpoint=(await post('/projects/artifacts/checkpoint',{projectIDs:['v2-project-a'],includeAccountResearch:true})).body;
   const follow=await post('/research/conversations/message',{...context(linked),question:'Explain these names again.',requestID:'v2-linked-followup'});
   assert.equal(follow.status,200,JSON.stringify(follow));

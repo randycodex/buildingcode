@@ -18020,6 +18020,8 @@ html body .research-compact-composer .research-question-input:focus-visible {
 }
 .column-group-menu :is(button, .reader-trust > summary, .search-match-mode):is(:hover, :focus-visible),
 .column-style-select-menu .custom-select-option:is(:hover, :focus-visible) { background: rgba(128,128,128,.16); }
+.column-group-menu [role="menuitemcheckbox"]::before { content: ""; display: inline-block; width: 1.4em; }
+.column-group-menu [role="menuitemcheckbox"][aria-checked="true"]::before { content: "✓"; }
 .column-group-menu button:disabled { opacity: .45; cursor: default; }
 .column-group-menu button:disabled:hover { background: transparent; }
 .column-menu-divider {
