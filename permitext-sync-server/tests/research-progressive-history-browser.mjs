@@ -28,12 +28,12 @@ try{
  ${actual('createResearchRefresh')} ${refresh} ${actual('renderResearch')}
  `});
  await page.evaluate(async()=>{for(const instance of state.utilityInstances){const pane=await renderResearch(paneIDForUtilityInstance(instance));document.querySelector('#track').append(pane);}});
- assert.equal(await page.getByRole('button',{name:'+ New chat',exact:true}).count(),2,'Both composers are actionable while all requests are held');
+ assert.equal(await page.getByRole('button',{name:'New Chat +',exact:true}).count(),2,'Both composers are actionable while all requests are held');
  await page.waitForFunction(()=>requests.length===2);
  assert.deepEqual(await page.evaluate(()=>requests.map(x=>x.path).sort()),['/research/conversations/list','/research/usage']);
  await page.evaluate(()=>requests.find(x=>x.path.endsWith('/list')).resolve({conversations:[{id:'saved',title:'Saved history',createdAt:'2026-10-08T12:00:00Z'}],hasMore:true,nextCursor:'page-2'}));
  await page.waitForFunction(()=>document.querySelectorAll('.research-conversation-row').length===2);
- assert.equal(await page.getByRole('button',{name:'+ New chat',exact:true}).count(),2);
+ assert.equal(await page.getByRole('button',{name:'New Chat +',exact:true}).count(),2);
  await page.evaluate(()=>requests.find(x=>x.path.endsWith('/usage')).reject(Error('Allowance unavailable')));
  await page.waitForFunction(()=>[...document.querySelectorAll('button')].filter(x=>x.textContent==='Retry allowance').length===2);
  assert.equal(await page.locator('.research-conversation-row').count(),2,'Usage failure does not remove history');
@@ -69,7 +69,7 @@ try{
  await page.getByRole('button',{name:'Load older conversations',exact:true}).first().click();await page.waitForFunction(()=>requests.length===9);
  assert.equal(await page.evaluate(()=>requests[8].values.cursor),'fresh-2');
  await page.evaluate(()=>requests[8].resolve({conversations:[{id:'fresh-older',title:'Fresh older page'}],hasMore:false}));await page.getByText('Fresh older page',{exact:true}).waitFor();assert.equal(await page.getByText('Project B stairs',{exact:true}).count(),0);
- await page.getByRole('button',{name:'+ New chat',exact:true}).first().click();
+ await page.getByRole('button',{name:'New Chat +',exact:true}).first().click();
  assert.equal(await page.evaluate(()=>researchDraftPaneIDs.has('utility:analysis:one')),true,'New chat works independently of usage/history metadata');
  assert.equal(await page.evaluate(()=>transitions.length),1);
  // A pending pane removed from the workspace cannot publish private content later.

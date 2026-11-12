@@ -3,7 +3,7 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, remo
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=29";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=30";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-current-project-context-v1721";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-new-chat-label-v1722";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-current-project-context-v1721";
+} from "./offline-storage.js?v=20261112-new-chat-label-v1722";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -27390,7 +27390,7 @@ async function renderLegacyResearch(paneID = "utility:analysis") {
     const newChatButton = document.createElement("button");
     newChatButton.type = "button";
     newChatButton.className = "ghost-button research-new-chat";
-    newChatButton.textContent = "+ New chat";
+    newChatButton.textContent = "New Chat +";
     newChatButton.addEventListener("click", () => {
       researchDraftPaneIDs.add(paneID);
       saveWorkspaceState();

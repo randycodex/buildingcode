@@ -106,7 +106,7 @@ export function createResearchV2View(options) {
   if(!history.length)list.append(node('p','rv2-empty-history','Your questions will appear here.'));
   rail.append(list);
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
-  const newChat = options.onNew ? action('+ New chat',async()=>{
+  const newChat = options.onNew ? action('New Chat +',async()=>{
     if(busy||includeBusy||revealBusy||chatTransitionPending||operationPending()||!isCurrent()||!root.isConnected)return;
     // Lock synchronously, before the create request can yield. The old
     // conversation must never accept input that a new mount will discard.

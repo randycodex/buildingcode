@@ -149,7 +149,7 @@ assert.deepEqual(renames,[['summary','My reading room question']]);
 assert.equal(historyItem.starterQuestion,originalAsk);
 assert.equal(grouped.element.querySelector('.rv2-input').value,'Keep my unsent follow-up');
 assert.ok(all(grouped.element).some(node=>node.textContent==='My reading room question'));
-all(grouped.element).find(node=>node.textContent==='+ New chat').handlers.click();
+all(grouped.element).find(node=>node.textContent==='New Chat +').handlers.click();
 assert.equal(newChats,1);assert.equal(grouped.element.querySelector('.rv2-input').value,'Keep my unsent follow-up');
 grouped.dispose();
 console.log('Grouped Research history passed: dates/Drafts, summary labels, full original ask, no legacy action, inline rename and draft preservation.');
