@@ -20,7 +20,7 @@ doc.createElement = tag => {
   n.style = {};
   n.removeAttribute = key => delete n.attributes[key];
   n.getAttribute = key => n.attributes[key] ?? null;
-  n.getBoundingClientRect = () => ({left:350,bottom:50,width:80});
+  n.getBoundingClientRect = () => ({left:350,top:24,bottom:50,width:80,height:26});
   n.classList = {
     contains: name => n.className.split(/\s+/).includes(name),
     add(...names) { n.className = [...new Set([...n.className.split(/\s+/).filter(Boolean), ...names])].join(' '); },
@@ -111,52 +111,87 @@ const allPanels=allIDs.map(id=>{const node=doc.createElement('article');node.cla
 const retainedDraft={text:'An unsent Assistant question',scrollTop:317};allPanels[3].draft=retainedDraft;
 const toolButtons=['search','analysis','calculator'].map(key=>({key,button:doc.createElement('button')}));
 const actualFunction=name=>{const first=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(first>=0,name);return source.slice(first,source.indexOf('\n}',first)+2);};
-let saves=0, allContext='A:research';
+let saves=0, allContext='A:research', previewOrder=[];
 const allState={readers:[{id:'a',codePrefix:'BC',codeVersion:'2022',title:'Reader'},{id:'b',codePrefix:'PC',codeVersion:'2022',title:'Reader'}],paneOrder:[...allIDs]};
 const appContext=vm.createContext({state:allState,track:allTrack,isProAccount:()=>true,workflowPaneIsVisible:()=>true,
   paneIDForReader:r=>`reader:${r.id}`,syncCodeVersion:value=>value,syncCodeVersionForPrefix:()=> '2022',codeOptions:[],
   readerTabs:()=>[{}],readerPositionLabel:r=>`Reader ${allState.readers.indexOf(r)+1}`,columnPaneLabel:()=> 'Evidence',
   activePaneIDs:()=>allState.paneOrder,paneGroupForMove:id=>[id],pinCriticalWorkflowPanesToLeft:ids=>ids,
+  get dragPreviewOrder(){return previewOrder;},
+  applyDragPreviewOrder(order){previewOrder=Array.from(order);allPanels.forEach(panel=>{panel.style.order=String(previewOrder.indexOf(panel.dataset.paneId));});},
+  clearDragPreviewOrder(){previewOrder=[];allPanels.forEach(panel=>{panel.style.order='';});},
   saveWorkspaceState(){saves++;},appendPaneSequence(nodes){
     const byID=new Map(nodes.map(node=>[node.dataset.paneId,node]));
     for(const id of allState.paneOrder)allTrack.append(byID.get(id));
   }});
-vm.runInContext(['readerShortcutItems','orderWithPaneMoved','moveWorkspaceColumnShortcut'].map(actualFunction).join('\n'),appContext);
+vm.runInContext(['readerShortcutItems','orderWithPaneMoved','previewWorkspaceColumnShortcut','moveWorkspaceColumnShortcut'].map(actualFunction).join('\n'),appContext);
 const allReveals=[];
 const navigation=createReaderShortcuts({host:allHost,track:allTrack,readers:()=>appContext.readerShortcutItems(),context:()=>allContext,
-  reveal:id=>allReveals.push(id),move:(...args)=>appContext.moveWorkspaceColumnShortcut(...args),tools:toolButtons});
+  reveal:id=>allReveals.push(id),move:(...args)=>appContext.moveWorkspaceColumnShortcut(...args),
+  preview:(...args)=>appContext.previewWorkspaceColumnShortcut(...args),cancelPreview:()=>appContext.clearDragPreviewOrder(),tools:toolButtons});
 appContext.readerShortcuts=navigation;
 const order=()=>allHost.children.map(button=>button.dataset.readerPaneId);
 assert.deepEqual(order(),allIDs);
 assert.deepEqual(allHost.children.map(button=>button.textContent),['Reader 1','Search','Reader 2','Assistant','Calculator']);
 assert(toolButtons.every(({button})=>button.classList.contains('has-open-column')),'Open tools use bubbles instead of duplicate launchers.');
-assert(allHost.children.every(button=>button.draggable));
+assert(allHost.children.every(button=>!button.draggable),'Top bubbles disable native drag images.');
+allHost.getBoundingClientRect=()=>({left:0,top:24,width:450,height:26,bottom:50});
+for (const button of allHost.children) button.getBoundingClientRect=()=>{
+  const visual=[...allHost.children].sort((a,b)=>Number(a.style.order || 0)-Number(b.style.order || 0));
+  const translation=/translate3d\(([-.\d]+)px, ([-.\d]+)px/.exec(button.style.transform || '');
+  return {left:visual.indexOf(button)*90+Number(translation?.[1] || 0),top:24+Number(translation?.[2] || 0),width:80,height:26,bottom:50};
+};
+const visualOrder=()=>[...allHost.children].sort((a,b)=>Number(a.style.order || 0)-Number(b.style.order || 0)).map(button=>button.dataset.readerPaneId);
+const pointer=(clientX,pointerId=1)=>({pointerType:'mouse',button:0,pointerId,clientX,clientY:37,preventDefault(){}});
 const moving=allHost.children[2], target=allHost.children[1];
 let selectionRestores=0;
 const selectionRange={commonAncestorContainer:{isConnected:true}};
 doc.getSelection=()=>({rangeCount:1,isCollapsed:false,anchorNode:allPanels[0],getRangeAt:()=>({cloneRange:()=>selectionRange}),
   removeAllRanges(){},addRange(range){assert.equal(range,selectionRange);selectionRestores++;}});
-moving.dispatch('pointerdown',{pointerType:'mouse',button:0,preventDefault(){assert.fail('Draggable bubbles must allow the native mouse drag.');}});
-moving.dispatch('click',{detail:1});assert.equal(selectionRestores,1,'Bubble clicks preserve the selected passage while allowing native dragging.');
+moving.dispatch('pointerdown',{pointerType:'mouse',button:0,preventDefault(){assert.fail('Click focus remains available before a drag.');}});
+moving.dispatch('click',{detail:1});assert.equal(selectionRestores,1,'Bubble clicks preserve the selected passage before dragging.');
 allPanels[1].dispatch('pointerdown',{bubbles:true});
 assert.equal(navigation.activePaneID(),'utility:search:s');
 assert.equal(navigation.activeReaderPaneID(),'reader:b','Using a tool retains the last Reader for normal source navigation.');
-const transfer={setData(type,id){this[type]=id;}};
-moving.dispatch('dragstart',{dataTransfer:transfer});
-let dropAccepted=false;target.dispatch('dragover',{clientX:360,dataTransfer:transfer,preventDefault(){dropAccepted=true;}});
-assert.equal(dropAccepted,true);assert.equal(transfer.dropEffect,'move');
-target.dispatch('drop',{clientX:360,dataTransfer:transfer,preventDefault(){}});
+let nativePrevented=false;
+moving.dispatch('dragstart',{preventDefault(){nativePrevented=true;}});assert(nativePrevented);
+moving.dispatch('pointerdown',pointer(220));
+doc.body.dispatch('pointermove',pointer(218));assert.deepEqual(visualOrder(),allIDs,'Small click jitter does not reorder.');
+doc.body.dispatch('pointermove',pointer(100));
+assert.deepEqual(visualOrder(),['reader:a','reader:b','utility:search:s','utility:analysis:r','utility:calculator'],'Bubbles move before pointer release.');
+assert.deepEqual(previewOrder,visualOrder(),'Mounted columns follow the same live preview.');
+assert.deepEqual(Array.from(allState.paneOrder),allIDs,'Live preview does not persist a partial drag.');assert.equal(saves,0);
+assert.match(moving.style.transform,/translate3d\(-30px, 0px/,'The actual bubble follows the grab point.');
+assert.equal(allPanels[3].draft,retainedDraft);
+doc.body.dispatch('pointerup',pointer(100));
 assert.deepEqual(order(),['reader:a','reader:b','utility:search:s','utility:analysis:r','utility:calculator']);
 assert.deepEqual(allTrack.children.map(node=>node.dataset.paneId),order());assert.equal(saves,1);
+assert.deepEqual(previewOrder,[]);assert(allHost.children.every(button=>!button.style.order && !button.style.transform));
 assert.equal(allPanels[3].draft,retainedDraft);assert.equal(retainedDraft.scrollTop,317);
 moving.dispatch('click');assert.deepEqual(allReveals,['reader:b'],'Dropping does not trigger an extra navigation click.');
+// A cancelled drag restores both rows without saving or replacing a column.
+const beforeCancel=order();
+moving.dispatch('pointerdown',pointer(130));doc.body.dispatch('pointermove',pointer(400));
+assert.notDeepEqual(visualOrder(),beforeCancel);
+doc.body.dispatch('keydown',{key:'Escape'});
+assert.deepEqual(visualOrder(),beforeCancel);assert.deepEqual(previewOrder,[]);assert.equal(saves,1);
+moving.dispatch('pointerdown',pointer(130));doc.body.dispatch('pointermove',pointer(400));
+doc.body.dispatch('pointercancel',pointer(400));assert.deepEqual(visualOrder(),beforeCancel);assert.equal(saves,1);
+// Moving back to the original order is a no-op on release.
+moving.dispatch('pointerdown',pointer(130));doc.body.dispatch('pointermove',pointer(400));doc.body.dispatch('pointermove',pointer(100));
+doc.body.dispatch('pointerup',pointer(100));assert.deepEqual(order(),beforeCancel);assert.equal(saves,1);
+// Touch uses the same direct movement; unrelated pointers cannot end the drag.
+moving.dispatch('pointerdown',{...pointer(130,2),pointerType:'touch'});
+doc.body.dispatch('pointermove',{...pointer(400,2),pointerType:'touch'});
+assert.notDeepEqual(visualOrder(),beforeCancel);
+doc.body.dispatch('pointerup',pointer(400,3));assert(allHost.classList.contains('is-reordering'));
+doc.body.dispatch('pointercancel',pointer(400,2));assert.deepEqual(visualOrder(),beforeCancel);assert.equal(saves,1);
 const first=allHost.children[0];
 first.dispatch('keydown',{altKey:true,shiftKey:true,key:'ArrowRight',preventDefault(){}});
 assert.deepEqual(order(),['reader:b','reader:a','utility:search:s','utility:analysis:r','utility:calculator']);
 assert.equal(doc.activeElement,first);assert.equal(saves,2);
-first.dispatch('dragstart',{dataTransfer:transfer});allContext='B:research';
-target.dispatch('drop',{clientX:360,dataTransfer:transfer,preventDefault(){assert.fail('A stale Project cannot accept this drop.');}});
-first.dispatch('dragend');assert.equal(saves,2,'Dragging across a Project change cannot mutate its layout.');
+first.dispatch('pointerdown',pointer(130));doc.body.dispatch('pointermove',pointer(400));allContext='B:research';
+doc.body.dispatch('pointerup',pointer(400));assert.equal(saves,2,'Dragging across a Project change cannot mutate its layout.');assert.deepEqual(previewOrder,[]);
 first.dispatch('keydown',{altKey:true,shiftKey:true,key:'ArrowRight',preventDefault(){}});
 assert.equal(saves,2,'Keyboard reordering cannot use bubbles retained from a previous Project.');
 const duplicate=doc.createElement('article');duplicate.className='workspace-panel';duplicate.dataset.paneId='utility:search:second';allTrack.append(duplicate);
@@ -165,4 +200,4 @@ assert.deepEqual(allHost.children.filter(button=>button.textContent.startsWith('
 allPanels[1].remove();duplicate.remove();navigation.refresh();
 assert.equal(toolButtons[0].button.classList.contains('has-open-column'),false,'Closing the last Search restores its launcher.');
 navigation.dispose();
-console.log('Column bubbles passed: matching physical order, open-tool styling, per-instance navigation, retained Reader targeting, mouse/keyboard reordering, intact drafts, stale-context guards and launcher restoration.');
+console.log('Column bubbles passed: matching physical order, open-tool styling, per-instance navigation, retained Reader targeting, live pointer/keyboard reordering, cancellation, no native ghost, intact drafts, stale-context guards and launcher restoration.');

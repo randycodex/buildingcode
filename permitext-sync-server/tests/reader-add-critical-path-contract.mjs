@@ -34,7 +34,7 @@ function fixture({pro=true,view='notebook',paneIDs=[],groups=[],hidden=[]}={}) {
     readerShortcuts:{activePaneID:()=>c.activeColumn || ''},
     transitionWorkspace:()=>rendering,scrollPaneIntoView:id=>scrolled.push(id)
   });
-  vm.runInContext(['newReaderState','requestLinkedPanePlacement','placePaneAfter','applyLinkedPanePlacements','openReaderFromToolbar'].map(actual).join('\n'),c);
+  vm.runInContext(['newReaderState','requestLinkedPanePlacement','placePaneAfter','placePaneBefore','applyLinkedPanePlacements','openReaderFromToolbar'].map(actual).join('\n'),c);
   return {c,pickers,scrolled,finishRender};
 }
 const code={prefix:'PC',version:'2022'};
@@ -77,18 +77,27 @@ assert.equal(free.c.state.readers.length,1,'Switching codes reuses the single Fr
 assert.equal(free.c.state.readers[0].id,readerID);
 assert.equal(free.c.state.readers[0].codePrefix,'MC');
 
-// Anchor to the selected column when the picker opens, even if hydration is delayed.
+// Reader + always inserts first, regardless of the active column or delayed hydration.
 const adjacent=fixture({view:'research',paneIDs:['reader:left','utility:search:one','reader:right']});
 adjacent.c.activeColumn='utility:search:one';
 await adjacent.c.openReaderFromToolbar({});
 adjacent.c.activeColumn='reader:right';
 const placed=adjacent.pickers[0](code), addedID=`reader:${adjacent.c.state.readers[0].id}`;
-assert.deepEqual(Array.from(adjacent.c.state.paneOrder),['reader:left','utility:search:one',addedID,'reader:right']);
+assert.deepEqual(Array.from(adjacent.c.state.paneOrder),[addedID,'reader:left','utility:search:one','reader:right']);
 adjacent.finishRender();await placed;
 assert.deepEqual(adjacent.scrolled,[addedID]);
 const grouped=fixture({view:'research',paneIDs:['utility:search:one','utility:analysis:one','reader:right'],groups:[{id:'g',paneIDs:['utility:search:one','utility:analysis:one']}]});
 grouped.c.activeColumn='utility:search:one';
 await grouped.c.openReaderFromToolbar({});const groupedPending=grouped.pickers[0](code);
-assert.equal(grouped.c.state.paneOrder[2],`reader:${grouped.c.state.readers[0].id}`,'New Readers sit beside the active group without splitting it.');
+assert.equal(grouped.c.state.paneOrder[0],`reader:${grouped.c.state.readers[0].id}`,'New Readers precede the first group without splitting it.');
 grouped.finishRender();await groupedPending;
+const hidden=fixture({view:'research',paneIDs:['utility:search:hidden','reader:visible'],hidden:['utility:search:hidden']});
+await hidden.c.openReaderFromToolbar({});const hiddenPending=hidden.pickers[0](code);
+assert.deepEqual(Array.from(hidden.c.state.paneOrder),['utility:search:hidden',`reader:${hidden.c.state.readers[0].id}`,'reader:visible'],'Only visible columns determine the first toolbar position.');
+hidden.finishRender();await hiddenPending;
+const concurrent=fixture({view:'research',paneIDs:['utility:search:one']});
+await concurrent.c.openReaderFromToolbar({});await concurrent.c.openReaderFromToolbar({});
+const concurrentPending=concurrent.pickers.map(pick=>pick(code));
+assert.deepEqual(Array.from(concurrent.c.state.paneOrder),[...concurrent.c.state.readers].reverse().map(reader=>`reader:${reader.id}`).concat('utility:search:one'),'The newest Reader stays immediately after Reader +, including overlapping selections.');
+concurrent.finishRender();await Promise.all(concurrentPending);
 console.log('Readers passed: explicit source selection, four working views, project/account/navigation guards, concurrent plan limits and late-render fencing.');

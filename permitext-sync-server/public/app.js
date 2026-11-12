@@ -1,4 +1,4 @@
-import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=6";
+import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=7";
 import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=3";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-app-update-handoff-v1689";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-live-tab-drag-v1691";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=10";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-app-update-handoff-v1689";
+} from "./offline-storage.js?v=20261112-live-tab-drag-v1691";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -10185,7 +10185,7 @@ function syncReaderToolbarButton(button) {
   button.dataset.mobileLabel = readerLabel;
   button.hidden = button.id === "free-reader" ? pro || state.readers.length === 0 : !pro;
   button.disabled = false;
-  button.title = requiresProject ? "Choose a workspace first to open Reader" : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader beside this view" : "Choose a code for Reader";
+  button.title = requiresProject ? "Choose a workspace first to open Reader" : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader as the first column" : "Choose a code for Reader";
   button.classList.toggle("has-open-reader", state.readers.length > 0);
   button.setAttribute("aria-label", readerLabel);
 }
@@ -10234,7 +10234,6 @@ async function openReaderFromToolbar(button) {
   const workspaceID = activeWorkspaceID;
   const view = currentColumnWorkflowView();
   const generation = state.workflowNavigationGeneration || 0;
-  const anchorPaneID = readerShortcuts?.activePaneID() || "";
   const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     currentColumnWorkflowView() === view && (state.workflowNavigationGeneration || 0) === generation;
   openReaderCodePicker(button, async code => {
@@ -10249,9 +10248,10 @@ async function openReaderFromToolbar(button) {
     if (previous) state.readers = [reader];
     else state.readers.push(reader);
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneIDForReader(reader), view);
-    if (!previous && anchorPaneID) {
-      const group = columnGroupForPane(anchorPaneID);
-      placePaneAfter(group?.paneIDs.at(-1) || anchorPaneID, paneIDForReader(reader));
+    if (!previous) {
+      const paneID = paneIDForReader(reader);
+      const firstColumn = activePaneIDs().find(id => id !== paneID && workflowPaneIsVisible(id));
+      placePaneBefore(firstColumn, paneID);
     }
     saveWorkspaceState();
     await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
@@ -46137,6 +46137,13 @@ function readerShortcutItems() {
   });
 }
 
+function previewWorkspaceColumnShortcut(paneID, targetID, position) {
+  if (!isProAccount() || !workflowPaneIsVisible(paneID) || !workflowPaneIsVisible(targetID)) return null;
+  const nextOrder = orderWithPaneMoved(paneID, targetID, position);
+  if (nextOrder && (nextOrder.length !== dragPreviewOrder.length || nextOrder.some((id, index) => id !== dragPreviewOrder[index]))) applyDragPreviewOrder(nextOrder);
+  return nextOrder;
+}
+
 function moveWorkspaceColumnShortcut(paneID, targetID, position) {
   if (!isProAccount() || !workflowPaneIsVisible(paneID) || !workflowPaneIsVisible(targetID)) return false;
   const nextOrder = orderWithPaneMoved(paneID, targetID, position);
@@ -50654,6 +50661,7 @@ function bindImmediateUtilityControls() {
     host: shortcutHost, track, readers: readerShortcutItems,
     context: () => `${accountRuntimeGeneration}:${activeWorkspaceID}:${currentColumnWorkflowView()}`,
     reveal: revealReaderShortcut, move: moveWorkspaceColumnShortcut,
+    preview: previewWorkspaceColumnShortcut, cancelPreview: clearDragPreviewOrder,
     tools: [{button:toggleSearchButton,key:'search'}, {button:toggleAnalysisButton,key:'analysis'}, {button:toggleCalculatorButton,key:'calculator'}]
   });
   const updateBadge = document.querySelector("#project-update-badge");
