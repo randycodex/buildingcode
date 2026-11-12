@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-auto-project-context-v1701";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-recovery-heading-v1702";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-auto-project-context-v1701";
+} from "./offline-storage.js?v=20261112-recovery-heading-v1702";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -43442,7 +43442,6 @@ function renderSettings({ upgrade = false } = {}) {
     if (!isCurrentAccountRequest(settingsIdentity)) return;
     const summary = currentContentSummary();
     const workspace = workspaceProject(summary.projects || []);
-    panel.querySelector('.settings-workspace-name').textContent = workspace ? readableProjectName(workspace) : 'Choose a workspace to view its data';
     panel.querySelector('.settings-workspace-choose').hidden = Boolean(workspace);
     panel.querySelectorAll('.settings-data-card > details').forEach(details => { details.hidden = !workspace; details.inert = !workspace; });
     savedCollections = visibleProjectRecords(summary.projects || [])
