@@ -13,12 +13,12 @@ const context={columnExpansionController:()=>({reveal:node=>visibleReaderReveals
 Object.assign(context,navigationDependencies);
 vm.createContext(context);vm.runInContext(code,context);
 const open=(sectionID,extra={})=>context.openSourceInReader({sectionID},'search-a',{sourceSurface:'search',...extra});
-const first=await open('2');const second=await open('3');assert.equal(first.id,second.id);assert.equal(state.readers.length,1);assert.equal(state.readers[0].sectionID,'3');
+const first=await open('2');const second=await open('3');assert.equal(first.id,second.id);assert.equal(state.readers.length,2);assert.equal(state.readers[0].sectionID,'1');
 second.searchPreviewPaneID='';const third=await open('4');assert.equal(third.id,second.id);assert.equal(second.sectionID,'4');
 const explicit=await open('5',{forceNewReader:true});assert.notEqual(explicit.id,third.id);assert.equal(explicit.searchPreviewPaneID,'');
 assert.equal((await open('6')).id,third.id);
-const other=await context.openSourceInReader({sectionID:'7'},'search-b',{sourceSurface:'search'});assert.equal(other.id,third.id);
-console.log('Search reuses existing Readers across searches; only explicit New reader adds a column.');
+const other=await context.openSourceInReader({sectionID:'7'},'search-b',{sourceSurface:'search'});assert.notEqual(other.id,third.id);
+console.log('Each Search owns one Reader; unrelated Readers and explicit new Readers stay untouched.');
 
 const manualSection = state.readers[0].sectionID;
 const notebook = await context.openSourceInReader({sectionID:'1'},'notebook');

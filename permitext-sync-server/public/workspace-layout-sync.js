@@ -1,6 +1,6 @@
 // Account-owned presentation metadata only. Never send documents, drafts,
 // cached section bodies, search text, or Code Question domain records here.
-import { readerTabs, activateReaderTab } from './reader-tabs.js?v=3';
+import { readerTabs, activateReaderTab } from './reader-tabs.js?v=4';
 export const workspaceLayoutsKey = 'workspaceLayoutsJSON';
 export const workspaceLayoutSyncDelay = 1500;
 const text = value => typeof value === 'string' ? value.slice(0, 500) : '';
@@ -25,7 +25,7 @@ function mergeReaderColumn(item, local) {
   const positions = new Map(prior ? readerTabs(prior).map(tab => [tab.id, tab]) : []);
   const tabs = item.tabs.map(tab => ({ title: 'Reader', ...tab, ...positions.get(tab.id) }));
   const activeTabID = tabs.some(tab => tab.id === prior?.activeTabID) ? prior.activeTabID : item.activeTabID;
-  const result = { id: item.id, tabs, activeTabID: '' };
+  const result = { id: item.id, tabs, activeTabID: '', sourceOwnerPaneID: text(item.sourceOwnerPaneID || prior?.sourceOwnerPaneID) };
   activateReaderTab(result, tabs.some(tab => tab.id === activeTabID) ? activeTabID : tabs[0].id);
   return result;
 }
@@ -38,6 +38,7 @@ export function sharedWorkspaceLayout(source = {}) {
   return {
     readers: list(source.readers).filter(item => text(item?.id)).map(item => ({
       ...readerLocator(item),
+      sourceOwnerPaneID: text(item.sourceOwnerPaneID),
       ...(Array.isArray(item.tabs) && item.tabs.length ? {
         tabs: readerTabs(item).map(readerLocator), activeTabID: text(item.activeTabID)
       } : {})
@@ -76,7 +77,7 @@ export function sharedWorkspaceLayout(source = {}) {
 // Reading/navigating within an existing column must not produce layout writes.
 export function workspaceLayoutFingerprint(value) {
   const layout = sharedWorkspaceLayout(value);
-  return JSON.stringify({...layout, readers: layout.readers.map(({id, tabs}) => ({id,
+  return JSON.stringify({...layout, readers: layout.readers.map(({id, tabs, sourceOwnerPaneID}) => ({id, sourceOwnerPaneID,
     ...(tabs ? {tabs: tabs.map(({id}) => ({id}))} : {})}))});
 }
 

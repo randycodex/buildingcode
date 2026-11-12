@@ -138,85 +138,55 @@ assert.match(source.slice(source.indexOf("async function renderSectionContent(")
 }
 console.log("Free Reader search passed: chapter-only requests, matching scope copy, same-chapter exact passage navigation and chapter-only empty results.");
 
-// A saved citation fetch failure must resolve to visible recovery, remove only
-// its abandoned detail pane, and retain the exact citation for another attempt.
-const savedStart = source.indexOf("async function openSavedItemInReader(");
-const savedEnd = source.indexOf("\nasync function startFocusedResearchFromSavedItem(", savedStart);
-const removeStart = source.indexOf("function removeSectionDetail(");
-const removeEnd = source.indexOf("\nfunction closeSavedItemDetailsForPane(", removeStart);
-assert.ok(savedStart > 0 && savedEnd > savedStart && removeStart > 0 && removeEnd > removeStart);
+// Saved citations use the same guarded Reader opener. A failed source lookup
+// cannot create an abandoned column or alter the saved citation, and retries
+// retain its historical edition and exact passage.
+const actual = name => {
+  const start = source.search(new RegExp(`(?:async )?function ${name}\\(`));
+  assert.ok(start > 0, name);
+  return source.slice(start, source.indexOf("\n}", start) + 2);
+};
 const settleSourceResolution = () => new Promise(resolve => setImmediate(resolve));
-function savedHarness({ online = false } = {}) {
-  const details = {}, anchors = {}, requests = [], notices = [], opened = [];
-  const state = { readers: [], utilityInstances: [{id:"unrelated",key:"search"}], paneWeights: {}, paneOrder: [] };
+function savedHarness() {
+  const requests = [], notices = [], opened = [];
+  const unrelated = {id:"manual",sectionID:"unrelated"};
+  const state = {readers:[unrelated],utilityInstances:[{id:"unrelated",key:"search"}],paneWeights:{},paneOrder:[]};
   let generation = 1, nextID = 0, saves = 0;
   const context = vm.createContext({
-    state, navigator: { onLine: online },
-    savedItemOpeningAttempts: new Map(), sectionDetailOpeningAttempts: new Map(), activeWorkspaceID: "workspace",
-    // Source authorization is covered separately; this fixture exercises detail
-    // recovery after the current source has been resolved asynchronously.
-    resolveReaderSource: async item => item,
-    isCurrentActiveCodeSourceContext: () => true,
-    captureAccountRequest: () => generation,
-    isCurrentAccountRequest: value => value === generation,
-    closeSavedItemDetailsForPane() {}, closeLinkedReaderForSearch() {},
-    sectionDetailsBySearch: () => details, sectionDetailAnchorsBySearch: () => anchors,
-    paneIDForSectionDetail: id => `detail:${id}`,
-    newUtilityInstance: key => ({id:`attempt-${++nextID}`,key}),
-    openSectionDetail(id, item, options) {
-      details[id] = item; anchors[id] = options.anchorPaneID;
-      state.paneWeights[`detail:${id}`] = 400; state.paneOrder.push(`detail:${id}`);
-      const request = deferred(); requests.push({ ...request, item, options }); return request.promise;
-    },
-    saveWorkspaceState() { saves += 1; },
-    showWebNotice: async (title, message) => { notices.push({title,message}); },
-    paneIDForReader: reader => reader.id,
-    normalizeAnnotationBlockID: value => value || "",
-    transitionWorkspace: async () => {}, revealReaderSourceTarget() {},
-    scrollPaneIntoView(paneID) {
-      const id = paneID.replace(/^detail:/, "");
-      assert.ok(details[id], "Only a successfully loaded detail pane may be revealed");
-      opened.push(details[id]);
-    }
+    state, savedItemOpeningAttempts:new Map(), searchReaderOpeningAttempts:new Map(), activeWorkspaceID:"workspace",
+    captureAccountRequest:()=>generation,isCurrentAccountRequest:value=>value===generation,
+    workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=>"research",workflowPaneIsVisible:()=>true,
+    resolveReaderSource(item) {const request=deferred();requests.push({...request,item});return request.promise;},
+    searchResultDetail:item=>item,readerFieldsForSectionDetail:(item,options)=>({...item,...options}),
+    isProAccount:()=>true,newReaderState:fields=>({id:`reader-${++nextID}`,...fields}),
+    paneIDForReader:reader=>reader.id,defaultPaneWidthForID:()=>630,placePaneAfter(){},appendPaneIfMissing(){},
+    updateBrowserSectionURL(){},scheduleContinuitySync(){},saveWorkspaceState(){saves++;},
+    showWebNotice:async(title,message)=>notices.push({title,message}),
+    normalizeAnnotationBlockID:value=>value||"",transitionWorkspace:async()=>{},whenWorkspacePaneReady:async()=>true,
+    resolvedReaderSourceNavigations:new WeakMap(),track:{querySelector:()=>null},CSS:{escape:value=>value},
+    paneIsCollapsed:()=>false,columnExpansionController:()=>({reveal(){}}),scrollPaneIntoView(){},
+    revealReaderSourceTarget:(reader,item,anchor)=>opened.push({reader,item,anchor})
   });
-  vm.runInContext(source.slice(removeStart,removeEnd)+"\n"+source.slice(savedStart,savedEnd)+"\nglobalThis.openSaved = openSavedItemInReader;",context);
-  return {state,details,anchors,requests,notices,opened,run:item=>context.openSaved(item,"saved"),switchAccount:()=>{generation+=1;},get saves(){return saves;}};
+  vm.runInContext(["reusableSearchReader","openSourceInReader","openSavedItemInReader"].map(actual).join("\n"),context);
+  return {state,requests,notices,opened,run:item=>context.openSavedItemInReader(item,"saved"),
+    switchAccount:()=>{generation++;},get saves(){return saves;}};
 }
-const historicalSaved = { sectionID:"2014-1010.2", sectionNumber:"1010.2", title:"Slope", codeVersion:"2014", chapterID:"2014-chapter-10" };
+const historicalSaved = {sectionID:"2014-1010.2",sectionNumber:"1010.2",title:"Slope",codeVersion:"2014",chapterID:"2014-chapter-10",blockID:"exact",evidenceAnchor:{passages:[{exact:"Saved source text"}]}};
 {
-  const t=savedHarness(), pending=t.run(historicalSaved);
-  await settleSourceResolution();
-  t.requests[0].reject(new Error("Failed to fetch")); await pending;
-  assert.equal(t.notices[0].title,"Saved section unavailable");
-  assert.match(t.notices[0].message,/Connect to the internet/);
-  assert.match(t.notices[0].message,/download the code library in Account/);
-  assert.equal(t.opened.length,0);
-  assert.equal(Object.keys(t.details).length,0); assert.equal(Object.keys(t.anchors).length,0);
-  assert.equal(Object.keys(t.state.paneWeights).length,0); assert.equal(t.state.paneOrder.length,0);
-  assert.equal(t.state.utilityInstances.length,1); assert.equal(t.state.utilityInstances[0].id,"unrelated");
-  const retry=t.run(historicalSaved); await settleSourceResolution(); t.requests[1].resolve(); await retry;
-  assert.equal(t.opened[0].sectionID,historicalSaved.sectionID);
-  assert.equal(t.opened[0].codeVersion,"2014"); assert.equal(t.opened[0].title,"Slope");
-  assert.equal(t.requests[1].options.anchorPaneID,"saved");
-}
-{
-  const t=savedHarness({online:true}), pending=t.run(historicalSaved);
-  await settleSourceResolution();
-  t.requests[0].reject(new Error("503")); await pending;
-  assert.match(t.notices[0].message,/saved item has not been removed/);
+  const t=savedHarness(),before=JSON.stringify(t.state),citation=JSON.stringify(historicalSaved),pending=t.run(historicalSaved);
+  await settleSourceResolution();t.requests[0].reject(new Error("Failed to fetch"));await pending;
+  assert.equal(t.notices[0].title,"Source could not be opened");assert.match(t.notices[0].message,/Failed to fetch/);
+  assert.equal(t.opened.length,0);assert.equal(JSON.stringify(t.state),before);assert.equal(t.saves,0);
+  assert.equal(JSON.stringify(historicalSaved),citation,"Failure preserves the saved historical passage");
+  const retry=t.run(historicalSaved);await settleSourceResolution();t.requests[1].resolve(historicalSaved);await retry;
+  assert.equal(t.opened[0].item.sectionID,historicalSaved.sectionID);assert.equal(t.opened[0].reader.codeVersion,"2014");
+  assert.equal(t.opened[0].reader.sourceBlockID,"exact");assert.equal(t.opened[0].anchor,historicalSaved.evidenceAnchor);
+  assert.equal(t.opened[0].reader.sourceOwnerPaneID,"saved");assert.equal(t.state.readers[0].sectionID,"unrelated");
 }
 for(const outcome of ["resolve","reject"]) {
-  const t=savedHarness(), pending=t.run(historicalSaved);
-  await settleSourceResolution();
-  t.switchAccount(); t.requests[0][outcome](new Error("Old account result")); await pending;
-  assert.equal(t.notices.length,0); assert.equal(t.opened.length,0); assert.equal(t.saves,0);
-  assert.ok(t.details["attempt-1"],"late results cannot clean up the next account's state");
-}
-{
-  const t=savedHarness(), pending=t.run(historicalSaved);
-  await settleSourceResolution();
-  delete t.details["attempt-1"];
-  t.requests[0].reject(new Error("Closed citation request")); await pending;
-  assert.equal(t.notices.length,0); assert.equal(t.saves,0);
+  const t=savedHarness(),before=JSON.stringify(t.state),pending=t.run(historicalSaved);
+  await settleSourceResolution();t.switchAccount();
+  t.requests[0][outcome](outcome==="resolve"?historicalSaved:new Error("Old account result"));await pending;
+  assert.equal(t.notices.length,0);assert.equal(t.opened.length,0);assert.equal(t.saves,0);assert.equal(JSON.stringify(t.state),before);
 }
 console.log("Reader recovery passed: find preservation/retry, visible saved-citation failure, exact-source reopening, and stale-account suppression.");

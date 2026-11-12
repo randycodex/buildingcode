@@ -34,28 +34,44 @@ function fixture() {
 }
 const item=(id,extra={})=>({sectionID:id,codePrefix:'BC',codeVersion:'2022',chapterID:'chapter',title:'Water',...extra});
 {
-  const f=fixture(),untouched=JSON.stringify(f.readers[0]);
+  const f=fixture(),untouched=JSON.stringify(f.readers);
+  let owned;
   for(const target of [item('1',{blockID:'paragraph'}),item('2',{codeVersion:'2014'}),item('3')]) {
     const reader=await f.c.openSearchResultDetail(target,f.search);
-    assert.equal(reader.id,'active'); assert.equal(reader.sectionID,target.sectionID);
-    assert.equal(reader.codeVersion,target.codeVersion); assert.equal(reader.sourceBlockID,target.blockID||'');
-    assert.equal(f.readers.length,2,'Search clicks reuse the current Reader without creating columns');
+    owned ||= reader;
+    assert.equal(reader.id,owned.id);assert.notEqual(reader.id,'active');
+    assert.equal(reader.sectionID,target.sectionID);assert.equal(reader.codeVersion,target.codeVersion);
+    assert.equal(reader.sourceBlockID,target.blockID||'');
+    assert.equal(f.readers.length,3,'First click creates one Search-owned Reader; later clicks update it');
+    assert.equal(JSON.stringify(f.readers.slice(0,2)),untouched,'Existing Readers stay untouched');
   }
-  assert.equal(JSON.stringify(f.readers[0]),untouched);
   assert.equal(f.reveals.at(-1).options.searchQuery,'water');
   const anchor={passages:[{exact:'Original saved quote'}]};
   const saved=await f.c.openSavedItemInReader(item('saved',{blockID:'exact',evidenceAnchor:anchor}),'utility:saved:list');
-  assert.equal(saved.id,'active');assert.equal(saved.sourceBlockID,'exact');
+  assert.notEqual(saved.id,owned.id);assert.equal(saved.sourceBlockID,'exact');assert.equal(f.readers.length,4);
   assert.equal(f.reveals.at(-1).anchor,anchor);assert.equal(f.reveals.at(-1).options.preferPassage,true);
-  assert.equal(Object.keys(f.details).length,0); assert.equal(f.c.state.utilityInstances.length,1);
+  assert.equal((await f.c.openSavedItemInReader(item('saved-next'),'utility:saved:list')).id,saved.id);
+  assert.equal(f.readers.length,4);assert.equal(Object.keys(f.details).length,0);
+  assert.equal(f.c.state.utilityInstances.length,1);
+  const preserved=JSON.stringify(f.readers);
   const explicit=await f.c.openSourceInReader(item('new'),'utility:search:search',{sourceSurface:'search',forceNewReader:true});
-  assert.notEqual(explicit.id,'active');assert.equal(f.readers.length,3,'Only explicit New reader creates another column');
+  assert.notEqual(explicit.id,owned.id);assert.equal(f.readers.length,5);
+  assert.equal(JSON.stringify(f.readers.slice(0,-1)),preserved,'New reader never changes another Reader');
+  assert.equal((await f.c.openSearchResultDetail(item('after-new'),f.search)).id,owned.id,'Normal clicks keep updating the Search-owned Reader');
+  assert.equal(explicit.sectionID,'new','The explicit new Reader stays on its passage');
+  const beforeNewSaved=JSON.stringify(f.readers);
+  const savedNew=await f.c.openSourceInReader(item('fresh-saved'),'utility:saved:list',{sourceSurface:'saved',forceNewReader:true});
+  assert.equal(f.readers.length,6);assert.notEqual(savedNew.id,saved.id);
+  assert.equal(JSON.stringify(f.readers.slice(0,-1)),beforeNewSaved);
 }
 {
   const f=fixture();f.c.state.readers.length=0;
   const first=await f.c.openSearchResultDetail(item('first'),f.search);
-  const second=await f.c.openSavedItemInReader(item('second'),'evidence');
-  assert.equal(first.id,second.id);assert.equal(f.readers.length,1,'One Reader is created when none exists');
+  const second=await f.c.openSearchResultDetail(item('second'),f.search);
+  assert.equal(first.id,second.id);assert.equal(f.readers.length,1);
+  const otherSearch={key:'search',id:'other',query:'water'};f.c.state.utilityInstances.push(otherSearch);
+  const other=await f.c.openSearchResultDetail(item('other'),otherSearch);
+  assert.notEqual(other.id,first.id);assert.equal(f.readers.length,2,'Separate Searches own separate Readers');
 }
 for(const surface of ['search','saved']) for(const change of ['account','workspace','view','query','closed-search','superseded']) {
   if(surface==='saved' && ['query','closed-search'].includes(change)) continue;
@@ -70,7 +86,7 @@ for(const surface of ['search','saved']) for(const change of ['account','workspa
   if(change==='closed-search')f.c.state.utilityInstances=[];
   if(change==='superseded') {
     const latest=open(item('latest'));gates[1]();await latest;
-    gates[0]();assert.equal(await pending,null);assert.equal(f.readers[1].sectionID,'latest');continue;
+    gates[0]();assert.equal(await pending,null);assert.equal(f.readers.at(-1).sectionID,'latest');continue;
   }
   gates[0]();assert.equal(await pending,null,`${surface} ${change}`);
   assert.equal(JSON.stringify(f.readers),before);assert.equal(f.reveals.length,0);
@@ -105,4 +121,4 @@ for(const surface of ['search','saved']) for(const change of ['account','workspa
 }
 assert.doesNotMatch(actual('workspacePaneDescriptors'), /add\(paneIDForSectionDetail/);
 assert.doesNotMatch(actual('defaultActivePaneIDs'), /ids\.push\(paneIDForSectionDetail/);
-console.log('Direct Reader evidence passed: active Reader reuse, exact editions/passages, explicit new columns, stale navigation fences and data-preserving layout retirement.');
+console.log('Direct Reader evidence passed: Search-owned Reader reuse, exact editions/passages, explicit new columns, stale navigation fences and data-preserving layout retirement.');

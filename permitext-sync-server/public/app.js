@@ -1,5 +1,5 @@
 import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=8";
-import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=3";
+import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=4";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-direct-evidence-reader-v1711";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-owned-source-reader-v1712";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -65,7 +65,7 @@ import { buildReaderChapterContents, readerContentsLabel, readerContentsChapterK
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
-import { isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, withoutWorkspaceLayoutSync, retireWorkspaceLayoutSyncEntries } from "./workspace-layout-sync.js?v=4";
+import { isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, withoutWorkspaceLayoutSync, retireWorkspaceLayoutSyncEntries } from "./workspace-layout-sync.js?v=5";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
 import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20261012-workflow-cache-v5";
 import {
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-direct-evidence-reader-v1711";
+} from "./offline-storage.js?v=20261112-owned-source-reader-v1712";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -40449,6 +40449,14 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
   } else if (!options.selectionController?.isActive()) {
     const actions = document.createElement("div");
     actions.className = "saved-row-actions";
+    const newReaderButton = document.createElement("button");
+    newReaderButton.type = "button";
+    newReaderButton.textContent = "New reader";
+    newReaderButton.addEventListener("click", () => {
+      void openSourceInReader(item, paneID, { sourceSurface: "saved", forceNewReader: true,
+        evidenceAnchor: item.evidenceAnchor || null });
+    });
+    actions.append(newReaderButton);
     const researchButton = document.createElement("button");
     researchButton.type = "button";
     researchButton.textContent = "Ask Assistant";
@@ -40918,7 +40926,8 @@ async function resolveReaderSource(item, options = {}) {
 
 function reusableSearchReader(readers, anchorPaneID, forceNewReader = false) {
   if (forceNewReader || !anchorPaneID) return null;
-  return readers.find((reader) => reader.searchPreviewPaneID === anchorPaneID) || null;
+  return readers.find(reader => reader.sourceOwnerPaneID === anchorPaneID) ||
+    readers.find(reader => !reader.sourceOwnerPaneID && reader.searchPreviewPaneID === anchorPaneID) || null;
 }
 
 const searchReaderOpeningAttempts = new Map();
@@ -40971,23 +40980,20 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   });
   const fromSearch = options.sourceSurface === "search";
   const fromSaved = options.sourceSurface === "saved";
+  const ownedSource = fromSearch || fromSaved;
   const visibleReaders = (state.readers || []).filter(candidate => workflowPaneIsVisible(paneIDForReader(candidate)));
-  let reader = fromSearch
+  let reader = options.forceNewReader ? null : ownedSource
     ? reusableSearchReader(visibleReaders, anchorPaneID, options.forceNewReader)
     : visibleReaders.find((candidate) =>
       (!anchorPaneID || candidate.sourceAnchorPaneID === anchorPaneID) && readerMatchesSource(candidate, detail));
-  if ((fromSearch || fromSaved) && !options.forceNewReader) {
-    const activeID = typeof readerShortcuts !== "undefined"
-      ? readerShortcuts?.activeReaderPaneID?.() || readerShortcuts?.activePaneID?.() : "";
-    reader = visibleReaders.find(candidate => paneIDForReader(candidate) === activeID) || reader || visibleReaders[0] || null;
-  }
-  if (!reader && !fromSearch) {
+  let createdReader = false;
+  if (!options.forceNewReader && !reader && !ownedSource) {
     reader = visibleReaders.find(readerIsClearlyAvailable) || null;
   }
-  if (!reader && anchorPaneID && options.sourceSurface !== "search") {
+  if (!options.forceNewReader && !reader && anchorPaneID && !ownedSource) {
     reader = visibleReaders.find((candidate) => candidate.sourceAnchorPaneID === anchorPaneID);
   }
-  if (!options.forceNewReader && isProAccount() && !reader) {
+  if (!options.forceNewReader && !ownedSource && isProAccount() && !reader) {
     const columns = visibleReaders.filter(candidate => Array.isArray(candidate.tabs));
     reader = columns.find(candidate => paneIDForReader(candidate) === (readerShortcuts?.activeReaderPaneID?.() || readerShortcuts?.activePaneID())) || columns[0] || null;
   }
@@ -40995,6 +41001,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     if (isProAccount() || state.readers.length < 1) {
       reader = newReaderState(sourceFields);
       state.readers.push(reader);
+      createdReader = true;
     } else if (options.sourceSurface === "search") {
       const replacement = searchReaderReplacementCandidate(anchorPaneID);
       const confirmed = await confirmSearchReaderReplacement(replacement, detail, anchorPaneID);
@@ -41013,10 +41020,13 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   Object.assign(reader, sourceFields);
   resolvedReaderSourceNavigations.set(reader, {chapterID: reader.chapterID, sectionID: reader.sectionID,
     sectionNumber: reader.sectionNumber, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion});
-  if (fromSearch) reader.searchPreviewPaneID = options.forceNewReader ? "" : anchorPaneID;
+  if (ownedSource) {
+    if (!options.forceNewReader) reader.sourceOwnerPaneID = anchorPaneID;
+    reader.searchPreviewPaneID = "";
+  }
   const paneID = paneIDForReader(reader);
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
-  if (anchorPaneID && anchorPaneID !== paneID && (!Array.isArray(reader.tabs) || options.forceNewReader)) placePaneAfter(anchorPaneID, paneID);
+  if (anchorPaneID && anchorPaneID !== paneID && (createdReader || options.forceNewReader || (!ownedSource && !Array.isArray(reader.tabs)))) placePaneAfter(anchorPaneID, paneID);
   else appendPaneIfMissing(paneID);
   if (reader.sectionID) updateBrowserSectionURL(reader.sectionID);
   scheduleContinuitySync(reader);
@@ -43457,7 +43467,7 @@ function renderSettings({ upgrade = false } = {}) {
         requireCurrentAccountRequest(settingsIdentity);
       }
       if (workspaceColumnsRequireProject()) return;
-      await openSavedItemInReader(item, panel.dataset.paneId || "");
+      await openSavedItemInReader(item, panel.dataset.paneId || "utility:settings");
     },
     onAssign: async (project, item) => {
       requirePrivateWorkspaceWritable();

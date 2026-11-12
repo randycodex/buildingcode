@@ -7,11 +7,12 @@ import { captureWorkspaceLayout, normalizeWorkspaceLayout } from '../public/work
 
 const column = { id: 'column-a', codePrefix: 'BC', codeVersion: '2022', chapterID: '10', sectionID: '1005',
   internalSearchQuery: 'stairs', internalSearchOpen: true, scrollPosition: { contentKey: 'bc', sectionID: '1005', anchorOffset: -120 } };
+column.sourceOwnerPaneID = 'utility:search:owner';
 initializeReaderTabs(column);
 const original = column.activeTabID;
 assert.equal(readerTabs(column).length, 1, 'A legacy Reader becomes one tab without changing the column ID.');
 addReaderTab(column, { codePrefix: 'PC', codeVersion: '2022', chapterID: '4', sectionID: '403' }, 'plumbing');
-assert.equal(column.id, 'column-a');
+assert.equal(column.id, 'column-a'); assert.equal(column.sourceOwnerPaneID, 'utility:search:owner', 'Search ownership belongs to the column across code tab switches');
 assert.equal(column.internalSearchQuery, undefined, 'A different tab does not inherit another tab’s search.');
 column.scrollPosition = { contentKey: 'pc', sectionID: '403', anchorOffset: -60 };
 assert.equal(activateReaderTab(column, original), true);
@@ -30,9 +31,10 @@ assert.deepEqual(readerTabs(restored).map(tab => tab.id), [original, 'other-bc']
 const retained = retainedReaderTab({ ...column, id: 'copy', searchPreviewPaneID: 'search', pinnedDetailSourceID: 'detail', referenceSourceReaderID: 'source' });
 assert.equal(retained.searchPreviewPaneID, undefined); assert.equal(retained.pinnedDetailSourceID, undefined);
 assert.equal(retained.referenceSourceReaderID, undefined); assert.equal(retained.sectionID, '1011');
+assert.equal(retained.sourceOwnerPaneID, undefined, 'A copied code tab cannot claim the original Search.');
 
 const shared = sharedWorkspaceLayout({ readers: [column] });
-assert.equal(shared.readers[0].tabs.length, 3);
+assert.equal(shared.readers[0].tabs.length, 3); assert.equal(shared.readers[0].sourceOwnerPaneID, 'utility:search:owner');
 assert.equal(JSON.stringify(shared).includes('stairs'), false, 'Shared layout contains locators, never search text.');
 assert.equal(JSON.stringify(shared).includes('anchorOffset'), false, 'Reading positions remain device-local.');
 const fingerprint = workspaceLayoutFingerprint({ readers: [column] });
@@ -41,7 +43,7 @@ assert.equal(workspaceLayoutFingerprint({ readers: [column] }), fingerprint, 'Re
 const remote = structuredClone(shared);
 remote.readers[0].tabs.push({ id: 'remote-tab', codePrefix: 'AC', codeVersion: '2014', chapterID: '1', sectionID: '101' });
 let merged = applySharedWorkspaceLayout({ readers: [column] }, {projectID: 'p', layout: remote}, {id: 'p'}).readers[0];
-assert.equal(merged.activeTabID, original); assert.equal(merged.sectionID, 'locally-navigated');
+assert.equal(merged.sourceOwnerPaneID, 'utility:search:owner'); assert.equal(merged.activeTabID, original); assert.equal(merged.sectionID, 'locally-navigated');
 assert.equal(merged.internalSearchQuery, 'stairs'); assert.equal(readerTabs(merged).length, 4);
 activateReaderTab(merged, 'remote-tab'); assert.equal(merged.codeVersion, '2014');
 remote.readers[0].tabs = remote.readers[0].tabs.filter(tab => tab.id !== original);
@@ -112,18 +114,20 @@ Object.assign(context, {
 vm.runInContext(actual('prepareReaderSourceTab') + '\n' + source.slice(source.indexOf('function reusableSearchReader('), source.indexOf('\nfunction removeSectionDetail(', source.indexOf('function reusableSearchReader('))), context);
 const firstCount = state.readers.length;
 let opened = await context.openSourceInReader({codePrefix: 'AC', codeVersion: '2014', chapterID: '1', sectionID: '101'}, 'search', {sourceSurface: 'search'});
-assert.equal(opened.id, 'a'); assert.equal(state.readers.length, firstCount);
+assert.notEqual(opened.id, 'a'); assert.equal(state.readers.length, firstCount + 1);
+const ownedSearchReader = opened;
+initializeReaderTabs(opened); // Rendering initializes a newly created column's tabs.
 const sourceTabID = opened.activeTabID, tabCount = readerTabs(opened).length;
 opened = await context.openSourceInReader({codePrefix: 'AC', codeVersion: '2014', chapterID: '2', sectionID: '201'}, 'search', {sourceSurface: 'search'});
 assert.equal(opened.activeTabID, sourceTabID); assert.equal(readerTabs(opened).length, tabCount, 'Another section in an existing code navigates its tab.');
 const explicit = await context.openSourceInReader({codePrefix: 'BC', codeVersion: '2022', chapterID: '10', sectionID: '1011'}, 'search', {sourceSurface: 'search', forceNewReader: true});
-assert.notEqual(explicit.id, 'a'); assert.equal(state.readers.length, firstCount + 1);
-assert.equal(readerTabs(a).find(tab => tab.id === sourceTabID).sectionID, '201');
+assert.notEqual(explicit.id, ownedSearchReader.id); assert.equal(state.readers.length, firstCount + 2);
+assert.equal(readerTabs(ownedSearchReader).find(tab => tab.id === sourceTabID).sectionID, '201');
 
 state.readers.push(full);
 const transferSnapshot = JSON.stringify(state.readers);
 const fullBeforeNavigation = JSON.stringify(full);
-await context.transferReaderTab(a, sourceTabID, {destination: full});
+await context.transferReaderTab(ownedSearchReader, sourceTabID, {destination: full});
 assert.equal(JSON.stringify(state.readers), transferSnapshot, 'Moving into a full column leaves both columns untouched.');
 context.readerShortcuts.activePaneID = () => 'reader:full';
 const oldCount = state.readers.length;
@@ -139,6 +143,7 @@ assert.equal(reopened, full); assert.equal(full.activeTabID, existingID);
 assert.equal(state.readers.length, oldCount + 1, 'A full column can still navigate any code already in its tabs.');
 
 // Direct Search/Saved navigation never creates a seventh-code overflow column.
+full.sourceOwnerPaneID = 'saved';
 const beforeDirectCount = state.readers.length;
 const inactiveTabs = readerTabs(full).filter(tab => tab.id !== full.activeTabID);
 const direct = await context.openSourceInReader({codePrefix:'DIRECT',codeVersion:'2022',chapterID:'1',sectionID:'direct'},'saved',{sourceSurface:'saved'});

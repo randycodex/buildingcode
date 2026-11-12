@@ -1,7 +1,7 @@
 // A Reader remains the stable workspace column. Each tab stores only its own
 // reading session; switching tabs never changes the column's pane identity.
 const copy = value => JSON.parse(JSON.stringify(value));
-const columnKeys = new Set(['id', 'tabs', 'activeTabID']);
+const columnKeys = new Set(['id', 'tabs', 'activeTabID', 'sourceOwnerPaneID']);
 export const maximumReaderTabs = 6;
 
 export function canAddReaderTab(reader) {

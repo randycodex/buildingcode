@@ -20,7 +20,7 @@ function declaration(name, kind = "function") {
   assert.ok(end > index, marker);
   return { index, text: source.slice(index, end + (kind === "function" ? 2 : 1)) };
 }
-const functions = ["retireUnassignedLayout", "loadWorkspaceState", "loadPersistedAccount", "normalizeUtilityInstances", "newUtilityInstance",
+const functions = ["retireEvidenceDetailLayout", "retireUnassignedLayout", "loadWorkspaceState", "loadPersistedAccount", "normalizeUtilityInstances", "newUtilityInstance",
   "normalizeProjectIdentities", "projectIdentity", "projectStructuredFacts", "normalizeProjectStructuredFact",
   "projectColor", "folderType", "projectDetailMatches", "workboardProjectID", "projectDetailKey",
   "clampNumber", "normalizeReaderSettings", "normalizeSearchCodeFilters", "normalizeSearchResultSources", "normalizeSearchHistorySplitRatio",
