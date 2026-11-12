@@ -5493,6 +5493,7 @@ select option:checked {
   transition: opacity 140ms ease;
 }
 
+.search-result-save.is-saved svg,
 .result-row:is(:hover, :focus-within) .search-result-save svg {
   opacity: 1;
 }
