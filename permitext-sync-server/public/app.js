@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-owned-source-reader-v1712";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-reader-passage-actions-v1713";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-owned-source-reader-v1712";
+} from "./offline-storage.js?v=20261112-reader-passage-actions-v1713";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -17726,13 +17726,11 @@ function buildReaderChapterSection(panel, reader, section, groupLabelsByFirstSec
   const sectionControls = renderInlineCommentBox(section, reader, annotationTargetForSection(section, reader), {
     showBookmark: savedSection, bookmarkStateResolved: true, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true
   });
-  sectionControls.classList.add("reader-section-actions");
-  sectionControls.querySelectorAll(".inline-research-toggle").forEach(button => button.remove());
   const savedMarker = sectionControls.querySelector(".inline-bookmark-toggle");
   savedMarker.classList.add('reader-section-saved-marker');
   savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Evidence' : 'Save section');
   savedMarker.title = savedSection ? 'Remove section from Evidence' : 'Save section';
-  headingRow.append(sectionHeading, sectionControls);
+  headingRow.append(sectionHeading, savedMarker);
   sectionWrapper.append(headingRow);
 
   if (privateContentAllowed) {

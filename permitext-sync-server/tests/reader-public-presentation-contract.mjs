@@ -62,7 +62,7 @@ const addNote=inline.querySelector(".inline-note-toggle");
 assert.equal(addNote.hidden,true);
 assert.equal(reads,0,"Pending Reader construction must not read saved records or private Research labels.");
 assert.equal(body.textContent,"Complete public enacted text");assert.equal(bookmark.hidden,true);assert.equal(research.hidden,true);
-assert.equal(bookmark.parentNode.parentNode,rendered.querySelector(".reader-section-heading-row"),"Whole-section extraction retains a real stable bookmark node.");
+assert.equal(bookmark.parentNode,rendered.querySelector(".reader-section-heading-row"),"Whole-section extraction retains a real stable bookmark node.");
 const host=new Node("div");panel.append(host);context.renderReaderSectionProjectContext(host,section,reader,panel);
 assert.equal(reads,0,"Project context must not read Project membership, names or note presence while pending.");assert.equal(host.hidden,true);
 await bookmark.click();await research.click();assert.equal(writes,0);
