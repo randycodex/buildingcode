@@ -56,7 +56,7 @@ assert(all(failedView.element).some(x=>x.textContent==='The provider failed.'));
 assert.equal(passageChipLabel({codePrefix:'BC68',sectionNumber:'27-369',codeVersion:'2026-bundle',codeSource:{editionLabel:'1968 NYC Building Code'}}),'BC68 § 27-369 · 1968');
 let sent=[],draft='Explain this.',savedRequest=null,current=true,snapshots=0;
 let flight=deferred(),review=deferred();
-const view=createResearchV2View({hasMore:true,history:[{id:'first',title:'First'}],onLoadMore:async()=>({conversations:[{id:'first',title:'First'},{id:'second',title:'Older question'}],hasMore:false}),renderAnswerActions:()=>Object.assign(document.createElement('button'),{textContent:'Add to note…'}),conversation:{id:'test',sources:[source],messages:[old]},initialDraft:draft,
+const view=createResearchV2View({hasMore:true,history:[{id:'first',title:'First'}],onLoadMore:async()=>({conversations:[{id:'first',title:'First'},{id:'second',title:'Older question'}],hasMore:false}),renderAnswerActions:()=>Object.assign(document.createElement('button'),{textContent:'Add to note…'}),conversation:{id:'test',sources:[source],messages:[{...old,answer:{...old.answer,additionalEvidenceNeeded:['Related definition.']}}]},initialDraft:draft,
   isCurrent:()=>current,onDraft:text=>{draft=text;},onFind:async()=>({candidates:[source],unresolvedReferences:[{title:'PC § 1',reason:'Not found in this edition.'}]}),
   onOpenReader:async()=>{},onReview:()=>review.promise,onInclude:async()=>{},onCitation:async()=>{},
   onSnapshot:async()=>{snapshots++;return [source];},
@@ -68,7 +68,7 @@ const thread=view.element.querySelector('.rv2-thread');thread.clientHeight=400;t
 assert(find('Add to note…'));assert(find('Save or share'));
 find('More questions').handlers.click();await tick();assert.equal(all(view.element).filter(x=>x.textContent==='First').length,1);assert(find('Older question'));assert.equal(find('More questions').hidden,true);
 const input=view.element.querySelector('.rv2-input'),send=view.element.querySelector('.rv2-send');
-find('Find passages').handlers.click();await tick();
+find('Find source').handlers.click();await tick();
 assert(find('Unresolved reference: PC § 1. Not found in this edition.'));
 find('Review in Reader').handlers.click();await tick();
 assert.equal(send.disabled,true);
@@ -95,7 +95,7 @@ rejectedView.dispose();
 let pages=[];const paged=createResearchV2View({conversation:{sources:[],messages:[]},initialDraft:'Find ramps',onDraft(){},
  onFind:async(question,options)=>{pages.push(options);return options.cursor?{candidates:[{...source,id:'a'},{...source,id:'b',title:'Second result'}],coverage:{candidateCount:2,shownCount:2},nextCursor:null}:{candidates:[{...source,id:'a',title:'First result'}],coverage:{candidateCount:2,shownCount:1},nextCursor:'next-page'};}});
 const pagedFind=text=>all(paged.element).find(x=>x.textContent===text);
-pagedFind('Find passages').handlers.click();await tick();
+paged.element.querySelector('.rv2-send').handlers.click();await tick();
 await pagedFind('More results').handlers.click();
 assert.equal(pages[1].cursor,'next-page');assert.equal(all(paged.element).filter(x=>x.className==='rv2-candidate').length,2,'Appending a page preserves existing rows and skips duplicates.');
 assert.equal(pagedFind('More results').hidden,true);assert(pagedFind('Showing 2 of 2 candidates.'));paged.dispose();
@@ -104,7 +104,7 @@ const stalePage=createResearchV2View({conversation:{sources:[],messages:[]},init
  onFind:async(_question,options)=>{if(!options.cursor)return {candidates:[{...source,id:'first'}],nextCursor:'later'};
   if(++pageAttempts===1)throw Error('Page connection lost');return pendingPage.promise;}});
 const staleFind=text=>all(stalePage.element).find(x=>x.textContent===text);
-staleFind('Find passages').handlers.click();await tick();await staleFind('More results').handlers.click();
+stalePage.element.querySelector('.rv2-send').handlers.click();await tick();await staleFind('More results').handlers.click();
 assert.equal(staleFind('More results').disabled,false);assert.match(stalePage.element.querySelector('.rv2-status').textContent,/Page connection lost/);
 const loading=staleFind('More results').handlers.click();await tick();stalePage.dispose();pendingPage.resolve({candidates:[{...source,id:'late'}],nextCursor:null});await loading;
 assert.equal(all(stalePage.element).filter(x=>x.className==='rv2-candidate').length,1,'A late page cannot change a disposed or different conversation.');
@@ -112,7 +112,7 @@ const openingReader=deferred();let staleReviews=0;
 const staleReview=createResearchV2View({conversation:{sources:[],messages:[]},initialDraft:'Find ramps',onDraft(){},
  onFind:async()=>({candidates:[source]}),onOpenReader:()=>openingReader.promise,onReview:async()=>{staleReviews++;return {selection:source};}});
 const staleReviewFind=text=>all(staleReview.element).find(x=>x.textContent===text);
-staleReviewFind('Find passages').handlers.click();await tick();const reviewing=staleReviewFind('Review in Reader').handlers.click();await tick();staleReview.dispose();openingReader.resolve();await reviewing;
+staleReview.element.querySelector('.rv2-send').handlers.click();await tick();const reviewing=staleReviewFind('Review in Reader').handlers.click();await tick();staleReview.dispose();openingReader.resolve();await reviewing;
 assert.equal(staleReviews,0,'A stale Reader opening cannot start a review for a different account or conversation.');
 console.log('Research v2 view: legacy answer preservation, edition labels, attachment/send races, source-detail send, failure draft retention, stable retry identity and stale-context isolation passed.');
 

@@ -43,7 +43,7 @@ export function researchV2RetryContext(previous,next,requestID){
 
 export function createResearchV2View(options) {
   const { conversation, history = [], initialDraft = '', onDraft, onOpen, onSend,
-    onBrowse, onFind, onReview, onInclude, onRemove, onCitation, onSnapshot,
+    onFind, onReview, onInclude, onRemove, onCitation, onSnapshot,
     isCurrent = () => true, onStatus } = options;
   const root=node('section','research-v2');root.setAttribute('aria-label','Research');
   const rail=node('aside','rv2-rail');rail.setAttribute('aria-label','Research history');
@@ -211,12 +211,9 @@ export function createResearchV2View(options) {
   const input=node('textarea','rv2-input');input.setAttribute('aria-label','Research question');input.dataset.researchDraftKey=options.draftKey||'';input.placeholder='Message';input.rows=2;input.maxLength=2000;input.value=initialDraft;
   input.addEventListener('input',()=>{lastRequest=null;onDraft(input.value);update();});
   const controls=node('div','rv2-composer-controls');
-  const attach=action('+',()=>{menu.hidden=!menu.hidden;attach.setAttribute('aria-expanded',String(!menu.hidden));},'rv2-attach');attach.setAttribute('aria-label','Attach passages');attach.setAttribute('aria-expanded','false');
-  const menu=node('div','rv2-attach-menu');menu.hidden=true;
-  menu.append(action('From Reader',async()=>{menu.hidden=true;attach.setAttribute('aria-expanded','false');await onBrowse();}),action('Find passages',()=>void findPassages()));
   const send=action('↑',()=>void sendQuestion(),'rv2-send');send.setAttribute('aria-label','Send question');
   const cancel=action('Stop',()=>controller?.abort(),'rv2-text-action');cancel.hidden=true;
-  controls.append(attach,cancel,send);composer.append(chips,input,controls,menu);
+  controls.append(cancel,send);composer.append(chips,input,controls);
   const projectContext = options.renderProjectContext?.(composer);
   const operationStatus=node('p','rv2-status');operationStatus.setAttribute('role','status');operationStatus.hidden=true;
   const detail=node('section','rv2-detail');detail.hidden=true;detail.setAttribute('aria-label','Passage details');
@@ -224,7 +221,7 @@ export function createResearchV2View(options) {
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
   chat.append(mobileHistory,thread,detail,status,operationStatus,composer);root.append(rail,divider,chat);
   const operationPending=()=>chatTransitionPending||Boolean(options.operationGate?.status());
-  function update(){const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());attach.disabled=busy||includeBusy||revealBusy||pending;send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||pending));
+  function update(){const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||pending));
     if(newChat)newChat.disabled=busy||includeBusy||revealBusy||pending;
     operationStatus.textContent=chatTransitionPending?'Starting new chat…':options.operationGate?.status() || '';operationStatus.hidden=!pending;
     projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});}
@@ -256,8 +253,8 @@ export function createResearchV2View(options) {
         content.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));}
     }catch(error){if(valid(attempt))notice(error.message,true);}}
   async function findPassages(discoveryQuestion,{focus=''}={}){
-    if(busy||includeBusy)return;menu.hidden=true;attach.setAttribute('aria-expanded','false');const question=typeof discoveryQuestion==='string'?discoveryQuestion:input.value.trim();
-    if(!question&&!focus&&!passageSources.length){notice('Enter a topic to find passages, or choose From Reader.');return;}
+    if(busy||includeBusy)return;const question=typeof discoveryQuestion==='string'?discoveryQuestion:input.value.trim();
+    if(!question&&!focus&&!passageSources.length){notice('Enter a topic to find passages.');return;}
     const attempt=++generation;notice('Finding passages…');
     try{const result=await onFind(question||focus,{focus});if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','','Candidate passages'));
       if(focus)content.append(node('p','rv2-detail-caption',`Source needed: ${focus}`));

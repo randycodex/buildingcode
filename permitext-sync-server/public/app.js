@@ -3,7 +3,7 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, remo
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=26";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=27";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-search-reader-name-v1718";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-composer-actions-v1719";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-search-reader-name-v1718";
+} from "./offline-storage.js?v=20261112-composer-actions-v1719";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -27156,7 +27156,6 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
         finally { release(); }
       },
       onOpen:async id => {if(id===conversation?.id)return;try {await open(id);}catch(error){if(current())await showWebNotice("Could not open Research",error.message);}},
-      onBrowse:() => openReaderFromToolbar(panel),
       onOpenReader:async source => {
         const reader=await openSourceInReader(source,paneID,{sourceSurface:"research",isCurrent:current});
         if(!reader&&current())throw new Error("The source was not opened. Open its exact edition in Reader before including it.");

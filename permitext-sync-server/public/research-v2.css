@@ -60,10 +60,7 @@
 .research-v2 .rv2-passage-chip{font-size:12px;padding:3px 5px;line-height:1.4;border-radius:7px}
 .rv2-input{background:transparent;border:0;width:100%;resize:none;display:block;min-height:46px;max-height:140px;padding:4px 0}
 .rv2-composer-controls{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.research-v2 .rv2-attach{font-size:23px;padding:0 6px;line-height:1.2}
 .research-v2 .rv2-send{font-size:20px;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--text-primary);color:var(--surface);padding:0;margin-left:auto}
-.rv2-attach-menu{position:absolute;bottom:55px;left:10px;padding:6px;border-radius:12px;background:var(--menu-surface);box-shadow:var(--shadow-panel);z-index:5;min-width:155px}
-.rv2-attach-menu button{display:block;width:100%;font-size:13px}
 .rv2-status{font-size:12px;color:var(--text-secondary);margin:4px 0 10px;overflow-wrap:anywhere}
 .rv2-status.is-error{color:var(--destructive)}
 .rv2-detail{flex:1;min-height:0;overflow:auto;padding:15px 0 20px;overflow-wrap:anywhere}
