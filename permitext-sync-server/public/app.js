@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-history-menu-center-v1696";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-collapsed-chapter-menu-v1697";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -61,7 +61,7 @@ import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections, rankReaderSearchResults } from "./reader-search-match.js?v=20261026-exact-section-v4";
 import { searchWords, searchWordPattern } from "./search-words.js?v=20261025-workspace-chrome-v1379";
-import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey, readerContentsNodeCanExpand } from "./reader-navigation-tree.js?v=20261105-reserved-chapters-v2";
+import { buildReaderChapterContents, readerContentsChapterKey, readerContentsNodeCanExpand } from "./reader-navigation-tree.js?v=20261105-reserved-chapters-v2";
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-history-menu-center-v1696";
+} from "./offline-storage.js?v=20261112-collapsed-chapter-menu-v1697";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -9275,12 +9275,8 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
   }));
   const activeChapterID = String(select.value || reader.chapterID || "");
   const activeSectionID = String(reader.sectionID || "");
-  const target = `${activeChapterID}:${activeSectionID}`;
-  const revealTarget = menu._navigationTarget !== target;
-  menu._navigationTarget = target;
   if (!menu._expandedNavigationIDs) menu._expandedNavigationIDs = new Set();
   const expanded = menu._expandedNavigationIDs;
-  if (revealTarget) expanded.add(readerContentsChapterKey(activeChapterID));
   if (options.toggleID) {
     if (expanded.has(options.toggleID)) expanded.delete(options.toggleID);
     else expanded.add(options.toggleID);
@@ -9364,7 +9360,8 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
     menu.append(tree);
     bindReaderNavigationKeyboard(menu, select, tree);
     const focusTarget = (options.focusID && tree.querySelector(`#${CSS.escape(options.focusID)}`)) ||
-      tree.querySelector('[aria-selected="true"]') || tree.querySelector('[role="treeitem"]');
+      tree.querySelector('[aria-selected="true"]') ||
+      tree.querySelector(`[data-chapter-id="${CSS.escape(activeChapterID)}"]`) || tree.querySelector('[role="treeitem"]');
     menu.scrollTop = preservedScrollTop;
     if (focusTarget && preservedOffset !== null) {
       menu.scrollTop += focusTarget.getBoundingClientRect().top - menu.getBoundingClientRect().top - preservedOffset;
@@ -9389,11 +9386,6 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
       if (!isCurrent()) return;
       node.children = buildReaderChapterContents(chapter, readerNavigationSections(chapter), sectionDisplayTitle);
       node.sectionCount = node.children.length;
-      if (revealTarget && node.chapterID === activeChapterID) {
-        const ancestors = readerContentsAncestorKeys(node.children, activeSectionID);
-        if (ancestors) ancestors.forEach(key => expanded.add(key));
-        else if (!activeSectionID && node.children[0]?.kind === "group") expanded.add(node.children[0].key);
-      }
     } catch (error) {
       if (!isCurrent()) return;
       node.error = true;
@@ -9631,6 +9623,8 @@ function enhanceSelect(select) {
       menu.hidden = false;
       trigger.setAttribute("aria-expanded", "true");
       if (readerChapterMenu) {
+        menu._expandedNavigationIDs = new Set();
+        menu.scrollTop = 0;
         await renderReaderChapterNavigationMenu(menu, select);
       } else {
         renderOptions();

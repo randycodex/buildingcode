@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
-import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsNodeCanExpand } from "../public/reader-navigation-tree.js";
+import {documentFixture} from "./helpers/workflow-dom.mjs";
+import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey, readerContentsNodeCanExpand } from "../public/reader-navigation-tree.js";
 
 const [app, styles, html] = await Promise.all([
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
@@ -25,8 +26,8 @@ assert(app.includes("ArrowLeft"), "Chapter menu does not collapse with ArrowLeft
 assert(app.includes("Escape"), "Chapter menu does not close on Escape.");
 assert(app.includes("fetchChapter(node.chapterID, { signal: controller.signal })"), "Chapter expansion must use a cancellable chapter-summary request.");
 assert(
-  app.includes("menu._expandedNavigationIDs") && app.includes("expanded.delete(options.toggleID)"),
-  "Closing and reopening the chapter menu must preserve its last disclosure state, including fully collapsed."
+  app.includes("menu._expandedNavigationIDs = new Set()") && app.includes("expanded.delete(options.toggleID)"),
+  "Opening the chapter menu starts collapsed; chevrons control disclosure while it is open."
 );
 assert(app.includes("function readerNavigationSections"), "Chapter menu does not filter nested list-item catalog rows.");
 assert(app.includes("isReaderNavigationSection"), "Chapter menu lacks a section-navigation predicate.");
@@ -133,6 +134,32 @@ press("ArrowLeft",parent);
 assert.equal(toggled.length,2);
 press("Escape",leaf); press("Tab",leaf);
 assert.equal(closed,2); assert.equal(triggerFocused,1); assert.equal(adjacent,1);
+
+// Opening contents must not load or expand the active chapter/section implicitly.
+{
+  const doc=documentFixture(), menu=doc.createElement('div');
+  menu.id='contents';menu.hidden=false;menu.isConnected=true;menu.scrollTop=0;menu.style={setProperty(){}};
+  const reader={chapterID:'1',sectionID:'1',codePrefix:'BC',codeVersion:'2022'};
+  const originalReader=JSON.stringify(reader), panel={isConnected:true};let fetches=0;
+  const select={closest:()=>panel,value:'1',options:[1,2].map(id=>({value:String(id),textContent:`Chapter ${id}`,dataset:{sectionCount:'1'}}))};
+  const c=vm.createContext({document:doc,crypto:{randomUUID:()=>String(Math.random())},AbortController,
+    captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',readerForPanel:()=>reader,
+    workspaceReaderContentIdentity:()=> 'stable',codeOptionFor:()=>({}),enabledReaderBrowseProjection:async()=>({token:{},codes:[{}]}),
+    activeCodeSourcesController:{isCurrent:()=>true},getComputedStyle:()=>({getPropertyValue:()=> '#abc'}),
+    readerContentsChapterKey,readerContentsNodeCanExpand,buildReaderChapterContents,
+    clear:node=>node.replaceChildren(),bindReaderNavigationKeyboard(){},CSS:{escape:value=>value},requestAnimationFrame(){},
+    readerNavigationSections:chapter=>chapter.sections,sectionDisplayTitle:(number,title)=>`${number} ${title}`,
+    fetchChapter:async id=>{fetches++;return {id,groups:[],sections:[{id:1,sectionNumber:'101.1',title:'Title.'}]};}});
+  vm.runInContext(actual('readerNavItemID')+'\n'+actual('renderReaderChapterNavigationMenu'),c);
+  await c.renderReaderChapterNavigationMenu(menu,select);
+  assert.equal(fetches,0,'Opening a menu does not fetch the active chapter.');
+  assert(menu.children[0].children.every(item=>item.attributes['aria-expanded']==='false'),'Every chapter starts collapsed, including the active first chapter.');
+  await c.renderReaderChapterNavigationMenu(menu,select,{toggleID:readerContentsChapterKey('1')});
+  assert.equal(fetches,1,'Explicit expansion loads the chapter contents.');
+  assert.equal(menu.children[0].children[0].attributes['aria-expanded'],'true');
+  assert.equal(menu.children[0].children[1].attributes['aria-expanded'],'false');
+  assert.equal(JSON.stringify(reader),originalReader,'Disclosure leaves the reading location intact.');
+}
 
 // A closed, detached or context-changed menu may not publish a late projection.
 for (const stale of ["closed", "account", "workspace", "reader", "detached"]) {
