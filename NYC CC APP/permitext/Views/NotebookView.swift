@@ -1018,7 +1018,6 @@ private struct NotebookCardEditorView: View {
         .font(.system(size: 18))
         .padding(.horizontal, 22).padding(.vertical, 12)
         .frame(maxWidth: .infinity)
-        .background(.bar)
         .disabled(!documentEditor.isReady || isLeaving || !isCurrentOwner)
         .accessibilityIdentifier("native-notebook-formatting-toolbar")
     }
