@@ -37,14 +37,15 @@ for(const otherTabs of [false,true]) {
  if(otherTabs)await assert.rejects(pending,/Close other per codes tabs/);else await pending;
  assert.equal(checks,1);
 }
-// Run the actual worker message handler, including the multi-tab refusal.
+// A user-requested activation can proceed with another page open. The worker's
+// lifecycle retains that page's generation rather than forcing it to reload.
 const workerSource=await readFile(new URL('../public/service-worker.js',import.meta.url),'utf8');
 const start=workerSource.indexOf('self.addEventListener("message"'),end=workerSource.indexOf('\n});',start)+4;
 for(const otherTabs of [false,true]) {
  let handler,promise,activated=0;const replies=[];
  vm.runInNewContext(workerSource.slice(start,end),{self:{addEventListener:(type,fn)=>handler=fn,clients:{matchAll:async()=>otherTabs?[{id:'current'},{id:'editing-elsewhere'}]:[{id:'current'}]},skipWaiting:async()=>activated++}});
  handler({data:{type:'PERMITEXT_ACTIVATE_UPDATE'},source:{id:'current'},ports:[{postMessage:value=>replies.push(value)}],waitUntil:value=>promise=value});await promise;
- assert.equal(replies[0].ready,!otherTabs);assert.equal(activated,otherTabs?0:1);
+ assert.equal(replies[0].ready,true);assert.equal(activated,1);
 }
 
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
@@ -100,4 +101,4 @@ for(const scenario of ['clean','no-workspace','background','offline','outbox','c
  }
  assert.equal(JSON.stringify(retainedState),before,'Update preparation cannot clear saved content, outbox entries or conflicts');
 }
-console.log('App update button passed: pending-only visibility, no announcement banner, one click and duplicate prevention, short errors, specific editor/storage/images/Research/race guards and independent Project-sync availability, explicit worker activation and other-tab refusal.');
+console.log('App update button passed: pending-only visibility, one click and duplicate prevention, legacy errors, editor/storage/images/Research/race guards, independent Project sync and explicit worker activation across open pages.');

@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v2260";
+const shellCacheName = "permitext-pro-shell-v2261";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -64,7 +64,7 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261112-column-order-tabs-v1688",
+  "/web/web-client-version.js?v=20261112-app-update-handoff-v1689",
   "/web/web-app-update.js?v=20261110-per-codes-v3",
   "/web/research-delete-controls.js?v=10",
   "/web/assistant-composer-hint.js?v=1",
@@ -94,13 +94,13 @@ const shellURLs = [
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261112-column-order-tabs-v1688",
+  "/web/app.js?v=20261112-app-update-handoff-v1689",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261112-column-order-tabs-v1688",
+  "/web/offline-storage.js?v=20261112-app-update-handoff-v1689",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261111-selective-menus-v3",
@@ -182,28 +182,68 @@ self.addEventListener("install", (event) => {
   );
 });
 
+const retainedShellClientsKey = "/__permitext_retained_shell_clients__";
+
+async function obsoleteShellCaches() {
+  const generation = name => Number(name.match(/^permitext-pro-shell-v(\d+)$/)?.[1]) || 0;
+  return (await caches.keys()).filter(name => generation(name) > 0 && generation(name) < generation(shellCacheName));
+}
+
+async function retainOpenClientShells() {
+  const obsolete = await obsoleteShellCaches();
+  if (!obsolete.length) return;
+  const clients = await self.clients.matchAll({type:"window", includeUncontrolled:true});
+  if (!clients.length) {
+    await Promise.all(obsolete.map(name => caches.delete(name)));
+    return;
+  }
+  // An explicit update does not reload other pages. Retain their immutable
+  // scripts until those pages close or navigate to a fresh document.
+  const cache = await caches.open(shellCacheName);
+  try {
+    await cache.put(retainedShellClientsKey, new Response(JSON.stringify(clients.map(client => client.id)), {
+      headers:{"Content-Type":"application/json"}
+    }));
+  } catch {
+    // If bookkeeping cannot be saved, leave the older public shells intact.
+  }
+}
+
+async function pruneRetainedShells() {
+  const cache = await caches.open(shellCacheName);
+  const record = await cache.match(retainedShellClientsKey);
+  if (!record) return;
+  let retained;
+  try { retained = await record.json(); } catch { return; }
+  if (!Array.isArray(retained)) return;
+  const live = new Set((await self.clients.matchAll({type:"window", includeUncontrolled:true})).map(client => client.id));
+  if (retained.some(id => live.has(id))) return;
+  await Promise.all((await obsoleteShellCaches()).map(name => caches.delete(name)));
+  await cache.delete(retainedShellClientsKey);
+}
+
+async function previousShellAsset(request) {
+  for (const name of await caches.keys()) {
+    if (!name.startsWith("permitext-pro-shell-") || name === shellCacheName) continue;
+    const cache = await caches.open(name);
+    // Workspace HTML is committed last, so incomplete installations cannot
+    // supply another page's lazy-loaded scripts.
+    if (!(await cache.match("/workspace"))) continue;
+    const response = await cache.match(request);
+    if (response) return response;
+  }
+}
+
 self.addEventListener("activate", (event) => {
-  // Updates wait for existing controlled tabs to close. Do not claim an
-  // uncontrolled document: it may still be running an older app generation.
-  event.waitUntil(
-    caches.keys().then((names) => Promise.all(
-      names
-        .filter((name) => name.startsWith("permitext-pro-shell-") && name !== shellCacheName)
-        .map((name) => caches.delete(name))
-    ))
-  );
+  // Never claim uncontrolled pages or force another document to reload.
+  event.waitUntil(retainOpenClientShells());
 });
 
-// Explicit user action only. Never replace a worker underneath another open
-// tab, and never activate automatically during install or claim existing pages.
+// Explicit user action only. Other pages can continue using their retained
+// generation; saving and reloading the requesting tab is handled by the app.
 self.addEventListener("message", (event) => {
   if (event.data?.type !== "PERMITEXT_ACTIVATE_UPDATE" || !event.ports?.[0] || !event.source?.id) return;
   event.waitUntil((async () => {
-    const clients = await self.clients.matchAll({type:"window", includeUncontrolled:true});
-    if (clients.some(client => client.id !== event.source.id)) {
-      event.ports[0].postMessage({ready:false, reason:"other-tabs"});
-      return;
-    }
     event.ports[0].postMessage({ready:true});
     await self.skipWaiting();
   })());
@@ -232,6 +272,7 @@ async function networkFirstNavigation(request) {
 
 async function cacheFirstAsset(request) {
   const url = new URL(request.url);
+  if (url.pathname === "/web/app.js") await pruneRetainedShells();
   const requestedAssetRevision = url.searchParams.get("assetRevision");
   const revisionedAsset = url.pathname.startsWith("/code/assets/") && /^[a-f0-9]{64}$/.test(requestedAssetRevision || "");
   const cache = await caches.open(
@@ -240,6 +281,10 @@ async function cacheFirstAsset(request) {
   );
   const cached = await cache.match(request);
   if (cached) return cached;
+  if (url.pathname.startsWith("/web/") || url.pathname.startsWith("/marketing/")) {
+    const retained = await previousShellAsset(request);
+    if (retained) return retained;
+  }
   const response = await fetch(request);
   if (response.ok && (!revisionedAsset || response.headers.get("x-permitext-asset-revision") === requestedAssetRevision)) {
     await cache.put(request, response.clone());
