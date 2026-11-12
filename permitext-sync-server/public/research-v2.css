@@ -17,8 +17,9 @@
 .rv2-history-group{margin:0 0 18px}
 .rv2-history-group-label{margin:0 0 12px;font-size:14px;font-weight:400;color:var(--text-secondary)}
 .rv2-question-group-list{padding:0;margin:0;list-style:none}
-.rv2-question-row{padding:0;margin:0}
-.rv2-question-row+.rv2-question-row{border-top:1px solid var(--border)}
+.rv2-question-row{padding:0 10px;margin:0 -10px;border-radius:8px}
+.rv2-question-row:is(:hover,:has(:focus-visible)){background:var(--menu-highlight)}
+.rv2-question-row:has(>.rv2-question-link[aria-current=page]){background:color-mix(in srgb,var(--text-primary) 16%,transparent)}
 .research-v2 .rv2-question-link{display:block;width:100%;padding:12px 0;font-size:14px;line-height:1.5;box-sizing:border-box;min-width:0;overflow-wrap:anywhere;vertical-align:middle;color:var(--text-primary)}
 .rv2-question-title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;white-space:normal;overflow:hidden}
 .research-v2 .rv2-question-link,.research-v2 .rv2-question-link:hover{background:transparent;border-radius:0;box-shadow:none}
