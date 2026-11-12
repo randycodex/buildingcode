@@ -12,7 +12,7 @@ document.querySelector=()=>null;
 const track=document.createElement('main');
 const state={...emptyWorkspaceLayout(),readers:[{id:"legacy-reader"}],utilityInstances:[{id:"legacy-search",key:"search"}],
  utilities:{search:true,calculator:true},localSavedItems:[{id:"recoverable"}]};
-const context=vm.createContext({state,document,track,isProAccount:()=>pro,
+const context=vm.createContext({state,document,track,isProAccount:()=>pro,readerShortcuts:null,
  detachedProjectWindow:false,detachedProject:null,activeWorkspaceID:'general',workspaceActionsButton:{},
  activeWorkspaceRecord:()=>selected,currentContentSummary:()=>({projects}),
  activeFolderRecords:values=>values.filter(p=>!p.deletedAt&&!p.archivedAt),

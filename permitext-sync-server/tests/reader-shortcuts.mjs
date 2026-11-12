@@ -20,7 +20,13 @@ doc.createElement = tag => {
   n.style = {};
   n.removeAttribute = key => delete n.attributes[key];
   n.getAttribute = key => n.attributes[key] ?? null;
-  n.getBoundingClientRect = () => ({left:350,bottom:50});
+  n.getBoundingClientRect = () => ({left:350,bottom:50,width:80});
+  n.classList = {
+    contains: name => n.className.split(/\s+/).includes(name),
+    add(...names) { n.className = [...new Set([...n.className.split(/\s+/).filter(Boolean), ...names])].join(' '); },
+    remove(...names) { n.className = n.className.split(/\s+/).filter(name => !names.includes(name)).join(' '); },
+    toggle(name, on) { on ? this.add(name) : this.remove(name); }
+  };
   n.offsetWidth = 300;
   n.insertBefore = (child, before) => {
     child.remove(); child.parentNode = n;
@@ -96,3 +102,67 @@ assert.equal(liveGroup.collapsed,true,'Collapse updates the current group, even 
 groupContext.setColumnGroupCollapsed(staleGroup,false);
 assert.equal(liveGroup.collapsed,false);
 console.log('Reader group navigation passed: current group identity survives menu reconciliation.');
+
+// The real column projection and move handler drive the same mounted columns
+// and bubbles. Utility instances are independent, and drafts never remount.
+const allHost=doc.createElement('div'), allTrack=doc.createElement('section');doc.body.append(allHost,allTrack);
+const allIDs=['reader:a','utility:search:s','reader:b','utility:analysis:r','utility:calculator'];
+const allPanels=allIDs.map(id=>{const node=doc.createElement('article');node.className='workspace-panel';node.dataset.paneId=id;allTrack.append(node);return node;});
+const retainedDraft={text:'An unsent Assistant question',scrollTop:317};allPanels[3].draft=retainedDraft;
+const toolButtons=['search','analysis','calculator'].map(key=>({key,button:doc.createElement('button')}));
+const actualFunction=name=>{const first=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(first>=0,name);return source.slice(first,source.indexOf('\n}',first)+2);};
+let saves=0, allContext='A:research';
+const allState={readers:[{id:'a',codePrefix:'BC',codeVersion:'2022',title:'Reader'},{id:'b',codePrefix:'PC',codeVersion:'2022',title:'Reader'}],paneOrder:[...allIDs]};
+const appContext=vm.createContext({state:allState,track:allTrack,isProAccount:()=>true,workflowPaneIsVisible:()=>true,
+  paneIDForReader:r=>`reader:${r.id}`,syncCodeVersion:value=>value,syncCodeVersionForPrefix:()=> '2022',codeOptions:[],
+  readerTabs:()=>[{}],readerPositionLabel:r=>`Reader ${allState.readers.indexOf(r)+1}`,columnPaneLabel:()=> 'Evidence',
+  activePaneIDs:()=>allState.paneOrder,paneGroupForMove:id=>[id],pinCriticalWorkflowPanesToLeft:ids=>ids,
+  saveWorkspaceState(){saves++;},appendPaneSequence(nodes){
+    const byID=new Map(nodes.map(node=>[node.dataset.paneId,node]));
+    for(const id of allState.paneOrder)allTrack.append(byID.get(id));
+  }});
+vm.runInContext(['readerShortcutItems','orderWithPaneMoved','moveWorkspaceColumnShortcut'].map(actualFunction).join('\n'),appContext);
+const allReveals=[];
+const navigation=createReaderShortcuts({host:allHost,track:allTrack,readers:()=>appContext.readerShortcutItems(),context:()=>allContext,
+  reveal:id=>allReveals.push(id),move:(...args)=>appContext.moveWorkspaceColumnShortcut(...args),tools:toolButtons});
+appContext.readerShortcuts=navigation;
+const order=()=>allHost.children.map(button=>button.dataset.readerPaneId);
+assert.deepEqual(order(),allIDs);
+assert.deepEqual(allHost.children.map(button=>button.textContent),['Reader 1','Search','Reader 2','Assistant','Calculator']);
+assert(toolButtons.every(({button})=>button.classList.contains('has-open-column')),'Open tools use bubbles instead of duplicate launchers.');
+assert(allHost.children.every(button=>button.draggable));
+const moving=allHost.children[2], target=allHost.children[1];
+let selectionRestores=0;
+const selectionRange={commonAncestorContainer:{isConnected:true}};
+doc.getSelection=()=>({rangeCount:1,isCollapsed:false,anchorNode:allPanels[0],getRangeAt:()=>({cloneRange:()=>selectionRange}),
+  removeAllRanges(){},addRange(range){assert.equal(range,selectionRange);selectionRestores++;}});
+moving.dispatch('pointerdown',{pointerType:'mouse',button:0,preventDefault(){assert.fail('Draggable bubbles must allow the native mouse drag.');}});
+moving.dispatch('click',{detail:1});assert.equal(selectionRestores,1,'Bubble clicks preserve the selected passage while allowing native dragging.');
+allPanels[1].dispatch('pointerdown',{bubbles:true});
+assert.equal(navigation.activePaneID(),'utility:search:s');
+assert.equal(navigation.activeReaderPaneID(),'reader:b','Using a tool retains the last Reader for normal source navigation.');
+const transfer={setData(type,id){this[type]=id;}};
+moving.dispatch('dragstart',{dataTransfer:transfer});
+let dropAccepted=false;target.dispatch('dragover',{clientX:360,dataTransfer:transfer,preventDefault(){dropAccepted=true;}});
+assert.equal(dropAccepted,true);assert.equal(transfer.dropEffect,'move');
+target.dispatch('drop',{clientX:360,dataTransfer:transfer,preventDefault(){}});
+assert.deepEqual(order(),['reader:a','reader:b','utility:search:s','utility:analysis:r','utility:calculator']);
+assert.deepEqual(allTrack.children.map(node=>node.dataset.paneId),order());assert.equal(saves,1);
+assert.equal(allPanels[3].draft,retainedDraft);assert.equal(retainedDraft.scrollTop,317);
+moving.dispatch('click');assert.deepEqual(allReveals,['reader:b'],'Dropping does not trigger an extra navigation click.');
+const first=allHost.children[0];
+first.dispatch('keydown',{altKey:true,shiftKey:true,key:'ArrowRight',preventDefault(){}});
+assert.deepEqual(order(),['reader:b','reader:a','utility:search:s','utility:analysis:r','utility:calculator']);
+assert.equal(doc.activeElement,first);assert.equal(saves,2);
+first.dispatch('dragstart',{dataTransfer:transfer});allContext='B:research';
+target.dispatch('drop',{clientX:360,dataTransfer:transfer,preventDefault(){assert.fail('A stale Project cannot accept this drop.');}});
+first.dispatch('dragend');assert.equal(saves,2,'Dragging across a Project change cannot mutate its layout.');
+first.dispatch('keydown',{altKey:true,shiftKey:true,key:'ArrowRight',preventDefault(){}});
+assert.equal(saves,2,'Keyboard reordering cannot use bubbles retained from a previous Project.');
+const duplicate=doc.createElement('article');duplicate.className='workspace-panel';duplicate.dataset.paneId='utility:search:second';allTrack.append(duplicate);
+navigation.refresh();
+assert.deepEqual(allHost.children.filter(button=>button.textContent.startsWith('Search')).map(button=>button.textContent),['Search 1','Search 2']);
+allPanels[1].remove();duplicate.remove();navigation.refresh();
+assert.equal(toolButtons[0].button.classList.contains('has-open-column'),false,'Closing the last Search restores its launcher.');
+navigation.dispose();
+console.log('Column bubbles passed: matching physical order, open-tool styling, per-instance navigation, retained Reader targeting, mouse/keyboard reordering, intact drafts, stale-context guards and launcher restoration.');

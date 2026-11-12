@@ -1,4 +1,4 @@
-import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=4";
+import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=6";
 import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=3";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-reader-minimum-width-v1685";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-column-order-tabs-v1688";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=10";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-reader-minimum-width-v1685";
+} from "./offline-storage.js?v=20261112-column-order-tabs-v1688";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -10234,6 +10234,7 @@ async function openReaderFromToolbar(button) {
   const workspaceID = activeWorkspaceID;
   const view = currentColumnWorkflowView();
   const generation = state.workflowNavigationGeneration || 0;
+  const anchorPaneID = readerShortcuts?.activePaneID() || "";
   const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     currentColumnWorkflowView() === view && (state.workflowNavigationGeneration || 0) === generation;
   openReaderCodePicker(button, async code => {
@@ -10248,6 +10249,10 @@ async function openReaderFromToolbar(button) {
     if (previous) state.readers = [reader];
     else state.readers.push(reader);
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneIDForReader(reader), view);
+    if (!previous && anchorPaneID) {
+      const group = columnGroupForPane(anchorPaneID);
+      placePaneAfter(group?.paneIDs.at(-1) || anchorPaneID, paneIDForReader(reader));
+    }
     saveWorkspaceState();
     await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
     if (isCurrent()) scrollPaneIntoView(paneIDForReader(reader));
@@ -40893,7 +40898,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   }
   if (!options.forceNewReader && isProAccount() && !reader) {
     const columns = visibleReaders.filter(candidate => Array.isArray(candidate.tabs));
-    reader = columns.find(candidate => paneIDForReader(candidate) === readerShortcuts?.activePaneID()) || columns[0] || null;
+    reader = columns.find(candidate => paneIDForReader(candidate) === (readerShortcuts?.activeReaderPaneID?.() || readerShortcuts?.activePaneID())) || columns[0] || null;
   }
   if (!reader) {
     if (isProAccount() || state.readers.length < 1) {
@@ -46103,23 +46108,45 @@ function appendPaneSequence(panes) {
 function readerShortcutItems() {
   if (!isProAccount()) return [];
   const byID = new Map((state.readers || []).map(reader => [paneIDForReader(reader), reader]));
-  return [...track.querySelectorAll(":scope > .workspace-panel")].flatMap(panel => {
-    const id = panel.dataset.paneId;
-    const reader = byID.get(id);
-    if (!reader || !workflowPaneIsVisible(id)) return [];
+  const items = [...track.querySelectorAll(":scope > .workspace-panel")].filter(panel => panel.dataset.paneId && workflowPaneIsVisible(panel.dataset.paneId)).map(panel => {
+    const id = panel.dataset.paneId, reader = byID.get(id);
+    if (!reader) {
+      const toolKey = /^utility:search(?::|$)/.test(id) ? 'search'
+        : /^(?:utility:analysis(?::|$)|research:conversation:)/.test(id) ? 'analysis'
+        : id === 'utility:calculator' ? 'calculator' : '';
+      const label = {search:'Search', analysis:'Assistant', calculator:'Calculator'}[toolKey] || columnPaneLabel(panel);
+      const query = toolKey === 'search' ? panel.querySelector('.search-input')?.value?.trim() : '';
+      return {id, name:label, label, location:query || '', column:true, theme:'current-consolidation', toolKey};
+    }
     const prefix = String(reader.codePrefix || "BC").toUpperCase();
     const version = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(prefix));
     const code = codeOptions.find(option => option.prefix === prefix && codeOptionVersion(option) === version);
     const name = code ? readerCodeOptionLabel(code) : reader.codeName || prefix;
-    const edition = code ? researchCodeEdition({ codePrefix: prefix, codeVersion: version })
-      : String(reader.codeEdition || version.match(/\b(?:19|20)\d{2}\b/)?.[0] || "Current");
     const chapter = panel.querySelector(".chapter-select")?.selectedOptions?.[0]?.textContent || "";
     const section = reader.sectionNumber ? sectionDisplayTitle(reader.sectionNumber, reader.title, "") : reader.title;
     const tabs = readerTabs(reader);
-    return [{ id, prefix, edition, name: readerPositionLabel(reader), label: readerPositionLabel(reader), column: true,
-      theme: code?.theme || "current-consolidation",
-      location: [name, `${tabs.length} ${tabs.length === 1 ? 'tab' : 'tabs'}`, ...new Set([chapter, section].filter(value => value && value !== "Reader"))].join(" · ") }];
+    return { id, name:readerPositionLabel(reader), label:readerPositionLabel(reader), column:true,
+      theme:code?.theme || "current-consolidation",
+      location:[name, `${tabs.length} ${tabs.length === 1 ? 'tab' : 'tabs'}`, ...new Set([chapter, section].filter(value => value && value !== "Reader"))].join(" · ") };
   });
+  const counts = new Map(), occurrences = new Map();
+  for (const item of items) counts.set(item.label, (counts.get(item.label) || 0) + 1);
+  return items.map(item => {
+    const index = (occurrences.get(item.label) || 0) + 1; occurrences.set(item.label, index);
+    return counts.get(item.label) > 1 ? {...item, label:`${item.label} ${index}`, name:`${item.name} ${index}`} : item;
+  });
+}
+
+function moveWorkspaceColumnShortcut(paneID, targetID, position) {
+  if (!isProAccount() || !workflowPaneIsVisible(paneID) || !workflowPaneIsVisible(targetID)) return false;
+  const nextOrder = orderWithPaneMoved(paneID, targetID, position);
+  if (!nextOrder) return false;
+  state.paneOrder = nextOrder;
+  // Reuse the mounted columns, preserving editors, scroll and their controls.
+  appendPaneSequence([...track.querySelectorAll(':scope > .workspace-panel')]);
+  saveWorkspaceState();
+  readerShortcuts?.refresh();
+  return true;
 }
 
 async function revealReaderShortcut(paneID) {
@@ -50626,7 +50653,8 @@ function bindImmediateUtilityControls() {
   if (shortcutHost && !readerShortcuts) readerShortcuts = createReaderShortcuts({
     host: shortcutHost, track, readers: readerShortcutItems,
     context: () => `${accountRuntimeGeneration}:${activeWorkspaceID}:${currentColumnWorkflowView()}`,
-    reveal: revealReaderShortcut
+    reveal: revealReaderShortcut, move: moveWorkspaceColumnShortcut,
+    tools: [{button:toggleSearchButton,key:'search'}, {button:toggleAnalysisButton,key:'analysis'}, {button:toggleCalculatorButton,key:'calculator'}]
   });
   const updateBadge = document.querySelector("#project-update-badge");
   if (updateBadge && !updateBadge.dataset.bound) {

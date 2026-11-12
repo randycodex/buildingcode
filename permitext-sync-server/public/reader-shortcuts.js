@@ -9,12 +9,15 @@ export function readerShortcutLabel({ prefix = '', edition = '' }) {
 
 // The toolbar navigates columns. Code tabs and their reading sessions live in
 // the Reader header rather than becoming additional toolbar shortcuts.
-export function createReaderShortcuts({ host, track, readers, context, reveal }) {
+export function createReaderShortcuts({ host, track, readers, context, reveal, move, tools = [] }) {
   const doc = host.ownerDocument;
   const win = doc.defaultView;
   const buttons = new Map();
   const activeByContext = new Map();
+  const readerByContext = new Map();
   let currentContext = '', activeID = '', scheduled = false, disposed = false;
+  let draggedID = '', dragContext = '', suppressClickUntil = 0, currentItems = [];
+  let pointerSelection = null;
   let tooltipButton = null;
   const tooltip = doc.createElement('div');
   tooltip.className = 'reader-shortcut-tooltip';
@@ -29,6 +32,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal })
     tooltip.hidden = true;
   }
   function showTooltip(button) {
+    if (draggedID) return;
     hideTooltip();
     tooltipButton = button;
     tooltip.textContent = button.dataset.description;
@@ -42,7 +46,25 @@ export function createReaderShortcuts({ host, track, readers, context, reveal })
     if (!buttons.has(id)) return;
     activeID = id;
     activeByContext.set(currentContext, id);
+    if (id.startsWith('reader:')) readerByContext.set(currentContext, id);
     for (const [key, button] of buttons) button.setAttribute('aria-pressed', String(key === id));
+  }
+  function clearDropMarkers() {
+    for (const button of buttons.values()) button.classList.remove('is-drop-before', 'is-drop-after');
+  }
+  function endDrag() {
+    clearDropMarkers();
+    for (const button of buttons.values()) button.classList.remove('is-dragging');
+    draggedID = ''; dragContext = '';
+    pointerSelection = null;
+    suppressClickUntil = Date.now() + 250;
+  }
+  function dropPosition(event, button) {
+    const bounds = button.getBoundingClientRect();
+    return event.clientX > bounds.left + bounds.width / 2 ? 'after' : 'before';
+  }
+  function canDrop(id) {
+    return Boolean(move && draggedID && draggedID !== id && dragContext === context() && buttons.has(draggedID));
   }
   function refresh() {
     if (disposed) return;
@@ -50,11 +72,14 @@ export function createReaderShortcuts({ host, track, readers, context, reveal })
     const contextChanged = nextContext !== currentContext;
     const previousIDs = new Set(buttons.keys());
     if (contextChanged) {
+      if (draggedID) endDrag();
       currentContext = nextContext;
       activeID = activeByContext.get(currentContext) || '';
       hideTooltip();
     }
     const items = readers();
+    currentItems = items;
+    for (const {button, key} of tools) button?.classList.toggle('has-open-column', items.some(item => item.toolKey === key));
     const wanted = new Set(items.map(item => item.id));
     for (const [id, button] of buttons) if (!wanted.has(id)) {
       if (tooltipButton === button) hideTooltip();
@@ -75,9 +100,52 @@ export function createReaderShortcuts({ host, track, readers, context, reveal })
         // Preserve text selection when using a mouse; keyboard focus still
         // reaches every shortcut normally, and touch keeps its native behavior.
         button.addEventListener('pointerdown', event => {
-          if (event.pointerType === 'mouse' && event.button === 0) event.preventDefault();
+          pointerSelection = null;
+          if (event.pointerType !== 'mouse' || event.button !== 0) return;
+          if (!move) event.preventDefault();
+          else {
+            const selection = doc.getSelection?.();
+            if (selection?.rangeCount && !selection.isCollapsed && track.contains(selection.anchorNode)) pointerSelection = selection.getRangeAt(0).cloneRange();
+          }
         });
-        button.addEventListener('click', () => { activate(item.id); void reveal(item.id); });
+        button.addEventListener('click', event => {
+          if (Date.now() < suppressClickUntil) return;
+          if (event.detail !== 0 && pointerSelection?.commonAncestorContainer?.isConnected) {
+            const selection = doc.getSelection(); selection.removeAllRanges(); selection.addRange(pointerSelection);
+          }
+          pointerSelection = null;
+          activate(item.id); void reveal(item.id);
+        });
+        button.draggable = Boolean(move);
+        if (move) {
+          button.setAttribute('aria-keyshortcuts', 'Alt+Shift+ArrowLeft Alt+Shift+ArrowRight');
+          button.addEventListener('dragstart', event => {
+            draggedID = item.id; dragContext = currentContext; hideTooltip();
+            button.classList.add('is-dragging');
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', item.id);
+          });
+          button.addEventListener('dragover', event => {
+            if (!canDrop(item.id)) return;
+            event.preventDefault(); event.dataTransfer.dropEffect = 'move'; clearDropMarkers();
+            button.classList.add(`is-drop-${dropPosition(event, button)}`);
+          });
+          button.addEventListener('dragleave', clearDropMarkers);
+          button.addEventListener('drop', event => {
+            if (!canDrop(item.id)) return;
+            event.preventDefault(); const source = draggedID, position = dropPosition(event, button);
+            endDrag(); void move(source, item.id, position);
+          });
+          button.addEventListener('dragend', endDrag);
+          button.addEventListener('keydown', event => {
+            if (!event.altKey || !event.shiftKey || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+            event.preventDefault(); hideTooltip();
+            if (context() !== currentContext) return;
+            const direction = event.key === 'ArrowLeft' ? -1 : 1;
+            const target = currentItems[currentItems.findIndex(entry => entry.id === item.id) + direction];
+            if (target) { void move(item.id, target.id, direction < 0 ? 'before' : 'after'); button.focus({preventScroll:true}); }
+          });
+        }
         button.addEventListener('pointerenter', () => showTooltip(button));
         button.addEventListener('pointerleave', () => { if (doc.activeElement !== button) hideTooltip(); });
         button.addEventListener('focus', () => showTooltip(button));
@@ -89,7 +157,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal })
       occurrences.set(label, occurrence);
       const name = item.column || item.name.includes(item.edition) || !item.edition ? item.name : `${item.name} (${item.edition})`;
       const duplicate = counts.get(label) > 1 ? `Reader ${occurrence} of ${counts.get(label)}` : '';
-      const description = [name, item.location || 'Code contents', duplicate].filter(Boolean).join(' · ');
+      const description = [name, item.location || (item.column ? '' : 'Code contents'), duplicate].filter(Boolean).join(' · ');
       button.className = `reader-shortcut code-theme-${item.theme}${item.column ? ' reader-column-shortcut' : ''}`;
       button.textContent = label;
       button.dataset.description = description;
@@ -111,20 +179,18 @@ export function createReaderShortcuts({ host, track, readers, context, reveal })
     win.requestAnimationFrame(() => { scheduled = false; refresh(); });
   }
   function remember(event) {
-    const panel = event.target.closest?.('.reader-panel');
+    const panel = event.target.closest?.('.workspace-panel');
     if (panel && track.contains(panel)) activate(panel.dataset.paneId);
   }
   function dismiss(event) { if (event.key === 'Escape') hideTooltip(); }
   function observe() {
     observer.disconnect();
     observer.observe(track, { childList: true });
-    // Observe small Reader headers and pane visibility, never passage DOM.
+    // Observe small column headers and visibility, never passage/editor DOM.
     for (const panel of track.querySelectorAll(':scope > .workspace-panel')) {
       observer.observe(panel, { attributes: true, attributeFilter: ['class'] });
-      if (panel.dataset.paneId?.startsWith('reader:')) {
-        const header = panel.querySelector(':scope > header');
-        if (header) observer.observe(header, { childList: true, characterData: true, subtree: true });
-      }
+      const header = panel.querySelector(':scope > header');
+      if (header) observer.observe(header, { childList: true, characterData: true, subtree: true });
     }
   }
   const observer = new win.MutationObserver(schedule);
@@ -138,6 +204,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal })
   refresh();
   return {
     refresh, activePaneID: () => activeID,
+    activeReaderPaneID: () => buttons.has(readerByContext.get(currentContext)) ? readerByContext.get(currentContext) : '',
     dispose() {
       disposed = true;
       observer.disconnect();
@@ -149,6 +216,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal })
       win.removeEventListener('resize', hideTooltip);
       doc.removeEventListener('keydown', dismiss);
       tooltip.remove();
+      for (const {button} of tools) button?.classList.remove('has-open-column');
       host.replaceChildren();
     }
   };

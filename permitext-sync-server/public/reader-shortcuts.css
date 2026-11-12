@@ -1,6 +1,11 @@
 /* Reader shortcuts share each code family's existing Reader accent. */
 .reader-toolbar-tools,.reader-shortcuts{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%}
 .reader-shortcuts[hidden]{display:none}
+.workflow-toolbar .toolbar-button.has-open-column{display:none}
+.workflow-toolbar .reader-shortcut[draggable=true]{cursor:grab;user-select:none;-webkit-user-select:none}
+.workflow-toolbar .reader-shortcut.is-dragging{opacity:.45;cursor:grabbing}
+.workflow-toolbar .reader-shortcut.is-drop-before{box-shadow:-3px 0 0 var(--text-primary)}
+.workflow-toolbar .reader-shortcut.is-drop-after{box-shadow:3px 0 0 var(--text-primary)}
 .workflow-toolbar .reader-shortcut{appearance:none;flex:0 0 auto;box-sizing:border-box;border:0;outline:0;border-radius:var(--radius-pill);padding:4px 11px;min-height:26px;color:var(--code-accent);background:color-mix(in srgb,var(--code-accent) 10%,var(--surface));font:500 12px/18px var(--ui-font-family);white-space:nowrap;cursor:pointer;transition:background 160ms}
 .workflow-toolbar .reader-shortcut:is(:hover,:focus-visible){background:color-mix(in srgb,var(--code-accent) 19%,var(--surface))}
 .workflow-toolbar .reader-shortcut[aria-pressed=true]{background:color-mix(in srgb,var(--code-accent) 27%,var(--surface))}

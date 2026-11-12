@@ -31,6 +31,7 @@ function fixture({pro=true,view='notebook',paneIDs=[],groups=[],hidden=[]}={}) {
     activePaneIDs:()=>orderColumnGroups([...c.state.paneOrder,...c.state.readers.map(reader=>`reader:${reader.id}`).filter(id=>!c.state.paneOrder.includes(id))],c.state.columnGroups),
     workflowPaneIsVisible:id=>!hidden.includes(id),
     columnGroupForPane:id=>c.state.columnGroups.find(group=>group.paneIDs.includes(id)),
+    readerShortcuts:{activePaneID:()=>c.activeColumn || ''},
     transitionWorkspace:()=>rendering,scrollPaneIntoView:id=>scrolled.push(id)
   });
   vm.runInContext(['newReaderState','requestLinkedPanePlacement','placePaneAfter','applyLinkedPanePlacements','openReaderFromToolbar'].map(actual).join('\n'),c);
@@ -75,4 +76,19 @@ await free.pickers[1]({prefix:'MC',version:'2022'});
 assert.equal(free.c.state.readers.length,1,'Switching codes reuses the single Free column');
 assert.equal(free.c.state.readers[0].id,readerID);
 assert.equal(free.c.state.readers[0].codePrefix,'MC');
+
+// Anchor to the selected column when the picker opens, even if hydration is delayed.
+const adjacent=fixture({view:'research',paneIDs:['reader:left','utility:search:one','reader:right']});
+adjacent.c.activeColumn='utility:search:one';
+await adjacent.c.openReaderFromToolbar({});
+adjacent.c.activeColumn='reader:right';
+const placed=adjacent.pickers[0](code), addedID=`reader:${adjacent.c.state.readers[0].id}`;
+assert.deepEqual(Array.from(adjacent.c.state.paneOrder),['reader:left','utility:search:one',addedID,'reader:right']);
+adjacent.finishRender();await placed;
+assert.deepEqual(adjacent.scrolled,[addedID]);
+const grouped=fixture({view:'research',paneIDs:['utility:search:one','utility:analysis:one','reader:right'],groups:[{id:'g',paneIDs:['utility:search:one','utility:analysis:one']}]});
+grouped.c.activeColumn='utility:search:one';
+await grouped.c.openReaderFromToolbar({});const groupedPending=grouped.pickers[0](code);
+assert.equal(grouped.c.state.paneOrder[2],`reader:${grouped.c.state.readers[0].id}`,'New Readers sit beside the active group without splitting it.');
+grouped.finishRender();await groupedPending;
 console.log('Readers passed: explicit source selection, four working views, project/account/navigation guards, concurrent plan limits and late-render fencing.');
