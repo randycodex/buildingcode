@@ -71,6 +71,12 @@
 .rv2-candidate{padding:10px 0}.rv2-candidate p{font-size:13px;margin:5px 0}
 .research-v2 .rv2-mobile-history{display:none}
 .research-v2 [hidden]{display:none!important}
+/* Keep the split line and resize target flush with the column's outer edges. */
+@media(min-width:681px){
+  .research-v2-panel{position:relative}
+  .rv2-rail-divider{position:absolute;inset-block:0;left:calc(var(--panel-padding) + var(--rv2-rail-width,320px));width:1px}
+  .rv2-chat{grid-column:3}
+}
 @media(max-width:680px){.research-v2-panel{min-width:92vw}.research-v2{grid-template-columns:minmax(0,1fr)}.rv2-rail{display:none;max-height:240px;border-block-end:1px solid var(--border)}.rv2-rail-divider{display:none}.rv2-show-history .rv2-rail{display:block}.rv2-chat{padding:0 14px}.research-v2 .rv2-mobile-history{display:block;font-size:12px;align-self:flex-start;margin-top:8px}.rv2-welcome{margin:45px 0}.rv2-input,.rv2-fact-input{font-size:16px}.rv2-answer{padding:14px}.rv2-composer{margin-bottom:12px}}
 @media(prefers-reduced-motion:reduce){.rv2-thread{scroll-behavior:auto}}
 
