@@ -940,6 +940,10 @@ struct NotebookDocument: Codable, Hashable, Sendable {
 
 struct NotebookBlock: Codable, Hashable, Identifiable, Sendable {
     var id: String
+    // Source and calculation handoffs may not have passed through BlockNote
+    // yet. Give those blocks stable presentation IDs without rewriting their
+    // saved document merely by opening it on another device.
+    var hadExplicitID = true
     var type: String
     var props: NotebookBlockProps
     var content: [NotebookInlineContent]?
@@ -1043,7 +1047,10 @@ extension NotebookBlock {
 
     init(from decoder: Decoder) throws {
         let fields = try decoder.container(keyedBy: CodingKeys.self)
-        id = try fields.decode(String.self, forKey: .id)
+        let savedID = try fields.decodeIfPresent(String.self, forKey: .id)
+        hadExplicitID = savedID != nil
+        let path = decoder.codingPath.compactMap(\.intValue).map(String.init).joined(separator: "-")
+        id = savedID ?? "native-idless-block:\(path.isEmpty ? "root" : path)"
         type = try fields.decode(String.self, forKey: .type)
         props = try fields.decode(NotebookBlockProps.self, forKey: .props)
         children = try fields.decode([NotebookBlock].self, forKey: .children)
@@ -1062,7 +1069,7 @@ extension NotebookBlock {
 
     func encode(to encoder: Encoder) throws {
         var fields = encoder.container(keyedBy: CodingKeys.self)
-        try fields.encode(id, forKey: .id)
+        if hadExplicitID { try fields.encode(id, forKey: .id) }
         try fields.encode(type, forKey: .type)
         try fields.encode(props, forKey: .props)
         try fields.encode(children, forKey: .children)
@@ -1112,6 +1119,7 @@ struct NotebookTextStyles: Codable, Hashable, Sendable {
     var code: Bool? = nil
     var textColor: String? = nil
     var backgroundColor: String? = nil
+    var superscript: Bool? = nil
 }
 
 struct NotebookReferenceProps: Codable, Hashable, Sendable {
@@ -1130,6 +1138,7 @@ struct NotebookEvidenceLink: Codable, Hashable, Identifiable, Sendable {
     let passages: [NotebookEvidencePassage]
     let createdAt: String
     let noteTarget: NotebookEvidenceNoteTarget
+    var noteTextVersion: Int? = nil
 }
 
 struct NotebookEvidenceSource: Codable, Hashable, Sendable {

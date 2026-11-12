@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import {researchTableFootnotes, researchSelectedTables, researchFootnoteScopeIssues, tableFootnoteInstruction} from './research-table-footnotes.mjs';
 
-export const researchV2Version = 'research-v2-20261111-r9';
+export const researchV2Version = 'research-v2-20261111-r10';
 const fail = (message, code = 'V2_INVALID_INPUT') => Object.assign(new Error(message), { code });
 const stringList = { type: 'array', items: { type: 'string' } };
 export const researchV2DraftSchema = { type: 'object', additionalProperties: false,
@@ -91,8 +91,8 @@ export function parseResearchV2Payload(payload) {
   try { return JSON.parse(text); } catch { throw fail('Luna did not return the required answer format.', 'V2_PROVIDER_FORMAT'); }
 }
 
-export async function runResearchV2(input, { call, signal, onStage = () => {}, maxRepairRounds = 1 } = {}) {
-  if (typeof call !== 'function' || ![0,1].includes(maxRepairRounds)) throw fail('A bounded Luna provider is required.');
+export async function runResearchV2(input, { call, signal, onStage = () => {}, maxRepairRounds = 2 } = {}) {
+  if (typeof call !== 'function' || ![0,1,2].includes(maxRepairRounds)) throw fail('A bounded Luna provider is required.');
   const packet = freezeResearchV2Turn(input), payloads = [], reviews = [], startedAt = Date.now();
   const deadline = AbortSignal.timeout(240000);
   const combinedSignal = signal ? AbortSignal.any([signal,deadline]) : deadline;
@@ -105,7 +105,9 @@ export async function runResearchV2(input, { call, signal, onStage = () => {}, m
     combinedSignal.throwIfAborted();
     onStage(round ? 'repair' : 'draft');
     const body = request(round ? 'repair' : 'draft', writer + ' Set questionTitle to a natural 3–8 word summary of the user question for the history list, in the question\'s language. Describe the ask, not an answer or compliance finding. Omit administrative or test prefixes, introductory instructions, and detailed input lists. Preserve the main subject and requested task. This title is presentation metadata, not a source claim.' + (round ? ' Repair all reported issues and return a complete replacement answer. Preserve the supported scope distinctions and material qualifications already present in the previous draft. A repair must not drop a different applicable qualification while fixing the reported issue. Recheck the entire replacement against the evidence. Do not add evidence.' : ''),
-      round ? { evidence: packet, previousDraft: draft, issues } : packet,complex||round?'medium':'low');
+      round ? { evidence: packet, previousDraft: draft,
+        issues: [...new Map(reviews.flatMap(review=>review.issues).map(issue=>[`${issue.code}:${issue.detail}`,issue])).values()] }
+        : packet,complex||round?'medium':'low');
     const draftStarted=Date.now();
     const drafted = await call(body, { phase: round ? 'repair' : 'draft', signal: combinedSignal });
     const draftMilliseconds=Date.now()-draftStarted;
@@ -127,6 +129,18 @@ export async function runResearchV2(input, { call, signal, onStage = () => {}, m
     if (pass) return { version: researchV2Version, packet, draft, payloads, reviews,
       status: draft.missingSources.length || draft.missingFacts.length ? 'supported_with_limits' : 'reviewed',
       elapsedMilliseconds: Date.now()-startedAt };
+    // A repair can expose a different table qualification that the first full
+    // review missed. Resolve it automatically once, using the same frozen
+    // evidence and all prior findings. Repeated defects, identity failures and
+    // non-table failures retain the existing stop behavior. Every replacement
+    // still requires a fresh complete review and the original deadline/caps.
+    if (round >= 1) {
+      const previousCodes=new Set(reviews.slice(0,-1).flatMap(review=>review.issues.map(issue=>issue.code.toLowerCase())));
+      const novelTableIssue=complex && identities.length===0 && issues.length>0 &&
+        issues.every(issue=>/table|footnote|factor|arithmetic|calculation|unit/i.test(`${issue.code} ${issue.detail}`)) &&
+        issues.some(issue=>!previousCodes.has(issue.code.toLowerCase()));
+      if (!novelTableIssue) break;
+    }
   }
   // Failed generated text is never published as a reviewed or supported answer.
   return { version: researchV2Version, packet, payloads, reviews, status: 'review_failed',

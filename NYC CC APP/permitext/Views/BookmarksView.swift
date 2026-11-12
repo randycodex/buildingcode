@@ -896,12 +896,12 @@ struct BookmarkExportModifier<Progress: View>: ViewModifier {
             )) {
                 progressSheet()
             }
-            .sheet(isPresented: Binding(
+            .fullScreenCover(isPresented: Binding(
                 get: { isReady },
                 set: { if !$0 { library.clearBookmarkExportState() } }
             )) {
                 if let url = readyURL {
-                    BookmarkExportShareSheet(fileURL: url) {
+                    ProjectReportPDFPreviewSheet(fileURL: url) {
                         library.clearBookmarkExportState()
                     }
                     .ignoresSafeArea()
@@ -1013,7 +1013,7 @@ struct ProjectView: View {
     @State private var isProjectHubVisible = false
     @State private var isProjectDescriptionExpanded = false
     @State private var lastProjectHubLoadAt: Date?
-    @State private var projectReportShareURL: URL?
+    @State private var projectReportPreviewURL: URL?
     @State private var isProjectReportBuilding = false
     @State private var projectReportBuildError: String?
     @State private var collapsedEvidenceGroupIDs: Set<String> = []
@@ -1161,20 +1161,23 @@ struct ProjectView: View {
                 }
             }
         }
-        .sheet(
+        .fullScreenCover(
             isPresented: Binding(
-                get: { projectReportShareURL != nil },
-                set: { if !$0 { projectReportShareURL = nil } }
+                get: { projectReportPreviewURL != nil },
+                set: { if !$0 { projectReportPreviewURL = nil } }
             )
         ) {
-            if let projectReportShareURL {
-                BookmarkExportShareSheet(fileURL: projectReportShareURL) {
-                    self.projectReportShareURL = nil
+            if let projectReportPreviewURL {
+                ProjectReportPDFPreviewSheet(fileURL: projectReportPreviewURL) {
+                    self.projectReportPreviewURL = nil
                 }
             }
         }
         .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
-        .onChange(of: library.privateSessionID) { _, _ in removedProjectSections = [] }
+        .onChange(of: library.privateSessionID) { _, _ in
+            removedProjectSections = []
+            projectReportPreviewURL = nil
+        }
         .onChange(of: folderID) { _, _ in removedProjectSections = [] }
         .refreshable {
             library.refreshBookmarks()
@@ -1332,8 +1335,8 @@ struct ProjectView: View {
                             buildProjectReportPDF(report)
                         } label: {
                             Label(
-                                isProjectReportBuilding ? "Exporting & saving PDF…" : "Export & Save iOS PDF",
-                                systemImage: "square.and.arrow.up"
+                                isProjectReportBuilding ? "Opening PDF…" : "Open PDF",
+                                systemImage: "doc.richtext"
                             )
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(accentColor)
@@ -1414,7 +1417,7 @@ struct ProjectView: View {
         projectReportBuildError = nil
         Task {
             do {
-                projectReportShareURL = try await library.projectReportPDF(manifestID: report.id)
+                projectReportPreviewURL = try await library.projectReportPDF(manifestID: report.id)
                 await loadProjectHub()
             } catch {
                 projectReportBuildError = error.localizedDescription
@@ -1429,7 +1432,7 @@ struct ProjectView: View {
         projectReportBuildError = nil
         Task {
             do {
-                projectReportShareURL = try await library.projectReportPDF(manifestID: manifestID)
+                projectReportPreviewURL = try await library.projectReportPDF(manifestID: manifestID)
                 await loadProjectHub()
             } catch {
                 projectReportBuildError = error.localizedDescription

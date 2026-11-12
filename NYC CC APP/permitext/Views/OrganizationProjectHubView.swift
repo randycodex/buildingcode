@@ -9,7 +9,7 @@ struct OrganizationProjectHubView: View {
     @State private var snapshot: BackendOrganizationProjectSnapshotResponse?
     @State private var isLoading = false
     @State private var errorMessage: String?
-    @State private var reportShareURL: URL?
+    @State private var reportPreviewURL: URL?
     @State private var downloadingReportID: String?
     @State private var isProjectHubVisible = false
     @State private var lastSnapshotLoadAt: Date?
@@ -143,7 +143,7 @@ struct OrganizationProjectHubView: View {
         .task(id: library.privateSessionID) {
             snapshot = nil
             errorMessage = nil
-            reportShareURL = nil
+            reportPreviewURL = nil
             await loadSnapshot()
         }
         .onAppear {
@@ -159,15 +159,15 @@ struct OrganizationProjectHubView: View {
         .refreshable {
             await loadSnapshot()
         }
-        .sheet(
+        .fullScreenCover(
             isPresented: Binding(
-                get: { reportShareURL != nil },
-                set: { if !$0 { reportShareURL = nil } }
+                get: { reportPreviewURL != nil },
+                set: { if !$0 { reportPreviewURL = nil } }
             )
         ) {
-            if let reportShareURL {
-                BookmarkExportShareSheet(fileURL: reportShareURL) {
-                    self.reportShareURL = nil
+            if let reportPreviewURL {
+                ProjectReportPDFPreviewSheet(fileURL: reportPreviewURL) {
+                    self.reportPreviewURL = nil
                 }
             }
         }
@@ -505,13 +505,13 @@ struct OrganizationProjectHubView: View {
                                 ProgressView()
                                     .frame(width: 22, height: 22)
                             } else {
-                                Image(systemName: "square.and.arrow.down")
+                                Image(systemName: "doc.richtext")
                                     .font(.body.weight(.semibold))
                             }
                         }
                         .buttonStyle(.plain)
                         .disabled(downloadingReportID != nil)
-                        .accessibilityLabel("Download Project Report PDF")
+                        .accessibilityLabel("Open Project Report PDF")
                     }
                     .projectHubRow(accent: projectAccent)
                 }
@@ -650,16 +650,20 @@ struct OrganizationProjectHubView: View {
 
     private func downloadReport(_ file: ProjectReportFile) {
         guard downloadingReportID == nil else { return }
+        let identity = library.privateRequestIdentity
         downloadingReportID = file.id
         Task {
             defer { downloadingReportID = nil }
             do {
-                reportShareURL = try await library.organizationProjectReportURL(
+                let url = try await library.organizationProjectReportURL(
                     projectID: project.id,
                     projectName: project.name,
                     file: file
                 )
+                guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
+                reportPreviewURL = url
             } catch {
+                guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
                 errorMessage = error.localizedDescription
             }
         }

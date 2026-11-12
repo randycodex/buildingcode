@@ -13,6 +13,7 @@ import "@blocknote/mantine/style.css";
 import "./notebook.css";
 import { notebookReferenceBlocks } from "../public/notebook-passage-blocks.js";
 import { normalizeNotebookDocumentStyles } from "../public/notebook-styles.js";
+import { notebookTablePasteHTML } from "../public/notebook-html-paste.js";
 export { createReportFormatting } from "./report-text-editor.js";
 import { en } from "@blocknote/core/locales";
 import {
@@ -381,6 +382,16 @@ function PermitextNotebookEditor({ options, controllerRef }) {
       editor: { "aria-label": options.ariaLabel || "Note body", "aria-multiline": "true" }
     },
     initialContent,
+    pasteHandler: ({event,editor,defaultPasteHandler}) => {
+      if (!event.clipboardData?.types.includes('blocknote/html')) {
+        const html=event.clipboardData?.getData('text/html');
+        if (html) {
+          const normalized=notebookTablePasteHTML(html);
+          if (normalized!==html) {editor.pasteHTML(normalized);return true;}
+        }
+      }
+      return defaultPasteHandler();
+    },
     uploadFile: options.uploadFile,
     resolveFileUrl: options.resolveFileUrl
   });

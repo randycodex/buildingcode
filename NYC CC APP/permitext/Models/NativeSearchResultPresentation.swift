@@ -1,5 +1,39 @@
 import Foundation
 
+// A complete citation carries a code scope as well as search text. Ordinary
+// prose and quoted phrases keep the existing exact-phrase behavior.
+struct NativeSearchCitation: Equatable {
+    let query: String
+    let codePrefix: String?
+
+    init(_ value: String) {
+        let raw = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        let pattern = #"^(?:(?:section|table)\s+)?(AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR|HMC|T24|T25|T26|T28)\s*(?:(?:section|table)\s+|§+\s*)?([A-Z]?\d+(?:[-.]\d+[A-Z]?)*(?:\([\dA-Z]+\))*)\.?$"#
+        if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+           let match = regex.firstMatch(in: raw, range: NSRange(raw.startIndex..., in: raw)),
+           let prefix = Range(match.range(at: 1), in: raw),
+           let number = Range(match.range(at: 2), in: raw) {
+            query = String(raw[number])
+            codePrefix = String(raw[prefix]).uppercased()
+        } else {
+            query = raw
+            codePrefix = nil
+        }
+    }
+
+    func permits(codeName: String) -> Bool {
+        guard let codePrefix else { return true }
+        let name = codeName.uppercased()
+        let families = [("EBC", "EXISTING BUILDING"), ("FGC", "FUEL GAS"),
+                        ("HMC", "HOUSING MAINTENANCE"), ("ECC", "ENERGY"),
+                        ("EC", "ELECTRICAL"), ("BC", "BUILDING CODE"),
+                        ("MC", "MECHANICAL"), ("PC", "PLUMBING"),
+                        ("FC", "FIRE CODE"), ("ZR", "ZONING"), ("AC", "ADMINISTRATIVE")]
+        if codePrefix.hasPrefix("T") { return name.contains("TITLE \(codePrefix.dropFirst())") }
+        return families.first(where: { name.contains($0.1) })?.0 == codePrefix
+    }
+}
+
 struct NativeSearchResultPresentation: Equatable {
     let source: String
     let context: String

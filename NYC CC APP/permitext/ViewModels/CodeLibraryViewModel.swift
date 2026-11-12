@@ -2210,7 +2210,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let sectionID = result.id
         let generation = allEditionSearchGeneration
         let snippet = await Task.detached(priority: .userInitiated) {
-            store.searchSnippet(sectionID: sectionID, query: query)
+            store.searchSnippet(sectionID: sectionID, query: NativeSearchCitation(query).query)
         }.value
         guard !Task.isCancelled, allEditionSearchGeneration == generation else { return "" }
         return snippet
@@ -2320,7 +2320,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 }
                 let cacheKey: CompletedSearchCache.Key? = revisions.count == versions.count && !versions.isEmpty
                     ? .init(query: query, scope: cacheScope, corpusRevision: revisions.joined(separator: "\n"),
-                            engineRevision: "native-exact-phrase-v1") : nil
+                            engineRevision: "native-exact-phrase-v2") : nil
                 if let cacheKey, let cached = await CompletedSearchCache.shared.value(for: cacheKey) {
                     try Task.checkCancellation()
                     var expectedFilters: [CodeSectionCategory] = []
@@ -2536,7 +2536,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 let cacheKey = authoredCodeStore.searchCorpusRevision.map {
                     CompletedSearchCache.Key(query: trimmedQuery,
                         scope: ["selected-edition"] + versionScope + [selectedCodeSectionID.map(String.init) ?? "all-categories"] + activeScope,
-                        corpusRevision: $0, engineRevision: "native-exact-phrase-v1")
+                        corpusRevision: $0, engineRevision: "native-exact-phrase-v2")
                 }
                 if let cacheKey, let cached = await CompletedSearchCache.shared.value(for: cacheKey),
                    !Task.isCancelled {
@@ -4070,8 +4070,12 @@ final class CodeLibraryViewModel: ObservableObject {
             )
             .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
         let fileName = safeName.isEmpty ? "per-codes-Project-Report" : String(safeName.prefix(80))
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("\(fileName)-\(file.format).pdf")
+        // Each open owns its file, even when the same version is opened again
+        // while the previous preview is finishing its dismissal.
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("per-codes-report-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let url = directory.appendingPathComponent("\(fileName)-v\(file.reportVersion).pdf")
         try data.write(to: url, options: .atomic)
         return url
     }
@@ -4080,14 +4084,28 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let signedInAccount else {
             throw ProjectHubLoadError.signInRequired
         }
-        let manifest = try await accountBackendClient.projectReportManifest(
+        let identity = privateRequestIdentity
+        let snapshot = try await accountBackendClient.projectReportExportSnapshot(
             account: signedInAccount,
             manifestID: manifestID
         )
+        guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
+        let manifest = snapshot.manifest
+        guard manifest.id == manifestID else { throw URLError(.cannotDecodeContentData) }
+        // An issued web PDF is already the fixed, richly formatted report.
+        // Export its verified bytes instead of rebuilding a text-only copy on
+        // the phone and losing its tables, figures, links and Note formatting.
+        if let file = snapshot.files?.first(where: { $0.format == "web-pdf" && $0.contentType == "application/pdf" }) {
+            let url = try await organizationProjectReportURL(
+                projectID: manifest.project.id, projectName: manifest.title, file: file)
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
+            return url
+        }
         let rendered = try await Task.detached(priority: .userInitiated) {
             let url = try ProjectReportExportBuilder(manifest: manifest).build()
             return (url, try Data(contentsOf: url))
         }.value
+        guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
         _ = try await accountBackendClient.saveProjectReportPDF(
             account: signedInAccount,
             projectID: manifest.project.id,

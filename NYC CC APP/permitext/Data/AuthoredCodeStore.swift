@@ -869,6 +869,18 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         } else {
             contentBlocks = synthesizedContentBlocks(for: indexed, onlyRequestedSection: true)
         }
+        // Prepared sections may contain a single mixed HTML block. The native
+        // text renderer deliberately omits HTML images, so expose those images
+        // as media blocks from the same exact fragment, in source order.
+        contentBlocks = contentBlocks.flatMap { block -> [CodeContentBlock] in
+            guard block.kind == .html, let html = block.html,
+                  html.range(of: #"<img\b"#, options: [.regularExpression, .caseInsensitive]) != nil else { return [block] }
+            return Self.htmlContentBlocks(from: html, sectionID: indexed.section.id).enumerated().map { index, part in
+                CodeContentBlock(id: index == 0 ? block.id : "\(block.id)-media-part-\(index)",
+                    kind: part.kind, html: part.html, tableID: part.tableID, imageID: part.imageID,
+                    caption: part.caption, plainText: part.plainText)
+            }
+        }
         contentBlocks = contentBlocksEnrichedWithPublishedRichSources(
             contentBlocks,
             for: indexed
@@ -1263,8 +1275,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         section: Section,
         chaptersURL: URL
     ) -> [Int64: [CodeContentBlock]] {
-        guard section.contentBlocks.isEmpty,
-              let htmlURL = chapterHTMLURL(chapterNumber: chapterNumber,
+        // This is also the published-source enrichment path for prepared
+        // sections. Existing text blocks do not prove that their figures were
+        // included; compare them with the complete authored section below.
+        guard let htmlURL = chapterHTMLURL(chapterNumber: chapterNumber,
                 codeSectionName: codeSectionName, chaptersURL: chaptersURL),
               let html = try? String(contentsOf: htmlURL, encoding: .utf8), !html.isEmpty,
               let regex = try? NSRegularExpression(pattern: #"<h6\b[^>]*>(.*?)</h6>"#,
@@ -1406,7 +1420,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         os_signpost(.begin, log: AppSignpost.search, name: "search", signpostID: signpostID)
         defer { os_signpost(.end, log: AppSignpost.search, name: "search", signpostID: signpostID) }
 
-        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let citation = NativeSearchCitation(query)
+        let trimmed = citation.query
         guard !trimmed.isEmpty else { return [] }
         let lowercasedQuery = trimmed.lowercased()
         let phrase = trimmed.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
@@ -1452,6 +1467,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let matchedHits: [SearchHit] = candidateIDs
             .compactMap { sectionID -> SearchHit? in
                 guard !Task.isCancelled, let indexed = sectionIndex[sectionID] else { return nil }
+                if citation.codePrefix != nil {
+                    guard let categoryID = indexed.chapter.codeSectionID,
+                          let name = codeSectionNameByID[categoryID],
+                          citation.permits(codeName: name) else { return nil }
+                }
                 let text = [indexed.section.sectionNumber, indexed.section.title, searchOfficialText(for: indexed)].joined(separator: " ")
                 guard exactPhrase?.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil else { return nil }
 

@@ -1978,7 +1978,9 @@ struct ProjectReportManifest: Codable, Hashable, Identifiable, Sendable {
     let disclaimers: [String]
     let presentation: ProjectReportPresentation?
     let reportVersion: Int
-    let sourceVersions: [String: StringOrNumber]
+    // Web manifests include structured selections and provenance, in addition
+    // to legacy scalar version values. Keep that immutable snapshot intact.
+    let sourceVersions: [String: NotebookJSONValue]
     let createdAt: String
     let contentHash: String
 }
@@ -5507,6 +5509,7 @@ protocol AccountBackendClient {
     ) async throws -> NotebookImageAsset
     func notebookAsset(account: SignedInAccount, projectID: String, assetID: String) async throws -> Data
     func projectReportManifest(account: SignedInAccount, manifestID: String) async throws -> ProjectReportManifest
+    func projectReportExportSnapshot(account: SignedInAccount, manifestID: String) async throws -> BackendProjectReportManifestResponse
     func saveProjectReportPDF(
         account: SignedInAccount,
         projectID: String,
@@ -6669,6 +6672,10 @@ extension PermitextBackendTransport {
     func researchRetainInterrupted(_ request: ResearchRetainInterruptedRequest) async throws -> ResearchRetainInterruptedResponse { throw URLError(.unsupportedURL) }
 }
 extension AccountBackendClient {
+    func projectReportExportSnapshot(account: SignedInAccount, manifestID: String) async throws -> BackendProjectReportManifestResponse {
+        BackendProjectReportManifestResponse(
+            manifest: try await projectReportManifest(account: account, manifestID: manifestID), files: nil)
+    }
     func researchConversationPage(account: SignedInAccount, limit: Int, cursor: String?, query: String, projectID: String?) async throws -> ResearchConversationListResponse {
         // Local/demo clients retain the legacy full-list contract. The live
         // backend overrides this with a bounded server request.

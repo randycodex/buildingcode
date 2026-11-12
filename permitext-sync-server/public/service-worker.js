@@ -1,8 +1,8 @@
-const shellCacheName = "permitext-pro-shell-v2244";
+const shellCacheName = "permitext-pro-shell-v2245";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
-  "/web/notebook-content.js?v=7",
+  "/web/notebook-content.js?v=8",
   "/web/notebook-titles.js?v=1",
   "/web/project-details-columns.js?v=20261019-project-workflow-v2",
   "/web/workflow-views.js?v=14",
@@ -64,7 +64,7 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261111-citation-workflow-fixes-v1672",
+  "/web/web-client-version.js?v=20261111-cross-device-workflows-v1673",
   "/web/web-app-update.js?v=20261110-per-codes-v3",
   "/web/research-delete-controls.js?v=10",
   "/web/assistant-composer-hint.js?v=1",
@@ -93,13 +93,13 @@ const shellURLs = [
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261111-citation-workflow-fixes-v1672",
+  "/web/app.js?v=20261111-cross-device-workflows-v1673",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261111-citation-workflow-fixes-v1672",
+  "/web/offline-storage.js?v=20261111-cross-device-workflows-v1673",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261022-boundary-observer-v2",

@@ -69,7 +69,16 @@ export function notebookBlocksFromSourceElement(root) {
       ...(node.tagName === 'U' ? {underline:true} : {}), ...(['S','STRIKE','DEL'].includes(node.tagName) ? {strike:true} : {}),
       ...(node.tagName === 'MARK' ? {backgroundColor:'yellow'} : {}),
       ...(node.tagName === 'SUP' || node.style?.verticalAlign === 'super' ? {superscript:true} : {})};
-    const content = [...node.childNodes].flatMap(child => inline(child, next));
+    const content = [...node.childNodes].flatMap((child,index) => {
+      const runs=inline(child,next);
+      // Table cells accept inline content, so retain source paragraph
+      // boundaries explicitly when copying a published table into a Note.
+      if (node.closest?.('td,th') && /^(P|DIV|H[1-6]|PRE|BLOCKQUOTE)$/.test(child.nodeName) &&
+          [...node.childNodes].slice(index+1).some(sibling=>sibling.nodeType!==3 || sibling.textContent.trim())) {
+        runs.push({type:'text',text:'\n',styles:next});
+      }
+      return runs;
+    });
     // Source HTML indentation around an exponent is not a printed separator.
     // Keep word spacing after footnotes, but attach exponents and punctuation.
     content.forEach((run, index) => {

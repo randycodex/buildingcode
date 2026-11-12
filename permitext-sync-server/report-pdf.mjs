@@ -467,6 +467,30 @@ export function drawReportRichTable(document, table, startX, contentWidth, {head
     return end;
   };
   const sum=(start,end)=>heights.slice(start,end).reduce((a,b)=>a+b,0);
+  const pageHeight = document.page.height-document.page.margins.bottom-2-document.page.margins.top;
+  const oversizedGroups = [];
+  for (let start=headers; start<runs.length;) {
+    const end=groupEnd(start);
+    if (sum(0,headers)+sum(start,end)>pageHeight) oversizedGroups.push([start,end]);
+    start=end;
+  }
+  // Some published tables merge a classification cell across more rows than
+  // fit on one page. Repeat that shared label with each of its rows instead of
+  // treating the entire group as indivisible. Keep horizontal spans, marks and
+  // links, and leave the frozen source grid and source text unchanged.
+  const splitSpans=(table.cellSpans || []).filter(span=>span.rowSpan>1 &&
+    oversizedGroups.some(([start,end])=>span.row>=start && span.row<end));
+  if (splitSpans.length) {
+    const expanded = runs.map(row=>row.slice());
+    const spans = (table.cellSpans || []).flatMap(span=>{
+      if (!splitSpans.includes(span)) return [span];
+      return Array.from({length:span.rowSpan},(_,offset)=>{
+        expanded[span.row+offset][span.column]=runs[span.row][span.column];
+        return {...span,row:span.row+offset,rowSpan:1};
+      });
+    });
+    return drawReportRichTable(document,{...table,rows:expanded,cellSpans:spans},startX,contentWidth,{headerBold});
+  }
   let position = headers;
   while (position < runs.length || position === headers && position === runs.length) {
     const bottom = document.page.height-document.page.margins.bottom-2;

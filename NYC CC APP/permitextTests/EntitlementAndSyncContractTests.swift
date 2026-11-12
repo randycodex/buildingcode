@@ -7,6 +7,114 @@ import PDFKit
 import WebKit
 @testable import permitext
 
+extension EntitlementAndSyncContractTests {
+    func testP7WebHandoffBlocksOpenWithoutRewritingMissingIDs() throws {
+        let data = Data(#"""
+        {"schema":"permitext-notebook-card","schemaVersion":2,"format":"blocknote-json","document":[
+          {"type":"paragraph","props":{},"children":[],"content":[{"type":"text","text":"Calculation: 26 people","styles":{"bold":true,"superscript":true}}]},
+          {"type":"paragraph","props":{},"children":[{"type":"paragraph","props":{},"children":[],"content":[]}],"content":[{"type":"permitextReference","props":{"referenceKind":"researchAnswer","referenceID":"answer-1","label":"Saved answer"}}]},
+          {"type":"image","props":{"url":"https://per.codes/code/assets/figure.jpg"},"children":[]}
+        ]}
+        """#.utf8)
+        let first = try JSONDecoder().decode(NotebookDocument.self, from: data)
+        let second = try JSONDecoder().decode(NotebookDocument.self, from: data)
+        XCTAssertEqual(first, second, "Repeated opens must not invent changing draft identities")
+        XCTAssertEqual(Set(first.document.map(\.id)).count, 3)
+        XCTAssertNotEqual(first.document[1].id, first.document[1].children[0].id)
+        XCTAssertEqual(first.document[0].content?.first?.styles?.superscript, true)
+        XCTAssertEqual(first.document[1].content?.first?.props?.referenceID, "answer-1")
+        XCTAssertEqual(try JSONSerialization.jsonObject(with: JSONEncoder().encode(first)) as? NSDictionary,
+                       try JSONSerialization.jsonObject(with: data) as? NSDictionary,
+                       "Opening a web handoff retains its original wire document")
+    }
+
+    func testP7ReportProvenanceSupportsWebSelectionsAndLegacyScalars() throws {
+        let data = Data(#"""
+        {"id":"manifest","immutable":true,"schemaVersion":2,"generatorVersion":"permitext-report-v2",
+         "project":{"id":"project","name":"Test","address":"","description":""},"draftID":"draft","title":"Report",
+         "reportDate":"2026-11-11T00:00:00Z","author":{"userID":"test","displayName":"Tester"},"codeEdition":"2022",
+         "items":[],"disclaimers":[],"reportVersion":1,"createdAt":"2026-11-11T00:00:00Z","contentHash":"hash",
+         "sourceVersions":{"draftVersion":2,"edition":"2022","selections":[{"sectionID":"2152","hasTables":true,"version":null}]}}
+        """#.utf8)
+        let manifest = try JSONDecoder().decode(ProjectReportManifest.self, from: data)
+        let encoded = try JSONSerialization.jsonObject(with: JSONEncoder().encode(manifest)) as? [String: Any]
+        let original = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        XCTAssertEqual(encoded?["sourceVersions"] as? NSDictionary, original?["sourceVersions"] as? NSDictionary)
+    }
+
+    func testP7PublishedIllustratedSectionsKeepAllFigures() throws {
+        let version = try XCTUnwrap(BundleDatabaseLocator().availableCodeVersions().first {
+            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
+        })
+        let store = try AuthoredCodeStore(jsonURL: version.fileURL, codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+        let building = try XCTUnwrap(store.codeSections().first { $0.name == "BUILDING CODE" }?.id)
+        for (number, expected) in [("D106.1", 41), ("S101.1", 15), ("M103.1", 2)] {
+            let section = try XCTUnwrap(store.sectionSummary(sectionNumber: number, codeSectionID: building))
+            let detail = try XCTUnwrap(store.sectionDetail(sectionID: section.id))
+            let images = detail.contentBlocks.filter { $0.kind == .image }
+            XCTAssertEqual(images.count, expected, number)
+            for image in images {
+                let id = try XCTUnwrap(image.imageID)
+                let root = version.fileURL.deletingLastPathComponent()
+                // The Reader also resolves original assets that do not have a
+                // prepared-image manifest entry.
+                let url = PublishedHTMLContentStore.resolvedImageURL(imageID: id, readAccessURL: root)
+                    ?? root.appendingPathComponent("assets").appendingPathComponent(id)
+                XCTAssertNotNil(UIImage(contentsOfFile: url.path), "Every restored figure resolves to a decodable bundled image: \(id)")
+            }
+        }
+    }
+
+    @MainActor
+    func testP7PDFPreviewReadsFixedBytesAndNavigatesBeforeExport() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("per-codes-report-\(UUID())")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let url = directory.appendingPathComponent("Report-v1.pdf")
+        let data = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: 612, height: 792)).pdfData { context in
+            for number in 1...3 {
+                context.beginPage()
+                ("Fixed report page \(number)" as NSString).draw(at: CGPoint(x: 40, y: 40), withAttributes: nil)
+            }
+        }
+        try data.write(to: url)
+        try autoreleasepool {
+            let preview = NativeReportPDFPreviewModel(fileURL: url)
+            let view = PDFView(frame: CGRect(x: 0, y: 0, width: 390, height: 700))
+            view.document = preview.document
+            preview.pdfView = view
+            XCTAssertEqual(preview.pageCount, 3)
+            preview.goToPage(3)
+            XCTAssertEqual(preview.currentPage, 3)
+            XCTAssertEqual(preview.document?.index(for: try XCTUnwrap(view.currentPage)), 2)
+            preview.goToPage(0)
+            preview.goToPage(4)
+            XCTAssertEqual(preview.currentPage, 3, "Invalid page requests cannot leave the document")
+            XCTAssertEqual(try Data(contentsOf: preview.fileURL), data, "Previewing and navigating never rebuilds the fixed export")
+        }
+        XCTAssertFalse(FileManager.default.fileExists(atPath: url.path), "Closing the preview releases its temporary PDF")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: directory.path), "Preview cleanup removes only its own temporary directory")
+    }
+
+    func testP7PrefixedCitationsRespectCodeAndEnabledScopes() throws {
+        let version = try XCTUnwrap(BundleDatabaseLocator().availableCodeVersions().first {
+            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
+        })
+        let store = try AuthoredCodeStore(jsonURL: version.fileURL, codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+        for (query, name, number) in [("BC 1004.1.3", "BUILDING CODE", "1004.1.3"),
+                                     ("PC § 403.1", "PLUMBING CODE", "403.1"),
+                                     ("MC 403.1", "MECHANICAL CODE", "403.1")] {
+            let category = try XCTUnwrap(store.codeSections().first { $0.name == name }?.id)
+            let matches = store.search(query: query, includeSnippets: false, resultLimit: nil)
+            XCTAssertTrue(matches.contains { $0.sectionNumber == number && $0.codeSectionID == category }, query)
+            XCTAssertTrue(matches.allSatisfy { $0.codeSectionID == category }, "A prefix never searches a neighboring code")
+            XCTAssertTrue(store.search(query: query, allowedCodeSectionIDs: []).isEmpty, "Prefixes cannot enable disabled sources")
+        }
+        XCTAssertEqual(NativeSearchCitation("BC egress").query, "BC egress")
+        XCTAssertNil(NativeSearchCitation("\"BC 1004.1.3\"").codePrefix)
+        XCTAssertEqual(NativeSearchCitation("Table BC D106.1").query, "D106.1")
+    }
+}
+
 private final class ScopedPermitextURLProtocol: URLProtocol {
     typealias Handler = (URLRequest) throws -> (statusCode: Int, data: Data)
 

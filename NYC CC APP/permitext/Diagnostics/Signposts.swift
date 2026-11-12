@@ -725,13 +725,19 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         account: SignedInAccount,
         manifestID: String
     ) async throws -> ProjectReportManifest {
-        let response = try await transport.projectReportManifest(
+        try await projectReportExportSnapshot(account: account, manifestID: manifestID).manifest
+    }
+
+    func projectReportExportSnapshot(
+        account: SignedInAccount,
+        manifestID: String
+    ) async throws -> BackendProjectReportManifestResponse {
+        try await transport.projectReportManifest(
             BackendProjectReportManifestRequest(
                 auth: authContext(for: account),
                 manifestID: manifestID
             )
         )
-        return response.manifest
     }
 
     func saveProjectReportPDF(
