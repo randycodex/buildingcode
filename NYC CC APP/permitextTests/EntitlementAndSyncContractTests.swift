@@ -8,6 +8,42 @@ import WebKit
 @testable import permitext
 
 extension EntitlementAndSyncContractTests {
+    func testSearchBreadcrumbsFollowSectionRootsAndRestartedLists() throws {
+        let version = try XCTUnwrap(BundleDatabaseLocator().availableCodeVersions().first {
+            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
+        })
+        let store = try AuthoredCodeStore(jsonURL: version.fileURL, codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+        for (name, number, expected) in [
+            ("PLUMBING CODE", "403.1", []),
+            ("MECHANICAL CODE", "403.1", []),
+            ("PLUMBING CODE", "403.1.1", ["403.1"]),
+            ("MECHANICAL CODE", "403.3.1.1", ["403.3", "403.3.1"]),
+            ("MECHANICAL CODE", "1.1.", ["401.2"]),
+            ("MECHANICAL CODE", "3.1.", ["403.3", "403.3.1", "403.3.1.1"])
+        ] as [(String, String, [String])] {
+            let category = try XCTUnwrap(store.codeSections().first { $0.name == name }?.id)
+            let listID: Int64? = number == "1.1." ? 10403 : number == "3.1." ? 10422 : nil
+            let section = try XCTUnwrap(listID.flatMap { store.readerTarget(sectionID: $0)?.section }
+                ?? store.sectionSummary(sectionNumber: number, codeSectionID: category))
+            let labels = store.searchParentLabels(sectionID: section.id)
+            XCTAssertEqual(labels.map { String($0.prefix { !$0.isWhitespace }) }, expected, "\(name) \(number)")
+            XCTAssertEqual(store.sectionDetail(sectionID: section.id)?.parentSectionLabels, labels, "Search and Reader use the same hierarchy")
+            let presentation = NativeSearchResultPresentation(sectionNumber: number, title: section.title,
+                isParagraph: false, codeName: name, edition: "2022", chapterNumber: "4", parentLabels: labels, snippet: "")
+            if number == "403.1" { XCTAssertEqual(presentation.context, "Chapter 4", "Do not show a neighboring section as the parent") }
+        }
+        for chapter in store.chapters() {
+            for section in store.sectionGroups(chapterID: chapter.id).flatMap(\.sections) {
+                let number = section.sectionNumber
+                guard number.range(of: #"^[A-Z]?\d{3,}(?:\.\d+)*$"#, options: .regularExpression) != nil else { continue }
+                for label in store.searchParentLabels(sectionID: section.id) {
+                    let parent = label.prefix { !$0.isWhitespace }.trimmingCharacters(in: CharacterSet(charactersIn: ". "))
+                    XCTAssertTrue(number.hasPrefix(parent + "."), "A canonical section cannot inherit a neighboring root: \(number) → \(label)")
+                }
+            }
+        }
+    }
+
     func testP7WebHandoffBlocksOpenWithoutRewritingMissingIDs() throws {
         let data = Data(#"""
         {"schema":"permitext-notebook-card","schemaVersion":2,"format":"blocknote-json","document":[

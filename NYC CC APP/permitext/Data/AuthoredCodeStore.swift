@@ -840,11 +840,21 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         // cannot classify later roots as restarted list items.
         let groupHeader = indexed.group.headerLine.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         let isWholeChapterGroup = groupHeader.hasPrefix("CHAPTER ") || groupHeader.hasPrefix("APPENDIX ")
-        let isCodeSection = isWholeChapterGroup || normalized == root || normalized.hasPrefix(root + ".")
+        // An imported group can retain its first SECTION header while holding
+        // later complete roots, such as PC 401, 402 and 403. Those roots have
+        // the same numbering width; short, restarted list numbers do not.
+        let isCodeNumber: (String) -> Bool = { value in
+            let raw = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            let number = raw.trimmingCharacters(in: CharacterSet(charactersIn: ". "))
+            let numberRoot = number.split(separator: ".").first.map(String.init) ?? ""
+            return isWholeChapterGroup || number == root || number.hasPrefix(root + ".") ||
+                (!root.isEmpty && numberRoot.count >= root.count && !raw.hasSuffix("."))
+        }
+        let isCodeSection = isCodeNumber(indexed.section.sectionNumber)
         // Numbered list items restart at 1 inside a code subsection. Resolve
         // their enclosing code subsection from source order, never from "1".
         let enclosing = isCodeSection ? normalized : preceding.last(where: {
-            $0.sectionNumber.hasPrefix(root + ".")
+            isCodeNumber($0.sectionNumber)
         })?.sectionNumber.trimmingCharacters(in: CharacterSet(charactersIn: ". "))
         guard let enclosing else { return [] }
         return preceding.filter { section in
