@@ -18360,6 +18360,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   --settings-weight-regular: 400;
   --settings-weight-medium: 500;
   --settings-weight-heading: 600;
+  --settings-section-content-gap: 20px;
   --settings-disclosure-indent: calc(var(--space-4) + 25px);
   --account-category-gutter: 24px;
   --account-category-top-gutter: 32px;
@@ -18484,7 +18485,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   width: 100%;
   max-width: none;
   align-content: start;
-  gap: 20px;
+  gap: var(--settings-section-content-gap);
   min-height: 0;
   margin: 0;
   box-sizing: border-box;
@@ -21422,6 +21423,8 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workspace-manager-floating .workspace-manager-body > .settings-trash { margin-inline: -20px; padding-inline: 20px; border-top: 1px solid var(--border); }
 .account-screen .settings-workspace-choose { margin-bottom: 20px; }
 .account-screen .settings-account-column > .settings-account-activity { align-items: center; padding-block: 20px; border-block: 1px solid var(--border); border-inline: 0; border-radius: 0; margin: 0; background: transparent; }
+.account-screen .settings-account-activity .settings-content-copy { display: grid; gap: var(--settings-section-content-gap); }
+.account-screen .settings-account-activity .settings-content-count { margin: 0; }
 .account-screen .settings-account-column-account > .settings-offline-card { margin-block: 20px; padding-top: 20px; border-top: 1px solid var(--border); border-radius: 0; background: transparent; }
 .settings-floating-panel .account-screen-header,
 .workspace-floating-panel .project-details-screen-header {
