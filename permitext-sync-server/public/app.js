@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-collapsed-chapter-menu-v1697";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-menu-label-case-v1698";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -61,7 +61,7 @@ import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections, rankReaderSearchResults } from "./reader-search-match.js?v=20261026-exact-section-v4";
 import { searchWords, searchWordPattern } from "./search-words.js?v=20261025-workspace-chrome-v1379";
-import { buildReaderChapterContents, readerContentsChapterKey, readerContentsNodeCanExpand } from "./reader-navigation-tree.js?v=20261105-reserved-chapters-v2";
+import { buildReaderChapterContents, readerContentsLabel, readerContentsChapterKey, readerContentsNodeCanExpand } from "./reader-navigation-tree.js?v=20261112-label-case-v3";
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-collapsed-chapter-menu-v1697";
+} from "./offline-storage.js?v=20261112-menu-label-case-v1698";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -9271,7 +9271,7 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
   menu.style.setProperty("--code-accent", getComputedStyle(panel).getPropertyValue("--code-accent"));
   const chapters = Array.from(select.options).filter(option => option.value).map(option => ({
     key: readerContentsChapterKey(option.value), kind: "chapter", chapterID: option.value,
-    title: option.textContent, sectionCount: Number(option.dataset.sectionCount || -1), children: []
+    title: readerContentsLabel(option.textContent), sectionCount: Number(option.dataset.sectionCount || -1), children: []
   }));
   const activeChapterID = String(select.value || reader.chapterID || "");
   const activeSectionID = String(reader.sectionID || "");
@@ -9459,7 +9459,8 @@ function enhanceSelect(select) {
   select._customSelectObserver = disabledObserver;
 
   const syncTrigger = () => {
-    const selectedLabel = select.options[select.selectedIndex]?.textContent || "";
+    const sourceLabel = select.options[select.selectedIndex]?.textContent || "";
+    const selectedLabel = readerChapterMenu ? readerContentsLabel(sourceLabel) : sourceLabel;
     trigger.textContent = iconOnlyTrigger ? "⌄" : selectedLabel;
     if (iconOnlyTrigger) {
       trigger.classList.add("is-icon-only");

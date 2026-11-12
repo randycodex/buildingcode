@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import {documentFixture} from "./helpers/workflow-dom.mjs";
-import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey, readerContentsNodeCanExpand } from "../public/reader-navigation-tree.js";
+import { buildReaderChapterContents, readerContentsLabel, readerContentsAncestorKeys, readerContentsChapterKey, readerContentsNodeCanExpand } from "../public/reader-navigation-tree.js";
 
 const [app, styles, html] = await Promise.all([
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
@@ -58,6 +58,24 @@ assert(
 
 assert(styles.includes("margin: 0 0 2px 35px"), "Contents indentation should be half the former 70 pixels.");
 assert(!styles.includes("padding-left: calc(var(--space-2) + 44px)"), "Legacy row padding must not compound at each level.");
+
+for (const [source, expected] of [
+  ['CHAPTER 1 — ADMINISTRATION', 'Chapter 1 — Administration'],
+  ['CHAPTER R2 — DEFINITIONS', 'Chapter R2 — Definitions'],
+  ['CHAPTER C3 — GENERAL REQUIREMENTS', 'Chapter C3 — General requirements'],
+  ['APPENDIX RF — ALTERNATIVE BUILDING THERMAL ENVELOPE', 'Appendix RF — Alternative building thermal envelope'],
+  ['101 SCOPE AND GENERAL REQUIREMENTS', '101 Scope and general requirements'],
+  ['BC 101 GENERAL', 'BC 101 General'],
+  ['101.2 HVAC EQUIPMENT', '101.2 HVAC equipment'],
+  ['2025 NYS ASHRAE 90.1 — MODIFIED ENERGY STANDARD', '2025 NYS ASHRAE 90.1 — Modified energy standard'],
+  ['Chapter 1: Administration', 'Chapter 1: Administration'],
+  ['28-101.1 New York City Building Code', '28-101.1 New York City Building Code']
+]) assert.equal(readerContentsLabel(source), expected);
+const uppercaseChapter={id:'ecc',chapterNumber:'1',groups:[]};
+const uppercaseSections=[{id:1,sectionNumber:'101',title:'SCOPE AND GENERAL REQUIREMENTS'}];
+const authored=JSON.stringify(uppercaseSections);
+assert.equal(buildReaderChapterContents(uppercaseChapter,uppercaseSections,(number,title)=>`${number} ${title}`)[0].title,'101 Scope and general requirements');
+assert.equal(JSON.stringify(uppercaseSections),authored,'Normal menu capitalization must not change source headings.');
 
 const title = (number, text) => `${number} ${text || ""}`.trim();
 const section = (id, number, groupID = "g") => ({ id, sectionNumber: number, title: "Heading.", groupID });
@@ -146,7 +164,7 @@ assert.equal(closed,2); assert.equal(triggerFocused,1); assert.equal(adjacent,1)
     captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',readerForPanel:()=>reader,
     workspaceReaderContentIdentity:()=> 'stable',codeOptionFor:()=>({}),enabledReaderBrowseProjection:async()=>({token:{},codes:[{}]}),
     activeCodeSourcesController:{isCurrent:()=>true},getComputedStyle:()=>({getPropertyValue:()=> '#abc'}),
-    readerContentsChapterKey,readerContentsNodeCanExpand,buildReaderChapterContents,
+    readerContentsLabel,readerContentsChapterKey,readerContentsNodeCanExpand,buildReaderChapterContents,
     clear:node=>node.replaceChildren(),bindReaderNavigationKeyboard(){},CSS:{escape:value=>value},requestAnimationFrame(){},
     readerNavigationSections:chapter=>chapter.sections,sectionDisplayTitle:(number,title)=>`${number} ${title}`,
     fetchChapter:async id=>{fetches++;return {id,groups:[],sections:[{id:1,sectionNumber:'101.1',title:'Title.'}]};}});

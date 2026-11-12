@@ -18,10 +18,19 @@ function parentNumbers(number) {
   return parents;
 }
 
-function headingLabel(value) {
+const contentsAcronyms = new Set('AC ADA ANSI ASHRAE ASME ASTM BC DOB EBC ECC FGC HVAC IBC ICC IEBC IECC IFC IFGC IMC IPC IRC MC NEC NFPA NYC NYS PC UL'.split(' '));
+
+export function readerContentsLabel(value) {
   const text = compact(value);
   if (!text || text !== text.toUpperCase()) return text;
-  return text.charAt(0) + text.slice(1).toLowerCase();
+  const chapterIdentifier = text.match(/^(?:CHAPTER|APPENDIX)\s+([A-Z0-9.-]+)/)?.[1];
+  const label = text.replace(/\b[A-Z][A-Z0-9]*\b/g, word =>
+    contentsAcronyms.has(word) || word === chapterIdentifier || word.length === 1 || /\d/.test(word)
+      ? word : word.toLowerCase());
+  return label
+    .replace(/[a-zA-Z]/, letter => letter.toUpperCase())
+    .replace(/^((?:§\s*)?(?:[A-Z]{1,6}\s+)?[A-Z]?\d[\w.()/-]*\s+)([a-zA-Z])/, (_, prefix, letter) => prefix + letter.toUpperCase())
+    .replace(/([:—–]\s*)([a-z])/g, (_, prefix, letter) => prefix + letter.toUpperCase());
 }
 
 export function readerContentsChapterKey(chapterID) {
@@ -63,7 +72,7 @@ export function buildReaderChapterContents(chapter, sections, displayTitle) {
       chapterID,
       sectionID: String(section.id),
       number: provisionNumber(section.sectionNumber),
-      title: displayTitle(section.sectionNumber, section.title).replace(/\.$/, ""),
+      title: readerContentsLabel(displayTitle(section.sectionNumber, section.title).replace(/\.$/, "")),
       children: []
     }));
     const byNumber = new Map();
@@ -75,7 +84,7 @@ export function buildReaderChapterContents(chapter, sections, displayTitle) {
       kind: "group",
       chapterID,
       sectionID: nodes[0].sectionID,
-      title: [header, headingLabel(group.headingLine)].filter(Boolean).join(" "),
+      title: readerContentsLabel([header, group.headingLine].filter(Boolean).join(" ")),
       children: []
     } : null;
     if (syntheticGroup) roots.push(syntheticGroup);
