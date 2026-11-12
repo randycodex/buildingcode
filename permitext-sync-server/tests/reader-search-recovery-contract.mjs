@@ -37,7 +37,21 @@ function harness({ pro = true } = {}) {
     appendHighlighted: (node,value) => {node.textContent = value;}, snippetForMatch: value => value
   });
   vm.runInContext(source.slice(source.indexOf("function cancelReaderInternalSearch("), source.indexOf("async function fetchReaderChapterSearch(")) + source.slice(start,end+2)+"\nglobalThis.render = renderReaderInternalSearchResults;",context);
-  return {content,panel,requests,restore,opened,run: query => context.render(panel,reader,query)};
+  return {content,panel,requests,restore,opened,cancel:()=>context.cancelReaderInternalSearch(panel),run: (query,options) => context.render(panel,reader,query,options)};
+}
+
+// A tab's saved search is complete before its detached Reader is published.
+{
+  const t=harness();t.panel.isConnected=false;
+  const pending=t.run('stairs',{allowDetached:true});
+  t.requests[0].resolve([{chapterID:'synthetic-chapter',sectionID:'stairs',heading:'Stairs',snippet:''}]);
+  await pending;
+  assert.equal(t.content.children[0].children.find(item=>item.className==='reader-internal-result').children[0].textContent,'Stairs');
+  const cancelled=t.run('water',{allowDetached:true});t.cancel();
+  assert.equal(t.requests[1].signal.aborted,true);
+  t.requests[1].resolve([{chapterID:'synthetic-chapter',sectionID:'water',heading:'Obsolete result',snippet:''}]);
+  await cancelled;
+  assert.equal(t.content.children.some(item=>item.children?.some(row=>row.children?.some(node=>node.textContent==='Obsolete result'))),false);
 }
 
 // Opening/clearing find preserves the enacted text; it never presents a blank pane.

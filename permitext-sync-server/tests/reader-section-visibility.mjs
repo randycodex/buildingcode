@@ -77,7 +77,7 @@ selected = false; listeners.get('selectionchange')(); flush(); expire();
 assert.equal(releases, 51);
 allowed = true; hidden = true; offscreen = false; intersection(); flush();
 assert.equal(mounts, 25, 'Hidden workflows stay suspended even when their layout rectangle intersects');
-hidden = false; intersection(); flush();
+hidden = false; listeners.get('permitext:workspace-layout-change')(); flush();
 assert.equal(mounts, 50);
 assert.ok(roots.every(root => root.children[0].comments === comments), 'Edited comments are rebuilt fresh on return');
 offscreen = true; intersection(); flush(); controller.dispose(); expire(); flush();

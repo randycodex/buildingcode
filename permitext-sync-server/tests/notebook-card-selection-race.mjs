@@ -209,7 +209,7 @@ for (const stage of ['draft', 'assets']) {
   const pending = h.c.load('A'); await h.reached('network', 'A');
   await h.c.createNew(); release(); await pending;
   assert.equal(h.c.activeCard.id, '', 'New Note invalidates an older existing-note load');
-  assert.equal(h.c.activeCard.title, '');
+  assert.equal(h.c.activeCard.title, 'Untitled');
 }
 for (const invalidation of ['account', 'workspace', 'dispose']) {
   const h = harness(), release = h.hold('draft', '');

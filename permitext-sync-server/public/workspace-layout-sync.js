@@ -1,5 +1,6 @@
 // Account-owned presentation metadata only. Never send documents, drafts,
 // cached section bodies, search text, or Code Question domain records here.
+import { readerTabs, activateReaderTab } from './reader-tabs.js?v=3';
 export const workspaceLayoutsKey = 'workspaceLayoutsJSON';
 export const workspaceLayoutSyncDelay = 1500;
 const text = value => typeof value === 'string' ? value.slice(0, 500) : '';
@@ -12,6 +13,23 @@ const widths = value => Object.fromEntries(Object.entries(object(value)).slice(0
 const views = ['research', 'notebook', 'report', 'project-details', 'notes-research-explicit'];
 const toolKeys = ['notebooks', 'reportDrafts', 'coordinations'];
 
+function readerLocator(item) {
+  return { id: text(item.id), codePrefix: text(item.codePrefix), codeVersion: text(item.codeVersion),
+    chapterID: String(item.chapterID || '').slice(0, 500), sectionID: String(item.sectionID || '').slice(0, 500),
+    sectionNumber: text(item.sectionNumber) };
+}
+
+function mergeReaderColumn(item, local) {
+  const prior = list(local).find(reader => reader.id === item.id);
+  if (!item.tabs) return { title: 'Reader', ...item, ...prior };
+  const positions = new Map(prior ? readerTabs(prior).map(tab => [tab.id, tab]) : []);
+  const tabs = item.tabs.map(tab => ({ title: 'Reader', ...tab, ...positions.get(tab.id) }));
+  const activeTabID = tabs.some(tab => tab.id === prior?.activeTabID) ? prior.activeTabID : item.activeTabID;
+  const result = { id: item.id, tabs, activeTabID: '' };
+  activateReaderTab(result, tabs.some(tab => tab.id === activeTabID) ? activeTabID : tabs[0].id);
+  return result;
+}
+
 export function sharedWorkspaceLayout(source = {}) {
   const cq = object(source.codeQuestionWorkspace);
   const research = object(source.researchViewState);
@@ -19,9 +37,10 @@ export function sharedWorkspaceLayout(source = {}) {
   const tools = object(source.tools);
   return {
     readers: list(source.readers).filter(item => text(item?.id)).map(item => ({
-      id: text(item.id), codePrefix: text(item.codePrefix), codeVersion: text(item.codeVersion),
-      chapterID: String(item.chapterID || '').slice(0, 500), sectionID: String(item.sectionID || '').slice(0, 500),
-      sectionNumber: text(item.sectionNumber)
+      ...readerLocator(item),
+      ...(Array.isArray(item.tabs) && item.tabs.length ? {
+        tabs: readerTabs(item).map(readerLocator), activeTabID: text(item.activeTabID)
+      } : {})
     })),
     utilityInstances: list(source.utilityInstances).filter(item => text(item?.id) && ['search', 'saved', 'analysis'].includes(item.key))
       .map(item => ({id: text(item.id), key: item.key, ...(item.key === 'analysis' ? {conversationID: text(item.conversationID), historyShowing: item.historyShowing === true} : {})})),
@@ -57,7 +76,8 @@ export function sharedWorkspaceLayout(source = {}) {
 // Reading/navigating within an existing column must not produce layout writes.
 export function workspaceLayoutFingerprint(value) {
   const layout = sharedWorkspaceLayout(value);
-  return JSON.stringify({...layout, readers: layout.readers.map(({id}) => ({id}))});
+  return JSON.stringify({...layout, readers: layout.readers.map(({id, tabs}) => ({id,
+    ...(tabs ? {tabs: tabs.map(({id}) => ({id}))} : {})}))});
 }
 
 export function mergeWorkspaceLayouts(...catalogs) {
@@ -86,7 +106,7 @@ export function applySharedWorkspaceLayout(local, record, project) {
   const match = (items, id) => list(items).find(item => item.id === id) || {};
   const {tools, codeQuestionWorkspace, researchViewState, ...presentation} = shared;
   const result = {...local, ...presentation,
-    readers: shared.readers.map(item => ({title: 'Reader', ...item, ...match(local.readers, item.id)})),
+    readers: shared.readers.map(item => mergeReaderColumn(item, local.readers)),
     utilityInstances: shared.utilityInstances.map(item => ({...match(local.utilityInstances, item.id), ...item})),
     utilities: {...local.utilities, ...shared.utilities},
     researchViewState: {...local.researchViewState, ...researchViewState},

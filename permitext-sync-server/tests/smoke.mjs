@@ -2250,7 +2250,7 @@ async function main() {
       "Free web accounts can expose or persist more than two Readers."
     );
     assert(
-      workspaceScript.text.includes("const defaultReaderPaneWidth = 600") &&
+      workspaceScript.text.includes("const defaultReaderPaneWidth = 630") &&
         workspaceScript.text.includes("const defaultNonReaderPaneWidth = 400") &&
         workspaceScript.text.includes("const defaultUtilityPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultSavedPaneWidth = 600") &&

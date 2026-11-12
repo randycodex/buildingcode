@@ -120,7 +120,7 @@ export function createColumnExpansion({ host, columns, label, key = node => node
     observer.disconnect();
     observer.observe(host, { childList: true });
     for (const node of columns()) observer.observe(node, {
-      childList: menu, attributes: true, attributeFilter: ['hidden', 'class']
+      childList: Boolean(menu), attributes: true, attributeFilter: ['hidden', 'class']
     });
   };
   const observer = new MutationObserver(records => {
@@ -138,6 +138,10 @@ export function createColumnExpansion({ host, columns, label, key = node => node
   // Nested report columns have their own header menus; ordinary workspace panes
   // use the shared column menu in app.js.
   function prepareMenus() { for (const node of columns()) {
+    if (typeof menu === 'function' && !menu(node)) {
+      node.querySelector('.column-expansion-options')?.remove();
+      continue;
+    }
     if (node.querySelector('.column-expansion-options')) continue;
     let header = node.querySelector(':scope > header, :scope > .report-draft-picker');
     if (!header) { header = document.createElement('header'); header.className = 'column-expansion-header'; node.prepend(header); }

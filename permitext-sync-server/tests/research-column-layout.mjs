@@ -34,7 +34,7 @@ const track = { dataset: {}, clientWidth: 2403, inert: false,
 const collapsed = new Set();
 const context = vm.createContext({ workspaceColumnExpansion: undefined, state, track, activeWorkspaceID: 'test', window: { innerWidth: 2403 }, researchColumnsLayout,
   currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400,
-  assistantHistoryOnlyPane: id => id === 'utility:analysis:history', paneIsCollapsed: id => collapsed.has(id), defaultPaneWidthForID: () => 600,
+  assistantHistoryOnlyPane: id => id === 'utility:analysis:history', paneIsCollapsed: id => collapsed.has(id), defaultPaneWidthForID: id => id.startsWith('reader:') ? 630 : 600,
   applyPaneWeight(panel, id) { panel.style.flex = `1 0 ${state.paneWeights[id] || 600}px`; } });
 vm.runInContext(['minimumPaneWidthForID', 'maximumPaneWidthForID', 'constrainPaneWidth', 'syncResearchColumnLayout', 'capturePaneResizeWidths'].map(actual).join('\n'), context);
 const sizes = () => panels.map(p=>p.getBoundingClientRect().width);
@@ -46,19 +46,19 @@ context.syncResearchColumnLayout();
 assert.deepEqual(sizes(), [2399/3, 2399/3, 2399/3]);
 panels.push(makePane('reader:three'));
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [600,600,600,600], 'Adding a fourth column crosses into horizontal scrolling at the minimum');
+assert.deepEqual(sizes(), [600,630,630,630], 'Adding a fourth column crosses into horizontal scrolling at the minimum');
 assert.equal(track.dataset.researchColumnSizing, 'overflow');
 assert.equal(panels[0].style.maxWidth, '900px');
 assert.equal(panels[1].style.maxWidth, 'none', 'Overflow Readers have no CSS maximum');
 state.paneWeights['reader:one'] = 1800;
 delete track._researchColumnLayout;
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [600,1800,600,600], 'Stored Reader widths remain uncapped in overflow');
+assert.deepEqual(sizes(), [600,1800,630,630], 'Stored Reader widths remain uncapped in overflow');
 context.capturePaneResizeWidths();
 state.paneWeights['utility:search:one'] = 850;
 state.paneWeights['reader:one'] = 1800;
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [850,1800,600,600], 'Manual Reader widths beyond 900px survive layout notifications');
+assert.deepEqual(sizes(), [850,1800,630,630], 'Manual Reader widths beyond 900px survive layout notifications');
 track.clientWidth = 3605;
 context.syncResearchColumnLayout({reset:true});
 assert.deepEqual(sizes(), [900,900,900,900], 'A viewport change restores equal sharing');
@@ -81,11 +81,11 @@ assert.equal(track.dataset.researchColumnSizing, 'fit');
 context.window.innerWidth = 760;
 context.syncResearchColumnLayout();
 assert.equal(track.dataset.researchColumnSizing, undefined, 'Phone paging keeps its viewport width');
-assert.equal(context.minimumPaneWidthForID('reader:one'), 600);
+assert.equal(context.minimumPaneWidthForID('reader:one'), 630);
 assert.equal(context.maximumPaneWidthForID('utility:search:one'), 900);
 assert.equal(context.maximumPaneWidthForID('reader:one'), Infinity);
 workflow = 'project-details';
-assert.equal(context.minimumPaneWidthForID('reader:one'), 400, 'Project reference Reader bounds stay intact');
+assert.equal(context.minimumPaneWidthForID('reader:one'), 630, 'Project reference Readers share the 630px minimum');
 console.log('Research columns passed: equal fit, minimum widths, unlimited Readers, bounded Search, manual persistence, collapse and phone isolation.');
 
 // Chapter/code refreshes prepare the live header again. That reapplies the
@@ -124,7 +124,7 @@ console.log('Reader navigation preserves fitted and manually resized widths for 
 
 // A fresh page has no track._researchColumnLayout. Restore the saved sizing
 // mode rather than replacing manually chosen widths with equal shares.
-for (const widths of [[1800, 600], [730, 600]]) {
+for (const widths of [[1800, 630], [730, 630]]) {
   panels = ['reader:one', 'reader:two'].map(makePane);
   state.paneWeights = Object.fromEntries(panels.map((panel, index) => [panel.dataset.paneId, widths[index]]));
   state.researchColumnWidthsManual = true;
@@ -171,12 +171,12 @@ for (const available of [2428,1600]) {
   track.scrollLeft = 300;
   await context.resetVisibleColumnWidths();
   resetFrames.splice(0).forEach(callback => callback());
-  const readerWidth = available === 2428 ? 759 : 600;
+  const readerWidth = available === 2428 ? 759 : 630;
   assert.deepEqual(sizes().slice(0,6), [readerWidth,48,48,48,readerWidth,readerWidth]);
   assert.equal(track.dataset.researchColumnSizing, available === 2428 ? 'fit' : 'overflow');
   assert.equal(state.paneWeights['reader:hidden'], 1800);
   assert.equal(state.columnGroups[0].columns['reader:hidden'].width,1800);
-  assert.equal(state.columnGroups[0].columns['reader:one'].width,600);
+  assert.equal(state.columnGroups[0].columns['reader:one'].width,630);
   assert.equal(track.scrollLeft, available === 2428 ? 0 : 300);
   context.syncResearchColumnLayout();
   assert.equal(track.dataset.researchColumnSizing, available === 2428 ? 'fit' : 'overflow', 'Later hydration keeps the reset layout');
@@ -239,7 +239,7 @@ for (const assistantID of ['utility:analysis', 'utility:analysis:one', 'research
     context.window.innerWidth = track.clientWidth = available;
     delete track._researchColumnLayout;
     context.syncResearchColumnLayout();
-    assert.deepEqual(sizes(), available >= 1843 ? [(available-3)/2, (available-3)/2] : [920,600], 'Cold Assistant shares space only when its full minimum fits');
+    assert.deepEqual(sizes(), available >= 1843 ? [(available-3)/2, (available-3)/2] : [920,630], 'Cold Assistant shares space only when its full minimum fits');
     assert.equal(panels[0].style['--pane-default-min-width'], '920px');
     assert.equal(panels[0].style.maxWidth, 'none', 'Assistant has no Search-style maximum');
   }
@@ -256,7 +256,7 @@ for (const assistantID of ['utility:analysis', 'utility:analysis:one', 'research
   assert.deepEqual(sizes(), [1200,1200], 'Reset restores equal Assistant shares');
   context.window.innerWidth = track.clientWidth = 1280;
   context.syncResearchColumnLayout();
-  assert.deepEqual(sizes(), [600,920], 'Shrinking the viewport preserves Assistant history and composer minimum');
+  assert.deepEqual(sizes(), [630,920], 'Shrinking the viewport preserves Assistant history and composer minimum');
 }
 panels = ['utility:search:one', 'utility:analysis:one', 'reader:one'].map(makePane);
 state.paneWeights = {'utility:search:one':600, 'utility:analysis:one':920, 'reader:one':600};

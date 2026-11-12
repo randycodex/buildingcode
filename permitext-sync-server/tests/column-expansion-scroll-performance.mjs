@@ -41,10 +41,12 @@ const observations=[];
 globalThis.MutationObserver=class {observe(node,options){observations.push({node,options});}disconnect(){}};
 globalThis.ResizeObserver=class {observe(){}disconnect(){}};
 try {
-  const controller=createColumnExpansion({host,columns:()=>panes,label:node=>node.dataset.paneId,menu:false,
+  const controller=createColumnExpansion({host,columns:()=>panes,label:node=>node.dataset.paneId,menu:node=>node===panes[0],
     capturePosition:()=>({anchor:'source'}),restorePosition:position=>{assert.equal(position.anchor,'source');restoredAnchors++;}});
   assert.ok(observations.every(({options})=>!options.subtree),'Layout observation must never subscribe to thousands of nested passage mutations');
   assert.deepEqual(observations.map(({node})=>node),[host,...panes],'Observe host membership and only direct pane layout attributes');
+  assert.ok(panes[0].querySelector('.column-expansion-options'),'Columns opting in retain their expansion menu');
+  assert.equal(panes[1].querySelector('.column-expansion-options'),null,'Columns opting out have no generated header menu');
   assert.equal(paragraphReads,0,'Initial expansion setup cannot read scroll geometry from 10,000 non-scrolling paragraphs');
   assert.ok(scrollerReads<=12,'Only the two actual scrolling containers are measured');
   controller.expand(panes[0]);

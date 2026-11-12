@@ -119,6 +119,35 @@ grip.emit('dragstart', { dataTransfer: { setData: (_type, id) => { transfer = id
 assert.equal(transfer, 'reader:drag', 'Empty header space initiates the same column drag');
 console.log('Header dragging excludes title buttons and other interactive controls.');
 
+// Readers reorder from the code-tab row rather than their content header.
+const tabRow = eventNode(), readerHeader = eventNode(), readerPane = eventNode();
+readerPane.dataset.paneId = 'reader:tabs';
+const headerClasses = new Set(['pane-header-drag-area']);
+readerHeader.classList = {remove: name => headerClasses.delete(name)};
+readerHeader.draggable = true;
+readerHeader.removeAttribute = name => { delete readerHeader[name]; };
+readerPane.classList = {add() {}, remove() {}, contains: name => name === 'reader-panel'};
+readerPane.querySelector = selector => selector.includes('reader-column-tabs') ? tabRow : readerHeader;
+readerPane.querySelectorAll = selector => {
+  assert(selector.includes('.reader-column-tabs'));
+  return [tabRow];
+};
+dragContext.bindPaneDragging([readerPane]); dragContext.bindPaneDragging([readerPane]);
+assert.equal(headerClasses.has('pane-header-drag-area'), false); assert.equal(readerHeader.draggable, undefined);
+assert.equal(tabRow.draggable, true); assert.equal(tabRow.listeners.dragstart.length, 1);
+for (const name of ['code tab', 'add button']) {
+  let prevented = false;
+  tabRow.emit('pointerdown', {target: {closest: () => ({tagName: 'BUTTON'})}});
+  tabRow.emit('dragstart', {preventDefault: () => {prevented = true;}});
+  assert.equal(prevented, true, `${name} keeps its own interaction rather than dragging the column.`);
+}
+tabRow.emit('pointerdown', {target: {closest: () => null}});
+tabRow.emit('dragstart', {dataTransfer: {setData: (_type, id) => {transfer = id;}}});
+assert.equal(transfer, 'reader:tabs', 'Empty tab-row space starts the whole-column drag.');
+dragContext.dragPreviewOrder = ['reader:target', 'reader:tabs']; tabRow.emit('dragend');
+assert.deepEqual(dragState.paneOrder, ['reader:target', 'reader:tabs']);
+console.log('Reader tab rows reorder entire columns while code tabs and + remain interactive.');
+
 // Evidence, Notebook and Report move independently; only Evidence detail follows its list.
 const savedID = 'utility:saved:one', notebookID = 'project:notebook:p', reportID = 'project:report-draft:p';
 const detailID = 'section:detail:evidence';
@@ -304,7 +333,7 @@ const menuPanel={dataset:{paneId:'reader:one'},editor:retainedEditor,
   classList:{contains:name=>menuReader&&name==='reader-panel'}};
 const peerPanel={dataset:{paneId:'reader:two'}};
 let menuOrder=['reader:one','reader:two'], menuPro=false;
-const menuState={paneOrder:menuOrder,columnGroups:[]};
+const menuState={paneOrder:menuOrder,columnGroups:[],readers:[]};
 const menuItems = () => menu.children.filter(item => item.tag === 'button');
 const menuContext=vm.createContext({state:menuState,primarySavedPaneID:()=>'',AbortController,isProAccount:()=>menuPro,currentColumnWorkflowView:()=> 'research',workflowPaneIsVisible:()=>true,
   document:{querySelector:()=>null,createElement:tag=>menuNode(tag),body:{append:n=>{menu=n;}},addEventListener(){},get activeElement(){return focused;}},

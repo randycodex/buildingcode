@@ -149,7 +149,8 @@ panels[0].dataset.readerContentKey = "";
 assert.equal(context.captureReaderScrollPositions().has("reader:a"), false, "Loading content cannot become a recovery anchor");
 
 assert.match(actual("renderWorkspace"), /mountWorkspacePanesIndependently\(context, \{ \.\.\.options, readerScrollPositions, accessGate, shellReady: true \}\)/);
-assert.match(actual("workspacePaneDescriptors"), /renderReader\(reader, \{ scrollPosition: options\.readerScrollPositions\?\.get\(id\)/);
+assert.match(actual("workspacePaneDescriptors"), /const scrollPosition = options\.readerScrollPositions\?\.get\(id\) \|\| reader\.scrollPosition/);
+assert.match(actual("workspacePaneDescriptors"), /renderReader\(reader, \{ scrollPosition,/);
 assert.match(actual("getWorkspacePaneHydrator"), /restoreReaderScrollPositions\(new Map\(\[\[job\.id, job\.descriptor\.scrollPosition\]\]\)\)/);
 assert.match(actual("renderReader"), /refreshReaderContent\(panel, reader,\s*\{\s*scrollPosition: options\.scrollPosition/);
 assert.match(actual("refreshReaderContent"), /renderSectionContent\(panel, reader, options\)/);

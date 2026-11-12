@@ -930,8 +930,8 @@ assert.match(appSource, /instance\.projectsMenuOpen = overrides\.projectsMenuOpe
 assert.match(appSource, /archiveButton\.innerHTML = showingArchived \? activeProjectsIconSVG\(\) : archiveIconSVG\(\)/);
 assert.match(appSource, /const defaultNonReaderPaneWidth = 400;/);
 assert.match(appSource, /const legacyCoordinationPaneWidth = 430;[\s\S]*?const defaultCoordinationPaneWidth = 600;/);
-assert.match(appSource, /const defaultReaderPaneWidth = 600;/);
-assert.match(appSource, /const defaultSourceLinkedReaderPaneWidth = 600;/);
+assert.match(appSource, /const defaultReaderPaneWidth = 630;/);
+assert.match(appSource, /const defaultSourceLinkedReaderPaneWidth = 630;/);
 assert.match(appSource, /const defaultResearchPaneWidth = assistantHistoryWidth \+ 600;/);
 assert.match(appSource, /const defaultCodeDecisionPaneWidth = 600;/);
 assert.match(appSource, /const defaultSearchPaneWidth = 600;/);
@@ -939,15 +939,15 @@ assert.match(appSource, /paneID === "utility:search" \|\| paneID\.startsWith\("u
 assert.match(appSource, /return Math\.max\(defaultCodeDecisionPaneWidth, minimumWidthForPaneRole\(parsed\?\.paneRole\) \|\| 0\);/);
 assert.match(appSource, /paneID === "utility:analysis" \|\| paneID\.startsWith\("utility:analysis:"\) \|\| paneID\.startsWith\("research:conversation:"\)\) return defaultResearchPaneWidth;/);
 const migrateReaderWidth = new Function([
-  'const currentColumnWorkflowView = () => "notebook"; const defaultPaneWidthForID = () => 600;',
+  'const currentColumnWorkflowView = () => "notebook"; const defaultPaneWidthForID = () => 630;',
   appSource.match(/const defaultReaderPaneWidth = [^;]+;/)[0],
   ...["minimumPaneWidthForID", "maximumPaneWidthForID", "constrainPaneWidth", "migrateLegacyPaneWidth"]
     .map(name => functionSource(appSource, name)),
   "return migrateLegacyPaneWidth;"
 ].join("\n"))();
-for (const [stored, expected] of [[350,400], [400,400], [520,520], [600,600], [900,900], [1000,1000], [1600,1600], [40,600], [0,600], [NaN,600]]) {
+for (const [stored, expected] of [[350,630], [400,630], [520,630], [600,630], [630,630], [900,900], [1000,1000], [1600,1600], [40,630], [0,630], [NaN,630]]) {
   assert.equal(migrateReaderWidth("reader:fixture", stored), expected,
-    "Restored Reader widths preserve manual choices above the 400px minimum and default invalid/strip widths to 600px.");
+    "Restored Reader widths preserve manual choices above the 630px minimum and default invalid/strip widths to 630px.");
 }
 assert.match(appSource, /if \(isProjectCoordinationPaneID\(paneID\) && value === legacyCoordinationPaneWidth\) \{[\s\S]*?return defaultCoordinationPaneWidth;/);
 assert.match(appSource, /projectsMenuToggle\.onclick = \(\) => \{[\s\S]*?if \(instance\.projectsMenuOpen \|\| !showingArchived\) return;[\s\S]*?instance\.projectsArchiveMode = false;/);

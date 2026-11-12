@@ -1,4 +1,5 @@
-import { createReaderShortcuts } from "./reader-shortcuts.js?v=2";
+import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=4";
+import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=3";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
@@ -12,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261111-cross-device-workflows-v1673";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-reader-minimum-width-v1685";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=10";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -26,7 +27,7 @@ import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
-import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261022-boundary-observer-v2";
+import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=31";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261108-floating-menu-pins-v1382";
@@ -64,7 +65,7 @@ import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsC
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=30261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
-import { isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, withoutWorkspaceLayoutSync, retireWorkspaceLayoutSyncEntries } from "./workspace-layout-sync.js?v=3";
+import { isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, withoutWorkspaceLayoutSync, retireWorkspaceLayoutSyncEntries } from "./workspace-layout-sync.js?v=4";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
 import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20261012-workflow-cache-v5";
 import {
@@ -165,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261111-cross-device-workflows-v1673";
+} from "./offline-storage.js?v=20261112-reader-minimum-width-v1685";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -495,8 +496,8 @@ const zoningCodePrefix = "ZR";
 const existingBuildingCodePrefix = "EBC";
 
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
-const defaultReaderPaneWidth = 600;
-const defaultSourceLinkedReaderPaneWidth = 600;
+const defaultReaderPaneWidth = 630;
+const defaultSourceLinkedReaderPaneWidth = 630;
 const legacyCoordinationPaneWidth = 430;
 const defaultNonReaderPaneWidth = 400;
 const defaultContextPaneWidth = 600;
@@ -719,6 +720,7 @@ let notebookStylesPromise = null;
 const notebookMounts = new Map();
 const notebookCatalogs = new Map();
 const notebookCatalogRequests = new Map();
+let notebookNoteOpeningGeneration = 0;
 const notebookColumnRegistry = createNotebookMountRegistry(notebookMounts, {openCard: async (projectID, cardID) => {
   const project = workspaceProject();
   if (!project || projectDetailKey(project) !== projectID) return false;
@@ -3660,20 +3662,42 @@ function publishSavedNotebookCard(projectID, card) {
 
 async function openNotebookNoteColumn(project, card) {
   const projectID = projectDetailKey(project), requestIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const attempt = ++notebookNoteOpeningGeneration;
   const navigationGeneration = state.workflowNavigationGeneration || 0;
   const current = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
-    navigationGeneration === (state.workflowNavigationGeneration || 0) && projectDetailKey(workspaceProject()) === projectID;
+    attempt === notebookNoteOpeningGeneration && navigationGeneration === (state.workflowNavigationGeneration || 0) && projectDetailKey(workspaceProject()) === projectID;
   if (!current() || !hasCapability('notebook')) return false;
   let columns = notebookColumnsForProject(project);
   let column = columns.find(item => item.open && card.id && item.cardID === card.id) ||
     columns.find(item => item.id === card.column?.id) || columns.find(item => card.id && item.cardID === card.id);
   if (!column) column = columns.find(item => item.open && !item.cardID && !notebookColumnMounts.get(notebookColumnPaneID(item))?.insertionTarget?.());
+  const targetID = column?.id;
+  // Navigation replaces the open Note. Preserve outgoing drafts before retiring
+  // their editors; closing a Note never removes it from the project's note list.
+  for (const outgoing of columns.filter(item => item.open && item.id !== targetID)) {
+    const mount = notebookColumnMounts.get(notebookColumnPaneID(outgoing));
+    if (mount?.persistForNavigation) await mount.persistForNavigation();
+    else await mount?.persistDraft?.();
+    if (!current()) return false;
+  }
+  // Draft acknowledgement can refresh column records while persistence awaits.
+  columns = notebookColumnsForProject(project);
+  column = columns.find(item => item.id === targetID);
   if (!column) {
     column = {id: columns.length ? crypto.randomUUID() : 'primary', projectID, cardID: card.id || '', title: card.title || '', open: true};
     state.notebookColumns ||= []; state.notebookColumns.push(column);
   }
   column.open = true; column.cardID = card.id || column.cardID; column.title = card.title || column.title;
-  for (const item of columns) delete item.selected;
+  const retiredPaneIDs = new Set();
+  for (const item of columns) {
+    delete item.selected;
+    if (item !== column && item.open) {
+      item.open = false;
+      const retiredID = notebookColumnPaneID(item);
+      retiredPaneIDs.add(retiredID);
+      if (state.workflowMembership) delete state.workflowMembership[retiredID];
+    }
+  }
   column.selected = true;
   if (card.newNote && !column.cardID) column.newNote = true;
   const paneID = notebookColumnPaneID(column);
@@ -3681,8 +3705,9 @@ async function openNotebookNoteColumn(project, card) {
   const view = currentColumnWorkflowView();
   state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, view === 'research' ? 'research' : 'notebook');
   state.paneWeights[paneID] ||= defaultNotebookPaneWidth;
-  const previous = columns.filter(item => item.open && notebookColumnPaneID(item) !== paneID).at(-1);
-  if (!(state.paneOrder || []).includes(paneID) && previous) placePaneAfter(notebookColumnPaneID(previous), paneID);
+  const hasPosition = (state.paneOrder || []).includes(paneID);
+  state.paneOrder = [...new Set((state.paneOrder || []).flatMap(id =>
+    retiredPaneIDs.has(id) ? hasPosition ? [] : [paneID] : [id]))];
   savedPaneIDs().forEach(id => placeEvidenceBeforeNotebook(id, project));
   saveWorkspaceState();
   await transitionWorkspace('utility');
@@ -4397,6 +4422,271 @@ function newReaderState(overrides = {}) {
     shouldSmoothScrollToSection: false,
     ...overrides
   };
+}
+
+function rememberReaderTabPosition(reader) {
+  const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"]`);
+  if (!panel || panel.dataset.readerId !== reader.id ||
+      panel.dataset.readerDisplayedTabId && panel.dataset.readerDisplayedTabId !== reader.activeTabID) return;
+  const position = captureReaderScrollPositions(panel).get(paneIDForReader(reader));
+  if (position) reader.scrollPosition = position;
+}
+
+function retainReaderColumn(reader) {
+  keepDerivedReader(reader);
+  reader.pinnedDetailSourceID = "";
+  reader.pinnedSearchPaneID = "";
+}
+
+async function switchReaderTab(reader, tabID, { focus = true } = {}) {
+  if (!state.readers.includes(reader)) return;
+  const paneID = paneIDForReader(reader);
+  const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (reader.activeTabID === tabID && !panel?.dataset.readerTabPending) return;
+  rememberReaderTabPosition(reader);
+  retainReaderColumn(reader);
+  if (!activateReaderTab(reader, tabID)) return;
+  retainReaderColumn(reader);
+  const workspaceID = activeWorkspaceID;
+  const identity = captureAccountRequest();
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneID], readerTabSwitchPaneID: paneID });
+  if (!await whenWorkspacePaneReady(paneID) || activeWorkspaceID !== workspaceID ||
+      !isCurrentAccountRequest(identity) || reader.activeTabID !== tabID) return;
+  if (focus) track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"] .reader-code-tab[aria-selected="true"]`)?.focus({ preventScroll: true });
+}
+
+function retainReaderPaneForTabSwitch(panel, reader) {
+  if (!panel.dataset.readerTabPending) {
+    // Stop outgoing work before the mutable column starts rendering another
+    // source, while retaining its painted text until the replacement is ready.
+    cancelReaderPanelRequests(panel);
+    for (const child of panel.children) if (!child.classList.contains('reader-column-tabs')) child.inert = true;
+  }
+  panel.dataset.readerTabPending = 'true';
+  panel.dataset.workspacePaneUnavailable = 'false';
+  panel.setAttribute('aria-busy', 'true');
+  renderReaderTabs(panel, reader);
+  return panel;
+}
+
+function openReaderTabPicker(reader, anchor) {
+  if (!canAddReaderTab(reader)) return;
+  const workspaceID = activeWorkspaceID, identity = captureAccountRequest();
+  const view = currentColumnWorkflowView(), generation = state.workflowNavigationGeneration || 0;
+  openReaderCodePicker(anchor, async code => {
+    if (!state.readers.includes(reader) || activeWorkspaceID !== workspaceID || !isCurrentAccountRequest(identity) ||
+        currentColumnWorkflowView() !== view || (state.workflowNavigationGeneration || 0) !== generation || !canAddReaderTab(reader)) return;
+    rememberReaderTabPosition(reader);
+    retainReaderColumn(reader);
+    addReaderTab(reader, newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) }));
+    saveWorkspaceState();
+    await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
+  });
+}
+
+function prepareReaderSourceTab(reader, fields) {
+  if (!isProAccount() || !Array.isArray(reader.tabs)) return reader;
+  const matches = tab => tab.codePrefix === fields.codePrefix && tab.codeVersion === fields.codeVersion &&
+    String(tab.chapterID || '') === String(fields.chapterID || '') && String(tab.sectionID || '') === String(fields.sectionID || '');
+  if (matches(reader)) return reader;
+  const tabs = readerTabs(reader);
+  const existing = tabs.find(matches) || tabs.find(tab => tab.codePrefix === fields.codePrefix && tab.codeVersion === fields.codeVersion);
+  if (!existing && !canAddReaderTab(reader)) {
+    // Keep every existing session when a link needs a seventh code.
+    const destination = newReaderState(fields);
+    initializeReaderTabs(destination);
+    state.readers.push(destination);
+    state.workflowMembership = linkPaneToView(state.workflowMembership, paneIDForReader(destination), currentColumnWorkflowView());
+    placePaneAfter(paneIDForReader(reader), paneIDForReader(destination));
+    return destination;
+  }
+  rememberReaderTabPosition(reader);
+  retainReaderColumn(reader);
+  if (existing) activateReaderTab(reader, existing.id);
+  else addReaderTab(reader, newReaderState(fields));
+  retainReaderColumn(reader);
+  return reader;
+}
+
+async function openReferenceInReaderTab(reader, detail, sourceContext) {
+  const workspaceID = activeWorkspaceID, identity = captureAccountRequest();
+  const fields = readerFieldsForSectionDetail(detail);
+  reader = prepareReaderSourceTab(reader, fields);
+  Object.assign(reader, fields);
+  const tabID = reader.activeTabID, paneID = paneIDForReader(reader);
+  const target = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? '')));
+  const current = () => state.readers.includes(reader) && activeWorkspaceID === workspaceID &&
+    isCurrentAccountRequest(identity) && reader.activeTabID === tabID && activeCodeSourcesController.isCurrent(sourceContext) &&
+    JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? ''))) === target;
+  if (readerAlreadyAtReferenceTarget(reader, detail)) {
+    updateBrowserSectionURL(reader.sectionID); scrollPaneIntoView(paneID, 'auto'); return;
+  }
+  if (reader.sectionID) updateBrowserSectionURL(reader.sectionID);
+  scheduleContinuitySync(reader);
+  saveWorkspaceState();
+  await transitionWorkspace('utility', { refreshPaneIDs: [paneID] });
+  if (!current() || !await whenWorkspacePaneReady(paneID) || !current()) return;
+  scrollPaneIntoView(paneID, 'auto');
+  if (reader.sectionID) {
+    if (readerReferenceNeedsPassage(detail)) await revealReaderCodeReference(reader, detail, current);
+    else alignReaderSectionAfterLayout(reader);
+  }
+}
+
+async function closeReaderTab(reader, tabID) {
+  if (!state.readers.includes(reader)) return;
+  rememberReaderTabPosition(reader);
+  const last = readerTabs(reader).length === 1;
+  const active = reader.activeTabID === tabID;
+  if (active) retainReaderColumn(reader);
+  if (!removeReaderTab(reader, tabID)) return;
+  if (last) {
+    state.readers = state.readers.filter(item => item !== reader);
+    for (const item of state.readers) if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = "";
+  }
+  saveWorkspaceState();
+  if (!active && !last) {
+    const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"]`);
+    if (panel) renderReaderTabs(panel, reader);
+    readerShortcuts?.refresh();
+    return;
+  }
+  await transitionWorkspace("utility", { refreshPaneIDs: last ? [] : [paneIDForReader(reader)] });
+}
+
+async function transferReaderTab(reader, tabID, { duplicate = false, destination = null } = {}) {
+  if (!isProAccount() || !state.readers.includes(reader) || destination === reader ||
+      (destination && (!state.readers.includes(destination) || !canAddReaderTab(destination)))) return;
+  rememberReaderTabPosition(reader);
+  const tab = readerTabs(reader).find(item => item.id === tabID);
+  if (!tab || (!duplicate && !destination && readerTabs(reader).length === 1)) return;
+  const session = retainedReaderTab(tab);
+  if (destination) {
+    rememberReaderTabPosition(destination);
+    retainReaderColumn(destination);
+    addReaderTab(destination, session);
+  } else {
+    const { id, ...fields } = session;
+    destination = newReaderState(fields);
+    initializeReaderTabs(destination);
+    state.readers.push(destination);
+    state.workflowMembership = linkPaneToView(state.workflowMembership, paneIDForReader(destination), currentColumnWorkflowView());
+    placePaneAfter(paneIDForReader(reader), paneIDForReader(destination));
+  }
+  if (!duplicate) {
+    if (reader.activeTabID === tabID) retainReaderColumn(reader);
+    const last = readerTabs(reader).length === 1;
+    removeReaderTab(reader, tabID);
+    if (last) state.readers = state.readers.filter(item => item !== reader);
+  }
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader), paneIDForReader(destination)] });
+  scrollPaneIntoView(paneIDForReader(destination));
+}
+
+function openReaderTabMenu(reader, tabID, anchor) {
+  document.querySelector('.reader-tab-menu')?._close?.();
+  const workspaceID = activeWorkspaceID, identity = captureAccountRequest();
+  const menu = document.createElement('div');
+  menu.className = 'column-group-menu reader-tab-menu';
+  menu.setAttribute('role', 'menu');
+  menu.setAttribute('aria-label', 'Reader tab options');
+  const controller = new AbortController();
+  const close = () => { controller.abort(); menu.remove(); anchor.setAttribute('aria-expanded', 'false'); anchor.focus({ preventScroll: true }); };
+  menu._close = close;
+  const add = (label, action, disabled = false) => {
+    const button = document.createElement('button'); button.type = 'button'; button.setAttribute('role', 'menuitem');
+    button.textContent = label; button.disabled = disabled;
+    button.addEventListener('click', () => {
+      close();
+      if (workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity) && state.readers.includes(reader)) void action();
+    });
+    menu.append(button);
+  };
+  if (isProAccount()) {
+    add('Move to new column', () => transferReaderTab(reader, tabID), readerTabs(reader).length < 2);
+    add('Duplicate in new column', () => transferReaderTab(reader, tabID, { duplicate: true }));
+    for (const destination of state.readers.filter(item => item !== reader && workflowPaneIsVisible(paneIDForReader(item)))) {
+      add(`Move to ${readerPositionLabel(destination)}${canAddReaderTab(destination) ? '' : ` (full · ${maximumReaderTabs} codes)`}`,
+        () => transferReaderTab(reader, tabID, { destination }), !canAddReaderTab(destination));
+    }
+  }
+  add('Close tab', () => closeReaderTab(reader, tabID));
+  document.body.append(menu);
+  anchor.setAttribute('aria-expanded', 'true');
+  const rect = anchor.getBoundingClientRect();
+  menu.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - menu.offsetWidth - 8))}px`;
+  menu.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - menu.offsetHeight - 8))}px`;
+  document.addEventListener('pointerdown', event => { if (!menu.contains(event.target) && !anchor.contains(event.target)) close(); }, { signal: controller.signal });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); close(); }
+    if (event.key === 'Tab') close();
+    if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault(); const buttons = [...menu.querySelectorAll('button:not(:disabled)')];
+      let index = buttons.indexOf(document.activeElement);
+      index = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowUp' ? -1 : 1) + buttons.length) % buttons.length;
+      buttons[index]?.focus();
+    }
+  }, { signal: controller.signal });
+  window.addEventListener('resize', close, { once: true, signal: controller.signal });
+  track.addEventListener('scroll', close, { once: true, signal: controller.signal, passive: true });
+  menu.querySelector('button:not(:disabled)')?.focus();
+}
+
+function renderReaderTabs(panel, reader) {
+  initializeReaderTabs(reader);
+  const actions = panel.querySelector('.panel-actions');
+  let strip = panel.querySelector('.reader-column-tabs');
+  if (!strip) { strip = document.createElement('div'); strip.className = 'reader-column-tabs'; panel.prepend(strip); }
+  strip.replaceChildren();
+  panel.classList.add('has-reader-tabs');
+  panel.dataset.readerTabId = reader.activeTabID;
+  const list = document.createElement('div'); list.className = 'reader-code-tabs';
+  list.setAttribute('role', 'tablist'); list.setAttribute('aria-label', `${readerPositionLabel(reader)} code tabs`);
+  const tabs = readerTabs(reader);
+  for (const tab of tabs) {
+    const code = codeOptionFor(tab.codePrefix || 'BC', tab.codeVersion);
+    const edition = researchCodeEdition({ codePrefix: tab.codePrefix, codeVersion: tab.codeVersion });
+    const base = readerShortcutLabel({ prefix: tab.codePrefix, edition });
+    const duplicates = tabs.filter(item => item.codePrefix === tab.codePrefix && item.codeVersion === tab.codeVersion);
+    const label = duplicates.length > 1 ? `${base} · ${tab.sectionNumber || duplicates.findIndex(item => item.id === tab.id) + 1}` : base;
+    const name = readerCodeOptionLabel(code);
+    const button = document.createElement('button'); button.type = 'button'; button.className = `reader-code-tab code-theme-${code?.theme || 'current-consolidation'}`;
+    button.textContent = label; button.dataset.readerTabId = tab.id;
+    button.id = `reader-tab-${reader.id}-${tab.id}`;
+    button.setAttribute('role', 'tab'); button.setAttribute('aria-selected', String(tab.id === reader.activeTabID));
+    button.setAttribute('aria-controls', `reader-tabpanel-${reader.id}`);
+    button.tabIndex = tab.id === reader.activeTabID ? 0 : -1;
+    button.title = [name, tab.sectionNumber ? `§ ${tab.sectionNumber}` : tab.title !== 'Reader' ? tab.title : ''].filter(Boolean).join(' · ');
+    button.setAttribute('aria-label', button.title);
+    button.addEventListener('click', () => void switchReaderTab(reader, tab.id));
+    button.addEventListener('contextmenu', event => { event.preventDefault(); openReaderTabMenu(reader, tab.id, button); });
+    button.addEventListener('keydown', event => {
+      if (event.key === 'Delete') { event.preventDefault(); void closeReaderTab(reader, tab.id); return; }
+      if (event.key === 'F10' && event.shiftKey) { event.preventDefault(); openReaderTabMenu(reader, tab.id, button); return; }
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault(); const index = tabs.findIndex(item => item.id === tab.id);
+      const next = event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs.at(-1) : tabs[(index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+      void switchReaderTab(reader, next.id);
+    });
+    list.append(button);
+  }
+  strip.append(list);
+  if (isProAccount()) {
+    const add = document.createElement('button'); add.type = 'button'; add.className = 'icon-button reader-tab-add'; add.textContent = '+';
+    add.disabled = !canAddReaderTab(reader);
+    add.title = add.disabled ? `Maximum ${maximumReaderTabs} codes per column` : 'Add code tab';
+    add.setAttribute('aria-label', add.disabled ? `${readerPositionLabel(reader)} is full · Maximum ${maximumReaderTabs} codes per column` : `Add code tab to ${readerPositionLabel(reader)}`);
+    add.addEventListener('click', () => openReaderTabPicker(reader, add)); strip.append(add);
+  }
+  if (actions) {
+    actions.inert = Boolean(panel.dataset.readerTabPending);
+    strip.append(actions);
+  }
+  const content = panel.querySelector('.reader-body');
+  content.id = `reader-tabpanel-${reader.id}`; content.setAttribute('role', 'tabpanel');
+  content.setAttribute('aria-labelledby', `reader-tab-${reader.id}-${reader.activeTabID}`);
 }
 
 function sectionRouteIDFromLocation() {
@@ -5263,7 +5553,7 @@ function assistantHistoryOnlyPane(paneID) {
 
 function minimumPaneWidthForID(paneID) {
   if (paneID?.startsWith('project:notes-index:')) return 220;
-  if (paneID?.startsWith("reader:")) return currentColumnWorkflowView() === "research" ? 600 : 400;
+  if (paneID?.startsWith("reader:")) return 630;
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 300;
   if (assistantHistoryOnlyPane(paneID)) return assistantHistoryWidth;
   if (paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") || paneID?.startsWith("research:conversation:")) return assistantHistoryWidth + 600;
@@ -8321,6 +8611,7 @@ function setTitle(panel, reader) {
     title.textContent = sectionDisplayTitle(reader.sectionNumber, reader.title, "Reader");
   } else title.textContent = reader.title || "Reader";
   updateReaderLocationTitle(panel, reader);
+  if (panel.querySelector('.reader-column-tabs')) renderReaderTabs(panel, reader);
 }
 
 function updateReaderLocationTitle(panel, reader) {
@@ -9569,8 +9860,8 @@ function replaceActiveAccount(nextAccount, options = {}) {
         const { codePrefix, codeVersion, chapterID, chapterNumber, sectionID, sectionNumber, title, blockID, blockLabel, headerLine, headingLine } = detail;
         return [[item.id, { codePrefix, codeVersion, chapterID, chapterNumber, sectionID, sectionNumber, title, blockID, blockLabel, headerLine, headingLine }]];
       })),
-    readers: (state.readers || []).map(({ id, codePrefix, codeVersion, chapterID, sectionID, sectionNumber, title, internalSearchQuery, scrollTop, scrollPosition }) =>
-      ({ id, codePrefix, codeVersion, chapterID, sectionID, sectionNumber, title, internalSearchQuery, scrollTop, scrollPosition })),
+    readers: (state.readers || []).map(({ id, codePrefix, codeVersion, chapterID, sectionID, sectionNumber, title, internalSearchQuery, internalSearchOpen, scrollTop, scrollPosition, tabs, activeTabID }) =>
+      ({ id, codePrefix, codeVersion, chapterID, sectionID, sectionNumber, title, internalSearchQuery, internalSearchOpen, scrollTop, scrollPosition, tabs, activeTabID })),
     searches: (state.utilityInstances || []).filter(item => item.key === "search")
       .map(({ id, query, searchPosition, codeFilters }) => newUtilityInstance("search", { id, query, searchPosition, codeFilters }))
   } : null;
@@ -16895,7 +17186,7 @@ const readerResolvedWorkspaceIdentities = new WeakMap();
 const resolvedReaderSourceNavigations = new WeakMap();
 
 function workspaceReaderContentIdentity(reader) {
-  const value = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  const value = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID, ...(reader.activeTabID ? [reader.activeTabID] : [])]);
   const resolved = readerResolvedWorkspaceIdentities.get(reader);
   return resolved?.value === value ? resolved.identity : value;
 }
@@ -16903,7 +17194,7 @@ function workspaceReaderContentIdentity(reader) {
 function setResolvedReaderChapter(reader, chapterID) {
   const identity = workspaceReaderContentIdentity(reader);
   reader.chapterID = chapterID;
-  const value = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  const value = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID, ...(reader.activeTabID ? [reader.activeTabID] : [])]);
   readerResolvedWorkspaceIdentities.set(reader, { value, identity });
 }
 
@@ -19552,6 +19843,10 @@ async function openReferenceInAdjacentReader(sourceReader, detail) {
     return;
   }
   if (!isCurrent() || !activeCodeSourcesController.isCurrent(context)) return;
+  if (isProAccount() && Array.isArray(sourceReader.tabs)) {
+    await openReferenceInReaderTab(sourceReader, detail, context);
+    return;
+  }
   let targetReader = state.readers.find((reader) =>
     reader.id !== sourceReader.id &&
     reader.referenceSourceReaderID === sourceReader.id
@@ -19861,7 +20156,7 @@ async function fetchReaderChapterSearch(reader, query, signal, { scope = "chapte
   return result.results.map(item => ({ ...item, chapterID: reader.chapterID, corpusRevision: result.corpusRevision }));
 }
 
-async function renderReaderInternalSearchResults(panel, reader, query) {
+async function renderReaderInternalSearchResults(panel, reader, query, { allowDetached = false } = {}) {
   const content = panel.querySelector(".reader-content");
   if (!content) return;
   const chapterOnly = !isProAccount();
@@ -19869,12 +20164,13 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
   const needle = query.trim().toLowerCase();
   const searchToken = `search:${crypto.randomUUID()}`;
   panel.dataset.readerSearchToken = searchToken;
+  const current = () => (panel.isConnected || allowDetached) && panel.dataset.readerSearchToken === searchToken;
   if (needle.length < 2 || !reader.chapterID) {
     if (content.classList.contains("is-searching-reader")) await restoreReaderAfterSearch(panel, reader);
     return;
   }
   if (!content.classList.contains("is-searching-reader")) {
-    panel._readerSearchReturnPosition ||= captureReaderScrollPositions().get(panel.dataset.paneId);
+    if (panel.isConnected) panel._readerSearchReturnPosition ||= captureReaderScrollPositions().get(panel.dataset.paneId);
   }
   const controller = new AbortController();
   panel._readerSearchAbort = controller;
@@ -19891,7 +20187,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       scope: chapterOnly ? "chapter" : "code"
     }), query);
   } catch {
-    if (panel.isConnected && panel.dataset.readerSearchToken === searchToken) {
+    if (current()) {
       emptyReader(content, "Search could not load", "Try again, or close find to return to the code text.");
       const retry = document.createElement("button");
       retry.type = "button";
@@ -19902,7 +20198,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
     }
     return;
   }
-  if (!panel.isConnected || panel.dataset.readerSearchToken !== searchToken) return;
+  if (!current()) return;
   clear(content);
 
   const results = document.createElement("section");
@@ -19953,6 +20249,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       reader.sectionNumber = result.sectionNumber || "";
       reader.title = result.title || "Reader";
       reader.internalSearchQuery = query;
+      reader.internalSearchOpen = false;
       reader.pendingSearchHighlightQuery = result.matchText;
       reader.pendingSearchHighlightBlockID = result.blockID || "";
       panel.dataset.pendingSearchHighlightQuery = result.matchText;
@@ -20129,7 +20426,7 @@ function isHeaderLikeTableRow(row) {
 }
 
 async function renderReader(reader, options = {}) {
-  options = { ...options, scrollPosition: options.scrollPosition || pendingGroupReaderPositions.get(reader.id) };
+  options = { ...options, scrollPosition: options.scrollPosition || pendingGroupReaderPositions.get(reader.id) || reader.scrollPosition };
   pendingGroupReaderPositions.delete(reader.id);
   // Import before wiring observers. A template clone belongs to its inert
   // document; observing it there before adoption can retain disposed Readers.
@@ -20153,6 +20450,20 @@ async function renderReader(reader, options = {}) {
     searchLinkedReadersBySearch()[recentlyViewedSearchID] === reader.id
   );
   const referenceSourceReader = state.readers.find((item) => item.id === reader.referenceSourceReaderID);
+  renderReaderTabs(panel, reader);
+  panel.dataset.readerDisplayedTabId = reader.activeTabID;
+  closeButton.title = "Close Reader column";
+  closeButton.setAttribute("aria-label", "Close Reader column");
+  let tabScrollTimer;
+  panel.querySelector('.reader-content').addEventListener('scroll', () => {
+    clearTimeout(tabScrollTimer);
+    const tabID = panel.dataset.readerTabId;
+    tabScrollTimer = window.setTimeout(() => {
+      if (!panel.isConnected || !state.readers.includes(reader) || reader.activeTabID !== tabID) return;
+      rememberReaderTabPosition(reader);
+      saveWorkspaceState();
+    }, 250);
+  }, { passive: true });
 
   if (reader.searchPreviewPaneID || reader.pinnedSearchPaneID || reader.pinnedDetailSourceID || searchIDForLinkedReaderPane(`reader:${reader.id}`)) {
     const keepButton = document.createElement("button");
@@ -20272,6 +20583,8 @@ async function renderReader(reader, options = {}) {
 
   internalSearchButton.addEventListener("click", async () => {
     const willOpen = internalSearchButton.getAttribute("aria-pressed") !== "true";
+    reader.internalSearchOpen = willOpen;
+    saveWorkspaceState();
     internalSearchButton.setAttribute("aria-pressed", String(willOpen));
     const visibility = setReaderSearchVisibility(internalSearchBox, willOpen);
     if (willOpen) {
@@ -20350,6 +20663,7 @@ async function renderReader(reader, options = {}) {
 
   const cancelConstruction = () => {
     panel._readerNavigationAbort?.abort();
+    cancelReaderInternalSearch(panel);
     panel.dataset.readerNavigationToken = `cancelled:${crypto.randomUUID()}`;
     panel.dataset.readerRenderToken = panel.dataset.readerNavigationToken;
     stopReaderProgressiveHydration(panel.querySelector(".reader-content"));
@@ -20361,6 +20675,12 @@ async function renderReader(reader, options = {}) {
       blankReader(panel.querySelector(".reader-content"));
     } else {
       await refreshReaderContent(panel, reader, { scrollPosition: options.scrollPosition });
+    }
+    if (reader.internalSearchOpen && !isRecentlyViewedLinkedReader) {
+      internalSearchButton.setAttribute("aria-pressed", "true");
+      internalSearchBox.hidden = false;
+      panel._readerSearchReturnPosition = reader.scrollPosition;
+      await renderReaderInternalSearchResults(panel, reader, reader.internalSearchQuery || "", { allowDetached: true });
     }
     return panel;
   } finally {
@@ -30533,6 +30853,13 @@ async function renderProjectNotebook(project, options = {}) {
     summary: () => activeCard,
     hasPendingEdits: () => dirty || saveConflict,
     persistDraft: persistFocusedDraft,
+    async persistForNavigation() {
+      let revision;
+      do {
+        revision = notebookRevision;
+        await persistFocusedDraft();
+      } while (notebookRevision !== revision);
+    },
     async syncDraft() { return flushNotebookAutosave(); },
     activeCardID() {
       return activeCard?.id || "";
@@ -33105,19 +33432,13 @@ async function renderProjectReportDraft(project, resume = null) {
     };
 
     const projectFactsSources = sources.filter((source) => source.kind === "projectFacts" && !source.hiddenFromPicker);
-    appendSourceGroup("Project", "", (groupBody) => {
-      for (const [section, label] of [["context", "Context"], ["facts", "Facts"]]) {
-        const group = document.createElement("details");
-        group.className = "report-project-source-section";
-        const title = document.createElement("summary");
-        title.textContent = label;
-        group.append(title);
+    for (const [section, label] of [["context", "Context"], ["facts", "Facts"]]) {
+      appendSourceGroup(label, "", (groupBody) => {
         const items = projectFactsSources.filter(source => (source.projectSection || (source.id.endsWith(":context") ? "context" : "facts")) === section);
-        items.forEach(source => appendSourceCard(group, source));
-        if (!items.length) { const empty = document.createElement("p"); empty.textContent = `No ${label.toLowerCase()} added yet.`; group.append(empty); }
-        groupBody.append(group);
-      }
-    });
+        items.forEach(source => appendSourceCard(groupBody, source));
+        if (!items.length) { const empty = document.createElement("p"); empty.textContent = `No ${label.toLowerCase()} added yet.`; groupBody.append(empty); }
+      });
+    }
 
     for (const [kind, label] of [["evidence", "Evidence"], ["notebookCard", "Notes"]]) {
       appendSourceGroup(label, "", body => {
@@ -33811,6 +34132,7 @@ async function renderProjectReportDraft(project, resume = null) {
     panel._updateReportColumns();
     panel._columnExpansion = createColumnExpansion({
       host: columns, columns: () => [library, outline, documentBody, comparison.preview, comparison.versions],
+      menu: node => node !== library && node !== outline,
       label: node => node === library ? 'Sources' : node === outline ? 'Outline' : node === documentBody ? 'Report' : node === comparison.preview ? 'PDF' : 'Versions',
       key: node => node.className.split(' ')[0], minimumWidth: () => 300
     });
@@ -36401,7 +36723,9 @@ async function openProjectSavedSection(project, item, anchorPaneID = primarySave
   };
   let reader = (state.readers || []).find((candidate) => candidate.projectSavedSourceKey === projectKey)
     || (!isProAccount() ? state.readers[0] : null);
+  if (!reader && isProAccount()) reader = state.readers.find(candidate => Array.isArray(candidate.tabs) && workflowPaneIsVisible(paneIDForReader(candidate)));
   if (reader) {
+    if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, readerFields);
     Object.assign(reader, readerFields);
   } else {
     reader = newReaderState(readerFields);
@@ -40308,12 +40632,14 @@ async function openDeepLinkedSectionInReader(item) {
   const detail = searchResultDetail(navigationItem);
   let reader = (state.readers || []).find((candidate) => candidate.codePrefix === detail.codePrefix)
     || (!isProAccount() ? state.readers[0] : null);
+  if (!reader && isProAccount()) reader = state.readers.find(candidate => Array.isArray(candidate.tabs) && workflowPaneIsVisible(paneIDForReader(candidate)));
   if (!reader) {
     reader = newReaderState(readerFieldsForSectionDetail(detail, {
       shouldSmoothScrollToSection: false
     }));
     state.readers.push(reader);
   } else {
+    if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, readerFieldsForSectionDetail(detail));
     Object.assign(reader, readerFieldsForSectionDetail(detail, {
       shouldSmoothScrollToSection: false
     }));
@@ -40565,6 +40891,10 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (!reader && anchorPaneID && options.sourceSurface !== "search") {
     reader = visibleReaders.find((candidate) => candidate.sourceAnchorPaneID === anchorPaneID);
   }
+  if (!options.forceNewReader && isProAccount() && !reader) {
+    const columns = visibleReaders.filter(candidate => Array.isArray(candidate.tabs));
+    reader = columns.find(candidate => paneIDForReader(candidate) === readerShortcuts?.activePaneID()) || columns[0] || null;
+  }
   if (!reader) {
     if (isProAccount() || state.readers.length < 1) {
       reader = newReaderState(sourceFields);
@@ -40580,6 +40910,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
       reader = replacement;
     }
   }
+  if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields);
   const retainedPanel = fromSearch && !options.forceNewReader ? retainReaderForSource(reader, detail) : null;
   Object.assign(reader, sourceFields);
   resolvedReaderSourceNavigations.set(reader, {chapterID: reader.chapterID, sectionID: reader.sectionID,
@@ -40587,7 +40918,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (fromSearch) reader.searchPreviewPaneID = options.forceNewReader ? "" : anchorPaneID;
   const paneID = paneIDForReader(reader);
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
-  if (anchorPaneID && anchorPaneID !== paneID) placePaneAfter(anchorPaneID, paneID);
+  if (anchorPaneID && anchorPaneID !== paneID && !Array.isArray(reader.tabs)) placePaneAfter(anchorPaneID, paneID);
   else appendPaneIfMissing(paneID);
   if (reader.sectionID) updateBrowserSectionURL(reader.sectionID);
   scheduleContinuitySync(reader);
@@ -44384,19 +44715,26 @@ function clearDragPreviewOrder() {
 function bindPaneDragging(panes) {
   panes.forEach((pane) => {
     const header = pane.querySelector(":scope > header");
+    const tabRow = pane.classList.contains('reader-panel') ? pane.querySelector(":scope > .reader-column-tabs") : null;
+    const dragArea = tabRow || header;
     if (pane.classList.contains('notebook-index-panel')) {
       if (header) header.removeAttribute('title');
       return;
     }
-    if (header) {
+    if (header && tabRow) {
+      header.classList.remove("pane-header-drag-area");
+      header.removeAttribute("draggable");
+      header.removeAttribute("title");
+    } else if (header) {
       header.classList.add("pane-header-drag-area");
       header.title = paneCanCollapse(pane.dataset.paneId) ? "Drag to move · Click title to collapse" : "Drag to move";
     }
-    pane.querySelectorAll(".pane-header-drag-area, .pane-collapsed-tab, :scope > .pane-drag-handle").forEach((handle) => {
+    if (tabRow) tabRow.title = "Drag to move column";
+    pane.querySelectorAll(".reader-column-tabs, .pane-header-drag-area, .pane-collapsed-tab, :scope > .pane-drag-handle").forEach((handle) => {
       if (handle.dataset.dragBound === "true") return;
       handle.dataset.dragBound = "true";
       handle.draggable = true;
-      if (handle === header) {
+      if (handle === dragArea) {
         // Native dragstart targets the draggable ancestor, so remember where
         // the pointer actually started before allowing a header drag.
         handle.addEventListener("pointerdown", (event) => {
@@ -44405,7 +44743,7 @@ function bindPaneDragging(panes) {
       }
 
       handle.addEventListener("dragstart", (event) => {
-        if (handle === header && handle._dragFromControl) {
+        if (handle === dragArea && handle._dragFromControl) {
           event.preventDefault();
           return;
         }
@@ -44741,7 +45079,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
 
 function notifyWorkspaceLayoutChange() {
   syncReferenceReaderLayout();
-  track.dispatchEvent(new Event("permitext:workspace-layout-change"));
+  track.dispatchEvent(new Event("permitext:workspace-layout-change", { bubbles: true }));
 }
 
 function ensureWorkspacePanelAccessibleName(panel) {
@@ -45065,6 +45403,7 @@ function focusColumnGroupControl(group) {
 }
 
 function prepareColumnGroupControls(panel, header, group) {
+  header = panel.querySelector('.reader-column-tabs .panel-actions') || header;
   if (panel.classList.contains('notebook-panel') || panel.classList.contains('notebook-index-panel')) {
     header.querySelector('.column-group-menu-button')?.remove();
     panel.querySelector('.column-group-collapsed-menu')?.remove();
@@ -45205,6 +45544,14 @@ function openColumnGroupMenu(panel, anchor) {
   }
   if (panel.classList.contains("reader-panel")) {
     separate();
+    if (pro) {
+      const reader = state.readers.find(item => item.id === panel.dataset.readerId);
+      if (reader) {
+        add("Add code tab", () => openReaderTabPicker(reader, anchor), !canAddReaderTab(reader));
+        add("Duplicate in new column", () => transferReaderTab(reader, reader.activeTabID, { duplicate: true }));
+        add("Move tab to new column", () => transferReaderTab(reader, reader.activeTabID), readerTabs(reader).length < 2);
+      }
+    }
     if (pro) add("Change Code", () => openReaderCodePicker(anchor, async (code) => {
       const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
       if (reader && panel.isConnected) await changeReaderCode(panel, reader, code);
@@ -45510,7 +45857,7 @@ function preparePaneCollapse(panel) {
   if (!header || detachedProjectWindow) return;
   if (panel.classList.contains("reader-panel")) {
     const reader = state.readers.find(item => paneIDForReader(item) === panel.dataset.paneId);
-    if (reader) updateReaderLocationTitle(panel, reader);
+    if (reader && !panel.dataset.readerTabPending) updateReaderLocationTitle(panel, reader);
   }
   if (!paneCanCollapse(panel.dataset.paneId)) {
     panel._collapseAnimation?.cancel();
@@ -45584,7 +45931,8 @@ function preparePaneCollapse(panel) {
     });
     panel.append(rail);
   }
-  const headerClose = header.querySelector("button[class*='close']");
+  const closeControls = panel.querySelector('.reader-column-tabs .panel-actions') || header;
+  const headerClose = closeControls.querySelector("button[class*='close']");
   let collapsedClose = panel.querySelector(":scope > .pane-collapsed-close");
   if (headerClose) {
     if (!collapsedClose) {
@@ -45593,7 +45941,7 @@ function preparePaneCollapse(panel) {
       collapsedClose.className = "icon-button pane-collapsed-close";
       collapsedClose.addEventListener("click", (event) => {
         event.stopPropagation();
-        header.querySelector("button[class*='close']")?.click();
+        closeControls.querySelector("button[class*='close']")?.click();
       });
       panel.append(collapsedClose);
     }
@@ -45767,8 +46115,10 @@ function readerShortcutItems() {
       : String(reader.codeEdition || version.match(/\b(?:19|20)\d{2}\b/)?.[0] || "Current");
     const chapter = panel.querySelector(".chapter-select")?.selectedOptions?.[0]?.textContent || "";
     const section = reader.sectionNumber ? sectionDisplayTitle(reader.sectionNumber, reader.title, "") : reader.title;
-    return [{ id, prefix, edition, name, theme: code?.theme || "current-consolidation",
-      location: [...new Set([chapter, section].filter(value => value && value !== "Reader"))].join(" · ") }];
+    const tabs = readerTabs(reader);
+    return [{ id, prefix, edition, name: readerPositionLabel(reader), label: readerPositionLabel(reader), column: true,
+      theme: code?.theme || "current-consolidation",
+      location: [name, `${tabs.length} ${tabs.length === 1 ? 'tab' : 'tabs'}`, ...new Set([chapter, section].filter(value => value && value !== "Reader"))].join(" · ") }];
   });
 }
 
@@ -49279,7 +49629,7 @@ function whenWorkspacePaneReady(paneID) {
   const pane = Array.from(track.querySelectorAll(":scope > .workspace-panel"))
     .find((candidate) => candidate.dataset.paneId === paneID);
   if (!pane) return Promise.resolve(false);
-  if (!pane.dataset.workspacePaneLoading) return Promise.resolve(true);
+  if (!pane.dataset.workspacePaneLoading && !pane.dataset.readerTabPending) return Promise.resolve(true);
   if (pane.dataset.workspacePaneUnavailable === "true") return Promise.resolve(false);
   return new Promise((resolve) => workspacePaneReadyWaiters.add({
     shell: pane, workspaceID: activeWorkspaceID, identity: captureAccountRequest(), resolve
@@ -49539,6 +49889,7 @@ function getWorkspacePaneHydrator() {
       bindPaneDragging([pane]);
       pane.classList.toggle("is-workflow-hidden", !workflowPaneIsVisible(job.id));
       shell.replaceWith(pane);
+      if (shell.dataset.readerTabPending) disposeUnpublishedWorkspacePane(shell);
       // The new header is prepared above; retained editors and menus need no rebuild.
       refreshColumnGroupPresentation({ preparePanels: false });
       if (job.id === activePinnedPaneID()) refreshPinnedPaneDivider();
@@ -49568,6 +49919,11 @@ function getWorkspacePaneHydrator() {
       if (!shell?.isConnected) return;
       shell.setAttribute("aria-busy", "false");
       shell.dataset.workspacePaneUnavailable = "true";
+      if (shell.dataset.readerTabPending) {
+        finishWorkspacePaneReady(shell, false);
+        void showWebNotice('Reader could not open', 'Select the tab again to retry, or choose another tab.');
+        return;
+      }
       shell.querySelector(".workspace-pane-load-status").textContent = `Could not load ${job.descriptor.label}. Retry when ready.`;
       shell.querySelector(".workspace-pane-retry").hidden = false;
       finishWorkspacePaneReady(shell, false);
@@ -49691,8 +50047,10 @@ function workspacePaneDescriptors(options = {}) {
   if (state.utilities.calculator) add("utility:calculator", "Calculator", renderCalculatorColumn, closeCalculatorColumn, { ownerClass: "calculator-panel", accessCapabilities: ["notebook", "research"] });
   if (state.utilities.settings) add("utility:settings", "Settings", renderSettings, closeAndRender(() => { state.utilities.settings = false; }));
   for (const reader of state.readers) {
+    initializeReaderTabs(reader);
     const id = paneIDForReader(reader);
-    add(id, "Reader", (signal) => renderReader(reader, { scrollPosition: options.readerScrollPositions?.get(id), accessGate: options.accessGate, signal }), closeAndRender(() => {
+    const scrollPosition = options.readerScrollPositions?.get(id) || reader.scrollPosition;
+    add(id, "Reader", (signal) => renderReader(reader, { scrollPosition, accessGate: options.accessGate, signal }), closeAndRender(() => {
       state.readers = state.readers.filter((item) => item.id !== reader.id);
       state.readers.forEach((item) => { if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = ""; });
       Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
@@ -49701,7 +50059,7 @@ function workspacePaneDescriptors(options = {}) {
     }), {
       publicContent: true,
       identity: workspaceReaderContentIdentity(reader),
-      scrollPosition: options.readerScrollPositions?.get(id)
+      scrollPosition
     });
   }
   foundationScope.release("");
@@ -49735,12 +50093,16 @@ async function mountWorkspacePanesIndependently(context, options = {}) {
     const privateBlocked = !descriptor.publicContent && options.accessGate && !options.accessGate.allowed;
     const reusable = pane && !pane.classList.contains("workspace-switch-placeholder") &&
       !(privateBlocked && !pane.dataset.workspacePaneLoading) && !refresh.has(descriptor.id) && sameIdentity;
-    if (reusable && !pane.dataset.workspacePaneLoading) {
+    if (reusable && !pane.dataset.workspacePaneLoading && !pane.dataset.readerTabPending) {
       descriptor.foundationScope?.release(descriptor.id);
       descriptor.existing = pane;
       if (descriptor.publicContent && options.accessGate && !options.accessGate.allowed) maskUnverifiedWorkspacePane(pane);
     }
-    descriptor.placeholder = reusable ? pane : createWorkspacePaneLoadingShell(descriptor);
+    const retainingReaderTab = pane?.classList.contains('reader-panel') && pane.querySelector('.reader-content') &&
+      (options.readerTabSwitchPaneID === descriptor.id || pane.dataset.readerTabPending);
+    const reader = retainingReaderTab && state.readers.find(item => paneIDForReader(item) === descriptor.id);
+    descriptor.placeholder = reader ? retainReaderPaneForTabSwitch(pane, reader)
+      : reusable ? pane : createWorkspacePaneLoadingShell(descriptor);
     if (refresh.has(descriptor.id) && descriptor.id === "utility:settings") descriptor.scrollTop = pane?.scrollTop;
     applyPaneWeight(descriptor.placeholder, descriptor.id);
   }

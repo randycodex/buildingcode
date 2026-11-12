@@ -1909,7 +1909,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 }
 
 .reader-panel {
-  --pane-min-width: 400px;
+  --pane-min-width: 630px;
   max-width: none;
   --reader-header-overlay-height: calc(var(--panel-control-row-top) + 40px);
   --reader-scrollbar-rail-width: 0px;
@@ -1921,7 +1921,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   grid-template-rows: minmax(0, 1fr);
 }
 
-.panel-track[data-research-column-sizing] > .reader-panel:not(.is-collapsed) { --pane-min-width: 600px; }
+.panel-track[data-research-column-sizing] > .reader-panel:not(.is-collapsed) { --pane-min-width: 630px; }
 .search-panel { max-width: 900px; }
 
 .workspace-panel.reader-panel:not(.is-collapsed) {

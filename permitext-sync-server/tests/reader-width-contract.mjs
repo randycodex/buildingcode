@@ -40,13 +40,13 @@ function layout(id, ids, storedWidth = 600, linked = false, collapsed = false) {
 }
 for (const storedWidth of [350, 400, 520, 600, 900, 1000]) {
   for (const linked of [false, true]) {
-    assert.equal(layout('reader:a', ['reader:a'], storedWidth, linked).flex, `0 0 ${Math.max(600, storedWidth)}px`, 'Readers retain manual widths above 900px, including source-linked Readers');
+    assert.equal(layout('reader:a', ['reader:a'], storedWidth, linked).flex, `0 0 ${Math.max(630, storedWidth)}px`, 'Readers retain manual widths above 900px, including source-linked Readers');
   }
 }
 for (const ids of [['reader:a','reader:b'], ['reader:a','reader:b','reader:c'], ['reader:a','utility:search']]) {
   const style = layout('reader:a', ids);
-  assert.equal(style.flex, '0 0 600px');
-  assert.equal(style['--pane-default-min-width'], '600px', 'Research Readers stop shrinking at 600px');
+  assert.equal(style.flex, '0 0 630px');
+  assert.equal(style['--pane-default-min-width'], '630px', 'Research Readers stop shrinking at 630px');
 }
 assert.equal(layout('reader:a', ['reader:a','reader:b'], 900).flex, '0 0 900px', 'Small layouts retain the chosen Reader width');
 assert.equal(layout('reader:a', ['reader:a','reader:b','utility:search','utility:saved'], 900).flex, '0 0 900px', 'Saved divider widths remain visible when the workspace overflows');
@@ -65,7 +65,7 @@ for (const id of mainPaneIDs) {
   const search = /^utility:search(?::|$)/.test(id);
   const evidence = /^utility:saved(?::|$)/.test(id);
   const fixedBasis = reader || search || evidence;
-  const minimum = evidence ? 300 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
+  const minimum = reader ? 630 : evidence ? 300 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
   const maximum = evidence ? 600 : search ? 900 : Infinity;
   for (const count of [1, 2, 3, 4, 8]) {
     const ids = [id, ...Array.from({ length: count - 1 }, (_, index) => `reader:other-${index}`)];
@@ -85,7 +85,7 @@ for (const id of mainPaneIDs) {
   assert.equal(layout(id, [id], 600, false, true).flex, '0 0 48px', `${id} keeps its collapsed width`);
 }
 for (workflow of ['notebook', 'project-details']) {
-  assert.equal(layout('reader:a', ['reader:a'], 400).flex, '0 0 400px', `${workflow} retains the reference Reader minimum`);
+  assert.equal(layout('reader:a', ['reader:a'], 400).flex, '0 0 630px', `${workflow} enforces the same Reader minimum`);
   assert.equal(layout('utility:search:instance', ['utility:search:instance'], 1200).flex, '0 0 900px', 'Repeated Search columns also respect their resize maximum');
 }
 workflow = 'research';
@@ -107,11 +107,11 @@ context.state.utilityInstances[0].conversationID='selected';
 assert.equal(context.minimumPaneWidthForID('utility:analysis:instance'),920,'Selected chat retains a 600px message column beside conversation history.');
 console.log('Main column minimums passed: all main kinds, repeated utilities, saved narrow/wider widths, one through eight columns, and collapse.');
 for (const invalidWidth of [NaN, 0, -1]) {
-  assert.equal(layout('reader:a', ['reader:a'], invalidWidth).flex, '0 0 600px', 'A missing or invalid Reader width uses the 600px default');
+  assert.equal(layout('reader:a', ['reader:a'], invalidWidth).flex, '0 0 630px', 'A missing or invalid Reader width uses the 630px default');
 }
-assert.equal(context.defaultPaneWidthForID('reader:a'),600);
+assert.equal(context.defaultPaneWidthForID('reader:a'),630);
 const css = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
-assert.match(css, /\.reader-panel\s*\{\s*--pane-min-width: 400px;\s*max-width: none;/, 'CSS preserves manually resized Readers above 900px before and after mounting');
+assert.match(css, /\.reader-panel\s*\{\s*--pane-min-width: 630px;\s*max-width: none;/, 'CSS preserves manually resized Readers above 900px before and after mounting');
 assert.match(css, /--assistant-sidebar-width: 320px;[\s\S]*?grid-template-columns: var\(--assistant-sidebar-width\) minmax\(600px, 1fr\);/, 'The Assistant keeps its 320px conversation sidebar beside a flexible 600px-minimum conversation');
 assert.match(css, /--workspace-content-max-width: 800px;/, 'Workspace reading content retains the 800px measure');
 assert.match(css, /\.reader-content > \*[^{}]*\{[^}]*max-width: var\(--workspace-content-max-width\);[^}]*margin-right: auto;[^}]*margin-left: auto;/, 'Panel expansion must retain the shared centered text measure');

@@ -7,8 +7,8 @@ export function readerShortcutLabel({ prefix = '', edition = '' }) {
     : `${abbreviation} · ${edition || 'Current'}`;
 }
 
-// The toolbar owns only navigation controls. Reader DOM and saved state remain
-// with the existing independent columns and their navigation controller.
+// The toolbar navigates columns. Code tabs and their reading sessions live in
+// the Reader header rather than becoming additional toolbar shortcuts.
 export function createReaderShortcuts({ host, track, readers, context, reveal }) {
   const doc = host.ownerDocument;
   const win = doc.defaultView;
@@ -63,7 +63,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal })
     }
     const counts = new Map(), occurrences = new Map();
     for (const item of items) {
-      const label = readerShortcutLabel(item);
+      const label = item.label || readerShortcutLabel(item);
       counts.set(label, (counts.get(label) || 0) + 1);
     }
     items.forEach((item, index) => {
@@ -84,16 +84,16 @@ export function createReaderShortcuts({ host, track, readers, context, reveal })
         button.addEventListener('blur', hideTooltip);
         buttons.set(item.id, button);
       }
-      const label = readerShortcutLabel(item);
+      const label = item.label || readerShortcutLabel(item);
       const occurrence = (occurrences.get(label) || 0) + 1;
       occurrences.set(label, occurrence);
-      const name = item.name.includes(item.edition) || !item.edition ? item.name : `${item.name} (${item.edition})`;
+      const name = item.column || item.name.includes(item.edition) || !item.edition ? item.name : `${item.name} (${item.edition})`;
       const duplicate = counts.get(label) > 1 ? `Reader ${occurrence} of ${counts.get(label)}` : '';
       const description = [name, item.location || 'Code contents', duplicate].filter(Boolean).join(' · ');
-      button.className = `reader-shortcut code-theme-${item.theme}`;
+      button.className = `reader-shortcut code-theme-${item.theme}${item.column ? ' reader-column-shortcut' : ''}`;
       button.textContent = label;
       button.dataset.description = description;
-      button.setAttribute('aria-label', `Show ${name} Reader${item.location ? ` · ${item.location}` : ''}${duplicate ? ` · ${duplicate}` : ''}`);
+      button.setAttribute('aria-label', `Show ${name}${item.column ? '' : ' Reader'}${item.location ? ` · ${item.location}` : ''}${duplicate ? ` · ${duplicate}` : ''}`);
       // Moving only out-of-order nodes preserves a focused shortcut on updates.
       if (host.children[index] !== button) host.insertBefore(button, host.children[index] || null);
       if (tooltipButton === button) showTooltip(button);
