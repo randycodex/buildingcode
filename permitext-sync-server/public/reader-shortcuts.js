@@ -9,7 +9,7 @@ export function readerShortcutLabel({ prefix = '', edition = '' }) {
 
 // The toolbar navigates columns. Code tabs and their reading sessions live in
 // the Reader header rather than becoming additional toolbar shortcuts.
-export function createReaderShortcuts({ host, track, readers, context, reveal, move, preview, cancelPreview, tools = [] }) {
+export function createReaderShortcuts({ host, track, readers, context, reveal, move, preview, cancelPreview, renderIcon, tools = [] }) {
   const doc = host.ownerDocument;
   const win = doc.defaultView;
   const buttons = new Map();
@@ -234,6 +234,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
       button.className = `reader-shortcut code-theme-${item.theme}${item.column ? ' reader-column-shortcut' : ''}`;
       if (gesture?.active && gesture.id === item.id) button.classList.add('is-dragging');
       button.textContent = label;
+      if (item.iconName) renderIcon?.(button, item.iconName);
       button.dataset.description = description;
       button.setAttribute('aria-label', `Show ${name}${item.column ? '' : ' Reader'}${item.location ? ` · ${item.location}` : ''}${duplicate ? ` · ${duplicate}` : ''}`);
       // Moving only out-of-order nodes preserves a focused shortcut on updates.

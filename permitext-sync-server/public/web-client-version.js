@@ -1,4 +1,4 @@
-export const webAppVersion = "20261112-outline-tool-bubbles-v1694";
+export const webAppVersion = "20261112-tool-bubble-icons-v1695";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

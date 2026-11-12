@@ -1,4 +1,4 @@
-import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=7";
+import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=8";
 import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=3";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-outline-tool-bubbles-v1694";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-tool-bubble-icons-v1695";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=10";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-outline-tool-bubbles-v1694";
+} from "./offline-storage.js?v=20261112-tool-bubble-icons-v1695";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -46116,7 +46116,8 @@ function readerShortcutItems() {
         : id === 'utility:calculator' ? 'calculator' : '';
       const label = {search:'Search', analysis:'Assistant', calculator:'Calculator'}[toolKey] || columnPaneLabel(panel);
       const query = toolKey === 'search' ? panel.querySelector('.search-input')?.value?.trim() : '';
-      return {id, name:label, label, location:query || '', column:true, theme:'current-consolidation', toolKey};
+      return {id, name:label, label, location:query || '', column:true, theme:'current-consolidation', toolKey,
+        iconName:{search:'search', analysis:'astroid', calculator:'calculator'}[toolKey] || ''};
     }
     const prefix = String(reader.codePrefix || "BC").toUpperCase();
     const version = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(prefix));
@@ -46125,7 +46126,7 @@ function readerShortcutItems() {
     const chapter = panel.querySelector(".chapter-select")?.selectedOptions?.[0]?.textContent || "";
     const section = reader.sectionNumber ? sectionDisplayTitle(reader.sectionNumber, reader.title, "") : reader.title;
     const tabs = readerTabs(reader);
-    return { id, name:readerPositionLabel(reader), label:readerPositionLabel(reader), column:true,
+    return { id, name:readerPositionLabel(reader), label:readerPositionLabel(reader), column:true, iconName:"library-big",
       theme:code?.theme || "current-consolidation",
       location:[name, `${tabs.length} ${tabs.length === 1 ? 'tab' : 'tabs'}`, ...new Set([chapter, section].filter(value => value && value !== "Reader"))].join(" · ") };
   });
@@ -50661,7 +50662,7 @@ function bindImmediateUtilityControls() {
     host: shortcutHost, track, readers: readerShortcutItems,
     context: () => `${accountRuntimeGeneration}:${activeWorkspaceID}:${currentColumnWorkflowView()}`,
     reveal: revealReaderShortcut, move: moveWorkspaceColumnShortcut,
-    preview: previewWorkspaceColumnShortcut, cancelPreview: clearDragPreviewOrder,
+    preview: previewWorkspaceColumnShortcut, cancelPreview: clearDragPreviewOrder, renderIcon: prependWorkspaceButtonIcon,
     tools: [{button:toggleSearchButton,key:'search'}, {button:toggleAnalysisButton,key:'analysis'}, {button:toggleCalculatorButton,key:'calculator'}]
   });
   const updateBadge = document.querySelector("#project-update-badge");

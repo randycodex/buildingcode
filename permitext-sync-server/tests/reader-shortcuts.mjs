@@ -128,12 +128,18 @@ vm.runInContext(['readerShortcutItems','orderWithPaneMoved','previewWorkspaceCol
 const allReveals=[];
 const navigation=createReaderShortcuts({host:allHost,track:allTrack,readers:()=>appContext.readerShortcutItems(),context:()=>allContext,
   reveal:id=>allReveals.push(id),move:(...args)=>appContext.moveWorkspaceColumnShortcut(...args),
-  preview:(...args)=>appContext.previewWorkspaceColumnShortcut(...args),cancelPreview:()=>appContext.clearDragPreviewOrder(),tools:toolButtons});
+  preview:(...args)=>appContext.previewWorkspaceColumnShortcut(...args),cancelPreview:()=>appContext.clearDragPreviewOrder(),renderIcon(button,name){
+    button.querySelectorAll('svg').forEach(icon=>icon.remove());
+    const icon=doc.createElement('svg');icon.dataset.lucideIcon=name;icon.setAttribute('aria-hidden','true');
+    button.prepend(icon);button.classList.add('has-workspace-button-icon');
+  },tools:toolButtons});
 appContext.readerShortcuts=navigation;
 const order=()=>allHost.children.map(button=>button.dataset.readerPaneId);
 assert.deepEqual(order(),allIDs);
 assert.deepEqual(allHost.children.map(button=>button.textContent),['Reader 1','Search','Reader 2','Assistant','Calculator']);
 assert(toolButtons.every(({button})=>button.classList.contains('has-open-column')),'Open tools use bubbles instead of duplicate launchers.');
+assert.deepEqual(allHost.children.map(button=>button.querySelector('svg')?.dataset.lucideIcon),['library-big','search','library-big','astroid','calculator'],'Open bubbles retain the existing Reader and tool icons.');
+assert(allHost.children.every(button=>button.querySelector('svg').getAttribute('aria-hidden')==='true'),'Decorative icons keep the existing accessible labels.');
 assert(allHost.children.every(button=>!button.draggable),'Top bubbles disable native drag images.');
 allHost.getBoundingClientRect=()=>({left:0,top:24,width:450,height:26,bottom:50});
 for (const button of allHost.children) button.getBoundingClientRect=()=>{
@@ -190,6 +196,7 @@ const first=allHost.children[0];
 first.dispatch('keydown',{altKey:true,shiftKey:true,key:'ArrowRight',preventDefault(){}});
 assert.deepEqual(order(),['reader:b','reader:a','utility:search:s','utility:analysis:r','utility:calculator']);
 assert.equal(doc.activeElement,first);assert.equal(saves,2);
+assert(allHost.children.every(button=>button.querySelectorAll('svg').length===1 && button.classList.contains('has-workspace-button-icon')),'Refreshing and reordering retain one styled icon per bubble.');
 first.dispatch('pointerdown',pointer(130));doc.body.dispatch('pointermove',pointer(400));allContext='B:research';
 doc.body.dispatch('pointerup',pointer(400));assert.equal(saves,2,'Dragging across a Project change cannot mutate its layout.');assert.deepEqual(previewOrder,[]);
 first.dispatch('keydown',{altKey:true,shiftKey:true,key:'ArrowRight',preventDefault(){}});
