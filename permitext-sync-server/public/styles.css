@@ -11687,7 +11687,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   flex-direction: column;
   box-sizing: border-box;
   max-width: 600px;
-  height: min(600px, calc(100dvh - var(--header-height) - (var(--space-3) * 2)));
+  min-height: min(600px, calc(100dvh - var(--header-height) - (var(--space-3) * 2)));
+  height: auto;
 }
 
 .project-sheet-overlay:not(.is-inline) > .project-create-sheet:not(.is-reference-folder) > * {
@@ -11695,12 +11696,15 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .project-sheet-overlay:not(.is-inline) > .project-create-sheet:not(.is-reference-folder) > .project-sheet-field:has(> .project-description-input) {
-  flex: 1 0 86px;
+  flex: 1 1 auto;
   min-height: 86px;
 }
 
 .project-sheet-overlay:not(.is-inline) > .project-create-sheet:not(.is-reference-folder) .project-description-input {
   max-height: none;
+  field-sizing: content;
+  resize: none;
+  overflow-y: auto;
   font-weight: 400;
 }
 
