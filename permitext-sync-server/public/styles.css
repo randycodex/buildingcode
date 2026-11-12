@@ -11681,6 +11681,29 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   overscroll-behavior: contain;
 }
 
+/* Give project dialogs more context space without changing inline editors or saved collections. */
+.project-sheet-overlay:not(.is-inline) > .project-create-sheet:not(.is-reference-folder) {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 600px;
+  height: min(600px, calc(100dvh - var(--header-height) - (var(--space-3) * 2)));
+}
+
+.project-sheet-overlay:not(.is-inline) > .project-create-sheet:not(.is-reference-folder) > * {
+  flex-shrink: 0;
+}
+
+.project-sheet-overlay:not(.is-inline) > .project-create-sheet:not(.is-reference-folder) > .project-sheet-field:has(> .project-description-input) {
+  flex: 1 0 86px;
+  min-height: 86px;
+}
+
+.project-sheet-overlay:not(.is-inline) > .project-create-sheet:not(.is-reference-folder) .project-description-input {
+  max-height: none;
+  font-weight: 400;
+}
+
 .sheet-grabber {
   width: 48px;
   height: 5px;
