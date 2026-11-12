@@ -21441,7 +21441,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .account-screen .settings-workspace-scope { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
 .settings-workspace-scope span { display: block; color: var(--text-secondary); font-size: var(--settings-type-support); margin-bottom: 5px; }
 .settings-workspace-scope h3 { margin: 0; overflow-wrap: anywhere; font-size: var(--settings-type-body); line-height: 1.4; }
-.account-screen .settings-account-activity { border: 0; border-radius: 0; margin: 0; background: transparent; }
+.account-screen .settings-account-column > .settings-account-activity { padding-block: 20px; border-block: 1px solid var(--border); border-inline: 0; border-radius: 0; margin: 0; background: transparent; }
 .account-screen .settings-account-column-account > .settings-offline-card { margin-block: 20px; padding-top: 20px; border-top: 1px solid var(--border); border-radius: 0; background: transparent; }
 .settings-floating-panel .account-screen-header,
 .workspace-floating-panel .project-details-screen-header {
