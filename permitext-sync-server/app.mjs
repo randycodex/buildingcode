@@ -54,6 +54,7 @@ import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation, r
 import { captureTrash, restoreTrash, trashSummary, trashContents, trashBatchForWorkspace, trashBatchWithoutWorkspace } from "./trash-recovery.mjs";
 import {notebookTrashMetadata, isNotebookTrashArtifact, notebookTrashSummary, notebookTrashContents, planNotebookTrashMutation} from './notebook-trash.mjs';
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
+import { internalReviewArchivePolicy, internalReviewView } from "./internal-review-archive.mjs";
 import { emailSubscribersFromAccounts, postgresEmailSubscribers, emailSubscribersCSV } from "./email-subscribers.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
 import { buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction } from "./research-claim-applicability-review.mjs";
@@ -19907,9 +19908,13 @@ async function zoningReviewEvidence(testCase) {
   }));
 }
 
-async function handleInternalEvaluationData(request, response) {
+async function handleInternalEvaluationData(request, response, exportArchive = false) {
   const context = await authenticatedInternalBody(request, response);
   if (!context) return;
+  const view = exportArchive ? "archive" : context.body.reviewView || "active";
+  if (!["active", "archive"].includes(view)) { sendError(response, 400, "Choose the current review workspace or its archive."); return; }
+  const reset = internalReviewArchivePolicy();
+  if (exportArchive && !reset) { sendError(response, 404, "No review archive is configured in this environment."); return; }
   const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
   validateEvaluationDataset(dataset);
   const caseTimeline = JSON.parse(await readFile(join(evaluationRootPath, "case-history.json"), "utf8").catch((error) => {
@@ -19926,26 +19931,37 @@ async function handleInternalEvaluationData(request, response) {
   ]);
   const reviews = reviewStore.reviews;
   const feedbackRecords = storedFeedback.filter((item) => item.status === "candidate");
-  const zoningReviewCases = await Promise.all(zoningDataset.cases.map(async (testCase) => ({
+  const review = internalReviewView({ dataset, retrievalDataset, zoningDataset, caseTimeline,
+    runs, reviews, feedbackRecords, researchSpend }, reset, view);
+  if (exportArchive) {
+    const { researchSpend: _spending, feedbackQualitySpend: _cohort, ...contents } = review;
+    response.writeHead(200, { ...securityHeaders(), "content-type": "application/json; charset=utf-8",
+      "content-disposition": `attachment; filename="internal-review-archive-${reset.resetAt.slice(0, 10)}.json"`,
+      "cache-control": "no-store" });
+    response.end(JSON.stringify({ schemaVersion: 1, exportedAt: new Date().toISOString(), ...contents }, null, 2));
+    return;
+  }
+  const zoningReviewCases = await Promise.all(review.zoningDataset.cases.map(async (testCase) => ({
     ...testCase,
     selectedEvidence: await zoningReviewEvidence(testCase)
   })));
   sendJSON(response, 200, {
-    dataset,
-    caseTimeline,
-    retrievalDataset,
-    zoningDataset,
+    dataset: review.dataset,
+    caseTimeline: review.caseTimeline,
+    retrievalDataset: review.retrievalDataset,
+    zoningDataset: review.zoningDataset,
+    reviewArchive: review.reviewArchive,
     zoningReviewCases,
-    runs,
-    reviews,
-    runReviewStatuses: Object.fromEntries(runs.map((run) => [
+    runs: review.runs,
+    reviews: review.reviews,
+    runReviewStatuses: Object.fromEntries(review.runs.map((run) => [
       run.configuration.runID,
-      evaluationRunReviewStatus(run, reviews)
+      evaluationRunReviewStatus(run, review.reviews)
     ])),
-    feedbackCandidates: feedbackRecords,
-    feedbackRecords: feedbackRecords.map(record => ({ ...record, sourceRecords: feedbackSourceRecords(record),
+    feedbackCandidates: review.feedbackRecords,
+    feedbackRecords: review.feedbackRecords.map(record => ({ ...record, sourceRecords: feedbackSourceRecords(record),
       operation: researchSpend.operationMetrics.find(operation => operation.id === record.operationID) || null })),
-    feedbackQuality: feedbackQualityReport(feedbackRecords, researchSpend),
+    feedbackQuality: feedbackQualityReport(review.feedbackRecords, review.feedbackQualitySpend || researchSpend),
     researchSpend
   });
 }
@@ -34846,6 +34862,7 @@ const handlers = {
   "reports/files/upload": handleReportFileUpload,
   "reports/files/read": handleReportFileRead,
   "internal/evaluations/data": handleInternalEvaluationData,
+  "internal/evaluations/archive/export": (request, response) => handleInternalEvaluationData(request, response, true),
   "internal/evaluations/review": handleInternalEvaluationReview,
   "internal/evaluations/feedback/triage": handleInternalFeedbackTriage,
   "internal/evaluations/feedback/case": handleInternalFeedbackCase,

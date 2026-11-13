@@ -18,6 +18,48 @@ let selectedFeedbackCategory = "all";
 let lifetimeGrantData = { invitations: [], audit: [] };
 let lifetimeGrantLookup = null;
 let lifetimeGrantMessage = "";
+let reviewView = "active";
+
+const evaluationData = (view = reviewView) => internalRequest("/internal/evaluations/data", { reviewView: view });
+
+function renderReviewWorkspace() {
+  const panel = document.querySelector("#review-workspace"), archive = data.reviewArchive;
+  panel.hidden = !archive?.enabled;
+  if (!archive?.enabled) return;
+  panel.replaceChildren(element("h2", { text: reviewView === "archive" ? "Archived review material" : "Current review workspace" }));
+  const counts = archive.archivedCounts;
+  panel.append(element("p", { text: `Started fresh on ${new Date(archive.resetAt).toLocaleString()}. Archived: ${counts.feedback} feedback reports, ${counts.researchCases + counts.retrievalCases + counts.zoningCases} test cases, ${counts.reviews} reviews, and ${counts.runs} saved runs. Spending history, account access, and subscriber preferences are preserved.` }));
+  const actions = element("div", { className: "actions" }), status = element("p", { className: "meta" });
+  status.setAttribute("role", "status");
+  const toggle = element("button", { text: reviewView === "archive" ? "Return to current workspace" : "View archive" });
+  const download = element("button", { text: "Download archive backup" });
+  toggle.type = download.type = "button";
+  toggle.addEventListener("click", async () => {
+    toggle.disabled = download.disabled = true;
+    try {
+      const nextView = reviewView === "archive" ? "active" : "archive";
+      const next = await evaluationData(nextView);
+      data = next; reviewView = nextView;
+      selectedCaseID = selectedRetrievalCaseID = selectedZoningCaseID = "";
+      caseQuery = ""; caseStatus = reviewView === "archive" ? "all" : "needs-review";
+      queueViews.retrieval = queueViews.zoning = reviewView === "archive" ? "all" : "needs-review";
+      selectedFeedbackStatus = reviewView === "archive" ? "all" : "open";
+      selectedFeedbackCategory = "all";
+      renderAll();
+    } catch (error) { status.textContent = error.message; toggle.disabled = download.disabled = false; }
+  });
+  download.addEventListener("click", async () => {
+    download.disabled = true; status.textContent = "Preparing archive backup…";
+    try {
+      const response = await internalResponse("/internal/evaluations/archive/export");
+      const url = URL.createObjectURL(await response.blob()), link = element("a");
+      link.href = url; link.download = `internal-review-archive-${archive.resetAt.slice(0, 10)}.json`; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000); status.textContent = "Archive backup downloaded.";
+    } catch (error) { status.textContent = error.message; }
+    finally { download.disabled = false; }
+  });
+  actions.append(toggle, download); panel.append(actions, status);
+}
 
 function account() {
   try {
@@ -119,6 +161,7 @@ async function saveReview(values, formStatus) {
 }
 
 function reviewForm(testCase, options = {}) {
+  if (reviewView === "archive") return element("p", { className: "meta", text: "Archived review material is read-only." });
   const form = element("section", { className: "review-form" });
   const reviewKind = options.runID ? "run" : options.reviewKind || "case";
   form.append(element("h3", {
@@ -268,6 +311,10 @@ function caseDetail(testCase, options = {}) {
 }
 
 function renderCases() {
+  if (!data.dataset.cases.length) {
+    panels.cases.replaceChildren(element("article", { className: "card", text: "No Research cases in the current review workspace. Previous cases are available in the archive." }));
+    return;
+  }
   const previousListScroll = panels.cases.querySelector(".case-results")?.scrollTop || 0;
   const wrapper = element("div", { className: "split case-workspace" });
   const list = element("aside", { className: "card case-sidebar" });
@@ -401,6 +448,10 @@ function retrievalCaseDetail(retrievalCase) {
 
 function renderRetrievalCases() {
   const cases = data.retrievalDataset.cases;
+  if (!cases.length) {
+    panels.retrieval.replaceChildren(element("article", { className: "card", text: "No Retrieval cases in the current review workspace. Previous cases are available in the archive." }));
+    return;
+  }
   selectedRetrievalCaseID ||= queueCases(cases)[0]?.id || "";
   const wrapper = element("div", { className: "split" });
   wrapper.append(
@@ -457,6 +508,10 @@ function zoningCaseDetail(testCase) {
 
 function renderZoningCases() {
   const cases = data.zoningReviewCases;
+  if (!cases.length) {
+    panels.zoning.replaceChildren(element("article", { className: "card", text: "No Zoning cases in the current review workspace. Previous cases are available in the archive." }));
+    return;
+  }
   selectedZoningCaseID ||= queueCases(cases)[0]?.id || "";
   const wrapper = element("div", { className: "split" });
   wrapper.append(
@@ -590,7 +645,7 @@ function runResultCard(run, caseID) {
 function renderRuns() {
   const section = element("section");
   if (!data.runs.length) {
-    section.append(element("article", { className: "card", text: "No paid evaluation run has been saved yet. The runner remains locked until spending is explicitly approved." }));
+    section.append(element("article", { className: "card", text: "No evaluation runs in this review workspace." }));
     panels.runs.replaceChildren(section);
     return;
   }
@@ -695,6 +750,10 @@ function renderFeedbackItem(feedback) {
       element("p", { text: feedback.triageNotes }),
       element("p", { className: "meta", text: `${feedback.triagedBy || "Unknown reviewer"} · ${feedback.triagedAt || "Unknown date"}` })
     );
+  }
+  if (reviewView === "archive") {
+    item.append(element("p", { className: "meta", text: "Archived feedback is read-only." }));
+    return item;
   }
   const form = element("section", { className: "review-form" });
   form.append(element("h3", { text: "Owner triage" }));
@@ -830,7 +889,7 @@ function renderFeedback() {
   const quality = data.feedbackQuality;
   if (quality) {
     const report = element("section", { className: "card" });
-    report.append(element("h3", { text: "Tester outcomes this month" }), element("p", { text: `${quality.ratedAnswers} rated answers: ${quality.usableAsIs} usable as written, ${quality.neededCorrection} needing correction, ${quality.notUsable} not usable.` }),
+    report.append(element("h3", { text: data.reviewArchive?.enabled && reviewView === "active" ? "Tester outcomes since reset" : "Tester outcomes this month" }), element("p", { text: `${quality.ratedAnswers} rated answers: ${quality.usableAsIs} usable as written, ${quality.neededCorrection} needing correction, ${quality.notUsable} not usable.` }),
       element("p", { text: `Outside checking: ${quality.outsideChecking.none} none, ${quality.outsideChecking.brief} brief, ${quality.outsideChecking.substantial} substantial.` }),
       element("p", { text: `Rating coverage: ${quality.ratedCompletedTurns}/${quality.completedTurns} completed live turns. Failed or cancelled turns: ${quality.failedTurns}.` }),
       element("p", { text: `Estimated API cost per usable answer: ${quality.estimatedCostPerUsableAnswerUSD == null ? "Not established — incomplete ratings or cost data" : `$${quality.estimatedCostPerUsableAnswerUSD.toFixed(4)}`}` }),
@@ -1301,6 +1360,7 @@ function renderActiveTab() {
 
 function renderAll() {
   renderSummary();
+  renderReviewWorkspace();
   renderedTabs.clear();
   renderActiveTab();
   tabs.hidden = false;
@@ -1308,7 +1368,7 @@ function renderAll() {
 }
 
 async function refreshEvaluations() {
-  data = await internalRequest("/internal/evaluations/data");
+  data = await evaluationData();
   renderSummary();
   // Keep the live review form, notes, focus, and scroll in place.
   renderedTabs.clear();
@@ -1339,7 +1399,7 @@ async function refreshEvaluations() {
 async function loadData() {
   try {
     [data, lifetimeGrantData] = await Promise.all([
-      internalRequest("/internal/evaluations/data"),
+      evaluationData(),
       internalRequest("/internal/lifetime-grants/data")
     ]);
     renderAll();

@@ -38,6 +38,10 @@ main { width: min(1440px, 100%); margin: auto; padding: 28px clamp(20px, 4vw, 56
 }
 
 .notice { padding: 14px 16px; color: #c7c4be; line-height: 1.45; }
+.review-workspace { margin-top: 16px; }
+.review-workspace h2 { margin: 0 0 8px; font-size: 18px; }
+.review-workspace p { margin: 8px 0 12px; }
+.review-workspace p:empty { display: none; }
 .status { padding: 16px; }
 .status.is-error { border-color: #8c2f2f; color: #ffb4ab; }
 

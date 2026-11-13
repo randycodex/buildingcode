@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:internal-review-reset": "node tests/internal-review-reset.mjs && node tests/research-feedback-contract.mjs && node tests/research-economics-persistence-contract.mjs && node tests/research-trust-boundary-contract.mjs",
     "test:reader-tabs": "node tests/reader-tabs.mjs && node tests/reader-tab-switch.mjs && node tests/reader-shortcuts.mjs && node tests/reader-add-critical-path-contract.mjs && node tests/reader-workspace-normalization-contract.mjs && node tests/search-reader-reuse-contract.mjs && node tests/reader-reference-repeat-contract.mjs && node tests/reader-search-recovery-contract.mjs && node tests/offline-shell-coherence.mjs",
     "test:research-bulk-delete:postgres": "node tests/research-bulk-delete-postgres.mjs",
     "test:research-bulk-delete": "node tests/research-bulk-delete.mjs && node tests/research-delete-controls.mjs && node tests/research-conversation-deletion-contract.mjs && node tests/research-history-pagination.mjs && node tests/offline-shell-coherence.mjs",
