@@ -102,3 +102,12 @@ welcome.detachedProjectWindow = false;
 welcome.isProAccount = () => true;
 assert.equal(welcome.shouldShowFirstUseWelcome(), false, 'An existing Pro workspace keeps its own empty state');
 console.log('Free access passed: blocked tools and workspace actions, restored panes, one-reader limit, Pro readers, and return home after closing.');
+
+// Notebook reuses one Reader launcher as its open-state indicator. Research
+// Readers must not make that Notebook control look open.
+{
+ pro=true;const attrs={},classes=new Map(),readerLabel={};
+ const notebookButton={id:'add-notebook-reader',dataset:{},querySelector:()=>readerLabel,classList:{toggle:(name,on)=>classes.set(name,on)},setAttribute:(name,value)=>attrs[name]=value};
+ state.workflowMembership={};c.syncReaderToolbarButton(notebookButton);assert.equal(attrs['aria-pressed'],'false');assert.equal(classes.get('has-open-reader'),false);assert.equal(readerLabel.textContent,'Reader');
+ state.workflowMembership={'reader:first':['notebook']};c.syncReaderToolbarButton(notebookButton);assert.equal(attrs['aria-pressed'],'true');assert.equal(classes.get('has-open-reader'),true);assert.equal(readerLabel.textContent,'Reader');assert.equal(notebookButton.title,'Show Notebook Reader');
+}

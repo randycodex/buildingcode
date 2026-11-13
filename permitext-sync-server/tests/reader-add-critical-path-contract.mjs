@@ -111,9 +111,9 @@ console.log('Readers passed: explicit source selection, four working views, proj
  await Promise.all([f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({})]);
  const pending=f.pickers.map(pick=>pick(code));assert.equal(f.c.state.readers.length,1);assert.equal(readerTabs(f.c.state.readers[0]).length,3);
  f.finishRender();await Promise.all(pending);
- for(let index=0;index<3;index++){await f.c.openReaderFromToolbar({});await f.pickers.at(-1)({prefix:'BC',version:'2022'});}
+ for(let index=0;index<3;index++)addReaderTab(f.c.state.readers[0],{codePrefix:'BC',codeVersion:'2022'},`extra-${index}`);
  assert.equal(readerTabs(f.c.state.readers[0]).length,6);assert.equal(f.c.state.readers.length,1);
  const before=JSON.stringify(f.c.state);let notices=0;f.c.showWebNotice=async()=>notices++;
- assert.equal(await f.c.openReaderFromToolbar({}),false);assert.equal(notices,1);assert.equal(JSON.stringify(f.c.state),before);
+ const pickerCount=f.pickers.length;assert.equal(await f.c.openReaderFromToolbar({}),true);assert.equal(notices,0);assert.equal(f.pickers.length,pickerCount,'The existing Notebook Reader button focuses its column without creating a picker or duplicate bubble');assert.equal(JSON.stringify(f.c.state),before);
 }
-console.log('Notebook launcher passed: one column, concurrent picker safety, six independent tabs and no replacement/overflow at capacity.');
+console.log('Notebook launcher passed: one control/column, concurrent picker safety, six independent tabs and focus without replacing tabs.');

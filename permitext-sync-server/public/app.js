@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-notebook-reader-tabs-v1730";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-shared-tool-outline-v1731";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-notebook-reader-tabs-v1730";
+} from "./offline-storage.js?v=20261112-shared-tool-outline-v1731";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -5891,9 +5891,6 @@ function syncWorkflowNavigation() {
   });
   document.querySelectorAll('[data-workflow-tools]').forEach(tools => { tools.hidden = tools.dataset.workflowTools !== view; });
   document.querySelectorAll('[data-saved-reader-action]').forEach(button => { button.textContent = view === 'notebook' ? 'New Reader tab' : 'New reader'; });
-  const shortcutHost = document.querySelector('#reader-shortcuts');
-  const readerTools = document.querySelector(`[data-workflow-tools="${view}"] .reader-toolbar-tools`);
-  if (shortcutHost && readerTools && shortcutHost.parentElement !== readerTools) readerTools.append(shortcutHost);
   syncReferenceReaderLayout();
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   updateWorkspaceLayoutControls();
@@ -10218,12 +10215,15 @@ function syncReaderToolbarButton(button) {
   const requiresProject = workspaceColumnsRequireProject();
   const replacesReader = !pro && state.readers.length >= 1;
   const readerLabel = "Reader";
-  button.querySelector("span").textContent = pro ? `${readerLabel} +` : readerLabel;
+  const notebookButton = button.id === 'add-notebook-reader';
+  const notebookOpen = notebookButton && pro && state.readers.some(reader => state.workflowMembership?.[`reader:${reader.id}`]?.includes('notebook'));
+  button.querySelector("span").textContent = pro && !notebookButton ? `${readerLabel} +` : readerLabel;
+  if (notebookButton) button.setAttribute('aria-pressed', String(Boolean(notebookOpen)));
   button.dataset.mobileLabel = readerLabel;
   button.hidden = button.id === "free-reader" ? pro || state.readers.length === 0 : !pro;
   button.disabled = false;
-  button.title = requiresProject ? "Choose a workspace first to open Reader" : button.id === 'add-notebook-reader' ? 'Choose a code tab for the Notebook Reader' : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader as the first column" : "Choose a code for Reader";
-  button.classList.toggle("has-open-reader", state.readers.length > 0);
+  button.title = requiresProject ? "Choose a workspace first to open Reader" : notebookButton ? notebookOpen ? 'Show Notebook Reader' : 'Open Notebook Reader' : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader as the first column" : "Choose a code for Reader";
+  button.classList.toggle("has-open-reader", notebookButton ? Boolean(notebookOpen) : state.readers.length > 0);
   button.setAttribute("aria-label", readerLabel);
 }
 
@@ -10274,9 +10274,9 @@ async function openReaderFromToolbar(button) {
   const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     currentColumnWorkflowView() === view && (state.workflowNavigationGeneration || 0) === generation;
   const notebookReader = view === 'notebook' && state.readers.find(reader => workflowPaneIsVisible(paneIDForReader(reader)));
-  if (notebookReader && !canAddReaderTab(notebookReader)) {
-    await showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
-    return false;
+  if (notebookReader) {
+    scrollPaneIntoView(paneIDForReader(notebookReader));
+    return true;
   }
   openReaderCodePicker(button, async code => {
     if (!isCurrent() || workspaceColumnsRequireProject()) return;
@@ -46302,11 +46302,9 @@ function appendPaneSequence(panes) {
 }
 
 function readerShortcutItems() {
-  if (!isProAccount()) return [];
+  if (!isProAccount() || currentColumnWorkflowView() === 'notebook') return [];
   const byID = new Map((state.readers || []).map(reader => [paneIDForReader(reader), reader]));
-  const notebookView = currentColumnWorkflowView() === 'notebook';
-  const items = [...track.querySelectorAll(":scope > .workspace-panel")].filter(panel => panel.dataset.paneId && workflowPaneIsVisible(panel.dataset.paneId) &&
-    (!notebookView || byID.has(panel.dataset.paneId))).map(panel => {
+  const items = [...track.querySelectorAll(":scope > .workspace-panel")].filter(panel => panel.dataset.paneId && workflowPaneIsVisible(panel.dataset.paneId)).map(panel => {
     const id = panel.dataset.paneId, reader = byID.get(id);
     if (!reader) {
       const toolKey = /^utility:search(?::|$)/.test(id) ? 'search'

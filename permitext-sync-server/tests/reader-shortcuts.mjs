@@ -207,6 +207,6 @@ assert.deepEqual(allHost.children.filter(button=>button.textContent.startsWith('
 allPanels[1].remove();duplicate.remove();navigation.refresh();
 assert.equal(toolButtons[0].button.classList.contains('has-open-column'),false,'Closing the last Search restores its launcher.');
 allContext='A:notebook';navigation.refresh();
-assert.deepEqual(allHost.children.map(button=>button.dataset.readerPaneId),allState.paneOrder.filter(id=>id.startsWith('reader:')),'Notebook shows Reader bubbles without duplicating Evidence or Notes buttons');
+assert.deepEqual(allHost.children,[],'Notebook reuses its Reader launcher instead of adding a duplicate bubble');
 navigation.dispose();
 console.log('Column bubbles passed: matching physical order, open-tool styling, per-instance navigation, retained Reader targeting, live pointer/keyboard reordering, cancellation, no native ghost, intact drafts, stale-context guards and launcher restoration.');

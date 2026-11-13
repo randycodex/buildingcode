@@ -289,7 +289,7 @@ assert.equal(paneBelongsToView(notesID,'research',notesLayout.workflowMembership
 assert.equal(paneBelongsToView(notesID,'notebook',notesLayout.workflowMembership),true);
 
 // Research and Notebook each retain live Reader sessions across repeated view
-// switches. Reuse one shortcut controller by moving its host between toolbars.
+// switches. Notebook keeps its own single Reader control.
 {
  const notebookReader=pane('reader:notebook');panes.splice(0,panes.length,reader,notebook,notebookReader);
  const session={id:'notebook',codePrefix:'BC',codeVersion:'2022',sectionID:'101',scrollPosition:{sectionID:'101',anchorOffset:-42}};
@@ -304,10 +304,10 @@ assert.equal(paneBelongsToView(notesID,'notebook',notesLayout.workflowMembership
  c.document.querySelector=selector=>selector==='#reader-shortcuts'?host:selector==='[data-workflow-tools="research"] .reader-toolbar-tools'?researchTools:selector==='[data-workflow-tools="notebook"] .reader-toolbar-tools'?notebookTools:null;
  state.workflowView='research';c.syncWorkflowColumnPresentation();reader.scrollTop=1850;
  await c.switchWorkflowView('notebook');notebookReader.scrollTop=2470;
- assert.equal(host.parentElement,notebookTools);assert.equal(c.workflowPaneIsVisible('reader:notebook'),true);assert.equal(c.workflowPaneIsVisible('reader:one'),false);
+ assert.equal(host.parentElement,researchTools);assert.equal(c.workflowPaneIsVisible('reader:notebook'),true);assert.equal(c.workflowPaneIsVisible('reader:one'),false);
  for(let n=0;n<3;n++){
   await c.switchWorkflowView('research');assert.equal(reader.scrollTop,1850);assert.equal(host.parentElement,researchTools);
-  await c.switchWorkflowView('notebook');assert.equal(notebookReader.scrollTop,2470);assert.equal(host.parentElement,notebookTools);
+  await c.switchWorkflowView('notebook');assert.equal(notebookReader.scrollTop,2470);assert.equal(host.parentElement,researchTools);
  }
  assert.equal(session.activeTabID,selectedTab);assert.equal(JSON.stringify(readerTabs(session).filter(tab=>tab.id!==session.activeTabID)),frozenTabs);assert.equal(session.scrollPosition.anchorOffset,-2470);assert.equal(readerTabs(session).length,6);assert.equal(notebook.draft,'Unsaved text');
  const frozen=JSON.stringify(session);
