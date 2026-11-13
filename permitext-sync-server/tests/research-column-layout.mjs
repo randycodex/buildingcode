@@ -36,7 +36,7 @@ const context = vm.createContext({ workspaceColumnExpansion: undefined, state, t
   currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400,
   assistantHistoryOnlyPane: id => id === 'utility:analysis:history', paneIsCollapsed: id => collapsed.has(id), defaultPaneWidthForID: id => id.startsWith('reader:') ? 630 : 600,
   applyPaneWeight(panel, id) { panel.style.flex = `1 0 ${state.paneWeights[id] || 600}px`; } });
-vm.runInContext(['minimumPaneWidthForID', 'maximumPaneWidthForID', 'constrainPaneWidth', 'syncResearchColumnLayout', 'capturePaneResizeWidths'].map(actual).join('\n'), context);
+vm.runInContext(['minimumPaneWidthForID', 'maximumPaneWidthForID', 'constrainPaneWidth', 'syncNotebookColumnLayout', 'syncResearchColumnLayout', 'capturePaneResizeWidths'].map(actual).join('\n'), context);
 const sizes = () => panels.map(p=>p.getBoundingClientRect().width);
 context.syncResearchColumnLayout();
 assert.deepEqual(sizes(), [1200, 1200], 'Existing unequal widths share the available screen');

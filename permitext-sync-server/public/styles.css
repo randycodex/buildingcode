@@ -21582,3 +21582,11 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .assistant-history-menu button:hover, .assistant-history-menu button:focus-visible { background: var(--menu-highlight); }
 .assistant-history-menu button.is-danger { color: var(--destructive); }
 .assistant-history-menu [aria-checked="true"]::before { content: "✓ "; }
+
+/* Notebook's four columns share the viewport; writing stays inside its column. */
+.panel-track[data-notebook-column-sizing="fit"] { overflow-x: hidden; }
+.notebook-panel[data-notebook-sized] :is(.notebook-shell, .notebook-focus, .notebook-editor-surface, .bn-container, .bn-editor) { min-width: 0; }
+.notebook-panel[data-notebook-sized] .notebook-focus > * { box-sizing: border-box; max-width: min(100%, var(--workspace-content-max-width)); }
+.notebook-panel[data-notebook-sized] .notebook-title-control { min-width: 0; }
+.notebook-panel[data-notebook-sized] .notebook-format-toolbar { max-width: 100%; flex-wrap: wrap; }
+.notebook-panel[data-notebook-sized] .bn-inline-content { overflow-wrap: anywhere; }

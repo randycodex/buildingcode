@@ -49,6 +49,28 @@ export function researchColumnsLayout(widths, availableWidth, fixedWidth = 0, di
   const fits = widths.length > 0 && minimums.every(minimum => equalWidth >= minimum);
   return { fits, widths: widths.map((width, index) => fits ? equalWidth : Math.max(minimums[index], Math.min(maximumWidths[index] ?? 900, Number(width) || minimums[index]))) };
 }
+// Notebook is one four-column desk. Reserve the writing space, fit the
+// reference columns beside it, and keep saved widths as preferences only.
+export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0) {
+  const available = Math.max(0, availableWidth - dividerWidth);
+  const minimums = columns.map(column => column.collapsed ? 48 :
+    ({reader:320, evidence:180, notes:140, editor:360}[column.kind] || 180));
+  const minimumTotal = minimums.reduce((sum, width) => sum + width, 0);
+  if (minimumTotal > available) return minimums.map(width => width * available / minimumTotal);
+  const editor = columns.findIndex(column => column.kind === 'editor' && !column.collapsed);
+  const widths = columns.map((column, index) => column.collapsed ? 48 : column.kind === 'editor' ? minimums[index] :
+    Math.max(minimums[index], Math.min({reader:900, evidence:360, notes:280}[column.kind] || 360,
+      Number(column.preferredWidth) || {reader:630, evidence:300, notes:220}[column.kind] || 300)));
+  const requested = widths.reduce((sum, width) => sum + width, 0);
+  if (requested > available) {
+    const slack = requested - minimumTotal;
+    const reduction = requested - available;
+    return widths.map((width, index) => width - (width - minimums[index]) * reduction / slack);
+  }
+  const flexible = editor >= 0 ? editor : columns.findIndex(column => !column.collapsed && column.kind === 'reader');
+  if (flexible >= 0) widths[flexible] += available - requested;
+  return widths;
+}
 // Sources reserve their chosen width beside the Report document.
 // Hide the optional outline before shrinking the document.
 export function reportColumnsLayout(availableWidth, libraryWidth = 0, requestedOutlineWidth = 300) {

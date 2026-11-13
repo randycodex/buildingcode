@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-new-chat-inset-v1737";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-notebook-fit-v1739";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -43,7 +43,7 @@ import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarg
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=14";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=15";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-new-chat-inset-v1737";
+} from "./offline-storage.js?v=20261112-notebook-fit-v1739";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -199,7 +199,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261112-notebook-reader-toggle-v1301";
+} from "./workspace-state.js?v=20261112-notebook-fit-v1302";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -6854,6 +6854,37 @@ function applyPaneWeight(panel, paneID) {
   panel.style.flex = `${isFlexibleReaderPaneID(paneID) || paneID.startsWith('project:notes-index:') || /^utility:(?:search|saved)(?::|$)/.test(paneID) ? 0 : 1} 0 ${width}px`;
 }
 
+function syncNotebookColumnLayout(panels) {
+  const active = currentColumnWorkflowView() === 'notebook' && !track.inert && track.clientWidth > 0;
+  const visible = active ? panels.filter(panel => !panel.classList.contains('is-workflow-hidden') && !panel.classList.contains('is-group-hidden')) : [];
+  const managed = new Set(visible);
+  panels.filter(panel => panel.dataset.notebookSized && !managed.has(panel)).forEach(panel => {
+    delete panel.dataset.notebookSized;
+    panel.style.minWidth = '';
+    panel.style.maxWidth = '';
+    applyPaneWeight(panel, panel.dataset.paneId);
+  });
+  if (!visible.length) { delete track.dataset.notebookColumnSizing; return; }
+  const columns = visible.map(panel => {
+    const id = panel.dataset.paneId;
+    return {kind:id.startsWith('reader:') ? 'reader' : id.startsWith('project:notes-index:') ? 'notes' :
+      id.startsWith('project:notebook:') ? 'editor' : 'evidence', collapsed:paneIsCollapsed(id),
+      preferredWidth:Number(state.paneWeights[id]) || defaultPaneWidthForID(id)};
+  });
+  const padding = getComputedStyle(track);
+  const available = track.clientWidth - (parseFloat(padding.paddingLeft) || 0) - (parseFloat(padding.paddingRight) || 0);
+  const dividers = [...track.querySelectorAll(':scope > .pane-divider')].reduce((sum, divider) => sum + divider.getBoundingClientRect().width, 0);
+  const widths = notebookColumnsLayout(columns, available, dividers);
+  visible.forEach((panel, index) => {
+    panel.dataset.notebookSized = 'true';
+    panel.style.minWidth = '0';
+    panel.style.maxWidth = 'none';
+    panel.style.flex = `0 0 ${widths[index]}px`;
+  });
+  track.dataset.notebookColumnSizing = 'fit';
+  if (track.scrollLeft) track.scrollLeft = 0;
+}
+
 function syncResearchColumnLayout({ reset = false } = {}) {
   const panels = [...track.querySelectorAll(":scope > .workspace-panel")];
   const active = currentColumnWorkflowView() === "research" && window.innerWidth > 760 && !track.inert;
@@ -6866,6 +6897,7 @@ function syncResearchColumnLayout({ reset = false } = {}) {
     panel.style.maxWidth = "";
     applyPaneWeight(panel, panel.dataset.paneId);
   });
+  syncNotebookColumnLayout(panels);
   if (!balanced.length) {
     delete track.dataset.researchColumnSizing;
     delete track._researchColumnLayout;
