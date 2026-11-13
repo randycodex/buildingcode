@@ -81,6 +81,8 @@ export const rateLimitPolicies = new Map([
   ["reports/files/read", workspacePolicy(240)],
   ["internal/evaluations/data", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/archive/export", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["internal/research-spend/data", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["internal/research-spend/export", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/review", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/feedback/triage", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/feedback/case", { limit: 120, windowMs: 60 * 60 * 1000 }],

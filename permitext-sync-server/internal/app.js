@@ -1,3 +1,5 @@
+import { renderResearchSpendPanel } from "./research-spend.js";
+
 const accountSessionKey = "permitext:webAccount:v1";
 const statusElement = document.querySelector("#status");
 const summaryElement = document.querySelector("#summary");
@@ -60,6 +62,7 @@ function renderReviewWorkspace() {
   });
   actions.append(toggle, download); panel.append(actions, status);
 }
+let researchSpendReport = null;
 
 function account() {
   try {
@@ -123,7 +126,7 @@ function renderSummary() {
     ["Retrieval approved", `${retrievalApproved}/${data.retrievalDataset.cases.length}`],
     ["Zoning approved", `${zoningApproved}/${data.zoningDataset.cases.length}`],
     ["Saved runs", data.runs.length],
-    ["Month spend", `$${Number(data.researchSpend?.totals?.estimatedCostUSD || 0).toFixed(4)}`]
+    ["Month spend", `${data.researchSpend?.totals?.unknownCostRequests || data.researchSpend?.totals?.partialCostRequests ? "≥ " : ""}$${Number(data.researchSpend?.totals?.estimatedCostUSD || 0).toFixed(4)}`]
   ].forEach(([label, value]) => {
     const card = element("article");
     card.append(element("strong", { text: value }), element("span", { text: label }));
@@ -942,7 +945,28 @@ function renderFeedback() {
 }
 
 function renderResearchSpend() {
-  const report = data.researchSpend || { totals: {}, users: [] };
+  const report = researchSpendReport || data.researchSpend || { totals: {}, users: [], requests: [] };
+  renderResearchSpendPanel(panels.spend, report, {
+    loadReport: async filters => {
+      researchSpendReport = (await internalRequest("/internal/research-spend/data", { filters })).report;
+      renderResearchSpend();
+    },
+    exportCSV: async (filters, view) => {
+      const response = await internalResponse("/internal/research-spend/export", { filters, view });
+      const url = URL.createObjectURL(await response.blob());
+      const link = element("a"); link.href = url; link.download = `research-spend-${view}-${filters.period}.csv`;
+      link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  });
+  const benchmark = element("details", { className: "spend-benchmark" });
+  benchmark.append(element("summary", { text: "Operational benchmark" }));
+  const content = element("div");
+  renderResearchSpendBenchmark(content, report);
+  benchmark.append(content);
+  panels.spend.append(benchmark);
+}
+
+function renderResearchSpendBenchmark(parent, report) {
   const economics = report.economics || {};
   const sample = economics.sample || {};
   const cost = economics.economics || {};
@@ -950,25 +974,7 @@ function renderResearchSpend() {
   const routing = economics.routing || {};
   const charging = economics.charging || {};
   const section = element("section");
-  section.append(
-    element("h2", { text: "Research spend" }),
-    element("p", {
-      className: "meta",
-      text: `Owner-only operational estimate since ${report.periodStart || "the current period"}. No questions, answers, or Project facts are included. The private request guardrail is ${Number(report.internalMonthlyRequestGuardrail || 0).toLocaleString()} per account and is not customer-facing.`
-    })
-  );
-  const totals = element("div", { className: "summary" });
-  [
-    ["Estimated spend", `$${Number(report.totals?.estimatedCostUSD || 0).toFixed(6)}`],
-    ["Active users", Number(report.totals?.users || 0).toLocaleString()],
-    ["Research requests", Number(report.totals?.requests || 0).toLocaleString()],
-    ["Total tokens", Number(report.totals?.totalTokens || 0).toLocaleString()]
-  ].forEach(([label, value]) => {
-    const card = element("article");
-    card.append(element("strong", { text: value }), element("span", { text: label }));
-    totals.append(card);
-  });
-  section.append(totals);
+  section.append(element("p", { className: "meta", text: "These operational projections use conservative spending bounds where available. The account report above uses recorded provider cost and shows unresolved allowances separately. No questions, answers, or Project facts are included." }));
   const benchmark = element("div", { className: "summary" });
   [
     [
@@ -1044,35 +1050,7 @@ function renderResearchSpend() {
   });
   diagnostics.append(diagnosticsHead, diagnosticsBody);
   section.append(diagnostics);
-  const table = element("table", { className: "spend-table" });
-  const head = element("thead");
-  const headRow = element("tr");
-  ["User", "Requests", "Input tokens", "Output tokens", "Estimated spend"].forEach((label) =>
-    headRow.append(element("th", { text: label }))
-  );
-  head.append(headRow);
-  const body = element("tbody");
-  (report.users || []).forEach((item) => {
-    const row = element("tr");
-    [
-      item.email || item.userID,
-      Number(item.requests || 0).toLocaleString(),
-      Number(item.inputTokens || 0).toLocaleString(),
-      Number(item.outputTokens || 0).toLocaleString(),
-      `$${Number(item.estimatedCostUSD || 0).toFixed(6)}`
-    ].forEach((value) => row.append(element("td", { text: value })));
-    body.append(row);
-  });
-  if (!report.users?.length) {
-    const row = element("tr");
-    const cell = element("td", { text: "No completed paid Research requests in this period." });
-    cell.colSpan = 5;
-    row.append(cell);
-    body.append(row);
-  }
-  table.append(head, body);
-  section.append(table);
-  panels.spend.replaceChildren(section);
+  parent.replaceChildren(section);
 }
 
 function formattedConsoleDate(value) {
