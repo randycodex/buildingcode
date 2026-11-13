@@ -30,7 +30,7 @@
 .research-v2 .assistant-history-row-menu:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .research-v2 .rv2-question-link[aria-current=page]{font-weight:700}
 .rv2-empty-history{font-size:12px;margin:0}
-.research-v2 .rv2-new-chat{width:100%;margin-top:10px;padding:10px 0;color:var(--text-secondary);font-size:14px}
+.research-v2 .rv2-new-chat{box-sizing:border-box;width:calc(100% + 20px);margin:10px -10px 0;padding:10px;border-radius:8px;color:var(--text-secondary);font-size:14px}
 .rv2-question-row.is-renaming{display:block}
 .rv2-rename-form{display:grid;grid-column:1/-1;grid-template-columns:1fr 1fr;gap:6px;padding:12px 0}
 .rv2-rename-input{grid-column:1/-1;width:100%;min-width:0;box-sizing:border-box;background:var(--surface-muted);color:var(--text-primary);border:0;border-radius:6px;padding:8px;font:inherit}
