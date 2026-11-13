@@ -5,10 +5,8 @@
 .workflow-toolbar .reader-shortcut[data-reorderable=true]{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .workflow-toolbar .reader-shortcut.is-dragging{position:relative;z-index:12;cursor:grabbing;will-change:transform}
 .workflow-toolbar .reader-shortcuts.is-reordering{cursor:grabbing}
-.workflow-toolbar .reader-shortcut{appearance:none;flex:0 0 auto;box-sizing:border-box;border:1px solid color-mix(in srgb,var(--code-accent) 35%,transparent);outline:0;border-radius:var(--radius-pill);padding:3px 10px;min-height:26px;color:var(--code-accent);background:transparent;font:500 12px/18px var(--ui-font-family);white-space:nowrap;cursor:pointer;transition:background 160ms}
-.workflow-toolbar .reader-shortcut:hover{background:color-mix(in srgb,var(--code-accent) 19%,var(--surface))}
-.workflow-toolbar .reader-shortcut[aria-pressed=true]{border-color:var(--workspace-active-tool-edge,color-mix(in srgb,var(--code-accent) 60%,transparent))}
-.workflow-toolbar .reader-shortcut[aria-pressed=true]:hover{background:color-mix(in srgb,var(--code-accent) 27%,var(--surface))}
+.workflow-toolbar .reader-shortcut{appearance:none;flex:0 0 auto;outline:0;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--code-accent) 35%,transparent);color:var(--code-accent);font-family:var(--ui-font-family);white-space:nowrap;cursor:pointer;transition:background 160ms}
+.workflow-toolbar .reader-shortcut[aria-pressed=true]{box-shadow:inset 0 0 0 1px var(--workspace-active-tool-edge,color-mix(in srgb,var(--code-accent) 60%,transparent))}
 .workflow-toolbar .reader-shortcut:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .reader-shortcut-tooltip{position:fixed;z-index:1500;box-sizing:border-box;max-width:min(360px,calc(100vw - 16px));padding:8px 10px;border-radius:10px;background:var(--menu-surface);color:var(--text-primary);box-shadow:var(--shadow-panel);font:12px/1.5 var(--ui-font-family);overflow-wrap:anywhere;pointer-events:none}
 .reader-shortcut-tooltip[hidden]{display:none}
