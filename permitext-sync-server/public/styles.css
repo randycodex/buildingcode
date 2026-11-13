@@ -12130,6 +12130,48 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   gap: var(--space-2);
 }
 
+.saved-section-row.has-evidence-menu .saved-section-meta-line {
+  padding-right: 32px;
+  min-height: 20px;
+}
+
+.saved-section-row.has-evidence-menu > .saved-section-open { grid-area: 1 / 1; }
+
+.saved-section-row > .saved-evidence-menu-button {
+  grid-area: 1 / 1;
+  align-self: start;
+  justify-self: end;
+  position: relative;
+  display: grid;
+  width: 28px;
+  height: 20px;
+  min-height: 0;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+.saved-section-row > .saved-evidence-menu-button:is(:hover, :focus-visible, [aria-expanded="true"]) {
+  background: var(--menu-highlight);
+  color: var(--text-primary);
+}
+
+.column-group-menu.saved-evidence-menu {
+  width: max-content;
+  min-width: 0;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+}
+
+.saved-evidence-menu[hidden] { display: none; }
+.saved-evidence-menu .report-membership-status { margin: 0; line-height: normal; }
+.saved-evidence-menu .saved-remove-evidence { color: var(--destructive); }
+
 .saved-section-status {
   display: inline-flex;
   align-items: center;
@@ -21582,3 +21624,11 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .assistant-history-menu button:hover, .assistant-history-menu button:focus-visible { background: var(--menu-highlight); }
 .assistant-history-menu button.is-danger { color: var(--destructive); }
 .assistant-history-menu [aria-checked="true"]::before { content: "✓ "; }
+
+/* Notebook's four columns share the viewport; writing stays inside its column. */
+.panel-track[data-notebook-column-sizing="fit"] { overflow-x: hidden; }
+.notebook-panel[data-notebook-sized] :is(.notebook-shell, .notebook-focus, .notebook-editor-surface, .bn-container, .bn-editor) { min-width: 0; }
+.notebook-panel[data-notebook-sized] .notebook-focus > * { box-sizing: border-box; max-width: min(100%, var(--workspace-content-max-width)); }
+.notebook-panel[data-notebook-sized] .notebook-title-control { min-width: 0; }
+.notebook-panel[data-notebook-sized] .notebook-format-toolbar { max-width: 100%; flex-wrap: wrap; }
+.notebook-panel[data-notebook-sized] .bn-inline-content { overflow-wrap: anywhere; }
