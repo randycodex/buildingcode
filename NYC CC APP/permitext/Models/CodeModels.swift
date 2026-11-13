@@ -717,6 +717,90 @@ struct ProjectFactSourceNote: Identifiable, Equatable {
     }
 }
 
+struct ProjectOpenQuestion: Codable, Hashable, Identifiable, Sendable {
+    var id: String = UUID().uuidString
+    var question: String = ""
+    var answer: String = ""
+
+    static func validate(_ items: [Self]) throws {
+        guard items.count <= 100, Set(items.map(\.id)).count == items.count,
+              items.allSatisfy({ !$0.id.isEmpty && $0.id.utf16.count <= 100 &&
+                  $0.question.utf16.count <= 2000 && $0.answer.utf16.count <= 8000 }) else {
+            throw ProjectWorkflowError.invalidQuestions
+        }
+    }
+}
+
+enum ProjectRecordStatus: String, Codable, CaseIterable, Identifiable, Sendable {
+    case needed, requested, received, reviewed
+    case notApplicable = "not-applicable"
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .needed: return "Needed"
+        case .requested: return "Requested"
+        case .received: return "Received"
+        case .reviewed: return "Reviewed"
+        case .notApplicable: return "Not applicable"
+        }
+    }
+}
+
+struct ProjectChecklistRecord: Codable, Hashable, Identifiable, Sendable {
+    var id: String = UUID().uuidString
+    var label: String = ""
+    var status: ProjectRecordStatus = .needed
+    var note: String = ""
+
+    init(id: String = UUID().uuidString, label: String = "", status: ProjectRecordStatus = .needed, note: String = "") {
+        self.id = id
+        self.label = label
+        self.status = status
+        self.note = note
+    }
+
+    private enum CodingKeys: String, CodingKey { case id, label, status, note }
+
+    init(from decoder: Decoder) throws {
+        let fields = try decoder.container(keyedBy: CodingKeys.self)
+        id = try fields.decode(String.self, forKey: .id)
+        label = try fields.decode(String.self, forKey: .label)
+        status = try fields.decode(ProjectRecordStatus.self, forKey: .status)
+        note = try fields.decodeIfPresent(String.self, forKey: .note) ?? ""
+    }
+
+    static let suggestedLabels = [
+        "Certificate of Occupancy or lawful occupancy record",
+        "Approved plans and amendments",
+        "Permit and application history",
+        "Survey and zoning lot records",
+        "Field measurements and photographs"
+    ]
+
+    static func validate(_ items: [Self]) throws {
+        guard items.count <= 50, Set(items.map(\.id)).count == items.count,
+              items.allSatisfy({ !$0.id.isEmpty && $0.id.utf16.count <= 100 &&
+                  !$0.label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+                  $0.label.utf16.count <= 300 && $0.note.utf16.count <= 2000 }) else {
+            throw ProjectWorkflowError.invalidChecklist
+        }
+    }
+}
+
+enum ProjectWorkflowError: LocalizedError {
+    case invalidQuestions, invalidChecklist
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidQuestions:
+            return "Use up to 100 questions, with 2,000 characters per question and 8,000 per answer."
+        case .invalidChecklist:
+            return "Use up to 50 records. Each needs a name of up to 300 characters and notes of up to 2,000 characters."
+        }
+    }
+}
+
 struct ServerProjectRecord: Codable, Hashable, Sendable {
     let id: String
     let userID: String
@@ -727,6 +811,8 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
     let address: String?
     let description: String?
     let structuredFacts: [ProjectStructuredFact]?
+    let openQuestions: [ProjectOpenQuestion]?
+    let recordsChecklist: [ProjectChecklistRecord]?
     let colorHex: String?
     let sortOrder: Int?
     let folderType: CodeFolderType
@@ -745,6 +831,8 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
         address: String?,
         description: String?,
         structuredFacts: [ProjectStructuredFact]? = nil,
+        openQuestions: [ProjectOpenQuestion]? = nil,
+        recordsChecklist: [ProjectChecklistRecord]? = nil,
         colorHex: String?,
         sortOrder: Int?,
         folderType: CodeFolderType = .project,
@@ -762,6 +850,8 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
         self.address = address
         self.description = description
         self.structuredFacts = structuredFacts
+        self.openQuestions = openQuestions
+        self.recordsChecklist = recordsChecklist
         self.colorHex = colorHex
         self.sortOrder = sortOrder
         self.folderType = folderType
@@ -774,7 +864,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
     private enum CodingKeys: String, CodingKey {
         case id, userID, codeVersion, clientID, localFolderID, name, address
         case description, structuredFacts, colorHex, sortOrder, folderType, archivedAt, updatedAt
-        case deletedAt, serverEventID
+        case deletedAt, serverEventID, openQuestions, recordsChecklist
     }
 
     init(from decoder: Decoder) throws {
@@ -788,6 +878,8 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
         address = try container.decodeIfPresent(String.self, forKey: .address)
         description = try container.decodeIfPresent(String.self, forKey: .description)
         structuredFacts = try container.decodeIfPresent([ProjectStructuredFact].self, forKey: .structuredFacts)
+        openQuestions = try container.decodeIfPresent([ProjectOpenQuestion].self, forKey: .openQuestions)
+        recordsChecklist = try container.decodeIfPresent([ProjectChecklistRecord].self, forKey: .recordsChecklist)
         colorHex = try container.decodeIfPresent(String.self, forKey: .colorHex)
         sortOrder = try container.decodeIfPresent(Int.self, forKey: .sortOrder)
         folderType = CodeFolderType(
@@ -1006,6 +1098,8 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     address: item.operationType == .delete ? nil : payload.values["address"],
                     description: item.operationType == .delete ? nil : payload.values["description"],
                     structuredFacts: item.operationType == .delete ? nil : Self.structuredFacts(from: payload.values["structuredFacts"]),
+                    openQuestions: item.operationType == .delete ? nil : Self.workflowItems(from: payload.values["openQuestions"]),
+                    recordsChecklist: item.operationType == .delete ? nil : Self.workflowItems(from: payload.values["recordsChecklist"]),
                     colorHex: item.operationType == .delete ? nil : payload.values["colorHex"],
                     sortOrder: payload.values["sortOrder"].flatMap(Int.init),
                     folderType: CodeFolderType(serverValue: payload.values["folderType"]),
@@ -1078,6 +1172,11 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
               let data = rawValue.data(using: .utf8)
         else { return nil }
         return try? JSONDecoder().decode([ProjectStructuredFact].self, from: data)
+    }
+
+    private static func workflowItems<T: Decodable>(from rawValue: String?) -> [T]? {
+        guard let rawValue else { return nil }
+        return try? JSONDecoder().decode([T].self, from: Data(rawValue.utf8))
     }
 
     private static func recordID(
@@ -4356,6 +4455,8 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
     let address: String
     let description: String
     let structuredFacts: [ProjectStructuredFact]
+    let openQuestions: [ProjectOpenQuestion]?
+    let recordsChecklist: [ProjectChecklistRecord]?
     let colorHex: String
     let folderType: CodeFolderType
     let sortOrder: Int
@@ -4374,6 +4475,8 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
         address: String,
         description: String,
         structuredFacts: [ProjectStructuredFact] = [],
+        openQuestions: [ProjectOpenQuestion]? = nil,
+        recordsChecklist: [ProjectChecklistRecord]? = nil,
         colorHex: String,
         folderType: CodeFolderType,
         sortOrder: Int,
@@ -4391,6 +4494,8 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
         self.address = address
         self.description = description
         self.structuredFacts = structuredFacts
+        self.openQuestions = openQuestions
+        self.recordsChecklist = recordsChecklist
         self.colorHex = colorHex
         self.folderType = folderType
         self.sortOrder = sortOrder

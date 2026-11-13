@@ -1625,6 +1625,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             .nyccc-section-card {
               scroll-margin-top: 96px;
             }
+            .nyccc-section-card + .nyccc-section-card {
+              margin-top: 1.25rem !important;
+            }
             .nyccc-section-card {
               box-sizing: border-box !important;
               width: auto !important;
@@ -1678,8 +1681,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               border-bottom: 0 !important;
             }
             .nyccc-section-card-expanded .Subsection {
-              margin-top: 0.72rem !important;
-              padding-top: 0.72rem !important;
+              margin-top: 0.9rem !important;
+              padding-top: 0.9rem !important;
               padding-right: 0 !important;
               border-top: 0 !important;
             }

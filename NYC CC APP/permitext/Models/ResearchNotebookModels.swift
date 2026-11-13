@@ -207,6 +207,12 @@ enum NativeResearchHistory {
         var seen = Set(existing.map(\.id))
         return existing + page.filter { seen.insert($0.id).inserted }
     }
+
+    static func mergingProjectPage(_ page: [ResearchConversationSummary], into existing: [ResearchConversationSummary],
+                                   projectID: String, replacingProject: Bool) -> [ResearchConversationSummary] {
+        let retained = replacingProject ? existing.filter { $0.primaryProjectID != projectID } : existing
+        return appending(retained, to: page.filter { $0.primaryProjectID == projectID })
+    }
 }
 
 struct ResearchConversationResponse: Codable, Hashable, Sendable {

@@ -2196,6 +2196,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
                 EmptyView()
             }
         }
+        .padding(.top, topSpacing)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.leading, block.kind == .heading ? 0 : hierarchyIndentation)
         .padding(.bottom, bottomSpacing)
@@ -2355,13 +2356,22 @@ private struct NativeReaderTextBlockView: View, Equatable {
         searchMatches.contains(where: { $0.id == activeSearchMatchID })
     }
 
+    private var topSpacing: CGFloat {
+        guard block.kind == .heading else { return 0 }
+        switch NativeReaderHeadingPresentation(block: block).style {
+        case .chapter: return 0
+        case .majorSection: return 20
+        case .provision: return 16
+        }
+    }
+
     private var bottomSpacing: CGFloat {
         switch block.kind {
         case .heading:
             return NativeReaderHeadingPresentation(block: block).level <= 2 ? 14 : 8
         case .paragraph, .orderedList, .unorderedList:
             if usesCompactSpacing {
-                return 3
+                return max(CGFloat(theme.paragraphSpacing), 12)
             }
             return max(CGFloat(theme.paragraphSpacing), 8)
         case .sourceNote, .editorNote:

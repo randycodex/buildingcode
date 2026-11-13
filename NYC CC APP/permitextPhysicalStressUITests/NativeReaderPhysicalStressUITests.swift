@@ -21,115 +21,594 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         executionTimeAllowance = 7_200
     }
 
+    func testProjectFirstNavigationAndResearchIsolation() throws {
+#if !DEBUG
+        throw XCTSkip("Project navigation uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        XCTAssertEqual(app.tabBars.count, 0)
+        keepScreenshot(named: "Project-first chooser", from: app)
+        func openProject(_ name: String) {
+            let card = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", name)).firstMatch
+            XCTAssertTrue(card.waitForExistence(timeout: 10))
+            card.tap()
+            XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+            XCTAssertEqual(app.tabBars.buttons.count, 4)
+            XCTAssertEqual(app.staticTexts["project-workspace-name"].label, name)
+        }
+        openProject("Acceptance Project")
+        for card in ["context", "structured-facts", "notebook", "evidence", "reports"] {
+            XCTAssertTrue(app.buttons["project-section-\(card)"].isHittable)
+        }
+        XCTAssertFalse(app.buttons["project-section-research"].exists)
+        keepScreenshot(named: "Five Project sections and four tabs", from: app)
+        app.buttons["main-tab-research"].tap()
+        XCTAssertFalse(app.staticTexts["Loading Research…"].exists)
+        let newResearch = app.buttons["New Research"]
+        XCTAssertTrue(newResearch.waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["research-history-project-filter"].exists)
+        newResearch.tap()
+        XCTAssertTrue(app.buttons["Research history"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["research-project-context-menu"].exists)
+        app.buttons["Research history"].tap()
+        XCTAssertTrue(app.buttons.matching(identifier: "research-history-row").firstMatch.waitForExistence(timeout: 15))
+        keepScreenshot(named: "Research belongs to Acceptance Project", from: app)
+
+        XCTAssertFalse(app.buttons["project-close"].exists)
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
+        XCTAssertEqual(app.tabBars.count, 0)
+        openProject("Correction Project")
+        app.buttons["main-tab-research"].tap()
+        XCTAssertTrue(app.buttons["New Research"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["No Research yet"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons.matching(identifier: "research-history-row").firstMatch.exists)
+        keepScreenshot(named: "Correction Project has separate Research", from: app)
+        XCTAssertFalse(app.buttons["project-close"].exists)
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+        app.buttons["main-tab-saved"].tap()
+        openProject("Acceptance Project")
+        app.buttons["main-tab-research"].tap()
+        XCTAssertTrue(app.buttons.matching(identifier: "research-history-row").firstMatch.waitForExistence(timeout: 15))
+
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        XCTAssertEqual(app.tabBars.count, 0, "A new launch always starts at the chooser")
+#endif
+    }
+
+    func testProjectCardsReorderWithPressAndDrag() throws {
+#if !DEBUG
+        throw XCTSkip("Project navigation uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        let first = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch
+        let second = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Correction Project")).firstMatch
+        XCTAssertTrue(first.isHittable)
+        XCTAssertTrue(second.isHittable)
+        XCTAssertLessThan(first.frame.minX, second.frame.minX)
+        keepScreenshot(named: "Project cards with title above address", from: app)
+        first.press(forDuration: 0.8, thenDragTo: second)
+        func assertSecondIsFirst(_ expected: Bool) {
+            XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                (second.frame.minX < first.frame.minX) == expected
+            }, object: nil)], timeout: 10), .completed)
+        }
+        assertSecondIsFirst(true)
+        XCTAssertEqual(app.tabBars.count, 0, "Dragging rearranges cards without opening a Project")
+        keepScreenshot(named: "Projects reordered by holding and dragging", from: app)
+        second.tap()
+        XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+        XCTAssertEqual(app.staticTexts["project-workspace-name"].label, "Correction Project")
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(first.waitForExistence(timeout: 10))
+        assertSecondIsFirst(true)
+        second.press(forDuration: 0.8, thenDragTo: first)
+        assertSecondIsFirst(false)
+        XCTAssertEqual(app.tabBars.count, 0)
+        keepScreenshot(named: "Projects dragged back to their original order", from: app)
+#endif
+    }
+
+    func testProjectReaderSwitchesEditionsAndPreservesSourceChoices() throws {
+#if !DEBUG
+        throw XCTSkip("Reader menu checks use the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch
+        project.tap()
+        XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+        app.buttons["main-tab-reader"].tap()
+        let picker = app.buttons["reader-session-primary"]
+        XCTAssertTrue(picker.waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["project-close"].exists)
+        XCTAssertFalse(app.buttons["reader-project-menu"].exists)
+        XCTAssertFalse(app.staticTexts["project-workspace-name"].exists)
+        picker.tap()
+        // Both editions remain available through the bottom capsule’s library.
+        let historicalBuilding = app.buttons.matching(NSPredicate(format: "label == %@", "Building Code")).element(boundBy: 1)
+        XCTAssertTrue(historicalBuilding.isHittable)
+        historicalBuilding.tap()
+        let selected = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            picker.staticTexts.firstMatch.label.localizedCaseInsensitiveContains("2014")
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [selected], timeout: 15), .completed)
+        picker.tap()
+        let manage = app.buttons["Manage code sources…"]
+        for _ in 0..<12 where !manage.isHittable { app.collectionViews.firstMatch.swipeUp() }
+        XCTAssertTrue(manage.isHittable)
+        manage.tap()
+        XCTAssertTrue(app.buttons["active-sources-close"].waitForExistence(timeout: 10))
+        let historical = app.switches["Building Code, 2014"]
+        XCTAssertTrue(historical.waitForExistence(timeout: 15))
+        for _ in 0..<12 where !historical.isHittable { app.swipeUp() }
+        XCTAssertTrue(historical.isHittable)
+        historical.tap()
+        app.buttons["active-sources-close"].tap()
+        for _ in 0..<4 { app.collectionViews.firstMatch.swipeDown() }
+        XCTAssertFalse(app.buttons["Building Code (off)"].exists)
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Building Code")).count, 1,
+            "Only the enabled 2022 Building Code should appear after disabling the 2014 source")
+        keepScreenshot(named: "Reader picker shows enabled sources only", from: app)
+        for _ in 0..<12 where !manage.isHittable { app.collectionViews.firstMatch.swipeUp() }
+        XCTAssertTrue(manage.isHittable, "Source settings stay available while disabled codes are hidden")
+        manage.tap()
+        XCTAssertTrue(app.buttons["active-sources-close"].waitForExistence(timeout: 10))
+        XCTAssertTrue(historical.waitForExistence(timeout: 15))
+        for _ in 0..<12 where !historical.isHittable { app.swipeUp() }
+        historical.tap()
+        app.buttons["active-sources-close"].tap()
+        for _ in 0..<4 { app.collectionViews.firstMatch.swipeDown() }
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Building Code")).count, 2)
+        historicalBuilding.tap()
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            picker.staticTexts.firstMatch.label.localizedCaseInsensitiveContains("2014")
+        }, object: nil)], timeout: 15), .completed)
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
+#endif
+    }
+
+    func testReaderCapsulesReturnToChaptersThenChooseCodesIndependently() throws {
+#if !DEBUG
+        throw XCTSkip("Reader navigation uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        app.buttons["main-tab-reader"].tap()
+        let primary = app.buttons["reader-session-primary"]
+        let secondary = app.buttons["reader-session-secondary"]
+        var browser: XCUIElement {
+            app.scrollViews["reader-chapter-browser-\(secondary.isSelected ? "secondary" : "primary")"]
+        }
+        var chapter: XCUIElement {
+            browser.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 1:")).firstMatch
+        }
+        func assertSource(_ source: String, in capsule: XCUIElement) {
+            XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                capsule.staticTexts.firstMatch.label.contains(source)
+            }, object: nil)], timeout: 20), .completed)
+        }
+        XCTAssertTrue(browser.waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["reader-code-picker"].exists)
+        primary.tap()
+        XCTAssertTrue(app.navigationBars["Code Library"].waitForExistence(timeout: 10))
+        app.buttons.matching(NSPredicate(format: "label == %@", "Building Code")).firstMatch.tap()
+        XCTAssertTrue(chapter.waitForExistence(timeout: 20))
+        chapter.tap()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+        keepScreenshot(named: "Reader provision spacing", from: app)
+        primary.tap()
+        XCTAssertTrue(browser.waitForExistence(timeout: 10))
+        XCTAssertTrue(chapter.isHittable)
+        primary.tap()
+        XCTAssertTrue(app.navigationBars["Code Library"].waitForExistence(timeout: 10))
+        keepScreenshot(named: "Reader capsule code library", from: app)
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@", "reader-code-", "Plumbing Code")).firstMatch.tap()
+        XCTAssertTrue(browser.waitForExistence(timeout: 15))
+        assertSource("Plumbing Code", in: primary)
+
+        secondary.tap()
+        XCTAssertTrue(browser.waitForExistence(timeout: 30))
+        secondary.tap()
+        XCTAssertTrue(app.navigationBars["Code Library"].waitForExistence(timeout: 10))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@", "reader-code-", "Mechanical Code")).firstMatch.tap()
+        XCTAssertTrue(browser.waitForExistence(timeout: 15))
+        assertSource("Mechanical Code", in: secondary)
+        XCTAssertTrue(chapter.waitForExistence(timeout: 20))
+        chapter.tap()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+        keepScreenshot(named: "Mechanical Reader section spacing", from: app)
+        secondary.tap()
+        XCTAssertTrue(browser.waitForExistence(timeout: 10))
+        secondary.tap()
+        XCTAssertTrue(app.navigationBars["Code Library"].waitForExistence(timeout: 10))
+        app.buttons["reader-code-library-close"].tap()
+        primary.tap()
+        XCTAssertTrue(browser.waitForExistence(timeout: 10))
+        assertSource("Plumbing Code", in: primary)
+        XCTAssertFalse(app.buttons["reader-code-picker"].exists)
+
+#endif
+    }
+
+    func testReaderAppendixPinsAndWorkspaceRequiresExplicitExit() throws {
+#if !DEBUG
+        throw XCTSkip("Project navigation uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        app.buttons["main-tab-reader"].tap()
+        let browser = app.scrollViews["reader-chapter-browser-primary"]
+        XCTAssertTrue(browser.waitForExistence(timeout: 20))
+        XCTAssertFalse(app.buttons["reader-code-picker"].exists)
+        let workspaceFrame = browser.frame
+        // Pull both the cards and the heading, which used to dismiss the zoomed workspace.
+        for y in [0.3, 0.12] {
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: y))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85)))
+            XCTAssertTrue(browser.exists)
+            XCTAssertEqual(app.tabBars.buttons.count, 4)
+            XCTAssertEqual(browser.frame.minY, workspaceFrame.minY, accuracy: 2)
+            XCTAssertEqual(browser.frame.width, workspaceFrame.width, accuracy: 2)
+            XCTAssertTrue(app.buttons["reader-session-primary"].isHittable)
+        }
+        keepScreenshot(named: "Workspace stays open after pull-down gestures", from: app)
+        // Pick a known source using the bottom capsule only.
+        app.buttons["reader-session-primary"].tap()
+        XCTAssertTrue(app.navigationBars["Code Library"].waitForExistence(timeout: 10))
+        app.buttons.matching(NSPredicate(format: "label == %@", "Building Code")).firstMatch.tap()
+        let chapters = browser.staticTexts["reader-heading-chapters"]
+        let appendix = browser.staticTexts["reader-heading-appendix"]
+        XCTAssertTrue(chapters.waitForExistence(timeout: 15))
+        let headingY = chapters.frame.minY
+        func isPinned(_ heading: XCUIElement) -> Bool {
+            heading.exists && heading.isHittable && abs(heading.frame.minY - headingY) < 3
+        }
+        browser.swipeUp(velocity: .slow)
+        XCTAssertTrue(isPinned(chapters), "Chapters stays pinned with a transparent header")
+        keepScreenshot(named: "Chapters pinned without a solid background", from: app)
+        for _ in 0..<20 {
+            if isPinned(appendix) { break }
+            browser.swipeUp(velocity: .slow)
+        }
+        XCTAssertTrue(isPinned(appendix), "Appendix should occupy the original Chapters header position")
+        XCTAssertFalse(chapters.exists && chapters.frame.maxY > headingY + 3,
+            "Chapters must leave the pinned title area when Appendix replaces it")
+        let appendixY = appendix.frame.minY
+        keepScreenshot(named: "Appendix replaces Chapters at the pinned heading", from: app)
+        browser.swipeUp(velocity: .slow)
+        XCTAssertEqual(appendix.frame.minY, appendixY, accuracy: 2, "Appendix stays pinned while its cards scroll")
+        for _ in 0..<20 {
+            if isPinned(chapters) { break }
+            browser.swipeDown(velocity: .slow)
+        }
+        XCTAssertTrue(isPinned(chapters), "Scrolling back restores Chapters")
+        keepScreenshot(named: "Chapters restored after scrolling back", from: app)
+        app.buttons["main-tab-research"].tap()
+        XCTAssertTrue(app.buttons["New Research"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.staticTexts["Loading Research…"].exists)
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+        app.buttons["project-close"].tap()
+        XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
+#endif
+    }
+
+    func testSearchHistoryRowsStayCompactAndSourcesUseIcon() throws {
+#if !DEBUG
+        throw XCTSkip("Search layout uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--search-history-layout-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        app.buttons["main-tab-search"].tap()
+        let sources = app.buttons["Code sources"]
+        XCTAssertTrue(sources.waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["Search"].isHittable)
+        let searchHeadingY = app.staticTexts["Search"].frame.minY
+        XCTAssertFalse(app.staticTexts["Searching enabled code sources"].exists)
+        XCTAssertFalse(app.buttons["Manage code sources"].exists)
+        sources.tap()
+        XCTAssertTrue(app.buttons["active-sources-close"].waitForExistence(timeout: 10))
+        app.buttons["active-sources-close"].tap()
+        let scroll = app.scrollViews["search-results-scroll"]
+        let rows = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH %@", "search-recent-passage-"))
+        XCTAssertTrue(rows.firstMatch.waitForExistence(timeout: 15))
+        func assertCompactRows() {
+            var unique: [String: XCUIElement] = [:]
+            for row in rows.allElementsBoundByIndex where row.isHittable {
+                if row.frame.minY > scroll.frame.minY + 60, row.frame.maxY < scroll.frame.maxY - 80 {
+                    if unique[row.identifier].map({ $0.frame.height < row.frame.height }) ?? true {
+                        unique[row.identifier] = row
+                    }
+                }
+            }
+            let visible = unique.values.sorted { $0.frame.minY < $1.frame.minY }
+            XCTAssertGreaterThanOrEqual(visible.count, 2)
+            for index in 1..<visible.count {
+                XCTAssertLessThan(visible[index].frame.minY - visible[index - 1].frame.maxY, 48,
+                    "Recent passages should not acquire blank rows between them")
+            }
+        }
+        assertCompactRows()
+        keepScreenshot(named: "Compact recent passage history", from: app)
+        scroll.swipeUp()
+        scroll.swipeUp()
+        assertCompactRows()
+        XCTAssertTrue(sources.isHittable)
+        // The transparent title lets result rows receive taps underneath it.
+        // Verify its visible position rather than treating static text as a control.
+        XCTAssertTrue(app.staticTexts["Search"].exists)
+        XCTAssertEqual(app.staticTexts["Search"].frame.minY, searchHeadingY, accuracy: 2,
+            "Search stays pinned with a transparent header")
+        keepScreenshot(named: "Scrolled recent passage history without gaps", from: app)
+        app.buttons["main-tab-saved"].tap()
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(app.buttons["Open Account"].waitForExistence(timeout: 10))
+        app.buttons["Open Account"].tap()
+        XCTAssertTrue(app.buttons["account-close"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Pro unlocks saved sections")).firstMatch.exists)
+        XCTAssertFalse(app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@", "Sync status:")).firstMatch.exists)
+        keepScreenshot(named: "Account without duplicate description or sync strip", from: app)
+#endif
+    }
+
+    func testFreeCodeLibraryCardPreservesReaderAndSearch() throws {
+#if !DEBUG
+        throw XCTSkip("Free navigation uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-access-flow-fixture", "--native-access-free", "--permitext-disable-clerk"]
+        app.launch()
+        let libraryCard = app.buttons["projects-code-library"]
+        XCTAssertTrue(libraryCard.waitForExistence(timeout: 45))
+        XCTAssertEqual(app.tabBars.count, 0)
+        libraryCard.tap()
+        XCTAssertTrue(app.buttons["main-tab-reader"].waitForExistence(timeout: 15))
+        XCTAssertEqual(app.tabBars.buttons.count, 2)
+        XCTAssertFalse(app.buttons["main-tab-research"].exists)
+        app.buttons["main-tab-search"].tap()
+        XCTAssertTrue(app.textFields["Search codes"].waitForExistence(timeout: 15))
+        keepScreenshot(named: "Free Code Library search", from: app)
+        app.buttons["project-close"].tap()
+        XCTAssertTrue(libraryCard.waitForExistence(timeout: 10))
+        XCTAssertEqual(app.tabBars.count, 0)
+#endif
+    }
+
     func testSavedProjectTilesAndAllSavedNavigation() throws {
         try verifySavedProjectNavigation(largeText: false)
     }
 
     func testProjectSectionsOpenWithBackNavigation() throws {
 #if !DEBUG
-        throw XCTSkip("Project navigation acceptance uses the isolated Debug fixture.")
+        throw XCTSkip("Project overview acceptance uses the isolated Debug fixture.")
 #else
         let app = XCUIApplication()
-        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--native-project-overview-fixture", "--native-project-overview-delayed-load", "--permitext-disable-clerk"]
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
-        app.buttons["main-tab-saved"].tap()
         let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch
-        XCTAssertTrue(project.waitForExistence(timeout: 10))
         project.tap()
-        let projectRoot = element(in: app, identifier: "project-folder-root")
-        XCTAssertTrue(projectRoot.waitForExistence(timeout: 10))
-        XCTAssertFalse(app.staticTexts["Research History"].exists)
-        let cardIDs = ["context", "structured-facts", "notebook", "research", "evidence", "reports"]
-        let cards = cardIDs.map { app.buttons["project-section-\($0)"] }
-        for card in cards { XCTAssertTrue(card.isHittable) }
-        for card in cards.dropFirst() {
-            XCTAssertEqual(card.frame.width, cards[0].frame.width, accuracy: 2)
-            XCTAssertEqual(card.frame.height, cards[0].frame.height, accuracy: 2)
-        }
-        for index in 1..<cards.count {
-            XCTAssertEqual(cards[index].frame.minX, cards[0].frame.minX, accuracy: 2)
-            XCTAssertGreaterThan(cards[index].frame.minY, cards[index - 1].frame.maxY)
-        }
-        keepScreenshot(named: "Project with separate sections", from: app)
-        let dockGap = app.buttons["main-tab-saved"].frame.minY - cards.last!.frame.maxY
-        XCTAssertGreaterThanOrEqual(dockGap, 8)
-        XCTAssertLessThanOrEqual(dockGap, 40)
-        let projectNavigationBar = app.navigationBars.firstMatch
-        let edit = projectNavigationBar.buttons["project-edit"]
-        let back = projectNavigationBar.buttons.element(boundBy: 0)
-        XCTAssertTrue(edit.isHittable)
-        XCTAssertEqual(edit.frame.midY, back.frame.midY, accuracy: 2)
-        XCTAssertGreaterThan(edit.frame.minX, back.frame.maxX)
-
-        for (identifier, title) in [
-            ("project-section-context", "Project Context"),
-            ("project-section-structured-facts", "Structured Facts"),
-            ("project-section-notebook", "Notebook"),
-            ("project-section-evidence", "Evidence"),
-            ("project-section-reports", "Reports")
-        ] {
-            let link = element(in: app, identifier: identifier)
-            reveal(link, in: app)
-            XCTAssertTrue(link.isHittable)
-            link.tap()
-            let navigationBar = app.navigationBars[title]
-            XCTAssertTrue(navigationBar.waitForExistence(timeout: 10), "\(title) must be a pushed screen.")
-            XCTAssertFalse(app.sheets.firstMatch.exists)
-            if title == "Project Context" {
-                let context = app.textViews["project-context-text"]
-                XCTAssertTrue(context.waitForExistence(timeout: 5))
-                context.tap()
-                let editor = app.textViews["project-context-editor"]
-                XCTAssertTrue(editor.waitForExistence(timeout: 5))
-                editor.tap()
-                XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
-                keepScreenshot(named: "Project context keyboard", from: app)
-                editor.typeText(" Updated on iPhone.")
-                keepScreenshot(named: "Typing Project context", from: app)
-                XCTAssertTrue((editor.value as? String ?? "").contains("Updated on iPhone."),
-                              "Typed context was: \(editor.value ?? "missing")")
-                keepScreenshot(named: "Edited Project context", from: app)
-                let save = app.buttons["project-context-save"]
-                save.tap()
-                // Retry an unregistered toolbar tap only while Save remains.
-                // A failed save still stays in edit mode and fails below.
-                if !context.waitForExistence(timeout: 2), save.exists { save.tap() }
-                XCTAssertTrue(context.waitForExistence(timeout: 5))
-                keepScreenshot(named: "Saved Project context", from: app)
-                XCTAssertTrue((context.value as? String ?? "").contains("Updated on iPhone."),
-                              "Saved context was: \(context.value ?? "missing")")
-                context.tap()
-                XCTAssertTrue(editor.waitForExistence(timeout: 5))
-                editor.tap()
-                editor.typeText(" Discard this draft.")
-                XCTAssertTrue((editor.value as? String ?? "").contains("Discard this draft."))
-                navigationBar.buttons["Cancel"].tap()
-                XCTAssertTrue(context.waitForExistence(timeout: 5))
-                XCTAssertFalse((context.value as? String ?? "").contains("Discard this draft."))
-            }
-            keepScreenshot(named: "Separate section: \(title)", from: app)
-            navigationBar.buttons.element(boundBy: 0).tap()
-            XCTAssertTrue(projectRoot.waitForExistence(timeout: 10))
-        }
-
+        let root = element(in: app, identifier: "project-folder-root")
+        XCTAssertTrue(root.waitForExistence(timeout: 10))
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            app.buttons["project-section-notebook"].label.contains("0 notes")
+        }, object: nil)], timeout: 10), .completed)
+        keepScreenshot(named: "Project overview without card chevrons", from: app)
         app.buttons["project-section-context"].tap()
-        let context = app.textViews["project-context-text"]
-        XCTAssertTrue(context.waitForExistence(timeout: 5))
-        XCTAssertTrue((context.value as? String ?? "").contains("Updated on iPhone."))
-        app.navigationBars["Project Context"].buttons.element(boundBy: 0).tap()
-        app.buttons["project-section-research"].tap()
-        let filter = app.buttons["research-history-project-filter"]
-        XCTAssertTrue(filter.waitForExistence(timeout: 10))
-        XCTAssertTrue(filter.label.contains("Acceptance Project"))
-        XCTAssertTrue(app.buttons["New Research"].exists)
-        XCTAssertFalse(app.buttons["Research actions"].exists)
-        keepScreenshot(named: "Research filtered to Project", from: app)
+        let editor = app.textViews["project-context-editor"]
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["project-inline-editor-title"].isHittable,
+                      "The expanded Context stays at its beginning when the keyboard appears")
+        XCTAssertFalse(app.navigationBars["Project Context"].exists)
+        editor.typeText(" Inline phone edit.")
+        keepScreenshot(named: "Context editing on the project overview", from: app)
+        func save() {
+            let header = app.buttons["project-inline-save"]
+            if header.isHittable { header.tap() }
+            else { app.buttons["project-inline-keyboard-save"].tap() }
+        }
+        save()
+        XCTAssertTrue(app.buttons["project-section-context"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["project-section-context"].label.contains("Inline phone edit."))
+        app.buttons["project-section-context"].tap()
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        editor.typeText(" Discard this draft.")
+        app.buttons["project-inline-cancel"].tap()
+        XCTAssertFalse(app.buttons["project-section-context"].label.contains("Discard this draft."))
+        let facts = app.buttons["project-section-structured-facts"]
+        reveal(facts, in: app)
+        facts.tap()
+        let value = app.textFields["project-fact-value-occupancy"]
+        XCTAssertTrue(value.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["project-fact-number-occupancy"].label, "1.")
+        XCTAssertEqual(app.buttons["Remove Occupancy"].frame.midY, value.frame.midY, accuracy: 2,
+                       "Delete aligns to the value rather than the label")
+        XCTAssertFalse(app.navigationBars["Structured Facts"].exists)
+        value.tap()
+        value.typeText(" phone edit")
+        let bottomSave = app.buttons["project-inline-bottom-save"]
+        reveal(bottomSave, in: app)
+        XCTAssertTrue(app.buttons["project-inline-bottom-cancel"].exists)
+        bottomSave.tap()
+        XCTAssertTrue(facts.waitForExistence(timeout: 5))
+        facts.tap()
+        XCTAssertTrue(value.waitForExistence(timeout: 5))
+        XCTAssertTrue((value.value as? String ?? "").contains("phone edit"))
+        keepScreenshot(named: "Facts edited inline on iPhone", from: app)
+        app.buttons["project-inline-cancel"].tap()
+        for (section, title) in [("notebook", "Notebook"), ("evidence", "Evidence"), ("reports", "Reports")] {
+            let card = app.buttons["project-section-\(section)"]
+            reveal(card, in: app)
+            card.tap()
+            XCTAssertTrue(app.navigationBars[title].waitForExistence(timeout: 10))
+            app.buttons["main-tab-saved"].tap()
+            XCTAssertTrue(root.waitForExistence(timeout: 10))
+            XCTAssertTrue(app.buttons["project-section-notebook"].label.contains("0 notes"), "Loaded previews survive the delayed refresh")
+            XCTAssertTrue(app.buttons["project-section-reports"].label.contains("0 reports"))
+        }
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
+#endif
+    }
+
+    func testProjectQuestionsAndChecklistEditAndReturnToOverview() throws {
+#if !DEBUG
+        throw XCTSkip("Workflow acceptance uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--native-project-overview-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        let root = element(in: app, identifier: "project-folder-root")
+        XCTAssertTrue(root.waitForExistence(timeout: 10))
+        let questionCard = app.buttons["project-section-questions"]
+        reveal(questionCard, in: app)
+        XCTAssertEqual(questionCard.frame.minY, app.buttons["project-section-structured-facts"].frame.minY, accuracy: 2)
+        keepScreenshot(named: "Project overview with six cards", from: app)
+        questionCard.tap()
+        XCTAssertTrue(app.navigationBars["Questions"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.keyboards.firstMatch.exists)
+        app.buttons["project-workflow-add"].tap()
+        let question = app.textFields["project-question-text-0"]
+        let questionText = question.exists ? question : app.textViews["project-question-text-0"]
+        XCTAssertTrue(questionText.waitForExistence(timeout: 5))
+        questionText.tap()
+        questionText.typeText("Is the survey current?")
+        let answer = app.textFields["project-question-answer-0"]
+        let answerText = answer.exists ? answer : app.textViews["project-question-answer-0"]
+        answerText.tap()
+        answerText.typeText("Requested today.")
+        app.buttons["project-workflow-save"].tap()
+        XCTAssertTrue(app.staticTexts["Is the survey current?"].waitForExistence(timeout: 5))
+        keepScreenshot(named: "Project questions on iPhone", from: app)
+        app.buttons["project-workflow-edit"].tap()
+        questionText.tap()
+        questionText.typeText(" Discard")
+        app.buttons["project-workflow-cancel"].tap()
+        XCTAssertFalse(app.staticTexts["Is the survey current? Discard"].exists)
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(root.waitForExistence(timeout: 5))
+        let checklistCard = app.buttons["project-section-checklist"]
+        reveal(checklistCard, in: app)
+        checklistCard.tap()
+        XCTAssertTrue(app.navigationBars["Checklist"].waitForExistence(timeout: 5))
+        app.buttons["project-checklist-suggested"].tap()
+        let status = app.buttons["project-record-status-0"]
+        XCTAssertTrue(status.waitForExistence(timeout: 5))
+        status.tap()
+        app.buttons["Reviewed"].tap()
+        app.buttons["project-workflow-save"].tap()
+        XCTAssertTrue(app.staticTexts["Reviewed"].waitForExistence(timeout: 5))
+        keepScreenshot(named: "Project record checklist on iPhone", from: app)
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(root.waitForExistence(timeout: 5))
+        XCTAssertTrue(checklistCard.label.contains("1/5 reviewed"))
+        reveal(questionCard, in: app)
+        XCTAssertTrue(questionCard.label.contains("1 question"))
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 5))
+#endif
+    }
+
+    func testLongContextExpansionKeepsBeginningVisible() throws {
+#if !DEBUG
+        throw XCTSkip("Project overview acceptance uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
+                               "--native-project-overview-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+                                        "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        let readMore = app.buttons["project-section-context"]
+        XCTAssertTrue(readMore.waitForExistence(timeout: 10))
+        readMore.tap()
+        let editor = app.textViews["project-context-editor"]
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        editor.typeText(String(repeating: "Long context line for scrolling.\n", count: 18))
+        let save = app.buttons["project-inline-save"]
+        if save.isHittable { save.tap() }
+        else { app.buttons["project-inline-keyboard-save"].tap() }
+        XCTAssertTrue(readMore.waitForExistence(timeout: 5))
+        reveal(readMore, in: app, swipingDown: true)
+        readMore.tap()
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["project-inline-editor-title"].isHittable,
+                      "Opening a long Context must keep the start visible rather than jump to its end")
+        XCTAssertGreaterThan((editor.value as? String ?? "").count, 500,
+                             "The full saved Context remains available for editing")
+        keepScreenshot(named: "Long Context expands at the beginning before editing", from: app)
+        app.buttons["project-inline-cancel"].tap()
 #endif
     }
 
     func testSavedProjectTilesAtAccessibilitySize() throws {
         try verifySavedProjectNavigation(largeText: true)
+    }
+
+    func testProjectOverviewAtAccessibilitySize() throws {
+#if !DEBUG
+        throw XCTSkip("Project overview uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
+                               "--native-project-overview-fixture", "--permitext-disable-clerk",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityM"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+                                        "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["project-section-context"].isHittable)
+        keepScreenshot(named: "Project overview accessibility size top", from: app)
+        for section in ["notebook", "evidence", "reports"] {
+            let card = app.buttons["project-section-\(section)"]
+            reveal(card, in: app)
+            XCTAssertTrue(card.isHittable)
+        }
+        keepScreenshot(named: "Project overview accessibility size collections", from: app)
+        app.buttons["project-section-reports"].tap()
+        XCTAssertTrue(app.navigationBars["Reports"].waitForExistence(timeout: 10))
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
+#endif
     }
 
     private func verifySavedProjectNavigation(largeText: Bool) throws {

@@ -227,7 +227,6 @@ private struct ProjectNotebookSessionView: View {
     @State private var permitsLocalDraftEditing = false
     @State private var isLoading = true
     @State private var loadID: UUID?
-    @State private var cachedAt: String?
     @State private var errorMessage: String?
     @State private var editorRoute: NativeNotebookEditorRoute?
     @State private var isVisible = false
@@ -328,13 +327,6 @@ private struct ProjectNotebookSessionView: View {
 
     private var notebookList: some View {
         VStack(spacing: 0) {
-            Label("Project: \(projectName)", systemImage: "folder")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-
             Group {
                 if isLoading && cards.isEmpty && localDrafts.isEmpty {
                     ProgressView("Loading Notebook…")
@@ -355,10 +347,6 @@ private struct ProjectNotebookSessionView: View {
                                 Text(errorMessage).font(.footnote).foregroundStyle(.secondary)
                                 Button("Retry") { Task { await loadCards(forceNetwork: true) } }
                             }
-                        }
-                        if let cachedAt {
-                            Text("Saved on this iPhone: \(notebookDate(cachedAt)). Connect to refresh access and content.")
-                                .font(.caption).foregroundStyle(.secondary)
                         }
                         if !localDrafts.isEmpty {
                             Section("Drafts on this iPhone") {
@@ -451,7 +439,6 @@ private struct ProjectNotebookSessionView: View {
             cards = PermitextReleaseSurfaceVisibility.visibleNotebookCards(cached.value.cards)
             // Cached access is descriptive; an online response authorizes edits.
             access = NotebookAccess(role: "viewer", readOnly: true)
-            cachedAt = cached.cachedAt
         }
         isLoading = true
         defer { if isCurrentOwner && loadID == requestID { isLoading = false } }
@@ -468,14 +455,12 @@ private struct ProjectNotebookSessionView: View {
             access = response.access ?? NotebookAccess(role: "editor", readOnly: false)
             permitsLocalDraftEditing = false
             errorMessage = nil
-            cachedAt = nil
             try? cache.store(response, accountID: owner.accountID, projectID: projectID, scope: "native-notebook-list")
         } catch {
             guard isCurrentOwner, loadID == requestID, !Task.isCancelled else { return }
             permitsLocalDraftEditing = access.readOnly && NativeNotebookOfflineDraftPolicy.permitsDraftEditing(cachedAccess: cachedAccess, after: error)
             if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) {
                 cards = []
-                cachedAt = nil
                 access = NotebookAccess(role: "viewer", readOnly: true)
             }
             if NativePrivateCachePolicy.requiresInvalidation(after: error) {
