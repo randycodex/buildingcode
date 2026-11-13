@@ -20,6 +20,8 @@ function fixture({pro=true,view='notebook',paneIDs=[],groups=[],hidden=[]}={}) {
     readerTabs,addReaderTab,canAddReaderTab,maximumReaderTabs,rememberReaderTabPosition(){},retainReaderColumn(){},showWebNotice:async()=>{},
     ...syncIdentity,crypto:{randomUUID},state:{readers:[],paneOrder:[...paneIDs],columnGroups:groups,workflowNavigationGeneration:0},
     pendingLinkedPanePlacements:new Map(),
+    CSS:{escape:value=>value},track:{querySelector:()=>null},workflowScrollStore:{capture(){},restore(){}},
+    whenWorkspacePaneReady:async()=>true,restoreReaderScrollPositions(){},
     activeWorkspaceID:'project-a',view,accountCurrent:true,needsProject:false,
     isProAccount:()=>pro,
     notifyProjectRequiredForColumn:()=>c.needsProject,
@@ -36,7 +38,7 @@ function fixture({pro=true,view='notebook',paneIDs=[],groups=[],hidden=[]}={}) {
     readerShortcuts:{activePaneID:()=>c.activeColumn || ''},
     transitionWorkspace:()=>rendering,scrollPaneIntoView:id=>scrolled.push(id)
   });
-  vm.runInContext(['newReaderState','requestLinkedPanePlacement','placePaneAfter','placePaneBefore','applyLinkedPanePlacements','openReaderFromToolbar'].map(actual).join('\n'),c);
+  vm.runInContext(['newReaderState','requestLinkedPanePlacement','placePaneAfter','placePaneBefore','applyLinkedPanePlacements','setNotebookReaderHidden','openReaderFromToolbar'].map(actual).join('\n'),c);
   return {c,pickers,scrolled,finishRender};
 }
 const code={prefix:'PC',version:'2022'};
@@ -113,7 +115,15 @@ console.log('Readers passed: explicit source selection, four working views, proj
  f.finishRender();await Promise.all(pending);
  for(let index=0;index<3;index++)addReaderTab(f.c.state.readers[0],{codePrefix:'BC',codeVersion:'2022'},`extra-${index}`);
  assert.equal(readerTabs(f.c.state.readers[0]).length,6);assert.equal(f.c.state.readers.length,1);
- const before=JSON.stringify(f.c.state);let notices=0;f.c.showWebNotice=async()=>notices++;
- const pickerCount=f.pickers.length;assert.equal(await f.c.openReaderFromToolbar({}),true);assert.equal(notices,0);assert.equal(f.pickers.length,pickerCount,'The existing Notebook Reader button focuses its column without creating a picker or duplicate bubble');assert.equal(JSON.stringify(f.c.state),before);
+ const reader=f.c.state.readers[0];reader.scrollPosition={contentKey:'PC:2022',sectionID:'kept',blockID:'paragraph',anchorOffset:-83};
+ const before=JSON.stringify(f.c.state.readers);let notices=0;f.c.showWebNotice=async()=>notices++;
+ const panel={querySelector:()=>null};f.c.track.querySelector=()=>panel;
+ let captures=0,restores=0;f.c.workflowScrollStore={capture:()=>captures++,restore:()=>restores++};
+ const positions=[];f.c.restoreReaderScrollPositions=map=>positions.push(map.get(`reader:${reader.id}`));
+ const pickerCount=f.pickers.length;
+ assert.equal(await f.c.openReaderFromToolbar({}),true);assert.equal(f.c.state.notebookReaderHidden,true);assert.equal(captures,1);assert.equal(panel._workflowReaderPosition,reader.scrollPosition);
+ assert.equal(JSON.stringify(f.c.state.readers),before,'Closing retains all six tabs and their exact reading sessions');
+ assert.equal(await f.c.openReaderFromToolbar({}),true);assert.equal(f.c.state.notebookReaderHidden,false);assert.equal(restores,1);assert.equal(positions[0],reader.scrollPosition);
+ assert.equal(notices,0);assert.equal(f.pickers.length,pickerCount,'Reopening restores the same Reader without a picker or a seventh tab');assert.equal(JSON.stringify(f.c.state.readers),before);
 }
-console.log('Notebook launcher passed: one control/column, concurrent picker safety, six independent tabs and focus without replacing tabs.');
+console.log('Notebook launcher passed: one control/column, concurrent picker safety, six independent tabs and close/reopen with exact reading positions.');

@@ -2,6 +2,8 @@ const visibleReaderReveals = [];
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import {readerTabs,initializeReaderTabs,addReaderTab,canAddReaderTab,maximumReaderTabs} from '../public/reader-tabs.js';
+import {linkPaneToView} from '../public/workflow-views.js';
 const source=readFileSync(new URL('../public/app.js', import.meta.url),'utf8');
 const code=source.slice(source.indexOf('function reusableSearchReader('),source.indexOf('\nfunction removeSectionDetail(',source.indexOf('function reusableSearchReader(')));
 let serial=0;
@@ -53,3 +55,27 @@ for (const delay of ['metadata', 'hydration']) {
 console.log('Delayed source navigation remains confined to its originating view.');
 
 assert(visibleReaderReveals.length > 0, 'Explicit source navigation reveals its destination through the shared column layout.');
+
+// A hidden Notebook Reader still owns its six reading sessions. Evidence can
+// reveal it and add a tab, but must never create a second Notebook column.
+{
+ const kept={id:'kept',codePrefix:'BC',codeVersion:'2022',sectionID:'101',scrollPosition:{sectionID:'101',anchorOffset:-67}};
+ initializeReaderTabs(kept);
+ const original=JSON.stringify(readerTabs(kept)[0]);let notices=0;
+ const notebookContext=vm.createContext({...context,
+  state:{readers:[kept],paneWeights:{},notebookReaderHidden:true,workflowMembership:{kept:['notebook']}},
+  currentColumnWorkflowView:()=> 'notebook',resolveReaderSource:async item=>item,
+  whenWorkspacePaneReady:async()=>true,isCurrentAccountRequest:()=>true,
+  readerTabs,addReaderTab,canAddReaderTab,maximumReaderTabs,linkPaneToView,
+  rememberReaderTabPosition(){},retainReaderColumn(){},showWebNotice:async()=>notices++,
+  workflowPaneIsVisible:()=>false});
+ vm.runInContext(code,notebookContext);
+ const opened=await notebookContext.openSourceInReader({sectionID:'102',codePrefix:'BC',codeVersion:'2022'},'saved',{sourceSurface:'saved',forceNewReader:true});
+ assert.equal(opened,kept);assert.equal(notebookContext.state.readers.length,1);assert.equal(notebookContext.state.notebookReaderHidden,false);
+ assert.equal(readerTabs(kept).length,2);assert.equal(JSON.stringify(readerTabs(kept)[0]),original);
+ for(let index=0;index<4;index++)addReaderTab(kept,{codePrefix:'BC',codeVersion:'2022',sectionID:`${index+3}01`},`extra-${index}`);
+ notebookContext.state.notebookReaderHidden=true;const before=JSON.stringify(kept);
+ assert.equal(await notebookContext.openSourceInReader({sectionID:'999'},'saved',{sourceSurface:'saved',forceNewReader:true}),null);
+ assert.equal(notices,1);assert.equal(notebookContext.state.readers.length,1);assert.equal(notebookContext.state.notebookReaderHidden,true);assert.equal(JSON.stringify(kept),before);
+}
+console.log('Hidden Notebook Reader passed: Evidence reopens the retained column, preserves prior tabs, and respects its six-tab limit.');

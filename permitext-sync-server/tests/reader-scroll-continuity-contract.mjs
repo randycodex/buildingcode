@@ -252,3 +252,23 @@ console.log('Reader revision recovery passed: fresh manifest, recomputed target 
  const fixture={dataset:{paneId:'reader:geometry',readerContentKey:'geometry'},classList:{contains:()=>false},querySelector:()=>content};
  assert.equal(context.captureReaderScrollPositions(fixture).get('reader:geometry').anchorOffset,-53,'A skipped-neighbor layout cannot introduce a cumulative tab-restoration shift');
 }
+
+// A closed Notebook Reader may finish laying out text after it reopens. Hold
+// the saved passage offset through those changes, then yield to user input.
+{
+ let resize,extent=400,scroll=0,corrections=0;
+ const events=new EventTarget();
+ const panel={addEventListener:(...args)=>events.addEventListener(...args)};
+ const target={isConnected:true,getBoundingClientRect:()=>({top:extent-scroll})};
+ const content={isConnected:true,closest:()=>panel,querySelectorAll:()=>[target],getBoundingClientRect:()=>({top:0})};
+ const position={sectionID:'kept',sectionOffset:-17};
+ const watcher=vm.createContext({AbortController,
+  ResizeObserver:class {constructor(fn){resize=fn;}observe(){}disconnect(){}},
+  MutationObserver:class {observe(){}disconnect(){}},
+  applyReaderScrollPosition:(_panel,saved)=>{assert.equal(saved,position);scroll=extent-saved.sectionOffset;corrections++;}});
+ vm.runInContext(actual('watchReaderSourcePosition'),watcher);
+ watcher.watchReaderSourcePosition(content,target,position);assert.equal(scroll,417);
+ extent+=55;resize();assert.equal(scroll,472);assert.equal(corrections,2);
+ events.dispatchEvent(new Event('wheel'));extent+=80;resize();assert.equal(scroll,472,'User scrolling ends automatic anchor correction');
+}
+console.log('Reopened Notebook Reader anchor passed: late layout preserves the exact passage offset until user input.');

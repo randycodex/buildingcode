@@ -44,7 +44,9 @@ for (const [s, b, inside] of [[0, 0, 0], [37, 620, 7], [127, 1237, 3], [90, 1, 0
   assert.equal(position.blockID, `b${b}`);
   assert.equal(position.anchorOffset, inside ? -inside : 0);
   assert.equal(position.sectionOffset, -offsets[b] - inside);
-  assert.ok(reads <= 24, `Anchor capture measured ${reads} nodes instead of a bounded binary search`);
+  // Binary searches plus boundary checks and the final settled-anchor sample.
+  const readBudget=Math.ceil(Math.log2(sectionCount))+Math.ceil(Math.log2(blockCount))+8;
+  assert.ok(reads <= readBudget, `Anchor capture measured ${reads} nodes instead of a bounded binary search`);
   maximumReads = Math.max(maximumReads, reads);
 }
 // Retained columns with unchanged scroll/width/extent reuse the exact anchor.
@@ -95,7 +97,7 @@ const restoredSections = Array.from({length: 128}, (_, index) => {
   return {dataset: {sectionId: `s${index}`}, style: {
     get contentVisibility() { return visibility; },
     set contentVisibility(value) { changes.push(index); visibility = value; }
-  }, querySelector: () => null, getBoundingClientRect: () => ({top: 25, height: 200})};
+  }, querySelector: () => null, getBoundingClientRect: () => ({top: 425-restoredContent.scrollTop, height: 200})};
 });
 const restoredContent = {dataset: {chapterFullyLoaded: 'true'}, scrollTop: 400, scrollHeight: 5000, clientHeight: 600,
   querySelector: () => restoredSections[63], querySelectorAll: () => restoredSections,
@@ -114,7 +116,20 @@ restoredSections.forEach((section, index) => assert.equal(section.style.contentV
 changes.length=0;
 restoring.applyReaderScrollPosition({isConnected:true,classList:{contains:()=>false},
  dataset:{readerContentKey:'same'},querySelector:()=>restoredContent},
- {contentKey:'same',sectionID:'s63',sectionOffset:25});
+ {contentKey:'same',sectionID:'s63',sectionOffset:5});
 assert.equal(changes.length,0,'An aligned retained passage must not relayout its five neighboring sections.');
 assert.equal(restoredContent.scrollTop,420,'An aligned retained passage keeps its native scroll position.');
 console.log(`Reader anchor performance passed: exact deep/boundary anchors with at most ${maximumReads} geometry reads across 128 sections and 1,238 passages; restoration contains its five-section measurement window.`);
+
+// Materializing a skipped section can change an earlier height during the
+// scroll assignment. The same paint must settle on the saved paragraph offset.
+{
+ let top=0,base=400,writes=0;
+ const section={style:{},querySelector:()=>null,getBoundingClientRect:()=>({top:base-top})};
+ const content={dataset:{chapterFullyLoaded:'true'},clientHeight:600,scrollHeight:5000,
+  get scrollTop(){return top;},set scrollTop(value){top=value;if(++writes===1)base+=80;},
+  querySelector:()=>section,querySelectorAll:()=>[section],getBoundingClientRect:()=>({top:0})};
+ restoring.applyReaderScrollPosition({isConnected:true,classList:{contains:()=>false},dataset:{readerContentKey:'shift'},querySelector:()=>content},
+  {contentKey:'shift',sectionID:'saved',sectionOffset:-12});
+ assert.equal(section.getBoundingClientRect().top,-12);assert.equal(top,492);assert.ok(writes<=3,'Restore layout correction remains bounded');
+}

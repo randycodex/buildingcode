@@ -109,5 +109,6 @@ console.log('Free access passed: blocked tools and workspace actions, restored p
  pro=true;const attrs={},classes=new Map(),readerLabel={};
  const notebookButton={id:'add-notebook-reader',dataset:{},querySelector:()=>readerLabel,classList:{toggle:(name,on)=>classes.set(name,on)},setAttribute:(name,value)=>attrs[name]=value};
  state.workflowMembership={};c.syncReaderToolbarButton(notebookButton);assert.equal(attrs['aria-pressed'],'false');assert.equal(classes.get('has-open-reader'),false);assert.equal(readerLabel.textContent,'Reader');
- state.workflowMembership={'reader:first':['notebook']};c.syncReaderToolbarButton(notebookButton);assert.equal(attrs['aria-pressed'],'true');assert.equal(classes.get('has-open-reader'),true);assert.equal(readerLabel.textContent,'Reader');assert.equal(notebookButton.title,'Show Notebook Reader');
+ state.workflowMembership={'reader:first':['notebook']};c.syncReaderToolbarButton(notebookButton);assert.equal(attrs['aria-pressed'],'true');assert.equal(classes.get('has-open-reader'),true);assert.equal(readerLabel.textContent,'Reader');assert.equal(notebookButton.title,'Close Notebook Reader');
+ state.notebookReaderHidden=true;c.syncReaderToolbarButton(notebookButton);assert.equal(attrs['aria-pressed'],'false');assert.equal(classes.get('has-open-reader'),false);assert.equal(notebookButton.title,'Open Notebook Reader');
 }

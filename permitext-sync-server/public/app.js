@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-stable-tool-labels-v1732";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-retained-reader-open-tools-v1736";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-stable-tool-labels-v1732";
+} from "./offline-storage.js?v=20261112-retained-reader-open-tools-v1736";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -199,7 +199,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261109-notebook-toggle-v1300";
+} from "./workspace-state.js?v=20261112-notebook-reader-toggle-v1301";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -1023,6 +1023,7 @@ function loadWorkspaceState(accountOverride) {
         : [],
       notebookColumns: normalizeNotebookColumns(saved.notebookColumns),
       notebookListHidden: saved.notebookListHidden === true,
+      notebookReaderHidden: saved.notebookReaderHidden === true,
       reportDrafts: activeProjectDetail && savedReportDrafts.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
@@ -1115,6 +1116,7 @@ function loadWorkspaceState(accountOverride) {
       notebooks: [],
       notebookColumns: [],
       notebookListHidden: false,
+      notebookReaderHidden: false,
       reportDrafts: [],
       coordinations: [],
       coordinationThreads: [],
@@ -5801,6 +5803,7 @@ function workflowPaneAnchors() {
 function workflowPaneIsVisible(paneID) {
   if (!isProAccount()) return state.readers.slice(0, 1).some(reader => paneIDForReader(reader) === paneID);
   const view = currentColumnWorkflowView();
+  if (view === 'notebook' && paneID.startsWith('reader:') && state.notebookReaderHidden) return false;
   if (paneID.startsWith('project:notes-index:')) return view === 'notebook' && !state.notebookListHidden;
   if (view === 'notebook' && isProjectNotebookPaneID(paneID)) {
     const project = workspaceProject();
@@ -10216,13 +10219,13 @@ function syncReaderToolbarButton(button) {
   const replacesReader = !pro && state.readers.length >= 1;
   const readerLabel = "Reader";
   const notebookButton = button.id === 'add-notebook-reader';
-  const notebookOpen = notebookButton && pro && state.readers.some(reader => state.workflowMembership?.[`reader:${reader.id}`]?.includes('notebook'));
+  const notebookOpen = notebookButton && pro && !state.notebookReaderHidden && state.readers.some(reader => state.workflowMembership?.[`reader:${reader.id}`]?.includes('notebook'));
   button.querySelector("span").textContent = pro && !notebookButton ? `${readerLabel} +` : readerLabel;
   if (notebookButton) button.setAttribute('aria-pressed', String(Boolean(notebookOpen)));
   button.dataset.mobileLabel = readerLabel;
   button.hidden = button.id === "free-reader" ? pro || state.readers.length === 0 : !pro;
   button.disabled = false;
-  button.title = requiresProject ? "Choose a workspace first to open Reader" : notebookButton ? notebookOpen ? 'Show Notebook Reader' : 'Open Notebook Reader' : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader as the first column" : "Choose a code for Reader";
+  button.title = requiresProject ? "Choose a workspace first to open Reader" : notebookButton ? notebookOpen ? 'Close Notebook Reader' : 'Open Notebook Reader' : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader as the first column" : "Choose a code for Reader";
   button.classList.toggle("has-open-reader", notebookButton ? Boolean(notebookOpen) : state.readers.length > 0);
   button.setAttribute("aria-label", readerLabel);
 }
@@ -10265,6 +10268,37 @@ function bindReaderToolbarButton(button) {
   });
 }
 
+async function setNotebookReaderHidden(reader, hidden) {
+  if (!state.readers.includes(reader) || currentColumnWorkflowView() !== 'notebook') return false;
+  const paneID = paneIDForReader(reader);
+  const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (hidden) {
+    panel?.querySelector('.reader-content')?._readerSourcePosition?.abort();
+    rememberReaderTabPosition(reader);
+    if (panel) {
+      panel._workflowReaderPosition = reader.scrollPosition;
+      workflowScrollStore.capture([panel]);
+    }
+  }
+  state.notebookReaderHidden = hidden;
+  saveWorkspaceState();
+  await transitionWorkspace('utility');
+  if (!hidden && await whenWorkspacePaneReady(paneID) && !state.notebookReaderHidden &&
+      state.readers.includes(reader) && currentColumnWorkflowView() === 'notebook') {
+    const restoredPanel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+    if (restoredPanel) workflowScrollStore.restore([restoredPanel]);
+    if (reader.scrollPosition) {
+      restoreReaderScrollPositions(new Map([[paneID, reader.scrollPosition]]));
+      const content = restoredPanel?.querySelector('.reader-content');
+      const section = content?.querySelector(`.chapter-section[data-section-id="${CSS.escape(reader.scrollPosition.sectionID)}"]`);
+      const target = reader.scrollPosition.blockID && section?.querySelector(`[data-block-id="${CSS.escape(reader.scrollPosition.blockID)}"]`) || section;
+      if (target) watchReaderSourcePosition(content, target, reader.scrollPosition);
+    }
+    scrollPaneIntoView(paneID);
+  }
+  return true;
+}
+
 async function openReaderFromToolbar(button) {
   if (notifyProjectRequiredForColumn()) return false;
   const identity = captureAccountRequest();
@@ -10273,20 +10307,20 @@ async function openReaderFromToolbar(button) {
   const generation = state.workflowNavigationGeneration || 0;
   const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     currentColumnWorkflowView() === view && (state.workflowNavigationGeneration || 0) === generation;
-  const notebookReader = view === 'notebook' && state.readers.find(reader => workflowPaneIsVisible(paneIDForReader(reader)));
+  const notebookReader = view === 'notebook' && state.readers.find(reader => state.workflowMembership?.[paneIDForReader(reader)]?.includes('notebook'));
   if (notebookReader) {
-    scrollPaneIntoView(paneIDForReader(notebookReader));
-    return true;
+    return setNotebookReaderHidden(notebookReader, !state.notebookReaderHidden);
   }
   openReaderCodePicker(button, async code => {
     if (!isCurrent() || workspaceColumnsRequireProject()) return;
     // Recheck at selection time: another picker may have created the Reader.
-    const notebookReader = view === 'notebook' && state.readers.find(reader => workflowPaneIsVisible(paneIDForReader(reader)));
+    const notebookReader = view === 'notebook' && state.readers.find(reader => state.workflowMembership?.[paneIDForReader(reader)]?.includes('notebook'));
     if (notebookReader) {
       if (!canAddReaderTab(notebookReader)) {
         await showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
         return;
       }
+      state.notebookReaderHidden = false;
       rememberReaderTabPosition(notebookReader);
       retainReaderColumn(notebookReader);
       addReaderTab(notebookReader, newReaderState({codePrefix:code.prefix,codeVersion:codeOptionVersion(code)}));
@@ -10303,6 +10337,7 @@ async function openReaderFromToolbar(button) {
       codePrefix: code.prefix, codeVersion: codeOptionVersion(code),
       ...(previous ? { id: previous.id } : {})
     });
+    if (view === 'notebook') state.notebookReaderHidden = false;
     if (previous) state.readers = [reader];
     else state.readers.push(reader);
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneIDForReader(reader), view);
@@ -20811,6 +20846,10 @@ async function renderReader(reader, options = {}) {
   });
 
   closeButton.addEventListener("click", () => {
+    if (currentColumnWorkflowView() === 'notebook' && state.workflowMembership?.[paneIDForReader(reader)]?.includes('notebook')) {
+      void setNotebookReaderHidden(reader, true);
+      return;
+    }
     // Closing has no next chapter to render. Stop pending work and detach the
     // source immediately instead of clearing it into a loading placeholder.
     cancelReaderPanelRequests(panel);
@@ -40829,7 +40868,7 @@ async function confirmSearchReaderReplacement(reader, detail, anchorPaneID = "")
   );
 }
 
-function watchReaderSourcePosition(content, target) {
+function watchReaderSourcePosition(content, target, position = null) {
   content._readerSourcePosition?.abort();
   if (typeof ResizeObserver !== 'function' || typeof MutationObserver !== 'function') return;
   const controller = new AbortController();
@@ -40838,6 +40877,13 @@ function watchReaderSourcePosition(content, target) {
     if (controller.signal.aborted) return;
     if (!content.isConnected || !target.isConnected) { controller.abort(); return; }
     const panel = content.closest('.reader-panel');
+    if (position) {
+      const offset = target.dataset?.blockId && position.blockID ? position.anchorOffset : position.sectionOffset;
+      if (Math.abs(target.getBoundingClientRect().top - content.getBoundingClientRect().top - offset) > 1) {
+        applyReaderScrollPosition(panel, position);
+      }
+      return;
+    }
     const header = Number.parseFloat(getComputedStyle(panel, '::before').height) || 0;
     if (Math.abs(target.getBoundingClientRect().top - panel.getBoundingClientRect().top - header) > 1) {
       positionReaderSourceBeforePaint(content, target);
@@ -41076,7 +41122,9 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   const fromSearch = options.sourceSurface === "search";
   const fromSaved = options.sourceSurface === "saved";
   const ownedSource = fromSearch || fromSaved;
-  const visibleReaders = (state.readers || []).filter(candidate => workflowPaneIsVisible(paneIDForReader(candidate)));
+  const visibleReaders = (state.readers || []).filter(candidate => notebookOpening
+    ? state.workflowMembership?.[paneIDForReader(candidate)]?.includes('notebook')
+    : workflowPaneIsVisible(paneIDForReader(candidate)));
   let reader = notebookOpening ? visibleReaders[0] || null : options.forceNewReader ? null : ownedSource
     ? reusableSearchReader(visibleReaders, anchorPaneID, options.forceNewReader)
     : visibleReaders.find((candidate) =>
@@ -41133,6 +41181,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   }
   const paneID = paneIDForReader(reader);
   if (currentColumnWorkflowView() === 'notebook') {
+    state.notebookReaderHidden = false;
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, 'notebook');
   }
   const sourceNavigation = ownedSource ? {
@@ -46608,9 +46657,14 @@ function applyReaderScrollPosition(panel, position) {
   try {
     const offset = block ? position.anchorOffset : Number.isFinite(position.estimatedFraction)
       ? -position.estimatedFraction * section.getBoundingClientRect().height : position.sectionOffset;
-    targetTop = Math.max(0, content.scrollTop + anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset);
-    maximumTop = Math.max(0, content.scrollHeight - content.clientHeight);
-    content.scrollTop = Math.min(targetTop, maximumTop);
+    // Scrolling can materialize skipped passages and change earlier heights.
+    // Settle that bounded layout before painting the restored reading position.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      targetTop = Math.max(0, content.scrollTop + anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset);
+      maximumTop = Math.max(0, content.scrollHeight - content.clientHeight);
+      content.scrollTop = Math.min(targetTop, maximumTop);
+      if (Math.abs(anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset) <= 1) break;
+    }
   } finally {
     measured.forEach(({ node, visibility }) => { node.style.contentVisibility = visibility; });
   }
@@ -50293,14 +50347,20 @@ function workspacePaneDescriptors(options = {}) {
     const scrollPosition = options.readerTabSwitchPaneID === id ? reader.scrollPosition
       : options.readerScrollPositions?.get(id) || reader.scrollPosition;
     add(id, readerPositionLabel(reader), (signal) => renderReader(reader, { scrollPosition: sourceNavigation ? undefined : scrollPosition,
-      sourceNavigation, accessGate: options.accessGate, signal }), closeAndRender(() => {
-      state.readers = state.readers.filter((item) => item.id !== reader.id);
-      state.readers.forEach((item) => { if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = ""; });
-      Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
-        if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
-      });
-    }), {
+      sourceNavigation, accessGate: options.accessGate, signal }), async () => {
+      if (currentColumnWorkflowView() === 'notebook' && state.workflowMembership?.[id]?.includes('notebook')) {
+        return setNotebookReaderHidden(reader, true);
+      }
+      return closeAndRender(() => {
+        state.readers = state.readers.filter((item) => item.id !== reader.id);
+        state.readers.forEach((item) => { if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = ""; });
+        Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
+          if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
+        });
+      })();
+    }, {
       publicContent: true,
+      deferWhileHidden: state.workflowMembership?.[id]?.includes('notebook') === true,
       identity: workspaceReaderContentIdentity(reader),
       scrollPosition: sourceNavigation ? undefined : scrollPosition,
       sourceNavigation

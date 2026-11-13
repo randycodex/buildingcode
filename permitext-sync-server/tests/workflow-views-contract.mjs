@@ -309,6 +309,10 @@ assert.equal(paneBelongsToView(notesID,'notebook',notesLayout.workflowMembership
   await c.switchWorkflowView('research');assert.equal(reader.scrollTop,1850);assert.equal(host.parentElement,researchTools);
   await c.switchWorkflowView('notebook');assert.equal(notebookReader.scrollTop,2470);assert.equal(host.parentElement,researchTools);
  }
+ state.notebookReaderHidden=true;assert.equal(c.workflowPaneIsVisible('reader:notebook'),false);
+ await c.switchWorkflowView('research');assert.equal(c.workflowPaneIsVisible('reader:one'),true,'Closing the Notebook Reader does not hide Research Readers');
+ await c.switchWorkflowView('notebook');assert.equal(c.workflowPaneIsVisible('reader:notebook'),false,'View changes retain the closed Notebook Reader');
+ state.notebookReaderHidden=false;c.syncWorkflowColumnPresentation();
  assert.equal(session.activeTabID,selectedTab);assert.equal(JSON.stringify(readerTabs(session).filter(tab=>tab.id!==session.activeTabID)),frozenTabs);assert.equal(session.scrollPosition.anchorOffset,-2470);assert.equal(readerTabs(session).length,6);assert.equal(notebook.draft,'Unsaved text');
  const frozen=JSON.stringify(session);
  const reloaded={};applyWorkspaceLayout(reloaded,captureWorkspaceLayout(state));
