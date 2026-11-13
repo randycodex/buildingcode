@@ -113,7 +113,7 @@ const toolButtons=['search','analysis','calculator'].map(key=>({key,button:doc.c
 const actualFunction=name=>{const first=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(first>=0,name);return source.slice(first,source.indexOf('\n}',first)+2);};
 let saves=0, allContext='A:research', previewOrder=[];
 const allState={readers:[{id:'a',codePrefix:'BC',codeVersion:'2022',title:'Reader'},{id:'b',codePrefix:'PC',codeVersion:'2022',title:'Reader'}],paneOrder:[...allIDs]};
-const appContext=vm.createContext({state:allState,track:allTrack,isProAccount:()=>true,workflowPaneIsVisible:()=>true,
+const appContext=vm.createContext({currentColumnWorkflowView:()=>allContext.endsWith(':notebook')?'notebook':'research',state:allState,track:allTrack,isProAccount:()=>true,workflowPaneIsVisible:()=>true,
   paneIDForReader:r=>`reader:${r.id}`,syncCodeVersion:value=>value,syncCodeVersionForPrefix:()=> '2022',codeOptions:[],
   readerTabs:()=>[{}],readerPositionLabel:r=>`Reader ${allState.readers.indexOf(r)+1}`,columnPaneLabel:()=> 'Evidence',
   activePaneIDs:()=>allState.paneOrder,paneGroupForMove:id=>[id],pinCriticalWorkflowPanesToLeft:ids=>ids,
@@ -206,5 +206,7 @@ navigation.refresh();
 assert.deepEqual(allHost.children.filter(button=>button.textContent.startsWith('Search')).map(button=>button.textContent),['Search 1','Search 2']);
 allPanels[1].remove();duplicate.remove();navigation.refresh();
 assert.equal(toolButtons[0].button.classList.contains('has-open-column'),false,'Closing the last Search restores its launcher.');
+allContext='A:notebook';navigation.refresh();
+assert.deepEqual(allHost.children.map(button=>button.dataset.readerPaneId),allState.paneOrder.filter(id=>id.startsWith('reader:')),'Notebook shows Reader bubbles without duplicating Evidence or Notes buttons');
 navigation.dispose();
 console.log('Column bubbles passed: matching physical order, open-tool styling, per-instance navigation, retained Reader targeting, live pointer/keyboard reordering, cancellation, no native ghost, intact drafts, stale-context guards and launcher restoration.');

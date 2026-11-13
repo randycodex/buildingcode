@@ -2563,10 +2563,9 @@ async function main() {
       "Paragraph selection, immediate saving, or Reader saved markers no longer preserve passage identity."
     );
     assert(
-      workspaceScript.text.includes("projectSavedSourceKey: projectKey") &&
-        workspaceScript.text.includes("candidate.projectSavedSourceKey === projectKey") &&
-        workspaceScript.text.includes("Object.assign(reader, readerFields)"),
-      "Project saved-item clicks no longer reuse one project-linked Reader column."
+      workspaceScript.text.includes("return openSavedItemInReader({...item,") &&
+        workspaceScript.text.includes('sourceSurface: "saved", isCurrent, forceNewReader: true'),
+      "Saved Evidence must open an independent Reader without replacing an existing reading session."
     );
     assert(
       workspaceScript.text.includes('heading.className = "project-detail-section-heading"') &&

@@ -1,3 +1,4 @@
+import {readerTabs,initializeReaderTabs,addReaderTab,canAddReaderTab} from '../public/reader-tabs.js';
 import {shouldOpenNotebookByDefault} from "../public/minimal-workflow.js";
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
@@ -286,3 +287,44 @@ const notesLayout = {};
 applyWorkspaceLayout(notesLayout,captureWorkspaceLayout({workflowMembership:explicitNotes}));
 assert.equal(paneBelongsToView(notesID,'research',notesLayout.workflowMembership),true);
 assert.equal(paneBelongsToView(notesID,'notebook',notesLayout.workflowMembership),true);
+
+// Research and Notebook each retain live Reader sessions across repeated view
+// switches. Reuse one shortcut controller by moving its host between toolbars.
+{
+ const notebookReader=pane('reader:notebook');panes.splice(0,panes.length,reader,notebook,notebookReader);
+ const session={id:'notebook',codePrefix:'BC',codeVersion:'2022',sectionID:'101',scrollPosition:{sectionID:'101',anchorOffset:-42}};
+ initializeReaderTabs(session);
+ for(const [index,prefix] of ['AC','PC','MC','FGC','ECC'].entries())addReaderTab(session,{codePrefix:prefix,codeVersion:'2022',sectionID:`${index+2}01`,scrollPosition:{sectionID:`${index+2}01`,anchorOffset:-50-index}},`tab-${index}`);
+ assert.equal(canAddReaderTab(session),false);assert.equal(addReaderTab(session,{codePrefix:'EC'},'seventh'),null);
+ const frozenTabs=JSON.stringify(readerTabs(session).filter(tab=>tab.id!==session.activeTabID));const selectedTab=session.activeTabID;state.readers=[session];state.workflowMembership={'reader:notebook':['notebook']};
+ c.paneIDForReader=reader=>`reader:${reader.id}`;
+ c.captureReaderScrollPositions=()=>new Map(panes.filter(pane=>!pane.hidden&&pane.dataset.paneId.startsWith('reader:')).map(pane=>[pane.dataset.paneId,{contentKey:pane.dataset.paneId,sectionID:'kept-section',anchorOffset:-pane.scrollTop}]));
+ const researchTools={append(host){host.parentElement=this;}},notebookTools={append(host){host.parentElement=this;}};
+ const host={parentElement:researchTools};
+ c.document.querySelector=selector=>selector==='#reader-shortcuts'?host:selector==='[data-workflow-tools="research"] .reader-toolbar-tools'?researchTools:selector==='[data-workflow-tools="notebook"] .reader-toolbar-tools'?notebookTools:null;
+ state.workflowView='research';c.syncWorkflowColumnPresentation();reader.scrollTop=1850;
+ await c.switchWorkflowView('notebook');notebookReader.scrollTop=2470;
+ assert.equal(host.parentElement,notebookTools);assert.equal(c.workflowPaneIsVisible('reader:notebook'),true);assert.equal(c.workflowPaneIsVisible('reader:one'),false);
+ for(let n=0;n<3;n++){
+  await c.switchWorkflowView('research');assert.equal(reader.scrollTop,1850);assert.equal(host.parentElement,researchTools);
+  await c.switchWorkflowView('notebook');assert.equal(notebookReader.scrollTop,2470);assert.equal(host.parentElement,notebookTools);
+ }
+ assert.equal(session.activeTabID,selectedTab);assert.equal(JSON.stringify(readerTabs(session).filter(tab=>tab.id!==session.activeTabID)),frozenTabs);assert.equal(session.scrollPosition.anchorOffset,-2470);assert.equal(readerTabs(session).length,6);assert.equal(notebook.draft,'Unsaved text');
+ const frozen=JSON.stringify(session);
+ const reloaded={};applyWorkspaceLayout(reloaded,captureWorkspaceLayout(state));
+ assert.equal(JSON.stringify(reloaded.readers[0]),frozen);assert.deepEqual(reloaded.workflowMembership,state.workflowMembership);
+}
+// Execute the ordering block from the real renderer, including multiple
+// Readers and the hidden Research Reader retained in the same workspace.
+{
+ const start=source.indexOf("  if (currentColumnWorkflowView() === 'notebook') {",source.indexOf('function appendPaneSequence('));
+ const end=source.indexOf('  state.paneOrder =',start);
+ const context=vm.createContext({currentColumnWorkflowView:()=> 'notebook',workspaceProject:()=>({id:'a'}),
+  notebookIndexPaneID:()=> 'index',selectedNotebookColumn:()=>({id:'note'}),notebookColumnPaneID:()=> 'note',savedPaneIDs:()=>['evidence']});
+ vm.runInContext(`function notebookOrder(orderedPanes){${source.slice(start,end)}return orderedPanes.map(pane=>pane.dataset.paneId);}`,context);
+ const ids=['note','reader:b','index','evidence','reader:a'];
+ const ordered=context.notebookOrder(ids.map(id=>({dataset:{paneId:id},classList:{contains:name=>name==='reader-panel'&&id.startsWith('reader:')}})));
+ assert.deepEqual(Array.from(ordered),['reader:b','reader:a','evidence','index','note']);
+ assert.deepEqual(Array.from(context.notebookOrder(ids.map(id=>({dataset:{paneId:id},classList:{contains:()=>false}})))),['reader:b','reader:a','evidence','index','note'],'Loading placeholders reserve the final Reader position before hydration');
+}
+console.log('Notebook Readers passed: six-tab cap, toolbar host, Reader → Evidence → Notes order, per-view visibility, live reading positions, unsent Note and reload retention.');

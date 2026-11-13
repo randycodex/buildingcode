@@ -163,3 +163,13 @@ const beforeStalePicker = JSON.stringify(full);
 await pickCode({prefix: 'SEVENTH'});
 assert.equal(JSON.stringify(full), beforeStalePicker, 'A stale picker cannot add a seventh tab.');
 console.log('Reader tabs passed: independent code/edition sessions, search and scroll restoration, saved-layout round trip, structural sync, local cursors, duplicate/move/new columns, empty-column removal, six-tab limits, stale pickers and overflow navigation.');
+
+// Notebook cannot create an extra column through tab transfer or overflow.
+{
+ const before=JSON.stringify(state.readers);let notices=0;
+ context.currentColumnWorkflowView=()=> 'notebook';context.showWebNotice=async()=>notices++;
+ await context.transferReaderTab(a,a.activeTabID,{duplicate:true});
+ assert.equal(JSON.stringify(state.readers),before);
+ assert.equal(context.prepareReaderSourceTab(full,{codePrefix:'SEVENTH',codeVersion:'2022',chapterID:'new',sectionID:'new'}),null);
+ assert.equal(notices,1);assert.equal(JSON.stringify(state.readers),before);
+}

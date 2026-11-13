@@ -21,6 +21,7 @@ for (const name of ['openSavedItemInReader', 'openResearchConversation', 'startN
       state: {utilityInstances: [], workflowNavigationGeneration: 0},
       activeWorkspaceID: 'a', captureAccountRequest: () => 1, isCurrentAccountRequest: () => true,
       savedItemOpeningAttempts: new Map(), resolveReaderSource: () => gate,
+      openSourceInReader: async (_item,_pane,options) => {assert.equal(options.forceNewReader,true);await gate;if(options.isCurrent())calls.push('saved-reader');},
       activeAccount: () => ({userID:'test',sessionToken:'local'}), hasCapability: () => true,
       currentColumnWorkflowView: () => 'research',
       activeProjectIDForCodeQuestions: () => 'project', postResearch: () => gate,

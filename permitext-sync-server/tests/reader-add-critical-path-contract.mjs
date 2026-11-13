@@ -1,3 +1,4 @@
+import {readerTabs,addReaderTab,canAddReaderTab,maximumReaderTabs} from '../public/reader-tabs.js';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
@@ -16,6 +17,7 @@ function fixture({pro=true,view='notebook',paneIDs=[],groups=[],hidden=[]}={}) {
   const rendering=new Promise(resolve=>{finishRender=resolve;});
   const pickers=[], scrolled=[];
   const c=vm.createContext({
+    readerTabs,addReaderTab,canAddReaderTab,maximumReaderTabs,rememberReaderTabPosition(){},retainReaderColumn(){},showWebNotice:async()=>{},
     ...syncIdentity,crypto:{randomUUID},state:{readers:[],paneOrder:[...paneIDs],columnGroups:groups,workflowNavigationGeneration:0},
     pendingLinkedPanePlacements:new Map(),
     activeWorkspaceID:'project-a',view,accountCurrent:true,needsProject:false,
@@ -57,12 +59,12 @@ for (const change of [c=>{c.view='report';},c=>{c.activeWorkspaceID='project-b';
 }
 // Reserve slots synchronously so overlapping menu selections respect plan limits.
 for (const pro of [false,true]) {
-  const f=fixture({pro});
+  const f=fixture({pro,view:'research'});
   await Promise.all([f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({})]);
   const pending=f.pickers.map(pick=>pick(code));
   assert.equal(f.c.state.readers.length,pro?3:1);
   assert.equal(new Set(f.c.state.readers.map(r=>r.id)).size,f.c.state.readers.length);
-  f.c.view='research';f.finishRender();await Promise.all(pending);
+  f.c.view='report';f.finishRender();await Promise.all(pending);
   assert.equal(f.scrolled.length,0,'Late rendering must not reveal a pane over another selected view');
 }
 const guarded=fixture();guarded.c.needsProject=true;
@@ -101,3 +103,17 @@ const concurrentPending=concurrent.pickers.map(pick=>pick(code));
 assert.deepEqual(Array.from(concurrent.c.state.paneOrder),[...concurrent.c.state.readers].reverse().map(reader=>`reader:${reader.id}`).concat('utility:search:one'),'The newest Reader stays immediately after Reader +, including overlapping selections.');
 concurrent.finishRender();await Promise.all(concurrentPending);
 console.log('Readers passed: explicit source selection, four working views, project/account/navigation guards, concurrent plan limits and late-render fencing.');
+
+// Notebook's launcher always adds tabs to one Reader, including overlapping
+// pickers opened before its first column exists.
+{
+ const f=fixture({view:'notebook'});
+ await Promise.all([f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({})]);
+ const pending=f.pickers.map(pick=>pick(code));assert.equal(f.c.state.readers.length,1);assert.equal(readerTabs(f.c.state.readers[0]).length,3);
+ f.finishRender();await Promise.all(pending);
+ for(let index=0;index<3;index++){await f.c.openReaderFromToolbar({});await f.pickers.at(-1)({prefix:'BC',version:'2022'});}
+ assert.equal(readerTabs(f.c.state.readers[0]).length,6);assert.equal(f.c.state.readers.length,1);
+ const before=JSON.stringify(f.c.state);let notices=0;f.c.showWebNotice=async()=>notices++;
+ assert.equal(await f.c.openReaderFromToolbar({}),false);assert.equal(notices,1);assert.equal(JSON.stringify(f.c.state),before);
+}
+console.log('Notebook launcher passed: one column, concurrent picker safety, six independent tabs and no replacement/overflow at capacity.');

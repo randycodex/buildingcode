@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-notes-header-align-v1723";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-notebook-reader-tabs-v1730";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-notes-header-align-v1723";
+} from "./offline-storage.js?v=20261112-notebook-reader-tabs-v1730";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4514,6 +4514,10 @@ function prepareReaderSourceTab(reader, fields, { allowNewColumn = true } = {}) 
   const tabs = readerTabs(reader);
   const existing = tabs.find(matches) || tabs.find(tab => tab.codePrefix === fields.codePrefix && tab.codeVersion === fields.codeVersion);
   if (!existing && !canAddReaderTab(reader)) {
+    if (currentColumnWorkflowView() === 'notebook') {
+      void showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
+      return null;
+    }
     if (!allowNewColumn) {
       rememberReaderTabPosition(reader);
       retainReaderColumn(reader);
@@ -4539,6 +4543,7 @@ async function openReferenceInReaderTab(reader, detail, sourceContext) {
   const workspaceID = activeWorkspaceID, identity = captureAccountRequest();
   const fields = readerFieldsForSectionDetail(detail);
   reader = prepareReaderSourceTab(reader, fields);
+  if (!reader) return;
   Object.assign(reader, fields);
   const tabID = reader.activeTabID, paneID = paneIDForReader(reader);
   const target = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? '')));
@@ -4583,6 +4588,7 @@ async function closeReaderTab(reader, tabID) {
 
 async function transferReaderTab(reader, tabID, { duplicate = false, destination = null } = {}) {
   if (!isProAccount() || !state.readers.includes(reader) || destination === reader ||
+      (!destination && currentColumnWorkflowView() === 'notebook') ||
       (destination && (!state.readers.includes(destination) || !canAddReaderTab(destination)))) return;
   rememberReaderTabPosition(reader);
   const tab = readerTabs(reader).find(item => item.id === tabID);
@@ -4630,7 +4636,7 @@ function openReaderTabMenu(reader, tabID, anchor) {
     });
     menu.append(button);
   };
-  if (isProAccount()) {
+  if (isProAccount() && currentColumnWorkflowView() !== 'notebook') {
     add('Move to new column', () => transferReaderTab(reader, tabID), readerTabs(reader).length < 2);
     add('Duplicate in new column', () => transferReaderTab(reader, tabID, { duplicate: true }));
     for (const destination of state.readers.filter(item => item !== reader && workflowPaneIsVisible(paneIDForReader(item)))) {
@@ -5837,7 +5843,16 @@ function syncWorkflowColumnPresentation() {
     const shell = document.querySelector(".workspace-shell");
     if (shell) referenceWorkspaceScroll.set(`${activeWorkspaceID}:${presentedColumnWorkflowView}`, shell.scrollLeft);
     const readerPositions = captureReaderScrollPositions();
-    panes.forEach(pane => { if (readerPositions.has(pane.dataset.paneId)) pane._workflowReaderPosition = readerPositions.get(pane.dataset.paneId); });
+    const readersByPane = new Map((state.readers || []).map(reader => [paneIDForReader(reader), reader]));
+    panes.forEach(pane => {
+      const position = readerPositions.get(pane.dataset.paneId);
+      if (!position) return;
+      pane._workflowReaderPosition = position;
+      const reader = readersByPane.get(pane.dataset.paneId);
+      if (reader && (!pane.dataset.readerDisplayedTabId || pane.dataset.readerDisplayedTabId === reader.activeTabID)) {
+        reader.scrollPosition = {...position};
+      }
+    });
     workflowScrollStore.capture(panes.filter(pane => !pane.classList.contains('is-workflow-hidden')));
     state.workflowScroll ||= {};
     state.workflowScroll[presentedColumnWorkflowView] = track.scrollLeft;
@@ -5875,6 +5890,10 @@ function syncWorkflowNavigation() {
     button.setAttribute('aria-pressed', String(button.dataset.workflowView === (view === 'project-details' ? 'project' : view)));
   });
   document.querySelectorAll('[data-workflow-tools]').forEach(tools => { tools.hidden = tools.dataset.workflowTools !== view; });
+  document.querySelectorAll('[data-saved-reader-action]').forEach(button => { button.textContent = view === 'notebook' ? 'New Reader tab' : 'New reader'; });
+  const shortcutHost = document.querySelector('#reader-shortcuts');
+  const readerTools = document.querySelector(`[data-workflow-tools="${view}"] .reader-toolbar-tools`);
+  if (shortcutHost && readerTools && shortcutHost.parentElement !== readerTools) readerTools.append(shortcutHost);
   syncReferenceReaderLayout();
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   updateWorkspaceLayoutControls();
@@ -10203,7 +10222,7 @@ function syncReaderToolbarButton(button) {
   button.dataset.mobileLabel = readerLabel;
   button.hidden = button.id === "free-reader" ? pro || state.readers.length === 0 : !pro;
   button.disabled = false;
-  button.title = requiresProject ? "Choose a workspace first to open Reader" : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader as the first column" : "Choose a code for Reader";
+  button.title = requiresProject ? "Choose a workspace first to open Reader" : button.id === 'add-notebook-reader' ? 'Choose a code tab for the Notebook Reader' : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader as the first column" : "Choose a code for Reader";
   button.classList.toggle("has-open-reader", state.readers.length > 0);
   button.setAttribute("aria-label", readerLabel);
 }
@@ -10254,8 +10273,29 @@ async function openReaderFromToolbar(button) {
   const generation = state.workflowNavigationGeneration || 0;
   const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     currentColumnWorkflowView() === view && (state.workflowNavigationGeneration || 0) === generation;
+  const notebookReader = view === 'notebook' && state.readers.find(reader => workflowPaneIsVisible(paneIDForReader(reader)));
+  if (notebookReader && !canAddReaderTab(notebookReader)) {
+    await showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
+    return false;
+  }
   openReaderCodePicker(button, async code => {
     if (!isCurrent() || workspaceColumnsRequireProject()) return;
+    // Recheck at selection time: another picker may have created the Reader.
+    const notebookReader = view === 'notebook' && state.readers.find(reader => workflowPaneIsVisible(paneIDForReader(reader)));
+    if (notebookReader) {
+      if (!canAddReaderTab(notebookReader)) {
+        await showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
+        return;
+      }
+      rememberReaderTabPosition(notebookReader);
+      retainReaderColumn(notebookReader);
+      addReaderTab(notebookReader, newReaderState({codePrefix:code.prefix,codeVersion:codeOptionVersion(code)}));
+      saveWorkspaceState();
+      const paneID = paneIDForReader(notebookReader);
+      await transitionWorkspace('utility', {refreshPaneIDs:[paneID],readerTabSwitchPaneID:paneID});
+      if (isCurrent()) scrollPaneIntoView(paneID);
+      return;
+    }
     // Replace the free Reader synchronously, including overlapping picker clicks.
     if (!isProAccount()) enforceReaderPlanLimit();
     const previous = !isProAccount() ? state.readers[0] : null;
@@ -36800,36 +36840,9 @@ async function renderProjectSectionText(content, project, item) {
 }
 
 async function openProjectSavedSection(project, item, anchorPaneID = primarySavedPaneID()) {
-  const detail = { ...item };
-  const { chapter, section } = await resolveSectionDetail(detail);
-  const projectKey = projectDetailKey(project);
-  const readerFields = {
-    codePrefix: detail.codePrefix || "BC",
-    chapterID: detail.chapterID || chapter?.id || "",
-    sectionID: String(detail.sectionID || detail.savedSectionID || detail.itemID || ""),
-    sectionNumber: section?.sectionNumber || detail.sectionNumber || "",
-    title: section?.title || detail.title || "Section",
-    shouldSmoothScrollToSection: false,
-    projectSavedSourceKey: projectKey
-  };
-  let reader = (state.readers || []).find((candidate) => candidate.projectSavedSourceKey === projectKey)
-    || (!isProAccount() ? state.readers[0] : null);
-  if (!reader && isProAccount()) reader = state.readers.find(candidate => Array.isArray(candidate.tabs) && workflowPaneIsVisible(paneIDForReader(candidate)));
-  if (reader) {
-    if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, readerFields);
-    Object.assign(reader, readerFields);
-  } else {
-    reader = newReaderState(readerFields);
-    state.readers.push(reader);
-  }
-  placePaneAfter(anchorPaneID, paneIDForReader(reader));
-  updateBrowserSectionURL(reader.sectionID);
-  scheduleContinuitySync(reader);
-  saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
-  if (!await whenWorkspacePaneReady(paneIDForReader(reader))) return;
-  scrollPaneIntoView(paneIDForReader(reader));
-  alignReaderSectionAfterLayout(reader);
+  return openSavedItemInReader({...item,
+    sectionID: String(item.sectionID || item.savedSectionID || item.itemID || "")
+  }, anchorPaneID);
 }
 
 function openWorkspaceManager() {
@@ -40459,7 +40472,8 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
     actions.className = "saved-row-actions";
     const newReaderButton = document.createElement("button");
     newReaderButton.type = "button";
-    newReaderButton.textContent = "New reader";
+    newReaderButton.dataset.savedReaderAction = '';
+    newReaderButton.textContent = currentColumnWorkflowView() === 'notebook' ? 'New Reader tab' : 'New reader';
     newReaderButton.addEventListener("click", () => {
       void openSourceInReader(item, paneID, { sourceSurface: "saved", forceNewReader: true,
         evidenceAnchor: item.evidenceAnchor || null });
@@ -40739,6 +40753,7 @@ async function openDeepLinkedSectionInReader(item) {
     state.readers.push(reader);
   } else {
     if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, readerFieldsForSectionDetail(detail));
+    if (!reader) return null;
     Object.assign(reader, readerFieldsForSectionDetail(detail, {
       shouldSmoothScrollToSection: false
     }));
@@ -40775,9 +40790,11 @@ function readerIsClearlyAvailable(reader) {
 }
 
 function readerPositionLabel(reader) {
+  const inNotebook = candidate => state.workflowMembership?.[`reader:${candidate?.id}`]?.includes('notebook');
+  if (inNotebook(reader)) return 'Reader';
   const fromSearch = candidate => /^utility:search(?::|$)/.test(String(candidate?.sourceOwnerPaneID || candidate?.searchPreviewPaneID || ""));
   const searchReader = fromSearch(reader);
-  const readers = (state.readers || []).filter(candidate => fromSearch(candidate) === searchReader);
+  const readers = (state.readers || []).filter(candidate => !inNotebook(candidate) && fromSearch(candidate) === searchReader);
   const index = readers.findIndex(candidate => candidate.id === reader?.id);
   if (searchReader) return readers.length > 1 && index >= 0 ? `Search Reader ${index + 1}` : "Search Reader";
   return index >= 0 ? `Reader ${index + 1}` : "Reader";
@@ -41030,6 +41047,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   }
   const requestIdentity = captureAccountRequest();
   const sourceWorkspaceID = activeWorkspaceID;
+  const notebookOpening = currentColumnWorkflowView() === 'notebook';
   const workflowGeneration = state.workflowNavigationGeneration || 0;
   const searchOpening = options.sourceSurface === "search" && !options.forceNewReader;
   const openingAttempt = searchOpening ? Symbol() : null;
@@ -41059,10 +41077,21 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   const fromSaved = options.sourceSurface === "saved";
   const ownedSource = fromSearch || fromSaved;
   const visibleReaders = (state.readers || []).filter(candidate => workflowPaneIsVisible(paneIDForReader(candidate)));
-  let reader = options.forceNewReader ? null : ownedSource
+  let reader = notebookOpening ? visibleReaders[0] || null : options.forceNewReader ? null : ownedSource
     ? reusableSearchReader(visibleReaders, anchorPaneID, options.forceNewReader)
     : visibleReaders.find((candidate) =>
       (!anchorPaneID || candidate.sourceAnchorPaneID === anchorPaneID) && readerMatchesSource(candidate, detail));
+  let notebookTabAdded = false;
+  if (notebookOpening && reader && (fromSaved || options.forceNewReader || !readerMatchesSource(reader, detail))) {
+    if (!canAddReaderTab(reader)) {
+      await showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
+      return null;
+    }
+    rememberReaderTabPosition(reader);
+    retainReaderColumn(reader);
+    addReaderTab(reader, newReaderState(sourceFields));
+    notebookTabAdded = true;
+  }
   let createdReader = false;
   if (!options.forceNewReader && !reader && !ownedSource) {
     reader = visibleReaders.find(readerIsClearlyAvailable) || null;
@@ -41090,9 +41119,10 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
       reader = replacement;
     }
   }
-  if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
+  if (!notebookTabAdded && Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
     allowNewColumn: !(fromSearch || fromSaved) || Boolean(options.forceNewReader)
   });
+  if (!reader) return null;
   const retainedPanel = ownedSource && !options.forceNewReader ? retainReaderForSource(reader, detail) : null;
   Object.assign(reader, sourceFields);
   resolvedReaderSourceNavigations.set(reader, {chapterID: reader.chapterID, sectionID: reader.sectionID,
@@ -41102,13 +41132,16 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     reader.searchPreviewPaneID = "";
   }
   const paneID = paneIDForReader(reader);
+  if (currentColumnWorkflowView() === 'notebook') {
+    state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, 'notebook');
+  }
   const sourceNavigation = ownedSource ? {
     paneID, reader, item: navigationItem, evidenceAnchor: options.evidenceAnchor,
     isCurrent: navigationIsCurrent,
     options: { preferPassage: true, searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode, immediate: true }
   } : null;
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
-  if (anchorPaneID && anchorPaneID !== paneID && (createdReader || options.forceNewReader || (!ownedSource && !Array.isArray(reader.tabs)))) placePaneAfter(anchorPaneID, paneID);
+  if (!notebookOpening && anchorPaneID && anchorPaneID !== paneID && (createdReader || options.forceNewReader || (!ownedSource && !Array.isArray(reader.tabs)))) placePaneAfter(anchorPaneID, paneID);
   else appendPaneIfMissing(paneID);
   if (reader.sectionID) updateBrowserSectionURL(reader.sectionID);
   scheduleContinuitySync(reader);
@@ -41122,7 +41155,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   await transitionWorkspace("utility", {
     refreshPaneIDs: retainedPanel ? [] : [paneID],
     ...(sourceNavigation ? { readerSourceNavigation: sourceNavigation,
-      readerTabSwitchPaneID: !retainedPanel && !createdReader && !options.forceNewReader ? paneID : "" } : {})
+      readerTabSwitchPaneID: notebookTabAdded || !retainedPanel && !createdReader && !options.forceNewReader ? paneID : "" } : {})
   });
   if (!navigationIsCurrent() || !await whenWorkspacePaneReady(paneID) || !navigationIsCurrent()) return null;
   const destinationPanel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
@@ -41176,7 +41209,7 @@ async function openSavedItemInReader(item, savedPaneID) {
     isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     generation === (state.workflowNavigationGeneration || 0);
   try {
-    return await openSourceInReader(item, savedPaneID, { sourceSurface: "saved", isCurrent,
+    return await openSourceInReader(item, savedPaneID, { sourceSurface: "saved", isCurrent, forceNewReader: true,
       evidenceAnchor: item.evidenceAnchor || null });
   } finally {
     if (savedItemOpeningAttempts.get(savedPaneID) === attempt) savedItemOpeningAttempts.delete(savedPaneID);
@@ -45713,8 +45746,10 @@ function openColumnGroupMenu(panel, anchor) {
       const reader = state.readers.find(item => item.id === panel.dataset.readerId);
       if (reader) {
         add("Add code tab", () => openReaderTabPicker(reader, anchor), !canAddReaderTab(reader));
-        add("Duplicate in new column", () => transferReaderTab(reader, reader.activeTabID, { duplicate: true }));
-        add("Move tab to new column", () => transferReaderTab(reader, reader.activeTabID), readerTabs(reader).length < 2);
+        if (currentColumnWorkflowView() !== 'notebook') {
+          add("Duplicate in new column", () => transferReaderTab(reader, reader.activeTabID, { duplicate: true }));
+          add("Move tab to new column", () => transferReaderTab(reader, reader.activeTabID), readerTabs(reader).length < 2);
+        }
       }
     }
     if (pro) add("Change Code", () => openReaderCodePicker(anchor, async (code) => {
@@ -46180,7 +46215,8 @@ function appendPaneSequence(panes) {
     const project = workspaceProject();
     const indexID = project && notebookIndexPaneID(project);
     const selected = project && selectedNotebookColumn(project);
-    const first = [...savedPaneIDs(), indexID, selected && notebookColumnPaneID(selected)].filter(Boolean);
+    const first = [...orderedPanes.filter(pane => pane.dataset.paneId.startsWith('reader:')).map(pane => pane.dataset.paneId),
+      ...savedPaneIDs(), indexID, selected && notebookColumnPaneID(selected)].filter(Boolean);
     const rank = id => first.includes(id) ? first.indexOf(id) : first.length;
     orderedPanes.sort((left, right) => rank(left.dataset.paneId) - rank(right.dataset.paneId));
   }
@@ -46268,7 +46304,9 @@ function appendPaneSequence(panes) {
 function readerShortcutItems() {
   if (!isProAccount()) return [];
   const byID = new Map((state.readers || []).map(reader => [paneIDForReader(reader), reader]));
-  const items = [...track.querySelectorAll(":scope > .workspace-panel")].filter(panel => panel.dataset.paneId && workflowPaneIsVisible(panel.dataset.paneId)).map(panel => {
+  const notebookView = currentColumnWorkflowView() === 'notebook';
+  const items = [...track.querySelectorAll(":scope > .workspace-panel")].filter(panel => panel.dataset.paneId && workflowPaneIsVisible(panel.dataset.paneId) &&
+    (!notebookView || byID.has(panel.dataset.paneId))).map(panel => {
     const id = panel.dataset.paneId, reader = byID.get(id);
     if (!reader) {
       const toolKey = /^utility:search(?::|$)/.test(id) ? 'search'
@@ -46471,12 +46509,18 @@ function captureReaderScrollPositions(onlyPanel = null) {
     const section = sectionMatch.node;
     const blockMatch = firstBelow(section.querySelectorAll(".annotated-code-block[data-block-id], .reader-block-placeholder[data-block-id]"), top);
     const block = blockMatch?.node;
+    // Boundary probes may lay out a skipped neighboring block. Measure the
+    // chosen anchor again after those probes so its saved offset is current.
+    block?.getBoundingClientRect();
+    const sectionBounds = section.getBoundingClientRect();
+    const anchorBounds = (block || section).getBoundingClientRect();
+    const viewportTop = content.getBoundingClientRect().top;
     positions.set(panel.dataset.paneId, {
       contentKey,
       sectionID: section.dataset.sectionId,
       blockID: block?.dataset.blockId || "",
-      anchorOffset: (blockMatch || sectionMatch).bounds.top - top,
-      sectionOffset: sectionMatch.bounds.top - top
+      anchorOffset: anchorBounds.top - viewportTop,
+      sectionOffset: sectionBounds.top - viewportTop
     });
     // Repeated workflow switches must not force skipped paragraphs through
     // layout again. Scroll, width, extent or a new render invalidates the anchor.
@@ -50248,7 +50292,8 @@ function workspacePaneDescriptors(options = {}) {
     initializeReaderTabs(reader);
     const id = paneIDForReader(reader);
     const sourceNavigation = options.readerSourceNavigation?.paneID === id ? options.readerSourceNavigation : null;
-    const scrollPosition = options.readerScrollPositions?.get(id) || reader.scrollPosition;
+    const scrollPosition = options.readerTabSwitchPaneID === id ? reader.scrollPosition
+      : options.readerScrollPositions?.get(id) || reader.scrollPosition;
     add(id, readerPositionLabel(reader), (signal) => renderReader(reader, { scrollPosition: sourceNavigation ? undefined : scrollPosition,
       sourceNavigation, accessGate: options.accessGate, signal }), closeAndRender(() => {
       state.readers = state.readers.filter((item) => item.id !== reader.id);

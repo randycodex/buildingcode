@@ -149,7 +149,13 @@ panels[0].dataset.readerContentKey = "";
 assert.equal(context.captureReaderScrollPositions().has("reader:a"), false, "Loading content cannot become a recovery anchor");
 
 assert.match(actual("renderWorkspace"), /mountWorkspacePanesIndependently\(context, \{ \.\.\.options, readerScrollPositions, accessGate, shellReady: true \}\)/);
-assert.match(actual("workspacePaneDescriptors"), /const scrollPosition = options\.readerScrollPositions\?\.get\(id\) \|\| reader\.scrollPosition/);
+assert.match(actual("workspacePaneDescriptors"), /const scrollPosition = options\.readerTabSwitchPaneID === id \? reader\.scrollPosition\s*: options\.readerScrollPositions\?\.get\(id\) \|\| reader\.scrollPosition/);
+const readerPositionAssignment=actual("workspacePaneDescriptors").match(/const scrollPosition = options\.readerTabSwitchPaneID[\s\S]*?;/)[0];
+const projectPosition=new Function('reader','options','id',readerPositionAssignment+'return scrollPosition;');
+const incomingPosition={contentKey:'same-code-and-chapter',sectionID:'saved-section',anchorOffset:-260};
+const outgoingPosition={contentKey:'same-code-and-chapter',sectionID:'different-section',anchorOffset:-15};
+assert.equal(projectPosition({scrollPosition:incomingPosition},{readerTabSwitchPaneID:'reader:one',readerScrollPositions:new Map([['reader:one',outgoingPosition]])},'reader:one'),incomingPosition,'A tab switch must restore the incoming tab, even when both tabs show the same code and chapter');
+assert.equal(projectPosition({scrollPosition:incomingPosition},{readerScrollPositions:new Map([['reader:one',outgoingPosition]])},'reader:one'),outgoingPosition,'An ordinary layout refresh still preserves its mounted viewport');
 assert.match(actual("workspacePaneDescriptors"), /renderReader\(reader, \{ scrollPosition: sourceNavigation \? undefined : scrollPosition,/);
 assert.match(actual("getWorkspacePaneHydrator"), /restoreReaderScrollPositions\(new Map\(\[\[job\.id, job\.descriptor\.scrollPosition\]\]\)\)/);
 assert.match(actual("renderReader"), /refreshReaderContent\(panel, reader,\s*\{\s*scrollPosition: options\.scrollPosition/);
@@ -234,3 +240,15 @@ assert.deepEqual(collapsed._collapsedReaderPosition, positions.get("reader:a"));
   context.fetchChapter=savedFetch;context.fetchChapterBodyWindow=savedWindow;context.emptyReader=savedEmpty;
 }
 console.log('Reader revision recovery passed: fresh manifest, recomputed target offsets, disappeared target guard and bounded retry.');
+
+// Measuring a preceding skipped block can change the chosen anchor after the
+// boundary search read it. Persist final geometry rather than its old bounds.
+{
+ let finalGeometry=false,selectedReads=0;
+ const previous={dataset:{blockId:'previous'},getBoundingClientRect(){if(selectedReads)finalGeometry=true;return{top:-100,bottom:-1};}};
+ const selected={dataset:{blockId:'selected'},getBoundingClientRect(){selectedReads++;return{top:finalGeometry?-53:-25,bottom:200};}};
+ const section={dataset:{sectionId:'geometry'},getBoundingClientRect:()=>({top:-100,bottom:500}),querySelectorAll:()=>[previous,selected]};
+ const content={scrollTop:1306,classList:{contains:()=>false},getBoundingClientRect:()=>({top:0}),querySelectorAll:()=>[section]};
+ const fixture={dataset:{paneId:'reader:geometry',readerContentKey:'geometry'},classList:{contains:()=>false},querySelector:()=>content};
+ assert.equal(context.captureReaderScrollPositions(fixture).get('reader:geometry').anchorOffset,-53,'A skipped-neighbor layout cannot introduce a cumulative tab-restoration shift');
+}

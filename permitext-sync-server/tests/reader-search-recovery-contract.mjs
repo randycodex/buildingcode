@@ -1,3 +1,4 @@
+import {linkPaneToView} from '../public/workflow-views.js';
 import { readerSearchMatch, snippetForMatch, readerSearchResultHeading, rankReaderSearchResults } from "../public/reader-search-match.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -153,7 +154,7 @@ function savedHarness() {
   const state = {readers:[unrelated],utilityInstances:[{id:"unrelated",key:"search"}],paneWeights:{},paneOrder:[]};
   let generation = 1, nextID = 0, saves = 0;
   const context = vm.createContext({
-    state, savedItemOpeningAttempts:new Map(), searchReaderOpeningAttempts:new Map(), activeWorkspaceID:"workspace",
+    linkPaneToView,state, savedItemOpeningAttempts:new Map(), searchReaderOpeningAttempts:new Map(), activeWorkspaceID:"workspace",
     captureAccountRequest:()=>generation,isCurrentAccountRequest:value=>value===generation,
     workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=>"research",workflowPaneIsVisible:()=>true,
     resolveReaderSource(item) {const request=deferred();requests.push({...request,item});return request.promise;},
@@ -182,7 +183,7 @@ const historicalSaved = {sectionID:"2014-1010.2",sectionNumber:"1010.2",title:"S
   const retry=t.run(historicalSaved);await settleSourceResolution();t.requests[1].resolve(historicalSaved);await retry;
   assert.equal(t.opened[0].item.sectionID,historicalSaved.sectionID);assert.equal(t.opened[0].reader.codeVersion,"2014");
   assert.equal(t.opened[0].reader.sourceBlockID,"exact");assert.equal(t.opened[0].anchor,historicalSaved.evidenceAnchor);
-  assert.equal(t.opened[0].reader.sourceOwnerPaneID,"saved");assert.equal(t.state.readers[0].sectionID,"unrelated");
+  assert.equal(t.opened[0].reader.sourceOwnerPaneID,undefined,"Saved Evidence opens an independent Reader");assert.equal(t.state.readers[0].sectionID,"unrelated");
 }
 for(const outcome of ["resolve","reject"]) {
   const t=savedHarness(),before=JSON.stringify(t.state),pending=t.run(historicalSaved);

@@ -233,7 +233,7 @@ assert.match(
 const openSavedItemSource = functionSource(appSource, "openSavedItemInReader");
 assert.match(
   openSavedItemSource,
-  /openSourceInReader\(item, savedPaneID, \{ sourceSurface: "saved", isCurrent,[\s\S]*?evidenceAnchor: item\.evidenceAnchor/,
+  /openSourceInReader\(item, savedPaneID, \{ sourceSurface: "saved", isCurrent, forceNewReader: true,[\s\S]*?evidenceAnchor: item\.evidenceAnchor/,
   "A saved passage opens its exact source directly in Reader."
 );
 assert.doesNotMatch(openSavedItemSource, /openOrUpdateLinkedReaderForSearch/,
