@@ -117,7 +117,7 @@ assert.equal(stalePeerCalls,0,"An account change stops the remaining old-account
 account="B";assert.equal(gate.allowed,false);
 const newGate=sandbox.workspaceAccessGateForRender();assert.notEqual(newGate,gate);await tick();assert.equal(newGate.allowed,false,"An A snapshot cannot authorize B.");
 assert.equal(await sandbox.whenWorkspacePaneReady("missing"),false);
-const descriptors=actual("workspacePaneDescriptors");assert.match(descriptors,/renderUtilityInstance\(instance, \{ accessGate: options\.accessGate,/);assert.match(descriptors,/const scrollPosition = options\.readerScrollPositions\?\.get\(id\) \|\| reader\.scrollPosition;[\s\S]*?renderReader\(reader, \{ scrollPosition, accessGate: options\.accessGate, signal \}\)/);
+const descriptors=actual("workspacePaneDescriptors");assert.match(descriptors,/renderUtilityInstance\(instance, \{ accessGate: options\.accessGate,/);assert.match(descriptors,/const scrollPosition = options\.readerTabSwitchPaneID === id \? reader\.scrollPosition[\s\S]*?: options\.readerScrollPositions\?\.get\(id\) \|\| reader\.scrollPosition;/);assert.match(descriptors,/renderReader\(reader, \{ scrollPosition: sourceNavigation \? undefined : scrollPosition,\s+sourceNavigation, accessGate: options\.accessGate, signal \}\)/);
 console.log("Workspace public startup passed: held sync/public publication, shared gate, fresh private reconciliation, shell/target readiness, close cancellation, denial/retry and account isolation.");
 console.log("Workspace notification snapshots passed: lazy summary work, throw isolation, one read per dispatch, fresh mutations, immediate release and mid-dispatch account revocation.");
 

@@ -147,6 +147,8 @@ console.log('Direct Reader evidence passed: Search-owned Reader reuse, exact edi
 }
 {
  const f=fixture();f.c.currentColumnWorkflowView=()=> 'notebook';
+ f.c.state.workflowMembership={'reader:first':['notebook'],'reader:active':['research']};
+ initializeReaderTabs(f.readers[0]);
  const one=await f.c.openProjectSavedSection({id:'project'},item('project-evidence'),'utility:saved:list');const firstTab=one.activeTabID;
  const two=await f.c.openProjectSavedSection({id:'project'},item('next-project-evidence'),'utility:saved:list');
  assert.equal(one.id,two.id);assert.equal(f.readers.length,2);assert.equal(readerTabs(one).find(tab=>tab.id===firstTab).sectionID,'project-evidence');
