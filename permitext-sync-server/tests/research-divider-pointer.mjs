@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
-import { researchColumnsLayout } from '../public/workflow-views.js';
+import { researchColumnsLayout, notebookColumnsLayout } from '../public/workflow-views.js';
 import { adjacentColumnWidths } from '../public/column-expansion.js';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
@@ -45,7 +45,8 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     getBoundingClientRect: () => ({ left: 800, right: 801 })
   };
   const context = vm.createContext({ workspaceColumnExpansion: undefined, adjacentColumnWidths,
-    state, track, activeWorkspaceID: 'test', CSS: { escape: value => value }, researchColumnsLayout,
+    state, track, activeWorkspaceID: 'test', CSS: { escape: value => value }, researchColumnsLayout, notebookColumnsLayout,
+    getComputedStyle:()=>({paddingLeft:'1px',paddingRight:'1px',getPropertyValue:()=> '800px'}),
     currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400,
     defaultUtilityPaneWidth: 400, defaultResearchPaneWidth: 920,
     assistantHistoryOnlyPane: id => id === 'utility:analysis', paneIsCollapsed: id => collapsed.has(id),
@@ -257,3 +258,19 @@ assert.equal(evidence.widths()[0],300,'The outer left grip uses the same minimum
 assert.equal(evidence.context.minimumPaneWidthForID('project:notebook:one'),600);
 assert.equal(evidence.context.maximumPaneWidthForID('reader:one'),Infinity);
 console.log('Evidence pointer resizing and restored widths stay within 300–600 pixels; Note and Reader bounds are preserved.');
+
+// Notebook Notes can use the editor's spare space, including on a pointer
+// drag, but stop before the existing 800px writing page must shrink.
+{
+ const notebook=fixture(['project:notes-index:one','project:notebook:one'],1920);
+ notebook.workflow='notebook';notebook.context.syncResearchColumnLayout();
+ const notesID='project:notes-index:one',editorID='project:notebook:one';
+ assert.equal(notebook.context.minimumPaneWidthForID(editorID),836);
+ assert.equal(notebook.context.maximumPaneWidthForID(notesID),1079);
+ notebook.context.startPaneResize(notebook.event(601),notesID,editorID);
+ notebook.move(1801);notebook.frame();notebook.finish(1801);
+ assert.deepEqual(notebook.widths(),[1079,836],'The Notes divider reaches the writing width without an arbitrary sidebar cap');
+ assert.equal(notebook.state.paneWeights[notesID],1079);assert.equal(notebook.saves,1);
+ notebook.context.syncResearchColumnLayout();assert.deepEqual(notebook.widths(),[1079,836],'Fitting does not undo the chosen Notes width');
+}
+console.log('Notebook divider passed: pointer expansion, writing-width boundary and stable saved geometry at 1920px.');
