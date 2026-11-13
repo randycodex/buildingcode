@@ -1,4 +1,4 @@
-export const webAppVersion = "20261112-new-chat-label-v1722";
+export const webAppVersion = "20261112-notes-header-align-v1723";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";
