@@ -13,7 +13,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-notebook-resize-v1740";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-evidence-menu-v1741";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -166,7 +166,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-notebook-resize-v1740";
+} from "./offline-storage.js?v=20261112-evidence-menu-v1741";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -5895,7 +5895,6 @@ function syncWorkflowNavigation() {
     button.setAttribute('aria-pressed', String(button.dataset.workflowView === (view === 'project-details' ? 'project' : view)));
   });
   document.querySelectorAll('[data-workflow-tools]').forEach(tools => { tools.hidden = tools.dataset.workflowTools !== view; });
-  document.querySelectorAll('[data-saved-reader-action]').forEach(button => { button.textContent = view === 'notebook' ? 'New Reader tab' : 'New reader'; });
   syncReferenceReaderLayout();
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   updateWorkspaceLayoutControls();
@@ -32556,7 +32555,7 @@ async function refreshProjectReportMembership(projectID, force = false) {
       if (index >= 0) drafts[index] = mounted;
       else drafts.unshift(mounted);
     }
-    track.querySelectorAll("[data-report-membership-project]").forEach(host => {
+    document.querySelectorAll("#panel-track [data-report-membership-project], body > .saved-evidence-menu [data-report-membership-project]").forEach(host => {
       if (host.dataset.reportMembershipProject !== projectID) return;
       let sourceID = host.dataset.reportSourceId;
       if (host.dataset.reportSourceKind === "evidence") {
@@ -32594,7 +32593,7 @@ async function refreshProjectReportMembership(projectID, force = false) {
     reportMembershipCache.set(key,data); paint(data);
   }).catch(() => {
     if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) return;
-    track.querySelectorAll("[data-report-membership-project]").forEach(host => {
+    document.querySelectorAll("#panel-track [data-report-membership-project], body > .saved-evidence-menu [data-report-membership-project]").forEach(host => {
       if (host.dataset.reportMembershipProject === projectID) host.textContent = "Report status unavailable";
     });
   }).finally(() => reportMembershipRequests.delete(key));
@@ -40463,6 +40462,58 @@ async function addSavedEvidenceToNotebook(anchor, item, projectID = "") {
   }, exact, notebookBlocksFromSourceElement(capture));
 }
 
+function openSavedEvidenceMenu(row, anchor, menu) {
+  const wasOpen = !menu.hidden;
+  document.querySelectorAll('.saved-evidence-menu:not([hidden])').forEach(existing => existing._close?.(false));
+  if (wasOpen) return;
+  document.querySelector('.column-group-menu')?._close?.(false);
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const generation = state.workflowNavigationGeneration || 0;
+  const current = () => row.isConnected && isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    generation === (state.workflowNavigationGeneration || 0);
+  const controller = new AbortController(), {signal} = controller;
+  const close = (restoreFocus = true) => {
+    controller.abort();
+    menu.hidden = true;
+    menu.classList.remove('column-group-menu');
+    if (row.isConnected) row.append(menu); else menu.remove();
+    anchor.setAttribute('aria-expanded', 'false');
+    if (restoreFocus && anchor.isConnected) anchor.focus({preventScroll:true});
+  };
+  menu._close = close;
+  menu.addEventListener('click', event => {
+    if (!event.target.closest('button')) return;
+    const allowed = current();
+    close(false);
+    if (!allowed) event.stopImmediatePropagation();
+  }, {capture:true, signal});
+  menu.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(); }
+    else if (event.key === 'Tab') close(false);
+    else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
+      const buttons = [...menu.querySelectorAll('button:not(:disabled)')];
+      const index = buttons.indexOf(document.activeElement);
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 :
+        (index + (event.key === 'ArrowUp' ? -1 : 1) + buttons.length) % buttons.length;
+      buttons[next]?.focus({preventScroll:true});
+    }
+  }, {signal});
+  document.addEventListener('pointerdown', event => {
+    if (!menu.contains(event.target) && !anchor.contains(event.target)) close(false);
+  }, {signal});
+  document.addEventListener('scroll', event => { if (!menu.contains(event.target)) close(false); }, {capture:true, signal});
+  window.addEventListener('resize', () => close(false), {signal});
+  menu.hidden = false;
+  menu.classList.add('column-group-menu');
+  document.body.append(menu);
+  anchor.setAttribute('aria-expanded', 'true');
+  const rect = anchor.getBoundingClientRect();
+  menu.style.left = `${Math.max(8, Math.min(rect.right - menu.offsetWidth, window.innerWidth - menu.offsetWidth - 8))}px`;
+  menu.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - menu.offsetHeight - 8))}px`;
+  menu.querySelector('button:not(:disabled)')?.focus({preventScroll:true});
+}
+
 function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnapshot) {
   const row = document.createElement("article");
   row.className = `saved-row saved-section-row code-theme-${codeTheme(item.codePrefix || item.code || "BC")}`;
@@ -40558,17 +40609,20 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
     assign.addEventListener("click", () => showSectionDetailProjectMenu(codeBody.closest(".saved-panel"), item, assign));
     row.append(assign);
   } else if (!options.selectionController?.isActive()) {
+    const menuButton = document.createElement('button');
+    menuButton.type = 'button';
+    menuButton.className = 'icon-button saved-evidence-menu-button';
+    menuButton.textContent = '⋯';
+    menuButton.setAttribute('aria-label', `Options for ${sectionNumber} ${titleText}`);
+    menuButton.setAttribute('aria-haspopup', 'menu');
+    menuButton.setAttribute('aria-expanded', 'false');
+    row.classList.add('has-evidence-menu');
     const actions = document.createElement("div");
-    actions.className = "saved-row-actions";
-    const newReaderButton = document.createElement("button");
-    newReaderButton.type = "button";
-    newReaderButton.dataset.savedReaderAction = '';
-    newReaderButton.textContent = currentColumnWorkflowView() === 'notebook' ? 'New Reader tab' : 'New reader';
-    newReaderButton.addEventListener("click", () => {
-      void openSourceInReader(item, paneID, { sourceSurface: "saved", forceNewReader: true,
-        evidenceAnchor: item.evidenceAnchor || null });
-    });
-    actions.append(newReaderButton);
+    actions.className = 'saved-evidence-menu';
+    actions.hidden = true;
+    actions.setAttribute('role', 'menu');
+    actions.setAttribute('aria-label', `Actions for ${sectionNumber} ${titleText}`);
+    menuButton.addEventListener('click', () => openSavedEvidenceMenu(row, menuButton, actions));
     const researchButton = document.createElement("button");
     researchButton.type = "button";
     researchButton.textContent = "Ask Assistant";
@@ -40593,11 +40647,11 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
       noteButton.addEventListener("click", async () => {
         if (noteButton.disabled) return;
         noteButton.disabled = true;
-        try { await addSavedEvidenceToNotebook(noteButton, item, options.researchProjectID || ""); }
+        try { await addSavedEvidenceToNotebook(menuButton, item, options.researchProjectID || ""); }
         catch (error) { if (noteButton.isConnected) await showWebNotice("Passage not added", error.message); }
         finally { if (noteButton.isConnected) noteButton.disabled = false; }
       });
-      actions.append(noteButton);
+      actions.prepend(noteButton);
     }
     if (options.reportProject && !options.reportProject.sharedOnly && hasCapability("professional-exports")) {
       const project = options.reportProject;
@@ -40643,7 +40697,8 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
       });
       actions.append(removeItemButton);
     }
-    row.append(actions);
+    actions.querySelectorAll('button').forEach(button => button.setAttribute('role', 'menuitem'));
+    row.append(menuButton, actions);
   }
   if (selectableSavedItem) options.selectionController.register(row, item);
   codeBody.append(row);

@@ -1,4 +1,4 @@
-export const webAppVersion = "20261112-notebook-resize-v1740";
+export const webAppVersion = "20261112-evidence-menu-v1741";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";
