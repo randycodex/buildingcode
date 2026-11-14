@@ -1,8 +1,9 @@
 /* Research v2 uses the existing workspace colors and Reader typography. */
+@property --rv2-rail-width{syntax:"<length>";inherits:true;initial-value:320px}
 .research-v2-panel{min-width:min(760px,95vw);flex-basis:960px}
 .research-v2-panel>.analysis-content{padding:0;overflow:hidden;display:flex;min-height:0}
-/* The stored sidebar width includes the panel's left gutter. */
-.research-v2{display:grid;grid-template-columns:calc(clamp(200px,var(--rv2-rail-width,320px),350px) - var(--panel-padding)) 1px minmax(0,1fr);width:100%;height:100%;min-height:420px;color:var(--text-primary);font:14px/1.6 var(--ui-font-family)}
+/* One animated width drives the list, divider and remaining conversation area. */
+.research-v2{display:grid;grid-template-columns:var(--rv2-rail-width,320px) 1px minmax(0,1fr);width:100%;height:100%;min-height:420px;color:var(--text-primary);font:14px/1.6 var(--ui-font-family)}
 .research-v2 button,.research-v2 textarea{font:inherit;color:inherit}
 .research-v2 button{border:0;background:transparent;padding:7px 9px;border-radius:10px;text-align:left}
 .research-v2 button:hover{background:var(--toolbar-active)}
@@ -84,16 +85,15 @@
   .research-v2-panel{position:relative}
   .research-v2-panel>.panel-header{position:relative;overflow:visible}
   .research-v2-panel>.panel-header::after{content:"";position:absolute;left:calc(-1 * var(--panel-padding));right:calc(-1 * var(--panel-padding));bottom:calc(-1 * var(--space-3));height:1px;background:var(--border);pointer-events:none}
-  .research-v2{transition:grid-template-columns 260ms cubic-bezier(.2,0,0,1)}
-  .research-v2-panel>.analysis-content{margin-inline-start:0;transition:margin-inline-start 260ms cubic-bezier(.2,0,0,1)}
-  .research-v2-panel:has(.is-history-collapsed)>.analysis-content{margin-inline-start:calc(-1 * var(--panel-padding))}
-  .research-v2.is-history-collapsed{grid-template-columns:35px 1px minmax(0,1fr)}
+  .research-v2{transition:--rv2-rail-width 260ms cubic-bezier(.2,0,0,1)}
+  .rv2-rail{padding-inline-start:calc(var(--panel-padding) + 8px)}
+  .research-v2-panel>.analysis-content{margin-inline-start:calc(-1 * var(--panel-padding))}
   .research-v2.is-history-collapsed .rv2-rail{padding-inline:0;overflow:hidden}
   .research-v2.is-history-collapsed .rv2-rail>:not(.rv2-rail-top-row),.research-v2.is-history-collapsed .rv2-new-chat{display:none}
   .research-v2.is-history-collapsed .rv2-rail-top-row{justify-content:center;gap:0}
-  .rv2-rail-divider{position:absolute;inset-block:calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3)) 0;left:clamp(200px,var(--rv2-rail-width,320px),350px);width:1px;transition:left 260ms cubic-bezier(.2,0,0,1)}
-  .is-history-collapsed .rv2-rail-divider{left:35px;pointer-events:none}
-  .research-v2.is-question-rail-resizing,.is-question-rail-resizing .rv2-rail-divider{transition:none}
+  .rv2-rail-divider{position:absolute;inset-block:calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3)) 0;left:var(--rv2-rail-width,320px);width:1px}
+  .is-history-collapsed .rv2-rail-divider{pointer-events:none}
+  .research-v2.is-question-rail-resizing{transition:none}
   .rv2-chat{grid-column:3}
 }
 @media(max-width:680px){.research-v2 .rv2-history-toggle{display:none}}
