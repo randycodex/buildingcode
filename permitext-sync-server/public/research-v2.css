@@ -10,7 +10,8 @@
 .research-v2 button:disabled{opacity:.4;cursor:default}
 .rv2-rail{background:var(--surface);padding:var(--column-content-top-gap) 8px 8px;overflow:auto;min-width:0}
 .rv2-rail-top-row{display:flex;align-items:flex-start;gap:4px;margin-bottom:12px}
-.research-v2 .rv2-history-toggle{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;min-width:28px;height:28px;min-height:28px;padding:5px;border-radius:var(--radius-pill);color:var(--text-secondary)}
+.research-v2 .rv2-history-toggle{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;min-width:28px;height:28px;min-height:28px;padding:5px;border-radius:0;background:transparent;box-shadow:none;color:var(--text-secondary)}
+.research-v2 .rv2-history-toggle:is(:hover,:active){background:transparent;box-shadow:none}
 .rv2-history-toggle .workspace-button-icon{width:16px;height:16px}
 .research-v2 .rv2-history-toggle:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .rv2-rail-divider{position:relative;min-height:0;background:transparent;cursor:col-resize;touch-action:none;z-index:2}
@@ -38,7 +39,7 @@
 .research-v2 .assistant-history-row-menu:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .research-v2 .rv2-question-link[aria-current=page]{font-weight:700}
 .rv2-empty-history{font-size:12px;margin:0}
-.research-v2 .rv2-new-chat{box-sizing:border-box;flex:1;min-width:0;min-height:44px;margin:0;padding:10px 12px;border-radius:8px;color:var(--text-secondary);font-size:14px}
+.research-v2 .rv2-new-chat{box-sizing:border-box;display:flex;align-items:center;flex:1;min-width:0;height:28px;min-height:28px;margin:0;padding:0 12px;border-radius:8px;color:var(--text-secondary);font-size:14px}
 .rv2-question-row.is-renaming{display:block}
 .rv2-rename-form{display:grid;grid-column:1/-1;grid-template-columns:1fr 1fr;gap:6px;padding:12px 0}
 .rv2-rename-input{grid-column:1/-1;width:100%;min-width:0;box-sizing:border-box;background:var(--surface-muted);color:var(--text-primary);border:0;border-radius:6px;padding:8px;font:inherit}

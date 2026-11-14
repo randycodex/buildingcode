@@ -1317,7 +1317,7 @@ textarea:focus-visible {
 }
 .notebook-index-top-row { display: flex; align-items: flex-start; gap: 4px; margin-bottom: 12px; }
 .notebook-index-body .notebook-index-top-row .notebook-index-create {
-  flex: 1 1 auto; min-width: 0; width: auto; margin: 0; padding-inline-end: 0; white-space: nowrap;
+  display: flex; align-items: center; flex: 1 1 auto; min-width: 0; width: auto; height: 28px; min-height: 28px; margin: 0; padding-block: 0; padding-inline-end: 0; white-space: nowrap;
 }
 .notebook-index-top-row .notebook-index-actions {
   flex: 0 0 auto; display: flex; align-items: center; gap: 4px; margin-inline: auto -8px; padding: 0;
@@ -1334,6 +1334,8 @@ textarea:focus-visible {
 /* Resize the live columns; the heading stays painted at its usual inset. */
 .notes-list-motion .notebook-index-panel { position: relative; z-index: 2; overflow: visible; }
 .notes-list-motion .notebook-index-body { overflow: hidden; }
+.notebook-index-top-row .notebook-index-actions > .notebook-list-toggle,
+.notebook-index-top-row .notebook-index-actions > .notebook-list-toggle:is(:hover, :active) { background: transparent; border-radius: 0; box-shadow: none; }
 .notebook-list-toggle .workspace-button-icon { width: 16px; height: 16px; }
 .notebook-list-toggle:hover { background: var(--menu-highlight); color: var(--text-primary); }
 .notebook-list-toggle:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
