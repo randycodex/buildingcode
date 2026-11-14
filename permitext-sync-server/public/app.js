@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1772";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1773";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1772";
+} from "./offline-storage.js?v=20261113-research-notebook-v1773";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -8735,17 +8735,14 @@ function updateReaderLocationTitle(panel, reader) {
   let button = panel.querySelector(".reader-collapse-title");
   if (!button) return;
   const collapsible = paneCanCollapse(panel.dataset.paneId);
-  const codePicker = currentColumnWorkflowView() === 'notebook';
-  const action = codePicker ? 'code-picker' : collapsible ? 'collapse' : 'label';
+  const action = collapsible ? 'collapse' : 'label';
   if (button.dataset.readerTitleAction !== action) {
-    const title = document.createElement(codePicker || collapsible ? "button" : "span");
+    const title = document.createElement(collapsible ? "button" : "span");
     title.className = "reader-collapse-title";
     title.dataset.readerTitleAction = action;
-    if (codePicker || collapsible) {
+    if (collapsible) {
       title.type = "button";
-      title.addEventListener("click", () => codePicker
-        ? openReaderTabPicker(reader, title)
-        : setPaneCollapsed(panel, true, { focus: true }));
+      title.addEventListener("click", () => setPaneCollapsed(panel, true, { focus: true }));
     }
     button.replaceWith(title);
     button = title;
@@ -8754,9 +8751,8 @@ function updateReaderLocationTitle(panel, reader) {
   const location = reader.sectionNumber ? `§ ${reader.sectionNumber}` : "";
   button.textContent = [code, location].filter(Boolean).join(" · ");
   const label = [code, sectionDisplayTitle(reader.sectionNumber, reader.title, "Reader")].join(" · ");
-  button.setAttribute("aria-label", codePicker ? `Choose code · ${code}` : collapsible ? `Collapse ${label}` : label);
-  if (codePicker) button.setAttribute('aria-haspopup', 'dialog');
-  button.title = codePicker ? 'Choose another code' : collapsible ? `${label} · Click to collapse column` : label;
+  button.setAttribute("aria-label", collapsible ? `Collapse ${label}` : label);
+  button.title = collapsible ? `${label} · Click to collapse column` : label;
 }
 
 function appendHighlighted(container, text, query) {
