@@ -114,7 +114,7 @@ const css = await readFile(new URL('../public/styles.css', import.meta.url), 'ut
 assert.match(css, /\.reader-panel\s*\{\s*--pane-min-width: 630px;\s*max-width: none;/, 'CSS preserves manually resized Readers above 900px before and after mounting');
 assert.match(css, /--assistant-sidebar-width: 320px;[\s\S]*?grid-template-columns: var\(--assistant-sidebar-width\) minmax\(600px, 1fr\);/, 'The Assistant keeps its 320px conversation sidebar beside a flexible 600px-minimum conversation');
 assert.match(css, /--workspace-content-max-width: 800px;/, 'Workspace reading content retains the 800px measure');
-assert.match(css, /\.reader-content > \*[^{}]*\{[^}]*max-width: var\(--workspace-content-max-width\);[^}]*margin-right: auto;[^}]*margin-left: auto;/, 'Panel expansion must retain the shared centered text measure');
+assert.match(css, /\.reader-content > \*\s*\{[^}]*max-width: var\(--workspace-content-max-width\);[^}]*margin-right: auto;[^}]*margin-left: 0;/, 'Reader text retains its left inset and readable measure as the column expands');
 console.log('Reader width contract passed: sole/restored/linked Readers, sharing, minimums, manual resizing, and text measure.');
 
 function scrollElement(width = 400, scrollWidth = 900) {

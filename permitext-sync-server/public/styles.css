@@ -3451,7 +3451,13 @@ select option:checked {
   font-size: var(--reader-font-size) !important;
 }
 
-.reader-content > *,
+.reader-content > * {
+  width: 100%;
+  max-width: var(--workspace-content-max-width);
+  margin-right: auto;
+  margin-left: 0;
+}
+
 .section-detail-content > *,
 .section-detail-body > * {
   width: 100%;
@@ -3473,7 +3479,7 @@ select option:checked {
   width: 100%;
   max-width: var(--workspace-content-max-width);
   margin-right: auto;
-  margin-left: auto;
+  margin-left: 0;
 }
 
 .reader-panel .reader-content {
