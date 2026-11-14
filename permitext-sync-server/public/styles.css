@@ -1335,7 +1335,8 @@ textarea:focus-visible {
   overflow-wrap: anywhere;
 }
 
-.notebook-index-body li > button {
+.notebook-index-body li > button,
+.notebook-index-body .notebook-index-create {
   border-radius: var(--radius-control);
 }
 
@@ -1386,8 +1387,7 @@ textarea:focus-visible {
 }
 
 .notebook-index-body .notebook-index-create {
-  margin-top: 12px;
-  border-top: 1px solid var(--border);
+  margin: 0 0 12px;
 }
 
 .notebook-index-body p {

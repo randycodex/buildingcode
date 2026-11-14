@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1773";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1774";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1773";
+} from "./offline-storage.js?v=20261113-research-notebook-v1774";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3593,6 +3593,15 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
   body.dataset.catalogKey = key;
   body.replaceChildren();
   body.setAttribute('aria-busy', String(selection.busy));
+  if (project.sharedRole !== 'viewer') {
+    const create = document.createElement('button');
+    create.type = 'button';
+    create.className = 'notebook-index-create';
+    create.textContent = 'New note';
+    create.disabled = selection.enabled || selection.busy;
+    create.addEventListener('click', () => void createNotebookNoteColumn(project));
+    body.append(create);
+  }
   if (selection.enabled) {
     const status = document.createElement('p');
     status.className = 'notebook-selection-status'; status.setAttribute('role', 'status');
@@ -3653,15 +3662,6 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
     retry.textContent = 'Retry';
     retry.addEventListener('click', () => { void ensureNotebookTabCatalog(); syncNotebookLanding(); });
     body.append(retry);
-  }
-  if (project.sharedRole !== 'viewer') {
-    const create = document.createElement('button');
-    create.type = 'button';
-    create.className = 'notebook-index-create';
-    create.textContent = 'New note';
-    create.disabled = selection.enabled || selection.busy;
-    create.addEventListener('click', () => void createNotebookNoteColumn(project));
-    body.append(create);
   }
   notebookIndexTitleScroll?.refresh();
 }
