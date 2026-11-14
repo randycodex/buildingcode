@@ -78,7 +78,7 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
 
 export function createReportLibraryControls(options) {
   return createReportSidebarControls({ ...options, element: options.library, kind: 'library',
-    label: 'Add from project', defaultWidth: 330, minimumWidth: 300 });
+    label: 'Sources', defaultWidth: 330, minimumWidth: 300 });
 }
 
 export function createReportOutlineControls(options) {

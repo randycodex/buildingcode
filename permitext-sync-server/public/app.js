@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1782";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1783";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -48,7 +48,7 @@ import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=19";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
-import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261113-project-picker-v9";
+import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261114-report-sources-v10";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261109-comparison-v21";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261019-project-workflow-v5";
 import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261021-project-questions-v8";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1782";
+} from "./offline-storage.js?v=20261113-research-notebook-v1783";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -34461,9 +34461,9 @@ async function renderProjectReportDraft(project, resume = null) {
     panel._reportSidebarControls = [libraryControls, outlineControls, versionsControls, comparison];
     const tools = document.createElement("button");
     tools.type = "button";
-    tools.textContent = "Add from project";
+    tools.textContent = "Sources";
     prependWorkspaceButtonIcon(tools, "form");
-    tools.title = "Show Report sources and versions";
+    tools.title = "Show Report sources";
     tools.setAttribute("aria-expanded", String(panel.dataset.libraryOpen === "true"));
     tools.addEventListener("click", () => {
       const expanded = panel.dataset.libraryOpen !== "true";
@@ -34560,7 +34560,7 @@ async function renderProjectReportDraft(project, resume = null) {
     panel._columnExpansion = createColumnExpansion({
       host: columns, columns: () => [library, outline, documentBody, comparison.preview, comparison.versions],
       menu: node => node !== library && node !== outline,
-      label: node => node === library ? 'Add from project' : node === outline ? 'Outline' : node === documentBody ? 'Report' : node === comparison.preview ? 'PDF' : 'Versions',
+      label: node => node === library ? 'Sources' : node === outline ? 'Outline' : node === documentBody ? 'Report' : node === comparison.preview ? 'PDF' : 'Versions',
       key: node => node.className.split(' ')[0], minimumWidth: () => 300
     });
     documents.scrollLeft = keepPosition ? columnsScroll : 0;
