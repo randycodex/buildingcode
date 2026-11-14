@@ -14,7 +14,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1754";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1755";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -167,7 +167,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1754";
+} from "./offline-storage.js?v=20261113-research-notebook-v1755";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28918,15 +28918,12 @@ function syncResearchNoteControls() {
   let control = host.querySelector('.research-note-destination');
   if (!control) {
     control = document.createElement('div'); control.className = 'research-note-destination';
-    const open = document.createElement('button'); open.type = 'button'; open.className = 'toolbar-button';
-    open.addEventListener('click', () => {
-      const note = workingResearchNote();
-      if (note) void openCalculationNotebook(workspaceProject(), note).catch(error => showWebNotice('Note not opened', error.message));
-      else control.lastElementChild.click();
-    });
-    const choose = document.createElement('button'); choose.type = 'button'; choose.className = 'toolbar-button';
-    choose.textContent = '⌄';
-    choose.setAttribute('aria-label', 'Change Research note');
+    const choose = document.createElement('button'); choose.type = 'button'; choose.className = 'toolbar-button research-note-picker-trigger';
+    const label = document.createElement('span'); label.className = 'research-note-picker-label';
+    const chevron = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    chevron.setAttribute('viewBox', '0 0 24 24'); chevron.setAttribute('aria-hidden', 'true'); chevron.setAttribute('focusable', 'false');
+    chevron.innerHTML = '<path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+    choose.append(label, chevron);
     choose.setAttribute('aria-haspopup', 'listbox');
     choose.setAttribute('aria-expanded', 'false');
     choose.addEventListener('click', async () => {
@@ -28954,15 +28951,15 @@ function syncResearchNoteControls() {
       } catch (error) { if (current()) await showWebNotice('Note not selected', error.message); }
       finally { choose.removeAttribute('aria-busy'); }
     });
-    control.append(open, choose); host.append(control);
+    control.append(choose); host.append(control);
   }
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const note = project ? workingResearchNote(researchProjectID(project)) : null;
   control.hidden = !project || !hasCapability('notebook');
-  const open = control.firstElementChild;
-  open.textContent = note ? `Note · ${note.title}` : 'Choose Research note';
-  open.disabled = false;
-  open.title = note ? `Open ${note.title} in Notebook` : 'Choose the note to collect this research';
+  const choose = control.firstElementChild;
+  choose.querySelector('.research-note-picker-label').textContent = note ? `Note · ${note.title}` : 'Choose Research note';
+  choose.setAttribute('aria-label', note ? `Choose Research note · ${note.title}` : 'Choose Research note');
+  choose.title = 'Choose the note to collect this research';
   document.querySelectorAll('[data-note-research-id]').forEach(button => {
     button.textContent = state.noteResearch?.[button.dataset.noteResearchProject]?.resumes?.[button.dataset.noteResearchId]
       ? 'Resume research' : 'Research for this note';

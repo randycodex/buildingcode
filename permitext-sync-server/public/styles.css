@@ -21633,7 +21633,9 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 
 .research-note-destination { display: flex; align-items: center; min-width: 0; margin-left: auto; }
 .research-note-destination[hidden] { display: none; }
-.research-note-destination > button:first-child { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: none; }
+.research-note-destination > button:first-child { display: inline-flex; align-items: center; gap: 8px; min-width: 0; max-width: 240px; white-space: nowrap; text-transform: none; }
+.research-note-destination .toolbar-button > .research-note-picker-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: none; }
+.research-note-destination .toolbar-button > svg { display: block; flex: 0 0 12px; width: 12px; height: 12px; }
 .notebook-title-control.has-note-columns { grid-template-columns: minmax(0, 1fr) auto auto; gap: 16px; }
 .notebook-title-action { gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
 .notebook-title-action .notebook-secondary-action { border: 0; padding: 8px 0; background: transparent; color: var(--text-secondary); font: inherit; font-size: 12px; cursor: pointer; }
