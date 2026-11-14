@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1816";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1817";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -171,7 +171,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1816";
+} from "./offline-storage.js?v=20261113-research-notebook-v1817";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2007,8 +2007,8 @@ function applySharedWorkspaceState(serializedState) {
   }
 }
 
-function clearWorkspaceTransientRuntime() {
-  workspaceViewPresentation?.cancel();
+function clearWorkspaceTransientRuntime({preservePresentation = false} = {}) {
+  if (!preservePresentation) workspaceViewPresentation?.cancel();
   projectInformationMounts.clear();
   researchOpenGeneration += 1;
   searchTimers.forEach((timer) => clearTimeout(timer));
@@ -2123,7 +2123,7 @@ function waitForWorkspaceTransitionPaint() {
   });
 }
 
-function applyStoredWorkspaceLayout(layout) {
+function applyStoredWorkspaceLayout(layout, {preservePresentation = false} = {}) {
   projectStudioTransitionGeneration += 1;
   delete track._researchColumnLayout;
   applyWorkspaceLayout(state, restoreSearchQuerySession(sessionStorage, tabWorkspaceKey, activeWorkspaceID,
@@ -2137,7 +2137,7 @@ function applyStoredWorkspaceLayout(layout) {
   state.coordinations = normalizeProjectIdentities(state.coordinations);
   state.coordinationThreads = openCoordinationThreads();
   reconcileOpenProjectToolState();
-  clearWorkspaceTransientRuntime();
+  clearWorkspaceTransientRuntime({preservePresentation});
   restoreResearchWorkspaceState();
 }
 
@@ -2145,6 +2145,8 @@ async function switchWorkspace(workspaceID, options = {}) {
   const requestIdentity = captureAccountRequest();
   const target = workspaceRegistry?.workspaces?.find((workspace) => workspace.id === workspaceID);
   if (!target) return false;
+  const selection = state.workspaceSelectionGeneration = (state.workspaceSelectionGeneration || 0) + 1;
+  const ownsSelection = () => isCurrentAccountRequest(requestIdentity) && state.workspaceSelectionGeneration === selection;
   if (workspaceID === activeWorkspaceID) {
     // Sync can select a Project before its presentation gate catches up. A
     // checked chooser row must still open that workspace, without reloading
@@ -2152,21 +2154,26 @@ async function switchWorkspace(workspaceID, options = {}) {
     const navigation = state.workflowNavigationGeneration || 0;
     const gate = workspaceAccessGateForRender();
     await gate.ready;
-    const current = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    const current = () => ownsSelection() && activeWorkspaceID === workspaceID &&
       (state.workflowNavigationGeneration || 0) === navigation && gate.allowed;
     if (!current()) { renderWorkspaceTabs(); return false; }
     await renderWorkspace({ persist: false });
+    await Promise.all([...track.querySelectorAll(':scope > .workspace-panel')]
+      .filter(pane => workflowPaneIsVisible(pane.dataset.paneId))
+      .map(pane => whenWorkspacePaneReady(pane.dataset.paneId)));
     if (!current()) return false;
+    track.removeAttribute("aria-busy");
     renderWorkspaceTabs();
     if (options.focus !== false) focusActiveWorkspaceTab();
     if (options.onSelected) await options.onSelected();
     return true;
   }
+  const outgoingWorkspaceID = activeWorkspaceID;
   if (!options.transitionConfirmed && !(await confirmWorkspaceTransition())) {
-    renderWorkspaceTabs();
+    if (ownsSelection()) renderWorkspaceTabs();
     return false;
   }
-  if (!isCurrentAccountRequest(requestIdentity)) return false;
+  if (!ownsSelection() || activeWorkspaceID !== outgoingWorkspaceID) return false;
   const nextLayout = loadWorkspaceSnapshot(workspaceID);
   clearWorkspaceNotice();
   if (!nextLayout) {
@@ -2174,38 +2181,69 @@ async function switchWorkspace(workspaceID, options = {}) {
     return false;
   }
   saveWorkspaceState();
-  activeWorkspaceID = workspaceID;
-  workspaceRegistry = { ...workspaceRegistry, activeWorkspaceID };
-  applyStoredWorkspaceLayout(nextLayout);
-  if (!target.projectID) {
-    setOpenProjectDetails([]);
-    state.projectContextOpen = false;
-    state.projectFactsOpen = false;
-    state.notebooks = [];
-    state.reportDrafts = [];
-    state.coordinations = [];
-    state.coordinationThreads = [];
-  }
-  persistWorkspaceRegistry();
-  renderWorkspaceTransitionState(target.name);
-  if (options.focus !== false) focusActiveWorkspaceTab();
-  const navigation = state.workflowNavigationGeneration || 0;
-  await waitForWorkspaceTransitionPaint();
-  suppressReaderScrollRestore = true;
+  let navigation;
+  let switched = false;
   try {
-    await renderWorkspace();
-  } finally {
-    suppressReaderScrollRestore = false;
-    track.removeAttribute("aria-busy");
-    renderProjectUpdateBadge();
+    switched = await workspaceViewPresentation.present({isCurrent:ownsSelection, update:async ownsPresentation => {
+      if (!ownsSelection() || activeWorkspaceID !== outgoingWorkspaceID) return false;
+      // Close retained document screens inside the same handoff. Their close
+      // callbacks must not briefly reveal the previous project's columns.
+      const deferred = state.workflowPresentationDeferred;
+      state.workflowPresentationDeferred = true;
+      try { closeSharedWorkspaceViews(); projectDetailsScreen?.close(); }
+      finally {
+        if (deferred === undefined) delete state.workflowPresentationDeferred;
+        else state.workflowPresentationDeferred = deferred;
+      }
+      activeWorkspaceID = workspaceID;
+      workspaceRegistry = { ...workspaceRegistry, activeWorkspaceID };
+      applyStoredWorkspaceLayout(nextLayout, {preservePresentation:true});
+      if (!target.projectID) {
+        setOpenProjectDetails([]);
+        state.projectContextOpen = false;
+        state.projectFactsOpen = false;
+        state.notebooks = [];
+        state.reportDrafts = [];
+        state.coordinations = [];
+        state.coordinationThreads = [];
+      }
+      persistWorkspaceRegistry();
+      renderWorkspaceTransitionState(target.name);
+      navigation = state.workflowNavigationGeneration || 0;
+      const current = () => ownsPresentation() && ownsSelection() && activeWorkspaceID === workspaceID &&
+        (state.workflowNavigationGeneration || 0) === navigation;
+      try {
+        // The loading shells stay behind the outgoing frame. Wait for this
+        // project's access decision and visible editors before presenting it.
+        await workspaceAccessGateForRender().ready;
+        if (!current()) return false;
+        suppressReaderScrollRestore = true;
+        try { await renderWorkspace(); }
+        finally { suppressReaderScrollRestore = false; }
+        if (!current()) return false;
+        await Promise.all([...track.querySelectorAll(':scope > .workspace-panel')]
+          .filter(pane => workflowPaneIsVisible(pane.dataset.paneId))
+          .map(pane => whenWorkspacePaneReady(pane.dataset.paneId)));
+        if (!current()) return false;
+        const scrollLeft = Number(state.trackScrollLeft) || 0;
+        track.scrollTo({left:Math.min(scrollLeft, Math.max(0, track.scrollWidth - track.clientWidth)), behavior:'instant'});
+        refreshOpenSettingsWorkspace();
+        if (options.focus !== false) focusActiveWorkspaceTab();
+        return true;
+      } finally {
+        if (ownsSelection() && activeWorkspaceID === workspaceID) {
+          track.removeAttribute("aria-busy");
+          renderProjectUpdateBadge();
+        }
+      }
+    }});
+  } catch (error) {
+    if (ownsSelection()) presentWorkspaceIssue(error.message || 'This workspace could not finish loading. Reload to retry.');
+    return false;
   }
-  const scrollLeft = Number(state.trackScrollLeft) || 0;
-  track.scrollLeft = Math.min(scrollLeft, Math.max(0, track.scrollWidth - track.clientWidth));
-  refreshOpenSettingsWorkspace();
-  if (options.onSelected) await workspaceAccessGateForRender().ready;
-  if (options.onSelected && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+  if (switched && options.onSelected && ownsSelection() && activeWorkspaceID === workspaceID &&
       (state.workflowNavigationGeneration || 0) === navigation) await options.onSelected();
-  return true;
+  return Boolean(switched);
 }
 
 function workspaceProject(projects = null) {
