@@ -68,6 +68,19 @@ try {
   assert.equal(menu.isConnected, false);
   controls = open(); menu = current(); controls.destroy();
   assert.equal(menu.isConnected, false, 'Closing Settings can dispose its nested menu.');
+
+  openProfilePreferenceMenu({ trigger, label: 'Research note', heading: 'Research note', value: 'current',
+    options: [{ label: 'Current note', value: 'current' }, { label: '+ New note', value: 'new' }],
+    onSelect: value => choices.push(value), onDismiss: () => dismissals.push(true) });
+  menu = current();
+  assert.equal(menu.children[0].textContent, 'Research note');
+  assert.equal(document.activeElement, menu.children[1], 'The heading does not change which saved note receives focus.');
+  dispatch(document, 'scroll', { target: menu });
+  assert.equal(menu.isConnected, true, 'Scrolling a long list keeps the note picker open.');
+  const tabEvent = dispatch(menu, 'keydown', { key: 'Tab', shiftKey: false });
+  assert.equal(tabEvent.defaultPrevented, false, 'Tab follows the normal toolbar focus order.');
+  assert.equal(menu.isConnected, false);
+  assert.equal(document.activeElement, trigger, 'Native Tab continues from the toolbar trigger after the menu closes.');
   console.log('Profile preference menu passed: immediate choices, saved selection, keyboard, dismissal, bounds, and listener cleanup.');
 } finally {
   globalThis.document = previousDocument; globalThis.window = previousWindow;

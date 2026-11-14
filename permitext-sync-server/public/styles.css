@@ -21656,3 +21656,29 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 }
 .notebook-question > label { justify-content: flex-start; text-transform: none; letter-spacing: normal; font-size: 13px; color: var(--text-secondary); }
 .notebook-question > label > input[type='checkbox'] { width: auto; flex: 0 0 auto; margin: 0; }
+
+.profile-preference-menu.research-note-picker {
+  width: min(352px, calc(100vw - 16px));
+  max-height: min(420px, calc(100dvh - 90px));
+}
+.research-note-picker .profile-preference-menu-heading {
+  padding: 8px 12px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.research-note-picker .custom-select-option {
+  gap: 16px;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+.research-note-picker .custom-select-option[aria-selected="true"]::after { flex: 0 0 auto; }
+.research-note-picker .custom-select-option:last-child {
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 8px 8px;
+  min-height: 42px;
+  font-weight: 500;
+}

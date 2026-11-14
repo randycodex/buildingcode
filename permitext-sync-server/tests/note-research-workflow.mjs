@@ -27,7 +27,7 @@ assert.throws(()=>normalizeNotebookQuestions([{id:'q',text:'Unknown',status:'res
 const app = await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const start = app.indexOf('function workingResearchNote(');
 const end = app.indexOf('\nfunction renderResearchNotebookHandoff(',start);
-function fixture({open=false,draft=false,archived=false}={}) {
+function fixture({open=false,draft=false,archived=false,pickerChoice='n'}={}) {
   const calls=[];
   const card={id:'n',title:'Analysis',version:3,document:structuredClone(document),evidenceLinks:[],archivedAt:archived?'today':null};
   const mount={panel:{dataset:{projectId:'p'}},activeCardID:()=>card.id,insertionTarget:()=>({id:'n',title:'Analysis',identity:'same'}),
@@ -35,6 +35,11 @@ function fixture({open=false,draft=false,archived=false}={}) {
   const c=vm.createContext({state:{noteResearch:structuredClone(context)},document:{querySelector:()=>null},saveWorkspaceState(){},
     workspaceProject:()=>({id:'p'}),researchProjectID:p=>p.id,captureAccountRequest:()=>({userID:'u'}),navigator:{onLine:true},
     loadInitialNotebookCardList:async()=>({cards:[card]}),notebookMounts:new Map(),notebookColumnMounts:new Map(open?[['pane',mount]]:[]),
+    openProfilePreferenceMenu: options => {
+      calls.push({picker:options});
+      queueMicrotask(() => pickerChoice === null ? options.onDismiss() : options.onSelect(pickerChoice));
+      return {dismiss:options.onDismiss};
+    },
     loadNotebookDraft:async()=>draft?{}:null,requireCurrentAccountRequest(){},notebookReferenceBlocks,structuredClone,
     postResearch:async(path,body)=>{
       calls.push({path,body});
@@ -57,6 +62,18 @@ for (const open of [true,false]) {
     assert.equal(save.document.document.at(-1).content[0].props.referenceID,'answer');
   }
   assert.equal(card.document.document.length,1);
+}
+for (const choice of ['n','new',null]) {
+  const {c,calls}=fixture({pickerChoice:choice});
+  const trigger={removeAttribute(){}};
+  const container={lastElementChild:trigger};
+  const destination=await c.chooseResearchNoteDestination({id:'p'},container,()=>true,{choose:true,trigger});
+  assert.equal(destination?.kind ?? null,choice === 'n' ? 'saved' : choice === 'new' ? 'new' : null);
+  const {picker}=calls[0];
+  assert.equal(picker.anchor,container);
+  assert.equal(picker.value,'n','The Research note picker marks the retained destination.');
+  assert.equal(picker.options.at(-1).value,'new','Creating a note remains available from the picker.');
+  assert.equal(trigger._researchNotePicker,undefined,'Selecting or dismissing releases the active picker.');
 }
 const pending=fixture({draft:true});
 await assert.rejects(pending.c.appendResearchReferenceToNote({id:'p'},{kind:'saved',card:pending.card},reference,'mutation',{userID:'u'},()=>true),/device draft/);

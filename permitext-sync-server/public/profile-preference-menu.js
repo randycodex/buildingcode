@@ -1,4 +1,4 @@
-// A compact, single-choice menu for an Account preference row.
+// A compact, single-choice menu anchored to its trigger or containing row.
 export function profilePreferenceMenuBounds(anchor, width, height, viewportWidth, viewportHeight) {
   const gap = 8;
   return {
@@ -8,7 +8,7 @@ export function profilePreferenceMenuBounds(anchor, width, height, viewportWidth
   };
 }
 
-export function openProfilePreferenceMenu({ trigger, anchor = trigger, label, value, options, className = '', onSelect, onDismiss, onTab }) {
+export function openProfilePreferenceMenu({ trigger, anchor = trigger, label, value, options, className = '', heading = '', onSelect, onDismiss, onTab }) {
   const controller = new AbortController();
   const { signal } = controller;
   const menu = document.createElement('div');
@@ -19,6 +19,13 @@ export function openProfilePreferenceMenu({ trigger, anchor = trigger, label, va
   trigger.setAttribute('aria-haspopup', 'listbox');
   trigger.setAttribute('aria-expanded', 'true');
   trigger.setAttribute('aria-controls', menu.id);
+  if (heading) {
+    const title = document.createElement('div');
+    title.className = 'profile-preference-menu-heading';
+    title.textContent = heading;
+    title.setAttribute('aria-hidden', 'true');
+    menu.append(title);
+  }
   let closed = false;
   const destroy = ({ restoreFocus = false } = {}) => {
     if (closed) return;
@@ -62,9 +69,11 @@ export function openProfilePreferenceMenu({ trigger, anchor = trigger, label, va
       event.stopPropagation();
       dismiss({ restoreFocus: true });
     } else if (event.key === 'Tab') {
-      event.preventDefault();
-      dismiss();
-      onTab?.(event.shiftKey);
+      if (onTab) {
+        event.preventDefault();
+        dismiss();
+        onTab(event.shiftKey);
+      } else dismiss({ restoreFocus: true });
     } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
       event.preventDefault();
       const current = items.indexOf(document.activeElement);
@@ -77,7 +86,9 @@ export function openProfilePreferenceMenu({ trigger, anchor = trigger, label, va
   document.addEventListener('pointerdown', event => {
     if (!trigger.contains(event.target) && !menu.contains(event.target)) dismiss();
   }, { signal });
-  document.addEventListener('scroll', () => dismiss(), { capture: true, signal });
+  document.addEventListener('scroll', event => {
+    if (!menu.contains(event.target)) dismiss();
+  }, { capture: true, signal });
   window.addEventListener('resize', position, { signal });
   document.body.append(menu);
   position();

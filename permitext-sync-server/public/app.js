@@ -10,11 +10,11 @@ import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=3";
-import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
+import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1747";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1748";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -167,7 +167,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1747";
+} from "./offline-storage.js?v=20261113-research-notebook-v1748";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28924,13 +28924,24 @@ function syncResearchNoteControls() {
       else control.lastElementChild.click();
     });
     const choose = document.createElement('button'); choose.type = 'button'; choose.className = 'toolbar-button';
-    choose.textContent = '⌄'; choose.setAttribute('aria-label', 'Change Research note');
+    choose.textContent = '⌄';
+    choose.setAttribute('aria-label', 'Change Research note');
+    choose.setAttribute('aria-haspopup', 'listbox');
+    choose.setAttribute('aria-expanded', 'false');
     choose.addEventListener('click', async () => {
+      if (choose._researchNotePicker) {
+        choose._researchNotePicker.dismiss({restoreFocus:true});
+        return;
+      }
+      if (choose.getAttribute('aria-busy') === 'true') return;
       const project = workspaceProject(), identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
-      const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID && control.isConnected;
+      const generation = state.workflowNavigationGeneration || 0;
+      const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID && control.isConnected &&
+        generation === (state.workflowNavigationGeneration || 0);
       if (!project) return;
+      choose.setAttribute('aria-busy', 'true');
       try {
-        const destination = await chooseResearchNoteDestination(project, control, current, {choose: true});
+        const destination = await chooseResearchNoteDestination(project, control, current, {choose:true, trigger:choose});
         if (!destination || !current()) return;
         if (destination.kind === 'new') {
           const payload = await postResearch('/notebook/cards/save', {projectID:researchProjectID(project), expectedVersion:0,
@@ -28940,6 +28951,7 @@ function syncResearchNoteControls() {
           rememberWorkingResearchNote(researchProjectID(project), payload.card);
         }
       } catch (error) { if (current()) await showWebNotice('Note not selected', error.message); }
+      finally { choose.removeAttribute('aria-busy'); }
     });
     control.append(open, choose); host.append(control);
   }
@@ -28961,7 +28973,7 @@ function syncResearchNoteControls() {
   });
 }
 
-async function chooseResearchNoteDestination(project, container, current, {choose = false} = {}) {
+async function chooseResearchNoteDestination(project, container, current, {choose = false, trigger = null} = {}) {
   const projectID = researchProjectID(project);
   const payload = navigator.onLine === false
     ? (await loadNotebookProjectSnapshot(captureAccountRequest().userID, projectID))?.cardPayload || {cards:[]}
@@ -28978,8 +28990,23 @@ async function chooseResearchNoteDestination(project, container, current, {choos
     const choices = [...(preferred ? [{value:preferred.id, label:preferred.title || 'Untitled Note'}] : []),
       ...cards.filter(item => item.id !== preferred?.id).map(item => ({value:item.id,label:item.title || 'Untitled Note'})),
       {value:'new',label:'New Note'}];
-    const destination = await openWebWarning({title:'Add to note', message:'Choose the note for this research. This destination stays selected for this Project.',
-      choiceLabel:'Destination Note', choices, confirmLabel:choose ? 'Choose note' : 'Add to note', container});
+    const destination = choose
+      ? await new Promise(resolve => {
+        const pickerTrigger = trigger || container.lastElementChild;
+        pickerTrigger.removeAttribute('aria-busy');
+        const finish = value => {
+          delete pickerTrigger._researchNotePicker;
+          resolve(value);
+        };
+        pickerTrigger._researchNotePicker = openProfilePreferenceMenu({
+          trigger:pickerTrigger, anchor:container, label:'Research note', heading:'Research note',
+          className:'research-note-picker', value:preferred?.id || '',
+          options:choices.map(choice => ({...choice,label:choice.value === 'new' ? '+ New note' : choice.label})),
+          onSelect:finish, onDismiss:() => finish(null)
+        });
+      })
+      : await openWebWarning({title:'Add to note', message:'Choose the note for this research.',
+        choiceLabel:'Destination Note', choices, confirmLabel:'Add to note', container});
     if (!destination || !current()) return null;
     if (destination === 'new') return {kind:'new'};
     card = cards.find(item => item.id === destination);
