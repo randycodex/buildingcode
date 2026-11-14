@@ -20122,6 +20122,9 @@ dialog.report-screen {
 .report-outline-drag svg { width: 12px; height: 12px; }
 .report-outline-item:hover .report-outline-drag, .report-outline-drag:focus-visible { opacity: 1; }
 .report-outline .report-outline-link { display: flex; align-items: flex-start; gap: 6px; padding: 5px 8px 5px 0; }
+.report-outline .report-outline-remove { display: inline-flex; flex: 0 0 28px; align-items: center; justify-content: center; align-self: center; width: 28px; min-width: 28px; height: 28px; min-height: 28px; padding: 6px; margin-left: auto; }
+.report-outline-remove svg { width: 14px; height: 14px; pointer-events: none; }
+.report-outline .report-outline-remove:is(:hover, :focus-visible) { color: var(--destructive); }
 .report-outline-number { flex: 0 0 auto; min-width: 20px; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
 .report-outline-item-label { display: block; min-width: 0; }
 .report-outline-item-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }

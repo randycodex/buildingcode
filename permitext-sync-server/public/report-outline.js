@@ -58,7 +58,7 @@ export function reportOutlineDropIndex(blocks, sourceIndex, targetIndex, after, 
 }
 
 export function createReportOutline({ blocks, introduction, targets, documentBody, describe,
-  onNavigate, onMove, dragIcon, sectionExpansion = new Map() }) {
+  onNavigate, onMove, onRemove, dragIcon, removeIcon = '', sectionExpansion = new Map() }) {
   const outline = document.createElement("nav");
   outline.className = "report-outline";
   outline.setAttribute("aria-label", "Report outline");
@@ -141,6 +141,8 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
     caption.hidden = !detail;
     row.querySelector(".report-outline-link").title = [title, detail].filter(Boolean).join(" · ");
     row.querySelector(".report-outline-drag").setAttribute("aria-label", `Reorder ${title}`);
+    const remove = entries.get(blocks[index]).remove;
+    if (remove) { remove.setAttribute("aria-label", `Remove ${title} from Report`); remove.title = `Remove ${title} from Report`; }
     const toggle = entries.get(blocks[index]).toggle;
     if (toggle) toggle.setAttribute("aria-label", `Expand or collapse ${title}`);
   });
@@ -224,6 +226,18 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
       const section = document.createElement("div");
       section.className = "reader-nav-chapter report-outline-section";
       Object.assign(entry, {toggle, children, section});
+    }
+    if (onRemove) {
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "report-outline-remove";
+      remove.draggable = false;
+      remove.innerHTML = removeIcon;
+      remove.addEventListener("pointerdown", event => event.stopPropagation());
+      remove.addEventListener("dragstart", event => { event.preventDefault(); event.stopPropagation(); });
+      remove.addEventListener("click", event => { event.preventDefault(); event.stopPropagation(); onRemove(block); });
+      row.append(remove);
+      entry.remove = remove;
     }
     row.addEventListener("dragstart", event => {
       dragged = block;

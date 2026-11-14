@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1803";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1804";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -41,7 +41,7 @@ import { createReaderBlockWindow } from "./reader-block-window.js?v=10";
 import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=4";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
-import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
+import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261114-outline-remove-v13";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1803";
+} from "./offline-storage.js?v=20261113-research-notebook-v1804";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -33588,11 +33588,7 @@ async function renderProjectReportDraft(project, resume = null) {
       remove.title = "Remove Report item";
       remove.setAttribute("aria-label", "Remove Report item");
       remove.innerHTML = trashIconSVG();
-      remove.addEventListener("click", () => {
-        activeDraft.blocks.splice(activeDraft.blocks.indexOf(block), 1);
-        setDirty();
-        renderWorkspaceContent();
-      });
+      remove.addEventListener("click", () => removeDraftBlock(block));
       actions.append(remove);
       top.append(label, actions);
       row.append(top);
@@ -34092,6 +34088,27 @@ async function renderProjectReportDraft(project, resume = null) {
     });
   }
 
+  function removeDraftBlock(block, focusArea = null) {
+    if (disposed || generatingReport || deletingReport || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
+    const index = activeDraft.blocks.indexOf(block);
+    if (index < 0) return false;
+    const title = reportBlockTitle(block);
+    const next = activeDraft.blocks[index + 1] || activeDraft.blocks[index - 1];
+    activeDraft.blocks.splice(index, 1);
+    setDirty();
+    renderWorkspaceContent();
+    if (focusArea === 'outline') {
+      outlineController.announce(`${title} removed from Report.`);
+      if (next) outlineController.reveal(next);
+      const nextID = next && (next.id || `${next.kind}-${activeDraft.blocks.indexOf(next)}`);
+      const target = shell.querySelector(next
+        ? `.report-outline-item[data-block-id="${CSS.escape(nextID)}"] .report-outline-link`
+        : '.report-outline-introduction .report-outline-link');
+      target?.focus({preventScroll:true});
+    }
+    return true;
+  }
+
   function reorderDraftBlock(block, targetIndex, focusArea = null) {
     if (!moveReportBlock(activeDraft.blocks, activeDraft.blocks.indexOf(block), targetIndex)) return;
     outlineNavigationGeneration += 1;
@@ -34468,7 +34485,7 @@ async function renderProjectReportDraft(project, resume = null) {
     outlineController = createReportOutline({
       blocks: activeDraft.blocks, introduction: metadata,
       targets: [...blocksBody.querySelectorAll(".report-draft-block")], documentBody,
-      dragIcon: paneDragHandleSVG(), sectionExpansion: outlineSectionExpansion,
+      dragIcon: paneDragHandleSVG(), removeIcon: trashIconSVG(), sectionExpansion: outlineSectionExpansion,
       describe: block => {
         const source = sources.find(item => item.kind === block.kind && item.id === block.sourceID);
         if (block.kind === "evidence" && source) return {
@@ -34490,7 +34507,8 @@ async function renderProjectReportDraft(project, resume = null) {
           })
         });
       },
-      onMove: reorderDraftBlock
+      onMove: reorderDraftBlock,
+      onRemove: block => removeDraftBlock(block, 'outline')
     });
     const outline = outlineController.element;
     const library = document.createElement("aside");
