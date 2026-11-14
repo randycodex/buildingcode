@@ -142,6 +142,46 @@ function harness() {
   assert.equal(h.track.children[0].body.textContent,'New tab enacted text');
   assert.equal(h.track.scrollLeft,17,'Adding a tab preserves the horizontal workspace position');
 }
+// The real chapter selector uses the same retained-pane publication path.
+for (const selectedSection of ['', 'B-section']) {
+  const h=harness();h.reader.chapterID='A';h.reader.codePrefix='BC';h.reader.codeVersion='2022';h.reader.scrollPosition={sectionID:'old'};
+  h.c.pendingGroupReaderPositions=new Map([['one',{sectionID:'old'}]]);
+  Object.assign(h.c,{captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
+    guardReaderChapterSource:async()=>({context:'accepted'}),activeCodeSourcesController:{isCurrent:()=>true},
+    closeActiveCustomSelect(){},currentColumnWorkflowView:()=> 'notebook',readerCodeSelectionKey:()=> 'BC-2022',
+    saveWorkspaceState(){},scheduleContinuitySync(){},updateBrowserSectionURL(){},
+    fetchChapter:async()=>({sections:[]}),sectionTitleFromID:()=>({sectionNumber:'201.1',title:'Incoming provision'}),
+    transitionWorkspace:async(_reason,options)=>{
+      assert.equal(options.readerChapterSwitchPaneID,'reader:one');
+      assert.equal(options.readerTabSwitchPaneID,'reader:one');
+      assert.equal(h.reader.scrollPosition,undefined,'A new chapter cannot inherit the outgoing scroll offset');
+      assert.equal(h.c.pendingGroupReaderPositions.has('one'),false);
+      if(selectedSection){assert.equal(options.readerSourceNavigation.options.immediate,true);assert.equal(options.readerSourceNavigation.isCurrent(),true);}
+      await h.open('B');
+    }});
+  vm.runInContext(actual('selectReaderNavigation'),h.c);
+  const opening=h.c.selectReaderNavigation(h.original,h.reader,{chapterID:'B',sectionID:selectedSection});
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(h.track.children[0],h.original,'The chapter selector keeps outgoing text mounted while data is pending');
+  assert.equal(h.original.body.textContent,'Complete outgoing enacted text');
+  const incoming=panel('B','Complete requested chapter');h.pending.get('B').resolve(incoming);
+  await h.c.workspacePaneHydrator.settled();await opening;
+  assert.equal(h.track.children[0],incoming);assert.equal(h.reader.sectionID,selectedSection);
+}
+{
+  const h=harness(),first=deferred(),last=deferred();h.reader.chapterID='A';
+  const opened=[];
+  Object.assign(h.c,{captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
+    activeCodeSourcesController:{isCurrent:()=>true},closeActiveCustomSelect(){},
+    guardReaderChapterSource:detail=>(detail.chapterID==='B'?first:last).promise,
+    currentColumnWorkflowView:()=> 'notebook',readerCodeSelectionKey:()=> 'BC',pendingGroupReaderPositions:new Map(),
+    saveWorkspaceState(){},scheduleContinuitySync(){},transitionWorkspace:async()=>opened.push(h.reader.chapterID),whenWorkspacePaneReady:async()=>true});
+  vm.runInContext(actual('selectReaderNavigation'),h.c);
+  const old=h.c.selectReaderNavigation(h.original,h.reader,{chapterID:'B'});
+  const latest=h.c.selectReaderNavigation(h.original,h.reader,{chapterID:'C'});
+  first.resolve({context:'accepted'});await old;assert.deepEqual(opened,[],'An older authorization cannot beat a newer chapter selection');
+  last.resolve({context:'accepted'});await latest;assert.deepEqual(opened,['C']);
+}
 function scopedBrowser(){
   const attributes=new Map(),transitions=[];
   const document={documentElement:{setAttribute:(key,value)=>attributes.set(key,value),removeAttribute:key=>attributes.delete(key)},

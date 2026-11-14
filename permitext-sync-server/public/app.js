@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1829";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1830";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -171,7 +171,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1829";
+} from "./offline-storage.js?v=20261113-research-notebook-v1830";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -9447,10 +9447,12 @@ async function guardReaderChapterSource(detail, isCurrent) {
 
 async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = {}) {
   if (!panel || !reader) return;
+  const request = {};
+  panel._readerSelectionRequest = request;
   const account = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const original = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? "")));
-  const isCurrent = () => panel.isConnected && isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
+  const isCurrent = () => panel._readerSelectionRequest === request && panel.isConnected && isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
     JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? ""))) === original;
   const nextChapterID = String(chapterID || reader.chapterID || "");
   const restoreSelection = () => {
@@ -9472,6 +9474,48 @@ async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = 
   closeActiveCustomSelect();
   const chapterSelect = panel.querySelector(".chapter-select");
   const chapterChanged = nextChapterID && nextChapterID !== String(reader.chapterID || "");
+  if (chapterChanged && panel.parentNode && panel.parentNode === track && state.readers.includes(reader)) {
+    // Keep the painted chapter and its header together until the accepted
+    // replacement has finished loading in the normal Reader pane hydrator.
+    let summary;
+    if (sectionID) {
+      try { summary = sectionTitleFromID(String(sectionID), await fetchChapter(nextChapterID)); }
+      catch (error) {
+        restoreSelection();
+        if (isCurrent()) await showWebNotice("Chapter could not be opened", error.message);
+        return;
+      }
+      if (!isCurrent() || !activeCodeSourcesController.isCurrent(access.context)) return;
+    }
+    const view = currentColumnWorkflowView(), generation = state.workflowNavigationGeneration || 0;
+    const tabID = reader.activeTabID, paneID = paneIDForReader(reader);
+    cancelReaderPanelRequests(panel);
+    reader.chapterID = nextChapterID;
+    reader.sectionID = sectionID ? String(sectionID) : "";
+    reader.sectionNumber = summary?.sectionNumber || "";
+    reader.title = summary?.title || "Reader";
+    reader.shouldSmoothScrollToSection = false;
+    delete reader.scrollPosition;
+    pendingGroupReaderPositions.delete(reader.id);
+    state.recentChaptersByCode ||= {};
+    state.recentChaptersByCode[readerCodeSelectionKey(reader)] = nextChapterID;
+    if (reader.sectionID) updateBrowserSectionURL(reader.sectionID);
+    const target = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID, tabID]);
+    const ownsTarget = () => isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
+      activeCodeSourcesController.isCurrent(access.context) && state.readers.includes(reader) &&
+      currentColumnWorkflowView() === view && (state.workflowNavigationGeneration || 0) === generation &&
+      JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID, reader.activeTabID]) === target;
+    const sourceNavigation = sectionID ? {
+      paneID, reader, item: { sectionID: reader.sectionID, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion },
+      options: { immediate: true }, isCurrent: ownsTarget
+    } : undefined;
+    saveWorkspaceState();
+    scheduleContinuitySync(reader);
+    await transitionWorkspace("utility", { refreshPaneIDs: [paneID], readerTabSwitchPaneID: paneID,
+      readerSourceNavigation: sourceNavigation, readerChapterSwitchPaneID: paneID });
+    if (!await whenWorkspacePaneReady(paneID) || !ownsTarget()) return;
+    return;
+  }
   const navigationToken = beginReaderNavigation(panel, { clearContent: Boolean(chapterChanged) });
   reader.chapterID = nextChapterID;
   if (chapterSelect) chapterSelect.value = reader.chapterID;
@@ -21222,7 +21266,7 @@ async function renderReader(reader, options = {}) {
       internalSearchButton.setAttribute("aria-pressed", "true");
       internalSearchBox.hidden = false;
       panel._readerSearchReturnPosition = reader.scrollPosition;
-      await renderReaderInternalSearchResults(panel, reader, reader.internalSearchQuery || "", { allowDetached: true });
+      if (!options.chapterNavigation) await renderReaderInternalSearchResults(panel, reader, reader.internalSearchQuery || "", { allowDetached: true });
     }
     return panel;
   } finally {
@@ -51019,7 +51063,7 @@ function workspacePaneDescriptors(options = {}) {
     const scrollPosition = options.readerTabSwitchPaneID === id ? reader.scrollPosition
       : options.readerScrollPositions?.get(id) || reader.scrollPosition;
     add(id, readerPositionLabel(reader), (signal) => renderReader(reader, { scrollPosition: sourceNavigation ? undefined : scrollPosition,
-      sourceNavigation, accessGate: options.accessGate, signal }), async () => {
+      sourceNavigation, chapterNavigation: options.readerChapterSwitchPaneID === id, accessGate: options.accessGate, signal }), async () => {
       if (currentColumnWorkflowView() === 'notebook' && state.workflowMembership?.[id]?.includes('notebook')) {
         return setNotebookReaderHidden(reader, true);
       }

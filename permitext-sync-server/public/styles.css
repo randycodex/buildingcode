@@ -21765,3 +21765,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   min-height: 42px;
   font-weight: 500;
 }
+
+/* Align every working-view tool row with the navigation and Reader header. */
+.workspace-shell > .workflow-toolbar,
+.report-workspace-view .report-draft-shell .report-draft-primary-actions { padding-inline-start: 24px; }
