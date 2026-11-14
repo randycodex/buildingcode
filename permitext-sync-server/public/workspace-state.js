@@ -1,3 +1,4 @@
+import { normalizeNoteResearch } from "./note-research.js?v=1";
 import { normalizeVisitedWorkflowViews } from "./minimal-workflow.js";
 import { normalizeNotebookColumns } from "./notebook-columns.js?v=4";
 import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=16";
@@ -33,6 +34,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "notebooks",
   "notebookColumns",
   "notebookListHidden",
+  "noteResearch",
   "notebookReaderHidden",
   "reportDrafts",
   "coordinations",
@@ -269,7 +271,8 @@ export function emptyWorkspaceLayout() {
     workboards: [],
     notebooks: [],
     notebookColumns: [],
-    notebookListHidden: false,
+    notebookListHidden: true,
+    noteResearch: {},
     notebookReaderHidden: false,
     reportDrafts: [],
     coordinations: [],
@@ -372,7 +375,8 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.workboards = genericWorkboardState(source.workboards);
   layout.notebooks = openProjectToolState(source.notebooks, layout.projectDetails);
   layout.notebookColumns = normalizeNotebookColumns(source.notebookColumns);
-  layout.notebookListHidden = source.notebookListHidden === true;
+  layout.notebookListHidden = source.notebookListHidden !== false;
+  layout.noteResearch = normalizeNoteResearch(source.noteResearch);
   layout.notebookReaderHidden = source.notebookReaderHidden === true;
   layout.reportDrafts = openProjectToolState(source.reportDrafts, layout.projectDetails);
   layout.coordinations = openProjectToolState(source.coordinations, layout.projectDetails);

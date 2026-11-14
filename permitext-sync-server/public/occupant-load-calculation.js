@@ -255,7 +255,7 @@ function calculationDraftLabel(item) {
   return `${input.spaceName || description || 'New calculation'} · ${item.savedNote ? 'has saved Note' : 'Device draft'}`;
 }
 
-export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = null, savedInputFingerprint = "", recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
+export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = null, getDestinationNote, savedInputFingerprint = "", recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
   const initialDraft = {...draft};
   let areaMeasurementBasis = draft.areaMeasurementBasis || draft.areaBasis || '';
   let userMeasurementBasis = draft.userMeasurementBasis ?? draft.areaBasis ?? '';
@@ -348,7 +348,7 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
   root.addEventListener('calculation-context-changed',()=>{invalidatedAnswerID=(getAssessment?.()||assessment)?.answerID||'';assessment=null;update();});
   root.addEventListener('calculation-assessment-refreshed',()=>update());
   const actions = document.createElement('div'); actions.className = 'calculation-actions';
-  const save = document.createElement('button'); save.type = 'submit'; save.className = 'ghost-button'; save.textContent = 'Save calculation to Notebook';
+  const save = document.createElement('button'); save.type = 'submit'; save.className = 'ghost-button'; save.textContent = 'Add calculation to note';
   const open = document.createElement('button'); open.type = 'button'; open.className = 'ghost-button'; open.textContent = 'Open in Notebook'; open.hidden = true;
   open.addEventListener('click', async () => {try {await onOpenNote?.(savedCard);} catch (error) {status.textContent = error.message;}});
   let staleDraft = false;
@@ -429,7 +429,9 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
     const changed = savedCard && fingerprint(calculation) !== savedFingerprint;
     draftState.textContent = staleDraft ? 'Updated in another view · reload this device draft to continue' : savedCard ? (changed ? 'Device draft · changes have not been saved to a new Note' : 'Saved snapshot in Notebook · editable device draft') : 'Device draft · inputs are saved on this device';
     save.disabled = staleDraft || busy || !calculation.valid || !canSave;
-    save.textContent = savedCard ? (changed ? 'Save revised calculation as new Note' : 'Saved to Notebook') : 'Save calculation to Notebook';
+    const destination = getDestinationNote?.();
+    save.textContent = savedCard && !changed ? `Added to ${savedCard.title || 'Notebook'}`
+      : `Add ${changed ? 'revised ' : ''}calculation to ${destination?.title || 'note'}`;
     if (savedCard && !changed) save.disabled = true;
     return calculation;
   };

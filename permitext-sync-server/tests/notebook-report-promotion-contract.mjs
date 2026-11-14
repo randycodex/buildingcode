@@ -14,7 +14,7 @@ const draft = { id: 'report-a', title: 'Report A', version: 2, introduction: 'Ke
 function fixture({ drafts = [draft], choice = '0', mount, gate, container = null } = {}) {
   let generation = 1;
   const calls = [], dialogs = [], saved = [];
-  const c = vm.createContext({ reportsContainingSource, isCurrentAccountRequest:()=>true, track:{querySelectorAll:()=>[]}, structuredClone, crypto: { randomUUID }, Date,
+  const c = vm.createContext({ reportsContainingSource, isCurrentAccountRequest:()=>true, document:{querySelectorAll:()=>[]},track:{querySelectorAll:()=>[]}, structuredClone, crypto: { randomUUID }, Date,
     activeWorkspaceID: 'workspace-a', hasCapability: () => true,
     captureAccountRequest: () => generation,
     requireCurrentAccountRequest: value => { if (value !== generation) throw new Error('Account changed'); },

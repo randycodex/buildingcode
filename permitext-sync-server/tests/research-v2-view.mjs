@@ -65,7 +65,8 @@ const view=createResearchV2View({hasMore:true,history:[{id:'first',title:'First'
 const find=text=>all(view.element).find(x=>x.textContent===text);
 assert(!all(view.element).some(x=>x.tagName==='select'),'The question list follows the workspace Project without a conversation Project selector.');
 const thread=view.element.querySelector('.rv2-thread');thread.clientHeight=400;thread.scrollHeight=1200;layoutCallback();assert.equal(thread.scrollTop,1200,'A delayed pane mount reveals the latest answer');
-assert(find('Add to note…'));assert(find('Save or share'));
+assert(find('Add to note…'));
+assert(view.element.querySelector('.rv2-answer-footer').children.includes(find('Add to note…')), 'The Note handoff is visible with the answer actions.');
 find('More questions').handlers.click();await tick();assert.equal(all(view.element).filter(x=>x.textContent==='First').length,1);assert(find('Older question'));assert.equal(find('More questions').hidden,true);
 const input=view.element.querySelector('.rv2-input'),send=view.element.querySelector('.rv2-send');
 find('Find source').handlers.click();await tick();

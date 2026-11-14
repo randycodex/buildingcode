@@ -88,7 +88,23 @@ try {
   assert.equal((await request("/notebook/cards/save",{...draft,cardID:id,expectedVersion:2,clientMutationID:"stale-open"})).status,409);
   assert.equal(JSON.stringify(preview.json),frozenPreview,"Previously captured report source remains unchanged");
   assert.equal((await request("/notebook/cards/list",{projectID:"project-a"})).json.cards.find(item=>item.id===id).openQuestions[0].status,"resolved");
-  console.log("Questions HTTP passed: durable create/replay, legacy preservation, resolution validation, conflict, Notebook metadata compatibility and question-free Report output.");
+  const chosen = [{...resolved[0],includeInReport:true},
+    {id:'action',kind:'action',text:'Obtain survey',why:'',status:'resolved',resolution:'',includeInReport:true},
+    {id:'internal',text:'Internal coordination question',why:'',status:'open',resolution:''}];
+  const selected = await request('/notebook/cards/save',{...draft,cardID:id,expectedVersion:3,clientMutationID:'selected-report-items',openQuestions:chosen});
+  assert.equal(selected.status,200,JSON.stringify(selected));
+  const selectedPreview = await request('/reports/sources/preview',{projectID:'project-a',kind:'notebookCard',sourceID:id});
+  assert.match(JSON.stringify(selectedPreview.json),/Confirm sprinkler protection/);
+  assert.match(JSON.stringify(selectedPreview.json),/Obtain survey/);
+  assert.doesNotMatch(JSON.stringify(selectedPreview.json),/Internal coordination question/);
+  const reportDraft = await request('/reports/drafts/save',{projectID:'project-a',expectedVersion:0,title:'Questions report',reportDate:'2026-11-13',
+    blocks:[{id:'note-block',kind:'notebookCard',sourceID:id,label:'Question test'}]});
+  assert.equal(reportDraft.status,201,JSON.stringify(reportDraft));
+  const generated = await request('/reports/generate',{projectID:'project-a',draftID:reportDraft.json.draft.id,expectedVersion:reportDraft.json.draft.version});
+  assert.equal(generated.status,201,JSON.stringify(generated));
+  assert.match(JSON.stringify(generated.json.manifest),/Obtain survey/);
+  assert.doesNotMatch(JSON.stringify(generated.json.manifest),/Internal coordination question/);
+  console.log('Questions HTTP passed: legacy preservation, CAS, action completion, selected items in Report preview and generated manifest.');
 } finally {
   globalThis.fetch = originalFetch;
   server.closeAllConnections();

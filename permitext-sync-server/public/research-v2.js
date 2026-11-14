@@ -185,7 +185,7 @@ export function createResearchV2View(options) {
       footer.append(node('span','',researchReviewLabel(message.answer)));
       footer.append(action('Sources used',()=>void showSnapshot(message),'rv2-text-action'));
       const actions=options.renderAnswerActions?.(message);
-      if(actions){const disclosure=node('details','rv2-saved-actions');disclosure.append(node('summary','','Save or share'),actions);footer.append(disclosure);}
+      if(actions) footer.append(actions);
       bubble.append(footer);
       const entry=node('div','rv2-answer-entry');entry.dataset.answerId=message.id||'';entry.append(bubble);
       if(options.revealAnswerID&&message.id===options.revealAnswerID){

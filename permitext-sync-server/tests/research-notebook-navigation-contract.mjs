@@ -13,15 +13,15 @@ for (const delay of ['confirmation','save','ready','refresh','none']) {
     const nodes = [];
     const project = {id:'p',name:'Local project'};
     const element = tag => {
-      const e = {tag,children:[],isConnected:true,value:'',
+      const e = {tag,dataset:{},children:[],isConnected:true,value:'',
         append(...children){this.children.push(...children);if(tag==='select')this.value=children[0].value;},
-        setAttribute(){},addEventListener(_type,fn){this.click=fn;},
+        setAttribute(){},addEventListener(type,fn){if(type==='click')this.click=fn;},
         closest:()=>({dataset:{paneId:'research:one'}})};
       nodes.push(e);return e;
     };
     let activeCard = '';
     const c = vm.createContext({window:{requestAnimationFrame:()=>{}},
-      state:{workflowNavigationGeneration:0},activeWorkspaceID:'w',
+      workingResearchNote:()=>null,rememberWorkingResearchNote(){},state:{workflowNavigationGeneration:0},activeWorkspaceID:'w',
       document:{createElement:element},hasCapability:()=>true,researchAnswerHasVerificationRecovery:()=>false,researchProjects:()=>[project],
       researchProjectID:p=>p.id,readableProjectName:p=>p.name,crypto:{randomUUID:()=> 'test-id'},
       captureAccountRequest:()=>({userID:'local'}),isCurrentAccountRequest:()=>true,

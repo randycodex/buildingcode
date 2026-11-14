@@ -49,7 +49,7 @@ const client = await readFile(new URL('../public/app.js', import.meta.url), 'utf
 function extract(name, next) { const start=client.indexOf(name); const end=client.indexOf(next,start+name.length); assert(start>=0&&end>start);return client.slice(start,end); }
 function harness({ unavailable=false, stale=false }={}) {
   const state={ utilities:{}, paneWeights:{}, paneOrder:[] }, seen=[];
-  const context=vm.createContext({
+  const context=vm.createContext({workingResearchNote:()=>null,
     state, researchOpenGeneration:0, researchConversationPaneOpened:false, researchDraftPaneIDs:new Set(),
     track:{querySelector:()=>null}, activeAccount:()=>({userID:'local',sessionToken:'local-session'}),
     activeProjectIDForCodeQuestions:()=> 'project',

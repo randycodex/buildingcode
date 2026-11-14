@@ -9,7 +9,7 @@ const code=source.slice(source.indexOf('function reusableSearchReader('),source.
 let serial=0;
 const state={readers:[{id:'manual',sectionID:'1'}],paneWeights:{}};
 const hidden=new Set();
-const navigationDependencies={currentColumnWorkflowView:()=> 'research', resolvedReaderSourceNavigations:new WeakMap(),
+const navigationDependencies={workingResearchNote:()=>null,currentColumnWorkflowView:()=> 'research', resolvedReaderSourceNavigations:new WeakMap(),
   track:{querySelector:()=>null}, CSS:{escape:value=>value}};
 const context={columnExpansionController:()=>({reveal:node=>visibleReaderReveals.push(node)}),paneIsCollapsed:()=>false,state,workflowPaneIsVisible:id=>!hidden.has(id),workspaceColumnsRequireProject:()=>false,captureAccountRequest:()=>({}),isCurrentAccountRequest:()=>true,activeWorkspaceID:"test",whenWorkspacePaneReady:async()=>true,resolveReaderSource:async x=>x,searchResultDetail:x=>x,readerFieldsForSectionDetail:(x,o)=>({...x,...o}),normalizeAnnotationBlockID:x=>x,readerMatchesSource:(r,d)=>r.sectionID===d.sectionID,readerIsClearlyAvailable:()=>false,isProAccount:()=>true,newReaderState:x=>({id:`new-${++serial}`,...x}),paneIDForReader:r=>r.id,defaultPaneWidthForID:()=>600,placePaneAfter(){},appendPaneIfMissing(){},updateBrowserSectionURL(){},scheduleContinuitySync(){},saveWorkspaceState(){},transitionWorkspace:async()=>{},revealReaderSourceTarget(){},scrollPaneIntoView(){}};
 Object.assign(context,navigationDependencies);

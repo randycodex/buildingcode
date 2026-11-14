@@ -1,3 +1,4 @@
+import { notebookReportDocument } from "./public/notebook-questions.js";
 import { researchSelectedTables } from "./research-table-footnotes.mjs";
 import { runResearchV2, researchV2AnswerMetadata, researchV2Version } from "./research-v2-engine.mjs";
 import { createResearchV2Budget } from "./research-v2-budget.mjs";
@@ -17005,9 +17006,11 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
           cardID: artifact.envelope.id,
           cardType: artifact.payload.cardType,
           title: artifact.payload.title,
-          ...(artifact.payload.document ? {document:artifact.payload.document} : {}),
+          ...(artifact.payload.document ? {
+            document: notebookReportDocument(artifact.payload.document, artifact.payload.openQuestions)
+          } : {}),
           plainText: artifact.payload.document
-            ? notebookPlainText(artifact.payload.document)
+            ? notebookPlainText(notebookReportDocument(artifact.payload.document, artifact.payload.openQuestions))
             : (artifact.payload.plainText || ""),
           references: artifact.payload.references || []
         }
