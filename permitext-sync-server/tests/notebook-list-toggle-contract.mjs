@@ -55,7 +55,7 @@ assert.equal(localToggle.attrs['aria-label'],'Hide notes list');
 assert.equal(localToggle.attrs['aria-expanded'],'true');
 const list = panel.querySelector('.notebook-index-body');
 assert.deepEqual(list.querySelectorAll('li').map(node => node.textContent), ['Note A','Note B'], 'A newly reopened deferred panel renders existing notes before mounting.');
-assert.equal(list.children[0].textContent,'New note +');
+assert.equal(list.querySelector('.notebook-index-create').textContent,'New note +');
 assert.equal(list.querySelector('.notebook-index-group-label').textContent,'Older','Unknown dates are not presented as recent.');
 context.notebookCatalogs.get('project')[0].updatedAt=new Date().toISOString();
 context.syncNotebookLanding(null,panel);

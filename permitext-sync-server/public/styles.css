@@ -1309,10 +1309,22 @@ textarea:focus-visible {
 .notebook-shared-label,
 .notebook-header .notebook-shared-label { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .notebook-shared-label .panel-kind { margin: 0; }
-.notebook-shared-label .notebook-list-toggle {
+.notebook-list-reopen .notebook-list-toggle,
+.notebook-index-top-row .notebook-index-actions > button {
   display: inline-flex; align-items: center; justify-content: center;
   width: 28px; min-width: 28px; height: 28px; min-height: 28px; padding: 5px;
   border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-secondary);
+}
+.notebook-index-top-row { display: flex; align-items: flex-start; gap: 4px; margin-bottom: 12px; }
+.notebook-index-body .notebook-index-top-row .notebook-index-create {
+  flex: 1 1 auto; min-width: 0; width: auto; margin: 0; padding-inline-end: 0; white-space: nowrap;
+}
+.notebook-index-top-row .notebook-index-actions {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 4px; margin-inline: auto -8px; padding: 0;
+}
+.notebook-panel > .notebook-list-reopen {
+  position: absolute; z-index: 3; left: calc(var(--panel-padding) + 8px);
+  top: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3) + 8px);
 }
 .notebook-list-toggle .workspace-button-icon { width: 16px; height: 16px; }
 .notebook-list-toggle:hover { background: var(--menu-highlight); color: var(--text-primary); }
@@ -1327,6 +1339,7 @@ textarea:focus-visible {
 .panel-track[data-notebook-column-sizing="fit"]:has(> .notebook-index-panel:not(.is-workflow-hidden)) > .notebook-panel .notebook-shared-label {
   visibility: hidden;
 }
+.panel-track[data-notebook-column-sizing="fit"]:has(> .notebook-index-panel:not(.is-workflow-hidden)) > .notebook-panel > .notebook-list-reopen { display: none; }
 .panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel .notebook-index-actions { padding-inline-end: 0; }
 .panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::before,
 .panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::after {

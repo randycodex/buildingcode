@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1789";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1790";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1789";
+} from "./offline-storage.js?v=20261113-research-notebook-v1790";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3285,8 +3285,10 @@ function renderNotebookIndex(project) {
   heading.textContent = 'Notes';
   const label = document.createElement('div');
   label.className = 'notebook-shared-label';
-  label.append(heading, createNotebookListToggle());
+  label.append(heading);
   header.append(label);
+  const actions = document.createElement('div');
+  actions.className = 'panel-actions notebook-index-actions';
   if (project.sharedRole !== 'viewer') {
     const options = document.createElement('button');
     options.type = 'button';
@@ -3296,11 +3298,10 @@ function renderNotebookIndex(project) {
     options.setAttribute('aria-haspopup', 'menu');
     options.setAttribute('aria-expanded', 'false');
     options.addEventListener('click', () => openNotebookListMenu(panel, options));
-    const actions = document.createElement('div');
-    actions.className = 'panel-actions notebook-index-actions';
     actions.append(options);
-    header.append(actions);
   }
+  actions.append(createNotebookListToggle());
+  panel._notebookControls = actions;
   const body = document.createElement('div');
   body.className = 'notebook-index-body';
   body.setAttribute('aria-label', 'Project notes');
@@ -3645,6 +3646,9 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
   body.dataset.catalogKey = key;
   body.replaceChildren();
   body.setAttribute('aria-busy', String(selection.busy));
+  const topRow = document.createElement('div');
+  topRow.className = 'notebook-index-top-row';
+  body.append(topRow);
   if (project.sharedRole !== 'viewer') {
     const create = document.createElement('button');
     create.type = 'button';
@@ -3652,8 +3656,9 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
     create.textContent = 'New note +';
     create.disabled = selection.enabled || selection.busy;
     create.addEventListener('click', () => void createNotebookNoteColumn(project));
-    body.append(create);
+    topRow.append(create);
   }
+  if (panel._notebookControls) topRow.append(panel._notebookControls);
   if (selection.enabled) {
     const status = document.createElement('p');
     status.className = 'notebook-selection-status'; status.setAttribute('role', 'status');
@@ -31152,8 +31157,11 @@ async function renderProjectNotebook(project, options = {}) {
   const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Notes";
   headingTitle.className = "eyebrow panel-kind";
-  heading.append(headingTitle, createNotebookListToggle());
+  heading.append(headingTitle);
   header.append(heading);
+  const reopen = document.createElement('div');
+  reopen.className = 'notebook-list-reopen';
+  reopen.append(createNotebookListToggle());
 
   const shell = document.createElement("div");
   shell.className = "notebook-shell";
@@ -31162,7 +31170,7 @@ async function renderProjectNotebook(project, options = {}) {
   status.setAttribute("role", "status");
   showColumnLoadingStatus(status, "Loading Project Notebook…");
   shell.append(status);
-  panel.append(header, shell);
+  panel.append(header, reopen, shell);
 
   let editorMount = null;
   let passageDisclosure = null;
