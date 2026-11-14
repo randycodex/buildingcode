@@ -45,11 +45,16 @@ const context = vm.createContext({
   notebookIndexTitleScroll:null, attachResearchHistoryTitleScroll:() => ({refresh(){}}),
   async transitionWorkspace(mode){assert.equal(mode,'utility'); transitions++;}
 });
-vm.runInContext(['notebookIndexPaneID','renderNotebookIndex','syncNotebookLanding','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
+vm.runInContext(['researchHistoryDayIndex','researchConversationHistoryGroups','notebookHistoryGroups',
+  'notebookIndexPaneID','renderNotebookIndex','syncNotebookLanding','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
 const panel = context.renderNotebookIndex(project);
 const list = panel.querySelector('.notebook-index-body');
 assert.deepEqual(list.querySelectorAll('li').map(node => node.textContent), ['Note A','Note B'], 'A newly reopened deferred panel renders existing notes before mounting.');
-assert.ok(list.querySelectorAll('button').some(node => node.textContent === 'New note'));
+assert.equal(list.children[0].textContent,'New note +');
+assert.equal(list.querySelector('.notebook-index-group-label').textContent,'Older','Unknown dates are not presented as recent.');
+context.notebookCatalogs.get('project')[0].updatedAt=new Date().toISOString();
+context.syncNotebookLanding(null,panel);
+assert.equal(list.querySelector('.notebook-index-group-label').textContent,'7 days','A changed edit date refreshes grouping even when its title is unchanged.');
 const indexID = context.notebookIndexPaneID(project);
 await context.toggleNotebookList();
 assert.equal(context.workflowPaneIsVisible(indexID), false);
@@ -63,3 +68,24 @@ allowed = true; view = 'research';
 assert.equal(await context.toggleNotebookList(), false);
 assert.equal(saves, 2, 'Unavailable tools and other working views cannot change list visibility.');
 console.log('Notes list toggle passed: immediate deferred contents, independent editor visibility, persistence and access/view guards.');
+
+const now=new Date('2026-11-14T12:00:00');
+const notes=[
+ {id:'today',createdAt:'2020-01-01T12:00:00',updatedAt:'2026-11-14T12:00:00'},
+ {id:'six-days',updatedAt:'2026-11-08T12:00:00'},
+ {id:'seven-days',updatedAt:'2026-11-07T12:00:00'},
+ {id:'thirteen-days',updatedAt:'2026-11-01T12:00:00'},
+ {id:'fourteen-days',updatedAt:'2026-10-31T12:00:00'},
+ {id:'twenty-nine-days',updatedAt:'2026-10-16T12:00:00'},
+ {id:'thirty-days',updatedAt:'2026-10-15T12:00:00'},
+ {id:'prior-year',updatedAt:'2025-11-01T12:00:00'},
+ {id:'undated',updatedAt:'unavailable'},
+ {id:'',column:{id:'local-draft'}}
+];
+const before=JSON.stringify(notes),groups=context.notebookHistoryGroups(notes,now);
+assert.deepEqual(Array.from(groups,group=>group.id),['last-7-days','previous-7-days','previous-30-days','month-2026-10','year-2025','older','drafts']);
+assert.deepEqual(Array.from(groups.slice(0,3),group=>Array.from(group.cards,card=>card.id)),
+ [['today','six-days'],['seven-days','thirteen-days'],['fourteen-days','twenty-nine-days']]);
+assert.equal(groups[0].cards[0],notes[0]);assert.equal(JSON.stringify(notes),before,'Presentation grouping preserves original Note records and creation dates.');
+assert.equal(context.notebookHistoryGroups([{id:'fallback',updatedAt:'invalid',createdAt:'2026-11-10T12:00:00'}],now)[0].id,'last-7-days');
+console.log('Notebook date groups passed: Assistant buckets, latest edit dates, creation fallback, day boundaries, month/year groups, undated Notes and local drafts.');

@@ -1388,6 +1388,16 @@ textarea:focus-visible {
 
 .notebook-index-body .notebook-index-create {
   margin: 0 0 12px;
+  color: var(--text-secondary);
+}
+
+.notebook-index-group { margin: 0 0 18px; }
+.notebook-index-group-label {
+  margin: 0 0 12px;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
 }
 
 .notebook-index-body p {

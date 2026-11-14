@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1774";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1776";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1774";
+} from "./offline-storage.js?v=20261113-research-notebook-v1776";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3379,7 +3379,9 @@ function publishNotebookColumn(projectID, paneID, card, cards) {
     const catalog = notebookCatalogs.get(projectID) || [];
     if (card.id) {
       const summary = catalog.find(item => item.id === card.id);
-      if (summary) Object.assign(summary, {title: card.title});
+      if (summary) Object.assign(summary, {title: card.title,
+        ...(card.createdAt ? {createdAt: card.createdAt} : {}),
+        ...(card.updatedAt ? {updatedAt: card.updatedAt} : {})});
       else catalog.push({...card});
       notebookCatalogs.set(projectID, catalog);
     }
@@ -3404,7 +3406,10 @@ function syncNotebookNoteTabs() {
     const live = notebookColumnMounts.get(notebookColumnPaneID(column))?.summary?.();
     const note = notes.find(card => card.id === (live?.id || column.cardID));
     if (note && live) note.title = live.title;
-    if (column.open && !note && (live || column.cardID || column.newNote || column.title)) notes.push({id: live?.id || column.cardID || '', title: live?.title || column.title || 'Untitled', column});
+    if (column.open && !note && (live || column.cardID || column.newNote || column.title)) notes.push({
+      id: live?.id || column.cardID || '', title: live?.title || column.title || 'Untitled', column,
+      createdAt: live?.createdAt, updatedAt: live?.updatedAt
+    });
   }
   notebookTabs.replaceChildren();
   notebookTabs.hidden = true;
@@ -3568,6 +3573,16 @@ async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archi
   }
 }
 
+function notebookHistoryGroups(cards = [], now = new Date()) {
+  const history = cards.map(card => ({
+    card,
+    createdAt: [card.updatedAt, card.createdAt].find(value => Number.isFinite(Date.parse(value))) || '',
+    messageCount: card.id ? 1 : 0
+  }));
+  return researchConversationHistoryGroups(history, now).map(({conversations, ...group}) =>
+    ({...group, cards: conversations.map(item => item.card)}));
+}
+
 function syncNotebookLanding(notes = null, panel = track.querySelector('.notebook-index-panel')) {
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const body = panel?.querySelector('.notebook-index-body');
@@ -3584,9 +3599,9 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
   if (project.sharedRole === 'viewer') { selection.enabled = false; selection.ids.clear(); }
   const options = panel.querySelector('.notebook-index-menu-button');
   if (options) options.disabled = selection.busy || !hasCapability('notebook') || project.sharedRole === 'viewer';
-  const key = JSON.stringify([projectID, available, loading, selectedID, selected?.id,
+  const key = JSON.stringify([projectID, available, loading, selectedID, selected?.id, researchHistoryDayIndex(new Date()),
     selection.enabled, [...selection.ids], selection.busy,
-    cards.map(card => [card.id, card.title, card.column?.id])]);
+    cards.map(card => [card.id, card.title, card.column?.id, card.updatedAt, card.createdAt])]);
   if (body.dataset.catalogKey === key) return;
   const menu = document.querySelector('.notebook-index-menu');
   if (menu?._panel === panel) menu._close?.(false);
@@ -3597,7 +3612,7 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
     const create = document.createElement('button');
     create.type = 'button';
     create.className = 'notebook-index-create';
-    create.textContent = 'New note';
+    create.textContent = 'New note +';
     create.disabled = selection.enabled || selection.busy;
     create.addEventListener('click', () => void createNotebookNoteColumn(project));
     body.append(create);
@@ -3609,47 +3624,57 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
     body.append(status);
   }
   if (cards.length) {
-    const list = document.createElement('ul');
-    for (const card of cards) {
-      const item = document.createElement('li');
-      const open = document.createElement('button');
-      open.type = 'button';
-      open.className = selection.enabled ? 'notebook-index-note notebook-index-choice' : 'notebook-index-note';
-      open.dataset.noteId = card.id || '';
-      open.disabled = selection.busy || selection.enabled && !card.id;
-      if (selection.enabled) {
-        open.setAttribute('role', 'checkbox');
-        open.setAttribute('aria-checked', String(selection.ids.has(card.id)));
-        open.setAttribute('aria-label', card.title || 'Untitled');
-        const check = document.createElement('span');
-        check.className = 'notebook-note-check'; check.setAttribute('aria-hidden', 'true');
-        check.textContent = selection.ids.has(card.id) ? '✓' : '';
-        open.append(check);
-      }
-      const label = document.createElement('span');
-      label.className = 'notebook-index-title';
-      const titleText = document.createElement('span');
-      titleText.className = 'notebook-index-title-text';
-      titleText.textContent = card.title || 'Untitled';
-      label.append(titleText);
-      open.title = titleText.textContent;
-      open.append(label);
-      const active = card.id ? card.id === selectedID : card.column?.id === selected?.id;
-      open.classList.toggle('is-selected', selection.enabled ? selection.ids.has(card.id) : active);
-      if (active) open.setAttribute('aria-current', 'true');
-      open.addEventListener('click', () => {
+    for (const group of notebookHistoryGroups(cards)) {
+      const section = document.createElement('section');
+      section.className = 'notebook-index-group';
+      section.setAttribute('aria-label', group.label);
+      section.dataset.dateGroupId = group.id;
+      const heading = document.createElement('h3');
+      heading.className = 'notebook-index-group-label';
+      heading.textContent = group.label;
+      const list = document.createElement('ul');
+      for (const card of group.cards) {
+        const item = document.createElement('li');
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.className = selection.enabled ? 'notebook-index-note notebook-index-choice' : 'notebook-index-note';
+        open.dataset.noteId = card.id || '';
+        open.disabled = selection.busy || selection.enabled && !card.id;
         if (selection.enabled) {
-          selection.ids.has(card.id) ? selection.ids.delete(card.id) : selection.ids.add(card.id);
-          syncNotebookLanding();
-          [...panel.querySelectorAll('[role="checkbox"]')].find(node => node.dataset.noteId === card.id)?.focus({preventScroll:true});
-          return;
+          open.setAttribute('role', 'checkbox');
+          open.setAttribute('aria-checked', String(selection.ids.has(card.id)));
+          open.setAttribute('aria-label', card.title || 'Untitled');
+          const check = document.createElement('span');
+          check.className = 'notebook-note-check'; check.setAttribute('aria-hidden', 'true');
+          check.textContent = selection.ids.has(card.id) ? '✓' : '';
+          open.append(check);
         }
-        void openNotebookNoteColumn(project, card).catch(error => showWebNotice('Note not opened', error.message));
-      });
-      item.append(open);
-      list.append(item);
+        const label = document.createElement('span');
+        label.className = 'notebook-index-title';
+        const titleText = document.createElement('span');
+        titleText.className = 'notebook-index-title-text';
+        titleText.textContent = card.title || 'Untitled';
+        label.append(titleText);
+        open.title = titleText.textContent;
+        open.append(label);
+        const active = card.id ? card.id === selectedID : card.column?.id === selected?.id;
+        open.classList.toggle('is-selected', selection.enabled ? selection.ids.has(card.id) : active);
+        if (active) open.setAttribute('aria-current', 'true');
+        open.addEventListener('click', () => {
+          if (selection.enabled) {
+            selection.ids.has(card.id) ? selection.ids.delete(card.id) : selection.ids.add(card.id);
+            syncNotebookLanding();
+            [...panel.querySelectorAll('[role="checkbox"]')].find(node => node.dataset.noteId === card.id)?.focus({preventScroll:true});
+            return;
+          }
+          void openNotebookNoteColumn(project, card).catch(error => showWebNotice('Note not opened', error.message));
+        });
+        item.append(open);
+        list.append(item);
+      }
+      section.append(heading, list);
+      body.append(section);
     }
-    body.append(list);
   } else if (!available) {
     const status = document.createElement('p');
     status.setAttribute('role', 'status');
