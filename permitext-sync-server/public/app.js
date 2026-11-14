@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1790";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1792";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1790";
+} from "./offline-storage.js?v=20261113-research-notebook-v1792";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3251,15 +3251,48 @@ function syncNotebookListControls() {
   document.querySelectorAll('.notebook-list-toggle').forEach(updateNotebookListToggle);
 }
 
+function rememberNotebookListTogglePosition() {
+  const editor = track.querySelector('.notebook-panel:not(.is-workflow-hidden)');
+  const list = track.querySelector('.notebook-index-panel:not(.is-workflow-hidden)');
+  const button = (list || editor)?.querySelector('.notebook-list-toggle');
+  if (!editor || !button) return;
+  const origin = (list || editor).getBoundingClientRect();
+  const bounds = button.getBoundingClientRect();
+  editor.style.setProperty('--notebook-list-toggle-left', `${bounds.left - origin.left}px`);
+  editor.style.setProperty('--notebook-list-toggle-top', `${bounds.top - editor.getBoundingClientRect().top}px`);
+}
+
+async function transitionNotebookList(update) {
+  track._notebookListTransition?.skipTransition();
+  if (typeof document.startViewTransition !== 'function' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    await update();
+    return;
+  }
+  const root = document.documentElement;
+  root.classList.add('notes-list-motion');
+  const transition = document.startViewTransition(update);
+  track._notebookListTransition = transition;
+  const finish = () => {
+    if (track._notebookListTransition !== transition) return;
+    delete track._notebookListTransition;
+    root.classList.remove('notes-list-motion');
+  };
+  transition.ready.catch(() => {}); // Interrupted transitions still commit their update.
+  transition.finished.then(finish, finish);
+  await transition.updateCallbackDone;
+  await transition.finished.catch(() => {});
+}
+
 async function toggleNotebookList() {
   if (!workspacePrivatePresentationAllowed() || !hasCapability('notebook') ||
       !workspaceProject() || currentWorkflowView() !== 'notebook') return false;
   const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  rememberNotebookListTogglePosition();
   state.notebookListHidden = !state.notebookListHidden;
   const hidden = state.notebookListHidden;
   document.querySelector('.notebook-index-menu')?._close?.(false);
   saveWorkspaceState();
-  await transitionWorkspace('utility');
+  await transitionNotebookList(() => transitionWorkspace('utility'));
   if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
       currentWorkflowView() !== 'notebook' || state.notebookListHidden !== hidden) return false;
   const owner = state.notebookListHidden ? '.notebook-panel' : '.notebook-index-panel';
@@ -31148,6 +31181,9 @@ async function renderProjectNotebook(project, options = {}) {
   panel.dataset.paneId = paneID;
   panel.dataset.projectId = projectID;
   panel.style.setProperty("--project-color", identity.color || "#c96410");
+  const listID = notebookIndexPaneID(identity);
+  const listWidth = Math.max(200, Math.min(350, Number(state.paneWeights[listID]) || defaultPaneWidthForID(listID)));
+  panel.style.setProperty('--notebook-list-width', `${listWidth}px`);
   applyPaneWeight(panel, paneID);
 
   const header = document.createElement("header");

@@ -48,7 +48,8 @@ const context = vm.createContext({
   async transitionWorkspace(mode){assert.equal(mode,'utility'); transitions++;}
 });
 vm.runInContext(['researchHistoryDayIndex','researchConversationHistoryGroups','notebookHistoryGroups',
-  'notebookIndexPaneID','updateNotebookListToggle','createNotebookListToggle','renderNotebookIndex','syncNotebookLanding','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
+  'notebookIndexPaneID','updateNotebookListToggle','createNotebookListToggle','renderNotebookIndex','syncNotebookLanding',
+  'rememberNotebookListTogglePosition','transitionNotebookList','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
 const panel = context.renderNotebookIndex(project);
 const localToggle = panel.querySelector('.notebook-list-toggle');
 assert.equal(localToggle.attrs['aria-label'],'Hide notes list');
@@ -76,6 +77,46 @@ allowed = true; view = 'research';
 assert.equal(await context.toggleNotebookList(), false);
 assert.equal(saves, 2, 'Unavailable tools and other working views cannot change list visibility.');
 console.log('Notes list toggle passed: immediate deferred contents, independent editor visibility, persistence and access/view guards.');
+
+const positions = {};
+let listVisible = true;
+const anchoredButton = {getBoundingClientRect:()=>({left:328,top:160})};
+const anchoredEditor = {style:{setProperty:(key,value)=>{positions[key]=value;}},
+  getBoundingClientRect:()=>({left:listVisible?381:100,top:70}),querySelector:()=>anchoredButton};
+const anchoredList = {getBoundingClientRect:()=>({left:100,top:70}),querySelector:()=>anchoredButton};
+const anchored = vm.createContext({track:{querySelector:selector=>selector.startsWith('.notebook-panel')?anchoredEditor:listVisible?anchoredList:null}});
+vm.runInContext(actual('rememberNotebookListTogglePosition'),anchored);
+anchored.rememberNotebookListTogglePosition();
+assert.equal(positions['--notebook-list-toggle-left'],'228px');
+assert.equal(positions['--notebook-list-toggle-top'],'90px');
+listVisible = false;
+anchored.rememberNotebookListTogglePosition();
+assert.equal(positions['--notebook-list-toggle-left'],'228px','The restore toggle retains the same viewport x coordinate after the editor expands left.');
+
+let reducedMotion = false, updates = 0, starts = 0, skipped = 0;
+const motionClasses = new Set(), releases = [];
+const motion = vm.createContext({track:{},window:{matchMedia:()=>({matches:reducedMotion})},
+  document:{documentElement:{classList:{add:name=>motionClasses.add(name),remove:name=>motionClasses.delete(name)}},
+    startViewTransition(update) {
+      starts++;
+      let finish;
+      const finished=new Promise(resolve=>{finish=resolve;}); releases.push(finish);
+      return {ready:Promise.resolve(),updateCallbackDone:Promise.resolve().then(update),finished,
+        skipTransition(){skipped++;finish();}};
+    }}});
+vm.runInContext(actual('transitionNotebookList'),motion);
+const firstMotion = motion.transitionNotebookList(()=>{updates++;});
+const secondMotion = motion.transitionNotebookList(()=>{updates++;});
+await firstMotion;
+assert.equal(skipped,1,'A quick second toggle interrupts the earlier motion.');
+assert(motionClasses.has('notes-list-motion'),'An older completion cannot clear the newer transition.');
+releases[1](); await secondMotion;
+assert.equal(updates,2);assert.equal(motionClasses.size,0);
+reducedMotion=true;
+await motion.transitionNotebookList(()=>{updates++;});
+assert.equal(starts,2,'Reduced motion changes visibility without starting an animation.');
+assert.equal(updates,3);
+console.log('Notes motion passed: stationary x/y anchor, interrupted transitions, retained update callbacks, cleanup and reduced-motion behavior.');
 
 // Notebook is a permanent writing area, including older saved layouts that
 // closed it and the transition after its last active Note moves to Trash.

@@ -1323,9 +1323,31 @@ textarea:focus-visible {
   flex: 0 0 auto; display: flex; align-items: center; gap: 4px; margin-inline: auto -8px; padding: 0;
 }
 .notebook-panel > .notebook-list-reopen {
-  position: absolute; z-index: 3; left: calc(var(--panel-padding) + 8px);
-  top: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3) + 8px);
+  position: absolute; z-index: 3;
+  left: var(--notebook-list-toggle-left, calc(var(--notebook-list-width, 280px) - var(--panel-padding) - 28px));
+  top: var(--notebook-list-toggle-top, calc((2 * var(--panel-padding)) + var(--panel-title-row-height) + var(--space-3)));
 }
+
+/* Animate layout snapshots while keeping the live editor and its history.
+   Title, text and toggle move independently so letters never stretch. */
+.notes-list-motion .notebook-panel:not(.is-workflow-hidden) { view-transition-name: notes-panel; }
+.notes-list-motion .notebook-panel:not(.is-workflow-hidden) .notebook-title-control { view-transition-name: notes-title; }
+.notes-list-motion .notebook-panel:not(.is-workflow-hidden) .notebook-editor-surface { view-transition-name: notes-editor; }
+.notes-list-motion .notebook-index-panel:not(.is-workflow-hidden) { view-transition-name: notes-list; }
+.notes-list-motion .notebook-list-toggle { view-transition-name: notes-toggle; }
+.notes-list-motion::view-transition { pointer-events: none; }
+.notes-list-motion::view-transition-old(root), .notes-list-motion::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+.notes-list-motion::view-transition-group(notes-panel),
+.notes-list-motion::view-transition-group(notes-title),
+.notes-list-motion::view-transition-group(notes-editor),
+.notes-list-motion::view-transition-group(notes-toggle),
+.notes-list-motion::view-transition-group(notes-list) {
+  animation-duration: 260ms; animation-timing-function: cubic-bezier(.2, 0, 0, 1);
+}
+.notes-list-motion::view-transition-old(notes-list) { animation: notes-list-out 200ms ease both; }
+.notes-list-motion::view-transition-new(notes-list) { animation: notes-list-in 260ms ease both; }
+@keyframes notes-list-out { to { opacity: 0; transform: translateX(-12px); } }
+@keyframes notes-list-in { from { opacity: 0; transform: translateX(-12px); } }
 .notebook-list-toggle .workspace-button-icon { width: 16px; height: 16px; }
 .notebook-list-toggle:hover { background: var(--menu-highlight); color: var(--text-primary); }
 .notebook-list-toggle:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
