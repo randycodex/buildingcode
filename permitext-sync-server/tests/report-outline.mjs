@@ -123,7 +123,7 @@ const calls = [];
 const context = vm.createContext({activeDraft, shell: {querySelector: () => documentBody}, moveReportBlock,
   outlineNavigationGeneration: 0, outlineController: {reorder: () => calls.push('outline'), announce() {}}, reportBlockTitle: b => b.id,
   renderIncludedReportComments: () => calls.push('comments'), panel: {}, setDirty: () => calls.push('dirty')});
-vm.runInContext(app.slice(reorderStart, app.indexOf('  function renderWorkspaceContent()', reorderStart)), context);
+vm.runInContext(app.slice(reorderStart, app.indexOf('  const reportSwitch = ', reorderStart)), context);
 context.reorderDraftBlock(activeDraft.blocks[2], 0);
 assert.deepEqual(blockBody.children, [documentRows[2], documentRows[0], documentRows[1]], 'Move the mounted editors and source previews');
 assert.equal(documentBody.scrollTop, 1706, 'Reordering keeps the document scroll position');

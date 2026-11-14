@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1812";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1814";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -44,6 +44,7 @@ import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQ
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261114-outline-remove-v13";
 import { applyLetterDocumentLayout } from "./document-layout.js?v=1";
 import { createReportAutosave } from "./report-autosave.js?v=1";
+import { createReportSwitch, createReportSourcePreviews, retainReportChildren } from "./report-presentation.js?v=1";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=20";
@@ -169,7 +170,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1812";
+} from "./offline-storage.js?v=20261113-research-notebook-v1814";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -33032,7 +33033,11 @@ async function renderProjectReportDraft(project, resume = null) {
       await openNotebookNoteColumn(identity, note);
     }
   };
-  const sourcePreviewRequests = new Map();
+  const sourcePreviews = createReportSourcePreviews({
+    request: block => reportRequest("/reports/sources/preview", {projectID, kind:block.kind, sourceID:block.sourceID}),
+    isCurrent: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID
+  });
+  const sourcePreviewRequests = sourcePreviews.requests;
   let sourceWarnings = [];
   let history = [];
   let reportOptions = {
@@ -33051,6 +33056,7 @@ async function renderProjectReportDraft(project, resume = null) {
   let draggedReportBlock = null;
   let reportFormatting = null;
   let reportFormattingModule = null;
+  let reportPresentationGeneration = 0;
   const reportNoteEditors = new Set();
   const reportNoteObjectURLs = new Set();
   const disposeReportNoteEditors = () => {
@@ -33061,9 +33067,10 @@ async function renderProjectReportDraft(project, resume = null) {
   };
   const mountReportNoteEditor = (block, {document:noteDocument = block.notebookDocument, editable = true} = {}) => {
     const host = document.createElement('div'); host.className = 'notebook-editor report-note-editor';
-    void loadNotebookModule().then(module => {
-      if (!host.isConnected || disposed || !isCurrentAccountRequest(requestIdentity)) return;
-      const editor = module.mountPermitextNotebookEditor(host, {document:noteDocument, editable, autofocus:false,
+    const generation = reportPresentationGeneration;
+    const mount = module => {
+      if (disposed || generation !== reportPresentationGeneration || requestWorkspaceID !== activeWorkspaceID || !isCurrentAccountRequest(requestIdentity)) return;
+      const editor = module.mountPermitextNotebookEditor(host, {document:noteDocument, editable, autofocus:false, synchronousMount:true,
         uploadFile:file => {
           if (navigator.onLine === false) throw new Error('Reconnect to add an image to this Report snapshot.');
           return uploadNotebookAsset(projectID, file, '', requestIdentity);
@@ -33080,7 +33087,9 @@ async function renderProjectReportDraft(project, resume = null) {
         }
       });
       reportNoteEditors.add(editor);
-    }).catch(error => { if (host.isConnected) showStatusError(error.message); });
+    };
+    if (reportFormattingModule) mount(reportFormattingModule);
+    else void loadNotebookModule().then(mount).catch(error => { if (host.isConnected) showStatusError(error.message); });
     return host;
   };
   let outlineController = null;
@@ -33165,7 +33174,9 @@ async function renderProjectReportDraft(project, resume = null) {
       for (const [key, expanded] of snapshot.outlineSections) outlineSectionExpansion.set(key, expanded);
       applyReportResumeLayout(panel, snapshot);
       renderWorkspaceContent();
+      const generation = reportPresentationGeneration;
       if (snapshot.versionID && history.some(report => report.id === snapshot.versionID)) await openHistoricalReport(snapshot.versionID);
+      if (disposed || generation !== reportPresentationGeneration || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
       applyReportResumeLayout(panel, snapshot);
       syncReferenceReaderLayout();
       comparisonController?.restorePosition(snapshot.comparisonScroll);
@@ -33173,7 +33184,7 @@ async function renderProjectReportDraft(project, resume = null) {
       const interaction = reportPresentationInteraction;
       await navigateReportOutline({requests: sourcePreviewRequests.values(),
         isCurrent: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID &&
-          reportScreen?.isOpen() && reportPresentationInteraction === interaction,
+          generation === reportPresentationGeneration && reportScreen?.isOpen() && reportPresentationInteraction === interaction,
         navigate: () => restoreReportResumeScroll(panel, snapshot)});
     },
     hasUnsavedChanges: () => dirty,
@@ -33776,65 +33787,66 @@ async function renderProjectReportDraft(project, resume = null) {
           preview.open = !reportEvidenceCoverage(activeDraft.blocks, sources).has(block.id);
           let loaded = false, loading = false;
           let previewRevision = 0;
-          const loadPreview = async () => {
-            if (!preview.open || loaded || loading) return;
-            const revision = previewRevision;
-            loading = true; reportFormatting.unregisterSource(body); body.textContent = "Loading complete source…";
-            const identity = captureAccountRequest();
-            try {
-              const key = JSON.stringify([block.kind, block.sourceID, source]);
-              let request = sourcePreviewRequests.get(key);
-              if (!request) {
-                request = postResearch("/reports/sources/preview", {projectID, kind:block.kind, sourceID:block.sourceID});
-                sourcePreviewRequests.set(key, request);
-                request.catch(() => { if (sourcePreviewRequests.get(key) === request) sourcePreviewRequests.delete(key); });
-              }
-              const result = await request;
-              requireCurrentAccountRequest(identity);
-              if (disposed || requestWorkspaceID !== activeWorkspaceID || revision !== previewRevision) return;
-              body.replaceChildren();
-              const noteDocument = block.kind === 'notebookCard' && result.items?.find(item => item.kind === 'notebookCard')?.document;
-              if (noteDocument) {
-                body.append(mountReportNoteEditor(block, {document:noteDocument, editable:false}));
-                loaded = true; return;
-              }
-              for (const part of result.preview || []) {
-                if (part.kind === 'image') {
-                  const figure = document.createElement('figure');
-                  const image = document.createElement('img');
-                  const sourceURL = new URL(part.url); image.src = `${sourceURL.pathname}${sourceURL.search}`; image.alt = part.caption || 'Published code figure';
-                  image.loading = 'lazy'; image.style.maxWidth = '100%'; figure.append(image);
-                  if (part.caption) {const caption=document.createElement('figcaption');caption.textContent=part.caption;figure.append(caption);}
-                  body.append(figure);
-                } else if (part.kind === "table") {
-                  const scroll = document.createElement("div"); scroll.className = "report-preview-table";
-                  const table = document.createElement("table");
-                  for (const [rowIndex,cells] of tableDisplayCells(part.rows || [],part.cellSpans || []).entries()) {
-                    const row = document.createElement("tr");
-                    for (const entry of cells.filter(Boolean)) {
-                      const columnIndex=entry.column,value=entry.content;
-                      const cell = document.createElement(rowIndex<(part.headerRowCount||0)?"th":"td"); cell.textContent = value;
-                      cell.rowSpan=entry.rowSpan;cell.colSpan=entry.colSpan;row.append(cell);
-                      if (String(value)) reportFormatting.registerSource(block,cell,{key:`${part.key}:${rowIndex}:${columnIndex}`,text:String(value),
-                        superscriptRanges:part.cellSuperscripts?.find(mark=>mark.row===rowIndex&&mark.column===columnIndex)?.ranges});
-                    }
-                    table.append(row);
+          const generation = reportPresentationGeneration;
+          const previewIsCurrent = () => !disposed && generation === reportPresentationGeneration &&
+            requestWorkspaceID === activeWorkspaceID && isCurrentAccountRequest(requestIdentity);
+          const paintPreview = result => {
+            body.replaceChildren();
+            const noteDocument = block.kind === 'notebookCard' && result.items?.find(item => item.kind === 'notebookCard')?.document;
+            if (noteDocument) {
+              body.append(mountReportNoteEditor(block, {document:noteDocument, editable:false}));
+              loaded = true; return;
+            }
+            for (const part of result.preview || []) {
+              if (part.kind === 'image') {
+                const figure = document.createElement('figure');
+                const image = document.createElement('img');
+                const sourceURL = new URL(part.url); image.src = `${sourceURL.pathname}${sourceURL.search}`; image.alt = part.caption || 'Published code figure';
+                image.loading = 'lazy'; image.style.maxWidth = '100%'; figure.append(image);
+                if (part.caption) {const caption=document.createElement('figcaption');caption.textContent=part.caption;figure.append(caption);}
+                body.append(figure);
+              } else if (part.kind === "table") {
+                const scroll = document.createElement("div"); scroll.className = "report-preview-table";
+                const table = document.createElement("table");
+                for (const [rowIndex,cells] of tableDisplayCells(part.rows || [],part.cellSpans || []).entries()) {
+                  const row = document.createElement("tr");
+                  for (const entry of cells.filter(Boolean)) {
+                    const columnIndex=entry.column,value=entry.content;
+                    const cell = document.createElement(rowIndex<(part.headerRowCount||0)?"th":"td"); cell.textContent = value;
+                    cell.rowSpan=entry.rowSpan;cell.colSpan=entry.colSpan;row.append(cell);
+                    if (String(value)) reportFormatting.registerSource(block,cell,{key:`${part.key}:${rowIndex}:${columnIndex}`,text:String(value),
+                      superscriptRanges:part.cellSuperscripts?.find(mark=>mark.row===rowIndex&&mark.column===columnIndex)?.ranges});
                   }
-                  scroll.append(table); body.append(scroll);
-                } else {
-                  if (part.label) {
-                    const heading = document.createElement("strong"); heading.textContent = part.label; body.append(heading);
-                  }
-                  const text = document.createElement("p"); text.textContent = part.text; body.append(text);
-                  if (part.text) reportFormatting.registerSource(block,text,part);
+                  table.append(row);
                 }
+                scroll.append(table); body.append(scroll);
+              } else {
+                if (part.label) {
+                  const heading = document.createElement("strong"); heading.textContent = part.label; body.append(heading);
+                }
+                const text = document.createElement("p"); text.textContent = part.text; body.append(text);
+                if (part.text) reportFormatting.registerSource(block,text,part);
               }
-              loaded = true;
+            }
+            loaded = true;
+          };
+          const loadPreview = async () => {
+            if (!previewIsCurrent() || !preview.open || loaded || loading) return;
+            const revision = previewRevision;
+            loading = true;
+            reportFormatting.unregisterSource(body);
+            try {
+              const cached = sourcePreviews.get(block, source);
+              if (cached) { paintPreview(cached); return; }
+              body.textContent = "Loading complete source…";
+              const result = await sourcePreviews.load(block, source);
+              if (!previewIsCurrent() || revision !== previewRevision) return;
+              paintPreview(result);
             } catch (error) {
-              if (isCurrentAccountRequest(identity) && revision === previewRevision) body.textContent = `${error.message} Close and reopen to retry.`;
+              if (previewIsCurrent() && revision === previewRevision) body.textContent = `${error.message} Close and reopen to retry.`;
             } finally {
               loading = false;
-              if (revision !== previewRevision && !disposed) void loadPreview();
+              if (revision !== previewRevision && previewIsCurrent()) void loadPreview();
             }
           };
           if (block.kind === "notebookCard") {
@@ -34158,13 +34170,52 @@ async function renderProjectReportDraft(project, resume = null) {
     });
   }
 
+  const reportSwitch = createReportSwitch({
+    read: () => activeDraft,
+    isCurrent: () => !disposed && !generatingReport && !deletingReport &&
+      isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
+    async preserve(current) {
+      let pending;
+      do {
+        pending = sourceMutation;
+        // A failed source change still goes through the save/recovery decision.
+        if (sourceMutationDraft === activeDraft) await pending.catch(() => {});
+        if (!current() || !await mountState.confirmDiscardIfNeeded() || !current()) return false;
+      } while (sourceMutationDraft === activeDraft && pending !== sourceMutation);
+      return true;
+    },
+    async prepare(draftID) {
+      const incoming = draftID === "__new__" ? emptyProjectReportDraft(identity) :
+        structuredClone(drafts.find(draft => draft.id === draftID) || emptyProjectReportDraft(identity));
+      const covered = reportEvidenceCoverage(incoming.blocks, sources);
+      await Promise.all(incoming.blocks.filter(block => !covered.has(block.id)).map(block => {
+        const source = sources.find(item => item.kind === block.kind && item.id === block.sourceID);
+        return source ? sourcePreviews.load(block, source) : undefined;
+      }));
+      return incoming;
+    },
+    commit(incoming) {
+      activeDraft = incoming;
+      dirty = false;
+      recoveryEditorID = crypto.randomUUID();
+      autosave.reset();
+      clearStatus();
+      renderWorkspaceContent();
+      shell.querySelector(".report-draft-version-list > summary")?.focus({preventScroll:true});
+    },
+    onError: error => showStatusError(error.message)
+  });
+
   function renderWorkspaceContent() {
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
     reportUndo.bind(activeDraft);
     outlineNavigationGeneration += 1;
+    const presentation = ++reportPresentationGeneration;
     const draftKey = activeDraft.id || activeDraft.clientDraftID;
     const keepPosition = renderedDraftKey === draftKey;
     const oldDocument = shell.querySelector(".report-document");
+    const oldColumns = shell.querySelector(".report-workspace-columns");
+    const oldDocuments = shell.querySelector(".report-document-columns");
     const oldOutline = shell.querySelector(".report-outline");
     const columnsScroll = shell.querySelector(".report-document-columns")?.scrollLeft || 0;
     const comparisonScroll = comparisonController?.capturePosition();
@@ -34181,7 +34232,6 @@ async function renderProjectReportDraft(project, resume = null) {
     disposeReportNoteEditors();
     outlineController?.dispose();
     resetEnhancedSelects(shell);
-    shell.querySelectorAll(":scope > :not(.report-draft-status)").forEach((element) => element.remove());
 
     const draftPicker = document.createElement("div");
     draftPicker.className = "report-draft-picker";
@@ -34272,22 +34322,7 @@ async function renderProjectReportDraft(project, resume = null) {
     versionList.addEventListener("focusout", event => {
       if (event.relatedTarget && !versionList.contains(event.relatedTarget)) versionList.open = false;
     });
-    const switchDraft = async (draftID) => {
-      if (deletingReport) return;
-      if (dirty && !(await mountState.confirmDiscardIfNeeded())) return;
-      activeDraft = draftID === "__new__"
-        ? emptyProjectReportDraft(identity)
-        : structuredClone(
-            drafts.find((draft) => draft.id === draftID) || emptyProjectReportDraft(identity)
-          );
-      dirty = false;
-      recoveryEditorID = crypto.randomUUID();
-      deletingReport = false;
-      autosave.reset();
-      clearStatus();
-      renderWorkspaceContent();
-      shell.querySelector(".report-draft-version-list > summary")?.focus({ preventScroll: true });
-    };
+    const switchDraft = draftID => reportSwitch.select(draftID);
     drafts.forEach((draft) => {
       const current = draft.id === activeDraft.id;
       const choice = document.createElement("button");
@@ -34301,7 +34336,7 @@ async function renderProjectReportDraft(project, resume = null) {
       choice.append(choiceTitle, choiceRevision);
       choice.addEventListener("click", () => {
         versionList.open = false;
-        if (current) reportMenu.focus({ preventScroll: true });
+        if (current) { reportSwitch.cancel(); reportMenu.focus({ preventScroll: true }); }
         else void switchDraft(draft.id);
       });
       reportOptions.append(choice);
@@ -34506,9 +34541,9 @@ async function renderProjectReportDraft(project, resume = null) {
     const historyBody = comparison.versionBody;
     historyBody.replaceChildren();
     renderHistory(historyBody);
-    const documentBody = document.createElement("div");
+    const documentBody = oldDocument || document.createElement("div");
     documentBody.className = "report-document";
-    documentBody.append(draftPicker, metadata, blocks);
+    documentBody.replaceChildren(draftPicker, metadata, blocks);
     outlineController = createReportOutline({
       blocks: activeDraft.blocks, introduction: metadata,
       targets: [...blocksBody.querySelectorAll(".report-draft-block")], documentBody,
@@ -34625,17 +34660,17 @@ async function renderProjectReportDraft(project, resume = null) {
     versionsToggle.title = "Compare saved PDF versions beside the current Report";
     versionsToggle.addEventListener("click", () => comparison.toggle());
     primaryActions.insertBefore(versionsToggle, saveStatus);
-    const columns = document.createElement("div");
+    const columns = oldColumns || document.createElement("div");
     columns.className = "report-workspace-columns";
     columns.setAttribute("role", "region");
     columns.setAttribute("aria-label", "Report columns");
-    const documents = document.createElement("div");
+    const documents = oldDocuments || document.createElement("div");
     documents.className = "report-document-columns";
     documents.setAttribute("role", "region");
     documents.setAttribute("aria-label", "Report documents");
     documents.tabIndex = 0;
-    documents.append(outline, outlineControls.divider, documentBody, comparison.divider, comparison.preview);
-    columns.append(library, libraryControls.divider, documents, versionsControls.divider, comparison.versions);
+    retainReportChildren(documents, outline, outlineControls.divider, documentBody, comparison.divider, comparison.preview);
+    retainReportChildren(columns, library, libraryControls.divider, documents, versionsControls.divider, comparison.versions);
     panel._updateReportColumns = () => {
       versionsToggle.hidden = history.length === 0;
       const comparing = panel.dataset.comparisonOpen === "true";
@@ -34679,7 +34714,7 @@ async function renderProjectReportDraft(project, resume = null) {
       libraryControls.update(); versionsControls.update();
     };
     panel._columnExpansion?.dispose();
-    shell.append(primaryActions, columns);
+    retainReportChildren(shell, status, primaryActions, columns);
     panel._updateReportColumns();
     panel._columnExpansion = createColumnExpansion({
       host: columns, columns: () => [library, outline, documentBody, comparison.preview, comparison.versions],
@@ -34694,18 +34729,20 @@ async function renderProjectReportDraft(project, resume = null) {
       const previous = disclosures.get(row.dataset.blockId);
       if (previous) row.querySelectorAll("details").forEach((detail, index) => { detail.open = previous[index] || false; });
     });
-    documentBody.scrollTop = documentScroll;
+    documentBody.scrollTo({top:documentScroll, behavior:"instant"});
     outline.scrollTop = outlineScroll;
     if (keepPosition && documentScroll) {
       const interaction = reportPresentationInteraction;
       void navigateReportOutline({requests: sourcePreviewRequests.values(),
-        isCurrent: () => !disposed && documentBody.isConnected && isCurrentAccountRequest(requestIdentity) &&
+        isCurrent: () => !disposed && presentation === reportPresentationGeneration && documentBody.isConnected && isCurrentAccountRequest(requestIdentity) &&
           requestWorkspaceID === activeWorkspaceID && reportPresentationInteraction === interaction,
         navigate: () => { documentBody.scrollTop = documentScroll; }});
     }
-    documentBody.addEventListener("input", () => outlineController.refreshLabels());
-    documentBody.addEventListener("wheel", () => { outlineNavigationGeneration += 1; }, { passive: true });
-    documentBody.addEventListener("pointerdown", () => { outlineNavigationGeneration += 1; });
+    if (!oldDocument) {
+      documentBody.addEventListener("input", () => outlineController?.refreshLabels());
+      documentBody.addEventListener("wheel", () => { outlineNavigationGeneration += 1; }, {passive:true});
+      documentBody.addEventListener("pointerdown", () => { outlineNavigationGeneration += 1; });
+    }
     paintReportSaveState();
     if (panel.isConnected) syncReferenceReaderLayout();
   }
