@@ -14,7 +14,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1752";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1754";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -167,7 +167,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1752";
+} from "./offline-storage.js?v=20261113-research-notebook-v1754";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -21104,20 +21104,21 @@ function refreshSearchGroupCounts(results) {
 }
 
 function updateSearchScopeSummary(panel, instance) {
-  const button = panel.querySelector(".search-scope-summary");
+  const button = panel._searchSourcesButton || panel.querySelector(".search-sources-button");
   if (!button) return;
   const {catalog} = activeCodeSourcesController.state;
   const sources = catalog ? searchPanelSources(instance, catalog) : null;
   const labels = sources ? activeCodeSourceMenuRows(sources).map(row => row.label) : [];
-  const summary = !catalog ? 'Search within · all codebooks'
-    : !sources.length ? 'Search within · no sources selected' : !Array.isArray(instance?.querySourceKeys) ? `Search within · all ${sources.length} codebooks`
-    : labels.length > 2 ? `Search within · ${labels.length} codebooks & editions` : `Search within · ${labels.join(' · ')}`;
+  const summary = !catalog ? 'Filter codes · all codebooks'
+    : !sources.length ? 'Filter codes · no sources selected' : !Array.isArray(instance?.querySourceKeys) ? `Filter codes · all ${sources.length} codebooks`
+    : labels.length > 2 ? `Filter codes · ${labels.length} codebooks & editions` : `Filter codes · ${labels.join(' · ')}`;
   button.setAttribute('aria-label', summary);
   button.title = [summary, 'Applies to this Search column only. Reader offers all codes.', ...labels].join('\n');
   const mode = panel.querySelector('.search-visible-match-mode');
   if (mode) {
     mode.hidden = instance?.matchMode !== 'exact';
     mode.textContent = mode.hidden ? '' : 'Exact phrase';
+    panel.querySelector('.search-visible-context').hidden = mode.hidden;
   }
 }
 
@@ -21640,10 +21641,10 @@ async function renderSearch(instance, options = {}) {
     if (!matchControl.contains(event.relatedTarget)) matchControl.open = false;
   });
   const sourcesButton = panel.querySelector(".search-sources-button");
+  panel._searchSourcesButton = sourcesButton;
   sourcesButton.setAttribute("aria-expanded", "false");
   sourcesButton.setAttribute("aria-haspopup", "dialog");
   sourcesButton.addEventListener("click", () => openSearchCodeSourceSettings(panel));
-  panel.querySelector('.search-scope-summary')?.addEventListener('click', () => openSearchCodeSourceSettings(panel));
   const scopeToken = activeCodeSourcesController.captureContext();
   void activeCodeSourcesController.ensureCatalog().then(() => {
     if (panel.isConnected && activeCodeSourcesController.isCurrent(scopeToken)) updateSearchScopeSummary(panel, searchInstance);
@@ -43378,9 +43379,9 @@ async function openSearchCodeSourceSettings(panel) {
     const {catalog} = activeCodeSourcesController.state;
     const enabled = catalog || [];
     const selected = new Set(searchPanelSources(instance, catalog).map(codeSourceKey));
-    const trigger = panel.querySelector(".search-scope-summary");
+    const trigger = panel.querySelector(".column-group-menu-button");
     const dialog = document.createElement("dialog"); dialog.className = "search-scope-dialog";
-    dialog.setAttribute("aria-label", "Search within codebooks and editions");
+    dialog.setAttribute("aria-label", "Filter codes");
     const header = document.createElement("div"); header.className = "search-scope-header";
     const choices = document.createElement("div"); choices.className = "search-scope-choices";
     const controls = [];
@@ -43410,7 +43411,6 @@ async function openSearchCodeSourceSettings(panel) {
       if (closed) return;
       closed = true;
       observer.disconnect(); resize?.disconnect(); dialog.close(); dialog.remove();
-      trigger?.setAttribute("aria-expanded", "false");
       if (trigger?.isConnected && current()) trigger.focus({preventScroll:true});
     };
     const position = () => {
@@ -43454,7 +43454,7 @@ async function openSearchCodeSourceSettings(panel) {
     observer.observe(track,{childList:true,subtree:true});
     resize?.observe(panel);
     const dock = panel.querySelector(".search-dock"); if (dock) resize?.observe(dock);
-    trigger?.setAttribute("aria-expanded","true"); dialog.show();
+    dialog.show();
   } catch(error) { if(isCurrentAccountRequest(identity)&&workspaceID===activeWorkspaceID) await showWebNotice("Search sources unavailable",error.message); }
 }
 
@@ -45976,6 +45976,7 @@ function appendReaderMenuControls(menu, panel) {
 
 function openColumnGroupMenu(panel, anchor) {
   document.querySelector('.column-group-menu')?._close?.();
+  document.querySelector('.search-scope-dialog')?._close?.();
   const pro = isProAccount();
   const group = workspacePrivatePresentationAllowed() && canGroupWorkspaceColumn(panel.dataset.paneId) ? columnGroupForPane(panel.dataset.paneId) : null;
   const menu = document.createElement('div');
