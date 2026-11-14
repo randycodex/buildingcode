@@ -87,9 +87,9 @@
   .research-v2{transition:--rv2-rail-width 260ms cubic-bezier(.2,0,0,1)}
   .rv2-rail{padding-inline-start:calc(var(--panel-padding) + 8px)}
   .research-v2-panel>.analysis-content{margin-inline-start:calc(-1 * var(--panel-padding))}
-  .research-v2.is-history-collapsed .rv2-rail{padding-inline:0;overflow:hidden}
+  .research-v2.is-history-collapsed .rv2-rail{padding-inline:0;overflow:visible}
   .research-v2.is-history-collapsed .rv2-rail>:not(.rv2-rail-top-row),.research-v2.is-history-collapsed .rv2-new-chat{display:none}
-  .research-v2.is-history-collapsed .rv2-rail-top-row{justify-content:center;gap:0}
+  .research-v2.is-history-collapsed .rv2-rail-top-row{justify-content:flex-start;gap:0;padding-inline-start:calc(var(--panel-padding) - 8px)}
   .rv2-rail-divider{position:absolute;inset-block:calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3)) 0;left:var(--rv2-rail-width,320px);width:1px}
   .is-history-collapsed .rv2-rail-divider{pointer-events:none}
   .research-v2.is-question-rail-resizing{transition:none}

@@ -1323,11 +1323,13 @@ textarea:focus-visible {
   flex: 0 0 auto; display: flex; align-items: center; gap: 4px; margin-inline: auto -8px; padding: 0;
 }
 .notebook-index-panel[data-notebook-list-collapsed="true"] { position: relative; z-index: 2; padding-inline: 0; overflow: visible; }
-.notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-body { padding-inline: 0; overflow: hidden; }
+.notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-body { padding-inline: 0; overflow: visible; }
 .notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-body > :not(.notebook-index-top-row),
 .notebook-index-panel[data-notebook-list-collapsed="true"] :is(.notebook-index-create, .notebook-index-menu-button) { display: none; }
 .notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-top-row { gap: 0; }
-.notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-actions { width: 100%; margin-inline: 0; justify-content: center; }
+/* The 28px toggle centers its 12px icon 8px from its left edge. */
+.notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-actions { width: 100%; box-sizing: border-box; margin-inline: 0; justify-content: flex-start; padding-inline-start: calc(var(--panel-padding) - 8px); }
+.notebook-index-panel[data-notebook-list-collapsed="true"] + .pane-divider[data-next-pane-id^="project:notebook:"] { pointer-events: none; }
 
 /* Resize the live columns; the heading stays painted at its usual inset. */
 .notes-list-motion .notebook-index-panel { position: relative; z-index: 2; overflow: visible; }
