@@ -18,6 +18,10 @@ for(const missing of ['reader','evidence','notes']) {
  assert.ok(sizes[visible.findIndex(column=>column.kind==='editor')]>wide[3],'Closing a reference column gives its space to the editor');
 }
 assert.deepEqual(notebookColumnsLayout([{kind:'reader',collapsed:true},{kind:'editor'}],1920,3),[48,1869]);
+const withRail=[{kind:'reader',preferredWidth:630},{kind:'evidence',preferredWidth:600},{kind:'notes',collapsed:true,preferredWidth:280},{kind:'editor'}];
+assert.deepEqual(notebookColumnsLayout(withRail,3054,5),[630,600,35,1784],'Only the notepad gains space when Notes becomes a 35px rail.');
+assert.equal(notebookColumnsLayout(withRail,700,5)[2],35,'The rail keeps its exact width in a constrained desk.');
+assert.deepEqual(notebookColumnsLayout(withRail.map(column=>({...column,collapsed:false})),3054,5),[630,600,280,1539],'Reopening restores Notes without changing Reader or Evidence.');
 assert.deepEqual(notebookColumnsLayout([
  {kind:'reader',preferredWidth:1349},{kind:'evidence',preferredWidth:550},
  {kind:'notes',preferredWidth:350},{kind:'editor',preferredWidth:800}

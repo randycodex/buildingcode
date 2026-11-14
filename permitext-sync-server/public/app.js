@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1792";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1795";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -45,7 +45,7 @@ import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarg
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=19";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=20";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261114-report-sources-v10";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1792";
+} from "./offline-storage.js?v=20261113-research-notebook-v1795";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3251,17 +3251,6 @@ function syncNotebookListControls() {
   document.querySelectorAll('.notebook-list-toggle').forEach(updateNotebookListToggle);
 }
 
-function rememberNotebookListTogglePosition() {
-  const editor = track.querySelector('.notebook-panel:not(.is-workflow-hidden)');
-  const list = track.querySelector('.notebook-index-panel:not(.is-workflow-hidden)');
-  const button = (list || editor)?.querySelector('.notebook-list-toggle');
-  if (!editor || !button) return;
-  const origin = (list || editor).getBoundingClientRect();
-  const bounds = button.getBoundingClientRect();
-  editor.style.setProperty('--notebook-list-toggle-left', `${bounds.left - origin.left}px`);
-  editor.style.setProperty('--notebook-list-toggle-top', `${bounds.top - editor.getBoundingClientRect().top}px`);
-}
-
 async function transitionNotebookList(update) {
   track._notebookListTransition?.skipTransition();
   if (typeof document.startViewTransition !== 'function' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -3287,7 +3276,6 @@ async function toggleNotebookList() {
   if (!workspacePrivatePresentationAllowed() || !hasCapability('notebook') ||
       !workspaceProject() || currentWorkflowView() !== 'notebook') return false;
   const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
-  rememberNotebookListTogglePosition();
   state.notebookListHidden = !state.notebookListHidden;
   const hidden = state.notebookListHidden;
   document.querySelector('.notebook-index-menu')?._close?.(false);
@@ -3295,8 +3283,7 @@ async function toggleNotebookList() {
   await transitionNotebookList(() => transitionWorkspace('utility'));
   if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
       currentWorkflowView() !== 'notebook' || state.notebookListHidden !== hidden) return false;
-  const owner = state.notebookListHidden ? '.notebook-panel' : '.notebook-index-panel';
-  track.querySelector(`${owner}:not(.is-workflow-hidden) .notebook-list-toggle`)?.focus({preventScroll:true});
+  track.querySelector('.notebook-index-panel:not(.is-workflow-hidden) .notebook-list-toggle')?.focus({preventScroll:true});
   return true;
 }
 
@@ -5943,7 +5930,7 @@ function workflowPaneIsVisible(paneID) {
   if (!isProAccount()) return state.readers.slice(0, 1).some(reader => paneIDForReader(reader) === paneID);
   const view = currentColumnWorkflowView();
   if (view === 'notebook' && paneID.startsWith('reader:') && state.notebookReaderHidden) return false;
-  if (paneID.startsWith('project:notes-index:')) return view === 'notebook' && !state.notebookListHidden;
+  if (paneID.startsWith('project:notes-index:')) return view === 'notebook';
   if (view === 'notebook' && isProjectNotebookPaneID(paneID)) {
     const project = workspaceProject();
     const selected = project && selectedNotebookColumn(project);
@@ -6963,6 +6950,16 @@ function normalizePaneWeights(ids) {
 
 function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
+  if (paneID.startsWith('project:notes-index:')) {
+    const collapsed = currentColumnWorkflowView() === 'notebook' && state.notebookListHidden;
+    panel.dataset.notebookListCollapsed = String(Boolean(collapsed));
+    if (collapsed) {
+      panel.style.setProperty('--pane-resized-min-width', '35px');
+      panel.style.setProperty('--pane-default-min-width', '35px');
+      panel.style.flex = '0 0 35px';
+      return;
+    }
+  }
   if (panel.classList.contains("is-collapsed")) {
     panel.style.flex = "0 0 48px";
     return;
@@ -31181,9 +31178,6 @@ async function renderProjectNotebook(project, options = {}) {
   panel.dataset.paneId = paneID;
   panel.dataset.projectId = projectID;
   panel.style.setProperty("--project-color", identity.color || "#c96410");
-  const listID = notebookIndexPaneID(identity);
-  const listWidth = Math.max(200, Math.min(350, Number(state.paneWeights[listID]) || defaultPaneWidthForID(listID)));
-  panel.style.setProperty('--notebook-list-width', `${listWidth}px`);
   applyPaneWeight(panel, paneID);
 
   const header = document.createElement("header");
@@ -31195,10 +31189,6 @@ async function renderProjectNotebook(project, options = {}) {
   headingTitle.className = "eyebrow panel-kind";
   heading.append(headingTitle);
   header.append(heading);
-  const reopen = document.createElement('div');
-  reopen.className = 'notebook-list-reopen';
-  reopen.append(createNotebookListToggle());
-
   const shell = document.createElement("div");
   shell.className = "notebook-shell";
   const status = document.createElement("p");
@@ -31206,7 +31196,7 @@ async function renderProjectNotebook(project, options = {}) {
   status.setAttribute("role", "status");
   showColumnLoadingStatus(status, "Loading Project Notebook…");
   shell.append(status);
-  panel.append(header, reopen, shell);
+  panel.append(header, shell);
 
   let editorMount = null;
   let passageDisclosure = null;
@@ -46385,10 +46375,16 @@ function columnGroupIsCollapsed(group) {
 }
 
 function paneIsCollapsed(paneID) {
+  if (paneID.startsWith('project:notes-index:') && currentColumnWorkflowView() === 'notebook') return Boolean(state.notebookListHidden);
   return paneCanCollapse(paneID) && ((paneID !== activePinnedPaneID() && columnGroupIsCollapsed(columnGroupForPane(paneID))) || (state.collapsedPaneIDs || []).includes(paneID));
 }
 
 function applyPaneCollapsedState(panel) {
+  if (panel.dataset.paneId.startsWith('project:notes-index:')) {
+    // Notes keeps its own toggle and live list, rather than the generic rail.
+    applyPaneWeight(panel, panel.dataset.paneId);
+    return;
+  }
   const collapsed = paneIsCollapsed(panel.dataset.paneId);
   const wasCollapsed = panel.classList.contains("is-collapsed");
   if (collapsed && !wasCollapsed) {

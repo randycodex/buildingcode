@@ -39,6 +39,7 @@ const context = vm.createContext({
   workspaceProject:() => project, projectDetailKey:value => value?.id || '',
   captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',
   currentWorkflowView:() => view, currentColumnWorkflowView:() => view, isProAccount:() => true,
+  paneCanCollapse:() => false,
   selectedNotebookColumn:() => ({id:'editor',cardID:'a'}), notebookColumnPaneID:() => editorID,
   isProjectNotebookPaneID:id => id.startsWith('project:notebook:'),
   notebookCatalogs:new Map([['project',[{id:'a',title:'Note A'},{id:'b',title:'Note B'}]]]),
@@ -49,7 +50,7 @@ const context = vm.createContext({
 });
 vm.runInContext(['researchHistoryDayIndex','researchConversationHistoryGroups','notebookHistoryGroups',
   'notebookIndexPaneID','updateNotebookListToggle','createNotebookListToggle','renderNotebookIndex','syncNotebookLanding',
-  'rememberNotebookListTogglePosition','transitionNotebookList','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
+  'paneIsCollapsed','transitionNotebookList','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
 const panel = context.renderNotebookIndex(project);
 const localToggle = panel.querySelector('.notebook-list-toggle');
 assert.equal(localToggle.attrs['aria-label'],'Hide notes list');
@@ -63,13 +64,15 @@ context.syncNotebookLanding(null,panel);
 assert.equal(list.querySelector('.notebook-index-group-label').textContent,'7 days','A changed edit date refreshes grouping even when its title is unchanged.');
 const indexID = context.notebookIndexPaneID(project);
 await context.toggleNotebookList();
-assert.equal(context.workflowPaneIsVisible(indexID), false);
+assert.equal(context.workflowPaneIsVisible(indexID), true, 'The collapsed list remains mounted as a rail.');
+assert.equal(context.paneIsCollapsed(indexID), true);
 assert.equal(context.workflowPaneIsVisible(editorID), true, 'Hiding the list leaves the selected note visible.');
 context.updateNotebookListToggle(localToggle);
 assert.equal(localToggle.attrs['aria-label'],'Show notes list');
 assert.equal(localToggle.attrs['aria-expanded'],'false');
 await context.toggleNotebookList();
 assert.equal(context.workflowPaneIsVisible(indexID), true);
+assert.equal(context.paneIsCollapsed(indexID), false);
 assert.equal(saves, 2); assert.equal(transitions, 2);
 allowed = false;
 assert.equal(await context.toggleNotebookList(), false);
@@ -78,20 +81,23 @@ assert.equal(await context.toggleNotebookList(), false);
 assert.equal(saves, 2, 'Unavailable tools and other working views cannot change list visibility.');
 console.log('Notes list toggle passed: immediate deferred contents, independent editor visibility, persistence and access/view guards.');
 
-const positions = {};
-let listVisible = true;
-const anchoredButton = {getBoundingClientRect:()=>({left:328,top:160})};
-const anchoredEditor = {style:{setProperty:(key,value)=>{positions[key]=value;}},
-  getBoundingClientRect:()=>({left:listVisible?381:100,top:70}),querySelector:()=>anchoredButton};
-const anchoredList = {getBoundingClientRect:()=>({left:100,top:70}),querySelector:()=>anchoredButton};
-const anchored = vm.createContext({track:{querySelector:selector=>selector.startsWith('.notebook-panel')?anchoredEditor:listVisible?anchoredList:null}});
-vm.runInContext(actual('rememberNotebookListTogglePosition'),anchored);
-anchored.rememberNotebookListTogglePosition();
-assert.equal(positions['--notebook-list-toggle-left'],'228px');
-assert.equal(positions['--notebook-list-toggle-top'],'90px');
-listVisible = false;
-anchored.rememberNotebookListTogglePosition();
-assert.equal(positions['--notebook-list-toggle-left'],'228px','The restore toggle retains the same viewport x coordinate after the editor expands left.');
+const railState = {notebookListHidden:true,paneWeights:{[indexID]:280}};
+const rail = {dataset:{paneId:indexID},style:{setProperty(key,value){this[key]=value;}},
+  classList:{contains:()=>false},getBoundingClientRect:()=>({width:35})};
+const sizing = vm.createContext({state:railState,currentColumnWorkflowView:()=> 'notebook',
+  minimumPaneWidthForID:()=>200,defaultPaneWidthForID:()=>280,migrateLegacyPaneWidth:(_id,value)=>value,
+  assistantHistoryOnlyPane:()=>false,isFlexibleReaderPaneID:()=>false,paneCanCollapse:()=>false,
+  workspaceColumnExpansion:null,track:{querySelectorAll:()=>[rail]}});
+vm.runInContext(['applyPaneWeight','paneIsCollapsed','capturePaneResizeWidths'].map(actual).join('\n'),sizing);
+sizing.applyPaneWeight(rail,indexID);
+assert.equal(rail.style.flex,'0 0 35px');
+assert.equal(rail.dataset.notebookListCollapsed,'true');
+sizing.capturePaneResizeWidths();
+assert.equal(railState.paneWeights[indexID],280,'Resizing other columns must not save the rail width over the expanded list width.');
+railState.notebookListHidden=false;
+sizing.applyPaneWeight(rail,indexID);
+assert.equal(rail.style.flex,'0 0 280px','Reopening restores the preferred width.');
+assert.equal(rail.dataset.notebookListCollapsed,'false');
 
 let reducedMotion = false, updates = 0, starts = 0, skipped = 0;
 const motionClasses = new Set(), releases = [];
@@ -116,7 +122,7 @@ reducedMotion=true;
 await motion.transitionNotebookList(()=>{updates++;});
 assert.equal(starts,2,'Reduced motion changes visibility without starting an animation.');
 assert.equal(updates,3);
-console.log('Notes motion passed: stationary x/y anchor, interrupted transitions, retained update callbacks, cleanup and reduced-motion behavior.');
+console.log('Notes rail passed: 35px collapse, retained expanded width during resizing, reopening, interrupted transitions and reduced motion.');
 
 // Notebook is a permanent writing area, including older saved layouts that
 // closed it and the transition after its last active Note moves to Trash.

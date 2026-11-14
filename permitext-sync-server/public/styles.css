@@ -1304,12 +1304,11 @@ textarea:focus-visible {
   padding-inline-end: calc(var(--panel-title-control-size) + var(--space-2));
 }
 
-/* The Notes list and notepad share one header band. Resizing stays independent
-   below the band, and the same local toggle remains when the list is hidden. */
+/* The Notes list and notepad share one header band. The list keeps its own
+   toggle when it collapses to a narrow rail beside the writing area. */
 .notebook-shared-label,
 .notebook-header .notebook-shared-label { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .notebook-shared-label .panel-kind { margin: 0; }
-.notebook-list-reopen .notebook-list-toggle,
 .notebook-index-top-row .notebook-index-actions > button {
   display: inline-flex; align-items: center; justify-content: center;
   width: 28px; min-width: 28px; height: 28px; min-height: 28px; padding: 5px;
@@ -1322,11 +1321,13 @@ textarea:focus-visible {
 .notebook-index-top-row .notebook-index-actions {
   flex: 0 0 auto; display: flex; align-items: center; gap: 4px; margin-inline: auto -8px; padding: 0;
 }
-.notebook-panel > .notebook-list-reopen {
-  position: absolute; z-index: 3;
-  left: var(--notebook-list-toggle-left, calc(var(--notebook-list-width, 280px) - var(--panel-padding) - 28px));
-  top: var(--notebook-list-toggle-top, calc((2 * var(--panel-padding)) + var(--panel-title-row-height) + var(--space-3)));
-}
+.notebook-index-panel[data-notebook-list-collapsed="true"] { padding-inline: 0; }
+.notebook-index-panel[data-notebook-list-collapsed="true"] > .panel-header .notebook-shared-label { visibility: hidden; }
+.notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-body { padding-inline: 0; overflow: hidden; }
+.notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-body > :not(.notebook-index-top-row),
+.notebook-index-panel[data-notebook-list-collapsed="true"] :is(.notebook-index-create, .notebook-index-menu-button) { display: none; }
+.notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-top-row { gap: 0; }
+.notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-actions { width: 100%; margin-inline: 0; justify-content: center; }
 
 /* Animate layout snapshots while keeping the live editor and its history.
    Title, text and toggle move independently so letters never stretch. */
@@ -1358,10 +1359,9 @@ textarea:focus-visible {
   content: ""; position: absolute; left: calc(-1 * var(--panel-padding)); right: calc(-1 * var(--panel-padding));
   bottom: calc(-1 * var(--space-3)); height: 1px; background: var(--border); pointer-events: none;
 }
-.panel-track[data-notebook-column-sizing="fit"]:has(> .notebook-index-panel:not(.is-workflow-hidden)) > .notebook-panel .notebook-shared-label {
+.panel-track[data-notebook-column-sizing="fit"]:has(> .notebook-index-panel:not(.is-workflow-hidden):not([data-notebook-list-collapsed="true"])) > .notebook-panel .notebook-shared-label {
   visibility: hidden;
 }
-.panel-track[data-notebook-column-sizing="fit"]:has(> .notebook-index-panel:not(.is-workflow-hidden)) > .notebook-panel > .notebook-list-reopen { display: none; }
 .panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel .notebook-index-actions { padding-inline-end: 0; }
 .panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::before,
 .panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::after {
