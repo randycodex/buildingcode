@@ -42,14 +42,15 @@
 .rv2-rename-form{display:grid;grid-column:1/-1;grid-template-columns:1fr 1fr;gap:6px;padding:12px 0}
 .rv2-rename-input{grid-column:1/-1;width:100%;min-width:0;box-sizing:border-box;background:var(--surface-muted);color:var(--text-primary);border:0;border-radius:6px;padding:8px;font:inherit}
 .rv2-rename-status{grid-column:1/-1;font-size:12px;color:var(--text-secondary)}
-.rv2-chat{display:flex;flex-direction:column;min-height:0;min-width:0;padding:0 max(24px,calc((100% - 600px)/2));background:var(--surface)}
+.rv2-chat{display:flex;flex-direction:column;align-items:center;min-height:0;min-width:0;padding:0 24px;background:var(--surface)}
+.rv2-chat>:is(.rv2-thread,.rv2-detail,.rv2-status,.rv2-composer){width:100%;max-width:var(--workspace-content-max-width,800px)}
 .rv2-thread{flex:1;min-height:0;overflow:auto;padding:30px 0 20px;scroll-behavior:smooth;overflow-wrap:anywhere}
 .rv2-welcome{margin:80px auto 40px;max-width:440px}
 .rv2-welcome h3{font-size:22px;font-weight:500;letter-spacing:-.3px;margin:0 0 8px}
 .rv2-welcome p{font-size:14px;color:var(--text-secondary)}
 .rv2-user{background:var(--toolbar-active);border-radius:19px;padding:11px 16px;margin:0 0 22px auto;max-width:85%;width:fit-content;white-space:pre-wrap}
-.rv2-answer{background:transparent;border-radius:18px;padding:16px 19px;margin:0 0 25px;max-width:680px;white-space:pre-wrap}
-.rv2-answer-entry{max-width:680px;margin:0 0 25px}
+.rv2-answer{background:transparent;border-radius:18px;padding:16px 19px;margin:0 0 25px;max-width:100%;white-space:pre-wrap}
+.rv2-answer-entry{max-width:100%;margin:0 0 25px}
 .rv2-answer-entry>.rv2-answer{margin-bottom:0}
 .rv2-answer-time{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;margin-top:5px;padding:0 2px;color:var(--text-secondary);font-size:12px;line-height:1.4}
 /* Keep answer timing smaller than the workspace typography override. */
