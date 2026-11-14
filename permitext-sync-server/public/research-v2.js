@@ -108,8 +108,6 @@ export function createResearchV2View(options) {
   });renderHistory();}
   appendQuestions(history);
   if(!history.length)list.append(node('p','rv2-empty-history','Your questions will appear here.'));
-  rail.append(list);
-  if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
   const newChat = options.onNew ? action('New Chat +',async()=>{
     if(busy||includeBusy||revealBusy||chatTransitionPending||operationPending()||!isCurrent()||!root.isConnected)return;
     // Lock synchronously, before the create request can yield. The old
@@ -120,6 +118,8 @@ export function createResearchV2View(options) {
     finally{chatTransitionPending=false;if(isCurrent()&&root.isConnected)update();}
   },'rv2-new-chat') : null;
   if(newChat)rail.append(newChat);
+  rail.append(list);
+  if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
   const divider=node('div','rv2-rail-divider');
   const questionRail=attachResearchQuestionRail({root,divider,widthStore:options.railWidthStore});
   const historyTitleResize=new ResizeObserver(()=>historyTitles.refresh());historyTitleResize.observe(rail);
