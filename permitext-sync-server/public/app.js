@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1783";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1784";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1783";
+} from "./offline-storage.js?v=20261113-research-notebook-v1784";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -31414,7 +31414,8 @@ async function renderProjectNotebook(project, options = {}) {
     const railHeader = noteMenu.footer;
     const railLabel = noteMenu.label;
     noteMenu.element.classList.add('has-note-columns');
-    noteMenu.toggle.hidden = false;
+    noteMenu.menu.remove();
+    noteMenu.titleAction.remove();
     mountState.editTitle = () => noteMenu.editTitle();
     const newButton = noteMenu.createButton;
     const cardList = noteMenu.list;
@@ -32303,38 +32304,9 @@ async function renderProjectNotebook(project, options = {}) {
           snapshot: { label: `Notebook: ${activeCard.title || "Untitled card"}` }
         });
       });
-      const reportButton = document.createElement("button");
-      reportButton.type = "button";
-      reportButton.className = "notebook-add-to-report";
-      reportButton.textContent = "Add to Report";
-      reportButton.dataset.reportMembershipMode = "action";
-      reportButton.dataset.reportMembershipProject = projectID;
-      reportButton.dataset.reportSourceKind = "notebookCard";
-      reportButton.dataset.reportSourceId = activeCard.id || "";
-      refreshNotebookReportStatus = async () => refreshProjectReportMembership(projectID, true);
-      window.requestAnimationFrame(() => { if (reportButton.isConnected && activeCard.id) void refreshProjectReportMembership(projectID); });
-      reportButton.disabled = notebookReadOnly;
-      reportButton.addEventListener("click", async () => {
-        const handoffRenderSequence = editorRenderSequence;
-        reportButton.disabled = true;
-        try {
-          const synchronized = await saveActiveNotebookCard();
-          if (disposed || !isCurrentAccountRequest(requestIdentity) || handoffRenderSequence !== editorRenderSequence) return;
-          if (!synchronized || dirty || saveConflict) throw new Error("Finish syncing this Note and resolve any save conflict before adding it to a Report. Your device draft is preserved.");
-          if (!activeCard?.id) throw new Error("Save this Note before adding it to a Report.");
-          reportButton.dataset.reportSourceId = activeCard.id;
-          if (await openIncludedSourceReport(reportButton, identity)) return;
-          const addedReport = await promoteNotebookCardToReport(identity, activeCard, { container: panel });
-          reportAdditionFeedback(reportButton, addedReport);
-        } catch (error) {
-          if (!disposed && isCurrentAccountRequest(requestIdentity)) await showWebNotice("Report handoff not completed", error.message);
-        }
-        finally { if (!disposed) reportButton.disabled = notebookReadOnly; }
-      });
       footerActions.append(coordinateButton);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      noteMenu.titleAction.append(reportButton);
       footer.append(footerActions);
       const focusedContent = [editorElement];
       if (notebookReadOnly) panel.append(draftStatus);

@@ -20162,7 +20162,7 @@ dialog.report-screen {
 .notebook-title-control :is(.notebook-title-text, .notebook-title-editor)[hidden] { display: none; }
 .notebook-title-action { grid-column: 2; grid-row: 1; display: flex; align-items: center; }
 .notebook-title-action:empty { display: none; }
-.notebook-title-control.has-note-columns { grid-template-columns: minmax(0, 1fr) auto; }
+.notebook-title-control.has-note-columns { grid-template-columns: minmax(0, 1fr); }
 .notebook-note-tabs { display: flex; flex: 0 0 auto; align-items: center; gap: var(--workspace-menu-gap); min-width: 0; }
 .workflow-toolbar .toolbar-button.notebook-note-tab { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: none; }
 .workflow-toolbar .toolbar-button.notebook-new-note { flex: 0 0 auto; min-width: 36px; font-size: 22px !important; line-height: 1; }
@@ -21645,7 +21645,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .research-note-destination > button:first-child { display: inline-flex; align-items: center; gap: 8px; min-width: 0; max-width: 240px; white-space: nowrap; text-transform: none; }
 .research-note-destination .toolbar-button > .research-note-picker-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: none; }
 .research-note-destination .toolbar-button > svg { display: block; flex: 0 0 12px; width: 12px; height: 12px; }
-.notebook-title-control.has-note-columns { grid-template-columns: minmax(0, 1fr) auto auto; gap: 16px; }
+.notebook-title-control.has-note-columns { grid-template-columns: minmax(0, 1fr); }
 .notebook-title-action { gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
 .notebook-title-action .notebook-secondary-action { border: 0; padding: 8px 0; background: transparent; color: var(--text-secondary); font: inherit; font-size: 12px; cursor: pointer; }
 .notebook-questions { margin: 16px 24px; font-size: 13px; line-height: 1.5; }
@@ -21658,7 +21658,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .notebook-question-form label { display: grid; gap: 4px; }
 .notebook-question-form textarea { width: 100%; padding: 8px; font: inherit; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border-color, #ddd); }
 @media (max-width: 700px) {
-  .notebook-title-control.has-note-columns { grid-template-columns: minmax(0, 1fr) auto; }
+  .notebook-title-control.has-note-columns { grid-template-columns: minmax(0, 1fr); }
   .notebook-title-action { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; }
   .notebook-title-control.has-note-columns .notebook-note-menu { grid-column: 2; }
   .research-note-destination > button:first-child { max-width: 170px; }
