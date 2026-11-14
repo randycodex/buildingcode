@@ -21145,7 +21145,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   background: var(--surface);
 }
 .report-screen .report-format-toolbar {
-  display: flex; align-items: center; flex-wrap: wrap; gap: 3px;
+  display: flex; align-items: center; flex-wrap: nowrap; justify-content: space-between; gap: 2px;
   min-height: 42px; padding: 5px 0;
   background: var(--surface); color: var(--text-primary);
   border-bottom: 1px solid var(--border); font: 13px var(--ui-font-family);
@@ -21154,8 +21154,8 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   min-height: 30px; padding: 4px 7px; border: 0; border-radius: 4px;
   background: transparent; color: inherit; font: inherit; cursor: pointer;
 }
-.report-screen .report-format-toolbar > button { width: 30px; flex: 0 0 30px; }
-.report-screen .report-draft-shell .report-format-toolbar > select { width: auto; min-width: 100px; flex: 0 0 auto; margin: 0; }
+.report-screen .report-format-toolbar > button { width: 28px; flex: 0 0 28px; }
+.report-screen .report-draft-shell .report-format-toolbar > select { appearance: none; -webkit-appearance: none; background-image: none; width: 80px; min-width: 0; flex: 0 0 80px; margin: 0; text-align: center; text-align-last: center; }
 .report-screen .report-format-toolbar svg { display: block; width: 17px; height: 17px; }
 .report-screen .report-format-toolbar :is(button, select, summary):hover,
 .report-screen .report-format-toolbar [aria-pressed="true"] { background: var(--menu-highlight, #80808022); }
@@ -21163,9 +21163,10 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .report-screen .report-format-toolbar :focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
 .report-screen .report-format-toolbar .report-format-highlight { color: var(--highlight-tool-color); }
 .report-screen .report-format-link, .report-screen .report-format-insert { position: relative; }
+.report-screen .report-format-link > button { display: inline-flex; align-items: center; justify-content: center; width: 28px; min-width: 28px; padding: 0; }
 .report-screen .report-format-insert summary { list-style: none; }
 .report-screen .report-format-insert summary::-webkit-details-marker { display: none; }
-.report-screen .report-format-insert summary::after { content: '⌄'; margin-left: 10px; }
+.report-screen .report-format-insert summary::after { content: none; }
 .report-screen .report-format-link-form, .report-screen .report-format-insert-menu {
   position: absolute; top: calc(100% + 8px); left: 0; z-index: 10;
   width: 260px; padding: 10px; border: 1px solid var(--border); border-radius: 12px;
@@ -21175,7 +21176,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .report-screen .report-format-link-form label { display: block; margin-bottom: 8px; color: var(--text-secondary); }
 .report-screen .report-format-link-form input { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 7px; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; }
 .report-screen .report-format-link-form [role="alert"] { font-size: 12px; }
-.report-screen .report-format-insert-menu { width: 180px; }
+.report-screen .report-format-insert-menu { width: 180px; left: auto; right: 0; }
 .report-screen .report-format-insert-menu button { display: block; width: 100%; text-align: left; }
 .report-screen .report-rich-editor .tiptap { min-height: 44px; outline: none; font: 17px/1.65 var(--ui-font-family); color: var(--text-primary); overflow-wrap: anywhere; white-space: pre-wrap; }
 .report-screen .report-rich-editor .tiptap p { display: block; overflow: visible; -webkit-line-clamp: unset; margin: 0; color: inherit; font: inherit; white-space: pre-wrap; }
