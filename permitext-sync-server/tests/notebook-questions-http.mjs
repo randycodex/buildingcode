@@ -76,7 +76,7 @@ try {
   const invalid = await request("/notebook/cards/save",{...draft,cardID:id,expectedVersion:2,clientMutationID:"invalid-resolution",openQuestions:[{...questions[0],status:"resolved"}]});
   assert.equal(invalid.status,400,"Resolution requires supporting explanation");
   const summary=await request("/reports/sources/list",{projectID:"project-a"});
-  assert.deepEqual(summary.json.sources.find(item=>item.id===id).openQuestions,questions);
+  assert.deepEqual(summary.json.sources.find(item=>item.id===id).openQuestions,[], "Report sources do not expose retired Note follow-ups");
   const preview=await request("/reports/sources/preview",{projectID:"project-a",kind:"notebookCard",sourceID:id});
   assert.equal(preview.status,200,JSON.stringify(preview));
   const frozenPreview=JSON.stringify(preview.json);
@@ -94,17 +94,19 @@ try {
   const selected = await request('/notebook/cards/save',{...draft,cardID:id,expectedVersion:3,clientMutationID:'selected-report-items',openQuestions:chosen});
   assert.equal(selected.status,200,JSON.stringify(selected));
   const selectedPreview = await request('/reports/sources/preview',{projectID:'project-a',kind:'notebookCard',sourceID:id});
-  assert.match(JSON.stringify(selectedPreview.json),/Confirm sprinkler protection/);
-  assert.match(JSON.stringify(selectedPreview.json),/Obtain survey/);
+  assert.match(JSON.stringify(selectedPreview.json),/Check the supporting evidence\./);
+  assert.doesNotMatch(JSON.stringify(selectedPreview.json),/Confirm sprinkler protection/);
+  assert.doesNotMatch(JSON.stringify(selectedPreview.json),/Obtain survey/);
   assert.doesNotMatch(JSON.stringify(selectedPreview.json),/Internal coordination question/);
   const reportDraft = await request('/reports/drafts/save',{projectID:'project-a',expectedVersion:0,title:'Questions report',reportDate:'2026-11-13',
     blocks:[{id:'note-block',kind:'notebookCard',sourceID:id,label:'Question test'}]});
   assert.equal(reportDraft.status,201,JSON.stringify(reportDraft));
   const generated = await request('/reports/generate',{projectID:'project-a',draftID:reportDraft.json.draft.id,expectedVersion:reportDraft.json.draft.version});
   assert.equal(generated.status,201,JSON.stringify(generated));
-  assert.match(JSON.stringify(generated.json.manifest),/Obtain survey/);
+  assert.match(JSON.stringify(generated.json.manifest),/Check the supporting evidence\./);
+  assert.doesNotMatch(JSON.stringify(generated.json.manifest),/Obtain survey/);
   assert.doesNotMatch(JSON.stringify(generated.json.manifest),/Internal coordination question/);
-  console.log('Questions HTTP passed: legacy preservation, CAS, action completion, selected items in Report preview and generated manifest.');
+  console.log('Questions HTTP passed: legacy preservation, CAS, action completion, retired items excluded from new Report previews and manifests.');
 } finally {
   globalThis.fetch = originalFetch;
   server.closeAllConnections();

@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1780";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1781";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -31,7 +31,7 @@ import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSear
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=32";
-import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor, notebookReportDocument } from "./notebook-questions.js?v=2";
+import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js?v=2";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261108-floating-menu-pins-v1382";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261109-notebook-desk-v1299";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1780";
+} from "./offline-storage.js?v=20261113-research-notebook-v1781";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -31233,8 +31233,7 @@ async function renderProjectNotebook(project, options = {}) {
       baseVersion: activeCard.version, cardType: activeCard.cardType || "finding",
       title: activeCard.title || "", document: structuredClone(draftDocument),
       evidenceLinks: structuredClone(activeCard.evidenceLinks || []),
-      openQuestions: structuredClone(activeCard.openQuestions || []),
-      questionsEditable: true
+      openQuestions: structuredClone(activeCard.openQuestions || [])
     };
     const write = draftWriteQueue.catch(() => {}).then(async () => {
       // A write captured while acknowledgement was rekeying a new Note may
@@ -32352,12 +32351,6 @@ async function renderProjectNotebook(project, options = {}) {
       footer.append(footerActions);
       const focusedContent = [editorElement];
       if (notebookReadOnly) panel.append(draftStatus);
-      const questions = createNotebookQuestionsEditor({questions:activeCard.openQuestions || [], readOnly:notebookReadOnly,
-        onChange(items) {
-          if (disposed || activeCard?.id !== focusedCardID || renderSequence !== editorRenderSequence) return;
-          activeCard.openQuestions = items; markNotebookDirty();
-        }});
-      focusedContent.push(questions);
       if (!coordinateButton.hidden) focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 
@@ -33615,7 +33608,7 @@ async function renderProjectReportDraft(project, resume = null) {
               });
               if (!card) return;
               block.text = card.plainText || "";
-              if (card.document) block.notebookDocument = structuredClone(notebookReportDocument(card.document, card.openQuestions));
+              if (card.document) block.notebookDocument = structuredClone(card.document);
               else delete block.notebookDocument;
               delete block.richText;
               delete block.sourceFormatting;
@@ -33688,7 +33681,7 @@ async function renderProjectReportDraft(project, resume = null) {
                 if (disposed || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
                 const text = card.plainText || "";
                 if (!card.document && text.length > 20000) throw new Error("This Note is too long for one Report paragraph. Keep the linked source or split the Note first.");
-                const content = card.document ? {notebookDocument:structuredClone(notebookReportDocument(card.document, card.openQuestions))} : {richText:reportFormatting.sourceSnapshotRuns(block,text)};
+                const content = card.document ? {notebookDocument:structuredClone(card.document)} : {richText:reportFormatting.sourceSnapshotRuns(block,text)};
                 Object.assign(block, {kind: "paragraph", text, ...content, reportTitle: (block.reportTitle || card.title).slice(0,240), derivedFrom: {kind: "notebookCard", id: card.id, title: card.title, version: card.version},
                   sourceSnapshotAt: new Date().toISOString(), evidenceLinks: structuredClone(card.evidenceLinks || [])});
                 delete block.sourceID;
