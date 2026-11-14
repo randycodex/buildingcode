@@ -54,12 +54,16 @@ export function researchColumnsLayout(widths, availableWidth, fixedWidth = 0, di
 export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0) {
   const available = Math.max(0, availableWidth - dividerWidth);
   const minimums = columns.map(column => column.collapsed ? 48 :
-    ({reader:320, evidence:180, notes:140, editor:360}[column.kind] || 180));
+    ({reader:320, evidence:180, notes:200, editor:360}[column.kind] || 180));
   const minimumTotal = minimums.reduce((sum, width) => sum + width, 0);
-  if (minimumTotal > available) return minimums.map(width => width * available / minimumTotal);
+  if (minimumTotal > available) {
+    const notesMinimum = columns.reduce((sum, column, index) => sum + (column.kind === 'notes' && !column.collapsed ? minimums[index] : 0), 0);
+    return minimums.map((width, index) => columns[index].kind === 'notes' && !columns[index].collapsed ? width :
+      width * Math.max(0, available - notesMinimum) / (minimumTotal - notesMinimum));
+  }
   const editor = columns.findIndex(column => column.kind === 'editor' && !column.collapsed);
   const widths = columns.map((column, index) => column.collapsed ? 48 : column.kind === 'editor' ? minimums[index] :
-    Math.max(minimums[index], Math.min({reader:900, evidence:360, notes:Infinity}[column.kind] || 360,
+    Math.max(minimums[index], Math.min({reader:900, evidence:360, notes:350}[column.kind] || 360,
       Number(column.preferredWidth) || {reader:630, evidence:300, notes:220}[column.kind] || 300)));
   const requested = widths.reduce((sum, width) => sum + width, 0);
   if (requested > available) {

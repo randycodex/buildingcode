@@ -1364,13 +1364,16 @@ textarea:focus-visible {
 
 .notebook-index-menu .is-destructive { color: var(--destructive); }
 .notebook-index-title {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  display: block;
+  flex: 1 1 auto;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   min-width: 0;
   line-height: 1.45;
 }
+.notebook-index-title-text { position: relative; white-space: nowrap; }
+.notebook-index-title.is-title-scrolling { text-overflow: clip; }
 .result-parent-scope { display:block; margin-bottom:4px; color:var(--text-secondary); font-size:.85em; }
 .research-context-review { max-height:50vh; overflow:auto; }
 .report-note-editor { min-height:100px; }

@@ -1,4 +1,4 @@
-import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=4";
+import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=5";
 import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
 import {researchInlineRuns} from "./research-inline-format.js?v=1";
 // A small view with injected workspace/Reader adapters. No provider calls or
@@ -122,7 +122,6 @@ export function createResearchV2View(options) {
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
   const divider=node('div','rv2-rail-divider');
   const questionRail=attachResearchQuestionRail({root,divider,widthStore:options.railWidthStore});
-  const historyTitleResize=new ResizeObserver(()=>historyTitles.refresh());historyTitleResize.observe(rail);
   const chat=node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');
   const mobileHistory=action('Questions',()=>{const expanded=root.classList.toggle('rv2-show-history');mobileHistory.setAttribute('aria-expanded',String(expanded));},'rv2-mobile-history');
   mobileHistory.setAttribute('aria-expanded','false');
@@ -348,7 +347,7 @@ export function createResearchV2View(options) {
     initialScroll.disconnect();}});initialScroll.observe(thread);}
   if(revealEntry)revealController=revealResearchAnswer({entry:revealEntry,tokens:revealTokens,isCurrent,
     onDone:()=>{revealBusy=false;update();}});
-  return {element:root,dispose(){stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();historyTitleResize.disconnect();historyTitles.dispose();},focus(){input.focus({preventScroll:true});},
+  return {element:root,dispose(){stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();historyTitles.dispose();},focus(){input.focus({preventScroll:true});},
     focusAnswer(answerID){
       const answer=Array.from(thread.querySelectorAll('.rv2-answer')).find(entry=>entry.dataset.messageId===answerID);
       if(!answer || !root.isConnected)return false;

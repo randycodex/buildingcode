@@ -4,7 +4,8 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, remo
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=34";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=35";
+import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=5";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
@@ -14,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1762";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1763";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -44,7 +45,7 @@ import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarg
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=16";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=17";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261113-project-picker-v9";
@@ -167,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1762";
+} from "./offline-storage.js?v=20261113-research-notebook-v1763";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -721,6 +722,7 @@ let notebookStylesPromise = null;
 const notebookMounts = new Map();
 const notebookCatalogs = new Map();
 const notebookCatalogRequests = new Map();
+let notebookIndexTitleScroll = null;
 let notebookNoteOpeningGeneration = 0;
 const notebookColumnRegistry = createNotebookMountRegistry(notebookMounts, {openCard: async (projectID, cardID) => {
   const project = workspaceProject();
@@ -3265,6 +3267,8 @@ function renderNotebookIndex(project) {
   body.setAttribute('aria-label', 'Project notes');
   body.setAttribute('role', 'region');
   panel.append(header, body);
+  notebookIndexTitleScroll ||= attachResearchHistoryTitleScroll({root:track,
+    buttonSelector:'.notebook-index-note', titleSelector:'.notebook-index-title', textSelector:'.notebook-index-title-text'});
   syncNotebookLanding(null, panel);
   return panel;
 }
@@ -3599,10 +3603,10 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
       const item = document.createElement('li');
       const open = document.createElement('button');
       open.type = 'button';
+      open.className = selection.enabled ? 'notebook-index-note notebook-index-choice' : 'notebook-index-note';
       open.dataset.noteId = card.id || '';
       open.disabled = selection.busy || selection.enabled && !card.id;
       if (selection.enabled) {
-        open.className = 'notebook-index-choice';
         open.setAttribute('role', 'checkbox');
         open.setAttribute('aria-checked', String(selection.ids.has(card.id)));
         open.setAttribute('aria-label', card.title || 'Untitled');
@@ -3613,8 +3617,11 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
       }
       const label = document.createElement('span');
       label.className = 'notebook-index-title';
-      label.textContent = card.title || 'Untitled';
-      open.title = label.textContent;
+      const titleText = document.createElement('span');
+      titleText.className = 'notebook-index-title-text';
+      titleText.textContent = card.title || 'Untitled';
+      label.append(titleText);
+      open.title = titleText.textContent;
       open.append(label);
       const active = card.id ? card.id === selectedID : card.column?.id === selected?.id;
       open.classList.toggle('is-selected', selection.enabled ? selection.ids.has(card.id) : active);
@@ -3654,6 +3661,7 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
     create.addEventListener('click', () => void createNotebookNoteColumn(project));
     body.append(create);
   }
+  notebookIndexTitleScroll?.refresh();
 }
 
 async function ensureNotebookTabCatalog({ refresh = false } = {}) {
@@ -5592,7 +5600,7 @@ function assistantHistoryOnlyPane(paneID) {
 function minimumPaneWidthForID(paneID) {
   const writingMinimum = typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMinimums?.[paneID];
   if (Number.isFinite(writingMinimum)) return writingMinimum;
-  if (paneID?.startsWith('project:notes-index:')) return 220;
+  if (paneID?.startsWith('project:notes-index:')) return 200;
   if (paneID?.startsWith("reader:")) return 630;
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 300;
   if (assistantHistoryOnlyPane(paneID)) return assistantHistoryWidth;
@@ -5601,7 +5609,7 @@ function minimumPaneWidthForID(paneID) {
 }
 
 function maximumPaneWidthForID(paneID) {
-  if (paneID?.startsWith('project:notes-index:')) return (typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMaximums?.[paneID]) ?? Infinity;
+  if (paneID?.startsWith('project:notes-index:')) return Math.min(350, (typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMaximums?.[paneID]) ?? 350);
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 600;
   if (!/^utility:search(?::|$)/.test(paneID || "")) return Infinity;
   const layout = typeof track === "undefined" ? null : track._researchColumnLayout;
@@ -6900,7 +6908,7 @@ function syncNotebookColumnLayout(panels) {
     const writingWidth = Math.min(widths[editorIndex], textWidth + gutters);
     resizeMinimums[editor.dataset.paneId] = writingWidth;
     columns.forEach((column, index) => {
-      if (column.kind === 'notes') resizeMaximums[visible[index].dataset.paneId] = widths[index] + widths[editorIndex] - writingWidth;
+      if (column.kind === 'notes') resizeMaximums[visible[index].dataset.paneId] = Math.min(350, widths[index] + widths[editorIndex] - writingWidth);
     });
   }
   track._notebookColumnLayout = {resizeMinimums, resizeMaximums};

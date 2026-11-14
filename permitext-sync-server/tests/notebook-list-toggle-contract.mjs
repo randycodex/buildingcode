@@ -42,6 +42,7 @@ const context = vm.createContext({
   isProjectNotebookPaneID:id => id.startsWith('project:notebook:'),
   notebookCatalogs:new Map([['project',[{id:'a',title:'Note A'},{id:'b',title:'Note B'}]]]),
   notebookCatalogRequests:new Map(), saveWorkspaceState(){saves++;},
+  notebookIndexTitleScroll:null, attachResearchHistoryTitleScroll:() => ({refresh(){}}),
   async transitionWorkspace(mode){assert.equal(mode,'utility'); transitions++;}
 });
 vm.runInContext(['notebookIndexPaneID','renderNotebookIndex','syncNotebookLanding','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);

@@ -72,13 +72,18 @@ export function attachResearchQuestionRail({root, divider, widthStore}) {
   }};
 }
 
-// One delegated controller serves the whole history, including rows added later.
+// One delegated controller serves a title list, including rows added later.
 // Scroll once at a steady speed, hold the end, and reset as soon as focus/hover leaves.
-export function attachResearchHistoryTitleScroll({root, environment = globalThis}) {
+export function attachResearchHistoryTitleScroll({root, environment = globalThis,
+  buttonSelector = '.rv2-question-link', titleSelector = '.rv2-question-title', textSelector = '.rv2-question-title-text'}) {
   let hovered = null, focused = null, active = null, timer = null, animation = null, title = null;
+  let observedTitle = null, observedWidth = 0;
+  const resize = typeof environment.ResizeObserver === 'function' ? new environment.ResizeObserver(() => {
+    if (observedTitle && observedTitle.clientWidth !== observedWidth) refresh(true);
+  }) : null;
   const reducedMotion = environment.matchMedia?.('(prefers-reduced-motion: reduce)');
   const buttonFor = target => {
-    const button = target?.closest?.('.rv2-question-link');
+    const button = target?.closest?.(buttonSelector);
     return button && root.contains(button) ? button : null;
   };
   const stop = () => {
@@ -93,13 +98,19 @@ export function attachResearchHistoryTitleScroll({root, environment = globalThis
     const next = hovered || focused;
     if (!force && next === active) return;
     stop(); active = next;
+    const clip = active?.querySelector(titleSelector) || null;
+    observedWidth = clip?.clientWidth || 0;
+    if (clip !== observedTitle) {
+      resize?.disconnect(); observedTitle = clip;
+      if (clip) resize?.observe(clip);
+    }
     if (!active || reducedMotion?.matches) return;
     const current = active;
     timer = environment.setTimeout(() => {
       timer = null;
       if (active !== current || !root.isConnected || !root.contains(current) || reducedMotion?.matches) return;
-      const clip = current.querySelector('.rv2-question-title');
-      const text = current.querySelector('.rv2-question-title-text');
+      const clip = current.querySelector(titleSelector);
+      const text = current.querySelector(textSelector);
       const distance = (text?.getBoundingClientRect().width || 0) - (clip?.clientWidth || 0);
       if (distance <= 1 || !text?.animate) return;
       title = clip; title.classList.toggle('is-title-scrolling', true);
@@ -120,6 +131,7 @@ export function attachResearchHistoryTitleScroll({root, environment = globalThis
     refresh:() => refresh(true),
     dispose() {
       stop(); active = hovered = focused = null;
+      resize?.disconnect(); observedTitle = null;
       for (const [type, handler] of Object.entries(handlers)) root.removeEventListener(type, handler);
       reducedMotion?.removeEventListener?.('change', motionChanged);
     }

@@ -9,8 +9,9 @@ const text={width:280,getBoundingClientRect(){return {width:this.width};},animat
   const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};
   animations.push(animation);return animation;
 }};
-const button={querySelector:selector=>selector==='.rv2-question-title'?clip:text};
-const target={closest:()=>button};
+let matchedSelector;
+const button={querySelector:selector=>['.rv2-question-title','.notebook-index-title'].includes(selector)?clip:text};
+const target={closest:selector=>{matchedSelector=selector;return button;}};
 const root={isConnected:true,contains:value=>connected&&value===button,
   addEventListener:(type,handler)=>handlers.set(type,handler),removeEventListener:type=>handlers.delete(type)};
 const motion={matches:false,addEventListener:(type,handler)=>motionHandlers.set(type,handler),removeEventListener:type=>motionHandlers.delete(type)};
@@ -43,4 +44,16 @@ fire('pointerover',{pointerType:'touch'});advance(1000);assert.equal(animations.
 fire('pointerover');connected=false;advance(700);assert.equal(animations.length,4,'Removed history rows cannot animate later.');
 connected=true;controller.refresh();controller.dispose();advance(1000);
 assert.equal(timers.size,0);assert.equal(handlers.size,0);assert.equal(motionHandlers.size,0);assert.equal(classes.size,0);
+
+const resizes=[];
+environment.ResizeObserver=class {constructor(callback){this.callback=callback;resizes.push(this);}observe(target){this.target=target;}disconnect(){this.target=null;}};
+const notes=attachResearchHistoryTitleScroll({root,environment,buttonSelector:'.notebook-index-note',titleSelector:'.notebook-index-title',textSelector:'.notebook-index-title-text'});
+fire('pointerover');advance(700);
+assert.equal(matchedSelector,'.notebook-index-note','Notes uses the same delegated hover behavior.');
+assert.equal(resizes.at(-1).target,clip);
+const previousAnimation=animations.at(-1);
+clip.clientWidth=140;resizes.at(-1).callback();
+assert.equal(previousAnimation.cancelled,true,'Changing the Notes column width resets the old animation.');
+advance(700);assert.deepEqual(animations.at(-1).frames.at(-1),{left:'-140px'},'Scrolling uses the resized title width.');
+notes.dispose();assert.equal(resizes.at(-1).target,null);assert.equal(timers.size,0);assert.equal(handlers.size,0);
 console.log('History title scrolling passed: hover delay, measured overflow, steady speed, reset, resize, keyboard, reduced motion, touch and cleanup.');
