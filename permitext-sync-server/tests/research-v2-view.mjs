@@ -7,6 +7,7 @@ class Element {
   constructor(tag){this.tagName=tag;this.children=[];this.handlers={};this.attributes={};this.dataset={};this.className='';this.isConnected=true;this.hidden=false;this.value='';this.style={setProperty(){}};}
   focus(){this.focused=true;}
   get lastChild(){return this.children.at(-1);}
+  get childNodes(){return this.children;}
   append(...items){for(const item of items){item.parent=this;this.children.push(item);}}
   replaceChildren(...items){this.children=[];this.append(...items);}
   setAttribute(key,value){this.attributes[key]=value;}
@@ -174,3 +175,48 @@ console.log('Grouped Research history passed: dates/Drafts, summary labels, full
  view.dispose();
 }
 console.log('Default-context view passed: context-only send and saved answer Project snapshot inspection.');
+
+// Prepare the next conversation without blanking the existing chat. Commit
+// reuses the actual grid/chat/scroll containers and scrolls without animation.
+{
+ let nextDraft='',oldDraftWrites=0;
+ const first=createResearchV2View({conversation:{id:'stable-a',sources:[],messages:[{role:'user',question:'First conversation'}]},
+  initialDraft:'Unsent A',onDraft:()=>oldDraftWrites++});
+ const shell=first.capturePresentation(),oldRoot=first.element;
+ shell.thread.clientHeight=400;shell.thread.scrollHeight=1600;
+ const scrollBehaviors=[];let scrollTop=300;
+ Object.defineProperty(shell.thread,'scrollTop',{get:()=>scrollTop,set:value=>{scrollBehaviors.push(shell.thread.style.scrollBehavior);scrollTop=value;}});
+ const next=createResearchV2View({presentation:shell,conversation:{id:'stable-b',sources:[],messages:[{role:'user',question:'Second conversation'}]},
+  initialDraft:'Unsent B',onDraft:value=>nextDraft=value});
+ assert.equal(next.element,oldRoot);
+ assert(all(oldRoot).some(e=>e.textContent==='First conversation'),'Preparation keeps the outgoing conversation visible.');
+ assert(!all(oldRoot).some(e=>e.textContent==='Second conversation'),'The incoming conversation is staged until commit.');
+ first.dispose();next.commit();
+ assert.equal(oldRoot.querySelector('.rv2-chat'),shell.chat);
+ assert.equal(oldRoot.querySelector('.rv2-thread'),shell.thread);
+ assert(all(oldRoot).some(e=>e.textContent==='Second conversation'));
+ assert(!all(oldRoot).some(e=>e.textContent==='First conversation'));
+ assert.equal(scrollTop,1600,'A retained thread reaches its final position during the synchronous commit.');
+ assert.deepEqual(scrollBehaviors,['auto'],'Initial position never inherits smooth scrolling.');
+ const nextInput=oldRoot.querySelector('.rv2-input');assert.equal(nextInput.value,'Unsent B');
+ nextInput.value='Edited B';nextInput.handlers.input();assert.equal(nextDraft,'Edited B');
+ assert.equal(oldDraftWrites,0,'Reused containers bind to the incoming conversation handlers.');
+ next.commit();assert.equal(scrollBehaviors.length,1,'Commit is idempotent.');next.dispose();
+}
+console.log('Stable conversation presentation passed: staged content, retained grid/chat/thread, instant initial scroll and isolated incoming draft handlers.');
+
+{
+ const completion=deferred();
+ const outgoing=createResearchV2View({conversation:{id:'outgoing',sources:[source],messages:[]},initialDraft:'Pending question',
+  requestStore:{read:()=>({question:'Pending question',requestID:'outgoing-request'}),write(){}},onDraft(){},onSend:()=>completion.promise});
+ const pending=outgoing.element.querySelector('.rv2-send').handlers.click();
+ const incoming=createResearchV2View({presentation:outgoing.capturePresentation(),conversation:{id:'incoming',sources:[],messages:[]},
+  onDraft(){},operationGate:{status:()=> 'Working in the new conversation',blocksInput:()=>true,subscribe:()=>()=>{}}});
+ outgoing.dispose();incoming.commit();
+ assert.equal(incoming.element.attributes['aria-busy'],'true');
+ completion.resolve();await pending;await tick();
+ assert.equal(incoming.element.attributes['aria-busy'],'true','Late cleanup from a disposed conversation cannot change the retained root.');
+ assert.equal(incoming.element.querySelector('.rv2-input').disabled,true);
+ incoming.dispose();
+}
+console.log('Retained-root ownership passed: disposed request cleanup cannot clear the new conversation busy state.');

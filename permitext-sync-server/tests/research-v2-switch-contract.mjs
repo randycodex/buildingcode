@@ -6,8 +6,8 @@ import {createResearchOperationGate} from '../public/research-operation-gate.js'
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
 function harness(instanceMode=false){
- const calls={requests:[],loading:0,disposed:0,created:0,layout:0},header={},rail={scrollTop:83,contains:()=>false,querySelector:()=>null};
- const content={children:[],querySelector:()=>content.children.length?rail:null,replaceChildren(...children){this.children=children;}};
+ const calls={requests:[],loading:0,disposed:0,created:0,layout:0,contentSwaps:0,commits:0},header={},rail={scrollTop:83,contains:()=>false,querySelector:()=>null};
+ const content={children:[],querySelector:()=>content.children.length?rail:null,replaceChildren(...children){calls.contentSwaps++;this.children=children;}};
  const panel={isConnected:true,parentNode:null,classList:{add(){}},dataset:{},querySelector:()=>content};
  const instance=instanceMode?{id:'instance',key:'analysis',conversationID:'a'}:null;
  const state={researchConversationID:'a',utilityInstances:instance?[instance]:[],workflowNavigationGeneration:0};
@@ -20,7 +20,8 @@ function harness(instanceMode=false){
   postResearch:async(path,body)=>{calls.requests.push(path);if(path.endsWith('/list'))return{conversations:Object.values(conversations),nextCursor:null,hasMore:false};if(path.endsWith('/get'))return{conversation:conversations[body.conversationID]};throw Error(path);},
   researchWorkspaceProjectID:()=> 'project-a',researchConversationInWorkspace:conversation=>conversation.primaryProjectID==='project-a',
   assistantHistoryManagement:()=>({dispose(){}}),
-  createResearchV2View(value){options=value;return{element:{id:value.conversation?.id},dispose(){calls.disposed++;}};},
+  createResearchV2View(value){options=value;const element=value.presentation?.root || {id:value.conversation?.id};
+   return{element,capturePresentation:()=>({root:element}),commit(){calls.commits++;},dispose(){calls.disposed++;}};},
   crypto:{randomUUID:()=> 'new-request'},sessionStorage:{getItem:()=>null},document:{activeElement:null},MutationObserver:class{observe(){}disconnect(){}},requestAnimationFrame:fn=>fn(),
   hasCapability:()=>true,scheduleResearchDraftPersistence(){},notifyWorkspaceLayoutChange(){calls.layout++;}
  });
@@ -42,6 +43,8 @@ for(const mode of [false,true]){
  assert.equal(f.calls.requests.length,2,'Switch rendering must not repeat configuration, history or conversation requests');
  assert.equal(f.calls.loading,1,'An already visible Assistant never goes back to a loading screen');
  assert.equal(f.calls.created,1,'The original column and its header/close controls stay mounted');
+ assert.equal(f.calls.contentSwaps,1,'Switching conversations retains the grid instead of detaching and remounting it.');
+ assert.equal(f.calls.commits,4,'Each complete conversation is committed once.');
  assert.equal(f.options.history[0].id,'a','Numbered history ordering stays stable');
  f.state.researchConversationID='a';
  if(mode){f.instance.conversationID='a';f.context.supplementalResearchConversations.set('a',f.conversations.a);}else f.context.activeResearchConversation=f.conversations.a;

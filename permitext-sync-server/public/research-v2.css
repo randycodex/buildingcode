@@ -65,7 +65,7 @@
 .research-v2 .rv2-text-action{font-size:12px;color:var(--text-secondary);padding:5px 7px}
 .research-v2 .rv2-citation{font-size:12px;color:var(--text-link);padding:0 3px;display:inline}
 .rv2-composer{position:relative;background:var(--toolbar-active);border-radius:23px;padding:12px 15px;margin:0 0 20px}
-.rv2-chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px}
+.rv2-chips{display:flex;gap:5px;flex-wrap:wrap;min-height:26px;margin-bottom:4px}
 .research-v2 .rv2-passage-chip{font-size:12px;padding:3px 5px;line-height:1.4;border-radius:7px}
 .rv2-input{background:transparent;border:0;width:100%;resize:none;display:block;min-height:46px;max-height:140px;padding:4px 0}
 .rv2-composer-controls{display:flex;align-items:center;justify-content:space-between;gap:10px}

@@ -42,10 +42,13 @@ export function researchV2RetryContext(previous,next,requestID){
 }
 
 export function createResearchV2View(options) {
+  let disposed=false;
   const { conversation, history = [], initialDraft = '', onDraft, onOpen, onSend,
     onFind, onReview, onInclude, onRemove, onCitation, onSnapshot,
-    isCurrent = () => true, onStatus } = options;
-  const root=node('section','research-v2');root.setAttribute('aria-label','Research');
+    isCurrent: contextIsCurrent = () => true, onStatus } = options;
+  const isCurrent=()=>!disposed&&contextIsCurrent();
+  const presentation=options.presentation;
+  const root=presentation?.root || node('section','research-v2');root.setAttribute('aria-label','Research');
   const historyTitles=attachResearchHistoryTitleScroll({root});
   const rail=node('aside','rv2-rail');rail.setAttribute('aria-label','Research history');
   const list=node('div','rv2-questions');
@@ -126,14 +129,14 @@ export function createResearchV2View(options) {
   const divider=node('div','rv2-rail-divider');
   const questionRail=attachResearchQuestionRail({root,divider,toggle:historyToggle,widthStore:options.railWidthStore,
     collapsedStore:options.railCollapsedStore,onCollapse:collapsed=>options.renderHistoryToggle?.(historyToggle,collapsed)});
-  const chat=node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');
+  const chat=presentation?.chat || node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');
   const mobileHistory=action('Questions',()=>{const expanded=root.classList.toggle('rv2-show-history');mobileHistory.setAttribute('aria-expanded',String(expanded));},'rv2-mobile-history');
   mobileHistory.setAttribute('aria-expanded','false');
-  const thread=node('div','rv2-thread');thread.setAttribute('aria-label','Conversation');
+  let thread=node('div','rv2-thread');thread.setAttribute('aria-label','Conversation');
   const status=node('p','rv2-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.hidden=true;
   let busy=false,controller=null,generation=0,lastRequest=options.requestStore?.read() || null,includeBusy=false,pendingBubble=null,revealBusy=false,revealEntry=null,revealController=null,chatTransitionPending=false;
   const revealTokens=[];
-  function notice(text,error=false){status.hidden=!text;status.textContent=text;status.classList.toggle('is-error',error);onStatus?.(text);}
+  function notice(text,error=false){if(disposed)return;status.hidden=!text;status.textContent=text;status.classList.toggle('is-error',error);onStatus?.(text);}
   function valid(attempt){return attempt===generation&&isCurrent()&&root.isConnected;}
   function paragraphText(parent,text,message,{reveal=false}={}){
     const appendText = (target,value) => {
@@ -227,9 +230,8 @@ export function createResearchV2View(options) {
   const detail=node('section','rv2-detail');detail.hidden=true;detail.setAttribute('aria-label','Passage details');
   const detailBody=node('div','rv2-detail-body');
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
-  chat.append(mobileHistory,thread,detail,status,operationStatus,composer);root.append(rail,divider,chat);
   const operationPending=()=>chatTransitionPending||Boolean(options.operationGate?.status());
-  function update(){const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||includeBusy||revealBusy||pending));
+  function update(){if(disposed)return;const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||includeBusy||revealBusy||pending));
     if(newChat)newChat.disabled=busy||includeBusy||revealBusy||pending;
     operationStatus.textContent=chatTransitionPending?'Starting new chat…':options.operationGate?.status() || '';operationStatus.hidden=!pending;
     projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});}
@@ -342,19 +344,41 @@ export function createResearchV2View(options) {
   composer.addEventListener('submit',event=>{event.preventDefault();void sendQuestion();});
   input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();void sendQuestion();}});
   update();
-  // The workspace can mount this pane after an animation frame has already
-  // passed. Wait for its first real layout before revealing the latest answer.
-  let initialScroll=null;
-  if(messages.length){initialScroll=new ResizeObserver(()=>{if(root.isConnected&&thread.clientHeight>0){
+  let initialScroll=null,committed=false;
+  const positionThread=()=>{
+    if(disposed||!root.isConnected||!(thread.clientHeight>0))return false;
+    // Saved conversations appear at their final position before paint. The
+    // thread's normal smooth scrolling is reserved for later user navigation.
+    const behavior=thread.style.scrollBehavior;
+    thread.style.scrollBehavior='auto';
     if(revealEntry)thread.scrollTop+=revealEntry.getBoundingClientRect().top-thread.getBoundingClientRect().top-70;
-    else thread.scrollTop=thread.scrollHeight;
-    initialScroll.disconnect();}});initialScroll.observe(thread);}
-  if(revealEntry)revealController=revealResearchAnswer({entry:revealEntry,tokens:revealTokens,isCurrent,
-    onDone:()=>{revealBusy=false;update();}});
-  return {element:root,dispose(){stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();historyTitles.dispose();},focus(){input.focus({preventScroll:true});},
+    else thread.scrollTop=messages.length?thread.scrollHeight:0;
+    thread.style.scrollBehavior=behavior || '';
+    initialScroll?.disconnect();
+    return true;
+  };
+  const commit=()=>{
+    if(committed||disposed)return;
+    committed=true;
+    if(presentation?.thread){
+      presentation.thread.replaceChildren(...thread.childNodes);
+      thread=presentation.thread;
+    }
+    thread.hidden=false;
+    chat.replaceChildren(mobileHistory,thread,detail,status,operationStatus,composer);
+    root.replaceChildren(rail,divider,chat);
+    historyTitles.refresh();
+    // First mounts can be detached; retained threads can be positioned now.
+    if(messages.length){initialScroll=new ResizeObserver(positionThread);initialScroll.observe(thread);}
+    positionThread();
+    if(revealEntry)revealController=revealResearchAnswer({entry:revealEntry,tokens:revealTokens,isCurrent,
+      onDone:()=>{revealBusy=false;update();}});
+  };
+  if(!presentation)commit();
+  return {element:root,commit,capturePresentation:()=>({root,chat,thread}),dispose(){if(disposed)return;disposed=true;stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();historyTitles.dispose();},focus(){input.focus({preventScroll:true});},
     focusAnswer(answerID){
       const answer=Array.from(thread.querySelectorAll('.rv2-answer')).find(entry=>entry.dataset.messageId===answerID);
-      if(!answer || !root.isConnected)return false;
+      if(disposed || !answer || !root.isConnected)return false;
       // A saved-answer link takes precedence over the initial latest-message scroll.
       initialScroll?.disconnect();answer.tabIndex=-1;answer.focus({preventScroll:true});answer.scrollIntoView({block:'center'});return true;
     }};

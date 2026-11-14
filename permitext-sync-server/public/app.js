@@ -4,7 +4,7 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, open
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=36";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=39";
 import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=6";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1809";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1812";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -169,7 +169,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1809";
+} from "./offline-storage.js?v=20261113-research-notebook-v1812";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -27442,7 +27442,9 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
         if (ownsPanel()) await renderResearchV2Pane(paneID,availability,{...retained,panel,conversation,listed:nextListed,includeHidden});
       }
     });
+    const previousView=panel._researchV2View;
     view = createResearchV2View({ conversation,revealAnswerID:retained.revealAnswerID,historyManagement,
+      presentation:previousView?.capturePresentation?.(),
       historyGroups:researchConversationHistoryGroups,historyTitle:researchConversationTitle,
       railWidthStore:{read:()=>localStorage.getItem(railWidthKey),write:width=>{if(ownsPanel())localStorage.setItem(railWidthKey,String(width));}},
       railCollapsedStore:{read:()=>localStorage.getItem(`${railWidthKey}:collapsed`)==='true',
@@ -27585,9 +27587,10 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     const previousRail = content.querySelector(".rv2-rail");
     const historyScroll = previousRail?.scrollTop || 0;
     const historyFocused = Boolean(previousRail?.contains(document.activeElement));
-    panel._researchV2View?.dispose();
+    previousView?.dispose();
     panel._researchV2Observer?.disconnect();
-    content.replaceChildren(view.element);
+    view.commit?.();
+    if(previousView?.element!==view.element)content.replaceChildren(view.element);
     panel._researchV2View = view;
     const nextRail = content.querySelector(".rv2-rail");
     if (nextRail) {
