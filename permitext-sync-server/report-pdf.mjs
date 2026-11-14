@@ -42,7 +42,9 @@ function drawNotebookContent(document, notebookDocument, material) {
       drawReportRichTable(document, table, left, width, {headerBold:true});
       document.x = left; document.moveDown(0.7);
     } else {
-      drawReportRichText(document, noteRuns(block.content), {size:block.type === 'heading' ? Math.max(11, 16 - (block.props?.level || 1)) : 9.5,
+      const size=block.type === 'heading' ? Math.max(11, 16 - (block.props?.level || 1)) : 9.5;
+      drawReportRichText(document, noteRuns(block.content), {size,
+        ...(block.props?.lineSpacing ? {lineHeight:size*Number(block.props.lineSpacing)} : {}),
         bold:block.type === 'heading', indent:Math.min(depth * 12, 60),
         prefix:block.type === 'bulletListItem' ? '• ' : block.type === 'numberedListItem' ? `${number}. ` : ''});
     }
@@ -386,24 +388,25 @@ export function drawReportRichText(document, runs, {size = 10, bold = false, par
   left = document.page.margins.left + indent, width = document.page.width - document.page.margins.right - left,
   lineHeight = size * 1.5, paginate = true, measureOnly = false} = {}) {
   let line = [], used = 0, measuredHeight = 0;
-  const runSize = run => run.superscript ? size * 0.7 : size;
+  const runSize = run => (Number(run.fontSize) || size) * (run.superscript ? 0.7 : 1);
   const measure = run => document.font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(runSize(run)).widthOfString(run.text);
   const flush = () => {
-    measuredHeight += lineHeight;
+    const height=Math.max(lineHeight,...line.map(run=>runSize(run)*lineHeight/size));
+    measuredHeight += height;
     if (measureOnly) {line = []; used = 0; return;}
-    if (paginate) ensureVerticalSpace(document, lineHeight + 2);
+    if (paginate) ensureVerticalSpace(document, height + 2);
     const top = document.y;
     let x = left;
     for (const run of line) {
       const runWidth = measure(run);
-      if (run.highlight) document.save().fillColor("#f4d35e").fillOpacity(0.5).rect(x, top + 1, runWidth, size * 1.25).fill().restore();
+      if (run.highlight) document.save().fillColor("#f4d35e").fillOpacity(0.5).rect(x, top + 1, runWidth, runSize(run) * 1.25).fill().restore();
       document.fillColor(colors.ink).font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(runSize(run))
         .text(run.text, x, top - (run.superscript ? size * 0.15 : 0), {lineBreak:false, oblique:run.italic || false, strike:run.strike || false,
           underline:run.underline || Boolean(run.href), ...(run.href ? {link:run.href} : {})});
       x += runWidth;
     }
     document.x = document.page.margins.left;
-    document.y = top + lineHeight;
+    document.y = top + height;
     line = []; used = 0;
   };
   const append = run => {

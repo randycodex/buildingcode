@@ -1,5 +1,5 @@
 import { normalizeNotebookQuestions } from "./public/notebook-questions.js";
-import { normalizeNotebookStyles } from "./public/notebook-styles.js";
+import { normalizeNotebookStyles, notebookFontSize, notebookLineSpacings } from "./public/notebook-styles.js";
 import {
   emptyNotebookDocument as emptyVersionedNotebookDocument,
   notebookBlockTypes,
@@ -160,6 +160,12 @@ function canonicalStyles(styles) {
   }
   const canonical = {};
   for (const [name, value] of Object.entries(normalizeNotebookStyles(styles))) {
+    if (name === 'fontSize') {
+      const size=notebookFontSize(value);
+      if (!size) throw new Error('Notebook font size is invalid.');
+      canonical.fontSize=size;
+      continue;
+    }
     if (name === "backgroundColor" && (value === "yellow" || value === "default")) {
       if (value === "yellow") canonical.backgroundColor = "yellow";
       continue;
@@ -242,11 +248,14 @@ function canonicalBlockProps(type, props = {}) {
   if (!props || typeof props !== "object" || Array.isArray(props)) {
     throw new Error("Notebook block properties are invalid.");
   }
-  const common = () => ({
-    backgroundColor: "default",
-    textColor: "default",
-    textAlignment: "left"
-  });
+  const common = () => {
+    const canonical={backgroundColor:'default',textColor:'default',textAlignment:'left'};
+    if (inlineBlockTypes.has(type) && props.lineSpacing !== undefined) {
+      if (!notebookLineSpacings.includes(props.lineSpacing)) throw new Error('Notebook line spacing is invalid.');
+      if (props.lineSpacing!=='normal') canonical.lineSpacing=props.lineSpacing;
+    }
+    return canonical;
+  };
   if (type === "paragraph" || type === "bulletListItem" || type === "table") return common();
   if (type === "numberedListItem") {
     const canonical = common();
@@ -468,6 +477,7 @@ function renderInlineHTML(content) {
     if (node.styles.underline) html = `<u>${html}</u>`;
     if (node.styles.superscript) html = `<sup>${html}</sup>`;
     if (node.styles.backgroundColor === "yellow") html = `<mark>${html}</mark>`;
+    if (node.styles.fontSize) html = `<span style="font-size:${node.styles.fontSize}pt">${html}</span>`;
     return html;
   }).join("");
 }
@@ -479,9 +489,10 @@ function renderBlockHTML(block) {
     return `<${tag}${cell.props?.colspan ? ` colspan="${cell.props.colspan}"` : ''}${cell.props?.rowspan ? ` rowspan="${cell.props.rowspan}"` : ''}>${renderInlineHTML(Array.isArray(cell) ? cell : cell.content)}</${tag}>`;
   }).join('')}</tr>`).join('')}</table>${children}`;
   const content = renderInlineHTML(block.content);
-  if (block.type === "heading") return `<h${block.props.level}>${content}</h${block.props.level}>${children}`;
-  if (block.type === "bulletListItem") return `<ul><li>${content}${children}</li></ul>`;
-  if (block.type === "numberedListItem") return `<ol${block.props.start ? ` start="${block.props.start}"` : ""}><li>${content}${children}</li></ol>`;
+  const spacing=block.props?.lineSpacing?` style="line-height:${block.props.lineSpacing}"`:'';
+  if (block.type === "heading") return `<h${block.props.level}${spacing}>${content}</h${block.props.level}>${children}`;
+  if (block.type === "bulletListItem") return `<ul><li${spacing}>${content}${children}</li></ul>`;
+  if (block.type === "numberedListItem") return `<ol${block.props.start ? ` start="${block.props.start}"` : ""}><li${spacing}>${content}${children}</li></ol>`;
   if (block.type === "image") {
     if (!block.props.url) return children;
     const caption = block.props.caption ? `<figcaption>${escapeHTML(block.props.caption)}</figcaption>` : "";
@@ -490,7 +501,7 @@ function renderBlockHTML(block) {
       : `<span data-notebook-image-asset="${escapeHTML(block.props.url)}">${escapeHTML(block.props.name || "Notebook image")}</span>`;
     return `<figure>${image}${caption}</figure>${children}`;
   }
-  return `<p>${content}</p>${children}`;
+  return `<p${spacing}>${content}</p>${children}`;
 }
 
 export function renderNotebookDocumentHTML(input) {

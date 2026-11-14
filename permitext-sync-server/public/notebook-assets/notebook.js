@@ -9072,7 +9072,7 @@ var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescr
 	return t || b(n, Symbol.toStringTag, { value: "Module" }), n;
 };
 //#endregion
-//#region node_modules/orderedmap/dist/index.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/orderedmap/dist/index.js
 function S(e) {
 	this.content = e;
 }
@@ -9138,7 +9138,7 @@ S.prototype = {
 	return new S(t);
 };
 //#endregion
-//#region node_modules/prosemirror-model/dist/index.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/prosemirror-model/dist/index.js
 function C(e, t, n) {
 	for (let r = 0;; r++) {
 		if (r == e.childCount || r == t.childCount) return e.childCount == t.childCount ? null : n;
@@ -10920,7 +10920,7 @@ function lt(e, t, n, r) {
 	};
 }
 //#endregion
-//#region node_modules/prosemirror-transform/dist/index.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/prosemirror-transform/dist/index.js
 var ut = 65535, dt = 2 ** 16;
 function ft(e, t) {
 	return e + t * dt;
@@ -12914,7 +12914,7 @@ var Er = Tr(qn, Yn, er), Dr = Tr(qn, rr, ir), Or = {
 for (let e in Or) kr[e] = Or[e];
 typeof navigator < "u" ? /Mac|iP(hone|[oa]d)/.test(navigator.platform) : typeof os < "u" && os.platform && os.platform();
 //#endregion
-//#region node_modules/prosemirror-schema-list/dist/index.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/prosemirror-schema-list/dist/index.js
 function Ar(e, t = null) {
 	return function(n, r) {
 		let { $from: i, $to: a } = n.selection, o = i.blockRange(a);
@@ -12984,7 +12984,7 @@ function Ir(e) {
 	};
 }
 //#endregion
-//#region node_modules/prosemirror-view/dist/index.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/prosemirror-view/dist/index.js
 var Lr = function(e) {
 	for (var t = 0;; t++) if (e = e.previousSibling, !e) return t;
 }, Rr = function(e) {
@@ -16372,7 +16372,7 @@ function fc(e) {
 	return t == "Esc" && (t = "Escape"), t == "Del" && (t = "Delete"), t == "Left" && (t = "ArrowLeft"), t == "Up" && (t = "ArrowUp"), t == "Right" && (t = "ArrowRight"), t == "Down" && (t = "ArrowDown"), t;
 }
 //#endregion
-//#region node_modules/prosemirror-keymap/dist/index.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/prosemirror-keymap/dist/index.js
 var pc = typeof navigator < "u" && /Mac|iP(hone|[oa]d)/.test(navigator.platform), mc = typeof navigator < "u" && /Win/.test(navigator.platform);
 function hc(e) {
 	let t = e.split(/-(?!$)/), n = t[t.length - 1];
@@ -16419,7 +16419,7 @@ function yc(e) {
 	};
 }
 //#endregion
-//#region node_modules/@tiptap/core/dist/index.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tiptap/core/dist/index.js
 function bc(e) {
 	let { state: t, transaction: n } = e, { selection: r } = n, { doc: i } = n, { storedMarks: a } = n;
 	return {
@@ -19607,7 +19607,7 @@ function yf(e) {
 	});
 }
 //#endregion
-//#region node_modules/@blocknote/core/dist/BlockNoteExtension-CbvDA0F7.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@blocknote/core/dist/BlockNoteExtension-CbvDA0F7.js
 var bf = "annotation";
 function xf(e) {
 	return e && e.options.extensions.some((e) => {
@@ -20998,7 +20998,7 @@ function hm({ allowTableNodeSelection: e = !1 } = {}) {
 	});
 }
 //#endregion
-//#region node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tiptap/core/dist/jsx-runtime/jsx-runtime.js
 var gm = /* @__PURE__ */ new WeakSet(), _m = /* @__PURE__ */ new WeakSet();
 function vm(e) {
 	let t = e;
@@ -21336,7 +21336,7 @@ var Sm = (e, t) => xm(e, t), Cm = /(?:^|\s)(\*\*(?!\s+\*\*)((?:[^*]+))\*\*(?!\s+
 	}
 });
 //#endregion
-//#region node_modules/@blocknote/core/dist/blocks-Dol85hpH.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@blocknote/core/dist/blocks-Dol85hpH.js
 function Bm(e) {
 	return e.marks.some((e) => ["y-attributed-delete"].includes(e.type.name));
 }
@@ -24749,7 +24749,7 @@ function Mv(e) {
 	return typeof e == "function" ? jv(e) : e ?? jv(async () => []);
 }
 //#endregion
-//#region node_modules/fast-deep-equal/index.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/fast-deep-equal/index.js
 var Nv = /* @__PURE__ */ o(((e, t) => {
 	t.exports = function e(t, n) {
 		if (t === n) return !0;
@@ -25170,7 +25170,7 @@ function cy(e, t) {
 	}), n;
 }
 //#endregion
-//#region node_modules/prosemirror-highlight/dist/shiki.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/prosemirror-highlight/dist/shiki.js
 function ly(e, t) {
 	return function({ content: n, language: r, pos: i, size: a }) {
 		let o = [], { tokens: s, fg: c, bg: l, rootStyle: u } = e.codeToTokens(n, {
@@ -25199,7 +25199,7 @@ function uy(e) {
 	return typeof e == "string" ? e : Object.entries(e).map(([e, t]) => `${e}:${t}`).join(";");
 }
 //#endregion
-//#region node_modules/@blocknote/core/dist/extensions-D6JcJCwd.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@blocknote/core/dist/extensions-D6JcJCwd.js
 var dy = /* @__PURE__ */ c(Nv(), 1);
 function fy(e) {
 	let t = Array.from(e.classList).filter((e) => !e.startsWith("bn-")) || [];
@@ -26633,7 +26633,7 @@ Of(({ editor: e, options: t }) => ({
 var Xb;
 async function Zb() {
 	return Xb || (Xb = (async () => {
-		let [e, t] = await Promise.all([import("./module-BicDiM_5.js"), import("./native-B_0ZyPxP.js")]), n = "default" in e ? e.default : e, r = "default" in t ? t.default : t;
+		let [e, t] = await Promise.all([import("./module-CitT_e7p.js"), import("./native-Bn6_JDoG.js")]), n = "default" in e ? e.default : e, r = "default" in t ? t.default : t;
 		return await n.init({ data: r }), {
 			emojiMart: n,
 			emojiData: r
@@ -27184,7 +27184,7 @@ Of(({ options: e, editor: t }) => {
 	};
 });
 //#endregion
-//#region node_modules/@blocknote/core/dist/en-uzHzj6eH.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@blocknote/core/dist/en-uzHzj6eH.js
 var hx = {
 	slash_menu: {
 		heading: {
@@ -27723,7 +27723,7 @@ function bx(e, t, n, r, i, a) {
 }
 new gx(/--$/, "—", { inCodeMark: !1 }), new gx(/\.\.\.$/, "…", { inCodeMark: !1 }), new gx(/(?:^|[\s\{\[\(\<'"\u2018\u201C])(")$/, "“", { inCodeMark: !1 }), new gx(/"$/, "”", { inCodeMark: !1 }), new gx(/(?:^|[\s\{\[\(\<'"\u2018\u201C])(')$/, "‘", { inCodeMark: !1 }), new gx(/'$/, "’", { inCodeMark: !1 });
 //#endregion
-//#region node_modules/@tiptap/extension-text/dist/index.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tiptap/extension-text/dist/index.js
 var xx = _f.create({
 	name: "text",
 	group: "inline",
@@ -27897,7 +27897,7 @@ function Nx(e) {
 	return t.className = "ProseMirror-gapcursor", U.create(e.doc, [_s.widget(e.selection.head, t, { key: "gapcursor" })]);
 }
 //#endregion
-//#region node_modules/@tiptap/extensions/dist/gap-cursor/index.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tiptap/extensions/dist/gap-cursor/index.js
 var Px = Zd.create({
 	name: "gapCursor",
 	addProseMirrorPlugins() {
@@ -27912,7 +27912,7 @@ var Px = Zd.create({
 	}
 });
 //#endregion
-//#region node_modules/@blocknote/core/dist/src-Buuo5l7X.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@blocknote/core/dist/src-Buuo5l7X.js
 function Fx(e) {
 	return e.matches("[data-editable]") ? e : e.querySelector("[data-editable]") || e;
 }
@@ -30971,7 +30971,7 @@ var gT = {
 	}
 };
 //#endregion
-//#region node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs
 function vT() {
 	return typeof window < "u";
 }
@@ -31068,7 +31068,7 @@ function HT(e) {
 	return e.parent && Object.getPrototypeOf(e.parent) ? e.frameElement : null;
 }
 //#endregion
-//#region node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs
 var UT = [
 	"top",
 	"right",
@@ -31350,7 +31350,7 @@ var yE = /* #__PURE__ */ [
 	return xE.call(e, yE) !== !1 && UE(t, e);
 };
 //#endregion
-//#region node_modules/@floating-ui/react/dist/floating-ui.react.utils.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@floating-ui/react/dist/floating-ui.react.utils.mjs
 function YE() {
 	let e = navigator.userAgentData;
 	return e != null && e.platform ? e.platform : navigator.platform;
@@ -31505,7 +31505,7 @@ function jD(e) {
 	});
 }
 //#endregion
-//#region node_modules/react/cjs/react-jsx-runtime.production.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/react/cjs/react-jsx-runtime.production.js
 var MD = /* @__PURE__ */ o(((e) => {
 	var t = Symbol.for("react.transitional.element"), n = Symbol.for("react.fragment");
 	function r(e, n, r) {
@@ -31958,7 +31958,7 @@ var YD = function(e) {
 	};
 };
 //#endregion
-//#region node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs
 function $D(e) {
 	let t = LT(e), n = parseFloat(t.width) || 0, r = parseFloat(t.height) || 0, i = wT(e), a = i ? e.offsetWidth : n, o = i ? e.offsetHeight : r, s = JT(n) !== a || JT(r) !== o;
 	return s && (n = a, r = o), {
@@ -32493,7 +32493,7 @@ var WO = (e) => {
 	};
 };
 //#endregion
-//#region node_modules/@floating-ui/react/dist/floating-ui.react.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@floating-ui/react/dist/floating-ui.react.mjs
 function ek(e) {
 	let t = _.useRef(void 0), n = _.useCallback((t) => {
 		let n = e.map((e) => {
@@ -33957,7 +33957,7 @@ function jA(e) {
 	return u.__options = { blockPointerEvents: n }, u;
 }
 //#endregion
-//#region node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.production.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.production.js
 var MA = /* @__PURE__ */ o(((e) => {
 	var t = u();
 	function n(e, t) {
@@ -34346,7 +34346,7 @@ function sj(e) {
 	return !e.hasUnsavedContent || !e.confirmBeforeDiscard || (e.confirm ?? ((e) => window.confirm(e)))(e.message);
 }
 //#endregion
-//#region node_modules/@blocknote/core/dist/comments.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@blocknote/core/dist/comments.js
 var cj = Ud.create({
 	name: "comment",
 	excludes: "",
@@ -34903,7 +34903,7 @@ function Fj({ ...e }) {
 }
 Fj.displayName = "Tiptap.Content", Object.assign(Pj, { Content: Fj });
 //#endregion
-//#region node_modules/@blocknote/react/dist/blocknote-react.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@blocknote/react/dist/blocknote-react.js
 var Ij = Object.defineProperty, Lj = (e, t) => {
 	let n = {};
 	for (var r in e) Ij(n, r, {
@@ -38255,7 +38255,7 @@ function qP(e, t) {
 var JP;
 async function YP() {
 	return JP || (JP = (async () => {
-		let [e, t] = await Promise.all([import("./module-BicDiM_5.js"), import("./native-B_0ZyPxP.js")]), n = "default" in e ? e.default : e, r = "default" in t ? t.default : t;
+		let [e, t] = await Promise.all([import("./module-CitT_e7p.js"), import("./native-Bn6_JDoG.js")]), n = "default" in e ? e.default : e, r = "default" in t ? t.default : t;
 		return await n.init({ data: r }), {
 			emojiMart: n,
 			emojiData: r
@@ -38904,12 +38904,12 @@ function gF(e) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/keys/keys.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/keys/keys.mjs
 function _F(e) {
 	return Object.keys(e);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/deep-merge/deep-merge.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/deep-merge/deep-merge.mjs
 function vF(e) {
 	return e && typeof e == "object" && !Array.isArray(e);
 }
@@ -38920,12 +38920,12 @@ function yF(e, t) {
 	}), n;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/camel-to-kebab-case/camel-to-kebab-case.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/camel-to-kebab-case/camel-to-kebab-case.mjs
 function bF(e) {
 	return e.replace(/[A-Z]/g, (e) => `-${e.toLowerCase()}`);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/units-converters/px.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/units-converters/px.mjs
 function xF(e) {
 	return typeof e != "string" || !e.includes("var(--mantine-scale)") ? e : e.match(/^calc\((.*?)\)$/)?.[1].split("*")[0].trim();
 }
@@ -38934,7 +38934,7 @@ function SF(e) {
 	return typeof t == "number" ? t : typeof t == "string" ? t.includes("calc") || t.includes("var") ? t : t.includes("px") ? Number(t.replace("px", "")) : t.includes("rem") ? Number(t.replace("rem", "")) * 16 : t.includes("em") ? Number(t.replace("em", "")) * 16 : Number(t) : NaN;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/units-converters/rem.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/units-converters/rem.mjs
 function CF(e) {
 	return e === "0rem" ? "0rem" : `calc(${e} * var(--mantine-scale))`;
 }
@@ -38961,12 +38961,12 @@ function wF(e, { shouldScale: t = !1 } = {}) {
 }
 var Z = wF("rem", { shouldScale: !0 }), TF = wF("em");
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/filter-props/filter-props.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/filter-props/filter-props.mjs
 function EF(e) {
 	return Object.keys(e).reduce((t, n) => (e[n] !== void 0 && (t[n] = e[n]), t), {});
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/is-number-like/is-number-like.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/is-number-like/is-number-like.mjs
 function DF(e) {
 	if (typeof e == "number") return !0;
 	if (typeof e == "string") {
@@ -38977,12 +38977,12 @@ function DF(e) {
 	return !1;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/is-element/is-element.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/is-element/is-element.mjs
 function OF(e) {
 	return Array.isArray(e) || e === null ? !1 : typeof e == "object" && e.type !== _.Fragment;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/create-safe-context/create-safe-context.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/create-safe-context/create-safe-context.mjs
 function kF(e) {
 	let t = (0, _.createContext)(null);
 	return [t, () => {
@@ -38992,7 +38992,7 @@ function kF(e) {
 	}];
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/get-safe-id/get-safe-id.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/get-safe-id/get-safe-id.mjs
 function AF(e, t) {
 	return (n) => {
 		if (typeof n != "string" || n.trim().length === 0) throw Error(t);
@@ -39000,14 +39000,14 @@ function AF(e, t) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/find-element-ancestor/find-element-ancestor.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/find-element-ancestor/find-element-ancestor.mjs
 function jF(e, t) {
 	let n = e;
 	for (; (n = n.parentElement) && !n.matches(t););
 	return n;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/create-scoped-keydown-handler/create-scoped-keydown-handler.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/create-scoped-keydown-handler/create-scoped-keydown-handler.mjs
 function MF(e, t, n) {
 	for (let n = e - 1; n >= 0; --n) if (!t[n].disabled) return n;
 	if (n) {
@@ -39050,7 +39050,7 @@ function FF({ parentSelector: e, siblingSelector: t, onKeyDown: n, loop: r = !0,
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/get-default-z-index/get-default-z-index.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/get-default-z-index/get-default-z-index.mjs
 var IF = {
 	app: 100,
 	modal: 200,
@@ -39062,17 +39062,17 @@ function LF(e) {
 	return IF[e];
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/noop/noop.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/noop/noop.mjs
 var RF = () => {};
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/close-on-escape/close-on-escape.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/close-on-escape/close-on-escape.mjs
 function zF(e, t = { active: !0 }) {
 	return typeof e != "function" || !t.active ? t.onKeyDown || RF : (n) => {
 		n.key === "Escape" && (e(n), t.onTrigger?.());
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/get-size/get-size.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/get-size/get-size.mjs
 function BF(e, t = "size", n = !0) {
 	if (e !== void 0) return DF(e) ? n ? Z(e) : e : `var(--${t}-${e})`;
 }
@@ -39092,24 +39092,24 @@ function GF(e) {
 	if (e) return BF(e, "mantine-shadow", !1);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/create-event-handler/create-event-handler.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/create-event-handler/create-event-handler.mjs
 function KF(e, t) {
 	return (n) => {
 		e?.(n), t?.(n);
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/get-context-item-index/get-context-item-index.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/get-context-item-index/get-context-item-index.mjs
 function qF(e, t, n) {
 	return n ? Array.from(jF(n, t)?.querySelectorAll(e) || []).findIndex((e) => e === n) : null;
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/utils/random-id/random-id.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/utils/random-id/random-id.mjs
 function JF(e = "mantine-") {
 	return `${e}${Math.random().toString(36).slice(2, 11)}`;
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/utils/use-callback-ref/use-callback-ref.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/utils/use-callback-ref/use-callback-ref.mjs
 function YF(e) {
 	let t = (0, _.useRef)(e);
 	return (0, _.useEffect)(() => {
@@ -39117,7 +39117,7 @@ function YF(e) {
 	}), (0, _.useMemo)(() => ((...e) => t.current?.(...e)), []);
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-click-outside/use-click-outside.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-click-outside/use-click-outside.mjs
 var XF = ["mousedown", "touchstart"];
 function ZF(e, t, n, r = !0) {
 	let i = (0, _.useRef)(null), a = t || XF, o = (0, _.useEffectEvent)((t) => {
@@ -39135,7 +39135,7 @@ function ZF(e, t, n, r = !0) {
 	}, [s, r]), i;
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-media-query/use-media-query.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-media-query/use-media-query.mjs
 function QF(e, t) {
 	return typeof t == "boolean" ? t : typeof window < "u" && "matchMedia" in window && window.matchMedia(e).matches;
 }
@@ -39157,10 +39157,10 @@ function $F(e, t, { getInitialValueInEffect: n } = { getInitialValueInEffect: !0
 	}, [e]), r || !1;
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-isomorphic-effect/use-isomorphic-effect.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-isomorphic-effect/use-isomorphic-effect.mjs
 var eI = typeof document < "u" ? _.useLayoutEffect : _.useEffect;
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-did-update/use-did-update.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-did-update/use-did-update.mjs
 function tI(e, t) {
 	let n = (0, _.useRef)(!1);
 	(0, _.useEffect)(() => () => {
@@ -39171,7 +39171,7 @@ function tI(e, t) {
 	}, t);
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-focus-return/use-focus-return.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-focus-return/use-focus-return.mjs
 function nI({ opened: e, shouldReturnFocus: t = !0 }) {
 	let n = (0, _.useRef)(null), r = () => {
 		n.current && "focus" in n.current && typeof n.current.focus == "function" && n.current?.focus({ preventScroll: !0 });
@@ -39194,7 +39194,7 @@ function nI({ opened: e, shouldReturnFocus: t = !0 }) {
 	}, [e, t]), r;
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-focus-trap/tabbable.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-focus-trap/tabbable.mjs
 var rI = /input|select|textarea|button|object/, iI = "a, input, select, textarea, button, object, [tabindex]";
 function aI(e) {
 	return e.style.display === "none";
@@ -39224,7 +39224,7 @@ function uI(e) {
 	return Array.from(e.querySelectorAll(iI)).filter(lI);
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-focus-trap/scope-tab.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-focus-trap/scope-tab.mjs
 function dI(e, t) {
 	let n = uI(e);
 	if (!n.length) {
@@ -39238,7 +39238,7 @@ function dI(e, t) {
 	s && s.focus();
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-focus-trap/use-focus-trap.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-focus-trap/use-focus-trap.mjs
 function fI(e = !0) {
 	let t = (0, _.useRef)(null), n = (e) => {
 		let t = e.querySelector("[data-autofocus]");
@@ -39270,14 +39270,14 @@ function fI(e = !0) {
 	}, [e]), r;
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-force-update/use-force-update.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-force-update/use-force-update.mjs
 var pI = (e) => (e + 1) % 1e6;
 function mI() {
 	let [, e] = (0, _.useReducer)(pI, 0);
 	return e;
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-id/use-id.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-id/use-id.mjs
 function hI(e) {
 	let t = (0, _.useId)(), [n, r] = (0, _.useState)(`mantine-${t.replace(/:/g, "")}`), i = (0, _.useRef)(!1);
 	return eI(() => {
@@ -39285,7 +39285,7 @@ function hI(e) {
 	}, []), typeof e == "string" ? e : n;
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-merged-ref/use-merged-ref.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-merged-ref/use-merged-ref.mjs
 function gI(e, t) {
 	if (typeof e == "function") return e(t);
 	typeof e == "object" && e && "current" in e && (e.current = t);
@@ -39308,7 +39308,7 @@ function vI(...e) {
 	return (0, _.useCallback)(_I(...e), e);
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-uncontrolled/use-uncontrolled.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-uncontrolled/use-uncontrolled.mjs
 function yI({ value: e, defaultValue: t, finalValue: n, onChange: r = () => {} }) {
 	let [i, a] = (0, _.useState)(t === void 0 ? n : t);
 	return e === void 0 ? [
@@ -39324,12 +39324,12 @@ function yI({ value: e, defaultValue: t, finalValue: n, onChange: r = () => {} }
 	];
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-reduced-motion/use-reduced-motion.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-reduced-motion/use-reduced-motion.mjs
 function bI(e, t) {
 	return $F("(prefers-reduced-motion: reduce)", e, t);
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-hover/use-hover.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-hover/use-hover.mjs
 function xI() {
 	let [e, t] = (0, _.useState)(!1), n = (0, _.useRef)(null), r = (0, _.useCallback)(() => {
 		t(!0);
@@ -39344,7 +39344,7 @@ function xI() {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-focus-within/use-focus-within.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-focus-within/use-focus-within.mjs
 function SI(e) {
 	return e.currentTarget instanceof HTMLElement && e.relatedTarget instanceof HTMLElement && e.currentTarget.contains(e.relatedTarget);
 }
@@ -39366,7 +39366,7 @@ function CI({ onBlur: e, onFocus: t } = {}) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/hooks/esm/use-long-press/use-long-press.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/hooks/esm/use-long-press/use-long-press.mjs
 var wI = ["mouse", "touch"], TI = 10;
 function EI(e, t = {}) {
 	let { threshold: n = 400, events: r = wI, cancelOnMove: i = !1, onStart: a, onFinish: o, onCancel: s } = t, c = (0, _.useRef)(!1), l = (0, _.useRef)(!1), u = (0, _.useRef)(-1), d = (0, _.useRef)(null);
@@ -39418,23 +39418,23 @@ function kI(e) {
 	return e.nativeEvent instanceof MouseEvent;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/get-ref-prop/get-ref-prop.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/get-ref-prop/get-ref-prop.mjs
 function AI(e) {
 	return e?.props?.ref;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/utils/get-single-element-child/get-single-element-child.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/utils/get-single-element-child/get-single-element-child.mjs
 function jI(e) {
 	let t = _.Children.toArray(e);
 	return t.length !== 1 || !OF(t[0]) ? null : t[0];
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/create-vars-resolver/create-vars-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/create-vars-resolver/create-vars-resolver.mjs
 function MI(e) {
 	return e;
 }
 //#endregion
-//#region node_modules/@mantine/core/node_modules/clsx/dist/clsx.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/node_modules/clsx/dist/clsx.mjs
 function NI(e) {
 	var t, n, r = "";
 	if (typeof e == "string" || typeof e == "number") r += e;
@@ -39451,7 +39451,7 @@ function PI() {
 	return r;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/resolve-class-names/resolve-class-names.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/resolve-class-names/resolve-class-names.mjs
 var FI = {};
 function II(e) {
 	let t = {};
@@ -39465,19 +39465,19 @@ function LI({ theme: e, classNames: t, props: n, stylesCtx: r }) {
 	return II((Array.isArray(t) ? t : [t]).map((t) => typeof t == "function" ? t(e, n, r) : t || FI));
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/resolve-styles/resolve-styles.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/resolve-styles/resolve-styles.mjs
 function RI({ theme: e, styles: t, props: n, stylesCtx: r }) {
 	let i = Array.isArray(t) ? t : [t], a = {};
 	for (let t of i) typeof t == "function" ? Object.assign(a, t(e, n, r)) : t && Object.assign(a, t);
 	return a;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-scheme-managers/is-mantine-color-scheme.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-scheme-managers/is-mantine-color-scheme.mjs
 function zI(e) {
 	return e === "auto" || e === "dark" || e === "light";
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-scheme-managers/local-storage-manager.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-scheme-managers/local-storage-manager.mjs
 function BI({ key: e = "mantine-color-scheme-value" } = {}) {
 	let t;
 	return {
@@ -39511,12 +39511,12 @@ function BI({ key: e = "mantine-color-scheme-value" } = {}) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-primary-shade/get-primary-shade.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-primary-shade/get-primary-shade.mjs
 function VI(e, t) {
 	return typeof e.primaryShade == "number" ? e.primaryShade : t === "dark" ? e.primaryShade.dark : e.primaryShade.light;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/to-rgba/to-rgba.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-functions/to-rgba/to-rgba.mjs
 function HI(e) {
 	return /^#?([0-9A-F]{3}){1,2}([0-9A-F]{2})?$/i.test(e);
 }
@@ -39584,7 +39584,7 @@ function KI(e) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/luminance/luminance.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-functions/luminance/luminance.mjs
 function qI(e) {
 	return e <= .03928 ? e / 12.92 : ((e + .055) / 1.055) ** 2.4;
 }
@@ -39601,7 +39601,7 @@ function XI(e, t = .179) {
 	return !e.startsWith("var(") && YI(e) > t;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/parse-theme-color/parse-theme-color.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-functions/parse-theme-color/parse-theme-color.mjs
 function ZI({ color: e, theme: t, colorScheme: n }) {
 	if (typeof e != "string") throw Error(`[@mantine/core] Failed to parse color. Expected color to be a string, instead got ${typeof e}`);
 	if (e === "bright") return {
@@ -39650,7 +39650,7 @@ function ZI({ color: e, theme: t, colorScheme: n }) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-theme-color/get-theme-color.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-theme-color/get-theme-color.mjs
 function QI(e, t) {
 	let n = ZI({
 		color: e || t.primaryColor,
@@ -39659,19 +39659,19 @@ function QI(e, t) {
 	return n.variable ? `var(${n.variable})` : e;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/virtual-color/virtual-color.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/virtual-color/virtual-color.mjs
 function $I(e) {
 	return !!e && typeof e == "object" && "mantine-virtual-color" in e;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/darken/darken.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-functions/darken/darken.mjs
 function eL(e, t) {
 	if (e.startsWith("var(")) return `color-mix(in srgb, ${e}, black ${t * 100}%)`;
 	let { r: n, g: r, b: i, a } = KI(e), o = 1 - t, s = (e) => Math.round(e * o);
 	return `rgba(${s(n)}, ${s(r)}, ${s(i)}, ${a})`;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-gradient/get-gradient.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-gradient/get-gradient.mjs
 function tL(e, t) {
 	let n = {
 		from: e?.from || t.defaultGradient.from,
@@ -39681,7 +39681,7 @@ function tL(e, t) {
 	return `linear-gradient(${n.deg}deg, ${r} 0%, ${i} 100%)`;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/rgba/rgba.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-functions/rgba/rgba.mjs
 function nL(e, t) {
 	if (typeof e != "string" || t > 1 || t < 0) return "rgba(0, 0, 0, 1)";
 	if (e.startsWith("var(")) return `color-mix(in srgb, ${e}, transparent ${(1 - t) * 100}%)`;
@@ -39824,7 +39824,7 @@ var rL = nL, iL = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: 
 	} : {};
 };
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-contrast-color/get-contrast-color.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-contrast-color/get-contrast-color.mjs
 function aL({ color: e, theme: t, autoContrast: n, colorScheme: r }) {
 	return (typeof n == "boolean" ? n : t.autoContrast) && ZI({
 		color: e || t.primaryColor,
@@ -39849,12 +39849,12 @@ function sL(e, t) {
 	});
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-auto-contrast-value/get-auto-contrast-value.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-auto-contrast-value/get-auto-contrast-value.mjs
 function cL(e, t) {
 	return typeof e == "boolean" ? e : t.autoContrast;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/Mantine.context.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/Mantine.context.mjs
 var lL = (0, _.createContext)(null);
 function uL() {
 	let e = (0, _.use)(lL);
@@ -39889,7 +39889,7 @@ function yL() {
 	return uL().deduplicateInlineStyles;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/use-mantine-color-scheme/use-provider-color-scheme.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/use-mantine-color-scheme/use-provider-color-scheme.mjs
 function bL(e, t) {
 	let n = typeof window < "u" && "matchMedia" in window && window.matchMedia("(prefers-color-scheme: dark)")?.matches, r = e === "auto" ? n ? "dark" : "light" : e;
 	t()?.setAttribute("data-mantine-color-scheme", r);
@@ -39920,7 +39920,7 @@ function xL({ manager: e, defaultColorScheme: t, getRootElement: n, forceColorSc
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/default-colors.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/default-colors.mjs
 var SL = {
 	dark: [
 		"#C9C9C9",
@@ -40214,7 +40214,7 @@ function kL(e, t) {
 	}), OL(n), n;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/MantineThemeProvider/MantineThemeProvider.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/MantineThemeProvider/MantineThemeProvider.mjs
 var AL = (0, _.createContext)(null), jL = () => (0, _.use)(AL) || wL;
 function ML() {
 	let e = (0, _.use)(AL);
@@ -40234,18 +40234,18 @@ function NL({ theme: e, children: t, inherit: n = !0 }) {
 }
 NL.displayName = "@mantine/core/MantineThemeProvider";
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/convert-css-variables/css-variables-object-to-string.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/convert-css-variables/css-variables-object-to-string.mjs
 function PL(e) {
 	return Object.entries(e).map(([e, t]) => `${e}: ${t};`).join("");
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/convert-css-variables/convert-css-variables.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/convert-css-variables/convert-css-variables.mjs
 function FL(e, t) {
 	let n = t ? [t] : [":root", ":host"], r = PL(e.variables), i = r ? `${n.join(", ")}{${r}}` : "", a = PL(e.dark), o = PL(e.light), s = (e) => n.map((t) => t === ":host" ? `${t}([data-mantine-color-scheme="${e}"])` : `${t}[data-mantine-color-scheme="${e}"]`).join(", ");
 	return `${i}\n\n${a ? `${s("dark")}{${a}}` : ""}\n\n${o ? `${s("light")}{${o}}` : ""}`;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/get-css-color-variables.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/get-css-color-variables.mjs
 function IL({ theme: e, color: t, colorScheme: n, name: r = t, withColorValues: i = !0 }) {
 	if (!e.colors[t]) return {};
 	if (n === "light") {
@@ -40298,7 +40298,7 @@ function IL({ theme: e, color: t, colorScheme: n, name: r = t, withColorValues: 
 	} : o;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/default-css-variables-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/default-css-variables-resolver.mjs
 function LL(e, t, n) {
 	_F(t).forEach((r) => Object.assign(e, { [`--mantine-${n}-${r}`]: t[r] }));
 }
@@ -40408,7 +40408,7 @@ var RL = (e) => {
 	}), r;
 };
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/MantineClasses/MantineClasses.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/MantineClasses/MantineClasses.mjs
 function zL() {
 	let e = ML(), t = pL(), n = _F(e.breakpoints).reduce((t, n) => {
 		let r = e.breakpoints[n].includes("px"), i = SF(e.breakpoints[n]);
@@ -40421,13 +40421,13 @@ function zL() {
 	});
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/get-merged-variables.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/get-merged-variables.mjs
 function BL({ theme: e, generator: t }) {
 	let n = RL(e), r = t?.(e);
 	return r ? yF(n, r) : n;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/remove-default-variables.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/remove-default-variables.mjs
 var VL = RL(wL);
 function HL(e) {
 	let t = {
@@ -40444,7 +40444,7 @@ function HL(e) {
 	}), t;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/MantineCssVariables.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/MantineCssVariables.mjs
 function UL(e) {
 	return FL({
 		variables: {},
@@ -40465,14 +40465,14 @@ function WL({ cssVariablesSelector: e, deduplicateCssVariables: t }) {
 }
 WL.displayName = "@mantine/CssVariables";
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/use-respect-reduce-motion/use-respect-reduce-motion.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/use-respect-reduce-motion/use-respect-reduce-motion.mjs
 function GL({ respectReducedMotion: e, getRootElement: t }) {
 	eI(() => {
 		e && t()?.setAttribute("data-respect-reduced-motion", "true");
 	}, [e]);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/MantineProvider.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/MantineProvider.mjs
 function KL({ theme: e, children: t, getStyleNonce: n, withStaticClasses: r = !0, withGlobalClasses: i = !0, deduplicateCssVariables: a = !0, withCssVariables: o = !0, cssVariablesSelector: s, classNamesPrefix: c = "mantine", colorSchemeManager: l = BI(), defaultColorScheme: u = "light", getRootElement: d = () => document.documentElement, cssVariablesResolver: f, forceColorScheme: p, stylesTransform: m, env: h, deduplicateInlineStyles: g = !1 }) {
 	let { colorScheme: _, setColorScheme: v, clearColorScheme: y } = xL({
 		defaultColorScheme: u,
@@ -40513,7 +40513,7 @@ function KL({ theme: e, children: t, getStyleNonce: n, withStaticClasses: r = !0
 }
 KL.displayName = "@mantine/core/MantineProvider";
 //#endregion
-//#region node_modules/@mantine/core/esm/core/MantineProvider/use-props/use-props.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/MantineProvider/use-props/use-props.mjs
 function Q(e, t, n) {
 	let r = ML(), i = (Array.isArray(e) ? e : [e]).filter(Boolean), a = {};
 	for (let e of i) {
@@ -40530,7 +40530,7 @@ function Q(e, t, n) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-resolved-styles-api/use-resolved-styles-api.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-resolved-styles-api/use-resolved-styles-api.mjs
 function qL({ classNames: e, styles: t, props: n, stylesCtx: r }) {
 	let i = ML();
 	return {
@@ -40549,7 +40549,7 @@ function qL({ classNames: e, styles: t, props: n, stylesCtx: r }) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-global-class-names/get-global-class-names.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-global-class-names/get-global-class-names.mjs
 var JL = {
 	always: "mantine-focus-always",
 	auto: "mantine-focus-auto",
@@ -40559,7 +40559,7 @@ function YL({ theme: e, options: t, unstyled: n }) {
 	return PI(t?.focusable && !n && (e.focusClassName || JL[e.focusRing]), t?.active && !n && e.activeClassName);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-options-class-names/get-options-class-names.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-options-class-names/get-options-class-names.mjs
 function XL({ selector: e, stylesCtx: t, options: n, props: r, theme: i }) {
 	return LI({
 		theme: i,
@@ -40569,7 +40569,7 @@ function XL({ selector: e, stylesCtx: t, options: n, props: r, theme: i }) {
 	})[e];
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-resolved-class-names/get-resolved-class-names.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-resolved-class-names/get-resolved-class-names.mjs
 function ZL({ selector: e, stylesCtx: t, theme: n, classNames: r, props: i }) {
 	return LI({
 		theme: n,
@@ -40579,27 +40579,27 @@ function ZL({ selector: e, stylesCtx: t, theme: n, classNames: r, props: i }) {
 	})[e];
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-root-class-name/get-root-class-name.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-root-class-name/get-root-class-name.mjs
 function QL({ rootSelector: e, selector: t, className: n }) {
 	return e === t ? n : void 0;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-selector-class-name/get-selector-class-name.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-selector-class-name/get-selector-class-name.mjs
 function $L({ selector: e, classes: t, unstyled: n }) {
 	return n ? void 0 : t[e];
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-static-class-names/get-static-class-names.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-static-class-names/get-static-class-names.mjs
 function eR({ themeName: e, classNamesPrefix: t, selector: n, withStaticClass: r }) {
 	return r === !1 ? [] : e.map((e) => `${t}-${e}-${n}`);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-variant-class-name/get-variant-class-name.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-variant-class-name/get-variant-class-name.mjs
 function tR({ options: e, classes: t, selector: n, unstyled: r }) {
 	return e?.variant && !r ? t[`${n}--${e.variant}`] : void 0;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-class-name.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-class-name.mjs
 function nR({ theme: e, options: t, themeName: n, selector: r, classNamesPrefix: i, resolvedClassNames: a, resolvedThemeClassNames: o, classes: s, unstyled: c, className: l, rootSelector: u, props: d, stylesCtx: f, withStaticClasses: p, headless: m, transformedStyles: h }) {
 	return PI(YL({
 		theme: e,
@@ -40638,7 +40638,7 @@ function nR({ theme: e, options: t, themeName: n, selector: r, classNamesPrefix:
 	}), t?.className);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/resolve-style/resolve-style.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/resolve-style/resolve-style.mjs
 function rR({ style: e, theme: t }) {
 	return Array.isArray(e) ? e.reduce((e, n) => ({
 		...e,
@@ -40649,7 +40649,7 @@ function rR({ style: e, theme: t }) {
 	}), {}) : typeof e == "function" ? e(t) : e ?? {};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/get-style.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/get-style.mjs
 function iR({ theme: e, selector: t, options: n, props: r, stylesCtx: i, rootSelector: a, withStylesTransform: o, resolvedStyles: s, resolvedThemeStyles: c, resolvedVars: l, resolvedRootStyle: u }) {
 	return {
 		...c[t],
@@ -40669,7 +40669,7 @@ function iR({ theme: e, selector: t, options: n, props: r, stylesCtx: i, rootSel
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/resolve-vars/merge-vars.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/resolve-vars/merge-vars.mjs
 function aR(e) {
 	return e.reduce((e, t) => (t && Object.keys(t).forEach((n) => {
 		e[n] = {
@@ -40679,7 +40679,7 @@ function aR(e) {
 	}), e), {});
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/use-transformed-styles.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/use-transformed-styles.mjs
 function oR({ props: e, stylesCtx: t, themeName: n, theme: r }) {
 	let i = _L()?.();
 	return {
@@ -40696,7 +40696,7 @@ function oR({ props: e, stylesCtx: t, themeName: n, theme: r }) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/styles-api/use-styles/use-styles.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/styles-api/use-styles/use-styles.mjs
 function sR({ name: e, classes: t, props: n, stylesCtx: r, className: i, style: a, rootSelector: o = "root", unstyled: s, classNames: c, styles: l, vars: u, varsResolver: d, attributes: f }) {
 	let p = ML(), m = fL(), h = mL(), g = hL(), _ = (Array.isArray(e) ? e : [e]).filter((e) => e), { withStylesTransform: v, getTransformedStyles: y } = oR({
 		props: n,
@@ -40775,18 +40775,18 @@ function sR({ name: e, classes: t, props: n, stylesCtx: r, className: i, style: 
 	});
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/InlineStyles/css-object-to-string/css-object-to-string.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/InlineStyles/css-object-to-string/css-object-to-string.mjs
 function cR(e) {
 	return _F(e).reduce((t, n) => e[n] === void 0 ? t : `${t}${bF(n)}:${e[n]};`, "").trim();
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/InlineStyles/styles-to-string/styles-to-string.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/InlineStyles/styles-to-string/styles-to-string.mjs
 function lR({ selector: e, styles: t, media: n, container: r }) {
 	let i = t ? cR(t) : "", a = Array.isArray(n) ? n.map((t) => `@media${t.query}{${e}{${cR(t.styles)}}}`) : [], o = Array.isArray(r) ? r.map((t) => `@container ${t.query}{${e}{${cR(t.styles)}}}`) : [];
 	return `${i ? `${e}{${i}}` : ""}${a.join("")}${o.join("")}`.trim();
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/InlineStyles/InlineStyles.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/InlineStyles/InlineStyles.mjs
 function uR(e) {
 	let t = 5381;
 	for (let n = 0; n < e.length; n++) t = (t << 5) + t + e.charCodeAt(n) & 4294967295;
@@ -40806,7 +40806,7 @@ function dR({ deduplicate: e, ...t }) {
 	});
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/InlineStyles/hash-styles.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/InlineStyles/hash-styles.mjs
 function fR(e) {
 	let t = 5381;
 	for (let n = 0; n < e.length; n++) t = (t << 5) + t + e.charCodeAt(n) & 4294967295;
@@ -40816,7 +40816,7 @@ function pR(e, t) {
 	return `__mdi__-${fR(`${e ? cR(e) : ""}|${Array.isArray(t) ? t.map((e) => `${e.query}:${cR(e.styles)}`).join("|") : ""}`)}`;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/extract-style-props/extract-style-props.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/extract-style-props/extract-style-props.mjs
 function mR(e) {
 	let { m: t, mx: n, my: r, mt: i, mb: a, ml: o, mr: s, me: c, ms: l, mis: u, mie: d, p: f, px: p, py: m, pt: h, pb: g, pl: _, pr: v, pe: y, ps: b, pis: x, pie: S, bd: C, bdrs: w, bg: T, c: E, opacity: D, ff: O, fz: k, fw: A, lts: j, ta: M, lh: N, fs: ee, tt: P, td: te, w: ne, miw: re, maw: ie, h: F, mih: ae, mah: oe, bgsz: se, bgp: ce, bgr: le, bga: ue, pos: de, top: fe, left: pe, bottom: me, right: I, inset: L, display: he, flex: ge, hiddenFrom: _e, visibleFrom: ve, lightHidden: ye, darkHidden: be, sx: xe, ...Se } = e;
 	return {
@@ -40885,7 +40885,7 @@ function mR(e) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/style-props-data.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/style-props-data.mjs
 var hR = {
 	m: {
 		type: "spacing",
@@ -41105,7 +41105,7 @@ var hR = {
 	}
 };
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/color-resolver/color-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/resolvers/color-resolver/color-resolver.mjs
 function gR(e, t) {
 	let n = ZI({
 		color: e,
@@ -41121,7 +41121,7 @@ function _R(e, t) {
 	return n.isThemeColor && n.shade === void 0 ? `var(--mantine-color-${n.color}-text)` : gR(e, t);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/border-resolver/border-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/resolvers/border-resolver/border-resolver.mjs
 function vR(e, t) {
 	if (typeof e == "number") return Z(e);
 	if (typeof e == "string") {
@@ -41131,7 +41131,7 @@ function vR(e, t) {
 	return e;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/font-family-resolver/font-family-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/resolvers/font-family-resolver/font-family-resolver.mjs
 var yR = {
 	text: "var(--mantine-font-family)",
 	mono: "var(--mantine-font-family-monospace)",
@@ -41143,7 +41143,7 @@ function bR(e) {
 	return typeof e == "string" && e in yR ? yR[e] : e;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/font-size-resolver/font-size-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/resolvers/font-size-resolver/font-size-resolver.mjs
 var xR = [
 	"h1",
 	"h2",
@@ -41156,12 +41156,12 @@ function SR(e, t) {
 	return typeof e == "string" && e in t.fontSizes ? `var(--mantine-font-size-${e})` : typeof e == "string" && xR.includes(e) ? `var(--mantine-${e}-font-size)` : typeof e == "number" || typeof e == "string" ? Z(e) : e;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/identity-resolver/identity-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/resolvers/identity-resolver/identity-resolver.mjs
 function CR(e) {
 	return e;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/line-height-resolver/line-height-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/resolvers/line-height-resolver/line-height-resolver.mjs
 var wR = [
 	"h1",
 	"h2",
@@ -41174,17 +41174,17 @@ function TR(e, t) {
 	return typeof e == "string" && e in t.lineHeights ? `var(--mantine-line-height-${e})` : typeof e == "string" && wR.includes(e) ? `var(--mantine-${e}-line-height)` : e;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/radius-resolver/radius-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/resolvers/radius-resolver/radius-resolver.mjs
 function ER(e, t) {
 	return typeof e == "string" && e in t.radius ? `var(--mantine-radius-${e})` : typeof e == "number" || typeof e == "string" ? Z(e) : e;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/size-resolver/size-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/resolvers/size-resolver/size-resolver.mjs
 function DR(e) {
 	return typeof e == "number" ? Z(e) : e;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/spacing-resolver/spacing-resolver.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/resolvers/spacing-resolver/spacing-resolver.mjs
 function OR(e, t) {
 	if (typeof e == "number") return Z(e);
 	if (typeof e == "string") {
@@ -41196,7 +41196,7 @@ function OR(e, t) {
 	return e;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/index.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/resolvers/index.mjs
 var kR = {
 	color: gR,
 	textColor: _R,
@@ -41210,7 +41210,7 @@ var kR = {
 	border: vR
 };
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/parse-style-props/sort-media-queries.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/parse-style-props/sort-media-queries.mjs
 function AR(e) {
 	return e.replace("(min-width: ", "").replace("em)", "");
 }
@@ -41225,7 +41225,7 @@ function jR({ media: e, ...t }) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/style-props/parse-style-props/parse-style-props.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/style-props/parse-style-props/parse-style-props.mjs
 function MR(e) {
 	if (typeof e != "object" || !e) return !1;
 	let t = Object.keys(e);
@@ -41266,12 +41266,12 @@ function IR({ styleProps: e, data: t, theme: n }) {
 	}));
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/use-random-classname/use-random-classname.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/use-random-classname/use-random-classname.mjs
 function LR() {
 	return `__m__-${(0, _.useId)().replace(/[:«»]/g, "")}`;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/get-style-object/get-style-object.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/get-style-object/get-style-object.mjs
 function RR(e, t) {
 	return Array.isArray(e) ? [...e].reduce((e, n) => ({
 		...e,
@@ -41279,13 +41279,13 @@ function RR(e, t) {
 	}), {}) : typeof e == "function" ? e(t) : e ?? {};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/factory/create-polymorphic-component.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/factory/create-polymorphic-component.mjs
 function zR(e) {
 	return e;
 }
 var BR = zR;
 //#endregion
-//#region node_modules/@mantine/core/esm/core/factory/factory.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/factory/factory.mjs
 function VR(e) {
 	return e;
 }
@@ -41303,7 +41303,7 @@ function UR(e) {
 	return HR(e);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/factory/polymorphic-factory.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/factory/polymorphic-factory.mjs
 function WR(e) {
 	let t = e;
 	return t.withProps = (e) => {
@@ -41315,7 +41315,7 @@ function WR(e) {
 	}, t.extend = VR, t;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/get-box-mod/get-box-mod.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/get-box-mod/get-box-mod.mjs
 function GR(e) {
 	return `data-${(e.startsWith("data-") ? e.slice(5) : e).replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase()}`;
 }
@@ -41332,7 +41332,7 @@ function qR(e) {
 	}), {}) : KR(e) : null;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/get-box-style/get-box-style.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/get-box-style/get-box-style.mjs
 function JR(e, t) {
 	return Array.isArray(e) ? [...e].reduce((e, n) => ({
 		...e,
@@ -41348,7 +41348,7 @@ function YR({ theme: e, style: t, vars: n, styleProps: r }) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/core/Box/Box.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/core/Box/Box.mjs
 function XR({ component: e, style: t, __vars: n, className: r, variant: i, mod: a, size: o, hiddenFrom: s, visibleFrom: c, lightHidden: l, darkHidden: u, renderRoot: d, __size: f, ref: p, ...m }) {
 	let h = ML(), g = e || "div", { styleProps: _, rest: v } = mR(m), y = gL()?.()?.(_.sx), b = LR(), x = IR({
 		styleProps: _,
@@ -41392,7 +41392,7 @@ function QR() {
 	return (0, _.use)(ZR);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/UnstyledButton/UnstyledButton.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/UnstyledButton/UnstyledButton.module.mjs
 var $R = { root: "m_87cf2631" }, ez = { __staticSelector: "UnstyledButton" }, tz = WR((e) => {
 	let t = Q("UnstyledButton", ez, e), { className: n, component: r = "button", __staticSelector: i, unstyled: a, classNames: o, styles: s, style: c, attributes: l, ...u } = t, d = sR({
 		name: i,
@@ -41414,7 +41414,7 @@ var $R = { root: "m_87cf2631" }, ez = { __staticSelector: "UnstyledButton" }, tz
 });
 tz.classes = $R, tz.displayName = "@mantine/core/UnstyledButton";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/VisuallyHidden/VisuallyHidden.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/VisuallyHidden/VisuallyHidden.module.mjs
 var nz = { root: "m_515a97f8" }, rz = HR((e) => {
 	let t = Q("VisuallyHidden", null, e), { classNames: n, className: r, style: i, styles: a, unstyled: o, vars: s, attributes: c, ...l } = t, u = sR({
 		name: "VisuallyHidden",
@@ -41435,7 +41435,7 @@ var nz = { root: "m_515a97f8" }, rz = HR((e) => {
 });
 rz.classes = nz, rz.displayName = "@mantine/core/VisuallyHidden";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Paper/Paper.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Paper/Paper.module.mjs
 var iz = { root: "m_1b7284a3" }, az = MI((e, { radius: t, shadow: n }) => ({ root: {
 	"--paper-radius": t === void 0 ? void 0 : HF(t),
 	"--paper-shadow": GF(n)
@@ -41462,7 +41462,7 @@ var iz = { root: "m_1b7284a3" }, az = MI((e, { radius: t, shadow: n }) => ({ roo
 });
 oz.classes = iz, oz.varsResolver = az, oz.displayName = "@mantine/core/Paper";
 //#endregion
-//#region node_modules/@mantine/core/esm/utils/Floating/FloatingArrow/get-arrow-position-styles.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/utils/Floating/FloatingArrow/get-arrow-position-styles.mjs
 function sz(e, t, n, r) {
 	return e === "center" || r === "center" ? { top: t } : e === "end" ? { bottom: n } : e === "start" ? { top: n } : {};
 }
@@ -41570,7 +41570,7 @@ function fz({ position: e, dir: t }) {
 	if (n === "right") return r === "start" ? { borderTopLeftRadius: 0 } : { borderBottomLeftRadius: 0 };
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/utils/Floating/FloatingArrow/FloatingArrow.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/utils/Floating/FloatingArrow/FloatingArrow.mjs
 function pz({ position: e, arrowSize: t, arrowOffset: n, arrowRadius: r, arrowPosition: i, visible: a, arrowX: o, arrowY: s, style: c, ...l }) {
 	let { dir: u } = QR();
 	return a ? /* @__PURE__ */ (0, K.jsx)("div", {
@@ -41593,7 +41593,7 @@ function pz({ position: e, arrowSize: t, arrowOffset: n, arrowRadius: r, arrowPo
 }
 pz.displayName = "@mantine/core/FloatingArrow";
 //#endregion
-//#region node_modules/@mantine/core/esm/utils/Floating/get-floating-position/get-floating-position.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/utils/Floating/get-floating-position/get-floating-position.mjs
 function mz(e, t) {
 	if (e === "rtl" && (t.includes("right") || t.includes("left"))) {
 		let [e, n] = t.split("-"), r = e === "right" ? "left" : "right";
@@ -41602,7 +41602,7 @@ function mz(e, t) {
 	return t;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/utils/Floating/use-delayed-hover.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/utils/Floating/use-delayed-hover.mjs
 function hz({ open: e, close: t, openDelay: n, closeDelay: r }) {
 	let i = (0, _.useRef)(-1), a = (0, _.useRef)(-1), o = () => {
 		window.clearTimeout(i.current), window.clearTimeout(a.current);
@@ -41617,7 +41617,7 @@ function hz({ open: e, close: t, openDelay: n, closeDelay: r }) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Overlay/Overlay.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Overlay/Overlay.module.mjs
 var gz = { root: "m_9814e45f" }, _z = { zIndex: LF("modal") }, vz = MI((e, { gradient: t, color: n, backgroundOpacity: r, blur: i, radius: a, zIndex: o }) => ({ root: {
 	"--overlay-bg": t || (n !== void 0 || r !== void 0) && nL(n || "#000", r ?? .6) || void 0,
 	"--overlay-filter": i ? `blur(${Z(i)})` : void 0,
@@ -41649,7 +41649,7 @@ var gz = { root: "m_9814e45f" }, _z = { zIndex: LF("modal") }, vz = MI((e, { gra
 });
 yz.classes = gz, yz.varsResolver = vz, yz.displayName = "@mantine/core/Overlay";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Portal/Portal.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Portal/Portal.mjs
 function bz(e) {
 	let t = document.createElement("div");
 	return t.setAttribute("data-portal", "true"), typeof e.className == "string" && t.classList.add(...e.className.split(" ").filter(Boolean)), typeof e.style == "object" && Object.assign(t.style, e.style), typeof e.id == "string" && t.setAttribute("id", e.id), t;
@@ -41676,14 +41676,14 @@ var Sz = { reuseTargetNode: !0 }, Cz = HR((e) => {
 });
 Cz.displayName = "@mantine/core/Portal";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Portal/OptionalPortal.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Portal/OptionalPortal.mjs
 var wz = HR(({ withinPortal: e = !0, children: t, ...n }) => vL() === "test" || !e ? /* @__PURE__ */ (0, K.jsx)(K.Fragment, { children: t }) : /* @__PURE__ */ (0, K.jsx)(Cz, {
 	...n,
 	children: t
 }));
 wz.displayName = "@mantine/core/OptionalPortal";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Transition/transitions.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Transition/transitions.mjs
 var Tz = (e) => ({
 	in: {
 		opacity: 1,
@@ -41923,7 +41923,7 @@ function Oz({ transition: e, state: t, duration: n, timingFunction: r }) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Transition/use-transition.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Transition/use-transition.mjs
 function kz({ duration: e, exitDuration: t, timingFunction: n, mounted: r, onEnter: i, onExit: a, onEntered: o, onExited: s, enterDelay: c, exitDelay: l }) {
 	let u = ML(), d = bI(), f = u.respectReducedMotion ? d : !1, [p, m] = (0, _.useState)(f ? 0 : e), [h, g] = (0, _.useState)(r ? "entered" : "exited"), y = (0, _.useRef)(-1), b = (0, _.useRef)(-1), x = (0, _.useRef)(-1);
 	function S() {
@@ -41961,7 +41961,7 @@ function kz({ duration: e, exitDuration: t, timingFunction: n, mounted: r, onEnt
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Transition/Transition.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Transition/Transition.mjs
 function Az({ keepMounted: e, keepMountedMode: t = "activity", transition: n = "fade", duration: r = 250, exitDuration: i = r, mounted: a, children: o, timingFunction: s = "ease", onExit: c, onEntered: l, onEnter: u, onExited: d, enterDelay: f, exitDelay: p }) {
 	let m = vL(), { transitionDuration: h, transitionStatus: g, transitionTimingFunction: v } = kz({
 		mounted: a,
@@ -42002,7 +42002,7 @@ function Az({ keepMounted: e, keepMountedMode: t = "activity", transition: n = "
 }
 Az.displayName = "@mantine/core/Transition";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Transition/get-transition-props/get-transition-props.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Transition/get-transition-props/get-transition-props.mjs
 var jz = {
 	duration: 100,
 	transition: "fade"
@@ -42015,10 +42015,10 @@ function Mz(e, t) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Popover/Popover.context.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Popover/Popover.context.mjs
 var [Nz, Pz] = kF("Popover component was not found in the tree");
 //#endregion
-//#region node_modules/@mantine/core/esm/utils/Floating/use-context-menu-handlers.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/utils/Floating/use-context-menu-handlers.mjs
 function Fz({ childProps: e, disabled: t, opened: n, longPressDelay: r = 500, setReference: i, open: a }) {
 	let o = (0, _.useRef)(!1), s = (0, _.useRef)(!1), c = (0, _.useRef)(null), l = (0, _.useRef)(t);
 	l.current = t;
@@ -42076,7 +42076,7 @@ function Fz({ childProps: e, disabled: t, opened: n, longPressDelay: r = 500, se
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Popover/PopoverContextMenu/PopoverContextMenu.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Popover/PopoverContextMenu/PopoverContextMenu.mjs
 function Iz(e) {
 	let { children: t, disabled: n, longPressDelay: r } = Q("PopoverContextMenu", null, e), i = jI(t);
 	if (!i) throw Error("Popover.ContextMenu component children should be an element or a component that accepts ref. Fragments, strings, numbers and other primitive values are not supported");
@@ -42094,7 +42094,7 @@ function Iz(e) {
 }
 Iz.displayName = "@mantine/core/PopoverContextMenu";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/FocusTrap/FocusTrap.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/FocusTrap/FocusTrap.mjs
 function Lz({ children: e, active: t = !0, refProp: n = "ref", innerRef: r }) {
 	let i = vI(fI(t), r), a = jI(e);
 	return a ? (0, _.cloneElement)(a, { [n]: i }) : e;
@@ -42108,7 +42108,7 @@ function Rz(e) {
 }
 Lz.displayName = "@mantine/core/FocusTrap", Rz.displayName = "@mantine/core/FocusTrapInitialFocus", Lz.InitialFocus = Rz;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Popover/Popover.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Popover/Popover.module.mjs
 var zz = {
 	dropdown: "m_38a85659",
 	arrow: "m_a31dc6c1",
@@ -42196,7 +42196,7 @@ var zz = {
 });
 Bz.classes = zz, Bz.displayName = "@mantine/core/PopoverDropdown";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Popover/PopoverTarget/PopoverTarget.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Popover/PopoverTarget/PopoverTarget.mjs
 var Vz = {
 	refProp: "ref",
 	popupType: "dialog"
@@ -42222,7 +42222,7 @@ var Vz = {
 });
 Hz.displayName = "@mantine/core/PopoverTarget";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Popover/use-popover.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Popover/use-popover.mjs
 function Uz(e) {
 	if (e === void 0) return {
 		shift: !0,
@@ -42343,7 +42343,7 @@ function Gz(e) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Popover/Popover.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Popover/Popover.mjs
 var Kz = {
 	position: "bottom",
 	offset: 8,
@@ -42505,7 +42505,7 @@ Jz.Target = Hz, Jz.Dropdown = Bz, Jz.ContextMenu = Iz, Jz.varsResolver = qz, Jz.
 	return t.extend = Jz.extend, t.displayName = `WithProps(${Jz.displayName})`, t;
 };
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Loader/Loader.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Loader/Loader.module.mjs
 var Yz = {
 	root: "m_5ae2e3c",
 	barsLoader: "m_7a2bd4cd",
@@ -42528,7 +42528,7 @@ var Yz = {
 });
 Xz.displayName = "@mantine/core/Bars";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Loader/loaders/Dots.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Loader/loaders/Dots.mjs
 var Zz = ({ className: e, ...t }) => /* @__PURE__ */ (0, K.jsxs)($, {
 	component: "span",
 	className: PI(Yz.dotsLoader, e),
@@ -42541,7 +42541,7 @@ var Zz = ({ className: e, ...t }) => /* @__PURE__ */ (0, K.jsxs)($, {
 });
 Zz.displayName = "@mantine/core/Dots";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Loader/loaders/Oval.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Loader/loaders/Oval.mjs
 var Qz = ({ className: e, ...t }) => /* @__PURE__ */ (0, K.jsx)($, {
 	component: "span",
 	className: PI(Yz.ovalLoader, e),
@@ -42549,7 +42549,7 @@ var Qz = ({ className: e, ...t }) => /* @__PURE__ */ (0, K.jsx)($, {
 });
 Qz.displayName = "@mantine/core/Oval";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Loader/Loader.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Loader/Loader.mjs
 var $z = {
 	bars: Xz,
 	oval: Qz,
@@ -42588,7 +42588,7 @@ var $z = {
 });
 nB.defaultLoaders = $z, nB.classes = Yz, nB.varsResolver = tB, nB.displayName = "@mantine/core/Loader";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/ActionIcon/ActionIcon.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/ActionIcon/ActionIcon.module.mjs
 var rB = {
 	root: "m_8d3f4000",
 	icon: "m_8d3afb97",
@@ -42620,7 +42620,7 @@ var rB = {
 });
 oB.classes = rB, oB.varsResolver = aB, oB.displayName = "@mantine/core/ActionIconGroup";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/ActionIcon/ActionIconGroupSection/ActionIconGroupSection.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/ActionIcon/ActionIconGroupSection/ActionIconGroupSection.mjs
 var sB = MI((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a, size: o }) => {
 	let s = e.variantColorResolver({
 		color: n || e.primaryColor,
@@ -42661,7 +42661,7 @@ var sB = MI((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a,
 });
 cB.classes = rB, cB.varsResolver = sB, cB.displayName = "@mantine/core/ActionIconGroupSection";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/ActionIcon/ActionIcon.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/ActionIcon/ActionIcon.mjs
 var lB = MI((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoContrast: o }) => {
 	let s = e.variantColorResolver({
 		color: a || e.primaryColor,
@@ -42729,7 +42729,7 @@ var lB = MI((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoCon
 });
 uB.classes = rB, uB.varsResolver = lB, uB.displayName = "@mantine/core/ActionIcon", uB.Group = oB, uB.GroupSection = cB;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/CloseButton/CloseIcon.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/CloseButton/CloseIcon.mjs
 function dB({ size: e = "var(--cb-icon-size, 70%)", style: t, ...n }) {
 	return /* @__PURE__ */ (0, K.jsx)("svg", {
 		viewBox: "0 0 15 15",
@@ -42751,7 +42751,7 @@ function dB({ size: e = "var(--cb-icon-size, 70%)", style: t, ...n }) {
 }
 dB.displayName = "@mantine/core/CloseIcon";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/CloseButton/CloseButton.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/CloseButton/CloseButton.module.mjs
 var fB = {
 	root: "m_86a44da5",
 	"root--subtle": "m_220c80f2"
@@ -42788,12 +42788,12 @@ var fB = {
 });
 hB.classes = fB, hB.varsResolver = mB, hB.displayName = "@mantine/core/CloseButton";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Group/filter-falsy-children/filter-falsy-children.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Group/filter-falsy-children/filter-falsy-children.mjs
 function gB(e) {
 	return _.Children.toArray(e).filter(Boolean);
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Group/Group.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Group/Group.module.mjs
 var _B = { root: "m_4081bf90" }, vB = {
 	preventGrowOverflow: !0,
 	gap: "md",
@@ -42832,7 +42832,7 @@ var _B = { root: "m_4081bf90" }, vB = {
 });
 bB.classes = _B, bB.varsResolver = yB, bB.displayName = "@mantine/core/Group";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/Input.context.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/Input.context.mjs
 var xB = (0, _.createContext)({ size: "sm" }), SB = HR((e) => {
 	let t = Q("InputClearButton", null, e), { size: n, variant: r, vars: i, classNames: a, styles: o, ...s } = t, c = (0, _.use)(xB), { resolvedClassNames: l, resolvedStyles: u } = qL({
 		classNames: a,
@@ -42855,7 +42855,7 @@ var xB = (0, _.createContext)({ size: "sm" }), SB = HR((e) => {
 });
 SB.displayName = "@mantine/core/InputClearButton";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/InputClearSection/InputClearSection.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/InputClearSection/InputClearSection.mjs
 var CB = {
 	xs: 7,
 	sm: 8,
@@ -42877,7 +42877,7 @@ function wB({ __clearable: e, __clearSection: t, rightSection: n, __defaultRight
 	}) : n === null ? null : n || o || r;
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/InputWrapper.context.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/InputWrapper.context.mjs
 var TB = (0, _.createContext)({
 	offsetBottom: !1,
 	offsetTop: !1,
@@ -42923,7 +42923,7 @@ var TB = (0, _.createContext)({
 });
 OB.classes = EB, OB.varsResolver = DB, OB.displayName = "@mantine/core/InputDescription";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/InputError/InputError.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/InputError/InputError.mjs
 var kB = MI((e, { size: t }) => ({ error: { "--input-error-size": t === void 0 ? void 0 : `calc(${UF(t)} - ${Z(2)})` } })), AB = HR((e) => {
 	let t = Q("InputError", null, e), { classNames: n, className: r, style: i, styles: a, unstyled: o, vars: s, attributes: c, __staticSelector: l, __inheritStyles: u = !0, ...d } = t, f = sR({
 		name: ["InputWrapper", l],
@@ -42950,7 +42950,7 @@ var kB = MI((e, { size: t }) => ({ error: { "--input-error-size": t === void 0 ?
 });
 AB.classes = EB, AB.varsResolver = kB, AB.displayName = "@mantine/core/InputError";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/InputLabel/InputLabel.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/InputLabel/InputLabel.mjs
 var jB = { labelElement: "label" }, MB = MI((e, { size: t }) => ({ label: {
 	"--input-label-size": UF(t),
 	"--input-asterisk-color": void 0
@@ -42990,7 +42990,7 @@ var jB = { labelElement: "label" }, MB = MI((e, { size: t }) => ({ label: {
 });
 NB.classes = EB, NB.varsResolver = MB, NB.displayName = "@mantine/core/InputLabel";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/InputPlaceholder/InputPlaceholder.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/InputPlaceholder/InputPlaceholder.mjs
 var PB = HR((e) => {
 	let t = Q("InputPlaceholder", null, e), { classNames: n, className: r, style: i, styles: a, unstyled: o, vars: s, __staticSelector: c, error: l, mod: u, attributes: d, ...f } = t, p = sR({
 		name: ["InputPlaceholder", c],
@@ -43013,7 +43013,7 @@ var PB = HR((e) => {
 });
 PB.classes = EB, PB.displayName = "@mantine/core/InputPlaceholder";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/InputSuccess/InputSuccess.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/InputSuccess/InputSuccess.mjs
 var FB = MI((e, { size: t }) => ({ success: { "--input-success-size": t === void 0 ? void 0 : `calc(${UF(t)} - ${Z(2)})` } })), IB = HR((e) => {
 	let t = Q("InputSuccess", null, e), { classNames: n, className: r, style: i, styles: a, unstyled: o, vars: s, attributes: c, __staticSelector: l, __inheritStyles: u = !0, ...d } = t, f = sR({
 		name: ["InputWrapper", l],
@@ -43040,7 +43040,7 @@ var FB = MI((e, { size: t }) => ({ success: { "--input-success-size": t === void
 });
 IB.classes = EB, IB.varsResolver = FB, IB.displayName = "@mantine/core/InputSuccess";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/InputWrapper/get-input-offsets/get-input-offsets.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/InputWrapper/get-input-offsets/get-input-offsets.mjs
 function LB(e, { hasDescription: t, hasError: n }) {
 	let r = e.findIndex((e) => e === "input"), i = e.slice(0, r), a = e.slice(r + 1), o = t && i.includes("description") || n && i.includes("error");
 	return {
@@ -43049,7 +43049,7 @@ function LB(e, { hasDescription: t, hasError: n }) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/InputWrapper/InputWrapper.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/InputWrapper/InputWrapper.mjs
 var RB = {
 	labelElement: "label",
 	inputContainer: (e) => e,
@@ -43146,7 +43146,7 @@ var RB = {
 });
 BB.classes = EB, BB.varsResolver = zB, BB.displayName = "@mantine/core/InputWrapper";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/Input.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/Input.mjs
 var VB = {
 	variant: "default",
 	leftSectionPointerEvents: "none",
@@ -43267,7 +43267,7 @@ var VB = {
 });
 UB.classes = EB, UB.varsResolver = HB, UB.Wrapper = BB, UB.Label = NB, UB.Error = AB, UB.Success = IB, UB.Description = OB, UB.Placeholder = PB, UB.ClearButton = SB, UB.displayName = "@mantine/core/Input";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Input/use-input-props.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Input/use-input-props.mjs
 function WB(e, t, n) {
 	let r = Q([
 		"Input",
@@ -43326,7 +43326,7 @@ function WB(e, t, n) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/InputBase/InputBase.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/InputBase/InputBase.mjs
 var GB = {
 	__staticSelector: "InputBase",
 	withAria: !0,
@@ -43346,7 +43346,7 @@ KB.classes = {
 	...UB.Wrapper.classes
 }, KB.displayName = "@mantine/core/InputBase";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Flex/flex-props.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Flex/flex-props.mjs
 var qB = {
 	gap: {
 		type: "spacing",
@@ -43416,7 +43416,7 @@ var qB = {
 });
 YB.classes = JB, YB.displayName = "@mantine/core/Flex";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Accordion/AccordionChevron.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Accordion/AccordionChevron.mjs
 function XB({ style: e, size: t = 16, ...n }) {
 	return /* @__PURE__ */ (0, K.jsx)("svg", {
 		viewBox: "0 0 15 15",
@@ -43439,10 +43439,10 @@ function XB({ style: e, size: t = 16, ...n }) {
 }
 XB.displayName = "@mantine/core/AccordionChevron";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Text/Text.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Text/Text.module.mjs
 var ZB = { root: "m_b6d8b162" };
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Text/Text.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Text/Text.mjs
 function QB(e) {
 	if (e === "start") return "start";
 	if (e === "end" || e) return "end";
@@ -43483,7 +43483,7 @@ var $B = { inherit: !1 }, eV = MI((e, { variant: t, lineClamp: n, gradient: r, s
 });
 tV.classes = ZB, tV.varsResolver = eV, tV.displayName = "@mantine/core/Text";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Checkbox/CheckIcon.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Checkbox/CheckIcon.mjs
 function nV({ size: e, style: t, ...n }) {
 	let r = e === void 0 ? t : {
 		width: Z(e),
@@ -43506,7 +43506,7 @@ function nV({ size: e, style: t, ...n }) {
 	});
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Avatar/Avatar.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Avatar/Avatar.module.mjs
 var rV = {
 	group: "m_11def92b",
 	root: "m_f85678b6",
@@ -43537,7 +43537,7 @@ var rV = {
 });
 oV.classes = rV, oV.varsResolver = aV, oV.displayName = "@mantine/core/AvatarGroup";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Avatar/AvatarPlaceholderIcon.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Avatar/AvatarPlaceholderIcon.mjs
 function sV(e) {
 	return /* @__PURE__ */ (0, K.jsx)("svg", {
 		...e,
@@ -43554,7 +43554,7 @@ function sV(e) {
 	});
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Avatar/get-initials-color/get-initials-color.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Avatar/get-initials-color/get-initials-color.mjs
 function cV(e) {
 	let t = 0;
 	for (let n = 0; n < e.length; n += 1) {
@@ -43581,13 +43581,13 @@ function uV(e, t = lV) {
 	return t[Math.abs(n) % t.length];
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Avatar/get-initials/get-initials.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Avatar/get-initials/get-initials.mjs
 function dV(e, t = 2) {
 	let n = e.split(" ");
 	return n.length === 1 ? e.slice(0, t).toUpperCase() : n.map((e) => e[0]).slice(0, t).join("").toUpperCase();
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Avatar/Avatar.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Avatar/Avatar.mjs
 var fV = MI((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoContrast: o, name: s, allowedInitialsColors: c }) => {
 	let l = a === "initials" && typeof s == "string" ? uV(s, c) : a, u = e.variantColorResolver({
 		color: l || "gray",
@@ -43638,7 +43638,7 @@ var fV = MI((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoCon
 });
 pV.classes = rV, pV.varsResolver = fV, pV.displayName = "@mantine/core/Avatar", pV.Group = oV;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Badge/Badge.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Badge/Badge.module.mjs
 var mV = {
 	root: "m_347db0ec",
 	"root--dot": "m_fbd81e3d",
@@ -43706,7 +43706,7 @@ var mV = {
 });
 gV.classes = mV, gV.varsResolver = hV, gV.displayName = "@mantine/core/Badge";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Button/Button.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Button/Button.module.mjs
 var _V = {
 	root: "m_77c9d27d",
 	inner: "m_80f1301b",
@@ -43739,7 +43739,7 @@ var _V = {
 });
 bV.classes = _V, bV.varsResolver = yV, bV.displayName = "@mantine/core/ButtonGroup";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Button/ButtonGroupSection/ButtonGroupSection.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Button/ButtonGroupSection/ButtonGroupSection.mjs
 var xV = MI((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a, size: o }) => {
 	let s = e.variantColorResolver({
 		color: n || e.primaryColor,
@@ -43779,7 +43779,7 @@ var xV = MI((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a,
 });
 SV.classes = _V, SV.varsResolver = xV, SV.displayName = "@mantine/core/ButtonGroupSection";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Button/Button.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Button/Button.mjs
 var CV = {
 	in: {
 		opacity: 1,
@@ -43879,7 +43879,7 @@ var CV = {
 });
 TV.classes = _V, TV.varsResolver = wV, TV.displayName = "@mantine/core/Button", TV.Group = bV, TV.GroupSection = SV;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Card/Card.context.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Card/Card.context.mjs
 var [EV, DV] = kF("Card component was not found in tree"), OV = {
 	root: "m_e615b15f",
 	section: "m_599a2148"
@@ -43901,7 +43901,7 @@ var [EV, DV] = kF("Card component was not found in tree"), OV = {
 });
 kV.classes = OV, kV.displayName = "@mantine/core/CardSection";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Card/Card.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Card/Card.mjs
 var AV = MI((e, { padding: t }) => ({ root: { "--card-padding": VF(t) } })), jV = { orientation: "vertical" }, MV = WR((e) => {
 	let t = Q("Card", jV, e), { classNames: n, className: r, style: i, styles: a, unstyled: o, vars: s, children: c, padding: l, attributes: u, orientation: d, ...f } = t, p = sR({
 		name: "Card",
@@ -43933,7 +43933,7 @@ var AV = MI((e, { padding: t }) => ({ root: { "--card-padding": VF(t) } })), jV 
 });
 MV.classes = OV, MV.varsResolver = AV, MV.displayName = "@mantine/core/Card", MV.Section = kV;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Chip/ChipGroup/ChipGroup.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Chip/ChipGroup/ChipGroup.mjs
 var NV = UR((e) => {
 	let { value: t, defaultValue: n, onChange: r, multiple: i, children: a } = Q("ChipGroup", null, e), [o, s] = yI({
 		value: t,
@@ -44043,7 +44043,7 @@ var PV = (0, _.createContext)(null), FV = {
 });
 RV.classes = FV, RV.varsResolver = LV, RV.displayName = "@mantine/core/Chip", RV.Group = NV;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Divider/Divider.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Divider/Divider.module.mjs
 var zV = {
 	root: "m_3eebeb36",
 	label: "m_9e365f20"
@@ -44083,7 +44083,7 @@ var zV = {
 });
 HV.classes = zV, HV.varsResolver = VV, HV.displayName = "@mantine/core/Divider";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/FileButton/FileButton.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/FileButton/FileButton.mjs
 var UV = UR((e) => {
 	let { onChange: t, children: n, multiple: r, accept: i, name: a, form: o, resetRef: s, disabled: c, capture: l, inputProps: u, ref: d, ...f } = Q("FileButton", null, e), p = (0, _.useRef)(null), m = () => {
 		!c && p.current?.click();
@@ -44183,7 +44183,7 @@ var WV = {
 });
 GV.classes = KB.classes, GV.displayName = "@mantine/core/FileInput";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/LoadingOverlay/LoadingOverlay.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/LoadingOverlay/LoadingOverlay.module.mjs
 var KV = {
 	root: "m_6e45937b",
 	loader: "m_e8eb006c",
@@ -44258,10 +44258,10 @@ var KV = {
 });
 YV.classes = KV, YV.varsResolver = JV, YV.displayName = "@mantine/core/LoadingOverlay";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/Menu.context.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/Menu.context.mjs
 var [XV, ZV] = kF("Menu component was not found in the tree"), QV = (0, _.createContext)(null);
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuCheckboxGroup/MenuCheckboxGroup.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuCheckboxGroup/MenuCheckboxGroup.mjs
 function $V(e) {
 	let { value: t, defaultValue: n, onChange: r, children: i } = Q("MenuCheckboxGroup", null, e), [a, o] = yI({
 		value: t,
@@ -44281,10 +44281,10 @@ function $V(e) {
 }
 $V.displayName = "@mantine/core/MenuCheckboxGroup";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuSub/MenuSub.context.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuSub/MenuSub.context.mjs
 var eH = (0, _.createContext)(null);
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuSelectableItem/MenuSelectableItem.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuSelectableItem/MenuSelectableItem.mjs
 function tH({ role: e, checked: t, indicator: n, onSelect: r, color: i, closeMenuOnClick: a, rightSection: o, children: s, disabled: c, dataDisabled: l, className: u, style: d, styles: f, classNames: p, buttonRef: m, others: h }) {
 	let g = ZV(), v = (0, _.use)(eH), y = ML(), { dir: b } = QR(), x = (0, _.useRef)(null), S = KF(h.onClick, () => {
 		l || (r(), a && g.closeDropdownImmediately());
@@ -44367,7 +44367,7 @@ function tH({ role: e, checked: t, indicator: n, onSelect: r, color: i, closeMen
 	});
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/Menu.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/Menu.module.mjs
 var nH = {
 	dropdown: "m_dc9b7c9f",
 	label: "m_9bfac126",
@@ -44408,7 +44408,7 @@ var nH = {
 });
 rH.classes = nH, rH.displayName = "@mantine/core/MenuCheckboxItem";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuContextMenu/MenuContextMenu.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuContextMenu/MenuContextMenu.mjs
 function iH(e) {
 	let { children: t, disabled: n, longPressDelay: r } = Q("MenuContextMenu", null, e), i = jI(t);
 	if (!i) throw Error("Menu.ContextMenu component children should be an element or a component that accepts ref. Fragments, strings, numbers and other primitive values are not supported");
@@ -44424,7 +44424,7 @@ function iH(e) {
 }
 iH.displayName = "@mantine/core/MenuContextMenu";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuDivider/MenuDivider.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuDivider/MenuDivider.mjs
 var aH = HR((e) => {
 	let { classNames: t, className: n, style: r, styles: i, vars: a, ...o } = Q("MenuDivider", null, e), s = ZV();
 	return /* @__PURE__ */ (0, K.jsx)($, {
@@ -44439,7 +44439,7 @@ var aH = HR((e) => {
 });
 aH.classes = nH, aH.displayName = "@mantine/core/MenuDivider";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/use-menu-type-ahead.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/use-menu-type-ahead.mjs
 var oH = 500;
 function sH(e) {
 	return ((e.querySelector("[data-menu-item-label]") ?? e).textContent ?? "").trim().toLowerCase();
@@ -44489,7 +44489,7 @@ function lH({ enabled: e, opened: t, getDropdown: n }) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuDropdown/MenuDropdown.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuDropdown/MenuDropdown.mjs
 var uH = HR((e) => {
 	let { classNames: t, className: n, style: r, styles: i, vars: a, onMouseEnter: o, onMouseLeave: s, onKeyDown: c, children: l, ref: u, ...d } = Q("MenuDropdown", null, e), f = (0, _.useRef)(null), p = ZV(), m = lH({
 		enabled: !p.hasSearch,
@@ -44526,7 +44526,7 @@ var uH = HR((e) => {
 });
 uH.classes = nH, uH.displayName = "@mantine/core/MenuDropdown";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuItem/MenuItem.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuItem/MenuItem.mjs
 var dH = WR((e) => {
 	let { classNames: t, className: n, style: r, styles: i, vars: a, color: o, closeMenuOnClick: s, leftSection: c, rightSection: l, children: u, disabled: d, "data-disabled": f, ref: p, ...m } = Q("MenuItem", null, e), h = ZV(), g = (0, _.use)(eH), v = ML(), { dir: y } = QR(), b = (0, _.useRef)(null), x = m, S = KF(x.onClick, () => {
 		f || (typeof s == "boolean" ? s && h.closeDropdownImmediately() : h.closeOnItemClick && h.closeDropdownImmediately());
@@ -44615,7 +44615,7 @@ var dH = WR((e) => {
 });
 dH.classes = nH, dH.displayName = "@mantine/core/MenuItem";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuLabel/MenuLabel.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuLabel/MenuLabel.mjs
 var fH = HR((e) => {
 	let { classNames: t, className: n, style: r, styles: i, vars: a, ...o } = Q("MenuLabel", null, e), s = ZV();
 	return /* @__PURE__ */ (0, K.jsx)($, {
@@ -44630,10 +44630,10 @@ var fH = HR((e) => {
 });
 fH.classes = nH, fH.displayName = "@mantine/core/MenuLabel";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuRadioGroup/MenuRadioGroup.context.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuRadioGroup/MenuRadioGroup.context.mjs
 var pH = (0, _.createContext)(null);
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuRadioGroup/MenuRadioGroup.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuRadioGroup/MenuRadioGroup.mjs
 function mH(e) {
 	let { value: t, defaultValue: n, onChange: r, children: i } = Q("MenuRadioGroup", null, e), [a, o] = yI({
 		value: t,
@@ -44651,7 +44651,7 @@ function mH(e) {
 }
 mH.displayName = "@mantine/core/MenuRadioGroup";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Radio/RadioIcon.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Radio/RadioIcon.mjs
 function hH({ size: e, style: t, ...n }) {
 	return /* @__PURE__ */ (0, K.jsx)("svg", {
 		xmlns: "http://www.w3.org/2000/svg",
@@ -44673,7 +44673,7 @@ function hH({ size: e, style: t, ...n }) {
 	});
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuRadioItem/MenuRadioItem.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuRadioItem/MenuRadioItem.mjs
 var gH = HR((e) => {
 	let { classNames: t, className: n, style: r, styles: i, vars: a, color: o, closeMenuOnClick: s, rightSection: c, children: l, disabled: u, "data-disabled": d, value: f, checked: p, onChange: m, checkIcon: h, ref: g, ...v } = Q("MenuRadioItem", null, e), y = ZV(), b = (0, _.use)(pH), x = p ?? (b ? b.value === f : !1), S = h ?? y.checkIcon ?? /* @__PURE__ */ (0, K.jsx)(hH, { size: 5 });
 	return /* @__PURE__ */ (0, K.jsx)(tH, {
@@ -44699,7 +44699,7 @@ var gH = HR((e) => {
 });
 gH.classes = nH, gH.displayName = "@mantine/core/MenuRadioItem";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuSearch/MenuSearch.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuSearch/MenuSearch.mjs
 var _H = "[data-menu-item]:not([data-disabled])", vH = "[data-menu-active]";
 function yH(e) {
 	return e?.closest("[data-menu-dropdown]");
@@ -44767,7 +44767,7 @@ var wH = { clearSearchOnClose: !0 }, TH = HR((e) => {
 });
 TH.classes = nH, TH.displayName = "@mantine/core/MenuSearch";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuSubDropdown/MenuSubDropdown.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuSubDropdown/MenuSubDropdown.mjs
 var EH = HR((e) => {
 	let { classNames: t, className: n, style: r, styles: i, vars: a, onMouseEnter: o, onMouseLeave: s, onPointerEnter: c, onPointerLeave: l, onKeyDown: u, children: d, ref: f, ...p } = Q("MenuSubDropdown", null, e), m = (0, _.useRef)(null), h = ZV(), g = (0, _.use)(eH), v = lH({
 		enabled: !h.hasSearch,
@@ -44802,7 +44802,7 @@ var EH = HR((e) => {
 });
 EH.classes = nH, EH.displayName = "@mantine/core/MenuSubDropdown";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuSubItem/MenuSubItem.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuSubItem/MenuSubItem.mjs
 var DH = WR((e) => {
 	let { classNames: t, className: n, style: r, styles: i, vars: a, color: o, leftSection: s, rightSection: c, children: l, disabled: u, "data-disabled": d, closeMenuOnClick: f, ref: p, ...m } = Q("MenuSubItem", null, e), h = ZV(), g = (0, _.use)(eH), v = ML(), { dir: y } = QR(), b = (0, _.useRef)(null), x = m, S = o ? v.variantColorResolver({
 		color: o,
@@ -44901,7 +44901,7 @@ var DH = WR((e) => {
 });
 DH.classes = nH, DH.displayName = "@mantine/core/MenuSubItem";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuSubTarget/MenuSubTarget.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuSubTarget/MenuSubTarget.mjs
 function OH({ children: e, refProp: t }) {
 	if (!OF(e)) throw Error("Menu.Sub.Target component children should be an element or a component that accepts ref. Fragments, strings, numbers and other primitive values are not supported");
 	return ZV(), /* @__PURE__ */ (0, K.jsx)(Jz.Target, {
@@ -44912,7 +44912,7 @@ function OH({ children: e, refProp: t }) {
 }
 OH.displayName = "@mantine/core/MenuSubTarget";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuSub/MenuSub.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuSub/MenuSub.mjs
 var kH = {
 	offset: 0,
 	position: "right-start",
@@ -44986,7 +44986,7 @@ function AH(e) {
 }
 AH.extend = (e) => e, AH.displayName = "@mantine/core/MenuSub", AH.Target = OH, AH.Dropdown = EH, AH.Item = DH;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/MenuTarget/MenuTarget.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/MenuTarget/MenuTarget.mjs
 var jH = { refProp: "ref" };
 function MH(e) {
 	let { children: t, refProp: n, ...r } = Q("MenuTarget", jH, e), i = jI(t);
@@ -45010,7 +45010,7 @@ function MH(e) {
 }
 MH.displayName = "@mantine/core/MenuTarget";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Menu/Menu.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Menu/Menu.mjs
 var NH = {
 	trapFocus: !0,
 	closeOnItemClick: !0,
@@ -45110,7 +45110,7 @@ var NH = {
 });
 PH.displayName = "@mantine/core/Menu", PH.classes = nH, PH.Item = dH, PH.Label = fH, PH.Dropdown = uH, PH.Target = MH, PH.Divider = aH, PH.Search = TH, PH.Sub = AH, PH.CheckboxItem = rH, PH.CheckboxGroup = $V, PH.RadioItem = gH, PH.RadioGroup = mH, PH.ContextMenu = iH;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Tooltip/TooltipFloating/use-floating-tooltip.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Tooltip/TooltipFloating/use-floating-tooltip.mjs
 function FH({ offset: e, position: t, defaultOpened: n }) {
 	let [r, i] = (0, _.useState)(n), a = (0, _.useRef)(null), { x: o, y: s, elements: c, refs: l, update: u, placement: d } = gA({
 		placement: t,
@@ -45163,7 +45163,7 @@ function FH({ offset: e, position: t, defaultOpened: n }) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Tooltip/Tooltip.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Tooltip/Tooltip.module.mjs
 var IH = {
 	tooltip: "m_1b3c8819",
 	arrow: "m_f898399f"
@@ -45228,7 +45228,7 @@ var IH = {
 });
 zH.classes = IH, zH.varsResolver = RH, zH.displayName = "@mantine/core/TooltipFloating";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Tooltip/TooltipGroup/TooltipGroup.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Tooltip/TooltipGroup/TooltipGroup.mjs
 var BH = (0, _.createContext)({ withinGroup: !1 }), VH = {
 	openDelay: 0,
 	closeDelay: 0
@@ -45248,7 +45248,7 @@ function HH(e) {
 }
 HH.displayName = "@mantine/core/TooltipGroup", HH.extend = (e) => e;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Tooltip/use-tooltip.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Tooltip/use-tooltip.mjs
 function UH(e) {
 	if (e === void 0) return {
 		shift: !0,
@@ -45313,7 +45313,7 @@ function GH(e) {
 	};
 }
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Tooltip/Tooltip.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Tooltip/Tooltip.mjs
 var KH = {
 	position: "top",
 	refProp: "ref",
@@ -45500,7 +45500,7 @@ var KH = {
 });
 JH.classes = IH, JH.varsResolver = qH, JH.displayName = "@mantine/core/Tooltip", JH.Floating = zH, JH.Group = HH;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Skeleton/Skeleton.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Skeleton/Skeleton.module.mjs
 var YH = {
 	root: "m_18320242",
 	"skeleton-fade": "m_299c329c"
@@ -45536,7 +45536,7 @@ var YH = {
 });
 QH.classes = YH, QH.varsResolver = ZH, QH.displayName = "@mantine/core/Skeleton";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Stack/Stack.module.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Stack/Stack.module.mjs
 var $H = { root: "m_6d731127" }, eU = {
 	gap: "md",
 	align: "stretch",
@@ -45567,7 +45567,7 @@ var $H = { root: "m_6d731127" }, eU = {
 });
 nU.classes = $H, nU.varsResolver = tU, nU.displayName = "@mantine/core/Stack";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Tabs/Tabs.context.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Tabs/Tabs.context.mjs
 var [rU, iU] = kF("Tabs component was not found in the tree"), aU = {
 	root: "m_89d60db1",
 	"list--default": "m_576c9d4",
@@ -45607,7 +45607,7 @@ var [rU, iU] = kF("Tabs component was not found in the tree"), aU = {
 });
 oU.classes = aU, oU.displayName = "@mantine/core/TabsList";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Tabs/TabsPanel/TabsPanel.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Tabs/TabsPanel/TabsPanel.mjs
 var sU = HR((e) => {
 	let t = Q("TabsPanel", null, e), { children: n, className: r, value: i, classNames: a, styles: o, style: s, mod: c, keepMounted: l, ...u } = t, d = vL(), f = iU();
 	(0, _.useEffect)(() => (f.setMountedPanel(i, !0), () => {
@@ -45635,7 +45635,7 @@ var sU = HR((e) => {
 });
 sU.classes = aU, sU.displayName = "@mantine/core/TabsPanel";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Tabs/TabsTab/TabsTab.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Tabs/TabsTab/TabsTab.mjs
 var cU = HR((e) => {
 	let t = Q("TabsTab", null, e), { className: n, children: r, rightSection: i, leftSection: a, value: o, onClick: s, onKeyDown: c, disabled: l, color: u, style: d, classNames: f, styles: p, vars: m, mod: h, tabIndex: g, ..._ } = t, v = ML(), { dir: y } = QR(), b = iU(), x = o === b.value, S = (e) => {
 		b.onChange(b.allowTabDeactivation && o === b.value ? null : o), s?.(e);
@@ -45698,7 +45698,7 @@ var cU = HR((e) => {
 });
 cU.classes = aU, cU.displayName = "@mantine/core/TabsTab";
 //#endregion
-//#region node_modules/@mantine/core/esm/components/Tabs/Tabs.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/Tabs/Tabs.mjs
 var lU = "Tabs.Tab or Tabs.Panel component was rendered with invalid value or without value", uU = {
 	keepMounted: !0,
 	keepMountedMode: "activity",
@@ -45776,7 +45776,7 @@ var lU = "Tabs.Tab or Tabs.Panel component was rendered with invalid value or wi
 });
 fU.classes = aU, fU.varsResolver = dU, fU.displayName = "@mantine/core/Tabs", fU.Tab = cU, fU.Panel = sU, fU.List = oU;
 //#endregion
-//#region node_modules/@mantine/core/esm/components/TextInput/TextInput.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@mantine/core/esm/components/TextInput/TextInput.mjs
 var pU = HR((e) => {
 	let t = Q([
 		"Input",
@@ -45791,7 +45791,7 @@ var pU = HR((e) => {
 });
 pU.classes = KB.classes, pU.displayName = "@mantine/core/TextInput";
 //#endregion
-//#region node_modules/@blocknote/mantine/dist/blocknote-mantine.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@blocknote/mantine/dist/blocknote-mantine.js
 var mU = (e, t, n = !1) => {
 	let r = [];
 	function i(e, r = "--bn") {
@@ -46851,7 +46851,34 @@ function AW(e, t = [], n = [], r = null) {
 }
 //#endregion
 //#region public/notebook-styles.js
-function jW(e) {
+var jW = Object.freeze([
+	"8",
+	"9",
+	"10",
+	"11",
+	"12",
+	"14",
+	"16",
+	"18",
+	"20",
+	"24",
+	"28",
+	"32",
+	"36",
+	"48"
+]), MW = Object.freeze([
+	"normal",
+	"1",
+	"1.15",
+	"1.5",
+	"2"
+]);
+function NW(e) {
+	if (typeof e != "string" || !/^\d{1,2}(?:\.5)?(?:pt|px)?$/i.test(e.trim())) return;
+	let t = e.trim().toLowerCase(), n = parseFloat(t) * (t.endsWith("px") ? .75 : 1), r = Math.round(n * 2) / 2;
+	return r >= 8 && r <= 48 ? String(r) : void 0;
+}
+function PW(e) {
 	if (typeof e != "string") return e;
 	let t = e.trim().toLowerCase();
 	return [
@@ -46861,19 +46888,19 @@ function jW(e) {
 		"none"
 	].includes(t) ? "default" : /^[a-z]+$/.test(t) || /^#[\da-f]{3,8}$/.test(t) || /^(?:rgb|hsl)a?\([\d\s.,%/+-]+\)$/.test(t) ? "yellow" : e;
 }
-function MW(e) {
+function FW(e) {
 	if (!e || typeof e != "object" || Array.isArray(e)) return e;
 	let t = { ...e };
 	if (Object.hasOwn(t, "backgroundColor")) {
-		let e = jW(t.backgroundColor);
+		let e = PW(t.backgroundColor);
 		e === "default" ? delete t.backgroundColor : t.backgroundColor = e;
 	}
 	return t;
 }
-function NW(e) {
+function IW(e) {
 	let t = (e) => Array.isArray(e) ? e.map((e) => ({
 		...e,
-		...e.styles ? { styles: MW(e.styles) } : {},
+		...e.styles ? { styles: FW(e.styles) } : {},
 		...Array.isArray(e.content) ? { content: t(e.content) } : {}
 	})) : e, n = (e) => e.map((e) => ({
 		...e,
@@ -46896,7 +46923,7 @@ function NW(e) {
 }
 //#endregion
 //#region public/notebook-html-paste.js
-function PW(e, t = globalThis.document) {
+function LW(e, t = globalThis.document) {
 	if (!/<table\b/i.test(e) || !t) return e;
 	let n = t.createElement("template");
 	n.innerHTML = e;
@@ -46913,13 +46940,13 @@ function PW(e, t = globalThis.document) {
 	return r ? n.innerHTML : e;
 }
 //#endregion
-//#region node_modules/prosemirror-dropcursor/dist/index.js
-function FW(e = {}) {
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/prosemirror-dropcursor/dist/index.js
+function RW(e = {}) {
 	return new V({ view(t) {
-		return new IW(t, e);
+		return new zW(t, e);
 	} });
 }
-var IW = class {
+var zW = class {
 	constructor(e, t) {
 		this.editorView = e, this.cursorPos = null, this.element = null, this.timeout = -1, this.lastDragEvent = null, this.width = t.width ?? 1, this.color = t.color === !1 ? void 0 : t.color || "black", this.class = t.class, this.handlers = [
 			"dragover",
@@ -47091,7 +47118,7 @@ Zd.create({
 		};
 	},
 	addProseMirrorPlugins() {
-		return [FW(this.options)];
+		return [RW(this.options)];
 	}
 }), Zd.create({
 	name: "focus",
@@ -47136,8 +47163,8 @@ Zd.create({
 		})) ?? null };
 	}
 });
-var LW = "placeholder", RW = new Kn("tiptap__placeholder");
-function zW(e) {
+var BW = "placeholder", VW = new Kn("tiptap__placeholder");
+function HW(e) {
 	let { editor: t, placeholder: n, dataAttribute: r, pos: i, node: a, isEmptyDoc: o, hasAnchor: s, classes: { emptyNode: c, emptyEditor: l } } = e, u = [c];
 	return o && u.push(l), _s.node(i, i + a.nodeSize, {
 		class: u.join(" "),
@@ -47149,14 +47176,14 @@ function zW(e) {
 		}) : n
 	});
 }
-function BW(e, t) {
+function UW(e, t) {
 	return typeof e == "function" ? e(t) : e;
 }
-function VW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i, from: a, to: o }) {
+function WW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i, from: a, to: o }) {
 	let { anchor: s } = i, c = [], l = e.isEmpty;
 	return r.nodesBetween(a, o, (r, i) => {
 		let a = s >= i && s <= i + r.nodeSize, o = !r.isLeaf && Tu(r);
-		return r.type.isTextblock && (a || !t.showOnlyCurrent) && o && c.push(zW({
+		return r.type.isTextblock && (a || !t.showOnlyCurrent) && o && c.push(HW({
 			editor: e,
 			isEmptyDoc: l,
 			dataAttribute: n,
@@ -47164,7 +47191,7 @@ function VW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i, fro
 			placeholder: t.placeholder,
 			classes: {
 				emptyEditor: t.emptyEditorClass,
-				emptyNode: BW(t.emptyNodeClass, {
+				emptyNode: UW(t.emptyNodeClass, {
 					editor: e,
 					node: r,
 					pos: i,
@@ -47176,14 +47203,14 @@ function VW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i, fro
 		})), t.includeChildren;
 	}), c;
 }
-function HW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i }) {
+function GW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i }) {
 	if (!e.isEditable && t.showOnlyWhenEditable) return null;
 	let { anchor: a } = i, o = [], s = e.isEmpty;
 	if (t.showOnlyCurrent && !t.includeChildren) {
 		let i = r.resolve(a), c = i.depth > 0 ? i.node(1) : i.nodeAfter, l = i.depth > 0 ? i.before(1) : a;
 		if (c && c.type.isTextblock && Tu(c)) {
 			let r = a >= l && a <= l + c.nodeSize;
-			o.push(zW({
+			o.push(HW({
 				editor: e,
 				isEmptyDoc: s,
 				dataAttribute: n,
@@ -47191,7 +47218,7 @@ function HW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i }) {
 				placeholder: t.placeholder,
 				classes: {
 					emptyEditor: t.emptyEditorClass,
-					emptyNode: BW(t.emptyNodeClass, {
+					emptyNode: UW(t.emptyNodeClass, {
 						editor: e,
 						node: c,
 						pos: l,
@@ -47202,7 +47229,7 @@ function HW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i }) {
 				pos: l
 			}));
 		}
-	} else o.push(...VW({
+	} else o.push(...WW({
 		editor: e,
 		options: t,
 		dataAttribute: n,
@@ -47213,7 +47240,7 @@ function HW({ editor: e, options: t, dataAttribute: n, doc: r, selection: i }) {
 	}));
 	return U.create(r, o);
 }
-function UW(e, t) {
+function KW(e, t) {
 	let n = e.resolve(t);
 	if (n.depth === 0) {
 		let e = n.nodeAfter ?? n.nodeBefore;
@@ -47233,13 +47260,13 @@ function UW(e, t) {
 		to: r + n.node(1).nodeSize
 	};
 }
-function WW(e, t) {
+function qW(e, t) {
 	return {
 		from: Math.max(0, t.from - 1),
 		to: Math.min(e.content.size, t.to - 1)
 	};
 }
-function GW(e, t, n) {
+function JW(e, t, n) {
 	let r = [];
 	return e.forEach((e, i) => {
 		let a = i, o = a + e.nodeSize, s = a + 1, c = o + 1;
@@ -47249,7 +47276,7 @@ function GW(e, t, n) {
 		});
 	}), r;
 }
-function KW(e) {
+function YW(e) {
 	if (e.length === 0) return [];
 	let t = [...e].sort((e, t) => e.from - t.from), n = [{ ...t[0] }];
 	for (let e = 1; e < t.length; e += 1) {
@@ -47258,31 +47285,31 @@ function KW(e) {
 	}
 	return n;
 }
-function qW(e, t) {
-	let n = GW(e, t.from, t.to);
-	return n.push(WW(e, UW(e, t.from))), t.to > t.from ? n.push(WW(e, UW(e, Math.min(t.to, e.content.size + 1) - 1))) : t.from < e.content.size + 1 && n.push(WW(e, UW(e, Math.min(t.from + 1, e.content.size)))), n;
+function XW(e, t) {
+	let n = JW(e, t.from, t.to);
+	return n.push(qW(e, KW(e, t.from))), t.to > t.from ? n.push(qW(e, KW(e, Math.min(t.to, e.content.size + 1) - 1))) : t.from < e.content.size + 1 && n.push(qW(e, KW(e, Math.min(t.from + 1, e.content.size)))), n;
 }
-function JW(e, t, n) {
+function ZW(e, t, n) {
 	let r = [];
 	if (e.docChanged) {
 		let t = gu(e);
-		for (let e of t) r.push(...qW(n.doc, e.newRange));
+		for (let e of t) r.push(...XW(n.doc, e.newRange));
 	}
-	return e.selectionSet && (r.push(WW(n.doc, UW(n.doc, e.mapping.map(t.selection.anchor)))), r.push(WW(n.doc, UW(n.doc, n.selection.anchor)))), KW(r);
+	return e.selectionSet && (r.push(qW(n.doc, KW(n.doc, e.mapping.map(t.selection.anchor)))), r.push(qW(n.doc, KW(n.doc, n.selection.anchor)))), YW(r);
 }
-function YW(e, t, n) {
+function QW(e, t, n) {
 	let r = Math.max(0, Math.min(e, n.content.size));
 	return {
 		from: r,
 		to: Math.max(r, Math.min(t, n.content.size))
 	};
 }
-function XW({ decorations: e, ranges: t, editor: n, options: r, dataAttribute: i, doc: a, selection: o }) {
+function $W({ decorations: e, ranges: t, editor: n, options: r, dataAttribute: i, doc: a, selection: o }) {
 	let s = e;
 	for (let e of t) {
-		let { from: t, to: c } = YW(e.from, e.to, a), l = s.find(t, c).filter((e) => e.from >= t && e.to <= c);
+		let { from: t, to: c } = QW(e.from, e.to, a), l = s.find(t, c).filter((e) => e.from >= t && e.to <= c);
 		l.length && (s = s.remove(l));
-		let u = VW({
+		let u = WW({
 			editor: n,
 			options: r,
 			dataAttribute: i,
@@ -47295,10 +47322,10 @@ function XW({ decorations: e, ranges: t, editor: n, options: r, dataAttribute: i
 	}
 	return s;
 }
-function ZW({ editor: e, options: t, dataAttribute: n }) {
+function eG({ editor: e, options: t, dataAttribute: n }) {
 	return {
 		init(r, i) {
-			return HW({
+			return GW({
 				editor: e,
 				options: t,
 				dataAttribute: n,
@@ -47307,9 +47334,9 @@ function ZW({ editor: e, options: t, dataAttribute: n }) {
 			}) ?? U.empty;
 		},
 		apply(r, i, a, o) {
-			return !r.docChanged && !r.selectionSet ? i : XW({
+			return !r.docChanged && !r.selectionSet ? i : $W({
 				decorations: i.map(r.mapping, r.doc),
-				ranges: JW(r, a, o),
+				ranges: ZW(r, a, o),
 				editor: e,
 				options: t,
 				dataAttribute: n,
@@ -47319,25 +47346,25 @@ function ZW({ editor: e, options: t, dataAttribute: n }) {
 		}
 	};
 }
-function QW(e) {
+function tG(e) {
 	return e.replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "").replace(/^[0-9-]+/, "").replace(/^-+/, "").toLowerCase();
 }
-function $W({ editor: e, options: t }) {
-	let n = t.dataAttribute ? `data-${QW(t.dataAttribute)}` : `data-${LW}`, r = t.showOnlyCurrent && !t.includeChildren;
+function nG({ editor: e, options: t }) {
+	let n = t.dataAttribute ? `data-${tG(t.dataAttribute)}` : `data-${BW}`, r = t.showOnlyCurrent && !t.includeChildren;
 	return new V({
-		key: RW,
-		...r ? {} : { state: ZW({
+		key: VW,
+		...r ? {} : { state: eG({
 			editor: e,
 			options: t,
 			dataAttribute: n
 		}) },
-		props: { decorations: r ? ({ doc: r, selection: i }) => HW({
+		props: { decorations: r ? ({ doc: r, selection: i }) => GW({
 			editor: e,
 			options: t,
 			dataAttribute: n,
 			doc: r,
 			selection: i
-		}) : (n) => t.showOnlyWhenEditable && !e.isEditable ? U.empty : RW.getState(n) ?? U.empty }
+		}) : (n) => t.showOnlyWhenEditable && !e.isEditable ? U.empty : VW.getState(n) ?? U.empty }
 	});
 }
 Zd.create({
@@ -47346,7 +47373,7 @@ Zd.create({
 		return {
 			emptyEditorClass: "is-editor-empty",
 			emptyNodeClass: "is-empty",
-			dataAttribute: LW,
+			dataAttribute: BW,
 			placeholder: "Write something …",
 			showOnlyWhenEditable: !0,
 			showOnlyCurrent: !0,
@@ -47354,23 +47381,23 @@ Zd.create({
 		};
 	},
 	addProseMirrorPlugins() {
-		return [$W({
+		return [nG({
 			editor: this.editor,
 			options: this.options
 		})];
 	}
 });
-function eG(e, t) {
+function rG(e, t) {
 	return !e.selection.empty && !Eu(e.selection) && t.isEditable;
 }
-function tG(e, t) {
-	return eG(e, t) && !t.isFocused && !t.view.dragging;
+function iG(e, t) {
+	return rG(e, t) && !t.isFocused && !t.view.dragging;
 }
-function nG() {
+function aG() {
 	var e;
 	(e = window.getSelection()) == null || e.removeAllRanges();
 }
-function rG(e) {
+function oG(e) {
 	e.focus();
 }
 Zd.create({
@@ -47384,15 +47411,15 @@ Zd.create({
 			key: new Kn("selection"),
 			props: {
 				decorations(n) {
-					return tG(n, e) ? U.create(n.doc, [_s.inline(n.selection.from, n.selection.to, { class: t.className })]) : null;
+					return iG(n, e) ? U.create(n.doc, [_s.inline(n.selection.from, n.selection.to, { class: t.className })]) : null;
 				},
 				handleDOMEvents: {
 					blur(t) {
-						return eG(t.state, e) && nG(), !1;
+						return rG(t.state, e) && aG(), !1;
 					},
 					focus(t) {
-						return eG(t.state, e) && requestAnimationFrame(() => {
-							!e.isDestroyed && t.hasFocus() && rG(t);
+						return rG(t.state, e) && requestAnimationFrame(() => {
+							!e.isDestroyed && t.hasFocus() && oG(t);
 						}), !1;
 					}
 				}
@@ -47400,7 +47427,7 @@ Zd.create({
 		})];
 	}
 });
-function iG({ types: e, node: t }) {
+function sG({ types: e, node: t }) {
 	return t && Array.isArray(e) && e.includes(t.type) || t?.type === e;
 }
 Zd.create({
@@ -47422,7 +47449,7 @@ Zd.create({
 			state: {
 				init: (e, t) => {
 					let r = t.tr.doc.lastChild;
-					return !iG({
+					return !sG({
 						node: r,
 						types: n
 					});
@@ -47430,7 +47457,7 @@ Zd.create({
 				apply: (e, t) => {
 					if (!e.docChanged || e.getMeta("__uniqueIDTransaction")) return t;
 					let r = e.doc.lastChild;
-					return !iG({
+					return !sG({
 						node: r,
 						types: n
 					});
@@ -47439,7 +47466,7 @@ Zd.create({
 		})];
 	}
 });
-var aG = Zd.create({
+var cG = Zd.create({
 	name: "undoRedo",
 	addOptions() {
 		return {
@@ -47468,7 +47495,7 @@ var aG = Zd.create({
 });
 //#endregion
 //#region public/report-rich-text.js
-function oG(e) {
+function lG(e) {
 	try {
 		let t = new URL(String(e || "").trim());
 		return [
@@ -47480,7 +47507,7 @@ function oG(e) {
 		return "";
 	}
 }
-var sG = (e) => (e || []).map((e) => e.text).join(""), cG = (e, t) => [
+var uG = (e) => (e || []).map((e) => e.text).join(""), dG = (e, t) => [
 	"bold",
 	"italic",
 	"underline",
@@ -47488,14 +47515,14 @@ var sG = (e) => (e || []).map((e) => e.text).join(""), cG = (e, t) => [
 	"highlight",
 	"href"
 ].every((n) => e[n] === t[n]);
-function lG(e) {
+function fG(e) {
 	let t = [];
-	for (let n of e) n.text && (t.length && cG(t.at(-1), n) ? t.at(-1).text += n.text : t.push({ ...n }));
+	for (let n of e) n.text && (t.length && dG(t.at(-1), n) ? t.at(-1).text += n.text : t.push({ ...n }));
 	return t;
 }
-function uG(e, t, n) {
+function pG(e, t, n) {
 	let r = 0;
-	return lG(e.flatMap((e) => {
+	return fG(e.flatMap((e) => {
 		let i = Math.max(0, t - r), a = Math.min(e.text.length, n - r);
 		return r += e.text.length, a > i ? [{
 			...e,
@@ -47503,18 +47530,18 @@ function uG(e, t, n) {
 		}] : [];
 	}));
 }
-function dG(e) {
-	let t = sG(e);
-	return uG(e, t.length - t.trimStart().length, t.trimEnd().length);
+function mG(e) {
+	let t = uG(e);
+	return pG(e, t.length - t.trimStart().length, t.trimEnd().length);
 }
-function fG(e) {
-	let t = sG(e), n = 0;
+function hG(e) {
+	let t = uG(e), n = 0;
 	return t.split("\n").map((t) => {
-		let r = uG(e, n, n + t.length);
+		let r = pG(e, n, n + t.length);
 		return n += t.length + 1, r;
 	});
 }
-function pG(e, { list: t = !1 } = {}) {
+function gG(e, { list: t = !1 } = {}) {
 	if (!Array.isArray(e) || e.length > 5e3) throw Error("Invalid Report formatting.");
 	let n = 0, r = e.map((e) => {
 		if (!e || typeof e.text != "string") throw Error("Invalid Report formatted text.");
@@ -47531,21 +47558,21 @@ function pG(e, { list: t = !1 } = {}) {
 			e[n] && (t[n] = !0);
 		}
 		if (e.href) {
-			if (typeof e.href != "string" || e.href.length > 2048 || !oG(e.href)) throw Error("Invalid Report link.");
-			t.href = oG(e.href);
+			if (typeof e.href != "string" || e.href.length > 2048 || !lG(e.href)) throw Error("Invalid Report link.");
+			t.href = lG(e.href);
 		}
 		return t;
 	});
-	return t && (r = fG(r).map(dG).filter((e) => sG(e)).flatMap((e, t) => t ? [{ text: "\n" }, ...e] : e)), lG(dG(r));
+	return t && (r = hG(r).map(mG).filter((e) => uG(e)).flatMap((e, t) => t ? [{ text: "\n" }, ...e] : e)), fG(mG(r));
 }
-function mG(e) {
+function _G(e) {
 	let t = e.kind === "list" ? (e.items || []).join("\n") : e.text || "";
 	return e.richText || [{ text: t }];
 }
-function hG(e) {
+function vG(e) {
 	return {
 		type: "doc",
-		content: fG(e).map((e) => ({
+		content: hG(e).map((e) => ({
 			type: "paragraph",
 			content: e.map((e) => ({
 				type: "text",
@@ -47564,8 +47591,8 @@ function hG(e) {
 		}))
 	};
 }
-function gG(e) {
-	return lG((e.content || []).flatMap((e, t) => [...t ? [{ text: "\n" }] : [], ...(e.content || []).map((e) => {
+function yG(e) {
+	return fG((e.content || []).flatMap((e, t) => [...t ? [{ text: "\n" }] : [], ...(e.content || []).map((e) => {
 		let t = { text: e.type === "hardBreak" ? "\n" : e.text || "" };
 		for (let n of e.marks || []) [
 			"bold",
@@ -47573,25 +47600,25 @@ function gG(e) {
 			"underline",
 			"strike",
 			"highlight"
-		].includes(n.type) && (t[n.type] = !0), n.type === "link" && oG(n.attrs?.href) && (t.href = oG(n.attrs.href));
+		].includes(n.type) && (t[n.type] = !0), n.type === "link" && lG(n.attrs?.href) && (t.href = lG(n.attrs.href));
 		return t;
 	})]));
 }
 //#endregion
 //#region public/report-source-formatting.js
-var _G = [
+var bG = [
 	"bold",
 	"italic",
 	"underline",
 	"strike",
 	"highlight"
 ];
-function vG(e) {
+function xG(e) {
 	let t = [];
 	for (let n of [...e].sort((e, t) => e[0] - t[0] || e[1] - t[1])) t.length && n[0] <= t.at(-1)[1] ? t.at(-1)[1] = Math.max(t.at(-1)[1], n[1]) : t.push([...n]);
 	return t;
 }
-function yG(e) {
+function SG(e) {
 	if (e === void 0) return [];
 	if (!Array.isArray(e) || e.length > 200) throw Error("Invalid Report source formatting.");
 	let t = /* @__PURE__ */ new Map(), n = 0, r = 0;
@@ -47606,17 +47633,17 @@ function yG(e) {
 		let a = i.formats || {};
 		if (!a || typeof a != "object" || Array.isArray(a)) throw Error("Invalid Report source styles.");
 		for (let [o, s] of Object.entries(a)) {
-			if (!_G.includes(o) || !Array.isArray(s)) throw Error("Invalid Report source style.");
+			if (!bG.includes(o) || !Array.isArray(s)) throw Error("Invalid Report source style.");
 			if (r += s.length, n > 5e5 || r > 1e3) throw Error("Too much Report source formatting.");
 			for (let e of s) if (!Array.isArray(e) || e.length !== 2 || !e.every(Number.isSafeInteger) || e[0] < 0 || e[1] <= e[0] || e[1] > i.text.length) throw Error("Invalid Report formatting range.");
-			let a = t.get(e).formats, c = vG([...a[o] || [], ...s]);
+			let a = t.get(e).formats, c = xG([...a[o] || [], ...s]);
 			c.length && (a[o] = c);
 		}
 	}
 	if (n > 5e5) throw Error("Too much Report source formatting.");
 	return [...t.values()].filter((e) => Object.keys(e.formats).length);
 }
-function bG(e, t = [], n = "highlight") {
+function CG(e, t = [], n = "highlight") {
 	let r = [];
 	for (let i of t) {
 		let t = i.formats?.[n] || [];
@@ -47626,10 +47653,10 @@ function bG(e, t = [], n = "highlight") {
 			n >= 0 && e.text.indexOf(i.text, n + 1) < 0 && r.push(...t.map(([e, t]) => [e + n, t + n]));
 		}
 	}
-	return vG(r);
+	return xG(r);
 }
-function xG(e, t = []) {
-	let n = new Map(_G.map((n) => [n, bG(e, t, n)]));
+function wG(e, t = []) {
+	let n = new Map(bG.map((n) => [n, CG(e, t, n)]));
 	e.superscriptRanges?.length && n.set("superscript", e.superscriptRanges);
 	let r = [.../* @__PURE__ */ new Set([
 		0,
@@ -47642,22 +47669,22 @@ function xG(e, t = []) {
 		return o;
 	}).filter((e) => e.text);
 }
-function SG(e, t, n, r, i = !1) {
-	if (!_G.includes(r)) throw Error("Invalid Report source style.");
+function TG(e, t, n, r, i = !1) {
+	if (!bG.includes(r)) throw Error("Invalid Report source style.");
 	let a = {};
-	for (let o of _G) {
-		let s = bG(t, e, o);
-		o === r && (s = i ? s.flatMap(([e, t]) => t <= n[0] || e >= n[1] ? [[e, t]] : [[e, Math.min(t, n[0])], [Math.max(e, n[1]), t]].filter(([e, t]) => t > e)) : vG([...s, n])), s.length && (a[o] = s);
+	for (let o of bG) {
+		let s = CG(t, e, o);
+		o === r && (s = i ? s.flatMap(([e, t]) => t <= n[0] || e >= n[1] ? [[e, t]] : [[e, Math.min(t, n[0])], [Math.max(e, n[1]), t]].filter(([e, t]) => t > e)) : xG([...s, n])), s.length && (a[o] = s);
 	}
-	return yG([...e.filter((e) => e.key !== t.key), {
+	return SG([...e.filter((e) => e.key !== t.key), {
 		key: t.key,
 		text: t.text,
 		formats: a
 	}]);
 }
-function CG({ onChange: e, isCurrent: t }) {
+function EG({ onChange: e, isCurrent: t }) {
 	let n = /* @__PURE__ */ new Set(), r = [], i = !1, a = (e) => !i && t() && e.element.isConnected && e.element.getClientRects().length > 0 && e.element.textContent === e.part.text, o = (e) => {
-		e.element.replaceChildren(...xG(e.part, e.block.sourceFormatting).map((e) => {
+		e.element.replaceChildren(...wG(e.part, e.block.sourceFormatting).map((e) => {
 			let t = document.createTextNode(e.text);
 			for (let [n, r] of [
 				["bold", "strong"],
@@ -47690,7 +47717,7 @@ function CG({ onChange: e, isCurrent: t }) {
 			}
 			r.sort((e, t) => e.entry.element.compareDocumentPosition(t.entry.element) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
 		}
-	}, c = (e, t) => bG(e.entry.part, e.entry.block.sourceFormatting, t).some(([t, n]) => t <= e.range[0] && n >= e.range[1]), l = (e, t) => {
+	}, c = (e, t) => CG(e.entry.part, e.entry.block.sourceFormatting, t).some(([t, n]) => t <= e.range[0] && n >= e.range[1]), l = (e, t) => {
 		let n = document.createTreeWalker(e, NodeFilter.SHOW_TEXT), r;
 		for (; r = n.nextNode();) {
 			if (t <= r.length) return [r, t];
@@ -47720,16 +47747,16 @@ function CG({ onChange: e, isCurrent: t }) {
 			r = r.filter((e) => n.has(e.entry));
 		},
 		capture: s,
-		snapshotRuns: (e, t) => xG([...n].find((n) => n.block === e && n.part.text === t)?.part || {
+		snapshotRuns: (e, t) => wG([...n].find((n) => n.block === e && n.part.text === t)?.part || {
 			key: `${e.kind}:text::0`,
 			text: t
 		}, e.sourceFormatting),
 		hasSelection: () => r.length > 0 && r.every((e) => a(e.entry)),
 		isActive: (e) => r.length > 0 && r.every((t) => c(t, e)),
 		toggle(t) {
-			if (!_G.includes(t) || !r.length || !r.every((e) => a(e.entry))) return;
+			if (!bG.includes(t) || !r.length || !r.every((e) => a(e.entry))) return;
 			let i = [...r], u = i.every((e) => c(e, t)), d = /* @__PURE__ */ new Map();
-			for (let { entry: e, range: n } of i) d.set(e.block, SG(d.get(e.block) || e.block.sourceFormatting || [], e.part, n, t, u));
+			for (let { entry: e, range: n } of i) d.set(e.block, TG(d.get(e.block) || e.block.sourceFormatting || [], e.part, n, t, u));
 			d.forEach((e, t) => {
 				e.length ? t.sourceFormatting = e : delete t.sourceFormatting;
 			});
@@ -47746,11 +47773,11 @@ function CG({ onChange: e, isCurrent: t }) {
 }
 //#endregion
 //#region src/report-text-editor.js
-var wG = _f.create({
+var DG = _f.create({
 	name: "doc",
 	topNode: !0,
 	content: "paragraph+"
-}), TG = _f.create({
+}), OG = _f.create({
 	name: "paragraph",
 	group: "block",
 	content: "inline*",
@@ -47763,7 +47790,7 @@ var wG = _f.create({
 		{ tag: "li" }
 	],
 	renderHTML: () => ["p", 0]
-}), EG = _f.create({
+}), kG = _f.create({
 	name: "hardBreak",
 	inline: !0,
 	group: "inline",
@@ -47773,35 +47800,35 @@ var wG = _f.create({
 	addKeyboardShortcuts() {
 		return { "Shift-Enter": () => this.editor.commands.insertContent({ type: "hardBreak" }) };
 	}
-}), DG = Ud.create({
+}), AG = Ud.create({
 	name: "highlight",
 	parseHTML: () => [{ tag: "mark" }],
 	renderHTML: () => ["mark", 0]
-}), OG = Ud.create({
+}), jG = Ud.create({
 	name: "link",
 	inclusive: !1,
 	addAttributes: () => ({ href: {
 		default: null,
-		parseHTML: (e) => oG(e.getAttribute("href")) || null
+		parseHTML: (e) => lG(e.getAttribute("href")) || null
 	} }),
 	parseHTML: () => [{
 		tag: "a[href]",
-		getAttrs: (e) => oG(e.getAttribute("href")) ? {} : !1
+		getAttrs: (e) => lG(e.getAttribute("href")) ? {} : !1
 	}],
 	renderHTML: ({ HTMLAttributes: e }) => [
 		"a",
 		Ql(e, { rel: "noopener noreferrer" }),
 		0
 	]
-}), kG = (e) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">${e.map((e) => `<path d="${e}"/>`).join("")}</svg>`, AG = kG([
+}), MG = (e) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">${e.map((e) => `<path d="${e}"/>`).join("")}</svg>`, NG = MG([
 	"M5 12l6-8 5 4-6 8-5-4Z",
 	"M5 12l-2 5h6",
 	"M2 19h15"
 ]);
-function jG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () => !1, canRedo: a = () => !1, onError: o = () => {}, isCurrent: s = () => !0 }) {
+function PG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () => !1, canRedo: a = () => !1, onError: o = () => {}, isCurrent: s = () => !0 }) {
 	let c = document.createElement("div");
 	c.className = "report-format-toolbar", c.setAttribute("role", "toolbar"), c.setAttribute("aria-label", "Report formatting");
-	let l = null, u = !1, d = null, f = /* @__PURE__ */ new Set(), p = [], m = CG({
+	let l = null, u = !1, d = null, f = /* @__PURE__ */ new Set(), p = [], m = EG({
 		onChange: e,
 		isCurrent: s
 	}), h = () => !u && s() && l && !l.editor.isDestroyed && l.element.isConnected, g = () => {
@@ -47818,9 +47845,9 @@ function jG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 		return i.type = "button", i.title = e, i.setAttribute("aria-label", e), i.innerHTML = t, i.addEventListener("mousedown", (e) => e.preventDefault()), i.addEventListener("click", () => {
 			!u && s() && (!r || h()) && n();
 		}), r && p.push(i), i;
-	}, v = /* @__PURE__ */ new Map(), y = _("Undo", kG(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"]), () => n?.(), !1);
+	}, v = /* @__PURE__ */ new Map(), y = _("Undo", MG(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"]), () => n?.(), !1);
 	y.className = "report-format-undo", y.title = "Undo (⌘Z / Ctrl+Z)", c.append(y);
-	let b = _("Redo", kG(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"]), () => r?.(), !1);
+	let b = _("Redo", MG(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"]), () => r?.(), !1);
 	b.className = "report-format-redo", b.title = "Redo (⌘⇧Z / Ctrl+Shift+Z)", c.append(b);
 	for (let [e, t, n] of [
 		[
@@ -47846,7 +47873,7 @@ function jG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 		[
 			"highlight",
 			"Highlight",
-			AG
+			NG
 		]
 	]) {
 		let r = _(t, n, () => {
@@ -47872,17 +47899,17 @@ function jG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 	let S = (e) => {
 		e.element.dataset.kind = e.block.kind, e.element.dataset.headingLevel = String(e.block.headingLevel || 1), e.element.dataset.listStyle = e.block.listStyle || "bullet", e.element.querySelector("[contenteditable]")?.setAttribute("aria-label", `Report ${e.block.kind === "list" ? "list items" : e.block.kind}`);
 	}, C = (t, n = !1) => {
-		let r = pG(gG(t.editor.getJSON()), { list: t.block.kind === "list" });
-		t.block.kind === "list" ? (t.block.items = sG(r).split("\n"), delete t.block.text) : (t.block.text = sG(r), delete t.block.items), t.block.richText = r, e(t.block, { group: n ? `text:${t.block.id}` : null }), g();
+		let r = gG(yG(t.editor.getJSON()), { list: t.block.kind === "list" });
+		t.block.kind === "list" ? (t.block.items = uG(r).split("\n"), delete t.block.text) : (t.block.text = uG(r), delete t.block.items), t.block.richText = r, e(t.block, { group: n ? `text:${t.block.id}` : null }), g();
 	}, w = (e, t = {}) => {
 		h() && (l.block.kind = e, delete l.block.headingLevel, delete l.block.listStyle, Object.assign(l.block, t), S(l), C(l), l.editor.commands.focus());
 	};
 	x.addEventListener("change", () => w(x.value.startsWith("heading") ? "heading" : "paragraph", x.value.startsWith("heading") ? { headingLevel: Number(x.value.slice(-1)) } : {})), p.push(x), c.append(x);
-	let T = _("Bulleted list", kG(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"]), () => w(l.block.kind === "list" && l.block.listStyle !== "ordered" ? "paragraph" : "list", { listStyle: "bullet" })), E = _("Numbered list", kG(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"]), () => w(l.block.kind === "list" && l.block.listStyle === "ordered" ? "paragraph" : "list", { listStyle: "ordered" }));
+	let T = _("Bulleted list", MG(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"]), () => w(l.block.kind === "list" && l.block.listStyle !== "ordered" ? "paragraph" : "list", { listStyle: "bullet" })), E = _("Numbered list", MG(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"]), () => w(l.block.kind === "list" && l.block.listStyle === "ordered" ? "paragraph" : "list", { listStyle: "ordered" }));
 	c.append(T, E);
 	let D = document.createElement("span");
 	D.className = "report-format-link";
-	let O = _("Link", kG(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"]), () => {
+	let O = _("Link", MG(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"]), () => {
 		if (d) {
 			N();
 			return;
@@ -47917,7 +47944,7 @@ function jG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 	}), !0);
 	k.addEventListener("submit", (e) => {
 		e.preventDefault();
-		let t = oG(A.value);
+		let t = lG(A.value);
 		if (!t) {
 			M.textContent = "Use an HTTP, HTTPS, or mailto URL.";
 			return;
@@ -47988,19 +48015,19 @@ function jG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 			return n.editor = new hf({
 				element: t,
 				extensions: [
-					wG,
-					TG,
+					DG,
+					OG,
 					Sx,
-					EG,
+					kG,
 					Dm,
 					Fm,
 					zm,
 					Rm,
-					DG,
-					OG,
-					aG
+					AG,
+					jG,
+					cG
 				],
-				content: hG(mG(e)),
+				content: vG(_G(e)),
 				editorProps: {
 					attributes: {
 						role: "textbox",
@@ -48037,13 +48064,13 @@ function jG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 }
 //#endregion
 //#region src/notebook-schema.js
-var MG = "permitext-notebook-card", NG = "blocknote-json", PG = Object.freeze([
+var FG = "permitext-notebook-card", IG = "blocknote-json", LG = Object.freeze([
 	"canonicalSection",
 	"selectedPassage",
 	"researchAnswer",
 	"notebookCard",
 	"attachment"
-]), FG = Object.freeze([
+]), RG = Object.freeze([
 	"paragraph",
 	"heading",
 	"bulletListItem",
@@ -48051,13 +48078,13 @@ var MG = "permitext-notebook-card", NG = "blocknote-json", PG = Object.freeze([
 	"image",
 	"table"
 ]);
-function IG() {
+function zG() {
 	return [{
 		type: "paragraph",
 		content: []
 	}];
 }
-function LG(e) {
+function BG(e) {
 	let t = {};
 	return (Array.isArray(e) ? e : []).forEach((e) => {
 		[
@@ -48069,11 +48096,11 @@ function LG(e) {
 		].includes(e?.type) && (t[e.type] = !0), e?.type === "backgroundColor" && e.attrs?.stringValue === "yellow" && (t.backgroundColor = "yellow");
 	}), t;
 }
-function RG(e) {
+function VG(e) {
 	return e?.type === "text" && typeof e.text == "string" ? {
 		type: "text",
 		text: e.text,
-		styles: LG(e.marks)
+		styles: BG(e.marks)
 	} : e?.type === "permitextReference" ? {
 		type: "permitextReference",
 		props: {
@@ -48083,17 +48110,17 @@ function RG(e) {
 		}
 	} : null;
 }
-function zG(e) {
+function HG(e) {
 	let t = (Array.isArray(e?.content) ? e.content : []).filter((e) => e?.type === "paragraph").map((e) => ({
 		type: "paragraph",
-		content: (Array.isArray(e.content) ? e.content : []).map(RG).filter(Boolean)
+		content: (Array.isArray(e.content) ? e.content : []).map(VG).filter(Boolean)
 	}));
-	return t.length ? t : IG();
+	return t.length ? t : zG();
 }
-function BG(e) {
-	return Array.isArray(e) ? e.length ? e : IG() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 2 && e?.format === "blocknote-json" && Array.isArray(e.document) ? e.document.length ? e.document : IG() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 1 && e?.format === "tiptap-json" ? zG(e.document) : e?.schemaVersion === 0 && typeof e.plainText == "string" ? VG(e.plainText) : IG();
+function UG(e) {
+	return Array.isArray(e) ? e.length ? e : zG() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 2 && e?.format === "blocknote-json" && Array.isArray(e.document) ? e.document.length ? e.document : zG() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 1 && e?.format === "tiptap-json" ? HG(e.document) : e?.schemaVersion === 0 && typeof e.plainText == "string" ? WG(e.plainText) : zG();
 }
-function VG(e) {
+function WG(e) {
 	let t = String(e || "").split(/\n{2,}/).map((e) => e.replace(/\s*\n\s*/g, " ").trim()).filter(Boolean).map((e) => ({
 		type: "paragraph",
 		content: [{
@@ -48102,11 +48129,11 @@ function VG(e) {
 			styles: {}
 		}]
 	}));
-	return t.length ? t : IG();
+	return t.length ? t : zG();
 }
 //#endregion
 //#region src/notebook-editor.js
-var HG = new Set(FG), UG = {
+var GG = new Set(RG), KG = {
 	BC: "Building Code",
 	EBC: "Existing Building Code",
 	BC68: "1968 Building Code",
@@ -48117,11 +48144,11 @@ var HG = new Set(FG), UG = {
 	AC: "Administrative Code",
 	ZR: "Zoning Resolution"
 };
-function WG(e) {
-	return String(e || "Linked item").trim().replace(/^([A-Z][A-Z0-9]{0,4})\s+(§\s*)/, (e, t, n) => `${UG[t] || t} · ${n}`);
+function qG(e) {
+	return String(e || "Linked item").trim().replace(/^([A-Z][A-Z0-9]{0,4})\s+(§\s*)/, (e, t, n) => `${KG[t] || t} · ${n}`);
 }
-function GG(e, t) {
-	let n = WG(t);
+function JG(e, t) {
+	let n = qG(t);
 	if (e === "researchAnswer") return {
 		meta: "Research",
 		title: "Research answer",
@@ -48143,8 +48170,8 @@ function GG(e, t) {
 		preview: ""
 	};
 }
-function KG(e, t) {
-	let n = GG(e, t);
+function YG(e, t) {
+	let n = JG(e, t);
 	return [
 		_.createElement("span", {
 			className: "notebook-reference-meta",
@@ -48160,12 +48187,12 @@ function KG(e, t) {
 		}, n.preview) : null
 	].filter(Boolean);
 }
-var qG = mF({
+var XG = mF({
 	type: "permitextReference",
 	propSchema: {
 		referenceKind: {
 			default: "canonicalSection",
-			values: [...PG]
+			values: [...LG]
 		},
 		referenceID: { default: "" },
 		label: { default: "Linked per codes item" }
@@ -48174,7 +48201,7 @@ var qG = mF({
 }, {
 	render: ({ inlineContent: e }) => {
 		if (e.props.referenceKind === "selectedPassage") {
-			let t = GG(e.props.referenceKind, e.props.label);
+			let t = JG(e.props.referenceKind, e.props.label);
 			return _.createElement("span", {
 				className: "notebook-reference-chip",
 				"data-permitext-reference": "true",
@@ -48202,7 +48229,7 @@ var qG = mF({
 			"data-reference-id": e.props.referenceID,
 			"data-reference-label": e.props.label,
 			"aria-label": `Open ${e.props.label}`
-		}, ...KG(e.props.referenceKind, e.props.label));
+		}, ...YG(e.props.referenceKind, e.props.label));
 	},
 	toExternalHTML: ({ inlineContent: e }) => _.createElement("span", {
 		className: "notebook-reference-chip",
@@ -48210,19 +48237,57 @@ var qG = mF({
 		"data-reference-kind": e.props.referenceKind,
 		"data-reference-id": e.props.referenceID,
 		"data-reference-label": e.props.label
-	}, ...KG(e.props.referenceKind, e.props.label))
-}), JG = Object.fromEntries(Object.entries(Sv).filter(([e]) => HG.has(e))), YG = Tv.backgroundColor, XG = {
-	...YG,
+	}, ...YG(e.props.referenceKind, e.props.label))
+}), ZG = Object.fromEntries(Object.entries(Sv).filter(([e]) => GG.has(e)).map(([e, t]) => {
+	if (![
+		"paragraph",
+		"heading",
+		"bulletListItem",
+		"numberedListItem"
+	].includes(e)) return [e, t];
+	let n = (e) => function(t, ...n) {
+		let r = e.call(this, t, ...n);
+		return MW.includes(t.props.lineSpacing) && t.props.lineSpacing !== "normal" && r.dom.style.setProperty("line-height", t.props.lineSpacing, "important"), r;
+	};
+	return [e, {
+		...t,
+		config: {
+			...t.config,
+			propSchema: {
+				...t.config.propSchema,
+				lineSpacing: {
+					default: "normal",
+					values: [...MW]
+				}
+			}
+		},
+		implementation: {
+			...t.implementation,
+			render: n(t.implementation.render),
+			toExternalHTML: n(t.implementation.toExternalHTML || t.implementation.render),
+			parse: (e) => {
+				let n = t.implementation.parse?.(e);
+				if (n === void 0) return;
+				let r = e.getAttribute("data-line-spacing") || e.style.lineHeight;
+				return {
+					...n,
+					...MW.includes(r) ? { lineSpacing: r } : {}
+				};
+			}
+		}
+	}];
+})), QG = Tv.backgroundColor, $G = {
+	...QG,
 	implementation: {
-		...YG.implementation,
-		mark: YG.implementation.mark.extend({ parseHTML() {
+		...QG.implementation,
+		mark: QG.implementation.mark.extend({ parseHTML() {
 			return [{
 				tag: "mark",
 				getAttrs: () => ({ stringValue: "yellow" })
 			}, ...this.parent?.() || []];
 		} })
 	}
-}, ZG = $h({
+}, eK = $h({
 	type: "superscript",
 	propSchema: "boolean"
 }, {
@@ -48234,23 +48299,36 @@ var qG = mF({
 		};
 	},
 	parse: (e) => e.tagName === "SUP" || e.style.verticalAlign === "super" || void 0
-}), QG = Ov.create({
-	blockSpecs: JG,
+}), tK = $h({
+	type: "fontSize",
+	propSchema: "string"
+}, {
+	render: (e) => {
+		let t = document.createElement("span"), n = NW(e);
+		return n && (t.style.fontSize = `${n}pt`), {
+			dom: t,
+			contentDOM: t
+		};
+	},
+	parse: (e) => NW(e.style.fontSize)
+}), nK = Ov.create({
+	blockSpecs: ZG,
 	inlineContentSpecs: {
 		...Ev,
-		permitextReference: qG
+		permitextReference: XG
 	},
 	styleSpecs: {
 		bold: Tv.bold,
 		italic: Tv.italic,
 		strike: Tv.strike,
 		underline: Tv.underline,
-		backgroundColor: XG,
-		superscript: ZG
+		backgroundColor: $G,
+		superscript: eK,
+		fontSize: tK
 	}
 });
-function $G({ editor: e, options: t }) {
-	let [n, r] = (0, _.useState)(!1), [i, a] = (0, _.useState)(""), [o, s] = (0, _.useState)(""), [c, l] = (0, _.useState)(""), u = (0, _.useRef)(null), d = (0, _.useRef)(null), f = () => {
+function rK({ editor: e, options: t }) {
+	let [n, r] = (0, _.useState)(!1), [i, a] = (0, _.useState)(""), [o, s] = (0, _.useState)(""), [c, l] = (0, _.useState)(""), u = (0, _.useRef)(null), d = (0, _.useRef)(null), f = (0, _.useRef)(null), p = () => {
 		let t = e._tiptapEditor.state;
 		return {
 			from: t.selection.from,
@@ -48258,14 +48336,14 @@ function $G({ editor: e, options: t }) {
 			document: t.doc,
 			text: e.getSelectedText()
 		};
-	}, p = (t) => {
+	}, m = (t) => {
 		if (!t || t.document !== e._tiptapEditor.state.doc) return !1;
 		let n = e._tiptapEditor.state.selection;
 		return (n.from !== t.from || n.to !== t.to) && e._tiptapEditor.commands.setTextSelection({
 			from: t.from,
 			to: t.to
 		}), !0;
-	}, m = QA({
+	}, h = QA({
 		editor: e,
 		selector: ({ editor: e }) => {
 			let t = e.getExtension("yUndo") || e.getExtension("history");
@@ -48277,35 +48355,35 @@ function $G({ editor: e, options: t }) {
 				blocks: e.getSelection()?.blocks || [e.getTextCursorPosition().block]
 			};
 		}
-	}), h = m.blocks.filter((e) => [
+	}), g = h.blocks.filter((e) => [
 		"paragraph",
 		"heading",
 		"bulletListItem",
 		"numberedListItem"
-	].includes(e.type)), g = m.blocks.some((e) => [
+	].includes(e.type)), v = h.blocks.some((e) => [
 		"paragraph",
 		"heading",
 		"bulletListItem",
 		"numberedListItem",
 		"table"
-	].includes(e.type)), v = h[0], y = v?.type === "heading" ? `heading-${v.props.level}` : "paragraph", b = (t, n = {}) => {
-		e.focus(), e.transact(() => h.forEach((r) => e.updateBlock(r, {
+	].includes(e.type)), y = g[0], b = h.blocks.find((e) => e.type === "table"), x = b ? e.getExtension(sx) : null, S = x?.getCellSelection(), C = y?.type === "heading" ? `heading-${y.props.level}` : "paragraph", w = (t, n = {}) => {
+		e.focus(), e.transact(() => g.forEach((r) => e.updateBlock(r, {
 			type: t,
 			props: n
 		})));
-	}, x = (t, n, r) => _.createElement("button", {
+	}, T = (t, n, r) => _.createElement("button", {
 		key: t,
 		type: "button",
 		className: `notebook-format-button notebook-format-${t}`,
 		title: n,
 		"aria-label": n,
-		"aria-pressed": !!m.styles[t],
-		disabled: !m.editable || !g,
+		"aria-pressed": !!h.styles[t],
+		disabled: !h.editable || !v,
 		onMouseDown: (e) => e.preventDefault(),
 		onClick: () => {
 			e.focus(), e.toggleStyles({ [t]: !0 });
 		}
-	}, r), S = (e) => _.createElement("svg", {
+	}, r), E = (e) => _.createElement("svg", {
 		viewBox: "0 0 20 20",
 		width: 18,
 		height: 18,
@@ -48316,9 +48394,9 @@ function $G({ editor: e, options: t }) {
 	}, ...e.map((e, t) => _.createElement("path", {
 		key: t,
 		d: e
-	}))), C = () => {
-		u.current = f(), a(e.getSelectedLinkUrl() || ""), s(e.getSelectedText()), l(""), r(!0);
-	}, w = (t) => {
+	}))), D = () => {
+		u.current = p(), a(e.getSelectedLinkUrl() || ""), s(e.getSelectedText()), l(""), r(!0);
+	}, O = (t) => {
 		t.preventDefault();
 		let n;
 		try {
@@ -48335,28 +48413,128 @@ function $G({ editor: e, options: t }) {
 			l("Use an HTTP, HTTPS, or mailto URL.");
 			return;
 		}
-		if (!p(u.current)) {
+		if (!m(u.current)) {
 			l("The Note changed. Close this form and select the link location again.");
 			return;
 		}
 		let a = u.current, s = o.trim();
 		e.focus(), e.createLink(n.href, a.from === a.to ? s || n.href : s && s !== a.text ? s : void 0), r(!1);
-	}, T = (e, t, n) => _.createElement("button", {
+	}, k = (e, t, n) => _.createElement("button", {
 		key: e,
 		type: "button",
 		className: "notebook-format-button",
 		title: t,
 		"aria-label": t,
-		"aria-pressed": v?.type === e,
-		disabled: !m.editable || !h.length,
+		"aria-pressed": y?.type === e,
+		disabled: !h.editable || !g.length,
 		onMouseDown: (e) => e.preventDefault(),
-		onClick: () => b(v?.type === e ? "paragraph" : e)
-	}, n), E = [
+		onClick: () => w(y?.type === e ? "paragraph" : e)
+	}, n), A = [
 		["evidence", "Evidence"],
 		["research", "Assistant answer"],
 		["image", "Image"],
 		["template", "Finding template"]
-	].filter(([e]) => !t.insertItems || t.insertItems.includes(e));
+	].filter(([e]) => !t.insertItems || t.insertItems.includes(e)), j = (t, n, r, i, a = !1) => _.createElement(PH, {
+		position: "bottom-start",
+		offset: 8,
+		withinPortal: !1,
+		width: 190,
+		loop: !0,
+		returnFocus: !1
+	}, _.createElement(PH.Target, null, _.createElement("button", {
+		type: "button",
+		className: "notebook-format-style",
+		"aria-label": t,
+		title: t,
+		disabled: !h.editable || a,
+		onMouseDown: (e) => e.preventDefault(),
+		onClick: () => {
+			f.current = p();
+		}
+	}, n, E(["M5 8l5 5 5-5"]))), _.createElement(PH.Dropdown, {
+		className: "notebook-format-style-menu",
+		"aria-label": t
+	}, ...r.map((t) => _.createElement(PH.Item, {
+		key: t.value,
+		className: "notebook-format-style-option",
+		disabled: t.disabled,
+		"aria-current": t.selected ? "true" : void 0,
+		onClick: () => {
+			m(f.current) && (e.focus(), i(t.value));
+		}
+	}, t.label)))), M = j("Font size", h.styles.fontSize || "Size", [{
+		value: "default",
+		label: "Default",
+		selected: !h.styles.fontSize
+	}, ...jW.map((e) => ({
+		value: e,
+		label: `${e} pt`,
+		selected: h.styles.fontSize === e
+	}))], (t) => t === "default" ? e.removeStyles({ fontSize: h.styles.fontSize || "" }) : e.addStyles({ fontSize: t }), !v), N = y?.props?.lineSpacing || "normal", ee = j("Line spacing", N === "normal" ? "Spacing" : `${N}×`, MW.map((e) => ({
+		value: e,
+		label: e === "normal" ? "Default" : e === "1" ? "1 · Single" : e === "2" ? "2 · Double" : e,
+		selected: N === e
+	})), (t) => e.transact(() => g.forEach((n) => e.updateBlock(n, { props: { lineSpacing: t } }))), !g.length), P = [
+		2,
+		3,
+		4
+	].map((e) => ({
+		value: `insert-${e}`,
+		label: `Insert ${e} × ${e} table`
+	}));
+	b && P.push({
+		value: "row",
+		label: "Add row below",
+		disabled: !S || b.content.rows.length >= 500
+	}, {
+		value: "column",
+		label: "Add column right",
+		disabled: !S || b.content.rows[0].cells.length >= 100
+	}, {
+		value: "header",
+		label: b.content.headerRows ? "Remove header row" : "Use first row as header"
+	}, {
+		value: "remove-row",
+		label: "Delete row",
+		disabled: !S || b.content.rows.length <= 1
+	}, {
+		value: "remove-column",
+		label: "Delete column",
+		disabled: !S || b.content.rows[0].cells.length <= 1
+	}, {
+		value: "remove-table",
+		label: "Delete table"
+	});
+	let te = j("Table", "Table", P, (t) => {
+		if (t.startsWith("insert-")) {
+			let n = Number(t.slice(7)), r = e.getTextCursorPosition().block, i = {
+				type: "tableContent",
+				headerRows: 1,
+				rows: Array.from({ length: n }, () => ({ cells: Array.from({ length: n }, () => []) }))
+			}, a;
+			e.transact(() => {
+				r.type === "paragraph" && !r.content?.length && !r.children?.length ? a = e.updateBlock(r, {
+					type: "table",
+					content: i
+				}) : [a] = e.insertBlocks([{
+					type: "table",
+					content: i
+				}], r, "after"), e.insertBlocks([{
+					type: "paragraph",
+					content: []
+				}], a, "after");
+			}), e.setTextCursorPosition(a, "start");
+		} else b && (t === "header" && e.updateBlock(b, { content: {
+			...b.content,
+			headerRows: +!b.content.headerRows
+		} }), t === "row" && x?.addRowOrColumn(S.from.row, {
+			orientation: "row",
+			side: "below"
+		}), t === "column" && x?.addRowOrColumn(S.from.col, {
+			orientation: "column",
+			side: "right"
+		}), t === "remove-row" && x?.removeRowOrColumn(S.from.row, "row"), t === "remove-column" && x?.removeRowOrColumn(S.from.col, "column"), t === "remove-table" && e.removeBlocks([b]));
+	});
 	return _.createElement("div", {
 		className: "notebook-format-toolbar",
 		role: "toolbar",
@@ -48366,33 +48544,33 @@ function $G({ editor: e, options: t }) {
 		className: "notebook-format-button notebook-format-undo",
 		title: "Undo (⌘Z / Ctrl+Z)",
 		"aria-label": "Undo",
-		disabled: !m.editable || !m.canUndo,
+		disabled: !h.editable || !h.canUndo,
 		onMouseDown: (e) => e.preventDefault(),
 		onClick: () => {
 			e.focus(), e.undo();
 		}
-	}, S(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"])), _.createElement("button", {
+	}, E(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"])), _.createElement("button", {
 		type: "button",
 		className: "notebook-format-button notebook-format-redo",
 		title: "Redo (⌘⇧Z / Ctrl+Shift+Z)",
 		"aria-label": "Redo",
-		disabled: !m.editable || !m.canRedo,
+		disabled: !h.editable || !h.canRedo,
 		onMouseDown: (e) => e.preventDefault(),
 		onClick: () => {
 			e.focus(), e.redo();
 		}
-	}, S(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"])), x("bold", "Bold", _.createElement("strong", null, "B")), x("italic", "Italic", _.createElement("em", null, "I")), x("underline", "Underline", _.createElement("u", null, "U")), x("strike", "Strikethrough", _.createElement("s", null, "S")), _.createElement("button", {
+	}, E(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"])), T("bold", "Bold", _.createElement("strong", null, "B")), T("italic", "Italic", _.createElement("em", null, "I")), T("underline", "Underline", _.createElement("u", null, "U")), T("strike", "Strikethrough", _.createElement("s", null, "S")), _.createElement("button", {
 		type: "button",
 		className: "notebook-format-button notebook-format-highlight",
 		title: "Highlight",
 		"aria-label": "Highlight",
-		"aria-pressed": m.styles.backgroundColor === "yellow",
-		disabled: !m.editable || !g,
+		"aria-pressed": h.styles.backgroundColor === "yellow",
+		disabled: !h.editable || !v,
 		onMouseDown: (e) => e.preventDefault(),
 		onClick: () => {
-			e.focus(), m.styles.backgroundColor === "yellow" ? e.removeStyles({ backgroundColor: "yellow" }) : e.addStyles({ backgroundColor: "yellow" });
+			e.focus(), h.styles.backgroundColor === "yellow" ? e.removeStyles({ backgroundColor: "yellow" }) : e.addStyles({ backgroundColor: "yellow" });
 		}
-	}, S([
+	}, E([
 		"M5 12l6-8 5 4-6 8-5-4Z",
 		"M5 12l-2 5h6",
 		"M2 19h15"
@@ -48408,9 +48586,9 @@ function $G({ editor: e, options: t }) {
 		type: "button",
 		className: "notebook-format-style",
 		"aria-label": "Text style",
-		disabled: !m.editable || !h.length,
+		disabled: !h.editable || !g.length,
 		onMouseDown: (e) => e.preventDefault()
-	}, y.startsWith("heading-") ? `Heading ${y.slice(-1)}` : "Body", S(["M5 8l5 5 5-5"]))), _.createElement(PH.Dropdown, {
+	}, C.startsWith("heading-") ? `Heading ${C.slice(-1)}` : "Body", E(["M5 8l5 5 5-5"]))), _.createElement(PH.Dropdown, {
 		className: "notebook-format-style-menu",
 		"aria-label": "Text style",
 		onKeyDown: (e) => {
@@ -48424,22 +48602,22 @@ function $G({ editor: e, options: t }) {
 	].map(([e, t]) => _.createElement(PH.Item, {
 		key: e,
 		className: "notebook-format-style-option",
-		"aria-current": y === e ? "true" : void 0,
-		onClick: () => e.startsWith("heading-") ? b("heading", { level: Number(e.slice(-1)) }) : b("paragraph")
-	}, t)))), T("bulletListItem", "Bulleted list", S(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])), T("numberedListItem", "Numbered list", S(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])), _.createElement("span", { className: "notebook-format-link" }, _.createElement("button", {
+		"aria-current": C === e ? "true" : void 0,
+		onClick: () => e.startsWith("heading-") ? w("heading", { level: Number(e.slice(-1)) }) : w("paragraph")
+	}, t)))), M, ee, te, k("bulletListItem", "Bulleted list", E(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])), k("numberedListItem", "Numbered list", E(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])), _.createElement("span", { className: "notebook-format-link" }, _.createElement("button", {
 		type: "button",
 		className: "notebook-format-button",
 		title: "Link",
 		"aria-label": "Link",
 		"aria-expanded": n,
-		disabled: !m.editable || !g,
+		disabled: !h.editable || !v,
 		onMouseDown: (e) => e.preventDefault(),
-		onClick: C
-	}, S(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"])), n && _.createElement("form", {
+		onClick: D
+	}, E(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"])), n && _.createElement("form", {
 		className: "notebook-format-link-form",
-		onSubmit: w,
+		onSubmit: O,
 		onKeyDown: (t) => {
-			t.key === "Escape" && (t.preventDefault(), r(!1), p(u.current) && e.focus());
+			t.key === "Escape" && (t.preventDefault(), r(!1), m(u.current) && e.focus());
 		}
 	}, _.createElement("label", null, "URL", _.createElement("input", {
 		autoFocus: !0,
@@ -48456,17 +48634,17 @@ function $G({ editor: e, options: t }) {
 	})), c && _.createElement("p", { role: "alert" }, c), _.createElement("div", null, _.createElement("button", { type: "submit" }, "Apply link"), _.createElement("button", {
 		type: "button",
 		onClick: () => {
-			r(!1), p(u.current) && e.focus();
+			r(!1), m(u.current) && e.focus();
 		}
 	}, "Cancel")))), t.toolbarInsertElement ? _.createElement("span", {
 		className: "notebook-format-insert-slot",
 		ref: (e) => {
 			e && t.toolbarInsertElement.parentElement !== e && e.append(t.toolbarInsertElement);
 		}
-	}) : t.onInsert && _.createElement("details", { className: "notebook-format-insert" }, _.createElement("summary", null, "Insert"), _.createElement("div", { className: "notebook-format-insert-menu" }, ...E.map(([e, n]) => _.createElement("button", {
+	}) : t.onInsert && _.createElement("details", { className: "notebook-format-insert" }, _.createElement("summary", null, "Insert"), _.createElement("div", { className: "notebook-format-insert-menu" }, ...A.map(([e, n]) => _.createElement("button", {
 		type: "button",
 		key: e,
-		disabled: !m.editable,
+		disabled: !h.editable,
 		onMouseDown: (e) => e.preventDefault(),
 		onClick: (n) => {
 			n.currentTarget.closest("details").open = !1, t.onInsert(e);
@@ -48479,30 +48657,30 @@ function $G({ editor: e, options: t }) {
 		}
 	}, t.toolbarStatusElement ? null : t.status || ""));
 }
-function eK(e) {
+function iK(e) {
 	let t = String(e?.referenceKind || "").trim(), n = String(e?.referenceID || "").trim(), r = String(e?.label || "").trim();
-	if (!PG.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
+	if (!LG.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
 	return {
 		referenceKind: t,
 		referenceID: n,
 		label: r
 	};
 }
-function tK(e) {
-	return NW({
-		schema: MG,
+function aK(e) {
+	return IW({
+		schema: FG,
 		schemaVersion: 2,
-		format: NG,
+		format: IG,
 		document: e
 	});
 }
-function nK() {
+function oK() {
 	let e = document.documentElement.dataset.theme;
 	return e === "dark" || e === "light" ? e : window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
-function rK({ options: e, controllerRef: t }) {
-	let [n, r] = (0, _.useState)(nK), i = (0, _.useMemo)(() => BG(e.document), []), a = tj({
-		schema: QG,
+function sK({ options: e, controllerRef: t }) {
+	let [n, r] = (0, _.useState)(oK), i = (0, _.useMemo)(() => UG(e.document), []), a = tj({
+		schema: nK,
 		dictionary: {
 			...hx,
 			placeholders: {
@@ -48520,7 +48698,7 @@ function rK({ options: e, controllerRef: t }) {
 			if (!e.clipboardData?.types.includes("blocknote/html")) {
 				let n = e.clipboardData?.getData("text/html");
 				if (n) {
-					let e = PW(n);
+					let e = LW(n);
 					if (e !== n) return t.pasteHTML(e), !0;
 				}
 			}
@@ -48530,7 +48708,7 @@ function rK({ options: e, controllerRef: t }) {
 		resolveFileUrl: e.resolveFileUrl
 	}), o = (0, _.useRef)(e.document);
 	return (0, _.useEffect)(() => {
-		let e = () => r(nK()), t = new MutationObserver(e);
+		let e = () => r(oK()), t = new MutationObserver(e);
 		t.observe(document.documentElement, {
 			attributes: !0,
 			attributeFilter: ["class", "data-theme"]
@@ -48543,7 +48721,7 @@ function rK({ options: e, controllerRef: t }) {
 		t.current === a && (t.current = null);
 	}), [a]), (0, _.useEffect)(() => {
 		let t = e.document;
-		t && t !== o.current && (o.current = t, a.replaceBlocks(a.document, BG(t)));
+		t && t !== o.current && (o.current = t, a.replaceBlocks(a.document, UG(t)));
 	}, [a, e.document]), _.createElement(EW, {
 		editor: a,
 		className: "permitext-notebook-editor",
@@ -48553,14 +48731,14 @@ function rK({ options: e, controllerRef: t }) {
 		sideMenu: !1,
 		slashMenu: !1,
 		renderEditor: !1,
-		onChange: () => e.onChange?.(tK(a.document)),
+		onChange: () => e.onChange?.(aK(a.document)),
 		"aria-label": e.ariaLabel || "Notebook card"
-	}, e.toolbar !== !1 && e.editable !== !1 && _.createElement($G, {
+	}, e.toolbar !== !1 && e.editable !== !1 && _.createElement(rK, {
 		editor: a,
 		options: e
 	}), _.createElement(GP));
 }
-function iK(e, t = {}) {
+function cK(e, t = {}) {
 	if (!(e instanceof HTMLElement)) throw Error("A Notebook editor mount element is required.");
 	let n = (e) => JSON.stringify(e.state.doc.toJSON(), (e, t) => e === "id" ? void 0 : t), r = { current: null }, i = (0, y.createRoot)(e), a = null, o = {
 		...t,
@@ -48568,7 +48746,7 @@ function iK(e, t = {}) {
 			a = e;
 		}
 	};
-	return i.render(_.createElement(rK, {
+	return i.render(_.createElement(sK, {
 		options: o,
 		controllerRef: r
 	})), {
@@ -48576,13 +48754,13 @@ function iK(e, t = {}) {
 			o.status = String(e || ""), a && !t.toolbarStatusElement && (a.textContent = o.status);
 		},
 		setEditable(e) {
-			o.editable = !!e, r.current && (r.current.isEditable = o.editable), i.render(_.createElement(rK, {
+			o.editable = !!e, r.current && (r.current.isEditable = o.editable), i.render(_.createElement(sK, {
 				options: { ...o },
 				controllerRef: r
 			}));
 		},
 		getDocument() {
-			return tK(r.current?.document || t.document?.document || []);
+			return aK(r.current?.document || t.document?.document || []);
 		},
 		getEditingPosition() {
 			let e = r.current?._tiptapEditor, t = e?.state.selection;
@@ -48603,7 +48781,7 @@ function iK(e, t = {}) {
 		},
 		setDocument(e) {
 			let t = r.current;
-			t && t.replaceBlocks(t.document, BG(e));
+			t && t.replaceBlocks(t.document, UG(e));
 		},
 		insertImage() {
 			let e = r.current;
@@ -48613,13 +48791,13 @@ function iK(e, t = {}) {
 			let t = r.current;
 			return t ? (t.focus(), t.insertInlineContent([{
 				type: "permitextReference",
-				props: eK(e)
+				props: iK(e)
 			}, " "]), !0) : !1;
 		},
 		appendReference(e, t = [], n = [], i = null) {
 			let a = r.current, o = a?.document.at(-1);
 			if (!a || !o) return !1;
-			let s = a.insertBlocks(AW(eK(e), t, n, i), o, "after");
+			let s = a.insertBlocks(AW(iK(e), t, n, i), o, "after");
 			return a.setTextCursorPosition(s.at(-1), "end"), a.focus(), !0;
 		},
 		replaceAssetURL(e, t) {
@@ -48654,4 +48832,4 @@ function iK(e, t = {}) {
 	};
 }
 //#endregion
-export { jG as createReportFormatting, iK as mountPermitextNotebookEditor, QG as permitextNotebookSchema };
+export { PG as createReportFormatting, cK as mountPermitextNotebookEditor, nK as permitextNotebookSchema };

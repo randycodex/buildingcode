@@ -1,5 +1,16 @@
 // Notes expose one highlight color. Clipboard CSS colors must not create marks
 // that the editor can display but the save contract cannot accept.
+export const notebookFontSizes = Object.freeze(['8','9','10','11','12','14','16','18','20','24','28','32','36','48']);
+export const notebookLineSpacings = Object.freeze(['normal','1','1.15','1.5','2']);
+
+export function notebookFontSize(value) {
+  if (typeof value !== 'string' || !/^\d{1,2}(?:\.5)?(?:pt|px)?$/i.test(value.trim())) return undefined;
+  const text=value.trim().toLowerCase();
+  const points=parseFloat(text)*(text.endsWith('px')?0.75:1);
+  const size=Math.round(points*2)/2;
+  return size>=8&&size<=48?String(size):undefined;
+}
+
 export function notebookHighlightColor(value) {
   if (typeof value !== 'string') return value;
   const color = value.trim().toLowerCase();
