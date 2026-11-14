@@ -19554,6 +19554,16 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
   cursor: pointer;
 }
 span.reader-collapse-title { cursor: default; }
+.reader-collapse-title[data-reader-title-action="code-picker"]::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-inline: 10px 3px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+}
 .reader-open-code-menu {
   position: fixed;
   z-index: 1100;

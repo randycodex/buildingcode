@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
-import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from '../public/reader-tabs.js';
+import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, openRecentReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from '../public/reader-tabs.js';
 import { sharedWorkspaceLayout, workspaceLayoutFingerprint, applySharedWorkspaceLayout } from '../public/workspace-layout-sync.js';
 import { captureWorkspaceLayout, normalizeWorkspaceLayout } from '../public/workspace-state.js';
 
@@ -53,6 +53,25 @@ assert.notEqual(merged.activeTabID, original);
 const damaged = {id: 'damaged', codePrefix: 'wrong', tabs: [{id: 'valid', codePrefix: 'PC', codeVersion: '2014'}]};
 initializeReaderTabs(damaged); assert.equal(damaged.codePrefix, 'PC');
 
+const recent = {id:'recent',codePrefix:'BC',codeVersion:'2022',chapterID:'1',sectionID:'101',scrollPosition:{anchorOffset:-120},sourceOwnerPaneID:'evidence'};
+initializeReaderTabs(recent);
+const firstRecentID=recent.activeTabID;
+for(let index=2;index<=6;index++)openRecentReaderTab(recent,{codePrefix:'BC',codeVersion:'2022',chapterID:'1',sectionID:`10${index}`},`recent-${index}`);
+assert.deepEqual(readerTabs(recent).map(tab=>tab.sectionID),['106','105','104','103','102','101']);
+openRecentReaderTab(recent,{codePrefix:'BC',codeVersion:'2022',chapterID:'different-navigation-alias',sectionID:'101'});
+assert.equal(recent.activeTabID,firstRecentID);assert.equal(recent.scrollPosition.anchorOffset,-120);
+assert.equal(readerTabs(recent).length,6);assert.equal(readerTabs(recent)[0].id,firstRecentID);
+openRecentReaderTab(recent,{codePrefix:'PC',codeVersion:'2022',chapterID:'1',sectionID:'101'},'new-code');
+assert.deepEqual(readerTabs(recent).map(tab=>tab.id),['new-code',firstRecentID,'recent-6','recent-5','recent-4','recent-3']);
+assert.equal(recent.sourceOwnerPaneID,'evidence');assert.equal(recent.id,'recent');
+const recentRestored=normalizeWorkspaceLayout(JSON.parse(JSON.stringify(captureWorkspaceLayout({readers:[recent]})))).readers[0];
+assert.deepEqual(readerTabs(recentRestored),readerTabs(recent),'Recent order, sessions and closed oldest tab survive reload.');
+// Collapse legacy duplicates when their exact source is reopened.
+recentRestored.tabs.push({...readerTabs(recentRestored).find(tab=>tab.id===firstRecentID),id:'legacy-duplicate'});
+openRecentReaderTab(recentRestored,{codePrefix:'BC',codeVersion:'2022',sectionID:'101'});
+assert.equal(readerTabs(recentRestored).filter(tab=>tab.codePrefix==='BC'&&tab.sectionID==='101').length,1);
+assert.equal(readerTabs(recentRestored).length,6);
+
 const full = {id: 'full', codePrefix: 'BC', codeVersion: '2022'};
 initializeReaderTabs(full);
 for (let i = 1; i < maximumReaderTabs; i++) addReaderTab(full, {codePrefix: `CODE${i}`, codeVersion: '2022'}, `tab-${i}`);
@@ -77,7 +96,7 @@ vm.runInContext(actual('notifyWorkspaceLayoutChange'), layoutContext); layoutCon
 const a = { id: 'a', codePrefix: 'BC', codeVersion: '2022', sectionID: '1005' };
 initializeReaderTabs(a); addReaderTab(a, {codePrefix: 'PC', codeVersion: '2022', sectionID: '403'}, 'pc');
 const state = {readers: [a], workflowMembership: {}}; let serial = 0, renders = 0;
-const context = vm.createContext({workingResearchNote:()=>null,state, readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs,
+const context = vm.createContext({workingResearchNote:()=>null,state, readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, openRecentReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs,
   isProAccount: () => true, rememberReaderTabPosition() {}, retainReaderColumn() {},
   newReaderState: fields => ({id: `column-${++serial}`, ...fields}),
   linkPaneToView: value => value, currentColumnWorkflowView: () => 'research', paneIDForReader: reader => `reader:${reader.id}`,
@@ -164,16 +183,20 @@ await pickCode({prefix: 'SEVENTH'});
 assert.equal(JSON.stringify(full), beforeStalePicker, 'A stale picker cannot add a seventh tab.');
 console.log('Reader tabs passed: independent code/edition sessions, search and scroll restoration, saved-layout round trip, structural sync, local cursors, duplicate/move/new columns, empty-column removal, six-tab limits, stale pickers and overflow navigation.');
 
-// Notebook source browsing reuses the active tab even at capacity; explicit
+// Notebook source browsing rolls its history even at capacity; explicit
 // tab transfers still cannot create an extra Notebook column.
 {
  const before=JSON.stringify(state.readers);let notices=0;
  context.currentColumnWorkflowView=()=> 'notebook';context.showWebNotice=async()=>notices++;
  await context.transferReaderTab(a,a.activeTabID,{duplicate:true});
  assert.equal(JSON.stringify(state.readers),before);
- const selectedTab=full.activeTabID;
- const otherTabs=JSON.stringify(readerTabs(full).filter(tab=>tab.id!==selectedTab));
+ const priorTabs=readerTabs(full);
  assert.equal(context.prepareReaderSourceTab(full,{codePrefix:'SEVENTH',codeVersion:'2022',chapterID:'new',sectionID:'new'}),full);
- assert.equal(notices,0);assert.equal(full.activeTabID,selectedTab);assert.equal(readerTabs(full).length,6);
- assert.equal(JSON.stringify(readerTabs(full).filter(tab=>tab.id!==selectedTab)),otherTabs);
+ assert.equal(notices,0);assert.equal(readerTabs(full)[0].id,full.activeTabID);assert.equal(readerTabs(full).length,6);
+ assert.deepEqual(readerTabs(full).slice(1),priorTabs.slice(0,5));
+ const beforePick=readerTabs(full);
+ context.openReaderTabPicker(full,{});assert.equal(pickerOpens,2,'Notebook can choose another code at capacity.');
+ await pickCode({prefix:'PICKED'});
+ assert.equal(full.codePrefix,'PICKED');assert.equal(readerTabs(full)[0].id,full.activeTabID);
+ assert.equal(readerTabs(full).length,6);assert.deepEqual(readerTabs(full).slice(1),beforePick.slice(0,5));
 }

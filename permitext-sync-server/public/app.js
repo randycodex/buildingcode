@@ -1,6 +1,6 @@
 import { normalizeNoteResearch } from "./note-research.js?v=1";
 import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=8";
-import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=4";
+import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, openRecentReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=5";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1766";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1768";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1766";
+} from "./offline-storage.js?v=20261113-research-notebook-v1768";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4507,15 +4507,18 @@ function retainReaderPaneForTabSwitch(panel, reader) {
 }
 
 function openReaderTabPicker(reader, anchor) {
-  if (!canAddReaderTab(reader)) return;
   const workspaceID = activeWorkspaceID, identity = captureAccountRequest();
   const view = currentColumnWorkflowView(), generation = state.workflowNavigationGeneration || 0;
+  if (view !== 'notebook' && !canAddReaderTab(reader)) return;
   openReaderCodePicker(anchor, async code => {
     if (!state.readers.includes(reader) || activeWorkspaceID !== workspaceID || !isCurrentAccountRequest(identity) ||
-        currentColumnWorkflowView() !== view || (state.workflowNavigationGeneration || 0) !== generation || !canAddReaderTab(reader)) return;
+        currentColumnWorkflowView() !== view || (state.workflowNavigationGeneration || 0) !== generation ||
+        view !== 'notebook' && !canAddReaderTab(reader)) return;
     rememberReaderTabPosition(reader);
     retainReaderColumn(reader);
-    addReaderTab(reader, newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) }));
+    const session = newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) });
+    if (view === 'notebook') openRecentReaderTab(reader, session);
+    else addReaderTab(reader, session);
     saveWorkspaceState();
     const paneID = paneIDForReader(reader);
     await transitionWorkspace("utility", { refreshPaneIDs: [paneID], readerTabSwitchPaneID: paneID });
@@ -4523,15 +4526,18 @@ function openReaderTabPicker(reader, anchor) {
 }
 
 function prepareReaderSourceTab(reader, fields, { allowNewColumn = true } = {}) {
-  if (!isProAccount() || !Array.isArray(reader.tabs)) return reader;
-  // Notebook sources are browsing actions. Only the + picker adds a tab;
-  // Evidence and citations navigate the selected tab without consuming slots.
+  if (!isProAccount()) return reader;
+  // Notebook sources form a bounded history, independent of Research's
+  // manually managed comparison tabs.
   if (currentColumnWorkflowView() === 'notebook') {
     rememberReaderTabPosition(reader);
     retainReaderColumn(reader);
+    openRecentReaderTab(reader, newReaderState(fields));
     reader.internalSearchQuery = '';
+    reader.internalSearchOpen = false;
     return reader;
   }
+  if (!Array.isArray(reader.tabs)) return reader;
   const matches = tab => tab.codePrefix === fields.codePrefix && tab.codeVersion === fields.codeVersion &&
     String(tab.chapterID || '') === String(fields.chapterID || '') && String(tab.sectionID || '') === String(fields.sectionID || '');
   if (matches(reader)) return reader;
@@ -4727,8 +4733,8 @@ function renderReaderTabs(panel, reader) {
   strip.append(list);
   if (isProAccount()) {
     const add = document.createElement('button'); add.type = 'button'; add.className = 'icon-button reader-tab-add'; add.textContent = '+';
-    add.disabled = !canAddReaderTab(reader);
-    add.title = add.disabled ? `Maximum ${maximumReaderTabs} codes per column` : 'Add code tab';
+    add.disabled = currentColumnWorkflowView() !== 'notebook' && !canAddReaderTab(reader);
+    add.title = add.disabled ? `Maximum ${maximumReaderTabs} codes per column` : currentColumnWorkflowView() === 'notebook' ? 'Open a code · Keeps the 6 most recent tabs' : 'Add code tab';
     add.setAttribute('aria-label', add.disabled ? `${readerPositionLabel(reader)} is full · Maximum ${maximumReaderTabs} codes per column` : `Add code tab to ${readerPositionLabel(reader)}`);
     add.addEventListener('click', () => openReaderTabPicker(reader, add)); strip.append(add);
   }
@@ -8729,12 +8735,17 @@ function updateReaderLocationTitle(panel, reader) {
   let button = panel.querySelector(".reader-collapse-title");
   if (!button) return;
   const collapsible = paneCanCollapse(panel.dataset.paneId);
-  if (button.tagName !== (collapsible ? "BUTTON" : "SPAN")) {
-    const title = document.createElement(collapsible ? "button" : "span");
+  const codePicker = currentColumnWorkflowView() === 'notebook';
+  const action = codePicker ? 'code-picker' : collapsible ? 'collapse' : 'label';
+  if (button.dataset.readerTitleAction !== action) {
+    const title = document.createElement(codePicker || collapsible ? "button" : "span");
     title.className = "reader-collapse-title";
-    if (collapsible) {
+    title.dataset.readerTitleAction = action;
+    if (codePicker || collapsible) {
       title.type = "button";
-      title.addEventListener("click", () => setPaneCollapsed(panel, true, { focus: true }));
+      title.addEventListener("click", () => codePicker
+        ? openReaderTabPicker(reader, title)
+        : setPaneCollapsed(panel, true, { focus: true }));
     }
     button.replaceWith(title);
     button = title;
@@ -8743,8 +8754,9 @@ function updateReaderLocationTitle(panel, reader) {
   const location = reader.sectionNumber ? `§ ${reader.sectionNumber}` : "";
   button.textContent = [code, location].filter(Boolean).join(" · ");
   const label = [code, sectionDisplayTitle(reader.sectionNumber, reader.title, "Reader")].join(" · ");
-  button.setAttribute("aria-label", collapsible ? `Collapse ${label}` : label);
-  button.title = collapsible ? `${label} · Click to collapse column` : label;
+  button.setAttribute("aria-label", codePicker ? `Choose code · ${code}` : collapsible ? `Collapse ${label}` : label);
+  if (codePicker) button.setAttribute('aria-haspopup', 'dialog');
+  button.title = codePicker ? 'Choose another code' : collapsible ? `${label} · Click to collapse column` : label;
 }
 
 function appendHighlighted(container, text, query) {
@@ -10385,14 +10397,10 @@ async function openReaderFromToolbar(button) {
     // Recheck at selection time: another picker may have created the Reader.
     const notebookReader = view === 'notebook' && state.readers.find(reader => state.workflowMembership?.[paneIDForReader(reader)]?.includes('notebook'));
     if (notebookReader) {
-      if (!canAddReaderTab(notebookReader)) {
-        await showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
-        return;
-      }
       state.notebookReaderHidden = false;
       rememberReaderTabPosition(notebookReader);
       retainReaderColumn(notebookReader);
-      addReaderTab(notebookReader, newReaderState({codePrefix:code.prefix,codeVersion:codeOptionVersion(code)}));
+      openRecentReaderTab(notebookReader, newReaderState({codePrefix:code.prefix,codeVersion:codeOptionVersion(code)}));
       saveWorkspaceState();
       const paneID = paneIDForReader(notebookReader);
       await transitionWorkspace('utility', {refreshPaneIDs:[paneID],readerTabSwitchPaneID:paneID});
@@ -20545,6 +20553,11 @@ async function renderReaderInternalSearchResults(panel, reader, query, { allowDe
     row.append(heading);
     if (result.snippet) row.append(snippet);
     row.addEventListener("click", async () => {
+      if (currentColumnWorkflowView() === 'notebook') {
+        await openSourceInReader({...result, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion},
+          paneIDForReader(reader), {sourceSurface: 'search-detail', searchQuery: query});
+        return;
+      }
       const searchBox = panel.querySelector(".reader-internal-search");
       const searchButton = panel.querySelector(".reader-internal-search-toggle");
       panel.dataset.readerSearchToken = `selected:${Date.now()}`;
@@ -41455,7 +41468,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
       reader = replacement;
     }
   }
-  if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
+  if (notebookOpening || Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
     allowNewColumn: !(fromSearch || fromSaved) || Boolean(options.forceNewReader)
   });
   if (!reader) return null;
@@ -46086,17 +46099,19 @@ function openColumnGroupMenu(panel, anchor) {
     if (pro) {
       const reader = state.readers.find(item => item.id === panel.dataset.readerId);
       if (reader) {
-        add("Add code tab", () => openReaderTabPicker(reader, anchor), !canAddReaderTab(reader));
+        add("Add code tab", () => openReaderTabPicker(reader, anchor), currentColumnWorkflowView() !== 'notebook' && !canAddReaderTab(reader));
         if (currentColumnWorkflowView() !== 'notebook') {
           add("Duplicate in new column", () => transferReaderTab(reader, reader.activeTabID, { duplicate: true }));
           add("Move tab to new column", () => transferReaderTab(reader, reader.activeTabID), readerTabs(reader).length < 2);
         }
       }
     }
-    if (pro) add("Change Code", () => openReaderCodePicker(anchor, async (code) => {
+    if (pro) add("Change Code", () => {
       const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
-      if (reader && panel.isConnected) await changeReaderCode(panel, reader, code);
-    }));
+      if (!reader || !panel.isConnected) return;
+      if (currentColumnWorkflowView() === 'notebook') openReaderTabPicker(reader, anchor);
+      else openReaderCodePicker(anchor, code => panel.isConnected && changeReaderCode(panel, reader, code));
+    });
     if (trust) {
       panel._readerTrust = trust;
       trust.open = false;

@@ -1,4 +1,4 @@
-import {initializeReaderTabs,addReaderTab,readerTabs,canAddReaderTab,maximumReaderTabs} from '../public/reader-tabs.js';
+import {initializeReaderTabs,addReaderTab,openRecentReaderTab,readerTabs,canAddReaderTab,maximumReaderTabs} from '../public/reader-tabs.js';
 import {linkPaneToView} from '../public/workflow-views.js';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
@@ -13,10 +13,10 @@ function fixture() {
   const search={key:'search',id:'search',query:'water',matchMode:'words'};
   const readers=[{id:'first',sectionID:'old',codeVersion:'2022'},{id:'active',sectionID:'other',codeVersion:'2022'}];
   const reveals=[],details={},anchors={}; let account=1,serial=0;
-  const c=vm.createContext({initializeReaderTabs,addReaderTab,readerTabs,canAddReaderTab,maximumReaderTabs,rememberReaderTabPosition(){},retainReaderColumn(){},linkPaneToView,state:{readers,utilityInstances:[search],paneWeights:{},paneOrder:[]},activeWorkspaceID:'workspace',
+  const c=vm.createContext({initializeReaderTabs,addReaderTab,openRecentReaderTab,readerTabs,canAddReaderTab,maximumReaderTabs,rememberReaderTabPosition(){},retainReaderColumn(){},linkPaneToView,state:{readers,utilityInstances:[search],paneWeights:{},paneOrder:[]},activeWorkspaceID:'workspace',
     searchReaderOpeningAttempts:new Map(),savedItemOpeningAttempts:new Map(),sectionDetailOpeningAttempts:new Map(),
     captureAccountRequest:()=>account,isCurrentAccountRequest:value=>value===account,
-    currentColumnWorkflowView:()=> 'research',workflowPaneIsVisible:()=>true,workspaceColumnsRequireProject:()=>false,
+    currentColumnWorkflowView:()=> 'research',workingResearchNote:()=>null,workflowPaneIsVisible:()=>true,workspaceColumnsRequireProject:()=>false,
     readerShortcuts:{activeReaderPaneID:()=> 'reader:active'},
     resolveReaderSource:async item=>({...item,__activeCodeSourceContext:{}}),activeCodeSourcesController:{isCurrent:()=>true},
     searchResultDetail:item=>item,readerFieldsForSectionDetail:(d,o)=>({...d,...o}),normalizeAnnotationBlockID:v=>v||'',
@@ -30,7 +30,7 @@ function fixture() {
     showWebNotice:async()=>{},sectionDetailsBySearch:()=>details,sectionDetailAnchorsBySearch:()=>anchors,
     searchWords,searchWordPattern
   });
-  vm.runInContext(['reusableSearchReader','openSourceInReader','openSearchResultDetail','openSavedItemInReader',
+  vm.runInContext(['prepareReaderSourceTab','reusableSearchReader','openSourceInReader','openSearchResultDetail','openSavedItemInReader',
     'retireEvidenceDetailLayout','searchDetailPassageBlock','openProjectSavedSection','readerPositionLabel'].map(actual).join('\n'),c);
   return {c,search,readers,reveals,details,anchors,changeAccount(){account++;}};
 }
@@ -128,8 +128,7 @@ assert.doesNotMatch(actual('defaultActivePaneIDs'), /ids\.push\(paneIDForSection
 console.log('Direct Reader evidence passed: Search-owned Reader reuse, exact editions/passages, explicit new columns, stale navigation fences and data-preserving layout retirement.');
 
 
-// Notebook owns one Reader: Evidence adds a fresh tab instead of changing an
-// existing tab. A full Reader stays intact and requires an explicit close.
+// Notebook owns one Reader with the six most recently opened source tabs.
 {
  const f=fixture();f.c.currentColumnWorkflowView=()=> 'notebook';
  const reader=f.readers[0];Object.assign(reader,{codePrefix:'BC',scrollPosition:{sectionID:'old',anchorOffset:-87}});initializeReaderTabs(reader);
@@ -142,8 +141,10 @@ console.log('Direct Reader evidence passed: Search-owned Reader reuse, exact edi
  assert.equal(readerTabs(reader).find(tab=>tab.id===firstTab).sectionID,'evidence-one');assert.equal(readerTabs(reader).find(tab=>tab.id===firstTab).codeVersion,'2014');
  assert.deepEqual(readerTabs(reader).find(tab=>tab.id===originalTab.id),originalTab);assert.equal(JSON.stringify(f.readers[1]),other);
  for(const [index,prefix] of ['MC','FGC','ECC'].entries())addReaderTab(reader,{codePrefix:prefix,codeVersion:'2022',sectionID:`section-${index}`,scrollPosition:{sectionID:`section-${index}`,anchorOffset:-100-index}},`code-${index}`);
- const preserved=JSON.stringify(f.readers);let notices=0;f.c.showWebNotice=async()=>notices++;
- assert.equal(await f.c.openSavedItemInReader(item('seventh'),'utility:saved:list'),null);assert.equal(notices,1);assert.equal(JSON.stringify(f.readers),preserved);
+ const priorTabs=readerTabs(reader);let notices=0;f.c.showWebNotice=async()=>notices++;
+ assert.equal(await f.c.openSavedItemInReader(item('seventh'),'utility:saved:list'),reader);assert.equal(notices,0);
+ assert.equal(readerTabs(reader).length,6);assert.equal(readerTabs(reader)[0].sectionID,'seventh');
+ assert.deepEqual(readerTabs(reader).slice(1),priorTabs.slice(0,5));assert.equal(JSON.stringify(f.readers[1]),other);
 }
 {
  const f=fixture();f.c.currentColumnWorkflowView=()=> 'notebook';
@@ -153,4 +154,4 @@ console.log('Direct Reader evidence passed: Search-owned Reader reuse, exact edi
  const two=await f.c.openProjectSavedSection({id:'project'},item('next-project-evidence'),'utility:saved:list');
  assert.equal(one.id,two.id);assert.equal(f.readers.length,2);assert.equal(readerTabs(one).find(tab=>tab.id===firstTab).sectionID,'project-evidence');
 }
-console.log('Notebook Evidence passed: one Reader, new tabs for saved passages, exact editions/positions preserved and full-capacity protection.');
+console.log('Notebook Evidence passed: one Reader, new sources first, exact editions/positions preserved, and oldest-tab retirement at capacity.');

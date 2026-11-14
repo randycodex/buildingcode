@@ -50,6 +50,21 @@ export function addReaderTab(reader, session, id = crypto.randomUUID()) {
   return id;
 }
 
+// Notebook keeps a short source history: reopen exact sources at the front,
+// preserve their sessions, and retire only the least recently opened tabs.
+export function openRecentReaderTab(reader, session, id) {
+  initializeReaderTabs(reader);
+  const tabs = readerTabs(reader);
+  const matches = tab => tab.codePrefix === session.codePrefix && tab.codeVersion === session.codeVersion &&
+    String(tab.sectionID || '') === String(session.sectionID || '') &&
+    (Boolean(session.sectionID) || String(tab.chapterID || '') === String(session.chapterID || ''));
+  const existing = tabs.find(matches);
+  const next = existing || readerTabSnapshot(session, id || crypto.randomUUID());
+  reader.tabs = [next, ...tabs.filter(tab => tab.id !== next.id && !matches(tab))].slice(0, maximumReaderTabs);
+  activateReaderTab(reader, next.id);
+  return next.id;
+}
+
 export function removeReaderTab(reader, tabID) {
   initializeReaderTabs(reader);
   const tabs = readerTabs(reader), index = tabs.findIndex(tab => tab.id === tabID);
