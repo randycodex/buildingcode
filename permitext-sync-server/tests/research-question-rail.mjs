@@ -42,5 +42,25 @@ try {
     const previous=attachResearchQuestionRail({root,divider,widthStore:{read:()=>saved}});
     assert.equal(styles['--rv2-rail-width'],`${expected}px`,'Old saved preferences respect the new bounds.');previous.dispose();
   }
+  const toggleHandlers=new Map(),toggleAttrs={},collapsedWrites=[],widthWrites=[];
+  const toggle={setAttribute:(key,value)=>toggleAttrs[key]=value,focus(){},
+    addEventListener:(type,handler)=>toggleHandlers.set(type,handler),removeEventListener:type=>toggleHandlers.delete(type)};
+  const stores={widthStore:{read:()=>270,write:value=>widthWrites.push(value)},
+    collapsedStore:{read:()=>collapsedWrites.at(-1)===true,write:value=>collapsedWrites.push(value)}};
+  const collapsible=attachResearchQuestionRail({root,divider,toggle,...stores});
+  assert.equal(toggleAttrs['aria-expanded'],'true');
+  toggleHandlers.get('click')();
+  assert.equal(styles['--rv2-rail-width'],'35px');assert.equal(divider.tabIndex,-1);
+  assert.equal(toggleAttrs['aria-label'],'Show conversations list');
+  assert.equal(fire('pointerdown'),false);assert.equal(fire('keydown',{key:'End'}),false);
+  assert.deepEqual(widthWrites,[],'Collapsing and the disabled divider never replace the expanded width.');
+  toggleHandlers.get('click')();
+  assert.equal(styles['--rv2-rail-width'],'270px');assert.equal(divider.tabIndex,0);
+  toggleHandlers.get('click')();collapsible.dispose();
+  assert.equal(toggleHandlers.size,0);
+  const collapsedRestored=attachResearchQuestionRail({root,divider,toggle,...stores});
+  assert.equal(styles['--rv2-rail-width'],'35px','A remounted conversation retains the collapsed list.');
+  toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'270px');
+  collapsedRestored.dispose();
 } finally {delete globalThis.matchMedia;delete globalThis.ResizeObserver;}
 console.log('Research question rail passed: drag/capture, keyboard, bounds, live sizing, local preference, outer resize, cancel, mobile isolation and disposal.');

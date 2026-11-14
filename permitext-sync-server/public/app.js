@@ -4,8 +4,8 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, open
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=35";
-import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=5";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=36";
+import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=6";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1796";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1797";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1796";
+} from "./offline-storage.js?v=20261113-research-notebook-v1797";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -27405,6 +27405,9 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     view = createResearchV2View({ conversation,revealAnswerID:retained.revealAnswerID,historyManagement,
       historyGroups:researchConversationHistoryGroups,historyTitle:researchConversationTitle,
       railWidthStore:{read:()=>localStorage.getItem(railWidthKey),write:width=>{if(ownsPanel())localStorage.setItem(railWidthKey,String(width));}},
+      railCollapsedStore:{read:()=>localStorage.getItem(`${railWidthKey}:collapsed`)==='true',
+        write:collapsed=>{if(ownsPanel())localStorage.setItem(`${railWidthKey}:collapsed`,String(collapsed));}},
+      renderHistoryToggle:(button,collapsed)=>prependWorkspaceButtonIcon(button,collapsed?'panel-left-open':'panel-left-close'),
       history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
       hasMore:listed.hasMore,
@@ -27549,7 +27552,8 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     const nextRail = content.querySelector(".rv2-rail");
     if (nextRail) {
       nextRail.scrollTop = historyScroll;
-      if (historyFocused) nextRail.querySelector('[aria-current="page"]')?.focus({preventScroll:true});
+      if (historyFocused) (nextRail.querySelector('.rv2-history-toggle[aria-expanded="false"]') ||
+        nextRail.querySelector('[aria-current="page"]'))?.focus({preventScroll:true});
     }
     // Switching an already mounted pane needs only the authoritative conversation
     // read performed by openResearchConversation. Keep its header and shell.

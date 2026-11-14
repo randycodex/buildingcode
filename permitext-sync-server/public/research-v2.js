@@ -1,4 +1,4 @@
-import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=5";
+import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=6";
 import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
 import {researchInlineRuns} from "./research-inline-format.js?v=1";
 // A small view with injected workspace/Reader adapters. No provider calls or
@@ -117,11 +117,15 @@ export function createResearchV2View(options) {
     catch(error){if(isCurrent()&&root.isConnected)notice(error.message||'Could not start Research',true);}
     finally{chatTransitionPending=false;if(isCurrent()&&root.isConnected)update();}
   },'rv2-new-chat') : null;
-  if(newChat)rail.append(newChat);
+  const historyTop=node('div','rv2-rail-top-row');
+  if(newChat)historyTop.append(newChat);
+  const historyToggle=action('',null,'icon-button rv2-history-toggle');
+  historyTop.append(historyToggle);rail.append(historyTop);
   rail.append(list);
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
   const divider=node('div','rv2-rail-divider');
-  const questionRail=attachResearchQuestionRail({root,divider,widthStore:options.railWidthStore});
+  const questionRail=attachResearchQuestionRail({root,divider,toggle:historyToggle,widthStore:options.railWidthStore,
+    collapsedStore:options.railCollapsedStore,onCollapse:collapsed=>options.renderHistoryToggle?.(historyToggle,collapsed)});
   const chat=node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');
   const mobileHistory=action('Questions',()=>{const expanded=root.classList.toggle('rv2-show-history');mobileHistory.setAttribute('aria-expanded',String(expanded));},'rv2-mobile-history');
   mobileHistory.setAttribute('aria-expanded','false');

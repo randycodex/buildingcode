@@ -1,18 +1,31 @@
 const minimum = 200, maximumWidth = 350, initial = 320, chatMinimum = 320;
 
-export function attachResearchQuestionRail({root, divider, widthStore}) {
+export function attachResearchQuestionRail({root, divider, widthStore, toggle, collapsedStore, onCollapse}) {
   let preferred = initial;
   try { const saved = Number(widthStore?.read()); if (Number.isFinite(saved) && saved > 0) preferred = Math.max(minimum, Math.min(saved, maximumWidth)); } catch {}
+  let collapsed = false;
+  try { collapsed = collapsedStore?.read() === true; } catch {}
   let drag = null, disposed = false;
   const narrow = () => typeof matchMedia === 'function' && matchMedia('(max-width:680px)').matches;
   const maximum = () => root.clientWidth > 0 ? Math.min(maximumWidth, Math.max(minimum, root.clientWidth - chatMinimum - 1)) : maximumWidth;
   const clamp = value => Math.max(minimum, Math.min(value, maximum()));
   const apply = () => {
-    if (disposed || narrow()) return;
-    const width = clamp(preferred);
+    if (disposed) return;
+    root.classList.toggle('is-history-collapsed', collapsed);
+    if (toggle) {
+      const label = collapsed ? 'Show conversations list' : 'Hide conversations list';
+      toggle.setAttribute('aria-label', label);
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+      toggle.title = label;
+    }
+    divider.tabIndex = collapsed ? -1 : 0;
+    divider.setAttribute('aria-disabled', String(collapsed));
+    onCollapse?.(collapsed);
+    if (narrow()) return;
+    const width = collapsed ? 35 : clamp(preferred);
     root.style.setProperty('--rv2-rail-width', `${width}px`);
-    divider.setAttribute('aria-valuemin', String(minimum));
-    divider.setAttribute('aria-valuemax', String(Math.floor(maximum())));
+    divider.setAttribute('aria-valuemin', String(collapsed ? 35 : minimum));
+    divider.setAttribute('aria-valuemax', String(collapsed ? 35 : Math.floor(maximum())));
     divider.setAttribute('aria-valuenow', String(Math.round(width)));
     divider.setAttribute('aria-valuetext', `Questions width ${Math.round(width)} pixels`);
   };
@@ -27,7 +40,7 @@ export function attachResearchQuestionRail({root, divider, widthStore}) {
     if (divider.hasPointerCapture?.(previous.id)) divider.releasePointerCapture(previous.id);
   };
   const down = event => {
-    if (disposed || narrow() || event.isPrimary === false || event.button !== 0 || drag) return;
+    if (disposed || collapsed || narrow() || event.isPrimary === false || event.button !== 0 || drag) return;
     event.preventDefault();
     event.stopPropagation();
     drag = {id:event.pointerId, x:event.clientX, width:clamp(preferred), preferred};
@@ -43,7 +56,7 @@ export function attachResearchQuestionRail({root, divider, widthStore}) {
   const cancel = event => { if (drag?.id === event.pointerId) finish(true); };
   const lost = event => { if (drag?.id === event.pointerId) finish(); };
   const key = event => {
-    if (disposed || narrow()) return;
+    if (disposed || collapsed || narrow()) return;
     if (event.key === 'Escape' && drag) { event.preventDefault(); finish(true); return; }
     const step = event.shiftKey ? 80 : 24;
     const width = clamp(preferred);
@@ -60,6 +73,15 @@ export function attachResearchQuestionRail({root, divider, widthStore}) {
   divider.setAttribute('aria-label', 'Resize Questions and chat');
   divider.setAttribute('aria-orientation', 'vertical');
   divider.tabIndex = 0;
+  const toggleHistory = () => {
+    if (disposed || narrow()) return;
+    finish(true);
+    collapsed = !collapsed;
+    apply();
+    try { collapsedStore?.write(collapsed); } catch {}
+    toggle?.focus({preventScroll:true});
+  };
+  toggle?.addEventListener('click', toggleHistory);
   for (const [type, handler] of Object.entries({pointerdown:down,pointermove:move,pointerup:up,pointercancel:cancel,lostpointercapture:lost,keydown:key})) divider.addEventListener(type, handler);
   const resize = new ResizeObserver(apply);
   resize.observe(root);
@@ -68,6 +90,7 @@ export function attachResearchQuestionRail({root, divider, widthStore}) {
     disposed = true;
     finish(true);
     resize.disconnect();
+    toggle?.removeEventListener('click', toggleHistory);
     for (const [type, handler] of Object.entries({pointerdown:down,pointermove:move,pointerup:up,pointercancel:cancel,lostpointercapture:lost,keydown:key})) divider.removeEventListener(type, handler);
   }};
 }
