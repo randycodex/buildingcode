@@ -21631,6 +21631,9 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .notebook-panel[data-notebook-sized] .notebook-format-toolbar { max-width: 100%; flex-wrap: wrap; }
 .notebook-panel[data-notebook-sized] .bn-inline-content { overflow-wrap: anywhere; }
 
+@media (pointer: fine) {
+  .workspace-shell > :is(.topbar, .workflow-toolbar) button { --workspace-menu-height: 20px; height: 20px; min-height: 20px; padding-block: 0; line-height: 18px; }
+}
 .research-note-destination { display: flex; align-items: center; min-width: 0; margin-left: auto; }
 .research-note-destination::before { content: ""; flex: 0 0 1px; height: 14px; margin-inline: 4px; background: var(--text-secondary); opacity: .55; }
 .research-note-destination[hidden] { display: none; }
