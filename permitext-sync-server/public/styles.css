@@ -1285,6 +1285,7 @@ textarea:focus-visible {
 }
 
 .notebook-index-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -1322,39 +1323,15 @@ textarea:focus-visible {
   flex: 0 0 auto; display: flex; align-items: center; gap: 4px; margin-inline: auto -8px; padding: 0;
 }
 .notebook-index-panel[data-notebook-list-collapsed="true"] { position: relative; z-index: 2; padding-inline: 0; overflow: visible; }
-.notebook-index-panel[data-notebook-list-collapsed="true"] > .panel-header .notebook-shared-label {
-  flex: 0 0 auto; width: max-content; margin-inline-start: var(--panel-padding);
-}
 .notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-body { padding-inline: 0; overflow: hidden; }
 .notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-body > :not(.notebook-index-top-row),
 .notebook-index-panel[data-notebook-list-collapsed="true"] :is(.notebook-index-create, .notebook-index-menu-button) { display: none; }
 .notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-top-row { gap: 0; }
 .notebook-index-panel[data-notebook-list-collapsed="true"] .notebook-index-actions { width: 100%; margin-inline: 0; justify-content: center; }
 
-/* Animate layout snapshots while keeping the live editor and its history.
-   Title, text and toggle move independently so letters never stretch. */
-.notes-list-motion .notebook-panel:not(.is-workflow-hidden) { view-transition-name: notes-panel; }
-.notes-list-motion .notebook-panel:not(.is-workflow-hidden) .notebook-title-control { view-transition-name: notes-title; }
-.notes-list-motion .notebook-panel:not(.is-workflow-hidden) .notebook-editor-surface { view-transition-name: notes-editor; }
-.notes-list-motion .notebook-index-panel:not(.is-workflow-hidden) { view-transition-name: notes-list; }
-.notes-list-motion .notebook-index-panel:not(.is-workflow-hidden) .notebook-shared-label { view-transition-name: notes-label; }
-.notes-list-motion .notebook-list-toggle { view-transition-name: notes-toggle; }
-.notes-list-motion::view-transition { pointer-events: none; }
-.notes-list-motion::view-transition-old(root), .notes-list-motion::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-.notes-list-motion::view-transition-old(notes-label), .notes-list-motion::view-transition-old(notes-title) { display: none; }
-.notes-list-motion::view-transition-new(notes-label), .notes-list-motion::view-transition-new(notes-title) { animation: none; mix-blend-mode: normal; }
-.notes-list-motion::view-transition-group(notes-panel),
-.notes-list-motion::view-transition-group(notes-title),
-.notes-list-motion::view-transition-group(notes-editor),
-.notes-list-motion::view-transition-group(notes-toggle),
-.notes-list-motion::view-transition-group(notes-label),
-.notes-list-motion::view-transition-group(notes-list) {
-  animation-duration: 260ms; animation-timing-function: cubic-bezier(.2, 0, 0, 1);
-}
-.notes-list-motion::view-transition-old(notes-list) { animation: notes-list-out 200ms ease both; }
-.notes-list-motion::view-transition-new(notes-list) { animation: notes-list-in 260ms ease both; }
-@keyframes notes-list-out { to { opacity: 0; transform: translateX(-12px); } }
-@keyframes notes-list-in { from { opacity: 0; transform: translateX(-12px); } }
+/* Resize the live columns; the heading stays painted at its usual inset. */
+.notes-list-motion .notebook-index-panel { position: relative; z-index: 2; overflow: visible; }
+.notes-list-motion .notebook-index-body { overflow: hidden; }
 .notebook-list-toggle .workspace-button-icon { width: 16px; height: 16px; }
 .notebook-list-toggle:hover { background: var(--menu-highlight); color: var(--text-primary); }
 .notebook-list-toggle:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
@@ -1365,7 +1342,17 @@ textarea:focus-visible {
   content: ""; position: absolute; left: calc(-1 * var(--panel-padding)); right: calc(-1 * var(--panel-padding));
   bottom: calc(-1 * var(--space-3)); height: 1px; background: var(--border); pointer-events: none;
 }
-.panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel[data-notebook-list-collapsed="true"] > .notebook-shared-header::after { left: 0; right: 0; }
+.panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel > .notebook-shared-header { position: static; }
+.panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel > .notebook-shared-header::after { display: none; }
+.panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel .notebook-shared-label {
+  position: absolute; left: var(--panel-padding); top: var(--panel-padding);
+  width: max-content; height: var(--panel-title-row-height);
+}
+.panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel::before {
+  content: ""; position: absolute; left: 0; right: 0;
+  top: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
+  height: 1px; background: var(--border); pointer-events: none;
+}
 .panel-track[data-notebook-column-sizing="fit"]:has(> .notebook-index-panel:not(.is-workflow-hidden)) > .notebook-panel .notebook-shared-label {
   visibility: hidden;
 }

@@ -34,7 +34,7 @@ let view = 'notebook', allowed = true, saves = 0, transitions = 0;
 const context = vm.createContext({
   state, document:{createElement:tag => new Element(tag), querySelector:() => null},
   // Deferred panels are built before they belong to the workspace track.
-  track:{querySelector:() => null}, applyPaneWeight() {},
+  track:{querySelector:() => null,querySelectorAll:()=>[]}, applyPaneWeight() {},
   workspacePrivatePresentationAllowed:() => allowed, hasCapability:() => allowed,
   workspaceProject:() => project, projectDetailKey:value => value?.id || '',
   captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',
@@ -99,30 +99,46 @@ sizing.applyPaneWeight(rail,indexID);
 assert.equal(rail.style.flex,'0 0 280px','Reopening restores the preferred width.');
 assert.equal(rail.dataset.notebookListCollapsed,'false');
 
-let reducedMotion = false, updates = 0, starts = 0, skipped = 0;
-const motionClasses = new Set(), releases = [];
-const motion = vm.createContext({track:{},window:{matchMedia:()=>({matches:reducedMotion})},
+let reducedMotion = false, updates = 0, cancelled = 0;
+let widths=[280,1000],padding='24px';
+const motionClasses = new Set(), motions = [];
+function animate(frames,options) {
+  let finish,reject;
+  const finished=new Promise((resolve,fail)=>{finish=resolve;reject=fail;});
+  motions.push({frames,options,finish});
+  return {finished,cancel(){cancelled++;reject(Error('Animation interrupted'));}};
+}
+const livePanels=[0,1].map(index=>({isConnected:true,index,animate,getBoundingClientRect:()=>({width:widths[index]})}));
+const motion = vm.createContext({track:{querySelectorAll:()=>livePanels},
+  window:{matchMedia:()=>({matches:reducedMotion})},
+  getComputedStyle:element=>({paddingInlineStart:element.index===0?padding:'24px',paddingInlineEnd:element.index===0?padding:'24px'}),
   document:{documentElement:{classList:{add:name=>motionClasses.add(name),remove:name=>motionClasses.delete(name)}},
-    startViewTransition(update) {
-      starts++;
-      let finish;
-      const finished=new Promise(resolve=>{finish=resolve;}); releases.push(finish);
-      return {ready:Promise.resolve(),updateCallbackDone:Promise.resolve().then(update),finished,
-        skipTransition(){skipped++;finish();}};
-    }}});
+    startViewTransition(){assert.fail('The live heading must never be replaced with a snapshot.');}}});
 vm.runInContext(actual('transitionNotebookList'),motion);
-const firstMotion = motion.transitionNotebookList(()=>{updates++;});
-const secondMotion = motion.transitionNotebookList(()=>{updates++;});
+const firstMotion = motion.transitionNotebookList(()=>{updates++;widths=[35,1245];padding='0px';});
+await Promise.resolve();
+assert.equal(motions.length,2,'Only the two live columns animate; the heading stays anchored.');
+assert.equal(motions[0].frames[0].flexBasis,'280px');assert.equal(motions[0].frames[1].flexBasis,'35px');
+// A quick reversal starts from the pixels currently on screen, before the
+// previous animation is cancelled back to its underlying final geometry.
+widths=[150,1130];padding='11px';
+const secondMotion = motion.transitionNotebookList(()=>{updates++;widths=[280,1000];padding='24px';});
 await firstMotion;
-assert.equal(skipped,1,'A quick second toggle interrupts the earlier motion.');
+assert.equal(cancelled,2,'A quick second toggle interrupts the earlier live motion.');
 assert(motionClasses.has('notes-list-motion'),'An older completion cannot clear the newer transition.');
-releases[1](); await secondMotion;
+assert.equal(motions[2].frames[0].flexBasis,'150px');
+motions.slice(2).forEach(animation=>animation.finish());await secondMotion;
 assert.equal(updates,2);assert.equal(motionClasses.size,0);
+assert(motions.every(animation=>animation.options.duration===260&&animation.frames.every(frame=>!('opacity' in frame)&&!('transform' in frame))),
+  'Live titles retain full opacity and their font size throughout the resize.');
 reducedMotion=true;
 await motion.transitionNotebookList(()=>{updates++;});
-assert.equal(starts,2,'Reduced motion changes visibility without starting an animation.');
+assert.equal(motions.length,4,'Reduced motion changes visibility without starting an animation.');
 assert.equal(updates,3);
-console.log('Notes rail passed: 35px collapse, retained expanded width during resizing, reopening, interrupted transitions and reduced motion.');
+reducedMotion=false;
+await assert.rejects(motion.transitionNotebookList(()=>{throw Error('Update failed');}),/Update failed/);
+assert.equal(motionClasses.size,0,'A failed update cannot leave motion styles active.');
+console.log('Notes rail passed: 35px collapse, retained width, live titles without snapshots/fades, interrupted transitions, cleanup and reduced motion.');
 
 // Notebook is a permanent writing area, including older saved layouts that
 // closed it and the transition after its last active Note moves to Trash.

@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1797";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1799";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1797";
+} from "./offline-storage.js?v=20261113-research-notebook-v1799";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3252,24 +3252,48 @@ function syncNotebookListControls() {
 }
 
 async function transitionNotebookList(update) {
-  track._notebookListTransition?.skipTransition();
-  if (typeof document.startViewTransition !== 'function' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const previous = track._notebookListTransition;
+  const before = [...track.querySelectorAll('.notebook-index-panel:not(.is-workflow-hidden), .notebook-panel:not(.is-workflow-hidden)')].map(panel => {
+    const style = getComputedStyle(panel);
+    return {panel, width: panel.getBoundingClientRect().width,
+      paddingInlineStart: style.paddingInlineStart, paddingInlineEnd: style.paddingInlineEnd};
+  });
+  if (!before.length || !before.every(({panel}) => typeof panel.animate === 'function') ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    previous?.skipTransition();
     await update();
     return;
   }
   const root = document.documentElement;
-  root.classList.add('notes-list-motion');
-  const transition = document.startViewTransition(update);
+  const animations = [];
+  const transition = {skipTransition: () => animations.forEach(animation => animation.cancel())};
   track._notebookListTransition = transition;
-  const finish = () => {
-    if (track._notebookListTransition !== transition) return;
-    delete track._notebookListTransition;
-    root.classList.remove('notes-list-motion');
+  previous?.skipTransition();
+  root.classList.add('notes-list-motion');
+  const animate = (element, frames) => {
+    const animation = element.animate(frames, {duration:260, easing:'cubic-bezier(.2, 0, 0, 1)'});
+    // Retargeting a quick second toggle cancels the earlier live animation.
+    animation.finished.catch(() => {});
+    animations.push(animation);
   };
-  transition.ready.catch(() => {}); // Interrupted transitions still commit their update.
-  transition.finished.then(finish, finish);
-  await transition.updateCallbackDone;
-  await transition.finished.catch(() => {});
+  try {
+    await update();
+    if (track._notebookListTransition !== transition) return;
+    before.forEach(({panel, width, paddingInlineStart, paddingInlineEnd}) => {
+      if (!panel.isConnected) return;
+      const style = getComputedStyle(panel);
+      animate(panel, [
+        {flexBasis:`${width}px`, paddingInlineStart, paddingInlineEnd},
+        {flexBasis:`${panel.getBoundingClientRect().width}px`, paddingInlineStart:style.paddingInlineStart, paddingInlineEnd:style.paddingInlineEnd}
+      ]);
+    });
+    await Promise.allSettled(animations.map(animation => animation.finished));
+  } finally {
+    if (track._notebookListTransition === transition) {
+      delete track._notebookListTransition;
+      root.classList.remove('notes-list-motion');
+    }
+  }
 }
 
 async function toggleNotebookList() {
