@@ -130,7 +130,7 @@ panes.clear();state.paneWeights={};
 const noteListID='project:notes-index:one',editorID='project:notebook:one';
 for(const [id,width] of [['reader:one',810],[evidenceID,450],[noteListID,220],[editorID,1500]])
  panes.set(id,{dataset:{paneId:id},width,getBoundingClientRect(){return {width:this.width};}});
-track._notebookColumnLayout={resizeMinimums:{[editorID]:836}};
+track._notebookColumnLayout={resizeMinimums:{[editorID]:800}};
 const evidenceNotes=context.createDivider(evidenceID,noteListID);
 press(evidenceNotes,'ArrowRight',true);
 assert.deepEqual(widths(),[810,530,220,1420]);
@@ -139,9 +139,15 @@ press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,600,220,13
 const notesEditor=context.createDivider(noteListID,editorID);
 press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,600,300,1270]);
 press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,600,350,1220]);
+const readerEvidence=context.createDivider('reader:one',evidenceID);
+press(readerEvidence,'ArrowRight',true);assert.deepEqual(widths(),[890,600,350,1140]);
+context.resizeAdjacentPanesBy('reader:one',evidenceID,10000,readerEvidence);
+assert.deepEqual(widths(),[1230,600,350,800],'Reader stops at the 800px notepad without resizing either list.');
+press(readerEvidence,'ArrowRight',true);assert.deepEqual(widths(),[1230,600,350,800]);
+panes.get('reader:one').width=810;
 panes.get(evidenceID).width=450;panes.get(editorID).width=850;
-press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,464,350,836]);
-press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,464,350,836],'The writing minimum stops growth without squeezing another column.');
+press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,500,350,800]);
+press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,500,350,800],'The writing minimum stops growth without squeezing another column.');
 panes.delete('reader:one');panes.get(evidenceID).width=400;panes.get(editorID).width=1200;
 const notebookEdge=context.createDivider('',evidenceID);
 press(notebookEdge,'ArrowLeft',true);assert.deepEqual(widths(),[480,350,1120]);

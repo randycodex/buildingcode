@@ -18,6 +18,10 @@ for(const missing of ['reader','evidence','notes']) {
  assert.ok(sizes[visible.findIndex(column=>column.kind==='editor')]>wide[3],'Closing a reference column gives its space to the editor');
 }
 assert.deepEqual(notebookColumnsLayout([{kind:'reader',collapsed:true},{kind:'editor'}],1920,3),[48,1869]);
+assert.deepEqual(notebookColumnsLayout([
+ {kind:'reader',preferredWidth:1349},{kind:'evidence',preferredWidth:550},
+ {kind:'notes',preferredWidth:350},{kind:'editor',preferredWidth:800}
+],3054,5),[1349,550,350,800],'A manually widened Reader survives fitting with both lists fixed and an 800px notepad.');
 assert.equal(columns[1].preferredWidth,600,'Fitting does not overwrite saved width preferences');
 console.log('Notebook fitting passed: four visible columns, responsive widths, remaining editor space, hidden columns, collapsed rails and unchanged preferences.');
 
@@ -54,7 +58,7 @@ console.log('Notebook fitting passed: four visible columns, responsive widths, r
   getComputedStyle:()=>({paddingLeft:'1px',paddingRight:'1px',getPropertyValue:()=> '800px'}),defaultPaneWidthForID:()=>600,applyPaneWeight(){}});
  vm.runInContext(['syncNotebookColumnLayout','minimumPaneWidthForID','maximumPaneWidthForID'].map(actual).join('\n'),context);
  context.syncNotebookColumnLayout(panels);
- assert.equal(context.maximumPaneWidthForID(ids[0]),350);assert.equal(context.minimumPaneWidthForID(ids[0]),200);assert.equal(context.minimumPaneWidthForID(ids[1]),836);
+ assert.equal(context.maximumPaneWidthForID(ids[0]),350);assert.equal(context.minimumPaneWidthForID(ids[0]),200);assert.equal(context.minimumPaneWidthForID(ids[1]),800);
  state.paneWeights[ids[0]]=1081;context.syncNotebookColumnLayout(panels);
  assert.equal(panels[0].style.flex,'0 0 350px');assert.equal(panels[1].style.flex,'0 0 1567px');
  assert.equal(context.maximumPaneWidthForID(ids[0]),350,'The resize limit remains stable at 350px.');

@@ -63,7 +63,7 @@ export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0)
   }
   const editor = columns.findIndex(column => column.kind === 'editor' && !column.collapsed);
   const widths = columns.map((column, index) => column.collapsed ? 48 : column.kind === 'editor' ? minimums[index] :
-    Math.max(minimums[index], Math.min({reader:900, evidence:600, notes:350}[column.kind] || 360,
+    Math.max(minimums[index], Math.min({reader:Infinity, evidence:600, notes:350}[column.kind] || 360,
       Number(column.preferredWidth) || {reader:630, evidence:300, notes:220}[column.kind] || 300)));
   const requested = widths.reduce((sum, width) => sum + width, 0);
   if (requested > available) {

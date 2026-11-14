@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1770";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1771";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -45,7 +45,7 @@ import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarg
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=18";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=19";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261113-project-picker-v9";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1770";
+} from "./offline-storage.js?v=20261113-research-notebook-v1771";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -5621,6 +5621,8 @@ function minimumPaneWidthForID(paneID) {
 }
 
 function maximumPaneWidthForID(paneID) {
+  if (paneID?.startsWith('reader:') && currentColumnWorkflowView() === 'notebook')
+    return (typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMaximums?.[paneID]) ?? Infinity;
   if (paneID?.startsWith('project:notes-index:')) return Math.min(350, (typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMaximums?.[paneID]) ?? 350);
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 600;
   if (!/^utility:search(?::|$)/.test(paneID || "")) return Infinity;
@@ -6908,18 +6910,16 @@ function syncNotebookColumnLayout(panels) {
     panel.style.maxWidth = 'none';
     panel.style.flex = `0 0 ${widths[index]}px`;
   });
-  // Resizing may consume the editor's unused margins, while preserving the
-  // width its title, toolbar and text currently use for writing.
+  // Reference columns may use spare notepad width down to its 800px writing
+  // area. A compact viewport retains the width the notepad already has.
   const editorIndex = columns.findIndex(column => column.kind === 'editor' && !column.collapsed);
   const resizeMinimums = {}, resizeMaximums = {};
   if (editorIndex >= 0) {
-    const editor = visible[editorIndex], focus = editor.querySelector?.('.notebook-focus');
-    const focusStyle = focus && getComputedStyle(focus);
-    const textWidth = parseFloat(padding.getPropertyValue?.('--workspace-content-max-width')) || 800;
-    const gutters = (parseFloat(focusStyle?.paddingLeft) || 18) + (parseFloat(focusStyle?.paddingRight) || 18);
-    const writingWidth = Math.min(widths[editorIndex], textWidth + gutters);
+    const editor = visible[editorIndex];
+    const writingWidth = Math.min(widths[editorIndex], 800);
     resizeMinimums[editor.dataset.paneId] = writingWidth;
     columns.forEach((column, index) => {
+      if (column.kind === 'reader') resizeMaximums[visible[index].dataset.paneId] = widths[index] + widths[editorIndex] - writingWidth;
       if (column.kind === 'notes') resizeMaximums[visible[index].dataset.paneId] = Math.min(350, widths[index] + widths[editorIndex] - writingWidth);
     });
   }
@@ -44863,7 +44863,7 @@ function capturePaneResizeWidths() {
 
 function notebookReferenceResize(panes, previousPaneID, nextPaneID, delta) {
   if (currentColumnWorkflowView() !== 'notebook') return null;
-  const reference = id => /^(?:utility:saved(?::|$)|project:notes-index:)/.test(id || '');
+  const reference = id => /^(?:reader:|utility:saved(?::|$)|project:notes-index:)/.test(id || '');
   const targetID = reference(previousPaneID) ? previousPaneID : reference(nextPaneID) ? nextPaneID : '';
   const targetIndex = panes.findIndex(pane => pane.id === targetID);
   const editorIndex = panes.findIndex(pane => pane.id.startsWith('project:notebook:'));
