@@ -20965,7 +20965,7 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
   padding: 0 var(--report-column-header-inset, 20px); margin: 0; box-sizing: border-box;
   border-bottom: 1px solid var(--border);
 }
-.report-outline-header, .report-versions-header { border-bottom: 0; }
+.report-library-header, .report-outline-header, .report-versions-header { border-bottom: 0; }
 .report-pdf-preview-panel .report-export-inline > header h2 { font-size: 13px; }
 .report-pdf-preview-panel .report-export-close { font-size: 12px; padding: 4px 0; color: var(--text-secondary); }
 .report-pdf-preview-panel .report-export-status { font-size: 12px; margin: 0; padding: 12px 20px; }
