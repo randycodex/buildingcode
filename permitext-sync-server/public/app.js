@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1769";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1770";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1769";
+} from "./offline-storage.js?v=20261113-research-notebook-v1770";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -44861,6 +44861,24 @@ function capturePaneResizeWidths() {
   return panes;
 }
 
+function notebookReferenceResize(panes, previousPaneID, nextPaneID, delta) {
+  if (currentColumnWorkflowView() !== 'notebook') return null;
+  const reference = id => /^(?:utility:saved(?::|$)|project:notes-index:)/.test(id || '');
+  const targetID = reference(previousPaneID) ? previousPaneID : reference(nextPaneID) ? nextPaneID : '';
+  const targetIndex = panes.findIndex(pane => pane.id === targetID);
+  const editorIndex = panes.findIndex(pane => pane.id.startsWith('project:notebook:'));
+  if (targetIndex < 0 || editorIndex < 0) return null;
+  const widths = panes.map(pane => pane.startWidth);
+  const editorID = panes[editorIndex].id;
+  // Reference columns borrow only from the writing column. Their shared
+  // divider must never squeeze another reference column to make room.
+  [widths[targetIndex], widths[editorIndex]] = adjacentColumnWidths(
+    widths[targetIndex], widths[editorIndex], targetID === previousPaneID ? delta : -delta,
+    minimumPaneWidthForID(targetID), minimumPaneWidthForID(editorID),
+    maximumPaneWidthForID(targetID), maximumPaneWidthForID(editorID));
+  return {widths, indices: [targetIndex, editorIndex], targetIndex};
+}
+
 function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
   if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID) || assistantHistoryOnlyPane(previousPaneID) || assistantHistoryOnlyPane(nextPaneID)) return;
   const previousPane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(previousPaneID)}"]`);
@@ -44868,18 +44886,28 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
   if (!previousPane || !nextPane) return;
   // Expansion must be restored before measuring the pair, just as it is for
   // pointer resizing. Expanded/strip widths are presentation, not resize bases.
-  capturePaneResizeWidths();
+  const paneData = capturePaneResizeWidths();
   const previousWidth = previousPane.getBoundingClientRect().width;
   const nextWidth = nextPane.getBoundingClientRect().width;
   const scrollLeft = track.scrollLeft;
-  const widths = adjacentColumnWidths(previousWidth, nextWidth, delta,
+  const notebookResize = notebookReferenceResize(paneData, previousPaneID, nextPaneID, delta);
+  const widths = notebookResize ? [
+    notebookResize.widths[paneData.findIndex(pane => pane.id === previousPaneID)],
+    notebookResize.widths[paneData.findIndex(pane => pane.id === nextPaneID)]
+  ] : adjacentColumnWidths(previousWidth, nextWidth, delta,
     minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
     maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID),
     { expandLeft: previousPaneID.startsWith("reader:"), expandRight: nextPaneID.startsWith("reader:") });
-  state.paneWeights[previousPaneID] = widths[0];
-  state.paneWeights[nextPaneID] = widths[1];
-  applyPaneWeight(previousPane, previousPaneID);
-  applyPaneWeight(nextPane, nextPaneID);
+  if (notebookResize) notebookResize.indices.forEach(index => {
+    state.paneWeights[paneData[index].id] = notebookResize.widths[index];
+    applyPaneWeight(paneData[index].pane, paneData[index].id);
+  });
+  else {
+    state.paneWeights[previousPaneID] = widths[0];
+    state.paneWeights[nextPaneID] = widths[1];
+    applyPaneWeight(previousPane, previousPaneID);
+    applyPaneWeight(nextPane, nextPaneID);
+  }
   // Match pointer resizing when one column reaches its minimum width.
   track.scrollLeft = scrollLeft;
   updateAdjacentDividerValue(divider, ...widths);
@@ -45382,13 +45410,14 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
 
   const applyResizeAt = (clientX) => {
     const delta = clientX - startX;
-    const widths = paneData.map((pane) => pane.startWidth);
-    [widths[previousIndex], widths[nextIndex]] = adjacentColumnWidths(
+    const notebookResize = notebookReferenceResize(paneData, previousPaneID, nextPaneID, delta);
+    const widths = notebookResize?.widths || paneData.map((pane) => pane.startWidth);
+    if (!notebookResize) [widths[previousIndex], widths[nextIndex]] = adjacentColumnWidths(
       paneData[previousIndex].startWidth, paneData[nextIndex].startWidth, delta,
       minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
       maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID),
       { expandLeft, expandRight });
-    [previousIndex, nextIndex].forEach((index) => {
+    (notebookResize?.indices || [previousIndex, nextIndex]).forEach((index) => {
       if (Math.abs(widths[index] - lastAppliedWidths[index]) < 0.25) return;
       const pane = paneData[index];
       state.paneWeights[pane.id] = widths[index];
@@ -45483,10 +45512,17 @@ function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
   const currentWidth = pane.getBoundingClientRect().width;
-  capturePaneResizeWidths();
-  const nextWidth = constrainPaneWidth(paneID, currentWidth + delta);
-  state.paneWeights[paneID] = nextWidth;
-  applyPaneWeight(pane, paneID);
+  const paneData = capturePaneResizeWidths();
+  const notebookResize = notebookReferenceResize(paneData, paneID, '', delta);
+  const nextWidth = notebookResize ? notebookResize.widths[notebookResize.targetIndex] : constrainPaneWidth(paneID, currentWidth + delta);
+  if (notebookResize) notebookResize.indices.forEach(index => {
+    state.paneWeights[paneData[index].id] = notebookResize.widths[index];
+    applyPaneWeight(paneData[index].pane, paneData[index].id);
+  });
+  else {
+    state.paneWeights[paneID] = nextWidth;
+    applyPaneWeight(pane, paneID);
+  }
   resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
   resizeHandle?.setAttribute("aria-valuetext", `Column width ${Math.round(nextWidth)} pixels`);
   notifyWorkspaceLayoutChange();
@@ -45510,6 +45546,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   const initialRightOverflow = edgeSide === "right"
     ? Math.max(0, startBounds.right - Math.min(track.getBoundingClientRect().right, window.innerWidth)) : 0;
   let resizeStarted = false;
+  let paneData;
   const isReferenceResize = ["report", "project-details"].includes(currentColumnWorkflowView());
   const edgeAutoResizeThreshold = 32;
   const edgeAutoResizeMaxSpeed = 640;
@@ -45522,10 +45559,18 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
 
   const applyResizeAt = (clientX) => {
     const direction = edgeSide === "left" ? -1 : 1;
-    const nextWidth = constrainPaneWidth(paneID, startWidth + direction * (clientX - startX));
+    const delta = direction * (clientX - startX);
+    const notebookResize = notebookReferenceResize(paneData, paneID, '', delta);
+    const nextWidth = notebookResize ? notebookResize.widths[notebookResize.targetIndex] : constrainPaneWidth(paneID, startWidth + delta);
     if (Math.abs(nextWidth - lastAppliedWidth) < 0.25) return;
-    state.paneWeights[paneID] = nextWidth;
-    applyPaneWeight(pane, paneID);
+    if (notebookResize) notebookResize.indices.forEach(index => {
+      state.paneWeights[paneData[index].id] = notebookResize.widths[index];
+      applyPaneWeight(paneData[index].pane, paneData[index].id);
+    });
+    else {
+      state.paneWeights[paneID] = nextWidth;
+      applyPaneWeight(pane, paneID);
+    }
     syncReferenceReaderLayout();
     resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
     resizeHandle?.setAttribute("aria-valuetext", `Column width ${Math.round(nextWidth)} pixels`);
@@ -45575,7 +45620,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
     if (moveEvent.pointerId !== undefined && moveEvent.pointerId !== event.pointerId) return;
     if (!resizeStarted) {
       if (Math.abs(moveEvent.clientX - startX) < 3) return;
-      capturePaneResizeWidths();
+      paneData = capturePaneResizeWidths();
       track.classList.add("is-resizing");
       resizeStarted = true;
     }

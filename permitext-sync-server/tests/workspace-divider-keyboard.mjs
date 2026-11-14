@@ -25,7 +25,7 @@ const context = vm.createContext({state, track, adjacentColumnWidths, workspaceC
   document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, children:[], classList:{add(){},toggle(){}}, append(child){this.children.push(child);},
     setAttribute(k,v){this.attrs[k]=v;}, removeAttribute(k){delete this.attrs[k];}, addEventListener(k,v){this.handlers[k]=v;}};}}
 });
-vm.runInContext(['minimumPaneWidthForID','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
+vm.runInContext(['minimumPaneWidthForID','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','notebookReferenceResize','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
 const divider=context.createDivider('left','right');
 assert.equal(divider.children.length,0,'Column dividers only resize; Reader creation remains in the toolbar.');
 
@@ -82,23 +82,23 @@ assert.equal(panes.get('right').width,historyWidth);
 console.log('Workspace divider keyboard: expanded pairs, minimums, scroll compensation, Shift steps, collapsed neighbors and outer edges passed.');
 
 // Reader minimums apply to both paths; neither path imposes a maximum.
-for (const id of ['reader:left','reader:right']) panes.set(id,{dataset:{paneId:id},width:600,getBoundingClientRect(){return {width:this.width};}});
+for (const id of ['reader:left','reader:right']) panes.set(id,{dataset:{paneId:id},width:630,getBoundingClientRect(){return {width:this.width};}});
 const readerDivider=context.createDivider('reader:left','reader:right');
 context.resizeAdjacentPanesBy('reader:left','reader:right',1000,readerDivider);
-assert.equal(panes.get('reader:left').width,1600); assert.equal(panes.get('reader:right').width,400);
+assert.equal(panes.get('reader:left').width,1630); assert.equal(panes.get('reader:right').width,630);
 context.resizeAdjacentPanesBy('reader:left','reader:right',-2000,readerDivider);
-assert.equal(panes.get('reader:left').width,400); assert.equal(panes.get('reader:right').width,2400);
+assert.equal(panes.get('reader:left').width,630); assert.equal(panes.get('reader:right').width,2630);
 const readerEdge=context.createDivider('','reader:left'); readerEdge.handlers.focus();
-assert.equal(readerEdge.attrs['aria-valuemin'],'400'); assert.equal(readerEdge.attrs['aria-valuemax'],undefined);
-context.resizePaneEdgeBy('reader:left',10000,readerEdge); assert.equal(panes.get('reader:left').width,10400);
-context.resizePaneEdgeBy('reader:left',-10000,readerEdge); assert.equal(panes.get('reader:left').width,400);
+assert.equal(readerEdge.attrs['aria-valuemin'],'630'); assert.equal(readerEdge.attrs['aria-valuemax'],undefined);
+context.resizePaneEdgeBy('reader:left',10000,readerEdge); assert.equal(panes.get('reader:left').width,10630);
+context.resizePaneEdgeBy('reader:left',-10000,readerEdge); assert.equal(panes.get('reader:left').width,630);
 panes.get('reader:left').width=1600; panes.get('reader:right').width=1600;
 context.resizeAdjacentPanesBy('reader:left','reader:right',1000,readerDivider);
-assert.equal(panes.get('reader:left').width,2600); assert.equal(panes.get('reader:right').width,600);
-panes.get('reader:right').width=400;
+assert.equal(panes.get('reader:left').width,2600); assert.equal(panes.get('reader:right').width,630);
+panes.get('reader:right').width=630;
 press(readerDivider,'ArrowRight');
 assert.equal(panes.get('reader:left').width,2624,'Arrow keys keep widening a Reader after its neighbor reaches the minimum');
-assert.equal(panes.get('reader:right').width,400);
+assert.equal(panes.get('reader:right').width,630);
 console.log('Reader keyboard resizing passed: unlimited growth, minimum widths, adjacent and outer edges, accessible bounds.');
 
 // Expanded and strip presentation sizes cannot become the resize bases.
@@ -124,3 +124,25 @@ assert.equal(panes.get(evidenceID).width,600);
 press(evidenceEdge,'ArrowLeft');
 assert.equal(panes.get(evidenceID).width,576);
 console.log('Evidence keyboard resizing and accessible bounds stay within 300–600 pixels.');
+
+// Notebook's keyboard and outer grips use the notepad as their width donor.
+panes.clear();state.paneWeights={};
+const noteListID='project:notes-index:one',editorID='project:notebook:one';
+for(const [id,width] of [['reader:one',810],[evidenceID,450],[noteListID,220],[editorID,1500]])
+ panes.set(id,{dataset:{paneId:id},width,getBoundingClientRect(){return {width:this.width};}});
+track._notebookColumnLayout={resizeMinimums:{[editorID]:836}};
+const evidenceNotes=context.createDivider(evidenceID,noteListID);
+press(evidenceNotes,'ArrowRight',true);
+assert.deepEqual(widths(),[810,530,220,1420]);
+assert.equal(evidenceNotes.attrs['aria-valuetext'],'Left column 530 pixels; right column 220 pixels');
+press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,600,220,1350]);
+const notesEditor=context.createDivider(noteListID,editorID);
+press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,600,300,1270]);
+press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,600,350,1220]);
+panes.get(evidenceID).width=450;panes.get(editorID).width=850;
+press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,464,350,836]);
+press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,464,350,836],'The writing minimum stops growth without squeezing another column.');
+panes.delete('reader:one');panes.get(evidenceID).width=400;panes.get(editorID).width=1200;
+const notebookEdge=context.createDivider('',evidenceID);
+press(notebookEdge,'ArrowLeft',true);assert.deepEqual(widths(),[480,350,1120]);
+console.log('Notebook keyboard resizing passed: notepad supplies width, other columns stay fixed, writing minimum and reference caps hold, Reader may be closed.');
