@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1802";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1803";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -51,7 +51,7 @@ import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatin
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261114-report-sources-v10";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261109-comparison-v21";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261019-project-workflow-v5";
-import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261021-project-questions-v8";
+import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportBlockUsesSource, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261114-report-source-toggle-v9";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1802";
+} from "./offline-storage.js?v=20261113-research-notebook-v1803";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -33092,8 +33092,44 @@ async function renderProjectReportDraft(project, resume = null) {
     reportSourceGroupExpanded.set(sectionName, Boolean(expanded));
     persistProjectSectionExpansion(identity, `Report:${sectionName}`, expanded);
   };
-  let sourceAddition = Promise.resolve();
-  let sourceAdditionDraft = null;
+  let sourceMutation = Promise.resolve();
+  let sourceMutationDraft = null;
+  function queueReportSourceMutation(draftID, selectedSources, removing = false) {
+    if (generatingReport || deletingReport || activeDraft.id !== draftID) {
+      return Promise.reject(new Error("The Report has changed or is exporting. Choose its destination again."));
+    }
+    const destinationDraft = activeDraft;
+    sourceMutationDraft = destinationDraft;
+    const selected = structuredClone(selectedSources);
+    const mutate = async () => {
+      const current = () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
+      if (!current()) throw accountContextChangedError();
+      if (activeDraft !== destinationDraft || deletingReport) throw new Error("The Report has changed. Choose its destination again.");
+      if (removing) {
+        const kept = activeDraft.blocks.filter(block => !selected.some(source => reportBlockUsesSource(block, source.kind, source.id)));
+        if (kept.length === activeDraft.blocks.length) return structuredClone(activeDraft);
+        activeDraft.blocks = kept;
+      } else {
+        // The first save assigns an ID to this same object. Retain its identity
+        // and serialize all source changes so a late Add cannot undo a Remove.
+        if (!await saveDraft()) throw new Error("Save the Report with Retry before adding more sources. Your edits are preserved.");
+        if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
+        await prepareReportNoteSources(projectID, selected, requestIdentity);
+        if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
+        appendUniqueReportSources(activeDraft, selected);
+      }
+      setDirty();
+      renderWorkspaceContent();
+      if (!await saveDraft()) throw new Error("The Report could not finish saving. Your change remains in the open Report; use Retry to save it.");
+      if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
+      return structuredClone(activeDraft);
+    };
+    const pending = sourceMutation.catch(() => {}).then(mutate);
+    sourceMutation = pending;
+    // Export observes a failure; subsequent source changes can still retry.
+    void pending.catch(() => {});
+    return pending;
+  }
   const mountState = {
     panel,
     getPresentationState: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID && renderedDraftKey ? captureReportResume(panel, {
@@ -33120,35 +33156,10 @@ async function renderProjectReportDraft(project, resume = null) {
     hasPendingEdits: () => dirty || autosave?.isSaving() || generatingReport || deletingReport,
     getDraftSnapshot: () => structuredClone(activeDraft),
     addSources(draftID, selectedSources) {
-      if (generatingReport || deletingReport || activeDraft.id !== draftID) {
-        return Promise.reject(new Error("The Report has changed or is exporting. Choose its destination again."));
-      }
-      // The first save assigns an ID to this same draft. Track its object
-      // identity so that assigning that ID does not discard the first source.
-      const destinationDraft = activeDraft;
-      sourceAdditionDraft = destinationDraft;
-      const sources = structuredClone(selectedSources);
-      const add = async () => {
-        const current = () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
-        if (!current()) throw accountContextChangedError();
-        if (activeDraft !== destinationDraft || deletingReport) throw new Error("The Report has changed. Choose its destination again.");
-        // Wait for the current save and preceding additions, keeping the user's
-        // chosen destination and every requested source intact.
-        if (!await saveDraft()) throw new Error("Save the Report with Retry before adding more sources. Your edits are preserved.");
-        if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
-        await prepareReportNoteSources(projectID, sources, requestIdentity);
-        if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
-        appendUniqueReportSources(activeDraft, sources);
-        setDirty();
-        renderWorkspaceContent();
-        if (!await saveDraft()) throw new Error("The Report could not finish saving. Your added material and edits remain in the Report; use Retry to save them.");
-        return structuredClone(activeDraft);
-      };
-      const pending = sourceAddition.catch(() => {}).then(add);
-      sourceAddition = pending;
-      // Keep failures observable by export while allowing a later retry.
-      void pending.catch(() => {});
-      return pending;
+      return queueReportSourceMutation(draftID, selectedSources);
+    },
+    removeSources(draftID, selectedSources) {
+      return queueReportSourceMutation(draftID, selectedSources, true);
     },
     async confirmDiscardIfNeeded() {
       if (!dirty || await saveDraft()) return true;
@@ -33327,9 +33338,9 @@ async function renderProjectReportDraft(project, resume = null) {
     generatingReport = true;
     paintExportState();
     try {
-      // Already accepted source additions may still be preparing a Note or
-      // saving the draft. Export their completed version, never an earlier one.
-      if (sourceAdditionDraft === activeDraft) await sourceAddition;
+      // Source changes may still be preparing a Note or saving the draft.
+      // Export their completed version, never an earlier one.
+      if (sourceMutationDraft === activeDraft) await sourceMutation;
       if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
       if (dirty) {
@@ -33877,6 +33888,8 @@ async function renderProjectReportDraft(project, resume = null) {
     const appendSourceCard = (container, source) => {
       const row = document.createElement("article");
       row.className = "report-source-card";
+      row.dataset.sourceKind = source.kind;
+      row.dataset.sourceId = source.id;
       const copy = document.createElement("div");
       const heading = document.createElement("strong");
       heading.textContent = source.label;
@@ -33894,16 +33907,28 @@ async function renderProjectReportDraft(project, resume = null) {
       }
       const add = document.createElement("button");
       add.type = "button";
-      add.textContent = "Add";
-      add.disabled = reportsContainingSource([activeDraft], source.kind, source.id).length > 0;
-      add.textContent = add.disabled ? "Added" : "Add";
-      add.setAttribute("aria-label", `${add.disabled ? "Already included" : "Add to Report"}: ${source.label || heading.textContent}`);
+      const included = () => reportsContainingSource([activeDraft], source.kind, source.id).length > 0;
+      const paintAction = () => {
+        const removing = included();
+        add.textContent = removing ? "Remove" : "Add";
+        add.disabled = generatingReport || deletingReport;
+        add.setAttribute("aria-label", `${removing ? "Remove from Report" : "Add to Report"}: ${source.label || heading.textContent}`);
+      };
+      paintAction();
       add.addEventListener("click", async () => {
+        if (add.disabled || disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+        const destinationDraft = activeDraft;
+        const removing = included();
         add.disabled = true;
-        try { await mountState.addSources(activeDraft.id, [source]); }
+        try {
+          await mountState[removing ? 'removeSources' : 'addSources'](destinationDraft.id, [source]);
+          if (!disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID && activeDraft === destinationDraft) {
+            panel.querySelector(`.report-source-card[data-source-kind="${CSS.escape(source.kind)}"][data-source-id="${CSS.escape(source.id)}"] > button`)?.focus({preventScroll:true});
+          }
+        }
         catch (error) {
-          if (!disposed && isCurrentAccountRequest(requestIdentity)) await showWebNotice("Report handoff not completed", error.message);
-        } finally { if (add.isConnected) add.disabled = reportsContainingSource([activeDraft], source.kind, source.id).length > 0; }
+          if (!disposed && isCurrentAccountRequest(requestIdentity)) await showWebNotice("Report update not completed", error.message);
+        } finally { if (add.isConnected) paintAction(); }
       });
       row.append(copy, add);
       container.append(row);

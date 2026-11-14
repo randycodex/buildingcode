@@ -46,10 +46,12 @@ export function selectedReportEvidenceItems(block, items) {
   const excluded = new Set(block.excludedCommentKeys || []);
   return items.filter(item => !item.reportCommentKey || !excluded.has(item.reportCommentKey));
 }
+export function reportBlockUsesSource(block, kind, sourceID) {
+  return (block.kind === kind && block.sourceID === sourceID) ||
+    (kind === 'notebookCard' && block.derivedFrom?.kind === kind && block.derivedFrom.id === sourceID);
+}
 export function reportsContainingSource(drafts, kind, sourceID) {
-  return drafts.filter(draft => (draft.blocks || []).some(block =>
-    (block.kind === kind && block.sourceID === sourceID) ||
-    (kind === 'notebookCard' && block.derivedFrom?.kind === kind && block.derivedFrom.id === sourceID)));
+  return drafts.filter(draft => (draft.blocks || []).some(block => reportBlockUsesSource(block, kind, sourceID)));
 }
 
 // A whole section already contains each of its passages. Comments are unioned
