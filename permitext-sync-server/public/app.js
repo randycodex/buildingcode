@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1836";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1838";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -30,7 +30,7 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=32";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=33";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js?v=2";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261108-floating-menu-pins-v1382";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
@@ -171,7 +171,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1836";
+} from "./offline-storage.js?v=20261113-research-notebook-v1838";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -19089,7 +19089,7 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
     return {resolved, section: payload.section};
   };
   const currentConversation=()=>getConversation ? getConversation() : (conversationID ? [activeResearchConversation,...supplementalResearchConversations.values()].find(item=>item?.id===conversationID) : conversation || calculatorConversationForPane());
-  card = createOccupantLoadCard({draft, sourceLabel, canSave: Boolean(project),
+  card = createOccupantLoadCard({draft, column: Boolean(calculatorID), sourceLabel, canSave: Boolean(project),
     getDestinationNote: () => workingResearchNote(project ? researchProjectID(project) : ""),
     savedNote: record.savedNote, savedInputFingerprint: record.savedFingerprint,
     recentDrafts: storageError ? [] : store.list(context), activeDraftID: record.id,

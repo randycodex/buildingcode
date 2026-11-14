@@ -255,7 +255,7 @@ function calculationDraftLabel(item) {
   return `${input.spaceName || description || 'New calculation'} · ${item.savedNote ? 'has saved Note' : 'Device draft'}`;
 }
 
-export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = null, getDestinationNote, savedInputFingerprint = "", recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
+export function createOccupantLoadCard({draft = {}, column = false, onDraftChange, savedNote = null, getDestinationNote, savedInputFingerprint = "", recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
   const initialDraft = {...draft};
   let areaMeasurementBasis = draft.areaMeasurementBasis || draft.areaBasis || '';
   let userMeasurementBasis = draft.userMeasurementBasis ?? draft.areaBasis ?? '';
@@ -266,6 +266,7 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
   root.className = 'occupant-load-card';
   root.dataset.researchSelectionExclude = 'true';
   const summary = document.createElement('summary'); summary.textContent = 'Occupant load calculation';
+  summary.hidden = column;
   const body = document.createElement('div'); body.className = 'occupant-load-body';
   const form = document.createElement('form'); form.className = 'occupant-load-form';
   const draftTools = document.createElement('div'); draftTools.className = 'calculation-draft-tools';
@@ -284,7 +285,9 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
   newDraft.addEventListener('click', () => onNewDraft?.());
   const reloadDraft = document.createElement('button'); reloadDraft.type = 'button'; reloadDraft.className = 'ghost-button'; reloadDraft.textContent = 'Reload device draft'; reloadDraft.hidden = true;
   reloadDraft.addEventListener('click', () => onReloadDraft?.());
-  recentLabel.append(recent); draftTools.append(draftState, reloadDraft, recentLabel, newDraft);
+  recentLabel.append(recent);
+  if (!column) draftTools.append(draftState);
+  draftTools.append(reloadDraft, recentLabel, newDraft);
   const fields = {};
   for (const [key, label, options] of [
     ['spaceName', 'Space / room name (optional)', null],
@@ -498,7 +501,9 @@ export function createOccupantLoadCard({draft = {}, onDraftChange, savedNote = n
     finally {loading = false;}
   });
   actions.append(save, open); form.append(result, formula, footnotes, actions);
-  body.append(source);
-  body.append(draftTools, form, status); root.append(summary, body); update();
+  if (!column) body.append(source);
+  body.append(draftTools, form, status);
+  if (column) body.append(draftState);
+  root.append(summary, body); update();
   return root;
 }
