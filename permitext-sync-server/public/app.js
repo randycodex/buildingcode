@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1814";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1816";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -45,6 +45,7 @@ import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarg
 import { applyLetterDocumentLayout } from "./document-layout.js?v=1";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportSwitch, createReportSourcePreviews, retainReportChildren } from "./report-presentation.js?v=1";
+import { createWorkspaceViewPresentation } from "./workspace-view-presentation.js?v=2";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=20";
@@ -170,7 +171,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1814";
+} from "./offline-storage.js?v=20261113-research-notebook-v1816";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2007,6 +2008,7 @@ function applySharedWorkspaceState(serializedState) {
 }
 
 function clearWorkspaceTransientRuntime() {
+  workspaceViewPresentation?.cancel();
   projectInformationMounts.clear();
   researchOpenGeneration += 1;
   searchTimers.forEach((timer) => clearTimeout(timer));
@@ -3684,7 +3686,7 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
   if (project.sharedRole === 'viewer') { selection.enabled = false; selection.ids.clear(); }
   const options = panel.querySelector('.notebook-index-menu-button');
   if (options) options.disabled = selection.busy || !hasCapability('notebook') || project.sharedRole === 'viewer';
-  const key = JSON.stringify([projectID, available, loading, selectedID, selected?.id, researchHistoryDayIndex(new Date()),
+  const key = JSON.stringify([projectID, available, !available && loading, selectedID, selected?.id, researchHistoryDayIndex(new Date()),
     selection.enabled, [...selection.ids], selection.busy,
     cards.map(card => [card.id, card.title, card.column?.id, card.updatedAt, card.createdAt])]);
   if (body.dataset.catalogKey === key) return;
@@ -5884,7 +5886,39 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
 }
 
 const workflowScrollStore = createWorkflowScrollStore();
+const workspaceViewPresentation = createWorkspaceViewPresentation(document);
 const referenceWorkspaceScroll = new Map();
+async function presentWorkingView(view, update) {
+  // Workspace/account choosers must remain interactive while awaiting input.
+  if (!workspacePrivatePresentationAllowed() || workspaceColumnsRequireProject() ||
+      view !== 'research' && !workspaceProject()) return update();
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID;
+  // Invalidate earlier asynchronous navigation at the click, before the
+  // browser captures the next view's outgoing frame.
+  state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
+  try {
+    return await workspaceViewPresentation.present({isCurrent:current, update:async owns => {
+      track._notebookListTransition?.skipTransition();
+      const result = await update();
+      if (!owns() || result === false || currentColumnWorkflowView() !== view) return false;
+      if (view === 'report') {
+        const project = workspaceProject();
+        await reportDraftMounts.get(projectDetailKey(project))?.whenPresented?.();
+      } else {
+        await Promise.all([...track.querySelectorAll(':scope > .workspace-panel')]
+          .filter(pane => workflowPaneIsVisible(pane.dataset.paneId))
+          .map(pane => whenWorkspacePaneReady(pane.dataset.paneId)));
+      }
+      if (!owns() || currentColumnWorkflowView() !== view) return false;
+      syncWorkflowColumnPresentation();
+      return result;
+    }});
+  } catch (error) {
+    if (current()) presentWorkspaceIssue(error.message || 'Could not open this workspace view.');
+    return false;
+  }
+}
 function currentWorkflowView() { return isProAccount() ? normalizeWorkflowView(state.workflowView) : "research"; }
 function workspaceResumeContext() {
   const project = workspaceProject();
@@ -6107,7 +6141,7 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
   if (view === 'notebook') {
     const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
     const navigation = state.workflowNavigationGeneration || 0;
-    await ensureNotebookTabCatalog({refresh:true});
+    await ensureNotebookTabCatalog();
     if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
         (state.workflowNavigationGeneration || 0) !== navigation) return false;
     await prepareNotebookView();
@@ -6128,6 +6162,7 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
     state.workflowVisitedViews = [...new Set([...(state.workflowVisitedViews || []), view])];
   }
   saveWorkspaceState();
+  if (view === 'notebook') void ensureNotebookTabCatalog({refresh:true});
   return true;
 }
 
@@ -10125,6 +10160,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   } : null;
   if (options.persistPrevious !== false) saveWorkspaceState();
   accountRuntimeGeneration += 1;
+  workspaceViewPresentation?.cancel();
   cancelPendingProjectChoice?.();
   notebookReturnScrollPositions.clear();
   notebookReturnCardIDs.clear();
@@ -33165,6 +33201,7 @@ async function renderProjectReportDraft(project, resume = null) {
   }
   const mountState = {
     panel,
+    whenPresented: () => Promise.allSettled([...sourcePreviewRequests.values()]),
     getPresentationState: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID && renderedDraftKey ? captureReportResume(panel, {
       draftID: activeDraft.id || "", versionID: comparisonController?.selectedID || "",
       comparisonScroll: comparisonController?.capturePosition(), outlineSections: [...outlineSectionExpansion]
@@ -51464,7 +51501,8 @@ function bindImmediateUtilityControls() {
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     if (button.dataset.bound) return;
     button.dataset.bound = 'true';
-    button.addEventListener('click', () => void switchWorkflowView(button.dataset.workflowView));
+    button.addEventListener('click', () => void presentWorkingView(button.dataset.workflowView,
+      () => switchWorkflowView(button.dataset.workflowView)));
   });
   [
     [toggleContextButton, "context"],
@@ -51487,7 +51525,8 @@ function bindImmediateUtilityControls() {
         else void openProjectDetailsScreen();
         return;
       }
-      return tool === "facts" ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ? openProjectReportDraft(workspaceProject()) : toggleProjectTool(tool);
+      return tool === "facts" ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ?
+        presentWorkingView('report', () => openProjectReportDraft(workspaceProject())) : toggleProjectTool(tool);
     };
     button.addEventListener("click", () => void openTool());
   });

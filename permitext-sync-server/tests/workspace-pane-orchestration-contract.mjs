@@ -24,7 +24,9 @@ function pane(id, loading=false) {
   return {
     dataset: { paneId: id, ...(loading ? { workspacePaneLoading: "true" } : {}) },
     isConnected: false, parentNode: null, scrollTop: 0, draft: "unchanged unsaved text", selection: [4, 12],
-    classList: { contains: name => classes.has(name), toggle(name, enabled) { if(enabled) classes.add(name); else classes.delete(name); } }, setAttribute() {}, querySelectorAll: () => [],
+    classList: { contains: name => classes.has(name), add: (...names) => names.forEach(name => classes.add(name)),
+      remove: (...names) => names.forEach(name => classes.delete(name)),
+      toggle(name, enabled) { if(enabled) classes.add(name); else classes.delete(name); } }, setAttribute() {}, querySelectorAll: () => [],
     querySelector: (selector) => selector.includes("retry") ? retry : status,
     replaceWith(next) {
       const index = track.children.indexOf(this); assert.ok(index >= 0);
