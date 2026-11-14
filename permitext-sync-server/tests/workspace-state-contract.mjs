@@ -38,12 +38,14 @@ applyWorkspaceLayout(restoredNotesList, notesListLayout);
 assert.equal(restoredNotesList.notebookListHidden, true);
 applyWorkspaceLayout(restoredNotesList, emptyWorkspaceLayout());
 assert.equal(restoredNotesList.notebookListHidden, true, 'A new workspace uses the compact note switcher.');
-assert.equal(emptyWorkspaceLayout().notebookReaderHidden, false);
+assert.equal(emptyWorkspaceLayout().notebookReaderHidden, true);
+assert.equal(normalizeWorkspaceLayout({notebookReaderHidden:false}).notebookReaderHidden,true,'The old automatic-open default migrates to a closed Reader.');
+assert.equal(normalizeWorkspaceLayout({notebookReaderVisibilityVersion:1,notebookReaderHidden:false}).notebookReaderHidden,false,'Explicitly opening Reader survives reload after migration.');
 const retainedReader={id:'notebook-reader',activeTabID:'tab-5',tabs:Array.from({length:6},(_,index)=>({id:`tab-${index}`,codePrefix:'BC',codeVersion:'2022',scrollPosition:{sectionID:`${index}01`,anchorOffset:-(index+1)*31}}))};
 const closedReaderLayout=captureWorkspaceLayout({notebookReaderHidden:true,readers:[retainedReader],workflowMembership:{'reader:notebook-reader':['notebook']}});
 const restoredReaderLayout={};applyWorkspaceLayout(restoredReaderLayout,JSON.parse(JSON.stringify(closedReaderLayout)));
 assert.equal(restoredReaderLayout.notebookReaderHidden,true);assert.deepEqual(restoredReaderLayout.readers,[retainedReader],'A closed Reader persists all tabs and positions through reload');
-applyWorkspaceLayout(restoredReaderLayout,emptyWorkspaceLayout());assert.equal(restoredReaderLayout.notebookReaderHidden,false,'Reader visibility belongs to its workspace');
+applyWorkspaceLayout(restoredReaderLayout,emptyWorkspaceLayout());assert.equal(restoredReaderLayout.notebookReaderHidden,true,'A new workspace starts with Reader closed.');
 assert.equal(workspaceLayoutHasVisiblePanes(emptyWorkspaceLayout()), false);
 
 const migratedQuestionIndexWidth = normalizeWorkspaceLayout({

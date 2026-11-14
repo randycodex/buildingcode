@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1763";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1765";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1763";
+} from "./offline-storage.js?v=20261113-research-notebook-v1765";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -201,7 +201,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261113-note-research-v1304";
+} from "./workspace-state.js?v=20261113-note-research-v1305";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -1027,7 +1027,8 @@ function loadWorkspaceState(accountOverride) {
       notebookColumns: normalizeNotebookColumns(saved.notebookColumns),
       notebookListHidden: saved.notebookListHidden !== false,
       noteResearch: normalizeNoteResearch(saved.noteResearch),
-      notebookReaderHidden: saved.notebookReaderHidden === true,
+      notebookReaderVisibilityVersion: 1,
+      notebookReaderHidden: saved.notebookReaderVisibilityVersion === 1 ? saved.notebookReaderHidden !== false : true,
       reportDrafts: activeProjectDetail && savedReportDrafts.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
@@ -1121,7 +1122,8 @@ function loadWorkspaceState(accountOverride) {
       notebookColumns: [],
       notebookListHidden: true,
       noteResearch: {},
-      notebookReaderHidden: false,
+      notebookReaderVisibilityVersion: 1,
+      notebookReaderHidden: true,
       reportDrafts: [],
       coordinations: [],
       coordinationThreads: [],

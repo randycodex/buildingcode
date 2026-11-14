@@ -35,6 +35,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "notebookColumns",
   "notebookListHidden",
   "noteResearch",
+  "notebookReaderVisibilityVersion",
   "notebookReaderHidden",
   "reportDrafts",
   "coordinations",
@@ -273,7 +274,8 @@ export function emptyWorkspaceLayout() {
     notebookColumns: [],
     notebookListHidden: true,
     noteResearch: {},
-    notebookReaderHidden: false,
+    notebookReaderVisibilityVersion: 1,
+    notebookReaderHidden: true,
     reportDrafts: [],
     coordinations: [],
     coordinationThreads: [],
@@ -377,7 +379,10 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.notebookColumns = normalizeNotebookColumns(source.notebookColumns);
   layout.notebookListHidden = source.notebookListHidden !== false;
   layout.noteResearch = normalizeNoteResearch(source.noteResearch);
-  layout.notebookReaderHidden = source.notebookReaderHidden === true;
+  // Retire the former automatically open Reader default once. Subsequent
+  // source navigation and toolbar choices remain part of this workspace.
+  layout.notebookReaderVisibilityVersion = 1;
+  layout.notebookReaderHidden = source.notebookReaderVisibilityVersion === 1 ? source.notebookReaderHidden !== false : true;
   layout.reportDrafts = openProjectToolState(source.reportDrafts, layout.projectDetails);
   layout.coordinations = openProjectToolState(source.coordinations, layout.projectDetails);
   layout.coordinationThreads = Array.isArray(source.coordinationThreads)

@@ -79,3 +79,32 @@ assert(visibleReaderReveals.length > 0, 'Explicit source navigation reveals its 
  assert.equal(notices,1);assert.equal(notebookContext.state.readers.length,1);assert.equal(notebookContext.state.notebookReaderHidden,true);assert.equal(JSON.stringify(kept),before);
 }
 console.log('Hidden Notebook Reader passed: Evidence reopens the retained column, preserves prior tabs, and respects its six-tab limit.');
+
+// Exercise both Note citation paths through the real source opener. Reading a
+// citation must retain the current Note and its unsaved writing in Notebook.
+{
+ const kept={id:'citation-reader',codePrefix:'BC',codeVersion:'2022',sectionID:'101'};
+ initializeReaderTabs(kept);
+ const note={id:'current-note',cardID:'authored-note',draft:'Keep this unsaved analysis'};
+ const notebookState={readers:[kept],paneWeights:{},notebookReaderVisibilityVersion:1,notebookReaderHidden:true,
+  notebookColumns:[note],workflowMembership:{[kept.id]:['notebook']}};
+ const c=vm.createContext({...context,state:notebookState,currentColumnWorkflowView:()=> 'notebook',
+  resolveReaderSource:async item=>item,whenWorkspacePaneReady:async()=>true,isCurrentAccountRequest:()=>true,
+  readerTabs,addReaderTab,canAddReaderTab,maximumReaderTabs,linkPaneToView,
+  rememberReaderTabPosition(){},retainReaderColumn(){},workflowPaneIsVisible:()=>false,
+  currentContentSummary:()=>({savedItems:[{sectionID:'102',codePrefix:'BC',codeVersion:'2022'}]})});
+ vm.runInContext(code,c);
+ const start=source.indexOf('async function openNotebookReference(');
+ vm.runInContext(source.slice(start,source.indexOf('\n}',start)+2),c);
+ for(const reference of [
+  {referenceKind:'canonicalSection',referenceID:'102',label:'BC § 102'},
+  {referenceKind:'selectedPassage',referenceID:'passage',evidenceLink:{source:{sectionID:'103',codePrefix:'BC',codeVersion:'2022'},passages:[{exact:'Exact source text'}]}}
+ ]) {
+  notebookState.notebookReaderHidden=true;
+  await c.openNotebookReference({id:'project'},{},reference,()=>assert.fail('A code citation must not select another Note'),'note-pane','project');
+  assert.equal(notebookState.notebookReaderHidden,false);
+  assert.equal(notebookState.readers.length,1);assert.equal(notebookState.readers[0],kept);
+  assert.equal(notebookState.notebookColumns[0],note);assert.equal(note.draft,'Keep this unsaved analysis');
+ }
+}
+console.log('Notebook citations passed: canonical sections and exact passages reveal Reader while retaining the current Note and draft.');
