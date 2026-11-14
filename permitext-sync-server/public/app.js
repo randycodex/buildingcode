@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1765";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1766";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1765";
+} from "./offline-storage.js?v=20261113-research-notebook-v1766";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4524,16 +4524,20 @@ function openReaderTabPicker(reader, anchor) {
 
 function prepareReaderSourceTab(reader, fields, { allowNewColumn = true } = {}) {
   if (!isProAccount() || !Array.isArray(reader.tabs)) return reader;
+  // Notebook sources are browsing actions. Only the + picker adds a tab;
+  // Evidence and citations navigate the selected tab without consuming slots.
+  if (currentColumnWorkflowView() === 'notebook') {
+    rememberReaderTabPosition(reader);
+    retainReaderColumn(reader);
+    reader.internalSearchQuery = '';
+    return reader;
+  }
   const matches = tab => tab.codePrefix === fields.codePrefix && tab.codeVersion === fields.codeVersion &&
     String(tab.chapterID || '') === String(fields.chapterID || '') && String(tab.sectionID || '') === String(fields.sectionID || '');
   if (matches(reader)) return reader;
   const tabs = readerTabs(reader);
   const existing = tabs.find(matches) || tabs.find(tab => tab.codePrefix === fields.codePrefix && tab.codeVersion === fields.codeVersion);
   if (!existing && !canAddReaderTab(reader)) {
-    if (currentColumnWorkflowView() === 'notebook') {
-      void showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
-      return null;
-    }
     if (!allowNewColumn) {
       rememberReaderTabPosition(reader);
       retainReaderColumn(reader);
@@ -41424,17 +41428,6 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     ? reusableSearchReader(visibleReaders, anchorPaneID, options.forceNewReader)
     : visibleReaders.find((candidate) =>
       (!anchorPaneID || candidate.sourceAnchorPaneID === anchorPaneID) && readerMatchesSource(candidate, detail));
-  let notebookTabAdded = false;
-  if (notebookOpening && reader && (fromSaved || options.forceNewReader || !readerMatchesSource(reader, detail))) {
-    if (!canAddReaderTab(reader)) {
-      await showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
-      return null;
-    }
-    rememberReaderTabPosition(reader);
-    retainReaderColumn(reader);
-    addReaderTab(reader, newReaderState(sourceFields));
-    notebookTabAdded = true;
-  }
   let createdReader = false;
   if (!options.forceNewReader && !reader && !ownedSource) {
     reader = visibleReaders.find(readerIsClearlyAvailable) || null;
@@ -41462,7 +41455,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
       reader = replacement;
     }
   }
-  if (!notebookTabAdded && Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
+  if (Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
     allowNewColumn: !(fromSearch || fromSaved) || Boolean(options.forceNewReader)
   });
   if (!reader) return null;
@@ -41498,8 +41491,9 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   }
   await transitionWorkspace("utility", {
     refreshPaneIDs: retainedPanel ? [] : [paneID],
-    ...(sourceNavigation ? { readerSourceNavigation: sourceNavigation,
-      readerTabSwitchPaneID: notebookTabAdded || !retainedPanel && !createdReader && !options.forceNewReader ? paneID : "" } : {})
+    ...(sourceNavigation ? { readerSourceNavigation: sourceNavigation } : {}),
+    ...(!retainedPanel && !createdReader && (notebookOpening || sourceNavigation && !options.forceNewReader)
+      ? {readerTabSwitchPaneID: paneID} : {})
   });
   if (!navigationIsCurrent() || !await whenWorkspacePaneReady(paneID) || !navigationIsCurrent()) return null;
   const destinationPanel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
@@ -41556,7 +41550,7 @@ async function openSavedItemInReader(item, savedPaneID) {
     isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     generation === (state.workflowNavigationGeneration || 0);
   try {
-    return await openSourceInReader(item, savedPaneID, { sourceSurface: "saved", isCurrent, forceNewReader: true,
+    return await openSourceInReader(item, savedPaneID, { sourceSurface: "saved", isCurrent, forceNewReader: currentColumnWorkflowView() !== 'notebook',
       evidenceAnchor: item.evidenceAnchor || null });
   } finally {
     if (savedItemOpeningAttempts.get(savedPaneID) === attempt) savedItemOpeningAttempts.delete(savedPaneID);

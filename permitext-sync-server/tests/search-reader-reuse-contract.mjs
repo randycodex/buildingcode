@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import {readerTabs,initializeReaderTabs,addReaderTab,canAddReaderTab,maximumReaderTabs} from '../public/reader-tabs.js';
 import {linkPaneToView} from '../public/workflow-views.js';
 const source=readFileSync(new URL('../public/app.js', import.meta.url),'utf8');
+const actual=name=>{const start=source.indexOf(`function ${name}(`);return source.slice(start,source.indexOf('\n}',start)+2);};
 const code=source.slice(source.indexOf('function reusableSearchReader('),source.indexOf('\nfunction removeSectionDetail(',source.indexOf('function reusableSearchReader(')));
 let serial=0;
 const state={readers:[{id:'manual',sectionID:'1'}],paneWeights:{}};
@@ -56,12 +57,12 @@ console.log('Delayed source navigation remains confined to its originating view.
 
 assert(visibleReaderReveals.length > 0, 'Explicit source navigation reveals its destination through the shared column layout.');
 
-// A hidden Notebook Reader still owns its six reading sessions. Evidence can
-// reveal it and add a tab, but must never create a second Notebook column.
+// Evidence navigates the selected Notebook tab, including at capacity. Other
+// manually opened tabs and the current Note remain untouched.
 {
  const kept={id:'kept',codePrefix:'BC',codeVersion:'2022',sectionID:'101',scrollPosition:{sectionID:'101',anchorOffset:-67}};
  initializeReaderTabs(kept);
- const original=JSON.stringify(readerTabs(kept)[0]);let notices=0;
+ const selectedTab=kept.activeTabID;let notices=0;
  const notebookContext=vm.createContext({...context,
   state:{readers:[kept],paneWeights:{},notebookReaderHidden:true,workflowMembership:{kept:['notebook']}},
   currentColumnWorkflowView:()=> 'notebook',resolveReaderSource:async item=>item,
@@ -69,16 +70,24 @@ assert(visibleReaderReveals.length > 0, 'Explicit source navigation reveals its 
   readerTabs,addReaderTab,canAddReaderTab,maximumReaderTabs,linkPaneToView,
   rememberReaderTabPosition(){},retainReaderColumn(){},showWebNotice:async()=>notices++,
   workflowPaneIsVisible:()=>false});
- vm.runInContext(code,notebookContext);
- const opened=await notebookContext.openSourceInReader({sectionID:'102',codePrefix:'BC',codeVersion:'2022'},'saved',{sourceSurface:'saved',forceNewReader:true});
+ vm.runInContext(actual('prepareReaderSourceTab')+'\n'+code+'\nconst savedItemOpeningAttempts = new Map();\nasync '+actual('openSavedItemInReader'),notebookContext);
+ const opened=await notebookContext.openSavedItemInReader({sectionID:'102',codePrefix:'BC',codeVersion:'2022'},'saved');
  assert.equal(opened,kept);assert.equal(notebookContext.state.readers.length,1);assert.equal(notebookContext.state.notebookReaderHidden,false);
- assert.equal(readerTabs(kept).length,2);assert.equal(JSON.stringify(readerTabs(kept)[0]),original);
- for(let index=0;index<4;index++)addReaderTab(kept,{codePrefix:'BC',codeVersion:'2022',sectionID:`${index+3}01`},`extra-${index}`);
- notebookContext.state.notebookReaderHidden=true;const before=JSON.stringify(kept);
- assert.equal(await notebookContext.openSourceInReader({sectionID:'999'},'saved',{sourceSurface:'saved',forceNewReader:true}),null);
- assert.equal(notices,1);assert.equal(notebookContext.state.readers.length,1);assert.equal(notebookContext.state.notebookReaderHidden,true);assert.equal(JSON.stringify(kept),before);
+ assert.equal(readerTabs(kept).length,1);assert.equal(kept.activeTabID,selectedTab);assert.equal(kept.sectionID,'102');
+ for(let index=0;index<5;index++)addReaderTab(kept,{codePrefix:'BC',codeVersion:'2022',sectionID:`${index+3}01`},`extra-${index}`);
+ const activeTab=kept.activeTabID;
+ const otherTabs=JSON.stringify(readerTabs(kept).filter(tab=>tab.id!==activeTab));
+ for(let index=0;index<8;index++){
+  notebookContext.state.notebookReaderHidden=true;kept.internalSearchQuery='old Reader search';
+  const sectionID=`new-${index}`;
+  assert.equal(await notebookContext.openSavedItemInReader({sectionID,codePrefix:index%2?'PC':'BC',codeVersion:index%2?'2014':'2022'},'saved'),kept);
+  assert.equal(kept.sectionID,sectionID);assert.equal(kept.activeTabID,activeTab);assert.equal(kept.internalSearchQuery,'');
+  assert.equal(readerTabs(kept).length,6);assert.equal(notebookContext.state.notebookReaderHidden,false);
+  assert.equal(JSON.stringify(readerTabs(kept).filter(tab=>tab.id!==activeTab)),otherTabs);
+ }
+ assert.equal(notices,0);assert.equal(notebookContext.state.readers.length,1);
 }
-console.log('Hidden Notebook Reader passed: Evidence reopens the retained column, preserves prior tabs, and respects its six-tab limit.');
+console.log('Notebook Evidence passed: repeated cross-code navigation reuses the selected tab at capacity, preserves other tabs and reveals the closed Reader.');
 
 // Exercise both Note citation paths through the real source opener. Reading a
 // citation must retain the current Note and its unsaved writing in Notebook.
@@ -93,7 +102,8 @@ console.log('Hidden Notebook Reader passed: Evidence reopens the retained column
   readerTabs,addReaderTab,canAddReaderTab,maximumReaderTabs,linkPaneToView,
   rememberReaderTabPosition(){},retainReaderColumn(){},workflowPaneIsVisible:()=>false,
   currentContentSummary:()=>({savedItems:[{sectionID:'102',codePrefix:'BC',codeVersion:'2022'}]})});
- vm.runInContext(code,c);
+ vm.runInContext(actual('prepareReaderSourceTab')+'\n'+code,c);
+ const selectedTab=kept.activeTabID;
  const start=source.indexOf('async function openNotebookReference(');
  vm.runInContext(source.slice(start,source.indexOf('\n}',start)+2),c);
  for(const reference of [
@@ -104,6 +114,7 @@ console.log('Hidden Notebook Reader passed: Evidence reopens the retained column
   await c.openNotebookReference({id:'project'},{},reference,()=>assert.fail('A code citation must not select another Note'),'note-pane','project');
   assert.equal(notebookState.notebookReaderHidden,false);
   assert.equal(notebookState.readers.length,1);assert.equal(notebookState.readers[0],kept);
+  assert.equal(readerTabs(kept).length,1);assert.equal(kept.activeTabID,selectedTab);
   assert.equal(notebookState.notebookColumns[0],note);assert.equal(note.draft,'Keep this unsaved analysis');
  }
 }
