@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1804";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1806";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -42,6 +42,7 @@ import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261114-outline-remove-v13";
+import { applyLetterDocumentLayout } from "./document-layout.js?v=1";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
@@ -168,7 +169,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1804";
+} from "./offline-storage.js?v=20261113-research-notebook-v1806";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -331,6 +332,7 @@ import {
   unlinkLegacyPromotion
 } from "./code-question-legacy.js?v=20260806-code-question-legacy-v1";
 
+applyLetterDocumentLayout(document.documentElement);
 const permitextSyncSchemaVersion = 2;
 installScrollEdgeFades();
 
@@ -376,7 +378,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261114-notebook-format-tools-v2";
+const notebookClientVersion = "20261114-notebook-format-tools-v3";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -34407,7 +34409,10 @@ async function renderProjectReportDraft(project, resume = null) {
       empty.textContent = "Add a heading, paragraph, list, or saved source to start your report.";
       blocksBody.append(empty);
     }
-    renderBlockEditor(blocksBody);
+    const printContent = document.createElement("div");
+    printContent.className = "report-print-content";
+    renderBlockEditor(printContent);
+    blocksBody.append(printContent);
     blocks.append(blocksBody);
     const sourcePalette = document.createElement("section");
     sourcePalette.className = "report-source-palette";

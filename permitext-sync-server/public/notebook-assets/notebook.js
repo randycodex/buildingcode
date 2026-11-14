@@ -48451,7 +48451,7 @@ function rK({ editor: e, options: t }) {
 		onClick: () => {
 			f.current = p();
 		}
-	}, n, E(["M5 8l5 5 5-5"]))), _.createElement(PH.Dropdown, {
+	}, n)), _.createElement(PH.Dropdown, {
 		className: "notebook-format-style-menu",
 		"aria-label": t
 	}, ...r.map((t) => _.createElement(PH.Item, {
@@ -48588,7 +48588,7 @@ function rK({ editor: e, options: t }) {
 		"aria-label": "Text style",
 		disabled: !h.editable || !g.length,
 		onMouseDown: (e) => e.preventDefault()
-	}, C.startsWith("heading-") ? `Heading ${C.slice(-1)}` : "Body", E(["M5 8l5 5 5-5"]))), _.createElement(PH.Dropdown, {
+	}, C.startsWith("heading-") ? `Heading ${C.slice(-1)}` : "Body")), _.createElement(PH.Dropdown, {
 		className: "notebook-format-style-menu",
 		"aria-label": "Text style",
 		onKeyDown: (e) => {

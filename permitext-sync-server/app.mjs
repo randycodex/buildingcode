@@ -7646,6 +7646,9 @@ function contentTypeForPath(path) {
   if (path.endsWith(".woff")) {
     return "font/woff";
   }
+  if (path.endsWith(".ttf")) {
+    return "font/ttf";
+  }
   return "application/octet-stream";
 }
 
@@ -23538,7 +23541,7 @@ async function handleServiceWorker(response) {
 
 export function webStaticCacheControl(fileName, version) {
   if (fileName.startsWith("marketing/")) return "public, max-age=0, must-revalidate";
-  return version && /\.(?:js|css|woff2?|png|jpe?g|svg|ico|webmanifest)$/.test(fileName)
+  return version && /\.(?:js|css|woff2?|ttf|png|jpe?g|svg|ico|webmanifest)$/.test(fileName)
     ? immutableStaticCacheControl
     : "public, max-age=0, must-revalidate";
 }

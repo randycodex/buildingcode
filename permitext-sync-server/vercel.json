@@ -108,7 +108,7 @@
       ]
     },
     {
-      "source": "/web/(.*\\.(?:js|css|woff2?|png|jpe?g|svg|ico|webmanifest))",
+      "source": "/web/(.*\\.(?:js|css|woff2?|ttf|png|jpe?g|svg|ico|webmanifest))",
       "has": [
         {
           "type": "query",

@@ -1,4 +1,5 @@
 import PDFDocument from "pdfkit";
+import {letterDocumentLayout as documentLayout} from './public/document-layout.js';
 import { notebookTableDisplayData, tableDisplayCells } from './public/notebook-content.js';
 import {researchAnswerURL} from './public/research-answer-links.js';
 
@@ -42,7 +43,7 @@ function drawNotebookContent(document, notebookDocument, material) {
       drawReportRichTable(document, table, left, width, {headerBold:true});
       document.x = left; document.moveDown(0.7);
     } else {
-      const size=block.type === 'heading' ? Math.max(11, 16 - (block.props?.level || 1)) : 9.5;
+      const size=block.type === 'heading' ? documentLayout.headingSizes[block.props?.level || 1] : documentLayout.bodySize;
       drawReportRichText(document, noteRuns(block.content), {size,
         ...(block.props?.lineSpacing ? {lineHeight:size*Number(block.props.lineSpacing)} : {}),
         bold:block.type === 'heading', indent:Math.min(depth * 12, 60),
@@ -384,9 +385,9 @@ function drawCover(document, manifest) {
 
 // Lay out authored runs explicitly so marks, links and printed highlights stay
 // attached to their text across wrapping and page breaks.
-export function drawReportRichText(document, runs, {size = 10, bold = false, paragraphGap = 10, indent = 0, prefix = "",
+export function drawReportRichText(document, runs, {size = documentLayout.bodySize, bold = false, paragraphGap = documentLayout.paragraphGap, indent = 0, prefix = "",
   left = document.page.margins.left + indent, width = document.page.width - document.page.margins.right - left,
-  lineHeight = size * 1.5, paginate = true, measureOnly = false} = {}) {
+  lineHeight = size * documentLayout.lineSpacing, paginate = true, measureOnly = false} = {}) {
   let line = [], used = 0, measuredHeight = 0;
   const runSize = run => (Number(run.fontSize) || size) * (run.superscript ? 0.7 : 1);
   const measure = run => document.font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(runSize(run)).widthOfString(run.text);
@@ -453,7 +454,7 @@ export function drawReportRichTable(document, table, startX, contentWidth, {head
   if (!table.rows?.length) return;
   const columns = Math.max(...table.rows.map(row=>row.length)), width = contentWidth / columns;
   if (width <= 10) throw new Error('This Report table has too many columns for the PDF page. Split it into smaller tables before exporting.');
-  const size = 8, lineHeight = 10.4;
+  const size = documentLayout.tableSize, lineHeight = size * documentLayout.tableLineSpacing;
   const runs = table.rows;
   const headers = table.headerRowCount || 0;
   const cells=tableDisplayCells(runs,table.cellSpans || []);
@@ -544,11 +545,9 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
         drawReportRichText(document, item.richText || markedText, {bold:true, size:item.presentationRole === "comment" ? 9 : ({1:17,2:14,3:12}[item.headingLevel] || 17), paragraphGap:item.presentationRole === "comment" ? 4 : 10});
         return;
       }
-      document
-        .fillColor(colors.ink)
-        .font("Report-Bold")
-        .fontSize(item.presentationRole === "comment" ? 9 : 17)
-        .text(item.text, { paragraphGap: item.presentationRole === "comment" ? 4 : 10 });
+      drawReportRichText(document, [{text:item.text}], {bold:true,
+        size:item.presentationRole === "comment" ? 9 : documentLayout.headingSizes[item.headingLevel || 1],
+        paragraphGap:item.presentationRole === "comment" ? 4 : documentLayout.paragraphGap});
       return;
     }
     if (item.kind === "paragraph") {
@@ -559,11 +558,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
       } else ensureVerticalSpace(document, 55);
       if (item.notebookDocument) drawNotebookContent(document, item.notebookDocument, projectMaterialBySourceID);
       else if (item.richText || markedText) drawReportRichText(document, item.richText || markedText);
-      else document
-        .fillColor(colors.ink)
-        .font("Report-Regular")
-        .fontSize(10)
-        .text(printableNoteText(item.text), document.page.margins.left, document.y, {width:document.page.width - document.page.margins.left - document.page.margins.right, lineGap: 2, paragraphGap: 10 });
+      else drawReportRichText(document, [{text:printableNoteText(item.text)}]);
       if (item.derivedFrom?.kind === "notebookCard" && item.evidenceLinks?.length) {
         const evidenceHeading = `Evidence linked to ${item.derivedFrom.title}`;
         const firstCitation = item.evidenceLinks.find(link => link.label || link.source?.sectionNumber);
@@ -703,8 +698,8 @@ function drawPageFooters(document, manifest) {
 
 export async function renderReportPDF(manifest, { projectMaterialBySourceID = new Map() } = {}) {
   const document = new PDFDocument({
-    size: "LETTER",
-    margins: { top: 54, right: 54, bottom: 54, left: 54 },
+    size: [documentLayout.width, documentLayout.height],
+    margins: { top: documentLayout.margin, right: documentLayout.margin, bottom: documentLayout.margin, left: documentLayout.margin },
     bufferPages: true,
     autoFirstPage: true,
     tagged: true,

@@ -32,7 +32,7 @@ for (const path of ["/", "/index.html", "/web", "/web/", "/web/index.html", "/op
     assert.equal(compiledCacheControl(path + query), revalidate, `HTML must revalidate: ${path + query}`);
   }
 }
-for (const asset of ["app.js", "styles.css", "icons/permitext-192.png", "manifest.webmanifest", "fonts/font.woff2", "nested/client.js"]) {
+for (const asset of ["app.js", "styles.css", "icons/permitext-192.png", "manifest.webmanifest", "fonts/font.woff2", "fonts/font.ttf", "nested/client.js"]) {
   assert.equal(compiledCacheControl(`/web/${asset}?v=release-55`), immutable);
   assert.equal(compiledCacheControl(`/web/${asset}`), revalidate);
   assert.equal(compiledCacheControl(`/web/${asset}?v=`), revalidate);
@@ -58,11 +58,13 @@ try {
     ["/web", "no-store"], ["/web/", "no-store"],
     ["/web/index.html?v=release-55", revalidate],
     ["/web/app.js", revalidate], ["/web/app.js?v=release-55", immutable],
-    ["/web/styles.css?v=release-55", immutable], ["/service-worker.js", "no-cache"]
+    ["/web/styles.css?v=release-55", immutable], ["/web/document-layout.css?v=1", immutable],
+    ["/web/fonts/DejaVuSans.ttf?v=3fdf69c", immutable], ["/service-worker.js", "no-cache"]
   ]) {
     const response = await fetch(origin + path);
     assert.equal(response.status, 200, path);
     assert.equal(response.headers.get("cache-control"), expected, path);
+    if (path.includes('.ttf')) assert.equal(response.headers.get('content-type'), 'font/ttf');
     await response.arrayBuffer();
   }
 } finally {

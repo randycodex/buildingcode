@@ -294,7 +294,7 @@ function PermitextFormattingToolbar({ editor, options }) {
   const formatMenu = (label,caption,choices,apply,disabled=false) => React.createElement(Menu,
     {position:'bottom-start',offset:8,withinPortal:false,width:190,loop:true,returnFocus:false},
     React.createElement(Menu.Target,null,React.createElement('button',{type:'button',className:'notebook-format-style','aria-label':label,title:label,
-      disabled:!state.editable || disabled,onMouseDown:event=>event.preventDefault(),onClick:()=>{formatSelection.current=captureSelection();}},caption,icon(['M5 8l5 5 5-5']))),
+      disabled:!state.editable || disabled,onMouseDown:event=>event.preventDefault(),onClick:()=>{formatSelection.current=captureSelection();}},caption)),
     React.createElement(Menu.Dropdown,{className:'notebook-format-style-menu','aria-label':label},...choices.map(choice=>React.createElement(Menu.Item,
       {key:choice.value,className:'notebook-format-style-option',disabled:choice.disabled,
         'aria-current':choice.selected?'true':undefined,onClick:()=>{if(!restoreSelection(formatSelection.current))return;editor.focus();apply(choice.value);}},choice.label))));
@@ -367,7 +367,7 @@ function PermitextFormattingToolbar({ editor, options }) {
           ref: textStyleButton, type: "button", className: "notebook-format-style", "aria-label": "Text style",
           disabled: !state.editable || !textBlocks.length,
           onMouseDown: event => event.preventDefault()
-        }, type.startsWith("heading-") ? `Heading ${type.slice(-1)}` : "Body", icon(["M5 8l5 5 5-5"]))),
+        }, type.startsWith("heading-") ? `Heading ${type.slice(-1)}` : "Body")),
       React.createElement(Menu.Dropdown, {
         className: "notebook-format-style-menu", "aria-label": "Text style",
         onKeyDown: event => { if (event.key === "Escape") textStyleButton.current?.focus(); }
