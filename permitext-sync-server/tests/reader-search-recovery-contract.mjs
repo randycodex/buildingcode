@@ -154,7 +154,7 @@ function savedHarness() {
   const state = {readers:[unrelated],utilityInstances:[{id:"unrelated",key:"search"}],paneWeights:{},paneOrder:[]};
   let generation = 1, nextID = 0, saves = 0;
   const context = vm.createContext({
-    linkPaneToView,state, savedItemOpeningAttempts:new Map(), searchReaderOpeningAttempts:new Map(), activeWorkspaceID:"workspace",
+    workingResearchNote:()=>null,linkPaneToView,state, savedItemOpeningAttempts:new Map(), searchReaderOpeningAttempts:new Map(), activeWorkspaceID:"workspace",
     captureAccountRequest:()=>generation,isCurrentAccountRequest:value=>value===generation,
     workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=>"research",workflowPaneIsVisible:()=>true,
     resolveReaderSource(item) {const request=deferred();requests.push({...request,item});return request.promise;},

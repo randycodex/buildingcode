@@ -77,7 +77,7 @@ vm.runInContext(actual('notifyWorkspaceLayoutChange'), layoutContext); layoutCon
 const a = { id: 'a', codePrefix: 'BC', codeVersion: '2022', sectionID: '1005' };
 initializeReaderTabs(a); addReaderTab(a, {codePrefix: 'PC', codeVersion: '2022', sectionID: '403'}, 'pc');
 const state = {readers: [a], workflowMembership: {}}; let serial = 0, renders = 0;
-const context = vm.createContext({state, readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs,
+const context = vm.createContext({workingResearchNote:()=>null,state, readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs,
   isProAccount: () => true, rememberReaderTabPosition() {}, retainReaderColumn() {},
   newReaderState: fields => ({id: `column-${++serial}`, ...fields}),
   linkPaneToView: value => value, currentColumnWorkflowView: () => 'research', paneIDForReader: reader => `reader:${reader.id}`,

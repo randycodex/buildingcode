@@ -52,11 +52,11 @@ function harness() {
     createWorkspacePaneLoadingShell(){assert.fail('A tab switch must keep the existing Reader instead of a loading shell.');}
   });
   vm.runInContext(['retainReaderPaneForTabSwitch','finishWorkspacePaneReady','whenWorkspacePaneReady','getWorkspacePaneHydrator','mountWorkspacePanesIndependently'].map(actual).join('\n'),c);
-  const open=async(tab,{refresh=true,source=false}={})=>{
+  const open=async(tab,{refresh=true,source=false,retain=true}={})=>{
     wanted=tab;reader.activeTabID=tab;generation++;
     sourceNavigation=source?{reader,item:{sectionID:tab},options:{immediate:true},isCurrent:()=>wanted===tab}:null;
     pending.set(tab,pending.get(tab)||deferred());
-    await c.mountWorkspacePanesIndependently({key:'account:workspace',generation},{shellReady:true,readerTabSwitchPaneID:'reader:one',refreshPaneIDs:refresh?['reader:one']:[]});
+    await c.mountWorkspacePanesIndependently({key:'account:workspace',generation},{shellReady:true,...(retain?{readerTabSwitchPaneID:'reader:one'}:{}),refreshPaneIDs:refresh?['reader:one']:[]});
     await Promise.resolve();
   };
   return {c,track,original,pending,signals,reader,notices,releases,restores,reveals,open,get stopCount(){return stopCount;},get sourceNavigation(){return sourceNavigation;}};
@@ -115,5 +115,27 @@ function harness() {
   vm.runInContext(actual('rememberReaderTabPosition'),h.c);
   h.c.rememberReaderTabPosition(h.reader);assert.equal(captures,0,'Outgoing text cannot overwrite the pending tab’s reading position.');
   h.reader.activeTabID='A';h.c.rememberReaderTabPosition(h.reader);assert.equal(captures,1);
+}
+{
+  const h=harness();
+  let chooseCode;
+  Object.assign(h.c, {
+    currentColumnWorkflowView:()=> 'research',
+    canAddReaderTab:()=>true,
+    openReaderCodePicker:(_anchor,choose)=>{chooseCode=choose;},
+    rememberReaderTabPosition(){},retainReaderColumn(){},saveWorkspaceState(){},
+    codeOptionVersion:code=>code.version,newReaderState:value=>value,
+    addReaderTab(reader){reader.activeTabID='B';},
+    transitionWorkspace:(_reason,options)=>h.open('B',{retain:options.readerTabSwitchPaneID==='reader:one'})
+  });
+  vm.runInContext(actual('openReaderTabPicker'),h.c);
+  h.c.openReaderTabPicker(h.reader,{});
+  await chooseCode({prefix:'PC',version:'2022'});
+  assert.equal(h.track.children[0],h.original,'Adding an inner tab retains the painted Reader until its new code is ready');
+  assert.equal(h.original.dataset.readerTabPending,'true');
+  h.pending.get('B').resolve(panel('B','New tab enacted text'));
+  await h.c.workspacePaneHydrator.settled();
+  assert.equal(h.track.children[0].body.textContent,'New tab enacted text');
+  assert.equal(h.track.scrollLeft,17,'Adding a tab preserves the horizontal workspace position');
 }
 console.log('Reader tab publication passed: retained painted content, no loading shell, inert outgoing actions, immediate saved-position restore, rapid-switch ownership, reconciliation, failure recovery and cleanup.');
