@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { createWorkspacePaneHydrator } from '../public/workspace-pane-hydration.js';
+import { createWorkspaceViewPresentation } from '../public/workspace-view-presentation.js';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const actual = name => {
@@ -18,6 +19,7 @@ function panel(tab, text) {
     children:[strip,header,body],body,header,isConnected:false,attrs:{},
     classList:{contains:name=>names.has(name),toggle(name,on){on?names.add(name):names.delete(name);}},
     setAttribute(name,value){this.attrs[name]=value;},querySelector:selector=>selector==='.reader-content'?body:selector==='.reader-column-tabs'?strip:null,
+    removeAttribute(name){delete this.attrs[name];},
     querySelectorAll:()=>[],replaceWith(next){const parent=this.parentNode,index=parent.children.indexOf(this);assert(index>=0);parent.children[index]=next;next.parentNode=parent;next.isConnected=true;this.parentNode=null;this.isConnected=false;}};
 }
 function harness() {
@@ -33,12 +35,14 @@ function harness() {
     workspacePaneDescriptors:()=>wanted?[{id:'reader:one',identity:wanted,publicContent:true,label:'Reader',sourceNavigation,scrollPosition:sourceNavigation?undefined:{top:425},
       load(signal){signals.set(wanted,signal);return pending.get(wanted).promise;}}]:[],
     paneIDForReader:reader=>`reader:${reader.id}`,hasCapability:()=>true,activePinnedPaneID:()=>'',workflowPaneIsVisible:()=>true,
+    workspaceViewPresentation:{coversWorkspace:()=>true},
     applyPaneWeight(){},ensureWorkspacePanelAccessibleName(){},preparePaneCollapse(){},bindPaneDragging(){},
     refreshColumnGroupPresentation(){},updateCollapsedPaneDividers(){},refreshPinnedPaneDivider(){},
     bindReaderScrollIndicator(){},updateReaderScrollIndicator(){},enhanceSelect(){},notifyWorkspaceLayoutChange(){},
     cancelReaderPanelRequests(){stopCount++;},renderReaderTabs(pane,reader){pane.dataset.readerTabId=reader.activeTabID;},
     disposeUnpublishedWorkspacePane(pane){assert.equal(pane.isConnected,false);releases.push(pane);},
     restoreReaderScrollPositions(positions){restores.push(positions);track.children[0].body.scrollTop=positions.get('reader:one').top;},
+    applyReaderScrollPosition(pane,position){restores.push(new Map([['reader:one',position]]));pane.body.scrollTop=position.top;},
     revealReaderSourceTarget(reader,item,_anchor,options){
       assert.equal(track.children[0].isConnected,true,'Source positioning runs after final column geometry is available.');
       assert.equal(options.immediate,true);reveals.push(item.sectionID);track.children[0].body.scrollTop=940;return true;
@@ -138,4 +142,73 @@ function harness() {
   assert.equal(h.track.children[0].body.textContent,'New tab enacted text');
   assert.equal(h.track.scrollLeft,17,'Adding a tab preserves the horizontal workspace position');
 }
-console.log('Reader tab publication passed: retained painted content, no loading shell, inert outgoing actions, immediate saved-position restore, rapid-switch ownership, reconciliation, failure recovery and cleanup.');
+function scopedBrowser(){
+  const attributes=new Map(),transitions=[];
+  const document={documentElement:{setAttribute:(key,value)=>attributes.set(key,value),removeAttribute:key=>attributes.delete(key)},
+    startViewTransition(update){
+      const done=deferred(),ready=deferred(),finished=deferred();
+      const transition={updateCallbackDone:done.promise,ready:ready.promise,finished:finished.promise,
+        async start(){try{await update();done.resolve();ready.resolve();finished.resolve();}catch(error){done.reject(error);ready.reject(error);finished.reject(error);}},
+        skipTransition(){ready.reject(Error('Superseded'));done.promise.then(()=>finished.resolve(),()=>finished.resolve());}};
+      transitions.push(transition);return transition;
+    }};
+  return {attributes,transitions,presentation:createWorkspaceViewPresentation(document)};
+}
+{
+  const h=harness(),b=scopedBrowser();h.c.workspaceViewPresentation=b.presentation;
+  let finalLayout=false;
+  h.c.notifyWorkspaceLayoutChange=()=>{finalLayout=true;};
+  const restore=h.c.applyReaderScrollPosition;
+  let reserved=false;
+  h.c.applyReaderScrollPosition=(pane,position)=>{
+    assert.equal(finalLayout,true,'Measure the saved anchor after final column layout');
+    assert.equal(reserved,true,'Reserve progressive chapter space before restoring and presenting the passage');
+    restore(pane,position);
+  };
+  await h.open('B');
+  assert.equal(b.transitions.length,0,'Network and content loading happen outside the visual transaction');
+  assert.equal(b.attributes.size,0,'The rest of the workspace remains live throughout loading');
+  let complete=false;const ready=h.c.whenWorkspacePaneReady('reader:one').then(value=>{complete=true;return value;});
+  const incoming=panel('B','Complete incoming enacted text');incoming.body._readerPrepareSourceNavigation=()=>{reserved=true;};
+  h.pending.get('B').resolve(incoming);await h.c.workspacePaneHydrator.settled();
+  assert.equal(b.transitions.length,0,'A prepared Reader commits without native snapshots remeasuring virtual sections');
+  assert.equal(await ready,true);await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(complete,true);assert.equal(b.presentation.coversWorkspace(),false);
+  assert.equal(h.track.children[0].body.scrollTop,425,'The final position is ready before the new Reader is presented');
+  assert.equal(b.attributes.size,0);assert.equal(h.original.attrs['data-reader-tab-presenting'],undefined);
+  assert.equal(h.track.children[0].attrs['data-reader-tab-presenting'],undefined);
+}
+{
+  const h=harness(),b=scopedBrowser();h.c.workspaceViewPresentation=b.presentation;
+  await h.open('B');await h.open('C');const ready=h.c.whenWorkspacePaneReady('reader:one');
+  h.pending.get('C').resolve(panel('C','Latest complete code'));await h.c.workspacePaneHydrator.settled();
+  assert.equal(await ready,true);const newest=h.track.children[0];
+  const obsolete=panel('B','Obsolete code');h.pending.get('B').resolve(obsolete);await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(h.track.children[0],newest,'A late source cannot replace the latest tab');assert.ok(h.releases.includes(obsolete));
+  assert.equal(b.transitions.length,0);assert.equal(b.attributes.size,0);
+}
+for(const skip of ['another column','unavailable native transition']){
+  const h=harness();h.c.workspaceViewPresentation={coversWorkspace:()=>false,present:()=>skip==='another column'?Promise.resolve(false):Promise.reject(Error('Skipped'))};
+  await h.open('B');const ready=h.c.whenWorkspacePaneReady('reader:one');
+  h.pending.get('B').resolve(panel('B','Ready code'));await h.c.workspacePaneHydrator.settled();assert.equal(await ready,true,skip);
+  assert.equal(h.track.children[0].body.textContent,'Ready code','A visual cancellation must not strand an independent ready Reader');
+}
+{
+  const h=harness(),b=scopedBrowser();let visible=true;h.c.workspaceViewPresentation=b.presentation;h.c.workflowPaneIsVisible=()=>visible;
+  await h.open('B');visible=false;const ready=h.c.whenWorkspacePaneReady('reader:one');
+  h.pending.get('B').resolve(panel('B','Ready hidden tab'));await h.c.workspacePaneHydrator.settled();assert.equal(await ready,true);
+  assert.equal(b.transitions.length,0);
+  assert.equal(h.track.children[0].classList.contains('is-workflow-hidden'),true,'Finishing a background tab cannot reveal its hidden workflow');
+}
+const css=await readFile(new URL('../public/styles.css',import.meta.url),'utf8');
+assert.match(css,/html\[data-reader-tab-presenting\] \.reader-panel\[data-reader-tab-presenting\] \*/);
+assert.doesNotMatch(css,/view-transition-name: reader-tab/);
+{
+  const cleared=[],content={__sectionAlignmentTimers:[11,22,33],querySelectorAll:()=>[],closest:()=>null};
+  const c=vm.createContext({window:{clearTimeout:timer=>cleared.push(timer)},cancelReaderScrollRestore(){}});
+  vm.runInContext(actual('stopReaderProgressiveHydration'),c);
+  c.stopReaderProgressiveHydration(content);c.stopReaderProgressiveHydration(content);
+  assert.deepEqual(cleared,[11,22,33],'Outgoing passage alignment cannot scroll a retained Reader after another tab is selected');
+  assert.equal(content.__sectionAlignmentTimers.length,0);
+}
+console.log('Reader tab publication passed: retained painted content, atomic no-fade handoff, synchronous position restore, live neighboring tools, rapid-switch ownership, context fences, failure recovery and cleanup.');

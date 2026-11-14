@@ -10,7 +10,7 @@ globalThis.window={innerWidth:1200};
 globalThis.requestAnimationFrame=fn=>{frame=fn;return 1;};globalThis.cancelAnimationFrame=()=>{frame=null;};
 globalThis.IntersectionObserver=class{constructor(fn){intersection=fn;}observe(){}disconnect(){}};
 globalThis.ResizeObserver=class{constructor(fn){resize=fn;}observe(){}unobserve(){}disconnect(){}};
-const panel={isConnected:true,classList:{contains:()=>false},getBoundingClientRect:()=>({width:600,left:offscreen?1400:0,right:offscreen?2000:600})};
+const panel={isConnected:true,classList:{contains:()=>false},getBoundingClientRect:()=>({top:0,width:600,left:offscreen?1400:0,right:offscreen?2000:600})};
 const blocks=Array.from({length:1319},(_,i)=>({id:`b${i}`,plainText:`Original authoritative passage ${i}`}));
 const controller=createReaderBlockWindow({root,content,panel,blocks,blockID:b=>b.id,render(b){mounts++;const n=node();n.textContent=b.plainText;n.dataset.blockId=b.id;return n;},release(){releases++;},beforeMount(){},isCurrent:()=>true});
 const notifyResize=()=>resize([]);
@@ -34,4 +34,18 @@ const held=controller.ensure('b1300');held.classList.contains=name=>name==='is-n
 offscreen=true;intersection();flush();assert.equal(root.children.filter(n=>n.textContent).length,1,'Only the explicit destination survives offscreen suspension');
 offscreen=false;intersection();flush();assert.ok(root.children.filter(n=>n.textContent).length<=41);
 controller.dispose();const previous=mounts;controller.ensure('b2');assert.equal(mounts,previous,'Disposed Readers cannot recreate detached passages');
+{
+  root.children=[];content.scrollTop=0;content.clientWidth=600;
+  const originalComputedStyle=globalThis.getComputedStyle;
+  globalThis.getComputedStyle=()=>({height:'160px'});
+  let changeCoveredPassage=false;
+  const overlay=createReaderBlockWindow({root,content,panel,blocks:blocks.slice(0,60),blockID:b=>b.id,
+    render(b){const n=node();n.dataset.blockId=b.id;return n;},release(){},isCurrent:()=>true,
+    beforeMount(){if(changeCoveredPassage){root.children[1].style.height='85px';changeCoveredPassage=false;}}});
+  flush();const before=root.children[3].getBoundingClientRect().top;
+  changeCoveredPassage=true;intersection();flush();
+  assert.equal(root.children[3].getBoundingClientRect().top,before,
+    'Materializing a passage covered by the header cannot move the visible passage below it');
+  overlay.dispose();globalThis.getComputedStyle=originalComputedStyle;
+}
 console.log('Passage windows: 1319 identities, at most 40 bodies, exact/text/end jumps, resize anchor, offscreen suspension/resume and disposal passed.');

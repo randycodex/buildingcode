@@ -109,6 +109,8 @@ try {
   overlay.content.closest = () => ({headerHeight:'160px',getBoundingClientRect:()=>({top:0})});
   const visiblePassage = overlay.content.querySelector('[data-section-id="48"]');
   overlay.content.scrollTop -= 160;
+  assert.equal(overlay.extent.unloadedScrollPosition('fixed-header'),null,
+    'A placeholder covered by the header cannot override the visible loaded passage when saving a tab');
   const beforeHydration = visiblePassage.getBoundingClientRect().top;
   overlay.extent.replace(36, sections.slice(36, 48).map(section => new Node(700, section.id)), () => {});
   assert.equal(visiblePassage.getBoundingClientRect().top,beforeHydration,

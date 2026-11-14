@@ -72,7 +72,8 @@ export function createReaderBlockWindow({root, content, panel, blocks, blockID, 
       for (const index of [...mounted]) if (!protectedNode(slots[index])) evict(index);
       return;
     }
-    const top = viewport.top;
+    const headerHeight = typeof getComputedStyle === 'function' ? Number.parseFloat(getComputedStyle(panel, '::before').height) : 0;
+    const top = Math.max(viewport.top, (panel.getBoundingClientRect().top ?? viewport.top) + (Number.isFinite(headerHeight) ? headerHeight : 0));
     let lower = 0, upper = slots.length;
     while (lower < upper) {
       const middle = (lower + upper) >>> 1;

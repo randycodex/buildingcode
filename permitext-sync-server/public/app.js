@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1817";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1829";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -37,7 +37,7 @@ import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./min
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261109-notebook-desk-v1299";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=4";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=3";
-import { createReaderBlockWindow } from "./reader-block-window.js?v=10";
+import { createReaderBlockWindow } from "./reader-block-window.js?v=11";
 import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=4";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -45,7 +45,7 @@ import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarg
 import { applyLetterDocumentLayout } from "./document-layout.js?v=1";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportSwitch, createReportSourcePreviews, retainReportChildren } from "./report-presentation.js?v=1";
-import { createWorkspaceViewPresentation } from "./workspace-view-presentation.js?v=2";
+import { createWorkspaceViewPresentation } from "./workspace-view-presentation.js?v=5";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=20";
@@ -67,7 +67,7 @@ import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=202
 import { searchReaderTextSections, rankReaderSearchResults } from "./reader-search-match.js?v=20261026-exact-section-v4";
 import { searchWords, searchWordPattern } from "./search-words.js?v=20261025-workspace-chrome-v1379";
 import { buildReaderChapterContents, readerContentsLabel, readerContentsChapterKey, readerContentsNodeCanExpand } from "./reader-navigation-tree.js?v=20261112-label-case-v3";
-import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261112-visible-anchor-v3";
+import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261114-reader-tab-anchor-v4";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, withoutWorkspaceLayoutSync, retireWorkspaceLayoutSyncEntries } from "./workspace-layout-sync.js?v=5";
@@ -171,7 +171,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1817";
+} from "./offline-storage.js?v=20261113-research-notebook-v1829";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4664,10 +4664,12 @@ async function switchReaderTab(reader, tabID, { focus = true } = {}) {
   retainReaderColumn(reader);
   const workspaceID = activeWorkspaceID;
   const identity = captureAccountRequest();
+  const view = currentColumnWorkflowView(), navigation = state.workflowNavigationGeneration || 0;
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID], readerTabSwitchPaneID: paneID });
   if (!await whenWorkspacePaneReady(paneID) || activeWorkspaceID !== workspaceID ||
-      !isCurrentAccountRequest(identity) || reader.activeTabID !== tabID) return;
+      !isCurrentAccountRequest(identity) || reader.activeTabID !== tabID || currentColumnWorkflowView() !== view ||
+      (state.workflowNavigationGeneration || 0) !== navigation) return;
   if (focus) track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"] .reader-code-tab[aria-selected="true"]`)?.focus({ preventScroll: true });
 }
 
@@ -18193,6 +18195,8 @@ function stopReaderProgressiveHydration(content) {
   content?.querySelectorAll(".chapter-section").forEach(section => section._readerBlockWindow?.dispose());
   content?._readerProgressiveCleanup?.();
   if (content) {
+    (content.__sectionAlignmentTimers || []).forEach(timer => window.clearTimeout(timer));
+    content.__sectionAlignmentTimers = [];
     const panel = content.closest?.(".reader-panel");
     if (panel && panel._readerSectionVisibility === content._readerSectionVisibility) delete panel._readerSectionVisibility;
     delete content._readerSectionVisibility;
@@ -18362,6 +18366,7 @@ async function progressivelyRenderReaderChapter(
     if (hydrationInFlight) return;
     const threshold = Math.max(320, content.clientHeight * 0.6);
     const window = extent.nextWindow(readerProgressiveSectionBatchSize, threshold);
+    restorePendingReaderScrollPosition(panel);
     if (window) void hydrateWindow(window);
     else if (extent.loadedCount === sections.length) {
       content.dataset.chapterFullyLoaded = "true";
@@ -47144,14 +47149,34 @@ function captureReaderScrollPositions(onlyPanel = null) {
       positions.set(panel.dataset.paneId, snapshot.position);
       return;
     }
-    const reservedPosition = content._readerChapterExtent?.unloadedScrollPosition(contentKey);
-    if (reservedPosition) { positions.set(panel.dataset.paneId, reservedPosition); return; }
-    const top = content.getBoundingClientRect().top;
-    const sectionMatch = firstBelow(content.querySelectorAll(".chapter-section[data-section-id]"), top);
-    if (!sectionMatch) return;
-    const section = sectionMatch.node;
-    const blockMatch = firstBelow(section.querySelectorAll(".annotated-code-block[data-block-id], .reader-block-placeholder[data-block-id]"), top);
-    const block = blockMatch?.node;
+    const contentBounds = content.getBoundingClientRect();
+    const contentTop = contentBounds.top;
+    const headerHeight = typeof getComputedStyle === 'function' ? Number.parseFloat(getComputedStyle(panel, '::before').height) : 0;
+    const top = Math.max(contentTop, (panel.getBoundingClientRect?.().top ?? contentTop) + (Number.isFinite(headerHeight) ? headerHeight : 0));
+    // Hit testing reads the text actually painted on screen without measuring
+    // skipped sections, whose intrinsic height can change during a probe.
+    let block = null, section = null;
+    if (content.ownerDocument?.elementFromPoint && contentBounds.width > 0) {
+      for (const gap of [1, 24, 48, 96, 160]) {
+        const y = top + gap;
+        if (y >= contentBounds.bottom) break;
+        const hit = content.ownerDocument.elementFromPoint(contentBounds.left + contentBounds.width / 2, y);
+        const candidate = hit?.closest('.annotated-code-block[data-block-id]');
+        if (candidate && content.contains(candidate)) {
+          block = candidate;
+          section = block.closest('.chapter-section[data-section-id]');
+          if (section) break;
+        }
+      }
+    }
+    if (!section) {
+      const reservedPosition = content._readerChapterExtent?.unloadedScrollPosition(contentKey);
+      if (reservedPosition) { positions.set(panel.dataset.paneId, reservedPosition); return; }
+      const sectionMatch = firstBelow(content.querySelectorAll(".chapter-section[data-section-id]"), top);
+      if (!sectionMatch) return;
+      section = sectionMatch.node;
+      block = firstBelow(section.querySelectorAll(".annotated-code-block[data-block-id], .reader-block-placeholder[data-block-id]"), top)?.node;
+    }
     // Boundary probes may lay out a skipped neighboring block. Measure the
     // chosen anchor again after those probes so its saved offset is current.
     block?.getBoundingClientRect();
@@ -47207,21 +47232,34 @@ function cancelReaderScrollRestore(content) {
   if (content) {
     delete content._readerScrollRestoreAbort;
     delete content._readerPendingScrollPosition;
+    delete content._readerScrollRestoreRetained;
   }
 }
 
-function applyReaderScrollPosition(panel, position) {
+function applyReaderScrollPosition(panel, position, { retain = false } = {}) {
   if (panel?.classList.contains("is-workflow-hidden")) { panel._workflowReaderPosition = position; return; }
   const content = panel?.querySelector(".reader-content");
   if (!content || !panel.isConnected || panel.dataset.readerContentKey !== position?.contentKey) {
     cancelReaderScrollRestore(content);
     return;
   }
+  retain ||= Boolean(content._readerScrollRestoreRetained);
+  const holdPosition = () => {
+    content._readerPendingScrollPosition = position;
+    content._readerScrollRestoreRetained = retain;
+    if (!content._readerScrollRestoreAbort) {
+      const controller = new AbortController();
+      content._readerScrollRestoreAbort = controller;
+      for (const event of ["wheel", "touchstart", "pointerdown", "keydown"]) {
+        content.addEventListener(event, () => cancelReaderScrollRestore(content), { signal: controller.signal, passive: true });
+      }
+    }
+  };
   const snapshot = panel._readerAnchorSnapshot;
   if (snapshot?.position === position && snapshot.renderToken === panel.dataset.readerRenderToken &&
       [content.scrollTop, content.clientWidth, content.scrollHeight, content.childElementCount]
         .every((value, index) => value === snapshot.metrics[index])) {
-    cancelReaderScrollRestore(content);
+    if (retain) holdPosition(); else cancelReaderScrollRestore(content);
     return;
   }
   const section = content.querySelector(`.chapter-section[data-section-id="${CSS.escape(position.sectionID)}"]`);
@@ -47237,7 +47275,7 @@ function applyReaderScrollPosition(panel, position) {
   const retainedOffset = block ? position.anchorOffset : position.sectionOffset;
   if (position.estimatedFraction === undefined && Number.isFinite(retainedOffset) && content.clientHeight > 0 &&
       Math.abs(anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - retainedOffset) <= 1) {
-    cancelReaderScrollRestore(content);
+    if (retain) holdPosition(); else cancelReaderScrollRestore(content);
     updateReaderScrollIndicator(panel);
     return;
   }
@@ -47248,33 +47286,32 @@ function applyReaderScrollPosition(panel, position) {
   const sectionIndex = sections.indexOf(section);
   const measured = sections.slice(Math.max(0, sectionIndex - 2), sectionIndex + 3)
     .map(node => ({ node, visibility: node.style.contentVisibility }));
-  let targetTop, maximumTop;
-  measured.forEach(({ node }) => { node.style.contentVisibility = "visible"; });
-  try {
-    const offset = block ? position.anchorOffset : Number.isFinite(position.estimatedFraction)
-      ? -position.estimatedFraction * section.getBoundingClientRect().height : position.sectionOffset;
-    // Scrolling can materialize skipped passages and change earlier heights.
-    // Settle that bounded layout before painting the restored reading position.
+  let targetTop, maximumTop, offset;
+  const settleAnchor = () => {
     for (let attempt = 0; attempt < 3; attempt++) {
       targetTop = Math.max(0, content.scrollTop + anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset);
       maximumTop = Math.max(0, content.scrollHeight - content.clientHeight);
       content.scrollTop = Math.min(targetTop, maximumTop);
       if (Math.abs(anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset) <= 1) break;
     }
+  };
+  measured.forEach(({ node }) => { node.style.contentVisibility = "visible"; });
+  try {
+    offset = block ? position.anchorOffset : Number.isFinite(position.estimatedFraction)
+      ? -position.estimatedFraction * section.getBoundingClientRect().height : position.sectionOffset;
+    // Scrolling can materialize skipped passages and change earlier heights.
+    // Settle that bounded layout before painting the restored reading position.
+    settleAnchor();
   } finally {
     measured.forEach(({ node, visibility }) => { node.style.contentVisibility = visibility; });
   }
-  if (targetTop > maximumTop + 1 && content.dataset.chapterFullyLoaded !== "true") {
-    // The first small window may be shorter than the viewport. Retry after
-    // nearby sections hydrate, but give control back as soon as the user acts.
-    content._readerPendingScrollPosition = position;
-    if (!content._readerScrollRestoreAbort) {
-      const controller = new AbortController();
-      content._readerScrollRestoreAbort = controller;
-      for (const event of ["wheel", "touchstart", "pointerdown", "keydown"]) {
-        content.addEventListener(event, () => cancelReaderScrollRestore(content), { signal: controller.signal, passive: true });
-      }
-    }
+  // Restoring auto containment changes margin collapsing. Settle once more in
+  // the actual reading layout so repeated tab switches cannot accumulate drift.
+  if (Number.isFinite(offset)) settleAnchor();
+  if (retain || targetTop > maximumTop + 1 && content.dataset.chapterFullyLoaded !== "true") {
+    // Nearby chapter hydration can change reserved heights after the first
+    // publication. Keep the restored passage fixed until the user takes over.
+    holdPosition();
   } else {
     cancelReaderScrollRestore(content);
   }
@@ -50765,54 +50802,89 @@ function getWorkspacePaneHydrator() {
   workspacePaneHydrator = createWorkspacePaneHydrator({
     isContextCurrent: workspacePaneContextIsCurrent,
     onReady(job, pane) {
+      let published = false, discarded = false;
+      const publish = () => {
+        const shell = job.placeholder;
+        if (!shell?.isConnected || shell.parentNode !== track || !pane) {
+          discarded = true;
+          disposeUnpublishedWorkspacePane(pane);
+          return false;
+        }
+        const sourceNavigation = pane._readerSourceNavigation || job.descriptor.sourceNavigation;
+        if (sourceNavigation && !sourceNavigation.isCurrent()) {
+          discarded = true;
+          disposeUnpublishedWorkspacePane(pane);
+          finishWorkspacePaneReady(shell, false);
+          return false;
+        }
+        const scrollLeft = track.scrollLeft;
+        pane.dataset.workspacePaneIdentity ||= job.descriptor.contentIdentity;
+        pane.dataset.workspacePaneAccessIdentity = job.descriptor.accessIdentity;
+        pane.classList.toggle("is-pinned", job.id === activePinnedPaneID());
+        applyPaneWeight(pane, job.id);
+        ensureWorkspacePanelAccessibleName(pane);
+        preparePaneCollapse(pane);
+        bindPaneDragging([pane]);
+        pane.classList.toggle("is-workflow-hidden", !workflowPaneIsVisible(job.id));
+        shell.replaceWith(pane);
+        if (shell.dataset.readerTabPending) disposeUnpublishedWorkspacePane(shell);
+        // The new header is prepared above; retained editors and menus need no rebuild.
+        refreshColumnGroupPresentation({ preparePanels: false });
+        if (job.id === activePinnedPaneID()) refreshPinnedPaneDivider();
+        updateCollapsedPaneDividers();
+        // Only the newly mounted Reader gets restoration listeners and frames.
+        if (pane.classList.contains("reader-panel")) {
+          bindReaderScrollIndicator(pane);
+          updateReaderScrollIndicator(pane);
+          pane.querySelectorAll("select").forEach(enhanceSelect);
+        }
+        if (sourceNavigation) {
+          sourceNavigation.positioned = revealReaderSourceTarget(sourceNavigation.reader, sourceNavigation.item,
+            sourceNavigation.evidenceAnchor, sourceNavigation.options);
+        } else if (job.descriptor.scrollPosition) {
+          if (!shell.dataset.readerTabPending || !pane.classList.contains('reader-panel')) {
+            restoreReaderScrollPositions(new Map([[job.id, job.descriptor.scrollPosition]]));
+          }
+        }
+        if (job.descriptor.scrollTop != null) pane.scrollTop = job.descriptor.scrollTop;
+        // Even a same-value assignment cancels an in-flight smooth scroll.
+        if (track.scrollLeft !== scrollLeft) track.scrollLeft = scrollLeft;
+        notifyWorkspaceLayoutChange();
+        if (!sourceNavigation && shell.dataset.readerTabPending && job.descriptor.scrollPosition && pane.classList.contains('reader-panel')) {
+          // Reserve unloaded chapter space before restoring the anchor. Doing
+          // this on the next frame would move an already presented passage.
+          pane.querySelector('.reader-content')?._readerPrepareSourceNavigation?.();
+          applyReaderScrollPosition(pane, job.descriptor.scrollPosition, { retain: true });
+        }
+        // Retarget the opening scroll to the ready column's final geometry,
+        // preserving the caller's motion instead of snapping to the destination.
+        if (pendingWorkspacePaneRevealID === job.id) {
+          scrollPaneIntoView(job.id, pendingWorkspacePaneRevealBehavior);
+        }
+        finishWorkspacePaneReady(shell, true);
+        published = true;
+        return true;
+      };
       const shell = job.placeholder;
-      if (!shell?.isConnected || shell.parentNode !== track || !pane) {
-        disposeUnpublishedWorkspacePane(pane);
+      if (!shell?.dataset.readerTabPending || !pane?.classList.contains('reader-panel') ||
+          !workflowPaneIsVisible(job.id) || workspaceViewPresentation.coversWorkspace()) {
+        publish();
         return;
       }
-      const sourceNavigation = pane._readerSourceNavigation || job.descriptor.sourceNavigation;
-      if (sourceNavigation && !sourceNavigation.isCurrent()) {
-        disposeUnpublishedWorkspacePane(pane);
-        finishWorkspacePaneReady(shell, false);
-        return;
-      }
-      const scrollLeft = track.scrollLeft;
-      pane.dataset.workspacePaneIdentity ||= job.descriptor.contentIdentity;
-      pane.dataset.workspacePaneAccessIdentity = job.descriptor.accessIdentity;
-      pane.classList.toggle("is-pinned", job.id === activePinnedPaneID());
-      applyPaneWeight(pane, job.id);
-      ensureWorkspacePanelAccessibleName(pane);
-      preparePaneCollapse(pane);
-      bindPaneDragging([pane]);
-      pane.classList.toggle("is-workflow-hidden", !workflowPaneIsVisible(job.id));
-      shell.replaceWith(pane);
-      if (shell.dataset.readerTabPending) disposeUnpublishedWorkspacePane(shell);
-      // The new header is prepared above; retained editors and menus need no rebuild.
-      refreshColumnGroupPresentation({ preparePanels: false });
-      if (job.id === activePinnedPaneID()) refreshPinnedPaneDivider();
-      updateCollapsedPaneDividers();
-      // Only the newly mounted Reader gets restoration listeners and frames.
-      if (pane.classList.contains("reader-panel")) {
-        bindReaderScrollIndicator(pane);
-        updateReaderScrollIndicator(pane);
-        pane.querySelectorAll("select").forEach(enhanceSelect);
-      }
-      if (sourceNavigation) {
-        sourceNavigation.positioned = revealReaderSourceTarget(sourceNavigation.reader, sourceNavigation.item,
-          sourceNavigation.evidenceAnchor, sourceNavigation.options);
-      } else if (job.descriptor.scrollPosition) {
-        restoreReaderScrollPositions(new Map([[job.id, job.descriptor.scrollPosition]]));
-      }
-      if (job.descriptor.scrollTop != null) pane.scrollTop = job.descriptor.scrollTop;
-      // Even a same-value assignment cancels an in-flight smooth scroll.
-      if (track.scrollLeft !== scrollLeft) track.scrollLeft = scrollLeft;
-      notifyWorkspaceLayoutChange();
-      // Retarget the opening scroll to the ready column's final geometry,
-      // preserving the caller's motion instead of snapping to the destination.
-      if (pendingWorkspacePaneRevealID === job.id) {
-        scrollPaneIntoView(job.id, pendingWorkspacePaneRevealBehavior);
-      }
-      finishWorkspacePaneReady(shell, true);
+      // Fetching and rendering finished offscreen. Commit only this Reader
+      // synchronously; neighboring tools keep running throughout the load.
+      const ownsSource = () => !discarded && !job.signal?.aborted && workspacePaneContextIsCurrent(job.context) &&
+        (published ? pane.isConnected : shell.isConnected && shell.parentNode === track);
+      const finish = () => {
+        if (published || discarded) return;
+        if (ownsSource()) publish();
+        else if (!pane.isConnected) { discarded = true; disposeUnpublishedWorkspacePane(pane); }
+      };
+      void workspaceViewPresentation.present({
+        isCurrent: () => ownsSource() && workflowPaneIsVisible(job.id),
+        scope: () => published ? pane : shell,
+        update: publish
+      }).then(finish, finish);
     },
     onError(job) {
       const shell = job.placeholder;

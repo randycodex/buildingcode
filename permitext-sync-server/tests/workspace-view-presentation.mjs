@@ -72,6 +72,29 @@ for(const action of ['cancel','context changed','update failed']){
   assert.equal(b.attributes.size,0);
 }
 
+{
+  const b=browser(),ready=deferred(),marks=[];
+  const element=name=>{const attributes=new Map();return {attributes,setAttribute(key,value){attributes.set(key,value);marks.push(name);},removeAttribute:key=>attributes.delete(key)};};
+  const outgoing=element('outgoing'),incoming=element('incoming');let reader=outgoing;
+  const switching=b.presentation.present({isCurrent:()=>true,scope:()=>reader,update:async()=>{await ready.promise;reader=incoming;return true;}});
+  assert.equal(b.presentation.coversWorkspace(),false,'A Reader handoff leaves the neighboring workspace live');
+  assert.equal(b.attributes.get('data-reader-tab-presenting'),'true');
+  assert.equal(outgoing.attributes.get('data-reader-tab-presenting'),'true');
+  assert.equal(b.transitions.length,0,'Reader publication must not snapshot virtual sections');
+  ready.resolve();assert.equal(await switching,true);assert.deepEqual(marks,['outgoing','incoming']);
+  assert.equal(outgoing.attributes.size,0);assert.equal(incoming.attributes.size,0);assert.equal(b.attributes.size,0);
+}
+{
+  const b=browser(),attributes=new Map(),ready=deferred();
+  const reader={setAttribute:(key,value)=>attributes.set(key,value),removeAttribute:key=>attributes.delete(key)};
+  const first=b.presentation.present({isCurrent:()=>true,scope:()=>reader,update:async()=>{await ready.promise;return true;}});
+  const last=b.presentation.present({isCurrent:()=>true,update:()=>true});
+  assert.equal(attributes.size,0,'Switching views clears Reader presentation markers');
+  assert.equal(b.attributes.has('data-reader-tab-presenting'),false);assert.equal(b.presentation.coversWorkspace(),true);
+  ready.resolve();assert.equal(await first,false);
+  await b.transitions[0].start();b.transitions[0].finish();assert.equal(await last,true);assert.equal(b.attributes.size,0);
+}
+
 // Exercise the real top-menu handoff with delayed editor/source hydration.
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const start=app.indexOf('async function presentWorkingView(');

@@ -136,6 +136,10 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
     unloadedScrollPosition(contentKey) {
       const saved = anchor(false);
       if (!saved || loaded[saved.index]) return null;
+      // A reserved slot behind the fixed header must not replace the reading
+      // anchor of real source text already visible below that header.
+      const visible = anchor();
+      if (visible && loaded[visible.index]) return null;
       return { contentKey, sectionID: String(sections[saved.index].id), blockID: "",
         anchorOffset: saved.offset, sectionOffset: saved.offset, estimatedFraction: saved.fraction };
     },

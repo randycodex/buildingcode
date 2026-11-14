@@ -20333,7 +20333,8 @@ dialog.report-export-review {
 .workflow-toolbar > div { display: flex; align-items: center; gap: 20px; }
 .workflow-toolbar > [hidden], .panel-track > .is-workflow-hidden { display: none !important; }
 /* Present each working view in one paint, without fading the retained editors. */
-html[data-workflow-presenting] .workspace-shell * {
+html[data-workflow-presenting]:not([data-reader-tab-presenting]) .workspace-shell *,
+html[data-reader-tab-presenting] .reader-panel[data-reader-tab-presenting] * {
   transition: none !important;
   animation: none !important;
 }
