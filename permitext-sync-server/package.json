@@ -33,6 +33,7 @@
     "test:shell-rollout": "node tests/populated-rollout-fixture-contract.mjs && node tests/offline-shell-coherence.mjs",
     "test:matched-workload": "node tests/populated-matched-workload-contract.mjs && node tests/populated-benchmark-observer-contract.mjs && node tests/populated-summary-attribution-contract.mjs",
     "test:research-draft-refresh": "node tests/research-draft-refresh-isolation.mjs",
+    "test:research-history-sidebar": "node tests/research-question-rail.mjs && node tests/research-history-title-scroll.mjs",
     "test:research-history-grouping": "node tests/research-history-grouping-contract.mjs",
     "test:research-history-content": "node tests/research-history-content-contract.mjs",
     "test:native-reader-definition-decoration": "node tests/native-reader-definition-decoration.mjs",

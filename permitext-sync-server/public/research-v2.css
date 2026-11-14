@@ -1,7 +1,8 @@
 /* Research v2 uses the existing workspace colors and Reader typography. */
 .research-v2-panel{min-width:min(760px,95vw);flex-basis:960px}
 .research-v2-panel>.analysis-content{padding:0;overflow:hidden;display:flex;min-height:0}
-.research-v2{display:grid;grid-template-columns:minmax(0,var(--rv2-rail-width,320px)) 1px minmax(0,1fr);width:100%;height:100%;min-height:420px;color:var(--text-primary);font:14px/1.6 var(--ui-font-family)}
+/* The stored sidebar width includes the panel's left gutter. */
+.research-v2{display:grid;grid-template-columns:calc(clamp(200px,var(--rv2-rail-width,320px),350px) - var(--panel-padding)) 1px minmax(0,1fr);width:100%;height:100%;min-height:420px;color:var(--text-primary);font:14px/1.6 var(--ui-font-family)}
 .research-v2 button,.research-v2 textarea{font:inherit;color:inherit}
 .research-v2 button{border:0;background:transparent;padding:7px 9px;border-radius:10px;text-align:left}
 .research-v2 button:hover{background:var(--toolbar-active)}
@@ -21,7 +22,9 @@
 .rv2-question-row:is(:hover,:has(:focus-visible)){background:var(--menu-highlight)}
 .rv2-question-row:has(>.rv2-question-link[aria-current=page]){background:color-mix(in srgb,var(--text-primary) 16%,transparent)}
 .research-v2 .rv2-question-link{display:block;width:100%;padding:12px 0;font-size:14px;line-height:1.5;box-sizing:border-box;min-width:0;overflow-wrap:anywhere;vertical-align:middle;color:var(--text-primary)}
-.rv2-question-title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;white-space:normal;overflow:hidden}
+.rv2-question-title{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rv2-question-title-text{position:relative;white-space:nowrap}
+.rv2-question-title.is-title-scrolling{text-overflow:clip}
 .research-v2 .rv2-question-link,.research-v2 .rv2-question-link:hover{background:transparent;border-radius:0;box-shadow:none}
 .research-v2 .assistant-history-row-menu{display:inline-flex;align-items:center;justify-content:center;padding:0}
 .research-v2 .assistant-history-row-menu svg{display:block;width:18px;height:18px;flex:0 0 18px;pointer-events:none}
@@ -74,7 +77,7 @@
 /* Keep the split line and resize target flush with the column's outer edges. */
 @media(min-width:681px){
   .research-v2-panel{position:relative}
-  .rv2-rail-divider{position:absolute;inset-block:0;left:calc(var(--panel-padding) + var(--rv2-rail-width,320px));width:1px}
+  .rv2-rail-divider{position:absolute;inset-block:0;left:clamp(200px,var(--rv2-rail-width,320px),350px);width:1px}
   .rv2-chat{grid-column:3}
 }
 @media(max-width:680px){.research-v2-panel{min-width:92vw}.research-v2{grid-template-columns:minmax(0,1fr)}.rv2-rail{display:none;max-height:240px;border-block-end:1px solid var(--border)}.rv2-rail-divider{display:none}.rv2-show-history .rv2-rail{display:block}.rv2-chat{padding:0 14px}.research-v2 .rv2-mobile-history{display:block;font-size:12px;align-self:flex-start;margin-top:8px}.rv2-welcome{margin:45px 0}.rv2-input,.rv2-fact-input{font-size:16px}.rv2-answer{padding:14px}.rv2-composer{margin-bottom:12px}}

@@ -1,4 +1,4 @@
-import {attachResearchQuestionRail} from "./research-question-rail.js?v=2";
+import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=4";
 import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
 import {researchInlineRuns} from "./research-inline-format.js?v=1";
 // A small view with injected workspace/Reader adapters. No provider calls or
@@ -46,6 +46,7 @@ export function createResearchV2View(options) {
     onFind, onReview, onInclude, onRemove, onCitation, onSnapshot,
     isCurrent = () => true, onStatus } = options;
   const root=node('section','research-v2');root.setAttribute('aria-label','Research');
+  const historyTitles=attachResearchHistoryTitleScroll({root});
   const rail=node('aside','rv2-rail');rail.setAttribute('aria-label','Research history');
   const list=node('div','rv2-questions');
   const historyRecords=[];
@@ -63,7 +64,9 @@ export function createResearchV2View(options) {
         const li=node('li','rv2-question-row');
         const title=options.historyTitle?.(item)||item.title||item.starterQuestion||'New question';
         const open=action('',()=>{if(!options.historyManagement?.selectConversation(item.id))onOpen(item.id);},'rv2-question-link');
-        open.append(node('span','rv2-question-title',title));open.title=item.starterQuestion||title;
+        const titleClip=node('span','rv2-question-title');
+        titleClip.append(node('span','rv2-question-title-text',title));
+        open.append(titleClip);open.title=item.starterQuestion||title;
         if(item.id===conversation?.id)open.setAttribute('aria-current','page');
         const rename=()=>{
           const form=node('form','rv2-rename-form');
@@ -98,6 +101,7 @@ export function createResearchV2View(options) {
     }
     options.historyManagement?.setConversations(historyRecords);
     rail.scrollTop=scroll;
+    historyTitles.refresh();
   }
   function appendQuestions(items){items.forEach(item=>{
     if(knownQuestions.has(item.id))return;knownQuestions.add(item.id);historyRecords.push(item);
@@ -118,6 +122,7 @@ export function createResearchV2View(options) {
   if(newChat)rail.append(newChat);
   const divider=node('div','rv2-rail-divider');
   const questionRail=attachResearchQuestionRail({root,divider,widthStore:options.railWidthStore});
+  const historyTitleResize=new ResizeObserver(()=>historyTitles.refresh());historyTitleResize.observe(rail);
   const chat=node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');
   const mobileHistory=action('Questions',()=>{const expanded=root.classList.toggle('rv2-show-history');mobileHistory.setAttribute('aria-expanded',String(expanded));},'rv2-mobile-history');
   mobileHistory.setAttribute('aria-expanded','false');
@@ -343,7 +348,7 @@ export function createResearchV2View(options) {
     initialScroll.disconnect();}});initialScroll.observe(thread);}
   if(revealEntry)revealController=revealResearchAnswer({entry:revealEntry,tokens:revealTokens,isCurrent,
     onDone:()=>{revealBusy=false;update();}});
-  return {element:root,dispose(){stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();},focus(){input.focus({preventScroll:true});},
+  return {element:root,dispose(){stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();historyTitleResize.disconnect();historyTitles.dispose();},focus(){input.focus({preventScroll:true});},
     focusAnswer(answerID){
       const answer=Array.from(thread.querySelectorAll('.rv2-answer')).find(entry=>entry.dataset.messageId===answerID);
       if(!answer || !root.isConnected)return false;
