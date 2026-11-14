@@ -292,6 +292,7 @@ struct PermitextApp: App {
                     } else if ProcessInfo.processInfo.arguments.contains("--native-access-flow-fixture") {
                         if library.isInitialContentLoaded {
                             PermitextRootNavigation(offersFirstUseExperience: offersFirstUseExperience)
+                                .task { await library.performStartupAccountSyncIfNeeded() }
                         } else {
                             AppLaunchLoadingView(progress: library.initialLoadProgress, message: "Loading code library...")
                         }
@@ -706,24 +707,31 @@ private struct Phase3EntitledResearchHarness: View {
     @State private var isReady = false
 
     var body: some View {
-        PermitextMainTabs(
-            saved: BookmarksView(filterDefaults: configuration.defaults),
-            primary: Group {
-                if ProcessInfo.processInfo.arguments.contains("--main-header-alignment-fixture") {
-                    BrowseView(browserContext: .primary)
-                } else {
-                    readerTab
-                }
-            }.environment(\.isBrowserTabActive, library.selectedTab == .browse),
-            secondary: Group {
-                if ProcessInfo.processInfo.arguments.contains("--main-header-alignment-fixture") {
-                    BrowseView(browserContext: .secondary)
-                } else {
-                    ContentUnavailableView("Second Reader", systemImage: "text.line.last.and.arrowtriangle.forward")
-                }
-            },
-            research: ResearchView(cacheDirectoryURL: configuration.cacheDirectoryURL)
-        )
+        Group {
+            if ProcessInfo.processInfo.arguments.contains("--native-project-navigation-fixture") {
+                PermitextTabNavigation(researchCacheDirectoryURL: configuration.cacheDirectoryURL,
+                                      filterDefaults: configuration.defaults)
+            } else {
+                PermitextMainTabs(
+                    saved: BookmarksView(filterDefaults: configuration.defaults),
+                    primary: Group {
+                        if ProcessInfo.processInfo.arguments.contains("--main-header-alignment-fixture") {
+                            BrowseView(browserContext: .primary)
+                        } else {
+                            readerTab
+                        }
+                    }.environment(\.isBrowserTabActive, library.selectedTab == .browse),
+                    secondary: Group {
+                        if ProcessInfo.processInfo.arguments.contains("--main-header-alignment-fixture") {
+                            BrowseView(browserContext: .secondary)
+                        } else {
+                            ContentUnavailableView("Second Reader", systemImage: "text.line.last.and.arrowtriangle.forward")
+                        }
+                    },
+                    research: ResearchView(cacheDirectoryURL: configuration.cacheDirectoryURL)
+                )
+            }
+        }
         .scrollIndicators(.hidden)
         .modifier(GlobalSearchPresentation())
         .overlay(alignment: .topTrailing) {
@@ -812,10 +820,23 @@ private struct Phase3EntitledResearchHarness: View {
             return
         }
 
+        let overviewFixture = ProcessInfo.processInfo.arguments.contains("--native-project-overview-fixture")
+        let overviewFacts: [ProjectStructuredFact] = overviewFixture ? [
+            ("occupancy", "Occupancy", "Residential"),
+            ("work-type", "Work type", "Alteration"),
+            ("location", "Location", "New York City"),
+            ("edition", "Code edition", "2022")
+        ].map { key, label, value in
+            ProjectStructuredFact(id: key, key: key, label: label, value: value,
+                                  status: "confirmed", source: "Synthetic fixture", sourceText: "", updatedAt: nil)
+        } : []
         guard let acceptanceProject = library.createFolder(
             name: "Acceptance Project",
             address: "1 Centre Street",
-            description: "Phase 3 entitled Research acceptance",
+            description: overviewFixture
+                ? "Interior renovation to the residence, with updates to the entry and ground-floor layout."
+                : "Phase 3 entitled Research acceptance",
+            structuredFacts: overviewFacts,
             colorHex: CodeFolder.presetColorHexes[0],
             folderType: .project
         ),
@@ -828,6 +849,9 @@ private struct Phase3EntitledResearchHarness: View {
         ) != nil else {
             failureMessage = "The isolated Projects could not be created."
             return
+        }
+        if overviewFixture {
+            _ = library.saveSection(sectionID: section1011.id, toFolderIDs: [acceptanceProject.id])
         }
         if ProcessInfo.processInfo.arguments.contains("--saved-project-pages-fixture") {
             for number in 3...12 {
@@ -855,6 +879,17 @@ private struct Phase3EntitledResearchHarness: View {
                         title: section.title, chapterTitle: chapter.title,
                         codeSectionID: buildingCode.id, codeSectionName: "Building Code", viewedAt: Date()))
                 }
+            }
+        }
+        if ProcessInfo.processInfo.arguments.contains("--search-history-layout-fixture") {
+            for (index, section) in library.sections(for: chapterOne).prefix(24).enumerated() {
+                library.recordRecentlyViewed(RecentlyViewedEntry(
+                    sectionID: section.id, sectionNumber: section.sectionNumber,
+                    title: section.title, chapterTitle: chapterOne.title,
+                    codeSectionID: buildingCode.id, codeSectionName: "Building Code",
+                    previewText: String(repeating: "Preview text for this recently opened code provision. ", count: index % 3 + 1),
+                    viewedAt: Date()
+                ))
             }
         }
         library.noteProjectOpened(acceptanceProject.id)
@@ -1535,7 +1570,7 @@ private struct PermitextRootNavigation: View {
         Group {
             switch layoutMode {
             case .compactTabs, .regularPreparedTabs:
-                PermitextTabNavigation(offersFirstUseExperience: offersFirstUseExperience)
+                PermitextTabNavigation()
             }
         }
         .onAppear { library.recordStartupRootAppeared() }
@@ -1553,45 +1588,72 @@ private enum PermitextRootLayoutMode {
 
 private struct PermitextTabNavigation: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
-    @AppStorage(PermitextFirstUseGate.completionVersionKey)
-    private var completedFirstUseVersion = 0
-    @State private var presentsFirstUseExperience = false
-    @State private var presentsAccountSettings = false
-    @State private var pendingFirstUseDestination: FirstUseDestination?
-    @State private var dismissedForExternalIntent = false
-    let offersFirstUseExperience: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Namespace private var projectTileNamespace
+    @State private var showsCodeLibrary = false
+    @State private var projectHomePath = NavigationPath()
+    @State private var presentsLibraryAccount = false
+    var researchCacheDirectoryURL: URL? = nil
+    var filterDefaults: UserDefaults = .standard
+
+    private struct ProjectDestination: Identifiable {
+        let id: Int64
+    }
+
+    private var projectDestination: Binding<ProjectDestination?> {
+        Binding(
+            get: {
+                guard let id = library.openProjectID, library.folder(id: id) != nil else { return nil }
+                return ProjectDestination(id: id)
+            },
+            set: { destination in
+                if let destination { library.openProjectWorkspace(destination.id) }
+                else { library.closeProjectWorkspace() }
+            }
+        )
+    }
 
     var body: some View {
-        PermitextMainTabs(
-            saved: BookmarksView().safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() },
-            primary: BrowseView(browserContext: .primary)
-                .environment(\.isBrowserTabActive, library.selectedTab == .browse)
-                .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() },
-            secondary: IndependentReaderHost(browserContext: .secondary),
-            research: ResearchView().safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
-        )
-        .scrollIndicators(.hidden)
-        .modifier(GlobalSearchPresentation())
-        .task {
-            await presentFirstUseExperienceIfEligible()
-        }
-        .onChange(of: library.pendingDeepLinkedSectionID) { _, sectionID in
-            if sectionID != nil { bypassFirstUseForExternalIntent() }
-        }
-        .onChange(of: library.pendingOrganizationInvitationToken) { _, token in
-            if token != nil { bypassFirstUseForExternalIntent() }
-        }
-        .onChange(of: library.pendingResearchSelections) { _, selections in
-            if !selections.isEmpty { bypassFirstUseForExternalIntent() }
-        }
-        .sheet(isPresented: $presentsFirstUseExperience, onDismiss: finishFirstUseDismissal) {
-            PermitextFirstUseSheet { destination in
-                completeFirstUse(destination: destination)
+        BookmarksView(
+                filterDefaults: filterDefaults,
+                onOpenProject: { library.openProjectWorkspace($0) },
+                onOpenLibrary: {
+                    library.closeProjectWorkspace()
+                    library.selectedTab = .browse
+                    showsCodeLibrary = true
+                },
+                projectTransitionNamespace: projectTileNamespace
+            )
+            .fullScreenCover(item: projectDestination) { destination in
+                if let project = library.folder(id: destination.id) {
+                    workspaceTabs(project: project)
+                        .id("\(library.privateSessionID):\(project.clientID)")
+                        .modifier(GlobalSearchPresentation())
+                        .cardZoomDestination(id: project.id, in: projectTileNamespace, reduceMotion: reduceMotion)
+                        .interactiveDismissDisabled()
+                }
             }
-            .environmentObject(library)
+            .fullScreenCover(isPresented: $showsCodeLibrary) {
+                workspaceTabs(project: nil)
+                    .modifier(GlobalSearchPresentation())
+                    .interactiveDismissDisabled()
+            }
+        .scrollIndicators(.hidden)
+        .onChange(of: library.privateSessionID) { _, _ in
+            showsCodeLibrary = false
+            projectHomePath = NavigationPath()
         }
-        .sheet(isPresented: $presentsAccountSettings) {
-            PermitextAccountEntryView(initialSection: .account)
+        .onChange(of: library.openProjectID) { _, _ in projectHomePath = NavigationPath() }
+        .onChange(of: library.selectedTab) { previous, tab in
+            if tab == .bookmarks, previous != .bookmarks {
+                projectHomePath = NavigationPath()
+            }
+            guard showsCodeLibrary, tab == .research else { return }
+            library.selectedTab = library.selectedReaderContext == .secondary ? .browseSecondary : .browse
+            presentsLibraryAccount = true
+        }
+        .sheet(isPresented: $presentsLibraryAccount) {
+            PermitextAccountEntryView(initialSection: library.signedInAccount == nil ? .account : .plan)
                 .environmentObject(library)
         }
         .onReceive(NotificationCenter.default.publisher(for: .permitextSavedWorkDidChange)) { notification in
@@ -1600,58 +1662,70 @@ private struct PermitextTabNavigation: View {
         }
     }
 
-    @MainActor
-    private func presentFirstUseExperienceIfEligible() async {
-        await Task.yield()
-        guard PermitextFirstUseGate.canPresent(
-            wasOffered: offersFirstUseExperience,
-            isDebugPresentationForced: PermitextFirstUseGate.isDebugPresentationForced(),
-            completedVersion: completedFirstUseVersion,
-            selectedTab: library.selectedTab,
-            pendingDeepLinkedSectionID: library.pendingDeepLinkedSectionID,
-            pendingInvitationToken: library.pendingOrganizationInvitationToken,
-            pendingResearchSelectionCount: library.pendingResearchSelections.count
-        ) else { return }
-        presentsFirstUseExperience = true
-    }
-
-    private func completeFirstUse(destination: FirstUseDestination) {
-        dismissedForExternalIntent = false
-        completedFirstUseVersion = PermitextFirstUseGate.currentVersion
-        pendingFirstUseDestination = destination
-        presentsFirstUseExperience = false
-    }
-
-    private func finishFirstUseDismissal() {
-        if !PermitextFirstUseGate.shouldPersistCompletionAfterDismissal(
-            dismissedForExternalIntent: dismissedForExternalIntent
-        ) {
-            dismissedForExternalIntent = false
-            pendingFirstUseDestination = nil
-            return
-        } else {
-            completedFirstUseVersion = PermitextFirstUseGate.currentVersion
-        }
-        guard let destination = pendingFirstUseDestination else { return }
-        pendingFirstUseDestination = nil
-        Task { @MainActor in
-            await Task.yield()
-            switch destination {
-            case .reader:
-                library.selectedTab = .browse
-            case .account:
-                presentsAccountSettings = true
-            case .citation(let sectionID, let codeVersion):
-                library.openResearchCitation(sectionID: sectionID, codeVersion: codeVersion)
+    private func workspaceTabs(project: CodeFolder?) -> some View {
+        VStack(spacing: 0) {
+            if project == nil {
+                workspaceHeader(project: nil)
             }
+            PermitextMainTabs(
+                saved: Group {
+                    if let project {
+                        NavigationStack(path: $projectHomePath) {
+                            ProjectView(folderID: project.id)
+                                .toolbar(.visible, for: .navigationBar)
+                                .toolbar {
+                                    ToolbarItem(placement: .topBarLeading) { closeProjectButton }
+                                }
+                        }
+                        .background {
+                            TabBarReselectListener(onReselect: projectFolderReselectAction)
+                        }
+                        .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
+                    }
+                },
+                primary: BrowseView(browserContext: .primary)
+                    .environment(\.isBrowserTabActive, library.selectedTab == .browse)
+                    .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() },
+                secondary: IndependentReaderHost(browserContext: .secondary),
+                research: ResearchView(projectFolderID: project?.id, cacheDirectoryURL: researchCacheDirectoryURL)
+                    .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() },
+                projectScoped: project != nil,
+                isCodeLibrary: project == nil
+            )
         }
     }
 
-    private func bypassFirstUseForExternalIntent() {
-        guard presentsFirstUseExperience else { return }
-        dismissedForExternalIntent = true
-        pendingFirstUseDestination = nil
-        presentsFirstUseExperience = false
+    private var projectFolderReselectAction: () -> Void {
+        if projectHomePath.isEmpty {
+            return { library.closeProjectWorkspace() }
+        }
+        return { projectHomePath = NavigationPath() }
+    }
+
+    private func workspaceHeader(project: CodeFolder?) -> some View {
+        HStack(spacing: 12) {
+            closeProjectButton
+            Spacer(minLength: 0)
+            Text(project?.name ?? "Code Library")
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(1)
+                .accessibilityIdentifier("project-workspace-name")
+        }
+        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+        .background(.regularMaterial)
+    }
+
+    private var closeProjectButton: some View {
+        Button {
+            showsCodeLibrary = false
+            library.closeProjectWorkspace()
+        } label: {
+            Label("Projects", systemImage: "chevron.left")
+                .font(.subheadline.weight(.semibold))
+                .frame(minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("project-close")
     }
 }
 
@@ -1828,12 +1902,22 @@ private struct IndependentReaderContent: View {
     let browserContext: BrowserContextID
     @ObservedObject var readerLibrary: CodeLibraryViewModel
     @ObservedObject var sharedLibrary: CodeLibraryViewModel
+    @State private var hasLoadedContent = false
 
     var body: some View {
         Group {
-            if readerLibrary.isInitialContentLoaded {
+            if readerLibrary.isInitialContentLoaded || hasLoadedContent {
                 BrowseView(browserContext: browserContext)
                     .environment(\.isBrowserTabActive, sharedLibrary.selectedTab == .browseSecondary)
+                    .onAppear { hasLoadedContent = true }
+                    .overlay {
+                        if !readerLibrary.isInitialContentLoaded {
+                            AppLaunchLoadingView(
+                                progress: readerLibrary.initialLoadProgress,
+                                message: readerLibrary.statusMessage ?? "Preparing second Reader..."
+                            )
+                        }
+                    }
             } else {
                 AppLaunchLoadingView(
                     progress: readerLibrary.initialLoadProgress,
@@ -1975,6 +2059,8 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     let primary: Primary
     let secondary: Secondary
     let research: Research
+    var projectScoped = false
+    var isCodeLibrary = false
 
     private var selection: Binding<String> {
         Binding(
@@ -1995,9 +2081,13 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 nativeTabs
             } else {
                 TabView(selection: selection) {
-                    saved.tabItem { Label("Saved", systemImage: "folder") }.tag(AppTab.bookmarks.rawValue)
+                    if !isCodeLibrary {
+                        saved.tabItem { Label(projectScoped ? "Project" : "Saved", systemImage: "folder") }.tag(AppTab.bookmarks.rawValue)
+                    }
                     readers.tabItem { Label("Reader", systemImage: "book") }.tag(AppTab.browse.rawValue)
-                    research.tabItem { Label("Research", systemImage: "sparkle") }.tag(AppTab.research.rawValue)
+                    if !isCodeLibrary {
+                        research.tabItem { Label("Research", systemImage: "sparkle") }.tag(AppTab.research.rawValue)
+                    }
                     SearchView().tabItem { Image(systemName: "magnifyingglass").accessibilityLabel("Search").accessibilityIdentifier("main-tab-search") }.tag(AppTab.search.rawValue)
                 }
 
@@ -2057,6 +2147,10 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     library.availableVersions.contains(where: { $0.fileName == source.versionFileName }) ? source : nil
                 }
                 Button {
+                    if selected {
+                        NativeReaderHandoff.shared.reselect(context)
+                        return
+                    }
                     if context == .secondary { hasOpenedSecondary = true }
                     library.selectedTab = context == .primary ? .browse : .browseSecondary
                 } label: {
@@ -2081,6 +2175,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("reader-session-\(context.rawValue)")
+                .accessibilityHint(selected ? "Return to Chapters, then choose a code on the next tap" : "Switch to this Reader")
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
@@ -2092,12 +2187,14 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     @available(iOS 18.0, *)
     private var nativeTabs: some View {
         TabView(selection: selection) {
-            Tab(value: AppTab.bookmarks.rawValue) {
-                saved
-            } label: {
-                Image(systemName: "folder")
-                    .accessibilityLabel("Saved")
-                    .accessibilityIdentifier("main-tab-saved")
+            if !isCodeLibrary {
+                Tab(value: AppTab.bookmarks.rawValue) {
+                    saved
+                } label: {
+                    Image(systemName: "folder")
+                        .accessibilityLabel(projectScoped ? "Project" : "Saved")
+                        .accessibilityIdentifier("main-tab-saved")
+                }
             }
             Tab(value: AppTab.browse.rawValue) {
                 readers
@@ -2106,12 +2203,14 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     .accessibilityLabel("Reader")
                     .accessibilityIdentifier("main-tab-reader")
             }
-            Tab(value: AppTab.research.rawValue) {
-                research
-            } label: {
-                Image(systemName: "sparkle")
-                    .accessibilityLabel("Research")
-                    .accessibilityIdentifier("main-tab-research")
+            if !isCodeLibrary {
+                Tab(value: AppTab.research.rawValue) {
+                    research
+                } label: {
+                    Image(systemName: "sparkle")
+                        .accessibilityLabel("Research")
+                        .accessibilityIdentifier("main-tab-research")
+                }
             }
             Tab(value: AppTab.search.rawValue) {
                 SearchView()

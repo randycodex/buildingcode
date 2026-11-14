@@ -1,5 +1,53 @@
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
+
+private struct ProjectCardDrag {
+    let id: Int64
+    let sessionID: UUID
+}
+
+private struct ReferenceCardEditMenu: ViewModifier {
+    let isReference: Bool
+    let edit: () -> Void
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if isReference {
+            content.contextMenu {
+                Button(action: edit) { Label("Edit reference", systemImage: "pencil") }
+            }
+        } else {
+            content
+        }
+    }
+}
+
+private struct ProjectCardDropDelegate: DropDelegate {
+    static let contentType = UTType(exportedAs: "com.randycodex.permitext.project-card")
+    let isLocalDrag: () -> Bool
+    let move: () -> Void
+    let finish: () -> Void
+
+    func validateDrop(info: DropInfo) -> Bool {
+        isLocalDrag() && info.hasItemsConforming(to: [Self.contentType])
+    }
+
+    func dropEntered(info: DropInfo) {
+        guard validateDrop(info: info) else { return }
+        move()
+    }
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: validateDrop(info: info) ? .move : .cancel)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        guard validateDrop(info: info) else { return false }
+        finish()
+        return true
+    }
+}
 
 struct NativeEntitlementStatusView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
@@ -24,6 +72,7 @@ struct NativeEntitlementStatusView: View {
 struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var savedFilterCodeSectionIDs: Set<String>
     @State private var savedFilterFolderIDs: Set<Int64>
     @State private var folderEditorTarget: FolderEditorTarget?
@@ -36,16 +85,27 @@ struct BookmarksView: View {
     @State private var pendingExport: BookmarkExportRequest?
     @State private var showingSettings = false
     @State private var showingAccessSettings = false
+    @State private var projectCardDrag: ProjectCardDrag?
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.sourceFilters.v2"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
     private let filterDefaults: UserDefaults
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
-    private let screenTitle = "Saved"
+    private let onOpenProject: ((Int64) -> Void)?
+    private let onOpenLibrary: (() -> Void)?
+    private let projectTransitionNamespace: Namespace.ID?
+    private let embedsNavigationStack: Bool
+    private var screenTitle: String { onOpenProject == nil ? "Saved" : "Projects" }
 
-    init(filterDefaults: UserDefaults = .standard) {
+    init(filterDefaults: UserDefaults = .standard, onOpenProject: ((Int64) -> Void)? = nil,
+         onOpenLibrary: (() -> Void)? = nil, projectTransitionNamespace: Namespace.ID? = nil,
+         embedsNavigationStack: Bool = true) {
         self.filterDefaults = filterDefaults
+        self.onOpenProject = onOpenProject
+        self.onOpenLibrary = onOpenLibrary
+        self.projectTransitionNamespace = projectTransitionNamespace
+        self.embedsNavigationStack = embedsNavigationStack
         _savedFilterCodeSectionIDs = State(initialValue: Set(filterDefaults.stringArray(forKey: Self.filterCodeSectionIDsDefaultsKey) ?? []))
         _savedFilterFolderIDs = State(
             initialValue: FilterIDsStorage.load(
@@ -160,7 +220,7 @@ struct BookmarksView: View {
                         .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                         .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
                 }
-        } else if !library.hasCapability(.savedWork) {
+        } else if !library.hasCapability(.savedWork), onOpenLibrary == nil {
             VStack(spacing: 14) {
                 Image(systemName: "lock")
                     .font(.largeTitle)
@@ -193,8 +253,11 @@ struct BookmarksView: View {
                     .environmentObject(library)
             }
         } else {
-            NavigationStack { savedContent }
-                .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
+            Group {
+                if embedsNavigationStack { NavigationStack { savedContent } }
+                else { savedContent }
+            }
+            .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         }
     }
 
@@ -235,6 +298,8 @@ struct BookmarksView: View {
             // tabs.
             rebuildBookmarkCaches()
         }
+        .onDisappear { projectCardDrag = nil }
+        .onChange(of: library.privateSessionID) { _, _ in projectCardDrag = nil }
         .onChange(of: savedFilterCodeSectionIDs) { _, newValue in
             filterDefaults.set(newValue.sorted(), forKey: Self.filterCodeSectionIDsDefaultsKey)
             rebuildBookmarkCaches()
@@ -290,7 +355,10 @@ struct BookmarksView: View {
                             colorHex: colorHex,
                             folderType: folderType
                         )
-                        if let created { library.noteProjectOpened(created.id) }
+                        if let created {
+                            if let onOpenProject { onOpenProject(created.id) }
+                            else { library.noteProjectOpened(created.id) }
+                        }
                     }
                 },
                 onDelete: {
@@ -352,6 +420,24 @@ struct BookmarksView: View {
                 .hidden()
                 .accessibilityHidden(true)
             if showsProjectsSection { projectTilesSection }
+            else if let onOpenLibrary {
+                Button(action: onOpenLibrary) {
+                    CodeSurface(accent: accentColor, showsBorder: false) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Image(systemName: "book")
+                                .font(.title2)
+                            Text("Code Library").font(.title3.weight(.semibold))
+                            Text("Read and search codes")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                    }
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("projects-code-library")
+            }
         }
     }
 
@@ -524,6 +610,13 @@ private var filteredSavedEmptyState: some View {
     private var projectTilesSection: some View {
         if !projectFolders.isEmpty {
             folderGrid(projectFolders)
+        } else {
+            CodeEmptyStateCard(
+                title: "Create your first Project",
+                systemImage: "folder.badge.plus",
+                description: "Use + to create a Project for your notes, evidence, and Research.",
+                accent: accentColor
+            )
         }
     }
 
@@ -541,29 +634,76 @@ private var filteredSavedEmptyState: some View {
         )
         return LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
             ForEach(folders) { folder in
-                projectTileSlot(folder, tileHeight: folder.folderType == .project ? preferredProjectTileHeight : nil)
+                if folder.folderType == .project && library.hasProjectAccess {
+                    projectTileSlot(folder, tileHeight: dynamicTypeSize.isAccessibilitySize ? nil : preferredProjectTileHeight)
+                        .contentShape(.interaction, RoundedRectangle(cornerRadius: 28, style: .continuous))
+                        .contentShape(.dragPreview, RoundedRectangle(cornerRadius: 28, style: .continuous))
+                        .onDrag {
+                            projectCardDrag = ProjectCardDrag(id: folder.id, sessionID: library.privateSessionID)
+                            let provider = NSItemProvider()
+                            provider.registerDataRepresentation(forTypeIdentifier: ProjectCardDropDelegate.contentType.identifier,
+                                visibility: .ownProcess) { completion in
+                                completion(Data(folder.clientID.utf8), nil)
+                                return nil
+                            }
+                            return provider
+                        }
+                        .onDrop(of: [ProjectCardDropDelegate.contentType], delegate: ProjectCardDropDelegate(
+                            isLocalDrag: {
+                                projectCardDrag?.sessionID == library.privateSessionID && library.hasProjectAccess
+                            },
+                            move: { moveDraggedProject(to: folder.id) },
+                            finish: { projectCardDrag = nil }
+                        ))
+                        .accessibilityHint("Open Project. Touch and hold, then drag to reorder.")
+                        .accessibilityAction(named: "Move earlier") { moveProject(folder, offset: -1) }
+                        .accessibilityAction(named: "Move later") { moveProject(folder, offset: 1) }
+                } else {
+                    projectTileSlot(folder)
+                }
             }
         }
+    }
+
+    private func moveDraggedProject(to targetID: Int64) {
+        guard let drag = projectCardDrag else { return }
+        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+            _ = library.moveProject(id: drag.id, to: targetID, sessionID: drag.sessionID)
+        }
+    }
+
+    private func moveProject(_ folder: CodeFolder, offset: Int) {
+        guard let index = projectFolders.firstIndex(where: { $0.id == folder.id }),
+              projectFolders.indices.contains(index + offset) else { return }
+        _ = library.moveProject(id: folder.id, to: projectFolders[index + offset].id, sessionID: library.privateSessionID)
     }
 
     @ViewBuilder
     private func projectTileSlot(_ folder: CodeFolder, tileHeight: CGFloat? = nil) -> some View {
         if library.hasProjectAccess {
-            NavigationLink {
-                ProjectView(folderID: folder.id)
-                    .id(library.privateSessionID)
-            } label: {
-                projectTile(folder, tileHeight: tileHeight)
+            Group {
+                if let onOpenProject, folder.folderType == .project {
+                    Button { onOpenProject(folder.id) } label: {
+                        if let projectTransitionNamespace {
+                            projectTile(folder, tileHeight: tileHeight)
+                                .cardZoomSource(id: folder.id, in: projectTransitionNamespace, reduceMotion: reduceMotion)
+                        } else {
+                            projectTile(folder, tileHeight: tileHeight)
+                        }
+                    }
+                } else {
+                    NavigationLink {
+                        ProjectView(folderID: folder.id)
+                            .id(library.privateSessionID)
+                    } label: {
+                        projectTile(folder, tileHeight: tileHeight)
+                    }
+                }
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("saved-folder-\(folder.id)")
-            .contextMenu {
-                Button {
-                    folderEditorTarget = .edit(folder)
-                } label: {
-                    Label("Edit \(folder.folderType == .project ? "project" : "reference")", systemImage: "pencil")
-                }
-            }
+            .modifier(ReferenceCardEditMenu(isReference: folder.folderType == .reference,
+                edit: { folderEditorTarget = .edit(folder) }))
         } else {
             Button { library.requireProjectAccess() } label: { projectTile(folder, tileHeight: tileHeight) }
                 .buttonStyle(.plain)
@@ -572,27 +712,30 @@ private var filteredSavedEmptyState: some View {
 
     private func projectTile(_ folder: CodeFolder, tileHeight: CGFloat? = nil) -> some View {
         VStack(alignment: .leading, spacing: tileHeight == nil ? 8 : 6) {
-            HStack {
-                Text("\(library.bookmarkCount(inFolder: folder.id)) saved")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                if folder.folderType == .reference {
+            if folder.folderType == .reference {
+                HStack {
+                    Text("\(library.bookmarkCount(inFolder: folder.id)) saved")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     Spacer()
                     Image(systemName: "books.vertical")
                         .font(.title3.weight(.medium))
                 }
+                Spacer(minLength: tileHeight == nil ? 12 : 0)
             }
-            Spacer(minLength: tileHeight == nil ? 12 : 0)
             Text(folder.name)
                 .font(.headline)
                 .lineLimit(tileHeight == nil ? nil : 2)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.leading)
+            if folder.folderType == .project {
+                Spacer(minLength: 12)
+            }
             if !folder.address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Text(folder.address)
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .lineLimit(tileHeight == nil ? (dynamicTypeSize.isAccessibilitySize ? nil : 2) : 1)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                     .multilineTextAlignment(.leading)
             }
         }
@@ -991,6 +1134,98 @@ private struct BookmarkExportPreviewSheet: View {
     }
 }
 
+enum ProjectOverviewSection: Hashable {
+    case context, structuredFacts, questions, checklist, notebook, evidence, reports
+}
+
+private struct ProjectFactDraft: Identifiable {
+    let id: String
+    var label: String
+    var value: String
+    let original: ProjectStructuredFact?
+}
+
+private struct ProjectInlineContextEditor: UIViewRepresentable {
+    @Binding var text: String
+    let requestsFocus: Bool
+    let onCancel: () -> Void
+    let onSave: () -> Void
+
+    func makeUIView(context: Context) -> UITextView {
+        let view = UITextView()
+        view.backgroundColor = .clear
+        view.font = .preferredFont(forTextStyle: .body)
+        view.adjustsFontForContentSizeCategory = true
+        view.textColor = .label
+        view.tintColor = UIColor(Color.appChrome)
+        view.textContainerInset = UIEdgeInsets(top: 8, left: 0, bottom: 12, right: 0)
+        view.textContainer.lineFragmentPadding = 0
+        view.isScrollEnabled = false
+        view.isEditable = false
+        view.text = text
+        view.selectedRange = NSRange(location: 0, length: 0)
+        view.delegate = context.coordinator
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        toolbar.autoresizingMask = .flexibleWidth
+        let cancel = UIBarButtonItem(title: "Cancel", style: .plain,
+                                     target: context.coordinator, action: #selector(Coordinator.cancel))
+        cancel.accessibilityIdentifier = "project-inline-keyboard-cancel"
+        let save = UIBarButtonItem(title: "Save", style: .done,
+                                   target: context.coordinator, action: #selector(Coordinator.save))
+        save.accessibilityIdentifier = "project-inline-keyboard-save"
+        toolbar.items = [cancel, UIBarButtonItem(systemItem: .flexibleSpace), save]
+        view.inputAccessoryView = toolbar
+        view.accessibilityIdentifier = "project-context-editor"
+        view.accessibilityLabel = "Project context"
+        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        return view
+    }
+
+    func updateUIView(_ view: UITextView, context: Context) {
+        context.coordinator.parent = self
+        view.font = .preferredFont(forTextStyle: .body)
+        if view.text != text {
+            let selection = view.selectedRange
+            view.text = text
+            let length = (text as NSString).length
+            view.selectedRange = NSRange(location: min(selection.location, length), length: 0)
+        }
+        view.isEditable = requestsFocus
+        if requestsFocus && !context.coordinator.didRequestFocus {
+            context.coordinator.didRequestFocus = true
+            // The first insertion point stays at the beginning of the expanded
+            // text, so keyboard avoidance does not take the page to its end.
+            view.selectedRange = NSRange(location: 0, length: 0)
+            view.becomeFirstResponder()
+        } else if !requestsFocus && view.isFirstResponder {
+            view.resignFirstResponder()
+        }
+    }
+
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextView, context: Context) -> CGSize? {
+        guard let width = proposal.width, width > 0 else { return nil }
+        let fitted = uiView.sizeThatFits(CGSize(width: width, height: .greatestFiniteMagnitude))
+        return CGSize(width: width, height: max(180, fitted.height))
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
+
+    final class Coordinator: NSObject, UITextViewDelegate {
+        var parent: ProjectInlineContextEditor
+        var didRequestFocus = false
+
+        init(parent: ProjectInlineContextEditor) { self.parent = parent }
+
+        @objc func cancel() { parent.onCancel() }
+        @objc func save() { parent.onSave() }
+
+        func textViewDidChange(_ textView: UITextView) {
+            parent.text = textView.text
+        }
+    }
+}
+
 struct ProjectView: View {
     let folderID: Int64
 
@@ -998,6 +1233,7 @@ struct ProjectView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var sortMode: BookmarkSortMode = .codeOrder
     @State private var removedProjectSections: [BookmarkedSection] = []
     @State private var removalSessionID: UUID?
@@ -1019,6 +1255,13 @@ struct ProjectView: View {
     @State private var collapsedEvidenceGroupIDs: Set<String> = []
     @State private var evidenceSearchQuery = ""
     @State private var isEvidenceSearchPresented = false
+    @State private var inlineEditingSection: ProjectOverviewSection?
+    @State private var inlineEditingFolder: CodeFolder?
+    @State private var inlineEditingSessionID: UUID?
+    @State private var contextDraft = ""
+    @State private var factsDraft: [ProjectFactDraft] = []
+    @State private var inlineSaveError: String?
+    @State private var isContextEditorFocused = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let automaticProjectHubRefreshInterval: TimeInterval = 30
@@ -1095,25 +1338,40 @@ struct ProjectView: View {
     var body: some View {
         Group {
             if isProjectFolder {
-                if dynamicTypeSize.isAccessibilitySize {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 16) {
-                            projectHeader
-                            projectSectionCards.frame(height: 600)
+                GeometryReader { geometry in
+                    ScrollViewReader { scroll in
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 20) {
+                                projectHeader
+                                projectContextOverview
+                                    .id(ProjectOverviewSection.context)
+                                if inlineEditingSection == .structuredFacts {
+                                    projectFactsOverview
+                                        .id(ProjectOverviewSection.structuredFacts)
+                                }
+                                projectSectionCards
+                            }
+                            .frame(minHeight: max(0, geometry.size.height - CodeScreenMetrics.topTitlePadding - 16),
+                                   alignment: .top)
+                            .padding(.horizontal, contentHorizontalInset)
+                            .padding(.top, CodeScreenMetrics.topTitlePadding)
+                            .padding(.bottom, 16)
                         }
-                        .padding(.horizontal, contentHorizontalInset)
-                        .padding(.top, CodeScreenMetrics.topTitlePadding)
-                        .padding(.bottom, 16)
+                        .scrollBounceBehavior(.basedOnSize)
+                        .scrollDismissesKeyboard(.interactively)
+                        .task(id: inlineEditingSection) {
+                            guard let section = inlineEditingSection else { return }
+                            withAnimation(inlineExpansionAnimation) {
+                                scroll.scrollTo(section, anchor: .top)
+                            }
+                            guard section == .context else { return }
+                            do {
+                                try await Task.sleep(nanoseconds: reduceMotion ? 100_000_000 : 650_000_000)
+                            } catch { return }
+                            guard !Task.isCancelled, inlineEditingSection == .context else { return }
+                            isContextEditorFocused = true
+                        }
                     }
-                } else {
-                    VStack(alignment: .leading, spacing: 16) {
-                        projectHeader
-                        projectSectionCards
-                    }
-                    .padding(.horizontal, contentHorizontalInset)
-                    .padding(.top, CodeScreenMetrics.topTitlePadding)
-                    .padding(.bottom, 16)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             } else {
                 projectEvidenceDestination
@@ -1124,6 +1382,9 @@ struct ProjectView: View {
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: ProjectOverviewSection.self) { section in
+            projectSectionDestination(section)
+        }
         .toolbar {
             if isProjectFolder {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -1133,6 +1394,16 @@ struct ProjectView: View {
                     .labelStyle(.iconOnly)
                     .tint(Color.appChrome)
                     .accessibilityIdentifier("project-edit")
+                    .disabled(inlineEditingSection != nil)
+                }
+                if inlineEditingSection == .structuredFacts {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Button("Cancel", action: finishInlineEditing)
+                            .accessibilityIdentifier("project-inline-keyboard-cancel")
+                        Spacer()
+                        Button("Save", action: saveInlineEditing).fontWeight(.semibold)
+                            .accessibilityIdentifier("project-inline-keyboard-save")
+                    }
                 }
             }
         }
@@ -1175,10 +1446,24 @@ struct ProjectView: View {
         }
         .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         .onChange(of: library.privateSessionID) { _, _ in
+            finishInlineEditing()
+            contextDraft = ""
+            factsDraft = []
             removedProjectSections = []
             projectReportPreviewURL = nil
+            projectHubSnapshot = nil
+            projectHubError = nil
+            lastProjectHubLoadAt = nil
         }
-        .onChange(of: folderID) { _, _ in removedProjectSections = [] }
+        .onChange(of: folderID) { _, _ in
+            finishInlineEditing()
+            contextDraft = ""
+            factsDraft = []
+            removedProjectSections = []
+            projectHubSnapshot = nil
+            projectHubError = nil
+            lastProjectHubLoadAt = nil
+        }
         .refreshable {
             library.refreshBookmarks()
             await loadProjectHub()
@@ -1197,8 +1482,8 @@ struct ProjectView: View {
             isProjectHubVisible = false
         }
         .task(id: "\(library.privateSessionID):\(folder?.clientID ?? "missing")") {
-            projectHubSnapshot = nil
-            projectHubError = nil
+            // This task starts again when a section pops back to the overview.
+            // Keep the current Project's previews visible during reconciliation.
             await loadProjectHub()
         }
         .onChange(of: scenePhase) { _, phase in
@@ -1299,7 +1584,7 @@ struct ProjectView: View {
     @ViewBuilder
     private var projectReportSummary: some View {
         let reports = projectHubSnapshot?.reports ?? []
-        projectHubSection(title: "Reports", systemImage: "doc.richtext") {
+        VStack(alignment: .leading, spacing: 8) {
             if reports.isEmpty {
                 projectHubEmpty("No immutable Project Reports have been generated yet.")
             } else {
@@ -1455,6 +1740,12 @@ struct ProjectView: View {
         isProjectHubLoading = true
         defer { isProjectHubLoading = false }
         do {
+#if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("--native-project-overview-fixture"),
+               ProcessInfo.processInfo.arguments.contains("--native-project-overview-delayed-load") {
+                try await Task.sleep(nanoseconds: 2_000_000_000)
+            }
+#endif
             let snapshot = try await library.projectHubSnapshot(folderID: folderID)
             guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
             projectHubSnapshot = snapshot
@@ -1485,6 +1776,7 @@ struct ProjectView: View {
                         .frame(width: 12, height: 12)
                 }
                 Text(folder?.name ?? (isProjectFolder ? "Project" : "Reference"))
+                    .accessibilityIdentifier("project-workspace-name")
                     .font(.title2.weight(.bold))
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -1516,85 +1808,378 @@ struct ProjectView: View {
         }
     }
 
-    private var projectSectionCards: some View {
-        VStack(spacing: 12) {
-            NavigationLink {
-                ProjectContextView(folderID: folderID, accentColor: accentColor)
-            } label: { projectSectionCard("Context", systemImage: "text.alignleft") }
-            .accessibilityIdentifier("project-section-context")
+    private var projectContextOverview: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if inlineEditingSection == .context {
+                inlineEditorHeader("Context")
+                ProjectInlineContextEditor(text: $contextDraft, requestsFocus: isContextEditorFocused,
+                                           onCancel: finishInlineEditing, onSave: saveInlineEditing)
+                    .frame(maxWidth: .infinity)
+                    .transition(.opacity)
+                inlineEditorError
+            } else {
+                Button { beginInlineEditing(.context) } label: {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Context").font(.headline).foregroundStyle(.primary)
+                        let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        Text(description.isEmpty ? "No context yet." : description)
+                            .font(.body).foregroundStyle(.secondary)
+                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? 5 : 3)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("project-overview-context")
+                        Text(description.isEmpty ? "Add context" : "Read more")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(inlineEditingSection != nil)
+                .accessibilityIdentifier("project-section-context")
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.bottom, 20)
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(Color.primary.opacity(0.15)).frame(height: 0.5)
+        }
+    }
 
-            NavigationLink {
-                projectSectionScreen(title: "Structured Facts") {
-                    let facts = folder?.structuredFacts ?? []
-                    if facts.isEmpty {
-                        projectHubEmpty("No Structured facts yet.")
-                    } else {
-                        VStack(alignment: .leading, spacing: 0) {
-                            ForEach(facts) { fact in
-                                ProjectStructuredFactRow(fact: fact)
-                                if fact.id != facts.last?.id { Divider() }
+    private var overviewFacts: [ProjectStructuredFact] {
+        Array((folder?.structuredFacts ?? []).filter {
+            !$0.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            $0.status.lowercased() != "rejected"
+        }.prefix(4))
+    }
+
+    private var projectFactsOverview: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if inlineEditingSection == .structuredFacts {
+                inlineEditorHeader("Facts")
+                ForEach($factsDraft) { $draft in
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text("\((factsDraft.firstIndex { $0.id == draft.id } ?? 0) + 1).")
+                                .monospacedDigit()
+                                .accessibilityIdentifier("project-fact-number-\(draft.id)")
+                            if draft.original == nil {
+                                TextField("Fact name", text: $draft.label)
+                                    .accessibilityIdentifier("project-fact-label-\(draft.id)")
+                            } else {
+                                Text(draft.label)
                             }
-                            ProjectStructuredFactsSources(facts: facts)
-                                .padding(.top, 16)
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        HStack(alignment: .center, spacing: 12) {
+                            TextField("Value", text: $draft.value, axis: .vertical)
+                                .font(.subheadline)
+                                .lineLimit(1...4)
+                                .textFieldStyle(.plain)
+                                .frame(minHeight: 44)
+                                .accessibilityLabel(draft.label.isEmpty ? "Fact value" : draft.label)
+                                .accessibilityIdentifier("project-fact-value-\(draft.id)")
+                            Button(role: .destructive) {
+                                withAnimation(inlineExpansionAnimation) {
+                                    factsDraft.removeAll { $0.id == draft.id }
+                                }
+                            } label: {
+                                Image(systemName: "minus.circle").frame(width: 44, height: 44)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Remove \(draft.label.isEmpty ? "fact" : draft.label)")
                         }
                     }
+                    .transition(.opacity)
                 }
-            } label: { projectSectionCard("Facts", systemImage: "building.2") }
+                factsEditorFooter
+                inlineEditorError
+            } else {
+                Button { beginInlineEditing(.structuredFacts) } label: {
+                    HStack {
+                        Text("Facts").font(.headline).foregroundStyle(.primary)
+                        Spacer(minLength: 12)
+                        Text(overviewFacts.isEmpty ? "Add facts" : "See all")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(inlineEditingSection != nil)
+                .accessibilityIdentifier("project-section-structured-facts")
+                if overviewFacts.isEmpty {
+                    Text("No facts yet.").font(.subheadline).foregroundStyle(.secondary)
+                } else {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .topLeading),
+                                             count: dynamicTypeSize.isAccessibilitySize ? 1 : 2),
+                              alignment: .leading, spacing: 14) {
+                        ForEach(overviewFacts) { fact in
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(fact.label).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                                Text(fact.value).font(.subheadline.weight(.medium)).foregroundStyle(.primary).lineLimit(2)
+                                if !["sourced", "confirmed"].contains(fact.status.lowercased()) {
+                                    Text(fact.status.lowercased() == "stated" ? "Stated" : "Unknown")
+                                        .font(.caption2).foregroundStyle(.secondary)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .accessibilityElement(children: .combine)
+                        }
+                    }
+                    .accessibilityIdentifier("project-overview-facts")
+                }
+            }
+        }
+        .padding(.bottom, 4)
+    }
+
+    private func inlineEditorHeader(_ title: String) -> some View {
+        HStack {
+            Text(title).font(.headline)
+                .accessibilityIdentifier("project-inline-editor-title")
+            Spacer(minLength: 12)
+            Button("Cancel", action: finishInlineEditing)
+                .accessibilityIdentifier("project-inline-cancel")
+            Button("Save", action: saveInlineEditing)
+                .fontWeight(.semibold)
+                .accessibilityIdentifier("project-inline-save")
+        }
+        .font(.subheadline)
+        .buttonStyle(.plain)
+        .frame(minHeight: 44)
+    }
+
+    private var inlineExpansionAnimation: Animation? {
+        reduceMotion ? nil : .easeInOut(duration: 0.55)
+    }
+
+    private var addFactButton: some View {
+        Button {
+            withAnimation(inlineExpansionAnimation) {
+                factsDraft.append(ProjectFactDraft(id: UUID().uuidString, label: "", value: "", original: nil))
+            }
+        } label: { Label("Add fact", systemImage: "plus") }
+        .frame(minHeight: 44)
+        .accessibilityIdentifier("project-fact-add")
+    }
+
+    private var factsEditorFooter: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if dynamicTypeSize.isAccessibilitySize {
+                addFactButton
+                HStack { Spacer(); factsBottomSaveControls }
+            } else {
+                HStack(spacing: 16) { addFactButton; Spacer(); factsBottomSaveControls }
+            }
+        }
+        .font(.subheadline)
+        .buttonStyle(.plain)
+    }
+
+    private var factsBottomSaveControls: some View {
+        HStack(spacing: 16) {
+            Button("Cancel", action: finishInlineEditing)
+                .frame(minHeight: 44)
+                .accessibilityIdentifier("project-inline-bottom-cancel")
+            Button("Save", action: saveInlineEditing)
+                .fontWeight(.semibold)
+                .frame(minHeight: 44)
+                .accessibilityIdentifier("project-inline-bottom-save")
+        }
+    }
+
+    @ViewBuilder
+    private var inlineEditorError: some View {
+        if let inlineSaveError {
+            Text(inlineSaveError).font(.footnote).foregroundStyle(.secondary)
+        }
+    }
+
+    private func beginInlineEditing(_ section: ProjectOverviewSection) {
+        guard inlineEditingSection == nil, let folder, library.requireProjectAccess() else { return }
+        inlineEditingFolder = folder
+        inlineEditingSessionID = library.privateSessionID
+        inlineSaveError = nil
+        contextDraft = folder.description
+        factsDraft = folder.structuredFacts.map {
+            ProjectFactDraft(id: $0.id, label: $0.label, value: $0.value, original: $0)
+        }
+        withAnimation(inlineExpansionAnimation) { inlineEditingSection = section }
+    }
+
+    private func saveInlineEditing() {
+        guard let original = inlineEditingFolder, let session = inlineEditingSessionID else { return }
+        let saved: Bool
+        if inlineEditingSection == .context {
+            saved = library.updateProjectContext(folderID: folderID, description: contextDraft,
+                expectedClientID: original.clientID, expectedDescription: original.description, sessionID: session)
+        } else if inlineEditingSection == .structuredFacts {
+            var facts: [ProjectStructuredFact] = []
+            for draft in factsDraft {
+                let label = draft.label.trimmingCharacters(in: .whitespacesAndNewlines)
+                let value = draft.value.trimmingCharacters(in: .whitespacesAndNewlines)
+                if draft.original == nil && label.isEmpty && value.isEmpty { continue }
+                guard !label.isEmpty else {
+                    inlineSaveError = "Give each fact a name."
+                    return
+                }
+                if let fact = draft.original, label == fact.label, value == fact.value {
+                    facts.append(fact)
+                } else {
+                    facts.append(ProjectStructuredFact(id: draft.id, key: draft.original?.key ?? "manual-\(draft.id)",
+                        label: label, value: value, status: value.isEmpty ? "unknown" : "stated", source: "manual",
+                        sourceText: draft.original == nil ? "Entered on iPhone." : "Edited on iPhone.", updatedAt: Date()))
+                }
+            }
+            saved = library.updateProjectFacts(folderID: folderID, facts: facts,
+                expectedClientID: original.clientID, expectedFacts: original.structuredFacts, sessionID: session)
+        } else {
+            return
+        }
+        if saved { finishInlineEditing() }
+        else { inlineSaveError = library.statusMessage ?? "Your changes could not be saved. Try again." }
+    }
+
+    private func finishInlineEditing() {
+        isContextEditorFocused = false
+        withAnimation(inlineExpansionAnimation) { inlineEditingSection = nil }
+        inlineEditingFolder = nil
+        inlineEditingSessionID = nil
+        inlineSaveError = nil
+    }
+
+    private var latestProjectNote: ProjectNotebookCardSummary? {
+        projectHubSnapshot?.notebookCards.max { $0.updatedAt < $1.updatedAt }
+    }
+
+    private var latestProjectReport: ProjectReportSummary? {
+        projectHubSnapshot?.reports.max { $0.createdAt < $1.createdAt }
+    }
+
+    private var projectSectionCards: some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .topLeading),
+                                 count: dynamicTypeSize.isAccessibilitySize ? 1 : 2), spacing: 12) {
+            Button { beginInlineEditing(.structuredFacts) } label: {
+                let facts = folder?.structuredFacts ?? []
+                projectSectionCard("Facts", systemImage: "building.2",
+                    count: "\(facts.count) \(facts.count == 1 ? "fact" : "facts")",
+                    preview: facts.first.map { "\($0.label): \($0.value)" } ?? "No facts yet.")
+            }
+            .disabled(inlineEditingSection != nil)
             .accessibilityIdentifier("project-section-structured-facts")
 
-            NavigationLink {
-                if let projectID = library.backendProjectID(for: folderID) {
-                    projectNotebookDestination(projectID: projectID)
-                } else {
-                    projectSectionScreen(title: "Notebook") {
-                        projectHubEmpty("Connect to sync this Project’s Notebook.")
-                    }
-                }
-            } label: { projectSectionCard("Notes", systemImage: "note.text") }
+            NavigationLink(value: ProjectOverviewSection.questions) {
+                let questions = folder?.openQuestions ?? []
+                projectSectionCard("Questions", systemImage: "questionmark.bubble",
+                    count: folder?.openQuestions.map { "\($0.count) \($0.count == 1 ? "question" : "questions")" },
+                    preview: questions.first(where: { !$0.question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })?.question
+                        ?? (folder?.openQuestions == nil ? "" : "No questions yet."))
+            }
+            .accessibilityIdentifier("project-section-questions")
+
+            NavigationLink(value: ProjectOverviewSection.checklist) {
+                let records = folder?.recordsChecklist ?? []
+                projectSectionCard("Checklist", systemImage: "checklist",
+                    count: folder?.recordsChecklist.map { "\($0.filter { $0.status == .reviewed }.count)/\($0.count) reviewed" },
+                    preview: records.first(where: { $0.status != .reviewed && $0.status != .notApplicable })?.label
+                        ?? (folder?.recordsChecklist == nil ? "" : records.isEmpty ? "No records yet." : "All records reviewed or not applicable."))
+            }
+            .accessibilityIdentifier("project-section-checklist")
+
+            NavigationLink(value: ProjectOverviewSection.notebook) {
+                projectSectionCard("Notes", systemImage: "note.text",
+                    count: projectHubSnapshot.map { "\($0.notebookCards.count) \($0.notebookCards.count == 1 ? "note" : "notes")" },
+                    preview: latestProjectNote.map { $0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled note" : $0.title }
+                        ?? (projectHubSnapshot == nil ? "Open Notebook" : "No notes yet."))
+            }
             .accessibilityIdentifier("project-section-notebook")
 
-            Button {
-                guard let projectID = library.backendProjectID(for: folderID) else { return }
-                library.researchHistoryProjectFilter = projectID
-                library.researchHistoryIsPresented = true
-                library.selectedTab = .research
-            } label: { projectSectionCard("Research", systemImage: "sparkle") }
-            .accessibilityIdentifier("project-section-research")
-
-            NavigationLink { projectEvidenceDestination } label: {
-                projectSectionCard("Evidence", systemImage: "bookmark")
+            NavigationLink(value: ProjectOverviewSection.evidence) {
+                projectSectionCard("Evidence", systemImage: "bookmark",
+                    count: "\(library.bookmarkCount(inFolder: folderID)) saved",
+                    preview: projectBookmarks.first.map { "\($0.sectionNumber) · \($0.displayTitle)" }
+                        ?? "No saved evidence yet.")
             }
             .accessibilityIdentifier("project-section-evidence")
 
-            NavigationLink {
-                projectSectionScreen(title: "Reports") {
-                    projectHubStatus
-                    if projectHubSnapshot != nil || (!isProjectHubLoading && projectHubError == nil) {
-                        projectReportSummary
-                        if !projectCodeQuestions.isEmpty { projectCodeQuestionSummary }
-                    }
-                }
-                .refreshable { await loadProjectHub() }
-            } label: { projectSectionCard("Reports", systemImage: "doc.richtext") }
+            NavigationLink(value: ProjectOverviewSection.reports) {
+                projectSectionCard("Reports", systemImage: "doc.richtext",
+                    count: projectHubSnapshot.map { "\($0.reports.count) \($0.reports.count == 1 ? "report" : "reports")" },
+                    preview: latestProjectReport.map { "\($0.title) · V\($0.reportVersion)" }
+                        ?? (projectHubSnapshot == nil ? "Open Reports" : "No reports yet."))
+            }
             .accessibilityIdentifier("project-section-reports")
         }
         .buttonStyle(.plain)
         .tint(Color.appChrome)
     }
 
-    private func projectSectionCard(_ title: String, systemImage: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .font(.title3.weight(.medium))
-                .frame(width: 24)
-                .accessibilityHidden(true)
-            Text(title)
-                .font(.title3.weight(.semibold))
-                .multilineTextAlignment(.leading)
+    @ViewBuilder
+    private func projectSectionDestination(_ section: ProjectOverviewSection) -> some View {
+        switch section {
+        case .questions, .checklist:
+            ProjectWorkflowView(folderID: folderID, section: section)
+        case .context:
+            ProjectContextView(folderID: folderID, accentColor: accentColor)
+        case .structuredFacts:
+            projectSectionScreen(title: "Structured Facts") {
+                let facts = folder?.structuredFacts ?? []
+                if facts.isEmpty {
+                    projectHubEmpty("No Structured facts yet.")
+                } else {
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(facts) { fact in
+                            ProjectStructuredFactRow(fact: fact)
+                            if fact.id != facts.last?.id { Divider() }
+                        }
+                        ProjectStructuredFactsSources(facts: facts)
+                            .padding(.top, 16)
+                    }
+                }
+            }
+        case .notebook:
+            if let projectID = library.backendProjectID(for: folderID) {
+                projectNotebookDestination(projectID: projectID)
+            } else {
+                projectSectionScreen(title: "Notebook") {
+                    projectHubEmpty("Connect to sync this Project’s Notebook.")
+                }
+            }
+        case .evidence:
+            projectEvidenceDestination
+        case .reports:
+            projectSectionScreen(title: "Reports") {
+                projectHubStatus
+                if projectHubSnapshot != nil || (!isProjectHubLoading && projectHubError == nil) {
+                    projectReportSummary
+                    if !projectCodeQuestions.isEmpty { projectCodeQuestionSummary }
+                }
+            }
+            .refreshable { await loadProjectHub() }
         }
+    }
+
+    private func projectSectionCard(_ title: String, systemImage: String,
+                                    count: String?, preview: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: systemImage)
+                    .font(.body.weight(.medium))
+                    .accessibilityHidden(true)
+                Text(title).font(.headline)
+            }
+            Spacer(minLength: 8)
+            Text(preview)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+            if let count { Text(count).font(.caption).foregroundStyle(.secondary) }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundStyle(.primary)
         .padding(16)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 140, alignment: .topLeading)
         .background(projectTileBackgroundColor(for: folder?.colorHex ?? CodeFolder.defaultColorHex),
                     in: RoundedRectangle(cornerRadius: 28, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
@@ -1716,7 +2301,6 @@ struct ProjectView: View {
 
     private var savedEvidenceHeader: some View {
         HStack(spacing: 4) {
-            CodeEyebrow(text: "Saved Evidence", accent: accentColor)
             Spacer(minLength: 12)
             Button {
                 isEvidenceSearchPresented = true

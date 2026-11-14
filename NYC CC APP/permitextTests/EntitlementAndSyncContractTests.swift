@@ -1036,7 +1036,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(webView.contains("user-scalable=no"))
     }
 
-    func testReaderHeaderShowsEditionOnlyWithoutBookIcon() throws {
+    func testReaderBrowserPinsChapterAndAppendixHeadingsWithoutDuplicateProjectMenu() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -1045,17 +1045,21 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             encoding: .utf8
         )
 
-        let headerStart = try XCTUnwrap(browseSource.range(of: "private var libraryHeader: some View"))
+        let headerStart = try XCTUnwrap(browseSource.range(of: "private func readerSectionHeader("))
         let headerEnd = try XCTUnwrap(
             browseSource.range(
-                of: "private var constructionCodeSectionNames",
+                of: "private var readerCodeLibraryChoices",
                 range: headerStart.upperBound..<browseSource.endIndex
             )
         )
         let headerSource = String(browseSource[headerStart.lowerBound..<headerEnd.lowerBound])
 
-        XCTAssertTrue(headerSource.contains("Text(selectedVersionName)"))
-        XCTAssertTrue(headerSource.contains(".accessibilityIdentifier(\"reader-source-edition\")"))
+        XCTAssertTrue(headerSource.contains("Text(heading.rawValue)"))
+        XCTAssertTrue(headerSource.contains(".accessibilityAddTraits(.isHeader)"))
+        XCTAssertTrue(browseSource.contains("pinnedViews: [.sectionHeaders]"))
+        XCTAssertTrue(browseSource.contains("readerSectionHeader(.chapters"))
+        XCTAssertTrue(browseSource.contains("readerSectionHeader(.appendix"))
+        XCTAssertFalse(browseSource.contains("ReaderProjectMenu()"))
         XCTAssertFalse(headerSource.contains("Source jurisdiction ·"))
         XCTAssertFalse(headerSource.contains("systemImage: \"text.book.closed\""))
     }
@@ -2762,6 +2766,30 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertNotEqual(ReaderCodePickerIdentity.normalizedName("Plumbing Code"), target)
     }
 
+    @MainActor
+    func testReaderCatalogIncludesEveryBundledEditionAndKeepsDisabledSourcePreferences() async throws {
+        let defaults = isolatedEntitlementDefaults()
+        let database = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".sqlite")
+        defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: database.path + suffix) } }
+        let library = CodeLibraryViewModel(userContentRepository: try UserDataStore(databaseURL: database),
+            continuityStore: ContinuityStore(defaults: defaults), preferencesDefaults: defaults,
+            loadsInitialContent: true, loadsPersistedAccount: false)
+        for _ in 0..<600 where !library.isInitialContentLoaded { try await Task.sleep(for: .milliseconds(100)) }
+        XCTAssertTrue(library.isInitialContentLoaded)
+        let bundles = Set(library.availableVersions.compactMap { $0.authoredHTMLBundlePath?.components(separatedBy: "/").last })
+        XCTAssertEqual(bundles, ["2014-construction-codes", "2022-construction-codes", "2025-specialty-codes",
+                                 "2026-enacted-administrative-code", "2026-existing-building-code", "2026-zoning-resolution"])
+        let options = try await library.activeCodeSourceOptions()
+        XCTAssertTrue(options.allSatisfy { library.activeCodeSources?.isEnabled($0.id) == true })
+        let historical = try XCTUnwrap(options.first { $0.id.canonicalEdition == UserContentSyncCodeVersion.canonicalNYC2014 && $0.categoryLabel == "Building Code" })
+        let version = try XCTUnwrap(library.availableVersions.first { $0.authoredHTMLBundlePath?.hasSuffix("2014-construction-codes") == true })
+        XCTAssertTrue(library.isBrowseSourceEnabled(version: version, categoryName: "Building Code"))
+        XCTAssertTrue(library.updateActiveCodeSource(historical.id, enabled: false))
+        XCTAssertFalse(library.isBrowseSourceEnabled(version: version, categoryName: "Building Code"))
+        XCTAssertFalse(try ActiveCodeSourcePreferences(defaults: defaults).load(accountID: nil).isEnabled(historical.id))
+        XCTAssertTrue(library.isBrowseSourceEnabled(version: version, categoryName: "Plumbing Code"))
+    }
+
     func testReaderCodeMenuGroupsConstructionCodesByEditionYear() {
         XCTAssertEqual(ReaderCodeMenuSectionTitle.construction2022, "2022 Construction Codes")
         XCTAssertEqual(ReaderCodeMenuSectionTitle.codes2025, "2025 Codes")
@@ -3388,7 +3416,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(exchangeSource.contains("expectedAccountGeneration == accountMutationGeneration"))
     }
 
-    func testSavedAccountButtonOpensSettingsDirectlyAndSyncLivesInAccountCard() throws {
+    func testSavedAccountButtonOpensSettingsDirectlyWithoutDuplicateSyncBadges() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -3416,10 +3444,10 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(bookmarksSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
         XCTAssertFalse(bookmarksSource.contains("Label(\"Sync: \\(library.syncStatusTitle)\""))
         XCTAssertFalse(bookmarksSource.contains("Label(\"Settings\", systemImage: \"gearshape\")"))
-        XCTAssertTrue(settingsSource.contains("CodeScreenTitle(title: \"Account\", collapseProgress: collapseProgress)\n                        .offset(y: 8)"))
-        XCTAssertTrue(settingsSource.contains("CodeTopContentFade(title: \"Account\", progress: collapseProgress)"))
-        XCTAssertTrue(settingsSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
-        XCTAssertTrue(settingsSource.contains(".accessibilityLabel(\"Sync status: \\(library.syncStatusTitle)\")"))
+        XCTAssertTrue(settingsSource.contains("CodeMainScreenToolbarTitle(title: screenTitle)"))
+        XCTAssertTrue(settingsSource.contains("isSourcesScreen ? \"Active Code Sources\" : \"Account\""))
+        XCTAssertFalse(settingsSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
+        XCTAssertTrue(bookmarksSource.contains(".sheet(isPresented: $showingSettings)"))
     }
 
     func testSettingsSignInButtonMatchesUpgradeButtonStyle() throws {
@@ -5014,11 +5042,6 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             contentsOf: projectRoot.appendingPathComponent("permitext/Views/ChapterHTMLReaderView.swift"),
             encoding: .utf8
         )
-        let projectsSource = try String(
-            contentsOf: projectRoot.appendingPathComponent("permitext/Views/BookmarksView.swift"),
-            encoding: .utf8
-        )
-
         XCTAssertFalse(htmlSource.contains("installParagraphBookmarkSwipe"))
         XCTAssertFalse(htmlSource.contains("nyccc-swipe-bookmark"))
         XCTAssertFalse(htmlSource.contains("action: 'toggleBookmark'"))
@@ -5026,13 +5049,14 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(chapterSource.contains("struct ReaderCurrentSectionBookmarkButton"))
         XCTAssertTrue(chapterSource.contains("let desiredBookmarkState = !displayedIsBookmarked"))
         XCTAssertTrue(chapterSource.contains("if displayedIsBookmarked == desiredBookmarkState"))
-        XCTAssertTrue(chapterSource.contains("displayedIsBookmarked ? \"Saved\" : \"Removed from Saved\""))
+        XCTAssertTrue(chapterSource.contains("showBookmarkConfirmation(\"Saved to \\(library.readerSaveDestinationName)\")"))
+        XCTAssertTrue(chapterSource.contains("\"Removed from Saved\" : \"Removed from Project\""))
         XCTAssertTrue(chapterSource.contains("Task.sleep(for: .milliseconds(1_200))"))
         XCTAssertTrue(chapterSource.contains(".overlay(alignment: .topTrailing)"))
-        XCTAssertTrue(chapterSource.contains(".lineLimit(1)\n                    .fixedSize()"))
+        XCTAssertNotNil(chapterSource.range(of: #"\.lineLimit\(1\)\s*\.fixedSize\(\)"#, options: .regularExpression))
+        XCTAssertTrue(chapterSource.contains(".accessibilityLabel(sectionID.map { library.readerSaveActionLabel(sectionID: $0) }"))
         XCTAssertTrue(nativeSource.contains("ReaderCurrentSectionBookmarkButton"))
         XCTAssertTrue(htmlReaderSource.contains("ReaderCurrentSectionBookmarkButton"))
-        XCTAssertEqual(projectsSource.components(separatedBy: "library.refreshBookmarks()").count - 1, 1)
     }
 
     func testQueuedBookmarkDeleteSurvivesPullUntilItUploads() throws {
@@ -5963,6 +5987,85 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(reopened.activeResearchConversationID, "conversation-a")
         reopened.activeResearchConversationID = nil
         XCTAssertNil(try model("owner-a").activeResearchConversationID)
+    }
+
+    func testProjectResearchCacheRetainsOtherProjectsAndPartialPages() {
+        func summary(_ id: String, project: String?) -> ResearchConversationSummary {
+            ResearchConversation(id: id, title: id, createdAt: "2026-11-12T12:00:00Z",
+                                 updatedAt: "2026-11-12T12:00:00Z", primaryProjectID: project).summary
+        }
+        let existing = [summary("old-a", project: "a"), summary("b", project: "b"), summary("unassigned", project: nil)]
+        let page = [summary("new-a", project: "a")]
+        let partial = NativeResearchHistory.mergingProjectPage(page, into: existing, projectID: "a", replacingProject: false)
+        XCTAssertEqual(Set(partial.map(\.id)), ["new-a", "old-a", "b", "unassigned"])
+        let complete = NativeResearchHistory.mergingProjectPage(page, into: existing, projectID: "a", replacingProject: true)
+        XCTAssertEqual(Set(complete.map(\.id)), ["new-a", "b", "unassigned"])
+        let removed = NativeResearchHistory.mergingProjectPage([], into: complete, projectID: "a", replacingProject: true)
+        XCTAssertEqual(Set(removed.map(\.id)), ["b", "unassigned"])
+        let pollutedPage = NativeResearchHistory.mergingProjectPage(existing, into: [], projectID: "a", replacingProject: true)
+        XCTAssertEqual(pollutedPage.map(\.id), ["old-a"])
+    }
+
+    @MainActor
+    func testProjectWorkspaceSwitchClearsConversationAndPendingPassages() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let defaults = isolatedEntitlementDefaults()
+        LocalEntitlementService.setDebugPlan(.pro, defaults: defaults)
+        let account = SignedInAccount(appUserID: "clerk:project-navigation", authProvider: .clerk,
+            authProviderUserID: "project-navigation", appleUserID: "", displayName: "Navigation",
+            signedInAt: Date(), backendSessionToken: "test-token")
+        let store = try UserDataStore(databaseURL: directory.appendingPathComponent("projects.sqlite"))
+        let library = CodeLibraryViewModel(userContentRepository: store,
+            continuityStore: ContinuityStore(defaults: defaults), preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults),
+            loadsInitialContent: true, loadsPersistedAccount: false,
+            initialSignedInAccount: account, ownsAccountSync: false)
+        for _ in 0..<600 where !library.isInitialContentLoaded {
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        XCTAssertTrue(library.isInitialContentLoaded)
+        let first = try XCTUnwrap(library.createFolder(name: "First"))
+        let second = try XCTUnwrap(library.createFolder(name: "Second"))
+        XCTAssertNil(library.openProjectID)
+
+        library.openProjectWorkspace(first.id)
+        let firstWorkspaceSession = library.projectWorkspaceSessionID
+        XCTAssertEqual(library.openProjectID, first.id)
+        XCTAssertEqual(library.activeProjectID, first.id)
+        XCTAssertEqual(library.readerSaveDestinationProject?.id, first.id)
+        XCTAssertEqual(library.researchHistoryProjectFilter, library.backendProjectID(for: first.id))
+        XCTAssertEqual(library.selectedTab, .bookmarks)
+        library.activeResearchConversationID = "first-project-conversation"
+        library.sendToResearch(ResearchSelectionRequest(sectionID: "101", selectedText: "First Project evidence"))
+        let firstRequest = try XCTUnwrap(library.researchRequestIdentity)
+
+        // Choosing another destination from Reader switches the entire workspace.
+        library.selectReaderSaveDestination(.project(second.clientID))
+        XCTAssertEqual(library.openProjectID, second.id)
+        XCTAssertNotEqual(library.projectWorkspaceSessionID, firstWorkspaceSession)
+        XCTAssertEqual(library.activeProjectID, second.id)
+        XCTAssertEqual(library.readerSaveDestinationProject?.id, second.id)
+        XCTAssertEqual(library.researchHistoryProjectFilter, library.backendProjectID(for: second.id))
+        XCTAssertNil(library.activeResearchConversationID)
+        XCTAssertTrue(library.pendingResearchSelections.isEmpty)
+        XCTAssertNotEqual(library.researchRequestIdentity, firstRequest)
+        XCTAssertTrue(library.researchHistoryIsPresented)
+
+        library.activeResearchConversationID = "second-project-conversation"
+        library.closeProjectWorkspace()
+        XCTAssertNil(library.openProjectID)
+        XCTAssertNil(library.activeProjectID)
+        XCTAssertNil(library.activeResearchConversationID)
+        XCTAssertEqual(library.selectedTab, .bookmarks)
+        library.openProjectWorkspace(-1)
+        XCTAssertNil(library.openProjectID, "A missing Project cannot expose the workspace tabs")
+        library.openProjectWorkspace(first.id)
+        XCTAssertNotEqual(library.projectWorkspaceSessionID, firstWorkspaceSession,
+                          "Reopening the same Project must reject work from its previous session")
+        library.deleteFolder(id: first.id)
+        XCTAssertNil(library.openProjectID, "Deleting the open Project returns to the chooser")
     }
 
     func testLegacyWorkspaceSelectionDecodesWithoutReaderContext() throws {
@@ -11788,5 +11891,220 @@ final class ReaderBrowseHeaderSelectionTests: XCTestCase {
             .init(order: 0, heading: .chapters, minY: 16),
             .init(order: 1, heading: .appendix, minY: 1000)
         ]), .chapters)
+    }
+}
+
+final class ProjectReorderingTests: XCTestCase {
+    func testProjectOrderPersistsAcrossEditionsAndEditsAndQueuesCompleteSyncRecords() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("project-order-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-wal", "-shm"] { try? FileManager.default.removeItem(atPath: url.path + suffix) }
+        }
+        let store = try UserDataStore(databaseURL: url)
+        let version = UserContentSyncCodeVersion.localNYC2022
+        let otherVersion = UserContentSyncCodeVersion.localNYCEnactedAdministrative
+        let fact = ProjectStructuredFact(id: "stories", key: "stories", label: "Stories", value: "3", status: "confirmed", source: "user", sourceText: "Field notes", updatedAt: nil)
+        let a = try store.createFolder(name: "A", address: "1 Main Street", description: "Keep context", structuredFacts: [fact], colorHex: "#6674c8", codeVersion: version)
+        let b = try store.createFolder(name: "B", address: "", description: "", colorHex: "#6674c8", codeVersion: otherVersion)
+        let reference = try store.createFolder(name: "Reference", address: "", description: "", colorHex: "#6674c8", folderType: .reference, codeVersion: version)
+        let c = try store.createFolder(name: "C", address: "", description: "", colorHex: "#6674c8", codeVersion: version)
+        let referenceOrder = try XCTUnwrap(store.allFolders().first { $0.id == reference }).sortOrder
+        for item in try store.pendingSyncQueueItems(limit: 100) { try store.markSyncQueueItemSynced(id: item.id) }
+
+        try store.reorderProjects(ids: [c, a, b])
+        let reopened = try UserDataStore(databaseURL: url)
+        XCTAssertEqual(try reopened.allFolders().filter { $0.folderType == "project" }.map(\.id), [c, a, b])
+        XCTAssertEqual(try XCTUnwrap(reopened.allFolders().first { $0.id == reference }).sortOrder, referenceOrder)
+        let queued = try store.pendingSyncQueueItems(limit: 100)
+        XCTAssertEqual(queued.count, 3)
+        let account = SignedInAccount(appUserID: "apple:project-order", appleUserID: "project-order", displayName: "Project Order", signedInAt: Date())
+        let records = try queued.map { item -> ServerProjectRecord in
+            guard case .project(let record) = try ServerUserContentMutation(syncQueueItem: item, account: account) else {
+                throw NSError(domain: "ProjectReorderingTests", code: 1)
+            }
+            return record
+        }
+        let aRecord = try XCTUnwrap(records.first { $0.localFolderID == a })
+        XCTAssertEqual(aRecord.sortOrder, 1)
+        XCTAssertEqual(aRecord.name, "A")
+        XCTAssertEqual(aRecord.address, "1 Main Street")
+        XCTAssertEqual(aRecord.description, "Keep context")
+        XCTAssertEqual(aRecord.colorHex, "#6674c8")
+        XCTAssertEqual(aRecord.structuredFacts, [fact])
+        XCTAssertEqual(records.first { $0.localFolderID == b }?.codeVersion, UserContentSyncCodeVersion.server(otherVersion))
+        try store.reorderProjects(ids: [c, a, b])
+        XCTAssertEqual(try store.pendingSyncQueueItems(limit: 100).count, queued.count, "An unchanged order queues nothing")
+
+        try store.updateFolder(id: a, name: "Edited A", address: "1 Main Street", description: "Edited context", structuredFacts: [fact], colorHex: "#6674c8", codeVersion: version)
+        let edit = try XCTUnwrap(store.pendingSyncQueueItems(limit: 100).last)
+        guard case .project(let editedRecord) = try ServerUserContentMutation(syncQueueItem: edit, account: account) else {
+            return XCTFail("Expected a Project update")
+        }
+        XCTAssertEqual(editedRecord.sortOrder, 1, "Editing a Project must retain its order in sync")
+        let d = try store.createFolder(name: "D", address: "", description: "", colorHex: "#6674c8", codeVersion: otherVersion)
+        XCTAssertEqual(try store.allFolders().filter { $0.folderType == "project" }.map(\.id), [c, a, b, d], "New Projects append across code editions")
+        let before = try store.allFolders().map(\.id)
+        let pendingCount = try store.pendingSyncQueueItems(limit: 100).count
+        XCTAssertThrowsError(try store.reorderProjects(ids: [c, a, b]))
+        XCTAssertThrowsError(try store.reorderProjects(ids: [c, a, b, b]))
+        XCTAssertEqual(try store.allFolders().map(\.id), before)
+        XCTAssertEqual(try store.pendingSyncQueueItems(limit: 100).count, pendingCount)
+    }
+}
+
+
+final class ProjectWorkflowSyncTests: XCTestCase {
+    func testWorkflowQueueFailureRollsBackSavedFields() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("workflow-rollback-\(UUID().uuidString).sqlite")
+        defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) } }
+        let store = try UserDataStore(databaseURL: url)
+        let version = UserContentSyncCodeVersion.localNYC2022
+        let id = try store.createFolder(name: "Original", address: "", description: "Original context", colorHex: "#6674c8", codeVersion: version)
+        var database: OpaquePointer?
+        XCTAssertEqual(sqlite3_open(url.path, &database), SQLITE_OK)
+        defer { sqlite3_close(database) }
+        XCTAssertEqual(sqlite3_exec(database, "CREATE TRIGGER fail_workflow_queue BEFORE INSERT ON sync_queue BEGIN SELECT RAISE(FAIL, 'synthetic queue failure'); END;", nil, nil, nil), SQLITE_OK)
+        XCTAssertThrowsError(try store.updateProjectWorkflow(id: id, openQuestions: [.init(question: "Must not claim saved")], recordsChecklist: nil, codeVersion: version))
+        XCTAssertEqual(try store.allFolders().first?.openQuestions, [])
+        XCTAssertThrowsError(try store.updateFolder(id: id, name: "Must roll back", address: "", description: "New context", colorHex: "#6674c8", codeVersion: version))
+        XCTAssertEqual(try store.allFolders().first?.name, "Original")
+        XCTAssertEqual(try store.allFolders().first?.description, "Original context")
+    }
+
+    func testMetadataUpdatesOmitAcknowledgedWorkflowsAndOnlySendEditedList() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("workflow-intent-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let store = try UserDataStore(databaseURL: root.appendingPathComponent("user.sqlite"))
+        let version = UserContentSyncCodeVersion.localNYC2022
+        let id = try store.createFolder(name: "Project", address: "", description: "", colorHex: "#6674c8", codeVersion: version)
+        let records = [ProjectChecklistRecord(label: "Survey", status: .requested)]
+        try store.updateProjectWorkflow(id: id, openQuestions: [.init(question: "Original")], recordsChecklist: records, codeVersion: version)
+        for queued in try store.pendingSyncQueueItems(limit: 100) { try store.markSyncQueueItemSynced(id: queued.id) }
+        try store.updateFolder(id: id, name: "Renamed", address: "", description: "New context", colorHex: "#6674c8", codeVersion: version)
+        let metadata = try XCTUnwrap(store.pendingSyncQueueItems(limit: 100).last)
+        XCTAssertNil(metadata.payload.values["openQuestions"], "Unrelated edits leave newer web Questions untouched")
+        XCTAssertNil(metadata.payload.values["recordsChecklist"])
+        let questions = [ProjectOpenQuestion(question: "Edited on phone")]
+        try store.updateProjectWorkflow(id: id, openQuestions: questions, recordsChecklist: nil, codeVersion: version)
+        let edit = try XCTUnwrap(store.pendingSyncQueueItems(limit: 100).last)
+        XCTAssertNotNil(edit.payload.values["openQuestions"])
+        XCTAssertNil(edit.payload.values["recordsChecklist"], "A Questions edit cannot overwrite a newer web Checklist")
+        XCTAssertEqual(try store.allFolders().first?.recordsChecklist, records)
+        // A later metadata mutation must retain intentional edits not yet synced.
+        try store.updateFolder(id: id, name: "Renamed again", address: "", description: "", colorHex: "#6674c8", codeVersion: version)
+        XCTAssertEqual(try store.pendingSyncQueueItems(limit: 100).last?.payload.values["openQuestions"], edit.payload.values["openQuestions"])
+    }
+
+    @MainActor
+    func testWorkflowSaveRejectsStaleDraftsAndSessionsButKeepsOtherEdits() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("workflow-fences-\(UUID().uuidString).sqlite")
+        let suite = "workflow-fences-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer {
+            defaults.removePersistentDomain(forName: suite)
+            for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) }
+        }
+        let store = try UserDataStore(databaseURL: url)
+        LocalEntitlementService.setDebugPlan(.pro, defaults: defaults)
+        let library = CodeLibraryViewModel(userContentRepository: store, preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults),
+            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        for _ in 0..<600 where !library.isInitialContentLoaded { try await Task.sleep(for: .milliseconds(100)) }
+        let original = try XCTUnwrap(library.createFolder(name: "Project", address: "", description: "Keep context"))
+        let session = library.privateSessionID
+        let records = [ProjectChecklistRecord(label: "Survey", status: .requested)]
+        XCTAssertTrue(library.updateProjectWorkflow(expectedFolder: original, sessionID: session, recordsChecklist: records))
+        let questions = [ProjectOpenQuestion(question: "Is the survey current?", answer: "Requested")]
+        XCTAssertTrue(library.updateProjectWorkflow(expectedFolder: original, sessionID: session, openQuestions: questions), "A checklist change does not conflict with a question edit")
+        XCTAssertEqual(library.folder(id: original.id)?.recordsChecklist, records)
+        XCTAssertEqual(library.folder(id: original.id)?.description, "Keep context")
+        XCTAssertFalse(library.updateProjectWorkflow(expectedFolder: original, sessionID: session, openQuestions: []), "An older Questions snapshot cannot overwrite new answers")
+        let latest = try XCTUnwrap(library.folder(id: original.id))
+        XCTAssertFalse(library.updateProjectWorkflow(expectedFolder: latest, sessionID: UUID(), openQuestions: []))
+        XCTAssertEqual(library.folder(id: original.id)?.openQuestions, questions)
+    }
+
+    func testWorkflowUpgradeRequiresFreshServerCheckpoint() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("workflow-upgrade-\(UUID().uuidString).sqlite")
+        defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) } }
+        let store = try UserDataStore(databaseURL: url)
+        var database: OpaquePointer?
+        XCTAssertEqual(sqlite3_open(url.path, &database), SQLITE_OK)
+        defer { sqlite3_close(database) }
+        XCTAssertEqual(sqlite3_exec(database, "INSERT INTO sync_checkpoints (account_user_id, backend_name, schema_version, payload_json) VALUES ('workflow-user', 'cloud', 1, '{}');", nil, nil, nil), SQLITE_OK)
+        XCTAssertNil(try store.loadSyncCheckpoint(accountUserID: "workflow-user", backendName: "cloud"), "Older native checkpoints must not skip loading existing web Questions and Checklist")
+    }
+
+    func testWebWorkflowImportsEditsAndSurvivesProjectMetadataAndReordering() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("workflow-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let url = root.appendingPathComponent("user.sqlite")
+        let store = try UserDataStore(databaseURL: url)
+        let version = UserContentSyncCodeVersion.localNYC2022
+        let json = Data("""
+        {"id":"web-project","userID":"workflow-user","codeVersion":"nyc-2022",
+         "clientID":"workflow-project","localFolderID":123,"name":"Web Project","address":"1 Main St",
+         "description":"Keep context","colorHex":"#6674c8","sortOrder":0,
+         "updatedAt":"2026-11-13T14:00:00Z",
+         "openQuestions":[{"id":"q1","question":"Is a survey needed?","answer":"Obtain the current survey."}],
+         "recordsChecklist":[{"id":"r1","label":"Survey","status":"requested"}]}
+        """.utf8)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let web = try decoder.decode(ServerProjectRecord.self, from: json)
+        try store.applyServerUserContentMutation(.project(web))
+        var local = try XCTUnwrap(store.allFolders().first)
+        XCTAssertEqual(local.openQuestions, web.openQuestions)
+        XCTAssertEqual(local.recordsChecklist?.first?.status, .requested)
+        XCTAssertEqual(local.recordsChecklist?.first?.note, "")
+        let editedQuestions = [ProjectOpenQuestion(id: "q1", question: "Is a survey needed?", answer: "Yes, requested today.")]
+        let editedRecords = [ProjectChecklistRecord(id: "r1", label: "Survey", status: .received, note: "Received on phone")]
+        try store.updateProjectWorkflow(id: local.id, openQuestions: editedQuestions, recordsChecklist: nil, codeVersion: local.codeVersion)
+        XCTAssertEqual(try store.allFolders().first?.recordsChecklist, local.recordsChecklist)
+        try store.updateProjectWorkflow(id: local.id, openQuestions: nil, recordsChecklist: editedRecords, codeVersion: local.codeVersion)
+        try store.updateFolder(id: local.id, name: "Renamed", address: local.address, description: "Edited context", colorHex: local.colorHex, codeVersion: local.codeVersion)
+        let other = try store.createFolder(name: "Other", address: "", description: "", colorHex: "#6674c8", codeVersion: version)
+        try store.reorderProjects(ids: [other, local.id])
+        let reopened = try UserDataStore(databaseURL: url)
+        local = try XCTUnwrap(reopened.allFolders().first { $0.clientID == "workflow-project" })
+        XCTAssertEqual(local.openQuestions, editedQuestions)
+        XCTAssertEqual(local.recordsChecklist, editedRecords)
+        let account = SignedInAccount(appUserID: "workflow-user", appleUserID: "workflow", displayName: "Workflow", signedInAt: Date())
+        let queued = try XCTUnwrap(store.pendingSyncQueueItems(limit: 100).last { $0.entityType == .folder && $0.payload.folderID == local.id })
+        guard case .project(let outbound) = try ServerUserContentMutation(syncQueueItem: queued, account: account) else { return XCTFail("Expected project") }
+        XCTAssertEqual(outbound.openQuestions, editedQuestions)
+        XCTAssertEqual(outbound.recordsChecklist, editedRecords)
+        let remote = try UserDataStore(databaseURL: root.appendingPathComponent("remote.sqlite"))
+        try remote.applyServerUserContentMutation(.project(outbound))
+        XCTAssertEqual(try remote.allFolders().first?.openQuestions, editedQuestions)
+        XCTAssertEqual(try remote.allFolders().first?.recordsChecklist, editedRecords)
+        // Legacy clients omit workflow fields; omission preserves known content.
+        let legacy = ServerProjectRecord(id: outbound.id, userID: outbound.userID, codeVersion: outbound.codeVersion,
+            clientID: outbound.clientID, localFolderID: outbound.localFolderID, name: "Legacy rename", address: "", description: "",
+            colorHex: outbound.colorHex, sortOrder: 0, archivedAt: nil, updatedAt: Date(), deletedAt: nil)
+        try remote.applyServerUserContentMutation(.project(legacy))
+        XCTAssertEqual(try remote.allFolders().first?.openQuestions, editedQuestions)
+        XCTAssertEqual(try remote.allFolders().first?.recordsChecklist, editedRecords)
+        try store.updateProjectWorkflow(id: local.id, openQuestions: [], recordsChecklist: [], codeVersion: local.codeVersion)
+        XCTAssertEqual(try store.allFolders().first { $0.id == local.id }?.openQuestions, [])
+        XCTAssertEqual(try store.allFolders().first { $0.id == local.id }?.recordsChecklist, [])
+    }
+
+    func testWorkflowValidationRejectsInvalidEditsWithoutMutatingSavedRecords() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("workflow-invalid-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let store = try UserDataStore(databaseURL: root.appendingPathComponent("user.sqlite"))
+        let version = UserContentSyncCodeVersion.localNYC2022
+        let id = try store.createFolder(name: "Project", address: "", description: "", colorHex: "#6674c8", codeVersion: version)
+        let q = ProjectOpenQuestion(id: "q", question: "Keep this", answer: "")
+        try store.updateProjectWorkflow(id: id, openQuestions: [q], recordsChecklist: nil, codeVersion: version)
+        XCTAssertThrowsError(try store.updateProjectWorkflow(id: id, openQuestions: [q, q], recordsChecklist: nil, codeVersion: version))
+        XCTAssertThrowsError(try store.updateProjectWorkflow(id: id, openQuestions: nil, recordsChecklist: [.init(label: " ")], codeVersion: version))
+        XCTAssertThrowsError(try ProjectOpenQuestion.validate([.init(question: String(repeating: "😀", count: 1001))]))
+        XCTAssertEqual(try store.allFolders().first?.openQuestions, [q])
+        XCTAssertEqual(try store.allFolders().first?.recordsChecklist, [])
     }
 }

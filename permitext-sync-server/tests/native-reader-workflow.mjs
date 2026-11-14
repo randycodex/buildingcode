@@ -27,7 +27,9 @@ assert.match(chapter,/showBookmarkConfirmation\("Saved to /, 'Transient confirma
 assert.match(chapter,/if let sectionID, library.isBookmarked\(sectionID: sectionID\) \{\s*Divider\(\)\s*Button\("Add to Projects"\) \{ openFolderPicker\(\) \}/,
  'Already saved passages retain deliberate additional Project assignment in the context menu');
 assert.match(chapter,/memberFolderIDs: Set\(library.folderMembership\[sectionID\] \?\? \[\]\)/, 'Secondary assignment retains current memberships');
-assert.match(browse,/ReaderProjectMenu\(\)/);
+assert.doesNotMatch(browse,/ReaderProjectMenu\(\)/, 'Reader stays within the Project selected by the workspace');
+assert.match(app,/onOpenProject: \{ library.openProjectWorkspace\(\$0\) \}/);
+assert.match(app,/\.fullScreenCover\(item: projectDestination\)/);
 assert.match(search,/Button\(readerDestinationLabel\(\.primary\)\)/);
 assert.match(search,/Button\(readerDestinationLabel\(\.secondary\)\)/);
 assert.match(browse,/rememberedSectionBinding\(for: target.chapter.id\).wrappedValue = target.section.id/);
@@ -70,7 +72,7 @@ final class Repository {
  struct Account { var appUserID:String }
  struct Version { var codeVersion = "2022" }
  struct CodeSourceNavigationContext { var accountID:String?; var ownerSessionID:UUID; var ownerRevision:UUID; var ownerIdentity:ObjectIdentifier }
- enum Tab { case browse, browseSecondary, search }
+ enum Tab { case bookmarks, browse, browseSecondary, search }
  var selectedTab = Tab.search
  var signedInAccount:Account? = Account(appUserID:"A")
  var selectedVersion:Version? = Version()
@@ -82,6 +84,10 @@ final class Repository {
  var userContentRepository:Repository? = Repository()
  var folders:[CodeFolder] = []; var folderMembership:[Int64:[Int64]] = [:]
  var activeProjectID:Int64?; var continuityCalls=0
+ var openProjectID:Int64?; var projectWorkspaceSessionID=UUID()
+ var activeResearchConversationID:String?; var pendingResearchSelections:[String]=[]
+ var researchHistoryProjectFilter="all"; var researchHistoryIsPresented=false
+ func backendProjectID(for id:Int64)->String? { folders.first{$0.id == id}?.clientID }
  func persistContinuityContext() { continuityCalls += 1 }
  var statusMessage:String?; var saveCalls=0; var toggleCalls=0; var syncCalls=0; var projectRequests=0
  func requestProjectSelection(sectionID:Int64? = nil) { projectRequests += 1 }

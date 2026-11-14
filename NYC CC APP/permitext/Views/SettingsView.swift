@@ -291,20 +291,6 @@ struct SettingsView: View {
         Color(uiColor: .secondaryLabel)
     }
 
-    private var syncStatusSystemImage: String {
-        if library.signedInAccount == nil { return "icloud.slash" }
-        if library.isAccountBusy { return "arrow.triangle.2.circlepath" }
-        if !library.userContentSyncConflicts.isEmpty { return "exclamationmark.icloud" }
-        if library.pendingUserContentSyncCount > 0 { return "icloud.and.arrow.up" }
-        return "checkmark.icloud"
-    }
-
-    private var syncStatusColor: Color {
-        if !library.userContentSyncConflicts.isEmpty { return .orange }
-        if library.signedInAccount == nil || library.isAccountBusy { return .secondary }
-        return Color.appChrome
-    }
-
     private var appVersionLabel: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
@@ -357,7 +343,7 @@ struct SettingsView: View {
                 dataAndStorageCard
             }
 
-            Text("permitext is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.")
+            Text("per codes is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 6)
@@ -712,21 +698,12 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 14) {
             CodeEyebrow(text: "Account", accent: settingsChromeColor)
 
-            Text(accountSummaryText)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(syncStatusColor)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(14)
-                .background(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(Color.primary.opacity(0.06))
-                )
-                .accessibilityLabel("Sync status: \(library.syncStatusTitle)")
+            if library.signedInAccount == nil {
+                Text("Sign in to access your account. Saving, Projects, and synced work require Pro; reading and search are free.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
 
             if let message = library.accountAuthenticationMessage {
                 Label(
@@ -927,16 +904,6 @@ struct SettingsView: View {
         if library.isStoreKitTestTransaction { return "Pro (Test)" }
         if library.currentEntitlementSource == .lifetimeGrant { return "Lifetime Pro" }
         return "Pro"
-    }
-
-    private var accountSummaryText: String {
-        guard let account = library.signedInAccount else {
-            return "Sign in to access your account. Saving, Projects, and synced work require Pro; reading and search are free."
-        }
-        if let displayName = account.displayName, !displayName.isEmpty {
-            return "Signed in as \(displayName). Pro unlocks saved sections, notes, Projects, and sync across your devices."
-        }
-        return "Signed in with \(account.authProvider.rawValue). Pro unlocks saved sections, notes, Projects, and sync across your devices."
     }
 
     private var upgradeButtonTitle: String {

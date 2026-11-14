@@ -34,6 +34,8 @@ struct BrowseView: View {
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @Namespace private var chapterTileNamespace
     @State private var showsCodeSources = false
+    @State private var showsReaderCodeLibrary = false
+    @State private var showsPickerCodeSources = false
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollRestingOffset: CGFloat?
     @State private var browseHeading: ReaderBrowseHeading = .chapters
@@ -105,7 +107,6 @@ struct BrowseView: View {
             versionFileName: hasSeededBrowseSection && library.isInitialContentLoaded ? library.selectedVersionFileName : nil,
             codeSectionID: browseCodeSectionID
         )])
-        .coordinateSpace(name: "browseScroll")
         .onPreferenceChange(ReaderBrowseHeadingPreferenceKey.self) { boundaries in
             let heading = ReaderBrowseHeaderSelection.heading(at: boundaries)
             if heading != browseHeading { browseHeading = heading }
@@ -124,6 +125,23 @@ struct BrowseView: View {
             SettingsView(initialSection: .sources)
                 .environmentObject(library.codeSourceSettingsLibrary)
         }
+        .sheet(isPresented: $showsReaderCodeLibrary) {
+            NavigationStack {
+                List { readerCodeLibraryChoices }
+                    .navigationTitle("Code Library")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") { showsReaderCodeLibrary = false }
+                                .accessibilityIdentifier("reader-code-library-close")
+                        }
+                    }
+            }
+            .sheet(isPresented: $showsPickerCodeSources) {
+                SettingsView(initialSection: .sources)
+                    .environmentObject(library.codeSourceSettingsLibrary)
+            }
+        }
         .onAppear {
             restoreReaderVersionIfNeeded()
         }
@@ -141,6 +159,16 @@ struct BrowseView: View {
         }
         .onChange(of: openedChapter) { _, chapter in
             if chapter == nil { preparedNativeOpening = nil }
+        }
+        .onChange(of: readerHandoff.reselections[browserContext]) { _, request in
+            guard request != nil, isBrowserTabActive else { return }
+            cancelChapterPreparation()
+            readerHandoff.cancel(in: browserContext)
+            if openedChapter != nil {
+                withAnimation { openedChapter = nil }
+            } else {
+                showsReaderCodeLibrary = true
+            }
         }
         .onChange(of: chapterPreparationScope) { _, scope in
             if let preparationSource, preparationSource != scope { cancelChapterPreparation() }
@@ -176,19 +204,7 @@ struct BrowseView: View {
         let chapters = library.browseChapters(for: browseCodeSectionID)
 
         return ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                GeometryReader { proxy in
-                    Color.clear
-                        .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("browseScroll")).minY)
-                }
-                .frame(height: 0)
-
-                libraryHeader
-                    .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                    .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
-                    .padding(.bottom, 12)
-                    .zIndex(1)
-
+            LazyVStack(alignment: .leading, spacing: 12, pinnedViews: [.sectionHeaders]) {
                 if let preparationError {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(preparationError).font(.callout).foregroundStyle(.secondary)
@@ -199,6 +215,7 @@ struct BrowseView: View {
                 }
 
                 if chapters.isEmpty {
+                    readerSectionHeader(.chapters, order: 0)
                     CodeEmptyStateCard(
                         title: library.activeCodeSources == nil ? "Code Sources Unavailable" : (selectedBrowseSourceIsDisabled ? "Code Source Turned Off" : "No Chapters"),
                         systemImage: "text.book.closed",
@@ -224,58 +241,56 @@ struct BrowseView: View {
                         selectedCodeSectionName: codeSectionName
                     )
 
-                    // Keep section boundaries in the layout even when their cards
-                    // are offscreen, so scrolling back restores the right heading.
-                    VStack(alignment: .leading, spacing: 12) {
-                        ForEach(Array(chapterGroups.enumerated()), id: \.element.id) { index, group in
-                            if !group.chapterItems.isEmpty {
-                                VStack(alignment: .leading, spacing: 12) {
-                                    if codeSectionName == "All Sections" {
-                                        codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
-                                            .padding(.top, index == 0 ? 0 : 8)
-                                    }
-                                    LazyVGrid(columns: columns, spacing: 12) {
-                                        ForEach(group.chapterItems) { chapter in
-                                            chapterOpeningButton(chapter, kind: .chapter)
-                                        }
+                    ForEach(Array(chapterGroups.enumerated()), id: \.element.id) { index, group in
+                        if !group.chapterItems.isEmpty {
+                            Section {
+                                if codeSectionName == "All Sections" {
+                                    codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
+                                        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                                }
+                                LazyVGrid(columns: columns, spacing: 12) {
+                                    ForEach(group.chapterItems) { chapter in
+                                        chapterOpeningButton(chapter, kind: .chapter)
                                     }
                                 }
-                                .background(headingBoundary(.chapters, order: index * 2))
-                            } else if codeSectionName == "All Sections" {
-                                codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
-                                    .padding(.top, index == 0 ? 0 : 8)
+                                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                            } header: {
+                                readerSectionHeader(.chapters, order: index * 2)
                             }
+                        }
 
-                            if !group.appendixItems.isEmpty {
-                                Text("Appendix")
-                                    .font(CodeTypography.screenTitle)
-                                    .foregroundStyle(.primary)
-                                    .padding(.top, 8)
-                                    .accessibilityAddTraits(.isHeader)
-                                    .background(headingBoundary(.appendix, order: index * 2 + 1))
+                        if !group.appendixItems.isEmpty {
+                            Section {
+                                if group.chapterItems.isEmpty && codeSectionName == "All Sections" {
+                                    codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
+                                        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                                }
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.appendixItems) { chapter in
                                         chapterOpeningButton(chapter, kind: .appendix)
                                     }
                                 }
+                                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                            } header: {
+                                readerSectionHeader(.appendix, order: index * 2 + 1)
                             }
                         }
                     }
-                    .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
+            .background {
+                GeometryReader { proxy in
+                    Color.clear.preference(key: CodeScrollOffsetPreferenceKey.self,
+                        value: proxy.frame(in: .named("browseScroll")).minY)
+                }
+            }
         }
+        .coordinateSpace(name: "browseScroll")
         .contentMargins(.bottom, tabBarClearance, for: .scrollContent)
         .scrollIndicators(.hidden)
         .overlay(alignment: .top) {
             CodeTopContentFade(title: selectedCodeSectionName, progress: collapseProgress)
-        }
-        .overlay(alignment: .top) {
-            pinnedReaderHeader
-                .frame(minHeight: CodeScreenMetrics.mainHeaderHeight, alignment: .center)
-                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
         }
         .background(
             CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
@@ -283,6 +298,7 @@ struct BrowseView: View {
         )
         .accessibilityElement(children: .contain)
         .accessibilityHidden(!isBrowserTabActive)
+        .accessibilityIdentifier("reader-chapter-browser-\(browserContext.rawValue)")
     }
 
     private var canResumeChapterWarmups: Bool {
@@ -303,7 +319,7 @@ struct BrowseView: View {
             ChapterTile(chapter: chapter, palette: tilePalette(for: chapter), kind: kind)
         }
         .buttonStyle(.plain)
-        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
+        .cardZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         .onAppear { library.prewarmChapterForBrowsing(chapter) }
     }
 
@@ -391,13 +407,13 @@ struct BrowseView: View {
                 rememberedScrollOffset: rememberedScrollOffset,
                 preparedNativeOpening: preparedNativeOpening
             )
-            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
+            .cardZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         } else {
             ChapterLaunchView(
                 chapter: chapter,
                 rememberedSectionID: rememberedSectionID
             )
-            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
+            .cardZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         }
     }
 
@@ -414,107 +430,58 @@ struct BrowseView: View {
         }
     }
 
-    private var libraryHeader: some View {
-        Color.clear.frame(height: 44)
-            .accessibilityHidden(true)
+    private func readerSectionHeader(_ heading: ReaderBrowseHeading, order: Int) -> some View {
+        Text(heading.rawValue)
+            .font(CodeTypography.screenTitle)
+            .foregroundStyle(.primary)
+            .frame(minHeight: CodeScreenMetrics.mainHeaderHeight, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+            .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
+            .background(headingBoundary(heading, order: order))
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityIdentifier("reader-heading-\(heading.rawValue.lowercased())")
     }
 
-    private var pinnedReaderHeader: some View {
-        HStack(spacing: 12) {
-            Text(browseHeading.rawValue)
-                .font(CodeTypography.screenTitle)
-                .foregroundStyle(.primary)
-                .accessibilityAddTraits(.isHeader)
-            Spacer(minLength: 0)
-            ReaderProjectMenu()
-            Menu {
-                Section(ReaderCodeMenuSectionTitle.construction2022) {
-                    ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
-                        readerCodePickerButton(
-                            version: constructionCodeVersion,
-                            codeSectionName: codeSectionName
-                        )
-                    }
-                }
-
-                Section(ReaderCodeMenuSectionTitle.construction2014) {
-                    ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
-                        readerCodePickerButton(
-                            version: historicalConstructionCodeVersion,
-                            codeSectionName: codeSectionName
-                        )
-                    }
-                }
-
-                Section(ReaderCodeMenuSectionTitle.codes2025) {
-                    readerCodePickerButton(
-                        version: specialtyCodeVersion,
-                        codeSectionName: "2025 Energy Conservation Code"
-                    )
-                    readerCodePickerButton(
-                        version: specialtyCodeVersion,
-                        codeSectionName: "2025 Electrical Code — NYC Amendments"
-                    )
-                }
-
-                Section(ReaderCodeMenuSectionTitle.existingAndHistorical) {
-                    readerCodePickerButton(
-                        version: existingBuildingCodeVersion,
-                        codeSectionName: "Existing Building Code"
-                    )
-                    readerCodePickerButton(
-                        version: enactedAdministrativeCodeVersion,
-                        codeSectionName: "1968 Building Code"
-                    )
-                }
-
-                Section(ReaderCodeMenuSectionTitle.fireAndHousing) {
-                    readerCodePickerButton(
-                        version: enactedAdministrativeCodeVersion,
-                        codeSectionName: "Fire Code"
-                    )
-                    readerCodePickerButton(
-                        version: enactedAdministrativeCodeVersion,
-                        codeSectionName: "Housing Maintenance Code"
-                    )
-                }
-
-                Section(ReaderCodeMenuSectionTitle.administrative) {
-                    ForEach(enactedAdministrativeCodeSectionNames, id: \.self) { codeSectionName in
-                        readerCodePickerButton(
-                            version: enactedAdministrativeCodeVersion,
-                            codeSectionName: codeSectionName
-                        )
-                    }
-                }
-
-                Section(ReaderCodeMenuSectionTitle.localLaws) {
-                    readerCodePickerButton(
-                        version: enactedAdministrativeCodeVersion,
-                        codeSectionName: "Construction-Related Local Laws"
-                    )
-                }
-
-                Section(ReaderCodeMenuSectionTitle.landUseAndZoning) {
-                    readerCodePickerButton(
-                        version: zoningResolutionVersion,
-                        codeSectionName: "Zoning Resolution"
-                    )
-                }
-            } label: {
-                Image(systemName: "line.3.horizontal")
-                    .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                    .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                    .codeLiquidGlassCircle()
-                    .contentShape(Circle())
+    @ViewBuilder
+    private var readerCodeLibraryChoices: some View {
+        readerCodePickerSection(ReaderCodeMenuSectionTitle.construction2022,
+            choices: constructionCodeSectionNames.map {
+                ReaderCodePickerChoice(version: constructionCodeVersion, name: $0)
+            })
+        readerCodePickerSection(ReaderCodeMenuSectionTitle.construction2014,
+            choices: constructionCodeSectionNames.map {
+                ReaderCodePickerChoice(version: historicalConstructionCodeVersion, name: $0)
+            })
+        readerCodePickerSection(ReaderCodeMenuSectionTitle.codes2025, choices: [
+            ReaderCodePickerChoice(version: specialtyCodeVersion, name: "2025 Energy Conservation Code"),
+            ReaderCodePickerChoice(version: specialtyCodeVersion, name: "2025 Electrical Code — NYC Amendments")
+        ])
+        readerCodePickerSection(ReaderCodeMenuSectionTitle.existingAndHistorical, choices: [
+            ReaderCodePickerChoice(version: existingBuildingCodeVersion, name: "Existing Building Code"),
+            ReaderCodePickerChoice(version: enactedAdministrativeCodeVersion, name: "1968 Building Code")
+        ])
+        readerCodePickerSection(ReaderCodeMenuSectionTitle.fireAndHousing, choices: [
+            ReaderCodePickerChoice(version: enactedAdministrativeCodeVersion, name: "Fire Code"),
+            ReaderCodePickerChoice(version: enactedAdministrativeCodeVersion, name: "Housing Maintenance Code")
+        ])
+        readerCodePickerSection(ReaderCodeMenuSectionTitle.administrative,
+            choices: enactedAdministrativeCodeSectionNames.map {
+                ReaderCodePickerChoice(version: enactedAdministrativeCodeVersion, name: $0)
+            })
+        readerCodePickerSection(ReaderCodeMenuSectionTitle.localLaws, choices: [
+            ReaderCodePickerChoice(version: enactedAdministrativeCodeVersion, name: "Construction-Related Local Laws")
+        ])
+        readerCodePickerSection(ReaderCodeMenuSectionTitle.landUseAndZoning, choices: [
+            ReaderCodePickerChoice(version: zoningResolutionVersion, name: "Zoning Resolution")
+        ])
+        Section {
+            Button("Manage code sources…", systemImage: "slider.horizontal.3") {
+                if showsReaderCodeLibrary { showsPickerCodeSources = true }
+                else { showsCodeSources = true }
             }
-            .buttonStyle(.plain)
-            .accessibilityHidden(!isBrowserTabActive)
-            .accessibilityLabel(selectedCodeSectionName + " · " + selectedVersionName)
-            .accessibilityHint("Change code or version")
-            .accessibilityIdentifier("reader-code-picker")
+            .accessibilityIdentifier("reader-manage-code-sources")
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var constructionCodeSectionNames: [String] {
@@ -525,6 +492,25 @@ struct BrowseView: View {
             "Mechanical Code",
             "Fuel Gas Code"
         ]
+    }
+
+    private struct ReaderCodePickerChoice {
+        let version: BundledCodeVersion?
+        let name: String
+    }
+
+    @ViewBuilder
+    private func readerCodePickerSection(_ title: String, choices: [ReaderCodePickerChoice]) -> some View {
+        let enabled = choices.filter {
+            library.isBrowseSourceEnabled(version: $0.version, categoryName: $0.name)
+        }
+        if !enabled.isEmpty {
+            Section(title) {
+                ForEach(enabled, id: \.name) { choice in
+                    readerCodePickerButton(version: choice.version, codeSectionName: choice.name)
+                }
+            }
+        }
     }
 
     private var constructionCodeVersion: BundledCodeVersion? {
@@ -587,19 +573,15 @@ struct BrowseView: View {
         version: BundledCodeVersion?,
         codeSectionName: String
     ) -> some View {
-        if library.isBrowseSourceEnabled(version: version, categoryName: codeSectionName) {
+        if let version {
             Button {
                 selectReaderCode(version: version, codeSectionName: codeSectionName)
             } label: {
-                codeSectionPickerLabel(
-                    codeSectionName,
-                    isSelected: isReaderCodeSelected(
-                        version: version,
-                        codeSectionName: codeSectionName
-                    )
-                )
+                codeSectionPickerLabel(codeSectionName,
+                    isSelected: isReaderCodeSelected(version: version, codeSectionName: codeSectionName))
             }
-            .disabled(version == nil)
+            .accessibilityIdentifier("reader-code-\(version.fileName)-\(codeSectionName)")
+            .accessibilityHint("Open this code")
         }
     }
 
@@ -608,6 +590,7 @@ struct BrowseView: View {
         codeSectionName: String
     ) {
         guard let version, library.isBrowseSourceEnabled(version: version, categoryName: codeSectionName) else { return }
+        showsReaderCodeLibrary = false
         readerHandoff.cancel(in: browserContext)
         pendingReaderCodeSectionName = codeSectionName
         BrowserContextID.persistVersionFileName(version.fileName, for: browserContext)
@@ -1376,9 +1359,9 @@ private extension UIColor {
     }
 }
 
-private extension View {
+extension View {
     @ViewBuilder
-    func chapterZoomSource<ID: Hashable>(id: ID, in namespace: Namespace.ID, reduceMotion: Bool) -> some View {
+    func cardZoomSource<ID: Hashable>(id: ID, in namespace: Namespace.ID, reduceMotion: Bool) -> some View {
         if #available(iOS 18.0, *), !reduceMotion {
             self.matchedTransitionSource(id: id, in: namespace)
         } else {
@@ -1387,7 +1370,7 @@ private extension View {
     }
 
     @ViewBuilder
-    func chapterZoomDestination<ID: Hashable>(id: ID, in namespace: Namespace.ID, reduceMotion: Bool) -> some View {
+    func cardZoomDestination<ID: Hashable>(id: ID, in namespace: Namespace.ID, reduceMotion: Bool) -> some View {
         if #available(iOS 18.0, *), !reduceMotion {
             self.navigationTransition(.zoom(sourceID: id, in: namespace))
         } else {

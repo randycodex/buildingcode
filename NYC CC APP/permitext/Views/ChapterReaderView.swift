@@ -175,7 +175,6 @@ struct ChapterReaderView: View {
                 .sourceProblemReporting(sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                ReaderProjectMenu()
                 ReaderCurrentSectionBookmarkButton(
                     sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id,
                     accentColor: accentColor)
@@ -1348,24 +1347,6 @@ struct ReaderSaveDestinationMenuContent: View {
             }
         }
         Button("New Project…") { library.requestProjectSelection() }
-    }
-}
-
-struct ReaderProjectMenu: View {
-    @EnvironmentObject private var library: CodeLibraryViewModel
-
-    var body: some View {
-        if library.hasProjectAccess {
-            Menu { ReaderSaveDestinationMenuContent() } label: {
-                Text(library.readerSaveDestinationName)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .frame(maxWidth: 150)
-            }
-            .accessibilityLabel("Save to Project: \(library.readerSaveDestinationName)")
-            .accessibilityIdentifier("reader-project-menu")
-        }
     }
 }
 

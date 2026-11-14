@@ -345,14 +345,6 @@ struct SearchView: View {
                         .accessibilityIdentifier("search-reader-opening-error")
                     }
 
-                    HStack {
-                        Text(library.activeCodeSources == nil ? "Code source preferences unavailable" : (allInstalledSourcesDisabled == true ? "No code sources enabled" : (hasDisabledCodeSources ? "Searching enabled code sources" : "All installed code sources")))
-                            .font(.footnote).foregroundStyle(.secondary)
-                        Spacer()
-                        Button("Manage code sources") { showsCodeSources = true }
-                            .font(.footnote)
-                    }
-                    .accessibilityIdentifier("search-manage-code-sources")
                     if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         searchResultSummary
                         if !library.allEditionSearchWarnings.isEmpty {
@@ -426,6 +418,27 @@ struct SearchView: View {
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, 8)
                 .padding(.bottom, 16)
+            }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                HStack {
+                    Text("Search")
+                        .font(CodeTypography.screenTitle)
+                        .foregroundStyle(.primary)
+                        .accessibilityAddTraits(.isHeader)
+                        .accessibilityIdentifier("search-main-title")
+                    Spacer(minLength: 0)
+                    Button { showsCodeSources = true } label: {
+                        Image(systemName: "line.3.horizontal")
+                            .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                            .codeLiquidGlassCircle()
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Code sources")
+                    .accessibilityIdentifier("search-manage-code-sources")
+                }
+                .padding(.horizontal, contentHorizontalInset)
+                .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             }
             .accessibilityIdentifier("search-results-scroll")
             .scrollPosition(id: scrollPositionBinding, anchor: .top)
@@ -1090,7 +1103,9 @@ struct SearchView: View {
 
     private func recentlyViewedSection(limit: Int?) -> some View {
         let entries = Array(cachedRecentEntries.prefix(limit ?? cachedRecentEntries.count))
-        return LazyVStack(alignment: .leading, spacing: 0) {
+        // History is capped at 50 entries. Measure these rows together so lazy
+        // height estimates cannot leave gaps while restoring the scroll position.
+        return VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(entries.enumerated()), id: \.element.historyIdentity) { index, entry in
                 if let group = recentlyOpenedGroup(entry), index == 0 || group != recentlyOpenedGroup(entries[index - 1]) {
                     Text(group)

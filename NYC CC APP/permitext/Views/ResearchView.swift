@@ -489,12 +489,19 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
 struct ResearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     private let cacheDirectoryURL: URL?
+    private let projectFolderID: Int64?
 
-    init(cacheDirectoryURL: URL? = nil) { self.cacheDirectoryURL = cacheDirectoryURL }
+    init(projectFolderID: Int64? = nil, cacheDirectoryURL: URL? = nil) {
+        self.projectFolderID = projectFolderID
+        self.cacheDirectoryURL = cacheDirectoryURL
+    }
 
     var body: some View {
-        ResearchSessionView(owner: library.privateRequestIdentity, cacheDirectoryURL: cacheDirectoryURL)
-            .id(library.privateSessionID)
+        ResearchSessionView(owner: library.privateRequestIdentity, projectFolderID: projectFolderID,
+                            scopedProjectID: projectFolderID.flatMap { library.backendProjectID(for: $0) },
+                            projectSessionID: library.projectWorkspaceSessionID,
+                            cacheDirectoryURL: cacheDirectoryURL)
+            .id("\(library.privateSessionID):\(projectFolderID.map(String.init) ?? "all")")
     }
 }
 
@@ -557,9 +564,15 @@ private struct ResearchSessionView: View {
     @State private var isVisible = false
     private let cache: ProjectHubOfflineCache
     private let owner: NativePrivateRequestIdentity?
+    private let projectFolderID: Int64?
+    private let scopedProjectID: String?
+    private let projectSessionID: UUID
 
-    init(owner: NativePrivateRequestIdentity?, cacheDirectoryURL: URL? = nil) {
+    init(owner: NativePrivateRequestIdentity?, projectFolderID: Int64?, scopedProjectID: String?, projectSessionID: UUID, cacheDirectoryURL: URL? = nil) {
         self.owner = owner
+        self.projectFolderID = projectFolderID
+        self.scopedProjectID = scopedProjectID
+        self.projectSessionID = projectSessionID
         cache = ProjectHubOfflineCache(directoryURL: cacheDirectoryURL)
     }
 
@@ -589,7 +602,8 @@ private struct ResearchSessionView: View {
                             buttonTitle: "View Plans",
                             section: .plan
                         )
-                    } else if !library.researchHistoryIsPresented, let conversation, conversation.id == library.activeResearchConversationID {
+                    } else if !library.researchHistoryIsPresented, let conversation,
+                              conversation.id == library.activeResearchConversationID, acceptsConversation(conversation) {
                         conversationView(conversation)
                     } else {
                         historyView
@@ -935,32 +949,40 @@ private struct ResearchSessionView: View {
         if let conversation, !library.researchHistoryIsPresented {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .center, spacing: 6) {
-                    Menu {
-                        Button("Unassigned") { requestAssignment(nil) }
-                        ForEach(library.folders.filter { $0.folderType == .project }) { folder in
-                            if let projectID = library.backendProjectID(for: folder.id) {
-                                Button(folder.name) { requestAssignment(projectID) }
-                            }
-                        }
-                        Divider()
-                        Button("New Project…", systemImage: "folder.badge.plus") {
-                            if library.hasProjectAccess {
-                                showingProjectCreator = true
-                            } else {
-                                library.requireProjectAccess()
-                            }
-                        }
-                    } label: {
-                        Text(projectName(for: conversation.primaryProjectID))
+                    if projectFolderID != nil {
+                        Text(projectName(for: scopedProjectID))
                             .font(CodeTypography.screenTitle)
-                            .foregroundStyle(.primary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.72)
                             .frame(height: 44, alignment: .leading)
+                    } else {
+                        Menu {
+                            Button("Unassigned") { requestAssignment(nil) }
+                            ForEach(library.folders.filter { $0.folderType == .project }) { folder in
+                                if let projectID = library.backendProjectID(for: folder.id) {
+                                    Button(folder.name) { requestAssignment(projectID) }
+                                }
+                            }
+                            Divider()
+                            Button("New Project…", systemImage: "folder.badge.plus") {
+                                if library.hasProjectAccess {
+                                    showingProjectCreator = true
+                                } else {
+                                    library.requireProjectAccess()
+                                }
+                            }
+                        } label: {
+                            Text(projectName(for: conversation.primaryProjectID))
+                                .font(CodeTypography.screenTitle)
+                                .foregroundStyle(.primary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.72)
+                                .frame(height: 44, alignment: .leading)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Project context: \(projectName(for: conversation.primaryProjectID))")
+                        .accessibilityIdentifier("research-project-context-menu")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Project context: \(projectName(for: conversation.primaryProjectID))")
-                    .accessibilityIdentifier("research-project-context-menu")
 
                     Spacer(minLength: 0)
                     researchHeaderActions
@@ -1042,12 +1064,6 @@ private struct ResearchSessionView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
 
-            if isLoadingHistory {
-                ProgressView("Loading Research…")
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-            }
-
             if let message = errorMessage ?? historyErrorMessage {
                 statusMessage(message)
                     .listRowBackground(Color.clear)
@@ -1059,9 +1075,9 @@ private struct ResearchSessionView: View {
 
             if orderedSummaries.isEmpty && !isLoading && errorMessage == nil && historyErrorMessage == nil {
                 ContentUnavailableView(
-                    historyIsFiltered ? "No matching Research" : "No Research yet",
+                    historyIsFiltered && (projectFolderID == nil || !historyQuery.isEmpty) ? "No matching Research" : "No Research yet",
                     image: "Astroid",
-                    description: Text(historyIsFiltered ? "Try a different question or Project." : "Tap the plus button to start Research.")
+                    description: Text(!historyQuery.isEmpty ? "Try a different question." : "Tap the plus button to start Research.")
                 )
                 .padding(.top, 70)
                 .listRowBackground(Color.clear)
@@ -1169,7 +1185,8 @@ private struct ResearchSessionView: View {
     }
 
     private var historyProjectID: String? {
-        library.researchHistoryProjectFilter == "all" ? nil : library.researchHistoryProjectFilter == "unassigned" ? "" : library.researchHistoryProjectFilter
+        if projectFolderID != nil { return scopedProjectID ?? "" }
+        return library.researchHistoryProjectFilter == "all" ? nil : library.researchHistoryProjectFilter == "unassigned" ? "" : library.researchHistoryProjectFilter
     }
 
     private var historyIsFiltered: Bool {
@@ -1177,7 +1194,7 @@ private struct ResearchSessionView: View {
     }
 
     private var historyFilterKey: String {
-        "\(library.researchHistoryProjectFilter.utf8.count):\(library.researchHistoryProjectFilter):\(historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
+        "\(historyProjectID?.utf8.count ?? 0):\(historyProjectID ?? "all"):\(historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
     }
 
     private func boundedHistoryQuery(_ value: String) -> String {
@@ -1207,22 +1224,24 @@ private struct ResearchSessionView: View {
             }
             .padding(12)
             .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
-            Menu {
-                Picker("Project", selection: $library.researchHistoryProjectFilter) {
-                    Text("All Projects").tag("all")
-                    Text("Unassigned").tag("unassigned")
-                    ForEach(library.folders.filter { $0.folderType == .project }) { project in
-                        if let id = library.backendProjectID(for: project.id) {
-                            Text(project.name).tag(id)
+            if projectFolderID == nil {
+                Menu {
+                    Picker("Project", selection: $library.researchHistoryProjectFilter) {
+                        Text("All Projects").tag("all")
+                        Text("Unassigned").tag("unassigned")
+                        ForEach(library.folders.filter { $0.folderType == .project }) { project in
+                            if let id = library.backendProjectID(for: project.id) {
+                                Text(project.name).tag(id)
+                            }
                         }
                     }
+                } label: {
+                    Label(historyProjectID == nil ? "All Projects" : historyProjectID == "" ? "Unassigned" : library.folder(forBackendProjectID: historyProjectID ?? "")?.name ?? "Project", systemImage: "line.3.horizontal.decrease")
+                        .font(.subheadline)
+                        .frame(minHeight: 44)
                 }
-            } label: {
-                Label(historyProjectID == nil ? "All Projects" : historyProjectID == "" ? "Unassigned" : library.folder(forBackendProjectID: historyProjectID ?? "")?.name ?? "Project", systemImage: "line.3.horizontal.decrease")
-                    .font(.subheadline)
-                    .frame(minHeight: 44)
+                .accessibilityIdentifier("research-history-project-filter")
             }
-            .accessibilityIdentifier("research-history-project-filter")
         }
     }
 
@@ -1839,7 +1858,21 @@ private struct ResearchSessionView: View {
     private var isLoading: Bool { isLoadingHistory || isLoadingConversation }
 
     private var isCurrentOwner: Bool {
-        owner != nil && owner == library.privateRequestIdentity
+        owner != nil && owner == library.privateRequestIdentity &&
+            (projectFolderID == nil ||
+             (library.openProjectID == projectFolderID && library.activeBackendProjectID == scopedProjectID &&
+              library.projectWorkspaceSessionID == projectSessionID))
+    }
+
+    private func acceptsConversation(_ value: ResearchConversation) -> Bool {
+        projectFolderID == nil || value.primaryProjectID == scopedProjectID
+    }
+
+    private func returnToProjectHistory() {
+        conversation = nil
+        question = ""
+        library.activeResearchConversationID = nil
+        library.researchHistoryIsPresented = true
     }
 
     private func requestIdentity() -> NativeResearchRequestIdentity? {
@@ -1990,7 +2023,7 @@ private struct ResearchSessionView: View {
         defer { if isCurrent(identity), conversationLoadID == loadID { isLoadingConversation = false } }
         if useCache, let cached = try? ResearchConversationCacheLifecycle.load(
             ResearchConversation.self, cache: cache, accountID: identity.account.accountID, conversationID: id
-        ) { conversation = cached.value }
+        ), acceptsConversation(cached.value) { conversation = cached.value }
         // Restore local edits before publishing a cached conversation's composer.
         // A slow refresh must not expose an empty, editable field over a saved draft.
         if question.isEmpty, let saved = try? ResearchComposerDraftCache.load(
@@ -2001,6 +2034,10 @@ private struct ResearchSessionView: View {
             let loaded = try await library.researchConversation(id: id)
             guard isCurrent(identity), !Task.isCancelled,
                   conversationLoadID == loadID, conversationPublicationID == publicationID else { return }
+            guard acceptsConversation(loaded) else {
+                returnToProjectHistory()
+                return
+            }
             conversation = loaded
             loadedAuthoritativeConversation = true
             cacheConversation(loaded)
@@ -2158,9 +2195,13 @@ private struct ResearchSessionView: View {
         do {
             let created = try await library.createResearchConversation(
                 selections: selections,
-                projectID: library.activeBackendProjectID
+                projectID: scopedProjectID ?? library.activeBackendProjectID
             )
             guard isCurrent(identity) else { return false }
+            guard acceptsConversation(created) else {
+                returnToProjectHistory()
+                return false
+            }
             conversation = created
             library.researchHistoryIsPresented = false
             library.activeResearchConversationID = created.id
@@ -2427,6 +2468,7 @@ private struct ResearchSessionView: View {
     }
 
     private func requestAssignment(_ projectID: String?) {
+        guard projectFolderID == nil else { return }
         guard projectID != conversation?.primaryProjectID else { return }
         if conversation?.primaryProjectID != nil {
             pendingAssignmentProjectID = projectID
@@ -2437,6 +2479,7 @@ private struct ResearchSessionView: View {
     }
 
     private func assignConversation(projectID: String?, confirmed: Bool) async {
+        guard projectFolderID == nil else { return }
         guard let identity = requestIdentity(), identity.conversationID == conversation?.id else { return }
         guard let id = conversation?.id else { return }
         do {
@@ -2531,14 +2574,22 @@ private struct ResearchSessionView: View {
     }
 
     private func cacheHistory(_ history: [ResearchConversationSummary], accountID: String, replacingAll: Bool = false) {
-        guard isCurrentOwner, owner?.accountID == accountID, !historyIsFiltered else { return }
+        guard isCurrentOwner, owner?.accountID == accountID,
+              !historyIsFiltered || projectFolderID != nil else { return }
         let existing = (try? cache.load(
             [ResearchConversationSummary].self, accountID: accountID,
             projectID: "all-research", scope: "research-history"
         ))?.value ?? []
         // A first page is not a complete account snapshot. Keep older offline
         // rows until a complete list or an explicit deletion supersedes them.
-        let retained = replacingAll ? history : NativeResearchHistory.appending(existing, to: history)
+        let retained: [ResearchConversationSummary]
+        if let scopedProjectID {
+            retained = NativeResearchHistory.mergingProjectPage(history, into: existing,
+                projectID: scopedProjectID,
+                replacingProject: replacingAll && historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        } else {
+            retained = replacingAll ? history : NativeResearchHistory.appending(existing, to: history)
+        }
         try? cache.store(
             retained,
             accountID: accountID,
@@ -2586,6 +2637,10 @@ private struct ResearchSessionView: View {
 
     private func cacheConversation(_ conversation: ResearchConversation) {
         guard isCurrentOwner, let owner else { return }
+        guard acceptsConversation(conversation) else {
+            returnToProjectHistory()
+            return
+        }
         // Every accepted mutation invalidates reads begun before its publication.
         // Account/conversation identity alone cannot detect an older same-route GET.
         conversationPublicationID = UUID()

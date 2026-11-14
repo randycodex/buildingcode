@@ -22,6 +22,11 @@ struct NativeReaderHandoffRequest {
 final class NativeReaderHandoff: ObservableObject {
     static let shared = NativeReaderHandoff()
     @Published private(set) var requests: [BrowserContextID: NativeReaderHandoffRequest] = [:]
+    @Published private(set) var reselections: [BrowserContextID: UUID] = [:]
+
+    func reselect(_ destination: BrowserContextID) {
+        reselections[destination] = UUID()
+    }
 
     func open(_ route: SearchReaderRoute, in destination: BrowserContextID, library: CodeLibraryViewModel) {
         guard route.sourceVersion != nil, let context = library.captureCodeSourceNavigationContext() else { return }

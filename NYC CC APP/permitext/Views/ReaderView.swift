@@ -175,7 +175,6 @@ struct ReaderView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                ReaderProjectMenu()
                 ReaderCurrentSectionBookmarkButton(sectionID: sectionID, accentColor: accentColor)
             }
         }

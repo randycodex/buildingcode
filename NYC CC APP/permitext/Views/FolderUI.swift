@@ -433,11 +433,10 @@ struct ProjectContextView: View {
                 ProjectContextTextView(
                     text: isEditing ? draft : folder?.description ?? "",
                     isEditing: isEditing,
-                    onBeginEditing: beginEditing,
                     onTextChange: { draft = $0 }
                 )
                 if !isEditing && (folder?.description.isEmpty ?? true) {
-                    Text("Tap to add Project context.")
+                    Text("Use Edit to add Project context.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .allowsHitTesting(false)
@@ -466,6 +465,11 @@ struct ProjectContextView: View {
                     Button("Save", action: save)
                         .fontWeight(.semibold)
                         .accessibilityIdentifier("project-context-save")
+                }
+            } else {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Edit", systemImage: "pencil") { _ = beginEditing() }
+                        .accessibilityIdentifier("project-context-edit")
                 }
             }
         }
@@ -510,11 +514,10 @@ struct ProjectContextView: View {
     }
 }
 
-/// Keep the same text surface and native tap-to-caret behavior in both modes.
+/// Reading never enables the keyboard; the Edit action controls editability.
 private struct ProjectContextTextView: UIViewRepresentable {
     let text: String
     let isEditing: Bool
-    let onBeginEditing: () -> Bool
     let onTextChange: (String) -> Void
 
     func makeUIView(context: Context) -> UITextView {
@@ -528,6 +531,8 @@ private struct ProjectContextTextView: UIViewRepresentable {
         view.textContainer.lineFragmentPadding = 0
         view.contentInsetAdjustmentBehavior = .never
         view.keyboardDismissMode = .interactive
+        view.isEditable = false
+        view.isSelectable = true
         view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         view.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         view.delegate = context.coordinator
@@ -536,6 +541,8 @@ private struct ProjectContextTextView: UIViewRepresentable {
 
     func updateUIView(_ view: UITextView, context: Context) {
         context.coordinator.parent = self
+        let beginsEditing = isEditing && !view.isEditable
+        view.isEditable = isEditing
         if !isEditing && view.isFirstResponder { view.resignFirstResponder() }
         // Reassigning text on every SwiftUI update would reset native selection
         // and scroll position as the keyboard appears or the user types.
@@ -547,8 +554,9 @@ private struct ProjectContextTextView: UIViewRepresentable {
             view.selectedRange = NSRange(location: location, length: min(selection.length, length - location))
         }
         view.accessibilityLabel = "Project context"
-        view.accessibilityHint = "Edit Project context"
+        view.accessibilityHint = isEditing ? "Edit Project context" : "Read Project context. Use Edit to make changes."
         view.accessibilityIdentifier = isEditing ? "project-context-editor" : "project-context-text"
+        if beginsEditing { view.becomeFirstResponder() }
     }
 
     func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
@@ -559,7 +567,7 @@ private struct ProjectContextTextView: UIViewRepresentable {
         init(parent: ProjectContextTextView) { self.parent = parent }
 
         func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-            parent.isEditing || parent.onBeginEditing()
+            parent.isEditing
         }
 
         func textViewDidChange(_ textView: UITextView) {

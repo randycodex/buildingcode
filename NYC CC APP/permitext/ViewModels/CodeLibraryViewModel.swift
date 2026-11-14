@@ -198,6 +198,10 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var folders: [CodeFolder] = []
     @Published private(set) var readerSaveDestinationChoice: NativeReaderSaveDestination = .unassigned
     @Published private(set) var activeProjectID: Int64?
+    // Navigation starts at the chooser on every launch. The last save destination
+    // can still be restored without reopening a Project's private workspace.
+    @Published private(set) var openProjectID: Int64?
+    private(set) var projectWorkspaceSessionID = UUID()
     struct ProjectSaveRequest: Identifiable {
         let id = UUID()
         let accountID: String?
@@ -242,6 +246,7 @@ final class CodeLibraryViewModel: ObservableObject {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
             readerSaveDestinationChoice = NativeReaderSaveDestination.load(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
             activeProjectID = nil
+            openProjectID = nil
             researchHistoryProjectFilter = "all"
             researchHistoryIsPresented = false
             projectSaveRequest = nil
@@ -1050,12 +1055,49 @@ final class CodeLibraryViewModel: ObservableObject {
     func noteProjectOpened(_ folderID: Int64) {
         let owner = sharedAccountLibrary ?? self
         if owner !== self { owner.noteProjectOpened(folderID); activeProjectID = owner.activeProjectID; return }
-        guard let project = readerSaveDestinationProjects.first(where: { $0.id == folderID }) else { return }
+        guard hasProjectAccess,
+              let project = folders.first(where: { $0.id == folderID && $0.folderType == .project && $0.deletedAt == nil })
+        else { return }
+        if openProjectID != nil, openProjectID != folderID {
+            openProjectWorkspace(folderID)
+            return
+        }
         readerSaveDestinationChoice = .project(project.clientID)
         readerSaveDestinationChoice.store(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
         guard activeProjectID != folderID else { return }
         activeProjectID = folderID
         persistContinuityContext()
+    }
+
+    func openProjectWorkspace(_ folderID: Int64) {
+        let owner = sharedAccountLibrary ?? self
+        if owner !== self { owner.openProjectWorkspace(folderID); return }
+        guard hasProjectAccess,
+              folders.contains(where: { $0.id == folderID && $0.folderType == .project && $0.deletedAt == nil })
+        else { return }
+        if openProjectID != folderID {
+            projectWorkspaceSessionID = UUID()
+            activeResearchConversationID = nil
+            pendingResearchSelections = []
+        }
+        openProjectID = folderID
+        noteProjectOpened(folderID)
+        researchHistoryProjectFilter = backendProjectID(for: folderID) ?? "unassigned"
+        researchHistoryIsPresented = true
+        selectedTab = .bookmarks
+    }
+
+    func closeProjectWorkspace() {
+        let owner = sharedAccountLibrary ?? self
+        if owner !== self { owner.closeProjectWorkspace(); return }
+        projectWorkspaceSessionID = UUID()
+        openProjectID = nil
+        activeResearchConversationID = nil
+        pendingResearchSelections = []
+        researchHistoryProjectFilter = "all"
+        researchHistoryIsPresented = true
+        selectedTab = .bookmarks
+        clearActiveProject()
     }
 
     func clearActiveProject(ifMatches folderID: Int64? = nil) {
@@ -3135,6 +3177,8 @@ final class CodeLibraryViewModel: ObservableObject {
                     address: record.address,
                     description: record.description,
                     structuredFacts: record.structuredFacts,
+                    openQuestions: record.openQuestions,
+                    recordsChecklist: record.recordsChecklist,
                     colorHex: record.colorHex,
                     folderType: CodeFolderType(serverValue: record.folderType),
                     sortOrder: record.sortOrder,
@@ -3146,6 +3190,9 @@ final class CodeLibraryViewModel: ObservableObject {
             validateReaderSaveDestination()
             if let activeProjectID, folders.contains(where: { $0.id == activeProjectID }) == false {
                 self.activeProjectID = nil
+            }
+            if let openProjectID, !folders.contains(where: { $0.id == openProjectID && $0.deletedAt == nil }) {
+                closeProjectWorkspace()
             }
             if scheduleProjectPresentation { scheduleProjectPresentationRefresh() }
         } catch {
@@ -3338,12 +3385,94 @@ final class CodeLibraryViewModel: ObservableObject {
                             description: description, colorHex: folder.colorHex)
     }
 
+    @discardableResult
+    func updateProjectFacts(
+        folderID: Int64,
+        facts: [ProjectStructuredFact],
+        expectedClientID: String,
+        expectedFacts: [ProjectStructuredFact],
+        sessionID: UUID
+    ) -> Bool {
+        guard privateSessionID == sessionID,
+              let folder = folder(id: folderID),
+              folder.clientID == expectedClientID,
+              folder.folderType == .project else {
+            statusMessage = "This Project is no longer available in this account."
+            return false
+        }
+        guard folder.structuredFacts == expectedFacts else {
+            statusMessage = "Project facts changed while you were editing. Cancel to view the latest facts before trying again."
+            return false
+        }
+        var address = folder.address
+        if let fact = facts.first(where: { $0.key == "address" }),
+           fact.value != expectedFacts.first(where: { $0.key == "address" })?.value {
+            address = fact.value
+        }
+        return updateFolder(folder, name: folder.name, address: address,
+                            description: folder.description, structuredFacts: facts, colorHex: folder.colorHex)
+    }
+
+    @discardableResult
+    func updateProjectWorkflow(expectedFolder: CodeFolder, sessionID: UUID,
+                               openQuestions: [ProjectOpenQuestion]? = nil,
+                               recordsChecklist: [ProjectChecklistRecord]? = nil) -> Bool {
+        guard privateSessionID == sessionID,
+              let current = folder(id: expectedFolder.id),
+              current.clientID == expectedFolder.clientID, current.folderType == .project,
+              requireProjectAccess(), let userContentRepository else {
+            statusMessage = "This Project is no longer available in this account."
+            return false
+        }
+        guard (openQuestions == nil || expectedFolder.openQuestions != nil),
+              (recordsChecklist == nil || expectedFolder.recordsChecklist != nil) else {
+            statusMessage = "Connect to load this Project’s records before editing."
+            return false
+        }
+        guard (openQuestions == nil || current.openQuestions == expectedFolder.openQuestions),
+              (recordsChecklist == nil || current.recordsChecklist == expectedFolder.recordsChecklist) else {
+            statusMessage = "These records changed while you were editing. Cancel to view the latest version before trying again."
+            return false
+        }
+        do {
+            try userContentRepository.updateProjectWorkflow(id: current.id, openQuestions: openQuestions,
+                recordsChecklist: recordsChecklist, codeVersion: current.codeVersion)
+            refreshFolders()
+            scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+            return true
+        } catch {
+            statusMessage = error.localizedDescription
+            return false
+        }
+    }
+
     func projectPropertyContext(address: String) async throws -> BackendProjectPropertyContext {
         guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
         return try await accountBackendClient.projectPropertyContext(
             account: signedInAccount,
             address: address
         )
+    }
+
+    @discardableResult
+    func moveProject(id: Int64, to targetID: Int64, sessionID: UUID) -> Bool {
+        guard sessionID == privateSessionID, requireProjectAccess(),
+              let userContentRepository else { return false }
+        var ids = folders.filter { $0.folderType == .project && $0.deletedAt == nil }.map(\.id)
+        guard let from = ids.firstIndex(of: id), let to = ids.firstIndex(of: targetID), from != to else { return false }
+        ids.remove(at: from)
+        ids.insert(id, at: to)
+        do {
+            try userContentRepository.reorderProjects(ids: ids)
+            refreshFolders(scheduleProjectPresentation: false)
+            scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+            return true
+        } catch {
+            statusMessage = error.localizedDescription
+            return false
+        }
     }
 
     func deleteFolder(id: Int64) {

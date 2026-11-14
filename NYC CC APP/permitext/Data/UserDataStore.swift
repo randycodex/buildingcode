@@ -40,6 +40,8 @@ protocol UserContentRepository {
     func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String)]
     func createFolder(name: String, address: String, description: String, structuredFacts: [ProjectStructuredFact], colorHex: String, folderType: CodeFolderType, codeVersion: String) throws -> Int64
     func updateFolder(id: Int64, name: String, address: String, description: String, structuredFacts: [ProjectStructuredFact], colorHex: String, folderType: CodeFolderType, codeVersion: String) throws
+    func updateProjectWorkflow(id: Int64, openQuestions: [ProjectOpenQuestion]?, recordsChecklist: [ProjectChecklistRecord]?, codeVersion: String) throws
+    func reorderProjects(ids: [Int64]) throws
     func deleteFolder(id: Int64, codeVersion: String) throws
     func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String) throws
     func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws
@@ -198,7 +200,9 @@ final class UserDataStore: UserContentRepository {
     }
 
     // Increment only when local sync application semantics require a full reconciliation.
-    private static let syncCheckpointSchemaVersion = 1
+    // Re-fetch existing server projects once to hydrate workflow fields that
+    // older native builds did not retain. Queued local edits stay intact.
+    private static let syncCheckpointSchemaVersion = 2
     private let connection: SQLiteConnection
     let databaseURL: URL
     private let isoFormatter = ISO8601DateFormatter()
@@ -1034,6 +1038,8 @@ final class UserDataStore: UserContentRepository {
         try addColumnIfMissing(table: "folders", column: "archived_at", definition: "TEXT")
         try addColumnIfMissing(table: "folders", column: "folder_type", definition: "TEXT NOT NULL DEFAULT 'project'")
         try addColumnIfMissing(table: "folders", column: "structured_facts_json", definition: "TEXT NOT NULL DEFAULT '[]'")
+        try addColumnIfMissing(table: "folders", column: "open_questions_json", definition: "TEXT")
+        try addColumnIfMissing(table: "folders", column: "records_checklist_json", definition: "TEXT")
         try addColumnIfMissing(table: "folder_sections", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folder_sections", column: "owner_id", definition: "TEXT NOT NULL DEFAULT 'local'")
         try addColumnIfMissing(table: "folder_sections", column: "visibility", definition: "TEXT NOT NULL DEFAULT 'personal'")
@@ -1256,7 +1262,7 @@ final class UserDataStore: UserContentRepository {
             "folders": [
                 "id", "client_id", "owner_id", "visibility", "sync_state",
                 "code_version", "folder_type", "name", "address", "description", "structured_facts_json", "color_hex", "sort_order",
-                "archived_at", "created_at", "updated_at", "deleted_at"
+                "archived_at", "created_at", "updated_at", "deleted_at", "open_questions_json", "records_checklist_json"
             ],
             "folder_sections": [
                 "client_id", "owner_id", "visibility", "sync_state", "folder_id",
@@ -2102,6 +2108,84 @@ final class UserDataStore: UserContentRepository {
 
     // MARK: - Folders
 
+    private func encodedWorkflow<T: Encodable>(_ items: T) throws -> String {
+        String(decoding: try jsonEncoder.encode(items), as: UTF8.self)
+    }
+
+    private func decodedWorkflow<T: Decodable>(_ value: String?) throws -> [T]? {
+        guard let value else { return nil }
+        return try jsonDecoder.decode([T].self, from: Data(value.utf8))
+    }
+
+    /// Missing fields mean this client has not received them yet. Keep them
+    /// omitted on upload so an older snapshot cannot erase the web's records.
+    private func folderWorkflowValues(id: Int64, codeVersion: String) throws -> [String: String] {
+        let statement = try connection.prepare("SELECT open_questions_json, records_checklist_json FROM folders WHERE id = ? AND code_version = ?;")
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, id)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        guard try connection.step(statement) == SQLITE_ROW else { return [:] }
+        var values: [String: String] = [:]
+        values["openQuestions"] = connection.stringOrNil(at: 0, in: statement)
+        values["recordsChecklist"] = connection.stringOrNil(at: 1, in: statement)
+        return values
+    }
+
+    /// Send only intentional workflow edits that still await acknowledgement.
+    /// A Context edit or reorder must not resend a stale copy of the web's lists.
+    private func pendingFolderWorkflowValues(id: Int64, codeVersion: String) throws -> [String: String] {
+        let statement = try connection.prepare("SELECT payload_json FROM sync_queue WHERE entity_type = 'folder' AND operation_type = 'upsert' AND state <> 'synced' ORDER BY id;")
+        defer { connection.finalize(statement) }
+        var values: [String: String] = [:]
+        while try connection.step(statement) == SQLITE_ROW {
+            let payload = try jsonDecoder.decode(SyncQueuePayload.self,
+                from: Data(connection.string(at: 0, in: statement).utf8))
+            guard payload.folderID == id,
+                  UserContentSyncCodeVersion.server(payload.codeVersion) == UserContentSyncCodeVersion.server(codeVersion) else { continue }
+            for key in ["openQuestions", "recordsChecklist"] {
+                if let value = payload.values[key] { values[key] = value }
+            }
+        }
+        return values
+    }
+
+    private func storeProjectWorkflow(id: Int64, codeVersion: String,
+                                      openQuestions: [ProjectOpenQuestion]?,
+                                      recordsChecklist: [ProjectChecklistRecord]?) throws {
+        let statement = try connection.prepare("UPDATE folders SET open_questions_json = COALESCE(?, open_questions_json), records_checklist_json = COALESCE(?, records_checklist_json) WHERE id = ? AND code_version = ?;")
+        defer { connection.finalize(statement) }
+        if let openQuestions {
+            try connection.bind(text: encodedWorkflow(openQuestions), index: 1, to: statement)
+        } else { sqlite3_bind_null(statement, 1) }
+        if let recordsChecklist {
+            try connection.bind(text: encodedWorkflow(recordsChecklist), index: 2, to: statement)
+        } else { sqlite3_bind_null(statement, 2) }
+        sqlite3_bind_int64(statement, 3, id)
+        try connection.bind(text: codeVersion, index: 4, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    func updateProjectWorkflow(id: Int64, openQuestions: [ProjectOpenQuestion]?,
+                               recordsChecklist: [ProjectChecklistRecord]?, codeVersion: String) throws {
+        if let openQuestions { try ProjectOpenQuestion.validate(openQuestions) }
+        if let recordsChecklist { try ProjectChecklistRecord.validate(recordsChecklist) }
+        try performTransaction {
+            guard let record = try allFolders().first(where: { $0.id == id && $0.codeVersion == codeVersion }) else {
+                throw NSError(domain: "UserDataStore", code: 6,
+                              userInfo: [NSLocalizedDescriptionKey: "This Project is no longer available."])
+            }
+            try storeProjectWorkflow(id: id, codeVersion: codeVersion,
+                                     openQuestions: openQuestions, recordsChecklist: recordsChecklist)
+            var changes: [String: String] = [:]
+            if let openQuestions { changes["openQuestions"] = try encodedWorkflow(openQuestions) }
+            if let recordsChecklist { changes["recordsChecklist"] = try encodedWorkflow(recordsChecklist) }
+            try updateFolderRecord(id: id, name: record.name, address: record.address,
+                description: record.description, structuredFacts: record.structuredFacts,
+                colorHex: record.colorHex, folderType: CodeFolderType(serverValue: record.folderType),
+                codeVersion: codeVersion, workflowChanges: changes)
+        }
+    }
+
     private func encodedProjectStructuredFacts(_ facts: [ProjectStructuredFact]) throws -> String {
         let data = try jsonEncoder.encode(facts)
         guard let value = String(data: data, encoding: .utf8) else {
@@ -2125,7 +2209,7 @@ final class UserDataStore: UserContentRepository {
     func folders(codeVersion: String) throws -> [FolderRecord] {
         let statement = try connection.prepare(
             """
-            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, code_version, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at, structured_facts_json
+            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, code_version, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at, structured_facts_json, open_questions_json, records_checklist_json
             FROM folders
             WHERE code_version = ? AND archived_at IS NULL
             ORDER BY sort_order ASC, name COLLATE NOCASE ASC;
@@ -2153,7 +2237,9 @@ final class UserDataStore: UserContentRepository {
                     sortOrder: Int(connection.int64(at: 12, in: statement)),
                     createdAt: connection.string(at: 13, in: statement),
                     updatedAt: connection.string(at: 14, in: statement),
-                    structuredFacts: decodedProjectStructuredFacts(connection.string(at: 15, in: statement))
+                    structuredFacts: decodedProjectStructuredFacts(connection.string(at: 15, in: statement)),
+                    openQuestions: try decodedWorkflow(connection.stringOrNil(at: 16, in: statement)),
+                    recordsChecklist: try decodedWorkflow(connection.stringOrNil(at: 17, in: statement))
                 )
             )
         }
@@ -2165,7 +2251,7 @@ final class UserDataStore: UserContentRepository {
     func allFolders() throws -> [FolderRecord] {
         let statement = try connection.prepare(
             """
-            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, code_version, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at, structured_facts_json
+            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, code_version, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at, structured_facts_json, open_questions_json, records_checklist_json
             FROM folders
             WHERE archived_at IS NULL
             ORDER BY sort_order ASC, name COLLATE NOCASE ASC;
@@ -2192,7 +2278,9 @@ final class UserDataStore: UserContentRepository {
                     sortOrder: Int(connection.int64(at: 12, in: statement)),
                     createdAt: connection.string(at: 13, in: statement),
                     updatedAt: connection.string(at: 14, in: statement),
-                    structuredFacts: decodedProjectStructuredFacts(connection.string(at: 15, in: statement))
+                    structuredFacts: decodedProjectStructuredFacts(connection.string(at: 15, in: statement)),
+                    openQuestions: try decodedWorkflow(connection.stringOrNil(at: 16, in: statement)),
+                    recordsChecklist: try decodedWorkflow(connection.stringOrNil(at: 17, in: statement))
                 )
             )
         }
@@ -2301,10 +2389,9 @@ final class UserDataStore: UserContentRepository {
         // the list until the user reorders.
         let nextSortOrder: Int = {
             guard let stmt = try? connection.prepare(
-                "SELECT COALESCE(MAX(sort_order), -1) FROM folders WHERE code_version = ?;"
+                "SELECT COALESCE(MAX(sort_order), -1) FROM folders WHERE archived_at IS NULL;"
             ) else { return 0 }
             defer { connection.finalize(stmt) }
-            try? connection.bind(text: codeVersion, index: 1, to: stmt)
             return ((try? connection.step(stmt)) == SQLITE_ROW)
                 ? Int(connection.int64(at: 0, in: stmt)) + 1
                 : 0
@@ -2340,6 +2427,7 @@ final class UserDataStore: UserContentRepository {
         _ = try connection.step(statement)
 
         let folderID = connection.lastInsertedRowID()
+        try storeProjectWorkflow(id: folderID, codeVersion: codeVersion, openQuestions: [], recordsChecklist: [])
         enqueueSyncOperationIfPossible(
             entityType: .folder,
             operationType: .upsert,
@@ -2371,6 +2459,17 @@ final class UserDataStore: UserContentRepository {
         folderType: CodeFolderType = .project,
         codeVersion: String
     ) throws {
+        try performTransaction {
+            try updateFolderRecord(id: id, name: name, address: address, description: description,
+                structuredFacts: structuredFacts, colorHex: colorHex, folderType: folderType,
+                codeVersion: codeVersion, workflowChanges: [:])
+        }
+    }
+
+    private func updateFolderRecord(id: Int64, name: String, address: String, description: String,
+                                    structuredFacts: [ProjectStructuredFact], colorHex: String,
+                                    folderType: CodeFolderType, codeVersion: String,
+                                    workflowChanges: [String: String]) throws {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else {
             throw NSError(
@@ -2381,6 +2480,9 @@ final class UserDataStore: UserContentRepository {
         }
         let clientID = try folderClientID(id: id, codeVersion: codeVersion)
         let structuredFactsJSON = try encodedProjectStructuredFacts(structuredFacts)
+        let sortOrder = try folderSortOrder(id: id, codeVersion: codeVersion)
+        let workflowValues = try pendingFolderWorkflowValues(id: id, codeVersion: codeVersion)
+            .merging(workflowChanges) { _, new in new }
 
         let statement = try connection.prepare(
             """
@@ -2401,7 +2503,7 @@ final class UserDataStore: UserContentRepository {
         sqlite3_bind_int64(statement, 9, id)
         try connection.bind(text: codeVersion, index: 10, to: statement)
         _ = try connection.step(statement)
-        enqueueSyncOperationIfPossible(
+        try enqueueSyncOperation(
             entityType: .folder,
             operationType: .upsert,
             payload: SyncQueuePayload(
@@ -2414,10 +2516,58 @@ final class UserDataStore: UserContentRepository {
                     "description": description,
                     "structuredFacts": structuredFactsJSON,
                     "colorHex": colorHex,
-                    "folderType": folderType.rawValue
-                ]
+                    "folderType": folderType.rawValue,
+                    "sortOrder": String(sortOrder)
+                ].merging(workflowValues) { _, new in new }
             )
         )
+    }
+
+    /// Save the account's entire project order atomically with its sync mutations.
+    /// A stale list cannot overwrite projects added or removed during a drag.
+    func reorderProjects(ids: [Int64]) throws {
+        try performTransaction {
+            let projects = try allFolders().filter {
+                CodeFolderType(serverValue: $0.folderType) == .project && $0.deletedAt == nil
+            }
+            guard ids.count == projects.count, Set(ids).count == ids.count,
+                  Set(ids) == Set(projects.map(\.id)) else {
+                throw NSError(domain: "UserDataStore", code: 5,
+                    userInfo: [NSLocalizedDescriptionKey: "The Projects list changed. Try moving the Project again."])
+            }
+            let records = Dictionary(uniqueKeysWithValues: projects.map { ($0.id, $0) })
+            let now = isoFormatter.string(from: Date())
+            for (order, id) in ids.enumerated() {
+                guard let record = records[id], record.sortOrder != order else { continue }
+                let statement = try connection.prepare(
+                    "UPDATE folders SET sort_order = ?, updated_at = ?, sync_state = ? WHERE id = ?;"
+                )
+                defer { connection.finalize(statement) }
+                sqlite3_bind_int64(statement, 1, Int64(order))
+                try connection.bind(text: now, index: 2, to: statement)
+                try connection.bind(text: pendingSyncState, index: 3, to: statement)
+                sqlite3_bind_int64(statement, 4, id)
+                _ = try connection.step(statement)
+                // Project upserts replace server fields, so retain all metadata.
+                try enqueueSyncOperation(entityType: .folder, operationType: .upsert,
+                    payload: SyncQueuePayload(codeVersion: record.codeVersion, folderID: id,
+                        clientID: record.clientID, values: [
+                            "name": record.name, "address": record.address,
+                            "description": record.description,
+                            "structuredFacts": try encodedProjectStructuredFacts(record.structuredFacts),
+                            "colorHex": record.colorHex, "folderType": record.folderType,
+                            "sortOrder": String(order)
+                        ].merging(try pendingFolderWorkflowValues(id: id, codeVersion: record.codeVersion)) { _, new in new }))
+            }
+        }
+    }
+
+    private func folderSortOrder(id: Int64, codeVersion: String) throws -> Int {
+        let statement = try connection.prepare("SELECT sort_order FROM folders WHERE id = ? AND code_version = ?;")
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, id)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        return try connection.step(statement) == SQLITE_ROW ? Int(connection.int64(at: 0, in: statement)) : 0
     }
 
     private func folderStructuredFactsJSON(id: Int64, codeVersion: String) throws -> String {
@@ -3195,6 +3345,8 @@ final class UserDataStore: UserContentRepository {
                 address: record.address,
                 description: record.description,
                 structuredFacts: record.structuredFacts,
+                openQuestions: record.openQuestions,
+                recordsChecklist: record.recordsChecklist,
                 colorHex: record.colorHex,
                 sortOrder: record.sortOrder,
                 folderType: record.folderType,
@@ -3442,6 +3594,8 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: timestamp, index: 14, to: statement)
         try connection.bind(text: timestamp, index: 15, to: statement)
         _ = try connection.step(statement)
+        try storeProjectWorkflow(id: connection.lastInsertedRowID(), codeVersion: record.codeVersion,
+                                 openQuestions: record.openQuestions ?? [], recordsChecklist: record.recordsChecklist ?? [])
     }
 
     private func mergeServerProjectDuplicates(
@@ -3498,6 +3652,7 @@ final class UserDataStore: UserContentRepository {
 
     private func updateServerProject(_ record: ServerProjectRecord, localFolderID: Int64, clientID: String) throws {
         let timestamp = isoFormatter.string(from: record.updatedAt)
+        let knownWorkflow = try folderWorkflowValues(id: localFolderID, codeVersion: record.codeVersion)
         let structuredFactsJSON = try record.structuredFacts.map(encodedProjectStructuredFacts) ??
             folderStructuredFactsJSON(id: localFolderID, codeVersion: record.codeVersion)
         let statement = try connection.prepare(
@@ -3542,6 +3697,9 @@ final class UserDataStore: UserContentRepository {
         sqlite3_bind_int64(statement, 14, localFolderID)
         try connection.bind(text: record.codeVersion, index: 15, to: statement)
         _ = try connection.step(statement)
+        try storeProjectWorkflow(id: localFolderID, codeVersion: record.codeVersion,
+            openQuestions: record.openQuestions ?? (knownWorkflow["openQuestions"] == nil ? [] : nil),
+            recordsChecklist: record.recordsChecklist ?? (knownWorkflow["recordsChecklist"] == nil ? [] : nil))
     }
 
     private func deleteServerProject(_ record: ServerProjectRecord) throws {
@@ -3832,4 +3990,6 @@ struct FolderRecord: Sendable {
     let createdAt: String
     let updatedAt: String
     let structuredFacts: [ProjectStructuredFact]
+    var openQuestions: [ProjectOpenQuestion]? = nil
+    var recordsChecklist: [ProjectChecklistRecord]? = nil
 }

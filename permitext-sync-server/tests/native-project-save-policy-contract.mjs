@@ -19,7 +19,8 @@ assert.match(note, /requestProjectSelection\(sectionID: sectionID, blockID: norm
 assert.match(note, /guard saveSection\(sectionID: sectionID, toFolderIDs: ids\)/);
 assert.match(model, /destinations.contains\(where: \{ \$0.folderType == \.project && \$0.deletedAt == nil \}\)/);
 assert.doesNotMatch(bookmarks, /Unassigned|unassigned|collectionOnly|allSavedLink/);
-assert.match(chapter, /Text\(library.readerSaveDestinationName\)/);
+assert.match(chapter, /\.accessibilityValue\([^\n]*library\.readerSaveDestinationName/,
+  'The save control still identifies its Project destination after removing the duplicate header menu');
 assert.match(chapter, /library.createFolder\(name: projectName/);
 assert.match(app, /library.projectSaveRequest != nil/);
 assert.match(app, /onChange\(of: library.signedInAccount\?\.appUserID\)/);
