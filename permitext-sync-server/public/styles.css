@@ -1338,25 +1338,17 @@ textarea:focus-visible {
 .panel-track[data-notebook-column-sizing="fit"] > :is(.notebook-index-panel, .notebook-panel) > .notebook-shared-header {
   position: relative; overflow: visible;
 }
-.panel-track[data-notebook-column-sizing="fit"] > :is(.notebook-index-panel, .notebook-panel) > .notebook-shared-header::after {
-  content: ""; position: absolute; left: calc(-1 * var(--panel-padding)); right: calc(-1 * var(--panel-padding));
-  bottom: calc(-1 * var(--space-3)); height: 1px; background: var(--border); pointer-events: none;
-}
 .panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel > .notebook-shared-header { position: static; }
-.panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel > .notebook-shared-header::after { display: none; }
 .panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel .notebook-shared-label {
   position: absolute; left: var(--panel-padding); top: var(--panel-padding);
   width: max-content; height: var(--panel-title-row-height);
-}
-.panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel::before {
-  content: ""; position: absolute; left: 0; right: 0;
-  top: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
-  height: 1px; background: var(--border); pointer-events: none;
 }
 .panel-track[data-notebook-column-sizing="fit"]:has(> .notebook-index-panel:not(.is-workflow-hidden)) > .notebook-panel .notebook-shared-label {
   visibility: hidden;
 }
 .panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel .notebook-index-actions { padding-inline-end: 0; }
+/* The invisible list boundary still supports resizing. */
+.panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::before { background: transparent; }
 .panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::before,
 .panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::after {
   top: calc(clamp(16px, 1.8vw, 24px) + max(calc(var(--chrome-font-size) * var(--code-title-scale) * 1.2), 28px) + var(--space-3));

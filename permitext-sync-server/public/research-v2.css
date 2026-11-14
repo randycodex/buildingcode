@@ -13,9 +13,9 @@
 .research-v2 .rv2-history-toggle{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;min-width:28px;height:28px;min-height:28px;padding:5px;border-radius:var(--radius-pill);color:var(--text-secondary)}
 .rv2-history-toggle .workspace-button-icon{width:16px;height:16px}
 .research-v2 .rv2-history-toggle:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
-.rv2-rail-divider{position:relative;min-height:0;background:var(--border);cursor:col-resize;touch-action:none;z-index:2}
+.rv2-rail-divider{position:relative;min-height:0;background:transparent;cursor:col-resize;touch-action:none;z-index:2}
 .rv2-rail-divider::after{content:"";position:absolute;inset:0 -6px;cursor:col-resize}
-.rv2-rail-divider:focus-visible{outline:0;background:var(--text-secondary)}
+.rv2-rail-divider:focus-visible{outline:0;background:transparent}
 .research-v2.is-question-rail-resizing,.research-v2.is-question-rail-resizing *{cursor:col-resize!important;user-select:none}
 .rv2-questions{padding:0;margin:0;color:var(--text-secondary)}
 .research-v2 .assistant-history-management{display:contents}
@@ -80,11 +80,10 @@
 .rv2-candidate{padding:10px 0}.rv2-candidate p{font-size:13px;margin:5px 0}
 .research-v2 .rv2-mobile-history{display:none}
 .research-v2 [hidden]{display:none!important}
-/* Keep the split line and resize target flush with the column's outer edges. */
+/* Keep the invisible resize target flush with the column's outer edges. */
 @media(min-width:681px){
   .research-v2-panel{position:relative}
   .research-v2-panel>.panel-header{position:relative;overflow:visible}
-  .research-v2-panel>.panel-header::after{content:"";position:absolute;left:calc(-1 * var(--panel-padding));right:calc(-1 * var(--panel-padding));bottom:calc(-1 * var(--space-3));height:1px;background:var(--border);pointer-events:none}
   .research-v2{transition:--rv2-rail-width 260ms cubic-bezier(.2,0,0,1)}
   .rv2-rail{padding-inline-start:calc(var(--panel-padding) + 8px)}
   .research-v2-panel>.analysis-content{margin-inline-start:calc(-1 * var(--panel-padding))}
