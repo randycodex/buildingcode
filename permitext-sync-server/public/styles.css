@@ -14822,6 +14822,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 /* Keep the text and BlockNote controls in their existing gutter while the
  * editor's horizontal edges span the full Notebook column. */
 .notebook-panel .notebook-editor-surface .bn-editor {
+  border-top: 1px solid var(--border);
   padding-inline-start: calc((2 * var(--space-4)) + 33px);
   padding-inline-end: calc((2 * var(--space-4)) + 1px);
 }
