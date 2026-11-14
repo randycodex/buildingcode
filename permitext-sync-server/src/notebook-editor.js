@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
 import {
   BlockNoteSchema,
   defaultBlockSpecs,
@@ -528,7 +529,11 @@ export function mountPermitextNotebookEditor(element, options = {}) {
   const root = createRoot(element);
   let statusElement = null;
   const mountedOptions = {...options, onStatusMount: element => { statusElement = element; }};
-  root.render(React.createElement(PermitextNotebookEditor, { options: mountedOptions, controllerRef }));
+  const render = () => root.render(React.createElement(PermitextNotebookEditor, { options: mountedOptions, controllerRef }));
+  // Note navigation commits title and document in one browser task. Finish the
+  // initial React tree before returning so the old editor never paints blank.
+  if (options.synchronousMount) flushSync(render);
+  else render();
 
   return {
     setStatus(text) {

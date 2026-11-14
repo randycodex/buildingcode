@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1808";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1809";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -169,7 +169,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1808";
+} from "./offline-storage.js?v=20261113-research-notebook-v1809";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -378,7 +378,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261114-notebook-format-tools-v3";
+const notebookClientVersion = "20261114-notebook-format-tools-v4";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -3817,6 +3817,20 @@ async function openNotebookNoteColumn(project, card) {
     attempt === notebookNoteOpeningGeneration && navigationGeneration === (state.workflowNavigationGeneration || 0) && projectDetailKey(workspaceProject()) === projectID;
   if (!current() || !hasCapability('notebook')) return false;
   let columns = notebookColumnsForProject(project);
+  const openColumns = columns.filter(item => item.open);
+  const liveColumn = openColumns.length === 1 ? openColumns[0] : null;
+  const livePaneID = liveColumn && notebookColumnPaneID(liveColumn);
+  const liveMount = livePaneID && notebookColumnMounts.get(livePaneID);
+  // The Notebook has one notepad. Switch its document in place, retaining the
+  // column/header/list geometry while the next Note and editor prepare.
+  if (card.id && !card.newNote && currentColumnWorkflowView() === 'notebook' &&
+      liveMount?.panel.isConnected && liveMount.focusCard && !paneIsCollapsed(livePaneID)) {
+    if (liveMount.activeCardID() !== card.id) await liveMount.focusCard(card.id, {shouldApply:current});
+    if (!current() || notebookColumnMounts.get(livePaneID) !== liveMount || liveMount.activeCardID() !== card.id) return false;
+    notebookColumnRegistry.activate(livePaneID);
+    syncNotebookNoteTabs();
+    return true;
+  }
   let column = columns.find(item => item.open && card.id && item.cardID === card.id) ||
     columns.find(item => item.id === card.column?.id) || columns.find(item => card.id && item.cardID === card.id);
   if (!column) column = columns.find(item => item.open && !item.cardID && !notebookColumnMounts.get(notebookColumnPaneID(item))?.insertionTarget?.());
@@ -31819,6 +31833,10 @@ async function renderProjectNotebook(project, options = {}) {
         requestIdentity
       );
       if (!isCurrent()) return;
+      const [preparedModule, preparedCandidates] = await Promise.all([
+        loadNotebookModule(), notebookReferenceCandidates(identity, foundation, cards)
+      ]);
+      if (!isCurrent()) return;
       // The old editor remains usable while the next Note loads. Persist any
       // intervening edits before replacing it, including edits during a save.
       while (outgoingIsCurrent() && notebookRevision !== outgoingRevision) {
@@ -31856,7 +31874,7 @@ async function renderProjectNotebook(project, options = {}) {
           : useLocalDraft ? "Recovered device draft · waiting to sync" : "Synced");
       }
       renderCardList();
-      await renderFocusedCard();
+      await renderFocusedCard({module:preparedModule, candidates:preparedCandidates});
       if (isCurrent() && activeCard === candidateCard && dirty) scheduleNotebookAutosave();
     }
     mountState.focusCard = loadCard;
@@ -32108,7 +32126,7 @@ async function renderProjectNotebook(project, options = {}) {
       return true;
     };
 
-    async function renderFocusedCard() {
+    async function renderFocusedCard(prepared = null) {
       if (!disposed && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === returnScrollContext.workspaceID &&
           notebookColumnMounts.get(paneID) === mountState) {
         rememberNotebookReturnCard(returnScrollContext, activeCard?.id || "");
@@ -32155,7 +32173,7 @@ async function renderProjectNotebook(project, options = {}) {
       referenceToggle.append(referenceLabel);
       const referenceList = document.createElement("div");
       referenceList.className = "notebook-reference-list";
-      let candidates = (await notebookReferenceCandidates(identity, foundation, cards))
+      let candidates = (prepared ? prepared.candidates : await notebookReferenceCandidates(identity, foundation, cards))
         .filter((reference) =>
           reference.referenceKind !== "notebookCard" ||
           reference.referenceID !== activeCard.id
@@ -32402,7 +32420,7 @@ async function renderProjectNotebook(project, options = {}) {
         });
       });
       footerActions.append(coordinateButton);
-      const module = await loadNotebookModule();
+      const module = prepared ? prepared.module : await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
       footer.append(footerActions);
       const focusedContent = [editorElement];
@@ -32429,6 +32447,7 @@ async function renderProjectNotebook(project, options = {}) {
       };
       editorMount = module.mountPermitextNotebookEditor(editorElement, {
         document: draftDocument,
+        synchronousMount: true,
         autofocus: false,
         editable: !notebookReadOnly,
         toolbarInsertElement: toolbar,
@@ -50576,20 +50595,24 @@ function createWorkspacePaneLoadingShell(descriptor) {
     panel.append(root);
   }
   const isReport = descriptor.ownerClass === "report-draft-panel";
+  const isNotebook = descriptor.ownerClass === "notebook-panel";
   const isSectionDetail = (descriptor.ownerClass || "").includes("section-detail-panel");
   const header = isReport ? createReportPaneHeader(() => descriptor.close()) : document.createElement("header");
   if (!isReport) {
     if (isSectionDetail) header.className = "panel-header section-detail-chrome";
+    if (isNotebook) header.className = "notebook-header notebook-shared-header";
     const heading = document.createElement("h2");
     heading.className = "eyebrow panel-kind";
     heading.textContent = descriptor.label;
+    if (isNotebook) heading.classList.add("notebook-shared-label");
     const close = document.createElement("button");
     close.type = "button";
     close.className = isSectionDetail ? "section-detail-icon section-detail-close" : "icon-button utility-close";
     close.setAttribute("aria-label", `Close ${descriptor.label}`);
     close.innerHTML = circleXIconSVG();
     close.addEventListener("click", () => { void descriptor.close(); });
-    header.append(heading, close);
+    header.append(heading);
+    if (!isNotebook) header.append(close);
   }
   const status = document.createElement("p");
   status.className = `${isReport ? "report-draft-status" : isSectionDetail ? "section-detail-content" : "empty-state"} workspace-pane-load-status`;
@@ -50767,7 +50790,7 @@ function workspacePaneDescriptors(options = {}) {
       for (const column of notebookColumnsForProject(project).filter(item => item.open)) {
         const paneID = notebookColumnPaneID(column);
         foundationScope.register(paneID);
-        add(paneID, column.title || 'Notes', () => renderProjectNotebook(project, {foundationScope, column}),
+        add(paneID, 'Notes', () => renderProjectNotebook(project, {foundationScope, column}),
           () => closeNotebookNoteColumn(project, paneID), {foundationScope, ownerClass: 'notebook-panel', projectID, accessCapabilities: ['notebook'], deferWhileHidden: true});
       }
     }

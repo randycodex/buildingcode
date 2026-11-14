@@ -48745,11 +48745,11 @@ function cK(e, t = {}) {
 		onStatusMount: (e) => {
 			a = e;
 		}
-	};
-	return i.render(_.createElement(sK, {
+	}, s = () => i.render(_.createElement(sK, {
 		options: o,
 		controllerRef: r
-	})), {
+	}));
+	return t.synchronousMount ? (0, v.flushSync)(s) : s(), {
 		setStatus(e) {
 			o.status = String(e || ""), a && !t.toolbarStatusElement && (a.textContent = o.status);
 		},

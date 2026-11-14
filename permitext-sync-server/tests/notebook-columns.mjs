@@ -118,6 +118,34 @@ const latestMount=[...registry.mounts.values()][0];
 latestMount.persistForNavigation=async()=>{throw new Error('Device save failed');};
 await assert.rejects(context.openNotebookNoteColumn(project,{id:'unsafe',title:'Unsafe'}),/Device save failed/);
 assert.deepEqual(Array.from(state.notebookColumns.filter(item=>item.open),item=>item.cardID),['latest'],'A failed device save leaves the current Note open.');
+
+// A mounted notepad switches documents without replacing its column or showing
+// a workspace loading shell, including when a closed per-note record exists.
+latestMount.panel.isConnected=true;
+const stablePaneID=latestMount.panel.dataset.paneId, stablePanel=latestMount.panel;
+context.transitionWorkspace=async()=>assert.fail('A live Note switch must retain the notepad and column layout.');
+let liveSelections=0,releaseSelection;
+latestMount.focusCard=async(id,{shouldApply})=>{
+  liveSelections++;
+  if(id==='slow-selection')await new Promise(resolve=>releaseSelection=resolve);
+  if(!shouldApply())return;
+  latestMount.cardID=id;
+  const column=state.notebookColumns.find(item=>notebookColumnPaneID(item)===stablePaneID);
+  column.cardID=id;column.title=id;
+};
+assert.equal(await context.openNotebookNoteColumn(project,{id:'a',title:'Note A'}),true);
+assert.equal(registry.mounts.get(stablePaneID).panel,stablePanel);
+assert.equal(state.notebookColumns.filter(item=>item.open).length,1);
+assert.equal(await context.openNotebookNoteColumn(project,{id:'a',title:'Note A'}),true);
+assert.equal(liveSelections,1,'Selecting the current Note does not redraw its editor.');
+const slowSelection=context.openNotebookNoteColumn(project,{id:'slow-selection',title:'Slow'});
+assert.equal(await context.openNotebookNoteColumn(project,{id:'latest-selection',title:'Latest'}),true);
+releaseSelection();assert.equal(await slowSelection,false);
+assert.equal(latestMount.activeCardID(),'latest-selection');
+latestMount.focusCard=async()=>{throw Error('Incoming Note unavailable');};
+await assert.rejects(context.openNotebookNoteColumn(project,{id:'unavailable',title:'Unavailable'}),/Incoming Note unavailable/);
+assert.equal(latestMount.activeCardID(),'latest-selection');
+assert.equal(registry.mounts.get(stablePaneID).panel,stablePanel,'Failure retains the current editor column.');
 facade.dispose();assert.equal(registry.mounts.size,0);assert.equal(projects.size,0);
 console.log('Notebook selection passed: only the latest Note stays open, prior drafts persist, offline recovery slots remain reusable, stale opens cannot win and failed saves retain the current editor.');
 
