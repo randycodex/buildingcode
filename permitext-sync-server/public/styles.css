@@ -19564,7 +19564,8 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
   text-overflow: ellipsis;
   cursor: pointer;
 }
-span.reader-collapse-title { cursor: default; }
+/* Plain Notebook labels share the Research button's centered title row. */
+span.reader-collapse-title { cursor: default; line-height: 32px; }
 .reader-open-code-menu {
   position: fixed;
   z-index: 1100;
