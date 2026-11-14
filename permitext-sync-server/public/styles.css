@@ -21286,7 +21286,8 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workflow-toolbar { padding-inline-end: 24px; }
 .workflow-toolbar > [data-workflow-tools] { min-width: 0; }
 .workflow-toolbar > .workflow-layout-actions { margin-inline-start: auto; flex: 0 0 auto; gap: 2px; padding-inline-start: 12px; }
-.workflow-layout-actions > .toolbar-button { width: 30px; flex: 0 0 30px; padding: 0; border: 1px solid var(--workspace-active-tool-edge); border-radius: var(--radius-pill); }
+.workflow-layout-actions > .toolbar-button { width: 30px; flex: 0 0 30px; padding: 0; border: 1px solid transparent; border-radius: var(--radius-pill); }
+.workflow-layout-actions > .toolbar-button:not(:disabled):is(:hover, :focus-visible) { border-color: var(--workspace-active-tool-edge); background: var(--workspace-menu-highlight); }
 .workflow-layout-actions > .toolbar-button[hidden] { display: none; }
 .workflow-layout-actions > .toolbar-button:disabled { opacity: .35; cursor: default; }
 
