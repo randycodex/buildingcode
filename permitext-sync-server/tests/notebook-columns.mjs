@@ -46,14 +46,14 @@ const persistence=vm.createContext({notebookRevision:0,async persistFocusedDraft
 vm.runInContext(source.slice(persistStart,persistEnd+6).replace('async persistForNavigation()', 'async function persistForNavigation()'),persistence);
 await persistence.persistForNavigation();
 assert.equal(deviceWrites,2,'Edits made during a device write must also persist before closing the editor.');
-let sequence=0,workspace='workspace',account='account',requests=0;
+let sequence=0,workspace='workspace',account='account',requests=0,currentView='notebook';
 const state={notebooks:[project],notebookColumns:structuredClone(initial),paneWeights:{},paneOrder:[a.panel.dataset.paneId]};
 const catalog=new Map([['project',[{id:'a',title:'Note A'},{id:'b',title:'Note B'}]]]);
 const context=vm.createContext({state,normalizeNotebookColumns,notebookColumnPaneID,linkPaneToView,
   projectDetailKey:p=>p?.id||'',projectDetailMatches:(a,b)=>a?.id===b?.id,projectIdentity:p=>p,workspaceProject:()=>project,
   projectHasOpenNotebook:p=>state.notebooks.some(item=>item.id===p.id),openNotebooks:()=>state.notebooks,
   captureAccountRequest:()=>account,isCurrentAccountRequest:value=>value===account,
-  get activeWorkspaceID(){return workspace;},currentColumnWorkflowView:()=> 'notebook',hasCapability:()=>true,
+  get activeWorkspaceID(){return workspace;},currentColumnWorkflowView:()=>currentView,hasCapability:()=>true,
   crypto:{randomUUID:()=>`column-${++sequence}`},defaultNotebookPaneWidth:600,
   notebookColumnMounts:registry.mounts,notebookColumnRegistry:registry,notebookMounts:projects,notebookCatalogs:catalog,
   savedPaneIDs:()=>[],placeEvidenceBeforeNotebook(){},saveWorkspaceState(){},
@@ -74,9 +74,9 @@ assert(events.some(event=>event[0]==='persist'&&event[1]==='a'),'The outgoing No
 assert.equal(a.body,'Unsaved text a');assert.equal(a.scrollTop,123);
 await context.openNotebookNoteColumn(project,{id:'b',title:'Note B'});
 assert.equal(registry.mounts.size,1,'Opening an open note focuses it without duplicating the editor.');
-await context.closeNotebookNoteColumn(project,b.panel.dataset.paneId);
-assert.equal(registry.mounts.size,0);
-assert.equal(state.notebookColumns.find(item=>item.cardID==='b').open,false);
+assert.equal(await context.closeNotebookNoteColumn(project,b.panel.dataset.paneId),false);
+assert.equal(registry.mounts.size,1,'The notepad stays mounted in Notebook.');
+assert.equal(state.notebookColumns.find(item=>item.cardID==='b').open,true);
 await context.createNotebookNoteColumn(project);await context.createNotebookNoteColumn(project);
 assert.equal(requests,2);assert.equal(registry.mounts.size,1);
 assert.equal(events.filter(event=>event[0]==='topbar').length,2,'Creation refreshes topbar buttons after clearing the pending state.');
@@ -104,9 +104,10 @@ await lateCreation;
 assert.equal(registry.mounts.size,1,'A late create response cannot open a Note in a subsequently selected view.');
 context.postResearch=originalSave;
 let release; const activeMount=[...registry.mounts.values()][0];activeMount.confirmDiscardIfNeeded=()=>new Promise(resolve=>release=resolve);
+currentView='research';
 const closing=context.closeNotebookNoteColumn(project,activeMount.panel.dataset.paneId);workspace='different';release(true);
 assert.equal(await closing,false);assert.equal(state.notebookColumns.find(item=>item.id===offlineColumn.id).open,true,'A workspace switch fences a late close.');
-workspace='workspace';
+workspace='workspace';currentView='notebook';
 let releaseEarlier, preparations=0;
 activeMount.persistForNavigation=()=>++preparations===1 ? new Promise(resolve=>releaseEarlier=resolve) : Promise.resolve();
 const earlier=context.openNotebookNoteColumn(project,{id:'earlier',title:'Earlier'});

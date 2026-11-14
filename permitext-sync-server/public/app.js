@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1784";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1789";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1784";
+} from "./offline-storage.js?v=20261113-research-notebook-v1789";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -394,7 +394,6 @@ const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleCalculatorButton = document.querySelector("#toggle-calculator");
 const toggleSavedButton = document.querySelector("#toggle-saved");
-const toggleNotesListButton = document.querySelector("#toggle-notes-list");
 const toggleContextButton = document.querySelector("#toggle-context");
 const toggleFactsButton = document.querySelector("#toggle-facts");
 const toggleNotebookButton = document.querySelector("#toggle-notebook");
@@ -3151,6 +3150,7 @@ async function openProjectCodeDecisions(project) {
 }
 
 async function closeProjectNotebook(project) {
+  if (currentColumnWorkflowView() === 'notebook') return false;
   if (!(await confirmNotebookDiscard(project))) return false;
   const notebookIDs = notebookPaneIDsForProject(project);
   // Closing ends the explicit Research opt-in; Notebook can reopen at home.
@@ -3167,7 +3167,7 @@ async function closeProjectNotebook(project) {
   return true;
 }
 
-async function prepareNotebookView({openNote = true} = {}) {
+async function prepareNotebookView() {
   const project = workspaceProject();
   let evidence = savedInstanceForPaneID(primarySavedPaneID());
   let changed = false;
@@ -3179,7 +3179,7 @@ async function prepareNotebookView({openNote = true} = {}) {
     state.paneWeights[state.projectHostPaneID] ||= 360;
     changed = true;
   }
-  if (openNote && !projectHasOpenNotebook(project)) await openProjectNotebook(project);
+  if (project && !projectHasOpenNotebook(project)) await openProjectNotebook(project);
   else if (changed) await transitionWorkspace('utility');
 }
 
@@ -3223,13 +3223,47 @@ function notebookIndexPaneID(project) {
   return `project:notes-index:${encodeURIComponent(projectDetailKey(project))}`;
 }
 
+function updateNotebookListToggle(button) {
+  const expanded = !state.notebookListHidden;
+  const label = expanded ? 'Hide notes list' : 'Show notes list';
+  button.hidden = currentColumnWorkflowView() !== 'notebook';
+  button.disabled = !workspacePrivatePresentationAllowed() || !hasCapability('notebook') || !workspaceProject() || projectToolTogglePending;
+  button.setAttribute('aria-label', label);
+  button.setAttribute('aria-expanded', String(expanded));
+  button.title = label;
+  if (button.dataset.listExpanded !== String(expanded)) {
+    button.dataset.listExpanded = String(expanded);
+    button.replaceChildren();
+    prependWorkspaceButtonIcon(button, expanded ? 'panel-left-close' : 'panel-left-open');
+  }
+}
+
+function createNotebookListToggle() {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'icon-button notebook-list-toggle';
+  updateNotebookListToggle(button);
+  button.addEventListener('click', () => void toggleNotebookList());
+  return button;
+}
+
+function syncNotebookListControls() {
+  document.querySelectorAll('.notebook-list-toggle').forEach(updateNotebookListToggle);
+}
+
 async function toggleNotebookList() {
   if (!workspacePrivatePresentationAllowed() || !hasCapability('notebook') ||
       !workspaceProject() || currentWorkflowView() !== 'notebook') return false;
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   state.notebookListHidden = !state.notebookListHidden;
+  const hidden = state.notebookListHidden;
   document.querySelector('.notebook-index-menu')?._close?.(false);
   saveWorkspaceState();
   await transitionWorkspace('utility');
+  if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
+      currentWorkflowView() !== 'notebook' || state.notebookListHidden !== hidden) return false;
+  const owner = state.notebookListHidden ? '.notebook-panel' : '.notebook-index-panel';
+  track.querySelector(`${owner}:not(.is-workflow-hidden) .notebook-list-toggle`)?.focus({preventScroll:true});
   return true;
 }
 
@@ -3245,11 +3279,14 @@ function renderNotebookIndex(project) {
   panel.dataset.projectId = projectDetailKey(project);
   applyPaneWeight(panel, panel.dataset.paneId);
   const header = document.createElement('header');
-  header.className = 'panel-header';
+  header.className = 'panel-header notebook-shared-header';
   const heading = document.createElement('h2');
   heading.className = 'eyebrow panel-kind';
   heading.textContent = 'Notes';
-  header.append(heading);
+  const label = document.createElement('div');
+  label.className = 'notebook-shared-label';
+  label.append(heading, createNotebookListToggle());
+  header.append(label);
   if (project.sharedRole !== 'viewer') {
     const options = document.createElement('button');
     options.type = 'button';
@@ -3389,7 +3426,7 @@ function publishNotebookColumn(projectID, paneID, card, cards) {
   const panel = notebookColumnMounts.get(paneID)?.panel;
   if (panel && card) {
     panel.dataset.noteId = card.id || '';
-    panel.querySelector('.notebook-heading .panel-kind').textContent = card.title || 'Untitled';
+    panel.dataset.notebookTitle = card.title || 'Untitled';
     preparePaneCollapse(panel);
   }
   syncNotebookNoteTabs();
@@ -3784,6 +3821,7 @@ async function openNotebookNoteColumn(project, card) {
 }
 
 async function closeNotebookNoteColumn(project, paneID) {
+  if (currentColumnWorkflowView() === 'notebook') return false;
   const requestIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   if (await notebookColumnMounts.get(paneID)?.confirmDiscardIfNeeded?.() === false) return false;
   if (!isCurrentAccountRequest(requestIdentity) || workspaceID !== activeWorkspaceID) return false;
@@ -3798,8 +3836,18 @@ async function closeNotebookNoteColumn(project, paneID) {
 
 async function retireNotebookNoteColumns(project, cardID) {
   const columns = notebookColumnsForProject(project);
+  let emptyColumn = null;
   columns.filter(column => column.cardID === cardID).forEach(column => { column.open = false; });
-  if (!columns.some(column => column.open)) state.notebooks = openNotebooks().filter(item => !projectDetailMatches(item, project));
+  if (!columns.some(column => column.open)) {
+    if (currentColumnWorkflowView() === 'notebook') {
+      const empty = columns.find(column => column.cardID === cardID);
+      if (empty) {
+        Object.assign(empty, {cardID:'', title:'', newNote:true, open:true, selected:true});
+        emptyColumn = empty;
+      }
+    } else state.notebooks = openNotebooks().filter(item => !projectDetailMatches(item, project));
+  }
+  if (emptyColumn) await notebookColumnMounts.get(notebookColumnPaneID(emptyColumn))?.createLocalNote?.({retiredCardID:cardID});
   saveWorkspaceState(); await transitionWorkspace('utility'); syncNotebookNoteTabs();
 }
 
@@ -5996,7 +6044,7 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
     await ensureNotebookTabCatalog({refresh:true});
     if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
         (state.workflowNavigationGeneration || 0) !== navigation) return false;
-    await prepareNotebookView({openNote: initialize});
+    await prepareNotebookView();
     if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
         (state.workflowNavigationGeneration || 0) !== navigation || currentWorkflowView() !== view) return false;
     savedPaneIDs().forEach(paneID => placeEvidenceBeforeNotebook(paneID));
@@ -6529,12 +6577,7 @@ function syncTopbarProjectToolStates() {
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const identity = project ? projectIdentity(project) : null;
   const requiresProject = workspaceColumnsRequireProject();
-  if (toggleNotesListButton) {
-    const opened = Boolean(project && !state.notebookListHidden);
-    toggleNotesListButton.disabled = !project || !hasCapability('notebook') || projectToolTogglePending;
-    toggleNotesListButton.setAttribute('aria-pressed', String(opened));
-    toggleNotesListButton.title = `${opened ? 'Close' : 'Open'} Notes column`;
-  }
+  syncNotebookListControls();
   [
     [toggleContextButton, "Context", "projects", () => projectDetailsScreen?.isOpen() === true],
     [toggleFactsButton, "Facts", "projects", () => Boolean(state.projectFactsOpen)],
@@ -31103,24 +31146,14 @@ async function renderProjectNotebook(project, options = {}) {
   applyPaneWeight(panel, paneID);
 
   const header = document.createElement("header");
-  header.className = "notebook-header";
+  header.className = "notebook-header notebook-shared-header";
   const heading = document.createElement("div");
-  heading.className = "notebook-heading";
+  heading.className = "notebook-heading notebook-shared-label";
   const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Notes";
   headingTitle.className = "eyebrow panel-kind";
-  heading.append(headingTitle);
-  const dragHandle = createProjectToolDragHandle(identity);
-  const closeButton = document.createElement("button");
-  closeButton.className = "icon-button utility-close notebook-close";
-  closeButton.type = "button";
-  closeButton.title = "Close notes";
-  closeButton.setAttribute("aria-label", "Close notes");
-  closeButton.innerHTML = circleXIconSVG();
-  closeButton.addEventListener("click", () => {
-    void closeNotebookNoteColumn(identity, paneID);
-  });
-  header.append(heading, closeButton, dragHandle);
+  heading.append(headingTitle, createNotebookListToggle());
+  header.append(heading);
 
   const shell = document.createElement("div");
   shell.className = "notebook-shell";
@@ -32375,26 +32408,7 @@ async function renderProjectNotebook(project, options = {}) {
       if (!notebookReadOnly && !activeCard.id) {
         noteMenu.editTitle();
       }
-      researchButton.addEventListener('click', async () => {
-        const card = activeCard;
-        if (!card?.id || disposed) return;
-        researchButton.disabled = true;
-        try {
-          await persistFocusedDraft();
-          if (disposed || activeCard !== card || !isCurrentAccountRequest(requestIdentity)) return;
-          rememberWorkingResearchNote(projectID, card);
-          if (!await switchWorkflowView('research') || !isCurrentAccountRequest(requestIdentity)) return;
-          const resume = state.noteResearch?.[projectID]?.resumes?.[card.id];
-          if (resume?.kind === 'conversation') {
-            const instance = (state.utilityInstances || []).find(item => item.key === 'analysis' && item.conversationID === resume.conversationID);
-            await openResearchConversation(resume.conversationID, {instance});
-          }
-          else if (resume?.kind === 'reader') await openSourceInReader(resume.source, '',
-            {projectID, evidenceAnchor:resume.exact ? {passages:[{exact:resume.exact}]} : undefined});
-          else await focusUtility('search');
-        } catch (error) { if (isCurrentAccountRequest(requestIdentity)) await showWebNotice('Research not opened',error.message); }
-        finally { if (!disposed && researchButton.isConnected) researchButton.disabled = notebookReadOnly; }
-      });
+
     }
 
     archiveButton.addEventListener("click", () => {
@@ -32455,7 +32469,7 @@ async function renderProjectNotebook(project, options = {}) {
       selectButton.focus({ preventScroll: true });
     });
 
-    const createLocalNotebookNote = async () => {
+    const createLocalNotebookNote = async ({retiredCardID} = {}) => {
       const loadGeneration = ++notebookCardLoadGeneration;
       const workspaceID = activeWorkspaceID;
       const isCurrent = () => loadGeneration === notebookCardLoadGeneration && !disposed &&
@@ -32473,6 +32487,11 @@ async function renderProjectNotebook(project, options = {}) {
         return isCurrent() && confirmed;
       };
       if (!(await preserveFocusedChanges()) || !isCurrent()) return;
+      if (retiredCardID) {
+        const available = notebookCatalogs.get(projectID);
+        if (available) cards = cards.filter(card => available.some(item => item.id === card.id));
+        if (activeCard?.id === retiredCardID) { activeCard = null; dirty = false; }
+      }
       let outgoingCard = activeCard;
       const outgoingIdentity = notebookCardIdentity(outgoingCard);
       const outgoingIsCurrent = () => activeCard === outgoingCard ||
@@ -32589,6 +32608,7 @@ async function renderProjectNotebook(project, options = {}) {
     status.textContent = error.payload?.code === "PRO_REQUIRED_NOTEBOOK"
       ? "The Project Notebook is included with per codes Pro."
       : `Notebook unavailable: ${error.message}`;
+    showDraftStatus(status.textContent);
     await appendNotebookDeviceRecovery(shell, projectID, requestIdentity);
   }
   return panel;
@@ -45253,7 +45273,7 @@ function bindPaneDragging(panes) {
     const header = pane.querySelector(":scope > header");
     const tabRow = pane.classList.contains('reader-panel') ? pane.querySelector(":scope > .reader-column-tabs") : null;
     const dragArea = tabRow || header;
-    if (pane.classList.contains('notebook-index-panel')) {
+    if (pane.classList.contains('notebook-index-panel') || pane.classList.contains('notebook-panel')) {
       if (header) header.removeAttribute('title');
       return;
     }
@@ -45815,6 +45835,7 @@ function renderFirstUseWelcome() {
 }
 
 function columnPaneLabel(panel) {
+  if (panel.classList.contains('notebook-panel')) return panel.dataset.notebookTitle || 'Notepad';
   const code = panel.querySelector('.code-select')?.selectedOptions?.[0]?.textContent;
   const chapter = panel.querySelector('.chapter-select')?.selectedOptions?.[0]?.textContent;
   return code ? [code, chapter].filter(Boolean).join(' · ')
@@ -51247,10 +51268,6 @@ function bindWorkspaceKeyboardNavigation() {
 }
 
 function bindImmediateUtilityControls() {
-  if (toggleNotesListButton && toggleNotesListButton.dataset.coldStartBound !== 'true') {
-    toggleNotesListButton.dataset.coldStartBound = 'true';
-    toggleNotesListButton.addEventListener('click', () => void toggleNotebookList());
-  }
   const shortcutHost = document.querySelector("#reader-shortcuts");
   if (shortcutHost && !readerShortcuts) readerShortcuts = createReaderShortcuts({
     host: shortcutHost, track, readers: readerShortcutItems,

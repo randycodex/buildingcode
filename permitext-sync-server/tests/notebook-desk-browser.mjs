@@ -66,17 +66,17 @@ try {
   assert.ok(resized.width>listBounds.width+40,'The middle/editor divider increases the list width.');
   assert.ok((await selected.boundingBox()).width<editorBounds.width-40,'The editor shares the resize.');
   assert.ok(Math.abs((await evidence.boundingBox()).width-evidenceBounds.width)<2,'Resizing the list keeps Evidence in place.');
-  const listToggle=page.locator('#toggle-notes-list');
+  const listToggle=page.getByRole('button',{name:'Hide notes list',exact:true});
   await listToggle.click();
   await index.waitFor({state:'hidden'});
-  assert.equal(await listToggle.getAttribute('aria-pressed'),'false');
+  assert.equal(await page.getByRole('button',{name:'Show notes list',exact:true}).getAttribute('aria-expanded'),'false');
   assert.equal(await editor.evaluate((node,retained)=>node===retained,editorNode),true,'Hiding the list retains the live note editor.');
   assert.match(await editor.innerText(),/Notebook draft retention check/);
-  await listToggle.click();
+  await page.getByRole('button',{name:'Show notes list',exact:true}).click();
   await index.waitFor({state:'visible'});
   assert.equal(await index.evaluate((node,retained)=>node===retained,indexNode),true,'Reopening retains the list and its selection.');
   assert.ok(Math.abs((await index.boundingBox()).width-resized.width)<2,'Reopening restores the resized list width.');
-  for (const panel of [evidence,index,selected]) {
+  for (const panel of [evidence,index]) {
     await panel.locator('.panel-kind').first().click();
     assert.equal(await panel.evaluate(node=>node.classList.contains('is-collapsed')),false);
     assert.equal(await panel.locator(':scope > header').getByRole('button',{name:/^(Collapse|Expand) /}).count(),0);

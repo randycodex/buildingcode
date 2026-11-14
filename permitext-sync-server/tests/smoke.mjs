@@ -1710,9 +1710,9 @@ async function main() {
         workspaceScript.text.includes("noteMenu.render({ cards, activeCard, showingArchivedCards, selectingCards, selectedCardIDs,") &&
         workspaceScript.text.includes("shell.append(noteMenu.element, focus)") &&
         workspaceScript.text.includes('.notebook-note-menu[open]') &&
-        workspaceScript.text.includes('closeButton.className = "icon-button utility-close notebook-close";') &&
-        workspaceScript.text.includes('closeButton.setAttribute("aria-label", "Close notes");') &&
-        workspaceScript.text.includes("closeButton.innerHTML = circleXIconSVG();") &&
+        workspaceScript.text.includes('function createNotebookListToggle()') &&
+        workspaceScript.text.includes("header.className = \"notebook-header notebook-shared-header\";") &&
+        !workspaceScript.text.includes('closeButton.className = "icon-button utility-close notebook-close";') &&
         workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  min-height: var(--panel-title-row-height);") &&
         workspaceStyles.text.includes(".notebook-title-control { display: grid;") &&
         workspaceStyles.text.includes(".notebook-note-menu > summary { display: flex;") &&

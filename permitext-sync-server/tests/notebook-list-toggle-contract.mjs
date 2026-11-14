@@ -37,17 +37,22 @@ const context = vm.createContext({
   track:{querySelector:() => null}, applyPaneWeight() {},
   workspacePrivatePresentationAllowed:() => allowed, hasCapability:() => allowed,
   workspaceProject:() => project, projectDetailKey:value => value?.id || '',
+  captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',
   currentWorkflowView:() => view, currentColumnWorkflowView:() => view, isProAccount:() => true,
   selectedNotebookColumn:() => ({id:'editor',cardID:'a'}), notebookColumnPaneID:() => editorID,
   isProjectNotebookPaneID:id => id.startsWith('project:notebook:'),
   notebookCatalogs:new Map([['project',[{id:'a',title:'Note A'},{id:'b',title:'Note B'}]]]),
   notebookCatalogRequests:new Map(), saveWorkspaceState(){saves++;},
   notebookIndexTitleScroll:null, attachResearchHistoryTitleScroll:() => ({refresh(){}}),
+  projectToolTogglePending:false, prependWorkspaceButtonIcon() {},
   async transitionWorkspace(mode){assert.equal(mode,'utility'); transitions++;}
 });
 vm.runInContext(['researchHistoryDayIndex','researchConversationHistoryGroups','notebookHistoryGroups',
-  'notebookIndexPaneID','renderNotebookIndex','syncNotebookLanding','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
+  'notebookIndexPaneID','updateNotebookListToggle','createNotebookListToggle','renderNotebookIndex','syncNotebookLanding','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
 const panel = context.renderNotebookIndex(project);
+const localToggle = panel.querySelector('.notebook-list-toggle');
+assert.equal(localToggle.attrs['aria-label'],'Hide notes list');
+assert.equal(localToggle.attrs['aria-expanded'],'true');
 const list = panel.querySelector('.notebook-index-body');
 assert.deepEqual(list.querySelectorAll('li').map(node => node.textContent), ['Note A','Note B'], 'A newly reopened deferred panel renders existing notes before mounting.');
 assert.equal(list.children[0].textContent,'New note +');
@@ -59,6 +64,9 @@ const indexID = context.notebookIndexPaneID(project);
 await context.toggleNotebookList();
 assert.equal(context.workflowPaneIsVisible(indexID), false);
 assert.equal(context.workflowPaneIsVisible(editorID), true, 'Hiding the list leaves the selected note visible.');
+context.updateNotebookListToggle(localToggle);
+assert.equal(localToggle.attrs['aria-label'],'Show notes list');
+assert.equal(localToggle.attrs['aria-expanded'],'false');
 await context.toggleNotebookList();
 assert.equal(context.workflowPaneIsVisible(indexID), true);
 assert.equal(saves, 2); assert.equal(transitions, 2);
@@ -68,6 +76,35 @@ allowed = true; view = 'research';
 assert.equal(await context.toggleNotebookList(), false);
 assert.equal(saves, 2, 'Unavailable tools and other working views cannot change list visibility.');
 console.log('Notes list toggle passed: immediate deferred contents, independent editor visibility, persistence and access/view guards.');
+
+// Notebook is a permanent writing area, including older saved layouts that
+// closed it and the transition after its last active Note moves to Trash.
+const retained = {notebooks:[project], notebookColumns:[{id:'primary',cardID:'removed',open:true,selected:true}]};
+let reopened = 0;
+let blankPages = 0;
+const permanent = vm.createContext({state:retained, workspaceProject:()=>project,
+  currentColumnWorkflowView:()=> 'notebook',
+  notebookColumnsForProject:()=>retained.notebookColumns,
+  notebookColumnPaneID:column=>column.id,
+  notebookColumnMounts:new Map([['primary',{async createLocalNote(options) {
+    assert.equal(options.retiredCardID,'removed'); blankPages++;
+  }}]]),
+  openNotebooks:()=>retained.notebooks,projectDetailMatches:(a,b)=>a.id===b.id,
+  savedInstanceForPaneID:()=>({}),primarySavedPaneID:()=> 'evidence',
+  projectHasOpenNotebook:()=>false,openProjectNotebook:async()=>{reopened++;},
+  saveWorkspaceState(){},transitionWorkspace:async()=>{},syncNotebookNoteTabs(){}});
+vm.runInContext(['prepareNotebookView','retireNotebookNoteColumns','closeProjectNotebook','closeNotebookNoteColumn'].map(actual).join('\n'),permanent);
+await permanent.prepareNotebookView({openNote:false});
+assert.equal(reopened,1,'Returning to Notebook restores its writing area even after a saved close.');
+assert.equal(await permanent.closeProjectNotebook(project),false);
+assert.equal(await permanent.closeNotebookNoteColumn(project,'primary'),false);
+await permanent.retireNotebookNoteColumns(project,'removed');
+assert.equal(retained.notebookColumns[0].open,true);
+assert.equal(retained.notebookColumns[0].cardID,'');
+assert.equal(retained.notebookColumns[0].newNote,true,'The final removed Note leaves a fresh, unsaved writing page.');
+assert.equal(retained.notebooks[0],project);
+assert.equal(blankPages,1,'A retained editor opens the blank page immediately instead of keeping a placeholder.');
+console.log('Permanent notepad passed: reopen saved layouts, reject close actions and retain a blank page after final Note removal.');
 
 const now=new Date('2026-11-14T12:00:00');
 const notes=[

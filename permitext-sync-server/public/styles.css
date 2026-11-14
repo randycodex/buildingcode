@@ -1304,6 +1304,35 @@ textarea:focus-visible {
   padding-inline-end: calc(var(--panel-title-control-size) + var(--space-2));
 }
 
+/* The Notes list and notepad share one header band. Resizing stays independent
+   below the band, and the same local toggle remains when the list is hidden. */
+.notebook-shared-label,
+.notebook-header .notebook-shared-label { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.notebook-shared-label .panel-kind { margin: 0; }
+.notebook-shared-label .notebook-list-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; min-width: 28px; height: 28px; min-height: 28px; padding: 5px;
+  border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-secondary);
+}
+.notebook-list-toggle .workspace-button-icon { width: 16px; height: 16px; }
+.notebook-list-toggle:hover { background: var(--menu-highlight); color: var(--text-primary); }
+.notebook-list-toggle:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.panel-track[data-notebook-column-sizing="fit"] > :is(.notebook-index-panel, .notebook-panel) > .notebook-shared-header {
+  position: relative; overflow: visible;
+}
+.panel-track[data-notebook-column-sizing="fit"] > :is(.notebook-index-panel, .notebook-panel) > .notebook-shared-header::after {
+  content: ""; position: absolute; left: calc(-1 * var(--panel-padding)); right: calc(-1 * var(--panel-padding));
+  bottom: calc(-1 * var(--space-3)); height: 1px; background: var(--border); pointer-events: none;
+}
+.panel-track[data-notebook-column-sizing="fit"]:has(> .notebook-index-panel:not(.is-workflow-hidden)) > .notebook-panel .notebook-shared-label {
+  visibility: hidden;
+}
+.panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel .notebook-index-actions { padding-inline-end: 0; }
+.panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::before,
+.panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::after {
+  top: calc(clamp(16px, 1.8vw, 24px) + max(calc(var(--chrome-font-size) * var(--code-title-scale) * 1.2), 28px) + var(--space-3));
+}
+
 .notebook-index-actions > .notebook-index-menu-button {
   width: var(--panel-title-control-size);
   flex: 0 0 var(--panel-title-control-size);
