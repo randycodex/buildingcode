@@ -16,7 +16,7 @@ const context = vm.createContext({
   reportMembershipIndicator:()=>{throw new Error('Notes must not mount a Report membership status');},
   disposed:false,requestIdentity:{userID:'owner'},renderSequence:1,editorRenderSequence:1,
   loadNotebookModule:()=>moduleReady,footer,footerActions:element(),noteMenu:{titleAction},
-  reportButton:element(),researchButton:{...element(),hidden:true},coordinateButton:{...element(),hidden:true},
+  reportButton:element(),coordinateButton:{...element(),hidden:true},
   editorElement:element(),notebookReadOnly:false,
   replaceFocusedContent:(...content)=>mountedContent.splice(0,mountedContent.length,...content)
 });
@@ -26,8 +26,7 @@ assert.equal(mountedContent.length,0,'The writing surface waits for the lazy edi
 releaseModule({});
 await pendingRender;
 assert.deepEqual(mountedContent,[context.editorElement],'Notes have no Report status or empty footer row');
-assert.equal(titleAction.children[0],context.researchButton,'Resume research is mounted in the title row');
-assert.equal(titleAction.children[1],context.reportButton,'Add to Report is mounted in the title row beside Notes');
+assert.deepEqual(titleAction.children,[context.reportButton],'The title row keeps Add to Report without a Resume research button');
 assert(!footer.children.flatMap(child=>child.children || []).includes(context.reportButton),'The footer does not keep a duplicate report action');
 context.coordinateButton.hidden = false;
 await context.render();

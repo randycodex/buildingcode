@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1781";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1782";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -168,7 +168,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1781";
+} from "./offline-storage.js?v=20261113-research-notebook-v1782";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -29008,10 +29008,6 @@ function syncResearchNoteControls() {
   choose.querySelector('.research-note-picker-label').textContent = note ? `Note · ${note.title}` : 'Choose Research note';
   choose.setAttribute('aria-label', note ? `Choose Research note · ${note.title}` : 'Choose Research note');
   choose.title = 'Choose the note to collect this research';
-  document.querySelectorAll('[data-note-research-id]').forEach(button => {
-    button.textContent = state.noteResearch?.[button.dataset.noteResearchProject]?.resumes?.[button.dataset.noteResearchId]
-      ? 'Resume research' : 'Research for this note';
-  });
   document.querySelectorAll('[data-note-destination]').forEach(button => {
     button.setAttribute('aria-label', note ? `Add to ${note.title}` : 'Add to note');
     button.title = button.getAttribute('aria-label');
@@ -32288,15 +32284,6 @@ async function renderProjectNotebook(project, options = {}) {
       const footer = document.createElement("div");
       footer.className = "notebook-card-footer";
       const footerActions = document.createElement("div");
-      const researchButton = document.createElement("button");
-      researchButton.className = "notebook-secondary-action";
-      researchButton.type = "button";
-      const resume = state.noteResearch?.[projectID]?.resumes?.[activeCard.id];
-      researchButton.dataset.noteResearchId = activeCard.id;
-      researchButton.dataset.noteResearchProject = projectID;
-      researchButton.textContent = resume ? 'Resume research' : 'Research for this note';
-      researchButton.title = 'Continue Research with this Note as the destination';
-      researchButton.disabled = notebookReadOnly || !activeCard.id;
       const coordinateButton = document.createElement("button");
       coordinateButton.className = "notebook-secondary-action";
       coordinateButton.type = "button";
@@ -32347,7 +32334,7 @@ async function renderProjectNotebook(project, options = {}) {
       footerActions.append(coordinateButton);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      noteMenu.titleAction.append(researchButton, reportButton);
+      noteMenu.titleAction.append(reportButton);
       footer.append(footerActions);
       const focusedContent = [editorElement];
       if (notebookReadOnly) panel.append(draftStatus);
