@@ -63,7 +63,7 @@ const track={scrollLeft:110,querySelectorAll:()=>panes};
 let constructions=0, needProject=false, dividerUpdates=0;
 let reportOpen=false, detailsOpen=false;
 const c=vm.createContext({isProAccount:()=>true,columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){if(reportOpen){reportOpen=false;c.syncWorkflowColumnPresentation();}}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){if(detailsOpen){detailsOpen=false;c.syncWorkflowColumnPresentation();}}},toggleSettingsButton:null,toggleReportButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
-  activeWorkspaceID:'workspace',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
+  activeWorkspaceID:'workspace',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,toggleSavedButton:null,
   prepareNotebookView:async()=>{},isProjectNotebookPaneID:id=>id.startsWith('project:notebook:'),
   selectedNotebookColumn:()=>({id:'primary',projectID:'a'}),notebookColumnPaneID:()=>notebook.dataset.paneId,
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,

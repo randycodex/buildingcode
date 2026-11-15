@@ -791,7 +791,7 @@ assert.match(clientSource, /renderNewResearchComposer\(assistantBody, true, inst
 assert.match(clientSource, /newChatButton\.className = "ghost-button research-new-chat"[\s\S]*?panel\.classList\.add\("has-research-history-footer"\)[\s\S]*?historyRail\.append\(newChatButton\)/, "Research history does not end with the dedicated New chat action.");
 assert.match(stylesSource, /\.analysis-panel\.has-research-composer > \.research-composer \{[\s\S]*?padding: var\(--space-3\) 0 var\(--panel-padding\);/, "The New chat composer does not retain its bottom position.");
 assert.match(stylesSource, /\.research-composer \.research-question-input \{[\s\S]*?background: light-dark\(var\(--toolbar-active\), rgb\(246 244 241 \/ 10%\)\);[\s\S]*?color: var\(--text-primary\);/, "Research composer textareas use theme-aware fill and text color.");
-assert.match(indexSource, /id="add-reader"[^>]*data-mobile-label="Reader"/, "The mobile Reader action lacks its compact label.");
+assert.match(indexSource, /id="add-reader"[^>]*data-mobile-label="New Reader"/, "The mobile Reader creation action lacks its distinct label.");
 assert.match(indexSource, /id="toggle-saved"[^>]*data-mobile-label="Evidence"/, "The mobile Saved action lacks its compact label.");
 assert.match(indexSource, /id="mobile-more"[\s\S]*?aria-haspopup="dialog"[\s\S]*?data-mobile-label="More"/, "The mobile dock lacks its More action.");
 assert.match(stylesSource, /@media \(max-width: 760px\) \{[\s\S]*?grid-template-columns: repeat\(5, minmax\(0, 1fr\)\);[\s\S]*?#toggle-saved \{ order: 1; \}[\s\S]*?#mobile-more \{ order: 5; \}/, "The mobile dock is not a five-action layout.");

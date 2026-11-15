@@ -1,75 +1,102 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-import {notebookColumnsLayout} from '../public/workflow-views.js';
-const columns=[{kind:'reader',preferredWidth:900},{kind:'evidence',preferredWidth:600},{kind:'notes',preferredWidth:480},{kind:'editor',preferredWidth:3000}];
-for(const width of [1000,1920,3054]) {
- const fitted=notebookColumnsLayout(columns,width,5);
- assert.equal(fitted.length,4);assert.ok(fitted.every(value=>value>0));
- assert.ok(Math.abs(fitted.reduce((sum,value)=>sum+value,0)+5-width)<0.001,'Every column fits without horizontal overflow');
- assert.equal(fitted[2],300,'Expanded Notes stays exactly 300px at every desk width.');
- if(width>=1920)assert.ok(fitted[3]>=360,'The editor receives the remaining writing space');
-}
-const wide=notebookColumnsLayout(columns,1920,5);
-assert.equal(wide[2],300,'Older saved widths do not change the fixed Notes width.');
-for(const missing of ['reader','evidence','notes']) {
- const visible=columns.filter(column=>column.kind!==missing),sizes=notebookColumnsLayout(visible,1920,4);
- assert.ok(Math.abs(sizes.reduce((sum,width)=>sum+width,0)+4-1920)<0.001);
- assert.ok(sizes[visible.findIndex(column=>column.kind==='editor')]>wide[3],'Closing a reference column gives its space to the editor');
-}
-assert.deepEqual(notebookColumnsLayout([{kind:'reader',collapsed:true},{kind:'editor'}],1920,3),[48,1869]);
-const withRail=[{kind:'reader',preferredWidth:630},{kind:'evidence',preferredWidth:600},{kind:'notes',collapsed:true,preferredWidth:280},{kind:'editor'}];
-assert.deepEqual(notebookColumnsLayout(withRail,3054,5),[630,600,35,1784],'Only the notepad gains space when Notes becomes a 35px rail.');
-assert.equal(notebookColumnsLayout(withRail,700,5)[2],35,'The rail keeps its exact width in a constrained desk.');
-assert.deepEqual(notebookColumnsLayout(withRail.map(column=>({...column,collapsed:false})),3054,5),[630,600,300,1519],'Reopening restores Notes without changing Reader or Evidence.');
-assert.deepEqual(notebookColumnsLayout([
- {kind:'reader',preferredWidth:1399},{kind:'evidence',preferredWidth:550},
- {kind:'notes',preferredWidth:350},{kind:'editor',preferredWidth:800}
-],3054,5),[1399,550,300,800],'A manually widened Reader survives fitting with both lists fixed and an 800px notepad.');
-assert.equal(columns[1].preferredWidth,600,'Fitting does not overwrite saved width preferences');
-console.log('Notebook fitting passed: four visible columns, responsive widths, remaining editor space, hidden columns, collapsed rails and unchanged preferences.');
+import {notebookColumnsLayout, notebookReferenceVisibility, paneBelongsToView} from '../public/workflow-views.js';
+import {captureWorkspaceLayout, normalizeWorkspaceLayout} from '../public/workspace-state.js';
 
-// Execute the actual fitting lifecycle without replacing any mounted editor or
-// changing saved per-view preferences. Returning to Research restores its sizing.
-{
- const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
- const start=source.indexOf('function syncNotebookColumnLayout('),end=source.indexOf('\n}',start)+2;
- const ids=['reader:one','utility:saved:one','project:notes-index:p','project:notebook:p'];
- const panels=ids.map(id=>({dataset:{paneId:id},style:{},hidden:false,classList:{contains(name){return name==='is-workflow-hidden'&&panels.find(p=>p.dataset.paneId===id).hidden;}}}));
- const state={paneWeights:Object.fromEntries(ids.map((id,index)=>[id,[900,600,480,2000][index]]))};
- const before=JSON.stringify(state);let view='notebook';
- const track={clientWidth:1920,scrollLeft:200,inert:false,dataset:{},querySelectorAll:()=>Array.from({length:3},()=>({getBoundingClientRect:()=>({width:1})}))};
- const context=vm.createContext({track,state,notebookColumnsLayout,currentColumnWorkflowView:()=>view,paneIsCollapsed:()=>false,
-  getComputedStyle:()=>({paddingLeft:'1px',paddingRight:'1px'}),defaultPaneWidthForID:()=>600,
-  applyPaneWeight(panel,id){panel.style.flex=`0 0 ${state.paneWeights[id]}px`;}});
- vm.runInContext(source.slice(start,end),context);context.syncNotebookColumnLayout(panels);
- assert.equal(track.dataset.notebookColumnSizing,'fit');assert.equal(track.scrollLeft,0);
- assert.ok(panels.every(panel=>panel.style.minWidth==='0'));assert.equal(JSON.stringify(state),before);
- const initialEditor=parseFloat(panels[3].style.flex.split(' ').at(-1));panels[2].hidden=true;context.syncNotebookColumnLayout(panels);
- assert.ok(parseFloat(panels[3].style.flex.split(' ').at(-1))>initialEditor);
- view='research';context.syncNotebookColumnLayout(panels);assert.equal(track.dataset.notebookColumnSizing,undefined);
- assert.ok(panels.every(panel=>!panel.dataset.notebookSized));assert.equal(panels[0].style.flex,'0 0 900px');assert.equal(JSON.stringify(state),before);
+const both = {readerOpen:true,evidenceOpen:true,notesWidth:300,active:'reader'};
+assert.deepEqual(notebookReferenceVisibility({...both,availableWidth:2035}), {readerOpen:true,evidenceOpen:true,compact:false});
+assert.deepEqual(notebookReferenceVisibility({...both,availableWidth:2034}), {readerOpen:true,evidenceOpen:false,compact:true});
+assert.deepEqual(notebookReferenceVisibility({...both,active:'evidence',availableWidth:1671}), {readerOpen:false,evidenceOpen:true,compact:true});
+assert.equal(notebookReferenceVisibility({...both,notesWidth:35,availableWidth:1770}).compact,false);
+assert.equal(notebookReferenceVisibility({...both,notesWidth:35,availableWidth:1769}).compact,true);
+assert.equal(notebookReferenceVisibility({...both,readerWidth:900,evidenceWidth:450,availableWidth:2450}).compact,true,'Chosen reference widths determine the breakpoint.');
+assert.deepEqual(notebookReferenceVisibility({...both,readerOpen:false,availableWidth:3054}), {readerOpen:false,evidenceOpen:true,compact:false},'Widening does not reopen a closed reference.');
+for (const width of [1671,1920,3054]) {
+ const columns=[{kind:'reader',preferredWidth:900},{kind:'notes'},{kind:'editor'}];
+ const sizes=notebookColumnsLayout(columns,width,4);
+ assert.equal(sizes.reduce((sum,value)=>sum+value,0)+4,width);
+ assert.equal(sizes[1],300);assert.ok(sizes[2]>=800);
+ assert.equal(columns[0].preferredWidth,900,'Fitting does not change the saved Reader preference.');
 }
-// Notes stays fixed while retaining the writing space and old preferences.
-{
- const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
- const actual=name=>{const start=source.indexOf(`function ${name}(`);return source.slice(start,source.indexOf('\n}',start)+2);};
- const ids=['project:notes-index:p','project:notebook:p'];
- const panels=ids.map(id=>({dataset:{paneId:id},style:{},classList:{contains:()=>false},querySelector:()=>null}));
- const state={paneWeights:{[ids[0]]:280,[ids[1]]:600}};
- const track={clientWidth:1920,scrollLeft:0,inert:false,dataset:{},querySelectorAll:()=>[{getBoundingClientRect:()=>({width:1})}]};
- const context=vm.createContext({track,state,notebookColumnsLayout,currentColumnWorkflowView:()=> 'notebook',paneIsCollapsed:()=>false,
-  getComputedStyle:()=>({paddingLeft:'1px',paddingRight:'1px',getPropertyValue:()=> '800px'}),defaultPaneWidthForID:()=>600,applyPaneWeight(){}});
- vm.runInContext(['syncNotebookColumnLayout','minimumPaneWidthForID','maximumPaneWidthForID'].map(actual).join('\n'),context);
- context.syncNotebookColumnLayout(panels);
- assert.equal(context.maximumPaneWidthForID(ids[0]),300);assert.equal(context.minimumPaneWidthForID(ids[0]),300);assert.equal(context.minimumPaneWidthForID(ids[1]),800);
- state.paneWeights[ids[0]]=1081;context.syncNotebookColumnLayout(panels);
- assert.equal(panels[0].style.flex,'0 0 300px');assert.equal(panels[1].style.flex,'0 0 1617px');
- assert.equal(context.maximumPaneWidthForID(ids[0]),300,'The fixed Notes width remains stable.');
- const restored=JSON.parse(JSON.stringify(state));state.paneWeights=restored.paneWeights;delete track._notebookColumnLayout;context.syncNotebookColumnLayout(panels);
- assert.equal(panels[0].style.flex,'0 0 300px','Older wide preferences cannot expand Notes.');
- state.paneWeights[ids[0]]=100;context.syncNotebookColumnLayout(panels);
- assert.equal(panels[0].style.flex,'0 0 300px','Older narrow preferences cannot shrink Notes.');
-}
-console.log('Notebook sizing passed: fixed 300px Notes, stable writing width, exact boundary and saved-preference migration.');
-console.log('Notebook lifecycle passed: viewport fitting, freed editor space, retained panels/preferences and Research restoration.');
+assert.deepEqual(notebookColumnsLayout([{kind:'evidence'},{kind:'notes'},{kind:'editor'}],1671,4),[300,300,1067]);
+assert.deepEqual(notebookColumnsLayout([{kind:'reader',preferredWidth:630},{kind:'evidence'},{kind:'notes'},{kind:'editor'}],3054,5),[630,300,300,1819]);
+assert.deepEqual(notebookColumnsLayout([{kind:'reader',collapsed:true},{kind:'notes',collapsed:true},{kind:'editor'}],1671,4),[48,35,1584]);
+
+const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+function actual(name) {const start=source.indexOf(`function ${name}(`);assert.ok(start>=0,name);
+ return `${source.slice(start-6,start)==='async '?'async ':''}${source.slice(start,source.indexOf('\n}',start)+2)}`;}
+const ids=['reader:one','utility:saved:one','project:notes-index:p','project:notebook:p'];
+const state={paneWeights:Object.fromEntries(ids.map((id,index)=>[id,[630,600,480,2000][index]])),
+ utilityInstances:[{id:'one',key:'saved'}],notebookReaderHidden:false,notebookEvidenceHidden:false,
+ notebookReferenceActive:'reader',notebookReferenceWidth:300,notebookListHidden:false,workflowMembership:{[ids[0]]:['notebook']}};
+const panels=ids.map(id=>{const classes=new Set();return {dataset:{paneId:id},style:{},draft:`retained ${id}`,
+ classList:{contains:name=>classes.has(name),toggle(name,on){on?classes.add(name):classes.delete(name);}},querySelector:()=>null};});
+const track={clientWidth:1671,scrollLeft:200,inert:false,dataset:{},querySelector:()=>null,
+ querySelectorAll:()=>Array.from({length:panels.filter(p=>!p.classList.contains('is-workflow-hidden')).length+1},()=>({getBoundingClientRect:()=>({width:1})}))};
+let view='notebook',saves=0;
+const reader={id:'one'};
+const context=vm.createContext({state,track,panels,notebookReferenceVisibility,notebookColumnsLayout,paneBelongsToView,
+ notebookReferenceTransition:undefined,notebookReferenceTransitionController:()=>({begin(){}}),
+ currentColumnWorkflowView:()=>view,paneIsCollapsed:id=>id.startsWith('project:notes-index:')&&state.notebookListHidden,
+ workflowPaneAnchors:()=>({}),defaultPaneWidthForID:id=>id.startsWith('reader:')?630:300,
+ getComputedStyle:()=>({paddingLeft:'1px',paddingRight:'1px',getPropertyValue:()=> '1px'}),
+ scheduleWorkspaceStateSaveAfterPaint(){saves++;},saveWorkspaceState(){saves++;},applyPaneWeight(){},
+ isProAccount:()=>true,notifyProjectRequiredForColumn:()=>false,paneIDForUtilityInstance:()=>ids[1],
+ paneIDForReader:()=>ids[0],placeEvidenceBeforeNotebook(){},whenWorkspacePaneReady:async()=>false,
+ scrollPaneIntoView(){},CSS:{escape:value=>value},rememberReaderTabPosition(){},workflowScrollStore:{capture(){}},
+ appendPaneSequence(){for(const panel of panels){const id=panel.dataset.paneId;
+  panel.classList.toggle('is-workflow-hidden',id===ids[0]?state.notebookReaderHidden:id===ids[1]?state.notebookEvidenceHidden:false);}
+  context.syncNotebookColumnLayout(panels);},
+ async transitionWorkspace(){context.appendPaneSequence();},focusUtility:()=>assert.fail('The retained Evidence instance must be reused.')});
+state.readers=[reader];
+vm.runInContext(['activateNotebookReference','reconcileNotebookReferences','syncNotebookColumnLayout',
+ 'toggleNotebookEvidence','focusUtility','setNotebookReaderHidden','closeUtilityInstance','minimumPaneWidthForID','maximumPaneWidthForID'].map(actual).join('\n'),context);
+const widths=()=>panels.filter(p=>!p.classList.contains('is-workflow-hidden')).map(p=>parseFloat(p.style.flex.split(' ').at(-1)));
+const fit=()=>context.syncNotebookColumnLayout(panels);
+fit();
+assert.equal(state.notebookEvidenceHidden,true);assert.equal(state.notebookReaderHidden,false);
+assert.equal(state.paneWeights[ids[1]],300,'Old Evidence defaults migrate to 300px only once.');
+assert.deepEqual(widths(),[300,300,1065]);
+const readerGeometry=widths();
+assert.equal(context.minimumPaneWidthForID(ids[0]),300,'A compact Reader can resize without snapping past the page boundary.');
+assert.equal(context.minimumPaneWidthForID(ids[3]),800);
+assert.equal(track.scrollLeft,0,'The Notebook no longer scrolls references underneath the notepad.');
+await context.toggleNotebookEvidence();
+assert.equal(state.notebookReaderHidden,true);assert.equal(state.notebookEvidenceHidden,false);
+assert.deepEqual(widths(),readerGeometry,'Swapping changes neither Notes nor the notepad geometry.');
+await context.toggleNotebookEvidence();
+assert.equal(state.notebookReaderHidden,true);assert.equal(state.notebookEvidenceHidden,true);
+assert.deepEqual(widths(),[300,1366]);
+await context.setNotebookReaderHidden(reader,false);
+assert.equal(state.notebookReaderHidden,false);assert.equal(state.notebookEvidenceHidden,true);
+await context.setNotebookReaderHidden(reader,true);
+assert.equal(state.notebookReaderHidden,true,'The second Reader click closes its column.');
+track.clientWidth=3054;fit();
+assert.equal(state.notebookReaderHidden,true);assert.equal(state.notebookEvidenceHidden,true,'Widening keeps both closed.');
+await context.setNotebookReaderHidden(reader,false);await context.toggleNotebookEvidence();
+assert.equal(state.notebookReaderHidden,false);assert.equal(state.notebookEvidenceHidden,false);
+assert.deepEqual(widths(),[630,300,300,1817]);
+state.paneWeights[ids[1]]=450;fit();assert.equal(widths()[1],450,'Later manual Evidence widths survive the migration.');
+track.clientWidth=1671;fit();
+assert.equal(state.notebookReaderHidden,true);assert.equal(state.notebookEvidenceHidden,false,'Shrinking keeps the last-used Evidence.');
+state.notebookReferenceWidth=450;fit();const resizedGeometry=widths();
+await context.setNotebookReaderHidden(reader,false);
+assert.deepEqual(widths(),resizedGeometry,'A manually chosen shared width carries from Evidence to Reader.');
+await context.toggleNotebookEvidence();
+assert.deepEqual(widths(),resizedGeometry,'The return swap leaves the notepad at exactly the same width.');
+await context.closeUtilityInstance(state.utilityInstances[0]);
+assert.equal(state.notebookEvidenceHidden,true,'The Evidence close icon hides its retained column too.');
+await context.focusUtility('saved');
+assert.equal(state.notebookEvidenceHidden,false,'Explicit Evidence links reveal rather than toggle the open column.');
+await context.focusUtility('saved');
+assert.equal(state.notebookEvidenceHidden,false);
+state.notebookListHidden=true;fit();assert.equal(widths()[1],35);
+assert.deepEqual(panels.map(p=>p.draft),ids.map(id=>`retained ${id}`));
+assert.equal(state.utilityInstances.length,1);assert.equal(state.readers[0],reader,'Swapping keeps the Reader and its tabs.');
+const restored=normalizeWorkspaceLayout(captureWorkspaceLayout(state));
+assert.equal(restored.notebookEvidenceHidden,false);assert.equal(restored.notebookReaderHidden,true);
+assert.equal(restored.notebookReferenceWidth,450);assert.equal(restored.notebookReferenceActive,'evidence');assert.equal(restored.notebookReferenceLayoutVersion,1);
+view='research';fit();assert.equal(track.dataset.notebookColumnSizing,undefined);
+assert.ok(panels.every(p=>!p.dataset.notebookSized));assert.ok(saves>0);
+console.log('Notebook responsive references passed: exact breakpoints, both references on wide desks, compact swapping, second-click closing, retained content, 300px Evidence default, page width, resize and persisted state.');

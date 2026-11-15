@@ -442,7 +442,7 @@ async function main() {
     );
     assert(workflowSource.includes('<div hidden><button class="toolbar-button" id="toggle-notebook"'),
       "The legacy Notes toggle must stay hidden while the notepad remains available.");
-    for (const [id, label] of [["add-reader", "Reader"], ["toggle-search", "Search"], ["toggle-analysis", "Assistant"],
+    for (const [id, label] of [["add-reader", "New Reader"], ["toggle-search", "Search"], ["toggle-analysis", "Assistant"],
       ["add-notebook-reader", "Reader"], ["toggle-saved", "Evidence"]]) {
       const tag = tagWithID(workflowSource, id);
       assert(tag.includes('type="button"') && tag.includes(`aria-label="${label}"`), `${label} tool lost button semantics or its accessible label.`);
@@ -1448,13 +1448,17 @@ async function main() {
         workspaceScript.text.includes("function presentWorkspaceIssue"),
       "Hidden plan usage tracking or persistent workspace failure feedback is no longer preserved."
     );
+    const searchResultsStart = workspaceScript.text.indexOf('async function renderSearchResults(');
+    const searchResultsEnd = workspaceScript.text.indexOf('\n}', searchResultsStart) + 2;
+    const searchResultsSource = workspaceScript.text.slice(searchResultsStart, searchResultsEnd);
     assert(
       !workspaceScript.text.includes('activeReaderButton') &&
         !workspaceScript.text.includes('Open in reader') &&
         !workspaceScript.text.includes('Open Section ${detail.sectionNumber} in active reader') &&
         !workspaceScript.text.includes('function openSearchResultInReader') &&
         !workspaceScript.text.includes('function openSearchResultInNewReader') &&
-        !workspaceScript.text.includes('newReaderButton') &&
+        searchResultsStart >= 0 && searchResultsEnd > searchResultsStart &&
+        !searchResultsSource.includes('newReaderButton') &&
         workspaceScript.text.includes('openNewButton.textContent = "New reader"') &&
         workspaceScript.text.includes('void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance), {') &&
         workspaceScript.text.includes('sourceSurface: "search"') &&
@@ -2255,7 +2259,7 @@ async function main() {
         workspaceScript.text.includes("const defaultNonReaderPaneWidth = 400") &&
         workspaceScript.text.includes("const defaultUtilityPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultSavedPaneWidth = 600") &&
-        workspaceScript.text.includes('if (paneID === "utility:saved" || paneID.startsWith("utility:saved:")) return defaultSavedPaneWidth') &&
+        workspaceScript.text.includes('if (paneID === "utility:saved" || paneID.startsWith("utility:saved:")) return currentColumnWorkflowView() === \'notebook\' ? 300 : defaultSavedPaneWidth') &&
         workspaceScript.text.includes("function migrateLegacyPaneWidth(paneID, value)") &&
         workspaceScript.text.includes("return Number.isFinite(value) && value > 40 ? constrainPaneWidth(paneID, value) : defaultPaneWidthForID(paneID)") &&
         workspaceScript.text.includes("const value = migrateLegacyPaneWidth(paneID, storedValue)") &&

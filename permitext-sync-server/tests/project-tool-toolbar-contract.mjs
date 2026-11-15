@@ -42,7 +42,8 @@ const c = vm.createContext({
   projectHasOpenReportDraft: () => reportOpen,
   reportScreen: {get projectID(){return project?.id;},isOpen:()=>reportOpen,close(){reportOpen=false;}},
   projectDetailsScreen: {isOpen:()=>contextOpen},
-  syncNotebookNoteTabs() {},
+  syncNotebookNoteTabs() {}, syncResearchNoteControls() {}, syncNotebookListControls() {},
+  currentColumnWorkflowView: () => "research",
   paneIDForProjectNotebook: value => `notebook:${value.id}`,
   notebookPaneIDsForProject: value => [`notebook:${value.id}`], notebookColumnsForProject: () => [],
   paneIDForProjectReportDraft: value => `report:${value.id}`,
@@ -161,6 +162,7 @@ const savedState = {
 };
 const savedContext = vm.createContext({
   state: savedState, workspaceProject: () => activeProject,
+  currentColumnWorkflowView: () => 'research',
   paneIDForUtilityInstance: instance => instance.id,
   savedItemOpeningAttempts: new Map(), openProjectDetails: () => savedState.projectDetails,
   async deactivateProjectStudio() { deactivations++; return permitDiscard; },

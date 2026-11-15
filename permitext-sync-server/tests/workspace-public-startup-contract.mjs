@@ -16,7 +16,7 @@ let syncResult=null,forceResult=null,forcePulls=0,summaryReads=0;
 let savedKeys=new Set(["before mutation"]);
 const noop=()=>{};
 const showColumnLoadingStatus=(status,label)=>{status.textContent=label;};
-const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHydrator,showColumnLoadingStatus,Map,Set,JSON,Promise,console,
+const sandbox=vm.createContext({notebookReferenceTransition:undefined,createWorkspaceAccessGate,createWorkspacePaneHydrator,showColumnLoadingStatus,Map,Set,JSON,Promise,console,
  track,activeWorkspaceID:"workspace",accountRuntimeGeneration:1,workspaceRenderGeneration:0,syncedContent:null,syncLoadPromise:null,detachedProjectWindow:false,
  state:{utilityInstances:[],utilities:{},readers:[]},suppressReaderScrollRestore:false,
  captureAccountRequest:()=>({account}),isCurrentAccountRequest:id=>id.account===account,activeAccount:()=>({userID:account}),

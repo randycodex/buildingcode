@@ -37,6 +37,10 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "noteResearch",
   "notebookReaderVisibilityVersion",
   "notebookReaderHidden",
+  "notebookEvidenceHidden",
+  "notebookReferenceActive",
+  "notebookReferenceLayoutVersion",
+  "notebookReferenceWidth",
   "reportDrafts",
   "coordinations",
   "coordinationThreads",
@@ -276,6 +280,10 @@ export function emptyWorkspaceLayout() {
     noteResearch: {},
     notebookReaderVisibilityVersion: 1,
     notebookReaderHidden: true,
+    notebookEvidenceHidden: false,
+    notebookReferenceActive: 'evidence',
+    notebookReferenceLayoutVersion: 0,
+    notebookReferenceWidth: 300,
     reportDrafts: [],
     coordinations: [],
     coordinationThreads: [],
@@ -383,6 +391,10 @@ export function normalizeWorkspaceLayout(value = {}) {
   // source navigation and toolbar choices remain part of this workspace.
   layout.notebookReaderVisibilityVersion = 1;
   layout.notebookReaderHidden = source.notebookReaderVisibilityVersion === 1 ? source.notebookReaderHidden !== false : true;
+  layout.notebookEvidenceHidden = source.notebookEvidenceHidden === true;
+  layout.notebookReferenceActive = source.notebookReferenceActive === 'reader' ? 'reader' : 'evidence';
+  layout.notebookReferenceLayoutVersion = source.notebookReferenceLayoutVersion === 1 ? 1 : 0;
+  layout.notebookReferenceWidth = Math.max(300, Math.min(600, Number(source.notebookReferenceWidth) || 300));
   layout.reportDrafts = openProjectToolState(source.reportDrafts, layout.projectDetails);
   layout.coordinations = openProjectToolState(source.coordinations, layout.projectDetails);
   layout.coordinationThreads = Array.isArray(source.coordinationThreads)

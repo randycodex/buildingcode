@@ -9201,7 +9201,7 @@ function C({ packageName: e, customMessages: t }) {
 	};
 }
 //#endregion
-//#region node_modules/@clerk/shared/dist/authorization-errors.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/authorization-errors.mjs
 var ne = "reverification-error", w = (e) => ({ clerk_error: {
 	type: "forbidden",
 	reason: ne,
@@ -9296,7 +9296,7 @@ function ye() {
 	} };
 }
 //#endregion
-//#region node_modules/@clerk/shared/dist/getEnvVariable.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/getEnvVariable.mjs
 var be = (e) => !!e?.cloudflare?.env, xe = (e) => !!e?.env, Se = (e, t) => {
 	if (typeof process < "u" && process.env && typeof process.env[e] == "string") return process.env[e];
 	if (typeof {
@@ -9346,7 +9346,7 @@ function Ee(e, t) {
 	};
 }
 //#endregion
-//#region node_modules/@clerk/shared/dist/_chunks/noop-LBsrDrTs.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/_chunks/noop-LBsrDrTs.mjs
 var De = (...e) => {}, Oe = () => {
 	let e = De, t = De;
 	return {
@@ -9361,7 +9361,7 @@ function Ae() {
 	throw Error(`${ke} Clerk instance not found. Make sure Clerk is initialized before using any Clerk components.`);
 }
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/subscribable.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/subscribable.js
 var D = class {
 	constructor() {
 		this.listeners = /* @__PURE__ */ new Set(), this.subscribe = this.subscribe.bind(this);
@@ -9440,7 +9440,7 @@ function Pe(e) {
 	setTimeout(e, 0);
 }
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/utils.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/utils.js
 var Fe = typeof window > "u" || "Deno" in globalThis;
 function Ie() {}
 function Le(e, t) {
@@ -9569,7 +9569,7 @@ function it(e, t, n) {
 	}), e;
 }
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/environmentManager.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/environmentManager.js
 var at = /* @__PURE__ */ (() => {
 	let e = () => Fe;
 	return {
@@ -9582,7 +9582,7 @@ var at = /* @__PURE__ */ (() => {
 	};
 })();
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/thenable.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/thenable.js
 function ot() {
 	let e, t, n = new Promise((n, r) => {
 		e = n, t = r;
@@ -9604,7 +9604,7 @@ function ot() {
 	}, n;
 }
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/notifyManager.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/notifyManager.js
 var st = Pe;
 function ct() {
 	let e = [], t = 0, n = (e) => {
@@ -9686,7 +9686,7 @@ var lt = ct(), ut = new class extends D {
 	}
 }();
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/retryer.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/retryer.js
 function dt(e) {
 	return Math.min(1e3 * 2 ** e, 3e4);
 }
@@ -9750,7 +9750,7 @@ function mt(e) {
 	};
 }
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/removable.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/removable.js
 var ht = class {
 	#e;
 	destroy() {
@@ -9769,7 +9769,7 @@ var ht = class {
 	}
 };
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/infiniteQueryBehavior.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/infiniteQueryBehavior.js
 function gt(e) {
 	return { onFetch: (t, n) => {
 		let r = t.options, i = t.fetchOptions?.meta?.fetchMore?.direction, a = t.state.data?.pages || [], o = t.state.data?.pageParams || [], s = {
@@ -9834,7 +9834,7 @@ function bt(e, t) {
 	return !t || !e.getPreviousPageParam ? !1 : vt(e, t) != null;
 }
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/query.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/query.js
 var xt = class extends ht {
 	#e;
 	#t;
@@ -10133,7 +10133,7 @@ function wt(e) {
 	};
 }
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/queryObserver.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/queryObserver.js
 var Tt = class extends D {
 	constructor(e, t) {
 		super(), this.options = t, this.#e = e, this.#s = null, this.#o = ot(), this.bindMethods(), this.setOptions(t);
@@ -10372,7 +10372,7 @@ function jt(e, t) {
 	return !Je(e.getCurrentResult(), t);
 }
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/infiniteQueryObserver.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/infiniteQueryObserver.js
 var Mt = class extends Tt {
 	constructor(e, t) {
 		super(e, t);
@@ -10598,7 +10598,7 @@ function Pt() {
 	};
 }
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/mutationCache.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/mutationCache.js
 var Ft = class extends D {
 	constructor(e = {}) {
 		super(), this.config = e, this.#e = /* @__PURE__ */ new Set(), this.#t = /* @__PURE__ */ new Map(), this.#n = 0;
@@ -10697,7 +10697,7 @@ function It(e) {
 	return e.options.scope?.id;
 }
 //#endregion
-//#region node_modules/@tanstack/query-core/build/modern/queryCache.js
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@tanstack/query-core/build/modern/queryCache.js
 var Lt = class extends D {
 	constructor(e = {}) {
 		super(), this.config = e, this.#e = /* @__PURE__ */ new Map();
@@ -10992,7 +10992,7 @@ function Vt(e, t) {
 	return e !== e && t !== t;
 }
 //#endregion
-//#region node_modules/@clerk/shared/dist/react/index.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/react/index.mjs
 function Ht(e, t) {
 	if (!e) throw Error(typeof t == "string" ? t : `${t.displayName} not found`);
 }
@@ -11557,14 +11557,14 @@ var $n = Gt, er = (e) => {
 	});
 };
 //#endregion
-//#region node_modules/@clerk/shared/dist/_chunks/handleValueOrFn-CKEDuW4I.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/_chunks/handleValueOrFn-CKEDuW4I.mjs
 function tr(e, t, n) {
 	if (typeof e == "function") return e(t);
 	if (e !== void 0) return e;
 	if (n !== void 0) return n;
 }
 //#endregion
-//#region node_modules/@clerk/shared/dist/_chunks/utils-V2FbmPWk.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/_chunks/utils-V2FbmPWk.mjs
 var nr = (e) => {
 	Ce() && console.error(`Clerk: ${e}`);
 }, rr = /* @__PURE__ */ c(m(), 1), ir = (e, ...t) => {
@@ -11573,13 +11573,13 @@ var nr = (e) => {
 	return n;
 };
 //#endregion
-//#region node_modules/@clerk/shared/dist/browser.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/browser.mjs
 function ar() {
 	return typeof window < "u";
 }
 new RegExp((/* @__PURE__ */ "bot.spider.crawl.APIs-Google.AdsBot.Googlebot.mediapartners.Google Favicon.FeedFetcher.Google-Read-Aloud.DuplexWeb-Google.googleweblight.bing.yandex.baidu.duckduck.yahoo.ecosia.ia_archiver.facebook.instagram.pinterest.reddit.slack.twitter.whatsapp.youtube.semrush".split(".")).join("|"), "i");
 //#endregion
-//#region node_modules/@clerk/react/dist/hooks-66XwX3F0.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/react/dist/hooks-66XwX3F0.mjs
 var or = "You've added multiple <ClerkProvider> components in your React component tree. Wrap your components in a single <ClerkProvider>.", sr = (e) => `You've passed multiple children components to <${e}/>. You can only pass a single child component or text.`, cr = "Unsupported usage of isSatellite, domain or proxyUrl. The usage of isSatellite, domain or proxyUrl as function is not supported in non-browser environments.", lr = "<UserProfile.Page /> component needs to be a direct child of `<UserProfile />` or `<UserButton />`.", ur = "<UserProfile.Link /> component needs to be a direct child of `<UserProfile />` or `<UserButton />`.", dr = "<OrganizationProfile.Page /> component needs to be a direct child of `<OrganizationProfile />` or `<OrganizationSwitcher />`.", fr = "<OrganizationProfile.Link /> component needs to be a direct child of `<OrganizationProfile />` or `<OrganizationSwitcher />`.", pr = (e) => `<${e} /> can only accept <${e}.Page /> and <${e}.Link /> as its children. Any other provided component will be ignored. Additionally, please ensure that the component is rendered in a client component.`, mr = (e) => `Missing props. <${e}.Page /> component requires the following props: url, label, labelIcon, alongside with children to be rendered inside the page.`, hr = (e) => `Missing props. <${e}.Link /> component requires the following props: url, label and labelIcon.`, gr = "<UserButton /> can only accept <UserButton.UserProfilePage />, <UserButton.UserProfileLink /> and <UserButton.MenuItems /> as its children. Any other provided component will be ignored. Additionally, please ensure that the component is rendered in a client component.", _r = "<UserButton.MenuItems /> component can only accept <UserButton.Action /> and <UserButton.Link /> as its children. Any other provided component will be ignored. Additionally, please ensure that the component is rendered in a client component.", vr = "<UserButton.MenuItems /> component needs to be a direct child of `<UserButton />`.", yr = "<UserButton.Action /> component needs to be a direct child of `<UserButton.MenuItems />`.", br = "<UserButton.Link /> component needs to be a direct child of `<UserButton.MenuItems />`.", xr = "Missing props. <UserButton.Link /> component requires the following props: href, label and labelIcon.", Sr = "Missing props. <UserButton.Action /> component requires the following props: label.", Cr = (e) => (t) => {
 	try {
 		return _.Children.only(e);
@@ -12299,7 +12299,7 @@ Object.assign(di, {
 	renderWhileLoading: !0
 });
 //#endregion
-//#region node_modules/@clerk/shared/dist/retry.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/retry.mjs
 var pi = {
 	initialDelay: 125,
 	maxDelayBetweenRetries: 0,
@@ -12345,7 +12345,7 @@ async function xi(e = "", t) {
 	}), { shouldRetry: (e, t) => t <= 5 });
 }
 //#endregion
-//#region node_modules/@clerk/shared/dist/proxy.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/proxy.mjs
 function Si(e) {
 	return !e || Ci(e) || wi(e);
 }
@@ -12359,7 +12359,7 @@ function Ti(e) {
 	return e ? !wi(e) || typeof window > "u" || !window.location?.origin ? e : new URL(e, window.location.origin).toString() : "";
 }
 //#endregion
-//#region node_modules/@clerk/shared/dist/url.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/url.mjs
 function Ei(e) {
 	if (!e) return "";
 	let t;
@@ -12369,7 +12369,7 @@ function Ei(e) {
 	return `clerk.${e.replace(t, "")}`;
 }
 //#endregion
-//#region node_modules/@clerk/shared/dist/versionSelector.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/versionSelector.mjs
 var Di = (e, t = "6.31.0") => {
 	if (e) return e;
 	let n = Oi(t);
@@ -12497,7 +12497,7 @@ function qi(e) {
 	ji.setPackageName({ packageName: e });
 }
 //#endregion
-//#region node_modules/@clerk/shared/dist/deprecated.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/deprecated.mjs
 var Ji = /* @__PURE__ */ new Set(), Yi = (e, t, n) => {
 	let r = we() || Te(), i = n ?? e;
 	Ji.has(i) || r || (Ji.add(i), console.warn(`Clerk - DEPRECATION WARNING: "${e}" is deprecated and will be removed in the next major release.\n${t}`));
@@ -12548,7 +12548,7 @@ function oa(e, t) {
 	window.dispatchEvent(new CustomEvent(na)), window.location.href = n.href;
 }
 //#endregion
-//#region node_modules/@clerk/shared/dist/versionCheck.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@clerk/shared/dist/versionCheck.mjs
 function sa(e) {
 	let t = e.match(/^(\d+)\.(\d+)\.(\d+)/);
 	if (!t) return null;

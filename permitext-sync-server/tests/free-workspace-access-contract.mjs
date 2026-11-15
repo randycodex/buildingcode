@@ -83,7 +83,7 @@ assert.equal(button.hidden, true, 'The Free Reader navigation is hidden on Pro')
 button.id = 'add-reader';
 c.syncReaderToolbarButton(button);
 assert.equal(button.hidden, false);
-assert.equal(label.textContent, 'Reader +');
+assert.equal(label.textContent, 'New Reader');
 const welcome = vm.createContext({
   state: {readers: []}, firstUseWelcomeActive: false, detachedProjectWindow: false,
   isProAccount: () => false, entryHasExternalIntent: () => false,

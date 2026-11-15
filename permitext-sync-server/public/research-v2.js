@@ -53,7 +53,7 @@ export function createResearchV2View(options) {
   const rail=node('aside','rv2-rail');rail.setAttribute('aria-label','Research history');
   const list=node('div','rv2-questions');
   const historyRecords=[];
-  if(options.historyManagement){rail.append(options.historyManagement.element);rail.addEventListener("keydown",options.historyManagement.handleKeyDown);}
+  if(options.historyManagement)rail.addEventListener("keydown",options.historyManagement.handleKeyDown);
   const knownQuestions=new Set();
   function renderHistory(){
     const scroll=rail.scrollTop;
@@ -122,8 +122,10 @@ export function createResearchV2View(options) {
   },'rv2-new-chat') : null;
   const historyTop=node('div','rv2-rail-top-row');
   if(newChat)historyTop.append(newChat);
+  if(options.historyManagement?.toolbar)historyTop.append(options.historyManagement.toolbar);
   const historyToggle=action('',null,'icon-button rv2-history-toggle');
   historyTop.append(historyToggle);rail.append(historyTop);
+  if(options.historyManagement)rail.append(options.historyManagement.element);
   rail.append(list);
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
   const divider=node('div','rv2-rail-divider');

@@ -1,4 +1,4 @@
-//#region node_modules/@vercel/analytics/dist/index.mjs
+//#region ../../../../../Documents/X_CODING/Building Code/permitext-sync-server/node_modules/@vercel/analytics/dist/index.mjs
 var e = () => {
 	window.va || (window.va = function(...e) {
 		window.vaq || (window.vaq = []), window.vaq.push(e);

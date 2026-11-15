@@ -79,6 +79,12 @@ assert.equal(await context.toggleNotebookList(), false);
 allowed = true; view = 'research';
 assert.equal(await context.toggleNotebookList(), false);
 assert.equal(saves, 2, 'Unavailable tools and other working views cannot change list visibility.');
+view='notebook';state.notebookListHidden=true;
+const revealed=[];
+context.scrollPaneIntoView=id=>revealed.push(id);
+context.track.querySelector=selector=>selector.includes(' .notebook-list-toggle')?{focus(){}}:{dataset:{paneId:indexID}};
+await context.toggleNotebookList();
+assert.deepEqual(revealed,[indexID],'Expanding Notes keeps the list reachable beside the notepad.');
 console.log('Notes list toggle passed: immediate deferred contents, independent editor visibility, persistence and access/view guards.');
 
 const railState = {notebookListHidden:true,paneWeights:{[indexID]:280}};

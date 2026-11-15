@@ -6,12 +6,12 @@ import {readerTabs,initializeReaderTabs,addReaderTab,openRecentReaderTab,canAddR
 import {linkPaneToView} from '../public/workflow-views.js';
 const source=readFileSync(new URL('../public/app.js', import.meta.url),'utf8');
 const actual=name=>{const start=source.indexOf(`function ${name}(`);return source.slice(start,source.indexOf('\n}',start)+2);};
-const code=source.slice(source.indexOf('function reusableSearchReader('),source.indexOf('\nfunction removeSectionDetail(',source.indexOf('function reusableSearchReader(')));
+const code=actual('activateNotebookReference')+'\n'+source.slice(source.indexOf('function reusableSearchReader('),source.indexOf('\nfunction removeSectionDetail(',source.indexOf('function reusableSearchReader(')));
 let serial=0;
 const state={readers:[{id:'manual',sectionID:'1'}],paneWeights:{}};
 const hidden=new Set();
 const navigationDependencies={workingResearchNote:()=>null,currentColumnWorkflowView:()=> 'research', resolvedReaderSourceNavigations:new WeakMap(),
-  track:{querySelector:()=>null}, CSS:{escape:value=>value}};
+  track:{dataset:{},querySelector:()=>null}, CSS:{escape:value=>value}};
 const context={columnExpansionController:()=>({reveal:node=>visibleReaderReveals.push(node)}),paneIsCollapsed:()=>false,state,workflowPaneIsVisible:id=>!hidden.has(id),workspaceColumnsRequireProject:()=>false,captureAccountRequest:()=>({}),isCurrentAccountRequest:()=>true,activeWorkspaceID:"test",whenWorkspacePaneReady:async()=>true,resolveReaderSource:async x=>x,searchResultDetail:x=>x,readerFieldsForSectionDetail:(x,o)=>({...x,...o}),normalizeAnnotationBlockID:x=>x,readerMatchesSource:(r,d)=>r.sectionID===d.sectionID,readerIsClearlyAvailable:()=>false,isProAccount:()=>true,newReaderState:x=>({id:`new-${++serial}`,...x}),paneIDForReader:r=>r.id,defaultPaneWidthForID:()=>600,placePaneAfter(){},appendPaneIfMissing(){},updateBrowserSectionURL(){},scheduleContinuitySync(){},saveWorkspaceState(){},transitionWorkspace:async()=>{},revealReaderSourceTarget(){},scrollPaneIntoView(){}};
 Object.assign(context,navigationDependencies);
 vm.createContext(context);vm.runInContext(code,context);
@@ -73,6 +73,7 @@ assert(visibleReaderReveals.length > 0, 'Explicit source navigation reveals its 
  vm.runInContext(actual('prepareReaderSourceTab')+'\n'+code+'\nconst savedItemOpeningAttempts = new Map();\nasync '+actual('openSavedItemInReader'),notebookContext);
  const opened=await notebookContext.openSavedItemInReader({sectionID:'102',codePrefix:'BC',codeVersion:'2022'},'saved');
  assert.equal(opened,kept);assert.equal(notebookContext.state.readers.length,1);assert.equal(notebookContext.state.notebookReaderHidden,false);
+ assert.equal(notebookContext.state.notebookReferenceActive,'reader','Evidence source navigation selects Reader in the shared reference slot.');
  assert.equal(readerTabs(kept).length,2);assert.equal(readerTabs(kept)[0].id,kept.activeTabID);assert.equal(kept.sectionID,'102');
  for(let index=0;index<4;index++)addReaderTab(kept,{codePrefix:'BC',codeVersion:'2022',sectionID:`${index+3}01`},`extra-${index}`);
  for(let index=0;index<8;index++){

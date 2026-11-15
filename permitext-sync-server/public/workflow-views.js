@@ -49,30 +49,38 @@ export function researchColumnsLayout(widths, availableWidth, fixedWidth = 0, di
   const fits = widths.length > 0 && minimums.every(minimum => equalWidth >= minimum);
   return { fits, widths: widths.map((width, index) => fits ? equalWidth : Math.max(minimums[index], Math.min(maximumWidths[index] ?? 900, Number(width) || minimums[index]))) };
 }
-// Notebook is one four-column desk. Reserve the writing space, fit the
-// reference columns beside it, and keep saved widths as preferences only.
-export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0) {
-  const available = Math.max(0, availableWidth - dividerWidth);
-  const minimums = columns.map(column => column.collapsed ? (column.kind === 'notes' ? 35 : 48) :
-    ({reader:320, evidence:180, notes:300, editor:360}[column.kind] || 180));
-  const minimumTotal = minimums.reduce((sum, width) => sum + width, 0);
-  if (minimumTotal > available) {
-    const notesMinimum = columns.reduce((sum, column, index) => sum + (column.kind === 'notes' ? minimums[index] : 0), 0);
-    return minimums.map((width, index) => columns[index].kind === 'notes' ? width :
-      width * Math.max(0, available - notesMinimum) / (minimumTotal - notesMinimum));
+// Optional references share one slot when their chosen widths would squeeze
+// the writing page. Closing one is persistent; a wider desk never reopens it.
+export function notebookReferenceVisibility({readerOpen, evidenceOpen, active = 'evidence',
+  readerWidth = 630, evidenceWidth = 300, notesWidth = 300, availableWidth, dividerWidth = 1}) {
+  const compact = availableWidth < 800 + notesWidth + readerWidth + evidenceWidth + dividerWidth * 5;
+  if (compact && readerOpen && evidenceOpen) {
+    readerOpen = active === 'reader';
+    evidenceOpen = !readerOpen;
   }
+  return {readerOpen, evidenceOpen, compact};
+}
+// Notebook reserves its writing page first. A single Reader can fit the
+// remaining reference space without moving or shrinking the writing page.
+export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0, sharedReferenceWidth = 0) {
+  const available = Math.max(0, availableWidth - dividerWidth);
+  const shared = column => sharedReferenceWidth > 0 && ['reader', 'evidence'].includes(column.kind);
+  const minimums = columns.map(column => column.collapsed ? (column.kind === 'notes' ? 35 : 48) :
+    shared(column) ? 300 : ({reader:630, evidence:300, notes:300, editor:800}[column.kind] || 300));
   const editor = columns.findIndex(column => column.kind === 'editor' && !column.collapsed);
   const widths = columns.map((column, index) => column.collapsed || column.kind === 'editor' ? minimums[index] :
-    Math.max(minimums[index], Math.min({reader:Infinity, evidence:600, notes:300}[column.kind] || 360,
-      Number(column.preferredWidth) || {reader:630, evidence:300, notes:300}[column.kind] || 300)));
+    Math.max(minimums[index], Math.min(shared(column) ? 600 : {reader:Infinity, evidence:600, notes:300}[column.kind] || 360,
+      shared(column) ? sharedReferenceWidth : Number(column.preferredWidth) || {reader:630, evidence:300, notes:300}[column.kind] || 300)));
+  let excess = widths.reduce((sum, width) => sum + width, 0) - available;
+  columns.forEach((column, index) => {
+    if (column.collapsed || !['reader', 'evidence'].includes(column.kind) || excess <= 0) return;
+    const reduction = Math.min(excess, Math.max(0, widths[index] - 300));
+    widths[index] -= reduction;
+    excess -= reduction;
+  });
   const requested = widths.reduce((sum, width) => sum + width, 0);
-  if (requested > available) {
-    const slack = requested - minimumTotal;
-    const reduction = requested - available;
-    return widths.map((width, index) => width - (width - minimums[index]) * reduction / slack);
-  }
   const flexible = editor >= 0 ? editor : columns.findIndex(column => !column.collapsed && column.kind === 'reader');
-  if (flexible >= 0) widths[flexible] += available - requested;
+  if (flexible >= 0) widths[flexible] += Math.max(0, available - requested);
   return widths;
 }
 // Sources reserve their chosen width beside the Report document.

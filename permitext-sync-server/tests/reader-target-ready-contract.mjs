@@ -20,6 +20,7 @@ for (const name of ["openSourceInReader", "openDeepLinkedSectionInReader"]) {
       normalizeAnnotationBlockID:id=>id||"", readerMatchesSource:()=>false, readerIsClearlyAvailable:()=>false,
       isProAccount:()=>true, newReaderState:fields=>({id:"reader-a",...fields}),
       paneIDForReader:reader=>`reader:${reader.id}`, defaultPaneWidthForID:()=>480,
+      workingResearchNote:()=>null,
       appendPaneIfMissing(){}, updateBrowserSectionURL(){}, scheduleContinuitySync(){},saveWorkspaceState(){},
       async transitionWorkspace(){ calls.push("shell"); },
       whenWorkspacePaneReady(id){calls.push(["wait",id]);return gate;},

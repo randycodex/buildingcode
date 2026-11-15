@@ -20320,7 +20320,7 @@ dialog.report-export-review {
   --workspace-menu-height: 30px;
   --workspace-menu-gap: 6px;
   --workspace-menu-highlight: light-dark(var(--toolbar-active), #252525);
-  --workspace-active-tool-edge: color-mix(in srgb, var(--text-primary) 60%, transparent);
+  --workspace-menu-active: #6aa9ff;
 }
 .workspace-shell { grid-template-rows: var(--workspace-bar-height) var(--workspace-bar-height) minmax(0, 1fr); }
 .workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: var(--workspace-bar-height) var(--workspace-bar-height) auto minmax(0, 1fr); }
@@ -20359,8 +20359,7 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
   pointer-events: none;
 }
 .workflow-toolbar .toolbar-button:hover { color: var(--text); }
-.topbar-actions > :is([data-workflow-view], #toggle-report) { color: var(--text-secondary); }
-.topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text); }
+.topbar-actions > .toolbar-button { color: var(--text-secondary); }
 @media (min-width:761px) {
   :root { --header-height: var(--workspace-bar-height); }
   .topbar { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-rows: 1fr; gap: 12px; padding: 0 24px; }
@@ -20370,8 +20369,7 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
   .topbar .topbar-actions > .toolbar-button { font-size: 12px !important; padding: 0 10px; }
   .topbar .workspace-actions-button { max-width: none; }
 }
-.workflow-toolbar .toolbar-button:hover,
-.topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text-primary); }
+.workflow-toolbar .toolbar-button:hover { color: var(--text-primary); }
 
 /* Report shares the workspace navigation; retain column geometry underneath. */
 .report-workspace-view { grid-column: 1; grid-row: 2 / -1; z-index: 2; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: var(--surface); }
@@ -20586,7 +20584,6 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 }
 :is(.account-workspace-view .account-screen-header, .project-details-screen-header) h1 { font-size: 13px; color: var(--text-secondary); font-weight: 500; letter-spacing: normal; }
 :is(.account-workspace-view .account-screen-close, .project-details-screen-close) { --panel-title-control-size: 32px; }
-.topbar #toggle-settings[aria-pressed="true"] { color: var(--text-primary); }
 
 /* Keep menu pills clear of the shared bar dividers. */
 .topbar-actions, .topbar-end, .workflow-toolbar > div, .project-details-screen .project-details-tabs { gap: var(--workspace-menu-gap); }
@@ -20622,29 +20619,27 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 .project-details-screen .project-details-tabs button,
 .report-workspace-view .report-draft-shell .report-draft-primary-actions > button {
   font-size: 12px !important;
-  font-weight: 300 !important;
+  font-weight: var(--workspace-menu-weight, 300) !important;
   text-transform: uppercase;
 }
 
 .topbar :is(.topbar-actions > button, .workspace-actions-button, .topbar-settings-button):is([aria-pressed="true"], [aria-expanded="true"]),
 .topbar .topbar-layout-menu[open] > summary,
 .workflow-toolbar .toolbar-button[aria-pressed="true"],
+.workflow-toolbar .toolbar-button[aria-expanded="true"],
 .workflow-toolbar .toolbar-button.has-open-reader,
+.workflow-toolbar .reader-shortcut[aria-pressed="true"],
 .project-details-screen [data-open-reader].has-open-reader,
 .report-workspace-view [data-open-reader].has-open-reader,
 .project-details-screen .project-details-tabs button[aria-pressed="true"],
 .report-workspace-view .report-draft-shell .report-draft-primary-actions > button:is([aria-expanded="true"], [aria-pressed="true"]) {
-  color: var(--text-primary);
-}
-
-/* Open tools share the Reader bubble's thin edge; hover supplies the fill. */
-.workflow-toolbar [data-workflow-tools="notebook"] .toolbar-button[aria-pressed="true"],
-.report-workspace-view .report-draft-shell .report-draft-primary-actions > button:is([aria-expanded="true"], [aria-pressed="true"]) {
-  box-shadow: inset 0 0 0 1px var(--workspace-active-tool-edge);
+  --workspace-menu-weight: 500;
+  color: var(--workspace-menu-active);
+  box-shadow: none;
 }
 
 /* All navigation bars share the same hover highlight. */
-.topbar .topbar-actions > :is([data-workflow-view], #toggle-report):not(:disabled):hover,
+.topbar .topbar-actions > button:not(:disabled):hover,
 .topbar :is(.workspace-actions-button, .topbar-settings-button, .topbar-layout-menu > summary, .mobile-more-button):not(:disabled):hover,
 .workflow-toolbar .toolbar-button:not(:disabled):hover,
 .workflow-toolbar .reader-shortcut:not(:disabled):hover,
@@ -20654,18 +20649,16 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
   color: var(--text-primary);
 }
 
-/* Selected working views retain a light-blue identity without heavier text. */
-.topbar .topbar-actions > :is([data-workflow-view], #toggle-report, #free-reader)[aria-pressed="true"] {
-  color: #6aa9ff;
-  background: rgb(106 169 255 / 10%) !important;
-}
-.topbar .topbar-actions > :is([data-workflow-view], #toggle-report, #free-reader)[aria-pressed="true"]:not(:disabled):hover {
-  background: var(--workspace-menu-highlight) !important;
-  color: var(--text-primary);
+/* Active navigation uses blue text; only hovering adds a pill. */
+.topbar :is(.topbar-actions > button, .workspace-actions-button, .topbar-settings-button):is([aria-pressed="true"], [aria-expanded="true"]),
+.topbar .topbar-layout-menu[open] > summary,
+.workflow-toolbar :is(.toolbar-button, .reader-shortcut):is([aria-pressed="true"], [aria-expanded="true"], .has-open-reader),
+.report-workspace-view .report-draft-shell .report-draft-primary-actions > button:is([aria-expanded="true"], [aria-pressed="true"]) {
+  color: var(--workspace-menu-active);
 }
 
-.topbar #get-pro { color: #ff7b7b; background: rgb(255 123 123 / 10%) !important; }
-.topbar #get-pro:not(:disabled):is(:hover, :focus-visible) { color: #ff9494; background: rgb(255 123 123 / 18%) !important; }
+.topbar #get-pro { color: #ff7b7b; }
+.topbar #get-pro:not(:disabled):hover { color: #ff9494; background: var(--workspace-menu-highlight) !important; }
 
 /* Keep the Account disclaimer on the screen centerline within a 42px footer. */
 .account-workspace-view .settings-panel .settings-footer {
@@ -21354,7 +21347,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workflow-toolbar > [data-workflow-tools] { min-width: 0; }
 .workflow-toolbar > .workflow-layout-actions { margin-inline-start: auto; flex: 0 0 auto; gap: 2px; padding-inline-start: 12px; }
 .workflow-layout-actions > .toolbar-button { width: 30px; flex: 0 0 30px; padding: 0; border: 1px solid transparent; border-radius: var(--radius-pill); }
-.workflow-layout-actions > .toolbar-button:not(:disabled):is(:hover, :focus-visible) { border-color: var(--workspace-active-tool-edge); background: var(--workspace-menu-highlight); }
+.workflow-layout-actions > .toolbar-button:not(:disabled):hover { background: var(--workspace-menu-highlight); }
 .workflow-layout-actions > .toolbar-button[hidden] { display: none; }
 .workflow-layout-actions > .toolbar-button:disabled { opacity: .35; cursor: default; }
 
@@ -21607,7 +21600,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .floating-workspace-tabs > button:hover { color: var(--text-primary); }
 .floating-workspace-tabs > button:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 .topbar :is(#toggle-context, #toggle-settings) { width: 30px; min-width: 30px; padding: 0; flex: 0 0 30px; }
-.topbar :is(#toggle-context, #toggle-settings)[aria-expanded="true"] { background: var(--workspace-menu-highlight); }
 .topbar #toggle-context:disabled { opacity: .45; cursor: default; }
 .settings-floating-panel > .settings-panel { display: flex; flex-direction: column; flex: 1 !important; min-height: 0; background: transparent; overflow: visible; }
 .settings-floating-panel > .settings-panel > .settings-scroll { display: block; flex: 1; min-height: 0; margin-inline: calc(-1 * var(--account-category-gutter)); overflow: hidden; }
@@ -21704,8 +21696,17 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .assistant-history-menu button.is-danger { color: var(--destructive); }
 .assistant-history-menu [aria-checked="true"]::before { content: "✓ "; }
 
-/* Notebook's four columns share the viewport; writing stays inside its column. */
-.panel-track[data-notebook-column-sizing="fit"] { overflow-x: hidden; }
+/* Notebook shares its reference slot while preserving the writing page. */
+.panel-track[data-notebook-column-sizing="fit"] { position: relative; overflow-x: auto; }
+.panel-track[data-notebook-column-sizing="fit"] > .workspace-panel[data-notebook-reference-cover] {
+  display: flex !important; position: absolute !important; z-index: 40;
+  left: var(--notebook-reference-left); top: 0; bottom: 0;
+  width: var(--notebook-reference-width); min-width: 0 !important; max-width: none !important;
+  pointer-events: none; background: var(--surface);
+}
+.panel-track[data-notebook-column-sizing="fit"] > .notebook-panel[data-notebook-sized] {
+  position: relative; left: auto; right: auto;
+}
 .notebook-panel[data-notebook-sized] :is(.notebook-shell, .notebook-focus, .notebook-editor-surface, .bn-container, .bn-editor) { min-width: 0; }
 .notebook-panel[data-notebook-sized] .notebook-focus > * { box-sizing: border-box; max-width: min(100%, var(--workspace-content-max-width)); }
 .notebook-panel[data-notebook-sized] .notebook-title-control { min-width: 0; }

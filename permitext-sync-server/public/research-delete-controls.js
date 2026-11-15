@@ -144,7 +144,7 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
   };
   paint();
   return {
-    element, handleKeyDown,
+    element, toolbar, handleKeyDown,
     setConversations(next) {
       closeMenu(); conversations = next;
       const ids = new Set(next.map(conversation=>conversation.id));

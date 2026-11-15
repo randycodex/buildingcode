@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { createWorkspacePaneHydrator } from '../public/workspace-pane-hydration.js';
 import { createWorkspaceViewPresentation } from '../public/workspace-view-presentation.js';
+import { readerTabs, removeReaderTab } from '../public/reader-tabs.js';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const actual = name => {
@@ -29,7 +30,7 @@ function harness() {
   const reader={id:'one',activeTabID:'B'}, state={readers:[reader]}, pending=new Map(), signals=new Map(), notices=[], releases=[], restores=[];
   let wanted='B', generation=1, stopCount=0, sourceNavigation=null;
   const reveals=[];
-  const c=vm.createContext({state,track,CSS:{escape:value=>value},workspacePaneHydrator:null,createWorkspacePaneHydrator,
+  const c=vm.createContext({notebookReferenceTransition:undefined,state,track,CSS:{escape:value=>value},workspacePaneHydrator:null,createWorkspacePaneHydrator,
     workspacePaneReadyWaiters:new Set(),activeWorkspaceID:'workspace',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
     workspacePaneContextIsCurrent:context=>context.generation===generation,pendingWorkspacePaneRevealID:'',
     workspacePaneDescriptors:()=>wanted?[{id:'reader:one',identity:wanted,publicContent:true,label:'Reader',sourceNavigation,scrollPosition:sourceNavigation?undefined:{top:425},
@@ -142,6 +143,36 @@ function harness() {
   assert.equal(h.track.children[0].body.textContent,'New tab enacted text');
   assert.equal(h.track.scrollLeft,17,'Adding a tab preserves the horizontal workspace position');
 }
+// Closing the active tab is another source switch. Its neighboring tab must
+// replace the existing painted Reader only after its text and position are ready.
+for (const active of [true,false]) {
+  const h=harness();h.reader.activeTabID='A';h.reader.codePrefix='BC';
+  h.reader.tabs=[{id:'A',codePrefix:'BC'},{id:'B',codePrefix:'PC',scrollPosition:{top:425}}];
+  let transitions=0,shortcuts=0;
+  Object.assign(h.c,{readerTabs,removeReaderTab,rememberReaderTabPosition(){},retainReaderColumn(){},saveWorkspaceState(){},
+    readerShortcuts:{refresh(){shortcuts++;}},
+    transitionWorkspace:async(_reason,options)=>{
+      transitions++;
+      await h.open(h.reader.activeTabID,{retain:options.readerTabSwitchPaneID==='reader:one'});
+    }});
+  vm.runInContext(actual('closeReaderTab'),h.c);
+  await h.c.closeReaderTab(h.reader,active?'A':'B');
+  assert.equal(h.track.children[0],h.original,'Closing a tab does not insert a loading or blank column.');
+  assert.equal(h.original.body.textContent,'Complete outgoing enacted text');
+  assert.equal(h.track.scrollLeft,17);
+  if(active){
+    assert.equal(transitions,1);assert.equal(h.original.dataset.readerTabPending,'true');
+    h.pending.get('B').resolve(panel('B','Neighboring tab enacted text'));
+    await h.c.workspacePaneHydrator.settled();
+    assert.equal(h.track.children[0].body.textContent,'Neighboring tab enacted text');
+    assert.equal(h.track.children[0].body.scrollTop,425);
+    assert.equal(h.track.scrollLeft,17);
+  }else{
+    assert.equal(transitions,0,'Closing a background tab updates only the tab strip.');
+    assert.equal(h.stopCount,0);assert.equal(shortcuts,1);assert.equal(h.reader.activeTabID,'A');
+  }
+}
+
 // The real chapter selector uses the same retained-pane publication path.
 for (const selectedSection of ['', 'B-section']) {
   const h=harness();h.reader.chapterID='A';h.reader.codePrefix='BC';h.reader.codeVersion='2022';h.reader.scrollPosition={sectionID:'old'};
@@ -245,7 +276,7 @@ assert.match(css,/html\[data-reader-tab-presenting\] \.reader-panel\[data-reader
 assert.doesNotMatch(css,/view-transition-name: reader-tab/);
 {
   const cleared=[],content={__sectionAlignmentTimers:[11,22,33],querySelectorAll:()=>[],closest:()=>null};
-  const c=vm.createContext({window:{clearTimeout:timer=>cleared.push(timer)},cancelReaderScrollRestore(){}});
+  const c=vm.createContext({notebookReferenceTransition:undefined,window:{clearTimeout:timer=>cleared.push(timer)},cancelReaderScrollRestore(){}});
   vm.runInContext(actual('stopReaderProgressiveHydration'),c);
   c.stopReaderProgressiveHydration(content);c.stopReaderProgressiveHydration(content);
   assert.deepEqual(cleared,[11,22,33],'Outgoing passage alignment cannot scroll a retained Reader after another tab is selected');

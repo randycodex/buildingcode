@@ -45,9 +45,9 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     getBoundingClientRect: () => ({ left: 800, right: 801 })
   };
   const context = vm.createContext({ workspaceColumnExpansion: undefined, adjacentColumnWidths,
-    state, track, activeWorkspaceID: 'test', CSS: { escape: value => value }, researchColumnsLayout, notebookColumnsLayout,
+    state, track, notebookReferenceTransition:undefined, activeWorkspaceID: 'test', CSS: { escape: value => value }, researchColumnsLayout, notebookColumnsLayout,
     getComputedStyle:()=>({paddingLeft:'1px',paddingRight:'1px',getPropertyValue:()=> '800px'}),
-    currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400,
+    currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400, reconcileNotebookReferences:()=>false,
     defaultUtilityPaneWidth: 400, defaultResearchPaneWidth: 920,
     assistantHistoryOnlyPane: id => id === 'utility:analysis', paneIsCollapsed: id => collapsed.has(id),
     defaultPaneWidthForID: () => 600, isFlexibleReaderPaneID: id => id.startsWith('reader:'),
@@ -282,6 +282,21 @@ console.log('Evidence pointer resizing and restored widths stay within 300–600
  notebook.context.syncResearchColumnLayout();assert.equal(notebook.widths()[1],600,'A fresh fit preserves the chosen Evidence width.');
 }
 console.log('Notebook reference dividers passed: notepad supplies the extra space, other references stay fixed, caps and saved geometry hold.');
+
+// A compact Notebook has one reference beside Notes and the writing page.
+// Its divider cannot push the page past its minimum or create overflow.
+{
+ const ids=['reader:one','project:notes-index:one','project:notebook:one'];
+ const notebook=fixture(ids,1671);notebook.workflow='notebook';notebook.track.dataset.notebookReferenceMode='shared';
+ ids.forEach((id,index)=>notebook.state.paneWeights[id]=[900,300,2000][index]);
+ notebook.context.syncResearchColumnLayout();assert.deepEqual(notebook.widths(),[300,300,1065]);
+ notebook.context.startPaneResize(notebook.event(566),ids[0],ids[1]);
+ notebook.move(2566);notebook.frame();notebook.finish(2566);
+ assert.deepEqual(notebook.widths(),[565,300,800],'A compact Reader stops at the reserved writing page.');
+ assert.equal(notebook.state.notebookReferenceWidth,565,'Resizing updates the shared Reader/Evidence width.');
+ notebook.track.scrollLeft=100;notebook.context.syncResearchColumnLayout();
+ assert.equal(notebook.track.scrollLeft,0,'The compact Notebook fits without horizontal reference scrolling.');
+}
 
 // Reader uses the same donor, can grow beyond 900px, and stops at an 800px
 // notepad through both its inner divider and outer grip.

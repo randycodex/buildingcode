@@ -120,9 +120,17 @@ console.log('Research v2 view: legacy answer preservation, edition labels, attac
 
 // Both Assistant views expose the same history management without opening a chat while selecting.
 const historyBindings=[],historyPages=[];let selectingHistory=false,openedHistory='',disposedHistory=0;
-const historyManagement={element:new Element('div'),handleKeyDown(){},bindRow(row,button,item){historyBindings.push(item.id);},setConversations(items){historyPages.push(items.map(item=>item.id));},selectConversation(){return selectingHistory;},dispose(){disposedHistory++;}};
-const managedView=createResearchV2View({history:[{id:'one',title:'First chat'},{id:'two',title:'Second chat'}],historyManagement,onOpen:id=>{openedHistory=id;}});
+const historyToolbar=new Element('div');historyToolbar.className='assistant-history-management-toolbar';
+const historyManagement={element:new Element('div'),toolbar:historyToolbar,handleKeyDown(){},bindRow(row,button,item){historyBindings.push(item.id);},setConversations(items){historyPages.push(items.map(item=>item.id));},selectConversation(){return selectingHistory;},dispose(){disposedHistory++;}};
+const managedView=createResearchV2View({history:[{id:'one',title:'First chat'},{id:'two',title:'Second chat'}],historyManagement,onNew(){},onOpen:id=>{openedHistory=id;}});
 assert.deepEqual(historyBindings,['one','two']);assert.deepEqual(historyPages,[['one','two']]);
+const historyTop=managedView.element.querySelector('.rv2-rail-top-row');
+assert.equal(historyTop.children[0].textContent,'New Chat +');
+assert.equal(historyTop.children[1],historyToolbar,'History options sit beside New Chat instead of in a hidden toolbar.');
+assert.equal(historyTop.children[2].className,'icon-button rv2-history-toggle','History options stay immediately left of collapse.');
+const managedRail=managedView.element.querySelector('.rv2-rail');
+assert.equal(managedRail.children[0],historyTop);
+assert.equal(managedRail.children[1],historyManagement.element,'Selection controls follow the top row.');
 const managedFirst=all(managedView.element).find(node=>node.className==='rv2-question-link');
 selectingHistory=true;managedFirst.handlers.click();assert.equal(openedHistory,'','Selection stays in History.');
 selectingHistory=false;managedFirst.handlers.click();assert.equal(openedHistory,'one');
