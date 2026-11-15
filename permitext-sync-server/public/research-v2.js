@@ -1,4 +1,4 @@
-import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=6";
+import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=7";
 import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
 import {researchInlineRuns} from "./research-inline-format.js?v=1";
 // A small view with injected workspace/Reader adapters. No provider calls or

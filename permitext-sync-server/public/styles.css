@@ -1351,7 +1351,8 @@ textarea:focus-visible {
   visibility: hidden;
 }
 .panel-track[data-notebook-column-sizing="fit"] > .notebook-index-panel .notebook-index-actions { padding-inline-end: 0; }
-/* The invisible list boundary still supports resizing. */
+/* Notes has a fixed expanded width; its toggle still collapses the list. */
+.panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"] { pointer-events: none; cursor: default; }
 .panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::before { background: transparent; }
 .panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::before,
 .panel-track[data-notebook-column-sizing="fit"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::after {

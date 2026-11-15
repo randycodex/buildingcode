@@ -1,14 +1,9 @@
-const minimum = 200, maximumWidth = 350, initial = 320, chatMinimum = 320;
+const expandedWidth = 300, collapsedWidth = 35;
 
-export function attachResearchQuestionRail({root, divider, widthStore, toggle, collapsedStore, onCollapse}) {
-  let preferred = initial;
-  try { const saved = Number(widthStore?.read()); if (Number.isFinite(saved) && saved > 0) preferred = Math.max(minimum, Math.min(saved, maximumWidth)); } catch {}
-  let collapsed = false;
+export function attachResearchQuestionRail({root, divider, toggle, collapsedStore, onCollapse}) {
+  let collapsed = false, disposed = false;
   try { collapsed = collapsedStore?.read() === true; } catch {}
-  let drag = null, disposed = false;
   const narrow = () => typeof matchMedia === 'function' && matchMedia('(max-width:680px)').matches;
-  const maximum = () => root.clientWidth > 0 ? Math.min(maximumWidth, Math.max(minimum, root.clientWidth - chatMinimum - 1)) : maximumWidth;
-  const clamp = value => Math.max(minimum, Math.min(value, maximum()));
   const apply = () => {
     if (disposed) return;
     root.classList.toggle('is-history-collapsed', collapsed);
@@ -18,80 +13,28 @@ export function attachResearchQuestionRail({root, divider, widthStore, toggle, c
       toggle.setAttribute('aria-expanded', String(!collapsed));
       toggle.title = label;
     }
-    divider.tabIndex = collapsed ? -1 : 0;
-    divider.setAttribute('aria-disabled', String(collapsed));
     onCollapse?.(collapsed);
-    if (narrow()) return;
-    const width = collapsed ? 35 : clamp(preferred);
-    root.style.setProperty('--rv2-rail-width', `${width}px`);
-    divider.setAttribute('aria-valuemin', String(collapsed ? 35 : minimum));
-    divider.setAttribute('aria-valuemax', String(collapsed ? 35 : Math.floor(maximum())));
-    divider.setAttribute('aria-valuenow', String(Math.round(width)));
-    divider.setAttribute('aria-valuetext', `Questions width ${Math.round(width)} pixels`);
+    if (!narrow()) root.style.setProperty('--rv2-rail-width', `${collapsed ? collapsedWidth : expandedWidth}px`);
   };
-  const save = () => { try { widthStore?.write(preferred); } catch {} };
-  const finish = (cancel = false) => {
-    if (!drag) return;
-    const previous = drag;
-    drag = null;
-    root.classList.toggle('is-question-rail-resizing', false);
-    if (cancel) { preferred = previous.preferred; apply(); }
-    else save();
-    if (divider.hasPointerCapture?.(previous.id)) divider.releasePointerCapture(previous.id);
-  };
-  const down = event => {
-    if (disposed || collapsed || narrow() || event.isPrimary === false || event.button !== 0 || drag) return;
-    event.preventDefault();
-    event.stopPropagation();
-    drag = {id:event.pointerId, x:event.clientX, width:clamp(preferred), preferred};
-    divider.setPointerCapture(event.pointerId);
-    root.classList.toggle('is-question-rail-resizing', true);
-  };
-  const move = event => {
-    if (!drag || event.pointerId !== drag.id) return;
-    preferred = clamp(drag.width + event.clientX - drag.x);
-    apply();
-  };
-  const up = event => { if (drag?.id === event.pointerId) finish(); };
-  const cancel = event => { if (drag?.id === event.pointerId) finish(true); };
-  const lost = event => { if (drag?.id === event.pointerId) finish(); };
-  const key = event => {
-    if (disposed || collapsed || narrow()) return;
-    if (event.key === 'Escape' && drag) { event.preventDefault(); finish(true); return; }
-    const step = event.shiftKey ? 80 : 24;
-    const width = clamp(preferred);
-    const next = event.key === 'ArrowLeft' ? width - step : event.key === 'ArrowRight' ? width + step
-      : event.key === 'Home' ? minimum : event.key === 'End' ? maximum() : null;
-    if (next === null) return;
-    event.preventDefault();
-    event.stopPropagation();
-    preferred = clamp(next);
-    apply();
-    save();
-  };
-  divider.setAttribute('role', 'separator');
-  divider.setAttribute('aria-label', 'Resize Questions and chat');
-  divider.setAttribute('aria-orientation', 'vertical');
-  divider.tabIndex = 0;
+  // The boundary still occupies its layout slot, but the list has a fixed
+  // expanded width. Its dedicated toggle keeps the saved collapse behavior.
+  divider.tabIndex = -1;
+  divider.setAttribute('aria-hidden', 'true');
   const toggleHistory = () => {
     if (disposed || narrow()) return;
-    finish(true);
     collapsed = !collapsed;
     apply();
     try { collapsedStore?.write(collapsed); } catch {}
     toggle?.focus({preventScroll:true});
   };
   toggle?.addEventListener('click', toggleHistory);
-  for (const [type, handler] of Object.entries({pointerdown:down,pointermove:move,pointerup:up,pointercancel:cancel,lostpointercapture:lost,keydown:key})) divider.addEventListener(type, handler);
   const resize = new ResizeObserver(apply);
   resize.observe(root);
   apply();
   return {dispose() {
     disposed = true;
-    finish(true);
     resize.disconnect();
     toggle?.removeEventListener('click', toggleHistory);
-    for (const [type, handler] of Object.entries({pointerdown:down,pointermove:move,pointerup:up,pointercancel:cancel,lostpointercapture:lost,keydown:key})) divider.removeEventListener(type, handler);
   }};
 }
 

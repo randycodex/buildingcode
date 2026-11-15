@@ -54,7 +54,7 @@ export function researchColumnsLayout(widths, availableWidth, fixedWidth = 0, di
 export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0) {
   const available = Math.max(0, availableWidth - dividerWidth);
   const minimums = columns.map(column => column.collapsed ? (column.kind === 'notes' ? 35 : 48) :
-    ({reader:320, evidence:180, notes:200, editor:360}[column.kind] || 180));
+    ({reader:320, evidence:180, notes:300, editor:360}[column.kind] || 180));
   const minimumTotal = minimums.reduce((sum, width) => sum + width, 0);
   if (minimumTotal > available) {
     const notesMinimum = columns.reduce((sum, column, index) => sum + (column.kind === 'notes' ? minimums[index] : 0), 0);
@@ -63,8 +63,8 @@ export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0)
   }
   const editor = columns.findIndex(column => column.kind === 'editor' && !column.collapsed);
   const widths = columns.map((column, index) => column.collapsed || column.kind === 'editor' ? minimums[index] :
-    Math.max(minimums[index], Math.min({reader:Infinity, evidence:600, notes:350}[column.kind] || 360,
-      Number(column.preferredWidth) || {reader:630, evidence:300, notes:220}[column.kind] || 300)));
+    Math.max(minimums[index], Math.min({reader:Infinity, evidence:600, notes:300}[column.kind] || 360,
+      Number(column.preferredWidth) || {reader:630, evidence:300, notes:300}[column.kind] || 300)));
   const requested = widths.reduce((sum, width) => sum + width, 0);
   if (requested > available) {
     const slack = requested - minimumTotal;

@@ -96,7 +96,7 @@ sizing.capturePaneResizeWidths();
 assert.equal(railState.paneWeights[indexID],280,'Resizing other columns must not save the rail width over the expanded list width.');
 railState.notebookListHidden=false;
 sizing.applyPaneWeight(rail,indexID);
-assert.equal(rail.style.flex,'0 0 280px','Reopening restores the preferred width.');
+assert.equal(rail.style.flex,'0 0 300px','Reopening always restores the fixed expanded width.');
 assert.equal(rail.dataset.notebookListCollapsed,'false');
 
 let reducedMotion = false, updates = 0, cancelled = 0;

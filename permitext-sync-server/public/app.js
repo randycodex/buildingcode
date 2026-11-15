@@ -4,8 +4,8 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, open
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=39";
-import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=6";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=40";
+import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=7";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1842";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1843";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -48,7 +48,7 @@ import { createReportSwitch, createReportSourcePreviews, retainReportChildren } 
 import { createWorkspaceViewPresentation } from "./workspace-view-presentation.js?v=5";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=20";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=21";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261114-report-sources-v10";
@@ -171,7 +171,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1842";
+} from "./offline-storage.js?v=20261113-research-notebook-v1843";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -5765,7 +5765,7 @@ function defaultPaneWidthForID(paneID) {
     }
     return Math.max(defaultCodeDecisionPaneWidth, minimumWidthForPaneRole(parsed?.paneRole) || 0);
   }
-  if (paneID.startsWith('project:notes-index:')) return 280;
+  if (paneID.startsWith('project:notes-index:')) return 300;
   if (isProjectWorkboardPaneID(paneID)) return defaultWorkboardPaneWidth;
   if (isProjectNotebookPaneID(paneID)) return defaultNotebookPaneWidth;
   if (isProjectReportDraftPaneID(paneID)) return defaultReportDraftPaneWidth;
@@ -5793,7 +5793,7 @@ function assistantHistoryOnlyPane(paneID) {
 function minimumPaneWidthForID(paneID) {
   const writingMinimum = typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMinimums?.[paneID];
   if (Number.isFinite(writingMinimum)) return writingMinimum;
-  if (paneID?.startsWith('project:notes-index:')) return 200;
+  if (paneID?.startsWith('project:notes-index:')) return 300;
   if (paneID?.startsWith("reader:")) return 630;
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 300;
   if (assistantHistoryOnlyPane(paneID)) return assistantHistoryWidth;
@@ -5804,7 +5804,7 @@ function minimumPaneWidthForID(paneID) {
 function maximumPaneWidthForID(paneID) {
   if (paneID?.startsWith('reader:') && currentColumnWorkflowView() === 'notebook')
     return (typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMaximums?.[paneID]) ?? Infinity;
-  if (paneID?.startsWith('project:notes-index:')) return Math.min(350, (typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMaximums?.[paneID]) ?? 350);
+  if (paneID?.startsWith('project:notes-index:')) return 300;
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 600;
   if (!/^utility:search(?::|$)/.test(paneID || "")) return Infinity;
   const layout = typeof track === "undefined" ? null : track._researchColumnLayout;
@@ -7075,6 +7075,10 @@ function applyPaneWeight(panel, paneID) {
       panel.style.flex = '0 0 35px';
       return;
     }
+    panel.style.setProperty('--pane-resized-min-width', '300px');
+    panel.style.setProperty('--pane-default-min-width', '300px');
+    panel.style.flex = '0 0 300px';
+    return;
   }
   if (panel.classList.contains("is-collapsed")) {
     panel.style.flex = "0 0 48px";
@@ -7139,7 +7143,7 @@ function syncNotebookColumnLayout(panels) {
     resizeMinimums[editor.dataset.paneId] = writingWidth;
     columns.forEach((column, index) => {
       if (column.kind === 'reader') resizeMaximums[visible[index].dataset.paneId] = widths[index] + widths[editorIndex] - writingWidth;
-      if (column.kind === 'notes') resizeMaximums[visible[index].dataset.paneId] = Math.min(350, widths[index] + widths[editorIndex] - writingWidth);
+      if (column.kind === 'notes') resizeMaximums[visible[index].dataset.paneId] = column.collapsed ? 35 : 300;
     });
   }
   track._notebookColumnLayout = {resizeMinimums, resizeMaximums};
@@ -45205,6 +45209,12 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
 function refreshPaneDividerValue(divider) {
   const previousID = divider.dataset.previousPaneId;
   const nextID = divider.dataset.nextPaneId;
+  if (previousID?.startsWith('project:notes-index:') && nextID?.startsWith('project:notebook:')) {
+    divider.classList.add('is-collapse-disabled');
+    divider.setAttribute('aria-disabled', 'true');
+    divider.tabIndex = -1;
+    return;
+  }
   const edge = singleExpandedDividerEdge(previousID, nextID, divider);
   const paneForID = (id) => id ? track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(id)}"]`) : null;
   const previousPane = paneForID(previousID);
