@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, matchesGlob } from "node:path";
 import {
   assertPreparedResearchSemanticIndex, loadPreparedResearchSemanticVectors,
   preparedResearchSemanticArtifactVersion, preparedResearchSemanticManifestPath,
@@ -117,10 +117,12 @@ try {
   assert(!preparedResearchSemanticVectorPath.includes("/public/"));
   assert.equal(dirname(preparedResearchSemanticVectorPath), dirname(preparedResearchSemanticManifestPath));
   const config = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8"));
-  assert(config.buildCommand.includes("node scripts/verify-prepared-research-assets.mjs"));
+  const packageJSON = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+  const buildCommand = config.buildCommand === "npm run build:production" ? packageJSON.scripts["build:production"] : config.buildCommand;
+  assert(buildCommand.includes("node scripts/verify-prepared-research-assets.mjs"));
   const include = config.functions["api/index.mjs"].includeFiles;
-  assert(include.includes("prepared/research-semantic/current-vectors.bin"));
-  assert(include.includes("prepared/research-semantic/current-vectors-manifest.json"));
+  assert(matchesGlob("prepared/research-semantic/current-vectors.bin", include));
+  assert(matchesGlob("prepared/research-semantic/current-vectors-manifest.json", include));
   assert(!include.includes("CodeContent"), "Vector packaging must not duplicate canonical content includes");
   const bundle = await inspectPreparedResearchFunctionBundle(dirname(vectorPath), { maximumBytes: 10000 });
   assert(bundle.bytes > binary.length && bundle.headroomBytes > 0);

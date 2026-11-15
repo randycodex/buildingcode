@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "artifactVersion": "20261003-private-current-corpus-v1",
   "vectorFile": "current-vectors.bin",
-  "byteLength": 55194320,
-  "sha256": "f38c71f84c81ca207b78576e624ead85c642eaeb6b4eb9e4c86a93af8d661c6c",
+  "byteLength": 56703344,
+  "sha256": "cc13dc759d7298729756001af771adccfb3dffbd204863f996cd8eb355117f77",
   "model": "text-embedding-3-small",
   "dimensions": 256,
   "embeddingTextVersion": "20261002-passage-title-context-v1",
   "passageIndexVersion": "20261007-published-text-context-v7",
-  "inputCount": 52267,
-  "currentCorpusFingerprint": "75f38d02c17f8344cec7e7f52b79d5834fc970446a2fa728c8306a9a65016cb5",
+  "inputCount": 53696,
+  "currentCorpusFingerprint": "75409e1b1ebfdb05eef4a2b3ea41fbf1222112aeda2367169c8180017186d20c",
   "currentCorpora": [
     {
       "id": "nyc-2022-construction-codes",
@@ -156,31 +156,31 @@
       ]
     },
     {
-      "fingerprint": "2eef070686a7973afa148d50276f95ea75796cd1957192b28b6bb2d4da0470a9",
-      "passageCount": 28013,
+      "fingerprint": "3506a6cb7f033cc88a0e343fa026c1521eb7832bc505b5cb3495182f8ec8a8dc",
+      "passageCount": 29565,
       "corpusIDs": [
         "nyc-zoning-resolution"
       ]
     },
     {
-      "fingerprint": "f603ee759e3b38d09e95640a35f095d334c7aed10a55ae4b5f5cb203b54d4f22",
-      "passageCount": 48197,
+      "fingerprint": "2f882d8cdfcaedcf738c2877cd695479030a1314098af38a6356cb9c64cd4d99",
+      "passageCount": 49749,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-zoning-resolution"
       ]
     },
     {
-      "fingerprint": "f3a28111f0e4b9922d86a7b4f0f9ff712cc16a1cfd5e84121ab23be08ebbd888",
-      "passageCount": 32714,
+      "fingerprint": "2969c180111e9ca564a94a72e46c45fc3549fdef5e1880f959390c36e2f3cbf0",
+      "passageCount": 34266,
       "corpusIDs": [
         "nyc-2022-fire-code",
         "nyc-zoning-resolution"
       ]
     },
     {
-      "fingerprint": "976da796748ac8fb9ee50ce589702740230974b68282cb602c33bac1f92732d6",
-      "passageCount": 52898,
+      "fingerprint": "50cdab9ec8c14e5a074cc36a3e3fc1382358e0a209207229033deb15b16d58d4",
+      "passageCount": 54450,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-2022-fire-code",
@@ -188,16 +188,16 @@
       ]
     },
     {
-      "fingerprint": "81e5604faeea5725063118cfe448da4adfd46501eb3185751bc6238723a33c47",
-      "passageCount": 29687,
+      "fingerprint": "1cf73cfd4775a040de62a27acaa61ca0e93ee684f69ea2881c668c01b0700774",
+      "passageCount": 31239,
       "corpusIDs": [
         "nyc-2025-energy-code",
         "nyc-zoning-resolution"
       ]
     },
     {
-      "fingerprint": "c1ebfef8426441dfce8b7e16f2cfdff1b7b17e4220614c5b375605093f36eb7f",
-      "passageCount": 49871,
+      "fingerprint": "62cec14cd7cbf361d566dd03c75db664fec8018a9c1608f79c5ec7db961fc63b",
+      "passageCount": 51423,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-2025-energy-code",
@@ -205,8 +205,8 @@
       ]
     },
     {
-      "fingerprint": "ba8ed7f56b75335d3b0b4b56618ac81172108ed0af1a053ea84d08ea83b08196",
-      "passageCount": 34388,
+      "fingerprint": "ab1f305f3d47fdc0424cdced852668e7832e814adcfe48242a91eb00129714bf",
+      "passageCount": 35940,
       "corpusIDs": [
         "nyc-2022-fire-code",
         "nyc-2025-energy-code",
@@ -214,8 +214,8 @@
       ]
     },
     {
-      "fingerprint": "da4032cd5e982b5ed958a8f86b48d464ce484665d01b614bbae311b7ada2d32c",
-      "passageCount": 54572,
+      "fingerprint": "36aef52ebed2b99bb42c7c8add1096b344cd42a33b32bfb1e305d23e0235e21a",
+      "passageCount": 56124,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-2022-fire-code",
@@ -224,16 +224,16 @@
       ]
     },
     {
-      "fingerprint": "a961f75930e64bc0eeb60af199482f150cba41b6850ce0a949f8f42a5642df96",
-      "passageCount": 28360,
+      "fingerprint": "556685d966e222879be22796bf47abbb893c50ef463dd00b62f20dc0b5145b55",
+      "passageCount": 29912,
       "corpusIDs": [
         "nyc-2025-electrical-amendments",
         "nyc-zoning-resolution"
       ]
     },
     {
-      "fingerprint": "90ccb5dbb55df267e83ff75c04561c22a8687e52b05bac7496021ef543d0bd7f",
-      "passageCount": 48544,
+      "fingerprint": "9fc5e4d2a7a1e03f93b2f97414ba767e74278e8a9dfb28819e9fe86f380b66d9",
+      "passageCount": 50096,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-2025-electrical-amendments",
@@ -241,8 +241,8 @@
       ]
     },
     {
-      "fingerprint": "497aec54aaf4669fd4733ce2b4c63e13b7cc2c7e367837c38380e07e8861a07f",
-      "passageCount": 33061,
+      "fingerprint": "1e848695e2128ca436f8d568c8aae0025132bd5834d1b0b845ff6bc9ec220fb5",
+      "passageCount": 34613,
       "corpusIDs": [
         "nyc-2022-fire-code",
         "nyc-2025-electrical-amendments",
@@ -250,8 +250,8 @@
       ]
     },
     {
-      "fingerprint": "dfa151be1678a7a8b546e310a54931df17eb0479c53847cda451698e83d23124",
-      "passageCount": 53245,
+      "fingerprint": "7a1ba2510d13d96e6f49aac9b64b838467ae61a54c9d239ce7f2dc47dbbefe11",
+      "passageCount": 54797,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-2022-fire-code",
@@ -260,8 +260,8 @@
       ]
     },
     {
-      "fingerprint": "72507b4cc677c0bc84e8fa2a53dd6dbf4f6823253ef93df3dc6e4b9685cabf9f",
-      "passageCount": 30034,
+      "fingerprint": "a1ea25398bafc1acdc231e3eaadf8c995f5e21b0668aa76855b95822106439ad",
+      "passageCount": 31586,
       "corpusIDs": [
         "nyc-2025-electrical-amendments",
         "nyc-2025-energy-code",
@@ -269,8 +269,8 @@
       ]
     },
     {
-      "fingerprint": "706d0c4c8b4e464f0bc58cfc0e1dd9b795aee9e71aa5ee1218698f841a5bbc75",
-      "passageCount": 50218,
+      "fingerprint": "2f1dae05a64b13269efbe951393e8cfed2579c3fa5acd04dbac0ece3bf18299f",
+      "passageCount": 51770,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-2025-electrical-amendments",
@@ -279,8 +279,8 @@
       ]
     },
     {
-      "fingerprint": "de6f9624363b61d6a5fa0ea70ed8d03db57f4293b1e8d16b2c2f275433b28692",
-      "passageCount": 34735,
+      "fingerprint": "6b1d5d775e11dd12436fbb0fe6bed0f695a4d9c1eae22300b19ee97c81095ba3",
+      "passageCount": 36287,
       "corpusIDs": [
         "nyc-2022-fire-code",
         "nyc-2025-electrical-amendments",
@@ -289,8 +289,8 @@
       ]
     },
     {
-      "fingerprint": "75f38d02c17f8344cec7e7f52b79d5834fc970446a2fa728c8306a9a65016cb5",
-      "passageCount": 54919,
+      "fingerprint": "75409e1b1ebfdb05eef4a2b3ea41fbf1222112aeda2367169c8180017186d20c",
+      "passageCount": 56471,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-2022-fire-code",

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:research-semantic-maintenance": "node tests/research-semantic-maintenance.mjs && node tests/research-semantic-artifact-contract.mjs && node tests/research-semantic-passages-contract.mjs",
     "test:internal-review-reset": "node tests/internal-review-reset.mjs && node tests/research-feedback-contract.mjs && node tests/research-economics-persistence-contract.mjs && node tests/research-trust-boundary-contract.mjs",
     "test:research-spend": "node tests/research-spend-report.mjs && node tests/research-provider-cost-usage-contract.mjs && node tests/research-economics-persistence-contract.mjs",
     "test:research-spend:postgres": "node tests/postgres-research-spend.mjs",
