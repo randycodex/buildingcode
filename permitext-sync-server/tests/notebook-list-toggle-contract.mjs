@@ -34,27 +34,45 @@ let view = 'notebook', allowed = true, saves = 0, transitions = 0;
 const context = vm.createContext({
   state, document:{createElement:tag => new Element(tag), querySelector:() => null},
   // Deferred panels are built before they belong to the workspace track.
-  track:{querySelector:() => null}, applyPaneWeight() {},
+  track:{querySelector:() => null,querySelectorAll:()=>[]}, applyPaneWeight() {},
   workspacePrivatePresentationAllowed:() => allowed, hasCapability:() => allowed,
   workspaceProject:() => project, projectDetailKey:value => value?.id || '',
+  captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',
   currentWorkflowView:() => view, currentColumnWorkflowView:() => view, isProAccount:() => true,
+  paneCanCollapse:() => false,
   selectedNotebookColumn:() => ({id:'editor',cardID:'a'}), notebookColumnPaneID:() => editorID,
   isProjectNotebookPaneID:id => id.startsWith('project:notebook:'),
   notebookCatalogs:new Map([['project',[{id:'a',title:'Note A'},{id:'b',title:'Note B'}]]]),
   notebookCatalogRequests:new Map(), saveWorkspaceState(){saves++;},
+  notebookIndexTitleScroll:null, attachResearchHistoryTitleScroll:() => ({refresh(){}}),
+  projectToolTogglePending:false, prependWorkspaceButtonIcon() {},
   async transitionWorkspace(mode){assert.equal(mode,'utility'); transitions++;}
 });
-vm.runInContext(['notebookIndexPaneID','renderNotebookIndex','syncNotebookLanding','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
+vm.runInContext(['researchHistoryDayIndex','researchConversationHistoryGroups','notebookHistoryGroups',
+  'notebookIndexPaneID','updateNotebookListToggle','createNotebookListToggle','renderNotebookIndex','syncNotebookLanding',
+  'paneIsCollapsed','transitionNotebookList','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
 const panel = context.renderNotebookIndex(project);
+const localToggle = panel.querySelector('.notebook-list-toggle');
+assert.equal(localToggle.attrs['aria-label'],'Hide notes list');
+assert.equal(localToggle.attrs['aria-expanded'],'true');
 const list = panel.querySelector('.notebook-index-body');
 assert.deepEqual(list.querySelectorAll('li').map(node => node.textContent), ['Note A','Note B'], 'A newly reopened deferred panel renders existing notes before mounting.');
-assert.ok(list.querySelectorAll('button').some(node => node.textContent === 'New note'));
+assert.equal(list.querySelector('.notebook-index-create').textContent,'New note +');
+assert.equal(list.querySelector('.notebook-index-group-label').textContent,'Older','Unknown dates are not presented as recent.');
+context.notebookCatalogs.get('project')[0].updatedAt=new Date().toISOString();
+context.syncNotebookLanding(null,panel);
+assert.equal(list.querySelector('.notebook-index-group-label').textContent,'7 days','A changed edit date refreshes grouping even when its title is unchanged.');
 const indexID = context.notebookIndexPaneID(project);
 await context.toggleNotebookList();
-assert.equal(context.workflowPaneIsVisible(indexID), false);
+assert.equal(context.workflowPaneIsVisible(indexID), true, 'The collapsed list remains mounted as a rail.');
+assert.equal(context.paneIsCollapsed(indexID), true);
 assert.equal(context.workflowPaneIsVisible(editorID), true, 'Hiding the list leaves the selected note visible.');
+context.updateNotebookListToggle(localToggle);
+assert.equal(localToggle.attrs['aria-label'],'Show notes list');
+assert.equal(localToggle.attrs['aria-expanded'],'false');
 await context.toggleNotebookList();
 assert.equal(context.workflowPaneIsVisible(indexID), true);
+assert.equal(context.paneIsCollapsed(indexID), false);
 assert.equal(saves, 2); assert.equal(transitions, 2);
 allowed = false;
 assert.equal(await context.toggleNotebookList(), false);
@@ -62,3 +80,112 @@ allowed = true; view = 'research';
 assert.equal(await context.toggleNotebookList(), false);
 assert.equal(saves, 2, 'Unavailable tools and other working views cannot change list visibility.');
 console.log('Notes list toggle passed: immediate deferred contents, independent editor visibility, persistence and access/view guards.');
+
+const railState = {notebookListHidden:true,paneWeights:{[indexID]:280}};
+const rail = {dataset:{paneId:indexID},style:{setProperty(key,value){this[key]=value;}},
+  classList:{contains:()=>false},getBoundingClientRect:()=>({width:35})};
+const sizing = vm.createContext({state:railState,currentColumnWorkflowView:()=> 'notebook',
+  minimumPaneWidthForID:()=>200,defaultPaneWidthForID:()=>280,migrateLegacyPaneWidth:(_id,value)=>value,
+  assistantHistoryOnlyPane:()=>false,isFlexibleReaderPaneID:()=>false,paneCanCollapse:()=>false,
+  workspaceColumnExpansion:null,track:{querySelectorAll:()=>[rail]}});
+vm.runInContext(['applyPaneWeight','paneIsCollapsed','capturePaneResizeWidths'].map(actual).join('\n'),sizing);
+sizing.applyPaneWeight(rail,indexID);
+assert.equal(rail.style.flex,'0 0 35px');
+assert.equal(rail.dataset.notebookListCollapsed,'true');
+sizing.capturePaneResizeWidths();
+assert.equal(railState.paneWeights[indexID],280,'Resizing other columns must not save the rail width over the expanded list width.');
+railState.notebookListHidden=false;
+sizing.applyPaneWeight(rail,indexID);
+assert.equal(rail.style.flex,'0 0 300px','Reopening always restores the fixed expanded width.');
+assert.equal(rail.dataset.notebookListCollapsed,'false');
+
+let reducedMotion = false, updates = 0, cancelled = 0;
+let widths=[280,1000],padding='24px';
+const motionClasses = new Set(), motions = [];
+function animate(frames,options) {
+  let finish,reject;
+  const finished=new Promise((resolve,fail)=>{finish=resolve;reject=fail;});
+  motions.push({frames,options,finish});
+  return {finished,cancel(){cancelled++;reject(Error('Animation interrupted'));}};
+}
+const livePanels=[0,1].map(index=>({isConnected:true,index,animate,getBoundingClientRect:()=>({width:widths[index]})}));
+const motion = vm.createContext({track:{querySelectorAll:()=>livePanels},
+  window:{matchMedia:()=>({matches:reducedMotion})},
+  getComputedStyle:element=>({paddingInlineStart:element.index===0?padding:'24px',paddingInlineEnd:element.index===0?padding:'24px'}),
+  document:{documentElement:{classList:{add:name=>motionClasses.add(name),remove:name=>motionClasses.delete(name)}},
+    startViewTransition(){assert.fail('The live heading must never be replaced with a snapshot.');}}});
+vm.runInContext(actual('transitionNotebookList'),motion);
+const firstMotion = motion.transitionNotebookList(()=>{updates++;widths=[35,1245];padding='0px';});
+await Promise.resolve();
+assert.equal(motions.length,2,'Only the two live columns animate; the heading stays anchored.');
+assert.equal(motions[0].frames[0].flexBasis,'280px');assert.equal(motions[0].frames[1].flexBasis,'35px');
+// A quick reversal starts from the pixels currently on screen, before the
+// previous animation is cancelled back to its underlying final geometry.
+widths=[150,1130];padding='11px';
+const secondMotion = motion.transitionNotebookList(()=>{updates++;widths=[280,1000];padding='24px';});
+await firstMotion;
+assert.equal(cancelled,2,'A quick second toggle interrupts the earlier live motion.');
+assert(motionClasses.has('notes-list-motion'),'An older completion cannot clear the newer transition.');
+assert.equal(motions[2].frames[0].flexBasis,'150px');
+motions.slice(2).forEach(animation=>animation.finish());await secondMotion;
+assert.equal(updates,2);assert.equal(motionClasses.size,0);
+assert(motions.every(animation=>animation.options.duration===260&&animation.frames.every(frame=>!('opacity' in frame)&&!('transform' in frame))),
+  'Live titles retain full opacity and their font size throughout the resize.');
+reducedMotion=true;
+await motion.transitionNotebookList(()=>{updates++;});
+assert.equal(motions.length,4,'Reduced motion changes visibility without starting an animation.');
+assert.equal(updates,3);
+reducedMotion=false;
+await assert.rejects(motion.transitionNotebookList(()=>{throw Error('Update failed');}),/Update failed/);
+assert.equal(motionClasses.size,0,'A failed update cannot leave motion styles active.');
+console.log('Notes rail passed: 35px collapse, retained width, live titles without snapshots/fades, interrupted transitions, cleanup and reduced motion.');
+
+// Notebook is a permanent writing area, including older saved layouts that
+// closed it and the transition after its last active Note moves to Trash.
+const retained = {notebooks:[project], notebookColumns:[{id:'primary',cardID:'removed',open:true,selected:true}]};
+let reopened = 0;
+let blankPages = 0;
+const permanent = vm.createContext({state:retained, workspaceProject:()=>project,
+  currentColumnWorkflowView:()=> 'notebook',
+  notebookColumnsForProject:()=>retained.notebookColumns,
+  notebookColumnPaneID:column=>column.id,
+  notebookColumnMounts:new Map([['primary',{async createLocalNote(options) {
+    assert.equal(options.retiredCardID,'removed'); blankPages++;
+  }}]]),
+  openNotebooks:()=>retained.notebooks,projectDetailMatches:(a,b)=>a.id===b.id,
+  savedInstanceForPaneID:()=>({}),primarySavedPaneID:()=> 'evidence',
+  projectHasOpenNotebook:()=>false,openProjectNotebook:async()=>{reopened++;},
+  saveWorkspaceState(){},transitionWorkspace:async()=>{},syncNotebookNoteTabs(){}});
+vm.runInContext(['prepareNotebookView','retireNotebookNoteColumns','closeProjectNotebook','closeNotebookNoteColumn'].map(actual).join('\n'),permanent);
+await permanent.prepareNotebookView({openNote:false});
+assert.equal(reopened,1,'Returning to Notebook restores its writing area even after a saved close.');
+assert.equal(await permanent.closeProjectNotebook(project),false);
+assert.equal(await permanent.closeNotebookNoteColumn(project,'primary'),false);
+await permanent.retireNotebookNoteColumns(project,'removed');
+assert.equal(retained.notebookColumns[0].open,true);
+assert.equal(retained.notebookColumns[0].cardID,'');
+assert.equal(retained.notebookColumns[0].newNote,true,'The final removed Note leaves a fresh, unsaved writing page.');
+assert.equal(retained.notebooks[0],project);
+assert.equal(blankPages,1,'A retained editor opens the blank page immediately instead of keeping a placeholder.');
+console.log('Permanent notepad passed: reopen saved layouts, reject close actions and retain a blank page after final Note removal.');
+
+const now=new Date('2026-11-14T12:00:00');
+const notes=[
+ {id:'today',createdAt:'2020-01-01T12:00:00',updatedAt:'2026-11-14T12:00:00'},
+ {id:'six-days',updatedAt:'2026-11-08T12:00:00'},
+ {id:'seven-days',updatedAt:'2026-11-07T12:00:00'},
+ {id:'thirteen-days',updatedAt:'2026-11-01T12:00:00'},
+ {id:'fourteen-days',updatedAt:'2026-10-31T12:00:00'},
+ {id:'twenty-nine-days',updatedAt:'2026-10-16T12:00:00'},
+ {id:'thirty-days',updatedAt:'2026-10-15T12:00:00'},
+ {id:'prior-year',updatedAt:'2025-11-01T12:00:00'},
+ {id:'undated',updatedAt:'unavailable'},
+ {id:'',column:{id:'local-draft'}}
+];
+const before=JSON.stringify(notes),groups=context.notebookHistoryGroups(notes,now);
+assert.deepEqual(Array.from(groups,group=>group.id),['last-7-days','previous-7-days','previous-30-days','month-2026-10','year-2025','older','drafts']);
+assert.deepEqual(Array.from(groups.slice(0,3),group=>Array.from(group.cards,card=>card.id)),
+ [['today','six-days'],['seven-days','thirteen-days'],['fourteen-days','twenty-nine-days']]);
+assert.equal(groups[0].cards[0],notes[0]);assert.equal(JSON.stringify(notes),before,'Presentation grouping preserves original Note records and creation dates.');
+assert.equal(context.notebookHistoryGroups([{id:'fallback',updatedAt:'invalid',createdAt:'2026-11-10T12:00:00'}],now)[0].id,'last-7-days');
+console.log('Notebook date groups passed: Assistant buckets, latest edit dates, creation fallback, day boundaries, month/year groups, undated Notes and local drafts.');

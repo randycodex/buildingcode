@@ -18,9 +18,11 @@ export function normalizeNotebookQuestions(value = []) {
     ids.add(id);
     const status = question.status || 'open';
     if (!['open', 'resolved'].includes(status)) throw new Error('Invalid question status.');
-    return {id, text: text(question.text, 'question', 1000, true),
+    const kind = question.kind || 'question';
+    if (!['question','action'].includes(kind)) throw new Error('Invalid Note item kind.');
+    return {id, ...(kind === 'action' ? {kind} : {}), ...(question.includeInReport === true ? {includeInReport:true} : {}), text: text(question.text, 'question', 1000, true),
       why: text(question.why, 'question context', 2000), status,
-      resolution: text(question.resolution, 'resolution explanation', 4000, status === 'resolved')};
+      resolution: text(question.resolution, 'resolution explanation', 4000, status === 'resolved' && kind === 'question')};
   });
 }
 
@@ -30,8 +32,8 @@ export function openNotebookQuestions(card) {
 
 export function notebookQuestionsText(questions = []) {
   if (!questions.length) return '';
-  return ['Questions and verification', ...questions.map(question => [
-    `${question.status === 'resolved' ? 'Resolved' : 'Open'}: ${question.text}`,
+  return ['Questions and actions', ...questions.map(question => [
+    `${question.kind === 'action' ? 'Action' : 'Question'} · ${question.status === 'resolved' ? 'Resolved' : 'Open'}: ${question.text}`,
     question.why ? `Why it matters: ${question.why}` : '',
     question.resolution ? `Resolution: ${question.resolution}` : ''
   ].filter(Boolean).join('\n')), 'Resolution records research progress; it does not certify compliance.'].join('\n\n');
@@ -46,6 +48,7 @@ export function createNotebookQuestionsEditor({questions = [], readOnly = false,
   status.setAttribute('role', 'status');
   let current = structuredClone(questions);
   let editingID = null;
+  let editingKind = 'question';
   const commit = next => {
     try {
       const normalized = normalizeNotebookQuestions(next);
@@ -74,24 +77,29 @@ export function createNotebookQuestionsEditor({questions = [], readOnly = false,
   };
   const render = () => {
     const count = openNotebookQuestions({openQuestions: current}).length;
-    summary.textContent = `${count} open ${count === 1 ? 'question' : 'questions'}`;
+    summary.textContent = `Questions and checklist · ${count} open`;
     body.replaceChildren(); status.textContent = '';
     const hint = document.createElement('p');
     hint.className = 'notebook-questions-hint';
-    hint.textContent = 'Questions use this Note’s linked evidence and Assistant answers. Resolution records research progress, not compliance approval.';
+    hint.textContent = 'Questions record what you need to know. Checklist items record what you need to do. Select which items to include in Report.';
     body.append(hint);
     for (const question of current) {
       const row = document.createElement('article');
       row.className = 'notebook-question';
       const heading = document.createElement('strong');
-      heading.textContent = `${question.status === 'resolved' ? 'Resolved' : 'Open'} · ${question.text}`;
+      heading.textContent = `${question.kind === 'action' ? 'Action' : 'Question'} · ${question.status === 'resolved' ? 'Resolved' : 'Open'} · ${question.text}`;
       row.append(heading);
       for (const [label, value] of [['Why it matters', question.why], ['Resolution', question.resolution]]) {
         if (!value) continue;
         const paragraph = document.createElement('p'); paragraph.textContent = `${label}: ${value}`; row.append(paragraph);
       }
-      if (!readOnly) row.append(button('Edit question', () => { editingID = question.id; render(); }),
+      const reportLabel = document.createElement('label');
+      const include = document.createElement('input'); include.type = 'checkbox'; include.checked = question.includeInReport === true; include.disabled = readOnly;
+      include.addEventListener('change', () => commit(current.map(item => item.id === question.id ? {...item,includeInReport:include.checked} : item)));
+      reportLabel.append(include, 'Include in Report'); row.append(reportLabel);
+      if (!readOnly) row.append(button('Edit item', () => { editingID = question.id; editingKind = question.kind || 'question'; render(); }),
         button('Remove question', () => remove(question.id)),
+        ...(question.kind === 'action' && question.status === 'open' ? [button('Mark completed', () => commit(current.map(item => item.id === question.id ? {...item,status:'resolved'} : item)))] : []),
         ...(question.status === 'resolved' ? [button('Reopen', () => commit(current.map(item => item.id === question.id ? {...item, status: 'open'} : item)))] : []));
       body.append(row);
     }
@@ -101,7 +109,7 @@ export function createNotebookQuestionsEditor({questions = [], readOnly = false,
       const form = document.createElement('form');
       form.className = 'notebook-question-form';
       const fields = {};
-      for (const [key, label, maximum] of [['text', 'Question', 1000], ['why', 'Why it matters', 2000], ['resolution', 'Resolution explanation or source', 4000]]) {
+      for (const [key, label, maximum] of [['text', editingKind === 'action' ? 'Action' : 'Question', 1000], ['why', 'Why it matters', 2000], ['resolution', 'Resolution explanation or source', 4000]]) {
         const wrapper = document.createElement('label'); wrapper.textContent = label;
         const input = document.createElement('textarea'); input.rows = key === 'text' ? 2 : 3;
         input.maxLength = maximum; input.required = key === 'text'; input.value = previous?.[key] || '';
@@ -109,13 +117,13 @@ export function createNotebookQuestionsEditor({questions = [], readOnly = false,
       }
       const resolvedLabel = document.createElement('label');
       const resolved = document.createElement('input'); resolved.type = 'checkbox'; resolved.checked = previous?.status === 'resolved';
-      resolvedLabel.append(resolved, 'Mark resolved'); form.append(resolvedLabel);
-      resolved.addEventListener('change', () => { fields.resolution.required = resolved.checked; });
-      fields.resolution.required = resolved.checked;
-      const save = document.createElement('button'); save.type = 'submit'; save.className = 'notebook-secondary-action'; save.textContent = 'Save question';
+      resolvedLabel.append(resolved, editingKind === 'action' ? 'Mark completed' : 'Mark resolved'); form.append(resolvedLabel);
+      resolved.addEventListener('change', () => { fields.resolution.required = resolved.checked && editingKind === 'question'; });
+      fields.resolution.required = resolved.checked && editingKind === 'question';
+      const save = document.createElement('button'); save.type = 'submit'; save.className = 'notebook-secondary-action'; save.textContent = 'Save item';
       form.append(save, button('Remove question', () => remove(questionID)));
       const capture = () => {
-        const next = {id: questionID, text: fields.text.value, why: fields.why.value,
+        const next = {...previous, id: questionID, kind:editingKind, text: fields.text.value, why: fields.why.value,
           resolution: fields.resolution.value, status: resolved.checked ? 'resolved' : 'open'};
         const items = current.some(item => item.id === questionID)
           ? current.map(item => item.id === questionID ? next : item) : [...current, next];
@@ -127,16 +135,30 @@ export function createNotebookQuestionsEditor({questions = [], readOnly = false,
       form.addEventListener('change', capture);
       form.addEventListener('submit', event => {
         event.preventDefault();
-        const next = {id: questionID, text: fields.text.value, why: fields.why.value,
+        const next = {...previous, id: questionID, kind:editingKind, text: fields.text.value, why: fields.why.value,
           resolution: fields.resolution.value, status: resolved.checked ? 'resolved' : 'open'};
         commit(current.some(item => item.id === questionID) ? current.map(item => item.id === questionID ? next : item) : [...current, next]);
       });
       body.append(form);
     } else if (!readOnly && current.length < 40) {
-      body.append(button('Add question', () => { editingID = ''; render(); }));
+      body.append(button('Add question', () => { editingID = ''; editingKind = 'question'; section.open = true; render(); }),
+        button('Add checklist item', () => { editingID = ''; editingKind = 'action'; section.open = true; render(); }));
     }
     body.append(status);
   };
   section.append(summary, body); render();
   return section;
+}
+
+// Report reads a snapshot, with only the question/action items the author chose.
+export function notebookReportDocument(document, questions = []) {
+  if (!Array.isArray(document?.document)) return document;
+  const selected = questions.filter(item => item.includeInReport === true);
+  if (!selected.length) return document;
+  return {...document, document:[...document.document,
+    {type:'heading',props:{level:2},content:[{type:'text',text:'Questions and actions',styles:{}}]},
+    ...selected.map(item => ({type:'paragraph',content:[{type:'text',text:[
+      `${item.kind === 'action' ? 'Action' : 'Question'} · ${item.status === 'resolved' ? 'Resolved' : 'Open'} · ${item.text}`,
+      item.why, item.resolution
+    ].filter(Boolean).join('\n'),styles:{}}]}))]};
 }

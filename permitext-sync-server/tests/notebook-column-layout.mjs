@@ -3,20 +3,29 @@ import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
 import {notebookColumnsLayout} from '../public/workflow-views.js';
 const columns=[{kind:'reader',preferredWidth:900},{kind:'evidence',preferredWidth:600},{kind:'notes',preferredWidth:480},{kind:'editor',preferredWidth:3000}];
-for(const width of [1920]) {
+for(const width of [1000,1920,3054]) {
  const fitted=notebookColumnsLayout(columns,width,5);
  assert.equal(fitted.length,4);assert.ok(fitted.every(value=>value>0));
  assert.ok(Math.abs(fitted.reduce((sum,value)=>sum+value,0)+5-width)<0.001,'Every column fits without horizontal overflow');
+ assert.equal(fitted[2],300,'Expanded Notes stays exactly 300px at every desk width.');
  if(width>=1920)assert.ok(fitted[3]>=360,'The editor receives the remaining writing space');
 }
 const wide=notebookColumnsLayout(columns,1920,5);
-assert.ok(wide[2]>280,'Notes uses its requested width instead of the former 280px cap');
+assert.equal(wide[2],300,'Older saved widths do not change the fixed Notes width.');
 for(const missing of ['reader','evidence','notes']) {
  const visible=columns.filter(column=>column.kind!==missing),sizes=notebookColumnsLayout(visible,1920,4);
  assert.ok(Math.abs(sizes.reduce((sum,width)=>sum+width,0)+4-1920)<0.001);
  assert.ok(sizes[visible.findIndex(column=>column.kind==='editor')]>wide[3],'Closing a reference column gives its space to the editor');
 }
 assert.deepEqual(notebookColumnsLayout([{kind:'reader',collapsed:true},{kind:'editor'}],1920,3),[48,1869]);
+const withRail=[{kind:'reader',preferredWidth:630},{kind:'evidence',preferredWidth:600},{kind:'notes',collapsed:true,preferredWidth:280},{kind:'editor'}];
+assert.deepEqual(notebookColumnsLayout(withRail,3054,5),[630,600,35,1784],'Only the notepad gains space when Notes becomes a 35px rail.');
+assert.equal(notebookColumnsLayout(withRail,700,5)[2],35,'The rail keeps its exact width in a constrained desk.');
+assert.deepEqual(notebookColumnsLayout(withRail.map(column=>({...column,collapsed:false})),3054,5),[630,600,300,1519],'Reopening restores Notes without changing Reader or Evidence.');
+assert.deepEqual(notebookColumnsLayout([
+ {kind:'reader',preferredWidth:1399},{kind:'evidence',preferredWidth:550},
+ {kind:'notes',preferredWidth:350},{kind:'editor',preferredWidth:800}
+],3054,5),[1399,550,300,800],'A manually widened Reader survives fitting with both lists fixed and an 800px notepad.');
 assert.equal(columns[1].preferredWidth,600,'Fitting does not overwrite saved width preferences');
 console.log('Notebook fitting passed: four visible columns, responsive widths, remaining editor space, hidden columns, collapsed rails and unchanged preferences.');
 
@@ -41,8 +50,7 @@ console.log('Notebook fitting passed: four visible columns, responsive widths, r
  view='research';context.syncNotebookColumnLayout(panels);assert.equal(track.dataset.notebookColumnSizing,undefined);
  assert.ok(panels.every(panel=>!panel.dataset.notebookSized));assert.equal(panels[0].style.flex,'0 0 900px');assert.equal(JSON.stringify(state),before);
 }
-// With only Notes and the editor, the list can consume unused editor space
-// until the existing 800px writing page and its 36px gutters remain.
+// Notes stays fixed while retaining the writing space and old preferences.
 {
  const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
  const actual=name=>{const start=source.indexOf(`function ${name}(`);return source.slice(start,source.indexOf('\n}',start)+2);};
@@ -54,12 +62,14 @@ console.log('Notebook fitting passed: four visible columns, responsive widths, r
   getComputedStyle:()=>({paddingLeft:'1px',paddingRight:'1px',getPropertyValue:()=> '800px'}),defaultPaneWidthForID:()=>600,applyPaneWeight(){}});
  vm.runInContext(['syncNotebookColumnLayout','minimumPaneWidthForID','maximumPaneWidthForID'].map(actual).join('\n'),context);
  context.syncNotebookColumnLayout(panels);
- assert.equal(context.maximumPaneWidthForID(ids[0]),1081);assert.equal(context.minimumPaneWidthForID(ids[1]),836);
+ assert.equal(context.maximumPaneWidthForID(ids[0]),300);assert.equal(context.minimumPaneWidthForID(ids[0]),300);assert.equal(context.minimumPaneWidthForID(ids[1]),800);
  state.paneWeights[ids[0]]=1081;context.syncNotebookColumnLayout(panels);
- assert.equal(panels[0].style.flex,'0 0 1081px');assert.equal(panels[1].style.flex,'0 0 836px');
- assert.equal(context.maximumPaneWidthForID(ids[0]),1081,'The resize limit remains stable at the writing width');
+ assert.equal(panels[0].style.flex,'0 0 300px');assert.equal(panels[1].style.flex,'0 0 1617px');
+ assert.equal(context.maximumPaneWidthForID(ids[0]),300,'The fixed Notes width remains stable.');
  const restored=JSON.parse(JSON.stringify(state));state.paneWeights=restored.paneWeights;delete track._notebookColumnLayout;context.syncNotebookColumnLayout(panels);
- assert.equal(panels[0].style.flex,'0 0 1081px','A restored Notes width is not clamped to the former sidebar cap');
+ assert.equal(panels[0].style.flex,'0 0 300px','Older wide preferences cannot expand Notes.');
+ state.paneWeights[ids[0]]=100;context.syncNotebookColumnLayout(panels);
+ assert.equal(panels[0].style.flex,'0 0 300px','Older narrow preferences cannot shrink Notes.');
 }
-console.log('Notebook resize passed: expandable Notes, stable writing width, exact boundary and saved-width restoration.');
+console.log('Notebook sizing passed: fixed 300px Notes, stable writing width, exact boundary and saved-preference migration.');
 console.log('Notebook lifecycle passed: viewport fitting, freed editor space, retained panels/preferences and Research restoration.');

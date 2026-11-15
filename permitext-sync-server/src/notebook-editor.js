@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
 import {
   BlockNoteSchema,
   defaultBlockSpecs,
@@ -12,7 +13,8 @@ import { Menu } from "@mantine/core";
 import "@blocknote/mantine/style.css";
 import "./notebook.css";
 import { notebookReferenceBlocks } from "../public/notebook-passage-blocks.js";
-import { normalizeNotebookDocumentStyles } from "../public/notebook-styles.js";
+import { normalizeNotebookDocumentStyles, notebookFontSize, notebookFontSizes, notebookLineSpacings } from "../public/notebook-styles.js";
+import { TableHandlesExtension } from '@blocknote/core/extensions';
 import { notebookTablePasteHTML } from "../public/notebook-html-paste.js";
 export { createReportFormatting } from "./report-text-editor.js";
 import { en } from "@blocknote/core/locales";
@@ -150,7 +152,21 @@ const PermitextReference = createReactInlineContentSpec(
 );
 
 const notebookBlockSpecs = Object.fromEntries(
-  Object.entries(defaultBlockSpecs).filter(([type]) => allowedBlockTypeSet.has(type))
+  Object.entries(defaultBlockSpecs).filter(([type]) => allowedBlockTypeSet.has(type)).map(([type,spec]) => {
+    if (!['paragraph','heading','bulletListItem','numberedListItem'].includes(type)) return [type,spec];
+    const renderSpacing=render=>function(block,...args){
+      const result=render.call(this,block,...args);
+      if (notebookLineSpacings.includes(block.props.lineSpacing) && block.props.lineSpacing!=='normal')
+        result.dom.style.setProperty('line-height',block.props.lineSpacing,'important');
+      return result;
+    };
+    return [type,{...spec,config:{...spec.config,propSchema:{...spec.config.propSchema,lineSpacing:{default:'normal',values:[...notebookLineSpacings]}}},
+      implementation:{...spec.implementation,render:renderSpacing(spec.implementation.render),
+        toExternalHTML:renderSpacing(spec.implementation.toExternalHTML || spec.implementation.render),
+        parse:element=>{const props=spec.implementation.parse?.(element);if(props===undefined)return undefined;
+          const spacing=element.getAttribute('data-line-spacing') || element.style.lineHeight;
+          return {...props,...(notebookLineSpacings.includes(spacing)?{lineSpacing:spacing}:{})};}}}];
+  })
 );
 
 // Keep the normal color parser and renderer, and recognize semantic highlights
@@ -171,6 +187,10 @@ const notebookSuperscript = createStyleSpec({type: "superscript", propSchema: "b
   },
   parse: element => element.tagName === "SUP" || element.style.verticalAlign === "super" ? true : undefined
 });
+const notebookFontSizeStyle = createStyleSpec({type:'fontSize',propSchema:'string'},{
+  render:value=>{const dom=document.createElement('span'),size=notebookFontSize(value);if(size)dom.style.fontSize=`${size}pt`;return {dom,contentDOM:dom};},
+  parse:element=>notebookFontSize(element.style.fontSize)
+});
 
 export const permitextNotebookSchema = BlockNoteSchema.create({
   blockSpecs: notebookBlockSpecs,
@@ -184,7 +204,8 @@ export const permitextNotebookSchema = BlockNoteSchema.create({
     strike: defaultStyleSpecs.strike,
     underline: defaultStyleSpecs.underline,
     backgroundColor: notebookBackgroundColor,
-    superscript: notebookSuperscript
+    superscript: notebookSuperscript,
+    fontSize: notebookFontSizeStyle
   }
 });
 
@@ -195,6 +216,7 @@ function PermitextFormattingToolbar({ editor, options }) {
   const [linkError, setLinkError] = useState("");
   const linkSelection = useRef(null);
   const textStyleButton = useRef(null);
+  const formatSelection = useRef(null);
   const captureSelection = () => {
     const state = editor._tiptapEditor.state;
     return {from: state.selection.from, to: state.selection.to, document: state.doc, text: editor.getSelectedText()};
@@ -223,6 +245,9 @@ function PermitextFormattingToolbar({ editor, options }) {
   const textBlocks = state.blocks.filter(block => ["paragraph", "heading", "bulletListItem", "numberedListItem"].includes(block.type));
   const inlineSelection = state.blocks.some(block => ["paragraph", "heading", "bulletListItem", "numberedListItem", "table"].includes(block.type));
   const first = textBlocks[0];
+  const table = state.blocks.find(block=>block.type==='table');
+  const tableHandles = table ? editor.getExtension(TableHandlesExtension) : null;
+  const cellSelection = tableHandles?.getCellSelection();
   const type = first?.type === "heading" ? `heading-${first.props.level}` : "paragraph";
   const setBlockType = (type, props = {}) => {
     editor.focus();
@@ -267,6 +292,48 @@ function PermitextFormattingToolbar({ editor, options }) {
   }, glyph);
   const insertActions = [["evidence", "Evidence"], ["research", "Assistant answer"], ["image", "Image"], ["template", "Finding template"]]
     .filter(([kind]) => !options.insertItems || options.insertItems.includes(kind));
+  const formatMenu = (label,caption,choices,apply,disabled=false) => React.createElement(Menu,
+    {position:'bottom-start',offset:8,withinPortal:false,width:190,loop:true,returnFocus:false},
+    React.createElement(Menu.Target,null,React.createElement('button',{type:'button',className:'notebook-format-style','aria-label':label,title:label,
+      disabled:!state.editable || disabled,onMouseDown:event=>event.preventDefault(),onClick:()=>{formatSelection.current=captureSelection();}},caption)),
+    React.createElement(Menu.Dropdown,{className:'notebook-format-style-menu','aria-label':label},...choices.map(choice=>React.createElement(Menu.Item,
+      {key:choice.value,className:'notebook-format-style-option',disabled:choice.disabled,
+        'aria-current':choice.selected?'true':undefined,onClick:()=>{if(!restoreSelection(formatSelection.current))return;editor.focus();apply(choice.value);}},choice.label))));
+  const sizeMenu = formatMenu('Font size',state.styles.fontSize || 'Size',
+    [{value:'default',label:'Default',selected:!state.styles.fontSize},...notebookFontSizes.map(value=>({value,label:`${value} pt`,selected:state.styles.fontSize===value}))],
+    value=>value==='default'?editor.removeStyles({fontSize:state.styles.fontSize || ''}):editor.addStyles({fontSize:value}),!inlineSelection);
+  const spacing = first?.props?.lineSpacing || 'normal';
+  const spacingMenu = formatMenu('Line spacing',spacing==='normal'?'Spacing':`${spacing}×`,
+    notebookLineSpacings.map(value=>({value,label:value==='normal'?'Default':value==='1'?'1 · Single':value==='2'?'2 · Double':value,selected:spacing===value})),
+    value=>editor.transact(()=>textBlocks.forEach(block=>editor.updateBlock(block,{props:{lineSpacing:value}}))),!textBlocks.length);
+  const tableChoices = [2,3,4].map(size=>({value:`insert-${size}`,label:`Insert ${size} × ${size} table`}));
+  if(table) tableChoices.push(
+    {value:'row',label:'Add row below',disabled:!cellSelection || table.content.rows.length>=500},
+    {value:'column',label:'Add column right',disabled:!cellSelection || table.content.rows[0].cells.length>=100},
+    {value:'header',label:table.content.headerRows?'Remove header row':'Use first row as header'},
+    {value:'remove-row',label:'Delete row',disabled:!cellSelection || table.content.rows.length<=1},
+    {value:'remove-column',label:'Delete column',disabled:!cellSelection || table.content.rows[0].cells.length<=1},
+    {value:'remove-table',label:'Delete table'});
+  const tableMenu = formatMenu('Table','Table',tableChoices,value=>{
+    if(value.startsWith('insert-')){
+      const size=Number(value.slice(7)),cursor=editor.getTextCursorPosition().block;
+      const content={type:'tableContent',headerRows:1,rows:Array.from({length:size},()=>({cells:Array.from({length:size},()=>[])}))};
+      let inserted;
+      editor.transact(()=>{
+        if(cursor.type==='paragraph' && !cursor.content?.length && !cursor.children?.length)inserted=editor.updateBlock(cursor,{type:'table',content});
+        else [inserted]=editor.insertBlocks([{type:'table',content}],cursor,'after');
+        editor.insertBlocks([{type:'paragraph',content:[]}],inserted,'after');
+      });
+      editor.setTextCursorPosition(inserted,'start');
+    } else if(table){
+      if(value==='header')editor.updateBlock(table,{content:{...table.content,headerRows:table.content.headerRows?0:1}});
+      if(value==='row')tableHandles?.addRowOrColumn(cellSelection.from.row,{orientation:'row',side:'below'});
+      if(value==='column')tableHandles?.addRowOrColumn(cellSelection.from.col,{orientation:'column',side:'right'});
+      if(value==='remove-row')tableHandles?.removeRowOrColumn(cellSelection.from.row,'row');
+      if(value==='remove-column')tableHandles?.removeRowOrColumn(cellSelection.from.col,'column');
+      if(value==='remove-table')editor.removeBlocks([table]);
+    }
+  });
   return React.createElement("div", {className: "notebook-format-toolbar", role: "toolbar", "aria-label": "Note formatting"},
     React.createElement("button", {
       type: "button", className: "notebook-format-button notebook-format-undo",
@@ -301,7 +368,7 @@ function PermitextFormattingToolbar({ editor, options }) {
           ref: textStyleButton, type: "button", className: "notebook-format-style", "aria-label": "Text style",
           disabled: !state.editable || !textBlocks.length,
           onMouseDown: event => event.preventDefault()
-        }, type.startsWith("heading-") ? `Heading ${type.slice(-1)}` : "Body", icon(["M5 8l5 5 5-5"]))),
+        }, type.startsWith("heading-") ? `Heading ${type.slice(-1)}` : "Body")),
       React.createElement(Menu.Dropdown, {
         className: "notebook-format-style-menu", "aria-label": "Text style",
         onKeyDown: event => { if (event.key === "Escape") textStyleButton.current?.focus(); }
@@ -312,6 +379,9 @@ function PermitextFormattingToolbar({ editor, options }) {
             onClick: () => value.startsWith("heading-")
               ? setBlockType("heading", {level: Number(value.slice(-1))}) : setBlockType("paragraph")
           }, label)))),
+    sizeMenu,
+    spacingMenu,
+    tableMenu,
     listButton("bulletListItem", "Bulleted list", icon(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])),
     listButton("numberedListItem", "Numbered list", icon(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])),
     React.createElement("span", {className:"notebook-format-link"},
@@ -459,7 +529,11 @@ export function mountPermitextNotebookEditor(element, options = {}) {
   const root = createRoot(element);
   let statusElement = null;
   const mountedOptions = {...options, onStatusMount: element => { statusElement = element; }};
-  root.render(React.createElement(PermitextNotebookEditor, { options: mountedOptions, controllerRef }));
+  const render = () => root.render(React.createElement(PermitextNotebookEditor, { options: mountedOptions, controllerRef }));
+  // Note navigation commits title and document in one browser task. Finish the
+  // initial React tree before returning so the old editor never paints blank.
+  if (options.synchronousMount) flushSync(render);
+  else render();
 
   return {
     setStatus(text) {

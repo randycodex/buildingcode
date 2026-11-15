@@ -7,7 +7,7 @@ const source=await readFile(new URL("../public/app.js",import.meta.url),"utf8");
 function actual(name){const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));const end=source.indexOf("\n}",start);assert.ok(start>=0&&end>start,name);return source.slice(start,end+2);}
 const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});return{promise,resolve};};
 const tick=async()=>{for(let i=0;i<24;i++)await Promise.resolve();};
-const track={children:[],scrollLeft:80,querySelectorAll(){return this.children;}};
+const track={children:[],scrollLeft:80,querySelectorAll(){return this.children;},removeAttribute(){}};
 function pane(id,loading=false){const status={textContent:""},retry={hidden:true};return{dataset:{paneId:id,...loading?{workspacePaneLoading:"true"}:{}},isConnected:false,parentNode:null,classList:{contains:()=>false,toggle(){}},querySelectorAll:()=>[],setAttribute(){},querySelector:s=>s.includes("retry")?retry:status,replaceWith(next){const i=track.children.indexOf(this);assert.ok(i>=0);track.children[i]=next;next.isConnected=true;next.parentNode=track;this.isConnected=false;this.parentNode=null;}};}
 const sync=deferred(),report=deferred();let account="A",pulls=0,privateLoads=0,removeNotebookOnVerify=false;
 const notebook=pane("notebook"),reader=pane("reader"),search=pane("search");
@@ -117,7 +117,7 @@ assert.equal(stalePeerCalls,0,"An account change stops the remaining old-account
 account="B";assert.equal(gate.allowed,false);
 const newGate=sandbox.workspaceAccessGateForRender();assert.notEqual(newGate,gate);await tick();assert.equal(newGate.allowed,false,"An A snapshot cannot authorize B.");
 assert.equal(await sandbox.whenWorkspacePaneReady("missing"),false);
-const descriptors=actual("workspacePaneDescriptors");assert.match(descriptors,/renderUtilityInstance\(instance, \{ accessGate: options\.accessGate,/);assert.match(descriptors,/const scrollPosition = options\.readerTabSwitchPaneID === id \? reader\.scrollPosition[\s\S]*?: options\.readerScrollPositions\?\.get\(id\) \|\| reader\.scrollPosition;/);assert.match(descriptors,/renderReader\(reader, \{ scrollPosition: sourceNavigation \? undefined : scrollPosition,\s+sourceNavigation, accessGate: options\.accessGate, signal \}\)/);
+const descriptors=actual("workspacePaneDescriptors");assert.match(descriptors,/renderUtilityInstance\(instance, \{ accessGate: options\.accessGate,/);assert.match(descriptors,/const scrollPosition = options\.readerTabSwitchPaneID === id \? reader\.scrollPosition[\s\S]*?: options\.readerScrollPositions\?\.get\(id\) \|\| reader\.scrollPosition;/);assert.match(descriptors,/renderReader\(reader, \{ scrollPosition: sourceNavigation \? undefined : scrollPosition,\s+sourceNavigation, chapterNavigation: options\.readerChapterSwitchPaneID === id, accessGate: options\.accessGate, signal \}\)/);
 console.log("Workspace public startup passed: held sync/public publication, shared gate, fresh private reconciliation, shell/target readiness, close cancellation, denial/retry and account isolation.");
 console.log("Workspace notification snapshots passed: lazy summary work, throw isolation, one read per dispatch, fresh mutations, immediate release and mid-dispatch account revocation.");
 

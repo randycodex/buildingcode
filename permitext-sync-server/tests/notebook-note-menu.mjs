@@ -162,6 +162,7 @@ const c=vm.createContext({ createNotebookNoteMenu, notebookReadOnly:false, docum
   shell:new Element('div'),panel:new Element('article'),header:new Element('header'),draftStatus:new Element('p'),mountState:{},
   identity:{id:'project'},projectID:'project',paneID:'note-a',publishNotebookColumn(){},
   cards:appCards,activeCard:appCards[0],disposed:false,requestIdentity:'account',
+  workingResearchNote:()=>null,
   isCurrentAccountRequest:()=>true,dirtyWrites:0,opened:[],
   markNotebookDirty:()=>{c.dirtyWrites++},
   loadCard:async id=>{c.opened.push(id)},openNotebookNoteColumn:async(_project,card)=>{c.opened.push(card.id)},showWebNotice:()=>{},
@@ -169,6 +170,8 @@ const c=vm.createContext({ createNotebookNoteMenu, notebookReadOnly:false, docum
 vm.runInContext(source.slice(setupStart,setupEnd)+source.slice(managementStart,managementEnd)+
   '\nglobalThis.controls={noteMenu,render:renderCardList,selectButton,newButton,archiveButton,selectMode(){selectingCards=true;renderCardList()},archiveMode(){showingArchivedCards=true;selectingCards=false;renderCardList()}};',c);
 c.controls.render();
+assert.equal(c.controls.noteMenu.menu.removed,true,'The per-note dropdown is detached; the Notes column owns navigation');
+assert.equal(c.controls.noteMenu.titleAction.removed,true,'The note header contains only its editable title');
 assert.equal(c.controls.noteMenu.list.children.length,2);
 c.controls.noteMenu.list.querySelectorAll('button')[1].click();
 assert.deepEqual(c.opened,['b']);

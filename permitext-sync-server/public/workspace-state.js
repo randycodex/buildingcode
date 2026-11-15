@@ -1,3 +1,4 @@
+import { normalizeNoteResearch } from "./note-research.js?v=1";
 import { normalizeVisitedWorkflowViews } from "./minimal-workflow.js";
 import { normalizeNotebookColumns } from "./notebook-columns.js?v=4";
 import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=16";
@@ -33,6 +34,8 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "notebooks",
   "notebookColumns",
   "notebookListHidden",
+  "noteResearch",
+  "notebookReaderVisibilityVersion",
   "notebookReaderHidden",
   "reportDrafts",
   "coordinations",
@@ -269,8 +272,10 @@ export function emptyWorkspaceLayout() {
     workboards: [],
     notebooks: [],
     notebookColumns: [],
-    notebookListHidden: false,
-    notebookReaderHidden: false,
+    notebookListHidden: true,
+    noteResearch: {},
+    notebookReaderVisibilityVersion: 1,
+    notebookReaderHidden: true,
     reportDrafts: [],
     coordinations: [],
     coordinationThreads: [],
@@ -372,8 +377,12 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.workboards = genericWorkboardState(source.workboards);
   layout.notebooks = openProjectToolState(source.notebooks, layout.projectDetails);
   layout.notebookColumns = normalizeNotebookColumns(source.notebookColumns);
-  layout.notebookListHidden = source.notebookListHidden === true;
-  layout.notebookReaderHidden = source.notebookReaderHidden === true;
+  layout.notebookListHidden = source.notebookListHidden !== false;
+  layout.noteResearch = normalizeNoteResearch(source.noteResearch);
+  // Retire the former automatically open Reader default once. Subsequent
+  // source navigation and toolbar choices remain part of this workspace.
+  layout.notebookReaderVisibilityVersion = 1;
+  layout.notebookReaderHidden = source.notebookReaderVisibilityVersion === 1 ? source.notebookReaderHidden !== false : true;
   layout.reportDrafts = openProjectToolState(source.reportDrafts, layout.projectDetails);
   layout.coordinations = openProjectToolState(source.coordinations, layout.projectDetails);
   layout.coordinationThreads = Array.isArray(source.coordinationThreads)

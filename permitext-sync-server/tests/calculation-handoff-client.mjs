@@ -19,7 +19,7 @@ for(const stale of [false,true]) {
  const localStorage={getItem:key=>storageValues.get(key)??null,setItem:(key,value)=>storageValues.set(key,value)};
  let options,resolve; const gate=new Promise(r=>resolve=r); const calls=[];
  const context=vm.createContext({occupantLoadSource,occupantLoadPrefill,occupantLoadTable:readTable,occupantLoadTableInput,calculateOccupantLoad,calculationNoteBlocks,calculationDraftStore,generatedNoteTitle,localStorage,privateWorkspaceKeys:()=>({baseWorkspaceKey:"private-owner"}),calculationDraftViews:new Set(),
-  calculatorFootnoteAssessmentFor:()=>null,calculatorConversationForPane:()=>null,supplementalResearchConversations:new Map(),activeResearchConversation:null,
+  chooseResearchNoteDestination:async()=>({kind:'new'}),rememberWorkingResearchNote(){},calculatorFootnoteAssessmentFor:()=>null,calculatorConversationForPane:()=>null,supplementalResearchConversations:new Map(),activeResearchConversation:null,
   state:{workflowNavigationGeneration:0},activeWorkspaceID:'workspace',captureAccountRequest:()=>({userID:'owner'}),
   isCurrentAccountRequest:()=>true,hasCapability:()=>true,workspaceProject:()=>({id:'project'}),researchProjectID:()=> 'project',researchCodeEdition:()=> '2022',
   crypto:{randomUUID:()=> 'synthetic-id'},document:{createElement:()=>({blocks:[],append(block){this.blocks.push(block);}})},
@@ -69,6 +69,16 @@ for(const stale of [false,true]) {
   await assert.rejects(options.onSave({...custom,input:{...custom.input,factor:'0'}}),/positive factor/);
   await assert.rejects(options.onSave({...custom,input:{...custom.input,factorBasis:'Changed notes'}}),/BC table changed/);
   assert.equal(calls.length,2,'Invalid overrides cannot write a Note.');
+  let appendOptions;
+  context.chooseResearchNoteDestination=async()=>({kind:'saved',card:{id:'existing-note'}});
+  context.appendResearchReferenceToNote=async(_project,_destination,_reference,_mutation,_identity,_current,material)=>{
+    appendOptions=material;return {id:'existing-note',title:'Analysis'};
+  };
+  assert.equal((await options.onSave(calculation)).id,'existing-note');
+  assert.match(JSON.stringify(appendOptions.blocks),/12 people/);
+  assert.equal(appendOptions.blocks.flatMap(block=>block.content || []).filter(node=>node.props?.referenceID===appendOptions.evidenceLink.id).length,0,
+    'The common handoff inserts the calculation source reference once');
+  assert.equal(calls.length,2,'Appending to the chosen Note does not create a new Note');
  }
 }
 console.log('Actual client save handler captures canonical evidence, saves the arithmetic snapshot, and cancels after a view change.');

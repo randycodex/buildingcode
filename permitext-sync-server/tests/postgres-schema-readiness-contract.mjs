@@ -90,6 +90,8 @@ assert.equal(initializeCalls, 0, "a ready cold isolate must avoid the DDL initia
 // readiness signature would incorrectly skip initialization and fail this test.
 const historyIndexes = [
   "permitext_research_conversations_creation_request_idx",
+  "permitext_research_conversations_pinned_history_idx",
+  "permitext_research_conversations_pinned_project_history_idx",
   "permitext_research_conversations_visible_history_idx",
   "permitext_research_conversations_visible_project_history_idx"
 ];

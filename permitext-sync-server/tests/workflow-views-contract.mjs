@@ -302,6 +302,7 @@ assert.equal(paneBelongsToView(notesID,'notebook',notesLayout.workflowMembership
  const researchTools={append(host){host.parentElement=this;}},notebookTools={append(host){host.parentElement=this;}};
  const host={parentElement:researchTools};
  c.document.querySelector=selector=>selector==='#reader-shortcuts'?host:selector==='[data-workflow-tools="research"] .reader-toolbar-tools'?researchTools:selector==='[data-workflow-tools="notebook"] .reader-toolbar-tools'?notebookTools:null;
+ state.notebookReaderVisibilityVersion=1;state.notebookReaderHidden=false;
  state.workflowView='research';c.syncWorkflowColumnPresentation();reader.scrollTop=1850;
  await c.switchWorkflowView('notebook');notebookReader.scrollTop=2470;
  assert.equal(host.parentElement,researchTools);assert.equal(c.workflowPaneIsVisible('reader:notebook'),true);assert.equal(c.workflowPaneIsVisible('reader:one'),false);
@@ -328,7 +329,7 @@ assert.equal(paneBelongsToView(notesID,'notebook',notesLayout.workflowMembership
  vm.runInContext(`function notebookOrder(orderedPanes){${source.slice(start,end)}return orderedPanes.map(pane=>pane.dataset.paneId);}`,context);
  const ids=['note','reader:b','index','evidence','reader:a'];
  const ordered=context.notebookOrder(ids.map(id=>({dataset:{paneId:id},classList:{contains:name=>name==='reader-panel'&&id.startsWith('reader:')}})));
- assert.deepEqual(Array.from(ordered),['reader:b','reader:a','evidence','index','note']);
- assert.deepEqual(Array.from(context.notebookOrder(ids.map(id=>({dataset:{paneId:id},classList:{contains:()=>false}})))),['reader:b','reader:a','evidence','index','note'],'Loading placeholders reserve the final Reader position before hydration');
+ assert.deepEqual(Array.from(ordered),['reader:b','reader:a','evidence','index','note'],'The Notes list stays next to the current Note.');
+ assert.deepEqual(Array.from(context.notebookOrder(ids.map(id=>({dataset:{paneId:id},classList:{contains:()=>false}})))),['reader:b','reader:a','evidence','index','note'],'Loading placeholders preserve the Notes list and editor pairing.');
 }
-console.log('Notebook Readers passed: six-tab cap, toolbar host, Reader → Evidence → Notes order, per-view visibility, live reading positions, unsent Note and reload retention.');
+console.log('Notebook Readers passed: six-tab cap, toolbar host, Reader → Evidence → Notes → current Note order, per-view visibility, live reading positions, unsent Note and reload retention.');

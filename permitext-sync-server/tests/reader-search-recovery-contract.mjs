@@ -16,15 +16,17 @@ function element() {
     querySelector() { return this; } };
 }
 function deferred() { let resolve, reject; const promise = new Promise((a,b) => {resolve=a; reject=b;}); return {promise,resolve,reject}; }
-function harness({ pro = true } = {}) {
+function harness({ pro = true, view = 'research' } = {}) {
   const content = element(), requests = [];
   content.children = ["Original enacted provision"];
   const panel = { dataset: {}, isConnected: true, querySelector: () => content };
-  const reader = { chapterID: "synthetic-chapter" };
-  const opened = [];
+  const reader = { id:'reader',codePrefix:'BC',codeVersion:'2022',chapterID: "synthetic-chapter" };
+  const opened = [],openedSources=[];
   const restore = () => { panel.dataset.readerSearchToken = randomUUID(); content.classList.remove("is-searching-reader"); content.children = ["Original enacted provision"]; };
   const context = vm.createContext({ readerSearchMatch, snippetForMatch, readerSearchResultHeading, rankReaderSearchResults, crypto: { randomUUID }, document: { createElement: element },
     isProAccount: () => pro,
+    currentColumnWorkflowView:()=>view,paneIDForReader:reader=>`reader:${reader.id}`,
+    openSourceInReader:async(item,anchor,options)=>openedSources.push({item,anchor,options}),
     annotatedBlocksForSection: section => section.blocks || [],
     annotationTargetForBlock: (_section, block, _reader, index) => ({blockID: block.id || `block-${index}`}),
     stopReaderProgressiveHydration() {}, startReaderSectionVisibility() {}, clear: node => {node.children = [];},
@@ -38,7 +40,18 @@ function harness({ pro = true } = {}) {
     appendHighlighted: (node,value) => {node.textContent = value;}, snippetForMatch: value => value
   });
   vm.runInContext(source.slice(source.indexOf("function cancelReaderInternalSearch("), source.indexOf("async function fetchReaderChapterSearch(")) + source.slice(start,end+2)+"\nglobalThis.render = renderReaderInternalSearchResults;",context);
-  return {content,panel,requests,restore,opened,cancel:()=>context.cancelReaderInternalSearch(panel),run: (query,options) => context.render(panel,reader,query,options)};
+  return {content,panel,requests,restore,opened,openedSources,cancel:()=>context.cancelReaderInternalSearch(panel),run: (query,options) => context.render(panel,reader,query,options)};
+}
+
+// Notebook's direct section search shares the same recent-source opening path.
+{
+  const t=harness({view:'notebook'}),pending=t.run('1005.3');
+  t.requests[0].resolve([{chapterID:'other-chapter',chapterTitle:'Chapter 10',sectionID:'exact',sectionNumber:'1005.3',heading:'1005.3 Required capacity',snippet:''}]);
+  await pending;
+  await t.content.children[0].children.find(row=>row.className==='reader-internal-result').callbacks.click();
+  assert.equal(t.opened.length,0);assert.equal(t.openedSources.length,1);
+  assert.equal(t.openedSources[0].item.sectionID,'exact');assert.equal(t.openedSources[0].item.codePrefix,'BC');
+  assert.equal(t.openedSources[0].anchor,'reader:reader');assert.equal(t.openedSources[0].options.searchQuery,'1005.3');
 }
 
 // A tab's saved search is complete before its detached Reader is published.
@@ -154,7 +167,7 @@ function savedHarness() {
   const state = {readers:[unrelated],utilityInstances:[{id:"unrelated",key:"search"}],paneWeights:{},paneOrder:[]};
   let generation = 1, nextID = 0, saves = 0;
   const context = vm.createContext({
-    linkPaneToView,state, savedItemOpeningAttempts:new Map(), searchReaderOpeningAttempts:new Map(), activeWorkspaceID:"workspace",
+    workingResearchNote:()=>null,linkPaneToView,state, savedItemOpeningAttempts:new Map(), searchReaderOpeningAttempts:new Map(), activeWorkspaceID:"workspace",
     captureAccountRequest:()=>generation,isCurrentAccountRequest:value=>value===generation,
     workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=>"research",workflowPaneIsVisible:()=>true,
     resolveReaderSource(item) {const request=deferred();requests.push({...request,item});return request.promise;},

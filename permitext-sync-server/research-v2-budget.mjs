@@ -1,6 +1,9 @@
 import { mkdir, open, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { researchSemanticEmbeddingModel, researchSemanticEmbeddingDimensions, researchSemanticEmbeddingMaximumCharacters,
+  researchSemanticEmbeddingReservation, researchSemanticEmbeddingCost,
+  researchSemanticEmbeddingPricingVersion } from './research-semantic-passages.mjs';
 
 // USD per million tokens, verified against official Standard pricing 2026-10-26.
 // Reservations deliberately allow the highest cache-write price and Fast output
@@ -70,29 +73,40 @@ export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitU
     } finally { await lock.close(); await unlink(path + '.lock'); }
   }
   const used = ledger => ledger.calls.reduce((sum, call) => sum + (call.chargedMicroUSD ?? call.reservedMicroUSD), 0);
+  const reserve = (details, reservedMicroUSD) => transaction(ledger => {
+    if (ledger.overrun || used(ledger) + reservedMicroUSD > ledger.limitMicroUSD)
+      throw error('The $7 Research evaluation budget has insufficient unreserved funds.', 'V2_BUDGET_EXHAUSTED');
+    const call = { id: randomUUID(), ...details, createdAt: new Date().toISOString(), reservedMicroUSD, status: 'reserved' };
+    ledger.calls.push(call);
+    return call.id;
+  });
   return {
     async reserve(requestBody, phase) {
       const bytes = assertLunaV2Request(requestBody);
       const reservedMicroUSD = Math.ceil((bytes + 8192) * lunaV2Pricing.reservationInput +
         requestBody.max_output_tokens * lunaV2Pricing.reservationOutput);
-      return transaction(ledger => {
-        if (ledger.overrun || used(ledger) + reservedMicroUSD > ledger.limitMicroUSD)
-          throw error('The $7 Research evaluation budget has insufficient unreserved funds.', 'V2_BUDGET_EXHAUSTED');
-        const call = { id: randomUUID(), phase, model: requestBody.model, createdAt: new Date().toISOString(),
-          reservedMicroUSD, status: 'reserved', pricingVersion: lunaV2Pricing.version };
-        ledger.calls.push(call);
-        return call.id;
-      });
+      return reserve({phase, model: requestBody.model, pricingVersion: lunaV2Pricing.version}, reservedMicroUSD);
+    },
+    async reserveEmbedding(body) {
+      if (body?.model !== researchSemanticEmbeddingModel || body?.dimensions !== researchSemanticEmbeddingDimensions ||
+          body?.encoding_format !== 'float' || !Array.isArray(body.input) || !body.input.length || body.input.length > 128 ||
+          Object.keys(body).some(key => !['model','dimensions','input','encoding_format'].includes(key)) ||
+          body.input.some(input => typeof input !== 'string' || !input.trim() || input.length > researchSemanticEmbeddingMaximumCharacters || Buffer.byteLength(input) > 8192))
+        throw error('This embedding is outside the approved local retrieval limits.', 'V2_REQUEST_LIMIT');
+      return reserve({kind:'embedding', phase:'retrieval', model:body.model, pricingVersion:researchSemanticEmbeddingPricingVersion},
+        micros(researchSemanticEmbeddingReservation(body.input)));
     },
     async settle(id, payload) {
       return transaction(ledger => {
         const call = ledger.calls.find(item => item.id === id);
         if (!call || call.status !== 'reserved') throw error('Unknown or completed budget reservation.', 'V2_BUDGET_RESERVATION');
-        const actual = lunaUsageMicroUSD(payload);
+        const embeddingCost = call.kind === 'embedding' ? researchSemanticEmbeddingCost(payload?.usage) : null;
+        const actual = call.kind === 'embedding' ? (embeddingCost === null ? null : micros(embeddingCost)) : lunaUsageMicroUSD(payload);
         call.chargedMicroUSD = actual ?? call.reservedMicroUSD;
         call.status = actual === null ? 'uncertain' : 'settled';
         call.completedAt = new Date().toISOString();
-        if (actual !== null) { call.inputTokens = payload.usage.input_tokens; call.outputTokens = payload.usage.output_tokens; }
+        if (actual !== null) { call.inputTokens = call.kind === 'embedding' ? payload.usage.total_tokens : payload.usage.input_tokens;
+          call.outputTokens = call.kind === 'embedding' ? 0 : payload.usage.output_tokens; }
         if (actual > call.reservedMicroUSD) ledger.overrun = true;
         return { ...call };
       });

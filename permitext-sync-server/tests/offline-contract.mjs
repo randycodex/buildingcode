@@ -205,7 +205,7 @@ vm.runInNewContext(serviceWorker, {
   },
   self: {
     location: { origin: "https://permitext.test" },
-    clients: { claim: async () => {} },
+    clients: { claim: async () => {}, matchAll: async () => [] },
     skipWaiting() {},
     addEventListener(type, listener) {
       listeners.set(type, listener);

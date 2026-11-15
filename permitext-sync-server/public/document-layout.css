@@ -1,0 +1,177 @@
+@font-face {
+  font-family: "Permitext Document";
+  src: url("/web/fonts/DejaVuSans.ttf?v=3fdf69c") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Permitext Document";
+  src: url("/web/fonts/DejaVuSans-Bold.ttf?v=b184b89") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --document-font-family: "Permitext Document", sans-serif;
+  --document-printable-width: 672px;
+  --document-printable-height: 912px;
+  --document-body-size: 10pt;
+  --document-line-spacing: 1.5;
+  --document-paragraph-gap: 10pt;
+}
+
+/* The Note's 24px editor gutters sit outside the printable text measure. */
+.notebook-panel .notebook-focus > .notebook-editor-surface,
+.notebook-panel[data-notebook-sized] .notebook-focus > .notebook-editor-surface {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(var(--document-printable-width) + 48px);
+  margin-inline: auto;
+}
+.notebook-panel .notebook-title-control {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(var(--document-printable-width) + 48px);
+}
+.notebook-panel .notebook-title-control :is(.notebook-title-text, .notebook-title-editor) {
+  font-family: var(--document-font-family);
+  font-size: var(--document-note-title-size) !important;
+  line-height: var(--document-line-spacing);
+  font-weight: 700;
+}
+body .panel-track > article.workspace-panel.notebook-panel .notebook-title-control :is(.notebook-title-text, .notebook-title-editor) {
+  font-size: var(--document-note-title-size) !important;
+}
+
+/* Center explicit content widths instead of deriving them from pane padding. */
+.report-screen .report-document {
+  padding-inline: 28px;
+}
+.report-screen .report-document > :is(.report-draft-picker, .report-draft-metadata, .report-draft-blocks) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--document-printable-width);
+  margin-inline: auto;
+}
+.report-screen :is(.report-draft-blocks-body, .report-print-content) {
+  min-width: 0;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+}
+.report-screen .report-print-content .report-draft-block > * { min-width: 0; }
+.report-screen .report-draft-block-projectFacts > :is(.report-full-preview, .report-block-summary) { grid-column: 1 / -1; }
+.report-screen :is(.report-title-text, .report-title-editor) {
+  font-family: var(--document-font-family);
+  font-size: var(--document-report-title-size);
+  font-weight: 700;
+}
+
+/* Scope document type to authored/source text. Controls retain interface type. */
+.notebook-panel .notebook-editor-surface .bn-editor,
+.report-screen .report-note-editor .bn-editor,
+.report-screen .report-rich-editor .tiptap,
+.report-screen .report-draft-shell .report-full-preview-body,
+.report-screen .report-draft-shell .report-full-preview-body p,
+.report-screen .report-draft-shell .report-block-summary,
+.report-screen .report-introduction-section textarea {
+  font-family: var(--document-font-family);
+  font-size: var(--document-body-size);
+  line-height: var(--document-line-spacing);
+}
+.notebook-panel .notebook-editor-surface .bn-editor,
+.report-screen .report-note-editor .bn-editor {
+  --bn-font-family: var(--document-font-family);
+}
+.notebook-panel .notebook-editor-surface .bn-editor .bn-block-content,
+.report-screen .report-note-editor .bn-editor .bn-block-content {
+  padding-block: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+.notebook-panel .notebook-editor-surface .bn-editor .bn-block-group > .bn-block-outer,
+.report-screen .report-note-editor .bn-editor .bn-block-group > .bn-block-outer {
+  margin-block-end: var(--document-paragraph-gap);
+}
+.notebook-panel .notebook-editor-surface .bn-editor h1.bn-inline-content,
+.report-screen .report-note-editor .bn-editor h1.bn-inline-content,
+.report-screen .report-rich-editor[data-kind="heading"] .tiptap {
+  font-size: var(--document-heading-1-size);
+  line-height: var(--document-line-spacing);
+}
+.notebook-panel .notebook-editor-surface .bn-editor h2.bn-inline-content,
+.report-screen .report-note-editor .bn-editor h2.bn-inline-content,
+.report-screen .report-rich-editor[data-kind="heading"][data-heading-level="2"] .tiptap {
+  font-size: var(--document-heading-2-size);
+  line-height: var(--document-line-spacing);
+}
+.notebook-panel .notebook-editor-surface .bn-editor h3.bn-inline-content,
+.report-screen .report-note-editor .bn-editor h3.bn-inline-content,
+.report-screen .report-rich-editor[data-kind="heading"][data-heading-level="3"] .tiptap {
+  font-size: var(--document-heading-3-size);
+  line-height: var(--document-line-spacing);
+}
+.report-screen .report-rich-editor .tiptap { min-height: 20px; }
+.report-screen .report-rich-editor .tiptap p + p { margin-block-start: var(--document-paragraph-gap); }
+.report-screen .report-note-editor .bn-editor {
+  min-height: 0;
+  padding: 0;
+}
+.report-screen .report-draft-shell .report-full-preview-body .bn-editor p {
+  font-size: inherit;
+  line-height: inherit;
+}
+.report-screen .report-draft-shell .report-draft-block > strong {
+  font-family: var(--document-font-family);
+  font-size: var(--document-note-title-size);
+  line-height: var(--document-line-spacing);
+}
+.notebook-panel .bn-editor [data-content-type="table"] table,
+.report-screen .bn-editor [data-content-type="table"] table,
+.report-screen .report-full-preview table {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100%;
+  table-layout: fixed;
+  font-size: var(--document-table-size);
+  line-height: var(--document-table-line-spacing);
+}
+.notebook-panel .bn-editor table col,
+.report-screen .bn-editor table col { width: auto !important; }
+.notebook-panel .bn-editor [data-content-type="table"] .tableWrapper,
+.report-screen .bn-editor [data-content-type="table"] .tableWrapper {
+  width: calc(100% + 31px);
+  margin-inline: -9px -22px;
+}
+.notebook-panel .bn-editor :is(th, td),
+.report-screen .bn-editor :is(th, td) {
+  min-width: 0;
+  padding: 8px 6.6667px;
+  overflow-wrap: anywhere;
+}
+.notebook-panel .bn-editor table .bn-block-content,
+.report-screen .bn-editor table .bn-block-content { font-size: inherit; }
+
+/* Approximate printable-page boundaries, independent of editor controls.
+ * These never split editable blocks or appear in exported/printed content. */
+.report-screen .report-print-content {
+  position: relative;
+  min-height: var(--document-printable-height);
+}
+.report-screen .report-print-content::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  mask-image: repeating-linear-gradient(to right, #000 0 6px, transparent 6px 12px);
+  background: repeating-linear-gradient(to bottom,
+    transparent 0,
+    transparent calc(var(--document-printable-height) - 1px),
+    color-mix(in srgb, var(--text-secondary) 24%, transparent) calc(var(--document-printable-height) - 1px),
+    color-mix(in srgb, var(--text-secondary) 24%, transparent) var(--document-printable-height));
+}
+@media print {
+  .report-screen .report-print-content::after { display: none; }
+}

@@ -164,6 +164,73 @@ assert.match(actual("beginReaderNavigation"), /delete panel\.dataset\.readerCont
 assert.match(actual("navigateReaderToSection"), /panel\.dataset\.readerContentKey = readerContentScrollKey\(reader\)/);
 console.log("Reader scroll continuity passed: independent progressive anchors, unchanged citations, edition/navigation guards and real render wiring.");
 
+// The Reader header overlays its scroll container. Anchoring text hidden
+// behind that header changes the visible passage when the DOM window changes.
+{
+  const covered={dataset:{sectionId:'covered'},getBoundingClientRect:()=>({top:-20,bottom:80})};
+  const block={dataset:{blockId:'visible-block'},getBoundingClientRect:()=>({top:120,bottom:200})};
+  const visible={dataset:{sectionId:'visible'},getBoundingClientRect:()=>({top:100,bottom:300}),querySelectorAll:()=>[block]};
+  const content={scrollTop:0,clientWidth:500,scrollHeight:1000,childElementCount:2,classList:{contains:()=>false},
+    getBoundingClientRect:()=>({top:0}),querySelectorAll:()=>[covered,visible]};
+  const panel={dataset:{paneId:'reader:header',readerContentKey:'chapter',readerRenderToken:'render'},classList:{contains:()=>false},
+    getBoundingClientRect:()=>({top:0}),querySelector:()=>content};
+  context.getComputedStyle=()=>({height:'100px'});
+  const position=context.captureReaderScrollPositions(panel).get('reader:header');
+  assert.equal(position.sectionID,'visible','Choose a passage inside the usable Reader viewport');
+  assert.equal(position.blockID,'visible-block');assert.equal(position.anchorOffset,120);
+  delete context.getComputedStyle;
+}
+
+// Capturing a painted paragraph must not probe skipped offscreen sections.
+{
+  const block={dataset:{blockId:'painted'},getBoundingClientRect:()=>({top:140,bottom:250}),closest:()=>section};
+  const section={dataset:{sectionId:'painted-section'},getBoundingClientRect:()=>({top:100,bottom:300})};
+  const content={scrollTop:100,clientWidth:500,scrollHeight:1000,childElementCount:2,classList:{contains:()=>false},
+    ownerDocument:{elementFromPoint:()=>({closest:()=>block})},contains:node=>node===block,
+    getBoundingClientRect:()=>({left:0,top:0,width:500,bottom:600}),
+    querySelectorAll(){assert.fail('Do not measure offscreen sections when a painted passage is available');},
+    _readerChapterExtent:{unloadedScrollPosition(){assert.fail('A visible paragraph owns the reading anchor');}}};
+  const panel={dataset:{paneId:'reader:painted',readerContentKey:'chapter'},classList:{contains:()=>false},querySelector:()=>content};
+  const position=context.captureReaderScrollPositions(panel).get('reader:painted');
+  assert.equal(position.blockID,'painted');assert.equal(position.anchorOffset,140);
+}
+
+// Real content-visibility containment prevents a paragraph's margin from
+// collapsing. Measuring it as visible and then restoring auto shifts it 14px.
+{
+  const content={scrollTop:0,clientHeight:600,scrollHeight:2000,dataset:{chapterFullyLoaded:'true'},
+    getBoundingClientRect:()=>({top:0}),querySelector:()=>section,querySelectorAll:()=>[section]};
+  const section={dataset:{sectionId:'margin'},style:{contentVisibility:'auto'},querySelector:()=>null,
+    getBoundingClientRect:()=>({top:(section.style.contentVisibility==='visible'?100:114)-content.scrollTop,height:200})};
+  const panel={isConnected:true,dataset:{readerContentKey:'margin-chapter'},classList:{contains:()=>false},querySelector:()=>content};
+  context.applyReaderScrollPosition(panel,{contentKey:'margin-chapter',sectionID:'margin',sectionOffset:0});
+  assert.equal(content.scrollTop,114,'Restore against the final contained layout, including paragraph margins');
+  assert.equal(section.getBoundingClientRect().top,0);
+  assert.equal(section.style.contentVisibility,'auto');
+  context.applyReaderScrollPosition(panel,{contentKey:'margin-chapter',sectionID:'margin',sectionOffset:0});
+  assert.equal(content.scrollTop,114,'Repeated restores cannot accumulate a paragraph-margin drift');
+}
+
+// A restored tab stays anchored while nearby reserved chapter slots resolve,
+// then wheel/key/pointer input immediately gives control back to the reader.
+{
+  const events=new EventTarget();let heightBefore=400;
+  const content={scrollTop:0,clientHeight:600,scrollHeight:2000,dataset:{chapterFullyLoaded:'true'},
+    addEventListener:(...args)=>events.addEventListener(...args),
+    getBoundingClientRect:()=>({top:0}),querySelector:()=>section,querySelectorAll:()=>[section]};
+  const section={dataset:{sectionId:'late'},style:{},querySelector:()=>null,
+    getBoundingClientRect:()=>({top:heightBefore-content.scrollTop,height:200})};
+  const panel={isConnected:true,dataset:{readerContentKey:'late-chapter'},classList:{contains:()=>false},querySelector:()=>content};
+  const position={contentKey:'late-chapter',sectionID:'late',sectionOffset:150};
+  context.applyReaderScrollPosition(panel,position,{retain:true});
+  assert.equal(section.getBoundingClientRect().top,150);
+  heightBefore+=43;context.restorePendingReaderScrollPosition(panel);
+  assert.equal(section.getBoundingClientRect().top,150,'Late chapter geometry cannot move the restored passage');
+  events.dispatchEvent(new Event('wheel'));assert.equal(content._readerPendingScrollPosition,undefined);
+  content.scrollTop=321;heightBefore+=23;context.restorePendingReaderScrollPosition(panel);
+  assert.equal(content.scrollTop,321,'User scrolling releases the retained anchor immediately');
+}
+
 frames.length = 0;
 await context.renderSectionContent(changed, a, {sourceNavigation: true});
 assert.equal(frames.length, 0, 'Explicit results skip the deferred section scroll; publication aligns the exact passage before paint.');

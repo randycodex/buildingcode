@@ -7685,6 +7685,9 @@ function contentTypeForPath(path) {
   if (path.endsWith(".woff")) {
     return "font/woff";
   }
+  if (path.endsWith(".ttf")) {
+    return "font/ttf";
+  }
   return "application/octet-stream";
 }
 
@@ -17033,7 +17036,6 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
       sources.push({
         id: artifact.envelope.id,
         kind: "notebookCard",
-        openQuestions: artifact.payload.openQuestions || [],
         version: artifact.envelope.version,
         label: artifact.payload.title,
         summary: artifact.payload.plainText?.slice(0, 500) || "",
@@ -17044,7 +17046,9 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
           cardID: artifact.envelope.id,
           cardType: artifact.payload.cardType,
           title: artifact.payload.title,
-          ...(artifact.payload.document ? {document:artifact.payload.document} : {}),
+          ...(artifact.payload.document ? {
+            document: artifact.payload.document
+          } : {}),
           plainText: artifact.payload.document
             ? notebookPlainText(artifact.payload.document)
             : (artifact.payload.plainText || ""),
@@ -23600,7 +23604,7 @@ async function handleServiceWorker(response) {
 
 export function webStaticCacheControl(fileName, version) {
   if (fileName.startsWith("marketing/")) return "public, max-age=0, must-revalidate";
-  return version && /\.(?:js|css|woff2?|png|jpe?g|svg|ico|webmanifest)$/.test(fileName)
+  return version && /\.(?:js|css|woff2?|ttf|png|jpe?g|svg|ico|webmanifest)$/.test(fileName)
     ? immutableStaticCacheControl
     : "public, max-age=0, must-revalidate";
 }

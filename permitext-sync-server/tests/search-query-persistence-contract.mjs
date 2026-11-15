@@ -25,7 +25,11 @@ input.value='navigation';listeners.input({});c.flushSearchQueryPersistence();c.a
 assert.ok(cancels>=12);
 assert.equal(JSON.parse(stored.get('a')).utilityInstances[0].query,'','Saved layouts do not retain the live query');
 assert.match(actual('replaceActiveAccount'),/flushSearchQueryPersistence\(\)/);
-assert.match(actual('switchWorkspace'),/saveWorkspaceState\(\);\s*activeWorkspaceID = workspaceID/);
+{
+  const switcher = actual('switchWorkspace');
+  assert.ok(switcher.indexOf('saveWorkspaceState();') < switcher.indexOf('activeWorkspaceID = workspaceID;'),
+    'Persist outgoing Search state before the visual handoff changes its workspace owner');
+}
 assert.match(source,/addEventListener\("pagehide", flushSearchQueryPersistence\)/);
 c.activeWorkspaceID='a';
 input.value='water supply';listeners.input({});

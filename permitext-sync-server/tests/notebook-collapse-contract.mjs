@@ -56,10 +56,10 @@ context.setPaneCollapsed(panels[0],true);
 assert.equal(context.paneIsCollapsed(ids[0]),true);
 pro=false;
 assert.equal(context.paneCanCollapse(ids[0]),false);
-// A Reader linked into Notebook must lose its separate collapse-title button.
+// Notebook's code heading is plain text; + owns its code picker. Research keeps collapse.
 let readerTitle;
-const titleNode = tag => ({tagName:tag.toUpperCase(),attrs:{},
-  setAttribute(name,value){this.attrs[name]=value;},addEventListener(){},
+const titleNode = tag => ({tagName:tag.toUpperCase(),attrs:{},dataset:{},listeners:{},
+  setAttribute(name,value){this.attrs[name]=value;},addEventListener(name,listener){this.listeners[name]=listener;},
   replaceWith(node){readerTitle=node;}});
 readerTitle=titleNode('button');
 Object.assign(context,{document:{createElement:titleNode},
@@ -71,6 +71,8 @@ pro=true;view='notebook';
 context.updateReaderLocationTitle(readerPanel,{});
 assert.equal(readerTitle.tagName,'SPAN');
 assert.doesNotMatch(readerTitle.attrs['aria-label'],/Collapse/);
+assert.equal(readerTitle.attrs['aria-haspopup'],undefined);
+assert.equal(readerTitle.listeners.click,undefined);
 view='research';
 context.updateReaderLocationTitle(readerPanel,{});
 assert.equal(readerTitle.tagName,'BUTTON');

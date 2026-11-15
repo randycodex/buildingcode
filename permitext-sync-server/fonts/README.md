@@ -2,7 +2,7 @@ Report PDFs embed DejaVu Sans Regular and Bold to preserve arrows, mathematical 
 
 Source: https://github.com/matplotlib/matplotlib/tree/main/lib/matplotlib/mpl-data/fonts/ttf
 
-The unmodified font files are distributed under the accompanying LICENSE_DEJAVU. They are server assets and are not added to the web shell cache.
+The unmodified font files are distributed under the accompanying LICENSE_DEJAVU. Matching copies in `public/fonts` are used by Notes and Report so their character metrics match the PDF. Those public copies are included in the offline web shell.
 
 SHA-256:
 

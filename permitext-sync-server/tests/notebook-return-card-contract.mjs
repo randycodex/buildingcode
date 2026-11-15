@@ -112,7 +112,7 @@ assert.equal(afterReload.readNotebookReturnCard(newIdentity, cards), "");
 afterReload.localStorage.setItem = () => { throw new Error('Quota'); };
 assert.doesNotThrow(() => afterReload.rememberNotebookReturnCard(newIdentity, "remembered"));
 assert.equal(afterReload.readNotebookReturnCard(newIdentity, cards), "remembered");
-assert.match(source, /async function renderFocusedCard\(\) \{[\s\S]{0,350}rememberNotebookReturnCard/,
+assert.match(source, /async function renderFocusedCard\([^)]*\) \{[\s\S]{0,350}rememberNotebookReturnCard/,
   "Selection must persist as the selected card renders, without waiting for disposal");
 console.log("Notebook reload selection passed: fresh runtime, private account/workspace/project scope, archive pruning and storage failure tolerance.");
 

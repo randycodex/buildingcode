@@ -27,8 +27,9 @@ function panel(id) {
   const dock = document.createElement("section"); dock.className = "search-dock";
   dock.getBoundingClientRect = () => ({ top: 120, bottom: 250, left: 220, width: 800 });
   node.clientLeft = 2;
-  const trigger = document.createElement("button"); trigger.className = "search-scope-summary";
-  dock.append(trigger); node.append(dock); track.append(node);
+  const trigger = document.createElement("button"); trigger.className = "column-group-menu-button";
+  trigger.getBoundingClientRect = () => ({ top: 80, bottom: 108, left: 960, width: 28 });
+  node.append(trigger, dock); track.append(node);
   return node;
 }
 const first = panel("one"), second = panel("two");
@@ -76,6 +77,7 @@ assert.deepEqual(picker.querySelectorAll("h3").map(heading=>heading.textContent)
 assert.deepEqual(picker.querySelectorAll("label").map(label=>label.children[1].textContent),["Building Code (2022)","Plumbing Code (2014)"]);
 assert.equal(picker.style["--search-scope-width"],"800px");
 assert.equal(picker.style["--search-scope-left"],"198px","The menu accounts for the column border when aligning to Search");
+assert.equal(picker.style["--search-scope-top"],"46px","The source picker anchors below the Search header menu.");
 assert.deepEqual(picker.querySelectorAll("button").map(button=>button.textContent),["Select all","Deselect all",""],"Selection saves directly without Cancel or Apply controls");
 instances[0].position = { loadedPages: 3, scrollTop: 500, groupPages: { BC: 2 }, groupScope: "old" };
 picker.querySelectorAll("input")[0].checked = false;
@@ -87,6 +89,7 @@ assert.equal(dialog(), picker,"Changing sources keeps the menu open");
 assert.equal(JSON.stringify(instances[0].position),JSON.stringify({loadedPages:1,scrollTop:0,groupPages:{},groupScope:""}),"New source selection restarts results at the first page");
 close(picker);
 assert.equal(dialog(), null);
+assert.equal(document.activeElement,first.querySelector('.column-group-menu-button'),'Closing returns focus to the visible header menu.');
 assert.deepEqual([...instances[0].querySourceKeys], ["plumbing"],"Closing keeps the last selection");
 assert.ok(!mutations.at(-1).connected && !resizes.at(-1).connected, "Closing disposes positioning and lifecycle observers.");
 

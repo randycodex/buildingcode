@@ -1,41 +1,42 @@
 import assert from 'node:assert/strict';
 import {attachResearchQuestionRail} from '../public/research-question-rail.js';
 
-const handlers=new Map(),attrs={},writes=[],styles={};
-let captured=null,narrow=false,resizeCallback,disconnected=false;
-const root={clientWidth:1000,style:{setProperty:(key,value)=>styles[key]=value},classList:{toggle(){}}};
+const handlers=new Map(),attrs={},styles={},toggleHandlers=new Map(),toggleAttrs={},collapseWrites=[];
+let narrow=false,resizeCallback,disconnected=false,focused=0;
+const classes=new Set();
+const root={clientWidth:1000,style:{setProperty:(key,value)=>styles[key]=value},
+  classList:{toggle(name,on){on?classes.add(name):classes.delete(name);}}};
 const divider={setAttribute:(key,value)=>attrs[key]=value,
-  addEventListener:(type,handler)=>handlers.set(type,handler),
-  removeEventListener:type=>handlers.delete(type),
-  setPointerCapture:id=>captured=id,hasPointerCapture:id=>captured===id,releasePointerCapture:()=>captured=null};
+  addEventListener:(type,handler)=>handlers.set(type,handler),removeEventListener:type=>handlers.delete(type)};
+const toggle={setAttribute:(key,value)=>toggleAttrs[key]=value,focus(){focused++;},
+  addEventListener:(type,handler)=>toggleHandlers.set(type,handler),removeEventListener:type=>toggleHandlers.delete(type)};
 globalThis.matchMedia=()=>({matches:narrow});
 globalThis.ResizeObserver=class{constructor(callback){resizeCallback=callback;}observe(){}disconnect(){disconnected=true;}};
-const fire=(type,values={})=>{let prevented=false;handlers.get(type)?.({button:0,pointerId:1,clientX:310,
-  preventDefault(){prevented=true;},stopPropagation(){},...values});return prevented;};
+const fire=(type,values={})=>handlers.get(type)?.({button:0,pointerId:1,clientX:310,preventDefault(){},stopPropagation(){},...values});
 try {
-  const controller=attachResearchQuestionRail({root,divider,widthStore:{read:()=>310,write:value=>writes.push(value)}});
-  assert.equal(styles['--rv2-rail-width'],'310px');
-  assert.equal(attrs.role,'separator');assert.equal(attrs['aria-orientation'],'vertical');
-  fire('pointerdown');fire('pointermove',{clientX:600});
-  assert.equal(styles['--rv2-rail-width'],'600px','Dragging immediately widens the question list.');
-  assert.equal(writes.length,0,'Moves do not repeatedly write local preferences.');
-  fire('pointermove',{clientX:1200});
-  assert.equal(styles['--rv2-rail-width'],'679px','Leave a usable 320px chat beside the divider.');
-  fire('pointerup');assert.deepEqual(writes,[679]);assert.equal(captured,null);
-  fire('keydown',{key:'Home'});assert.equal(styles['--rv2-rail-width'],'160px');
-  fire('keydown',{key:'End'});assert.equal(styles['--rv2-rail-width'],'679px');
-  fire('keydown',{key:'ArrowLeft',shiftKey:true});assert.equal(styles['--rv2-rail-width'],'599px');
-  const savedWrites=writes.length;
-  root.clientWidth=700;resizeCallback();assert.equal(styles['--rv2-rail-width'],'379px');
-  root.clientWidth=1000;resizeCallback();assert.equal(styles['--rv2-rail-width'],'599px','Widening the column restores the preferred rail width.');
-  assert.equal(writes.length,savedWrites,'Outer resizing must not overwrite the saved preference.');
-  fire('pointerdown');fire('pointermove',{clientX:0});fire('pointercancel');
-  assert.equal(styles['--rv2-rail-width'],'599px');assert.equal(writes.length,savedWrites);
-  assert.equal(fire('pointerdown',{button:2}),false);
-  narrow=true;fire('keydown',{key:'Home'});assert.equal(styles['--rv2-rail-width'],'599px','The hidden mobile divider cannot resize the stacked layout.');
-  narrow=false;
-  controller.dispose();assert.equal(handlers.size,0);assert.equal(disconnected,true);
-  const restored=attachResearchQuestionRail({root,divider,widthStore:{read:()=>writes.at(-1)}});
-  assert.equal(styles['--rv2-rail-width'],'599px','Reopening reads the committed local preference.');restored.dispose();
+  for(const saved of [160,270,350,900]) {
+    const controller=attachResearchQuestionRail({root,divider,toggle,
+      widthStore:{read:()=>saved,write(){assert.fail('Fixed list widths must not save resize preferences');}}});
+    assert.equal(styles['--rv2-rail-width'],'300px','Old saved widths cannot change the expanded list');
+    assert.equal(attrs['aria-hidden'],'true');assert.equal(divider.tabIndex,-1);
+    assert.equal(handlers.size,0,'A fixed list has no drag or keyboard resize target');
+    fire('pointerdown');fire('pointermove',{clientX:1200});fire('keydown',{key:'End'});
+    assert.equal(styles['--rv2-rail-width'],'300px');
+    for(const width of [560,1800]){root.clientWidth=width;resizeCallback();assert.equal(styles['--rv2-rail-width'],'300px','Resizing the outer column retains the fixed width');}
+    controller.dispose();assert.equal(toggleHandlers.size,0);assert.equal(disconnected,true);
+  }
+  const store={read:()=>collapseWrites.at(-1)===true,write:value=>collapseWrites.push(value)};
+  const collapsible=attachResearchQuestionRail({root,divider,toggle,collapsedStore:store});
+  assert.equal(toggleAttrs['aria-expanded'],'true');
+  toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'35px');
+  assert.equal(toggleAttrs['aria-label'],'Show conversations list');assert.equal(classes.has('is-history-collapsed'),true);
+  toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'300px');
+  assert.equal(toggleAttrs['aria-label'],'Hide conversations list');assert.equal(classes.has('is-history-collapsed'),false);
+  narrow=true;toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'300px','Mobile history keeps its separate stacked-layout control');narrow=false;
+  toggleHandlers.get('click')();collapsible.dispose();
+  const restored=attachResearchQuestionRail({root,divider,toggle,collapsedStore:store});
+  assert.equal(styles['--rv2-rail-width'],'35px','Remounting a conversation preserves the collapsed list');
+  toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'300px');
+  assert.ok(focused>=4);restored.dispose();assert.equal(toggleHandlers.size,0);
 } finally {delete globalThis.matchMedia;delete globalThis.ResizeObserver;}
-console.log('Research question rail passed: drag/capture, keyboard, bounds, live sizing, local preference, outer resize, cancel, mobile isolation and disposal.');
+console.log('Research history passed: fixed 300px expanded width, 35px collapse, persisted collapse state, ignored old widths, no resize target, outer resize, mobile isolation and disposal.');

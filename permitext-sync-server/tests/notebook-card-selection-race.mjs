@@ -12,7 +12,7 @@ const identityStart = source.indexOf('  const notebookCardIdentities = new WeakM
 const identityEnd = source.indexOf('  let cards = [];', identityStart);
 assert.ok(identityStart > 0 && identityEnd > identityStart);
 const identityImplementation = source.slice(identityStart, identityEnd);
-const newStart = source.indexOf('    const createLocalNotebookNote = async () => {', end);
+const newStart = source.indexOf('    const createLocalNotebookNote = async (', end);
 const newEnd = source.indexOf('    mountState.createLocalNote =', newStart);
 assert.ok(newStart > end && newEnd > newStart);
 const newImplementation = source.slice(newStart, newEnd);
@@ -37,7 +37,7 @@ function harness() {
     activeCard: {id: 'original', title: 'Original', version: 1, document: {cardID: 'original', text: 'Original body'}},
     draftDocument: {cardID: 'original', text: 'Original body'}, dirty: false, saveConflict: false,
     notebookRevision: 0, persistedDraft: null, persistedCardID: 'original', persistedRevision: 0,
-    cards: [], editorMount: {getEditingPosition: () => ({from: 1, to: 1})},
+    cards: [], identity:{id:'project'}, foundation:{}, editorMount: {getEditingPosition: () => ({from: 1, to: 1})},
     notebookEditingPositions: new Map(), focus: {querySelector: () => ({scrollTop: 13})}, shell: {scrollTop: 21},
     captureNotebookReturnScroll() {},
     newButton: {addEventListener(name, listener) { assert.equal(name, 'click'); c.createNew = listener; }},
@@ -56,12 +56,17 @@ function harness() {
     loadNotebookDraft: (account, project, id) => waitAt('draft', id, drafts.get(id) || null),
     reconcileNotebookDocumentAssets: document => waitAt('assets', document.cardID, structuredClone(document)),
     notebookDocumentWithCurrentCardLabels: document => ({document, changed: false}), restoreNotebookPassageText,
+    loadNotebookModule: async () => ({ready:true}),
+    notebookReferenceCandidates: () => waitAt('presentation', responses.at(-1)?.id || '', []),
     privateCacheFallbackAllowed: () => false,
     loadNotebookProjectSnapshot: async () => null,
     showNotebookRecoveryConflict: () => false,
     showDraftStatus(message) { statuses.push(message); },
     renderCardList() {},
-    async renderFocusedCard() { published.push(plain({card: c.activeCard, document: c.draftDocument})); },
+    async renderFocusedCard(prepared) {
+      if(c.activeCard.id) assert(prepared?.module.ready && Array.isArray(prepared.candidates),'The incoming editor and Insert menu must be ready before publication.');
+      published.push(plain({card: c.activeCard, document: c.draftDocument}));
+    },
     scheduleNotebookAutosave() { scheduled.push(c.activeCard.id); },
     async flushNotebookAutosave() {
       const card = c.activeCard, revision = c.notebookRevision;
@@ -110,7 +115,7 @@ function harness() {
   assert.equal(h.c.activeCard.title, 'Remote A 2', 'A-B-A retains the newest A request, not the older matching ID');
   assert.equal(h.published.length, 1);
 }
-for (const stage of ['snapshot', 'draft', 'assets']) {
+for (const stage of ['snapshot', 'draft', 'assets', 'presentation']) {
   const h = harness(), release = h.hold(stage, 'A');
   h.drafts.set('A', {cardID: 'A', baseVersion: 8, title: 'Private draft A',
     document: {cardID: 'A', text: 'Private body A'}, evidenceLinks: [{id: 'evidence-A'}]});
@@ -125,7 +130,7 @@ for (const stage of ['snapshot', 'draft', 'assets']) {
   assert.deepEqual(h.published.map(item => item.card.id), ['B']);
   assert.equal(h.responses[0].title, 'Remote A 1', 'Local draft reconciliation must not mutate the fetched response object');
 }
-for (const stage of ['network', 'snapshot', 'draft', 'assets']) {
+for (const stage of ['network', 'snapshot', 'draft', 'assets', 'presentation']) {
   for (const invalidation of ['account', 'workspace', 'dispose']) {
     const h = harness(), release = h.hold(stage, 'A');
     const pending = h.c.load('A'); await h.reached(stage, 'A');
@@ -184,6 +189,21 @@ for (const stage of ['network', 'snapshot', 'draft', 'assets']) {
   assert.equal(h.published.length, 0);
 }
 console.log('Notebook selection passed: A-B and A-B-A latest-request ownership; snapshot/draft/assets staging; account/workspace/disposal fences; draft identity isolation; and edits retained during loading.');
+
+{
+  const h=harness(),release=h.hold('presentation','A');
+  const pending=h.c.load('A');await h.reached('presentation','A');
+  h.c.draftDocument.text='Typed while the next editor prepared';h.c.dirty=true;h.c.notebookRevision++;
+  release();await pending;
+  assert.equal(h.saved.at(-1)?.document.text,'Typed while the next editor prepared');
+  assert.equal(h.c.activeCard.id,'A');
+}
+{
+  const h=harness();h.c.loadNotebookModule=async()=>{throw Error('Editor preparation failed');};
+  await assert.rejects(h.c.load('A'),/Editor preparation failed/);
+  assert.equal(h.c.activeCard.id,'original');assert.equal(h.c.draftDocument.text,'Original body');
+  assert.equal(h.published.length,0,'Preparation failure retains the visible Note and its title.');
+}
 
 for (const stage of ['draft', 'assets']) {
   const h = harness(), release = h.hold(stage, '');

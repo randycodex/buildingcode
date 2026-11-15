@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {moveReportBlock, reportDropIndex, reportOutlineDropIndex, groupReportOutline, createReportOutline, scrollReportTarget, revealOutlineHandle, navigateReportOutline} from '../public/report-outline.js';
 import {createReportAutosave} from '../public/report-autosave.js';
+import {createReportUndo} from '../public/report-undo.js';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 
@@ -122,7 +123,7 @@ const calls = [];
 const context = vm.createContext({activeDraft, shell: {querySelector: () => documentBody}, moveReportBlock,
   outlineNavigationGeneration: 0, outlineController: {reorder: () => calls.push('outline'), announce() {}}, reportBlockTitle: b => b.id,
   renderIncludedReportComments: () => calls.push('comments'), panel: {}, setDirty: () => calls.push('dirty')});
-vm.runInContext(app.slice(reorderStart, app.indexOf('  function renderWorkspaceContent()', reorderStart)), context);
+vm.runInContext(app.slice(reorderStart, app.indexOf('  const reportSwitch = ', reorderStart)), context);
 context.reorderDraftBlock(activeDraft.blocks[2], 0);
 assert.deepEqual(blockBody.children, [documentRows[2], documentRows[0], documentRows[1]], 'Move the mounted editors and source previews');
 assert.equal(documentBody.scrollTop, 1706, 'Reordering keeps the document scroll position');
@@ -197,4 +198,64 @@ const remounted = createReportOutline({...options, blocks: sectionBlocks.map(blo
 assert.equal(remounted.element.querySelectorAll('.report-outline-section-items')[1].hidden, true, 'Fold state survives refreshed draft objects');
 remounted.dispose();
 autosave.dispose();
+
+// Remove is a separate action on every item, including headings and children.
+{
+  const items=[{id:'heading',kind:'heading'},{id:'note',kind:'notebookCard',sourceID:'saved-note'}];
+  const removed=[],navigated=[],reordered=[];
+  const removable=createReportOutline({blocks:items,introduction:new Element(),targets:items.map(()=>new Element()),documentBody:new Element(),
+    describe:block=>({title:block.title||block.id}),dragIcon:'',removeIcon:'<svg></svg>',
+    onNavigate:target=>navigated.push(target),onMove:block=>reordered.push(block),onRemove:block=>removed.push(block)});
+  const actions=removable.element.querySelectorAll('.report-outline-remove');
+  assert.equal(actions.length,2);assert.equal(actions[0].attributes['aria-label'],'Remove heading from Report');
+  assert.equal(removable.element.querySelector('.report-outline-introduction').querySelector('.report-outline-remove'),undefined);
+  let stopped=0,prevented=0;
+  actions[1].events.click({preventDefault(){prevented++;},stopPropagation(){stopped++;}});
+  assert.equal(removed[0],items[1]);assert.equal(stopped,1);assert.equal(prevented,1);
+  assert.equal(navigated.length,0);assert.equal(reordered.length,0,'Removing must not navigate or start a reorder.');
+  items[1].title='Renamed note';removable.refreshLabels();
+  assert.equal(actions[1].attributes['aria-label'],'Remove Renamed note from Report');
+  items.reverse();removable.reorder();
+  removable.element.querySelectorAll('.report-outline-remove')[0].events.click({preventDefault(){},stopPropagation(){}});
+  assert.equal(removed.at(-1),items[0],'Reordered actions still remove their original block object.');
+  removable.dispose();
+}
+
+// The actual app removal shares Undo, saving and identity guards with the document.
+{
+  const data={id:'report',version:1,title:'Keep this Report title',introduction:'Keep this introduction',blocks:[
+    {id:'section',kind:'heading',text:'Section'},
+    {id:'source',kind:'evidence',sourceID:'saved-evidence',excludedCommentKeys:['private']},
+    {id:'writing',kind:'paragraph',text:'Keep this report-specific wording'}]};
+  const original=structuredClone(data),history=createReportUndo(),saved=[],focus=[],announcements=[];
+  history.bind(data);
+  const saving=createReportAutosave({read:()=>data,isCurrent:()=>true,retain:async()=>({}),acknowledge:async()=>{},
+    write:async snapshot=>{saved.push(snapshot);return{...snapshot,version:snapshot.version+1};},
+    onSaved:value=>{data.version=value.version;},setTimer:()=>1,clearTimer(){}});
+  const c=vm.createContext({activeDraft:data,disposed:false,generatingReport:false,deletingReport:false,
+    requestIdentity:'account',requestWorkspaceID:'workspace',activeWorkspaceID:'workspace',isCurrentAccountRequest:()=>true,
+    CSS:{escape:value=>value},reportBlockTitle:block=>block.id,outlineController:{reveal(){},announce:text=>announcements.push(text)},
+    shell:{querySelector:selector=>({focus:options=>focus.push({selector,options})})},renderWorkspaceContent(){},
+    setDirty(){history.record(data);saving.change();}});
+  const start=app.indexOf('  function removeDraftBlock(');
+  vm.runInContext(app.slice(start,app.indexOf('  function reorderDraftBlock(',start)),c);
+  const section=data.blocks[0];assert.equal(c.removeDraftBlock(section,'outline'),true);
+  assert.deepEqual(data.blocks.map(block=>block.id),['source','writing'],'Removing a heading retains its child items.');
+  assert.match(focus.at(-1).selector,/data-block-id="source"/);assert.equal(focus.at(-1).options.preventScroll,true);
+  assert.equal(announcements[0],'section removed from Report.');
+  await saving.flush();assert.deepEqual(saved[0].blocks.map(block=>block.id),['source','writing']);
+  assert.equal(c.removeDraftBlock(section),false,'A stale removed block cannot delete the last remaining item.');
+  Object.assign(data,history.undo(data));
+  assert.deepEqual(data.blocks,original.blocks,'Undo restores exact source references, exclusions and authored text.');
+  assert.equal(data.title,original.title);assert.equal(data.introduction,original.introduction);
+  for(const flag of ['disposed','generatingReport','deletingReport']){
+    c[flag]=true;assert.equal(c.removeDraftBlock(data.blocks[0],'outline'),false);c[flag]=false;
+  }
+  c.isCurrentAccountRequest=()=>false;assert.equal(c.removeDraftBlock(data.blocks[0]),false);c.isCurrentAccountRequest=()=>true;
+  c.activeWorkspaceID='other';assert.equal(c.removeDraftBlock(data.blocks[0]),false);c.activeWorkspaceID='workspace';
+  while(data.blocks.length)c.removeDraftBlock(data.blocks[0],'outline');
+  assert.equal(focus.at(-1).selector,'.report-outline-introduction .report-outline-link','Deleting the final item retains keyboard access to the Outline.');
+  await saving.flush();saving.dispose();
+}
 console.log('Report outline passed: ordered heading groups, fold state, insertion boundaries, keyboard/pointer dragging, autosave, navigation and cleanup.');
+console.log('Outline removal passed: per-item actions, current labels, reorder identity, retained children, Undo, autosave, focus, stale-item and access guards.');

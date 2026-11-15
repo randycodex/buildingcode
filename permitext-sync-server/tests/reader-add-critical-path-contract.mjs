@@ -1,4 +1,4 @@
-import {readerTabs,addReaderTab,canAddReaderTab,maximumReaderTabs} from '../public/reader-tabs.js';
+import {readerTabs,addReaderTab,openRecentReaderTab,canAddReaderTab,maximumReaderTabs} from '../public/reader-tabs.js';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
@@ -17,7 +17,7 @@ function fixture({pro=true,view='notebook',paneIDs=[],groups=[],hidden=[]}={}) {
   const rendering=new Promise(resolve=>{finishRender=resolve;});
   const pickers=[], scrolled=[];
   const c=vm.createContext({
-    readerTabs,addReaderTab,canAddReaderTab,maximumReaderTabs,rememberReaderTabPosition(){},retainReaderColumn(){},showWebNotice:async()=>{},
+    readerTabs,addReaderTab,openRecentReaderTab,canAddReaderTab,maximumReaderTabs,rememberReaderTabPosition(){},retainReaderColumn(){},showWebNotice:async()=>{},
     ...syncIdentity,crypto:{randomUUID},state:{readers:[],paneOrder:[...paneIDs],columnGroups:groups,workflowNavigationGeneration:0},
     pendingLinkedPanePlacements:new Map(),
     CSS:{escape:value=>value},track:{querySelector:()=>null},workflowScrollStore:{capture(){},restore(){}},
@@ -111,9 +111,9 @@ console.log('Readers passed: explicit source selection, four working views, proj
 {
  const f=fixture({view:'notebook'});
  await Promise.all([f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({})]);
- const pending=f.pickers.map(pick=>pick(code));assert.equal(f.c.state.readers.length,1);assert.equal(readerTabs(f.c.state.readers[0]).length,3);
+ const pending=f.pickers.map(pick=>pick(code));assert.equal(f.c.state.readers.length,1);assert.equal(readerTabs(f.c.state.readers[0]).length,1);
  f.finishRender();await Promise.all(pending);
- for(let index=0;index<3;index++)addReaderTab(f.c.state.readers[0],{codePrefix:'BC',codeVersion:'2022'},`extra-${index}`);
+ for(let index=0;index<5;index++)addReaderTab(f.c.state.readers[0],{codePrefix:'BC',codeVersion:'2022'},`extra-${index}`);
  assert.equal(readerTabs(f.c.state.readers[0]).length,6);assert.equal(f.c.state.readers.length,1);
  const reader=f.c.state.readers[0];reader.scrollPosition={contentKey:'PC:2022',sectionID:'kept',blockID:'paragraph',anchorOffset:-83};
  const before=JSON.stringify(f.c.state.readers);let notices=0;f.c.showWebNotice=async()=>notices++;

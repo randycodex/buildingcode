@@ -63,7 +63,7 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     notifyWorkspaceLayoutChange() { layouts++; context.syncResearchColumnLayout(); }, saveWorkspaceState() { saves++; }
   });
   vm.runInContext(['minimumPaneWidthForID', 'maximumPaneWidthForID', 'constrainPaneWidth', 'migrateLegacyPaneWidth',
-    'applyPaneWeight', 'syncNotebookColumnLayout', 'syncResearchColumnLayout', 'capturePaneResizeWidths', 'singleExpandedDividerEdge', 'startPaneResize', 'startPaneEdgeResize'].map(actual).join('\n'), context);
+    'applyPaneWeight', 'syncNotebookColumnLayout', 'syncResearchColumnLayout', 'capturePaneResizeWidths','notebookReferenceResize', 'singleExpandedDividerEdge', 'startPaneResize', 'startPaneEdgeResize'].map(actual).join('\n'), context);
   context.syncResearchColumnLayout();
   return {
     context, state, track, panes, handlers, frames, classes, makePane, handle,
@@ -259,18 +259,92 @@ assert.equal(evidence.context.minimumPaneWidthForID('project:notebook:one'),600)
 assert.equal(evidence.context.maximumPaneWidthForID('reader:one'),Infinity);
 console.log('Evidence pointer resizing and restored widths stay within 300–600 pixels; Note and Reader bounds are preserved.');
 
-// Notebook Notes can use the editor's spare space, including on a pointer
-// drag, but stop before the existing 800px writing page must shrink.
+// Notebook reference columns borrow from the notepad, even when another
+// reference is at its minimum. The fitted layout must preserve that choice.
+{
+ const ids=['reader:one','utility:saved:one','project:notes-index:one','project:notebook:one'];
+ const notebook=fixture(ids,3054);notebook.workflow='notebook';
+ ids.forEach((id,index)=>notebook.state.paneWeights[id]=[900,360,200,2000][index]);
+ notebook.context.syncResearchColumnLayout();
+ const before=notebook.widths();
+ notebook.context.startPaneResize(notebook.event(1261),ids[1],ids[2]);
+ notebook.move(1341);notebook.frame();
+ assert.deepEqual(notebook.widths(),[900,440,300,before[3]-80],'Evidence takes its extra width from the notepad while Notes stays at 300px.');
+ notebook.finish(1341);
+ assert.deepEqual(notebook.widths(),[900,440,300,before[3]-80],'Both reference widths survive release.');
+ notebook.context.startPaneResize(notebook.event(1341),ids[1],ids[2]);
+ notebook.move(2341);notebook.frame();notebook.finish(2341);
+ assert.equal(notebook.widths()[1],600,'Evidence reaches its existing 600px cap.');
+ assert.deepEqual(notebook.widths(),[900,600,300,before[3]-240],'Growing Evidence preserves Reader and Notes.');
+ notebook.context.startPaneResize(notebook.event(1703),ids[2],ids[3]);
+ notebook.move(2203);notebook.frame();notebook.finish(2203);
+ assert.deepEqual(notebook.widths(),[900,600,300,before[3]-240],'The fixed Notes list does not resize the notepad.');
+ notebook.context.syncResearchColumnLayout();assert.equal(notebook.widths()[1],600,'A fresh fit preserves the chosen Evidence width.');
+}
+console.log('Notebook reference dividers passed: notepad supplies the extra space, other references stay fixed, caps and saved geometry hold.');
+
+// Reader uses the same donor, can grow beyond 900px, and stops at an 800px
+// notepad through both its inner divider and outer grip.
+{
+ const ids=['reader:one','utility:saved:one','project:notes-index:one','project:notebook:one'];
+ const notebook=fixture(ids,3054);notebook.workflow='notebook';
+ ids.forEach((id,index)=>notebook.state.paneWeights[id]=[810,450,250,2000][index]);
+ notebook.context.syncResearchColumnLayout();const before=notebook.widths();
+ const maximum=before[0]+before[3]-800;
+ assert.equal(notebook.context.maximumPaneWidthForID(ids[0]),maximum);
+ notebook.context.startPaneResize(notebook.event(811),ids[0],ids[1]);
+ notebook.move(2811);notebook.frame();
+ assert.deepEqual(notebook.widths(),[maximum,450,300,800],'Only Reader and the notepad change during the drag.');
+ notebook.finish(2811);
+ assert.ok(maximum>900);assert.deepEqual(notebook.widths(),[maximum,450,300,800]);
+ notebook.context.startPaneResize(notebook.event(1548),ids[0],ids[1]);
+ notebook.move(1308);notebook.frame();notebook.finish(1308);
+ assert.deepEqual(notebook.widths(),[maximum-240,450,300,1040],'Shrinking Reader returns space to the notepad.');
+ notebook.context.startPaneEdgeResize(notebook.event(1),ids[0],'left');
+ notebook.move(-999);notebook.frame();notebook.finish(-999);
+ assert.deepEqual(notebook.widths(),[maximum,450,300,800],'The outside grip respects the same 800px floor.');
+ notebook.context.syncResearchColumnLayout();assert.deepEqual(notebook.widths(),[maximum,450,300,800],'Fitting preserves a Reader wider than 900px.');
+}
+console.log('Notebook Reader divider passed: notepad-only resizing, fixed Evidence/Notes, growth beyond 900px, exact 800px floor and restored geometry.');
+
+{
+ const ids=['reader:one','utility:saved:one','project:notes-index:one','project:notebook:one'];
+ const notebook=fixture(ids,2450);notebook.workflow='notebook';
+ ids.forEach((id,index)=>notebook.state.paneWeights[id]=[850,450,300,1000][index]);
+ notebook.context.syncResearchColumnLayout();const before=notebook.widths();
+ notebook.context.startPaneResize(notebook.event(1351),ids[1],ids[2]);
+ notebook.move(2351);notebook.frame();notebook.finish(2351);
+ assert.deepEqual(notebook.widths(),[before[0],before[1]+before[3]-800,before[2],800],
+  'Evidence stops at the writing width instead of squeezing Notes or Reader.');
+}
+
+// With Reader closed, the outer Evidence grip still borrows from the notepad.
+{
+ const ids=['utility:saved:one','project:notes-index:one','project:notebook:one'];
+ const notebook=fixture(ids,3054);notebook.workflow='notebook';
+ ids.forEach((id,index)=>notebook.state.paneWeights[id]=[400,250,2000][index]);
+ notebook.context.syncResearchColumnLayout();const before=notebook.widths();
+ notebook.context.startPaneEdgeResize(notebook.event(1),ids[0],'left');
+ notebook.move(-99);notebook.frame();notebook.finish(-99);
+ assert.deepEqual(notebook.widths(),[500,300,before[2]-100]);
+}
+
+// Notebook Notes uses the Assistant sidebar's fixed 300px width while keeping
+// the existing writing page in place.
 {
  const notebook=fixture(['project:notes-index:one','project:notebook:one'],1920);
  notebook.workflow='notebook';notebook.context.syncResearchColumnLayout();
  const notesID='project:notes-index:one',editorID='project:notebook:one';
- assert.equal(notebook.context.minimumPaneWidthForID(editorID),836);
- assert.equal(notebook.context.maximumPaneWidthForID(notesID),1079);
- notebook.context.startPaneResize(notebook.event(601),notesID,editorID);
- notebook.move(1801);notebook.frame();notebook.finish(1801);
- assert.deepEqual(notebook.widths(),[1079,836],'The Notes divider reaches the writing width without an arbitrary sidebar cap');
- assert.equal(notebook.state.paneWeights[notesID],1079);assert.equal(notebook.saves,1);
- notebook.context.syncResearchColumnLayout();assert.deepEqual(notebook.widths(),[1079,836],'Fitting does not undo the chosen Notes width');
+ const before=notebook.widths();
+ assert.equal(notebook.context.minimumPaneWidthForID(editorID),800);
+ assert.equal(notebook.context.minimumPaneWidthForID(notesID),300);
+ assert.equal(notebook.context.maximumPaneWidthForID(notesID),300);
+ notebook.context.startPaneResize(notebook.event(351),notesID,editorID);
+ notebook.move(-849);notebook.frame();notebook.finish(-849);
+ assert.deepEqual(notebook.widths(),before,'The fixed Notes width cannot shrink.');
+ notebook.context.startPaneResize(notebook.event(201),notesID,editorID);
+ notebook.move(1401);notebook.frame();notebook.finish(1401);
+ assert.deepEqual(notebook.widths(),before,'The fixed Notes width cannot grow.');
+ notebook.context.syncResearchColumnLayout();assert.deepEqual(notebook.widths(),before,'Fitting preserves the Notes width');
 }
-console.log('Notebook divider passed: pointer expansion, writing-width boundary and stable saved geometry at 1920px.');
+console.log('Notebook Notes divider passed: fixed 300px width and stable writing space.');

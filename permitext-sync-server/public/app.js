@@ -1,19 +1,21 @@
+import { normalizeNoteResearch } from "./note-research.js?v=1";
 import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=8";
-import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=4";
+import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, openRecentReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=5";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=30";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=40";
+import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=7";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
 import { researchReaderPassageTarget } from "./research-reader-target.js?v=3";
 import { calculationDraftStore } from "./calculation-drafts.js?v=3";
-import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=3";
+import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261112-evidence-menu-v1741";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1844";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -28,28 +30,31 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=31";
-import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=33";
+import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js?v=2";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261108-floating-menu-pins-v1382";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261109-notebook-desk-v1299";
 import { normalizeNotebookColumns, notebookColumnPaneID, createNotebookMountRegistry } from "./notebook-columns.js?v=4";
 import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=3";
-import { createReaderBlockWindow } from "./reader-block-window.js?v=10";
+import { createReaderBlockWindow } from "./reader-block-window.js?v=11";
 import { createReaderSectionVisibility } from "./reader-section-visibility.js?v=4";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
-import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
+import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261114-outline-remove-v13";
+import { applyLetterDocumentLayout } from "./document-layout.js?v=1";
 import { createReportAutosave } from "./report-autosave.js?v=1";
+import { createReportSwitch, createReportSourcePreviews, retainReportChildren } from "./report-presentation.js?v=1";
+import { createWorkspaceViewPresentation } from "./workspace-view-presentation.js?v=5";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=4";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261108-reader-menus-v10";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=16";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout } from "./workflow-views.js?v=21";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
-import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
+import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261114-report-sources-v10";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261109-comparison-v21";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261019-project-workflow-v5";
-import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261021-project-questions-v8";
+import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportBlockUsesSource, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261114-report-source-toggle-v9";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
@@ -62,7 +67,7 @@ import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=202
 import { searchReaderTextSections, rankReaderSearchResults } from "./reader-search-match.js?v=20261026-exact-section-v4";
 import { searchWords, searchWordPattern } from "./search-words.js?v=20261025-workspace-chrome-v1379";
 import { buildReaderChapterContents, readerContentsLabel, readerContentsChapterKey, readerContentsNodeCanExpand } from "./reader-navigation-tree.js?v=20261112-label-case-v3";
-import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261112-visible-anchor-v3";
+import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261114-reader-tab-anchor-v4";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { isWorkspaceLayoutOnlyMutation, onlyWorkspaceLayoutsChanged, withoutWorkspaceLayoutSync, retireWorkspaceLayoutSyncEntries } from "./workspace-layout-sync.js?v=5";
@@ -166,7 +171,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261112-evidence-menu-v1741";
+} from "./offline-storage.js?v=20261113-research-notebook-v1844";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -199,7 +204,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261112-notebook-resize-v1303";
+} from "./workspace-state.js?v=20261113-note-research-v1305";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -329,6 +334,7 @@ import {
   unlinkLegacyPromotion
 } from "./code-question-legacy.js?v=20260806-code-question-legacy-v1";
 
+applyLetterDocumentLayout(document.documentElement);
 const permitextSyncSchemaVersion = 2;
 installScrollEdgeFades();
 
@@ -374,7 +380,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261111-cross-device-notebook-v5";
+const notebookClientVersion = "20261114-notebook-format-tools-v4";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -392,7 +398,6 @@ const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleCalculatorButton = document.querySelector("#toggle-calculator");
 const toggleSavedButton = document.querySelector("#toggle-saved");
-const toggleNotesListButton = document.querySelector("#toggle-notes-list");
 const toggleContextButton = document.querySelector("#toggle-context");
 const toggleFactsButton = document.querySelector("#toggle-facts");
 const toggleNotebookButton = document.querySelector("#toggle-notebook");
@@ -720,6 +725,7 @@ let notebookStylesPromise = null;
 const notebookMounts = new Map();
 const notebookCatalogs = new Map();
 const notebookCatalogRequests = new Map();
+let notebookIndexTitleScroll = null;
 let notebookNoteOpeningGeneration = 0;
 const notebookColumnRegistry = createNotebookMountRegistry(notebookMounts, {openCard: async (projectID, cardID) => {
   const project = workspaceProject();
@@ -1022,8 +1028,10 @@ function loadWorkspaceState(accountOverride) {
         ? [projectIdentity(activeProjectDetail)]
         : [],
       notebookColumns: normalizeNotebookColumns(saved.notebookColumns),
-      notebookListHidden: saved.notebookListHidden === true,
-      notebookReaderHidden: saved.notebookReaderHidden === true,
+      notebookListHidden: saved.notebookListHidden !== false,
+      noteResearch: normalizeNoteResearch(saved.noteResearch),
+      notebookReaderVisibilityVersion: 1,
+      notebookReaderHidden: saved.notebookReaderVisibilityVersion === 1 ? saved.notebookReaderHidden !== false : true,
       reportDrafts: activeProjectDetail && savedReportDrafts.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
@@ -1115,8 +1123,10 @@ function loadWorkspaceState(accountOverride) {
       workboards: [],
       notebooks: [],
       notebookColumns: [],
-      notebookListHidden: false,
-      notebookReaderHidden: false,
+      notebookListHidden: true,
+      noteResearch: {},
+      notebookReaderVisibilityVersion: 1,
+      notebookReaderHidden: true,
       reportDrafts: [],
       coordinations: [],
       coordinationThreads: [],
@@ -1997,7 +2007,8 @@ function applySharedWorkspaceState(serializedState) {
   }
 }
 
-function clearWorkspaceTransientRuntime() {
+function clearWorkspaceTransientRuntime({preservePresentation = false} = {}) {
+  if (!preservePresentation) workspaceViewPresentation?.cancel();
   projectInformationMounts.clear();
   researchOpenGeneration += 1;
   searchTimers.forEach((timer) => clearTimeout(timer));
@@ -2112,7 +2123,7 @@ function waitForWorkspaceTransitionPaint() {
   });
 }
 
-function applyStoredWorkspaceLayout(layout) {
+function applyStoredWorkspaceLayout(layout, {preservePresentation = false} = {}) {
   projectStudioTransitionGeneration += 1;
   delete track._researchColumnLayout;
   applyWorkspaceLayout(state, restoreSearchQuerySession(sessionStorage, tabWorkspaceKey, activeWorkspaceID,
@@ -2126,7 +2137,7 @@ function applyStoredWorkspaceLayout(layout) {
   state.coordinations = normalizeProjectIdentities(state.coordinations);
   state.coordinationThreads = openCoordinationThreads();
   reconcileOpenProjectToolState();
-  clearWorkspaceTransientRuntime();
+  clearWorkspaceTransientRuntime({preservePresentation});
   restoreResearchWorkspaceState();
 }
 
@@ -2134,6 +2145,8 @@ async function switchWorkspace(workspaceID, options = {}) {
   const requestIdentity = captureAccountRequest();
   const target = workspaceRegistry?.workspaces?.find((workspace) => workspace.id === workspaceID);
   if (!target) return false;
+  const selection = state.workspaceSelectionGeneration = (state.workspaceSelectionGeneration || 0) + 1;
+  const ownsSelection = () => isCurrentAccountRequest(requestIdentity) && state.workspaceSelectionGeneration === selection;
   if (workspaceID === activeWorkspaceID) {
     // Sync can select a Project before its presentation gate catches up. A
     // checked chooser row must still open that workspace, without reloading
@@ -2141,21 +2154,26 @@ async function switchWorkspace(workspaceID, options = {}) {
     const navigation = state.workflowNavigationGeneration || 0;
     const gate = workspaceAccessGateForRender();
     await gate.ready;
-    const current = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    const current = () => ownsSelection() && activeWorkspaceID === workspaceID &&
       (state.workflowNavigationGeneration || 0) === navigation && gate.allowed;
     if (!current()) { renderWorkspaceTabs(); return false; }
     await renderWorkspace({ persist: false });
+    await Promise.all([...track.querySelectorAll(':scope > .workspace-panel')]
+      .filter(pane => workflowPaneIsVisible(pane.dataset.paneId))
+      .map(pane => whenWorkspacePaneReady(pane.dataset.paneId)));
     if (!current()) return false;
+    track.removeAttribute("aria-busy");
     renderWorkspaceTabs();
     if (options.focus !== false) focusActiveWorkspaceTab();
     if (options.onSelected) await options.onSelected();
     return true;
   }
+  const outgoingWorkspaceID = activeWorkspaceID;
   if (!options.transitionConfirmed && !(await confirmWorkspaceTransition())) {
-    renderWorkspaceTabs();
+    if (ownsSelection()) renderWorkspaceTabs();
     return false;
   }
-  if (!isCurrentAccountRequest(requestIdentity)) return false;
+  if (!ownsSelection() || activeWorkspaceID !== outgoingWorkspaceID) return false;
   const nextLayout = loadWorkspaceSnapshot(workspaceID);
   clearWorkspaceNotice();
   if (!nextLayout) {
@@ -2163,38 +2181,69 @@ async function switchWorkspace(workspaceID, options = {}) {
     return false;
   }
   saveWorkspaceState();
-  activeWorkspaceID = workspaceID;
-  workspaceRegistry = { ...workspaceRegistry, activeWorkspaceID };
-  applyStoredWorkspaceLayout(nextLayout);
-  if (!target.projectID) {
-    setOpenProjectDetails([]);
-    state.projectContextOpen = false;
-    state.projectFactsOpen = false;
-    state.notebooks = [];
-    state.reportDrafts = [];
-    state.coordinations = [];
-    state.coordinationThreads = [];
-  }
-  persistWorkspaceRegistry();
-  renderWorkspaceTransitionState(target.name);
-  if (options.focus !== false) focusActiveWorkspaceTab();
-  const navigation = state.workflowNavigationGeneration || 0;
-  await waitForWorkspaceTransitionPaint();
-  suppressReaderScrollRestore = true;
+  let navigation;
+  let switched = false;
   try {
-    await renderWorkspace();
-  } finally {
-    suppressReaderScrollRestore = false;
-    track.removeAttribute("aria-busy");
-    renderProjectUpdateBadge();
+    switched = await workspaceViewPresentation.present({isCurrent:ownsSelection, update:async ownsPresentation => {
+      if (!ownsSelection() || activeWorkspaceID !== outgoingWorkspaceID) return false;
+      // Close retained document screens inside the same handoff. Their close
+      // callbacks must not briefly reveal the previous project's columns.
+      const deferred = state.workflowPresentationDeferred;
+      state.workflowPresentationDeferred = true;
+      try { closeSharedWorkspaceViews(); projectDetailsScreen?.close(); }
+      finally {
+        if (deferred === undefined) delete state.workflowPresentationDeferred;
+        else state.workflowPresentationDeferred = deferred;
+      }
+      activeWorkspaceID = workspaceID;
+      workspaceRegistry = { ...workspaceRegistry, activeWorkspaceID };
+      applyStoredWorkspaceLayout(nextLayout, {preservePresentation:true});
+      if (!target.projectID) {
+        setOpenProjectDetails([]);
+        state.projectContextOpen = false;
+        state.projectFactsOpen = false;
+        state.notebooks = [];
+        state.reportDrafts = [];
+        state.coordinations = [];
+        state.coordinationThreads = [];
+      }
+      persistWorkspaceRegistry();
+      renderWorkspaceTransitionState(target.name);
+      navigation = state.workflowNavigationGeneration || 0;
+      const current = () => ownsPresentation() && ownsSelection() && activeWorkspaceID === workspaceID &&
+        (state.workflowNavigationGeneration || 0) === navigation;
+      try {
+        // The loading shells stay behind the outgoing frame. Wait for this
+        // project's access decision and visible editors before presenting it.
+        await workspaceAccessGateForRender().ready;
+        if (!current()) return false;
+        suppressReaderScrollRestore = true;
+        try { await renderWorkspace(); }
+        finally { suppressReaderScrollRestore = false; }
+        if (!current()) return false;
+        await Promise.all([...track.querySelectorAll(':scope > .workspace-panel')]
+          .filter(pane => workflowPaneIsVisible(pane.dataset.paneId))
+          .map(pane => whenWorkspacePaneReady(pane.dataset.paneId)));
+        if (!current()) return false;
+        const scrollLeft = Number(state.trackScrollLeft) || 0;
+        track.scrollTo({left:Math.min(scrollLeft, Math.max(0, track.scrollWidth - track.clientWidth)), behavior:'instant'});
+        refreshOpenSettingsWorkspace();
+        if (options.focus !== false) focusActiveWorkspaceTab();
+        return true;
+      } finally {
+        if (ownsSelection() && activeWorkspaceID === workspaceID) {
+          track.removeAttribute("aria-busy");
+          renderProjectUpdateBadge();
+        }
+      }
+    }});
+  } catch (error) {
+    if (ownsSelection()) presentWorkspaceIssue(error.message || 'This workspace could not finish loading. Reload to retry.');
+    return false;
   }
-  const scrollLeft = Number(state.trackScrollLeft) || 0;
-  track.scrollLeft = Math.min(scrollLeft, Math.max(0, track.scrollWidth - track.clientWidth));
-  refreshOpenSettingsWorkspace();
-  if (options.onSelected) await workspaceAccessGateForRender().ready;
-  if (options.onSelected && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+  if (switched && options.onSelected && ownsSelection() && activeWorkspaceID === workspaceID &&
       (state.workflowNavigationGeneration || 0) === navigation) await options.onSelected();
-  return true;
+  return Boolean(switched);
 }
 
 function workspaceProject(projects = null) {
@@ -3144,6 +3193,7 @@ async function openProjectCodeDecisions(project) {
 }
 
 async function closeProjectNotebook(project) {
+  if (currentColumnWorkflowView() === 'notebook') return false;
   if (!(await confirmNotebookDiscard(project))) return false;
   const notebookIDs = notebookPaneIDsForProject(project);
   // Closing ends the explicit Research opt-in; Notebook can reopen at home.
@@ -3160,7 +3210,7 @@ async function closeProjectNotebook(project) {
   return true;
 }
 
-async function prepareNotebookView({openNote = true} = {}) {
+async function prepareNotebookView() {
   const project = workspaceProject();
   let evidence = savedInstanceForPaneID(primarySavedPaneID());
   let changed = false;
@@ -3172,7 +3222,7 @@ async function prepareNotebookView({openNote = true} = {}) {
     state.paneWeights[state.projectHostPaneID] ||= 360;
     changed = true;
   }
-  if (openNote && !projectHasOpenNotebook(project)) await openProjectNotebook(project);
+  if (project && !projectHasOpenNotebook(project)) await openProjectNotebook(project);
   else if (changed) await transitionWorkspace('utility');
 }
 
@@ -3216,13 +3266,91 @@ function notebookIndexPaneID(project) {
   return `project:notes-index:${encodeURIComponent(projectDetailKey(project))}`;
 }
 
+function updateNotebookListToggle(button) {
+  const expanded = !state.notebookListHidden;
+  const label = expanded ? 'Hide notes list' : 'Show notes list';
+  button.hidden = currentColumnWorkflowView() !== 'notebook';
+  button.disabled = !workspacePrivatePresentationAllowed() || !hasCapability('notebook') || !workspaceProject() || projectToolTogglePending;
+  button.setAttribute('aria-label', label);
+  button.setAttribute('aria-expanded', String(expanded));
+  button.title = label;
+  if (button.dataset.listExpanded !== String(expanded)) {
+    button.dataset.listExpanded = String(expanded);
+    button.replaceChildren();
+    prependWorkspaceButtonIcon(button, expanded ? 'panel-left-close' : 'panel-left-open');
+  }
+}
+
+function createNotebookListToggle() {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'icon-button notebook-list-toggle';
+  updateNotebookListToggle(button);
+  button.addEventListener('click', () => void toggleNotebookList());
+  return button;
+}
+
+function syncNotebookListControls() {
+  document.querySelectorAll('.notebook-list-toggle').forEach(updateNotebookListToggle);
+}
+
+async function transitionNotebookList(update) {
+  const previous = track._notebookListTransition;
+  const before = [...track.querySelectorAll('.notebook-index-panel:not(.is-workflow-hidden), .notebook-panel:not(.is-workflow-hidden)')].map(panel => {
+    const style = getComputedStyle(panel);
+    return {panel, width: panel.getBoundingClientRect().width,
+      paddingInlineStart: style.paddingInlineStart, paddingInlineEnd: style.paddingInlineEnd};
+  });
+  if (!before.length || !before.every(({panel}) => typeof panel.animate === 'function') ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    previous?.skipTransition();
+    await update();
+    return;
+  }
+  const root = document.documentElement;
+  const animations = [];
+  const transition = {skipTransition: () => animations.forEach(animation => animation.cancel())};
+  track._notebookListTransition = transition;
+  previous?.skipTransition();
+  root.classList.add('notes-list-motion');
+  const animate = (element, frames) => {
+    const animation = element.animate(frames, {duration:260, easing:'cubic-bezier(.2, 0, 0, 1)'});
+    // Retargeting a quick second toggle cancels the earlier live animation.
+    animation.finished.catch(() => {});
+    animations.push(animation);
+  };
+  try {
+    await update();
+    if (track._notebookListTransition !== transition) return;
+    before.forEach(({panel, width, paddingInlineStart, paddingInlineEnd}) => {
+      if (!panel.isConnected) return;
+      const style = getComputedStyle(panel);
+      animate(panel, [
+        {flexBasis:`${width}px`, paddingInlineStart, paddingInlineEnd},
+        {flexBasis:`${panel.getBoundingClientRect().width}px`, paddingInlineStart:style.paddingInlineStart, paddingInlineEnd:style.paddingInlineEnd}
+      ]);
+    });
+    await Promise.allSettled(animations.map(animation => animation.finished));
+  } finally {
+    if (track._notebookListTransition === transition) {
+      delete track._notebookListTransition;
+      root.classList.remove('notes-list-motion');
+    }
+  }
+}
+
 async function toggleNotebookList() {
   if (!workspacePrivatePresentationAllowed() || !hasCapability('notebook') ||
       !workspaceProject() || currentWorkflowView() !== 'notebook') return false;
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   state.notebookListHidden = !state.notebookListHidden;
+  const hidden = state.notebookListHidden;
   document.querySelector('.notebook-index-menu')?._close?.(false);
   saveWorkspaceState();
-  await transitionWorkspace('utility');
+  await transitionNotebookList(() => transitionWorkspace('utility'));
+  if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
+      currentWorkflowView() !== 'notebook' || state.notebookListHidden !== hidden) return false;
+  track.querySelector('.notebook-index-panel:not(.is-workflow-hidden) .notebook-list-toggle')?.focus({preventScroll:true});
   return true;
 }
 
@@ -3238,11 +3366,16 @@ function renderNotebookIndex(project) {
   panel.dataset.projectId = projectDetailKey(project);
   applyPaneWeight(panel, panel.dataset.paneId);
   const header = document.createElement('header');
-  header.className = 'panel-header';
+  header.className = 'panel-header notebook-shared-header';
   const heading = document.createElement('h2');
   heading.className = 'eyebrow panel-kind';
   heading.textContent = 'Notes';
-  header.append(heading);
+  const label = document.createElement('div');
+  label.className = 'notebook-shared-label';
+  label.append(heading);
+  header.append(label);
+  const actions = document.createElement('div');
+  actions.className = 'panel-actions notebook-index-actions';
   if (project.sharedRole !== 'viewer') {
     const options = document.createElement('button');
     options.type = 'button';
@@ -3252,16 +3385,17 @@ function renderNotebookIndex(project) {
     options.setAttribute('aria-haspopup', 'menu');
     options.setAttribute('aria-expanded', 'false');
     options.addEventListener('click', () => openNotebookListMenu(panel, options));
-    const actions = document.createElement('div');
-    actions.className = 'panel-actions notebook-index-actions';
     actions.append(options);
-    header.append(actions);
   }
+  actions.append(createNotebookListToggle());
+  panel._notebookControls = actions;
   const body = document.createElement('div');
   body.className = 'notebook-index-body';
   body.setAttribute('aria-label', 'Project notes');
   body.setAttribute('role', 'region');
   panel.append(header, body);
+  notebookIndexTitleScroll ||= attachResearchHistoryTitleScroll({root:track,
+    buttonSelector:'.notebook-index-note', titleSelector:'.notebook-index-title', textSelector:'.notebook-index-title-text'});
   syncNotebookLanding(null, panel);
   return panel;
 }
@@ -3370,7 +3504,9 @@ function publishNotebookColumn(projectID, paneID, card, cards) {
     const catalog = notebookCatalogs.get(projectID) || [];
     if (card.id) {
       const summary = catalog.find(item => item.id === card.id);
-      if (summary) Object.assign(summary, {title: card.title});
+      if (summary) Object.assign(summary, {title: card.title,
+        ...(card.createdAt ? {createdAt: card.createdAt} : {}),
+        ...(card.updatedAt ? {updatedAt: card.updatedAt} : {})});
       else catalog.push({...card});
       notebookCatalogs.set(projectID, catalog);
     }
@@ -3378,7 +3514,7 @@ function publishNotebookColumn(projectID, paneID, card, cards) {
   const panel = notebookColumnMounts.get(paneID)?.panel;
   if (panel && card) {
     panel.dataset.noteId = card.id || '';
-    panel.querySelector('.notebook-heading .panel-kind').textContent = card.title || 'Untitled';
+    panel.dataset.notebookTitle = card.title || 'Untitled';
     preparePaneCollapse(panel);
   }
   syncNotebookNoteTabs();
@@ -3395,7 +3531,10 @@ function syncNotebookNoteTabs() {
     const live = notebookColumnMounts.get(notebookColumnPaneID(column))?.summary?.();
     const note = notes.find(card => card.id === (live?.id || column.cardID));
     if (note && live) note.title = live.title;
-    if (column.open && !note && (live || column.cardID || column.newNote || column.title)) notes.push({id: live?.id || column.cardID || '', title: live?.title || column.title || 'Untitled', column});
+    if (column.open && !note && (live || column.cardID || column.newNote || column.title)) notes.push({
+      id: live?.id || column.cardID || '', title: live?.title || column.title || 'Untitled', column,
+      createdAt: live?.createdAt, updatedAt: live?.updatedAt
+    });
   }
   notebookTabs.replaceChildren();
   notebookTabs.hidden = true;
@@ -3559,6 +3698,16 @@ async function mutateNotebookNotesFromMenu(project, cards, {trash = false, archi
   }
 }
 
+function notebookHistoryGroups(cards = [], now = new Date()) {
+  const history = cards.map(card => ({
+    card,
+    createdAt: [card.updatedAt, card.createdAt].find(value => Number.isFinite(Date.parse(value))) || '',
+    messageCount: card.id ? 1 : 0
+  }));
+  return researchConversationHistoryGroups(history, now).map(({conversations, ...group}) =>
+    ({...group, cards: conversations.map(item => item.card)}));
+}
+
 function syncNotebookLanding(notes = null, panel = track.querySelector('.notebook-index-panel')) {
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const body = panel?.querySelector('.notebook-index-body');
@@ -3575,15 +3724,28 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
   if (project.sharedRole === 'viewer') { selection.enabled = false; selection.ids.clear(); }
   const options = panel.querySelector('.notebook-index-menu-button');
   if (options) options.disabled = selection.busy || !hasCapability('notebook') || project.sharedRole === 'viewer';
-  const key = JSON.stringify([projectID, available, loading, selectedID, selected?.id,
+  const key = JSON.stringify([projectID, available, !available && loading, selectedID, selected?.id, researchHistoryDayIndex(new Date()),
     selection.enabled, [...selection.ids], selection.busy,
-    cards.map(card => [card.id, card.title, card.column?.id])]);
+    cards.map(card => [card.id, card.title, card.column?.id, card.updatedAt, card.createdAt])]);
   if (body.dataset.catalogKey === key) return;
   const menu = document.querySelector('.notebook-index-menu');
   if (menu?._panel === panel) menu._close?.(false);
   body.dataset.catalogKey = key;
   body.replaceChildren();
   body.setAttribute('aria-busy', String(selection.busy));
+  const topRow = document.createElement('div');
+  topRow.className = 'notebook-index-top-row';
+  body.append(topRow);
+  if (project.sharedRole !== 'viewer') {
+    const create = document.createElement('button');
+    create.type = 'button';
+    create.className = 'notebook-index-create';
+    create.textContent = 'New note +';
+    create.disabled = selection.enabled || selection.busy;
+    create.addEventListener('click', () => void createNotebookNoteColumn(project));
+    topRow.append(create);
+  }
+  if (panel._notebookControls) topRow.append(panel._notebookControls);
   if (selection.enabled) {
     const status = document.createElement('p');
     status.className = 'notebook-selection-status'; status.setAttribute('role', 'status');
@@ -3591,44 +3753,57 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
     body.append(status);
   }
   if (cards.length) {
-    const list = document.createElement('ul');
-    for (const card of cards) {
-      const item = document.createElement('li');
-      const open = document.createElement('button');
-      open.type = 'button';
-      open.dataset.noteId = card.id || '';
-      open.disabled = selection.busy || selection.enabled && !card.id;
-      if (selection.enabled) {
-        open.className = 'notebook-index-choice';
-        open.setAttribute('role', 'checkbox');
-        open.setAttribute('aria-checked', String(selection.ids.has(card.id)));
-        open.setAttribute('aria-label', card.title || 'Untitled');
-        const check = document.createElement('span');
-        check.className = 'notebook-note-check'; check.setAttribute('aria-hidden', 'true');
-        check.textContent = selection.ids.has(card.id) ? '✓' : '';
-        open.append(check);
-      }
-      const label = document.createElement('span');
-      label.className = 'notebook-index-title';
-      label.textContent = card.title || 'Untitled';
-      open.title = label.textContent;
-      open.append(label);
-      const active = card.id ? card.id === selectedID : card.column?.id === selected?.id;
-      open.classList.toggle('is-selected', selection.enabled ? selection.ids.has(card.id) : active);
-      if (active) open.setAttribute('aria-current', 'true');
-      open.addEventListener('click', () => {
+    for (const group of notebookHistoryGroups(cards)) {
+      const section = document.createElement('section');
+      section.className = 'notebook-index-group';
+      section.setAttribute('aria-label', group.label);
+      section.dataset.dateGroupId = group.id;
+      const heading = document.createElement('h3');
+      heading.className = 'notebook-index-group-label';
+      heading.textContent = group.label;
+      const list = document.createElement('ul');
+      for (const card of group.cards) {
+        const item = document.createElement('li');
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.className = selection.enabled ? 'notebook-index-note notebook-index-choice' : 'notebook-index-note';
+        open.dataset.noteId = card.id || '';
+        open.disabled = selection.busy || selection.enabled && !card.id;
         if (selection.enabled) {
-          selection.ids.has(card.id) ? selection.ids.delete(card.id) : selection.ids.add(card.id);
-          syncNotebookLanding();
-          [...panel.querySelectorAll('[role="checkbox"]')].find(node => node.dataset.noteId === card.id)?.focus({preventScroll:true});
-          return;
+          open.setAttribute('role', 'checkbox');
+          open.setAttribute('aria-checked', String(selection.ids.has(card.id)));
+          open.setAttribute('aria-label', card.title || 'Untitled');
+          const check = document.createElement('span');
+          check.className = 'notebook-note-check'; check.setAttribute('aria-hidden', 'true');
+          check.textContent = selection.ids.has(card.id) ? '✓' : '';
+          open.append(check);
         }
-        void openNotebookNoteColumn(project, card).catch(error => showWebNotice('Note not opened', error.message));
-      });
-      item.append(open);
-      list.append(item);
+        const label = document.createElement('span');
+        label.className = 'notebook-index-title';
+        const titleText = document.createElement('span');
+        titleText.className = 'notebook-index-title-text';
+        titleText.textContent = card.title || 'Untitled';
+        label.append(titleText);
+        open.title = titleText.textContent;
+        open.append(label);
+        const active = card.id ? card.id === selectedID : card.column?.id === selected?.id;
+        open.classList.toggle('is-selected', selection.enabled ? selection.ids.has(card.id) : active);
+        if (active) open.setAttribute('aria-current', 'true');
+        open.addEventListener('click', () => {
+          if (selection.enabled) {
+            selection.ids.has(card.id) ? selection.ids.delete(card.id) : selection.ids.add(card.id);
+            syncNotebookLanding();
+            [...panel.querySelectorAll('[role="checkbox"]')].find(node => node.dataset.noteId === card.id)?.focus({preventScroll:true});
+            return;
+          }
+          void openNotebookNoteColumn(project, card).catch(error => showWebNotice('Note not opened', error.message));
+        });
+        item.append(open);
+        list.append(item);
+      }
+      section.append(heading, list);
+      body.append(section);
     }
-    body.append(list);
   } else if (!available) {
     const status = document.createElement('p');
     status.setAttribute('role', 'status');
@@ -3642,15 +3817,7 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
     retry.addEventListener('click', () => { void ensureNotebookTabCatalog(); syncNotebookLanding(); });
     body.append(retry);
   }
-  if (project.sharedRole !== 'viewer') {
-    const create = document.createElement('button');
-    create.type = 'button';
-    create.className = 'notebook-index-create';
-    create.textContent = 'New note';
-    create.disabled = selection.enabled || selection.busy;
-    create.addEventListener('click', () => void createNotebookNoteColumn(project));
-    body.append(create);
-  }
+  notebookIndexTitleScroll?.refresh();
 }
 
 async function ensureNotebookTabCatalog({ refresh = false } = {}) {
@@ -3691,6 +3858,20 @@ async function openNotebookNoteColumn(project, card) {
     attempt === notebookNoteOpeningGeneration && navigationGeneration === (state.workflowNavigationGeneration || 0) && projectDetailKey(workspaceProject()) === projectID;
   if (!current() || !hasCapability('notebook')) return false;
   let columns = notebookColumnsForProject(project);
+  const openColumns = columns.filter(item => item.open);
+  const liveColumn = openColumns.length === 1 ? openColumns[0] : null;
+  const livePaneID = liveColumn && notebookColumnPaneID(liveColumn);
+  const liveMount = livePaneID && notebookColumnMounts.get(livePaneID);
+  // The Notebook has one notepad. Switch its document in place, retaining the
+  // column/header/list geometry while the next Note and editor prepare.
+  if (card.id && !card.newNote && currentColumnWorkflowView() === 'notebook' &&
+      liveMount?.panel.isConnected && liveMount.focusCard && !paneIsCollapsed(livePaneID)) {
+    if (liveMount.activeCardID() !== card.id) await liveMount.focusCard(card.id, {shouldApply:current});
+    if (!current() || notebookColumnMounts.get(livePaneID) !== liveMount || liveMount.activeCardID() !== card.id) return false;
+    notebookColumnRegistry.activate(livePaneID);
+    syncNotebookNoteTabs();
+    return true;
+  }
   let column = columns.find(item => item.open && card.id && item.cardID === card.id) ||
     columns.find(item => item.id === card.column?.id) || columns.find(item => card.id && item.cardID === card.id);
   if (!column) column = columns.find(item => item.open && !item.cardID && !notebookColumnMounts.get(notebookColumnPaneID(item))?.insertionTarget?.());
@@ -3746,6 +3927,7 @@ async function openNotebookNoteColumn(project, card) {
 }
 
 async function closeNotebookNoteColumn(project, paneID) {
+  if (currentColumnWorkflowView() === 'notebook') return false;
   const requestIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   if (await notebookColumnMounts.get(paneID)?.confirmDiscardIfNeeded?.() === false) return false;
   if (!isCurrentAccountRequest(requestIdentity) || workspaceID !== activeWorkspaceID) return false;
@@ -3760,8 +3942,18 @@ async function closeNotebookNoteColumn(project, paneID) {
 
 async function retireNotebookNoteColumns(project, cardID) {
   const columns = notebookColumnsForProject(project);
+  let emptyColumn = null;
   columns.filter(column => column.cardID === cardID).forEach(column => { column.open = false; });
-  if (!columns.some(column => column.open)) state.notebooks = openNotebooks().filter(item => !projectDetailMatches(item, project));
+  if (!columns.some(column => column.open)) {
+    if (currentColumnWorkflowView() === 'notebook') {
+      const empty = columns.find(column => column.cardID === cardID);
+      if (empty) {
+        Object.assign(empty, {cardID:'', title:'', newNote:true, open:true, selected:true});
+        emptyColumn = empty;
+      }
+    } else state.notebooks = openNotebooks().filter(item => !projectDetailMatches(item, project));
+  }
+  if (emptyColumn) await notebookColumnMounts.get(notebookColumnPaneID(emptyColumn))?.createLocalNote?.({retiredCardID:cardID});
   saveWorkspaceState(); await transitionWorkspace('utility'); syncNotebookNoteTabs();
 }
 
@@ -4472,10 +4664,12 @@ async function switchReaderTab(reader, tabID, { focus = true } = {}) {
   retainReaderColumn(reader);
   const workspaceID = activeWorkspaceID;
   const identity = captureAccountRequest();
+  const view = currentColumnWorkflowView(), navigation = state.workflowNavigationGeneration || 0;
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID], readerTabSwitchPaneID: paneID });
   if (!await whenWorkspacePaneReady(paneID) || activeWorkspaceID !== workspaceID ||
-      !isCurrentAccountRequest(identity) || reader.activeTabID !== tabID) return;
+      !isCurrentAccountRequest(identity) || reader.activeTabID !== tabID || currentColumnWorkflowView() !== view ||
+      (state.workflowNavigationGeneration || 0) !== navigation) return;
   if (focus) track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"] .reader-code-tab[aria-selected="true"]`)?.focus({ preventScroll: true });
 }
 
@@ -4494,32 +4688,43 @@ function retainReaderPaneForTabSwitch(panel, reader) {
 }
 
 function openReaderTabPicker(reader, anchor) {
-  if (!canAddReaderTab(reader)) return;
   const workspaceID = activeWorkspaceID, identity = captureAccountRequest();
   const view = currentColumnWorkflowView(), generation = state.workflowNavigationGeneration || 0;
+  if (view !== 'notebook' && !canAddReaderTab(reader)) return;
   openReaderCodePicker(anchor, async code => {
     if (!state.readers.includes(reader) || activeWorkspaceID !== workspaceID || !isCurrentAccountRequest(identity) ||
-        currentColumnWorkflowView() !== view || (state.workflowNavigationGeneration || 0) !== generation || !canAddReaderTab(reader)) return;
+        currentColumnWorkflowView() !== view || (state.workflowNavigationGeneration || 0) !== generation ||
+        view !== 'notebook' && !canAddReaderTab(reader)) return;
     rememberReaderTabPosition(reader);
     retainReaderColumn(reader);
-    addReaderTab(reader, newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) }));
+    const session = newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) });
+    if (view === 'notebook') openRecentReaderTab(reader, session);
+    else addReaderTab(reader, session);
     saveWorkspaceState();
-    await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
+    const paneID = paneIDForReader(reader);
+    await transitionWorkspace("utility", { refreshPaneIDs: [paneID], readerTabSwitchPaneID: paneID });
   });
 }
 
 function prepareReaderSourceTab(reader, fields, { allowNewColumn = true } = {}) {
-  if (!isProAccount() || !Array.isArray(reader.tabs)) return reader;
+  if (!isProAccount()) return reader;
+  // Notebook sources form a bounded history, independent of Research's
+  // manually managed comparison tabs.
+  if (currentColumnWorkflowView() === 'notebook') {
+    rememberReaderTabPosition(reader);
+    retainReaderColumn(reader);
+    openRecentReaderTab(reader, newReaderState(fields));
+    reader.internalSearchQuery = '';
+    reader.internalSearchOpen = false;
+    return reader;
+  }
+  if (!Array.isArray(reader.tabs)) return reader;
   const matches = tab => tab.codePrefix === fields.codePrefix && tab.codeVersion === fields.codeVersion &&
     String(tab.chapterID || '') === String(fields.chapterID || '') && String(tab.sectionID || '') === String(fields.sectionID || '');
   if (matches(reader)) return reader;
   const tabs = readerTabs(reader);
   const existing = tabs.find(matches) || tabs.find(tab => tab.codePrefix === fields.codePrefix && tab.codeVersion === fields.codeVersion);
   if (!existing && !canAddReaderTab(reader)) {
-    if (currentColumnWorkflowView() === 'notebook') {
-      void showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
-      return null;
-    }
     if (!allowNewColumn) {
       rememberReaderTabPosition(reader);
       retainReaderColumn(reader);
@@ -4709,8 +4914,8 @@ function renderReaderTabs(panel, reader) {
   strip.append(list);
   if (isProAccount()) {
     const add = document.createElement('button'); add.type = 'button'; add.className = 'icon-button reader-tab-add'; add.textContent = '+';
-    add.disabled = !canAddReaderTab(reader);
-    add.title = add.disabled ? `Maximum ${maximumReaderTabs} codes per column` : 'Add code tab';
+    add.disabled = currentColumnWorkflowView() !== 'notebook' && !canAddReaderTab(reader);
+    add.title = add.disabled ? `Maximum ${maximumReaderTabs} codes per column` : currentColumnWorkflowView() === 'notebook' ? 'Open a code · Keeps the 6 most recent tabs' : 'Add code tab';
     add.setAttribute('aria-label', add.disabled ? `${readerPositionLabel(reader)} is full · Maximum ${maximumReaderTabs} codes per column` : `Add code tab to ${readerPositionLabel(reader)}`);
     add.addEventListener('click', () => openReaderTabPicker(reader, add)); strip.append(add);
   }
@@ -5560,7 +5765,7 @@ function defaultPaneWidthForID(paneID) {
     }
     return Math.max(defaultCodeDecisionPaneWidth, minimumWidthForPaneRole(parsed?.paneRole) || 0);
   }
-  if (paneID.startsWith('project:notes-index:')) return 280;
+  if (paneID.startsWith('project:notes-index:')) return 300;
   if (isProjectWorkboardPaneID(paneID)) return defaultWorkboardPaneWidth;
   if (isProjectNotebookPaneID(paneID)) return defaultNotebookPaneWidth;
   if (isProjectReportDraftPaneID(paneID)) return defaultReportDraftPaneWidth;
@@ -5588,7 +5793,7 @@ function assistantHistoryOnlyPane(paneID) {
 function minimumPaneWidthForID(paneID) {
   const writingMinimum = typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMinimums?.[paneID];
   if (Number.isFinite(writingMinimum)) return writingMinimum;
-  if (paneID?.startsWith('project:notes-index:')) return 220;
+  if (paneID?.startsWith('project:notes-index:')) return 300;
   if (paneID?.startsWith("reader:")) return 630;
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 300;
   if (assistantHistoryOnlyPane(paneID)) return assistantHistoryWidth;
@@ -5597,7 +5802,9 @@ function minimumPaneWidthForID(paneID) {
 }
 
 function maximumPaneWidthForID(paneID) {
-  if (paneID?.startsWith('project:notes-index:')) return (typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMaximums?.[paneID]) ?? Infinity;
+  if (paneID?.startsWith('reader:') && currentColumnWorkflowView() === 'notebook')
+    return (typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMaximums?.[paneID]) ?? Infinity;
+  if (paneID?.startsWith('project:notes-index:')) return 300;
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 600;
   if (!/^utility:search(?::|$)/.test(paneID || "")) return Infinity;
   const layout = typeof track === "undefined" ? null : track._researchColumnLayout;
@@ -5719,7 +5926,39 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
 }
 
 const workflowScrollStore = createWorkflowScrollStore();
+const workspaceViewPresentation = createWorkspaceViewPresentation(document);
 const referenceWorkspaceScroll = new Map();
+async function presentWorkingView(view, update) {
+  // Workspace/account choosers must remain interactive while awaiting input.
+  if (!workspacePrivatePresentationAllowed() || workspaceColumnsRequireProject() ||
+      view !== 'research' && !workspaceProject()) return update();
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID;
+  // Invalidate earlier asynchronous navigation at the click, before the
+  // browser captures the next view's outgoing frame.
+  state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
+  try {
+    return await workspaceViewPresentation.present({isCurrent:current, update:async owns => {
+      track._notebookListTransition?.skipTransition();
+      const result = await update();
+      if (!owns() || result === false || currentColumnWorkflowView() !== view) return false;
+      if (view === 'report') {
+        const project = workspaceProject();
+        await reportDraftMounts.get(projectDetailKey(project))?.whenPresented?.();
+      } else {
+        await Promise.all([...track.querySelectorAll(':scope > .workspace-panel')]
+          .filter(pane => workflowPaneIsVisible(pane.dataset.paneId))
+          .map(pane => whenWorkspacePaneReady(pane.dataset.paneId)));
+      }
+      if (!owns() || currentColumnWorkflowView() !== view) return false;
+      syncWorkflowColumnPresentation();
+      return result;
+    }});
+  } catch (error) {
+    if (current()) presentWorkspaceIssue(error.message || 'Could not open this workspace view.');
+    return false;
+  }
+}
 function currentWorkflowView() { return isProAccount() ? normalizeWorkflowView(state.workflowView) : "research"; }
 function workspaceResumeContext() {
   const project = workspaceProject();
@@ -5806,7 +6045,7 @@ function workflowPaneIsVisible(paneID) {
   if (!isProAccount()) return state.readers.slice(0, 1).some(reader => paneIDForReader(reader) === paneID);
   const view = currentColumnWorkflowView();
   if (view === 'notebook' && paneID.startsWith('reader:') && state.notebookReaderHidden) return false;
-  if (paneID.startsWith('project:notes-index:')) return view === 'notebook' && !state.notebookListHidden;
+  if (paneID.startsWith('project:notes-index:')) return view === 'notebook';
   if (view === 'notebook' && isProjectNotebookPaneID(paneID)) {
     const project = workspaceProject();
     const selected = project && selectedNotebookColumn(project);
@@ -5942,10 +6181,10 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
   if (view === 'notebook') {
     const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
     const navigation = state.workflowNavigationGeneration || 0;
-    await ensureNotebookTabCatalog({refresh:true});
+    await ensureNotebookTabCatalog();
     if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
         (state.workflowNavigationGeneration || 0) !== navigation) return false;
-    await prepareNotebookView({openNote: initialize});
+    await prepareNotebookView();
     if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
         (state.workflowNavigationGeneration || 0) !== navigation || currentWorkflowView() !== view) return false;
     savedPaneIDs().forEach(paneID => placeEvidenceBeforeNotebook(paneID));
@@ -5963,6 +6202,7 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
     state.workflowVisitedViews = [...new Set([...(state.workflowVisitedViews || []), view])];
   }
   saveWorkspaceState();
+  if (view === 'notebook') void ensureNotebookTabCatalog({refresh:true});
   return true;
 }
 
@@ -6474,15 +6714,11 @@ function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
 }
 
 function syncTopbarProjectToolStates() {
+  syncResearchNoteControls();
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const identity = project ? projectIdentity(project) : null;
   const requiresProject = workspaceColumnsRequireProject();
-  if (toggleNotesListButton) {
-    const opened = Boolean(project && !state.notebookListHidden);
-    toggleNotesListButton.disabled = !project || !hasCapability('notebook') || projectToolTogglePending;
-    toggleNotesListButton.setAttribute('aria-pressed', String(opened));
-    toggleNotesListButton.title = `${opened ? 'Close' : 'Open'} Notes column`;
-  }
+  syncNotebookListControls();
   [
     [toggleContextButton, "Context", "projects", () => projectDetailsScreen?.isOpen() === true],
     [toggleFactsButton, "Facts", "projects", () => Boolean(state.projectFactsOpen)],
@@ -6830,6 +7066,20 @@ function normalizePaneWeights(ids) {
 
 function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
+  if (paneID.startsWith('project:notes-index:')) {
+    const collapsed = currentColumnWorkflowView() === 'notebook' && state.notebookListHidden;
+    panel.dataset.notebookListCollapsed = String(Boolean(collapsed));
+    if (collapsed) {
+      panel.style.setProperty('--pane-resized-min-width', '35px');
+      panel.style.setProperty('--pane-default-min-width', '35px');
+      panel.style.flex = '0 0 35px';
+      return;
+    }
+    panel.style.setProperty('--pane-resized-min-width', '300px');
+    panel.style.setProperty('--pane-default-min-width', '300px');
+    panel.style.flex = '0 0 300px';
+    return;
+  }
   if (panel.classList.contains("is-collapsed")) {
     panel.style.flex = "0 0 48px";
     return;
@@ -6883,19 +7133,17 @@ function syncNotebookColumnLayout(panels) {
     panel.style.maxWidth = 'none';
     panel.style.flex = `0 0 ${widths[index]}px`;
   });
-  // Resizing may consume the editor's unused margins, while preserving the
-  // width its title, toolbar and text currently use for writing.
+  // Reference columns may use spare notepad width down to its 800px writing
+  // area. A compact viewport retains the width the notepad already has.
   const editorIndex = columns.findIndex(column => column.kind === 'editor' && !column.collapsed);
   const resizeMinimums = {}, resizeMaximums = {};
   if (editorIndex >= 0) {
-    const editor = visible[editorIndex], focus = editor.querySelector?.('.notebook-focus');
-    const focusStyle = focus && getComputedStyle(focus);
-    const textWidth = parseFloat(padding.getPropertyValue?.('--workspace-content-max-width')) || 800;
-    const gutters = (parseFloat(focusStyle?.paddingLeft) || 18) + (parseFloat(focusStyle?.paddingRight) || 18);
-    const writingWidth = Math.min(widths[editorIndex], textWidth + gutters);
+    const editor = visible[editorIndex];
+    const writingWidth = Math.min(widths[editorIndex], 800);
     resizeMinimums[editor.dataset.paneId] = writingWidth;
     columns.forEach((column, index) => {
-      if (column.kind === 'notes') resizeMaximums[visible[index].dataset.paneId] = widths[index] + widths[editorIndex] - writingWidth;
+      if (column.kind === 'reader') resizeMaximums[visible[index].dataset.paneId] = widths[index] + widths[editorIndex] - writingWidth;
+      if (column.kind === 'notes') resizeMaximums[visible[index].dataset.paneId] = column.collapsed ? 35 : 300;
     });
   }
   track._notebookColumnLayout = {resizeMinimums, resizeMaximums};
@@ -8710,9 +8958,11 @@ function updateReaderLocationTitle(panel, reader) {
   let button = panel.querySelector(".reader-collapse-title");
   if (!button) return;
   const collapsible = paneCanCollapse(panel.dataset.paneId);
-  if (button.tagName !== (collapsible ? "BUTTON" : "SPAN")) {
+  const action = collapsible ? 'collapse' : 'label';
+  if (button.dataset.readerTitleAction !== action) {
     const title = document.createElement(collapsible ? "button" : "span");
     title.className = "reader-collapse-title";
+    title.dataset.readerTitleAction = action;
     if (collapsible) {
       title.type = "button";
       title.addEventListener("click", () => setPaneCollapsed(panel, true, { focus: true }));
@@ -9201,10 +9451,12 @@ async function guardReaderChapterSource(detail, isCurrent) {
 
 async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = {}) {
   if (!panel || !reader) return;
+  const request = {};
+  panel._readerSelectionRequest = request;
   const account = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const original = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? "")));
-  const isCurrent = () => panel.isConnected && isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
+  const isCurrent = () => panel._readerSelectionRequest === request && panel.isConnected && isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
     JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID].map(value => String(value ?? ""))) === original;
   const nextChapterID = String(chapterID || reader.chapterID || "");
   const restoreSelection = () => {
@@ -9226,6 +9478,48 @@ async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = 
   closeActiveCustomSelect();
   const chapterSelect = panel.querySelector(".chapter-select");
   const chapterChanged = nextChapterID && nextChapterID !== String(reader.chapterID || "");
+  if (chapterChanged && panel.parentNode && panel.parentNode === track && state.readers.includes(reader)) {
+    // Keep the painted chapter and its header together until the accepted
+    // replacement has finished loading in the normal Reader pane hydrator.
+    let summary;
+    if (sectionID) {
+      try { summary = sectionTitleFromID(String(sectionID), await fetchChapter(nextChapterID)); }
+      catch (error) {
+        restoreSelection();
+        if (isCurrent()) await showWebNotice("Chapter could not be opened", error.message);
+        return;
+      }
+      if (!isCurrent() || !activeCodeSourcesController.isCurrent(access.context)) return;
+    }
+    const view = currentColumnWorkflowView(), generation = state.workflowNavigationGeneration || 0;
+    const tabID = reader.activeTabID, paneID = paneIDForReader(reader);
+    cancelReaderPanelRequests(panel);
+    reader.chapterID = nextChapterID;
+    reader.sectionID = sectionID ? String(sectionID) : "";
+    reader.sectionNumber = summary?.sectionNumber || "";
+    reader.title = summary?.title || "Reader";
+    reader.shouldSmoothScrollToSection = false;
+    delete reader.scrollPosition;
+    pendingGroupReaderPositions.delete(reader.id);
+    state.recentChaptersByCode ||= {};
+    state.recentChaptersByCode[readerCodeSelectionKey(reader)] = nextChapterID;
+    if (reader.sectionID) updateBrowserSectionURL(reader.sectionID);
+    const target = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID, tabID]);
+    const ownsTarget = () => isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
+      activeCodeSourcesController.isCurrent(access.context) && state.readers.includes(reader) &&
+      currentColumnWorkflowView() === view && (state.workflowNavigationGeneration || 0) === generation &&
+      JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID, reader.activeTabID]) === target;
+    const sourceNavigation = sectionID ? {
+      paneID, reader, item: { sectionID: reader.sectionID, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion },
+      options: { immediate: true }, isCurrent: ownsTarget
+    } : undefined;
+    saveWorkspaceState();
+    scheduleContinuitySync(reader);
+    await transitionWorkspace("utility", { refreshPaneIDs: [paneID], readerTabSwitchPaneID: paneID,
+      readerSourceNavigation: sourceNavigation, readerChapterSwitchPaneID: paneID });
+    if (!await whenWorkspacePaneReady(paneID) || !ownsTarget()) return;
+    return;
+  }
   const navigationToken = beginReaderNavigation(panel, { clearContent: Boolean(chapterChanged) });
   reader.chapterID = nextChapterID;
   if (chapterSelect) chapterSelect.value = reader.chapterID;
@@ -9954,6 +10248,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   } : null;
   if (options.persistPrevious !== false) saveWorkspaceState();
   accountRuntimeGeneration += 1;
+  workspaceViewPresentation?.cancel();
   cancelPendingProjectChoice?.();
   notebookReturnScrollPositions.clear();
   notebookReturnCardIDs.clear();
@@ -10366,14 +10661,10 @@ async function openReaderFromToolbar(button) {
     // Recheck at selection time: another picker may have created the Reader.
     const notebookReader = view === 'notebook' && state.readers.find(reader => state.workflowMembership?.[paneIDForReader(reader)]?.includes('notebook'));
     if (notebookReader) {
-      if (!canAddReaderTab(notebookReader)) {
-        await showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
-        return;
-      }
       state.notebookReaderHidden = false;
       rememberReaderTabPosition(notebookReader);
       retainReaderColumn(notebookReader);
-      addReaderTab(notebookReader, newReaderState({codePrefix:code.prefix,codeVersion:codeOptionVersion(code)}));
+      openRecentReaderTab(notebookReader, newReaderState({codePrefix:code.prefix,codeVersion:codeOptionVersion(code)}));
       saveWorkspaceState();
       const paneID = paneIDForReader(notebookReader);
       await transitionWorkspace('utility', {refreshPaneIDs:[paneID],readerTabSwitchPaneID:paneID});
@@ -13263,14 +13554,15 @@ async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountR
   if (draft.accountUserID !== requestIdentity.userID) throw accountContextChangedError();
   if (draft.recoveryConflict || (draft.scope && draft.scope !== "notebook-card")) return null;
   const pending = draft.pendingSave || draft;
-  // Simple Notes leave stored legacy question metadata untouched. An existing
+  // Validate new question edits before creating a save receipt. An existing
   // uncertain receipt is replayed byte-for-byte before ordinary saves resume.
+  if (draft.questionsEditable === true && !draft.pendingSave && draft.openQuestions !== undefined) normalizeNotebookQuestions(draft.openQuestions);
   if (!Number.isSafeInteger(pending.baseVersion) || pending.baseVersion < 0 ||
       !(draft.pendingSave ? String(pending.title || "").trim() : notebookDraftSaveTitle(draft))) return null;
   const document = await reconcileNotebookDocumentAssets(pending.document, pending.projectID, requestIdentity);
   requireCurrentAccountRequest(requestIdentity);
   if (notebookDocumentAssetURLs(document, "permitext-notebook-local:").length) return null;
-  const submittedDraft = await beginNotebookDraftSave(requestIdentity.userID, draft.projectID, draft.cardID, draft.revision, { document, omitQuestionUpdates: true });
+  const submittedDraft = await beginNotebookDraftSave(requestIdentity.userID, draft.projectID, draft.cardID, draft.revision, { document, omitQuestionUpdates: draft.questionsEditable !== true });
   requireCurrentAccountRequest(requestIdentity);
   const submittedDocument = submittedDraft.document;
   if (notebookDocumentAssetURLs(submittedDocument, "permitext-notebook-local:").length) return null;
@@ -16185,7 +16477,7 @@ async function chooseProjectForSaving() {
 }
 
 function bookmarkActionLabel(saved, project = saved ? workspaceProject() : null) {
-  if (!saved) return "Save passage";
+  if (!saved) return "Save passage to Evidence";
   return project
     ? `Remove from project: ${project.name || project.title || "Untitled project"}`
     : "Remove from Evidence";
@@ -17853,8 +18145,8 @@ function buildReaderChapterSection(panel, reader, section, groupLabelsByFirstSec
   });
   const savedMarker = sectionControls.querySelector(".inline-bookmark-toggle");
   savedMarker.classList.add('reader-section-saved-marker');
-  savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Evidence' : 'Save section');
-  savedMarker.title = savedSection ? 'Remove section from Evidence' : 'Save section';
+  savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Evidence' : 'Save whole section to Evidence');
+  savedMarker.title = savedSection ? 'Remove section from Evidence' : 'Save whole section to Evidence';
   headingRow.append(sectionHeading, savedMarker);
   sectionWrapper.append(headingRow);
 
@@ -17951,6 +18243,8 @@ function stopReaderProgressiveHydration(content) {
   content?.querySelectorAll(".chapter-section").forEach(section => section._readerBlockWindow?.dispose());
   content?._readerProgressiveCleanup?.();
   if (content) {
+    (content.__sectionAlignmentTimers || []).forEach(timer => window.clearTimeout(timer));
+    content.__sectionAlignmentTimers = [];
     const panel = content.closest?.(".reader-panel");
     if (panel && panel._readerSectionVisibility === content._readerSectionVisibility) delete panel._readerSectionVisibility;
     delete content._readerSectionVisibility;
@@ -18120,6 +18414,7 @@ async function progressivelyRenderReaderChapter(
     if (hydrationInFlight) return;
     const threshold = Math.max(320, content.clientHeight * 0.6);
     const window = extent.nextWindow(readerProgressiveSectionBatchSize, threshold);
+    restorePendingReaderScrollPosition(panel);
     if (window) void hydrateWindow(window);
     else if (extent.loadedCount === sections.length) {
       content.dataset.chapterFullyLoaded = "true";
@@ -18529,7 +18824,8 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
   const message = document.createElement("span");
   message.setAttribute("role", "status");
   message.setAttribute("aria-live", "polite");
-  message.textContent = "Saved";
+  const savedScope = `${sectionPayload.blockID ? "Passage" : "Whole section"} · ${sectionPayload.sectionNumber || sectionPayload.sectionID}`;
+  message.textContent = `${savedScope} saved to Evidence`;
   const projectButton = document.createElement("button");
   projectButton.type = "button";
   projectButton.textContent = "Add to Project";
@@ -18538,15 +18834,20 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
   const savedInProject = project && (currentContentSummary().projectSections || []).some((link) =>
     savedEvidenceKey(link) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(link, project));
   if (savedInProject) {
-    message.textContent = `Saved to ${project.name || project.title || "Project"}`;
+    message.textContent = `${savedScope} saved to Evidence · ${project.name || project.title || "Project"}`;
     projectButton.textContent = "Manage Projects";
   }
   const queued = (state.syncOutbox || []).some(entry => {
     const {kind, record} = mutationKindAndRecord(entry.mutation);
     return ["savedItem", "projectSection"].includes(kind) && savedEvidenceKey(record) === savedEvidenceKey(sectionPayload);
   });
-  if (queued) message.textContent = "Saved on this device · waiting to sync";
-  confirmation.append(message, projectButton);
+  if (queued) message.textContent = `${savedScope} saved on this device · waiting to sync`;
+  const view = document.createElement('button'); view.type = 'button'; view.textContent = 'View in Evidence';
+  view.addEventListener('click', async () => {
+    confirmation.remove();
+    if (await switchWorkflowView('notebook')) await focusUtility('saved');
+  });
+  confirmation.append(message, view, projectButton);
   panel.append(confirmation);
   let removeTimer = null;
   const dismissConfirmation = () => {
@@ -18792,7 +19093,8 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
     return {resolved, section: payload.section};
   };
   const currentConversation=()=>getConversation ? getConversation() : (conversationID ? [activeResearchConversation,...supplementalResearchConversations.values()].find(item=>item?.id===conversationID) : conversation || calculatorConversationForPane());
-  card = createOccupantLoadCard({draft, sourceLabel, canSave: Boolean(project),
+  card = createOccupantLoadCard({draft, column: Boolean(calculatorID), sourceLabel, canSave: Boolean(project),
+    getDestinationNote: () => workingResearchNote(project ? researchProjectID(project) : ""),
     savedNote: record.savedNote, savedInputFingerprint: record.savedFingerprint,
     recentDrafts: storageError ? [] : store.list(context), activeDraftID: record.id,
     onChooseDraft: id => replaceDraftView(() => store.open(context, {}, id)),
@@ -18852,6 +19154,18 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       notebookDocument.document = calculationNoteBlocks(calculation, [link], answerID, draft.spaceLocation);
       if (spaceName) notebookDocument.document.unshift({type: "paragraph", content: [{type: "text", text: `Space / room: ${spaceName}`, styles: {}}]});
       const fingerprint = JSON.stringify({spaceName, ...(draft.spaceLocation ? {spaceLocation: draft.spaceLocation} : {}), input: calculation.input});
+      const destination = await chooseResearchNoteDestination(project,card,actionCurrent);
+      if (!destination || !actionCurrent()) return null;
+      if (destination.kind !== 'new') {
+        const savedCard = await appendResearchReferenceToNote(project,destination,
+          {referenceKind:'selectedPassage',referenceID:link.id,label:link.label}, `calculation-note:${crypto.randomUUID()}`,identity,actionCurrent,
+          {evidenceLink:link,blocks:notebookDocument.document.filter(block =>
+            !block.content?.some(node => node.type === 'permitextReference' && node.props?.referenceID === link.id))});
+        if (!savedCard || !actionCurrent()) return null;
+        rememberWorkingResearchNote(researchProjectID(project),savedCard,{kind:'reader',source:link.source});
+        if (!storageError) record = store.markSaved(record,savedCard,fingerprint);
+        return savedCard;
+      }
       const submission = savePayloads.get(fingerprint) || {projectID: researchProjectID(project), expectedVersion: 0,
         clientMutationID: `occupant-load:${crypto.randomUUID()}`, cardType: "finding",
         title: generatedNoteTitle(`Occupant load · ${spaceName || calculation.input.spaceFunction}${calculation.input.factorMode === 'custom' ? ' · Custom factor' : ''}`), document: notebookDocument, evidenceLinks: [link],
@@ -18864,7 +19178,7 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       publishSavedNotebookCard(researchProjectID(project), saved.card);
       if (!actionCurrent()) return null;
       if (!storageError) record = store.markSaved(record, saved.card, fingerprint);
-      // Saving never opens Notes in Research or overwrites an existing author-edited Note.
+      rememberWorkingResearchNote(researchProjectID(project),saved.card,{kind:'reader',source:link.source});
       return saved.card;
     },
     onOpenNote: async saved => {assertCurrent(); await openCalculationNotebook(project, saved);}
@@ -18886,11 +19200,7 @@ async function addPassageToNotebook(anchor, source, exact, sourceBlocks = null) 
   const current = () => isCurrentAccountRequest(identity) && anchor.isConnected && activeWorkspaceID === workspaceID &&
     generation === (state.workflowNavigationGeneration || 0);
   const projectID = researchProjectID(project);
-  const mount = notebookMounts.get(projectID);
-  const target = mount?.insertionTarget?.();
-  const destination = await openWebWarning({ title: "Add to note", message: "Keep a link to this exact passage and its code edition.",
-    confirmLabel: "Add to note", choiceLabel: "Destination Note", container: anchor.closest(".workspace-panel"),
-    choices: [...(target ? [{value:"current",label:`Current Note: ${target.title || "Untitled"}`}] : []), { value: "new", label: "New Note" }] });
+  const destination = await chooseResearchNoteDestination(project, anchor.closest('.workspace-panel'), current);
   if (!destination || !current()) return;
   const availableComments = evidenceComments(detailNoteValueForTarget(source)).filter(comment => comment.trim());
   let comments = [];
@@ -18907,9 +19217,14 @@ async function addPassageToNotebook(anchor, source, exact, sourceBlocks = null) 
       sectionTitle: source.title, codeEdition: researchCodeEdition(source), sourceLibraryVersion: source.codeVersion },
     passages: [{ exact: String(exact).trim() }], createdAt: new Date().toISOString() };
   const reference = { referenceKind: "selectedPassage", referenceID: link.id, label };
-  if (destination === "current") {
-    await mount.insertLinkedReference(target.id, reference, link, comments, sourceBlocks);
-    if (current()) showNotebookSavedLink(anchor, project, mount.insertionTarget?.() || target, {added: true});
+  const resume = {kind:'reader', source:link.source, exact:String(exact).trim()};
+  if (destination.kind !== 'new') {
+    const card = await appendResearchReferenceToNote(project,destination,reference,`passage-note:${link.id}`,identity,current,
+      {evidenceLink:link,blocks:sourceBlocks,comments});
+    if (card && current()) {
+      rememberWorkingResearchNote(projectID,card,resume);
+      showNotebookSavedLink(anchor,project,card,{added:true});
+    }
     return;
   }
   if (navigator.onLine === false) throw new Error("Reconnect to create a Note.");
@@ -18922,6 +19237,7 @@ async function addPassageToNotebook(anchor, source, exact, sourceBlocks = null) 
   requireCurrentAccountRequest(identity);
   publishSavedNotebookCard(projectID, payload.card);
   if (!current()) return;
+  rememberWorkingResearchNote(projectID, payload.card, resume);
   showNotebookSavedLink(anchor, project, payload.card);
 }
 
@@ -19074,7 +19390,8 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   noteButton.className = "inline-note-toggle";
   noteButton.innerHTML = noteAddIconSVG();
   noteButton.setAttribute("aria-label", "Add to note");
-  noteButton.title = "Add this passage to a Note";
+  noteButton.dataset.noteDestination = "icon";
+  noteButton.title = "Add to note";
   noteButton.addEventListener("click", async () => {
     if (!allowed() || noteButton.disabled) return;
     noteButton.disabled = true;
@@ -19114,6 +19431,9 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     const permitted = allowed();
     noteButton.hidden = !permitted || !hasCapability("notebook");
     noteButton.disabled = !permitted;
+    const noteTitle = permitted && gate && hasCapability("notebook") ? workingResearchNote()?.title : "";
+    noteButton.title = noteTitle ? `Add to ${noteTitle}` : "Add to note";
+    noteButton.setAttribute("aria-label", noteButton.title);
     bookmarkButton.hidden = !permitted;
     bookmarkButton.disabled = !permitted;
     researchButton.hidden = !permitted;
@@ -19131,7 +19451,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     bookmarkButton.classList.toggle("is-saved", saved);
     bookmarkButton.innerHTML = bookmarkIconSVG(saved);
     const bookmarkLabel = options.sectionMarker
-      ? (saved ? "Remove section from Evidence" : "Save section")
+      ? (saved ? "Remove section from Evidence" : "Save whole section to Evidence")
       : bookmarkActionLabel(saved);
     bookmarkButton.setAttribute("aria-label", bookmarkLabel);
     bookmarkButton.title = bookmarkLabel;
@@ -19177,7 +19497,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     const passage = researchButton.closest(".annotated-code-block") || sectionWrapper;
     openResearchDestinationMenu(researchButton, readerSectionResearchSelection(sectionWrapper, passage));
   });
-  wrapper.append(bookmarkButton, researchButton, noteButton);
+  wrapper.append(bookmarkButton, noteButton, researchButton, commentButton);
   return wrapper;
 }
 
@@ -19677,8 +19997,8 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
       blockID: ""
     }, "", snapshot()));
     syncImmediateBookmarkButton(marker, showSectionMarker, bookmarkActionLabel(showSectionMarker, project));
-    marker.setAttribute("aria-label", showSectionMarker ? "Remove section from Evidence" : "Save section");
-    marker.title = showSectionMarker ? "Remove section from Evidence" : "Save section";
+    marker.setAttribute("aria-label", showSectionMarker ? "Remove section from Evidence" : "Save whole section to Evidence");
+    marker.title = showSectionMarker ? "Remove section from Evidence" : "Save whole section to Evidence";
   });
 }
 
@@ -20502,6 +20822,11 @@ async function renderReaderInternalSearchResults(panel, reader, query, { allowDe
     row.append(heading);
     if (result.snippet) row.append(snippet);
     row.addEventListener("click", async () => {
+      if (currentColumnWorkflowView() === 'notebook') {
+        await openSourceInReader({...result, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion},
+          paneIDForReader(reader), {sourceSurface: 'search-detail', searchQuery: query});
+        return;
+      }
       const searchBox = panel.querySelector(".reader-internal-search");
       const searchButton = panel.querySelector(".reader-internal-search-toggle");
       panel.dataset.readerSearchToken = `selected:${Date.now()}`;
@@ -20947,7 +21272,7 @@ async function renderReader(reader, options = {}) {
       internalSearchButton.setAttribute("aria-pressed", "true");
       internalSearchBox.hidden = false;
       panel._readerSearchReturnPosition = reader.scrollPosition;
-      await renderReaderInternalSearchResults(panel, reader, reader.internalSearchQuery || "", { allowDetached: true });
+      if (!options.chapterNavigation) await renderReaderInternalSearchResults(panel, reader, reader.internalSearchQuery || "", { allowDetached: true });
     }
     return panel;
   } finally {
@@ -21075,20 +21400,21 @@ function refreshSearchGroupCounts(results) {
 }
 
 function updateSearchScopeSummary(panel, instance) {
-  const button = panel.querySelector(".search-scope-summary");
+  const button = panel._searchSourcesButton || panel.querySelector(".search-sources-button");
   if (!button) return;
   const {catalog} = activeCodeSourcesController.state;
   const sources = catalog ? searchPanelSources(instance, catalog) : null;
   const labels = sources ? activeCodeSourceMenuRows(sources).map(row => row.label) : [];
-  const summary = !catalog ? 'Search within · all codebooks'
-    : !sources.length ? 'Search within · no sources selected' : !Array.isArray(instance?.querySourceKeys) ? `Search within · all ${sources.length} codebooks`
-    : labels.length > 2 ? `Search within · ${labels.length} codebooks & editions` : `Search within · ${labels.join(' · ')}`;
+  const summary = !catalog ? 'Filter codes · all codebooks'
+    : !sources.length ? 'Filter codes · no sources selected' : !Array.isArray(instance?.querySourceKeys) ? `Filter codes · all ${sources.length} codebooks`
+    : labels.length > 2 ? `Filter codes · ${labels.length} codebooks & editions` : `Filter codes · ${labels.join(' · ')}`;
   button.setAttribute('aria-label', summary);
   button.title = [summary, 'Applies to this Search column only. Reader offers all codes.', ...labels].join('\n');
   const mode = panel.querySelector('.search-visible-match-mode');
   if (mode) {
     mode.hidden = instance?.matchMode !== 'exact';
     mode.textContent = mode.hidden ? '' : 'Exact phrase';
+    panel.querySelector('.search-visible-context').hidden = mode.hidden;
   }
 }
 
@@ -21611,10 +21937,10 @@ async function renderSearch(instance, options = {}) {
     if (!matchControl.contains(event.relatedTarget)) matchControl.open = false;
   });
   const sourcesButton = panel.querySelector(".search-sources-button");
+  panel._searchSourcesButton = sourcesButton;
   sourcesButton.setAttribute("aria-expanded", "false");
   sourcesButton.setAttribute("aria-haspopup", "dialog");
   sourcesButton.addEventListener("click", () => openSearchCodeSourceSettings(panel));
-  panel.querySelector('.search-scope-summary')?.addEventListener('click', () => openSearchCodeSourceSettings(panel));
   const scopeToken = activeCodeSourcesController.captureContext();
   void activeCodeSourcesController.ensureCatalog().then(() => {
     if (panel.isConnected && activeCodeSourcesController.isCurrent(scopeToken)) updateSearchScopeSummary(panel, searchInstance);
@@ -24969,6 +25295,9 @@ async function openResearchConversation(conversationID, options = {}) {
       scrollPaneIntoView(paneID);
       if (!await focusLinkedResearchAnswer(paneID, options.focusAnswerID, current)) return null;
     }
+    const workingNote = workingResearchNote();
+    if (workingNote && currentWorkflowView() === 'research') rememberWorkingResearchNote(researchProjectID(workspaceProject()), workingNote,
+      {kind:'conversation',conversationID:conversation.id});
     return conversation;
   }
   const showResearchList = options.showResearchList !== false;
@@ -25079,6 +25408,9 @@ async function openResearchConversation(conversationID, options = {}) {
   if (options.focusAnswerID) {
     if (!await focusLinkedResearchAnswer(conversationPaneID, options.focusAnswerID,
       () => workflowIsCurrent() && researchOpenContextIsCurrent(openingContext, { requireConversationID: true }))) return null;
+    const workingNote = workingResearchNote();
+    if (workingNote && currentWorkflowView() === 'research') rememberWorkingResearchNote(researchProjectID(workspaceProject()), workingNote,
+      {kind:'conversation',conversationID:conversation.id});
     return conversation;
   }
   requestAnimationFrame(() => {
@@ -25087,6 +25419,9 @@ async function openResearchConversation(conversationID, options = {}) {
     const focusTarget = pane?.querySelector(".research-question-input:not(:disabled), .panel-title");
     focusTarget?.focus({ preventScroll: true });
   });
+  const note = workingResearchNote();
+  if (note && currentWorkflowView() === 'research') rememberWorkingResearchNote(researchProjectID(workspaceProject()), note,
+    {kind:'conversation',conversationID:conversation.id});
   return conversation;
 }
 
@@ -27237,9 +27572,14 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
         if (ownsPanel()) await renderResearchV2Pane(paneID,availability,{...retained,panel,conversation,listed:nextListed,includeHidden});
       }
     });
+    const previousView=panel._researchV2View;
     view = createResearchV2View({ conversation,revealAnswerID:retained.revealAnswerID,historyManagement,
+      presentation:previousView?.capturePresentation?.(),
       historyGroups:researchConversationHistoryGroups,historyTitle:researchConversationTitle,
       railWidthStore:{read:()=>localStorage.getItem(railWidthKey),write:width=>{if(ownsPanel())localStorage.setItem(railWidthKey,String(width));}},
+      railCollapsedStore:{read:()=>localStorage.getItem(`${railWidthKey}:collapsed`)==='true',
+        write:collapsed=>{if(ownsPanel())localStorage.setItem(`${railWidthKey}:collapsed`,String(collapsed));}},
+      renderHistoryToggle:(button,collapsed)=>prependWorkspaceButtonIcon(button,collapsed?'panel-left-open':'panel-left-close'),
       history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
       hasMore:listed.hasMore,
@@ -27377,14 +27717,16 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     const previousRail = content.querySelector(".rv2-rail");
     const historyScroll = previousRail?.scrollTop || 0;
     const historyFocused = Boolean(previousRail?.contains(document.activeElement));
-    panel._researchV2View?.dispose();
+    previousView?.dispose();
     panel._researchV2Observer?.disconnect();
-    content.replaceChildren(view.element);
+    view.commit?.();
+    if(previousView?.element!==view.element)content.replaceChildren(view.element);
     panel._researchV2View = view;
     const nextRail = content.querySelector(".rv2-rail");
     if (nextRail) {
       nextRail.scrollTop = historyScroll;
-      if (historyFocused) nextRail.querySelector('[aria-current="page"]')?.focus({preventScroll:true});
+      if (historyFocused) (nextRail.querySelector('.rv2-history-toggle[aria-expanded="false"]') ||
+        nextRail.querySelector('[aria-current="page"]'))?.focus({preventScroll:true});
     }
     // Switching an already mounted pane needs only the authoritative conversation
     // read performed by openResearchConversation. Keep its header and shell.
@@ -28859,67 +29201,156 @@ function researchAnswerQuestion(conversation, message) {
   return String(question?.question || message.question || conversation.starterQuestion || researchConversationTitle(conversation)).trim();
 }
 
-async function chooseResearchNoteDestination(project, container, current) {
+function workingResearchNote(projectID = researchProjectID(workspaceProject() || {})) {
+  return state.noteResearch?.[projectID]?.selected || null;
+}
+
+function rememberWorkingResearchNote(projectID, card, resume = null) {
+  if (!card?.id) return;
+  state.noteResearch ||= {};
+  const context = state.noteResearch[projectID] ||= { selected: null, resumes: {} };
+  context.selected = { id: card.id, title: card.title || "Untitled Note" };
+  if (resume) context.resumes[card.id] = resume;
+  saveWorkspaceState();
+  syncResearchNoteControls();
+}
+
+function syncResearchNoteControls() {
+  const host = document.querySelector('[data-workflow-tools="research"]');
+  if (!host) return;
+  let control = host.querySelector('.research-note-destination');
+  if (!control) {
+    control = document.createElement('div'); control.className = 'research-note-destination';
+    const choose = document.createElement('button'); choose.type = 'button'; choose.className = 'toolbar-button research-note-picker-trigger';
+    const label = document.createElement('span'); label.className = 'research-note-picker-label';
+    const chevron = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    chevron.setAttribute('viewBox', '0 0 24 24'); chevron.setAttribute('aria-hidden', 'true'); chevron.setAttribute('focusable', 'false');
+    chevron.innerHTML = '<path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+    choose.append(label, chevron);
+    choose.setAttribute('aria-haspopup', 'listbox');
+    choose.setAttribute('aria-expanded', 'false');
+    choose.addEventListener('click', async () => {
+      if (choose._researchNotePicker) {
+        choose._researchNotePicker.dismiss({restoreFocus:true});
+        return;
+      }
+      if (choose.getAttribute('aria-busy') === 'true') return;
+      const project = workspaceProject(), identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+      const generation = state.workflowNavigationGeneration || 0;
+      const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID && control.isConnected &&
+        generation === (state.workflowNavigationGeneration || 0);
+      if (!project) return;
+      choose.setAttribute('aria-busy', 'true');
+      try {
+        const destination = await chooseResearchNoteDestination(project, control, current, {choose:true, trigger:choose});
+        if (!destination || !current()) return;
+        if (destination.kind === 'new') {
+          const payload = await postResearch('/notebook/cards/save', {projectID:researchProjectID(project), expectedVersion:0,
+            clientMutationID:crypto.randomUUID(), cardType:'finding', title:'Untitled', document:emptyNotebookDocument(), evidenceLinks:[]});
+          if (!current()) return;
+          publishSavedNotebookCard(researchProjectID(project), payload.card);
+          rememberWorkingResearchNote(researchProjectID(project), payload.card);
+        }
+      } catch (error) { if (current()) await showWebNotice('Note not selected', error.message); }
+      finally { choose.removeAttribute('aria-busy'); }
+    });
+    control.append(choose); host.append(control);
+  }
+  const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
+  const note = project ? workingResearchNote(researchProjectID(project)) : null;
+  control.hidden = !project || !hasCapability('notebook');
+  const choose = control.firstElementChild;
+  choose.querySelector('.research-note-picker-label').textContent = note ? `NOTE · ${note.title}` : 'Choose Research note';
+  choose.setAttribute('aria-label', note ? `Choose Research note · ${note.title}` : 'Choose Research note');
+  choose.title = 'Choose the note to collect this research';
+  document.querySelectorAll('[data-note-destination]').forEach(button => {
+    button.setAttribute('aria-label', note ? `Add to ${note.title}` : 'Add to note');
+    button.title = button.getAttribute('aria-label');
+    if (button.dataset.noteDestination === 'text') button.textContent = button.title;
+  });
+}
+
+async function chooseResearchNoteDestination(project, container, current, {choose = false, trigger = null} = {}) {
   const projectID = researchProjectID(project);
-  const mount = notebookMounts.get(projectID);
-  const target = mount?.insertionTarget?.();
   const payload = navigator.onLine === false
-    ? await loadNotebookProjectSnapshot(captureAccountRequest().userID, projectID) || { cards: [] }
+    ? (await loadNotebookProjectSnapshot(captureAccountRequest().userID, projectID))?.cardPayload || {cards:[]}
     : await loadInitialNotebookCardList(project);
   if (!current()) return null;
   if (payload.access?.readOnly) throw new Error("This Project's Notes are read-only.");
   const cards = (payload.cards || []).filter(card => !card.deletedAt && !card.archivedAt);
-  const choices = [
-    ...(target ? [{ value: "current", label: `Current Note: ${target.title || "Untitled Note"}` }] : []),
-    { value: "new", label: "New Note" },
-    ...cards.filter(card => card.id !== target?.id).map(card => ({ value: `note:${card.id}`, label: card.title || "Untitled Note" }))
-  ];
-  const destination = await openWebWarning({ title: "Add Research to a Note",
-    message: `Project: ${readableProjectName(project)}. Choose where to keep the link to this exact saved answer and its sources.`,
-    choiceLabel: "Destination Note", choices, confirmLabel: "Add to selected Note", container });
-  if (!destination || !current()) return null;
-  if (destination === "new") return { kind: "new" };
-  if (destination === "current") {
-    const next = mount?.insertionTarget?.();
-    if (notebookMounts.get(projectID) !== mount || !next ||
-        (target.identity ? next.identity !== target.identity : next.id !== target.id)) {
-      throw new Error("The destination Note changed. Choose it again.");
-    }
-    return { kind: "open", mount, target };
+  const selected = workingResearchNote(projectID);
+  const selectedCard = cards.find(card => card.id === selected?.id);
+  const mounted = notebookMounts.get(projectID)?.insertionTarget?.();
+  const preferred = selectedCard || cards.find(card => card.id === mounted?.id);
+  let card = preferred;
+  if (choose || !selectedCard) {
+    const choices = [...(preferred ? [{value:preferred.id, label:preferred.title || 'Untitled Note'}] : []),
+      ...cards.filter(item => item.id !== preferred?.id).map(item => ({value:item.id,label:item.title || 'Untitled Note'})),
+      {value:'new',label:'New Note'}];
+    const destination = choose
+      ? await new Promise(resolve => {
+        const pickerTrigger = trigger || container.lastElementChild;
+        pickerTrigger.removeAttribute('aria-busy');
+        const finish = value => {
+          delete pickerTrigger._researchNotePicker;
+          resolve(value);
+        };
+        pickerTrigger._researchNotePicker = openProfilePreferenceMenu({
+          trigger:pickerTrigger, anchor:container, label:'Research note', heading:'Research note',
+          className:'research-note-picker', value:preferred?.id || '',
+          options:choices.map(choice => ({...choice,label:choice.value === 'new' ? '+ New note' : choice.label})),
+          onSelect:finish, onDismiss:() => finish(null)
+        });
+      })
+      : await openWebWarning({title:'Add to note', message:'Choose the note for this research.',
+        choiceLabel:'Destination Note', choices, confirmLabel:'Add to note', container});
+    if (!destination || !current()) return null;
+    if (destination === 'new') return {kind:'new'};
+    card = cards.find(item => item.id === destination);
   }
-  const card = cards.find(item => `note:${item.id}` === destination);
-  if (!card) throw new Error("The selected Note is no longer available.");
-  return { kind: "saved", card };
+  if (!card) throw new Error('The selected Note is no longer available.');
+  rememberWorkingResearchNote(projectID, card);
+  const mount = [...notebookColumnMounts.values()].find(item => item.panel.dataset.projectId === projectID && item.activeCardID() === card.id);
+  if (mount) {
+    const target = mount.insertionTarget?.();
+    if (!target || target.id !== card.id) throw new Error('The selected Note has a save conflict or is unavailable. Review it before adding material.');
+    return {kind:'open',mount,target};
+  }
+  return {kind:'saved',card};
 }
 
-async function appendResearchReferenceToNote(project, destination, reference, mutationID, identity, current) {
+async function appendResearchReferenceToNote(project, destination, reference, mutationID, identity, current, {evidenceLink = null, blocks = null, comments = []} = {}) {
   const projectID = researchProjectID(project);
-  const openMount = destination.kind === "open" ? destination.mount
-    : [...notebookColumnMounts.values()].find(mount => mount.panel.dataset.projectId === projectID &&
-        mount.activeCardID() === destination.card.id);
+  const openMount = destination.kind === 'open' ? destination.mount
+    : [...notebookColumnMounts.values()].find(mount => mount.panel.dataset.projectId === projectID && mount.activeCardID() === destination.card.id);
   if (openMount) {
     const target = openMount.insertionTarget?.();
-    const expected = destination.kind === "open" ? destination.target : destination.card;
+    const expected = destination.kind === 'open' ? destination.target : destination.card;
     if (!target || target.id !== expected.id || expected.identity && target.identity !== expected.identity) {
-      throw new Error("The selected Note has pending changes or is unavailable. Review it before adding this answer.");
+      throw new Error('The destination Note changed. Choose it again.');
     }
     if (!current()) return null;
-    await openMount.insertLinkedReference(target.id, reference);
-    return { ...expected, title: target.title || "Untitled Note" };
+    await openMount.insertLinkedReference(target.id, reference, evidenceLink, comments, blocks);
+    return {...expected,title:target.title || 'Untitled Note'};
   }
-  if (navigator.onLine === false) throw new Error("Reconnect to update this Note. The saved Research answer remains available.");
-  const { card } = await postResearch("/notebook/cards/get", { projectID, cardID: destination.card.id });
+  if (navigator.onLine === false) throw new Error('Reconnect to update this Note.');
+  if (await loadNotebookDraft(identity.userID, projectID, destination.card.id)) {
+    throw new Error('This Note has a device draft. Open it before adding material so your writing can be preserved.');
+  }
+  if (!current()) return null;
+  const {card} = await postResearch('/notebook/cards/get', {projectID,cardID:destination.card.id});
   requireCurrentAccountRequest(identity);
   if (!current()) return null;
-  // Get returns the normalized, current document. CAS rejects a concurrent
-  // update; do not replace an open editor or retry with a newer version blindly.
-  if (!Array.isArray(card.document?.document)) throw new Error("Open this Note to review its document before adding the answer.");
+  if (card.archivedAt || card.deletedAt) throw new Error('This Note is archived or deleted. Choose another Note.');
+  if (!Array.isArray(card.document?.document)) throw new Error('Open this Note to review its document before adding material.');
   const document = structuredClone(card.document);
-  document.document.push({ type: "paragraph", content: [{ type: "permitextReference", props: reference }] });
-  const payload = await postResearch("/notebook/cards/save", { ...card, projectID, cardID: card.id,
-    expectedVersion: card.version, clientMutationID: mutationID, document });
+  document.document.push(...notebookReferenceBlocks(reference, evidenceLink?.passages, comments, blocks));
+  const payload = await postResearch('/notebook/cards/save', {...card,projectID,cardID:card.id, expectedVersion:card.version,
+    clientMutationID:mutationID, document, evidenceLinks:evidenceLink ? [...(card.evidenceLinks || []),evidenceLink] : card.evidenceLinks});
   requireCurrentAccountRequest(identity);
-  await saveNotebookCardSnapshot(identity.userID, projectID, payload.card);
+  await saveNotebookCardSnapshot(identity.userID,projectID,payload.card);
+  requireCurrentAccountRequest(identity);
+  publishSavedNotebookCard(projectID,payload.card);
   return payload.card;
 }
 
@@ -28940,7 +29371,19 @@ function renderResearchNotebookHandoff(conversation, message, {linkForReport=fal
   const button = document.createElement("button");
   button.type = "button";
   button.className = "ghost-button";
-  button.textContent = "Add to note…";
+  button.dataset.noteDestination = 'text';
+  button.textContent = workingResearchNote(projectID)?.title ? `Add to ${workingResearchNote(projectID).title}` : 'Add to note…';
+  let selectedExcerpt = '';
+  button.addEventListener('pointerdown', () => {
+    selectedExcerpt = '';
+    const selection = window.getSelection();
+    const answer = region.closest('.rv2-answer, .research-message.is-assistant');
+    if (!answer || !selection?.rangeCount || selection.isCollapsed) return;
+    const range = selection.getRangeAt(0);
+    if (answer.contains(range.startContainer) && answer.contains(range.endContainer) && !region.contains(range.startContainer)) {
+      selectedExcerpt = selection.toString().trim().slice(0, 20000);
+    }
+  });
   button.disabled = !choices.length;
   if (!choices.length) button.title = "Create or restore a Project to keep this Research reference in Notebook.";
   const mutationID = `research-reference:${crypto.randomUUID()}`;
@@ -28968,10 +29411,15 @@ function renderResearchNotebookHandoff(conversation, message, {linkForReport=fal
         if (destination.kind !== "new") {
           savedCard = await appendResearchReferenceToNote(project, destination, {
             referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${fullQuestion}`
-          }, mutationID, requestIdentity, originIsCurrent);
+          }, mutationID, requestIdentity, originIsCurrent, {blocks:selectedExcerpt ?
+            [{type:'paragraph',content:[{type:'text',text:selectedExcerpt,styles:{}}]}] : null});
+          if (savedCard && originIsCurrent()) rememberWorkingResearchNote(researchProjectID(project), savedCard,
+            {kind:'conversation',conversationID:conversation.id});
           if (savedCard && destination.kind === "open") savedDestinationMount = destination.mount;
           if (savedCard && originIsCurrent()) {
+            delete button.dataset.noteDestination;
             button.textContent = `Open Note: ${savedCard.title || "Untitled Note"}`;
+            button.setAttribute("aria-label", button.textContent);
             button.title = `Added to ${savedCard.title || "Untitled Note"}`;
           }
           return;
@@ -28981,6 +29429,7 @@ function renderResearchNotebookHandoff(conversation, message, {linkForReport=fal
         document.document = [{ type: "paragraph", content: [{ type: "permitextReference", props: {
           referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${fullQuestion}`
         } }] }];
+        if (selectedExcerpt) document.document.push({type:'paragraph',content:[{type:'text',text:selectedExcerpt,styles:{}}]});
         const payload = await postResearch("/notebook/cards/save", { projectID: researchProjectID(project),
           clientMutationID: mutationID, expectedVersion: 0, cardType: "finding", title, document, evidenceLinks: [] });
         requireCurrentAccountRequest(requestIdentity);
@@ -28990,7 +29439,12 @@ function renderResearchNotebookHandoff(conversation, message, {linkForReport=fal
         publishSavedNotebookCard(researchProjectID(project), savedCard);
         // Saving a reference does not change the current view or pane membership.
         // A second, explicitly labelled action opens it beside Research.
-        if (originIsCurrent()) button.textContent = `Open Note: ${savedCard.title || "Untitled Note"}`;
+        if (originIsCurrent()) {
+          rememberWorkingResearchNote(researchProjectID(project),savedCard,{kind:'conversation',conversationID:conversation.id});
+          delete button.dataset.noteDestination;
+          button.textContent = `Open Note: ${savedCard.title || "Untitled Note"}`;
+            button.setAttribute("aria-label", button.textContent);
+        }
         return;
       }
       requireCurrentAccountRequest(requestIdentity);
@@ -29021,6 +29475,7 @@ function renderResearchNotebookHandoff(conversation, message, {linkForReport=fal
       if (mount?.activeCardID?.() !== savedCard.id) await mount?.focusCard?.(savedCard.id);
       if (mount?.activeCardID?.() === savedCard.id) pendingNotebookCardByProject.delete(researchProjectID(project));
       button.textContent = `Open Note: ${savedCard.title || "Untitled Note"}`;
+            button.setAttribute("aria-label", button.textContent);
     } catch (error) {
       if (originIsCurrent()) await showWebNotice("Notebook handoff not completed", error.message);
     } finally {
@@ -30903,25 +31358,14 @@ async function renderProjectNotebook(project, options = {}) {
   applyPaneWeight(panel, paneID);
 
   const header = document.createElement("header");
-  header.className = "notebook-header";
+  header.className = "notebook-header notebook-shared-header";
   const heading = document.createElement("div");
-  heading.className = "notebook-heading";
+  heading.className = "notebook-heading notebook-shared-label";
   const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Notes";
   headingTitle.className = "eyebrow panel-kind";
   heading.append(headingTitle);
-  const dragHandle = createProjectToolDragHandle(identity);
-  const closeButton = document.createElement("button");
-  closeButton.className = "icon-button utility-close notebook-close";
-  closeButton.type = "button";
-  closeButton.title = "Close notes";
-  closeButton.setAttribute("aria-label", "Close notes");
-  closeButton.innerHTML = circleXIconSVG();
-  closeButton.addEventListener("click", () => {
-    void closeNotebookNoteColumn(identity, paneID);
-  });
-  header.append(heading, closeButton, dragHandle);
-
+  header.append(heading);
   const shell = document.createElement("div");
   shell.className = "notebook-shell";
   const status = document.createElement("p");
@@ -31203,6 +31647,7 @@ async function renderProjectNotebook(project, options = {}) {
       onTitleChange(value) {
         if (disposed || notebookReadOnly || !isCurrentAccountRequest(requestIdentity) || !activeCard) return;
         activeCard.title = value;
+        if (workingResearchNote(projectID)?.id === activeCard.id) rememberWorkingResearchNote(projectID, activeCard);
         publishNotebookColumn(projectID, paneID, activeCard);
         const summary = cards.find((card) => card.id && card.id === activeCard.id);
         if (summary) summary.title = value;
@@ -31213,8 +31658,8 @@ async function renderProjectNotebook(project, options = {}) {
     const railHeader = noteMenu.footer;
     const railLabel = noteMenu.label;
     noteMenu.element.classList.add('has-note-columns');
-    noteMenu.toggle.hidden = true;
     noteMenu.menu.remove();
+    noteMenu.titleAction.remove();
     mountState.editTitle = () => noteMenu.editTitle();
     const newButton = noteMenu.createButton;
     const cardList = noteMenu.list;
@@ -31521,6 +31966,10 @@ async function renderProjectNotebook(project, options = {}) {
         requestIdentity
       );
       if (!isCurrent()) return;
+      const [preparedModule, preparedCandidates] = await Promise.all([
+        loadNotebookModule(), notebookReferenceCandidates(identity, foundation, cards)
+      ]);
+      if (!isCurrent()) return;
       // The old editor remains usable while the next Note loads. Persist any
       // intervening edits before replacing it, including edits during a save.
       while (outgoingIsCurrent() && notebookRevision !== outgoingRevision) {
@@ -31558,7 +32007,7 @@ async function renderProjectNotebook(project, options = {}) {
           : useLocalDraft ? "Recovered device draft · waiting to sync" : "Synced");
       }
       renderCardList();
-      await renderFocusedCard();
+      await renderFocusedCard({module:preparedModule, candidates:preparedCandidates});
       if (isCurrent() && activeCard === candidateCard && dirty) scheduleNotebookAutosave();
     }
     mountState.focusCard = loadCard;
@@ -31810,7 +32259,7 @@ async function renderProjectNotebook(project, options = {}) {
       return true;
     };
 
-    async function renderFocusedCard() {
+    async function renderFocusedCard(prepared = null) {
       if (!disposed && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === returnScrollContext.workspaceID &&
           notebookColumnMounts.get(paneID) === mountState) {
         rememberNotebookReturnCard(returnScrollContext, activeCard?.id || "");
@@ -31857,7 +32306,7 @@ async function renderProjectNotebook(project, options = {}) {
       referenceToggle.append(referenceLabel);
       const referenceList = document.createElement("div");
       referenceList.className = "notebook-reference-list";
-      let candidates = (await notebookReferenceCandidates(identity, foundation, cards))
+      let candidates = (prepared ? prepared.candidates : await notebookReferenceCandidates(identity, foundation, cards))
         .filter((reference) =>
           reference.referenceKind !== "notebookCard" ||
           reference.referenceID !== activeCard.id
@@ -32084,12 +32533,6 @@ async function renderProjectNotebook(project, options = {}) {
       const footer = document.createElement("div");
       footer.className = "notebook-card-footer";
       const footerActions = document.createElement("div");
-      const researchButton = document.createElement("button");
-      researchButton.className = "notebook-secondary-action";
-      researchButton.type = "button";
-      researchButton.textContent = "Ask Assistant";
-      researchButton.title = "Use this card as the starting point for a new evidence-selected Research question";
-      researchButton.hidden = true;
       const coordinateButton = document.createElement("button");
       coordinateButton.className = "notebook-secondary-action";
       coordinateButton.type = "button";
@@ -32109,42 +32552,13 @@ async function renderProjectNotebook(project, options = {}) {
           snapshot: { label: `Notebook: ${activeCard.title || "Untitled card"}` }
         });
       });
-      const reportButton = document.createElement("button");
-      reportButton.type = "button";
-      reportButton.className = "notebook-add-to-report";
-      reportButton.textContent = "Add to Report";
-      reportButton.dataset.reportMembershipMode = "action";
-      reportButton.dataset.reportMembershipProject = projectID;
-      reportButton.dataset.reportSourceKind = "notebookCard";
-      reportButton.dataset.reportSourceId = activeCard.id || "";
-      refreshNotebookReportStatus = async () => refreshProjectReportMembership(projectID, true);
-      window.requestAnimationFrame(() => { if (reportButton.isConnected && activeCard.id) void refreshProjectReportMembership(projectID); });
-      reportButton.disabled = notebookReadOnly;
-      reportButton.addEventListener("click", async () => {
-        const handoffRenderSequence = editorRenderSequence;
-        reportButton.disabled = true;
-        try {
-          const synchronized = await saveActiveNotebookCard();
-          if (disposed || !isCurrentAccountRequest(requestIdentity) || handoffRenderSequence !== editorRenderSequence) return;
-          if (!synchronized || dirty || saveConflict) throw new Error("Finish syncing this Note and resolve any save conflict before adding it to a Report. Your device draft is preserved.");
-          if (!activeCard?.id) throw new Error("Save this Note before adding it to a Report.");
-          reportButton.dataset.reportSourceId = activeCard.id;
-          if (await openIncludedSourceReport(reportButton, identity)) return;
-          const addedReport = await promoteNotebookCardToReport(identity, activeCard, { container: panel });
-          reportAdditionFeedback(reportButton, addedReport);
-        } catch (error) {
-          if (!disposed && isCurrentAccountRequest(requestIdentity)) await showWebNotice("Report handoff not completed", error.message);
-        }
-        finally { if (!disposed) reportButton.disabled = notebookReadOnly; }
-      });
-      footerActions.append(researchButton, coordinateButton);
-      const module = await loadNotebookModule();
+      footerActions.append(coordinateButton);
+      const module = prepared ? prepared.module : await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      noteMenu.titleAction.append(reportButton);
       footer.append(footerActions);
       const focusedContent = [editorElement];
       if (notebookReadOnly) panel.append(draftStatus);
-      if (!researchButton.hidden || !coordinateButton.hidden) focusedContent.push(footer);
+      if (!coordinateButton.hidden) focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 
       let scrollCaptureReady = false;
@@ -32166,6 +32580,7 @@ async function renderProjectNotebook(project, options = {}) {
       };
       editorMount = module.mountPermitextNotebookEditor(editorElement, {
         document: draftDocument,
+        synchronousMount: true,
         autofocus: false,
         editable: !notebookReadOnly,
         toolbarInsertElement: toolbar,
@@ -32209,16 +32624,7 @@ async function renderProjectNotebook(project, options = {}) {
       if (!notebookReadOnly && !activeCard.id) {
         noteMenu.editTitle();
       }
-      researchButton.addEventListener("click", async () => {
-        const bodyText = notebookRecoveryPlainText(editorMount?.getDocument() || draftDocument).trim();
-        researchQuestionDraft = bodyText || activeCard.title;
-        const researchWasOpen = Boolean(state.utilities.analysis);
-        await focusUtility("analysis");
-        if (researchWasOpen) {
-          await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
-          scrollPaneIntoView("utility:analysis");
-        }
-      });
+
     }
 
     archiveButton.addEventListener("click", () => {
@@ -32279,7 +32685,7 @@ async function renderProjectNotebook(project, options = {}) {
       selectButton.focus({ preventScroll: true });
     });
 
-    const createLocalNotebookNote = async () => {
+    const createLocalNotebookNote = async ({retiredCardID} = {}) => {
       const loadGeneration = ++notebookCardLoadGeneration;
       const workspaceID = activeWorkspaceID;
       const isCurrent = () => loadGeneration === notebookCardLoadGeneration && !disposed &&
@@ -32297,6 +32703,11 @@ async function renderProjectNotebook(project, options = {}) {
         return isCurrent() && confirmed;
       };
       if (!(await preserveFocusedChanges()) || !isCurrent()) return;
+      if (retiredCardID) {
+        const available = notebookCatalogs.get(projectID);
+        if (available) cards = cards.filter(card => available.some(item => item.id === card.id));
+        if (activeCard?.id === retiredCardID) { activeCard = null; dirty = false; }
+      }
       let outgoingCard = activeCard;
       const outgoingIdentity = notebookCardIdentity(outgoingCard);
       const outgoingIsCurrent = () => activeCard === outgoingCard ||
@@ -32413,6 +32824,7 @@ async function renderProjectNotebook(project, options = {}) {
     status.textContent = error.payload?.code === "PRO_REQUIRED_NOTEBOOK"
       ? "The Project Notebook is included with per codes Pro."
       : `Notebook unavailable: ${error.message}`;
+    showDraftStatus(status.textContent);
     await appendNotebookDeviceRecovery(shell, projectID, requestIdentity);
   }
   return panel;
@@ -32750,7 +33162,11 @@ async function renderProjectReportDraft(project, resume = null) {
       await openNotebookNoteColumn(identity, note);
     }
   };
-  const sourcePreviewRequests = new Map();
+  const sourcePreviews = createReportSourcePreviews({
+    request: block => reportRequest("/reports/sources/preview", {projectID, kind:block.kind, sourceID:block.sourceID}),
+    isCurrent: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID
+  });
+  const sourcePreviewRequests = sourcePreviews.requests;
   let sourceWarnings = [];
   let history = [];
   let reportOptions = {
@@ -32769,6 +33185,7 @@ async function renderProjectReportDraft(project, resume = null) {
   let draggedReportBlock = null;
   let reportFormatting = null;
   let reportFormattingModule = null;
+  let reportPresentationGeneration = 0;
   const reportNoteEditors = new Set();
   const reportNoteObjectURLs = new Set();
   const disposeReportNoteEditors = () => {
@@ -32779,9 +33196,10 @@ async function renderProjectReportDraft(project, resume = null) {
   };
   const mountReportNoteEditor = (block, {document:noteDocument = block.notebookDocument, editable = true} = {}) => {
     const host = document.createElement('div'); host.className = 'notebook-editor report-note-editor';
-    void loadNotebookModule().then(module => {
-      if (!host.isConnected || disposed || !isCurrentAccountRequest(requestIdentity)) return;
-      const editor = module.mountPermitextNotebookEditor(host, {document:noteDocument, editable, autofocus:false,
+    const generation = reportPresentationGeneration;
+    const mount = module => {
+      if (disposed || generation !== reportPresentationGeneration || requestWorkspaceID !== activeWorkspaceID || !isCurrentAccountRequest(requestIdentity)) return;
+      const editor = module.mountPermitextNotebookEditor(host, {document:noteDocument, editable, autofocus:false, synchronousMount:true,
         uploadFile:file => {
           if (navigator.onLine === false) throw new Error('Reconnect to add an image to this Report snapshot.');
           return uploadNotebookAsset(projectID, file, '', requestIdentity);
@@ -32798,7 +33216,9 @@ async function renderProjectReportDraft(project, resume = null) {
         }
       });
       reportNoteEditors.add(editor);
-    }).catch(error => { if (host.isConnected) showStatusError(error.message); });
+    };
+    if (reportFormattingModule) mount(reportFormattingModule);
+    else void loadNotebookModule().then(mount).catch(error => { if (host.isConnected) showStatusError(error.message); });
     return host;
   };
   let outlineController = null;
@@ -32834,10 +33254,47 @@ async function renderProjectReportDraft(project, resume = null) {
     reportSourceGroupExpanded.set(sectionName, Boolean(expanded));
     persistProjectSectionExpansion(identity, `Report:${sectionName}`, expanded);
   };
-  let sourceAddition = Promise.resolve();
-  let sourceAdditionDraft = null;
+  let sourceMutation = Promise.resolve();
+  let sourceMutationDraft = null;
+  function queueReportSourceMutation(draftID, selectedSources, removing = false) {
+    if (generatingReport || deletingReport || activeDraft.id !== draftID) {
+      return Promise.reject(new Error("The Report has changed or is exporting. Choose its destination again."));
+    }
+    const destinationDraft = activeDraft;
+    sourceMutationDraft = destinationDraft;
+    const selected = structuredClone(selectedSources);
+    const mutate = async () => {
+      const current = () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
+      if (!current()) throw accountContextChangedError();
+      if (activeDraft !== destinationDraft || deletingReport) throw new Error("The Report has changed. Choose its destination again.");
+      if (removing) {
+        const kept = activeDraft.blocks.filter(block => !selected.some(source => reportBlockUsesSource(block, source.kind, source.id)));
+        if (kept.length === activeDraft.blocks.length) return structuredClone(activeDraft);
+        activeDraft.blocks = kept;
+      } else {
+        // The first save assigns an ID to this same object. Retain its identity
+        // and serialize all source changes so a late Add cannot undo a Remove.
+        if (!await saveDraft()) throw new Error("Save the Report with Retry before adding more sources. Your edits are preserved.");
+        if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
+        await prepareReportNoteSources(projectID, selected, requestIdentity);
+        if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
+        appendUniqueReportSources(activeDraft, selected);
+      }
+      setDirty();
+      renderWorkspaceContent();
+      if (!await saveDraft()) throw new Error("The Report could not finish saving. Your change remains in the open Report; use Retry to save it.");
+      if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
+      return structuredClone(activeDraft);
+    };
+    const pending = sourceMutation.catch(() => {}).then(mutate);
+    sourceMutation = pending;
+    // Export observes a failure; subsequent source changes can still retry.
+    void pending.catch(() => {});
+    return pending;
+  }
   const mountState = {
     panel,
+    whenPresented: () => Promise.allSettled([...sourcePreviewRequests.values()]),
     getPresentationState: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID && renderedDraftKey ? captureReportResume(panel, {
       draftID: activeDraft.id || "", versionID: comparisonController?.selectedID || "",
       comparisonScroll: comparisonController?.capturePosition(), outlineSections: [...outlineSectionExpansion]
@@ -32847,7 +33304,9 @@ async function renderProjectReportDraft(project, resume = null) {
       for (const [key, expanded] of snapshot.outlineSections) outlineSectionExpansion.set(key, expanded);
       applyReportResumeLayout(panel, snapshot);
       renderWorkspaceContent();
+      const generation = reportPresentationGeneration;
       if (snapshot.versionID && history.some(report => report.id === snapshot.versionID)) await openHistoricalReport(snapshot.versionID);
+      if (disposed || generation !== reportPresentationGeneration || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
       applyReportResumeLayout(panel, snapshot);
       syncReferenceReaderLayout();
       comparisonController?.restorePosition(snapshot.comparisonScroll);
@@ -32855,42 +33314,17 @@ async function renderProjectReportDraft(project, resume = null) {
       const interaction = reportPresentationInteraction;
       await navigateReportOutline({requests: sourcePreviewRequests.values(),
         isCurrent: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID &&
-          reportScreen?.isOpen() && reportPresentationInteraction === interaction,
+          generation === reportPresentationGeneration && reportScreen?.isOpen() && reportPresentationInteraction === interaction,
         navigate: () => restoreReportResumeScroll(panel, snapshot)});
     },
     hasUnsavedChanges: () => dirty,
     hasPendingEdits: () => dirty || autosave?.isSaving() || generatingReport || deletingReport,
     getDraftSnapshot: () => structuredClone(activeDraft),
     addSources(draftID, selectedSources) {
-      if (generatingReport || deletingReport || activeDraft.id !== draftID) {
-        return Promise.reject(new Error("The Report has changed or is exporting. Choose its destination again."));
-      }
-      // The first save assigns an ID to this same draft. Track its object
-      // identity so that assigning that ID does not discard the first source.
-      const destinationDraft = activeDraft;
-      sourceAdditionDraft = destinationDraft;
-      const sources = structuredClone(selectedSources);
-      const add = async () => {
-        const current = () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
-        if (!current()) throw accountContextChangedError();
-        if (activeDraft !== destinationDraft || deletingReport) throw new Error("The Report has changed. Choose its destination again.");
-        // Wait for the current save and preceding additions, keeping the user's
-        // chosen destination and every requested source intact.
-        if (!await saveDraft()) throw new Error("Save the Report with Retry before adding more sources. Your edits are preserved.");
-        if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
-        await prepareReportNoteSources(projectID, sources, requestIdentity);
-        if (!current() || activeDraft !== destinationDraft) throw accountContextChangedError();
-        appendUniqueReportSources(activeDraft, sources);
-        setDirty();
-        renderWorkspaceContent();
-        if (!await saveDraft()) throw new Error("The Report could not finish saving. Your added material and edits remain in the Report; use Retry to save them.");
-        return structuredClone(activeDraft);
-      };
-      const pending = sourceAddition.catch(() => {}).then(add);
-      sourceAddition = pending;
-      // Keep failures observable by export while allowing a later retry.
-      void pending.catch(() => {});
-      return pending;
+      return queueReportSourceMutation(draftID, selectedSources);
+    },
+    removeSources(draftID, selectedSources) {
+      return queueReportSourceMutation(draftID, selectedSources, true);
     },
     async confirmDiscardIfNeeded() {
       if (!dirty || await saveDraft()) return true;
@@ -33069,9 +33503,9 @@ async function renderProjectReportDraft(project, resume = null) {
     generatingReport = true;
     paintExportState();
     try {
-      // Already accepted source additions may still be preparing a Note or
-      // saving the draft. Export their completed version, never an earlier one.
-      if (sourceAdditionDraft === activeDraft) await sourceAddition;
+      // Source changes may still be preparing a Note or saving the draft.
+      // Export their completed version, never an earlier one.
+      if (sourceMutationDraft === activeDraft) await sourceMutation;
       if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
       if (dirty) {
@@ -33319,11 +33753,7 @@ async function renderProjectReportDraft(project, resume = null) {
       remove.title = "Remove Report item";
       remove.setAttribute("aria-label", "Remove Report item");
       remove.innerHTML = trashIconSVG();
-      remove.addEventListener("click", () => {
-        activeDraft.blocks.splice(activeDraft.blocks.indexOf(block), 1);
-        setDirty();
-        renderWorkspaceContent();
-      });
+      remove.addEventListener("click", () => removeDraftBlock(block));
       actions.append(remove);
       top.append(label, actions);
       row.append(top);
@@ -33487,65 +33917,66 @@ async function renderProjectReportDraft(project, resume = null) {
           preview.open = !reportEvidenceCoverage(activeDraft.blocks, sources).has(block.id);
           let loaded = false, loading = false;
           let previewRevision = 0;
-          const loadPreview = async () => {
-            if (!preview.open || loaded || loading) return;
-            const revision = previewRevision;
-            loading = true; reportFormatting.unregisterSource(body); body.textContent = "Loading complete source…";
-            const identity = captureAccountRequest();
-            try {
-              const key = JSON.stringify([block.kind, block.sourceID, source]);
-              let request = sourcePreviewRequests.get(key);
-              if (!request) {
-                request = postResearch("/reports/sources/preview", {projectID, kind:block.kind, sourceID:block.sourceID});
-                sourcePreviewRequests.set(key, request);
-                request.catch(() => { if (sourcePreviewRequests.get(key) === request) sourcePreviewRequests.delete(key); });
-              }
-              const result = await request;
-              requireCurrentAccountRequest(identity);
-              if (disposed || requestWorkspaceID !== activeWorkspaceID || revision !== previewRevision) return;
-              body.replaceChildren();
-              const noteDocument = block.kind === 'notebookCard' && result.items?.find(item => item.kind === 'notebookCard')?.document;
-              if (noteDocument) {
-                body.append(mountReportNoteEditor(block, {document:noteDocument, editable:false}));
-                loaded = true; return;
-              }
-              for (const part of result.preview || []) {
-                if (part.kind === 'image') {
-                  const figure = document.createElement('figure');
-                  const image = document.createElement('img');
-                  const sourceURL = new URL(part.url); image.src = `${sourceURL.pathname}${sourceURL.search}`; image.alt = part.caption || 'Published code figure';
-                  image.loading = 'lazy'; image.style.maxWidth = '100%'; figure.append(image);
-                  if (part.caption) {const caption=document.createElement('figcaption');caption.textContent=part.caption;figure.append(caption);}
-                  body.append(figure);
-                } else if (part.kind === "table") {
-                  const scroll = document.createElement("div"); scroll.className = "report-preview-table";
-                  const table = document.createElement("table");
-                  for (const [rowIndex,cells] of tableDisplayCells(part.rows || [],part.cellSpans || []).entries()) {
-                    const row = document.createElement("tr");
-                    for (const entry of cells.filter(Boolean)) {
-                      const columnIndex=entry.column,value=entry.content;
-                      const cell = document.createElement(rowIndex<(part.headerRowCount||0)?"th":"td"); cell.textContent = value;
-                      cell.rowSpan=entry.rowSpan;cell.colSpan=entry.colSpan;row.append(cell);
-                      if (String(value)) reportFormatting.registerSource(block,cell,{key:`${part.key}:${rowIndex}:${columnIndex}`,text:String(value),
-                        superscriptRanges:part.cellSuperscripts?.find(mark=>mark.row===rowIndex&&mark.column===columnIndex)?.ranges});
-                    }
-                    table.append(row);
+          const generation = reportPresentationGeneration;
+          const previewIsCurrent = () => !disposed && generation === reportPresentationGeneration &&
+            requestWorkspaceID === activeWorkspaceID && isCurrentAccountRequest(requestIdentity);
+          const paintPreview = result => {
+            body.replaceChildren();
+            const noteDocument = block.kind === 'notebookCard' && result.items?.find(item => item.kind === 'notebookCard')?.document;
+            if (noteDocument) {
+              body.append(mountReportNoteEditor(block, {document:noteDocument, editable:false}));
+              loaded = true; return;
+            }
+            for (const part of result.preview || []) {
+              if (part.kind === 'image') {
+                const figure = document.createElement('figure');
+                const image = document.createElement('img');
+                const sourceURL = new URL(part.url); image.src = `${sourceURL.pathname}${sourceURL.search}`; image.alt = part.caption || 'Published code figure';
+                image.loading = 'lazy'; image.style.maxWidth = '100%'; figure.append(image);
+                if (part.caption) {const caption=document.createElement('figcaption');caption.textContent=part.caption;figure.append(caption);}
+                body.append(figure);
+              } else if (part.kind === "table") {
+                const scroll = document.createElement("div"); scroll.className = "report-preview-table";
+                const table = document.createElement("table");
+                for (const [rowIndex,cells] of tableDisplayCells(part.rows || [],part.cellSpans || []).entries()) {
+                  const row = document.createElement("tr");
+                  for (const entry of cells.filter(Boolean)) {
+                    const columnIndex=entry.column,value=entry.content;
+                    const cell = document.createElement(rowIndex<(part.headerRowCount||0)?"th":"td"); cell.textContent = value;
+                    cell.rowSpan=entry.rowSpan;cell.colSpan=entry.colSpan;row.append(cell);
+                    if (String(value)) reportFormatting.registerSource(block,cell,{key:`${part.key}:${rowIndex}:${columnIndex}`,text:String(value),
+                      superscriptRanges:part.cellSuperscripts?.find(mark=>mark.row===rowIndex&&mark.column===columnIndex)?.ranges});
                   }
-                  scroll.append(table); body.append(scroll);
-                } else {
-                  if (part.label) {
-                    const heading = document.createElement("strong"); heading.textContent = part.label; body.append(heading);
-                  }
-                  const text = document.createElement("p"); text.textContent = part.text; body.append(text);
-                  if (part.text) reportFormatting.registerSource(block,text,part);
+                  table.append(row);
                 }
+                scroll.append(table); body.append(scroll);
+              } else {
+                if (part.label) {
+                  const heading = document.createElement("strong"); heading.textContent = part.label; body.append(heading);
+                }
+                const text = document.createElement("p"); text.textContent = part.text; body.append(text);
+                if (part.text) reportFormatting.registerSource(block,text,part);
               }
-              loaded = true;
+            }
+            loaded = true;
+          };
+          const loadPreview = async () => {
+            if (!previewIsCurrent() || !preview.open || loaded || loading) return;
+            const revision = previewRevision;
+            loading = true;
+            reportFormatting.unregisterSource(body);
+            try {
+              const cached = sourcePreviews.get(block, source);
+              if (cached) { paintPreview(cached); return; }
+              body.textContent = "Loading complete source…";
+              const result = await sourcePreviews.load(block, source);
+              if (!previewIsCurrent() || revision !== previewRevision) return;
+              paintPreview(result);
             } catch (error) {
-              if (isCurrentAccountRequest(identity) && revision === previewRevision) body.textContent = `${error.message} Close and reopen to retry.`;
+              if (previewIsCurrent() && revision === previewRevision) body.textContent = `${error.message} Close and reopen to retry.`;
             } finally {
               loading = false;
-              if (revision !== previewRevision && !disposed) void loadPreview();
+              if (revision !== previewRevision && previewIsCurrent()) void loadPreview();
             }
           };
           if (block.kind === "notebookCard") {
@@ -33609,7 +34040,7 @@ async function renderProjectReportDraft(project, resume = null) {
       renderBody(body);
       section.append(heading, body);
       container.append(section);
-      const initiallyExpanded = reportSectionExpanded(label);
+      const initiallyExpanded = reportSectionExpanded(label, false);
       wireProjectSectionMotion(section, body, [title], label, initiallyExpanded, {
         onChange(expanded) {
           persistReportSectionExpanded(label, expanded);
@@ -33619,6 +34050,8 @@ async function renderProjectReportDraft(project, resume = null) {
     const appendSourceCard = (container, source) => {
       const row = document.createElement("article");
       row.className = "report-source-card";
+      row.dataset.sourceKind = source.kind;
+      row.dataset.sourceId = source.id;
       const copy = document.createElement("div");
       const heading = document.createElement("strong");
       heading.textContent = source.label;
@@ -33636,21 +34069,36 @@ async function renderProjectReportDraft(project, resume = null) {
       }
       const add = document.createElement("button");
       add.type = "button";
-      add.textContent = "Add";
-      add.disabled = reportsContainingSource([activeDraft], source.kind, source.id).length > 0;
-      add.textContent = add.disabled ? "Added" : "Add";
-      add.setAttribute("aria-label", `${add.disabled ? "Already included" : "Add to Report"}: ${source.label || heading.textContent}`);
+      const included = () => reportsContainingSource([activeDraft], source.kind, source.id).length > 0;
+      const paintAction = () => {
+        const removing = included();
+        add.textContent = removing ? "Remove" : "Add";
+        add.disabled = generatingReport || deletingReport;
+        add.setAttribute("aria-label", `${removing ? "Remove from Report" : "Add to Report"}: ${source.label || heading.textContent}`);
+      };
+      paintAction();
       add.addEventListener("click", async () => {
+        if (add.disabled || disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+        const destinationDraft = activeDraft;
+        const removing = included();
         add.disabled = true;
-        try { await mountState.addSources(activeDraft.id, [source]); }
+        try {
+          await mountState[removing ? 'removeSources' : 'addSources'](destinationDraft.id, [source]);
+          if (!disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID && activeDraft === destinationDraft) {
+            panel.querySelector(`.report-source-card[data-source-kind="${CSS.escape(source.kind)}"][data-source-id="${CSS.escape(source.id)}"] > button`)?.focus({preventScroll:true});
+          }
+        }
         catch (error) {
-          if (!disposed && isCurrentAccountRequest(requestIdentity)) await showWebNotice("Report handoff not completed", error.message);
-        } finally { if (add.isConnected) add.disabled = reportsContainingSource([activeDraft], source.kind, source.id).length > 0; }
+          if (!disposed && isCurrentAccountRequest(requestIdentity)) await showWebNotice("Report update not completed", error.message);
+        } finally { if (add.isConnected) paintAction(); }
       });
       row.append(copy, add);
       container.append(row);
     };
 
+    appendSourceGroup('Notes', '', body => {
+      sources.filter(source => source.kind === 'notebookCard').forEach(source => appendSourceCard(body, source));
+    });
     const projectFactsSources = sources.filter((source) => source.kind === "projectFacts" && !source.hiddenFromPicker);
     for (const [section, label] of [["context", "Context"], ["facts", "Facts"]]) {
       appendSourceGroup(label, "", (groupBody) => {
@@ -33660,7 +34108,7 @@ async function renderProjectReportDraft(project, resume = null) {
       });
     }
 
-    for (const [kind, label] of [["evidence", "Evidence"], ["notebookCard", "Notes"]]) {
+    for (const [kind, label] of [["evidence", "Evidence"]]) {
       appendSourceGroup(label, "", body => {
         const items = sources.filter(source => source.kind === kind);
         items.forEach(source => appendSourceCard(body, source));
@@ -33806,6 +34254,27 @@ async function renderProjectReportDraft(project, resume = null) {
     });
   }
 
+  function removeDraftBlock(block, focusArea = null) {
+    if (disposed || generatingReport || deletingReport || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
+    const index = activeDraft.blocks.indexOf(block);
+    if (index < 0) return false;
+    const title = reportBlockTitle(block);
+    const next = activeDraft.blocks[index + 1] || activeDraft.blocks[index - 1];
+    activeDraft.blocks.splice(index, 1);
+    setDirty();
+    renderWorkspaceContent();
+    if (focusArea === 'outline') {
+      outlineController.announce(`${title} removed from Report.`);
+      if (next) outlineController.reveal(next);
+      const nextID = next && (next.id || `${next.kind}-${activeDraft.blocks.indexOf(next)}`);
+      const target = shell.querySelector(next
+        ? `.report-outline-item[data-block-id="${CSS.escape(nextID)}"] .report-outline-link`
+        : '.report-outline-introduction .report-outline-link');
+      target?.focus({preventScroll:true});
+    }
+    return true;
+  }
+
   function reorderDraftBlock(block, targetIndex, focusArea = null) {
     if (!moveReportBlock(activeDraft.blocks, activeDraft.blocks.indexOf(block), targetIndex)) return;
     outlineNavigationGeneration += 1;
@@ -33831,13 +34300,52 @@ async function renderProjectReportDraft(project, resume = null) {
     });
   }
 
+  const reportSwitch = createReportSwitch({
+    read: () => activeDraft,
+    isCurrent: () => !disposed && !generatingReport && !deletingReport &&
+      isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
+    async preserve(current) {
+      let pending;
+      do {
+        pending = sourceMutation;
+        // A failed source change still goes through the save/recovery decision.
+        if (sourceMutationDraft === activeDraft) await pending.catch(() => {});
+        if (!current() || !await mountState.confirmDiscardIfNeeded() || !current()) return false;
+      } while (sourceMutationDraft === activeDraft && pending !== sourceMutation);
+      return true;
+    },
+    async prepare(draftID) {
+      const incoming = draftID === "__new__" ? emptyProjectReportDraft(identity) :
+        structuredClone(drafts.find(draft => draft.id === draftID) || emptyProjectReportDraft(identity));
+      const covered = reportEvidenceCoverage(incoming.blocks, sources);
+      await Promise.all(incoming.blocks.filter(block => !covered.has(block.id)).map(block => {
+        const source = sources.find(item => item.kind === block.kind && item.id === block.sourceID);
+        return source ? sourcePreviews.load(block, source) : undefined;
+      }));
+      return incoming;
+    },
+    commit(incoming) {
+      activeDraft = incoming;
+      dirty = false;
+      recoveryEditorID = crypto.randomUUID();
+      autosave.reset();
+      clearStatus();
+      renderWorkspaceContent();
+      shell.querySelector(".report-draft-version-list > summary")?.focus({preventScroll:true});
+    },
+    onError: error => showStatusError(error.message)
+  });
+
   function renderWorkspaceContent() {
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
     reportUndo.bind(activeDraft);
     outlineNavigationGeneration += 1;
+    const presentation = ++reportPresentationGeneration;
     const draftKey = activeDraft.id || activeDraft.clientDraftID;
     const keepPosition = renderedDraftKey === draftKey;
     const oldDocument = shell.querySelector(".report-document");
+    const oldColumns = shell.querySelector(".report-workspace-columns");
+    const oldDocuments = shell.querySelector(".report-document-columns");
     const oldOutline = shell.querySelector(".report-outline");
     const columnsScroll = shell.querySelector(".report-document-columns")?.scrollLeft || 0;
     const comparisonScroll = comparisonController?.capturePosition();
@@ -33854,7 +34362,6 @@ async function renderProjectReportDraft(project, resume = null) {
     disposeReportNoteEditors();
     outlineController?.dispose();
     resetEnhancedSelects(shell);
-    shell.querySelectorAll(":scope > :not(.report-draft-status)").forEach((element) => element.remove());
 
     const draftPicker = document.createElement("div");
     draftPicker.className = "report-draft-picker";
@@ -33945,22 +34452,7 @@ async function renderProjectReportDraft(project, resume = null) {
     versionList.addEventListener("focusout", event => {
       if (event.relatedTarget && !versionList.contains(event.relatedTarget)) versionList.open = false;
     });
-    const switchDraft = async (draftID) => {
-      if (deletingReport) return;
-      if (dirty && !(await mountState.confirmDiscardIfNeeded())) return;
-      activeDraft = draftID === "__new__"
-        ? emptyProjectReportDraft(identity)
-        : structuredClone(
-            drafts.find((draft) => draft.id === draftID) || emptyProjectReportDraft(identity)
-          );
-      dirty = false;
-      recoveryEditorID = crypto.randomUUID();
-      deletingReport = false;
-      autosave.reset();
-      clearStatus();
-      renderWorkspaceContent();
-      shell.querySelector(".report-draft-version-list > summary")?.focus({ preventScroll: true });
-    };
+    const switchDraft = draftID => reportSwitch.select(draftID);
     drafts.forEach((draft) => {
       const current = draft.id === activeDraft.id;
       const choice = document.createElement("button");
@@ -33974,7 +34466,7 @@ async function renderProjectReportDraft(project, resume = null) {
       choice.append(choiceTitle, choiceRevision);
       choice.addEventListener("click", () => {
         versionList.open = false;
-        if (current) reportMenu.focus({ preventScroll: true });
+        if (current) { reportSwitch.cancel(); reportMenu.focus({ preventScroll: true }); }
         else void switchDraft(draft.id);
       });
       reportOptions.append(choice);
@@ -34104,7 +34596,10 @@ async function renderProjectReportDraft(project, resume = null) {
       empty.textContent = "Add a heading, paragraph, list, or saved source to start your report.";
       blocksBody.append(empty);
     }
-    renderBlockEditor(blocksBody);
+    const printContent = document.createElement("div");
+    printContent.className = "report-print-content";
+    renderBlockEditor(printContent);
+    blocksBody.append(printContent);
     blocks.append(blocksBody);
     const sourcePalette = document.createElement("section");
     sourcePalette.className = "report-source-palette";
@@ -34176,13 +34671,13 @@ async function renderProjectReportDraft(project, resume = null) {
     const historyBody = comparison.versionBody;
     historyBody.replaceChildren();
     renderHistory(historyBody);
-    const documentBody = document.createElement("div");
+    const documentBody = oldDocument || document.createElement("div");
     documentBody.className = "report-document";
-    documentBody.append(draftPicker, metadata, blocks);
+    documentBody.replaceChildren(draftPicker, metadata, blocks);
     outlineController = createReportOutline({
       blocks: activeDraft.blocks, introduction: metadata,
       targets: [...blocksBody.querySelectorAll(".report-draft-block")], documentBody,
-      dragIcon: paneDragHandleSVG(), sectionExpansion: outlineSectionExpansion,
+      dragIcon: paneDragHandleSVG(), removeIcon: trashIconSVG(), sectionExpansion: outlineSectionExpansion,
       describe: block => {
         const source = sources.find(item => item.kind === block.kind && item.id === block.sourceID);
         if (block.kind === "evidence" && source) return {
@@ -34204,7 +34699,8 @@ async function renderProjectReportDraft(project, resume = null) {
           })
         });
       },
-      onMove: reorderDraftBlock
+      onMove: reorderDraftBlock,
+      onRemove: block => removeDraftBlock(block, 'outline')
     });
     const outline = outlineController.element;
     const library = document.createElement("aside");
@@ -34256,7 +34752,7 @@ async function renderProjectReportDraft(project, resume = null) {
     tools.type = "button";
     tools.textContent = "Sources";
     prependWorkspaceButtonIcon(tools, "form");
-    tools.title = "Show Report sources and versions";
+    tools.title = "Show Report sources";
     tools.setAttribute("aria-expanded", String(panel.dataset.libraryOpen === "true"));
     tools.addEventListener("click", () => {
       const expanded = panel.dataset.libraryOpen !== "true";
@@ -34294,17 +34790,17 @@ async function renderProjectReportDraft(project, resume = null) {
     versionsToggle.title = "Compare saved PDF versions beside the current Report";
     versionsToggle.addEventListener("click", () => comparison.toggle());
     primaryActions.insertBefore(versionsToggle, saveStatus);
-    const columns = document.createElement("div");
+    const columns = oldColumns || document.createElement("div");
     columns.className = "report-workspace-columns";
     columns.setAttribute("role", "region");
     columns.setAttribute("aria-label", "Report columns");
-    const documents = document.createElement("div");
+    const documents = oldDocuments || document.createElement("div");
     documents.className = "report-document-columns";
     documents.setAttribute("role", "region");
     documents.setAttribute("aria-label", "Report documents");
     documents.tabIndex = 0;
-    documents.append(outline, outlineControls.divider, documentBody, comparison.divider, comparison.preview);
-    columns.append(library, libraryControls.divider, documents, versionsControls.divider, comparison.versions);
+    retainReportChildren(documents, outline, outlineControls.divider, documentBody, comparison.divider, comparison.preview);
+    retainReportChildren(columns, library, libraryControls.divider, documents, versionsControls.divider, comparison.versions);
     panel._updateReportColumns = () => {
       versionsToggle.hidden = history.length === 0;
       const comparing = panel.dataset.comparisonOpen === "true";
@@ -34348,7 +34844,7 @@ async function renderProjectReportDraft(project, resume = null) {
       libraryControls.update(); versionsControls.update();
     };
     panel._columnExpansion?.dispose();
-    shell.append(primaryActions, columns);
+    retainReportChildren(shell, status, primaryActions, columns);
     panel._updateReportColumns();
     panel._columnExpansion = createColumnExpansion({
       host: columns, columns: () => [library, outline, documentBody, comparison.preview, comparison.versions],
@@ -34363,18 +34859,20 @@ async function renderProjectReportDraft(project, resume = null) {
       const previous = disclosures.get(row.dataset.blockId);
       if (previous) row.querySelectorAll("details").forEach((detail, index) => { detail.open = previous[index] || false; });
     });
-    documentBody.scrollTop = documentScroll;
+    documentBody.scrollTo({top:documentScroll, behavior:"instant"});
     outline.scrollTop = outlineScroll;
     if (keepPosition && documentScroll) {
       const interaction = reportPresentationInteraction;
       void navigateReportOutline({requests: sourcePreviewRequests.values(),
-        isCurrent: () => !disposed && documentBody.isConnected && isCurrentAccountRequest(requestIdentity) &&
+        isCurrent: () => !disposed && presentation === reportPresentationGeneration && documentBody.isConnected && isCurrentAccountRequest(requestIdentity) &&
           requestWorkspaceID === activeWorkspaceID && reportPresentationInteraction === interaction,
         navigate: () => { documentBody.scrollTop = documentScroll; }});
     }
-    documentBody.addEventListener("input", () => outlineController.refreshLabels());
-    documentBody.addEventListener("wheel", () => { outlineNavigationGeneration += 1; }, { passive: true });
-    documentBody.addEventListener("pointerdown", () => { outlineNavigationGeneration += 1; });
+    if (!oldDocument) {
+      documentBody.addEventListener("input", () => outlineController?.refreshLabels());
+      documentBody.addEventListener("wheel", () => { outlineNavigationGeneration += 1; }, {passive:true});
+      documentBody.addEventListener("pointerdown", () => { outlineNavigationGeneration += 1; });
+    }
     paintReportSaveState();
     if (panel.isConnected) syncReferenceReaderLayout();
   }
@@ -41235,17 +41733,6 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     ? reusableSearchReader(visibleReaders, anchorPaneID, options.forceNewReader)
     : visibleReaders.find((candidate) =>
       (!anchorPaneID || candidate.sourceAnchorPaneID === anchorPaneID) && readerMatchesSource(candidate, detail));
-  let notebookTabAdded = false;
-  if (notebookOpening && reader && (fromSaved || options.forceNewReader || !readerMatchesSource(reader, detail))) {
-    if (!canAddReaderTab(reader)) {
-      await showWebNotice('Reader is full', `Close a Reader tab before opening another code or saved passage. Maximum ${maximumReaderTabs} tabs.`);
-      return null;
-    }
-    rememberReaderTabPosition(reader);
-    retainReaderColumn(reader);
-    addReaderTab(reader, newReaderState(sourceFields));
-    notebookTabAdded = true;
-  }
   let createdReader = false;
   if (!options.forceNewReader && !reader && !ownedSource) {
     reader = visibleReaders.find(readerIsClearlyAvailable) || null;
@@ -41273,7 +41760,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
       reader = replacement;
     }
   }
-  if (!notebookTabAdded && Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
+  if (notebookOpening || Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
     allowNewColumn: !(fromSearch || fromSaved) || Boolean(options.forceNewReader)
   });
   if (!reader) return null;
@@ -41309,8 +41796,9 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   }
   await transitionWorkspace("utility", {
     refreshPaneIDs: retainedPanel ? [] : [paneID],
-    ...(sourceNavigation ? { readerSourceNavigation: sourceNavigation,
-      readerTabSwitchPaneID: notebookTabAdded || !retainedPanel && !createdReader && !options.forceNewReader ? paneID : "" } : {})
+    ...(sourceNavigation ? { readerSourceNavigation: sourceNavigation } : {}),
+    ...(!retainedPanel && !createdReader && (notebookOpening || sourceNavigation && !options.forceNewReader)
+      ? {readerTabSwitchPaneID: paneID} : {})
   });
   if (!navigationIsCurrent() || !await whenWorkspacePaneReady(paneID) || !navigationIsCurrent()) return null;
   const destinationPanel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
@@ -41322,6 +41810,9 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     immediate: ownedSource
   });
   scrollPaneIntoView(paneID, createdReader || options.forceNewReader ? "smooth" : "auto");
+  const note = workingResearchNote();
+  if (note && currentWorkflowView() === 'research') rememberWorkingResearchNote(researchProjectID(workspaceProject()), note,
+    {kind:'reader',source:{sectionID:String(navigationItem.sectionID || navigationItem.id),codeVersion:navigationItem.codeVersion,codePrefix:navigationItem.codePrefix,sectionNumber:navigationItem.sectionNumber,title:navigationItem.title,chapterID:reader.chapterID,blockID:navigationItem.blockID || ''},exact:options.evidenceAnchor?.passages?.[0]?.exact || ''});
   return reader;
 }
 
@@ -41364,7 +41855,7 @@ async function openSavedItemInReader(item, savedPaneID) {
     isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     generation === (state.workflowNavigationGeneration || 0);
   try {
-    return await openSourceInReader(item, savedPaneID, { sourceSurface: "saved", isCurrent, forceNewReader: true,
+    return await openSourceInReader(item, savedPaneID, { sourceSurface: "saved", isCurrent, forceNewReader: currentColumnWorkflowView() !== 'notebook',
       evidenceAnchor: item.evidenceAnchor || null });
   } finally {
     if (savedItemOpeningAttempts.get(savedPaneID) === attempt) savedItemOpeningAttempts.delete(savedPaneID);
@@ -43194,9 +43685,9 @@ async function openSearchCodeSourceSettings(panel) {
     const {catalog} = activeCodeSourcesController.state;
     const enabled = catalog || [];
     const selected = new Set(searchPanelSources(instance, catalog).map(codeSourceKey));
-    const trigger = panel.querySelector(".search-scope-summary");
+    const trigger = panel.querySelector(".column-group-menu-button");
     const dialog = document.createElement("dialog"); dialog.className = "search-scope-dialog";
-    dialog.setAttribute("aria-label", "Search within codebooks and editions");
+    dialog.setAttribute("aria-label", "Filter codes");
     const header = document.createElement("div"); header.className = "search-scope-header";
     const choices = document.createElement("div"); choices.className = "search-scope-choices";
     const controls = [];
@@ -43226,7 +43717,6 @@ async function openSearchCodeSourceSettings(panel) {
       if (closed) return;
       closed = true;
       observer.disconnect(); resize?.disconnect(); dialog.close(); dialog.remove();
-      trigger?.setAttribute("aria-expanded", "false");
       if (trigger?.isConnected && current()) trigger.focus({preventScroll:true});
     };
     const position = () => {
@@ -43270,7 +43760,7 @@ async function openSearchCodeSourceSettings(panel) {
     observer.observe(track,{childList:true,subtree:true});
     resize?.observe(panel);
     const dock = panel.querySelector(".search-dock"); if (dock) resize?.observe(dock);
-    trigger?.setAttribute("aria-expanded","true"); dialog.show();
+    dialog.show();
   } catch(error) { if(isCurrentAccountRequest(identity)&&workspaceID===activeWorkspaceID) await showWebNotice("Search sources unavailable",error.message); }
 }
 
@@ -44663,6 +45153,24 @@ function capturePaneResizeWidths() {
   return panes;
 }
 
+function notebookReferenceResize(panes, previousPaneID, nextPaneID, delta) {
+  if (currentColumnWorkflowView() !== 'notebook') return null;
+  const reference = id => /^(?:reader:|utility:saved(?::|$)|project:notes-index:)/.test(id || '');
+  const targetID = reference(previousPaneID) ? previousPaneID : reference(nextPaneID) ? nextPaneID : '';
+  const targetIndex = panes.findIndex(pane => pane.id === targetID);
+  const editorIndex = panes.findIndex(pane => pane.id.startsWith('project:notebook:'));
+  if (targetIndex < 0 || editorIndex < 0) return null;
+  const widths = panes.map(pane => pane.startWidth);
+  const editorID = panes[editorIndex].id;
+  // Reference columns borrow only from the writing column. Their shared
+  // divider must never squeeze another reference column to make room.
+  [widths[targetIndex], widths[editorIndex]] = adjacentColumnWidths(
+    widths[targetIndex], widths[editorIndex], targetID === previousPaneID ? delta : -delta,
+    minimumPaneWidthForID(targetID), minimumPaneWidthForID(editorID),
+    maximumPaneWidthForID(targetID), maximumPaneWidthForID(editorID));
+  return {widths, indices: [targetIndex, editorIndex], targetIndex};
+}
+
 function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
   if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID) || assistantHistoryOnlyPane(previousPaneID) || assistantHistoryOnlyPane(nextPaneID)) return;
   const previousPane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(previousPaneID)}"]`);
@@ -44670,18 +45178,28 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
   if (!previousPane || !nextPane) return;
   // Expansion must be restored before measuring the pair, just as it is for
   // pointer resizing. Expanded/strip widths are presentation, not resize bases.
-  capturePaneResizeWidths();
+  const paneData = capturePaneResizeWidths();
   const previousWidth = previousPane.getBoundingClientRect().width;
   const nextWidth = nextPane.getBoundingClientRect().width;
   const scrollLeft = track.scrollLeft;
-  const widths = adjacentColumnWidths(previousWidth, nextWidth, delta,
+  const notebookResize = notebookReferenceResize(paneData, previousPaneID, nextPaneID, delta);
+  const widths = notebookResize ? [
+    notebookResize.widths[paneData.findIndex(pane => pane.id === previousPaneID)],
+    notebookResize.widths[paneData.findIndex(pane => pane.id === nextPaneID)]
+  ] : adjacentColumnWidths(previousWidth, nextWidth, delta,
     minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
     maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID),
     { expandLeft: previousPaneID.startsWith("reader:"), expandRight: nextPaneID.startsWith("reader:") });
-  state.paneWeights[previousPaneID] = widths[0];
-  state.paneWeights[nextPaneID] = widths[1];
-  applyPaneWeight(previousPane, previousPaneID);
-  applyPaneWeight(nextPane, nextPaneID);
+  if (notebookResize) notebookResize.indices.forEach(index => {
+    state.paneWeights[paneData[index].id] = notebookResize.widths[index];
+    applyPaneWeight(paneData[index].pane, paneData[index].id);
+  });
+  else {
+    state.paneWeights[previousPaneID] = widths[0];
+    state.paneWeights[nextPaneID] = widths[1];
+    applyPaneWeight(previousPane, previousPaneID);
+    applyPaneWeight(nextPane, nextPaneID);
+  }
   // Match pointer resizing when one column reaches its minimum width.
   track.scrollLeft = scrollLeft;
   updateAdjacentDividerValue(divider, ...widths);
@@ -44693,6 +45211,12 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
 function refreshPaneDividerValue(divider) {
   const previousID = divider.dataset.previousPaneId;
   const nextID = divider.dataset.nextPaneId;
+  if (previousID?.startsWith('project:notes-index:') && nextID?.startsWith('project:notebook:')) {
+    divider.classList.add('is-collapse-disabled');
+    divider.setAttribute('aria-disabled', 'true');
+    divider.tabIndex = -1;
+    return;
+  }
   const edge = singleExpandedDividerEdge(previousID, nextID, divider);
   const paneForID = (id) => id ? track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(id)}"]`) : null;
   const previousPane = paneForID(previousID);
@@ -45054,7 +45578,7 @@ function bindPaneDragging(panes) {
     const header = pane.querySelector(":scope > header");
     const tabRow = pane.classList.contains('reader-panel') ? pane.querySelector(":scope > .reader-column-tabs") : null;
     const dragArea = tabRow || header;
-    if (pane.classList.contains('notebook-index-panel')) {
+    if (pane.classList.contains('notebook-index-panel') || pane.classList.contains('notebook-panel')) {
       if (header) header.removeAttribute('title');
       return;
     }
@@ -45184,13 +45708,14 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
 
   const applyResizeAt = (clientX) => {
     const delta = clientX - startX;
-    const widths = paneData.map((pane) => pane.startWidth);
-    [widths[previousIndex], widths[nextIndex]] = adjacentColumnWidths(
+    const notebookResize = notebookReferenceResize(paneData, previousPaneID, nextPaneID, delta);
+    const widths = notebookResize?.widths || paneData.map((pane) => pane.startWidth);
+    if (!notebookResize) [widths[previousIndex], widths[nextIndex]] = adjacentColumnWidths(
       paneData[previousIndex].startWidth, paneData[nextIndex].startWidth, delta,
       minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
       maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID),
       { expandLeft, expandRight });
-    [previousIndex, nextIndex].forEach((index) => {
+    (notebookResize?.indices || [previousIndex, nextIndex]).forEach((index) => {
       if (Math.abs(widths[index] - lastAppliedWidths[index]) < 0.25) return;
       const pane = paneData[index];
       state.paneWeights[pane.id] = widths[index];
@@ -45285,10 +45810,17 @@ function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
   const currentWidth = pane.getBoundingClientRect().width;
-  capturePaneResizeWidths();
-  const nextWidth = constrainPaneWidth(paneID, currentWidth + delta);
-  state.paneWeights[paneID] = nextWidth;
-  applyPaneWeight(pane, paneID);
+  const paneData = capturePaneResizeWidths();
+  const notebookResize = notebookReferenceResize(paneData, paneID, '', delta);
+  const nextWidth = notebookResize ? notebookResize.widths[notebookResize.targetIndex] : constrainPaneWidth(paneID, currentWidth + delta);
+  if (notebookResize) notebookResize.indices.forEach(index => {
+    state.paneWeights[paneData[index].id] = notebookResize.widths[index];
+    applyPaneWeight(paneData[index].pane, paneData[index].id);
+  });
+  else {
+    state.paneWeights[paneID] = nextWidth;
+    applyPaneWeight(pane, paneID);
+  }
   resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
   resizeHandle?.setAttribute("aria-valuetext", `Column width ${Math.round(nextWidth)} pixels`);
   notifyWorkspaceLayoutChange();
@@ -45312,6 +45844,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   const initialRightOverflow = edgeSide === "right"
     ? Math.max(0, startBounds.right - Math.min(track.getBoundingClientRect().right, window.innerWidth)) : 0;
   let resizeStarted = false;
+  let paneData;
   const isReferenceResize = ["report", "project-details"].includes(currentColumnWorkflowView());
   const edgeAutoResizeThreshold = 32;
   const edgeAutoResizeMaxSpeed = 640;
@@ -45324,10 +45857,18 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
 
   const applyResizeAt = (clientX) => {
     const direction = edgeSide === "left" ? -1 : 1;
-    const nextWidth = constrainPaneWidth(paneID, startWidth + direction * (clientX - startX));
+    const delta = direction * (clientX - startX);
+    const notebookResize = notebookReferenceResize(paneData, paneID, '', delta);
+    const nextWidth = notebookResize ? notebookResize.widths[notebookResize.targetIndex] : constrainPaneWidth(paneID, startWidth + delta);
     if (Math.abs(nextWidth - lastAppliedWidth) < 0.25) return;
-    state.paneWeights[paneID] = nextWidth;
-    applyPaneWeight(pane, paneID);
+    if (notebookResize) notebookResize.indices.forEach(index => {
+      state.paneWeights[paneData[index].id] = notebookResize.widths[index];
+      applyPaneWeight(paneData[index].pane, paneData[index].id);
+    });
+    else {
+      state.paneWeights[paneID] = nextWidth;
+      applyPaneWeight(pane, paneID);
+    }
     syncReferenceReaderLayout();
     resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
     resizeHandle?.setAttribute("aria-valuetext", `Column width ${Math.round(nextWidth)} pixels`);
@@ -45377,7 +45918,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
     if (moveEvent.pointerId !== undefined && moveEvent.pointerId !== event.pointerId) return;
     if (!resizeStarted) {
       if (Math.abs(moveEvent.clientX - startX) < 3) return;
-      capturePaneResizeWidths();
+      paneData = capturePaneResizeWidths();
       track.classList.add("is-resizing");
       resizeStarted = true;
     }
@@ -45599,6 +46140,7 @@ function renderFirstUseWelcome() {
 }
 
 function columnPaneLabel(panel) {
+  if (panel.classList.contains('notebook-panel')) return panel.dataset.notebookTitle || 'Notepad';
   const code = panel.querySelector('.code-select')?.selectedOptions?.[0]?.textContent;
   const chapter = panel.querySelector('.chapter-select')?.selectedOptions?.[0]?.textContent;
   return code ? [code, chapter].filter(Boolean).join(' · ')
@@ -45792,6 +46334,7 @@ function appendReaderMenuControls(menu, panel) {
 
 function openColumnGroupMenu(panel, anchor) {
   document.querySelector('.column-group-menu')?._close?.();
+  document.querySelector('.search-scope-dialog')?._close?.();
   const pro = isProAccount();
   const group = workspacePrivatePresentationAllowed() && canGroupWorkspaceColumn(panel.dataset.paneId) ? columnGroupForPane(panel.dataset.paneId) : null;
   const menu = document.createElement('div');
@@ -45900,17 +46443,19 @@ function openColumnGroupMenu(panel, anchor) {
     if (pro) {
       const reader = state.readers.find(item => item.id === panel.dataset.readerId);
       if (reader) {
-        add("Add code tab", () => openReaderTabPicker(reader, anchor), !canAddReaderTab(reader));
+        add("Add code tab", () => openReaderTabPicker(reader, anchor), currentColumnWorkflowView() !== 'notebook' && !canAddReaderTab(reader));
         if (currentColumnWorkflowView() !== 'notebook') {
           add("Duplicate in new column", () => transferReaderTab(reader, reader.activeTabID, { duplicate: true }));
           add("Move tab to new column", () => transferReaderTab(reader, reader.activeTabID), readerTabs(reader).length < 2);
         }
       }
     }
-    if (pro) add("Change Code", () => openReaderCodePicker(anchor, async (code) => {
+    if (pro) add("Change Code", () => {
       const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
-      if (reader && panel.isConnected) await changeReaderCode(panel, reader, code);
-    }));
+      if (!reader || !panel.isConnected) return;
+      if (currentColumnWorkflowView() === 'notebook') openReaderTabPicker(reader, anchor);
+      else openReaderCodePicker(anchor, code => panel.isConnected && changeReaderCode(panel, reader, code));
+    });
     if (trust) {
       panel._readerTrust = trust;
       trust.open = false;
@@ -46101,10 +46646,17 @@ function columnGroupIsCollapsed(group) {
 }
 
 function paneIsCollapsed(paneID) {
+  if (paneID.startsWith('project:notes-index:') && currentColumnWorkflowView() === 'notebook') return Boolean(state.notebookListHidden);
   return paneCanCollapse(paneID) && ((paneID !== activePinnedPaneID() && columnGroupIsCollapsed(columnGroupForPane(paneID))) || (state.collapsedPaneIDs || []).includes(paneID));
 }
 
 function applyPaneCollapsedState(panel) {
+  if (panel.dataset.paneId.startsWith('project:notes-index:')) {
+    // Notes keeps its own toggle and live list, rather than the generic rail.
+    panel.classList.toggle('is-collapsed', false);
+    applyPaneWeight(panel, panel.dataset.paneId);
+    return;
+  }
   const collapsed = paneIsCollapsed(panel.dataset.paneId);
   const wasCollapsed = panel.classList.contains("is-collapsed");
   if (collapsed && !wasCollapsed) {
@@ -46654,14 +47206,34 @@ function captureReaderScrollPositions(onlyPanel = null) {
       positions.set(panel.dataset.paneId, snapshot.position);
       return;
     }
-    const reservedPosition = content._readerChapterExtent?.unloadedScrollPosition(contentKey);
-    if (reservedPosition) { positions.set(panel.dataset.paneId, reservedPosition); return; }
-    const top = content.getBoundingClientRect().top;
-    const sectionMatch = firstBelow(content.querySelectorAll(".chapter-section[data-section-id]"), top);
-    if (!sectionMatch) return;
-    const section = sectionMatch.node;
-    const blockMatch = firstBelow(section.querySelectorAll(".annotated-code-block[data-block-id], .reader-block-placeholder[data-block-id]"), top);
-    const block = blockMatch?.node;
+    const contentBounds = content.getBoundingClientRect();
+    const contentTop = contentBounds.top;
+    const headerHeight = typeof getComputedStyle === 'function' ? Number.parseFloat(getComputedStyle(panel, '::before').height) : 0;
+    const top = Math.max(contentTop, (panel.getBoundingClientRect?.().top ?? contentTop) + (Number.isFinite(headerHeight) ? headerHeight : 0));
+    // Hit testing reads the text actually painted on screen without measuring
+    // skipped sections, whose intrinsic height can change during a probe.
+    let block = null, section = null;
+    if (content.ownerDocument?.elementFromPoint && contentBounds.width > 0) {
+      for (const gap of [1, 24, 48, 96, 160]) {
+        const y = top + gap;
+        if (y >= contentBounds.bottom) break;
+        const hit = content.ownerDocument.elementFromPoint(contentBounds.left + contentBounds.width / 2, y);
+        const candidate = hit?.closest('.annotated-code-block[data-block-id]');
+        if (candidate && content.contains(candidate)) {
+          block = candidate;
+          section = block.closest('.chapter-section[data-section-id]');
+          if (section) break;
+        }
+      }
+    }
+    if (!section) {
+      const reservedPosition = content._readerChapterExtent?.unloadedScrollPosition(contentKey);
+      if (reservedPosition) { positions.set(panel.dataset.paneId, reservedPosition); return; }
+      const sectionMatch = firstBelow(content.querySelectorAll(".chapter-section[data-section-id]"), top);
+      if (!sectionMatch) return;
+      section = sectionMatch.node;
+      block = firstBelow(section.querySelectorAll(".annotated-code-block[data-block-id], .reader-block-placeholder[data-block-id]"), top)?.node;
+    }
     // Boundary probes may lay out a skipped neighboring block. Measure the
     // chosen anchor again after those probes so its saved offset is current.
     block?.getBoundingClientRect();
@@ -46717,21 +47289,34 @@ function cancelReaderScrollRestore(content) {
   if (content) {
     delete content._readerScrollRestoreAbort;
     delete content._readerPendingScrollPosition;
+    delete content._readerScrollRestoreRetained;
   }
 }
 
-function applyReaderScrollPosition(panel, position) {
+function applyReaderScrollPosition(panel, position, { retain = false } = {}) {
   if (panel?.classList.contains("is-workflow-hidden")) { panel._workflowReaderPosition = position; return; }
   const content = panel?.querySelector(".reader-content");
   if (!content || !panel.isConnected || panel.dataset.readerContentKey !== position?.contentKey) {
     cancelReaderScrollRestore(content);
     return;
   }
+  retain ||= Boolean(content._readerScrollRestoreRetained);
+  const holdPosition = () => {
+    content._readerPendingScrollPosition = position;
+    content._readerScrollRestoreRetained = retain;
+    if (!content._readerScrollRestoreAbort) {
+      const controller = new AbortController();
+      content._readerScrollRestoreAbort = controller;
+      for (const event of ["wheel", "touchstart", "pointerdown", "keydown"]) {
+        content.addEventListener(event, () => cancelReaderScrollRestore(content), { signal: controller.signal, passive: true });
+      }
+    }
+  };
   const snapshot = panel._readerAnchorSnapshot;
   if (snapshot?.position === position && snapshot.renderToken === panel.dataset.readerRenderToken &&
       [content.scrollTop, content.clientWidth, content.scrollHeight, content.childElementCount]
         .every((value, index) => value === snapshot.metrics[index])) {
-    cancelReaderScrollRestore(content);
+    if (retain) holdPosition(); else cancelReaderScrollRestore(content);
     return;
   }
   const section = content.querySelector(`.chapter-section[data-section-id="${CSS.escape(position.sectionID)}"]`);
@@ -46747,7 +47332,7 @@ function applyReaderScrollPosition(panel, position) {
   const retainedOffset = block ? position.anchorOffset : position.sectionOffset;
   if (position.estimatedFraction === undefined && Number.isFinite(retainedOffset) && content.clientHeight > 0 &&
       Math.abs(anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - retainedOffset) <= 1) {
-    cancelReaderScrollRestore(content);
+    if (retain) holdPosition(); else cancelReaderScrollRestore(content);
     updateReaderScrollIndicator(panel);
     return;
   }
@@ -46758,33 +47343,32 @@ function applyReaderScrollPosition(panel, position) {
   const sectionIndex = sections.indexOf(section);
   const measured = sections.slice(Math.max(0, sectionIndex - 2), sectionIndex + 3)
     .map(node => ({ node, visibility: node.style.contentVisibility }));
-  let targetTop, maximumTop;
-  measured.forEach(({ node }) => { node.style.contentVisibility = "visible"; });
-  try {
-    const offset = block ? position.anchorOffset : Number.isFinite(position.estimatedFraction)
-      ? -position.estimatedFraction * section.getBoundingClientRect().height : position.sectionOffset;
-    // Scrolling can materialize skipped passages and change earlier heights.
-    // Settle that bounded layout before painting the restored reading position.
+  let targetTop, maximumTop, offset;
+  const settleAnchor = () => {
     for (let attempt = 0; attempt < 3; attempt++) {
       targetTop = Math.max(0, content.scrollTop + anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset);
       maximumTop = Math.max(0, content.scrollHeight - content.clientHeight);
       content.scrollTop = Math.min(targetTop, maximumTop);
       if (Math.abs(anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset) <= 1) break;
     }
+  };
+  measured.forEach(({ node }) => { node.style.contentVisibility = "visible"; });
+  try {
+    offset = block ? position.anchorOffset : Number.isFinite(position.estimatedFraction)
+      ? -position.estimatedFraction * section.getBoundingClientRect().height : position.sectionOffset;
+    // Scrolling can materialize skipped passages and change earlier heights.
+    // Settle that bounded layout before painting the restored reading position.
+    settleAnchor();
   } finally {
     measured.forEach(({ node, visibility }) => { node.style.contentVisibility = visibility; });
   }
-  if (targetTop > maximumTop + 1 && content.dataset.chapterFullyLoaded !== "true") {
-    // The first small window may be shorter than the viewport. Retry after
-    // nearby sections hydrate, but give control back as soon as the user acts.
-    content._readerPendingScrollPosition = position;
-    if (!content._readerScrollRestoreAbort) {
-      const controller = new AbortController();
-      content._readerScrollRestoreAbort = controller;
-      for (const event of ["wheel", "touchstart", "pointerdown", "keydown"]) {
-        content.addEventListener(event, () => cancelReaderScrollRestore(content), { signal: controller.signal, passive: true });
-      }
-    }
+  // Restoring auto containment changes margin collapsing. Settle once more in
+  // the actual reading layout so repeated tab switches cannot accumulate drift.
+  if (Number.isFinite(offset)) settleAnchor();
+  if (retain || targetTop > maximumTop + 1 && content.dataset.chapterFullyLoaded !== "true") {
+    // Nearby chapter hydration can change reserved heights after the first
+    // publication. Keep the restored passage fixed until the user takes over.
+    holdPosition();
   } else {
     cancelReaderScrollRestore(content);
   }
@@ -50220,20 +50804,24 @@ function createWorkspacePaneLoadingShell(descriptor) {
     panel.append(root);
   }
   const isReport = descriptor.ownerClass === "report-draft-panel";
+  const isNotebook = descriptor.ownerClass === "notebook-panel";
   const isSectionDetail = (descriptor.ownerClass || "").includes("section-detail-panel");
   const header = isReport ? createReportPaneHeader(() => descriptor.close()) : document.createElement("header");
   if (!isReport) {
     if (isSectionDetail) header.className = "panel-header section-detail-chrome";
+    if (isNotebook) header.className = "notebook-header notebook-shared-header";
     const heading = document.createElement("h2");
     heading.className = "eyebrow panel-kind";
     heading.textContent = descriptor.label;
+    if (isNotebook) heading.classList.add("notebook-shared-label");
     const close = document.createElement("button");
     close.type = "button";
     close.className = isSectionDetail ? "section-detail-icon section-detail-close" : "icon-button utility-close";
     close.setAttribute("aria-label", `Close ${descriptor.label}`);
     close.innerHTML = circleXIconSVG();
     close.addEventListener("click", () => { void descriptor.close(); });
-    header.append(heading, close);
+    header.append(heading);
+    if (!isNotebook) header.append(close);
   }
   const status = document.createElement("p");
   status.className = `${isReport ? "report-draft-status" : isSectionDetail ? "section-detail-content" : "empty-state"} workspace-pane-load-status`;
@@ -50271,54 +50859,89 @@ function getWorkspacePaneHydrator() {
   workspacePaneHydrator = createWorkspacePaneHydrator({
     isContextCurrent: workspacePaneContextIsCurrent,
     onReady(job, pane) {
+      let published = false, discarded = false;
+      const publish = () => {
+        const shell = job.placeholder;
+        if (!shell?.isConnected || shell.parentNode !== track || !pane) {
+          discarded = true;
+          disposeUnpublishedWorkspacePane(pane);
+          return false;
+        }
+        const sourceNavigation = pane._readerSourceNavigation || job.descriptor.sourceNavigation;
+        if (sourceNavigation && !sourceNavigation.isCurrent()) {
+          discarded = true;
+          disposeUnpublishedWorkspacePane(pane);
+          finishWorkspacePaneReady(shell, false);
+          return false;
+        }
+        const scrollLeft = track.scrollLeft;
+        pane.dataset.workspacePaneIdentity ||= job.descriptor.contentIdentity;
+        pane.dataset.workspacePaneAccessIdentity = job.descriptor.accessIdentity;
+        pane.classList.toggle("is-pinned", job.id === activePinnedPaneID());
+        applyPaneWeight(pane, job.id);
+        ensureWorkspacePanelAccessibleName(pane);
+        preparePaneCollapse(pane);
+        bindPaneDragging([pane]);
+        pane.classList.toggle("is-workflow-hidden", !workflowPaneIsVisible(job.id));
+        shell.replaceWith(pane);
+        if (shell.dataset.readerTabPending) disposeUnpublishedWorkspacePane(shell);
+        // The new header is prepared above; retained editors and menus need no rebuild.
+        refreshColumnGroupPresentation({ preparePanels: false });
+        if (job.id === activePinnedPaneID()) refreshPinnedPaneDivider();
+        updateCollapsedPaneDividers();
+        // Only the newly mounted Reader gets restoration listeners and frames.
+        if (pane.classList.contains("reader-panel")) {
+          bindReaderScrollIndicator(pane);
+          updateReaderScrollIndicator(pane);
+          pane.querySelectorAll("select").forEach(enhanceSelect);
+        }
+        if (sourceNavigation) {
+          sourceNavigation.positioned = revealReaderSourceTarget(sourceNavigation.reader, sourceNavigation.item,
+            sourceNavigation.evidenceAnchor, sourceNavigation.options);
+        } else if (job.descriptor.scrollPosition) {
+          if (!shell.dataset.readerTabPending || !pane.classList.contains('reader-panel')) {
+            restoreReaderScrollPositions(new Map([[job.id, job.descriptor.scrollPosition]]));
+          }
+        }
+        if (job.descriptor.scrollTop != null) pane.scrollTop = job.descriptor.scrollTop;
+        // Even a same-value assignment cancels an in-flight smooth scroll.
+        if (track.scrollLeft !== scrollLeft) track.scrollLeft = scrollLeft;
+        notifyWorkspaceLayoutChange();
+        if (!sourceNavigation && shell.dataset.readerTabPending && job.descriptor.scrollPosition && pane.classList.contains('reader-panel')) {
+          // Reserve unloaded chapter space before restoring the anchor. Doing
+          // this on the next frame would move an already presented passage.
+          pane.querySelector('.reader-content')?._readerPrepareSourceNavigation?.();
+          applyReaderScrollPosition(pane, job.descriptor.scrollPosition, { retain: true });
+        }
+        // Retarget the opening scroll to the ready column's final geometry,
+        // preserving the caller's motion instead of snapping to the destination.
+        if (pendingWorkspacePaneRevealID === job.id) {
+          scrollPaneIntoView(job.id, pendingWorkspacePaneRevealBehavior);
+        }
+        finishWorkspacePaneReady(shell, true);
+        published = true;
+        return true;
+      };
       const shell = job.placeholder;
-      if (!shell?.isConnected || shell.parentNode !== track || !pane) {
-        disposeUnpublishedWorkspacePane(pane);
+      if (!shell?.dataset.readerTabPending || !pane?.classList.contains('reader-panel') ||
+          !workflowPaneIsVisible(job.id) || workspaceViewPresentation.coversWorkspace()) {
+        publish();
         return;
       }
-      const sourceNavigation = pane._readerSourceNavigation || job.descriptor.sourceNavigation;
-      if (sourceNavigation && !sourceNavigation.isCurrent()) {
-        disposeUnpublishedWorkspacePane(pane);
-        finishWorkspacePaneReady(shell, false);
-        return;
-      }
-      const scrollLeft = track.scrollLeft;
-      pane.dataset.workspacePaneIdentity ||= job.descriptor.contentIdentity;
-      pane.dataset.workspacePaneAccessIdentity = job.descriptor.accessIdentity;
-      pane.classList.toggle("is-pinned", job.id === activePinnedPaneID());
-      applyPaneWeight(pane, job.id);
-      ensureWorkspacePanelAccessibleName(pane);
-      preparePaneCollapse(pane);
-      bindPaneDragging([pane]);
-      pane.classList.toggle("is-workflow-hidden", !workflowPaneIsVisible(job.id));
-      shell.replaceWith(pane);
-      if (shell.dataset.readerTabPending) disposeUnpublishedWorkspacePane(shell);
-      // The new header is prepared above; retained editors and menus need no rebuild.
-      refreshColumnGroupPresentation({ preparePanels: false });
-      if (job.id === activePinnedPaneID()) refreshPinnedPaneDivider();
-      updateCollapsedPaneDividers();
-      // Only the newly mounted Reader gets restoration listeners and frames.
-      if (pane.classList.contains("reader-panel")) {
-        bindReaderScrollIndicator(pane);
-        updateReaderScrollIndicator(pane);
-        pane.querySelectorAll("select").forEach(enhanceSelect);
-      }
-      if (sourceNavigation) {
-        sourceNavigation.positioned = revealReaderSourceTarget(sourceNavigation.reader, sourceNavigation.item,
-          sourceNavigation.evidenceAnchor, sourceNavigation.options);
-      } else if (job.descriptor.scrollPosition) {
-        restoreReaderScrollPositions(new Map([[job.id, job.descriptor.scrollPosition]]));
-      }
-      if (job.descriptor.scrollTop != null) pane.scrollTop = job.descriptor.scrollTop;
-      // Even a same-value assignment cancels an in-flight smooth scroll.
-      if (track.scrollLeft !== scrollLeft) track.scrollLeft = scrollLeft;
-      notifyWorkspaceLayoutChange();
-      // Retarget the opening scroll to the ready column's final geometry,
-      // preserving the caller's motion instead of snapping to the destination.
-      if (pendingWorkspacePaneRevealID === job.id) {
-        scrollPaneIntoView(job.id, pendingWorkspacePaneRevealBehavior);
-      }
-      finishWorkspacePaneReady(shell, true);
+      // Fetching and rendering finished offscreen. Commit only this Reader
+      // synchronously; neighboring tools keep running throughout the load.
+      const ownsSource = () => !discarded && !job.signal?.aborted && workspacePaneContextIsCurrent(job.context) &&
+        (published ? pane.isConnected : shell.isConnected && shell.parentNode === track);
+      const finish = () => {
+        if (published || discarded) return;
+        if (ownsSource()) publish();
+        else if (!pane.isConnected) { discarded = true; disposeUnpublishedWorkspacePane(pane); }
+      };
+      void workspaceViewPresentation.present({
+        isCurrent: () => ownsSource() && workflowPaneIsVisible(job.id),
+        scope: () => published ? pane : shell,
+        update: publish
+      }).then(finish, finish);
     },
     onError(job) {
       const shell = job.placeholder;
@@ -50411,7 +51034,7 @@ function workspacePaneDescriptors(options = {}) {
       for (const column of notebookColumnsForProject(project).filter(item => item.open)) {
         const paneID = notebookColumnPaneID(column);
         foundationScope.register(paneID);
-        add(paneID, column.title || 'Notes', () => renderProjectNotebook(project, {foundationScope, column}),
+        add(paneID, 'Notes', () => renderProjectNotebook(project, {foundationScope, column}),
           () => closeNotebookNoteColumn(project, paneID), {foundationScope, ownerClass: 'notebook-panel', projectID, accessCapabilities: ['notebook'], deferWhileHidden: true});
       }
     }
@@ -50453,7 +51076,7 @@ function workspacePaneDescriptors(options = {}) {
     const scrollPosition = options.readerTabSwitchPaneID === id ? reader.scrollPosition
       : options.readerScrollPositions?.get(id) || reader.scrollPosition;
     add(id, readerPositionLabel(reader), (signal) => renderReader(reader, { scrollPosition: sourceNavigation ? undefined : scrollPosition,
-      sourceNavigation, accessGate: options.accessGate, signal }), async () => {
+      sourceNavigation, chapterNavigation: options.readerChapterSwitchPaneID === id, accessGate: options.accessGate, signal }), async () => {
       if (currentColumnWorkflowView() === 'notebook' && state.workflowMembership?.[id]?.includes('notebook')) {
         return setNotebookReaderHidden(reader, true);
       }
@@ -51028,10 +51651,6 @@ function bindWorkspaceKeyboardNavigation() {
 }
 
 function bindImmediateUtilityControls() {
-  if (toggleNotesListButton && toggleNotesListButton.dataset.coldStartBound !== 'true') {
-    toggleNotesListButton.dataset.coldStartBound = 'true';
-    toggleNotesListButton.addEventListener('click', () => void toggleNotebookList());
-  }
   const shortcutHost = document.querySelector("#reader-shortcuts");
   if (shortcutHost && !readerShortcuts) readerShortcuts = createReaderShortcuts({
     host: shortcutHost, track, readers: readerShortcutItems,
@@ -51049,7 +51668,8 @@ function bindImmediateUtilityControls() {
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     if (button.dataset.bound) return;
     button.dataset.bound = 'true';
-    button.addEventListener('click', () => void switchWorkflowView(button.dataset.workflowView));
+    button.addEventListener('click', () => void presentWorkingView(button.dataset.workflowView,
+      () => switchWorkflowView(button.dataset.workflowView)));
   });
   [
     [toggleContextButton, "context"],
@@ -51072,7 +51692,8 @@ function bindImmediateUtilityControls() {
         else void openProjectDetailsScreen();
         return;
       }
-      return tool === "facts" ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ? openProjectReportDraft(workspaceProject()) : toggleProjectTool(tool);
+      return tool === "facts" ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ?
+        presentWorkingView('report', () => openProjectReportDraft(workspaceProject())) : toggleProjectTool(tool);
     };
     button.addEventListener("click", () => void openTool());
   });

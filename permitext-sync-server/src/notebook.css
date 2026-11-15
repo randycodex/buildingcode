@@ -15,15 +15,16 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 3px;
+  justify-content: space-between;
+  gap: 2px;
   min-height: 42px;
-  padding: 5px 12px;
+  padding: 5px 24px;
   border-bottom: 1px solid var(--border, #d7d9dc);
   background: var(--surface, var(--bn-colors-editor-background));
   color: var(--text-primary, inherit);
   font: 13px var(--bn-font-family);
 }
-.permitext-notebook-editor .notebook-format-toolbar > button { width: 30px; flex: 0 0 30px; }
+.permitext-notebook-editor .notebook-format-toolbar > button { width: 28px; flex: 0 0 28px; }
 .permitext-notebook-editor .notebook-format-toolbar > button svg { width: 17px; height: 17px; }
 .permitext-notebook-editor .notebook-format-toolbar :is(button, select, summary) {
   min-height: 30px;
@@ -52,7 +53,7 @@
 }
 .permitext-notebook-editor .notebook-format-highlight { color: var(--highlight-tool-color, #826700); }
 .permitext-notebook-editor .notebook-format-save-status { margin-inline-start: auto; font-size: 11px; color: var(--text-secondary, #777); }
-.permitext-notebook-editor .notebook-format-toolbar .notebook-format-style { display: inline-flex; align-items: center; justify-content: space-between; gap: 16px; width: auto; flex: 0 0 auto; }
+.permitext-notebook-editor .notebook-format-toolbar .notebook-format-style { display: inline-flex; align-items: center; justify-content: center; gap: 0; width: auto; flex: 0 0 auto; white-space: nowrap; }
 .permitext-notebook-editor .notebook-format-toolbar .notebook-format-style svg { width: 14px; height: 14px; }
 .permitext-notebook-editor .notebook-format-style-menu {
   padding: 6px;
@@ -90,6 +91,9 @@
 .permitext-notebook-editor .notebook-format-toolbar .notebook-draft-status-message {
   white-space: normal;
 }
+.permitext-notebook-editor .notebook-format-save-status:empty,
+.permitext-notebook-editor .notebook-format-save-status:has(> .notebook-draft-status[hidden]) { display: none; }
+.permitext-notebook-editor .notebook-format-save-status:not(:empty) { flex-basis: 100%; margin-inline-start: 0; }
 .permitext-notebook-editor .notebook-format-insert { position: relative; }
 .permitext-notebook-editor .notebook-format-insert-menu {
   position: absolute;

@@ -39,5 +39,5 @@ assert.match(actual('populateReaderSelectors'),/fetchChapterList\(reader.codePre
 assert.match(actual('renderSectionContent'),/fetchChapterBodyWindow\([\s\S]*signal: panel\._readerNavigationAbort\?\.signal/);
 assert.match(actual('progressivelyRenderReaderChapter'),/requestController\.abort\(\)/);
 assert.match(actual('renderReader'),/finally\s*\{\s*options\.signal\?\.removeEventListener\("abort", cancelConstruction\)/);
-assert.match(actual('workspacePaneDescriptors'),/\(signal\) => renderReader\(reader,[^\n]*signal/);
+assert.match(actual('workspacePaneDescriptors'),/\(signal\) => renderReader\(reader, \{[^}]*\bsignal\s*\}\)/);
 console.log('Chapter request cancellation passed: actual catalog/summary/window leases, navigation abort, shared unsignaled ownership, full-body shortcut and completed-cache reuse.');

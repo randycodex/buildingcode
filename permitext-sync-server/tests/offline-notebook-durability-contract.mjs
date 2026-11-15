@@ -453,6 +453,12 @@ assert((await offline.loadNotebookDraft(questionOwner,projectID,'question-card')
 database.failPut = null;
 await syncQuestions(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'));
 assert.equal(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'),null);
+const editableDraft = await offline.saveNotebookDraft({...input(questionOwner,'editable-card'),baseVersion:1,
+  openQuestions:[{...corrected,includeInReport:true}],questionsEditable:true});
+assert.equal(editableDraft.questionsEditable,true,'The current editor capability survives the device checkpoint');
+await syncQuestions(editableDraft);
+assert.deepEqual(submitted.at(-1).openQuestions,[{...corrected,includeInReport:true}],'The current editor saves its question and Report inclusion choice');
+assert.equal(await offline.loadNotebookDraft(questionOwner,projectID,'editable-card'),null);
 console.log('Simple Notes metadata compatibility passed: hidden drafts retained, question updates omitted, valid receipts replayed, uncertainty preserved, rejected legacy receipt recovered.');
 
 // A definitive pre-save rejection retains its exact receipt in recovery while

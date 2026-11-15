@@ -27,9 +27,10 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261112-evidence-menu-v195">
-    <link rel="stylesheet" href="/web/research-v2.css?v=28">
-    <link rel="stylesheet" href="/web/reader-shortcuts.css?v=13">
+    <link rel="stylesheet" href="/web/styles.css?v=20261113-note-research-v1844">
+    <link rel="stylesheet" href="/web/document-layout.css?v=4">
+    <link rel="stylesheet" href="/web/research-v2.css?v=40">
+    <link rel="stylesheet" href="/web/reader-shortcuts.css?v=15">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -89,7 +90,7 @@
             <span>Calculator</span>
           </button></div><div data-workflow-tools="notebook" hidden><div class="reader-toolbar-tools"><button class="toolbar-button" id="add-notebook-reader" data-open-reader type="button" aria-label="Reader" title="Reader" aria-pressed="false" data-mobile-label="Reader" data-workspace-icon="library-big"><span>Reader</span></button></div><button class="toolbar-button" id="toggle-saved" type="button" aria-label="Evidence" title="Evidence" aria-pressed="false" data-mobile-label="Evidence" data-workspace-icon="list-check">
             <span>Evidence</span>
-          </button><button class="toolbar-button" id="toggle-notes-list" type="button" aria-label="Notes" title="Close Notes column" aria-pressed="true" data-mobile-label="Notes" data-workspace-icon="sticky-notes"><span>Notes</span></button><div id="notebook-note-tabs" class="notebook-note-tabs" role="group" aria-label="Project notes"></div></div><div hidden><button class="toolbar-button" id="toggle-notebook" type="button" aria-label="Notes" title="Choose a Project to open Notebook" aria-pressed="false" disabled data-workspace-icon="sticky-notes">
+          </button><div id="notebook-note-tabs" class="notebook-note-tabs" role="group" aria-label="Project notes"></div></div><div hidden><button class="toolbar-button" id="toggle-notebook" type="button" aria-label="Notes" title="Choose a Project to open Notebook" aria-pressed="false" disabled data-workspace-icon="sticky-notes">
             <span>Notes</span>
           </button></div><div hidden><button class="toolbar-button" id="toggle-facts" type="button" aria-label="Facts" title="Choose a Project to open Facts" aria-pressed="false" disabled>
             <span>Facts</span>
@@ -155,7 +156,7 @@
           </div>
           <div class="panel-actions">
             <button class="ghost-button reader-reference-source" type="button" hidden>Source</button>
-            <button class="icon-button reader-internal-search-toggle" type="button" title="Search in reader" aria-label="Search in reader" aria-pressed="false">
+            <button class="icon-button reader-internal-search-toggle" type="button" title="Find in this Reader" aria-label="Find in this Reader" aria-pressed="false">
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 6H3"></path>
                 <path d="M10 12H3"></path>
@@ -198,7 +199,7 @@
             <circle cx="11" cy="11" r="7"></circle>
             <path d="m20 20-3.6-3.6"></path>
           </svg>
-          <span>Search in reader</span>
+          <span>Find in this Reader</span>
           <input class="reader-internal-search-input search-input" type="search" autocomplete="off" placeholder="Search this code" maxlength="200">
           <button class="reader-internal-search-clear search-clear-button" type="button" aria-label="Clear reader search" hidden>
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
@@ -292,8 +293,8 @@
               <circle cx="11" cy="11" r="7"></circle>
               <path d="m20 20-3.6-3.6"></path>
             </svg>
-            <span>Search</span>
-            <input class="search-input" type="search" autocomplete="off" placeholder="Search">
+            <span>Search codes</span>
+            <input class="search-input" type="search" autocomplete="off" placeholder="Search codes">
             <button class="search-clear-button" type="button" aria-label="Clear search" hidden>
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
                 <circle cx="12" cy="12" r="9"></circle>
@@ -301,8 +302,7 @@
               </svg>
             </button>
           </label>
-          <div class="search-visible-context">
-            <button class="search-scope-summary" type="button" aria-label="Search within codebooks and editions" aria-haspopup="dialog"><svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.75"></circle><circle cx="12" cy="12" r="1.75"></circle><circle cx="19" cy="12" r="1.75"></circle></svg></button>
+          <div class="search-visible-context" hidden>
             <span class="search-visible-match-mode" hidden></span>
           </div>
           <div class="search-options" hidden>
@@ -312,7 +312,7 @@
                 <button class="search-match-alternative workspace-menu-option" type="button"><span>Exact phrase</span></button>
               </div>
             </details>
-            <button class="search-sources-button" type="button">Search within…</button>
+            <button class="search-sources-button" type="button">Filter codes…</button>
           </div>
           <div class="search-recent-popover" role="region" aria-label="Recent searches" hidden></div>
           <div class="search-result-summary" aria-live="polite" hidden>
@@ -582,6 +582,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261112-evidence-menu-v1741" type="module"></script>
+    <script src="/web/app.js?v=20261113-research-notebook-v1844" type="module"></script>
   </body>
 </html>

@@ -25,15 +25,21 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v2313";
+const shellCacheName = "permitext-pro-shell-v2416";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
+  "/web/document-layout.js?v=1",
+  "/web/document-layout.css?v=4",
+  "/web/fonts/DejaVuSans.ttf?v=3fdf69c",
+  "/web/fonts/DejaVuSans-Bold.ttf?v=b184b89",
+  "/web/note-research.js?v=1",
   "/web/notebook-content.js?v=8",
   "/web/notebook-titles.js?v=1",
   "/web/project-details-columns.js?v=20261019-project-workflow-v2",
+  "/web/workflow-views.js?v=21",
   "/web/workflow-views.js?v=16",
   "/web/active-code-sources.js",
   "/web/offline-code-metadata.js?v=1",
@@ -46,10 +52,10 @@ const shellURLs = [
   "/web/project-details-columns.js?v=20261021-project-columns-v3",
   "/web/workspace-button-icons.js?v=20261108-floating-menu-pins-v1382",
   "/web/minimal-workflow.js",
-  "/web/notebook-questions.js",
-  "/web/project-workflow.js?v=20261021-project-questions-v8",
+  "/web/notebook-questions.js?v=2",
+  "/web/project-workflow.js?v=20261114-report-source-toggle-v9",
   "/web/search-relevance.js?v=20261110-general-provisions-v2",
-  "/web/occupant-load-calculation.js?v=31",
+  "/web/occupant-load-calculation.js?v=33",
   "/web/calculation-drafts.js?v=3",
   "/web/notebook-passage-blocks.js?v=8",
   "/web/evidence-comments.js?v=6",
@@ -66,16 +72,18 @@ const shellURLs = [
   "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
   "/web/reader-search-match.js?v=20261026-exact-section-v4",
   "/web/report-autosave.js?v=1",
+  "/web/report-presentation.js?v=1",
+  "/web/workspace-view-presentation.js?v=5",
   "/web/report-undo.js?v=4",
   "/web/scroll-edge-fades.js?v=20261108-reader-menus-v10",
-  "/web/report-outline.js?v=20261018-pinned-outline-v12",
+  "/web/report-outline.js?v=20261114-outline-remove-v13",
   "/web/report-export-review.js?v=20261109-report-export-v14",
   "/web/report-note-review.js?v=3",
   "/web/report-rich-text.js",
   "/web/report-comparison.js?v=20261109-comparison-v21",
   "/web/workspace-resume.js?v=20261019-project-workflow-v5",
   "/web/reader-navigation-tree.js?v=20261112-label-case-v3",
-  "/web/reader-chapter-extent.js?v=20261112-visible-anchor-v3",
+  "/web/reader-chapter-extent.js?v=20261114-reader-tab-anchor-v4",
   "/web/sync-identity.js",
   "/web/analytics.js?v=20260918-privacy-analytics-v1",
   "/favicon.ico",
@@ -93,47 +101,48 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261112-evidence-menu-v1741",
+  "/web/web-client-version.js?v=20261113-research-notebook-v1844",
   "/web/web-app-update.js?v=20261110-per-codes-v3",
   "/web/research-delete-controls.js?v=11",
   "/web/assistant-composer-hint.js?v=1",
   "/web/research-related-provisions.js?v=3",
-  "/web/research-v2.js?v=30",
+  "/web/research-v2.js?v=40",
   "/web/research-inline-format.js?v=1",
   "/web/research-operation-gate.js?v=2",
   "/web/request-rate-limit.js?v=2",
   "/web/research-answer-links.js?v=1",
   "/web/research-answer-reveal.js?v=1",
-  "/web/research-question-rail.js?v=2",
+  "/web/research-question-rail.js?v=7",
   "/web/research-reader-target.js?v=3",
   "/web/research-discovery-query.js?v=3",
   "/web/research-v2-rollout.js?v=2",
-  "/web/research-v2.css?v=28",
+  "/web/research-v2.css?v=40",
   "/web/reader-shortcuts.js?v=8",
-  "/web/reader-shortcuts.css?v=13",
+  "/web/reader-shortcuts.css?v=15",
   "/web/reader-tabs.js?v=4",
+  "/web/reader-tabs.js?v=5",
   "/workspace",
   "/",
   "/marketing/home.js?v=20260921-theme-switch-v1",
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261112-evidence-menu-v195",
+  "/web/styles.css?v=20261113-note-research-v1844",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261112-evidence-menu-v1741",
+  "/web/app.js?v=20261113-research-notebook-v1844",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261112-evidence-menu-v1741",
+  "/web/offline-storage.js?v=20261113-research-notebook-v1844",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261111-selective-menus-v3",
-  "/web/workspace-state.js?v=20261112-notebook-resize-v1303",
+  "/web/workspace-state.js?v=20261113-note-research-v1305",
   "/web/recent-view-scope.js?v=1",
   "/web/recent-search-scope.js?v=1",
   "/web/workspace-state.js?v=20261012-workflow-views-v18",
@@ -157,11 +166,11 @@ const shellURLs = [
   "/web/floating-workspace-panel.js?v=4",
   "/web/settings-disclosure-state.js?v=1",
   "/web/settings-saved-content.js?v=5",
-  "/web/profile-preference-menu.js?v=3",
-  "/web/report-library.js?v=20261012-sidebar-width-v8",
+  "/web/profile-preference-menu.js?v=4",
+  "/web/report-library.js?v=20261114-report-sources-v10",
   "/web/notebook-note-menu.js?v=20261109-notebook-desk-v1299",
   "/web/notebook-columns.js?v=4",
-  "/web/reader-block-window.js?v=10",
+  "/web/reader-block-window.js?v=11",
   "/web/reader-section-visibility.js?v=4",
   "/web/reader-render-batches.js?v=20261012-reader-batches-v1",
   "/web/search-query-session.js?v=20261012-search-session-v2",
@@ -407,7 +416,7 @@ function draftMatches(record, accountUserID, projectID, cardID) {
   return record?.accountUserID === accountUserID && record.projectID === projectID && record.cardID === (cardID || "");
 }
 
-export async function saveNotebookDraft({ accountUserID, projectID, cardID, title, document, evidenceLinks = [], openQuestions, baseVersion, cardType, scope, expectedRevision }) {
+export async function saveNotebookDraft({ accountUserID, projectID, cardID, title, document, evidenceLinks = [], openQuestions, questionsEditable, baseVersion, cardType, scope, expectedRevision }) {
   if (!String(accountUserID || "").trim() || !String(projectID || "").trim()) {
     throw new Error("A Notebook draft must belong to an account and Project.");
   }
@@ -430,6 +439,7 @@ export async function saveNotebookDraft({ accountUserID, projectID, cardID, titl
     const record = {
       key, accountUserID, projectID, cardID: cardID || "", title: String(title || ""), document, evidenceLinks,
       ...(openQuestions !== undefined ? {openQuestions} : {}),
+      ...(questionsEditable === true ? {questionsEditable:true} : {}),
       baseVersion: localConflict ? baseVersion ?? (cardID ? null : 0)
         : Number.isSafeInteger(previous?.baseVersion) && Number.isSafeInteger(baseVersion)
         ? Math.max(previous.baseVersion, baseVersion)

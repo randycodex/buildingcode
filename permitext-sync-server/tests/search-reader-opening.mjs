@@ -10,7 +10,7 @@ const untouched={id:'other',codePrefix:'PC',chapterID:'10',sectionID:'100'};
 const content={classList:{contains:()=>false},querySelectorAll:()=>[{dataset:{sectionId:'113',sectionAliases:'114 115'},classList:{contains:()=>false}}]};
 const panel={dataset:{readerPublicCorpusGeneration:'1'},querySelector:name=>name==='.reader-content'?content:{value:''}};
 const c=vm.createContext({columnExpansionController:()=>({reveal:node=>visibleReaderReveals.push(node)}),paneIsCollapsed:()=>false,state:{readers:[existing,untouched],paneWeights:{}},activeWorkspaceID:'workspace',
-  workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=> 'research',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
+  workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=> 'research',workingResearchNote:()=>null,captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
   workflowPaneIsVisible:()=>true,resolveReaderSource:item=>new Promise(resolve=>requests.push(()=>resolve(item))),
   searchResultDetail:item=>item,readerFieldsForSectionDetail:(item,options)=>({...item,...options}),normalizeAnnotationBlockID:id=>id||'',
   readerMatchesSource:()=>false,readerIsClearlyAvailable:()=>false,isProAccount:()=>true,newReaderState:item=>({id:'new',...item}),

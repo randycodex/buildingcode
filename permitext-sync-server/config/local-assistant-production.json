@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "productionCommit": "e88016353337386c370a3d2d6a53cef59a9cb6b8",
+  "deploymentId": "dpl_GyBp9xy9cr5NmWoh3GtM2gcMeUY9",
+  "checkedAt": "2026-11-15T00:31:24.834Z",
+  "environment": {
+    "PERMITEXT_RESEARCH_V2_DEFAULT": "v2",
+    "PERMITEXT_RESEARCH_V2_ROLLOUT": "all",
+    "PERMITEXT_RESEARCH_V2": "1",
+    "PERMITEXT_RESEARCH_ENGINE": "open",
+    "PERMITEXT_RESEARCH_VERIFICATION_SERVICE_TIER": "default",
+    "PERMITEXT_RESEARCH_LUNA_ONLY": "1",
+    "PERMITEXT_RESEARCH_REVISION_REASONING_EFFORT": "high",
+    "PERMITEXT_RESEARCH_REVISION_SERVICE_TIER": "default",
+    "PERMITEXT_RESEARCH_ACCURATE_SERVICE_TIER": "priority",
+    "PERMITEXT_RESEARCH_COMPLEX_VERIFICATION": "1",
+    "PERMITEXT_RESEARCH_ROUTING_POLICY": "review_first",
+    "PERMITEXT_RESEARCH_SEMANTIC_SEARCH": "1",
+    "PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES": "1",
+    "PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING": "1",
+    "PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL": "1",
+    "PERMITEXT_RESEARCH_PASSAGE_SEARCH": "1",
+    "PERMITEXT_RESEARCH_SERVICE_TIER": "priority",
+    "PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT": "medium",
+    "PERMITEXT_RESEARCH_FAST_MODEL": "gpt-6-luna",
+    "PERMITEXT_RESEARCH_ACCURATE_MODEL": "gpt-6-luna",
+    "PERMITEXT_RESEARCH_ROUTING_MODE": "single",
+    "PERMITEXT_RESEARCH_REASONING_EFFORT": "low",
+    "PERMITEXT_RESEARCH_MODEL": "gpt-6-luna"
+  },
+  "sourceHashes": {
+    "research-v2-engine.mjs": "e6ea63d5d7af462e60273fda2d43a9a14f2aab97a13e1566718c962e91f25d9f",
+    "research-table-footnotes.mjs": "293aeb222f9ed152f93d61ad3e5d98b62758c9d27d0527009b7b22c55ecd3603",
+    "research-v2-runtime.mjs": "d825ec72be04484314e6bd58ea4f6654b4f3272cfff19771ee8080a7165cb401",
+    "research-provider-client.mjs": "87991b0a986ad6a5d4c28b035c05dc7c00bc8f9b15f115ed343993072bc5de30",
+    "research-open-investigation.mjs": "8f9b009bedf9c98d7737a291266bff661af11c7fe9f7c9feff6017ace3d3edfc",
+    "research-semantic-artifact.mjs": "e9a0fdd9e120921a7172919cf113f702c88d264774f18f8fec80a8dcb9251fdf",
+    "research-semantic-passages.mjs": "f46911c4ae8d4d3b7273aafb2dab8a5c19545f03d23f9dc16a2adb064cbbcc45",
+    "research-fast-stream.mjs": "48ce14485c6d75298076c4a73eeb2f20223bbfeb6d5d723da021206a8125ec37",
+    "assistant-conversation-scope.mjs": "dc1545b5305aca027c719d21b1fd6d0193d325014a2f68bfbb1fe0262edb89ce"
+  }
+}

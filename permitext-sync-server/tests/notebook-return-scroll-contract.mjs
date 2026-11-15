@@ -34,7 +34,7 @@ assert.equal(c.positions.size, size);
 assert.equal(c.readNotebookReturnScroll(context, "bounded-100"), null);
 
 const captureStart = source.indexOf("      let scrollCaptureReady = false;");
-const captureEnd = source.indexOf("\n      if (!notebookReadOnly && !activeCard.id)", captureStart);
+const captureEnd = source.indexOf("\n    }\n\n    archiveButton.addEventListener", captureStart);
 assert.ok(captureStart >= 0 && captureEnd > captureStart);
 const mounting = source.slice(captureStart, captureEnd);
 function element() {

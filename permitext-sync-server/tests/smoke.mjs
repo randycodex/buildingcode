@@ -419,9 +419,6 @@ async function main() {
       'data-workflow-view="research"',
       'data-workflow-view="notebook"',
       'id="toggle-report"',
-      'class="topbar-layout-actions"',
-      'id="fit-columns"',
-      'id="collapse-readers"',
       'class="topbar-workspaces"',
       'id="workspace-actions"',
       'id="toggle-settings"',
@@ -429,21 +426,24 @@ async function main() {
     ].map((marker) => topbarSource.indexOf(marker));
     assert(
       topbarGroupOrder.every((index, position) => index >= 0 && (position === 0 || index > topbarGroupOrder[position - 1])),
-      "Working views, layout, Projects and Account controls are no longer in their intended topbar order."
+      "Working views, Projects and Account controls are no longer in their intended topbar order."
     );
     const tagWithID = (html, id) => html.match(new RegExp(`<[^>]+\\bid="${id}"[^>]*>`))?.[0] || "";
     const workflowStart = webRoot.text.indexOf('<nav class="workflow-toolbar"');
     const workflowSource = webRoot.text.slice(workflowStart, webRoot.text.indexOf("</nav>", workflowStart));
     const workflowOrder = ['data-workflow-tools="research"', 'id="add-reader"', 'id="toggle-search"',
-      'id="toggle-analysis"', 'data-workflow-tools="notebook"', 'id="toggle-saved"', 'id="toggle-notebook"']
+      'id="toggle-analysis"', 'id="toggle-calculator"', 'data-workflow-tools="notebook"',
+      'id="add-notebook-reader"', 'id="toggle-saved"', 'class="workflow-layout-actions"',
+      'id="collapse-all-columns"', 'id="expand-all-columns"', 'id="fit-columns"']
       .map(marker => workflowSource.indexOf(marker));
     assert(
       workflowStart >= 0 && workflowOrder.every((index, position) => index >= 0 && (position === 0 || index > workflowOrder[position - 1])),
-      "Research tools must remain Reader, Search, Assistant; Notebook tools must remain Evidence, Notes."
+      "Research and Notebook tools must retain their Reader access and shared column layout controls."
     );
-    assert(!workflowSource.includes('id="add-notebook-reader"'), "Notebook must not expose a Reader toolbar button.");
+    assert(workflowSource.includes('<div hidden><button class="toolbar-button" id="toggle-notebook"'),
+      "The legacy Notes toggle must stay hidden while the notepad remains available.");
     for (const [id, label] of [["add-reader", "Reader"], ["toggle-search", "Search"], ["toggle-analysis", "Assistant"],
-      ["toggle-saved", "Evidence"], ["toggle-notebook", "Notes"]]) {
+      ["add-notebook-reader", "Reader"], ["toggle-saved", "Evidence"]]) {
       const tag = tagWithID(workflowSource, id);
       assert(tag.includes('type="button"') && tag.includes(`aria-label="${label}"`), `${label} tool lost button semantics or its accessible label.`);
       if (id.startsWith("toggle-")) assert(tag.includes('aria-pressed="false"'), `${label} tool lost its initial toggle state.`);
@@ -497,7 +497,7 @@ async function main() {
         !settingsTemplateSource.includes("All browser changes are synced."),
       "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
-    ["Move all saved collections to Trash", "Clear recent activity", "Move all saved passages to Trash", "Move all section notes to Trash"].forEach((label) => {
+    ["Move all saved collections to Trash", "Clear recent activity", "Move this workspace’s saved passages to Trash", "Move all section notes to Trash"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
     assert(!settingsTemplateSource.includes("Clear All Tags"), "Web Settings still exposes tag management.");
@@ -573,9 +573,10 @@ async function main() {
     const workspaceScriptURL = webRoot.text.match(/<script[^>]*src="(\/web\/app\.js\?v=[^"]+)"/)?.[1];
     assert(workspaceScriptURL, "Web HTML must select a versioned workspace script.");
     const workspaceScript = await request(workspaceScriptURL);
-    assert(workspaceScript.text.includes('settingsProjectsIncludeCollections') &&
-      workspaceScript.text.includes('"Move all projects and saved collections to Trash" : "Move all projects to Trash"'),
-      "Settings must retain the legacy collection scope only when those records exist.");
+    assert(workspaceScript.text.includes('const workspace = workspaceProject(summary.projects || []);') &&
+      workspaceScript.text.includes('details.hidden = !workspace; details.inert = !workspace;') &&
+      workspaceScript.text.includes('settingsSavedContentForSummary(summary)'),
+      "Settings data controls must stay scoped to the active workspace.");
     const workspaceStyles = await request("/web/styles.css");
     const readerFont = await requestBinary("/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0");
     const workspaceStateScript = await request("/web/workspace-state.js");
@@ -614,9 +615,9 @@ async function main() {
     assert(workspaceStateScript.response.ok, "Named workspace state module did not load.");
     assert(
       webRoot.text.includes('id="workspace-actions"') &&
-        webRoot.text.includes('class="workspace-current-name">Projects</span>') &&
+        webRoot.text.includes('class="workspace-current-name">Workspace</span>') &&
         !webRoot.text.includes('id="add-workspace"') &&
-        tagWithID(webRoot.text, "collapse-readers").includes('title="Close columns in this working view"') &&
+        tagWithID(webRoot.text, "collapse-all-columns").includes('title="Collapse all columns"') &&
         !webRoot.text.includes(">One Reader</button>") &&
         workspaceScript.text.includes('let workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
         workspaceScript.text.includes('privateWorkspaceKeys') &&
@@ -638,10 +639,10 @@ async function main() {
         workspaceScript.text.includes('"Resize right edge of last column"') &&
         workspaceScript.text.includes("function renderWorkspaceTransitionState") &&
         workspaceScript.text.includes('track.setAttribute("aria-busy", "true")') &&
-        workspaceScript.text.includes("await waitForWorkspaceTransitionPaint()") &&
+        workspaceScript.text.includes("await whenWorkspacePaneReady(") &&
         workspaceScript.text.includes('track.removeAttribute("aria-busy")') &&
         workspaceScript.text.includes("async function closeAllColumns()") &&
-        workspaceScript.text.includes("fitColumnsButton.hidden = !inReport && !hasColumns") &&
+        workspaceScript.text.includes("fitColumnsButton.hidden = false") &&
         workspaceScript.text.includes("fitColumnsButton.disabled = inReport ? !reportReady : !hasColumns") &&
         workspaceScript.text.includes("label: 'Close all columns'") &&
         workspaceScript.text.includes("disabled: !defaultActivePaneIDs().some(workflowPaneIsVisible)") &&
@@ -674,13 +675,13 @@ async function main() {
     );
     assert(
       /toggleAnalysisButton\.addEventListener\("click", \(\) => \{\s*if \(notifyProjectRequiredForColumn\(\)\) return;\s*void focusRecentUtilityColumn\("analysis"\);/.test(workspaceScript.text) &&
-        /toggleSavedButton\.addEventListener\("click", \(\) => \{\s*if \(notifyProjectRequiredForColumn\(\)\) return;\s*void focusRecentUtilityColumn\("saved"\);/.test(workspaceScript.text) &&
+        /toggleSavedButton\.addEventListener\("click", \(\) => \{\s*if \(notifyProjectRequiredForColumn\(\)\) return;\s*void toggleProjectsColumns\(\);/.test(workspaceScript.text) &&
         workspaceScript.text.includes("async function openNewResearchColumn()") &&
         workspaceScript.text.includes('add("New research column", () => void openNewResearchColumn())') &&
         workspaceScript.text.includes('const instance = newUtilityInstance("analysis");') &&
         workspaceScript.text.includes("state.utilityInstances.push(instance);") &&
         workspaceScript.text.includes('if (key === "settings") { toggleAccountDialog(); return; }') &&
-        workspaceScript.text.includes('toggleSettingsButton.addEventListener("click", () => {\n    toggleUtilityPane("settings");'),
+        workspaceScript.text.includes('const settingsButton = document.querySelector("#toggle-settings");'),
       "Evidence and Research toolbar controls must focus recent columns, retain explicit new Research actions, and open Account from Settings."
     );
     const syncStateScript = await request("/web/sync-state.js");
@@ -968,7 +969,7 @@ async function main() {
         workspaceScript.text.includes('choice.className = "report-draft-version-option"') &&
         workspaceScript.text.includes('choiceRevision.textContent = current ? "Current" : `Revision ${draft.version || 1}`') &&
         workspaceScript.text.includes('createNew.textContent = "+ New report"') &&
-        workspaceScript.text.includes('const switchDraft = async (draftID) =>') &&
+        workspaceScript.text.includes('const switchDraft = draftID => reportSwitch.select(draftID)') &&
         workspaceScript.text.includes('titleControl.className = "report-title-control"') &&
         workspaceScript.text.includes('titleButton.className = "report-title-text"') &&
         workspaceScript.text.includes('titleEditor.setAttribute("aria-label", "Edit Report title")') &&
@@ -986,12 +987,12 @@ async function main() {
         workspaceStyles.text.includes(".report-title-revision") &&
         !workspaceScript.text.includes('dateInput.type = "date"') &&
         !workspaceScript.text.includes('previewMeta.textContent = `${identity.name} · Date and time added automatically on export`') &&
-        workspaceScript.text.includes('appendSourceGroup("Project facts", ""') &&
+        workspaceScript.text.includes('[["context", "Context"], ["facts", "Facts"]]') &&
         !workspaceScript.text.includes("Add a paragraph, heading, list, or Project source to begin the professional narrative.") &&
-        workspaceScript.text.includes('[["evidence", "Evidence"], ["notebookCard", "Notes"]]') &&
+        workspaceScript.text.includes('[["evidence", "Evidence"]]') &&
         workspaceScript.text.includes('appendSourceGroup(label, "", body => {') &&
         workspaceScript.text.includes('const items = sources.filter(source => source.kind === kind)') &&
-        workspaceScript.text.includes('add.setAttribute("aria-label", `${add.disabled ? "Already included" : "Add to Report"}: ${source.label || heading.textContent}`)') &&
+        workspaceScript.text.includes('add.setAttribute("aria-label", `${removing ? "Remove from Report" : "Add to Report"}: ${source.label || heading.textContent}`)') &&
         workspaceScript.text.includes('{ numeric: true, sensitivity: "base" }') &&
         workspaceScript.text.includes('`code-theme-${codeTheme(source.codePrefix)}`') &&
         workspaceScript.text.includes('heading.textContent = source.label') &&
@@ -1710,9 +1711,9 @@ async function main() {
         workspaceScript.text.includes("noteMenu.render({ cards, activeCard, showingArchivedCards, selectingCards, selectedCardIDs,") &&
         workspaceScript.text.includes("shell.append(noteMenu.element, focus)") &&
         workspaceScript.text.includes('.notebook-note-menu[open]') &&
-        workspaceScript.text.includes('closeButton.className = "icon-button utility-close notebook-close";') &&
-        workspaceScript.text.includes('closeButton.setAttribute("aria-label", "Close notes");') &&
-        workspaceScript.text.includes("closeButton.innerHTML = circleXIconSVG();") &&
+        workspaceScript.text.includes('function createNotebookListToggle()') &&
+        workspaceScript.text.includes("header.className = \"notebook-header notebook-shared-header\";") &&
+        !workspaceScript.text.includes('closeButton.className = "icon-button utility-close notebook-close";') &&
         workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  min-height: var(--panel-title-row-height);") &&
         workspaceStyles.text.includes(".notebook-title-control { display: grid;") &&
         workspaceStyles.text.includes(".notebook-note-menu > summary { display: flex;") &&
