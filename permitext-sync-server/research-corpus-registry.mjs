@@ -136,7 +136,7 @@ export function createResearchCorpusRegistry({
     immutableCorpus({
       id: "nyc-zoning-resolution",
       label: "NYC Zoning Resolution",
-      codeEdition: "NYC Zoning Resolution — text through 2026-08-13",
+      codeEdition: "NYC Zoning Resolution — text through 2026-11-12",
       codeVersion: zoningCodeVersion,
       codeYear: null,
       codePrefixes: ["ZR"],

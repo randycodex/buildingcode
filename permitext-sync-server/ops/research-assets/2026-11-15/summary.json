@@ -1,0 +1,16 @@
+{
+  "fingerprint": "75409e1b1ebfdb05eef4a2b3ea41fbf1222112aeda2367169c8180017186d20c",
+  "passageCount": 56471,
+  "inputCount": 53696,
+  "reusedInputCount": 26261,
+  "missingInputCount": 27435,
+  "batchCount": 429,
+  "conservativeReservationUSD": 0.42744649200000007,
+  "model": "text-embedding-3-small",
+  "maximumCostUSD": 0.5,
+  "actualCostUSD": 0.07723533999999996,
+  "providerRequestCount": 429,
+  "outputSHA256": "cc13dc759d7298729756001af771adccfb3dffbd204863f996cd8eb355117f77",
+  "outputBytes": 56703344,
+  "dataScope": "Current public enacted source text only; no user questions, project data, or generated answers."
+}

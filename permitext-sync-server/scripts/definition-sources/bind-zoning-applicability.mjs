@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto';
 import {auditZoningApplicability} from '../audit-zoning-definition-applicability.mjs';
 
-export const reviewedZoningApplicationSHA256='1d319b4f9d1c94cfe416d5b97ba529774ae0d22582c311e700a8016a1c719b83';
+export const reviewedZoningApplicationSHA256='c3bd4a875b35e5a0f73bee6640cf55658b190b4d79df5de531312275e497eccc';
 
 // Explicit singular/plural labels attested in the reviewed II-3 source.
 export const reviewedZoningTerms = Object.freeze({

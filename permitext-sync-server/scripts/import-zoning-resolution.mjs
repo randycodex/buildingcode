@@ -7,7 +7,8 @@ import {
   writeFile
 } from "node:fs/promises";
 import { dirname, extname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { applyZoningAdoptedAmendments } from "../zoning-adopted-amendments.mjs";
 import {
   parseZoningAmendmentHistoryJSON,
   parseZoningAppendixHTML,
@@ -37,6 +38,7 @@ function parsedArguments(argv) {
   const result = {
     concurrency: 10,
     output: defaultOutput,
+    previousOutput: defaultOutput,
     skipAmendments: false
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -44,6 +46,8 @@ function parsedArguments(argv) {
     if (argument === "--output") {
       result.output = argv[index + 1];
       index += 1;
+    } else if (argument === "--previous-output") {
+      result.previousOutput = resolve(process.cwd(), argv[++index]);
     } else if (argument === "--concurrency") {
       result.concurrency = Number.parseInt(argv[index + 1], 10);
       index += 1;
@@ -80,11 +84,15 @@ async function writeJSON(path, value, options = {}) {
   await writeFile(path, `${JSON.stringify(value, null, spacing)}\n`);
 }
 
+async function readJSON(path) {
+  return JSON.parse(await readFile(path, "utf8"));
+}
+
 async function fetchResponse(url, options = {}) {
   let lastError = null;
-  for (let attempt = 1; attempt <= 4; attempt += 1) {
+  for (let attempt = 1; attempt <= (options.attempts || 4); attempt += 1) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 45_000);
+    const timeout = setTimeout(() => controller.abort(), options.timeout || 45_000);
     try {
       const response = await fetch(url, {
         headers: {
@@ -97,7 +105,7 @@ async function fetchResponse(url, options = {}) {
       if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText}`);
       }
-      return response;
+      return options.read ? await options.read(response) : response;
     } catch (error) {
       lastError = error;
       if (attempt < 4) {
@@ -110,8 +118,8 @@ async function fetchResponse(url, options = {}) {
   throw new Error(`Unable to retrieve ${url}: ${lastError?.message || "unknown error"}`);
 }
 
-async function fetchText(url, accept) {
-  return (await fetchResponse(url, { accept })).text();
+async function fetchText(url, accept, options = {}) {
+  return fetchResponse(url, { accept, ...options, read: response => response.text() });
 }
 
 async function concurrentMap(values, concurrency, worker, label) {
@@ -147,7 +155,8 @@ async function concurrentMap(values, concurrency, worker, label) {
 function sanitizedAssetName(sourceURL, contentType, contentHash) {
   let baseName = "asset";
   try {
-    baseName = decodeURIComponent(new URL(sourceURL).pathname.split("/").at(-1) || "asset");
+    const url = new URL(sourceURL);
+    baseName = decodeURIComponent((url.hash.startsWith("#word/media/") ? url.hash : url.pathname).split("/").at(-1) || "asset");
   } catch {
     baseName = "asset";
   }
@@ -174,7 +183,7 @@ function escapedHTML(value) {
     .replace(/"/g, "&quot;");
 }
 
-function chapterHTML(chapter, sections) {
+export function chapterHTML(chapter, sections) {
   const sectionMarkup = sections.map((section) => {
     const body = section.blocks
       .map((block) => String(block.html || "").replaceAll("../../../assets/", "../assets/"))
@@ -249,7 +258,7 @@ function preparedChapter(chapter, sections) {
   };
 }
 
-function sectionPayload(section) {
+export function sectionPayload(section) {
   return {
     schemaVersion: 2,
     sectionID: section.id,
@@ -266,6 +275,8 @@ function sectionPayload(section) {
       sourcePath: section.sourcePath,
       sourceURL: section.sourceURL,
       sourceContentHash: section.sourceContentHash,
+      ...(section.supplementaryAdoptions ? { supplementaryAdoptions: section.supplementaryAdoptions,
+        consolidatedSourceContentHash: section.consolidatedSourceContentHash } : {}),
       article: section.article,
       chapter: section.chapter,
       appendix: section.appendix || null,
@@ -275,6 +286,7 @@ function sectionPayload(section) {
       appendixReferences: section.appendixReferences,
       specialDistrict: section.specialDistrict,
       amendmentHistory: section.amendmentHistory,
+      amendmentHistoryStatus: section.amendmentHistoryStatus || "not-retrieved",
       amendmentHistorySourceURL: section.amendmentHistorySourceURL,
       effectiveDate: section.effectiveDate,
       lastAmended: section.lastAmended,
@@ -314,29 +326,35 @@ function buildSearchIndex(sections) {
   };
 }
 
-function sourceNotes(summary, generatedAt) {
+function sourceNotes(summary, generatedAt, history, historicalAssetCount) {
   return `# NYC Zoning Resolution source snapshot
 
 This package was generated from the official NYC Department of City Planning Online Zoning Resolution.
 
 - Official source: ${zoningResolutionContract.sourceHomepageURL}
 - Text changes represented through: ${zoningResolutionContract.textChangesThrough}
+- DCP consolidated website through: ${zoningResolutionContract.consolidatedTextChangesThrough}
+- Additional adopted authority: Council Resolutions 736 and 737, adopted November 12, 2026; original attachments retained under docs/source-evidence/zoning.
 - Generated: ${generatedAt}
 - Articles: ${summary.articles}
 - Chapters: ${summary.chapters}
 - Section and appendix records: ${summary.sections}
 - Preserved tables: ${summary.tables}
 - Preserved amendment events: ${summary.amendmentEvents}
-- Downloaded local assets: ${summary.assets}
+- Downloaded current local assets: ${summary.assets}
+- Retained historical map assets: ${historicalAssetCount}, for saved content and issued Report snapshots
+- Detailed amendment history: ${history.retained} retained from identical source; ${history.retrieved} retrieved; ${history.unavailable.length} lookups unavailable from DCP's separate history service. Known historical events are retained and gaps are recorded in source-manifest.json. Current enacted text and adopted maps are independently captured.
 
 The official live HTML is canonical for this snapshot. The downloadable complete PDF is retained as a secondary validation source because its current published archive predates the live text-change date.
 
-AI Research eligibility is intentionally disabled. Reader, Search, Saved sections, Notes, Projects, and direct links may use this package after their client-specific validation gates pass.
+This import retains the content-foundation validation flags. Product configuration independently controls runtime Research availability. Reader, Search, Saved sections, Notes, Projects, and direct links share the same stable section identities.
 `;
 }
 
 async function main() {
   const options = parsedArguments(process.argv.slice(2));
+  const previousManifest = await exists(join(options.previousOutput, "source-manifest.json"))
+    ? await readJSON(join(options.previousOutput, "source-manifest.json")) : null;
   const stagingOutput = `${options.output}.staging-${process.pid}`;
   if (await exists(options.output)) {
     throw new Error(`Refusing to overwrite the existing zoning package at ${options.output}.`);
@@ -351,9 +369,9 @@ async function main() {
 
   const homepageHTML = await fetchText(zoningResolutionContract.sourceHomepageURL);
   const homepage = parseZoningHomepageHTML(homepageHTML);
-  if (homepage.textChangesThrough !== zoningResolutionContract.textChangesThrough) {
+  if (homepage.textChangesThrough !== zoningResolutionContract.consolidatedTextChangesThrough) {
     throw new Error(
-      `The official site reports text through ${homepage.textChangesThrough}; importer contract expects ${zoningResolutionContract.textChangesThrough}.`
+      `The official site reports text through ${homepage.textChangesThrough}; importer expects consolidation through ${zoningResolutionContract.consolidatedTextChangesThrough}. Review supplements before changing this boundary.`
     );
   }
 
@@ -454,27 +472,56 @@ async function main() {
   const sections = [...sectionBySourceNodeID.values()];
 
   if (!options.skipAmendments) {
+    let historyServiceUnavailable = false;
     await concurrentMap(
       sections,
       options.concurrency,
       async (section) => {
-        const payload = await fetchText(section.amendmentHistorySourceURL, "application/json");
-        section.amendmentHistory = parseZoningAmendmentHistoryJSON(payload);
-        section.amendmentHistoryContentHash = sha256(payload);
+        const priorPath = join(options.previousOutput, "prepared", "sections", `${section.id}.json`);
+        const prior = previousManifest && await exists(priorPath) ? (await readJSON(priorPath)).zoning : null;
+        section.sourceChanged = !prior || prior.sourceContentHash !== section.sourceContentHash || prior.lastAmended !== section.lastAmended;
+        if (prior?.sourceContentHash === section.sourceContentHash && prior.lastAmended === section.lastAmended && prior.amendmentHistoryStatus !== "history-service-unavailable") {
+          section.amendmentHistory = prior.amendmentHistory;
+          section.amendmentHistoryStatus = "retained-identical-source";
+          return;
+        }
+        try {
+          if (historyServiceUnavailable) throw new Error("History service circuit is open after a failed lookup.");
+          const payload = await fetchText(section.amendmentHistorySourceURL, "application/json", { timeout: 10_000, attempts: 1 });
+          section.amendmentHistory = parseZoningAmendmentHistoryJSON(payload);
+          section.amendmentHistoryContentHash = sha256(payload);
+          section.amendmentHistoryStatus = "retrieved";
+        } catch (error) {
+          historyServiceUnavailable = true;
+          // Current enacted text is independently captured from DCP's chapter
+          // HTML. Never invent historical events when its separate AJAX service
+          // is unavailable. Preserve known history and disclose the gap.
+          section.amendmentHistory = prior?.amendmentHistory || [];
+          section.amendmentHistoryStatus = "history-service-unavailable";
+          console.info(JSON.stringify({ event: "zoning_history_unavailable", sectionID: section.id, sourceURL: section.amendmentHistorySourceURL }));
+        }
       },
       "amendment-histories"
     );
   }
 
+  const { manifest: adoptedAmendments, embeddedAssets } = await applyZoningAdoptedAmendments(sections);
+  const changedAssetURLs = new Set(sections.filter(section => section.sourceChanged).flatMap(section => section.sourceAssets || []));
   const uniqueAssetURLs = [...new Set(sections.flatMap((section) => section.sourceAssets || []))];
   const assetRecords = await concurrentMap(
     uniqueAssetURLs,
     Math.min(options.concurrency, 8),
     async (sourceURL) => {
-      const response = await fetchResponse(sourceURL, { accept: "image/*,application/pdf;q=0.8,*/*;q=0.2" });
-      const bytes = Buffer.from(await response.arrayBuffer());
+      const embedded = embeddedAssets.get(sourceURL);
+      const prior = !changedAssetURLs.has(sourceURL) && previousManifest?.assets.find(asset => asset.sourceURL === sourceURL);
+      const cached = prior ? await readFile(join(options.previousOutput, "assets", prior.fileName)) : null;
+      if (cached && sha256(cached) !== prior.contentHash) throw new Error(`Cached asset checksum mismatch: ${sourceURL}`);
+      const downloaded = embedded || (cached ? { bytes: cached, contentType: prior.contentType }
+        : await fetchResponse(sourceURL, { accept: "image/*,application/pdf;q=0.8,*/*;q=0.2", read: async response => ({
+          bytes: Buffer.from(await response.arrayBuffer()), contentType: response.headers.get("content-type") || "application/octet-stream" }) }));
+      const bytes = downloaded.bytes;
       const contentHash = sha256(bytes);
-      const contentType = response.headers.get("content-type") || "application/octet-stream";
+      const contentType = downloaded.contentType;
       const fileName = sanitizedAssetName(sourceURL, contentType, contentHash);
       await mkdir(join(stagingOutput, "assets"), { recursive: true });
       await writeFile(join(stagingOutput, "assets", fileName), bytes);
@@ -489,6 +536,16 @@ async function main() {
     "assets"
   );
   const assetNamesByURL = new Map(assetRecords.map((asset) => [asset.sourceURL, asset.fileName]));
+  // Issued Report snapshots and saved content can still reference prior map
+  // filenames. Retain those immutable bytes without listing them as current law.
+  const currentAssetNames = new Set(assetRecords.map(asset => asset.fileName));
+  const historicalAssets = new Map([...(previousManifest?.assets || []), ...(previousManifest?.retainedHistoricalAssets || [])]
+    .filter(asset => !currentAssetNames.has(asset.fileName)).map(asset => [asset.fileName, asset]));
+  for (const asset of historicalAssets.values()) {
+    const bytes = await readFile(join(options.previousOutput, "assets", asset.fileName));
+    if (sha256(bytes) !== asset.contentHash) throw new Error(`Historical map checksum mismatch: ${asset.fileName}`);
+    await writeFile(join(stagingOutput, "assets", asset.fileName), bytes);
+  }
   for (const section of sections) {
     section.blocks = rewriteZoningAssetReferences(section.blocks, assetNamesByURL);
   }
@@ -518,7 +575,7 @@ async function main() {
     libraryID: zoningResolutionContract.libraryID,
     codeVersion: zoningResolutionContract.codeVersion,
     syncCodeVersion: zoningResolutionContract.syncCodeVersion,
-    textChangesThrough: homepage.textChangesThrough,
+    textChangesThrough: zoningResolutionContract.textChangesThrough,
     statedCounts: homepage.statedCounts,
     articles: homepage.articles,
     chapters,
@@ -555,7 +612,8 @@ async function main() {
       schemaVersion: 1,
       libraryID: zoningResolutionContract.libraryID,
       sourceURL: zoningResolutionContract.sourceHomepageURL,
-      textChangesThrough: homepage.textChangesThrough,
+      textChangesThrough: zoningResolutionContract.textChangesThrough,
+      consolidatedTextChangesThrough: homepage.textChangesThrough,
       researchEligibility: false
     }
   };
@@ -613,7 +671,7 @@ async function main() {
     schemaVersion: 1,
     libraryID: zoningResolutionContract.libraryID,
     codeVersion: zoningResolutionContract.codeVersion,
-    textChangesThrough: homepage.textChangesThrough,
+    textChangesThrough: zoningResolutionContract.textChangesThrough,
     chapters: manifestChapters
   });
   await writeJSON(join(stagingOutput, "prepared", "chapterCatalog.json"), {
@@ -649,10 +707,19 @@ async function main() {
     sourceAuthority: "New York City Department of City Planning",
     sourceHomepageURL: zoningResolutionContract.sourceHomepageURL,
     sourceDownloadsURL: zoningResolutionContract.sourceDownloadsURL,
-    textChangesThrough: homepage.textChangesThrough,
+    textChangesThrough: zoningResolutionContract.textChangesThrough,
+    consolidatedTextChangesThrough: homepage.textChangesThrough,
+    adoptedAmendments: adoptedAmendments.amendments.map(({ sections, maps, ...source }) => ({ ...source,
+      affectedSections: sections.map(section => section.sectionNumber),
+      ...(maps ? { affectedMaps: maps.map(map => map.number) } : {}) })),
+    amendmentHistoryRetrieval: { retained: sections.filter(section => section.amendmentHistoryStatus === "retained-identical-source").length,
+      retrieved: sections.filter(section => section.amendmentHistoryStatus === "retrieved").length,
+      unavailable: sections.filter(section => section.amendmentHistoryStatus === "history-service-unavailable").map(section => ({
+        sectionID: section.id, sourceURL: section.amendmentHistorySourceURL })) },
     statedCounts: homepage.statedCounts,
     documents: sourceDocuments.sort((left, right) => left.sourceURL.localeCompare(right.sourceURL)),
     assets: assetRecords.sort((left, right) => left.sourceURL.localeCompare(right.sourceURL)),
+    retainedHistoricalAssets: [...historicalAssets.values()].sort((left, right) => left.fileName.localeCompare(right.fileName)),
     validationSummary,
     sectionCompletenessRepairs: zoningResolutionContract.requiredCompleteSections.map((contract) => ({
       sectionID: sections.find((section) => section.sourcePath === contract.sourcePath).id,
@@ -679,7 +746,10 @@ async function main() {
       "Approved zoning-specific evaluation cases"
     ]
   });
-  await writeFile(join(stagingOutput, "SOURCE.md"), sourceNotes(validationSummary, generatedAt));
+  const history = { retained: sections.filter(section => section.amendmentHistoryStatus === "retained-identical-source").length,
+    retrieved: sections.filter(section => section.amendmentHistoryStatus === "retrieved").length,
+    unavailable: sections.filter(section => section.amendmentHistoryStatus === "history-service-unavailable") };
+  await writeFile(join(stagingOutput, "SOURCE.md"), sourceNotes(validationSummary, generatedAt, history, historicalAssets.size));
 
   await rename(stagingOutput, options.output);
   console.info(JSON.stringify({
@@ -690,7 +760,7 @@ async function main() {
   }));
 }
 
-main().catch(async (error) => {
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main().catch(async (error) => {
   console.error(error.stack || error.message || String(error));
   process.exitCode = 1;
 });

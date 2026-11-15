@@ -3661,7 +3661,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-B-21239.html",
-      "sourceSHA256" : "7ea418505c9c8e615651309329cc62b62c92693e28e89d97eabfc9c971aeb3b3",
+      "sourceSHA256" : "5726e7761332fc8e6aaa4f76271288e26dcce05b227c69a3e76b7b0a1f505369",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3669,7 +3669,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-C-21242.html",
-      "sourceSHA256" : "4e4006596984f80ceff23919dfe64a5c983f18a67cff7430059c4489e5ac8d39",
+      "sourceSHA256" : "cdc12a5a991f867498d3541a659bbb8088e8bbd87d46db83afde5312f1d2b7f1",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3677,7 +3677,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-C-21243.html",
-      "sourceSHA256" : "17d7957125d0d46d219e21fb1138f8fdee61513415fe022fadd48f86b7551346",
+      "sourceSHA256" : "5e812c46a68e034e44998f76cbb641ca6d8a6b99fd0492eb9e64359872ebef99",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3685,7 +3685,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-D-21241.html",
-      "sourceSHA256" : "d281c07002ceaaf6603f95b4e2109fd4514adaa61980dc6ed82bc071a49744e8",
+      "sourceSHA256" : "ffd65595d5b180ef7cc7d8c51641073dc7a64396f4186299c755d912509e9bfb",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3693,7 +3693,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-E-21240.html",
-      "sourceSHA256" : "26441a8a9303b327781ec922b63a39148b7440cf0516210197d9d20803ca6a87",
+      "sourceSHA256" : "41de1f1d794c4e813f633213f721f0fe7b2f45654db71f88e16ed3a9d3be2f4b",
       "state" : "native"
     },
     {
@@ -3701,7 +3701,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21424.html",
-      "sourceSHA256" : "ed9f67442f917d8ebb646d8dea9eadbe874c8b1e97777d3c454ff73ecd39ca89",
+      "sourceSHA256" : "e438739078fe2855f457d240611ec9149f052942b7cd24742998fb428910194f",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3709,7 +3709,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21765.html",
-      "sourceSHA256" : "ec79022d1a1b93248a82cd22d12be469aac61cdd78db62fee5b2a2da064c8656",
+      "sourceSHA256" : "6c5f9abb07b8277df6348fd0fd51cbf9b2f38cce622c7a61ceb06b80d31f1aa9",
       "state" : "native"
     },
     {
@@ -3717,7 +3717,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21766.html",
-      "sourceSHA256" : "04d00f15650f5da741ba0b4594f93a6a8165c5c3561f2507490db23bbe9560cf",
+      "sourceSHA256" : "f4c0f8589ebb3c6b720e30e67e056d15f05ee026288571601a29fc710d10697a",
       "state" : "native"
     },
     {
@@ -3725,7 +3725,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21767.html",
-      "sourceSHA256" : "8cd2cb5d17e1595e1b97326c2c78917c1b7fb4202e6e9368c5b637509b960506",
+      "sourceSHA256" : "c9bbab28ab5b722e28e6968f37759f7b3fb146593fe573042ab669265cf1e4c9",
       "state" : "native"
     },
     {
@@ -3733,7 +3733,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21768.html",
-      "sourceSHA256" : "7cd656232cef627bbfeb26ddc6342fc2ec9c69ce57c10a9816325cd99bd8662f",
+      "sourceSHA256" : "9ae26d0338dcf20d077624781a9e69bbb09a11905bdb1aa7ee80979eaa1c775a",
       "state" : "native"
     },
     {
@@ -3741,7 +3741,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21769.html",
-      "sourceSHA256" : "3304042a15cec6c74df99d98b9c1f8fab1b5f6a4b08089c4e772b491652f5c85",
+      "sourceSHA256" : "2757a194095acb76b3daee1317442ca740604f4cfbd812800a52be4c754f62b0",
       "state" : "native"
     },
     {
@@ -3749,7 +3749,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-G-21235.html",
-      "sourceSHA256" : "16b564c8202d1ed6fa23381db0a6b6adfc19393ae86a85cd6f8d3f35d2c36e18",
+      "sourceSHA256" : "dcc6ec73faa2daaee9429dd3c7c714dcb67d1ec06e1a3b2c9d3ca05b5daa4fbf",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3757,7 +3757,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-H-21233.html",
-      "sourceSHA256" : "4482e8bd1cefc889c1707e112f49272847d1a5e9cc0f08db805649b69930c2e8",
+      "sourceSHA256" : "598075ebc69251d77c89870b46ca1c41d35884f0710f149b9757f99b610f9c2b",
       "state" : "native"
     },
     {
@@ -3765,7 +3765,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-I-21238.html",
-      "sourceSHA256" : "9c2b062f4e9a3dd58c2b76056a5fcc38b2875b9250f2859ec547b649010f828b",
+      "sourceSHA256" : "73238cb6260d4bb86910b3411710903a522fb3fe01bf5b8add2f61fadfa7a73f",
       "state" : "native"
     },
     {
@@ -3773,7 +3773,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-J-21237.html",
-      "sourceSHA256" : "45afe380fe95bfaf0d15cf06ed746eeba5177f69d39d8782977cb2bac3333434",
+      "sourceSHA256" : "057ba6acb2c8e9e5ba59b2da619d458cac8deaf45cf7de136fd13c442d8d2cff",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3781,7 +3781,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-K-21498.html",
-      "sourceSHA256" : "1daf9d9985d35ace157f32f9160f491cefb6bf8946bbafd1a69443048a086c77",
+      "sourceSHA256" : "0dffb7fb450c97f3d64da5324cfd7c1c77d04d69ee751f504a8b70798402e163",
       "state" : "native"
     },
     {
@@ -3789,7 +3789,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/I-1.html",
-      "sourceSHA256" : "4c79393cbdf27ae004219449e4ecd689edeb0f9c235e08e648f9bae269f55050",
+      "sourceSHA256" : "80bf6ce7e0bf493e8026ada297a9c099fda3abbb60946252d2cc0b7b0e12d341",
       "state" : "native"
     },
     {
@@ -3797,7 +3797,7 @@
         "isolatedHTMLTableCount: 8"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/I-2.html",
-      "sourceSHA256" : "e7707f4f9b5c705832d42d7320101f6ded124658f2a6f356f6bdd4f690f48cf7",
+      "sourceSHA256" : "2abf003c05bd274690f221d93c8644f59ba585659968c790d22d036daf5ed4b5",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3805,7 +3805,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/I-3.html",
-      "sourceSHA256" : "c0100cfcf08aa87b0c40758b02c9e385d68e3d095190bd38895729d07f776f5f",
+      "sourceSHA256" : "c9fe70bee2442f7a84a894c8f7bec40055972921ce7fd7dac631e96a7530d88b",
       "state" : "native"
     },
     {
@@ -3813,7 +3813,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/I-5.html",
-      "sourceSHA256" : "eb068207f72d24d935a757cb6fac2ef17ba1dea54a246734418f7ad908253ce4",
+      "sourceSHA256" : "48e4a8d42166c23bbf86990e4e16eb120f70a95d38d391c332f64c287861b9d0",
       "state" : "native"
     },
     {
@@ -3821,7 +3821,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/I-6.html",
-      "sourceSHA256" : "cb896717ec6e2b05b4c06ff6ebac0aa0f3f5a08433764c4e19643accfc34ddfb",
+      "sourceSHA256" : "70da64ef6bf5ae2cb22f3ada2a50fbd50514e41a16e21e10d9f4fbc227f9a333",
       "state" : "native"
     },
     {
@@ -3829,7 +3829,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-1.html",
-      "sourceSHA256" : "2311c8f6cbc9709b9fa316d95bb20ddc77febaa1331b234ef5a0d951ad26f3aa",
+      "sourceSHA256" : "cf8d2a4e3f61f7b757761a878b821d0fe4957a4daedf55a283ef4df3bb78ee78",
       "state" : "native"
     },
     {
@@ -3837,7 +3837,7 @@
         "isolatedHTMLTableCount: 7"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-2.html",
-      "sourceSHA256" : "8fd8a17628c9d9434b2f2f32526c22f665c01c7de8dfbf870bcfb693d9605020",
+      "sourceSHA256" : "e212a4fffd64e9dc0335cf428ac59cea61d68a05e62f31e5a780dd226e8d9170",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3845,7 +3845,7 @@
         "isolatedHTMLTableCount: 23"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-3.html",
-      "sourceSHA256" : "1d319b4f9d1c94cfe416d5b97ba529774ae0d22582c311e700a8016a1c719b83",
+      "sourceSHA256" : "c3bd4a875b35e5a0f73bee6640cf55658b190b4d79df5de531312275e497eccc",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3853,7 +3853,7 @@
         "isolatedHTMLTableCount: 12"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-4.html",
-      "sourceSHA256" : "c5278ecbf58014f68b04a993dc1bb56949e4d04b9250f685387f3687a3806d34",
+      "sourceSHA256" : "6b685c9fc49f0af908fe385ad786646861427be812e7b2ac0c5184df28393f06",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3861,7 +3861,7 @@
         "isolatedHTMLTableCount: 15"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-5.html",
-      "sourceSHA256" : "10663f46595a8e89ecfb4cc9e9db9a43c3c5c3a7df8169effa2cc0f4e19a36a2",
+      "sourceSHA256" : "8c5221a447a814893086d9ad6e4bacdfaafbe1e9c4263274fc0c139653a24c87",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3869,7 +3869,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-6.html",
-      "sourceSHA256" : "f0dbeb10128e235551fdd8efa7d56960b1129440a0b0657ded2849d4bf7fc829",
+      "sourceSHA256" : "72b6022bd1fd5804f3db8d4208a119872a58e90e33fc02e4d1026313cf8cc5a3",
       "state" : "native"
     },
     {
@@ -3877,7 +3877,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-7.html",
-      "sourceSHA256" : "7b6113cd63a66b204ae15f5bdae51aff75b7ee4876094beb87c95178afaf5b1f",
+      "sourceSHA256" : "d2c482f9df5429ae4e739edaf61f6bb79e630b65433ab6cdbfbff16dadcd2bbb",
       "state" : "native"
     },
     {
@@ -3885,7 +3885,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-1.html",
-      "sourceSHA256" : "b9ddb99a675228d71caf719cbec2b846781ceed28f2e1ff512f8589c61b3f379",
+      "sourceSHA256" : "fe469a62cbb9ecb7f90efb215107f28bfc5087ff43816500c46a6d0b3476387a",
       "state" : "native"
     },
     {
@@ -3893,7 +3893,7 @@
         "isolatedHTMLTableCount: 19"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-2.html",
-      "sourceSHA256" : "51cff2cf7482acde7fff82067a77acd2c33fedac8f6770b71465ae4f4fdb19f4",
+      "sourceSHA256" : "2c00e348b19145ede988898ad862c5b425a977cc601cf4f5c9acdd586c887b8d",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3901,7 +3901,7 @@
         "isolatedHTMLTableCount: 21"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-3.html",
-      "sourceSHA256" : "90c70012b23f5e0244693a20e165594ec73d6f003ea84020b401db13e482824e",
+      "sourceSHA256" : "d6312c9fdc16a371d1755c918b71e4371cb4f5a3fe670e94dc8c0aec0f3a9e06",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3909,7 +3909,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-4.html",
-      "sourceSHA256" : "22648f45662ffe9c4d7555c35146bd7dc5422e78cb173ff50ceaa201db784ee0",
+      "sourceSHA256" : "4e15439dda823bdff917f854258ba2a291f1248ae7374b13e7819fe11191461e",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3917,7 +3917,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-5.html",
-      "sourceSHA256" : "b2f9426cc01e13bc8c26eb5c11fd0e22853580e86f9d62410c62804cbe5eef00",
+      "sourceSHA256" : "bced0168e77974f2f96d091876ffebc29997be2084e9479e08463a615140baf5",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3925,7 +3925,7 @@
         "isolatedHTMLTableCount: 13"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-6.html",
-      "sourceSHA256" : "c1b5d49e73fd9702f0388b3f6134560efcc0116bc0215df6a12224addcdc6b5f",
+      "sourceSHA256" : "0342c19a9b95c6318348421d6a6f07cd5de58e17e66800cf8a07c4531a86c601",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3933,7 +3933,7 @@
         "isolatedHTMLTableCount: 7"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-7.html",
-      "sourceSHA256" : "7cf42d452b3e165450c70660f154138c6ae117ed3e334ec62100dd5b2cc2a19a",
+      "sourceSHA256" : "59677ff6120a8ed2b4b0f34a34cce87379f7aad0db734d5e7614d81f8450577b",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3941,7 +3941,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IV-1.html",
-      "sourceSHA256" : "74405a0e4fd939e2e62170f142bfd0c2ac8aeb324011916b47190ac6e960e362",
+      "sourceSHA256" : "6456bd2d0558af8af0f95febe57cbdc5c1a2a68e3071ae60ce218a7e91b17fcb",
       "state" : "native"
     },
     {
@@ -3949,7 +3949,7 @@
         "isolatedHTMLTableCount: 19"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IV-2.html",
-      "sourceSHA256" : "8c4e62a9eac6c81e3ebe006a57889ad99f1e36cedeb7cab0315e38dffb8c8d11",
+      "sourceSHA256" : "1d19621db81fc1c9afd6c7aa9a2d99586a38bc2ca6720f568a517923dee4ec41",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3957,7 +3957,7 @@
         "isolatedHTMLTableCount: 10"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IV-3.html",
-      "sourceSHA256" : "5784e58c96c89f644b4658f0af088eab38eaee933b769ce43ff8809a499c45c5",
+      "sourceSHA256" : "ffcca5cab8ce07b8774522e41277daca8c537e6cafe39c385551c33a83ddb76e",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3965,7 +3965,7 @@
         "isolatedHTMLTableCount: 10"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IV-4.html",
-      "sourceSHA256" : "8fa1a99efc4807a41267aecb4c08c8332d07caef69b0dd5428a6858925e23bfa",
+      "sourceSHA256" : "d721523bc42af1ed66464a213a7bfe63f576f3730a3c0f6c6ceb02864f73112f",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3973,7 +3973,7 @@
         "isolatedHTMLTableCount: 4"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-1.html",
-      "sourceSHA256" : "442b560e627ee3e7527647cf43eca01a0687b52c3fd64e950a7806e45cac0917",
+      "sourceSHA256" : "051a85c49d030a496ec17d76ef5372f8559134556b66c9c995e3f2d3f01b6976",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3981,7 +3981,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-2.html",
-      "sourceSHA256" : "c39c36e8b9160a95577cee7957a6d0204968f489db78ea9040300ad97b1bccef",
+      "sourceSHA256" : "08753734204837ae48f73f23988d39f3e02b5d005e3e28a16f1f7b1e9bd5a0c5",
       "state" : "native"
     },
     {
@@ -3989,7 +3989,7 @@
         "isolatedHTMLTableCount: 5"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-3.html",
-      "sourceSHA256" : "88a8e627e7029311e525fd4ed1fa11c090be0daceb518b043fbcbff7aca89986",
+      "sourceSHA256" : "6c8c51a65cc37b4f3d415830eaa18c677dc2b98d85f0cae2022d1c119d66fbc7",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -3997,7 +3997,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-4.html",
-      "sourceSHA256" : "0df3e05f572a463f088c64750437c725c0c0ef2d71e1c65b92c52b55685bee4d",
+      "sourceSHA256" : "39a93ea1f4fcd3ac4cc8e832b2b08f479253a64e8caa8f05dee442e1c40ebcc8",
       "state" : "native"
     },
     {
@@ -4005,7 +4005,7 @@
         "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-5.html",
-      "sourceSHA256" : "9248434492f65da61da38791e4269c90e3789b261c2ba4ee4fe8224294a882fb",
+      "sourceSHA256" : "b2eaf1aa1a77a8d752b96f2de43d6b252d4e684440f2927d8ff4aba012ee8578",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4013,7 +4013,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-6.html",
-      "sourceSHA256" : "82f389e52e1fe3ff9dffe9ded02189067c75e9a4a8da41f0b935d94397667288",
+      "sourceSHA256" : "c362021aa5f53a88b4d7d9e776ef31e6889cca462252687a5ef9d29e4a51ef44",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4021,7 +4021,7 @@
         "isolatedHTMLTableCount: 5"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-7.html",
-      "sourceSHA256" : "8290b1b82cd0b5b7736bf3a1a2d1197627bfdf961631e3eb152d49e69cc1cd07",
+      "sourceSHA256" : "e6198c4f38ead0e4612f97fe2a4388e82e301f70c2ec000c323685c2f8e7a540",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4029,7 +4029,7 @@
         "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-8.html",
-      "sourceSHA256" : "427eb68e81caefb5097863ce0ff17e4f0e7f161e88d881f8e792416eb326552c",
+      "sourceSHA256" : "a1d5f05b2909ff247c2be59a36339e76c14553e47f2c38d9b617a83730417231",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4037,7 +4037,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-9.html",
-      "sourceSHA256" : "a0bf053d680a914a13e78b17132e47d736fb14a527d53948f0ef93d41296ef4f",
+      "sourceSHA256" : "61835815375ef0b444cce791ae5e38294fd270417a5e5bb2d95f0b537ec49c1a",
       "state" : "native"
     },
     {
@@ -4045,7 +4045,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/V-1.html",
-      "sourceSHA256" : "b00cb506ab40fdf29a1ec5e1d71a64dee3bda096e5da85beb396390f7e6c3221",
+      "sourceSHA256" : "6b1261d4cba4356bcf91b9758febd60d879007ab0e41c9b240afd463d6bdc9f4",
       "state" : "native"
     },
     {
@@ -4053,7 +4053,7 @@
         "isolatedHTMLTableCount: 5"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/V-2.html",
-      "sourceSHA256" : "cc21976c55e9673e575a8030ea7927d92276426117137541cd42ef79ddd52d2a",
+      "sourceSHA256" : "24ba438920d1c56ec7bcbdbacf2b8b394c74a6f84cd23aea3ff9f3da7acd3fd5",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4061,7 +4061,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/V-3.html",
-      "sourceSHA256" : "3b5e213ceed4397977a09a6667fee9528ed4859395ca2166cbde72f5d3e5f225",
+      "sourceSHA256" : "4a1d585f4dc0484da8765e6bbf2179814576dd45538df21c2ab8de7b1e587f1b",
       "state" : "native"
     },
     {
@@ -4069,7 +4069,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/V-4.html",
-      "sourceSHA256" : "f8966fc6e2c63ace97e65f8709f25fe9a7b824332bb78daab16bbf7fbd4bfd44",
+      "sourceSHA256" : "2e3cb3656b96bd49faa82d7bb3d4ba28e4c6ed349e8ab337bd6918aa2b82620b",
       "state" : "native"
     },
     {
@@ -4077,7 +4077,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-1.html",
-      "sourceSHA256" : "89ee7ad08c17fafce2854d1936b959b59680d169a18338b99ed76f16e134c991",
+      "sourceSHA256" : "b8d2171fcc5682651c1b6a1ffc166337cbbf686cdc49faab82a03d0ddff56823",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4085,7 +4085,7 @@
         "isolatedHTMLTableCount: 11"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-2.html",
-      "sourceSHA256" : "bd6ba78602b347362a77087df104f2b6c0d405f3eb98678f0f7bb104a974aea4",
+      "sourceSHA256" : "1a6344148f973ae4df304910e4e1162001af88ea8ade3dc78f92327f35a8c8ba",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4093,7 +4093,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-3.html",
-      "sourceSHA256" : "1be1c2ddc768c8f365ac924be512602816c26ae29a5b354cf641fd6cb26ee58f",
+      "sourceSHA256" : "7ca0fc63c5fff3088be38542088ffef569450f6f887a121c0e3d32bda21c3dab",
       "state" : "native"
     },
     {
@@ -4101,7 +4101,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-4.html",
-      "sourceSHA256" : "3355082957691675a352fe1d931b3de64866a80a190a4bee8c481995b8c93e83",
+      "sourceSHA256" : "93f1465542656f71d444480c242933edabb5577779bfe2c8b036d0c672152b2b",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4109,7 +4109,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-5.html",
-      "sourceSHA256" : "c65da88ec76dbd11ad1726fe111d9eafe7608b1484342f9997d52320e36b604e",
+      "sourceSHA256" : "7d5d4b62de722c766dbe2851f0f83961a0d607ffef317d49d00c8801d3270b09",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4117,7 +4117,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-6.html",
-      "sourceSHA256" : "2b03e6192d344504fbe4c8a4aaa4e0103d2224e056a4c2b92030db32d2710121",
+      "sourceSHA256" : "aebb82708cd708f693d684862bbfc0b3a2c860f24ff8f9ffb592f837100fadc9",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4125,7 +4125,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-1.html",
-      "sourceSHA256" : "8cdb763241f3af709412f5f60e8954beb3bee226ca07dfa4256122367d6d90d3",
+      "sourceSHA256" : "40aaa3d166a9a172a6782be671c5438659e89d476c0745d84615d68dee74af9e",
       "state" : "native"
     },
     {
@@ -4133,7 +4133,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-2.html",
-      "sourceSHA256" : "83130e471893608b905b72cc51172dc2bc5ba2d3717e06621aae38ed12cd259e",
+      "sourceSHA256" : "e994594d64fe67a3db536b76fa64c30ae4efd69b2fe2780efd9fa36dc9d8ce78",
       "state" : "native"
     },
     {
@@ -4141,7 +4141,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-3.html",
-      "sourceSHA256" : "a6029b94c586bb9dfd93c2c490498816830e14c3a8947852c1879a84841a86d3",
+      "sourceSHA256" : "45401f93bae2bbb47c9b6cb593b365fb39a7ea3b7f370e44915d1b731fbf3fea",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4149,7 +4149,7 @@
         "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-4.html",
-      "sourceSHA256" : "12d8f770bae69682eb1340f5d78b578e720f1520d520e2d79ce284956b26f62e",
+      "sourceSHA256" : "dbfe4c97f94367cb5ed21c51514000bf7a8753a7c1e4a4d4135447a889d24922",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4157,7 +4157,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-5.html",
-      "sourceSHA256" : "5fae9219c4d3872ad68850a052604242fa3534ce1e22b230de249c5e1cc1db95",
+      "sourceSHA256" : "618e67698ea1aec82df79dccc38ce16b8332f4e36f477a0b8d29a1da2bf0b1f5",
       "state" : "native"
     },
     {
@@ -4165,7 +4165,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-6.html",
-      "sourceSHA256" : "d27dd0dce74f749a4ede94b45a4952a24dc57f4a8ca30b80b1ff034708400111",
+      "sourceSHA256" : "fd00a147b76e326efa39bb3b975538f9d578cc2cbb3874d0a23682fe9c6c8f7d",
       "state" : "native"
     },
     {
@@ -4173,7 +4173,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-7.html",
-      "sourceSHA256" : "70f49a2bd28e0b72d31f54bb4baa873e095b3171e6091aa83aafcb507f065763",
+      "sourceSHA256" : "ecd11161bdca23654b93cff03747fd5729fbd2c5315033fba67b8e9bd8f64994",
       "state" : "native"
     },
     {
@@ -4181,7 +4181,7 @@
         "isolatedHTMLTableCount: 8"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-8.html",
-      "sourceSHA256" : "fea2e1cdeb003abb1dfd762082888dc3d64aa2ed9b169a5828f8bd92bfa87fe5",
+      "sourceSHA256" : "f0987e78b64c392344ed07b22377ec220b6745195f482c4a80f32ea779633c16",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4189,7 +4189,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-9.html",
-      "sourceSHA256" : "931583834f042c4e567ef1c16506d0d58147933167ff4219aae4574f5829841f",
+      "sourceSHA256" : "f99ea2aff3426d35797837093fd4ff633f81ba32e6aad5ca833627ffc91da82a",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4197,7 +4197,7 @@
         "isolatedHTMLTableCount: 32"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-1.html",
-      "sourceSHA256" : "7f1fbebb6c59e7e638f2c7b93416a6b616e009e81ff7af84073fb86c8461815d",
+      "sourceSHA256" : "5eb4ebf6b02477840d27c3eee981188af01f037a47b384de5fc3f17023927ba8",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4205,7 +4205,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-2.html",
-      "sourceSHA256" : "0a67d6b82ad4806079d9b32f8ab11588a10aadef31c51b87c3f5c6efa2650f71",
+      "sourceSHA256" : "bcc2e971d6096f9326a5647f28ca95f58ec7c7e881ebc8c3bc077431a3c2a926",
       "state" : "native"
     },
     {
@@ -4213,7 +4213,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-3.html",
-      "sourceSHA256" : "2e6774a8da69fa9371ec30d6266a32b77afd0c43710e2c34d56f005ca9a45e05",
+      "sourceSHA256" : "42b7a5ed2902adc9369954eb3a18bfda43afd3be946e290eead14e15dddab66f",
       "state" : "native"
     },
     {
@@ -4221,7 +4221,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-4.html",
-      "sourceSHA256" : "8c7007d18a823977eb1001e4a3664e5d26d014320db8e9a1950227091d4d957a",
+      "sourceSHA256" : "ae7e9f081d1befb9d6f8da4d2027f00245fd9d5f216efb3562b2a36436bcd804",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4229,7 +4229,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-5.html",
-      "sourceSHA256" : "6eaad9831d8ef1738a44d9a7cfaf87b14654c9927abaef23be7938d776a8f5d4",
+      "sourceSHA256" : "e46e95fdae6f25578eaafdc26da5ba0c982416c97dae230835d3c305fcad7cb8",
       "state" : "native"
     },
     {
@@ -4237,7 +4237,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-6.html",
-      "sourceSHA256" : "997c5dea0b3f54f5db19ecde03605f282a5313c0c3071a0fbd20143094d4c209",
+      "sourceSHA256" : "0aa34f36e4c99f5162b1af70a62934e65e4fbbe197df7952f53e5b2dd7a76119",
       "state" : "native"
     },
     {
@@ -4245,7 +4245,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-7.html",
-      "sourceSHA256" : "64360cae502e43161003feff6e74166dd882aeaa922cd5acc1b4219268cb8112",
+      "sourceSHA256" : "5e5a5a91ba6e4fa0cc0531e9a723f5f1a2ec2ac2508ff156171119273795bd71",
       "state" : "native"
     },
     {
@@ -4253,7 +4253,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-8.html",
-      "sourceSHA256" : "00a7c647de8807303da1ed828a931a845173b52c2709e9d9ce5b2da0f031c139",
+      "sourceSHA256" : "7aec0d1c101f4f1eb6de836b859dde78875ed204304be759b5041606d3de4eff",
       "state" : "native"
     },
     {
@@ -4261,7 +4261,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-9.html",
-      "sourceSHA256" : "637cb11b03ddb37b507fa052260f773d6ebe60ef526b63aeb89634fc31505644",
+      "sourceSHA256" : "8a25763a1300d06d94533a14bdf7e494ace1d326e7152a191616da119ae060c3",
       "state" : "native"
     },
     {
@@ -4269,7 +4269,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-1.html",
-      "sourceSHA256" : "c478c873caca2512a353575be41e38b9e744b2a63d0e5f0a0de8bc0dc4f2cd58",
+      "sourceSHA256" : "61a0354ac68de3d4dc6e86928456e8a410068b75768fd760f8bf15146596bbb6",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4277,7 +4277,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-2.html",
-      "sourceSHA256" : "2b43ef9440f1085df8a8690d9d24b42f7b588bffdfc26572faee9e43111e3f5f",
+      "sourceSHA256" : "77ecc1cd4fe50c082d66a9c94296cec46401eca2678e1447173f9312c03d4b72",
       "state" : "native"
     },
     {
@@ -4285,23 +4285,23 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-3.html",
-      "sourceSHA256" : "5d1f3605f431754e6973f0bce09604443563deb2d4608d3cc3e5175d6b222e0e",
+      "sourceSHA256" : "3245f403283dbff13eada3addca34b2b32ace78276aba26d486f21a172c349bf",
       "state" : "native"
     },
     {
       "reasons" : [
-
+        "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-4.html",
-      "sourceSHA256" : "a96ddc04962adcf40434ef0d3bbbc13fe063d8efbf3da215545f231e89aa5ce7",
-      "state" : "native"
+      "sourceSHA256" : "9b31a071f11196c1b09139aeff7c98919a9e345438e6cfdb9fe41ec4d1c44efd",
+      "state" : "nativeWithTableFallback"
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 4"
+        "isolatedHTMLTableCount: 8"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-5.html",
-      "sourceSHA256" : "bbe7118465610e712918d6c94f5eef64de93bc62507444f8f523b3766c537221",
+      "sourceSHA256" : "099ed9ec695e2a1b56da5d9b033e79224bb7c093e83ec0687b2a559f89a9b8b5",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4309,7 +4309,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-6.html",
-      "sourceSHA256" : "537e0eba94b39486b89d5082cbd4bb1f0b8e9b3688af726fe92309cd8a64abf9",
+      "sourceSHA256" : "c8fee6fdd238555b585582f1cdb684eb2bc22a4315c595b2db4b9e7cc50c0978",
       "state" : "native"
     },
     {
@@ -4317,7 +4317,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-7.html",
-      "sourceSHA256" : "f32d7de9ab061d8fb33329d148287ef55e66f85f0e1aeec77ef5ff680a23ea52",
+      "sourceSHA256" : "5a469fa36f9242f48ae1a03758810211f351b39674af1dca1df059eb94e4d326",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4325,15 +4325,15 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-8.html",
-      "sourceSHA256" : "8bd8b12d84a5d0814b9c6681810eae21bbaa3166edd24a22a2a032eb94402522",
+      "sourceSHA256" : "1fba51f0bfb89cfafd60c1eae2c15acebe872d51f8045fc23609f0ed0487cf50",
       "state" : "native"
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 2"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-9.html",
-      "sourceSHA256" : "3b0e94a77b51cc1426d1eedb07ad0aa83db5f66a60ff1be9a564ecb5e9c99c09",
+      "sourceSHA256" : "d9351f48c98003a3d6218770f0aac118020d3fdb75cabb7ec37a0b477f7a3de8",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4341,7 +4341,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-1.html",
-      "sourceSHA256" : "b1517e15dc04b10c62b810b2ad583babe669212e1e21489a76c3f086e55e4f7f",
+      "sourceSHA256" : "10f5f15d28a3d2919b617f2eb52701495a72b54cd7b26376a2762c2fca104920",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4349,7 +4349,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-2.html",
-      "sourceSHA256" : "4ae200b6805874ea11339259de55e5a923278dfcfd5241062f7561b9d24890e3",
+      "sourceSHA256" : "92455ee87e976108015b3d4ce9a8f7f3f97034d5f48d6c6040bbe1f42026f40e",
       "state" : "native"
     },
     {
@@ -4357,7 +4357,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-3.html",
-      "sourceSHA256" : "993a73b242228000bbc53fc15c62373b0d8016d1948162cc6bb1d3647a51420f",
+      "sourceSHA256" : "68657e8a30fe98206a5a8ae88ebeb3ba0930dc3b9052eb3620773f1d5521285f",
       "state" : "native"
     },
     {
@@ -4365,7 +4365,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-4.html",
-      "sourceSHA256" : "b39b8cdc3e47dbb7f8e8d0b102b397a77fe2bd4b5f11f1ec2d502f9555186cc9",
+      "sourceSHA256" : "74658fb00c20ea920963774101b3beb7eaa5ded4fc61985e4697ea92e2cf1e43",
       "state" : "native"
     },
     {
@@ -4373,7 +4373,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-5.html",
-      "sourceSHA256" : "19c92a9f1e51fe32c721016b87d42ff6b1d23f34534c885bab13c3291ef6cb1b",
+      "sourceSHA256" : "bc2b517af19bb12524c9dd86874ec83d68da84a086d7de8cd652113ceeed2da6",
       "state" : "native"
     },
     {
@@ -4381,7 +4381,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-6.html",
-      "sourceSHA256" : "f6e11cc353fa593239edcb5033f41e7bcbb479f36f230cee9852733450f5c2e1",
+      "sourceSHA256" : "f3b57230cb3fdb0bc142100b9b0dea7f142fee162242494d63ff18aa9eec69bc",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4389,7 +4389,7 @@
         "isolatedHTMLTableCount: 7"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-7.html",
-      "sourceSHA256" : "869948501aeac2c264edd5b886e9552431cacd05e5cbf96c47ef8520fbadb015",
+      "sourceSHA256" : "3bf8260cda54b78bdeb029709120f66f9821b22c5875eb3b1f555611757bc446",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4397,15 +4397,15 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-8.html",
-      "sourceSHA256" : "5a2f298b02ca2aff8e7b889bd09a6123ad18793bc5dbff7f8ee83e0b080895fc",
+      "sourceSHA256" : "7b1737d0e1d4cf8b419198903e7d8b2f10ea353f06f7a967788a589510bca9c3",
       "state" : "native"
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 3"
+        "isolatedHTMLTableCount: 6"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-9.html",
-      "sourceSHA256" : "8dc00483afa3845f00feb255e200ba3e1548a8acdb4a250d005c483ffa25e095",
+      "sourceSHA256" : "ba008be87ac4adb64985b00f6719495f069caa92e0133b7a7d32cc357a19d619",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4413,7 +4413,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-1.html",
-      "sourceSHA256" : "8cbe6b55331117cf2e2d9094d0c2ce782ea4465b71fc5fca22784d8de6cfd1a7",
+      "sourceSHA256" : "b4f067a4baa08af4f4eb6e7765e18a05aea291bb7b8cbb0c3c351cc53c2d37a3",
       "state" : "native"
     },
     {
@@ -4421,7 +4421,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-2.html",
-      "sourceSHA256" : "e47b9b4f30bc6caf040fed069b25f9cbc287d78f6c73243ace559c1359017c61",
+      "sourceSHA256" : "0d733eee63f4f27ff5aba59dcdee960fd5770cfd9804a38ba7683140fda77306",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4429,7 +4429,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-3.html",
-      "sourceSHA256" : "97c51a89fe41acae9e53498a5b741cdc251ca07fc92cb5f67c4dc390af4132e5",
+      "sourceSHA256" : "6422e529a443cbb5738472f341a9e1af7a6abd66bcdba34f24531f77ebf0bb31",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4437,7 +4437,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-4.html",
-      "sourceSHA256" : "1305a9e2a78eaef0eb18f69886668ccbd8a8a0265449238b5e2ba98d3a9371a2",
+      "sourceSHA256" : "3b2174ac8fed907d6601491ad38fb17a9f627d0cc91c61f1537e44a111512a76",
       "state" : "native"
     },
     {
@@ -4445,7 +4445,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-5.html",
-      "sourceSHA256" : "9da734f60467dc01268bffb2bd31e42fe830dbf2b0d689f197de0ef74e6b29d4",
+      "sourceSHA256" : "fb37fb117d0bbbc5c2b56d71cd58d5ca62ba494b651f6acc2e7a91e3e0b5b922",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4453,7 +4453,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-6.html",
-      "sourceSHA256" : "ff34d58bf10429c5d1dc22a952cb49dfed68d6c5b765d3c0de2081e7d2db9605",
+      "sourceSHA256" : "51c5ac41dd01045f067eb30d192049297f19be7defd253310d9e0cdd9f637e45",
       "state" : "native"
     },
     {
@@ -4461,7 +4461,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-7.html",
-      "sourceSHA256" : "3203d84748906c72e45a2e9885c4fd719ef27b7fda246416ebdd22be91ddcd65",
+      "sourceSHA256" : "ca05c7d475051d51b479fc5c0d3abe8d3146e1e0007167c1faf354655e89786d",
       "state" : "native"
     },
     {
@@ -4469,7 +4469,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-8.html",
-      "sourceSHA256" : "9b91e39337eac7308c8138c5f3d1767e089b2e1614cffb2f218dca2fef43e659",
+      "sourceSHA256" : "00184ada0dc594ca51f35ce5933abf43cdd66fb6b563f4028830cb96fb4313a9",
       "state" : "native"
     },
     {
@@ -4477,7 +4477,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-1.html",
-      "sourceSHA256" : "59a57ccb0443123f9dccd3538ca0890a3fa8ffe75aa8dd9689c60bb805ebbac7",
+      "sourceSHA256" : "e4015d8f232250113baedf893c5876b9dc5dcb3eb25dd17b720cb314662d0827",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4485,7 +4485,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-2.html",
-      "sourceSHA256" : "c45f332f2c2c04a037ecfad050bf6b55a4a982bd9ad284db5ba28a967cdd33eb",
+      "sourceSHA256" : "3b5840efa8a785bfd9bc42d94b0d71e63e059fbdb2b900bb7832c2a2b8355d36",
       "state" : "native"
     },
     {
@@ -4493,7 +4493,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-3.html",
-      "sourceSHA256" : "87a7f9796f2e15a2de33180092004078174a420b0c6ad94be5a4c634cfc43629",
+      "sourceSHA256" : "6c3f61b9bcfb1e69f57cc31a7bc390cf75220d09058962dc35c2907f8cde9c9b",
       "state" : "native"
     },
     {
@@ -4501,7 +4501,7 @@
         "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-4.html",
-      "sourceSHA256" : "64580f6dae39f2c3676f0fd093f59578cd16e010c2b1445ae60bf28279f42816",
+      "sourceSHA256" : "ce7f92d4d7995d46c35c3c524cf45c78c3566e92518d8fd4b2966f62dabb5bca",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4509,7 +4509,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-5.html",
-      "sourceSHA256" : "ea5fe9f846f06ce282c043ba1b982e37ef2412a5097f76aa6aa345474889c420",
+      "sourceSHA256" : "3251499cda199840c71a782cd87a718db25862623ae4f88d7ef572850953fbab",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4517,7 +4517,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-6.html",
-      "sourceSHA256" : "eea25c2087d7dc253b3abd0735771d1037b9f9fa96f5fe9898b4a20063e71c9a",
+      "sourceSHA256" : "1fddaaf5a48722bdb020681971780c6fc3db8971525c7acff8757292966c57b4",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4525,7 +4525,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-7.html",
-      "sourceSHA256" : "05b2d4997eaa5be3367e078df86d007de46abc4f8518cd54cdd814790c08b681",
+      "sourceSHA256" : "c795b409bab07c4aefc779d721606cece3bb0db3c427b45e8ae0123efd4dc1b6",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4533,7 +4533,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-8.html",
-      "sourceSHA256" : "a5d4115cdad18023619d5bec2475be4c65b7e5ff6ab3ffb5dd4c4ce210811448",
+      "sourceSHA256" : "8266e5b8719150b2e8727a4460f7e413729d169cbbc6c8090f73d62b6648f77f",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4541,7 +4541,7 @@
         "isolatedHTMLTableCount: 6"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-9.html",
-      "sourceSHA256" : "8f6263a19be418cfb12b451194d9f62964fb1b82726b0bc2b34141996a54df3f",
+      "sourceSHA256" : "7fd94b654a3639066e0606d1fc235fb5e90c98957080a6c3b0f87507eb1f5747",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4549,7 +4549,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-1.html",
-      "sourceSHA256" : "bd705ba1657eff32dc8a80b7c948b9ac11ac0c8b5c6c7610a8e2002b202f4479",
+      "sourceSHA256" : "edfc05a0030324e8d6de609a127d4d53fcc70c6c26f398c69ca4859699f6ad34",
       "state" : "native"
     },
     {
@@ -4557,7 +4557,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-2.html",
-      "sourceSHA256" : "9c6eb2be50d8237284be1393a760dfd8e3802ed72589f5d66d949f61af4f517a",
+      "sourceSHA256" : "ebf7cbd1ca7b538ad1c940b8238893878cef7548b59db2431f5ace8f20edf996",
       "state" : "native"
     },
     {
@@ -4565,7 +4565,7 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-3.html",
-      "sourceSHA256" : "09d40604279c352a3503d66987a01266694e3d6206f14acd858d1facfd0432e0",
+      "sourceSHA256" : "b96aa727c88c302f0faa34f5bf14c64d4c44ea84c9857231050479e6692fbf18",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4573,7 +4573,7 @@
 
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-4.html",
-      "sourceSHA256" : "c74033bb3e125c62552e7ceeb285befe961b74315d221e919569382a1b76e3f4",
+      "sourceSHA256" : "33f5e1bd129db58fb745a2e1bab423a238aa6e1178c8ff20dea1cc5d6cc57208",
       "state" : "native"
     },
     {
@@ -4581,7 +4581,7 @@
         "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-5.html",
-      "sourceSHA256" : "2595c646eea5950910a7fbb99b3142a46cea4b23c5354890e1b405cc6b27b179",
+      "sourceSHA256" : "ebe64029dba3c16d0225038357a4bdea27da4dd07d1ecb8af5646c4e67249653",
       "state" : "nativeWithTableFallback"
     },
     {
@@ -4589,11 +4589,11 @@
         "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-6.html",
-      "sourceSHA256" : "899c26391348ce6f633574245484e5734ca57f0b530a6862dda97c4539ffd6db",
+      "sourceSHA256" : "b4b090cd88593666deb23c323173a753d2d083d366a1062e696b7ed7b946a76f",
       "state" : "nativeWithTableFallback"
     }
   ],
-  "corpusSHA256" : "4217fce744c219f2f8592c27385bcaa15b034f8e714eaafa6f0adcd291701782",
+  "corpusSHA256" : "9f36ccbb323efe56bd4435b374007c4134cdf36dba360dc06c11dd870a3e4083",
   "parserSchemaVersion" : "native-reader-document-v3",
   "schemaVersion" : 3
 }

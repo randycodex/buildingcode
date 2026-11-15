@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "libraryID": "nyc-zoning-resolution",
-  "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
-  "textChangesThrough": "2026-08-13",
+  "codeVersion": "NYC Zoning Resolution — text through 2026-11-12",
+  "textChangesThrough": "2026-11-12",
   "chapters": [
     {
       "chapterID": 15000101,
@@ -240,9 +240,9 @@
       "chapterID": 15000603,
       "chapterNumber": "VI-3",
       "codeSectionID": 1,
-      "sectionCount": 19,
-      "preparedSectionCount": 19,
-      "blockCount": 95
+      "sectionCount": 21,
+      "preparedSectionCount": 21,
+      "blockCount": 158
     },
     {
       "chapterID": 15000604,
@@ -256,9 +256,9 @@
       "chapterID": 15000605,
       "chapterNumber": "VI-5",
       "codeSectionID": 1,
-      "sectionCount": 15,
-      "preparedSectionCount": 15,
-      "blockCount": 68
+      "sectionCount": 16,
+      "preparedSectionCount": 16,
+      "blockCount": 71
     },
     {
       "chapterID": 15000606,
@@ -344,17 +344,17 @@
       "chapterID": 15000801,
       "chapterNumber": "VIII-1",
       "codeSectionID": 1,
-      "sectionCount": 155,
-      "preparedSectionCount": 155,
-      "blockCount": 1783
+      "sectionCount": 157,
+      "preparedSectionCount": 157,
+      "blockCount": 1828
     },
     {
       "chapterID": 15000802,
       "chapterNumber": "VIII-2",
       "codeSectionID": 1,
-      "sectionCount": 24,
-      "preparedSectionCount": 24,
-      "blockCount": 73
+      "sectionCount": 25,
+      "preparedSectionCount": 25,
+      "blockCount": 75
     },
     {
       "chapterID": 15000803,
@@ -368,9 +368,9 @@
       "chapterID": 15000804,
       "chapterNumber": "VIII-4",
       "codeSectionID": 1,
-      "sectionCount": 36,
-      "preparedSectionCount": 36,
-      "blockCount": 138
+      "sectionCount": 51,
+      "preparedSectionCount": 51,
+      "blockCount": 182
     },
     {
       "chapterID": 15000805,
@@ -384,41 +384,41 @@
       "chapterID": 15000806,
       "chapterNumber": "VIII-6",
       "codeSectionID": 1,
-      "sectionCount": 18,
-      "preparedSectionCount": 18,
-      "blockCount": 45
+      "sectionCount": 19,
+      "preparedSectionCount": 19,
+      "blockCount": 48
     },
     {
       "chapterID": 15000807,
       "chapterNumber": "VIII-7",
       "codeSectionID": 1,
-      "sectionCount": 50,
-      "preparedSectionCount": 50,
-      "blockCount": 249
+      "sectionCount": 51,
+      "preparedSectionCount": 51,
+      "blockCount": 258
     },
     {
       "chapterID": 15000808,
       "chapterNumber": "VIII-8",
       "codeSectionID": 1,
-      "sectionCount": 21,
-      "preparedSectionCount": 21,
-      "blockCount": 66
+      "sectionCount": 22,
+      "preparedSectionCount": 22,
+      "blockCount": 68
     },
     {
       "chapterID": 15000809,
       "chapterNumber": "VIII-9",
       "codeSectionID": 1,
-      "sectionCount": 10,
-      "preparedSectionCount": 10,
-      "blockCount": 41
+      "sectionCount": 11,
+      "preparedSectionCount": 11,
+      "blockCount": 44
     },
     {
       "chapterID": 15000901,
       "chapterNumber": "IX-1",
       "codeSectionID": 1,
-      "sectionCount": 71,
-      "preparedSectionCount": 71,
-      "blockCount": 485
+      "sectionCount": 72,
+      "preparedSectionCount": 72,
+      "blockCount": 520
     },
     {
       "chapterID": 15000902,
@@ -432,17 +432,17 @@
       "chapterID": 15000903,
       "chapterNumber": "IX-3",
       "codeSectionID": 1,
-      "sectionCount": 128,
-      "preparedSectionCount": 128,
-      "blockCount": 1272
+      "sectionCount": 130,
+      "preparedSectionCount": 130,
+      "blockCount": 1319
     },
     {
       "chapterID": 15000904,
       "chapterNumber": "IX-4",
       "codeSectionID": 1,
-      "sectionCount": 30,
-      "preparedSectionCount": 30,
-      "blockCount": 162
+      "sectionCount": 31,
+      "preparedSectionCount": 31,
+      "blockCount": 164
     },
     {
       "chapterID": 15000905,
@@ -456,25 +456,25 @@
       "chapterID": 15000906,
       "chapterNumber": "IX-6",
       "codeSectionID": 1,
-      "sectionCount": 36,
-      "preparedSectionCount": 36,
-      "blockCount": 221
+      "sectionCount": 37,
+      "preparedSectionCount": 37,
+      "blockCount": 223
     },
     {
       "chapterID": 15000907,
       "chapterNumber": "IX-7",
       "codeSectionID": 1,
-      "sectionCount": 42,
-      "preparedSectionCount": 42,
-      "blockCount": 124
+      "sectionCount": 43,
+      "preparedSectionCount": 43,
+      "blockCount": 126
     },
     {
       "chapterID": 15000908,
       "chapterNumber": "IX-8",
       "codeSectionID": 1,
-      "sectionCount": 60,
-      "preparedSectionCount": 60,
-      "blockCount": 265
+      "sectionCount": 66,
+      "preparedSectionCount": 66,
+      "blockCount": 597
     },
     {
       "chapterID": 15000909,
@@ -488,9 +488,9 @@
       "chapterID": 15001001,
       "chapterNumber": "X-1",
       "codeSectionID": 1,
-      "sectionCount": 77,
-      "preparedSectionCount": 77,
-      "blockCount": 241
+      "sectionCount": 82,
+      "preparedSectionCount": 82,
+      "blockCount": 364
     },
     {
       "chapterID": 15001002,
@@ -512,17 +512,17 @@
       "chapterID": 15001004,
       "chapterNumber": "X-4",
       "codeSectionID": 1,
-      "sectionCount": 55,
-      "preparedSectionCount": 55,
-      "blockCount": 317
+      "sectionCount": 57,
+      "preparedSectionCount": 57,
+      "blockCount": 345
     },
     {
       "chapterID": 15001005,
       "chapterNumber": "X-5",
       "codeSectionID": 1,
-      "sectionCount": 52,
-      "preparedSectionCount": 52,
-      "blockCount": 468
+      "sectionCount": 57,
+      "preparedSectionCount": 57,
+      "blockCount": 1024
     },
     {
       "chapterID": 15001006,
@@ -536,49 +536,49 @@
       "chapterID": 15001007,
       "chapterNumber": "X-7",
       "codeSectionID": 1,
-      "sectionCount": 81,
-      "preparedSectionCount": 81,
-      "blockCount": 297
+      "sectionCount": 82,
+      "preparedSectionCount": 82,
+      "blockCount": 351
     },
     {
       "chapterID": 15001008,
       "chapterNumber": "X-8",
       "codeSectionID": 1,
-      "sectionCount": 11,
-      "preparedSectionCount": 11,
-      "blockCount": 64
+      "sectionCount": 12,
+      "preparedSectionCount": 12,
+      "blockCount": 66
     },
     {
       "chapterID": 15001009,
       "chapterNumber": "X-9",
       "codeSectionID": 1,
-      "sectionCount": 42,
-      "preparedSectionCount": 42,
-      "blockCount": 100
+      "sectionCount": 44,
+      "preparedSectionCount": 44,
+      "blockCount": 107
     },
     {
       "chapterID": 15001101,
       "chapterNumber": "XI-1",
       "codeSectionID": 1,
-      "sectionCount": 14,
-      "preparedSectionCount": 14,
-      "blockCount": 57
+      "sectionCount": 15,
+      "preparedSectionCount": 15,
+      "blockCount": 59
     },
     {
       "chapterID": 15001102,
       "chapterNumber": "XI-2",
       "codeSectionID": 1,
-      "sectionCount": 25,
-      "preparedSectionCount": 25,
-      "blockCount": 55
+      "sectionCount": 26,
+      "preparedSectionCount": 26,
+      "blockCount": 57
     },
     {
       "chapterID": 15001103,
       "chapterNumber": "XI-3",
       "codeSectionID": 1,
-      "sectionCount": 20,
-      "preparedSectionCount": 20,
-      "blockCount": 45
+      "sectionCount": 21,
+      "preparedSectionCount": 21,
+      "blockCount": 48
     },
     {
       "chapterID": 15001104,
@@ -592,57 +592,57 @@
       "chapterID": 15001105,
       "chapterNumber": "XI-5",
       "codeSectionID": 1,
-      "sectionCount": 26,
-      "preparedSectionCount": 26,
-      "blockCount": 63
+      "sectionCount": 27,
+      "preparedSectionCount": 27,
+      "blockCount": 74
     },
     {
       "chapterID": 15001106,
       "chapterNumber": "XI-6",
       "codeSectionID": 1,
-      "sectionCount": 41,
-      "preparedSectionCount": 41,
-      "blockCount": 154
+      "sectionCount": 42,
+      "preparedSectionCount": 42,
+      "blockCount": 172
     },
     {
       "chapterID": 15001107,
       "chapterNumber": "XI-7",
       "codeSectionID": 1,
-      "sectionCount": 100,
-      "preparedSectionCount": 100,
-      "blockCount": 294
+      "sectionCount": 105,
+      "preparedSectionCount": 105,
+      "blockCount": 334
     },
     {
       "chapterID": 15001108,
       "chapterNumber": "XI-8",
       "codeSectionID": 1,
-      "sectionCount": 11,
-      "preparedSectionCount": 11,
-      "blockCount": 32
+      "sectionCount": 12,
+      "preparedSectionCount": 12,
+      "blockCount": 34
     },
     {
       "chapterID": 15001109,
       "chapterNumber": "XI-9",
       "codeSectionID": 1,
-      "sectionCount": 41,
-      "preparedSectionCount": 41,
-      "blockCount": 313
+      "sectionCount": 43,
+      "preparedSectionCount": 43,
+      "blockCount": 325
     },
     {
       "chapterID": 15001201,
       "chapterNumber": "XII-1",
       "codeSectionID": 1,
-      "sectionCount": 22,
-      "preparedSectionCount": 22,
-      "blockCount": 27
+      "sectionCount": 23,
+      "preparedSectionCount": 23,
+      "blockCount": 29
     },
     {
       "chapterID": 15001202,
       "chapterNumber": "XII-2",
       "codeSectionID": 1,
-      "sectionCount": 11,
-      "preparedSectionCount": 11,
-      "blockCount": 67
+      "sectionCount": 12,
+      "preparedSectionCount": 12,
+      "blockCount": 72
     },
     {
       "chapterID": 15001203,
@@ -656,49 +656,49 @@
       "chapterID": 15001204,
       "chapterNumber": "XII-4",
       "codeSectionID": 1,
-      "sectionCount": 42,
-      "preparedSectionCount": 42,
-      "blockCount": 309
+      "sectionCount": 43,
+      "preparedSectionCount": 43,
+      "blockCount": 321
     },
     {
       "chapterID": 15001205,
       "chapterNumber": "XII-5",
       "codeSectionID": 1,
-      "sectionCount": 34,
-      "preparedSectionCount": 34,
-      "blockCount": 92
+      "sectionCount": 35,
+      "preparedSectionCount": 35,
+      "blockCount": 121
     },
     {
       "chapterID": 15001206,
       "chapterNumber": "XII-6",
       "codeSectionID": 1,
-      "sectionCount": 33,
-      "preparedSectionCount": 33,
-      "blockCount": 113
+      "sectionCount": 34,
+      "preparedSectionCount": 34,
+      "blockCount": 125
     },
     {
       "chapterID": 15001207,
       "chapterNumber": "XII-7",
       "codeSectionID": 1,
-      "sectionCount": 47,
-      "preparedSectionCount": 47,
-      "blockCount": 266
+      "sectionCount": 48,
+      "preparedSectionCount": 48,
+      "blockCount": 281
     },
     {
       "chapterID": 15001208,
       "chapterNumber": "XII-8",
       "codeSectionID": 1,
-      "sectionCount": 35,
-      "preparedSectionCount": 35,
-      "blockCount": 146
+      "sectionCount": 36,
+      "preparedSectionCount": 36,
+      "blockCount": 161
     },
     {
       "chapterID": 15001301,
       "chapterNumber": "XIII-1",
       "codeSectionID": 1,
-      "sectionCount": 54,
-      "preparedSectionCount": 54,
-      "blockCount": 215
+      "sectionCount": 55,
+      "preparedSectionCount": 55,
+      "blockCount": 246
     },
     {
       "chapterID": 15001302,
@@ -712,105 +712,105 @@
       "chapterID": 15001303,
       "chapterNumber": "XIII-3",
       "codeSectionID": 1,
-      "sectionCount": 26,
-      "preparedSectionCount": 26,
-      "blockCount": 137
+      "sectionCount": 27,
+      "preparedSectionCount": 27,
+      "blockCount": 142
     },
     {
       "chapterID": 15001304,
       "chapterNumber": "XIII-4",
       "codeSectionID": 1,
-      "sectionCount": 40,
-      "preparedSectionCount": 40,
-      "blockCount": 441
+      "sectionCount": 41,
+      "preparedSectionCount": 41,
+      "blockCount": 477
     },
     {
       "chapterID": 15001305,
       "chapterNumber": "XIII-5",
       "codeSectionID": 1,
-      "sectionCount": 27,
-      "preparedSectionCount": 27,
-      "blockCount": 84
+      "sectionCount": 28,
+      "preparedSectionCount": 28,
+      "blockCount": 88
     },
     {
       "chapterID": 15001306,
       "chapterNumber": "XIII-6",
       "codeSectionID": 1,
-      "sectionCount": 36,
-      "preparedSectionCount": 36,
-      "blockCount": 155
+      "sectionCount": 37,
+      "preparedSectionCount": 37,
+      "blockCount": 200
     },
     {
       "chapterID": 15001307,
       "chapterNumber": "XIII-7",
       "codeSectionID": 1,
-      "sectionCount": 14,
-      "preparedSectionCount": 14,
-      "blockCount": 79
+      "sectionCount": 15,
+      "preparedSectionCount": 15,
+      "blockCount": 112
     },
     {
       "chapterID": 15001308,
       "chapterNumber": "XIII-8",
       "codeSectionID": 1,
-      "sectionCount": 23,
-      "preparedSectionCount": 23,
-      "blockCount": 62
+      "sectionCount": 24,
+      "preparedSectionCount": 24,
+      "blockCount": 69
     },
     {
       "chapterID": 15001309,
       "chapterNumber": "XIII-9",
       "codeSectionID": 1,
-      "sectionCount": 75,
-      "preparedSectionCount": 75,
-      "blockCount": 433
+      "sectionCount": 77,
+      "preparedSectionCount": 77,
+      "blockCount": 457
     },
     {
       "chapterID": 15001401,
       "chapterNumber": "XIV-1",
       "codeSectionID": 1,
-      "sectionCount": 18,
-      "preparedSectionCount": 18,
-      "blockCount": 48
+      "sectionCount": 19,
+      "preparedSectionCount": 19,
+      "blockCount": 63
     },
     {
       "chapterID": 15001402,
       "chapterNumber": "XIV-2",
       "codeSectionID": 1,
-      "sectionCount": 43,
-      "preparedSectionCount": 43,
-      "blockCount": 178
+      "sectionCount": 44,
+      "preparedSectionCount": 44,
+      "blockCount": 207
     },
     {
       "chapterID": 15001403,
       "chapterNumber": "XIV-3",
       "codeSectionID": 1,
-      "sectionCount": 21,
-      "preparedSectionCount": 21,
-      "blockCount": 81
+      "sectionCount": 22,
+      "preparedSectionCount": 22,
+      "blockCount": 83
     },
     {
       "chapterID": 15001404,
       "chapterNumber": "XIV-4",
       "codeSectionID": 1,
-      "sectionCount": 42,
-      "preparedSectionCount": 42,
-      "blockCount": 293
+      "sectionCount": 43,
+      "preparedSectionCount": 43,
+      "blockCount": 311
     },
     {
       "chapterID": 15001405,
       "chapterNumber": "XIV-5",
       "codeSectionID": 1,
-      "sectionCount": 29,
-      "preparedSectionCount": 29,
-      "blockCount": 54
+      "sectionCount": 30,
+      "preparedSectionCount": 30,
+      "blockCount": 62
     },
     {
       "chapterID": 15001406,
       "chapterNumber": "XIV-6",
       "codeSectionID": 1,
-      "sectionCount": 22,
-      "preparedSectionCount": 22,
-      "blockCount": 39
+      "sectionCount": 23,
+      "preparedSectionCount": 23,
+      "blockCount": 41
     },
     {
       "chapterID": 16021239,
@@ -866,7 +866,7 @@
       "codeSectionID": 1,
       "sectionCount": 1,
       "preparedSectionCount": 1,
-      "blockCount": 143
+      "blockCount": 146
     },
     {
       "chapterID": 16021766,
@@ -874,7 +874,7 @@
       "codeSectionID": 1,
       "sectionCount": 1,
       "preparedSectionCount": 1,
-      "blockCount": 272
+      "blockCount": 275
     },
     {
       "chapterID": 16021767,
@@ -890,7 +890,7 @@
       "codeSectionID": 1,
       "sectionCount": 1,
       "preparedSectionCount": 1,
-      "blockCount": 160
+      "blockCount": 173
     },
     {
       "chapterID": 16021769,

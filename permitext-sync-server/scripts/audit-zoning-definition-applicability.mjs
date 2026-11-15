@@ -2,7 +2,7 @@ import {parse,serialize} from 'parse5';
 import {createHash} from 'node:crypto';
 import {readFile,writeFile} from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
-export const expectedSourceSHA256='e7707f4f9b5c705832d42d7320101f6ded124658f2a6f356f6bdd4f690f48cf7';
+export const expectedSourceSHA256='2abf003c05bd274690f221d93c8644f59ba585659968c790d22d036daf5ed4b5';
 export const sourceFile='2026-zoning-resolution/chapters/I-2.html';
 export const sourceURL=new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/'+sourceFile,import.meta.url);
 const attr=(node,name)=>node.attrs?.find(a=>a.name===name)?.value||'';
