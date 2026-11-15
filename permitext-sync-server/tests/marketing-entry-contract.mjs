@@ -45,9 +45,10 @@ try {
   for (const path of ["/homepage-original", "/homepage-columns", "/homepage-columns-three", "/homepage-norma"]) assert.equal((await request(path, 308)).headers.get("location"), "/");
   assert.match(home, /FIND YOUR WAY THROUGH NYC CODES/);
   assert.match(home, /marketing\/home.js/);
-  assert.match(home, /<html lang="en" data-theme="dark">/);
-  assert.match(home, /:root\{color-scheme:dark;/);
-  assert.doesNotMatch(home, /id="theme"|theme-toggle|color-scheme:light|permitext-norma-theme/);
+  assert.match(home, /<html lang="en">/);
+  assert.match(home, /:root\{color-scheme:light;/);
+  assert.match(home, /@media\(prefers-color-scheme:dark\)\{:root\{color-scheme:dark;/);
+  assert.doesNotMatch(home, /data-theme="dark"|id="theme"|theme-toggle|permitext-norma-theme/);
   assert.doesNotMatch(source, /themeButton|localStorage/);
   assert.doesNotMatch(home, /noindex|homepage preview/);
   assert.doesNotMatch(home, /id="panel-track"|src="\/web\/app\.js/);
