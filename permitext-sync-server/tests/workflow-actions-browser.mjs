@@ -51,14 +51,12 @@ try {
   console.log('Calculator passed: blank reuse, meaningful draft preservation and recognizable area fallback.');
 
   await page.getByRole('button',{name:'Report',exact:true}).click();
-  await page.getByRole('button',{name:'Create PDF version',exact:true}).click();
-  const preview=page.locator('.report-export-review:visible');
-  await preview.getByText('Synthetic Project 1 · Version 1 saved',{exact:true}).waitFor({timeout:45000});
-  const download=page.waitForEvent('download');
-  await preview.getByRole('button',{name:'Download PDF',exact:true}).click();
+  const download=page.waitForEvent('download',{timeout:45000});
+  await page.getByRole('button',{name:'Export PDF',exact:true}).click();
   const file=await download;
   assert.ok((await stat(await file.path())).size>1000);
-  console.log('Report passed: Create PDF version, saved-version feedback and actual PDF download.');
+  assert.equal(await page.locator('.report-export-review:visible').count(),0);
+  console.log('Report passed: direct PDF export without opening a preview.');
   assert.deepEqual(errors,[]);
 
   // Exercise the shipped consent listener with an instrumented checkout button.

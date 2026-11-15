@@ -956,16 +956,16 @@ async function main() {
         !workspaceScript.text.includes("Select saved project items") &&
         !workspaceScript.text.includes("createProjectSectionSelectionController") &&
         workspaceScript.text.includes('reportRequest("/reports/generate", {') &&
-        workspaceScript.text.includes("reviewReport(payload.manifest, payload.generatedReport.file)") &&
+        workspaceScript.text.includes("await downloadProjectReportFile(projectID,payload.generatedReport.file,activeDraft.title)") &&
         workspaceScript.text.includes("function renderFirmStandardsEditor") &&
         workspaceScript.text.includes('postResearch("/organizations/controls/save"') &&
         workspaceScript.text.includes('reportRequest("/reports/options"') &&
         workspaceScript.text.includes('const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };') &&
-        workspaceScript.text.includes('versionList.className = "report-draft-version-list"') &&
-        workspaceScript.text.includes('choice.className = "report-draft-version-option"') &&
-        workspaceScript.text.includes('choiceRevision.textContent = current ? "Current" : `Revision ${draft.version || 1}`') &&
-        workspaceScript.text.includes('createNew.textContent = "+ New report"') &&
-        workspaceScript.text.includes('const switchDraft = draftID => reportSwitch.select(draftID)') &&
+        workspaceScript.text.includes("reportsRail.className = 'report-list-rail'") &&
+        workspaceScript.text.includes("choice.className = 'report-list-choice'") &&
+        workspaceScript.text.includes("choice.setAttribute('aria-current','true')") &&
+        workspaceScript.text.includes("createNew.textContent = 'New report +'") &&
+        workspaceScript.text.includes('else void reportSwitch.select(draft.id)') &&
         workspaceScript.text.includes('titleControl.className = "report-title-control"') &&
         workspaceScript.text.includes('titleButton.className = "report-title-text"') &&
         workspaceScript.text.includes('titleEditor.setAttribute("aria-label", "Edit Report title")') &&
@@ -977,8 +977,8 @@ async function main() {
         workspaceScript.text.includes('remove.setAttribute("aria-label", "Remove Report item")') &&
         workspaceScript.text.includes("remove.innerHTML = trashIconSVG()") &&
         workspaceStyles.text.includes(".report-draft-block-actions .report-draft-block-remove") &&
-        workspaceStyles.text.includes(".report-draft-version-list") &&
-        workspaceStyles.text.includes(".report-draft-version-option") &&
+        workspaceStyles.text.includes(".report-list-rail") &&
+        workspaceStyles.text.includes(".report-list-choice") &&
         workspaceStyles.text.includes(".report-title-control") &&
         workspaceStyles.text.includes(".report-title-revision") &&
         !workspaceScript.text.includes('dateInput.type = "date"') &&
@@ -995,7 +995,7 @@ async function main() {
         workspaceScript.text.includes('block.kind === "evidence" && source') &&
         workspaceScript.text.includes('[source.sectionNumber, stripLeadingSectionNumber(source.title || "", source.sectionNumber)]') &&
         workspaceScript.text.includes('[source.codePrefix || "Code", savedEvidenceEdition(source)]') &&
-        workspaceScript.text.includes('appendSourceGroup("Research", ""') &&
+        workspaceScript.text.includes('appendSourceGroup("Assistant", ""') &&
         workspaceScript.text.includes('heading.textContent = `${report.title} · Version ${report.reportVersion}`') &&
         workspaceScript.text.includes('`${generatedDate} at ${generatedTime}`') &&
         workspaceScript.text.includes('`${report.itemCount} included ${report.itemCount === 1 ? "item" : "items"}`') &&
