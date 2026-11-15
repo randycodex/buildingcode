@@ -1036,7 +1036,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(webView.contains("user-scalable=no"))
     }
 
-    func testReaderHeaderShowsEditionOnlyWithoutBookIcon() throws {
+    func testReaderBrowserPinsChapterAndAppendixHeadingsWithoutDuplicateProjectMenu() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -1045,17 +1045,21 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             encoding: .utf8
         )
 
-        let headerStart = try XCTUnwrap(browseSource.range(of: "private var libraryHeader: some View"))
+        let headerStart = try XCTUnwrap(browseSource.range(of: "private func readerSectionHeader("))
         let headerEnd = try XCTUnwrap(
             browseSource.range(
-                of: "private var constructionCodeSectionNames",
+                of: "private var readerCodeLibraryChoices",
                 range: headerStart.upperBound..<browseSource.endIndex
             )
         )
         let headerSource = String(browseSource[headerStart.lowerBound..<headerEnd.lowerBound])
 
-        XCTAssertTrue(headerSource.contains("Text(selectedVersionName)"))
-        XCTAssertTrue(headerSource.contains(".accessibilityIdentifier(\"reader-source-edition\")"))
+        XCTAssertTrue(headerSource.contains("Text(heading.rawValue)"))
+        XCTAssertTrue(headerSource.contains(".accessibilityAddTraits(.isHeader)"))
+        XCTAssertTrue(browseSource.contains("pinnedViews: [.sectionHeaders]"))
+        XCTAssertTrue(browseSource.contains("readerSectionHeader(.chapters"))
+        XCTAssertTrue(browseSource.contains("readerSectionHeader(.appendix"))
+        XCTAssertFalse(browseSource.contains("ReaderProjectMenu()"))
         XCTAssertFalse(headerSource.contains("Source jurisdiction ·"))
         XCTAssertFalse(headerSource.contains("systemImage: \"text.book.closed\""))
     }
@@ -3412,7 +3416,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(exchangeSource.contains("expectedAccountGeneration == accountMutationGeneration"))
     }
 
-    func testSavedAccountButtonOpensSettingsDirectlyAndSyncLivesInAccountCard() throws {
+    func testSavedAccountButtonOpensSettingsDirectlyWithoutDuplicateSyncBadges() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -3440,10 +3444,10 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(bookmarksSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
         XCTAssertFalse(bookmarksSource.contains("Label(\"Sync: \\(library.syncStatusTitle)\""))
         XCTAssertFalse(bookmarksSource.contains("Label(\"Settings\", systemImage: \"gearshape\")"))
-        XCTAssertTrue(settingsSource.contains("CodeScreenTitle(title: \"Account\", collapseProgress: collapseProgress)\n                        .offset(y: 8)"))
-        XCTAssertTrue(settingsSource.contains("CodeTopContentFade(title: \"Account\", progress: collapseProgress)"))
-        XCTAssertTrue(settingsSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
-        XCTAssertTrue(settingsSource.contains(".accessibilityLabel(\"Sync status: \\(library.syncStatusTitle)\")"))
+        XCTAssertTrue(settingsSource.contains("CodeMainScreenToolbarTitle(title: screenTitle)"))
+        XCTAssertTrue(settingsSource.contains("isSourcesScreen ? \"Active Code Sources\" : \"Account\""))
+        XCTAssertFalse(settingsSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
+        XCTAssertTrue(bookmarksSource.contains(".sheet(isPresented: $showingSettings)"))
     }
 
     func testSettingsSignInButtonMatchesUpgradeButtonStyle() throws {
@@ -5038,11 +5042,6 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             contentsOf: projectRoot.appendingPathComponent("permitext/Views/ChapterHTMLReaderView.swift"),
             encoding: .utf8
         )
-        let projectsSource = try String(
-            contentsOf: projectRoot.appendingPathComponent("permitext/Views/BookmarksView.swift"),
-            encoding: .utf8
-        )
-
         XCTAssertFalse(htmlSource.contains("installParagraphBookmarkSwipe"))
         XCTAssertFalse(htmlSource.contains("nyccc-swipe-bookmark"))
         XCTAssertFalse(htmlSource.contains("action: 'toggleBookmark'"))
@@ -5050,13 +5049,14 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(chapterSource.contains("struct ReaderCurrentSectionBookmarkButton"))
         XCTAssertTrue(chapterSource.contains("let desiredBookmarkState = !displayedIsBookmarked"))
         XCTAssertTrue(chapterSource.contains("if displayedIsBookmarked == desiredBookmarkState"))
-        XCTAssertTrue(chapterSource.contains("displayedIsBookmarked ? \"Saved\" : \"Removed from Saved\""))
+        XCTAssertTrue(chapterSource.contains("showBookmarkConfirmation(\"Saved to \\(library.readerSaveDestinationName)\")"))
+        XCTAssertTrue(chapterSource.contains("\"Removed from Saved\" : \"Removed from Project\""))
         XCTAssertTrue(chapterSource.contains("Task.sleep(for: .milliseconds(1_200))"))
         XCTAssertTrue(chapterSource.contains(".overlay(alignment: .topTrailing)"))
-        XCTAssertTrue(chapterSource.contains(".lineLimit(1)\n                    .fixedSize()"))
+        XCTAssertNotNil(chapterSource.range(of: #"\.lineLimit\(1\)\s*\.fixedSize\(\)"#, options: .regularExpression))
+        XCTAssertTrue(chapterSource.contains(".accessibilityLabel(sectionID.map { library.readerSaveActionLabel(sectionID: $0) }"))
         XCTAssertTrue(nativeSource.contains("ReaderCurrentSectionBookmarkButton"))
         XCTAssertTrue(htmlReaderSource.contains("ReaderCurrentSectionBookmarkButton"))
-        XCTAssertEqual(projectsSource.components(separatedBy: "library.refreshBookmarks()").count - 1, 1)
     }
 
     func testQueuedBookmarkDeleteSurvivesPullUntilItUploads() throws {

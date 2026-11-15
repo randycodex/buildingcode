@@ -263,7 +263,9 @@ export function beginResearchSpendReservation(reservation, environment = process
     pendingProviderReservations: new Map(),
     embeddingReservationIDs: new Set(),
     embeddingSettlements: new Map(),
-    embeddingModelUsage: []
+    embeddingModelUsage: [],
+    providerModelUsage: [],
+    pricingVersions: new Set()
   };
   const prepared = productionSpendContext.getStore();
   if (prepared?.prepared && !prepared.active) Object.assign(prepared, values);
@@ -351,6 +353,7 @@ export function settleResearchEmbeddingSpend(reservation, accounting) {
   const actualCost = rejected ? 0 : researchSemanticEmbeddingCost(accounting.usage);
   context.pendingProviderReservations.delete(reservation.reservationID);
   context.actualUSD = Number((context.actualUSD + actualCost).toFixed(6));
+  if (!rejected) context.pricingVersions.add(researchSemanticEmbeddingPricingVersion);
   context.reservedUSD = Number(Math.max(0, context.reservedUSD - held + actualCost).toFixed(6));
   if (!rejected) context.embeddingModelUsage.push({ requestKind: "embedding", model: researchSemanticEmbeddingModel,
     dimensions: researchSemanticEmbeddingDimensions, pricingVersion: researchSemanticEmbeddingPricingVersion,
@@ -400,9 +403,9 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
       settled: false
     };
   }
-  const actualCost = estimatedResearchCost({
-    modelUsage: [researchProviderCostEntry(providerPayload, reservation.model, reservation.serviceTier)]
-  }, environment).estimatedUSD;
+  const costEntry = researchProviderCostEntry(providerPayload, reservation.model, reservation.serviceTier);
+  const priced = estimatedResearchCost({ modelUsage: [costEntry] }, environment);
+  const actualCost = priced.estimatedUSD;
   if (actualCost === null) {
     const error = new Error("Research provider usage could not be reconciled against versioned pricing.");
     error.code = "RESEARCH_SPEND_CAP";
@@ -416,6 +419,8 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
     ? Math.ceil(inputTokens * reservation.pricingCeiling.inputRate + outputTokens * reservation.pricingCeiling.outputRate) / 1_000_000
     : actualCost;
   context.actualUSD = Number((context.actualUSD + actualCost).toFixed(6));
+  context.providerModelUsage.push(costEntry);
+  context.pricingVersions.add(priced.pricingVersion);
   context.cacheWriteInputTokens += Number(usage.input_tokens_details?.cache_write_tokens || 0);
   context.reservedUSD = Number(Math.max(
     0,
@@ -437,6 +442,8 @@ export function endResearchSpendReservation() {
   const context = productionSpendContext.getStore();
   const embeddingUsage = researchEmbeddingUsage();
   productionSpendContext.enterWith(null);
+  const entries = context?.active ? [...context.providerModelUsage, ...context.embeddingModelUsage] : [];
+  const sum = key => entries.reduce((total, entry) => total + (entry[key] || 0), 0);
   return context?.active ? {
     id: context.id,
     maximumRequestUSD: context.maximumRequestUSD,
@@ -445,7 +452,22 @@ export function endResearchSpendReservation() {
     providerRequestCount: context.providerRequestCount,
     cacheWriteInputTokens: context.cacheWriteInputTokens,
     pendingProviderReservationCount: context.pendingProviderReservations.size,
-    embeddingUsage
+    embeddingUsage,
+    accounting: {
+      schemaVersion: 1,
+      inputTokens: sum("inputTokens"), cachedInputTokens: sum("cachedInputTokens"),
+      cacheWriteInputTokens: sum("cacheWriteInputTokens"), outputTokens: sum("outputTokens"),
+      totalTokens: sum("inputTokens") + sum("outputTokens"),
+      embeddingInputTokens: embeddingUsage?.inputTokens || 0,
+      webSearchCalls: sum("webSearchCalls"),
+      models: [...new Set(entries.map(entry => entry.model).filter(Boolean))],
+      pricingVersion: [...context.pricingVersions].filter(Boolean).sort().join("+") || null,
+      providerRequestCount: context.providerRequestCount,
+      pendingProviderRequestCount: context.pendingProviderReservations.size,
+      reportedCostUSD: context.actualUSD,
+      unreconciledCostUpperBoundUSD: Number([...context.pendingProviderReservations.values()]
+        .reduce((total, held) => total + held, 0).toFixed(6))
+    }
   } : null;
 }
 

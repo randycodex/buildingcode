@@ -54,6 +54,7 @@ import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation, r
 import { captureTrash, restoreTrash, trashSummary, trashContents, trashBatchForWorkspace, trashBatchWithoutWorkspace } from "./trash-recovery.mjs";
 import {notebookTrashMetadata, isNotebookTrashArtifact, notebookTrashSummary, notebookTrashContents, planNotebookTrashMutation} from './notebook-trash.mjs';
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
+import { internalReviewArchivePolicy, internalReviewView } from "./internal-review-archive.mjs";
 import { emailSubscribersFromAccounts, postgresEmailSubscribers, emailSubscribersCSV } from "./email-subscribers.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
 import { buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction } from "./research-claim-applicability-review.mjs";
@@ -308,6 +309,8 @@ import {
 import { requestResearchProvider } from "./research-provider-client.mjs";
 import { openInvestigationEnabled, openInvestigationServiceTier, investigateResearchEvidence, mergeInvestigationEvidence, investigationInstructions, investigationSchema, reviewInstructions, reviewSchema, openInvestigationVersion, validateOpenInvestigationValue, openReviewRevisionFeedback, openCitationOnlyRepairAllowed, assertOpenCitationOnlyRepair } from "./research-open-investigation.mjs";
 import { researchProviderCostEntry } from "./research-cost-usage.mjs";
+import { researchSpendRange, buildResearchSpendReport, researchSpendCSV } from "./research-spend-report.mjs";
+import { postgresResearchSpendRecords } from "./postgres-research-spend.mjs";
 import { researchDecisionFactRepair } from "./research-decision-fact-repair.mjs";
 import {
   researchEvidenceForBoundedCitationLookup,
@@ -2332,6 +2335,38 @@ export function createFileStoreAdapter() {
           creditEntry
         };
       }));
+    },
+    async researchSpendRecords(range) {
+      const store = await this.read();
+      const records = [];
+      const userIDs = new Set([...Object.keys(store.researchUsageByUserID || {}), ...Object.keys(store.researchOperationsByUserID || {})]);
+      for (const userID of userIDs) {
+        const account = store.users?.[userID] || {};
+        const email = account.email || account.emailAddress || account.privateRelayEmail || null;
+        const operations = new Map((store.researchOperationsByUserID?.[userID] || []).map(row => [row.id, row]));
+        // Saved answer IDs and reservation IDs share the request hash. This is an
+        // authoritative link for historical data, not a timestamp/cost heuristic.
+        const links = new Map((store.researchAnswersByUserID?.[userID] || [])
+          .filter(row => row.operationID && /^research-[a-f0-9]{64}:answer$/.test(row.id))
+          .map(row => [row.id.replace(/:answer$/, ":usage"), row.operationID]));
+        for (const usage of store.researchUsageByUserID?.[userID] || []) {
+          const operationID = links.get(usage.id) || [...operations.values()]
+            .find(row => row.charged === true && row.usageReservationID === usage.id)?.id;
+          const operation = operations.get(operationID) || null;
+          records.push({ userID, email, usage, operation });
+          if (operation) operations.delete(operation.id);
+        }
+        for (const operation of operations.values()) records.push({ userID, email, operation,
+          // A charged operation means the atomic completion wrote a usage row.
+          // If its answer/link was later deleted, the ledger remains canonical.
+          // Keep the metric for diagnostics, without adding its cost twice.
+          coveredByLegacyLedger: operation.charged === true &&
+            (store.researchUsageByUserID?.[userID] || []).some(row => row.mode !== "reservation") });
+      }
+      return records.filter(row => {
+        const createdAt = row.operation?.createdAt || row.usage?.createdAt;
+        return createdAt >= range.periodStart && createdAt < range.periodEnd;
+      });
     },
     async researchSpendSince(since) {
       const store = await this.read();
@@ -5776,6 +5811,10 @@ async function createPostgresStoreAdapter() {
           createdAt: dateToISO(row.created_at)
         } : null
       };
+    },
+    async researchSpendRecords(range) {
+      await ensureSchema();
+      return postgresResearchSpendRecords(sql, range);
     },
     async researchSpendSince(since) {
       await ensureSchema();
@@ -19582,12 +19621,12 @@ async function researchUsageForClient(userID, entitlement, options = {}) {
   });
 }
 
-async function internalResearchSpendReport() {
-  const periodStart = currentMonthStart();
-  const [users, operations] = await Promise.all([
-    researchSpendSince(periodStart),
-    researchOperationsSince(periodStart)
-  ]);
+async function internalResearchSpendReport(filters = {}) {
+  const range = researchSpendRange(filters);
+  const records = await (await storeAdapter()).researchSpendRecords(range);
+  const report = buildResearchSpendReport(records, range);
+  const operations = records.filter(row => row.operation && (!range.userID || row.userID === range.userID) &&
+    (range.status === "all" || row.operation.status === range.status)).map(row => row.operation);
   const economics = researchEconomicsReport(operations, {
     minimumCompletedTurns: Number(
       process.env.PERMITEXT_RESEARCH_ECONOMICS_MINIMUM_COMPLETED_TURNS || 25
@@ -19600,26 +19639,32 @@ async function internalResearchSpendReport() {
     )
   });
   return {
-    periodStart,
-    generatedAt: new Date().toISOString(),
+    ...report,
     internalMonthlyRequestGuardrail: monthlyResearchRequestLimit(),
-    totals: {
-      users: users.length,
-      requests: users.reduce((total, item) => total + item.requests, 0),
-      inputTokens: users.reduce((total, item) => total + item.inputTokens, 0),
-      outputTokens: users.reduce((total, item) => total + item.outputTokens, 0),
-      totalTokens: users.reduce((total, item) => total + item.totalTokens, 0),
-      estimatedCostUSD: Number(users.reduce(
-        (total, item) => total + item.estimatedCostUSD,
-        0
-      ).toFixed(6))
-    },
-    users,
     operationMetrics: operations.map((operation) =>
       createResearchOperationMetric(operation)
     ),
     economics
   };
+}
+
+async function handleInternalResearchSpend(request, response, exportCSV = false) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  let report, csv;
+  try {
+    report = await internalResearchSpendReport(context.body.filters || {});
+    if (exportCSV) csv = researchSpendCSV(report, context.body.view || "requests");
+  } catch (error) {
+    if (!(error instanceof TypeError)) throw error;
+    sendError(response, 400, error.message);
+    return;
+  }
+  if (!exportCSV) { sendJSON(response, 200, { report }); return; }
+  response.writeHead(200, { ...securityHeaders(), "content-type": "text/csv; charset=utf-8",
+    "content-disposition": `attachment; filename="research-spend-${context.body.view === "accounts" ? "accounts" : "requests"}-${report.period}.csv"`,
+    "cache-control": "no-store" });
+  response.end(csv);
 }
 
 async function handleResearchV2Config(request,response){
@@ -19911,9 +19956,13 @@ async function zoningReviewEvidence(testCase) {
   }));
 }
 
-async function handleInternalEvaluationData(request, response) {
+async function handleInternalEvaluationData(request, response, exportArchive = false) {
   const context = await authenticatedInternalBody(request, response);
   if (!context) return;
+  const view = exportArchive ? "archive" : context.body.reviewView || "active";
+  if (!["active", "archive"].includes(view)) { sendError(response, 400, "Choose the current review workspace or its archive."); return; }
+  const reset = internalReviewArchivePolicy();
+  if (exportArchive && !reset) { sendError(response, 404, "No review archive is configured in this environment."); return; }
   const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
   validateEvaluationDataset(dataset);
   const caseTimeline = JSON.parse(await readFile(join(evaluationRootPath, "case-history.json"), "utf8").catch((error) => {
@@ -19930,26 +19979,37 @@ async function handleInternalEvaluationData(request, response) {
   ]);
   const reviews = reviewStore.reviews;
   const feedbackRecords = storedFeedback.filter((item) => item.status === "candidate");
-  const zoningReviewCases = await Promise.all(zoningDataset.cases.map(async (testCase) => ({
+  const review = internalReviewView({ dataset, retrievalDataset, zoningDataset, caseTimeline,
+    runs, reviews, feedbackRecords, researchSpend }, reset, view);
+  if (exportArchive) {
+    const { researchSpend: _spending, feedbackQualitySpend: _cohort, ...contents } = review;
+    response.writeHead(200, { ...securityHeaders(), "content-type": "application/json; charset=utf-8",
+      "content-disposition": `attachment; filename="internal-review-archive-${reset.resetAt.slice(0, 10)}.json"`,
+      "cache-control": "no-store" });
+    response.end(JSON.stringify({ schemaVersion: 1, exportedAt: new Date().toISOString(), ...contents }, null, 2));
+    return;
+  }
+  const zoningReviewCases = await Promise.all(review.zoningDataset.cases.map(async (testCase) => ({
     ...testCase,
     selectedEvidence: await zoningReviewEvidence(testCase)
   })));
   sendJSON(response, 200, {
-    dataset,
-    caseTimeline,
-    retrievalDataset,
-    zoningDataset,
+    dataset: review.dataset,
+    caseTimeline: review.caseTimeline,
+    retrievalDataset: review.retrievalDataset,
+    zoningDataset: review.zoningDataset,
+    reviewArchive: review.reviewArchive,
     zoningReviewCases,
-    runs,
-    reviews,
-    runReviewStatuses: Object.fromEntries(runs.map((run) => [
+    runs: review.runs,
+    reviews: review.reviews,
+    runReviewStatuses: Object.fromEntries(review.runs.map((run) => [
       run.configuration.runID,
-      evaluationRunReviewStatus(run, reviews)
+      evaluationRunReviewStatus(run, review.reviews)
     ])),
-    feedbackCandidates: feedbackRecords,
-    feedbackRecords: feedbackRecords.map(record => ({ ...record, sourceRecords: feedbackSourceRecords(record),
+    feedbackCandidates: review.feedbackRecords,
+    feedbackRecords: review.feedbackRecords.map(record => ({ ...record, sourceRecords: feedbackSourceRecords(record),
       operation: researchSpend.operationMetrics.find(operation => operation.id === record.operationID) || null })),
-    feedbackQuality: feedbackQualityReport(feedbackRecords, researchSpend),
+    feedbackQuality: feedbackQualityReport(review.feedbackRecords, review.feedbackQualitySpend || researchSpend),
     researchSpend
   });
 }
@@ -23128,6 +23188,9 @@ async function handleResearchConversationMessage(request, response) {
     }
     const providerSpend = endResearchSpendReservation();
     Object.assign(researchOperation, {
+      route: "research",
+      usageReservationID: providerSpend?.id || (researchReservationCompleted ? researchReservationID : null),
+      providerAccounting: providerSpend?.accounting || { schemaVersion: 1, reportedCostUSD: 0, unreconciledCostUpperBoundUSD: 0 },
       providerRequestCount: Math.max(
         Number(researchOperation.providerRequestCount || 0),
         Number(providerSpend?.providerRequestCount || 0)
@@ -33332,6 +33395,10 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
   const requestFingerprint = codeQuestionAnalysisBindingHash(binding);
   let reserved = false;
   let completedReservation = false;
+  const operationStartedAt = performance.now();
+  const operation = { id: randomUUID(), createdAt: new Date().toISOString(), status: "rejected", charged: false,
+    route: "code-question", providerRequestCount: 0, pendingProviderRequestCount: 0 };
+  if (!mockMode) prepareResearchSpendReservation();
   try {
     if (!mockMode) {
       const spendGuardrails = researchSpendGuardrails();
@@ -33352,6 +33419,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
         createdAt: new Date().toISOString()
       });
       reserved = reservation.reserved;
+      operation.fundingSource = reservation.fundingSource || null;
       if (!reserved && reservation.reason === "payment_required") {
         throw new CodeQuestionCommandError(
           "You have used this month's included Research turns. Buy more turns to continue.",
@@ -33470,14 +33538,26 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
     });
     if (!mockMode) {
       completedReservation = true;
+      Object.assign(operation, { status: "completed", charged: true, model: result.model,
+        estimatedCostUSD: estimatedCost.estimatedUSD, pricingVersion: estimatedCost.pricingVersion });
     }
     await repairCodeQuestionAnalysisSecondaryRecords(context, question, artifact, answer);
     return { analysis: { id: artifact.envelope.id, ...artifact.payload }, answer, replayed: false };
   } catch (error) {
+    operation.status = error.name === "AbortError" ? "cancelled" : "failed";
+    operation.failureCode = error.code || error.name;
     if (reserved && !completedReservation) await releaseResearchUsageReservation(actorUserID, reservationID);
     throw error;
   } finally {
-    endResearchSpendReservation();
+    const spend = endResearchSpendReservation();
+    if (!mockMode) {
+      Object.assign(operation, { usageReservationID: spend?.id || (completedReservation ? reservationID : null),
+        providerAccounting: spend?.accounting || { schemaVersion: 1, reportedCostUSD: 0, unreconciledCostUpperBoundUSD: 0 },
+        providerRequestCount: spend?.providerRequestCount || 0, pendingProviderRequestCount: spend?.pendingProviderReservationCount || 0,
+        actualProviderCostUSD: spend?.actualUSD ?? 0, conservativeProviderCostUSD: spend?.reservedUSD ?? 0,
+        durationMilliseconds: Math.round(performance.now() - operationStartedAt) });
+      await saveResearchOperationMetricBestEffort(actorUserID, operation);
+    }
   }
 }
 
@@ -34850,6 +34930,9 @@ const handlers = {
   "reports/files/upload": handleReportFileUpload,
   "reports/files/read": handleReportFileRead,
   "internal/evaluations/data": handleInternalEvaluationData,
+  "internal/evaluations/archive/export": (request, response) => handleInternalEvaluationData(request, response, true),
+  "internal/research-spend/data": handleInternalResearchSpend,
+  "internal/research-spend/export": (request, response) => handleInternalResearchSpend(request, response, true),
   "internal/evaluations/review": handleInternalEvaluationReview,
   "internal/evaluations/feedback/triage": handleInternalFeedbackTriage,
   "internal/evaluations/feedback/case": handleInternalFeedbackCase,

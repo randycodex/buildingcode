@@ -281,6 +281,21 @@ export function createResearchOperationMetric(operation = {}) {
     schemaVersion: 1,
     id,
     createdAt: new Date(createdAt).toISOString(),
+    usageReservationID: normalizedString(operation.usageReservationID, 200),
+    route: normalizedString(operation.route, 80),
+    ...(operation.providerAccounting?.schemaVersion === 1 ? {
+      providerAccounting: {
+        schemaVersion: 1,
+        ...Object.fromEntries(["inputTokens", "cachedInputTokens", "cacheWriteInputTokens", "outputTokens", "totalTokens",
+          "embeddingInputTokens", "webSearchCalls", "providerRequestCount", "pendingProviderRequestCount"]
+          .map(key => [key, nonnegativeInteger(operation.providerAccounting[key])])),
+        reportedCostUSD: nonnegativeNumber(operation.providerAccounting.reportedCostUSD, null),
+        unreconciledCostUpperBoundUSD: nonnegativeNumber(operation.providerAccounting.unreconciledCostUpperBoundUSD, null),
+        models: [...new Set((Array.isArray(operation.providerAccounting.models) ? operation.providerAccounting.models : [])
+          .map(model => normalizedString(model, 160)).filter(Boolean))],
+        pricingVersion: normalizedString(operation.providerAccounting.pricingVersion, 500)
+      }
+    } : {}),
     status: normalized.status,
     mode: normalizedString(operation.mode, 80),
     charged: normalized.charged,

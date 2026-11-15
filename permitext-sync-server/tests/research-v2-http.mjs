@@ -80,6 +80,11 @@ try{
     before.researchOperationsByUserID[userID].find(operation=>operation.status==='completed');
   assert.equal(firstOperation.verificationAttemptDiagnostics[0].passageReview.kind,'research_v2');
   assert.equal(firstOperation.verificationAttemptDiagnostics[0].passageReview.pass,true);
+  assert.equal(firstOperation.providerAccounting.inputTokens,400);
+  assert.equal(firstOperation.providerAccounting.outputTokens,200);
+  assert.equal(firstOperation.providerAccounting.totalTokens,600);
+  assert.equal(firstOperation.providerAccounting.providerRequestCount,2);
+  assert(firstOperation.usageReservationID,'Completed usage has an explicit accounting link.');
   const record=before.researchAnswersByUserID[userID][0];assert.equal(record.evidence[0].passageText,passage);
   const replay=await post('/research/conversations/message',input);
   assert.equal(replay.body.replayed,true);assert.equal(calls,2,'Replay makes no extra paid calls');
@@ -108,6 +113,16 @@ try{
   broken=true;
   const rejected=await post('/research/conversations/message',{...context(conversation),question:'Explain this passage again.',requestID:'v2-failed-review'});
   assert.equal(rejected.status,422,JSON.stringify(rejected));assert.equal(rejected.body.code,'V2_REVIEW_FAILED');
+  await lastHandled;
+  const failedMetric=postgres?(await postgres.sql`SELECT operation FROM permitext_research_operations WHERE user_id=${userID} AND operation->>'failureCode'='V2_REVIEW_FAILED'`)[0].operation:
+    (await adapter.read()).researchOperationsByUserID[userID].find(operation=>operation.failureCode==='V2_REVIEW_FAILED');
+  assert.equal(failedMetric.charged,false);
+  assert.equal(failedMetric.providerAccounting.inputTokens,800,'Withheld drafts still incur all four provider stages.');
+  assert.equal(failedMetric.providerAccounting.outputTokens,400);
+  assert.equal(failedMetric.providerAccounting.totalTokens,1200);
+  assert.equal(failedMetric.providerAccounting.providerRequestCount,4);
+  assert.equal(failedMetric.providerAccounting.pendingProviderRequestCount,0);
+  assert(failedMetric.providerAccounting.reportedCostUSD>0,'A failed answer retains its measured API cost.');
   assert.equal((await adapter.read()).researchAnswersByUserID[userID].length,2,'A failed draft is not saved as a supported answer');broken=false;
   const current=(await post('/research/conversations/get',{conversationID:conversation.id})).body.conversation;
   const removed=await post('/research/conversations/evidence',{conversationID:current.id,action:'remove',sourceID:current.sources.find(s=>s.kind==='selection').id,expectedRevision:current.revision,expectedEvidenceSetVersion:current.evidenceSetVersion});
