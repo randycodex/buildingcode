@@ -35,7 +35,8 @@ async function officialHomepageHTML(sourceFile) {
 
 const sourceFile = sourceFileArgument(process.argv.slice(2));
 const result = evaluateZoningFreshness({
-  homepageHTML: await officialHomepageHTML(sourceFile)
+  homepageHTML: await officialHomepageHTML(sourceFile),
+  sourceManifest: JSON.parse(await readFile(new URL("../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/source-manifest.json", import.meta.url), "utf8"))
 });
 
 console.info(JSON.stringify(result, null, 2));

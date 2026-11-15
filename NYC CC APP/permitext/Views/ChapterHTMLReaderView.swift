@@ -1168,7 +1168,7 @@ enum NativeReaderEditionLabel {
         case UserContentSyncCodeVersion.canonicalNYC2014: return "2014"
         case UserContentSyncCodeVersion.canonicalNYC2022: return "2022"
         case UserContentSyncCodeVersion.canonicalNYC2025Specialty: return "2025"
-        case UserContentSyncCodeVersion.canonicalNYCZoning: return "through 2026-08-13"
+        case UserContentSyncCodeVersion.canonicalNYCZoning: return "through 2026-11-12"
         case UserContentSyncCodeVersion.canonicalNYCExistingBuilding: return "effective 2027-07-17"
         case UserContentSyncCodeVersion.canonicalNYCEnactedAdministrative: return "through 2026-07-25"
         default: return version

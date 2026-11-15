@@ -5,12 +5,13 @@ export const zoningResolutionContract = Object.freeze({
   schemaVersion: 1,
   libraryID: "nyc-zoning-resolution",
   codePrefix: "ZR",
-  codeVersion: "NYC Zoning Resolution — text through 2026-08-13",
+  codeVersion: "NYC Zoning Resolution — text through 2026-11-12",
   syncCodeVersion: "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
   sourceBaseURL: "https://zr.planning.nyc.gov",
   sourceHomepageURL: "https://zr.planning.nyc.gov/",
   sourceDownloadsURL: "https://zr.planning.nyc.gov/zr-downloads",
-  textChangesThrough: "2026-08-13",
+  textChangesThrough: "2026-11-12",
+  consolidatedTextChangesThrough: "2026-10-22",
   requiredCompleteSections: Object.freeze([Object.freeze({
     sourcePath: "/article-i/chapter-2/12-10",
     sourceNodeID: 18_523,
@@ -267,14 +268,19 @@ function specialDistrictRecord(chapterTitle) {
 }
 
 function sectionRecord(sectionNode, context) {
-  const sourceNodeID = Number.parseInt(attribute(sectionNode, "data-node-id"), 10);
+  const chapterAppendix = classes(sectionNode).has("node--type-chapter-appendix");
+  const historyLink = firstDescendant(sectionNode, (node) =>
+    node.tagName === "a" && Boolean(attribute(node, "data-content-nid"))
+  );
+  const sourceNodeID = Number.parseInt(attribute(sectionNode, "data-node-id") || attribute(historyLink, "data-content-nid"), 10);
   if (!Number.isSafeInteger(sourceNodeID) || sourceNodeID <= 0) {
     throw new Error(`Zoning section at ${attribute(sectionNode, "about") || context.sourcePath} has no stable Drupal node ID.`);
   }
   const titleNode = firstDescendant(sectionNode, (node) => node?.tagName === "h3");
   const numberNode = firstDescendant(sectionNode, (node) => hasClasses(node, "field--name-title"));
   const sectionNumber = attribute(sectionNode, "data-section") || normalizedText(numberNode);
-  const title = normalizedText(titleNode);
+  const appendixHeadings = chapterAppendix ? descendants(sectionNode, (node) => node.tagName === "h2") : [];
+  const title = chapterAppendix ? normalizedText(appendixHeadings[1]) : normalizedText(titleNode);
   const sectionBody = firstDescendant(sectionNode, (node) => hasClasses(node, "sec-body"));
   const fieldBody = firstDescendant(sectionNode, (node) => hasClasses(node, "field--name-body", "field__item"));
   const containsDefinedTerms = Boolean(firstDescendant(sectionBody, (node) =>
@@ -323,9 +329,10 @@ function sectionRecord(sectionNode, context) {
       title: context.chapterTitle,
       canonicalNumber: context.canonicalChapterNumber
     },
-    sectionNumber,
+    sectionNumber: chapterAppendix ? normalizedText(appendixHeadings[0]) : sectionNumber,
     title,
     specialDistrict: specialDistrictRecord(context.chapterTitle),
+    ...(chapterAppendix ? { appendix: { code: normalizedText(appendixHeadings[0]), isChapterAppendix: true } } : {}),
     lastAmended: normalizedDate(attribute(timeNode, "datetime") || normalizedText(timeNode)),
     effectiveDate: normalizedDate(attribute(timeNode, "datetime") || normalizedText(timeNode)),
     version: zoningResolutionContract.codeVersion,
@@ -337,7 +344,9 @@ function sectionRecord(sectionNode, context) {
     mapReferences,
     appendixReferences,
     sourceAssets: sourceAssets(bodyNode),
-    amendmentHistorySourceURL: absoluteSourceURL(`/ajax/get/amendment/section/${sourceNodeID}`),
+    amendmentHistorySourceURL: absoluteSourceURL(chapterAppendix
+      ? `/ajax/get/amendment/chapter_appendix/${sourceNodeID}`
+      : `/ajax/get/amendment/section/${sourceNodeID}`),
     amendmentHistory: []
   };
 }
@@ -453,8 +462,9 @@ export function parseZoningArticleHTML(html, articleContext = {}) {
 export function parseZoningChapterHTML(html, chapterContext) {
   const document = parse(String(html || ""));
   const sectionNodes = descendants(document, (node) =>
-    hasClasses(node, "node--type-section", "node--view-mode-default") &&
-    Boolean(attribute(node, "data-node-id"))
+    (hasClasses(node, "node--type-section", "node--view-mode-default") &&
+      Boolean(attribute(node, "data-node-id"))) ||
+    hasClasses(node, "node--type-chapter-appendix", "node--view-mode-default")
   );
   const sections = sectionNodes.map((node) => sectionRecord(node, chapterContext));
   if (!sections.length) {
@@ -587,6 +597,7 @@ export function rewriteZoningAssetReferences(blocks, assetNamesByURL, relativePr
     let html = String(block.html || "");
     for (const [sourceURL, fileName] of assetNamesByURL) {
       html = html.split(sourceURL).join(`${relativePrefix}${fileName}`);
+      html = html.split(sourceURL.replaceAll("&", "&amp;")).join(`${relativePrefix}${fileName}`);
     }
     return { ...block, html };
   });

@@ -68,7 +68,7 @@ export function reportEvidenceEdition(item = {}) {
   if (text(item.codeEdition)) return text(item.codeEdition);
   const version = text(item.sourceLibraryVersion || item.codeVersion);
   if (text(item.codePrefix || item.codeBook) === 'BC68') return '1968 NYC Building Code';
-  if (version.includes('2026-zoning-resolution')) return 'NYC Zoning Resolution — text through 2026-08-13';
+  if (version.includes('2026-zoning-resolution')) return 'NYC Zoning Resolution — text through 2026-11-12';
   if (version.includes('2026-existing-building-code')) return 'NYC Existing Building Code — effective 2027-07-17';
   if (version.includes('2026-enacted-administrative-code')) return 'NYC Administrative Code — through 2026-07-25';
   const year = version.match(/(?:^|\/)(1968|2008|2014|2022|2025)-(?:construction|specialty|building)-codes?\b/i)?.[1];

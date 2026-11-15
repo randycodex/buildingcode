@@ -70,6 +70,8 @@ export async function zoningContentMetadata() {
     syncCodeVersion: zoningSyncCodeVersion,
     displayName: "NYC Zoning Resolution",
     textChangesThrough: source.textChangesThrough,
+    consolidatedTextChangesThrough: source.consolidatedTextChangesThrough,
+    adoptedAmendments: source.adoptedAmendments || [],
     sourceAuthority: source.sourceAuthority,
     sourceURL: source.sourceHomepageURL,
     // Runtime availability is a product decision, independent of the frozen

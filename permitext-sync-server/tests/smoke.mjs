@@ -3308,13 +3308,13 @@ async function main() {
         trustProfilesByPrefix.get("EBC")?.effectiveDate === "2027-07-17" &&
         trustProfilesByPrefix.get("BC68")?.statusKind === "historical" &&
         trustProfilesByPrefix.get("ZR")?.statusKind === "continuously-amended" &&
-        /2026-08-13/.test(trustProfilesByPrefix.get("ZR")?.currentThrough || ""),
+        /2026-11-12/.test(trustProfilesByPrefix.get("ZR")?.currentThrough || ""),
       "Normalized trust metadata lost a material legal status distinction."
     );
     const zoningLibrary = codeLibraries.json.libraries.find((library) => library.id === "nyc-zoning-resolution");
     assert(zoningLibrary, "Code-library metadata omitted the Zoning Resolution.");
     assert(zoningLibrary.syncCodeVersion === zoningSyncCodeVersion, "Zoning library returned the wrong sync identity.");
-    assert(zoningLibrary.textChangesThrough === "2026-08-13", "Zoning library returned the wrong source cutoff.");
+    assert(zoningLibrary.textChangesThrough === "2026-11-12", "Zoning library returned the wrong source cutoff.");
     assert(zoningLibrary.researchEligibility === true, "Ordinary Zoning Research must be available.");
     const existingBuildingLibrary = codeLibraries.json.libraries.find(
       (library) => library.id === "nyc-existing-building-code"
