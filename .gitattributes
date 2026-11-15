@@ -1,1 +1,3 @@
 permitext-sync-server/evals/results/*.md whitespace=-blank-at-eof
+# These generated packs use byte offsets; whitespace and line endings are data.
+**/prepared/searchText.utf8 binary

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "source": "authoritative bundled chapter HTML only",
-  "totalSections": 12891,
-  "availablePreparedBodies": 11611,
-  "classifiedStructuralEntries": 1280,
+  "totalSections": 12894,
+  "availablePreparedBodies": 11616,
+  "classifiedStructuralEntries": 1278,
   "classificationCounts": {
-    "title-only-official-heading": 67,
-    "nested-or-title-only-catalog-entry": 1213
+    "title-only-official-heading": 69,
+    "nested-or-title-only-catalog-entry": 1209
   },
   "entries": [
     {
@@ -2578,18 +2578,6 @@
       "sourceHTMLPath": "code-sections/building-code/chapters/16.html"
     },
     {
-      "sectionID": 3674,
-      "webSectionID": 3674,
-      "codePrefix": "BC",
-      "chapterID": 17,
-      "chapterNumber": "17",
-      "sectionNumber": "1703",
-      "title": "SECTION 1703: Approvals",
-      "classification": "nested-or-title-only-catalog-entry",
-      "reason": "no-official-heading",
-      "sourceHTMLPath": "code-sections/building-code/chapters/17.html"
-    },
-    {
       "sectionID": 3679,
       "webSectionID": 3679,
       "codePrefix": "BC",
@@ -4222,18 +4210,6 @@
       "sourceHTMLPath": "code-sections/building-code/chapters/26.html"
     },
     {
-      "sectionID": 5341,
-      "webSectionID": 5341,
-      "codePrefix": "BC",
-      "chapterID": 26,
-      "chapterNumber": "26",
-      "sectionNumber": "2613",
-      "title": "SECTION 2613: Fiber-Reinforced Polymer",
-      "classification": "nested-or-title-only-catalog-entry",
-      "reason": "no-official-heading",
-      "sourceHTMLPath": "code-sections/building-code/chapters/26.html"
-    },
-    {
       "sectionID": 5348,
       "webSectionID": 5348,
       "codePrefix": "BC",
@@ -4409,18 +4385,6 @@
       "chapterNumber": "31",
       "sectionNumber": "2.2.",
       "title": "2.2. The skin of the structure shall be of such strength, and the joints so constructed, as to provide a minimum dead load strip tensile strength at 70°F (21°C) of four times the 70 mph (121.65 km/hr) design load (inflation and aerodynamic loading). The joints shall provide a dead load strip tensile strength of 160°F (71°C) of twice the 70 mph (121.65 km/hr) design load (i.e., a factor of safety of 4 and 2, respectively). In addition, the material shall provide a trapezoidal tear strength of not less than 15 percent of the maximum design tensile load. Material and joint strengths shall be so certified by the manufacturer, justified by analytical and/or experimental data.",
-      "classification": "nested-or-title-only-catalog-entry",
-      "reason": "no-official-heading",
-      "sourceHTMLPath": "code-sections/building-code/chapters/31.html"
-    },
-    {
-      "sectionID": 5606,
-      "webSectionID": 5606,
-      "codePrefix": "BC",
-      "chapterID": 31,
-      "chapterNumber": "31",
-      "sectionNumber": "3105",
-      "title": "SECTION 3105: Awnings, Canopies And Sun Control Devices",
       "classification": "nested-or-title-only-catalog-entry",
       "reason": "no-official-heading",
       "sourceHTMLPath": "code-sections/building-code/chapters/31.html"
@@ -6476,18 +6440,6 @@
       "classification": "title-only-official-heading",
       "reason": "empty-official-heading",
       "sourceHTMLPath": "code-sections/building-code/chapters/33.html"
-    },
-    {
-      "sectionID": 6863,
-      "webSectionID": 6863,
-      "codePrefix": "BC",
-      "chapterID": 35,
-      "chapterNumber": "35",
-      "sectionNumber": "3502",
-      "title": "SECTION 3502: Standards",
-      "classification": "nested-or-title-only-catalog-entry",
-      "reason": "no-official-heading",
-      "sourceHTMLPath": "code-sections/building-code/chapters/35.html"
     },
     {
       "sectionID": 6864,
@@ -13445,6 +13397,30 @@
       "chapterNumber": "6",
       "sectionNumber": "621.6",
       "title": "621.6 Reserved.",
+      "classification": "title-only-official-heading",
+      "reason": "empty-official-heading",
+      "sourceHTMLPath": "code-sections/fuel-gas-code/chapters/Chapter 6.html"
+    },
+    {
+      "sectionID": 8725,
+      "webSectionID": 8725,
+      "codePrefix": "FGC",
+      "chapterID": 71,
+      "chapterNumber": "6",
+      "sectionNumber": "621.7",
+      "title": "621.7 Reserved.",
+      "classification": "title-only-official-heading",
+      "reason": "empty-official-heading",
+      "sourceHTMLPath": "code-sections/fuel-gas-code/chapters/Chapter 6.html"
+    },
+    {
+      "sectionID": 8742,
+      "webSectionID": 8742,
+      "codePrefix": "FGC",
+      "chapterID": 71,
+      "chapterNumber": "6",
+      "sectionNumber": "626.2",
+      "title": "626.2 Reserved.",
       "classification": "title-only-official-heading",
       "reason": "empty-official-heading",
       "sourceHTMLPath": "code-sections/fuel-gas-code/chapters/Chapter 6.html"

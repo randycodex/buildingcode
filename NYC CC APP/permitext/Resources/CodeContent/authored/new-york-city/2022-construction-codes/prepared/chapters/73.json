@@ -26,6 +26,19 @@
           "title": "801.3 Applicability."
         }
       ]
+    },
+    {
+      "headerLine": "SECTION FGC 802",
+      "headingLine": "STANDARDS",
+      "id": "SECTION FGC 802",
+      "sections": [
+        {
+          "id": 25652,
+          "kind": "textBlock",
+          "sectionNumber": "802",
+          "title": "SECTION 802: Standards"
+        }
+      ]
     }
   ],
   "rawDraftText": "#- Chapter 8: Referenced Standards\n\nSection FGC 801: General\n\n#--- 801.1 General.\n\nThis chapter lists the standards that are referenced in various sections of this document. The standards are listed herein by the promulgating agency of the standard, the standard identification, the effective date and title and the section or sections of this document that reference the standard.\n\n#--- 801.2 Subsequent additions, modifications, or deletions.\n\nRefer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to these standards in accordance with Section 28-103.19 of the Administrative Code.\n\n#--- 801.3 Applicability.\n\nThe application of the referenced standards shall be as specified in Section 102.8.\n\nSection FGC 802: Standards",

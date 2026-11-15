@@ -165,7 +165,12 @@ async function main() {
     sections.push(...chapterSections);
     sectionsByChapterID.set(Number(chapter.id), chapterSections);
   }
-  assert(sections.length === 12_891, `Construction section count changed from 12,891 to ${sections.length}.`);
+  // The three recovered FGC/MC/PC Standards sections extend the original catalog.
+  for (const [id, prefix, number] of [[25652, 'FGC', '802'], [25653, 'MC', '1502'], [25654, 'PC', '1502']]) {
+    assert(sections.some(section => section.id === id && section.codePrefix === prefix && section.sectionNumber === number),
+      `Recovered ${prefix} Standards section ${number} is absent.`);
+  }
+  assert(sections.length === 12_894, `Construction section count changed from 12,894 to ${sections.length}.`);
   assert(new Set(sections.map((section) => Number(section.id))).size === sections.length, "Construction section IDs are not unique.");
   assert(
     Number(bundle.nextSectionID) > Math.max(...sections.map((section) => Number(section.id))),

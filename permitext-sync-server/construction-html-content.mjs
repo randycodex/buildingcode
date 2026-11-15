@@ -322,6 +322,20 @@ export async function constructionHTMLBodyStatusForSection(section, options = {}
     return bodyFromHeadingSlice(section, source, headings, selected.index, options);
   }
 
+  // Catalogs can publish a major section itself (e.g. BC 3502 Standards).
+  // These banners are boundaries for leaf provisions, but their own tables
+  // still belong to that section. Match its explicit code and number rather
+  // than requiring the catalog title to repeat the source's code prefix.
+  if (!candidates.length) {
+    const allHeadings = allChapterHeadings(source);
+    const banners = allHeadings.map((heading, index) => ({heading, index})).filter(({heading}) => {
+      const match = heading.headingText.match(/^Section\s+([A-Z]+)\s+(\d+(?:[.-]\d+)*)\s*:/i);
+      return match && match[1].toUpperCase() === String(section.codePrefix || '').toUpperCase() &&
+        normalizedSectionNumber(match[2]) === target;
+    });
+    if (banners.length === 1) return bodyFromHeadingSlice(section, source, allHeadings, banners[0].index, options);
+  }
+
   // Numbered headings miss lettered appendix titles such as "Appendix A: ...".
   // Only fall back when a catalog title uniquely matches one official h6.
   if (expectedTitle) {

@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -80,6 +80,16 @@ function structuralClassification(reason) {
   return "unavailable-authoritative-body";
 }
 
+function structuralEntry(section, status) {
+  return {
+    sectionID: section.id, webSectionID: section.webSectionID,
+    codePrefix: section.codePrefix, chapterID: section.chapterID,
+    chapterNumber: section.chapterNumber, sectionNumber: section.sectionNumber,
+    title: section.title, classification: structuralClassification(status.reason),
+    reason: status.reason, sourceHTMLPath: status.sourceHTMLPath || null
+  };
+}
+
 function structuralCatalog(entries, totalSections) {
   const classificationCounts = Object.fromEntries(
     entries.reduce((counts, entry) => {
@@ -153,12 +163,28 @@ async function main() {
   const structuralEntries = [];
   const extracted = [];
   const reboundOfficialBodies = [];
+  const refreshedHTMLBodies = [];
   let existingBodies = 0;
   for (const section of sections) {
     if (await bodyAlreadyAvailable(section.id, section.webSectionID)) {
       existingBodies += 1;
       const authoredPath = join(canonicalSectionRoot, `${section.id}.json`);
-      if (!(await exists(authoredPath))) {
+      if (await exists(authoredPath)) {
+        const prepared = await readJSON(authoredPath);
+        // Refresh only outputs derived from bundled HTML. Hand-authored
+        // overrides and legacy bodies keep their existing ownership.
+        if (prepared.sourceHTMLPath) {
+          const status = await constructionHTMLBodyStatusForSection(section);
+          assert(status.body || status.reason === "empty-official-heading",
+            `Cannot refresh derived body ${section.id}: ${status.reason}.`);
+          if (JSON.stringify(prepared) !== JSON.stringify(status.body))
+            refreshedHTMLBodies.push({section, body:status.body});
+          if (!status.body) {
+            existingBodies -= 1;
+            structuralEntries.push(structuralEntry(section, status));
+          }
+        }
+      } else {
         const status = await constructionHTMLBodyStatusForSection(section);
         const prepared = await firstExistingPreparedBody(section.id, section.webSectionID);
         if (status.body && officialBodyHasUnboundImages(prepared, status.body)) {
@@ -172,18 +198,7 @@ async function main() {
       extracted.push({ section, body: status.body });
       continue;
     }
-    structuralEntries.push({
-      sectionID: section.id,
-      webSectionID: section.webSectionID,
-      codePrefix: section.codePrefix,
-      chapterID: section.chapterID,
-      chapterNumber: section.chapterNumber,
-      sectionNumber: section.sectionNumber,
-      title: section.title,
-      classification: structuralClassification(status.reason),
-      reason: status.reason,
-      sourceHTMLPath: status.sourceHTMLPath || null
-    });
+    structuralEntries.push(structuralEntry(section, status));
   }
   structuralEntries.sort((left, right) => left.sectionID - right.sectionID);
   const catalog = structuralCatalog(structuralEntries, sections.length);
@@ -195,10 +210,18 @@ async function main() {
       assert(!(await exists(path)), `Refusing to replace existing prepared body ${path}.`);
       await writeFile(path, `${JSON.stringify(body)}\n`);
     }
+    for (const {section, body} of refreshedHTMLBodies) {
+      const path = join(canonicalSectionRoot, `${section.id}.json`);
+      assert((await readJSON(path)).sourceHTMLPath, `Refusing to replace hand-authored body ${path}.`);
+      if (body) await writeFile(path, `${JSON.stringify(body)}\n`);
+      else await unlink(path);
+    }
     await writeFile(structuralCatalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
   }
 
   if (check) {
+    assert(!refreshedHTMLBodies.length,
+      `Derived HTML bodies are stale (${refreshedHTMLBodies.length}); run scripts/prepare-construction-section-bodies.mjs --write.`);
     assert(await exists(structuralCatalogPath), "Structural section catalog is missing; run with --write.");
     const savedCatalog = await readJSON(structuralCatalogPath);
     assert(
@@ -219,6 +242,8 @@ async function main() {
     existingPreparedBodies: existingBodies,
     deterministicHTMLBodies: extracted.length,
     reboundOfficialFigureBodies: reboundOfficialBodies.length,
+    refreshedHTMLBodies: refreshedHTMLBodies.filter(item => item.body).length,
+    retiredEmptyHTMLBodies: refreshedHTMLBodies.filter(item => !item.body).length,
     preparedBodiesAfterWrite: existingBodies + extracted.length,
     classifiedStructuralEntries: structuralEntries.length,
     classificationCounts: catalog.classificationCounts

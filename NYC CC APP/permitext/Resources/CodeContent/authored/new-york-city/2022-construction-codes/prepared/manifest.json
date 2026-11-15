@@ -9,11 +9,11 @@
       "sectionCount" : 107
     },
     {
-      "blockCount" : 5,
+      "blockCount" : 6,
       "chapterID" : 2,
       "chapterNumber" : "2",
       "codeSectionID" : 1,
-      "preparedSectionCount" : 5,
+      "preparedSectionCount" : 6,
       "sectionCount" : 19
     },
     {
@@ -129,11 +129,11 @@
       "sectionCount" : 254
     },
     {
-      "blockCount" : 233,
+      "blockCount" : 234,
       "chapterID" : 17,
       "chapterNumber" : "17",
       "codeSectionID" : 1,
-      "preparedSectionCount" : 213,
+      "preparedSectionCount" : 214,
       "sectionCount" : 241
     },
     {
@@ -201,11 +201,11 @@
       "sectionCount" : 71
     },
     {
-      "blockCount" : 126,
+      "blockCount" : 127,
       "chapterID" : 26,
       "chapterNumber" : "26",
       "codeSectionID" : 1,
-      "preparedSectionCount" : 116,
+      "preparedSectionCount" : 117,
       "sectionCount" : 125
     },
     {
@@ -241,11 +241,11 @@
       "sectionCount" : 144
     },
     {
-      "blockCount" : 159,
+      "blockCount" : 160,
       "chapterID" : 31,
       "chapterNumber" : "31",
       "codeSectionID" : 1,
-      "preparedSectionCount" : 159,
+      "preparedSectionCount" : 160,
       "sectionCount" : 162
     },
     {
@@ -273,11 +273,11 @@
       "sectionCount" : 1
     },
     {
-      "blockCount" : 66,
+      "blockCount" : 67,
       "chapterID" : 35,
       "chapterNumber" : "35",
       "codeSectionID" : 1,
-      "preparedSectionCount" : 3,
+      "preparedSectionCount" : 4,
       "sectionCount" : 4
     },
     {
@@ -561,11 +561,11 @@
       "sectionCount" : 242
     },
     {
-      "blockCount" : 127,
+      "blockCount" : 139,
       "chapterID" : 71,
       "chapterNumber" : "6",
       "codeSectionID" : 4,
-      "preparedSectionCount" : 125,
+      "preparedSectionCount" : 128,
       "sectionCount" : 135
     },
     {
@@ -577,12 +577,12 @@
       "sectionCount" : 6
     },
     {
-      "blockCount" : 12,
+      "blockCount" : 4,
       "chapterID" : 73,
       "chapterNumber" : "8",
       "codeSectionID" : 4,
-      "preparedSectionCount" : 3,
-      "sectionCount" : 3
+      "preparedSectionCount" : 4,
+      "sectionCount" : 4
     },
     {
       "blockCount" : 413,
@@ -761,12 +761,12 @@
       "sectionCount" : 22
     },
     {
-      "blockCount" : 28,
+      "blockCount" : 4,
       "chapterID" : 96,
       "chapterNumber" : "15",
       "codeSectionID" : 6,
-      "preparedSectionCount" : 3,
-      "sectionCount" : 3
+      "preparedSectionCount" : 4,
+      "sectionCount" : 4
     },
     {
       "blockCount" : 0,
@@ -937,12 +937,12 @@
       "sectionCount" : 25
     },
     {
-      "blockCount" : 24,
+      "blockCount" : 4,
       "chapterID" : 118,
       "chapterNumber" : "15",
       "codeSectionID" : 5,
-      "preparedSectionCount" : 3,
-      "sectionCount" : 3
+      "preparedSectionCount" : 4,
+      "sectionCount" : 4
     }
   ],
   "generatedAt" : "2026-05-23T04:00:24Z",
