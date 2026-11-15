@@ -20,12 +20,18 @@ const context = vm.createContext({
   projectDetailKey: project => project.id, initialReportOutlineHidden,
   saveWorkspaceState() { saves++; disk = JSON.stringify(context.state); },
   syncReferenceReaderLayout() {}, saveStatus: {},
-  document: {createElement: () => ({className: '', setAttribute() {}, addEventListener(type, callback) {this[type] = callback;}})},
-  primaryActions: {insertBefore(button) {context.toggle = button;}}
+  setTimeout: () => 1, clearTimeout() {},
+  prependWorkspaceButtonIcon(button, icon) {button.icon = icon;},
+  document: {createElement: () => ({className: '', dataset: {}, attributes: {},
+    setAttribute(name, value) {this.attributes[name] = value;}, replaceChildren() {},
+    addEventListener(type, callback) {this[type] = callback;}})}
 });
 vm.runInContext(['projectSectionExpansionKey', 'projectSectionExpanded', 'persistProjectSectionExpansion'].map(declaration).join('\n') + `
 function mountReport(identity, blocks, dataset = {}) {
   const panel = {dataset}, activeDraft = {blocks}, reportSourceGroupExpanded = new Map();
+  const outlineHeader = {append(button) {globalThis.toggle = button;}};
+  const documents = {classList: {add() {}, remove() {}}};
+  let outlineRailTimer;
   ${source.slice(helpersStart, helpersEnd)}
   ${source.slice(toggleStart, toggleEnd)}
   return panel;
@@ -33,9 +39,13 @@ function mountReport(identity, blocks, dataset = {}) {
 const developed = [{kind:'heading'}, {kind:'heading'}];
 let panel = context.mountReport({id:'alpha'}, []);
 assert.equal(panel.dataset.outlineHidden, 'true');
+assert.equal(context.toggle.attributes['aria-label'], 'Show outline');
+assert.equal(context.toggle.icon, 'panel-left-open');
 assert.equal(saves, 0, 'automatic defaults must not become intentional preferences');
 context.toggle.click();
 assert.equal(panel.dataset.outlineHidden, 'false');
+assert.equal(context.toggle.attributes['aria-expanded'], 'true');
+assert.equal(context.toggle.icon, 'panel-left-close');
 context.state = JSON.parse(disk); // Refresh while a different workflow is open.
 panel = context.mountReport({id:'alpha'}, []);
 assert.equal(panel.dataset.outlineHidden, 'false', 'explicit show must survive Report disposal and page reload');

@@ -8,10 +8,28 @@ export const letterDocumentLayout = Object.freeze({
   tableSize: 8, tableLineSpacing: 1.3
 });
 
-export function applyLetterDocumentLayout(root) {
-  const page = letterDocumentLayout;
+export const reportPageFormats = Object.freeze({
+  letter: Object.freeze({label: 'Letter', dimensions: '8.5 × 11 in', width: 612, height: 792}),
+  a4: Object.freeze({label: 'A4', dimensions: '210 × 297 mm', width: 595.275590551, height: 841.88976378}),
+  legal: Object.freeze({label: 'Legal', dimensions: '8.5 × 14 in', width: 612, height: 1008}),
+  tabloid: Object.freeze({label: 'Tabloid', dimensions: '11 × 17 in', width: 792, height: 1224})
+});
+
+export function normalizeReportPageFormat(value = 'letter') {
+  if (!Object.hasOwn(reportPageFormats, value)) throw new Error('Choose Letter, A4, Legal, or Tabloid paper.');
+  return value;
+}
+
+export function reportDocumentLayout(format = 'letter') {
+  return {...letterDocumentLayout, ...reportPageFormats[normalizeReportPageFormat(format)]};
+}
+
+export function applyDocumentLayout(root, format = 'letter') {
+  const page = reportDocumentLayout(format);
   const px = points => `${points * 96 / 72}px`;
   const properties = {
+    '--document-page-width': px(page.width),
+    '--document-page-height': px(page.height),
     '--document-printable-width': px(page.width - 2 * page.margin),
     '--document-printable-height': px(page.height - 2 * page.margin),
     '--document-body-size': `${page.bodySize}pt`,
@@ -25,3 +43,5 @@ export function applyLetterDocumentLayout(root) {
   for (const [level, size] of Object.entries(page.headingSizes)) properties[`--document-heading-${level}-size`] = `${size}pt`;
   for (const [name, value] of Object.entries(properties)) root.style.setProperty(name, value);
 }
+
+export const applyLetterDocumentLayout = root => applyDocumentLayout(root, 'letter');

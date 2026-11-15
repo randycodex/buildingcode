@@ -1,10 +1,10 @@
 import { normalizeProjectDetailsWidths } from './project-details-columns.js?v=20261019-project-workflow-v2';
 
 const views = ['research', 'notebook', 'report', 'project-details', 'account'];
-export const reportResumeFlags = ['libraryOpen', 'outlineHidden', 'comparisonOpen', 'versionsCollapsed'];
+export const reportResumeFlags = ['libraryOpen', 'outlineHidden', 'reportsHidden', 'comparisonOpen', 'versionsCollapsed'];
 export const reportResumeWidths = ['libraryWidth', 'outlineWidth', 'versionsWidth', 'reportComparisonWidth', 'pdfComparisonWidth'];
 export const reportResumeScrolls = {
-  document: '.report-document', outline: '.report-outline', sources: '.report-source-picker', columns: '.report-document-columns'
+  document: '.report-document', outline: '.report-outline', sources: '.report-source-picker', reports: '.report-list-items', columns: '.report-document-columns'
 };
 const id = value => typeof value === 'string' ? value.slice(0, 300) : '';
 const position = value => Number.isFinite(Number(value)) ? Math.max(0, Number(value)) : 0;

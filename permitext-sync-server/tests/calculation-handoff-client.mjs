@@ -23,6 +23,7 @@ for(const stale of [false,true]) {
   state:{workflowNavigationGeneration:0},activeWorkspaceID:'workspace',captureAccountRequest:()=>({userID:'owner'}),
   isCurrentAccountRequest:()=>true,hasCapability:()=>true,workspaceProject:()=>({id:'project'}),researchProjectID:()=> 'project',researchCodeEdition:()=> '2022',
   crypto:{randomUUID:()=> 'synthetic-id'},document:{createElement:()=>({blocks:[],append(block){this.blocks.push(block);}})},
+  projectCalculationStore:()=>calculationDraftStore(localStorage,'private-owner:calculator-drafts:v1'), syncedProjectCalculations:()=>null,
   createOccupantLoadCard:o=>{options=o;return {isConnected:true,addEventListener(){},closest:()=>({dataset:{paneId:'reader'}})};},
   resolveReaderSource:async()=>source,api:async()=>{await gate;return {section:{...source,blocks}};},
   sectionRecordMatchesRequestedEdition:()=>true,renderCodeBlock:()=>({text:'Exact canonical text'}),

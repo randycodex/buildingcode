@@ -1,0 +1,56 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+
+// Exercise the live list's wiring without creating or deleting user reports.
+class Element {
+  constructor() {this.dataset={};this.attributes={};this.events={};this.children=[];this.classes=new Set();this.hidden=false;this.scrollTop=0;}
+  append(...nodes) {this.children.push(...nodes);}
+  replaceChildren(...nodes) {this.children=[...nodes];}
+  setAttribute(key,value) {this.attributes[key]=value;}
+  addEventListener(type,handler) {this.events[type]=handler;}
+  focus(options) {this.focusOptions=options;}
+  get classList() {return {toggle:(key,on)=>on?this.classes.add(key):this.classes.delete(key),add:key=>this.classes.add(key),remove:key=>this.classes.delete(key)};}
+}
+const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+const start=app.indexOf("    const reportsRail = document.createElement('aside');");
+const end=app.indexOf('    titleControl.append(',start);
+assert(start>0&&end>start);
+const selections=[],preferences=[];
+let resizes=0,cancels=0;
+const current={id:'one',title:'First report'},other={id:'two',title:'Second report'};
+const c=vm.createContext({document:{createElement:()=>new Element()},panel:{dataset:{}},
+  activeDraft:current,drafts:[current,other],recoveredDrafts:[],reportLibraryScroll:{reports:0},
+  deleteButton:new Element(),documents:new Element(),reportsRailTimer:null,refreshReportList:null,
+  reportSectionExpanded:()=>true,persistReportSectionExpanded:(key,value)=>preferences.push([key,value]),
+  reportSwitch:{select:async id=>selections.push(id),cancel:()=>cancels++},
+  prependWorkspaceButtonIcon:(element,icon)=>{element.icon=icon;},
+  clearTimeout(){},setTimeout:()=>1,syncReferenceReaderLayout:()=>resizes++});
+vm.runInContext(`function build(){${app.slice(start,end)}
+  return {rail:reportsRail,options:reportOptions,toggle:reportsToggle,create:createNew};}
+  globalThis.list=build();`,c);
+const {list}=c;
+assert.equal(list.rail.attributes['aria-label'],'Project reports');
+assert.equal(list.options.children.length,2);
+assert.equal(list.options.children[0].attributes['aria-current'],'true');
+list.options.children[0].events.click();assert.equal(cancels,1);
+list.options.children[1].events.click();assert.deepEqual(selections,['two']);
+list.create.events.click();assert.deepEqual(selections,['two','__new__']);
+list.toggle.events.click();
+assert.equal(c.panel.dataset.reportsHidden,'true');assert.equal(list.options.hidden,true);
+assert.equal(list.toggle.attributes['aria-label'],'Show reports list');
+assert.equal(list.toggle.attributes['aria-expanded'],'false');
+assert.equal(c.deleteButton.hidden,true);
+list.toggle.events.click();
+assert.equal(c.panel.dataset.reportsHidden,'false');assert.equal(list.options.hidden,false);
+assert.equal(list.toggle.attributes['aria-label'],'Hide reports list');
+assert.equal(resizes,2);assert.deepEqual(preferences,[['Reports column',false],['Reports column',true]]);
+c.activeDraft={...current,title:'Renamed report'};c.refreshReportList();
+assert.equal(list.options.children[0].textContent,'Renamed report');
+assert.equal(list.options.children[0].attributes['aria-current'],'true');
+c.activeDraft={title:'Untitled Report'};c.refreshReportList();
+assert.equal(list.options.children.length,3,'A new unsaved document has a selected list row');
+assert.equal(list.options.children[0].attributes['aria-current'],'true');
+c.activeDraft={...c.activeDraft,id:'three'};c.drafts.unshift(c.activeDraft);c.refreshReportList();
+assert.equal(list.options.children.length,3,'Autosave replaces the unsaved row without duplicating it');
+console.log('Reports list passed: current document, switching, creation, renamed/autosaved rows, collapse, restore and project preference.');

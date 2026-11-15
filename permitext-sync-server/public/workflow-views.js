@@ -60,8 +60,8 @@ export function notebookReferenceVisibility({readerOpen, evidenceOpen, active = 
   }
   return {readerOpen, evidenceOpen, compact};
 }
-// Notebook reserves its writing page first. A single Reader can fit the
-// remaining reference space without moving or shrinking the writing page.
+// Notebook reserves its writing page and the expanded Notes list first.
+// Collapsing Notes gives that space to the editor, keeping references stable.
 export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0, sharedReferenceWidth = 0) {
   const available = Math.max(0, availableWidth - dividerWidth);
   const shared = column => sharedReferenceWidth > 0 && ['reader', 'evidence'].includes(column.kind);
@@ -71,7 +71,9 @@ export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0,
   const widths = columns.map((column, index) => column.collapsed || column.kind === 'editor' ? minimums[index] :
     Math.max(minimums[index], Math.min(shared(column) ? 600 : {reader:Infinity, evidence:600, notes:300}[column.kind] || 360,
       shared(column) ? sharedReferenceWidth : Number(column.preferredWidth) || {reader:630, evidence:300, notes:300}[column.kind] || 300)));
-  let excess = widths.reduce((sum, width) => sum + width, 0) - available;
+  const notesReserve = columns.reduce((sum, column, index) => sum +
+    (column.kind === 'notes' && column.collapsed ? 300 - minimums[index] : 0), 0);
+  let excess = widths.reduce((sum, width) => sum + width, 0) + notesReserve - available;
   columns.forEach((column, index) => {
     if (column.collapsed || !['reader', 'evidence'].includes(column.kind) || excess <= 0) return;
     const reduction = Math.min(excess, Math.max(0, widths[index] - 300));

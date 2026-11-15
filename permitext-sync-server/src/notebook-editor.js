@@ -233,11 +233,25 @@ function PermitextFormattingToolbar({ editor, options }) {
     editor,
     selector: ({ editor }) => {
       const history = editor.getExtension('yUndo') || editor.getExtension('history');
+      const styles = editor.getActiveStyles();
+      let fontSize = styles.fontSize;
+      if (!fontSize && typeof getComputedStyle === 'function') {
+        // Read inherited body, heading and table-cell sizes at the caret too.
+        const tiptap = editor._tiptapEditor;
+        const view = editor.domElement?.isConnected ? editor.prosemirrorView : null;
+        if (view?.dom?.isConnected) {
+          const node = view.domAtPos(tiptap.state.selection.from).node;
+          const element = node.nodeType === 1 ? node : node.parentElement;
+          const pixels = element && parseFloat(getComputedStyle(element).fontSize);
+          if (pixels) fontSize = notebookFontSize(String(Math.round(pixels * 1.5) / 2));
+        }
+      }
       return {
         editable: editor.isEditable,
         canUndo: Boolean(history && editor.canExec(history.undoCommand)),
         canRedo: Boolean(history && editor.canExec(history.redoCommand)),
-        styles: editor.getActiveStyles(),
+        styles,
+        fontSize,
         blocks: editor.getSelection()?.blocks || [editor.getTextCursorPosition().block]
       };
     }
@@ -299,7 +313,7 @@ function PermitextFormattingToolbar({ editor, options }) {
     React.createElement(Menu.Dropdown,{className:'notebook-format-style-menu','aria-label':label},...choices.map(choice=>React.createElement(Menu.Item,
       {key:choice.value,className:'notebook-format-style-option',disabled:choice.disabled,
         'aria-current':choice.selected?'true':undefined,onClick:()=>{if(!restoreSelection(formatSelection.current))return;editor.focus();apply(choice.value);}},choice.label))));
-  const sizeMenu = formatMenu('Font size',state.styles.fontSize || 'Size',
+  const sizeMenu = formatMenu('Font size',state.fontSize ? `${state.fontSize} pt` : 'Size',
     [{value:'default',label:'Default',selected:!state.styles.fontSize},...notebookFontSizes.map(value=>({value,label:`${value} pt`,selected:state.styles.fontSize===value}))],
     value=>value==='default'?editor.removeStyles({fontSize:state.styles.fontSize || ''}):editor.addStyles({fontSize:value}),!inlineSelection);
   const spacing = first?.props?.lineSpacing || 'normal';
@@ -334,7 +348,27 @@ function PermitextFormattingToolbar({ editor, options }) {
       if(value==='remove-table')editor.removeBlocks([table]);
     }
   });
+  const textStyleMenu = React.createElement(Menu, {position: "bottom-start", offset: 8, withinPortal: false, width: 180, loop: true, returnFocus: false},
+    React.createElement(Menu.Target, null,
+      React.createElement("button", {
+        ref: textStyleButton, type: "button", className: "notebook-format-style notebook-format-text-style", "aria-label": "Text style",
+        disabled: !state.editable || !textBlocks.length,
+        onMouseDown: event => event.preventDefault()
+      }, type.startsWith("heading-") ? `Heading ${type.slice(-1)}` : "Body")),
+    React.createElement(Menu.Dropdown, {
+      className: "notebook-format-style-menu", "aria-label": "Text style",
+      onKeyDown: event => { if (event.key === "Escape") textStyleButton.current?.focus(); }
+    },
+      ...[["paragraph", "Body"], ["heading-1", "Heading 1"], ["heading-2", "Heading 2"], ["heading-3", "Heading 3"]]
+        .map(([value, label]) => React.createElement(Menu.Item, {
+          key: value, className: "notebook-format-style-option", "aria-current": type === value ? "true" : undefined,
+          onClick: () => value.startsWith("heading-")
+            ? setBlockType("heading", {level: Number(value.slice(-1))}) : setBlockType("paragraph")
+        }, label))));
+  const group = (label, ...children) => React.createElement('div',
+    {className:'format-toolbar-group',role:'group','aria-label':label}, ...children);
   return React.createElement("div", {className: "notebook-format-toolbar", role: "toolbar", "aria-label": "Note formatting"},
+    group('History',
     React.createElement("button", {
       type: "button", className: "notebook-format-button notebook-format-undo",
       title: "Undo (⌘Z / Ctrl+Z)", "aria-label": "Undo", disabled: !state.editable || !state.canUndo,
@@ -346,7 +380,9 @@ function PermitextFormattingToolbar({ editor, options }) {
       title: "Redo (⌘⇧Z / Ctrl+Shift+Z)", "aria-label": "Redo", disabled: !state.editable || !state.canRedo,
       onMouseDown: event => event.preventDefault(),
       onClick: () => {editor.focus(); editor.redo();}
-    }, icon(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"])),
+    }, icon(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"]))),
+    group('Text style and size', textStyleMenu, sizeMenu),
+    group('Emphasis',
     styleButton("bold", "Bold", React.createElement("strong", null, "B")),
     styleButton("italic", "Italic", React.createElement("em", null, "I")),
     styleButton("underline", "Underline", React.createElement("u", null, "U")),
@@ -361,29 +397,12 @@ function PermitextFormattingToolbar({ editor, options }) {
         if (state.styles.backgroundColor === "yellow") editor.removeStyles({backgroundColor: "yellow"});
         else editor.addStyles({backgroundColor: "yellow"});
       }
-    }, icon(["M5 12l6-8 5 4-6 8-5-4Z", "M5 12l-2 5h6", "M2 19h15"])),
-    React.createElement(Menu, {position: "bottom-start", offset: 8, withinPortal: false, width: 180, loop: true, returnFocus: false},
-      React.createElement(Menu.Target, null,
-        React.createElement("button", {
-          ref: textStyleButton, type: "button", className: "notebook-format-style", "aria-label": "Text style",
-          disabled: !state.editable || !textBlocks.length,
-          onMouseDown: event => event.preventDefault()
-        }, type.startsWith("heading-") ? `Heading ${type.slice(-1)}` : "Body")),
-      React.createElement(Menu.Dropdown, {
-        className: "notebook-format-style-menu", "aria-label": "Text style",
-        onKeyDown: event => { if (event.key === "Escape") textStyleButton.current?.focus(); }
-      },
-        ...[["paragraph", "Body"], ["heading-1", "Heading 1"], ["heading-2", "Heading 2"], ["heading-3", "Heading 3"]]
-          .map(([value, label]) => React.createElement(Menu.Item, {
-            key: value, className: "notebook-format-style-option", "aria-current": type === value ? "true" : undefined,
-            onClick: () => value.startsWith("heading-")
-              ? setBlockType("heading", {level: Number(value.slice(-1))}) : setBlockType("paragraph")
-          }, label)))),
-    sizeMenu,
-    spacingMenu,
-    tableMenu,
+    }, icon(["M5 12l6-8 5 4-6 8-5-4Z", "M5 12l-2 5h6", "M2 19h15"]))),
+    group('Paragraph',
     listButton("bulletListItem", "Bulleted list", icon(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])),
     listButton("numberedListItem", "Numbered list", icon(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])),
+    spacingMenu),
+    group('Insert',
     React.createElement("span", {className:"notebook-format-link"},
       React.createElement("button", {type:"button", className:"notebook-format-button", title:"Link", "aria-label":"Link", "aria-expanded":linkOpen,
         disabled:!state.editable || !inlineSelection, onMouseDown:event=>event.preventDefault(), onClick:openLink},
@@ -396,6 +415,7 @@ function PermitextFormattingToolbar({ editor, options }) {
         React.createElement("div", null,
           React.createElement("button", {type:"submit"}, "Apply link"),
           React.createElement("button", {type:"button", onClick:()=>{setLinkOpen(false);if(restoreSelection(linkSelection.current)) editor.focus();}}, "Cancel")))) ,
+    tableMenu,
     options.toolbarInsertElement ? React.createElement("span", {className: "notebook-format-insert-slot",
       ref: element => { if (element && options.toolbarInsertElement.parentElement !== element) element.append(options.toolbarInsertElement); }})
       : options.onInsert && React.createElement("details", {className: "notebook-format-insert"},
@@ -405,7 +425,7 @@ function PermitextFormattingToolbar({ editor, options }) {
             onMouseDown:event=>event.preventDefault(), onClick:event=>{
               event.currentTarget.closest("details").open = false;
               options.onInsert(kind);
-            }}, label)))),
+            }}, label))))),
     React.createElement("span", {className:"notebook-format-save-status", role:"status",
       ref:element=>{
         if (element && options.toolbarStatusElement && options.toolbarStatusElement.parentElement !== element) element.append(options.toolbarStatusElement);

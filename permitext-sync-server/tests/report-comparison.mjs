@@ -1,5 +1,31 @@
 import assert from 'node:assert/strict';
-import {reportComparisonLayout, createReportComparison, preserveReportReadingPosition, preservePDFReadingPosition, resetReportColumnWidths} from '../public/report-comparison.js';
+import {reportComparisonLayout, reportOutlineRailWidth, createReportComparison, preserveReportReadingPosition, preservePDFReadingPosition, resetReportColumnWidths} from '../public/report-comparison.js';
+
+for (const available of [1100, 1671, 2288]) {
+  for (const collapsed of [false, true]) {
+    const rail = reportOutlineRailWidth(collapsed);
+    assert.equal(rail, collapsed ? 35 : 300);
+    const layout = reportComparisonLayout(available, {sources: 300, outline: rail,
+      minimumReportWidth: 728, outlineDivider: false});
+    assert.equal(layout.sourcesWidth, 300, 'Collapsing Outline leaves the independent Sources column at its chosen width');
+    assert.equal(layout.documentTemplate, `${rail}px 0px minmax(728px, 1fr) 0px 0px`,
+      'The outline rail and printable report share a group without an internal divider');
+    const compared = reportComparisonLayout(available, {sources: 300, outline: rail,
+      minimumReportWidth: 728, outlineDivider: false, comparing: true});
+    assert.equal(compared.documentTemplate, `${rail}px 0px minmax(728px, 1fr) 1px minmax(600px, 1fr)`);
+    assert.equal(compared.versionsWidth, 300, 'The outline rail keeps saved PDF versions available');
+    for (const reports of [300,35]) {
+      const listed=reportComparisonLayout(available,{sources:300,outline:rail,reports,
+        minimumReportWidth:728,outlineDivider:false});
+      assert.equal(listed.documentTemplate,`${rail}px 0px minmax(728px, 1fr) ${reports}px 0px 0px`,
+        'The Reports list stays immediately right of the editor without shrinking its printable minimum');
+      const listedComparison=reportComparisonLayout(available,{outline:rail,reports,
+        minimumReportWidth:728,outlineDivider:false,comparing:true});
+      assert.equal(listedComparison.documentTemplate,`${rail}px 0px minmax(728px, 1fr) ${reports}px 1px minmax(600px, 1fr)`);
+      assert.equal(listedComparison.minimumWidth,rail+reports+728+600+300+2);
+    }
+  }
+}
 
 const full = reportComparisonLayout(1920, {sources: 330, outline: 300, comparing: true, reportWidth: 900});
 assert.equal(full.minimumWidth, 2434, 'Retain document minimums while their viewport owns overflow');
@@ -254,4 +280,22 @@ assert.equal(reviews.length, 5, 'Changed account context cannot open a private P
 assert.equal(comparison.removeVersion('second'), false, 'Changed account context cannot close a private PDF');
 comparison.dispose();
 assert.ok(resized > 0);
+const railPanel = new Element(), railHost = new Element();
+railPanel.dataset.outlineHidden = 'true';
+railHost.document = Object.assign(new Element(), {width: 800});
+railPanel.dataset.libraryOpen = 'true'; railPanel.dataset.libraryWidth = '300';
+const railComparison = createReportComparison({panel: railPanel, columns: () => railHost,
+  availableWidth: () => 2300, isCurrent: () => true, onResize() {},
+  outlineWidth: () => reportOutlineRailWidth(railPanel.dataset.outlineHidden === 'true'),
+  minimumReportWidth: () => 728, outlineDivider: false});
+railComparison.divider.events.keydown({key: 'Home', preventDefault() {}});
+assert.equal(railPanel.dataset.reportComparisonWidth, '728', 'PDF resizing preserves the printable editor minimum');
+railComparison.divider.events.keydown({key: 'End', preventDefault() {}});
+assert.equal(Number(railPanel.dataset.reportComparisonWidth), 831,
+  'Balancing accounts for the 35px Outline rail without adding an internal divider');
+railPanel.dataset.outlineHidden = 'false';
+railComparison.divider.events.keydown({key: 'End', preventDefault() {}});
+assert.equal(Number(railPanel.dataset.reportComparisonWidth), 728,
+  'Expanding Outline still reserves the full printable editor width during comparison');
+railComparison.dispose();
 console.log('Report comparison passed: five-column order, document minimums, separate PDF mount, retained draft/page state, stale-selection fences, resizing and cleanup.');

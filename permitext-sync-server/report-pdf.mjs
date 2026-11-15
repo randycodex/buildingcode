@@ -1,5 +1,6 @@
 import PDFDocument from "pdfkit";
-import {letterDocumentLayout as documentLayout} from './public/document-layout.js';
+import {captureReportEditLayout} from './report-edit-layout.mjs';
+import {letterDocumentLayout as documentLayout, reportDocumentLayout} from './public/document-layout.js';
 import { notebookTableDisplayData, tableDisplayCells } from './public/notebook-content.js';
 import {researchAnswerURL} from './public/research-answer-links.js';
 
@@ -62,7 +63,7 @@ function drawNotebookContent(document, notebookDocument, material) {
   document.x = left;
 }
 import { fileURLToPath } from "node:url";
-import { reportEvidenceDisplayText, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation, reportItemPreview } from "./report-presentation.mjs";
+import { reportEvidenceDisplayText, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation, reportItemPreview, reportCalculationPresentation } from "./report-presentation.mjs";
 import { reportBlockRuns, reportRunsLines } from "./public/report-rich-text.js";
 import { sourceFormattingRuns, sourceTextStyles } from "./public/report-source-formatting.js";
 
@@ -145,6 +146,34 @@ function drawTextSection(document, title, body) {
   document.font("Report-Regular").fontSize(9.5).text(body, { lineGap: 2, paragraphGap: 8 });
 }
 
+function drawCalculation(document, item, startX, width) {
+  const calculation = reportCalculationPresentation(item);
+  document.fillColor(colors.ink).font('Report-Bold').fontSize(12).text(item.title, {paragraphGap: 8});
+  if (!calculation) {
+    document.font('Report-Regular').fontSize(9.5).text(printableNoteText(item.plainText || ''), {width});
+    return;
+  }
+  document.font('Report-Regular').fontSize(8.5).fillColor(colors.muted).text('Occupant load', {paragraphGap: 3});
+  document.font('Report-Bold').fontSize(17).fillColor(colors.ink).text(calculation.result, {paragraphGap: 6});
+  document.font('Report-Regular').fontSize(9.5).text(calculation.equation, {width, paragraphGap: 14});
+  const labelWidth = 126, gap = 16, valueWidth = width - labelWidth - gap;
+  for (const row of calculation.rows) {
+    document.font('Report-Regular').fontSize(9.5);
+    const height = Math.max(document.heightOfString(row.label, {width: labelWidth, lineGap: 2}),
+      document.heightOfString(row.value, {width: valueWidth, lineGap: 2}));
+    ensureVerticalSpace(document, height + 8);
+    const top = document.y;
+    document.fillColor(colors.muted).text(row.label, startX, top, {width: labelWidth, lineGap: 2});
+    document.fillColor(colors.ink).text(row.value, startX + labelWidth + gap, top, {width: valueWidth, lineGap: 2});
+    document.x = startX; document.y = top + height + 8;
+  }
+  document.moveDown(0.5);
+  drawTextSection(document, 'Table row and footnotes', calculation.basis);
+  drawTextSection(document, 'Source', calculation.source);
+  ensureVerticalSpace(document, 38);
+  document.font('Report-Regular').fontSize(8.5).fillColor(colors.muted).text(calculation.review, {width, lineGap: 2});
+}
+
 function drawClassification(document, classification) {
   document.font("Report-Regular").fontSize(7.5).fillColor(colors.muted)
     .text((classificationLabels[classification] || "Project material").toUpperCase(), {paragraphGap:6});
@@ -185,6 +214,9 @@ export function drawReportTable(document, table, startX, contentWidth) {
   const measure = row => Math.max(...row.map(value =>
     document.heightOfString(value, {width: width - 10, lineGap: 0}))) + 12;
   const heights = rows.map(measure);
+  const completeHeight = heights.reduce((sum, height) => sum + height, 0);
+  const printableHeight = document.page.height - document.page.margins.top - document.page.margins.bottom - 2;
+  if (completeHeight <= printableHeight) ensureVerticalSpace(document, completeHeight + 2);
   const headerHeight = heights.slice(0,headers.length).reduce((sum,height) => sum + height,0);
   let position = headers.length;
   while (position < rows.length || position === headers.length && position === rows.length) {
@@ -218,13 +250,12 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
     ? `${item.question.slice(0, 95).trimEnd()}…` : item.question) || "Project content";
   const titleHeight = document.heightOfString(sourceTitle, { width, paragraphGap: 7 });
   document.font("Report-Regular").fontSize(9.5);
-  const calculationHeight = item.kind === "notebookCard" && item.cardType === "calculation"
+  const calculationHeight = item.kind === "calculation" || item.kind === "notebookCard" && item.cardType === "calculation"
     ? document.heightOfString(item.plainText || "", { width, lineGap: 2, paragraphGap: 8 }) + titleHeight + 55 : 0;
   const pageSpace = document.page.height - document.page.margins.top - document.page.margins.bottom;
   ensureVerticalSpace(document, calculationHeight && calculationHeight < pageSpace ? calculationHeight : Math.max(105, titleHeight + 65));
   const startX = document.x;
   const contentWidth = document.page.width - document.page.margins.left - document.page.margins.right;
-  if (showClassification) drawClassification(document, item.sourceClassification);
 
   const formatted = annotatedSourceParts(item);
   if (hasSourceMarks(formatted)) {
@@ -266,6 +297,8 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
         document.x=startX;document.moveDown(0.7);
       } else document.font('Report-Regular').fontSize(9.5).text(part.text,{width:contentWidth,lineGap:2,paragraphGap:8});
     }
+  } else if (item.kind === 'calculation') {
+    drawCalculation(document, item, startX, contentWidth);
   } else if (item.kind === "notebookCard") {
     document
       .fillColor(colors.ink)
@@ -346,11 +379,13 @@ function drawCover(document, manifest) {
       );
   }
   document.moveDown(1.4);
+  document._reportBegin?.('__title', 'title');
   document
     .fillColor(colors.ink)
     .font("Report-Bold")
     .fontSize(28)
     .text(manifest.title, { width: contentWidth, lineGap: 3 });
+  document._reportEnd?.();
   document.moveDown(1.2);
   document
     .font("Report-Bold")
@@ -495,6 +530,8 @@ export function drawReportRichTable(document, table, startX, contentWidth, {head
     });
     return drawReportRichTable(document,{...table,rows:expanded,cellSpans:spans},startX,contentWidth,{headerBold});
   }
+  const completeHeight = sum(0, runs.length);
+  if (completeHeight <= pageHeight) ensureVerticalSpace(document, completeHeight + 2);
   let position = headers;
   while (position < runs.length || position === headers && position === runs.length) {
     const bottom = document.page.height-document.page.margins.bottom-2;
@@ -531,6 +568,9 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
   document.addPage();
   let previousSourceClassification = null;
   (manifest.items || []).forEach((item, index, items) => {
+    document._reportBegin?.(item.id, item.kind);
+    try {
+    if (document._reportEmptyPreview && item.id === '__empty') return;
     const sourceParts = annotatedSourceParts(item);
     const markedText = sourceParts.find(part=>part.kind === 'text' && part.runs.some(hasInlineStyle))?.runs;
     if (!["heading","paragraph","list"].includes(item.kind) && hasSourceMarks(sourceParts)) {
@@ -556,6 +596,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
         reserveHeading(document, noteTitle, item.text, { size: 12, gap: 7, bodySize: 10 });
         document.fillColor(colors.ink).font("Report-Bold").fontSize(12).text(noteTitle, { paragraphGap: 7 });
       } else ensureVerticalSpace(document, 55);
+      document._reportEditBody?.();
       if (item.notebookDocument) drawNotebookContent(document, item.notebookDocument, projectMaterialBySourceID);
       else if (item.richText || markedText) drawReportRichText(document, item.richText || markedText);
       else drawReportRichText(document, [{text:printableNoteText(item.text)}]);
@@ -601,7 +642,6 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
     }
     if (item.kind === "projectFacts") {
       ensureVerticalSpace(document, 90);
-      drawClassification(document, item.sourceClassification);
       document
         .fillColor(colors.ink)
         .font("Report-Bold")
@@ -627,6 +667,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
     drawSourceItem(document, item, projectMaterialBySourceID, presentation,
       previousSourceClassification !== item.sourceClassification);
     previousSourceClassification = item.sourceClassification;
+    } finally {document._reportEnd?.();}
   });
 
 }
@@ -696,10 +737,11 @@ function drawPageFooters(document, manifest) {
   }
 }
 
-export async function renderReportPDF(manifest, { projectMaterialBySourceID = new Map() } = {}) {
+export async function renderReportPDF(manifest, { projectMaterialBySourceID = new Map(), onLayout, emptyPreview = false } = {}) {
+  const pageLayout = reportDocumentLayout(manifest.pageFormat || 'letter');
   const document = new PDFDocument({
-    size: [documentLayout.width, documentLayout.height],
-    margins: { top: documentLayout.margin, right: documentLayout.margin, bottom: documentLayout.margin, left: documentLayout.margin },
+    size: [pageLayout.width, pageLayout.height],
+    margins: { top: pageLayout.margin, right: pageLayout.margin, bottom: pageLayout.margin, left: pageLayout.margin },
     bufferPages: true,
     autoFirstPage: true,
     tagged: true,
@@ -716,6 +758,8 @@ export async function renderReportPDF(manifest, { projectMaterialBySourceID = ne
   });
   document.registerFont("Report-Regular", fileURLToPath(new URL("./fonts/DejaVuSans.ttf", import.meta.url)));
   document.registerFont("Report-Bold", fileURLToPath(new URL("./fonts/DejaVuSans-Bold.ttf", import.meta.url)));
+  const readLayout = onLayout ? captureReportEditLayout(document) : null;
+  document._reportEmptyPreview = emptyPreview;
   const chunks = [];
   document.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
   const completed = new Promise((resolve, reject) => {
@@ -726,6 +770,7 @@ export async function renderReportPDF(manifest, { projectMaterialBySourceID = ne
   drawCover(document, manifest);
   drawProfessionalNotice(document, manifest);
   drawBody(document, manifest, projectMaterialBySourceID);
+  if (readLayout) onLayout(readLayout());
   drawPageFooters(document, manifest);
   document.end();
   return completed;

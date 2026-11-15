@@ -252,10 +252,10 @@ export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '',
 function calculationDraftLabel(item) {
   const input = item.input;
   const description = [input.spaceFunction, input.area ? `${input.area} ft²` : ''].filter(Boolean).join(' · ');
-  return `${input.spaceName || description || 'New calculation'} · ${item.savedNote ? 'has saved Note' : 'Device draft'}`;
+  return `${input.spaceName || description || 'New calculation'} · ${item.serverVersion ? 'Project calculation' : 'Device draft'}`;
 }
 
-export function createOccupantLoadCard({draft = {}, column = false, onDraftChange, savedNote = null, getDestinationNote, savedInputFingerprint = "", recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
+export function createOccupantLoadCard({draft = {}, column = false, projectSyncState = null, onDraftChange, savedNote = null, getDestinationNote, savedInputFingerprint = "", recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
   const initialDraft = {...draft};
   let areaMeasurementBasis = draft.areaMeasurementBasis || draft.areaBasis || '';
   let userMeasurementBasis = draft.userMeasurementBasis ?? draft.areaBasis ?? '';
@@ -273,7 +273,7 @@ export function createOccupantLoadCard({draft = {}, column = false, onDraftChang
   const draftState = document.createElement('p'); draftState.className = 'calculation-draft-state';
   draftState.textContent = 'Device draft · inputs are saved on this device';
   const recentLabel = document.createElement('label'); recentLabel.textContent = 'Recent calculations';
-  const recent = document.createElement('select'); recent.setAttribute('aria-label', 'Recent calculations');
+  const recent = document.createElement('select'); recent.className = 'calculation-draft-select'; recent.setAttribute('aria-label', 'Recent calculations');
   for (const item of recentDrafts) {
     const option = document.createElement('option'); option.value = item.id;
     option.textContent = calculationDraftLabel(item);
@@ -281,13 +281,13 @@ export function createOccupantLoadCard({draft = {}, column = false, onDraftChang
   }
   recent.value = activeDraftID;
   recent.addEventListener('change', () => onChooseDraft?.(recent.value));
-  const newDraft = document.createElement('button'); newDraft.type = 'button'; newDraft.className = 'ghost-button'; newDraft.textContent = 'New calculation';
+  const newDraft = document.createElement('button'); newDraft.type = 'button'; newDraft.className = 'ghost-button calculation-new-draft'; newDraft.textContent = 'New calculation';
   newDraft.addEventListener('click', () => onNewDraft?.());
-  const reloadDraft = document.createElement('button'); reloadDraft.type = 'button'; reloadDraft.className = 'ghost-button'; reloadDraft.textContent = 'Reload device draft'; reloadDraft.hidden = true;
+  const reloadDraft = document.createElement('button'); reloadDraft.type = 'button'; reloadDraft.className = 'ghost-button'; reloadDraft.textContent = 'Reload calculation'; reloadDraft.hidden = true;
   reloadDraft.addEventListener('click', () => onReloadDraft?.());
   recentLabel.append(recent);
   if (!column) draftTools.append(draftState);
-  draftTools.append(reloadDraft, recentLabel, newDraft);
+  draftTools.append(reloadDraft, newDraft, recentLabel);
   const fields = {};
   for (const [key, label, options] of [
     ['spaceName', 'Space / room name (optional)', null],
@@ -347,6 +347,7 @@ export function createOccupantLoadCard({draft = {}, column = false, onDraftChang
       recent.append(option);
     }
     recent.value = currentID;
+    recent._syncCustomSelect?.();
   };
   root.addEventListener('calculation-context-changed',()=>{invalidatedAnswerID=(getAssessment?.()||assessment)?.answerID||'';assessment=null;update();});
   root.addEventListener('calculation-assessment-refreshed',()=>update());
@@ -362,6 +363,27 @@ export function createOccupantLoadCard({draft = {}, column = false, onDraftChang
     staleDraft = true; reloadDraft.hidden = false;
     Object.values(fields).forEach(field => field.disabled = true);
     update();
+  };
+  root.setProjectSyncState = next => {projectSyncState = next; update();};
+  root.applyProjectDraft = next => {
+    if (busy || !table) return false;
+    if (draft.spaceLocation !== next.spaceLocation) invalidatedAnswerID = (getAssessment?.() || assessment)?.answerID || '';
+    for (const key of Object.keys(initialDraft)) delete initialDraft[key];
+    Object.assign(initialDraft, next);
+    for (const key of Object.keys(draft)) delete draft[key];
+    Object.assign(draft, next);
+    areaMeasurementBasis = next.areaMeasurementBasis || next.areaBasis || '';
+    userMeasurementBasis = next.userMeasurementBasis ?? next.areaBasis ?? '';
+    customFactor = next.factorMode === 'custom' ? next.factor || '' : '';
+    reason.value = next.customReason || '';
+    for (const key of ['spaceName', 'spaceLocation', 'area', 'seating']) fields[key].value = next[key] || '';
+    fields.spaceFunction.value = occupantLoadSuggestedRow(next, table)?.id || '';
+    selectedRowID = fields.spaceFunction.value;
+    fields.factorMode.value = next.factorMode === 'custom' ? 'custom' : 'table';
+    staleDraft = false; reloadDraft.hidden = true;
+    Object.values(fields).forEach(field => {field.disabled = false; field._syncCustomSelect?.();});
+    update();
+    return true;
   };
   const values = () => occupantLoadTableInput({area: fields.area.value, seating: fields.seating.value,
     spaceLocation: Object.hasOwn(occupantLoadSpaceLocations, fields.spaceLocation.value) ? fields.spaceLocation.value : '',
@@ -430,7 +452,12 @@ export function createOccupantLoadCard({draft = {}, column = false, onDraftChang
     formula.textContent = hasResult ? ''
       : special ? row.factorText : fixedSeating ? 'Fixed seating uses a separate calculation method.' : calculation.errors[0];
     const changed = savedCard && fingerprint(calculation) !== savedFingerprint;
-    draftState.textContent = staleDraft ? 'Updated in another view · reload this device draft to continue' : savedCard ? (changed ? 'Device draft · changes have not been saved to a new Note' : 'Saved snapshot in Notebook · editable device draft') : 'Device draft · inputs are saved on this device';
+    draftState.hidden = Boolean(projectSyncState && projectSyncState.state !== 'error' && !staleDraft);
+    draftState.textContent = staleDraft ? 'Updated in another view · reload to continue. Your edits are preserved.'
+      : projectSyncState ? projectSyncState.state === 'error'
+        ? `Saved on this device · sync pending. ${projectSyncState.error}`
+        : projectSyncState.state === 'saved' ? '' : 'Saving calculation to project…'
+      : savedCard ? (changed ? 'Device draft · changes have not been saved to a new Note' : 'Saved snapshot in Notebook · editable device draft') : 'Device draft · inputs are saved on this device';
     save.disabled = staleDraft || busy || !calculation.valid || !canSave;
     const destination = getDestinationNote?.();
     save.textContent = savedCard && !changed ? `Added to ${savedCard.title || 'Notebook'}`
@@ -480,6 +507,7 @@ export function createOccupantLoadCard({draft = {}, column = false, onDraftChang
   root.addEventListener('toggle', async () => {
     if (!root.open || table || loading) return;
     loading = true;
+    onControlsReady?.(body);
     try {
       table = await onLoadTable();
       const selected = occupantLoadSuggestedRow(initialDraft, table);
@@ -494,7 +522,7 @@ export function createOccupantLoadCard({draft = {}, column = false, onDraftChang
       if (selected?.areaBasis && areaMeasurementBasis && selected.areaBasis !== areaMeasurementBasis) fields.area.value = '';
       if (selected?.areaBasis) areaMeasurementBasis = selected.areaBasis;
       if (selected?.method === 'fixed') fields.seating.value = 'fixed-seating';
-      update(); onControlsReady?.(form);
+      update(); onControlsReady?.(body);
       fields.spaceFunction.dispatchEvent(new Event('change', {bubbles: true}));
       fields.seating.dispatchEvent(new Event('change', {bubbles: true}));
     } catch (error) {table = null; status.textContent = error.message;}

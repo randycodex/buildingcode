@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import {randomUUID} from 'node:crypto';
 import {reportBlockUsesSource,reportsContainingSource} from '../public/project-workflow.js';
 import {createReportUndo} from '../public/report-undo.js';
+import {createReportInsertion,reportInsertionIndex} from '../public/report-outline.js';
 
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const queue=app.slice(app.indexOf('  function queueReportSourceMutation('),app.indexOf('  const mountState = {',app.indexOf('  function queueReportSourceMutation(')));
@@ -28,7 +29,7 @@ function fixture({blocks=[authored,snapshot],sources=[note],save=true,prepare}={
   history.bind(draft);
   const c=vm.createContext({activeDraft:draft,sources:structuredClone(sources),sourceWarnings:[],sourceMutation:Promise.resolve(),sourceMutationDraft:null,
     generatingReport:false,deletingReport:false,disposed:false,requestIdentity:'account',requestWorkspaceID:'workspace',activeWorkspaceID:'workspace',projectID:'project',
-    structuredClone,crypto:{randomUUID},reportBlockUsesSource,reportsContainingSource,
+    structuredClone,crypto:{randomUUID},reportBlockUsesSource,reportsContainingSource,reportInsertionIndex,reportInsertion:createReportInsertion(),outlineController:null,
     isCurrentAccountRequest:()=>true,accountContextChangedError:()=>Error('Account changed'),
     prepareReportNoteSources:prepare||(async()=>{}),saveDraft:async()=>{saved.push(structuredClone(c.activeDraft));return save;},
     setDirty:()=>history.record(c.activeDraft),renderWorkspaceContent:()=>{host.replaceChildren();c.renderSourcePalette(host);},
@@ -91,4 +92,39 @@ for(const stale of ['account','workspace','draft']){
 const failed=fixture({save:false});await failed.button(note).events.click();
 assert.equal(failed.button(note).textContent,'Add');assert(failed.history.canUndo(failed.c.activeDraft));
 assert.match(failed.notices[0].message,/Retry/);
-console.log('Report source toggles passed: enabled Remove/Add actions, all source types and snapshots, preserved edits/project data, Undo/Redo, serialized saves, stale identities and recoverable save failure.');
+const anchors = ['a','b','c'].map(id=>({id,kind:'paragraph',text:id}));
+for (const kind of ['projectFacts','evidence','notebookCard','calculation','researchAnswer','attachment','workboardPreview']) {
+  const source={id:`source-${kind}`,kind,label:kind};
+  const item=fixture({blocks:anchors,sources:[source]});
+  item.c.reportInsertion.select(item.c.activeDraft,'b');
+  if (['attachment','workboardPreview'].includes(kind)) await item.c.queueReportSourceMutation('report',[source]);
+  else await item.button(source).events.click();
+  assert.deepEqual(Array.from(item.c.activeDraft.blocks,block=>block.sourceID || block.id),['a','b',source.id,'c']);
+  assert.equal(item.saved.at(-1).blocks[2].sourceID,source.id,'Source placement reaches the saved Report.');
+  assert.equal(item.c.reportInsertion.selected(item.c.activeDraft),item.c.activeDraft.blocks[2].id);
+}
+{
+  let release;
+  const gate=new Promise(resolve=>{release=resolve;});
+  const first={kind:'evidence',id:'first',label:'First'},second={kind:'calculation',id:'second',label:'Second'};
+  const item=fixture({blocks:anchors,prepare:()=>gate});
+  item.c.reportInsertion.select(item.c.activeDraft,'b');
+  const one=item.c.queueReportSourceMutation('report',[first]);
+  const two=item.c.queueReportSourceMutation('report',[second]);
+  release();await Promise.all([one,two]);
+  assert.deepEqual(Array.from(item.c.activeDraft.blocks,block=>block.sourceID || block.id),['a','b','first','second','c'],
+    'Queued additions advance the captured cursor in request order.');
+}
+{
+  let release;
+  const gate=new Promise(resolve=>{release=resolve;});
+  const source={kind:'evidence',id:'delayed',label:'Delayed'};
+  const item=fixture({blocks:anchors,prepare:()=>gate});
+  item.c.reportInsertion.select(item.c.activeDraft,'b');
+  const pending=item.c.queueReportSourceMutation('report',[source]);
+  item.c.reportInsertion.select(item.c.activeDraft,'c');
+  release();await pending;
+  assert.deepEqual(Array.from(item.c.activeDraft.blocks,block=>block.sourceID || block.id),['a','b','delayed','c']);
+  assert.equal(item.c.reportInsertion.selected(item.c.activeDraft),'c','An asynchronous source keeps its requested target and preserves a later outline selection.');
+}
+console.log('Report source toggles passed: all source types insert after selection, queued/source-loading cursors retain order and intent, Remove/Add preserves project data, Undo/Redo, saves and ownership fences.');

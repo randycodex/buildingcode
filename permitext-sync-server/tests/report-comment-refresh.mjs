@@ -23,7 +23,7 @@ const original=structuredClone(draft);
 const c=vm.createContext({reportSourcesRefreshGeneration:0,evidenceCommentsText,panel,activeDraft:draft,sources:[{id:'s',kind:'evidence',sectionID:1,notes:[{body:'Old comment'}]}],
  document:{createElement:()=>new Element(),createTextNode:text=>Object.assign(new Element(),{textContent:text})},
  reportCommentPresentation,reportCommentKey,disposed:false,requestIdentity:'a',projectID:'p',sourceWarnings:[],
- isCurrentAccountRequest:()=>true,setDirty:()=>{},renderSourcePalette:()=>{},
+ isCurrentAccountRequest:()=>true,setDirty:()=>{},renderSourcePalette:()=>{},outlineController:{refreshLabels(){}},pageLayout:{invalidate(){}},
  reportRequest:async()=>({sources:[{id:'s',kind:'evidence',sectionID:1,notes:[{body:'Updated comment'},{blockID:'p',body:'Excluded passage'}]}]})});
 const start=source.indexOf('  function renderIncludedReportComments(');
 vm.runInContext(source.slice(start,source.indexOf('  function renderBlockEditor(',start)),c);

@@ -222,6 +222,7 @@ import {
   projectMembershipRules,
   syncContract
 } from "./project-foundation-contract.mjs";
+import {normalizeProjectCalculation, projectCalculationForClient, calculationDraftFingerprint, normalizeReportCalculation} from './calculation-contract.mjs';
 import {
   allocateQuestionNumber,
   allocateScopedVersion,
@@ -284,6 +285,7 @@ import { codeMemoHTML, codeMemoStructuredJSON } from "./public/code-question-iss
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { codeReferenceRequest, resolveCodeReference } from "./public/code-reference-resolution.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
+import { mergeProjectURLNames, projectURLSlug } from './public/project-urls.js';
 import { recordSurvivesBulkClear } from "./public/sync-state.js";
 import {
   beginResearchSpendReservation,
@@ -651,6 +653,7 @@ const emptyStore = () => ({
   sessions: {},
   passkeyCredentials: {},
   mutationsByUserID: {},
+  projectURLNamesByUserID: {},
   syncRevisionsByUserID: {},
   foundationArtifactsByUserID: {},
   projectLinksByUserID: {},
@@ -1101,6 +1104,18 @@ function fileStoreOrganizationSeatState(store, organizationID) {
   );
 }
 
+function rememberFileProjectURLNames(store, userID, existing, accepted) {
+  const previous = existing.filter(mutation => mutation.project).map(mutation => mutation.project);
+  const previousIDs = new Set(previous.map(project => project.id));
+  store.projectURLNamesByUserID ||= {};
+  const history = store.projectURLNamesByUserID[userID] || [];
+  store.projectURLNamesByUserID[userID] = mergeProjectURLNames(history,
+    previous.map(project => ({projectID:projectIdentityForRecord(project,userID), name:project.name || project.title,
+      claimedAt:history.find(entry => entry.projectID === projectIdentityForRecord(project,userID) && projectURLSlug(entry.name) === projectURLSlug(project.name || project.title))?.claimedAt || project.createdAt || project.updatedAt})),
+    accepted.filter(mutation => mutation.project).map(({project}) => ({projectID:projectIdentityForRecord(project,userID),
+      name:project.name || project.title, claimedAt:previousIDs.has(project.id) ? project.updatedAt : project.createdAt || project.updatedAt})));
+}
+
 export function createFileStoreAdapter() {
   const rateLimitRepository = createLocalRateLimitRepository();
   async function readUnlocked() {
@@ -1141,6 +1156,7 @@ export function createFileStoreAdapter() {
         const entries = (store.trashByUserID[userID] || []).filter(b => Date.parse(b.expiresAt) > Date.now());
         if (batch && !entries.some(b => b.id === batch.id)) entries.push(batch);
         store.trashByUserID[userID] = entries;
+        rememberFileProjectURLNames(store,userID,existing,accepted);
         store.mutationsByUserID[userID] = merge.mutations;
         if (merge.acceptedMutationIDs.length) store.syncRevisionsByUserID[userID] = Number(store.syncRevisionsByUserID[userID] || 0) + 1;
         await writeUnlocked(store);
@@ -1265,6 +1281,9 @@ export function createFileStoreAdapter() {
       const store = await this.read();
       return (store.mutationsByUserID[userID] || []).filter((mutation) => mutation.project);
     },
+    async listProjectURLNames(userID) {
+      return (await this.read()).projectURLNamesByUserID?.[userID] || [];
+    },
     async projectMutationsForRecordIDs(userID, recordIDs) {
       const ids = new Set(recordIDs);
       if (!ids.size) return [];
@@ -1354,6 +1373,7 @@ export function createFileStoreAdapter() {
       delete store.entitlements[userID];
       delete store.sessions[userID];
       delete store.mutationsByUserID[userID];
+      delete store.projectURLNamesByUserID?.[userID];
       if (store.trashByUserID) delete store.trashByUserID[userID];
       delete store.syncRevisionsByUserID[userID];
       delete store.foundationArtifactsByUserID[userID];
@@ -4073,6 +4093,23 @@ async function createPostgresStoreAdapter() {
         ORDER BY record_id
       `;
       return rows.map((row) => safeJSON(row.mutation, {}));
+    },
+    async listProjectURLNames(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      const rows = await sql`
+        SELECT COALESCE(projects.mutation->'project'->>'clientID', projects.mutation->'project'->>'id') AS project_id,
+          COALESCE(events.mutation->'project'->>'name', events.mutation->'project'->>'title') AS name,
+          MIN(events.mutation_updated_at) AS claimed_at
+        FROM permitext_sync_events events
+        JOIN permitext_projects projects ON projects.record_id = events.record_id AND projects.user_id = events.user_id
+        WHERE events.user_id = ${userID} AND events.entity_kind = 'project'
+        GROUP BY 1, 2
+      `;
+      return rows.filter(row => row.project_id && row.name).map(row => ({
+        projectID:syncProjectIdentity(row.project_id, userID), name:row.name,
+        claimedAt:new Date(row.claimed_at).toISOString()
+      }));
     },
     async latestEventID(userID) {
       await ensureSchema();
@@ -14971,6 +15008,45 @@ async function handleOrganizationProjectTransfer(request, response) {
   });
 }
 
+async function handleProjectURLs(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const requested = context.body.projectIDs || [];
+  if (!Array.isArray(requested) || requested.length > 1000 || requested.some(id => typeof id !== 'string' || id.length > 512)) {
+    sendError(response, 400, 'Choose valid Projects.');return;
+  }
+  const adapter = await storeAdapter();
+  const owned = await adapter.listOwnedProjectMutations(context.userID);
+  const projects = new Map();
+  const reads = new Map([[context.userID, Promise.resolve(owned)]]);
+  for (const {project} of owned) {
+    const id = projectIdentityForRecord(project,context.userID);
+    const ownership = await storedProjectOwnership(id);
+    if (ownership && !(ownership.owner?.kind === 'user' && ownership.owner.id === context.userID)) {
+      const access = await projectAccessForUser(context.userID,id,reads);
+      if (!access?.permissions.includes(organizationPermissions.projectView)) continue;
+    }
+    projects.set(id, project);
+  }
+  const owners = new Map([[context.userID, new Set(projects.keys())]]);
+  for (const id of new Set(requested)) {
+    if (projects.has(id)) continue;
+    const access = await projectAccessForUser(context.userID, id, reads);
+    if (!access?.permissions.includes(organizationPermissions.projectView)) continue;
+    projects.set(access.projectID, access.project);
+    if (!owners.has(access.storageOwnerUserID)) owners.set(access.storageOwnerUserID, new Set());
+    owners.get(access.storageOwnerUserID).add(access.projectID);
+  }
+  const names = (await Promise.all([...owners].map(async ([owner, ids]) =>
+    (await adapter.listProjectURLNames(owner)).filter(item => ids.has(item.projectID))))).flat();
+  sendJSON(response, 200, {
+    projects:[...projects].filter(([,project]) => project.folderType !== 'reference').map(([projectID, project]) => ({
+      projectID, name:project.name || project.title || 'Project', createdAt:project.createdAt,
+      updatedAt:project.updatedAt, deletedAt:project.deletedAt || null
+    })), names
+  });
+}
+
 async function handleOrganizationProjectList(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
@@ -16375,6 +16451,67 @@ async function handleNotebookCardList(request, response) {
   });
 }
 
+async function projectCalculationAccess(request, response, permission) {
+  const context = await authenticatedNotebookBody(request, response);
+  if (!context) return null;
+  const access = await notebookProjectAccess(context, response, permission);
+  return access ? {context, access} : null;
+}
+
+async function handleProjectCalculationList(request, response) {
+  const scope = await projectCalculationAccess(request, response, organizationPermissions.projectView);
+  if (!scope) return;
+  const {access} = scope;
+  const links = await listStoredProjectLinks(access.storageOwnerUserID, {projectID: access.projectID, targetKind: 'projectCalculation'});
+  const ids = links.filter(link => !link.deletedAt).map(link => link.targetID);
+  const artifacts = ids.length ? await listStoredFoundationArtifacts(access.storageOwnerUserID, {ids}) : [];
+  sendJSON(response, 200, {projectID: access.projectID, calculations: artifacts.filter(artifact =>
+    artifact.envelope?.type === 'projectCalculation' && !artifact.envelope.deletedAt &&
+    artifact.payload?.projectID === access.projectID).map(projectCalculationForClient).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))});
+}
+
+async function handleProjectCalculationSave(request, response) {
+  const scope = await projectCalculationAccess(request, response, organizationPermissions.projectEdit);
+  if (!scope) return;
+  const {context, access} = scope, body = context.body;
+  const id = String(body.calculationID || '');
+  const expectedVersion = body.expectedVersion;
+  let payload;
+  try {
+    if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,159}$/.test(id) || !Number.isSafeInteger(expectedVersion) || expectedVersion < 0) throw new Error('Invalid calculation identity or version.');
+    payload = normalizeProjectCalculation(body, access.projectID);
+  } catch (error) {sendJSON(response, 400, {error: error.message, code: 'INVALID_PROJECT_CALCULATION'}); return;}
+  const ownerID = access.storageOwnerUserID;
+  const read = async () => (await listStoredFoundationArtifacts(ownerID, {ids: [id]}))[0] || null;
+  const existing = await read();
+  if (existing && (existing.envelope.type !== 'projectCalculation' || existing.payload?.projectID !== access.projectID || existing.payload?.context !== payload.context)) {
+    sendError(response, 404, 'Calculation not found in this Project.'); return;
+  }
+  const links = await listStoredProjectLinks(ownerID, {projectID: access.projectID, targetKind: 'projectCalculation', targetIDs: [id]});
+  const link = links.find(link => !link.deletedAt && link.targetID === id);
+  if (existing && (!link || existing.envelope.deletedAt)) {sendError(response, 404, 'Calculation is unavailable.'); return;}
+  const replay = artifact => artifact && !artifact.envelope.deletedAt && calculationDraftFingerprint(artifact.payload) === calculationDraftFingerprint(payload);
+  if (replay(existing)) {sendJSON(response, 200, {calculation: projectCalculationForClient(existing)}); return;}
+  const conflict = artifact => sendJSON(response, 409, {error: 'This calculation changed on another device. Both versions will be preserved.',
+    code: 'CALCULATION_VERSION_CONFLICT', ...(artifact ? {calculation: projectCalculationForClient(artifact)} : {})});
+  if (Number(existing?.envelope.version || 0) !== expectedVersion) {conflict(existing); return;}
+  const now = new Date().toISOString();
+  const artifact = {envelope: artifactEnvelope({id, type: 'projectCalculation', owner: access.owner,
+    createdAt: existing?.envelope.createdAt || now, updatedAt: now, version: expectedVersion + 1}), payload};
+  const newLink = link || projectLinkRecord({id: deterministicFoundationLinkID(ownerID, access.projectID, 'projectCalculation', id),
+    owner: access.owner, projectID: access.projectID, targetKind: 'projectCalculation', targetID: id,
+    relationship: 'owner', createdAt: now, updatedAt: now, version: 1});
+  try {
+    await commitStoredNotebookCardMutation(ownerID, {artifact, expectedVersion, links: link ? [] : [newLink], expectedLinks: link ? [link] : []});
+    sendJSON(response, existing ? 200 : 201, {calculation: projectCalculationForClient(artifact)});
+  } catch (error) {
+    if (error.code !== 'CALCULATION_VERSION_CONFLICT') throw error;
+    const current = await read();
+    if (replay(current)) sendJSON(response, 200, {calculation: projectCalculationForClient(current)});
+    else conflict(current);
+  }
+}
+
 async function handleNotebookCardGet(request, response) {
   const context = await authenticatedNotebookBody(request, response);
   if (!context) return;
@@ -16894,6 +17031,7 @@ function reportSourceClientSummary(source) {
     ...(source.kind === "projectFacts" ? { projectSection: source.projectSection || "facts", hiddenFromPicker: source.hiddenFromPicker === true } : {}),
     ...(source.kind === "notebookCard" ? { openQuestions: source.openQuestions || [], version: source.version } : {}),
     ...(source.kind === "researchAnswer" ? { isRecovery: source.isRecovery === true } : {}),
+    ...(source.kind === "calculation" ? {version: source.version, unavailableReason: source.unavailableReason || ''} : {}),
     sourceClassification: source.sourceClassification,
     updatedAt: source.updatedAt || null
   };
@@ -16936,7 +17074,7 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
   const links = (await listStoredProjectLinks(userID, { projectID }))
     .filter((link) => !link.deletedAt && link.projectID === projectID);
   const artifactIDs = [...new Set(links.filter((link) =>
-    ["notebookCard", "workboardPreview", "attachment"].includes(link.targetKind)).map((link) => link.targetID))];
+    ["notebookCard", "projectCalculation", "workboardPreview", "attachment"].includes(link.targetKind)).map((link) => link.targetID))];
   const artifacts = artifactIDs.length ? await listStoredFoundationArtifacts(userID, { ids: artifactIDs }) : [];
   const sources = [];
   const warnings = [];
@@ -17056,6 +17194,20 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
         }
       });
     });
+
+  const calculationIDs = new Set(links.filter(link => link.targetKind === 'projectCalculation').map(link => link.targetID));
+  for (const artifact of artifacts.filter(item => item.envelope?.type === 'projectCalculation' &&
+      !item.envelope.deletedAt && item.payload?.projectID === projectID && calculationIDs.has(item.envelope.id))) {
+    const label = String(artifact.payload.input?.spaceName || 'Occupant load calculation').slice(0, 500);
+    let manifestItem, unavailableReason = '';
+    try {
+      manifestItem = normalizeReportCalculation({...artifact.payload, sourceID: artifact.envelope.id,
+        sourceVersion: artifact.envelope.version, title: label}, {kind: 'calculation', sourceClassification: 'user-authored'});
+    } catch (error) {unavailableReason = `Complete this calculation in Calculator: ${error.message}`;}
+    sources.push({id: artifact.envelope.id, kind: 'calculation', label, title: label, version: artifact.envelope.version,
+      summary: manifestItem ? `${manifestItem.input.area} ft² ${manifestItem.input.areaBasis} · ${manifestItem.people} ${manifestItem.people === 1 ? 'person' : 'people'}` : unavailableReason,
+      unavailableReason, manifestItem, sourceClassification: 'user-authored', updatedAt: artifact.envelope.updatedAt});
+  }
 
   const linkedAnswerIDs=links.filter(link=>link.targetKind==="researchAnswer").map(link=>link.targetID);
   (await listStoredResearchAnswers(userID, {
@@ -17181,6 +17333,7 @@ async function handleReportSourcePreview(request, response) {
   const source = sources.find(item => item.kind === kind && item.id === sourceID);
   if (!source) return sendError(response, 404, "This Report source is no longer available.");
   if (source.isRecovery) return sendError(response, 400, "This Research attempt did not complete an answer and cannot be added to a Report.");
+  if (source.unavailableReason) return sendError(response, 400, source.unavailableReason);
   const items = source.manifestItems || [source.manifestItem];
   const { reportItemPreview } = await import("./report-presentation.mjs");
   sendJSON(response, 200, { items, preview: items.filter(item => !item.reportCommentKey).flatMap(reportItemPreview) });
@@ -17302,7 +17455,7 @@ async function handleReportDraftGet(request, response) {
 
 async function validateReportDraftSources(userID, projectID, draft) {
   const { sources } = await reportSourcesForProject(userID, projectID, { summaryOnly: true });
-  const sourceKeys = new Set(sources.filter(source => !source.isRecovery).map((source) => `${source.kind}:${source.id}`));
+  const sourceKeys = new Set(sources.filter(source => !source.isRecovery && !source.unavailableReason).map((source) => `${source.kind}:${source.id}`));
   for (const block of draft.blocks) {
     if (["heading", "paragraph", "list"].includes(block.kind)) continue;
     if (!sourceKeys.has(`${block.kind}:${block.sourceID}`)) {
@@ -17340,6 +17493,7 @@ async function handleReportDraftSave(request, response) {
   if (existing && existing.envelope.version === expectedVersion + 1) {
     try {
       const retried = normalizeReportDraftPayload({ title:context.body.title, reportDate:context.body.reportDate,
+        pageFormat:context.body.pageFormat ?? existing.payload.pageFormat,
         introduction:context.body.introduction, blocks:context.body.blocks,
         createdBy:existing.payload.createdBy, updatedBy:context.userID });
       if (JSON.stringify(retried) === JSON.stringify(existing.payload)) {
@@ -17364,6 +17518,7 @@ async function handleReportDraftSave(request, response) {
     const payload = normalizeReportDraftPayload({
       title: context.body.title,
       reportDate: context.body.reportDate,
+      pageFormat: context.body.pageFormat ?? existing?.payload?.pageFormat,
       introduction: context.body.introduction,
       blocks: context.body.blocks,
       createdBy: existing?.payload?.createdBy || context.userID,
@@ -17487,6 +17642,7 @@ function reportManifestItemForDraftBlock(block, sourcesByKey) {
   const source = sourcesByKey.get(`${block.kind}:${block.sourceID}`);
   if (!source) throw new Error(`Report source is unavailable: ${block.label}`);
   if (source.isRecovery) throw new Error("This Research attempt did not complete an answer and cannot be added to a Report.");
+  if (source.unavailableReason) throw new Error(source.unavailableReason);
   return { ...source.manifestItem, id: block.id,
     ...(block.reportTitle !== undefined ? { reportTitle: block.reportTitle } : {}),
     ...(block.kind === "researchAnswer" && typeof block.includeResearchMetadata === "boolean"
@@ -17622,7 +17778,7 @@ async function reportProjectMaterialBySourceID(userID, projectID, manifest) {
   return material;
 }
 
-async function handleReportGenerate(request, response) {
+async function handleReportGenerate(request, response, {preview = false} = {}) {
   const context = await authenticatedReportBody(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
@@ -17654,7 +17810,7 @@ async function handleReportGenerate(request, response) {
     });
     return;
   }
-  if (!privateProjectAssetStorageConfigured()) {
+  if (!preview && !privateProjectAssetStorageConfigured()) {
     sendError(response, 503, "Private Report PDF storage is not configured.");
     return;
   }
@@ -17691,6 +17847,8 @@ async function handleReportGenerate(request, response) {
     ];
     const evidenceCharacters = items.reduce((sum, item) => sum + (item.passageText || item.text || "").length, 0);
     if (evidenceCharacters > 1_000_000) throw new Error("The Report is too large. Remove some sources and try again.");
+    const emptyPreview = preview && !items.length;
+    if (emptyPreview) items.push({id:'__empty',kind:'paragraph',text:'.'});
     const projectMaterialBySourceID = await reportProjectMaterialBySourceID(storageOwnerUserID, access.projectID, {items});
     const manifest = immutableReportManifest({
       id: manifestID,
@@ -17703,6 +17861,7 @@ async function handleReportGenerate(request, response) {
       draftID: draft.envelope.id,
       title: draft.payload.title,
       reportDate: now,
+      pageFormat: draft.payload.pageFormat || 'letter',
       author: {
         userID: context.userID,
         displayName: context.authContext.account?.displayName ||
@@ -17734,9 +17893,21 @@ async function handleReportGenerate(request, response) {
       createdAt: now
     });
     const generatedReportID = randomUUID();
-    const pdfBody = await renderReportPDFOnDemand(manifest, { projectMaterialBySourceID });
+    let editingLayout;
+    const pdfBody = await renderReportPDFOnDemand(manifest, { projectMaterialBySourceID, emptyPreview,
+      ...(preview && context.body.editingLayout === true ? {onLayout:value => {editingLayout=value;}} : {}) });
     if (!pdfBody.length || pdfBody.length > maxReportFileBytes) {
       throw new Error("The generated Report PDF exceeds the supported file size.");
+    }
+    if (preview) {
+      if (editingLayout) {
+        response.setHeader('Cache-Control', 'private, no-store'); response.setHeader('Vary', 'Authorization');
+        sendJSON(response,200,{pdf:pdfBody.toString('base64'),layout:editingLayout}); return;
+      }
+      response.writeHead(200, {'Content-Type': 'application/pdf', 'Cache-Control': 'private, no-store',
+        'Content-Length': pdfBody.length, 'Vary': 'Authorization'});
+      response.end(pdfBody);
+      return;
     }
     const requestedPathname = reportFilePathname(
       access.projectID,
@@ -27276,6 +27447,10 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
   const mergedMutations = mergeMutations(targetMutations, sourceMutations);
   store.mutationsByUserID[targetUserID] = mergedMutations.mutations;
   delete store.mutationsByUserID[sourceUserID];
+  store.projectURLNamesByUserID ||= {};
+  store.projectURLNamesByUserID[targetUserID] = mergeProjectURLNames(store.projectURLNamesByUserID[targetUserID] || [],
+    (store.projectURLNamesByUserID[sourceUserID] || []).map(entry => ({...entry, projectID:syncProjectIdentity(entry.projectID, sourceUserID)})));
+  delete store.projectURLNamesByUserID[sourceUserID];
 
   const moveUserEntries = (field, transform = (item) => item) => {
     store[field] ||= {};
@@ -29048,6 +29223,8 @@ async function handlePush(request, response) {
     store.entitlements[userID] || null
   );
   const merge = mergeMutations(existing, planEnforcement.acceptedMutations);
+  rememberFileProjectURLNames(store,userID,existing,planEnforcement.acceptedMutations.filter(mutation =>
+    merge.acceptedMutationIDs.includes(mutationRecordID(mutation))));
   store.mutationsByUserID[userID] = merge.mutations;
   if (merge.acceptedMutationIDs.length > 0) {
     store.syncRevisionsByUserID[userID] = Number(store.syncRevisionsByUserID[userID] || 0) + 1;
@@ -34809,6 +34986,8 @@ async function handleClientErrorReport(request, response) {
 }
 
 const handlers = {
+  "projects/calculations/list": handleProjectCalculationList,
+  "projects/calculations/save": handleProjectCalculationSave,
   "account/sign-in": handleSignIn,
   "account/clerk/config": handleClerkConfig,
   "account/sign-out": handleSignOut,
@@ -34858,6 +35037,7 @@ const handlers = {
   "research/evidence/discover": handleResearchEvidenceDiscover,
   "research/conversations/candidate-disposition": handleResearchCandidateDisposition,
   "projects/foundation/state": handleProjectFoundationState,
+  "projects/urls": handleProjectURLs,
   "projects/hub/bootstrap": handleProjectHubBootstrap,
   "projects/property/lookup": handleProjectPropertyLookup,
   "projects/artifacts/checkpoint": handleProjectArtifactCheckpoint,
@@ -34924,6 +35104,7 @@ const handlers = {
   "reports/drafts/save": handleReportDraftSave,
   "reports/drafts/delete": handleReportDraftDelete,
   "reports/generate": handleReportGenerate,
+  "reports/drafts/preview": (request, response) => handleReportGenerate(request, response, {preview: true}),
   "reports/history/list": handleReportHistoryList,
   "reports/history/delete": handleReportHistoryDelete,
   "reports/manifests/get": handleReportManifestGet,
@@ -34995,7 +35176,7 @@ async function handleRequestUnlocked(request, response) {
     if (
       request.method === "GET" &&
       (
-        path === "workspace" ||
+        path === "workspace" || /^workspace\/[^/]+\/?$/.test(path) ||
         path === "index.html" ||
         path.startsWith("open/section/")
       )

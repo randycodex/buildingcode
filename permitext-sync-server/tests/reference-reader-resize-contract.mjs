@@ -44,7 +44,7 @@ function fixture(view, widths = [800], sourcesWidth = 0) {
     getBoundingClientRect: () => ({ left: reportWidth() + 1, right: reportWidth() + 2 })
   };
   const context = vm.createContext({
-    workspaceColumnExpansion: null, adjacentColumnWidths,
+    workspaceColumnExpansion: null, adjacentColumnWidths, notebookReferenceResize: () => null,
     state, track, CSS: { escape: value => value }, referenceColumnsWidth, reportColumnsLayout,
     currentColumnWorkflowView: () => view,
     defaultActivePaneIDs: () => panes.map(pane => pane.dataset.paneId), workflowPaneIsVisible: () => true,

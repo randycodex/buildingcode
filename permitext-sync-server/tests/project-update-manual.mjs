@@ -32,7 +32,7 @@ for(const changed of [false,true]) {
  const c=vm.createContext({publicCodeRevision:{probe(){}},canRunForegroundSync:()=>true,foregroundSyncPromise:null,
   captureAccountRequest:()=>1,requireCurrentAccountRequest(){},isCurrentAccountRequest:()=>true,activeAccount:()=>({userID:'u',sessionToken:'token'}),
   syncedContent:content,syncLoadPromise:null,foregroundSyncLastFullPullAt:0,foregroundSyncSchedule,syncCheckpointRequiresFullPull,
-  flushPendingNotebookImages:async()=>{},flushPendingNotebookDrafts:async()=>{},flushSyncOutbox:async()=>({}),syncResultChangesWorkspace:()=>false,
+  flushPendingProjectCalculations:async()=>{},flushPendingNotebookImages:async()=>{},flushPendingNotebookDrafts:async()=>{},flushSyncOutbox:async()=>({}),syncResultChangesWorkspace:()=>false,
   postJSON:async route=>{assert.equal(route,'/sync/checkpoint');calls.push('checkpoint');return {...content,changed};},
   loadSyncedContent:async()=>{calls.push('full');return {...content,latestEventID:8};},
   migrateLegacyArchivedProjects:async()=>false,refreshSyncedWorkspaceInPlace:async()=>calls.push('render'),updateConnectionStatus(){}});
@@ -77,10 +77,10 @@ for(const changed of [false,true]) {
 {
  const calls=[];
  const c=vm.createContext({captureAccountRequest:()=>1,requireCurrentAccountRequest:()=>{},
-  flushPendingNotebookImages:async()=>calls.push('images'),flushPendingNotebookDrafts:async()=>calls.push('drafts'),
+  flushPendingProjectCalculations:async()=>calls.push('calculations'),flushPendingNotebookImages:async()=>calls.push('images'),flushPendingNotebookDrafts:async()=>calls.push('drafts'),
   flushSyncOutbox:async options=>{assert.equal(options.refresh,false);calls.push('writes');}});
  vm.runInContext(actual('flushPendingContentWrites'),c);await c.flushPendingContentWrites();
- assert.deepEqual(calls,['images','drafts','writes']);
+ assert.deepEqual(calls,['calculations','images','drafts','writes']);
 }
 
 function harness(scenario='changed') {

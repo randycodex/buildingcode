@@ -6,17 +6,20 @@ import {createReportUndo,reportContentBlocks} from '../public/report-undo.js';
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const start = source.indexOf('  const paintReportSaveState = () => {');
 assert.ok(start > 0);
-const implementation = source.slice(start, source.indexOf('\n  const reviewReport', start));
+const end = source.indexOf('\n  const documentMinimumWidth', start);
+assert.ok(end>start);
+const implementation = source.slice(start,end);
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 function harness() {
   let resolve, reject;
   const context = vm.createContext({
     structuredClone, crypto:{randomUUID:()=> 'synthetic-create-id'},
     activeDraft: {id: null, version: 0, title:'Draft', introduction:'Before', blocks:[]},
+    reportListUpdates:0,refreshReportList:()=>{context.reportListUpdates++;},
     drafts: [], dirty:false, disposed:false, deletingReport:false, projectID:'p', requestIdentity:'a', current:true,
     requestWorkspaceID:'w',activeWorkspaceID:'w',accountUserID:'a',recoveryEditorID:'editor',restoredRecovery:null,recoveredDrafts:[],
     autosave:null,savePresentation:{state:'saved'},shell:{querySelector:()=>null},
-    reportUndo:createReportUndo(),reportContentBlocks,reportFormatting:null,renderProjectUpdateBadge(){},panel:{addEventListener:()=>{}},
+    reportUndo:createReportUndo(),reportContentBlocks,reportFormatting:null,pageLayout:{invalidate(){}},reportInsertion:{remember(){}},renderProjectUpdateBadge(){},panel:{addEventListener:()=>{}},
     createReportAutosave:options=>createReportAutosave({...options,setTimer:()=>1,clearTimer:()=>{}}),
     saveReportDraftRecovery:async record=>record,deleteReportDraftRecovery:async()=>true,
     isCurrentAccountRequest:()=>context.current, calls:[], renders:0, message:'',
@@ -35,6 +38,7 @@ function harness() {
  assert.equal(h.c.calls[0].blocks.length,0,'An empty editing placeholder must not prevent Undo from saving');
  assert.equal(h.c.activeDraft.blocks.length,1,'Saving does not replace the live editing placeholder');
  h.complete();assert.equal(await p,true);
+ assert.equal(h.c.reportListUpdates,1,'Saving refreshes the Reports list without rebuilding the editor');
 }
 {
  const h=harness(), p=h.c.save(); assert.equal(h.c.save(),p); await tick(); assert.equal(h.c.calls.length,1);
@@ -65,7 +69,7 @@ console.log('Report autosave integration passed: edits during save, live editor 
 const refreshStart = source.indexOf('  refreshReportArtifacts = async');
 const refreshImplementation = source.slice(refreshStart, source.indexOf('\n  try {', refreshStart));
 for (const mode of ['success', 'dirty', 'failure', 'account']) {
- const c = vm.createContext({reportSourcesRefreshGeneration:0,structuredClone, disposed:false, deletingReport:false, deletingVersionID:null, historyMutationGeneration:0, dirty:mode==='dirty',
+ const c = vm.createContext({refreshReportList(){},reportSourcesRefreshGeneration:0,structuredClone, disposed:false, deletingReport:false, deletingVersionID:null, historyMutationGeneration:0, dirty:mode==='dirty',
   requestIdentity:'a',projectID:'p',identity:{},drafts:[],sources:[],sourceWarnings:[],history:[],
   activeDraft:{id:'d',title:'Local'},message:'Earlier failure',renders:0,
   isCurrentAccountRequest:()=>mode!=='account',panel:{querySelector:()=>null},
@@ -82,7 +86,7 @@ console.log('Report refresh status passed: successful clean recovery clears erro
 {
  let resolveRefresh;
  const response = new Promise(resolve=>{resolveRefresh=resolve;});
- const c = vm.createContext({reportSourcesRefreshGeneration:0,disposed:false,deletingReport:false,deletingVersionID:null,historyMutationGeneration:0,
+ const c = vm.createContext({refreshReportList(){},reportSourcesRefreshGeneration:0,disposed:false,deletingReport:false,deletingVersionID:null,historyMutationGeneration:0,
    requestIdentity:'a',projectID:'p',isCurrentAccountRequest:()=>true,
    reportRequest:()=>response});
  vm.runInContext(refreshImplementation,c);

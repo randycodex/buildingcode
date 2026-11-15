@@ -2,6 +2,7 @@
 // that snapshot does not load Research, Notebook, Report, or organization tables.
 const userCollections = Object.freeze({
   trash: "trashByUserID",
+  projectURLNames: "projectURLNamesByUserID",
   foundationArtifacts: "foundationArtifactsByUserID",
   projectLinks: "projectLinksByUserID",
   researchAnswers: "researchAnswersByUserID",

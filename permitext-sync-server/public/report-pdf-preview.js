@@ -1,5 +1,5 @@
 // Render the exported bytes, not a second HTML interpretation of the report.
-export async function renderReportPDF(container, blob, current) {
+export async function renderReportPDF(container, blob, current, {eagerFirstPage = false} = {}) {
   const pdfjs = await import('/web/pdf-preview-assets/pdf.min.js');
   if (!current()) return () => {};
   pdfjs.GlobalWorkerOptions.workerSrc = '/web/pdf-preview-assets/pdf.worker.min.js';
@@ -96,6 +96,10 @@ export async function renderReportPDF(container, blob, current) {
       item.setAttribute('aria-label', `Page ${number}`);
       pages.set(item, {page, base: viewport, scale: 0});
       container.append(item);
+      if (number === 1 && eagerFirstPage) {
+        await paint(item);
+        if (current() && !pages.get(item).canvas) throw new Error('The first PDF page could not be displayed. Retry the preview.');
+      }
       observer.observe(item);
     }
   } catch (error) {

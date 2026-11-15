@@ -197,6 +197,10 @@
       "destination": "/workspace.html"
     },
     {
+      "source": "/workspace/:project",
+      "destination": "/workspace.html"
+    },
+    {
       "source": "/open/section/:path*",
       "destination": "/workspace.html"
     },

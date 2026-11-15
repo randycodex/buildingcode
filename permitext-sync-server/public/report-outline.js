@@ -13,6 +13,37 @@ export function moveReportBlock(blocks, sourceIndex, targetIndex) {
   return true;
 }
 
+export function reportInsertionIndex(blocks, afterID) {
+  if (afterID === null) return 0; // Introduction precedes the first report item.
+  const index = afterID === undefined ? -1 : blocks.findIndex(block => block.id === afterID);
+  return index < 0 ? blocks.length : index + 1;
+}
+
+// A captured cursor advances across queued additions. A later outline click
+// creates a separate cursor, so delayed source loading cannot change its target.
+export function createReportInsertion() {
+  const objects = new WeakMap(), reports = new Map();
+  const read = draft => objects.get(draft) || (draft.id ? reports.get(draft.id) : undefined);
+  const remember = draft => {
+    const cursor = objects.get(draft);
+    if (cursor && draft.id) reports.set(draft.id, cursor);
+  };
+  const capture = (draft, fallback) => {
+    let cursor = read(draft);
+    if (!cursor) cursor = {afterID: fallback};
+    objects.set(draft, cursor); remember(draft); return cursor;
+  };
+  return {
+    capture, remember,
+    selected: draft => read(draft)?.afterID,
+    select(draft, afterID) {objects.set(draft, {afterID}); remember(draft);},
+    advance(draft, cursor, inserted) {
+      if (inserted.length) cursor.afterID = inserted.at(-1).id;
+      if (read(draft) === cursor) {objects.set(draft, cursor); remember(draft);}
+    }
+  };
+}
+
 export function scrollReportTarget(container, target) {
   const controlsHeight = container.querySelector?.('.report-editor-controls')?.getBoundingClientRect().height || 0;
   const topInset = Math.max(32, controlsHeight + 16);
@@ -58,7 +89,8 @@ export function reportOutlineDropIndex(blocks, sourceIndex, targetIndex, after, 
 }
 
 export function createReportOutline({ blocks, introduction, targets, documentBody, describe,
-  onNavigate, onMove, onRemove, dragIcon, removeIcon = '', sectionExpansion = new Map() }) {
+  onNavigate, onMove, onRemove, dragIcon, removeIcon = '', sectionExpansion = new Map(),
+  selectedBlockID, onSelect = () => {} }) {
   const outline = document.createElement("nav");
   outline.className = "report-outline";
   outline.setAttribute("aria-label", "Report outline");
@@ -80,6 +112,7 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
   let pointerDrag = null;
   let dragFrame = 0;
   let currentLink = null;
+  let selection = selectedBlockID;
   const markCurrent = link => {
     currentLink = link;
     const parent = parents.get(blocks[links.indexOf(link) - 1]);
@@ -89,11 +122,14 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
       else candidate.removeAttribute("aria-current");
     });
   };
-  const makeLink = (target, label) => {
+  const makeLink = (target, label, block = null) => {
     const link = document.createElement("button");
     link.type = "button";
     link.className = "reader-nav-label report-outline-link";
-    link.addEventListener("click", () => { markCurrent(link); onNavigate(target); });
+    link.addEventListener("click", () => {
+      selection = block?.id ?? null;
+      markCurrent(link); onSelect(selection); onNavigate(target);
+    });
     link.textContent = label;
     links.push(link);
     return link;
@@ -191,7 +227,7 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
       event.preventDefault();
       onMove(block, blocks.indexOf(block) + (event.key === "ArrowUp" ? -1 : 1), "outline");
     });
-    const link = makeLink(targets[index], "");
+    const link = makeLink(targets[index], "", block);
     const number = document.createElement("span");
     number.className = "report-outline-number";
     number.textContent = `${index + 1}.`;
@@ -302,6 +338,12 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
   outline.append(title, introRow, contents, status, dragImage);
   const updateCurrent = () => {
     scrollFrame = 0;
+    if (selection !== undefined) {
+      const index = blocks.findIndex(block => block.id === selection);
+      const selected = selection === null ? intro : index < 0 ? null : links[index + 1];
+      if (selected) {markCurrent(selected); return;}
+      selection = undefined;
+    }
     const top = documentBody.getBoundingClientRect().top + 48;
     let current = intro;
     targets.forEach((target, index) => {
@@ -312,7 +354,9 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
   const onScroll = () => { if (!scrollFrame) scrollFrame = requestAnimationFrame(updateCurrent); };
   documentBody.addEventListener("scroll", onScroll);
   onScroll();
+  if (selection !== undefined) updateCurrent();
   return { element: outline, refreshLabels,
+    selectedBlockID: () => currentLink === intro ? null : blocks[links.indexOf(currentLink) - 1]?.id,
     reorder() {
       const scroll = outline.scrollTop;
       rows.splice(0, rows.length, ...blocks.map(block => entries.get(block).row));

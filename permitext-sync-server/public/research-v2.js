@@ -221,19 +221,30 @@ export function createResearchV2View(options) {
   passageSources.forEach(source=>{
     const chip=action(passageChipLabel(source),()=>showPassage(source),'rv2-passage-chip');chips.append(chip);
   });
-  const input=node('textarea','rv2-input');input.setAttribute('aria-label','Research question');input.dataset.researchDraftKey=options.draftKey||'';input.placeholder='Message';input.rows=2;input.maxLength=2000;input.value=initialDraft;
+  const input=node('textarea','rv2-input');input.setAttribute('aria-label','Research question');input.dataset.researchDraftKey=options.draftKey||'';input.placeholder='Message';input.rows=1;input.maxLength=2000;input.value=initialDraft;
+  let measuredDraft=null,measuredWidth=0,composerResize=null;
+  const resizeInput=()=>{
+    const width=input.clientWidth;
+    if(disposed||!width||width===measuredWidth&&input.value===measuredDraft)return;
+    measuredWidth=width;measuredDraft=input.value;
+    input.style.height='auto';
+    input.style.height=`${input.scrollHeight}px`;
+  };
   input.addEventListener('input',()=>{lastRequest=null;onDraft(input.value);update();});
   const controls=node('div','rv2-composer-controls');
   const send=action('↑',()=>void sendQuestion(),'rv2-send');send.setAttribute('aria-label','Send question');
   const cancel=action('Stop',()=>controller?.abort(),'rv2-text-action');cancel.hidden=true;
   controls.append(cancel,send);composer.append(chips,input,controls);
+  composer.addEventListener('click',event=>{
+    if(event.target===composer||event.target===controls)input.focus({preventScroll:true});
+  });
   const projectContext = options.renderProjectContext?.(composer);
   const operationStatus=node('p','rv2-status');operationStatus.setAttribute('role','status');operationStatus.hidden=true;
   const detail=node('section','rv2-detail');detail.hidden=true;detail.setAttribute('aria-label','Passage details');
   const detailBody=node('div','rv2-detail-body');
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
   const operationPending=()=>chatTransitionPending||Boolean(options.operationGate?.status());
-  function update(){if(disposed)return;const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||includeBusy||revealBusy||pending));
+  function update(){if(disposed)return;resizeInput();const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||includeBusy||revealBusy||pending));
     if(newChat)newChat.disabled=busy||includeBusy||revealBusy||pending;
     operationStatus.textContent=chatTransitionPending?'Starting new chat…':options.operationGate?.status() || '';operationStatus.hidden=!pending;
     projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});}
@@ -370,6 +381,8 @@ export function createResearchV2View(options) {
     chat.replaceChildren(mobileHistory,thread,detail,status,operationStatus,composer);
     root.replaceChildren(rail,divider,chat);
     historyTitles.refresh();
+    resizeInput();
+    if(typeof ResizeObserver==='function'){composerResize=new ResizeObserver(resizeInput);composerResize.observe(input);}
     // First mounts can be detached; retained threads can be positioned now.
     if(messages.length){initialScroll=new ResizeObserver(positionThread);initialScroll.observe(thread);}
     positionThread();
@@ -377,7 +390,7 @@ export function createResearchV2View(options) {
       onDone:()=>{revealBusy=false;update();}});
   };
   if(!presentation)commit();
-  return {element:root,commit,capturePresentation:()=>({root,chat,thread}),dispose(){if(disposed)return;disposed=true;stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();revealController?.dispose();questionRail.dispose();historyTitles.dispose();},focus(){input.focus({preventScroll:true});},
+  return {element:root,commit,capturePresentation:()=>({root,chat,thread}),dispose(){if(disposed)return;disposed=true;stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();composerResize?.disconnect();revealController?.dispose();questionRail.dispose();historyTitles.dispose();},focus(){input.focus({preventScroll:true});},
     focusAnswer(answerID){
       const answer=Array.from(thread.querySelectorAll('.rv2-answer')).find(entry=>entry.dataset.messageId===answerID);
       if(disposed || !answer || !root.isConnected)return false;

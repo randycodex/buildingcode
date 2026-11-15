@@ -14,7 +14,7 @@ const viewports = [
   '.coordination-content', '.coordination-thread-content', '.calculator-column-content',
   '.project-information-panel', '.project-information-content', '.project-details-column-body',
   '.settings-account-column', '.settings-scroll', '.account-welcome',
-  '.report-document', '.report-outline', '.report-source-picker', '.report-history', '.report-export-content',
+  '.report-document', '.report-outline', '.report-list-items', '.report-source-picker', '.report-history', '.report-export-content',
   '.report-draft-shell',
   '.code-question-panel-body', '.code-question-index-list',
   '.custom-select-menu:not(.reader-chapter-select-menu):not(.reader-code-select-menu)', '.reader-definition-popover',

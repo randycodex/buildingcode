@@ -1831,10 +1831,8 @@ async function main() {
       /\.topbar\s*\{[^}]*position:\s*relative;[^}]*display:\s*grid;/.test(workspaceStyles.text) &&
         workspaceStyles.text.includes("border-bottom: 1px solid var(--border);\n  text-transform: none;") &&
         workspaceStyles.text.includes(".topbar-brand-name {") &&
-        workspaceStyles.text.includes("letter-spacing: -0.03em;\n  text-transform: none;") &&
-        workspaceStyles.text.includes(".topbar-brand-plan {") &&
-        workspaceStyles.text.includes("letter-spacing: 0.08em;\n  text-transform: uppercase;"),
-      "The top bar should preserve title-case controls and wordmark while rendering the PRO plan label in uppercase."
+        workspaceStyles.text.includes("letter-spacing: -0.03em;\n  text-transform: none;"),
+      "The top bar should preserve title-case controls and the wordmark."
     );
     assert(
       workspaceStyles.text.includes(".is-saved-selecting .saved-section-row .saved-row-button {\n  padding-right: 40px;") &&
@@ -2236,12 +2234,10 @@ async function main() {
     );
     assert(
       webRoot.text.includes('class="topbar-brand" aria-label="per codes"') &&
-        webRoot.text.includes('class="topbar-brand-plan" hidden') &&
-        workspaceScript.text.includes("function updateTopbarPlanBadge") &&
-        workspaceScript.text.includes("topbarBrandPlan.hidden = !pro") &&
-        workspaceScript.text.includes('topbarBrandPlan.textContent = pro ? "PRO" : ""') &&
-        workspaceScript.text.includes('topbarBrand.setAttribute("aria-label", pro ? "per codes Pro plan" : "per codes")'),
-      "The topbar plan badge must remain hidden unless the account has active Pro access."
+        !webRoot.text.includes('class="topbar-brand-plan"') &&
+        !workspaceScript.text.includes('topbarBrandPlan') &&
+        workspaceScript.text.includes('function currentPlan()'),
+      "The topbar wordmark must omit the plan badge while retaining account plan handling."
     );
     assert(
       workspaceScript.text.includes("function enforceReaderPlanLimit") &&

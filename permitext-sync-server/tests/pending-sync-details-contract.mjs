@@ -40,6 +40,7 @@ const context = vm.createContext({
   pendingNotebookDrafts: () => draftRead(),
   currentContentSummary: () => ({ projects: [{ id: "older-project", name: "Older project" }] }),
   projectRecordID: value => value.id,
+  researchProjectID: value => value.id,
   mutationKindAndRecord: mutation => ({ kind: Object.keys(mutation)[0], record: Object.values(mutation)[0] }),
   notebookDocumentAssetURLs: document => document?.localImage ? ["permitext-notebook-local:image"] : [],
   document: { createElement: element },
@@ -79,7 +80,7 @@ Object.assign(context, { projectUpdateAutoApplyReady:false, connectionStatus: ba
   window: { setTimeout(callback, delay) { scheduledAttention = { callback, delay }; return 1; } },
   clearTimeout() { scheduledAttention = null; },
   navigator: { onLine: true }, serverReachable: true,
-  syncFlushPromise: null, foregroundSyncPromise: null, updateTopbarPlanBadge() {} });
+  syncFlushPromise: null, foregroundSyncPromise: null, updateReaderPlanControls() {} });
 vm.runInContext(["pendingSyncAttentionAt", "updateConnectionStatus", "refreshNotebookPendingStatus"].map(actual).join("\n"), context);
 context.updateConnectionStatus();
 assert.equal(badge.attributes.role, "button");

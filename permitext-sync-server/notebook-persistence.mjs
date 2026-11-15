@@ -16,8 +16,8 @@ export function notebookMutationReplay(artifact, links, receipt, artifactType = 
 }
 
 export function notebookVersionConflict(artifactType = "notebookCard") {
-  const error = new Error(`This ${artifactType === "projectNote" ? "Project note" : "Notebook card"} changed after you opened it. Review the current version before saving.`);
-  error.code = artifactType === "projectNote" ? "PROJECT_NOTE_VERSION_CONFLICT" : "NOTEBOOK_VERSION_CONFLICT";
+  const error = new Error(`This ${artifactType === "projectCalculation" ? "calculation" : artifactType === "projectNote" ? "Project note" : "Notebook card"} changed after you opened it. Review the current version before saving.`);
+  error.code = artifactType === "projectCalculation" ? "CALCULATION_VERSION_CONFLICT" : artifactType === "projectNote" ? "PROJECT_NOTE_VERSION_CONFLICT" : "NOTEBOOK_VERSION_CONFLICT";
   error.statusCode = 409;
   return error;
 }
@@ -30,7 +30,7 @@ export function applyNotebookCardMutation(store, userID, {
   const index = artifacts.findIndex((item) => item.envelope?.id === artifact.envelope.id);
   const existing = artifacts[index];
   if (!Number.isSafeInteger(expectedVersion) || expectedVersion < 0 ||
-      !["notebookCard", "projectNote"].includes(artifactType) ||
+      !["notebookCard", "projectNote", "projectCalculation"].includes(artifactType) ||
       (existing && (existing.envelope.type !== artifactType || (existing.envelope.deletedAt || null) !== expectedDeletedAt)) ||
       Number(existing?.envelope.version || 0) !== expectedVersion ||
       artifact.envelope.version !== expectedVersion + 1) throw notebookVersionConflict(artifactType);
@@ -70,7 +70,7 @@ export async function commitPostgresNotebookCardMutation(sql, userID, {
 }) {
   const artifactType = artifact.envelope.type;
   if (!Number.isSafeInteger(expectedVersion) || expectedVersion < 0 ||
-      !["notebookCard", "projectNote"].includes(artifactType) ||
+      !["notebookCard", "projectNote", "projectCalculation"].includes(artifactType) ||
       artifact.envelope.version !== expectedVersion + 1) throw notebookVersionConflict(artifactType);
   const envelope = artifact.envelope;
   const queries = [];

@@ -47985,18 +47985,23 @@ function PG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 	]) F.append(_(n, n, () => {
 		re.open = !1, t(e);
 	}, !1));
-	re.append(ie, F), c.append(re), c.addEventListener("focusout", (e) => {
+	re.append(ie, F), c.append(re);
+	let ae = (e, ...t) => {
+		let n = document.createElement("div");
+		return n.className = "format-toolbar-group", n.setAttribute("role", "group"), n.setAttribute("aria-label", e), n.append(...t), n;
+	};
+	c.replaceChildren(ae("History", y, b), ae("Text style", x), ae("Emphasis", ...v.values()), ae("Paragraph", T, E), ae("Insert", D, re)), c.addEventListener("focusout", (e) => {
 		c.contains(e.relatedTarget) || (re.open = !1, d && N());
 	});
-	let ae = () => {
+	let oe = () => {
 		if (m.capture(), h()) {
 			let e = window.getSelection();
 			e?.anchorNode && !l.element.contains(e.anchorNode) && !c.contains(document.activeElement) && (l = null);
 		}
 		g();
 	};
-	document.addEventListener("selectionchange", ae);
-	let oe = {
+	document.addEventListener("selectionchange", oe);
+	let se = {
 		element: c,
 		refreshHistory: () => {
 			y.disabled = u || !s() || !i(), b.disabled = u || !s() || !a();
@@ -48057,10 +48062,10 @@ function PG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () =>
 			t && (l = t, t.editor.commands.focus("end"), g());
 		},
 		dispose() {
-			u = !0, m.dispose(), document.removeEventListener("selectionchange", ae), f.forEach((e) => e.editor.destroy()), f.clear(), l = null;
+			u = !0, m.dispose(), document.removeEventListener("selectionchange", oe), f.forEach((e) => e.editor.destroy()), f.clear(), l = null;
 		}
 	};
-	return g(), oe;
+	return g(), se;
 }
 //#endregion
 //#region src/notebook-schema.js
@@ -48346,12 +48351,20 @@ function rK({ editor: e, options: t }) {
 	}, h = QA({
 		editor: e,
 		selector: ({ editor: e }) => {
-			let t = e.getExtension("yUndo") || e.getExtension("history");
+			let t = e.getExtension("yUndo") || e.getExtension("history"), n = e.getActiveStyles(), r = n.fontSize;
+			if (!r && typeof getComputedStyle == "function") {
+				let t = e._tiptapEditor, n = e.domElement?.isConnected ? e.prosemirrorView : null;
+				if (n?.dom?.isConnected) {
+					let e = n.domAtPos(t.state.selection.from).node, i = e.nodeType === 1 ? e : e.parentElement, a = i && parseFloat(getComputedStyle(i).fontSize);
+					a && (r = NW(String(Math.round(a * 1.5) / 2)));
+				}
+			}
 			return {
 				editable: e.isEditable,
 				canUndo: !!(t && e.canExec(t.undoCommand)),
 				canRedo: !!(t && e.canExec(t.redoCommand)),
-				styles: e.getActiveStyles(),
+				styles: n,
+				fontSize: r,
 				blocks: e.getSelection()?.blocks || [e.getTextCursorPosition().block]
 			};
 		}
@@ -48462,7 +48475,7 @@ function rK({ editor: e, options: t }) {
 		onClick: () => {
 			m(f.current) && (e.focus(), i(t.value));
 		}
-	}, t.label)))), M = j("Font size", h.styles.fontSize || "Size", [{
+	}, t.label)))), M = j("Font size", h.fontSize ? `${h.fontSize} pt` : "Size", [{
 		value: "default",
 		label: "Default",
 		selected: !h.styles.fontSize
@@ -48534,47 +48547,7 @@ function rK({ editor: e, options: t }) {
 			orientation: "column",
 			side: "right"
 		}), t === "remove-row" && x?.removeRowOrColumn(S.from.row, "row"), t === "remove-column" && x?.removeRowOrColumn(S.from.col, "column"), t === "remove-table" && e.removeBlocks([b]));
-	});
-	return _.createElement("div", {
-		className: "notebook-format-toolbar",
-		role: "toolbar",
-		"aria-label": "Note formatting"
-	}, _.createElement("button", {
-		type: "button",
-		className: "notebook-format-button notebook-format-undo",
-		title: "Undo (⌘Z / Ctrl+Z)",
-		"aria-label": "Undo",
-		disabled: !h.editable || !h.canUndo,
-		onMouseDown: (e) => e.preventDefault(),
-		onClick: () => {
-			e.focus(), e.undo();
-		}
-	}, E(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"])), _.createElement("button", {
-		type: "button",
-		className: "notebook-format-button notebook-format-redo",
-		title: "Redo (⌘⇧Z / Ctrl+Shift+Z)",
-		"aria-label": "Redo",
-		disabled: !h.editable || !h.canRedo,
-		onMouseDown: (e) => e.preventDefault(),
-		onClick: () => {
-			e.focus(), e.redo();
-		}
-	}, E(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"])), T("bold", "Bold", _.createElement("strong", null, "B")), T("italic", "Italic", _.createElement("em", null, "I")), T("underline", "Underline", _.createElement("u", null, "U")), T("strike", "Strikethrough", _.createElement("s", null, "S")), _.createElement("button", {
-		type: "button",
-		className: "notebook-format-button notebook-format-highlight",
-		title: "Highlight",
-		"aria-label": "Highlight",
-		"aria-pressed": h.styles.backgroundColor === "yellow",
-		disabled: !h.editable || !v,
-		onMouseDown: (e) => e.preventDefault(),
-		onClick: () => {
-			e.focus(), h.styles.backgroundColor === "yellow" ? e.removeStyles({ backgroundColor: "yellow" }) : e.addStyles({ backgroundColor: "yellow" });
-		}
-	}, E([
-		"M5 12l6-8 5 4-6 8-5-4Z",
-		"M5 12l-2 5h6",
-		"M2 19h15"
-	])), _.createElement(PH, {
+	}), ne = _.createElement(PH, {
 		position: "bottom-start",
 		offset: 8,
 		withinPortal: !1,
@@ -48584,7 +48557,7 @@ function rK({ editor: e, options: t }) {
 	}, _.createElement(PH.Target, null, _.createElement("button", {
 		ref: d,
 		type: "button",
-		className: "notebook-format-style",
+		className: "notebook-format-style notebook-format-text-style",
 		"aria-label": "Text style",
 		disabled: !h.editable || !g.length,
 		onMouseDown: (e) => e.preventDefault()
@@ -48604,7 +48577,51 @@ function rK({ editor: e, options: t }) {
 		className: "notebook-format-style-option",
 		"aria-current": C === e ? "true" : void 0,
 		onClick: () => e.startsWith("heading-") ? w("heading", { level: Number(e.slice(-1)) }) : w("paragraph")
-	}, t)))), M, ee, te, k("bulletListItem", "Bulleted list", E(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])), k("numberedListItem", "Numbered list", E(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])), _.createElement("span", { className: "notebook-format-link" }, _.createElement("button", {
+	}, t)))), re = (e, ...t) => _.createElement("div", {
+		className: "format-toolbar-group",
+		role: "group",
+		"aria-label": e
+	}, ...t);
+	return _.createElement("div", {
+		className: "notebook-format-toolbar",
+		role: "toolbar",
+		"aria-label": "Note formatting"
+	}, re("History", _.createElement("button", {
+		type: "button",
+		className: "notebook-format-button notebook-format-undo",
+		title: "Undo (⌘Z / Ctrl+Z)",
+		"aria-label": "Undo",
+		disabled: !h.editable || !h.canUndo,
+		onMouseDown: (e) => e.preventDefault(),
+		onClick: () => {
+			e.focus(), e.undo();
+		}
+	}, E(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"])), _.createElement("button", {
+		type: "button",
+		className: "notebook-format-button notebook-format-redo",
+		title: "Redo (⌘⇧Z / Ctrl+Shift+Z)",
+		"aria-label": "Redo",
+		disabled: !h.editable || !h.canRedo,
+		onMouseDown: (e) => e.preventDefault(),
+		onClick: () => {
+			e.focus(), e.redo();
+		}
+	}, E(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"]))), re("Text style and size", ne, M), re("Emphasis", T("bold", "Bold", _.createElement("strong", null, "B")), T("italic", "Italic", _.createElement("em", null, "I")), T("underline", "Underline", _.createElement("u", null, "U")), T("strike", "Strikethrough", _.createElement("s", null, "S")), _.createElement("button", {
+		type: "button",
+		className: "notebook-format-button notebook-format-highlight",
+		title: "Highlight",
+		"aria-label": "Highlight",
+		"aria-pressed": h.styles.backgroundColor === "yellow",
+		disabled: !h.editable || !v,
+		onMouseDown: (e) => e.preventDefault(),
+		onClick: () => {
+			e.focus(), h.styles.backgroundColor === "yellow" ? e.removeStyles({ backgroundColor: "yellow" }) : e.addStyles({ backgroundColor: "yellow" });
+		}
+	}, E([
+		"M5 12l6-8 5 4-6 8-5-4Z",
+		"M5 12l-2 5h6",
+		"M2 19h15"
+	]))), re("Paragraph", k("bulletListItem", "Bulleted list", E(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])), k("numberedListItem", "Numbered list", E(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])), ee), re("Insert", _.createElement("span", { className: "notebook-format-link" }, _.createElement("button", {
 		type: "button",
 		className: "notebook-format-button",
 		title: "Link",
@@ -48636,7 +48653,7 @@ function rK({ editor: e, options: t }) {
 		onClick: () => {
 			r(!1), m(u.current) && e.focus();
 		}
-	}, "Cancel")))), t.toolbarInsertElement ? _.createElement("span", {
+	}, "Cancel")))), te, t.toolbarInsertElement ? _.createElement("span", {
 		className: "notebook-format-insert-slot",
 		ref: (e) => {
 			e && t.toolbarInsertElement.parentElement !== e && e.append(t.toolbarInsertElement);
@@ -48649,7 +48666,7 @@ function rK({ editor: e, options: t }) {
 		onClick: (n) => {
 			n.currentTarget.closest("details").open = !1, t.onInsert(e);
 		}
-	}, n)))), _.createElement("span", {
+	}, n))))), _.createElement("span", {
 		className: "notebook-format-save-status",
 		role: "status",
 		ref: (e) => {

@@ -1,0 +1,62 @@
+/* Typing surfaces use the surrounding panel color, with one quiet edge.
+ * Keep this shared treatment last in the workspace stylesheet order. */
+@media screen {
+  html body :is(
+    input:not(:is([type="hidden"], [type="button"], [type="submit"],
+      [type="reset"], [type="checkbox"], [type="radio"], [type="range"],
+      [type="color"], [type="file"], [type="image"])),
+    textarea,
+    select
+  ),
+  html body .occupant-load-form .custom-select-trigger {
+    box-sizing: border-box;
+    background: transparent !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
+  }
+
+  /* Composite fields own the edge; their editable child stays unframed. */
+  html body :is(.search-box, .rv2-composer, .research-composer-box) {
+    box-sizing: border-box;
+    background: transparent !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
+  }
+  html body :is(.search-box, .rv2-composer, .research-composer-box) :is(input, textarea) {
+    border: 0 !important;
+  }
+
+  /* Floating Reader search needs an opaque panel surface over the passage. */
+  html body .reader-internal-search {
+    background: var(--reader-controls-surface, var(--surface)) !important;
+  }
+
+  /* An inset outline preserves the printable text measure and editor layout.
+   * It is a permanent field edge, identical before and after focus. */
+  html body [contenteditable]:not([contenteditable="false"]),
+  html body [contenteditable]:not([contenteditable="false"]):focus,
+  html body [contenteditable]:not([contenteditable="false"]):focus-visible {
+    background: transparent !important;
+    border: 0 !important;
+    outline: 1px solid var(--border) !important;
+    outline-offset: -1px !important;
+    box-shadow: none !important;
+  }
+  html body [contenteditable]:not([contenteditable="false"]) [contenteditable] {
+    outline: none !important;
+  }
+
+  /* The notepad is a continuous writing surface, without a field frame.
+   * Leave a small caret gutter below the final block instead of 100px. */
+  html body .notebook-panel .notebook-editor-surface .bn-editor[contenteditable] {
+    outline: none !important;
+    padding-block-end: 24px;
+  }
+
+  /* The Report introduction is part of the writing surface. */
+  html body .report-screen .report-introduction-section textarea {
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}

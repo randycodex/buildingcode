@@ -1,7 +1,8 @@
 const maximumSidebarWidth = 720;
 
 function createReportSidebarControls({ panel, shell, element, kind, label, defaultWidth, minimumWidth,
-  availableWidth = () => shell.clientWidth, reservedWidth = () => 0, onResize = () => {}, resizeDirection = 1 }) {
+  availableWidth = () => shell.clientWidth, reservedWidth = () => 0, documentMinimumWidth = () => 600,
+  onResize = () => {}, resizeDirection = 1 }) {
   const header = document.createElement('header');
   header.className = `report-${kind}-header`;
   const title = document.createElement('h2');
@@ -19,7 +20,7 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
   const maximumWidth = () => {
     const available = availableWidth();
     if (!available) return maximumSidebarWidth;
-    return Math.max(minimumWidth, Math.min(maximumSidebarWidth, available - reservedWidth() - 601));
+    return Math.max(minimumWidth, Math.min(maximumSidebarWidth, available - reservedWidth() - documentMinimumWidth() - 1));
   };
   const currentWidth = () => Number(panel.dataset[`${kind}Width`]) || defaultWidth;
   const updateControls = () => {

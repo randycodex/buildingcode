@@ -16,16 +16,24 @@
   align-items: center;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 2px;
+  column-gap: 12px;
+  row-gap: 2px;
   min-height: 42px;
   padding: 5px 24px;
+  border-top: 1px solid var(--border, #d7d9dc);
   border-bottom: 1px solid var(--border, #d7d9dc);
   background: var(--surface, var(--bn-colors-editor-background));
   color: var(--text-primary, inherit);
   font: 13px var(--bn-font-family);
 }
-.permitext-notebook-editor .notebook-format-toolbar > button { width: 28px; flex: 0 0 28px; }
-.permitext-notebook-editor .notebook-format-toolbar > button svg { width: 17px; height: 17px; }
+:is(.notebook-format-toolbar, .report-format-toolbar) > .format-toolbar-group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+}
+.permitext-notebook-editor .notebook-format-toolbar .notebook-format-button { width: 28px; flex: 0 0 28px; }
+.permitext-notebook-editor .notebook-format-toolbar .notebook-format-button svg { width: 17px; height: 17px; }
 .permitext-notebook-editor .notebook-format-toolbar :is(button, select, summary) {
   min-height: 30px;
   border: 0;
@@ -55,6 +63,9 @@
 .permitext-notebook-editor .notebook-format-save-status { margin-inline-start: auto; font-size: 11px; color: var(--text-secondary, #777); }
 .permitext-notebook-editor .notebook-format-toolbar .notebook-format-style { display: inline-flex; align-items: center; justify-content: center; gap: 0; width: auto; flex: 0 0 auto; white-space: nowrap; }
 .permitext-notebook-editor .notebook-format-toolbar .notebook-format-style svg { width: 14px; height: 14px; }
+.permitext-notebook-editor .notebook-format-toolbar .notebook-format-text-style { width: 80px; flex-basis: 80px; }
+.permitext-notebook-editor .notebook-format-toolbar [aria-label="Font size"] { min-width: 48px; }
+.permitext-notebook-editor .notebook-format-toolbar [aria-label="Line spacing"] { min-width: 62px; }
 .permitext-notebook-editor .notebook-format-style-menu {
   padding: 6px;
   border: 0;

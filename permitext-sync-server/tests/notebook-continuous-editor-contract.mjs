@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { blockNoteBlocksFromNotebookDocument } from '../src/notebook-schema.js';
 import { validateNotebookDocument, renderNotebookDocumentHTML } from '../notebook-contract.mjs';
-import { notebookFontSizes, notebookLineSpacings } from '../public/notebook-styles.js';
+import { notebookFontSize, notebookFontSizes, notebookLineSpacings } from '../public/notebook-styles.js';
 
 // Reusing the editor must preserve authored structure and reference identity.
 const fixture = {schema:'permitext-notebook-card',schemaVersion:2,format:'blocknote-json',document:[
@@ -68,7 +68,8 @@ const editor = {
 const hookState = [], hookRefs = [];
 let stateIndex = 0, refIndex = 0;
 const context = vm.createContext({
-  notebookFontSizes,notebookLineSpacings,
+  notebookFontSize,notebookFontSizes,notebookLineSpacings,
+  getComputedStyle:()=>({fontSize:'13.3333px'}),
   URL, Menu:{Target:'menu-target',Dropdown:'menu-dropdown',Item:'menu-item'},
   useState:initial=>{const index=stateIndex++; if(!(index in hookState)) hookState[index]=initial; return [hookState[index],value=>{hookState[index]=value;}];},
   useRef:initial=>{const index=refIndex++; return hookRefs[index] ||= {current:initial};},
@@ -86,19 +87,26 @@ assert.equal(focusCount,1); assert.equal(transactions,1);
 assert.deepEqual(updates.map(update=>update.id),['heading','list'],'Images remain images');
 assert.ok(updates.every(update=>update.type==='heading' && update.props.level===2));
 assert.deepEqual(selected,fixture.document,'Toolbar does not rebuild content or strip nested data');
-const bullets = toolbar.children.find(child=>child?.props?.['aria-label']==='Bulleted list');
+const bullets = menuItems(toolbar).find(child=>child?.props?.['aria-label']==='Bulleted list');
 let prevented = false;
 bullets.props.onMouseDown({preventDefault(){prevented=true;}});
 assert.equal(prevented,true,'Pointer formatting retains the editor selection');
 console.log('Continuous toolbar callbacks passed: focus, selected text-only conversion, one undo transaction, and preserved structure.');
 
-const bold = toolbar.children.find(child=>child?.props?.['aria-label']==='Bold');
+const bold = menuItems(toolbar).find(child=>child?.props?.['aria-label']==='Bold');
 bold.props.onClick();
 assert.equal(styleState.bold,true,'Persistent Bold applies directly to selected text');
-renderToolbar().children.find(child=>child?.props?.['aria-label']==='Bold').props.onClick();
+menuItems(renderToolbar()).find(child=>child?.props?.['aria-label']==='Bold').props.onClick();
 assert.equal(styleState.bold,false,'Clicking active Bold toggles it off');
 const descendants = node => node && typeof node === 'object' ? [node,...(node.children || []).flatMap(descendants)] : [];
 const named = (tree,name) => descendants(tree).find(node=>node.props?.['aria-label']===name);
+editor.domElement={isConnected:true};
+editor.prosemirrorView={dom:{isConnected:true},domAtPos:()=>({node:{nodeType:1}})};
+assert.equal(named(renderToolbar(),'Font size').children[0],'10 pt','Inherited CSS pixel sizes display as document points.');
+editor.domElement.isConnected=false;
+Object.defineProperty(editor,'prosemirrorView',{configurable:true,get(){assert.fail('An unmounted editor has no view.');}});
+assert.doesNotThrow(renderToolbar,'The toolbar must render before the editor mounts.');
+delete editor.prosemirrorView;delete editor.domElement;
 named(renderToolbar(),'Link').props.onClick();
 named(renderToolbar(),'Link URL').props.onChange({target:{value:'https://example.com/record'}});
 let linkForm = descendants(renderToolbar()).find(node=>node.type==='form');

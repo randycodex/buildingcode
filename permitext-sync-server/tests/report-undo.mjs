@@ -98,4 +98,12 @@ for(const placeholder of [
   writes[1].resolve({...writes[1].snapshot,version:3});assert(await saving);assert.equal(draft.version,3);
   assert(history.canRedo(draft),'Successful autosave retains Redo'); autosave.dispose();
 }
-console.log('Report Undo/Redo passed: grouped typing, inline/source formatting, structure, identity fences, server refresh, bounded history and autosave races.');
+{
+  const draft = {title:'Legacy report', reportDate:'2026-11-15', introduction:'', blocks:[]};
+  const history = createReportUndo(); history.bind(draft);
+  draft.pageFormat = 'a4'; history.record(draft);
+  Object.assign(draft, history.undo(draft));
+  assert.equal(draft.pageFormat, 'letter', 'Undo restores Letter for a report created before paper-size settings existed.');
+  Object.assign(draft, history.redo(draft)); assert.equal(draft.pageFormat, 'a4');
+}
+console.log('Report Undo/Redo passed: grouped typing, inline/source formatting, structure, paper size, identity fences, server refresh, bounded history and autosave races.');

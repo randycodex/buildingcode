@@ -559,6 +559,7 @@ export function parseCodeQuestionDeepLink(hash) {
   const segments = raw.split("/").filter(Boolean);
   // cq project {id} [question {id} [stage {stage}]]
   if (segments[0] !== "cq" || segments[1] !== "project" || !segments[2]) return null;
+  try {
   const result = {
     projectID: decodeURIComponent(segments[2]),
     questionID: null,
@@ -575,6 +576,7 @@ export function parseCodeQuestionDeepLink(hash) {
     }
   }
   return result;
+  } catch {return null;}
 }
 
 /**

@@ -146,6 +146,13 @@ export function createReportFormatting({onChange, onInsert, onUndo, onRedo, canU
     menu.append(button(label,label,() => {insert.open = false; onInsert(kind);},false));
   }
   insert.append(summary,menu); toolbar.append(insert);
+  const group = (label, ...items) => {
+    const element = document.createElement('div'); element.className = 'format-toolbar-group';
+    element.setAttribute('role','group'); element.setAttribute('aria-label',label);
+    element.append(...items); return element;
+  };
+  toolbar.replaceChildren(group('History',undo,redo), group('Text style',style),
+    group('Emphasis',...marks.values()), group('Paragraph',bullets,numbers), group('Insert',link,insert));
   const focusOut = event => {if (!toolbar.contains(event.relatedTarget)) {insert.open = false; if (linkSession) closeLink();}};
   toolbar.addEventListener('focusout',focusOut);
   const selectionChanged = () => {

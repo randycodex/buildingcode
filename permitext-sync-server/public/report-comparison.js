@@ -10,14 +10,17 @@ export function preserveReportReadingPosition(container, change) {
   container.scrollTop = anchor ? container.scrollTop + anchor.getBoundingClientRect().top - before : scroll;
 }
 
-export function reportComparisonLayout(available, { sources = 0, outline = 0, versions = 300,
-  comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0 } = {}) {
+export function reportOutlineRailWidth(collapsed) { return collapsed ? 35 : 300; }
+
+export function reportComparisonLayout(available, { sources = 0, outline = 0, reports = 0, versions = 300,
+  comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0, minimumReportWidth = 600, outlineDivider = true } = {}) {
+  const reportMinimum = Math.max(600, minimumReportWidth);
   const showPDF = comparing && previewing;
   const minimumSources = sources ? 300 : 0;
   sources = Math.max(minimumSources, sources);
   const minimumVersions = comparing ? Math.min(300, versions) : 0;
   const sidebarBudget = Math.max(minimumSources + minimumVersions,
-    available - 600 - Number(sources > 0) - Number(comparing));
+    available - reportMinimum - reports - Number(sources > 0) - Number(comparing));
   const requestedVersions = comparing ? versions : 0;
   if (sources + requestedVersions > sidebarBudget) {
     const extra = sidebarBudget - minimumSources - minimumVersions;
@@ -25,19 +28,20 @@ export function reportComparisonLayout(available, { sources = 0, outline = 0, ve
     sources = minimumSources + Math.floor(extra * (sources - minimumSources) / requestedExtra);
     versions = Math.min(requestedVersions, sidebarBudget - sources);
   }
-  const sidebars = sources + outline + (comparing ? versions : 0);
-  const dividers = Number(sources > 0) + Number(outline > 0) + Number(comparing) + Number(showPDF);
-  const pairWidth = Math.max(1200, available - sidebars - dividers);
-  const chosenReport = reportWidth ? Math.max(600, reportWidth) : 0;
+  const sidebars = sources + outline + reports + (comparing ? versions : 0);
+  const dividers = Number(sources > 0) + Number(outline > 0 && outlineDivider) + Number(comparing) + Number(showPDF);
+  const pairWidth = Math.max(reportMinimum + 600, available - sidebars - dividers);
+  const chosenReport = reportWidth ? Math.max(reportMinimum, reportWidth) : 0;
   const chosenPDF = pdfWidth ? Math.max(600, pdfWidth) : 0;
   return {
     sourcesWidth: sources, versionsWidth: comparing ? versions : 0,
     template: [sources ? `${sources}px` : '0px', sources ? '1px' : '0px',
       'minmax(0, 1fr)', comparing ? '1px' : '0px', comparing ? `${versions}px` : '0px'].join(' '),
-    documentTemplate: [outline ? `${outline}px` : '0px', outline ? '1px' : '0px',
-      showPDF && chosenReport ? `${chosenReport}px` : 'minmax(600px, 1fr)',
+    documentTemplate: [outline ? `${outline}px` : '0px', outline && outlineDivider ? '1px' : '0px',
+      showPDF && chosenReport ? `${chosenReport}px` : `minmax(${reportMinimum}px, 1fr)`,
+      ...(reports ? [`${reports}px`] : []),
       showPDF ? '1px' : '0px', showPDF ? chosenPDF ? `${chosenPDF}px` : 'minmax(600px, 1fr)' : '0px'].join(' '),
-    minimumWidth: sidebars + dividers + (showPDF ? (chosenReport || 600) + (chosenPDF || 600) : 600),
+    minimumWidth: sidebars + dividers + (showPDF ? (chosenReport || reportMinimum) + (chosenPDF || 600) : reportMinimum),
     balancedDocumentWidth: pairWidth / 2
   };
 }
@@ -71,7 +75,10 @@ export function resetReportColumnWidths(panel, onResize) {
 // the editable draft, its fields, or its scroll position.
 export function createReportComparison({ panel, columns, isCurrent, onResize,
   availableWidth = () => columns()?.clientWidth || 0,
+  outlineWidth = () => panel.dataset.outlineHidden === 'true' ? 0 : Number(panel.dataset.outlineWidth) || 300,
+  minimumReportWidth = () => 600, reportsWidth = () => 0, outlineDivider = true,
   renderReview = openReportExportReview }) {
+  const reportMinimum = () => Math.max(600, minimumReportWidth());
   const preview = document.createElement('section');
   preview.className = 'report-pdf-preview-panel';
   preview.setAttribute('aria-label', 'Report PDF preview');
@@ -134,7 +141,7 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
   divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to balance';
   const balancedWidth = () => reportComparisonLayout(availableWidth(), {
     sources: panel.dataset.libraryOpen === 'true' ? Number(panel.dataset.libraryWidth) || 330 : 0,
-    outline: panel.dataset.outlineHidden === 'true' ? 0 : Number(panel.dataset.outlineWidth) || 300,
+    outline: outlineWidth(), reports: reportsWidth(), minimumReportWidth: reportMinimum(), outlineDivider,
     versions: panel.dataset.versionsCollapsed === 'true' ? 48 : Number(panel.dataset.versionsWidth) || 300, comparing: true
   }).balancedDocumentWidth;
   const widths = () => ({
@@ -150,7 +157,7 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
     paintSelection();
   };
   const resize = (report, pdf) => {
-    panel.dataset.reportComparisonWidth = String(Math.max(600, report));
+    panel.dataset.reportComparisonWidth = String(Math.max(reportMinimum(), report));
     panel.dataset.pdfComparisonWidth = String(Math.max(600, pdf));
     preservePDFReadingPosition(preview.querySelector('.report-export-content'), onResize);
     update();
@@ -167,12 +174,12 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
     event.preventDefault();
     const delta = event.key === 'ArrowLeft' ? -step : event.key === 'ArrowRight' ? step :
-      event.key === 'Home' ? 600 - report : 0;
+      event.key === 'Home' ? reportMinimum() - report : 0;
     if (event.key === 'End') resize(balancedWidth(), balancedWidth());
     else {
       const scroll = columns().scrollLeft;
       resize(report + delta, pdf - delta);
-      columns().scrollLeft = scroll + Math.max(600, report + delta) - report - delta;
+      columns().scrollLeft = scroll + Math.max(reportMinimum(), report + delta) - report - delta;
     }
   });
   let drag = null, versionsResize = null;
@@ -188,7 +195,7 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
     resize(drag.report + delta, drag.pdf - delta);
     // Once the Report reaches its minimum, keep the boundary under the pointer
     // by scrolling the documents while the PDF continues growing to the left.
-    columns().scrollLeft = drag.scroll + Math.max(600, drag.report + delta) - drag.report - delta;
+    columns().scrollLeft = drag.scroll + Math.max(reportMinimum(), drag.report + delta) - drag.report - delta;
   });
   const finish = () => { drag = null; };
   for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) divider.addEventListener(event, finish);
@@ -204,7 +211,7 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
       const origin = versionsResize;
       if (selectedID && panel.dataset.comparisonOpen === 'true') {
         const delta = (Number(panel.dataset.versionsWidth) || 300) - origin.width;
-        panel.dataset.reportComparisonWidth = String(Math.max(600, origin.report));
+        panel.dataset.reportComparisonWidth = String(Math.max(reportMinimum(), origin.report));
         panel.dataset.pdfComparisonWidth = String(Math.max(600, origin.pdf - delta));
       }
       preservePDFReadingPosition(preview.querySelector('.report-export-content'), onResize);

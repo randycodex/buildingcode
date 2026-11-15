@@ -508,11 +508,13 @@ let continuedDraftSyncs = 0;
 const foregroundImages = new Promise((resolve) => { continueForegroundImages = resolve; });
 const guardedForegroundSync = new Function(
   "canRunForegroundSync", "captureAccountRequest", "activeAccount",
+  "flushPendingProjectCalculations",
   "flushPendingNotebookImages", "requireCurrentAccountRequest", "flushPendingNotebookDrafts",
   "isCurrentAccountRequest", "updateConnectionStatus",
   `let foregroundSyncPromise = null; let syncedContent = null; ${foregroundSyncSource}; return performForegroundSync;`
 )(
   () => true, () => ({ userID: "account-A" }), () => ({ userID: "account-A" }),
+  async () => {},
   () => foregroundImages,
   () => { if (!foregroundAccountCurrent) throw new Error("ACCOUNT_CONTEXT_CHANGED"); },
   () => { continuedDraftSyncs += 1; }, () => foregroundAccountCurrent, () => {}

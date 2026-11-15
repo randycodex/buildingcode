@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {moveReportBlock, reportDropIndex, reportOutlineDropIndex, groupReportOutline, createReportOutline, scrollReportTarget, revealOutlineHandle, navigateReportOutline} from '../public/report-outline.js';
+import {moveReportBlock, reportDropIndex, reportOutlineDropIndex, groupReportOutline, createReportOutline, createReportInsertion, reportInsertionIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline} from '../public/report-outline.js';
 import {createReportAutosave} from '../public/report-autosave.js';
 import {createReportUndo} from '../public/report-undo.js';
 import {readFile} from 'node:fs/promises';
@@ -257,5 +257,29 @@ autosave.dispose();
   assert.equal(focus.at(-1).selector,'.report-outline-introduction .report-outline-link','Deleting the final item retains keyboard access to the Outline.');
   await saving.flush();saving.dispose();
 }
-console.log('Report outline passed: ordered heading groups, fold state, insertion boundaries, keyboard/pointer dragging, autosave, navigation and cleanup.');
+{
+  const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+  const start=source.indexOf('    const addReportContent = kind => {');
+  const implementation=source.slice(start,source.indexOf('    reportFormatting = ',start));
+  for(const kind of ['heading','paragraph','list','ordered']) {
+    const draft={id:'selected-report',blocks:['a','b','c'].map(id=>({id,kind:'paragraph',text:id}))};
+    const insertion=createReportInsertion(); insertion.select(draft,'b');
+    let next=0;
+    const context=vm.createContext({activeDraft:draft,reportInsertion:insertion,reportInsertionIndex,
+      crypto:{randomUUID:()=>`new-${++next}`},panel:{dataset:{},querySelector:()=>({focus(){}})},
+      setDirty(){},renderWorkspaceContent(){},outlineController:{reveal(){}},reportFormatting:{focus(){}}});
+    vm.runInContext(implementation+'\nglobalThis.add=addReportContent;',context);
+    context.add(kind); context.add('paragraph');
+    assert.deepEqual(draft.blocks.map(block=>block.id),['a','b','new-1','new-2','c']);
+    assert.equal(draft.blocks[2].kind,kind==='ordered'?'list':kind);
+    insertion.select(draft,null);context.add('heading');assert.equal(draft.blocks[0].id,'new-3','Introduction inserts before the first content item.');
+    insertion.select(draft,'missing');context.add('paragraph');assert.equal(draft.blocks.at(-1).id,'new-4','A removed anchor safely falls back to the end.');
+    insertion.select(draft,'b');context.add('source');assert.equal(insertion.selected(draft),'b','Opening Sources retains the selected insertion target.');
+  }
+  const insertion=createReportInsertion(),draft={id:'',blocks:[{id:'b'}]};
+  insertion.select(draft,'b');draft.id='saved';insertion.remember(draft);
+  const refreshed=structuredClone(draft);assert.equal(insertion.selected(refreshed),'b');
+  insertion.select({id:'different',blocks:[]},null);assert.equal(insertion.selected(refreshed),'b','Selection remains isolated by report.');
+}
+console.log('Report outline passed: heading/paragraph/list/source insertion after selection, sequential additions, Introduction and stale anchors, per-report selection, folding, dragging, saves and cleanup.');
 console.log('Outline removal passed: per-item actions, current labels, reorder identity, retained children, Undo, autosave, focus, stale-item and access guards.');

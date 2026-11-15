@@ -50,7 +50,7 @@
 .rv2-chat{display:flex;flex-direction:column;align-items:center;min-height:0;min-width:0;padding:0 24px;background:var(--surface)}
 .rv2-chat>:is(.rv2-thread,.rv2-detail,.rv2-status,.rv2-composer){width:100%;max-width:var(--workspace-content-max-width,800px)}
 .rv2-thread{flex:1;min-height:0;overflow:auto;padding:30px 0 20px;scroll-behavior:smooth;overflow-wrap:anywhere}
-.rv2-welcome{margin:80px auto 40px;max-width:440px}
+.rv2-welcome{margin:80px auto 40px;max-width:440px;text-align:center}
 .rv2-welcome h3{font-size:22px;font-weight:500;letter-spacing:-.3px;margin:0 0 8px}
 .rv2-welcome p{font-size:14px;color:var(--text-secondary)}
 .rv2-user{background:var(--toolbar-active);border-radius:19px;padding:11px 16px;margin:0 0 22px auto;max-width:85%;width:fit-content;white-space:pre-wrap}
@@ -68,10 +68,11 @@
 .rv2-answer-footer{display:flex;align-items:center;flex-wrap:wrap;gap:12px;color:var(--text-secondary);font-size:11px;margin-top:16px;white-space:normal}
 .research-v2 .rv2-text-action{font-size:12px;color:var(--text-secondary);padding:5px 7px}
 .research-v2 .rv2-citation{font-size:12px;color:var(--text-link);padding:0 3px;display:inline}
-.rv2-composer{position:relative;background:var(--toolbar-active);border-radius:23px;padding:12px 15px;margin:0 0 20px}
-.rv2-chips{display:flex;gap:5px;flex-wrap:wrap;min-height:26px;margin-bottom:4px}
+.rv2-composer{position:relative;box-sizing:border-box;display:flex;flex:0 0 auto;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:23px;padding:14px 16px 12px;margin:0 0 20px;cursor:text}
+.rv2-chips{display:flex;gap:5px;flex-wrap:wrap}
+.rv2-chips:empty{display:none}
 .research-v2 .rv2-passage-chip{font-size:12px;padding:3px 5px;line-height:1.4;border-radius:7px}
-.rv2-input{background:transparent;border:0;width:100%;resize:none;display:block;min-height:46px;max-height:140px;padding:4px 0}
+.research-v2 .rv2-input{box-sizing:border-box;background:transparent;border:0;border-radius:0;width:100%;resize:none;display:block;min-height:24px;max-height:192px;margin:0;padding:0;line-height:1.45;overflow-y:auto;overflow-wrap:anywhere;scrollbar-width:thin}
 .rv2-composer-controls{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .research-v2 .rv2-send{font-size:20px;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--text-primary);color:var(--surface);padding:0;margin-left:auto}
 .rv2-status{font-size:12px;color:var(--text-secondary);margin:4px 0 10px;overflow-wrap:anywhere}

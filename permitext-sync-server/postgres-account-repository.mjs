@@ -755,6 +755,16 @@ export function createPostgresAccountRepository(sql, options = {}) {
       sql`UPDATE permitext_passkey_credentials SET user_id = ${targetUserID}, updated_at = now() WHERE user_id = ${sourceUserID}`,
       sql`DELETE FROM permitext_account_sessions WHERE user_id = ${sourceUserID}`,
       sql`DELETE FROM permitext_sessions WHERE user_id = ${sourceUserID}`,
+      // Retain previous Project names used by browser bookmarks after linking accounts.
+      sql`
+        INSERT INTO permitext_sync_events(record_id,user_id,entity_kind,code_version,mutation_updated_at,mutation)
+        SELECT CASE WHEN left(record_id,length(${sourceUserID})+1) = ${sourceUserID} || ':'
+          THEN ${targetUserID} || substring(record_id FROM length(${sourceUserID})+1) ELSE record_id END,
+          ${targetUserID}, entity_kind, code_version, mutation_updated_at,
+          jsonb_build_object('project',(mutation->'project') || jsonb_build_object('userID',${targetUserID}::text))
+        FROM permitext_sync_events WHERE user_id = ${sourceUserID} AND entity_kind = 'project'
+        ON CONFLICT(record_id,mutation_updated_at) DO NOTHING
+      `,
       sql`DELETE FROM permitext_sync_events WHERE user_id = ${sourceUserID}`,
       sql`DELETE FROM permitext_saved_items WHERE user_id = ${sourceUserID}`,
       sql`DELETE FROM permitext_annotations WHERE user_id = ${sourceUserID}`,

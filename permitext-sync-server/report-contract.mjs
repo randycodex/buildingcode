@@ -4,6 +4,8 @@ import { normalizedResearchProjectStructuredFacts, projectFactProjectionVersion 
 import { normalizeReportRuns } from "./public/report-rich-text.js";
 import { normalizeSourceFormatting } from "./public/report-source-formatting.js";
 import { tableDisplayCells } from "./public/notebook-content.js";
+import {normalizeReportCalculation} from './calculation-contract.mjs';
+import {normalizeReportPageFormat} from './public/document-layout.js';
 
 export const reportDraftSchemaVersion = 1;
 export const reportDraftSchemaVersionV2 = 2;
@@ -37,6 +39,7 @@ export const reportDraftBlockKinds = Object.freeze([
   "projectFacts",
   "evidence",
   "notebookCard",
+  "calculation",
   "researchAnswer",
   "workboardPreview",
   "attachment"
@@ -222,6 +225,7 @@ export function normalizeReportDraftBlock(block, index = 0) {
 export function normalizeReportDraftPayload({
   title,
   reportDate,
+  pageFormat,
   introduction = "",
   blocks,
   createdBy,
@@ -241,6 +245,7 @@ export function normalizeReportDraftPayload({
     schemaVersion: reportDraftSchemaVersion,
     title: requiredText(title, "Report title", 300),
     reportDate: requiredISO(reportDate, "Report date"),
+    ...(pageFormat === undefined ? {} : {pageFormat: normalizeReportPageFormat(pageFormat)}),
     introduction: optionalText(introduction, maximumAuthoredTextLength),
     blocks: normalizedBlocks,
     createdBy: requiredText(createdBy, "Report Draft creator", 256),
@@ -255,6 +260,7 @@ export function normalizeReportDraftPayload({
 export function normalizeReportDraftPayloadV2({
   title,
   reportDate,
+  pageFormat,
   introduction = "",
   blocks,
   createdBy,
@@ -268,6 +274,7 @@ export function normalizeReportDraftPayloadV2({
   const base = normalizeReportDraftPayload({
     title,
     reportDate,
+    pageFormat,
     introduction,
     blocks,
     createdBy,
@@ -356,6 +363,7 @@ export function reportDraftV1CompatibleView(payload) {
     schemaVersion: reportDraftSchemaVersion,
     title: payload.title,
     reportDate: payload.reportDate,
+    ...(payload.pageFormat ? {pageFormat: payload.pageFormat} : {}),
     introduction: payload.introduction,
     blocks: payload.blocks,
     createdBy: payload.createdBy,
@@ -521,6 +529,7 @@ export function normalizeReportManifestItem(item, index = 0) {
   if (kind === "evidence") return normalizeEvidenceManifestItem(item, base);
   if (kind === "projectFacts") return normalizeProjectFactsManifestItem(item, base);
   if (kind === "notebookCard") return normalizeNotebookManifestItem(item, base);
+  if (kind === "calculation") return normalizeReportCalculation(item, base);
   if (kind === "researchAnswer") return normalizeResearchManifestItem(item, base);
   return {
     ...base,
@@ -538,6 +547,7 @@ export function immutableReportManifest({
   draftID,
   title,
   reportDate,
+  pageFormat = 'letter',
   author,
   codeEdition,
   items,
@@ -563,6 +573,7 @@ export function immutableReportManifest({
     draftID: requiredText(draftID, "Report Draft ID", 256),
     title: requiredText(title, "Report title", 300),
     reportDate: requiredISO(reportDate, "Report date"),
+    pageFormat: normalizeReportPageFormat(pageFormat),
     author: {
       userID: requiredText(author?.userID, "Report author user ID", 256),
       displayName: requiredText(author?.displayName || "per codes user", "Report author", 500)
@@ -595,6 +606,7 @@ export function immutableReportManifestV3({
   draftID,
   title,
   reportDate,
+  pageFormat = 'letter',
   author,
   codeEdition,
   items,
@@ -620,6 +632,7 @@ export function immutableReportManifestV3({
     draftID,
     title,
     reportDate,
+    pageFormat,
     author,
     codeEdition,
     items,
@@ -765,6 +778,7 @@ export function reportManifestSummary(manifest) {
     draftID: manifest.draftID,
     title: manifest.title,
     reportDate: manifest.reportDate,
+    pageFormat: manifest.pageFormat || 'letter',
     author: manifest.author,
     codeEdition: manifest.codeEdition,
     reportVersion: manifest.reportVersion,

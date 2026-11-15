@@ -75,6 +75,32 @@ export function reportEvidenceEdition(item = {}) {
   return year ? `${year} NYC Codes` : 'Edition not recorded';
 }
 
+export function reportCalculationPresentation(item) {
+  const input = item.input || {};
+  if (!input.area || !input.factor || !Number.isSafeInteger(item.people)) return null;
+  const locations = {interior: 'Interior only - no rooftop or terrace', rooftop: 'Rooftop',
+    terrace: 'Terrace', mixed: 'Mixed / other'};
+  const context = (() => {try {return JSON.parse(item.context);} catch {return [];}})();
+  const source = String(context?.[2] || '').includes('/2022-construction-codes/')
+    ? '2022 NYC Building Code - Table 1004.1.3' : String(context?.[2] || 'Edition not recorded');
+  const custom = input.factorMode === 'custom';
+  return {
+    result: `${item.people} ${item.people === 1 ? 'person' : 'people'}`,
+    equation: `${input.area} ft² ÷ ${input.factor} ft²/person = ${item.people} ${item.people === 1 ? 'person' : 'people'} (rounded up)`,
+    rows: [
+      {label: 'Function of space', value: input.spaceFunction},
+      {label: 'Floor area', value: `${input.area} ft² (${input.areaBasis})`},
+      {label: custom ? 'Custom factor' : 'Occupant-load factor', value: `${input.factor} ft²/person`},
+      {label: 'Seating', value: 'Without fixed seating'},
+      ...(input.spaceLocation ? [{label: 'Location (user-stated)', value: locations[input.spaceLocation] || input.spaceLocation}] : []),
+      ...(custom ? [{label: 'BC table factor', value: `${input.tableFactor} ft²/person`},
+        {label: 'Reason / reference', value: input.customReason}] : [])
+    ],
+    basis: String(input.factorBasis || ''), source,
+    review: 'Needs review: confirm applicable footnotes, exceptions, and cumulative occupant loads.'
+  };
+}
+
 // Preview the same source fields that the PDF renders, without trusting HTML.
 export function reportItemPreview(item) {
   const parts = [];
@@ -114,6 +140,10 @@ export function reportItemPreview(item) {
     add('Additional evidence needed',item.additionalEvidenceNeeded);
     add('Citations',[...new Set((item.citations || []).map(citation=>reportCitationLabel(citation,item.evidence || [],item.codeEdition)))]);
     add('Professional-use notice',item.disclaimer);
+  } else if (item.kind === 'calculation') {
+    add('', item.plainText);
+    const presentation = reportCalculationPresentation(item);
+    if (presentation && parts[0]) parts[0].calculation = presentation;
   } else if (item.kind === 'projectFacts') {
     add('Address',item.address);
     const facts = reportFactPresentation(item);

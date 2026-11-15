@@ -9,6 +9,7 @@ export const reportContentBlocks = blocks => blocks.filter(block=>{
   return true;
 });
 const content = draft => JSON.stringify({title:String(draft.title || '').trim(),
+  pageFormat: draft.pageFormat || 'letter',
   reportDate:Number.isFinite(Date.parse(draft.reportDate)) ? new Date(draft.reportDate).toISOString() : draft.reportDate,
   introduction:String(draft.introduction || '').trim(), blocks:draft.blocks.map(({order,sourceClassification,...block})=>{
     if (typeof block.text === 'string') block.text = block.text.trim();
