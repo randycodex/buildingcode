@@ -14,7 +14,7 @@ const footer = element(), titleAction = element();
 const context = vm.createContext({
   isCurrentAccountRequest:()=>true,activeCard:{id:'accepted-note'},focusedCardID:'accepted-note',
   reportMembershipIndicator:()=>{throw new Error('Notes must not mount a Report membership status');},
-  disposed:false,requestIdentity:{userID:'owner'},renderSequence:1,editorRenderSequence:1,
+  disposed:false,prepared:null,requestIdentity:{userID:'owner'},renderSequence:1,editorRenderSequence:1,
   loadNotebookModule:()=>moduleReady,footer,footerActions:element(),noteMenu:{titleAction},
   coordinateButton:{...element(),hidden:true},
   editorElement:element(),notebookReadOnly:false,

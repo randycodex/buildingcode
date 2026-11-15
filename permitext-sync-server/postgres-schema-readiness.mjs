@@ -95,6 +95,8 @@ export const postgresNormalizedSchemaRequiredIndexes = Object.freeze([
   "permitext_rate_limit_buckets_reset_idx",
   "permitext_research_answers_conversation_idx",
   "permitext_research_conversations_creation_request_idx",
+  "permitext_research_conversations_pinned_history_idx",
+  "permitext_research_conversations_pinned_project_history_idx",
   "permitext_research_conversations_user_updated_idx",
   "permitext_research_conversations_visible_history_idx",
   "permitext_research_conversations_visible_project_history_idx",

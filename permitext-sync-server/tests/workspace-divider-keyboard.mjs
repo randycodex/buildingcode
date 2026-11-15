@@ -128,27 +128,27 @@ console.log('Evidence keyboard resizing and accessible bounds stay within 300–
 // Notebook's keyboard and outer grips use the notepad as their width donor.
 panes.clear();state.paneWeights={};
 const noteListID='project:notes-index:one',editorID='project:notebook:one';
-for(const [id,width] of [['reader:one',810],[evidenceID,450],[noteListID,220],[editorID,1500]])
+for(const [id,width] of [['reader:one',810],[evidenceID,450],[noteListID,300],[editorID,1500]])
  panes.set(id,{dataset:{paneId:id},width,getBoundingClientRect(){return {width:this.width};}});
 track._notebookColumnLayout={resizeMinimums:{[editorID]:800}};
 const evidenceNotes=context.createDivider(evidenceID,noteListID);
 press(evidenceNotes,'ArrowRight',true);
-assert.deepEqual(widths(),[810,530,220,1420]);
-assert.equal(evidenceNotes.attrs['aria-valuetext'],'Left column 530 pixels; right column 220 pixels');
-press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,600,220,1350]);
+assert.deepEqual(widths(),[810,530,300,1420]);
+assert.equal(evidenceNotes.attrs['aria-valuetext'],'Left column 530 pixels; right column 300 pixels');
+press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,600,300,1350]);
 const notesEditor=context.createDivider(noteListID,editorID);
-press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,600,300,1270]);
-press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,600,350,1220]);
+press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,600,300,1350]);
+press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,600,300,1350]);
 const readerEvidence=context.createDivider('reader:one',evidenceID);
-press(readerEvidence,'ArrowRight',true);assert.deepEqual(widths(),[890,600,350,1140]);
+press(readerEvidence,'ArrowRight',true);assert.deepEqual(widths(),[890,600,300,1270]);
 context.resizeAdjacentPanesBy('reader:one',evidenceID,10000,readerEvidence);
-assert.deepEqual(widths(),[1230,600,350,800],'Reader stops at the 800px notepad without resizing either list.');
-press(readerEvidence,'ArrowRight',true);assert.deepEqual(widths(),[1230,600,350,800]);
+assert.deepEqual(widths(),[1360,600,300,800],'Reader stops at the 800px notepad without resizing either list.');
+press(readerEvidence,'ArrowRight',true);assert.deepEqual(widths(),[1360,600,300,800]);
 panes.get('reader:one').width=810;
 panes.get(evidenceID).width=450;panes.get(editorID).width=850;
-press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,500,350,800]);
-press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,500,350,800],'The writing minimum stops growth without squeezing another column.');
+press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,500,300,800]);
+press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,500,300,800],'The writing minimum stops growth without squeezing another column.');
 panes.delete('reader:one');panes.get(evidenceID).width=400;panes.get(editorID).width=1200;
 const notebookEdge=context.createDivider('',evidenceID);
-press(notebookEdge,'ArrowLeft',true);assert.deepEqual(widths(),[480,350,1120]);
+press(notebookEdge,'ArrowLeft',true);assert.deepEqual(widths(),[480,300,1120]);
 console.log('Notebook keyboard resizing passed: notepad supplies width, other columns stay fixed, writing minimum and reference caps hold, Reader may be closed.');

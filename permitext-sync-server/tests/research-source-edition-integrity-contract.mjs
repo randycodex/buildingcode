@@ -32,6 +32,7 @@ import { createActiveCodeSourceNavigationGuard } from "../public/active-code-sou
 import { codeSourceIdentity, codeSourceKey } from "../public/active-code-sources.js";
 import {linkPaneToView} from "../public/workflow-views.js";
 import { withCodeAssetRevision } from "../public/code-asset-identity.js";
+import {searchCitationQuery} from "../public/search-citation-query.js";
 import { parseActiveCodeSearchScope } from "../public/active-code-search-scope.js";
 import { isConversationOnly } from '../assistant-conversation-scope.mjs';
 const sourceCatalog = await activeCodeSourceCatalog();
@@ -97,6 +98,7 @@ function clientHarness(overrides = {}) {
     resolvedReaderSourceNavigations: new WeakMap(),
     currentContentSummary: () => ({ savedItems: [] }),
     currentColumnWorkflowView: () => "research", workspaceColumnsRequireProject: () => false,
+    isProAccount:()=>true,readerShortcuts:null,newReaderState:fields=>({id:'reader-new',...fields}),workingResearchNote:()=>null,
     workflowPaneIsVisible: () => true, linkPaneToView,
     normalizeAnnotationBlockID: (value) => String(value || ""),
     api: async (path) => {
@@ -270,7 +272,7 @@ const installMetadata = {
 };
 function offlineHarness(records, chapters, metadata = installMetadata) {
   const context = vm.createContext({
-    searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions,
+    searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions, searchCitationQuery,
     codeSourceIdentity, codeSourceKey, parseActiveCodeSearchScope,
     URL, defaultCodeVersion: defaultSyncCodeVersion, historicalConstructionSyncCodeVersion,
     syncCodeVersion, syncCodeVersionForPrefix, chaptersStoreName: "chapters", sectionsStoreName: "sections",

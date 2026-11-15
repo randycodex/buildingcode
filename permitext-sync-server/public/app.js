@@ -15,7 +15,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1843";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261113-research-notebook-v1844";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=11";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -171,7 +171,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261113-research-notebook-v1843";
+} from "./offline-storage.js?v=20261113-research-notebook-v1844";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -19391,8 +19391,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   noteButton.innerHTML = noteAddIconSVG();
   noteButton.setAttribute("aria-label", "Add to note");
   noteButton.dataset.noteDestination = "icon";
-  noteButton.title = workingResearchNote()?.title ? `Add to ${workingResearchNote().title}` : "Add to note";
-  noteButton.setAttribute("aria-label", noteButton.title);
+  noteButton.title = "Add to note";
   noteButton.addEventListener("click", async () => {
     if (!allowed() || noteButton.disabled) return;
     noteButton.disabled = true;
@@ -19432,6 +19431,9 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     const permitted = allowed();
     noteButton.hidden = !permitted || !hasCapability("notebook");
     noteButton.disabled = !permitted;
+    const noteTitle = permitted && gate && hasCapability("notebook") ? workingResearchNote()?.title : "";
+    noteButton.title = noteTitle ? `Add to ${noteTitle}` : "Add to note";
+    noteButton.setAttribute("aria-label", noteButton.title);
     bookmarkButton.hidden = !permitted;
     bookmarkButton.disabled = !permitted;
     researchButton.hidden = !permitted;
@@ -46651,6 +46653,7 @@ function paneIsCollapsed(paneID) {
 function applyPaneCollapsedState(panel) {
   if (panel.dataset.paneId.startsWith('project:notes-index:')) {
     // Notes keeps its own toggle and live list, rather than the generic rail.
+    panel.classList.toggle('is-collapsed', false);
     applyPaneWeight(panel, panel.dataset.paneId);
     return;
   }

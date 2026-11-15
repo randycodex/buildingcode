@@ -43,6 +43,7 @@ const context=vm.createContext({
   renderCodeBlock(block){const node=new Node("p");node.textContent=block.plainText;return node;},
   linkInlineCodeReferences(){},decorateReaderDefinitions(){},
   savedSectionRecord(){reads++;return {saved:true};},currentResearchConversationLabel(){reads++;return currentLabel;},
+  workingResearchNote(){reads++;return null;},
   bookmarkIconSVG:saved=>saved?"saved":"save", bookmarkActionLabel:saved=>saved?"Remove passage":"Save passage",
   researchActionIconSVG:()=>"research",checkActionIconSVG:()=>"check",
   readerPassagePayload:()=>target,persistSectionBookmark:async()=>{writes++;return true;},
