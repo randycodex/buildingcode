@@ -16,6 +16,26 @@ export function assistantConversation(history){
   content:m.role==='user'?String(m.question||m.text||''):String(m.answer?.answerText||m.text||'').replace(/\[(?:S|W|R)\d+\]/g,'(earlier citation; use the current source catalog)')})).filter(m=>m.content.trim());
 }
 const base={model:'gpt-6-luna',service_tier:'default',store:false,reasoning:{effort:'low'},max_output_tokens:4096};
+export function assistantRequestInput(input,readSources){
+ return input.map((entry,index)=>{
+  if(index===0){
+   const context=JSON.parse(entry.content),readEvidence=[...readSources.values()],read=new Map(readEvidence.map(source=>[source.id,source]));
+   const attachedPassages=(context.attachedPassages||[]).map(source=>{
+    const original=read.get(source.id);
+    if(!source.id||!original||['sectionID','codeVersion','edition','jurisdiction','authority'].some(key=>source[key]!==original[key]))return source;
+    // Retain both source records and every distinct byte. Only remove content
+    // already present under the same current-turn verified source identity.
+    const reference={...source};
+    for(const key of ['text','tables'])if(Object.hasOwn(source,key)&&Object.hasOwn(original,key)&&
+      JSON.stringify(source[key])===JSON.stringify(original[key]))delete reference[key];
+    return reference;
+   });
+   return {...entry,content:JSON.stringify({...context,attachedPassages,readEvidence})};
+  }
+  if(entry.type==='function_call_output'){const result=JSON.parse(entry.output);return {...entry,output:JSON.stringify({...result,sources:result.sources?.map(({text,tables,...source})=>source)})};}
+  return entry;
+ });
+}
 export async function runAssistant({question,history=[],projectContext=null,attachedSources=[],privateIdentifiers=[],priorEvidence=[]},{call,searchLibrary,recallEvidence=async()=>({sources:[]}),readLibrary,signal,onStage=()=>{}}){
  const started=Date.now(),payloads=[],webSources=[],trace=[];
  const knownLibraryIDs=new Set(attachedSources.map(s=>s.id)),readSources=new Map();
@@ -37,11 +57,7 @@ export async function runAssistant({question,history=[],projectContext=null,atta
   ...conversation,{role:'user',content:JSON.stringify({question,task:'Answer this current question using the project, latest exchange and verified evidence. Retrieve only material missing authority; use the archive when relevant earlier context is absent.'})}];
  for(let round=0;round<7;round++){
   combined.throwIfAborted();onStage('answering');
-  const requestInput=input.map((entry,index)=>{
-   if(index===0)return {...entry,content:JSON.stringify({...JSON.parse(entry.content),readEvidence:[...readSources.values()]})};
-   if(entry.type==='function_call_output'){const result=JSON.parse(entry.output);return {...entry,output:JSON.stringify({...result,sources:result.sources?.map(({text,tables,...source})=>source)})};}
-   return entry;
-  });
+  const requestInput=assistantRequestInput(input,readSources);
   const payload=await call({...base,instructions:assistantInstructions,input:requestInput,tools:round<6?[tool('search_library'),...(readLibrary?[readTool]:[]),...archiveTools,tool('search_web')]:[],include:['reasoning.encrypted_content']},{phase:'experimental',signal:combined});payloads.push(payload);
   if(payload.status!=='completed')throw new Error('Experimental Assistant response did not complete.');
   const calls=(payload.output||[]).filter(i=>i.type==='function_call');

@@ -95,3 +95,11 @@ At the user's request, the simplified Assistant is the sole conversational engin
 Hosted Assistant requests use the existing durable application usage/spend accounting; local tests retain the separate cumulative ledger. The shared Luna/tool allowlist applies to both. Project-context snapshots are captured and checked against the exact answer input. The web shell/cache generation is bumped to replace stale selector assets. Local production builds, the Assistant regression suite, hosted PostgreSQL transport/accounting tests, and cache/Reader attachment checks passed with no paid provider calls during release verification.
 
 This is a version-selection/deployment change, not a claim that AUTH-001, COV-001 or UX-002 have been resolved. Those findings remain open for systemic evaluation.
+
+## Duplicate-evidence transport — local evaluation, November 16
+
+Exact duplicate source text/tables were removed from outgoing request attachment records when the complete identical content is already in the same request's verified `readEvidence`, with matching source ID and scope metadata. No source selection, history, context, prompt or research-stage changes. Fourteen recorded requests passed exact reconstruction checks; request bytes fell 30.1%. Assistant and disposable PostgreSQL integration suites passed. The evaluation ran locally; the user subsequently authorized merging and releasing the change.
+
+The controlled 16-call same-evidence comparison used identical tool-disabled answer generation: input tokens fell 31.3%, estimated cost fell 30.2%, but median completion time rose from 2.416 to 2.670 seconds. No latency improvement is claimed. An earlier 16-call tools-enabled representation comparison had unequal completion/tool choices and is retained as development evidence, not a final-answer speed result. All calls remain charged to the original $7 ledger. [Full report](assistant-evidence-dedup-20261116.md).
+
+**Citation output follow-up:** One table response in each controlled variant omitted the app's source markers, despite the underlying source text being present. This is an output-format observation, not source loss from deduplication, and is not automatically repaired in this change. Existing AUTH-001/COV-001 findings and unvalidated Zoning interpretations remain open. Passing transport invariants does not establish legal accuracy.

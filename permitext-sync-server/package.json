@@ -300,7 +300,7 @@
     "test:report-calculations": "node tests/report-calculations-http.mjs",
     "test:calculation-sync": "node tests/calculation-drafts.mjs && node tests/calculation-project-sync-http.mjs",
     "test:project-urls": "node tests/project-urls.mjs && node tests/project-urls-http.mjs",
-    "test:assistant": "node tests/assistant-engine.mjs && node tests/assistant-library-navigation.mjs && node tests/assistant-conversation-memory.mjs && node tests/assistant-evidence-recall.mjs && node tests/assistant-http.mjs && node tests/assistant-long-chat-http.mjs && node tests/assistant-current-project-context-http.mjs && node tests/research-v2-view.mjs",
+    "test:assistant": "node tests/assistant-engine.mjs && node tests/assistant-evidence-dedup.mjs && node tests/assistant-library-navigation.mjs && node tests/assistant-conversation-memory.mjs && node tests/assistant-evidence-recall.mjs && node tests/assistant-http.mjs && node tests/assistant-long-chat-http.mjs && node tests/assistant-current-project-context-http.mjs && node tests/research-v2-view.mjs",
     "test:assistant:production": "node tests/research-v2-production-preflight.mjs && node tests/assistant-http.mjs --production"
   },
   "dependencies": {

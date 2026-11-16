@@ -1,0 +1,1148 @@
+{
+  "date": "2026-11-16",
+  "basedOn": "32a7e1420f3e8965752a0619bdf9d76cf6a999c4",
+  "branch": "codex/assistant-evidence-dedup",
+  "localOnly": true,
+  "implementation": "Only duplicate text/tables are removed from attachedPassages when identical content exists in readEvidence under the same source identity. Full evidence remains in readEvidence. No model, prompts, retrieval, source selection or conversation changes.",
+  "engineHash": "592161675b70a25db1c9496d5a623eacb848b7e7ee294fb697f61b7bbe36b454",
+  "controlled": {
+    "scope": "Controlled same-evidence answer-generation comparison with tools disabled identically for both variants; not end-to-end latency or a legal-accuracy revalidation.",
+    "model": "gpt-6-luna",
+    "replay": {
+      "requests": 14,
+      "beforeBytes": 888503,
+      "afterBytes": 620867,
+      "checks": "Every original source body/table and metadata record can be reconstructed exactly. History, project context, prompts, tools and settings unchanged."
+    },
+    "cases": [
+      {
+        "question": "What if we're sprinklered throughout?",
+        "beforeBytes": 40033,
+        "afterBytes": 30895,
+        "contextHash": "be4ec72084a1ea707d665954c027a3208383e698edb9f1f75af3c3182cd52e62",
+        "historyHash": "e949d9f505945fd3113ac20ad5986a897e443d3495d9524d611b6f53e3765204"
+      },
+      {
+        "question": "No, it's more than halfway above curb level.",
+        "beforeBytes": 86325,
+        "afterBytes": 55290,
+        "contextHash": "285fe8b333db8ca96d070bffa49ee3f690d7fdf5726b22ab96862269dde8f9e3",
+        "historyHash": "e468e3040c802a0cd7f80931e8f3047d6b351a88f20346b5cad84396a6aee709"
+      },
+      {
+        "question": "Where can I see the table you used?",
+        "beforeBytes": 47614,
+        "afterBytes": 36048,
+        "contextHash": "dbc0b6e767d1c533a612a6d58b1eaf4a753689dc6dbf6e345a778b2ed15cfacf",
+        "historyHash": "bc00b02b213496de5b55a3a8bb81e715ffdd8431139b373884f04b57f5011718"
+      },
+      {
+        "question": "But this is a residential building. Doesn't that make a difference?",
+        "beforeBytes": 62577,
+        "afterBytes": 42851,
+        "contextHash": "c44126d89521a4b95ee9a0e10497ed6a110d87b9667a875a1300f503e6c78977",
+        "historyHash": "794296076ad4592ce94955f564acc9198c597c32fe466b9016d3decf79fddce5"
+      }
+    ],
+    "runs": [
+      {
+        "question": "What if we're sprinklered throughout?",
+        "repeat": 0,
+        "variant": "before",
+        "milliseconds": 2500.3757499999997,
+        "requestBytes": 37880,
+        "usage": {
+          "input_tokens": 8432,
+          "input_tokens_details": {
+            "cache_write_tokens": 8429,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 8429
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 145,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 8577
+        },
+        "estimatedUSD": 0.003023,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "If the building is **sprinklered throughout**, that satisfies one condition for the fire-damper exception—but it does **not** by itself remove the fire-damper requirement. For the one-hour corridor fire barrier, the exception also requires a non-Group H area and a ducted HVAC system made of at least 26-gage sheet metal, continuous from the HVAC equipment to the air terminals. If those conditions are met, a fire damper is not required there. [S1]\n\nThat exception addresses the **fire damper at the corridor wall only**. The separate smoke-barrier penetration may still require a smoke damper, subject to its own exceptions. [S4]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "What if we're sprinklered throughout?",
+        "repeat": 0,
+        "variant": "after",
+        "milliseconds": 4035.6474999999996,
+        "requestBytes": 28742,
+        "usage": {
+          "input_tokens": 6476,
+          "input_tokens_details": {
+            "cache_write_tokens": 6473,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 6473
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 277,
+          "output_tokens_details": {
+            "reasoning_tokens": 108
+          },
+          "total_tokens": 6753
+        },
+        "estimatedUSD": 0.002405,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "If the building is **sprinklered throughout**, the duct **may be exempt from a fire damper** at the one-hour corridor wall—but only if the wall is a fire barrier rated no more than 1 hour, the area is not Group H, and the HVAC duct is at least 26-gage sheet metal and continuous from the HVAC equipment to its outlets and inlets. The sprinkler system must meet the specified NYC Building Code standard. [S1]\n\nThat exception addresses the **fire damper only**. If this is a public corridor, a smoke damper may still be required; sprinklering throughout is not, by itself, an exception to that requirement. [S2] The separate smoke-barrier penetration also has its own smoke-damper rule and exceptions. [S4]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "No, it's more than halfway above curb level.",
+        "repeat": 0,
+        "variant": "before",
+        "milliseconds": 2413.5571660000005,
+        "requestBytes": 84172,
+        "usage": {
+          "input_tokens": 17352,
+          "input_tokens_details": {
+            "cache_write_tokens": 17349,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 17349
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 133,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 17485
+        },
+        "estimatedUSD": 0.006139,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "That changes the classification: **if more than half the space’s floor-to-ceiling height is above curb level, it is a basement—not a cellar** (assuming curb level is the applicable reference; a base plane may apply instead). Basement space generally counts as floor area, and using it as a gym does not create an exemption. [S1]\n\nThe comparison is about the **space’s vertical height**, not simply how much of its floor area is above curb. On a through lot, use the curb nearest the space; if the ZR uses a base plane for building height, apply the base-plane test instead. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "No, it's more than halfway above curb level.",
+        "repeat": 0,
+        "variant": "after",
+        "milliseconds": 2034.0155840000007,
+        "requestBytes": 53137,
+        "usage": {
+          "input_tokens": 11075,
+          "input_tokens_details": {
+            "cache_write_tokens": 11072,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 11072
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 94,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 11169
+        },
+        "estimatedUSD": 0.003923,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "That changes the classification: **if more than half the room’s floor-to-ceiling height is above curb level, it is generally a basement, not a cellar**. The Zoning Resolution includes basement space in floor area, so a gym there would generally count toward floor area. [S1]\n\nThis assumes curb level is the applicable reference; if a base plane governs building height, the comparison is to the base plane instead. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "Where can I see the table you used?",
+        "repeat": 0,
+        "variant": "before",
+        "milliseconds": 2028.812,
+        "requestBytes": 45461,
+        "usage": {
+          "input_tokens": 10388,
+          "input_tokens_details": {
+            "cache_write_tokens": 10385,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 10385
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 93,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 10481
+        },
+        "estimatedUSD": 0.003682,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "It’s **2022 NYC Mechanical Code Table 308.4.2**, “Clearance Reduction Methods,” in §308.4.2. You can see its text in the [table passage above](#). It lists the protective assemblies, required construction and reduced clearances; for example, some sheet-metal methods require specified air gaps. The required clearance for your furnace still depends on its listing and manufacturer’s instructions. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "Where can I see the table you used?",
+        "repeat": 0,
+        "variant": "after",
+        "milliseconds": 2830.342125000001,
+        "requestBytes": 33895,
+        "usage": {
+          "input_tokens": 7625,
+          "input_tokens_details": {
+            "cache_write_tokens": 7622,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 7622
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 137,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 7762
+        },
+        "estimatedUSD": 0.002737,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "You can see it in the **2022 NYC Mechanical Code, Table 308.4.2, “Clearance Reduction Methods.”** The City’s online Mechanical Code is available through the [NYC Construction Codes](https://www.nyc.gov/site/buildings/codes/2022-construction-codes.page); open the Mechanical Code and find §308.4.2.\n\nThe table lists the protective-assembly methods, construction details and reduced clearances. For the sheet-metal methods we discussed, it specifies the required insulation or layers and spacing; plain sheet metal alone is not one of the listed methods. The assembly must also meet §308.3.",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": false
+        }
+      },
+      {
+        "question": "But this is a residential building. Doesn't that make a difference?",
+        "repeat": 0,
+        "variant": "before",
+        "milliseconds": 2417.818625,
+        "requestBytes": 60424,
+        "usage": {
+          "input_tokens": 14379,
+          "input_tokens_details": {
+            "cache_write_tokens": 14376,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 14376
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 162,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 14541
+        },
+        "estimatedUSD": 0.005113,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "Yes. **Because this is Group R-2, there’s a specific exception to the usual stair-separation rule.** If the stair enclosures are at least 2-hour-rated masonry or masonry-equivalent, the stair exit doors must be at least **15 feet apart**. The stairs may even share an enclosure, but the construction separating them must also meet those requirements. [S1]\n\nWithout that exception, the general separation rule applies: at least half the maximum overall diagonal of the building or area served—or one-third if the building is sprinklered throughout as specified in the code. [S1]\n\nSo residential status can make side-by-side stairs permissible, but **it does not waive the conditions**. The project’s proposed stair construction and door layout are not yet verified.",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "But this is a residential building. Doesn't that make a difference?",
+        "repeat": 0,
+        "variant": "after",
+        "milliseconds": 2610.8677910000006,
+        "requestBytes": 40698,
+        "usage": {
+          "input_tokens": 9563,
+          "input_tokens_details": {
+            "cache_write_tokens": 9560,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 9560
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 154,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 9717
+        },
+        "estimatedUSD": 0.003424,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "Yes. **Residential occupancy makes a specific difference here:** NYC’s 2022 Building Code has a Group R-2 exception to the usual stair-separation rule. If the stair enclosures meet the specified **2-hour masonry or masonry-equivalent construction**, the stair exit doors may be only **15 feet apart**, and the stairs may even share an enclosure if the construction separating them also meets those requirements. [S1]\n\nThat exception is not simply because the building is residential: the construction conditions matter, and the applicable separation is measured between the **exit doors**. If those conditions are not met, the general rule applies—one-half the area’s maximum diagonal, or one-third for a building sprinklered throughout as specified. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "What if we're sprinklered throughout?",
+        "repeat": 1,
+        "variant": "after",
+        "milliseconds": 2161.0387910000027,
+        "requestBytes": 28742,
+        "usage": {
+          "input_tokens": 6476,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 6473
+          },
+          "output_tokens": 135,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 6611
+        },
+        "estimatedUSD": 0.000133,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "If the building is **sprinklered throughout**, the fire damper is **not required at the one-hour corridor fire-barrier penetration** if the area is not Group H and the duct is part of the HVAC system, at least 26-gage sheet metal, and continuous from the HVAC equipment to the air terminals. That is the sprinkler-based exception in NYC Mechanical Code §607.5.2. [S1]\n\nThat exception does **not** remove the separate smoke-damper requirements for a public-corridor wall or the building’s smoke barrier; those have their own rules and exceptions. [S2] [S4]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "What if we're sprinklered throughout?",
+        "repeat": 1,
+        "variant": "before",
+        "milliseconds": 2468.2024999999994,
+        "requestBytes": 37880,
+        "usage": {
+          "input_tokens": 8432,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 8429
+          },
+          "output_tokens": 130,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 8562
+        },
+        "estimatedUSD": 0.00015,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "If the building is **equipped throughout with the required automatic sprinkler system**, the corridor-wall penetration can qualify for the fire-damper exception—provided the wall is rated **1 hour or less**, the area is **not Group H**, and the duct is HVAC sheet metal at least **26 gage**, continuous from the equipment to the air terminals. [S1]\n\nThat exception concerns the **fire damper only**. A sprinklered building may still need a **smoke damper** at a public-corridor wall or the separate smoke barrier unless a separate exception applies. [S2] [S4]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "No, it's more than halfway above curb level.",
+        "repeat": 1,
+        "variant": "after",
+        "milliseconds": 2729.5355830000008,
+        "requestBytes": 53137,
+        "usage": {
+          "input_tokens": 11075,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 11072
+          },
+          "output_tokens": 107,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 11182
+        },
+        "estimatedUSD": 0.000165,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "Then it is **not a cellar** under the ordinary curb-level test: a space with more than half its height above curb level meets the Zoning Resolution’s definition of a **basement**. Basement space generally counts as floor area, and using it as a gym does not create a cellar exemption. [S1]\n\nThis assumes curb level is the applicable measurement reference; if the zoning lot uses a base plane for determining building height, the ZR applies the corresponding base-plane test instead. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "No, it's more than halfway above curb level.",
+        "repeat": 1,
+        "variant": "before",
+        "milliseconds": 2299.1447080000034,
+        "requestBytes": 84172,
+        "usage": {
+          "input_tokens": 17352,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 17349
+          },
+          "output_tokens": 121,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 17473
+        },
+        "estimatedUSD": 0.000235,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "Then it is **not a cellar under the stated curb-level test**: a cellar must have **more than half its height below curb level**. If the space is partly below curb and at least half its height is above, it meets the ZR definition of a **basement** instead. Basement space generally counts as floor area, so a gym there would generally count too. [S1]\n\nThat assumes curb level is the applicable reference (rather than a zoning base plane) and that the stated measurement is for the space’s floor-to-ceiling height. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "Where can I see the table you used?",
+        "repeat": 1,
+        "variant": "after",
+        "milliseconds": 2269.4577499999978,
+        "requestBytes": 33895,
+        "usage": {
+          "input_tokens": 7625,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 7622
+          },
+          "output_tokens": 118,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 7743
+        },
+        "estimatedUSD": 0.000136,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "It’s **NYC Mechanical Code Table 308.4.2, “Clearance Reduction Methods,”** in the **2022 NYC Construction Codes**. The table is in §308.4.2; you can look it up in the NYC Mechanical Code on the NYC Department of Buildings website or in the 2022 code text.\n\nFor the sheet-metal methods we discussed, look for the rows specifying galvanized sheet metal and the required insulation or airspace. The table gives different reduced clearances depending on the method and the original required clearance. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "Where can I see the table you used?",
+        "repeat": 1,
+        "variant": "before",
+        "milliseconds": 2330.5994999999966,
+        "requestBytes": 45461,
+        "usage": {
+          "input_tokens": 10388,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 10385
+          },
+          "output_tokens": 110,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 10498
+        },
+        "estimatedUSD": 0.00016,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "It’s **2022 NYC Mechanical Code Table 308.4.2, “Clearance Reduction Methods,”** under §308.4.2. The table is reproduced in the NYC Mechanical Code source here: [Table 308.4.2](https://codes.iccsafe.org/content/NYCMC2022P1/chapter-3-general-regulations#NYCMC2022P1_Ch03_Sec308.4.2). The relevant rows specify the construction and clearances for the different protective assemblies.",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": false
+        }
+      },
+      {
+        "question": "But this is a residential building. Doesn't that make a difference?",
+        "repeat": 1,
+        "variant": "after",
+        "milliseconds": 2733.4219999999987,
+        "requestBytes": 40698,
+        "usage": {
+          "input_tokens": 9563,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 9560
+          },
+          "output_tokens": 125,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 9688
+        },
+        "estimatedUSD": 0.000159,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "**Yes.** The R-2 exception is the residential-specific difference. If the stairs meet its construction conditions—at least 2-hour masonry or masonry-equivalent enclosures—their exit doors may be **15 feet apart**, and the stairs may share an enclosure if the construction separating them also meets those conditions. Otherwise, the general separation rule applies: half the maximum overall diagonal, or one-third if the building is sprinklered throughout as specified by the code. [S1]\n\nThat exception is **not automatic just because it’s residential**; the proposed stair construction and door layout are unverified.",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "But this is a residential building. Doesn't that make a difference?",
+        "repeat": 1,
+        "variant": "before",
+        "milliseconds": 2696.1920420000024,
+        "requestBytes": 60424,
+        "usage": {
+          "input_tokens": 14379,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 14376
+          },
+          "output_tokens": 178,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 14557
+        },
+        "estimatedUSD": 0.000234,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "**Yes. Group R-2 has a specific exception that can allow the stairs close together, even sharing an enclosure.** If the stair enclosures are at least **2-hour fire-resistance-rated masonry or masonry equivalent**, the stair exit doors must be at least **15 feet apart**; the stairs may share common construction only if the separation between them also meets that 2-hour masonry-equivalent requirement. [S1]\n\nThat is a conditional exception, not a blanket rule for residential buildings. If its construction conditions are not met, the usual separation rule applies: at least half the maximum overall diagonal of the area served, or one-third in a building sprinklered throughout as specified by the code. [S1]\n\nFor this proposed eight-story R-2 building, the special exception is potentially relevant, but the stair construction and door spacing are still unverified.",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      }
+    ],
+    "budgetBefore": {
+      "limitUSD": 7,
+      "accountedUSD": 5.842298,
+      "settledUSD": 5.827647,
+      "uncertainOrReservedCalls": 2,
+      "callCount": 1643
+    },
+    "budgetAfter": {
+      "limitUSD": 7,
+      "accountedUSD": 5.874116,
+      "settledUSD": 5.859465,
+      "uncertainOrReservedCalls": 2,
+      "callCount": 1659
+    },
+    "summary": {
+      "before": {
+        "calls": 8,
+        "medianMilliseconds": 2415.6878955,
+        "totalMilliseconds": 19154.702291,
+        "inputTokens": 101102,
+        "outputTokens": 1072,
+        "cachedTokens": 50539,
+        "cacheWriteTokens": 50539,
+        "estimatedUSD": 0.018736000000000003,
+        "checksPassed": false
+      },
+      "after": {
+        "calls": 8,
+        "medianMilliseconds": 2670.2016870000007,
+        "totalMilliseconds": 21404.327124,
+        "inputTokens": 69478,
+        "outputTokens": 1147,
+        "cachedTokens": 34727,
+        "cacheWriteTokens": 34727,
+        "estimatedUSD": 0.013082,
+        "checksPassed": false
+      }
+    }
+  },
+  "developmentAttempt": {
+    "scope": "Same-evidence model-turn comparison; excludes retrieval and application persistence. Synthetic historical requests, not a legal-accuracy revalidation.",
+    "representation": "Earlier candidate kept full content under attachedPassages instead of readEvidence.",
+    "summary": {
+      "before": {
+        "calls": 8,
+        "medianMilliseconds": 2821.682458000001,
+        "totalMilliseconds": 23399.592582,
+        "inputTokens": 103670,
+        "outputTokens": 1139,
+        "cachedTokens": 51823,
+        "cacheWriteTokens": 51823,
+        "estimatedUSD": 0.019232,
+        "checksPassed": false
+      },
+      "after": {
+        "calls": 8,
+        "medianMilliseconds": 2332.188833,
+        "totalMilliseconds": 19253.672624,
+        "inputTokens": 72054,
+        "outputTokens": 855,
+        "cachedTokens": 36015,
+        "cacheWriteTokens": 36015,
+        "estimatedUSD": 0.013398999999999998,
+        "checksPassed": false
+      }
+    },
+    "runs": [
+      {
+        "question": "What if we're sprinklered throughout?",
+        "repeat": 0,
+        "variant": "before",
+        "milliseconds": 5560.806666,
+        "requestBytes": 40033,
+        "usage": {
+          "input_tokens": 8753,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 8750,
+            "cache_write_tokens_details": {
+              "ttl_30m_tokens": 8750,
+              "ttl_12h_tokens": 0
+            }
+          },
+          "output_tokens": 291,
+          "output_tokens_details": {
+            "reasoning_tokens": 128
+          },
+          "total_tokens": 9044
+        },
+        "estimatedUSD": 0.003209,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "If the building is **sprinklered throughout**, the duct **does not need a fire damper** at the one-hour fire-barrier wall **if** the area is not Group H and the HVAC duct is at least 26-gage sheet metal, continuous from the HVAC equipment to its outlet and inlet terminals. That is the sprinkler-related exception in 2022 NYC MC §607.5.2. [S1]\n\nThat exception removes the **fire-damper** requirement; it does not automatically waive a **smoke damper** requirement. If this is a public corridor wall, a smoke damper is generally required unless a separate exception applies. The separate smoke-barrier penetration also has its own requirements and exceptions. [S2] [S4]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "What if we're sprinklered throughout?",
+        "repeat": 0,
+        "variant": "after",
+        "milliseconds": 1338.0773330000002,
+        "requestBytes": 30895,
+        "usage": {
+          "input_tokens": 6794,
+          "input_tokens_details": {
+            "cache_write_tokens": 6791,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 6791
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 50,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 6844
+        },
+        "estimatedUSD": 0.002403,
+        "status": "completed",
+        "toolCalls": [
+          "search_conversation"
+        ],
+        "text": "",
+        "checks": {
+          "completeAnswer": false,
+          "citationIDs": false
+        }
+      },
+      {
+        "question": "No, it's more than halfway above curb level.",
+        "repeat": 0,
+        "variant": "before",
+        "milliseconds": 3755.0730829999993,
+        "requestBytes": 86325,
+        "usage": {
+          "input_tokens": 17673,
+          "input_tokens_details": {
+            "cache_write_tokens": 17670,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 17670
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 205,
+          "output_tokens_details": {
+            "reasoning_tokens": 96
+          },
+          "total_tokens": 17878
+        },
+        "estimatedUSD": 0.006288,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "Then it is **a basement, not a cellar** under the stated curb-level test: a space partly below curb level with at least half its floor-to-ceiling height above curb level is a basement. Basement space generally counts toward zoning floor area, so putting a gym there does not avoid the floor-area count. [S1]\n\nThat assumes curb level is the applicable reference; where a base plane is used to determine building height, the Zoning Resolution applies the corresponding base-plane test instead. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "No, it's more than halfway above curb level.",
+        "repeat": 0,
+        "variant": "after",
+        "milliseconds": 2715.388417,
+        "requestBytes": 55290,
+        "usage": {
+          "input_tokens": 11404,
+          "input_tokens_details": {
+            "cache_write_tokens": 11401,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 11401
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 103,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 11507
+        },
+        "estimatedUSD": 0.004043,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "Then it’s **not a cellar** under the stated curb-level test: if at least half the room’s floor-to-ceiling height is above curb level, the Zoning Resolution classifies it as a **basement**. Basement space generally counts as floor area, so the gym would count too. [S1]\n\nThat assumes curb level is the applicable reference; where a base plane is used to determine building height, the ZR uses the base-plane test instead. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "Where can I see the table you used?",
+        "repeat": 0,
+        "variant": "before",
+        "milliseconds": 2605.7520409999997,
+        "requestBytes": 47614,
+        "usage": {
+          "input_tokens": 10709,
+          "input_tokens_details": {
+            "cache_write_tokens": 10706,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 10706
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 111,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 10820
+        },
+        "estimatedUSD": 0.003803,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "It’s **NYC Mechanical Code Table 308.4.2, “Clearance Reduction Methods,”** in §308.4.2. You can view the table in the NYC Mechanical Code; the version cited here is from the **2022 NYC Construction Codes**. [S1]\n\nThat table gives different protection details and reduced clearances by assembly type. For the exact sheet-metal options, see §308.4.2; the installation requirements are in §308.3. [S1] [S2]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "Where can I see the table you used?",
+        "repeat": 0,
+        "variant": "after",
+        "milliseconds": 3366.434250000002,
+        "requestBytes": 36048,
+        "usage": {
+          "input_tokens": 7945,
+          "input_tokens_details": {
+            "cache_write_tokens": 7942,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 7942
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 136,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 8081
+        },
+        "estimatedUSD": 0.002848,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "It’s **Table 308.4.2, “Clearance Reduction Methods,” in the 2022 NYC Mechanical Code**. It appears in §308.4.2. You can see the table in the code text here: [Table 308.4.2 — Clearance Reduction Methods](https://codes.iccsafe.org/content/NYCMC2022P1/chapter-3-general-regulations#NYCMC2022P1_Ch03_Sec308.4.2). The table lists the protection methods and the reduced clearances; §308.3 gives the installation requirements. (earlier citation; use the current source catalog)",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": false
+        }
+      },
+      {
+        "question": "But this is a residential building. Doesn't that make a difference?",
+        "repeat": 0,
+        "variant": "before",
+        "milliseconds": 1173.143541999998,
+        "requestBytes": 62577,
+        "usage": {
+          "input_tokens": 14700,
+          "input_tokens_details": {
+            "cache_write_tokens": 14697,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 14697
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 47,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 14747
+        },
+        "estimatedUSD": 0.005168,
+        "status": "completed",
+        "toolCalls": [
+          "search_conversation"
+        ],
+        "text": "",
+        "checks": {
+          "completeAnswer": false,
+          "citationIDs": false
+        }
+      },
+      {
+        "question": "But this is a residential building. Doesn't that make a difference?",
+        "repeat": 0,
+        "variant": "after",
+        "milliseconds": 3307.6752500000002,
+        "requestBytes": 42851,
+        "usage": {
+          "input_tokens": 9884,
+          "input_tokens_details": {
+            "cache_write_tokens": 9881,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 9881
+            },
+            "cached_tokens": 0
+          },
+          "output_tokens": 164,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 10048
+        },
+        "estimatedUSD": 0.003541,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "**Yes.** Because this is Group R-2, there’s a specific exception to the usual stair-separation rule: the stairs’ exit doors may be at least **15 feet apart** if the stairs are enclosed by walls rated at least 2 hours and built of masonry or masonry equivalent under department rules. The stairs may even share an enclosure, but the construction separating them must meet those same requirements. [S1]\n\nWithout that exception, the general rule requires separation of at least half the maximum diagonal of the building or area served—or one-third if the building is sprinklered throughout as specified by the code. [S1] So residential occupancy changes the answer, but it does **not** mean two adjacent stairs automatically comply. The project’s stair construction and door layout remain unverified.",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "What if we're sprinklered throughout?",
+        "repeat": 1,
+        "variant": "after",
+        "milliseconds": 1733.8381249999984,
+        "requestBytes": 30895,
+        "usage": {
+          "input_tokens": 6794,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 6791
+          },
+          "output_tokens": 29,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 6823
+        },
+        "estimatedUSD": 0.000083,
+        "status": "completed",
+        "toolCalls": [
+          "search_conversation"
+        ],
+        "text": "",
+        "checks": {
+          "completeAnswer": false,
+          "citationIDs": false
+        }
+      },
+      {
+        "question": "What if we're sprinklered throughout?",
+        "repeat": 1,
+        "variant": "before",
+        "milliseconds": 3037.6128750000025,
+        "requestBytes": 40033,
+        "usage": {
+          "input_tokens": 8753,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 8750
+          },
+          "output_tokens": 145,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 8898
+        },
+        "estimatedUSD": 0.000161,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "If the building is **sprinklered throughout with the system specified by the code**, that satisfies the sprinkler condition for the fire-damper exception at the one-hour corridor wall—but the other conditions still apply: it must be a ducted HVAC system, the area must not be Group H, and the duct must be at least 26-gage sheet metal and continuous from HVAC equipment to its terminals. If those conditions are met, a fire damper is not required there. [S1]\n\nThat exception addresses the **fire damper at the corridor wall only**. The separate smoke-barrier penetration may still require a smoke damper unless a smoke-barrier exception applies. [S4]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "No, it's more than halfway above curb level.",
+        "repeat": 1,
+        "variant": "after",
+        "milliseconds": 2127.8815829999985,
+        "requestBytes": 55290,
+        "usage": {
+          "input_tokens": 11404,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 11401
+          },
+          "output_tokens": 113,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 11517
+        },
+        "estimatedUSD": 0.000171,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "Then it is **not a cellar** under the stated curb-level test. If at least half its floor-to-ceiling height is above curb level and it is partly below curb level, the Zoning Resolution classifies it as a **basement**; basement space generally counts as floor area. The cellar exclusion therefore would not apply, whether you use the space as a recreation room or a gym. [S1]\n\nThat conclusion assumes curb level is the applicable reference (rather than a base plane) and that the space is partly below it.",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "No, it's more than halfway above curb level.",
+        "repeat": 1,
+        "variant": "before",
+        "milliseconds": 3348.8034590000025,
+        "requestBytes": 86325,
+        "usage": {
+          "input_tokens": 17673,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 17670
+          },
+          "output_tokens": 201,
+          "output_tokens_details": {
+            "reasoning_tokens": 87
+          },
+          "total_tokens": 17874
+        },
+        "estimatedUSD": 0.000278,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "Then it is **a basement, not a cellar**, assuming it is partly below curb level and curb level is the applicable reference. A basement is a story or portion of one with at least half its height above curb level; basement space is included in floor area. So the proposed gym would generally count toward floor area—not qualify for the cellar-space exclusion. [S1]\n\nIf a base plane applies to determine building height, the ZR uses that reference instead; the definition also has a rule for certain lowered yards. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "Where can I see the table you used?",
+        "repeat": 1,
+        "variant": "after",
+        "milliseconds": 2221.3427080000038,
+        "requestBytes": 36048,
+        "usage": {
+          "input_tokens": 7945,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 7942
+          },
+          "output_tokens": 114,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 8059
+        },
+        "estimatedUSD": 0.000137,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "You can see it in the **2022 NYC Mechanical Code, Table 308.4.2 (“Clearance Reduction Methods”)**, under §308.4.2. The table lists the approved protective-assembly types and reduced clearances. Its sheet-metal options include specific layer, insulation, and spacing requirements—not just a sheet-metal sheet. [S1]\n\nThe cited text is attached here as **[S1]**; §308.3, which gives the general protective-assembly installation rules, is **[S2]**.",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "Where can I see the table you used?",
+        "repeat": 1,
+        "variant": "before",
+        "milliseconds": 2437.5775409999987,
+        "requestBytes": 47614,
+        "usage": {
+          "input_tokens": 10709,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 10706
+          },
+          "output_tokens": 94,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 10803
+        },
+        "estimatedUSD": 0.000155,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "You can see it in the **2022 NYC Mechanical Code, Table 308.4.2 (“Clearance Reduction Methods”)**, in §308.4.2. It’s the table listing the protective-assembly types, required clearances, and reduced clearances. [S1]\n\nThe table is also reproduced in the NYC Mechanical Code’s official text. Look up **“308.4.2 Reduction table”** in the code.",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "But this is a residential building. Doesn't that make a difference?",
+        "repeat": 1,
+        "variant": "after",
+        "milliseconds": 2443.0349579999965,
+        "requestBytes": 42851,
+        "usage": {
+          "input_tokens": 9884,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 9881
+          },
+          "output_tokens": 146,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 10030
+        },
+        "estimatedUSD": 0.000173,
+        "status": "completed",
+        "toolCalls": [],
+        "text": "**Yes.** Because this is Group R-2, the code has a special stair-separation exception: the two stair exit doors may be only **15 feet apart** if the stairs are enclosed in walls with at least a 2-hour fire rating and masonry or masonry-equivalent construction. The stairs may even share an enclosure if the construction separating them meets those requirements. [S1]\n\nThat’s a specific R-2 exception—not a general exemption for residential buildings. If its construction conditions aren’t met, the general separation rule applies: at least half the maximum diagonal of the building or area served, or one-third if the building is sprinklered throughout as specified by the code. [S1]",
+        "checks": {
+          "completeAnswer": true,
+          "citationIDs": true
+        }
+      },
+      {
+        "question": "But this is a residential building. Doesn't that make a difference?",
+        "repeat": 1,
+        "variant": "before",
+        "milliseconds": 1480.823375,
+        "requestBytes": 62577,
+        "usage": {
+          "input_tokens": 14700,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cache_write_tokens_details": {
+              "ttl_12h_tokens": 0,
+              "ttl_30m_tokens": 0
+            },
+            "cached_tokens": 14697
+          },
+          "output_tokens": 45,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 14745
+        },
+        "estimatedUSD": 0.00017,
+        "status": "completed",
+        "toolCalls": [
+          "search_conversation"
+        ],
+        "text": "",
+        "checks": {
+          "completeAnswer": false,
+          "citationIDs": false
+        }
+      }
+    ],
+    "artifact": "/tmp/assistant-evidence-dedup-real-20261116/results.json"
+  },
+  "budgetBefore": {
+    "limitUSD": 7,
+    "accountedUSD": 5.809667,
+    "settledUSD": 5.795016,
+    "uncertainOrReservedCalls": 2,
+    "callCount": 1627
+  },
+  "budgetAfter": {
+    "limitUSD": 7,
+    "accountedUSD": 5.874116,
+    "settledUSD": 5.859465,
+    "uncertainOrReservedCalls": 2,
+    "callCount": 1659
+  },
+  "totalAccountedDeltaUSD": 0.064449,
+  "checks": {
+    "losslessReplay": true,
+    "unchangedConversationAndProjectContext": true,
+    "fullSourceTablesFootnotes": true,
+    "assistantSuite": true,
+    "disposablePostgresProductionSuite": true
+  },
+  "limitations": [
+    "Sixteen controlled model calls across four frozen follow-up requests are a small sample; tools disabled identically to isolate answer generation. This is not an end-to-end speed benchmark.",
+    "No demonstrated latency improvement: controlled median rose from 2.416s to 2.670s. Provider variability, cache state and different output lengths affect timing.",
+    "One table output in each controlled variant omitted app-recognized S citation markers. Existing authority-selection and Zoning coverage findings remain unresolved.",
+    "All source content and selected conversation context are retained exactly; this is not independent validation of every legal conclusion.",
+    "Estimated API costs include configured cache-write premiums; they are not invoice charges or account balance."
+  ]
+}
