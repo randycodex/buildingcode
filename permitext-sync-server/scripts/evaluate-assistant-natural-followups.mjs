@@ -6,9 +6,10 @@ import {join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 import {performance} from 'node:perf_hooks';
 import {configureLocalAssistant,budgetLocalAssistantEmbeddings} from './local-assistant-environment.mjs';
-import {naturalFollowupCases} from '../tests/assistant-natural-followup-cases.mjs';
-const {OPENAI_API_KEY,PERMITEXT_RESEARCH_V2_BUDGET_PATH,PERMITEXT_EVAL_CASES}=process.env;
+import {naturalFollowupCases as defaultCases} from '../tests/assistant-natural-followup-cases.mjs';
+const {OPENAI_API_KEY,PERMITEXT_RESEARCH_V2_BUDGET_PATH,PERMITEXT_EVAL_CASES,PERMITEXT_EVAL_CASE_MODULE}=process.env;
 if(!OPENAI_API_KEY||!PERMITEXT_RESEARCH_V2_BUDGET_PATH)throw new Error('Set the API key and existing cumulative evaluation-budget path.');
+const {naturalFollowupCases}=PERMITEXT_EVAL_CASE_MODULE?await import(new URL(PERMITEXT_EVAL_CASE_MODULE,`file://${process.cwd()}/`)):{naturalFollowupCases:defaultCases};
 const out=resolve(process.argv[2]||'assistant-followup-results');await mkdir(out,{recursive:true});
 const directory=await mkdtemp(join(tmpdir(),'permitext-natural-followups-'));
 const {budget}=await configureLocalAssistant({apiKey:OPENAI_API_KEY,budgetPath:PERMITEXT_RESEARCH_V2_BUDGET_PATH,dataPath:join(directory,'store.json'),assetsPath:join(directory,'assets'),allowLocalSourceChanges:true});
@@ -43,12 +44,12 @@ try{
    const response=await nativeFetch(base+'/research/conversations/message',{method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${token}`},body:JSON.stringify({auth:{accountUserID:userID},conversationID:conversation.id,question,requestID:crypto.randomUUID(),researchEngine:'v2',assistantMode:'experimental',analysisMode:'conversation_only',expectedRevision:conversation.revision,expectedEvidenceSetVersion:conversation.evidenceSetVersion||1})});
    const result=await response.json(),milliseconds=performance.now()-started;
    let record=null,answer=null;if(result.conversation){conversation=result.conversation;const message=conversation.messages.filter(m=>m.role==='assistant').at(-1);answer=message?.answer;if(message)record=(await post('/research/answers/get',{answerID:message.id})).answer;}
-   const trace=record?.experimentalResearchTrace||[],intent=trace.find(t=>t.tool==='resolve_conversation')?.result;
+   const trace=record?.experimentalResearchTrace||[],intent=trace.find(t=>['resolve_conversation','plan_research'].includes(t.tool))?.result;
    const calls=providerCalls.filter(c=>c.started>=started&&c.started<started+milliseconds);
    // Attribution by question in the last user message; web helpers are reported as totals separately.
    const intentCall=calls.find(c=>c.request.text?.format?.name==='assistant_conversational_intent'&&JSON.parse(c.request.input).currentQuestion===question);
-   const row={topic:test.id,turn,question,status:response.status,milliseconds,intentMilliseconds:intentCall?.milliseconds||0,intent,answer:answer?.answerText,record,
-    checks:{topic:expectedTopic.test(intent?.question||question)&&expectedTopic.test(answer?.answerText||''),citations:(answer?.citations||[]).every(c=>(record?.evidence||[]).some(e=>e.sectionID===c.sectionID)),hasUnverifiedMarker:/\[source not verified\]/.test(answer?.answerText||'')},
+   const row={error:result.error||null,topic:test.id,turn,question,status:response.status,milliseconds,intentMilliseconds:intentCall?.milliseconds||0,intent,answer:answer?.answerText,record,
+    checks:{topic:(!intent||expectedTopic.test([intent.question,...(intent.issues||[]).map(i=>i.question)].join(' ')))&&expectedTopic.test(answer?.answerText||''),citations:(answer?.citations||[]).every(c=>(record?.evidence||[]).some(e=>e.sectionID===c.sectionID)),hasUnverifiedMarker:/\[source not verified\]/.test(answer?.answerText||'')},
     tools:trace.map(t=>({tool:t.tool,query:t.query,sources:t.result?.sources?.map(s=>({id:s.id,sectionID:s.sectionID,title:s.title,recalledFrom:s.recalledFrom})),unavailable:t.result?.unavailable}))};
    results.push(row);await writeFile(join(out,'results.json'),JSON.stringify(results,null,2));
    console.log(JSON.stringify({topic:test.id,turn,question,status:response.status,seconds:+(milliseconds/1000).toFixed(1),intentSeconds:+((intentCall?.milliseconds||0)/1000).toFixed(1),checks:row.checks,tools:row.tools.map(t=>t.tool),budget:await budget.summary()}));

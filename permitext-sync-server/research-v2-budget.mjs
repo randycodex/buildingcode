@@ -90,7 +90,7 @@ export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitU
     async reserveExperimental(body,phase) {
       const bytes=assertLunaV2Request({...body,tools:[]});
       if((body.tools||[]).some(t=>!['function','web_search'].includes(t.type)) ||
-         (body.tools||[]).some(t=>t.type==='function'&&!['search_library','search_web'].includes(t.name)) ||
+         (body.tools||[]).some(t=>t.type==='function'&&!['search_library','read_library','search_web'].includes(t.name)) ||
          (body.tools||[]).some(t=>t.type==='web_search') && body.max_tool_calls!==4)
         throw error('Invalid experimental research tools.','V2_REQUEST_LIMIT');
       const web=(body.tools||[]).some(t=>t.type==='web_search');

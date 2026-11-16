@@ -1,3 +1,4 @@
+import {assistantLibraryNavigation,governingSectionContext} from './assistant-library-navigation.mjs';
 import {restoreAssistantEvidence} from './assistant-evidence-recall.mjs';
 import {runExperimentalAssistant,experimentalAssistantVersion} from './assistant-experimental.mjs';
 import {assistantNavigatedSource} from "./research-evidence-assembly.mjs";
@@ -21318,6 +21319,8 @@ async function handleResearchConversationMessage(request, response) {
       const fastGenerationStartedAt = performance.now();
       let firstTextMilliseconds = null, v2Result = null, experimentalResult = null, providerPayloads;
       if (experimentalAssistant) {
+        const {catalog:experimentalCatalog}=await researchCorpusResources(corpusPlan);
+        const navigation=assistantLibraryNavigation(experimentalCatalog,await chapterIndex());
         const activeAnswerIDs=activeMessages.filter(m=>m.role==='assistant').map(m=>m.id);
         const priorRecords=activeAnswerIDs.length?await listStoredResearchAnswers(context.userID,{ids:activeAnswerIDs}):[];
         const priorEvidence=[],priorSnapshots=new Map();
@@ -21329,10 +21332,31 @@ async function handleResearchConversationMessage(request, response) {
             priorSnapshots.set(priorEvidence.at(-1).id,snapshot);
           }
         }
-        experimentalResult=await runExperimentalAssistant({question,history:activeMessages,priorEvidence,
+        experimentalResult=await runExperimentalAssistant({question,history:activeMessages,priorEvidence,libraryGuide:navigation.guide,
           projectContext:conversationScope?.includeProjectContext?conversationScope.projectContext:null,
           attachedSources:sources,privateIdentifiers:[projectInformation?.name,projectInformation?.address]}, {
-          call:v2Call,signal:progressResponse.signal,
+          call:v2Call,signal:progressResponse.signal,libraryOutlines:navigation.outlines,
+          readLibrary:async(ids,signal)=>{
+            const returned=[],unavailable=[];
+            const directIDs=ids.map(id=>sources.find(s=>s.id===id)?.sectionID||id);
+            const selectedContext=governingSectionContext(directIDs,experimentalCatalog);
+            for(const requestedID of ids)if(!sources.some(s=>s.id===requestedID)&&!experimentalCatalog.some(s=>String(s.id)===requestedID))unavailable.push({id:requestedID,reason:'Not in the authorized library catalog or current candidates.'});
+            for(const {id,contextFor} of selectedContext){
+              signal.throwIfAborted();const selected=sources.find(s=>ids.includes(s.id)&&s.sectionID===id);if(selected&&!contextFor){returned.push(selected);continue;}
+              const candidate=experimentalCatalog.find(s=>String(s.id)===id);
+              if(!candidate){unavailable.push({id,reason:'Not in the authorized library catalog.'});continue;}
+              let resolved;try{resolved=await resolveResearchAssemblySection({...candidate,sectionID:id},experimentalCatalog,cachedResearchSourceBody);}
+              catch(error){if(!['INCOMPLETE_RESEARCH_SECTION','INVALID_RESEARCH_SECTION','ENOENT'].includes(error.code))throw error;unavailable.push({id,reason:error.code});continue;}
+              if(!resolved){unavailable.push({id,reason:'Section text unavailable.'});continue;}
+              const source=assistantNavigatedSource(resolved);
+              if(source.text.length>18000){unavailable.push({id,reason:'Section too large for a complete direct read. Search for the specific definition or issue and read the resulting candidate passage.'});continue;}
+              let index=evidence.findIndex(s=>s.sectionID===source.sectionID&&s.codeVersion===source.codeVersion&&(s.text||s.selectedText||'')===source.text);
+              if(index<0){index=evidence.length;evidence.push(source);sources.push(await bindAnswerSource(source,index));
+                snapshots.push(immutableEvidenceSnapshot({source,approvedAt:now,evidenceSetVersion:Number(conversation.evidenceSetVersion||1),sourceLibraryVersion:source.codeVersion}));}
+              returned.push({...sources[index],...(contextFor?{contextFor,contextNotice:'Parent or adjacent sibling context. Check applicability; proximity alone does not make this controlling.'}:{})});
+            }
+            return {sources:returned,unavailable};
+          },
           recallEvidence:async(ids,signal)=>{
             const recalled=[],unavailable=[];
             for(const id of ids){
