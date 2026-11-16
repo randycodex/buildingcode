@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import {researchAnswerBlocks} from '../public/research-answer-blocks.js';
+
+const blocks=researchAnswerBlocks('Three separate rules:\n- **General clearance:** Keep the stated conditions. [S1]\n- Reduced clearance:\n  Keep the full table notes. [S2]\n\n- Plenum clearance. [S3]\n\nReview in order:\n1. Identify the appliance.\n2. Read the listing.\n   - Keep its stated conditions.\n   - Review the edition.\n3. Compare the clearance.\n\nA closing paragraph.');
+assert.deepEqual(blocks.map(block=>block.type),['paragraph','list','paragraph','list','paragraph']);
+assert.equal(blocks[1].ordered,false);assert.equal(blocks[1].items.length,3);
+assert.equal(blocks[1].items[1].blocks[0].text,'Reduced clearance:\nKeep the full table notes. [S2]');
+assert.equal(blocks[3].ordered,true);assert.deepEqual(blocks[3].items.map(item=>item.number),[1,2,3]);
+assert.equal(blocks[3].items[1].blocks[1].ordered,false);assert.equal(blocks[3].items[1].blocks[1].items.length,2);
+const nested=researchAnswerBlocks('- Parent\n  - Child\n  More about the parent.\n\n  A separate parent paragraph.\n- Next');
+assert.deepEqual(nested[0].items[0].blocks.map(block=>block.type),['paragraph','list','paragraph','paragraph']);
+assert.equal(nested[0].items[0].blocks[2].text,'More about the parent.');
+assert.equal(nested[0].items[0].blocks[3].text,'A separate parent paragraph.');
+assert.equal(nested[0].items[1].blocks[0].text,'Next');
+const literals=researchAnswerBlocks('A 2.5-inch dimension and Section 308.3.1.\n\\- An escaped marker.\n\n```text\n- Keep this code line literal.\n1. Keep this code number literal.\n```\n\n<img src=x onerror=alert(1)>');
+assert(literals.every(block=>block.type==='paragraph'),'Code, prose, escaped markers and model HTML do not become list markup');
+assert(literals[1].text.includes('- Keep this code line literal.'));
+assert.equal(literals[2].text,'<img src=x onerror=alert(1)>');
+assert.equal(researchAnswerBlocks('- First\n+ Second\n• Third\n* Fourth')[0].items.length,4);
+assert.deepEqual(researchAnswerBlocks('3) Third\n5) Fifth\n5) Another fifth')[0].items.map(item=>item.number),[3,5,5]);
+console.log('Answer blocks passed: bullets, numbered steps, nested/continued items, separated prose, original wording/citations, literal code and safe text-only parsing.');

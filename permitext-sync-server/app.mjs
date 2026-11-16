@@ -1,4 +1,5 @@
 import { researchSelectedTables } from "./research-table-footnotes.mjs";
+import {expandAssistantReferenceEvidence, assistantReferenceCodeBasis} from './assistant-reference-evidence.mjs';
 import { runResearchV2, researchV2AnswerMetadata, researchV2Version } from "./research-v2-engine.mjs";
 import { createResearchV2Budget } from "./research-v2-budget.mjs";
 import { researchV2Configuration, researchV2Availability, createResearchV2ApplicationCall } from "./research-v2-runtime.mjs";
@@ -12894,6 +12895,30 @@ export async function resolveResearchAssemblySection(request, catalog, readSecti
   };
 }
 
+export async function assistantEvidenceForTurn(options) {
+  const evidencePackage = assistantEvidencePackage(options);
+  const selectedOnly = researchEvidenceStrategyForTurn(options).reason === 'question_explicitly_bounded_to_selected_evidence' ||
+    /\b(?:do not|don't|never)\s+(?:look\s*up|retrieve|follow|add|search\s+for)\b[^.!?\n]{0,70}\b(?:references?|sources?|passages?|provisions?)\b/i.test(options.question);
+  const catalogs = new Map();
+  return expandAssistantReferenceEvidence({evidencePackage, selectedOnly, signal:options.signal,
+    resolveReference:async request => {
+      const corpus = (await currentResearchCorpusRegistry()).find(item => item.id === request.corpusID &&
+        item.codeVersion === request.codeVersion && item.codeEdition === request.codeEdition &&
+        item.jurisdiction === request.jurisdiction && item.codePrefixes.includes(request.codePrefix));
+      if (!corpus) return null;
+      if (!catalogs.has(corpus.id)) catalogs.set(corpus.id,
+        researchCorpusResources({selected:[corpus], passageSearch:false}).then(resource => resource.catalog));
+      const catalog = await catalogs.get(corpus.id);
+      const matches = catalog.filter(item => item.codePrefix === request.codePrefix && item.sectionNumber === request.sectionNumber);
+      if (new Set(matches.map(item => String(item.id))).size !== 1) return null;
+      const source = await resolveResearchAssemblySection(request, catalog);
+      if (!source) return null;
+      const body = source.body || await researchBodyForCatalogSection({...source, id:source.sectionID});
+      return {...source, body, snapshotTables:structuredRichSources(body, {codePrefix:source.codePrefix}),
+        richSources:structuredRichSources(body, {codePrefix:source.codePrefix, preserveCellLines:true})};
+    }});
+}
+
 export async function assembledResearchEvidenceForTurn({
   question,
   messages,
@@ -21136,18 +21161,29 @@ async function handleResearchConversationMessage(request, response) {
     const initialZoningPlan = zoningTurn
       ? planZoningResearchQuestion({ question, projectFacts: combinedProjectFacts, topicContext })
       : null;
-    const answerCodeBasis = researchCodeBasis(
+    let answerCodeBasis = researchCodeBasis(
       conversation.primaryProjectID,
       projectInformation,
       new Date().toISOString(),
       corpusPlan
     );
+    // Current Assistant engines receive canonical references as supplied
+    // passages. Historical verified prompts retain their exact old scope.
+    const resolveExplicitReferences = requestedV2 || !mockMode && context.body.answerMode !== 'verified';
+    const conversationEvidencePackage = conversationOnly ? (resolveExplicitReferences ? await assistantEvidenceForTurn({question, pinnedEvidence,
+      messages:activeMessages, topicContext, projectFacts:combinedProjectFacts, signal:progressResponse.signal})
+      : assistantEvidencePackage({question, pinnedEvidence, messages:activeMessages, topicContext, projectFacts:combinedProjectFacts})) : null;
+    if (conversationEvidencePackage?.referenceLookup) {
+      answerCodeBasis = assistantReferenceCodeBasis(answerCodeBasis, conversationEvidencePackage);
+      if (conversationEvidencePackage.referenceLookup.added.length)
+        conversationScope.referenceLookup = structuredClone(conversationEvidencePackage.referenceLookup);
+    }
     if ((!mockMode || requestedV2) && (context.body.answerMode !== "verified" || requestedV2)) {
       if (!process.env.OPENAI_API_KEY) throw Object.assign(new Error("Research AI is not configured."), {code:"RESEARCH_NOT_CONFIGURED"});
       // Reuse authorization, source freshness, idempotency and durable usage above.
       // Both engines retain the same explicit passage scope and storage safeguards.
       const packageForFast = conversationOnly
-        ? assistantEvidencePackage({ question, pinnedEvidence, messages:activeMessages, topicContext, projectFacts:combinedProjectFacts })
+        ? conversationEvidencePackage
         : await assembledResearchEvidenceForTurn({ question, messages:activeMessages, pinnedEvidence,
             originSurface:conversation.origin?.surface || "", projectFacts:combinedProjectFacts, topicContext, corpusPlan,
             beforeSemanticRequest:async () => {
@@ -21166,12 +21202,12 @@ async function handleResearchConversationMessage(request, response) {
         evidenceSetVersion:Number(conversation.evidenceSetVersion || 1), sourceLibraryVersion:source.codeVersion || conversation.codeVersion }));
       const sources = await Promise.all(evidence.map(async (source,index) => {
         const text = source.text || source.selectedText || "";
-        let tables = [];
+        let tables = source.tables || [];
         if (requestedV2 && /\btable\s+\d/i.test(text)) {
           const [canonical] = await researchEvidenceForSectionIDs([source.sectionID], {allowOptInCorpora:true});
           if (canonical?.codeVersion === source.codeVersion) {
             const tableBody = await researchBodyForCatalogSection({...canonical, id:canonical.sectionID});
-            tables = researchSelectedTables(text, structuredRichSources(tableBody, {
+            if (!tables.length) tables = researchSelectedTables(text, structuredRichSources(tableBody, {
               codePrefix:canonical.codePrefix, preserveCellLines:true
             }));
           }
@@ -21256,7 +21292,10 @@ async function handleResearchConversationMessage(request, response) {
         model:body.model,requestedModel:body.model,promptVersion:"fast-stream-v1",evidenceVersion:"selected-or-retrieved-v1",
         codeBasis:answerCodeBasis,codeVersion:answerCodeBasis.codeVersion,codeEdition:answerCodeBasis.codeEdition,
         evidenceSectionIDs:[...new Set(evidence.map(source=>source.sectionID))],evidenceSourceIDs:evidence.map(source=>source.sourceID),
-        sourceAsOf:now,sourceSummary:{userPinnedCount:pinnedEvidence.length,permitextDiscoveredCount:conversationOnly?0:evidence.length-pinnedEvidence.length,crossReferenceCount:0},
+        sourceAsOf:now,sourceSummary:{userPinnedCount:pinnedEvidence.length,
+          permitextDiscoveredCount:evidence.filter(source => source.origin === 'permitext_discovered').length,
+          crossReferenceCount:evidence.filter(source => source.origin === 'permitext_cross_reference').length},
+        ...(packageForFast.referenceLookup ? {referenceLookup:packageForFast.referenceLookup} : {}),
         factUsage:{projectContext:combinedProjectFacts,conversation:[],other:[]},
         retrieval:{sourceMode:packageForFast.sourceMode,codeBasis:answerCodeBasis,webSupportRequested:webDecision.useWeb,webSupportSearched:web.searched},
         routing:{mode:"fast",answerTier:"fast",verificationAttemptCount:0},
@@ -21269,8 +21308,11 @@ async function handleResearchConversationMessage(request, response) {
       });
       if (v2Result) {
         answer.citationIdentity.substantiveVerification = "ai_review_performed";
-        answer.citations = answer.citations.map(citation => ({...citation,relevance:"Cited exact selected passage; review its text and conditions."}));
+        answer.citations = answer.citations.map(citation => ({...citation,relevance:"Cited supplied passage; review its text and conditions."}));
       }
+      if (packageForFast.referenceLookup?.added.length) answer.evidenceLimitations = [
+        ...packageForFast.limitations.map(limitation=>limitation.text), 'Retrieved references retain their stated conditions; retrieval does not establish applicability or compliance.'
+      ];
       answer.supportingSources = web.sources.filter((source,index)=>answer.citationIdentity.cited.includes(`W${index+1}`))
         .map(source=>({...source,authorityClass:"official_guidance",role:"supporting",controlling:false}));
       const identity = researchRequestMessageIdentity(context.userID,conversation.id,researchRequestID);
@@ -21326,7 +21368,7 @@ async function handleResearchConversationMessage(request, response) {
     researchOperation.retrievalTimings = [];
     const recordRetrievalTiming = timing => researchOperation.retrievalTimings.push(timing);
     const assembleForZoningPlan = (questionPlan) => conversationOnly
-      ? assistantEvidencePackage({ question, pinnedEvidence, messages: activeMessages, topicContext, projectFacts: combinedProjectFacts })
+      ? conversationEvidencePackage
       : assembledResearchEvidenceForTurn({
       question,
       messages: activeMessages,
@@ -22808,6 +22850,7 @@ async function handleResearchConversationMessage(request, response) {
       researchProgress: progressResponse.summary(now),
       answer: {
         ...(openInvestigation ? { researchEngine:openInvestigationVersion, investigation:evidencePackage.investigation } : {}),
+        ...(conversationEvidencePackage?.referenceLookup ? {referenceLookup:conversationEvidencePackage.referenceLookup} : {}),
         ...(propertyResearch ? { propertyResearch } : {}),
         ...(suppliedText ? { suppliedText } : {}),
         ...(conversationRecall ? { conversationRecall: true } : {}),

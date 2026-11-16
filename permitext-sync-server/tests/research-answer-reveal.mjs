@@ -33,7 +33,7 @@ e=entry();revealResearchAnswer({entry:e,tokens:tokens(4),environment:env,onDone:
 done=0;revealResearchAnswer({entry:entry(),tokens:tokens(4),environment:env,isCurrent:()=>false,onDone:()=>done++});flushFrame();flushTimers();assert.equal(done,0);assert.equal(listeners.size,0);
 Object.assign(globalThis,{document:doc,requestAnimationFrame:env.requestAnimationFrame,cancelAnimationFrame:env.cancelAnimationFrame,setTimeout:env.setTimeout,clearTimeout:env.clearTimeout,matchMedia:env.matchMedia,ResizeObserver:class{observe(){}disconnect(){}}});
 let cited;
-const messages=[{id:'old',role:'assistant',answer:{answerText:'An existing answer.'}},{id:'new',role:'assistant',answer:{answerText:'The text remains exact. [S1]',missingFacts:['Confirm the project facts.']}}];
+const messages=[{id:'old',role:'assistant',answer:{answerText:'An existing answer.'}},{id:'new',role:'assistant',answer:{answerText:'The text remains exact. [S1]\n\n- First rule. [S1]\n- Second rule.\n\n1. First step.\n2. Second step.',missingFacts:['Confirm the project facts.']}}];
 const options={conversation:{id:'c',sources:[{kind:'selection',selectedText:'Exact enacted text.'}],messages},initialDraft:'Follow up',onDraft(){},onCitation:(message,id)=>{cited=[message.id,id];}};
 const history=createResearchV2View(options);assert.equal(all(history.element).some(n=>n.classList.contains('rv2-reveal-token')),false,'Saved answers never replay the reveal');history.dispose();
 const view=createResearchV2View({...options,revealAnswerID:'new'}),answers=all(view.element).filter(n=>n.classList.contains('rv2-answer-entry'));
@@ -41,6 +41,7 @@ assert.equal(answers[0].classList.contains('is-answer-revealing'),false);
 assert.equal(answers[1].classList.contains('is-answer-revealing'),true);
 assert.equal(view.element.querySelector('.rv2-send').disabled,true,'Wait for the presentation to finish before another submit');
 assert.equal(all(answers[1]).find(n=>n.tagName==='p').textContent,'The text remains exact. [S1]','Token spans preserve the checked answer and citation text exactly');
+assert.deepEqual(all(answers[1]).filter(n=>n.classList.contains('rv2-answer-list')).map(n=>n.tagName),['ul','ol'],'List structure is present throughout the reveal');
 flushFrame();flushTimers();assert.equal(view.element.querySelector('.rv2-send').disabled,false);
 all(answers[1]).find(n=>n.classList.contains('rv2-citation')).handlers.click();assert.deepEqual(cited,['new','S1'],'The real citation handler remains connected');view.dispose();
 assert.equal(listeners.size,0);assert.equal(timers.size,0);

@@ -265,7 +265,9 @@ function immutableStructuredEvidenceSource(source, passageText) {
     .map((grid) => ({
       rows: (Array.isArray(grid?.rows) ? grid.rows : []).slice(0, 500).map((row) => ({
         cells: (Array.isArray(row?.cells) ? row.cells : []).slice(0, 100).map((cell) => ({
-          text: requiredText(cell?.text, "structured evidence cell", 20_000),
+          // Blank header/spanning cells are part of the canonical grid.
+          text: typeof cell?.text === 'string' && cell.text.length <= 20_000 ? cell.text.trim()
+            : requiredText(cell?.text, "structured evidence cell", 20_000),
           rowSpan: boundedVersion(cell?.rowSpan || 1, "structured evidence row span"),
           columnSpan: boundedVersion(cell?.columnSpan || 1, "structured evidence column span")
         }))

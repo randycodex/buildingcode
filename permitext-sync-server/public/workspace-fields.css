@@ -59,4 +59,11 @@
     outline: none !important;
     box-shadow: none !important;
   }
+
+  /* Project Context reads as an open form rather than three framed boxes. */
+  html body .project-context-panel :is(.project-name-input, .project-address-input, .project-overview-context) {
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
 }

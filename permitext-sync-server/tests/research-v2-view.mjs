@@ -26,6 +26,28 @@ const tick=()=>new Promise(resolve=>setImmediate(resolve));
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};};
 const source={kind:'selection',sectionID:'2342',sectionNumber:'1012.2',codePrefix:'BC',codeEdition:'2022',selectedText:'Exact passage.'};
 const prior={id:'same',revision:1,sources:[source],messages:[]};const retry={...prior,revision:2,messages:[{id:'q',role:'user',requestID:'stable',failure:{status:'failed'}}]};
+{
+ const removal=deferred(),removed=[];
+ const selected={...source,id:'passage-to-remove'},other={...source,id:'different-passage',selectedText:'A different passage from the same section.'};
+ const attached=createResearchV2View({conversation:{id:'attachments',sources:[selected,other],messages:[]},initialDraft:'Keep my unsent question',
+   onDraft(){},onRemove:async item=>{removed.push(item.id);await removal.promise;},onSend:()=>{throw Error('Do not send while removing a passage');}});
+ const controls=all(attached.element).filter(element=>element.className==='rv2-passage-remove');
+ assert.equal(controls.length,2,'Every selected passage has its own direct remove control');
+ assert.match(controls[0].attributes['aria-label'],/Remove BC § 1012.2.*next question/);
+ controls[1].handlers.click();await tick();controls[1].handlers.click();
+ assert.deepEqual(removed,['different-passage'],'Removing a repeated section targets the exact passage once');
+ assert.equal(attached.element.querySelector('.rv2-detail').hidden,true,'Removal never opens the passage details');
+ assert.equal(attached.element.querySelector('.rv2-input').disabled,false,'The question draft stays editable');
+ assert.equal(attached.element.querySelector('.rv2-send').disabled,true);
+ assert.ok(controls.every(button=>button.disabled));
+ attached.element.querySelector('.rv2-send').handlers.click();await tick();
+ removal.reject(Error('Could not save this removal'));await tick();
+ assert.equal(all(attached.element).filter(element=>element.className==='rv2-passage-remove').length,2,'A failed removal retains both passages');
+ assert.match(attached.element.querySelector('.rv2-status').textContent,/Could not save this removal/);
+ assert.equal(attached.element.querySelector('.rv2-input').value,'Keep my unsent question');
+ assert.ok(controls.every(button=>!button.disabled));
+ attached.dispose();
+}
 assert.equal(researchV2RetryContext(prior,retry,'stable'),retry);
 assert.equal(researchV2RetryContext(prior,{...retry,evidenceSetVersion:2},'stable'),prior);
 assert.equal(researchV2RetryContext(prior,{...retry,messages:[{id:'other',role:'user',requestID:'other',failure:{}}]},'stable'),prior);
@@ -52,6 +74,48 @@ assert.equal(gapSends,0,'Providing a fact only changes the draft; it never start
 gapsView.dispose();
 assert.equal(researchAnswerText(old),'Conclusion.\n\nImportant qualification.');
 assert.equal(researchReviewLabel(old.answer),'Unreviewed');
+{
+ let opened;
+ const text='Rules:\n- **First rule.** [S1]\n- Second rule with a wrapped\n  continuation. [S2]\n\nSteps:\n3. Identify the equipment.\n5. Review the listing.\n5. Confirm the stated conditions.\n\nRepeated Markdown numbers:\n1. First step.\n1. Second step.';
+ const message={id:'lists',role:'assistant',answer:{answerText:text,verification:{pass:true}}};
+ const listView=createResearchV2View({conversation:{sources:[],messages:[message]},onDraft(){},onCitation:(answer,id)=>{opened={answer,id};}});
+ const answer=listView.element.querySelector('.rv2-answer');
+ const lists=all(answer).filter(element=>element.className==='rv2-answer-list');
+ assert.deepEqual(lists.map(element=>element.tagName),['ul','ol','ol']);
+ assert.equal(lists[0].children.length,2);assert.equal(lists[1].attributes.start,'3');
+ assert.deepEqual(lists[1].children.map(element=>element.attributes.value),['3','5','5'],'Explicit nonconsecutive numbers retain their values');
+ assert(lists[2].children.every(element=>element.attributes.value===undefined),'Repeated 1. Markdown markers use the native counter');
+ assert(all(lists[0]).some(element=>element.tagName==='strong'));
+ assert(all(lists[0]).some(element=>element.textContent?.includes('continuation. ')));
+ all(lists[0]).find(element=>element.attributes['aria-label']==='Open citation S2').handlers.click();
+ assert.equal(opened.answer,message);assert.equal(opened.id,'S2');assert.equal(message.answer.answerText,text,'Rendering never rewrites the saved answer');
+ listView.dispose();
+}
+{
+ let opened,openedSource;
+ const message={id:'reference-answer',role:'assistant',answer:{answerText:'A referenced table is supplied. [S2]',verification:{pass:true},
+  referenceLookup:{added:[{label:'FGC Table 308.2',codeEdition:'2022 New York City Construction Codes',citationID:'S2'}]}}};
+ const referenceView=createResearchV2View({conversation:{sources:[],messages:[message]},onDraft(){},
+  onCitation:(answer,id)=>{opened={answer,id};},onOpenReader:source=>{openedSource=source;},onSnapshot:async()=>({sources:[
+   {codePrefix:'FGC',sectionNumber:'308.3.2',codeEdition:'2022',passageText:'Exact attached passage.'},
+   {codeBook:'FGC',sectionNumber:'308.2',codeEdition:'2022',
+   passageText:'Complete table and notes.',provenance:{origin:'permitext_cross_reference',retrievalReason:'Automatically retrieved FGC Table 308.2 from the same codebook and edition'}}]})});
+ const elements=()=>all(referenceView.element);
+ assert(elements().some(element=>element.attributes['aria-label']==='Automatically retrieved references'));
+ elements().find(element=>element.textContent==='FGC Table 308.2 · 2022').handlers.click();
+ assert.equal(opened.answer,message);assert.equal(opened.id,'S2','Automatically retrieved sources use the original saved citation index');
+ await elements().find(element=>element.textContent==='Sources used').handlers.click();await tick();
+ const rows=elements().filter(element=>element.className==='rv2-snapshot-row');
+ assert.equal(rows.length,2);assert(rows.every(row=>row.tagName==='details'&&row.open===false),'Saved sources start as compact collapsed rows');
+ assert(elements().some(element=>element.textContent==='2. FGC § 308.2 · 2022'),'Numbered source rows retain the answer citation order');
+ const sourceList=referenceView.element.querySelector('.rv2-snapshot-list');
+ assert.equal(sourceList.tagName,'ol');assert.equal(sourceList.children.length,2);
+ assert(elements().some(element=>element.textContent==='Automatically retrieved FGC Table 308.2 from the same codebook and edition'));
+ assert(elements().some(element=>element.textContent==='Complete table and notes.'));
+ all(rows[1]).find(element=>element.textContent==='Open in Reader').handlers.click();
+ assert.equal(openedSource.sectionNumber,'308.2');assert.equal(openedSource.passageText,'Complete table and notes.');
+ referenceView.dispose();
+}
 const failedView=createResearchV2View({conversation:{sources:[],messages:[{role:'user',question:'Interrupted question.',requestID:'prior-request',failure:{message:'The provider failed.'}}]},onDraft(){},isCurrent:()=>true});
 assert(all(failedView.element).some(x=>x.textContent==='The provider failed.'));assert(all(failedView.element).some(x=>x.textContent==='Retry question'));failedView.dispose();
 assert.equal(passageChipLabel({codePrefix:'BC68',sectionNumber:'27-369',codeVersion:'2026-bundle',codeSource:{editionLabel:'1968 NYC Building Code'}}),'BC68 § 27-369 · 1968');
@@ -179,7 +243,9 @@ console.log('Grouped Research history passed: dates/Drafts, summary labels, full
   onSnapshot:async()=>({sources:[],projectContextSnapshot:{capturedAt:'2026-11-12T12:00:00.000Z',projectInformation:{address:'Saved address',description:'Original proposal',facts:['Stories Above Grade: 3 (stated; user survey)']}}})});
  view.element.querySelector('.rv2-send').handlers.click();await tick();assert.equal(sends,1);assert.equal(finds,0);
  all(view.element).find(x=>x.textContent==='Sources used').handlers.click();await tick();
- for(const expected of ['Project context for this answer','Original proposal','Saved address','Stories Above Grade: 3 (stated; user survey)'])assert(all(view.element).some(x=>x.textContent===expected));
+ for(const expected of ['Project context','Original proposal','Saved address','Stories Above Grade: 3 (stated; user survey)'])assert(all(view.element).some(x=>x.textContent===expected));
+ const contextRow=view.element.querySelector('.rv2-project-snapshot');
+ assert.equal(contextRow.tagName,'details');assert.equal(contextRow.open,false,'A captured Project context stays collapsed while preserving every saved value');
  view.dispose();
 }
 console.log('Default-context view passed: context-only send and saved answer Project snapshot inspection.');

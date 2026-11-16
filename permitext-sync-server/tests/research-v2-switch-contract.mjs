@@ -56,6 +56,73 @@ for(const mode of [false,true]){
 }
 console.log('V2 switching passed: primary/repeated columns, no loading-shell rebuild, no redundant requests, stable history order, per-conversation drafts and stale-account rejection.');
 
+// Cold mounts receive the just-saved conversation through the workspace loader.
+for(const mode of [false,true]){
+ const f=harness(mode),paneID=mode?'instance:instance':'utility:analysis';
+ await f.context.renderResearchV2Pane(paneID,{available:true},{conversation:f.conversations.a});
+ assert.deepEqual(f.calls.requests,['/research/conversations/list'],'A saved conversation is not fetched again while opening its column');
+ assert.equal(f.options.conversation,f.conversations.a);
+}
+
+// Reader attachments require one durable mutation, with no history/config/get
+// readback and no remount of the destination or its unsent question.
+for(const mode of [false,true]){
+ const f=harness(mode),paneID=mode?'instance:instance':'utility:analysis';
+ await f.context.renderResearchV2Pane(paneID,{available:true});f.options.onDraft('Keep my unsent question');
+ const selected={sectionID:'2152',selectedText:'The complete selected passage, including its exception.',codeVersion:'2022'};
+ const saved={...f.conversations.a,revision:2,sources:[{...selected,id:'exact-source',kind:'selection'}]};
+ let finishWrite,scrolled=0;
+ Object.assign(f.context,{researchConversationList:[f.conversations.a],paneIDForResearchConversation:()=>paneID,
+  window:{getSelection:()=>({removeAllRanges(){}})},scrollPaneIntoView:()=>scrolled++,
+  transitionWorkspace:async()=>{throw Error('Do not rebuild a mounted Assistant to attach a passage');},
+  postResearch:async(path,values)=>{f.calls.requests.push(path);assert.equal(values.conversationID,'a');assert.equal(values.selections[0].selectedText,selected.selectedText);return new Promise(resolve=>{finishWrite=resolve;});}});
+ vm.runInContext(actual('addResearchSelectionToCurrent'),f.context);
+ const adding=f.context.addResearchSelectionToCurrent(selected,'a');
+ assert.match(f.context.researchOperations.status('owner:workspace'),/Adding passage/);
+ finishWrite({conversation:saved});await adding;
+ assert.deepEqual(f.calls.requests.slice(2),['/research/conversations/evidence']);
+ assert.equal(f.options.conversation,saved);assert.equal(f.options.initialDraft,'Keep my unsent question');
+ assert.equal(f.calls.created,1);assert.equal(f.calls.loading,1);assert.equal(f.calls.contentSwaps,1);assert.equal(scrolled,1);
+ assert.equal(f.context.researchOperations.status('owner:workspace'),'');
+}
+for(const change of ['account','workspace','workflow']){
+ const f=harness();await f.context.renderResearchV2Pane('utility:analysis',{available:true});
+ let finishWrite;
+ Object.assign(f.context,{postResearch:()=>new Promise(resolve=>{finishWrite=resolve;}),researchConversationList:[f.conversations.a]});
+ vm.runInContext(actual('addResearchSelectionToCurrent'),f.context);
+ const adding=f.context.addResearchSelectionToCurrent({sectionID:'2152',selectedText:'Exact selected passage'},'a');
+ if(change==='account')f.accountCurrent=false;
+ else if(change==='workspace')f.context.activeWorkspaceID='another-workspace';
+ else f.state.workflowNavigationGeneration+=2;
+ finishWrite({conversation:{...f.conversations.a,revision:2,sources:[{id:'late'}]}});
+ assert.equal(await adding,null);assert.equal(f.options.conversation.sources.length,0);
+ assert.equal(f.context.researchOperations.status('owner:workspace'),'');
+}
+console.log('Reader attachments passed: one write, no readback/remount, cold response hydration, retained drafts and account/workspace/navigation fences.');
+
+for(const mode of [false,true]){
+ const f=harness(mode),paneID=mode?'instance:instance':'utility:analysis';
+ const selected={id:'remove-this-source',kind:'selection',selectedText:'The selected provision.'};
+ const historical={id:'saved-answer',role:'assistant',answer:{answerText:'Earlier saved answer. [S1]',evidenceSnapshot:[selected]}};
+ f.conversations.a={...f.conversations.a,revision:4,evidenceSetVersion:2,sources:[selected],messages:[historical]};
+ if(!mode)f.context.activeResearchConversation=f.conversations.a;
+ let finishWrite;
+ Object.assign(f.context,{researchConversationList:[f.conversations.a],researchHistoryPageReaders:new Map(),supplementalResearchConversationIDs:[],
+  readResearchConversationList:{invalidate(){}},refreshResearchUsage:{invalidate(){}},saveWorkspaceState(){},
+  postResearch:async(path,body)=>{f.calls.requests.push(path);if(path.endsWith('/list'))return{conversations:[f.conversations.a]};if(path.endsWith('/get'))return{conversation:f.conversations.a};
+   assert.equal(body.action,'remove');assert.equal(body.sourceID,selected.id);assert.equal(body.expectedRevision,4);assert.equal(body.expectedEvidenceSetVersion,2);
+   return new Promise(resolve=>{finishWrite=resolve;});}});
+ await f.context.renderResearchV2Pane(paneID,{available:true});f.options.onDraft('Retain my follow-up');
+ const removing=f.options.onRemove(selected);
+ assert.match(f.context.researchOperations.status('owner:workspace'),/Removing passage/);
+ finishWrite({conversation:{...f.conversations.a,revision:5,evidenceSetVersion:3,sources:[]}});await removing;
+ assert.equal(f.options.conversation.sources.length,0);assert.equal(f.options.conversation.messages[0],historical,'Earlier answers retain their original passage snapshot');
+ assert.equal(f.options.initialDraft,'Retain my follow-up');assert.equal(f.options.revealAnswerID,'');
+ assert.equal(f.calls.created,1);assert.equal(f.calls.contentSwaps,1);assert.equal(f.calls.requests.length,3);
+ assert.equal(f.context.researchOperations.status('owner:workspace'),'');
+}
+console.log('Direct removal passed: exact source/revision, one write, retained drafts/saved answers and no readback or remount.');
+
 // A completed turn is published from its authoritative mutation response.
 // It must not reopen the pane or perform list/get/configuration reads.
 for(const mode of [false,true]){

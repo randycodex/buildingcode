@@ -19536,29 +19536,33 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
 .research-conversation-start-time { display: block; margin-top: 3px; text-align: right; }
 
 .reader-selection-research-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: fixed;
-  bottom: 24px;
+  top: 0;
   transform: translateX(-50%);
   z-index: 1000;
   box-sizing: border-box;
-  width: 232px;
-  min-width: 232px;
-  max-width: 232px;
+  width: max-content;
+  min-width: 0;
+  max-width: calc(100vw - 32px);
   height: 44px;
   min-height: 44px;
   max-height: 44px;
   padding: 0 16px;
   white-space: nowrap;
   transition: none;
-  border: 1px solid var(--selection-code-accent, var(--code-accent));
+  border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--menu-surface);
-  color: var(--selection-code-accent, var(--code-accent));
-  box-shadow: 0 4px 24px #0008;
+  color: var(--text-primary);
+  box-shadow: 0 4px 16px #0004;
   font-family: inherit;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
+  text-align: center;
   cursor: pointer;
 }
 .reader-selection-research-action[hidden] { display: none; }
@@ -20944,9 +20948,8 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
   display: flex; align-items: center; flex: 0 0 var(--report-column-header-height);
   padding: 10px 24px 0; box-sizing: border-box;
 }
-.report-list-header h2 { margin: 0; font-size: 11px; line-height: 18px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
-.report-list-top-row { display: flex; align-items: center; gap: 8px; flex: 0 0 52px; padding: var(--column-content-top-gap) 24px 0; box-sizing: border-box; }
-.report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-create { flex: 1; min-width: 0; padding: 0; border: 0; background: transparent; color: var(--text-secondary); text-align: left; font: 13px var(--ui-font-family); cursor: pointer; white-space: nowrap; }
+.report-list-top-row { display: flex; align-items: flex-start; gap: 8px; flex: 0 0 calc(var(--column-content-top-gap) + 28px); padding: var(--column-content-top-gap) 24px 0; box-sizing: border-box; }
+.report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-create { display: flex; align-items: center; flex: 1; min-width: 0; height: 28px; min-height: 28px; padding: 0; border: 0; background: transparent; color: var(--text-secondary); text-align: left; font: 13px var(--ui-font-family); cursor: pointer; white-space: nowrap; }
 .report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-create:hover { color: var(--text-primary); }
 .report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-top-row :is(.report-list-toggle, .report-title-delete) {
   display: inline-flex; align-items: center; justify-content: center;
@@ -20954,7 +20957,7 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
   margin: 0; padding: 5px; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-secondary); cursor: pointer;
 }
 .report-list-toggle .workspace-button-icon { width: 12px; height: 12px; margin: 0; transform: scaleX(-1); }
-.report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-top-row :is(.report-list-toggle, .report-title-delete):hover { color: var(--text-primary); background: transparent; }
+.report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-top-row :is(.report-list-toggle, .report-title-delete):is(:hover, :active) { color: var(--text-primary); background: transparent; }
 .report-screen .report-list-rail :focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 .report-list-items { flex: 1; min-height: 0; overflow: auto; padding: 12px 24px 24px; scrollbar-gutter: stable; }
 .report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-choice {
@@ -20964,7 +20967,6 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 }
 .report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-choice[aria-current='true'] { background: var(--toolbar-active); font-weight: 700; }
 .report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-choice:hover { background: var(--menu-highlight); }
-.report-list-rail.is-reports-collapsed .report-list-header h2 { display: none; }
 .report-list-rail.is-reports-collapsed .report-list-top-row { justify-content: center; padding-inline: 0; }
 .report-screen .report-list-rail [hidden] { display: none !important; }
 .report-screen .report-document-columns > .report-comparison-divider { grid-column: 5; }
@@ -20977,11 +20979,11 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
   padding: 5px; border: 0; border-radius: 0; background: transparent; box-shadow: none;
   color: var(--text-secondary); cursor: pointer;
 }
-.report-screen .report-draft-panel .report-outline .report-outline-toggle:hover { color: var(--text-primary); background: transparent; }
+.report-screen .report-draft-panel .report-outline .report-outline-toggle:is(:hover, :active) { color: var(--text-primary); background: transparent; }
 .report-screen .report-draft-panel .report-outline .report-outline-toggle:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 .report-outline-toggle .workspace-button-icon { width: 12px; height: 12px; margin: 0; }
 .report-screen .report-draft-panel .report-document-columns > .report-outline.is-outline-collapsed { position: relative; z-index: 2; overflow: visible; }
-.report-outline.is-outline-collapsed .report-outline-rail-header { justify-content: flex-start; padding-inline: calc(var(--panel-padding) - 8px) 0; }
+.report-outline.is-outline-collapsed .report-outline-rail-header { justify-content: center; padding-inline: 0; }
 .report-screen .report-outline.is-outline-collapsed :is(.report-outline-rail-header h2, .report-outline-introduction, .report-outline-contents) { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .report-document-columns:is(.is-outline-toggling, .is-reports-toggling) { transition: none; }

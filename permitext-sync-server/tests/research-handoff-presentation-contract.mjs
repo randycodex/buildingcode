@@ -75,6 +75,15 @@ assert.equal(opened.state.researchConversationID,'conversation');
 assert.equal(opened.context.researchConversationPaneIsOpen(),true);
 assert(opened.seen.includes(true),'The answer pane is visible during the transition.');
 for(const mode of [{unavailable:true},{stale:true}]) {const h=harness(mode);await h.context.openResearchConversation('conversation');assert.equal(h.context.researchConversationPaneIsOpen(),false);}
+{
+ const h=harness({unavailable:true}),saved={id:'conversation',primaryProjectID:'project',messages:[],sources:[]};
+ h.context.transitionWorkspace=async(_mode,options)=>assert.equal(options.researchConversation,saved,'A new column receives the saved conversation without a second GET');
+ assert.equal(await h.context.openResearchConversation('conversation',{conversation:saved}),saved);
+ assert.equal(h.context.researchConversationPaneIsOpen(),true,'The create response opens the Assistant even when a redundant GET would fail');
+ const wrong=harness({unavailable:true});
+ await wrong.context.openResearchConversation('conversation',{conversation:{...saved,id:'another-conversation'}});
+ assert.equal(wrong.context.researchConversationPaneIsOpen(),false,'A different conversation cannot satisfy the requested identity');
+}
 await assert.rejects(harness().context.openNotebookReference({}, {researchAnswers:[]}, {referenceKind:'researchAnswer',referenceID:'missing'}), /reference is unavailable/);
 
 const manifest={id:'synthetic-manifest',immutable:true,schemaVersion:2,generatorVersion:'local-report-handoff-test',contentHash:'b'.repeat(64),title:'Synthetic Research handoff',reportVersion:1,reportDate:'2026-09-06T00:00:00Z',createdAt:'2026-09-06T00:00:00Z',author:{displayName:'Synthetic reviewer'},project:{name:'Synthetic Project',address:'No real property'},codeEdition:'2022 NYC Construction Codes',disclaimers:['Synthetic review; verify enacted sources.'],items:[

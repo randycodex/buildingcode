@@ -1,6 +1,7 @@
 import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=7";
 import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
 import {researchInlineRuns} from "./research-inline-format.js?v=1";
+import {researchAnswerBlocks} from './research-answer-blocks.js?v=1';
 // A small view with injected workspace/Reader adapters. No provider calls or
 // evidence selection policy live in the presentation module.
 const node = (tag, className = '', text = '') => {
@@ -162,6 +163,23 @@ export function createResearchV2View(options) {
       appendText(target,run.text.slice(offset));
     }
   }
+  function answerBlocks(parent,blocks,message,reveal){
+    for(const block of blocks){
+      if(block.type==='paragraph'){
+        const p=node('p');paragraphText(p,block.text,message,{reveal});parent.append(p);continue;
+      }
+      const list=node(block.ordered?'ol':'ul','rv2-answer-list');
+      const start=block.items[0].number;
+      if(block.ordered&&start!==1)list.setAttribute('start',String(start));
+      const repeated=block.ordered&&block.items.every(item=>item.number===start);
+      block.items.forEach(item=>{
+        const li=node('li');
+        if(block.ordered&&!repeated)li.setAttribute('value',String(item.number));
+        answerBlocks(li,item.blocks,message,reveal);list.append(li);
+      });
+      parent.append(list);
+    }
+  }
   const messages=conversation?.messages||[];
   if(!messages.length){
     const welcome=node('div','rv2-welcome');welcome.append(node('h3','','What are you researching?'),node('p','','Ask a question or attach a passage from Reader.'));
@@ -177,7 +195,7 @@ export function createResearchV2View(options) {
       const bubble=node('article','rv2-answer');bubble.setAttribute('aria-label','Research answer');
       bubble.dataset.messageId=message.id || '';
       const text=researchAnswerText(message);
-      for(const paragraph of text.split(/\n\s*\n/)){const p=node('p');paragraphText(p,paragraph,message,{reveal:Boolean(options.revealAnswerID&&message.id===options.revealAnswerID)});bubble.append(p);}
+      answerBlocks(bubble,researchAnswerBlocks(text),message,Boolean(options.revealAnswerID&&message.id===options.revealAnswerID));
       const gapLists=[['Sources still needed',message.answer?.additionalEvidenceNeeded],['Project facts still needed',message.answer?.missingFacts]];
       if(gapLists.some(([,items])=>Array.isArray(items)&&items.some(item=>typeof item==='string'&&item.trim()))){
         const gaps=node('div','rv2-answer-gaps');gaps.setAttribute('aria-label','Unresolved information');
@@ -194,8 +212,18 @@ export function createResearchV2View(options) {
         }
         bubble.append(gaps);
       }
+      const references=message.answer?.referenceLookup?.added || [];
+      if(references.length){
+        const added=node('div','rv2-reference-sources');added.setAttribute('aria-label','Automatically retrieved references');
+        added.append(node('p','rv2-detail-caption','References added from the same codebook and edition'));
+        for(const reference of references){
+          const label=`${reference.label} · ${String(reference.codeEdition || '').match(/(?:19|20)\d{2}/)?.[0] || reference.codeEdition}`;
+          added.append(action(label,()=>void onCitation(message,reference.citationID),'rv2-text-action'));
+        }
+        bubble.append(added);
+      }
       const footer=node('div','rv2-answer-footer');
-      footer.append(node('span','',researchReviewLabel(message.answer)));
+      if(message.answer?.verification?.pass!==true)footer.append(node('span','',researchReviewLabel(message.answer)));
       footer.append(action('Sources used',()=>void showSnapshot(message),'rv2-text-action'));
       const actions=options.renderAnswerActions?.(message);
       if(actions) footer.append(actions);
@@ -218,8 +246,15 @@ export function createResearchV2View(options) {
   const composer=node('form','rv2-composer');composer.setAttribute('aria-label','Research message');
   const chips=node('div','rv2-chips');chips.setAttribute('aria-label','Passages attached to this conversation');
   const passageSources=(conversation?.sources||[]).filter(source=>source.kind==='selection'&&source.selectedText);
+  const passageControls=[];
   passageSources.forEach(source=>{
-    const chip=action(passageChipLabel(source),()=>showPassage(source),'rv2-passage-chip');chips.append(chip);
+    const attachment=node('span','rv2-passage-attachment');
+    const chip=action(passageChipLabel(source),()=>showPassage(source),'rv2-passage-chip');
+    const remove=action('',()=>void removePassage(source),'rv2-passage-remove');
+    remove.setAttribute('aria-label',`Remove ${passageChipLabel(source)} from next question`);
+    remove.title='Remove passage from future questions';
+    remove.innerHTML='<svg aria-hidden="true" focusable="false" data-lucide-icon="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg>';
+    passageControls.push(chip,remove);attachment.append(chip,remove);chips.append(attachment);
   });
   const input=node('textarea','rv2-input');input.setAttribute('aria-label','Research question');input.dataset.researchDraftKey=options.draftKey||'';input.placeholder='Message';input.rows=1;input.maxLength=2000;input.value=initialDraft;
   let measuredDraft=null,measuredWidth=0,composerResize=null;
@@ -246,6 +281,7 @@ export function createResearchV2View(options) {
   const operationPending=()=>chatTransitionPending||Boolean(options.operationGate?.status());
   function update(){if(disposed)return;resizeInput();const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||includeBusy||revealBusy||pending));
     if(newChat)newChat.disabled=busy||includeBusy||revealBusy||pending;
+    passageControls.forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});
     operationStatus.textContent=chatTransitionPending?'Starting new chat…':options.operationGate?.status() || '';operationStatus.hidden=!pending;
     projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});}
   const stopObservingOperations=options.operationGate?.subscribe(update);
@@ -264,27 +300,56 @@ export function createResearchV2View(options) {
       input.value=draft;lastRequest=null;onDraft(draft);detail.hidden=true;thread.hidden=false;update();notice('Fact added to your draft. Send the message when ready.');input.focus({preventScroll:true});
     },'rv2-text-action'));response.focus({preventScroll:true});
   }
+  async function removePassage(source){
+    if(disposed||busy||includeBusy||revealBusy||operationPending()||!isCurrent()||!root.isConnected)return;
+    includeBusy=true;update();
+    try{await onRemove(source);if(!disposed&&isCurrent()){detail.hidden=true;thread.hidden=false;}}
+    catch(error){if(!disposed&&isCurrent())notice(error.message||'The passage could not be removed.',true);}
+    finally{includeBusy=false;update();}
+  }
   function showPassage(source){const content=showDetail();content.append(node('h3','',passageChipLabel(source)),node('p','rv2-source-text',source.selectedText));
     content.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));
-    content.append(action('Remove from next question',async()=>{
-      if(busy)return;try{await onRemove(source);}catch(error){notice(error.message,true);}
-    },'rv2-text-action'));
+    content.append(action('Remove from next question',()=>void removePassage(source),'rv2-text-action'));
+  }
+  function snapshotRow(label,preview,className=''){
+    const row=node('details',`rv2-snapshot-row ${className}`.trim());row.open=false;
+    const summary=node('summary'),heading=node('span','rv2-snapshot-label',label);
+    const text=node('span','rv2-snapshot-summary');text.append(heading);
+    if(preview)text.append(node('span','rv2-snapshot-preview',preview));
+    summary.append(text);
+    const body=node('div','rv2-snapshot-body');row.append(summary,body);
+    return {row,body};
+  }
+  function snapshotPreview(value){
+    const text=String(value || '').replace(/\s+/g,' ').trim();
+    return text.length>110?`${text.slice(0,109)}…`:text;
   }
   async function showSnapshot(message){if(busy||includeBusy)return;const attempt=++generation;notice('Loading original passages…');
-    try{const saved=await onSnapshot(message);if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','','Sources used by this answer'));
+    try{const saved=await onSnapshot(message);if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','rv2-snapshot-title','Sources used'));
       const sources=Array.isArray(saved)?saved:saved.sources||[];
       const snapshot=saved.projectContextSnapshot,information=snapshot?.projectInformation;
       if(information){
-        const context=node('section','rv2-project-snapshot');context.append(node('h4','','Project context for this answer'));
+        const facts=information.facts||[];
+        const preview=[snapshotPreview(information.address || information.description),facts.length?`${facts.length} ${facts.length===1?'fact':'facts'}`:''].filter(Boolean).join(' · ');
+        const {row,body:context}=snapshotRow('Project context',preview,'rv2-project-snapshot');
         const capturedAt=snapshot.capturedAt||information.capturedAt||snapshot.reviewedAt||information.reviewedAt;
         if(capturedAt)context.append(node('p','rv2-detail-caption',`Captured ${new Date(capturedAt).toLocaleString()}`));
         if(information.address)context.append(node('p','rv2-source-text',information.address));
         if(information.description)context.append(node('p','rv2-source-text',information.description));
-        for(const fact of information.facts||[])context.append(node('p','rv2-source-text',typeof fact==='string'?fact:JSON.stringify(fact)));
-        content.append(context);
+        for(const fact of facts)context.append(node('p','rv2-source-text',typeof fact==='string'?fact:JSON.stringify(fact)));
+        content.append(row);
       }
-      for(const source of sources){content.append(node('h4','',passageChipLabel(source)),node('p','rv2-source-text',source.passageText||source.selectedText||source.text||''));
-        content.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));}
+      const sourceList=node('ol','rv2-snapshot-list');sourceList.setAttribute('role','list');sourceList.setAttribute('aria-label','Code sources');
+      sources.forEach((source,index)=>{
+        const text=source.passageText||source.selectedText||source.text||'';
+        const automatic=source.provenance?.origin==='permitext_cross_reference';
+        const preview=[automatic?'Automatically retrieved':'',snapshotPreview(text)].filter(Boolean).join(' · ');
+        const {row,body}=snapshotRow(`${index+1}. ${passageChipLabel(source)}`,preview);
+        if(automatic)body.append(node('p','rv2-detail-caption',source.provenance.retrievalReason || 'Automatically retrieved explicit reference'));
+        body.append(node('p','rv2-source-text',text),action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));
+        const item=node('li');item.append(row);sourceList.append(item);
+      });
+      if(sources.length)content.append(sourceList);
     }catch(error){if(valid(attempt))notice(error.message,true);}}
   async function findPassages(discoveryQuestion,{focus=''}={}){
     if(busy||includeBusy)return;const question=typeof discoveryQuestion==='string'?discoveryQuestion:input.value.trim();

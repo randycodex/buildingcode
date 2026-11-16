@@ -5,7 +5,7 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, open
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=42";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=49";
 import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=7";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261115-report-sheet-edge-v1909";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261115-numbered-answer-sources-v1923";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=12";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261115-report-sheet-edge-v1909";
+} from "./offline-storage.js?v=20261115-numbered-answer-sources-v1923";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -24895,7 +24895,7 @@ async function renderUtilityInstance(instance, options = {}) {
   } else if (instance.key === "saved") {
     panel = await renderSaved(instance, options);
   } else if (instance.key === "analysis") {
-    panel = await renderResearch(paneID);
+    panel = await renderResearch(paneID, {conversation:options.researchConversation});
   }
   wireUtilityInstanceActions(panel, instance);
   return panel;
@@ -25454,10 +25454,10 @@ function researchAssistantContentIdentity(instance = null) {
     : ["analysis", state.researchConversationID || "", researchHistoryShowing, researchConversationPaneOpened]);
 }
 
-async function refreshResearchConversationInPlace(paneID, conversationID, instance = null) {
+async function refreshResearchConversationInPlace(paneID, conversationID, instance = null, savedConversation = null) {
   const v2Panel = track.querySelector(`.research-v2-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (v2Panel?._refreshResearchV2) {
-    const conversation = instance ? supplementalResearchConversations.get(conversationID) : activeResearchConversation;
+    const conversation = savedConversation || (instance ? supplementalResearchConversations.get(conversationID) : activeResearchConversation);
     return v2Panel._refreshResearchV2(conversation);
   }
   const panel = track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneID)}"]`);
@@ -25516,6 +25516,8 @@ async function focusLinkedResearchAnswer(paneID, answerID, isCurrent) {
 async function openResearchConversation(conversationID, options = {}) {
   const normalizedConversationID = String(conversationID || "").trim();
   if (!normalizedConversationID) return null;
+  const savedConversation = options.conversation?.id === normalizedConversationID &&
+    Array.isArray(options.conversation.messages) && Array.isArray(options.conversation.sources) ? options.conversation : null;
   const workflowGeneration = state.workflowNavigationGeneration || 0;
   const workflowIsCurrent = () => workflowGeneration === (state.workflowNavigationGeneration || 0);
   researchDraftPaneIDs.delete(options.instance ? paneIDForUtilityInstance(options.instance) : "utility:analysis");
@@ -25526,7 +25528,7 @@ async function openResearchConversation(conversationID, options = {}) {
     const attemptKey = `${workspaceID}:${instanceID}`;
     const attempt = {};
     researchConversationOpeningAttempts.set(attemptKey, attempt);
-    const conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
+    const conversation = savedConversation || await fetchAuthoritativeResearchConversation(normalizedConversationID);
     if (!workflowIsCurrent() || workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity) ||
         researchDraftPaneIDs.has(paneIDForUtilityInstance(options.instance)) ||
         researchConversationOpeningAttempts.get(attemptKey) !== attempt) return null;
@@ -25555,7 +25557,7 @@ async function openResearchConversation(conversationID, options = {}) {
     const paneID = paneIDForUtilityInstance(instance);
     const refreshed = await refreshResearchConversationInPlace(paneID, normalizedConversationID, instance);
     if (refreshed === "stale") return null;
-    await transitionWorkspace("utility", { refreshPaneIDs: refreshed === "updated" ? [] : [paneID] });
+    await transitionWorkspace("utility", { refreshPaneIDs: refreshed === "updated" ? [] : [paneID], researchConversation:conversation });
     if (options.focusAnswerID) {
       const current = () => workflowIsCurrent() && workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity) &&
         instance.conversationID === normalizedConversationID;
@@ -25581,7 +25583,8 @@ async function openResearchConversation(conversationID, options = {}) {
   };
   let conversation = null;
   try {
-    conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
+    conversation = savedConversation;
+    if (!conversation) conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
   } catch (error) {
     if (!workflowIsCurrent() || !researchOpenContextIsCurrent(openingContext)) return null;
     await showWebNotice("Could not open Research", error.message || "The conversation could not be loaded.");
@@ -25656,6 +25659,7 @@ async function openResearchConversation(conversationID, options = {}) {
   const refreshed = await refreshResearchConversationInPlace(conversationPaneID, normalizedConversationID);
   if (refreshed === "stale") return null;
   await transitionWorkspace("utility", {
+    researchConversation:conversation,
     refreshPaneIDs: [
       ...(refreshed === "updated" ? [] : [conversationPaneID]),
       ...projectPaneIDs
@@ -27744,6 +27748,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
   const currentInstance = () => instance ? (state.utilityInstances || []).find(item => item.key === "analysis" && item.id === instance.id) : null;
   const selectedID = () => researchDraftPaneIDs.has(paneID) ? "" : (currentInstance()?.conversationID || state.researchConversationID || "");
   let conversationID = selectedID();
+  const savedConversation = retained.conversation?.id === conversationID ? retained.conversation : null;
   const accountIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   const current = () => isCurrentAccountRequest(accountIdentity) && workspaceID === activeWorkspaceID && selectedID() === conversationID;
   const ownsPanel = () => current() && panel.isConnected && panel.parentNode === track && (!instance || currentInstance());
@@ -27754,7 +27759,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
   try {
     const [listed, fetched, availability] = await Promise.all([
       retained.listed || postResearch("/research/conversations/list", {limit:30,projectID:researchWorkspaceProjectID() || "",...(retained.includeHidden ? {includeHidden:true} : {})}),
-      retained.conversation ? {conversation:retained.conversation} : conversationID ? postResearch("/research/conversations/get", { conversationID }) : null,
+      savedConversation ? {conversation:savedConversation} : conversationID ? postResearch("/research/conversations/get", { conversationID }) : null,
       configuration || postResearch("/research/v2/config")
     ]);
     if (!current()) return panel;
@@ -27877,7 +27882,6 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
         if(current()){historyCursor=page.nextCursor;listed.nextCursor=page.nextCursor;listed.hasMore=page.hasMore;
           listed.conversations=[...listed.conversations,...(page.conversations||[])];}
         return {...page,conversations:(page.conversations||[]).filter(item=>researchConversationInWorkspace(item))};},
-      renderAnswerActions:message=>renderResearchNotebookHandoff(conversation,message,{linkForReport:true}),
       renderProjectContext:host=>renderResearchProjectContext(host, conversation || {primaryProjectID:researchWorkspaceProjectID(),id:''}, {onUpdated:publish}),
       operationGate:{status:()=>researchOperations.status(researchOperationScope(accountIdentity,workspaceID)),
         blocksInput:()=>researchOperations.blocksInput(researchOperationScope(accountIdentity,workspaceID)),
@@ -27924,8 +27928,12 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
           await publish(result);
         }
       },
-      onRemove:async source => publish(await postResearch("/research/conversations/evidence", {conversationID:conversation.id,
-        action:"remove",sourceID:source.id,expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)})),
+      onRemove:async source => {
+        const release = researchOperations.begin(researchOperationScope(accountIdentity,workspaceID),'Removing passage…');
+        try {await publish(await postResearch("/research/conversations/evidence", {conversationID:conversation.id,
+          action:"remove",sourceID:source.id,expectedRevision:Number(conversation.revision || 0),expectedEvidenceSetVersion:Number(conversation.evidenceSetVersion || 1)}), {revealAnswer:false});}
+        finally {release();}
+      },
       onSend:async ({question,requestID,signal,onProgress}) => {
         if (researchOperations.status(researchOperationScope(accountIdentity,workspaceID))) throw new Error('Wait for the conversation update to finish before sending.');
         if (!researchWorkspaceProjectID()) throw new Error("Open a Project before asking a question.");
@@ -28044,12 +28052,12 @@ function assistantHistoryManagement(panel, identity, isCurrent, options = {}) {
   return management;
 }
 
-async function renderResearch(paneID = "utility:analysis") {
+async function renderResearch(paneID = "utility:analysis", retained = {}) {
   if (!hasCapability("research")) return renderProLockedPane(paneID, "Assistant");
   const identity=captureAccountRequest(),workspaceID=activeWorkspaceID;
   const configuration=await researchV2Rollout.refresh({force:true});
   if(!isCurrentAccountRequest(identity)||workspaceID!==activeWorkspaceID)return null;
-  return renderResearchV2Pane(paneID, configuration);
+  return renderResearchV2Pane(paneID, configuration, retained);
 }
 
 // Retained presentation helpers can still read historical records. This
@@ -29621,7 +29629,7 @@ async function appendResearchReferenceToNote(project, destination, reference, mu
   return payload.card;
 }
 
-function renderResearchNotebookHandoff(conversation, message, {linkForReport=false} = {}) {
+function renderResearchNotebookHandoff(conversation, message) {
   if (!message.id || !message.answer || researchAnswerHasVerificationRecovery(message.answer) || !hasCapability("notebook")) return null;
   const region = document.createElement("div");
   region.className = "research-notebook-handoff";
@@ -29753,49 +29761,7 @@ function renderResearchNotebookHandoff(conversation, message, {linkForReport=fal
     }
   });
   region.append(select, button);
-  if (hasCapability("professional-exports")) {
-    const reportButton = document.createElement("button");
-    reportButton.type = "button";
-    reportButton.className = "workflow-action workflow-action-secondary";
-    reportButton.textContent = "Add to Report";
-    reportButton.disabled = !choices.length;
-    const refreshMembership = () => {
-      reportButton.setAttribute("data-report-membership-mode", "action");
-      reportButton.setAttribute("data-report-membership-project", select.value);
-      reportButton.setAttribute("data-report-source-kind", "researchAnswer");
-      reportButton.setAttribute("data-report-source-id", message.id);
-      window.requestAnimationFrame(() => { if (reportButton.isConnected) void refreshProjectReportMembership(select.value); });
-    };
-    select.addEventListener("change", refreshMembership);
-    refreshMembership();
-    reportButton.addEventListener("click", async () => {
-      const project = choices.find(item => researchProjectID(item) === select.value);
-      if (!project) return;
-      const requestIdentity = captureAccountRequest();
-      const workspaceID = activeWorkspaceID;
-      reportButton.disabled = true;
-      try {
-        if (await openIncludedSourceReport(reportButton, project)) return;
-        if(linkForReport)await postResearch("/projects/foundation/link",{projectID:researchProjectID(project),targetKind:"researchAnswer",targetID:message.id,relationship:"primary"});
-        const draft = await addProjectSourcesToReport(project, sources => {
-          const source = sources.find(item => item.kind === "researchAnswer" && item.id === message.id);
-          if (!source) throw new Error("Link this Assistant conversation to the selected Project before adding its answer to a Report.");
-          return [source];
-        }, { container: region });
-        if (!draft) return;
-        if (isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID && reportButton.isConnected) {
-          reportAdditionFeedback(reportButton, draft);
-        }
-      } catch (error) {
-        if (isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID && region.isConnected) {
-          await showWebNotice("Report handoff not completed", error.message);
-        }
-      } finally {
-        if (isCurrentAccountRequest(requestIdentity) && reportButton.isConnected) reportButton.disabled = !choices.length;
-      }
-    });
-    region.append(reportButton);
-  }
+
   return region;
 }
 
@@ -30294,8 +30260,6 @@ async function renderResearchConversation(conversationID, options = {}) {
       const calculation = renderOccupantLoadCalculation(calculationSource, {conversationID, answerID: message.id, answer: message.answer, conversation});
       if (calculation) bubble.append(calculation);
     }
-    const notebookHandoff = renderResearchNotebookHandoff(conversation, message);
-    if (notebookHandoff) bubble.append(notebookHandoff);
     thread.append(bubble);
   });
   if (pendingProgress) {
@@ -30557,15 +30521,21 @@ function selectedReaderResearchPassages() {
 const readerSelectionResearchAction = document.createElement("button");
 readerSelectionResearchAction.type = "button";
 readerSelectionResearchAction.className = "reader-selection-research-action";
-readerSelectionResearchAction.textContent = "Ask Assistant about selected text";
+readerSelectionResearchAction.textContent = "Add to Assistant";
+readerSelectionResearchAction.title = "Add selected text to a conversation";
 readerSelectionResearchAction.hidden = true;
 document.body.append(readerSelectionResearchAction);
 let selectedReaderResearchIntent = null;
 let readerSelectionResearchPositionFrame = 0;
+let readerSelectionResearchPointerDown = false;
 function positionReaderSelectionResearchAction() {
   readerSelectionResearchPositionFrame = 0;
-  if (readerSelectionResearchAction.hidden) return;
-  const range = window.getSelection()?.rangeCount ? window.getSelection().getRangeAt(0) : null;
+  const selection = window.getSelection();
+  if (!selectedReaderResearchIntent || readerSelectionResearchPointerDown || !selection?.rangeCount || selection.isCollapsed) {
+    readerSelectionResearchAction.hidden = true;
+    return;
+  }
+  const range = selection.getRangeAt(0);
   const node = range?.startContainer;
   const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
   const panel = element?.closest(".reader-panel");
@@ -30573,18 +30543,37 @@ function positionReaderSelectionResearchAction() {
     readerSelectionResearchAction.hidden = true;
     return;
   }
-  readerSelectionResearchAction.style.setProperty(
-    "--selection-code-accent", getComputedStyle(panel).getPropertyValue("--code-accent").trim()
-  );
-  const bounds = panel.getBoundingClientRect();
-  const left = Math.max(0, bounds.left);
-  const right = Math.min(window.innerWidth, bounds.right);
-  if (right <= left || bounds.bottom <= 0 || bounds.top >= window.innerHeight) {
+  const bounds = (panel.querySelector('.reader-content') || panel).getBoundingClientRect();
+  const left = Math.max(8, bounds.left + 8), right = Math.min(window.innerWidth - 8, bounds.right - 8);
+  const top = Math.max(8, bounds.top + 8), bottom = Math.min(window.innerHeight - 8, bounds.bottom - 8);
+  const endpoint = range.cloneRange();
+  endpoint.setStart(selection.focusNode || range.endContainer, selection.focusOffset ?? range.endOffset);
+  endpoint.collapse(true);
+  const rects = [...range.getClientRects()].filter(rect => rect.height > 0 && rect.width > 0);
+  let anchor = endpoint.getBoundingClientRect();
+  let anchorX = anchor.left;
+  if (!anchor.height) {
+    const backwards = selection.focusNode === range.startContainer && selection.focusOffset === range.startOffset;
+    anchor = backwards ? rects[0] : rects.at(-1);
+    anchorX = backwards ? anchor?.left : anchor?.right;
+  }
+  if (!anchor || right <= left || bottom <= top || anchor.bottom <= top || anchor.top >= bottom || anchorX < left || anchorX > right) {
     readerSelectionResearchAction.hidden = true;
     return;
   }
-  readerSelectionResearchAction.style.left = `${bounds.left + bounds.width / 2}px`;
-  readerSelectionResearchAction.style.bottom = `${Math.max(24, window.innerHeight - bounds.bottom + 24)}px`;
+  readerSelectionResearchAction.hidden = false;
+  const width = readerSelectionResearchAction.offsetWidth, height = readerSelectionResearchAction.offsetHeight;
+  if (bottom - top < height) { readerSelectionResearchAction.hidden = true; return; }
+  const x = Math.max(left + width / 2, Math.min(right - width / 2, anchorX));
+  const above = anchor.top - height - 8;
+  const positions = [above, anchor.bottom + 8, Math.min(...rects.map(rect => rect.top)) - height - 8];
+  const y = positions.find(value => value >= top && value + height <= bottom &&
+    !rects.some(rect => rect.bottom > value && rect.top < value + height && rect.right > x - width / 2 && rect.left < x + width / 2)) ?? above;
+  readerSelectionResearchAction.style.left = `${x}px`;
+  readerSelectionResearchAction.style.top = `${Math.max(top, Math.min(bottom - height, y))}px`;
+}
+function scheduleReaderSelectionResearchAction() {
+  if (!selectedReaderResearchIntent || readerSelectionResearchPointerDown || readerSelectionResearchPositionFrame) return;
   readerSelectionResearchPositionFrame = requestAnimationFrame(positionReaderSelectionResearchAction);
 }
 readerSelectionResearchAction.addEventListener("pointerdown", (event) => event.preventDefault());
@@ -30593,13 +30582,31 @@ readerSelectionResearchAction.addEventListener("click", () => {
   if (!intent || readerSelectionResearchAction.disabled) return;
   openResearchDestinationMenu(readerSelectionResearchAction, intent);
 });
-document.addEventListener("selectionchange", () => {
+function refreshReaderSelectionResearchAction() {
   if (document.activeElement === readerSelectionResearchAction) return;
+  if (readerSelectionResearchPointerDown) { readerSelectionResearchAction.hidden = true; return; }
   selectedReaderResearchIntent = selectedReaderResearchPassages();
   readerSelectionResearchAction.hidden = !selectedReaderResearchIntent;
-  if (readerSelectionResearchPositionFrame) cancelAnimationFrame(readerSelectionResearchPositionFrame);
-  positionReaderSelectionResearchAction();
+  scheduleReaderSelectionResearchAction();
+}
+document.addEventListener("selectionchange", refreshReaderSelectionResearchAction);
+document.addEventListener('pointerdown', event => {
+  if (event.button !== 0 || !event.target.closest?.('.reader-panel')) return;
+  readerSelectionResearchPointerDown = true;
+  readerSelectionResearchAction.hidden = true;
+}, {capture:true});
+window.addEventListener('pointerup', () => {
+  if (!readerSelectionResearchPointerDown) return;
+  readerSelectionResearchPointerDown = false;
+  refreshReaderSelectionResearchAction();
 });
+window.addEventListener('pointercancel', () => {
+  readerSelectionResearchPointerDown = false;
+  refreshReaderSelectionResearchAction();
+});
+document.addEventListener('scroll', scheduleReaderSelectionResearchAction, {capture:true,passive:true});
+window.addEventListener('resize', scheduleReaderSelectionResearchAction);
+track.addEventListener('permitext:workspace-layout-change', scheduleReaderSelectionResearchAction);
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     readerSelectionResearchAction.hidden = true;
@@ -30788,10 +30795,9 @@ async function startNewResearchFromSelection(selection) {
     }
     activeResearchConversation = payload.conversation;
     window.getSelection?.().removeAllRanges();
-    await refreshResearchConversationList();
-    if (!navigationIsCurrent()) return payload.conversation;
+    researchConversationList = [payload.conversation, ...researchConversationList.filter(item => item.id !== payload.conversation.id)];
     await openResearchConversation(payload.conversation.id, {
-      refreshList: true,
+      conversation: payload.conversation,
       anchorPaneID: selection.originPaneID || ""
     });
     return payload.conversation;
@@ -30816,30 +30822,37 @@ async function addResearchSelectionToCurrent(selection, destinationConversationI
   }
   const workspaceID = activeWorkspaceID;
   const identity = captureAccountRequest();
-  const passages = selection.passages || [selection];
-  const payload = await postResearch("/research/conversations/evidence", {
-    conversationID,
-    ...(selection.relatedReview ? { action: "add_related",
-      expectedRevision: selection.relatedReview.expectedRevision,
-      expectedEvidenceSetVersion: selection.relatedReview.expectedEvidenceSetVersion } : {}),
-    selections: passages.map(({ sectionID, selectedText, savedItemID, codeVersion, reviewedSectionHash }) => ({
-      sectionID,
-      selectedText,
-      savedItemID,
-      ...(selection.relatedReview ? { codeVersion, reviewedSectionHash } : {})
-    }))
-  });
-  if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return null;
-  if (conversationID === state.researchConversationID) activeResearchConversation = payload.conversation;
-  else supplementalResearchConversations.set(conversationID, payload.conversation);
-  researchConversationList = researchConversationList.map((item) => item.id === conversationID ? payload.conversation : item);
-  window.getSelection?.().removeAllRanges();
-  // Refresh only the existing destination. Its composer restores its own durable
-  // follow-up draft; adding evidence never submits a question or replaces another chat.
-  const paneID = paneIDForResearchConversation(conversationID);
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-  if (workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity)) scrollPaneIntoView(paneID);
-  return payload.conversation;
+  const workflowGeneration = state.workflowNavigationGeneration || 0;
+  const finish = researchOperations.begin(researchOperationScope(identity,workspaceID),'Adding passage…');
+  try {
+    const passages = selection.passages || [selection];
+    const payload = await postResearch("/research/conversations/evidence", {
+      conversationID,
+      ...(selection.relatedReview ? { action: "add_related",
+        expectedRevision: selection.relatedReview.expectedRevision,
+        expectedEvidenceSetVersion: selection.relatedReview.expectedEvidenceSetVersion } : {}),
+      selections: passages.map(({ sectionID, selectedText, savedItemID, codeVersion, reviewedSectionHash }) => ({
+        sectionID,
+        selectedText,
+        savedItemID,
+        ...(selection.relatedReview ? { codeVersion, reviewedSectionHash } : {})
+      }))
+    });
+    if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity) ||
+        workflowGeneration !== (state.workflowNavigationGeneration || 0)) return null;
+    if (conversationID === state.researchConversationID) activeResearchConversation = payload.conversation;
+    else supplementalResearchConversations.set(conversationID, payload.conversation);
+    researchConversationList = researchConversationList.map((item) => item.id === conversationID ? payload.conversation : item);
+    window.getSelection?.().removeAllRanges();
+    // Refresh only the existing destination. Its composer restores its own durable
+    // follow-up draft; adding evidence never submits a question or replaces another chat.
+    const paneID = paneIDForResearchConversation(conversationID);
+    const refreshed = await refreshResearchConversationInPlace(paneID, conversationID, null, payload.conversation);
+    if (refreshed === 'stale') return payload.conversation;
+    if (refreshed !== 'updated') await transitionWorkspace("utility", { refreshPaneIDs: [paneID], researchConversation:payload.conversation });
+    if (workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity)) scrollPaneIntoView(paneID);
+    return payload.conversation;
+  } finally {finish();}
 }
 
 function createProjectBulkSelectionController(panel, projects, mode) {
@@ -34820,8 +34833,8 @@ async function renderProjectReportDraft(project, resume = null) {
     draftPicker.append(pageTitleEditor); pageFields.set('__title',{element:pageTitleEditor,size:28});
     const reportsRail = document.createElement('aside'); reportsRail.className = 'report-list-rail';
     reportsRail.setAttribute('aria-label', 'Project reports');
-    const reportsHeader = document.createElement('header'); reportsHeader.className = 'report-list-header';
-    const reportsLabel = document.createElement('h2'); reportsLabel.textContent = 'Reports'; reportsHeader.append(reportsLabel);
+    const reportsHeader = document.createElement('div'); reportsHeader.className = 'report-list-header';
+    reportsHeader.setAttribute('aria-hidden','true');
     const reportsTopRow = document.createElement('div'); reportsTopRow.className = 'report-list-top-row';
     const createNew = document.createElement('button'); createNew.type = 'button'; createNew.className = 'report-list-create';
     createNew.textContent = 'New report +'; createNew.setAttribute('aria-label','New report');
@@ -51500,11 +51513,11 @@ function workspacePaneDescriptors(options = {}) {
     const savedFoundationScope = instance.key === "saved" && hasCapability("saved-work") ? foundationScope : null;
     savedFoundationScope?.register(paneIDForUtilityInstance(instance));
     if (instance.key !== "sdc") add(paneIDForUtilityInstance(instance), ({ search: "Search", saved: "Evidence", analysis: "Assistant" }[instance.key] || "Column"),
-      (signal) => renderUtilityInstance(instance, { accessGate: options.accessGate, foundationScope: savedFoundationScope, signal }), () => closeUtilityInstance(instance),
+      (signal) => renderUtilityInstance(instance, { accessGate: options.accessGate, foundationScope: savedFoundationScope, signal, researchConversation:options.researchConversation }), () => closeUtilityInstance(instance),
       { foundationScope: savedFoundationScope, deferredFoundationRelease: Boolean(savedFoundationScope), publicContent: instance.key === "search", identity: instance.key === "analysis"
         ? researchAssistantContentIdentity(instance) : JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
   }
-  if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Assistant", () => renderResearch("utility:analysis"), closeResearchWorkspace,
+  if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Assistant", () => renderResearch("utility:analysis", {conversation:options.researchConversation}), closeResearchWorkspace,
     { identity: researchAssistantContentIdentity() });
   for (const id of supplementalResearchConversationIDs) {
     if (researchConversationPaneIsOpen() && id === state.researchConversationID) continue;

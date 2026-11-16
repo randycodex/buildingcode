@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { mkdtemp, rm, readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import {notebookReferenceBlocks} from '../public/notebook-passage-blocks.js';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const temporary = await mkdtemp(join(tmpdir(), 'permitext-conversation-scope-'));
@@ -90,13 +91,16 @@ try {
   const clientSource=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
   const appendSource=clientSource.slice(clientSource.indexOf('async function appendResearchReferenceToNote('),
     clientSource.indexOf('\nfunction renderResearchNotebookHandoff('));
-  const handoff=vm.createContext({structuredClone,navigator:{onLine:true},notebookColumnMounts:new Map(),
+  let publishedNote;
+  const handoff=vm.createContext({structuredClone,notebookReferenceBlocks,navigator:{onLine:true},notebookColumnMounts:new Map(),
+    loadNotebookDraft:async()=>null,publishSavedNotebookCard:(_project,card)=>{publishedNote=card;},
     researchProjectID:project=>project.id,requireCurrentAccountRequest(){},
     postResearch:(path,body)=>request(path,body),saveNotebookCardSnapshot:async()=>{}});
   vm.runInContext(appendSource,handoff);
   const updatedNote=await handoff.appendResearchReferenceToNote({id:projectID},{kind:'saved',card:destinationNote},
     {referenceKind:'researchAnswer',referenceID:record.id,label:'Research: saved ramp answer'},'chosen-note-insertion',{},()=>true);
   assert.equal(updatedNote.id,destinationNote.id);assert.equal(updatedNote.version,destinationNote.version+1);
+  assert.equal(publishedNote,updatedNote,'The saved Note is published to the current local catalog');
   assert.match(updatedNote.plainText,/Keep this existing analysis/);
   assert(updatedNote.references.some(reference=>reference.referenceID===record.id));
   assert.deepEqual(stored.researchConversationsByUserID[userID].find(item=>item.id===conversation.id).assistantScope,legacyScope);

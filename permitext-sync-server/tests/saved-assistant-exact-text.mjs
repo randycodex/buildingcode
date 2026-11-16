@@ -23,8 +23,8 @@ const n=vm.createContext({state:navigationState,activeAccount:()=>({}),hasCapabi
  switchWorkflowView:async(view)=>{if(!allowSwitch)return false;visibleView=view;navigationState.workflowNavigationGeneration++;return true;},
  captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',
  postResearch:async()=>{assert.equal(visibleView,'research');created++;return {conversation:{id:'new-chat'}};},
- researchV2Enabled:()=>false,window:{},refreshResearchConversationList:async()=>{},
- openResearchConversation:async id=>{opened=id;}});
+ researchV2Enabled:()=>false,window:{},researchConversationList:[],refreshResearchConversationList:async()=>{throw Error('Do not refetch history before opening the saved conversation');},
+ openResearchConversation:async (id,options)=>{opened=id;assert.equal(options.conversation.id,id,'Opening uses the authoritative create response');}});
 vm.runInContext(app.slice(app.indexOf('async function startNewResearchFromSelection('),app.indexOf('async function addResearchSelectionToCurrent(')),n);
 await n.startNewResearchFromSelection({sectionID:'2152',selectedText:full,projectID:'project'});
 assert.equal(visibleView,'research');assert.equal(opened,'new-chat');assert.equal(created,1,'Notebook evidence reveals the Assistant before opening the new chat');
