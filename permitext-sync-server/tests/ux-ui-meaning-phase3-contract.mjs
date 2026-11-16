@@ -33,14 +33,13 @@ const [
 ]);
 
 // Canonical product meanings:
-// Saved = preserved code; Project = job context; Report = professional artifact;
+// Saved = preserved code; Project = scoped job context; Report = professional artifact;
 // Export = an action or produced file.
-assert(
-  (iosApp.match(/\.accessibilityLabel\("Saved"\)/g) || []).length >= 2,
-  "Every production and acceptance tab shell must retain Saved as the top-level label."
-);
+assert.match(iosApp, /\.accessibilityLabel\("Saved"\)/, "The acceptance shell retains the Saved destination.");
+assert(iosApp.includes('.accessibilityLabel(projectScoped ? "Project" : "Saved")'),
+  "The main shell names the scoped Project and the unscoped Saved collection explicitly.");
 assert.doesNotMatch(iosApp, /\.accessibilityLabel\("Projects"\)/);
-assert.match(iosSaved, /private let screenTitle = "Saved"/);
+assert.match(iosSaved, /private var screenTitle: String \{ onOpenProject == nil \? "Saved" : "Projects" \}/);
 assert.match(iosSaved, /CodeTopContentFade\(title: screenTitle/);
 assert.match(iosSaved, /private var pinnedSavedHeader[\s\S]*?CodeScreenTitleRow\(title: screenTitle/);
 assert.match(iosSaved, /CodeScreenTitleRow\(title: "Saved"/);
@@ -88,10 +87,11 @@ for (const field of ["sectionID", "sourceIDs", "relevance", "codeVersion", "code
 assert.match(iosViewModel, /func openResearchCitation\(sectionID: Int64, codeVersion: String\?\)/);
 assert.match(iosViewModel, /pendingDeepLinkedSectionID = sectionID[\s\S]*?selectedTab = \.search/);
 assert.match(iosViewModel, /func reviewResearchProjectContext\(/);
-assert(iosNotebook.includes('Label("Project: \\(projectName)", systemImage: "folder")'));
+assert.match(iosNotebook, /\.navigationTitle\(projectName\)/);
 
-assert.match(iosSaved, /projectHubSection\(title: "Reports"/);
-assert.match(iosSaved, /"Export & Save iOS PDF"/);
+assert.match(iosSaved, /projectSectionScreen\(title: "Reports"/);
+assert.match(iosSaved, /isProjectReportBuilding \? "Opening PDF…" : "Open PDF"/);
+assert.match(iosSaved, /library\.projectReportPDF\(manifestID: report\.id\)/);
 assert.doesNotMatch(iosSaved, /projectHubSection\(title: "Exports"|Create & Save iOS PDF/);
 assert.match(iosOrganizationHub, /label: "Reports"/);
 assert.match(iosOrganizationHub, /projectSection\(title: "Reports"/);

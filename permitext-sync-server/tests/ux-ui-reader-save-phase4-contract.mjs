@@ -65,7 +65,7 @@ assert.match(webClient, /if \(!panel \|\| panel\.classList\.contains\("section-d
 assert.doesNotMatch(sectionDetailSave, /confirmSectionBookmarkRemoval\(panel\)/);
 assert.doesNotMatch(sectionDetailSave, /showReaderNotesProjectPicker\(notes, sectionPayload\)/);
 
-assert.match(webClient, /message\.textContent = "Saved"/);
+assert.match(webClient, /message\.textContent = `\$\{savedScope\} saved to Evidence`/);
 assert.match(webClient, /projectButton\.textContent = "Add to Project"/);
 // The confirmation names only a Project that actually contains this exact evidence.
 let confirmationProject = { id: "p1", name: "Test Project" };
@@ -83,22 +83,22 @@ const confirmationContext = vm.createContext({
   projectSectionBelongsToProject: (link, project) => link.projectID === project.id
 });
 vm.runInContext(sourceBetween("function showReaderSaveConfirmation(", "\nasync function saveReaderPassage"), confirmationContext);
-confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
-assert.equal(confirmationPanel.current.children[0].textContent, "Saved to Test Project");
-assert.equal(confirmationPanel.current.children[1].textContent, "Manage Projects");
+confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4", sectionNumber:"1020.4", blockID:"passage" });
+assert.equal(confirmationPanel.current.children[0].textContent, "Passage · 1020.4 saved to Evidence · Test Project");
+assert.equal(confirmationPanel.current.children[2].textContent, "Manage Projects");
 confirmationLinks = [{ projectID: "p1", key: "BC2014:1020.4" }];
-confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
-assert.equal(confirmationPanel.current.children[0].textContent, "Saved", "A different edition does not confirm this Project destination.");
+confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4", sectionNumber:"1020.4", blockID:"passage" });
+assert.equal(confirmationPanel.current.children[0].textContent, "Passage · 1020.4 saved to Evidence", "A different edition does not confirm this Project destination.");
 confirmationProject = null;
-confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
-assert.equal(confirmationPanel.current.children[1].textContent, "Add to Project");
+confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4", sectionNumber:"1020.4", blockID:"passage" });
+assert.equal(confirmationPanel.current.children[2].textContent, "Add to Project");
 
-confirmationState.syncOutbox = [{ mutation: { kind: "savedItem", record: { key: "BC2022:1020.4" } } }];
-confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
-assert.equal(confirmationPanel.current.children[0].textContent, "Saved on this device · waiting to sync");
+confirmationState.syncOutbox = [{ mutation: { kind: "savedItem", record: { key: "BC2022:1020.4", sectionNumber:"1020.4", blockID:"passage" } } }];
+confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4", sectionNumber:"1020.4", blockID:"passage" });
+assert.equal(confirmationPanel.current.children[0].textContent, "Passage · 1020.4 saved on this device · waiting to sync");
 confirmationState.syncOutbox = [{ mutation: { kind: "savedItem", record: { key: "BC2014:1020.4" } } }];
-confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
-assert.equal(confirmationPanel.current.children[0].textContent, "Saved");
+confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4", sectionNumber:"1020.4", blockID:"passage" });
+assert.equal(confirmationPanel.current.children[0].textContent, "Passage · 1020.4 saved to Evidence");
 
 assert.match(webClient, /confirmation\.classList\.add\("is-leaving"\)/);
 assert.match(cssRule(".reader-save-confirmation"), /animation: reader-save-confirmation-enter/);

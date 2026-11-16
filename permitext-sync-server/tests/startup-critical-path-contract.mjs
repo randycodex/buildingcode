@@ -17,7 +17,7 @@ const priorStart = actualStart.replace("void loadStartupCatalogs();", priorBlock
 assert.notEqual(priorStart, actualStart, "The shipped startup must launch optional catalog work without awaiting it.");
 function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 function node() { return { dataset: {}, scrollLeft: 0, scrollWidth: 100, clientWidth: 100, addEventListener() {}, querySelectorAll: () => [] }; }
-async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = false, failProfile = false, quarantined = false, dismissed = false, pro = false, savedColumns = [], upgradeReturn = false, retainedUpgrade = false } = {}) {
+async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = false, failProfile = false, quarantined = false, dismissed = false, pro = false, savedColumns = [], upgradeReturn = false, retainedUpgrade = false, namedProject = false } = {}) {
   const events = [];
   const issues = [];
   let firstWorkspaceAt;
@@ -29,6 +29,14 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     console: { warn: noop }, Promise, Map, Set, Math, Number, JSON,
     publicCodeRevision: createPublicCodeRevisionController({fetchRevision: async () => ({corpusRevision: "a".repeat(64)}), onInvalidate: noop}),
     detachedWorkboardRoute: false, detachedProjectWindow: false,
+    pendingProjectWorkspaceLink:namedProject ? {slug:'synthetic-project'} : null, projectURLStartupReady:false,
+    refreshProjectURLCatalog() {if(namedProject)events.push('project-url-catalog');},
+    async applyProjectWorkspaceURL() {
+      assert.ok(events.includes('auth-complete'));
+      if(pro)assert.ok(events.includes('verify-complete'));
+      events.push('project-url-start');await delay(10);
+      context.pendingProjectWorkspaceLink=null;events.push('project-url-ready');
+    },
     workspaceMigrationError: null, workspaceRestoreError: null, initialPersistedAccount: null,
     state: { readers: pro ? ["retired-reader"] : [], utilities: {}, trackScrollLeft: 0 }, track: node(),
     activeWorkspaceID: "workspace", workspaceAccessState: null,
@@ -70,14 +78,14 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     resumePendingProSave: async () => { events.push("save-resume"); },
     resumeProUpgradeIntent: async () => { events.push("upgrade-resume"); }
   };
-  for (const name of ["bindReaderToolbarButton", "saveWorkspaceResumeForRefresh", "restoreWorkspaceAfterRefresh", "syncReferenceReaderLayout", "flushSearchQueryPersistence", "flushResearchDraftPersistence", "openSavedColumnGroupsMenu", "updateConnectionStatus", "repositionActiveCustomSelect", "keepFocusedWorkspacePaneVisible", "scheduleVisibleReaderScrollIndicatorUpdates", "bindWorkspaceKeyboardNavigation", "stopForegroundSyncLoop", "startForegroundSyncLoop", "bindHorizontalWheelScroll", "openMobileMoreSheet", "consumeBrowserSectionURL", "renderReaderTrust"]) sandbox[name] = noop;
+  for (const name of ["bindReaderToolbarButton", "saveWorkspaceResumeForRefresh", "restoreWorkspaceAfterRefresh", "syncReferenceReaderLayout", "flushSearchQueryPersistence", "flushResearchDraftPersistence", "openSavedColumnGroupsMenu", "updateConnectionStatus", "repositionActiveCustomSelect", "keepFocusedWorkspacePaneVisible", "scheduleVisibleReaderScrollIndicatorUpdates", "bindWorkspaceKeyboardNavigation", "stopForegroundSyncLoop", "startForegroundSyncLoop", "bindHorizontalWheelScroll", "openMobileMoreSheet", "consumeBrowserSectionURL", "renderReaderTrust", "refreshOpenProjectCalculations"]) sandbox[name] = noop;
   for (const name of ["addReaderButton", "toggleArchiveButton", "toggleSettingsButton", "workspaceActionsButton", "getProButton", "mobileMoreButton", "fitColumnsButton", "collapseReadersButton", "settingsButton"]) sandbox[name] = node();
   const context = vm.createContext(sandbox);
   vm.runInContext(`let chapters = []; let codeTrustProfiles = []; let codeTrustProfilesStatus = "loading"; let startupCatalogPromise = null; ${catalogHelpers} ${start} globalThis.startTest = start; globalThis.catalogState = () => ({chapters,codeTrustProfiles,codeTrustProfilesStatus,startupCatalogPromise});`, context);
   await context.startTest();
   const stateAtWorkspace = context.catalogState();
   if (stateAtWorkspace.startupCatalogPromise) await stateAtWorkspace.startupCatalogPromise;
-  return { firstWorkspaceAt, events, issues, catalogLoads, stateAtWorkspace, finalState: context.catalogState() };
+  return { firstWorkspaceAt, events, issues, catalogLoads, stateAtWorkspace, finalState: context.catalogState(),urlStartupReady:context.projectURLStartupReady };
 }
 const before = await sample(priorStart);
 const after = await sample(actualStart);
@@ -89,6 +97,11 @@ assert.deepEqual(after.events, expectedEvents);
 assert.equal(after.catalogLoads, 2);
 assert.equal(after.stateAtWorkspace.codeTrustProfilesStatus, "loading");
 assert.equal(after.finalState.codeTrustProfilesStatus, "ready");
+const namedProject = await sample(actualStart,{namedProject:true,pro:true});
+assert.equal(namedProject.urlStartupReady,true);
+assert.ok(namedProject.events.indexOf('verify-complete') < namedProject.events.indexOf('project-url-start'));
+assert.ok(namedProject.events.indexOf('project-url-ready') < namedProject.events.indexOf('workspace'),
+  'A named project URL resolves after account/layout verification and before private rendering');
 const failed = await sample(actualStart, { failCatalogs: true });
 assert.ok(failed.firstWorkspaceAt < 110, "Metadata failure must not become a failed private workspace load.");
 assert.equal(failed.finalState.codeTrustProfilesStatus, "unavailable");

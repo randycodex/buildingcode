@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { referenceColumnsWidth, reportColumnsLayout } from '../public/workflow-views.js';
+import {reportOutlineRailWidth} from '../public/report-comparison.js';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 function actual(name) {
@@ -45,7 +46,7 @@ function fixture(view, widths = [800], sourcesWidth = 0) {
   };
   const context = vm.createContext({
     workspaceColumnExpansion: null, adjacentColumnWidths, notebookReferenceResize: () => null,
-    state, track, CSS: { escape: value => value }, referenceColumnsWidth, reportColumnsLayout,
+    state, track, CSS: { escape: value => value }, referenceColumnsWidth, reportColumnsLayout,reportOutlineRailWidth,
     currentColumnWorkflowView: () => view,
     defaultActivePaneIDs: () => panes.map(pane => pane.dataset.paneId), workflowPaneIsVisible: () => true,
     paneIsCollapsed: () => false, assistantHistoryOnlyPane: () => false,
@@ -105,6 +106,10 @@ for (const [view, sourcesWidth] of [['project-details', 0]]) {
 const report = fixture('report', [800]);
 assert.equal(report.dockWidth(), 0, 'Report keeps existing Readers hidden while retaining their state');
 assert.equal(report.panes[0].width, 800);
+assert.equal(report.properties.get('--reference-document-min-width'),'900px','The open Reports list reserves its width beside the document');
+report.context.document.querySelector('.report-draft-panel').dataset.reportsHidden='true';
+report.context.syncReferenceReaderLayout();
+assert.equal(report.properties.get('--reference-document-min-width'),'635px','Collapsing Reports reserves only its narrow rail');
 const pair = fixture('project-details', [800, 800]);
 pair.context.startPaneResize(pair.event(1300), 'reader:0', 'reader:1');
 pair.move(1140); pair.frame();

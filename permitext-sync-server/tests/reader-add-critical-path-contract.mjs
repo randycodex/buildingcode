@@ -20,7 +20,7 @@ function fixture({pro=true,view='notebook',paneIDs=[],groups=[],hidden=[]}={}) {
     readerTabs,addReaderTab,openRecentReaderTab,canAddReaderTab,maximumReaderTabs,rememberReaderTabPosition(){},retainReaderColumn(){},showWebNotice:async()=>{},
     ...syncIdentity,crypto:{randomUUID},state:{readers:[],paneOrder:[...paneIDs],columnGroups:groups,workflowNavigationGeneration:0},
     pendingLinkedPanePlacements:new Map(),
-    CSS:{escape:value=>value},track:{querySelector:()=>null},workflowScrollStore:{capture(){},restore(){}},
+    CSS:{escape:value=>value},track:{dataset:{},querySelector:()=>null},workflowScrollStore:{capture(){},restore(){}},
     whenWorkspacePaneReady:async()=>true,restoreReaderScrollPositions(){},
     activeWorkspaceID:'project-a',view,accountCurrent:true,needsProject:false,
     isProAccount:()=>pro,
@@ -38,7 +38,7 @@ function fixture({pro=true,view='notebook',paneIDs=[],groups=[],hidden=[]}={}) {
     readerShortcuts:{activePaneID:()=>c.activeColumn || ''},
     transitionWorkspace:()=>rendering,scrollPaneIntoView:id=>scrolled.push(id)
   });
-  vm.runInContext(['newReaderState','requestLinkedPanePlacement','placePaneAfter','placePaneBefore','applyLinkedPanePlacements','setNotebookReaderHidden','openReaderFromToolbar'].map(actual).join('\n'),c);
+  vm.runInContext(['newReaderState','requestLinkedPanePlacement','placePaneAfter','placePaneBefore','applyLinkedPanePlacements','activateNotebookReference','setNotebookReaderHidden','openReaderFromToolbar'].map(actual).join('\n'),c);
   return {c,pickers,scrolled,finishRender};
 }
 const code={prefix:'PC',version:'2022'};
@@ -49,6 +49,7 @@ for (const view of ['research','notebook','report','project-details']) {
   const pending=f.pickers[0](code);
   const reader=f.c.state.readers[0];
   assert.equal(reader.codePrefix,'PC');assert.equal(reader.codeVersion,'2022');
+  if(view==='notebook') assert.equal(f.c.state.notebookReferenceActive,'reader');
   assert.equal(reader.chapterID,'','Navigation resolves the first chapter asynchronously');
   assert.deepEqual(Array.from(f.c.state.workflowMembership[`reader:${reader.id}`]),[view]);
   f.finishRender();await pending;

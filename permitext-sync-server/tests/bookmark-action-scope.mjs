@@ -9,7 +9,7 @@ vm.runInContext(source.slice(start,source.indexOf('\nfunction showBookmarkUndo',
 assert.equal(context.bookmarkActionLabel(true),'Remove from Evidence');
 context.project={name:'House'};
 assert.equal(context.bookmarkActionLabel(true),'Remove from project: House');
-assert.equal(context.bookmarkActionLabel(false),'Save passage');
+assert.equal(context.bookmarkActionLabel(false),'Save passage to Evidence');
 context.project={title:'Office'};
 assert.equal(context.bookmarkActionLabel(true),'Remove from project: Office');
 context.project={};

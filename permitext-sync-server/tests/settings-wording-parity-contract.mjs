@@ -117,11 +117,12 @@ for (const copy of [
   settingsCopy.proPlanSummary,
   settingsCopy.lifetimePlanSummary,
   settingsCopy.freePlanDetails,
-  settingsCopy.signedOutAccountSummary,
-  settingsCopy.signedInAccountSuffix
+  settingsCopy.signedOutAccountSummary
 ]) {
   assert(iosSettings.includes(copy), `iOS Settings no longer contains shared Account copy: ${copy}`);
 }
+assert(iosSettings.includes('SharedAccountProfileView()'), 'Signed-in identity uses the shared name/email profile.');
+assert(!iosSettings.includes(settingsCopy.signedInAccountSuffix), 'The retired signed-in plan disclaimer stays out of the identity presentation.');
 
 for (const copy of [
   settingsCopy.freePlanSummary,

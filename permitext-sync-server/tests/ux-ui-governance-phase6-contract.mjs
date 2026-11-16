@@ -85,13 +85,13 @@ assert(contrastRatio("#0d0d0f", cssToken(darkTokens, "ios-accent-building")) >= 
 
 await import("./bookmark-action-scope.mjs");
 assert.match(webClient, /bookmarkActionLabel\(saved\)/);
-assert.match(webClient, /message\.textContent = "Saved"/);
+assert.match(webClient, /message\.textContent = `\$\{savedScope\} saved to Evidence`/);
 assert.match(webClient, /projectButton\.textContent = "Add to Project"/);
 assert.match(webClient, /title\.textContent = "Reports"/);
 assert.doesNotMatch(webClient, /title\.textContent = "Report exports"/);
 // Web bulk deletion is recoverable Trash; native labels remain a separate contract.
 assert.match(webIndex, /data-clear-action="bookmarks"[^>]*aria-label="Move this workspace’s saved passages to Trash"[^>]*>Move all to Trash/);
-assert.match(webIndex, /<summary aria-label="Trash"><span>Trash<\/span>/);
+assert.match(webIndex, /<summary aria-label="Trash"><span[^>]*>Trash<\/span>/);
 assert.match(webIndex, /Restore deleted items within 30 days\./);
 assert.doesNotMatch(webIndex, /Clear All Bookmarks/);
 
@@ -115,8 +115,8 @@ assert.match(sectionReader, /ReaderCurrentSectionBookmarkButton\(sectionID: sect
 assert.match(settingsView, /Clear All Saved Passages/);
 assert.doesNotMatch(settingsView, /Clear All Bookmarks/);
 assert.match(organizationHub, /projectSection\(title: "Reports"/);
-assert.match(bookmarksView, /projectHubSection\(title: "Reports"/);
-assert.match(bookmarksView, /Export & Save iOS PDF/);
+assert.match(bookmarksView, /projectSectionScreen\(title: "Reports"/);
+assert.match(bookmarksView, /isProjectReportBuilding \? "Opening PDF…" : "Open PDF"/);
 
 const userFacingSources = [webClient, permitextApp, chapterReader, sectionReader];
 for (const source of userFacingSources) {

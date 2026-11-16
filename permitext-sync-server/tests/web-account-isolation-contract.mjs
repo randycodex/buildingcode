@@ -191,12 +191,16 @@ async function reached(predicate, label) {
 
 function harness(overrides = {}) {
   const requests = [];
-  const effects = { connectionUpdates: 0, expired: 0, saved: [], entitlements: [], broadcasts: [], repairs: [], offlineLoads: [], recovery: [], continuity: 0, catalogs: [] };
+  const effects = { connectionUpdates: 0, expired: 0, saved: [], entitlements: [], broadcasts: [], repairs: [], offlineLoads: [], recovery: [], continuity: 0, catalogs: [], urlFollowups: [], urlCatalogs: [] };
   const state = { account: { ...accountA } };
   const sandbox = {
     requestRateLimit:createRequestRateLimit(),
     webSyncProtocolHeader:"X-Permitext-Web-Sync", webSyncProtocol:"manual-sync-v1", webUpdateRequiredCode:"WEB_APP_UPDATE_REQUIRED", webAppUpdates:{requireReload(){}},
     state, accountRequestIdentity, accountRequestIsCurrent, accountContextChangedError,
+    projectURLStartupReady:true, pendingProjectWorkspaceLink:null,
+    setTimeout(callback) {effects.urlFollowups.push(callback);return effects.urlFollowups.length;},
+    refreshProjectURLCatalog() {effects.urlCatalogs.push(state.account?.userID);},
+    applyProjectWorkspaceURL() {effects.urlCatalogs.push(state.account?.userID);},
     permitextSyncSchemaVersion: 1, permitextClientCapabilities: {},
     fetch(path, options) {
       const request = { path, options, ...deferred() };
@@ -267,6 +271,8 @@ function assertNoStaleSideEffects(test, currentContent) {
   assert.equal(test.effects.entitlements.length, 0);
   assert.equal(test.effects.broadcasts.length, 0);
   assert.equal(test.effects.catalogs.length, 0);
+  assert.equal(test.effects.urlFollowups.length, 0);
+  assert.equal(test.effects.urlCatalogs.length, 0);
 }
 
 for (const completion of ["success", "401", "network-failure"]) {
@@ -286,11 +292,24 @@ for (const completion of ["success", "401", "network-failure"]) {
   await currentLoad;
   assert.equal(test.api.content().userID, accountB.userID);
   assert.equal(test.api.content().status, "connected");
+  assert.equal(test.effects.urlFollowups.length,1);
+  test.effects.urlFollowups[0]();
+  assert.deepEqual(test.effects.urlCatalogs,[accountB.userID],'Only the current account refreshes project URLs');
   assert.deepEqual(test.effects.catalogs, [accountB.userID]);
   assert.equal(test.effects.saved[0]?.userID, accountB.userID);
   assert.deepEqual(test.effects.recovery, [accountB.userID]);
   assert.equal(test.effects.entitlements[0]?.userID, accountB.userID);
   assert.equal(test.api.request(), null);
+}
+
+// A deferred URL refresh must also respect an account switch after sync finished.
+{
+  const test=harness(),load=test.api.load();
+  test.respond(0,payloadFor(accountA));await load;
+  assert.equal(test.effects.urlFollowups.length,1);
+  test.api.switchAccount({...accountB});
+  test.effects.urlFollowups[0]();
+  assert.deepEqual(test.effects.urlCatalogs,[],'An old account cannot refresh the next account\'s URL catalog');
 }
 
 // A response can cross the account boundary while its JSON body is still read.

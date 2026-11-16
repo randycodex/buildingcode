@@ -45,6 +45,7 @@ function harness(overrides = {}) {
   const calls = [], saves = [], callbacks = [], projectUpdateObservations = [];
   const c = {
     withoutWorkspaceLayoutSync,
+    pendingProjectWorkspaceLink:null,
     projectUpdateBrowserID: () => 'synthetic-browser',
     observeSyncedProjectUpdates: mutations => projectUpdateObservations.push(clone(mutations)),
     state: workspace(A), accountRuntimeGeneration: 1, accountLinkWriteFence: null, accountContextChangedError, accountRequestIdentity, accountRequestIsCurrent,
@@ -365,6 +366,18 @@ for(const [hostname,available,expectedOrigin,returnOrigin] of [
   assert.equal(t.button.disabled,false);assert.equal(t.button.textContent,mode==='signUp'?'Continue with Pro':'Sign in');
   assert.equal(t.button.attributes['aria-busy'],undefined,'Browser Back restores a usable button');
 }
+}
+{
+  const t=directEntry();
+  t.c.pendingProjectWorkspaceLink={slug:'synthetic-project'};
+  Object.assign(t.c.location,{pathname:'/workspace/synthetic-project',search:'?view=report',hash:'#question/fixture'});
+  assert.equal(await t.run(),true);
+  const returnURL=new URL(new URL(t.redirects[0]).searchParams.get('redirect_url'));
+  assert.equal(returnURL.pathname,'/workspace/synthetic-project');
+  assert.equal(returnURL.searchParams.get('view'),'report');
+  assert.equal(returnURL.searchParams.get('clerk_return'),'1');
+  assert.equal(returnURL.hash,'#question/fixture','Sign-in preserves the selected project and question');
+  t.listeners.get('pageshow')();t.assertRestored();
 }
 for(const mode of ['signIn','signUp']) {
 for(const options of [{available:false},{hostname:'127.0.0.1',config:async()=>{throw Error('Network failure');}}]) {

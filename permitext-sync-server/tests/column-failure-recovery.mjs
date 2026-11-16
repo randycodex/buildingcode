@@ -5,12 +5,14 @@ const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf
 const begin = source.indexOf('  let propertyLookupAddress = "";');
 const end = source.indexOf('\n  nameInput.addEventListener', begin);
 assert(begin > 0 && end > begin);
-function lookupHarness() {
+function lookupHarness({online=true}={}) {
   const pending = [];
   let current = true;
+  const status={dataset:{},children:[],value:'',get textContent(){return this.value;},set textContent(value){this.value=value;this.children=[];},append(...nodes){this.children.push(...nodes);}};
   const c = vm.createContext({ identity: null, selectedFolderType: 'project', isEditing: false, autoSave: false,
     isCurrent: () => current,
-    addressInput: { value: 'Sample address' }, propertyLookupStatus: { dataset: {}, textContent: '' },
+    navigator:{onLine:online},document:{createElement:()=>({events:{},addEventListener(type,handler){this.events[type]=handler;}})},
+    addressInput: { value: 'Sample address' }, propertyLookupStatus: status,
     activeAccount: () => ({ id: 'isolated' }),
     postResearch: () => new Promise((resolve, reject) => pending.push({resolve, reject})) });
   vm.runInContext(source.slice(begin,end) + '\nglobalThis.lookup = lookupPropertyContext;',c);
@@ -33,9 +35,17 @@ function lookupHarness() {
   pending[0].resolve({property:{structuredFacts:[{}],normalizedAddress:'Stale address'}}); await old;
   assert.equal(c.addressInput.value,'New address');
   pending[1].reject(new Error('Unavailable')); await next;
-  assert.match(c.propertyLookupStatus.textContent,/could not be imported.*can still be saved/);
-  const retry=c.lookup(); pending[2].resolve({property:{structuredFacts:[{}],warnings:[]}}); await retry;
+  assert.match(c.propertyLookupStatus.textContent,/could not finish.*manual facts are unchanged.*Try again/);
+  const retry=c.propertyLookupStatus.children.find(node=>node?.textContent==='Try again');
+  assert.ok(retry);retry.events.click();assert.equal(retry.disabled,true);
+  pending[2].resolve({property:{structuredFacts:[{}],warnings:[]}});await c.lookup();
   assert.equal(c.propertyLookupStatus.dataset.state,'success');
+}
+{
+  const {c,pending}=lookupHarness({online:false}),request=c.lookup();
+  pending[0].reject(new Error('Offline'));await request;
+  assert.match(c.propertyLookupStatus.textContent,/offline.*Reconnect.*manual facts are unchanged/);
+  assert.equal(c.addressInput.value,'Sample address');
 }
 for (const outcome of ['success','failure']) {
   const {c,pending,invalidate}=lookupHarness(); const request=c.lookup();
