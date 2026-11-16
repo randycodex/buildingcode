@@ -26,7 +26,7 @@ globalThis.fetch=async(url,options)=>{
  else if(Array.isArray(body.input)){
   if(body.input.at(-1).type==='function_call_output'){const r=JSON.parse(body.input.at(-1).output);if(r.candidates)output=[{type:'function_call',call_id:'read-1',name:'read_library',arguments:JSON.stringify({sectionIDs:[r.candidates[0].id]})}];else output=text(r.sources?.[0]?.id?.startsWith('S')?'A retrieved rule. [S1]':'The public source says this. [W1]');}
   else if(JSON.parse(body.input[0].content).question==='Find provisions')output=[{type:'function_call',call_id:'library-1',name:'search_library',arguments:JSON.stringify({query:'2022 NYC BC 1007.1.1 403.5.1 remoteness interior exit stairways'})}];
-  else if(JSON.parse(body.input[0].content).question==='Reconsider earlier evidence'){const recalled=JSON.parse(body.input[0].content).earlierEvidence;assert(recalled.length>0);output=text(`A recalled rule. [${recalled[0].id}]`);}
+  else if(JSON.parse(body.input[0].content).question==='Reconsider earlier evidence'){const recalled=JSON.parse(body.input[0].content).readEvidence;assert(recalled.length>0);output=text(`A recalled rule. [${recalled[0].id}]`);}
   else if(JSON.parse(body.input[0].content).question==='Use web')output=[{type:'function_call',call_id:'web-1',name:'search_web',arguments:JSON.stringify({query:'NYC public code'})}];
   else output=text('Your project context is available.');
  }else output=text(JSON.stringify(body.text.format.name==='permitext_v2_review'?{pass:true,issues:[]}:{answerText:'These are recorded project facts.',claims:[],missingSources:[],missingFacts:[]}));

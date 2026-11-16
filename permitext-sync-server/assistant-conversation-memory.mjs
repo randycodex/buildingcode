@@ -64,7 +64,11 @@ export function smallerAssistantRequest(body,scale=1){
  if(!Array.isArray(body.input))return body;
  const first=body.input.find(e=>e.role==='user'),last=body.input.findLast(e=>e.role==='user');
  if(!first)return body;
- try{return {...body,input:[{role:'user',content:JSON.stringify(pack(JSON.parse(first.content)))},...(last&&last!==first?[last]:[])]};}catch{return body;}
+ try{
+  const history=body.input.filter(entry=>entry!==first&&entry!==last&&['user','assistant'].includes(entry.role)&&typeof entry.content==='string');
+  const recent=fit(history.slice(-6).reverse(),Math.floor(10000*scale)).reverse();
+  return {...body,input:[{role:'user',content:JSON.stringify(pack(JSON.parse(first.content)))},...recent,...(last&&last!==first?[last]:[])]};
+ }catch{return body;}
 }
 export async function callWithAssistantContextRecovery(call,body,options,state={}){
  try{return await call(state.level?smallerAssistantRequest(body,2**(-state.level)):body,options);}catch(error){

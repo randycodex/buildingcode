@@ -794,7 +794,7 @@ export function immutableResearchAnswer({
     /^research-v2-/.test(answer?.researchEngine || '') && answer?.verification?.pass === true &&
     researchEvidence.length === 0 && researchCitations.length === 0 &&
     Array.isArray(answer?.claimBindings) && answer.claimBindings.length === 0;
-  const experimentalUnreviewed = answer?.researchEngine === 'assistant-open-luna-20261116-v1' &&
+  const experimentalUnreviewed = ['assistant-open-luna-20261116-v1','assistant-open-luna-20261116-v2'].includes(answer?.researchEngine) &&
     assistantScopeSnapshot?.version === assistantScopeVersion && answer?.experimental === true &&
     answer?.mode === 'openai' && model === 'gpt-6-luna' && answer?.model === model &&
     answer?.verification?.status === 'unreviewed' && answer?.verification?.pass === false &&

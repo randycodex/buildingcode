@@ -24,14 +24,14 @@ assert.equal(digest({history,sources}),before,'Selecting/searching/reading never
 const message=text=>({status:'completed',output:[{type:'message',content:[{type:'output_text',text}]}]});
 const invoke=(name,args)=>({status:'completed',output:[{type:'function_call',call_id:name,name,arguments:JSON.stringify(args)}]});
 let step=0,recalls=0;
-const result=await runExperimentalAssistant({question:'But does the residential use change that?',history:history.map(m=>({role:m.role,text:m.content})),priorEvidence:sources},{
- searchLibrary:()=>assert.fail('No forced new search'),recallEvidence:async ids=>{assert.deepEqual(ids,['R1701']);recalls++;return {sources:[{id:'S8',sectionID:'section-1700',text:sources[1700].searchText}]};},
+const result=await runExperimentalAssistant({question:'But does this occupancy change that?',history:history.map(m=>({role:m.role,text:m.content})),priorEvidence:sources},{
+ searchLibrary:()=>assert.fail('No forced new search'),recallEvidence:async ids=>{if(!ids.includes('R1701'))return {sources:[]};recalls++;return {sources:[{id:'S8',sectionID:'section-1700',text:sources[1700].searchText}]};},
  call:async(body,{phase})=>{
   if(phase==='experimental_intent'){assert(Buffer.byteLength(JSON.stringify(body))<100000);const ctx=JSON.parse(body.input);assert.equal(ctx.archive.messages,2000);assert(ctx.latestExchange.at(-1).content.includes('separation'));return message(JSON.stringify({question:'Does residential use affect stair separation?',subject:'Stair separation',reference:'latest',clarification:'',evidenceIDs:[]}));}
   step++;
   if(step===1)return invoke('search_conversation',{query:'resident terrace accessibility'});
   if(step===2){const r=JSON.parse(body.input.at(-1).output);assert(r.sourceCandidates.some(s=>s.id==='R1701'));return invoke('read_conversation',{messageIDs:['H601'],sourceIDs:['R1701'],offset:0});}
-  const r=JSON.parse(body.input.at(-1).output);assert(r.messages[0].text.includes('confirmed at 42'));assert(r.sources[0].text.includes('Footnote'));return message('The saved evidence contains the complete route condition. [S8]');
+  const r=JSON.parse(body.input.at(-1).output);assert(r.messages[0].text.includes('confirmed at 42'));assert(JSON.parse(body.input[0].content).readEvidence[0].text.includes('Footnote'));return message('The saved evidence contains the complete route condition. [S8]');
  }});
 assert.equal(recalls,1);assert.match(result.text,/\[S8\]/);assert(result.trace.some(t=>t.tool==='search_conversation'));
 let attempts=0;const body={input:JSON.stringify({earlierConversation:history,priorEvidence:sources})};
@@ -48,7 +48,7 @@ const webMemory=createConversationMemory([],[{id:'Rweb',url:'https://www.nyc.gov
 assert.equal(webMemory.search('official document').sourceCandidates[0].url,'https://www.nyc.gov/example');
 const historicalReference=await runExperimentalAssistant({question:'Which official document did we use?',history:[{role:'user',text:'We used the official document.'},{role:'assistant',text:'It was an earlier web source.'}],priorEvidence:[{id:'Rweb',url:'https://www.nyc.gov/example',title:'Earlier document'}]},{
  recallEvidence:async()=>({sources:[],references:[{id:'Rweb',url:'https://www.nyc.gov/example',status:'historical_reference_not_reverified'}]}),
- call:async(body,{phase})=>phase==='experimental_intent'?message(JSON.stringify({question:'Identify the saved document',subject:'Prior document',reference:'earlier source',clarification:'',evidenceIDs:['Rweb']})):(assert.equal(JSON.parse(body.input[0].content).earlierReferences[0].status,'historical_reference_not_reverified'),message('The saved document was https://www.nyc.gov/example .'))
+ call:async(body)=>{assert.equal(JSON.parse(body.input[0].content).earlierReferences[0].status,'historical_reference_not_reverified');return message('The saved document was https://www.nyc.gov/example .');}
 });
 assert.match(historicalReference.text,/www.nyc.gov/);
 console.log('Long chat: historical web identities preserved distinctly from freshly verified source text.');
@@ -58,3 +58,10 @@ await callWithAssistantContextRecovery(provider,body,{},state);
 await callWithAssistantContextRecovery(provider,body,{},state);
 assert.equal(repeated,3,'Following research calls retain the smaller working request after recovery');
 console.log('Long chat: capacity recovery stays active for the rest of the current answer.');
+let capacityAttempt=0;
+await callWithAssistantContextRecovery(async next=>{
+ if(!capacityAttempt++)throw {providerCause:'context_length_exceeded'};
+ assert(next.input.some(m=>m.role==='assistant'&&m.content==='The current subject is stair separation.'));
+ return 'ok';
+},{input:[{role:'user',content:JSON.stringify({question:'But does this occupancy change that?'})},{role:'user',content:'Can both stairs be adjacent?'},{role:'assistant',content:'The current subject is stair separation.'},{role:'user',content:'But does this occupancy change that?'}]},{});
+console.log('Capacity recovery preserves the latest exchange as well as the current question.');

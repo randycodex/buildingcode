@@ -1,4 +1,4 @@
-import {assistantLibraryNavigation,governingSectionContext} from './assistant-library-navigation.mjs';
+import {governingSectionContext} from './assistant-library-navigation.mjs';
 import {restoreAssistantEvidence} from './assistant-evidence-recall.mjs';
 import {runExperimentalAssistant,experimentalAssistantVersion} from './assistant-experimental.mjs';
 import {assistantNavigatedSource} from "./research-evidence-assembly.mjs";
@@ -21320,7 +21320,6 @@ async function handleResearchConversationMessage(request, response) {
       let firstTextMilliseconds = null, v2Result = null, experimentalResult = null, providerPayloads;
       if (experimentalAssistant) {
         const {catalog:experimentalCatalog}=await researchCorpusResources(corpusPlan);
-        const navigation=assistantLibraryNavigation(experimentalCatalog,await chapterIndex());
         const activeAnswerIDs=activeMessages.filter(m=>m.role==='assistant').map(m=>m.id);
         const priorRecords=activeAnswerIDs.length?await listStoredResearchAnswers(context.userID,{ids:activeAnswerIDs}):[];
         const priorEvidence=[],priorSnapshots=new Map(),priorKeys=new Set();
@@ -21339,10 +21338,10 @@ async function handleResearchConversationMessage(request, response) {
               searchText:[reference.title,reference.url,record.question].join(' '),priorQuestion:record.question,retrievedAt:reference.retrievedAt});
           }
         }
-        experimentalResult=await runExperimentalAssistant({question,history:activeMessages,priorEvidence,libraryGuide:navigation.guide,
+        experimentalResult=await runExperimentalAssistant({question,history:activeMessages,priorEvidence,
           projectContext:conversationScope?.includeProjectContext?conversationScope.projectContext:null,
           attachedSources:sources,privateIdentifiers:[projectInformation?.name,projectInformation?.address]}, {
-          call:v2Call,signal:progressResponse.signal,libraryOutlines:navigation.outlines,
+          call:v2Call,signal:progressResponse.signal,
           readLibrary:async(ids,signal)=>{
             const returned=[],unavailable=[];
             const directIDs=ids.map(id=>sources.find(s=>s.id===id)?.sectionID||id);
@@ -21375,7 +21374,7 @@ async function handleResearchConversationMessage(request, response) {
               let index=evidence.findIndex(s=>s.sectionID===source.sectionID&&s.codeVersion===source.codeVersion&&(s.text||s.selectedText||"")===(source.text||source.selectedText||""));
               if(index<0){index=evidence.length;evidence.push(source);sources.push(await bindAnswerSource(source,index));
                 snapshots.push(immutableEvidenceSnapshot({source,approvedAt:now,evidenceSetVersion:Number(conversation.evidenceSetVersion||1),sourceLibraryVersion:source.codeVersion}));}
-              recalled.push({...sources[index],recalledFrom:id});
+              recalled.push({...sources[index],recalledFrom:id,priorQuestion:prior.priorQuestion});
             }
             return {sources:recalled,unavailable,references};
           },
@@ -21391,7 +21390,7 @@ async function handleResearchConversationMessage(request, response) {
                 snapshots.push(immutableEvidenceSnapshot({source,approvedAt:now,evidenceSetVersion:Number(conversation.evidenceSetVersion||1),sourceLibraryVersion:source.codeVersion||conversation.codeVersion}));}
               returned.push(sources[index]);
             }
-            return {sources:returned,limitations:found.limitations||[]};
+            return {sources:returned,evidenceStatus:'verified_library_text',limitations:found.limitations||[]};
           }
         });
         providerPayloads=experimentalResult.payloads;

@@ -67,7 +67,7 @@ try{
    const intentCall=calls.find(c=>c.request.text?.format?.name==='assistant_conversational_intent'&&JSON.parse(c.request.input).currentQuestion===question);
    const metrics=profiling?summarizeTurnProfile(apiCalls.filter(c=>c.turnID===turnID),{milliseconds,cpuMilliseconds:(cpu.user+cpu.system)/1000,progress:progressByTurn.get(turnID)||[]},trace):null;
    const row={...(metrics?{profile:metrics}:{}),error:result.error||null,topic:test.id,turn,question,status:effectiveStatus,milliseconds,intentMilliseconds:intentCall?.milliseconds||0,intent,answer:answer?.answerText,record,
-    checks:{topic:(!intent||expectedTopic.test([intent.question,...(intent.issues||[]).map(i=>i.question)].join(' ')))&&expectedTopic.test(answer?.answerText||''),citations:(answer?.citations||[]).every(c=>(record?.evidence||[]).some(e=>e.sectionID===c.sectionID)),hasUnverifiedMarker:/\[source not verified\]/.test(answer?.answerText||'')},
+    checks:{topic:(!intent||expectedTopic.test([intent.question,...(intent.issues||[]).map(i=>i.question)].join(' ')))&&expectedTopic.test(answer?.answerText||''),citations:(!test.requireCitations||answer?.citations?.length>0)&&(answer?.citations||[]).every(c=>(record?.evidence||[]).some(e=>e.sectionID===c.sectionID)),hasUnverifiedMarker:/\[source not verified\]/.test(answer?.answerText||'')},
     tools:compactResearchTrace(trace)};
    results.push(row);await writeFile(join(out,'results.json'),JSON.stringify(results,null,2));
    console.log(JSON.stringify({topic:test.id,turn,question,status:effectiveStatus,seconds:+(milliseconds/1000).toFixed(1),intentSeconds:+((intentCall?.milliseconds||0)/1000).toFixed(1),checks:row.checks,tools:row.tools.map(t=>t.tool),budget:await budget.summary()}));

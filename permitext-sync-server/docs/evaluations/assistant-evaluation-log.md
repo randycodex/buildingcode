@@ -44,3 +44,32 @@ Log observations before proposing behavior changes. Do not automatically add pro
 ## Unverified areas
 
 No new fabricated-citation or wrong-authority failure was established in this small profiling sample. Citation identity smoke checks do not prove complete governing coverage or legal entailment. Zoning, library effective-date coverage, broad unfamiliar cases and long-chat behavior were not newly evaluated here. Keep those limitations visible; do not label this baseline production-ready.
+
+## November 16 simplification update
+
+Application candidate: `assistant-open-luna-20261116-v2`, based on `ebad072ee`. [Measured comparison and limitations](assistant-simplification-20261116.md), [records](assistant-simplification-20261116.json).
+
+- **PERF-001:** Addressed in the candidate. No chapter guide or planner is sent for fact questions; they now use one model call. The normal runtime no longer calls an intent planner or section selector.
+- **PERF-002:** Reduced, still open for ranking/relevance review. Earlier sources are reloaded without an AI selection stage; actual search text is directly citable and source bodies are sent once. Paired input tokens fell 76.8%. Extra searches remain possible when material evidence is missing.
+- **TOOL-001:** Addressed at the tool identity contract: H message-ID and R source-ID patterns, explicit candidate types, and no automatic model recall-selection call. No repeated source-as-message misuse appeared in the final run. Broader reliability is not established by this sample.
+
+## CITE-001 — Missing or stale citation markers during simplification
+
+- **Status:** Corrected in candidate; final 22 turns passed strengthened identity/nonempty-citation checks.
+- **Observed:** The first simplified prompt allowed correct-looking section references without app-recognized markers. A later regression copied a previous-turn citation notice, and a table answer emitted a `#sectionID` link that the client did not bind as a citation.
+- **Fix:** Restored the existing explicit S/W marker protocol, removed reusable old numeric markers from model history, and normalized exact already-read section-ID links/marker punctuation deterministically. Unknown IDs cannot acquire a verified citation. No extra AI pass.
+- **Accounting:** Intermediate replies remain failed development cases. Their spending is included. “Every citation is valid” is no longer sufficient to pass these code cases with zero citations.
+
+## COV-001 — Reused related evidence can omit governing overlap
+
+- **Status:** Open for systemic completeness evaluation; high priority when it could change a conclusion.
+- **Observed:** An intermediate adjacent-stair question reused roof-egress sources and said the supplied text did not establish a separation distance, rather than looking it up. Subsequent residential qualification triggered the relevant search. The candidate now treats supplied sources as reusable rather than an exhaustive library search, within the existing single-agent instruction.
+- **Final result:** Correct subject and the retrieved R-2 separation exception in BC 1007.1.1 were retained, including on the follow-up. BC 403.5.1 was not retrieved in the final regression, so complete overlapping authority coverage is not claimed. A separate offline check verifies that relevant earlier overlapping sources, including previously uncited ones, are reloaded together when they are in the catalog.
+- **Triage:** Review indexing, governing-source metadata/ranking and coverage across unfamiliar topics before adding any research stage. No section-number routing rule or automatic follow-up pass was introduced.
+
+## UX-002 — Cautious headline obscures the practical roof-exit answer
+
+- **Status:** Open; usefulness/clarity review.
+- **Observed:** Final stair-context roof answer begins “Not necessarily two roof exits,” then explains the two-exit rule for 1–500 occupants and why the small R-2 single-exit exceptions do not appear to fit the stated eight-story project.
+- **Expected:** The first sentence should reflect what the actual project facts and retrieved exceptions support. Topic/citation checks passing does not establish that the answer is sufficiently direct.
+- **Triage:** Logged rather than patched with another prompt paragraph or model pass. No production-readiness claim.

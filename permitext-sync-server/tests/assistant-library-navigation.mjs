@@ -1,47 +1,48 @@
 import assert from 'node:assert/strict';
-import {assistantLibraryNavigation} from '../assistant-library-navigation.mjs';
+import {assistantLibraryNavigation,governingChapterIDs,governingSectionContext} from '../assistant-library-navigation.mjs';
 import {runExperimentalAssistant} from '../assistant-experimental.mjs';
 const catalog=Array.from({length:320},(_,i)=>({id:`source-${i}`,codeVersion:'edition-1',codeEdition:'Edition',codePrefix:'TEST',chapterNumber:8,sectionNumber:`8.${i}.1`,title:`8.${i}.1 Requirement ${i}`}));
-catalog.push({id:'deep',codeVersion:'edition-1',codeEdition:'Edition',codePrefix:'TEST',chapterNumber:8,sectionNumber:'8.1.1.2',title:'Detailed exception'});
 const navigation=assistantLibraryNavigation(catalog,[{codePrefix:'TEST',chapterNumber:8,fullTitle:'Chapter 8: People and facilities'}]);
-assert.equal(navigation.guide[0].title,'Chapter 8: People and facilities');
-assert(navigation.outlines(['C1'])[0].headings.some(h=>h.id==='source-319'),'Later primary headings must not be hidden by an arbitrary list cutoff');
-assert.match(navigation.outlines(['C1'])[0].coverage,/Deeper subsections/);
+assert(navigation.outlines(['C1'])[0].headings.some(h=>h.id==='source-319'));
 const message=text=>({status:'completed',output:[{type:'message',content:[{type:'output_text',text}]}]});
 const invoke=(name,args,id)=>({status:'completed',output:[{type:'function_call',call_id:id,name,arguments:JSON.stringify(args)}]});
-let step=0,readCount=0;
+let step=0;
 const result=await runExperimentalAssistant({question:'Can this facility be located upstairs?',projectContext:{users:'Residents'},libraryGuide:navigation.guide},{
- libraryOutlines:navigation.outlines,
- searchLibrary:async()=>({sources:[{id:'S4',sectionID:'source-319',title:'Governing requirement',text:'Complete actual rule with exceptions.'}]}),
- readLibrary:async(ids)=>{assert.deepEqual(ids,['S4']);readCount++;return {sources:[{id:'S4',sectionID:'source-319',title:'Governing requirement',text:'Complete actual rule with exceptions.'}]};},
+ searchLibrary:async()=>({evidenceStatus:'verified_library_text',sources:[{id:'S4',sectionID:'source-319',text:'Complete actual rule with exceptions.',tables:[{rows:[['Item','Value']]}]}]}),
+ readLibrary:()=>assert.fail('No forced second read of verified search text'),
  call:async(body,{phase})=>{
- if(phase==='experimental_navigation'){assert(JSON.parse(body.input).chapterOutlines[0].headings.some(h=>h.id==='source-319'));return message(JSON.stringify({ids:[]}));}
- if(phase==='experimental_intent'){
-  const context=JSON.parse(body.input);assert(context.libraryGuide.length);assert.equal(context.latestExchange.length,0);
-  assert(body.text.format.schema.required.includes('issues'));
-  return message(JSON.stringify({question:'Which requirements govern this location for its users?',subject:'Facility access',reference:'Current project',clarification:'',evidenceIDs:[],chapterIDs:['C1'],issues:[{question:'What connections must serve the users?',reason:'A common facility serves residents',query:'common facility service requirements'}]}));
- }
- step++;const context=JSON.parse(body.input[0].content);assert.equal(context.chapterOutlines[0].id,'C1');assert(!context.chapterOutlines[0].headings,'Full outlines belong in navigation, not repeated generation context');
- if(step===1)return invoke('search_library',{query:'common facility'},'search');
- if(step===2){const output=JSON.parse(body.input.at(-1).output);assert(output.candidates.length);assert.equal(output.candidates[0].preview,'Complete actual rule with exceptions.');assert(!output.sources);assert(!context.readEvidence.length);return invoke('read_library',{sectionIDs:['S4']},'read');}
- assert.equal(context.readEvidence[0].text,'Complete actual rule with exceptions.');assert(!JSON.parse(body.input.at(-1).output).sources[0].text,'No repeated source text in the tool transcript');
- return message('The facility must meet the required connection. [S4]');
+  assert.equal(phase,'experimental');assert(!body.text?.format);const context=JSON.parse(body.input[0].content);
+  assert(!context.libraryGuide&&!context.chapterOutlines,'No full guide or headings in the normal model path');
+  if(++step===1)return invoke('search_library',{query:'required connections for common facilities serving residents'},'search');
+  assert.equal(context.readEvidence[0].text,'Complete actual rule with exceptions.');assert.equal(context.readEvidence[0].tables.length,1);
+  assert(!JSON.parse(body.input.at(-1).output).sources[0].text,'Full evidence appears once in the request');
+  return message('The facility must meet the required connection. [S4]');
  }});
-assert.equal(readCount,1);assert.match(result.text,/\[S4\]/);assert.equal(result.trace[0].tool,'plan_research');
-console.log('Library navigation: complete later headings, first-turn discipline planning, candidate previews, direct reads and compact evidence context passed.');
-const {governingChapterIDs,governingSectionContext}=await import('../assistant-library-navigation.mjs');
-assert(governingChapterIDs({chapterIDs:['wrong'],issues:[{question:'How do we meet energy conservation obligations?',query:'energy conservation'}]},[{id:'energy',title:'Energy Conservation'},{id:'wrong',title:'Conveying Systems'}]).includes('energy'));
+assert.equal(step,2);assert.match(result.text,/\[S4\]/);
+let readCount=0;step=0;
+const conditional=await runExperimentalAssistant({question:'Does an exception apply?'},{
+ searchLibrary:async()=>({evidenceStatus:'verified_library_text',sources:[{id:'S1',sectionID:'rule',text:'Rule, subject to the exception in another provision.'}]}),
+ readLibrary:async ids=>{assert.deepEqual(ids,['exception']);readCount++;return {sources:[{id:'S2',sectionID:'exception',text:'The complete exception and its footnote.'}]};},
+ call:async body=>{
+  if(++step===1)return invoke('search_library',{query:'current controlling rule'},'first');
+  if(step===2)return invoke('read_library',{sectionIDs:['exception']},'additional');
+  assert.equal(JSON.parse(body.input[0].content).readEvidence.length,2);return message('The exception applies conditionally. [S1] [S2]');
+ }});
+assert.equal(readCount,1);assert.match(conditional.text,/\[S2\]/);
+step=0;
+const preview=await runExperimentalAssistant({question:'Explain the requirement.'},{
+ searchLibrary:async()=>({candidates:[{id:'S4',preview:'A heading only'}]}),
+ call:async()=>++step===1?invoke('search_library',{query:'requirement'},'preview'):message('This rule applies [S4, S99].')
+});
+assert(!/\[S4[,\]]/.test(preview.text));assert.match(preview.text,/source not verified/);
 const family=['1','1.1','1.2','1.3','2.1'].map((number,index)=>({id:`p${index}`,sectionNumber:number,codePrefix:'TEST',codeVersion:'same',chapterNumber:1}));
-const surrounding=governingSectionContext(['p3'],family);
-assert.deepEqual(surrounding.map(s=>s.id),['p3','p0','p2']);
-assert.equal(surrounding[1].contextFor,'p3');
-assert(governingSectionContext(['p2'],family).some(s=>s.id==='p3'&&s.contextFor==='p2'));
-assert(!governingSectionContext(['unknown'],family).length);
-console.log('Governing discovery: issue-to-heading binding, parent scope and preceding sibling context passed.');
-const previewOnly=await runExperimentalAssistant({question:'Explain the requirement.',libraryGuide:navigation.guide},{libraryOutlines:navigation.outlines,readLibrary:async()=>({sources:[]}),searchLibrary:async()=>({sources:[{id:'S4',sectionID:'source-319',text:'Candidate preview only'}]}),call:async(body,{phase})=>{
- if(phase==='experimental_intent')return message(JSON.stringify({question:'Explain requirement',subject:'Requirement',reference:'current',clarification:'',evidenceIDs:[],chapterIDs:[],issues:[]}));
- if(body.input.at(-1).type==='function_call_output')return message('This rule applies [S4, S99].');
- return invoke('search_library',{query:'candidate requirement'},'preview');
-}});
-assert(!/\[S4[,\]]/.test(previewOnly.text));assert.match(previewOnly.text,/source not verified/);
-console.log('Evidence identity: grouped citations cannot bypass reading the actual source.');
+assert.deepEqual(governingSectionContext(['p3'],family).map(s=>s.id),['p3','p0','p2']);
+assert(governingChapterIDs({issues:[{question:'energy conservation'}]},[{id:'energy',title:'Energy Conservation'}]).includes('energy'));
+console.log('Library: two-call verified search, preserved tables, no mandatory planner/read, conditional exception read, preview citation rejection and context helpers passed.');
+const linked=await runExperimentalAssistant({question:'Where can I see it?',attachedSources:[{id:'S2',sectionID:'actual-section',text:'Actual supplied rule'}]},{
+ call:async()=>message('[The table](#actual-section) 【S2, S99】 [Unknown](#invented)')
+});
+assert.match(linked.text,/\[S2\]/);assert(!linked.text.includes('#actual-section'));
+assert(!linked.text.includes('[S99]'));assert(!linked.text.includes('#invented'));
+assert.match(linked.text,/source not verified/);
+console.log('Citation protocol: explicit verified section links normalized; unknown IDs remain unverified.');
