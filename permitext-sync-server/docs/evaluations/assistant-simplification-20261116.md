@@ -1,5 +1,7 @@
 # Assistant simplification — November 16, 2026
 
+**Follow-up accuracy review:** The gas-furnace case now has a confirmed governing-code selection failure, rather than merely an unverified scope limitation. MC 101.2 assigns fuel-gas-fired appliances to the Fuel Gas Code; the answer used Mechanical Code clearance methods and missed an FGC protection option. See AUTH-001 in the [evaluation log](assistant-evaluation-log.md). The 22 passing topic/citation-binding checks must not be read as 22 legally validated answers. The measured speed/cost results are unchanged.
+
 The local Experimental Assistant now uses one answering agent instead of a mandatory intent planner, mandatory section selector, and then another research agent. The model and settings remain Luna, low reasoning, default service tier. Formal Research and the reviewed Current mode retain their existing workflows. No push or deployment occurred.
 
 ## What changed

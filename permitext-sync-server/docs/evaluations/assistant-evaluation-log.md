@@ -73,3 +73,17 @@ Application candidate: `assistant-open-luna-20261116-v2`, based on `ebad072ee`. 
 - **Observed:** Final stair-context roof answer begins “Not necessarily two roof exits,” then explains the two-exit rule for 1–500 occupants and why the small R-2 single-exit exceptions do not appear to fit the stated eight-story project.
 - **Expected:** The first sentence should reflect what the actual project facts and retrieved exceptions support. Topic/citation checks passing does not establish that the answer is sufficiently direct.
 - **Triage:** Logged rather than patched with another prompt paragraph or model pass. No production-readiness claim.
+
+## AUTH-001 — Gas-furnace answer selected the wrong governing code family
+
+- **Status:** Confirmed material source-selection/coverage failure on follow-up review, November 16, 2026. This strengthens the earlier report's description of an unverified appliance-scope limitation. Application behavior has not been changed for this finding.
+- **Observed:** The gas-furnace regression used MC 304.9 and Table 308.4.2 without retrieving governing Fuel Gas provisions. It said the cited sheet-metal methods require insulation or multiple layers. Topic and citation-binding checks passed because the Mechanical Code sources were real; that did not establish applicability.
+- **Primary-source check:** [MC 101.2](https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022MC_Chapter1_AdministrationWB.pdf) assigns fuel-gas-fired appliances to the Fuel Gas Code. [FGC 308.4.1–308.4.2 and Table 308.2](https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022FGC_Chapter3_GenRegsWB.pdf) govern furnace clearances/reduction subject to manufacturer instructions and table conditions. Table 308.2 includes a nominal 24-gage sheet-metal method with ventilated airspace; it is not limited to the insulated or multiple-layer methods the answer described.
+- **Material effect:** Could incorrectly rule out a compliant protective assembly or apply the wrong clearance/table conditions. It does not establish a permitted distance for the synthetic furnace without its listing and installation facts. No blanket approval of bare/flush sheet metal follows.
+- **Triage:** Evaluate code-scope metadata, source-family ranking and whether cited authority actually governs the appliance. No topic-specific routing patch or extra AI pass added.
+
+## Clarification of COV-001 and the test results
+
+[BC 403.5.1](https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022BC_Chapter04_SpecialUseWBwm.pdf) expressly excepts Group R-2. Its omission is a completeness gap; it does not, by itself, overturn the tested R-2 stair conclusion. Missing overlapping authority can materially change results for other applicable occupancies/scenarios.
+
+The final 22 passes remain passes of topic/citation identity checks, not 22 legally validated answers. AUTH-001 demonstrates that distinction. The cellar/gym use interpretation remains unvalidated: [ZR 12-10](https://zr.planning.nyc.gov/article-i/chapter-2/12-10) makes actual classification/use and applicable exclusions material, so a room label alone does not settle the floor-area result. No additional paid model tests or runtime changes were made during this review.
