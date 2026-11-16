@@ -1,3 +1,4 @@
+import {restoreAssistantEvidence} from './assistant-evidence-recall.mjs';
 import {runExperimentalAssistant,experimentalAssistantVersion} from './assistant-experimental.mjs';
 import {assistantNavigatedSource} from "./research-evidence-assembly.mjs";
 import {planAssistantRetrieval,selectAssistantEvidence} from "./assistant-retrieval-plan.mjs";
@@ -21319,12 +21320,13 @@ async function handleResearchConversationMessage(request, response) {
       if (experimentalAssistant) {
         const activeAnswerIDs=activeMessages.filter(m=>m.role==='assistant').map(m=>m.id);
         const priorRecords=activeAnswerIDs.length?await listStoredResearchAnswers(context.userID,{ids:activeAnswerIDs}):[];
-        const priorEvidence=[];
+        const priorEvidence=[],priorSnapshots=new Map();
         for(const record of priorRecords.filter(r=>r.conversationID===conversation.id&&activeAnswerIDs.includes(r.id))){
           for(const snapshot of record.evidence||[]){
             if(priorEvidence.some(s=>s.sectionID===snapshot.sectionID&&s.codeVersion===snapshot.sourceLibraryVersion))continue;
             priorEvidence.push({id:`R${priorEvidence.length+1}`,sectionID:snapshot.sectionID,sourceID:snapshot.sourceID,codeVersion:snapshot.sourceLibraryVersion,
               title:`${snapshot.codeBook} ${snapshot.sectionNumber}`,summary:snapshot.passageText.slice(0,500),priorQuestion:record.question});
+            priorSnapshots.set(priorEvidence.at(-1).id,snapshot);
           }
         }
         experimentalResult=await runExperimentalAssistant({question,history:activeMessages,priorEvidence,
@@ -21336,9 +21338,9 @@ async function handleResearchConversationMessage(request, response) {
             for(const id of ids){
               signal.throwIfAborted();const prior=priorEvidence.find(s=>s.id===id);if(!prior)continue;
               const [canonical]=await researchEvidenceForSectionIDs([prior.sectionID],{allowOptInCorpora:true});
-              const source=canonical?{...canonical,sourceID:canonical.sourceID||prior.sourceID,origin:"conversation_recall",retrievalReason:"Relevant evidence from an earlier active conversation turn"}:null;
+              const source=await restoreAssistantEvidence(priorSnapshots.get(id),canonical,{comparableText:comparableResearchText,loadVisual:constructionVisualSourceWithContent});
               if(!source||source.codeVersion!==prior.codeVersion){unavailable.push({id,reason:'Original library identity or edition is no longer available; search again.'});continue;}
-              let index=evidence.findIndex(s=>s.sectionID===source.sectionID&&s.codeVersion===source.codeVersion);
+              let index=evidence.findIndex(s=>s.sectionID===source.sectionID&&s.codeVersion===source.codeVersion&&(s.text||s.selectedText||"")===(source.text||source.selectedText||""));
               if(index<0){index=evidence.length;evidence.push(source);sources.push(await bindAnswerSource(source,index));
                 snapshots.push(immutableEvidenceSnapshot({source,approvedAt:now,evidenceSetVersion:Number(conversation.evidenceSetVersion||1),sourceLibraryVersion:source.codeVersion}));}
               recalled.push({...sources[index],recalledFrom:id});
@@ -21352,7 +21354,7 @@ async function handleResearchConversationMessage(request, response) {
               beforeSemanticRequest:async()=>{signal.throwIfAborted();if(!(await ensureResearchTurnReservation()))throw new Error('Research reservation unavailable.');},onStage:progressResponse.progress});
             const returned=[];
             for(const source of found.sources||[]){
-              let index=evidence.findIndex(item=>item.sectionID===source.sectionID&&item.codeVersion===source.codeVersion);
+              let index=evidence.findIndex(item=>item.sectionID===source.sectionID&&item.codeVersion===source.codeVersion&&(item.text||item.selectedText||"")===(source.text||source.selectedText||""));
               if(index<0){index=evidence.length;evidence.push(source);sources.push(await bindAnswerSource(source,index));
                 snapshots.push(immutableEvidenceSnapshot({source,approvedAt:now,evidenceSetVersion:Number(conversation.evidenceSetVersion||1),sourceLibraryVersion:source.codeVersion||conversation.codeVersion}));}
               returned.push(sources[index]);

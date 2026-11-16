@@ -60,3 +60,8 @@ const recall=await runExperimentalAssistant({question:'Does the exception change
  }});
 assert.deepEqual(recallIDs,['R1']);assert.equal(recallStep,1);assert.match(recall.text,/\[S2\]/);assert.equal(recall.trace[1].tool,'recall_evidence');
 console.log('Evidence recall: selection before answer, unrelated/invalid IDs excluded, deduplication, separate attachments and fresh citation identities passed.');
+const {experimentalConversation}=await import('../assistant-experimental.mjs');
+const historical=experimentalConversation([{role:'assistant',answer:{answerText:'A previous rule [S8]. A web result [W2].'}}]);
+assert(!historical[0].content.includes('[S8]'));assert.match(historical[0].content,/previous turn 1 citation S8/);
+assert(!historical[0].content.includes('[W2]'));
+console.log('Conversation citations: historical identities cannot masquerade as current-turn source markers.');
