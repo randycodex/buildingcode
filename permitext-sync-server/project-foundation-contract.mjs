@@ -794,12 +794,19 @@ export function immutableResearchAnswer({
     /^research-v2-/.test(answer?.researchEngine || '') && answer?.verification?.pass === true &&
     researchEvidence.length === 0 && researchCitations.length === 0 &&
     Array.isArray(answer?.claimBindings) && answer.claimBindings.length === 0;
-  const experimentalUnreviewed = ['assistant-open-luna-20261116-v1','assistant-open-luna-20261116-v2'].includes(answer?.researchEngine) &&
-    assistantScopeSnapshot?.version === assistantScopeVersion && answer?.experimental === true &&
+  if(answer?.researchEngine === 'assistant-luna-20261116-v1'){
+    const captured=assistantScopeSnapshot?.includeProjectContext?assistantScopeSnapshot.projectContext:null;
+    if(assistantProjectSnapshotHash(captured)!==assistantProjectSnapshotHash(answer?.inputSnapshot?.projectContextSnapshot||null)||
+       captured&&captured.contentHash!==assistantProjectSnapshotHash(captured.projectInformation))
+      throw new Error("Research answers require evidence with an exact captured Project context.");
+  }
+  const conversationalUnreviewed = (answer?.researchEngine === 'assistant-luna-20261116-v1' && answer?.assistant === true ||
+    ['assistant-open-luna-20261116-v1','assistant-open-luna-20261116-v2'].includes(answer?.researchEngine) && answer?.experimental === true) &&
+    assistantScopeSnapshot?.version === assistantScopeVersion &&
     answer?.mode === 'openai' && model === 'gpt-6-luna' && answer?.model === model &&
     answer?.verification?.status === 'unreviewed' && answer?.verification?.pass === false &&
     answer?.authorityStatus === 'unreviewed' && typeof answer?.answerText === 'string' && answer.answerText.trim().length>0;
-  if (researchEvidence.length < 1 && !experimentalUnreviewed && !reviewedProjectContextAnswer && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer && !(assistantScopeSnapshot?.version === assistantScopeVersion && suppliedTextAnswer)) {
+  if (researchEvidence.length < 1 && !conversationalUnreviewed && !reviewedProjectContextAnswer && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer && !(assistantScopeSnapshot?.version === assistantScopeVersion && suppliedTextAnswer)) {
     throw new Error("Research answers require evidence.");
   }
   const fastUnreviewed = answer?.researchEngine === "fast-stream-v1" && answer?.mode === "openai" &&
@@ -834,7 +841,7 @@ export function immutableResearchAnswer({
     !investigatedEvidenceGapAnswer &&
     !conversationEvidenceGap &&
     !fastUnreviewed &&
-    !experimentalUnreviewed
+    !conversationalUnreviewed
   ) {
     throw new Error("Research answers require citations.");
   }

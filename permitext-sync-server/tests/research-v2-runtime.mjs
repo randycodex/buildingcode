@@ -37,3 +37,12 @@ for(const change of [{model:'gpt-6-sol'},{service_tier:'priority'},{max_output_t
 assert.equal(calls,1);
 const abort=new AbortController();abort.abort();await assert.rejects(call(body,{signal:abort.signal}),{name:'AbortError'});assert.equal(calls,1);
 console.log('V2 production policy: default-off, allowlist/all rollout, per-account default, readiness rejection, application spending, mandatory local ledger, request bounds and cancellation passed.');
+
+let hostedCalls=0;
+const hostedAssistant=createResearchV2ApplicationCall({assistant:true,provider:async()=>{hostedCalls++;return {status:'completed'};}});
+await hostedAssistant({...body,tools:[{type:'function',name:'search_library',strict:true}]});
+await hostedAssistant({...body,tools:[{type:'web_search'}],max_tool_calls:4});
+assert.equal(hostedCalls,2,'Hosted tool calls use the accounted provider without a local evaluation ledger');
+for(const change of [{model:'gpt-6-sol'},{tools:[{type:'computer'}]},{tools:[{type:'function',name:'unknown'}]},{tools:[{type:'web_search'}],max_tool_calls:100}])await assert.rejects(hostedAssistant({...body,...change}));
+assert.equal(hostedCalls,2,'Invalid model/tools are rejected before hosted dispatch');
+console.log('Hosted Assistant: same Luna/tool policy, application accounting transport and no evaluation-ledger requirement passed.');

@@ -20,11 +20,9 @@ const nativeFetch=globalThis.fetch,packets=[];let duringWriter=null,server;
 globalThis.fetch=async(input,options)=>{
  if(String(input)!=='https://api.openai.com/v1/responses')return nativeFetch(input,options);
  const body=JSON.parse(options.body);packets.push(body.input);
- if(body.text.format.name!=='permitext_v2_review'&&duringWriter){const hook=duringWriter;duringWriter=null;await hook();}
- const output=body.text.format.name==='permitext_v2_review'?{pass:true,issues:[]}:
-  {answerText:'The Project facts are recorded statements and require confirmation before application.',claims:[],missingSources:[],missingFacts:[]};
+ if(duringWriter){const hook=duringWriter;duringWriter=null;await hook();}
  return Response.json({model:body.model,status:'completed',service_tier:'default',usage:{input_tokens:200,output_tokens:80},
-  output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(output)}]}]});
+  output:[{type:'message',content:[{type:'output_text',text:'The Project facts are recorded statements and require confirmation before application.'}]}]});
 };
 try{
  const {handleRequest}=await import('../app.mjs');
@@ -61,9 +59,9 @@ try{
  assert.equal(snapshot.contentHash,assistantProjectSnapshotHash(snapshot.projectInformation));
  assert.equal(snapshot.projectInformation.structuredFacts.find(f=>f.id==='current-stories').status,'stated');
  assert.equal(snapshot.projectInformation.structuredFacts.find(f=>f.id==='current-stories').sourceText,'Synthetic field survey; verify independently.');
- assert.equal(packets.length,2);assert(packets.every(packet=>packet.includes('CONTEXT_ALPHA')&&!packet.includes('CONTEXT_BETA')),'Writer and reviewer use the same frozen input during live edits');
+ assert.equal(packets.length,1);assert(packets.every(packet=>JSON.stringify(packet).includes('CONTEXT_ALPHA')&&!JSON.stringify(packet).includes('CONTEXT_BETA')),'Writer and reviewer use the same frozen input during live edits');
  const replay=await post('/research/conversations/message',{conversationID:conversation.id,question:'Summarize the recorded Project facts.',requestID:'current-alpha',researchEngine:'v2',analysisMode:'conversation_only'});
- assert.equal(replay.conversation.messages.at(-1).id,first.id);assert.equal(packets.length,2,'Successful replay cannot generate with new facts');
+ assert.equal(replay.conversation.messages.at(-1).id,first.id);assert.equal(packets.length,1,'Successful replay cannot generate with new facts');
  const second=await send('current-beta'),beta=second.answer.inputSnapshot.projectContextSnapshot;
  assert.equal(beta.projectInformation.description,'CONTEXT_BETA: revised laboratory renovation.');
  assert.equal(beta.projectInformation.structuredFacts.find(f=>f.id==='current-stories').value,'4');
@@ -75,7 +73,7 @@ try{
  conversation=(await post('/research/conversations/get',{conversationID:conversation.id})).conversation;
  assert.equal(conversation.assistantScope.projectContextMode,'excluded');
  const excluded=await send('current-excluded');
- assert.equal(excluded.answer.charged,false);assert.equal(packets.length,4,'No context and no passages produce a free material-needed response');
+ assert.equal(excluded.answer.researchEngine,'assistant-luna-20261116-v1');assert.equal(packets.length,3,'Excluded Project context remains excluded while autonomous research is available');
  const excludedRecord=(await post('/research/answers/get',{answerID:excluded.id})).answer;
  assert.equal(excludedRecord.projectContextSnapshot.projectInformation,null);
  await change('CONTEXT_GAMMA: latest recorded proposal.','5','stated');
@@ -87,5 +85,5 @@ try{
  const other=(await post('/account/sign-in',{credential:{provider:'apple',providerUserID:'synthetic-current-context-other',email:'other-context@example.test'}})).account.backendSessionToken;
  await post('/research/conversations/project-context',{auth:{accountUserID:otherID},conversationID:conversation.id,include:true},404,other);
  await post('/research/answers/get',{auth:{accountUserID:otherID},answerID:first.id},404,other);
- console.log('PASS current Project context: default-on, current facts each question, writer/reviewer frozen during edits, status/provenance/hash, replay, opt-out/re-enable, immutable old answers and account isolation; paid provider calls: 0.');
+ console.log('PASS current Project context: default-on, current facts each question, single Assistant input frozen during edits, status/provenance/hash, replay, opt-out/re-enable, immutable old answers and account isolation; paid provider calls: 0.');
 }finally{globalThis.fetch=nativeFetch;server?.closeAllConnections();if(server)await new Promise(resolve=>server.close(resolve));await rm(directory,{recursive:true,force:true});}

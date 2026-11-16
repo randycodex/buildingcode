@@ -87,3 +87,11 @@ Application candidate: `assistant-open-luna-20261116-v2`, based on `ebad072ee`. 
 [BC 403.5.1](https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022BC_Chapter04_SpecialUseWBwm.pdf) expressly excepts Group R-2. Its omission is a completeness gap; it does not, by itself, overturn the tested R-2 stair conclusion. Missing overlapping authority can materially change results for other applicable occupancies/scenarios.
 
 The final 22 passes remain passes of topic/citation identity checks, not 22 legally validated answers. AUTH-001 demonstrates that distinction. The cellar/gym use interpretation remains unvalidated: [ZR 12-10](https://zr.planning.nyc.gov/article-i/chapter-2/12-10) makes actual classification/use and applicable exclusions material, so a room label alone does not settle the floor-area result. No additional paid model tests or runtime changes were made during this review.
+
+## Single-version release — November 16, 2026
+
+At the user's request, the simplified Assistant is the sole conversational engine (`assistant-luna-20261116-v1`, in `assistant-engine.mjs`). The former Current/Experimental selector and retired Assistant discovery path are removed. Obsolete client mode labels route to the same current engine. Historical answers and their old version identities remain readable. Formal Research retains its separate evidence/review workflow.
+
+Hosted Assistant requests use the existing durable application usage/spend accounting; local tests retain the separate cumulative ledger. The shared Luna/tool allowlist applies to both. Project-context snapshots are captured and checked against the exact answer input. The web shell/cache generation is bumped to replace stale selector assets. Local production builds, the Assistant regression suite, hosted PostgreSQL transport/accounting tests, and cache/Reader attachment checks passed with no paid provider calls during release verification.
+
+This is a version-selection/deployment change, not a claim that AUTH-001, COV-001 or UX-002 have been resolved. Those findings remain open for systemic evaluation.

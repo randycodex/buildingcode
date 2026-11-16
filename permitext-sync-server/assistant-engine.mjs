@@ -1,8 +1,7 @@
 import {createConversationMemory,callWithAssistantContextRecovery} from './assistant-conversation-memory.mjs';
-// Separate local experiment. No reviewed-engine planner, legal-claim schema,
-// reviewer, or repair loop is used here.
-export const experimentalAssistantVersion='assistant-open-luna-20261116-v2';
-export const experimentalAssistantInstructions=`You are PER.CODES Assistant, an NYC architectural code-research colleague. Answer naturally and concisely, leading with the practical conclusion, verified citations and only material qualifications.
+// Conversational Assistant. Formal Research keeps its separate reviewed pipeline.
+export const assistantVersion='assistant-luna-20261116-v1';
+export const assistantInstructions=`You are PER.CODES Assistant, an NYC architectural code-research colleague. Answer naturally and concisely, leading with the practical conclusion, verified citations and only material qualifications.
 Understand the current question before choosing a tool. Resolve short follow-ups, pronouns, objections and corrections against the immediately preceding user question and assistant answer. Older topics and project facts are background unless the user returns to them. Preserve relevant established facts; distinguish proposals, assumptions, conflicts and hypothetical changes. Ask a brief clarification only when the intended referent remains genuinely ambiguous. Missing design facts can often be handled with a conditional answer.
 Use the active project and supplied conversation. Historical assistant statements are not authority. The full saved chat and source archive remain searchable beyond the working window. Source candidates use R IDs; messages use H IDs. Reload source candidates before citing returned S IDs. Earlier evidence supplied below has been reloaded against its original library identity.
 For code questions, identify the governing obligation from the intended users, occupancy, activity, common/private use, location and work, rather than only the equipment named. When passages are attached, focus primarily on those passages. Treat supplied evidence as reusable, not an exhaustive library search. If it covers the current governing requirement, answer now; otherwise search for that requirement instead of relying on related rules or declaring authority missing while library access is available. Search results marked verified_library_text are actual accessed provisions, including supplied tables, and can be cited directly. Previews and headings are not evidence. Use read_library for additional identified provisions.
@@ -12,16 +11,16 @@ const tool=name=>({type:'function',name,description:name==='search_library'?'Sea
 const readTool={type:'function',name:'read_library',description:'Read additional identified provisions by actual section ID or S candidate ID. Use when controlling scope, exceptions or cross-references are still needed; do not reread sufficient evidence.',strict:true,parameters:{type:'object',additionalProperties:false,required:['sectionIDs'],properties:{sectionIDs:{type:'array',minItems:1,maxItems:8,items:{type:'string'}}}}};
 const archiveTools=[{type:'function',name:'search_conversation',description:'Search the complete saved conversation and source catalog when relevant earlier facts or evidence are absent from the working window. Messages use H IDs; source candidates use R IDs.',strict:true,parameters:{type:'object',additionalProperties:false,required:['query','offset'],properties:{query:{type:'string'},offset:{type:'integer',minimum:0}}}},{type:'function',name:'read_conversation',description:'Read saved H message IDs or reload R source IDs into verified current-turn S evidence. Do not pass a source ID as a message ID.',strict:true,parameters:{type:'object',additionalProperties:false,required:['messageIDs','sourceIDs','offset'],properties:{messageIDs:{type:'array',maxItems:8,items:{type:'string',pattern:'^H[0-9]+$'}},sourceIDs:{type:'array',maxItems:8,items:{type:'string',pattern:'^R[0-9]+$'}},offset:{type:'integer',minimum:0}}}}];
 const outputText=p=>(p.output||[]).flatMap(i=>i.content||[]).filter(c=>c.type==='output_text').map(c=>c.text).join('\n');
-export function experimentalConversation(history){
+export function assistantConversation(history){
  return history.filter(m=>!m.failure&&['user','assistant'].includes(m.role)).map((m,index)=>({role:m.role,
   content:m.role==='user'?String(m.question||m.text||''):String(m.answer?.answerText||m.text||'').replace(/\[(?:S|W|R)\d+\]/g,'(earlier citation; use the current source catalog)')})).filter(m=>m.content.trim());
 }
 const base={model:'gpt-6-luna',service_tier:'default',store:false,reasoning:{effort:'low'},max_output_tokens:4096};
-export async function runExperimentalAssistant({question,history=[],projectContext=null,attachedSources=[],privateIdentifiers=[],priorEvidence=[]},{call,searchLibrary,recallEvidence=async()=>({sources:[]}),readLibrary,signal,onStage=()=>{}}){
+export async function runAssistant({question,history=[],projectContext=null,attachedSources=[],privateIdentifiers=[],priorEvidence=[]},{call,searchLibrary,recallEvidence=async()=>({sources:[]}),readLibrary,signal,onStage=()=>{}}){
  const started=Date.now(),payloads=[],webSources=[],trace=[];
  const knownLibraryIDs=new Set(attachedSources.map(s=>s.id)),readSources=new Map();
  const combined=signal?AbortSignal.any([signal,AbortSignal.timeout(180000)]):AbortSignal.timeout(180000);
- const memory=createConversationMemory(experimentalConversation(history),priorEvidence);
+ const memory=createConversationMemory(assistantConversation(history),priorEvidence);
  const working=memory.context(question);
  const conversation=working.conversation;
  const originalCall=call,recoveryState={};call=(body,options)=>callWithAssistantContextRecovery(originalCall,body,options,recoveryState);
@@ -43,7 +42,7 @@ export async function runExperimentalAssistant({question,history=[],projectConte
    if(entry.type==='function_call_output'){const result=JSON.parse(entry.output);return {...entry,output:JSON.stringify({...result,sources:result.sources?.map(({text,tables,...source})=>source)})};}
    return entry;
   });
-  const payload=await call({...base,instructions:experimentalAssistantInstructions,input:requestInput,tools:round<6?[tool('search_library'),...(readLibrary?[readTool]:[]),...archiveTools,tool('search_web')]:[],include:['reasoning.encrypted_content']},{phase:'experimental',signal:combined});payloads.push(payload);
+  const payload=await call({...base,instructions:assistantInstructions,input:requestInput,tools:round<6?[tool('search_library'),...(readLibrary?[readTool]:[]),...archiveTools,tool('search_web')]:[],include:['reasoning.encrypted_content']},{phase:'experimental',signal:combined});payloads.push(payload);
   if(payload.status!=='completed')throw new Error('Experimental Assistant response did not complete.');
   const calls=(payload.output||[]).filter(i=>i.type==='function_call');
   if(!calls.length){
@@ -58,7 +57,7 @@ export async function runExperimentalAssistant({question,history=[],projectConte
    text=text.replace(/\[((?:S\d+|W\d+)(?:\s*[,;]\s*(?:S\d+|W\d+))*)\]/g,(_,group)=>group.split(/\s*[,;]\s*/).map(id=>id.startsWith('S')?(knownLibraryIDs.has(id)?`[${id}]`:'[source not verified]'):`[${id}]`).join(' '));
    // Render only genuine retrieved web identities as clickable citations.
    text=text.replace(/\[W(\d+)\]/g,(marker,n)=>{const s=webSources[Number(n)-1];return s?`[${marker.slice(1,-1)}](${s.url})`:'[source not verified]';});
-   return {text,payloads,webSources,trace,elapsedMilliseconds:Date.now()-started,version:experimentalAssistantVersion};
+   return {text,payloads,webSources,trace,elapsedMilliseconds:Date.now()-started,version:assistantVersion};
   }
   input.push(...payload.output);
   for(const item of calls){

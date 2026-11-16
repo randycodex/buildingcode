@@ -3,7 +3,7 @@
 import {readFile,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
-import {runExperimentalAssistant} from '../assistant-experimental.mjs';
+import {runAssistant} from '../assistant-engine.mjs';
 import {createResearchV2Budget} from '../research-v2-budget.mjs';
 const {OPENAI_API_KEY,PERMITEXT_RESEARCH_V2_BUDGET_PATH}=process.env;
 if(!OPENAI_API_KEY||!PERMITEXT_RESEARCH_V2_BUDGET_PATH)throw new Error('Provide a local key and the existing cumulative budget path.');
@@ -23,7 +23,7 @@ const results=[],requests=[];
 const call=async(body,{phase,signal})=>{const id=await budget.reserveExperimental(body,phase);let payload;const start=Date.now();try{const response=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{authorization:`Bearer ${OPENAI_API_KEY}`,'content-type':'application/json'},body:JSON.stringify(body),signal});payload=await response.json();requests.push({phase,bytes:Buffer.byteLength(JSON.stringify(body)),milliseconds:Date.now()-start});if(!response.ok)throw new Error(`Provider HTTP ${response.status}`);return payload;}finally{await budget.settle(id,payload);}};
 const questions=['What entrance width did I confirm, and was the earlier number verified?','Back to the courtyard: what did we settle on, and what earlier number did that replace?','Please show the saved note that supports that.'];
 for(const question of questions){
- const started=Date.now(),bindings=new Map();const result=await runExperimentalAssistant({question,history,priorEvidence,projectContext:{name:'Synthetic long conversation',status:'Fictional evaluation, project choices only'}},{call,
+ const started=Date.now(),bindings=new Map();const result=await runAssistant({question,history,priorEvidence,projectContext:{name:'Synthetic long conversation',status:'Fictional evaluation, project choices only'}},{call,
   searchLibrary:async()=>({sources:[],limitations:['This evaluation asks only about saved project choices. No code requirement is asserted.']}),
   recallEvidence:async ids=>({sources:ids.map((id,i)=>{const source=priorEvidence.find(s=>s.id===id);if(!bindings.has(id))bindings.set(id,`S${bindings.size+1}`);return {id:bindings.get(id),sectionID:source.sectionID,title:source.title,authority:'synthetic_project_document',text:source.searchText};})})});
  const row={question,messagesBefore:history.length,sourcesAvailable:priorEvidence.length,milliseconds:Date.now()-started,answer:result.text,trace:result.trace};results.push(row);

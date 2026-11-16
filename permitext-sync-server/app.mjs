@@ -1,8 +1,7 @@
 import {governingSectionContext} from './assistant-library-navigation.mjs';
 import {restoreAssistantEvidence} from './assistant-evidence-recall.mjs';
-import {runExperimentalAssistant,experimentalAssistantVersion} from './assistant-experimental.mjs';
+import {runAssistant,assistantVersion} from './assistant-engine.mjs';
 import {assistantNavigatedSource} from "./research-evidence-assembly.mjs";
-import {planAssistantRetrieval,selectAssistantEvidence} from "./assistant-retrieval-plan.mjs";
 import { researchSelectedTables } from "./research-table-footnotes.mjs";
 import {expandAssistantReferenceEvidence, assistantReferenceCodeBasis} from './assistant-reference-evidence.mjs';
 import { runResearchV2, researchV2AnswerMetadata, researchV2Version } from "./research-v2-engine.mjs";
@@ -20827,7 +20826,11 @@ async function commitMissingDocumentClarification({ context, conversation, origi
 async function handleResearchConversationMessage(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
-  const requestedV2 = context.body.researchEngine === "v2";
+  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
+  if (!conversation) return;
+  // Saved conversational chats and older clients use the same current Assistant.
+  // assistantMode is no longer a runtime/version selector.
+  const requestedV2 = context.body.researchEngine === "v2" || context.body.analysisMode === assistantScopeMode || isConversationOnly(conversation);
   if(process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH&&!requestedV2&&context.body.answerMode==="verified"){
     sendJSON(response,403,{error:"This local testing session supports Luna Fast answers and Research v2.",code:"LOCAL_LUNA_TESTS_ONLY"});return;
   }
@@ -20837,16 +20840,10 @@ async function handleResearchConversationMessage(request, response) {
   if (context.body.answerMode != null && !["fast", "verified"].includes(context.body.answerMode)) {
     sendError(response, 400, "Choose Fast answer or Verified Research."); return;
   }
-  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
-  if (!conversation) return;
-  if (requestedV2 || context.body.analysisMode === assistantScopeMode) await ensureAssistantConversationScope(context.userID, conversation);
+  if (requestedV2) await ensureAssistantConversationScope(context.userID, conversation);
   const conversationOnly = isConversationOnly(conversation);
-  const experimentalAssistant = context.body.assistantMode === "experimental";
-  if(experimentalAssistant && (!conversationOnly || !requestedV2 || process.env.PERMITEXT_ASSISTANT_EXPERIMENTAL!=="1" ||
-    process.env.NODE_ENV==="production" || process.env.VERCEL || process.env.VERCEL_ENV ||
-    !['127.0.0.1','::1','::ffff:127.0.0.1'].includes(request.socket?.remoteAddress))) {
-    sendJSON(response,403,{code:"ASSISTANT_EXPERIMENT_DISABLED",error:"Experimental Assistant is available only in the enabled local workspace."});return;
-  }
+  const conversationalAssistant = conversationOnly;
+
 
   let conversationScope = conversationOnly ? assistantPassageScope(conversation) : null;
   if (conversationOnly && conversation.primaryProjectID && !await projectAccessForUser(context.userID, conversation.primaryProjectID)) {
@@ -21104,7 +21101,7 @@ async function handleResearchConversationMessage(request, response) {
     }
     const projectInformation = conversationOnly ? assistantProjectInformation(conversationScope)
       : await currentResearchProjectInformation(context.userID, conversation.primaryProjectID);
-    if (!experimentalAssistant && projectInformation?.projectID && isAmbiguousResearchProjectCorrection(question)) {
+    if (!conversationalAssistant && projectInformation?.projectID && isAmbiguousResearchProjectCorrection(question)) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "project_scope" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification",
@@ -21114,7 +21111,7 @@ async function handleResearchConversationMessage(request, response) {
     }
     const manualProjectFacts = conversationOnly ? [] : conversation.projectContext?.facts || [];
     const combinedProjectFacts = combinedResearchProjectFacts(projectInformation, manualProjectFacts);
-    if (!experimentalAssistant && conversationOnly && !pinnedEvidence.length && !conversationScope.includeProjectContext) {
+    if (!conversationalAssistant && conversationOnly && !pinnedEvidence.length && !conversationScope.includeProjectContext) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
         researchRequestID, progressResponse, evidenceSnapshots: [], conversationScopeEmpty: true });
       Object.assign(researchOperation, { status: "completed", mode: "evidence_boundary", charged: false });
@@ -21149,23 +21146,13 @@ async function handleResearchConversationMessage(request, response) {
         progressResponse, evidenceSnapshots:[]});
       Object.assign(researchOperation,{status:'completed',mode:'clarification',charged:false}); return;
     }
-    const automaticAssistantDiscovery = !experimentalAssistant && requestedV2 && conversationOnly && !pinnedEvidence.length &&
-      conversationScope?.includeProjectContext &&
-      !researchProjectContextOnlyEligibility({question, projectInformation}) &&
-      !(/\b(?:summari[sz]e|list|show)\b/i.test(question) && /\b(?:recorded )?project (?:facts|context|information)\b/i.test(question) && !/\b(?:code|requirements?|comply|compliance|required)\b/i.test(question)) &&
-      researchEvidenceStrategyForTurn({question, pinnedEvidence, originSurface:""}).reason !== 'question_explicitly_bounded_to_selected_evidence';
     const propertyResearch = mockMode || conversationOnly ? null : await researchPropertyContext({ question, messages: activeMessages, projectInformation });
-    const corpusPlan = conversationOnly && !automaticAssistantDiscovery && !experimentalAssistant
-      ? selectedEvidenceCorpusPlan(pinnedEvidence, await currentResearchCorpusRegistry())
-      : await researchCorpusPlanForTurn({
-      question,
-      messages: activeMessages,
-      topicContext,
-      projectCodeVersion: projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
-      projectFacts: combinedProjectFacts,
-      pinnedEvidence
+    const corpusPlan = await researchCorpusPlanForTurn({
+      question,messages:activeMessages,topicContext,
+      projectCodeVersion:projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
+      projectFacts:combinedProjectFacts,pinnedEvidence
     });
-    if ((!conversationOnly || automaticAssistantDiscovery) && corpusPlan.unavailable?.some(corpus => corpus.id === "nyc-zoning-resolution")) {
+    if (!conversationOnly && corpusPlan.unavailable?.some(corpus => corpus.id === "nyc-zoning-resolution")) {
       researchOperation.failureCode = "RESEARCH_ZONING_SOURCE_UNAVAILABLE";
       progressResponse.json(422, {
         code: "RESEARCH_ZONING_SOURCE_UNAVAILABLE",
@@ -21186,15 +21173,8 @@ async function handleResearchConversationMessage(request, response) {
     );
     // Current Assistant engines receive canonical references as supplied
     // passages. Historical verified prompts retain their exact old scope.
-    const resolveExplicitReferences = requestedV2 || !mockMode && context.body.answerMode !== 'verified';
-    const conversationEvidencePackage = conversationOnly ? (resolveExplicitReferences && !experimentalAssistant ? await assistantEvidenceForTurn({question, pinnedEvidence,
-      messages:activeMessages, topicContext, projectFacts:combinedProjectFacts, signal:progressResponse.signal})
-      : assistantEvidencePackage({question, pinnedEvidence, messages:activeMessages, topicContext, projectFacts:combinedProjectFacts})) : null;
-    if (conversationEvidencePackage?.referenceLookup) {
-      answerCodeBasis = assistantReferenceCodeBasis(answerCodeBasis, conversationEvidencePackage);
-      if (conversationEvidencePackage.referenceLookup.added.length)
-        conversationScope.referenceLookup = structuredClone(conversationEvidencePackage.referenceLookup);
-    }
+    const conversationEvidencePackage = conversationOnly ? assistantEvidencePackage({question,pinnedEvidence,
+      messages:activeMessages,topicContext,projectFacts:combinedProjectFacts}) : null;
     if ((!mockMode || requestedV2) && (context.body.answerMode !== "verified" || requestedV2)) {
       if (!process.env.OPENAI_API_KEY) throw Object.assign(new Error("Research AI is not configured."), {code:"RESEARCH_NOT_CONFIGURED"});
       // Reuse authorization, source freshness, idempotency and durable usage above.
@@ -21203,7 +21183,7 @@ async function handleResearchConversationMessage(request, response) {
       if (requestedV2) {
         const configuration = researchV2Configuration(process.env);
         const budget = configuration.spending === "evaluation" ? createResearchV2Budget({ path: configuration.evaluationBudgetPath }) : null;
-        v2Call = createResearchV2ApplicationCall({ apiKey: process.env.OPENAI_API_KEY, evaluationBudget:budget,experimental:experimentalAssistant,
+        v2Call = createResearchV2ApplicationCall({ apiKey: process.env.OPENAI_API_KEY, evaluationBudget:budget,assistant:conversationalAssistant,
           provider: async (requestBody, signal) => {
             requestBody.safety_identifier = createHash("sha256").update(String(context.userID)).digest("hex");
             const { payload } = await requestResearchProvider({ apiKey:process.env.OPENAI_API_KEY, requestBody,
@@ -21214,59 +21194,11 @@ async function handleResearchConversationMessage(request, response) {
             return payload;
           } });
       }
-      let retrievalPlan = null;
-      if (automaticAssistantDiscovery) {
-        if (!(await ensureResearchTurnReservation())) return;
-        progressResponse.progress("searching_authorized_library","active");
-        retrievalPlan = await planAssistantRetrieval({question,projectFacts:combinedProjectFacts,history:activeMessages,topicContext,call:v2Call,signal:progressResponse.signal});
-      }
-      const discoverForQuestion = async searchQuestion => assembledResearchEvidenceForTurn({question:searchQuestion,messages:activeMessages,pinnedEvidence,
-        originSurface:automaticAssistantDiscovery?"":conversation.origin?.surface||"",projectFacts:retrievalPlan?retrievalPlan.context:combinedProjectFacts,topicContext,corpusPlan,
-        beforeSemanticRequest:async()=>{if (!(await ensureResearchTurnReservation())) throw Object.assign(new Error("Request handled."),{code:"RESEARCH_REQUEST_HANDLED"});},onStage:progressResponse.progress});
-      let packageForFast;
-      if(retrievalPlan?.clarification) packageForFast={sources:[]};
-      else if(automaticAssistantDiscovery) {
-        const packages=[];
-        for(const query of retrievalPlan.queries) packages.push(await discoverForQuestion(query));
-        packageForFast={...packages[0],sources:[...new Map(packages.flatMap(item=>item.sources||[]).map(source=>[`${source.codeVersion}:${source.sectionID}`,source])).values()]};
-      } else packageForFast=conversationOnly?conversationEvidencePackage:await discoverForQuestion(question);
-      if (retrievalPlan?.clarification) answerCodeBasis = researchCodeBasis(conversation.primaryProjectID,projectInformation,new Date().toISOString(),selectedEvidenceCorpusPlan([],await currentResearchCorpusRegistry()));
-      const followupSearches=[],discoveryPayloads=retrievalPlan?[retrievalPlan.payload]:[];
-      let evidence = packageForFast.sources || [];
-      if (automaticAssistantDiscovery && evidence.length) {
-        const selected=await selectAssistantEvidence({question:`${question}\nResearch intent: ${retrievalPlan.queries.join('; ')}`,context:retrievalPlan.context,sources:evidence,call:v2Call,signal:progressResponse.signal});
-        evidence=selected.sources;discoveryPayloads.push(selected.payload);
-        // Browse the actual heading hierarchy around relevant hits. This can
-        // locate governing siblings that semantic similarity did not nominate.
-        const {catalog}=await researchCorpusResources(corpusPlan);
-        const chapters=[...new Set(evidence.flatMap(source=>{
-          const section=catalog.find(item=>String(item.id)===String(source.sectionID)&&item.codeVersion===source.codeVersion);
-          return section?[`${section.codeVersion}:${section.codePrefix}:${section.chapterNumber}`]:[];
-        }))].slice(0,3);
-        const headings=chapters.flatMap(chapter=>catalog.filter(item=>`${item.codeVersion}:${item.codePrefix}:${item.chapterNumber}`===chapter))
-          .map(item=>({...item,sectionID:String(item.id),text:[item.headerLine,item.headingLine].filter(Boolean).join(' — ')}));
-        const nominated=await selectAssistantEvidence({question:`${question}\nResearch intent: ${retrievalPlan.queries.join('; ')}`,context:retrievalPlan.context,sources:headings,call:v2Call,signal:progressResponse.signal,navigation:true});
-        if(nominated.payload)discoveryPayloads.push(nominated.payload);
-        retrievalPlan.unavailableSources=[];
-        const known=new Set(evidence.map(source=>`${source.codeVersion}:${source.sectionID}`));
-        let characters=evidence.reduce((n,source)=>n+(source.text||source.selectedText||'').length,0);
-        for(const candidate of nominated.sources){
-          const key=`${candidate.codeVersion}:${candidate.sectionID}`;
-          if(known.has(key)||evidence.length>=24)continue;
-          let resolved;
-          try {resolved=await resolveResearchAssemblySection(candidate,catalog,cachedResearchSourceBody);}
-          catch(error){
-            if(!['INCOMPLETE_RESEARCH_SECTION','INVALID_RESEARCH_SECTION','ENOENT'].includes(error.code))throw error;
-            retrievalPlan.unavailableSources.push({codePrefix:candidate.codePrefix,sectionNumber:candidate.sectionNumber,edition:candidate.codeEdition,reason:error.code});
-            continue;
-          }
-          if(!resolved)continue;
-          const source=assistantNavigatedSource(resolved);
-          if(characters+source.text.length>96000)continue;
-          evidence.push(source);known.add(key);characters+=source.text.length;
-        }
-      }
-      if (!experimentalAssistant && !evidence.length && !conversationScope?.includeProjectContext) {
+      const packageForFast=conversationOnly?conversationEvidencePackage:await assembledResearchEvidenceForTurn({question,messages:activeMessages,pinnedEvidence,
+        originSurface:conversation.origin?.surface||"",projectFacts:combinedProjectFacts,topicContext,corpusPlan,
+        beforeSemanticRequest:async()=>{if (!(await ensureResearchTurnReservation()))throw Object.assign(new Error("Request handled."),{code:"RESEARCH_REQUEST_HANDLED"});},onStage:progressResponse.progress});
+      const evidence=packageForFast.sources || [];
+      if (!conversationalAssistant && !evidence.length && !conversationScope?.includeProjectContext) {
         await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
           researchRequestID, progressResponse, evidenceSnapshots:[], clarificationReason:"evidence_unavailable" });
         Object.assign(researchOperation, {status:"completed",mode:"clarification",charged:false});
@@ -21313,13 +21245,13 @@ async function handleResearchConversationMessage(request, response) {
       }
       progressResponse.progress("preparing_question","completed");
       progressResponse.progress("preparing_conclusion","active");
-      const body = fastResearchRequest(question,sources,combinedProjectFacts.join("\n"),activeMessages.slice(-6).map(message => ({
+      const body = conversationalAssistant ? {model:"gpt-6-luna"} : fastResearchRequest(question,sources,combinedProjectFacts.join("\n"),activeMessages.slice(-6).map(message => ({
         role:message.role,text:message.question || message.answer?.answerText || "" })));
       body.safety_identifier = createHash("sha256").update(String(context.userID)).digest("hex");
       const fastGenerationStartedAt = performance.now();
-      let firstTextMilliseconds = null, v2Result = null, experimentalResult = null, providerPayloads;
-      if (experimentalAssistant) {
-        const {catalog:experimentalCatalog}=await researchCorpusResources(corpusPlan);
+      let firstTextMilliseconds = null, v2Result = null, assistantResult = null, providerPayloads;
+      if (conversationalAssistant) {
+        const {catalog:assistantCatalog}=await researchCorpusResources(corpusPlan);
         const activeAnswerIDs=activeMessages.filter(m=>m.role==='assistant').map(m=>m.id);
         const priorRecords=activeAnswerIDs.length?await listStoredResearchAnswers(context.userID,{ids:activeAnswerIDs}):[];
         const priorEvidence=[],priorSnapshots=new Map(),priorKeys=new Set();
@@ -21338,20 +21270,20 @@ async function handleResearchConversationMessage(request, response) {
               searchText:[reference.title,reference.url,record.question].join(' '),priorQuestion:record.question,retrievedAt:reference.retrievedAt});
           }
         }
-        experimentalResult=await runExperimentalAssistant({question,history:activeMessages,priorEvidence,
+        assistantResult=await runAssistant({question,history:activeMessages,priorEvidence,
           projectContext:conversationScope?.includeProjectContext?conversationScope.projectContext:null,
           attachedSources:sources,privateIdentifiers:[projectInformation?.name,projectInformation?.address]}, {
           call:v2Call,signal:progressResponse.signal,
           readLibrary:async(ids,signal)=>{
             const returned=[],unavailable=[];
             const directIDs=ids.map(id=>sources.find(s=>s.id===id)?.sectionID||id);
-            const selectedContext=governingSectionContext(directIDs,experimentalCatalog);
-            for(const requestedID of ids)if(!sources.some(s=>s.id===requestedID)&&!experimentalCatalog.some(s=>String(s.id)===requestedID))unavailable.push({id:requestedID,reason:'Not in the authorized library catalog or current candidates.'});
+            const selectedContext=governingSectionContext(directIDs,assistantCatalog);
+            for(const requestedID of ids)if(!sources.some(s=>s.id===requestedID)&&!assistantCatalog.some(s=>String(s.id)===requestedID))unavailable.push({id:requestedID,reason:'Not in the authorized library catalog or current candidates.'});
             for(const {id,contextFor} of selectedContext){
               signal.throwIfAborted();const selected=sources.find(s=>ids.includes(s.id)&&s.sectionID===id);if(selected&&!contextFor){returned.push(selected);continue;}
-              const candidate=experimentalCatalog.find(s=>String(s.id)===id);
+              const candidate=assistantCatalog.find(s=>String(s.id)===id);
               if(!candidate){unavailable.push({id,reason:'Not in the authorized library catalog.'});continue;}
-              let resolved;try{resolved=await resolveResearchAssemblySection({...candidate,sectionID:id},experimentalCatalog,cachedResearchSourceBody);}
+              let resolved;try{resolved=await resolveResearchAssemblySection({...candidate,sectionID:id},assistantCatalog,cachedResearchSourceBody);}
               catch(error){if(!['INCOMPLETE_RESEARCH_SECTION','INVALID_RESEARCH_SECTION','ENOENT'].includes(error.code))throw error;unavailable.push({id,reason:error.code});continue;}
               if(!resolved){unavailable.push({id,reason:'Section text unavailable.'});continue;}
               const source=assistantNavigatedSource(resolved);
@@ -21393,41 +21325,13 @@ async function handleResearchConversationMessage(request, response) {
             return {sources:returned,evidenceStatus:'verified_library_text',limitations:found.limitations||[]};
           }
         });
-        providerPayloads=experimentalResult.payloads;
-        web.sources=experimentalResult.webSources;web.searched=web.sources.length>0;
+        providerPayloads=assistantResult.payloads;
+        web.sources=assistantResult.webSources;web.searched=web.sources.length>0;
         sources.push(...web.sources.map(source=>({...source,authority:'web_source'})));
       } else if (requestedV2) {
         const call = v2Call;
-        v2Result = await runResearchV2({ question, sources, history:activeMessages,
-          ...(retrievalPlan ? {assistantIntent:{clarification:retrievalPlan.clarification,queries:retrievalPlan.queries,unavailableSources:retrievalPlan.unavailableSources||[],searchedCorpora:retrievalPlan.clarification?[]:(corpusPlan?.selected||[]).map(corpus=>({id:corpus.id,codeVersion:corpus.codeVersion})),libraryLimitations:packageForFast.limitations||[]}} : {}),
-          ...(conversationScope?.includeProjectContext ? {projectContextSnapshot:conversationScope.projectContext} : {}) }, { call, assistantDiscovery:automaticAssistantDiscovery,
-          retrieveMissingSources:automaticAssistantDiscovery ? async (gaps,signal) => {
-            signal.throwIfAborted();
-            const followups=[];
-            for(const gap of gaps) followups.push(await assembledResearchEvidenceForTurn({
-              question:gap.slice(0,1500),
-              messages:[],pinnedEvidence:[],originSurface:"",projectFacts:retrievalPlan?.context || combinedProjectFacts,topicContext:null,corpusPlan,
-              beforeSemanticRequest:async()=>{signal.throwIfAborted();if (!(await ensureResearchTurnReservation())) throw Object.assign(new Error("Request handled."),{code:"RESEARCH_REQUEST_HANDLED"});},
-              onStage:progressResponse.progress
-            }));
-            const followup={sources:[...new Map(followups.flatMap(item=>item.sources||[]).map(source=>[`${source.codeVersion}:${source.sectionID}`,source])).values()]};
-            followupSearches.push({query:gaps.join("; ").slice(0,1500),sourceCount:followup.sources?.length||0});
-            const retainedKeys=new Set(evidence.map(source=>`${source.codeVersion}:${source.sectionID}`));
-            const pool=(followup.sources||[]).filter(source=>!retainedKeys.has(`${source.codeVersion}:${source.sectionID}`));
-            const selected=await selectAssistantEvidence({question:`${question}\nMissing authority to resolve: ${gaps.join('; ')}`,context:retrievalPlan?.context||[],sources:pool,call:v2Call,signal});
-            if(selected.payload)discoveryPayloads.push(selected.payload);
-            // Follow-up discovery adds missing authority; it must not discard
-            // governing provisions already read or renumber their citations.
-            let characters=evidence.reduce((total,source)=>total+(source.text||source.selectedText||'').length,0);
-            for(const source of selected.sources){
-              const length=(source.text||source.selectedText||'').length;
-              if(evidence.length>=24||characters+length>96000)continue;
-              evidence.push(source);characters+=length;
-            }
-            sources.splice(0,sources.length,...await Promise.all(evidence.map(bindAnswerSource)));
-            snapshots.splice(0,snapshots.length,...evidence.map(source=>immutableEvidenceSnapshot({source,approvedAt:now,evidenceSetVersion:Number(conversation.evidenceSetVersion||1),sourceLibraryVersion:source.codeVersion||conversation.codeVersion})));
-            return sources;
-          } : null,
+        v2Result = await runResearchV2({question,sources,history:activeMessages,
+          ...(conversationScope?.includeProjectContext?{projectContextSnapshot:conversationScope.projectContext}:{})},{call,
           signal:progressResponse.signal, onStage:stage => {
             progressResponse.progress(stage === "discovery" ? "searching_authorized_library" : stage === "review" ? "checking_citation_support" : "preparing_conclusion", "active");
           } });
@@ -21440,7 +21344,7 @@ async function handleResearchConversationMessage(request, response) {
           })))
         });
         if (v2Result.status === "review_failed") throw Object.assign(new Error(v2Result.draft.answerText), {code:"V2_REVIEW_FAILED",missingSources:v2Result.draft.missingSources,missingFacts:v2Result.draft.missingFacts});
-        providerPayloads = [...discoveryPayloads,...v2Result.payloads];
+        providerPayloads = v2Result.payloads;
       } else {
         const generateFast=async(requestBody,signal)=>{const {payload}=await requestResearchProvider({apiKey:process.env.OPENAI_API_KEY, requestBody,
           signal,timeoutMilliseconds:120000,maximumAttempts:1,
@@ -21456,7 +21360,7 @@ async function handleResearchConversationMessage(request, response) {
           :await generateFast(body,progressResponse.signal);
         providerPayloads = [payload];
       }
-      const text = experimentalResult ? experimentalResult.text : v2Result ? v2Result.draft.answerText : outputTextFromResponse(providerPayloads[0]);
+      const text = assistantResult ? assistantResult.text : v2Result ? v2Result.draft.answerText : outputTextFromResponse(providerPayloads[0]);
       const usage = combinedResearchUsage(researchEmbeddingUsage(),web.usage,
         ...providerPayloads.map(payload => researchUsageFromProviderPayload(payload,body.model)));
       const cost = estimatedResearchCostWithProviderAllowance(usage);
@@ -21470,13 +21374,13 @@ async function handleResearchConversationMessage(request, response) {
         ...(packageForFast.referenceLookup ? {referenceLookup:packageForFast.referenceLookup} : {}),
         factUsage:{projectContext:combinedProjectFacts,conversation:[],other:[]},
         retrieval:{sourceMode:packageForFast.sourceMode,codeBasis:answerCodeBasis,webSupportRequested:webDecision.useWeb,webSupportSearched:web.searched,
-          ...(automaticAssistantDiscovery ? {automaticDiscovery:true,queries:retrievalPlan?.clarification?[]:retrievalPlan?.queries||[],followupSearches,searchedCorpora:retrievalPlan?.clarification?[]:(corpusPlan?.selected||[]).map(corpus=>({id:corpus.id,codeVersion:corpus.codeVersion}))} : {})},
+          },
         routing:{mode:"fast",answerTier:"fast",verificationAttemptCount:0},
         delivery:{mode:"streamed",firstTextMilliseconds,generationMilliseconds:Math.round(performance.now()-fastGenerationStartedAt)},
         disclaimer:"AI-generated, unreviewed research assistance. Verify the cited text before relying on this answer." };
-      if(experimentalResult)Object.assign(answer,{researchEngine:experimentalAssistantVersion,promptVersion:experimentalAssistantVersion,
-        authorityLabel:'Experimental Assistant',experimental:true,retrieval:{...answer.retrieval,experimental:true,toolCalls:experimentalResult.trace.map(({tool,query})=>({tool,query}))},
-        delivery:{mode:'experimental',generationMilliseconds:experimentalResult.elapsedMilliseconds}});
+      if(assistantResult)Object.assign(answer,{researchEngine:assistantVersion,promptVersion:assistantVersion,
+        authorityLabel:'Assistant',assistant:true,inputSnapshot:{projectContextSnapshot:structuredClone(conversationScope?.projectContext||null)},retrieval:{...answer.retrieval,assistant:true,toolCalls:assistantResult.trace.map(({tool,query})=>({tool,query}))},
+        delivery:{mode:'assistant',generationMilliseconds:assistantResult.elapsedMilliseconds}});
       if (v2Result) Object.assign(answer, researchV2AnswerMetadata(v2Result), {
         promptVersion:researchV2Version, evidenceVersion:researchV2Version,
         delivery:{mode:"reviewed",generationMilliseconds:v2Result.elapsedMilliseconds},
@@ -21490,7 +21394,7 @@ async function handleResearchConversationMessage(request, response) {
         ...packageForFast.limitations.map(limitation=>limitation.text), 'Retrieved references retain their stated conditions; retrieval does not establish applicability or compliance.'
       ];
       answer.supportingSources = web.sources.filter((source,index)=>answer.citationIdentity.cited.includes(`W${index+1}`))
-        .map(source=>({...source,authorityClass:experimentalResult?"web_source":"official_guidance",role:"supporting",controlling:false}));
+        .map(source=>({...source,authorityClass:assistantResult?"web_source":"official_guidance",role:"supporting",controlling:false}));
       const identity = researchRequestMessageIdentity(context.userID,conversation.id,researchRequestID);
       const userMessage = {id:`${identity}:question`,role:"user",question,createdAt:now,
         contextRevision:researchContextRevision(conversation),researchRequestID};
@@ -21498,9 +21402,9 @@ async function handleResearchConversationMessage(request, response) {
         contextRevision:researchContextRevision(conversation),researchRequestID};
       const record = {...immutableResearchAnswer({assistantScopeSnapshot:conversationScope,id:assistantMessage.id,
         owner:ownerScope(context.userID),conversationID:conversation.id,projectID:conversation.primaryProjectID || null,
-        question,answer,evidence:snapshots,citations:answer.citations,model:body.model,researchSystemVersion:experimentalResult?experimentalAssistantVersion:requestedV2 ? researchV2Version : "fast-stream-v1",createdAt:now}),
-        operationID:researchOperation.id,officialEvidenceSnapshot:experimentalResult?[]:web.sources,
-        ...(experimentalResult?{experimentalResearchTrace:experimentalResult.trace,webEvidenceSnapshot:web.sources}:{}),assistantScopeSnapshot:conversationScope,
+        question,answer,evidence:snapshots,citations:answer.citations,model:body.model,researchSystemVersion:assistantResult?assistantVersion:requestedV2 ? researchV2Version : "fast-stream-v1",createdAt:now}),
+        operationID:researchOperation.id,officialEvidenceSnapshot:assistantResult?[]:web.sources,
+        ...(assistantResult?{assistantResearchTrace:assistantResult.trace,webEvidenceSnapshot:web.sources}:{}),assistantScopeSnapshot:conversationScope,
         projectContextSnapshot:{projectID:conversation.primaryProjectID || null,projectInformation,manualFacts:manualProjectFacts,
           combinedFacts:combinedProjectFacts,capturedAt:now}};
       conversation.codeBasis=structuredClone(answerCodeBasis); conversation.codeVersion=answerCodeBasis.codeVersion;
@@ -21519,7 +21423,7 @@ async function handleResearchConversationMessage(request, response) {
       conversation.updatedAt=now; conversation.sourceStatus="current"; delete conversation.historyHiddenAt;
       progressResponse.assertActive();
       await commitResearchConversationMessage(context.userID,{recoveryBase:{conversation:originalConversation,requestID:researchRequestID,question},
-        reservationID:researchReservationID,usageEntry:{...usage,model:body.model,requestedModel:body.model,routingMode:requestedV2 ? "research-v2" : "fast",answerTier:experimentalResult?"experimental":requestedV2 ? v2Result.status : "fast",
+        reservationID:researchReservationID,usageEntry:{...usage,model:body.model,requestedModel:body.model,routingMode:requestedV2 ? "research-v2" : "fast",answerTier:assistantResult?"assistant":requestedV2 ? v2Result.status : "fast",
           verificationAttemptCount:v2Result?.reviews.length || 0,mode:"openai",estimatedCostUSD:cost.estimatedUSD,pricingVersion:cost.pricingVersion,createdAt:researchReservationCreatedAt},
         answer:record,conversation,events:conversation.primaryProjectID ? ["research.question.submitted","research.answer.generated"].map(action =>
           activityEvent({owner:ownerScope(context.userID),projectID:conversation.primaryProjectID,actorUserID:context.userID,

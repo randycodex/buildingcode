@@ -9,6 +9,8 @@ import {tmpdir} from 'node:os';
 const {assistantSuppliedText,assistantProjectSnapshotHash}=await import('../assistant-conversation-scope.mjs');
 assert.equal(createHash('sha256').update(JSON.stringify(assistantSuppliedText({version:'20261019-conversation-only-v1',inputMode:'reader_passages',includeProjectContext:false,projectContext:null,projectID:'historical-project',facts:[],materials:[]},'Explain the selected text.'))).digest('hex'),
  '03011567c2abe7ef4dd45a5e052f60271ff65d21cac0dd78b3c802eef4049086');
+const production=process.argv.includes('--production');
+const postgres=production?await (await import('./research-v2-local-postgres.mjs')).startResearchV2Postgres():null;
 const directory=await mkdtemp(join(tmpdir(),'permitext-current-project-'));
 for(const key of Object.keys(process.env))if(/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$|BLOB_|CLERK_|STRIPE_|RESEND_|APPLE_.*(?:SECRET|KEY))/.test(key))delete process.env[key];
 Object.assign(process.env,{NODE_ENV:'test',OPENAI_API_KEY:'offline-project-context-double',PERMITEXT_SYNC_DATA_PATH:join(directory,'store.json'),
@@ -16,6 +18,7 @@ Object.assign(process.env,{NODE_ENV:'test',OPENAI_API_KEY:'offline-project-conte
  PERMITEXT_RESEARCH_V2_BUDGET_PATH:join(directory,'budget.json'),PERMITEXT_RESEARCH_MODEL:'gpt-6-luna',PERMITEXT_RESEARCH_MAX_REQUEST_USD:'1',
  PERMITEXT_RESEARCH_USER_DAILY_CAP_USD:'7',PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD:'7',PERMITEXT_RESEARCH_DAILY_CAP_USD:'7',PERMITEXT_RESEARCH_MONTHLY_CAP_USD:'7',
  PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS:'.1',PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS:'.01',PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS:'.5',PERMITEXT_RESEARCH_PRICING_VERSION:'offline-context-test'});
+if(postgres)process.env.PERMITEXT_SYNC_DATABASE_URL=postgres.connectionString;
 const nativeFetch=globalThis.fetch;let server,calls=0;
 globalThis.fetch=async(url,options)=>{
  if(String(url)!=='https://api.openai.com/v1/responses')return nativeFetch(url,options);
@@ -49,25 +52,26 @@ try{
   updatedAt:new Date(Date.now()+1000*++update).toISOString()}}]}});
  await change('CONTEXT_ALPHA: proposed office renovation.','3','stated');
  let conversation=(await post('/research/conversations/create',{projectID,analysisMode:'conversation_only',requestID:'create-default-context'},201)).conversation;
+ if(production){Object.assign(process.env,{NODE_ENV:'production',VERCEL:'1',VERCEL_ENV:'preview',PERMITEXT_RESEARCH_V2_ROLLOUT:'all',PERMITEXT_RESEARCH_V2_DEFAULT:'v2'});delete process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH;}
 
  const send=async(question,assistantMode='experimental',requestID=crypto.randomUUID(),expected=200)=>{
   const result=await post('/research/conversations/message',{conversationID:conversation.id,question,assistantMode,requestID,researchEngine:'v2',analysisMode:'conversation_only',expectedRevision:conversation.revision,expectedEvidenceSetVersion:conversation.evidenceSetVersion||1},expected);
   if(result.conversation)conversation=result.conversation;return result;
  };
- await send('Use web','experimental','disabled',403);assert.equal(calls,0);
- process.env.PERMITEXT_ASSISTANT_EXPERIMENTAL='1';
- await send('Use web','experimental','web');const answer=conversation.messages.at(-1);assert.equal(answer.answer.verification.pass,false);assert.equal(answer.answer.experimental,true);
+ await send('Use web','experimental','web');const answer=conversation.messages.at(-1);assert.equal(answer.answer.verification.pass,false);assert.equal(answer.answer.assistant,true);
  assert.match(answer.answer.answerText,/https:\/\/www.nyc.gov/);assert.equal(answer.answer.supportingSources.length,1);
  const saved=(await post('/research/answers/get',{answerID:answer.id})).answer;
- assert(saved.experimentalResearchTrace.length);assert.equal(saved.webEvidenceSnapshot.length,1);assert.deepEqual(saved.officialEvidenceSnapshot,[]);
+ assert(saved.assistantResearchTrace.length);assert.equal(saved.webEvidenceSnapshot.length,1);assert.deepEqual(saved.officialEvidenceSnapshot,[]);
  const before=calls;await send('Use web','experimental','web');assert.equal(calls,before,'Replay must not spend twice');
  await send('Summarize project facts.');assert.equal(conversation.messages.at(-1).answer.verification.status,'unreviewed');
- await send('Summarize the recorded Project facts.','current');assert.equal(conversation.messages.at(-1).answer.verification.pass,true,'Current mode still uses its reviewer');
+ await send('Summarize the recorded Project facts.','current');assert.equal(conversation.messages.at(-1).answer.verification.pass,false,'Obsolete Current mode uses the same conversational Assistant');
  await send('Find provisions');
  await send('Reconsider earlier evidence');
  const recalledRecord=(await post('/research/answers/get',{answerID:conversation.messages.at(-1).id})).answer;
- assert(recalledRecord.experimentalResearchTrace.some(t=>t.tool==='recall_evidence'&&t.result.sources.length));
+ assert(recalledRecord.assistantResearchTrace.some(t=>t.tool==='recall_evidence'&&t.result.sources.length));
  assert(recalledRecord.evidence.length);assert(conversation.messages.at(-1).answer.citations.length);
- process.env.PERMITEXT_ASSISTANT_EXPERIMENTAL='0';await send('Use web','experimental','disabled-again',403);
- console.log('PASS experimental HTTP: local gate, web-only and context-only persistence, genuine web links, unreviewed provenance, replay, and switch back to Current; no paid calls.');
-}finally{globalThis.fetch=nativeFetch;server?.closeAllConnections();if(server)await new Promise(resolve=>server.close(resolve));await rm(directory,{recursive:true,force:true});}
+ process.env.PERMITEXT_ASSISTANT_EXPERIMENTAL='0';await send('Summarize project facts.','current','obsolete-mode');assert.equal(conversation.messages.at(-1).answer.researchEngine,'assistant-luna-20261116-v1');
+ const oldClient=await post('/research/conversations/message',{conversationID:conversation.id,question:'Summarize project facts.',requestID:'old-client-no-mode',expectedRevision:conversation.revision,expectedEvidenceSetVersion:conversation.evidenceSetVersion||1});assert.equal(oldClient.conversation.messages.at(-1).answer.researchEngine,'assistant-luna-20261116-v1');
+ if(production){const usage=await postgres.sql`SELECT count(*)::int AS n FROM permitext_research_usage WHERE user_id=${userID} AND mode='openai'`;assert(Number(usage[0].n)>0,'Hosted Assistant uses durable application accounting');}
+ console.log('PASS Assistant HTTP: single default engine, obsolete-mode compatibility, web/context/source persistence, unreviewed provenance and replay; no paid calls.');
+}finally{globalThis.fetch=nativeFetch;server?.closeAllConnections();if(server)await new Promise(resolve=>server.close(resolve));await rm(directory,{recursive:true,force:true});await postgres?.close();}

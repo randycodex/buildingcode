@@ -41,7 +41,7 @@ try{
   assert((await experiment.summary()).accountedUSD>.2,'Reserve search context and all four tool calls');
   const webCharge=await experiment.settle(webID,{usage:{input_tokens:1000,output_tokens:100},output:[{type:'web_search_call'}]});
   assert.equal(webCharge.chargedMicroUSD,10150,'Include web tool charge plus model tokens');
-  await assert.rejects(experiment.reserveExperimental({...body,tools:[{type:'computer'}]},'bad'),/Invalid experimental/);
+  await assert.rejects(experiment.reserveExperimental({...body,tools:[{type:'computer'}]},'bad'),/Invalid Assistant/);
   const longID=await experiment.reserveExperimental({...body,input:'x'.repeat(400000)},'long-context');
   await experiment.settle(longID,{usage:{input_tokens:0,output_tokens:0},output:[]});
   await assert.rejects(experiment.reserve({...body,input:'x'.repeat(400000)},'reviewed-context'),{code:'V2_REQUEST_LIMIT'});

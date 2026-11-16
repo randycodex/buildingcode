@@ -201,27 +201,27 @@ assert.equal(rejectedView.element.querySelector('.rv2-input').value,'Explain the
 all(rejectedView.element).find(x=>x.textContent==='Retry answer').handlers.click();await tick();
 assert.equal(reviewAttempts.length,2);assert.notEqual(reviewAttempts[0].requestID,reviewAttempts[1].requestID,'Retry after completed rejection gets a fresh reviewed attempt');
 rejectedView.dispose();
-let pages=[];const paged=createResearchV2View({conversation:{sources:[],messages:[]},initialDraft:'Find ramps',onDraft(){},
+let pages=[];const paged=createResearchV2View({conversation:{sources:[],messages:[{role:'user',question:'Find ramps'},{role:'assistant',answer:{additionalEvidenceNeeded:['Ramp rules.']}}]},initialDraft:'Find ramps',onDraft(){},
  onFind:async(question,options)=>{pages.push(options);return options.cursor?{candidates:[{...source,id:'a'},{...source,id:'b',title:'Second result'}],coverage:{candidateCount:2,shownCount:2},nextCursor:null}:{candidates:[{...source,id:'a',title:'First result'}],coverage:{candidateCount:2,shownCount:1},nextCursor:'next-page'};}});
 const pagedFind=text=>all(paged.element).find(x=>x.textContent===text);
-paged.element.querySelector('.rv2-send').handlers.click();await tick();
+await pagedFind('Find source').handlers.click();await tick();
 await pagedFind('More results').handlers.click();
 assert.equal(pages[1].cursor,'next-page');assert.equal(all(paged.element).filter(x=>x.className==='rv2-candidate').length,2,'Appending a page preserves existing rows and skips duplicates.');
 assert.equal(pagedFind('More results').hidden,true);assert(pagedFind('Showing 2 of 2 candidates.'));paged.dispose();
 const pendingPage=deferred();let pageAttempts=0;
-const stalePage=createResearchV2View({conversation:{sources:[],messages:[]},initialDraft:'Find ramps',onDraft(){},
+const stalePage=createResearchV2View({conversation:{sources:[],messages:[{role:'user',question:'Find ramps'},{role:'assistant',answer:{additionalEvidenceNeeded:['Ramp rules.']}}]},initialDraft:'Find ramps',onDraft(){},
  onFind:async(_question,options)=>{if(!options.cursor)return {candidates:[{...source,id:'first'}],nextCursor:'later'};
   if(++pageAttempts===1)throw Error('Page connection lost');return pendingPage.promise;}});
 const staleFind=text=>all(stalePage.element).find(x=>x.textContent===text);
-stalePage.element.querySelector('.rv2-send').handlers.click();await tick();await staleFind('More results').handlers.click();
+await staleFind('Find source').handlers.click();await tick();await staleFind('More results').handlers.click();
 assert.equal(staleFind('More results').disabled,false);assert.match(stalePage.element.querySelector('.rv2-status').textContent,/Page connection lost/);
 const loading=staleFind('More results').handlers.click();await tick();stalePage.dispose();pendingPage.resolve({candidates:[{...source,id:'late'}],nextCursor:null});await loading;
 assert.equal(all(stalePage.element).filter(x=>x.className==='rv2-candidate').length,1,'A late page cannot change a disposed or different conversation.');
 const openingReader=deferred();let staleReviews=0;
-const staleReview=createResearchV2View({conversation:{sources:[],messages:[]},initialDraft:'Find ramps',onDraft(){},
+const staleReview=createResearchV2View({conversation:{sources:[],messages:[{role:'user',question:'Find ramps'},{role:'assistant',answer:{additionalEvidenceNeeded:['Ramp rules.']}}]},initialDraft:'Find ramps',onDraft(){},
  onFind:async()=>({candidates:[source]}),onOpenReader:()=>openingReader.promise,onReview:async()=>{staleReviews++;return {selection:source};}});
 const staleReviewFind=text=>all(staleReview.element).find(x=>x.textContent===text);
-staleReview.element.querySelector('.rv2-send').handlers.click();await tick();const reviewing=staleReviewFind('Review in Reader').handlers.click();await tick();staleReview.dispose();openingReader.resolve();await reviewing;
+await staleReviewFind('Find source').handlers.click();await tick();const reviewing=staleReviewFind('Review in Reader').handlers.click();await tick();staleReview.dispose();openingReader.resolve();await reviewing;
 assert.equal(staleReviews,0,'A stale Reader opening cannot start a review for a different account or conversation.');
 console.log('Research v2 view: legacy answer preservation, edition labels, attachment/send races, source-detail send, failure draft retention, stable retry identity and stale-context isolation passed.');
 

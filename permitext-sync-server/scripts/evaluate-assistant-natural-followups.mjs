@@ -61,7 +61,7 @@ try{
    if(streamed){const events=(await response.text()).trim().split('\n').map(line=>JSON.parse(line));const last=events.at(-1);result=last.type==='result'?last.payload:last.error;}else result=await response.json();
    const milliseconds=performance.now()-started,cpu=process.cpuUsage(cpuStarted),effectiveStatus=result.error?(result.status||response.status):response.status;
    let record=null,answer=null;if(result.conversation){conversation=result.conversation;const message=conversation.messages.filter(m=>m.role==='assistant').at(-1);answer=message?.answer;if(message)record=(await post('/research/answers/get',{answerID:message.id})).answer;}
-   const trace=record?.experimentalResearchTrace||[],intent=trace.find(t=>['resolve_conversation','plan_research'].includes(t.tool))?.result;
+   const trace=record?.assistantResearchTrace||record?.experimentalResearchTrace||[],intent=trace.find(t=>['resolve_conversation','plan_research'].includes(t.tool))?.result;
    const calls=providerCalls.filter(c=>c.turnID===turnID);
    // Attribution by question in the last user message; web helpers are reported as totals separately.
    const intentCall=calls.find(c=>c.request.text?.format?.name==='assistant_conversational_intent'&&JSON.parse(c.request.input).currentQuestion===question);

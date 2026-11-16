@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createConversationMemory,callWithAssistantContextRecovery} from '../assistant-conversation-memory.mjs';
-import {runExperimentalAssistant} from '../assistant-experimental.mjs';
+import {runAssistant} from '../assistant-engine.mjs';
 const history=Array.from({length:2000},(_,i)=>({role:i%2?'assistant':'user',content:`Unrelated ceiling coordination note ${i}. `+'coordination '.repeat(25)}));
 history[10]={role:'user',content:'The entrance clear width is 39 inches, still an unverified assumption.'};
 history[600]={role:'user',content:'Correction: the entrance clear width is confirmed at 42 inches; the 39-inch value was an assumption.'};
@@ -24,7 +24,7 @@ assert.equal(digest({history,sources}),before,'Selecting/searching/reading never
 const message=text=>({status:'completed',output:[{type:'message',content:[{type:'output_text',text}]}]});
 const invoke=(name,args)=>({status:'completed',output:[{type:'function_call',call_id:name,name,arguments:JSON.stringify(args)}]});
 let step=0,recalls=0;
-const result=await runExperimentalAssistant({question:'But does this occupancy change that?',history:history.map(m=>({role:m.role,text:m.content})),priorEvidence:sources},{
+const result=await runAssistant({question:'But does this occupancy change that?',history:history.map(m=>({role:m.role,text:m.content})),priorEvidence:sources},{
  searchLibrary:()=>assert.fail('No forced new search'),recallEvidence:async ids=>{if(!ids.includes('R1701'))return {sources:[]};recalls++;return {sources:[{id:'S8',sectionID:'section-1700',text:sources[1700].searchText}]};},
  call:async(body,{phase})=>{
   if(phase==='experimental_intent'){assert(Buffer.byteLength(JSON.stringify(body))<100000);const ctx=JSON.parse(body.input);assert.equal(ctx.archive.messages,2000);assert(ctx.latestExchange.at(-1).content.includes('separation'));return message(JSON.stringify({question:'Does residential use affect stair separation?',subject:'Stair separation',reference:'latest',clarification:'',evidenceIDs:[]}));}
@@ -46,7 +46,7 @@ const page=memory.search('source');assert(page.nextOffset);const next=memory.sea
 console.log('Long chat: explicit subject priority and paginated archive search passed.');
 const webMemory=createConversationMemory([],[{id:'Rweb',url:'https://www.nyc.gov/example',title:'An earlier official document',summary:'Historical web reference'}]);
 assert.equal(webMemory.search('official document').sourceCandidates[0].url,'https://www.nyc.gov/example');
-const historicalReference=await runExperimentalAssistant({question:'Which official document did we use?',history:[{role:'user',text:'We used the official document.'},{role:'assistant',text:'It was an earlier web source.'}],priorEvidence:[{id:'Rweb',url:'https://www.nyc.gov/example',title:'Earlier document'}]},{
+const historicalReference=await runAssistant({question:'Which official document did we use?',history:[{role:'user',text:'We used the official document.'},{role:'assistant',text:'It was an earlier web source.'}],priorEvidence:[{id:'Rweb',url:'https://www.nyc.gov/example',title:'Earlier document'}]},{
  recallEvidence:async()=>({sources:[],references:[{id:'Rweb',url:'https://www.nyc.gov/example',status:'historical_reference_not_reverified'}]}),
  call:async(body)=>{assert.equal(JSON.parse(body.input[0].content).earlierReferences[0].status,'historical_reference_not_reverified');return message('The saved document was https://www.nyc.gov/example .');}
 });
