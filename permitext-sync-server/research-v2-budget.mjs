@@ -30,9 +30,10 @@ export function lunaUsageMicroUSD(payload) {
     usage.output_tokens * lunaV2Pricing.output + writes * .25) * multiplier);
 }
 
-export function assertLunaV2Request(requestBody){
+export function assertLunaV2Request(requestBody,{maximumBytes=180_000}={}){
   const bytes = Buffer.byteLength(JSON.stringify(requestBody), 'utf8');
-  if (bytes > 180_000 || !Number.isSafeInteger(requestBody.max_output_tokens) ||
+  if(bytes>maximumBytes)throw Object.assign(error('The Assistant could not fit this material into one model request. Your complete conversation and sources remain saved.','V2_REQUEST_LIMIT'),{requestLimitReason:'context_size'});
+  if (!Number.isSafeInteger(requestBody.max_output_tokens) ||
           requestBody.max_output_tokens < 1 || requestBody.max_output_tokens > 8192 ||
           requestBody.model !== 'gpt-6-luna' || requestBody.service_tier !== 'default' ||
           requestBody.store !== false || requestBody.tools?.length || requestBody.background) {
@@ -88,9 +89,9 @@ export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitU
       return reserve({phase, model: requestBody.model, pricingVersion: lunaV2Pricing.version}, reservedMicroUSD);
     },
     async reserveExperimental(body,phase) {
-      const bytes=assertLunaV2Request({...body,tools:[]});
+      const bytes=assertLunaV2Request({...body,tools:[]},{maximumBytes:Infinity});
       if((body.tools||[]).some(t=>!['function','web_search'].includes(t.type)) ||
-         (body.tools||[]).some(t=>t.type==='function'&&!['search_library','read_library','search_web'].includes(t.name)) ||
+         (body.tools||[]).some(t=>t.type==='function'&&!['search_library','read_library','search_web','search_conversation','read_conversation'].includes(t.name)) ||
          (body.tools||[]).some(t=>t.type==='web_search') && body.max_tool_calls!==4)
         throw error('Invalid experimental research tools.','V2_REQUEST_LIMIT');
       const web=(body.tools||[]).some(t=>t.type==='web_search');

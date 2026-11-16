@@ -55,10 +55,10 @@ const recall=await runExperimentalAssistant({question:'Does the exception change
  attachedSources:[{id:'S1',text:'Different currently attached source'}],priorEvidence:[{id:'R1',title:'Related exception'},{id:'R2',title:'Unrelated rule'}]}, {
  recallEvidence:async ids=>{recallIDs=ids;return {sources:[{id:'S2',text:'Rehydrated related provision',recalledFrom:'R1'}],unavailable:[]};},
  searchLibrary:()=>assert.fail('Recall can supply sufficient evidence without forced search'),call:async(body,{phase})=>{
- if(phase==='experimental_intent'){assert.equal(JSON.parse(body.input).priorEvidence.length,2);return message(JSON.stringify({question:'Current exception',subject:'Related subject',reference:'latest',clarification:'',evidenceIDs:['R1','R1','invented']}));}
+ if(phase==='experimental_intent'){assert.equal(JSON.parse(body.input).priorEvidence.length,1,'The unrelated source is kept in the archive, not repeated in the working window');return message(JSON.stringify({question:'Current exception',subject:'Related subject',reference:'latest',clarification:'',evidenceIDs:['R1','R1','invented']}));}
  recallStep++;const ctx=JSON.parse(body.input[0].content);assert.equal(ctx.earlierEvidence[0].id,'S2');assert.equal(ctx.attachedPassages[0].id,'S1');return message('The exception changes it. [S2]');
  }});
-assert.deepEqual(recallIDs,['R1']);assert.equal(recallStep,1);assert.match(recall.text,/\[S2\]/);assert.equal(recall.trace[1].tool,'recall_evidence');
+assert.deepEqual(recallIDs,['R1']);assert.equal(recallStep,1);assert.match(recall.text,/\[S2\]/);assert(recall.trace.some(t=>t.tool==='recall_evidence'));assert(recall.trace.some(t=>t.tool==='conversation_context'&&t.result.sources===2));
 console.log('Evidence recall: selection before answer, unrelated/invalid IDs excluded, deduplication, separate attachments and fresh citation identities passed.');
 const {experimentalConversation}=await import('../assistant-experimental.mjs');
 const historical=experimentalConversation([{role:'assistant',answer:{answerText:'A previous rule [S8]. A web result [W2].'}}]);

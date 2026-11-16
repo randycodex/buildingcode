@@ -1,0 +1,604 @@
+{
+  "messagesAtStart": 2000,
+  "sources": 2000,
+  "sourceHashUnchanged": true,
+  "results": [
+    {
+      "question": "What entrance width did I confirm, and was the earlier number verified?",
+      "messagesBefore": 2000,
+      "sourcesAvailable": 2000,
+      "milliseconds": 8818,
+      "answer": "You confirmed the entrance clear width as **42 inches**. The earlier **39-inch** figure was only an unverified early assumption, not a verified measurement.",
+      "trace": [
+        {
+          "tool": "conversation_context",
+          "query": "What entrance width did I confirm, and was the earlier number verified?",
+          "result": {
+            "messages": 2000,
+            "sources": 2000,
+            "workingMessages": 70,
+            "workingSources": 68,
+            "notice": "Complete earlier messages and sources remain saved. Search/read the conversation archive to resolve earlier facts, corrections or source references; this working window is not the entire chat."
+          }
+        },
+        {
+          "tool": "resolve_conversation",
+          "query": "What entrance width did I confirm, and was the earlier number verified?",
+          "result": {
+            "question": "What entrance clear width did the user confirm, and was the earlier 39-inch width verified?",
+            "subject": "The entrance clear width and the status of the earlier 39-inch assumption",
+            "reference": "The user's correction that the approved entrance clear width is confirmed at 42 inches and that 39 inches was only an early assumption",
+            "clarification": "",
+            "evidenceIDs": []
+          }
+        },
+        {
+          "tool": "search_conversation",
+          "query": "approved entrance clear width 42 inches earlier 39 inch assumption correction",
+          "result": {
+            "totals": {
+              "messages": 2000,
+              "sources": 2000
+            },
+            "messages": [
+              {
+                "id": "H601",
+                "role": "user",
+                "text": "Correction: the approved entrance clear width is confirmed at 42 inches. The 39-inch width was only an early assumption.",
+                "offset": 0,
+                "complete": true
+              },
+              {
+                "id": "H11",
+                "role": "user",
+                "text": "The entrance clear width is 39 inches, but this is an unverified assumption.",
+                "offset": 0,
+                "complete": true
+              },
+              {
+                "id": "H1401",
+                "role": "user",
+                "text": "The courtyard route is now confirmed at 60 inches in the agreed project sketch, replacing the earlier draft 48-inch route. This is our project choice, not a statement of a code minimum.",
+                "offset": 0,
+                "complete": true
+              },
+              {
+                "id": "H801",
+                "role": "user",
+                "text": "The first courtyard sketch shows a 48-inch route; it is only a draft.",
+                "offset": 0,
+                "complete": true
+              }
+            ],
+            "sourceCandidates": [
+              {
+                "id": "R1701",
+                "sectionID": "synthetic-courtyard-note",
+                "title": "Courtyard route \u2014 agreed project sketch",
+                "summary": "SYNTHETIC PROJECT DOCUMENT, NOT LEGAL AUTHORITY. The agreed courtyard route is 60 inches clear, replacing the superseded 48-inch draft. Footnote: retain the selected project route in future layout revisions.",
+                "priorQuestion": "Courtyard route decision"
+              },
+              {
+                "id": "R2000",
+                "sectionID": "synthetic-note-1999",
+                "title": "Other schematic note 1999",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1999",
+                "sectionID": "synthetic-note-1998",
+                "title": "Other schematic note 1998",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1998",
+                "sectionID": "synthetic-note-1997",
+                "title": "Other schematic note 1997",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1997",
+                "sectionID": "synthetic-note-1996",
+                "title": "Other schematic note 1996",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1996",
+                "sectionID": "synthetic-note-1995",
+                "title": "Other schematic note 1995",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1995",
+                "sectionID": "synthetic-note-1994",
+                "title": "Other schematic note 1994",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1994",
+                "sectionID": "synthetic-note-1993",
+                "title": "Other schematic note 1993",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1993",
+                "sectionID": "synthetic-note-1992",
+                "title": "Other schematic note 1992",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1992",
+                "sectionID": "synthetic-note-1991",
+                "title": "Other schematic note 1991",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1991",
+                "sectionID": "synthetic-note-1990",
+                "title": "Other schematic note 1990",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1990",
+                "sectionID": "synthetic-note-1989",
+                "title": "Other schematic note 1989",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              }
+            ],
+            "notice": "Message excerpts are conversation history, not verified legal authority. Read source IDs to reload evidence before citing it."
+          }
+        },
+        {
+          "tool": "search_conversation",
+          "query": "39 inch entrance width verified assumption",
+          "result": {
+            "totals": {
+              "messages": 2000,
+              "sources": 2000
+            },
+            "messages": [
+              {
+                "id": "H601",
+                "role": "user",
+                "text": "Correction: the approved entrance clear width is confirmed at 42 inches. The 39-inch width was only an early assumption.",
+                "offset": 0,
+                "complete": true
+              },
+              {
+                "id": "H11",
+                "role": "user",
+                "text": "The entrance clear width is 39 inches, but this is an unverified assumption.",
+                "offset": 0,
+                "complete": true
+              },
+              {
+                "id": "H1401",
+                "role": "user",
+                "text": "The courtyard route is now confirmed at 60 inches in the agreed project sketch, replacing the earlier draft 48-inch route. This is our project choice, not a statement of a code minimum.",
+                "offset": 0,
+                "complete": true
+              },
+              {
+                "id": "H801",
+                "role": "user",
+                "text": "The first courtyard sketch shows a 48-inch route; it is only a draft.",
+                "offset": 0,
+                "complete": true
+              }
+            ],
+            "sourceCandidates": [
+              {
+                "id": "R1701",
+                "sectionID": "synthetic-courtyard-note",
+                "title": "Courtyard route \u2014 agreed project sketch",
+                "summary": "SYNTHETIC PROJECT DOCUMENT, NOT LEGAL AUTHORITY. The agreed courtyard route is 60 inches clear, replacing the superseded 48-inch draft. Footnote: retain the selected project route in future layout revisions.",
+                "priorQuestion": "Courtyard route decision"
+              },
+              {
+                "id": "R2000",
+                "sectionID": "synthetic-note-1999",
+                "title": "Other schematic note 1999",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1999",
+                "sectionID": "synthetic-note-1998",
+                "title": "Other schematic note 1998",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1998",
+                "sectionID": "synthetic-note-1997",
+                "title": "Other schematic note 1997",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1997",
+                "sectionID": "synthetic-note-1996",
+                "title": "Other schematic note 1996",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1996",
+                "sectionID": "synthetic-note-1995",
+                "title": "Other schematic note 1995",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1995",
+                "sectionID": "synthetic-note-1994",
+                "title": "Other schematic note 1994",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1994",
+                "sectionID": "synthetic-note-1993",
+                "title": "Other schematic note 1993",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1993",
+                "sectionID": "synthetic-note-1992",
+                "title": "Other schematic note 1992",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1992",
+                "sectionID": "synthetic-note-1991",
+                "title": "Other schematic note 1991",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1991",
+                "sectionID": "synthetic-note-1990",
+                "title": "Other schematic note 1990",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1990",
+                "sectionID": "synthetic-note-1989",
+                "title": "Other schematic note 1989",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              }
+            ],
+            "notice": "Message excerpts are conversation history, not verified legal authority. Read source IDs to reload evidence before citing it."
+          }
+        },
+        {
+          "tool": "search_conversation",
+          "query": "staff share cafe toilet room requirements",
+          "result": {
+            "totals": {
+              "messages": 2000,
+              "sources": 2000
+            },
+            "messages": [
+              {
+                "id": "H1999",
+                "role": "user",
+                "text": "We were discussing whether staff could share the cafe toilet room.",
+                "offset": 0,
+                "complete": true
+              }
+            ],
+            "sourceCandidates": [
+              {
+                "id": "R2000",
+                "sectionID": "synthetic-note-1999",
+                "title": "Other schematic note 1999",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1999",
+                "sectionID": "synthetic-note-1998",
+                "title": "Other schematic note 1998",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1998",
+                "sectionID": "synthetic-note-1997",
+                "title": "Other schematic note 1997",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1997",
+                "sectionID": "synthetic-note-1996",
+                "title": "Other schematic note 1996",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1996",
+                "sectionID": "synthetic-note-1995",
+                "title": "Other schematic note 1995",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1995",
+                "sectionID": "synthetic-note-1994",
+                "title": "Other schematic note 1994",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1994",
+                "sectionID": "synthetic-note-1993",
+                "title": "Other schematic note 1993",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1993",
+                "sectionID": "synthetic-note-1992",
+                "title": "Other schematic note 1992",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1992",
+                "sectionID": "synthetic-note-1991",
+                "title": "Other schematic note 1991",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1991",
+                "sectionID": "synthetic-note-1990",
+                "title": "Other schematic note 1990",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1990",
+                "sectionID": "synthetic-note-1989",
+                "title": "Other schematic note 1989",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              },
+              {
+                "id": "R1989",
+                "sectionID": "synthetic-note-1988",
+                "title": "Other schematic note 1988",
+                "summary": "A fictional equipment layout note; no legal authority is asserted.",
+                "priorQuestion": "Equipment coordination"
+              }
+            ],
+            "notice": "Message excerpts are conversation history, not verified legal authority. Read source IDs to reload evidence before citing it."
+          }
+        },
+        {
+          "tool": "search_library",
+          "query": "entrance clear width 42 inches confirmed 39 inch assumption",
+          "result": {
+            "sources": [],
+            "limitations": [
+              "This evaluation asks only about saved project choices. No code requirement is asserted."
+            ]
+          }
+        },
+        {
+          "tool": "read_conversation",
+          "query": "H601,H11,H1999",
+          "result": {
+            "messages": [
+              {
+                "id": "H601",
+                "role": "user",
+                "text": "Correction: the approved entrance clear width is confirmed at 42 inches. The 39-inch width was only an early assumption.",
+                "offset": 0,
+                "complete": true,
+                "nextOffset": null
+              },
+              {
+                "id": "H11",
+                "role": "user",
+                "text": "The entrance clear width is 39 inches, but this is an unverified assumption.",
+                "offset": 0,
+                "complete": true,
+                "nextOffset": null
+              },
+              {
+                "id": "H1999",
+                "role": "user",
+                "text": "We were discussing whether staff could share the cafe toilet room.",
+                "offset": 0,
+                "complete": true,
+                "nextOffset": null
+              }
+            ],
+            "sources": []
+          }
+        }
+      ]
+    },
+    {
+      "question": "Back to the courtyard: what did we settle on, and what earlier number did that replace?",
+      "messagesBefore": 2002,
+      "sourcesAvailable": 2000,
+      "milliseconds": 5056,
+      "answer": "We settled on a **60-inch clear courtyard route**, replacing the earlier **48-inch draft**. That\u2019s the project choice, not a statement of a code minimum.",
+      "trace": [
+        {
+          "tool": "conversation_context",
+          "query": "Back to the courtyard: what did we settle on, and what earlier number did that replace?",
+          "result": {
+            "messages": 2002,
+            "sources": 2000,
+            "workingMessages": 14,
+            "workingSources": 67,
+            "notice": "Complete earlier messages and sources remain saved. Search/read the conversation archive to resolve earlier facts, corrections or source references; this working window is not the entire chat."
+          }
+        },
+        {
+          "tool": "resolve_conversation",
+          "query": "Back to the courtyard: what did we settle on, and what earlier number did that replace?",
+          "result": {
+            "question": "What clear width was settled for the courtyard route, and what earlier draft width did it replace?",
+            "subject": "The confirmed courtyard route width in the agreed project sketch",
+            "reference": "The user\u2019s confirmed 60-inch courtyard route, replacing the earlier draft 48-inch route; this is a project choice, not a code minimum.",
+            "clarification": "",
+            "evidenceIDs": [
+              "R1701"
+            ]
+          }
+        },
+        {
+          "tool": "recall_evidence",
+          "query": "What clear width was settled for the courtyard route, and what earlier draft width did it replace?",
+          "result": {
+            "sources": [
+              {
+                "id": "S1",
+                "sectionID": "synthetic-courtyard-note",
+                "title": "Courtyard route \u2014 agreed project sketch",
+                "authority": "synthetic_project_document",
+                "text": "SYNTHETIC PROJECT DOCUMENT, NOT LEGAL AUTHORITY. The agreed courtyard route is 60 inches clear, replacing the superseded 48-inch draft. Footnote: retain the selected project route in future layout revisions."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "question": "Please show the saved note that supports that.",
+      "messagesBefore": 2004,
+      "sourcesAvailable": 2000,
+      "milliseconds": 6262,
+      "answer": "> \u201cThe agreed courtyard route is 60 inches clear, replacing the superseded 48-inch draft.\u201d\n\nThat\u2019s from the saved project sketch note. It is a project choice, not legal authority or a statement of a code minimum. [S1]",
+      "trace": [
+        {
+          "tool": "conversation_context",
+          "query": "Please show the saved note that supports that.",
+          "result": {
+            "messages": 2004,
+            "sources": 2000,
+            "workingMessages": 14,
+            "workingSources": 67,
+            "notice": "Complete earlier messages and sources remain saved. Search/read the conversation archive to resolve earlier facts, corrections or source references; this working window is not the entire chat."
+          }
+        },
+        {
+          "tool": "resolve_conversation",
+          "query": "Please show the saved note that supports that.",
+          "result": {
+            "question": "What does the saved project note say about the agreed courtyard route and the earlier draft it replaced?",
+            "subject": "The courtyard route decision",
+            "reference": "\u201cThat\u201d refers to the agreed 60-inch clear courtyard route replacing the earlier 48-inch draft.",
+            "clarification": "",
+            "evidenceIDs": [
+              "R1701"
+            ]
+          }
+        },
+        {
+          "tool": "recall_evidence",
+          "query": "What does the saved project note say about the agreed courtyard route and the earlier draft it replaced?",
+          "result": {
+            "sources": [
+              {
+                "id": "S1",
+                "sectionID": "synthetic-courtyard-note",
+                "title": "Courtyard route \u2014 agreed project sketch",
+                "authority": "synthetic_project_document",
+                "text": "SYNTHETIC PROJECT DOCUMENT, NOT LEGAL AUTHORITY. The agreed courtyard route is 60 inches clear, replacing the superseded 48-inch draft. Footnote: retain the selected project route in future layout revisions."
+              }
+            ]
+          }
+        },
+        {
+          "tool": "read_conversation",
+          "query": "R1701",
+          "result": {
+            "messages": [
+              {
+                "id": "R1701",
+                "unavailable": true
+              }
+            ],
+            "sources": []
+          }
+        }
+      ]
+    }
+  ],
+  "requests": [
+    {
+      "phase": "experimental_intent",
+      "bytes": 47225,
+      "milliseconds": 3479
+    },
+    {
+      "phase": "experimental",
+      "bytes": 35481,
+      "milliseconds": 2267
+    },
+    {
+      "phase": "experimental",
+      "bytes": 47809,
+      "milliseconds": 1346
+    },
+    {
+      "phase": "experimental",
+      "bytes": 48757,
+      "milliseconds": 1481
+    },
+    {
+      "phase": "experimental_intent",
+      "bytes": 22371,
+      "milliseconds": 2497
+    },
+    {
+      "phase": "experimental",
+      "bytes": 11541,
+      "milliseconds": 2470
+    },
+    {
+      "phase": "experimental_intent",
+      "bytes": 21756,
+      "milliseconds": 2226
+    },
+    {
+      "phase": "experimental",
+      "bytes": 10857,
+      "milliseconds": 1241
+    },
+    {
+      "phase": "experimental",
+      "bytes": 11263,
+      "milliseconds": 2681
+    }
+  ],
+  "budget": {
+    "limitUSD": 7,
+    "accountedUSD": 5.447586,
+    "settledUSD": 5.432935,
+    "uncertainOrReservedCalls": 2,
+    "callCount": 1485
+  }
+}

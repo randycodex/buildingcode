@@ -21323,13 +21323,20 @@ async function handleResearchConversationMessage(request, response) {
         const navigation=assistantLibraryNavigation(experimentalCatalog,await chapterIndex());
         const activeAnswerIDs=activeMessages.filter(m=>m.role==='assistant').map(m=>m.id);
         const priorRecords=activeAnswerIDs.length?await listStoredResearchAnswers(context.userID,{ids:activeAnswerIDs}):[];
-        const priorEvidence=[],priorSnapshots=new Map();
+        const priorEvidence=[],priorSnapshots=new Map(),priorKeys=new Set();
         for(const record of priorRecords.filter(r=>r.conversationID===conversation.id&&activeAnswerIDs.includes(r.id))){
           for(const snapshot of record.evidence||[]){
-            if(priorEvidence.some(s=>s.sectionID===snapshot.sectionID&&s.codeVersion===snapshot.sourceLibraryVersion))continue;
+            const contentIdentity=[snapshot.passageTextHash,snapshot.structuredSource?.contentHash,...(snapshot.visualSources||[]).map(s=>s.contentHash)].join(':');
+            const key=JSON.stringify([snapshot.sectionID,snapshot.sourceLibraryVersion,contentIdentity]);if(priorKeys.has(key))continue;priorKeys.add(key);
             priorEvidence.push({id:`R${priorEvidence.length+1}`,sectionID:snapshot.sectionID,sourceID:snapshot.sourceID,codeVersion:snapshot.sourceLibraryVersion,
-              title:`${snapshot.codeBook} ${snapshot.sectionNumber}`,summary:snapshot.passageText.slice(0,500),priorQuestion:record.question});
+              contentIdentity,passageTextHash:snapshot.passageTextHash,searchText:snapshot.passageText,title:`${snapshot.codeBook} ${snapshot.sectionNumber}`,summary:snapshot.passageText.slice(0,500),priorQuestion:record.question});
             priorSnapshots.set(priorEvidence.at(-1).id,snapshot);
+          }
+          for(const reference of record.webEvidenceSnapshot||record.officialEvidenceSnapshot||[]){
+            const key=JSON.stringify(['web',reference.url,reference.retrievedAt]);if(!reference.url||priorKeys.has(key))continue;priorKeys.add(key);
+            priorEvidence.push({id:`R${priorEvidence.length+1}`,kind:'historical_web_reference',url:reference.url,title:reference.title||reference.url,
+              summary:'Saved historical web-source identity. Reopen the primary source before treating its current contents as verified authority.',
+              searchText:[reference.title,reference.url,record.question].join(' '),priorQuestion:record.question,retrievedAt:reference.retrievedAt});
           }
         }
         experimentalResult=await runExperimentalAssistant({question,history:activeMessages,priorEvidence,libraryGuide:navigation.guide,
@@ -21358,10 +21365,11 @@ async function handleResearchConversationMessage(request, response) {
             return {sources:returned,unavailable};
           },
           recallEvidence:async(ids,signal)=>{
-            const recalled=[],unavailable=[];
+            const recalled=[],unavailable=[],references=[];
             for(const id of ids){
               signal.throwIfAborted();const prior=priorEvidence.find(s=>s.id===id);if(!prior)continue;
-              const [canonical]=await researchEvidenceForSectionIDs([prior.sectionID],{allowOptInCorpora:true});
+              if(prior.url){references.push({id:prior.id,url:prior.url,title:prior.title,retrievedAt:prior.retrievedAt,status:'historical_reference_not_reverified'});continue;}
+              let canonical;try{[canonical]=await researchEvidenceForSectionIDs([prior.sectionID],{allowOptInCorpora:true});}catch(error){if(!['INVALID_RESEARCH_SECTION','INCOMPLETE_RESEARCH_SECTION','ENOENT'].includes(error.code))throw error;unavailable.push({id,reason:error.code});continue;}
               const source=await restoreAssistantEvidence(priorSnapshots.get(id),canonical,{comparableText:comparableResearchText,loadVisual:constructionVisualSourceWithContent});
               if(!source||source.codeVersion!==prior.codeVersion){unavailable.push({id,reason:'Original library identity or edition is no longer available; search again.'});continue;}
               let index=evidence.findIndex(s=>s.sectionID===source.sectionID&&s.codeVersion===source.codeVersion&&(s.text||s.selectedText||"")===(source.text||source.selectedText||""));
@@ -21369,7 +21377,7 @@ async function handleResearchConversationMessage(request, response) {
                 snapshots.push(immutableEvidenceSnapshot({source,approvedAt:now,evidenceSetVersion:Number(conversation.evidenceSetVersion||1),sourceLibraryVersion:source.codeVersion}));}
               recalled.push({...sources[index],recalledFrom:id});
             }
-            return {sources:recalled,unavailable};
+            return {sources:recalled,unavailable,references};
           },
           onStage:stage=>progressResponse.progress(stage==='searching'?'searching_authorized_library':'preparing_conclusion','active'),
           searchLibrary:async(query,signal)=>{
@@ -23358,10 +23366,16 @@ async function handleResearchConversationMessage(request, response) {
   } catch (error) {
     if (error.code === "RESEARCH_REQUEST_HANDLED") return;
     const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
+    if(failureCode==='ASSISTANT_CONTEXT_CAPACITY'){
+      Object.assign(researchOperation,{status:'failed',failureCode,charged:false});progressResponse.failActive('failed');
+      progressResponse.error(503,error.message,{code:failureCode,conversationPreserved:true});return;
+    }
     if ((requestedV2 || process.env.PERMITEXT_RESEARCH_V2_BUDGET_PATH) && String(failureCode).startsWith("V2_")) {
       Object.assign(researchOperation,{status:"failed",failureCode,charged:false});
       progressResponse.failActive("failed");
-      progressResponse.error(failureCode === "V2_BUDGET_EXHAUSTED" ? 429 : 422, error.message, {
+      progressResponse.error(failureCode === "V2_BUDGET_EXHAUSTED" ? 429 : 422,
+        failureCode==='V2_REQUEST_LIMIT'&&error.requestLimitReason!=='context_size'?"The local Assistant couldn't prepare this request because its model or tool configuration is invalid. Your conversation and sources are saved.":
+        failureCode==='V2_BUDGET_EXHAUSTED'?"The local Assistant testing budget does not have enough remaining for another request. Your conversation and sources are saved.":error.message, {
         code:failureCode, additionalEvidenceNeeded:error.missingSources || [], missingFacts:error.missingFacts || []
       });
       return;
