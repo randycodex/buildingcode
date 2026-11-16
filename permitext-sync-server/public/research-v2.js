@@ -256,6 +256,13 @@ export function createResearchV2View(options) {
     remove.innerHTML='<svg aria-hidden="true" focusable="false" data-lucide-icon="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg>';
     passageControls.push(chip,remove);attachment.append(chip,remove);chips.append(attachment);
   });
+  let assistantMode='current';
+  if(['localhost','127.0.0.1','[::1]'].includes(globalThis.location?.hostname)){
+    const modes=node('select','rv2-assistant-mode');modes.setAttribute('aria-label','Assistant mode');
+    for(const [value,label] of [['experimental','Experimental · Luna'],['current','Current · reviewed']]){const option=node('option','',label);option.value=value;modes.append(option);}
+    modes.value=localStorage.getItem('permitext-assistant-mode')||'experimental';assistantMode=modes.value;localStorage.setItem('permitext-assistant-mode',modes.value);
+    modes.addEventListener('change',()=>{assistantMode=modes.value;localStorage.setItem('permitext-assistant-mode',modes.value);});composer.append(modes);
+  }
   const input=node('textarea','rv2-input');input.setAttribute('aria-label','Research question');input.dataset.researchDraftKey=options.draftKey||'';input.placeholder='Message';input.rows=1;input.maxLength=2000;input.value=initialDraft;
   let measuredDraft=null,measuredWidth=0,composerResize=null;
   const resizeInput=()=>{
@@ -398,9 +405,9 @@ export function createResearchV2View(options) {
   }
   async function sendQuestion(){
     if(busy||includeBusy||revealBusy||operationPending()||!input.value.trim())return;
-    if(!passageSources.length&&!projectContext?._projectContextOptions?.enabled()){await findPassages();return;}
+    if(assistantMode!=='experimental'&&!passageSources.length&&!projectContext?._projectContextOptions?.enabled()){await findPassages();return;}
     const submittedDraft=input.value,question=submittedDraft.trim();
-    if(!lastRequest||lastRequest.question!==question)lastRequest={question,requestID:crypto.randomUUID()};
+    if(!lastRequest||lastRequest.question!==question)lastRequest={question,requestID:crypto.randomUUID(),assistantMode};
     options.requestStore?.write(lastRequest);
     const attempt=++generation;busy=true;detail.hidden=true;thread.hidden=false;controller=new AbortController();notice('');
     thread.querySelector('.rv2-welcome')?.setAttribute('hidden','');

@@ -165,7 +165,11 @@ function spendCapError(message) {
 }
 
 function providerToolAllowance(requestBody) {
-  const tools = requestBody?.tools || [];
+  const requestedTools = requestBody?.tools || [];
+  const tools = requestedTools.filter(tool=>!(tool.type==='function' && tool.strict===true &&
+    ['search_library','search_web'].includes(tool.name)));
+  // These local function calls do not execute at the provider. Their outputs
+  // are billed in the next explicit request; web lookup has its own reservation.
   if (!tools.length) return { inputTokens: 0, costUSD: 0 };
   const calls = requestBody.max_tool_calls;
   if (!Number.isSafeInteger(calls) || calls <= 0 || tools.some((tool) =>

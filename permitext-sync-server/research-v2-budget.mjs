@@ -87,6 +87,16 @@ export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitU
         requestBody.max_output_tokens * lunaV2Pricing.reservationOutput);
       return reserve({phase, model: requestBody.model, pricingVersion: lunaV2Pricing.version}, reservedMicroUSD);
     },
+    async reserveExperimental(body,phase) {
+      const bytes=assertLunaV2Request({...body,tools:[]});
+      if((body.tools||[]).some(t=>!['function','web_search'].includes(t.type)) ||
+         (body.tools||[]).some(t=>t.type==='function'&&!['search_library','search_web'].includes(t.name)) ||
+         (body.tools||[]).some(t=>t.type==='web_search') && body.max_tool_calls!==4)
+        throw error('Invalid experimental research tools.','V2_REQUEST_LIMIT');
+      const web=(body.tools||[]).some(t=>t.type==='web_search');
+      return reserve({kind:'experimental',phase,model:body.model,pricingVersion:lunaV2Pricing.version},
+        Math.ceil((bytes+8192+(web?128000*5:0))*lunaV2Pricing.reservationInput+body.max_output_tokens*lunaV2Pricing.reservationOutput+(web?40000:0)));
+    },
     // Isolated same-evidence evaluations only; application calls remain Luna-only.
     async reserveComparison(body) {
       if(body.model!=='gpt-6.1-sol'||body.service_tier!=='default'||body.store!==false||body.tools?.length||body.background||
@@ -116,6 +126,7 @@ export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitU
           actual=u&&[u.input_tokens,u.output_tokens,cached,writes].every(n=>Number.isSafeInteger(n)&&n>=0)&&cached<=u.input_tokens
             ? Math.ceil((u.input_tokens-cached)*2+cached*.1+u.output_tokens*10+writes*2.5):null;
         }
+        if(call.kind==='experimental'&&actual!==null)actual+=(payload.output||[]).filter(item=>item.type==='web_search_call').length*10000;
         call.chargedMicroUSD = actual ?? call.reservedMicroUSD;
         call.status = actual === null ? 'uncertain' : 'settled';
         call.completedAt = new Date().toISOString();

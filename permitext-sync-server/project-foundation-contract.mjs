@@ -794,7 +794,12 @@ export function immutableResearchAnswer({
     /^research-v2-/.test(answer?.researchEngine || '') && answer?.verification?.pass === true &&
     researchEvidence.length === 0 && researchCitations.length === 0 &&
     Array.isArray(answer?.claimBindings) && answer.claimBindings.length === 0;
-  if (researchEvidence.length < 1 && !reviewedProjectContextAnswer && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer && !(assistantScopeSnapshot?.version === assistantScopeVersion && suppliedTextAnswer)) {
+  const experimentalUnreviewed = answer?.researchEngine === 'assistant-open-luna-20261116-v1' &&
+    assistantScopeSnapshot?.version === assistantScopeVersion && answer?.experimental === true &&
+    answer?.mode === 'openai' && model === 'gpt-6-luna' && answer?.model === model &&
+    answer?.verification?.status === 'unreviewed' && answer?.verification?.pass === false &&
+    answer?.authorityStatus === 'unreviewed' && typeof answer?.answerText === 'string' && answer.answerText.trim().length>0;
+  if (researchEvidence.length < 1 && !experimentalUnreviewed && !reviewedProjectContextAnswer && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer && !(assistantScopeSnapshot?.version === assistantScopeVersion && suppliedTextAnswer)) {
     throw new Error("Research answers require evidence.");
   }
   const fastUnreviewed = answer?.researchEngine === "fast-stream-v1" && answer?.mode === "openai" &&
@@ -828,7 +833,8 @@ export function immutableResearchAnswer({
     !suppliedTextAnswer &&
     !investigatedEvidenceGapAnswer &&
     !conversationEvidenceGap &&
-    !fastUnreviewed
+    !fastUnreviewed &&
+    !experimentalUnreviewed
   ) {
     throw new Error("Research answers require citations.");
   }

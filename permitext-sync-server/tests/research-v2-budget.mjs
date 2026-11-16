@@ -36,5 +36,11 @@ try{
   const settled=await comparison.settle(comparisonID,{usage:{input_tokens:1000,output_tokens:1000,input_tokens_details:{cached_tokens:500}}});
   assert.equal(settled.chargedMicroUSD,11050,'Comparison uses Sol pricing, not Luna pricing');
   await assert.rejects(comparison.reserve({...body,model:'gpt-6.1-sol'},'draft'),/approved Luna/);
+  const experiment=createResearchV2Budget({path:join(scratch,'experiment.json'),limitUSD:1});
+  const webID=await experiment.reserveExperimental({...body,tools:[{type:'web_search'}],max_tool_calls:4},'web');
+  assert((await experiment.summary()).accountedUSD>.2,'Reserve search context and all four tool calls');
+  const webCharge=await experiment.settle(webID,{usage:{input_tokens:1000,output_tokens:100},output:[{type:'web_search_call'}]});
+  assert.equal(webCharge.chargedMicroUSD,10150,'Include web tool charge plus model tokens');
+  await assert.rejects(experiment.reserveExperimental({...body,tools:[{type:'computer'}]},'bad'),/Invalid experimental/);
   console.log('Research v2 budget: $7 ceiling, atomic concurrent reservations, restart durability, token settlement, ambiguous failure accounting and Luna-only request limits passed.');
 }finally{await rm(scratch,{recursive:true,force:true});}

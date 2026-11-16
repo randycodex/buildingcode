@@ -44,8 +44,12 @@ export function researchV2Availability(env,userID){
 
 // The supplied provider owns durable application reservations, entitlements,
 // cumulative per-turn caps and accounting. Only local testing adds the $7 ledger.
-export function createResearchV2ApplicationCall({provider,apiKey,evaluationBudget}={}){
+export function createResearchV2ApplicationCall({provider,apiKey,evaluationBudget,experimental=false}={}){
   if(typeof provider!=='function')throw new Error('Research v2 requires an accounted application provider.');
+  if(experimental){
+    if(!evaluationBudget)throw new Error('Experimental Assistant is local-only and requires its durable budget.');
+    return async(body,{phase,signal}={})=>{signal?.throwIfAborted();const id=await evaluationBudget.reserveExperimental(body,phase);let payload;try{payload=await provider(body,signal);return payload;}finally{await evaluationBudget.settle(id,payload);}};
+  }
   if(evaluationBudget)return createLunaV2Client({apiKey,budget:evaluationBudget,transport:provider});
   return async(body,{signal}={})=>{signal?.throwIfAborted();assertLunaV2Request(body);return provider(body,signal);};
 }
