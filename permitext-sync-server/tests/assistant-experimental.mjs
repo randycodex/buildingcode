@@ -50,3 +50,13 @@ assert.equal(receivedQuery,'Resolved current subject');assert.equal(phases[0],'e
 const clarification=await runExperimentalAssistant({question:'Can it be smaller?',history:[{role:'assistant',text:'There are two possible objects.'}]},{searchLibrary:()=>assert.fail('No search for ambiguous intent'),call:async()=>message(JSON.stringify({question:'Can it be smaller?',subject:'Unclear',reference:'two objects',clarification:'Which of the two do you mean?'}))});
 assert.equal(clarification.text,'Which of the two do you mean?');
 console.log('Conversation: role-specific history, latest exchange, intent before retrieval, trace and ambiguity handling passed.');
+let recallIDs,recallStep=0;
+const recall=await runExperimentalAssistant({question:'Does the exception change that?',history:[{role:'user',question:'Earlier subject'},{role:'assistant',answer:{answerText:'Earlier answer [S1]'}}],
+ attachedSources:[{id:'S1',text:'Different currently attached source'}],priorEvidence:[{id:'R1',title:'Related exception'},{id:'R2',title:'Unrelated rule'}]}, {
+ recallEvidence:async ids=>{recallIDs=ids;return {sources:[{id:'S2',text:'Rehydrated related provision',recalledFrom:'R1'}],unavailable:[]};},
+ searchLibrary:()=>assert.fail('Recall can supply sufficient evidence without forced search'),call:async(body,{phase})=>{
+ if(phase==='experimental_intent'){assert.equal(JSON.parse(body.input).priorEvidence.length,2);return message(JSON.stringify({question:'Current exception',subject:'Related subject',reference:'latest',clarification:'',evidenceIDs:['R1','R1','invented']}));}
+ recallStep++;const ctx=JSON.parse(body.input[0].content);assert.equal(ctx.earlierEvidence[0].id,'S2');assert.equal(ctx.attachedPassages[0].id,'S1');return message('The exception changes it. [S2]');
+ }});
+assert.deepEqual(recallIDs,['R1']);assert.equal(recallStep,1);assert.match(recall.text,/\[S2\]/);assert.equal(recall.trace[1].tool,'recall_evidence');
+console.log('Evidence recall: selection before answer, unrelated/invalid IDs excluded, deduplication, separate attachments and fresh citation identities passed.');

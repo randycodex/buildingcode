@@ -2,7 +2,7 @@
 import {writeFile} from 'node:fs/promises';
 import {resolveExperimentalIntent} from '../assistant-experimental.mjs';
 import {createResearchV2Budget} from '../research-v2-budget.mjs';
-import {contextCases} from '../tests/assistant-conversation-cases.mjs';
+import {contextCases,contextEvidenceCatalog} from '../tests/assistant-conversation-cases.mjs';
 const {OPENAI_API_KEY,PERMITEXT_RESEARCH_V2_BUDGET_PATH}=process.env;
 if(!OPENAI_API_KEY||!PERMITEXT_RESEARCH_V2_BUDGET_PATH)throw new Error('Provide the API key and existing evaluation-budget ledger explicitly.');
 const budget=createResearchV2Budget({path:PERMITEXT_RESEARCH_V2_BUDGET_PATH});
@@ -14,7 +14,7 @@ const call=async(body,{phase,signal})=>{
 };
 const results=[];
 for(const [name,turns,question] of contextCases){
- const started=Date.now();const {intent}=await resolveExperimentalIntent({question,conversation:turns.map((content,i)=>({role:i%2?'assistant':'user',content})),projectContext:{occupancy:'R-2',roof:'occupied terrace'}},call,AbortSignal.timeout(60000));
+ const started=Date.now();const {intent}=await resolveExperimentalIntent({question,conversation:turns.map((content,i)=>({role:i%2?'assistant':'user',content})),projectContext:{occupancy:'R-2',roof:'occupied terrace'},priorEvidence:contextEvidenceCatalog},call,AbortSignal.timeout(60000));
  results.push({name,intent,milliseconds:Date.now()-started});console.log(JSON.stringify(results.at(-1)));
 }
 if(process.argv[2])await writeFile(process.argv[2],JSON.stringify(results,null,2));

@@ -21317,10 +21317,34 @@ async function handleResearchConversationMessage(request, response) {
       const fastGenerationStartedAt = performance.now();
       let firstTextMilliseconds = null, v2Result = null, experimentalResult = null, providerPayloads;
       if (experimentalAssistant) {
-        experimentalResult=await runExperimentalAssistant({question,history:activeMessages,
+        const activeAnswerIDs=activeMessages.filter(m=>m.role==='assistant').map(m=>m.id);
+        const priorRecords=activeAnswerIDs.length?await listStoredResearchAnswers(context.userID,{ids:activeAnswerIDs}):[];
+        const priorEvidence=[];
+        for(const record of priorRecords.filter(r=>r.conversationID===conversation.id&&activeAnswerIDs.includes(r.id))){
+          for(const snapshot of record.evidence||[]){
+            if(priorEvidence.some(s=>s.sectionID===snapshot.sectionID&&s.codeVersion===snapshot.sourceLibraryVersion))continue;
+            priorEvidence.push({id:`R${priorEvidence.length+1}`,sectionID:snapshot.sectionID,sourceID:snapshot.sourceID,codeVersion:snapshot.sourceLibraryVersion,
+              title:`${snapshot.codeBook} ${snapshot.sectionNumber}`,summary:snapshot.passageText.slice(0,500),priorQuestion:record.question});
+          }
+        }
+        experimentalResult=await runExperimentalAssistant({question,history:activeMessages,priorEvidence,
           projectContext:conversationScope?.includeProjectContext?conversationScope.projectContext:null,
           attachedSources:sources,privateIdentifiers:[projectInformation?.name,projectInformation?.address]}, {
           call:v2Call,signal:progressResponse.signal,
+          recallEvidence:async(ids,signal)=>{
+            const recalled=[],unavailable=[];
+            for(const id of ids){
+              signal.throwIfAborted();const prior=priorEvidence.find(s=>s.id===id);if(!prior)continue;
+              const [canonical]=await researchEvidenceForSectionIDs([prior.sectionID],{allowOptInCorpora:true});
+              const source=canonical?{...canonical,sourceID:canonical.sourceID||prior.sourceID,origin:"conversation_recall",retrievalReason:"Relevant evidence from an earlier active conversation turn"}:null;
+              if(!source||source.codeVersion!==prior.codeVersion){unavailable.push({id,reason:'Original library identity or edition is no longer available; search again.'});continue;}
+              let index=evidence.findIndex(s=>s.sectionID===source.sectionID&&s.codeVersion===source.codeVersion);
+              if(index<0){index=evidence.length;evidence.push(source);sources.push(await bindAnswerSource(source,index));
+                snapshots.push(immutableEvidenceSnapshot({source,approvedAt:now,evidenceSetVersion:Number(conversation.evidenceSetVersion||1),sourceLibraryVersion:source.codeVersion}));}
+              recalled.push({...sources[index],recalledFrom:id});
+            }
+            return {sources:recalled,unavailable};
+          },
           onStage:stage=>progressResponse.progress(stage==='searching'?'searching_authorized_library':'preparing_conclusion','active'),
           searchLibrary:async(query,signal)=>{
             signal.throwIfAborted();

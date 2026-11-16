@@ -1,0 +1,100 @@
+[
+  {
+    "name": "stairs",
+    "intent": {
+      "question": "Does the residential occupancy of the building affect whether its two stairs may be located next to each other?",
+      "subject": "Required separation between the two stairs serving the roof",
+      "reference": "The immediately preceding exchange about whether both stairs can be next to each other; the user clarifies that the building is residential.",
+      "clarification": "",
+      "evidenceIDs": [
+        "R1"
+      ]
+    },
+    "ms": 2162
+  },
+  {
+    "name": "pronoun",
+    "intent": {
+      "question": "Can the corridor or the restroom door be made narrower while complying with applicable NYC code requirements?",
+      "subject": "Restroom door and corridor width",
+      "reference": "The immediately preceding exchange about a restroom door swinging into a corridor and its effect on encroachment and egress width.",
+      "clarification": "Do you mean making the corridor narrower or making the restroom door narrower?",
+      "evidenceIDs": []
+    },
+    "ms": 3749
+  },
+  {
+    "name": "correction",
+    "intent": {
+      "question": "Under NYC code, does the duct penetration through an exterior wall require a fire damper, and what exceptions may apply?",
+      "subject": "Fire damper requirements for a duct penetrating an exterior wall",
+      "reference": "The duct in the immediately preceding exchange; the user clarified that it passes through an exterior wall, not a shaft.",
+      "clarification": "",
+      "evidenceIDs": [
+        "R2"
+      ]
+    },
+    "ms": 2890
+  },
+  {
+    "name": "earlier",
+    "intent": {
+      "question": "Under NYC requirements, how are visitor bicycle parking spaces counted toward the required bicycle spaces?",
+      "subject": "Bicycle parking requirements",
+      "reference": "The earlier question about how many bicycle spaces are required, and the answer that the requirement depends on use and floor area.",
+      "clarification": "",
+      "evidenceIDs": [
+        "R3"
+      ]
+    },
+    "ms": 3799
+  },
+  {
+    "name": "citation",
+    "intent": {
+      "question": "What NYC code provisions govern whether a bedroom may open only onto a court, including applicable court-dimension and light-and-air requirements?",
+      "subject": "A bedroom opening only onto a court",
+      "reference": "The immediately preceding assistant answer\u2019s statement that court dimensions and light-and-air requirements matter.",
+      "clarification": "",
+      "evidenceIDs": [
+        "R4"
+      ]
+    },
+    "ms": 3489
+  },
+  {
+    "name": "hypothetical",
+    "intent": {
+      "question": "For an existing building in NYC, can the shop entrance have one step, considering accessible-entrance requirements and any applicable exceptions?",
+      "subject": "A step at the shop entrance of an existing building",
+      "reference": "\u201cIt\u201d refers to the shop entrance and the possibility of having one step, from the immediately preceding exchange.",
+      "clarification": "",
+      "evidenceIDs": [
+        "R5"
+      ]
+    },
+    "ms": 3187
+  },
+  {
+    "name": "new-topic",
+    "intent": {
+      "question": "What permits are required for a sidewalk shed in New York City?",
+      "subject": "Sidewalk shed permits",
+      "reference": "The user explicitly introduces a new, unrelated topic: permits for a sidewalk shed.",
+      "clarification": "",
+      "evidenceIDs": []
+    },
+    "ms": 3703
+  },
+  {
+    "name": "ambiguous",
+    "intent": {
+      "question": "Can the lobby or vestibule be made smaller?",
+      "subject": "Minimum dimensions of a lobby or vestibule",
+      "reference": "\u201cCan I make it smaller?\u201d refers to the lobby or vestibule in the immediately preceding exchange.",
+      "clarification": "Do you mean the lobby, the vestibule, or both?",
+      "evidenceIDs": []
+    },
+    "ms": 3685
+  }
+]

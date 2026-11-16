@@ -21,10 +21,12 @@ globalThis.fetch=async(url,options)=>{
  if(String(url)!=='https://api.openai.com/v1/responses')return nativeFetch(url,options);
  calls++;const body=JSON.parse(options.body);let output;
  const text=t=>[{type:'message',role:'assistant',content:[{type:'output_text',text:t}]}];
- if(body.text?.format?.name==='assistant_conversational_intent')output=text(JSON.stringify({question:JSON.parse(body.input).currentQuestion,subject:'Current question',reference:'latest exchange',clarification:''}));
+ if(body.text?.format?.name==='assistant_conversational_intent'){const c=JSON.parse(body.input);if(c.currentQuestion==='Reconsider earlier evidence')assert(c.priorEvidence.length>0);output=text(JSON.stringify({question:c.currentQuestion,subject:'Current question',reference:'latest exchange',clarification:'',evidenceIDs:c.currentQuestion==='Reconsider earlier evidence'?[c.priorEvidence.at(-1).id]:[]}));}
  else if(body.tools?.some(t=>t.type==='web_search'))output=[{type:'web_search_call',action:{type:'search'}},{type:'message',role:'assistant',content:[{type:'output_text',text:'Public source finding.',annotations:[{type:'url_citation',url:'https://www.nyc.gov/example',title:'Official example'}]}]}];
  else if(Array.isArray(body.input)){
-  if(body.input.at(-1).type==='function_call_output')output=text('The public source says this. [W1]');
+  if(body.input.at(-1).type==='function_call_output'){const r=JSON.parse(body.input.at(-1).output);output=text(r.sources?.[0]?.id?.startsWith('S')?'A retrieved rule. [S1]':'The public source says this. [W1]');}
+  else if(JSON.parse(body.input[0].content).question==='Find provisions')output=[{type:'function_call',call_id:'library-1',name:'search_library',arguments:JSON.stringify({query:'2022 NYC BC 1007.1.1 403.5.1 remoteness interior exit stairways'})}];
+  else if(JSON.parse(body.input[0].content).question==='Reconsider earlier evidence'){const recalled=JSON.parse(body.input[0].content).earlierEvidence;assert(recalled.length>0);output=text(`A recalled rule. [${recalled[0].id}]`);}
   else if(JSON.parse(body.input[0].content).question==='Use web')output=[{type:'function_call',call_id:'web-1',name:'search_web',arguments:JSON.stringify({query:'NYC public code'})}];
   else output=text('Your project context is available.');
  }else output=text(JSON.stringify(body.text.format.name==='permitext_v2_review'?{pass:true,issues:[]}:{answerText:'These are recorded project facts.',claims:[],missingSources:[],missingFacts:[]}));
@@ -61,6 +63,11 @@ try{
  const before=calls;await send('Use web','experimental','web');assert.equal(calls,before,'Replay must not spend twice');
  await send('Summarize project facts.');assert.equal(conversation.messages.at(-1).answer.verification.status,'unreviewed');
  await send('Summarize the recorded Project facts.','current');assert.equal(conversation.messages.at(-1).answer.verification.pass,true,'Current mode still uses its reviewer');
+ await send('Find provisions');
+ await send('Reconsider earlier evidence');
+ const recalledRecord=(await post('/research/answers/get',{answerID:conversation.messages.at(-1).id})).answer;
+ assert(recalledRecord.experimentalResearchTrace.some(t=>t.tool==='recall_evidence'&&t.result.sources.length));
+ assert(recalledRecord.evidence.length);assert(conversation.messages.at(-1).answer.citations.length);
  process.env.PERMITEXT_ASSISTANT_EXPERIMENTAL='0';await send('Use web','experimental','disabled-again',403);
  console.log('PASS experimental HTTP: local gate, web-only and context-only persistence, genuine web links, unreviewed provenance, replay, and switch back to Current; no paid calls.');
 }finally{globalThis.fetch=nativeFetch;server?.closeAllConnections();if(server)await new Promise(resolve=>server.close(resolve));await rm(directory,{recursive:true,force:true});}

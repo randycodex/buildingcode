@@ -9,3 +9,11 @@ export const contextCases=[
  ['new-topic',['Can the two exits be adjacent?','Separation matters.'],'Unrelated: what permits do I need for a sidewalk shed?'],
  ['ambiguous',['Can I reduce the lobby or the vestibule?','Both have different minimum dimensions.'],'Can I make it smaller?']
 ];
+// Synthetic catalog labels used only to evaluate relevance selection, not legal content.
+export const contextEvidenceCatalog=[
+ {id:'R1',title:'Exit stair separation: special building provisions',summary:'Remoteness of interior exit stairways; occupancy exception.'},
+ {id:'R2',title:'Duct fire damper exceptions at exterior walls',summary:'Requirements and exceptions for duct penetrations.'},
+ {id:'R3',title:'Bicycle parking counting rules',summary:'Required resident and visitor bicycle spaces.'},
+ {id:'R4',title:'Light and air for rooms opening onto courts',summary:'Court dimensions and bedroom openings.'},
+ {id:'R5',title:'Accessible entrances in existing buildings',summary:'Alterations, existing entrances and exceptions.'}
+];
