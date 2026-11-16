@@ -3074,3 +3074,12 @@ export async function assembleResearchEvidence({
     }
   };
 }
+
+// Canonical sections nominated through library navigation use the same source
+// records and table binding as search-discovered sections. Never clip authority.
+export function assistantNavigatedSource(value) {
+  const text=canonicalText(value);
+  if(!text||!value.sectionID||!value.codeVersion)throw new Error('Canonical navigation source is unavailable.');
+  return sourceRecord(value,{origin:'permitext_discovered',sourceID:`assistant-navigation-${value.codeVersion}-${value.sectionID}`,
+    relationship:'Governing provision located through the library chapter headings.',characterAllowance:text.length,canonicalResolved:true});
+}

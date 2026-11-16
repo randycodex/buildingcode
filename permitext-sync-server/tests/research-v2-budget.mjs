@@ -30,5 +30,11 @@ try{
   assert((await uncertain.summary()).accountedUSD>0,'Ambiguous failure retains its full reservation');
   await assert.rejects(uncertain.reserve({...body,model:'gpt-6-sol'},'draft'),/approved Luna/);
   await assert.rejects(uncertain.reserve({...body,tools:[{type:'web_search'}]},'draft'),/approved Luna/);
+  await assert.rejects(budget.reserveComparison({...body,model:'gpt-6.1-sol'}),{code:'V2_BUDGET_EXHAUSTED'});
+  const comparison=createResearchV2Budget({path:join(scratch,'comparison.json'),limitUSD:1});
+  const comparisonID=await comparison.reserveComparison({...body,model:'gpt-6.1-sol'});
+  const settled=await comparison.settle(comparisonID,{usage:{input_tokens:1000,output_tokens:1000,input_tokens_details:{cached_tokens:500}}});
+  assert.equal(settled.chargedMicroUSD,11050,'Comparison uses Sol pricing, not Luna pricing');
+  await assert.rejects(comparison.reserve({...body,model:'gpt-6.1-sol'},'draft'),/approved Luna/);
   console.log('Research v2 budget: $7 ceiling, atomic concurrent reservations, restart durability, token settlement, ambiguous failure accounting and Luna-only request limits passed.');
 }finally{await rm(scratch,{recursive:true,force:true});}

@@ -87,6 +87,15 @@ export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitU
         requestBody.max_output_tokens * lunaV2Pricing.reservationOutput);
       return reserve({phase, model: requestBody.model, pricingVersion: lunaV2Pricing.version}, reservedMicroUSD);
     },
+    // Isolated same-evidence evaluations only; application calls remain Luna-only.
+    async reserveComparison(body) {
+      if(body.model!=='gpt-6.1-sol'||body.service_tier!=='default'||body.store!==false||body.tools?.length||body.background||
+        !Number.isSafeInteger(body.max_output_tokens)||body.max_output_tokens<1||body.max_output_tokens>8192||Buffer.byteLength(JSON.stringify(body))>180000)
+        throw error('Comparison request exceeds local evaluation limits.','V2_REQUEST_LIMIT');
+      return reserve({kind:'comparison',phase:'same-evidence-comparison',model:body.model,pricingVersion:'openai-standard-20261115',
+        pricingSource:'https://developers.openai.com/api/docs/changelog'},
+        Math.ceil((Buffer.byteLength(JSON.stringify(body))+8192)*5+body.max_output_tokens*10));
+    },
     async reserveEmbedding(body) {
       if (body?.model !== researchSemanticEmbeddingModel || body?.dimensions !== researchSemanticEmbeddingDimensions ||
           body?.encoding_format !== 'float' || !Array.isArray(body.input) || !body.input.length || body.input.length > 128 ||
@@ -101,7 +110,12 @@ export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitU
         const call = ledger.calls.find(item => item.id === id);
         if (!call || call.status !== 'reserved') throw error('Unknown or completed budget reservation.', 'V2_BUDGET_RESERVATION');
         const embeddingCost = call.kind === 'embedding' ? researchSemanticEmbeddingCost(payload?.usage) : null;
-        const actual = call.kind === 'embedding' ? (embeddingCost === null ? null : micros(embeddingCost)) : lunaUsageMicroUSD(payload);
+        let actual = call.kind === 'embedding' ? (embeddingCost === null ? null : micros(embeddingCost)) : lunaUsageMicroUSD(payload);
+        if(call.kind==='comparison') {
+          const u=payload?.usage,cached=u?.input_tokens_details?.cached_tokens||0,writes=u?.input_tokens_details?.cache_write_tokens||0;
+          actual=u&&[u.input_tokens,u.output_tokens,cached,writes].every(n=>Number.isSafeInteger(n)&&n>=0)&&cached<=u.input_tokens
+            ? Math.ceil((u.input_tokens-cached)*2+cached*.1+u.output_tokens*10+writes*2.5):null;
+        }
         call.chargedMicroUSD = actual ?? call.reservedMicroUSD;
         call.status = actual === null ? 'uncertain' : 'settled';
         call.completedAt = new Date().toISOString();

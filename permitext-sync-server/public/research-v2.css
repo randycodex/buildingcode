@@ -92,6 +92,8 @@ ul.rv2-answer-list{list-style-type:disc}ol.rv2-answer-list{list-style-type:decim
 .research-v2 .rv2-send{font-size:20px;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--text-primary);color:var(--surface);padding:0;margin-left:auto}
 .rv2-status{font-size:12px;color:var(--text-secondary);margin:4px 0 10px;overflow-wrap:anywhere}
 .rv2-status.is-error{color:var(--destructive)}
+.rv2-pending-turn>.rv2-user{margin-bottom:14px}
+.rv2-turn-status{margin:0 0 22px;padding:0 19px}
 .rv2-detail{flex:1;min-height:0;overflow:auto;padding:15px 0 20px;overflow-wrap:anywhere}
 .rv2-detail h3{font-size:17px;font-weight:500}.rv2-detail h4{font-size:13px;font-weight:500;margin:18px 0 4px}
 .rv2-detail .rv2-snapshot-title{font-size:15px;margin:8px 0 12px}

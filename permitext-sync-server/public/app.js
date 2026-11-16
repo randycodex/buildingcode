@@ -5,7 +5,7 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, open
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=49";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=50";
 import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=7";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261115-numbered-answer-sources-v1923";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261115-inline-answer-progress-v1924";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=12";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261115-numbered-answer-sources-v1923";
+} from "./offline-storage.js?v=20261115-inline-answer-progress-v1924";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,

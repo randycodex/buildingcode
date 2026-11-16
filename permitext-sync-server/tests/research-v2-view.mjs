@@ -140,14 +140,57 @@ find('Review in Reader').handlers.click();await tick();
 assert.equal(send.disabled,true);
 input.handlers.keydown({key:'Enter',preventDefault(){}});assert.equal(sent.length,0,'Enter cannot submit during passage review');
 review.resolve({selection:source});await tick();assert.equal(send.disabled,false);
-send.handlers.click();await tick();assert.equal(sent.length,1);
+send.handlers.click();
+assert.equal(input.value,'','Sending clears the visible composer before the network request can finish');
+assert.equal(input.disabled,true);
+assert.equal(draft,'Explain this.','The recovery draft remains durable until the answer is saved');
+assert.equal(savedRequest.question,'Explain this.');
+await tick();assert.equal(sent.length,1);
 assert.equal(view.element.querySelector('.rv2-thread').hidden,false,'Send restores the conversation from the source detail view');
+const pendingTurn=view.element.querySelector('.rv2-pending-turn');
+const turnStatus=view.element.querySelector('.rv2-turn-status');
+assert.equal(pendingTurn.parent,thread);
+assert.equal(pendingTurn.children[0].textContent,'Explain this.');
+assert.equal(pendingTurn.children[1],turnStatus,'Progress follows the submitted question inside the conversation');
+assert.equal(turnStatus.attributes.role,'status');assert.equal(turnStatus.attributes['aria-live'],'polite');
+assert.equal(turnStatus.textContent,'Preparing your answer…');
+sent[0].onProgress({stage:'generating_answer'});assert.equal(turnStatus.textContent,'Developing your answer…');
+sent[0].onProgress({stage:'checking_citation_support'});assert.equal(turnStatus.textContent,'Checking the answer against the sources…');
+assert(all(view.element).filter(element=>element.className==='rv2-status').every(element=>element.hidden),'Generation notices never occupy the space above the composer');
 find('Sources used').handlers.click();await tick();assert.equal(snapshots,0,'Source inspection cannot invalidate the active request');
 flight.reject(new Error('Network interrupted'));await tick();
 assert.equal(draft,'Explain this.');assert.match(view.element.querySelector('.rv2-status').textContent,/Network interrupted/);
+assert.equal(input.value,'Explain this.','A failed request restores the question for editing or retry');
+assert.equal(turnStatus.textContent,'Network interrupted');assert.equal(turnStatus.hidden,false);
 const firstID=sent[0].requestID;flight=deferred();send.handlers.click();await tick();assert.equal(sent[1].requestID,firstID,'Retry preserves the request identity');
-current=false;flight.resolve();await tick();assert.equal(draft,'Explain this.','Late completion cannot clear a different account or conversation draft');
+assert.equal(all(view.element).filter(element=>element.className==='rv2-pending-turn').length,1,'Retry replaces the pending exchange instead of duplicating the question');
+const activeStatus=view.element.querySelector('.rv2-turn-status');
+current=false;sent[1].onProgress({stage:'checking_citation_support'});
+assert.equal(activeStatus.textContent,'Preparing your answer…','Late progress cannot change a different account or conversation');
+flight.resolve();await tick();assert.equal(draft,'Explain this.','Late completion cannot clear a different account or conversation draft');
 view.dispose();
+{
+ let retainedDraft='  Keep my question.\n',request=null,attempts=[];
+ const stopped=createResearchV2View({conversation:{id:'stop-and-retry',sources:[source],messages:[]},initialDraft:retainedDraft,
+  onDraft:value=>{retainedDraft=value;},requestStore:{read:()=>request,write:value=>{request=value;}},
+  onSend:args=>{attempts.push(args);return new Promise((resolve,reject)=>{
+    args.signal.addEventListener('abort',()=>reject(Object.assign(Error('Aborted'),{name:'AbortError'})));
+    args.complete=resolve;
+  });}});
+ const stoppedInput=stopped.element.querySelector('.rv2-input');
+ stopped.element.querySelector('.rv2-send').handlers.click();
+ all(stopped.element).find(element=>element.textContent==='Stop').handlers.click();await tick();
+ assert.equal(stoppedInput.value,'  Keep my question.\n','Stop restores the exact draft including whitespace');
+ assert.equal(retainedDraft,stoppedInput.value);assert.equal(stoppedInput.disabled,false);
+ assert.equal(stopped.element.querySelector('.rv2-turn-status').textContent,'Stopped. Your draft and passages are retained.');
+ const stoppedRequestID=request.requestID;
+ stopped.element.querySelector('.rv2-send').handlers.click();
+ assert.equal(stoppedInput.value,'');assert.equal(attempts[1].requestID,stoppedRequestID);
+ attempts[1].complete();await tick();
+ assert.equal(stoppedInput.value,'');assert.equal(retainedDraft,'');assert.equal(request,null);
+ assert.equal(stopped.element.querySelector('.rv2-turn-status').hidden,true,'Completed requests remove the generation notice');
+ assert.equal(stoppedInput.disabled,false);stopped.dispose();
+}
 const reviewAttempts=[];let persistedReviewRequest=null;
 const rejectedView=createResearchV2View({conversation:{id:'review-retry',sources:[source],messages:[]},initialDraft:'Explain the table.',onDraft(){},isCurrent:()=>true,
  requestStore:{read:()=>persistedReviewRequest,write:value=>{persistedReviewRequest=value;}},

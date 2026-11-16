@@ -62,3 +62,29 @@ assert.equal(calls[0].body.reasoning.effort,'medium');
 for(const call of calls)assert.match(call.body.instructions,/hypothetical/i,'Both writer and reviewer distinguish stipulated inputs from verified Project facts');
 assert.match(result.draft.answerText,/retry|one part/i,'A rejected answer gives an actionable recovery without publishing unchecked claims');
 console.log('Research v2 engine: frozen passage-only inputs, Luna-only calls, citation identity gate, fresh repair review, bounded failure and cancellation passed.');
+
+const assistantRequests=[];
+await runResearchV2(input,{assistantDiscovery:true,call:async(body,meta)=>{
+  assistantRequests.push(body);
+  return payload(meta.phase==='review'?{pass:true,issues:[]}:draft);
+}});
+assert(assistantRequests.every(body=>body.instructions.includes('experienced NYC architectural code-research colleague')));
+assert(assistantRequests.every(body=>body.instructions.includes('never invent authority')));
+const formalRequests=[];
+await runResearchV2(input,{call:async(body,meta)=>{
+  formalRequests.push(body);
+  return payload(meta.phase==='review'?{pass:true,issues:[]}:draft);
+}});
+assert(formalRequests.every(body=>!body.instructions.includes('conversational Assistant research')),
+  'Conversational instructions must not loosen the formal workflow.');
+
+let lookups=0;const expandedSource={...source,id:'S2',sectionID:'2',text:'The complete governing rule is supplied here.'};
+const discovered=await runResearchV2(input,{assistantDiscovery:true,retrieveMissingSources:async gaps=>{
+  lookups++;assert.deepEqual(gaps,['Governing table']);return [source,expandedSource];
+},call:async(body,meta)=>{
+  const input=JSON.parse(body.input),evidence=input.evidence||input;
+  if(meta.phase==='review'){assert.equal(evidence.sources.length,2);return payload({pass:true,issues:[]});}
+  return payload(evidence.sources.length===1?{...draft,missingSources:['Governing table']}:draft);
+}});
+assert.equal(lookups,1);assert.equal(discovered.packet.sources.length,2);
+assert.equal(discovered.payloads.length,3,'Accounting includes the discarded exploratory draft');

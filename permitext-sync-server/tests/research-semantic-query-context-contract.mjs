@@ -483,3 +483,9 @@ assert.match(blockedDrainContext, /8-foot primary drain run with a half-inch fal
 assert.match(blockedDrainContext, /not real project conditions/);
 assert.doesNotMatch(blockedDrainContext, /Stories Above Grade|85-foot-high|flat roof|sprinkler protection/,
   "Overflow protection is the saved equipment subject; generic 'protection' cannot nominate sprinkler/roof premises.");
+
+const fictionalProject = ["Additional Project facts (user wording; not independently verified): Fictional example: proposed new apartment building in assumed R7A/C2-4 with 56 apartments. Zoning floor area 37600 SF and lot area 8000 SF."];
+const fictionalContext = semanticResearchProjectFacts({question:"Can I build this much floor area here?", projectFacts:fictionalProject});
+assert.match(fictionalContext, /R7A/);
+assert.match(fictionalContext, /Fictional|assumed/i, "Search hints must preserve the hypothetical qualification.");
+assert.doesNotMatch(semanticResearchProjectFacts({question:"Return to the actual project, not the fictional example. What floor area is allowed?", projectFacts:fictionalProject}), /R7A/);

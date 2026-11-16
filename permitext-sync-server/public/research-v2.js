@@ -137,7 +137,7 @@ export function createResearchV2View(options) {
   mobileHistory.setAttribute('aria-expanded','false');
   let thread=node('div','rv2-thread');thread.setAttribute('aria-label','Conversation');
   const status=node('p','rv2-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.hidden=true;
-  let busy=false,controller=null,generation=0,lastRequest=options.requestStore?.read() || null,includeBusy=false,pendingBubble=null,revealBusy=false,revealEntry=null,revealController=null,chatTransitionPending=false;
+  let busy=false,controller=null,generation=0,lastRequest=options.requestStore?.read() || null,includeBusy=false,pendingTurn=null,revealBusy=false,revealEntry=null,revealController=null,chatTransitionPending=false;
   const revealTokens=[];
   function notice(text,error=false){if(disposed)return;status.hidden=!text;status.textContent=text;status.classList.toggle('is-error',error);onStatus?.(text);}
   function valid(attempt){return attempt===generation&&isCurrent()&&root.isConnected;}
@@ -399,22 +399,31 @@ export function createResearchV2View(options) {
   async function sendQuestion(){
     if(busy||includeBusy||revealBusy||operationPending()||!input.value.trim())return;
     if(!passageSources.length&&!projectContext?._projectContextOptions?.enabled()){await findPassages();return;}
-    const question=input.value.trim();
+    const submittedDraft=input.value,question=submittedDraft.trim();
     if(!lastRequest||lastRequest.question!==question)lastRequest={question,requestID:crypto.randomUUID()};
     options.requestStore?.write(lastRequest);
-    const attempt=++generation;busy=true;detail.hidden=true;thread.hidden=false;controller=new AbortController();update();notice('Preparing your answer…');
+    const attempt=++generation;busy=true;detail.hidden=true;thread.hidden=false;controller=new AbortController();notice('');
     thread.querySelector('.rv2-welcome')?.setAttribute('hidden','');
-    pendingBubble?.remove();pendingBubble=node('div','rv2-user',question);thread.append(pendingBubble);thread.scrollTop=thread.scrollHeight;
+    pendingTurn?.remove();pendingTurn=node('div','rv2-pending-turn');
+    const turnStatus=node('p','rv2-status rv2-turn-status');
+    turnStatus.setAttribute('role','status');turnStatus.setAttribute('aria-live','polite');
+    const turnNotice=(text,error=false)=>{
+      turnStatus.hidden=!text;turnStatus.textContent=text;turnStatus.classList.toggle('is-error',error);onStatus?.(text);
+    };
+    pendingTurn.append(node('div','rv2-user',question),turnStatus);thread.append(pendingTurn);
+    // Clear the visible composer now; retain its durable draft/request until
+    // success so failures, stops and interrupted sessions remain recoverable.
+    input.value='';update();turnNotice('Preparing your answer…');thread.scrollTop=thread.scrollHeight;
     try{await onSend({...lastRequest,signal:controller.signal,onProgress:event=>{
-      if(valid(attempt))notice(event.stage==='checking_citation_support'?'Checking the answer against your passages…':'Developing your answer…');
-    }});if(valid(attempt)){onDraft('');lastRequest=null;options.requestStore?.write(null);}}
-    catch(error){if(valid(attempt)){pendingBubble?.remove();pendingBubble=null;thread.querySelector('.rv2-welcome')?.removeAttribute('hidden');notice(error.name==='AbortError'?'Stopped. Your draft and passages are retained.':error.message,true);
+      if(valid(attempt))turnNotice(event.stage==='checking_citation_support'?'Checking the answer against the sources…':/search|retriev|discover/.test(event.stage)?'Finding relevant code for your question…':'Developing your answer…');
+    }});if(valid(attempt)){turnNotice('');onDraft('');lastRequest=null;options.requestStore?.write(null);}}
+    catch(error){if(valid(attempt)){input.value=submittedDraft;update();turnNotice(error.name==='AbortError'?'Stopped. Your draft and passages are retained.':error.message,true);
       if((error.payload?.code||error.code)==='V2_REVIEW_FAILED'){
         // A definitive failed review is not an uncertain in-flight request.
         // An explicit retry gets a new identity and the same visible inputs.
         lastRequest=null;options.requestStore?.write(null);
         const retry=action('Retry answer',()=>{retry.remove();void sendQuestion();},'rv2-text-action');
-        status.append(retry);
+        turnStatus.append(retry);
       }
     }}
     finally{busy=false;controller=null;update();}

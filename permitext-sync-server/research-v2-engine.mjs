@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import {researchTableFootnotes, researchSelectedTables, researchFootnoteScopeIssues, tableFootnoteInstruction} from './research-table-footnotes.mjs';
 
-export const researchV2Version = 'research-v2-20261112-r11';
+export const researchV2Version = 'research-v2-20261115-r13';
 const fail = (message, code = 'V2_INVALID_INPUT') => Object.assign(new Error(message), { code });
 const stringList = { type: 'array', items: { type: 'string' } };
 export const researchV2DraftSchema = { type: 'object', additionalProperties: false,
@@ -20,7 +20,13 @@ const boundary = `You are per codes, an evidence-bounded code passage assistant.
 const writer = boundary + ` Answer the user's actual question directly and concisely. Include supplied [S1] style citation identifiers next to claims supported by the passages; do not invent IDs, URLs, quotes, rules, or values. Preserve all material conditions, exceptions, units, thresholds, table qualifications, and optional versus mandatory distinctions. Retain each clause’s mandatory, permissive, or prohibitory force (shall, may, shall not); do not substitute “may be” for “shall be.” Keep separate rules for different devices or contexts distinct. When stating a general limit, identify adjacent source rules that give a different limit for a particular device or context. If you mention an exception, retain its material conditions; do not summarize several exceptions as sharing an effect unless the text gives that effect to each one. Use the source’s technical terms for each particular requirement; do not carry a qualifier from an adjacent requirement into a different one without support. Apply the latest explicit user correction over earlier statements. If a stated fact rules out an exception, do not list that exception’s applicability as an unresolved fact. Put a short direct answer first, then reasoning and limitations in plain paragraphs or short bullets. Use no Markdown headings. The claims array maps each substantive source-based claim to supporting IDs. Every claims.text statement must retain the same material conditions and exception qualifications as the narrative; a caveat elsewhere does not qualify an unqualified claim in this array. Return the complete proposed answer in answerText; missingSources and missingFacts contain only information material to this question.`;
 const reviewer = boundary + ` Independently review the ENTIRE proposed answer against the user's question and this exact evidence package. Check substantive support for every claim and citation, omitted conditions and exceptions, table footnotes, definitions, edition conflicts, units, mathematical comparisons, invented project facts, and whether a purported missing requirement is actually relevant. Review all answer text, not just the claims array. A bounded explanation can pass with explicit unresolved applicability. Do not demand evidence irrelevant to the question. A pass is an AI review result, not proof of compliance. Return pass=true only if no material issue remains; otherwise identify every material issue you find in this single review, with specific repairable details. Continue checking the whole answer after finding an issue so the repair can address omissions, thresholds and applicability together. For a missing fact, identify the exact proposed conclusion that depends on it; distinguish an unsupported application from a conditional explanation that expressly leaves application unresolved. Do not rewrite the answer yourself.`;
 
-export function freezeResearchV2Turn({ question, sources, history = [], projectContextSnapshot = null } = {}) {
+
+// Assistant answers a design question; Formal Research retains the detailed
+// approval-oriented writer/reviewer contract above.
+const assistantWriter = boundary + ` Answer the architectural decision the user is asking about, using only the supplied provisions for legal requirements. Lead with the answer, then the few controlling reasons and inline [S1] citations. Apply stated design facts conditionally. You may explain an ordinary technical classification as an explicit working assumption; do not claim it is verified. A hypothetical is a scenario assumption, not a saved project fact. Preserve mandatory versus permissive language, applicable exceptions, thresholds, units, table footnotes and scope. Describe only exceptions material to this design or needed to explain the answer; do not recite irrelevant alternatives. Do not imply a proposed alternative complies without its material conditions. Never invent citations, legal rules or missing authority. Map substantive legal claims to supplied source IDs in claims, retaining their qualifications. MissingSources should identify governing authority needed to resolve this question, enabling a focused follow-up search; missingFacts should contain only facts that materially change the answer. Do not ask the user to find provisions. Use no Markdown headings.`;
+const assistantReviewer = boundary + ` Review the entire answer and its claim bindings against the supplied evidence for material errors: unsupported legal claims, incorrect citations, lost mandatory force, relevant exceptions or footnotes, wrong thresholds or units, conflicting editions, unsupported project facts and faulty arithmetic. Return pass=true only when no material error remains. Review the answer as preliminary architectural guidance, not as an exhaustive approval report. An explicit working assumption about the described design or ordinary technical classification can support a conditional answer; do not demand independent proof of a stipulated scenario. Require a legal definition when ambiguity in that definition could change the conclusion, not merely because an ordinary technical term appears. Do not demand unrelated compliance checks or an exhaustive list of alternatives that the answer does not propose. Do require all material conditions of an alternative the answer actually recommends. A clearly bounded conclusion may pass while precise missing governing authority remains unresolved. Identify all material errors in this review with specific repair instructions; do not rewrite the answer or add invented requirements. A pass is an AI evidence review, never professional approval.`;
+
+export function freezeResearchV2Turn({ question, sources, history = [], projectContextSnapshot = null, assistantIntent = null } = {}) {
   if (typeof question !== 'string' || question.trim().length < 3 || question.length > 2000) throw fail('Enter a question of 3–2,000 characters.');
   if (!Array.isArray(sources) || !sources.length && !projectContextSnapshot || sources.length > 24) throw fail('Include Reader passages or a Project context snapshot.');
   const ids = new Set();
@@ -43,6 +49,7 @@ export function freezeResearchV2Turn({ question, sources, history = [], projectC
       [message.answer?.conclusion,message.answer?.explanation].filter(Boolean).join('\n\n')),
     authority: message.role === 'user' ? 'user_statement' : 'not_source_authority' }));
   const packet = { version: researchV2Version, question: question.trim(), sources: selected, history: previous };
+  if (assistantIntent) packet.assistantIntent = structuredClone(assistantIntent);
   if (projectContextSnapshot) packet.projectContextSnapshot = structuredClone(projectContextSnapshot);
   // Prefer the unchanged selected text and reviewed facts if optional table
   // structure would push an otherwise valid turn over the existing budget.
@@ -91,9 +98,10 @@ export function parseResearchV2Payload(payload) {
   try { return JSON.parse(text); } catch { throw fail('Luna did not return the required answer format.', 'V2_PROVIDER_FORMAT'); }
 }
 
-export async function runResearchV2(input, { call, signal, onStage = () => {}, maxRepairRounds = 2 } = {}) {
+export async function runResearchV2(input, { call, signal, onStage = () => {}, maxRepairRounds = 2, assistantDiscovery = false, retrieveMissingSources = null } = {}) {
   if (typeof call !== 'function' || ![0,1,2].includes(maxRepairRounds)) throw fail('A bounded Luna provider is required.');
   const packet = freezeResearchV2Turn(input), payloads = [], reviews = [], startedAt = Date.now();
+  const colleagueInstruction = assistantDiscovery ? ` This is conversational Assistant research, not a formal approval report. If assistantIntent.clarification is nonempty, ask that one short clarification question without a legal conclusion, claims or invented citation. Search queries in assistantIntent are leads, never authority or facts. Resolve short follow-ups and pronouns from the latest conversational subject and explicit user corrections. A hypothetical changes only the scenario being discussed; do not imply it changed saved project information. Distinguish a change of scenario from a change of subject. When the referent is genuinely ambiguous, ask one precise clarification rather than silently choosing a consequential interpretation. For requests for the authority behind a prior answer, verify the prior claim against the current supplied source text instead of treating the prior answer as proof. Act as an experienced NYC architectural code-research colleague. The supplied sources were independently retrieved by the application; do not describe them as passages the user selected or ask the user to find code sections. Lead with the most useful supported answer applied conditionally to the active proposed design. Treat stated project inputs as assumptions for explanation, not verified facts; say the relevant assumption once. Separate existing property records from proposed work. Use short paragraphs or spaced bullets for independent findings, numbers only for ordered steps. Aim for about 150–250 words for a simple question, extending only for material conditions. Do not enumerate unrelated exceptions or repeat generic compliance disclaimers. A missing detail should qualify the particular conclusion it affects, not block other supported findings. The claims array contains only source-backed legal claims with nonempty supplied sourceIDs; project inputs and arithmetic belong in the narrative, not unreferenced claims. Cite only supplied source identifiers; never invent authority or present model knowledge as enacted law. If governing evidence is missing, identify the precise gap honestly. The review should check supported conditional conclusions without requiring independent verification of stipulated inputs or an exhaustive unrelated code review.` : '';
   const deadline = AbortSignal.timeout(240000);
   const combinedSignal = signal ? AbortSignal.any([signal,deadline]) : deadline;
   let draft = null, issues = [];
@@ -104,7 +112,7 @@ export async function runResearchV2(input, { call, signal, onStage = () => {}, m
   for (let round = 0; round <= maxRepairRounds; round++) {
     combinedSignal.throwIfAborted();
     onStage(round ? 'repair' : 'draft');
-    const body = request(round ? 'repair' : 'draft', writer + ' Set questionTitle to a natural 3–8 word summary of the user question for the history list, in the question\'s language. Describe the ask, not an answer or compliance finding. Omit administrative or test prefixes, introductory instructions, and detailed input lists. Preserve the main subject and requested task. This title is presentation metadata, not a source claim.' + (round ? ' Repair all reported issues and return a complete replacement answer. Preserve the supported scope distinctions and material qualifications already present in the previous draft. A repair must not drop a different applicable qualification while fixing the reported issue. Recheck the entire replacement against the evidence. Do not add evidence.' : ''),
+    const body = request(round ? 'repair' : 'draft', (assistantDiscovery ? assistantWriter : writer) + colleagueInstruction + ' Set questionTitle to a natural 3–8 word summary of the user question for the history list, in the question\'s language. Describe the ask, not an answer or compliance finding. Omit administrative or test prefixes, introductory instructions, and detailed input lists. Preserve the main subject and requested task. This title is presentation metadata, not a source claim.' + (round ? ' Repair all reported issues and return a complete replacement answer. Preserve the supported scope distinctions and material qualifications already present in the previous draft. A repair must not drop a different applicable qualification while fixing the reported issue. Recheck the entire replacement against the evidence. Do not add evidence.' : ''),
       round ? { evidence: packet, previousDraft: draft,
         issues: [...new Map(reviews.flatMap(review=>review.issues).map(issue=>[`${issue.code}:${issue.detail}`,issue])).values()] }
         : packet,complex||round?'medium':'low');
@@ -112,10 +120,20 @@ export async function runResearchV2(input, { call, signal, onStage = () => {}, m
     const drafted = await call(body, { phase: round ? 'repair' : 'draft', signal: combinedSignal });
     const draftMilliseconds=Date.now()-draftStarted;
     payloads.push(drafted); draft = parseResearchV2Payload(drafted);
+    if (!round && assistantDiscovery && typeof retrieveMissingSources === 'function' && Array.isArray(draft.missingSources) && draft.missingSources.length) {
+      onStage('discovery');
+      const expanded = await retrieveMissingSources(draft.missingSources.filter(value=>typeof value==='string').slice(0,2), combinedSignal);
+      if (Array.isArray(expanded) && expanded.length && JSON.stringify(expanded.map(source=>[source.sectionID,source.text])) !== JSON.stringify(packet.sources.map(source=>[source.sectionID,source.text]))) {
+        // One discovery retry only. The final writer and reviewer see exactly
+        // the same expanded, frozen authority packet; prior draft is discarded.
+        const retried = await runResearchV2({...input,sources:expanded},{call,signal:combinedSignal,onStage,maxRepairRounds,assistantDiscovery});
+        return {...retried,payloads:[...payloads,...retried.payloads]};
+      }
+    }
     const identities = researchV2IdentityIssues(draft, packet.sources, packet);
     onStage('review');
     const reviewStarted=Date.now();
-    const reviewed = await call(request('review', reviewer, { evidence: packet, proposedAnswer: draft,
+    const reviewed = await call(request('review', (assistantDiscovery ? assistantReviewer : reviewer) + colleagueInstruction, { evidence: packet, proposedAnswer: draft,
       mechanicalIssues: identities }), { phase: 'review', signal: combinedSignal });
     payloads.push(reviewed);
     const review = parseResearchV2Payload(reviewed);
@@ -165,6 +183,7 @@ export function researchV2AnswerMetadata(result) {
     conclusion: result.draft.answerText, explanation: '',
     claimBindings: result.draft.claims,
     inputSnapshot: {version:researchV2Version,history:result.packet.history,
+      ...(result.packet.assistantIntent ? {assistantIntent:result.packet.assistantIntent} : {}),
       ...(result.packet.projectContextSnapshot ? {projectContextSnapshot:result.packet.projectContextSnapshot} : {}),
       evidenceHashes:result.packet.sources.map(source=>({id:source.id,textHash:source.textHash}))},
     assumptions: [], missingFacts: result.draft.missingFacts, additionalEvidenceNeeded: result.draft.missingSources,

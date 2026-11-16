@@ -1,3 +1,5 @@
+import {assistantNavigatedSource} from "./research-evidence-assembly.mjs";
+import {planAssistantRetrieval,selectAssistantEvidence} from "./assistant-retrieval-plan.mjs";
 import { researchSelectedTables } from "./research-table-footnotes.mjs";
 import {expandAssistantReferenceEvidence, assistantReferenceCodeBasis} from './assistant-reference-evidence.mjs';
 import { runResearchV2, researchV2AnswerMetadata, researchV2Version } from "./research-v2-engine.mjs";
@@ -21137,8 +21139,13 @@ async function handleResearchConversationMessage(request, response) {
         progressResponse, evidenceSnapshots:[]});
       Object.assign(researchOperation,{status:'completed',mode:'clarification',charged:false}); return;
     }
+    const automaticAssistantDiscovery = requestedV2 && conversationOnly && !pinnedEvidence.length &&
+      conversationScope?.includeProjectContext &&
+      !researchProjectContextOnlyEligibility({question, projectInformation}) &&
+      !(/\b(?:summari[sz]e|list|show)\b/i.test(question) && /\b(?:recorded )?project (?:facts|context|information)\b/i.test(question) && !/\b(?:code|requirements?|comply|compliance|required)\b/i.test(question)) &&
+      researchEvidenceStrategyForTurn({question, pinnedEvidence, originSurface:""}).reason !== 'question_explicitly_bounded_to_selected_evidence';
     const propertyResearch = mockMode || conversationOnly ? null : await researchPropertyContext({ question, messages: activeMessages, projectInformation });
-    const corpusPlan = conversationOnly
+    const corpusPlan = conversationOnly && !automaticAssistantDiscovery
       ? selectedEvidenceCorpusPlan(pinnedEvidence, await currentResearchCorpusRegistry())
       : await researchCorpusPlanForTurn({
       question,
@@ -21148,7 +21155,7 @@ async function handleResearchConversationMessage(request, response) {
       projectFacts: combinedProjectFacts,
       pinnedEvidence
     });
-    if (!conversationOnly && corpusPlan.unavailable?.some(corpus => corpus.id === "nyc-zoning-resolution")) {
+    if ((!conversationOnly || automaticAssistantDiscovery) && corpusPlan.unavailable?.some(corpus => corpus.id === "nyc-zoning-resolution")) {
       researchOperation.failureCode = "RESEARCH_ZONING_SOURCE_UNAVAILABLE";
       progressResponse.json(422, {
         code: "RESEARCH_ZONING_SOURCE_UNAVAILABLE",
@@ -21181,15 +21188,74 @@ async function handleResearchConversationMessage(request, response) {
     if ((!mockMode || requestedV2) && (context.body.answerMode !== "verified" || requestedV2)) {
       if (!process.env.OPENAI_API_KEY) throw Object.assign(new Error("Research AI is not configured."), {code:"RESEARCH_NOT_CONFIGURED"});
       // Reuse authorization, source freshness, idempotency and durable usage above.
-      // Both engines retain the same explicit passage scope and storage safeguards.
-      const packageForFast = conversationOnly
-        ? conversationEvidencePackage
-        : await assembledResearchEvidenceForTurn({ question, messages:activeMessages, pinnedEvidence,
-            originSurface:conversation.origin?.surface || "", projectFacts:combinedProjectFacts, topicContext, corpusPlan,
-            beforeSemanticRequest:async () => {
-              if (!(await ensureResearchTurnReservation())) throw Object.assign(new Error("Request handled."), {code:"RESEARCH_REQUEST_HANDLED"});
-            }, onStage:progressResponse.progress });
-      const evidence = packageForFast.sources || [];
+      // Conversational discovery reuses the same account and immutable-source safeguards.
+      let v2Call = null;
+      if (requestedV2) {
+        const configuration = researchV2Configuration(process.env);
+        const budget = configuration.spending === "evaluation" ? createResearchV2Budget({ path: configuration.evaluationBudgetPath }) : null;
+        v2Call = createResearchV2ApplicationCall({ apiKey: process.env.OPENAI_API_KEY, evaluationBudget:budget,
+          provider: async (requestBody, signal) => {
+            requestBody.safety_identifier = createHash("sha256").update(String(context.userID)).digest("hex");
+            const { payload } = await requestResearchProvider({ apiKey:process.env.OPENAI_API_KEY, requestBody,
+              signal, timeoutMilliseconds:120000, maximumAttempts:1,
+              failureMessage:"The Research v2 answer could not complete.",
+              reserveEvaluationSpend:reserveResearchEvaluationSpend, reserveProviderSpend:reserveResearchProviderSpend,
+              settleProviderSpend:settleResearchProviderSpend });
+            return payload;
+          } });
+      }
+      let retrievalPlan = null;
+      if (automaticAssistantDiscovery) {
+        if (!(await ensureResearchTurnReservation())) return;
+        progressResponse.progress("searching_authorized_library","active");
+        retrievalPlan = await planAssistantRetrieval({question,projectFacts:combinedProjectFacts,history:activeMessages,topicContext,call:v2Call,signal:progressResponse.signal});
+      }
+      const discoverForQuestion = async searchQuestion => assembledResearchEvidenceForTurn({question:searchQuestion,messages:activeMessages,pinnedEvidence,
+        originSurface:automaticAssistantDiscovery?"":conversation.origin?.surface||"",projectFacts:retrievalPlan?retrievalPlan.context:combinedProjectFacts,topicContext,corpusPlan,
+        beforeSemanticRequest:async()=>{if (!(await ensureResearchTurnReservation())) throw Object.assign(new Error("Request handled."),{code:"RESEARCH_REQUEST_HANDLED"});},onStage:progressResponse.progress});
+      let packageForFast;
+      if(retrievalPlan?.clarification) packageForFast={sources:[]};
+      else if(automaticAssistantDiscovery) {
+        const packages=[];
+        for(const query of retrievalPlan.queries) packages.push(await discoverForQuestion(query));
+        packageForFast={...packages[0],sources:[...new Map(packages.flatMap(item=>item.sources||[]).map(source=>[`${source.codeVersion}:${source.sectionID}`,source])).values()]};
+      } else packageForFast=conversationOnly?conversationEvidencePackage:await discoverForQuestion(question);
+      if (retrievalPlan?.clarification) answerCodeBasis = researchCodeBasis(conversation.primaryProjectID,projectInformation,new Date().toISOString(),selectedEvidenceCorpusPlan([],await currentResearchCorpusRegistry()));
+      const followupSearches=[],discoveryPayloads=retrievalPlan?[retrievalPlan.payload]:[];
+      let evidence = packageForFast.sources || [];
+      if (automaticAssistantDiscovery && evidence.length) {
+        const selected=await selectAssistantEvidence({question:`${question}\nResearch intent: ${retrievalPlan.queries.join('; ')}`,context:retrievalPlan.context,sources:evidence,call:v2Call,signal:progressResponse.signal});
+        evidence=selected.sources;discoveryPayloads.push(selected.payload);
+        // Browse the actual heading hierarchy around relevant hits. This can
+        // locate governing siblings that semantic similarity did not nominate.
+        const {catalog}=await researchCorpusResources(corpusPlan);
+        const chapters=[...new Set(evidence.flatMap(source=>{
+          const section=catalog.find(item=>String(item.id)===String(source.sectionID)&&item.codeVersion===source.codeVersion);
+          return section?[`${section.codeVersion}:${section.codePrefix}:${section.chapterNumber}`]:[];
+        }))].slice(0,3);
+        const headings=chapters.flatMap(chapter=>catalog.filter(item=>`${item.codeVersion}:${item.codePrefix}:${item.chapterNumber}`===chapter))
+          .map(item=>({...item,sectionID:String(item.id),text:[item.headerLine,item.headingLine].filter(Boolean).join(' — ')}));
+        const nominated=await selectAssistantEvidence({question:`${question}\nResearch intent: ${retrievalPlan.queries.join('; ')}`,context:retrievalPlan.context,sources:headings,call:v2Call,signal:progressResponse.signal,navigation:true});
+        if(nominated.payload)discoveryPayloads.push(nominated.payload);
+        retrievalPlan.unavailableSources=[];
+        const known=new Set(evidence.map(source=>`${source.codeVersion}:${source.sectionID}`));
+        let characters=evidence.reduce((n,source)=>n+(source.text||source.selectedText||'').length,0);
+        for(const candidate of nominated.sources){
+          const key=`${candidate.codeVersion}:${candidate.sectionID}`;
+          if(known.has(key)||evidence.length>=24)continue;
+          let resolved;
+          try {resolved=await resolveResearchAssemblySection(candidate,catalog,cachedResearchSourceBody);}
+          catch(error){
+            if(!['INCOMPLETE_RESEARCH_SECTION','INVALID_RESEARCH_SECTION','ENOENT'].includes(error.code))throw error;
+            retrievalPlan.unavailableSources.push({codePrefix:candidate.codePrefix,sectionNumber:candidate.sectionNumber,edition:candidate.codeEdition,reason:error.code});
+            continue;
+          }
+          if(!resolved)continue;
+          const source=assistantNavigatedSource(resolved);
+          if(characters+source.text.length>96000)continue;
+          evidence.push(source);known.add(key);characters+=source.text.length;
+        }
+      }
       if (!evidence.length && !conversationScope?.includeProjectContext) {
         await commitMissingDocumentClarification({ context, conversation, originalConversation, question, conversationScope,
           researchRequestID, progressResponse, evidenceSnapshots:[], clarificationReason:"evidence_unavailable" });
@@ -21200,7 +21266,7 @@ async function handleResearchConversationMessage(request, response) {
       const now = new Date().toISOString();
       const snapshots = evidence.map(source => immutableEvidenceSnapshot({ source, approvedAt:now,
         evidenceSetVersion:Number(conversation.evidenceSetVersion || 1), sourceLibraryVersion:source.codeVersion || conversation.codeVersion }));
-      const sources = await Promise.all(evidence.map(async (source,index) => {
+      const bindAnswerSource = async (source,index) => {
         const text = source.text || source.selectedText || "";
         let tables = source.tables || [];
         if (requestedV2 && /\btable\s+\d/i.test(text)) {
@@ -21216,7 +21282,8 @@ async function handleResearchConversationMessage(request, response) {
           edition:source.codeEdition, ...(requestedV2 ? {codeVersion:source.codeVersion,jurisdiction:source.jurisdiction} : {}),
           authority:"enacted", title:[source.codePrefix,source.sectionNumber,source.title].filter(Boolean).join(" "),
           text, ...(tables.length ? {tables} : {}) };
-      }));
+      };
+      const sources = await Promise.all(evidence.map(bindAnswerSource));
       const webDecision = conversationOnly ? {useWeb:false,reasons:[]} : researchWebSupportTrigger({question,
         enactedEvidence:evidence,pinnedEvidenceCount:pinnedEvidence.length,projectFactsApplied:Boolean(combinedProjectFacts.length)});
       let web = {sources:[],searched:false,usage:combinedResearchUsage()};
@@ -21242,22 +21309,39 @@ async function handleResearchConversationMessage(request, response) {
       const fastGenerationStartedAt = performance.now();
       let firstTextMilliseconds = null, v2Result = null, providerPayloads;
       if (requestedV2) {
-        const configuration = researchV2Configuration(process.env);
-        const budget = configuration.spending === "evaluation" ? createResearchV2Budget({ path: configuration.evaluationBudgetPath }) : null;
-        const call = createResearchV2ApplicationCall({ apiKey: process.env.OPENAI_API_KEY, evaluationBudget:budget,
-          provider: async (requestBody, signal) => {
-            requestBody.safety_identifier = body.safety_identifier;
-            const { payload } = await requestResearchProvider({ apiKey:process.env.OPENAI_API_KEY, requestBody,
-              signal, timeoutMilliseconds:120000, maximumAttempts:1,
-              failureMessage:"The Research v2 answer could not complete.",
-              reserveEvaluationSpend:reserveResearchEvaluationSpend, reserveProviderSpend:reserveResearchProviderSpend,
-              settleProviderSpend:settleResearchProviderSpend });
-            return payload;
-          } });
+        const call = v2Call;
         v2Result = await runResearchV2({ question, sources, history:activeMessages,
-          ...(conversationScope?.includeProjectContext ? {projectContextSnapshot:conversationScope.projectContext} : {}) }, { call,
+          ...(retrievalPlan ? {assistantIntent:{clarification:retrievalPlan.clarification,queries:retrievalPlan.queries,unavailableSources:retrievalPlan.unavailableSources||[],searchedCorpora:retrievalPlan.clarification?[]:(corpusPlan?.selected||[]).map(corpus=>({id:corpus.id,codeVersion:corpus.codeVersion})),libraryLimitations:packageForFast.limitations||[]}} : {}),
+          ...(conversationScope?.includeProjectContext ? {projectContextSnapshot:conversationScope.projectContext} : {}) }, { call, assistantDiscovery:automaticAssistantDiscovery,
+          retrieveMissingSources:automaticAssistantDiscovery ? async (gaps,signal) => {
+            signal.throwIfAborted();
+            const followups=[];
+            for(const gap of gaps) followups.push(await assembledResearchEvidenceForTurn({
+              question:gap.slice(0,1500),
+              messages:[],pinnedEvidence:[],originSurface:"",projectFacts:retrievalPlan?.context || combinedProjectFacts,topicContext:null,corpusPlan,
+              beforeSemanticRequest:async()=>{signal.throwIfAborted();if (!(await ensureResearchTurnReservation())) throw Object.assign(new Error("Request handled."),{code:"RESEARCH_REQUEST_HANDLED"});},
+              onStage:progressResponse.progress
+            }));
+            const followup={sources:[...new Map(followups.flatMap(item=>item.sources||[]).map(source=>[`${source.codeVersion}:${source.sectionID}`,source])).values()]};
+            followupSearches.push({query:gaps.join("; ").slice(0,1500),sourceCount:followup.sources?.length||0});
+            const retainedKeys=new Set(evidence.map(source=>`${source.codeVersion}:${source.sectionID}`));
+            const pool=(followup.sources||[]).filter(source=>!retainedKeys.has(`${source.codeVersion}:${source.sectionID}`));
+            const selected=await selectAssistantEvidence({question:`${question}\nMissing authority to resolve: ${gaps.join('; ')}`,context:retrievalPlan?.context||[],sources:pool,call:v2Call,signal});
+            if(selected.payload)discoveryPayloads.push(selected.payload);
+            // Follow-up discovery adds missing authority; it must not discard
+            // governing provisions already read or renumber their citations.
+            let characters=evidence.reduce((total,source)=>total+(source.text||source.selectedText||'').length,0);
+            for(const source of selected.sources){
+              const length=(source.text||source.selectedText||'').length;
+              if(evidence.length>=24||characters+length>96000)continue;
+              evidence.push(source);characters+=length;
+            }
+            sources.splice(0,sources.length,...await Promise.all(evidence.map(bindAnswerSource)));
+            snapshots.splice(0,snapshots.length,...evidence.map(source=>immutableEvidenceSnapshot({source,approvedAt:now,evidenceSetVersion:Number(conversation.evidenceSetVersion||1),sourceLibraryVersion:source.codeVersion||conversation.codeVersion})));
+            return sources;
+          } : null,
           signal:progressResponse.signal, onStage:stage => {
-            progressResponse.progress(stage === "review" ? "checking_citation_support" : "preparing_conclusion", "active");
+            progressResponse.progress(stage === "discovery" ? "searching_authorized_library" : stage === "review" ? "checking_citation_support" : "preparing_conclusion", "active");
           } });
         Object.assign(researchOperation,{
           verificationAttemptCount:v2Result.reviews.length,
@@ -21268,7 +21352,7 @@ async function handleResearchConversationMessage(request, response) {
           })))
         });
         if (v2Result.status === "review_failed") throw Object.assign(new Error(v2Result.draft.answerText), {code:"V2_REVIEW_FAILED",missingSources:v2Result.draft.missingSources,missingFacts:v2Result.draft.missingFacts});
-        providerPayloads = v2Result.payloads;
+        providerPayloads = [...discoveryPayloads,...v2Result.payloads];
       } else {
         const generateFast=async(requestBody,signal)=>{const {payload}=await requestResearchProvider({apiKey:process.env.OPENAI_API_KEY, requestBody,
           signal,timeoutMilliseconds:120000,maximumAttempts:1,
@@ -21297,7 +21381,8 @@ async function handleResearchConversationMessage(request, response) {
           crossReferenceCount:evidence.filter(source => source.origin === 'permitext_cross_reference').length},
         ...(packageForFast.referenceLookup ? {referenceLookup:packageForFast.referenceLookup} : {}),
         factUsage:{projectContext:combinedProjectFacts,conversation:[],other:[]},
-        retrieval:{sourceMode:packageForFast.sourceMode,codeBasis:answerCodeBasis,webSupportRequested:webDecision.useWeb,webSupportSearched:web.searched},
+        retrieval:{sourceMode:packageForFast.sourceMode,codeBasis:answerCodeBasis,webSupportRequested:webDecision.useWeb,webSupportSearched:web.searched,
+          ...(automaticAssistantDiscovery ? {automaticDiscovery:true,queries:retrievalPlan?.clarification?[]:retrievalPlan?.queries||[],followupSearches,searchedCorpora:retrievalPlan?.clarification?[]:(corpusPlan?.selected||[]).map(corpus=>({id:corpus.id,codeVersion:corpus.codeVersion}))} : {})},
         routing:{mode:"fast",answerTier:"fast",verificationAttemptCount:0},
         delivery:{mode:"streamed",firstTextMilliseconds,generationMilliseconds:Math.round(performance.now()-fastGenerationStartedAt)},
         disclaimer:"AI-generated, unreviewed research assistance. Verify the cited text before relying on this answer." };

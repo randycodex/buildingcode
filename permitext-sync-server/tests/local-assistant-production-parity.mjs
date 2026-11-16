@@ -19,7 +19,10 @@ try {
   const env={NODE_ENV:'test',DATABASE_URL:'postgresql://production.invalid/main',PERMITEXT_SYNC_DATABASE_URL:'postgresql://production.invalid/main',
     PERMITEXT_TEST_RESEARCH_MOCK:'1',OPENAI_API_KEY:'production-key',PERMITEXT_RESEARCH_PROMPT_VERSION:'stale-preview',
     PERMITEXT_RESEARCH_FAST_PRICING_VERSION:'stale-price',PERMITEXT_PUBLIC_BASE_URL:'https://production.invalid'};
-  const parity=await configureLocalAssistant({...options,environment:env});
+  await assert.rejects(configureLocalAssistant({...options,environment:{}}), /source differs/);
+  const parity=await configureLocalAssistant({...options,environment:env,allowLocalSourceChanges:true});
+  assert.equal(parity.productionParity,false);
+  assert(parity.changedSources.includes('research-v2-engine.mjs'));
   const snapshot=JSON.parse(await readFile(new URL('../config/local-assistant-production.json',import.meta.url),'utf8'));
   for(const [key,value] of Object.entries(snapshot.environment))assert.equal(env[key],value,key);
   assert.equal(env.OPENAI_API_KEY,'local-test-key');
@@ -70,5 +73,5 @@ try {
   const fullPath=join(scratch,'exhausted.json');await writeFile(fullPath,JSON.stringify({...original,limitMicroUSD:1200}));
   const exhausted=budgetLocalAssistantEmbeddings(createResearchV2Budget({path:fullPath}),async()=>{throw new Error('Must never dispatch')});
   await assert.rejects(exhausted('https://api.openai.com/v1/embeddings',{body:JSON.stringify(embedding)}),{code:'V2_BUDGET_EXHAUSTED'});
-  console.log('Local Assistant parity: production settings and pinned prompts, reviewed request settings, isolated storage/key, existing $7 ledger, retrieval accounting and pre-dispatch budget rejection passed.');
+  console.log('Local Assistant parity: production settings, strict prompt-drift detection and explicit local experiment opt-in, reviewed request settings, isolated storage/key, existing $7 ledger, retrieval accounting and pre-dispatch budget rejection passed.');
 } finally {await rm(scratch,{recursive:true,force:true})}

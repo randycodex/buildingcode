@@ -216,6 +216,8 @@ function buildingScaleDimensionsRequested(value) {
     /\b(?:rooftop|roof)[- ](?:access|height|level|clear path|stairs?|exit|elevator)\b/i.test(subject);
 }
 function hypotheticalScopeRequested(value) {
+  if (/\b(?:return|back)\s+to\s+(?:the\s+)?(?:actual|real)\s+project\b/i.test(value) &&
+      /\bnot\s+(?:the\s+)?(?:fictional|hypothetical|test|sample|example)\b/i.test(value)) return false;
   return /\b(?:fictional|hypothetical|test|sample|example)\b[^.!?]{0,70}\b(?:scenario|premises|conditions|case|example)\b|\b(?:scenario|premises|conditions|case)\b[^.!?]{0,70}\b(?:fictional|hypothetical|test|sample|example)\b|\bsaved\b[^.!?]{0,60}\bexample\b/i.test(value);
 }
 function actualScopeRequested(value) {
@@ -234,7 +236,7 @@ function contextualFactStatements(fact) {
   // the scope introduction verbatim instead of promoting a test to a fact.
   const prefix = fact.payload.match(/^Additional Project facts\s*\([^)]*\):\s*/i)?.[0] || "";
   const description = prefix ? fact.payload.slice(prefix.length) : fact.payload;
-  if (fact.label || fact.payload.length <= 640) return [{ ...fact, scope: contextScopeIntroduction(description) }];
+  if (fact.label || fact.payload.length <= 240) return [{ ...fact, scope: contextScopeIntroduction(description) }];
   const rawSentences = description.split(/(?<=[.!?])\s+(?=[A-Z0-9“‘"'])/).map(text).filter(Boolean);
   if (rawSentences.length < 2) return [{ ...fact, scope: contextScopeIntroduction(description) }];
   const sentences = [];
@@ -312,7 +314,7 @@ export function relevantResearchRetrievalFactContext({ question, contextualTopic
   const zoning = /\b(?:zoning|district|use groups?|floor area ratio|parking|setback|yards?|lot coverage|lot|permitted use|use permitted|development rights?|frontage|transparency|streetscape|street[- ]wall|glazing)\b/i.test(subject) || researchFloorAreaRatioRequested(subject);
   if (intent.roomDimensions) relevant.add("use");
   if (zoning) for (const name of ["district", "use", "work", "lot"]) relevant.add(name);
-  if (/\b(?:occupancy|group\s+(?:A-[1-5]|B|E|F-[12]|H-[1-5]|I-[1-4]|M|R-[1-3]|S-[12]|U)|occupant load|egress|stairs?|exit|travel distance|accessible|fire|sprinkler|ventilation|plumbing fixtures?|water closets?)\b/i.test(subject)) relevant.add("use");
+  if (/\b(?:occupancy|group\s+(?:A-[1-5]|B|E|F-[12]|H-[1-5]|I-[1-4]|M|R-[1-3]|S-[12]|U)|occupant load|egress|stairs?|exit|travel distance|accessib\w*|fire|sprinkler|ventilation|plumbing fixtures?|water closets?)\b/i.test(subject)) relevant.add("use");
   if (/\b(?:new|development|enlargement|alteration|existing|change of use|construction)\b/i.test(subject)) relevant.add("work");
   if ((!intent.roomDimensions || /\b(?:sprinkler|fire|storage|egress|travel distance)\b/i.test(subject)) && /\b(?:sprinkler|fire|storage|egress|travel distance|height|area)\b/i.test(subject)) relevant.add("sprinklers");
   if (/\b(?:height|stories|storeys|high[- ]rise|floors?|vertical|elevator)\b/i.test(subject.replace(/\bfloor\s+drains?\b/gi, "drain"))) relevant.add("height");
@@ -334,7 +336,10 @@ export function relevantResearchRetrievalFactContext({ question, contextualTopic
   // An explicitly requested saved hypothetical must not silently use actual
   // inventory from the same description. A clear actual return drops the test.
   const latestScope = currentTopics(question, contextualTopics).find(value => hypotheticalScopeRequested(value) || actualScopeRequested(value));
-  const hypothetical = latestScope && hypotheticalScopeRequested(latestScope) && statementFacts.some(fact => fact.scope === "hypothetical");
+  const hypothetical = (latestScope ? hypotheticalScopeRequested(latestScope) :
+    statementFacts.some(fact => fact.scope === "hypothetical") &&
+    !statementFacts.some(fact => fact.descriptionStatement && fact.scope !== "hypothetical")) &&
+    statementFacts.some(fact => fact.scope === "hypothetical");
   const scopeAnchors = [...new Set(statementFacts.filter(fact => fact.scope === "hypothetical").map(fact => fact.scopeAnchor || fact.assertion))];
   const namedScopes = scopeAnchors.filter(anchor => {
     const name = anchor.match(/\b(?:scenario|case)\s+([A-Za-z0-9-]+)\s*[:—-]/i)?.[1];
@@ -388,7 +393,7 @@ export function relevantResearchRetrievalFactContext({ question, contextualTopic
 
 export function semanticResearchProjectFacts(options = {}) {
   return relevantResearchRetrievalFactContext({ ...options, queryMode: "semantic",
-    maximumCharacters: Math.max(0, Math.min(640, Math.floor(Number(options.maximumCharacters ?? 640) || 0))) });
+    maximumCharacters: Math.max(0, Math.min(1200, Math.floor(Number(options.maximumCharacters ?? 1200) || 0))) });
 }
 
 export function semanticResearchScenarioText(value) {

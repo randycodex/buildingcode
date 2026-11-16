@@ -16,7 +16,7 @@ const allowedSettings = new Set([
 ].map(key => `PERMITEXT_RESEARCH_${key}`));
 
 // Call before importing app.mjs: some prompt/configuration defaults are read at import time.
-export async function configureLocalAssistant({apiKey, dataPath, assetsPath, budgetPath, environment = process.env} = {}) {
+export async function configureLocalAssistant({apiKey, dataPath, assetsPath, budgetPath, environment = process.env, allowLocalSourceChanges = false} = {}) {
   if (environment.NODE_ENV === 'production' || environment.VERCEL || environment.VERCEL_ENV)
     throw new Error('This Assistant configuration is for local testing only.');
   if (!apiKey || ![dataPath,assetsPath,budgetPath].every(path => typeof path === 'string' && isAbsolute(path)) ||
@@ -26,9 +26,13 @@ export async function configureLocalAssistant({apiKey, dataPath, assetsPath, bud
   const durableBudgetPath = await realpath(budgetPath);
   if (snapshot.schemaVersion !== 1 || Object.keys(snapshot.environment).some(key => !allowedSettings.has(key)))
     throw new Error('The production Assistant snapshot contains unsupported configuration.');
+  const changedSources = [];
   for (const [file, expected] of Object.entries(snapshot.sourceHashes)) {
     const actual = createHash('sha256').update(await readFile(resolve(applicationRoot,file))).digest('hex');
-    if (actual !== expected) throw new Error(`Assistant source differs from the verified production snapshot: ${file}`);
+    if (actual !== expected) {
+      if (!allowLocalSourceChanges) throw new Error(`Assistant source differs from the verified production snapshot: ${file}`);
+      changedSources.push(file);
+    }
   }
   if (snapshot.environment.PERMITEXT_RESEARCH_SEMANTIC_SEARCH === '1') await loadPreparedResearchSemanticVectors();
   const budget = createResearchV2Budget({path:durableBudgetPath});
@@ -46,7 +50,7 @@ export async function configureLocalAssistant({apiKey, dataPath, assetsPath, bud
     PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS:'.1', PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS:'.01',
     PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS:'.5', PERMITEXT_RESEARCH_PRICING_VERSION:'openai-luna-20261026'
   });
-  return {budget, productionCommit:snapshot.productionCommit, deploymentId:snapshot.deploymentId,
+  return {budget, changedSources, productionParity:changedSources.length === 0, productionCommit:snapshot.productionCommit, deploymentId:snapshot.deploymentId,
     settingsCount:Object.keys(snapshot.environment).length};
 }
 
