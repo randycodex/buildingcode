@@ -304,7 +304,7 @@
     "test:assistant:production": "node tests/research-v2-production-preflight.mjs && node tests/assistant-http.mjs --production"
   },
   "dependencies": {
-    "@blocknote/core": "^0.54.0",
+    "@blocknote/core": "^0.57.0",
     "@blocknote/mantine": "^0.54.0",
     "@blocknote/react": "^0.54.0",
     "@clerk/backend": "^3.17.0",
