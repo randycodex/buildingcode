@@ -1,0 +1,4483 @@
+{
+  "date": "2026-11-16",
+  "baselineCommit": "b69513f97",
+  "mode": "local Experimental Luna; no behavior changes",
+  "model": "gpt-6-luna",
+  "reasoningEffort": "low",
+  "serviceTier": "default",
+  "method": "Serial synthetic HTTP tests; upstream request correlation via AsyncLocalStorage; network plus full response time. No new retrieval/reasoning/prompt changes. Primary set six fully recorded questions; independent two-turn roof repeat retained separately.",
+  "costs": "Configured local budget estimates including cache-write premium and web actions, not provider invoice or account balance.",
+  "primary": [
+    {
+      "topic": "project-recall",
+      "turn": 0,
+      "question": "How many apartments are in this project?",
+      "answer": "The project contains **56 apartments**.",
+      "status": 200,
+      "timingScope": "client end-to-end",
+      "profile": {
+        "milliseconds": 7137.394834,
+        "cpuMilliseconds": 3053.569,
+        "upstreamMilliseconds": 4744.164292000001,
+        "otherMilliseconds": 2393.2305419999984,
+        "modelCalls": 2,
+        "embeddingCalls": 0,
+        "estimatedUSD": 0.004309,
+        "unknownCostCalls": 0,
+        "inputTokens": 13457,
+        "outputTokens": 183,
+        "webActions": 0,
+        "phases": {
+          "intent_planning": {
+            "calls": 1,
+            "milliseconds": 2921.8546250000004,
+            "inputTokens": 11855,
+            "cachedTokens": 1446,
+            "cacheWriteTokens": 10406,
+            "outputTokens": 154,
+            "reasoningTokens": 75,
+            "estimatedUSD": 0.003734,
+            "unknownCostCalls": 0,
+            "requestBytes": 50804
+          },
+          "answer_generation": {
+            "calls": 1,
+            "milliseconds": 1822.3096670000004,
+            "inputTokens": 1602,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 1599,
+            "outputTokens": 29,
+            "reasoningTokens": 15,
+            "estimatedUSD": 0.000575,
+            "unknownCostCalls": 0,
+            "requestBytes": 9357
+          }
+        },
+        "tools": {
+          "plan_research": 1
+        },
+        "firstProgressMilliseconds": 14.717750000000024,
+        "progress": [
+          {
+            "milliseconds": 14.717750000000024,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "active",
+            "sequence": 1,
+            "at": "2026-11-16T17:05:10.525Z"
+          },
+          {
+            "milliseconds": 142.867208,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "completed",
+            "sequence": 2,
+            "at": "2026-11-16T17:05:10.654Z"
+          },
+          {
+            "milliseconds": 142.91491700000006,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 3,
+            "at": "2026-11-16T17:05:10.654Z"
+          },
+          {
+            "milliseconds": 5257.1680830000005,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 4,
+            "at": "2026-11-16T17:05:15.768Z"
+          },
+          {
+            "milliseconds": 7111.609875,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "completed",
+            "sequence": 5,
+            "at": "2026-11-16T17:05:17.622Z"
+          }
+        ]
+      },
+      "checks": {
+        "topic": true,
+        "citations": true,
+        "hasUnverifiedMarker": false
+      },
+      "tools": [
+        {
+          "tool": "plan_research",
+          "query": "How many apartments are in this project?"
+        }
+      ],
+      "citations": [],
+      "evidence": [],
+      "readSources": []
+    },
+    {
+      "topic": "project-recall",
+      "turn": 1,
+      "question": "And how many stories?",
+      "answer": "The project is described as an **eight-story** building.",
+      "status": 200,
+      "timingScope": "client end-to-end",
+      "profile": {
+        "milliseconds": 2942.9331249999996,
+        "cpuMilliseconds": 358.31,
+        "upstreamMilliseconds": 2807.991624999998,
+        "otherMilliseconds": 134.94150000000172,
+        "modelCalls": 2,
+        "embeddingCalls": 0,
+        "estimatedUSD": 0.004272,
+        "unknownCostCalls": 0,
+        "inputTokens": 13494,
+        "outputTokens": 82,
+        "webActions": 0,
+        "phases": {
+          "intent_planning": {
+            "calls": 1,
+            "milliseconds": 1853.5716669999993,
+            "inputTokens": 11883,
+            "cachedTokens": 1446,
+            "cacheWriteTokens": 10434,
+            "outputTokens": 66,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.0037,
+            "unknownCostCalls": 0,
+            "requestBytes": 50942
+          },
+          "answer_generation": {
+            "calls": 1,
+            "milliseconds": 954.4199579999986,
+            "inputTokens": 1611,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 1608,
+            "outputTokens": 16,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.000572,
+            "unknownCostCalls": 0,
+            "requestBytes": 9414
+          }
+        },
+        "tools": {
+          "resolve_conversation": 1
+        },
+        "firstProgressMilliseconds": 16.745832999999948,
+        "progress": [
+          {
+            "milliseconds": 16.745832999999948,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "active",
+            "sequence": 1,
+            "at": "2026-11-16T17:05:17.689Z"
+          },
+          {
+            "milliseconds": 35.59795800000029,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "completed",
+            "sequence": 2,
+            "at": "2026-11-16T17:05:17.708Z"
+          },
+          {
+            "milliseconds": 35.63816700000007,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 3,
+            "at": "2026-11-16T17:05:17.708Z"
+          },
+          {
+            "milliseconds": 1918.966708,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 4,
+            "at": "2026-11-16T17:05:19.591Z"
+          },
+          {
+            "milliseconds": 2917.061208000001,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "completed",
+            "sequence": 5,
+            "at": "2026-11-16T17:05:20.589Z"
+          }
+        ]
+      },
+      "checks": {
+        "topic": true,
+        "citations": true,
+        "hasUnverifiedMarker": false
+      },
+      "tools": [
+        {
+          "tool": "resolve_conversation",
+          "query": "And how many stories?"
+        }
+      ],
+      "citations": [],
+      "evidence": [],
+      "readSources": []
+    },
+    {
+      "topic": "drain-control",
+      "turn": 0,
+      "question": "How much slope does that drain need?",
+      "answer": "The minimum slope depends on the branch’s **diameter** under 2022 NYC Plumbing Code Table 704.1:\n\n- **2½ inches or smaller:** ¼ inch per foot\n- **3–6 inches:** ⅛ inch per foot\n- **8 inches or larger:** ¹⁄₁₆ inch per foot\n\nThe pipe must also be laid at a uniform slope. Since the diameter hasn’t been selected, the applicable minimum can’t yet be narrowed down further. [S1]",
+      "status": 200,
+      "timingScope": "client end-to-end",
+      "profile": {
+        "milliseconds": 10019.329584,
+        "cpuMilliseconds": 3340.36,
+        "upstreamMilliseconds": 7704.626833999999,
+        "otherMilliseconds": 2314.7027500000004,
+        "modelCalls": 4,
+        "embeddingCalls": 1,
+        "estimatedUSD": 0.00724872,
+        "unknownCostCalls": 0,
+        "inputTokens": 25187,
+        "outputTokens": 332,
+        "webActions": 0,
+        "phases": {
+          "intent_planning": {
+            "calls": 1,
+            "milliseconds": 2740.8491670000003,
+            "inputTokens": 11824,
+            "cachedTokens": 1446,
+            "cacheWriteTokens": 10375,
+            "outputTokens": 148,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.003721,
+            "unknownCostCalls": 0,
+            "requestBytes": 50718
+          },
+          "section_selection": {
+            "calls": 1,
+            "milliseconds": 1008.7987919999996,
+            "inputTokens": 4018,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 4015,
+            "outputTokens": 21,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.001417,
+            "unknownCostCalls": 0,
+            "requestBytes": 15788
+          },
+          "agent_tool_routing": {
+            "calls": 1,
+            "milliseconds": 1653.8891249999997,
+            "inputTokens": 3655,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 3652,
+            "outputTokens": 53,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.001305,
+            "unknownCostCalls": 0,
+            "requestBytes": 17534
+          },
+          "embedding": {
+            "calls": 1,
+            "milliseconds": 362.2640829999982,
+            "inputTokens": 36,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 0,
+            "outputTokens": 0,
+            "reasoningTokens": 0,
+            "estimatedUSD": 7.2e-7,
+            "unknownCostCalls": 0,
+            "requestBytes": 214
+          },
+          "answer_generation": {
+            "calls": 1,
+            "milliseconds": 1938.825667000001,
+            "inputTokens": 5690,
+            "cachedTokens": 3652,
+            "cacheWriteTokens": 2035,
+            "outputTokens": 110,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.000805,
+            "unknownCostCalls": 0,
+            "requestBytes": 26135
+          }
+        },
+        "tools": {
+          "plan_research": 1,
+          "navigate_library": 1,
+          "read_library": 1,
+          "search_library": 1
+        },
+        "firstProgressMilliseconds": 15.029624999999214,
+        "progress": [
+          {
+            "milliseconds": 15.029624999999214,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "active",
+            "sequence": 1,
+            "at": "2026-11-16T17:05:20.755Z"
+          },
+          {
+            "milliseconds": 32.25745900000038,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "completed",
+            "sequence": 2,
+            "at": "2026-11-16T17:05:20.772Z"
+          },
+          {
+            "milliseconds": 32.332000000000335,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 3,
+            "at": "2026-11-16T17:05:20.772Z"
+          },
+          {
+            "milliseconds": 3851.3099999999995,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 4,
+            "at": "2026-11-16T17:05:24.591Z"
+          },
+          {
+            "milliseconds": 5520.425834,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 5,
+            "at": "2026-11-16T17:05:26.260Z"
+          },
+          {
+            "milliseconds": 5736.383791999999,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 6,
+            "at": "2026-11-16T17:05:26.476Z"
+          },
+          {
+            "milliseconds": 7875.053084000001,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "completed",
+            "sequence": 7,
+            "at": "2026-11-16T17:05:28.615Z"
+          },
+          {
+            "milliseconds": 7875.091999999999,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "reviewing_provisions",
+            "label": "Reviewing potentially applicable provisions",
+            "state": "active",
+            "sequence": 8,
+            "at": "2026-11-16T17:05:28.615Z"
+          },
+          {
+            "milliseconds": 7934.764667000001,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "reviewing_provisions",
+            "label": "Reviewing potentially applicable provisions",
+            "state": "completed",
+            "sequence": 9,
+            "at": "2026-11-16T17:05:28.675Z"
+          },
+          {
+            "milliseconds": 7934.7967499999995,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "following_cross_references",
+            "label": "Following cross-references",
+            "state": "active",
+            "sequence": 10,
+            "at": "2026-11-16T17:05:28.675Z"
+          },
+          {
+            "milliseconds": 7950.1144589999985,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "following_cross_references",
+            "label": "Following cross-references",
+            "state": "completed",
+            "sequence": 11,
+            "at": "2026-11-16T17:05:28.690Z"
+          },
+          {
+            "milliseconds": 7984.830500000002,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 12,
+            "at": "2026-11-16T17:05:28.725Z"
+          },
+          {
+            "milliseconds": 9978.583541999998,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "completed",
+            "sequence": 13,
+            "at": "2026-11-16T17:05:30.718Z"
+          }
+        ]
+      },
+      "checks": {
+        "topic": true,
+        "citations": true,
+        "hasUnverifiedMarker": false
+      },
+      "tools": [
+        {
+          "tool": "plan_research",
+          "query": "How much slope does that drain need?"
+        },
+        {
+          "tool": "navigate_library",
+          "query": "What minimum slope is required for the proposed horizontal sanitary drainage branch in the NYC renovation?"
+        },
+        {
+          "tool": "read_library",
+          "query": "12334,12467",
+          "sources": [
+            {
+              "id": "S1",
+              "sectionID": "12334",
+              "title": "PC 704.1 704.1 Slope of horizontal drainage piping."
+            },
+            {
+              "id": "S2",
+              "sectionID": "12335",
+              "title": "PC 704.2 704.2 Change in size."
+            },
+            {
+              "id": "S3",
+              "sectionID": "12467",
+              "title": "PC 714.3.2 714.3.2 Slope of horizontal drainage piping."
+            },
+            {
+              "id": "S4",
+              "sectionID": "12465",
+              "title": "PC 714.3 714.3 Selections of drainage pipe sizes."
+            },
+            {
+              "id": "S5",
+              "sectionID": "12466",
+              "title": "PC 714.3.1 714.3.1 Selecting pipe wall roughness."
+            }
+          ],
+          "unavailable": []
+        },
+        {
+          "tool": "search_library",
+          "query": "NYC 2022 Plumbing Code Table 704.1 minimum slope horizontal drainage pipe size 2 1/2 3 4 6 8 exception slope drainage branch"
+        }
+      ],
+      "citations": [
+        {
+          "sectionID": "12334",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-12334"
+          ],
+          "sectionNumber": "704.1",
+          "codePrefix": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "704.1 Slope of horizontal drainage piping.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        }
+      ],
+      "evidence": [
+        {
+          "sectionID": "12334",
+          "sectionNumber": "704.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "eda770b051d9b4e8e4baa6d32c42417cb0ad2f9f4556d67154573b496276aafe"
+        },
+        {
+          "sectionID": "12335",
+          "sectionNumber": "704.2",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "0dbfb7c561aa546bc0663fc87b82b3e70ff7e1cfbacfbf9254078deb34d1caa1"
+        },
+        {
+          "sectionID": "12467",
+          "sectionNumber": "714.3.2",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "f85f75a2ff8bc448fba2c1d275583a42649c204261dd20284fe0b8a74ea12e6c"
+        },
+        {
+          "sectionID": "12465",
+          "sectionNumber": "714.3",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "90e9fb47e1acc1488d21140c7dc96215b090a5227d6f58d312597a08cc61b35b"
+        },
+        {
+          "sectionID": "12466",
+          "sectionNumber": "714.3.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "3e0c236f6cbd9aadd050615b7d276d9372ec27db1eeef2d65a5126c0465c14fe"
+        },
+        {
+          "sectionID": "12582",
+          "sectionNumber": "914.3",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "13b943f38bc16c424a0ebe84f89485ffa313c23bd339aa08717f72cf963ed873"
+        },
+        {
+          "sectionID": "12337",
+          "sectionNumber": "704.4",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "7a6e4c2dd8788cf3c1db53988abb3591e8ba6940fc6b43ac6865d261cb9c41e6"
+        },
+        {
+          "sectionID": "25654",
+          "sectionNumber": "1502",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "af3bdc943d599a79381942542c4c7665a25bb1f17cc9a739e2ff5d12ff8bde85"
+        },
+        {
+          "sectionID": "12590",
+          "sectionNumber": "915.2.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "a2bfcdf4b48f6ff8ca79f885448858c8f6750331a5b3503fa4c6b07f49f3cdfa"
+        },
+        {
+          "sectionID": "12591",
+          "sectionNumber": "915.2.2",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "3fad86420f957096b1577f9a6365f2dad2bbfd64fa3ab65078e3ca8b6e55c449"
+        },
+        {
+          "sectionID": "12683",
+          "sectionNumber": "1106.2",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "add06a180640e684cace48ee2bbdc37f1e04d7a46244b8c18debf57b34b9d2c4"
+        },
+        {
+          "sectionID": "12420",
+          "sectionNumber": "710.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "cf4e5de4d2e28226731684f30b845e97df924c3a517678b5c5e4961518463386"
+        },
+        {
+          "sectionID": "12821",
+          "sectionNumber": "1303.5.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8d9b47288bfd49c1e9f237a6e31059fa9d0a43dbb07a8a32c9c468d439889eb5"
+        },
+        {
+          "sectionID": "12302",
+          "sectionNumber": "701.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "f3fd437c990cb6266766438aab64d49ad835e0eae6a6366efdaf8e1b3a4672e2"
+        },
+        {
+          "sectionID": "12519",
+          "sectionNumber": "901.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "3a39b4ed3613401870ffcab666a1a5d138c3e1020e5bd892863ccedb82df58ea"
+        },
+        {
+          "sectionID": "12642",
+          "sectionNumber": "1101.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "e6cfbd6a9b7269a64cf7012e88011eaaf7deb7bce215bca2c0405d3f2c2903af"
+        },
+        {
+          "sectionID": "12220",
+          "sectionNumber": "608.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "f0d4f133931968ee351507a82c0911108d4af86ce6587d544510418c91f47d78"
+        },
+        {
+          "sectionID": "12318",
+          "sectionNumber": "702.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "75a116b3ee83aa3bca05778c547d72f57443e8253106f31ae48f3f2373154765"
+        },
+        {
+          "sectionID": "11733",
+          "sectionNumber": "102.1",
+          "codeBook": "PC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "63c03ca8df4f1769e62de5b230d451d221684cc4a038fd052c39504fe73bd66a"
+        }
+      ],
+      "readSources": [
+        {
+          "id": "S1",
+          "sectionID": "12334",
+          "title": "PC 704.1 704.1 Slope of horizontal drainage piping."
+        },
+        {
+          "id": "S2",
+          "sectionID": "12335",
+          "title": "PC 704.2 704.2 Change in size."
+        },
+        {
+          "id": "S3",
+          "sectionID": "12467",
+          "title": "PC 714.3.2 714.3.2 Slope of horizontal drainage piping."
+        },
+        {
+          "id": "S4",
+          "sectionID": "12465",
+          "title": "PC 714.3 714.3 Selections of drainage pipe sizes."
+        },
+        {
+          "id": "S5",
+          "sectionID": "12466",
+          "title": "PC 714.3.1 714.3.1 Selecting pipe wall roughness."
+        }
+      ]
+    },
+    {
+      "topic": "mechanical",
+      "turn": 0,
+      "question": "Does that duct need a fire damper?",
+      "answer": "**Probably not—but verify the wall’s code classification and the duct details.** Under the 2022 NYC Building Code, a duct through a fire partition generally needs a listed fire damper. But for an office (non-Group H) project, the stated facts could fit exceptions for a one-hour-or-less wall in a building sprinklered throughout, if the duct is part of the HVAC system, is at least No. 26-gage sheet steel, and is continuous from the equipment to its air terminals. A separate exception applies to an interior corridor wall in a fully sprinklered building if the penetration is protected as a through-penetration under BC 714.3. [S4]\n\nIf the wall is instead a **fire barrier**, BC 717.5.2 also has an exception for qualifying one-hour-or-less HVAC penetrations in non-Group H areas of fully sprinklered buildings, with the same duct-construction and continuity conditions. [S12] The general rule exempts ducts no larger than 20 square inches from fire dampers, but that is a narrow additional exception—not a reason to assume a larger duct is exempt. [S1]\n\n**Separate smoke-damper issue:** If this is a public corridor wall that is a fire barrier, BC 717.5.2.2 generally requires a smoke damper. One exception applies when the penetrating duct is steel at least 0.019 inch thick and has no openings serving the corridor. The fire-damper exceptions do not, by themselves, establish that no smoke damper is needed. [S15]\n\nSo, confirm whether the wall is a fire partition or fire barrier, whether the corridor is public, the building’s sprinkler coverage, and the duct gauge, continuity, size, and openings. The duct penetration still must preserve the wall’s required fire resistance. [S4] [S12]",
+      "status": 200,
+      "timingScope": "client end-to-end",
+      "profile": {
+        "milliseconds": 21439.694708999996,
+        "cpuMilliseconds": 2449.944,
+        "upstreamMilliseconds": 20035.700082999992,
+        "otherMilliseconds": 1403.9946260000033,
+        "modelCalls": 5,
+        "embeddingCalls": 1,
+        "estimatedUSD": 0.018759659999999997,
+        "unknownCostCalls": 0,
+        "inputTokens": 60362,
+        "outputTokens": 1279,
+        "webActions": 0,
+        "phases": {
+          "intent_planning": {
+            "calls": 1,
+            "milliseconds": 7671.874499999998,
+            "inputTokens": 11850,
+            "cachedTokens": 1446,
+            "cacheWriteTokens": 10401,
+            "outputTokens": 535,
+            "reasoningTokens": 86,
+            "estimatedUSD": 0.003923,
+            "unknownCostCalls": 0,
+            "requestBytes": 50858
+          },
+          "section_selection": {
+            "calls": 1,
+            "milliseconds": 1336.7024999999994,
+            "inputTokens": 19592,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 19589,
+            "outputTokens": 39,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.006876,
+            "unknownCostCalls": 0,
+            "requestBytes": 72088
+          },
+          "agent_tool_routing": {
+            "calls": 2,
+            "milliseconds": 4120.076332999994,
+            "inputTokens": 17145,
+            "cachedTokens": 7393,
+            "cacheWriteTokens": 9746,
+            "outputTokens": 180,
+            "reasoningTokens": 101,
+            "estimatedUSD": 0.003577,
+            "unknownCostCalls": 0,
+            "requestBytes": 83900
+          },
+          "embedding": {
+            "calls": 1,
+            "milliseconds": 269.484083000003,
+            "inputTokens": 33,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 0,
+            "outputTokens": 0,
+            "reasoningTokens": 0,
+            "estimatedUSD": 6.6e-7,
+            "unknownCostCalls": 0,
+            "requestBytes": 253
+          },
+          "answer_generation": {
+            "calls": 1,
+            "milliseconds": 6637.562666999998,
+            "inputTokens": 11775,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 11772,
+            "outputTokens": 525,
+            "reasoningTokens": 136,
+            "estimatedUSD": 0.004383,
+            "unknownCostCalls": 0,
+            "requestBytes": 57396
+          }
+        },
+        "tools": {
+          "plan_research": 1,
+          "navigate_library": 1,
+          "read_library": 2,
+          "search_library": 1
+        },
+        "firstProgressMilliseconds": 23.163791999999376,
+        "progress": [
+          {
+            "milliseconds": 23.163791999999376,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "active",
+            "sequence": 1,
+            "at": "2026-11-16T17:05:30.935Z"
+          },
+          {
+            "milliseconds": 66.80120800000077,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "completed",
+            "sequence": 2,
+            "at": "2026-11-16T17:05:30.979Z"
+          },
+          {
+            "milliseconds": 66.83287500000006,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 3,
+            "at": "2026-11-16T17:05:30.979Z"
+          },
+          {
+            "milliseconds": 9136.882083,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 4,
+            "at": "2026-11-16T17:05:40.049Z"
+          },
+          {
+            "milliseconds": 11965.516375,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 5,
+            "at": "2026-11-16T17:05:42.877Z"
+          },
+          {
+            "milliseconds": 11975.885000000002,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 6,
+            "at": "2026-11-16T17:05:42.888Z"
+          },
+          {
+            "milliseconds": 13249.798083000001,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "completed",
+            "sequence": 7,
+            "at": "2026-11-16T17:05:44.162Z"
+          },
+          {
+            "milliseconds": 13249.836499999998,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "reviewing_provisions",
+            "label": "Reviewing potentially applicable provisions",
+            "state": "active",
+            "sequence": 8,
+            "at": "2026-11-16T17:05:44.162Z"
+          },
+          {
+            "milliseconds": 13283.365791999997,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "reviewing_provisions",
+            "label": "Reviewing potentially applicable provisions",
+            "state": "completed",
+            "sequence": 9,
+            "at": "2026-11-16T17:05:44.195Z"
+          },
+          {
+            "milliseconds": 13283.397917000002,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "following_cross_references",
+            "label": "Following cross-references",
+            "state": "active",
+            "sequence": 10,
+            "at": "2026-11-16T17:05:44.195Z"
+          },
+          {
+            "milliseconds": 13289.467791999996,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "following_cross_references",
+            "label": "Following cross-references",
+            "state": "completed",
+            "sequence": 11,
+            "at": "2026-11-16T17:05:44.201Z"
+          },
+          {
+            "milliseconds": 13364.501624999997,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 12,
+            "at": "2026-11-16T17:05:44.276Z"
+          },
+          {
+            "milliseconds": 14686.971749999997,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 13,
+            "at": "2026-11-16T17:05:45.599Z"
+          },
+          {
+            "milliseconds": 14703.551166999998,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 14,
+            "at": "2026-11-16T17:05:45.615Z"
+          },
+          {
+            "milliseconds": 21390.438333,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "completed",
+            "sequence": 15,
+            "at": "2026-11-16T17:05:52.302Z"
+          }
+        ]
+      },
+      "checks": {
+        "topic": true,
+        "citations": true,
+        "hasUnverifiedMarker": false
+      },
+      "tools": [
+        {
+          "tool": "plan_research",
+          "query": "Does that duct need a fire damper?"
+        },
+        {
+          "tool": "navigate_library",
+          "query": "For the proposed NYC office fit-out, does the supply-air duct penetrating the one-hour corridor wall require a fire damper, and do any applicable exceptions or alternative fire/smoke-protection requirements affect that determination?"
+        },
+        {
+          "tool": "read_library",
+          "query": "1298,1306,1307,1308,1309,1310,1311,1313",
+          "sources": [
+            {
+              "id": "S1",
+              "sectionID": "1298",
+              "title": "BC 717.5 717.5 Where required."
+            },
+            {
+              "id": "S2",
+              "sectionID": "1297",
+              "title": "BC 717.4 717.4 Access and identification."
+            },
+            {
+              "id": "S3",
+              "sectionID": "1314",
+              "title": "BC 717.6 717.6 Horizontal assemblies."
+            },
+            {
+              "id": "S4",
+              "sectionID": "1306",
+              "title": "BC 717.5.4 717.5.4 Fire partitions."
+            },
+            {
+              "id": "S5",
+              "sectionID": "1304",
+              "title": "BC 717.5.3 717.5.3 Shaft enclosures."
+            },
+            {
+              "id": "S6",
+              "sectionID": "1311",
+              "title": "BC 717.5.5 717.5.5 Smoke barriers."
+            },
+            {
+              "id": "S7",
+              "sectionID": "1312",
+              "title": "BC 717.5.6 717.5.6 Exterior walls."
+            },
+            {
+              "id": "S8",
+              "sectionID": "1313",
+              "title": "BC 717.5.7 717.5.7 Smoke partitions."
+            }
+          ],
+          "unavailable": [
+            {
+              "id": "1307",
+              "reason": "INCOMPLETE_RESEARCH_SECTION"
+            },
+            {
+              "id": "1308",
+              "reason": "INCOMPLETE_RESEARCH_SECTION"
+            },
+            {
+              "id": "1309",
+              "reason": "INCOMPLETE_RESEARCH_SECTION"
+            },
+            {
+              "id": "1310",
+              "reason": "INCOMPLETE_RESEARCH_SECTION"
+            }
+          ]
+        },
+        {
+          "tool": "search_library",
+          "query": "2022 NYC BC 714 through penetrations fire-resistance rated walls firestop systems annular space; BC 717 fire partition corridor HVAC duct smoke damper requirements"
+        },
+        {
+          "tool": "read_library",
+          "query": "1303,1196,1195",
+          "sources": [
+            {
+              "id": "S15",
+              "sectionID": "1303",
+              "title": "BC 717.5.2.2 717.5.2.2 Public corridors."
+            },
+            {
+              "id": "S12",
+              "sectionID": "1301",
+              "title": "BC 717.5.2 717.5.2 Fire barriers."
+            },
+            {
+              "id": "S19",
+              "sectionID": "1302",
+              "title": "BC 717.5.2.1 717.5.2.1 Horizontal exits."
+            },
+            {
+              "id": "S22",
+              "sectionID": "1196",
+              "title": "BC 714.3.1 714.3.1 Through-penetrations."
+            },
+            {
+              "id": "S13",
+              "sectionID": "1195",
+              "title": "BC 714.3 714.3 Fire-resistance-rated walls."
+            },
+            {
+              "id": "S14",
+              "sectionID": "1199",
+              "title": "BC 714.3.2 714.3.2 Membrane penetrations."
+            },
+            {
+              "id": "S25",
+              "sectionID": "1194",
+              "title": "BC 714.2 714.2 Installation details."
+            },
+            {
+              "id": "S26",
+              "sectionID": "1207",
+              "title": "BC 714.4 714.4 Horizontal assemblies."
+            }
+          ],
+          "unavailable": []
+        }
+      ],
+      "citations": [
+        {
+          "sectionID": "1298",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-1298"
+          ],
+          "sectionNumber": "717.5",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "717.5 Where required.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "1306",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-1306"
+          ],
+          "sectionNumber": "717.5.4",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "717.5.4 Fire partitions.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "1301",
+          "sourceIDs": [
+            "research-permitext_discovered-id:1301-4"
+          ],
+          "sectionNumber": "717.5.2",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "717.5.2 Fire barriers.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "1303",
+          "sourceIDs": [
+            "research-permitext_discovered-id:1303-8"
+          ],
+          "sectionNumber": "717.5.2.2",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "717.5.2.2 Public corridors.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        }
+      ],
+      "evidence": [
+        {
+          "sectionID": "1298",
+          "sectionNumber": "717.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "b729c5a15a2269fbac251235c021a7e4932753cf1ef2dca09e8bbed74b95dc6d"
+        },
+        {
+          "sectionID": "1297",
+          "sectionNumber": "717.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "b8f7652d2226ba27874bf74f004e04104973ce314f2c754c839023af3857b0f2"
+        },
+        {
+          "sectionID": "1314",
+          "sectionNumber": "717.6",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8990ae48c9e3f402d5aa37751b31fd48823b5ab683cda116587882fb45abddb9"
+        },
+        {
+          "sectionID": "1306",
+          "sectionNumber": "717.5.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "187940297b6eb39b8ff13b8f2750e557d54ef41251edfa9fe9c41a6a25f094eb"
+        },
+        {
+          "sectionID": "1304",
+          "sectionNumber": "717.5.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "56d300815ab9d0daeb1277c7c67f4d6b3479ae4c6cb67e0db39c5d755073d620"
+        },
+        {
+          "sectionID": "1311",
+          "sectionNumber": "717.5.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "9e1f48d90eabf5fcf0e69e1d5c52c05c2f4e88e9644085918c4dc753f7e30ed1"
+        },
+        {
+          "sectionID": "1312",
+          "sectionNumber": "717.5.6",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "6e29fc304de0e70131bc7138ae025fb0c5b53abd7e61abf1c7f2b89dd3b94086"
+        },
+        {
+          "sectionID": "1313",
+          "sectionNumber": "717.5.7",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "98d70b9758d8e2b89960ebb7aa68fc953180e0736af4227b96bd9c38de28d8fe"
+        },
+        {
+          "sectionID": "964",
+          "sectionNumber": "702.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "d10f5101d856543937c11a407d008b79b4430ccac72f2f7d4d53bba7cac6b58d"
+        },
+        {
+          "sectionID": "1090",
+          "sectionNumber": "708.7",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "0c25af4c575c7868bfdc2fde6a093b8faa55ecbb7916d305891dae28f2fd5fcb"
+        },
+        {
+          "sectionID": "1092",
+          "sectionNumber": "708.9",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "101445dde4aca4368bc93d040237188a66210f4cc64debcb2012c0db62551602"
+        },
+        {
+          "sectionID": "1301",
+          "sectionNumber": "717.5.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "77419bf603e49c2e5759eb85e346a14370f70ad467e8eb8c56b2a6f0a1e4d90e"
+        },
+        {
+          "sectionID": "1195",
+          "sectionNumber": "714.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "055f2caf295d6caf66eb73d4aa450a59f20b921a4b668d422be386fb73f56ca7"
+        },
+        {
+          "sectionID": "1199",
+          "sectionNumber": "714.3.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "7420b85be6504e54bcea53110fe9a999300305e01df097ae5ff259806d0cf461"
+        },
+        {
+          "sectionID": "1303",
+          "sectionNumber": "717.5.2.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "6e9ecc38a570f6cbe84af742e9fdbb1ab72fe182a464941964f9f83103178ef7"
+        },
+        {
+          "sectionID": "1212",
+          "sectionNumber": "714.4.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "b966e1c1cf21d7fbb16ca529f63b413e1f10d3f213769c8c54bdb20059299f9b"
+        },
+        {
+          "sectionID": "1299",
+          "sectionNumber": "717.5.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "9b2133cef571c0c7759c5616cd49b2ec8f53199984a6e54661367362ba1c4e13"
+        },
+        {
+          "sectionID": "1057",
+          "sectionNumber": "706.9",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "35d20313241323f085ea0e4d7c0a2793c215c587009e01f2f4ef208ff0a5530c"
+        },
+        {
+          "sectionID": "1302",
+          "sectionNumber": "717.5.2.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8e57f43e849faf9b6cbb997df75d8ec8e4833fc59b41f0ef0f3feb2c31786bd3"
+        },
+        {
+          "sectionID": "962",
+          "sectionNumber": "701.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "474f02d4172941396c3d53be7dc7a052ce39a0502251fd4f08f3c38f8e7d9414"
+        },
+        {
+          "sectionID": "1282",
+          "sectionNumber": "717.2.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "4a1027b436d16299dfbf0d56c20202eb640462fc113a9422991906056d901bee"
+        },
+        {
+          "sectionID": "1196",
+          "sectionNumber": "714.3.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "c7c3970c32df3687dead27dd665500371519ca407192065bd6a2d0191f8a0f1d"
+        },
+        {
+          "sectionID": "11",
+          "sectionNumber": "102.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "63c03ca8df4f1769e62de5b230d451d221684cc4a038fd052c39504fe73bd66a"
+        },
+        {
+          "sectionID": "113",
+          "sectionNumber": "202",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "5f964706815c387ee4c8ad0cef54deeda0d8211d72e95d564cb9a09b7b1cb8a2"
+        },
+        {
+          "sectionID": "1194",
+          "sectionNumber": "714.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "69ec0a667bf7e3663b119005018b49d1d984a3f7ab2f8ef5152366be78c4448f"
+        },
+        {
+          "sectionID": "1207",
+          "sectionNumber": "714.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "fec8e0aa063d2a3cd82555af6baea51348b5b370b803a3c4461c2b41e13b9936"
+        }
+      ],
+      "readSources": [
+        {
+          "id": "S1",
+          "sectionID": "1298",
+          "title": "BC 717.5 717.5 Where required."
+        },
+        {
+          "id": "S2",
+          "sectionID": "1297",
+          "title": "BC 717.4 717.4 Access and identification."
+        },
+        {
+          "id": "S3",
+          "sectionID": "1314",
+          "title": "BC 717.6 717.6 Horizontal assemblies."
+        },
+        {
+          "id": "S4",
+          "sectionID": "1306",
+          "title": "BC 717.5.4 717.5.4 Fire partitions."
+        },
+        {
+          "id": "S5",
+          "sectionID": "1304",
+          "title": "BC 717.5.3 717.5.3 Shaft enclosures."
+        },
+        {
+          "id": "S6",
+          "sectionID": "1311",
+          "title": "BC 717.5.5 717.5.5 Smoke barriers."
+        },
+        {
+          "id": "S7",
+          "sectionID": "1312",
+          "title": "BC 717.5.6 717.5.6 Exterior walls."
+        },
+        {
+          "id": "S8",
+          "sectionID": "1313",
+          "title": "BC 717.5.7 717.5.7 Smoke partitions."
+        },
+        {
+          "id": "S15",
+          "sectionID": "1303",
+          "title": "BC 717.5.2.2 717.5.2.2 Public corridors."
+        },
+        {
+          "id": "S12",
+          "sectionID": "1301",
+          "title": "BC 717.5.2 717.5.2 Fire barriers."
+        },
+        {
+          "id": "S19",
+          "sectionID": "1302",
+          "title": "BC 717.5.2.1 717.5.2.1 Horizontal exits."
+        },
+        {
+          "id": "S22",
+          "sectionID": "1196",
+          "title": "BC 714.3.1 714.3.1 Through-penetrations."
+        },
+        {
+          "id": "S13",
+          "sectionID": "1195",
+          "title": "BC 714.3 714.3 Fire-resistance-rated walls."
+        },
+        {
+          "id": "S14",
+          "sectionID": "1199",
+          "title": "BC 714.3.2 714.3.2 Membrane penetrations."
+        },
+        {
+          "id": "S25",
+          "sectionID": "1194",
+          "title": "BC 714.2 714.2 Installation details."
+        },
+        {
+          "id": "S26",
+          "sectionID": "1207",
+          "title": "BC 714.4 714.4 Horizontal assemblies."
+        }
+      ]
+    },
+    {
+      "topic": "mechanical",
+      "turn": 1,
+      "question": "What if we're sprinklered throughout?",
+      "answer": "**Sprinklers throughout can allow the fire damper to be omitted, but only if the duct and wall meet an exception—not just because sprinklers are present.**\n\nFor this office project, if the wall is a **fire partition**, the exception can apply to a one-hour wall in a fully sprinklered, non-Group H occupancy when the duct is part of the HVAC system, made of at least No. 26-gage sheet steel, and continuous from the air-handling equipment to its terminals. There is also an exception for interior-corridor fire partitions in fully sprinklered buildings if the duct penetration is protected under BC 714. [S1]\n\nIf the wall is a **fire barrier**, a similar sprinkler-related exception allows no fire damper for a qualifying duct through a wall rated one hour or less in a non-Group H area. [S2]\n\n**Sprinklers alone do not waive a separate smoke-damper requirement.** If this is a public-corridor wall classified as a fire barrier, a smoke damper is generally required; one exception applies when the duct is steel at least 0.019 inch thick and has no openings serving the corridor. [S3]\n\nSo verify the wall classification, whether this is a public corridor, full sprinkler coverage, and the duct’s gauge, continuity, and openings. The wall penetration still needs the required fire-resistance protection. [S4]",
+      "status": 200,
+      "timingScope": "client end-to-end",
+      "profile": {
+        "milliseconds": 18579.177208,
+        "cpuMilliseconds": 330.549,
+        "upstreamMilliseconds": 17452.595793,
+        "otherMilliseconds": 1126.5814150000006,
+        "modelCalls": 4,
+        "embeddingCalls": 0,
+        "estimatedUSD": 0.024040000000000002,
+        "unknownCostCalls": 0,
+        "inputTokens": 68199,
+        "outputTokens": 1325,
+        "webActions": 0,
+        "phases": {
+          "intent_planning": {
+            "calls": 1,
+            "milliseconds": 7844.007792000004,
+            "inputTokens": 15100,
+            "cachedTokens": 1446,
+            "cacheWriteTokens": 13651,
+            "outputTokens": 717,
+            "reasoningTokens": 277,
+            "estimatedUSD": 0.005152,
+            "unknownCostCalls": 0,
+            "requestBytes": 64337
+          },
+          "section_selection": {
+            "calls": 1,
+            "milliseconds": 1453.6333340000056,
+            "inputTokens": 17499,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 17496,
+            "outputTokens": 39,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.006144,
+            "unknownCostCalls": 0,
+            "requestBytes": 64972
+          },
+          "agent_tool_routing": {
+            "calls": 1,
+            "milliseconds": 1813.8347499999945,
+            "inputTokens": 16292,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 16289,
+            "outputTokens": 102,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.005753,
+            "unknownCostCalls": 0,
+            "requestBytes": 74403
+          },
+          "answer_generation": {
+            "calls": 1,
+            "milliseconds": 6341.119916999996,
+            "inputTokens": 19308,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 19305,
+            "outputTokens": 467,
+            "reasoningTokens": 171,
+            "estimatedUSD": 0.006991,
+            "unknownCostCalls": 0,
+            "requestBytes": 87623
+          }
+        },
+        "tools": {
+          "resolve_conversation": 1,
+          "recall_evidence": 1,
+          "navigate_library": 1,
+          "read_library": 2,
+          "read_conversation": 1
+        },
+        "firstProgressMilliseconds": 26.03925000000163,
+        "progress": [
+          {
+            "milliseconds": 26.03925000000163,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "active",
+            "sequence": 1,
+            "at": "2026-11-16T17:05:52.528Z"
+          },
+          {
+            "milliseconds": 50.09524999999849,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "completed",
+            "sequence": 2,
+            "at": "2026-11-16T17:05:52.553Z"
+          },
+          {
+            "milliseconds": 50.127832999998645,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 3,
+            "at": "2026-11-16T17:05:52.553Z"
+          },
+          {
+            "milliseconds": 9436.502958000005,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 4,
+            "at": "2026-11-16T17:06:01.939Z"
+          },
+          {
+            "milliseconds": 11267.212167000005,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 5,
+            "at": "2026-11-16T17:06:03.769Z"
+          },
+          {
+            "milliseconds": 11296.263083000005,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 6,
+            "at": "2026-11-16T17:06:03.799Z"
+          },
+          {
+            "milliseconds": 17981.663333000004,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "completed",
+            "sequence": 7,
+            "at": "2026-11-16T17:06:10.484Z"
+          }
+        ]
+      },
+      "checks": {
+        "topic": true,
+        "citations": true,
+        "hasUnverifiedMarker": false
+      },
+      "tools": [
+        {
+          "tool": "resolve_conversation",
+          "query": "What if we're sprinklered throughout?"
+        },
+        {
+          "tool": "recall_evidence",
+          "query": "For the proposed NYC office fit-out’s supply-air duct through a one-hour corridor wall, how does having automatic sprinklers throughout affect whether a fire damper is required, and does it change any separate smoke-damper requirement? The wall classification and duct details are unverified.",
+          "sources": [
+            {
+              "id": "S1",
+              "sectionID": "1306",
+              "title": "BC 717.5.4 717.5.4 Fire partitions.",
+              "recalledFrom": "R4"
+            },
+            {
+              "id": "S2",
+              "sectionID": "1301",
+              "title": "BC 717.5.2 717.5.2 Fire barriers.",
+              "recalledFrom": "R12"
+            },
+            {
+              "id": "S3",
+              "sectionID": "1303",
+              "title": "BC 717.5.2.2 717.5.2.2 Public corridors.",
+              "recalledFrom": "R15"
+            },
+            {
+              "id": "S4",
+              "sectionID": "1195",
+              "title": "BC 714.3 714.3 Fire-resistance-rated walls.",
+              "recalledFrom": "R13"
+            },
+            {
+              "id": "S5",
+              "sectionID": "1199",
+              "title": "BC 714.3.2 714.3.2 Membrane penetrations.",
+              "recalledFrom": "R14"
+            }
+          ],
+          "unavailable": []
+        },
+        {
+          "tool": "navigate_library",
+          "query": "For the proposed NYC office fit-out’s supply-air duct through a one-hour corridor wall, how does having automatic sprinklers throughout affect whether a fire damper is required, and does it change any separate smoke-damper requirement? The wall classification and duct details are unverified."
+        },
+        {
+          "tool": "read_library",
+          "query": "1298,1306,1311,1279,1285,1195,1196,1207",
+          "sources": [
+            {
+              "id": "S6",
+              "sectionID": "1298",
+              "title": "BC 717.5 717.5 Where required."
+            },
+            {
+              "id": "S7",
+              "sectionID": "1297",
+              "title": "BC 717.4 717.4 Access and identification."
+            },
+            {
+              "id": "S8",
+              "sectionID": "1314",
+              "title": "BC 717.6 717.6 Horizontal assemblies."
+            },
+            {
+              "id": "S1",
+              "sectionID": "1306",
+              "title": "BC 717.5.4 717.5.4 Fire partitions."
+            },
+            {
+              "id": "S9",
+              "sectionID": "1304",
+              "title": "BC 717.5.3 717.5.3 Shaft enclosures."
+            },
+            {
+              "id": "S10",
+              "sectionID": "1311",
+              "title": "BC 717.5.5 717.5.5 Smoke barriers."
+            },
+            {
+              "id": "S11",
+              "sectionID": "1312",
+              "title": "BC 717.5.6 717.5.6 Exterior walls."
+            },
+            {
+              "id": "S12",
+              "sectionID": "1279",
+              "title": "BC 717.1.2 717.1.2 Ducts that penetrate fire-resistance-rated assemblies without dampers."
+            },
+            {
+              "id": "S13",
+              "sectionID": "1277",
+              "title": "BC 717.1 717.1 General."
+            },
+            {
+              "id": "S14",
+              "sectionID": "1278",
+              "title": "BC 717.1.1 717.1.1 Ducts and air transfer openings."
+            },
+            {
+              "id": "S15",
+              "sectionID": "1285",
+              "title": "BC 717.2.3 717.2.3 Supply air systems."
+            },
+            {
+              "id": "S16",
+              "sectionID": "1281",
+              "title": "BC 717.2 717.2 Installation."
+            },
+            {
+              "id": "S17",
+              "sectionID": "1284",
+              "title": "BC 717.2.2 717.2.2 Hazardous exhaust ducts."
+            },
+            {
+              "id": "S4",
+              "sectionID": "1195",
+              "title": "BC 714.3 714.3 Fire-resistance-rated walls."
+            },
+            {
+              "id": "S18",
+              "sectionID": "1194",
+              "title": "BC 714.2 714.2 Installation details."
+            },
+            {
+              "id": "S19",
+              "sectionID": "1207",
+              "title": "BC 714.4 714.4 Horizontal assemblies."
+            },
+            {
+              "id": "S20",
+              "sectionID": "1196",
+              "title": "BC 714.3.1 714.3.1 Through-penetrations."
+            },
+            {
+              "id": "S5",
+              "sectionID": "1199",
+              "title": "BC 714.3.2 714.3.2 Membrane penetrations."
+            },
+            {
+              "id": "S21",
+              "sectionID": "1213",
+              "title": "BC 714.5 714.5 Nonfire-resistance-rated assemblies."
+            }
+          ],
+          "unavailable": []
+        },
+        {
+          "tool": "read_conversation",
+          "query": "R4,R12,R15,R13,R14,R4,R12,R15,R13,R14",
+          "sources": [
+            {
+              "id": "S1",
+              "sectionID": "1306",
+              "title": "BC 717.5.4 717.5.4 Fire partitions.",
+              "recalledFrom": "R4"
+            },
+            {
+              "id": "S2",
+              "sectionID": "1301",
+              "title": "BC 717.5.2 717.5.2 Fire barriers.",
+              "recalledFrom": "R12"
+            },
+            {
+              "id": "S3",
+              "sectionID": "1303",
+              "title": "BC 717.5.2.2 717.5.2.2 Public corridors.",
+              "recalledFrom": "R15"
+            },
+            {
+              "id": "S4",
+              "sectionID": "1195",
+              "title": "BC 714.3 714.3 Fire-resistance-rated walls.",
+              "recalledFrom": "R13"
+            },
+            {
+              "id": "S5",
+              "sectionID": "1199",
+              "title": "BC 714.3.2 714.3.2 Membrane penetrations.",
+              "recalledFrom": "R14"
+            }
+          ],
+          "unavailable": []
+        },
+        {
+          "tool": "read_library",
+          "query": "1306,1301,1303,1195,1196",
+          "sources": [
+            {
+              "id": "S1",
+              "sectionID": "1306",
+              "title": "BC 717.5.4 717.5.4 Fire partitions."
+            },
+            {
+              "id": "S6",
+              "sectionID": "1298",
+              "title": "BC 717.5 717.5 Where required."
+            },
+            {
+              "id": "S9",
+              "sectionID": "1304",
+              "title": "BC 717.5.3 717.5.3 Shaft enclosures."
+            },
+            {
+              "id": "S10",
+              "sectionID": "1311",
+              "title": "BC 717.5.5 717.5.5 Smoke barriers."
+            },
+            {
+              "id": "S2",
+              "sectionID": "1301",
+              "title": "BC 717.5.2 717.5.2 Fire barriers."
+            },
+            {
+              "id": "S22",
+              "sectionID": "1299",
+              "title": "BC 717.5.1 717.5.1 Fire walls."
+            },
+            {
+              "id": "S3",
+              "sectionID": "1303",
+              "title": "BC 717.5.2.2 717.5.2.2 Public corridors."
+            },
+            {
+              "id": "S23",
+              "sectionID": "1302",
+              "title": "BC 717.5.2.1 717.5.2.1 Horizontal exits."
+            },
+            {
+              "id": "S4",
+              "sectionID": "1195",
+              "title": "BC 714.3 714.3 Fire-resistance-rated walls."
+            },
+            {
+              "id": "S18",
+              "sectionID": "1194",
+              "title": "BC 714.2 714.2 Installation details."
+            },
+            {
+              "id": "S19",
+              "sectionID": "1207",
+              "title": "BC 714.4 714.4 Horizontal assemblies."
+            },
+            {
+              "id": "S20",
+              "sectionID": "1196",
+              "title": "BC 714.3.1 714.3.1 Through-penetrations."
+            },
+            {
+              "id": "S5",
+              "sectionID": "1199",
+              "title": "BC 714.3.2 714.3.2 Membrane penetrations."
+            }
+          ],
+          "unavailable": []
+        }
+      ],
+      "citations": [
+        {
+          "sectionID": "1306",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-1306"
+          ],
+          "sectionNumber": "717.5.4",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "717.5.4 Fire partitions.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "1301",
+          "sourceIDs": [
+            "research-permitext_discovered-id:1301-4"
+          ],
+          "sectionNumber": "717.5.2",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "717.5.2 Fire barriers.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "1303",
+          "sourceIDs": [
+            "research-permitext_discovered-id:1303-8"
+          ],
+          "sectionNumber": "717.5.2.2",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "717.5.2.2 Public corridors.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "1195",
+          "sourceIDs": [
+            "research-permitext_discovered-id:1195-5"
+          ],
+          "sectionNumber": "714.3",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "714.3 Fire-resistance-rated walls.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        }
+      ],
+      "evidence": [
+        {
+          "sectionID": "1306",
+          "sectionNumber": "717.5.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "187940297b6eb39b8ff13b8f2750e557d54ef41251edfa9fe9c41a6a25f094eb"
+        },
+        {
+          "sectionID": "1301",
+          "sectionNumber": "717.5.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "77419bf603e49c2e5759eb85e346a14370f70ad467e8eb8c56b2a6f0a1e4d90e"
+        },
+        {
+          "sectionID": "1303",
+          "sectionNumber": "717.5.2.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "6e9ecc38a570f6cbe84af742e9fdbb1ab72fe182a464941964f9f83103178ef7"
+        },
+        {
+          "sectionID": "1195",
+          "sectionNumber": "714.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "055f2caf295d6caf66eb73d4aa450a59f20b921a4b668d422be386fb73f56ca7"
+        },
+        {
+          "sectionID": "1199",
+          "sectionNumber": "714.3.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "7420b85be6504e54bcea53110fe9a999300305e01df097ae5ff259806d0cf461"
+        },
+        {
+          "sectionID": "1298",
+          "sectionNumber": "717.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "b729c5a15a2269fbac251235c021a7e4932753cf1ef2dca09e8bbed74b95dc6d"
+        },
+        {
+          "sectionID": "1297",
+          "sectionNumber": "717.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "b8f7652d2226ba27874bf74f004e04104973ce314f2c754c839023af3857b0f2"
+        },
+        {
+          "sectionID": "1314",
+          "sectionNumber": "717.6",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8990ae48c9e3f402d5aa37751b31fd48823b5ab683cda116587882fb45abddb9"
+        },
+        {
+          "sectionID": "1304",
+          "sectionNumber": "717.5.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "56d300815ab9d0daeb1277c7c67f4d6b3479ae4c6cb67e0db39c5d755073d620"
+        },
+        {
+          "sectionID": "1311",
+          "sectionNumber": "717.5.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "9e1f48d90eabf5fcf0e69e1d5c52c05c2f4e88e9644085918c4dc753f7e30ed1"
+        },
+        {
+          "sectionID": "1312",
+          "sectionNumber": "717.5.6",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "6e29fc304de0e70131bc7138ae025fb0c5b53abd7e61abf1c7f2b89dd3b94086"
+        },
+        {
+          "sectionID": "1279",
+          "sectionNumber": "717.1.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "11471cfc4738373e1f0df790b0d331ed70bd740b79dcadc904bd7c6a4d17558f"
+        },
+        {
+          "sectionID": "1277",
+          "sectionNumber": "717.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "91b8c68598ad0edf7f9ae93eb4d428d7f3ee2c3b7f604a2e612c0c8317f990cd"
+        },
+        {
+          "sectionID": "1278",
+          "sectionNumber": "717.1.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "29f749d61609e0bd26264888c8d0884ee42bf47ea4bd8ad38e87046aa09f26ea"
+        },
+        {
+          "sectionID": "1285",
+          "sectionNumber": "717.2.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "a49f873e8df8996ced8ff5bae8b1a97601a3f6e31e9298ba1eca8a635bd4c754"
+        },
+        {
+          "sectionID": "1281",
+          "sectionNumber": "717.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "e6cc94c23666bacbae273b8c01ceea87135bb39438a2e1b71d3b7bd99f276e81"
+        },
+        {
+          "sectionID": "1284",
+          "sectionNumber": "717.2.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "229fef286c89bcfe2d3bca1ce38bd87b0f4f81fe3f63f46270684597d9ef0def"
+        },
+        {
+          "sectionID": "1194",
+          "sectionNumber": "714.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "69ec0a667bf7e3663b119005018b49d1d984a3f7ab2f8ef5152366be78c4448f"
+        },
+        {
+          "sectionID": "1207",
+          "sectionNumber": "714.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "fec8e0aa063d2a3cd82555af6baea51348b5b370b803a3c4461c2b41e13b9936"
+        },
+        {
+          "sectionID": "1196",
+          "sectionNumber": "714.3.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "c7c3970c32df3687dead27dd665500371519ca407192065bd6a2d0191f8a0f1d"
+        },
+        {
+          "sectionID": "1213",
+          "sectionNumber": "714.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "b1bb36565f34b368005f7225a37553854deedcd6a4bb57e283a4db52d0d1e380"
+        },
+        {
+          "sectionID": "1299",
+          "sectionNumber": "717.5.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "9b2133cef571c0c7759c5616cd49b2ec8f53199984a6e54661367362ba1c4e13"
+        },
+        {
+          "sectionID": "1302",
+          "sectionNumber": "717.5.2.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8e57f43e849faf9b6cbb997df75d8ec8e4833fc59b41f0ef0f3feb2c31786bd3"
+        }
+      ],
+      "readSources": [
+        {
+          "id": "S6",
+          "sectionID": "1298",
+          "title": "BC 717.5 717.5 Where required."
+        },
+        {
+          "id": "S7",
+          "sectionID": "1297",
+          "title": "BC 717.4 717.4 Access and identification."
+        },
+        {
+          "id": "S8",
+          "sectionID": "1314",
+          "title": "BC 717.6 717.6 Horizontal assemblies."
+        },
+        {
+          "id": "S1",
+          "sectionID": "1306",
+          "title": "BC 717.5.4 717.5.4 Fire partitions."
+        },
+        {
+          "id": "S9",
+          "sectionID": "1304",
+          "title": "BC 717.5.3 717.5.3 Shaft enclosures."
+        },
+        {
+          "id": "S10",
+          "sectionID": "1311",
+          "title": "BC 717.5.5 717.5.5 Smoke barriers."
+        },
+        {
+          "id": "S11",
+          "sectionID": "1312",
+          "title": "BC 717.5.6 717.5.6 Exterior walls."
+        },
+        {
+          "id": "S12",
+          "sectionID": "1279",
+          "title": "BC 717.1.2 717.1.2 Ducts that penetrate fire-resistance-rated assemblies without dampers."
+        },
+        {
+          "id": "S13",
+          "sectionID": "1277",
+          "title": "BC 717.1 717.1 General."
+        },
+        {
+          "id": "S14",
+          "sectionID": "1278",
+          "title": "BC 717.1.1 717.1.1 Ducts and air transfer openings."
+        },
+        {
+          "id": "S15",
+          "sectionID": "1285",
+          "title": "BC 717.2.3 717.2.3 Supply air systems."
+        },
+        {
+          "id": "S16",
+          "sectionID": "1281",
+          "title": "BC 717.2 717.2 Installation."
+        },
+        {
+          "id": "S17",
+          "sectionID": "1284",
+          "title": "BC 717.2.2 717.2.2 Hazardous exhaust ducts."
+        },
+        {
+          "id": "S4",
+          "sectionID": "1195",
+          "title": "BC 714.3 714.3 Fire-resistance-rated walls."
+        },
+        {
+          "id": "S18",
+          "sectionID": "1194",
+          "title": "BC 714.2 714.2 Installation details."
+        },
+        {
+          "id": "S19",
+          "sectionID": "1207",
+          "title": "BC 714.4 714.4 Horizontal assemblies."
+        },
+        {
+          "id": "S20",
+          "sectionID": "1196",
+          "title": "BC 714.3.1 714.3.1 Through-penetrations."
+        },
+        {
+          "id": "S5",
+          "sectionID": "1199",
+          "title": "BC 714.3.2 714.3.2 Membrane penetrations."
+        },
+        {
+          "id": "S21",
+          "sectionID": "1213",
+          "title": "BC 714.5 714.5 Nonfire-resistance-rated assemblies."
+        },
+        {
+          "id": "S1",
+          "sectionID": "1306",
+          "title": "BC 717.5.4 717.5.4 Fire partitions."
+        },
+        {
+          "id": "S6",
+          "sectionID": "1298",
+          "title": "BC 717.5 717.5 Where required."
+        },
+        {
+          "id": "S9",
+          "sectionID": "1304",
+          "title": "BC 717.5.3 717.5.3 Shaft enclosures."
+        },
+        {
+          "id": "S10",
+          "sectionID": "1311",
+          "title": "BC 717.5.5 717.5.5 Smoke barriers."
+        },
+        {
+          "id": "S2",
+          "sectionID": "1301",
+          "title": "BC 717.5.2 717.5.2 Fire barriers."
+        },
+        {
+          "id": "S22",
+          "sectionID": "1299",
+          "title": "BC 717.5.1 717.5.1 Fire walls."
+        },
+        {
+          "id": "S3",
+          "sectionID": "1303",
+          "title": "BC 717.5.2.2 717.5.2.2 Public corridors."
+        },
+        {
+          "id": "S23",
+          "sectionID": "1302",
+          "title": "BC 717.5.2.1 717.5.2.1 Horizontal exits."
+        },
+        {
+          "id": "S4",
+          "sectionID": "1195",
+          "title": "BC 714.3 714.3 Fire-resistance-rated walls."
+        },
+        {
+          "id": "S18",
+          "sectionID": "1194",
+          "title": "BC 714.2 714.2 Installation details."
+        },
+        {
+          "id": "S19",
+          "sectionID": "1207",
+          "title": "BC 714.4 714.4 Horizontal assemblies."
+        },
+        {
+          "id": "S20",
+          "sectionID": "1196",
+          "title": "BC 714.3.1 714.3.1 Through-penetrations."
+        },
+        {
+          "id": "S5",
+          "sectionID": "1199",
+          "title": "BC 714.3.2 714.3.2 Membrane penetrations."
+        }
+      ]
+    },
+    {
+      "topic": "residential-roof",
+      "turn": 0,
+      "question": "Does my elevator need to go to the roof?",
+      "answer": "**Yes—on the facts given, the common rooftop terrace needs an accessible route, and with no alternative accessible route proposed, the passenger elevator should serve the terrace.**\n\nThe code requires common-use spaces serving the dwelling units to be accessible, expressly including residents’ terraces. It also requires an accessible route connecting the building’s accessible units to exterior spaces and facilities serving them. The exception for certain private terraces attached to individual units does not fit a **common** terrace. [S9] [S8]\n\nFor a multilevel building, an accessible route must connect accessible levels. The 2,500-square-foot exception is limited to nonresidential buildings, and the other listed exceptions do not appear to cover this eight-story R-2 building or its common terrace. [S5] Thus, unless a code-compliant alternative accessible route is provided, the elevator is the practical route to the terrace; passenger elevators on an accessible route must comply with the accessibility requirements. [S15]\n\nSeparately, roof-access and egress provisions require stair access in this building; those provisions do **not** substitute for an accessible route. [S18] [S19] The elevator’s roof stop is therefore an accessibility issue, not simply a stair-to-roof requirement.",
+      "status": 200,
+      "timingScope": "client end-to-end",
+      "profile": {
+        "milliseconds": 22706.375999999997,
+        "cpuMilliseconds": 2751.886,
+        "upstreamMilliseconds": 21271.091749,
+        "otherMilliseconds": 1435.2842509999973,
+        "modelCalls": 5,
+        "embeddingCalls": 1,
+        "estimatedUSD": 0.026722700000000002,
+        "unknownCostCalls": 0,
+        "inputTokens": 88227,
+        "outputTokens": 1280,
+        "webActions": 0,
+        "phases": {
+          "intent_planning": {
+            "calls": 1,
+            "milliseconds": 9371.611375000008,
+            "inputTokens": 11886,
+            "cachedTokens": 1446,
+            "cacheWriteTokens": 10437,
+            "outputTokens": 676,
+            "reasoningTokens": 197,
+            "estimatedUSD": 0.004006,
+            "unknownCostCalls": 0,
+            "requestBytes": 50946
+          },
+          "section_selection": {
+            "calls": 1,
+            "milliseconds": 1325.9404159999976,
+            "inputTokens": 28596,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 28593,
+            "outputTokens": 39,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.010028,
+            "unknownCostCalls": 0,
+            "requestBytes": 105236
+          },
+          "agent_tool_routing": {
+            "calls": 2,
+            "milliseconds": 3545.771624999994,
+            "inputTokens": 27919,
+            "cachedTokens": 12660,
+            "cacheWriteTokens": 15253,
+            "outputTokens": 94,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.005514,
+            "unknownCostCalls": 0,
+            "requestBytes": 126987
+          },
+          "embedding": {
+            "calls": 1,
+            "milliseconds": 222.26945800000976,
+            "inputTokens": 35,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 0,
+            "outputTokens": 0,
+            "reasoningTokens": 0,
+            "estimatedUSD": 7.000000000000001e-7,
+            "unknownCostCalls": 0,
+            "requestBytes": 238
+          },
+          "answer_generation": {
+            "calls": 1,
+            "milliseconds": 6805.49887499999,
+            "inputTokens": 19826,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 19823,
+            "outputTokens": 471,
+            "reasoningTokens": 212,
+            "estimatedUSD": 0.007174,
+            "unknownCostCalls": 0,
+            "requestBytes": 87097
+          }
+        },
+        "tools": {
+          "plan_research": 1,
+          "navigate_library": 1,
+          "read_library": 2,
+          "search_library": 1
+        },
+        "firstProgressMilliseconds": 28.832707999994454,
+        "progress": [
+          {
+            "milliseconds": 28.832707999994454,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "active",
+            "sequence": 1,
+            "at": "2026-11-16T17:06:11.551Z"
+          },
+          {
+            "milliseconds": 53.86570799999754,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "completed",
+            "sequence": 2,
+            "at": "2026-11-16T17:06:11.576Z"
+          },
+          {
+            "milliseconds": 53.89545799999905,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 3,
+            "at": "2026-11-16T17:06:11.576Z"
+          },
+          {
+            "milliseconds": 10841.739624999995,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 4,
+            "at": "2026-11-16T17:06:22.363Z"
+          },
+          {
+            "milliseconds": 12384.627291999997,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 5,
+            "at": "2026-11-16T17:06:23.906Z"
+          },
+          {
+            "milliseconds": 12391.690708000002,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 6,
+            "at": "2026-11-16T17:06:23.913Z"
+          },
+          {
+            "milliseconds": 13566.085417000002,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "completed",
+            "sequence": 7,
+            "at": "2026-11-16T17:06:25.088Z"
+          },
+          {
+            "milliseconds": 13566.131499999996,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "reviewing_provisions",
+            "label": "Reviewing potentially applicable provisions",
+            "state": "active",
+            "sequence": 8,
+            "at": "2026-11-16T17:06:25.088Z"
+          },
+          {
+            "milliseconds": 13594.812792000004,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "reviewing_provisions",
+            "label": "Reviewing potentially applicable provisions",
+            "state": "completed",
+            "sequence": 9,
+            "at": "2026-11-16T17:06:25.116Z"
+          },
+          {
+            "milliseconds": 13594.846083000004,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "following_cross_references",
+            "label": "Following cross-references",
+            "state": "active",
+            "sequence": 10,
+            "at": "2026-11-16T17:06:25.116Z"
+          },
+          {
+            "milliseconds": 13616.321625000004,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "following_cross_references",
+            "label": "Following cross-references",
+            "state": "completed",
+            "sequence": 11,
+            "at": "2026-11-16T17:06:25.138Z"
+          },
+          {
+            "milliseconds": 13695.04708299999,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 12,
+            "at": "2026-11-16T17:06:25.217Z"
+          },
+          {
+            "milliseconds": 15724.308750000004,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 13,
+            "at": "2026-11-16T17:06:27.246Z"
+          },
+          {
+            "milliseconds": 15752.087374999996,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 14,
+            "at": "2026-11-16T17:06:27.274Z"
+          },
+          {
+            "milliseconds": 22641.997874999994,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "completed",
+            "sequence": 15,
+            "at": "2026-11-16T17:06:34.163Z"
+          }
+        ]
+      },
+      "checks": {
+        "topic": true,
+        "citations": true,
+        "hasUnverifiedMarker": false
+      },
+      "tools": [
+        {
+          "tool": "plan_research",
+          "query": "Does my elevator need to go to the roof?"
+        },
+        {
+          "tool": "navigate_library",
+          "query": "For the proposed new eight-story NYC Group R-2 building with a passenger elevator and a common rooftop terrace, must the elevator provide access to the roof terrace, given that no alternative accessible route is proposed?"
+        },
+        {
+          "tool": "read_library",
+          "query": "2623,2637,2658,2740,2760,2830,2331,2157",
+          "sources": [
+            {
+              "id": "S1",
+              "sectionID": "2623",
+              "title": "BC 1101.1 1101.1 Scope."
+            },
+            {
+              "id": "S2",
+              "sectionID": "2624",
+              "title": "BC 1101.2 1101.2 Design."
+            },
+            {
+              "id": "S3",
+              "sectionID": "2637",
+              "title": "BC 1103.1 1103.1 Where required."
+            },
+            {
+              "id": "S4",
+              "sectionID": "2638",
+              "title": "BC 1103.2 1103.2 General exceptions."
+            },
+            {
+              "id": "S5",
+              "sectionID": "2658",
+              "title": "BC 1104.4 1104.4 Multilevel buildings and facilities."
+            },
+            {
+              "id": "S6",
+              "sectionID": "2655",
+              "title": "BC 1104.3 1104.3 Connected spaces."
+            },
+            {
+              "id": "S7",
+              "sectionID": "2664",
+              "title": "BC 1104.5 1104.5 Location."
+            },
+            {
+              "id": "S8",
+              "sectionID": "2740",
+              "title": "BC 1107.4 1107.4 Accessible route."
+            },
+            {
+              "id": "S9",
+              "sectionID": "2738",
+              "title": "BC 1107.3 1107.3 Accessible spaces."
+            },
+            {
+              "id": "S10",
+              "sectionID": "2741",
+              "title": "BC 1107.5 1107.5 Group I."
+            },
+            {
+              "id": "S11",
+              "sectionID": "2760",
+              "title": "BC 1107.6.2 1107.6.2 Group R-2."
+            },
+            {
+              "id": "S12",
+              "sectionID": "2752",
+              "title": "BC 1107.6 1107.6 Group R."
+            },
+            {
+              "id": "S13",
+              "sectionID": "2753",
+              "title": "BC 1107.6.1 1107.6.1 Group R-1."
+            },
+            {
+              "id": "S14",
+              "sectionID": "2763",
+              "title": "BC 1107.6.3 1107.6.3 Group R-3."
+            },
+            {
+              "id": "S15",
+              "sectionID": "2830",
+              "title": "BC 1109.7 1109.7 Elevators."
+            },
+            {
+              "id": "S16",
+              "sectionID": "2829",
+              "title": "BC 1109.6 1109.6 Saunas and steam rooms."
+            },
+            {
+              "id": "S17",
+              "sectionID": "2858",
+              "title": "BC 1109.8 1109.8 Lifts."
+            },
+            {
+              "id": "S18",
+              "sectionID": "2331",
+              "title": "BC 1011.12.1 1011.12.1 Occupancy Groups I-1, R-1 and R-2."
+            },
+            {
+              "id": "S19",
+              "sectionID": "2330",
+              "title": "BC 1011.12 1011.12 Stairway to roof and roof access."
+            },
+            {
+              "id": "S20",
+              "sectionID": "2332",
+              "title": "BC 1011.12.2 1011.12.2 Stairway to elevator equipment."
+            },
+            {
+              "id": "S21",
+              "sectionID": "2157",
+              "title": "BC 1004.4 1004.4 Outdoor areas."
+            },
+            {
+              "id": "S22",
+              "sectionID": "2156",
+              "title": "BC 1004.3 1004.3 Fixed seating."
+            },
+            {
+              "id": "S23",
+              "sectionID": "2158",
+              "title": "BC 1004.5 1004.5 Multiple occupancies."
+            }
+          ],
+          "unavailable": []
+        },
+        {
+          "tool": "search_library",
+          "query": "BC 1107.4 common use exterior rooftop terrace accessible route exceptions Group R-2 1107.6.2 accessible route stories roof terrace elevator NYC 2022"
+        },
+        {
+          "tool": "read_library",
+          "query": "S27,S28,S24,S8,S9,S5,S35,S18",
+          "sources": [
+            {
+              "id": "S27",
+              "sectionID": "2183",
+              "title": "BC 1006.3 1006.3 Egress from stories or occupied roofs."
+            },
+            {
+              "id": "S36",
+              "sectionID": "2174",
+              "title": "BC 1006.2 1006.2 Egress from spaces."
+            },
+            {
+              "id": "S37",
+              "sectionID": "2195",
+              "title": "BC 1006.4 1006.4 Open or enclosed parking garages."
+            },
+            {
+              "id": "S28",
+              "sectionID": "2185",
+              "title": "BC 1006.3.2 1006.3.2 Single exits."
+            },
+            {
+              "id": "S38",
+              "sectionID": "2184",
+              "title": "BC 1006.3.1 1006.3.1 Egress based on occupant load."
+            },
+            {
+              "id": "S24",
+              "sectionID": "2769",
+              "title": "BC 1107.7.3 1107.7.3 Elevator service to the lowest story with Type B units."
+            },
+            {
+              "id": "S32",
+              "sectionID": "2764",
+              "title": "BC 1107.7 1107.7 General exceptions for Type B units."
+            },
+            {
+              "id": "S39",
+              "sectionID": "2768",
+              "title": "BC 1107.7.2 1107.7.2 Multistory units where Type B units are required."
+            },
+            {
+              "id": "S40",
+              "sectionID": "2770",
+              "title": "BC 1107.7.4 1107.7.4 General exceptions for Type B+NYC units."
+            },
+            {
+              "id": "S8",
+              "sectionID": "2740",
+              "title": "BC 1107.4 1107.4 Accessible route."
+            },
+            {
+              "id": "S9",
+              "sectionID": "2738",
+              "title": "BC 1107.3 1107.3 Accessible spaces."
+            },
+            {
+              "id": "S10",
+              "sectionID": "2741",
+              "title": "BC 1107.5 1107.5 Group I."
+            },
+            {
+              "id": "S41",
+              "sectionID": "2698",
+              "title": "BC 1107.2 1107.2 Design."
+            },
+            {
+              "id": "S5",
+              "sectionID": "2658",
+              "title": "BC 1104.4 1104.4 Multilevel buildings and facilities."
+            },
+            {
+              "id": "S6",
+              "sectionID": "2655",
+              "title": "BC 1104.3 1104.3 Connected spaces."
+            },
+            {
+              "id": "S7",
+              "sectionID": "2664",
+              "title": "BC 1104.5 1104.5 Location."
+            },
+            {
+              "id": "S35",
+              "sectionID": "2636",
+              "title": "BC 1102.1 1102.1 Definitions."
+            },
+            {
+              "id": "S18",
+              "sectionID": "2331",
+              "title": "BC 1011.12.1 1011.12.1 Occupancy Groups I-1, R-1 and R-2."
+            },
+            {
+              "id": "S19",
+              "sectionID": "2330",
+              "title": "BC 1011.12 1011.12 Stairway to roof and roof access."
+            },
+            {
+              "id": "S20",
+              "sectionID": "2332",
+              "title": "BC 1011.12.2 1011.12.2 Stairway to elevator equipment."
+            }
+          ],
+          "unavailable": []
+        }
+      ],
+      "citations": [
+        {
+          "sectionID": "2658",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-2658"
+          ],
+          "sectionNumber": "1104.4",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1104.4 Multilevel buildings and facilities.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "2740",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-2740"
+          ],
+          "sectionNumber": "1107.4",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1107.4 Accessible route.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "2738",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-2738"
+          ],
+          "sectionNumber": "1107.3",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1107.3 Accessible spaces.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "2830",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-2830"
+          ],
+          "sectionNumber": "1109.7",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1109.7 Elevators.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "2331",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-2331"
+          ],
+          "sectionNumber": "1011.12.1",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1011.12.1 Occupancy Groups I-1, R-1 and R-2.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "2330",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-2330"
+          ],
+          "sectionNumber": "1011.12",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1011.12 Stairway to roof and roof access.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        }
+      ],
+      "evidence": [
+        {
+          "sectionID": "2623",
+          "sectionNumber": "1101.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8bbf4709e5ed2b9b205e48f92b853edaad70da9b802c853b9a511d4abb002163"
+        },
+        {
+          "sectionID": "2624",
+          "sectionNumber": "1101.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "c3c3692bdc6301152abe241f543ad52bc0a3b6c591cbd5bb7b320663c35a1792"
+        },
+        {
+          "sectionID": "2637",
+          "sectionNumber": "1103.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "5e1965ec7f1ac7b95a607617c2004c37a57f6031d965685ae0ce21c1c011f877"
+        },
+        {
+          "sectionID": "2638",
+          "sectionNumber": "1103.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "3a94bb6c94ba9b73bf4380f053df181b709971220f1ac7f428377ae485e6ebde"
+        },
+        {
+          "sectionID": "2658",
+          "sectionNumber": "1104.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "d1c44953cd7d7a05600c8948e97d1df3b0a13357fab399c1859090149bdf32dc"
+        },
+        {
+          "sectionID": "2655",
+          "sectionNumber": "1104.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "c4a25de4c941c0e7ac4995bffa84749f4aae703cd250cd5f07a9d4c81efc5a06"
+        },
+        {
+          "sectionID": "2664",
+          "sectionNumber": "1104.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "25c700daa70ab904bb6302a7d1746c73cac571ab5a9c63685760c91cc2738958"
+        },
+        {
+          "sectionID": "2740",
+          "sectionNumber": "1107.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "de83fa5cb913d2be6c16a7a60a636a714f2d8939fa861ea4c056dc56ac7c1e81"
+        },
+        {
+          "sectionID": "2738",
+          "sectionNumber": "1107.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "ad20ce6f688316cbd532ad52f700c36ec0ccf5737dc9b45f22eae8c48db0d87b"
+        },
+        {
+          "sectionID": "2741",
+          "sectionNumber": "1107.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "0c8726d8c2262cce1a399dd540e67a1babc72495ff2290a8e21dd64982683fd7"
+        },
+        {
+          "sectionID": "2760",
+          "sectionNumber": "1107.6.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "a3e2eb67e4881711da796547d0600375554c39cabf47edeb454eb041f1bb0fbf"
+        },
+        {
+          "sectionID": "2752",
+          "sectionNumber": "1107.6",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "80de284a3082afb6d21586629629e2d38f6abe9dc95a901b5c2315c446de24b1"
+        },
+        {
+          "sectionID": "2753",
+          "sectionNumber": "1107.6.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8b08df6fd1266c1c8eb2910b05791ce7b00b1adc1fd9ec1e604807c3cc969a54"
+        },
+        {
+          "sectionID": "2763",
+          "sectionNumber": "1107.6.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "d1c456d33ebd7c51a0e5a95e69013fc54922fd55841061a9494876999b797345"
+        },
+        {
+          "sectionID": "2830",
+          "sectionNumber": "1109.7",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "969990dda2848000e0d2b14dd7415cee4d788aa656ca798809834ed6f3a2107b"
+        },
+        {
+          "sectionID": "2829",
+          "sectionNumber": "1109.6",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "e2fe9e83e6dda5f56ae48364a052950a9908b4d1ed34c9c0e97f74fd1ca3a4fb"
+        },
+        {
+          "sectionID": "2858",
+          "sectionNumber": "1109.8",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "68d646dbe3e24bf02c0956f5f81785c46be49d25ed6733ebdbd91ee8a2139f70"
+        },
+        {
+          "sectionID": "2331",
+          "sectionNumber": "1011.12.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8f3625e4be97fb175fa0c7e239e8859352c03714987e19de3506797929d3c6a5"
+        },
+        {
+          "sectionID": "2330",
+          "sectionNumber": "1011.12",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "6efb93097779f9dac618aadeb636c47709972b9eb6416129039ec7231ebac607"
+        },
+        {
+          "sectionID": "2332",
+          "sectionNumber": "1011.12.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "d5b4df76f4d29927f0e8da8222c01a783a0020e2dcc122849e5937622f4dabe7"
+        },
+        {
+          "sectionID": "2157",
+          "sectionNumber": "1004.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "3ec86d5f02ba636243abab7b6be28c50d50eef2d9a34655e92dd25076b674239"
+        },
+        {
+          "sectionID": "2156",
+          "sectionNumber": "1004.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "15d11e2b2d2227b4292f34004cbab87ed41cb560e25b2d672b2adf1fc157d839"
+        },
+        {
+          "sectionID": "2158",
+          "sectionNumber": "1004.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "0e9b863aa90d05d715d7337735c8782940600f0eacd2c938ecf7da8f3d814811"
+        },
+        {
+          "sectionID": "2769",
+          "sectionNumber": "1107.7.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "31e64124f23aa9dc0b93edea136f979bb0e34eb73cb2fba0da03b7781542725e"
+        },
+        {
+          "sectionID": "2791",
+          "sectionNumber": "1108.2.9",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8fcc429d602c93928f967e921874debbaea7aa95e05017d67491727eb80cb170"
+        },
+        {
+          "sectionID": "2656",
+          "sectionNumber": "1104.3.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "3e9e5d4ea5bb7077423d8c6384f00e002d7395858a81bb9356740995d7d24f29"
+        },
+        {
+          "sectionID": "2183",
+          "sectionNumber": "1006.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "d92ba0e8df1e2ead5138266b961b92982d6cce904e638ed3ca14215cd10647b5"
+        },
+        {
+          "sectionID": "2185",
+          "sectionNumber": "1006.3.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "ddffa964f98e35b6c49309cdf255bd006fb4374a64e7eae5f8416c0a6243833e"
+        },
+        {
+          "sectionID": "2640",
+          "sectionNumber": "1103.2.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "c876f145199d2bcde8ae9180d622ab846e0dfc259ef8b482169b878deb2731b6"
+        },
+        {
+          "sectionID": "2801",
+          "sectionNumber": "1108.4.1.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "3630a002c2c6d7889c665bfdb5b8f85c3e721dd1e45392c6a79bc0e1386ee569"
+        },
+        {
+          "sectionID": "2781",
+          "sectionNumber": "1108.2.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "1c93d80a481b84c469286a344cc349eb41bfc56e7c2ce4f13156ee0fbbcfcef6"
+        },
+        {
+          "sectionID": "2764",
+          "sectionNumber": "1107.7",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "c6b671ef20d4a93b7e89d55c4538d1ac7d533ef9fec95b840f708981faa7c3c0"
+        },
+        {
+          "sectionID": "11",
+          "sectionNumber": "102.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "63c03ca8df4f1769e62de5b230d451d221684cc4a038fd052c39504fe73bd66a"
+        },
+        {
+          "sectionID": "113",
+          "sectionNumber": "202",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "3643b7f5cc97955ff3236ddedb2528f92ae3d9af259bbae895bf4aba02fbcd99"
+        },
+        {
+          "sectionID": "2636",
+          "sectionNumber": "1102.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "331648e13bde7dca41cb1881ca9f37548abd4b45cb4f2f4878b0644ceee0e515"
+        },
+        {
+          "sectionID": "2174",
+          "sectionNumber": "1006.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "efba02080525e878cf340bf247d9face715155368e3db32946ccee07a85c4ba3"
+        },
+        {
+          "sectionID": "2195",
+          "sectionNumber": "1006.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8e2f2dba724f547a9a9a012f7d0cfa4d67432b1e7f7409a0c6397e531856baf0"
+        },
+        {
+          "sectionID": "2184",
+          "sectionNumber": "1006.3.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "4546a9df0263dd2d47698de335ffe812b183885af7f62df250b0e1519c5515bd"
+        },
+        {
+          "sectionID": "2768",
+          "sectionNumber": "1107.7.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "df048e13f243000fc2228d6f26d388579aacec911b1487899af0972d97316fa4"
+        },
+        {
+          "sectionID": "2770",
+          "sectionNumber": "1107.7.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "961cd6b675a6e940a21cb2cf6421bf9e2a1f5bb1b2157fe064fdad0242826f24"
+        },
+        {
+          "sectionID": "2698",
+          "sectionNumber": "1107.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "294f7de751d594426b80ba101956244c6ebf021d3315be02290a4975f69c73ca"
+        }
+      ],
+      "readSources": [
+        {
+          "id": "S1",
+          "sectionID": "2623",
+          "title": "BC 1101.1 1101.1 Scope."
+        },
+        {
+          "id": "S2",
+          "sectionID": "2624",
+          "title": "BC 1101.2 1101.2 Design."
+        },
+        {
+          "id": "S3",
+          "sectionID": "2637",
+          "title": "BC 1103.1 1103.1 Where required."
+        },
+        {
+          "id": "S4",
+          "sectionID": "2638",
+          "title": "BC 1103.2 1103.2 General exceptions."
+        },
+        {
+          "id": "S5",
+          "sectionID": "2658",
+          "title": "BC 1104.4 1104.4 Multilevel buildings and facilities."
+        },
+        {
+          "id": "S6",
+          "sectionID": "2655",
+          "title": "BC 1104.3 1104.3 Connected spaces."
+        },
+        {
+          "id": "S7",
+          "sectionID": "2664",
+          "title": "BC 1104.5 1104.5 Location."
+        },
+        {
+          "id": "S8",
+          "sectionID": "2740",
+          "title": "BC 1107.4 1107.4 Accessible route."
+        },
+        {
+          "id": "S9",
+          "sectionID": "2738",
+          "title": "BC 1107.3 1107.3 Accessible spaces."
+        },
+        {
+          "id": "S10",
+          "sectionID": "2741",
+          "title": "BC 1107.5 1107.5 Group I."
+        },
+        {
+          "id": "S11",
+          "sectionID": "2760",
+          "title": "BC 1107.6.2 1107.6.2 Group R-2."
+        },
+        {
+          "id": "S12",
+          "sectionID": "2752",
+          "title": "BC 1107.6 1107.6 Group R."
+        },
+        {
+          "id": "S13",
+          "sectionID": "2753",
+          "title": "BC 1107.6.1 1107.6.1 Group R-1."
+        },
+        {
+          "id": "S14",
+          "sectionID": "2763",
+          "title": "BC 1107.6.3 1107.6.3 Group R-3."
+        },
+        {
+          "id": "S15",
+          "sectionID": "2830",
+          "title": "BC 1109.7 1109.7 Elevators."
+        },
+        {
+          "id": "S16",
+          "sectionID": "2829",
+          "title": "BC 1109.6 1109.6 Saunas and steam rooms."
+        },
+        {
+          "id": "S17",
+          "sectionID": "2858",
+          "title": "BC 1109.8 1109.8 Lifts."
+        },
+        {
+          "id": "S18",
+          "sectionID": "2331",
+          "title": "BC 1011.12.1 1011.12.1 Occupancy Groups I-1, R-1 and R-2."
+        },
+        {
+          "id": "S19",
+          "sectionID": "2330",
+          "title": "BC 1011.12 1011.12 Stairway to roof and roof access."
+        },
+        {
+          "id": "S20",
+          "sectionID": "2332",
+          "title": "BC 1011.12.2 1011.12.2 Stairway to elevator equipment."
+        },
+        {
+          "id": "S21",
+          "sectionID": "2157",
+          "title": "BC 1004.4 1004.4 Outdoor areas."
+        },
+        {
+          "id": "S22",
+          "sectionID": "2156",
+          "title": "BC 1004.3 1004.3 Fixed seating."
+        },
+        {
+          "id": "S23",
+          "sectionID": "2158",
+          "title": "BC 1004.5 1004.5 Multiple occupancies."
+        },
+        {
+          "id": "S27",
+          "sectionID": "2183",
+          "title": "BC 1006.3 1006.3 Egress from stories or occupied roofs."
+        },
+        {
+          "id": "S36",
+          "sectionID": "2174",
+          "title": "BC 1006.2 1006.2 Egress from spaces."
+        },
+        {
+          "id": "S37",
+          "sectionID": "2195",
+          "title": "BC 1006.4 1006.4 Open or enclosed parking garages."
+        },
+        {
+          "id": "S28",
+          "sectionID": "2185",
+          "title": "BC 1006.3.2 1006.3.2 Single exits."
+        },
+        {
+          "id": "S38",
+          "sectionID": "2184",
+          "title": "BC 1006.3.1 1006.3.1 Egress based on occupant load."
+        },
+        {
+          "id": "S24",
+          "sectionID": "2769",
+          "title": "BC 1107.7.3 1107.7.3 Elevator service to the lowest story with Type B units."
+        },
+        {
+          "id": "S32",
+          "sectionID": "2764",
+          "title": "BC 1107.7 1107.7 General exceptions for Type B units."
+        },
+        {
+          "id": "S39",
+          "sectionID": "2768",
+          "title": "BC 1107.7.2 1107.7.2 Multistory units where Type B units are required."
+        },
+        {
+          "id": "S40",
+          "sectionID": "2770",
+          "title": "BC 1107.7.4 1107.7.4 General exceptions for Type B+NYC units."
+        },
+        {
+          "id": "S8",
+          "sectionID": "2740",
+          "title": "BC 1107.4 1107.4 Accessible route."
+        },
+        {
+          "id": "S9",
+          "sectionID": "2738",
+          "title": "BC 1107.3 1107.3 Accessible spaces."
+        },
+        {
+          "id": "S10",
+          "sectionID": "2741",
+          "title": "BC 1107.5 1107.5 Group I."
+        },
+        {
+          "id": "S41",
+          "sectionID": "2698",
+          "title": "BC 1107.2 1107.2 Design."
+        },
+        {
+          "id": "S5",
+          "sectionID": "2658",
+          "title": "BC 1104.4 1104.4 Multilevel buildings and facilities."
+        },
+        {
+          "id": "S6",
+          "sectionID": "2655",
+          "title": "BC 1104.3 1104.3 Connected spaces."
+        },
+        {
+          "id": "S7",
+          "sectionID": "2664",
+          "title": "BC 1104.5 1104.5 Location."
+        },
+        {
+          "id": "S35",
+          "sectionID": "2636",
+          "title": "BC 1102.1 1102.1 Definitions."
+        },
+        {
+          "id": "S18",
+          "sectionID": "2331",
+          "title": "BC 1011.12.1 1011.12.1 Occupancy Groups I-1, R-1 and R-2."
+        },
+        {
+          "id": "S19",
+          "sectionID": "2330",
+          "title": "BC 1011.12 1011.12 Stairway to roof and roof access."
+        },
+        {
+          "id": "S20",
+          "sectionID": "2332",
+          "title": "BC 1011.12.2 1011.12.2 Stairway to elevator equipment."
+        }
+      ]
+    }
+  ],
+  "repeat": [
+    {
+      "topic": "residential-roof",
+      "turn": 0,
+      "question": "Does my elevator need to go to the roof?",
+      "answer": "**Yes—on the stated facts, plan for the passenger elevator to serve the roof terrace.** The terrace is common resident space, not a private terrace within an individual unit. NYC BC 1107.3 includes common-use resident recreational facilities and exterior terraces among the spaces that must be accessible; BC 1107.4 generally requires an accessible route to spaces serving the required accessible units. [S15] [S14]\n\nFor Group R-2 buildings with four or more units, the recreational-facility rule requires **at least one accessible facility of each type**—so the 25% criterion does not exempt a sole terrace of its type. [S20] The ordinary route rules also call for routes to accessible portions of a building, subject to specified exceptions; none identified in the supplied facts appears to exempt this common terrace. [S7] [S8] If the elevator is the means of providing that route, it needs to reach the terrace level. A stair or roof-access requirement is not a substitute for an accessible route.\n\nThe terrace’s **1,100-SF area does not itself create an exemption** under the cited R-2 recreational-facility provision. This assumes it is a resident common-use recreational facility serving the units; a different, non-recreational use or a qualifying exception could affect the analysis.",
+      "status": 200,
+      "timingScope": "client end-to-end",
+      "profile": {
+        "milliseconds": 25745.962334,
+        "cpuMilliseconds": 7255.096,
+        "upstreamMilliseconds": 21296.878249999994,
+        "otherMilliseconds": 4449.0840840000055,
+        "modelCalls": 5,
+        "embeddingCalls": 1,
+        "estimatedUSD": 0.01611778,
+        "unknownCostCalls": 0,
+        "inputTokens": 55853,
+        "outputTokens": 889,
+        "webActions": 0,
+        "phases": {
+          "intent_planning": {
+            "calls": 1,
+            "milliseconds": 3783.4782089999994,
+            "inputTokens": 11890,
+            "cachedTokens": 1446,
+            "cacheWriteTokens": 10441,
+            "outputTokens": 234,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.003787,
+            "unknownCostCalls": 0,
+            "requestBytes": 50946
+          },
+          "section_selection": {
+            "calls": 1,
+            "milliseconds": 1428.7340409999997,
+            "inputTokens": 7888,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 7885,
+            "outputTokens": 39,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.00278,
+            "unknownCostCalls": 0,
+            "requestBytes": 29303
+          },
+          "agent_tool_routing": {
+            "calls": 2,
+            "milliseconds": 6642.159249999999,
+            "inputTokens": 22332,
+            "cachedTokens": 9950,
+            "cacheWriteTokens": 12376,
+            "outputTokens": 91,
+            "reasoningTokens": 0,
+            "estimatedUSD": 0.004477999999999999,
+            "unknownCostCalls": 0,
+            "requestBytes": 100495
+          },
+          "embedding": {
+            "calls": 1,
+            "milliseconds": 480.76274999999987,
+            "inputTokens": 39,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 0,
+            "outputTokens": 0,
+            "reasoningTokens": 0,
+            "estimatedUSD": 7.8e-7,
+            "unknownCostCalls": 0,
+            "requestBytes": 272
+          },
+          "answer_generation": {
+            "calls": 1,
+            "milliseconds": 8961.743999999999,
+            "inputTokens": 13743,
+            "cachedTokens": 0,
+            "cacheWriteTokens": 13740,
+            "outputTokens": 525,
+            "reasoningTokens": 247,
+            "estimatedUSD": 0.005072,
+            "unknownCostCalls": 0,
+            "requestBytes": 60992
+          }
+        },
+        "tools": {
+          "plan_research": 1,
+          "navigate_library": 1,
+          "read_library": 2,
+          "search_library": 1
+        },
+        "firstProgressMilliseconds": 14.668000000000006,
+        "progress": [
+          {
+            "milliseconds": 14.668000000000006,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "active",
+            "sequence": 1,
+            "at": "2026-11-16T17:08:39.202Z"
+          },
+          {
+            "milliseconds": 127.20587499999999,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_question",
+            "label": "Preparing the question",
+            "state": "completed",
+            "sequence": 2,
+            "at": "2026-11-16T17:08:39.314Z"
+          },
+          {
+            "milliseconds": 127.25374999999997,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 3,
+            "at": "2026-11-16T17:08:39.314Z"
+          },
+          {
+            "milliseconds": 7409.680958999999,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 4,
+            "at": "2026-11-16T17:08:46.597Z"
+          },
+          {
+            "milliseconds": 10849.907542,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 5,
+            "at": "2026-11-16T17:08:50.037Z"
+          },
+          {
+            "milliseconds": 11058.878209,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 6,
+            "at": "2026-11-16T17:08:50.246Z"
+          },
+          {
+            "milliseconds": 13357.702917,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "completed",
+            "sequence": 7,
+            "at": "2026-11-16T17:08:52.545Z"
+          },
+          {
+            "milliseconds": 13357.757667,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "reviewing_provisions",
+            "label": "Reviewing potentially applicable provisions",
+            "state": "active",
+            "sequence": 8,
+            "at": "2026-11-16T17:08:52.545Z"
+          },
+          {
+            "milliseconds": 13386.268959,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "reviewing_provisions",
+            "label": "Reviewing potentially applicable provisions",
+            "state": "completed",
+            "sequence": 9,
+            "at": "2026-11-16T17:08:52.573Z"
+          },
+          {
+            "milliseconds": 13386.35275,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "following_cross_references",
+            "label": "Following cross-references",
+            "state": "active",
+            "sequence": 10,
+            "at": "2026-11-16T17:08:52.573Z"
+          },
+          {
+            "milliseconds": 13392.007792,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "following_cross_references",
+            "label": "Following cross-references",
+            "state": "completed",
+            "sequence": 11,
+            "at": "2026-11-16T17:08:52.579Z"
+          },
+          {
+            "milliseconds": 13458.594500000001,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 12,
+            "at": "2026-11-16T17:08:52.645Z"
+          },
+          {
+            "milliseconds": 16687.352874999997,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "searching_authorized_library",
+            "label": "Searching the authorized enacted library",
+            "state": "active",
+            "sequence": 13,
+            "at": "2026-11-16T17:08:55.874Z"
+          },
+          {
+            "milliseconds": 16710.635124999997,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "active",
+            "sequence": 14,
+            "at": "2026-11-16T17:08:55.897Z"
+          },
+          {
+            "milliseconds": 25712.513084,
+            "version": "20261005-natural-recovery-v127",
+            "stage": "preparing_conclusion",
+            "label": "Preparing the conclusion",
+            "state": "completed",
+            "sequence": 15,
+            "at": "2026-11-16T17:09:04.899Z"
+          }
+        ]
+      },
+      "checks": {
+        "topic": true,
+        "citations": true,
+        "hasUnverifiedMarker": false
+      },
+      "tools": [
+        {
+          "tool": "plan_research",
+          "query": "Does my elevator need to go to the roof?"
+        },
+        {
+          "tool": "navigate_library",
+          "query": "For the proposed new eight-story NYC Group R-2 building with a 1,100-square-foot common rooftop terrace, must the passenger elevator provide access to the roof or terrace?"
+        },
+        {
+          "tool": "read_library",
+          "query": "2623,2637,2638,2654,2658,2760,2740,5411",
+          "sources": [
+            {
+              "id": "S1",
+              "sectionID": "2623",
+              "title": "BC 1101.1 1101.1 Scope."
+            },
+            {
+              "id": "S2",
+              "sectionID": "2624",
+              "title": "BC 1101.2 1101.2 Design."
+            },
+            {
+              "id": "S3",
+              "sectionID": "2637",
+              "title": "BC 1103.1 1103.1 Where required."
+            },
+            {
+              "id": "S4",
+              "sectionID": "2638",
+              "title": "BC 1103.2 1103.2 General exceptions."
+            },
+            {
+              "id": "S5",
+              "sectionID": "2654",
+              "title": "BC 1104.2 1104.2 Within a site."
+            },
+            {
+              "id": "S6",
+              "sectionID": "2653",
+              "title": "BC 1104.1 1104.1 Site arrival points."
+            },
+            {
+              "id": "S7",
+              "sectionID": "2655",
+              "title": "BC 1104.3 1104.3 Connected spaces."
+            },
+            {
+              "id": "S8",
+              "sectionID": "2658",
+              "title": "BC 1104.4 1104.4 Multilevel buildings and facilities."
+            },
+            {
+              "id": "S9",
+              "sectionID": "2664",
+              "title": "BC 1104.5 1104.5 Location."
+            },
+            {
+              "id": "S10",
+              "sectionID": "2760",
+              "title": "BC 1107.6.2 1107.6.2 Group R-2."
+            },
+            {
+              "id": "S11",
+              "sectionID": "2752",
+              "title": "BC 1107.6 1107.6 Group R."
+            },
+            {
+              "id": "S12",
+              "sectionID": "2753",
+              "title": "BC 1107.6.1 1107.6.1 Group R-1."
+            },
+            {
+              "id": "S13",
+              "sectionID": "2763",
+              "title": "BC 1107.6.3 1107.6.3 Group R-3."
+            },
+            {
+              "id": "S14",
+              "sectionID": "2740",
+              "title": "BC 1107.4 1107.4 Accessible route."
+            },
+            {
+              "id": "S15",
+              "sectionID": "2738",
+              "title": "BC 1107.3 1107.3 Accessible spaces."
+            },
+            {
+              "id": "S16",
+              "sectionID": "2741",
+              "title": "BC 1107.5 1107.5 Group I."
+            },
+            {
+              "id": "S17",
+              "sectionID": "5411",
+              "title": "BC 3001.3 3001.3 Accessibility."
+            },
+            {
+              "id": "S18",
+              "sectionID": "5410",
+              "title": "BC 3001.2 3001.2 Referenced standards."
+            },
+            {
+              "id": "S19",
+              "sectionID": "5412",
+              "title": "BC 3001.4 3001.4 Change in use."
+            }
+          ],
+          "unavailable": []
+        },
+        {
+          "tool": "search_library",
+          "query": "NYC Building Code 2022 rooftop terrace common use recreational facility Section 1110 roof terrace accessible route elevators Group R-2 1107.3 1104 elevator stories accessible rooftop"
+        },
+        {
+          "tool": "read_library",
+          "query": "S20,S21,S23,S26,2741,2752",
+          "sources": [
+            {
+              "id": "S20",
+              "sectionID": "2895",
+              "title": "BC 1110.2.2 1110.2.2 Facilities serving Type A, Type B+NYC and Type B units in a single building."
+            },
+            {
+              "id": "S35",
+              "sectionID": "2893",
+              "title": "BC 1110.2 1110.2 Facilities serving Group R-2 and R-3 occupancies."
+            },
+            {
+              "id": "S23",
+              "sectionID": "2894",
+              "title": "BC 1110.2.1 1110.2.1 Facilities serving Accessible units."
+            },
+            {
+              "id": "S21",
+              "sectionID": "2896",
+              "title": "BC 1110.2.3 1110.2.3 Facilities serving Type A, Type B+NYC and Type B units in multiple buildings."
+            },
+            {
+              "id": "S26",
+              "sectionID": "2331",
+              "title": "BC 1011.12.1 1011.12.1 Occupancy Groups I-1, R-1 and R-2."
+            },
+            {
+              "id": "S36",
+              "sectionID": "2330",
+              "title": "BC 1011.12 1011.12 Stairway to roof and roof access."
+            },
+            {
+              "id": "S37",
+              "sectionID": "2332",
+              "title": "BC 1011.12.2 1011.12.2 Stairway to elevator equipment."
+            },
+            {
+              "id": "S16",
+              "sectionID": "2741",
+              "title": "BC 1107.5 1107.5 Group I."
+            },
+            {
+              "id": "S14",
+              "sectionID": "2740",
+              "title": "BC 1107.4 1107.4 Accessible route."
+            },
+            {
+              "id": "S11",
+              "sectionID": "2752",
+              "title": "BC 1107.6 1107.6 Group R."
+            },
+            {
+              "id": "S38",
+              "sectionID": "2764",
+              "title": "BC 1107.7 1107.7 General exceptions for Type B units."
+            }
+          ],
+          "unavailable": []
+        }
+      ],
+      "citations": [
+        {
+          "sectionID": "2655",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-2655"
+          ],
+          "sectionNumber": "1104.3",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1104.3 Connected spaces.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "2658",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-2658"
+          ],
+          "sectionNumber": "1104.4",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1104.4 Multilevel buildings and facilities.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "2740",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-2740"
+          ],
+          "sectionNumber": "1107.4",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1107.4 Accessible route.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "2738",
+          "sourceIDs": [
+            "assistant-navigation-CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1-2738"
+          ],
+          "sectionNumber": "1107.3",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1107.3 Accessible spaces.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        },
+        {
+          "sectionID": "2895",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2895-3"
+          ],
+          "sectionNumber": "1110.2.2",
+          "codePrefix": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "title": "1110.2.2 Facilities serving Type A, Type B+NYC and Type B units in a single building.",
+          "relevance": "Cited in an unreviewed answer.",
+          "evidenceRole": "supporting"
+        }
+      ],
+      "evidence": [
+        {
+          "sectionID": "2623",
+          "sectionNumber": "1101.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8bbf4709e5ed2b9b205e48f92b853edaad70da9b802c853b9a511d4abb002163"
+        },
+        {
+          "sectionID": "2624",
+          "sectionNumber": "1101.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "c3c3692bdc6301152abe241f543ad52bc0a3b6c591cbd5bb7b320663c35a1792"
+        },
+        {
+          "sectionID": "2637",
+          "sectionNumber": "1103.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "5e1965ec7f1ac7b95a607617c2004c37a57f6031d965685ae0ce21c1c011f877"
+        },
+        {
+          "sectionID": "2638",
+          "sectionNumber": "1103.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "3a94bb6c94ba9b73bf4380f053df181b709971220f1ac7f428377ae485e6ebde"
+        },
+        {
+          "sectionID": "2654",
+          "sectionNumber": "1104.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "58a4f08089e6130f55986a0baf24f4ba33accdb3bfcd54e844d9e1aba09ce37c"
+        },
+        {
+          "sectionID": "2653",
+          "sectionNumber": "1104.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "1f6ed8bd0c700270781d88b95d5f803fba1e186226f5db8c571f7670dd1191f7"
+        },
+        {
+          "sectionID": "2655",
+          "sectionNumber": "1104.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "c4a25de4c941c0e7ac4995bffa84749f4aae703cd250cd5f07a9d4c81efc5a06"
+        },
+        {
+          "sectionID": "2658",
+          "sectionNumber": "1104.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "d1c44953cd7d7a05600c8948e97d1df3b0a13357fab399c1859090149bdf32dc"
+        },
+        {
+          "sectionID": "2664",
+          "sectionNumber": "1104.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "25c700daa70ab904bb6302a7d1746c73cac571ab5a9c63685760c91cc2738958"
+        },
+        {
+          "sectionID": "2760",
+          "sectionNumber": "1107.6.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "a3e2eb67e4881711da796547d0600375554c39cabf47edeb454eb041f1bb0fbf"
+        },
+        {
+          "sectionID": "2752",
+          "sectionNumber": "1107.6",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "80de284a3082afb6d21586629629e2d38f6abe9dc95a901b5c2315c446de24b1"
+        },
+        {
+          "sectionID": "2753",
+          "sectionNumber": "1107.6.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8b08df6fd1266c1c8eb2910b05791ce7b00b1adc1fd9ec1e604807c3cc969a54"
+        },
+        {
+          "sectionID": "2763",
+          "sectionNumber": "1107.6.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "d1c456d33ebd7c51a0e5a95e69013fc54922fd55841061a9494876999b797345"
+        },
+        {
+          "sectionID": "2740",
+          "sectionNumber": "1107.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "de83fa5cb913d2be6c16a7a60a636a714f2d8939fa861ea4c056dc56ac7c1e81"
+        },
+        {
+          "sectionID": "2738",
+          "sectionNumber": "1107.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "ad20ce6f688316cbd532ad52f700c36ec0ccf5737dc9b45f22eae8c48db0d87b"
+        },
+        {
+          "sectionID": "2741",
+          "sectionNumber": "1107.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "0c8726d8c2262cce1a399dd540e67a1babc72495ff2290a8e21dd64982683fd7"
+        },
+        {
+          "sectionID": "5411",
+          "sectionNumber": "3001.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "22da7c03ae0eb4a3b54dfa55ea8649b2db066302ade5542407b4dec155e02e31"
+        },
+        {
+          "sectionID": "5410",
+          "sectionNumber": "3001.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "bb40ef38044816c8a974a18b6e89ebfa323b48bb68e4c2e79c429600755d10a7"
+        },
+        {
+          "sectionID": "5412",
+          "sectionNumber": "3001.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "1303e03377c7cfc04250a8d0691dabd566ab9f8bb6e1b029064a6d1f52bfc4da"
+        },
+        {
+          "sectionID": "2895",
+          "sectionNumber": "1110.2.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "af74e0eb0402b1623c94dae4ee57d9789a8dbdbe0d8d411cd72dc6d650be61d1"
+        },
+        {
+          "sectionID": "2896",
+          "sectionNumber": "1110.2.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "d52457bd9f1f5af72625d2c433748f93c88ceff7a7a9d9ddf02244c1c363b978"
+        },
+        {
+          "sectionID": "2831",
+          "sectionNumber": "1109.7.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "1200c880853b4a14c91fb568c62aacb685e8ae055adaa94977d5561429dfab2b"
+        },
+        {
+          "sectionID": "2894",
+          "sectionNumber": "1110.2.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "e87384b2b70c29176042db3929cdb1b4dde853ab1e3d176d95dde705f895bc86"
+        },
+        {
+          "sectionID": "5433",
+          "sectionNumber": "3002.4.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "d7742c97e9cde7788c07e27f416aa46de32e87f29b6b19ac906f5631b66c2a2a"
+        },
+        {
+          "sectionID": "5436",
+          "sectionNumber": "3002.4.3.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "7d439895b165c0e0883944d0a14a117c3616bafeb61f90b8964eab068da81779"
+        },
+        {
+          "sectionID": "2331",
+          "sectionNumber": "1011.12.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8f3625e4be97fb175fa0c7e239e8859352c03714987e19de3506797929d3c6a5"
+        },
+        {
+          "sectionID": "2742",
+          "sectionNumber": "1107.5.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "3ab082c92d9ba2f6f64386018c01b7f28b83080987672227bee43dc5343989bc"
+        },
+        {
+          "sectionID": "2743",
+          "sectionNumber": "1107.5.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "8d28ee6b0ed57eb9f5803a10ef2850637d2aabf35d5465d68f0668494ace6ff4"
+        },
+        {
+          "sectionID": "2744",
+          "sectionNumber": "1107.5.3",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "a2062db2ab0f5aab7baabafe6667ff09cfa03af5d05d3b9dc95b6307acff893c"
+        },
+        {
+          "sectionID": "2746",
+          "sectionNumber": "1107.5.4",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "6671382748c2fdab92d947480ef0a9b835e1885fe169ba8649bf19106cf0747a"
+        },
+        {
+          "sectionID": "2748",
+          "sectionNumber": "1107.5.5",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "b5c72ffc7b33f15106ee1ed1b4ef41bac1581cd695dc48623195b329ff875a20"
+        },
+        {
+          "sectionID": "11",
+          "sectionNumber": "102.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "63c03ca8df4f1769e62de5b230d451d221684cc4a038fd052c39504fe73bd66a"
+        },
+        {
+          "sectionID": "113",
+          "sectionNumber": "202",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "24270b18d51e6a629c51140c65b97c3e88a3abf4d01180364bab1826a42bba2b"
+        },
+        {
+          "sectionID": "2636",
+          "sectionNumber": "1102.1",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "7585118a0ba572db905f4f43fbfcf83bb69c57ec34020160fccbee12ae16458e"
+        },
+        {
+          "sectionID": "2893",
+          "sectionNumber": "1110.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "a3b548bfffba49c488da8ce0250f756469bb0cdfe46f9951cfd663089b6c28e6"
+        },
+        {
+          "sectionID": "2330",
+          "sectionNumber": "1011.12",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "6efb93097779f9dac618aadeb636c47709972b9eb6416129039ec7231ebac607"
+        },
+        {
+          "sectionID": "2332",
+          "sectionNumber": "1011.12.2",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "d5b4df76f4d29927f0e8da8222c01a783a0020e2dcc122849e5937622f4dabe7"
+        },
+        {
+          "sectionID": "2764",
+          "sectionNumber": "1107.7",
+          "codeBook": "BC",
+          "codeEdition": "2022 New York City Construction Codes",
+          "passageTextHash": "c6b671ef20d4a93b7e89d55c4538d1ac7d533ef9fec95b840f708981faa7c3c0"
+        }
+      ],
+      "readSources": [
+        {
+          "id": "S1",
+          "sectionID": "2623",
+          "title": "BC 1101.1 1101.1 Scope."
+        },
+        {
+          "id": "S2",
+          "sectionID": "2624",
+          "title": "BC 1101.2 1101.2 Design."
+        },
+        {
+          "id": "S3",
+          "sectionID": "2637",
+          "title": "BC 1103.1 1103.1 Where required."
+        },
+        {
+          "id": "S4",
+          "sectionID": "2638",
+          "title": "BC 1103.2 1103.2 General exceptions."
+        },
+        {
+          "id": "S5",
+          "sectionID": "2654",
+          "title": "BC 1104.2 1104.2 Within a site."
+        },
+        {
+          "id": "S6",
+          "sectionID": "2653",
+          "title": "BC 1104.1 1104.1 Site arrival points."
+        },
+        {
+          "id": "S7",
+          "sectionID": "2655",
+          "title": "BC 1104.3 1104.3 Connected spaces."
+        },
+        {
+          "id": "S8",
+          "sectionID": "2658",
+          "title": "BC 1104.4 1104.4 Multilevel buildings and facilities."
+        },
+        {
+          "id": "S9",
+          "sectionID": "2664",
+          "title": "BC 1104.5 1104.5 Location."
+        },
+        {
+          "id": "S10",
+          "sectionID": "2760",
+          "title": "BC 1107.6.2 1107.6.2 Group R-2."
+        },
+        {
+          "id": "S11",
+          "sectionID": "2752",
+          "title": "BC 1107.6 1107.6 Group R."
+        },
+        {
+          "id": "S12",
+          "sectionID": "2753",
+          "title": "BC 1107.6.1 1107.6.1 Group R-1."
+        },
+        {
+          "id": "S13",
+          "sectionID": "2763",
+          "title": "BC 1107.6.3 1107.6.3 Group R-3."
+        },
+        {
+          "id": "S14",
+          "sectionID": "2740",
+          "title": "BC 1107.4 1107.4 Accessible route."
+        },
+        {
+          "id": "S15",
+          "sectionID": "2738",
+          "title": "BC 1107.3 1107.3 Accessible spaces."
+        },
+        {
+          "id": "S16",
+          "sectionID": "2741",
+          "title": "BC 1107.5 1107.5 Group I."
+        },
+        {
+          "id": "S17",
+          "sectionID": "5411",
+          "title": "BC 3001.3 3001.3 Accessibility."
+        },
+        {
+          "id": "S18",
+          "sectionID": "5410",
+          "title": "BC 3001.2 3001.2 Referenced standards."
+        },
+        {
+          "id": "S19",
+          "sectionID": "5412",
+          "title": "BC 3001.4 3001.4 Change in use."
+        },
+        {
+          "id": "S20",
+          "sectionID": "2895",
+          "title": "BC 1110.2.2 1110.2.2 Facilities serving Type A, Type B+NYC and Type B units in a single building."
+        },
+        {
+          "id": "S35",
+          "sectionID": "2893",
+          "title": "BC 1110.2 1110.2 Facilities serving Group R-2 and R-3 occupancies."
+        },
+        {
+          "id": "S23",
+          "sectionID": "2894",
+          "title": "BC 1110.2.1 1110.2.1 Facilities serving Accessible units."
+        },
+        {
+          "id": "S21",
+          "sectionID": "2896",
+          "title": "BC 1110.2.3 1110.2.3 Facilities serving Type A, Type B+NYC and Type B units in multiple buildings."
+        },
+        {
+          "id": "S26",
+          "sectionID": "2331",
+          "title": "BC 1011.12.1 1011.12.1 Occupancy Groups I-1, R-1 and R-2."
+        },
+        {
+          "id": "S36",
+          "sectionID": "2330",
+          "title": "BC 1011.12 1011.12 Stairway to roof and roof access."
+        },
+        {
+          "id": "S37",
+          "sectionID": "2332",
+          "title": "BC 1011.12.2 1011.12.2 Stairway to elevator equipment."
+        },
+        {
+          "id": "S16",
+          "sectionID": "2741",
+          "title": "BC 1107.5 1107.5 Group I."
+        },
+        {
+          "id": "S14",
+          "sectionID": "2740",
+          "title": "BC 1107.4 1107.4 Accessible route."
+        },
+        {
+          "id": "S11",
+          "sectionID": "2752",
+          "title": "BC 1107.6 1107.6 Group R."
+        },
+        {
+          "id": "S38",
+          "sectionID": "2764",
+          "title": "BC 1107.7 1107.7 General exceptions for Type B units."
+        }
+      ]
+    }
+  ],
+  "partiallyRecoveredFollowup": {
+    "topic": "residential-roof",
+    "turn": 1,
+    "question": "But only residents can use it. Does that change anything?",
+    "answer": "**No—restricting the terrace to residents does not change the conclusion.** A space shared by residents is “common use” under the code, and BC 1107.3 expressly covers common-use resident spaces, including recreational facilities and exterior terraces. A residents-only common terrace therefore still needs to be accessible. [S3] [S2]\n\nThe terrace exception in BC 1107.4 is for certain terraces that are **part of an individual Type B+NYC or Type B unit** and are **not for common use**; it does not fit a shared rooftop terrace. [S1] Since no alternative accessible route is proposed, the passenger elevator must serve the roof level if it is to provide the required route. [S1]",
+    "timingScope": "server operation accounting; client row lost to recorder type error",
+    "profile": {
+      "milliseconds": 16901,
+      "cpuMilliseconds": null,
+      "upstreamMilliseconds": 15668.035043000003,
+      "otherMilliseconds": 1232.9649569999965,
+      "modelCalls": 6,
+      "embeddingCalls": 1,
+      "estimatedUSD": 0.0225297,
+      "unknownCostCalls": 0,
+      "inputTokens": 97148,
+      "outputTokens": 805,
+      "webActions": 0,
+      "phases": {
+        "intent_planning": {
+          "calls": 1,
+          "milliseconds": 5155.554541000001,
+          "inputTokens": 15911,
+          "cachedTokens": 1446,
+          "cacheWriteTokens": 14462,
+          "outputTokens": 364,
+          "reasoningTokens": 0,
+          "estimatedUSD": 0.005259,
+          "unknownCostCalls": 0,
+          "requestBytes": 67144
+        },
+        "section_selection": {
+          "calls": 1,
+          "milliseconds": 1352.2133330000033,
+          "inputTokens": 11808,
+          "cachedTokens": 1666,
+          "cacheWriteTokens": 10139,
+          "outputTokens": 39,
+          "reasoningTokens": 0,
+          "estimatedUSD": 0.003586,
+          "unknownCostCalls": 0,
+          "requestBytes": 42588
+        },
+        "agent_tool_routing": {
+          "calls": 3,
+          "milliseconds": 4869.511418000002,
+          "inputTokens": 50090,
+          "cachedTokens": 31813,
+          "cacheWriteTokens": 18268,
+          "outputTokens": 139,
+          "reasoningTokens": 0,
+          "estimatedUSD": 0.006784,
+          "unknownCostCalls": 0,
+          "requestBytes": 227130
+        },
+        "embedding": {
+          "calls": 1,
+          "milliseconds": 513.5552919999973,
+          "inputTokens": 35,
+          "cachedTokens": 0,
+          "cacheWriteTokens": 0,
+          "outputTokens": 0,
+          "reasoningTokens": 0,
+          "estimatedUSD": 7.000000000000001e-7,
+          "unknownCostCalls": 0,
+          "requestBytes": 267
+        },
+        "answer_generation": {
+          "calls": 1,
+          "milliseconds": 3777.2004589999997,
+          "inputTokens": 19339,
+          "cachedTokens": 0,
+          "cacheWriteTokens": 19336,
+          "outputTokens": 263,
+          "reasoningTokens": 104,
+          "estimatedUSD": 0.0069,
+          "unknownCostCalls": 0,
+          "requestBytes": 86957
+        }
+      },
+      "tools": {},
+      "firstProgressMilliseconds": null,
+      "progress": []
+    },
+    "qualityScope": "Provider answer and retrieved text retained; no saved final-record citation-identity check for this row",
+    "toolRequests": [
+      {
+        "tool": "read_conversation",
+        "args": {
+          "messageIDs": [
+            "R14",
+            "R15",
+            "R21",
+            "R20",
+            "R23",
+            "R35",
+            "R8",
+            "R7"
+          ],
+          "sourceIDs": [],
+          "offset": 0
+        }
+      },
+      {
+        "tool": "search_library",
+        "args": {
+          "query": "BC 1110.2.1 1110.2.2 recreational facilities serving Group R-2 common recreational facilities accessibility accessible route accessible spaces resident only terrace roof terrace"
+        }
+      },
+      {
+        "tool": "read_library",
+        "args": {
+          "sectionIDs": [
+            "2898",
+            "2895",
+            "2894",
+            "2738",
+            "2740",
+            "2893"
+          ]
+        }
+      }
+    ]
+  },
+  "summary": {
+    "turns": 6,
+    "medianMilliseconds": 14299.253396,
+    "maximumMilliseconds": 22706.375999999997,
+    "modelCalls": 22,
+    "embeddingCalls": 3,
+    "inputTokens": 268926,
+    "outputTokens": 4481,
+    "estimatedUSD": 0.08535208,
+    "upstreamMilliseconds": 74016.170376,
+    "totalMilliseconds": 82824.90546,
+    "otherMilliseconds": 8808.735084000002,
+    "phases": {
+      "intent_planning": {
+        "calls": 6,
+        "milliseconds": 32403.76912600001,
+        "inputTokens": 74398,
+        "cachedTokens": 8676,
+        "cacheWriteTokens": 65704,
+        "outputTokens": 2296,
+        "reasoningTokens": 635,
+        "estimatedUSD": 0.024236
+      },
+      "answer_generation": {
+        "calls": 6,
+        "milliseconds": 24499.736750999986,
+        "inputTokens": 59812,
+        "cachedTokens": 3652,
+        "cacheWriteTokens": 56142,
+        "outputTokens": 1618,
+        "reasoningTokens": 534,
+        "estimatedUSD": 0.0205
+      },
+      "section_selection": {
+        "calls": 4,
+        "milliseconds": 5125.075042000002,
+        "inputTokens": 69705,
+        "cachedTokens": 0,
+        "cacheWriteTokens": 69693,
+        "outputTokens": 138,
+        "reasoningTokens": 0,
+        "estimatedUSD": 0.024465
+      },
+      "agent_tool_routing": {
+        "calls": 6,
+        "milliseconds": 11133.571832999982,
+        "inputTokens": 65011,
+        "cachedTokens": 20053,
+        "cacheWriteTokens": 44940,
+        "outputTokens": 429,
+        "reasoningTokens": 101,
+        "estimatedUSD": 0.016149
+      },
+      "embedding": {
+        "calls": 3,
+        "milliseconds": 854.017624000011,
+        "inputTokens": 104,
+        "cachedTokens": 0,
+        "cacheWriteTokens": 0,
+        "outputTokens": 0,
+        "reasoningTokens": 0,
+        "estimatedUSD": 0.00000208
+      }
+    }
+  },
+  "codeQuestions": {
+    "turns": 4,
+    "medianMilliseconds": 20009.4359585,
+    "maximumMilliseconds": 22706.375999999997,
+    "modelCalls": 18,
+    "embeddingCalls": 3,
+    "inputTokens": 241975,
+    "outputTokens": 4216,
+    "estimatedUSD": 0.07677108,
+    "upstreamMilliseconds": 66464.014459,
+    "totalMilliseconds": 72744.57750099999,
+    "otherMilliseconds": 6280.563042000002,
+    "phases": {
+      "intent_planning": {
+        "calls": 4,
+        "milliseconds": 27628.34283400001,
+        "inputTokens": 50660,
+        "cachedTokens": 5784,
+        "cacheWriteTokens": 44864,
+        "outputTokens": 2076,
+        "reasoningTokens": 560,
+        "estimatedUSD": 0.016802
+      },
+      "section_selection": {
+        "calls": 4,
+        "milliseconds": 5125.075042000002,
+        "inputTokens": 69705,
+        "cachedTokens": 0,
+        "cacheWriteTokens": 69693,
+        "outputTokens": 138,
+        "reasoningTokens": 0,
+        "estimatedUSD": 0.024465
+      },
+      "agent_tool_routing": {
+        "calls": 6,
+        "milliseconds": 11133.571832999982,
+        "inputTokens": 65011,
+        "cachedTokens": 20053,
+        "cacheWriteTokens": 44940,
+        "outputTokens": 429,
+        "reasoningTokens": 101,
+        "estimatedUSD": 0.016149
+      },
+      "embedding": {
+        "calls": 3,
+        "milliseconds": 854.017624000011,
+        "inputTokens": 104,
+        "cachedTokens": 0,
+        "cacheWriteTokens": 0,
+        "outputTokens": 0,
+        "reasoningTokens": 0,
+        "estimatedUSD": 0.00000208
+      },
+      "answer_generation": {
+        "calls": 4,
+        "milliseconds": 21723.007125999986,
+        "inputTokens": 56599,
+        "cachedTokens": 3652,
+        "cacheWriteTokens": 52935,
+        "outputTokens": 1573,
+        "reasoningTokens": 519,
+        "estimatedUSD": 0.019353
+      }
+    }
+  },
+  "repeatSummary": {
+    "turns": 1,
+    "medianMilliseconds": 25745.962334,
+    "maximumMilliseconds": 25745.962334,
+    "modelCalls": 5,
+    "embeddingCalls": 1,
+    "inputTokens": 55853,
+    "outputTokens": 889,
+    "estimatedUSD": 0.01611778,
+    "upstreamMilliseconds": 21296.878249999994,
+    "totalMilliseconds": 25745.962334,
+    "otherMilliseconds": 4449.0840840000055,
+    "phases": {
+      "intent_planning": {
+        "calls": 1,
+        "milliseconds": 3783.4782089999994,
+        "inputTokens": 11890,
+        "cachedTokens": 1446,
+        "cacheWriteTokens": 10441,
+        "outputTokens": 234,
+        "reasoningTokens": 0,
+        "estimatedUSD": 0.003787
+      },
+      "section_selection": {
+        "calls": 1,
+        "milliseconds": 1428.7340409999997,
+        "inputTokens": 7888,
+        "cachedTokens": 0,
+        "cacheWriteTokens": 7885,
+        "outputTokens": 39,
+        "reasoningTokens": 0,
+        "estimatedUSD": 0.00278
+      },
+      "agent_tool_routing": {
+        "calls": 2,
+        "milliseconds": 6642.159249999999,
+        "inputTokens": 22332,
+        "cachedTokens": 9950,
+        "cacheWriteTokens": 12376,
+        "outputTokens": 91,
+        "reasoningTokens": 0,
+        "estimatedUSD": 0.004477999999999999
+      },
+      "embedding": {
+        "calls": 1,
+        "milliseconds": 480.76274999999987,
+        "inputTokens": 39,
+        "cachedTokens": 0,
+        "cacheWriteTokens": 0,
+        "outputTokens": 0,
+        "reasoningTokens": 0,
+        "estimatedUSD": 7.8e-7
+      },
+      "answer_generation": {
+        "calls": 1,
+        "milliseconds": 8961.743999999999,
+        "inputTokens": 13743,
+        "cachedTokens": 0,
+        "cacheWriteTokens": 13740,
+        "outputTokens": 525,
+        "reasoningTokens": 247,
+        "estimatedUSD": 0.005072
+      }
+    }
+  },
+  "budgetBefore": {
+    "limitUSD": 7,
+    "accountedUSD": 5.447586,
+    "settledUSD": 5.432935,
+    "uncertainOrReservedCalls": 2,
+    "callCount": 1485
+  },
+  "budgetAfter": {
+    "limitUSD": 7,
+    "accountedUSD": 5.592121,
+    "settledUSD": 5.57747,
+    "uncertainOrReservedCalls": 2,
+    "callCount": 1530
+  },
+  "totalAccountedDeltaUSD": 0.14453499999999941,
+  "limitations": [
+    "Small nonstatistical sample; no production latency or p95 claim.",
+    "No web calls in fresh profiles. Historical built-in web helper recorded 28.54s in a different sample; not a controlled comparison.",
+    "Residual time includes local retrieval, preparation, I/O and harness work; not isolated retrieval CPU.",
+    "First question includes process/corpus warmup.",
+    "Two completed follow-ups hit a recorder source-count/list error; first lacks provider details, repeat retains complete API calls and server-operation duration. The recorder is corrected and offline-tested; no extra paid rerun.",
+    "Topic regexes are smoke checks, citation identity checks are not legal entailment or complete authority review. Initial two fact-check false negatives were test-pattern errors; regraded without a paid rerun.",
+    "Prior long-chat and retrieval regressions remain available, but long chats/Zoning were not retested in this measurement pass."
+  ],
+  "rawArtifacts": [
+    "/tmp/assistant-performance-baseline-20261116",
+    "/tmp/assistant-performance-roof-20261116"
+  ]
+}
