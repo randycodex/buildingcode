@@ -1,0 +1,82 @@
+[
+  {
+    "name": "stairs",
+    "intent": {
+      "question": "For a residential building, does the applicable exit-separation requirement affect whether two stairs can be next to each other?",
+      "subject": "Separation of two stairs in a residential building",
+      "reference": "The preceding exchange about whether both stairs can be next to each other and the assistant\u2019s note that exit separation may apply.",
+      "clarification": ""
+    },
+    "ms": 4205
+  },
+  {
+    "name": "pronoun",
+    "intent": {
+      "question": "Can the restroom door or the corridor be made narrower while maintaining the applicable requirements?",
+      "subject": "Restroom door and corridor width",
+      "reference": "The immediately preceding exchange about whether the restroom door can swing into the corridor and the effect on encroachment and egress width.",
+      "clarification": "Do you mean making the restroom door narrower or making the corridor narrower?"
+    },
+    "ms": 2791
+  },
+  {
+    "name": "correction",
+    "intent": {
+      "question": "Does a duct penetration through an exterior wall require a fire damper?",
+      "subject": "Fire-damper requirements for a duct through an exterior wall",
+      "reference": "The user clarifies that the duct goes through an exterior wall, not a shaft, in response to the assistant's statement about shaft penetrations.",
+      "clarification": ""
+    },
+    "ms": 3434
+  },
+  {
+    "name": "earlier",
+    "intent": {
+      "question": "For the bicycle-space requirement, do bicycle spaces for visitors count toward the required number?",
+      "subject": "Bicycle-space requirements",
+      "reference": "The earlier exchange asking how many bicycle spaces are required, with the answer that it depends on use and floor area.",
+      "clarification": ""
+    },
+    "ms": 4991
+  },
+  {
+    "name": "citation",
+    "intent": {
+      "question": "Where does the NYC code specify the court dimensions and light and air requirements relevant to a bedroom that opens only onto a court?",
+      "subject": "Code requirements for a bedroom opening only onto a court",
+      "reference": "\u201cCourt dimensions and light and air requirements matter,\u201d from the immediately preceding exchange",
+      "clarification": ""
+    },
+    "ms": 4422
+  },
+  {
+    "name": "hypothetical",
+    "intent": {
+      "question": "In NYC, can a shop entrance have one step in an existing building, or must it have an accessible route?",
+      "subject": "A one-step shop entrance in an existing building",
+      "reference": "The immediately preceding exchange about whether the shop entrance can have one step and the need for an accessible route.",
+      "clarification": ""
+    },
+    "ms": 8366
+  },
+  {
+    "name": "new-topic",
+    "intent": {
+      "question": "What permits are required for a sidewalk shed in New York City?",
+      "subject": "Sidewalk shed permits",
+      "reference": "The user explicitly introduces an unrelated topic, so this is a new question and does not refer to the two exits.",
+      "clarification": ""
+    },
+    "ms": 3700
+  },
+  {
+    "name": "ambiguous",
+    "intent": {
+      "question": "Can I make the lobby or the vestibule smaller?",
+      "subject": "Reducing the size of the lobby or vestibule",
+      "reference": "\u201cIt\u201d refers to the lobby or vestibule discussed in the immediately preceding exchange.",
+      "clarification": "Do you mean the lobby or the vestibule?"
+    },
+    "ms": 3026
+  }
+]

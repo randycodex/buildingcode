@@ -31,3 +31,22 @@ assert(!focused.text.includes('[S99]')&&!focused.text.includes('[W99]'));
 assert.equal(focused.trace.length,0);
 const stopped=new AbortController();stopped.abort();await assert.rejects(runExperimentalAssistant({question:'Question'},{signal:stopped.signal,call:()=>assert.fail('No cancelled call')}),{name:'AbortError'});
 console.log('Experimental Assistant: fresh prompt, attachments, autonomous tools, web citation links, private-query isolation, no reviewer, cancellation passed.');
+// Resolve meaning before retrieval, preserving actual role-specific answers.
+let phases=[],receivedQuery;
+const followup=await runExperimentalAssistant({question:'Does that change it?',history:[
+ {role:'user',question:'Old subject'}, {role:'assistant',answer:{answerText:'Old answer'}},
+ {role:'user',question:'Current subject'}, {role:'assistant',question:'Wrong fallback',answer:{answerText:'Current answer'}}
+]}, {searchLibrary:async query=>{receivedQuery=query;return {sources:[]};},call:async(body,{phase})=>{
+ phases.push(phase);
+ if(phase==='experimental_intent'){
+  const context=JSON.parse(body.input);assert.equal(context.latestExchange[1].content,'Current answer');assert.equal(context.earlierConversation[0].content,'Old subject');assert(!body.tools?.length);
+  return message(JSON.stringify({question:'Resolved current subject',subject:'Current subject',reference:'latest exchange',clarification:''}));
+ }
+ assert.deepEqual(body.input.slice(1,5).map(m=>m.role),['user','assistant','user','assistant']);
+ assert.equal(JSON.parse(body.input[5].content).resolvedIntent.question,'Resolved current subject');
+ return phases.length===2?invoke('search_library','Resolved current subject'):message('Current answer.');
+}});
+assert.equal(receivedQuery,'Resolved current subject');assert.equal(phases[0],'experimental_intent');assert.equal(followup.trace[0].tool,'resolve_conversation');
+const clarification=await runExperimentalAssistant({question:'Can it be smaller?',history:[{role:'assistant',text:'There are two possible objects.'}]},{searchLibrary:()=>assert.fail('No search for ambiguous intent'),call:async()=>message(JSON.stringify({question:'Can it be smaller?',subject:'Unclear',reference:'two objects',clarification:'Which of the two do you mean?'}))});
+assert.equal(clarification.text,'Which of the two do you mean?');
+console.log('Conversation: role-specific history, latest exchange, intent before retrieval, trace and ambiguity handling passed.');

@@ -21,7 +21,8 @@ globalThis.fetch=async(url,options)=>{
  if(String(url)!=='https://api.openai.com/v1/responses')return nativeFetch(url,options);
  calls++;const body=JSON.parse(options.body);let output;
  const text=t=>[{type:'message',role:'assistant',content:[{type:'output_text',text:t}]}];
- if(body.tools?.some(t=>t.type==='web_search'))output=[{type:'web_search_call',action:{type:'search'}},{type:'message',role:'assistant',content:[{type:'output_text',text:'Public source finding.',annotations:[{type:'url_citation',url:'https://www.nyc.gov/example',title:'Official example'}]}]}];
+ if(body.text?.format?.name==='assistant_conversational_intent')output=text(JSON.stringify({question:JSON.parse(body.input).currentQuestion,subject:'Current question',reference:'latest exchange',clarification:''}));
+ else if(body.tools?.some(t=>t.type==='web_search'))output=[{type:'web_search_call',action:{type:'search'}},{type:'message',role:'assistant',content:[{type:'output_text',text:'Public source finding.',annotations:[{type:'url_citation',url:'https://www.nyc.gov/example',title:'Official example'}]}]}];
  else if(Array.isArray(body.input)){
   if(body.input.at(-1).type==='function_call_output')output=text('The public source says this. [W1]');
   else if(JSON.parse(body.input[0].content).question==='Use web')output=[{type:'function_call',call_id:'web-1',name:'search_web',arguments:JSON.stringify({query:'NYC public code'})}];

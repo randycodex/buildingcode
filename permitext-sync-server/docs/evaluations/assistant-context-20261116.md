@@ -1,0 +1,13 @@
+# Local experimental Assistant conversational context — November 16, 2026
+
+The active conversation preserves user/assistant records within the current context revision. The previous experimental engine flattened those records into a single JSON user message and did not resolve intent before tool selection. No missing-message defect was established; recency and reference resolution were underspecified.
+
+The experimental engine now sends role-specific chronological turns, resolves a follow-up before retrieval with the same Luna model, distinguishes the immediately preceding exchange from older context, and records that interpretation in the immutable research trace. Explicit returns to earlier topics override recency. Corrections and hypotheticals retain their scope. Ambiguous referents produce a clarification before searches. Historical Assistant claims are not treated as verified sources. The original reviewed engine is unchanged.
+
+Eight synthetic real-Luna interpretation cases passed qualitative inspection: stair separation after roof exit count, ambiguous door/corridor pronoun, exterior-wall correction, explicit return to bicycle parking, request for authority for the latest claim, existing-building hypothetical, clear unrelated topic change, and ambiguous lobby/vestibule reference. Final outputs are in the adjacent JSON. These are intent tests, not legal-answer accuracy evaluations. Resolution took approximately 2.8–8.4 seconds in this run.
+
+Full local HTTP/model tests replayed roof exit count → adjacent stairs → residential qualification. The final follow-up stayed on separation and retrieved/cited the R-2 exception in 1007.1.1 rather than reverting to single-exit eligibility. A general instruction to investigate overlapping occupancy/height rules was added. The full trace contained 403.5.1 in retrieved library evidence during the adjacent-stairs turn, but the final residential answer did not discuss that provision. This remains a retrieval/answer-completeness limitation; context success is not proof of exhaustive code analysis. No stair-specific routing or section-number rule was added to the engine.
+
+Offline checks passed for intent-before-retrieval ordering, role-specific history, ambiguity short-circuit, source identity handling, attachment focus, local HTTP persistence/replay/switch-back, existing reviewed engine, and durable budget limits. Real calls used synthetic project data and the original cumulative $7 ledger. No production rollout or push.
+
+Opt-in reproduction: set OPENAI_API_KEY and PERMITEXT_RESEARCH_V2_BUDGET_PATH to the existing cumulative evaluation ledger, then run `node scripts/evaluate-assistant-context.mjs <output.json>`. Inspect meaning, not merely HTTP success.
