@@ -4,7 +4,7 @@ const historyMenuIcon = '<svg aria-hidden="true" width="18" height="18" viewBox=
 
 // Deletion belongs to the history list; the server still reviews and fences the exact IDs.
 export function createResearchHistoryManagement({request, confirm, isCurrent, project = () => null,
-  beforeDelete, onDeleted, onIncludeHidden, onBusy, includeHidden = false}) {
+  beforeDelete, onDeleted, onIncludeHidden, onBusy, includeHidden = false, listOptions = true}) {
   const node = (tag, className = '', text = '') => {
     const element = document.createElement(tag);
     element.className = className; element.textContent = text;
@@ -137,14 +137,19 @@ export function createResearchHistoryManagement({request, confirm, isCurrent, pr
   });
   const count = node('span','assistant-history-selected-count'); count.setAttribute('role','status');
   const remove = action('Delete selected', () => deleteConversations({scope:'selected',conversationIDs:[...selected]}),'is-danger');
-  toolbar.append(select,more); selectionTools.append(all,count,remove); element.append(toolbar,selectionTools,status);
+  if (listOptions) {
+    toolbar.append(select,more);
+    selectionTools.append(all,count,remove);
+    element.append(toolbar,selectionTools);
+  }
+  element.append(status);
   const handleKeyDown = event => {
     if (event.key !== 'Escape' || !selecting || busy || event.defaultPrevented) return;
     event.preventDefault(); selecting = false; selected.clear(); paint(); more.focus({preventScroll:true});
   };
   paint();
   return {
-    element, toolbar, handleKeyDown,
+    element, toolbar:listOptions ? toolbar : null, handleKeyDown,
     setConversations(next) {
       closeMenu(); conversations = next;
       const ids = new Set(next.map(conversation=>conversation.id));

@@ -65,8 +65,8 @@ for (const id of mainPaneIDs) {
   const search = /^utility:search(?::|$)/.test(id);
   const evidence = /^utility:saved(?::|$)/.test(id);
   const fixedBasis = reader || search || evidence;
-  const minimum = reader ? 630 : evidence ? 300 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
-  const maximum = evidence ? 600 : search ? 900 : Infinity;
+  const minimum = reader ? 630 : evidence || search ? 300 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
+  const maximum = Infinity;
   for (const count of [1, 2, 3, 4, 8]) {
     const ids = [id, ...Array.from({ length: count - 1 }, (_, index) => `reader:other-${index}`)];
     for (const restoredWidth of [350, 400, 520, 550, 600, 850, 900, 1200]) {
@@ -79,14 +79,14 @@ for (const id of mainPaneIDs) {
       assert.equal(style['--pane-default-min-width'], `${minimum}px`, `${id} enforces its rendered minimum`);
       assert.equal(context.state.paneWeights[id], expectedWidth, `${id} also clamps widths when mounted directly`);
       const basis = expectedWidth;
-      assert.equal(style.flex, `${fixedBasis ? 0 : 1} 0 ${basis}px`, `${id} keeps the intended sizing with ${count} columns`);
+      assert.equal(style.flex, `0 0 ${basis}px`, `${id} keeps the intended sizing with ${count} columns`);
     }
   }
   assert.equal(layout(id, [id], 600, false, true).flex, '0 0 48px', `${id} keeps its collapsed width`);
 }
 for (workflow of ['notebook', 'project-details']) {
   assert.equal(layout('reader:a', ['reader:a'], 400).flex, '0 0 630px', `${workflow} enforces the same Reader minimum`);
-  assert.equal(layout('utility:search:instance', ['utility:search:instance'], 1200).flex, '0 0 900px', 'Repeated Search columns also respect their resize maximum');
+  assert.equal(layout('utility:search:instance', ['utility:search:instance'], 1200).flex, '0 0 1200px', 'Repeated Search columns retain manually expanded widths');
 }
 workflow = 'research';
 context.paneIDs = ['utility:archive'];
@@ -98,7 +98,7 @@ context.state.utilityInstances = [{id:'instance',key:'analysis',conversationID:'
 for (const id of ['utility:analysis', 'utility:analysis:instance']) {
   assert.equal(context.minimumPaneWidthForID(id),920);
   assert.equal(context.defaultPaneWidthForID(id),920);
-  assert.equal(layout(id,[id,'reader:a'],1200).flex,'1 0 1200px','An empty Assistant retains its conversation composer.');
+  assert.equal(layout(id,[id,'reader:a'],1200).flex,'0 0 1200px','An empty Assistant retains its conversation composer.');
   context.researchDraftPaneIDs.add(id);
   assert.equal(context.minimumPaneWidthForID(id),920,'New chat reserves the message column.');
   context.researchDraftPaneIDs.delete(id);

@@ -16,7 +16,7 @@ function fixture() {
   const c=vm.createContext({initializeReaderTabs,addReaderTab,openRecentReaderTab,readerTabs,canAddReaderTab,maximumReaderTabs,rememberReaderTabPosition(){},retainReaderColumn(){},linkPaneToView,state:{readers,utilityInstances:[search],paneWeights:{},paneOrder:[]},activeWorkspaceID:'workspace',
     searchReaderOpeningAttempts:new Map(),savedItemOpeningAttempts:new Map(),sectionDetailOpeningAttempts:new Map(),
     captureAccountRequest:()=>account,isCurrentAccountRequest:value=>value===account,
-    currentColumnWorkflowView:()=> 'research',workingResearchNote:()=>null,workflowPaneIsVisible:()=>true,workspaceColumnsRequireProject:()=>false,
+    currentColumnWorkflowView:()=> 'research',activateNotebookReference(){},workingResearchNote:()=>null,workflowPaneIsVisible:()=>true,workspaceColumnsRequireProject:()=>false,
     readerShortcuts:{activeReaderPaneID:()=> 'reader:active'},
     resolveReaderSource:async item=>({...item,__activeCodeSourceContext:{}}),activeCodeSourcesController:{isCurrent:()=>true},
     searchResultDetail:item=>item,readerFieldsForSectionDetail:(d,o)=>({...d,...o}),normalizeAnnotationBlockID:v=>v||'',

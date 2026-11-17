@@ -39,6 +39,7 @@ class Node {
 let reads = 0, paints = 0, current = true, selected = "p1";
 const project = { id: "p1", clientID: "local-p1" };
 const matches = Array.from({ length: 80 }, (_, index) => ({ id: String(index % 40), sectionNumber: `100.${index}`, codePrefix: "BC",
+  chapterID: `chapter-${index % 3 + 1}`, chapterNumber: String(index % 3 + 1), chapterTitle: `Chapter ${index % 3 + 1}: Topic ${index % 3 + 1}`,
   codeVersion: index < 40 ? defaultSyncCodeVersion : historicalConstructionSyncCodeVersion,
   blockID: index % 2 ? "paragraph" : "", title: `Heading ${index}`, excerpt: `Complete result ${index}`, citation: `Citation ${index}` }));
 let links = matches.filter((_value, index) => index % 3 === 0).map((item, index) => ({ ...item, sectionID: item.id, folderClientID: index % 2 ? "other-project" : "local-p1" }));
@@ -61,14 +62,16 @@ const c = vm.createContext({
   codeDisplayLabel: prefix => prefix, codeTheme: prefix => prefix.toLowerCase(),
   researchCodeEdition: item => item.codeVersion === historicalConstructionSyncCodeVersion ? "2014" : "2022",
   normalizeSearchResultSources: value => value || [],
-  wireProjectSectionMotion() {}, searchPositionState: () => ({ selectedResult: "" }),
+  prependWorkspaceButtonIcon() {},
+  saveWorkspaceState() {},
+  wireProjectSectionMotion() {}, searchPositionState: instance => (instance.searchPosition ||= { selectedResult: "" }),
   searchResultPresentation: item => ({ heading: item.title, excerpt: item.excerpt, citation: item.citation }),
   appendHighlighted: (node, text) => { node.textContent = text; }, markResearchSelectable() {},
   searchGroupCountText: count => String(count)
 });
 const subscriptionLifecycle = source.slice(source.indexOf("const workspaceNodeAccessRecords"), source.indexOf("function readerPrivateContentAllowed"));
 vm.runInContext(subscriptionLifecycle + ["workspaceAccessGateForRender", "normalizeAnnotationBlockID", "savedEvidenceKey", "projectSectionBelongsToProject", "workspaceSavedEvidenceKeys", "isSectionSaved",
-  "searchResultDetail", "searchResultPositionKey", "createSearchResultSaveButton", "appendSearchResultGroups", "refreshSearchGroupCounts"].map(actual).join("\n"), c);
+  "searchResultDetail", "searchResultPositionKey", "searchResultChapter", "ensureSearchResultChapter", "searchGroupCountText", "createSearchResultSaveButton", "appendSearchResultGroups", "refreshSearchGroupCounts"].map(actual).join("\n"), c);
 const gate = c.workspaceAccessGateForRender();
 await gate.ready;
 panel.__workspaceAccessGate = gate;
@@ -89,6 +92,12 @@ const duration = performance.now() - start;
 assertRows(matches);
 assert.equal(reads, 1, "80 results across current/historical editions share one summary with a real eagerly notifying settled gate");
 assert.equal(paints, 80, "The eager callback and explicit initialization do not paint each button twice");
+const chapters = results.querySelectorAll('.search-chapter-group');
+assert.equal(chapters.length, 6, 'Chapters remain separated by edition');
+assert.deepEqual(chapters.slice(0,3).map(chapter => chapter.dataset.chapterKey), ['chapter-1','chapter-2','chapter-3'], 'Chapter order follows first ranked occurrence');
+assert.ok(chapters.every(chapter => chapter.open === false), 'All chapters start collapsed in current and historical editions');
+assert.equal(chapters[0].querySelector('.search-chapter-count').textContent, '14');
+chapters[0].open = true; chapters[0].events.toggle();
 const next = matches.slice(0, 5).map((item, index) => ({ ...item, id: `next-${index}`, title: `Next ${index}`, citation: `Next citation ${index}` }));
 links.push({ ...next[0], sectionID: next[0].id, folderID: "p1" });
 reads = 0;
@@ -96,6 +105,16 @@ c.appendSearchResultGroups(results, [...matches, ...next], "means of egress", in
 assertRows([...matches, ...next]);
 assert.equal(reads, 1, "Each new page uses fresh state and skips already-rendered rows");
 assert.equal(paints, 85);
+assert.equal(chapters[0].open, true, 'Loading another page respects manually expanded chapters');
+assert.equal(chapters[0].querySelector('.search-chapter-count').textContent, '16', 'Counts include later pages exactly once');
+results.dataset.searchHasMore = 'true'; c.refreshSearchGroupCounts(results);
+assert.equal(chapters[0].querySelector('.search-chapter-count').textContent, '16 loaded', 'Partial pagination counts never claim to be totals');
+results.dataset.searchHasMore = 'false';
+const restoredChapters = new Node('div'); panel.append(restoredChapters);
+c.appendSearchResultGroups(restoredChapters, matches.slice(0,3), 'means of egress', instance);
+assert.equal(restoredChapters.querySelector('.search-chapter-group').open, true, 'Explicit query-scoped choices restore on rerender');
+// Discard this isolated render before checking access callbacks and paint counts.
+panel.children = panel.children.filter(child => child !== restoredChapters); restoredChapters.parentNode = null;
 links = []; reads = 0; assert.equal(gate.retry(), true); await gate.ready;
 assertRows([...matches, ...next]);
 assert.equal(reads, 1, "85 access callbacks share one fresh notification snapshot after writes");
@@ -131,7 +150,7 @@ const mechanical = {...matches[0], codePrefix:"MC", id:"mechanical-result"};
 instance.defaultExpandedResultSource = `MC|${defaultSyncCodeVersion}`;
 c.appendSearchResultGroups(collapsedResults, [...matches, mechanical], "means of egress", instance);
 assert.equal(collapsedResults.querySelector(".search-family-card").dataset.family, "BC", "Old automatic previews never reorder families");
-assert.ok(collapsedResults.querySelectorAll(".search-result-group-toggle").every(button => button.attrs["aria-label"].startsWith("Expand ")), "Old preview state cannot expand a group");
+assert.equal(collapsedResults.querySelector('.search-result-group[data-source-key="MC|' + defaultSyncCodeVersion + '"]').querySelector('.search-result-group-toggle').attrs['aria-label'], 'Collapse MC results', 'The selected preview source exposes its strongest chapters');
 instance.defaultExpandedResultSource = `BC|${historicalConstructionSyncCodeVersion}`;
 c.appendSearchResultGroups(collapsedResults, [...matches, mechanical], "means of egress", instance);
 assert.equal(collapsedResults.querySelector(".search-result-group").dataset.sourceVersion, defaultSyncCodeVersion, "Editions retain their usual order");
@@ -140,4 +159,4 @@ instance.expandedResultSources = [`MC|${defaultSyncCodeVersion}`];
 c.appendSearchResultGroups(expandedResults, [...matches, mechanical], "means of egress", instance);
 const group = expandedResults.querySelector(`.search-result-group[data-source-key="MC|${defaultSyncCodeVersion}"]`);
 assert.equal(group.querySelector(".search-result-group-toggle").attrs["aria-label"], "Collapse MC results", "Manual expansions remain open");
-console.log("Search group rendering passed: collapsed defaults, ignored legacy previews, explicit expansion and stable family/edition order.");
+console.log("Search chapter rendering passed: collapsed defaults in every edition, ranked groups, honest loaded counts, pagination deduplication, explicit expansion/restore, and stable source identities.");

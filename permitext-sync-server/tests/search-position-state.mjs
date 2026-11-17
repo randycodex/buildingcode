@@ -8,9 +8,13 @@ vm.runInContext(['normalizeSearchResultSources','newUtilityInstance','normalizeU
 const original={id:'search-a',key:'search',query:'concrete',matchMode:'words',codeFilters:['BC'],historyScrollTop:275,searchEdition:'2014',expandedResultSources:['BC|2014','MC|2022']};
 const pos=c.searchPositionState(original);pos.loadedPages=3;pos.scrollTop=4500;pos.selectedResult='edition:section:paragraph';
 pos.groupPages={'BC|2014':2,'MC|2022':4,invalid:0,fraction:1.5,excess:1001};
+pos.chapterExpansion={'BC|2014|chapter-10':false, invalid:'not a choice'};
 const independent=c.newUtilityInstance('search',original);
 independent.searchPosition.groupPages['BC|2014']=3;
 assert.equal(pos.groupPages['BC|2014'],2,'Search columns must not share mutable group pagination state.');
+independent.searchPosition.chapterExpansion['BC|2014|chapter-10']=true;
+assert.equal(pos.chapterExpansion['BC|2014|chapter-10'],false,'Search columns never share mutable chapter choices');
+assert.equal(independent.searchPosition.chapterExpansion.invalid,undefined);
 assert.equal(independent.searchPosition.groupPages.invalid,undefined);
 assert.equal(independent.searchPosition.groupPages.fraction,undefined);
 assert.equal(independent.searchPosition.groupPages.excess,1000);
@@ -21,6 +25,7 @@ const legacy=c.normalizeUtilityInstances({utilityInstances:[{id:'legacy-search',
 assert.deepEqual(Array.from(legacy.expandedResultSources),['BC|2014']);
 assert.equal(c.searchPositionState(restored).loadedPages,3);assert.equal(restored.searchPosition.scrollTop,4500);assert.equal(restored.searchPosition.selectedResult,pos.selectedResult);
 assert.equal(restored.searchPosition.groupPages['BC|2014'],2);
+assert.equal(restored.searchPosition.chapterExpansion['BC|2014|chapter-10'],false);
 assert.equal(restored.matchMode,'words');
 restored.matchMode='exact';
 assert.equal(c.normalizeUtilityInstances(JSON.parse(JSON.stringify({utilityInstances:[restored]})))[0].matchMode,'exact','Explicit phrase mode survives reload');

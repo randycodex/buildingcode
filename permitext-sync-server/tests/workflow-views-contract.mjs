@@ -5,6 +5,7 @@ import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {normalizeWorkflowView, normalizeColumnWorkflowView, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout} from '../public/workflow-views.js';
 import {captureWorkspaceLayout, applyWorkspaceLayout} from '../public/workspace-state.js';
+import {reportOutlineRailWidth} from '../public/report-comparison.js';
 const membership=linkPaneToView({},'reader:linked','notebook');
 assert.equal(paneBelongsToView('reader:linked','research',membership),false,'A new linked Reader belongs to its originating view');
 assert.equal(paneBelongsToView('project:notebook:a','notebook',linkPaneToView({},'project:notebook:a','research')),true);
@@ -220,16 +221,16 @@ const referenceContext=vm.createContext({isProAccount:()=>true,
   state:{paneWeights:{'reader:reference':972}},track:referenceTrack,
   currentColumnWorkflowView:()=> 'report',defaultActivePaneIDs:()=>referenceIDs,
   workflowPaneIsVisible:()=>true,paneIsCollapsed:()=>false,minimumPaneWidthForID:()=>600,defaultPaneWidthForID:()=>600,
-  referenceColumnsWidth,reportColumnsLayout
+  referenceColumnsWidth,reportColumnsLayout,reportOutlineRailWidth
 });
 vm.runInContext([actual('maximumPaneWidthForID'),actual('constrainPaneWidth'),actual('syncReferenceReaderLayout')].join('\n'),referenceContext);
 referenceContext.syncReferenceReaderLayout();
-assert.equal(referenceStyles.get('--reference-document-min-width'),'1241px');
+assert.equal(referenceStyles.get('--reference-document-min-width'),'1541px','The expanded Reports list retains its 300px reservation');
 assert.equal(referenceStyles.get('--reference-readers-width'),'0px');
 assert.equal(referenceClasses.has('has-compact-reference-document'),false);
 assert.equal(referenceTrack.inert,true);
 referencePanel.dataset.libraryOpen='false';referenceContext.syncReferenceReaderLayout();
-assert.equal(referenceStyles.get('--reference-document-min-width'),'600px');
+assert.equal(referenceStyles.get('--reference-document-min-width'),'900px');
 assert.equal(referenceClasses.has('has-compact-reference-document'),false,'Closing Sources makes room for the outline again');
 referenceIDs=[];referenceContext.syncReferenceReaderLayout();
 assert.equal(referenceClasses.has('has-reference-readers'),false);

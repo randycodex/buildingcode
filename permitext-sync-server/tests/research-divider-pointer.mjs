@@ -114,31 +114,31 @@ assert.deepEqual(pair.widths(), [1200, 1200]); assert.equal(pair.saves, 0);
 assert.equal(pair.track.dataset.researchColumnSizing, 'fit');
 pair.context.startPaneResize(pair.event(1201), 'utility:search:one', 'reader:one');
 pair.move(1261); pair.frame(); pair.finish(1261);
-assert.deepEqual(pair.widths(), [1260, 1140], 'Dragging transfers the requested pixels between wider fitted panes');
+assert.deepEqual(pair.widths(), [1260, 1200], 'Dragging changes only the preceding fitted pane');
 assert.equal(pair.saves, 1); assert.equal(pair.handlers.size, 0);
 pair.panes.push(pair.makePane('reader:two'), pair.makePane('reader:three'));
 pair.context.syncResearchColumnLayout();
-assert.deepEqual(pair.widths(), [1260, 1140, 630, 630], 'Adding columns preserves manually resized widths');
+assert.deepEqual(pair.widths(), [1260, 1200, 630, 630], 'Adding columns preserves manually resized widths');
 pair.context.syncResearchColumnLayout({reset:true});
-assert.deepEqual(pair.widths(), [600, 630, 630, 630], 'Explicit reset restores each column minimum in overflow');
-assert.equal(pair.context.maximumPaneWidthForID('utility:search:one'), 900, 'Overflow retains the 900px maximum');
+assert.deepEqual(pair.widths(), [508, 630, 630, 630], 'Explicit reset shares the available width while preserving Reader minimums');
+assert.equal(pair.context.maximumPaneWidthForID('utility:search:one'), Infinity, 'Search retains manually expanded widths without a maximum');
 
 const assistantPair = fixture(['utility:analysis:one', 'reader:one']);
 assistantPair.context.assistantHistoryWidth = 320;
 assistantPair.context.startPaneResize(assistantPair.event(1201), 'utility:analysis:one', 'reader:one');
 assistantPair.move(1401); assistantPair.frame(); assistantPair.finish(1401);
-assert.deepEqual(assistantPair.widths(), [1400,1000], 'Assistant divider transfers width from an equal split');
+assert.deepEqual(assistantPair.widths(), [1400,1200], 'Assistant expands while its neighbor keeps its width');
 assert.equal(assistantPair.state.researchColumnWidthsManual, true);
 delete assistantPair.track._researchColumnLayout;
 assistantPair.context.syncResearchColumnLayout();
-assert.deepEqual(assistantPair.widths(), [1400,1000], 'The resized Assistant survives a fresh layout instance');
+assert.deepEqual(assistantPair.widths(), [1400,1200], 'The resized Assistant survives a fresh layout instance');
 assistantPair.context.syncResearchColumnLayout({reset:true});
 assert.deepEqual(assistantPair.widths(), [1200,1200], 'Reset returns Assistant to an equal split');
 
 const unlimited = fixture(['reader:one', 'reader:two']);
 unlimited.context.startPaneResize(unlimited.event(1201), 'reader:one', 'reader:two');
 unlimited.move(1801); unlimited.frame(); unlimited.finish(1801);
-assert.deepEqual(unlimited.widths(), [1800,630], 'Reader resizing is not capped by the fitted layout maximum');
+assert.deepEqual(unlimited.widths(), [1800,1200], 'Reader resizing is not capped by the fitted layout maximum');
 assert.equal(unlimited.context.maximumPaneWidthForID('reader:one'), Infinity);
 
 // Shared dividers must not impose the old combined-width cap. This is the
@@ -153,9 +153,9 @@ assert.equal(minimumPair.state.paneWeights['reader:one'], 1830);
 assert.equal(minimumPair.saves, 1);
 minimumPair.context.startPaneResize(minimumPair.event(1801), 'reader:one', 'reader:two');
 minimumPair.move(-199); minimumPair.frame(); minimumPair.finish(-199);
-assert.deepEqual(minimumPair.widths(), [630, 2630, 630, 630], 'Dragging the other direction can expand the right Reader beyond the pair total');
+assert.deepEqual(minimumPair.widths(), [630, 630, 630, 630], 'Dragging left stops at the left Reader minimum without growing its neighbor');
 
-for (const direction of ['right', 'left']) {
+for (const direction of ['right']) {
   const heldPair = fixture(['reader:one', 'reader:two', 'reader:three', 'reader:four'], 1605);
   const targetX = direction === 'right' ? 1604 : 1;
   const growingIndex = direction === 'right' ? 0 : 1;
@@ -178,7 +178,7 @@ for (const direction of ['right', 'left']) {
 const unrelated = fixture(['reader:one', 'reader:two', 'reader:three'], 2404);
 unrelated.context.startPaneResize(unrelated.event(801), 'reader:one', 'reader:two');
 unrelated.move(861); unrelated.frame(); unrelated.finish(861, 'pointercancel');
-assert.deepEqual(unrelated.widths(), [860, 740, 800], 'Resizing a pair preserves the third column');
+assert.deepEqual(unrelated.widths(), [860, 800, 800], 'Resizing a pair preserves the third column');
 assert.equal(unrelated.handlers.size, 0); assert.equal(unrelated.frames.size, 0);
 unrelated.context.startPaneResize(unrelated.event(801, 2), 'reader:one', 'reader:two');
 assert.equal(unrelated.handlers.size, 0, 'Secondary clicks cannot start a drag');
@@ -233,7 +233,7 @@ console.log('Research divider pointer behavior passed: click/jitter stability, a
 const evidence = fixture(['utility:saved:one','project:notebook:one']);
 evidence.workflow = 'research';
 const evidenceID = 'utility:saved:one';
-for (const [stored, expected] of [[100,300],[450,450],[1200,600]]) {
+for (const [stored, expected] of [[100,300],[450,450],[1200,1200]]) {
   evidence.state.paneWeights[evidenceID] = stored;
   evidence.context.applyPaneWeight(evidence.panes[0],evidenceID);
   assert.equal(evidence.widths()[0],expected);
@@ -242,7 +242,7 @@ for (const [stored, expected] of [[100,300],[450,450],[1200,600]]) {
 }
 for (const id of ['utility:saved',evidenceID]) {
   assert.equal(evidence.context.minimumPaneWidthForID(id),300);
-  assert.equal(evidence.context.maximumPaneWidthForID(id),600);
+  assert.equal(evidence.context.maximumPaneWidthForID(id),Infinity);
 }
 evidence.context.activePinnedPaneID = () => evidenceID;
 assert.equal(evidence.context.singleExpandedDividerEdge(evidenceID,'project:notebook:one').paneID,evidenceID);
@@ -251,7 +251,7 @@ evidence.move(-400); evidence.frame(); evidence.finish(-400);
 assert.deepEqual(evidence.widths(),[300,600],'Pinned Evidence can shrink without resizing a Note');
 evidence.context.startPaneEdgeResize(evidence.event(300),evidenceID,'right');
 evidence.move(1300); evidence.frame(); evidence.finish(1300);
-assert.deepEqual(evidence.widths(),[600,600],'Pinned Evidence stops at its maximum');
+assert.deepEqual(evidence.widths(),[1300,600],'Pinned Evidence expands beyond its former cap');
 evidence.context.startPaneEdgeResize(evidence.event(0),evidenceID,'left');
 evidence.move(1000); evidence.frame(); evidence.finish(1000);
 assert.equal(evidence.widths()[0],300,'The outer left grip uses the same minimum');

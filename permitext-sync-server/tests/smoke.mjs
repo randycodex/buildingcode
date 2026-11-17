@@ -1459,7 +1459,9 @@ async function main() {
         !workspaceScript.text.includes('function openSearchResultInNewReader') &&
         searchResultsStart >= 0 && searchResultsEnd > searchResultsStart &&
         !searchResultsSource.includes('newReaderButton') &&
-        workspaceScript.text.includes('openNewButton.textContent = "New reader"') &&
+        workspaceScript.text.includes('openNewButton.setAttribute("aria-label", "Open in new Reader")') &&
+        workspaceScript.text.includes('prependWorkspaceButtonIcon(openNewButton, "library-big")') &&
+        workspaceScript.text.includes('actions.append(openNewButton, saveButton)') &&
         workspaceScript.text.includes('void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance), {') &&
         workspaceScript.text.includes('sourceSurface: "search"') &&
         workspaceScript.text.includes("function updateSearchDock") &&

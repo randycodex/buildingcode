@@ -14,6 +14,10 @@ try {
     const metadata=await(await fetch(`${base}/code/sections/${result.id}?include=metadata&version=${encodeURIComponent(result.codeVersion)}`)).json();
     assert.deepEqual(result.codeSource,metadata.section.codeSource,'Search carries the exact source identity used by source preflight');
     assert.equal(String(result.navigationChapterID),String(metadata.section.navigationChapterID));
+    const chapters = await (await fetch(`${base}/code/chapters?code=${result.codePrefix}&version=${encodeURIComponent(result.codeVersion)}`)).json();
+    const chapter = chapters.chapters.find(chapter => String(chapter.id) === String(result.navigationChapterID));
+    assert.equal(result.chapterTitle, chapter.fullTitle || chapter.displayTitle || chapter.title || '');
+    assert.equal(result.navigationChapterNumber, chapter.chapterNumber);
   }
   console.log('Real concrete search results carry exact edition, source and navigation metadata.');
 } finally {server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}

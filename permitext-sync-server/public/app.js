@@ -5,7 +5,7 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, open
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=52";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=57";
 import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=7";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
@@ -17,9 +17,9 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261116-single-assistant-v1926";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261116-sources-hover-v2447";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
-import {createResearchHistoryManagement} from "./research-delete-controls.js?v=12";
+import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
@@ -52,8 +52,8 @@ import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportSwitch, createReportSourcePreviews, retainReportChildren } from "./report-presentation.js?v=1";
 import { createWorkspaceViewPresentation } from "./workspace-view-presentation.js?v=5";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=6";
-import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261115-reports-rail-v11";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout, notebookReferenceVisibility } from "./workflow-views.js?v=25";
+import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261116-assistant-fade-v12";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout, notebookReferenceVisibility } from "./workflow-views.js?v=26";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportLibraryControls, createReportVersionsControls } from "./report-library.js?v=20261115-report-rail-v12";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261116-single-assistant-v1926";
+} from "./offline-storage.js?v=20261116-sources-hover-v2447";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -1330,6 +1330,10 @@ function newUtilityInstance(key, overrides = {}) {
         instance.searchPosition.groupPages = Object.fromEntries(Object.entries(overrides.searchPosition.groupPages)
           .filter(([key, pages]) => key.length <= 1024 && Number.isSafeInteger(pages) && pages > 0)
           .map(([key, pages]) => [key, Math.min(pages, 1000)]));
+      }
+      if (overrides.searchPosition.chapterExpansion && typeof overrides.searchPosition.chapterExpansion === "object") {
+        instance.searchPosition.chapterExpansion = Object.fromEntries(Object.entries(overrides.searchPosition.chapterExpansion)
+          .filter(([key, expanded]) => key.length <= 2048 && typeof expanded === "boolean"));
       }
     }
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
@@ -5817,6 +5821,7 @@ function minimumPaneWidthForID(paneID) {
   if (Number.isFinite(writingMinimum)) return writingMinimum;
   if (paneID?.startsWith('project:notes-index:')) return 300;
   if (paneID?.startsWith("reader:")) return 630;
+  if (/^utility:search(?::|$)/.test(paneID || "")) return 300;
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 300;
   if (assistantHistoryOnlyPane(paneID)) return assistantHistoryWidth;
   if (paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") || paneID?.startsWith("research:conversation:")) return assistantHistoryWidth + 600;
@@ -5824,14 +5829,12 @@ function minimumPaneWidthForID(paneID) {
 }
 
 function maximumPaneWidthForID(paneID) {
+  if (currentColumnWorkflowView() === 'research') return Infinity;
   if (paneID?.startsWith('reader:') && currentColumnWorkflowView() === 'notebook')
     return (typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMaximums?.[paneID]) ?? Infinity;
   if (paneID?.startsWith('project:notes-index:')) return 300;
-  if (/^utility:saved(?::|$)/.test(paneID || "")) return 600;
-  if (!/^utility:search(?::|$)/.test(paneID || "")) return Infinity;
-  const layout = typeof track === "undefined" ? null : track._researchColumnLayout;
-  const resizeMaximum = layout && currentColumnWorkflowView() === "research" ? layout.resizeMaximums?.[paneID] : 0;
-  return Math.max(900, resizeMaximum || 0);
+  if (/^utility:saved(?::|$)/.test(paneID || '')) return 600;
+  return Infinity;
 }
 
 function constrainPaneWidth(paneID, width) {
@@ -7128,7 +7131,7 @@ function applyPaneWeight(panel, paneID) {
   panel.style.setProperty("--pane-default-min-width", `${minimumWidth}px`);
   // A divider's chosen width must survive an overflowing workspace. Allowing
   // flex shrink here silently pulled resized columns back to their minimum.
-  panel.style.flex = `${isFlexibleReaderPaneID(paneID) || paneID.startsWith('project:notes-index:') || /^utility:(?:search|saved)(?::|$)/.test(paneID) ? 0 : 1} 0 ${width}px`;
+  panel.style.flex = `${currentColumnWorkflowView() === 'research' || isFlexibleReaderPaneID(paneID) || /^utility:(?:search|saved)(?::|$)/.test(paneID) ? 0 : 1} 0 ${width}px`;
 }
 
 let notebookReferenceTransition;
@@ -7267,7 +7270,9 @@ function syncResearchColumnLayout({ reset = false } = {}) {
     return constrainPaneWidth(id, Number(state.paneWeights[id]) || defaultPaneWidthForID(id));
   };
   const fixed = visible.filter(panel => !balancedSet.has(panel));
-  const fixedWidth = fixed.reduce((sum, panel) => sum + preferredWidth(panel), 0);
+  const fixedWidth = fixed.reduce((sum, panel) => sum + preferredWidth(panel), 0) +
+    visible.reduce((sum, panel) => sum + (Number(panel.dataset.assistantSourcesWidth) || 0) +
+      (Number(panel.dataset.assistantHistoryWidth) || 0), 0);
   const dividerWidth = [...track.querySelectorAll(":scope > .pane-divider")]
     .reduce((sum, divider) => sum + divider.getBoundingClientRect().width, 0);
   const signature = [activeWorkspaceID, ...visible.map(panel => `${panel.dataset.paneId}:${paneIsCollapsed(panel.dataset.paneId)}`)].join("|");
@@ -7286,7 +7291,10 @@ function syncResearchColumnLayout({ reset = false } = {}) {
   const manual = state.researchColumnWidthsManual === true && !reset;
   state.researchColumnWidthsManual = Boolean(manual);
   if (manual) layout = { fits: false, widths: requested };
-  else if (!layout.fits && resetWidths) layout.widths = [...minimumWidths];
+  // Restore returns to usable defaults when the desk cannot fit. Minimums
+  // only bound manual dragging; using them here squeezed Search to 300px.
+  else if (!layout.fits && resetWidths) layout.widths = balanced.map(panel =>
+    constrainPaneWidth(panel.dataset.paneId, defaultPaneWidthForID(panel.dataset.paneId)));
   // A fitted layout can be wider than the overflow limit. Reserve its shared
   // space for manual resizing so the first drag starts from the visible width.
   const resizeMaximums = manual ? previous?.resizeMaximums : layout.fits
@@ -9234,7 +9242,8 @@ function searchResultPresentation(result, query = "") {
   const parentTitle = clean(result.headingLine);
   // Numbered list items sometimes contain an entire paragraph as their title.
   // Keep the supplied parent citation; never manufacture a subsection number.
-  const heading = result.definitionTerm ? `Definition: ${result.definitionTerm.toLocaleLowerCase()}` : title && title.length <= 110 ? title : parentTitle || "Code passage";
+  const heading = result.definitionTerm ? `Definition: ${result.definitionTerm.toLocaleLowerCase()}`
+    : title && title.length <= 110 ? title : parentTitle && parentTitle.length <= 110 ? parentTitle : "Code passage";
   const citation = [result.codePrefix || "BC", researchCodeEdition(result),
     parent && parent !== number && parent !== `${result.codePrefix || "BC"} ${number}` ? `Section ${parent}` : "",
     number ? `${parent && !number.startsWith(parent.replace(/^[A-Z]+\s+/, "")) ? "" : "§ "}${number}` : ""
@@ -9257,8 +9266,8 @@ function searchResultPresentation(result, query = "") {
     if (end < excerpt.length) { const boundary = excerpt.lastIndexOf(" ", end); if (boundary > start + 120) end = boundary; }
     excerpt = `${start ? "… " : ""}${excerpt.slice(start, end).trim()}${end < excerpt.length ? " …" : ""}`;
   }
-  const scope = parentTitle && parentTitle.toLowerCase() !== heading.toLowerCase() && !result.definitionTerm ? parentTitle : '';
-  return { citation, heading, excerpt, scope };
+  const scope = parentTitle && parentTitle.length <= 110 && parentTitle.toLowerCase() !== heading.toLowerCase() && !result.definitionTerm ? parentTitle : '';
+  return { citation, heading, excerpt, scope, number };
 }
 
 function recentlyViewedPreviewHasEnactedText(entry) {
@@ -21657,6 +21666,12 @@ function refreshSearchGroupCounts(results) {
     count.title = hasMore
       ? `${loaded.toLocaleString()} loaded. More results may be in this edition.`
       : `${loaded.toLocaleString()} ${loaded === 1 ? "result" : "results"}`;
+    group.querySelectorAll(".search-chapter-group").forEach((chapter) => {
+      const chapterCount = chapter.querySelector(".search-chapter-count");
+      const matches = chapter.querySelectorAll(".result-row").length;
+      chapterCount.textContent = searchGroupCountText(matches, hasMore);
+      chapterCount.title = `${matches.toLocaleString()} ${matches === 1 ? "match" : "matches"}${hasMore ? " loaded; more may be in this chapter" : ""}`;
+    });
   });
 }
 
@@ -21915,18 +21930,16 @@ async function renderSearchHistory(panel, instance, options = {}) {
       });
       const openNewButton = document.createElement("button");
       openNewButton.type = "button";
-      openNewButton.className = "search-open-new-reader workflow-action workflow-action-secondary";
-      openNewButton.textContent = "New reader";
+      openNewButton.className = "icon-button search-open-new-reader";
+      openNewButton.setAttribute("aria-label", "Open in new Reader");
+      prependWorkspaceButtonIcon(openNewButton, "library-big");
       openNewButton.title = "Open this source in an additional Reader beside Search";
       openNewButton.addEventListener("click", () => {
         void openSourceInReader(recentViewNavigationSource(entry), paneIDForUtilityInstance(instance), {
           sourceSurface: "search", forceNewReader: true
         });
       });
-      const actions = document.createElement("div");
-      actions.className = "saved-row-actions search-row-actions";
-      actions.append(openNewButton);
-      tile.append(openButton, actions);
+      tile.append(openButton, openNewButton);
       list.append(tile);
     });
     section.append(list);
@@ -22634,16 +22647,69 @@ async function renderSearchResults(panel, instance) {
   });
 }
 
-// Retire automatic previews from older clients. Only explicit user expansions
-// open result groups; new results and later pages remain collapsed by default.
+// Expose the first ranked source for a new query, then respect manual choices
+// through pagination and reload. Chapter choices belong to this query/scope.
 function applyInitialSearchGroupExpansion(instance, matches, sourceScope) {
-  const decisionKey = JSON.stringify(["collapsed-groups-v4", String(instance.query || "").trim(),
+  const decisionKey = JSON.stringify(["chapter-groups-v5", String(instance.query || "").trim(),
     normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all",
     sourceScope?.querySuffix || "", instance.matchMode || "words"]);
   if (!matches.length || instance.searchExpansionDecisionKey === decisionKey) return false;
   instance.searchExpansionDecisionKey = decisionKey;
-  instance.defaultExpandedResultSource = "";
+  instance.defaultExpandedResultSource = `${matches[0].codePrefix || "BC"}|${matches[0].codeVersion || defaultSyncCodeVersion}`;
+  const position = searchPositionState(instance);
+  position.chapterExpansion = {};
   return true;
+}
+
+function searchResultChapter(result) {
+  const clean = value => String(value ?? "").replace(/\s+/g, " ").trim();
+  const number = clean(result.navigationChapterNumber || result.chapterNumber);
+  const title = clean(result.chapterTitle);
+  const identity = clean(result.navigationChapterID || result.chapterID) || number || title || "other";
+  const titledChapter = /^(?:[A-Z][A-Z0-9]*\s+)?(chapter|appendix)\s+([A-Z0-9.-]+)(?:\s*[:—–-]\s*|\s+|$)(.*)$/i.exec(title);
+  const label = titledChapter
+    ? `${titledChapter[1].toLowerCase() === "appendix" ? "Appendix" : "Chapter"} ${titledChapter[2]}${titledChapter[3] ? `: ${titledChapter[3]}` : ""}`
+    : /^(?:article|title)\b/i.test(title) ? title
+    : number ? `${/^[A-Z]/i.test(number) ? "Appendix" : "Chapter"} ${number}${title ? `: ${title}` : ""}`
+    : title || "Other matching provisions";
+  return { key: encodeURIComponent(identity), label };
+}
+
+function ensureSearchResultChapter(body, result, instance, sourceKey) {
+  const presentation = searchResultChapter(result);
+  let chapter = body.querySelector(`.search-chapter-group[data-chapter-key="${CSS.escape(presentation.key)}"]`);
+  if (chapter) return chapter;
+  chapter = document.createElement("details");
+  chapter.className = "search-chapter-group";
+  chapter.dataset.chapterKey = presentation.key;
+  // First occurrence follows the server's relevance ranking. Later pages add
+  // chapters at the end and never reorder or collapse what the user is reading.
+  const position = searchPositionState(instance);
+  const choiceKey = `${sourceKey}|${presentation.key}`;
+  const savedChoice = position.chapterExpansion?.[choiceKey];
+  chapter.open = savedChoice === true;
+  const summary = document.createElement("summary");
+  summary.className = "search-chapter-summary";
+  const title = document.createElement("span");
+  title.className = "search-chapter-title";
+  title.textContent = presentation.label;
+  summary.title = presentation.label;
+  const count = document.createElement("span");
+  count.className = "search-chapter-count";
+  summary.append(title, count);
+  const rows = document.createElement("div");
+  rows.className = "search-chapter-body";
+  chapter.append(summary, rows);
+  let lastOpen = chapter.open;
+  chapter.addEventListener("toggle", () => {
+    if (lastOpen === chapter.open) return;
+    lastOpen = chapter.open;
+    const choices = searchPositionState(instance).chapterExpansion ||= {};
+    choices[choiceKey] = chapter.open;
+    saveWorkspaceState();
+  });
+  body.append(chapter);
+  return chapter;
 }
 
 function appendSearchResultGroups(results, searchResults, query, searchInstance) {
@@ -22705,7 +22771,8 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         count.className = "search-result-group-count";
         meta.append(count);
         label.append(meta);
-        const initiallyCollapsed = !normalizeSearchResultSources(searchInstance.expandedResultSources).includes(sourceKey);
+        const initiallyCollapsed = !normalizeSearchResultSources(searchInstance.expandedResultSources).includes(sourceKey) &&
+          searchInstance.defaultExpandedResultSource !== sourceKey;
         const syncToggleLabel = (expanded) => {
           label.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} ${codeDisplayLabel(prefix, sourceVersion)} results`);
         };
@@ -22715,6 +22782,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
             const expandedSources = new Set(normalizeSearchResultSources(searchInstance.expandedResultSources));
             if (expanded) expandedSources.add(sourceKey);
             else expandedSources.delete(sourceKey);
+            if (!expanded && searchInstance.defaultExpandedResultSource === sourceKey) searchInstance.defaultExpandedResultSource = "";
             searchInstance.expandedResultSources = Array.from(expandedSources);
             syncToggleLabel(expanded);
             saveWorkspaceState();
@@ -22750,6 +22818,12 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       const title = document.createElement("span");
       title.className = "result-title";
       appendHighlighted(title, presentation.heading, query);
+      if (presentation.number) {
+        const number = document.createElement("span");
+        number.className = "result-number";
+        number.textContent = presentation.number;
+        heading.append(number, textNode(" "));
+      }
       heading.append(title);
       const snippetText = presentation.excerpt;
       const snippet = document.createElement("p");
@@ -22779,8 +22853,9 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
 
       const openNewButton = document.createElement("button");
       openNewButton.type = "button";
-      openNewButton.className = "search-open-new-reader workflow-action workflow-action-secondary";
-      openNewButton.textContent = "New reader";
+      openNewButton.className = "icon-button search-open-new-reader";
+      openNewButton.setAttribute("aria-label", "Open in new Reader");
+      prependWorkspaceButtonIcon(openNewButton, "library-big");
       openNewButton.title = "Open this source in an additional Reader beside Search";
       openNewButton.addEventListener("click", () => {
         recordRecentSearch(query);
@@ -22789,13 +22864,14 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         });
       });
       const actions = document.createElement("div");
-      actions.className = "saved-row-actions search-row-actions";
-      actions.append(openNewButton);
+      actions.className = "search-result-header-actions";
+      actions.append(openNewButton, saveButton);
       const header = document.createElement("div");
       header.className = "result-row-header";
-      header.append(citation, saveButton);
-      row.append(header, mainButton, actions);
-      groupBody.append(row);
+      header.append(citation, actions);
+      row.append(header, mainButton);
+      const chapter = ensureSearchResultChapter(groupBody, result, searchInstance, sourceKey);
+      chapter.querySelector(".search-chapter-body").append(row);
     });
     const count = group.querySelector(".search-result-group-count");
     if (count) {
@@ -22872,7 +22948,9 @@ function appendSearchGroupLoadMore(results, page, options) {
       if (hadFocus) {
         const firstNew = matches.length && [...body.querySelectorAll(".result-row-main")]
           .find(item => item.dataset.searchResultKey === searchResultPositionKey(matches[0]));
-        (firstNew || body.querySelector(".search-load-more-button") || group.querySelector(".search-result-group-toggle"))
+        const chapter = firstNew?.closest(".search-chapter-group");
+        const target = chapter && !chapter.open ? chapter.querySelector(".search-chapter-summary") : firstNew;
+        (target || body.querySelector(".search-load-more-button") || group.querySelector(".search-result-group-toggle"))
           ?.focus({ preventScroll: true });
       }
       return true;
@@ -27740,6 +27818,44 @@ const researchOperations = createResearchOperationGate();
 const researchOperationScope = (identity = captureAccountRequest(), workspaceID = activeWorkspaceID) =>
   JSON.stringify([identity.userID,identity.generation,workspaceID]);
 
+function setAssistantHistoryRail(panel, expanded, {initial = false} = {}) {
+  // The 35px collapsed control stays in the base pane. Opening the 300px
+  // list adds its remaining width to the workspace, never to the chat budget.
+  const width = expanded ? 265 : 0;
+  const previous = Number(panel.dataset.assistantHistoryWidth) || 0;
+  if (previous === width && panel.dataset.assistantHistoryWidth !== undefined) return;
+  if (!initial && previous !== width && window.innerWidth > 680) capturePaneResizeWidths();
+  panel.dataset.assistantHistoryWidth = String(width);
+  panel.classList.toggle('has-history-rail', expanded);
+  if (panel.isConnected) syncResearchColumnLayout();
+  if (!initial) saveWorkspaceState();
+}
+
+function setAssistantSourcesRail(panel, expanded, rail, {reveal = true} = {}) {
+  const previous = Number(panel.dataset.assistantSourcesWidth) || 0;
+  const width = expanded ? 300 : 0;
+  if (previous !== width) {
+    // Reserve new workspace space rather than taking it from the conversation
+    // or its neighbors. Saved pane weights continue to describe the base panes.
+    if (expanded && window.innerWidth > 680) capturePaneResizeWidths();
+    panel.dataset.assistantSourcesWidth = String(width);
+    panel.classList.toggle('has-sources-rail', expanded);
+    syncResearchColumnLayout();
+    saveWorkspaceState();
+  }
+  if (expanded && reveal) requestAnimationFrame(() => {
+    const revealRail = () => {
+      if (!panel.isConnected || panel.dataset.assistantSourcesWidth !== '300' || !rail.isConnected) return;
+      rail.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});
+    };
+    const animations = rail.getAnimations?.() || [];
+    // Reveal the finished rail, rather than scrolling to its narrow first frame.
+    // A reversed/cancelled transition must not pull the workspace back afterward.
+    if (animations.length) void Promise.all(animations.map(animation => animation.finished)).then(revealRail, () => {});
+    else revealRail();
+  });
+}
+
 async function renderResearchV2Pane(paneID, configuration = null, retained = {}) {
   const panel = retained.panel || renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel", "research-v2-panel");
@@ -27837,6 +27953,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
     let historyCursor = listed.nextCursor;
     const railWidthKey = `permitext:research-question-width:${activeAccount()?.userID || "public"}:${workspaceID}:${paneID}`;
     const historyManagement = assistantHistoryManagement(panel,accountIdentity,ownsPanel,{
+      listOptions:false,
       project:() => researchWorkspaceProjectID() ? {id:researchWorkspaceProjectID(),name:researchProjectName(researchWorkspaceProjectID())} : null,
       includeHidden:Boolean(retained.includeHidden),
       onIncludeHidden:async includeHidden => {
@@ -27852,6 +27969,9 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       railCollapsedStore:{read:()=>localStorage.getItem(`${railWidthKey}:collapsed`)==='true',
         write:collapsed=>{if(ownsPanel())localStorage.setItem(`${railWidthKey}:collapsed`,String(collapsed));}},
       renderHistoryToggle:(button,collapsed)=>prependWorkspaceButtonIcon(button,collapsed?'panel-left-open':'panel-left-close'),
+      renderSourcesToggle:(button,collapsed)=>prependWorkspaceButtonIcon(button,collapsed?'panel-left-open':'panel-left-close'),
+      onHistoryRailChange:(expanded,settings)=>{if(ownsPanel() || settings?.initial && current())setAssistantHistoryRail(panel,expanded,settings);},
+      onSourcesRailChange:(expanded,rail,settings)=>{if(ownsPanel())setAssistantSourcesRail(panel,expanded,rail,settings);},
       history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
       hasMore:listed.hasMore,
@@ -27982,11 +28102,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
         researchNewChatDrafts.delete(draftKey); if (currentInstance()) currentInstance().draft = ""; sessionStorage.removeItem(recoveryKey);
         await publish(result, {revealAnswer:true});
       },
-      onSnapshot:snapshot,
-      onCitation:async (message,id) => {
-        const saved = await snapshot(message), source = saved.sources[Number(id.slice(1))-1];
-        if (current() && source) await openSourceInReader(source,paneID);
-      }
+      onSnapshot:snapshot
     });
     if (!current()) { view.dispose(); return panel; }
     const previousRail = content.querySelector(".rv2-rail");
@@ -45562,8 +45678,8 @@ function singleExpandedDividerEdge(previousPaneID, nextPaneID, divider = null) {
   // The pinned boundary belongs only to the fixed column, not the scrolling
   // neighbor that happens to follow it in the mounted sequence.
   if (previousOpen && previousPaneID === activePinnedPaneID()) return { paneID: previousPaneID, side: "right" };
-  if (previousOpen && !nextOpen) return { paneID: previousPaneID, side: "right" };
-  if (nextOpen && !previousOpen) return { paneID: nextPaneID, side: "left" };
+  if (previousOpen && (currentColumnWorkflowView() === 'research' || !nextOpen)) return { paneID: previousPaneID, side: "right" };
+  if (nextOpen && !previousOpen && (currentColumnWorkflowView() !== 'research' || !previousPaneID)) return { paneID: nextPaneID, side: "left" };
   return null;
 }
 
@@ -45588,7 +45704,7 @@ function capturePaneResizeWidths() {
     track.dataset.researchColumnSizing = "manual";
   }
   if (currentColumnWorkflowView() === "research") state.researchColumnWidthsManual = true;
-  // Freeze the currently shared space before changing a pair. Otherwise spare
+  // Freeze the currently shared space before changing one column. Otherwise spare
   // flex space is redistributed into unrelated columns during the drag.
   panes.forEach(({ id, pane, startWidth }) => {
     if (paneIsCollapsed(id)) return;
@@ -45624,6 +45740,10 @@ function notebookReferenceResize(panes, previousPaneID, nextPaneID, delta) {
 }
 
 function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
+  if (currentColumnWorkflowView() === 'research') {
+    resizePaneEdgeBy(previousPaneID, delta, divider);
+    return;
+  }
   if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID) || assistantHistoryOnlyPane(previousPaneID) || assistantHistoryOnlyPane(nextPaneID)) return;
   const previousPane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(previousPaneID)}"]`);
   const nextPane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(nextPaneID)}"]`);
@@ -45641,7 +45761,7 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
   ] : adjacentColumnWidths(previousWidth, nextWidth, delta,
     minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
     maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID),
-    { expandLeft: previousPaneID.startsWith("reader:"), expandRight: nextPaneID.startsWith("reader:") });
+    { expandLeft: /^(?:reader:|utility:search(?::|$))/.test(previousPaneID), expandRight: /^(?:reader:|utility:search(?::|$))/.test(nextPaneID) });
   if (notebookResize) notebookResize.indices.forEach(index => {
     state.paneWeights[paneData[index].id] = notebookResize.widths[index];
     applyPaneWeight(paneData[index].pane, paneData[index].id);
@@ -45720,7 +45840,7 @@ function createDivider(previousPaneID, nextPaneID) {
       ? "Resize left edge of first column"
       : isRightEdge
         ? "Resize right edge of last column"
-        : "Resize adjacent columns"
+        : currentColumnWorkflowView() === "research" ? "Resize column" : "Resize adjacent columns"
   );
   if (isLeftEdge || isRightEdge) {
     divider.setAttribute("aria-valuemin", String(Math.round(minimumPaneWidthForID(edgePaneID))));
@@ -45750,7 +45870,7 @@ function createDivider(previousPaneID, nextPaneID) {
     const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID, divider);
     if (edge) resetDividerPanes(edge.paneID, null);
     else if (isLeftEdge || isRightEdge) resetDividerPanes(edgePaneID, null);
-    else resetDividerPanes(previousPaneID, nextPaneID);
+    else resetDividerPanes(previousPaneID, currentColumnWorkflowView() === "research" ? null : nextPaneID);
   });
   return divider;
 }
@@ -46132,6 +46252,10 @@ function bindPaneDragging(panes) {
 }
 
 function startPaneResize(event, previousPaneID, nextPaneID) {
+  if (currentColumnWorkflowView() === 'research') {
+    startPaneEdgeResize(event, previousPaneID, 'right');
+    return;
+  }
   if (event.button > 0) return;
   if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID) || assistantHistoryOnlyPane(previousPaneID) || assistantHistoryOnlyPane(nextPaneID)) return;
   const panes = Array.from(track.querySelectorAll(".workspace-panel"));
@@ -46155,8 +46279,8 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   let previousFrameTime = null;
   let resizeFrame = null;
   let isDragging = true;
-  const expandLeft = previousPaneID.startsWith("reader:");
-  const expandRight = nextPaneID.startsWith("reader:");
+  const expandLeft = /^(?:reader:|utility:search(?::|$))/.test(previousPaneID);
+  const expandRight = /^(?:reader:|utility:search(?::|$))/.test(nextPaneID);
 
   const applyResizeAt = (clientX) => {
     const delta = clientX - startX;
@@ -46261,8 +46385,8 @@ function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
   if (paneIsCollapsed(paneID) || assistantHistoryOnlyPane(paneID)) return;
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
-  const currentWidth = pane.getBoundingClientRect().width;
   const paneData = capturePaneResizeWidths();
+  const currentWidth = pane.getBoundingClientRect().width;
   const notebookResize = notebookReferenceResize(paneData, paneID, '', delta);
   const nextWidth = notebookResize ? notebookResize.widths[notebookResize.targetIndex] : constrainPaneWidth(paneID, currentWidth + delta);
   if (notebookResize) notebookResize.indices.forEach(index => {
@@ -46275,6 +46399,7 @@ function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
   }
   resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
   resizeHandle?.setAttribute("aria-valuetext", `Column width ${Math.round(nextWidth)} pixels`);
+  scheduleVisibleReaderScrollIndicatorUpdates();
   notifyWorkspaceLayoutChange();
   saveWorkspaceState();
 }
@@ -46291,7 +46416,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   const startX = event.clientX;
   const startBounds = pane.getBoundingClientRect();
   const startWidth = startBounds.width;
-  // The outside grip is sticky, so its rectangle never moves offscreen.
+  // Track added width without taking any space from neighboring columns.
   // Follow the column's added width while preserving any existing overflow.
   const initialRightOverflow = edgeSide === "right"
     ? Math.max(0, startBounds.right - Math.min(track.getBoundingClientRect().right, window.innerWidth)) : 0;

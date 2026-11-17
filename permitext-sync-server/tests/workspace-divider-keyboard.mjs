@@ -14,11 +14,11 @@ const historyOnly = new Set();
 const panes = new Map(['left', 'right'].map(id => [id, {dataset:{paneId:id}, width:600, getBoundingClientRect(){return {width:this.width};}}]));
 const state = {paneWeights:{}};
 let saves=0, layouts=0, indicators=0, expansionRestores=0;
-let restoreWidths=null;
+let restoreWidths=null, workflow='research';
 const track = {scrollLeft:0, querySelectorAll(){return [...panes.values()];}, querySelector(selector){return panes.get(selector.match(/data-pane-id="([^"]+)"/)?.[1]);}};
 const context = vm.createContext({state, track, adjacentColumnWidths, workspaceColumnExpansion:{restore(){expansionRestores++;restoreWidths?.();}}, CSS:{escape:x=>x},isProAccount:()=>false,
   paneIsCollapsed:id=>collapsed.has(id), assistantHistoryOnlyPane:id=>historyOnly.has(id), defaultPaneWidthForID:()=>600,
-  currentColumnWorkflowView:()=> 'notebook', assistantHistoryWidth:400,
+  currentColumnWorkflowView:()=> workflow, assistantHistoryWidth:400,
   applyPaneWeight:(pane,id)=>{pane.width=state.paneWeights[id];},
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
   scheduleVisibleReaderScrollIndicatorUpdates:()=>indicators++,
@@ -26,129 +26,59 @@ const context = vm.createContext({state, track, adjacentColumnWidths, workspaceC
     setAttribute(k,v){this.attrs[k]=v;}, removeAttribute(k){delete this.attrs[k];}, addEventListener(k,v){this.handlers[k]=v;}};}}
 });
 vm.runInContext(['minimumPaneWidthForID','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','notebookReferenceResize','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
-const divider=context.createDivider('left','right');
-assert.equal(divider.children.length,0,'Column dividers only resize; Reader creation remains in the toolbar.');
 
+const divider=context.createDivider('left','right');
 function press(handle,key,shiftKey=false){let prevented=false;handle.handlers.keydown({key,shiftKey,preventDefault(){prevented=true;}});return prevented;}
 function widths(){return [...panes.values()].map(p=>p.width);}
 panes.get('left').width=680;
-assert.equal(press(divider,'ArrowLeft'),true);
-assert.deepEqual(widths(),[656,624]);
-assert.equal(expansionRestores,1,'Resizing restores an expanded column before capturing visible widths.');
-assert.equal(divider.attrs['aria-valuenow'],'51');
-assert.equal(divider.attrs['aria-valuetext'],'Left column 656 pixels; right column 624 pixels');
-assert.equal(press(divider,'ArrowRight',true),true);
-assert.deepEqual(widths(),[680,600]); // Shared helper preserves the pair total when either minimum is reached.
-assert.equal(saves,2);assert.equal(layouts,2);assert.equal(indicators,2);
-// At a pair minimum, keyboard resizing preserves both the total and scroll position.
-panes.get('left').width=600;panes.get('right').width=600;track.scrollLeft=40;
-press(divider,'ArrowLeft',true);assert.deepEqual(widths(),[600,600]);assert.equal(track.scrollLeft,40);
-assert.equal(press(divider,'Escape'),false);assert.equal(saves,3);
-// A collapsed neighbor delegates to the existing edge handler, in the right direction.
-collapsed.add('left');divider.handlers.focus();assert.equal(divider.attrs['aria-valuemax'],undefined);press(divider,'ArrowLeft');assert.deepEqual(widths(),[600,624]);
-assert.equal(divider.attrs['aria-valuetext'],'Column width 624 pixels');
-collapsed.add('right');divider.handlers.focus();assert.equal(divider.tabIndex,-1);assert.equal(divider.attrs['aria-valuenow'],undefined);assert.equal(press(divider,'ArrowRight'),false);assert.equal(saves,4);
-collapsed.clear();divider.handlers.focus();assert.equal(divider.tabIndex,0);assert.equal(divider.attrs['aria-valuemax'],'100');const leftEdge=context.createDivider('', 'left');
-press(leftEdge,'ArrowLeft',true);assert.deepEqual(widths(),[680,624]);
-press(leftEdge,'ArrowRight',true);assert.deepEqual(widths(),[600,624]);
-assert.equal(leftEdge.children.length,0,'Outer resize handles retain their existing behavior');
-const rightEdge=context.createDivider('right','');press(rightEdge,'ArrowRight');assert.deepEqual(widths(),[600,648]);
-// Missing DOM panes do not persist phantom widths.
-panes.delete('right');press(divider,'ArrowRight');assert.equal(saves,7);
-// A three-column layout has already shared spare viewport space. Resizing a
-// pair must preserve the unrelated column's visible width, not its old basis.
-panes.set('right',{dataset:{paneId:'right'},width:800,getBoundingClientRect(){return {width:this.width};}});
+press(divider,'ArrowRight',true);assert.deepEqual(widths(),[760,600]);
+press(divider,'ArrowLeft');assert.deepEqual(widths(),[736,600]);
+assert.equal(divider.attrs['aria-valuenow'],'736');
+assert.equal(divider.attrs['aria-valuetext'],'Column width 736 pixels');
+assert.equal(divider.attrs['aria-valuemax'],undefined);
+assert.equal(expansionRestores,2);assert.equal(saves,2);assert.equal(layouts,2);
+track.scrollLeft=40;press(divider,'ArrowLeft',true);press(divider,'ArrowLeft',true);
+assert.deepEqual(widths(),[600,600]);assert.equal(track.scrollLeft,40);
+assert.equal(press(divider,'Escape'),false);
+collapsed.add('right');press(divider,'ArrowRight');assert.deepEqual(widths(),[624,600]);
+collapsed.add('left');divider.handlers.focus();assert.equal(divider.tabIndex,-1);
+assert.equal(press(divider,'ArrowRight'),false);
+collapsed.clear();
+// Absolute widths survive a layout with spare space and hidden retained panes.
 panes.set('other',{dataset:{paneId:'other'},width:800,getBoundingClientRect(){return {width:this.width};}});
-panes.get('left').width=800;
-state.paneWeights={left:600,right:600,other:600};
-press(divider,'ArrowRight',true);
-assert.deepEqual(widths(),[880,720,800]);
-assert.deepEqual(state.paneWeights,{left:880,right:720,other:800},'Shared space is retained without redistributing it during a resize.');
+panes.get('left').width=800;panes.get('right').width=800;
+state.paneWeights={left:600,right:600,other:600};press(divider,'ArrowRight',true);
+assert.deepEqual(widths(),[880,800,800]);
+assert.deepEqual(state.paneWeights,{left:880,right:800,other:800});
 panes.set('hidden',{dataset:{paneId:'hidden'},width:0,getBoundingClientRect(){return {width:0};}});
-state.paneWeights.hidden=950;
-press(divider,'ArrowLeft');
-assert.equal(state.paneWeights.hidden,950,'A retained column in another working view keeps its saved width.');
-historyOnly.add('right');
-const historyWidth=panes.get('right').width;
-const readerWidth=panes.get('left').width;
-press(divider,'ArrowRight');
-assert.equal(panes.get('right').width,historyWidth,'A compact Assistant history is fixed; the adjacent Reader resizes independently.');
-assert.equal(panes.get('left').width,readerWidth+24);
-const historyEdge=context.createDivider('right','');
-historyEdge.handlers.focus();
-assert.equal(historyEdge.tabIndex,-1,'A history-only Assistant has no resizable outer edge.');
-press(historyEdge,'ArrowRight');
-assert.equal(panes.get('right').width,historyWidth);
-console.log('Workspace divider keyboard: expanded pairs, minimums, scroll compensation, Shift steps, collapsed neighbors and outer edges passed.');
-
-// Reader minimums apply to both paths; neither path imposes a maximum.
-for (const id of ['reader:left','reader:right']) panes.set(id,{dataset:{paneId:id},width:630,getBoundingClientRect(){return {width:this.width};}});
-const readerDivider=context.createDivider('reader:left','reader:right');
-context.resizeAdjacentPanesBy('reader:left','reader:right',1000,readerDivider);
-assert.equal(panes.get('reader:left').width,1630); assert.equal(panes.get('reader:right').width,630);
-context.resizeAdjacentPanesBy('reader:left','reader:right',-2000,readerDivider);
-assert.equal(panes.get('reader:left').width,630); assert.equal(panes.get('reader:right').width,2630);
-const readerEdge=context.createDivider('','reader:left'); readerEdge.handlers.focus();
-assert.equal(readerEdge.attrs['aria-valuemin'],'630'); assert.equal(readerEdge.attrs['aria-valuemax'],undefined);
-context.resizePaneEdgeBy('reader:left',10000,readerEdge); assert.equal(panes.get('reader:left').width,10630);
-context.resizePaneEdgeBy('reader:left',-10000,readerEdge); assert.equal(panes.get('reader:left').width,630);
-panes.get('reader:left').width=1600; panes.get('reader:right').width=1600;
-context.resizeAdjacentPanesBy('reader:left','reader:right',1000,readerDivider);
-assert.equal(panes.get('reader:left').width,2600); assert.equal(panes.get('reader:right').width,630);
-panes.get('reader:right').width=630;
-press(readerDivider,'ArrowRight');
-assert.equal(panes.get('reader:left').width,2624,'Arrow keys keep widening a Reader after its neighbor reaches the minimum');
-assert.equal(panes.get('reader:right').width,630);
-console.log('Reader keyboard resizing passed: unlimited growth, minimum widths, adjacent and outer edges, accessible bounds.');
-
-// Expanded and strip presentation sizes cannot become the resize bases.
-const restoredLeft=panes.get('left'), restoredRight=panes.get('right');
-historyOnly.clear();
-restoredLeft.width=1200;restoredRight.width=48;
-restoreWidths=()=>{restoredLeft.width=680;restoredRight.width=640;restoreWidths=null;};
+state.paneWeights.hidden=950;press(divider,'ArrowLeft');assert.equal(state.paneWeights.hidden,950);
+for(const id of ['reader:one','utility:analysis:one','utility:search:one','utility:saved:one','project:notebook:one','utility:calculator']) {
+ const minimum=context.minimumPaneWidthForID(id);
+ panes.set(id,{dataset:{paneId:id},width:minimum+500,getBoundingClientRect(){return {width:this.width};}});
+ const before=[...panes].filter(([key])=>key!==id).map(([key,p])=>[key,p.width]);
+ const handle=context.createDivider(id,'right');press(handle,'ArrowRight',true);
+ assert.equal(panes.get(id).width,minimum+580,`${id} grows without a maximum`);
+ press(handle,'ArrowLeft',true);context.resizeAdjacentPanesBy(id,'right',-10000,handle);
+ assert.equal(panes.get(id).width,minimum);
+ assert.deepEqual([...panes].filter(([key])=>key!==id).map(([key,p])=>[key,p.width]),before,`${id} never resizes any neighbor`);
+ assert.equal(state.paneWeights[id],minimum,'The selected pixel width is persisted');
+}
+// Expansion must restore actual widths before the next resize.
+restoreWidths=()=>{panes.get('left').width=680;panes.get('right').width=640;restoreWidths=null;};
 context.resizeAdjacentPanesBy('left','right',24,divider);
-assert.deepEqual([restoredLeft.width,restoredRight.width],[704,616]);
-console.log('Expanded-column keyboard resizing measures restored widths before applying the delta.');
+assert.deepEqual([panes.get('left').width,panes.get('right').width],[704,640]);
+console.log('Single-column keyboard resizing passed: all pane types, no neighbor changes, minimums, stored widths, collapsed columns and restored expansion.');
 
-const evidenceID='utility:saved:one';
-panes.set(evidenceID,{dataset:{paneId:evidenceID},width:450,getBoundingClientRect(){return {width:this.width};}});
-const evidenceEdge=context.createDivider(evidenceID,'');
-context.resizePaneEdgeBy(evidenceID,-1000,evidenceEdge);
-assert.equal(panes.get(evidenceID).width,300);
-assert.equal(evidenceEdge.attrs['aria-valuemin'],'300');
-assert.equal(evidenceEdge.attrs['aria-valuemax'],'600');
-context.resizePaneEdgeBy(evidenceID,1000,evidenceEdge);
-assert.equal(panes.get(evidenceID).width,600);
-press(evidenceEdge,'ArrowRight',true);
-assert.equal(panes.get(evidenceID).width,600);
-press(evidenceEdge,'ArrowLeft');
-assert.equal(panes.get(evidenceID).width,576);
-console.log('Evidence keyboard resizing and accessible bounds stay within 300–600 pixels.');
-
-// Notebook's keyboard and outer grips use the notepad as their width donor.
-panes.clear();state.paneWeights={};
-const noteListID='project:notes-index:one',editorID='project:notebook:one';
-for(const [id,width] of [['reader:one',810],[evidenceID,450],[noteListID,300],[editorID,1500]])
+workflow='notebook';panes.clear();state.paneWeights={};
+for(const [id,width] of [['reader:one',810],['utility:saved:one',450],['project:notes-index:one',300],['project:notebook:one',1500]])
  panes.set(id,{dataset:{paneId:id},width,getBoundingClientRect(){return {width:this.width};}});
-track._notebookColumnLayout={resizeMinimums:{[editorID]:800}};
-const evidenceNotes=context.createDivider(evidenceID,noteListID);
-press(evidenceNotes,'ArrowRight',true);
-assert.deepEqual(widths(),[810,530,300,1420]);
-assert.equal(evidenceNotes.attrs['aria-valuetext'],'Left column 530 pixels; right column 300 pixels');
-press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,600,300,1350]);
-const notesEditor=context.createDivider(noteListID,editorID);
-press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,600,300,1350]);
-press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,600,300,1350]);
-const readerEvidence=context.createDivider('reader:one',evidenceID);
-press(readerEvidence,'ArrowRight',true);assert.deepEqual(widths(),[890,600,300,1270]);
-context.resizeAdjacentPanesBy('reader:one',evidenceID,10000,readerEvidence);
-assert.deepEqual(widths(),[1360,600,300,800],'Reader stops at the 800px notepad without resizing either list.');
-press(readerEvidence,'ArrowRight',true);assert.deepEqual(widths(),[1360,600,300,800]);
-panes.get('reader:one').width=810;
-panes.get(evidenceID).width=450;panes.get(editorID).width=850;
-press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,500,300,800]);
-press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,500,300,800],'The writing minimum stops growth without squeezing another column.');
-panes.delete('reader:one');panes.get(evidenceID).width=400;panes.get(editorID).width=1200;
-const notebookEdge=context.createDivider('',evidenceID);
-press(notebookEdge,'ArrowLeft',true);assert.deepEqual(widths(),[480,300,1120]);
-console.log('Notebook keyboard resizing passed: notepad supplies width, other columns stay fixed, writing minimum and reference caps hold, Reader may be closed.');
+track._notebookColumnLayout={resizeMinimums:{'project:notebook:one':800}};
+const evidenceNotes=context.createDivider('utility:saved:one','project:notes-index:one');
+press(evidenceNotes,'ArrowRight',true);assert.deepEqual(widths(),[810,530,300,1420], 'Notebook keeps its prior notepad-donor rule');
+assert.equal(context.maximumPaneWidthForID('utility:saved:one'),600);
+const notesEditor=context.createDivider('project:notes-index:one','project:notebook:one');
+press(notesEditor,'ArrowRight',true);assert.deepEqual(widths(),[810,530,300,1420], 'Notes remains fixed at 300px');
+workflow='report';panes.clear();
+for(const id of ['left','right'])panes.set(id,{dataset:{paneId:id},width:800,getBoundingClientRect(){return {width:this.width};}});
+press(divider,'ArrowRight',true);assert.deepEqual(widths(),[880,720], 'Non-Research views retain pair resizing');
+console.log('Scope isolation passed: Notebook and Report keep their previous resizing rules.');

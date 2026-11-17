@@ -25,7 +25,7 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v2498";
+const shellCacheName = "permitext-pro-shell-v2518";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
@@ -42,7 +42,7 @@ const shellURLs = [
   "/web/notebook-content.js?v=8",
   "/web/notebook-titles.js?v=1",
   "/web/project-details-columns.js?v=20261019-project-workflow-v2",
-  "/web/workflow-views.js?v=25",
+  "/web/workflow-views.js?v=26",
   "/web/notebook-reference-transition.js?v=2",
   "/web/workflow-views.js?v=16",
   "/web/active-code-sources.js",
@@ -80,7 +80,7 @@ const shellURLs = [
   "/web/report-presentation.js?v=1",
   "/web/workspace-view-presentation.js?v=5",
   "/web/report-undo.js?v=6",
-  "/web/scroll-edge-fades.js?v=20261115-reports-rail-v11",
+  "/web/scroll-edge-fades.js?v=20261116-assistant-fade-v12",
   "/web/report-outline.js?v=20261115-outline-insert-v14",
   "/web/report-export-review.js?v=20261109-report-export-v14",
   "/web/report-note-review.js?v=3",
@@ -106,12 +106,12 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261116-single-assistant-v1926",
+  "/web/web-client-version.js?v=20261116-sources-hover-v2447",
   "/web/web-app-update.js?v=20261110-per-codes-v3",
-  "/web/research-delete-controls.js?v=12",
+  "/web/research-delete-controls.js?v=13",
   "/web/assistant-composer-hint.js?v=1",
   "/web/research-related-provisions.js?v=3",
-  "/web/research-v2.js?v=52",
+  "/web/research-v2.js?v=57",
   "/web/research-inline-format.js?v=1",
   "/web/research-answer-blocks.js?v=1",
   "/web/research-operation-gate.js?v=2",
@@ -122,7 +122,7 @@ const shellURLs = [
   "/web/research-reader-target.js?v=3",
   "/web/research-discovery-query.js?v=3",
   "/web/research-v2-rollout.js?v=2",
-  "/web/research-v2.css?v=52",
+  "/web/research-v2.css?v=61",
   "/web/reader-shortcuts.js?v=8",
   "/web/reader-shortcuts.css?v=18",
   "/web/reader-tabs.js?v=4",
@@ -133,18 +133,18 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261116-single-assistant-v1926",
+  "/web/styles.css?v=20261116-sources-hover-v2447",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261116-single-assistant-v1926",
+  "/web/app.js?v=20261116-sources-hover-v2447",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261116-single-assistant-v1926",
+  "/web/offline-storage.js?v=20261116-sources-hover-v2447",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261111-selective-menus-v3",
@@ -1538,7 +1538,9 @@ async function offlineSectionWithEdition(record, metadata, chapters = new Map())
           chapter: {
             id: stored.chapter.id,
             codePrefix: stored.chapter.codePrefix,
-            codeVersion: stored.chapter.codeVersion
+            codeVersion: stored.chapter.codeVersion,
+            chapterNumber: stored.chapter.chapterNumber,
+            chapterTitle: stored.chapter.fullTitle || stored.chapter.displayTitle || stored.chapter.title || ""
           }
         } : null;
       } finally {
@@ -1550,7 +1552,9 @@ async function offlineSectionWithEdition(record, metadata, chapters = new Map())
   if (chapterRecord?.installID !== metadata.installID ||
       String(chapterRecord.chapter?.id || "") !== String(record.chapterID)) return null;
   const codeVersion = offlineSectionCodeVersion(record, chapterRecord.chapter, metadata);
-  return codeVersion ? { ...record, codeVersion } : null;
+  return codeVersion ? { ...record, codeVersion,
+    chapterTitle: chapterRecord.chapter.chapterTitle,
+    navigationChapterNumber: chapterRecord.chapter.chapterNumber } : null;
 }
 
 function tokenizeSearchText(text) {
@@ -1649,7 +1653,8 @@ async function offlineSearch(metadata, url) {
     const record = await offlineSectionWithEdition(match.record, metadata, chapters);
     if (!record || (requestedVersion && requestedVersion !== "all" && record.codeVersion !== syncCodeVersion(requestedVersion))) return null;
     if (resultSource && (record.codePrefix !== resultSource.codePrefix || record.codeVersion !== resultSource.codeVersion)) return null;
-    return { rank: match.rank, result: { ...match.result, codeVersion: record.codeVersion } };
+    return { rank: match.rank, result: { ...match.result, codeVersion: record.codeVersion,
+      chapterTitle: record.chapterTitle, navigationChapterNumber: record.navigationChapterNumber } };
   }))).filter(Boolean)
     .sort((left, right) =>
       left.rank - right.rank ||

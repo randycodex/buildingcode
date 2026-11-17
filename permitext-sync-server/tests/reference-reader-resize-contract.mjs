@@ -125,9 +125,9 @@ const shared = fixture('research', [800, 800, 800]);
 shared.state.paneWeights = {'reader:0':600,'reader:1':600,'reader:2':600};
 shared.context.startPaneResize(shared.event(800), 'reader:0', 'reader:1');
 shared.move(900); shared.frame();
-assert.deepEqual(shared.panes.map(pane => pane.width), [900,700,800], 'Pointer resizing changes only the selected pair, preserving previously shared space.');
+assert.deepEqual(shared.panes.map(pane => pane.width), [900,800,800], 'Pointer resizing changes only the selected pair, preserving previously shared space.');
 shared.move(1200); shared.frame();
-assert.deepEqual(shared.panes.map(pane => pane.width), [1200,630,800], 'A Reader can grow beyond 900px while preserving its neighbor and the untouched column.');
+assert.deepEqual(shared.panes.map(pane => pane.width), [1200,800,800], 'A Reader can grow beyond 900px while preserving its neighbor and the untouched column.');
 shared.finish('pointerup',1200);
 assert.equal(shared.state.paneWeights['reader:2'],800,'The untouched rendered width also survives saving.');
 

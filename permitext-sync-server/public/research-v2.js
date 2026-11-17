@@ -12,6 +12,22 @@ const action = (label, callback, className = '') => {
 };
 export const passageChipLabel = source => `${source.codePrefix || source.codeBook || 'Code'} § ${source.sectionNumber || source.sectionID} · ${String(source.codeEdition || source.edition || source.codeSource?.editionLabel || source.codeVersion || '').match(/(?:19|20)\d{2}/)?.[0] || 'Edition unavailable'}`;
 
+export function researchSourceHeading(source){
+  const clean=value=>String(value||'').replace(/\s+/g,' ').trim();
+  const number=clean(source.sectionNumber);
+  const escaped=number.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const prefix=number?new RegExp(`^${escaped}(?=\\s|[A-Za-z]|[.:](?:\\s|$))\\.?\\s*`):null;
+  const strip=value=>{let text=clean(value);for(let i=0;prefix&&i<2&&prefix.test(text);i++)text=text.replace(prefix,'');return text;};
+  const explicit=source.sectionTitle||source.title;
+  if(explicit)return strip(explicit);
+  const original=clean(source.passageText||source.selectedText||source.text);
+  if(!prefix?.test(original))return '';
+  const text=strip(original),match=/^([^.!?]{3,140}[.!?])(?=\s|[A-Z]|$)/.exec(text);
+  // Old immutable snapshots have no title field. Only recognize a short
+  // numbered heading already present in the quote, never label a rule as one.
+  return match&&!/\b(?:shall|must|may|means|is|are)\b/i.test(match[1])?match[1].trim():'';
+}
+
 export {researchDiscoveryQuery} from './research-discovery-query.js?v=3';
 
 export const researchAnswerText = message => message.answer?.answerText || [message.answer?.conclusion, message.answer?.explanation].filter(Boolean).join('\n\n') || message.failure?.message || 'This answer did not complete.';
@@ -45,7 +61,7 @@ export function researchV2RetryContext(previous,next,requestID){
 export function createResearchV2View(options) {
   let disposed=false;
   const { conversation, history = [], initialDraft = '', onDraft, onOpen, onSend,
-    onFind, onReview, onInclude, onRemove, onCitation, onSnapshot,
+    onFind, onReview, onInclude, onRemove, onSnapshot,
     isCurrent: contextIsCurrent = () => true, onStatus } = options;
   const isCurrent=()=>!disposed&&contextIsCurrent();
   const presentation=options.presentation;
@@ -130,8 +146,15 @@ export function createResearchV2View(options) {
   rail.append(list);
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
   const divider=node('div','rv2-rail-divider');
+  let historyCollapsed;
   const questionRail=attachResearchQuestionRail({root,divider,toggle:historyToggle,widthStore:options.railWidthStore,
-    collapsedStore:options.railCollapsedStore,onCollapse:collapsed=>options.renderHistoryToggle?.(historyToggle,collapsed)});
+    collapsedStore:options.railCollapsedStore,onCollapse:collapsed=>{
+      if(historyCollapsed===collapsed)return;
+      const initial=historyCollapsed===undefined;
+      historyCollapsed=collapsed;
+      options.renderHistoryToggle?.(historyToggle,collapsed);
+      options.onHistoryRailChange?.(!collapsed,{initial});
+    }});
   const chat=presentation?.chat || node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');
   const mobileHistory=action('Questions',()=>{const expanded=root.classList.toggle('rv2-show-history');mobileHistory.setAttribute('aria-expanded',String(expanded));},'rv2-mobile-history');
   mobileHistory.setAttribute('aria-expanded','false');
@@ -158,7 +181,7 @@ export function createResearchV2View(options) {
       const expression=/\[(S[1-9]\d*)\]/g;let offset=0;
       for(const match of run.text.matchAll(expression)){
         appendText(target,run.text.slice(offset,match.index));
-        const cite=action(match[0],()=>void onCitation(message,match[1]),'rv2-citation');cite.setAttribute('aria-label',`Open citation ${match[1]}`);if(reveal){cite.classList.add('rv2-reveal-token');revealTokens.push(cite);}target.append(cite);offset=match.index+match[0].length;
+        const cite=action(match[0],()=>void showCitation(message,match[1]),'rv2-citation');cite.setAttribute('aria-label',`Open citation ${match[1]}`);if(reveal){cite.classList.add('rv2-reveal-token');revealTokens.push(cite);}target.append(cite);offset=match.index+match[0].length;
       }
       appendText(target,run.text.slice(offset));
     }
@@ -218,7 +241,7 @@ export function createResearchV2View(options) {
         added.append(node('p','rv2-detail-caption','References added from the same codebook and edition'));
         for(const reference of references){
           const label=`${reference.label} · ${String(reference.codeEdition || '').match(/(?:19|20)\d{2}/)?.[0] || reference.codeEdition}`;
-          added.append(action(label,()=>void onCitation(message,reference.citationID),'rv2-text-action'));
+          added.append(action(label,()=>void showCitation(message,reference.citationID),'rv2-text-action'));
         }
         bubble.append(added);
       }
@@ -278,6 +301,39 @@ export function createResearchV2View(options) {
   const detail=node('section','rv2-detail');detail.hidden=true;detail.setAttribute('aria-label','Passage details');
   const detailBody=node('div','rv2-detail-body');
   const closeDetail=action('Close',()=>{detail.hidden=true;thread.hidden=false;},'rv2-text-action');detail.append(closeDetail,detailBody);
+  const retainedSources=conversation?.id&&presentation?.sources?.conversationID===conversation.id?presentation.sources:null;
+  let sourcesMessage=messages.find(message=>message.id&&message.id===retainedSources?.messageID)||null;
+  let sourcesSnapshot=sourcesMessage?retainedSources?.snapshot:null;
+  let sourcesExpanded=Boolean(retainedSources?.expanded),sourcesGeneration=0;
+  let selectedCitationID=retainedSources?.selectedCitationID||'',sourcesRequest=null,sourceFocusAnimation=null;
+  const sourceRows=new Map();
+  const sourcesRail=node('aside','rv2-sources-rail');sourcesRail.setAttribute('aria-label','Answer sources');
+  const sourcesTop=node('header','rv2-sources-top-row');
+  const sourcesTitle=node('h3','','Sources');
+  const sourcesBody=node('div','rv2-sources-body');
+  sourcesBody.setAttribute('aria-live','polite');
+  const sourcesToggle=action('',()=>{
+    if(sourcesExpanded){setSourcesExpanded(false);return;}
+    if(!sourcesSnapshot){const message=sourcesMessage||messages.filter(message=>message.role==='assistant'&&message.answer).at(-1);if(message&&onSnapshot){void showSnapshot(message);return;}}
+    setSourcesExpanded(true);
+  },'icon-button rv2-sources-toggle');
+  sourcesTop.append(sourcesTitle,sourcesToggle);sourcesRail.append(sourcesTop,sourcesBody);
+  function syncSourcesRail(){
+    root.classList.toggle('has-sources',sourcesExpanded);
+    sourcesRail.classList.toggle('is-collapsed',!sourcesExpanded);
+    sourcesTitle.hidden=sourcesBody.hidden=!sourcesExpanded;
+    const label=sourcesExpanded?'Hide answer sources':'Show answer sources';
+    sourcesToggle.setAttribute('aria-label',label);sourcesToggle.title=label;
+    sourcesToggle.setAttribute('aria-expanded',String(sourcesExpanded));
+    options.renderSourcesToggle?.(sourcesToggle,!sourcesExpanded);
+  }
+  function setSourcesExpanded(expanded){
+    const changed=sourcesExpanded!==expanded;
+    sourcesExpanded=expanded;
+    if(!expanded){sourcesGeneration++;sourceFocusAnimation?.cancel();}
+    syncSourcesRail();
+    if(changed)options.onSourcesRailChange?.(sourcesExpanded,sourcesRail);
+  }
   const operationPending=()=>chatTransitionPending||Boolean(options.operationGate?.status());
   function update(){if(disposed)return;resizeInput();const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||includeBusy||revealBusy||pending));
     if(newChat)newChat.disabled=busy||includeBusy||revealBusy||pending;
@@ -311,21 +367,25 @@ export function createResearchV2View(options) {
     content.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));
     content.append(action('Remove from next question',()=>void removePassage(source),'rv2-text-action'));
   }
-  function snapshotRow(label,preview,className=''){
+  function snapshotRow(label,preview,className='',sourceHeading=''){
     const row=node('details',`rv2-snapshot-row ${className}`.trim());row.open=false;
     const summary=node('summary'),heading=node('span','rv2-snapshot-label',label);
-    const text=node('span','rv2-snapshot-summary');text.append(heading);
-    if(preview)text.append(node('span','rv2-snapshot-preview',preview));
+    const text=node('span','rv2-snapshot-summary');
+    if(sourceHeading){row.classList.add?.('has-source-heading');text.append(node('span','rv2-source-heading',sourceHeading));}
+    text.append(heading);
+    if(preview&&!sourceHeading)text.append(node('span','rv2-snapshot-preview',preview));
     summary.append(text);
     const body=node('div','rv2-snapshot-body');row.append(summary,body);
-    return {row,body};
+    return {row,body,summary};
   }
   function snapshotPreview(value){
     const text=String(value || '').replace(/\s+/g,' ').trim();
     return text.length>110?`${text.slice(0,109)}…`:text;
   }
-  async function showSnapshot(message){if(busy||includeBusy)return;const attempt=++generation;notice('Loading original passages…');
-    try{const saved=await onSnapshot(message);if(!valid(attempt))return;notice('');const content=showDetail();content.append(node('h3','rv2-snapshot-title','Sources used'));
+  function renderSnapshot(saved,message){
+      const content=sourcesBody;content.replaceChildren();sourceRows.clear();
+      const index=messages.indexOf(message),question=messages.slice(0,index).reverse().find(item=>item.role==='user')?.question;
+      if(question){const caption=node('p','rv2-sources-question',question);caption.title=question;content.append(caption);}
       const sources=Array.isArray(saved)?saved:saved.sources||[];
       const snapshot=saved.projectContextSnapshot,information=snapshot?.projectInformation;
       if(information){
@@ -344,13 +404,79 @@ export function createResearchV2View(options) {
         const text=source.passageText||source.selectedText||source.text||'';
         const automatic=source.provenance?.origin==='permitext_cross_reference';
         const preview=[automatic?'Automatically retrieved':'',snapshotPreview(text)].filter(Boolean).join(' · ');
-        const {row,body}=snapshotRow(`${index+1}. ${passageChipLabel(source)}`,preview);
+        const citationID=`S${index+1}`;
+        const {row,body,summary}=snapshotRow(`${index+1}. ${passageChipLabel(source)}`,preview,'',researchSourceHeading(source));
+        row.dataset.citationId=citationID;
+        row.open=selectedCitationID===citationID;
+        if(row.open)row.setAttribute('data-citation-active','true');
+        sourceRows.set(citationID,{row,summary});
+        body.append(action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action rv2-source-open'));
         if(automatic)body.append(node('p','rv2-detail-caption',source.provenance.retrievalReason || 'Automatically retrieved explicit reference'));
-        body.append(node('p','rv2-source-text',text),action('Open in Reader',()=>void options.onOpenReader(source),'rv2-text-action'));
+        body.append(node('p','rv2-source-text',text));
         const item=node('li');item.append(row);sourceList.append(item);
       });
       if(sources.length)content.append(sourceList);
-    }catch(error){if(valid(attempt))notice(error.message,true);}}
+      if(!sources.length&&!information)content.append(node('p','rv2-detail-caption','No saved sources were recorded for this answer.'));
+  }
+  function showCitation(message,citationID){
+    if(!/^S[1-9]\d*$/.test(citationID||''))return;
+    return showSnapshot(message,{citationID});
+  }
+  function revealCitation(message,citationID,attempt){
+    const target=sourceRows.get(citationID);
+    sourcesBody.querySelector('.rv2-citation-missing')?.remove();
+    if(!target){
+      selectedCitationID='';sourceFocusAnimation?.cancel();
+      for(const {row} of sourceRows.values())row.removeAttribute('data-citation-active');
+      sourcesBody.append(node('p','rv2-status is-error rv2-citation-missing',`Source [${citationID}] is unavailable in this answer’s saved sources.`));
+      return;
+    }
+    selectedCitationID=citationID;
+    for(const {row} of sourceRows.values())row.removeAttribute('data-citation-active');
+    target.row.open=true;target.row.setAttribute('data-citation-active','true');
+    requestAnimationFrame(()=>{
+      if(attempt!==sourcesGeneration||!sourcesExpanded||!isCurrent()||!root.isConnected||sourcesMessage!==message||sourceRows.get(citationID)!==target)return;
+      target.summary.focus({preventScroll:true});
+      const reduced=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+      // Scroll this panel only. The question and draft keep their positions.
+      sourcesBody.scrollTo({top:Math.max(0,sourcesBody.scrollTop+target.row.getBoundingClientRect().top-sourcesBody.getBoundingClientRect().top-12),behavior:reduced?'auto':'smooth'});
+      sourceFocusAnimation?.cancel();
+      if(!reduced)sourceFocusAnimation=target.row.animate?.([
+        {backgroundColor:'color-mix(in srgb, var(--text-link) 18%, transparent)'},
+        {backgroundColor:'transparent'}
+      ],{duration:1800,easing:'ease-out'});
+    });
+  }
+  async function showSnapshot(message,{citationID=''}={}){
+    if(!isCurrent())return;
+    const sameMessage=sourcesMessage===message;
+    const attempt=++sourcesGeneration;
+    if(!sameMessage){
+      sourcesMessage=message;sourcesSnapshot=null;selectedCitationID='';sourceRows.clear();
+      sourceFocusAnimation?.cancel();
+    }
+    setSourcesExpanded(true);
+    const current=()=>attempt===sourcesGeneration&&isCurrent()&&root.isConnected;
+    if(!sourcesSnapshot){
+      sourcesBody.replaceChildren(node('p','rv2-detail-caption','Loading sources…'));
+      const request=sourcesRequest?.message===message?sourcesRequest:
+        {message,promise:Promise.resolve().then(()=>{
+          if(!onSnapshot)throw new Error('Saved sources for this answer are unavailable.');
+          return onSnapshot(message);
+        })};
+      sourcesRequest=request;
+      try{
+        const saved=await request.promise;if(!current())return;
+        sourcesSnapshot=saved;renderSnapshot(saved,message);sourcesBody.scrollTop=0;
+      }catch(error){
+        if(!current())return;
+        sourcesBody.replaceChildren(node('p','rv2-status is-error',error.message||'The sources could not be loaded.'),
+          action('Try again',()=>void showSnapshot(message,{citationID}),'rv2-text-action'));
+        return;
+      }finally{if(sourcesRequest===request)sourcesRequest=null;}
+    }
+    if(current()&&citationID)revealCitation(message,citationID,attempt);
+  }
   async function findPassages(discoveryQuestion,{focus=''}={}){
     if(busy||includeBusy)return;const question=typeof discoveryQuestion==='string'?discoveryQuestion:input.value.trim();
     if(!question&&!focus&&!passageSources.length){notice('Enter a topic to find passages.');return;}
@@ -452,7 +578,14 @@ export function createResearchV2View(options) {
     }
     thread.hidden=false;
     chat.replaceChildren(mobileHistory,thread,detail,status,operationStatus,composer);
-    root.replaceChildren(rail,divider,chat);
+    root.replaceChildren(rail,divider,chat,sourcesRail);
+    syncSourcesRail();
+    if(sourcesSnapshot&&sourcesMessage)renderSnapshot(sourcesSnapshot,sourcesMessage);
+    else sourcesBody.append(node('p','rv2-detail-caption','Choose Sources used below an answer.'));
+    sourcesBody.scrollTop=retainedSources?.scrollTop||0;
+    options.onHistoryRailChange?.(!historyCollapsed,{initial:true});
+    options.onSourcesRailChange?.(sourcesExpanded,sourcesRail,{reveal:false});
+    if(sourcesExpanded&&sourcesMessage&&!sourcesSnapshot)void showSnapshot(sourcesMessage);
     historyTitles.refresh();
     resizeInput();
     if(typeof ResizeObserver==='function'){composerResize=new ResizeObserver(resizeInput);composerResize.observe(input);}
@@ -463,7 +596,7 @@ export function createResearchV2View(options) {
       onDone:()=>{revealBusy=false;update();}});
   };
   if(!presentation)commit();
-  return {element:root,commit,capturePresentation:()=>({root,chat,thread}),dispose(){if(disposed)return;disposed=true;stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();composerResize?.disconnect();revealController?.dispose();questionRail.dispose();historyTitles.dispose();},focus(){input.focus({preventScroll:true});},
+  return {element:root,commit,capturePresentation:()=>({root,chat,thread,sources:{conversationID:conversation?.id,messageID:sourcesMessage?.id,snapshot:sourcesSnapshot,expanded:sourcesExpanded,selectedCitationID,scrollTop:sourcesBody.scrollTop}}),dispose(){if(disposed)return;disposed=true;sourcesGeneration++;sourceFocusAnimation?.cancel();stopObservingOperations?.();options.historyManagement?.dispose();generation++;controller?.abort();initialScroll?.disconnect();composerResize?.disconnect();revealController?.dispose();questionRail.dispose();historyTitles.dispose();},focus(){input.focus({preventScroll:true});},
     focusAnswer(answerID){
       const answer=Array.from(thread.querySelectorAll('.rv2-answer')).find(entry=>entry.dataset.messageId===answerID);
       if(disposed || !answer || !root.isConnected)return false;

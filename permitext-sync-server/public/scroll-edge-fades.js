@@ -6,7 +6,7 @@ const viewports = [
   '.workspace-issue', '.mobile-more-sheet', '.reader-trust-details',
   '.section-save-project-sheet', '.reader-notes-project-options', '.section-detail-project-menu',
   '.search-results', '.search-jump-list', '.search-history-list', '.search-history-scroll-list',
-  '.search-recent-popover-list', '.research-message-thread', '.research-evidence-scroll',
+  '.search-recent-popover-list', '.research-message-thread', '.rv2-thread', '.research-evidence-scroll',
   '.research-citation-passages blockquote', '.evidence-candidate-card blockquote',
   '.search-code-filter-menu.is-open .search-code-filter', '.saved-project-list',
   '.notebook-editor-surface', '.notebook-card-list', '.notebook-reference-list',

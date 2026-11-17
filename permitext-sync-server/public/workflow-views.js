@@ -40,14 +40,23 @@ export function referenceColumnsWidth(widths, availableWidth, documentWidth = 60
     sum + (minimumWidths[index] ?? (width <= 48 ? width : 600)), dividersAndBorder);
   return Math.max(minimum, Math.min(requested, availableWidth - documentWidth));
 }
-// Reader, Search and Assistant share the desk equally when every column's
-// minimum fits. Assistant also reserves space for its conversation history.
+// Share the desk as evenly as each column's own minimum allows. Assistant
+// reserves its history/composer width before smaller columns share the rest.
 // Otherwise retain preferred widths, with each column's own bounds.
 export function researchColumnsLayout(widths, availableWidth, fixedWidth = 0, dividerWidth = 0, maximumWidths = [], minimumWidths = []) {
-  const equalWidth = widths.length ? (availableWidth - fixedWidth - dividerWidth) / widths.length : 0;
+  const available = availableWidth - fixedWidth - dividerWidth;
   const minimums = widths.map((_, index) => minimumWidths[index] ?? 600);
-  const fits = widths.length > 0 && minimums.every(minimum => equalWidth >= minimum);
-  return { fits, widths: widths.map((width, index) => fits ? equalWidth : Math.max(minimums[index], Math.min(maximumWidths[index] ?? 900, Number(width) || minimums[index]))) };
+  const fits = widths.length > 0 && minimums.reduce((sum, width) => sum + width, 0) <= available;
+  if (!fits) return { fits, widths: widths.map((width, index) => Math.max(minimums[index], Math.min(maximumWidths[index] ?? 900, Number(width) || minimums[index]))) };
+  const fitted = [...minimums], flexible = new Set(widths.map((_, index) => index));
+  let remaining = available;
+  while (flexible.size) {
+    const share = remaining / flexible.size;
+    const constrained = [...flexible].filter(index => minimums[index] > share);
+    if (!constrained.length) { for (const index of flexible) fitted[index] = share; break; }
+    for (const index of constrained) { remaining -= minimums[index]; flexible.delete(index); }
+  }
+  return { fits, widths: fitted };
 }
 // Optional references share one slot when their chosen widths would squeeze
 // the writing page. Closing one is persistent; a wider desk never reopens it.

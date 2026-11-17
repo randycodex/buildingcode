@@ -37,6 +37,19 @@ assert.equal(visible.attrs.has('data-scroll-fade'),false,'Open editor popups rem
 popup.open=false;mutate([{type:'attributes',attributeName:'open',target:popup}]);flush();assert.equal(visible.attrs.has('data-scroll-fade'),true);
 hidden.clientHeight=500;resizeUpdate();flush();assert.equal(hidden.styles.get('--scroll-fade-top-size'),'0px','Reader retains its existing top fade.');assert.equal(hidden.styles.get('--scroll-fade-bottom-size'),'24px');
 const added=new Element('.search-results');body.children.push(added);mutate([{type:'childList',target:body,addedNodes:[added]}]);flush();assert.ok(observed.has(added));assert.equal(added.attrs.has('data-scroll-fade'),true);assert.equal(documentScans,1);
+// The Assistant's actual scroll viewport uses the shared edge treatment;
+// the fixed composer remains outside it and the first message stays clear.
+const assistant=new Element('.rv2-thread');body.children.push(assistant);
+mutate([{type:'childList',target:body,addedNodes:[assistant]}]);flush();
+assert.ok(observed.has(assistant));
+assert.equal(assistant.styles.get('--scroll-fade-top-size'),'24px');
+assert.equal(assistant.styles.get('--scroll-fade-header'),'0px');
+assistant.scrollTop=0;listeners.get('scroll')();flush();
+assert.equal(assistant.styles.get('--scroll-fade-top-size'),'0px');
+assistant.scrollTop=500;listeners.get('scroll')();flush();
+assert.equal(assistant.styles.get('--scroll-fade-top-size'),'24px');
+assert.equal(assistant.styles.get('--scroll-fade-bottom-size'),'0px');
+assert.equal(documentScans,1,'Adding Assistant never rescans the whole page');
 const offscreenPanel={getBoundingClientRect:()=>({width:600,left:1400,right:2000})};
 added.closest=()=>offscreenPanel;
 Object.defineProperty(added,'clientHeight',{get(){throw new Error('Offscreen descendants must not force layout');},configurable:true});

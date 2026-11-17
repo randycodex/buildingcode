@@ -22,6 +22,7 @@ const c = vm.createContext({
   activePinnedPaneID: () => '', applyLinkedPanePlacements: ids => ids, pairSavedEvidenceDetails: ids => ids,
   ensureWorkspacePanelAccessibleName() {}, preparePaneCollapse() {events.push('prepare');},
   cleanupInactiveWorkboardMounts() {}, cleanupInactiveNotebookMounts() {}, cleanupInactiveReportDraftMounts() {},
+  reconcileNotebookReferences() {return false;},
   bindPaneDragging() {}, workflowPaneIsVisible: () => true, currentColumnWorkflowView: () => 'research',
   createDivider: (previousPaneId, nextPaneId) => ({dataset: {previousPaneId, nextPaneId}}),
   refreshColumnGroupPresentation(options = {}) {

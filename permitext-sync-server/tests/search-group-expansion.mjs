@@ -1,95 +1,48 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
-const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
-const extract = (name) => {
-  const start = source.indexOf(`function ${name}(`);
-  assert.ok(start >= 0);
-  return source.slice(start, source.indexOf('\n}', start) + 2);
-};
-const context = vm.createContext({
-  defaultSyncCodeVersion: '2022', repeatableUtilityKeys: new Set(['search']),
-  normalizeSearchCodeFilters: (value) => Array.isArray(value) ? value : [],
-  normalizeSearchHistorySplitRatio: (value) => value,
-});
-vm.runInContext(['normalizeSearchResultSources', 'newUtilityInstance', 'normalizeUtilityInstances',
-  'normalizeSearchInstance', 'applyInitialSearchGroupExpansion'].map(extract).join('\n'), context);
-const apply = context.applyInitialSearchGroupExpansion;
-const all = { querySuffix: '' };
-const current = { codePrefix: 'BC', codeVersion: '2022', sectionNumber: '403.2' };
-const historical = { codePrefix: 'BC', codeVersion: '2014', sectionNumber: '403.2.3.3' };
-const mechanical = { codePrefix: 'MC', codeVersion: '2022', sectionNumber: '301.1' };
-const make = (query = 'concrete', expanded = []) => context.newUtilityInstance('search', {
-  id: 'test-search', query, expandedResultSources: expanded,
-});
-const keys = (instance) => Array.from(new Set([...instance.expandedResultSources, ...(instance.defaultExpandedResultSource ? [instance.defaultExpandedResultSource] : [])]));
-const reload = (instance) => context.normalizeUtilityInstances(JSON.parse(JSON.stringify({ utilityInstances: [instance] })))[0];
-
-// Exact, broad, single-edition and partial searches all start collapsed.
-const matches = [mechanical, historical, current];
-const original = JSON.stringify(matches);
-for (const [query, results, scope, edition] of [
-  ['403.2.3.3', [current, historical], all, 'all'],
-  ['concrete', matches, all, 'all'],
-  ['concrete', [current], all, '2022'],
-  ['concrete', [current], {querySuffix:'&sourceScope=current-only', enabledSourceCount:1}, 'all'],
-  ['concrete', matches, {...all, preferredCodeVersion:'2014'}, 'all'],
-  ['concrete', [mechanical, current], {...all, preferredCodeVersion:'2014'}, 'all'],
-]) {
-  const instance = make(query); instance.searchEdition = edition;
-  assert.equal(apply(instance, results, scope), true);
-  assert.deepEqual(keys(instance), []);
-  assert.equal(apply(instance, [historical], scope), false, 'Later pages never open a group');
+const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+const extract=name=>{const start=source.indexOf(`function ${name}(`);assert.ok(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
+const c=vm.createContext({defaultSyncCodeVersion:'2022',repeatableUtilityKeys:new Set(['search']),
+  normalizeSearchCodeFilters:value=>Array.isArray(value)?value:[],normalizeSearchHistorySplitRatio:value=>value});
+vm.runInContext(['normalizeSearchResultSources','newUtilityInstance','normalizeUtilityInstances','normalizeSearchInstance',
+  'searchPositionState','applyInitialSearchGroupExpansion','searchResultChapter'].map(extract).join('\n'),c);
+const all={querySuffix:''};
+const matches=[{codePrefix:'MC',codeVersion:'2022'},{codePrefix:'BC',codeVersion:'2014'},{codePrefix:'BC',codeVersion:'2022'}];
+const make=()=>c.newUtilityInstance('search',{id:'test',query:'concrete',expandedResultSources:['BC|2014']});
+const instance=make(),before=JSON.stringify(matches);
+assert.equal(c.applyInitialSearchGroupExpansion(instance,matches,all),true);
+assert.equal(instance.defaultExpandedResultSource,'MC|2022','The first ranked source exposes matches immediately');
+assert.deepEqual(Array.from(instance.expandedResultSources),['BC|2014'],'Manual source choices survive');
+instance.searchPosition.chapterExpansion={'MC|2022|10':false};
+instance.defaultExpandedResultSource='';
+assert.equal(c.applyInitialSearchGroupExpansion(instance,matches.slice(1),all),false,'Pagination never reopens groups');
+assert.equal(instance.defaultExpandedResultSource,'');
+const restored=c.normalizeUtilityInstances(JSON.parse(JSON.stringify({utilityInstances:[instance]})))[0];
+assert.equal(c.applyInitialSearchGroupExpansion(restored,matches,all),false);
+assert.equal(restored.defaultExpandedResultSource,'','Closing the preview survives reload');
+assert.equal(restored.searchPosition.chapterExpansion['MC|2022|10'],false);
+for(const change of [()=>restored.query='steel',()=>restored.matchMode='exact',()=>restored.searchEdition='2014']){
+ change();assert.equal(c.applyInitialSearchGroupExpansion(restored,matches,all),true);
+ assert.equal(restored.defaultExpandedResultSource,'MC|2022');assert.deepEqual(Object.keys(restored.searchPosition.chapterExpansion),[]);
 }
-assert.equal(JSON.stringify(matches), original, 'Results and ranking are unchanged');
-
-// Only explicit user choices survive rerendering and reload, including legacy choices.
-const remembered = make('concrete', ['BC|2014', 'MC|2022']);
-apply(remembered, matches, all);
-assert.deepEqual(keys(remembered), ['BC|2014', 'MC|2022']);
-const restored = reload(remembered);
-context.normalizeSearchInstance(restored);
-assert.equal(apply(restored, matches, all), false);
-assert.deepEqual(keys(restored), ['BC|2014', 'MC|2022']);
-const absent = make('concrete', ['PC|2014']);
-apply(absent, [current, historical], all);
-assert.deepEqual(keys(absent), ['PC|2014'], 'An unavailable remembered source never opens a fallback');
-const legacy = context.normalizeUtilityInstances({utilityInstances:[{
-  id:'legacy', key:'search', query:'concrete', expandedResultSource:'BC|2014'
-}]})[0];
-apply(legacy, matches, all);
-assert.deepEqual(keys(legacy), ['BC|2014']);
-
-// Closing every group remains closed through retry, reload, a new query and scope/mode changes.
-remembered.expandedResultSources = [];
-assert.equal(apply(remembered, matches, all), false);
-const closed = reload(remembered);
-for (const [query, scope, mode] of [
-  ['concrete', all, 'words'], ['steel', all, 'words'],
-  ['steel', {querySuffix:'&sourceScope=historical-only'}, 'words'],
-  ['steel', all, 'exact'],
-]) {
-  closed.query = query; closed.matchMode = mode;
-  apply(closed, matches, scope);
-  assert.deepEqual(keys(closed), []);
-}
-
-// Older automatic previews are retired without discarding manual expansions.
-for (const expanded of [[], ['BC|2014']]) {
-  const old = make('concrete', expanded);
-  old.searchExpansionDecisionKey = JSON.stringify(['visible-matches-v3', 'concrete', [], 'all', '', '2022', 'words']);
-  old.defaultExpandedResultSource = 'BC|2022';
-  assert.equal(apply(old, matches, all), true);
-  assert.equal(old.defaultExpandedResultSource, '');
-  assert.deepEqual(keys(old), expanded);
-  assert.deepEqual(keys(reload(old)), expanded);
-}
-const empty = make();
-assert.equal(apply(empty, [], all), false);
-assert.equal(apply(empty, [historical], all), true);
-assert.deepEqual(keys(empty), []);
-
-// Both render paths apply the policy before constructing result groups.
-assert.match(source, /applyInitialSearchGroupExpansion\(searchInstance, filteredResults, sourceScope\)[\s\S]{0,100}appendSearchResultGroups\(results, filteredResults/);
-assert.match(extract('appendSearchLoadMore'), /applyInitialSearchGroupExpansion\(options.searchInstance, nextResults, options.sourceScope\)[\s\S]{0,100}appendSearchResultGroups\(results, nextResults/);
-console.log('Search groups start collapsed: exact/broad/partial results, preferred editions, pagination/retry, query/scope changes, manual choices and legacy preview migration passed.');
+restored.searchPosition.chapterExpansion={old:false};
+assert.equal(c.applyInitialSearchGroupExpansion(restored,matches,{querySuffix:'&sourceScope=other'}),true);
+assert.deepEqual(Object.keys(restored.searchPosition.chapterExpansion),[],'Source-scope changes reset query-specific chapter choices');
+assert.equal(JSON.stringify(matches),before,'Presentation never changes result ranking or source records');
+const empty=make();assert.equal(c.applyInitialSearchGroupExpansion(empty,[],all),false);
+assert.equal(c.applyInitialSearchGroupExpansion(empty,matches,all),true);
+const chapter=result=>JSON.parse(JSON.stringify(c.searchResultChapter(result)));
+assert.deepEqual(chapter({chapterID:7,chapterNumber:'7',chapterTitle:'Fire and Smoke Protection Features'}),{key:'7',label:'Chapter 7: Fire and Smoke Protection Features'});
+assert.equal(chapter({navigationChapterID:'k',chapterID:'k2',navigationChapterNumber:'K',chapterNumber:'K2',chapterTitle:'Appendix K: Modified Industry Standards'}).label,'Appendix K: Modified Industry Standards');
+assert.equal(chapter({chapterID:'zoning-12',chapterNumber:'12',chapterTitle:'Chapter 2: Construction of Language and Definitions'}).label,'Chapter 2: Construction of Language and Definitions');
+assert.equal(chapter({chapterID:'2014-7',chapterNumber:'7',chapterTitle:'BC CHAPTER 7 - FIRE AND SMOKE PROTECTION FEATURES'}).label,'Chapter 7: FIRE AND SMOKE PROTECTION FEATURES','Historical metadata never repeats the chapter number');
+assert.equal(chapter({chapterID:'opaque',chapterNumber:'',chapterTitle:''}).label,'Other matching provisions','Missing metadata never invents a chapter');
+assert.notEqual(chapter({chapterID:'a"b'}).key,chapter({chapterID:'a/b'}).key);
+const presentation=vm.createContext({researchCodeEdition:()=> '2022'});
+vm.runInContext(['escapeRegExp','stripLeadingSectionNumber','searchResultPresentation'].map(extract).join('\n'),presentation);
+const paragraph={codePrefix:'BC',sectionNumber:'2.1.',headerLine:'SECTION BC 403',title:'Stairs shall comply. '.repeat(20),headingLine:'SHALL APPLY TO ALL WALLS. '.repeat(15),snippet:'Stairs shall comply. '.repeat(20)};
+const compact=presentation.searchResultPresentation(paragraph,'stairs');
+assert.equal(compact.heading,'Code passage','A full legal paragraph never becomes a giant result heading');
+assert.equal(compact.scope,'');assert.equal(compact.number,'2.1.');assert.match(compact.excerpt,/Stairs/);
+console.log('Search expansion passed: strongest source preview, manual closure/reload, query/scope changes, ranked-result preservation, canonical chapter labels and missing-metadata fallbacks.');

@@ -1,11 +1,14 @@
 import assert from 'node:assert/strict';
-import {createResearchV2View, researchAnswerText, researchReviewLabel, passageChipLabel, researchV2RetryContext} from '../public/research-v2.js';
+import {createResearchV2View, researchAnswerText, researchReviewLabel, passageChipLabel, researchV2RetryContext, researchSourceHeading} from '../public/research-v2.js';
 
 // Minimal DOM for exercising the real asynchronous view handlers, without a
 // provider or browser dependency. Layout is verified separately in the browser.
 class Element {
   constructor(tag){this.tagName=tag;this.children=[];this.handlers={};this.attributes={};this.dataset={};this.className='';this.isConnected=true;this.hidden=false;this.value='';this.style={setProperty(){}};}
-  focus(){this.focused=true;}
+  focus(options){this.focused=true;this.focusOptions=options;}
+  getBoundingClientRect(){return {top:this.top||0,width:300,height:28};}
+  scrollTo(options){this.lastScroll=options;this.scrollTop=options.top;}
+  animate(keyframes,options){const animation={keyframes,options,cancel(){this.cancelled=true;}};this.animations||=[];this.animations.push(animation);return animation;}
   get lastChild(){return this.children.at(-1);}
   get childNodes(){return this.children;}
   append(...items){for(const item of items){item.parent=this;this.children.push(item);}}
@@ -78,7 +81,7 @@ assert.equal(researchReviewLabel(old.answer),'Unreviewed');
  let opened;
  const text='Rules:\n- **First rule.** [S1]\n- Second rule with a wrapped\n  continuation. [S2]\n\nSteps:\n3. Identify the equipment.\n5. Review the listing.\n5. Confirm the stated conditions.\n\nRepeated Markdown numbers:\n1. First step.\n1. Second step.';
  const message={id:'lists',role:'assistant',answer:{answerText:text,verification:{pass:true}}};
- const listView=createResearchV2View({conversation:{sources:[],messages:[message]},onDraft(){},onCitation:(answer,id)=>{opened={answer,id};}});
+ const listView=createResearchV2View({conversation:{sources:[],messages:[message]},onDraft(){},onSnapshot:async answer=>{opened=answer;return {sources:[source,{...source,id:'second'}]};},onOpenReader:()=>assert.fail('Citation clicks must stay in Sources')});
  const answer=listView.element.querySelector('.rv2-answer');
  const lists=all(answer).filter(element=>element.className==='rv2-answer-list');
  assert.deepEqual(lists.map(element=>element.tagName),['ul','ol','ol']);
@@ -87,8 +90,8 @@ assert.equal(researchReviewLabel(old.answer),'Unreviewed');
  assert(lists[2].children.every(element=>element.attributes.value===undefined),'Repeated 1. Markdown markers use the native counter');
  assert(all(lists[0]).some(element=>element.tagName==='strong'));
  assert(all(lists[0]).some(element=>element.textContent?.includes('continuation. ')));
- all(lists[0]).find(element=>element.attributes['aria-label']==='Open citation S2').handlers.click();
- assert.equal(opened.answer,message);assert.equal(opened.id,'S2');assert.equal(message.answer.answerText,text,'Rendering never rewrites the saved answer');
+ all(lists[0]).find(element=>element.attributes['aria-label']==='Open citation S2').handlers.click();await tick();
+ assert.equal(opened,message);assert.equal(all(listView.element).find(element=>element.dataset.citationId==='S2').open,true);assert.equal(message.answer.answerText,text,'Rendering never rewrites the saved answer');
  listView.dispose();
 }
 {
@@ -96,17 +99,17 @@ assert.equal(researchReviewLabel(old.answer),'Unreviewed');
  const message={id:'reference-answer',role:'assistant',answer:{answerText:'A referenced table is supplied. [S2]',verification:{pass:true},
   referenceLookup:{added:[{label:'FGC Table 308.2',codeEdition:'2022 New York City Construction Codes',citationID:'S2'}]}}};
  const referenceView=createResearchV2View({conversation:{sources:[],messages:[message]},onDraft(){},
-  onCitation:(answer,id)=>{opened={answer,id};},onOpenReader:source=>{openedSource=source;},onSnapshot:async()=>({sources:[
+  onOpenReader:source=>{openedSource=source;},onSnapshot:async answer=>{opened=answer;return {sources:[
    {codePrefix:'FGC',sectionNumber:'308.3.2',codeEdition:'2022',passageText:'Exact attached passage.'},
    {codeBook:'FGC',sectionNumber:'308.2',codeEdition:'2022',
-   passageText:'Complete table and notes.',provenance:{origin:'permitext_cross_reference',retrievalReason:'Automatically retrieved FGC Table 308.2 from the same codebook and edition'}}]})});
+   passageText:'Complete table and notes.',provenance:{origin:'permitext_cross_reference',retrievalReason:'Automatically retrieved FGC Table 308.2 from the same codebook and edition'}}]};}});
  const elements=()=>all(referenceView.element);
  assert(elements().some(element=>element.attributes['aria-label']==='Automatically retrieved references'));
- elements().find(element=>element.textContent==='FGC Table 308.2 · 2022').handlers.click();
- assert.equal(opened.answer,message);assert.equal(opened.id,'S2','Automatically retrieved sources use the original saved citation index');
+ elements().find(element=>element.textContent==='FGC Table 308.2 · 2022').handlers.click();await tick();
+ assert.equal(opened,message);assert.equal(openedSource,undefined,'An automatically retrieved reference expands Sources without opening Reader');
  await elements().find(element=>element.textContent==='Sources used').handlers.click();await tick();
  const rows=elements().filter(element=>element.className==='rv2-snapshot-row');
- assert.equal(rows.length,2);assert(rows.every(row=>row.tagName==='details'&&row.open===false),'Saved sources start as compact collapsed rows');
+ assert.equal(rows.length,2);assert.equal(rows[0].open,false);assert.equal(rows[1].open,true,'The matching reference expands using its original saved citation index');
  assert(elements().some(element=>element.textContent==='2. FGC § 308.2 · 2022'),'Numbered source rows retain the answer citation order');
  const sourceList=referenceView.element.querySelector('.rv2-snapshot-list');
  assert.equal(sourceList.tagName,'ol');assert.equal(sourceList.children.length,2);
@@ -157,7 +160,8 @@ assert.equal(turnStatus.textContent,'Preparing your answer…');
 sent[0].onProgress({stage:'generating_answer'});assert.equal(turnStatus.textContent,'Developing your answer…');
 sent[0].onProgress({stage:'checking_citation_support'});assert.equal(turnStatus.textContent,'Checking the answer against the sources…');
 assert(all(view.element).filter(element=>element.className==='rv2-status').every(element=>element.hidden),'Generation notices never occupy the space above the composer');
-find('Sources used').handlers.click();await tick();assert.equal(snapshots,0,'Source inspection cannot invalidate the active request');
+find('Sources used').handlers.click();await tick();assert.equal(snapshots,1,'Earlier answer sources remain available while a new answer is generating');
+assert.equal(sent[0].signal.aborted,false,'Source inspection never cancels the active answer');assert.equal(thread.hidden,false);
 flight.reject(new Error('Network interrupted'));await tick();
 assert.equal(draft,'Explain this.');assert.match(view.element.querySelector('.rv2-status').textContent,/Network interrupted/);
 assert.equal(input.value,'Explain this.','A failed request restores the question for editing or retry');
@@ -337,3 +341,158 @@ console.log('Stable conversation presentation passed: staged content, retained g
  incoming.dispose();
 }
 console.log('Retained-root ownership passed: disposed request cleanup cannot clear the new conversation busy state.');
+
+{
+ const first=deferred(),second=deferred(),late=deferred(),calls=[],changes=[];
+ const one={id:'one',role:'assistant',answer:{answerText:'First answer.'}};
+ const two={id:'two',role:'assistant',answer:{answerText:'Second answer.'}};
+ const three={id:'three',role:'assistant',answer:{answerText:'Third answer.'}};
+ const conversation={id:'sources-chat',sources:[],messages:[{role:'user',question:'First question?'},one,{role:'user',question:'Second question?'},two,{role:'user',question:'Third question?'},three]};
+ const snapshots={one:first,two:second,three:late};
+ const view=createResearchV2View({conversation,initialDraft:'Keep this draft',onDraft(){},
+   onSnapshot:message=>{calls.push(message.id);return snapshots[message.id].promise;},
+   onSourcesRailChange:expanded=>changes.push(expanded)});
+ const thread=view.element.querySelector('.rv2-thread'),composer=view.element.querySelector('.rv2-composer');
+ const sourceButtons=all(view.element).filter(element=>element.textContent==='Sources used');
+ sourceButtons[0].handlers.click();await tick();sourceButtons[1].handlers.click();await tick();
+ assert.equal(thread.hidden,false,'The conversation stays visible while inspecting sources');
+ assert.equal(view.element.querySelector('.rv2-composer'),composer);assert.equal(view.element.querySelector('.rv2-input').value,'Keep this draft');
+ second.resolve({sources:[{...source,passageText:'Second answer source.'}]});await tick();
+ first.resolve({sources:[{...source,passageText:'Obsolete first answer source.'}]});await tick();
+ const rail=view.element.querySelector('.rv2-sources-rail');
+ assert(all(rail).some(element=>element.textContent==='Second answer source.'));
+ assert(!all(rail).some(element=>element.textContent==='Obsolete first answer source.'),'A slow earlier response cannot replace the selected answer sources');
+ assert(all(rail).some(element=>element.textContent==='Second question?'),'The panel identifies the selected answer question');
+ all(rail).find(element=>element.attributes['aria-label']==='Hide answer sources').handlers.click();
+ assert.equal(rail.querySelector('.rv2-sources-body').hidden,true);assert.equal(thread.hidden,false);
+ all(rail).find(element=>element.attributes['aria-label']==='Show answer sources').handlers.click();await tick();
+ assert.deepEqual(calls,['one','two'],'Reopening the same immutable answer snapshot needs no extra request');
+ const presentation=view.capturePresentation();view.dispose();
+ const refreshed=createResearchV2View({conversation:structuredClone(conversation),presentation,onDraft(){},onSnapshot(){throw Error('Cached source should survive a same-chat render');}});
+ refreshed.commit();
+ assert(all(refreshed.element.querySelector('.rv2-sources-rail')).some(element=>element.textContent==='Second answer source.'));
+ const crossChat=refreshed.capturePresentation();refreshed.dispose();
+ const other=createResearchV2View({conversation:{id:'other-chat',sources:[],messages:[]},presentation:crossChat,onDraft(){}});other.commit();
+ assert.equal(other.element.querySelector('.rv2-sources-body').hidden,true,'Switching chats closes the previous answer sources');
+ assert(!all(other.element).some(element=>element.textContent==='Second answer source.'));other.dispose();
+ assert.deepEqual(changes,[false,true,false,true],'Sources updates do not repeatedly expand or resize the panel');
+ const closing=createResearchV2View({conversation,onDraft(){},onSnapshot:()=>late.promise});
+ all(closing.element).filter(element=>element.textContent==='Sources used')[2].handlers.click();await tick();
+ all(closing.element).find(element=>element.attributes['aria-label']==='Hide answer sources').handlers.click();
+ late.resolve({sources:[{...source,passageText:'Late closed-panel source.'}]});await tick();
+ assert.equal(closing.element.querySelector('.rv2-sources-body').hidden,true,'A late response cannot reopen a closed panel');closing.dispose();
+}
+console.log('Answer source rail passed: chat/draft retention, independent requests, rapid answer switching, cached reopening, same-chat remount, cross-chat isolation and close-during-load.');
+
+{
+ const source={sectionNumber:'1107.3',codeBook:'BC',codeEdition:'2022',
+   passageText:'1107.3 1107.3 Accessible spaces. Rooms and spaces shall be accessible.\n\nException: The complete exception stays here.'};
+ const original=JSON.stringify(source);
+ assert.equal(researchSourceHeading(source),'Accessible spaces.');
+ assert.equal(researchSourceHeading({...source,title:'1107.3 Accessible spaces.'}),'Accessible spaces.');
+ assert.equal(researchSourceHeading({...source,passageText:'1107.3 Rooms shall be accessible.'}), '','A rule sentence is not promoted into a section heading');
+ assert.equal(researchSourceHeading({...source,passageText:'1107.3.1 A different subsection.'}), '','A parent number never consumes another subsection number');
+ assert.equal(researchSourceHeading({passageText:'An unnumbered selected excerpt.'}), '');
+ let opened;
+ const view=createResearchV2View({conversation:{sources:[],messages:[{id:'readable',role:'assistant',answer:{answerText:'Answer. [S1]'}}]},onDraft(){},
+   onSnapshot:async()=>({sources:[source]}),onOpenReader:item=>{opened=item;}});
+ all(view.element).find(element=>element.textContent==='Sources used').handlers.click();await tick();
+ const rail=view.element.querySelector('.rv2-sources-rail'),heading=rail.querySelector('.rv2-source-heading');
+ assert.equal(heading.textContent,'Accessible spaces.');
+ assert.equal(rail.querySelector('.rv2-snapshot-label').textContent,'1. BC § 1107.3 · 2022','Citation numbering and edition stay intact');
+ const body=rail.querySelector('.rv2-snapshot-body');
+ assert.equal(body.children[0].textContent,'Open in Reader','The Reader action is available before a long quotation');
+ assert.equal(body.querySelector('.rv2-source-text').textContent,source.passageText,'Every original word, exception and line break remains in the quoted text');
+ body.children[0].handlers.click();assert.equal(opened,source);assert.equal(JSON.stringify(source),original,'Presentation never rewrites the saved evidence');view.dispose();
+}
+console.log('Readable sources passed: real headings, prose/subsection fallbacks, intact numbered citations and complete immutable quotations, with Reader navigation before the text.');
+
+// Moving the conversation list cannot remount the live chat, draft, thread or
+// source selection. Resize observers only repaint a changed collapse state.
+{
+ const historyChanges=[];let stored=true;
+ const view=createResearchV2View({conversation:{id:'history-width',sources:[],messages:[]},
+   initialDraft:'Keep this draft and its attachments',onDraft(){},onOpen(){},
+   railCollapsedStore:{read:()=>stored,write:value=>{stored=value;}},
+   onHistoryRailChange:(expanded,settings)=>historyChanges.push({expanded,...settings})});
+ const chat=view.element.querySelector('.rv2-chat'),thread=view.element.querySelector('.rv2-thread'),input=view.element.querySelector('.rv2-input');
+ const toggle=view.element.querySelector('.rv2-history-toggle');
+ assert.equal(historyChanges.at(-1).expanded,false);
+ toggle.handlers.click();
+ assert.deepEqual(historyChanges.at(-1),{expanded:true,initial:false});
+ assert.equal(stored,false);
+ toggle.handlers.click();
+ assert.deepEqual(historyChanges.at(-1),{expanded:false,initial:false});
+ assert.equal(view.element.querySelector('.rv2-chat'),chat);
+ assert.equal(view.element.querySelector('.rv2-thread'),thread);
+ assert.equal(view.element.querySelector('.rv2-input'),input);
+ assert.equal(input.value,'Keep this draft and its attachments');
+ assert.equal(stored,true);view.dispose();
+}
+console.log('Conversation history toggles preserve the live chat, thread, draft and saved collapse preference.');
+
+// Citation numbers belong to the specific answer snapshot, even when multiple
+// answers reuse S1. Source browsing never invokes the separate Reader action.
+{
+ const first=deferred(),second=deferred(),calls=[],readers=[];
+ const one={id:'citation-one',role:'assistant',answer:{answerText:'First answer [S1] and [S2].'}};
+ const two={id:'citation-two',role:'assistant',answer:{answerText:'Second answer [S1] and missing [S9].'}};
+ const conversation={id:'citations',sources:[],messages:[{role:'user',question:'First question'},one,{role:'user',question:'Second question'},two]};
+ const view=createResearchV2View({conversation,initialDraft:'Unsent follow-up',onDraft(){},
+   onSnapshot:message=>{calls.push(message.id);return message===one?first.promise:second.promise;},onOpenReader:item=>readers.push(item)});
+ const thread=view.element.querySelector('.rv2-thread');thread.scrollTop=271;
+ const input=view.element.querySelector('.rv2-input');
+ const cite=(messageID,id)=>{
+   const answer=all(view.element).find(element=>element.className==='rv2-answer'&&element.dataset.messageId===messageID);
+   all(answer).find(element=>element.attributes['aria-label']===`Open citation ${id}`).handlers.click();
+ };
+ const rows=()=>all(view.element.querySelector('.rv2-sources-rail')).filter(element=>element.dataset.citationId);
+ cite(one.id,'S1');cite(one.id,'S2');await tick();
+ assert.deepEqual(calls,[one.id],'Rapid citations in one answer share one saved-source request');
+ first.resolve({sources:[{...source,passageText:'First source.'},{...source,sectionNumber:'102.2',passageText:'Second source.'}],
+   projectContextSnapshot:{projectInformation:{address:'Saved project context'}}});await tick();
+ assert.equal(rows()[0].open,false);assert.equal(rows()[1].open,true,'The latest clicked citation wins');
+ assert.equal(rows()[1].attributes['data-citation-active'],'true');
+ assert.equal(rows()[1].children[0].focusOptions.preventScroll,true);
+ assert.equal(rows()[1].animations.length,1,'The matching source receives a brief highlight');
+ assert(view.element.querySelector('.rv2-sources-body').lastScroll,'Only the Sources viewport scrolls');
+ assert.equal(thread.scrollTop,271);assert.equal(thread.hidden,false);assert.equal(input.value,'Unsent follow-up');
+ assert.equal(readers.length,0);assert.equal(view.element.querySelector('.rv2-project-snapshot').open,false,'Project context never shifts the S-number mapping');
+ const retainedRow=rows()[1];cite(one.id,'S2');await tick();
+ assert.equal(rows()[1],retainedRow,'Cached citation clicks preserve the existing source rows');
+ assert.equal(retainedRow.animations.length,2);assert.equal(retainedRow.animations[0].cancelled,true);
+ assert.deepEqual(calls,[one.id]);
+ all(retainedRow).find(element=>element.textContent==='Open in Reader').handlers.click();
+ assert.equal(readers.length,1);assert.equal(readers[0].sectionNumber,'102.2','Reader opens only from its explicit action');
+ cite(two.id,'S1');await tick();second.resolve({sources:[{...source,sectionNumber:'201.1',passageText:'Second answer exact source.'}]});await tick();
+ assert.equal(rows().length,1);assert.equal(rows()[0].open,true);
+ assert(all(rows()[0]).some(element=>element.textContent==='Second answer exact source.'));
+ assert(all(view.element.querySelector('.rv2-sources-body')).some(element=>element.textContent==='Second question'));
+ assert(!all(view.element.querySelector('.rv2-sources-body')).some(element=>element.textContent==='Second source.'));
+ const presentation=view.capturePresentation();view.dispose();
+ const restored=createResearchV2View({conversation:structuredClone(conversation),presentation,onDraft(){},onSnapshot:()=>assert.fail('Retained source is already cached')});restored.commit();
+ assert.equal(all(restored.element).find(element=>element.dataset.citationId==='S1').open,true,'Same-chat remount preserves the selected source expansion');restored.dispose();
+ const missing=createResearchV2View({conversation:{sources:[],messages:[two]},onDraft(){},onSnapshot:async()=>({sources:[source]}),onOpenReader:()=>assert.fail('Missing citations cannot route to unrelated authority')});
+ all(missing.element).find(element=>element.attributes['aria-label']==='Open citation S9').handlers.click();await tick();
+ assert.match(missing.element.querySelector('.rv2-citation-missing').textContent,/Source \[S9\] is unavailable/);
+ assert.equal(all(missing.element).find(element=>element.dataset.citationId==='S1').open,false);missing.dispose();
+}
+{
+ const slow=deferred(),fast=deferred(),closed=deferred();
+ const a={id:'slow-citation',role:'assistant',answer:{answerText:'A [S1]'}};
+ const b={id:'fast-citation',role:'assistant',answer:{answerText:'B [S1]'}};
+ const view=createResearchV2View({conversation:{sources:[],messages:[a,b]},onDraft(){},onSnapshot:message=>message===a?slow.promise:fast.promise,
+   onOpenReader:()=>assert.fail('Citation clicks stay in Sources')});
+ const citations=all(view.element).filter(element=>element.className==='rv2-citation');
+ citations[0].handlers.click();citations[1].handlers.click();await tick();
+ fast.resolve({sources:[{...source,passageText:'Latest selected answer source.'}]});await tick();
+ slow.resolve({sources:[{...source,passageText:'Stale source must never replace B.'}]});await tick();
+ assert(all(view.element.querySelector('.rv2-sources-body')).some(element=>element.textContent==='Latest selected answer source.'));
+ assert(!all(view.element.querySelector('.rv2-sources-body')).some(element=>element.textContent==='Stale source must never replace B.'));view.dispose();
+ const closing=createResearchV2View({conversation:{sources:[],messages:[a]},onDraft(){},onSnapshot:()=>closed.promise});
+ all(closing.element).find(element=>element.className==='rv2-citation').handlers.click();await tick();
+ all(closing.element).find(element=>element.attributes['aria-label']==='Hide answer sources').handlers.click();
+ closed.resolve({sources:[source]});await tick();
+ assert.equal(closing.element.querySelector('.rv2-sources-body').hidden,true,'A late citation request cannot reopen a panel the user closed');closing.dispose();
+}
+console.log('Citation navigation passed: answer-specific matching, expand/scroll/highlight, repeated and rapid clicks, cached reads, immutable source order, separate Reader action, draft/scroll retention, missing citations and stale/closed-panel protection.');

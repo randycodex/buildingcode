@@ -24986,7 +24986,16 @@ function codeSearchSectionVersion(section) {
 
 async function codeSearchResults(hits, query, matchMode = "exact") {
   const { findActiveCodeSource } = await import("./active-code-source-catalog.mjs");
+  // Reuse the cached Reader hierarchy once per edition, rather than asking the
+  // client to fetch a chapter list for every group of matching sections.
+  const chapterMaps = new Map();
   return Promise.all(hits.map(async ({ section, plainText: matchedPlainText }) => {
+    const edition = codeSearchSectionVersion(section);
+    const sourceKey = `${section.codePrefix}|${edition}`;
+    if (!chapterMaps.has(sourceKey)) chapterMaps.set(sourceKey,
+      codeNavigationChapters(section.codePrefix, edition).then(chapters =>
+        new Map(chapters.map(chapter => [String(chapter.id), chapter]))).catch(() => new Map()));
+    const chapter = (await chapterMaps.get(sourceKey)).get(String(section.navigationChapterID || section.chapterID));
     const plainText = matchedPlainText ?? await searchableSectionPlainText(section);
     const codeSource = await findActiveCodeSource({ canonicalEdition: codeSearchSectionVersion(section),
       categoryID: section.codeSectionID, codePrefix: section.codePrefix }).catch(() => null);
@@ -24999,6 +25008,8 @@ async function codeSearchResults(hits, query, matchMode = "exact") {
       codeVersion: codeSearchSectionVersion(section),
       codeSource,
       chapterNumber: section.chapterNumber,
+      navigationChapterNumber: chapter?.chapterNumber || section.chapterNumber,
+      chapterTitle: chapter?.fullTitle || chapter?.displayTitle || chapter?.title || "",
       sectionNumber: section.sectionNumber,
       title: section.title,
       headerLine: section.headerLine,

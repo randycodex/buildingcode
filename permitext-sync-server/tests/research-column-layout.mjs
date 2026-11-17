@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { researchColumnsLayout } from '../public/workflow-views.js';
+import { adjacentColumnWidths } from '../public/column-expansion.js';
 
 assert.deepEqual(researchColumnsLayout([600], 2400, 0, 2), { fits: true, widths: [2398] });
 assert.deepEqual(researchColumnsLayout([900, 600], 2403, 0, 3), { fits: true, widths: [1200, 1200] });
@@ -12,7 +13,19 @@ assert.deepEqual(researchColumnsLayout([900, 600], 2203, 1000, 3), { fits: true,
 assert.deepEqual(researchColumnsLayout([1800, 1400], 1103, 0, 3, [Infinity, 900]), { fits: false, widths: [1800, 900] });
 assert.deepEqual(researchColumnsLayout([920, 600], 2403, 0, 3, [Infinity, Infinity], [920, 600]), { fits: true, widths: [1200, 1200] });
 assert.deepEqual(researchColumnsLayout([920, 600], 1843, 0, 3, [Infinity, Infinity], [920, 600]), { fits: true, widths: [920, 920] });
-assert.deepEqual(researchColumnsLayout([920, 600], 1842, 0, 3, [Infinity, Infinity], [920, 600]), { fits: false, widths: [920, 600] });
+assert.deepEqual(researchColumnsLayout([920, 600], 1842, 0, 3, [Infinity, Infinity], [920, 600]), { fits: true, widths: [920, 919] });
+assert.deepEqual(researchColumnsLayout([920, 600], 1523, 0, 3, [], [920, 600]), { fits: true, widths: [920, 600] });
+assert.deepEqual(researchColumnsLayout([920, 600], 1522, 0, 3, [], [920, 600]), { fits: false, widths: [920, 600] });
+const screenshot = researchColumnsLayout([630,920,600,630],3063,0,5,[],[630,920,600,630]);
+assert.equal(screenshot.fits,true,'Different minimums fit even when an equal share would squeeze Assistant');
+assert.deepEqual(screenshot.widths,[2138/3,920,2138/3,2138/3]);
+assert(Math.abs(screenshot.widths.reduce((sum,width)=>sum+width,5)-3063)<1e-8,'Use all available width without a trailing gap');
+for(const available of [2485,2705,3063,3685,5000]){
+ const minimums=[630,920,300,630],layout=researchColumnsLayout(minimums,available,0,5,[],minimums);
+ assert.equal(layout.fits,true);assert(layout.widths.every((width,index)=>width>=minimums[index]));
+ assert(Math.abs(layout.widths.reduce((sum,width)=>sum+width,5)-available)<1e-8);
+}
+assert.deepEqual(researchColumnsLayout([920,600],2024,500,4,[],[920,600]),{fits:true,widths:[920,600]},'Fixed panels and dividers keep their reserved width');
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 function actual(name) {
@@ -45,10 +58,11 @@ panels.push(makePane('reader:two'));
 context.syncResearchColumnLayout();
 assert.deepEqual(sizes(), [2399/3, 2399/3, 2399/3]);
 panels.push(makePane('reader:three'));
+track.clientWidth = 2005;
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [600,630,630,630], 'Adding a fourth column crosses into horizontal scrolling at the minimum');
+assert.deepEqual(sizes(), [600,630,630,630], 'A genuinely narrow viewport scrolls with usable default widths');
 assert.equal(track.dataset.researchColumnSizing, 'overflow');
-assert.equal(panels[0].style.maxWidth, '900px');
+assert.equal(panels[0].style.maxWidth, 'none');
 assert.equal(panels[1].style.maxWidth, 'none', 'Overflow Readers have no CSS maximum');
 state.paneWeights['reader:one'] = 1800;
 delete track._researchColumnLayout;
@@ -82,11 +96,14 @@ context.window.innerWidth = 760;
 context.syncResearchColumnLayout();
 assert.equal(track.dataset.researchColumnSizing, undefined, 'Phone paging keeps its viewport width');
 assert.equal(context.minimumPaneWidthForID('reader:one'), 630);
-assert.equal(context.maximumPaneWidthForID('utility:search:one'), 900);
+assert.equal(context.minimumPaneWidthForID('utility:search:one'), 300);
+assert.equal(context.maximumPaneWidthForID('utility:search:one'), Infinity);
+assert.equal(context.constrainPaneWidth('utility:search:one',200),300);
+assert.equal(context.constrainPaneWidth('utility:search:one',1400),1400);
 assert.equal(context.maximumPaneWidthForID('reader:one'), Infinity);
 workflow = 'project-details';
 assert.equal(context.minimumPaneWidthForID('reader:one'), 630, 'Project reference Readers share the 630px minimum');
-console.log('Research columns passed: equal fit, minimum widths, unlimited Readers, bounded Search, manual persistence, collapse and phone isolation.');
+console.log('Research columns passed: minimum-aware full fit, adjustable Search, manual persistence, collapse and phone isolation.');
 
 // Chapter/code refreshes prepare the live header again. That reapplies the
 // stored width, so the Research layout must be restored before publishing.
@@ -239,7 +256,7 @@ for (const assistantID of ['utility:analysis', 'utility:analysis:one', 'research
     context.window.innerWidth = track.clientWidth = available;
     delete track._researchColumnLayout;
     context.syncResearchColumnLayout();
-    assert.deepEqual(sizes(), available >= 1843 ? [(available-3)/2, (available-3)/2] : [920,630], 'Cold Assistant shares space only when its full minimum fits');
+    assert.deepEqual(sizes(), available >= 1843 ? [(available-3)/2, (available-3)/2] : available >= 1553 ? [920,available-3-920] : [920,630], 'Cold Assistant retains its minimum while Reader fills the remaining space');
     assert.equal(panels[0].style['--pane-default-min-width'], '920px');
     assert.equal(panels[0].style.maxWidth, 'none', 'Assistant has no Search-style maximum');
   }
@@ -269,3 +286,112 @@ collapsed.add('utility:analysis:one');
 context.syncResearchColumnLayout();
 assert.deepEqual(sizes(), [1476,48,1476], 'A collapsed Assistant reserves only its rail');
 console.log('Assistant layout passed: cold equal sharing, 920px minimum, manual restoration, reset, reorder and collapsed rails.');
+
+// Exercise the real keyboard-divider path used by Search on either side.
+collapsed.clear();
+panels=['utility:analysis','utility:search:resize','reader:one'].map(makePane);
+state.paneWeights={'utility:analysis':920,'utility:search:resize':600,'reader:one':630};
+panels.forEach(p=>context.applyPaneWeight(p,p.dataset.paneId));
+track.querySelector=selector=>panels.find(p=>selector.includes(`"${p.dataset.paneId}"`));
+Object.assign(context,{CSS:{escape:id=>id},adjacentColumnWidths,notebookReferenceResize:()=>null,scheduleVisibleReaderScrollIndicatorUpdates(){},notifyWorkspaceLayoutChange(){}});
+vm.runInContext(actual('updateAdjacentDividerValue')+'\n'+actual('resizePaneEdgeBy')+'\n'+actual('resizeAdjacentPanesBy'),context);
+const dividerValues={};const searchDivider={setAttribute:(key,value)=>dividerValues[key]=value};
+context.resizeAdjacentPanesBy('utility:search:resize','reader:one',-300,searchDivider);
+assert.deepEqual(sizes(),[920,300,630],'Search narrows to 300px without squeezing the adjacent Reader');
+context.resizeAdjacentPanesBy('utility:search:resize','reader:one',800,searchDivider);
+assert.deepEqual(sizes(),[920,1100,630],'Search grows beyond 900px while Assistant retains its minimum');
+assert.match(dividerValues['aria-valuetext'],/Column width 1100/i);
+context.syncResearchColumnLayout();
+assert.deepEqual(sizes(),[920,1100,630],'Chosen Search width survives subsequent automatic layout notifications');
+console.log('Search divider resizing passed: 300px minimum, expansion from either side and persistent manual widths.');
+
+// Sources reserves an attached internal rail without changing the base panes.
+panels=[makePane('reader:sources-test'),makePane('utility:analysis'),makePane('utility:search:sources-test')];
+panels.forEach(panel=>{panel.isConnected=true;panel.classList.toggle=(name,on)=>on?panel.classList.add(name):panel.classList.remove(name);});
+track.clientWidth=2804;context.window.innerWidth=2804;workflow='research';
+state.paneWeights={};state.researchColumnWidthsManual=false;delete track._researchColumnLayout;
+context.syncResearchColumnLayout();const beforeSources=sizes();
+context.saveWorkspaceState=()=>{};context.requestAnimationFrame=callback=>callback();
+vm.runInContext(actual('setAssistantSourcesRail'),context);
+let reveals=0;const sourcesRail={isConnected:true,scrollIntoView(){reveals++;}};
+context.setAssistantSourcesRail(panels[1],true,sourcesRail);
+assert.deepEqual(sizes(),beforeSources,'Opening sources never narrows the Assistant or neighboring panes');
+assert.equal(panels[1].dataset.assistantSourcesWidth,'300');assert.equal(reveals,1);
+assert.equal(state.paneWeights['utility:analysis'],beforeSources[1],'Saved pane weights exclude the temporary source rail');
+context.setAssistantSourcesRail(panels[1],true,sourcesRail,{reveal:false});
+assert.deepEqual(sizes(),beforeSources,'Updating the answer in an open rail never adds width again');
+context.setAssistantSourcesRail(panels[1],false,sourcesRail);
+assert.deepEqual(sizes(),beforeSources,'Closing the source rail keeps the original base dimensions');
+context.setAssistantSourcesRail(panels[1],true,sourcesRail,{reveal:false});
+context.syncResearchColumnLayout({reset:true});
+assert(Math.abs(sizes().reduce((sum,width)=>sum+width,304)-track.clientWidth)<1e-8,'Explicit auto-fit reserves the attached 300px rail');
+const resized=sizes();context.setAssistantSourcesRail(panels[1],false,sourcesRail);
+assert(sizes().every((width,index)=>width>=resized[index]),'Closing after an explicit reset may fill available space but never narrows a pane');
+assert.equal(panels[1].dataset.assistantSourcesWidth,'0');
+console.log('Assistant source geometry passed: reserved width, unchanged chat/neighbors, repeat selection, reset and close.');
+
+let finishMotion;
+sourcesRail.getAnimations=()=>[{finished:new Promise(resolve=>{finishMotion=resolve;})}];
+const beforeReveal=reveals;
+context.setAssistantSourcesRail(panels[1],true,sourcesRail);
+assert.equal(reveals,beforeReveal,'Workspace scrolling waits for the source rail to finish expanding');
+finishMotion();await new Promise(resolve=>setImmediate(resolve));
+assert.equal(reveals,beforeReveal+1);
+context.setAssistantSourcesRail(panels[1],false,sourcesRail);
+context.setAssistantSourcesRail(panels[1],true,sourcesRail);
+context.setAssistantSourcesRail(panels[1],false,sourcesRail);
+finishMotion();await new Promise(resolve=>setImmediate(resolve));
+assert.equal(reveals,beforeReveal+1,'Closing during the motion cannot cause a late workspace scroll');
+console.log('Source rail motion passed: reveal after expansion and no late scroll when closing.');
+
+// Conversation history reserves its own 265px beyond the collapsed 35px
+// control. Neither rail becomes a saved base width or resizes another pane.
+vm.runInContext(actual('setAssistantHistoryRail'),context);
+state.researchColumnWidthsManual=false;
+panels[1].dataset.assistantSourcesWidth='0';
+context.setAssistantHistoryRail(panels[1],true,{initial:true});
+assert.equal(panels[1].dataset.assistantHistoryWidth,'265');
+assert.equal(state.researchColumnWidthsManual,false,'Initial list restoration retains automatic-fit mode');
+const historyBases=sizes();
+context.setAssistantHistoryRail(panels[1],false);
+assert.deepEqual(sizes(),historyBases,'Closing history preserves every visible base pane');
+assert.equal(state.researchColumnWidthsManual,true,'A user toggle freezes the current column widths');
+context.setAssistantHistoryRail(panels[1],true);
+assert.deepEqual(sizes(),historyBases,'Opening history adds workspace space without taking column width');
+assert.equal(state.paneWeights['utility:analysis'],historyBases[1]);
+context.setAssistantSourcesRail(panels[1],true,sourcesRail,{reveal:false});
+assert.deepEqual(sizes(),historyBases,'History and Sources can both open beside the same base conversation');
+assert.equal(Number(panels[1].dataset.assistantHistoryWidth)+Number(panels[1].dataset.assistantSourcesWidth),565);
+context.setAssistantHistoryRail(panels[1],false);
+assert.equal(panels[1].dataset.assistantSourcesWidth,'300','Closing history never closes Sources');
+context.setAssistantHistoryRail(panels[1],true);
+context.syncResearchColumnLayout({reset:true});
+assert(Math.abs(sizes().reduce((sum,width)=>sum+width,569)-track.clientWidth)<1e-8,'Explicit auto-fit reserves both side rails');
+console.log('Conversation history geometry passed: independent reserved width, stable base panes on open/close, compatible Sources, initial restore and explicit auto-fit.');
+
+// Restore must use defaults, not drag minimums, when the open columns cannot
+// fit. The 300px Search minimum remains available for an intentional resize.
+for (const available of [1600, 3063, 4200]) {
+  panels = ['reader:one','reader:two','utility:analysis','utility:search:restore','utility:calculator'].map(makePane);
+  panels[2].dataset.assistantSourcesWidth = '300';
+  collapsed.clear();
+  state.paneWeights = {'reader:one':800,'reader:two':800,'utility:analysis':1100,'utility:search:restore':300,'utility:calculator':600};
+  state.researchColumnWidthsManual = true;
+  context.activeWorkspaceID = 'project:restore-search';
+  context.window.innerWidth = track.clientWidth = available;
+  delete track._researchColumnLayout;
+  context.syncResearchColumnLayout();
+  assert.equal(sizes()[3],300,'A deliberately narrow Search remains 300px before Restore');
+  await context.resetVisibleColumnWidths();
+  if (available < 3686) {
+    assert.deepEqual(sizes(),[630,630,920,600,600],'Restore uses a 600px Search and scrolls instead of squeezing it');
+    assert.equal(track.dataset.researchColumnSizing,'overflow');
+    assert.equal(state.paneWeights['utility:search:restore'],600);
+    context.syncResearchColumnLayout();
+    assert.equal(sizes()[3],600,'Later layout updates retain the restored Search default');
+  } else {
+    assert.equal(track.dataset.researchColumnSizing,'fit');
+    assert(Math.abs(sizes().reduce((sum,width)=>sum+width,306)-available)<1e-8,'A wide desk still distributes all remaining space');
+  }
+}
+console.log('Restore Search regression passed: 600px default in overflow with Sources, 300px manual minimum, stable subsequent updates and full fit on a wide desk.');
