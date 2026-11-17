@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import {webcrypto} from 'node:crypto';
+import {documentFixture} from './helpers/workflow-dom.mjs';
 
 const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const cleanup = app.slice(app.indexOf('async function deleteLocalWorkboard('), app.indexOf('function accountScopedWorkboardProjectIDs('));
@@ -38,7 +39,7 @@ for (const mode of ['existing', 'missing', 'unavailable', 'blocked', 'transactio
   } };
   const context = vm.createContext({
     crypto: webcrypto,
-    document: { body: {} }, prepareRecoverableDeletion: async () => {},
+    document: { ...documentFixture(), body: {} }, prepareRecoverableDeletion: async () => {},
     indexedDB, state, workboardMounts: new Map(), disposeProjectWorkboardMount() {},
     loadWorkboardModule() { throw new Error('Removed bundle must never load'); },
     requirePrivateWorkspaceWritable() {}, captureAccountRequest: () => 1, requireCurrentAccountRequest() {},

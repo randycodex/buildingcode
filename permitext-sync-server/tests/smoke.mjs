@@ -1539,10 +1539,10 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.search-jump-tile\s*\{/) &&
       !/(?:^|;)\s*(?:min-)?height:\s*\d+px/.test(workspaceStyles.text.match(/\.search-jump-tile\s*\{([^}]*)\}/)?.[1] || "") &&
-        workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?max-height: 4\.05em;[\s\S]*?line-height: 1\.35;[\s\S]*?-webkit-line-clamp: 3;/) &&
+        workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?max-height: 2\.96em;[\s\S]*?line-height: 1\.48;[\s\S]*?-webkit-line-clamp: 2;/) &&
         workspaceStyles.text.match(/\.search-results\.is-history:not\(\.is-split\) \{[\s\S]*?grid-template-rows: minmax\(0, 1fr\);[\s\S]*?overflow: hidden;/) &&
         workspaceStyles.text.match(/\.search-results\.is-history:not\(\.is-split\) \.search-jump-list \{[\s\S]*?max-height: none;[\s\S]*?overflow-y: auto;/),
-      "Recently Viewed previews should reserve three complete lines without clipping the last line."
+      "Recently Viewed previews should show at most two complete lines without clipping the last line."
     );
     assert(
       workspaceStyles.text.match(/\.search-recent-popover \{[\s\S]*?position: absolute;[\s\S]*?opacity: 0;[\s\S]*?transform: translateY\(-6px\) scale\(0\.985\);[\s\S]*?transition: opacity 180ms ease, transform 260ms cubic-bezier\(0\.22, 1, 0\.36, 1\);/) &&
@@ -2691,15 +2691,15 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
         workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-x: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
-        workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-1\);/) &&
-        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
-        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?padding: calc\(var\(--space-1\) \+ 12px\) var\(--panel-padding\);/) &&
+        workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-4\);/) &&
+        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?border: 0;[\s\S]*?border-radius: 8px;[\s\S]*?background: transparent;/) &&
+        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: var\(--space-1\);[\s\S]*?padding: 12px;/) &&
         workspaceScript.text.includes('code.className = "search-jump-code"') &&
         workspaceScript.text.includes("isNestedListParagraph = !rawPreview && Boolean(titleWithoutNumber)") &&
         workspaceScript.text.includes('String(entry.sectionNumber || "Paragraph").trim()') &&
         workspaceScript.text.includes('preview.className = "search-jump-preview"') &&
-        workspaceScript.text.includes("openButton.append(code, title, preview)") &&
-        workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?-webkit-line-clamp: 3;/) &&
+        workspaceScript.text.includes("openButton.append(title, metadata, preview)") &&
+        workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?-webkit-line-clamp: 2;/) &&
         !workspaceScript.text.includes('number.className = "search-jump-number"'),
       "Search history lists no longer use the requested heading size and independent vertical scrolling."
     );
@@ -3014,7 +3014,6 @@ async function main() {
         workspaceStyles.text.match(/\.saved-chapter-header strong,\s*\.saved-chapter-header span \{\s*color: var\(--code-accent\);/) &&
         workspaceStyles.text.includes(".saved-inline-filters") &&
         workspaceStyles.text.match(/\.search-jump-section \{[\s\S]*?grid-template-rows: minmax\(0, 1fr\);/) &&
-        workspaceStyles.text.match(/\.search-jump-tile:last-child \{[\s\S]*?border-bottom: 0;/) &&
         workspaceStyles.text.includes(".saved-paragraph-preview") &&
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes(".saved-section-meta"),

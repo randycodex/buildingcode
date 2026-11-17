@@ -48,6 +48,7 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     state, track, notebookReferenceTransition:undefined, activeWorkspaceID: 'test', CSS: { escape: value => value }, researchColumnsLayout, notebookColumnsLayout,
     getComputedStyle:()=>({paddingLeft:'1px',paddingRight:'1px',getPropertyValue:()=> '800px'}),
     currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400, reconcileNotebookReferences:()=>false,
+    activePaneIDs: () => panes.map(pane => pane.dataset.paneId), workflowPaneIsVisible: () => true,
     defaultUtilityPaneWidth: 400, defaultResearchPaneWidth: 920,
     assistantHistoryOnlyPane: id => id === 'utility:analysis', paneIsCollapsed: id => collapsed.has(id),
     defaultPaneWidthForID: () => 600, isFlexibleReaderPaneID: id => id.startsWith('reader:'),
@@ -118,7 +119,7 @@ assert.deepEqual(pair.widths(), [1260, 1200], 'Dragging changes only the precedi
 assert.equal(pair.saves, 1); assert.equal(pair.handlers.size, 0);
 pair.panes.push(pair.makePane('reader:two'), pair.makePane('reader:three'));
 pair.context.syncResearchColumnLayout();
-assert.deepEqual(pair.widths(), [1260, 1200, 630, 630], 'Adding columns preserves manually resized widths');
+assert.deepEqual(pair.widths(), [508, 630, 630, 630], 'Opening more columns automatically shares the desk down to each minimum');
 pair.context.syncResearchColumnLayout({reset:true});
 assert.deepEqual(pair.widths(), [508, 630, 630, 630], 'Explicit reset shares the available width while preserving Reader minimums');
 assert.equal(pair.context.maximumPaneWidthForID('utility:search:one'), Infinity, 'Search retains manually expanded widths without a maximum');

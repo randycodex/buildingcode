@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261116-sources-hover-v2447";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261116-search-recent-section-colors-v2460";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261116-sources-hover-v2447";
+} from "./offline-storage.js?v=20261116-search-recent-section-colors-v2460";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -7281,20 +7281,28 @@ function syncResearchColumnLayout({ reset = false } = {}) {
   const previous = track._researchColumnLayout?.workspaceID === activeWorkspaceID
     ? track._researchColumnLayout : null;
   const changed = previous && previous.signature !== signature;
+  // Compare the intended columns, not hydration order or left-to-right order.
+  // Opening, closing or collapsing a column starts a new automatic fit.
+  const membership = activePaneIDs().filter(workflowPaneIsVisible)
+    .map(id => `${id}:${paneIsCollapsed(id)}`).sort().join('|');
+  const columnsChanged = previous && previous.membership !== membership;
   const requested = balanced.map(preferredWidth);
   const minimumWidths = balanced.map(panel => minimumPaneWidthForID(panel.dataset.paneId));
   let layout = researchColumnsLayout(requested, track.clientWidth, fixedWidth, dividerWidth,
     balanced.map(panel => /^utility:search(?::|$)/.test(panel.dataset.paneId) ? 900 : Infinity), minimumWidths);
   const resetWidths = reset || changed || previous?.fits && !layout.fits;
-  // Restored/user-selected widths remain authoritative through reordering and
-  // staged hydration. Only the explicit Reset layout action leaves manual mode.
-  const manual = state.researchColumnWidthsManual === true && !reset;
+  // Real divider choices survive refresh/reordering. A rail toggle only holds
+  // geometry temporarily; it must not persist a manual layout with empty space.
+  // Old clients also saved manual mode for untouched default widths.
+  const defaultWidths = balanced.map(panel => constrainPaneWidth(panel.dataset.paneId, defaultPaneWidthForID(panel.dataset.paneId)));
+  const untouchedDefaults = !previous && requested.every((width, index) => width === defaultWidths[index]);
+  const manual = state.researchColumnWidthsManual === true && !reset && !columnsChanged && !untouchedDefaults;
+  const frozen = Boolean(previous?.frozen && !reset && !columnsChanged && previous.availableWidth === track.clientWidth);
   state.researchColumnWidthsManual = Boolean(manual);
-  if (manual) layout = { fits: false, widths: requested };
-  // Restore returns to usable defaults when the desk cannot fit. Minimums
-  // only bound manual dragging; using them here squeezed Search to 300px.
-  else if (!layout.fits && resetWidths) layout.widths = balanced.map(panel =>
-    constrainPaneWidth(panel.dataset.paneId, defaultPaneWidthForID(panel.dataset.paneId)));
+  if (manual || frozen) layout = { fits: false, widths: requested };
+  // Explicit Restore returns to defaults. Automatic column changes reach each
+  // minimum before overflowing, including the narrower manual Search bound.
+  else if (!layout.fits && resetWidths) layout.widths = reset ? defaultWidths : [...minimumWidths];
   // A fitted layout can be wider than the overflow limit. Reserve its shared
   // space for manual resizing so the first drag starts from the visible width.
   const resizeMaximums = manual ? previous?.resizeMaximums : layout.fits
@@ -7315,8 +7323,8 @@ function syncResearchColumnLayout({ reset = false } = {}) {
     panel.style.flex = `0 0 ${width}px`;
     if (!layout.fits) state.paneWeights[panel.dataset.paneId] = width;
   });
-  track.dataset.researchColumnSizing = manual ? "manual" : layout.fits ? "fit" : "overflow";
-  track._researchColumnLayout = { workspaceID: activeWorkspaceID, signature, fits: layout.fits, manual, resizeMaximums };
+  track.dataset.researchColumnSizing = manual ? "manual" : frozen ? "reserved" : layout.fits ? "fit" : "overflow";
+  track._researchColumnLayout = { workspaceID: activeWorkspaceID, signature, membership, availableWidth: track.clientWidth, fits: layout.fits, manual, frozen, resizeMaximums };
 }
 
 function setUtilityButtonStates() {
@@ -14065,9 +14073,49 @@ function recentViewSourceLabel(entry) {
   const version = recentViewSourceVersion(entry);
   const prefix = recentViewCodePrefix(entry);
   if (version && prefix && codeOptions.some(option => option.prefix === prefix && codeOptionVersion(option) === version)) {
-    return codeDisplayLabel(prefix, version);
+    const name = codeDisplayLabel(prefix, version).replace(/\s*\((?:19|20)\d{2}(?:\s+edition)?\)/gi, '');
+    return `${name} · ${researchCodeEdition({codePrefix: prefix, codeVersion: version})}`;
   }
   return `${prefix || "Code source"} · ${version ? "Source details unavailable" : "Edition not recorded"}`;
+}
+
+function recentViewTimestamp(entry) {
+  // Web and native history both store seconds since Apple's 2001 epoch.
+  const seconds = Number(entry?.viewedAt);
+  if (!Number.isFinite(seconds) || seconds <= 0) return null;
+  const timestamp = Date.UTC(2001, 0, 1) + seconds * 1000;
+  return Number.isFinite(new Date(timestamp).getTime()) ? timestamp : null;
+}
+
+function recentViewHistoryGroups(entries, now = new Date()) {
+  const today = researchHistoryDayIndex(now);
+  const groups = [
+    {label: 'Today', entries: []},
+    {label: 'Yesterday', entries: []},
+    {label: 'Earlier', entries: []}
+  ];
+  [...entries].sort((left, right) => (recentViewTimestamp(right) || 0) - (recentViewTimestamp(left) || 0)).forEach(entry => {
+    const timestamp = recentViewTimestamp(entry);
+    const day = timestamp === null ? null : researchHistoryDayIndex(timestamp);
+    const index = day !== null && day === today ? 0 : day !== null && day === today - 1 ? 1 : 2;
+    groups[index].entries.push(entry);
+  });
+  return groups.filter(group => group.entries.length);
+}
+
+function recentViewTimePresentation(entry, now = new Date()) {
+  const timestamp = recentViewTimestamp(entry);
+  if (timestamp === null) return null;
+  const date = new Date(timestamp);
+  const elapsed = now.getTime() - timestamp;
+  const day = researchHistoryDayIndex(date), today = researchHistoryDayIndex(now);
+  const label = elapsed >= 0 && elapsed < 60_000 ? 'Just now'
+    : day === today && elapsed >= 0 && elapsed < 3_600_000 ? `${Math.floor(elapsed / 60_000)}m ago`
+    : day === today && elapsed >= 0 ? `${Math.floor(elapsed / 3_600_000)}h ago`
+    : day === today - 1 ? new Intl.DateTimeFormat(undefined, {hour: 'numeric', minute: '2-digit'}).format(date)
+    : new Intl.DateTimeFormat(undefined, {month: 'short', day: 'numeric',
+      ...(date.getFullYear() !== now.getFullYear() ? {year: 'numeric'} : {})}).format(date);
+  return {label, dateTime: date.toISOString(), title: date.toLocaleString()};
 }
 
 function activeRecentViewProjectID() {
@@ -20885,7 +20933,16 @@ function cancelReaderInternalSearch(panel) {
   panel.dataset.readerSearchToken = `cancelled:${crypto.randomUUID()}`;
 }
 
+function rememberReaderInternalSearchPosition(panel, row = null, result = null) {
+  const view = panel._readerSearchView;
+  const content = panel.querySelector('.reader-content');
+  if (!view || !content?.classList.contains('is-searching-reader')) return;
+  view.scrollTop = content.scrollTop;
+  view.anchor = row ? {result, offset: row.getBoundingClientRect().top - content.getBoundingClientRect().top} : null;
+}
+
 async function restoreReaderAfterSearch(panel, reader) {
+  rememberReaderInternalSearchPosition(panel);
   if (!panel.querySelector(".reader-content")?.classList.contains("is-searching-reader")) {
     delete panel._readerSearchReturnPosition;
     return;
@@ -21007,7 +21064,7 @@ async function fetchReaderChapterSearch(reader, query, signal, { scope = "chapte
   return result.results.map(item => ({ ...item, chapterID: reader.chapterID, corpusRevision: result.corpusRevision }));
 }
 
-async function renderReaderInternalSearchResults(panel, reader, query, { allowDetached = false } = {}) {
+async function renderReaderInternalSearchResults(panel, reader, query, { allowDetached = false, resume = false, reveal } = {}) {
   const content = panel.querySelector(".reader-content");
   if (!content) return;
   const chapterOnly = !isProAccount();
@@ -21017,12 +21074,21 @@ async function renderReaderInternalSearchResults(panel, reader, query, { allowDe
   panel.dataset.readerSearchToken = searchToken;
   const current = () => (panel.isConnected || allowDetached) && panel.dataset.readerSearchToken === searchToken;
   if (needle.length < 2 || !reader.chapterID) {
+    delete panel._readerSearchView;
     if (content.classList.contains("is-searching-reader")) await restoreReaderAfterSearch(panel, reader);
     return;
   }
   if (!content.classList.contains("is-searching-reader")) {
     if (panel.isConnected) panel._readerSearchReturnPosition ||= captureReaderScrollPositions().get(panel.dataset.paneId);
   }
+  // Code-wide results keep their original order after opening another chapter.
+  // This view belongs only to this pane/tab, query, source and library epoch.
+  const searchKey = JSON.stringify([reader.activeTabID || reader.id, reader.codePrefix, reader.codeVersion,
+    chapterOnly ? reader.chapterID : null, needle]);
+  const previousView = panel._readerSearchView;
+  const retained = resume && previousView?.key === searchKey && previousView.generation === publicCodeRevision.generation
+    ? previousView : null;
+  delete panel._readerSearchView;
   const controller = new AbortController();
   panel._readerSearchAbort = controller;
   panel.dataset.readerRenderToken = searchToken;
@@ -21030,98 +21096,151 @@ async function renderReaderInternalSearchResults(panel, reader, query, { allowDe
   clear(content);
   content.classList.add("is-searching-reader");
   content.scrollTop = 0;
-  emptyReader(content, chapterOnly ? "Searching this chapter" : "Searching this code", chapterOnly
-    ? "Finding matches in the open chapter." : "Finding matches in this chapter and other chapters.");
-  let matches;
-  try {
-    matches = rankReaderSearchResults(await fetchReaderChapterSearch(reader, query, controller.signal, {
-      scope: chapterOnly ? "chapter" : "code"
-    }), query);
-  } catch {
-    if (current()) {
-      emptyReader(content, "Search could not load", "Try again, or close find to return to the code text.");
-      const retry = document.createElement("button");
-      retry.type = "button";
-      retry.className = "ghost-button search-empty-action";
-      retry.textContent = "Try again";
-      retry.addEventListener("click", () => void renderReaderInternalSearchResults(panel, reader, query));
-      content.querySelector(".reader-empty")?.append(retry);
+  let matches = retained?.matches;
+  if (!matches) {
+    emptyReader(content, chapterOnly ? "Searching this chapter" : "Searching this code", chapterOnly
+      ? "Finding matches in the open chapter." : "Finding matches in this chapter and other chapters.");
+    try {
+      matches = rankReaderSearchResults(await fetchReaderChapterSearch(reader, query, controller.signal, {
+        scope: chapterOnly ? "chapter" : "code"
+      }), query);
+    } catch {
+      if (current()) {
+        emptyReader(content, "Search could not load", "Try again, or close find to return to the code text.");
+        const retry = document.createElement("button");
+        retry.type = "button";
+        retry.className = "ghost-button search-empty-action";
+        retry.textContent = "Try again";
+        retry.addEventListener("click", () => void renderReaderInternalSearchResults(panel, reader, query));
+        content.querySelector(".reader-empty")?.append(retry);
+      }
+      return;
     }
-    return;
   }
   if (!current()) return;
   clear(content);
 
   const results = document.createElement("section");
-  results.className = "reader-internal-results";
+  results.className = "reader-internal-results search-family-card";
   if (!matches.length) {
     emptyReader(content, chapterOnly ? "No match in this chapter" : "No match in this code", chapterOnly
       ? "Try a shorter phrase, or choose another chapter." : "Try a shorter phrase, or use Search to look across codes.");
     return;
   }
 
-  let chapterID = null;
-  const chapterHeading = (title) => {
-    const heading = document.createElement("h3");
-    heading.className = "reader-internal-results-heading";
-    heading.textContent = title;
-    results.append(heading);
-  };
+  const expansionKey = searchKey;
+  if (panel._readerSearchExpansion?.key !== expansionKey) panel._readerSearchExpansion = {key: expansionKey, chapters: {}};
+  const expansion = panel._readerSearchExpansion.chapters;
   if (!matches.some(result => String(result.chapterID) === String(reader.chapterID))) {
-    chapterHeading("Current chapter");
     const empty = document.createElement("p");
     empty.className = "reader-internal-results-empty";
-    empty.textContent = "No matches in this chapter.";
+    empty.textContent = "No matches in the current chapter.";
     results.append(empty);
   }
-  matches.forEach((result) => {
-    if (String(result.chapterID) !== chapterID) {
-      chapterID = String(result.chapterID);
-      chapterHeading(chapterID === String(reader.chapterID) ? "Current chapter" : result.chapterTitle);
-    }
-    const row = document.createElement("button");
-    row.className = "reader-internal-result";
-    row.type = "button";
+  const chapters = new Map();
+  for (const result of matches) {
+    const chapterID = String(result.chapterID);
+    if (!chapters.has(chapterID)) chapters.set(chapterID, []);
+    chapters.get(chapterID).push(result);
+  }
+  // Keep the first-ranked chapter first and retain the original order within
+  // each chapter. Grouping never changes any source or navigation identity.
+  const chapterOptions = panel.querySelector('.chapter-select')?.options || [];
+  let restoreAnchor;
+  for (const [chapterID, chapterMatches] of chapters) {
+    const currentChapter = chapterID === String(reader.chapterID);
+    const chapterTitle = [...chapterOptions].find(option => option.value === chapterID)?.textContent || chapterMatches[0].chapterTitle || (currentChapter
+      ? panel.querySelector('.chapter-select')?.selectedOptions?.[0]?.textContent || 'Current chapter' : '');
+    const presentation = searchResultChapter({...chapterMatches[0], chapterTitle});
+    const chapter = document.createElement('details');
+    chapter.className = 'search-chapter-group reader-search-chapter';
+    chapter.dataset.chapterId = chapterID;
+    chapter.open = expansion[chapterID] === true;
+    const summary = document.createElement('summary');
+    summary.className = 'search-chapter-summary';
+    const title = document.createElement('span');
+    title.className = 'search-chapter-title';
+    title.textContent = `${presentation.label}${currentChapter && presentation.label !== 'Current chapter' ? ' · Current chapter' : ''}`;
+    summary.title = title.textContent;
+    const count = document.createElement('span');
+    count.className = 'search-chapter-count';
+    count.textContent = String(chapterMatches.length);
+    count.title = `${chapterMatches.length} ${chapterMatches.length === 1 ? 'match' : 'matches'}`;
+    summary.append(title, count);
+    const rows = document.createElement('div');
+    rows.className = 'search-chapter-body';
+    chapter.append(summary, rows);
+    chapter.addEventListener('toggle', () => { expansion[chapterID] = chapter.open; });
+    results.append(chapter);
+    for (const result of chapterMatches) {
+      const row = document.createElement("button");
+      row.className = "reader-internal-result";
+      row.type = "button";
+      if (retained?.anchor?.result === result) restoreAnchor = row;
 
-    const heading = document.createElement("strong");
-    appendHighlighted(heading, result.heading, result.headingHighlight);
-
-    const snippet = document.createElement("p");
-    appendHighlighted(snippet, result.snippet, result.snippetHighlight);
-
-    row.append(heading);
-    if (result.snippet) row.append(snippet);
-    row.addEventListener("click", async () => {
-      if (currentColumnWorkflowView() === 'notebook') {
-        await openSourceInReader({...result, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion},
-          paneIDForReader(reader), {sourceSurface: 'search-detail', searchQuery: query});
-        return;
+      const resultPresentation = searchResultPresentation({...result, title: result.heading || result.title,
+        codePrefix: reader.codePrefix, codeVersion: reader.codeVersion}, result.matchText || query);
+      const heading = document.createElement("strong");
+      heading.className = 'result-heading';
+      if (resultPresentation.number) {
+        const number = document.createElement('span');
+        number.className = 'result-number';
+        number.textContent = `${resultPresentation.number} `;
+        heading.append(number);
       }
-      const searchBox = panel.querySelector(".reader-internal-search");
-      const searchButton = panel.querySelector(".reader-internal-search-toggle");
-      panel.dataset.readerSearchToken = `selected:${Date.now()}`;
-      reader.chapterID = result.chapterID;
-      reader.sectionID = result.sectionID;
-      reader.sectionNumber = result.sectionNumber || "";
-      reader.title = result.title || "Reader";
-      reader.internalSearchQuery = query;
-      reader.internalSearchOpen = false;
-      reader.pendingSearchHighlightQuery = result.matchText;
-      reader.pendingSearchHighlightBlockID = result.blockID || "";
-      panel.dataset.pendingSearchHighlightQuery = result.matchText;
-      panel.dataset.pendingSearchHighlightBlockId = result.blockID || "";
-      reader.shouldSmoothScrollToSection = true;
-      updateBrowserSectionURL(reader.sectionID);
-      scheduleContinuitySync(reader);
-      if (searchBox) searchBox.hidden = true;
-      searchButton?.setAttribute("aria-pressed", "false");
-      saveWorkspaceState();
-      await refreshReaderContent(panel, reader, { expectedCorpusRevision: result.corpusRevision });
-    });
-    results.append(row);
-  });
+      const title = document.createElement('span');
+      title.className = 'result-title';
+      appendHighlighted(title, resultPresentation.heading, result.headingHighlight || query);
+      heading.append(title);
+
+      const snippet = document.createElement("p");
+      appendHighlighted(snippet, resultPresentation.excerpt, result.snippetHighlight || query);
+
+      row.append(heading);
+      if (resultPresentation.excerpt) row.append(snippet);
+      row.addEventListener("click", async () => {
+        rememberReaderInternalSearchPosition(panel, row, result);
+        if (currentColumnWorkflowView() === 'notebook') {
+          await openSourceInReader({...result, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion},
+            paneIDForReader(reader), {sourceSurface: 'search-detail', searchQuery: query});
+          return;
+        }
+        const searchBox = panel.querySelector(".reader-internal-search");
+        const searchButton = panel.querySelector(".reader-internal-search-toggle");
+        panel.dataset.readerSearchToken = `selected:${Date.now()}`;
+        reader.chapterID = result.chapterID;
+        reader.sectionID = result.sectionID;
+        reader.sectionNumber = result.sectionNumber || "";
+        reader.title = result.title || "Reader";
+        reader.internalSearchQuery = query;
+        reader.internalSearchOpen = false;
+        reader.pendingSearchHighlightQuery = result.matchText;
+        reader.pendingSearchHighlightBlockID = result.blockID || "";
+        panel.dataset.pendingSearchHighlightQuery = result.matchText;
+        panel.dataset.pendingSearchHighlightBlockId = result.blockID || "";
+        reader.shouldSmoothScrollToSection = true;
+        updateBrowserSectionURL(reader.sectionID);
+        scheduleContinuitySync(reader);
+        if (searchBox) searchBox.hidden = true;
+        searchButton?.setAttribute("aria-pressed", "false");
+        saveWorkspaceState();
+        await refreshReaderContent(panel, reader, { expectedCorpusRevision: result.corpusRevision });
+      });
+      rows.append(row);
+    }
+  }
 
   content.append(results);
+  content.scrollTop = retained?.scrollTop || 0;
+  const view = panel._readerSearchView = {key: searchKey, generation: publicCodeRevision.generation, matches, scrollTop: content.scrollTop};
+  if (restoreAnchor) {
+    // Measure after the find field's reveal finishes changing the viewport.
+    // A newer search or navigation owns the pane if that reveal was interrupted.
+    if (reveal) await reveal;
+    if (!current()) return;
+    content.scrollTop += restoreAnchor.getBoundingClientRect().top - content.getBoundingClientRect().top - retained.anchor.offset;
+    view.scrollTop = content.scrollTop;
+  }
 }
 
 function decorateCodeHTML(root) {
@@ -21449,7 +21568,7 @@ async function renderReader(reader, options = {}) {
       internalSearchInput.value = reader.internalSearchQuery || "";
       internalSearchClearButton.hidden = !internalSearchInput.value.trim();
       internalSearchInput.focus({ preventScroll: true });
-      await renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
+      await renderReaderInternalSearchResults(panel, reader, internalSearchInput.value, {resume: true, reveal: visibility});
       return;
     }
     cancelReaderInternalSearch(panel);
@@ -21616,6 +21735,7 @@ function searchRecentlyViewedEntries() {
   return entries
     .filter((entry) => Number(entry?.sectionID) > 0 && recentViewBelongsToProject(entry, projectID))
     .map((entry) => ({ ...entry, codePrefix: recentViewCodePrefix(entry) }))
+    .sort((left, right) => (recentViewTimestamp(right) || 0) - (recentViewTimestamp(left) || 0))
     .slice(0, recentViewLimit);
 }
 
@@ -21905,42 +22025,61 @@ async function renderSearchHistory(panel, instance, options = {}) {
     section.id = `search-jump-${instance.id}`;
     const list = document.createElement("div");
     list.className = "search-history-list search-history-scroll-list search-jump-list";
-    recentSections.forEach((entry) => {
-      const tile = document.createElement("article");
-      tile.className = `search-jump-tile code-theme-${codeTheme(entry.codePrefix || "BC")}`;
-      tile.dataset.recentViewIdentity = recentViewIdentity(entry);
-      const openButton = document.createElement("button");
-      openButton.type = "button";
-      openButton.className = "search-jump-open";
-      const code = document.createElement("span");
-      code.className = "search-jump-code";
-      code.textContent = recentViewSourceLabel(entry);
-      const title = document.createElement("strong");
-      title.textContent = entry.isNestedListParagraph
-        ? String(entry.sectionNumber || "Paragraph").trim()
-        : sectionDisplayTitle(entry.sectionNumber, entry.title, "Section");
-      const preview = document.createElement("span");
-      preview.className = "search-jump-preview";
-      preview.textContent = entry.previewText || "";
-      if (entry.previewText) markResearchSelectable(preview, entry);
-      openButton.append(code, title, preview);
-      openButton.addEventListener("click", () => {
-        if (window.getSelection && String(window.getSelection()).trim()) return;
-        void openRecentlyViewedInReader(instance, entry);
-      });
-      const openNewButton = document.createElement("button");
-      openNewButton.type = "button";
-      openNewButton.className = "icon-button search-open-new-reader";
-      openNewButton.setAttribute("aria-label", "Open in new Reader");
-      prependWorkspaceButtonIcon(openNewButton, "library-big");
-      openNewButton.title = "Open this source in an additional Reader beside Search";
-      openNewButton.addEventListener("click", () => {
-        void openSourceInReader(recentViewNavigationSource(entry), paneIDForUtilityInstance(instance), {
-          sourceSurface: "search", forceNewReader: true
+    const heading = document.createElement('h3');
+    heading.className = 'search-recent-heading';
+    heading.textContent = 'Recently viewed';
+    list.append(heading);
+    const now = new Date();
+    recentViewHistoryGroups(recentSections, now).forEach((group, index) => {
+      const groupSection = document.createElement('section');
+      groupSection.className = 'search-recent-group';
+      const groupHeading = document.createElement('h4');
+      groupHeading.className = 'search-recent-group-heading';
+      groupHeading.id = `search-recent-${instance.id}-${index}`;
+      groupHeading.textContent = group.label;
+      groupSection.setAttribute('aria-labelledby', groupHeading.id);
+      const groupItems = document.createElement('div');
+      groupItems.className = 'search-recent-group-items';
+      groupSection.append(groupHeading, groupItems);
+      list.append(groupSection);
+      group.entries.forEach((entry) => {
+        const tile = document.createElement("article");
+        tile.className = `search-jump-tile code-theme-${codeTheme(entry.codePrefix || "BC")}`;
+        tile.dataset.recentViewIdentity = recentViewIdentity(entry);
+        const openButton = document.createElement("button");
+        openButton.type = "button";
+        openButton.className = "search-jump-open";
+        const code = document.createElement("span");
+        code.className = "search-jump-code";
+        code.textContent = recentViewSourceLabel(entry);
+        const title = document.createElement("strong");
+        title.textContent = entry.isNestedListParagraph
+          ? String(entry.sectionNumber || "Paragraph").trim()
+          : sectionDisplayTitle(entry.sectionNumber, entry.title, "Section");
+        const preview = document.createElement("span");
+        preview.className = "search-jump-preview";
+        preview.textContent = entry.previewText || "";
+        if (entry.previewText) markResearchSelectable(preview, entry);
+        const metadata = document.createElement('span');
+        metadata.className = 'search-jump-meta';
+        metadata.append(code);
+        const viewed = recentViewTimePresentation(entry, now);
+        if (viewed) {
+          const time = document.createElement('time');
+          time.className = 'search-jump-time';
+          time.dateTime = viewed.dateTime;
+          time.title = viewed.title;
+          time.textContent = viewed.label;
+          metadata.append(time);
+        }
+        openButton.append(title, metadata, preview);
+        openButton.addEventListener("click", () => {
+          if (window.getSelection && String(window.getSelection()).trim()) return;
+          void openRecentlyViewedInReader(instance, entry);
         });
+        tile.append(openButton);
+        groupItems.append(tile);
       });
-      tile.append(openButton, openNewButton);
-      list.append(tile);
     });
     section.append(list);
     jumpSection = section;
@@ -27824,7 +27963,7 @@ function setAssistantHistoryRail(panel, expanded, {initial = false} = {}) {
   const width = expanded ? 265 : 0;
   const previous = Number(panel.dataset.assistantHistoryWidth) || 0;
   if (previous === width && panel.dataset.assistantHistoryWidth !== undefined) return;
-  if (!initial && previous !== width && window.innerWidth > 680) capturePaneResizeWidths();
+  if (!initial && previous !== width && window.innerWidth > 680) capturePaneResizeWidths({manual:false});
   panel.dataset.assistantHistoryWidth = String(width);
   panel.classList.toggle('has-history-rail', expanded);
   if (panel.isConnected) syncResearchColumnLayout();
@@ -27837,7 +27976,7 @@ function setAssistantSourcesRail(panel, expanded, rail, {reveal = true} = {}) {
   if (previous !== width) {
     // Reserve new workspace space rather than taking it from the conversation
     // or its neighbors. Saved pane weights continue to describe the base panes.
-    if (expanded && window.innerWidth > 680) capturePaneResizeWidths();
+    if (expanded && window.innerWidth > 680) capturePaneResizeWidths({manual:false});
     panel.dataset.assistantSourcesWidth = String(width);
     panel.classList.toggle('has-sources-rail', expanded);
     syncResearchColumnLayout();
@@ -35772,13 +35911,30 @@ async function deleteArchivedProjects(projects, options = {}) {
   if (!eligibleProjects.length) return false;
   const count = eligibleProjects.length;
   const recordLabel = folderRecordCountLabel(eligibleProjects);
-  const names = options.includeNames
-    ? `\n\n${eligibleProjects.map((project) => project.name || project.title || "Project").join("\n")}`
-    : "";
+  const content = document.createElement("div");
+  content.className = "project-trash-content";
+  const listHeading = document.createElement("h3");
+  listHeading.textContent = "Selected workspaces";
+  const list = document.createElement("ul");
+  list.className = "project-trash-list";
+  list.setAttribute("aria-label", "Selected workspaces");
+  list.tabIndex = 0;
+  for (const project of eligibleProjects) {
+    const item = document.createElement("li");
+    item.textContent = project.name || project.title || "Project";
+    list.append(item);
+  }
+  const scope = document.createElement("p");
+  scope.className = "project-trash-scope";
+  scope.textContent = "Passages and section notes move with these workspaces. Items used by another workspace stay.";
+  const recovery = document.createElement("p");
+  recovery.className = "project-trash-recovery";
+  recovery.textContent = "Restore from Manage workspaces → Deleted workspaces.";
+  content.append(listHeading, list, scope, recovery);
   const confirmed = await confirmWebWarning(
-    `Delete ${recordLabel}`,
-    `Move ${recordLabel} to Trash with passages and section notes that are not used by another workspace? Restore from Manage workspaces → Deleted workspaces within 30 days.${names}`,
-    { confirmLabel: "Move to Trash", container: warningContainer() }
+    `Move ${recordLabel} to Trash?`,
+    `You can restore ${count === 1 ? "it" : "them"} within 30 days.`,
+    { confirmLabel: "Move to Trash", container: warningContainer(), className: "project-trash-confirmation", content }
   );
   requireCurrentAccountRequest(requestIdentity);
   if (!confirmed) return false;
@@ -45691,7 +45847,7 @@ function updateAdjacentDividerValue(divider, previousWidth, nextWidth) {
   divider.setAttribute("aria-valuetext", `Left column ${Math.round(previousWidth)} pixels; right column ${Math.round(nextWidth)} pixels`);
 }
 
-function capturePaneResizeWidths() {
+function capturePaneResizeWidths({manual = true} = {}) {
   workspaceColumnExpansion?.restore();
   const panes = Array.from(track.querySelectorAll(".workspace-panel")).map((pane) => ({
     id: pane.dataset.paneId,
@@ -45700,10 +45856,13 @@ function capturePaneResizeWidths() {
     minWidth: minimumPaneWidthForID(pane.dataset.paneId)
   })).filter(({ startWidth, pane }) => startWidth > 0 && !pane.dataset.notebookReferenceCover);
   if (track._researchColumnLayout) {
-    track._researchColumnLayout.manual = true;
-    track.dataset.researchColumnSizing = "manual";
+    track._researchColumnLayout.manual = manual || state.researchColumnWidthsManual === true;
+    track._researchColumnLayout.frozen = !manual;
+    if (manual) track._researchColumnLayout.membership = activePaneIDs().filter(workflowPaneIsVisible)
+      .map(id => `${id}:${paneIsCollapsed(id)}`).sort().join('|');
+    track.dataset.researchColumnSizing = track._researchColumnLayout.manual ? "manual" : "reserved";
   }
-  if (currentColumnWorkflowView() === "research") state.researchColumnWidthsManual = true;
+  if (manual && currentColumnWorkflowView() === "research") state.researchColumnWidthsManual = true;
   // Freeze the currently shared space before changing one column. Otherwise spare
   // flex space is redistributed into unrelated columns during the drag.
   panes.forEach(({ id, pane, startWidth }) => {

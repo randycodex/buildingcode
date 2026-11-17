@@ -24,7 +24,7 @@ const context=vm.createContext({...recentSearchScope,...scope,syncCodeVersion,de
   snippetWithoutDuplicateTitle:entry=>entry.snippet,
 });
 const functions=['activeRecentViewProjectID','recentViewSourceVersion','recentViewCodePrefix','recentViewIdentity',
-  'recentViewEntryForReader','mergeRecentlyViewedDetails','recordRecentlyViewedReader','searchRecentlyViewedEntries',
+  'recentViewTimestamp','recentViewEntryForReader','mergeRecentlyViewedDetails','recordRecentlyViewedReader','searchRecentlyViewedEntries',
   'continuityRecentEntries','continuityRecentSearches','continuityRecentSearchHistory','outgoingRecentSearchHistory',
   'continuityValuesForReader','scheduleContinuitySync','scheduleRecentSearchContinuitySync','applyRemoteContinuityIfNewer',
   'recentViewNavigationSource','hydrateSearchRecentlyViewedEntries'];

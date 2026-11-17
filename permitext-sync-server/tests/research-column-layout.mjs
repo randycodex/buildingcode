@@ -47,6 +47,8 @@ const track = { dataset: {}, clientWidth: 2403, inert: false,
 const collapsed = new Set();
 const context = vm.createContext({notebookReferenceTransition:undefined, workspaceColumnExpansion: undefined, state, track, activeWorkspaceID: 'test', window: { innerWidth: 2403 }, researchColumnsLayout,
   currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400,
+  activePaneIDs: () => panels.map(panel => panel.dataset.paneId),
+  workflowPaneIsVisible: id => !panels.find(panel => panel.dataset.paneId === id)?.classList.contains('is-workflow-hidden'),
   assistantHistoryOnlyPane: id => id === 'utility:analysis:history', paneIsCollapsed: id => collapsed.has(id), defaultPaneWidthForID: id => id.startsWith('reader:') ? 630 : 600,
   applyPaneWeight(panel, id) { panel.style.flex = `1 0 ${state.paneWeights[id] || 600}px`; } });
 vm.runInContext(['minimumPaneWidthForID', 'maximumPaneWidthForID', 'constrainPaneWidth', 'syncNotebookColumnLayout', 'syncResearchColumnLayout', 'capturePaneResizeWidths'].map(actual).join('\n'), context);
@@ -60,14 +62,14 @@ assert.deepEqual(sizes(), [2399/3, 2399/3, 2399/3]);
 panels.push(makePane('reader:three'));
 track.clientWidth = 2005;
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [600,630,630,630], 'A genuinely narrow viewport scrolls with usable default widths');
+assert.deepEqual(sizes(), [300,630,630,630], 'Automatic layout reaches each minimum before scrolling');
 assert.equal(track.dataset.researchColumnSizing, 'overflow');
 assert.equal(panels[0].style.maxWidth, 'none');
 assert.equal(panels[1].style.maxWidth, 'none', 'Overflow Readers have no CSS maximum');
 state.paneWeights['reader:one'] = 1800;
 delete track._researchColumnLayout;
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [600,1800,630,630], 'Stored Reader widths remain uncapped in overflow');
+assert.deepEqual(sizes(), [300,1800,630,630], 'Stored Reader widths remain uncapped in overflow');
 context.capturePaneResizeWidths();
 state.paneWeights['utility:search:one'] = 850;
 state.paneWeights['reader:one'] = 1800;
@@ -233,6 +235,8 @@ collapsed.clear();
 panels = ['utility:search:manual','utility:calculator'].map(makePane);
 state.paneWeights = {'utility:calculator':648,'utility:search:manual':629};
 state.researchColumnWidthsManual = true;
+const stagedMembership = [...panels.map(panel=>panel.dataset.paneId),'reader:staged'];
+context.activePaneIDs = () => stagedMembership;
 context.syncResearchColumnLayout();
 panels.reverse();
 context.syncResearchColumnLayout();
@@ -243,6 +247,7 @@ state.paneWeights['reader:staged']=710;
 context.syncResearchColumnLayout();
 assert.deepEqual(sizes(),[648,629,710], 'Staged hydration keeps saved widths rather than resetting every pane');
 console.log('Reordering and staged hydration preserve the manual preference for subsequent cross-browser sync.');
+context.activePaneIDs = () => panels.map(panel=>panel.dataset.paneId);
 
 // Cold Assistant restoration uses the same equal-share layout as Reader/Search,
 // while its history + composer minimum remains intact on narrower desktops.
@@ -355,7 +360,8 @@ assert.equal(state.researchColumnWidthsManual,false,'Initial list restoration re
 const historyBases=sizes();
 context.setAssistantHistoryRail(panels[1],false);
 assert.deepEqual(sizes(),historyBases,'Closing history preserves every visible base pane');
-assert.equal(state.researchColumnWidthsManual,true,'A user toggle freezes the current column widths');
+assert.equal(state.researchColumnWidthsManual,false,'A list toggle never persists manual sizing');
+assert.equal(track.dataset.researchColumnSizing,'reserved','A list toggle temporarily holds geometry');
 context.setAssistantHistoryRail(panels[1],true);
 assert.deepEqual(sizes(),historyBases,'Opening history adds workspace space without taking column width');
 assert.equal(state.paneWeights['utility:analysis'],historyBases[1]);
@@ -395,3 +401,54 @@ for (const available of [1600, 3063, 4200]) {
   }
 }
 console.log('Restore Search regression passed: 600px default in overflow with Sources, 300px manual minimum, stable subsequent updates and full fit on a wide desk.');
+
+// Regression: rail toggles used to save manual=true for default-width panes.
+// Reopening that two-column workspace left over 1,000px unused on the right.
+workflow='research';context.activeWorkspaceID='project:automatic-recovery';
+context.window.innerWidth=track.clientWidth=3063;
+collapsed.clear();
+panels=['reader:gap','utility:analysis:gap'].map(makePane);
+panels.forEach(panel=>{panel.isConnected=true;panel.classList.toggle=(name,on)=>on?panel.classList.add(name):panel.classList.remove(name);});
+panels[1].dataset.assistantHistoryWidth='265';
+state.paneWeights={'reader:gap':630,'utility:analysis:gap':920};
+state.researchColumnWidthsManual=true;delete track._researchColumnLayout;
+context.syncResearchColumnLayout();
+const occupied=()=>sizes().reduce((sum,width,index)=>sum+width+(Number(panels[index].dataset.assistantHistoryWidth)||0)+(Number(panels[index].dataset.assistantSourcesWidth)||0),panels.length+1);
+const fillsDesk=()=>assert(Math.abs(occupied()-track.clientWidth)<1e-8,'Fitting columns use the full desk with no trailing gap');
+fillsDesk();assert.equal(track.dataset.researchColumnSizing,'fit');
+assert.equal(state.researchColumnWidthsManual,false,'Legacy default widths recover automatic mode');
+const beforeToggle=sizes();
+context.setAssistantHistoryRail(panels[1],false);
+assert.deepEqual(sizes(),beforeToggle,'The chat stays stable while its conversation list closes');
+assert.equal(state.researchColumnWidthsManual,false);
+context.syncResearchColumnLayout();assert.deepEqual(sizes(),beforeToggle,'Same-column refresh preserves the temporary hold');
+context.setAssistantHistoryRail(panels[1],true);fillsDesk();
+
+// A newly opened column ends the temporary hold, then a closed column fills
+// the newly available width. Reordering and hydration were tested above.
+panels.push(makePane('utility:search:gap'));state.paneWeights['utility:search:gap']=600;
+context.syncResearchColumnLayout();fillsDesk();
+assert.equal(track.dataset.researchColumnSizing,'fit');
+panels.push(makePane('utility:calculator'));state.paneWeights['utility:calculator']=600;
+context.syncResearchColumnLayout();fillsDesk();
+assert(sizes().every((width,index)=>width>=context.minimumPaneWidthForID(panels[index].dataset.paneId)));
+panels.push(makePane('reader:overflow'));state.paneWeights['reader:overflow']=630;
+context.syncResearchColumnLayout();
+assert.equal(track.dataset.researchColumnSizing,'overflow');
+assert.deepEqual(sizes(),[630,920,300,600,630],'Only after all automatic columns reach minimums does the desk scroll');
+panels.pop();context.syncResearchColumnLayout();fillsDesk();
+panels.pop();context.syncResearchColumnLayout();fillsDesk();
+
+// A real divider still resizes only its column and persists through refresh.
+context.resizePaneEdgeBy('utility:search:gap',100,searchDivider);
+const manuallyResized=sizes();context.syncResearchColumnLayout();
+assert.deepEqual(sizes(),manuallyResized);assert.equal(state.researchColumnWidthsManual,true);
+panels.pop();context.syncResearchColumnLayout();fillsDesk();
+assert.equal(state.researchColumnWidthsManual,false,'Closing a column starts a fresh automatic fit');
+const beforeSourcesToggle=sizes();
+context.setAssistantSourcesRail(panels[1],true,{isConnected:true},{reveal:false});
+assert.deepEqual(sizes(),beforeSourcesToggle);assert.equal(state.researchColumnWidthsManual,false);
+context.setAssistantSourcesRail(panels[1],false,{isConnected:true},{reveal:false});
+assert.deepEqual(sizes(),beforeSourcesToggle);
+context.window.innerWidth=track.clientWidth=3400;context.syncResearchColumnLayout();fillsDesk();
+console.log('Automatic-fit recovery passed: legacy gap, stable rail toggles, column open/close, minimum-only overflow, actual divider persistence and wider viewport recovery.');
