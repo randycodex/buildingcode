@@ -9,6 +9,26 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
   title.textContent = label;
   header.append(title);
 
+  const maximumWidth = () => {
+    const available = availableWidth();
+    if (!available) return maximumSidebarWidth;
+    return Math.max(minimumWidth, Math.min(maximumSidebarWidth, available - reservedWidth() - documentMinimumWidth() - 1));
+  };
+  const currentWidth = () => Number(panel.dataset[`${kind}Width`]) || defaultWidth;
+  const resize = createReportResizeDivider({
+    shell, element, kind, label, defaultWidth: () => defaultWidth, minimumWidth: () => minimumWidth, maximumWidth,
+    currentWidth, resizeDirection,
+    onResize(width, drag) {
+      panel.dataset[`${kind}Width`] = String(width);
+      panel.style.setProperty(`--report-${kind}-width`, `${width}px`);
+      onResize(drag);
+    }
+  });
+  return {header, ...resize};
+}
+
+export function createReportResizeDivider({shell, element, kind, label, defaultWidth,
+  minimumWidth, maximumWidth, currentWidth, resizeDirection = 1, onResize, onCommit = () => {}, onReset}) {
   const divider = document.createElement('div');
   divider.className = `report-${kind}-divider`;
   divider.tabIndex = 0;
@@ -17,34 +37,32 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
   divider.setAttribute('aria-label', `Resize ${label}`);
   divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to reset';
 
-  const maximumWidth = () => {
-    const available = availableWidth();
-    if (!available) return maximumSidebarWidth;
-    return Math.max(minimumWidth, Math.min(maximumSidebarWidth, available - reservedWidth() - documentMinimumWidth() - 1));
-  };
-  const currentWidth = () => Number(panel.dataset[`${kind}Width`]) || defaultWidth;
+  const clampWidth = width => Math.max(minimumWidth(), Math.min(maximumWidth(), width));
   const updateControls = () => {
-    const width = Math.max(minimumWidth, Math.min(currentWidth(), maximumWidth()));
-    divider.setAttribute('aria-valuemin', String(minimumWidth));
+    const width = clampWidth(currentWidth());
+    divider.setAttribute('aria-valuemin', String(minimumWidth()));
     divider.setAttribute('aria-valuemax', String(maximumWidth()));
     divider.setAttribute('aria-valuenow', String(Math.round(width)));
     divider.setAttribute('aria-valuetext', `${Math.round(width)} pixels wide`);
   };
   const resize = requested => {
-    const width = Math.max(minimumWidth, Math.min(maximumWidth(), requested));
-    panel.dataset[`${kind}Width`] = String(width);
-    panel.style.setProperty(`--report-${kind}-width`, `${width}px`);
-    onResize(drag);
+    onResize(clampWidth(requested), drag);
     updateControls();
+    if (!drag) onCommit();
   };
   divider.addEventListener('focus', updateControls);
-  divider.addEventListener('dblclick', () => resize(defaultWidth));
+  divider.addEventListener('dblclick', () => {
+    if (!onReset) { resize(defaultWidth()); return; }
+    onReset();
+    updateControls();
+    onCommit();
+  });
   divider.addEventListener('keydown', event => {
     const step = event.shiftKey ? 80 : 24;
     const requests = {
       ArrowLeft: currentWidth() - resizeDirection * step,
       ArrowRight: currentWidth() + resizeDirection * step,
-      Home: minimumWidth,
+      Home: minimumWidth(),
       End: maximumWidth()
     };
     if (!(event.key in requests)) return;
@@ -68,13 +86,14 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
     drag = null;
     shell.classList.remove(`is-${kind}-resizing`);
     if (divider.hasPointerCapture(event.pointerId)) divider.releasePointerCapture(event.pointerId);
+    onCommit();
   };
   divider.addEventListener('pointerup', finishDrag);
   divider.addEventListener('pointercancel', finishDrag);
   divider.addEventListener('lostpointercapture', finishDrag);
   shell.classList.remove(`is-${kind}-resizing`);
   updateControls();
-  return { header, divider, update: updateControls };
+  return { divider, update: updateControls };
 }
 
 export function createReportLibraryControls(options) {

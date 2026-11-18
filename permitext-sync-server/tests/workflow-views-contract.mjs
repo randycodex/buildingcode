@@ -155,13 +155,14 @@ assert.equal(referenceClasses.has('has-reference-readers'),false);
 console.log('Report constraints passed: 600px document minimum, expanded Sources, 300px optional outline, retained hidden Readers and Account isolation.');
 
 // Restore shared workspace and Report widths in the same action.
-let reportReady=true, reportResets=0, saves=0;
+let reportReady=true, reportResets=0, widthResets=0, saves=0;
 const fit = {}, actions = [{},{}];
 const reportPanel = {querySelector: () => reportReady ? {} : null};
 const layoutTrack = {scrollLeft:220,scrollWidth:1000,clientWidth:700,querySelector:()=>reportReady ? reportPanel : null,querySelectorAll:()=>[]};
 const layoutState = {paneWeights:{'reader:one':900},columnGroups:[]};
 const layoutContext=vm.createContext({
   isProAccount:()=>true,currentColumnWorkflowView:()=> 'research',fitColumnsButton:fit,
+  reportScreen:{resetWidth(){widthResets++;}},
   document:{querySelector:()=>reportReady?reportPanel:null,querySelectorAll:()=>actions},
   defaultActivePaneIDs:()=>['reader:one'],activePaneIDs:()=>['reader:one'],workflowPaneIsVisible:()=>true,defaultPaneWidthForID:()=>630,
   resetReportColumnWidths:panel=>{assert.equal(panel,reportPanel);reportResets++;},
@@ -174,6 +175,7 @@ assert.equal(fit.disabled,false);
 assert.ok(actions.every(button=>!button.disabled && !button.hidden));
 await layoutContext.resetVisibleColumnWidths();
 assert.equal(reportResets,1);assert.equal(layoutState.paneWeights['reader:one'],630);assert.equal(saves,1);assert.equal(layoutTrack.scrollLeft,220);
+assert.equal(widthResets,1,'Reset layout clears the outer Report width too.');
 reportReady=false;layoutContext.updateWorkspaceLayoutControls();assert.equal(fit.disabled,false,'A loading Report does not disable the Reader layout controls.');
 console.log('Reset shared layout passed: Reader and Report widths, retained scroll and available toolbar controls.');
 

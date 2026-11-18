@@ -125,3 +125,25 @@ assert.equal(panel.dataset.versionsWidth, '400');
 versionControls.divider.events.keydown({key: 'ArrowLeft', preventDefault() {}});
 assert.equal(panel.dataset.versionsWidth, '424', 'Keyboard left moves the right-hand column boundary left');
 console.log('Versions width passed: left-edge drag direction and cancellation.');
+
+let reportWidth = 1320;
+let commits = 0;
+const {divider} = c.createReportResizeDivider({
+  shell, element: {getBoundingClientRect: () => ({width: reportWidth})}, kind: 'workspace', label: 'Report column',
+  defaultWidth: () => 1320, minimumWidth: () => 1162, maximumWidth: () => 2400,
+  currentWidth: () => reportWidth, resizeDirection: -1,
+  onResize: width => { reportWidth = width; },
+  onCommit: () => { commits++; }
+});
+divider.events.pointerdown(pointer(9, 1320));
+divider.events.pointermove(pointer(9, 900));
+assert.equal(reportWidth, 1740, 'Dragging the Report divider left widens the column.');
+assert.equal(commits, 0, 'Persist the width after the drag ends.');
+divider.events.pointerup(pointer(9, 900));
+assert.equal(commits, 1);
+divider.events.keydown({key: 'Home', preventDefault() {}});
+assert.equal(reportWidth, 1162);
+divider.events.keydown({key: 'End', preventDefault() {}});
+assert.equal(reportWidth, 2400);
+divider.events.dblclick();
+assert.equal(reportWidth, 1320);

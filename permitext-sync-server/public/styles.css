@@ -21851,12 +21851,29 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .note-picker-host:has(.research-note-destination[hidden]) { display: none; }
 
 .panel-track > .shared-report-column {
-  --shared-report-basis: 1320px;
+  --default-report-width: 1320px;
+  --shared-report-basis: var(--preferred-report-width, var(--default-report-width));
   flex: 1 0 min(100%, var(--shared-report-basis));
+  position: relative;
   min-width: 0;
   border-inline-start: 1px solid var(--border);
 }
+.panel-track > .shared-report-column[data-report-resized] { flex-grow: 0; }
 .panel-track > .shared-report-column[hidden] { display: none; }
+.shared-report-column > .report-workspace-divider {
+  position: absolute;
+  inset: 0 auto 0 -1px;
+  z-index: 14;
+  width: 12px;
+  cursor: col-resize;
+  touch-action: none;
+}
+.shared-report-column > .report-workspace-divider:is(:hover, :focus-visible),
+.shared-report-column.is-workspace-resizing > .report-workspace-divider {
+  border-inline-start: 1px solid var(--text-secondary);
+  outline: none;
+}
+.shared-report-column.is-workspace-resizing { user-select: none; }
 
 .shared-report-column .report-library-header {
   box-sizing: border-box;
@@ -21887,9 +21904,21 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .panel-track > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::after { display: none; }
 
 .report-screen .report-draft-primary-actions > [hidden] { display: none !important; }
-.shared-report-column .report-paged-toolbar .report-format-toolbar { overflow-x: auto; }
+.shared-report-column .report-paged-toolbar .report-format-toolbar {
+  position: relative;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.shared-report-column .report-format-toolbar :is(.report-format-link, .report-format-insert) { position: static; }
+.shared-report-column .report-format-toolbar :is(.report-format-link-form, .report-format-insert-menu) {
+  left: auto;
+  right: 0;
+  box-sizing: border-box;
+  max-width: 100%;
+}
 @media (max-width: 760px) {
   .panel-track > .shared-report-column { flex: 0 0 100%; scroll-snap-align: start; }
+  .shared-report-column > .report-workspace-divider { display: none; }
 }
 
 .shared-report-column .report-document { min-width: 0; }

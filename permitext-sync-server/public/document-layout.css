@@ -184,7 +184,7 @@ body .panel-track > article.workspace-panel.notebook-panel .notebook-title-contr
 .report-paper-size-menu .custom-select-option[aria-selected="true"]::after {content:'✓';color:var(--accent);}
 
 /* Report editing chrome belongs around the paper, never in its print area. */
-.report-screen .report-document.is-page-editor {display:grid !important;grid-template-rows:auto minmax(0,1fr);padding:0;overflow:hidden;}
+.report-screen .report-document.is-page-editor {display:grid !important;grid-template: auto minmax(0,1fr) / minmax(0,1fr);padding:0;overflow:hidden;}
 .report-screen .report-document.is-page-editor > .report-editing-model {display:none !important;}
 .report-screen .report-document.is-page-editor > .report-paged-toolbar {display:block !important;grid-row:1;padding:0 20px;}
 .report-screen .report-document.is-page-editor > .report-page-layout {position:relative;inset:auto;grid-row:2;min-height:0;}

@@ -32,6 +32,10 @@ assert.equal(full.minimumWidth, 2434, 'Retain document minimums while their view
 assert.equal(full.balancedDocumentWidth, 600);
 assert.equal(full.template, '330px 1px minmax(0, 1fr) 1px 300px', 'Sources and Versions stay outside the scrolling document tracks');
 assert.equal(full.documentTemplate, '300px 1px 900px 1px minmax(600px, 1fr)');
+const compactReport = reportComparisonLayout(1319, {sources: 640, outline: 300, reports: 240,
+  compactEditor: true, minimumReportWidth: 320, outlineDivider: false});
+assert.equal(compactReport.sourcesWidth, 458, 'Expanded Sources leave room for Outline, Reports, and the editable pages.');
+assert.equal(compactReport.minimumWidth, 1319);
 const focused = reportComparisonLayout(1920, {comparing: true, reportWidth: 4000});
 assert.equal(focused.balancedDocumentWidth, 809);
 assert.ok(focused.documentTemplate.includes('4000px 1px minmax(600px, 1fr)'));

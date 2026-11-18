@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-shared-workspace-v2472";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-report-resize-v2474";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -56,8 +56,8 @@ import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261116-assist
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout, notebookReferenceVisibility } from "./workflow-views.js?v=26";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
-import { createReportLibraryControls, createReportVersionsControls } from "./report-library.js?v=20261115-report-rail-v12";
-import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261117-shared-report-v26";
+import { createReportLibraryControls, createReportResizeDivider, createReportVersionsControls } from "./report-library.js?v=20261117-report-resize-v13";
+import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261117-report-resize-v27";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261115-reports-rail-v6";
 import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportBlockUsesSource, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261114-report-source-toggle-v9";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-shared-workspace-v2472";
+} from "./offline-storage.js?v=20261117-report-resize-v2474";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4022,7 +4022,10 @@ async function openProjectReportDraft(project, {resume = null} = {}) {
     mount: track,
     screenClass: "shared-report-column",
     dismissOnEscape: false,
-    onOpen: syncWorkflowNavigation,
+    onOpen: () => {
+      syncWorkflowNavigation();
+      resize.update();
+    },
     openProjectDetails: () => void openProjectDetailsScreen(),
     load: () => renderProjectReportDraft(identity, resume),
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
@@ -4034,6 +4037,55 @@ async function openProjectReportDraft(project, {resume = null} = {}) {
       if (reportScreen === screen) reportScreen = null;
     }
   });
+  const column = screen.element;
+  const paneID = paneIDForProjectReportDraft(identity);
+  const defaultWidth = () => parseFloat(getComputedStyle(column).getPropertyValue("--default-report-width"));
+  const maximumWidth = () => track.clientWidth || defaultWidth();
+  // Allow room for the three open rails, the editor, and the two dividers.
+  const minimumDesktopWidth = 1162;
+  const minimumWidth = () => Math.min(maximumWidth(), minimumDesktopWidth);
+  const setReportWidth = width => {
+    column.style.setProperty("--preferred-report-width", `${width}px`);
+    column.dataset.reportResized = "true";
+  };
+  const savedWidth = Number(state.paneWeights[paneID]);
+  if (savedWidth >= minimumDesktopWidth) setReportWidth(savedWidth);
+  let widthChanged = false;
+  const resetWidth = () => {
+    widthChanged = column.dataset.reportResized === "true";
+    delete state.paneWeights[paneID];
+    delete column.dataset.reportResized;
+    column.style.removeProperty("--preferred-report-width");
+  };
+  const resize = createReportResizeDivider({
+    shell: column, element: column, kind: "workspace", label: "Report column",
+    defaultWidth, minimumWidth, maximumWidth, resizeDirection: -1,
+    currentWidth: () => column.getBoundingClientRect().width || defaultWidth(),
+    onReset: resetWidth,
+    onResize(width) {
+      if (!screen.isOpen()) return;
+      const previousWidth = column.getBoundingClientRect().width;
+      if (Math.abs(width - previousWidth) < 0.5) return;
+      const left = track.scrollLeft;
+      state.paneWeights[paneID] = width;
+      setReportWidth(width);
+      // The Report is the last column. Keep its right edge in place so the
+      // left divider follows the pointer without resizing its neighbors.
+      track.scrollLeft = left + column.getBoundingClientRect().width - previousWidth;
+      widthChanged = true;
+    },
+    onCommit() {
+      if (!widthChanged || !screen.isOpen()) return;
+      widthChanged = false;
+      saveWorkspaceState();
+    }
+  });
+  resize.divider.title = "Drag left to widen Report · Arrow keys to resize · Double-click to reset";
+  column.append(resize.divider);
+  screen.resetWidth = () => {
+    resetWidth();
+    resize.update();
+  };
   screen.projectID = projectID;
   reportScreen = screen;
   await screen.open();
@@ -7041,6 +7093,9 @@ async function closeArchiveColumn() {
 
 function normalizePaneWeights(ids) {
   const current = state.paneWeights || {};
+  // The shared Report is mounted separately from the hydrated utility panes.
+  const reportWidths = Object.fromEntries(Object.entries(current).filter(([id, width]) =>
+    isProjectReportDraftPaneID(id) && Number.isFinite(width)));
   const migrateQuestionIndexWidth = Number(state.paneWidthDefaultsVersion || 0) < 3;
   const migrateSettingsWidth = Number(state.paneWidthDefaultsVersion || 0) < 4;
   const migrateReportWidth = Number(state.paneWidthDefaultsVersion || 0) < 5;
@@ -7059,7 +7114,7 @@ function normalizePaneWeights(ids) {
       ? value
       : defaultWidth;
     return weights;
-  }, {});
+  }, reportWidths);
   state.paneWidthDefaultsVersion = 5;
 }
 
@@ -45638,7 +45693,7 @@ function updateAdjacentDividerValue(divider, previousWidth, nextWidth) {
 
 function capturePaneResizeWidths({manual = true} = {}) {
   workspaceColumnExpansion?.restore();
-  const panes = Array.from(track.querySelectorAll(".workspace-panel")).map((pane) => ({
+  const panes = Array.from(track.querySelectorAll(":scope > .workspace-panel")).map((pane) => ({
     id: pane.dataset.paneId,
     pane,
     startWidth: pane.getBoundingClientRect().width,
@@ -51876,9 +51931,15 @@ async function toggleUtilityPane(key) {
 
 async function resetVisibleColumnWidths() {
   const report = track.querySelector(":scope > .shared-report-column:not([hidden]) .report-draft-panel");
-  if (report?.querySelector(".report-workspace-columns")) resetReportColumnWidths(report, syncReferenceReaderLayout);
+  if (report?.querySelector(".report-workspace-columns")) {
+    reportScreen?.resetWidth?.();
+    resetReportColumnWidths(report, syncReferenceReaderLayout);
+  }
   const paneIDs = new Set(activePaneIDs().filter(workflowPaneIsVisible));
-  if (!paneIDs.size) return;
+  if (!paneIDs.size) {
+    if (report) saveWorkspaceState();
+    return;
+  }
   workspaceColumnExpansion?.restore();
   for (const group of state.columnGroups || []) {
     for (const [id, column] of Object.entries(group.columns || {})) if (paneIDs.has(id)) column.width = defaultPaneWidthForID(id);

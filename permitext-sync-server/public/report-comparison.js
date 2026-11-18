@@ -19,8 +19,9 @@ export function reportComparisonLayout(available, { sources = 0, outline = 0, re
   const minimumSources = sources ? 300 : 0;
   sources = Math.max(minimumSources, sources);
   const minimumVersions = comparing ? Math.min(300, versions) : 0;
+  const fixedRails = reports + (compactEditor ? outline + Number(outline > 0 && outlineDivider) : 0);
   const sidebarBudget = Math.max(minimumSources + minimumVersions,
-    available - reportMinimum - reports - Number(sources > 0) - Number(comparing));
+    available - reportMinimum - fixedRails - Number(sources > 0) - Number(comparing));
   const requestedVersions = comparing ? versions : 0;
   if (sources + requestedVersions > sidebarBudget) {
     const extra = sidebarBudget - minimumSources - minimumVersions;

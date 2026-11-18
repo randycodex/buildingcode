@@ -249,14 +249,14 @@ evidence.context.activePinnedPaneID = () => evidenceID;
 assert.equal(evidence.context.singleExpandedDividerEdge(evidenceID,'project:notebook:one').paneID,evidenceID);
 evidence.context.startPaneEdgeResize(evidence.event(600),evidenceID,'right');
 evidence.move(-400); evidence.frame(); evidence.finish(-400);
-assert.deepEqual(evidence.widths(),[300,600],'Pinned Evidence can shrink without resizing a Note');
+assert.deepEqual(evidence.widths(),[300,800],'Pinned Evidence can shrink without narrowing the shared notepad');
 evidence.context.startPaneEdgeResize(evidence.event(300),evidenceID,'right');
 evidence.move(1300); evidence.frame(); evidence.finish(1300);
-assert.deepEqual(evidence.widths(),[1300,600],'Pinned Evidence expands beyond its former cap');
+assert.deepEqual(evidence.widths(),[1300,800],'Pinned Evidence expands beyond its former cap');
 evidence.context.startPaneEdgeResize(evidence.event(0),evidenceID,'left');
 evidence.move(1000); evidence.frame(); evidence.finish(1000);
 assert.equal(evidence.widths()[0],300,'The outer left grip uses the same minimum');
-assert.equal(evidence.context.minimumPaneWidthForID('project:notebook:one'),600);
+assert.equal(evidence.context.minimumPaneWidthForID('project:notebook:one'),800);
 assert.equal(evidence.context.maximumPaneWidthForID('reader:one'),Infinity);
 console.log('Evidence pointer resizing and restored widths stay within 300–600 pixels; Note and Reader bounds are preserved.');
 
