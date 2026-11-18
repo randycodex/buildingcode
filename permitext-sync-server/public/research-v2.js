@@ -1,4 +1,4 @@
-import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=7";
+import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=8";
 import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
 import {researchInlineRuns} from "./research-inline-format.js?v=1";
 import {researchAnswerBlocks} from './research-answer-blocks.js?v=1';
@@ -138,10 +138,13 @@ export function createResearchV2View(options) {
     finally{chatTransitionPending=false;if(isCurrent()&&root.isConnected)update();}
   },'rv2-new-chat') : null;
   const historyTop=node('div','rv2-rail-top-row');
+  const historyTitle=node('h3','rv2-rail-title');
+  const historyToggle=action('Chats',null,'rv2-history-toggle');
+  historyTitle.append(historyToggle);
+  historyTop.append(historyTitle);
   if(newChat)historyTop.append(newChat);
   if(options.historyManagement?.toolbar)historyTop.append(options.historyManagement.toolbar);
-  const historyToggle=action('',null,'icon-button rv2-history-toggle');
-  historyTop.append(historyToggle);rail.append(historyTop);
+  rail.append(historyTop);
   if(options.historyManagement)rail.append(options.historyManagement.element);
   rail.append(list);
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
@@ -152,7 +155,6 @@ export function createResearchV2View(options) {
       if(historyCollapsed===collapsed)return;
       const initial=historyCollapsed===undefined;
       historyCollapsed=collapsed;
-      options.renderHistoryToggle?.(historyToggle,collapsed);
       options.onHistoryRailChange?.(!collapsed,{initial});
     }});
   const chat=presentation?.chat || node('section','rv2-chat');chat.setAttribute('aria-label','Questions and answers');
@@ -309,23 +311,21 @@ export function createResearchV2View(options) {
   const sourceRows=new Map();
   const sourcesRail=node('aside','rv2-sources-rail');sourcesRail.setAttribute('aria-label','Answer sources');
   const sourcesTop=node('header','rv2-sources-top-row');
-  const sourcesTitle=node('h3','','Sources');
+  const sourcesTitle=node('h3','rv2-rail-title');
   const sourcesBody=node('div','rv2-sources-body');
   sourcesBody.setAttribute('aria-live','polite');
-  const sourcesToggle=action('',()=>{
+  const sourcesToggle=action('Sources',()=>{
     if(sourcesExpanded){setSourcesExpanded(false);return;}
     if(!sourcesSnapshot){const message=sourcesMessage||messages.filter(message=>message.role==='assistant'&&message.answer).at(-1);if(message&&onSnapshot){void showSnapshot(message);return;}}
     setSourcesExpanded(true);
-  },'icon-button rv2-sources-toggle');
-  sourcesTop.append(sourcesTitle,sourcesToggle);sourcesRail.append(sourcesTop,sourcesBody);
+  },'rv2-sources-toggle');
+  sourcesTitle.append(sourcesToggle);
+  sourcesTop.append(sourcesTitle);sourcesRail.append(sourcesTop,sourcesBody);
   function syncSourcesRail(){
     root.classList.toggle('has-sources',sourcesExpanded);
     sourcesRail.classList.toggle('is-collapsed',!sourcesExpanded);
-    sourcesTitle.hidden=sourcesBody.hidden=!sourcesExpanded;
-    const label=sourcesExpanded?'Hide answer sources':'Show answer sources';
-    sourcesToggle.setAttribute('aria-label',label);sourcesToggle.title=label;
+    sourcesBody.hidden=!sourcesExpanded;
     sourcesToggle.setAttribute('aria-expanded',String(sourcesExpanded));
-    options.renderSourcesToggle?.(sourcesToggle,!sourcesExpanded);
   }
   function setSourcesExpanded(expanded){
     const changed=sourcesExpanded!==expanded;

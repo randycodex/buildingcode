@@ -53,7 +53,7 @@ vm.runInContext(['researchHistoryDayIndex','researchConversationHistoryGroups','
   'paneIsCollapsed','transitionNotebookList','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
 const panel = context.renderNotebookIndex(project);
 const localToggle = panel.querySelector('.notebook-list-toggle');
-assert.equal(localToggle.attrs['aria-label'],'Hide notes list');
+assert.equal(localToggle.textContent,'List');
 assert.equal(localToggle.attrs['aria-expanded'],'true');
 const list = panel.querySelector('.notebook-index-body');
 assert.deepEqual(list.querySelectorAll('li').map(node => node.textContent), ['Note A','Note B'], 'A newly reopened deferred panel renders existing notes before mounting.');
@@ -68,7 +68,7 @@ assert.equal(context.workflowPaneIsVisible(indexID), true, 'The collapsed list r
 assert.equal(context.paneIsCollapsed(indexID), true);
 assert.equal(context.workflowPaneIsVisible(editorID), true, 'Hiding the list leaves the selected note visible.');
 context.updateNotebookListToggle(localToggle);
-assert.equal(localToggle.attrs['aria-label'],'Show notes list');
+assert.equal(localToggle.textContent,'List');
 assert.equal(localToggle.attrs['aria-expanded'],'false');
 await context.toggleNotebookList();
 assert.equal(context.workflowPaneIsVisible(indexID), true);
@@ -89,14 +89,14 @@ console.log('Notes list toggle passed: immediate deferred contents, independent 
 
 const railState = {notebookListHidden:true,paneWeights:{[indexID]:280}};
 const rail = {dataset:{paneId:indexID},style:{setProperty(key,value){this[key]=value;}},
-  classList:{contains:()=>false},getBoundingClientRect:()=>({width:35})};
+  classList:{contains:()=>false},getBoundingClientRect:()=>({width:80})};
 const sizing = vm.createContext({state:railState,currentColumnWorkflowView:()=> 'notebook',
   minimumPaneWidthForID:()=>200,defaultPaneWidthForID:()=>280,migrateLegacyPaneWidth:(_id,value)=>value,
   assistantHistoryOnlyPane:()=>false,isFlexibleReaderPaneID:()=>false,paneCanCollapse:()=>false,
   workspaceColumnExpansion:null,track:{querySelectorAll:()=>[rail]}});
 vm.runInContext(['applyPaneWeight','paneIsCollapsed','capturePaneResizeWidths'].map(actual).join('\n'),sizing);
 sizing.applyPaneWeight(rail,indexID);
-assert.equal(rail.style.flex,'0 0 35px');
+assert.equal(rail.style.flex,'0 0 80px');
 assert.equal(rail.dataset.notebookListCollapsed,'true');
 sizing.capturePaneResizeWidths();
 assert.equal(railState.paneWeights[indexID],280,'Resizing other columns must not save the rail width over the expanded list width.');
@@ -121,10 +121,10 @@ const motion = vm.createContext({track:{querySelectorAll:()=>livePanels},
   document:{documentElement:{classList:{add:name=>motionClasses.add(name),remove:name=>motionClasses.delete(name)}},
     startViewTransition(){assert.fail('The live heading must never be replaced with a snapshot.');}}});
 vm.runInContext(actual('transitionNotebookList'),motion);
-const firstMotion = motion.transitionNotebookList(()=>{updates++;widths=[35,1245];padding='0px';});
+const firstMotion = motion.transitionNotebookList(()=>{updates++;widths=[80,1200];padding='0px';});
 await Promise.resolve();
 assert.equal(motions.length,2,'Only the two live columns animate; the heading stays anchored.');
-assert.equal(motions[0].frames[0].flexBasis,'280px');assert.equal(motions[0].frames[1].flexBasis,'35px');
+assert.equal(motions[0].frames[0].flexBasis,'280px');assert.equal(motions[0].frames[1].flexBasis,'80px');
 // A quick reversal starts from the pixels currently on screen, before the
 // previous animation is cancelled back to its underlying final geometry.
 widths=[150,1130];padding='11px';
@@ -144,7 +144,7 @@ assert.equal(updates,3);
 reducedMotion=false;
 await assert.rejects(motion.transitionNotebookList(()=>{throw Error('Update failed');}),/Update failed/);
 assert.equal(motionClasses.size,0,'A failed update cannot leave motion styles active.');
-console.log('Notes rail passed: 35px collapse, retained width, live titles without snapshots/fades, interrupted transitions, cleanup and reduced motion.');
+console.log('Notes rail passed: 80px collapse, retained width, live titles without snapshots/fades, interrupted transitions, cleanup and reduced motion.');
 
 // An open notepad keeps a blank writing area after the selected Note is trashed.
 const retained = {notebooks:[project], notebookColumns:[{id:'primary',cardID:'removed',open:true,selected:true}]};

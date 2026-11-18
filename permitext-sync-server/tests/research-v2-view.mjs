@@ -236,9 +236,9 @@ const historyManagement={element:new Element('div'),toolbar:historyToolbar,handl
 const managedView=createResearchV2View({history:[{id:'one',title:'First chat'},{id:'two',title:'Second chat'}],historyManagement,onNew(){},onOpen:id=>{openedHistory=id;}});
 assert.deepEqual(historyBindings,['one','two']);assert.deepEqual(historyPages,[['one','two']]);
 const historyTop=managedView.element.querySelector('.rv2-rail-top-row');
-assert.equal(historyTop.children[0].textContent,'New Chat +');
-assert.equal(historyTop.children[1],historyToolbar,'History options sit beside New Chat instead of in a hidden toolbar.');
-assert.equal(historyTop.children[2].className,'icon-button rv2-history-toggle','History options stay immediately left of collapse.');
+assert.equal(historyTop.querySelector('.rv2-history-toggle').textContent,'Chats');
+assert.equal(historyTop.children[1].textContent,'New Chat +');
+assert.equal(historyTop.children[2],historyToolbar,'History options sit beside New Chat instead of in a hidden toolbar.');
 const managedRail=managedView.element.querySelector('.rv2-rail');
 assert.equal(managedRail.children[0],historyTop);
 assert.equal(managedRail.children[1],historyManagement.element,'Selection controls follow the top row.');
@@ -363,9 +363,9 @@ console.log('Retained-root ownership passed: disposed request cleanup cannot cle
  assert(all(rail).some(element=>element.textContent==='Second answer source.'));
  assert(!all(rail).some(element=>element.textContent==='Obsolete first answer source.'),'A slow earlier response cannot replace the selected answer sources');
  assert(all(rail).some(element=>element.textContent==='Second question?'),'The panel identifies the selected answer question');
- all(rail).find(element=>element.attributes['aria-label']==='Hide answer sources').handlers.click();
+ rail.querySelector('.rv2-sources-toggle').handlers.click();
  assert.equal(rail.querySelector('.rv2-sources-body').hidden,true);assert.equal(thread.hidden,false);
- all(rail).find(element=>element.attributes['aria-label']==='Show answer sources').handlers.click();await tick();
+ rail.querySelector('.rv2-sources-toggle').handlers.click();await tick();
  assert.deepEqual(calls,['one','two'],'Reopening the same immutable answer snapshot needs no extra request');
  const presentation=view.capturePresentation();view.dispose();
  const refreshed=createResearchV2View({conversation:structuredClone(conversation),presentation,onDraft(){},onSnapshot(){throw Error('Cached source should survive a same-chat render');}});
@@ -378,7 +378,7 @@ console.log('Retained-root ownership passed: disposed request cleanup cannot cle
  assert.deepEqual(changes,[false,true,false,true],'Sources updates do not repeatedly expand or resize the panel');
  const closing=createResearchV2View({conversation,onDraft(){},onSnapshot:()=>late.promise});
  all(closing.element).filter(element=>element.textContent==='Sources used')[2].handlers.click();await tick();
- all(closing.element).find(element=>element.attributes['aria-label']==='Hide answer sources').handlers.click();
+ closing.element.querySelector('.rv2-sources-toggle').handlers.click();
  late.resolve({sources:[{...source,passageText:'Late closed-panel source.'}]});await tick();
  assert.equal(closing.element.querySelector('.rv2-sources-body').hidden,true,'A late response cannot reopen a closed panel');closing.dispose();
 }
@@ -491,7 +491,7 @@ console.log('Conversation history toggles preserve the live chat, thread, draft 
  assert(!all(view.element.querySelector('.rv2-sources-body')).some(element=>element.textContent==='Stale source must never replace B.'));view.dispose();
  const closing=createResearchV2View({conversation:{sources:[],messages:[a]},onDraft(){},onSnapshot:()=>closed.promise});
  all(closing.element).find(element=>element.className==='rv2-citation').handlers.click();await tick();
- all(closing.element).find(element=>element.attributes['aria-label']==='Hide answer sources').handlers.click();
+ closing.element.querySelector('.rv2-sources-toggle').handlers.click();
  closed.resolve({sources:[source]});await tick();
  assert.equal(closing.element.querySelector('.rv2-sources-body').hidden,true,'A late citation request cannot reopen a panel the user closed');closing.dispose();
 }

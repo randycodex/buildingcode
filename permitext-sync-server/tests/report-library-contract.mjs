@@ -72,9 +72,11 @@ console.log('Versions width passed: left-edge drag direction and cancellation.')
 
 let reportWidth = 1320;
 let commits = 0;
+let sidebars = {libraryOpen: 'false', outlineHidden: 'true', reportsHidden: 'true'};
+const minimumWidth = () => c.reportWorkspaceMinimumWidth(sidebars);
 const {divider} = c.createReportResizeDivider({
   shell, element: {getBoundingClientRect: () => ({width: reportWidth})}, kind: 'workspace', label: 'Report column',
-  defaultWidth: () => 1320, minimumWidth: () => 1162, maximumWidth: () => 2400,
+  defaultWidth: () => 1320, minimumWidth, maximumWidth: () => 2400,
   currentWidth: () => reportWidth, resizeDirection: -1,
   onResize: width => { reportWidth = width; },
   onCommit: () => { commits++; }
@@ -86,8 +88,28 @@ assert.equal(commits, 0, 'Persist the width after the drag ends.');
 divider.events.pointerup(pointer(9, 900));
 assert.equal(commits, 1);
 divider.events.keydown({key: 'Home', preventDefault() {}});
-assert.equal(reportWidth, 1162);
+assert.equal(reportWidth, 1160);
 divider.events.keydown({key: 'End', preventDefault() {}});
 assert.equal(reportWidth, 2400);
 divider.events.dblclick();
 assert.equal(reportWidth, 1320);
+
+let atRightEdge = true;
+sidebars = {libraryOpen: 'true', outlineHidden: 'false', reportsHidden: 'false'};
+const right = c.createReportResizeDivider({
+  shell, element: {getBoundingClientRect: () => ({width: reportWidth})}, kind: 'workspace', label: 'Report column from the right',
+  defaultWidth: () => 1320, minimumWidth, maximumWidth: () => 2400,
+  currentWidth: () => reportWidth, resizeDirection: () => atRightEdge ? -1 : 1,
+  onResize: width => { reportWidth = width; }
+}).divider;
+right.events.keydown({key: 'Home', preventDefault() {}});
+assert.equal(reportWidth, 1790);
+right.events.pointerdown(pointer(12, 1900));
+atRightEdge = false;
+right.events.pointermove(pointer(12, 1800));
+assert.equal(reportWidth, 1890, 'An inward drag at the screen edge widens Report without reversing mid-drag');
+right.events.pointerup(pointer(12, 1800));
+right.events.pointerdown(pointer(13, 1800));
+right.events.pointermove(pointer(13, 1830));
+assert.equal(reportWidth, 1920, 'Away from the screen edge, dragging the right handle right widens Report');
+right.events.pointerup(pointer(13, 1830));

@@ -8,10 +8,7 @@ export function attachResearchQuestionRail({root, divider, toggle, collapsedStor
     if (disposed) return;
     root.classList.toggle('is-history-collapsed', collapsed);
     if (toggle) {
-      const label = collapsed ? 'Show conversations list' : 'Hide conversations list';
-      toggle.setAttribute('aria-label', label);
       toggle.setAttribute('aria-expanded', String(!collapsed));
-      toggle.title = label;
     }
     onCollapse?.(collapsed);
     if (!narrow()) root.style.setProperty('--rv2-rail-width', `${collapsed ? collapsedWidth : expandedWidth}px`);

@@ -27,6 +27,11 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
   return {header, ...resize};
 }
 
+export function reportWorkspaceMinimumWidth({libraryOpen, outlineHidden, reportsHidden} = {}) {
+  const openSidebars = Number(libraryOpen === 'true') + Number(outlineHidden === 'false') + Number(reportsHidden === 'false');
+  return 1160 + openSidebars * 210;
+}
+
 export function createReportResizeDivider({shell, element, kind, label, defaultWidth,
   minimumWidth, maximumWidth, currentWidth, resizeDirection = 1, onResize, onCommit = () => {}, onReset}) {
   const divider = document.createElement('div');
@@ -37,6 +42,7 @@ export function createReportResizeDivider({shell, element, kind, label, defaultW
   divider.setAttribute('aria-label', `Resize ${label}`);
   divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to reset';
 
+  const direction = typeof resizeDirection === 'function' ? resizeDirection : () => resizeDirection;
   const clampWidth = width => Math.max(minimumWidth(), Math.min(maximumWidth(), width));
   const updateControls = () => {
     const width = clampWidth(currentWidth());
@@ -59,9 +65,10 @@ export function createReportResizeDivider({shell, element, kind, label, defaultW
   });
   divider.addEventListener('keydown', event => {
     const step = event.shiftKey ? 80 : 24;
+    const signedStep = direction() * step;
     const requests = {
-      ArrowLeft: currentWidth() - resizeDirection * step,
-      ArrowRight: currentWidth() + resizeDirection * step,
+      ArrowLeft: currentWidth() - signedStep,
+      ArrowRight: currentWidth() + signedStep,
       Home: minimumWidth(),
       End: maximumWidth()
     };
@@ -74,12 +81,12 @@ export function createReportResizeDivider({shell, element, kind, label, defaultW
     if (event.button !== 0) return;
     event.preventDefault();
     divider.focus({preventScroll: true});
-    drag = { pointerID: event.pointerId, x: event.clientX, width: element.getBoundingClientRect().width };
+    drag = { pointerID: event.pointerId, x: event.clientX, width: element.getBoundingClientRect().width, direction: direction() };
     divider.setPointerCapture(event.pointerId);
     shell.classList.add(`is-${kind}-resizing`);
   });
   divider.addEventListener('pointermove', event => {
-    if (drag?.pointerID === event.pointerId) resize(drag.width + resizeDirection * (event.clientX - drag.x));
+    if (drag?.pointerID === event.pointerId) resize(drag.width + drag.direction * (event.clientX - drag.x));
   });
   const finishDrag = event => {
     if (drag?.pointerID !== event.pointerId) return;

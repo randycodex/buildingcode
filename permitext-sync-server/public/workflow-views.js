@@ -74,7 +74,7 @@ export function notebookReferenceVisibility({readerOpen, evidenceOpen, active = 
 export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0, sharedReferenceWidth = 0) {
   const available = Math.max(0, availableWidth - dividerWidth);
   const shared = column => sharedReferenceWidth > 0 && ['reader', 'evidence'].includes(column.kind);
-  const minimums = columns.map(column => column.collapsed ? (column.kind === 'notes' ? 35 : 48) :
+  const minimums = columns.map(column => column.collapsed ? (column.kind === 'notes' ? 80 : 48) :
     shared(column) ? 300 : ({reader:630, evidence:300, notes:300, editor:800}[column.kind] || 300));
   const editor = columns.findIndex(column => column.kind === 'editor' && !column.collapsed);
   const widths = columns.map((column, index) => column.collapsed || column.kind === 'editor' ? minimums[index] :

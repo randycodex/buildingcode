@@ -20,8 +20,8 @@ const screenshot = researchColumnsLayout([630,920,600,630],3063,0,5,[],[630,920,
 assert.equal(screenshot.fits,true,'Different minimums fit even when an equal share would squeeze Assistant');
 assert.deepEqual(screenshot.widths,[2138/3,920,2138/3,2138/3]);
 assert(Math.abs(screenshot.widths.reduce((sum,width)=>sum+width,5)-3063)<1e-8,'Use all available width without a trailing gap');
-for(const available of [2485,2705,3063,3685,5000]){
- const minimums=[630,920,300,630],layout=researchColumnsLayout(minimums,available,0,5,[],minimums);
+for(const available of [2785,3063,3685,5000]){
+ const minimums=[630,920,600,630],layout=researchColumnsLayout(minimums,available,0,5,[],minimums);
  assert.equal(layout.fits,true);assert(layout.widths.every((width,index)=>width>=minimums[index]));
  assert(Math.abs(layout.widths.reduce((sum,width)=>sum+width,5)-available)<1e-8);
 }
@@ -62,14 +62,14 @@ assert.deepEqual(sizes(), [2399/3, 2399/3, 2399/3]);
 panels.push(makePane('reader:three'));
 track.clientWidth = 2005;
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [300,630,630,630], 'Automatic layout reaches each minimum before scrolling');
+assert.deepEqual(sizes(), [600,630,630,630], 'Automatic layout reaches each minimum before scrolling');
 assert.equal(track.dataset.researchColumnSizing, 'overflow');
 assert.equal(panels[0].style.maxWidth, 'none');
 assert.equal(panels[1].style.maxWidth, 'none', 'Overflow Readers have no CSS maximum');
 state.paneWeights['reader:one'] = 1800;
 delete track._researchColumnLayout;
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [300,1800,630,630], 'Stored Reader widths remain uncapped in overflow');
+assert.deepEqual(sizes(), [600,1800,630,630], 'Stored Reader widths remain uncapped in overflow');
 context.capturePaneResizeWidths();
 state.paneWeights['utility:search:one'] = 850;
 state.paneWeights['reader:one'] = 1800;
@@ -98,9 +98,9 @@ context.window.innerWidth = 760;
 context.syncResearchColumnLayout();
 assert.equal(track.dataset.researchColumnSizing, undefined, 'Phone paging keeps its viewport width');
 assert.equal(context.minimumPaneWidthForID('reader:one'), 630);
-assert.equal(context.minimumPaneWidthForID('utility:search:one'), 300);
+assert.equal(context.minimumPaneWidthForID('utility:search:one'), 600);
 assert.equal(context.maximumPaneWidthForID('utility:search:one'), Infinity);
-assert.equal(context.constrainPaneWidth('utility:search:one',200),300);
+assert.equal(context.constrainPaneWidth('utility:search:one',200),600);
 assert.equal(context.constrainPaneWidth('utility:search:one',1400),1400);
 assert.equal(context.maximumPaneWidthForID('reader:one'), Infinity);
 workflow = 'project-details';
@@ -302,13 +302,13 @@ Object.assign(context,{CSS:{escape:id=>id},adjacentColumnWidths,notebookReferenc
 vm.runInContext(actual('updateAdjacentDividerValue')+'\n'+actual('resizePaneEdgeBy')+'\n'+actual('resizeAdjacentPanesBy'),context);
 const dividerValues={};const searchDivider={setAttribute:(key,value)=>dividerValues[key]=value};
 context.resizeAdjacentPanesBy('utility:search:resize','reader:one',-300,searchDivider);
-assert.deepEqual(sizes(),[920,300,630],'Search narrows to 300px without squeezing the adjacent Reader');
-context.resizeAdjacentPanesBy('utility:search:resize','reader:one',800,searchDivider);
+assert.deepEqual(sizes(),[920,600,630],'Search stops at 600px without squeezing the adjacent Reader');
+context.resizeAdjacentPanesBy('utility:search:resize','reader:one',500,searchDivider);
 assert.deepEqual(sizes(),[920,1100,630],'Search grows beyond 900px while Assistant retains its minimum');
 assert.match(dividerValues['aria-valuetext'],/Column width 1100/i);
 context.syncResearchColumnLayout();
 assert.deepEqual(sizes(),[920,1100,630],'Chosen Search width survives subsequent automatic layout notifications');
-console.log('Search divider resizing passed: 300px minimum, expansion from either side and persistent manual widths.');
+console.log('Search divider resizing passed: 600px minimum, expansion from either side and persistent manual widths.');
 
 // Sources reserves an attached internal rail without changing the base panes.
 panels=[makePane('reader:sources-test'),makePane('utility:analysis'),makePane('utility:search:sources-test')];
@@ -376,7 +376,7 @@ assert(Math.abs(sizes().reduce((sum,width)=>sum+width,569)-track.clientWidth)<1e
 console.log('Conversation history geometry passed: independent reserved width, stable base panes on open/close, compatible Sources, initial restore and explicit auto-fit.');
 
 // Restore must use defaults, not drag minimums, when the open columns cannot
-// fit. The 300px Search minimum remains available for an intentional resize.
+// fit. Saved Search widths below 600px migrate to the minimum.
 for (const available of [1600, 3063, 4200]) {
   panels = ['reader:one','reader:two','utility:analysis','utility:search:restore','utility:calculator'].map(makePane);
   panels[2].dataset.assistantSourcesWidth = '300';
@@ -387,7 +387,7 @@ for (const available of [1600, 3063, 4200]) {
   context.window.innerWidth = track.clientWidth = available;
   delete track._researchColumnLayout;
   context.syncResearchColumnLayout();
-  assert.equal(sizes()[3],300,'A deliberately narrow Search remains 300px before Restore');
+  assert.equal(sizes()[3],600,'An older narrow Search is clamped to 600px before Restore');
   await context.resetVisibleColumnWidths();
   if (available < 3686) {
     assert.deepEqual(sizes(),[630,630,920,600,600],'Restore uses a 600px Search and scrolls instead of squeezing it');
@@ -400,7 +400,7 @@ for (const available of [1600, 3063, 4200]) {
     assert(Math.abs(sizes().reduce((sum,width)=>sum+width,306)-available)<1e-8,'A wide desk still distributes all remaining space');
   }
 }
-console.log('Restore Search regression passed: 600px default in overflow with Sources, 300px manual minimum, stable subsequent updates and full fit on a wide desk.');
+console.log('Restore Search regression passed: 600px default in overflow with Sources, 600px manual minimum, stable subsequent updates and full fit on a wide desk.');
 
 // Regression: rail toggles used to save manual=true for default-width panes.
 // Reopening that two-column workspace left over 1,000px unused on the right.
@@ -435,7 +435,7 @@ assert(sizes().every((width,index)=>width>=context.minimumPaneWidthForID(panels[
 panels.push(makePane('reader:overflow'));state.paneWeights['reader:overflow']=630;
 context.syncResearchColumnLayout();
 assert.equal(track.dataset.researchColumnSizing,'overflow');
-assert.deepEqual(sizes(),[630,920,300,600,630],'Only after all automatic columns reach minimums does the desk scroll');
+assert.deepEqual(sizes(),[630,920,600,600,630],'Only after all automatic columns reach minimums does the desk scroll');
 panels.pop();context.syncResearchColumnLayout();fillsDesk();
 panels.pop();context.syncResearchColumnLayout();fillsDesk();
 

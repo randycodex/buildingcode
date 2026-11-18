@@ -29,9 +29,9 @@ try {
   const collapsible=attachResearchQuestionRail({root,divider,toggle,collapsedStore:store});
   assert.equal(toggleAttrs['aria-expanded'],'true');
   toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'35px');
-  assert.equal(toggleAttrs['aria-label'],'Show conversations list');assert.equal(classes.has('is-history-collapsed'),true);
+  assert.equal(toggleAttrs['aria-expanded'],'false');assert.equal(classes.has('is-history-collapsed'),true);
   toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'300px');
-  assert.equal(toggleAttrs['aria-label'],'Hide conversations list');assert.equal(classes.has('is-history-collapsed'),false);
+  assert.equal(toggleAttrs['aria-expanded'],'true');assert.equal(classes.has('is-history-collapsed'),false);
   narrow=true;toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'300px','Mobile history keeps its separate stacked-layout control');narrow=false;
   toggleHandlers.get('click')();collapsible.dispose();
   const restored=attachResearchQuestionRail({root,divider,toggle,collapsedStore:store});

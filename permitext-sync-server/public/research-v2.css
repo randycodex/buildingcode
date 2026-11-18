@@ -10,10 +10,10 @@
 .research-v2 button:disabled{opacity:.4;cursor:default}
 .rv2-rail{background:var(--surface);padding:var(--column-content-top-gap) 8px 8px;overflow:auto;min-width:0}
 .rv2-rail-top-row{display:flex;align-items:flex-start;gap:4px;margin-bottom:12px}
-.research-v2 .rv2-history-toggle{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;min-width:28px;height:28px;min-height:28px;padding:5px;border-radius:0;background:transparent;box-shadow:none;color:var(--text-secondary)}
-.research-v2 .rv2-history-toggle:is(:hover,:active){background:transparent;box-shadow:none}
-.rv2-history-toggle .workspace-button-icon{width:16px;height:16px}
-.research-v2 .rv2-history-toggle:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.rv2-rail-title{flex:0 0 auto;margin:0;line-height:1}
+.research-v2 :is(.rv2-history-toggle,.rv2-sources-toggle){display:inline-flex;align-items:center;min-height:28px;padding:0;border-radius:0;background:transparent;color:var(--text-secondary);font:700 12px var(--ui-font-family);white-space:nowrap;cursor:pointer}
+.research-v2 :is(.rv2-history-toggle,.rv2-sources-toggle):is(:hover,:focus-visible){color:var(--text-primary)}
+.research-v2 :is(.rv2-history-toggle,.rv2-sources-toggle):focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .rv2-rail-divider{position:relative;min-height:0;background:transparent;pointer-events:none;z-index:2}
 .rv2-rail-divider::after{content:"";position:absolute;inset:0 -6px}
 .rv2-rail-divider:focus-visible{outline:0;background:transparent}
@@ -98,14 +98,10 @@ ul.rv2-answer-list{list-style-type:disc}ol.rv2-answer-list{list-style-type:decim
 .rv2-detail h3{font-size:17px;font-weight:500}.rv2-detail h4{font-size:13px;font-weight:500;margin:18px 0 4px}
 .rv2-detail .rv2-snapshot-title{font-size:15px;margin:8px 0 12px}
 .rv2-sources-rail{position:absolute;z-index:3;top:0;bottom:0;left:calc(100% + var(--panel-padding));box-sizing:border-box;display:flex;flex-direction:column;width:300px;min-height:0;background:var(--surface);border-inline-end:1px solid var(--border);color:var(--text-primary)}
-.rv2-sources-rail.is-collapsed{left:calc(100% - 35px);width:35px;border:0;background:transparent;pointer-events:none}
+.rv2-sources-rail.is-collapsed{left:calc(100% - 64px);width:64px;border:0;background:transparent;pointer-events:none}
 .rv2-sources-top-row{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding:var(--column-content-top-gap) 12px 12px}
-.rv2-sources-top-row h3{flex:1;margin:0;font-size:14px;font-weight:600;line-height:28px}
-.research-v2 .rv2-sources-toggle{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;min-width:28px;height:28px;min-height:28px;padding:5px;background:transparent;border-radius:0;box-shadow:none;color:var(--text-secondary);pointer-events:auto}
-.research-v2 .rv2-sources-toggle:is(:hover,:active){background:transparent;box-shadow:none}
-.rv2-sources-toggle .workspace-button-icon{width:16px;height:16px;transform:scaleX(-1)}
-.research-v2 .rv2-sources-toggle:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
-.is-collapsed>.rv2-sources-top-row{padding-inline:3px}
+.research-v2 .rv2-sources-toggle{pointer-events:auto}
+.is-collapsed>.rv2-sources-top-row{justify-content:center;padding-inline:0}
 .rv2-sources-body{flex:1;min-height:0;overflow:auto;padding:0 16px 20px;overflow-wrap:anywhere}
 .rv2-sources-question{margin:0 0 12px;color:var(--text-secondary);font-size:12px;line-height:1.5;display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3}
 .rv2-sources-body .rv2-source-text{white-space:pre-wrap;font-size:13px;line-height:1.6}
@@ -169,7 +165,7 @@ ul.rv2-answer-list{list-style-type:disc}ol.rv2-answer-list{list-style-type:decim
   .research-v2-panel>.analysis-content{margin-inline-start:calc(-1 * var(--panel-padding))}
   .research-v2.is-history-collapsed .rv2-rail{padding-inline:0;overflow:visible}
   .research-v2.is-history-collapsed .rv2-rail>:not(.rv2-rail-top-row),.research-v2.is-history-collapsed :is(.rv2-new-chat,.assistant-history-management-toolbar){display:none}
-  .research-v2.is-history-collapsed .rv2-rail-top-row{justify-content:flex-start;gap:0;padding-inline-start:calc(var(--panel-padding) - 8px)}
+  .research-v2.is-history-collapsed .rv2-rail-top-row{justify-content:center;gap:0;padding-inline-start:0}
   .rv2-rail-divider{position:absolute;inset-block:calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3)) 0;left:var(--rv2-rail-width,300px);width:1px}
   .is-history-collapsed .rv2-rail-divider{pointer-events:none}
   .research-v2.is-question-rail-resizing{transition:none}

@@ -65,7 +65,7 @@ for (const id of mainPaneIDs) {
   const search = /^utility:search(?::|$)/.test(id);
   const evidence = /^utility:saved(?::|$)/.test(id);
   const fixedBasis = reader || search || evidence;
-  const minimum = reader ? 630 : evidence || search ? 300 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
+  const minimum = reader ? 630 : evidence ? 300 : search ? 600 : id.startsWith('project:notebook:') ? 800 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
   const maximum = Infinity;
   for (const count of [1, 2, 3, 4, 8]) {
     const ids = [id, ...Array.from({ length: count - 1 }, (_, index) => `reader:other-${index}`)];

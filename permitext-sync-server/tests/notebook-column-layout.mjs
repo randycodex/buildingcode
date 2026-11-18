@@ -21,15 +21,15 @@ for (const width of [1671,1920,3054]) {
 }
 assert.deepEqual(notebookColumnsLayout([{kind:'evidence'},{kind:'notes'},{kind:'editor'}],1671,4),[300,300,1067]);
 assert.deepEqual(notebookColumnsLayout([{kind:'reader',preferredWidth:630},{kind:'evidence'},{kind:'notes'},{kind:'editor'}],3054,5),[630,300,300,1819]);
-assert.deepEqual(notebookColumnsLayout([{kind:'reader',collapsed:true},{kind:'notes',collapsed:true},{kind:'editor'}],1671,4),[48,35,1584]);
+assert.deepEqual(notebookColumnsLayout([{kind:'reader',collapsed:true},{kind:'notes',collapsed:true},{kind:'editor'}],1671,4),[48,80,1539]);
 for (const kind of ['reader','evidence']) for (const width of [1671,1920,2288,3054]) for (const shared of [0,300,450,600]) {
  const reference={kind,preferredWidth:kind==='reader'?900:600};
  const expanded=notebookColumnsLayout([reference,{kind:'notes'},{kind:'editor'}],width,4,shared);
  const collapsed=notebookColumnsLayout([reference,{kind:'notes',collapsed:true},{kind:'editor'}],width,4,shared);
  assert.equal(collapsed[0],expanded[0],'Toggling Notes cannot redistribute its width into Reader or Evidence.');
- assert.equal(collapsed[2]-expanded[2],265,'Only the notepad receives the space released by Notes.');
+ assert.equal(collapsed[2]-expanded[2],220,'Only the notepad receives the space released by Notes.');
 }
-assert.deepEqual(notebookColumnsLayout([{kind:'reader',preferredWidth:900},{kind:'notes',collapsed:true},{kind:'editor'}],1671,4),[567,35,1065]);
+assert.deepEqual(notebookColumnsLayout([{kind:'reader',preferredWidth:900},{kind:'notes',collapsed:true},{kind:'editor'}],1671,4),[567,80,1020]);
 
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 function actual(name) {const start=source.indexOf(`function ${name}(`);assert.ok(start>=0,name);
@@ -99,9 +99,9 @@ await context.focusUtility('saved');
 assert.equal(state.notebookEvidenceHidden,false,'Explicit Evidence links reveal rather than toggle the open column.');
 await context.focusUtility('saved');
 assert.equal(state.notebookEvidenceHidden,false);
-state.notebookListHidden=true;fit();assert.equal(widths()[1],35);
+state.notebookListHidden=true;fit();assert.equal(widths()[1],80);
 // This desk fits both references only when the collapsed list is mistakenly
-// counted as 35px. Its 300px expanded budget must keep the shared slot stable.
+// counted at its collapsed width. Its 300px expanded budget must keep the shared slot stable.
 track.clientWidth=2288;state.paneWeights[ids[0]]=900;state.paneWeights[ids[1]]=600;
 for (const kind of ['reader','evidence']) {
  state.notebookReferenceActive=kind;
@@ -111,8 +111,8 @@ for (const kind of ['reader','evidence']) {
  state.notebookListHidden=true;fit();const collapsed=widths();
  assert.equal(track.dataset.notebookReferenceMode,'shared','Collapsing Notes must not switch reference modes.');
  assert.equal(collapsed[0],expanded[0],'The live reference keeps its exact width.');
- assert.equal(collapsed[2]-expanded[2],265);
- assert.equal(context.minimumPaneWidthForID(ids[3]),1065,'Resizing a reference reserves space to reopen Notes.');
+ assert.equal(collapsed[2]-expanded[2],220);
+ assert.equal(context.minimumPaneWidthForID(ids[3]),1020,'Resizing a reference reserves space to reopen Notes.');
  if(kind==='reader') assert.equal(context.maximumPaneWidthForID(ids[0]),600);
  state.notebookListHidden=false;fit();assert.deepEqual(widths(),expanded,'Reopening Notes restores only the notepad geometry.');
 }
