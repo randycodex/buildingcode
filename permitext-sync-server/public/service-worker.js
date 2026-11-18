@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v2551";
+const shellCacheName = "permitext-pro-shell-v2552";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -56,7 +56,7 @@ const shellURLs = [
   "/web/report-export-review.js?v=20261109-report-export-v14",
   "/web/report-note-review.js?v=3",
   "/web/report-rich-text.js",
-  "/web/report-comparison.js?v=20261117-report-sources-v28",
+  "/web/report-comparison.js?v=20261117-report-rail-titles-v29",
   "/web/workspace-resume.js?v=20261115-reports-rail-v6",
   "/web/reader-navigation-tree.js?v=20261112-label-case-v3",
   "/web/reader-chapter-extent.js?v=20261114-reader-tab-anchor-v4",
@@ -77,7 +77,7 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261117-note-picker-label-v2481",
+  "/web/web-client-version.js?v=20261117-report-rail-titles-v2482",
   "/web/web-app-update.js?v=20261110-per-codes-v3",
   "/web/research-delete-controls.js?v=13",
   "/web/assistant-composer-hint.js?v=1",
@@ -104,18 +104,18 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261117-note-picker-label-v2481",
+  "/web/styles.css?v=20261117-report-rail-titles-v2482",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261117-note-picker-label-v2481",
+  "/web/app.js?v=20261117-report-rail-titles-v2482",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261117-note-picker-label-v2481",
+  "/web/offline-storage.js?v=20261117-report-rail-titles-v2482",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261111-selective-menus-v3",

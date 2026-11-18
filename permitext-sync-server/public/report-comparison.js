@@ -10,7 +10,7 @@ export function preserveReportReadingPosition(container, change) {
   container.scrollTop = anchor ? container.scrollTop + anchor.getBoundingClientRect().top - before : scroll;
 }
 
-export function reportOutlineRailWidth(collapsed) { return collapsed ? 35 : 300; }
+export function reportOutlineRailWidth(collapsed) { return collapsed ? 64 : 300; }
 
 export function reportComparisonLayout(available, { sources = 0, outline = 0, reports = 0, versions = 300,
   comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0, minimumReportWidth = 600,

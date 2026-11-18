@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-note-picker-label-v2481";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-report-rail-titles-v2482";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -57,7 +57,7 @@ import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, 
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportResizeDivider, createReportVersionsControls } from "./report-library.js?v=20261117-report-resize-v14";
-import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261117-report-sources-v28";
+import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261117-report-rail-titles-v29";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261115-reports-rail-v6";
 import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportBlockUsesSource, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261114-report-source-toggle-v9";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-note-picker-label-v2481";
+} from "./offline-storage.js?v=20261117-report-rail-titles-v2482";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -6144,7 +6144,7 @@ function syncReferenceReaderLayout() {
   const widths = visibleIDs.map(id => paneIsCollapsed(id) ? 48 : assistantHistoryOnlyPane(id) ? assistantHistoryWidth : constrainPaneWidth(id, state.paneWeights[id] || defaultPaneWidthForID(id)));
   const reportPanel = document.querySelector(".report-workspace-view:not([hidden]) .report-draft-panel");
   const libraryWidth = reportPanel?.dataset.libraryOpen === "true" ? Number(reportPanel.dataset.libraryWidth) || 330 : 0;
-  const outlineWidth = reportPanel?.dataset.outlineHidden === "true" ? 35 : 300;
+  const outlineWidth = reportOutlineRailWidth(reportPanel?.dataset.outlineHidden === "true");
   const reportsWidth = reportPanel ? reportOutlineRailWidth(reportPanel.dataset.reportsHidden === "true") : 0;
   const minimumDocumentWidth = view === "report" ? reportColumnsLayout(shell.clientWidth, libraryWidth, outlineWidth).minimumWidth + reportsWidth : 600;
   const minimumWidths = visibleIDs.map(id => paneIsCollapsed(id) ? 48 : minimumPaneWidthForID(id));
@@ -33478,6 +33478,15 @@ function createReportPaneHeader(closeReport) {
   return header;
 }
 
+function createReportRailTitle(heading, title = heading.textContent) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'report-rail-title';
+  button.textContent = title;
+  heading.replaceChildren(button);
+  return button;
+}
+
 async function renderProjectReportDraft(project, resume = null) {
   if (!hasCapability("professional-exports")) return renderProLockedPane(paneIDForProjectReportDraft(project), "Reports");
   const requestIdentity = captureAccountRequest();
@@ -34923,11 +34932,13 @@ async function renderProjectReportDraft(project, resume = null) {
     draftPicker.append(pageTitleEditor); pageFields.set('__title',{element:pageTitleEditor,size:28});
     const reportsRail = document.createElement('aside'); reportsRail.className = 'report-list-rail';
     reportsRail.setAttribute('aria-label', 'Project reports');
-    const reportsTopRow = document.createElement('div'); reportsTopRow.className = 'report-list-top-row';
+    const reportsTopRow = document.createElement('header');
+    reportsTopRow.className = 'report-list-top-row report-rail-header';
+    const reportsTitle = document.createElement('h2');
+    const reportsToggle = createReportRailTitle(reportsTitle, 'Reports');
     const createNew = document.createElement('button'); createNew.type = 'button'; createNew.className = 'report-list-create';
     createNew.textContent = 'New report +'; createNew.setAttribute('aria-label','New report');
     createNew.addEventListener('click', () => {void reportSwitch.select('__new__');});
-    const reportsToggle = document.createElement('button'); reportsToggle.type = 'button'; reportsToggle.className = 'icon-button report-list-toggle';
     if (panel.dataset.reportsHidden === undefined) panel.dataset.reportsHidden = String(!reportSectionExpanded('Reports column',true));
     const reportOptions = document.createElement('div'); reportOptions.className = 'report-list-items';
     reportOptions.setAttribute('role','group'); reportOptions.setAttribute('aria-label','Available reports');
@@ -34936,13 +34947,7 @@ async function renderProjectReportDraft(project, resume = null) {
       const shown = panel.dataset.reportsHidden !== 'true';
       reportsRail.classList.toggle('is-reports-collapsed',!shown);
       createNew.hidden = deleteButton.hidden = reportOptions.hidden = !shown;
-      reportsToggle.setAttribute('aria-label',shown ? 'Hide reports list' : 'Show reports list');
-      reportsToggle.title = shown ? 'Hide reports list' : 'Show reports list';
       reportsToggle.setAttribute('aria-expanded',String(shown));
-      if (reportsToggle.dataset.expanded !== String(shown)) {
-        reportsToggle.dataset.expanded = String(shown); reportsToggle.replaceChildren();
-        prependWorkspaceButtonIcon(reportsToggle,shown ? 'panel-left-close' : 'panel-left-open');
-      }
     };
     reportsToggle.addEventListener('click', () => {
       panel.dataset.reportsHidden = String(panel.dataset.reportsHidden !== 'true');
@@ -34951,7 +34956,7 @@ async function renderProjectReportDraft(project, resume = null) {
       reportsRailTimer = setTimeout(() => documents.classList.remove('is-reports-toggling'),220);
       paintReportsToggle(); syncReferenceReaderLayout();
     });
-    reportsTopRow.append(createNew,deleteButton,reportsToggle);
+    reportsTopRow.append(reportsTitle,createNew,deleteButton);
     reportsRail.append(reportsTopRow,reportOptions);
     refreshReportList = () => {
       reportOptions.replaceChildren();
@@ -35217,12 +35222,12 @@ async function renderProjectReportDraft(project, resume = null) {
     library.setAttribute("aria-label", "Report sources");
     const availableSidebarWidth = () => Math.min(shell.clientWidth || Infinity, document.querySelector('.workspace-shell')?.clientWidth || Infinity);
     const sourcesHeader = document.createElement("header");
-    sourcesHeader.className = "report-library-header report-outline-rail-header";
+    sourcesHeader.className = "report-library-header report-rail-header";
     const sourcesTitle = document.createElement("h2");
-    sourcesTitle.textContent = "Sources";
+    const sourcesToggle = createReportRailTitle(sourcesTitle, "Sources");
     sourcesHeader.append(sourcesTitle);
     const outlineHeader = document.createElement('header');
-    outlineHeader.className = 'report-outline-header report-outline-rail-header';
+    outlineHeader.className = 'report-outline-header report-rail-header';
     const outlineLabel = outline.querySelector('h2');
     outlineLabel.replaceWith(outlineHeader); outlineHeader.append(outlineLabel);
     sourcePicker.setAttribute("aria-label", "Report sources");
@@ -35251,42 +35256,21 @@ async function renderProjectReportDraft(project, resume = null) {
     comparison.versions.querySelector(".report-versions-header")?.remove();
     comparison.versions.prepend(versionsControls.header);
     panel._reportSidebarControls = [versionsControls, comparison];
-    const sourcesToggle = document.createElement("button");
-    sourcesToggle.type = "button";
-    sourcesToggle.className = "icon-button report-outline-toggle";
     const paintSourcesToggle = shown => {
       library.classList.toggle("is-sources-collapsed", !shown);
       sourcePicker.hidden = !shown;
-      const label = shown ? "Hide sources" : "Show sources";
-      sourcesToggle.setAttribute("aria-label", label);
-      sourcesToggle.title = label;
       sourcesToggle.setAttribute("aria-expanded", String(shown));
-      if (sourcesToggle.dataset.expanded !== String(shown)) {
-        sourcesToggle.dataset.expanded = String(shown);
-        sourcesToggle.replaceChildren();
-        prependWorkspaceButtonIcon(sourcesToggle, shown ? "panel-left-close" : "panel-left-open");
-      }
     };
     sourcesToggle.addEventListener("click", () => {
       panel.dataset.libraryOpen = String(panel.dataset.libraryOpen !== "true");
       syncReferenceReaderLayout();
     });
-    sourcesHeader.append(sourcesToggle);
     if (panel.dataset.outlineHidden === undefined) {
       panel.dataset.outlineHidden = String(!reportSectionExpanded("Outline column", !initialReportOutlineHidden(activeDraft.blocks)));
     }
-    const outlineToggle = document.createElement("button");
-    outlineToggle.type = "button";
-    outlineToggle.className = "icon-button report-outline-toggle";
+    const outlineToggle = createReportRailTitle(outlineLabel);
     const paintOutlineToggle = () => {
-      const shown = panel.dataset.outlineHidden !== "true";
-      const label = shown ? 'Hide outline' : 'Show outline';
-      outlineToggle.setAttribute('aria-label', label); outlineToggle.title = label;
-      outlineToggle.setAttribute('aria-expanded', String(shown));
-      if (outlineToggle.dataset.expanded !== String(shown)) {
-        outlineToggle.dataset.expanded = String(shown); outlineToggle.replaceChildren();
-        prependWorkspaceButtonIcon(outlineToggle, shown ? 'panel-left-close' : 'panel-left-open');
-      }
+      outlineToggle.setAttribute('aria-expanded', String(panel.dataset.outlineHidden !== "true"));
     };
     outlineToggle.addEventListener("click", () => {
       panel.dataset.outlineHidden = String(panel.dataset.outlineHidden !== "true");
@@ -35298,7 +35282,6 @@ async function renderProjectReportDraft(project, resume = null) {
       syncReferenceReaderLayout();
     });
     paintOutlineToggle();
-    outlineHeader.append(outlineToggle);
     const versionsToggle = document.createElement("button");
     versionsToggle.type = "button";
     versionsToggle.textContent = "Versions";

@@ -13,9 +13,11 @@ class Element {
   get classList() {return {toggle:(key,on)=>on?this.classes.add(key):this.classes.delete(key),add:key=>this.classes.add(key),remove:key=>this.classes.delete(key)};}
 }
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+const titleStart=app.indexOf('function createReportRailTitle(');
+const titleEnd=app.indexOf('\n}',titleStart);
 const start=app.indexOf("    const reportsRail = document.createElement('aside');");
 const end=app.indexOf('    titleControl.append(',start);
-assert(start>0&&end>start);
+assert(titleStart>0&&titleEnd>titleStart&&start>0&&end>start);
 const selections=[],preferences=[];
 let resizes=0,cancels=0;
 const current={id:'one',title:'First report'},other={id:'two',title:'Second report'};
@@ -24,9 +26,9 @@ const c=vm.createContext({document:{createElement:()=>new Element()},panel:{data
   deleteButton:new Element(),documents:new Element(),reportsRailTimer:null,refreshReportList:null,
   reportSectionExpanded:()=>true,persistReportSectionExpanded:(key,value)=>preferences.push([key,value]),
   reportSwitch:{select:async id=>selections.push(id),cancel:()=>cancels++},
-  prependWorkspaceButtonIcon:(element,icon)=>{element.icon=icon;},
   clearTimeout(){},setTimeout:()=>1,syncReferenceReaderLayout:()=>resizes++});
-vm.runInContext(`function build(){${app.slice(start,end)}
+vm.runInContext(`${app.slice(titleStart,titleEnd+2)}
+  function build(){${app.slice(start,end)}
   return {rail:reportsRail,options:reportOptions,toggle:reportsToggle,create:createNew};}
   globalThis.list=build();`,c);
 const {list}=c;
@@ -38,12 +40,13 @@ list.options.children[1].events.click();assert.deepEqual(selections,['two']);
 list.create.events.click();assert.deepEqual(selections,['two','__new__']);
 list.toggle.events.click();
 assert.equal(c.panel.dataset.reportsHidden,'true');assert.equal(list.options.hidden,true);
-assert.equal(list.toggle.attributes['aria-label'],'Show reports list');
+assert.equal(list.toggle.textContent,'Reports');
 assert.equal(list.toggle.attributes['aria-expanded'],'false');
 assert.equal(c.deleteButton.hidden,true);
 list.toggle.events.click();
 assert.equal(c.panel.dataset.reportsHidden,'false');assert.equal(list.options.hidden,false);
-assert.equal(list.toggle.attributes['aria-label'],'Hide reports list');
+assert.equal(list.toggle.textContent,'Reports');
+assert.equal(list.toggle.attributes['aria-expanded'],'true');
 assert.equal(resizes,2);assert.deepEqual(preferences,[['Reports column',false],['Reports column',true]]);
 c.activeDraft={...current,title:'Renamed report'};c.refreshReportList();
 assert.equal(list.options.children[0].textContent,'Renamed report');
