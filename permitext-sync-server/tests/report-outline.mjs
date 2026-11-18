@@ -267,7 +267,7 @@ autosave.dispose();
     let next=0;
     const context=vm.createContext({activeDraft:draft,reportInsertion:insertion,reportInsertionIndex,
       crypto:{randomUUID:()=>`new-${++next}`},panel:{dataset:{},querySelector:()=>({focus(){}})},
-      setDirty(){},renderWorkspaceContent(){},outlineController:{reveal(){}},reportFormatting:{focus(){}}});
+      setDirty(){},renderWorkspaceContent(){},syncReferenceReaderLayout(){},outlineController:{reveal(){}},reportFormatting:{focus(){}}});
     vm.runInContext(implementation+'\nglobalThis.add=addReportContent;',context);
     context.add(kind); context.add('paragraph');
     assert.deepEqual(draft.blocks.map(block=>block.id),['a','b','new-1','new-2','c']);

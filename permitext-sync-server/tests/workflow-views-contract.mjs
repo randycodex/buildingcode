@@ -57,147 +57,62 @@ assert.equal(referenceColumnsWidth([600,600],1600),1204,'Horizontal overflow beg
 assert.equal(referenceColumnsWidth([1000],1400,600,[1000]),1003,'Assistant history retains its existing additional width');
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert.ok(start>=0);return source.slice(start,source.indexOf('\n}',start)+2);};
-const pane=id=>({dataset:{paneId:id},scrollTop:0,scrollLeft:0,isConnected:true,querySelectorAll:()=>[],draft:'Unsaved text',hidden:false,classList:{contains(name){return name==='is-workflow-hidden' && panes.find(p=>p.classList===this).hidden;}}});
-const reader=pane('reader:one'), notebook=pane('project:notebook:a'); reader.scrollTop=1700; notebook.scrollTop=400;
-const panes=[reader,notebook], state={workflowVisitedViews:['research','notebook'],workflowView:'research',workflowMembership:{},workflowScroll:{notebook:70}};
-const track={scrollLeft:110,querySelectorAll:()=>panes};
-let constructions=0, needProject=false, dividerUpdates=0;
-let reportOpen=false, detailsOpen=false;
-const c=vm.createContext({isProAccount:()=>true,columnExpansionController:()=>({refresh(){}}),reportScreen:{isOpen:()=>reportOpen,close(){if(reportOpen){reportOpen=false;c.syncWorkflowColumnPresentation();}}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){if(detailsOpen){detailsOpen=false;c.syncWorkflowColumnPresentation();}}},toggleSettingsButton:null,toggleReportButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
-  activeWorkspaceID:'workspace',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,toggleSavedButton:null,
-  prepareNotebookView:async()=>{},isProjectNotebookPaneID:id=>id.startsWith('project:notebook:'),
-  selectedNotebookColumn:()=>({id:'primary',projectID:'a'}),notebookColumnPaneID:()=>notebook.dataset.paneId,
-  detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
-  document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,workspaceColumnsRequireProject:()=>false,
-  syncTopbarProjectToolStates(){},syncNotebookLanding(){},syncResearchStart(){},ensureNotebookTabCatalog:async()=>{},syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
-  defaultActivePaneIDs:()=>panes.map(p=>p.dataset.paneId),
-  appendPaneSequence(actualPanes){actualPanes.forEach((p,i)=>assert.equal(p,panes[i]));for(const p of actualPanes){p.hidden=!c.workflowPaneIsVisible(p.dataset.paneId);p.scrollTop=0;}c.syncWorkflowNavigation();},
-  projectHasOpenNotebook:()=>panes.includes(notebook),savedPaneIDs:()=>[],placeEvidenceBeforeNotebook(){},
-  openProjectNotebook(){constructions++;if(!panes.includes(notebook))panes.push(notebook);},focusRecentUtilityColumn(){constructions++;}
+const project = {id:'project'};
+let noteOpen = true, reportsOpen = true, notesOpened = 0, needsProject = false;
+const noteID = 'project:notebook:project:primary', indexID = 'project:notes-index:project';
+const state = {workflowMembership:{'reader:legacy':['notebook']}, notebookReaderHidden:true};
+const c = vm.createContext({
+  state, isProAccount:()=>true, detachedProjectWindow:false, workspaceProject:()=>project,
+  projectHasOpenNotebook:()=>noteOpen, notebookIndexPaneID:()=>indexID, selectedNotebookColumn:()=>noteOpen ? {id:'primary'} : null,
+  isProjectNotebookPaneID:id=>id.startsWith('project:notebook:'), notebookColumnPaneID:()=>noteID,
+  paneBelongsToView, workflowPaneAnchors:()=>({}),
+  reportScreen:{close(){reportsOpen=false;}}, projectDetailsScreen:null,
+  document:{querySelector:()=>null}, workspaceColumnsRequireProject:()=>false, notifyProjectRequiredForColumn:()=>needsProject,
+  openProjectNotebook:async()=>{notesOpened++;noteOpen=true;return true;}, syncWorkflowColumnPresentation(){},
 });
-vm.runInContext("let presentedColumnWorkflowView='research';\n"+['currentWorkflowView','currentColumnWorkflowView','syncReferenceReaderLayout','syncWorkflowColumnPresentation','workflowPaneAnchors','workflowPaneIsVisible','closeSharedWorkspaceViews','syncWorkflowNavigation','switchWorkflowView'].map(actual).join('\n'),c);
-await c.switchWorkflowView('notebook'); assert.equal(track.scrollLeft,70);
-assert.equal(dividerUpdates, 1, 'A workflow switch refreshes navigation once after its pane sequence is ready');
-notebook.scrollTop=450; track.scrollLeft=200;
-await c.switchWorkflowView('research');
-assert.equal(reader.scrollTop,1700); assert.equal(track.scrollLeft,110);
-assert.equal(notebook.draft,'Unsaved text'); assert.equal(constructions,0);
-await c.switchWorkflowView('notebook'); assert.equal(notebook.scrollTop,450); assert.equal(track.scrollLeft,200);
-assert.equal(state.workflowNavigationGeneration,3,'Each actual view change invalidates pending navigation');
-// Floating Context does not replace the underlying Research/Notebook view.
-await c.switchWorkflowView('research');
-detailsOpen=true;
-c.syncWorkflowColumnPresentation();
+vm.runInContext(['currentWorkflowView','currentColumnWorkflowView','sharedNotesOpen','workflowPaneIsVisible',
+  'closeSharedWorkspaceViews','switchWorkflowView'].map(actual).join('\n'),c);
+
 assert.equal(c.currentColumnWorkflowView(),'research');
-assert.equal(c.workflowPaneIsVisible(reader.dataset.paneId),true);
-assert.equal(c.workflowPaneIsVisible(notebook.dataset.paneId),false);
-const retainedReaderScroll=reader.scrollTop;
-await c.switchWorkflowView('notebook');
-assert.equal(detailsOpen,true,'Context stays open when changing working views.');
-assert.equal(notebook.scrollTop,450);assert.equal(track.scrollLeft,200);
-await c.switchWorkflowView('research');
-assert.equal(reader.scrollTop,retainedReaderScroll);
-assert.equal(reader.draft,'Unsaved text');
-assert.equal(detailsOpen,true);
-c.closeSharedWorkspaceViews('account');
-assert.equal(detailsOpen,false,'Authentication screens still close private Context.');
-await c.switchWorkflowView('notebook');
-needProject=true; assert.equal(await c.switchWorkflowView('research'),false); assert.equal(state.workflowView,'notebook');
-const beforeExplicit = constructions;
-needProject = false;
-c.projectHasOpenNotebook = () => false;
-c.defaultActivePaneIDs = () => [];
-state.workflowVisitedViews = [];
-await c.switchWorkflowView('research', {initialize: false});
-await c.switchWorkflowView('notebook', {initialize: false});
-assert.equal(constructions, beforeExplicit, 'An explicit saved-work destination opens only the requested column.');
-assert.equal(state.workflowView, 'notebook');
-let projectOpens = 0; c.openProjectDetailsScreen = async () => { projectOpens++; return true; };
-assert.equal(await c.switchWorkflowView('project'), true); assert.equal(projectOpens, 1);
-c.projectHasOpenNotebook = () => panes.includes(notebook);
-c.defaultActivePaneIDs = () => panes.map(p => p.dataset.paneId);
-state.workflowVisitedViews = ['research', 'notebook'];
-// Real mounted screen close callbacks present the underlying view. A switch
-// must not lay that intermediate view out before showing the requested one.
-for (const screen of ['report','project-details']) {
- state.workflowView='research';reportOpen=screen==='report';detailsOpen=screen==='project-details';
- c.syncWorkflowColumnPresentation();const before=dividerUpdates;
- await c.switchWorkflowView('notebook');
- assert.equal(dividerUpdates,before+1,'A mounted screen-to-Notebook switch presents only its final destination.');
- assert.equal(state.workflowPresentationDeferred,undefined,'Deferral never leaks into saved workspace state.');
- assert.equal(notebook.draft,'Unsaved text');assert.equal(notebook.scrollTop,450);
-}
-console.log('Workflow views passed: independent visibility, linked destinations, layout persistence, retained editors, nested scroll and project guard.');
-
-// The real view-switch fast path must start an existing deferred slot rather
-// than treating its placeholder as a healthy, already-mounted editor.
-let deferredHydrations=0;
-c.activeWorkspaceID='workspace';c.captureAccountRequest=()=>({});c.isCurrentAccountRequest=()=>true;
-c.transitionWorkspace=async mode=>{
- assert.equal(mode,'utility');deferredHydrations++;
- delete notebook.dataset.workspacePaneDeferred;delete notebook.dataset.workspacePaneLoading;
-};
-notebook.dataset.workspacePaneDeferred='true';notebook.dataset.workspacePaneLoading='true';
-await c.switchWorkflowView('research');assert.equal(deferredHydrations,0);
-await c.switchWorkflowView('notebook');assert.equal(deferredHydrations,1,'Revealing a deferred Note must reconcile its real loader');
-await c.switchWorkflowView('research');await c.switchWorkflowView('notebook');
-assert.equal(deferredHydrations,1,'An already mounted Note retains its controller without another hydration');
-assert.equal(notebook.draft,'Unsaved text');
-
-let releaseDeferred;
-c.transitionWorkspace=()=>new Promise(resolve=>{releaseDeferred=resolve;});
-notebook.dataset.workspacePaneDeferred='true';
-const lateReveal=c.switchWorkflowView('notebook');
-await new Promise(resolve=>setImmediate(resolve));
-state.workflowView='research';state.workflowNavigationGeneration++;
-releaseDeferred();assert.equal(await lateReveal,false,'A delayed reveal must not finish against a subsequently selected view');
-delete notebook.dataset.workspacePaneDeferred;
-await c.switchWorkflowView('notebook');
-console.log('Deferred Notes view reveal passed: starts once through the real view switch, retains mounted editors and fences late navigation.');
+assert.equal(c.workflowPaneIsVisible('reader:open'),true);
+assert.equal(c.workflowPaneIsVisible('reader:legacy'),false,'Do not reopen the old hidden Notebook Reader.');
+assert.equal(c.workflowPaneIsVisible('utility:saved:legacy'),false,'Do not open the old Notebook Evidence panel.');
+state.workflowMembership=linkPaneToView(state.workflowMembership,'utility:saved:legacy','research');
+assert.equal(c.workflowPaneIsVisible('utility:saved:legacy'),true,'Saved passages can open on request.');
+assert.equal(c.workflowPaneIsVisible(indexID),true);
+assert.equal(c.workflowPaneIsVisible(noteID),true);
+assert.equal(c.workflowPaneIsVisible('project:notebook:project:other'),false);
+assert.equal(await c.switchWorkflowView('research'),true);
+assert.equal(await c.switchWorkflowView('notebook'),true);
+assert.equal(notesOpened,0);
+assert.equal(c.workflowPaneIsVisible('reader:open'),true);
+assert.equal(reportsOpen,true,'Opening Notes keeps the existing Report visible.');
+noteOpen=false;
+assert.equal(c.workflowPaneIsVisible(indexID),false);
+assert.equal(c.workflowPaneIsVisible(noteID),false);
+assert.equal(await c.switchWorkflowView('notebook',{initialize:false}),true);
+assert.equal(notesOpened,0,'A link can open a particular Note without creating a second editor.');
+assert.equal(await c.switchWorkflowView('notebook'),true);
+assert.equal(notesOpened,1);
+assert.equal(c.workflowPaneIsVisible(indexID),true);
+needsProject=true;
+assert.equal(await c.switchWorkflowView('research'),false);
+needsProject=false;
+c.openProjectDetailsScreen=async()=>true;
+assert.equal(await c.switchWorkflowView('project'),true);
+c.closeSharedWorkspaceViews();
+assert.equal(reportsOpen,false,'Account and Project changes may close the current Report.');
 
 const closed=[];
-c.activeWorkspaceID='a'; c.captureAccountRequest=()=>({}); c.isCurrentAccountRequest=()=>true;
-c.workspacePaneDescriptors=()=>panes.map(p=>({id:p.dataset.paneId,close:async()=>{closed.push(p.dataset.paneId);}}));
+c.activeWorkspaceID='workspace'; c.captureAccountRequest=()=>({}); c.isCurrentAccountRequest=()=>true;
+c.saveWorkspaceState=()=>{};
+c.workspacePaneDescriptors=()=>[noteID,'reader:open','reader:legacy'].map(id=>({id,close:async()=>{closed.push(id);}}));
+reportsOpen=true;
 vm.runInContext(actual('closeAllColumns'),c);
 await c.closeAllColumns();
-assert.deepEqual(closed,['project:notebook:a'],'Close all only closes this view');
-
-// Closed columns remain closed; the Notebook toolbar can reopen individual Notes.
-needProject=false;
-c.workspacePaneDescriptors=()=>panes.map(p=>({id:p.dataset.paneId,close:async()=>{
-  panes.splice(panes.indexOf(p),1);
-}}));
-for (const view of ['research','notebook']) {
-  const other=view==='research'?'notebook':'research';
-  state.workflowView=view;
-  state.workflowVisitedViews=[];
-  panes.splice(0,panes.length,reader,notebook);
-  await c.closeAllColumns();
-  assert.equal(panes.length,1,'Close all retains the other view column');
-  assert.equal(panes[0],view==='research'?notebook:reader);
-  assert.ok(state.workflowVisitedViews.includes(view),'Remember a deliberately empty view');
-  // Exercise the same layout serialization used by reload and Project switches.
-  const saved=captureWorkspaceLayout(state);
-  applyWorkspaceLayout(state,saved);
-  const before=constructions;
-  await c.switchWorkflowView(other);
-  const afterOther=constructions;
-  await c.switchWorkflowView(view);
-  await c.switchWorkflowView(view);
-  assert.equal(afterOther,before,'Switching to a retained screen keeps its existing columns');
-  assert.equal(constructions,afterOther,'Switching views does not reopen deliberately closed Note columns');
-  assert.equal(panes.length,1,'Both views retain deliberate empty layouts');
-}
-for (const view of ['research','notebook']) {
-  panes.length=0;
-  state.workflowVisitedViews=[];
-  const beforeFresh=constructions;
-  await c.switchWorkflowView(view);
-  await c.switchWorkflowView(view);
-  assert.equal(constructions,beforeFresh,`First empty ${view} visit must not open default columns`);
-  assert.equal(panes.length,0,'An empty workspace stays empty until a column is explicitly opened');
-}
-console.log('Closed view regression passed: Deliberately closed columns stay closed, retained editors and saved layouts survive.');
+assert.deepEqual(closed,['reader:open',noteID],'Close all respects visible tools and leaves hidden legacy slots alone.');
+assert.equal(reportsOpen,false);
+console.log('Shared workspace passed: independent tools, one Notes editor, retained legacy data, and account/project guards.');
 
 const evidenceState={paneOrder:['reader:research','project:notebook:a','utility:saved:one','utility:saved:two']};
 const evidenceContext=vm.createContext({isProAccount:()=>true,state:evidenceState,workspaceProject:()=>({id:'a'}),
@@ -239,45 +154,28 @@ assert.equal(referenceTrack.inert,true,'Account keeps reference columns inactive
 assert.equal(referenceClasses.has('has-reference-readers'),false);
 console.log('Report constraints passed: 600px document minimum, expanded Sources, 300px optional outline, retained hidden Readers and Account isolation.');
 
-// Layout follows the visible Report, never the retained Research/Notebook track.
-let menuReportOpen = true, reportReady = true, reportResets = 0, savedLayouts = 0, workspaceTransitions = 0;
-const fit = {}, workspaceOnly = [{}, {}, {}];
-const layoutTrack = {scrollLeft: 220, scrollWidth: 1000, clientWidth: 700, querySelectorAll: () => []};
+// Restore shared workspace and Report widths in the same action.
+let reportReady=true, reportResets=0, saves=0;
+const fit = {}, actions = [{},{}];
 const reportPanel = {querySelector: () => reportReady ? {} : null};
-const layoutState = {paneWeights: {'reader:one': 900, 'project:notebook:a': 730}, columnGroups: []};
-const layoutContext = vm.createContext({isProAccount:()=>true, currentColumnWorkflowView: () => menuReportOpen ? "report" : "research",
-  reportScreen: {isOpen: () => menuReportOpen}, fitColumnsButton: fit,
-  document: {querySelector: selector => selector.endsWith('.report-draft-panel') ? reportPanel : reportReady ? {} : null,
-    querySelectorAll: () => workspaceOnly},
-  defaultActivePaneIDs: () => [], activePaneIDs: () => ['reader:one', 'project:notebook:a'],
-  workflowPaneIsVisible: id => id === 'reader:one', defaultPaneWidthForID: () => 600,
-  resetReportColumnWidths: panel => {assert.equal(panel, reportPanel); reportResets++;},
-  syncReferenceReaderLayout() {}, syncResearchColumnLayout() {}, workspaceColumnExpansion: null, state: layoutState, track: layoutTrack,
-  saveWorkspaceState: () => savedLayouts++, transitionWorkspace: async () => workspaceTransitions++, requestAnimationFrame: callback => callback()
+const layoutTrack = {scrollLeft:220,scrollWidth:1000,clientWidth:700,querySelector:()=>reportReady ? reportPanel : null,querySelectorAll:()=>[]};
+const layoutState = {paneWeights:{'reader:one':900},columnGroups:[]};
+const layoutContext=vm.createContext({
+  isProAccount:()=>true,currentColumnWorkflowView:()=> 'research',fitColumnsButton:fit,
+  document:{querySelector:()=>reportReady?reportPanel:null,querySelectorAll:()=>actions},
+  defaultActivePaneIDs:()=>['reader:one'],activePaneIDs:()=>['reader:one'],workflowPaneIsVisible:()=>true,defaultPaneWidthForID:()=>630,
+  resetReportColumnWidths:panel=>{assert.equal(panel,reportPanel);reportResets++;},
+  syncReferenceReaderLayout(){},syncResearchColumnLayout(){},workspaceColumnExpansion:null,state:layoutState,track:layoutTrack,
+  saveWorkspaceState:()=>saves++,transitionWorkspace:async()=>{},requestAnimationFrame:fn=>fn(),
 });
-vm.runInContext([actual('updateWorkspaceLayoutControls'), actual('resetVisibleColumnWidths')].join('\n'), layoutContext);
+vm.runInContext([actual('updateWorkspaceLayoutControls'),actual('resetVisibleColumnWidths')].join('\n'),layoutContext);
 layoutContext.updateWorkspaceLayoutControls();
-assert.equal(fit.hidden, false, 'Report reset stays available even when no Research columns are open');
-assert.equal(fit.disabled, false);
-assert.equal(fit.title, 'Restore default Report column widths');
-assert.ok(workspaceOnly.every(button => button.hidden), 'Report does not expose actions that operate on another view');
+assert.equal(fit.disabled,false);
+assert.ok(actions.every(button=>!button.disabled && !button.hidden));
 await layoutContext.resetVisibleColumnWidths();
-assert.equal(reportResets, 1);
-assert.equal(layoutState.paneWeights['reader:one'], 900);
-assert.equal(savedLayouts, 0);
-assert.equal(workspaceTransitions, 0, 'Report reset does not rebuild or change the retained working views');
-reportReady = false; layoutContext.updateWorkspaceLayoutControls();
-assert.equal(fit.disabled, true, 'Wait for the Report columns to finish loading');
-await layoutContext.resetVisibleColumnWidths();
-assert.equal(reportResets, 1, 'A loading Report does not fall through to resetting another view');
-menuReportOpen = false; layoutContext.updateWorkspaceLayoutControls();
-assert.ok(workspaceOnly.every(button => !button.hidden), 'Research/Notebook restore their existing Layout actions');
-await layoutContext.resetVisibleColumnWidths();
-assert.equal(layoutState.paneWeights['reader:one'], 600);
-assert.equal(layoutState.paneWeights['project:notebook:a'], 730, 'The other view retains its width');
-assert.equal(savedLayouts, 1); assert.equal(workspaceTransitions, 1);
-assert.equal(layoutTrack.scrollLeft, 220);
-console.log('Layout reset passed: Report-aware controls and reset, loading guard, retained working views and existing Research/Notebook behavior.');
+assert.equal(reportResets,1);assert.equal(layoutState.paneWeights['reader:one'],630);assert.equal(saves,1);assert.equal(layoutTrack.scrollLeft,220);
+reportReady=false;layoutContext.updateWorkspaceLayoutControls();assert.equal(fit.disabled,false,'A loading Report does not disable the Reader layout controls.');
+console.log('Reset shared layout passed: Reader and Report widths, retained scroll and available toolbar controls.');
 
 // Restoring a legacy automatic link must not reopen Notes in Research.
 const notesID = 'project:notebook:legacy';
@@ -289,48 +187,23 @@ applyWorkspaceLayout(notesLayout,captureWorkspaceLayout({workflowMembership:expl
 assert.equal(paneBelongsToView(notesID,'research',notesLayout.workflowMembership),true);
 assert.equal(paneBelongsToView(notesID,'notebook',notesLayout.workflowMembership),true);
 
-// Research and Notebook each retain live Reader sessions across repeated view
-// switches. Notebook keeps its own single Reader control.
-{
- const notebookReader=pane('reader:notebook');panes.splice(0,panes.length,reader,notebook,notebookReader);
- const session={id:'notebook',codePrefix:'BC',codeVersion:'2022',sectionID:'101',scrollPosition:{sectionID:'101',anchorOffset:-42}};
- initializeReaderTabs(session);
- for(const [index,prefix] of ['AC','PC','MC','FGC','ECC'].entries())addReaderTab(session,{codePrefix:prefix,codeVersion:'2022',sectionID:`${index+2}01`,scrollPosition:{sectionID:`${index+2}01`,anchorOffset:-50-index}},`tab-${index}`);
- assert.equal(canAddReaderTab(session),false);assert.equal(addReaderTab(session,{codePrefix:'EC'},'seventh'),null);
- const frozenTabs=JSON.stringify(readerTabs(session).filter(tab=>tab.id!==session.activeTabID));const selectedTab=session.activeTabID;state.readers=[session];state.workflowMembership={'reader:notebook':['notebook']};
- c.paneIDForReader=reader=>`reader:${reader.id}`;
- c.captureReaderScrollPositions=()=>new Map(panes.filter(pane=>!pane.hidden&&pane.dataset.paneId.startsWith('reader:')).map(pane=>[pane.dataset.paneId,{contentKey:pane.dataset.paneId,sectionID:'kept-section',anchorOffset:-pane.scrollTop}]));
- const researchTools={append(host){host.parentElement=this;}},notebookTools={append(host){host.parentElement=this;}};
- const host={parentElement:researchTools};
- c.document.querySelector=selector=>selector==='#reader-shortcuts'?host:selector==='[data-workflow-tools="research"] .reader-toolbar-tools'?researchTools:selector==='[data-workflow-tools="notebook"] .reader-toolbar-tools'?notebookTools:null;
- state.notebookReaderVisibilityVersion=1;state.notebookReaderHidden=false;
- state.workflowView='research';c.syncWorkflowColumnPresentation();reader.scrollTop=1850;
- await c.switchWorkflowView('notebook');notebookReader.scrollTop=2470;
- assert.equal(host.parentElement,researchTools);assert.equal(c.workflowPaneIsVisible('reader:notebook'),true);assert.equal(c.workflowPaneIsVisible('reader:one'),false);
- for(let n=0;n<3;n++){
-  await c.switchWorkflowView('research');assert.equal(reader.scrollTop,1850);assert.equal(host.parentElement,researchTools);
-  await c.switchWorkflowView('notebook');assert.equal(notebookReader.scrollTop,2470);assert.equal(host.parentElement,researchTools);
- }
- state.notebookReaderHidden=true;assert.equal(c.workflowPaneIsVisible('reader:notebook'),false);
- await c.switchWorkflowView('research');assert.equal(c.workflowPaneIsVisible('reader:one'),true,'Closing the Notebook Reader does not hide Research Readers');
- await c.switchWorkflowView('notebook');assert.equal(c.workflowPaneIsVisible('reader:notebook'),false,'View changes retain the closed Notebook Reader');
- state.notebookReaderHidden=false;c.syncWorkflowColumnPresentation();
- assert.equal(session.activeTabID,selectedTab);assert.equal(JSON.stringify(readerTabs(session).filter(tab=>tab.id!==session.activeTabID)),frozenTabs);assert.equal(session.scrollPosition.anchorOffset,-2470);assert.equal(readerTabs(session).length,6);assert.equal(notebook.draft,'Unsaved text');
- const frozen=JSON.stringify(session);
- const reloaded={};applyWorkspaceLayout(reloaded,captureWorkspaceLayout(state));
- assert.equal(JSON.stringify(reloaded.readers[0]),frozen);assert.deepEqual(reloaded.workflowMembership,state.workflowMembership);
-}
-// Execute the ordering block from the real renderer, including multiple
-// Readers and the hidden Research Reader retained in the same workspace.
-{
- const start=source.indexOf("  if (currentColumnWorkflowView() === 'notebook') {",source.indexOf('function appendPaneSequence('));
- const end=source.indexOf('  state.paneOrder =',start);
- const context=vm.createContext({currentColumnWorkflowView:()=> 'notebook',workspaceProject:()=>({id:'a'}),
-  notebookIndexPaneID:()=> 'index',selectedNotebookColumn:()=>({id:'note'}),notebookColumnPaneID:()=> 'note',savedPaneIDs:()=>['evidence']});
- vm.runInContext(`function notebookOrder(orderedPanes){${source.slice(start,end)}return orderedPanes.map(pane=>pane.dataset.paneId);}`,context);
- const ids=['note','reader:b','index','evidence','reader:a'];
- const ordered=context.notebookOrder(ids.map(id=>({dataset:{paneId:id},classList:{contains:name=>name==='reader-panel'&&id.startsWith('reader:')}})));
- assert.deepEqual(Array.from(ordered),['reader:b','reader:a','evidence','index','note'],'The Notes list stays next to the current Note.');
- assert.deepEqual(Array.from(context.notebookOrder(ids.map(id=>({dataset:{paneId:id},classList:{contains:()=>false}})))),['reader:b','reader:a','evidence','index','note'],'Loading placeholders preserve the Notes list and editor pairing.');
-}
-console.log('Notebook Readers passed: six-tab cap, toolbar host, Reader → Evidence → Notes → current Note order, per-view visibility, live reading positions, unsent Note and reload retention.');
+// The shared Reader keeps all of its tabs and reading position in saved layouts.
+const session={id:'shared',codePrefix:'BC',codeVersion:'2022',sectionID:'101',scrollPosition:{sectionID:'101',anchorOffset:-42}};
+initializeReaderTabs(session);
+for(const [index,prefix] of ['AC','PC','MC','FGC','ECC'].entries())addReaderTab(session,{codePrefix:prefix,codeVersion:'2022',sectionID:`${index+2}01`},`tab-${index}`);
+assert.equal(canAddReaderTab(session),false);assert.equal(addReaderTab(session,{codePrefix:'EC'},'seventh'),null);
+const restoredReaders={};applyWorkspaceLayout(restoredReaders,captureWorkspaceLayout({readers:[session]}));
+assert.deepEqual(readerTabs(restoredReaders.readers[0]),readerTabs(session));
+assert.deepEqual(restoredReaders.readers[0].scrollPosition,session.scrollPosition);
+
+// Execute report-independent Notes ordering from the real workspace renderer.
+const orderingStart=source.indexOf('  const project = workspaceProject();',source.indexOf('function appendPaneSequence('));
+const orderingEnd=source.indexOf('  state.paneOrder =',orderingStart);
+const orderContext=vm.createContext({workspaceProject:()=>project,sharedNotesOpen:()=>true,notebookIndexPaneID:()=>indexID,
+  selectedNotebookColumn:()=>({id:'primary'}),notebookColumnPaneID:()=>noteID});
+vm.runInContext(`function notebookOrder(orderedPanes){const panesByID=new Map(orderedPanes.map(pane=>[pane.dataset.paneId,pane]));${source.slice(orderingStart,orderingEnd)}
+  return orderedPanes.map(pane=>pane.dataset.paneId);}`,orderContext);
+const ids=['reader:one',noteID,'utility:search:one',indexID,'reader:two'];
+const ordered=orderContext.notebookOrder(ids.map(id=>({dataset:{paneId:id}})));
+assert.deepEqual(Array.from(ordered),['reader:one',indexID,noteID,'utility:search:one','reader:two']);
+console.log('Shared Reader and Notes passed: six-tab cap, reload and adjacent list ordering.');

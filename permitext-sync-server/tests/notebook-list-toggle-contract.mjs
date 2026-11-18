@@ -30,7 +30,7 @@ class Element {
 }
 const project = {id:'project'}, state = {notebookListHidden:false};
 const editorID = 'project:notebook:project:note:editor';
-let view = 'notebook', allowed = true, saves = 0, transitions = 0;
+let notesOpen = true, allowed = true, saves = 0, transitions = 0;
 const context = vm.createContext({
   state, document:{createElement:tag => new Element(tag), querySelector:() => null},
   // Deferred panels are built before they belong to the workspace track.
@@ -38,7 +38,7 @@ const context = vm.createContext({
   workspacePrivatePresentationAllowed:() => allowed, hasCapability:() => allowed,
   workspaceProject:() => project, projectDetailKey:value => value?.id || '',
   captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',
-  currentWorkflowView:() => view, currentColumnWorkflowView:() => view, isProAccount:() => true,
+  sharedNotesOpen:() => notesOpen, detachedProjectWindow:false, isProAccount:() => true,
   paneCanCollapse:() => false,
   selectedNotebookColumn:() => ({id:'editor',cardID:'a'}), notebookColumnPaneID:() => editorID,
   isProjectNotebookPaneID:id => id.startsWith('project:notebook:'),
@@ -76,10 +76,10 @@ assert.equal(context.paneIsCollapsed(indexID), false);
 assert.equal(saves, 2); assert.equal(transitions, 2);
 allowed = false;
 assert.equal(await context.toggleNotebookList(), false);
-allowed = true; view = 'research';
+allowed = true; notesOpen = false;
 assert.equal(await context.toggleNotebookList(), false);
-assert.equal(saves, 2, 'Unavailable tools and other working views cannot change list visibility.');
-view='notebook';state.notebookListHidden=true;
+assert.equal(saves, 2, 'The closed Notes tool cannot change list visibility.');
+notesOpen=true;state.notebookListHidden=true;
 const revealed=[];
 context.scrollPaneIntoView=id=>revealed.push(id);
 context.track.querySelector=selector=>selector.includes(' .notebook-list-toggle')?{focus(){}}:{dataset:{paneId:indexID}};
@@ -146,34 +146,25 @@ await assert.rejects(motion.transitionNotebookList(()=>{throw Error('Update fail
 assert.equal(motionClasses.size,0,'A failed update cannot leave motion styles active.');
 console.log('Notes rail passed: 35px collapse, retained width, live titles without snapshots/fades, interrupted transitions, cleanup and reduced motion.');
 
-// Notebook is a permanent writing area, including older saved layouts that
-// closed it and the transition after its last active Note moves to Trash.
+// An open notepad keeps a blank writing area after the selected Note is trashed.
 const retained = {notebooks:[project], notebookColumns:[{id:'primary',cardID:'removed',open:true,selected:true}]};
-let reopened = 0;
 let blankPages = 0;
-const permanent = vm.createContext({state:retained, workspaceProject:()=>project,
-  currentColumnWorkflowView:()=> 'notebook',
+const permanent = vm.createContext({state:retained, workspaceProject:()=>project, sharedNotesOpen:()=>true,
   notebookColumnsForProject:()=>retained.notebookColumns,
   notebookColumnPaneID:column=>column.id,
   notebookColumnMounts:new Map([['primary',{async createLocalNote(options) {
     assert.equal(options.retiredCardID,'removed'); blankPages++;
   }}]]),
   openNotebooks:()=>retained.notebooks,projectDetailMatches:(a,b)=>a.id===b.id,
-  savedInstanceForPaneID:()=>({}),primarySavedPaneID:()=> 'evidence',
-  projectHasOpenNotebook:()=>false,openProjectNotebook:async()=>{reopened++;},
   saveWorkspaceState(){},transitionWorkspace:async()=>{},syncNotebookNoteTabs(){}});
-vm.runInContext(['prepareNotebookView','retireNotebookNoteColumns','closeProjectNotebook','closeNotebookNoteColumn'].map(actual).join('\n'),permanent);
-await permanent.prepareNotebookView({openNote:false});
-assert.equal(reopened,1,'Returning to Notebook restores its writing area even after a saved close.');
-assert.equal(await permanent.closeProjectNotebook(project),false);
-assert.equal(await permanent.closeNotebookNoteColumn(project,'primary'),false);
+vm.runInContext(actual('retireNotebookNoteColumns'),permanent);
 await permanent.retireNotebookNoteColumns(project,'removed');
 assert.equal(retained.notebookColumns[0].open,true);
 assert.equal(retained.notebookColumns[0].cardID,'');
 assert.equal(retained.notebookColumns[0].newNote,true,'The final removed Note leaves a fresh, unsaved writing page.');
 assert.equal(retained.notebooks[0],project);
 assert.equal(blankPages,1,'A retained editor opens the blank page immediately instead of keeping a placeholder.');
-console.log('Permanent notepad passed: reopen saved layouts, reject close actions and retain a blank page after final Note removal.');
+console.log('Open notepad passed: retain a blank page after final Note removal.');
 
 const now=new Date('2026-11-14T12:00:00');
 const notes=[

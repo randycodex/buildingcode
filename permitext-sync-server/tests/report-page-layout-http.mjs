@@ -85,6 +85,20 @@ try {
     assert.deepEqual(exportedPages.slice(1), pages.slice(1), 'Preview/export body content and exact positions have identical pagination.');
     if (process.env.PERMITEXT_REPORT_PAGE_QA_DIR) await writeFile(join(process.env.PERMITEXT_REPORT_PAGE_QA_DIR, `report-pages-${pageFormat}.pdf`), preview);
   }
+  const historyBeforeDownload = (await post('/reports/history/list', {projectID})).reports;
+  assert.equal(historyBeforeDownload.length, Object.keys(reportPageFormats).length);
+  const unversionedRequest = {projectID,draftID:draft.id,expectedVersion:draft.version,unversioned:true};
+  const directDownload = await request('/reports/drafts/preview', unversionedRequest);
+  assert.equal(directDownload.status, 200);
+  assert.match(directDownload.headers.get('content-type'), /application\/pdf/);
+  const downloadedPages = await layout(Buffer.from(await directDownload.arrayBuffer()), reportPageFormats.tabloid);
+  const editPacket = await post('/reports/drafts/preview', {...unversionedRequest,editingLayout:true});
+  const editPages = await layout(Buffer.from(editPacket.pdf,'base64'), reportPageFormats.tabloid);
+  assert.equal(downloadedPages.length, editPages.length);
+  assert.deepEqual(downloadedPages.slice(1), editPages.slice(1), 'Direct download matches the editor pagination.');
+  assert(!downloadedPages[0].some(([text]) => /Report version/.test(text)), 'Direct PDF downloads omit the version label.');
+  assert.deepEqual((await post('/reports/history/list', {projectID})).reports, historyBeforeDownload,
+    'Direct download preserves all prior versions and does not create another.');
   const current = {...body, draftID: draft.id, expectedVersion: draft.version};
   const {draft:blank}=await post('/reports/drafts/save',{projectID,title:'Blank report',reportDate:'2026-11-15',expectedVersion:0,blocks:[]},201);
   const blankResponse=await request('/reports/drafts/preview',{projectID,draftID:blank.id,expectedVersion:blank.version,editingLayout:true});

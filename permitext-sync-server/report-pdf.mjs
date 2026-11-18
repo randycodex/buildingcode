@@ -358,7 +358,7 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
     .moveDown(1);
 }
 
-function drawCover(document, manifest) {
+function drawCover(document, manifest, unversioned) {
   const presentation = reportPresentation(manifest);
   const contentWidth = document.page.width - document.page.margins.left - document.page.margins.right;
   document.moveDown(4);
@@ -395,7 +395,7 @@ function drawCover(document, manifest) {
     manifest.project?.address,
     reportDate(manifest.reportDate),
     manifest.author?.displayName,
-    `Report version ${manifest.reportVersion}`,
+    unversioned ? "" : `Report version ${manifest.reportVersion}`,
     ...reportCodeBasisLines(manifest)
   ].filter(Boolean);
   document.moveDown(0.8);
@@ -737,7 +737,7 @@ function drawPageFooters(document, manifest) {
   }
 }
 
-export async function renderReportPDF(manifest, { projectMaterialBySourceID = new Map(), onLayout, emptyPreview = false } = {}) {
+export async function renderReportPDF(manifest, { projectMaterialBySourceID = new Map(), onLayout, emptyPreview = false, unversioned = false } = {}) {
   const pageLayout = reportDocumentLayout(manifest.pageFormat || 'letter');
   const document = new PDFDocument({
     size: [pageLayout.width, pageLayout.height],
@@ -767,7 +767,7 @@ export async function renderReportPDF(manifest, { projectMaterialBySourceID = ne
     document.once("error", reject);
   });
 
-  drawCover(document, manifest);
+  drawCover(document, manifest, unversioned);
   drawProfessionalNotice(document, manifest);
   drawBody(document, manifest, projectMaterialBySourceID);
   if (readLayout) onLayout(readLayout());

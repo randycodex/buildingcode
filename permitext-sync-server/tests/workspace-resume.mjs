@@ -81,10 +81,11 @@ const declaration = name => {
   for (;depth;end++) {if(app[end]==='{')depth++;else if(app[end]==='}')depth--;}
   return app.slice(app.lastIndexOf('\n',start)+1,end);
 };
-let hydratedProject=null, openedReport=null, restoredReport=null;
+let hydratedProject=null, openedReport=null, restoredReport=null, sharedScroll=null;
 const gate={allowed:true,ready:Promise.resolve().then(()=>{hydratedProject={id:'project-one'};})};
 const startup=vm.createContext({detachedProjectWindow:false,workspaceResumeReady:false,
-  state:{account:{userID:'owner'},workflowNavigationGeneration:0},activeWorkspaceID:'workspace-one',tabWorkspaceKey:'tab-one',
+  state:{account:{userID:'owner'},workflowNavigationGeneration:0,trackScrollLeft:420},activeWorkspaceID:'workspace-one',tabWorkspaceKey:'tab-one',
+  track:{scrollWidth:1350,clientWidth:1000,scrollTo:({left})=>{sharedScroll=left;}},
   sessionStorage:storage,readWorkspaceResume,restoreWorkspaceResume,
   workspaceProject:()=>hydratedProject,projectDetailKey:project=>project?.id||'',
   captureAccountRequest:()=>({userID:'owner'}),isCurrentAccountRequest:()=>true,
@@ -96,6 +97,7 @@ await startup.restoreWorkspaceAfterRefresh();
 assert.equal(openedReport.options.resume.draftID,'older-draft',
   'Startup reads the tab snapshot after access verification has supplied the Project identity');
 assert.equal(restoredReport.scrolls.document,950);
+assert.equal(sharedScroll,350,'Restore the shared horizontal position after mounting the Report, within the current width.');
 assert.equal(startup.workspaceResumeReady,true);
 
 // Data & Recovery keeps its scroll position while retired source-group state is ignored.

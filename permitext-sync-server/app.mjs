@@ -17861,7 +17861,8 @@ async function handleReportGenerate(request, response, {preview = false} = {}) {
         .map((block) => block.sourceID)
     });
     const sourcesByKey = new Map(sources.map((source) => [`${source.kind}:${source.id}`, source]));
-    const priorManifests = await projectReportManifests(storageOwnerUserID, access.projectID, { includeDeleted: true });
+    const unversioned = preview && context.body.unversioned === true;
+    const priorManifests = unversioned ? [] : await projectReportManifests(storageOwnerUserID, access.projectID, { includeDeleted: true });
     const reportVersion = Math.max(
       0,
       ...priorManifests.map((artifact) => Number(artifact.payload?.reportVersion || 0))
@@ -17927,7 +17928,7 @@ async function handleReportGenerate(request, response, {preview = false} = {}) {
     });
     const generatedReportID = randomUUID();
     let editingLayout;
-    const pdfBody = await renderReportPDFOnDemand(manifest, { projectMaterialBySourceID, emptyPreview,
+    const pdfBody = await renderReportPDFOnDemand(manifest, { projectMaterialBySourceID, emptyPreview, unversioned,
       ...(preview && context.body.editingLayout === true ? {onLayout:value => {editingLayout=value;}} : {}) });
     if (!pdfBody.length || pdfBody.length > maxReportFileBytes) {
       throw new Error("The generated Report PDF exceeds the supported file size.");

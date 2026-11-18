@@ -50,14 +50,15 @@ const context=vm.createContext({generatingReport:false,deletingReport:false,disp
   activeDraft:{id:'draft',version:4,title:'Actual pages',blocks:[{kind:'heading',text:'Heading'}]},
   sourceMutationDraft:null,projectID:'project',requestIdentity:'owner',requestWorkspaceID:'workspace',activeWorkspaceID:'workspace',selectedReportTemplateID:'standard',
   pageEditor:{finish(){calls.push('finish');}},paintExportState(){},clearStatus(){},showStatusError(message){throw Error(message);},
-  saveDraft:async()=>true,isCurrentAccountRequest:()=>true,renderWorkspaceContent(){calls.push('render');},
-  reportRequest:async path=>{calls.push(path);return path==='/reports/generate'?{manifest:{},generatedReport:{file:{generatedReportID:'pdf'}}}:{reports:[]};},
-  downloadProjectReportFile:async(...args)=>downloaded.push(args),
-  reviewReport(){throw Error('Export must not open a preview');},transitionWorkspace(){throw Error('Export must not change the workspace');},
-  history:[]});
+  saveDraft:async()=>true,isCurrentAccountRequest:()=>true,
+  reportRequest:async path=>assert.fail(`Export must not write or list Versions: ${path}`),
+  requestDraftPDF:async(draft, editingLayout)=>{calls.push(`pdf:${draft.id}`); assert.equal(editingLayout, undefined);
+    return {blob:async()=>({type:'application/pdf'})};},
+  downloadCodeMemoBlob:(...args)=>downloaded.push(args),
+  transitionWorkspace(){throw Error('Export must not change the workspace');}});
 vm.runInContext(source.slice(start,end)+'\nglobalThis.exportReport=generateReport;',context);
 await context.exportReport();
-assert.equal(downloaded.length,1);assert.equal(downloaded[0][2],'Actual pages');
-assert.deepEqual(calls,['finish','/reports/generate','/reports/history/list','render']);
+assert.deepEqual(downloaded, [[{type:'application/pdf'},'Actual pages.pdf']]);
+assert.deepEqual(calls,['finish','pdf:draft']);
 assert.equal(context.generatingReport,false);
 console.log('Paged editing passed: measured page targets, direct text editing, external item controls, live editor retention across reflow, and PDF download without preview or navigation.');

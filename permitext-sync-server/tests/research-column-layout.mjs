@@ -42,7 +42,7 @@ const makePane = id => {
 };
 let panels = [makePane('utility:search:one'), makePane('reader:one')];
 const state = { paneWeights: { 'utility:search:one': 1400, 'reader:one': 400 } };
-const track = { dataset: {}, clientWidth: 2403, inert: false,
+const track = { dataset: {}, clientWidth: 2403, inert: false, querySelector: () => null,
   querySelectorAll: selector => selector.includes('.pane-divider') ? Array.from({length: panels.filter(p=>!p.classList.contains('is-workflow-hidden')).length+1},()=>({getBoundingClientRect:()=>({width:1})})) : panels };
 const collapsed = new Set();
 const context = vm.createContext({notebookReferenceTransition:undefined, workspaceColumnExpansion: undefined, state, track, activeWorkspaceID: 'test', window: { innerWidth: 2403 }, researchColumnsLayout,

@@ -13,8 +13,8 @@ export function preserveReportReadingPosition(container, change) {
 export function reportOutlineRailWidth(collapsed) { return collapsed ? 35 : 300; }
 
 export function reportComparisonLayout(available, { sources = 0, outline = 0, reports = 0, versions = 300,
-  comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0, minimumReportWidth = 600, outlineDivider = true } = {}) {
-  const reportMinimum = Math.max(600, minimumReportWidth);
+  comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0, minimumReportWidth = 600, outlineDivider = true, compactEditor = false } = {}) {
+  const reportMinimum = Math.max(compactEditor ? 320 : 600, minimumReportWidth);
   const showPDF = comparing && previewing;
   const minimumSources = sources ? 300 : 0;
   sources = Math.max(minimumSources, sources);

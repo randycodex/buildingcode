@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-reader-two-actions-v2467";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-shared-workspace-v2472";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -57,7 +57,7 @@ import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, 
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportLibraryControls, createReportVersionsControls } from "./report-library.js?v=20261115-report-rail-v12";
-import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261115-reports-rail-v25";
+import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261117-shared-report-v26";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261115-reports-rail-v6";
 import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportBlockUsesSource, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261114-report-source-toggle-v9";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-reader-two-actions-v2467";
+} from "./offline-storage.js?v=20261117-shared-workspace-v2472";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2665,7 +2665,7 @@ function openMobileMoreSheet() {
     }));
   }
   projectList.append(
-    mobileMoreAction("Notebook", () => void toggleProjectTool("notebook"), {
+    mobileMoreAction("Notes", () => void toggleProjectTool("notebook"), {
       current: Boolean(identity && projectHasOpenNotebook(identity)),
       disabled: !identity || !hasCapability("notebook") || projectToolTogglePending
     }),
@@ -2860,15 +2860,13 @@ function renderWorkspaceTabs() {
 function updateWorkspaceLayoutControls() {
   document.querySelectorAll(".workflow-layout-actions")
     .forEach(group => { group.hidden = !isProAccount(); });
-  const inReport = Boolean(reportScreen?.isOpen());
-  const reportReady = Boolean(document.querySelector(".report-workspace-view:not([hidden]) .report-workspace-columns"));
+  const reportReady = Boolean(document.querySelector(".shared-report-column:not([hidden]) .report-workspace-columns"));
   const hasColumns = defaultActivePaneIDs().some(workflowPaneIsVisible);
   fitColumnsButton.hidden = false;
-  fitColumnsButton.disabled = inReport ? !reportReady : !hasColumns;
-  fitColumnsButton.title = inReport ? "Restore default Report column widths" : "Restore default panel widths";
-  const collapseUnavailable = inReport || currentColumnWorkflowView() === "notebook";
+  fitColumnsButton.disabled = !hasColumns && !reportReady;
+  fitColumnsButton.title = "Restore default panel widths";
   document.querySelectorAll("#collapse-all-columns, #expand-all-columns")
-    .forEach(button => { button.hidden = collapseUnavailable; button.disabled = collapseUnavailable || !hasColumns; });
+    .forEach(button => { button.hidden = false; button.disabled = !hasColumns; });
 }
 
 function normalizeProjectIdentities(value, legacyWorkboard = null) {
@@ -3213,13 +3211,10 @@ async function openProjectCodeDecisions(project) {
 }
 
 async function closeProjectNotebook(project) {
-  if (currentColumnWorkflowView() === 'notebook') return false;
   if (!(await confirmNotebookDiscard(project))) return false;
   const notebookIDs = notebookPaneIDsForProject(project);
-  // Closing ends the explicit Research opt-in; Notebook can reopen at home.
   for (const id of notebookIDs) {
     if (state.workflowMembership) delete state.workflowMembership[id];
-    delete state.paneWeights[id];
   }
   notebookColumnsForProject(project).forEach(column => { column.open = false; });
   state.notebooks = openNotebooks().filter((item) => !projectDetailMatches(project, item));
@@ -3228,22 +3223,6 @@ async function closeProjectNotebook(project) {
   saveWorkspaceState();
   await transitionWorkspace("utility");
   return true;
-}
-
-async function prepareNotebookView() {
-  const project = workspaceProject();
-  let evidence = savedInstanceForPaneID(primarySavedPaneID());
-  let changed = false;
-  if (!evidence) {
-    evidence = newUtilityInstance('saved');
-    state.utilityInstances.push(evidence);
-    scopeSavedInstanceToWorkspace(evidence);
-    state.projectHostPaneID = paneIDForUtilityInstance(evidence);
-    state.paneWeights[state.projectHostPaneID] ||= 300;
-    changed = true;
-  }
-  if (project && !projectHasOpenNotebook(project)) await openProjectNotebook(project);
-  else if (changed) await transitionWorkspace('utility');
 }
 
 async function openProjectNotebook(project) {
@@ -3258,7 +3237,7 @@ async function openProjectNotebook(project) {
     identity
   ];
   const columns = notebookColumnsForProject(identity);
-  if (!columns.some(column => column.open)) columns[0].open = true;
+  if (!columns.some(column => column.open)) (columns.find(column => column.selected) || columns[0]).open = true;
   const notebookID = notebookColumnPaneID(columns.find(column => column.open));
   state.paneWeights[notebookID] ||= defaultNotebookPaneWidth;
   if (!wasOpen) placeProjectToolPaneInControlOrder(identity);
@@ -3289,7 +3268,7 @@ function notebookIndexPaneID(project) {
 function updateNotebookListToggle(button) {
   const expanded = !state.notebookListHidden;
   const label = expanded ? 'Hide notes list' : 'Show notes list';
-  button.hidden = currentColumnWorkflowView() !== 'notebook';
+  button.hidden = !sharedNotesOpen();
   button.disabled = !workspacePrivatePresentationAllowed() || !hasCapability('notebook') || !workspaceProject() || projectToolTogglePending;
   button.setAttribute('aria-label', label);
   button.setAttribute('aria-expanded', String(expanded));
@@ -3361,7 +3340,7 @@ async function transitionNotebookList(update) {
 
 async function toggleNotebookList() {
   if (!workspacePrivatePresentationAllowed() || !hasCapability('notebook') ||
-      !workspaceProject() || currentWorkflowView() !== 'notebook') return false;
+      !sharedNotesOpen()) return false;
   const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   state.notebookListHidden = !state.notebookListHidden;
   const hidden = state.notebookListHidden;
@@ -3369,7 +3348,7 @@ async function toggleNotebookList() {
   saveWorkspaceState();
   await transitionNotebookList(() => transitionWorkspace('utility'));
   if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
-      currentWorkflowView() !== 'notebook' || state.notebookListHidden !== hidden) return false;
+      !sharedNotesOpen() || state.notebookListHidden !== hidden) return false;
   const listPaneID = track.querySelector('.notebook-index-panel:not(.is-workflow-hidden)')?.dataset.paneId;
   if (!hidden && listPaneID) scrollPaneIntoView(listPaneID);
   track.querySelector('.notebook-index-panel:not(.is-workflow-hidden) .notebook-list-toggle')?.focus({preventScroll:true});
@@ -3429,13 +3408,13 @@ function openNotebookListMenu(panel, anchor) {
   if (sameAnchor) return;
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   if (!project || project.sharedRole === 'viewer' || !hasCapability('notebook') ||
-      panel.dataset.projectId !== projectDetailKey(project) || currentWorkflowView() !== 'notebook') return;
+      panel.dataset.projectId !== projectDetailKey(project) || !sharedNotesOpen()) return;
   const selection = panel._notebookSelection;
   if (!selection || selection.busy) return;
   const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   const navigation = state.workflowNavigationGeneration || 0;
   const current = () => panel.isConnected && isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID &&
-    navigation === (state.workflowNavigationGeneration || 0) && currentWorkflowView() === 'notebook' &&
+    navigation === (state.workflowNavigationGeneration || 0) && sharedNotesOpen() &&
     projectDetailKey(workspaceProject()) === panel.dataset.projectId;
   const cards = selection.cards.filter(card => card.id);
   const menu = document.createElement('div');
@@ -3886,11 +3865,12 @@ async function openNotebookNoteColumn(project, card) {
   const liveMount = livePaneID && notebookColumnMounts.get(livePaneID);
   // The Notebook has one notepad. Switch its document in place, retaining the
   // column/header/list geometry while the next Note and editor prepare.
-  if (card.id && !card.newNote && currentColumnWorkflowView() === 'notebook' &&
+  if (card.id && !card.newNote &&
       liveMount?.panel.isConnected && liveMount.focusCard && !paneIsCollapsed(livePaneID)) {
     if (liveMount.activeCardID() !== card.id) await liveMount.focusCard(card.id, {shouldApply:current});
     if (!current() || notebookColumnMounts.get(livePaneID) !== liveMount || liveMount.activeCardID() !== card.id) return false;
     notebookColumnRegistry.activate(livePaneID);
+    scrollPaneIntoView(livePaneID);
     syncNotebookNoteTabs();
     return true;
   }
@@ -3949,7 +3929,6 @@ async function openNotebookNoteColumn(project, card) {
 }
 
 async function closeNotebookNoteColumn(project, paneID) {
-  if (currentColumnWorkflowView() === 'notebook') return false;
   const requestIdentity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   if (await notebookColumnMounts.get(paneID)?.confirmDiscardIfNeeded?.() === false) return false;
   if (!isCurrentAccountRequest(requestIdentity) || workspaceID !== activeWorkspaceID) return false;
@@ -3967,7 +3946,7 @@ async function retireNotebookNoteColumns(project, cardID) {
   let emptyColumn = null;
   columns.filter(column => column.cardID === cardID).forEach(column => { column.open = false; });
   if (!columns.some(column => column.open)) {
-    if (currentColumnWorkflowView() === 'notebook') {
+    if (sharedNotesOpen()) {
       const empty = columns.find(column => column.cardID === cardID);
       if (empty) {
         Object.assign(empty, {cardID:'', title:'', newNote:true, open:true, selected:true});
@@ -4023,7 +4002,10 @@ async function openProjectReportDraft(project, {resume = null} = {}) {
   closeSharedWorkspaceViews("report");
   const projectID = projectDetailKey(identity);
   if (reportScreen?.projectID === projectID && reportScreen.isCurrent() && !pendingReportDraftByProject.has(projectID)) {
-    await reportScreen.open();
+    const screen = reportScreen;
+    await screen.open();
+    if (!screen.isOpen()) return false;
+    revealReportColumn(screen.element, resume);
     syncProjectToolButtonStates(identity);
     updateWorkspaceLayoutControls();
     await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
@@ -4037,15 +4019,15 @@ async function openProjectReportDraft(project, {resume = null} = {}) {
   const workspaceID = activeWorkspaceID;
   const screen = createReportScreen({
     projectName: identity.name,
-    mount: document.querySelector(".workspace-shell"),
-    coveredElements: [track, document.querySelector(".workflow-toolbar")].filter(Boolean),
-    onOpen: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
-    backLabel: () => `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
+    mount: track,
+    screenClass: "shared-report-column",
+    dismissOnEscape: false,
+    onOpen: syncWorkflowNavigation,
     openProjectDetails: () => void openProjectDetailsScreen(),
     load: () => renderProjectReportDraft(identity, resume),
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
       hasCapability("professional-exports") && projectDetailMatches(workspaceProject(), identity),
-    onClose: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncProjectToolButtonStates(identity); syncWorkflowColumnPresentation(); },
+    onClose: syncWorkflowNavigation,
     onDispose: () => {
       reportDraftMounts.get(projectID)?.dispose?.();
       reportDraftMounts.delete(projectID);
@@ -4055,11 +4037,20 @@ async function openProjectReportDraft(project, {resume = null} = {}) {
   screen.projectID = projectID;
   reportScreen = screen;
   await screen.open();
+  if (!screen.isOpen()) return false;
+  revealReportColumn(screen.element, resume);
   updateWorkspaceLayoutControls();
   syncReferenceReaderLayout();
   syncProjectToolButtonStates(identity);
   startProjectArtifactCheckpointLoop({ immediate: true });
   return true;
+}
+
+function revealReportColumn(column, resume) {
+  if (resume || !column.isConnected || column.hidden) return;
+  if (column.getBoundingClientRect().right > track.getBoundingClientRect().right) {
+    track.scrollTo({left: track.scrollLeft + column.getBoundingClientRect().left - track.getBoundingClientRect().left, behavior: "instant"});
+  }
 }
 
 async function closeProjectCoordination(project) {
@@ -5820,6 +5811,7 @@ function minimumPaneWidthForID(paneID) {
   const writingMinimum = typeof track === 'undefined' ? undefined : track._notebookColumnLayout?.resizeMinimums?.[paneID];
   if (Number.isFinite(writingMinimum)) return writingMinimum;
   if (paneID?.startsWith('project:notes-index:')) return 300;
+  if (paneID?.startsWith('project:notebook:')) return 800;
   if (paneID?.startsWith("reader:")) return 630;
   if (/^utility:search(?::|$)/.test(paneID || "")) return 300;
   if (/^utility:saved(?::|$)/.test(paneID || "")) return 300;
@@ -5984,7 +5976,12 @@ async function presentWorkingView(view, update) {
     return false;
   }
 }
-function currentWorkflowView() { return isProAccount() ? normalizeWorkflowView(state.workflowView) : "research"; }
+function currentWorkflowView() { return "research"; }
+
+function sharedNotesOpen() {
+  const project = workspaceProject();
+  return Boolean(project && projectHasOpenNotebook(project));
+}
 function workspaceResumeContext() {
   const project = workspaceProject();
   return {userID: state.account?.userID || "", workspaceID: activeWorkspaceID,
@@ -5994,7 +5991,7 @@ function saveWorkspaceResumeForRefresh() {
   if (!workspaceResumeReady || workspaceRestoreError || detachedProjectWindow) return;
   const context = workspaceResumeContext();
   const account = document.querySelector(".account-workspace-view[open]");
-  const view = account ? "account" : currentColumnWorkflowView();
+  const view = account ? "account" : reportScreen?.isOpen() ? "report" : currentColumnWorkflowView();
   const report = reportDraftMounts.get(context.projectID)?.getPresentationState?.();
   if (view === "report" && !report) return;
   writeWorkspaceResume(sessionStorage, tabWorkspaceKey, context, {
@@ -6035,6 +6032,9 @@ async function restoreWorkspaceAfterRefresh(skip = false) {
         state.workflowView = snapshot.workflowView;
         if (!await openProjectReportDraft(workspaceProject(), {resume: report}) || !sameContext() || !reportScreen?.isOpen()) return false;
         await reportDraftMounts.get(context.projectID)?.restorePresentation?.(report);
+        if (!sameContext()) return false;
+        const left = Number(state.trackScrollLeft) || 0;
+        track.scrollTo({left:Math.min(left, Math.max(0, track.scrollWidth - track.clientWidth)), behavior:"instant"});
         return true;
       },
       openDetails: async details => {
@@ -6060,7 +6060,7 @@ async function restoreWorkspaceAfterRefresh(skip = false) {
   } finally { workspaceResumeReady = true; }
 }
 function currentColumnWorkflowView() {
-  return reportScreen?.isOpen() ? "report" : currentWorkflowView();
+  return currentWorkflowView();
 }
 let presentedColumnWorkflowView = currentWorkflowView();
 function workflowPaneAnchors() {
@@ -6068,16 +6068,19 @@ function workflowPaneAnchors() {
 }
 function workflowPaneIsVisible(paneID) {
   if (!isProAccount()) return state.readers.slice(0, 1).some(reader => paneIDForReader(reader) === paneID);
-  const view = currentColumnWorkflowView();
-  if (view === 'notebook' && paneID.startsWith('reader:') && state.notebookReaderHidden) return false;
-  if (view === 'notebook' && /^utility:saved(?::|$)/.test(paneID) && state.notebookEvidenceHidden) return false;
-  if (paneID.startsWith('project:notes-index:')) return view === 'notebook';
-  if (view === 'notebook' && isProjectNotebookPaneID(paneID)) {
-    const project = workspaceProject();
+  if (detachedProjectWindow) return true;
+  const membership = state.workflowMembership?.[paneID];
+  if (paneID.startsWith('reader:') && state.notebookReaderHidden &&
+      membership?.includes('notebook') && !membership.includes('research')) return false;
+  const project = workspaceProject();
+  if (paneID.startsWith('project:notes-index:')) return Boolean(project && sharedNotesOpen() && paneID === notebookIndexPaneID(project));
+  if (isProjectNotebookPaneID(paneID)) {
     const selected = project && selectedNotebookColumn(project);
     return Boolean(selected && notebookColumnPaneID(selected) === paneID);
   }
-  return view !== "report" && (detachedProjectWindow || paneBelongsToView(paneID, view, state.workflowMembership, workflowPaneAnchors()));
+  // A saved passages panel is opened explicitly from the shared Reader.
+  if (/^utility:saved(?::|$)/.test(paneID)) return paneBelongsToView(paneID, 'research', state.workflowMembership, workflowPaneAnchors());
+  return true;
 }
 function syncReferenceReaderLayout() {
   const shell = document.querySelector(".workspace-shell");
@@ -6153,14 +6156,16 @@ function closeSharedWorkspaceViews(except = "") {
 function syncWorkflowNavigation() {
   const accountOpen = Boolean(document.querySelector(".account-workspace-view[open]"));
   const view = accountOpen ? "account" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
-  if (view !== 'notebook') document.querySelector('.notebook-index-menu')?._close?.(false);
+  if (!sharedNotesOpen()) document.querySelector('.notebook-index-menu')?._close?.(false);
   document.querySelector("#free-reader")?.setAttribute("aria-pressed", String(!isProAccount() && view === "research"));
   toggleReportButton?.setAttribute("aria-pressed", String(view === "report"));
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     button.disabled = !isProAccount() && button.dataset.workflowView !== 'research';
     button.setAttribute('aria-pressed', String(button.dataset.workflowView === (view === 'project-details' ? 'project' : view)));
   });
-  document.querySelectorAll('[data-workflow-tools]').forEach(tools => { tools.hidden = tools.dataset.workflowTools !== view; });
+  document.querySelectorAll('[data-workflow-tools]').forEach(tools => {
+    tools.hidden = accountOpen || (!isProAccount() && tools.dataset.workflowTools !== 'research');
+  });
   syncReferenceReaderLayout();
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   toggleSavedButton?.setAttribute('aria-pressed', String((state.utilityInstances || []).some(item => item.key === 'saved') &&
@@ -6168,7 +6173,7 @@ function syncWorkflowNavigation() {
   updateWorkspaceLayoutControls();
   syncResearchColumnLayout();
   syncTopbarProjectToolStates();
-  if (view === 'notebook') void ensureNotebookTabCatalog();
+  if (sharedNotesOpen()) void ensureNotebookTabCatalog();
   syncNotebookLanding();
   syncResearchStart();
 }
@@ -6190,48 +6195,13 @@ async function switchWorkflowView(view, {initialize = true} = {}) {
     });
     return false;
   }
-  // A retained Report/Project close callback also presents columns. Defer it
-  // until the requested destination is known, avoiding an intermediate render
-  // of the previously underlying workflow and a second scroll/layout pass.
-  const wasDeferred = state.workflowPresentationDeferred;
-  state.workflowPresentationDeferred = true;
-  try { closeSharedWorkspaceViews(); }
-  finally {
-    if (wasDeferred === undefined) delete state.workflowPresentationDeferred;
-    else state.workflowPresentationDeferred = wasDeferred;
-  }
-  if (notifyProjectRequiredForColumn()) { syncWorkflowColumnPresentation(); return false; }
-  view = normalizeWorkflowView(view);
-  if (view !== currentWorkflowView()) {
-    state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
-    state.workflowView = view;
+  document.querySelector(".account-workspace-view[open]")?.close();
+  if (notifyProjectRequiredForColumn()) return false;
+  if (view === "notebook" && initialize) {
+    const project = workspaceProject();
+    return Boolean(project) && (sharedNotesOpen() || await openProjectNotebook(project));
   }
   syncWorkflowColumnPresentation();
-  if (view === 'notebook') {
-    const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
-    const navigation = state.workflowNavigationGeneration || 0;
-    await ensureNotebookTabCatalog();
-    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
-        (state.workflowNavigationGeneration || 0) !== navigation) return false;
-    await prepareNotebookView();
-    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
-        (state.workflowNavigationGeneration || 0) !== navigation || currentWorkflowView() !== view) return false;
-    savedPaneIDs().forEach(paneID => placeEvidenceBeforeNotebook(paneID));
-  }
-  if ([...track.querySelectorAll(':scope > .workspace-panel')].some(pane =>
-    pane.dataset.workspacePaneDeferred === "true" && workflowPaneIsVisible(pane.dataset.paneId)
-  )) {
-    const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
-    const navigation = state.workflowNavigationGeneration || 0;
-    await transitionWorkspace("utility");
-    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
-        (state.workflowNavigationGeneration || 0) !== navigation || view !== currentWorkflowView()) return false;
-  }
-  if (view === currentWorkflowView() && defaultActivePaneIDs().some(workflowPaneIsVisible)) {
-    state.workflowVisitedViews = [...new Set([...(state.workflowVisitedViews || []), view])];
-  }
-  saveWorkspaceState();
-  if (view === 'notebook') void ensureNotebookTabCatalog({refresh:true});
   return true;
 }
 
@@ -6764,7 +6734,7 @@ function syncTopbarProjectToolStates() {
       : !identity ? `Choose a Project to open ${label}`
       : !hasCapability(capability) ? `${label} requires Pro`
       : sharedReport ? "Report editing is unavailable for shared-only Projects."
-      : `${opened ? (["Notes", "Report"].includes(label) ? "Focus" : "Close") : "Open"} ${label} · ${identity.name}`;
+      : `${opened ? "Close" : "Open"} ${label} · ${identity.name}`;
   });
   syncNotebookNoteTabs();
 }
@@ -7096,7 +7066,7 @@ function normalizePaneWeights(ids) {
 function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
   if (paneID.startsWith('project:notes-index:')) {
-    const collapsed = currentColumnWorkflowView() === 'notebook' && state.notebookListHidden;
+    const collapsed = state.notebookListHidden;
     panel.dataset.notebookListCollapsed = String(Boolean(collapsed));
     if (collapsed) {
       panel.style.setProperty('--pane-resized-min-width', '35px');
@@ -7265,12 +7235,16 @@ function syncResearchColumnLayout({ reset = false } = {}) {
   }
   const preferredWidth = panel => {
     const id = panel.dataset.paneId;
-    if (paneIsCollapsed(id)) return 48;
+    if (paneIsCollapsed(id)) return id.startsWith('project:notes-index:') ? 35 : 48;
     if (assistantHistoryOnlyPane(id)) return assistantHistoryWidth;
     return constrainPaneWidth(id, Number(state.paneWeights[id]) || defaultPaneWidthForID(id));
   };
   const fixed = visible.filter(panel => !balancedSet.has(panel));
-  const fixedWidth = fixed.reduce((sum, panel) => sum + preferredWidth(panel), 0) +
+  const reportColumn = track.querySelector(":scope > .shared-report-column:not([hidden])");
+  const reportWidth = reportColumn
+    ? Math.min(track.clientWidth, parseFloat(getComputedStyle(reportColumn).getPropertyValue("--shared-report-basis")) || reportColumn.offsetWidth)
+    : 0;
+  const fixedWidth = reportWidth + fixed.reduce((sum, panel) => sum + preferredWidth(panel), 0) +
     visible.reduce((sum, panel) => sum + (Number(panel.dataset.assistantSourcesWidth) || 0) +
       (Number(panel.dataset.assistantHistoryWidth) || 0), 0);
   const dividerWidth = [...track.querySelectorAll(":scope > .pane-divider")]
@@ -7284,7 +7258,7 @@ function syncResearchColumnLayout({ reset = false } = {}) {
   // Compare the intended columns, not hydration order or left-to-right order.
   // Opening, closing or collapsing a column starts a new automatic fit.
   const membership = activePaneIDs().filter(workflowPaneIsVisible)
-    .map(id => `${id}:${paneIsCollapsed(id)}`).sort().join('|');
+    .map(id => `${id}:${paneIsCollapsed(id)}`).sort().join('|') + (reportColumn ? "|report" : "");
   const columnsChanged = previous && previous.membership !== membership;
   const requested = balanced.map(preferredWidth);
   const minimumWidths = balanced.map(panel => minimumPaneWidthForID(panel.dataset.paneId));
@@ -19035,7 +19009,7 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
   const view = document.createElement('button'); view.type = 'button'; view.textContent = 'View in Evidence';
   view.addEventListener('click', async () => {
     confirmation.remove();
-    if (await switchWorkflowView('notebook')) await focusUtility('saved');
+    await focusUtility('saved');
   });
   confirmation.append(message, view, projectButton);
   panel.append(confirmation);
@@ -19146,9 +19120,9 @@ async function openCalculationNotebook(project, card) {
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const currentAccountWorkspace = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID;
-  if (!currentAccountWorkspace() || !await switchWorkflowView("notebook") || !currentAccountWorkspace() || currentWorkflowView() !== "notebook") return;
+  if (!currentAccountWorkspace() || !await switchWorkflowView("notebook", {initialize:false}) || !currentAccountWorkspace()) return;
   const generation = state.workflowNavigationGeneration || 0;
-  const current = () => currentAccountWorkspace() && currentWorkflowView() === "notebook" && generation === (state.workflowNavigationGeneration || 0);
+  const current = () => currentAccountWorkspace() && generation === (state.workflowNavigationGeneration || 0);
   const projectID = researchProjectID(project);
   pendingNotebookCardByProject.set(projectID, card.id);
   try {
@@ -29531,7 +29505,7 @@ function rememberWorkingResearchNote(projectID, card, resume = null) {
 }
 
 function syncResearchNoteControls() {
-  const host = document.querySelector('[data-workflow-tools="research"]');
+  const host = document.querySelector('.note-picker-host');
   if (!host) return;
   let control = host.querySelector('.research-note-destination');
   if (!control) {
@@ -33455,6 +33429,22 @@ async function renderProjectReportDraft(project, resume = null) {
   const requestWorkspaceID = activeWorkspaceID;
   const accountUserID = requestIdentity.userID;
   const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };
+  const requestDraftPDF = async (draft, editingLayout = false) => {
+    requireCurrentAccountRequest(requestIdentity);
+    const account = activeAccount();
+    if (!account || requestWorkspaceID !== activeWorkspaceID) throw accountContextChangedError();
+    const response = await fetch("/reports/drafts/preview", {
+      method: "POST",
+      headers: {"Content-Type": "application/json", Authorization: `Bearer ${account.sessionToken}`},
+      body: JSON.stringify({auth: {accountUserID: account.userID}, projectID, draftID: draft.id,
+        expectedVersion: draft.version, reportTemplateID: selectedReportTemplateID, editingLayout, unversioned: true})
+    });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw Object.assign(new Error(payload.error || "The Report PDF could not be prepared."), {payload});
+    }
+    return response;
+  };
   const identity = projectIdentity(project);
   const projectID = projectDetailKey(identity);
   const paneID = paneIDForProjectReportDraft(identity);
@@ -33468,6 +33458,7 @@ async function renderProjectReportDraft(project, resume = null) {
   applyPaneWeight(panel, paneID);
 
   const header = createReportPaneHeader(() => closeProjectReportDraft(identity));
+  const closeReport = header.querySelector(".report-draft-close");
   header.hidden = true;
 
   const shell = document.createElement("div");
@@ -33483,7 +33474,7 @@ async function renderProjectReportDraft(project, resume = null) {
   let sources = [];
   const openReportSourceNote = async note => {
     const current = () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
-    if (!current() || !await confirmWorkspaceTransition() || !current()) return;
+    if (!current()) return;
     if (await switchWorkflowView("notebook", {initialize:false}) && current()) {
       await openNotebookNoteColumn(identity, note);
     }
@@ -33494,6 +33485,8 @@ async function renderProjectReportDraft(project, resume = null) {
   });
   const sourcePreviewRequests = sourcePreviews.requests;
   let sourceWarnings = [];
+  // The shared workspace hides Versions while retaining historical exports.
+  const showSavedVersions = false;
   let history = [];
   let reportOptions = {
     templates: [],
@@ -33522,13 +33515,8 @@ async function renderProjectReportDraft(project, resume = null) {
           throw new Error('Finish syncing the linked calculations before previewing this Report.');
         }
       }
-      const account = activeAccount();
-      if (!account || !current()) throw accountContextChangedError();
-      const response = await fetch('/reports/drafts/preview', {method: 'POST',
-        headers: {'Content-Type': 'application/json', Authorization: `Bearer ${account.sessionToken}`},
-        body: JSON.stringify({auth: {accountUserID: account.userID}, projectID, draftID: draft.id,
-          expectedVersion: draft.version, reportTemplateID: selectedReportTemplateID, editingLayout:true})});
-      if (!response.ok) {const payload = await response.json().catch(() => ({})); throw new Error(payload.error || 'The page layout could not be prepared.');}
+      if (!current()) throw accountContextChangedError();
+      const response = await requestDraftPDF(draft, true);
       const packet = await response.json();
       if (!current()) throw accountContextChangedError();
       const bytes = Uint8Array.from(atob(packet.pdf), char=>char.charCodeAt(0));
@@ -33694,6 +33682,7 @@ async function renderProjectReportDraft(project, resume = null) {
     async restorePresentation(snapshot) {
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
       for (const [key, expanded] of snapshot.outlineSections) outlineSectionExpansion.set(key, expanded);
+      if (!showSavedVersions) snapshot = {...snapshot, flags: {...snapshot.flags, comparisonOpen: false}, versionID: ""};
       applyReportResumeLayout(panel, snapshot);
       renderWorkspaceContent();
       const generation = reportPresentationGeneration;
@@ -33858,7 +33847,15 @@ async function renderProjectReportDraft(project, resume = null) {
     event.preventDefault(); event.stopPropagation(); changeReportHistory(redo || event.shiftKey);
   }, {capture:true});
 
-  const documentMinimumWidth = () => Math.max(600, (parseFloat(getComputedStyle(panel).getPropertyValue('--document-printable-width')) || 672) + 56);
+  const outlineRailWidth = collapsed => collapsed ? reportOutlineRailWidth(true) : shell.clientWidth < 760 ? 248 : 300;
+  const reportsRailWidth = collapsed => collapsed ? reportOutlineRailWidth(true) : shell.clientWidth < 1400 ? 240 : 300;
+  const documentMinimumWidth = () => {
+    const naturalWidth = (parseFloat(getComputedStyle(panel).getPropertyValue('--document-printable-width')) || 672) + 56;
+    const availableWidth = shell.clientWidth - outlineRailWidth(panel.dataset.outlineHidden === 'true') -
+      reportsRailWidth(panel.dataset.reportsHidden === 'true') -
+      (panel.dataset.libraryOpen === 'true' ? (Number(panel.dataset.libraryWidth) || 330) + 1 : reportOutlineRailWidth(true));
+    return Math.max(320, Math.min(naturalWidth, availableWidth));
+  };
   const ensureComparison = () => comparisonController ||= createReportComparison({
     panel, columns: () => shell.querySelector(".report-document-columns"),
     availableWidth: () => shell.querySelector(".report-workspace-columns")?.clientWidth || 0,
@@ -33921,19 +33918,12 @@ async function renderProjectReportDraft(project, resume = null) {
       }
       clearStatus();
       try {
-        const payload = await reportRequest("/reports/generate", {
-          projectID,
-          draftID: activeDraft.id,
-          expectedVersion: activeDraft.version,
-          reportTemplateID: selectedReportTemplateID
-        });
+        const draft = activeDraft;
+        const response = await requestDraftPDF(draft);
+        const pdf = await response.blob();
         if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
-        const historyPayload = await reportRequest("/reports/history/list", { projectID });
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
-        history = historyPayload.reports || [];
-        clearStatus();
-        renderWorkspaceContent();
-        await downloadProjectReportFile(projectID,payload.generatedReport.file,activeDraft.title);
+        const title = (draft.title || "Project Report").trim().replace(/[\\/:*?"<>|]/g, "-") || "Project Report";
+        downloadCodeMemoBlob(pdf, `${title}.pdf`);
       } catch (error) {
         if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
         if (error.payload?.code === "REPORT_DRAFT_VERSION_CONFLICT" && !dirty) {
@@ -34984,7 +34974,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const addReportContent = kind => {
       if (kind === "source") {
         panel.dataset.libraryOpen = "true";
-        renderWorkspaceContent();
+        syncReferenceReaderLayout();
         panel.querySelector('.report-source-group-toggle')?.focus({preventScroll: true});
         return;
       }
@@ -35111,7 +35101,7 @@ async function renderProjectReportDraft(project, resume = null) {
         snapshot: { label: `Report: ${activeDraft.title || "Untitled Report"}` }
       });
     });
-    primaryActions.append(exportSpacer, save, saveCopy, generate, coordinate);
+    primaryActions.append(exportSpacer, save, saveCopy, generate, coordinate, closeReport);
     const paperSize = document.createElement('select'); paperSize.className = 'report-paper-size';
     paperSize.setAttribute('aria-label', 'Paper size');
     for (const [value, format] of Object.entries(reportPageFormats)) {
@@ -35182,7 +35172,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const libraryControls = createReportLibraryControls({
       panel, shell, library,
       availableWidth: availableSidebarWidth, documentMinimumWidth,
-      reservedWidth: () => reportOutlineRailWidth(panel.dataset.outlineHidden === 'true') + reportOutlineRailWidth(panel.dataset.reportsHidden === 'true') +
+      reservedWidth: () => outlineRailWidth(panel.dataset.outlineHidden === 'true') + reportsRailWidth(panel.dataset.reportsHidden === 'true') +
         (panel.dataset.comparisonOpen === 'true' ? (panel.dataset.versionsCollapsed === 'true' ? 48 : Number(panel.dataset.versionsWidth) || 300) + 1 : 0),
       onResize: syncReferenceReaderLayout
     });
@@ -35196,7 +35186,7 @@ async function renderProjectReportDraft(project, resume = null) {
     library.append(libraryControls.header, sourcePicker);
     const versionsControls = createReportVersionsControls({
       panel, shell, versions: comparison.versions, availableWidth: () => shell.clientWidth,
-      reservedWidth: () => reportOutlineRailWidth(panel.dataset.outlineHidden === 'true') + reportOutlineRailWidth(panel.dataset.reportsHidden === 'true') +
+      reservedWidth: () => outlineRailWidth(panel.dataset.outlineHidden === 'true') + reportsRailWidth(panel.dataset.reportsHidden === 'true') +
         (panel.dataset.libraryOpen === "true" ? (Number(panel.dataset.libraryWidth) || 330) + 1 : 0),
       onResize: gesture => comparison.resizeVersions(gesture)
     });
@@ -35216,19 +35206,28 @@ async function renderProjectReportDraft(project, resume = null) {
     comparison.versions.querySelector(".report-versions-header")?.remove();
     comparison.versions.prepend(versionsControls.header);
     panel._reportSidebarControls = [libraryControls, versionsControls, comparison];
-    const tools = document.createElement("button");
-    tools.type = "button";
-    tools.textContent = "Sources";
-    prependWorkspaceButtonIcon(tools, "form");
-    tools.title = "Show Report sources";
-    tools.setAttribute("aria-expanded", String(panel.dataset.libraryOpen === "true"));
-    tools.addEventListener("click", () => {
-      const expanded = panel.dataset.libraryOpen !== "true";
-      panel.dataset.libraryOpen = String(expanded);
-      tools.setAttribute("aria-expanded", String(expanded));
+    const sourcesToggle = document.createElement("button");
+    sourcesToggle.type = "button";
+    sourcesToggle.className = "icon-button report-outline-toggle";
+    const paintSourcesToggle = shown => {
+      library.classList.toggle("is-sources-collapsed", !shown);
+      sourcePicker.hidden = !shown;
+      const label = shown ? "Hide sources" : "Show sources";
+      sourcesToggle.setAttribute("aria-label", label);
+      sourcesToggle.title = label;
+      sourcesToggle.setAttribute("aria-expanded", String(shown));
+      if (sourcesToggle.dataset.expanded !== String(shown)) {
+        sourcesToggle.dataset.expanded = String(shown);
+        sourcesToggle.replaceChildren();
+        prependWorkspaceButtonIcon(sourcesToggle, shown ? "panel-left-close" : "panel-left-open");
+      }
+    };
+    sourcesToggle.addEventListener("click", () => {
+      panel.dataset.libraryOpen = String(panel.dataset.libraryOpen !== "true");
       syncReferenceReaderLayout();
     });
-    primaryActions.insertBefore(tools, pageTheme);
+    libraryControls.header.classList.add("report-outline-rail-header");
+    libraryControls.header.append(sourcesToggle);
     if (panel.dataset.outlineHidden === undefined) {
       panel.dataset.outlineHidden = String(!reportSectionExpanded("Outline column", !initialReportOutlineHidden(activeDraft.blocks)));
     }
@@ -35260,10 +35259,10 @@ async function renderProjectReportDraft(project, resume = null) {
     versionsToggle.type = "button";
     versionsToggle.textContent = "Versions";
     prependWorkspaceButtonIcon(versionsToggle, "square-stack");
-    versionsToggle.hidden = history.length === 0;
+    versionsToggle.hidden = !showSavedVersions || history.length === 0;
     versionsToggle.title = "Compare saved PDF versions beside the current Report";
     versionsToggle.addEventListener("click", () => comparison.toggle());
-    primaryActions.insertBefore(versionsToggle, pageTheme);
+    if (showSavedVersions) primaryActions.insertBefore(versionsToggle, pageTheme);
     const columns = oldColumns || document.createElement("div");
     columns.className = "report-workspace-columns";
     columns.setAttribute("role", "region");
@@ -35278,18 +35277,19 @@ async function renderProjectReportDraft(project, resume = null) {
     retainReportChildren(documents, writingHeader, outline, documentBody, reportsRail, comparison.divider, comparison.preview);
     retainReportChildren(columns, library, libraryControls.divider, documents, versionsControls.divider, comparison.versions);
     panel._updateReportColumns = () => {
-      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
-      versionsToggle.hidden = history.length === 0;
-      const comparing = panel.dataset.comparisonOpen === "true";
+      if (!shell.clientWidth || disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+      versionsToggle.hidden = !showSavedVersions || history.length === 0;
+      const comparing = showSavedVersions && panel.dataset.comparisonOpen === "true";
       const previewing = comparing && Boolean(comparison.selectedID);
       const sourceWidth = panel.dataset.libraryOpen === 'true' ? Number(panel.dataset.libraryWidth) || 330 : 0;
       const outlineCollapsed = panel.dataset.outlineHidden === 'true';
-      const outlineWidth = reportOutlineRailWidth(outlineCollapsed);
+      const outlineWidth = outlineRailWidth(outlineCollapsed);
       const collapsedVersions = panel.dataset.versionsCollapsed === "true";
+      const sourceRailWidth = sourceWidth ? 0 : reportOutlineRailWidth(true);
       const available = Math.min(columns.clientWidth || availableSidebarWidth(), availableSidebarWidth());
-      const layout = reportComparisonLayout(available, {
-        sources: sourceWidth, outline: outlineWidth, reports: reportOutlineRailWidth(panel.dataset.reportsHidden === 'true'), comparing, previewing,
-        minimumReportWidth: documentMinimumWidth(), outlineDivider: false,
+      const layout = reportComparisonLayout(available - sourceRailWidth, {
+        sources: sourceWidth, outline: outlineWidth, reports: reportsRailWidth(panel.dataset.reportsHidden === 'true'), comparing, previewing,
+        minimumReportWidth: documentMinimumWidth(), outlineDivider: false, compactEditor: !comparing,
         versions: collapsedVersions ? 48 : Number(panel.dataset.versionsWidth) || 300,
         reportWidth: Number(panel.dataset.reportComparisonWidth) || 0,
         pdfWidth: Number(panel.dataset.pdfComparisonWidth) || 0
@@ -35302,13 +35302,15 @@ async function renderProjectReportDraft(project, resume = null) {
         panel.dataset.versionsWidth = String(layout.versionsWidth);
         panel.style.setProperty("--report-versions-width", `${layout.versionsWidth}px`);
       }
-      if (columns.style.gridTemplateColumns !== layout.template || documents.style.gridTemplateColumns !== layout.documentTemplate) {
+      const template = sourceRailWidth ? layout.template.replace(/^0px/, `${sourceRailWidth}px`) : layout.template;
+      if (columns.style.gridTemplateColumns !== template || documents.style.gridTemplateColumns !== layout.documentTemplate) {
         preserveReportReadingPosition(documentBody, () => {
-          columns.style.gridTemplateColumns = layout.template;
+          columns.style.gridTemplateColumns = template;
           documents.style.gridTemplateColumns = layout.documentTemplate;
         });
       }
-      library.hidden = libraryControls.divider.hidden = !sourceWidth;
+      libraryControls.divider.hidden = !sourceWidth;
+      paintSourcesToggle(Boolean(sourceWidth));
       outline.hidden = false; outline.classList.toggle('is-outline-collapsed', outlineCollapsed);
       comparison.preview.hidden = comparison.divider.hidden = !previewing;
       comparison.versions.hidden = versionsControls.divider.hidden = !comparing;
@@ -35317,8 +35319,6 @@ async function renderProjectReportDraft(project, resume = null) {
       versionsTitle.setAttribute("aria-expanded", String(!collapsedVersions));
       versionsTitle.setAttribute("aria-label", `${collapsedVersions ? "Expand" : "Collapse"} Versions list`);
       versionsToggle.setAttribute("aria-pressed", String(comparing));
-      tools.setAttribute("aria-expanded", String(Boolean(sourceWidth)));
-      tools.title = sourceWidth ? 'Hide Report sources' : 'Show Report sources';
       paintOutlineToggle(); paintReportsToggle();
       libraryControls.update(); versionsControls.update();
     };
@@ -35387,7 +35387,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const [draftPayload, sourcePayload, historyPayload] = await Promise.all([
       reportRequest("/reports/drafts/list", { projectID }),
       reportRequest("/reports/sources/list", { projectID }),
-      reportRequest("/reports/history/list", { projectID })
+      showSavedVersions ? reportRequest("/reports/history/list", { projectID }) : {}
     ]);
     if (options.shouldApply && !options.shouldApply() || disposed || deletingVersionID || historyGeneration !== historyMutationGeneration || !isCurrentAccountRequest(requestIdentity)) return false;
     drafts = draftPayload.drafts || [];
@@ -35424,8 +35424,8 @@ async function renderProjectReportDraft(project, resume = null) {
   };
 
   try {
-    const historyPayloadPromise = projectTransitionHubPayload(projectID)
-      .then((hubPayload) => hubPayload?.reports || reportRequest("/reports/history/list", { projectID }));
+    const historyPayloadPromise = showSavedVersions ? projectTransitionHubPayload(projectID)
+      .then((hubPayload) => hubPayload?.reports || reportRequest("/reports/history/list", { projectID })) : {};
     const [draftPayload, sourcePayload, historyPayload, optionsPayload, recoveries, editorModule] = await Promise.all([
       reportRequest("/reports/drafts/list", { projectID }),
       reportRequest("/reports/sources/list", { projectID }),
@@ -46562,7 +46562,7 @@ function completeFirstUseWelcome() {
 function syncResearchStart() {
   let start = track.querySelector('.research-start');
   if (!isProAccount() || !workspacePrivatePresentationAllowed() || !workspaceProject() ||
-      currentColumnWorkflowView() !== 'research' || defaultActivePaneIDs().some(workflowPaneIsVisible)) {
+      reportScreen?.isOpen() || defaultActivePaneIDs().some(workflowPaneIsVisible)) {
     start?.remove();
     return;
   }
@@ -46979,6 +46979,7 @@ function openColumnGroupMenu(panel, anchor) {
         }
       }
     }
+    if (pro) add("Saved passages", () => focusUtility("saved"), !workspaceProject());
     if (pro) add("Change Code", () => {
       const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
       if (!reader || !panel.isConnected) return;
@@ -47175,7 +47176,7 @@ function columnGroupIsCollapsed(group) {
 }
 
 function paneIsCollapsed(paneID) {
-  if (paneID.startsWith('project:notes-index:') && currentColumnWorkflowView() === 'notebook') return Boolean(state.notebookListHidden);
+  if (paneID.startsWith('project:notes-index:')) return Boolean(state.notebookListHidden);
   return paneCanCollapse(paneID) && ((paneID !== activePinnedPaneID() && columnGroupIsCollapsed(columnGroupForPane(paneID))) || (state.collapsedPaneIDs || []).includes(paneID));
 }
 
@@ -47447,14 +47448,15 @@ function appendPaneSequence(panes) {
   if (pinnedIndex > 0) orderedPanes.unshift(...orderedPanes.splice(pinnedIndex, 1));
   const panesByID = new Map(orderedPanes.map((pane) => [pane.dataset.paneId, pane]));
   orderedPanes.splice(0, orderedPanes.length, ...applyLinkedPanePlacements(pairSavedEvidenceDetails([...panesByID.keys()]), true).map((id) => panesByID.get(id)));
-  if (currentColumnWorkflowView() === 'notebook') {
-    const project = workspaceProject();
-    const indexID = project && notebookIndexPaneID(project);
-    const selected = project && selectedNotebookColumn(project);
-    const first = [...orderedPanes.filter(pane => pane.dataset.paneId.startsWith('reader:')).map(pane => pane.dataset.paneId),
-      ...savedPaneIDs(), indexID, selected && notebookColumnPaneID(selected)].filter(Boolean);
-    const rank = id => first.includes(id) ? first.indexOf(id) : first.length;
-    orderedPanes.sort((left, right) => rank(left.dataset.paneId) - rank(right.dataset.paneId));
+  const project = workspaceProject();
+  if (project && sharedNotesOpen()) {
+    const list = panesByID.get(notebookIndexPaneID(project));
+    const note = selectedNotebookColumn(project);
+    const editor = note && panesByID.get(notebookColumnPaneID(note));
+    if (list && editor) {
+      orderedPanes.splice(orderedPanes.indexOf(list), 1);
+      orderedPanes.splice(orderedPanes.indexOf(editor), 0, list);
+    }
   }
   state.paneOrder = orderedPanes.map((pane) => pane.dataset.paneId);
   orderedPanes.forEach((pane) => {
@@ -47503,6 +47505,7 @@ function appendPaneSequence(panes) {
     nodes.push(renderFirstUseWelcome());
   }
   nodes.push(...orderedPanes.filter(pane => !visiblePanes.includes(pane)));
+  if (reportScreen?.element.parentNode === track) nodes.push(reportScreen.element);
   const desiredNodes = new Set(nodes);
   Array.from(track.children).forEach((node) => {
     if (!desiredNodes.has(node)) node.remove();
@@ -47547,6 +47550,7 @@ function readerShortcutItems() {
       const toolKey = /^utility:search(?::|$)/.test(id) ? 'search'
         : /^(?:utility:analysis(?::|$)|research:conversation:)/.test(id) ? 'analysis'
         : id === 'utility:calculator' ? 'calculator' : '';
+      if (isProjectNotebookPaneID(id) || id.startsWith('project:notes-index:')) return null;
       const label = {search:'Search', analysis:'Assistant', calculator:'Calculator'}[toolKey] || columnPaneLabel(panel);
       const query = toolKey === 'search' ? panel.querySelector('.search-input')?.value?.trim() : '';
       return {id, name:label, label, location:query || '', column:true, theme:'current-consolidation', toolKey,
@@ -47562,7 +47566,7 @@ function readerShortcutItems() {
     return { id, name:readerPositionLabel(reader), label:readerPositionLabel(reader), column:true, iconName:"library-big",
       theme:code?.theme || "current-consolidation",
       location:[name, `${tabs.length} ${tabs.length === 1 ? 'tab' : 'tabs'}`, ...new Set([chapter, section].filter(value => value && value !== "Reader"))].join(" · ") };
-  });
+  }).filter(Boolean);
   const counts = new Map(), occurrences = new Map();
   for (const item of items) counts.set(item.label, (counts.get(item.label) || 0) + 1);
   return items.map(item => {
@@ -51871,13 +51875,11 @@ async function toggleUtilityPane(key) {
 }
 
 async function resetVisibleColumnWidths() {
-  if (reportScreen?.isOpen()) {
-    const panel = document.querySelector(".report-workspace-view:not([hidden]) .report-draft-panel");
-    if (panel?.querySelector(".report-workspace-columns")) resetReportColumnWidths(panel, syncReferenceReaderLayout);
-    return;
-  }
-  workspaceColumnExpansion?.restore();
+  const report = track.querySelector(":scope > .shared-report-column:not([hidden]) .report-draft-panel");
+  if (report?.querySelector(".report-workspace-columns")) resetReportColumnWidths(report, syncReferenceReaderLayout);
   const paneIDs = new Set(activePaneIDs().filter(workflowPaneIsVisible));
+  if (!paneIDs.size) return;
+  workspaceColumnExpansion?.restore();
   for (const group of state.columnGroups || []) {
     for (const [id, column] of Object.entries(group.columns || {})) if (paneIDs.has(id)) column.width = defaultPaneWidthForID(id);
   }
@@ -51894,20 +51896,19 @@ async function resetVisibleColumnWidths() {
 }
 
 async function closeAllColumns() {
-  // Each surface retains its own unsaved-edit guard. Never close a retained
-  // column in the other working view as a side effect of this view's action.
+  // Respect each tool's unsaved-edit guard in the shared workspace.
   const workspaceID = activeWorkspaceID;
   const identity = captureAccountRequest();
   const view = currentColumnWorkflowView();
   const allDescriptors = workspacePaneDescriptors();
   allDescriptors.forEach(item => item.foundationScope?.release(item.id));
-  const descriptors = allDescriptors.filter(item => workflowPaneIsVisible(item.id) ||
-    view === 'notebook' && isProjectNotebookPaneID(item.id)).reverse();
+  const descriptors = allDescriptors.filter(item => workflowPaneIsVisible(item.id)).reverse();
   for (const descriptor of descriptors) {
     if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return false;
     if (await descriptor.close() === false) return false;
   }
   if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return false;
+  reportScreen?.close();
   if (view === "research" || view === "notebook") {
     state.workflowVisitedViews = [...new Set([...(state.workflowVisitedViews || []), view])];
     saveWorkspaceState();
@@ -51934,6 +51935,10 @@ async function focusUtility(key, selector = "") {
     paneID = `utility:${key}`;
   }
   if (!paneID) return;
+  if (key === "saved" && !workflowPaneIsVisible(paneID)) {
+    state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, "research");
+    await transitionWorkspace("utility");
+  }
   scrollPaneIntoView(paneID);
   if (!await whenWorkspacePaneReady(paneID)) return;
   if (key === "analysis") startProjectArtifactCheckpointLoop({ immediate: true });
@@ -52244,8 +52249,7 @@ function bindImmediateUtilityControls() {
         else void openProjectDetailsScreen();
         return;
       }
-      return tool === "facts" ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ?
-        presentWorkingView('report', () => openProjectReportDraft(workspaceProject())) : toggleProjectTool(tool);
+      return tool === "facts" ? toggleProjectInformation(tool) : toggleProjectTool(tool);
     };
     button.addEventListener("click", () => void openTool());
   });
