@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-toolbar-height-v2494";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-notes-list-header-v2496";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-toolbar-height-v2494";
+} from "./offline-storage.js?v=20261117-notes-list-header-v2496";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3365,26 +3365,35 @@ function renderNotebookIndex(project) {
   heading.className = 'eyebrow panel-kind';
   heading.textContent = 'Notes';
   header.append(heading);
-  panel._notebookListToggle = createNotebookListToggle();
+  const list = document.createElement('div');
+  list.className = 'notebook-index-list';
+  list.setAttribute('aria-label', 'Project notes');
+  list.setAttribute('role', 'region');
+  const listHeader = document.createElement('header');
+  listHeader.className = 'notebook-list-header';
+  const listHeading = document.createElement('h3');
+  listHeading.append(createNotebookListToggle());
+  listHeader.append(listHeading);
   const actions = document.createElement('div');
-  actions.className = 'panel-actions notebook-index-actions';
-  if (project.sharedRole !== 'viewer') {
-    const options = document.createElement('button');
-    options.type = 'button';
-    options.className = 'icon-button notebook-index-menu-button';
-    options.textContent = '⋯';
-    options.setAttribute('aria-label', 'Notes options');
-    options.setAttribute('aria-haspopup', 'menu');
-    options.setAttribute('aria-expanded', 'false');
-    options.addEventListener('click', () => openNotebookListMenu(panel, options));
-    actions.append(options);
-  }
-  panel._notebookControls = actions;
+  actions.className = 'notebook-index-actions';
+  const create = document.createElement('button');
+  create.type = 'button';
+  create.className = 'notebook-index-create';
+  create.textContent = 'New note +';
+  create.addEventListener('click', () => void createNotebookNoteColumn(project));
+  const options = document.createElement('button');
+  options.type = 'button';
+  options.className = 'icon-button notebook-index-menu-button';
+  options.textContent = '⋯';
+  options.setAttribute('aria-label', 'Notes options');
+  options.setAttribute('aria-haspopup', 'menu');
+  options.setAttribute('aria-expanded', 'false');
+  options.addEventListener('click', () => openNotebookListMenu(panel, options));
+  actions.append(create, options);
   const body = document.createElement('div');
   body.className = 'notebook-index-body';
-  body.setAttribute('aria-label', 'Project notes');
-  body.setAttribute('role', 'region');
-  panel.append(header, body);
+  list.append(listHeader, actions, body);
+  panel.append(header, list);
   notebookIndexTitleScroll ||= attachResearchHistoryTitleScroll({root:track,
     buttonSelector:'.notebook-index-note', titleSelector:'.notebook-index-title', textSelector:'.notebook-index-title-text'});
   syncNotebookLanding(null, panel);
@@ -3712,9 +3721,14 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
   const selection = panel._notebookSelection ||= {enabled:false, ids:new Set(), busy:false, cards:[]};
   selection.cards = cards;
   for (const id of selection.ids) if (!cards.some(card => card.id === id)) selection.ids.delete(id);
-  if (project.sharedRole === 'viewer') { selection.enabled = false; selection.ids.clear(); }
+  const readOnly = project.sharedRole === 'viewer';
+  if (readOnly) { selection.enabled = false; selection.ids.clear(); }
+  const actions = panel.querySelector('.notebook-index-actions');
+  if (actions) actions.hidden = readOnly;
+  const create = panel.querySelector('.notebook-index-create');
+  if (create) create.disabled = selection.enabled || selection.busy || readOnly;
   const options = panel.querySelector('.notebook-index-menu-button');
-  if (options) options.disabled = selection.busy || !hasCapability('notebook') || project.sharedRole === 'viewer';
+  if (options) options.disabled = selection.busy || !hasCapability('notebook') || readOnly;
   const key = JSON.stringify([projectID, available, !available && loading, selectedID, selected?.id, researchHistoryDayIndex(new Date()),
     selection.enabled, [...selection.ids], selection.busy,
     cards.map(card => [card.id, card.title, card.column?.id, card.updatedAt, card.createdAt])]);
@@ -3724,25 +3738,6 @@ function syncNotebookLanding(notes = null, panel = track.querySelector('.noteboo
   body.dataset.catalogKey = key;
   body.replaceChildren();
   body.setAttribute('aria-busy', String(selection.busy));
-  const topRow = document.createElement('div');
-  topRow.className = 'notebook-index-top-row';
-  body.append(topRow);
-  if (panel._notebookListToggle) {
-    const listHeading = document.createElement('h3');
-    listHeading.className = 'notebook-list-heading';
-    listHeading.append(panel._notebookListToggle);
-    topRow.append(listHeading);
-  }
-  if (project.sharedRole !== 'viewer') {
-    const create = document.createElement('button');
-    create.type = 'button';
-    create.className = 'notebook-index-create';
-    create.textContent = 'New note +';
-    create.disabled = selection.enabled || selection.busy;
-    create.addEventListener('click', () => void createNotebookNoteColumn(project));
-    topRow.append(create);
-  }
-  if (panel._notebookControls) topRow.append(panel._notebookControls);
   if (selection.enabled) {
     const status = document.createElement('p');
     status.className = 'notebook-selection-status'; status.setAttribute('role', 'status');
