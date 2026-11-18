@@ -1,7 +1,5 @@
 /* Column shortcuts share the workspace navigation's active and hover states. */
-.reader-toolbar-tools,.reader-shortcuts{display:flex;gap:6px;min-width:0;max-width:100%}
-.reader-toolbar-tools{align-items:flex-start}
-.reader-shortcuts{align-items:center;flex-wrap:wrap}
+.reader-toolbar-tools,.reader-shortcuts{display:flex;align-items:center;gap:6px}
 .reader-shortcuts[hidden]{display:none}
 .reader-shortcuts:not([hidden])::before{content:"";align-self:center;flex:0 0 1px;height:var(--workspace-menu-icon-size,12px);margin-inline:4px;background:var(--border)}
 .workflow-toolbar #add-reader{--workspace-menu-weight:300;flex:0 0 auto;color:var(--text-secondary)}
@@ -18,7 +16,6 @@
 .reader-shortcut-tooltip{position:fixed;z-index:1500;box-sizing:border-box;max-width:min(360px,calc(100vw - 16px));padding:8px 10px;border-radius:10px;background:var(--menu-surface);color:var(--text-primary);box-shadow:var(--shadow-panel);font:12px/1.5 var(--ui-font-family);overflow-wrap:anywhere;pointer-events:none}
 .reader-shortcut-tooltip[hidden]{display:none}
 
-.workflow-toolbar>[data-workflow-tools=research]{min-width:0;flex:0 1 auto;flex-wrap:wrap;gap:4px 6px;max-width:100%}
 @media(pointer:coarse){.workflow-toolbar .reader-shortcut{min-height:44px;min-width:44px}}
 @media(prefers-reduced-motion:reduce){.workflow-toolbar .reader-shortcut{transition:none}}
 

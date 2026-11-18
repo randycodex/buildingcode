@@ -20301,16 +20301,19 @@ dialog.report-export-review {
   display: flex;
   grid-column: 2;
   grid-row: 1;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  align-content: center;
-  gap: 3px var(--workspace-menu-gap);
+  gap: var(--workspace-menu-gap);
   min-width: 0;
-  min-height: calc(var(--header-height) - 1px);
+  height: calc(var(--header-height) - 1px);
   box-sizing: border-box;
-  padding-block: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
 }
-.workflow-toolbar > div { display: flex; align-items: center; }
+.workflow-toolbar::-webkit-scrollbar { display: none; }
+.workflow-toolbar > div { display: flex; align-items: center; flex: 0 0 auto; }
 .workflow-toolbar > [hidden], .panel-track > .is-workflow-hidden { display: none !important; }
 /* Present each working view in one paint, without fading the retained editors. */
 html[data-workflow-presenting]:not([data-reader-tab-presenting]) .workspace-shell *,
@@ -21755,7 +21758,6 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 
 @media (pointer: fine) {
   .workspace-shell > .topbar { --workspace-menu-height: 26px; }
-  .topbar > .workflow-toolbar { padding-block: 7px; }
   .workspace-shell > .topbar button { height: var(--workspace-menu-height); min-height: var(--workspace-menu-height); padding-block: 0; line-height: 1; }
   .report-workspace-view .report-draft-shell .report-draft-primary-actions > button { --workspace-menu-height: 20px; height: 20px; min-height: 20px; padding-block: 0; line-height: 18px; }
 }

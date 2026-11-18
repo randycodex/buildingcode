@@ -37,7 +37,8 @@ doc.createElement = tag => {
 doc.body = doc.createElement('body');
 doc.addEventListener = (...args) => doc.body.addEventListener(...args);
 doc.removeEventListener = (...args) => doc.body.removeEventListener(...args);
-const host=doc.createElement('div'), track=doc.createElement('section');doc.body.append(host,track);
+const host=doc.createElement('div'), track=doc.createElement('section'), toolbar=doc.createElement('nav');
+toolbar.className='workflow-toolbar';toolbar.append(host);doc.body.append(toolbar,track);
 const panels=['reader:a','reader:b'].map(id=>{const p=doc.createElement('article');p.dataset.paneId=id;p.className='workspace-panel reader-panel';p.append(doc.createElement('header'));track.append(p);return p;});
 let items = panels.map((p,i)=>({id:p.dataset.paneId,prefix:'BC',edition:'2022',name:'Building Code (2022)',theme:'building',location:`Chapter ${i+1}: Location`}));
 let context='project-A:research';const reveals=[];
@@ -49,6 +50,7 @@ const b=host.children[1];b.focus();b.dispatch('focus');
 const tooltip=doc.body.querySelector('.reader-shortcut-tooltip');
 assert.equal(tooltip.hidden,false);assert.match(tooltip.textContent,/Building Code \(2022\).*Chapter 2/);
 assert.equal(tooltip.style.left,'82px','A tooltip stays within a narrow viewport.');
+toolbar.dispatch('scroll');assert.equal(tooltip.hidden,true,'Scrolling the toolbar clears the old tooltip position.');
 b.dispatch('click');assert.deepEqual(reveals,['reader:b']);assert.equal(b.getAttribute('aria-pressed'),'true');
 let prevented=false;b.dispatch('pointerdown',{pointerType:'mouse',button:0,preventDefault(){prevented=true;}});assert.equal(prevented,true,'Mouse shortcuts preserve the Reader text selection.');
 items.reverse();shortcuts.refresh();assert.equal(host.children[0],b);assert.equal(doc.activeElement,b,'Reordering keeps the same focused shortcut.');

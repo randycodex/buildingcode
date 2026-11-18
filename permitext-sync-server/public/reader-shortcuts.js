@@ -12,6 +12,7 @@ export function readerShortcutLabel({ prefix = '', edition = '' }) {
 export function createReaderShortcuts({ host, track, readers, context, reveal, move, preview, cancelPreview, renderIcon, tools = [] }) {
   const doc = host.ownerDocument;
   const win = doc.defaultView;
+  const toolbar = host.closest('.workflow-toolbar');
   const buttons = new Map();
   const activeByContext = new Map();
   const readerByContext = new Map();
@@ -274,6 +275,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
   track.addEventListener('focusin', remember);
   track.addEventListener('wheel', remember, { passive: true });
   track.addEventListener('scroll', hideTooltip, { passive: true });
+  toolbar?.addEventListener('scroll', hideTooltip, { passive: true });
   win.addEventListener('resize', resize, { passive: true });
   doc.addEventListener('pointermove', movePointer, { passive: false });
   doc.addEventListener('pointerup', releasePointer);
@@ -292,6 +294,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
       track.removeEventListener('focusin', remember);
       track.removeEventListener('wheel', remember);
       track.removeEventListener('scroll', hideTooltip);
+      toolbar?.removeEventListener('scroll', hideTooltip);
       win.removeEventListener('resize', resize);
       doc.removeEventListener('pointermove', movePointer);
       doc.removeEventListener('pointerup', releasePointer);
