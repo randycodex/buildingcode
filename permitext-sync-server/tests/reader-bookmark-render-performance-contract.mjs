@@ -61,7 +61,7 @@ const context = vm.createContext({
   renderOccupantLoadCalculation() { return null; }, readerPassagePayload() { return {}; },
   linkInlineCodeReferences() {}, decorateReaderDefinitions() {}, hasCapability: () => true,
   bookmarkIconSVG: saved => saved ? "saved" : "save", bookmarkActionLabel: saved => saved ? "Remove passage" : "Save passage",
-  researchActionIconSVG: () => "research", noteAddIconSVG: () => "note",
+  noteAddIconSVG: () => "note",
 });
 const subscriptionLifecycle = source.slice(source.indexOf("const workspaceNodeAccessRecords"), source.indexOf("function readerPrivateContentAllowed"));
 vm.runInContext(subscriptionLifecycle + ["workspaceAccessGateForRender", "normalizeAnnotationBlockID", "savedEvidenceKey", "projectSectionBelongsToProject", "workspaceSavedEvidenceKeys", "isSectionSaved",

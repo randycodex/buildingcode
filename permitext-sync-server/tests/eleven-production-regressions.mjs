@@ -35,7 +35,7 @@ const destination=vm.createContext({workspaceProject:()=>({id:'project'}),captur
  researchCodeEdition:()=> '2022',crypto:{randomUUID:()=> 'passage'},navigator:{onLine:true},emptyNotebookDocument:()=>({document:[]}),
  notebookReferenceBlocks:()=>[],generatedNoteTitle:x=>x,postResearch:async()=>{saved++;return {card:{id:'new'}};},
  requireCurrentAccountRequest(){},saveNotebookCardSnapshot:async()=>{},publishSavedNotebookCard:()=>{},showNotebookSavedLink(){}});
-vm.runInContext(extract('async function addPassageToNotebook(','let readerCommentIndex'),destination);
+vm.runInContext(extract('async function addPassageToNotebook(','function renderInlineCommentBox('),destination);
 const anchor={isConnected:true,closest:()=>null};
 await destination.addPassageToNotebook(anchor,{sectionID:'1',title:'Occupant load',codePrefix:'BC'},'Exact passage');
 assert.equal(offered.choices.length,2);assert.match(offered.choices[0].label,/Hidden current Note/);assert.equal(saved,1);assert.equal(inserted,0);

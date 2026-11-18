@@ -43,9 +43,11 @@ try {
   base = `http://127.0.0.1:${server.address().port}`;
   await post('/admin/lifetime-grants/grant', {userID}, 200, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   token = (await post('/account/sign-in', {credential: {provider: 'apple', providerUserID: 'report-pages-owner', email: 'report-pages@example.test', displayName: 'Page layout test'}})).account.backendSessionToken;
-  for (const id of [projectID, 'other-project']) await post('/sync/push', {batch: {user: {id: userID}, mutations: [{project: {
-    id: `record-${id}`, clientID: id, userID, name: id, description: 'Synthetic project', address: '100 Synthetic Street',
-    codeVersion: defaultSyncCodeVersion, colorHex: '#334455', sortOrder: 0, updatedAt: new Date().toISOString()}}]}});
+  let projectUpdatedAt = Date.now();
+  const pushProject = (id, description) => post('/sync/push', {batch: {user: {id: userID}, mutations: [{project: {
+    id: `record-${id}`, clientID: id, userID, name: id, description, address: '100 Synthetic Street',
+    codeVersion: defaultSyncCodeVersion, colorHex: '#334455', sortOrder: 0, updatedAt: new Date(projectUpdatedAt++).toISOString()}}]}});
+  for (const id of [projectID, 'other-project']) await pushProject(id, 'Synthetic project');
   let draft;
   const body = {projectID, title: 'Paper format preview test', reportDate: '2026-11-15', introduction: 'Previewed without issuing a version.',
     blocks: Array.from({length: 16}, (_, n) => ({id: `paragraph-${n}`, kind: 'paragraph', text: `Paragraph ${n}. ` + 'Printable source content and qualifications remain in the report. '.repeat(18)}))};
@@ -96,6 +98,32 @@ try {
   await post('/reports/drafts/preview', {projectID: 'other-project', draftID: draft.id}, 404);
   const unauthenticated = await request('/reports/drafts/preview', {projectID, draftID: draft.id}, null);
   assert.equal(unauthenticated.status, 401);
+
+  const contextBlock = {id:'linked-context',kind:'projectFacts',sourceID:`${projectID}:context`,label:'Project Context'};
+  const linkedReport = {projectID,title:'Linked Context report',reportDate:'2026-11-15',blocks:[contextBlock]};
+  const {draft:withContext} = await post('/reports/drafts/save', {...linkedReport,expectedVersion:0},201);
+  await pushProject(projectID, '   ');
+  const {sources} = await post('/reports/sources/list', {projectID});
+  assert.equal(sources.find(source => source.id === contextBlock.sourceID)?.hiddenFromPicker, true,
+    'Blank Context stays linked without being offered as a new source.');
+  const paragraph = {id:'body-after-context',kind:'paragraph',text:'Keep this edit after clearing Context.'};
+  const changedReport = {...linkedReport,draftID:withContext.id,expectedVersion:withContext.version,blocks:[contextBlock,paragraph]};
+  const {draft:withoutContext} = await post('/reports/drafts/save', changedReport);
+  assert.equal(withoutContext.blocks[0].sourceID, contextBlock.sourceID, 'Saving preserves the linked Context block.');
+  const contextRequest = {projectID,draftID:withoutContext.id,expectedVersion:withoutContext.version};
+  const blankContext = await post('/reports/drafts/preview', {...contextRequest,editingLayout:true});
+  assert(blankContext.layout.regions.some(region => region.id === paragraph.id));
+  assert(!blankContext.layout.regions.some(region => region.id === contextBlock.id));
+  const issuedWithoutContext = await post('/reports/generate', contextRequest, 201);
+  assert(!issuedWithoutContext.manifest.items.some(item => item.sourceID === contextBlock.sourceID));
+  await pushProject(projectID, 'Restored project context.');
+  const restoredContext = await post('/reports/drafts/preview', {...contextRequest,editingLayout:true});
+  assert(restoredContext.layout.regions.some(region => region.id === contextBlock.id), 'Adding Context back revives the existing link.');
+  const issuedWithContext = await post('/reports/generate', contextRequest, 201);
+  assert.equal(issuedWithContext.manifest.items.find(item => item.sourceID === contextBlock.sourceID)?.facts, 'Restored project context.');
+  await post('/reports/drafts/save', {...changedReport,expectedVersion:withoutContext.version,
+    blocks:[{...contextBlock,sourceID:'other-project:context'}]},400);
+
   console.log('Report page layout HTTP passed: Letter/A4/Legal/Tabloid persistence, exact PDF preview/export pagination, no issued preview versions or draft mutation, legacy compatibility, stale-version and ownership/auth fences.');
 } finally {
   globalThis.fetch = originalFetch;

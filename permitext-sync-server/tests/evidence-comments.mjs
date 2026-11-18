@@ -18,30 +18,10 @@ assert.equal(withComments[2].content[0].text, 'Comment 1: My interpretation');
 assert.equal(evidenceCommentBlocks(['', 'Present'])[0].content[0].text, 'Comment 1: Present');
 console.log('Evidence comment round trips and optional Note transfer passed');
 
-// A chapter's comment indicators share a single index, not a summary read for
-// every rendered passage. A later batch observes fresh edits.
 const { readFile } = await import('node:fs/promises');
 const { default: vm } = await import('node:vm');
 const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const actual = name => { const start = app.indexOf(`function ${name}(`); return app.slice(start, app.indexOf('\n}', start) + 2); };
-let reads = 0, scheduled;
-const record = {sectionID:'section',codeVersion:'2022',blockID:'paragraph',noteBody:serializeEvidenceComments(['One','Two'])};
-const runtime = vm.createContext({ evidenceComments, state: {localAnnotations: []},
-  currentContentSummary: () => { reads++; return {annotations:[record]}; },
-  consolidatedSavedAnnotations: records => records,
-  visibleSyncedTargetKey: target => [target.codeVersion,target.sectionID,target.blockID].join(':'),
-  queueMicrotask: callback => { scheduled=callback; }
-});
-vm.runInContext('let readerCommentIndex=null;\n'+actual('readerCommentCount'),runtime);
-for(let i=0;i<500;i++) assert.equal(runtime.readerCommentCount(record),2);
-assert.equal(reads,1);
-assert.equal(runtime.readerCommentCount({...record,codeVersion:'2014'}),0);
-record.noteBody=''; scheduled();
-assert.equal(runtime.readerCommentCount(record),0);
-assert.equal(reads,2);
-console.log('Reader comment index: one read per batch, exact edition and fresh subsequent edits passed');
-
-
 class CommentElement {
   constructor(tag) { this.tagName=tag; this.children=[]; this.listeners={}; this.attributes={}; this.value=''; }
   append(...children) { children.forEach(child => { child.parentElement=this; this.children.push(child); }); }

@@ -1334,8 +1334,8 @@ async function main() {
         !workspaceScript.text.includes("function renderReaderSectionToolbar") &&
         workspaceScript.text.includes("function renderInlineCommentBox") &&
         workspaceScript.text.includes('bookmarkButton.className = "inline-bookmark-toggle"') &&
-        workspaceScript.text.includes('researchButton.className = "inline-research-toggle"') &&
-        workspaceScript.text.includes("openResearchDestinationMenu(researchButton, readerSectionResearchSelection(sectionWrapper, passage))") &&
+        workspaceScript.text.includes('noteButton.className = "inline-note-toggle"') &&
+        workspaceScript.text.includes("openResearchDestinationMenu(readerSelectionResearchAction, intent)") &&
         workspaceScript.text.includes("function readerProjectsForSection") &&
         workspaceScript.text.includes("links.some((link) => projectSectionBelongsToProject(link, project))") &&
         workspaceScript.text.includes('label.textContent = "Saved in"'),
@@ -2385,9 +2385,8 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function renderInlineCommentBox") &&
-        workspaceScript.text.includes("wrapper.append(bookmarkButton, noteButton, researchButton, commentButton)") &&
+        workspaceScript.text.includes("wrapper.append(bookmarkButton, noteButton)") &&
         workspaceScript.text.includes("bookmarkButton.innerHTML = bookmarkIconSVG(saved)") &&
-        workspaceScript.text.includes("researchButton.innerHTML = researchActionIconSVG()") &&
         workspaceScript.text.includes("openResearchSelectionDestinations()") &&
         workspaceScript.text.includes("addResearchSelectionToCurrent(selection, conversationID)") &&
         workspaceScript.text.includes("async function addResearchSelectionToCurrent") &&
@@ -2536,7 +2535,6 @@ async function main() {
         !workspaceScript.text.includes('wrapper.setAttribute("aria-label", `Passage actions for') &&
         workspaceScript.text.includes('if (options.lazyControls && !options.showBookmark && typeof IntersectionObserver === "function")') &&
         workspaceScript.text.includes('wrapper.removeAttribute("tabindex")') &&
-        workspaceScript.text.includes('commentButton.hidden = !permitted || !hasCapability("notes")') &&
         !workspaceScript.text.includes('button.setAttribute("aria-label", "Link passage to Note")') &&
         workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", bookmarkLabel)') &&
         workspaceScript.text.includes('const removingSavedPassage = bookmarkButton.classList.contains("is-saved")') &&
@@ -2884,8 +2882,8 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.annotated-code-block \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;/) &&
-        workspaceStyles.text.match(/\.inline-bookmark-toggle,[\s\S]*?\.inline-research-toggle,\s*\.inline-note-toggle \{[\s\S]*?display: inline-flex;/),
-      "Reader passage actions no longer use the compact inline Save and Research row."
+        workspaceStyles.text.match(/\.inline-bookmark-toggle,[\s\S]*?\.inline-note-toggle \{[\s\S]*?display: inline-flex;/),
+      "Reader passage actions no longer use the compact inline Save and Note row."
     );
     assert(
       workspaceStyles.text.match(/\.section-detail-heading span \{[^}]*font-weight: 600;/) &&

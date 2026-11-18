@@ -17110,11 +17110,15 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
 
   const project = (await projectAccessForUser(userID, projectID))?.project || null;
   const factProjection = projectFactProjection({ ...project, description: "" });
-  if (project?.description?.trim()) {
+  if (project) {
+    const hasContext = Boolean(project.description?.trim());
+    // Reports retain their Context link when the project description is cleared.
+    // An empty source contributes no printable items until Context has text again.
     sources.push({ id: `${projectID}:context`, kind: "projectFacts", projectSection: "context", label: "Project Context",
-      summary: project.description, sourceClassification: "project-material", updatedAt: project.updatedAt || null,
-      manifestItem: { kind: "projectFacts", sourceID: `${projectID}:context`, title: "Project Context",
-        address: "", facts: project.description, structuredFacts: [], projectionVersion: factProjection.projectionVersion } });
+      summary: hasContext ? project.description : "", hiddenFromPicker: !hasContext, sourceClassification: "project-material",
+      updatedAt: project.updatedAt || null,
+      manifestItems: hasContext ? [{ kind: "projectFacts", sourceID: `${projectID}:context`, title: "Project Context",
+        address: "", facts: project.description, structuredFacts: [], projectionVersion: factProjection.projectionVersion }] : [] });
   }
   if (factProjection.reportFacts) {
     const facts = factProjection.reportFacts;

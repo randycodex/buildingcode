@@ -53,7 +53,7 @@ export function planSavedEvidenceDelete(userID, existing, input) {
     if (input.scope === 'notes') {
       if (!selectedLinks.length) continue;
       const selectedNotes = notes.filter(record => evidenceKey(record) === key);
-      if (selectedNotes.length && remainingLinks.length) throw new Error('These section notes are shared with another workspace. Edit them in Reader; clearing this workspace cannot erase another workspace’s notes.');
+      if (selectedNotes.length && remainingLinks.length) throw new Error('These section notes are shared with another workspace. Clearing this workspace would also remove them there.');
       for (const record of selectedNotes) mutations.push({annotation: {...record, noteBody: '', updatedAt: timestamp, deletedAt: record.tags?.length ? null : timestamp}});
       deletedCount += selectedNotes.length;
       continue;

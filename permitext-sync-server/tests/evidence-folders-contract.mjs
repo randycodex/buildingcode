@@ -574,7 +574,7 @@ const openResearchConversationSource = functionSource(appSource, "openResearchCo
 assert.match(openResearchConversationSource, /workflowIsCurrent/);
 assert.match(openResearchConversationSource, /if \(options\.anchorPaneID\)[\s\S]*?placePaneAfter\(options\.anchorPaneID, "utility:analysis"\)/);
 assert.match(openResearchConversationSource, /placePaneAfter\(options\.anchorPaneID, "utility:analysis"\)/);
-assert.match(functionSource(appSource, "readerSectionResearchSelection"), /originPaneID: panel\?\.dataset\.paneId/);
+assert.match(functionSource(appSource, "selectedReaderResearchPassages"), /originPaneID: panel\.dataset\.paneId/);
 [
   "closeUtilityInstance",
   "closeResearchWorkspace",

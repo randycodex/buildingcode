@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261116-search-recent-section-colors-v2460";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-reader-two-actions-v2467";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -46,7 +46,7 @@ import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, createReportInsertion, reportInsertionIndex, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261115-outline-insert-v14";
 import { applyLetterDocumentLayout, applyDocumentLayout, reportPageFormats } from "./document-layout.js?v=3";
-import { createReportPageLayout } from './report-page-layout.js?v=5';
+import { createReportPageLayout } from './report-page-layout.js?v=7';
 import { createReportPageEditor } from './report-page-editor.js?v=3';
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportSwitch, createReportSourcePreviews, retainReportChildren } from "./report-presentation.js?v=1";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261116-search-recent-section-colors-v2460";
+} from "./offline-storage.js?v=20261117-reader-two-actions-v2467";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -14859,7 +14859,6 @@ function refreshVisibleSyncedDerivedState() {
     if (textarea && !textarea.contains(focusedElement)) textarea.value = detailNoteValueForTarget(target);
   });
 
-  track.querySelectorAll(".reader-passage-comments").forEach(region => region._refresh?.());
 
   openProjectDetails().forEach((detail) => {
     const currentProject = visibleProjectRecords(currentContentSummary().projects || [])
@@ -17426,7 +17425,6 @@ function setAnnotationNoteValue(target, value, onStatus = () => {}) {
     deletedAt: deleteEmptyAnnotation ? new Date().toISOString() : null
   });
   upsertLocalAnnotation(record);
-  readerCommentIndex = null;
   scheduleAnnotationPush(record, onStatus);
   refreshVisiblePlanUsage();
   return true;
@@ -18131,37 +18129,6 @@ function refreshReaderSectionProjectContexts(sectionID = "") {
   });
 }
 
-function readerSectionResearchSelection(sectionWrapper, passageElement = sectionWrapper) {
-  if (!sectionWrapper) return;
-  const range = document.createRange();
-  range.selectNodeContents(passageElement);
-  const selectedText = researchSelectionTextFromRange("", range);
-  if (!selectedText) return;
-  const passage = {
-    sectionID: sectionWrapper.dataset.researchSectionId,
-    sectionNumber: sectionWrapper.dataset.researchSectionNumber,
-    title: sectionWrapper.dataset.researchSectionTitle,
-    codePrefix: sectionWrapper.dataset.researchCodePrefix,
-    savedItemID: sectionWrapper.dataset.researchSavedItemId || "",
-    selectedText,
-    codeEdition: sectionWrapper.dataset.researchCodeEdition || "",
-    codeVersion: sectionWrapper.dataset.researchCodeVersion || "",
-    sourceLibraryVersion: sectionWrapper.dataset.researchSourceLibraryVersion || "",
-    prefix: "",
-    suffix: "",
-    start: 0,
-    end: normalizedPassageAnchorText(selectedText).length
-  };
-  const panel = sectionWrapper.closest(".workspace-panel");
-  const projectID = researchCreationProjectID();
-  return {
-    ...passage,
-    passages: [passage],
-    projectID,
-    originPaneID: panel?.dataset.paneId || ""
-  };
-}
-
 function researchConversationTitle(conversation, fallback = "New Research") {
   const title = String(conversation?.title || "").trim();
   const question = String(conversation?.starterQuestion || "").replace(/\s+/g, " ").trim();
@@ -18201,7 +18168,7 @@ function openResearchDestinationMenu(anchor, selection) {
   const menu = document.createElement('div');
   menu.className = 'column-group-menu research-destination-menu';
   menu.setAttribute('role', 'menu');
-  menu.setAttribute('aria-label', 'Ask Assistant about this passage');
+  menu.setAttribute('aria-label', 'Add selected text to Assistant');
   const controller = new AbortController();
   anchor.setAttribute('aria-haspopup', 'menu');
   anchor.setAttribute('aria-expanded', 'true');
@@ -18227,17 +18194,7 @@ function openResearchDestinationMenu(anchor, selection) {
           if (!openResearchSelectionDestinations().some((item) => item.id === conversationID)) {
             throw new Error('This Research conversation is no longer open. Reopen the menu to choose a destination.');
           }
-          const conversation = await addResearchSelectionToCurrent(selection, conversationID);
-          if (conversation && workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity)) {
-            presentWorkspaceNotice(`Passage added to ${researchConversationTitle(conversation)}.`, {
-              actionLabel: 'View research',
-              onAction: () => {
-                if (workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity)) {
-                  scrollPaneIntoView(paneIDForResearchConversation(conversationID));
-                }
-              }
-            });
-          }
+          await addResearchSelectionToCurrent(selection, conversationID);
         } else {
           await startNewResearchFromSelection(selection);
         }
@@ -19559,131 +19516,6 @@ async function addPassageToNotebook(anchor, source, exact, sourceBlocks = null) 
   showNotebookSavedLink(anchor, project, payload.card);
 }
 
-let readerCommentIndex = null;
-function readerCommentCount(target, snapshot = null) {
-  if (!readerCommentIndex) {
-    const summary = snapshot || currentContentSummary();
-    // Pending deletions may use a local ID while the server still has its
-    // canonical record. Preserve those tombstones when merging by passage.
-    const annotations = [...(summary.annotations || []), ...(state.localAnnotations || [])];
-    const records = consolidatedSavedAnnotations(annotations, { ...summary, annotations });
-    readerCommentIndex = new Map(records.map(record => [visibleSyncedTargetKey(record), evidenceComments(record.noteBody).filter(text => text.trim()).length]));
-    queueMicrotask(() => { readerCommentIndex = null; });
-  }
-  return readerCommentIndex.get(visibleSyncedTargetKey(target)) || 0;
-}
-function updateReaderCommentIndicator(wrapper, count) {
-  const button = wrapper.querySelector(".inline-comment-toggle");
-  if (!button) return;
-  button.hidden = !hasCapability("notes");
-  button.setAttribute("aria-label", count ? `Open ${count} ${count === 1 ? "comment" : "comments"} in Reader` : "Add comment");
-  button.title = button.getAttribute("aria-label");
-  wrapper.classList.toggle("has-passage-comments", Boolean(count));
-}
-
-function openReaderPassageComments(panel, target, anchor) {
-  if (!panel || !readerPrivateContentAllowed(panel) || !hasCapability("notes")) return null;
-  const targetKey = visibleSyncedTargetKey(target);
-  const existing = panel.querySelector('.reader-passage-comments');
-  if (existing?.dataset.commentTarget === targetKey) {
-    existing.querySelector('textarea')?.focus();
-    return existing;
-  }
-  existing?.remove();
-  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
-  const region = document.createElement('section');
-  region.className = 'reader-passage-comments';
-  region.dataset.commentTarget = targetKey;
-  region.dataset.researchSelectionExclude = 'true';
-  const scope = target.blockID ? 'Passage' : 'Section';
-  const title = `${scope} comments · ${target.sectionNumber || ''}`.trim();
-  region.setAttribute('aria-label', title);
-  region.__annotationTarget = target;
-  const header = document.createElement('header');
-  const heading = document.createElement('h3'); heading.textContent = title;
-  const status = document.createElement('span'); status.className = 'section-detail-note-state'; status.setAttribute('role', 'status');
-  const close = document.createElement('button'); close.type = 'button'; close.className = 'icon-button';
-  close.innerHTML = circleXIconSVG(); close.setAttribute('aria-label', 'Close comments');
-  header.append(heading, status, close);
-  const editor = createEvidenceCommentsEditor(detailNoteValueForTarget(target),
-    `${scope} comment for ${sectionDisplayTitle(target.sectionNumber, target.title)}`, evidenceCommentUndoState(target));
-  const add = document.createElement('button'); add.type = 'button';
-  add.className = 'workflow-action workflow-action-secondary section-detail-add-comment'; add.textContent = 'Add comment';
-  region.append(header, editor.undoNotice, editor, add);
-  const passage = anchor.closest('.annotated-code-block') || anchor.closest('.reader-section-heading-row');
-  if (!passage) return null;
-  passage.after(region);
-  const current = () => region.isConnected && panel.isConnected && activeWorkspaceID === workspaceID &&
-    isCurrentAccountRequest(identity) && readerPrivateContentAllowed(panel);
-  close.addEventListener('click', () => { region.remove(); if (anchor.isConnected) anchor.focus(); });
-  region.addEventListener('keydown', event => {
-    if (event.key === 'Escape') { event.stopPropagation(); close.click(); }
-  });
-  add.addEventListener('click', () => { if (current()) editor.addComment(); });
-  let revision = 0;
-  const showStatus = (value, token = revision) => {
-    if (!current() || token !== revision) return;
-    status.replaceChildren();
-    const conflict = pendingAnnotationNoteForTarget(target, state.syncConflicts);
-    editor.readOnly = Boolean(conflict);
-    add.disabled = Boolean(conflict);
-    if (conflict) {
-      if (!editor.contains(document.activeElement)) editor.value = detailNoteValueForTarget(target);
-      status.append('Save conflict · ');
-      const review = document.createElement('button'); review.type = 'button'; review.textContent = 'Review conflict';
-      review.addEventListener('click', toggleAccountDialog); status.append(review);
-    } else if (value === 'error' || value === 'pending') {
-      status.append(value === 'error' ? 'Couldn’t sync · ' : 'Changes pending · ');
-      const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Retry';
-      retry.addEventListener('click', async () => {
-        if (!current()) return;
-        const pending = pendingAnnotationNoteForTarget(target);
-        if (!pending || pending.mutation.annotation.noteBody !== editor.value) { persist(); return; }
-        const token = ++revision; status.textContent = 'Saving…';
-        try {
-          await flushSyncOutbox({refresh: true});
-          if (!current() || token !== revision) return;
-          if (pendingAnnotationNoteForTarget(target)) { showStatus('error', token); return; }
-          const annotation = pending.mutation.annotation;
-          state.localAnnotations = (state.localAnnotations || []).filter(item =>
-            String(item.id || '') !== String(annotation.id || '') || item.updatedAt !== annotation.updatedAt);
-          saveWorkspaceState(); showStatus('synced', token);
-        } catch { showStatus('error', token); }
-      });
-      status.append(retry);
-    } else status.textContent = value === 'synced' ? 'Synced' : value === 'saving' ? 'Saving…' : 'Saved on this device';
-  };
-  const persist = () => {
-    if (!current()) { editor.readOnly = true; return; }
-    if (pendingAnnotationNoteForTarget(target, state.syncConflicts)) { showStatus('conflict'); return; }
-    if (!editor.value.trim() && !detailNoteValueForTarget(target).trim()) return;
-    const token = ++revision;
-    try {
-      if (!setAnnotationNoteValue(target, editor.value, value => showStatus(value, token))) return;
-      showStatus('saving', token);
-      syncReaderNoteControls(target.sectionID, target.blockID || '', editor.value, {source: editor, target});
-    } catch { if (current()) status.textContent = 'Couldn’t save on this device'; }
-  };
-  editor.addEventListener('input', () => {
-    persist();
-    if (!editor.querySelector('textarea')) add.focus();
-  });
-  region._refresh = () => {
-    if (!current()) { region.remove(); return; }
-    const conflict = pendingAnnotationNoteForTarget(target, state.syncConflicts);
-    if (conflict) showStatus('conflict');
-    else if (!editor.contains(document.activeElement)) {
-      editor.readOnly = false; add.disabled = false; editor.value = detailNoteValueForTarget(target);
-    }
-  };
-  const pending = pendingAnnotationNoteForTarget(target);
-  if (pendingAnnotationNoteForTarget(target, state.syncConflicts)) showStatus('conflict');
-  else if (pending) showStatus(pending.lastError ? 'error' : 'pending');
-  if (!editor.querySelector('textarea') && !editor.readOnly) editor.addComment();
-  else editor.querySelector('textarea')?.focus();
-  return region;
-}
-
 function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader), options = {}) {
   const gate = options.accessGate || options.panel?.__workspaceAccessGate || null;
   const allowed = () => (!gate || gate.allowed) &&
@@ -19700,9 +19532,6 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   const bookmarkButton = document.createElement("button");
   bookmarkButton.type = "button";
   bookmarkButton.className = "inline-bookmark-toggle";
-  const researchButton = document.createElement("button");
-  researchButton.type = "button";
-  researchButton.className = "inline-research-toggle";
   const noteButton = document.createElement("button");
   noteButton.type = "button";
   noteButton.className = "inline-note-toggle";
@@ -19722,28 +19551,6 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       if (allowed()) await showWebNotice("Passage not added", error.message);
     } finally { noteButton.disabled = !allowed(); }
   });
-  const commentButton = document.createElement("button");
-  commentButton.type = "button";
-  commentButton.className = "inline-comment-toggle";
-  commentButton.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-6 4v-4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h7"/></svg>';
-  commentButton.addEventListener("click", async () => {
-    if (!allowed() || commentButton.disabled) return;
-    commentButton.disabled = true;
-    try {
-      openReaderPassageComments(options.panel || commentButton.closest(".reader-panel"),
-        readerPassagePayload(section, reader, target), commentButton);
-    } catch (error) { if (allowed()) presentWorkspaceIssue(error.message); }
-    finally { commentButton.disabled = !allowed(); }
-  });
-  wrapper.append(commentButton);
-  const updateResearchControl = () => {
-    if (!allowed()) return;
-    researchButton.innerHTML = researchActionIconSVG();
-    researchButton.setAttribute("aria-label", "Ask Assistant about this passage");
-    researchButton.setAttribute("aria-haspopup", "menu");
-    researchButton.title = "Ask Assistant in a new or existing conversation";
-    researchButton.disabled = false;
-  };
   let subscribingToAccess = true;
   const updatePrivateControls = (initialRender = false) => {
     const permitted = allowed();
@@ -19754,11 +19561,6 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     noteButton.setAttribute("aria-label", noteButton.title);
     bookmarkButton.hidden = !permitted;
     bookmarkButton.disabled = !permitted;
-    researchButton.hidden = !permitted;
-    researchButton.disabled = !permitted;
-    commentButton.disabled = !permitted;
-    updateReaderCommentIndicator(wrapper, permitted ? readerCommentCount(target) : 0);
-    commentButton.hidden = !permitted || !hasCapability("notes");
     if (!permitted) return;
     const saved = gate && !(options.bookmarkStateResolved && (initialRender === true || subscribingToAccess)) ? Boolean(isSectionSaved({
       sectionID: target.sectionID || section.id,
@@ -19773,7 +19575,6 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       : bookmarkActionLabel(saved);
     bookmarkButton.setAttribute("aria-label", bookmarkLabel);
     bookmarkButton.title = bookmarkLabel;
-    updateResearchControl();
   };
   updatePrivateControls(true);
   if (gate) subscribeWorkspaceNodeAccess(bookmarkButton, gate, updatePrivateControls, options.panel || wrapper);
@@ -19808,14 +19609,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     }
   });
 
-  researchButton.addEventListener("click", () => {
-    if (!allowed() || researchButton.disabled) return;
-    const sectionWrapper = researchButton.closest(".chapter-section");
-    if (!sectionWrapper) return;
-    const passage = researchButton.closest(".annotated-code-block") || sectionWrapper;
-    openResearchDestinationMenu(researchButton, readerSectionResearchSelection(sectionWrapper, passage));
-  });
-  wrapper.append(bookmarkButton, noteButton, researchButton, commentButton);
+  wrapper.append(bookmarkButton, noteButton);
   return wrapper;
 }
 
@@ -20293,7 +20087,6 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
   wrappers.forEach((wrapper) => {
     if (!readerPrivateContentAllowed(wrapper.closest(".reader-panel"))) return;
     const wrapperBlockID = normalizeAnnotationBlockID(wrapper.dataset.commentBlockId);
-    updateReaderCommentIndicator(wrapper, readerCommentCount({ sectionID, codeVersion: exactCodeVersion, blockID: wrapperBlockID }, savedState?.summary));
     const savedRecord = isSectionSaved({
       sectionID,
       codeVersion: exactCodeVersion,
@@ -23430,14 +23223,6 @@ function selectionIndicatorIconSVG() {
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="9"></circle>
       <path class="project-selection-checkmark" d="m8 12 3 3 5-6"></path>
-    </svg>
-  `;
-}
-
-function researchActionIconSVG() {
-  return `
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12.983 21.186a1 1 0 0 1-1.966 0 10 10 0 0 0-8.203-8.203 1 1 0 0 1 0-1.966 10 10 0 0 0 8.203-8.203 1 1 0 0 1 1.966 0 10 10 0 0 0 8.203 8.203 1 1 0 0 1 0 1.966 10 10 0 0 0-8.203 8.203"></path>
     </svg>
   `;
 }
@@ -33727,8 +33512,9 @@ async function renderProjectReportDraft(project, resume = null) {
     async prepare() {
       const draft = activeDraft;
       const current = () => !disposed && activeDraft === draft && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID;
-      if (sourceMutationDraft === draft) await sourceMutation;
-      if (!current() || !await saveDraft() || !current()) throw new Error('Finish saving this Report before previewing its pages.');
+      if (sourceMutationDraft === draft) await sourceMutation.catch(() => {});
+      // Save failures already have their own status and Retry action.
+      if (!current() || savePresentation.state === "error" || !await saveDraft() || !current()) return null;
       if (draft.blocks.some(block => block.kind === 'calculation')) {
         await syncedProjectCalculations(projectID).flush();
         const linked = new Set(draft.blocks.filter(block => block.kind === 'calculation').map(block => block.sourceID));
@@ -33891,8 +33677,11 @@ async function renderProjectReportDraft(project, resume = null) {
     };
     const pending = sourceMutation.catch(() => {}).then(mutate);
     sourceMutation = pending;
-    // Export observes a failure; subsequent source changes can still retry.
-    void pending.catch(() => {});
+    const release = () => {
+      if (sourceMutation === pending) sourceMutationDraft = null;
+    };
+    // A finished source change cannot block preview or export after a save retry.
+    void pending.then(release, release);
     return pending;
   }
   const mountState = {
@@ -35281,8 +35070,8 @@ async function renderProjectReportDraft(project, resume = null) {
     const exportSpacer = document.createElement("span");
     exportSpacer.className = "report-action-spacer";
     exportSpacer.setAttribute("aria-hidden", "true");
-    save.addEventListener("click", () => {
-      void saveDraft();
+    save.addEventListener("click", async () => {
+      if (await saveDraft()) pageLayout.invalidate();
     });
     const saveCopy = document.createElement("button");
     saveCopy.type = "button"; saveCopy.className = "report-autosave-copy";
@@ -51463,7 +51252,7 @@ function workspaceAccessGateForRender(options = {}) {
 }
 
 function maskUnverifiedWorkspacePane(panel) {
-  panel.querySelectorAll(".inline-bookmark-toggle, .inline-research-toggle, .search-result-save").forEach((control) => {
+  panel.querySelectorAll(".inline-bookmark-toggle, .search-result-save").forEach((control) => {
     control.hidden = true;
     control.disabled = true;
     control.classList.remove("is-saved");

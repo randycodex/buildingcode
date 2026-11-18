@@ -10,10 +10,6 @@ export function createReportPageLayout({host, prepare, isCurrent, onPages = () =
   host.append(status, retry);
   let active = false, stopped = false, stale = true, generation = 0, timer = null;
   let committed = null, disposeCommitted = () => {};
-  const paintScrollEdge = () => {
-    const firstPage = committed?.querySelector('.report-pdf-page');
-    host.classList.toggle('is-pages-scrolled', Boolean(firstPage && committed.scrollTop > firstPage.offsetTop + 2));
-  };
   const current = revision => !stopped && active && isCurrent() && revision === generation;
   const cancelTimer = () => {clearTimer(timer); timer = null;};
   const refresh = async () => {
@@ -25,8 +21,13 @@ export function createReportPageLayout({host, prepare, isCurrent, onPages = () =
     status.setAttribute('role', 'status'); retry.hidden = true;
     try {
       const prepared = await prepare();
-      const blob = prepared?.blob || prepared;
       if (!current(revision)) return false;
+      if (!prepared) {
+        stale = true;
+        status.textContent = '';
+        return false;
+      }
+      const blob = prepared.blob || prepared;
       staging = document.createElement('div'); staging.className = 'report-page-layout-pages is-staging';
       staging.tabIndex = 0; staging.setAttribute('role', 'region');
       staging.setAttribute('aria-label', 'Report pages'); staging.setAttribute('aria-hidden', 'true'); host.append(staging);
@@ -36,8 +37,6 @@ export function createReportPageLayout({host, prepare, isCurrent, onPages = () =
       disposeCommitted(); committed?.remove();
       committed = staging; disposeCommitted = disposeStaging;
       staging.classList.remove('is-staging'); staging.setAttribute('aria-hidden', 'false'); staging.scrollTop = scroll;
-      staging.addEventListener('scroll', paintScrollEdge, {passive:true});
-      paintScrollEdge();
       onPages({container:staging,layout:prepared?.layout});
       stale = false;
       status.textContent = `${staging.querySelectorAll('.report-pdf-page').length} pages`;
@@ -55,7 +54,7 @@ export function createReportPageLayout({host, prepare, isCurrent, onPages = () =
   return {
     refresh,
     capturePosition() {return committed?.scrollTop || 0;},
-    restorePosition(top) {if(committed) {committed.scrollTop=top; paintScrollEdge();}},
+    restorePosition(top) {if (committed) committed.scrollTop = top;},
     setActive(value) {
       if (active === value) return;
       active = value;
@@ -70,6 +69,6 @@ export function createReportPageLayout({host, prepare, isCurrent, onPages = () =
         timer = setTimer(() => {void refresh();}, 400);
       }
     },
-    dispose() {stopped = true; generation += 1; cancelTimer(); disposeCommitted(); host.replaceChildren(); host.classList.toggle('is-pages-scrolled',false);}
+    dispose() {stopped = true; generation += 1; cancelTimer(); disposeCommitted(); host.replaceChildren();}
   };
 }

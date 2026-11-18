@@ -73,6 +73,7 @@ try {
     function isProAccount(){return true;}
     function researchConversationInWorkspace(c){return c.primaryProjectID==='';}
     function researchCreationProjectID(){return '';}
+    function readerPrivateContentAllowed(){return true;}
     function selectedOpenProjectID(){return '';}
     function presentWorkspaceIssue(message,options){document.querySelector('#feedback').textContent=message;notices.push({message,options});}
     async function showWebNotice(title,message){notices.push({title,message});}
@@ -84,7 +85,7 @@ try {
       if(failEvidence) throw new Error('Offline');
       return {conversation:{...researchConversationList.find(c=>c.id===values.conversationID),sources:values.selections}};
     }
-    ${['constrainPaneWidth','activePinnedPaneID','orderPanes','paneIDForUtilityInstance','paneIDForResearchConversation','researchConversationPaneIsOpen','researchConversationTitle','paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','paneIsCollapsed','applyPaneCollapsedState','setPaneCollapsed','preparePaneCollapse','prepareColumnGroupControls','openColumnGroupMenu','focusColumnGroupControl','setColumnGroupCollapsed','refreshColumnGroupPresentation','updateCollapsedPaneDividers','togglePinnedPane','refreshPinnedPaneDivider','reconcileNotebookReferences','appendPaneSequence','scrollPaneIntoView','createDivider','capturePaneResizeWidths','notebookReferenceResize','resizeAdjacentPanesBy','updateAdjacentDividerValue','singleExpandedDividerEdge','resizePaneEdgeBy','startPaneEdgeResize','startPaneResize','readerSectionResearchSelection','researchSelectionTextFromRange','normalizedPassageAnchorText','openResearchSelectionDestinations','openResearchDestinationMenu','addResearchSelectionToCurrent'].map(actual).join('\n')}
+    ${['constrainPaneWidth','activePinnedPaneID','orderPanes','paneIDForUtilityInstance','paneIDForResearchConversation','researchConversationPaneIsOpen','researchConversationTitle','paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','paneIsCollapsed','applyPaneCollapsedState','setPaneCollapsed','preparePaneCollapse','prepareColumnGroupControls','openColumnGroupMenu','focusColumnGroupControl','setColumnGroupCollapsed','refreshColumnGroupPresentation','updateCollapsedPaneDividers','togglePinnedPane','refreshPinnedPaneDivider','reconcileNotebookReferences','appendPaneSequence','scrollPaneIntoView','createDivider','capturePaneResizeWidths','notebookReferenceResize','resizeAdjacentPanesBy','updateAdjacentDividerValue','singleExpandedDividerEdge','resizePaneEdgeBy','startPaneEdgeResize','startPaneResize','selectedReaderResearchPassages','researchSelectionTextFromRange','openResearchSelectionDestinations','openResearchDestinationMenu','addResearchSelectionToCurrent'].map(actual).join('\n')}
     const panes = state.paneOrder.map((id,index)=>{
       const pane=document.createElement('article');pane.className='workspace-panel';pane.dataset.paneId=id;
       pane.innerHTML='<header><h2>Column '+(index+1)+'</h2><div class="panel-actions"></div></header><div class="body" style="overflow:auto"><textarea>Unsent question '+index+'</textarea><div style="height:1400px"></div></div>';
@@ -96,9 +97,16 @@ try {
     const section=document.createElement('section');section.className='chapter-section';
     Object.assign(section.dataset,{researchSectionId:'BC-101',researchSectionNumber:'101',researchSectionTitle:'General'});
     section.innerHTML='<div class="annotated-code-block"><p>Only this paragraph.</p><div data-research-selection-exclude="true"><button id="research">Research</button></div></div><div class="annotated-code-block"><p>Another paragraph, not selected.</p></div>';
+    panes[0].classList.add('reader-panel');
     panes[0].querySelector('.body').prepend(section);
     const anchor=document.querySelector('#research');
-    anchor.onclick=()=>openResearchDestinationMenu(anchor,readerSectionResearchSelection(section,anchor.closest('.annotated-code-block')));
+    anchor.onclick=()=>{
+      const range=document.createRange();
+      range.selectNodeContents(section.querySelector('p'));
+      const selection=window.getSelection();
+      selection.removeAllRanges(); selection.addRange(range);
+      openResearchDestinationMenu(anchor,selectedReaderResearchPassages());
+    };
   ` });
   const menu = page.locator('.column-group-menu');
   await page.locator('[data-pane-id="reader:two"] .column-group-menu-button').click();
@@ -166,7 +174,7 @@ try {
   // Clear the pin for research menu checks; retained source and draft stay mounted.
   await page.evaluate(() => { togglePinnedPane(panes[3]); track.scrollLeft=0; });
   await page.locator('#research').click();
-  assert.deepEqual(await menu.getByRole('menuitem').allTextContents(), ['＋ Start new research','Setbacks · Current','Egress']);
+  assert.deepEqual(await menu.getByRole('menuitem').allTextContents(), ['＋ Start new conversation','Setbacks · Current','Egress']);
   await page.keyboard.press('End');
   assert.equal(await page.evaluate(() => document.activeElement.textContent), 'Egress');
   await page.keyboard.press('Enter');
@@ -177,9 +185,9 @@ try {
   assert.equal(await page.evaluate(() => state.researchConversationID), 'a');
   assert.deepEqual(await page.evaluate(() => refreshes[0].refreshPaneIDs), ['research:conversation:b']);
   assert.equal(await page.evaluate(() => panes[4].querySelector('textarea').value), 'Unsent question 4');
-  assert.equal(await page.locator('#feedback').textContent(), 'Added to Egress.');
+  assert.equal(await page.locator('#feedback').textContent(), '');
   await page.locator('#research').click();
-  await menu.getByRole('menuitem', { name: '＋ Start new research', exact: true }).click();
+  await menu.getByRole('menuitem', { name: '＋ Start new conversation', exact: true }).click();
   assert.equal(await page.evaluate(() => calls.at(-1).path), 'create');
   await page.evaluate(() => { supplementalResearchConversationIDs=[]; });
   await page.locator('#research').click();
@@ -188,7 +196,7 @@ try {
   assert.equal(await page.locator('#research').getAttribute('aria-expanded'), 'false');
   await page.evaluate(() => { researchConversationPaneOpened=false; });
   await page.locator('#research').click();
-  assert.deepEqual(await menu.getByRole('menuitem').allTextContents(), ['＋ Start new research']);
+  assert.deepEqual(await menu.getByRole('menuitem').allTextContents(), ['＋ Start new conversation']);
   await page.keyboard.press('Escape');
   // Utility-owned conversations are offered once, scoped to this workspace.
   await page.evaluate(() => {

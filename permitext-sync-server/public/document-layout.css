@@ -167,16 +167,6 @@ body .panel-track > article.workspace-panel.notebook-panel .notebook-title-contr
 .report-page-layout > button { position: absolute; inset: 8px 16px auto auto; z-index: 2; }
 .report-page-layout-pages { position: absolute; inset: 44px 0 0; padding: 24px 20px; overflow: auto; scrollbar-gutter: stable; }
 .report-page-layout-pages.is-staging { opacity: 0; pointer-events: none; }
-/* Match Reader's bounded fade as pages pass beneath the fixed editing tools. */
-.report-page-layout.is-pages-scrolled::before {
-  content: '';
-  position: absolute;
-  inset: 44px 0 auto;
-  height: calc(var(--panel-padding) + var(--space-3));
-  z-index: 6;
-  pointer-events: none;
-  background: linear-gradient(to bottom, var(--surface), transparent);
-}
 .report-page-layout .report-pdf-page { width: 100%; max-width: var(--document-page-width, 816px); box-shadow: 0 0 0 1px var(--border), 0 4px 16px rgb(0 0 0 / 10%); margin: 0 auto 32px; }
 .report-paper-size-control { align-self: center; flex: 0 0 auto; width: 68px; }
 .workspace-panel.report-draft-panel .report-draft-shell .report-paper-size-control .custom-select-trigger {

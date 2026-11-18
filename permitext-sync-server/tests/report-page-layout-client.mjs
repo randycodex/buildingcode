@@ -2,13 +2,13 @@ import assert from 'node:assert/strict';
 import {createReportPageLayout} from '../public/report-page-layout.js';
 
 class Element {
-  constructor() {this.children = []; this.attributes = {}; this.events = {}; this.className = ''; this.scrollTop = 0;this.offsetTop = 24;}
+  constructor() {this.children = []; this.attributes = {}; this.events = {}; this.className = ''; this.scrollTop = 0;}
   append(...nodes) {for (const node of nodes) {node.parent = this; this.children.push(node);}}
   replaceChildren(...nodes) {this.children.forEach(node => {node.parent = null;}); this.children = []; this.append(...nodes);}
   remove() {if (this.parent) this.parent.children = this.parent.children.filter(node => node !== this); this.parent = null;}
   setAttribute(key, value) {this.attributes[key] = value;}
   addEventListener(name, callback) {this.events[name] = callback;}
-  get classList() {return {remove: value => {this.className = this.className.split(' ').filter(name => name !== value).join(' ');},toggle:(value,on)=>{const classes=new Set(this.className.split(' ').filter(Boolean));if(on)classes.add(value);else classes.delete(value);this.className=[...classes].join(' ');}};}
+  get classList() {return {remove: value => {this.className = this.className.split(' ').filter(name => name !== value).join(' ');}};}
   querySelector(selector) {return this.querySelectorAll(selector)[0] || null;}
   querySelectorAll(selector) {return this.children.flatMap(node => [
     ...(node.className.split(' ').includes(selector.slice(1)) ? [node] : []), ...node.querySelectorAll(selector)]);}
@@ -31,13 +31,6 @@ const newer = controller.refresh(); pending[1].resolve('Newer pages'); await tic
 assert.equal(await newer, true);
 const pages = () => host.querySelectorAll('.report-pdf-page');
 assert.equal(pages()[0].textContent, 'Newer pages');
-assert.equal(host.className.includes('is-pages-scrolled'),false,'The first sheet edge remains uncovered at the top');
-controller.restorePosition(24);
-assert.equal(host.className.includes('is-pages-scrolled'),false,'Scrolling the page gap does not fade the sheet edge');
-pages()[0].parent.scrollTop=40;pages()[0].parent.events.scroll();
-assert.equal(host.className.includes('is-pages-scrolled'),true,'Content fades only after the first sheet edge passes under the tools');
-controller.restorePosition(0);
-assert.equal(host.className.includes('is-pages-scrolled'),false,'Returning to the top uncovers the sheet again');
 pending[0].resolve('Late old pages'); await tick();
 assert.equal(pages()[0].textContent, 'Newer pages', 'A slower preview cannot replace newer content.');
 
@@ -56,11 +49,17 @@ assert.equal(pages()[0].textContent, 'Updated pages');
 assert.match(host.children[0].textContent, /Pages need updating.*Offline/);
 assert.equal(host.children[1].hidden, false);
 
-const changedOwner = controller.refresh(); pending[4].resolve('Other project'); await tick();
+const blockedBySave = controller.refresh(); pending[4].resolve(null);
+assert.equal(await blockedBySave, false);
+assert.equal(pages()[0].textContent, 'Updated pages', 'A save failure keeps the last complete pages visible.');
+assert.equal(host.children[0].textContent, '', 'A save failure is reported by autosave only.');
+assert.equal(host.children[1].hidden, true, 'Retry pages is reserved for page preparation errors.');
+
+const changedOwner = controller.refresh(); pending[5].resolve('Other project'); await tick();
 owner = false; rendering[2].finish(); assert.equal(await changedOwner, false);
 assert.equal(pages()[0].textContent, 'Updated pages', 'Project/account changes never expose a stale in-flight preview.');
 assert(disposed.includes('Other project'));
-controller.setActive(false); controller.invalidate(); assert.equal(pending.length, 5);
+controller.setActive(false); controller.invalidate(); assert.equal(pending.length, 6);
 controller.dispose(); assert.equal(host.children.length, 0); assert(disposed.includes('Updated pages'));
 delete globalThis.document;
 console.log('Live page layout client passed: on-demand rendering, stale-response/ownership fences, retained pages during refresh/error, eager first-page handoff, and resource cleanup.');
