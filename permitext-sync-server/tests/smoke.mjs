@@ -415,35 +415,32 @@ async function main() {
       webRoot.text.indexOf("</header>")
     );
     const topbarGroupOrder = [
+      'class="topbar-brand"',
       'class="topbar-actions"',
-      'data-workflow-view="research"',
-      'data-workflow-view="notebook"',
-      'id="toggle-report"',
+      'class="workflow-toolbar"',
       'class="topbar-workspaces"',
       'id="workspace-actions"',
-      'id="toggle-settings"',
-      'class="topbar-brand"'
+      'id="toggle-settings"'
     ].map((marker) => topbarSource.indexOf(marker));
     assert(
       topbarGroupOrder.every((index, position) => index >= 0 && (position === 0 || index > topbarGroupOrder[position - 1])),
-      "Working views, Projects and Account controls are no longer in their intended topbar order."
+      "The brand, workspace tools and account controls must appear in that order in the shared header."
     );
     const tagWithID = (html, id) => html.match(new RegExp(`<[^>]+\\bid="${id}"[^>]*>`))?.[0] || "";
     const workflowStart = webRoot.text.indexOf('<nav class="workflow-toolbar"');
     const workflowSource = webRoot.text.slice(workflowStart, webRoot.text.indexOf("</nav>", workflowStart));
     const workflowOrder = ['data-workflow-tools="research"', 'id="add-reader"', 'id="toggle-search"',
       'id="toggle-analysis"', 'id="toggle-calculator"', 'data-workflow-tools="notebook"',
-      'id="add-notebook-reader"', 'id="toggle-saved"', 'class="workflow-layout-actions"',
+      'id="toggle-notebook"', 'class="note-picker-host"', 'data-workflow-tools="report"',
+      'id="toggle-report"', 'id="toggle-saved"', 'class="workflow-layout-actions"',
       'id="collapse-all-columns"', 'id="expand-all-columns"', 'id="fit-columns"']
       .map(marker => workflowSource.indexOf(marker));
     assert(
       workflowStart >= 0 && workflowOrder.every((index, position) => index >= 0 && (position === 0 || index > workflowOrder[position - 1])),
-      "Research and Notebook tools must retain their Reader access and shared column layout controls."
+      "The shared header must retain Research, Notebook, Report and column layout controls."
     );
-    assert(workflowSource.includes('<div hidden><button class="toolbar-button" id="toggle-notebook"'),
-      "The legacy Notes toggle must stay hidden while the notepad remains available.");
     for (const [id, label] of [["add-reader", "New Reader"], ["toggle-search", "Search"], ["toggle-analysis", "Assistant"],
-      ["add-notebook-reader", "Reader"], ["toggle-saved", "Evidence"]]) {
+      ["toggle-notebook", "Notes"], ["toggle-report", "Report"], ["toggle-saved", "Evidence"]]) {
       const tag = tagWithID(workflowSource, id);
       assert(tag.includes('type="button"') && tag.includes(`aria-label="${label}"`), `${label} tool lost button semantics or its accessible label.`);
       if (id.startsWith("toggle-")) assert(tag.includes('aria-pressed="false"'), `${label} tool lost its initial toggle state.`);
@@ -650,9 +647,8 @@ async function main() {
         workspaceStyles.text.match(/\.topbar-workspaces\s*\{[^}]*display:\s*flex;[^}]*flex:\s*0 1 auto;[^}]*margin-left:\s*auto;/) &&
         workspaceStyles.text.includes('.workspace-actions-button .workspace-current-name') &&
         workspaceStyles.text.includes('.workspace-context-switch[aria-checked="true"]') &&
-        workspaceStyles.text.match(/\.topbar-brand\s*\{[^}]*position:\s*absolute;[^}]*left:\s*50%;[^}]*top:\s*50%;[^}]*transform:\s*translate\(-50%, -50%\);/) &&
-        workspaceStyles.text.match(/\.topbar-actions > \.toolbar-button\s*\{[^}]*width:\s*88px;[^}]*flex:\s*0 0 88px;[^}]*justify-content:\s*center;/) &&
-        workspaceStyles.text.match(/\.topbar \.toolbar-button\s*\{[^}]*font-size:\s*14px !important;/) &&
+        workspaceStyles.text.match(/\.topbar-brand\s*\{[^}]*grid-column:\s*1;[^}]*justify-self:\s*start;/) &&
+        workspaceStyles.text.match(/\.workflow-toolbar\s*\{[^}]*grid-column:\s*2;[^}]*flex-wrap:\s*wrap;/) &&
         workspaceStyles.text.match(/button:focus-visible,[\s\S]*?outline:\s*[23]px solid[^;]+;/) &&
         workspaceStyles.text.includes(".workspace-empty-state {") &&
         workspaceStyles.text.includes(".pane-edge-resizer {") &&

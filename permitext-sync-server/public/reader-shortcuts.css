@@ -1,29 +1,23 @@
 /* Column shortcuts share the workspace navigation's active and hover states. */
-.reader-toolbar-tools,.reader-shortcuts{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%}
+.reader-toolbar-tools,.reader-shortcuts{display:flex;gap:6px;min-width:0;max-width:100%}
+.reader-toolbar-tools{align-items:flex-start}
+.reader-shortcuts{align-items:center;flex-wrap:wrap}
 .reader-shortcuts[hidden]{display:none}
 .reader-shortcuts:not([hidden])::before{content:"";align-self:center;flex:0 0 1px;height:12px;margin-inline:4px;background:var(--border)}
-.workflow-toolbar #add-reader{--workspace-menu-weight:300;color:var(--text-secondary)}
+.workflow-toolbar #add-reader{--workspace-menu-weight:300;flex:0 0 auto;color:var(--text-secondary)}
 .workflow-toolbar .toolbar-button.has-open-column{display:none}
 .workflow-toolbar .reader-shortcut[data-reorderable=true]{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .workflow-toolbar .reader-shortcut.is-dragging{position:relative;z-index:12;cursor:grabbing;will-change:transform}
 .workflow-toolbar .reader-shortcuts.is-reordering{cursor:grabbing}
 /* Every open column stays active, independently of which one has focus. */
-.workflow-toolbar .reader-shortcut{--workspace-menu-weight:500;appearance:none;flex:0 0 auto;height:20px;min-height:20px;line-height:18px;outline:0;border:1px solid transparent;padding-inline:13px;color:var(--workspace-menu-active);font-family:var(--ui-font-family);white-space:nowrap;cursor:pointer;transition:background 160ms}
+.workflow-toolbar .reader-shortcut{--workspace-menu-weight:500;appearance:none;flex:0 0 auto;height:20px;min-height:20px;line-height:18px;outline:0;border:1px solid transparent;padding-inline:8px;color:var(--workspace-menu-active);font-family:var(--ui-font-family);white-space:nowrap;cursor:pointer;transition:background 160ms}
 .workflow-toolbar .reader-shortcut:not(:disabled):hover{color:var(--workspace-menu-active)}
-.workflow-toolbar .reader-shortcut[data-reader-pane-id^="utility:search"]{padding-inline:8px;gap:6px}
+.workflow-toolbar .reader-shortcut[data-reader-pane-id^="utility:search"]{gap:6px}
 .workflow-toolbar .reader-shortcut:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .reader-shortcut-tooltip{position:fixed;z-index:1500;box-sizing:border-box;max-width:min(360px,calc(100vw - 16px));padding:8px 10px;border-radius:10px;background:var(--menu-surface);color:var(--text-primary);box-shadow:var(--shadow-panel);font:12px/1.5 var(--ui-font-family);overflow-wrap:anywhere;pointer-events:none}
 .reader-shortcut-tooltip[hidden]{display:none}
 
-/* Let the tools row grow when controls wrap, including with narrow column tabs. */
-.workspace-shell{grid-template-rows:var(--workspace-bar-height) auto minmax(0,1fr)}
-.workspace-shell:has(>.workspace-issue:not([hidden])){grid-template-rows:var(--workspace-bar-height) auto auto minmax(0,1fr)}
-.workspace-shell:has(>.workspace-column-tabs:not([hidden])){grid-template-rows:var(--workspace-bar-height) auto 42px minmax(0,1fr)}
-.workspace-shell:has(>.workspace-column-tabs:not([hidden])):has(>.workspace-issue:not([hidden])){grid-template-rows:var(--workspace-bar-height) auto auto 42px minmax(0,1fr)}
-.workspace-shell>.workflow-toolbar{height:auto;min-width:0;max-width:100%;flex-wrap:wrap;gap:3px 6px;padding-block:2px}
-.workflow-toolbar>[data-workflow-tools=research]{height:auto;min-height:var(--workspace-menu-height);flex:0 1 auto;flex-wrap:wrap;gap:4px 6px;max-width:100%}
-.workflow-toolbar>.workflow-layout-actions{height:auto;min-height:var(--workspace-menu-height)}
-@media(max-width:660px){.workspace-shell>.workflow-toolbar{padding-inline:12px}.reader-toolbar-tools{flex-basis:100%}.workflow-toolbar>[data-workflow-tools=research]{flex:1 1 100%}.workflow-toolbar>.workflow-layout-actions{padding-inline-start:0}}
+.workflow-toolbar>[data-workflow-tools=research]{min-width:0;flex:0 1 auto;flex-wrap:wrap;gap:4px 6px;max-width:100%}
 @media(pointer:coarse){.workflow-toolbar .reader-shortcut{min-height:44px;min-width:44px}}
 @media(prefers-reduced-motion:reduce){.workflow-toolbar .reader-shortcut{transition:none}}
 

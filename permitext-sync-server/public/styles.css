@@ -748,12 +748,12 @@ textarea:focus-visible {
 }
 
 .topbar-brand {
-  grid-column: 2;
+  grid-column: 1;
   grid-row: 1;
   display: grid;
   grid-template-columns: auto auto;
   align-items: baseline;
-  justify-self: center;
+  justify-self: start;
   gap: var(--space-2);
   pointer-events: none;
   white-space: nowrap;
@@ -764,14 +764,6 @@ textarea:focus-visible {
   grid-row: 1;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-}
-
-.topbar-account-state {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-self: end;
   gap: var(--space-3);
 }
 
@@ -13933,14 +13925,6 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
     background: var(--surface-raised);
   }
 
-  .topbar-brand {
-    display: none;
-  }
-
-  .topbar-account-state {
-    display: contents;
-  }
-
   .topbar-end { display: contents; }
 
   .connection-status {
@@ -13970,7 +13954,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
     display: none;
   }
 
-  .topbar .toolbar-button,
+  .topbar-actions .toolbar-button,
   .topbar .mobile-more-button {
     display: grid;
     width: 100%;
@@ -13989,27 +13973,14 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
     text-transform: none;
   }
 
-  .topbar .toolbar-button > svg,
+  .topbar-actions .toolbar-button > svg,
   .topbar .mobile-more-button > svg {
     display: block;
     width: 21px;
     height: 21px;
   }
 
-  .topbar #toggle-saved { order: 1; }
-  .topbar #add-reader { order: 2; }
-  .topbar #toggle-search { order: 3; }
-  .topbar #toggle-analysis { order: 4; }
   .topbar #mobile-more { order: 5; }
-
-  .topbar #fit-columns,
-  .topbar #collapse-readers,
-  .topbar #toggle-workboard,
-  .topbar #toggle-facts,
-  .topbar #toggle-notebook,
-  .topbar #toggle-report {
-    display: none !important;
-  }
 
   .topbar .mobile-more-button[aria-expanded="true"] {
     background: color-mix(in srgb, var(--code-accent) 18%, transparent);
@@ -17451,7 +17422,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
   .topbar-workspaces > .workspace-actions-button { max-width: max(80px, 10vw); }
   .topbar-layout-actions { grid-column: 2; grid-row: 2; justify-self: end; }
   .topbar-settings-button { grid-column: 3; grid-row: 2; }
-  .topbar-account-state { display: contents; }
   .topbar-end > .connection-status { max-width: 40vw; }
   .topbar .topbar-actions > .toolbar-button,
   .topbar .topbar-layout-actions > .toolbar-button,
@@ -17477,8 +17447,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
 .legacy-workspace-recovery [role="status"]:empty {
   display: none;
 }
-
-.topbar-account-state:has(> .topbar-brand:only-child) { display: contents; }
 
 .settings-panel .settings-archived-project-row { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
 .settings-archived-project-row .settings-project-copy { flex: 1; }
@@ -20308,7 +20276,7 @@ dialog.report-export-review {
 
 .project-details-screen .saved-project-structured-fact-value { text-align: left; }
 
-/* Navigation and view tools share a 35px bar height. */
+/* Keep the workspace tools between the brand and account controls. */
 :root {
   --workspace-bar-height: 35px;
   --header-height: var(--workspace-bar-height);
@@ -20317,12 +20285,45 @@ dialog.report-export-review {
   --workspace-menu-highlight: light-dark(var(--toolbar-active), #252525);
   --workspace-menu-active: #6aa9ff;
 }
-.workspace-shell { grid-template-rows: var(--workspace-bar-height) var(--workspace-bar-height) minmax(0, 1fr); }
-.workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: var(--workspace-bar-height) var(--workspace-bar-height) auto minmax(0, 1fr); }
-.workspace-shell > .topbar { grid-column: 1; grid-row: 1; height: var(--workspace-bar-height); min-height: var(--workspace-bar-height); box-sizing: border-box; }
+.workspace-shell { grid-template-rows: auto minmax(0, 1fr); }
+.workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: auto auto minmax(0, 1fr); }
+.workspace-shell > .topbar {
+  display: grid;
+  grid-column: 1;
+  grid-row: 1;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  grid-template-rows: auto;
+  align-items: start;
+  gap: 0 12px;
+  min-width: 0;
+  min-height: var(--workspace-bar-height);
+  box-sizing: border-box;
+  padding: 0 clamp(12px, 2vw, 24px);
+  border-top: 0;
+  border-bottom: 1px solid var(--border);
+}
+.workspace-shell > .topbar > :is(.topbar-brand, .topbar-actions, .topbar-end) {
+  display: flex;
+  align-items: center;
+  height: calc(var(--workspace-bar-height) - 1px);
+}
+.topbar > .topbar-actions { grid-column: 2; grid-row: 1; }
+.workspace-shell:not(.is-free-account) > .topbar > .topbar-actions { display: none; }
 .workspace-shell > .topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button, .mobile-more-button) { height: var(--workspace-menu-height); min-height: var(--workspace-menu-height); }
-.workflow-toolbar { display: flex; align-items: center; height: var(--workspace-bar-height); min-height: var(--workspace-bar-height); box-sizing: border-box; padding: 0 clamp(22px, 3vw, 46px); border-bottom: 1px solid var(--border); background: var(--surface-raised); }
-.workflow-toolbar > div { display: flex; align-items: center; gap: 20px; }
+.workflow-toolbar {
+  display: flex;
+  grid-column: 2;
+  grid-row: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  gap: 3px var(--workspace-menu-gap);
+  min-width: 0;
+  min-height: calc(var(--workspace-bar-height) - 1px);
+  box-sizing: border-box;
+  padding-block: 2px;
+}
+.workflow-toolbar > div { display: flex; align-items: center; }
 .workflow-toolbar > [hidden], .panel-track > .is-workflow-hidden { display: none !important; }
 /* Present each working view in one paint, without fading the retained editors. */
 html[data-workflow-presenting]:not([data-reader-tab-presenting]) .workspace-shell *,
@@ -20357,23 +20358,21 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 .topbar-actions > .toolbar-button { color: var(--text-secondary); }
 @media (min-width:761px) {
   :root { --header-height: var(--workspace-bar-height); }
-  .topbar { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-rows: 1fr; gap: 12px; padding: 0 24px; }
-  .topbar .topbar-brand { display: flex; align-items: baseline; }
-  .topbar-end { display: flex; grid-column: 3; grid-row: 1; gap: 0; justify-self: end; min-width: 0; max-width: 100%; }
   .topbar-end > * { grid-column: auto; grid-row: auto; }
   .topbar .topbar-actions > .toolbar-button { font-size: 12px !important; padding: 0 10px; }
-  .topbar .workspace-actions-button { max-width: none; }
+}
+@media (max-width: 760px) {
+  .topbar > .workflow-toolbar { grid-column: 1 / -1; grid-row: 2; }
 }
 .workflow-toolbar .toolbar-button:hover { color: var(--text-primary); }
 
 /* Report shares the workspace navigation; retain column geometry underneath. */
 .report-workspace-view { grid-column: 1; grid-row: 2 / -1; z-index: 2; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: var(--surface); }
 .report-workspace-view[hidden] { display: none; }
-.workspace-shell:has(> .report-workspace-view:not(.workspace-floating-panel):not([hidden])) > :is(.workflow-toolbar, .panel-track, .workspace-issue) { visibility: hidden; }
-.workspace-shell > .workflow-toolbar { grid-row: 2; grid-column: 1; }
-.workspace-shell > .panel-track { grid-row: 3; grid-column: 1; }
-.workspace-shell:has(> .workspace-issue:not([hidden])) > .panel-track { grid-row: 4; }
-.workspace-shell > .workspace-issue { grid-column: 1; grid-row: 3; }
+.workspace-shell:has(> .report-workspace-view:not(.workspace-floating-panel):not([hidden])) > :is(.panel-track, .workspace-issue) { visibility: hidden; }
+.workspace-shell > .panel-track { grid-row: 2; grid-column: 1; }
+.workspace-shell:has(> .workspace-issue:not([hidden])) > .panel-track { grid-row: 3; }
+.workspace-shell > .workspace-issue { grid-column: 1; grid-row: 2; }
 
 /* Reference columns share the retained workspace track beside a document. */
 .workspace-shell.has-reference-readers {
@@ -20387,18 +20386,12 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 .workspace-shell.has-reference-readers > .topbar,
 .workspace-shell:has(> .report-workspace-view:not(.workspace-floating-panel):not([hidden])) > .topbar { grid-column: 1 / -1; width: 100vw; position: sticky; left: 0; z-index: 4; }
 .workspace-shell.has-reference-readers > .panel-track {
-  grid-column: 2; grid-row: 3; z-index: 3;
+  grid-column: 2; z-index: 3;
   width: 100%; min-width: 0; border-left: 1px solid var(--border);
 }
 .workspace-shell.has-reference-readers:has(> .report-workspace-view:not(.workspace-floating-panel):not([hidden])) > .panel-track {
   visibility: visible;
 }
-.workspace-shell.has-reference-readers::after {
-  content: ""; grid-column: 2; grid-row: 2; z-index: 3;
-  border-bottom: 1px solid var(--border); background: var(--surface);
-  pointer-events: none;
-}
-
 
 
 
@@ -20416,7 +20409,7 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 }
 
 /* Project details and Account use the same shared navigation and toolbar row. */
-.workspace-shell:has(> .account-workspace-view[open]) > :is(.workflow-toolbar, .panel-track, .workspace-issue) { visibility: hidden; }
+.workspace-shell:has(> .account-workspace-view[open]) > :is(.panel-track, .workspace-issue) { visibility: hidden; }
 .project-details-screen .project-details-content { max-width: none; }
 .project-details-screen .project-details-screen-header { max-width: none; }
 .project-details-screen .project-details-tabs {
@@ -20581,9 +20574,10 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 
 /* Keep menu pills clear of the shared bar dividers. */
 .topbar-actions, .topbar-end, .workflow-toolbar > div, .project-details-screen .project-details-tabs { gap: var(--workspace-menu-gap); }
-.topbar :is(.topbar-actions, .topbar-end, .topbar-workspaces, .topbar-layout-actions, .topbar-layout-menu),
-.workflow-toolbar > div { height: 100%; }
+.topbar :is(.topbar-workspaces, .topbar-layout-actions, .topbar-layout-menu) { height: 100%; }
 .topbar .workspace-actions-button { min-width: 0; flex-shrink: 1; max-width: none; }
+.topbar #workspace-actions { max-width: clamp(120px, 18vw, 260px); }
+.topbar .workspace-current-name { overflow: hidden; text-overflow: ellipsis; }
 .topbar :is(.topbar-actions > button, .workspace-actions-button, .topbar-settings-button, .topbar-layout-menu > summary),
 .workflow-toolbar .toolbar-button,
 .workflow-toolbar .reader-shortcut,
@@ -21106,12 +21100,12 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 .column-expansion-options summary { list-style: none; cursor: pointer; padding: 4px 8px; }
 .column-expansion-options > button { position: absolute; right: 0; top: 100%; z-index: 20; white-space: nowrap; background: var(--surface-raised); border: 1px solid var(--border); padding: 8px 16px; }
 .is-column-strip::before, .is-column-strip::after { display: none !important; }
-.workspace-shell:has(> .workspace-column-tabs:not([hidden])) { grid-template-rows: var(--workspace-bar-height) var(--workspace-bar-height) 42px minmax(0, 1fr); }
-.workspace-shell > .workspace-column-tabs:not([hidden]) { grid-column: 1; grid-row: 3; min-width: 0; }
-.workspace-shell:has(> .workspace-column-tabs:not([hidden])) > .panel-track { grid-row: 4; }
-.workspace-shell:has(> .workspace-column-tabs:not([hidden])):has(> .workspace-issue:not([hidden])) { grid-template-rows: var(--workspace-bar-height) var(--workspace-bar-height) auto 42px minmax(0, 1fr); }
-.workspace-shell:has(> .workspace-issue:not([hidden])) > .workspace-column-tabs:not([hidden]) { grid-row: 4; }
-.workspace-shell:has(> .workspace-column-tabs:not([hidden])):has(> .workspace-issue:not([hidden])) > .panel-track { grid-row: 5; }
+.workspace-shell:has(> .workspace-column-tabs:not([hidden])) { grid-template-rows: auto 42px minmax(0, 1fr); }
+.workspace-shell > .workspace-column-tabs:not([hidden]) { grid-column: 1; grid-row: 2; min-width: 0; }
+.workspace-shell:has(> .workspace-column-tabs:not([hidden])) > .panel-track { grid-row: 3; }
+.workspace-shell:has(> .workspace-column-tabs:not([hidden])):has(> .workspace-issue:not([hidden])) { grid-template-rows: auto auto 42px minmax(0, 1fr); }
+.workspace-shell:has(> .workspace-issue:not([hidden])) > .workspace-column-tabs:not([hidden]) { grid-row: 3; }
+.workspace-shell:has(> .workspace-column-tabs:not([hidden])):has(> .workspace-issue:not([hidden])) > .panel-track { grid-row: 4; }
 .workspace-shell:has(> .report-workspace-view:not(.workspace-floating-panel):not([hidden])) > .workspace-column-tabs { visibility: hidden; }
 .column-expansion-header { display: flex; justify-content: flex-end; }
 @media (max-width: 960px) {
@@ -21272,15 +21266,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   font-size: 12px; color: var(--text-secondary); white-space: pre-wrap;
 }
-/* Give four area buttons their own space before centering the brand on tablets. */
-@media (min-width: 761px) and (max-width: 1100px) {
-  .workspace-shell > .topbar { grid-template-columns: max-content minmax(0, 1fr) max-content; }
-  .topbar .topbar-actions > .toolbar-button { padding-inline: 8px; }
-}
-@media (min-width: 761px) and (max-width: 900px) {
-  .topbar .topbar-brand { display: none; }
-}
-
 /* Keep saved passage state visible when its hover actions are idle. */
 .annotated-code-block > .inline-comment.has-saved-section { opacity: 1; pointer-events: auto; }
 .annotated-code-block:not(:hover):not(:focus-within) > .inline-comment.has-saved-section > :not(.inline-bookmark-toggle) { visibility: hidden; }
@@ -21357,9 +21342,8 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workspace-shell .topbar .project-update-badge[hidden] { display: none !important; }
 .workspace-shell .topbar .project-update-badge:not(:disabled):hover { background: var(--workspace-menu-highlight); color: #fff; }
 
-/* Keep every header control centered inside the shared 35px bar. */
-.workspace-shell > .topbar { grid-template-rows: minmax(0, 1fr); align-items: center; }
-.workspace-shell > .topbar .topbar-brand { align-self: start; align-items: center; height: var(--workspace-bar-height); line-height: 1; }
+/* Align the brand and status controls with the first row of tools. */
+.workspace-shell > .topbar .topbar-brand { line-height: 1; }
 .topbar .project-update-badge { height: var(--workspace-menu-height); min-height: 0; }
 .topbar .web-app-update-button { color: #71cf98; width: 30px; padding: 0; }
 .project-update-badge.is-syncing { animation: project-sync-glow 1.4s ease-in-out .35s infinite; }
@@ -21373,9 +21357,9 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .web-app-update-notice > button:not(:disabled):hover { background: var(--workspace-menu-highlight); color: var(--text-primary); }
 .web-app-update-notice > button:disabled { opacity: .5; }
 
-/* Column actions sit below the project selector, beside the current view tools. */
-.workflow-toolbar { padding-inline-end: 24px; }
+/* Keep layout actions at the end of the workspace tools. */
 .workflow-toolbar > [data-workflow-tools] { min-width: 0; }
+.workflow-toolbar .toolbar-button { padding-inline: 8px; }
 .workflow-toolbar > .workflow-layout-actions { margin-inline-start: auto; flex: 0 0 auto; gap: 2px; padding-inline-start: 12px; }
 .workflow-layout-actions > .toolbar-button { width: 30px; flex: 0 0 30px; padding: 0; border: 1px solid transparent; border-radius: var(--radius-pill); }
 .workflow-layout-actions > .toolbar-button:not(:disabled):hover { background: var(--workspace-menu-highlight); }
@@ -21533,7 +21517,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workspace-add-empty[hidden] { display: none; }
 .workspace-shell.has-no-workspace > .workspace-add-empty:not([hidden]) {
   grid-column: 1;
-  grid-row: 3;
+  grid-row: 2;
   display: grid;
   place-items: center;
   min-height: 0;
@@ -21541,7 +21525,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
   z-index: 1;
 }
 .workspace-shell:has(> .workspace-issue:not([hidden])) > .workspace-add-empty {
-  grid-row: 4;
+  grid-row: 3;
 }
 .workspace-add-button {
   min-height: 44px;
@@ -21558,7 +21542,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 
 /* Free reading uses one navigation row and one Reader. */
 .workspace-shell.is-free-account { grid-template-rows: var(--workspace-bar-height) minmax(0, 1fr) !important; }
-.workspace-shell.is-free-account > :is(.workflow-toolbar, .workspace-column-tabs) { display: none !important; }
+.workspace-shell.is-free-account :is(.workflow-toolbar, .workspace-column-tabs) { display: none !important; }
 .workspace-shell.is-free-account:not(:has(.reader-panel)) > .topbar { border-bottom-color: transparent; }
 .workspace-shell.is-free-account .reader-reference-source { display: none !important; }
 .workspace-shell.is-free-account > .panel-track { grid-row: 2 !important; }
@@ -21765,7 +21749,8 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .notebook-panel[data-notebook-sized] .bn-inline-content { overflow-wrap: anywhere; }
 
 @media (pointer: fine) {
-  .workspace-shell > :is(.topbar, .workflow-toolbar) button,
+  .topbar > .workflow-toolbar { padding-block: 7px; }
+  .workspace-shell > .topbar button,
   .report-workspace-view .report-draft-shell .report-draft-primary-actions > button { --workspace-menu-height: 20px; height: 20px; min-height: 20px; padding-block: 0; line-height: 18px; }
 }
 .research-note-destination { display: flex; align-items: center; min-width: 0; }
@@ -21820,8 +21805,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   font-weight: 500;
 }
 
-/* Align every working-view tool row with the navigation and Reader header. */
-.workspace-shell > .workflow-toolbar,
+/* Align Report actions with the Reader header. */
 .report-workspace-view .report-draft-shell .report-draft-primary-actions { padding-inline-start: 24px; }
 
 .workflow-toolbar > .shared-tool-group {

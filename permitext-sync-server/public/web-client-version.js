@@ -1,4 +1,4 @@
-export const webAppVersion = "20261117-report-divider-v2478";
+export const webAppVersion = "20261117-unified-topbar-v2480";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

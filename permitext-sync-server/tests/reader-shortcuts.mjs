@@ -124,7 +124,7 @@ const appContext=vm.createContext({currentColumnWorkflowView:()=>allContext.ends
     const byID=new Map(nodes.map(node=>[node.dataset.paneId,node]));
     for(const id of allState.paneOrder)allTrack.append(byID.get(id));
   }});
-vm.runInContext(['readerShortcutItems','orderWithPaneMoved','previewWorkspaceColumnShortcut','moveWorkspaceColumnShortcut'].map(actualFunction).join('\n'),appContext);
+vm.runInContext(['isProjectNotebookPaneID','readerShortcutItems','orderWithPaneMoved','previewWorkspaceColumnShortcut','moveWorkspaceColumnShortcut'].map(actualFunction).join('\n'),appContext);
 const allReveals=[];
 const navigation=createReaderShortcuts({host:allHost,track:allTrack,readers:()=>appContext.readerShortcutItems(),context:()=>allContext,
   reveal:id=>allReveals.push(id),move:(...args)=>appContext.moveWorkspaceColumnShortcut(...args),
