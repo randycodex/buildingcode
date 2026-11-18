@@ -115,6 +115,12 @@ try {
   overlay.extent.replace(36, sections.slice(36, 48).map(section => new Node(700, section.id)), () => {});
   assert.equal(visiblePassage.getBoundingClientRect().top,beforeHydration,
     'Loading a placeholder hidden beneath the fixed header cannot move the selected visible passage');
+  overlay.content.scrollTop = 0;
+  const opening = overlay.extent.nextWindow(12, 320);
+  assert.equal(opening.start, 0, 'Returning to the top loads the beginning of the chapter first');
+  overlay.extent.replace(opening.start, sections.slice(opening.start, opening.end).map(section => new Node(700, section.id)), () => {});
+  assert.equal(overlay.content.scrollTop, 0, 'Measuring the first section must keep a Reader at the exact top');
+  assert.equal(overlay.content.querySelectorAll('.chapter-section')[0].dataset.sectionId, '0');
 
   // Exercise the actual asynchronous hydration function with a suspended fetch.
   const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");

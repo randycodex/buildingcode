@@ -7,7 +7,6 @@ import {tmpdir} from 'node:os';
 import sharp from 'sharp';
 import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
 import {emptyNotebookDocument, validateNotebookDocument} from '../notebook-contract.mjs';
-import {freezeResearchV2Turn} from '../research-v2-engine.mjs';
 import {assistantPassageScope, assistantProjectInformation, assistantProjectSnapshotHash} from '../assistant-conversation-scope.mjs';
 
 const directory = await mkdtemp(join(tmpdir(), 'permitext-workflow-polish-'));
@@ -20,20 +19,25 @@ Object.assign(process.env,{OPENAI_API_KEY:'offline-polish-double',PERMITEXT_TEST
   PERMITEXT_RESEARCH_MAX_REQUEST_USD:'1',PERMITEXT_RESEARCH_USER_DAILY_CAP_USD:'7',PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD:'7',
   PERMITEXT_RESEARCH_DAILY_CAP_USD:'7',PERMITEXT_RESEARCH_MONTHLY_CAP_USD:'7',PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS:'.1',
   PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS:'.01',PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS:'.5',PERMITEXT_RESEARCH_PRICING_VERSION:'offline-polish-test'});
-const originalFetch = globalThis.fetch, providerPackets = [];
+const originalFetch = globalThis.fetch, providerRequests = [];
+const assistantReply = 'The project describes a proposed office renovation. Existing conditions still need confirmation.';
+let base, server;
 globalThis.fetch = async (input, options) => {
-  if (String(input) !== 'https://api.openai.com/v1/responses') return originalFetch(input,options);
-  const body = JSON.parse(options.body); providerPackets.push(body.input);
-  const output = body.text.format.name === 'permitext_v2_review' ? {pass:true,issues:[]}
-    : {answerText:'The reviewed Project snapshot describes a proposed office renovation; existing conditions need confirmation.',claims:[],missingSources:[],missingFacts:[]};
+  const url = new URL(input?.url || input);
+  if (url.href !== 'https://api.openai.com/v1/responses') {
+    assert.equal(url.origin, base, 'The workflow fixture must not make external requests.');
+    return originalFetch(input, options);
+  }
+  const body = JSON.parse(options.body);
+  providerRequests.push(body);
   return Response.json({model:body.model,status:'completed',service_tier:'default',usage:{input_tokens:200,output_tokens:100},
-    output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(output)}]}]});
+    output:[{type:'message',role:'assistant',content:[{type:'output_text',text:assistantReply}]}]});
 };
-let server;
 try {
   const {handleRequest} = await import('../app.mjs');
   server = createServer(handleRequest); await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
-  const base = `http://127.0.0.1:${server.address().port}`, userID = 'apple:synthetic-polish', projectID = 'polish-project';
+  base = `http://127.0.0.1:${server.address().port}`;
+  const userID = 'apple:synthetic-polish', projectID = 'polish-project';
   let token;
   const post = async (path, body, expected = 200, bearer = token) => {
     const response = await fetch(base + path, {method:'POST',headers:{'content-type':'application/json',...(bearer ? {authorization:`Bearer ${bearer}`} : {})},
@@ -131,24 +135,32 @@ try {
   const included = (await post('/research/conversations/project-context',{conversationID:conversation.id,snapshotHash:preview.contentHash})).conversation;
   assert.equal(included.assistantScope.includeProjectContext,true);
   assert.equal(assistantProjectInformation(assistantPassageScope(included,{projectInformation:preview.projectInformation})).description, project.description);
-  const packet = freezeResearchV2Turn({question:'Summarize the reviewed project context.',sources:[],projectContextSnapshot:assistantPassageScope(included,{projectInformation:preview.projectInformation}).projectContext});
-  assert.equal(packet.projectContextSnapshot.projectInformation.description,project.description);
-  const frozen = JSON.stringify(packet);
-  const response = await post('/research/conversations/message',{ answerMode: "verified",conversationID:included.id,question:'Summarize the reviewed project context.',requestID:'polish-context-answer',
+  const question = 'Summarize the recorded project context.';
+  const response = await post('/research/conversations/message',{conversationID:included.id,question,requestID:'polish-context-answer',
     researchEngine:'v2',analysisMode:'conversation_only',expectedRevision:included.revision,expectedEvidenceSetVersion:included.evidenceSetVersion || 1});
-  const answer = response.conversation.messages.at(-1).answer;
-  assert(answer.inputSnapshot, JSON.stringify({answer,providerCalls:providerPackets.length}).slice(0,2800));
-  assert.equal(answer.inputSnapshot.projectContextSnapshot.contentHash,assistantProjectSnapshotHash(preview.projectInformation));
-  assert.equal(providerPackets.length,2,'A writer and a reviewer both receive the frozen context');
-  assert(providerPackets.every(value => value.includes(project.description)));
-  const frozenAnswer = JSON.stringify(answer);
+  const {id: answerID, answer} = response.conversation.messages.at(-1);
+  assert.equal(answer.answerText, assistantReply);
+  assert.equal(answer.verification.status, 'unreviewed');
+  assert.deepEqual(answer.retrieval.toolCalls, []);
+  assert.equal(providerRequests.length, 1, 'A project-context question takes one Assistant call.');
+  const [providerRequest] = providerRequests;
+  assert(Array.isArray(providerRequest.input), 'Assistant sends conversation messages to the provider.');
+  const promptContext = JSON.parse(providerRequest.input[0].content);
+  assert.equal(JSON.parse(providerRequest.input.at(-1).content).question, question);
+  assert.equal(promptContext.projectContext.projectInformation.description, project.description);
+  assert.equal(promptContext.projectContext.contentHash, assistantProjectSnapshotHash(preview.projectInformation));
+  assert.deepEqual(answer.inputSnapshot.projectContextSnapshot, promptContext.projectContext);
+  const frozenRecord = (await post('/research/answers/get', {answerID})).answer;
   await post('/sync/push',{batch:{user:{id:userID},mutations:[{project:{...project,description:'Changed after review',updatedAt:new Date(Date.now()+1000).toISOString()}}]}});
   const reopened = (await post('/research/conversations/get',{conversationID:conversation.id})).conversation;
   assert.equal(reopened.assistantScope.projectContextMode,'current','New questions read current Project facts; existing answer snapshots remain frozen');
   await post('/research/conversations/project-context',{conversationID:conversation.id,include:false});
-  assert.equal(JSON.stringify(packet),frozen,'Removing future context does not mutate captured packets');
-  assert.equal(JSON.stringify((await post('/research/conversations/get',{conversationID:conversation.id})).conversation.messages.at(-1).answer),frozenAnswer,'Reviewed answers remain immutable after Project changes and exclusion');
-  console.log('PASS: five rich Notes, PNG/WebP upload, table/link round trip, editable snapshots, five PDF images/links, immutable PDF, explicit/stale/frozen/excluded context.');
+  const excluded = (await post('/research/conversations/get', {conversationID: conversation.id})).conversation;
+  assert.equal(excluded.assistantScope.projectContextMode, 'excluded');
+  assert.deepEqual(excluded.messages.at(-1).answer, answer, 'The chat retains the original answer after Project changes and exclusion.');
+  assert.deepEqual((await post('/research/answers/get', {answerID})).answer, frozenRecord,
+    'The saved Assistant record retains the original answer and captured context.');
+  console.log('PASS: five rich Notes, PNG/WebP upload, table/link round trip, editable snapshots, five PDF images/links, immutable PDF, and frozen Assistant context using one mocked call.');
 } finally {
   globalThis.fetch = originalFetch;
   server?.closeAllConnections(); if (server) await new Promise(resolve=>server.close(resolve));

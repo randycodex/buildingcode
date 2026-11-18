@@ -9,7 +9,7 @@ const html=await readFile(new URL('../public/index.html',import.meta.url),'utf8'
 const elements=(node)=>[node,...(node.childNodes||[]).flatMap(elements)];
 const researchTools=elements(parse(html)).find(node=>node.attrs?.some(attr=>attr.name==='data-workflow-tools'&&attr.value==='research'));
 assert(researchTools,'Research toolbar must exist');
-assert.deepEqual(elements(researchTools).filter(node=>node.tagName==='button').map(node=>node.attrs.find(attr=>attr.name==='id')?.value),['add-reader','toggle-search','toggle-analysis','toggle-calculator']);
+assert.deepEqual(elements(researchTools).filter(node=>node.tagName==='button').map(node=>node.attrs.find(attr=>attr.name==='id')?.value),['add-reader','toggle-search','toggle-saved','toggle-analysis','toggle-calculator']);
 assert.equal(emptyWorkspaceLayout().utilities.calculator,false);
 const original=normalizeWorkspaceLayout({utilities:{calculator:true,analysis:true},paneOrder:['utility:analysis','utility:calculator'],paneWeights:{'utility:calculator':720},collapsedPaneIDs:['utility:calculator']});
 const target={};applyWorkspaceLayout(target,captureWorkspaceLayout(original));

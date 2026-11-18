@@ -524,8 +524,8 @@ foregroundAccountCurrent = false;
 continueForegroundImages();
 await assert.rejects(interruptedForegroundSync, /ACCOUNT_CONTEXT_CHANGED/);
 assert.equal(continuedDraftSyncs, 0, "The prior account's sync must stop before touching the next account's drafts.");
-assert.match(functionSource(appSource, "closeAllColumns"), /filter\(item => workflowPaneIsVisible\(item\.id\) \|\|\s*view === 'notebook' && isProjectNotebookPaneID\(item\.id\)\)[\s\S]*?await descriptor\.close\(\)/,
-  "Close All must close visible columns and the current Notebook host while retaining each column's unsaved-edit guard.");
+assert.match(functionSource(appSource, "closeAllColumns"), /filter\(item => workflowPaneIsVisible\(item\.id\)\)[\s\S]*?if \(await descriptor\.close\(\) === false\) return false;/,
+  "Close All must close visible columns through each tool's unsaved-edit guard.");
 assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordinationFilters = \{\}/);
 assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
 const pinnedWorkflowSource = functionSource(appSource, "pinCriticalWorkflowPanesToLeft");
@@ -595,7 +595,7 @@ const projectToolControlOrderSource = functionSource(appSource, "placeProjectToo
 assert.match(projectToolControlOrderSource, /paneIDForProjectNotebook\(detail\)[\s\S]*?paneIDForProjectReportDraft\(detail\)/, "Project tool placement must follow the Notebook then Report button order.");
 assert.match(projectToolControlOrderSource, /if \(ordered\.includes\(paneID\)\) return;[\s\S]*?ordered\.splice\(insertIndex, 0, paneID\)/, "Opening a tool must preserve existing sibling positions.");
 assert.match(functionSource(appSource, "openProjectNotebook"), /if \(!wasOpen\) placeProjectToolPaneInControlOrder\(identity\)/);
-assert.match(functionSource(appSource, "openProjectReportDraft"), /coveredElements: \[track/);
+assert.match(functionSource(appSource, "openProjectReportDraft"), /mount: track,\s*screenClass: "shared-report-column"/);
 assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinCriticalWorkflowPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
 assert.match(savedFolderContextSource, /if \(!folder\)[\s\S]*?inlineFilters\.hidden = !savedInstance\.organizeUnassigned;[\s\S]*?savedContent\.hidden = !savedInstance\.organizeUnassigned;/);
@@ -901,7 +901,7 @@ assert.match(stylesSource, /\.saved-section-row:hover \.saved-row-actions button
 assert.match(stylesSource, /\.saved-row-actions button:hover,[\s\S]*?\.saved-row-actions button:focus-visible \{[\s\S]*?background: color-mix/, "Saved Evidence pill fills must appear only on direct action hover or focus.");
 assert.match(stylesSource, /\.search-results \{[\s\S]*?width: calc\(100% \+ \(2 \* var\(--panel-padding\)\)\);[\s\S]*?margin-inline: calc\(-1 \* var\(--panel-padding\)\);[\s\S]*?overflow-x: hidden;/, "Search rows must span the column without horizontal overflow.");
 assert.match(stylesSource, /\.result-row \{[\s\S]*?padding: var\(--space-4\) var\(--panel-padding\);/, "Search result dividers must retain a full-width row with an inner text gutter.");
-assert.match(stylesSource, /\.search-jump-open \{[\s\S]*?padding: calc\(var\(--space-1\) \+ 12px\) var\(--panel-padding\);/, "Recently Viewed rows must retain their inner text gutter and current vertical spacing.");
+assert.match(stylesSource, /\.search-jump-open \{[^}]*padding: 12px;/, "Recently Viewed rows must retain consistent spacing around their content.");
 assert.match(stylesSource, /\.notebook-reference-chip \{[\s\S]*?display: inline-grid;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/, "Notebook links must read as compact evidence previews rather than pills.");
 assert.match(stylesSource, /\.notebook-card-row\.is-active-title \{[^}]*grid-template-columns: minmax\(0, 1fr\) auto;[^}]*align-items: center;[\s\S]*?\.notebook-card-list-title-editor \{[^}]*width: 100%;[^}]*background: transparent;[^}]*font-weight: 400;/, "The selected Notebook Note title must remain editable in the Notes list.");
 assert.match(stylesSource, /\.notebook-reference-meta \{[\s\S]*?color: var\(--text-tertiary\);[\s\S]*?\.notebook-reference-title \{[\s\S]*?font-weight: 700;[\s\S]*?\.notebook-reference-preview \{[\s\S]*?-webkit-line-clamp: 2;/, "Notebook references must expose a compact source, title, and preview hierarchy.");

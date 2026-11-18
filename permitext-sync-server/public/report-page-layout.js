@@ -39,7 +39,7 @@ export function createReportPageLayout({host, prepare, isCurrent, onPages = () =
       staging.classList.remove('is-staging'); staging.setAttribute('aria-hidden', 'false'); staging.scrollTop = scroll;
       onPages({container:staging,layout:prepared?.layout});
       stale = false;
-      status.textContent = `${staging.querySelectorAll('.report-pdf-page').length} pages`;
+      status.textContent = '';
       return true;
     } catch (error) {
       disposeStaging?.(); staging?.remove();

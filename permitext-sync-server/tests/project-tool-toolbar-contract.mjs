@@ -29,6 +29,7 @@ const calls = [];
 const scrollRequests = [];
 const reportColumn = {
   isConnected: true, hidden: false,
+  dataset: { paneId: "report:a" },
   getBoundingClientRect: () => ({left: 1500, right: 2500, width: 1000})
 };
 const track = {
@@ -61,11 +62,18 @@ const c = vm.createContext({
   notebookColumnPaneID: value => `notebook:${value.id}`,
   revealWorkspacePane: async id => { calls.push(["show", id]); return true; },
   paneIDForProjectReportDraft: value => `report:${value.id}`,
+  paneIsCollapsed: id => state.collapsedPaneIDs?.includes(id),
+  setPaneCollapsed: (column, collapsed) => {
+    assert.equal(column, reportColumn);
+    assert.equal(collapsed, false);
+    state.collapsedPaneIDs = [];
+  },
   confirmNotebookDiscard: async () => discard, confirmReportDraftDiscard: async () => discard,
   syncProjectToolButtonStates: () => c.syncTopbarProjectToolStates(),
   async openProjectNotebook(value) { calls.push(["notebook", value.id]); state.notebooks.push(value); if (heldOpen) await heldOpen; return true; },
   async openProjectReportDraft(value) { calls.push(["report", value.id]); state.reportDrafts.push(value); reportOpen=true; return true; },
   track, window: {matchMedia: query => ({matches: query.includes('reduced-motion') ? reducedMotion : true})},
+  getComputedStyle: () => ({marginInlineEnd:'228px'}),
   saveWorkspaceState() {}, transitionWorkspace: async () => {},
   presentWorkspaceIssue: message => calls.push(["error", message])
 });
@@ -112,6 +120,17 @@ assert.equal(notebookButton.attributes["aria-pressed"], "true");
 assert.equal(notebookButton.disabled, false);
 assert.equal(notebookButton.title, "Show Notes · Alpha");
 assert.equal(reportButton.title, "Show Report · Alpha");
+const previousScrollRequests = scrollRequests.length;
+let finishReportExpansion;
+state.collapsedPaneIDs = [reportColumn.dataset.paneId];
+reportColumn._collapseAnimation = { finished: new Promise(resolve => { finishReportExpansion = resolve; }) };
+await c.openOrRevealProjectTool("report");
+assert.deepEqual(state.collapsedPaneIDs, [], "Showing a collapsed Report expands the existing column");
+assert.equal(scrollRequests.length, previousScrollRequests, "Toolbar navigation waits for the expanded width");
+finishReportExpansion();
+await reportColumn._collapseAnimation.finished;
+delete reportColumn._collapseAnimation;
+assert.equal(scrollRequests.length, previousScrollRequests + 1);
 reducedMotion = true;
 await c.openOrRevealProjectTool("report");
 assert.deepEqual(scrollRequests.at(-1), {left: 1100, behavior: "instant"});
@@ -124,6 +143,38 @@ track.scrollWidth = 3100;
 c.scrollWorkspaceColumnIntoView({getBoundingClientRect: () => ({left: 550, right: 2200, width: 1650})});
 assert.deepEqual(scrollRequests.at(-1), {left: 650, behavior: "smooth"}, "For a wide column, show its leading edge");
 pinnedColumn = null;
+track.scrollLeft = 0;
+c.scrollWorkspaceColumnIntoView({
+  classList:{contains:name=>name==='research-v2-panel'},
+  getBoundingClientRect:()=>({left:50,right:1300,width:1250})
+});
+assert.deepEqual(scrollRequests.at(-1), {left:50,behavior:"smooth"}, "When Assistant and its sidebars exceed the viewport, align its leading edge.");
+c.scrollWorkspaceColumnIntoView({
+  classList:{contains:name=>name==='research-v2-panel'},
+  getBoundingClientRect:()=>({left:450,right:1370,width:920})
+});
+assert.deepEqual(scrollRequests.at(-1), {left:198,behavior:"smooth"}, "Reveal the full Assistant including its open sidebar.");
+const followingColumn=(left,right,collapsed=true)=>({
+  matches:()=>collapsed,
+  getBoundingClientRect:()=>({left,right,width:right-left})
+});
+const reopened=followingColumn(650,1450,false);
+const firstRail=followingColumn(1451,1499);
+const secondRail=followingColumn(1500,1548);
+const interveningColumn=followingColumn(1549,1950,false);
+const thirdRail=followingColumn(1951,1999);
+const tooFar=followingColumn(2000,2048);
+const outside=followingColumn(2049,2097);
+const follow=[reopened,firstRail,secondRail,interveningColumn,thirdRail,tooFar,outside];
+follow.forEach((column,index)=>column.nextElementSibling=follow[index+1]);
+c.scrollWorkspaceColumnIntoView(reopened);
+assert.deepEqual(scrollRequests.at(-1), {left:50,behavior:"smooth"}, "Ordinary navigation reveals only its target.");
+c.scrollWorkspaceColumnIntoView(reopened,"smooth",{includeCollapsedToRight:true});
+assert.deepEqual(scrollRequests.at(-1), {left:648,behavior:"smooth"}, "Reopening reveals right-hand rails that fit and leaves the target fully visible.");
+pinnedColumn={getBoundingClientRect:()=>({width:100})};
+c.scrollWorkspaceColumnIntoView(reopened,"smooth",{includeCollapsedToRight:true});
+assert.deepEqual(scrollRequests.at(-1), {left:148,behavior:"smooth"}, "A pinned column's width limits which rails can fit.");
+pinnedColumn=null;
 assert.equal(await c.closeProjectNotebook(project), false);
 discard = true;
 await c.closeProjectNotebook(project);

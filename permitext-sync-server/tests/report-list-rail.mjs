@@ -25,6 +25,7 @@ const c=vm.createContext({document:{createElement:()=>new Element()},panel:{data
   activeDraft:current,drafts:[current,other],recoveredDrafts:[],reportLibraryScroll:{reports:0},
   deleteButton:new Element(),refreshReportList:null,
   reportSectionExpanded:()=>true,persistReportSectionExpanded:(key,value)=>preferences.push([key,value]),
+  expandableReportRails:()=>false,
   reportSwitch:{select:async id=>selections.push(id),cancel:()=>cancels++},
   transitionReportSidebars(){resizes++;c.list.paintReportsToggle();}});
 vm.runInContext(`${app.slice(titleStart,titleEnd+2)}
@@ -45,16 +46,16 @@ list.options.children[0].events.click();assert.equal(cancels,1);
 list.options.children[1].events.click();assert.deepEqual(selections,['two']);
 list.create.events.click();assert.deepEqual(selections,['two','__new__']);
 list.toggle.events.click();
-assert.equal(c.panel.dataset.reportsHidden,'true');assert.equal(list.options.hidden,true);
+assert.equal(c.panel.dataset.reportsHidden,'true');assert.equal(list.options.inert,true);
 assert.equal(list.toggle.textContent,'Reports');
 assert.equal(list.toggle.attributes['aria-expanded'],'false');
-assert.equal(list.actions.hidden,true);
+assert.equal(list.actions.inert,true);
 assert.equal(list.header.hidden,false);
 list.toggle.events.click();
-assert.equal(c.panel.dataset.reportsHidden,'false');assert.equal(list.options.hidden,false);
+assert.equal(c.panel.dataset.reportsHidden,'false');assert.equal(list.options.inert,false);
 assert.equal(list.toggle.textContent,'Reports');
 assert.equal(list.toggle.attributes['aria-expanded'],'true');
-assert.equal(list.actions.hidden,false);
+assert.equal(list.actions.inert,false);
 assert.equal(resizes,2);assert.deepEqual(preferences,[['Reports column',false],['Reports column',true]]);
 c.activeDraft={...current,title:'Renamed report'};c.refreshReportList();
 assert.equal(list.options.children[0].textContent,'Renamed report');

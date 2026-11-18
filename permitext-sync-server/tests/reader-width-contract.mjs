@@ -56,16 +56,13 @@ assert.equal(layout('reader:a', ['reader:a','reader:b'], 900, false, true).flex,
 const mainPaneIDs = [
   'utility:saved', 'utility:saved:instance', 'reader:a', 'utility:search', 'utility:search:instance',
   'utility:analysis', 'utility:analysis:instance', 'research:conversation:conversation',
-  'project:context:alpha', 'project:facts:alpha', 'project:notebook:alpha', 'project:report-draft:alpha',
+  'project:context:alpha', 'project:facts:alpha', 'project:notebook:alpha',
   'utility:archive', 'utility:settings', 'project:coordination:alpha', 'project:coordination-thread:alpha',
   'project:workboard:alpha', 'project:detail:alpha', 'section:detail:one'
 ];
 for (const id of mainPaneIDs) {
   const reader = id.startsWith('reader:');
-  const search = /^utility:search(?::|$)/.test(id);
-  const evidence = /^utility:saved(?::|$)/.test(id);
-  const fixedBasis = reader || search || evidence;
-  const minimum = reader ? 630 : evidence ? 300 : search ? 600 : id.startsWith('project:notebook:') ? 800 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
+  const minimum = reader ? 630 : id.startsWith('project:notebook:') ? 800 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
   const maximum = Infinity;
   for (const count of [1, 2, 3, 4, 8]) {
     const ids = [id, ...Array.from({ length: count - 1 }, (_, index) => `reader:other-${index}`)];
@@ -84,6 +81,10 @@ for (const id of mainPaneIDs) {
   }
   assert.equal(layout(id, [id], 600, false, true).flex, '0 0 48px', `${id} keeps its collapsed width`);
 }
+const reportID='project:report-draft:alpha';
+context.state.paneWeights={[reportID]:1790};
+context.normalizePaneWeights(['reader:a']);
+assert.equal(context.state.paneWeights[reportID],1790,'Normalizing ordinary columns preserves the independently mounted Report width.');
 for (workflow of ['notebook', 'project-details']) {
   assert.equal(layout('reader:a', ['reader:a'], 400).flex, '0 0 630px', `${workflow} enforces the same Reader minimum`);
   assert.equal(layout('utility:search:instance', ['utility:search:instance'], 1200).flex, '0 0 1200px', 'Repeated Search columns retain manually expanded widths');

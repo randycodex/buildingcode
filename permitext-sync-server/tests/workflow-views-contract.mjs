@@ -108,7 +108,8 @@ c.activeWorkspaceID='workspace'; c.captureAccountRequest=()=>({}); c.isCurrentAc
 c.saveWorkspaceState=()=>{};
 c.workspacePaneDescriptors=()=>[noteID,'reader:open','reader:legacy'].map(id=>({id,close:async()=>{closed.push(id);}}));
 reportsOpen=true;
-vm.runInContext(actual('closeAllColumns'),c);
+vm.runInContext(['isProjectNotebookPaneID','isProjectReportDraftPaneID','workspaceColumnRank','orderedWorkspaceColumnIDs','closeAllColumns'].map(actual).join('\n'),c);
+c.defaultActivePaneIDs=()=>[];
 await c.closeAllColumns();
 assert.deepEqual(closed,['reader:open',noteID],'Close all respects visible tools and leaves hidden legacy slots alone.');
 assert.equal(reportsOpen,false);
@@ -167,9 +168,9 @@ const layoutContext=vm.createContext({
   defaultActivePaneIDs:()=>['reader:one'],activePaneIDs:()=>['reader:one'],workflowPaneIsVisible:()=>true,defaultPaneWidthForID:()=>630,
   resetReportColumnWidths:panel=>{assert.equal(panel,reportPanel);reportResets++;},
   syncReferenceReaderLayout(){},syncResearchColumnLayout(){},workspaceColumnExpansion:null,state:layoutState,track:layoutTrack,
-  saveWorkspaceState:()=>saves++,transitionWorkspace:async()=>{},requestAnimationFrame:fn=>fn(),
+  saveWorkspaceState:()=>saves++,appendPaneSequence(){},captureWorkspaceColumnMotion:()=>null,animateWorkspaceColumnMotion(){},
 });
-vm.runInContext([actual('updateWorkspaceLayoutControls'),actual('resetVisibleColumnWidths')].join('\n'),layoutContext);
+vm.runInContext(['isProjectReportDraftPaneID','workspaceColumnRank','orderedWorkspaceColumnIDs','updateWorkspaceLayoutControls','resetVisibleColumnWidths'].map(actual).join('\n'),layoutContext);
 layoutContext.updateWorkspaceLayoutControls();
 assert.equal(fit.disabled,false);
 assert.ok(actions.every(button=>!button.disabled && !button.hidden));

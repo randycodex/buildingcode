@@ -8053,6 +8053,28 @@ function notebookImageStorage(providerName = "") {
   });
 }
 
+async function readNotebookImageBytes(userID, pathname, {storageProvider, contentHash} = {}) {
+  const adapter = await storeAdapter();
+  if ((await adapter.privateAssetOwnerConflicts(userID, [pathname])).length) {
+    return {status: 403, error: "Private-image ownership requires review before this file can be accessed."};
+  }
+  const storage = notebookImageStorage(storageProvider);
+  if (!storage) {
+    return {status: 503, error: "Private Notebook image storage is not configured."};
+  }
+  let image;
+  try {
+    image = await storage.get(pathname);
+  } catch {
+    return {status: 503, error: "Private Notebook image storage is temporarily unavailable."};
+  }
+  if (!image) return {status: 404, error: "Notebook image was not found."};
+  if (contentHash && createHash("sha256").update(image).digest("hex") !== contentHash) {
+    return {status: 409, error: "The stored Notebook image no longer matches its synchronized metadata."};
+  }
+  return {image};
+}
+
 function notebookImageContentType(body) {
   if (body.length >= 8 && body.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) {
     return "image/png";
@@ -17754,7 +17776,7 @@ async function reportFilesForProject(userID, projectID) {
 
 async function reportProjectMaterialBySourceID(userID, projectID, manifest) {
   const material = new Map();
-  const assetIDs = new Set();
+  const noteTitlesByAssetID = new Map();
   const publicImages = new Map();
   const collectImages = blocks => {
     for (const block of blocks || []) {
@@ -17764,21 +17786,30 @@ async function reportProjectMaterialBySourceID(userID, projectID, manifest) {
   };
   for (const item of manifest.items || []) {
     const document = item.kind === 'notebookCard' ? item.document : item.notebookDocument;
-    if (document) for (const id of validateNotebookDocument(document).imageAssets) assetIDs.add(id);
-    if (document) collectImages(document.document);
+    if (document) {
+      const noteTitle = item.title || item.derivedFrom?.title || 'Untitled note';
+      for (const id of validateNotebookDocument(document).imageAssets) {
+        if (!noteTitlesByAssetID.has(id)) noteTitlesByAssetID.set(id, noteTitle);
+      }
+      collectImages(document.document);
+    }
     for (const figure of item.figures || []) publicImages.set(figure.url,figure.contentHash);
   }
-  if (publicImages.size + assetIDs.size > 200) throw Error('This Report has too many images. Include fewer than 200 images.');
+  if (publicImages.size + noteTitlesByAssetID.size > 200) throw Error('This Report has too many images. Include fewer than 200 images.');
   const {reportImageMaterial} = await import('./report-images.mjs');
   for (const [url,hash] of publicImages) material.set(url,await reportImageMaterial(url,hash));
-  for (const assetID of assetIDs) {
-    if (!await notebookImageAccessibleFromProject(userID, projectID, assetID)) throw new Error('A Report Note image is unavailable in this Project.');
+  for (const [assetID, noteTitle] of noteTitlesByAssetID) {
+    if (!await notebookImageAccessibleFromProject(userID, projectID, assetID)) {
+      throw new Error(`An image from “${noteTitle}” is unavailable in this Project.`);
+    }
     const asset = await ownedNotebookImageAsset(userID, assetID);
-    const body = await readPrivateProjectAsset(asset.payload.storageKey);
-    if (!body || createHash('sha256').update(body).digest('hex') !== asset.payload.contentHash) throw new Error('A Report Note image no longer matches its immutable content hash.');
-    const imageBody = ['image/png','image/jpeg'].includes(asset.payload.contentType) ? body
+    if (!asset?.payload?.contentHash) throw new Error(`An image from “${noteTitle}” has no saved fingerprint.`);
+    const {storageKey, contentType, contentHash} = asset.payload;
+    const {image: body, error} = await readNotebookImageBytes(userID, storageKey, asset.payload);
+    if (error) throw new Error(`Report could not load an image from “${noteTitle}”. ${error}`);
+    const imageBody = ['image/png','image/jpeg'].includes(contentType) ? body
       : await (await import('sharp')).default(body, {limitInputPixels:40_000_000, animated:false}).rotate().png().toBuffer();
-    material.set(`permitext-notebook-asset:${assetID}`, {body:imageBody, contentType:asset.payload.contentType, contentHash:asset.payload.contentHash});
+    material.set(`permitext-notebook-asset:${assetID}`, {body:imageBody, contentType, contentHash});
   }
   const requestedIDs = new Set(
     (manifest.items || [])
@@ -29071,26 +29102,9 @@ async function handleNotebookAssetRead(request, response) {
     sendError(response, 403, "This Notebook image does not belong to the authenticated Project.");
     return;
   }
-  const adapter = await storeAdapter();
-  if ((await adapter.privateAssetOwnerConflicts(access.storageOwnerUserID, [pathname])).length) {
-    sendError(response, 403, "Private-image ownership requires review before this file can be accessed.");
-    return;
-  }
-  const imageStorage = notebookImageStorage(asset?.payload?.storageProvider || "");
-  if (!imageStorage) {
-    sendError(response, 503, "Private Notebook image storage is not configured.");
-    return;
-  }
-  const image = await imageStorage.get(pathname);
-  if (!image) {
-    sendError(response, 404, "Notebook image was not found.");
-    return;
-  }
-  if (
-    asset?.payload?.contentHash &&
-    createHash("sha256").update(image).digest("hex") !== asset.payload.contentHash
-  ) {
-    sendError(response, 409, "The stored Notebook image no longer matches its synchronized metadata.");
+  const {image, status, error} = await readNotebookImageBytes(access.storageOwnerUserID, pathname, asset?.payload);
+  if (error) {
+    sendError(response, status, error);
     return;
   }
   const extension = pathname.split(".").pop();

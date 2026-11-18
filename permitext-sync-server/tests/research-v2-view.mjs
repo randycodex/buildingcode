@@ -369,7 +369,7 @@ console.log('Retained-root ownership passed: disposed request cleanup cannot cle
  assert(!all(rail).some(element=>element.textContent==='Obsolete first answer source.'),'A slow earlier response cannot replace the selected answer sources');
  assert(all(rail).some(element=>element.textContent==='Second question?'),'The panel identifies the selected answer question');
  rail.querySelector('.rv2-sources-toggle').handlers.click();
- assert.equal(rail.querySelector('.rv2-sources-body').hidden,true);assert.equal(thread.hidden,false);
+ assert.equal(rail.querySelector('.rv2-sources-body').inert,true);assert.equal(thread.hidden,false);
  rail.querySelector('.rv2-sources-toggle').handlers.click();await tick();
  assert.deepEqual(calls,['one','two'],'Reopening the same immutable answer snapshot needs no extra request');
  const presentation=view.capturePresentation();view.dispose();
@@ -378,14 +378,14 @@ console.log('Retained-root ownership passed: disposed request cleanup cannot cle
  assert(all(refreshed.element.querySelector('.rv2-sources-rail')).some(element=>element.textContent==='Second answer source.'));
  const crossChat=refreshed.capturePresentation();refreshed.dispose();
  const other=createResearchV2View({conversation:{id:'other-chat',sources:[],messages:[]},presentation:crossChat,onDraft(){}});other.commit();
- assert.equal(other.element.querySelector('.rv2-sources-body').hidden,true,'Switching chats closes the previous answer sources');
+ assert.equal(other.element.querySelector('.rv2-sources-body').inert,true,'Switching chats closes the previous answer sources');
  assert(!all(other.element).some(element=>element.textContent==='Second answer source.'));other.dispose();
  assert.deepEqual(changes,[false,true,false,true],'Sources updates do not repeatedly expand or resize the panel');
  const closing=createResearchV2View({conversation,onDraft(){},onSnapshot:()=>late.promise});
  all(closing.element).filter(element=>element.textContent==='Sources used')[2].handlers.click();await tick();
  closing.element.querySelector('.rv2-sources-toggle').handlers.click();
  late.resolve({sources:[{...source,passageText:'Late closed-panel source.'}]});await tick();
- assert.equal(closing.element.querySelector('.rv2-sources-body').hidden,true,'A late response cannot reopen a closed panel');closing.dispose();
+ assert.equal(closing.element.querySelector('.rv2-sources-body').inert,true,'A late response cannot reopen a closed panel');closing.dispose();
 }
 console.log('Answer source rail passed: chat/draft retention, independent requests, rapid answer switching, cached reopening, same-chat remount, cross-chat isolation and close-during-load.');
 
@@ -498,6 +498,6 @@ console.log('Conversation history toggles preserve the live chat, thread, draft 
  all(closing.element).find(element=>element.className==='rv2-citation').handlers.click();await tick();
  closing.element.querySelector('.rv2-sources-toggle').handlers.click();
  closed.resolve({sources:[source]});await tick();
- assert.equal(closing.element.querySelector('.rv2-sources-body').hidden,true,'A late citation request cannot reopen a panel the user closed');closing.dispose();
+ assert.equal(closing.element.querySelector('.rv2-sources-body').inert,true,'A late citation request cannot reopen a panel the user closed');closing.dispose();
 }
 console.log('Citation navigation passed: answer-specific matching, expand/scroll/highlight, repeated and rapid clicks, cached reads, immutable source order, separate Reader action, draft/scroll retention, missing citations and stale/closed-panel protection.');

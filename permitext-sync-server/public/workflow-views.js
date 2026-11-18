@@ -69,10 +69,10 @@ export function notebookReferenceVisibility({readerOpen, evidenceOpen, active = 
   }
   return {readerOpen, evidenceOpen, compact};
 }
-// Notebook reserves its writing page and the expanded Notes list first.
-// Collapsing Notes gives that space to the editor, keeping references stable.
+// The Notes list's extra width sits outside the writing and reference allocation.
 export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0, sharedReferenceWidth = 0) {
-  const available = Math.max(0, availableWidth - dividerWidth);
+  const notesExpansion = columns.some(column => column.kind === 'notes' && !column.collapsed) ? 220 : 0;
+  const available = Math.max(0, availableWidth - dividerWidth) + notesExpansion;
   const shared = column => sharedReferenceWidth > 0 && ['reader', 'evidence'].includes(column.kind);
   const minimums = columns.map(column => column.collapsed ? (column.kind === 'notes' ? 80 : 48) :
     shared(column) ? 300 : ({reader:630, evidence:300, notes:300, editor:800}[column.kind] || 300));
@@ -80,9 +80,7 @@ export function notebookColumnsLayout(columns, availableWidth, dividerWidth = 0,
   const widths = columns.map((column, index) => column.collapsed || column.kind === 'editor' ? minimums[index] :
     Math.max(minimums[index], Math.min(shared(column) ? 600 : {reader:Infinity, evidence:600, notes:300}[column.kind] || 360,
       shared(column) ? sharedReferenceWidth : Number(column.preferredWidth) || {reader:630, evidence:300, notes:300}[column.kind] || 300)));
-  const notesReserve = columns.reduce((sum, column, index) => sum +
-    (column.kind === 'notes' && column.collapsed ? 300 - minimums[index] : 0), 0);
-  let excess = widths.reduce((sum, width) => sum + width, 0) + notesReserve - available;
+  let excess = widths.reduce((sum, width) => sum + width, 0) - available;
   columns.forEach((column, index) => {
     if (column.collapsed || !['reader', 'evidence'].includes(column.kind) || excess <= 0) return;
     const reduction = Math.min(excess, Math.max(0, widths[index] - 300));

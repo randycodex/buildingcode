@@ -131,6 +131,29 @@ pending.content.scrollTop = 12;
 context.restorePendingReaderScrollPosition(pending);
 assert.equal(pending.content.scrollTop, 12);
 
+// Back to top is outside the scroll area. Even a synthetic click must cancel
+// both the queued frame and the previous section's alignment timers.
+{
+  const topButton = new EventTarget();
+  const current = panels[1], scroller = current.content;
+  const originalQuery = current.querySelector;
+  current.querySelector = selector => selector === ".reader-to-top" ? topButton : originalQuery(selector);
+  scroller.scrollTo = ({top, behavior}) => {assert.equal(behavior, "instant"); scroller.scrollTop = top;};
+  const cancelled = [];
+  scroller.__sectionAlignmentTimers = [1, 2];
+  scroller._readerSourcePosition = new AbortController();
+  context.window = {clearTimeout: timer => cancelled.push(timer)};
+  vm.runInContext(["cancelReaderSectionAlignment", "bindReaderScrollIndicator"].map(actual).join("\n"), context);
+  context.bindReaderScrollIndicator(current);
+  context.restoreReaderScrollPositions(positions);
+  topButton.dispatchEvent(new Event("click"));
+  frames.splice(0).forEach(callback => callback());
+  assert.equal(scroller.scrollTop, 0);
+  assert.equal(scroller._readerSourcePosition.signal.aborted, true);
+  assert.deepEqual(cancelled, [1, 2]);
+  current.querySelector = originalQuery;
+}
+
 const changedEdition = { ...a, codeVersion: "2014" };
 assert.notEqual(context.readerContentScrollKey(a), context.readerContentScrollKey(changedEdition), "Edition belongs in viewport identity");
 windows.length = 0;

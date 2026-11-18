@@ -54,6 +54,7 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
   };
   const restore = saved => {
     if (!saved) return;
+    if (saved.atStart) { content.scrollTop = 0; return; }
     if (saved.atEnd) { content.scrollTop = Math.max(0, content.scrollHeight - content.clientHeight); return; }
     const node = saved.node.isConnected ? saved.node : slots[saved.index]?.isConnected ? slots[saved.index]
       : live.find(item => item.node.dataset.sectionAliases?.split(/\s+/).includes(String(sections[saved.index].id)))?.node;
@@ -62,6 +63,7 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
     const offset = saved.fraction === null ? saved.offset : -saved.fraction * rect.height;
     content.scrollTop += rect.top - viewportTop() - offset;
   };
+  const anchorForResize = () => content.scrollTop === 0 ? { atStart: true } : anchor();
   const rememberBatch = items => {
     const connected = items.filter(({node, index}) => {
       if (node?.isConnected) return true;
@@ -82,7 +84,7 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
   const refreshLayout = () => {
     const next = signature();
     if (next === layoutKey) return;
-    const saved = anchor();
+    const saved = anchorForResize();
     layoutKey = next;
     heights = measuredLayouts.get(layoutKey) || new Map();
     measuredLayouts.delete(layoutKey);
@@ -145,6 +147,7 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
     },
     nextWindow(limit, threshold) {
       refreshLayout();
+      if (content.scrollTop === 0 && !loaded[0]) return readerExtentWindow(loaded, 0, limit);
       const bounds = {top: viewportTop(), bottom: content.getBoundingClientRect().bottom};
       // Prefer missing text actually on screen before prefetching either side.
       const visible = firstAfter(bounds.top);
@@ -162,7 +165,7 @@ export function createReaderChapterExtent(content, sections, initialStart, initi
       return null;
     },
     replace(start, nodes, collapseAliases) {
-      const saved = anchor();
+      const saved = anchorForResize();
       nodes.forEach((node, offset) => {
         const index = start + offset;
         if (loaded[index]) return;

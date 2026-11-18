@@ -47,7 +47,9 @@ export function createReportResizeDivider({shell, element, kind, label, defaultW
   const updateControls = () => {
     const width = clampWidth(currentWidth());
     divider.setAttribute('aria-valuemin', String(minimumWidth()));
-    divider.setAttribute('aria-valuemax', String(maximumWidth()));
+    const maximum = maximumWidth();
+    if (Number.isFinite(maximum)) divider.setAttribute('aria-valuemax', String(maximum));
+    else divider.removeAttribute('aria-valuemax');
     divider.setAttribute('aria-valuenow', String(Math.round(width)));
     divider.setAttribute('aria-valuetext', `${Math.round(width)} pixels wide`);
   };
@@ -72,11 +74,16 @@ export function createReportResizeDivider({shell, element, kind, label, defaultW
       Home: minimumWidth(),
       End: maximumWidth()
     };
-    if (!(event.key in requests)) return;
+    if (!Number.isFinite(requests[event.key])) return;
     event.preventDefault();
     resize(requests[event.key]);
   });
-  let drag = null;
+  let drag = null, frame = null, pointerX = null;
+  const flushDrag = () => {
+    frame = null;
+    if (drag && pointerX !== null) resize(drag.width + drag.direction * (pointerX - drag.x));
+    pointerX = null;
+  };
   divider.addEventListener('pointerdown', event => {
     if (event.button !== 0) return;
     event.preventDefault();
@@ -86,10 +93,17 @@ export function createReportResizeDivider({shell, element, kind, label, defaultW
     shell.classList.add(`is-${kind}-resizing`);
   });
   divider.addEventListener('pointermove', event => {
-    if (drag?.pointerID === event.pointerId) resize(drag.width + drag.direction * (event.clientX - drag.x));
+    if (drag?.pointerID !== event.pointerId) return;
+    pointerX = event.clientX;
+    if (frame === null) frame = requestAnimationFrame(flushDrag);
   });
   const finishDrag = event => {
     if (drag?.pointerID !== event.pointerId) return;
+    if (frame !== null) cancelAnimationFrame(frame);
+    if (event.type === 'pointerup' && Number.isFinite(event.clientX) && (pointerX !== null || event.clientX !== drag.x)) {
+      pointerX = event.clientX;
+    }
+    flushDrag();
     drag = null;
     shell.classList.remove(`is-${kind}-resizing`);
     if (divider.hasPointerCapture(event.pointerId)) divider.releasePointerCapture(event.pointerId);

@@ -44,7 +44,7 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     setPointerCapture() {}, hasPointerCapture: () => true, releasePointerCapture() {}, setAttribute() {},
     getBoundingClientRect: () => ({ left: 800, right: 801 })
   };
-  const context = vm.createContext({ workspaceColumnExpansion: undefined, adjacentColumnWidths,
+  const context = vm.createContext({ workspaceColumnExpansion: undefined, workspaceResumeReady: true, adjacentColumnWidths,
     state, track, notebookReferenceTransition:undefined, activeWorkspaceID: 'test', CSS: { escape: value => value }, researchColumnsLayout, notebookColumnsLayout,
     getComputedStyle:()=>({paddingLeft:'1px',paddingRight:'1px',getPropertyValue:()=> '800px'}),
     currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400, reconcileNotebookReferences:()=>false,
@@ -74,7 +74,7 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     widths: () => panes.map(p => p.getBoundingClientRect().width),
     move(clientX, pointerId = 7) { handlers.get('pointermove')({ clientX, pointerId }); },
     frame(time = 16) { const pending = [...frames.values()]; frames.clear(); pending.forEach(fn => fn(time)); },
-    finish(clientX, type = 'pointerup') { handlers.get(type)({ clientX, pointerId: 7 }); }
+    finish(clientX, type = 'pointerup') { handlers.get(type)({ clientX, pointerId: 7, type }); }
   };
 }
 
@@ -119,9 +119,9 @@ assert.deepEqual(pair.widths(), [1260, 1200], 'Dragging changes only the precedi
 assert.equal(pair.saves, 1); assert.equal(pair.handlers.size, 0);
 pair.panes.push(pair.makePane('reader:two'), pair.makePane('reader:three'));
 pair.context.syncResearchColumnLayout();
-assert.deepEqual(pair.widths(), [508, 630, 630, 630], 'Opening more columns automatically shares the desk down to each minimum');
+assert.deepEqual(pair.widths(), [600, 630, 630, 630], 'Opening more columns automatically shares the desk down to each minimum');
 pair.context.syncResearchColumnLayout({reset:true});
-assert.deepEqual(pair.widths(), [508, 630, 630, 630], 'Explicit reset shares the available width while preserving Reader minimums');
+assert.deepEqual(pair.widths(), [600, 630, 630, 630], 'Explicit reset shares the available width while preserving Reader minimums');
 assert.equal(pair.context.maximumPaneWidthForID('utility:search:one'), Infinity, 'Search retains manually expanded widths without a maximum');
 
 const assistantPair = fixture(['utility:analysis:one', 'reader:one']);
@@ -165,7 +165,7 @@ for (const direction of ['right']) {
   const firstWidth = heldPair.widths()[growingIndex];
   for (const time of [32, 48, 64, 80, 96]) heldPair.frame(time);
   assert(heldPair.widths()[growingIndex] > firstWidth, 'Holding a shared Reader divider at either screen edge keeps expanding it');
-  assert(heldPair.track.scrollLeft > 0, 'Newly added Reader width becomes visible before release');
+  assert.equal(heldPair.track.scrollLeft, 0, 'Widening the Reader does not pan the workspace');
   assert.equal(heldPair.widths()[1 - growingIndex], 630, 'The neighboring Reader retains its minimum');
   assert.deepEqual(heldPair.widths().slice(2), [630, 630], 'Unrelated Readers retain their widths during edge growth');
   const beforeRelease = heldPair.widths();
@@ -217,24 +217,22 @@ for (const [ids, initialScroll] of [
   held.move(availableWidth - 9); held.frame(16);
   for (const time of [32,48,64,80,96]) held.frame(time);
   assert(pane.getBoundingClientRect().width > initialWidth, 'Holding near the edge widens the column before release');
-  assert(held.track.scrollLeft > initialScroll, 'The workspace follows the widening column while the pointer is still held');
-  assert(held.track.scrollLeft - initialScroll <= pane.getBoundingClientRect().width - initialWidth + 1,
-    'A partially hidden column does not jump to its previously offscreen end');
-  assert(pane.getBoundingClientRect().right - availableWidth <= initialHiddenWidth + 1,
-    'The newly added width stays visible instead of accumulating offscreen');
+  assert.equal(held.track.scrollLeft, initialScroll, 'Expansion keeps the existing scroll offset');
+  assert(pane.getBoundingClientRect().right - availableWidth > initialHiddenWidth,
+    'Expansion pushes the far edge to the right');
   assert.equal(held.saves, 0, 'The live preview does not persist intermediate frames');
   const scrolledBeforeRelease = held.track.scrollLeft;
   held.finish(availableWidth - 9);
   assert.equal(held.track.scrollLeft, scrolledBeforeRelease, 'Release does not cause an extra scroll jump');
   assert.equal(held.frames.size, 0); assert.equal(held.handlers.size, 0);
 }
-console.log('Research divider pointer behavior passed: click/jitter stability, adjacent pairs, cancellation, sticky-edge live scrolling, partly hidden columns and overflow bounds.');
+console.log('Research divider pointer behavior passed: click/jitter stability, adjacent pairs, cancellation, anchored edge resizing, partly hidden columns and overflow bounds.');
 
 // Evidence has its own bounds even when restoring older, wider layouts.
 const evidence = fixture(['utility:saved:one','project:notebook:one']);
 evidence.workflow = 'research';
 const evidenceID = 'utility:saved:one';
-for (const [stored, expected] of [[100,300],[450,450],[1200,1200]]) {
+for (const [stored, expected] of [[100,600],[450,600],[1200,1200]]) {
   evidence.state.paneWeights[evidenceID] = stored;
   evidence.context.applyPaneWeight(evidence.panes[0],evidenceID);
   assert.equal(evidence.widths()[0],expected);
@@ -242,23 +240,24 @@ for (const [stored, expected] of [[100,300],[450,450],[1200,1200]]) {
   assert.equal(evidence.panes[0].style.flex,`0 0 ${expected}px`,'Evidence does not absorb spare viewport space');
 }
 for (const id of ['utility:saved',evidenceID]) {
-  assert.equal(evidence.context.minimumPaneWidthForID(id),300);
+  assert.equal(evidence.context.minimumPaneWidthForID(id),600);
   assert.equal(evidence.context.maximumPaneWidthForID(id),Infinity);
 }
 evidence.context.activePinnedPaneID = () => evidenceID;
 assert.equal(evidence.context.singleExpandedDividerEdge(evidenceID,'project:notebook:one').paneID,evidenceID);
+const writingWidth = evidence.widths()[1];
 evidence.context.startPaneEdgeResize(evidence.event(600),evidenceID,'right');
 evidence.move(-400); evidence.frame(); evidence.finish(-400);
-assert.deepEqual(evidence.widths(),[300,800],'Pinned Evidence can shrink without narrowing the shared notepad');
-evidence.context.startPaneEdgeResize(evidence.event(300),evidenceID,'right');
-evidence.move(1300); evidence.frame(); evidence.finish(1300);
-assert.deepEqual(evidence.widths(),[1300,800],'Pinned Evidence expands beyond its former cap');
+assert.deepEqual(evidence.widths(),[600,writingWidth],'Pinned Evidence stops at its 600px minimum without narrowing the shared notepad');
+evidence.context.startPaneEdgeResize(evidence.event(600),evidenceID,'right');
+evidence.move(1600); evidence.frame(); evidence.finish(1600);
+assert.deepEqual(evidence.widths(),[1600,writingWidth],'Pinned Evidence expands beyond its former cap without changing the notepad width');
 evidence.context.startPaneEdgeResize(evidence.event(0),evidenceID,'left');
 evidence.move(1000); evidence.frame(); evidence.finish(1000);
-assert.equal(evidence.widths()[0],300,'The outer left grip uses the same minimum');
+assert.equal(evidence.widths()[0],600,'The outer left grip uses the same minimum');
 assert.equal(evidence.context.minimumPaneWidthForID('project:notebook:one'),800);
 assert.equal(evidence.context.maximumPaneWidthForID('reader:one'),Infinity);
-console.log('Evidence pointer resizing and restored widths stay within 300–600 pixels; Note and Reader bounds are preserved.');
+console.log('Evidence uses a 600px minimum for pointer resizing and restored widths; Note and Reader bounds are preserved.');
 
 // Notebook reference columns borrow from the notepad, even when another
 // reference is at its minimum. The fitted layout must preserve that choice.
@@ -285,18 +284,22 @@ console.log('Evidence pointer resizing and restored widths stay within 300–600
 console.log('Notebook reference dividers passed: notepad supplies the extra space, other references stay fixed, caps and saved geometry hold.');
 
 // A compact Notebook has one reference beside Notes and the writing page.
-// Its divider cannot push the page past its minimum or create overflow.
+// The expanded Notes list adds 220px outside the reference and editor budget.
 {
  const ids=['reader:one','project:notes-index:one','project:notebook:one'];
  const notebook=fixture(ids,1671);notebook.workflow='notebook';notebook.track.dataset.notebookReferenceMode='shared';
  ids.forEach((id,index)=>notebook.state.paneWeights[id]=[900,300,2000][index]);
- notebook.context.syncResearchColumnLayout();assert.deepEqual(notebook.widths(),[300,300,1065]);
- notebook.context.startPaneResize(notebook.event(566),ids[0],ids[1]);
- notebook.move(2566);notebook.frame();notebook.finish(2566);
- assert.deepEqual(notebook.widths(),[565,300,800],'A compact Reader stops at the reserved writing page.');
- assert.equal(notebook.state.notebookReferenceWidth,565,'Resizing updates the shared Reader/Evidence width.');
+ notebook.context.syncResearchColumnLayout();
+ const before=notebook.widths();
+ assert.deepEqual(before,[300,300,1285]);
+ const originalScrollWidth=notebook.track.scrollWidth;
+ notebook.context.startPaneResize(notebook.event(301),ids[0],ids[1]);
+ notebook.move(1301);notebook.frame();notebook.finish(1301);
+ assert.deepEqual(notebook.widths(),[600,300,before[2]-300],'A compact Reader reaches its cap using only spare writing width.');
+ assert.equal(notebook.state.notebookReferenceWidth,600,'Resizing updates the shared Reader/Evidence width.');
+ assert.equal(notebook.track.scrollWidth,originalScrollWidth,'Resizing adds no overflow beyond the expanded Notes list.');
  notebook.track.scrollLeft=100;notebook.context.syncResearchColumnLayout();
- assert.equal(notebook.track.scrollLeft,0,'The compact Notebook fits without horizontal reference scrolling.');
+ assert.equal(notebook.track.scrollLeft,100,'Refitting the compact Notebook preserves its horizontal position.');
 }
 
 // Reader uses the same donor, can grow beyond 900px, and stops at an 800px
@@ -325,7 +328,7 @@ console.log('Notebook Reader divider passed: notepad-only resizing, fixed Eviden
 
 {
  const ids=['reader:one','utility:saved:one','project:notes-index:one','project:notebook:one'];
- const notebook=fixture(ids,2450);notebook.workflow='notebook';
+ const notebook=fixture(ids,2240);notebook.workflow='notebook';
  ids.forEach((id,index)=>notebook.state.paneWeights[id]=[850,450,300,1000][index]);
  notebook.context.syncResearchColumnLayout();const before=notebook.widths();
  notebook.context.startPaneResize(notebook.event(1351),ids[1],ids[2]);

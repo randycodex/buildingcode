@@ -109,12 +109,12 @@ ul.rv2-answer-list{list-style-type:disc}ol.rv2-answer-list{list-style-type:decim
 .rv2-sources-body .rv2-source-text{white-space:pre-wrap;font-size:13px;line-height:1.6}
 @media(min-width:681px){
   .research-v2-panel{--rv2-history-space:0px;--rv2-sources-space:0px;--rv2-rail-expansion:calc(var(--rv2-expanded-rail-width) - var(--rv2-collapsed-rail-width));margin-inline-end:calc(var(--rv2-history-space) + var(--rv2-sources-space));transition:margin-inline-end var(--workspace-sidebar-motion)}
-  #panel-track .research-v2-panel.has-history-rail{--rv2-history-space:var(--rv2-rail-expansion)}
-  #panel-track .research-v2-panel.has-sources-rail{--rv2-sources-space:var(--rv2-rail-expansion)}
+  #panel-track .research-v2-panel.has-history-rail:not(.is-collapsed){--rv2-history-space:var(--rv2-rail-expansion)}
+  #panel-track .research-v2-panel.has-sources-rail:not(.is-collapsed){--rv2-sources-space:var(--rv2-rail-expansion)}
   #panel-track .research-v2-panel>:is(.panel-header,.analysis-content){margin-inline-end:calc(-1 * (var(--rv2-history-space) + var(--rv2-sources-space)));transition:margin-inline-end var(--workspace-sidebar-motion)}
   /* Keep the closing rail visible until its reserved space reaches zero. */
-  #panel-track .research-v2-panel:is([data-assistant-sources-width],[data-assistant-history-width]){overflow:visible}
-  #panel-track .research-v2-panel:is([data-assistant-sources-width],[data-assistant-history-width])>.analysis-content{overflow:visible}
+  #panel-track .research-v2-panel:not(.is-collapsed):is([data-assistant-sources-width],[data-assistant-history-width]){overflow:visible}
+  #panel-track .research-v2-panel:not(.is-collapsed):is([data-assistant-sources-width],[data-assistant-history-width])>.analysis-content{overflow:visible}
   .rv2-sources-rail{grid-column:4;overflow:hidden;transition:background-color var(--workspace-sidebar-motion)}
   .rv2-sources-header{padding-inline:0}
   .rv2-sources-header>.rv2-rail-title{position:relative;inset-inline-start:var(--panel-padding);transition:inset-inline-start var(--workspace-sidebar-motion),transform var(--workspace-sidebar-motion)}
@@ -170,7 +170,6 @@ ul.rv2-answer-list{list-style-type:disc}ol.rv2-answer-list{list-style-type:decim
   .rv2-rail>:is(.rv2-history-actions,.rv2-questions){min-width:var(--rv2-history-content-width)}
   .research-v2-panel>.analysis-content{margin-inline-start:calc(-1 * var(--panel-padding))}
   .research-v2.is-history-collapsed .rv2-rail{padding-inline-end:0}
-  .research-v2.is-history-collapsed .rv2-rail>:not(.rv2-rail-header){display:none}
   .rv2-rail-divider{position:absolute;inset-block:calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3)) 0;left:var(--rv2-rail-width,300px);width:1px}
   .is-history-collapsed .rv2-rail-divider{pointer-events:none}
   .research-v2.is-question-rail-resizing{transition:none}

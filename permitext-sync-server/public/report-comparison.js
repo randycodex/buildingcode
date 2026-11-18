@@ -12,12 +12,12 @@ export function preserveReportReadingPosition(container, change) {
 
 export function reportOutlineRailWidth(collapsed) { return collapsed ? 72 : 300; }
 
-export function reportComparisonLayout(available, { sources = 0, outline = 0, reports = 0, versions = 300,
+export function reportComparisonLayout(available, { sources = 0, outline = 0, reports = 0, expandableRails = false, versions = 300,
   comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0, minimumReportWidth = 600,
   outlineDivider = true, sourcesDivider = true, compactEditor = false } = {}) {
   const reportMinimum = Math.max(compactEditor ? 320 : 600, minimumReportWidth);
   const showPDF = comparing && previewing;
-  const minimumSources = sources ? 300 : 0;
+  const minimumSources = expandableRails ? sources : sources ? 300 : 0;
   sources = Math.max(minimumSources, sources);
   const minimumVersions = comparing ? Math.min(300, versions) : 0;
   const fixedRails = reports + (compactEditor ? outline + Number(outline > 0 && outlineDivider) : 0);
@@ -36,13 +36,16 @@ export function reportComparisonLayout(available, { sources = 0, outline = 0, re
   const pairWidth = Math.max(reportMinimum + 600, available - sidebars - dividers);
   const chosenReport = reportWidth ? Math.max(reportMinimum, reportWidth) : 0;
   const chosenPDF = pdfWidth ? Math.max(600, pdfWidth) : 0;
+  const railTrack = (name, width) => expandableRails
+    ? `calc(var(--report-collapsed-rail-width) + var(--report-${name}-expansion))`
+    : `${width}px`;
   return {
     sourcesWidth: sources, versionsWidth: comparing ? versions : 0,
-    template: [`${sources}px`, `${sourceDividerWidth}px`,
+    template: [railTrack('sources', sources), `${sourceDividerWidth}px`,
       'minmax(0, 1fr)', comparing ? '1px' : '0px', comparing ? `${versions}px` : '0px'].join(' '),
-    documentTemplate: [outline ? `${outline}px` : '0px', outline && outlineDivider ? '1px' : '0px',
+    documentTemplate: [railTrack('outline', outline), outline && outlineDivider ? '1px' : '0px',
       showPDF && chosenReport ? `${chosenReport}px` : `minmax(${reportMinimum}px, 1fr)`,
-      ...(reports ? [`${reports}px`] : []),
+      ...(reports ? [railTrack('list', reports)] : []),
       showPDF ? '1px' : '0px', showPDF ? chosenPDF ? `${chosenPDF}px` : 'minmax(600px, 1fr)' : '0px'].join(' '),
     minimumWidth: sidebars + dividers + (showPDF ? (chosenReport || reportMinimum) + (chosenPDF || 600) : reportMinimum),
     balancedDocumentWidth: pairWidth / 2

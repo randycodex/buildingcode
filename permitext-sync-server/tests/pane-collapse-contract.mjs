@@ -32,7 +32,7 @@ const state = { collapsedPaneIDs: [], paneWeights: { 'utility:search:1': 720 }, 
 let reducedMotion = false;
 let saves = 0;
 const context = vm.createContext({
-  state, Set, Map, Array, Object, workspaceColumnExpansion: null, isProAccount:()=>false,
+  state, Set, Map, Array, Object, workspaceColumnExpansion: null, workspaceColumnMotion:{duration:280}, isProAccount:()=>false,
   currentColumnWorkflowView:()=> 'research', workflowPaneIsVisible:()=>true,
   columnGroupForPane: id => state.columnGroups?.find(group => group.paneIDs.includes(id)),
   track: { querySelectorAll: () => [] },
@@ -48,7 +48,7 @@ assert.equal(context.paneIsCollapsed(panel.dataset.paneId), true);
 assert.equal(rail.hidden, false);
 assert.equal(animations[0].frames[0].minWidth, '720px');
 assert.equal(animations[0].frames[1].minWidth, '48px');
-assert.equal(animations[0].options.duration, 240);
+assert.equal(animations[0].options.duration, 280);
 animations[0].finish();
 await Promise.resolve();
 // Simulate the browser resetting the hidden scroll container, then restore it.
@@ -84,42 +84,46 @@ dragPane.querySelector = () => grip;
 grip.classList = { add() {} };
 dragPane.querySelectorAll = () => [grip, collapsedTab];
 const dragState = { collapsedPaneIDs: ['reader:drag'], paneOrder: ['reader:drag', 'reader:target'] };
+const eventDocument = new EventTarget();
+const targetPane = {dataset:{paneId:'reader:target'},getBoundingClientRect:()=>({left:0,right:100})};
+dragPane.isConnected=true;
+dragPane.getBoundingClientRect=()=>({left:100,right:200});
 const dragContext = vm.createContext({
-  paneCanCollapse: () => true,
-  state: dragState, Date, draggedPaneID: '', dragPreviewOrder: [],
-  track: { querySelectorAll: () => [] }, saveWorkspaceState() {},
-  transitionWorkspace() {},
-  clearDragPreviewOrder() { dragContext.dragPreviewOrder = []; }
+  paneCanCollapse: () => true, Date, activeWorkspaceID:'project', AbortController,
+  document:eventDocument, dragPreviewOrder: [],
+  track:{getBoundingClientRect:()=>({left:0,top:25,bottom:600}),scrollLeft:0},
+  visibleWorkspaceColumns:()=>[targetPane,dragPane],
+  orderWithPaneMoved:(id,target,position)=>position==='before'?[id,target]:[target,id],
+  applyDragPreviewOrder(order){dragContext.dragPreviewOrder=order;},
+  clearDragPreviewOrder(){dragContext.dragPreviewOrder=[];},
+  commitWorkspaceColumnOrder(order){dragState.paneOrder=order;}
 });
-vm.runInContext(actual('bindPaneDragging'), dragContext);
+vm.runInContext(['workspaceDropDestination','bindPaneDragging'].map(actual).join('\n'), dragContext);
 dragContext.bindPaneDragging([dragPane]);
 dragContext.bindPaneDragging([dragPane]);
 for (const handle of [grip, collapsedTab]) {
-  assert.equal(handle.draggable, true);
-  assert.equal(handle.listeners.dragstart.length, 1, 'Reusing a pane cannot duplicate drag listeners');
+  assert.equal(handle.draggable, false);
+  assert.equal(handle.listeners.pointerdown.length, 1, 'Reusing a pane cannot duplicate drag listeners');
 }
-assert.equal(dragPane.listeners.drop.length, 1);
-let transfer;
-collapsedTab.emit('dragstart', { dataTransfer: { setData: (type, id) => { transfer = [type, id]; } } });
-assert.deepEqual(transfer, ['text/plain', 'reader:drag']);
-dragContext.dragPreviewOrder = ['reader:target', 'reader:drag'];
-collapsedTab.emit('dragend');
-assert.deepEqual(dragState.paneOrder, ['reader:target', 'reader:drag']);
+const pointerStart=(handle,control=false)=>handle.emit('pointerdown',{button:0,pointerId:1,clientX:140,clientY:45,
+  target:{closest:()=>control?{tagName:'BUTTON'}:null}});
+const pointer=(type,clientX)=>eventDocument.dispatchEvent(Object.assign(new Event(type,{cancelable:true}),{pointerId:1,clientX,clientY:45}));
+pointerStart(collapsedTab);
+pointer('pointermove',75);
+pointer('pointerup',75);
+assert.deepEqual(Array.from(dragState.paneOrder), ['reader:target', 'reader:drag']);
 assert.deepEqual(dragState.collapsedPaneIDs, ['reader:drag'], 'Dragging must not expand the column');
-assert.ok(collapsedTab._suppressExpandUntil > Date.now(), 'Drop-generated clicks cannot immediately expand the tab');
-console.log('Collapsed and expanded drag handles share reorder logic without duplicate listeners or expanding on drop.');
+assert.ok(collapsedTab._suppressExpandUntil > Date.now());
+pointerStart(grip,true);
+pointer('pointermove',12);
+pointer('pointerup',12);
+assert.equal(dragState.paneOrder[0],'reader:target','Clicking a header control cannot drag the pane');
+pointerStart(grip);
+pointer('pointermove',12);
+pointer('pointerup',12);
+assert.equal(dragState.paneOrder[0],'reader:drag','A pane can be dropped before the first column');
+console.log('Collapsed and expanded drag handles support the first slot and keep header controls interactive.');
 
-// Header controls must remain clickable and cannot initiate a column drag.
-let preventedHeaderDrag = false;
-grip.emit('pointerdown', { target: { closest: () => ({ tagName: 'BUTTON' }) } });
-grip.emit('dragstart', { preventDefault: () => { preventedHeaderDrag = true; } });
-assert.equal(preventedHeaderDrag, true);
-grip.emit('pointerdown', { target: { closest: () => null } });
-grip.emit('dragstart', { dataTransfer: { setData: (_type, id) => { transfer = id; } } });
-assert.equal(transfer, 'reader:drag', 'Empty header space initiates the same column drag');
-console.log('Header dragging excludes title buttons and other interactive controls.');
-
-// Readers reorder from the code-tab row rather than their content header.
 const tabRow = eventNode(), readerHeader = eventNode(), readerPane = eventNode();
 readerPane.dataset.paneId = 'reader:tabs';
 const headerClasses = new Set(['pane-header-drag-area']);
@@ -128,32 +132,25 @@ readerHeader.draggable = true;
 readerHeader.removeAttribute = name => { delete readerHeader[name]; };
 readerPane.classList = {add() {}, remove() {}, contains: name => name === 'reader-panel'};
 readerPane.querySelector = selector => selector.includes('reader-column-tabs') ? tabRow : readerHeader;
-readerPane.querySelectorAll = selector => {
-  assert(selector.includes('.reader-column-tabs'));
-  return [tabRow];
-};
+readerPane.querySelectorAll = () => [];
+readerPane.isConnected = true;
+tabRow.classList = {add(){}};
 dragContext.bindPaneDragging([readerPane]); dragContext.bindPaneDragging([readerPane]);
-assert.equal(headerClasses.has('pane-header-drag-area'), false); assert.equal(readerHeader.draggable, undefined);
-assert.equal(tabRow.draggable, true); assert.equal(tabRow.listeners.dragstart.length, 1);
-for (const name of ['code tab', 'add button']) {
-  let prevented = false;
-  tabRow.emit('pointerdown', {target: {closest: () => ({tagName: 'BUTTON'})}});
-  tabRow.emit('dragstart', {preventDefault: () => {prevented = true;}});
-  assert.equal(prevented, true, `${name} keeps its own interaction rather than dragging the column.`);
-}
-tabRow.emit('pointerdown', {target: {closest: () => null}});
-tabRow.emit('dragstart', {dataTransfer: {setData: (_type, id) => {transfer = id;}}});
-assert.equal(transfer, 'reader:tabs', 'Empty tab-row space starts the whole-column drag.');
-dragContext.dragPreviewOrder = ['reader:target', 'reader:tabs']; tabRow.emit('dragend');
-assert.deepEqual(dragState.paneOrder, ['reader:target', 'reader:tabs']);
-console.log('Reader tab rows reorder entire columns while code tabs and + remain interactive.');
+assert.equal(headerClasses.has('pane-header-drag-area'), false);
+assert.equal(readerHeader.draggable, undefined);
+assert.equal(tabRow.listeners.pointerdown.length, 1);
+pointerStart(tabRow,true); pointer('pointermove',12); pointer('pointerup',12);
+assert.equal(dragState.paneOrder[0],'reader:drag','Code tabs keep their interaction.');
+pointerStart(tabRow); pointer('pointermove',12); pointer('pointerup',12);
+assert.equal(dragState.paneOrder[0],'reader:tabs','Empty tab-row space drags the Reader column.');
+console.log('Reader tab rows reorder entire columns while code tabs remain interactive.');
 
 // Evidence, Notebook and Report move independently; only Evidence detail follows its list.
 const savedID = 'utility:saved:one', notebookID = 'project:notebook:p', reportID = 'project:report-draft:p';
 const detailID = 'section:detail:evidence';
 const orderState = { utilities: {}, utilityInstances: [], paneOrder: ['reader:one', notebookID, savedID, reportID], collapsedPaneIDs: [notebookID] };
 const orderContext = vm.createContext({
-  applyLinkedPanePlacements: ids => ids, requestLinkedPanePlacement() {},
+  applyLinkedPanePlacements: ids => ids, requestLinkedPanePlacement() {}, workspaceProject:()=>null,
   state: orderState, currentColumnWorkflowView:()=> 'research', Set, normalizeColumnGroups, orderColumnGroups, canGroupColumn,
   defaultActivePaneIDs: () => [savedID, notebookID, reportID, 'reader:one'],
   savedPaneIDs: () => [savedID], primarySavedPaneID: () => savedID,
@@ -164,7 +161,7 @@ const orderContext = vm.createContext({
   isProjectDetailPaneID: () => false, isProjectToolPaneID: () => false,
   searchIDForLinkedReaderPane: () => '', paneIDForResearchConversation: () => ''
 });
-vm.runInContext(['savedEvidenceColumnGroup', 'pairSavedEvidenceDetails', 'pinCriticalWorkflowPanesToLeft', 'activePaneIDs', 'columnGroupForPane', 'reconcileColumnGroups', 'basePaneGroupForMove', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
+vm.runInContext(['savedEvidenceColumnGroup', 'pairSavedEvidenceDetails', 'pinCriticalWorkflowPanesToLeft', 'workspaceColumnRank', 'orderedWorkspaceColumnIDs', 'isProjectReportDraftPaneID', 'activePaneIDs', 'columnGroupForPane', 'reconcileColumnGroups', 'basePaneGroupForMove', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
 assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', notebookID, savedID, reportID]);
 for (const member of [savedID, notebookID, reportID]) {
   orderState.paneOrder = ['reader:one', notebookID, savedID, reportID];
@@ -230,11 +227,11 @@ context.assistantHistoryOnlyPane = () => false;
 vm.runInContext(actual('singleExpandedDividerEdge'), context);
 state.collapsedPaneIDs = ['collapsed'];
 assert.equal(context.singleExpandedDividerEdge('reader', 'collapsed').side, 'right');
-assert.equal(context.singleExpandedDividerEdge('collapsed', 'reader').side, 'left');
-assert.equal(context.singleExpandedDividerEdge('reader', 'other-reader'), null);
+assert.equal(context.singleExpandedDividerEdge('collapsed', 'reader'), null);
+assert.equal(context.singleExpandedDividerEdge('reader', 'other-reader').side, 'right');
 assert.equal(context.singleExpandedDividerEdge('collapsed', ''), null);
 assert.equal(context.singleExpandedDividerEdge('', 'reader').side, 'left');
-console.log('Expanded columns resize beside collapsed neighbors on either edge.');
+console.log('Research dividers resize the column immediately to their left, with a separate left-edge handle.');
 
 // Unique project columns are stripped from both active and stored groups.
 orderState.columnGroups = normalizeColumnGroups([{ id: 'mixed', name: 'Research pack', paneIDs: ['reader:one', savedID, notebookID, reportID], columns: { [savedID]: { kind: 'utility' } }, collapsed: true }]);
@@ -250,12 +247,12 @@ console.log('Saved, Notebook and Report are excluded from active and persisted c
 // Reset updates the future expanded widths without changing visibility or group membership.
 const resetState = { paneWeights: { a: 950, b: 820 }, collapsedPaneIDs: ['a'], columnGroups: [{ id: 'g', paneIDs: ['b'], collapsed: true }] };
 const resetContext = vm.createContext({
-  state: resetState, track: { scrollLeft: 0, scrollWidth: 1200, clientWidth: 1000, querySelectorAll: () => [] },
+  state: resetState, track: { scrollLeft: 0, scrollWidth: 1200, clientWidth: 1000, querySelector: () => null, querySelectorAll: () => [] },
   reportScreen: null, workflowPaneIsVisible:()=>true, currentColumnWorkflowView:()=> 'research', workspaceColumnExpansion: null, syncResearchColumnLayout() {},
-  activePaneIDs: () => ['a', 'b'], defaultPaneWidthForID: () => 600,
-  saveWorkspaceState() {}, async transitionWorkspace() {}, requestAnimationFrame: fn => fn()
+  activePaneIDs: () => ['a', 'b'], defaultActivePaneIDs: () => ['a', 'b'], defaultPaneWidthForID: () => 600,
+  saveWorkspaceState() {}, appendPaneSequence() {}, captureWorkspaceColumnMotion:()=>null, animateWorkspaceColumnMotion() {}
 });
-vm.runInContext('async ' + actual('resetVisibleColumnWidths'), resetContext);
+vm.runInContext(['isProjectReportDraftPaneID','workspaceColumnRank','orderedWorkspaceColumnIDs'].map(actual).join('\n') + '\nasync ' + actual('resetVisibleColumnWidths'), resetContext);
 await resetContext.resetVisibleColumnWidths();
 assert.deepEqual(JSON.parse(JSON.stringify(resetState.paneWeights)), { a: 600, b: 600 });
 assert.deepEqual(resetState.collapsedPaneIDs, ['a']);

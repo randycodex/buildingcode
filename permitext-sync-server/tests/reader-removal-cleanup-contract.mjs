@@ -21,13 +21,14 @@ const retained = panel('retained-hidden-workflow'), removed = panel('closed'), s
 const c = vm.createContext({
   crypto: { randomUUID }, localWelcomePreviewPending: false, firstUseWelcomeActive: false,
   closeActiveCustomSelect() {}, orderPanes: value => value,
+  reportScreen: null,
   track: { querySelectorAll: selector => selector.includes('reader-panel') ? [retained, removed] : [] },
   cancelSearchPanelRequest() {},
   cancelReaderInternalSearch(panel) { panel._readerSearchAbort.abort(); },
   cancelReaderScrollRestore() { cancelledRestores++; },
   disposeWorkspaceNodeAccess() { releasedAccess++; }
 });
-vm.runInContext([actual('stopReaderProgressiveHydration'), actual('cancelReaderPanelRequests')].join('\n'), c);
+vm.runInContext(['cancelReaderSectionAlignment', 'stopReaderProgressiveHydration', 'cancelReaderPanelRequests'].map(actual).join('\n'), c);
 // Execute the actual removed-pane phase of appendPaneSequence. Subsequent layout
 // cannot change whether asynchronous work for an omitted panel is cancelled.
 const append = actual('appendPaneSequence');
@@ -53,7 +54,7 @@ console.log('Reader removal passed: immediate navigation/search/progressive abor
 
 // Execute the actual close handler: cleanup and removal precede persistence or
 // pane reconciliation, and closing cannot construct another loading chapter.
-const closeStart=source.indexOf('  closeButton.addEventListener("click", () => {\n    // Closing');
+const closeStart=source.indexOf('  closeButton.addEventListener("click", () => {', source.indexOf('async function renderReader('));
 assert.ok(closeStart>=0);
 const closeBody=source.slice(closeStart,source.indexOf('\n  chapterSelect.addEventListener',closeStart));
 const order=[];
@@ -61,6 +62,7 @@ const closed={id:'closed',referenceSourceReaderID:''},neighbor={id:'neighbor',re
 const closing=vm.createContext({closeButton:{addEventListener(_event,handler){this.close=handler;}},
  panel:{remove(){order.push('remove');}},reader:closed,options:{},
  state:{readers:[closed,neighbor],searchLinkedReaders:{search:'closed'}},
+ currentColumnWorkflowView:()=> 'research',
  cancelReaderPanelRequests(){order.push('cancel');},searchLinkedReadersBySearch(){return closing.state.searchLinkedReaders;},
  transitionWorkspace(mode,opts){assert.equal(mode,'utility');assert.equal(opts.deferStateSave,true);order.push('reconcile');}
 });

@@ -277,7 +277,7 @@ assert.doesNotMatch(css,/view-transition-name: reader-tab/);
 {
   const cleared=[],content={__sectionAlignmentTimers:[11,22,33],querySelectorAll:()=>[],closest:()=>null};
   const c=vm.createContext({notebookReferenceTransition:undefined,window:{clearTimeout:timer=>cleared.push(timer)},cancelReaderScrollRestore(){}});
-  vm.runInContext(actual('stopReaderProgressiveHydration'),c);
+  vm.runInContext(['cancelReaderSectionAlignment','stopReaderProgressiveHydration'].map(actual).join('\n'),c);
   c.stopReaderProgressiveHydration(content);c.stopReaderProgressiveHydration(content);
   assert.deepEqual(cleared,[11,22,33],'Outgoing passage alignment cannot scroll a retained Reader after another tab is selected');
   assert.equal(content.__sectionAlignmentTimers.length,0);

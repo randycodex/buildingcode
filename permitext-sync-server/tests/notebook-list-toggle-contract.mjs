@@ -38,7 +38,7 @@ const context = vm.createContext({
   workspacePrivatePresentationAllowed:() => allowed, hasCapability:() => allowed,
   workspaceProject:() => project, projectDetailKey:value => value?.id || '',
   captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',
-  sharedNotesOpen:() => notesOpen, detachedProjectWindow:false, isProAccount:() => true,
+  currentColumnWorkflowView:()=> 'research', sharedNotesOpen:() => notesOpen, detachedProjectWindow:false, isProAccount:() => true,
   paneCanCollapse:() => false,
   selectedNotebookColumn:() => ({id:'editor',cardID:'a'}), notebookColumnPaneID:() => editorID,
   isProjectNotebookPaneID:id => id.startsWith('project:notebook:'),
@@ -95,7 +95,7 @@ const revealed=[];
 context.scrollPaneIntoView=id=>revealed.push(id);
 context.track.querySelector=selector=>selector.includes(' .notebook-list-toggle')?{focus(){}}:{dataset:{paneId:indexID}};
 await context.toggleNotebookList();
-assert.deepEqual(revealed,[indexID],'Expanding Notes keeps the list reachable beside the notepad.');
+assert.deepEqual(revealed,[],'Expanding Notes keeps the workspace anchored.');
 console.log('Notes list toggle passed: immediate deferred contents, independent editor visibility, persistence and access/view guards.');
 
 const railState = {notebookListHidden:true,paneWeights:{[indexID]:280}};

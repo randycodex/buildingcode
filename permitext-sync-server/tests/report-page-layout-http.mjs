@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict';
+import {createHash, randomUUID} from 'node:crypto';
 import {createServer} from 'node:http';
 import {mkdtemp, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
+import sharp from 'sharp';
+import {emptyNotebookDocument} from '../notebook-contract.mjs';
 import {defaultSyncCodeVersion} from '../public/sync-identity.js';
 import {reportPageFormats} from '../public/document-layout.js';
 
@@ -138,7 +141,61 @@ try {
   await post('/reports/drafts/save', {...changedReport,expectedVersion:withoutContext.version,
     blocks:[{...contextBlock,sourceID:'other-project:context'}]},400);
 
+  const assetID = randomUUID();
+  const image = await sharp({create: {width: 12, height: 8, channels: 3, background: '#345678'}}).png().toBuffer();
+  const upload = await fetch(`${base}/notebook/assets/upload?projectID=${projectID}&assetID=${assetID}`, {
+    method: 'POST', headers: {authorization: `Bearer ${token}`, 'x-permitext-user-id': userID, 'content-type': 'image/png'},
+    body: image
+  });
+  assert.equal(upload.status, 200);
+  const {asset} = await upload.json();
+  const {card} = await post('/notebook/cards/save', {
+    projectID, expectedVersion: 0, clientMutationID: 'report-note-image', cardType: 'finding', title: 'Note with a private image',
+    document: {...emptyNotebookDocument(), document: [{type: 'image', props: {url: asset.url, caption: 'Private image caption'}}]},
+    evidenceLinks: []
+  }, 201);
+  const {draft: illustrated} = await post('/reports/drafts/save', {
+    projectID, expectedVersion: 0, title: 'Illustrated report', reportDate: '2026-11-15',
+    blocks: [{id: 'image-note-source', kind: 'notebookCard', sourceID: card.id, label: card.title}]
+  }, 201);
+  const imageReportRequest = {projectID, draftID: illustrated.id, expectedVersion: illustrated.version, unversioned: true};
+  const imagePreviewRequest = {...imageReportRequest, editingLayout: true};
+  // The recorded local provider must win even when the server defaults to Blob.
+  process.env.BLOB_READ_WRITE_TOKEN = 'fake-blob-default-for-local-regression';
+  try {
+    const notebookImage = await request('/notebook/assets/read', {projectID, assetID});
+    assert.equal(notebookImage.status, 200);
+    assert.deepEqual(Buffer.from(await notebookImage.arrayBuffer()), image);
+    const imagePreview = await post('/reports/drafts/preview', imagePreviewRequest);
+    const imageExport = await request('/reports/drafts/preview', imageReportRequest);
+    assert.equal(imageExport.status, 200);
+    assert.match(imageExport.headers.get('content-type'), /application\/pdf/);
+    for (const pdf of [Buffer.from(imagePreview.pdf, 'base64'), Buffer.from(await imageExport.arrayBuffer())]) {
+      assert.match(pdf.toString('latin1'), /\/Subtype \/Image\b/, 'Both PDFs contain the private Note image.');
+      const pages = await layout(pdf, reportPageFormats.letter);
+      assert.match(pages.flat().map(([text]) => text).join(' '), /Note with a private image/);
+    }
+
+    const hash = value => createHash('sha256').update(value).digest('hex').slice(0, 32);
+    const imageFile = join(directory, 'assets', 'project-assets', hash(projectID), 'notebook', hash(userID), `${hash(assetID)}.png`);
+    await rm(imageFile);
+    await post('/notebook/assets/read', {projectID, assetID}, 404);
+    for (const body of [imagePreviewRequest, imageReportRequest]) {
+      const missing = await post('/reports/drafts/preview', body, 400);
+      assert.match(missing.error, /Note with a private image.*was not found/);
+    }
+    await writeFile(imageFile, Buffer.from('Changed bytes'));
+    await post('/notebook/assets/read', {projectID, assetID}, 409);
+    for (const body of [imagePreviewRequest, imageReportRequest]) {
+      const mismatched = await post('/reports/drafts/preview', body, 400);
+      assert.match(mismatched.error, /Note with a private image.*no longer matches/);
+    }
+  } finally {
+    delete process.env.BLOB_READ_WRITE_TOKEN;
+  }
+
   console.log('Report page layout HTTP passed: Letter/A4/Legal/Tabloid persistence, exact PDF preview/export pagination, no issued preview versions or draft mutation, legacy compatibility, stale-version and ownership/auth fences.');
+  console.log('Private Note images passed: Notebook read, Report preview and direct PDF export with a different default provider, missing file and changed bytes.');
 } finally {
   globalThis.fetch = originalFetch;
   if (server) {server.closeAllConnections(); await new Promise(resolve => server.close(resolve));}

@@ -264,10 +264,10 @@ autosave.dispose();
   for(const kind of ['heading','paragraph','list','ordered']) {
     const draft={id:'selected-report',blocks:['a','b','c'].map(id=>({id,kind:'paragraph',text:id}))};
     const insertion=createReportInsertion(); insertion.select(draft,'b');
-    let next=0;
+    let next=0, sidebarTransitions=0;
     const context=vm.createContext({activeDraft:draft,reportInsertion:insertion,reportInsertionIndex,
       crypto:{randomUUID:()=>`new-${++next}`},panel:{dataset:{},querySelector:()=>({focus(){}})},
-      setDirty(){},renderWorkspaceContent(){},syncReferenceReaderLayout(){},outlineController:{reveal(){}},reportFormatting:{focus(){}}});
+      setDirty(){},renderWorkspaceContent(){},transitionReportSidebars(){sidebarTransitions++;},outlineController:{reveal(){}},reportFormatting:{focus(){}}});
     vm.runInContext(implementation+'\nglobalThis.add=addReportContent;',context);
     context.add(kind); context.add('paragraph');
     assert.deepEqual(draft.blocks.map(block=>block.id),['a','b','new-1','new-2','c']);
@@ -275,6 +275,8 @@ autosave.dispose();
     insertion.select(draft,null);context.add('heading');assert.equal(draft.blocks[0].id,'new-3','Introduction inserts before the first content item.');
     insertion.select(draft,'missing');context.add('paragraph');assert.equal(draft.blocks.at(-1).id,'new-4','A removed anchor safely falls back to the end.');
     insertion.select(draft,'b');context.add('source');assert.equal(insertion.selected(draft),'b','Opening Sources retains the selected insertion target.');
+    assert.equal(context.panel.dataset.libraryOpen, 'true');
+    assert.equal(sidebarTransitions, 1);
   }
   const insertion=createReportInsertion(),draft={id:'',blocks:[{id:'b'}]};
   insertion.select(draft,'b');draft.id='saved';insertion.remember(draft);

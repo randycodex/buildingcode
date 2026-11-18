@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { researchColumnsLayout } from '../public/workflow-views.js';
 import { adjacentColumnWidths } from '../public/column-expansion.js';
+import { reportWorkspaceMinimumWidth } from '../public/report-library.js';
 
 assert.deepEqual(researchColumnsLayout([600], 2400, 0, 2), { fits: true, widths: [2398] });
 assert.deepEqual(researchColumnsLayout([900, 600], 2403, 0, 3), { fits: true, widths: [1200, 1200] });
@@ -46,7 +47,7 @@ const track = { dataset: {}, clientWidth: 2403, inert: false, querySelector: () 
   querySelectorAll: selector => selector.includes('.pane-divider') ? Array.from({length: panels.filter(p=>!p.classList.contains('is-workflow-hidden')).length+1},()=>({getBoundingClientRect:()=>({width:1})})) : panels };
 const collapsed = new Set();
 const assistantRailExpansion = 228;
-const context = vm.createContext({notebookReferenceTransition:undefined, workspaceColumnExpansion: undefined, state, track, activeWorkspaceID: 'test', window: { innerWidth: 2403 }, researchColumnsLayout,
+const context = vm.createContext({notebookReferenceTransition:undefined, workspaceColumnExpansion: undefined, workspaceResumeReady:true, state, track, activeWorkspaceID: 'test', window: { innerWidth: 2403 }, researchColumnsLayout,
   currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400, assistantRailExpansion,
   activePaneIDs: () => panels.map(panel => panel.dataset.paneId),
   workflowPaneIsVisible: id => !panels.find(panel => panel.dataset.paneId === id)?.classList.contains('is-workflow-hidden'),
@@ -70,7 +71,12 @@ assert.equal(panels[1].style.maxWidth, 'none', 'Overflow Readers have no CSS max
 state.paneWeights['reader:one'] = 1800;
 delete track._researchColumnLayout;
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [600,1800,630,630], 'Stored Reader widths remain uncapped in overflow');
+assert.deepEqual(sizes(), [600,630,630,630], 'Stored automatic widths come down to minimums in overflow');
+state.paneWeights['reader:one'] = 1800;
+state.researchColumnWidthsManual = true;
+delete track._researchColumnLayout;
+context.syncResearchColumnLayout();
+assert.deepEqual(sizes(), [600,1800,630,630], 'Explicit manual widths remain uncapped when restored');
 context.capturePaneResizeWidths();
 state.paneWeights['utility:search:one'] = 850;
 state.paneWeights['reader:one'] = 1800;
@@ -158,19 +164,19 @@ assert.equal(state.researchColumnWidthsManual, false, 'An explicit layout reset 
 
 // Reset layout must leave manual sizing and fill the desk again. Retain the
 // collapsed rails and widths saved in other views, including grouped columns.
-vm.runInContext(actual('resetVisibleColumnWidths'), context);
+vm.runInContext(['isProjectReportDraftPaneID','workspaceColumnRank','orderedWorkspaceColumnIDs','resetVisibleColumnWidths'].map(actual).join('\n'), context);
 Object.assign(context, {
   reportScreen: null,
+  defaultActivePaneIDs: () => panels.map(panel => panel.dataset.paneId),
   activePaneIDs: () => panels.map(panel => panel.dataset.paneId),
   workflowPaneIsVisible: id => id !== 'reader:hidden',
   saveWorkspaceState() {},
-  async transitionWorkspace() {
+  captureWorkspaceColumnMotion:()=>null, animateWorkspaceColumnMotion() {},
+  appendPaneSequence() {
     panels.filter(panel => panel.dataset.paneId !== 'reader:hidden').forEach(panel => context.applyPaneWeight(panel, panel.dataset.paneId));
     context.syncResearchColumnLayout();
   }
 });
-const resetFrames = [];
-context.requestAnimationFrame = callback => resetFrames.push(callback);
 Object.defineProperty(track, 'scrollWidth', {get: () => Math.max(track.clientWidth,
   panels.filter(panel => panel.dataset.paneId !== 'reader:hidden')
     .reduce((total, panel) => total + panel.getBoundingClientRect().width + 1, 1))});
@@ -190,18 +196,32 @@ for (const available of [2428,1600]) {
   context.syncResearchColumnLayout();
   track.scrollLeft = 300;
   await context.resetVisibleColumnWidths();
-  resetFrames.splice(0).forEach(callback => callback());
   const readerWidth = available === 2428 ? 759 : 630;
   assert.deepEqual(sizes().slice(0,6), [readerWidth,48,48,48,readerWidth,readerWidth]);
   assert.equal(track.dataset.researchColumnSizing, available === 2428 ? 'fit' : 'overflow');
   assert.equal(state.paneWeights['reader:hidden'], 1800);
   assert.equal(state.columnGroups[0].columns['reader:hidden'].width,1800);
   assert.equal(state.columnGroups[0].columns['reader:one'].width,630);
-  assert.equal(track.scrollLeft, available === 2428 ? 0 : 300);
+  assert.equal(track.scrollLeft, 300, "Reset keeps the workspace scroll offset.");
+  assert.deepEqual(Array.from(state.paneOrder), ['reader:one','reader:two','reader:three','reader:hidden','utility:search:one','utility:analysis','utility:calculator']);
   context.syncResearchColumnLayout();
   assert.equal(track.dataset.researchColumnSizing, available === 2428 ? 'fit' : 'overflow', 'Later hydration keeps the reset layout');
 }
 console.log('Reset layout passed: clears manual widths, fills available space, retains collapsed rails and hidden views, and preserves minimums in overflow.');
+{
+  const defaults = ['reader:a','utility:search:a','utility:saved:a','utility:analysis:a','utility:calculator','project:notebook:a','project:report-draft:a'];
+  const active = [...defaults].reverse();
+  const workspace = {paneOrder:[...active], workflowVisitedViews:[]};
+  const closeContext = vm.createContext({state:workspace,activeWorkspaceID:'project',captureAccountRequest:()=>({}),isCurrentAccountRequest:()=>true,
+    currentColumnWorkflowView:()=> 'research',workflowPaneIsVisible:()=>true,reportScreen:{close(){active.splice(active.indexOf(defaults.at(-1)),1);}},
+    defaultActivePaneIDs:()=>[...active],saveWorkspaceState(){},
+    workspacePaneDescriptors:()=>active.filter(id=>id!==defaults.at(-1)).map(id=>({id,close(){active.splice(active.indexOf(id),1);}}))});
+  vm.runInContext(['isProjectReportDraftPaneID','workspaceColumnRank','orderedWorkspaceColumnIDs','closeAllColumns','appendPaneIfMissing'].map(actual).join('\n'),closeContext);
+  assert.equal(await closeContext.closeAllColumns(),true);
+  assert.deepEqual(Array.from(workspace.paneOrder),[]);
+  for (const id of [...defaults].reverse()) {active.push(id);closeContext.appendPaneIfMissing(id);}
+  assert.deepEqual(Array.from(workspace.paneOrder),defaults,'Reopening after Close All restores the default slots regardless of opening order.');
+}
 
 // Production regression: switching from a fitted Project to a restored manual
 // layout must not treat the previous Project's column signature as a reset.
@@ -288,9 +308,11 @@ context.window.innerWidth = track.clientWidth = 3004;
 delete track._researchColumnLayout;
 context.syncResearchColumnLayout();
 assert.deepEqual(sizes(), [1000,1000,1000], 'Search, Assistant and Reader share three equal columns');
+panels[1].dataset.assistantHistoryWidth = '228';
+panels[1].dataset.assistantSourcesWidth = '228';
 collapsed.add('utility:analysis:one');
 context.syncResearchColumnLayout();
-assert.deepEqual(sizes(), [1476,48,1476], 'A collapsed Assistant reserves only its rail');
+assert.deepEqual(sizes(), [1476,48,1476], 'A collapsed Assistant gives up its saved Chats and Sources space');
 console.log('Assistant layout passed: cold equal sharing, 920px minimum, manual restoration, reset, reorder and collapsed rails.');
 
 // Exercise the real keyboard-divider path used by Search on either side.
@@ -319,36 +341,22 @@ state.paneWeights={};state.researchColumnWidthsManual=false;delete track._resear
 context.syncResearchColumnLayout();const beforeSources=sizes();
 context.saveWorkspaceState=()=>{};context.requestAnimationFrame=callback=>callback();
 vm.runInContext(actual('setAssistantSourcesRail'),context);
-let reveals=0;const sourcesRail={isConnected:true,scrollIntoView(){reveals++;}};
-context.setAssistantSourcesRail(panels[1],true,sourcesRail);
+track.scrollLeft=400;
+context.setAssistantSourcesRail(panels[1],true);
 assert.deepEqual(sizes(),beforeSources,'Opening sources never narrows the Assistant or neighboring panes');
-assert.equal(panels[1].dataset.assistantSourcesWidth,String(assistantRailExpansion));assert.equal(reveals,1);
+assert.equal(panels[1].dataset.assistantSourcesWidth,String(assistantRailExpansion));assert.equal(track.scrollLeft,400,'Opening answer sources leaves workspace scroll alone.');
 assert.equal(state.paneWeights['utility:analysis'],beforeSources[1],'Saved pane weights exclude the temporary source rail');
-context.setAssistantSourcesRail(panels[1],true,sourcesRail,{reveal:false});
+context.setAssistantSourcesRail(panels[1],true);
 assert.deepEqual(sizes(),beforeSources,'Updating the answer in an open rail never adds width again');
-context.setAssistantSourcesRail(panels[1],false,sourcesRail);
+context.setAssistantSourcesRail(panels[1],false);
 assert.deepEqual(sizes(),beforeSources,'Closing the source rail keeps the original base dimensions');
-context.setAssistantSourcesRail(panels[1],true,sourcesRail,{reveal:false});
+context.setAssistantSourcesRail(panels[1],true);
 context.syncResearchColumnLayout({reset:true});
 assert(Math.abs(sizes().reduce((sum,width)=>sum+width,assistantRailExpansion+4)-track.clientWidth)<1e-8,'Auto-fit reserves only the added Sources width');
-const resized=sizes();context.setAssistantSourcesRail(panels[1],false,sourcesRail);
-assert(sizes().every((width,index)=>width>=resized[index]),'Closing after an explicit reset may fill available space but never narrows a pane');
+const resized=sizes();context.setAssistantSourcesRail(panels[1],false);
+assert(sizes().every((width,index)=>width>=resized[index]),'Closing after an explicit reset preserves the fitted base widths');
 assert.equal(panels[1].dataset.assistantSourcesWidth,'0');
 console.log('Assistant source geometry passed: reserved width, unchanged chat/neighbors, repeat selection, reset and close.');
-
-let finishMotion;
-sourcesRail.parentElement={getAnimations:()=>[{transitionProperty:'--rv2-sources-width',finished:new Promise(resolve=>{finishMotion=resolve;})}]};
-const beforeReveal=reveals;
-context.setAssistantSourcesRail(panels[1],true,sourcesRail);
-assert.equal(reveals,beforeReveal,'Workspace scrolling waits for the source rail to finish expanding');
-finishMotion();await new Promise(resolve=>setImmediate(resolve));
-assert.equal(reveals,beforeReveal+1);
-context.setAssistantSourcesRail(panels[1],false,sourcesRail);
-context.setAssistantSourcesRail(panels[1],true,sourcesRail);
-context.setAssistantSourcesRail(panels[1],false,sourcesRail);
-finishMotion();await new Promise(resolve=>setImmediate(resolve));
-assert.equal(reveals,beforeReveal+1,'Closing during the motion cannot cause a late workspace scroll');
-console.log('Source rail motion passed: reveal after expansion and no late scroll when closing.');
 
 // Each rail reserves only the difference between its collapsed and expanded widths.
 vm.runInContext(actual('setAssistantHistoryRail'),context);
@@ -365,7 +373,7 @@ assert.equal(track.dataset.researchColumnSizing,'reserved','A list toggle tempor
 context.setAssistantHistoryRail(panels[1],true);
 assert.deepEqual(sizes(),historyBases,'Opening history adds workspace space without taking column width');
 assert.equal(state.paneWeights['utility:analysis'],historyBases[1]);
-context.setAssistantSourcesRail(panels[1],true,sourcesRail,{reveal:false});
+context.setAssistantSourcesRail(panels[1],true);
 assert.deepEqual(sizes(),historyBases,'History and Sources can both open beside the same base conversation');
 assert.equal(Number(panels[1].dataset.assistantHistoryWidth)+Number(panels[1].dataset.assistantSourcesWidth),2*assistantRailExpansion);
 context.setAssistantHistoryRail(panels[1],false);
@@ -448,7 +456,96 @@ assert.equal(state.researchColumnWidthsManual,false,'Closing a column starts a f
 const beforeSourcesToggle=sizes();
 context.setAssistantSourcesRail(panels[1],true,{isConnected:true},{reveal:false});
 assert.deepEqual(sizes(),beforeSourcesToggle);assert.equal(state.researchColumnWidthsManual,false);
+
 context.setAssistantSourcesRail(panels[1],false,{isConnected:true},{reveal:false});
 assert.deepEqual(sizes(),beforeSourcesToggle);
 context.window.innerWidth=track.clientWidth=3400;context.syncResearchColumnLayout();fillsDesk();
 console.log('Automatic-fit recovery passed: legacy gap, stable rail toggles, column open/close, minimum-only overflow, actual divider persistence and wider viewport recovery.');
+
+// Expanded Report sidebars count at initial fit and on whole-layout changes.
+// A direct toggle holds the fitted editor and pushes only to the right.
+context.activeWorkspaceID='project:report-fit';
+panels=Array.from({length:7},(_,index)=>makePane(`reader:parked:${index}`));
+collapsed.clear();
+panels.forEach(panel=>collapsed.add(panel.dataset.paneId));
+const report=makePane('project:report-draft:fit');
+const draft={dataset:{libraryOpen:'true',outlineHidden:'false',reportsHidden:'false'}};
+report.querySelector=()=>draft;
+report.style.getPropertyValue=key=>report.style[key];
+track.querySelector=selector=>selector.includes('.shared-report-column')?report:null;
+context.activePaneIDs=()=>[...panels.map(panel=>panel.dataset.paneId),report.dataset.paneId];
+context.reportWorkspaceMinimumWidth=reportWorkspaceMinimumWidth;
+state.paneWeights={};
+state.researchColumnWidthsManual=false;
+const reportBase=()=>parseFloat(report.style['--workspace-report-width']);
+const resizeWorkspace=width=>{
+  context.window.innerWidth=track.clientWidth=width;
+  context.syncResearchColumnLayout();
+};
+for(const available of [1920,2133,2134,3403]) {
+  resizeWorkspace(available);
+  assert.equal(reportBase(),Math.max(1160,available-344-630));
+  assert.equal(track.dataset.researchColumnSizing,available>=2134?'fit':'overflow');
+  assert.deepEqual(sizes(),Array(7).fill(48));
+}
+context.capturePaneResizeWidths({manual:false});
+const readingWidth=reportBase();
+draft.dataset.libraryOpen='false';
+context.syncResearchColumnLayout();
+assert.equal(reportBase(),readingWidth,'Closing a Report sidebar keeps its editing width');
+context.syncResearchColumnLayout({reset:true});
+assert.equal(reportBase(),readingWidth+210,'Auto-fit uses the space freed by the sidebar');
+context.capturePaneResizeWidths({manual:false});
+draft.dataset.libraryOpen='true';
+context.syncResearchColumnLayout();
+assert.equal(reportBase(),readingWidth+210,'Opening a sidebar preserves the fitted Report base width');
+resizeWorkspace(3200);
+assert.equal(reportBase(),3200-344-630,'Viewport resizing ends the temporary hold');
+collapsed.delete(panels[0].dataset.paneId);
+resizeWorkspace(2715);
+assert.equal(sizes()[0],630);
+assert.equal(reportBase(),1160);
+assert.equal(track.dataset.researchColumnSizing,'overflow','Reader and Report both reach their minimums first');
+resizeWorkspace(2716);
+assert.equal(track.dataset.researchColumnSizing,'fit','Reader and Report fit at their combined minimums');
+state.researchColumnWidthsManual=true;
+state.paneWeights[report.dataset.paneId]=1600;
+context.workspaceResumeReady=false;
+delete track._researchColumnLayout;
+const withReport=track.querySelector;
+track.querySelector=()=>null;
+context.activePaneIDs=()=>panels.map(panel=>panel.dataset.paneId);
+context.syncResearchColumnLayout();
+track.querySelector=withReport;
+context.activePaneIDs=()=>[...panels.map(panel=>panel.dataset.paneId),report.dataset.paneId];
+context.syncResearchColumnLayout();
+assert.equal(reportBase(),1600,'Refreshing a manually resized Report preserves its width through delayed mounting');
+context.workspaceResumeReady=true;
+resizeWorkspace(2800);
+assert.equal(track.dataset.researchColumnSizing,'fit','A subsequent viewport change applies automatic fit');
+const evidenceID='utility:saved:fit';
+panels.push(makePane(evidenceID));
+state.paneWeights[evidenceID]=300;
+resizeWorkspace(3316);
+assert.equal(sizes().at(-1),600,'Evidence keeps a 600px minimum in automatic overflow.');
+assert.equal(track.dataset.researchColumnSizing,'overflow');
+resizeWorkspace(3317);
+assert.equal(sizes().at(-1),600,'Evidence fits at its minimum with the other tools.');
+assert.equal(track.dataset.researchColumnSizing,'fit');
+console.log('Report auto-fit passed: exact thresholds, companion Reader, all sidebar space counted and anchored sidebar expansion.');
+
+context.activeWorkspaceID='project:all-columns-fit';
+track.querySelector=()=>null;
+context.activePaneIDs=()=>panels.map(panel=>panel.dataset.paneId);
+for(const id of [evidenceID,'reader:fit','utility:analysis:fit','utility:calculator','project:notebook:fit',
+  'utility:settings','utility:archive','project:context:fit','project:facts:fit','section:detail:fit']) {
+  panels=['utility:search:fit',id].map(makePane);
+  state.paneWeights={'utility:search:fit':1200,[id]:600};
+  state.researchColumnWidthsManual=false;
+  for(const available of [3063,1920]) {
+    resizeWorkspace(available);
+    const share=(available-3)/2;
+    assert.deepEqual(sizes(),[share,share],`${id} shares the available space with Search after dividers.`);
+  }
+}
+console.log('All expanded desktop columns participate in automatic width sharing.');

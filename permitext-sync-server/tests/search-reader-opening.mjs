@@ -105,7 +105,7 @@ console.log('Research, Search-detail and ordinary Reader links passed: exact res
     positionReaderSourceBeforePaint:()=>events.push('align'),
     watchReaderSourcePosition(){},
     stabilizeReaderSectionAtHeader:()=>assert.fail('Result publication must not schedule repeated alignment')});
-  vm.runInContext(actual('revealReaderSourceTarget'),publication);
+  vm.runInContext(['cancelReaderSectionAlignment','revealReaderSourceTarget'].map(actual).join('\n'),publication);
   assert.equal(publication.revealReaderSourceTarget(reader,{sectionID:'result'},null,{preferPassage:true,immediate:true}),true);
   assert.deepEqual(events,['extent','cancel-restore','align']);assert.equal(timers.length,0);
   assert.equal(reader.sourceRevealToken,null);

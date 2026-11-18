@@ -9,16 +9,21 @@ export function readerShortcutLabel({ prefix = '', edition = '' }) {
 
 // The toolbar navigates columns. Code tabs and their reading sessions live in
 // the Reader header rather than becoming additional toolbar shortcuts.
-export function createReaderShortcuts({ host, track, readers, context, reveal, move, preview, cancelPreview, renderIcon, tools = [] }) {
+export function createReaderShortcuts({ host, track, readers, context, reveal, move, preview, cancelPreview, renderIcon, columnOrder, tools = [] }) {
   const doc = host.ownerDocument;
   const win = doc.defaultView;
   const toolbar = host.closest('.workflow-toolbar');
   const buttons = new Map();
   const activeByContext = new Map();
   const readerByContext = new Map();
+  const launchers = tools.filter(({button}) => button?.parentNode).map(tool => {
+    const home = doc.createElement('template');
+    tool.button.parentNode.insertBefore(home, tool.button);
+    return {...tool, home};
+  });
+  const toolRank = new Map(tools.map(({key}, index) => [key, index + 1]));
   let currentContext = '', activeID = '', scheduled = false, disposed = false;
   let gesture = null, suppressClickUntil = 0, currentItems = [];
-  const animations = new Map();
   let pointerSelection = null;
   let tooltipButton = null;
   const tooltip = doc.createElement('div');
@@ -51,10 +56,6 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     if (id.startsWith('reader:')) readerByContext.set(currentContext, id);
     for (const [key, button] of buttons) button.setAttribute('aria-pressed', String(key === id));
   }
-  function stopAnimations() {
-    for (const animation of animations.values()) animation.cancel();
-    animations.clear();
-  }
   function layoutBounds(button) {
     const bounds = button.getBoundingClientRect();
     const x = gesture?.button === button ? gesture.x : 0;
@@ -73,20 +74,22 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     gesture = null;
     if (ended.button.hasPointerCapture?.(ended.pointerId)) ended.button.releasePointerCapture(ended.pointerId);
     if (!ended.active) return;
-    stopAnimations();
     for (const button of buttons.values()) {
       button.classList.remove('is-dragging');
-      button.style.order = '';
       button.style.transform = '';
     }
     host.classList.remove('is-reordering');
-    cancelPreview?.();
     pointerSelection = null;
     suppressClickUntil = Date.now() + 250;
     if (commit && ended.context === context() && ended.target &&
-        ended.order.some((id, index) => id !== currentItems[index]?.id)) {
-      void move(ended.id, ended.target, ended.position);
+        ended.changed) {
+      if (move(ended.id, ended.target, ended.position)) {
+        previewOrder([]);
+        return;
+      }
     }
+    cancelPreview?.();
+    previewOrder([]);
   }
   function startPointer(event, button, id) {
     if (!move || event.button !== 0 || event.isPrimary === false || !Number.isFinite(event.clientX)) return;
@@ -94,7 +97,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     const bounds = button.getBoundingClientRect();
     gesture = {id, button, pointerId:event.pointerId, context:currentContext, active:false,
       startX:event.clientX, startY:event.clientY, grabX:event.clientX - bounds.left,
-      grabY:event.clientY - bounds.top, x:0, y:0, order:currentItems.map(item => item.id)};
+      grabY:event.clientY - bounds.top, x:0, y:0, originalOrder:columnOrder?.() || currentItems.map(item => item.id)};
   }
   function movePointer(event) {
     if (!gesture || event.pointerId !== gesture.pointerId) return;
@@ -110,7 +113,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     }
     event.preventDefault();
     followPointer(event);
-    const hostBounds = host.getBoundingClientRect();
+    const hostBounds = (toolbar || host).getBoundingClientRect();
     if (event.clientY < hostBounds.top - 16 || event.clientY > hostBounds.bottom + 16) return;
     // Use destination slots rather than animated rectangles for stable hit testing.
     const candidates = [...gesture.slots].filter(([id]) => id !== gesture.id);
@@ -126,23 +129,8 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     const nextOrder = preview?.(gesture.id, target, position);
     if (!nextOrder) return;
     gesture.target = target; gesture.position = position;
-    const visibleOrder = nextOrder.filter(id => buttons.has(id));
-    if (visibleOrder.every((id, index) => id === gesture.order[index])) return;
-    stopAnimations();
-    const previous = new Map([...buttons].map(([id, button]) => [id, layoutBounds(button)]));
-    gesture.order = visibleOrder;
-    visibleOrder.forEach((id, index) => { buttons.get(id).style.order = String(index); });
-    gesture.slots = new Map([...buttons].map(([id, button]) => [id, layoutBounds(button)]));
-    if (!win.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-      for (const [id, button] of buttons) {
-        if (id === gesture.id || !button.animate) continue;
-        const before = previous.get(id), after = gesture.slots.get(id);
-        animations.set(id, button.animate([
-          {transform:`translate(${before.left - after.left}px, ${before.top - after.top}px)`},
-          {transform:'none'}
-        ], {duration:140, easing:'ease-out'}));
-      }
-    }
+    gesture.changed = nextOrder.some((id, index) => id !== gesture.originalOrder[index]);
+    previewOrder(nextOrder);
     followPointer(event);
   }
   function releasePointer(event) {
@@ -152,6 +140,42 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     if (gesture?.pointerId === event.pointerId) finishPointer();
   }
   function resize() { finishPointer(); hideTooltip(); }
+  function toolbarNodes(items) {
+    const positioned = items.map(item => ({key:item.toolKey, rank:toolRank.get(item.toolKey) || 0, button:buttons.get(item.id)}));
+    for (const {key, button, after} of launchers) {
+      if (items.some(item => item.toolKey === key)) continue;
+      const rank = toolRank.get(key);
+      const partner = after ? positioned.findLastIndex(item => item.key === after) : -1;
+      const next = partner !== -1 ? partner + 1 : positioned.findIndex(item => item.rank > rank);
+      positioned.splice(next === -1 ? positioned.length : next, 0, {key, rank, button});
+    }
+    return positioned.map(item => item.button);
+  }
+  function previewOrder(ids) {
+    for (const button of [...buttons.values(), ...launchers.map(item => item.button)]) button.style.order = '';
+    if (!ids.length) return;
+    const byID = new Map(currentItems.map(item => [item.id, item]));
+    toolbarNodes(ids.map(id => byID.get(id)).filter(Boolean)).forEach((button, index) => {
+      button.style.order = String(index);
+    });
+  }
+  function placeButton(parent, button, reference) {
+    if (button === reference) return;
+    if (parent.moveBefore && button.isConnected) parent.moveBefore(button, reference || null);
+    else {
+      const focused = doc.activeElement === button;
+      parent.insertBefore(button, reference || null);
+      if (focused) button.focus({preventScroll:true});
+    }
+  }
+  function restoreLaunchers(items = []) {
+    for (const {button, home, key} of launchers) {
+      if (items.length && !items.some(item => item.toolKey === key)) continue;
+      const parent = home.parentNode;
+      const children = [...parent.children];
+      placeButton(parent, button, children[children.indexOf(home) + 1]);
+    }
+  }
   function refresh() {
     if (disposed) return;
     const nextContext = context();
@@ -178,7 +202,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
       const label = item.label || readerShortcutLabel(item);
       counts.set(label, (counts.get(label) || 0) + 1);
     }
-    items.forEach((item, index) => {
+    items.forEach(item => {
       let button = buttons.get(item.id);
       if (!button) {
         button = doc.createElement('button');
@@ -216,8 +240,9 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
             event.preventDefault(); hideTooltip();
             if (context() !== currentContext || gesture?.active) return;
             const direction = event.key === 'ArrowLeft' ? -1 : 1;
-            const target = currentItems[currentItems.findIndex(entry => entry.id === item.id) + direction];
-            if (target) { void move(item.id, target.id, direction < 0 ? 'before' : 'after'); button.focus({preventScroll:true}); }
+            const order = (columnOrder?.() || currentItems.map(entry => entry.id)).filter(id => buttons.has(id));
+            const target = order[order.indexOf(item.id) + direction];
+            if (target) { void move(item.id, target, direction < 0 ? 'before' : 'after'); button.focus({preventScroll:true}); }
           });
         }
         button.addEventListener('pointerenter', () => showTooltip(button));
@@ -238,10 +263,12 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
       if (item.iconName) renderIcon?.(button, item.iconName);
       button.dataset.description = description;
       button.setAttribute('aria-label', `Show ${name}${item.column ? '' : ' Reader'}${item.location ? ` · ${item.location}` : ''}${duplicate ? ` · ${duplicate}` : ''}`);
-      // Moving only out-of-order nodes preserves a focused shortcut on updates.
-      if (host.children[index] !== button) host.insertBefore(button, host.children[index] || null);
       if (tooltipButton === button) showTooltip(button);
     });
+    restoreLaunchers(items);
+    if (items.length) {
+      toolbarNodes(items).forEach((button, index) => placeButton(host, button, host.children[index]));
+    }
     host.hidden = items.length === 0;
     const added = !contextChanged && previousIDs.size ? items.filter(item => !previousIDs.has(item.id)).at(-1) : null;
     if (added) activeID = added.id;
@@ -255,7 +282,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     win.requestAnimationFrame(() => { scheduled = false; refresh(); });
   }
   function remember(event) {
-    const panel = event.target.closest?.('.workspace-panel');
+    const panel = event.target.closest?.('.workspace-panel, .shared-report-column');
     if (panel && track.contains(panel)) activate(panel.dataset.paneId);
   }
   function dismiss(event) { if (event.key === 'Escape') { finishPointer(); hideTooltip(); } }
@@ -263,7 +290,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     observer.disconnect();
     observer.observe(track, { childList: true });
     // Observe small column headers and visibility, never passage/editor DOM.
-    for (const panel of track.querySelectorAll(':scope > .workspace-panel')) {
+    for (const panel of track.querySelectorAll(':scope > :is(.workspace-panel, .shared-report-column)')) {
       observer.observe(panel, { attributes: true, attributeFilter: ['class'] });
       const header = panel.querySelector(':scope > header');
       if (header) observer.observe(header, { childList: true, characterData: true, subtree: true });
@@ -283,7 +310,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
   doc.addEventListener('keydown', dismiss);
   refresh();
   return {
-    refresh, activePaneID: () => activeID,
+    refresh, previewOrder, activePaneID: () => activeID,
     activeReaderPaneID: () => buttons.has(readerByContext.get(currentContext)) ? readerByContext.get(currentContext) : '',
     dispose() {
       finishPointer();
@@ -301,8 +328,11 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
       doc.removeEventListener('pointercancel', cancelPointer);
       doc.removeEventListener('keydown', dismiss);
       tooltip.remove();
+      restoreLaunchers();
+      launchers.forEach(({home}) => home.remove());
       for (const {button} of tools) button?.classList.remove('has-open-column');
-      host.replaceChildren();
+      buttons.forEach(button => button.remove());
+      host.hidden = true;
     }
   };
 }

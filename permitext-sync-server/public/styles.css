@@ -1307,6 +1307,7 @@ textarea:focus-visible {
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
+  overflow-anchor: none;
 }
 
 .notebook-index-panel {
@@ -1356,8 +1357,7 @@ textarea:focus-visible {
 .notebook-index-actions > button:not(:disabled):hover { color: var(--text-primary); }
 .notebook-index-actions > button:disabled { opacity: .45; cursor: default; }
 .notebook-index-panel[data-notebook-list-collapsed="true"] { position: relative; z-index: 2; padding-inline-end: 0; }
-.notebook-index-actions[hidden],
-.notebook-index-panel[data-notebook-list-collapsed="true"] :is(.notebook-index-actions, .notebook-index-body) { display: none; }
+.notebook-index-actions[hidden] { display: none; }
 .notebook-index-panel[data-notebook-list-collapsed="true"] + .pane-divider[data-next-pane-id^="project:notebook:"] { pointer-events: none; }
 
 /* Resize the live columns; the heading stays painted at its usual inset. */
@@ -12038,7 +12038,6 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 .saved-panel .saved-code-group + .saved-code-group {
   margin-top: var(--space-2);
-  border-top: 1px solid var(--border);
 }
 
 .saved-panel .saved-code-group .saved-row {
@@ -17920,7 +17919,7 @@ html body .research-compact-composer .research-question-input:focus-visible {
 
 .pane-collapsed-tab[hidden] { display: none; }
 
-.panel-track > .workspace-panel.is-collapsed {
+.panel-track > :is(.workspace-panel, .shared-report-column).is-collapsed:not([hidden]) {
   position: relative;
   display: block;
   flex: 0 0 48px;
@@ -17931,7 +17930,18 @@ html body .research-compact-composer .research-question-input:focus-visible {
   overflow: hidden;
 }
 
-.workspace-panel.is-collapsed > :not(.pane-collapsed-tab):not(.pane-collapsed-close) {
+/* Paint the trailing divider when the last collapsed column lacks a resize handle. */
+.panel-track > .is-collapsed:nth-last-child(1 of :is(.workspace-panel, .shared-report-column):not([hidden], .is-workflow-hidden, .is-group-hidden, .is-column-tab-hidden)):not(:has(+ .pane-right-edge-resizer:not([hidden], .is-group-hidden)))::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  inline-size: 1px;
+  background: var(--border);
+  pointer-events: none;
+}
+
+:is(.workspace-panel, .shared-report-column).is-collapsed > :not(.pane-collapsed-tab):not(.pane-collapsed-close) {
   display: none !important;
 }
 
@@ -19624,7 +19634,7 @@ span.reader-collapse-title { cursor: default; line-height: 32px; }
 }
 
 .pane-collapsed-close { display: none; }
-.workspace-panel.is-collapsed > .pane-collapsed-close {
+:is(.workspace-panel, .shared-report-column).is-collapsed > .pane-collapsed-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -19640,7 +19650,7 @@ span.reader-collapse-title { cursor: default; line-height: 32px; }
   background: transparent;
   color: var(--text-secondary);
 }
-.workspace-panel.is-collapsed > .pane-collapsed-tab { padding-top: 56px; }
+:is(.workspace-panel, .shared-report-column).is-collapsed > .pane-collapsed-tab { padding-top: 56px; }
 
 .project-refresh-dialog {
   border: 1px solid var(--border);
@@ -20265,7 +20275,7 @@ dialog.report-export-review {
 :root {
   --header-height: 45px;
   --workspace-secondary-bar-height: 35px;
-  --workspace-sidebar-motion: 260ms cubic-bezier(.2, 0, 0, 1);
+  --workspace-sidebar-motion: 280ms cubic-bezier(.2, 0, 0, 1);
   --workspace-menu-height: 30px;
   --workspace-menu-gap: 6px;
   --workspace-menu-highlight: light-dark(var(--toolbar-active), #252525);
@@ -20276,6 +20286,7 @@ dialog.report-export-review {
 .workspace-shell > .topbar {
   --workspace-menu-height: 44px;
   --workspace-menu-font-size: 14px;
+  --workspace-menu-weight: 500;
   --workspace-menu-icon-size: 15px;
   --workspace-menu-icon-button-width: 38px;
   --workspace-menu-padding-inline: 16px;
@@ -20971,24 +20982,24 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
   inset-inline-start: calc(var(--report-collapsed-rail-width) - var(--panel-padding)); transform: translateX(-100%);
 }
 .report-screen .report-draft-panel .report-document-columns > .report-outline.is-outline-collapsed { position: relative; z-index: 2; overflow: visible; }
-.report-screen .report-outline.is-outline-collapsed :is(.report-outline-introduction, .report-outline-contents) { display: none; }
 .report-screen .report-draft-panel .is-sidebar-toggling .report-document-columns > .report-outline { overflow-x: hidden; }
 .is-sidebar-toggling :is(.report-list-actions, .report-list-items, .report-outline-contents) { box-sizing: border-box; min-inline-size: 300px; }
 .is-sidebar-toggling .report-library > .report-source-picker { box-sizing: border-box; min-inline-size: var(--report-library-width, 300px); }
 
 /* Fade only the contents while the sidebar edge slides past them. */
-:is(.notebook-index-actions, .notebook-index-body, .rv2-history-actions, .rv2-questions, .rv2-sources-body,
+:is(.notebook-index-actions, .notebook-index-body, .rv2-rail > :not(.rv2-rail-header), .rv2-sources-body,
     .report-list-actions, .report-list-items, .report-outline-introduction, .report-outline-contents, .report-library > .report-source-picker) {
-  transition: opacity var(--workspace-sidebar-motion), display var(--workspace-sidebar-motion) allow-discrete;
+  transition: opacity var(--workspace-sidebar-motion), visibility var(--workspace-sidebar-motion);
 }
 :is(.notebook-index-panel[data-notebook-list-collapsed="true"] :is(.notebook-index-actions, .notebook-index-body),
-    .research-v2.is-history-collapsed :is(.rv2-history-actions, .rv2-questions), .rv2-sources-rail.is-collapsed > .rv2-sources-body,
+    .rv2-sources-rail.is-collapsed > .rv2-sources-body,
     .report-list-rail.is-reports-collapsed :is(.report-list-actions, .report-list-items),
     .report-outline.is-outline-collapsed :is(.report-outline-introduction, .report-outline-contents),
-    .report-library.is-sources-collapsed > .report-source-picker) { opacity: 0; pointer-events: none; }
-@starting-style {
-  :is(.notebook-index-actions, .notebook-index-body, .rv2-history-actions, .rv2-questions, .rv2-sources-body,
-      .report-list-actions, .report-list-items, .report-outline-introduction, .report-outline-contents, .report-library > .report-source-picker) { opacity: 0; }
+    .report-library.is-sources-collapsed > .report-source-picker) { opacity: 0; visibility: hidden; pointer-events: none; }
+@media (min-width: 681px) {
+  .research-v2.is-history-collapsed .rv2-rail > :not(.rv2-rail-header) {
+    opacity: 0; visibility: hidden; pointer-events: none;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   :root { --workspace-sidebar-motion: 0ms; }
@@ -21377,14 +21388,17 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 /* Align the brand and status controls with the first row of tools. */
 .workspace-shell > .topbar > .topbar-brand { margin-inline-end: 12px; line-height: 1; }
 .workspace-shell > .topbar .topbar-brand-name { font-size: calc(var(--chrome-font-size) * 1.38); }
+.workspace-shell > .topbar > a.topbar-brand {
+  color: var(--text-primary);
+  pointer-events: auto;
+  text-decoration: none;
+}
+.workspace-shell > .topbar > a.topbar-brand:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
 @media (min-width: 761px) {
-  .workspace-shell > .topbar > .topbar-brand { gap: 12px; margin-inline-end: 0; }
-  .workspace-shell > .topbar > .topbar-brand::after {
-    content: "";
-    flex: 0 0 1px;
-    height: var(--workspace-menu-height);
-    background: var(--border);
-  }
+  .workspace-shell > .topbar > .topbar-brand { margin-inline-end: 12px; }
 }
 .topbar :is(.connection-status, .project-update-badge) { font-size: var(--workspace-menu-font-size); }
 .topbar .project-update-badge { height: var(--workspace-menu-height); min-height: 0; padding-inline: var(--workspace-menu-padding-inline); }
@@ -21403,6 +21417,14 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 /* Keep layout actions at the end of the workspace tools. */
 .workflow-toolbar > [data-workflow-tools] { min-width: 0; }
 .workflow-toolbar .toolbar-button { padding-inline: 8px; }
+.workflow-toolbar :is(.reader-shortcut, #reader-shortcuts > .toolbar-button, [data-workflow-tools] > .toolbar-button) {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  padding-inline: 10px;
+  border: 1px solid transparent;
+  line-height: 1;
+}
+.workspace-shell .workflow-toolbar :is(.reader-shortcut, #reader-shortcuts > .toolbar-button, [data-workflow-tools] > .toolbar-button).has-workspace-button-icon { gap: 8px; }
 .workflow-toolbar > .workflow-layout-actions { margin-inline-start: auto; flex: 0 0 auto; gap: 2px; padding-inline-start: 12px; }
 .workflow-layout-actions > .toolbar-button { width: var(--workspace-menu-icon-button-width); flex: 0 0 var(--workspace-menu-icon-button-width); padding: 0; border: 1px solid transparent; border-radius: var(--radius-pill); }
 .workflow-layout-actions > .toolbar-button:not(:disabled):hover { background: var(--workspace-menu-highlight); }
@@ -21854,26 +21876,110 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .workflow-toolbar > .shared-tool-group {
   flex: 0 0 auto;
   gap: var(--workspace-menu-gap);
-  padding-inline-start: 12px;
-  border-inline-start: 1px solid var(--border);
 }
 .workflow-toolbar > .shared-tool-group[data-workflow-tools="notebook"] { overflow: visible; }
 .note-picker-host:has(.research-note-destination[hidden]) { display: none; }
 
+@property --report-sources-expansion {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --report-outline-expansion {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --report-list-expansion {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --report-total-sidebar-expansion {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --workspace-notes-base {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 80px;
+}
+
+@property --workspace-notes-expansion {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+.panel-track:not([data-notebook-column-sizing]):has(> .notebook-index-panel[data-notebook-list-collapsed="false"]:not(.is-workflow-hidden)) {
+  --workspace-notes-expansion: 220px;
+}
+
+.panel-track:has(> .notebook-index-panel:not(.is-workflow-hidden)) {
+  transition: --workspace-notes-base var(--workspace-sidebar-motion), --workspace-notes-expansion var(--workspace-sidebar-motion);
+}
+
+.panel-track:not([data-notebook-column-sizing]):has(> .notebook-index-panel + .pane-divider + .notebook-panel.is-collapsed) {
+  --workspace-notes-base: 0px;
+  --workspace-notes-expansion: 0px;
+}
+.panel-track:not([data-notebook-column-sizing]) > .notebook-index-panel {
+  overflow: hidden;
+  transition: padding-inline var(--workspace-sidebar-motion), visibility var(--workspace-sidebar-motion);
+}
+.panel-track:not([data-notebook-column-sizing]) > .notebook-index-panel:has(+ .pane-divider + .notebook-panel.is-collapsed) {
+  padding-inline: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.panel-track > .pane-divider[data-previous-pane-id^="project:notes-index:"]:has(+ .notebook-panel.is-collapsed) {
+  display: none;
+}
+
+.notebook-index-list { overflow: hidden; }
+.panel-track:not([data-notebook-column-sizing]) :is(.notebook-index-actions, .notebook-index-body) {
+  min-inline-size: calc(300px - 2 * var(--panel-padding));
+}
+
 .panel-track > .shared-report-column {
   --default-report-width: 1320px;
   --minimum-report-width: 1160px;
-  --shared-report-basis: var(--preferred-report-width, var(--default-report-width));
-  flex: 1 0 min(100%, max(var(--minimum-report-width), var(--shared-report-basis)));
+  flex: 0 0 max(var(--minimum-report-width), var(--workspace-report-width, var(--default-report-width)));
   position: relative;
   min-width: 0;
   border-inline-start: 1px solid var(--border);
 }
-.panel-track > .shared-report-column[data-report-resized] { flex-grow: 0; }
 .panel-track > .shared-report-column[hidden] { display: none; }
 @media (min-width: 761px) {
+  .panel-track:has(> .shared-report-column:not([hidden], .is-collapsed)) {
+    --report-sources-expansion: var(--report-sources-target, 0px);
+    --report-outline-expansion: var(--report-outline-target, 0px);
+    --report-list-expansion: var(--report-list-target, 0px);
+    --report-total-sidebar-expansion: calc(var(--report-sources-expansion) + var(--report-outline-expansion) + var(--report-list-expansion));
+  }
+  .panel-track > .shared-report-column {
+    flex-basis: calc(max(var(--minimum-report-width), var(--workspace-report-width, var(--default-report-width))) + var(--report-total-sidebar-expansion));
+  }
+  .panel-track:has(> .shared-report-column:not([hidden], .is-collapsed) .report-workspace-columns.is-sidebar-toggling) {
+    transition: --workspace-notes-base var(--workspace-sidebar-motion), --workspace-notes-expansion var(--workspace-sidebar-motion), --report-sources-expansion var(--workspace-sidebar-motion),
+      --report-outline-expansion var(--workspace-sidebar-motion), --report-list-expansion var(--workspace-sidebar-motion);
+  }
+  .shared-report-column .report-workspace-columns.is-sidebar-toggling,
+  .shared-report-column .report-workspace-columns.is-sidebar-toggling > .report-document-columns {
+    /* The shared width properties animate the grid and its outer column together. */
+    transition: none;
+  }
+  .shared-report-column :is(.report-list-actions, .report-list-items, .report-outline-contents, .report-library > .report-source-picker) {
+    box-sizing: border-box;
+    min-inline-size: calc(var(--report-collapsed-rail-width) + var(--report-sidebar-extra-width));
+  }
   /* The preceding pane's resize handle already draws this boundary. */
-  .panel-track > .pane-right-edge-resizer ~ .shared-report-column { border-inline-start-width: 0; }
+  .panel-track > .pane-right-edge-resizer + .shared-report-column { border-inline-start-width: 0; }
 }
 .shared-report-column > .report-workspace-divider {
   position: absolute;

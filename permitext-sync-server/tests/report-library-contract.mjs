@@ -12,7 +12,17 @@ class Element {
   hasPointerCapture(id) { return this.capture === id; }
   releasePointerCapture() { this.capture = null; }
 }
-const c = vm.createContext({ document: { createElement: () => new Element() } });
+const frames = new Map();
+let nextFrame = 0;
+const flushFrame = () => {
+  const queued = [...frames.values()];
+  frames.clear();
+  queued.forEach(callback => callback());
+};
+const c = vm.createContext({ document: { createElement: () => new Element() },
+  requestAnimationFrame(callback) { frames.set(++nextFrame, callback); return nextFrame; },
+  cancelAnimationFrame(id) { frames.delete(id); }
+});
 vm.runInContext((await readFile(new URL('../public/report-library.js', import.meta.url), 'utf8')).replaceAll('export function', 'function'), c);
 let widthProperty;
 const panel = { dataset: {}, style: { setProperty: (key, value) => { widthProperty = value; } } };
@@ -46,6 +56,7 @@ outlineControls.divider.events.dblclick();
 assert.equal(panel.dataset.outlineWidth, '300', 'Double-click restores the requested 300px outline');
 outlineControls.divider.events.pointerdown(pointer(3, 300));
 outlineControls.divider.events.pointermove(pointer(3, 520));
+flushFrame();
 assert.equal(panel.dataset.outlineWidth, '520');
 assert.ok(classes.has('is-outline-resizing'));
 outlineControls.divider.events.pointercancel(pointer(3, 520));
@@ -62,6 +73,7 @@ assert.equal(versionControls.header.children.length, 1, 'Versions has no Compact
 versionControls.divider.events.pointerdown(pointer(4, 1400));
 assert.equal(versionControls.divider.focusOptions.preventScroll, true, 'Starting a Versions drag does not scroll its edge away from the pointer');
 versionControls.divider.events.pointermove(pointer(4, 1300));
+flushFrame();
 assert.equal(panel.dataset.versionsWidth, '400', 'The right-hand Versions column expands to the left while dragging its left divider');
 versionControls.divider.events.pointercancel(pointer(4, 1300));
 versionControls.divider.events.pointermove(pointer(4, 1200));
@@ -82,7 +94,10 @@ const {divider} = c.createReportResizeDivider({
   onCommit: () => { commits++; }
 });
 divider.events.pointerdown(pointer(9, 1320));
+divider.events.pointermove(pointer(9, 1100));
 divider.events.pointermove(pointer(9, 900));
+assert.equal(frames.size, 1, "Only the latest pointer position is painted per frame.");
+flushFrame();
 assert.equal(reportWidth, 1740, 'Dragging the Report divider left widens the column.');
 assert.equal(commits, 0, 'Persist the width after the drag ends.');
 divider.events.pointerup(pointer(9, 900));
@@ -107,9 +122,11 @@ assert.equal(reportWidth, 1790);
 right.events.pointerdown(pointer(12, 1900));
 atRightEdge = false;
 right.events.pointermove(pointer(12, 1800));
+flushFrame();
 assert.equal(reportWidth, 1890, 'An inward drag at the screen edge widens Report without reversing mid-drag');
 right.events.pointerup(pointer(12, 1800));
 right.events.pointerdown(pointer(13, 1800));
 right.events.pointermove(pointer(13, 1830));
+flushFrame();
 assert.equal(reportWidth, 1920, 'Away from the screen edge, dragging the right handle right widens Report');
 right.events.pointerup(pointer(13, 1830));

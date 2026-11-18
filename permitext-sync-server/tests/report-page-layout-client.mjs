@@ -31,6 +31,7 @@ const newer = controller.refresh(); pending[1].resolve('Newer pages'); await tic
 assert.equal(await newer, true);
 const pages = () => host.querySelectorAll('.report-pdf-page');
 assert.equal(pages()[0].textContent, 'Newer pages');
+assert.equal(host.children[0].textContent, '', 'The preview status clears when pages are ready.');
 pending[0].resolve('Late old pages'); await tick();
 assert.equal(pages()[0].textContent, 'Newer pages', 'A slower preview cannot replace newer content.');
 

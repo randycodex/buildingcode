@@ -27,10 +27,10 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261117-assistant-rail-alignment-v2504">
+    <link rel="stylesheet" href="/web/styles.css?v=20261118-workspace-home-link-v2531">
     <link rel="stylesheet" href="/web/document-layout.css?v=20">
-    <link rel="stylesheet" href="/web/research-v2.css?v=65">
-    <link rel="stylesheet" href="/web/reader-shortcuts.css?v=23">
+    <link rel="stylesheet" href="/web/research-v2.css?v=67">
+    <link rel="stylesheet" href="/web/reader-shortcuts.css?v=25">
     <link rel="stylesheet" href="/web/workspace-fields.css?v=6">
   </head>
   <body>
@@ -43,9 +43,9 @@
     </main>
     <main class="workspace-shell">
       <header class="topbar">
-        <div class="topbar-brand" aria-label="per codes">
+        <a class="topbar-brand" aria-label="per codes" href="https://per.codes/">
           <span class="topbar-brand-name">per codes</span>
-        </div>
+        </a>
         <nav class="topbar-actions" aria-label="Working views">
           <button class="toolbar-button" id="free-reader" data-open-reader type="button" aria-label="Reader" aria-pressed="true" data-workspace-icon="library-big" hidden><span>Reader</span></button>
           <button class="mobile-more-button" id="mobile-more" type="button" aria-label="More" title="More" aria-haspopup="dialog" aria-expanded="false" data-mobile-label="More">
@@ -84,7 +84,7 @@
           <div class="workflow-layout-actions" role="group" aria-label="Column layout" hidden>
             <button class="toolbar-button" id="collapse-all-columns" type="button" aria-label="Collapse all" title="Collapse all columns" data-workspace-icon="panel-left-close"></button>
             <button class="toolbar-button" id="expand-all-columns" type="button" aria-label="Expand all" title="Expand all columns" data-workspace-icon="panel-left-open"></button>
-            <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset layout" title="Restore default panel widths" data-workspace-icon="rotate-ccw"></button>
+            <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset layout" title="Restore default column sizes and order" data-workspace-icon="rotate-ccw"></button>
           </div>
         </nav>
         <div class="topbar-end">
@@ -587,6 +587,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261117-assistant-rail-alignment-v2504" type="module"></script>
+    <script src="/web/app.js?v=20261118-workspace-home-link-v2531" type="module"></script>
   </body>
 </html>

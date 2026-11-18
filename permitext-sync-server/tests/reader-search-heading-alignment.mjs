@@ -40,7 +40,7 @@ assert.equal(earlierMatch.target, earlierMatch.match, "A heading after the match
 
 // Detail links highlight the exact passage while scrolling a nearby heading
 // clear of the fade. Both Search details and saved Evidence use this reveal.
-vm.runInContext(actual('revealReaderSourceTarget'), context);
+vm.runInContext(['cancelReaderSectionAlignment', 'revealReaderSourceTarget'].map(actual).join('\n'), context);
 for (const preferPassage of [false, true]) for (const height of [240, 600, 1000]) {
   const result = reader({height});
   result.content.scrollTop = 0;

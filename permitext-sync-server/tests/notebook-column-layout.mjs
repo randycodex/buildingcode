@@ -15,21 +15,21 @@ assert.deepEqual(notebookReferenceVisibility({...both,readerOpen:false,available
 for (const width of [1671,1920,3054]) {
  const columns=[{kind:'reader',preferredWidth:900},{kind:'notes'},{kind:'editor'}];
  const sizes=notebookColumnsLayout(columns,width,4);
- assert.equal(sizes.reduce((sum,value)=>sum+value,0)+4,width);
+ assert.equal(sizes.reduce((sum,value)=>sum+value,0)+4,width+220);
  assert.equal(sizes[1],300);assert.ok(sizes[2]>=800);
  assert.equal(columns[0].preferredWidth,900,'Fitting does not change the saved Reader preference.');
 }
-assert.deepEqual(notebookColumnsLayout([{kind:'evidence'},{kind:'notes'},{kind:'editor'}],1671,4),[300,300,1067]);
-assert.deepEqual(notebookColumnsLayout([{kind:'reader',preferredWidth:630},{kind:'evidence'},{kind:'notes'},{kind:'editor'}],3054,5),[630,300,300,1819]);
+assert.deepEqual(notebookColumnsLayout([{kind:'evidence'},{kind:'notes'},{kind:'editor'}],1671,4),[300,300,1287]);
+assert.deepEqual(notebookColumnsLayout([{kind:'reader',preferredWidth:630},{kind:'evidence'},{kind:'notes'},{kind:'editor'}],3054,5),[630,300,300,2039]);
 assert.deepEqual(notebookColumnsLayout([{kind:'reader',collapsed:true},{kind:'notes',collapsed:true},{kind:'editor'}],1671,4),[48,80,1539]);
 for (const kind of ['reader','evidence']) for (const width of [1671,1920,2288,3054]) for (const shared of [0,300,450,600]) {
  const reference={kind,preferredWidth:kind==='reader'?900:600};
  const expanded=notebookColumnsLayout([reference,{kind:'notes'},{kind:'editor'}],width,4,shared);
  const collapsed=notebookColumnsLayout([reference,{kind:'notes',collapsed:true},{kind:'editor'}],width,4,shared);
  assert.equal(collapsed[0],expanded[0],'Toggling Notes cannot redistribute its width into Reader or Evidence.');
- assert.equal(collapsed[2]-expanded[2],220,'Only the notepad receives the space released by Notes.');
+ assert.equal(collapsed[2],expanded[2],'The Notes editor keeps its width.');
 }
-assert.deepEqual(notebookColumnsLayout([{kind:'reader',preferredWidth:900},{kind:'notes',collapsed:true},{kind:'editor'}],1671,4),[567,80,1020]);
+assert.deepEqual(notebookColumnsLayout([{kind:'reader',preferredWidth:900},{kind:'notes',collapsed:true},{kind:'editor'}],1671,4),[787,80,800]);
 
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 function actual(name) {const start=source.indexOf(`function ${name}(`);assert.ok(start>=0,name);
@@ -65,17 +65,17 @@ const fit=()=>context.syncNotebookColumnLayout(panels);
 fit();
 assert.equal(state.notebookEvidenceHidden,true);assert.equal(state.notebookReaderHidden,false);
 assert.equal(state.paneWeights[ids[1]],300,'Old Evidence defaults migrate to 300px only once.');
-assert.deepEqual(widths(),[300,300,1065]);
+assert.deepEqual(widths(),[300,300,1285]);
 const readerGeometry=widths();
 assert.equal(context.minimumPaneWidthForID(ids[0]),300,'A compact Reader can resize without snapping past the page boundary.');
 assert.equal(context.minimumPaneWidthForID(ids[3]),800);
-assert.equal(track.scrollLeft,0,'The Notebook no longer scrolls references underneath the notepad.');
+assert.equal(track.scrollLeft,200,'Layout changes preserve the workspace scroll position.');
 await context.toggleNotebookEvidence();
 assert.equal(state.notebookReaderHidden,true);assert.equal(state.notebookEvidenceHidden,false);
 assert.deepEqual(widths(),readerGeometry,'Swapping changes neither Notes nor the notepad geometry.');
 await context.toggleNotebookEvidence();
 assert.equal(state.notebookReaderHidden,true);assert.equal(state.notebookEvidenceHidden,true);
-assert.deepEqual(widths(),[300,1366]);
+assert.deepEqual(widths(),[300,1586]);
 await context.setNotebookReaderHidden(reader,false);
 assert.equal(state.notebookReaderHidden,false);assert.equal(state.notebookEvidenceHidden,true);
 await context.setNotebookReaderHidden(reader,true);
@@ -84,7 +84,7 @@ track.clientWidth=3054;fit();
 assert.equal(state.notebookReaderHidden,true);assert.equal(state.notebookEvidenceHidden,true,'Widening keeps both closed.');
 await context.setNotebookReaderHidden(reader,false);await context.toggleNotebookEvidence();
 assert.equal(state.notebookReaderHidden,false);assert.equal(state.notebookEvidenceHidden,false);
-assert.deepEqual(widths(),[630,300,300,1817]);
+assert.deepEqual(widths(),[630,300,300,2037]);
 state.paneWeights[ids[1]]=450;fit();assert.equal(widths()[1],450,'Later manual Evidence widths survive the migration.');
 track.clientWidth=1671;fit();
 assert.equal(state.notebookReaderHidden,true);assert.equal(state.notebookEvidenceHidden,false,'Shrinking keeps the last-used Evidence.');
@@ -111,10 +111,10 @@ for (const kind of ['reader','evidence']) {
  state.notebookListHidden=true;fit();const collapsed=widths();
  assert.equal(track.dataset.notebookReferenceMode,'shared','Collapsing Notes must not switch reference modes.');
  assert.equal(collapsed[0],expanded[0],'The live reference keeps its exact width.');
- assert.equal(collapsed[2]-expanded[2],220);
- assert.equal(context.minimumPaneWidthForID(ids[3]),1020,'Resizing a reference reserves space to reopen Notes.');
+ assert.equal(collapsed[2],expanded[2]);
+ assert.equal(context.minimumPaneWidthForID(ids[3]),800,'Reopening the Notes list does not require extra space from the editor.');
  if(kind==='reader') assert.equal(context.maximumPaneWidthForID(ids[0]),600);
- state.notebookListHidden=false;fit();assert.deepEqual(widths(),expanded,'Reopening Notes restores only the notepad geometry.');
+ state.notebookListHidden=false;fit();assert.deepEqual(widths(),expanded,'Reopening Notes restores only the list width.');
 }
 state.notebookListHidden=true;fit();
 assert.deepEqual(panels.map(p=>p.draft),ids.map(id=>`retained ${id}`));

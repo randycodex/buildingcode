@@ -620,8 +620,8 @@ async function main() {
         workspaceScript.text.includes('privateWorkspaceKeys') &&
         workspaceScript.text.includes('function configurePrivateWorkspace(account)') &&
         !workspaceScript.text.includes("toolbarOrderKey") &&
-        !workspaceScript.text.includes("bindToolbarReordering") &&
-        !workspaceScript.text.includes("application/x-permitext-toolbar") &&
+        workspaceScript.text.includes("move: moveWorkspaceColumnShortcut") &&
+        workspaceScript.text.includes("columnOrder: activePaneIDs") &&
         workspaceScript.text.includes("function renderWorkspaceTabs()") &&
         workspaceScript.text.includes("async function switchWorkspace") &&
         workspaceScript.text.includes('function startPaneEdgeResize(event, paneID, edgeSide = "right")') &&
@@ -630,9 +630,9 @@ async function main() {
         workspaceScript.text.includes("virtualClientX += velocity * elapsed / 1000") &&
         workspaceScript.text.includes("Math.min(trackRect.right, window.innerWidth)") &&
         workspaceScript.text.includes("Math.max(trackRect.left, 0)") &&
-        workspaceScript.text.includes('createDivider("", firstPaneID)') &&
+        workspaceScript.text.includes('index <= visiblePanes.length') &&
+        workspaceScript.text.includes('createDivider(previousPaneID, nextPaneID)') &&
         workspaceScript.text.includes('"Resize left edge of first column"') &&
-        workspaceScript.text.includes('createDivider(lastPaneID, "")') &&
         workspaceScript.text.includes('"Resize right edge of last column"') &&
         workspaceScript.text.includes("function renderWorkspaceTransitionState") &&
         workspaceScript.text.includes('track.setAttribute("aria-busy", "true")') &&
@@ -640,7 +640,7 @@ async function main() {
         workspaceScript.text.includes('track.removeAttribute("aria-busy")') &&
         workspaceScript.text.includes("async function closeAllColumns()") &&
         workspaceScript.text.includes("fitColumnsButton.hidden = false") &&
-        workspaceScript.text.includes("fitColumnsButton.disabled = inReport ? !reportReady : !hasColumns") &&
+        workspaceScript.text.includes("fitColumnsButton.disabled = !hasColumns && !reportReady") &&
         workspaceScript.text.includes("label: 'Close all columns'") &&
         workspaceScript.text.includes("disabled: !defaultActivePaneIDs().some(workflowPaneIsVisible)") &&
         workspaceScript.text.includes("async function openDeepLinkedSectionInReader") &&
@@ -951,8 +951,10 @@ async function main() {
         workspaceStyles.text.includes(".project-collaboration-notes-body[hidden]") &&
         !workspaceScript.text.includes("Select saved project items") &&
         !workspaceScript.text.includes("createProjectSectionSelectionController") &&
-        workspaceScript.text.includes('reportRequest("/reports/generate", {') &&
-        workspaceScript.text.includes("await downloadProjectReportFile(projectID,payload.generatedReport.file,activeDraft.title)") &&
+        workspaceScript.text.includes('fetch("/reports/drafts/preview", {') &&
+        workspaceScript.text.includes("unversioned: true") &&
+        workspaceScript.text.includes("await requestDraftPDF(draft)") &&
+        workspaceScript.text.includes('downloadCodeMemoBlob(pdf, `${title}.pdf`)') &&
         workspaceScript.text.includes("function renderFirmStandardsEditor") &&
         workspaceScript.text.includes('postResearch("/organizations/controls/save"') &&
         workspaceScript.text.includes('reportRequest("/reports/options"') &&
@@ -1351,11 +1353,11 @@ async function main() {
         resetColumnWidthsEnd > resetColumnWidthsStart &&
         resetColumnWidthsSource.includes("state.paneWeights[id] = defaultPaneWidthForID(id)") &&
         resetColumnWidthsSource.includes("activePaneIDs().filter(workflowPaneIsVisible)") &&
-        resetColumnWidthsSource.includes("resetReportColumnWidths(panel, syncReferenceReaderLayout)") &&
-        resetColumnWidthsSource.includes("const currentLeft = track.scrollLeft") &&
-        !resetColumnWidthsSource.includes("state.paneOrder") &&
+        resetColumnWidthsSource.includes("resetReportColumnWidths(report, syncReferenceReaderLayout)") &&
+        resetColumnWidthsSource.includes("state.paneOrder = orderedWorkspaceColumnIDs(defaultActivePaneIDs())") &&
+        resetColumnWidthsSource.includes("animateWorkspaceColumnMotion(before, {resize:true})") &&
         !resetColumnWidthsSource.includes("scrollTo({ left: 0"),
-      "Reset must restore open column widths without changing their order or returning the workspace to the first column."
+      "Reset must restore default column widths and order and animate the layout."
     );
     assert(
       workspaceScript.text.includes("paneIDForSectionDetail(searchID),"),
@@ -2103,10 +2105,9 @@ async function main() {
       "Project context guidance should live at the bottom of its active Project Studio rather than in Research Conversation."
     );
     assert(
-      workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel),") &&
-        workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel) *:not(.bn-editor, .bn-editor *) {") &&
-        workspaceStyles.text.includes("font-size: 14px !important;"),
-      "Workspace chrome should use 14px text while keeping Reader text and editable Notebook text independent."
+      workspaceStyles.text.includes("--workspace-menu-font-size: 14px;") &&
+        workspaceStyles.text.includes("font-size: var(--workspace-menu-font-size)"),
+      "The shared toolbar should use the 14px workspace menu font size."
     );
     assert(
       !webRoot.text.includes("settings-code-section-select") &&
@@ -2413,8 +2414,8 @@ async function main() {
       const end = workspaceScript.text.indexOf("\n}", start) + 2;
       assert(start >= 0 && end > start, "Research movement helper is unavailable.");
       let primary = "research:conversation:primary";
-      const grouping = new Function("savedEvidenceColumnGroup", "paneIDForResearchConversation",
-        workspaceScript.text.slice(start, end) + "\nreturn basePaneGroupForMove;")(() => [], () => primary);
+      const grouping = new Function("savedEvidenceColumnGroup", "paneIDForResearchConversation", "currentColumnWorkflowView",
+        workspaceScript.text.slice(start, end) + "\nreturn basePaneGroupForMove;")(() => [], () => primary, () => "research");
       const order = ["utility:analysis", primary, "research:conversation:supplemental"];
       assert(JSON.stringify(grouping("utility:analysis", order)) === JSON.stringify(order.slice(0, 2)) &&
         JSON.stringify(grouping(primary, order)) === JSON.stringify(order.slice(0, 2)),
@@ -2965,7 +2966,7 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes('.connection-status:not([data-state="offline"]):not([data-state="pending"]):not([data-state="conflict"])') &&
-        workspaceStyles.text.match(/@media \(max-width: 760px\)[\s\S]*?\.topbar-account-state \{\s+display: contents;/) &&
+        workspaceStyles.text.match(/@media \(max-width: 760px\)[\s\S]*?\.topbar-end \{\s+display: contents;/) &&
         workspaceStyles.text.includes(".connection-status.is-actionable") &&
         workspaceStyles.text.includes(".connection-status.is-actionable:focus-visible"),
       "Mobile web no longer hides routine Online/Synced status while preserving exceptional sync states."
@@ -3109,7 +3110,7 @@ async function main() {
         workspaceStyles.text.match(/\.reader-to-top \{[\s\S]*?right: var\(--panel-padding\);[\s\S]*?bottom: calc\(var\(--panel-padding\) \+ var\(--space-3\)\);/) &&
         !workspaceScript.text.includes('progress?.setAttribute("aria-valuenow"') &&
         workspaceScript.text.includes('toTopButton.classList.toggle("is-visible", showToTop)') &&
-        workspaceScript.text.includes('content.scrollTo({ top: 0, behavior: "smooth" })') &&
+        workspaceScript.text.includes('content.scrollTo({ top: 0, behavior: "instant" })') &&
         workspaceScript.text.includes('track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates)'),
       "The removed Reader progress line returned or the contextual Back to top control is missing."
     );

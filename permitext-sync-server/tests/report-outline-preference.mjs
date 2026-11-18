@@ -29,11 +29,13 @@ vm.runInContext(['projectSectionExpansionKey', 'projectSectionExpanded', 'persis
 function mountReport(identity, blocks, dataset = {}) {
   const panel = {dataset}, activeDraft = {blocks}, reportSourceGroupExpanded = new Map();
   const outlineLabel = {textContent: 'Outline', replaceChildren() {}};
-  const documents = {classList: {add() {}, remove() {}}};
-  let outlineRailTimer;
+  const outlineBody = {inert: false};
+  const outline = {querySelectorAll: () => [outlineBody]};
+  function transitionReportSidebars() { paintOutlineToggle(); }
   ${source.slice(helpersStart, helpersEnd)}
   ${source.slice(toggleStart, toggleEnd)}
   globalThis.toggle = outlineToggle;
+  panel.outlineBody = outlineBody;
   return panel;
 }`, context);
 const developed = [{kind:'heading'}, {kind:'heading'}];
@@ -41,10 +43,12 @@ let panel = context.mountReport({id:'alpha'}, []);
 assert.equal(panel.dataset.outlineHidden, 'true');
 assert.equal(context.toggle.textContent, 'Outline');
 assert.equal(context.toggle.attributes['aria-expanded'], 'false');
+assert.equal(panel.outlineBody.inert, true);
 assert.equal(saves, 0, 'automatic defaults must not become intentional preferences');
 context.toggle.click();
 assert.equal(panel.dataset.outlineHidden, 'false');
 assert.equal(context.toggle.attributes['aria-expanded'], 'true');
+assert.equal(panel.outlineBody.inert, false);
 assert.equal(context.toggle.textContent, 'Outline');
 context.state = JSON.parse(disk); // Refresh while a different workflow is open.
 panel = context.mountReport({id:'alpha'}, []);

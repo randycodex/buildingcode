@@ -329,7 +329,7 @@ export function createResearchV2View(options) {
   function syncSourcesRail(){
     root.classList.toggle('has-sources',sourcesExpanded);
     sourcesRail.classList.toggle('is-collapsed',!sourcesExpanded);
-    sourcesBody.hidden=!sourcesExpanded;
+    sourcesBody.inert=!sourcesExpanded;
     sourcesToggle.setAttribute('aria-expanded',String(sourcesExpanded));
   }
   function setSourcesExpanded(expanded){

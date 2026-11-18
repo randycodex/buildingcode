@@ -17,7 +17,8 @@ const track = {
   }
 };
 const c = vm.createContext({
-  track, state: {}, localWelcomePreviewPending: false, firstUseWelcomeActive: false,
+  track, state: {}, reportScreen:null, localWelcomePreviewPending: false, firstUseWelcomeActive: false,
+  workspaceProject:()=>null,
   detachedProjectWindow: false, closeActiveCustomSelect() {}, orderPanes: panes => panes,
   activePinnedPaneID: () => '', applyLinkedPanePlacements: ids => ids, pairSavedEvidenceDetails: ids => ids,
   ensureWorkspacePanelAccessibleName() {}, preparePaneCollapse() {events.push('prepare');},
