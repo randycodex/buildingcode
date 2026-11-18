@@ -21345,7 +21345,7 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .workspace-shell .topbar .project-update-badge:not(:disabled):hover { background: var(--workspace-menu-highlight); color: #fff; }
 
 /* Align the brand and status controls with the first row of tools. */
-.workspace-shell > .topbar .topbar-brand { line-height: 1; }
+.workspace-shell > .topbar > .topbar-brand { margin-inline-end: 12px; line-height: 1; }
 .topbar .project-update-badge { height: var(--workspace-menu-height); min-height: 0; }
 .topbar .web-app-update-button { color: #71cf98; width: 30px; padding: 0; }
 .project-update-badge.is-syncing { animation: project-sync-glow 1.4s ease-in-out .35s infinite; }
