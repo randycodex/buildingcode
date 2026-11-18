@@ -21347,6 +21347,15 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 
 /* Align the brand and status controls with the first row of tools. */
 .workspace-shell > .topbar > .topbar-brand { margin-inline-end: 12px; line-height: 1; }
+@media (min-width: 761px) {
+  .workspace-shell > .topbar > .topbar-brand { gap: 12px; margin-inline-end: 0; }
+  .workspace-shell > .topbar > .topbar-brand::after {
+    content: "";
+    flex: 0 0 1px;
+    height: var(--workspace-menu-height);
+    background: var(--border);
+  }
+}
 .topbar .project-update-badge { height: var(--workspace-menu-height); min-height: 0; }
 .topbar .web-app-update-button { color: #71cf98; width: 30px; padding: 0; }
 .project-update-badge.is-syncing { animation: project-sync-glow 1.4s ease-in-out .35s infinite; }
