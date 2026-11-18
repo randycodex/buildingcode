@@ -5,6 +5,7 @@
 .reader-shortcuts[hidden]{display:none}
 .reader-shortcuts:not([hidden])::before{content:"";align-self:center;flex:0 0 1px;height:12px;margin-inline:4px;background:var(--border)}
 .workflow-toolbar #add-reader{--workspace-menu-weight:300;flex:0 0 auto;color:var(--text-secondary)}
+.workflow-toolbar #add-reader:not(:disabled):hover{color:light-dark(var(--text-primary),#fff)}
 .workflow-toolbar .toolbar-button.has-open-column{display:none}
 .workflow-toolbar .reader-shortcut[data-reorderable=true]{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .workflow-toolbar .reader-shortcut.is-dragging{position:relative;z-index:12;cursor:grabbing;will-change:transform}
