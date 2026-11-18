@@ -21843,6 +21843,10 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 }
 .panel-track > .shared-report-column[data-report-resized] { flex-grow: 0; }
 .panel-track > .shared-report-column[hidden] { display: none; }
+@media (min-width: 761px) {
+  /* The preceding pane's resize handle already draws this boundary. */
+  .panel-track > .pane-right-edge-resizer ~ .shared-report-column { border-inline-start-width: 0; }
+}
 .shared-report-column > .report-workspace-divider {
   position: absolute;
   inset: 0 auto 0 -1px;
