@@ -137,14 +137,19 @@ export function createResearchV2View(options) {
     catch(error){if(isCurrent()&&root.isConnected)notice(error.message||'Could not start Research',true);}
     finally{chatTransitionPending=false;if(isCurrent()&&root.isConnected)update();}
   },'rv2-new-chat') : null;
-  const historyTop=node('div','rv2-rail-top-row');
+  const historyHeader=node('header','rv2-rail-header');
   const historyTitle=node('h3','rv2-rail-title');
   const historyToggle=action('Chats',null,'rv2-history-toggle');
   historyTitle.append(historyToggle);
-  historyTop.append(historyTitle);
-  if(newChat)historyTop.append(newChat);
-  if(options.historyManagement?.toolbar)historyTop.append(options.historyManagement.toolbar);
-  rail.append(historyTop);
+  historyHeader.append(historyTitle);
+  rail.append(historyHeader);
+  const historyToolbar=options.historyManagement?.toolbar;
+  if(newChat||historyToolbar){
+    const historyActions=node('div','rv2-history-actions');
+    if(newChat)historyActions.append(newChat);
+    if(historyToolbar)historyActions.append(historyToolbar);
+    rail.append(historyActions);
+  }
   if(options.historyManagement)rail.append(options.historyManagement.element);
   rail.append(list);
   if(options.hasMore&&options.onLoadMore){const more=action('More questions',async()=>{more.disabled=true;try{const page=await options.onLoadMore();if(!isCurrent()||!root.isConnected)return;appendQuestions(page.conversations||[]);more.hidden=!page.hasMore;}catch(error){notice(error.message,true);}finally{more.disabled=false;}},'rv2-text-action');rail.append(more);}
@@ -310,7 +315,7 @@ export function createResearchV2View(options) {
   let selectedCitationID=retainedSources?.selectedCitationID||'',sourcesRequest=null,sourceFocusAnimation=null;
   const sourceRows=new Map();
   const sourcesRail=node('aside','rv2-sources-rail');sourcesRail.setAttribute('aria-label','Answer sources');
-  const sourcesTop=node('header','rv2-sources-top-row');
+  const sourcesHeader=node('header','rv2-rail-header rv2-sources-header');
   const sourcesTitle=node('h3','rv2-rail-title');
   const sourcesBody=node('div','rv2-sources-body');
   sourcesBody.setAttribute('aria-live','polite');
@@ -320,7 +325,7 @@ export function createResearchV2View(options) {
     setSourcesExpanded(true);
   },'rv2-sources-toggle');
   sourcesTitle.append(sourcesToggle);
-  sourcesTop.append(sourcesTitle);sourcesRail.append(sourcesTop,sourcesBody);
+  sourcesHeader.append(sourcesTitle);sourcesRail.append(sourcesHeader,sourcesBody);
   function syncSourcesRail(){
     root.classList.toggle('has-sources',sourcesExpanded);
     sourcesRail.classList.toggle('is-collapsed',!sourcesExpanded);
