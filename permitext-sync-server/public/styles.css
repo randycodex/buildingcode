@@ -20275,7 +20275,7 @@ dialog.report-export-review {
 .workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: auto auto minmax(0, 1fr); }
 .workspace-shell > .topbar {
   --workspace-menu-height: 44px;
-  --workspace-menu-font-size: 15px;
+  --workspace-menu-font-size: 14px;
   --workspace-menu-icon-size: 15px;
   --workspace-menu-icon-button-width: 38px;
   --workspace-menu-padding-inline: 16px;
