@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-report-resize-v2474";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-report-sources-v2475";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -56,8 +56,8 @@ import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261116-assist
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout, notebookReferenceVisibility } from "./workflow-views.js?v=26";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
-import { createReportLibraryControls, createReportResizeDivider, createReportVersionsControls } from "./report-library.js?v=20261117-report-resize-v13";
-import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261117-report-resize-v27";
+import { createReportResizeDivider, createReportVersionsControls } from "./report-library.js?v=20261117-report-resize-v14";
+import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261117-report-sources-v28";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261115-reports-rail-v6";
 import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportBlockUsesSource, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261114-report-source-toggle-v9";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-report-resize-v2474";
+} from "./offline-storage.js?v=20261117-report-sources-v2475";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4041,8 +4041,8 @@ async function openProjectReportDraft(project, {resume = null} = {}) {
   const paneID = paneIDForProjectReportDraft(identity);
   const defaultWidth = () => parseFloat(getComputedStyle(column).getPropertyValue("--default-report-width"));
   const maximumWidth = () => track.clientWidth || defaultWidth();
-  // Allow room for the three open rails, the editor, and the two dividers.
-  const minimumDesktopWidth = 1162;
+  // Allow room for the three open rails, the editor, and the outside border.
+  const minimumDesktopWidth = 1161;
   const minimumWidth = () => Math.min(maximumWidth(), minimumDesktopWidth);
   const setReportWidth = width => {
     column.style.setProperty("--preferred-report-width", `${width}px`);
@@ -33908,7 +33908,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const naturalWidth = (parseFloat(getComputedStyle(panel).getPropertyValue('--document-printable-width')) || 672) + 56;
     const availableWidth = shell.clientWidth - outlineRailWidth(panel.dataset.outlineHidden === 'true') -
       reportsRailWidth(panel.dataset.reportsHidden === 'true') -
-      (panel.dataset.libraryOpen === 'true' ? (Number(panel.dataset.libraryWidth) || 330) + 1 : reportOutlineRailWidth(true));
+      (panel.dataset.libraryOpen === 'true' ? Number(panel.dataset.libraryWidth) || 330 : reportOutlineRailWidth(true));
     return Math.max(320, Math.min(naturalWidth, availableWidth));
   };
   const ensureComparison = () => comparisonController ||= createReportComparison({
@@ -33916,7 +33916,7 @@ async function renderProjectReportDraft(project, resume = null) {
     availableWidth: () => shell.querySelector(".report-workspace-columns")?.clientWidth || 0,
     outlineWidth: () => reportOutlineRailWidth(panel.dataset.outlineHidden === 'true'),
     reportsWidth: () => reportOutlineRailWidth(panel.dataset.reportsHidden === 'true'),
-    minimumReportWidth: documentMinimumWidth, outlineDivider: false,
+    minimumReportWidth: documentMinimumWidth, outlineDivider: false, sourcesDivider: false,
     isCurrent: () => !disposed && panel.isConnected && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
     onResize: () => { panel._updateReportColumns?.(); if (panel.isConnected) syncReferenceReaderLayout(); }
   });
@@ -35224,13 +35224,11 @@ async function renderProjectReportDraft(project, resume = null) {
     library.className = "report-library";
     library.setAttribute("aria-label", "Report sources");
     const availableSidebarWidth = () => Math.min(shell.clientWidth || Infinity, document.querySelector('.workspace-shell')?.clientWidth || Infinity);
-    const libraryControls = createReportLibraryControls({
-      panel, shell, library,
-      availableWidth: availableSidebarWidth, documentMinimumWidth,
-      reservedWidth: () => outlineRailWidth(panel.dataset.outlineHidden === 'true') + reportsRailWidth(panel.dataset.reportsHidden === 'true') +
-        (panel.dataset.comparisonOpen === 'true' ? (panel.dataset.versionsCollapsed === 'true' ? 48 : Number(panel.dataset.versionsWidth) || 300) + 1 : 0),
-      onResize: syncReferenceReaderLayout
-    });
+    const sourcesHeader = document.createElement("header");
+    sourcesHeader.className = "report-library-header report-outline-rail-header";
+    const sourcesTitle = document.createElement("h2");
+    sourcesTitle.textContent = "Sources";
+    sourcesHeader.append(sourcesTitle);
     const outlineHeader = document.createElement('header');
     outlineHeader.className = 'report-outline-header report-outline-rail-header';
     const outlineLabel = outline.querySelector('h2');
@@ -35238,11 +35236,11 @@ async function renderProjectReportDraft(project, resume = null) {
     sourcePicker.setAttribute("aria-label", "Report sources");
     sourcePicker.addEventListener("scroll", () => { reportLibraryScroll.sources = sourcePicker.scrollTop; }, {passive: true});
     sourcePicker.scrollTop = reportLibraryScroll.sources;
-    library.append(libraryControls.header, sourcePicker);
+    library.append(sourcesHeader, sourcePicker);
     const versionsControls = createReportVersionsControls({
       panel, shell, versions: comparison.versions, availableWidth: () => shell.clientWidth,
       reservedWidth: () => outlineRailWidth(panel.dataset.outlineHidden === 'true') + reportsRailWidth(panel.dataset.reportsHidden === 'true') +
-        (panel.dataset.libraryOpen === "true" ? (Number(panel.dataset.libraryWidth) || 330) + 1 : 0),
+        (panel.dataset.libraryOpen === "true" ? Number(panel.dataset.libraryWidth) || 330 : reportOutlineRailWidth(true)),
       onResize: gesture => comparison.resizeVersions(gesture)
     });
     const versionsTitle = document.createElement("button");
@@ -35260,7 +35258,7 @@ async function renderProjectReportDraft(project, resume = null) {
     versionsControls.header.querySelector("h2").replaceChildren(versionsTitle);
     comparison.versions.querySelector(".report-versions-header")?.remove();
     comparison.versions.prepend(versionsControls.header);
-    panel._reportSidebarControls = [libraryControls, versionsControls, comparison];
+    panel._reportSidebarControls = [versionsControls, comparison];
     const sourcesToggle = document.createElement("button");
     sourcesToggle.type = "button";
     sourcesToggle.className = "icon-button report-outline-toggle";
@@ -35281,8 +35279,7 @@ async function renderProjectReportDraft(project, resume = null) {
       panel.dataset.libraryOpen = String(panel.dataset.libraryOpen !== "true");
       syncReferenceReaderLayout();
     });
-    libraryControls.header.classList.add("report-outline-rail-header");
-    libraryControls.header.append(sourcesToggle);
+    sourcesHeader.append(sourcesToggle);
     if (panel.dataset.outlineHidden === undefined) {
       panel.dataset.outlineHidden = String(!reportSectionExpanded("Outline column", !initialReportOutlineHidden(activeDraft.blocks)));
     }
@@ -35330,7 +35327,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const writingHeader = document.createElement('header'); writingHeader.className = 'report-writing-header';
     const writingTitle = document.createElement('h2'); writingTitle.textContent = 'Report'; writingHeader.append(writingTitle);
     retainReportChildren(documents, writingHeader, outline, documentBody, reportsRail, comparison.divider, comparison.preview);
-    retainReportChildren(columns, library, libraryControls.divider, documents, versionsControls.divider, comparison.versions);
+    retainReportChildren(columns, library, documents, versionsControls.divider, comparison.versions);
     panel._updateReportColumns = () => {
       if (!shell.clientWidth || disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
       versionsToggle.hidden = !showSavedVersions || history.length === 0;
@@ -35344,7 +35341,7 @@ async function renderProjectReportDraft(project, resume = null) {
       const available = Math.min(columns.clientWidth || availableSidebarWidth(), availableSidebarWidth());
       const layout = reportComparisonLayout(available - sourceRailWidth, {
         sources: sourceWidth, outline: outlineWidth, reports: reportsRailWidth(panel.dataset.reportsHidden === 'true'), comparing, previewing,
-        minimumReportWidth: documentMinimumWidth(), outlineDivider: false, compactEditor: !comparing,
+        minimumReportWidth: documentMinimumWidth(), outlineDivider: false, sourcesDivider: false, compactEditor: !comparing,
         versions: collapsedVersions ? 48 : Number(panel.dataset.versionsWidth) || 300,
         reportWidth: Number(panel.dataset.reportComparisonWidth) || 0,
         pdfWidth: Number(panel.dataset.pdfComparisonWidth) || 0
@@ -35364,7 +35361,6 @@ async function renderProjectReportDraft(project, resume = null) {
           documents.style.gridTemplateColumns = layout.documentTemplate;
         });
       }
-      libraryControls.divider.hidden = !sourceWidth;
       paintSourcesToggle(Boolean(sourceWidth));
       outline.hidden = false; outline.classList.toggle('is-outline-collapsed', outlineCollapsed);
       comparison.preview.hidden = comparison.divider.hidden = !previewing;
@@ -35375,7 +35371,7 @@ async function renderProjectReportDraft(project, resume = null) {
       versionsTitle.setAttribute("aria-label", `${collapsedVersions ? "Expand" : "Collapse"} Versions list`);
       versionsToggle.setAttribute("aria-pressed", String(comparing));
       paintOutlineToggle(); paintReportsToggle();
-      libraryControls.update(); versionsControls.update();
+      versionsControls.update();
     };
     panel._columnExpansion?.dispose();
     retainReportChildren(shell, status, primaryActions, columns);

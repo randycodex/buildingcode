@@ -96,11 +96,6 @@ export function createReportResizeDivider({shell, element, kind, label, defaultW
   return { divider, update: updateControls };
 }
 
-export function createReportLibraryControls(options) {
-  return createReportSidebarControls({ ...options, element: options.library, kind: 'library',
-    label: 'Sources', defaultWidth: 330, minimumWidth: 300 });
-}
-
 export function createReportOutlineControls(options) {
   return createReportSidebarControls({ ...options, element: options.outline, kind: 'outline',
     label: 'Outline', defaultWidth: 300, minimumWidth: 300 });

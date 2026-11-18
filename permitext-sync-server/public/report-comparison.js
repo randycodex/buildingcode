@@ -13,15 +13,17 @@ export function preserveReportReadingPosition(container, change) {
 export function reportOutlineRailWidth(collapsed) { return collapsed ? 35 : 300; }
 
 export function reportComparisonLayout(available, { sources = 0, outline = 0, reports = 0, versions = 300,
-  comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0, minimumReportWidth = 600, outlineDivider = true, compactEditor = false } = {}) {
+  comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0, minimumReportWidth = 600,
+  outlineDivider = true, sourcesDivider = true, compactEditor = false } = {}) {
   const reportMinimum = Math.max(compactEditor ? 320 : 600, minimumReportWidth);
   const showPDF = comparing && previewing;
   const minimumSources = sources ? 300 : 0;
   sources = Math.max(minimumSources, sources);
   const minimumVersions = comparing ? Math.min(300, versions) : 0;
   const fixedRails = reports + (compactEditor ? outline + Number(outline > 0 && outlineDivider) : 0);
+  const sourceDividerWidth = Number(sources > 0 && sourcesDivider);
   const sidebarBudget = Math.max(minimumSources + minimumVersions,
-    available - reportMinimum - fixedRails - Number(sources > 0) - Number(comparing));
+    available - reportMinimum - fixedRails - sourceDividerWidth - Number(comparing));
   const requestedVersions = comparing ? versions : 0;
   if (sources + requestedVersions > sidebarBudget) {
     const extra = sidebarBudget - minimumSources - minimumVersions;
@@ -30,13 +32,13 @@ export function reportComparisonLayout(available, { sources = 0, outline = 0, re
     versions = Math.min(requestedVersions, sidebarBudget - sources);
   }
   const sidebars = sources + outline + reports + (comparing ? versions : 0);
-  const dividers = Number(sources > 0) + Number(outline > 0 && outlineDivider) + Number(comparing) + Number(showPDF);
+  const dividers = sourceDividerWidth + Number(outline > 0 && outlineDivider) + Number(comparing) + Number(showPDF);
   const pairWidth = Math.max(reportMinimum + 600, available - sidebars - dividers);
   const chosenReport = reportWidth ? Math.max(reportMinimum, reportWidth) : 0;
   const chosenPDF = pdfWidth ? Math.max(600, pdfWidth) : 0;
   return {
     sourcesWidth: sources, versionsWidth: comparing ? versions : 0,
-    template: [sources ? `${sources}px` : '0px', sources ? '1px' : '0px',
+    template: [`${sources}px`, `${sourceDividerWidth}px`,
       'minmax(0, 1fr)', comparing ? '1px' : '0px', comparing ? `${versions}px` : '0px'].join(' '),
     documentTemplate: [outline ? `${outline}px` : '0px', outline && outlineDivider ? '1px' : '0px',
       showPDF && chosenReport ? `${chosenReport}px` : `minmax(${reportMinimum}px, 1fr)`,
@@ -77,7 +79,7 @@ export function resetReportColumnWidths(panel, onResize) {
 export function createReportComparison({ panel, columns, isCurrent, onResize,
   availableWidth = () => columns()?.clientWidth || 0,
   outlineWidth = () => panel.dataset.outlineHidden === 'true' ? 0 : Number(panel.dataset.outlineWidth) || 300,
-  minimumReportWidth = () => 600, reportsWidth = () => 0, outlineDivider = true,
+  minimumReportWidth = () => 600, reportsWidth = () => 0, outlineDivider = true, sourcesDivider = true,
   renderReview = openReportExportReview }) {
   const reportMinimum = () => Math.max(600, minimumReportWidth());
   const preview = document.createElement('section');
@@ -142,7 +144,7 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
   divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to balance';
   const balancedWidth = () => reportComparisonLayout(availableWidth(), {
     sources: panel.dataset.libraryOpen === 'true' ? Number(panel.dataset.libraryWidth) || 330 : 0,
-    outline: outlineWidth(), reports: reportsWidth(), minimumReportWidth: reportMinimum(), outlineDivider,
+    outline: outlineWidth(), reports: reportsWidth(), minimumReportWidth: reportMinimum(), outlineDivider, sourcesDivider,
     versions: panel.dataset.versionsCollapsed === 'true' ? 48 : Number(panel.dataset.versionsWidth) || 300, comparing: true
   }).balancedDocumentWidth;
   const widths = () => ({
