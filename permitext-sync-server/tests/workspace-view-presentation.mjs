@@ -124,5 +124,5 @@ const css=await readFile(new URL('../public/styles.css',import.meta.url),'utf8')
 assert.match(css,/html\[data-workflow-presenting\]::view-transition-old\(root\) \{ display: none; \}/);
 assert.match(css,/html\[data-workflow-presenting\]::view-transition-new\(root\) \{ mix-blend-mode: normal; \}/);
 assert.match(app,/presentWorkingView\(button.dataset.workflowView,/);
-assert.match(app,/tool === "facts" \? toggleProjectInformation\(tool\) : toggleProjectTool\(tool\)/, 'Report opens as a tool without a working-view transition');
+assert.match(app,/tool === "facts" \? toggleProjectInformation\(tool\) : openOrRevealProjectTool\(tool\)/, 'Report opens as a tool without a working-view transition');
 console.log('Working-view presentation passed: ready editors/sources, one no-fade handoff, rapid latest selection, context cleanup, failure, chooser and browser fallback.');

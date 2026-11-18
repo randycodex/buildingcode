@@ -1,4 +1,4 @@
-export const webAppVersion = "20261117-topbar-brand-gap-v2485";
+export const webAppVersion = "20261117-reveal-workspace-columns-v2487";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

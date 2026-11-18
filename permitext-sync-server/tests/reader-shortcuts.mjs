@@ -61,8 +61,8 @@ shortcuts.dispose();assert.equal(host.children.length,0);assert.equal(doc.body.q
 
 // Exercise the real app navigation against retained Reader state and animations.
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
-const start=source.indexOf('async function revealReaderShortcut('), end=source.indexOf('\n}',start)+2;
-let active='reader:exact', current=true, collapsed=true, groupCollapsed=true, reduced=false;
+const start=source.indexOf('async function revealWorkspacePane('), end=source.indexOf('\n}',start)+2;
+let active='reader:exact', current=true, collapsed=true, groupCollapsed=true;
 let finish;const finished=new Promise(resolve=>finish=resolve), calls=[];
 const original={sectionID:'1012',internalSearchQuery:'slope',scrollTop:730,selection:'selected passage'};
 let strip=true;
@@ -70,24 +70,24 @@ const panel={dataset:{paneId:'reader:exact'},classList:{contains:()=>strip},_col
 const group={paneIDs:['reader:exact'],get collapsed(){return groupCollapsed;}};
 const c=vm.createContext({Promise,CSS:{escape:x=>x},activeWorkspaceID:'A',currentColumnWorkflowView:()=> 'research',
   captureAccountRequest:()=>({}),isCurrentAccountRequest:()=>current,workflowPaneIsVisible:()=>true,
-  readerShortcuts:{activePaneID:()=>active},track:{querySelector:()=>panel,querySelectorAll:()=>[panel]},
+  track:{querySelector:()=>panel,querySelectorAll:()=>[panel]},
   columnGroupForPane:()=>group,columnGroupIsCollapsed:()=>groupCollapsed,
   setColumnGroupCollapsed(_group,value){calls.push('group');groupCollapsed=value;},
   paneIsCollapsed:()=>collapsed,setPaneCollapsed(_panel,value){calls.push('expand');collapsed=value;},
   columnExpansionController:()=>({reveal:n=>{assert.equal(n,panel);strip=false;calls.push('reveal');}}),
-  window:{matchMedia:()=>({matches:reduced})},scrollPaneIntoView:(id,behavior)=>calls.push({id,behavior})});
-vm.runInContext(`let readerShortcutNavigationGeneration=0;${source.slice(start,end)}`,c);
-const opening=c.revealReaderShortcut('reader:exact');
-assert.deepEqual(calls,['group','expand','reveal',{id:'reader:exact',behavior:'smooth'}]);
+  scrollPaneIntoView:id=>calls.push({id})});
+vm.runInContext(`let workspaceColumnNavigationGeneration=0;${source.slice(start,end)}`,c);
+const revealShortcut = () => c.revealWorkspacePane('reader:exact', () => active === 'reader:exact');
+const opening=revealShortcut();
+assert.deepEqual(calls,['group','expand','reveal',{id:'reader:exact'}]);
 finish();await opening;
-assert.deepEqual(calls.at(-1),{id:'reader:exact',behavior:'smooth'});
+assert.deepEqual(calls.at(-1),{id:'reader:exact'});
 assert.deepEqual(original,{sectionID:'1012',internalSearchQuery:'slope',scrollTop:730,selection:'selected passage'},'Navigation leaves Reader state intact.');
-reduced=true;calls.length=0;await c.revealReaderShortcut('reader:exact');assert.equal(calls.at(-1).behavior,'instant');
 let finishStale;panel._collapseAnimation={finished:new Promise(resolve=>finishStale=resolve)};
-calls.length=0;const stale=c.revealReaderShortcut('reader:exact');c.activeWorkspaceID='B';finishStale();await stale;
+calls.length=0;const stale=revealShortcut();c.activeWorkspaceID='B';finishStale();await stale;
 assert.equal(calls.filter(v=>typeof v==='object').length,1,'A completion from the previous Project cannot scroll the new Project.');
-c.activeWorkspaceID='A';active='reader:other';calls.length=0;await c.revealReaderShortcut('reader:exact');assert.equal(calls.length,0,'A superseded shortcut cannot navigate.');
-console.log('Reader shortcuts passed: editions/fallbacks, duplicates, exact instances, retained controls, direct activity, tooltip, project isolation, narrow tooltip, collapse/animation continuation and reduced motion.');
+c.activeWorkspaceID='A';active='reader:other';calls.length=0;await revealShortcut();assert.equal(calls.length,0,'A superseded shortcut cannot navigate.');
+console.log('Reader shortcuts passed: editions/fallbacks, duplicates, exact instances, retained controls, direct activity, tooltip, project isolation, narrow tooltip and collapse/animation continuation.');
 
 // Open menus can retain a group object from before column reconciliation.
 const groupStart=source.indexOf('function setColumnGroupCollapsed('), groupEnd=source.indexOf('\n}',groupStart)+2;
