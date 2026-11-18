@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-column-widths-v2490";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-report-rail-alignment-v2491";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-column-widths-v2490";
+} from "./offline-storage.js?v=20261117-report-rail-alignment-v2491";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -34965,10 +34965,12 @@ async function renderProjectReportDraft(project, resume = null) {
     draftPicker.append(pageTitleEditor); pageFields.set('__title',{element:pageTitleEditor,size:28});
     const reportsRail = document.createElement('aside'); reportsRail.className = 'report-list-rail';
     reportsRail.setAttribute('aria-label', 'Project reports');
-    const reportsTopRow = document.createElement('header');
-    reportsTopRow.className = 'report-list-top-row report-rail-header';
+    const reportsHeader = document.createElement('header');
+    reportsHeader.className = 'report-rail-header';
     const reportsTitle = document.createElement('h2');
     const reportsToggle = createReportRailTitle(reportsTitle, 'Reports');
+    const reportActions = document.createElement('div');
+    reportActions.className = 'report-list-actions';
     const createNew = document.createElement('button'); createNew.type = 'button'; createNew.className = 'report-list-create';
     createNew.textContent = 'New report +'; createNew.setAttribute('aria-label','New report');
     createNew.addEventListener('click', () => {void reportSwitch.select('__new__');});
@@ -34979,7 +34981,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const paintReportsToggle = () => {
       const shown = panel.dataset.reportsHidden !== 'true';
       reportsRail.classList.toggle('is-reports-collapsed',!shown);
-      createNew.hidden = deleteButton.hidden = reportOptions.hidden = !shown;
+      reportActions.hidden = reportOptions.hidden = !shown;
       reportsToggle.setAttribute('aria-expanded',String(shown));
     };
     reportsToggle.addEventListener('click', () => {
@@ -34989,8 +34991,9 @@ async function renderProjectReportDraft(project, resume = null) {
       reportsRailTimer = setTimeout(() => documents.classList.remove('is-reports-toggling'),220);
       paintReportsToggle(); syncReferenceReaderLayout();
     });
-    reportsTopRow.append(createNew,deleteButton,reportsTitle);
-    reportsRail.append(reportsTopRow,reportOptions);
+    reportsHeader.append(reportsTitle);
+    reportActions.append(createNew,deleteButton);
+    reportsRail.append(reportsHeader,reportActions,reportOptions);
     refreshReportList = () => {
       reportOptions.replaceChildren();
       const available = activeDraft.id ? drafts : [activeDraft,...drafts];

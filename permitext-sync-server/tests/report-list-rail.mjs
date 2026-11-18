@@ -29,10 +29,16 @@ const c=vm.createContext({document:{createElement:()=>new Element()},panel:{data
   clearTimeout(){},setTimeout:()=>1,syncReferenceReaderLayout:()=>resizes++});
 vm.runInContext(`${app.slice(titleStart,titleEnd+2)}
   function build(){${app.slice(start,end)}
-  return {rail:reportsRail,options:reportOptions,toggle:reportsToggle,create:createNew};}
+  return {rail:reportsRail,header:reportsHeader,actions:reportActions,options:reportOptions,toggle:reportsToggle,create:createNew};}
   globalThis.list=build();`,c);
 const {list}=c;
 assert.equal(list.rail.attributes['aria-label'],'Project reports');
+assert.equal(list.rail.children[0],list.header);
+assert.equal(list.header.children.length,1,'Reports is the only control on the heading row.');
+assert.equal(list.rail.children[1],list.actions);
+assert.equal(list.actions.children[0],list.create);
+assert.equal(list.actions.children[1],c.deleteButton);
+assert.equal(list.rail.children[2],list.options);
 assert.equal(list.options.children.length,2);
 assert.equal(list.options.children[0].attributes['aria-current'],'true');
 list.options.children[0].events.click();assert.equal(cancels,1);
@@ -42,11 +48,13 @@ list.toggle.events.click();
 assert.equal(c.panel.dataset.reportsHidden,'true');assert.equal(list.options.hidden,true);
 assert.equal(list.toggle.textContent,'Reports');
 assert.equal(list.toggle.attributes['aria-expanded'],'false');
-assert.equal(c.deleteButton.hidden,true);
+assert.equal(list.actions.hidden,true);
+assert.equal(list.header.hidden,false);
 list.toggle.events.click();
 assert.equal(c.panel.dataset.reportsHidden,'false');assert.equal(list.options.hidden,false);
 assert.equal(list.toggle.textContent,'Reports');
 assert.equal(list.toggle.attributes['aria-expanded'],'true');
+assert.equal(list.actions.hidden,false);
 assert.equal(resizes,2);assert.deepEqual(preferences,[['Reports column',false],['Reports column',true]]);
 c.activeDraft={...current,title:'Renamed report'};c.refreshReportList();
 assert.equal(list.options.children[0].textContent,'Renamed report');
