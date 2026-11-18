@@ -1,4 +1,4 @@
-export const webAppVersion = "20261117-report-rail-titles-v2482";
+export const webAppVersion = "20261117-report-title-alignment-v2484";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

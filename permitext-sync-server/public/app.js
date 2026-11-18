@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-report-rail-titles-v2482";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-report-title-alignment-v2484";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -57,7 +57,7 @@ import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, 
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
 import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
 import { createReportResizeDivider, createReportVersionsControls } from "./report-library.js?v=20261117-report-resize-v14";
-import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261117-report-rail-titles-v29";
+import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261117-report-title-alignment-v30";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261115-reports-rail-v6";
 import { appendFindingTemplate, normalizeProjectQuestions, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportBlockUsesSource, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261114-report-source-toggle-v9";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-report-rail-titles-v2482";
+} from "./offline-storage.js?v=20261117-report-title-alignment-v2484";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -34956,7 +34956,7 @@ async function renderProjectReportDraft(project, resume = null) {
       reportsRailTimer = setTimeout(() => documents.classList.remove('is-reports-toggling'),220);
       paintReportsToggle(); syncReferenceReaderLayout();
     });
-    reportsTopRow.append(reportsTitle,createNew,deleteButton);
+    reportsTopRow.append(createNew,deleteButton,reportsTitle);
     reportsRail.append(reportsTopRow,reportOptions);
     refreshReportList = () => {
       reportOptions.replaceChildren();

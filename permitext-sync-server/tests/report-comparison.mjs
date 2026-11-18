@@ -4,7 +4,7 @@ import {reportComparisonLayout, reportOutlineRailWidth, createReportComparison, 
 for (const available of [1100, 1671, 2288]) {
   for (const collapsed of [false, true]) {
     const rail = reportOutlineRailWidth(collapsed);
-    assert.equal(rail, collapsed ? 64 : 300);
+    assert.equal(rail, collapsed ? 72 : 300);
     const layout = reportComparisonLayout(available, {sources: 300, outline: rail,
       minimumReportWidth: 728, outlineDivider: false});
     assert.equal(layout.sourcesWidth, 300, 'Collapsing Outline leaves the independent Sources column at its chosen width');
@@ -14,7 +14,7 @@ for (const available of [1100, 1671, 2288]) {
       minimumReportWidth: 728, outlineDivider: false, comparing: true});
     assert.equal(compared.documentTemplate, `${rail}px 0px minmax(728px, 1fr) 1px minmax(600px, 1fr)`);
     assert.equal(compared.versionsWidth, 300, 'The outline rail keeps saved PDF versions available');
-    for (const reports of [300,64]) {
+    for (const reports of [300,72]) {
       const listed=reportComparisonLayout(available,{sources:300,outline:rail,reports,
         minimumReportWidth:728,outlineDivider:false});
       assert.equal(listed.documentTemplate,`${rail}px 0px minmax(728px, 1fr) ${reports}px 0px 0px`,
@@ -296,7 +296,7 @@ const railComparison = createReportComparison({panel: railPanel, columns: () => 
 railComparison.divider.events.keydown({key: 'Home', preventDefault() {}});
 assert.equal(railPanel.dataset.reportComparisonWidth, '728', 'PDF resizing preserves the printable editor minimum');
 railComparison.divider.events.keydown({key: 'End', preventDefault() {}});
-assert.equal(Number(railPanel.dataset.reportComparisonWidth), 816.5,
+assert.equal(Number(railPanel.dataset.reportComparisonWidth), 812.5,
   'Balancing leaves room for the collapsed Outline title');
 railPanel.dataset.outlineHidden = 'false';
 railComparison.divider.events.keydown({key: 'End', preventDefault() {}});
