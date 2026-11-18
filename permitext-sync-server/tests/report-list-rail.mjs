@@ -23,13 +23,13 @@ let resizes=0,cancels=0;
 const current={id:'one',title:'First report'},other={id:'two',title:'Second report'};
 const c=vm.createContext({document:{createElement:()=>new Element()},panel:{dataset:{}},
   activeDraft:current,drafts:[current,other],recoveredDrafts:[],reportLibraryScroll:{reports:0},
-  deleteButton:new Element(),documents:new Element(),reportsRailTimer:null,refreshReportList:null,
+  deleteButton:new Element(),refreshReportList:null,
   reportSectionExpanded:()=>true,persistReportSectionExpanded:(key,value)=>preferences.push([key,value]),
   reportSwitch:{select:async id=>selections.push(id),cancel:()=>cancels++},
-  clearTimeout(){},setTimeout:()=>1,syncReferenceReaderLayout:()=>resizes++});
+  transitionReportSidebars(){resizes++;c.list.paintReportsToggle();}});
 vm.runInContext(`${app.slice(titleStart,titleEnd+2)}
   function build(){${app.slice(start,end)}
-  return {rail:reportsRail,header:reportsHeader,actions:reportActions,options:reportOptions,toggle:reportsToggle,create:createNew};}
+  return {rail:reportsRail,header:reportsHeader,actions:reportActions,options:reportOptions,toggle:reportsToggle,create:createNew,paintReportsToggle};}
   globalThis.list=build();`,c);
 const {list}=c;
 assert.equal(list.rail.attributes['aria-label'],'Project reports');

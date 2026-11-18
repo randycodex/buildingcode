@@ -136,6 +136,7 @@ const firstMotion = motion.transitionNotebookList(()=>{updates++;widths=[80,1200
 await Promise.resolve();
 assert.equal(motions.length,2,'Only the two live columns animate; the heading stays anchored.');
 assert.equal(motions[0].frames[0].flexBasis,'280px');assert.equal(motions[0].frames[1].flexBasis,'80px');
+assert(motions.every(animation=>animation.frames.every(frame=>frame.minWidth==='0px')),'Expanded minimum widths cannot block the width animation.');
 // A quick reversal starts from the pixels currently on screen, before the
 // previous animation is cancelled back to its underlying final geometry.
 widths=[150,1130];padding='11px';

@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-toolbar-overflow-v2499";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-sidebar-motion-v2501";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-toolbar-overflow-v2499";
+} from "./offline-storage.js?v=20261117-sidebar-motion-v2501";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3318,8 +3318,8 @@ async function transitionNotebookList(update) {
       if (!panel.isConnected) return;
       const style = getComputedStyle(panel);
       animate(panel, [
-        {flexBasis:`${width}px`, paddingInlineStart, paddingInlineEnd},
-        {flexBasis:`${panel.getBoundingClientRect().width}px`, paddingInlineStart:style.paddingInlineStart, paddingInlineEnd:style.paddingInlineEnd}
+        {flexBasis:`${width}px`, minWidth:'0px', paddingInlineStart, paddingInlineEnd},
+        {flexBasis:`${panel.getBoundingClientRect().width}px`, minWidth:'0px', paddingInlineStart:style.paddingInlineStart, paddingInlineEnd:style.paddingInlineEnd}
       ]);
     });
     await Promise.allSettled(animations.map(animation => animation.finished));
@@ -33686,8 +33686,7 @@ async function renderProjectReportDraft(project, resume = null) {
   let outlineController = null;
   const reportInsertion = createReportInsertion();
   let reportColumnResizeObserver = null;
-  let outlineRailTimer = null;
-  let reportsRailTimer = null;
+  let sidebarRailTimer = null;
   let refreshReportList = () => {};
   let comparisonController = null;
   const outlineSectionExpansion = new Map();
@@ -33826,8 +33825,7 @@ async function renderProjectReportDraft(project, resume = null) {
       disposeReportNoteEditors();
       panel._columnExpansion?.dispose();
       reportColumnResizeObserver?.disconnect();
-      clearTimeout(outlineRailTimer);
-      clearTimeout(reportsRailTimer);
+      clearTimeout(sidebarRailTimer);
       outlineController?.dispose();
       comparisonController?.dispose();
       autosave?.dispose();
@@ -34983,9 +34981,7 @@ async function renderProjectReportDraft(project, resume = null) {
     reportsToggle.addEventListener('click', () => {
       panel.dataset.reportsHidden = String(panel.dataset.reportsHidden !== 'true');
       persistReportSectionExpanded('Reports column',panel.dataset.reportsHidden !== 'true');
-      documents.classList.add('is-reports-toggling'); clearTimeout(reportsRailTimer);
-      reportsRailTimer = setTimeout(() => documents.classList.remove('is-reports-toggling'),220);
-      paintReportsToggle(); syncReferenceReaderLayout();
+      transitionReportSidebars();
     });
     reportsHeader.append(reportsTitle);
     reportActions.append(createNew,deleteButton);
@@ -35295,7 +35291,7 @@ async function renderProjectReportDraft(project, resume = null) {
     };
     sourcesToggle.addEventListener("click", () => {
       panel.dataset.libraryOpen = String(panel.dataset.libraryOpen !== "true");
-      syncReferenceReaderLayout();
+      transitionReportSidebars();
     });
     if (panel.dataset.outlineHidden === undefined) {
       panel.dataset.outlineHidden = String(!reportSectionExpanded("Outline column", !initialReportOutlineHidden(activeDraft.blocks)));
@@ -35307,11 +35303,7 @@ async function renderProjectReportDraft(project, resume = null) {
     outlineToggle.addEventListener("click", () => {
       panel.dataset.outlineHidden = String(panel.dataset.outlineHidden !== "true");
       persistReportSectionExpanded("Outline column", panel.dataset.outlineHidden !== "true");
-      documents.classList.add('is-outline-toggling');
-      clearTimeout(outlineRailTimer);
-      outlineRailTimer = setTimeout(() => documents.classList.remove('is-outline-toggling'), 220);
-      paintOutlineToggle();
-      syncReferenceReaderLayout();
+      transitionReportSidebars();
     });
     paintOutlineToggle();
     const versionsToggle = document.createElement("button");
@@ -35327,6 +35319,12 @@ async function renderProjectReportDraft(project, resume = null) {
     columns.className = "report-workspace-columns";
     columns.setAttribute("role", "region");
     columns.setAttribute("aria-label", "Report columns");
+    function transitionReportSidebars() {
+      columns.classList.add('is-sidebar-toggling');
+      clearTimeout(sidebarRailTimer);
+      sidebarRailTimer = setTimeout(() => columns.classList.remove('is-sidebar-toggling'), 300);
+      syncReferenceReaderLayout();
+    }
     const documents = oldDocuments || document.createElement("div");
     documents.className = "report-document-columns";
     documents.setAttribute("role", "region");

@@ -1,6 +1,6 @@
 /* Research v2 uses the existing workspace colors and Reader typography. */
 @property --rv2-rail-width{syntax:"<length>";inherits:true;initial-value:300px}
-.research-v2-panel{--rv2-rail-motion:260ms cubic-bezier(.2,0,0,1);min-width:min(760px,95vw);flex-basis:960px}
+.research-v2-panel{min-width:min(760px,95vw);flex-basis:960px}
 .research-v2-panel>.analysis-content{padding:0;overflow:hidden;display:flex;min-height:0}
 /* The list slides into reserved workspace space beside a stable chat width. */
 .research-v2{position:relative;display:grid;grid-template-columns:var(--rv2-rail-width,300px) 1px minmax(0,1fr);width:100%;height:100%;min-height:420px;color:var(--text-primary);font:14px/1.6 var(--ui-font-family)}
@@ -103,20 +103,21 @@ ul.rv2-answer-list{list-style-type:disc}ol.rv2-answer-list{list-style-type:decim
 .rv2-sources-rail.is-collapsed{left:calc(100% - 64px);width:64px;border:0;background:transparent;pointer-events:none}
 .rv2-sources-header{padding:var(--column-content-top-gap) var(--panel-padding) 12px}
 .research-v2 .rv2-sources-toggle{pointer-events:auto}
-.rv2-sources-rail.is-collapsed>.rv2-sources-header{justify-content:center;padding-inline:0}
+.rv2-sources-rail.is-collapsed>.rv2-sources-header{padding-inline:9px 0}
 .rv2-sources-body{flex:1;min-height:0;overflow:auto;padding:0 var(--panel-padding) 20px;overflow-wrap:anywhere}
 .rv2-sources-question{margin:0 0 12px;color:var(--text-secondary);font-size:12px;line-height:1.5;display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3}
 .rv2-sources-body .rv2-source-text{white-space:pre-wrap;font-size:13px;line-height:1.6}
 @media(min-width:681px){
-  .research-v2-panel{--rv2-history-space:0px;--rv2-sources-space:0px;margin-inline-end:calc(var(--rv2-history-space) + var(--rv2-sources-space));transition:margin-inline-end var(--rv2-rail-motion)}
+  .research-v2-panel{--rv2-history-space:0px;--rv2-sources-space:0px;margin-inline-end:calc(var(--rv2-history-space) + var(--rv2-sources-space));transition:margin-inline-end var(--workspace-sidebar-motion)}
   #panel-track .research-v2-panel.has-history-rail{--rv2-history-space:265px}
   #panel-track .research-v2-panel.has-sources-rail{--rv2-sources-space:300px}
-  #panel-track .research-v2-panel>:is(.panel-header,.analysis-content){margin-inline-end:calc(-1 * var(--rv2-history-space));transition:margin-inline-end var(--rv2-rail-motion)}
+  #panel-track .research-v2-panel>:is(.panel-header,.analysis-content){margin-inline-end:calc(-1 * var(--rv2-history-space));transition:margin-inline-end var(--workspace-sidebar-motion)}
   #panel-track .research-v2-panel>.panel-header{margin-inline-end:calc(-1 * (var(--rv2-history-space) + var(--rv2-sources-space)))}
   /* Keep the closing rail visible until its reserved space reaches zero. */
   #panel-track .research-v2-panel:is([data-assistant-sources-width],[data-assistant-history-width]){overflow:visible}
   #panel-track .research-v2-panel:is([data-assistant-sources-width],[data-assistant-history-width])>.analysis-content{overflow:visible}
-  .rv2-sources-rail{overflow:hidden;transition:left var(--rv2-rail-motion),width var(--rv2-rail-motion)}
+  .rv2-sources-rail{overflow:hidden;transition:left var(--workspace-sidebar-motion),width var(--workspace-sidebar-motion),background-color var(--workspace-sidebar-motion)}
+  .rv2-sources-header{transition:padding-inline var(--workspace-sidebar-motion)}
   .rv2-sources-body{box-sizing:border-box;width:298px}
 }
 @media(max-width:680px){
@@ -160,14 +161,13 @@ ul.rv2-answer-list{list-style-type:disc}ol.rv2-answer-list{list-style-type:decim
 @media(min-width:681px){
   .research-v2-panel{position:relative}
   .research-v2-panel>.panel-header{position:relative;overflow:visible}
-  .research-v2{transition:--rv2-rail-width var(--rv2-rail-motion)}
-  .rv2-rail{--rv2-history-content-width:calc(300px - 2 * var(--panel-padding));padding-inline:var(--panel-padding);overflow-x:hidden}
+  .research-v2{transition:--rv2-rail-width var(--workspace-sidebar-motion)}
+  .rv2-rail{--rv2-history-content-width:calc(300px - 2 * var(--panel-padding));padding-inline:var(--panel-padding);overflow-x:hidden;transition:padding-inline var(--workspace-sidebar-motion)}
   /* Reveal full-width content through the moving edge; never reflow its text. */
-  .research-v2:not(.is-history-collapsed) .rv2-rail>:is(.rv2-rail-header,.rv2-history-actions,.rv2-questions){width:var(--rv2-history-content-width);min-width:var(--rv2-history-content-width)}
+  .rv2-rail>:is(.rv2-history-actions,.rv2-questions){min-width:var(--rv2-history-content-width)}
   .research-v2-panel>.analysis-content{margin-inline-start:calc(-1 * var(--panel-padding))}
-  .research-v2.is-history-collapsed .rv2-rail{padding-inline:0;overflow:visible}
+  .research-v2.is-history-collapsed .rv2-rail{padding-inline:1px 0}
   .research-v2.is-history-collapsed .rv2-rail>:not(.rv2-rail-header){display:none}
-  .research-v2.is-history-collapsed .rv2-rail>.rv2-rail-header{justify-content:center}
   .rv2-rail-divider{position:absolute;inset-block:calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3)) 0;left:var(--rv2-rail-width,300px);width:1px}
   .is-history-collapsed .rv2-rail-divider{pointer-events:none}
   .research-v2.is-question-rail-resizing{transition:none}
