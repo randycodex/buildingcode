@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-report-sources-v2475";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-report-header-v2476";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-report-sources-v2475";
+} from "./offline-storage.js?v=20261117-report-header-v2476";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -33457,7 +33457,7 @@ function reportBlockTitle(block) {
 
 function createReportPaneHeader(closeReport) {
   const header = document.createElement("header");
-  header.className = "report-draft-header";
+  header.className = "panel-header report-draft-header";
   const heading = document.createElement("div");
   heading.className = "report-heading";
   const title = document.createElement("h2");
@@ -33514,7 +33514,8 @@ async function renderProjectReportDraft(project, resume = null) {
 
   const header = createReportPaneHeader(() => closeProjectReportDraft(identity));
   const closeReport = header.querySelector(".report-draft-close");
-  header.hidden = true;
+  const primaryActions = header.querySelector(".report-draft-header-actions");
+  primaryActions.classList.add("report-draft-primary-actions");
 
   const shell = document.createElement("div");
   shell.className = "report-draft-shell";
@@ -33522,8 +33523,8 @@ async function renderProjectReportDraft(project, resume = null) {
   status.className = "report-draft-status";
   status.setAttribute("role", "status");
   status.hidden = true;
-  shell.append(status);
-  panel.append(header, shell);
+  shell.append(header, status);
+  panel.append(shell);
 
   let drafts = [];
   let sources = [];
@@ -34922,8 +34923,6 @@ async function renderProjectReportDraft(project, resume = null) {
     draftPicker.append(pageTitleEditor); pageFields.set('__title',{element:pageTitleEditor,size:28});
     const reportsRail = document.createElement('aside'); reportsRail.className = 'report-list-rail';
     reportsRail.setAttribute('aria-label', 'Project reports');
-    const reportsHeader = document.createElement('div'); reportsHeader.className = 'report-list-header';
-    reportsHeader.setAttribute('aria-hidden','true');
     const reportsTopRow = document.createElement('div'); reportsTopRow.className = 'report-list-top-row';
     const createNew = document.createElement('button'); createNew.type = 'button'; createNew.className = 'report-list-create';
     createNew.textContent = 'New report +'; createNew.setAttribute('aria-label','New report');
@@ -34953,7 +34952,7 @@ async function renderProjectReportDraft(project, resume = null) {
       paintReportsToggle(); syncReferenceReaderLayout();
     });
     reportsTopRow.append(createNew,deleteButton,reportsToggle);
-    reportsRail.append(reportsHeader,reportsTopRow,reportOptions);
+    reportsRail.append(reportsTopRow,reportOptions);
     refreshReportList = () => {
       reportOptions.replaceChildren();
       const available = activeDraft.id ? drafts : [activeDraft,...drafts];
@@ -35103,8 +35102,6 @@ async function renderProjectReportDraft(project, resume = null) {
     sourcePickerToggle.hidden = !sourceWarnings.length;
     sourcePicker.append(sourcePickerToggle, sourcePalette);
 
-    const primaryActions = document.createElement("div");
-    primaryActions.className = "report-draft-primary-actions";
     const save = document.createElement("button");
     save.type = "button";
     save.className = "workflow-action workflow-action-secondary";
@@ -35112,9 +35109,6 @@ async function renderProjectReportDraft(project, resume = null) {
     save.textContent = "Retry";
     save.title = "Retry saving Report edits";
     save.hidden = savePresentation.state !== "error";
-    const exportSpacer = document.createElement("span");
-    exportSpacer.className = "report-action-spacer";
-    exportSpacer.setAttribute("aria-hidden", "true");
     save.addEventListener("click", async () => {
       if (await saveDraft()) pageLayout.invalidate();
     });
@@ -35156,7 +35150,6 @@ async function renderProjectReportDraft(project, resume = null) {
         snapshot: { label: `Report: ${activeDraft.title || "Untitled Report"}` }
       });
     });
-    primaryActions.append(exportSpacer, save, saveCopy, generate, coordinate, closeReport);
     const paperSize = document.createElement('select'); paperSize.className = 'report-paper-size';
     paperSize.setAttribute('aria-label', 'Paper size');
     for (const [value, format] of Object.entries(reportPageFormats)) {
@@ -35186,7 +35179,6 @@ async function renderProjectReportDraft(project, resume = null) {
       pageLayoutHost.classList.toggle('is-dark-pages',darkReportPages);
       try {localStorage.setItem('permitext:report:dark-pages',String(darkReportPages));} catch {}
     });
-    primaryActions.insertBefore(pageTheme,exportSpacer);
 
     const comparison = ensureComparison();
     const historyBody = comparison.versionBody;
@@ -35314,7 +35306,8 @@ async function renderProjectReportDraft(project, resume = null) {
     versionsToggle.hidden = !showSavedVersions || history.length === 0;
     versionsToggle.title = "Compare saved PDF versions beside the current Report";
     versionsToggle.addEventListener("click", () => comparison.toggle());
-    if (showSavedVersions) primaryActions.insertBefore(versionsToggle, pageTheme);
+    retainReportChildren(primaryActions, save, saveCopy, coordinate, ...(showSavedVersions ? [versionsToggle] : []),
+      pageTheme, generate, closeReport);
     const columns = oldColumns || document.createElement("div");
     columns.className = "report-workspace-columns";
     columns.setAttribute("role", "region");
@@ -35324,9 +35317,7 @@ async function renderProjectReportDraft(project, resume = null) {
     documents.setAttribute("role", "region");
     documents.setAttribute("aria-label", "Report documents");
     documents.tabIndex = 0;
-    const writingHeader = document.createElement('header'); writingHeader.className = 'report-writing-header';
-    const writingTitle = document.createElement('h2'); writingTitle.textContent = 'Report'; writingHeader.append(writingTitle);
-    retainReportChildren(documents, writingHeader, outline, documentBody, reportsRail, comparison.divider, comparison.preview);
+    retainReportChildren(documents, outline, documentBody, reportsRail, comparison.divider, comparison.preview);
     retainReportChildren(columns, library, documents, versionsControls.divider, comparison.versions);
     panel._updateReportColumns = () => {
       if (!shell.clientWidth || disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
@@ -35374,7 +35365,7 @@ async function renderProjectReportDraft(project, resume = null) {
       versionsControls.update();
     };
     panel._columnExpansion?.dispose();
-    retainReportChildren(shell, status, primaryActions, columns);
+    retainReportChildren(shell, header, columns, status);
     panel._updateReportColumns();
     pageLayout.restorePosition(pagesScroll);
     if (!reportColumnResizeObserver && typeof ResizeObserver === 'function') {
