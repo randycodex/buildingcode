@@ -5,8 +5,8 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, open
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=59";
-import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=8";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=60";
+import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=9";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
 import {linkedResearchAnswerID} from "./research-answer-links.js?v=1";
@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-toolbar-label-size-v2503";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-assistant-rail-alignment-v2504";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-toolbar-label-size-v2503";
+} from "./offline-storage.js?v=20261117-assistant-rail-alignment-v2504";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -522,6 +522,7 @@ const defaultCoordinationThreadPaneWidth = 520;
 const defaultSettingsPaneWidth = 600;
 const assistantHistoryWidth = 320;
 const defaultResearchPaneWidth = assistantHistoryWidth + 600;
+const assistantRailExpansion = 300 - 72;
 const defaultCodeDecisionPaneWidth = 600;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
@@ -27784,9 +27785,8 @@ const researchOperationScope = (identity = captureAccountRequest(), workspaceID 
   JSON.stringify([identity.userID,identity.generation,workspaceID]);
 
 function setAssistantHistoryRail(panel, expanded, {initial = false} = {}) {
-  // The 35px collapsed control stays in the base pane. Opening the 300px
-  // list adds its remaining width to the workspace, never to the chat budget.
-  const width = expanded ? 265 : 0;
+  // Both collapsed rails already occupy space in the base pane.
+  const width = expanded ? assistantRailExpansion : 0;
   const previous = Number(panel.dataset.assistantHistoryWidth) || 0;
   if (previous === width && panel.dataset.assistantHistoryWidth !== undefined) return;
   if (!initial && previous !== width && window.innerWidth > 680) capturePaneResizeWidths({manual:false});
@@ -27798,7 +27798,7 @@ function setAssistantHistoryRail(panel, expanded, {initial = false} = {}) {
 
 function setAssistantSourcesRail(panel, expanded, rail, {reveal = true} = {}) {
   const previous = Number(panel.dataset.assistantSourcesWidth) || 0;
-  const width = expanded ? 300 : 0;
+  const width = expanded ? assistantRailExpansion : 0;
   if (previous !== width) {
     // Reserve new workspace space rather than taking it from the conversation
     // or its neighbors. Saved pane weights continue to describe the base panes.
@@ -27810,10 +27810,11 @@ function setAssistantSourcesRail(panel, expanded, rail, {reveal = true} = {}) {
   }
   if (expanded && reveal) requestAnimationFrame(() => {
     const revealRail = () => {
-      if (!panel.isConnected || panel.dataset.assistantSourcesWidth !== '300' || !rail.isConnected) return;
+      if (!panel.isConnected || panel.dataset.assistantSourcesWidth !== String(width) || !rail.isConnected) return;
       rail.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});
     };
-    const animations = rail.getAnimations?.() || [];
+    const animations = (rail.parentElement?.getAnimations?.() || [])
+      .filter(animation => animation.transitionProperty === '--rv2-sources-width');
     // Reveal the finished rail, rather than scrolling to its narrow first frame.
     // A reversed/cancelled transition must not pull the workspace back afterward.
     if (animations.length) void Promise.all(animations.map(animation => animation.finished)).then(revealRail, () => {});

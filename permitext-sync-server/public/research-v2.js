@@ -1,4 +1,4 @@
-import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=8";
+import {attachResearchQuestionRail, attachResearchHistoryTitleScroll} from "./research-question-rail.js?v=9";
 import {revealResearchAnswer} from "./research-answer-reveal.js?v=1";
 import {researchInlineRuns} from "./research-inline-format.js?v=1";
 import {researchAnswerBlocks} from './research-answer-blocks.js?v=1';

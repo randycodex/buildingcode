@@ -1,4 +1,4 @@
-const expandedWidth = 300, collapsedWidth = 35;
+const expandedWidth = 300, collapsedWidth = 72;
 
 export function attachResearchQuestionRail({root, divider, toggle, collapsedStore, onCollapse}) {
   let collapsed = false, disposed = false;

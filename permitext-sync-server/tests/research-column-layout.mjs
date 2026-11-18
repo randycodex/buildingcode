@@ -45,8 +45,9 @@ const state = { paneWeights: { 'utility:search:one': 1400, 'reader:one': 400 } }
 const track = { dataset: {}, clientWidth: 2403, inert: false, querySelector: () => null,
   querySelectorAll: selector => selector.includes('.pane-divider') ? Array.from({length: panels.filter(p=>!p.classList.contains('is-workflow-hidden')).length+1},()=>({getBoundingClientRect:()=>({width:1})})) : panels };
 const collapsed = new Set();
+const assistantRailExpansion = 228;
 const context = vm.createContext({notebookReferenceTransition:undefined, workspaceColumnExpansion: undefined, state, track, activeWorkspaceID: 'test', window: { innerWidth: 2403 }, researchColumnsLayout,
-  currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400,
+  currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400, assistantRailExpansion,
   activePaneIDs: () => panels.map(panel => panel.dataset.paneId),
   workflowPaneIsVisible: id => !panels.find(panel => panel.dataset.paneId === id)?.classList.contains('is-workflow-hidden'),
   assistantHistoryOnlyPane: id => id === 'utility:analysis:history', paneIsCollapsed: id => collapsed.has(id), defaultPaneWidthForID: id => id.startsWith('reader:') ? 630 : 600,
@@ -321,7 +322,7 @@ vm.runInContext(actual('setAssistantSourcesRail'),context);
 let reveals=0;const sourcesRail={isConnected:true,scrollIntoView(){reveals++;}};
 context.setAssistantSourcesRail(panels[1],true,sourcesRail);
 assert.deepEqual(sizes(),beforeSources,'Opening sources never narrows the Assistant or neighboring panes');
-assert.equal(panels[1].dataset.assistantSourcesWidth,'300');assert.equal(reveals,1);
+assert.equal(panels[1].dataset.assistantSourcesWidth,String(assistantRailExpansion));assert.equal(reveals,1);
 assert.equal(state.paneWeights['utility:analysis'],beforeSources[1],'Saved pane weights exclude the temporary source rail');
 context.setAssistantSourcesRail(panels[1],true,sourcesRail,{reveal:false});
 assert.deepEqual(sizes(),beforeSources,'Updating the answer in an open rail never adds width again');
@@ -329,14 +330,14 @@ context.setAssistantSourcesRail(panels[1],false,sourcesRail);
 assert.deepEqual(sizes(),beforeSources,'Closing the source rail keeps the original base dimensions');
 context.setAssistantSourcesRail(panels[1],true,sourcesRail,{reveal:false});
 context.syncResearchColumnLayout({reset:true});
-assert(Math.abs(sizes().reduce((sum,width)=>sum+width,304)-track.clientWidth)<1e-8,'Explicit auto-fit reserves the attached 300px rail');
+assert(Math.abs(sizes().reduce((sum,width)=>sum+width,assistantRailExpansion+4)-track.clientWidth)<1e-8,'Auto-fit reserves only the added Sources width');
 const resized=sizes();context.setAssistantSourcesRail(panels[1],false,sourcesRail);
 assert(sizes().every((width,index)=>width>=resized[index]),'Closing after an explicit reset may fill available space but never narrows a pane');
 assert.equal(panels[1].dataset.assistantSourcesWidth,'0');
 console.log('Assistant source geometry passed: reserved width, unchanged chat/neighbors, repeat selection, reset and close.');
 
 let finishMotion;
-sourcesRail.getAnimations=()=>[{finished:new Promise(resolve=>{finishMotion=resolve;})}];
+sourcesRail.parentElement={getAnimations:()=>[{transitionProperty:'--rv2-sources-width',finished:new Promise(resolve=>{finishMotion=resolve;})}]};
 const beforeReveal=reveals;
 context.setAssistantSourcesRail(panels[1],true,sourcesRail);
 assert.equal(reveals,beforeReveal,'Workspace scrolling waits for the source rail to finish expanding');
@@ -349,13 +350,12 @@ finishMotion();await new Promise(resolve=>setImmediate(resolve));
 assert.equal(reveals,beforeReveal+1,'Closing during the motion cannot cause a late workspace scroll');
 console.log('Source rail motion passed: reveal after expansion and no late scroll when closing.');
 
-// Conversation history reserves its own 265px beyond the collapsed 35px
-// control. Neither rail becomes a saved base width or resizes another pane.
+// Each rail reserves only the difference between its collapsed and expanded widths.
 vm.runInContext(actual('setAssistantHistoryRail'),context);
 state.researchColumnWidthsManual=false;
 panels[1].dataset.assistantSourcesWidth='0';
 context.setAssistantHistoryRail(panels[1],true,{initial:true});
-assert.equal(panels[1].dataset.assistantHistoryWidth,'265');
+assert.equal(panels[1].dataset.assistantHistoryWidth,String(assistantRailExpansion));
 assert.equal(state.researchColumnWidthsManual,false,'Initial list restoration retains automatic-fit mode');
 const historyBases=sizes();
 context.setAssistantHistoryRail(panels[1],false);
@@ -367,19 +367,19 @@ assert.deepEqual(sizes(),historyBases,'Opening history adds workspace space with
 assert.equal(state.paneWeights['utility:analysis'],historyBases[1]);
 context.setAssistantSourcesRail(panels[1],true,sourcesRail,{reveal:false});
 assert.deepEqual(sizes(),historyBases,'History and Sources can both open beside the same base conversation');
-assert.equal(Number(panels[1].dataset.assistantHistoryWidth)+Number(panels[1].dataset.assistantSourcesWidth),565);
+assert.equal(Number(panels[1].dataset.assistantHistoryWidth)+Number(panels[1].dataset.assistantSourcesWidth),2*assistantRailExpansion);
 context.setAssistantHistoryRail(panels[1],false);
-assert.equal(panels[1].dataset.assistantSourcesWidth,'300','Closing history never closes Sources');
+assert.equal(panels[1].dataset.assistantSourcesWidth,String(assistantRailExpansion),'Closing history never closes Sources');
 context.setAssistantHistoryRail(panels[1],true);
 context.syncResearchColumnLayout({reset:true});
-assert(Math.abs(sizes().reduce((sum,width)=>sum+width,569)-track.clientWidth)<1e-8,'Explicit auto-fit reserves both side rails');
+assert(Math.abs(sizes().reduce((sum,width)=>sum+width,2*assistantRailExpansion+4)-track.clientWidth)<1e-8,'Explicit auto-fit reserves both side rails');
 console.log('Conversation history geometry passed: independent reserved width, stable base panes on open/close, compatible Sources, initial restore and explicit auto-fit.');
 
 // Restore must use defaults, not drag minimums, when the open columns cannot
 // fit. Saved Search widths below 600px migrate to the minimum.
 for (const available of [1600, 3063, 4200]) {
   panels = ['reader:one','reader:two','utility:analysis','utility:search:restore','utility:calculator'].map(makePane);
-  panels[2].dataset.assistantSourcesWidth = '300';
+  panels[2].dataset.assistantSourcesWidth = String(assistantRailExpansion);
   collapsed.clear();
   state.paneWeights = {'reader:one':800,'reader:two':800,'utility:analysis':1100,'utility:search:restore':300,'utility:calculator':600};
   state.researchColumnWidthsManual = true;
@@ -389,7 +389,7 @@ for (const available of [1600, 3063, 4200]) {
   context.syncResearchColumnLayout();
   assert.equal(sizes()[3],600,'An older narrow Search is clamped to 600px before Restore');
   await context.resetVisibleColumnWidths();
-  if (available < 3686) {
+  if (available < 3380 + assistantRailExpansion + 6) {
     assert.deepEqual(sizes(),[630,630,920,600,600],'Restore uses a 600px Search and scrolls instead of squeezing it');
     assert.equal(track.dataset.researchColumnSizing,'overflow');
     assert.equal(state.paneWeights['utility:search:restore'],600);
@@ -397,7 +397,7 @@ for (const available of [1600, 3063, 4200]) {
     assert.equal(sizes()[3],600,'Later layout updates retain the restored Search default');
   } else {
     assert.equal(track.dataset.researchColumnSizing,'fit');
-    assert(Math.abs(sizes().reduce((sum,width)=>sum+width,306)-available)<1e-8,'A wide desk still distributes all remaining space');
+    assert(Math.abs(sizes().reduce((sum,width)=>sum+width,assistantRailExpansion+6)-available)<1e-8,'A wide desk still distributes all remaining space');
   }
 }
 console.log('Restore Search regression passed: 600px default in overflow with Sources, 600px manual minimum, stable subsequent updates and full fit on a wide desk.');
@@ -409,7 +409,7 @@ context.window.innerWidth=track.clientWidth=3063;
 collapsed.clear();
 panels=['reader:gap','utility:analysis:gap'].map(makePane);
 panels.forEach(panel=>{panel.isConnected=true;panel.classList.toggle=(name,on)=>on?panel.classList.add(name):panel.classList.remove(name);});
-panels[1].dataset.assistantHistoryWidth='265';
+panels[1].dataset.assistantHistoryWidth=String(assistantRailExpansion);
 state.paneWeights={'reader:gap':630,'utility:analysis:gap':920};
 state.researchColumnWidthsManual=true;delete track._researchColumnLayout;
 context.syncResearchColumnLayout();

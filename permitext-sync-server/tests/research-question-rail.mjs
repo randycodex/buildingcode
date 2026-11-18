@@ -28,15 +28,15 @@ try {
   const store={read:()=>collapseWrites.at(-1)===true,write:value=>collapseWrites.push(value)};
   const collapsible=attachResearchQuestionRail({root,divider,toggle,collapsedStore:store});
   assert.equal(toggleAttrs['aria-expanded'],'true');
-  toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'35px');
+  toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'72px');
   assert.equal(toggleAttrs['aria-expanded'],'false');assert.equal(classes.has('is-history-collapsed'),true);
   toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'300px');
   assert.equal(toggleAttrs['aria-expanded'],'true');assert.equal(classes.has('is-history-collapsed'),false);
   narrow=true;toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'300px','Mobile history keeps its separate stacked-layout control');narrow=false;
   toggleHandlers.get('click')();collapsible.dispose();
   const restored=attachResearchQuestionRail({root,divider,toggle,collapsedStore:store});
-  assert.equal(styles['--rv2-rail-width'],'35px','Remounting a conversation preserves the collapsed list');
+  assert.equal(styles['--rv2-rail-width'],'72px','Remounting a conversation preserves the collapsed list');
   toggleHandlers.get('click')();assert.equal(styles['--rv2-rail-width'],'300px');
   assert.ok(focused>=4);restored.dispose();assert.equal(toggleHandlers.size,0);
 } finally {delete globalThis.matchMedia;delete globalThis.ResizeObserver;}
-console.log('Research history passed: fixed 300px expanded width, 35px collapse, persisted collapse state, ignored old widths, no resize target, outer resize, mobile isolation and disposal.');
+console.log('Research history passed: fixed 300px expanded width, 72px collapse, persisted collapse state, ignored old widths, no resize target, outer resize, mobile isolation and disposal.');
