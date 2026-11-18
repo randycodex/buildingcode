@@ -3,7 +3,7 @@
 .reader-toolbar-tools{align-items:flex-start}
 .reader-shortcuts{align-items:center;flex-wrap:wrap}
 .reader-shortcuts[hidden]{display:none}
-.reader-shortcuts:not([hidden])::before{content:"";align-self:center;flex:0 0 1px;height:12px;margin-inline:4px;background:var(--border)}
+.reader-shortcuts:not([hidden])::before{content:"";align-self:center;flex:0 0 1px;height:var(--workspace-menu-icon-size,12px);margin-inline:4px;background:var(--border)}
 .workflow-toolbar #add-reader{--workspace-menu-weight:300;flex:0 0 auto;color:var(--text-secondary)}
 .workflow-toolbar #add-reader:not(:disabled):hover{color:light-dark(var(--text-primary),#fff)}
 .workflow-toolbar .toolbar-button.has-open-column{display:none}
@@ -11,7 +11,7 @@
 .workflow-toolbar .reader-shortcut.is-dragging{position:relative;z-index:12;cursor:grabbing;will-change:transform}
 .workflow-toolbar .reader-shortcuts.is-reordering{cursor:grabbing}
 /* Every open column stays active, independently of which one has focus. */
-.workflow-toolbar .reader-shortcut{--workspace-menu-weight:500;appearance:none;flex:0 0 auto;height:20px;min-height:20px;line-height:18px;outline:0;border:1px solid transparent;padding-inline:8px;color:var(--workspace-menu-active);font-family:var(--ui-font-family);white-space:nowrap;cursor:pointer;transition:background 160ms}
+.workflow-toolbar .reader-shortcut{--workspace-menu-weight:500;appearance:none;flex:0 0 auto;height:var(--workspace-menu-height);min-height:var(--workspace-menu-height);line-height:1;outline:0;border:1px solid transparent;padding-inline:10px;color:var(--workspace-menu-active);font-family:var(--ui-font-family);white-space:nowrap;cursor:pointer;transition:background 160ms}
 .workflow-toolbar .reader-shortcut:not(:disabled):hover{color:var(--workspace-menu-active)}
 .workflow-toolbar .reader-shortcut[data-reader-pane-id^="utility:search"]{gap:6px}
 .workflow-toolbar .reader-shortcut:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
