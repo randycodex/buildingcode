@@ -112,6 +112,7 @@ const allIDs=['reader:a','utility:search:s','reader:b','utility:analysis:r','uti
 const allPanels=allIDs.map(id=>{const node=doc.createElement('article');node.className='workspace-panel';node.dataset.paneId=id;allTrack.append(node);return node;});
 const retainedDraft={text:'An unsent Assistant question',scrollTop:317};allPanels[3].draft=retainedDraft;
 const toolButtons=['search','analysis','calculator'].map(key=>({key,button:doc.createElement('button')}));
+const evidenceLauncher=doc.createElement('button');
 const actualFunction=name=>{const first=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(first>=0,name);return source.slice(first,source.indexOf('\n}',first)+2);};
 let saves=0, allContext='A:research', previewOrder=[];
 const allState={readers:[{id:'a',codePrefix:'BC',codeVersion:'2022',title:'Reader'},{id:'b',codePrefix:'PC',codeVersion:'2022',title:'Reader'}],paneOrder:[...allIDs]};
@@ -134,7 +135,7 @@ const navigation=createReaderShortcuts({host:allHost,track:allTrack,readers:()=>
     button.querySelectorAll('svg').forEach(icon=>icon.remove());
     const icon=doc.createElement('svg');icon.dataset.lucideIcon=name;icon.setAttribute('aria-hidden','true');
     button.prepend(icon);button.classList.add('has-workspace-button-icon');
-  },tools:toolButtons});
+  },tools:[...toolButtons,{key:'saved',button:evidenceLauncher}]});
 appContext.readerShortcuts=navigation;
 const order=()=>allHost.children.map(button=>button.dataset.readerPaneId);
 assert.deepEqual(order(),allIDs);
@@ -143,6 +144,15 @@ assert(toolButtons.every(({button})=>button.classList.contains('has-open-column'
 assert.deepEqual(allHost.children.map(button=>button.querySelector('svg')?.dataset.lucideIcon),['library-big','search','library-big','astroid','calculator'],'Open bubbles retain the existing Reader and tool icons.');
 assert(allHost.children.every(button=>button.querySelector('svg').getAttribute('aria-hidden')==='true'),'Decorative icons keep the existing accessible labels.');
 assert(allHost.children.every(button=>!button.draggable),'Top bubbles disable native drag images.');
+const evidence=doc.createElement('article');evidence.className='workspace-panel';evidence.dataset.paneId='utility:saved:project';allTrack.append(evidence);
+navigation.refresh();
+const evidenceShortcut=allHost.children.find(button=>button.dataset.readerPaneId===evidence.dataset.paneId);
+assert.equal(evidenceShortcut.textContent,'Evidence');
+assert.equal(evidenceShortcut.querySelector('svg').dataset.lucideIcon,'bookmark');
+assert.equal(evidenceLauncher.classList.contains('has-open-column'),true,'The open Evidence shortcut replaces its launcher.');
+evidenceShortcut.dispatch('click');assert.equal(allReveals.pop(),evidence.dataset.paneId,'The toolbar reveals the existing Evidence column.');
+evidence.remove();navigation.refresh();
+assert.equal(evidenceLauncher.classList.contains('has-open-column'),false,'Closing Evidence restores its launcher.');
 allHost.getBoundingClientRect=()=>({left:0,top:24,width:450,height:26,bottom:50});
 for (const button of allHost.children) button.getBoundingClientRect=()=>{
   const visual=[...allHost.children].sort((a,b)=>Number(a.style.order || 0)-Number(b.style.order || 0));

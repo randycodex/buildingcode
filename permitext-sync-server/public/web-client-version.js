@@ -1,4 +1,4 @@
-export const webAppVersion = "20261117-sidebar-motion-v2501";
+export const webAppVersion = "20261117-toolbar-evidence-v2502";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

@@ -429,10 +429,10 @@ async function main() {
     const tagWithID = (html, id) => html.match(new RegExp(`<[^>]+\\bid="${id}"[^>]*>`))?.[0] || "";
     const workflowStart = webRoot.text.indexOf('<nav class="workflow-toolbar"');
     const workflowSource = webRoot.text.slice(workflowStart, webRoot.text.indexOf("</nav>", workflowStart));
-    const workflowOrder = ['data-workflow-tools="research"', 'id="add-reader"', 'id="toggle-search"',
+    const workflowOrder = ['data-workflow-tools="research"', 'id="add-reader"', 'id="toggle-search"', 'id="toggle-saved"',
       'id="toggle-analysis"', 'id="toggle-calculator"', 'data-workflow-tools="notebook"',
       'id="toggle-notebook"', 'class="note-picker-host"', 'data-workflow-tools="report"',
-      'id="toggle-report"', 'id="toggle-saved"', 'class="workflow-layout-actions"',
+      'id="toggle-report"', 'class="workflow-layout-actions"',
       'id="collapse-all-columns"', 'id="expand-all-columns"', 'id="fit-columns"']
       .map(marker => workflowSource.indexOf(marker));
     assert(
@@ -671,7 +671,7 @@ async function main() {
     );
     assert(
       /toggleAnalysisButton\.addEventListener\("click", \(\) => \{\s*if \(notifyProjectRequiredForColumn\(\)\) return;\s*void focusRecentUtilityColumn\("analysis"\);/.test(workspaceScript.text) &&
-        /toggleSavedButton\.addEventListener\("click", \(\) => \{\s*if \(notifyProjectRequiredForColumn\(\)\) return;\s*void toggleProjectsColumns\(\);/.test(workspaceScript.text) &&
+        workspaceScript.text.includes('toggleSavedButton.addEventListener("click", () => void focusUtility("saved"));') &&
         workspaceScript.text.includes("async function openNewResearchColumn()") &&
         workspaceScript.text.includes('add("New research column", () => void openNewResearchColumn())') &&
         workspaceScript.text.includes('const instance = newUtilityInstance("analysis");') &&

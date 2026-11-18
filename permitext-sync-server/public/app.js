@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-sidebar-motion-v2501";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261117-toolbar-evidence-v2502";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -34,7 +34,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=37";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js?v=2";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261115-page-theme-v1384";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261117-toolbar-evidence-v1385";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261109-notebook-desk-v1299";
 import { createNotebookReferenceTransition } from "./notebook-reference-transition.js?v=2";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261117-sidebar-motion-v2501";
+} from "./offline-storage.js?v=20261117-toolbar-evidence-v2502";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4997,18 +4997,6 @@ function renderReaderTabs(panel, reader) {
     add.addEventListener('click', () => openReaderTabPicker(reader, add)); strip.append(add);
   }
   if (actions) {
-    let evidence = actions.querySelector('.reader-evidence');
-    if (!evidence) {
-      evidence = document.createElement('button');
-      evidence.type = 'button';
-      evidence.className = 'icon-button reader-evidence';
-      evidence.setAttribute('aria-label', 'Open Evidence');
-      evidence.title = 'Open Evidence';
-      evidence.innerHTML = bookmarkIconSVG(false);
-      evidence.addEventListener('click', () => void focusUtility('saved'));
-      actions.prepend(evidence);
-    }
-    evidence.hidden = !isProAccount();
     actions.inert = Boolean(panel.dataset.readerTabPending);
     strip.append(actions);
   }
@@ -6149,7 +6137,7 @@ function workflowPaneIsVisible(paneID) {
     const selected = project && selectedNotebookColumn(project);
     return Boolean(selected && notebookColumnPaneID(selected) === paneID);
   }
-  // A saved passages panel is opened explicitly from the shared Reader.
+  // Evidence is a tool in the shared Research workspace.
   if (/^utility:saved(?::|$)/.test(paneID)) return paneBelongsToView(paneID, 'research', state.workflowMembership, workflowPaneAnchors());
   return true;
 }
@@ -47603,13 +47591,14 @@ function readerShortcutItems() {
     const id = panel.dataset.paneId, reader = byID.get(id);
     if (!reader) {
       const toolKey = /^utility:search(?::|$)/.test(id) ? 'search'
+        : /^utility:saved(?::|$)/.test(id) ? 'saved'
         : /^(?:utility:analysis(?::|$)|research:conversation:)/.test(id) ? 'analysis'
         : id === 'utility:calculator' ? 'calculator' : '';
       if (isProjectNotebookPaneID(id) || id.startsWith('project:notes-index:')) return null;
-      const label = {search:'Search', analysis:'Assistant', calculator:'Calculator'}[toolKey] || columnPaneLabel(panel);
+      const label = {search:'Search', saved:'Evidence', analysis:'Assistant', calculator:'Calculator'}[toolKey] || columnPaneLabel(panel);
       const query = toolKey === 'search' ? panel.querySelector('.search-input')?.value?.trim() : '';
       return {id, name:label, label, location:query || '', column:true, theme:'current-consolidation', toolKey,
-        iconName:{search:'search', analysis:'astroid', calculator:'calculator'}[toolKey] || ''};
+        iconName:{search:'search', saved:'bookmark', analysis:'astroid', calculator:'calculator'}[toolKey] || ''};
     }
     const prefix = String(reader.codePrefix || "BC").toUpperCase();
     const version = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(prefix));
@@ -52070,24 +52059,6 @@ async function focusRecentUtilityColumn(key) {
   panel.querySelector('.search-input, .research-question-input, .research-conversation-open, button')?.focus({ preventScroll: true });
 }
 
-async function toggleProjectsColumns() {
-  if (currentColumnWorkflowView() === 'notebook') return toggleNotebookEvidence();
-  const instances = (state.utilityInstances || []).filter((item) => item.key === "saved");
-  if (!instances.length) {
-    await focusUtility("saved");
-    return;
-  }
-
-  const projectHostPaneID = state.projectHostPaneID;
-  const closeOrder = [...instances].sort((left, right) =>
-    Number(paneIDForUtilityInstance(left) === projectHostPaneID) -
-    Number(paneIDForUtilityInstance(right) === projectHostPaneID)
-  );
-  for (const instance of closeOrder) {
-    if (!(await closeUtilityInstance(instance))) return;
-  }
-}
-
 async function toggleNotebookEvidence({toggle = true} = {}) {
   if (!isProAccount() || notifyProjectRequiredForColumn()) return false;
   const instance = (state.utilityInstances || []).find(item => item.key === 'saved' && !item.unassignedInbox);
@@ -52278,7 +52249,8 @@ function bindImmediateUtilityControls() {
     reveal: paneID => revealWorkspacePane(paneID, () => readerShortcuts?.activePaneID() === paneID),
     move: moveWorkspaceColumnShortcut,
     preview: previewWorkspaceColumnShortcut, cancelPreview: clearDragPreviewOrder, renderIcon: prependWorkspaceButtonIcon,
-    tools: [{button:toggleSearchButton,key:'search'}, {button:toggleAnalysisButton,key:'analysis'}, {button:toggleCalculatorButton,key:'calculator'}]
+    tools: [{button:toggleSearchButton,key:'search'}, {button:toggleSavedButton,key:'saved'},
+      {button:toggleAnalysisButton,key:'analysis'}, {button:toggleCalculatorButton,key:'calculator'}]
   });
   const updateBadge = document.querySelector("#project-update-badge");
   if (updateBadge && !updateBadge.dataset.bound) {
@@ -52360,10 +52332,7 @@ function bindImmediateUtilityControls() {
   }
   if (toggleSavedButton.dataset.coldStartBound === "true") return;
   toggleSavedButton.dataset.coldStartBound = "true";
-  toggleSavedButton.addEventListener("click", () => {
-    if (notifyProjectRequiredForColumn()) return;
-    void toggleProjectsColumns();
-  });
+  toggleSavedButton.addEventListener("click", () => void focusUtility("saved"));
 }
 
 function refreshVisibleReaderTrust() {
