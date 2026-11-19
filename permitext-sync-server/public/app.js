@@ -5,7 +5,7 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, open
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=62";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=63";
 import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=9";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-reader-evidence-v2558";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-calculator-sources-v2559";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -32,7 +32,7 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=38";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=39";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js?v=2";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261118-sync-refresh-v1386";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-reader-evidence-v2558";
+} from "./offline-storage.js?v=20261119-calculator-sources-v2559";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -19562,7 +19562,6 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       }
       projectSync?.schedule();
     },
-    ...(calculatorID ? {savedMessage: "Saved to Notebook · needs review."} : {}),
     getAssessment: () => calculatorFootnoteAssessmentFor(source,currentConversation(),answerID),
     onCheckFootnotes: draft => askCalculatorFootnotes(source,draft,{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId}),
     onReplyFootnotes: () => askCalculatorFootnotes(source,draft,{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId,reply:true}),
@@ -28132,7 +28131,10 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       draftKey,initialDraft:draft(), onDraft:saveDraft, isCurrent:current,
       requestStore:{ read:() => { try { return JSON.parse(sessionStorage.getItem(recoveryKey)); } catch { return null; } },
         write:value => { if (value) sessionStorage.setItem(recoveryKey, JSON.stringify(value)); else sessionStorage.removeItem(recoveryKey); } },
-      onNew:async () => {
+      onNew:async ({answerPending = false} = {}) => {
+        // Keep the mounted conversation and its request alive while the next
+        // chat gets its own Assistant column.
+        if (answerPending) return openNewResearchColumn();
         const release = researchOperations.begin(researchOperationScope(accountIdentity,workspaceID),'Starting new chat…',{blocksInput:true});
         try {
           if (!researchWorkspaceProjectID()) { await chooseProjectForSaving(); return; }

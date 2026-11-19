@@ -129,11 +129,11 @@ export function createResearchV2View(options) {
   appendQuestions(history);
   if(!history.length)list.append(node('p','rv2-empty-history','Your questions will appear here.'));
   const newChat = options.onNew ? action('New Chat +',async()=>{
-    if(busy||includeBusy||revealBusy||chatTransitionPending||operationPending()||!isCurrent()||!root.isConnected)return;
-    // Lock synchronously, before the create request can yield. The old
-    // conversation must never accept input that a new mount will discard.
+    if(includeBusy||operationPending()||!isCurrent()||!root.isConnected)return;
+    // Lock synchronously so a second click cannot launch another chat
+    // while this one mounts.
     chatTransitionPending=true;update();
-    try{await options.onNew();}
+    try{await options.onNew({answerPending:busy});}
     catch(error){if(isCurrent()&&root.isConnected)notice(error.message||'Could not start Research',true);}
     finally{chatTransitionPending=false;if(isCurrent()&&root.isConnected)update();}
   },'rv2-new-chat') : null;
@@ -341,7 +341,7 @@ export function createResearchV2View(options) {
   }
   const operationPending=()=>chatTransitionPending||Boolean(options.operationGate?.status());
   function update(){if(disposed)return;resizeInput();const pending=operationPending();input.disabled=busy||chatTransitionPending||Boolean(options.operationGate?.blocksInput?.());send.disabled=busy||includeBusy||revealBusy||pending||!input.value.trim();cancel.hidden=!busy;root.setAttribute('aria-busy',String(busy||includeBusy||revealBusy||pending));
-    if(newChat)newChat.disabled=busy||includeBusy||revealBusy||pending;
+    if(newChat)newChat.disabled=includeBusy||pending;
     passageControls.forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});
     operationStatus.textContent=chatTransitionPending?'Starting new chat…':options.operationGate?.status() || '';operationStatus.hidden=!pending;
     projectContext?.querySelectorAll('button').forEach(button=>{button.disabled=busy||includeBusy||revealBusy||pending;});}

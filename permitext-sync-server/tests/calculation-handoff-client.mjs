@@ -43,7 +43,7 @@ for(const stale of [false,true]) {
  context.renderOccupantLoadCalculation(prefilledSource,{calculatorID:'utility:calculator'});
  assert.equal(options.draft.area,undefined,'Manual calculations do not borrow answer-specific prefill.');
  options.draft.area='1700';options.onDraftChange({...options.draft});
- assert.equal(options.savedMessage,'Saved to Notebook · needs review.');
+ assert.equal(options.column,true,'The standalone calculator uses the column presentation.');
  context.renderOccupantLoadCalculation(prefilledSource,{calculatorID:'utility:calculator'});
  assert.equal(options.draft.area,'1700','Reopening the standalone calculator retains its device draft.');
  options=originalOptions;

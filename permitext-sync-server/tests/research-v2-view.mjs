@@ -348,6 +348,29 @@ console.log('Stable conversation presentation passed: staged content, retained g
 console.log('Retained-root ownership passed: disposed request cleanup cannot clear the new conversation busy state.');
 
 {
+ const answer=deferred(), opening=deferred(), launches=[];
+ let signal;
+ const view=createResearchV2View({conversation:{id:'answering',sources:[],messages:[]},initialDraft:'A pending question',
+  onDraft(){},onSend:request=>{signal=request.signal;return answer.promise;},
+  onNew:options=>{launches.push(options.answerPending);return opening.promise;}});
+ view.element.querySelector('.rv2-send').handlers.click();
+ const button=view.element.querySelector('.rv2-new-chat');
+ assert.equal(button.disabled,false,'An in-flight answer keeps New Chat available');
+ const starting=button.handlers.click();
+ assert.equal(button.disabled,true,'The button locks while the new chat mounts');
+ await button.handlers.click();
+ assert.deepEqual(launches,[true]);
+ opening.resolve();await starting;
+ assert.equal(signal.aborted,false);
+ assert.equal(view.element.attributes['aria-busy'],'true','The existing answer is still pending');
+ answer.resolve();await tick();
+ await button.handlers.click();
+ assert.deepEqual(launches,[true,false]);
+ view.dispose();
+}
+
+
+{
  const first=deferred(),second=deferred(),late=deferred(),calls=[],changes=[];
  const one={id:'one',role:'assistant',answer:{answerText:'First answer.'}};
  const two={id:'two',role:'assistant',answer:{answerText:'Second answer.'}};

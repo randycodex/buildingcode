@@ -165,6 +165,32 @@ for(const stale of ['account','workspace','closed-pane']){
 }
 console.log('Late completion passed: account, workspace and closed-pane changes preserve drafts and recovery state.');
 
+// Starting a new chat while this pane is sending delegates to an independent
+// Assistant. The original response stays associated with the mounted pane.
+for(const mode of [false,true]){
+ const f=harness(mode),paneID=mode?'instance:instance':'utility:analysis';
+ let finishAnswer,columns=0;
+ Object.assign(f.context,{
+  openNewResearchColumn:async()=>{columns++;},
+  postResearchWithProgress:()=>new Promise(resolve=>{finishAnswer=resolve;}),
+  researchConversationList:[],researchHistoryPageReaders:new Map(),supplementalResearchConversationIDs:[],
+  readResearchConversationList:{invalidate(){}},refreshResearchUsage:{invalidate(){}},saveWorkspaceState(){},
+  sessionStorage:{getItem:()=>null,removeItem(){}}
+ });
+ await f.context.renderResearchV2Pane(paneID,{available:true});
+ const inFlight=f.options.onSend({question:'Finish this question',requestID:'answering',signal:new AbortController().signal});
+ await f.options.onNew({answerPending:true});
+ assert.equal(columns,1);
+ assert.equal(f.options.conversation.id,'a');
+ assert.equal(f.calls.disposed,0);
+ assert.equal(f.calls.requests.length,2,'New chat does not create a replacement in the answering pane');
+ const reply={id:'completed',role:'assistant',answer:{answerText:'Original answer'}};
+ finishAnswer({conversation:{...f.conversations.a,messages:[reply]}});
+ await inFlight;
+ assert.equal(f.options.conversation.id,'a');
+ assert.equal(f.options.conversation.messages[0],reply);
+}
+
 // Creating a new question in a repeated column must retire its former owner,
 // while retaining that former conversation's unsent draft for a later reopen.
 {

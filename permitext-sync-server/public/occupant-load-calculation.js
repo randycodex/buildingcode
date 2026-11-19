@@ -255,7 +255,7 @@ function calculationDraftLabel(item) {
   return `${input.spaceName || description || 'New calculation'} · ${item.serverVersion ? 'Project calculation' : 'Device draft'}`;
 }
 
-export function createOccupantLoadCard({draft = {}, column = false, projectSyncState = null, onDraftChange, savedNote = null, getDestinationNote, savedInputFingerprint = "", recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
+export function createOccupantLoadCard({draft = {}, column = false, projectSyncState = null, onDraftChange, savedNote = null, getDestinationNote, savedInputFingerprint = "", recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes}) {
   const initialDraft = {...draft};
   let areaMeasurementBasis = draft.areaMeasurementBasis || draft.areaBasis || '';
   let userMeasurementBasis = draft.userMeasurementBasis ?? draft.areaBasis ?? '';
@@ -290,23 +290,23 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   draftTools.append(reloadDraft, newDraft, recentLabel);
   const fields = {};
   for (const [key, label, options] of [
+    ['factorMode', 'Factor source', [['table', 'BC table (default)'], ['custom', 'Custom factor']]],
     ['spaceName', 'Space / room name (optional)', null],
     ['spaceLocation', 'Space location (for footnotes)', [['', 'Not stated'], ['interior', 'Interior only — no rooftop or terrace'], ['rooftop', 'Rooftop'], ['terrace', 'Terrace'], ['mixed', 'Mixed / other — describe in question']]],
     ['spaceFunction', 'Function of space', [['', 'Select a BC table function']]], ['area', 'Floor area · ft²', null],
     ['areaBasis', 'Area basis', null],
     ['factor', 'Occupant-load factor · ft²/person', null],
-    ['seating', 'Seating', [['', 'Confirm seating'], ['without-fixed-seating', 'Without fixed seating'], ['fixed-seating', 'Fixed seating — separate method required']]],
-    ['factorMode', 'Factor source', [['table', 'BC table (default)'], ['custom', 'Custom factor']]]
+    ['seating', 'Seating', [['', 'Confirm seating'], ['without-fixed-seating', 'Without fixed seating'], ['fixed-seating', 'Fixed seating — separate method required']]]
   ]) {
     const wrapper = document.createElement('label'); wrapper.textContent = label;
+    if (key === 'factorMode') wrapper.className = 'calculation-factor-source';
     const field = document.createElement(options ? 'select' : 'input');
     field.setAttribute('aria-label', label);
     if (options) options.forEach(([value, text]) => {const option = document.createElement('option'); option.value = value; option.textContent = text; field.append(option);});
     else {field.type = 'text'; field.maxLength = 300; if (['area', 'factor'].includes(key)) field.inputMode = 'decimal';}
     const derived = ['areaBasis', 'factor'].includes(key);
-    field.readOnly = derived;
-    field.value = derived || key === 'spaceFunction' ? '' : draft[key] || (key === 'factorMode' ? 'table' : '');
-    if (key === 'spaceFunction') field.disabled = true;
+    field.disabled = derived || key === 'spaceFunction';
+    field.value = field.disabled ? '' : draft[key] || (key === 'factorMode' ? 'table' : '');
     if (key === 'spaceFunction') field.className = 'occupant-load-function-select';
     fields[key] = field; wrapper.append(field); form.append(wrapper);
   }
@@ -403,7 +403,8 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
     fields.factorMode.value = custom ? 'custom' : 'table';
     fields.factorMode.disabled = staleDraft || busy || row?.method !== 'area';
     fields.factorMode._syncCustomSelect?.();
-    fields.factor.readOnly = !custom;
+    fields.areaBasis.disabled = true;
+    fields.factor.disabled = staleDraft || busy || !custom;
     const factorLabel = custom ? 'Custom factor · ft²/person' : 'Occupant-load factor · ft²/person';
     fields.factor.parentElement.firstChild.textContent = factorLabel;
     fields.factor.setAttribute('aria-label', factorLabel);
@@ -502,9 +503,9 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
     Object.values(fields).forEach(field => field.disabled = true);
     try {
       const card = await onSave(calculation);
+      status.textContent = card && !column ? 'Saved to Notebook · needs review. The Assistant answer is unchanged.' : '';
       if (!card) return;
       savedCard = card; savedFingerprint = fingerprint(calculation); open.hidden = false;
-      status.textContent = savedMessage;
     } catch (error) {status.textContent = error.message;}
     finally {busy = false; root.removeAttribute('aria-busy'); recent.disabled = false; newDraft.disabled = false; Object.values(fields).forEach(field => field.disabled = staleDraft); fields.spaceFunction.disabled = staleDraft || !table; update();}
   });
