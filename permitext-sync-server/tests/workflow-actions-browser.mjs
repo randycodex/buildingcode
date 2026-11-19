@@ -7,31 +7,32 @@ assert.equal(fixtureURL.hostname, '127.0.0.1');
 const browser = await chromium.launch({headless:true,
   executablePath:process.env.CHROMIUM_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
 try {
-  const page = await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
+  const page = await browser.newPage({viewport:{width:1920,height:1080},reducedMotion:'reduce'});
   page.setDefaultTimeout(15000);
   const errors=[];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(fixtureURL.href);
   await page.getByRole('button',{name:'Choose workspace',exact:true}).click();
   await page.getByRole('menuitemradio',{name:'Synthetic Project 1',exact:true}).click();
-  const start=page.getByRole('region',{name:'Research tools'});
-  await start.getByRole('button',{name:'Search codes',exact:true}).click();
+  const closeColumns=async()=>{
+    await page.locator('#workspace-actions').click();
+    await page.getByRole('menuitem',{name:'Close all columns',exact:true}).click();
+    await page.locator('#panel-track > .workspace-panel:visible').first().waitFor({state:'hidden'});
+    assert.equal(await page.getByRole('region',{name:'Research tools',exact:true}).count(),0);
+  };
+  assert.equal(await page.getByRole('region',{name:'Research tools',exact:true}).count(),0);
+  await page.locator('#toggle-search').click();
   await page.locator('.search-panel:visible input[type=search]').waitFor();
   assert.equal(await page.locator('#collapse-readers').isVisible(),false);
-  await page.locator('#workspace-actions').click();
-  await page.getByRole('menuitem',{name:'Close all columns',exact:true}).click();
-  await start.waitFor();
-  await start.getByRole('button',{name:'Ask about this project',exact:true}).click();
-  await page.locator('.research-question-input:visible').waitFor();
-  await page.locator('#workspace-actions').click();
-  await page.getByRole('menuitem',{name:'Close all columns',exact:true}).click();
-  await start.getByRole('button',{name:'Open a reader',exact:true}).click();
+  await closeColumns();
+  await page.locator('#toggle-analysis').click();
+  await page.getByRole('textbox',{name:'Research question',exact:true}).waitFor();
+  await closeColumns();
+  await page.locator('#add-reader').click();
   await page.getByRole('button',{name:'Building Code (2022)',exact:true}).click();
   await page.locator('.reader-panel:visible').waitFor();
-  await page.locator('#workspace-actions').click();
-  await page.getByRole('menuitem',{name:'Close all columns',exact:true}).click();
-  await start.waitFor();
-  console.log('Research starting actions and Close all in View options passed.');
+  await closeColumns();
+  console.log('Toolbar launches Search, Assistant, and Reader, and closing every column returns to an empty workspace.');
 
   await page.getByRole('button',{name:'Calculator',exact:true}).click();
   const card=page.locator('.occupant-load-card:visible');

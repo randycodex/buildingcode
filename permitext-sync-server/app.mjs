@@ -16698,10 +16698,10 @@ async function handleNotebookCardSave(request, response) {
       createdBy: existing?.payload?.createdBy || context.userID,
       updatedBy: context.userID
     });
-    validatingCard = false;
     if (receipt) payload._saveReceipt = receipt;
     await validateNotebookReferences(storageOwnerUserID, payload.references, payload.evidenceLinks);
     await validateNotebookImageAssets(storageOwnerUserID, projectID, payload.imageAssets);
+    validatingCard = false;
     const artifact = {
       envelope: artifactEnvelope({
         id: cardID,

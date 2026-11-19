@@ -74,7 +74,7 @@ assert.doesNotMatch(clientSource, /const visibleProjects = visibleRecords\.filte
 assert.match(clientSource, /function unassignedSavedEvidenceKeys[\s\S]*?activeProjectRecords\(projects \|\| \[\]\)/);
 assert.match(clientSource, /typeLabel\.textContent = folderTypeLabel\(project\)/);
 assert.match(clientSource, /folderRecordCountLabel\(selectedCollections\)/);
-assert.match(indexSource, /id="add-reader"[^>]*aria-label="New Reader"[^>]*title="New Reader"[^>]*data-workspace-icon="plus"[\s\S]*?<span>New Reader<\/span>/);
+assert.match(indexSource, /id="add-reader"[^>]*aria-label="New reader"[^>]*title="New reader"[^>]*data-workspace-icon="plus"[\s\S]*?<span>New reader<\/span>/);
 assert.match(indexSource, /class="workflow-layout-actions"[^>]*aria-label="Column layout"/);
 assert.match(indexSource, /id="collapse-all-columns"[^>]*data-workspace-icon="panel-left-close"[\s\S]*?id="expand-all-columns"[^>]*data-workspace-icon="panel-left-open"[\s\S]*?id="fit-columns"[^>]*data-workspace-icon="rotate-ccw"/);
 assert.match(indexSource, /settings-project-clear-all[\s\S]*?Move all saved collections to Trash/);

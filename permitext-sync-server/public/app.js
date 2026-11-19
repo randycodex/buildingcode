@@ -1,6 +1,6 @@
 import { normalizeNoteResearch } from "./note-research.js?v=1";
 import {buildProjectWorkspaceURL, createProjectURLCatalog, mergeProjectURLNames, parseProjectWorkspaceURL, projectURLSlug} from './project-urls.js?v=1';
-import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=17";
+import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=19";
 import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, openRecentReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=5";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
@@ -17,9 +17,9 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261118-workspace-home-link-v2531";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261118-workspace-sync-icon-v2552";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
-import {createResearchHistoryManagement} from "./research-delete-controls.js?v=13";
+import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
@@ -34,7 +34,7 @@ import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProj
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=37";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js?v=2";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261117-toolbar-evidence-v1385";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261118-sync-refresh-v1386";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
 import { createNotebookNoteMenu, createNotebookToolbarMenu } from "./notebook-note-menu.js?v=20261109-notebook-desk-v1299";
 import { createNotebookReferenceTransition } from "./notebook-reference-transition.js?v=2";
@@ -55,7 +55,7 @@ import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=6";
 import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=20261116-assistant-fade-v12";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, capturePaneScrollPositions, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout, notebookColumnsLayout, notebookReferenceVisibility } from "./workflow-views.js?v=28";
 import { createReportScreen } from "./report-screen.js?v=20261107-floating-panels-v7";
-import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=4";
+import { floatingWorkspacePanelBounds, bindFloatingWorkspacePanel, createFloatingWorkspaceTabs } from "./floating-workspace-panel.js?v=5";
 import { createReportResizeDivider, createReportVersionsControls, reportWorkspaceMinimumWidth } from "./report-library.js?v=20261118-report-resize-v17";
 import { createReportComparison, reportComparisonLayout, reportOutlineRailWidth, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261118-report-sidebar-width-v32";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261115-reports-rail-v6";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261118-workspace-home-link-v2531";
+} from "./offline-storage.js?v=20261118-workspace-sync-icon-v2552";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -403,7 +403,6 @@ const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleCalculatorButton = document.querySelector("#toggle-calculator");
 const toggleSavedButton = document.querySelector("#toggle-saved");
-const toggleContextButton = document.querySelector("#toggle-context");
 const toggleFactsButton = document.querySelector("#toggle-facts");
 const toggleNotebookButton = document.querySelector("#toggle-notebook");
 const notebookTabs = document.querySelector("#notebook-note-tabs");
@@ -591,6 +590,8 @@ let activeWorkspaceID = "";
 let suppressReaderScrollRestore = false;
 let workspaceContextMenu = null;
 let workspaceContextMenuBinding = null;
+let workspaceMenu = null;
+let selectedWorkspaceMenuTab = "workspaces";
 let mobileMoreSheet = null;
 const codeQuestionListHydrationByProject = new Map();
 const codeQuestionStateHydrationByQuestion = new Map();
@@ -1573,15 +1574,17 @@ function renderProjectUpdateBadge() {
   const project = activeWorkspaceRecord();
   // The indicator reads account-scoped local metadata; pane access is verified separately.
   const notice = hasCapability("projects") ? pendingProjectUpdate(project?.projectID) : null;
-  if (!automaticContentUpdatesEnabled) {
+  const pendingWrites = connectionStatus?.dataset.state === "pending";
+  if (!automaticContentUpdatesEnabled || pendingWrites) {
     const key = projectUpdateRuntimeKey(project?.projectID);
     const syncing = projectUpdatesApplying.has(key);
-    button.hidden = !activeAccount() || Boolean(detachedProjectWindow) || !notice && !syncing;
+    button.hidden = !activeAccount() || Boolean(detachedProjectWindow) || !notice && !syncing && !pendingWrites;
     button.disabled = syncing || navigator.onLine === false;
     button.classList.toggle("is-syncing", syncing);
     button.setAttribute("aria-busy", String(syncing));
+    const action = syncing ? "Syncing" : pendingWrites ? "Sync pending changes" : "Sync project changes";
     const description = navigator.onLine === false ? "Connect to the internet to sync" :
-      `${syncing ? "Syncing" : "Sync project changes"}${project?.name ? ` · ${project.name}` : ""}${notice && !syncing ? " · changes awaiting review" : ""}`;
+      `${action}${project?.name ? ` · ${project.name}` : ""}${notice && !syncing ? " · changes awaiting review" : ""}`;
     button.title = description;
     button.setAttribute("aria-label", description);
     const time = button.querySelector("time");
@@ -1647,6 +1650,18 @@ async function applyPendingProjectUpdates({automatic = false, checkForUpdates = 
   projectUpdateAutoGuards.set(key, shouldApply);
   renderProjectUpdateBadge();
   try {
+    if (checkForUpdates && connectionStatus?.dataset.state === "pending") {
+      try { await flushPendingContentWrites(); }
+      catch (error) {
+        if (!shouldApply()) return false;
+        if (connectionStatus.dataset.state !== "pending") throw error;
+      }
+      if (!shouldApply()) return false;
+      if (connectionStatus.dataset.state === "pending") {
+        await openPendingSyncDetails();
+        return false;
+      }
+    }
     if (!automatic && !await confirmWorkspaceTransition()) {
       if (isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID) requirePendingProjectUpdateReview();
       return false;
@@ -2210,7 +2225,7 @@ async function switchWorkspace(workspaceID, options = {}) {
       // callbacks must not briefly reveal the previous project's columns.
       const deferred = state.workflowPresentationDeferred;
       state.workflowPresentationDeferred = true;
-      try { closeSharedWorkspaceViews(); projectDetailsScreen?.close(); }
+      try { closeWorkspaceContextMenu(); closeSharedWorkspaceViews(); projectDetailsScreen?.close(); }
       finally {
         if (deferred === undefined) delete state.workflowPresentationDeferred;
         else state.workflowPresentationDeferred = deferred;
@@ -2589,11 +2604,91 @@ function moveNamedWorkspace(workspaceID, direction) {
 }
 
 function closeWorkspaceContextMenu() {
+  closeWorkspaceMenu();
   workspaceContextMenuBinding?.dispose();
   workspaceContextMenuBinding = null;
   workspaceContextMenu?.remove();
   workspaceContextMenu = null;
   workspaceActionsButton?.setAttribute("aria-expanded", "false");
+}
+
+function closeWorkspaceMenu() {
+  const menu = workspaceMenu;
+  if (!menu) return;
+  workspaceMenu = null;
+  menu.binding.dispose();
+  menu.tabs.dispose();
+  menu.panels.settings.querySelector(".settings-floating-panel[open]")?.close();
+  if (projectDetailsScreen && menu.panels.project.contains(projectDetailsScreen.element)) {
+    projectDetailsScreen.close();
+    document.querySelector(".workspace-shell").append(projectDetailsScreen.element);
+  }
+  menu.element.remove();
+}
+
+function showWorkspaceMenuTab(menu, tab, options) {
+  if (menu.tab === "project" && tab !== "project") projectDetailsScreen?.close();
+  if (menu.tab === "settings" && tab !== "settings") menu.panels.settings.querySelector(".settings-floating-panel[open]")?.close();
+  menu.tab = tab;
+  menu.element.dataset.tab = tab;
+  selectedWorkspaceMenuTab = tab;
+  const mount = menu.panels[tab];
+  if (tab === "workspaces") {
+    menu.workspacesReady ??= openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton, { mount });
+    return menu.workspacesReady;
+  }
+  if (tab === "settings") return toggleAccountDialog({ mount });
+  if (!workspacePrivatePresentationAllowed() || !workspaceProject() || !hasCapability("projects")) {
+    mount.textContent = "Choose a workspace to open project details.";
+    return false;
+  }
+  return openProjectDetailsScreen(options.section, { ...options, mount });
+}
+
+function openWorkspaceMenu(tab, options = {}) {
+  if (workspaceMenu) {
+    workspaceMenu.options = options;
+    workspaceMenu.tabs.select(tab ?? selectedWorkspaceMenuTab, { focus: !options.shouldApply });
+    return workspaceMenu.ready;
+  }
+  closeWorkspaceContextMenu();
+  const element = document.createElement("section");
+  element.id = "workspace-menu-panel";
+  element.className = "workspace-menu-panel";
+  element.setAttribute("role", "dialog");
+  element.setAttribute("aria-label", "Workspace menu");
+  const entries = [["workspaces", "Workspaces"], ["project", "Project"], ["settings", "Settings"]].map(([id, label]) => {
+    const panel = document.createElement("section");
+    panel.className = "workspace-menu-page";
+    return { id, label, panel };
+  });
+  const panels = Object.fromEntries(entries.map(({id, panel}) => [id, panel]));
+  element.append(...entries.map(({panel}) => panel));
+  document.querySelector(".workspace-shell").append(element);
+  const menu = { element, panels, options };
+  const preferenceKey = `permitext:workspace-menu-tab:${activeAccount()?.userID || "guest"}`;
+  if (!tab) {
+    try { tab = sessionStorage.getItem(preferenceKey) || selectedWorkspaceMenuTab; }
+    catch { tab = selectedWorkspaceMenuTab; }
+  }
+  workspaceMenu = menu;
+  menu.binding = bindFloatingWorkspacePanel(element, {
+    anchor: workspaceActionsButton, alignmentReference: workspaceFloatingPanelReference, topGap: 25,
+    dismiss: closeWorkspaceMenu, manageAnchor: true,
+    isPinned: () => menu.tab !== "workspaces"
+  });
+  menu.tabs = createFloatingWorkspaceTabs({
+    id: "workspace-menu", label: "Workspace menu sections", entries, selected: tab,
+    onSelect: key => {
+      try { sessionStorage.setItem(preferenceKey, key); } catch { /* Keep the selection in memory. */ }
+      const selectionOptions = menu.options || {};
+      menu.options = null;
+      menu.ready = showWorkspaceMenuTab(menu, key, selectionOptions);
+    }
+  });
+  element.prepend(menu.tabs.element);
+  menu.tabs.element.querySelector('[aria-selected="true"]')?.focus({ preventScroll: true });
+  return menu.ready;
 }
 
 function closeMobileMoreSheet({ restoreFocus = true } = {}) {
@@ -2698,7 +2793,7 @@ function openMobileMoreSheet() {
   closeButton.focus({ preventScroll: true });
 }
 
-async function openWorkspaceContextMenu(workspaceID, anchor, {actionLabel = "", onSelected = null} = {}) {
+async function openWorkspaceContextMenu(workspaceID, anchor, {actionLabel = "", onSelected = null, mount = null} = {}) {
   // The chooser belongs to the account, not to the workspace being replaced.
   // Validate the synced account snapshot without depending on a selected pane gate.
   const identity = captureAccountRequest();
@@ -2712,12 +2807,12 @@ async function openWorkspaceContextMenu(workspaceID, anchor, {actionLabel = "", 
       }
     } catch { /* Public view controls remain available when private sync cannot load. */ }
   }
-  if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID ||
+  if ((mount && !mount.isConnected) || !isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID ||
       (state.workflowNavigationGeneration || 0) !== navigation) return;
   const projectsAvailable = Boolean(activeAccount()?.userID && content?.userID === activeAccount().userID &&
     ["verified", "permitted-offline"].includes(content?.workspacePresentationAccess));
   if (projectsAvailable) reconcileProjectWorkspaces();
-  closeWorkspaceContextMenu();
+  if (!mount) closeWorkspaceContextMenu();
   const workspaces = projectsAvailable ? visibleWorkspaceRecords() : [];
   const menu = document.createElement("div");
   menu.className = "workspace-context-menu workspace-chooser-menu";
@@ -2757,8 +2852,10 @@ async function openWorkspaceContextMenu(workspaceID, anchor, {actionLabel = "", 
   projectSection.setAttribute("aria-label", "Workspaces");
   const heading = document.createElement("strong");
   heading.className = "workspace-context-heading";
-  heading.textContent = actionLabel ? `Choose a workspace for ${actionLabel}` : "Workspaces";
-  projectSection.append(heading);
+  if (!mount) {
+    heading.textContent = actionLabel ? `Choose a workspace for ${actionLabel}` : "Workspaces";
+    projectSection.append(heading);
+  }
   workspaces.forEach((candidate) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -2781,9 +2878,8 @@ async function openWorkspaceContextMenu(workspaceID, anchor, {actionLabel = "", 
     appendMenuAction(projectSection, { label: activeAccount() ? "Account & project access" : "Sign in for Projects", run: () => toggleAccountDialog() });
   }
   menu.append(projectSection);
-  const viewOptions = document.createElement("div");
-  viewOptions.className = "workspace-view-options";
   const layoutActions = document.createElement("div");
+  layoutActions.className = "workspace-view-options";
   layoutActions.setAttribute("role", "group");
   layoutActions.setAttribute("aria-label", "View options");
   if (projectsAvailable && state.columnGroups?.length && !["notebook", "report"].includes(currentColumnWorkflowView())) appendMenuAction(layoutActions, {
@@ -2793,18 +2889,17 @@ async function openWorkspaceContextMenu(workspaceID, anchor, {actionLabel = "", 
     appendMenuAction(layoutActions, {label: 'Close all columns',
       disabled: !defaultActivePaneIDs().some(workflowPaneIsVisible), run: () => void closeAllColumns()});
   }
-  if (layoutActions.childElementCount) {
-    const label = document.createElement('strong');
-    label.className = 'workspace-context-heading';
-    label.textContent = 'View options';
-    viewOptions.append(label, layoutActions);
-    menu.append(viewOptions);
+  if (layoutActions.childElementCount) menu.append(layoutActions);
+  if (mount) {
+    mount.replaceChildren(menu);
+    return;
   }
   document.body.append(menu);
   workspaceContextMenu = menu;
   workspaceContextMenuBinding = bindFloatingWorkspacePanel(menu, {
     anchor: anchor || workspaceActionsButton,
     alignmentReference: workspaceFloatingPanelReference,
+    topGap: 25,
     dismiss: closeWorkspaceContextMenu,
     isOpen: () => workspaceContextMenu === menu,
     manageAnchor: true
@@ -2837,6 +2932,7 @@ function renderWorkspaceTabs() {
   const container = workspaceActionsButton?.closest(".topbar-workspaces");
   if (!workspaceActionsButton || !container) return;
   container.hidden = detachedProjectWindow || !isProAccount();
+  if (container.hidden) closeWorkspaceMenu();
   if (detachedProjectWindow) return;
   if (!privateAllowed) {
     const label = workspaceActionsButton.querySelector(".workspace-current-name");
@@ -2865,7 +2961,6 @@ function updateWorkspaceLayoutControls() {
   const hasColumns = defaultActivePaneIDs().some(workflowPaneIsVisible);
   fitColumnsButton.hidden = false;
   fitColumnsButton.disabled = !hasColumns && !reportReady;
-  fitColumnsButton.title = "Restore default column sizes and order";
   document.querySelectorAll("#collapse-all-columns, #expand-all-columns")
     .forEach(button => { button.hidden = false; button.disabled = !hasColumns && !reportReady; });
 }
@@ -5348,6 +5443,7 @@ function appendProjectOpenQuestions(container, project) {
 
 async function openProjectDetailsScreen(section = null, options = {}) {
   if (notifyProjectRequiredForColumn() || !workspacePrivatePresentationAllowed() || !hasCapability("projects")) return false;
+  if (!options.mount && !detachedProjectWindow) return openWorkspaceMenu("project", { ...options, section });
   document.querySelector('.workspace-manager-floating')?._close?.();
   const project = workspaceProject();
   if (!project) return false;
@@ -5356,6 +5452,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   document.querySelector(".settings-floating-panel[open]")?.close();
   const projectID = projectDetailKey(identity);
   if (projectDetailsScreen?.isCurrent()) {
+    if (options.mount && projectDetailsScreen.element.parentNode !== options.mount) options.mount.append(projectDetailsScreen.element);
     await projectDetailsScreen.open();
     if (section) projectDetailsScreen.selectSection(section);
     return true;
@@ -5376,7 +5473,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   columns.setAttribute("aria-label", "Project details columns");
   const panels = new Map();
   const contentFlushes = new Map();
-  const sections = [["context", "Context"], ["facts", "Facts"], ["questions", "Questions"], ["checklist", "Checklist"]];
+  const sections = [["context", "Context"], ["facts", "Zoning"], ["questions", "Questions"], ["checklist", "Checklist"]];
   let selectedSection = "context";
   let panelTabs = null;
   let floatingControls = null;
@@ -5391,7 +5488,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   };
   const screen = createReportScreen({
     screenTitle: "Project", screenClass: "project-details-screen workspace-floating-panel", projectName: identity.name,
-    mount: document.querySelector(".workspace-shell"),
+    mount: options.mount || document.querySelector(".workspace-shell"),
     coveredElements: [], dismissOnEscape: false,
     onOpen: () => { openProjectEditor(); floatingControls?.position(); syncWorkflowNavigation(); },
     backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
@@ -5493,14 +5590,17 @@ async function openProjectDetailsScreen(section = null, options = {}) {
       if (projectDetailsScreen === screen) projectDetailsScreen = null;
     }
   });
-  screen.element.setAttribute("role", "dialog");
   screen.element.id = "project-context-floating-panel";
-  screen.element.setAttribute("aria-label", "Project context");
-  screen.element.setAttribute("aria-modal", "false");
-  floatingControls = bindFloatingWorkspacePanel(screen.element, {
-    anchor: toggleContextButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(),
-    isPinned: () => true, alignmentReference: workspaceFloatingPanelReference
-  });
+  if (!options.mount) {
+    screen.element.setAttribute("role", "dialog");
+    screen.element.setAttribute("aria-label", "Project context");
+    screen.element.setAttribute("aria-modal", "false");
+    floatingControls = bindFloatingWorkspacePanel(screen.element, {
+      anchor: settingsButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(),
+      isPinned: () => true, topGap: 25,
+      alignmentReference: workspaceFloatingPanelReference
+    });
+  }
   screen.projectID = projectID;
   screen.selectSection = selectSection;
   screen.getPresentationState = () => ({section: selectedSection,
@@ -5516,8 +5616,8 @@ async function openProjectDetailsScreen(section = null, options = {}) {
   };
   projectDetailsScreen = screen;
   await screen.open();
-  floatingControls.position();
-  screen.element.querySelector('[role="tab"][aria-selected="true"]')?.focus({ preventScroll: true });
+  floatingControls?.position();
+  if (!options.mount) screen.element.querySelector('[role="tab"][aria-selected="true"]')?.focus({ preventScroll: true });
   if (options.shouldApply && !updateLoaded && screen.isCurrent()) throw new Error("Project information could not be refreshed. Your update is still waiting for review.");
   return screen.isCurrent();
 }
@@ -6238,7 +6338,6 @@ function syncWorkflowNavigation() {
   syncTopbarProjectToolStates();
   if (sharedNotesOpen()) void ensureNotebookTabCatalog();
   syncNotebookLanding();
-  syncResearchStart();
 }
 async function switchWorkflowView(view, {initialize = true} = {}) {
   if (!isProAccount() && view !== "research") return false;
@@ -6795,7 +6894,6 @@ function syncTopbarProjectToolStates() {
   const requiresProject = workspaceColumnsRequireProject();
   syncNotebookListControls();
   [
-    [toggleContextButton, "Context", "projects", () => projectDetailsScreen?.isOpen() === true],
     [toggleFactsButton, "Facts", "projects", () => Boolean(state.projectFactsOpen)],
     [toggleNotebookButton, "Notes", "notebook", projectHasOpenNotebook],
     [toggleReportButton, "Report", "professional-exports", projectHasOpenReportDraft]
@@ -6803,9 +6901,8 @@ function syncTopbarProjectToolStates() {
     if (!button) return;
     const opened = Boolean(identity && isOpen(identity));
     const sharedReport = Boolean(label === "Report" && identity?.sharedOnly);
-    button.disabled = projectToolTogglePending || ((label === "Context" || !requiresProject) && (!identity || !hasCapability(capability) || sharedReport));
-    if (label === "Context") button.setAttribute("aria-expanded", String(opened));
-    else button.setAttribute("aria-pressed", String(label === "Report" ? reportScreen?.isOpen() === true : opened));
+    button.disabled = projectToolTogglePending || (!requiresProject && (!identity || !hasCapability(capability) || sharedReport));
+    button.setAttribute("aria-pressed", String(label === "Report" ? reportScreen?.isOpen() === true : opened));
     button.title = requiresProject ? `Choose a workspace first to open ${label}`
       : !identity ? `Choose a Project to open ${label}`
       : !hasCapability(capability) ? `${label} requires Pro`
@@ -10453,6 +10550,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   activeWebWarningClose?.(false);
   closeActiveCustomSelect();
   closeWorkspaceContextMenu();
+  selectedWorkspaceMenuTab = "workspaces";
   closeMobileMoreSheet({ restoreFocus: false });
   document.querySelectorAll(".command-palette-backdrop, .project-sheet-overlay").forEach((node) => node.remove());
   notebookMounts.forEach((mount) => mount.dispose());
@@ -10565,9 +10663,11 @@ function updateConnectionStatus() {
       : pending > 0 ? `Changes pending · ${pending}`
         : syncFlushPromise || foregroundSyncPromise ? "Syncing"
           : account ? "Synced" : "Online";
-  connectionStatus.style.width = statusKind === "clean" ? "0px" : `${statusLabel.scrollWidth}px`;
-  connectionStatus.setAttribute("aria-hidden", String(statusKind === "clean"));
-  const statusActionAvailable = statusKind === "conflict" || statusKind === "pending";
+  const pendingUsesSyncButton = statusKind === "pending" && projectUpdateAutoApplyReady && !detachedProjectWindow;
+  const showConnectionStatus = statusKind !== "clean" && !pendingUsesSyncButton;
+  connectionStatus.style.width = showConnectionStatus ? `${statusLabel.scrollWidth}px` : "0px";
+  connectionStatus.setAttribute("aria-hidden", String(!showConnectionStatus));
+  const statusActionAvailable = showConnectionStatus && (statusKind === "conflict" || statusKind === "pending");
   connectionStatus.classList.toggle("is-actionable", statusActionAvailable);
   connectionStatus.setAttribute("role", statusActionAvailable ? "button" : "status");
   if (statusActionAvailable) {
@@ -10747,7 +10847,7 @@ function syncReaderToolbarButton(button) {
   const requiresProject = workspaceColumnsRequireProject();
   const replacesReader = !pro && state.readers.length >= 1;
   const newReaderButton = button.id === 'add-reader';
-  const readerLabel = newReaderButton ? "New Reader" : "Reader";
+  const readerLabel = newReaderButton ? "New reader" : "Reader";
   const notebookButton = button.id === 'add-notebook-reader';
   const notebookOpen = notebookButton && pro && !state.notebookReaderHidden && state.readers.some(reader => state.workflowMembership?.[`reader:${reader.id}`]?.includes('notebook'));
   button.querySelector("span").textContent = pro && !notebookButton && !newReaderButton ? `${readerLabel} +` : readerLabel;
@@ -13836,6 +13936,7 @@ async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountR
     error.recoverableDraft = await recordNotebookDraftSaveError(requestIdentity.userID, draft.projectID,
       submittedDraft.cardID, submittedDraft.revision, error.message,
       {rejected:error.status === 400 && error.payload?.rejectedBeforeSave === true && !invalidLegacyQuestions});
+    await refreshNotebookPendingStatus(requestIdentity);
     // Only a definitive rejection allows retiring an old invalid receipt.
     // Timeouts, conflicts and other uncertain outcomes keep the original body.
     if (error.status !== 400 || !invalidLegacyQuestions) throw error;
@@ -21295,7 +21396,7 @@ async function renderReader(reader, options = {}) {
   renderReaderTabs(panel, reader);
   panel.dataset.readerDisplayedTabId = reader.activeTabID;
   const columnLabel = readerPositionLabel(reader);
-  closeButton.title = columnLabel.startsWith("Search Reader") ? `Close ${columnLabel} column` : "Close Reader column";
+  closeButton.title = columnLabel.startsWith("Search reader") ? `Close ${columnLabel} column` : "Close Reader column";
   closeButton.setAttribute("aria-label", closeButton.title);
   let tabScrollTimer;
   panel.querySelector('.reader-content').addEventListener('scroll', () => {
@@ -38066,7 +38167,9 @@ function openWorkspaceManager() {
   const close = () => { clearInterval(contextCheck); binding?.dispose(); panel.remove(); workspaceActionsButton?.focus({preventScroll: true}); };
   panel._close = close;
   panel.querySelector('.workspace-manager-header button').addEventListener('click', close);
-  binding = bindFloatingWorkspacePanel(panel, {anchor: workspaceActionsButton, alignmentReference: workspaceFloatingPanelReference, dismiss: close});
+  binding = bindFloatingWorkspacePanel(panel, {
+    anchor: workspaceActionsButton, alignmentReference: workspaceFloatingPanelReference, topGap: 25, dismiss: close
+  });
   panel.querySelector('button')?.focus({preventScroll: true});
 }
 
@@ -38114,7 +38217,7 @@ function renderProjectManager(container, { onChange = () => {} } = {}) {
     controls.append(tabs);
     const toolbar = document.createElement("div");
     toolbar.className = "project-manager-toolbar";
-    const selectionButton = button(selecting ? "Done" : "Select", () => {
+    const selectionButton = button(selecting ? "Cancel selection" : "Select", () => {
       selecting = !selecting; selected.clear(); render();
     }, controls, !records.length && !selecting);
     selectionButton.className = "project-manager-selection";
@@ -42043,7 +42146,7 @@ function readerPositionLabel(reader) {
   const searchReader = fromSearch(reader);
   const readers = (state.readers || []).filter(candidate => !inNotebook(candidate) && fromSearch(candidate) === searchReader);
   const index = readers.findIndex(candidate => candidate.id === reader?.id);
-  if (searchReader) return readers.length > 1 && index >= 0 ? `Search Reader ${index + 1}` : "Search Reader";
+  if (searchReader) return readers.length > 1 && index >= 0 ? `Search reader ${index + 1}` : "Search reader";
   return index >= 0 ? `Reader ${index + 1}` : "Reader";
 }
 
@@ -44071,14 +44174,9 @@ function showProAccountCheckout(dialog) {
 }
 
 function workspaceFloatingPanelReference() {
-  const right = settingsButton?.getBoundingClientRect?.().right ?? window.innerWidth - 24;
-  const reader = [...document.querySelectorAll('.topbar [data-open-reader], .workflow-toolbar [data-open-reader]')]
-    .map(button => button.getBoundingClientRect()).find(bounds => bounds.height > 0);
-  if (reader) return { right, bottom: reader.bottom };
-  const toolbar = document.querySelector('.workflow-toolbar')?.getBoundingClientRect();
-  const bar = toolbar?.height ? toolbar : document.querySelector('.topbar').getBoundingClientRect();
-  const controlHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--workspace-menu-height')) || 30;
-  return { right, bottom: bar.bottom - Math.max(0, (bar.height - controlHeight) / 2) };
+  const workspace = workspaceActionsButton?.getBoundingClientRect();
+  const right = workspace?.width ? workspace.right : settingsButton?.getBoundingClientRect().right ?? window.innerWidth - 24;
+  return { right, bottom: document.querySelector('.topbar').getBoundingClientRect().bottom };
 }
 
 function organizeAccountSettings(panel, { floating = false, selected = "account", onSelect = () => {} } = {}) {
@@ -44180,16 +44278,18 @@ function mountAccountScreenContent(dialog, panel) {
   dialog.replaceChildren(header, panel);
 }
 
-function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
-  document.querySelector('.workspace-manager-floating')?._close?.();
+function toggleAccountDialog({ upgrade = false, signIn = false, mount = null } = {}) {
   const directSignIn = signIn && !activeAccount();
   const floating = !upgrade && !directSignIn;
+  if (floating && !mount && !detachedProjectWindow && isProAccount()) return openWorkspaceMenu("settings");
+  document.querySelector('.workspace-manager-floating')?._close?.();
   const existing = document.querySelector(floating ? ".settings-floating-panel[open]" : ".account-workspace-view[open]");
   if (existing) {
     if (!upgrade || existing.dataset.proUpgrade === "true") return;
     existing.close();
   }
   if (!floating) {
+    closeWorkspaceContextMenu();
     document.querySelector(".settings-floating-panel[open]")?.close();
     closeSharedWorkspaceViews("account");
   }
@@ -44202,8 +44302,10 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
   dialog.classList.add(floating ? "settings-floating-panel" : "account-workspace-view");
   if (floating) {
     dialog.id = "settings-floating-panel";
-    dialog.setAttribute("role", "dialog");
-    dialog.setAttribute("aria-modal", "false");
+    if (!mount) {
+      dialog.setAttribute("role", "dialog");
+      dialog.setAttribute("aria-modal", "false");
+    }
   }
   if (directSignIn) dialog.dataset.signIn = "true";
   if (upgrade) {
@@ -44259,14 +44361,15 @@ function toggleAccountDialog({ upgrade = false, signIn = false } = {}) {
   (floating ? [] : [track, document.querySelector(".workflow-toolbar")]).filter(Boolean).forEach(element => {
     coveredState.set(element, element.inert); element.inert = true;
   });
-  document.querySelector(".workspace-shell").append(dialog);
-  if (floating) dialog._floatingControls = bindFloatingWorkspacePanel(dialog, {
+  (mount || document.querySelector(".workspace-shell")).append(dialog);
+  if (floating && !mount) dialog._floatingControls = bindFloatingWorkspacePanel(dialog, {
     anchor: settingsButton, dismiss: () => dialog.close(), isPinned: () => true,
-    manageAnchor: true, alignmentReference: workspaceFloatingPanelReference
+    manageAnchor: true, topGap: 25,
+    alignmentReference: workspaceFloatingPanelReference
   });
-  else state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
+  if (!floating) state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
   syncWorkflowNavigation();
-  (dialog.querySelector('[role="tab"][aria-selected="true"]') || dialog).focus({ preventScroll: true });
+  if (!mount) (dialog.querySelector('[role="tab"][aria-selected="true"]') || dialog).focus({ preventScroll: true });
   if (directSignIn) panel.querySelector('[data-account-mode="signIn"]')?.click();
   else if (upgrade && activeAccount() && !isProAccount()) showProAccountCheckout(dialog);
 }
@@ -46669,34 +46772,6 @@ function completeFirstUseWelcome() {
   } catch {
     // No persisted dismissal is available in this browser session.
   }
-}
-
-function syncResearchStart() {
-  let start = track.querySelector('.research-start');
-  if (!isProAccount() || !workspacePrivatePresentationAllowed() || !workspaceProject() ||
-      reportScreen?.isOpen() || defaultActivePaneIDs().some(workflowPaneIsVisible)) {
-    start?.remove();
-    return;
-  }
-  if (start) return;
-  start = document.createElement('section');
-  start.className = 'workspace-empty-state research-start';
-  start.setAttribute('aria-label', 'Research tools');
-  const actions = document.createElement('div');
-  actions.className = 'workspace-empty-actions';
-  for (const [label, run] of [
-    ['Ask about this project', () => focusRecentUtilityColumn('analysis')],
-    ['Search codes', () => focusRecentUtilityColumn('search')],
-    ['Open a reader', () => openReaderFromToolbar(readerToolbarButtonForCurrentView())]
-  ]) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.textContent = label;
-    button.addEventListener('click', () => void run());
-    actions.append(button);
-  }
-  start.append(actions);
-  track.append(start);
 }
 
 function renderProjectRequiredWorkspace() {
@@ -52391,7 +52466,6 @@ function bindImmediateUtilityControls() {
       () => switchWorkflowView(button.dataset.workflowView)));
   });
   [
-    [toggleContextButton, "context"],
     [toggleFactsButton, "facts"],
     [toggleNotebookButton, "notebook"],
     [toggleReportButton, "report"]
@@ -52401,14 +52475,9 @@ function bindImmediateUtilityControls() {
     const openTool = () => {
       if (workspaceColumnsRequireProject()) {
         void openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton, {
-          actionLabel: tool === "report" ? "Report" : tool === "notebook" ? "Notebook" : tool === "facts" ? "Facts" : "Context",
+          actionLabel: tool === "report" ? "Report" : tool === "notebook" ? "Notebook" : "Facts",
           onSelected: openTool
         });
-        return;
-      }
-      if (tool === "context") {
-        if (projectDetailsScreen?.isOpen()) projectDetailsScreen.close();
-        else void openProjectDetailsScreen();
         return;
       }
       return tool === "facts" ? toggleProjectInformation(tool) : openOrRevealProjectTool(tool);
@@ -52716,11 +52785,11 @@ async function start() {
     toggleUtilityPane("archive");
   });
   workspaceActionsButton?.addEventListener("click", () => {
-    if (workspaceContextMenu) {
+    if (workspaceMenu || workspaceContextMenu) {
       closeWorkspaceContextMenu();
       return;
     }
-    openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
+    void openWorkspaceMenu();
   });
   settingsButton?.addEventListener("click", () => {
     const panel = document.querySelector(".settings-floating-panel[open]");

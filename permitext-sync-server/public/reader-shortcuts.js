@@ -49,6 +49,24 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     tooltip.style.left = `${Math.max(8, Math.min(bounds.left, win.innerWidth - tooltip.offsetWidth - 8))}px`;
     tooltip.style.top = `${bounds.bottom + 7}px`;
   }
+  function bindTooltip(button) {
+    const show = () => showTooltip(button);
+    const hide = () => { if (tooltipButton === button) hideTooltip(); };
+    const listeners = [
+      ['pointerenter', show],
+      ['pointerleave', () => { if (doc.activeElement !== button) hide(); }],
+      ['focus', show],
+      ['blur', hide]
+    ];
+    for (const [event, listener] of listeners) button.addEventListener(event, listener);
+    return () => {
+      for (const [event, listener] of listeners) button.removeEventListener(event, listener);
+    };
+  }
+  const unbindLayoutTooltips = Array.from(
+    doc.body.querySelector('.workflow-layout-actions')?.querySelectorAll('button') || [],
+    bindTooltip
+  );
   function activate(id) {
     if (!buttons.has(id)) return;
     activeID = id;
@@ -245,10 +263,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
             if (target) { void move(item.id, target, direction < 0 ? 'before' : 'after'); button.focus({preventScroll:true}); }
           });
         }
-        button.addEventListener('pointerenter', () => showTooltip(button));
-        button.addEventListener('pointerleave', () => { if (doc.activeElement !== button) hideTooltip(); });
-        button.addEventListener('focus', () => showTooltip(button));
-        button.addEventListener('blur', hideTooltip);
+        bindTooltip(button);
         buttons.set(item.id, button);
       }
       const label = item.label || readerShortcutLabel(item);
@@ -327,6 +342,8 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
       doc.removeEventListener('pointerup', releasePointer);
       doc.removeEventListener('pointercancel', cancelPointer);
       doc.removeEventListener('keydown', dismiss);
+      hideTooltip();
+      unbindLayoutTooltips.forEach(unbind => unbind());
       tooltip.remove();
       restoreLaunchers();
       launchers.forEach(({home}) => home.remove());

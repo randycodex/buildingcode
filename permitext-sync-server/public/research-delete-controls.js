@@ -1,4 +1,4 @@
-import {bindFloatingWorkspacePanel} from './floating-workspace-panel.js?v=4';
+import {bindFloatingWorkspacePanel} from './floating-workspace-panel.js?v=5';
 
 const historyMenuIcon = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>';
 

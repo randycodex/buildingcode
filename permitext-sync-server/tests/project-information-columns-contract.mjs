@@ -64,9 +64,9 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
   createProjectToolDragHandle: () => element('button'),
   applyPaneWeight: panel => renderedInformation.push(panel),
   renderProjectSavedWork: async () => {}, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
-  currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
+  currentWorkflowView:()=>"research", currentColumnWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
-  workspaceActionsButton: element('button'), toggleContextButton: element('button'),
+  workspaceActionsButton: element('button'), settingsButton: element('button'), detachedProjectWindow: true,
   workspaceFloatingPanelReference: () => ({bottom:70}),
   bindFloatingWorkspacePanel: (_panel, {isPinned}) => { assert.equal(isPinned(),true); return {position(){},dispose(){disposedResizers++;}}; },
   prependWorkspaceButtonIcon: button => button,
@@ -112,7 +112,7 @@ assert.equal(workspaceShell.inert, undefined, 'The floating panel leaves the cur
 assert.equal(contextPanel.hidden, false); assert.equal(factsPanel.hidden, true);
 const columns = find(screenElement, node => node.className === 'project-details-columns');
 assert.equal(columns.children.length, 4, 'All four tab editors remain mounted');
-for (const label of ['Context', 'Facts', 'Questions', 'Checklist']) {
+for (const label of ['Context', 'Zoning', 'Questions', 'Checklist']) {
   assert.ok(find(columns, node => node.tag === 'h2' && node.textContent === label));
 }
 assert.equal(find(screenElement, node => node.className === 'project-details-tabs'), undefined);
@@ -208,6 +208,7 @@ const widthContext = vm.createContext({
   isProjectNotebookPaneID: () => false, isProjectReportDraftPaneID: () => false,
   isProjectCoordinationThreadPaneID: () => false, isProjectCoordinationPaneID: () => false,
   isProjectDetailPaneID: () => false, isFixedWidthPaneID: () => false,
+  currentColumnWorkflowView: () => "notebook",
   detachedProjectWindow: false
 });
 vm.runInContext([
@@ -354,6 +355,7 @@ const u = vm.createContext({ state: localState,
   projectStructuredFacts: project => copy(project.structuredFacts || []), activeAccount: () => ({ userID: "test" }),
   openProjectDetails: () => identities, setOpenProjectDetails: value => { identities = value; },
   projectIdentity: value => ({ ...value }), projectDetailKey: value => value.id,
+  syncProjectWorkspaceURL() {}, refreshProjectURLCatalog() {}, mergeProjectURLNames: (before, after) => [...before, ...after],
   saveWorkspaceState() {}, refreshOpenProjectPaneTheme() {}, visibleProjectArtifactIDs: () => [],
   refreshOpenSettingsWorkspace() { settingsNames.push((localState.localProjects[0] || canonical).name); },
   projectMutationForRecord: value => copy(value),

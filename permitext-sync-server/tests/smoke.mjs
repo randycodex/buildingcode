@@ -432,21 +432,25 @@ async function main() {
     const workflowOrder = ['data-workflow-tools="research"', 'id="add-reader"', 'id="toggle-search"', 'id="toggle-saved"',
       'id="toggle-analysis"', 'id="toggle-calculator"', 'data-workflow-tools="notebook"',
       'id="toggle-notebook"', 'class="note-picker-host"', 'data-workflow-tools="report"',
-      'id="toggle-report"', 'class="workflow-layout-actions"',
-      'id="collapse-all-columns"', 'id="expand-all-columns"', 'id="fit-columns"']
+      'id="toggle-report"']
       .map(marker => workflowSource.indexOf(marker));
     assert(
       workflowStart >= 0 && workflowOrder.every((index, position) => index >= 0 && (position === 0 || index > workflowOrder[position - 1])),
-      "The shared header must retain Research, Notebook, Report and column layout controls."
+      "The shared toolbar must retain Research, Notebook, and Report controls."
     );
-    for (const [id, label] of [["add-reader", "New Reader"], ["toggle-search", "Search"], ["toggle-analysis", "Assistant"],
+    for (const [id, label] of [["add-reader", "New reader"], ["toggle-search", "Search"], ["toggle-analysis", "Assistant"],
       ["toggle-notebook", "Notes"], ["toggle-report", "Report"], ["toggle-saved", "Evidence"]]) {
       const tag = tagWithID(workflowSource, id);
       assert(tag.includes('type="button"') && tag.includes(`aria-label="${label}"`), `${label} tool lost button semantics or its accessible label.`);
       if (id.startsWith("toggle-")) assert(tag.includes('aria-pressed="false"'), `${label} tool lost its initial toggle state.`);
     }
-    assert(tagWithID(topbarSource, "workspace-actions").includes('aria-haspopup="menu"') &&
-      tagWithID(topbarSource, "workspace-actions").includes('aria-expanded="false"') &&
+    const layoutOrder = ['id="web-app-update-button"', 'id="collapse-all-columns"', 'id="expand-all-columns"', 'id="fit-columns"']
+      .map(marker => topbarSource.indexOf(marker));
+    assert(layoutOrder.every((index, position) => index >= 0 && (position === 0 || index > layoutOrder[position - 1])),
+      "The update button must precede the layout controls in the shared header.");
+    const workspaceMenuButton = tagWithID(topbarSource, "workspace-actions");
+    assert(workspaceMenuButton.includes('aria-haspopup="dialog"') &&
+      workspaceMenuButton.includes('aria-expanded="false"') && workspaceMenuButton.includes('aria-controls="workspace-menu-panel"') &&
       tagWithID(topbarSource, "toggle-settings").includes('aria-label="Settings"'),
     "Projects menu or Account navigation lost accessible semantics.");
     const settingsTemplateSource = webRoot.text.slice(
@@ -614,7 +618,7 @@ async function main() {
       webRoot.text.includes('id="workspace-actions"') &&
         webRoot.text.includes('class="workspace-current-name">Workspace</span>') &&
         !webRoot.text.includes('id="add-workspace"') &&
-        tagWithID(webRoot.text, "collapse-all-columns").includes('title="Collapse all columns"') &&
+        tagWithID(webRoot.text, "collapse-all-columns").includes('data-description="Collapse all columns"') &&
         !webRoot.text.includes(">One Reader</button>") &&
         workspaceScript.text.includes('let workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
         workspaceScript.text.includes('privateWorkspaceKeys') &&
@@ -2232,7 +2236,7 @@ async function main() {
       "Web warnings no longer share the Clear canvas confirmation-dialog pattern."
     );
     assert(
-      webRoot.text.includes('class="topbar-brand" aria-label="per codes"') &&
+      webRoot.text.includes('class="topbar-brand" aria-label="Per Codes"') &&
         !webRoot.text.includes('class="topbar-brand-plan"') &&
         !workspaceScript.text.includes('topbarBrandPlan') &&
         workspaceScript.text.includes('function currentPlan()'),

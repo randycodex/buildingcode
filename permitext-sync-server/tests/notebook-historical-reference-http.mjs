@@ -71,6 +71,7 @@ try {
   });
   assert.equal(rejected.status, 400);
   assert.match(rejected.json.error, /Notebook reference is unavailable/);
+  assert.equal(rejected.json.rejectedBeforeSave, true, "An invalid reference must let the client retire the rejected save and send the corrected draft.");
   const historicalVersion = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1";
   const pushed = await request("/sync/push", { batch: { user: { id: userID }, mutations: sectionIDs.map((sectionID) => ({
     projectSection: { id: `historical-${sectionID}`, userID, codeVersion: historicalVersion,

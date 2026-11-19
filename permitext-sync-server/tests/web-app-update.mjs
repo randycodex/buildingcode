@@ -53,8 +53,10 @@ const entry=await readFile(new URL('../public/index.html',import.meta.url),'utf8
 assert(entry.includes(`/web/app.js?v=${webAppVersion}`),'Server release metadata must match the shipped app');
 assert(source.includes(`./web-client-version.js?v=${webAppVersion}`),'The app must import its own immutable release metadata');
 assert(entry.indexOf('id="web-app-update-button"')<entry.indexOf('id="project-update-badge"'),'The app update action sits to the left of project sync');
+assert(entry.indexOf('id="project-update-badge"')<entry.indexOf('class="workflow-layout-actions"'),'Sync sits next to the app update action');
+assert(entry.indexOf('id="web-app-update-button"')<entry.indexOf('class="workflow-layout-actions"'),'The app update action sits to the left of the column layout controls');
 assert(entry.includes('data-workspace-icon="arrow-down-to-line"'));
-assert(entry.includes('<span>SYNC</span>'));
+assert.match(entry, /id="project-update-badge"[^>]*data-workspace-icon="refresh-cw"/);
 // Exercise the real client transport, including the version response. A stale
 // response must still pass the account fence before displaying a reload prompt.
 {

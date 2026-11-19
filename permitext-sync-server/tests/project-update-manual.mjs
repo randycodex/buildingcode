@@ -15,7 +15,7 @@ const event=n=>({projectID:'p',domain:'artifacts',version:n,updatedAt:`2026-10-2
 for(const [syncing,online] of [[false,true],[true,true],[false,false]]) {
  const attributes={},classes=new Set();
  const button={setAttribute:(key,value)=>attributes[key]=value,querySelector:()=>null,classList:{toggle:(name,on)=>on?classes.add(name):classes.delete(name)}};
- const c=vm.createContext({automaticContentUpdatesEnabled,document:{querySelector:()=>button},navigator:{onLine:online},
+ const c=vm.createContext({automaticContentUpdatesEnabled,connectionStatus:null,document:{querySelector:()=>button},navigator:{onLine:online},
   activeWorkspaceRecord:()=>({projectID:'p',name:'Test project'}),hasCapability:()=>false,activeAccount:()=>({userID:'u'}),detachedProjectWindow:false,
   projectUpdateRuntimeKey:()=> 'u:p',projectUpdatesApplying:new Set(syncing?['u:p']:[])});
  vm.runInContext(actual('renderProjectUpdateBadge'),c);c.renderProjectUpdateBadge();
@@ -86,6 +86,9 @@ for(const changed of [false,true]) {
 function harness(scenario='changed') {
  let stored={},current=true,publicProbes=0;const calls=[];
  const c=vm.createContext({automaticContentUpdatesEnabled,
+  connectionStatus:{dataset:{state:scenario.startsWith('pending')?'pending':'clean'}},
+  flushPendingContentWrites:async()=>{calls.push('retry-writes');if(scenario==='pending-success')c.connectionStatus.dataset.state='clean';},
+  openPendingSyncDetails:async()=>calls.push('pending-details'),
   projectUpdatesApplying:new Set(),projectUpdateAutoGuards:new Map(),projectUpdateReviewRequired:new Set(),projectUpdateEditingGeneration:0,
   publicCodeRevision:{probe:options=>{assert.equal(options.force,true);publicProbes++;return new Promise(()=>{});}},
   activeWorkspaceID:'w',activeWorkspaceRecord:()=>({projectID:'p'}),canonicalUpdateProjectID:x=>x,projectUpdateRuntimeKey:()=> 'u:p',
@@ -114,6 +117,12 @@ function harness(scenario='changed') {
   },saveWorkspaceState:()=>calls.push('save'),showWebNotice:async()=>calls.push('error')});
  vm.runInContext(actual('applyPendingProjectUpdates')+'\n'+actual('applyProjectUpdatesFromBadge'),c);
  return {c,calls,publicProbes:()=>publicProbes,notice:()=>projectUpdateNotice(stored,'p')};
+}
+{
+ const blocked=harness('pending-blocked');assert.equal(await blocked.c.applyProjectUpdatesFromBadge(),false);
+ assert.deepEqual(blocked.calls,['retry-writes','pending-details']);
+ const saved=harness('pending-success');assert.equal(await saved.c.applyProjectUpdatesFromBadge(),true);
+ assert.equal(saved.calls[0],'retry-writes');assert(!saved.calls.includes('pending-details'));
 }
 for(const scenario of ['changed','unchanged','offline','cancel','editing','editing-during-read','account','workspace','check-failure','read-failure','newer']) {
  const h=harness(scenario);const applied=await h.c.applyProjectUpdatesFromBadge();

@@ -1,7 +1,7 @@
 // Shared non-modal behavior for the Settings and Project context menus.
-export function floatingWorkspacePanelBounds(anchor, width, viewportWidth, viewportHeight) {
+export function floatingWorkspacePanelBounds(anchor, width, viewportWidth, viewportHeight, topGap = 8) {
   const gutter = 8;
-  const top = Math.max(gutter, anchor.bottom + 8);
+  const top = Math.max(gutter, anchor.bottom + topGap);
   return {
     left: Math.max(gutter, Math.min(anchor.right - width, viewportWidth - width - gutter)),
     top,
@@ -9,14 +9,14 @@ export function floatingWorkspacePanelBounds(anchor, width, viewportWidth, viewp
   };
 }
 
-export function bindFloatingWorkspacePanel(panel, { anchor, dismiss, alignmentReference, isOpen = () => panel.isConnected, isPinned = () => false, manageAnchor = false }) {
+export function bindFloatingWorkspacePanel(panel, { anchor, dismiss, alignmentReference, topGap, isOpen = () => panel.isConnected, isPinned = () => false, manageAnchor = false }) {
   const controller = new AbortController();
   const { signal } = controller;
   const position = () => {
     if (!isOpen() || !anchor?.isConnected) return;
     const anchorBounds = anchor.getBoundingClientRect();
     const reference = typeof alignmentReference === 'function' ? alignmentReference() : alignmentReference;
-    const bounds = floatingWorkspacePanelBounds({ right: reference?.right ?? anchorBounds.right, bottom: reference?.bottom ?? anchorBounds.bottom }, panel.offsetWidth, window.innerWidth, window.innerHeight);
+    const bounds = floatingWorkspacePanelBounds({ right: reference?.right ?? anchorBounds.right, bottom: reference?.bottom ?? anchorBounds.bottom }, panel.offsetWidth, window.innerWidth, window.innerHeight, topGap);
     panel.style.left = `${bounds.left}px`;
     panel.style.top = `${bounds.top}px`;
     panel.style.maxHeight = `${bounds.maxHeight}px`;

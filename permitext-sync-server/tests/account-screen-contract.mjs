@@ -92,6 +92,7 @@ function harness(signedIn, pro = signedIn) {
       focus: () => { focusReturns++; }, blur() {} },
     settingsButton: { setAttribute: (name,value) => { toggleAttributes[name] = value; }, focus: () => { focusReturns++; } },
     selectedSettingsTab: 'account',
+    detachedProjectWindow: true,
     projectDetailsScreen: null,
     createFloatingWorkspaceTabs({entries,selected,onSelect}) {
       const nav = Object.assign(element(), {className:'floating-workspace-tabs'});
@@ -113,7 +114,7 @@ function harness(signedIn, pro = signedIn) {
     showProAccountCheckout: dialog => checkoutStarts.push(dialog),
     trapWebModalFocus: () => { focusTraps++; }, clearProUpgradeIntent() {},
     activeWebWarningClose: confirmed => warningClosures.push(confirmed),
-    state: {}, saveWorkspaceState() {}, closeSharedWorkspaceViews() {},
+    state: {}, saveWorkspaceState() {}, closeSharedWorkspaceViews() {}, closeWorkspaceContextMenu() {},
     createSettingsColumnResizers: () => ({ refresh() {}, dispose() {} }),
     captureAccountRequest: () => signedIn ? { userID: "synthetic-account" } : {}, isCurrentAccountRequest: () => accountCurrent,
     setInterval: cb => { contextCheck = cb; return 1; }, clearInterval() {},
@@ -168,6 +169,16 @@ for (const signedIn of [false, true]) {
   assert.equal(h.dialog(), null, "Account changes discard the private account view.");
   assert.equal(h.track.inert, false);
 }
+
+const embeddedSettings = harness(true);
+let embeddedDialog;
+embeddedSettings.context.toggleAccountDialog({ mount: { append(panel) { embeddedDialog = panel; } } });
+assert.equal(embeddedDialog.open, true);
+assert.equal(embeddedDialog.getAttribute('role'), null, 'The shared workspace menu owns the dialog role.');
+assert.equal(embeddedDialog._floatingControls, undefined, 'The workspace menu positions the embedded settings.');
+assert.deepEqual(Array.from(embeddedSettings.panels[0].__settingsTabs.element.labels), ['Account', 'Data & Recovery']);
+embeddedDialog.close();
+assert.equal(embeddedDialog.open, false);
 
 // Pro entry keeps signup separate from Settings and retains the expected auth handoff.
 const replaceSettings = harness(false);

@@ -74,7 +74,7 @@ const badge = { ...element("span"), style: {}, classList: { toggle() {} },
   get textContent() { return label.textContent; }
 };
 let now = Date.parse("2026-10-14T18:00:00Z"), scheduledAttention = null;
-Object.assign(context, { projectUpdateAutoApplyReady:false, connectionStatus: badge, activeAccount: () => ({ userID: "owner" }),
+Object.assign(context, { projectUpdateAutoApplyReady:false, detachedProjectWindow:false, renderProjectUpdateBadge() {}, connectionStatus: badge, activeAccount: () => ({ userID: "owner" }),
   notebookPendingDraftCount: 0, notebookPendingDraftAttentionAt: Infinity, connectionStatusAttentionTimer: null,
   Date: { now: () => now, parse: Date.parse },
   window: { setTimeout(callback, delay) { scheduledAttention = { callback, delay }; return 1; } },
@@ -86,6 +86,11 @@ context.updateConnectionStatus();
 assert.equal(badge.attributes.role, "button");
 assert.equal(label.textContent, "Changes pending · 1");
 assert.match(badge.attributes['aria-label'], /Review pending changes/);
+context.projectUpdateAutoApplyReady = true;
+context.updateConnectionStatus();
+assert.equal(badge.attributes['aria-hidden'], 'true', 'Sync uses the shared toolbar button for pending changes.');
+assert.equal(badge.attributes.tabindex, undefined);
+context.projectUpdateAutoApplyReady = false;
 context.navigator.onLine = false;
 context.updateConnectionStatus();
 assert.equal(badge.attributes.role, "status", "The offline badge must not imply that review itself restores connectivity.");

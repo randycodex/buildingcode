@@ -38,7 +38,16 @@ doc.body = doc.createElement('body');
 doc.addEventListener = (...args) => doc.body.addEventListener(...args);
 doc.removeEventListener = (...args) => doc.body.removeEventListener(...args);
 const host=doc.createElement('div'), track=doc.createElement('section'), toolbar=doc.createElement('nav');
-toolbar.className='workflow-toolbar';toolbar.append(host);doc.body.append(toolbar,track);
+const layoutActions=doc.createElement('div');
+layoutActions.className='workflow-layout-actions';
+const layoutLabels=['Collapse all columns','Expand all columns','Restore default column sizes and order'];
+const layoutButtons=layoutLabels.map(description=>{
+  const button=doc.createElement('button');
+  button.dataset.description=description;
+  return button;
+});
+layoutActions.append(...layoutButtons);
+toolbar.className='workflow-toolbar';toolbar.append(host);doc.body.append(toolbar,layoutActions,track);
 const panels=['reader:a','reader:b'].map(id=>{const p=doc.createElement('article');p.dataset.paneId=id;p.className='workspace-panel reader-panel';p.append(doc.createElement('header'));track.append(p);return p;});
 let items = panels.map((p,i)=>({id:p.dataset.paneId,prefix:'BC',edition:'2022',name:'Building Code (2022)',theme:'building',location:`Chapter ${i+1}: Location`}));
 let context='project-A:research';const reveals=[];
@@ -57,9 +66,26 @@ items.reverse();shortcuts.refresh();assert.equal(host.children[0],b);assert.equa
 items[0]={...items[0],prefix:'PC',theme:'plumbing'};shortcuts.refresh();assert.equal(b.textContent,'PC’22');assert.match(b.className,/plumbing/);
 panels[0].dispatch('pointerdown',{bubbles:true});assert.equal(host.children[1].getAttribute('aria-pressed'),'true','Direct Reader interaction updates the active pill.');
 context='project-B:research';items=[];shortcuts.refresh();assert.equal(host.hidden,true);assert.equal(host.children.length,0);assert.equal(tooltip.hidden,true);
+for (const [index,button] of layoutButtons.entries()) {
+  button.disabled=true;
+  button.dispatch('pointerenter');
+  assert.equal(tooltip.hidden,false,'Layout tips stay available with no open columns.');
+  assert.equal(tooltip.textContent,layoutLabels[index]);
+  assert.equal(button.getAttribute('aria-describedby'),tooltip.id);
+  button.dispatch('pointerleave');
+  assert.equal(tooltip.hidden,true);
+}
+const resetLayout=layoutButtons.at(-1);
+resetLayout.disabled=false;
+resetLayout.focus();resetLayout.dispatch('focus');
+assert.equal(tooltip.hidden,false);
+doc.body.dispatch('keydown',{key:'Escape'});
+assert.equal(tooltip.hidden,true);
+assert.equal(resetLayout.getAttribute('aria-describedby'),null);
 items=[{id:'reader:c',prefix:'ZR',name:'Zoning Resolution',edition:'Current',theme:'zoning',location:'Article I'}];shortcuts.refresh();assert.equal(host.children[0].textContent,'ZR · Current');
 assert.ok(observations.filter(o=>o.options.subtree).every(o=>o.node.tagName==='HEADER'),'Passage DOM is never observed.');
 shortcuts.dispose();assert.equal(host.children.length,0);assert.equal(doc.body.querySelector('.reader-shortcut-tooltip'),null);
+assert.equal(resetLayout.handlers.pointerenter.length,0,'Disposal removes handlers from the retained layout buttons.');
 
 const searchLauncher=doc.createElement('button'),savedLauncher=doc.createElement('button'),assistantLauncher=doc.createElement('button');
 searchLauncher.textContent='Search';savedLauncher.textContent='Evidence';assistantLauncher.textContent='Assistant';
