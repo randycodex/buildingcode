@@ -10,26 +10,28 @@ function actual(name) {
 const reportID='project:report-draft:project';
 const ids=['reader:one','utility:saved:one','project:notebook:project','project:notes-index:project','utility:search:one',reportID];
 const notesListID='project:notes-index:project';
-const state={collapsedPaneIDs:[],notebookListHidden:false};
+const state={collapsedPaneIDs:[],columnGroups:[],notebookListHidden:false};
 const panels=ids.map(id=>{
   const classes=new Set(id===reportID?['shared-report-column']:['workspace-panel']);
   return {dataset:{paneId:id},querySelector:()=>null,
-    classList:{contains:name=>classes.has(name),toggle(name,on){on?classes.add(name):classes.delete(name);}},
+    classList:{contains:name=>classes.has(name),remove:name=>classes.delete(name),toggle(name,on){on?classes.add(name):classes.delete(name);}},
     getBoundingClientRect:()=>({width:classes.has('is-collapsed')?48:300})};
 });
-let view='notebook',pro=true,saves=0;
+let view='notebook',pro=true,saves=0,pinnedPaneID='';
 const hidden=new Set();
 const context=vm.createContext({state,isProAccount:()=>pro,currentColumnWorkflowView:()=>view,
-  activePinnedPaneID:()=>'',columnGroupForPane:()=>null,workspaceColumnExpansion:null,
+  activePinnedPaneID:()=>pinnedPaneID,columnGroupForPane:id=>state.columnGroups.find(group=>group.paneIDs.includes(id)),workspaceColumnExpansion:null,
   workflowPaneIsVisible:id=>!hidden.has(id),
-  track:{querySelectorAll:selector=>panels.filter(panel=>!hidden.has(panel.dataset.paneId) &&
-    (panel.dataset.paneId!==reportID || selector.includes('.shared-report-column')))},
+  track:{querySelectorAll:selector=>selector.includes('.pane-divider') ? [] : panels.filter(panel=>
+    !hidden.has(panel.dataset.paneId) && (panel.dataset.paneId!==reportID || selector.includes('.shared-report-column')))},
+  preparePaneCollapse:panel=>context.applyPaneCollapsedState(panel),
   capturePaneScrollPositions:()=>[],captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},
   applyPaneWeight(){},closeActiveCustomSelect(){},updateCollapsedPaneDividers(){},
   getComputedStyle:()=>({paddingInline:'0px'}),window:{matchMedia:()=>({matches:true})},
   saveWorkspaceState(){saves++;},notifyWorkspaceLayoutChange(){}});
 vm.runInContext(['paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','paneIsCollapsed',
-  'applyPaneCollapsedState','setPaneCollapsed','setAllColumnsCollapsed'].map(actual).join('\n'),context);
+  'applyPaneCollapsedState','setPaneCollapsed','refreshColumnGroupPresentation','setColumnGroupCollapsed',
+  'setAllColumnsCollapsed'].map(actual).join('\n'),context);
 for (const panel of panels) {
   assert.equal(context.paneCanCollapse(panel.dataset.paneId),false);
   context.setPaneCollapsed(panel,true);
@@ -70,6 +72,32 @@ assert.equal(state.collapsedPaneIDs.includes(notesListID),false,'The whole Notes
 context.setAllColumnsCollapsed(false);
 context.setPaneCollapsed(panels[0],true);
 assert.equal(context.paneIsCollapsed(ids[0]),true);
+hidden.delete(ids[4]);
+state.collapsedPaneIDs=[];
+const group={id:'lookup',paneIDs:[ids[0],ids[4]],collapsed:false};
+state.columnGroups=[group];
+context.setAllColumnsCollapsed(true);
+assert.equal(group.collapsed,true);
+assert.equal(panels[0].classList.contains('is-collapsed'),true);
+assert.equal(panels[4].classList.contains('is-group-hidden'),true);
+assert.ok(group.paneIDs.every(id=>!state.collapsedPaneIDs.includes(id)),'Collapse All uses one group rail.');
+assert.equal(context.paneIsCollapsed(reportID),true,'Ungrouped columns still collapse separately.');
+context.setColumnGroupCollapsed(group,false);
+assert.ok(group.paneIDs.every(id=>!context.paneIsCollapsed(id)),'Opening the group restores all its members together.');
+
+pinnedPaneID=ids[0];
+context.setAllColumnsCollapsed(true);
+assert.equal(group.collapsed,true);
+assert.equal(context.paneIsCollapsed(pinnedPaneID),false,'A pinned member stays expanded, as with the group menu.');
+assert.equal(panels[4].classList.contains('is-collapsed'),true);
+assert.equal(panels[4].classList.contains('is-group-hidden'),false);
+state.collapsedPaneIDs=[...state.collapsedPaneIDs,ids[4]]; // An older individual collapse choice.
+context.setAllColumnsCollapsed(false);
+assert.equal(group.collapsed,false);
+assert.equal(panels[4].classList.contains('is-collapsed'),false);
+assert.equal(context.paneIsCollapsed(reportID),false);
+pinnedPaneID='';
+state.columnGroups=[];
 pro=false;
 assert.equal(context.paneCanCollapse(ids[0]),false);
 // Notebook's code heading is plain text; + owns its code picker. Research keeps collapse.

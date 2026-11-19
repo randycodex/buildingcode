@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-calculator-note-action-v2562";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-bulk-column-groups-v2563";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-calculator-note-action-v2562";
+} from "./offline-storage.js?v=20261119-bulk-column-groups-v2563";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -47508,13 +47508,23 @@ function setPaneCollapsed(panel, collapsed, { focus = false } = {}) {
 }
 
 function setAllColumnsCollapsed(collapsed) {
-  const panels = [...track.querySelectorAll(":scope > :is(.workspace-panel, .shared-report-column):not([hidden], .is-workflow-hidden)")];
-  panels.filter(panel => paneCanCollapse(panel.dataset.paneId)).forEach(panel => {
-    if (paneIsCollapsed(panel.dataset.paneId) !== collapsed ||
-        (!collapsed && columnGroupIsCollapsed(columnGroupForPane(panel.dataset.paneId)))) {
-      setPaneCollapsed(panel, collapsed);
+  const panels = track.querySelectorAll(":scope > :is(.workspace-panel, .shared-report-column):not([hidden], .is-workflow-hidden)");
+  const pinnedPaneID = activePinnedPaneID();
+  for (const panel of panels) {
+    const paneID = panel.dataset.paneId;
+    if (!paneCanCollapse(paneID)) continue;
+    const group = columnGroupForPane(paneID);
+    if (group && columnGroupCanCollapse(group)) {
+      if (paneID !== pinnedPaneID && Boolean(group.collapsed) !== collapsed) {
+        workspaceColumnExpansion?.restore();
+        setColumnGroupCollapsed(group, collapsed);
+      }
+      if (collapsed) continue;
     }
-  });
+    // Expand All also clears individual collapse choices, including older
+    // layouts that had been collapsed one group member at a time.
+    if (paneIsCollapsed(paneID) !== collapsed) setPaneCollapsed(panel, collapsed);
+  }
 }
 
 function preparePaneCollapse(panel) {
