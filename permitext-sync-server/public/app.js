@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-assistant-reader-v2556";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-evidence-reader-v2557";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-assistant-reader-v2556";
+} from "./offline-storage.js?v=20261119-evidence-reader-v2557";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -42465,7 +42465,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   resolvedReaderSourceNavigations.set(reader, {chapterID: reader.chapterID, sectionID: reader.sectionID,
     sectionNumber: reader.sectionNumber, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion});
   if (ownedSource) {
-    if (!options.forceNewReader || (fromSaved && /^utility:saved(?::|$)/.test(anchorPaneID))) reader.sourceOwnerPaneID = anchorPaneID;
+    if (!options.forceNewReader) reader.sourceOwnerPaneID = anchorPaneID;
     reader.searchPreviewPaneID = "";
   }
   const paneID = paneIDForReader(reader);
@@ -42544,6 +42544,7 @@ const savedItemOpeningAttempts = new Map();
 
 async function openSavedItemInReader(item, savedPaneID) {
   if (!String(item?.sectionID || item?.id || "").trim()) return null;
+  const fromEvidence = /^utility:saved(?::|$)/.test(savedPaneID);
   const attempt = {};
   savedItemOpeningAttempts.set(savedPaneID, attempt);
   const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
@@ -42552,7 +42553,8 @@ async function openSavedItemInReader(item, savedPaneID) {
     isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     generation === (state.workflowNavigationGeneration || 0);
   try {
-    return await openSourceInReader(item, savedPaneID, { sourceSurface: "saved", isCurrent, forceNewReader: currentColumnWorkflowView() !== 'notebook',
+    return await openSourceInReader(item, savedPaneID, { sourceSurface: "saved", isCurrent,
+      forceNewReader: !fromEvidence && currentColumnWorkflowView() !== 'notebook',
       evidenceAnchor: item.evidenceAnchor || null });
   } finally {
     if (savedItemOpeningAttempts.get(savedPaneID) === attempt) savedItemOpeningAttempts.delete(savedPaneID);

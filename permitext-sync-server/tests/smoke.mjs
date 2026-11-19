@@ -1823,7 +1823,8 @@ async function main() {
         workspaceScript.text.includes("readerMatchesSource(candidate, detail)") &&
         workspaceScript.text.includes("candidate.sourceAnchorPaneID === anchorPaneID") &&
         workspaceScript.text.includes("placePaneAfter(anchorPaneID, paneID)") &&
-        /revealReaderSourceTarget\(reader,\s*navigationItem,\s*options\.evidenceAnchor,\s*\{\s*preferPassage:\s*fromSearch\s*\|\|\s*fromSaved/.test(workspaceScript.text),
+        workspaceScript.text.includes("revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, targetOptions)") &&
+        workspaceScript.text.includes("preferPassage: ownedSource"),
       "Saved Evidence items should open or reuse an exact-passage Reader beside Saved."
     );
     assert(
@@ -2569,8 +2570,8 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("return openSavedItemInReader({...item,") &&
-        workspaceScript.text.includes('sourceSurface: "saved", isCurrent, forceNewReader: currentColumnWorkflowView() !== \'notebook\''),
-      "Saved Evidence must preserve independent Research Readers while reusing the Notebook Reader."
+        workspaceScript.text.includes('forceNewReader: !fromEvidence && currentColumnWorkflowView() !== \'notebook\''),
+      "Saved Evidence must reuse its own Reader in Research and the shared Reader in Notebook."
     );
     assert(
       workspaceScript.text.includes('heading.className = "project-detail-section-heading"') &&

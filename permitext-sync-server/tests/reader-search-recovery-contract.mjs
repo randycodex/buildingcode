@@ -288,7 +288,7 @@ function savedHarness() {
     revealReaderSourceTarget:(reader,item,anchor)=>opened.push({reader,item,anchor})
   });
   vm.runInContext(["reusableSearchReader","openSourceInReader","openSavedItemInReader"].map(actual).join("\n"),context);
-  return {state,requests,notices,opened,run:item=>context.openSavedItemInReader(item,"saved"),
+  return {state,requests,notices,opened,run:item=>context.openSavedItemInReader(item,"utility:saved:evidence"),
     switchAccount:()=>{generation++;},get saves(){return saves;}};
 }
 const historicalSaved = {sectionID:"2014-1010.2",sectionNumber:"1010.2",title:"Slope",codeVersion:"2014",chapterID:"2014-chapter-10",blockID:"exact",evidenceAnchor:{passages:[{exact:"Saved source text"}]}};
@@ -301,7 +301,7 @@ const historicalSaved = {sectionID:"2014-1010.2",sectionNumber:"1010.2",title:"S
   const retry=t.run(historicalSaved);await settleSourceResolution();t.requests[1].resolve(historicalSaved);await retry;
   assert.equal(t.opened[0].item.sectionID,historicalSaved.sectionID);assert.equal(t.opened[0].reader.codeVersion,"2014");
   assert.equal(t.opened[0].reader.sourceBlockID,"exact");assert.equal(t.opened[0].anchor,historicalSaved.evidenceAnchor);
-  assert.equal(t.opened[0].reader.sourceOwnerPaneID,undefined,"Saved Evidence opens an independent Reader");assert.equal(t.state.readers[0].sectionID,"unrelated");
+  assert.equal(t.opened[0].reader.sourceOwnerPaneID,"utility:saved:evidence");assert.equal(t.state.readers[0].sectionID,"unrelated");
 }
 for(const outcome of ["resolve","reject"]) {
   const t=savedHarness(),before=JSON.stringify(t.state),pending=t.run(historicalSaved);

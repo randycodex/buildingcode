@@ -52,21 +52,25 @@ const item=(id,extra={})=>({sectionID:id,codePrefix:'BC',codeVersion:'2022',chap
   const saved=await f.c.openSavedItemInReader(item('saved',{blockID:'exact',evidenceAnchor:anchor}),'utility:saved:list');
   assert.notEqual(saved.id,owned.id);assert.equal(saved.sourceBlockID,'exact');assert.equal(f.readers.length,4);
   assert.equal(f.reveals.at(-1).anchor,anchor);assert.equal(f.reveals.at(-1).options.preferPassage,true);
-  const beforeNextSaved=JSON.stringify(f.readers);
-  assert.notEqual((await f.c.openSavedItemInReader(item('saved-next'),'utility:saved:list')).id,saved.id);
-  assert.equal(JSON.stringify(f.readers.slice(0,-1)),beforeNextSaved,'Every saved Evidence click preserves all existing Reader sessions');
-  assert.equal(f.readers.length,5);assert.equal(Object.keys(f.details).length,0);
+  const beforeNextSaved=JSON.stringify(f.readers.slice(0,-1));
+  const nextSaved=await f.c.openSavedItemInReader(item('saved-next',{codeVersion:'2014'}),'utility:saved:list');
+  assert.equal(nextSaved.id,saved.id,'Another Evidence item reuses the same Reader across editions');
+  assert.equal(nextSaved.sectionID,'saved-next');assert.equal(nextSaved.codeVersion,'2014');
+  assert.equal(JSON.stringify(f.readers.slice(0,-1)),beforeNextSaved,'Evidence navigation preserves other Reader sessions');
+  assert.equal(f.readers.length,4);assert.equal(Object.keys(f.details).length,0);
   assert.equal(f.c.state.utilityInstances.length,1);
   const preserved=JSON.stringify(f.readers);
   const explicit=await f.c.openSourceInReader(item('new'),'utility:search:search',{sourceSurface:'search',forceNewReader:true});
-  assert.notEqual(explicit.id,owned.id);assert.equal(f.readers.length,6);
+  assert.notEqual(explicit.id,owned.id);assert.equal(f.readers.length,5);
   assert.equal(JSON.stringify(f.readers.slice(0,-1)),preserved,'New reader never changes another Reader');
   assert.equal((await f.c.openSearchResultDetail(item('after-new'),f.search)).id,owned.id,'Normal clicks keep updating the Search-owned Reader');
   assert.equal(explicit.sectionID,'new','The explicit new Reader stays on its passage');
   const beforeNewSaved=JSON.stringify(f.readers);
   const savedNew=await f.c.openSourceInReader(item('fresh-saved'),'utility:saved:list',{sourceSurface:'saved',forceNewReader:true});
-  assert.equal(f.readers.length,7);assert.notEqual(savedNew.id,saved.id);
+  assert.equal(f.readers.length,6);assert.notEqual(savedNew.id,saved.id);
   assert.equal(JSON.stringify(f.readers.slice(0,-1)),beforeNewSaved);
+  assert.equal((await f.c.openSavedItemInReader(item('after-new-evidence'),'utility:saved:list')).id,saved.id);
+  assert.equal(savedNew.sectionID,'fresh-saved','An explicit new Reader stays independent of the reusable Evidence Reader');
 }
 {
   const f=fixture();f.c.state.readers.length=0;
@@ -82,12 +86,18 @@ const item=(id,extra={})=>({sectionID:id,codePrefix:'BC',codeVersion:'2022',chap
   const f=fixture();
   const reader=await f.c.openSavedItemInReader(item('evidence-source'),'utility:saved:project');
   assert.equal(f.c.readerPositionLabel(reader),'Evidence Reader');
+  const other=await f.c.openSavedItemInReader(item('other-evidence'),'utility:saved:other');
+  assert.notEqual(other.id,reader.id,'Separate Evidence columns have their own Readers');
+  assert.equal(reader.sectionID,'evidence-source');
+  const settings=await f.c.openSavedItemInReader(item('settings-source'),'utility:settings');
+  const nextSettings=await f.c.openSavedItemInReader(item('next-settings-source'),'utility:settings');
+  assert.notEqual(settings.id,nextSettings.id,'Saved Content in Settings keeps its separate Reader behavior');
 }
 for(const surface of ['search','saved']) for(const change of ['account','workspace','view','query','closed-search','superseded']) {
   if(surface==='saved' && ['query','closed-search'].includes(change)) continue;
   const f=fixture(),gates=[];f.c.resolveReaderSource=target=>new Promise(resolve=>gates.push(()=>resolve(target)));
   const before=JSON.stringify(f.readers);
-  const open=target=>surface==='search'?f.c.openSearchResultDetail(target,f.search):f.c.openSavedItemInReader(target,'evidence');
+  const open=target=>surface==='search'?f.c.openSearchResultDetail(target,f.search):f.c.openSavedItemInReader(target,'utility:saved:list');
   const pending=open(item('stale'));
   if(change==='account')f.changeAccount();
   if(change==='workspace')f.c.activeWorkspaceID='another';
@@ -131,7 +141,7 @@ for(const surface of ['search','saved']) for(const change of ['account','workspa
 }
 assert.doesNotMatch(actual('workspacePaneDescriptors'), /add\(paneIDForSectionDetail/);
 assert.doesNotMatch(actual('defaultActivePaneIDs'), /ids\.push\(paneIDForSectionDetail/);
-console.log('Direct Reader evidence passed: Search-owned Reader reuse, exact editions/passages, explicit new columns, stale navigation fences and data-preserving layout retirement.');
+console.log('Direct Reader navigation passed: Search and Evidence reuse, exact editions/passages, explicit new columns, stale navigation fences and data-preserving layout retirement.');
 
 
 // Notebook owns one Reader with the six most recently opened source tabs.
