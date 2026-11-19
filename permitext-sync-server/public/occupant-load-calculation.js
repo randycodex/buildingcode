@@ -273,7 +273,7 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   const draftState = document.createElement('p'); draftState.className = 'calculation-draft-state';
   draftState.textContent = 'Device draft · inputs are saved on this device';
   const recentLabel = document.createElement('label'); recentLabel.textContent = 'Recent calculations';
-  const recent = document.createElement('select'); recent.className = 'calculation-draft-select'; recent.setAttribute('aria-label', 'Recent calculations');
+  const recent = document.createElement('select'); recent.setAttribute('aria-label', 'Recent calculations');
   for (const item of recentDrafts) {
     const option = document.createElement('option'); option.value = item.id;
     option.textContent = calculationDraftLabel(item);
