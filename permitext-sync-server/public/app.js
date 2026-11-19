@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261118-workspace-sync-icon-v2552";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261118-workspace-sidebar-scroll-v2553";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261118-workspace-sync-icon-v2552";
+} from "./offline-storage.js?v=20261118-workspace-sidebar-scroll-v2553";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3433,6 +3433,7 @@ async function transitionNotebookList(update) {
 async function toggleNotebookList() {
   if (!workspacePrivatePresentationAllowed() || !hasCapability('notebook') ||
       !sharedNotesOpen()) return false;
+  const generation = ++workspaceColumnNavigationGeneration;
   const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   if (track._researchColumnLayout) capturePaneResizeWidths({manual:false});
   state.notebookListHidden = !state.notebookListHidden;
@@ -3441,9 +3442,15 @@ async function toggleNotebookList() {
   saveWorkspaceState();
   if (currentColumnWorkflowView() === 'research') await transitionWorkspace('utility');
   else await transitionNotebookList(() => transitionWorkspace('utility'));
-  if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
-      !sharedNotesOpen() || state.notebookListHidden !== hidden) return false;
+  if (!hidden) await waitForWorkspaceSidebarResize();
+  if (generation !== workspaceColumnNavigationGeneration || !isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
+      track.inert || !sharedNotesOpen() || state.notebookListHidden !== hidden) return false;
   track.querySelector('.notebook-index-panel:not(.is-workflow-hidden) .notebook-list-toggle')?.focus({preventScroll:true});
+  if (!hidden) {
+    const note = selectedNotebookColumn(workspaceProject());
+    const paneID = note && notebookColumnPaneID(note);
+    if (paneID && !paneIsCollapsed(paneID)) scrollPaneIntoView(paneID, 'smooth', {includeCollapsedToRight:true});
+  }
   return true;
 }
 
@@ -35102,7 +35109,7 @@ async function renderProjectReportDraft(project, resume = null) {
       const expanded = panel.dataset.reportsHidden === 'true';
       panel.dataset.reportsHidden = String(!expanded);
       persistReportSectionExpanded('Reports column', expanded);
-      transitionReportSidebars();
+      transitionReportSidebars(expanded, {alignEndWhenOversized:true});
     });
     reportsHeader.append(reportsTitle);
     reportActions.append(createNew,deleteButton);
@@ -35181,8 +35188,9 @@ async function renderProjectReportDraft(project, resume = null) {
 
     const addReportContent = kind => {
       if (kind === "source") {
+        const expanded = panel.dataset.libraryOpen !== "true";
         panel.dataset.libraryOpen = "true";
-        transitionReportSidebars();
+        transitionReportSidebars(expanded);
         panel.querySelector('.report-source-group-toggle')?.focus({preventScroll: true});
         return;
       }
@@ -35413,8 +35421,9 @@ async function renderProjectReportDraft(project, resume = null) {
       sourcesToggle.setAttribute("aria-expanded", String(shown));
     };
     sourcesToggle.addEventListener("click", () => {
-      panel.dataset.libraryOpen = String(panel.dataset.libraryOpen !== "true");
-      transitionReportSidebars();
+      const expanded = panel.dataset.libraryOpen !== "true";
+      panel.dataset.libraryOpen = String(expanded);
+      transitionReportSidebars(expanded);
     });
     if (panel.dataset.outlineHidden === undefined) {
       panel.dataset.outlineHidden = String(!reportSectionExpanded("Outline column", !initialReportOutlineHidden(activeDraft.blocks)));
@@ -35427,9 +35436,10 @@ async function renderProjectReportDraft(project, resume = null) {
         .forEach(body => { body.inert = !expanded; });
     };
     outlineToggle.addEventListener("click", () => {
-      panel.dataset.outlineHidden = String(panel.dataset.outlineHidden !== "true");
-      persistReportSectionExpanded("Outline column", panel.dataset.outlineHidden !== "true");
-      transitionReportSidebars();
+      const expanded = panel.dataset.outlineHidden === "true";
+      panel.dataset.outlineHidden = String(!expanded);
+      persistReportSectionExpanded("Outline column", expanded);
+      transitionReportSidebars(expanded);
     });
     paintOutlineToggle();
     const versionsToggle = document.createElement("button");
@@ -35445,8 +35455,10 @@ async function renderProjectReportDraft(project, resume = null) {
     columns.className = "report-workspace-columns";
     columns.setAttribute("role", "region");
     columns.setAttribute("aria-label", "Report columns");
-    function transitionReportSidebars() {
-      if (sharedReportColumn() && track._researchColumnLayout) capturePaneResizeWidths({manual:false});
+    async function transitionReportSidebars(expanded, options) {
+      const generation = ++workspaceColumnNavigationGeneration;
+      const column = sharedReportColumn();
+      if (column && track._researchColumnLayout) capturePaneResizeWidths({manual:false});
       columns.classList.add('is-sidebar-toggling');
       clearTimeout(sidebarRailTimer);
       sidebarRailTimer = setTimeout(() => {
@@ -35454,6 +35466,11 @@ async function renderProjectReportDraft(project, resume = null) {
         panel._updateReportColumns?.();
       }, workspaceColumnMotion.duration + 40);
       syncReferenceReaderLayout();
+      if (!expanded || !expandableReportRails()) return;
+      await waitForWorkspaceSidebarResize();
+      if (generation !== workspaceColumnNavigationGeneration || !panel.isConnected || column.hidden ||
+          track.inert || paneIsCollapsed(column.dataset.paneId)) return;
+      scrollWorkspaceColumnIntoView(column, 'smooth', {includeCollapsedToRight:true, ...options});
     }
     const documents = oldDocuments || document.createElement("div");
     documents.className = "report-document-columns";
@@ -47858,7 +47875,13 @@ function scrollPaneIntoView(paneID, behavior = "smooth", options) {
   scrollWorkspaceColumnIntoView(pane, behavior, options);
 }
 
-function scrollWorkspaceColumnIntoView(pane, behavior = "smooth", { includeCollapsedToRight = false } = {}) {
+async function waitForWorkspaceSidebarResize() {
+  // These track transitions determine the outer column widths used for scrolling.
+  const transitions = track.getAnimations().filter(animation => animation.transitionProperty?.endsWith('-expansion'));
+  await Promise.allSettled(transitions.map(transition => transition.finished));
+}
+
+function scrollWorkspaceColumnIntoView(pane, behavior = "smooth", { includeCollapsedToRight = false, alignEndWhenOversized = false } = {}) {
   const paneRect = pane.getBoundingClientRect();
   const trackRect = track.getBoundingClientRect();
   const pinned = window.matchMedia('(min-width: 761px)').matches
@@ -47884,7 +47907,9 @@ function scrollWorkspaceColumnIntoView(pane, behavior = "smooth", { includeColla
   }
   const paneLeft = start - trackRect.left - pinnedWidth;
   const paneRight = right - trackRect.right;
-  const offset = right - start > availableWidth || paneLeft < 0 ? paneLeft : Math.max(0, paneRight);
+  const oversized = right - start > availableWidth;
+  const offset = oversized ? (alignEndWhenOversized ? paneRight : paneLeft)
+    : paneLeft < 0 ? paneLeft : Math.max(0, paneRight);
   if (!offset) return;
   const left = Math.max(0, Math.min(track.scrollLeft + offset, track.scrollWidth - track.clientWidth));
   if (behavior === "smooth" && window.matchMedia('(prefers-reduced-motion: reduce)').matches) behavior = "instant";

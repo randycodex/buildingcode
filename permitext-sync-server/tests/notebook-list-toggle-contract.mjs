@@ -34,10 +34,10 @@ let notesOpen = true, allowed = true, saves = 0, transitions = 0;
 const context = vm.createContext({
   state, document:{createElement:tag => new Element(tag), querySelector:() => null},
   // Deferred panels are built before they belong to the workspace track.
-  track:{querySelector:() => null,querySelectorAll:()=>[]}, applyPaneWeight() {},
+  track:{querySelector:() => null,querySelectorAll:()=>[],getAnimations:()=>[]}, applyPaneWeight() {},
   workspacePrivatePresentationAllowed:() => allowed, hasCapability:() => allowed,
   workspaceProject:() => project, projectDetailKey:value => value?.id || '',
-  captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',
+  captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,activeWorkspaceID:'workspace',workspaceColumnNavigationGeneration:0,
   currentColumnWorkflowView:()=> 'research', sharedNotesOpen:() => notesOpen, detachedProjectWindow:false, isProAccount:() => true,
   paneCanCollapse:() => false,
   selectedNotebookColumn:() => ({id:'editor',cardID:'a'}), notebookColumnPaneID:() => editorID,
@@ -46,11 +46,12 @@ const context = vm.createContext({
   notebookCatalogRequests:new Map(), saveWorkspaceState(){saves++;},
   notebookIndexTitleScroll:null, attachResearchHistoryTitleScroll:() => ({refresh(){}}),
   projectToolTogglePending:false, prependWorkspaceButtonIcon() {},
-  async transitionWorkspace(mode){assert.equal(mode,'utility'); transitions++;}
+  async transitionWorkspace(mode){assert.equal(mode,'utility'); transitions++;},
+  scrollPaneIntoView() {}
 });
 vm.runInContext(['researchHistoryDayIndex','researchConversationHistoryGroups','notebookHistoryGroups',
   'notebookIndexPaneID','updateNotebookListToggle','createNotebookListToggle','renderNotebookIndex','syncNotebookLanding',
-  'paneIsCollapsed','transitionNotebookList','toggleNotebookList','workflowPaneIsVisible'].map(actual).join('\n'), context);
+  'paneIsCollapsed','transitionNotebookList','toggleNotebookList','waitForWorkspaceSidebarResize','workflowPaneIsVisible'].map(actual).join('\n'), context);
 const panel = context.renderNotebookIndex(project);
 const localToggle = panel.querySelector('.notebook-list-toggle');
 assert.equal(localToggle.textContent,'List');
@@ -92,10 +93,31 @@ assert.equal(await context.toggleNotebookList(), false);
 assert.equal(saves, 2, 'The closed Notes tool cannot change list visibility.');
 notesOpen=true;state.notebookListHidden=true;
 const revealed=[];
-context.scrollPaneIntoView=id=>revealed.push(id);
-context.track.querySelector=selector=>selector.includes(' .notebook-list-toggle')?{focus(){}}:{dataset:{paneId:indexID}};
+context.scrollPaneIntoView=(id,behavior,options)=>revealed.push([id,behavior,options.includeCollapsedToRight]);
+const expandList=()=>{
+  let finishResize;
+  const finished=new Promise(resolve=>{finishResize=resolve;});
+  const started=new Promise(resolve=>{
+    context.track.getAnimations=()=>{
+      resolve();
+      return [{transitionProperty:'--workspace-notes-expansion',finished}];
+    };
+  });
+  return {started,finished:context.toggleNotebookList(),finishResize};
+};
+const expansion=expandList();
+await expansion.started;
+assert.deepEqual(revealed,[],'Revealing Notes waits for the List width to settle.');
+expansion.finishResize();
+await expansion.finished;
+assert.deepEqual(revealed,[[editorID,'smooth',true]],'Expanding the List reveals the whole Notes column.');
 await context.toggleNotebookList();
-assert.deepEqual(revealed,[],'Expanding Notes keeps the workspace anchored.');
+const interrupted=expandList();
+await interrupted.started;
+await context.toggleNotebookList();
+interrupted.finishResize();
+assert.equal(await interrupted.finished,false);
+assert.equal(revealed.length,1,'Closing the List during expansion cancels its pending scroll.');
 console.log('Notes list toggle passed: immediate deferred contents, independent editor visibility, persistence and access/view guards.');
 
 const railState = {notebookListHidden:true,paneWeights:{[indexID]:280}};
