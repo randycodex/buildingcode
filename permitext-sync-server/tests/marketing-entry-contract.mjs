@@ -9,24 +9,30 @@ import { parse } from "parse5";
 const source = await readFile(new URL("../public/marketing/home.js", import.meta.url), "utf8");
 function entry(search = "", hash = "", standalone = false) {
   const redirects = [];
+  let noticeOpened = false;
   vm.runInNewContext(source, {
     URLSearchParams,
     location: { search, hash, replace: value => redirects.push(value) },
     matchMedia: () => ({ matches: standalone }),
     navigator: {}, window: {},
-    document: { querySelector: () => null },
+    document: { querySelector: selector => selector === "#development-notice"
+      ? { showModal: () => { noticeOpened = true; } }
+      : null },
     addEventListener() {}
   });
-  return redirects;
+  return { redirects, noticeOpened };
 }
-assert.deepEqual(entry(), []);
-assert.deepEqual(entry("?utm_source=example", "#explore"), []);
-assert.deepEqual(entry("", "#ios-details"), []);
-assert.deepEqual(entry("", "", true), ["/workspace"]);
+const homepageEntry = { redirects: [], noticeOpened: true };
+assert.deepEqual(entry(), homepageEntry);
+assert.deepEqual(entry("?utm_source=example", "#explore"), homepageEntry);
+assert.deepEqual(entry("", "#ios-details"), homepageEntry);
+assert.deepEqual(entry("", "", true), { redirects: ["/workspace"], noticeOpened: false });
 for (const parameter of ["checkout", "session_id", "package", "appleSignIn", "clerk_return", "organizationInvite", "detachedWorkboard", "enableCodeQuestionWorkspace"]) {
-  assert.deepEqual(entry(`?${parameter}=example`, "#cq/example"), [`/workspace?${parameter}=example#cq/example`]);
+  assert.deepEqual(entry(`?${parameter}=example`, "#cq/example"), {
+    redirects: [`/workspace?${parameter}=example#cq/example`], noticeOpened: false
+  });
 }
-assert.deepEqual(entry("", "#cq/example"), ["/workspace#cq/example"]);
+assert.deepEqual(entry("", "#cq/example"), { redirects: ["/workspace#cq/example"], noticeOpened: false });
 
 const temp = await mkdtemp(join(tmpdir(), "permitext-marketing-test-"));
 process.env.PERMITEXT_SYNC_DATA_PATH = join(temp, "store.json");

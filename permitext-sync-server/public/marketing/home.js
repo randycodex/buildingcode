@@ -5,6 +5,8 @@ const workspaceParameters = ["checkout", "session_id", "package", "appleSignIn",
 const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 if (standalone || location.hash.startsWith("#cq/") || workspaceParameters.some(key => parameters.has(key))) {
   location.replace(`/workspace${location.search}${location.hash}`);
+} else {
+  document.querySelector("#development-notice")?.showModal?.();
 }
 
 // Refresh an existing offline installation; do not install one for marketing visitors.
