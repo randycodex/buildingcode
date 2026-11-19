@@ -67,7 +67,8 @@ const c = vm.createContext({ state, createColumnExpansion: () => ({dispose(){}})
   currentWorkflowView:()=>"research", currentColumnWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
   workspaceActionsButton: element('button'), settingsButton: element('button'), detachedProjectWindow: true,
-  workspaceFloatingPanelReference: () => ({bottom:70}),
+  workspaceFloatingPanelReference: () => ({bottom:70}), workspaceFloatingPanelTopGap: 25,
+  webAppUpdates: {positionNotice() {}},
   bindFloatingWorkspacePanel: (_panel, {isPinned}) => { assert.equal(isPinned(),true); return {position(){},dispose(){disposedResizers++;}}; },
   prependWorkspaceButtonIcon: button => button,
   createFloatingWorkspaceTabs({entries,selected,onSelect}) {

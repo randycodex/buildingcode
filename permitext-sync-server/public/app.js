@@ -17,8 +17,8 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-bulk-column-groups-v2563";
-import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-update-notice-v2564";
+import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
 import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./project-update-policy.js?v=2";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-bulk-column-groups-v2563";
+} from "./offline-storage.js?v=20261119-update-notice-v2564";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -685,7 +685,11 @@ const chapterCache = createPublicContentCache();
 const searchResultCache = createPublicContentCache({ maxBytes: 4 * 1024 * 1024, maxEntries: 24 });
 const codeSectionCache = createPublicContentCache({ maxBytes: 4 * 1024 * 1024, maxEntries: 64 });
 const sectionSummaryCache = new Map();
-const webAppUpdates = createWebAppUpdatePrompt({document, serviceWorker:navigator.serviceWorker, location:window.location, currentVersion:webAppVersion, prepareReload:prepareWebAppReload});
+const workspaceFloatingPanelTopGap = 25;
+const webAppUpdates = createWebAppUpdatePrompt({
+  document, serviceWorker: navigator.serviceWorker, location: window.location, currentVersion: webAppVersion,
+  prepareReload: prepareWebAppReload, positionNotice: positionWebAppUpdateNotice
+});
 const publicCodeRevision = createPublicCodeRevisionController({
   async fetchRevision() {
     const controller = new AbortController();
@@ -2093,8 +2097,10 @@ async function prepareWebAppReload() {
       .some(mount => mount.hasPendingEdits?.() || mount.hasUnsavedChanges?.()) ||
       [...document.querySelectorAll('[data-project-editing-state]')].some(node => node._projectHasPendingEdits?.());
     if (dirtyEditor) return blocked("Finish saving the open Note, Report, or Project editor before updating.");
+    const projectMenu = workspaceMenu?.tab === "project" ? workspaceMenu.element : null;
     if ([...document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog[open]')]
-      .some(node => node.getClientRects().length && !node.hidden)) {
+      .some(node => node !== projectMenu && node !== projectDetailsScreen?.element &&
+        node.getClientRects().length && !node.hidden)) {
       return blocked("Close the open dialog, then update per codes.");
     }
     if (track.classList.contains("is-resizing") || track.querySelector('.workspace-panel.is-dragging')) {
@@ -2624,6 +2630,7 @@ function closeWorkspaceMenu() {
     document.querySelector(".workspace-shell").append(projectDetailsScreen.element);
   }
   menu.element.remove();
+  webAppUpdates.positionNotice();
 }
 
 function showWorkspaceMenuTab(menu, tab, options) {
@@ -2673,7 +2680,7 @@ function openWorkspaceMenu(tab, options = {}) {
   }
   workspaceMenu = menu;
   menu.binding = bindFloatingWorkspacePanel(element, {
-    anchor: workspaceActionsButton, alignmentReference: workspaceFloatingPanelReference, topGap: 25,
+    anchor: workspaceActionsButton, alignmentReference: workspaceFloatingPanelReference, topGap: workspaceFloatingPanelTopGap,
     dismiss: closeWorkspaceMenu, manageAnchor: true,
     isPinned: () => menu.tab !== "workspaces"
   });
@@ -2687,6 +2694,7 @@ function openWorkspaceMenu(tab, options = {}) {
     }
   });
   element.prepend(menu.tabs.element);
+  webAppUpdates.positionNotice();
   menu.tabs.element.querySelector('[aria-selected="true"]')?.focus({ preventScroll: true });
   return menu.ready;
 }
@@ -5498,7 +5506,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
     screenTitle: "Project", screenClass: "project-details-screen workspace-floating-panel", projectName: identity.name,
     mount: options.mount || document.querySelector(".workspace-shell"),
     coveredElements: [], dismissOnEscape: false,
-    onOpen: () => { openProjectEditor(); floatingControls?.position(); syncWorkflowNavigation(); },
+    onOpen: () => { openProjectEditor(); floatingControls?.position(); webAppUpdates.positionNotice(); syncWorkflowNavigation(); },
     backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
       projectDetailMatches(workspaceProject(), identity) && hasCapability("projects") && (!applyingUpdate || options.shouldApply()),
@@ -5587,7 +5595,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
       applyingUpdate = false;
       return content;
     },
-    onClose: () => { closeProjectEditor(); syncWorkflowNavigation(); },
+    onClose: () => { closeProjectEditor(); webAppUpdates.positionNotice(); syncWorkflowNavigation(); },
     onDispose: () => {
       panelTabs?.dispose();
       floatingControls?.dispose();
@@ -5605,7 +5613,7 @@ async function openProjectDetailsScreen(section = null, options = {}) {
     screen.element.setAttribute("aria-modal", "false");
     floatingControls = bindFloatingWorkspacePanel(screen.element, {
       anchor: settingsButton, dismiss: () => screen.close(), isOpen: () => screen.isOpen(),
-      isPinned: () => true, topGap: 25,
+      isPinned: () => true, topGap: workspaceFloatingPanelTopGap,
       alignmentReference: workspaceFloatingPanelReference
     });
   }
@@ -44205,6 +44213,21 @@ function workspaceFloatingPanelReference() {
   const workspace = workspaceActionsButton?.getBoundingClientRect();
   const right = workspace?.width ? workspace.right : settingsButton?.getBoundingClientRect().right ?? window.innerWidth - 24;
   return { right, bottom: document.querySelector('.topbar').getBoundingClientRect().bottom };
+}
+
+function positionWebAppUpdateNotice(notice, button) {
+  const reference = workspaceFloatingPanelReference();
+  const menu = workspaceMenu?.element || (projectDetailsScreen?.isOpen() ? projectDetailsScreen.element : null);
+  const width = notice.offsetWidth;
+  let right = button.getBoundingClientRect().right;
+  if (menu) {
+    const panel = floatingWorkspacePanelBounds(reference, menu.offsetWidth, window.innerWidth, window.innerHeight, workspaceFloatingPanelTopGap);
+    const besideMenu = panel.left - 12;
+    if (besideMenu >= width + 8) right = Math.min(right, besideMenu);
+  }
+  const { left, top } = floatingWorkspacePanelBounds({ ...reference, right }, width, window.innerWidth, window.innerHeight, workspaceFloatingPanelTopGap);
+  notice.style.left = `${left}px`;
+  notice.style.top = `${top}px`;
 }
 
 function organizeAccountSettings(panel, { floating = false, selected = "account", onSelect = () => {} } = {}) {

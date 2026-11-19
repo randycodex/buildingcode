@@ -1,22 +1,29 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
+import {floatingWorkspacePanelBounds} from '../public/floating-workspace-panel.js';
 import {createRequestRateLimit} from '../public/request-rate-limit.js';
 import {createWebAppUpdatePrompt,activateWebAppUpdate} from '../public/web-app-update.js';
 import {webAppVersion,webSyncProtocol,webSyncProtocolHeader,webUpdateRequiredCode} from '../public/web-client-version.js';
 class Element {constructor(tag){this.tag=tag;this.children=[];this.events={};this.hidden=false;this.attributes={};}setAttribute(key,value){this.attributes[key]=value;}append(...children){this.children.push(...children);}addEventListener(type,callback){this.events[type]=callback;}}
 function harness() {
  const body=new Element('body'),button=new Element('button');body.inert=false;button.hidden=true;let ready=true,activations=0,reloads=0,fail;
- const controller=createWebAppUpdatePrompt({document:{body,createElement:tag=>new Element(tag)},button,currentVersion:'current',
+ const defaultView=new EventTarget(),positions=[];
+ const controller=createWebAppUpdatePrompt({document:{body,defaultView,createElement:tag=>new Element(tag)},button,currentVersion:'current',
+  positionNotice:(notice,anchor)=>positions.push({notice,anchor}),
   prepareReload:async()=>ready,activate:async()=>{activations++;assert.equal(body.inert,true);if(fail)throw fail;},location:{reload:()=>reloads++}});
- return {controller,body,button,setReady:value=>ready=value,setFailure:error=>fail=error,counts:()=>({activations,reloads}),notice:()=>body.children[0]};
+ return {controller,body,button,defaultView,positions,setReady:value=>ready=value,setFailure:error=>fail=error,counts:()=>({activations,reloads}),notice:()=>body.children[0]};
 }
 {
  const h=harness();h.controller.observe('current');assert.equal(h.button.hidden,true);
  h.controller.observe('next');assert.equal(h.button.hidden,false);assert.equal(h.body.children.length,0,'An available update only reveals the toolbar icon');
  h.controller.requireReload('next');assert.equal(h.button.hidden,false);
  h.setReady({message:'Save first'});assert.equal(await h.controller.reload(),false);assert.equal(h.notice().children[0].textContent,'Save first');assert.deepEqual(h.counts(),{activations:0,reloads:0});assert.equal(h.body.inert,false);
+ assert.deepEqual(h.positions,[{notice:h.notice(),anchor:h.button}]);
+ h.defaultView.dispatchEvent(new Event('resize'));h.controller.positionNotice();
+ assert.equal(h.positions.length,3,'A visible message follows toolbar and menu layout changes');
  h.notice().children[1].events.click();h.controller.observe('next');assert.equal(h.notice().hidden,true,'Version checks do not reopen a dismissed error');assert.equal(h.button.hidden,false);
+ h.defaultView.dispatchEvent(new Event('resize'));assert.equal(h.positions.length,3);
  h.setReady(true);assert.equal(await h.controller.reload(),true);assert.deepEqual(h.counts(),{activations:1,reloads:1});
 }
 for(const error of [Object.assign(Error('Close other per codes tabs, then try again.'),{code:'OTHER_TABS'}),Error('Technical browser error')]) {
@@ -77,30 +84,49 @@ assert.match(entry, /id="project-update-badge"[^>]*data-workspace-icon="refresh-
  assert.deepEqual(prompts,['next'],'An obsolete account response cannot open the update prompt');
 }
 const first=source.indexOf('async function prepareWebAppReload('),last=source.indexOf('\n}',first)+2;
-for(const scenario of ['clean','no-workspace','background','offline','outbox','conflict','draft','image','dirty','project-editor','dialog','drag','research','race','storage','restore','account-change','anonymous']) {
+for(const scenario of ['clean','no-workspace','background','offline','outbox','conflict','draft','image','dirty','project-menu','project-panel','project-editor','project-confirmation','settings-menu','dialog','drag','research','race','storage','restore','account-change','anonymous']) {
  const retainedState={syncOutbox:[{accountUserID:'owner',recordID:'retained-local-change'}],syncConflicts:[{recordID:'retained-conflict'}]};
  const before=JSON.stringify(retainedState);let saves=0;
+ const panel={getClientRects:()=>[{}],hidden:false},confirmation={getClientRects:()=>[{}],hidden:false};
+ const workspaceMenu=['project-menu','project-editor','project-confirmation','settings-menu'].includes(scenario)
+   ? {tab:scenario==='settings-menu'?'settings':'project',element:panel} : null;
+ const projectDetailsScreen=scenario==='project-panel'?{element:panel}:null;
+ const dialogs=[...(workspaceMenu||projectDetailsScreen?[panel]:[]),...(['dialog','project-confirmation'].includes(scenario)?[confirmation]:[])];
  const c=vm.createContext({captureAccountRequest:()=>({userID:scenario==='anonymous'?'':'owner'}),projectUpdateEditingGeneration:1,
   workspaceRestoreError:scenario==='restore'?Error('Recovery required'):null,workspaceMigrationError:null,
+  workspaceMenu,projectDetailsScreen,
   activeResearchProgress:new Set(scenario==='research'?['pending']:[]),
   notebookColumnMounts:new Map([['note',{persistDraft:async()=>{if(scenario==='race')c.projectUpdateEditingGeneration++;}}]]),
   reportDraftMounts:new Map([['report',{hasPendingEdits:()=>scenario==='dirty'}]]),
   document:{visibilityState:scenario==='background'?'hidden':'visible',querySelectorAll:selector=>selector==='[data-project-editing-state]'
     ? [{_projectHasPendingEdits:()=>scenario==='project-editor'}]
-    : scenario==='dialog'?[{getClientRects:()=>[{}],hidden:false}]:[]},
+    : dialogs},
   track:{classList:{contains:()=>scenario==='drag'},querySelector:()=>null},
   state:retainedState,flushSearchQueryPersistence(){},flushResearchDraftPersistence(){},saveWorkspaceState(){saves++;if(scenario==='storage')throw Error('Quota');},persistCodeQuestionAccountState(){},
   pendingNotebookDrafts:async()=>scenario==='draft'?[{}]:[],pendingNotebookImages:async()=>scenario==='image'?[{}]:[],isCurrentAccountRequest:()=>scenario!=='account-change',
   projectUpdateAutoApplyBlocker:()=>assert.fail('App updates must not depend on Project-sync eligibility'),
   confirmWorkspaceTransition:()=>assert.fail('Reload cannot discard edits'),fetch:()=>assert.fail('Reload preparation cannot poll')});
  vm.runInContext(source.slice(first,last),c);const result=await c.prepareWebAppReload();
- if(['clean','no-workspace','background','offline','outbox','conflict','anonymous'].includes(scenario)) {
+ if(['clean','no-workspace','background','offline','outbox','conflict','anonymous','project-menu','project-panel'].includes(scenario)) {
   assert.equal(result,true,scenario);assert.equal(saves,1,'Persist workspace and outbox before permitting a reload');
  } else {
   assert.equal(typeof result.message,'string',scenario);
-  const reason={draft:/Note drafts/,image:/Note images/,dirty:/editor/, 'project-editor':/editor/,dialog:/dialog/,drag:/column/,research:/Assistant/,race:/changed/,storage:/could not save/,restore:/restore/, 'account-change':/changed/}[scenario];
+  const reason={draft:/Note drafts/,image:/Note images/,dirty:/editor/, 'project-editor':/editor/, 'project-confirmation':/dialog/, 'settings-menu':/dialog/,dialog:/dialog/,drag:/column/,research:/Assistant/,race:/changed/,storage:/could not save/,restore:/restore/, 'account-change':/changed/}[scenario];
   assert.match(result.message,reason,scenario);
  }
  assert.equal(JSON.stringify(retainedState),before,'Update preparation cannot clear saved content, outbox entries or conflicts');
+}
+{
+ const start=source.indexOf('function positionWebAppUpdateNotice('),end=source.indexOf('\n}',start)+2;
+ const window={innerWidth:3063,innerHeight:1312},reference={right:3038,bottom:45};
+ const c=vm.createContext({window,workspaceMenu:null,projectDetailsScreen:null,workspaceFloatingPanelTopGap:25,
+  workspaceFloatingPanelReference:()=>reference,floatingWorkspacePanelBounds});
+ vm.runInContext(source.slice(start,end),c);
+ const notice={offsetWidth:360,style:{}},button={getBoundingClientRect:()=>({right:2899})};
+ c.positionWebAppUpdateNotice(notice,button);
+ assert.deepEqual(notice.style,{left:'2539px',top:'70px'},'Notice aligns below Update');
+ c.workspaceMenu={element:{offsetWidth:600}};
+ c.positionWebAppUpdateNotice(notice,button);
+ assert.deepEqual(notice.style,{left:'2066px',top:'70px'},'Notice shares the panel top edge, with room beside it');
 }
 console.log('App update button passed: pending-only visibility, one click and duplicate prevention, legacy errors, editor/storage/images/Research/race guards, independent Project sync and explicit worker activation across open pages.');

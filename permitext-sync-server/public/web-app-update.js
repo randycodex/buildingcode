@@ -35,9 +35,12 @@ export async function activateWebAppUpdate({serviceWorker, MessageChannelClass =
 }
 
 export function createWebAppUpdatePrompt({document, button = document.querySelector("#web-app-update-button"), serviceWorker, location, prepareReload,
-  currentVersion, activate = activateWebAppUpdate} = {}) {
+  currentVersion, activate = activateWebAppUpdate, positionNotice} = {}) {
   if (!currentVersion) throw new Error("Missing web app version");
   let target = "", busy = false, notice, message;
+  const updateNoticePosition = () => {
+    if (notice && !notice.hidden) positionNotice?.(notice, button);
+  };
   function showMessage(text) {
     if (!notice) {
       notice = document.createElement("aside");
@@ -49,6 +52,7 @@ export function createWebAppUpdatePrompt({document, button = document.querySelec
       notice.append(message, dismiss); document.body.append(notice);
     }
     message.textContent = text; notice.hidden = false;
+    updateNoticePosition();
   }
   function observe(version, {required = false} = {}) {
     if (!required && (!version || version === currentVersion)) return;
@@ -58,6 +62,7 @@ export function createWebAppUpdatePrompt({document, button = document.querySelec
     button.hidden = false;
   }
   button.addEventListener("click", () => void reload());
+  if (positionNotice) document.defaultView?.addEventListener("resize", updateNoticePosition);
   async function reload() {
     if (busy || !target) return false;
     busy = true; button.disabled = true;
@@ -86,5 +91,5 @@ export function createWebAppUpdatePrompt({document, button = document.querySelec
       }
     }
   }
-  return {observe, requireReload:version => observe(version || "required", {required:true}), reload};
+  return {observe, requireReload:version => observe(version || "required", {required:true}), reload, positionNotice:updateNoticePosition};
 }
