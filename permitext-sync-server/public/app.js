@@ -5,7 +5,7 @@ import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, open
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
 import { createResearchV2Rollout } from "./research-v2-rollout.js?v=2";
-import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=61";
+import { createResearchV2View, researchV2RetryContext } from "./research-v2.js?v=62";
 import { attachResearchHistoryTitleScroll } from "./research-question-rail.js?v=9";
 import {createResearchOperationGate} from "./research-operation-gate.js?v=2";
 import {createRequestRateLimit} from "./request-rate-limit.js?v=2";
@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261118-selected-note-destination-v2554";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-assistant-reader-v2556";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261118-selected-note-destination-v2554";
+} from "./offline-storage.js?v=20261119-assistant-reader-v2556";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -21403,7 +21403,7 @@ async function renderReader(reader, options = {}) {
   renderReaderTabs(panel, reader);
   panel.dataset.readerDisplayedTabId = reader.activeTabID;
   const columnLabel = readerPositionLabel(reader);
-  closeButton.title = columnLabel.startsWith("Search reader") ? `Close ${columnLabel} column` : "Close Reader column";
+  closeButton.title = columnLabel.startsWith("Reader") ? "Close Reader column" : `Close ${columnLabel} column`;
   closeButton.setAttribute("aria-label", closeButton.title);
   let tabScrollTimer;
   panel.querySelector('.reader-content').addEventListener('scroll', () => {
@@ -24883,12 +24883,14 @@ function renderResearchInterpretation(container, result, options = {}) {
         );
         if (exactSource) {
           void openSourceInReader(exactSource, options.anchorPaneID || "", {
+            sourceSurface: options.anchorPaneID ? "research" : undefined,
             projectID: options.conversation?.primaryProjectID || ""
           });
           return;
         }
         if (citation.sectionID || citation.sectionNumber) {
           void openSourceInReader(citation, options.anchorPaneID || "", {
+            sourceSurface: options.anchorPaneID ? "research" : undefined,
             projectID: options.conversation?.primaryProjectID || ""
           });
           return;
@@ -26838,7 +26840,7 @@ function renderEvidenceDiscovery(container) {
       openButton.type = "button";
       openButton.className = "evidence-candidate-open";
       openButton.textContent = "Open source";
-      openButton.addEventListener("click", () => openSourceInReader(candidate, "utility:analysis"));
+      openButton.addEventListener("click", () => openSourceInReader(candidate, "utility:analysis", { sourceSurface: "research" }));
       actions.append(approveButton, rejectButton, openButton);
       const navigation = document.createElement("div");
       navigation.className = "evidence-candidate-navigation";
@@ -27712,7 +27714,7 @@ function renderResearchIncludedPassages(conversation, paneID, { busy = false, on
     quote.textContent = source.selectedText || "No exact passage is attached. Select text in Reader before asking.";
     const actions = document.createElement("div");
     actions.className = "research-passage-actions";
-    const open = researchWorkflowButton("Open in Reader", () => openSourceInReader(source, paneID));
+    const open = researchWorkflowButton("Open in Reader", () => openSourceInReader(source, paneID, { sourceSurface: "research" }));
     const warning = researchPassageScopeWarning(source.selectedText);
     if (warning) {
       const notice = document.createElement("p");
@@ -27814,7 +27816,7 @@ function renderResearchMissingEvidence(conversation, message, paneID) {
           !sectionRecordMatchesRequestedEdition(source, target)) {
         throw new Error("The exact referenced provision could not be resolved in this edition. Open Reader to locate and review it.");
       }
-      await openSourceInReader(target, paneID);
+      await openSourceInReader(target, paneID, { sourceSurface: "research" });
     }));
   }
   if (!referenced.size) actions.append(researchWorkflowButton("Open Reader", button => openReaderFromToolbar(button)));
@@ -28110,9 +28112,9 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
         finally { release(); }
       },
       onOpen:async id => {if(id===conversation?.id)return;try {await open(id);}catch(error){if(current())await showWebNotice("Could not open Research",error.message);}},
-      onOpenReader:async source => {
-        const reader=await openSourceInReader(source,paneID,{sourceSurface:"research",isCurrent:current});
-        if(!reader&&current())throw new Error("The source was not opened. Open its exact edition in Reader before including it.");
+      onOpenReader:async (source, {required = false} = {}) => {
+        const reader=await openSourceInReader(source,paneID,{sourceSurface:"research",isCurrent:ownsPanel});
+        if(!reader&&required&&ownsPanel())throw new Error("The source was not opened. Open its exact edition in Reader before including it.");
         return reader;
       },
       onFind:async (question,{focus="",cursor=null}={}) => {
@@ -29073,7 +29075,7 @@ function renderResearchSource(source, options = {}) {
     toggle.addEventListener("click", () => {
       const sourceURL = String(source.sourceURL || source.url || "").trim();
       if (source.sectionID || (!sourceURL && source.id)) {
-        void openSourceInReader(source, options.anchorPaneID, { projectID: options.projectID });
+        void openSourceInReader(source, options.anchorPaneID, { sourceSurface: "research", projectID: options.projectID });
       } else if (sourceURL) {
         window.open(sourceURL, "_blank", "noopener,noreferrer");
       }
@@ -29269,7 +29271,7 @@ function renderReaderResearchOrigin(conversation, sources, anchorPaneID) {
       void openSourceInReader(
         source,
         anchorPaneID,
-        { projectID: conversation.primaryProjectID || "" }
+        { sourceSurface: "research", projectID: conversation.primaryProjectID || "" }
       );
     });
     const edition = document.createElement("span");
@@ -30617,7 +30619,7 @@ async function renderResearchConversation(conversationID, options = {}) {
       sectionID: candidate.sectionID, codeVersion: candidate.codeVersion, reviewMode: "whole_section"
     }),
     openReader: async candidate => {
-      const reader = await openSourceInReader(candidate, paneID);
+      const reader = await openSourceInReader(candidate, paneID, { sourceSurface: "research", isCurrent: relatedIsCurrent });
       return relatedIsCurrent() && reader && String(reader.sectionID) === candidate.sectionID && reader.codeVersion === candidate.codeVersion;
     },
     include: async (passages, context) => {
@@ -42123,12 +42125,17 @@ function readerIsClearlyAvailable(reader) {
 function readerPositionLabel(reader) {
   const inNotebook = candidate => state.workflowMembership?.[`reader:${candidate?.id}`]?.includes('notebook');
   if (inNotebook(reader)) return 'Reader';
-  const fromSearch = candidate => /^utility:search(?::|$)/.test(String(candidate?.sourceOwnerPaneID || candidate?.searchPreviewPaneID || ""));
-  const searchReader = fromSearch(reader);
-  const readers = (state.readers || []).filter(candidate => !inNotebook(candidate) && fromSearch(candidate) === searchReader);
+  const labelFor = candidate => {
+    const owner = candidate?.sourceOwnerPaneID || candidate?.searchPreviewPaneID || "";
+    if (/^utility:search(?::|$)/.test(owner)) return "Search Reader";
+    if (/^utility:saved(?::|$)/.test(owner)) return "Evidence Reader";
+    if (/^(?:utility:analysis(?::|$)|research:conversation:)/.test(owner)) return "Assistant Reader";
+    return "Reader";
+  };
+  const label = labelFor(reader);
+  const readers = (state.readers || []).filter(candidate => !inNotebook(candidate) && labelFor(candidate) === label);
   const index = readers.findIndex(candidate => candidate.id === reader?.id);
-  if (searchReader) return readers.length > 1 && index >= 0 ? `Search reader ${index + 1}` : "Search reader";
-  return index >= 0 ? `Reader ${index + 1}` : "Reader";
+  return index >= 0 && (label === "Reader" || readers.length > 1) ? `${label} ${index + 1}` : label;
 }
 
 function readerSourceLabel(reader) {
@@ -42386,15 +42393,20 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   const sourceWorkspaceID = activeWorkspaceID;
   const notebookOpening = currentColumnWorkflowView() === 'notebook';
   const workflowGeneration = state.workflowNavigationGeneration || 0;
-  const searchOpening = options.sourceSurface === "search" && !options.forceNewReader;
-  const openingAttempt = searchOpening ? Symbol() : null;
-  if (searchOpening) searchReaderOpeningAttempts.set(anchorPaneID, openingAttempt);
+  const fromSearch = options.sourceSurface === "search";
+  const fromSaved = options.sourceSurface === "saved";
+  const fromResearch = options.sourceSurface === "research";
+  const fromAssistant = fromResearch && Boolean(anchorPaneID);
+  const ownedSource = fromSearch || fromSaved || fromAssistant;
+  const trackLatestOpening = (fromSearch || fromAssistant) && !options.forceNewReader;
+  const openingAttempt = trackLatestOpening ? Symbol() : null;
+  if (trackLatestOpening) searchReaderOpeningAttempts.set(anchorPaneID, openingAttempt);
   let navigationItem;
   const navigationIsCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === sourceWorkspaceID &&
     (options.isCurrent?.() ?? true) &&
     !workspaceColumnsRequireProject() && workflowGeneration === (state.workflowNavigationGeneration || 0) &&
     (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext)) &&
-    (!searchOpening || searchReaderOpeningAttempts.get(anchorPaneID) === openingAttempt);
+    (!trackLatestOpening || searchReaderOpeningAttempts.get(anchorPaneID) === openingAttempt);
   try {
     navigationItem = await resolveReaderSource(item, {isCurrent: navigationIsCurrent});
   } catch (error) {
@@ -42410,9 +42422,6 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     sourceProjectID: String(options.projectID || ""),
     sourceBlockID: normalizeAnnotationBlockID(detail.blockID)
   });
-  const fromSearch = options.sourceSurface === "search";
-  const fromSaved = options.sourceSurface === "saved";
-  const ownedSource = fromSearch || fromSaved;
   const visibleReaders = (state.readers || []).filter(candidate => notebookOpening
     ? state.workflowMembership?.[paneIDForReader(candidate)]?.includes('notebook')
     : workflowPaneIsVisible(paneIDForReader(candidate)));
@@ -42448,7 +42457,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     }
   }
   if (notebookOpening || Array.isArray(reader.tabs)) reader = prepareReaderSourceTab(reader, sourceFields, {
-    allowNewColumn: !(fromSearch || fromSaved) || Boolean(options.forceNewReader)
+    allowNewColumn: !ownedSource || Boolean(options.forceNewReader)
   });
   if (!reader) return null;
   const retainedPanel = ownedSource && !options.forceNewReader ? retainReaderForSource(reader, detail) : null;
@@ -42456,7 +42465,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   resolvedReaderSourceNavigations.set(reader, {chapterID: reader.chapterID, sectionID: reader.sectionID,
     sectionNumber: reader.sectionNumber, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion});
   if (ownedSource) {
-    if (!options.forceNewReader) reader.sourceOwnerPaneID = anchorPaneID;
+    if (!options.forceNewReader || (fromSaved && /^utility:saved(?::|$)/.test(anchorPaneID))) reader.sourceOwnerPaneID = anchorPaneID;
     reader.searchPreviewPaneID = "";
   }
   const paneID = paneIDForReader(reader);
@@ -42464,10 +42473,15 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     activateNotebookReference('reader');
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, 'notebook');
   }
+  const targetOptions = {
+    preferPassage: ownedSource || fromResearch || options.sourceSurface === "search-detail",
+    researchPassage: fromResearch, searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode,
+    immediate: ownedSource
+  };
   const sourceNavigation = ownedSource ? {
     paneID, reader, item: navigationItem, evidenceAnchor: options.evidenceAnchor,
     isCurrent: navigationIsCurrent,
-    options: { preferPassage: true, searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode, immediate: true }
+    options: targetOptions
   } : null;
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
   if (!notebookOpening && anchorPaneID && anchorPaneID !== paneID && (createdReader || options.forceNewReader || (!ownedSource && !Array.isArray(reader.tabs)))) placePaneAfter(anchorPaneID, paneID);
@@ -42491,11 +42505,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   const destinationPanel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (destinationPanel && paneIsCollapsed(paneID)) setPaneCollapsed(destinationPanel, false);
   columnExpansionController().reveal(destinationPanel);
-  if (!sourceNavigation?.positioned) revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {
-    preferPassage: fromSearch || fromSaved || options.sourceSurface === "search-detail" || options.sourceSurface === "research",
-    researchPassage: options.sourceSurface === "research", searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode,
-    immediate: ownedSource
-  });
+  if (!sourceNavigation?.positioned) revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, targetOptions);
   scrollPaneIntoView(paneID, createdReader || options.forceNewReader ? "smooth" : "auto");
   const note = workingResearchNote();
   if (note && currentWorkflowView() === 'research') rememberWorkingResearchNote(researchProjectID(workspaceProject()), note,

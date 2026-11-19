@@ -84,10 +84,11 @@ for (const ready of [true, false]) {
   const linkedPane={dataset:{},getBoundingClientRect:()=>({left:1304,right:1904,width:600})};
   const track={scrollLeft:0,scrollWidth:1904,clientWidth:1280,
     querySelector(selector){if(selector.includes("is-pinned"))return null;assert.match(selector,/reader:linked/);return linkedPane;},
-    getBoundingClientRect:()=>({left:0,right:1280}),
+    getBoundingClientRect:()=>({left:0,right:1280,width:1280}),
     scrollTo(options){calls.push(['scroll',options.left,options.behavior]);this.scrollLeft=options.left;}
   };
   const c=vm.createContext({currentColumnWorkflowView:()=>"research",workflowPaneIsVisible:()=>true,state,track,CSS:{escape:id=>id},
+    window:{matchMedia:()=>({matches:false})},
     heading:{addEventListener(type,fn){assert.equal(type,'click');handler=fn;}},
     searchID:'search-a',detail:{sectionID:42,chapterID:'target-chapter'},chapter:null,isSearchEvidenceDetail:false,
     sectionPayload:{sectionNumber:'403.2.3.3',title:'Concrete and masonry walls'},
@@ -101,7 +102,12 @@ for (const ready of [true, false]) {
     revealReaderSourceTarget:(reader,detail)=>calls.push(['reveal',reader.id,detail.sectionID]),
     paneIsCollapsed:()=>false
   });
-  vm.runInContext(actualFunction('openOrUpdateLinkedReaderForSearch',true)+'\n'+actualFunction('scrollPaneIntoView')+'\n'+headingHandler,c);
+  vm.runInContext([
+    actualFunction('openOrUpdateLinkedReaderForSearch',true),
+    actualFunction('scrollPaneIntoView'),
+    actualFunction('scrollWorkspaceColumnIntoView'),
+    headingHandler
+  ].join('\n'),c);
   const pending=handler();
   await new Promise(resolve=>setImmediate(resolve));
   assert.deepEqual(calls,[['place','search-a','linked'],'save',['shell','utility','reader:linked'],['wait','reader:linked']]);

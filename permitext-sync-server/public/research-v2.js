@@ -508,7 +508,7 @@ export function createResearchV2View(options) {
         const kind={provision:'Provision',definition:'Definition',table:'Table and notes',scope:'Scope',reference:'Cross-reference'}[candidate.kind];
         if(kind||candidate.reason)row.append(node('p','rv2-detail-caption',[kind,candidate.reason].filter(Boolean).join(' · ')));
         row.append(action('Review in Reader',async()=>{
-          if(busy||includeBusy)return;includeBusy=true;update();try{await options.onOpenReader(candidate);if(!valid(attempt))return;
+          if(busy||includeBusy)return;includeBusy=true;update();try{await options.onOpenReader(candidate,{required:true});if(!valid(attempt))return;
             if(candidate.requiresReaderSelection){notice('Select the complete table and its footnotes in Reader before attaching it.');return;}
             const preview=await onReview(candidate);if(!valid(attempt))return;
             if(preview.requiresVisualReview){notice('Select this passage and review its visuals in Reader before attaching it.');return;}

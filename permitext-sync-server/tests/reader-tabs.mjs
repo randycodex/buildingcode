@@ -150,7 +150,7 @@ await context.transferReaderTab(ownedSearchReader, sourceTabID, {destination: fu
 assert.equal(JSON.stringify(state.readers), transferSnapshot, 'Moving into a full column leaves both columns untouched.');
 context.readerShortcuts.activePaneID = () => 'reader:full';
 const oldCount = state.readers.length;
-const overflowReader = await context.openSourceInReader({codePrefix: 'NEW', codeVersion: '2022', chapterID: '1', sectionID: 'new-101'}, 'another-source', {sourceSurface: 'research'});
+const overflowReader = await context.openSourceInReader({codePrefix: 'NEW', codeVersion: '2022', chapterID: '1', sectionID: 'new-101'}, 'another-source');
 assert.notEqual(overflowReader.id, full.id); assert.equal(state.readers.length, oldCount + 1);
 assert.equal(readerTabs(overflowReader).length, 1); assert.equal(overflowReader.sectionID, 'new-101');
 assert.equal(JSON.stringify(full), fullBeforeNavigation, 'Overflow navigation preserves all six sessions and the selected tab.');
@@ -161,14 +161,18 @@ const reopened = context.prepareReaderSourceTab(full, {...existingCode, sectionI
 assert.equal(reopened, full); assert.equal(full.activeTabID, existingID);
 assert.equal(state.readers.length, oldCount + 1, 'A full column can still navigate any code already in its tabs.');
 
-// Direct Search/Saved navigation never creates a seventh-code overflow column.
-full.sourceOwnerPaneID = 'saved';
+// Direct source navigation stays in its Reader even at the tab limit.
 const beforeDirectCount = state.readers.length;
 const inactiveTabs = readerTabs(full).filter(tab => tab.id !== full.activeTabID);
-const direct = await context.openSourceInReader({codePrefix:'DIRECT',codeVersion:'2022',chapterID:'1',sectionID:'direct'},'saved',{sourceSurface:'saved'});
-assert.equal(direct.id,full.id);assert.equal(state.readers.length,beforeDirectCount);
-assert.equal(readerTabs(full).length,6);assert.equal(full.sectionID,'direct');
-for (const tab of inactiveTabs) assert.deepEqual(readerTabs(full).find(candidate=>candidate.id===tab.id),tab,'Other code tabs remain intact');
+for (const [sourceSurface, owner] of [['saved','utility:saved'], ['research','utility:analysis']]) {
+  full.sourceOwnerPaneID = owner;
+  const direct = await context.openSourceInReader({
+    codePrefix:sourceSurface.toUpperCase(),codeVersion:'2022',chapterID:'1',sectionID:sourceSurface
+  },owner,{sourceSurface});
+  assert.equal(direct.id,full.id);assert.equal(state.readers.length,beforeDirectCount);
+  assert.equal(readerTabs(full).length,6);assert.equal(full.sectionID,sourceSurface);
+  for (const tab of inactiveTabs) assert.deepEqual(readerTabs(full).find(candidate=>candidate.id===tab.id),tab,'Other code tabs remain intact');
+}
 
 // A picker opened before a column fills must recheck capacity on selection.
 let pickCode, pickerOpens = 0;

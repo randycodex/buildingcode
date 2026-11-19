@@ -71,11 +71,17 @@ const item=(id,extra={})=>({sectionID:id,codePrefix:'BC',codeVersion:'2022',chap
 {
   const f=fixture();f.c.state.readers.length=0;
   const first=await f.c.openSearchResultDetail(item('first'),f.search);
+  assert.equal(f.c.readerPositionLabel(first),'Search Reader');
   const second=await f.c.openSearchResultDetail(item('second'),f.search);
   assert.equal(first.id,second.id);assert.equal(f.readers.length,1);
   const otherSearch={key:'search',id:'other',query:'water'};f.c.state.utilityInstances.push(otherSearch);
   const other=await f.c.openSearchResultDetail(item('other'),otherSearch);
   assert.notEqual(other.id,first.id);assert.equal(f.readers.length,2,'Separate Searches own separate Readers');
+}
+{
+  const f=fixture();
+  const reader=await f.c.openSavedItemInReader(item('evidence-source'),'utility:saved:project');
+  assert.equal(f.c.readerPositionLabel(reader),'Evidence Reader');
 }
 for(const surface of ['search','saved']) for(const change of ['account','workspace','view','query','closed-search','superseded']) {
   if(surface==='saved' && ['query','closed-search'].includes(change)) continue;
