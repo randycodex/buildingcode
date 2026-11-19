@@ -71,15 +71,15 @@ for(const stale of [false,true]) {
   await assert.rejects(options.onSave({...custom,input:{...custom.input,factorBasis:'Changed notes'}}),/BC table changed/);
   assert.equal(calls.length,2,'Invalid overrides cannot write a Note.');
   const appends=[];
-  context.chooseResearchNoteDestination=async(_project,_container,_current,{chooseNote})=>({
-    kind:'saved',card:{id:chooseNote?'other-note':'existing-note'}
-  });
+  let selectedNoteID='existing-note';
+  context.chooseResearchNoteDestination=async()=>({kind:'saved',card:{id:selectedNoteID}});
   context.appendResearchReferenceToNote=async(_project,destination,reference,mutationID,_identity,_current,material)=>{
     appends.push({reference,mutationID,...material});return destination.card;
   };
   assert.equal((await options.onSave(calculation)).id,'existing-note');
   assert.equal((await options.onSave(calculation)).id,'existing-note');
-  assert.equal((await options.onSave(calculation,{chooseNote:true})).id,'other-note');
+  selectedNoteID='other-note';
+  assert.equal((await options.onSave(calculation)).id,'other-note');
   assert.equal(new Set(appends.map(item=>item.mutationID)).size,3);
   assert.equal(new Set(appends.map(item=>item.evidenceLink.id)).size,3);
   for (const added of appends) {
