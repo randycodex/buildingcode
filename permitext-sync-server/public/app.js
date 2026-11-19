@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261118-selected-note-destination-v2554";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261118-assistant-sidebar-scroll-v2555";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261118-selected-note-destination-v2554";
+} from "./offline-storage.js?v=20261118-assistant-sidebar-scroll-v2555";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -27932,10 +27932,13 @@ function setAssistantHistoryRail(panel, expanded, {initial = false} = {}) {
   panel.dataset.assistantHistoryWidth = String(width);
   panel.classList.toggle('has-history-rail', expanded);
   if (panel.isConnected) syncResearchColumnLayout();
-  if (!initial) saveWorkspaceState();
+  if (!initial) {
+    saveWorkspaceState();
+    void revealAssistantAfterRailResize(panel, 'history', expanded);
+  }
 }
 
-function setAssistantSourcesRail(panel, expanded) {
+function setAssistantSourcesRail(panel, expanded, {reveal = true} = {}) {
   const previous = Number(panel.dataset.assistantSourcesWidth) || 0;
   const width = expanded ? assistantRailExpansion : 0;
   if (previous !== width) {
@@ -27946,7 +27949,20 @@ function setAssistantSourcesRail(panel, expanded) {
     panel.classList.toggle('has-sources-rail', expanded);
     syncResearchColumnLayout();
     saveWorkspaceState();
+    if (reveal) void revealAssistantAfterRailResize(panel, 'sources', expanded);
   }
+}
+
+async function revealAssistantAfterRailResize(panel, rail, expanded) {
+  if (!panel.isConnected || window.innerWidth <= 680) return;
+  const generation = ++workspaceColumnNavigationGeneration;
+  if (!expanded) return;
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  await waitForWorkspaceSidebarResize(panel);
+  if (generation !== workspaceColumnNavigationGeneration || !isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID ||
+      track.inert || !visibleWorkspaceColumns().includes(panel) || paneIsCollapsed(panel.dataset.paneId) ||
+      !panel.classList.contains(`has-${rail}-rail`)) return;
+  scrollWorkspaceColumnIntoView(panel, 'smooth', {includeCollapsedToRight:true, alignEndWhenOversized:rail === 'sources'});
 }
 
 async function renderResearchV2Pane(paneID, configuration = null, retained = {}) {
@@ -28062,7 +28078,7 @@ async function renderResearchV2Pane(paneID, configuration = null, retained = {})
       railCollapsedStore:{read:()=>localStorage.getItem(`${railWidthKey}:collapsed`)==='true',
         write:collapsed=>{if(ownsPanel())localStorage.setItem(`${railWidthKey}:collapsed`,String(collapsed));}},
       onHistoryRailChange:(expanded,settings)=>{if(ownsPanel() || settings?.initial && current())setAssistantHistoryRail(panel,expanded,settings);},
-      onSourcesRailChange:expanded=>{if(ownsPanel())setAssistantSourcesRail(panel,expanded);},
+      onSourcesRailChange:(expanded,_rail,settings)=>{if(ownsPanel())setAssistantSourcesRail(panel,expanded,settings);},
       history:[...(listed.conversations || []).filter(item => researchConversationInWorkspace(item)),
         ...(conversation && !(listed.conversations || []).some(item=>item.id===conversation.id) ? [conversation] : [])],
       hasMore:listed.hasMore,
@@ -47839,9 +47855,10 @@ function scrollPaneIntoView(paneID, behavior = "smooth", options) {
   scrollWorkspaceColumnIntoView(pane, behavior, options);
 }
 
-async function waitForWorkspaceSidebarResize() {
-  // These track transitions determine the outer column widths used for scrolling.
-  const transitions = track.getAnimations().filter(animation => animation.transitionProperty?.endsWith('-expansion'));
+async function waitForWorkspaceSidebarResize(element = track) {
+  // Notes and Report reserve space on the track. Assistant uses the pane's trailing margin.
+  const transitions = element.getAnimations().filter(({transitionProperty}) =>
+    transitionProperty?.endsWith('-expansion') || transitionProperty?.startsWith('margin-'));
   await Promise.allSettled(transitions.map(transition => transition.finished));
 }
 

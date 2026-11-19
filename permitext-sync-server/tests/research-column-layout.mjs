@@ -340,11 +340,12 @@ track.clientWidth=2804;context.window.innerWidth=2804;workflow='research';
 state.paneWeights={};state.researchColumnWidthsManual=false;delete track._researchColumnLayout;
 context.syncResearchColumnLayout();const beforeSources=sizes();
 context.saveWorkspaceState=()=>{};context.requestAnimationFrame=callback=>callback();
+context.revealAssistantAfterRailResize=()=>{};
 vm.runInContext(actual('setAssistantSourcesRail'),context);
 track.scrollLeft=400;
 context.setAssistantSourcesRail(panels[1],true);
 assert.deepEqual(sizes(),beforeSources,'Opening sources never narrows the Assistant or neighboring panes');
-assert.equal(panels[1].dataset.assistantSourcesWidth,String(assistantRailExpansion));assert.equal(track.scrollLeft,400,'Opening answer sources leaves workspace scroll alone.');
+assert.equal(panels[1].dataset.assistantSourcesWidth,String(assistantRailExpansion));assert.equal(track.scrollLeft,400,'Reserving Sources space keeps the workspace anchored.');
 assert.equal(state.paneWeights['utility:analysis'],beforeSources[1],'Saved pane weights exclude the temporary source rail');
 context.setAssistantSourcesRail(panels[1],true);
 assert.deepEqual(sizes(),beforeSources,'Updating the answer in an open rail never adds width again');
@@ -454,10 +455,10 @@ assert.deepEqual(sizes(),manuallyResized);assert.equal(state.researchColumnWidth
 panels.pop();context.syncResearchColumnLayout();fillsDesk();
 assert.equal(state.researchColumnWidthsManual,false,'Closing a column starts a fresh automatic fit');
 const beforeSourcesToggle=sizes();
-context.setAssistantSourcesRail(panels[1],true,{isConnected:true},{reveal:false});
+context.setAssistantSourcesRail(panels[1],true,{reveal:false});
 assert.deepEqual(sizes(),beforeSourcesToggle);assert.equal(state.researchColumnWidthsManual,false);
 
-context.setAssistantSourcesRail(panels[1],false,{isConnected:true},{reveal:false});
+context.setAssistantSourcesRail(panels[1],false,{reveal:false});
 assert.deepEqual(sizes(),beforeSourcesToggle);
 context.window.innerWidth=track.clientWidth=3400;context.syncResearchColumnLayout();fillsDesk();
 console.log('Automatic-fit recovery passed: legacy gap, stable rail toggles, column open/close, minimum-only overflow, actual divider persistence and wider viewport recovery.');
@@ -549,3 +550,42 @@ for(const id of [evidenceID,'reader:fit','utility:analysis:fit','utility:calcula
   }
 }
 console.log('All expanded desktop columns participate in automatic width sharing.');
+
+const assistant = makePane('utility:analysis');
+assistant.isConnected = true;
+assistant.classList.toggle = (name, on) => on ? assistant.classList.add(name) : assistant.classList.remove(name);
+const scrolls = [];
+const sidebarContext = vm.createContext({assistantRailExpansion, track, window:{innerWidth:1920},
+  workspaceColumnNavigationGeneration:0, activeWorkspaceID:'workspace', captureAccountRequest:()=>1,
+  isCurrentAccountRequest:()=>true, visibleWorkspaceColumns:()=>[assistant], paneIsCollapsed:()=>false,
+  capturePaneResizeWidths(){}, syncResearchColumnLayout(){}, saveWorkspaceState(){},
+  scrollWorkspaceColumnIntoView:(pane, behavior, options)=>scrolls.push({pane, behavior, ...options})});
+vm.runInContext(['setAssistantHistoryRail','setAssistantSourcesRail','revealAssistantAfterRailResize',
+  'waitForWorkspaceSidebarResize'].map(actual).join('\n'),sidebarContext);
+let finishExpansion;
+const pendingExpansion = () => {
+  const finished = new Promise(resolve => {finishExpansion = resolve;});
+  assistant.getAnimations = () => [{transitionProperty:'margin-right',finished}];
+};
+const settleExpansion = async () => {finishExpansion(); await new Promise(resolve => setImmediate(resolve));};
+pendingExpansion();
+sidebarContext.setAssistantHistoryRail(assistant,true,{initial:true});
+sidebarContext.setAssistantSourcesRail(assistant,true,{reveal:false});
+await settleExpansion();
+assert.equal(scrolls.length,0,'Restoring Rails does not move the workspace.');
+for (const [setter, alignEndWhenOversized] of [[sidebarContext.setAssistantHistoryRail,false],[sidebarContext.setAssistantSourcesRail,true]]) {
+  setter(assistant,false);
+  pendingExpansion();
+  setter(assistant,true);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(scrolls.length,0,'The workspace stays anchored until the Assistant width settles.');
+  await settleExpansion();
+  assert.deepEqual(scrolls.pop(),{pane:assistant,behavior:'smooth',includeCollapsedToRight:true,alignEndWhenOversized});
+}
+sidebarContext.setAssistantSourcesRail(assistant,false);
+pendingExpansion();
+sidebarContext.setAssistantSourcesRail(assistant,true);
+sidebarContext.setAssistantSourcesRail(assistant,false);
+await settleExpansion();
+assert.equal(scrolls.length,0,'Closing a rail during expansion cancels its pending scroll.');
+console.log('Assistant rails reveal the combined column after the resize, with no scroll on restore or interrupted expansion.');
