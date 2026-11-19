@@ -18248,8 +18248,13 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   width: 100%;
   margin: 0;
   padding: var(--space-4) var(--saved-evidence-content-gutter);
-  border-radius: 0;
+  border-radius: 8px;
   background: transparent;
+}
+.saved-panel .saved-section-row { border-radius: 8px; }
+.saved-panel .saved-section-row:is(:hover, :has(:focus-visible)),
+.saved-panel .saved-folder-context.is-project .saved-project-evidence-body .saved-code-group .saved-section-row:is(:hover, :has(:focus-visible)) {
+  background-color: var(--menu-highlight);
 }
 .saved-panel .saved-folder-context.is-project .saved-project-evidence-body .saved-code-group .saved-row::after {
   content: none;

@@ -159,13 +159,22 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
   }
   function resize() { finishPointer(); hideTooltip(); }
   function toolbarNodes(items) {
-    const positioned = items.map(item => ({key:item.toolKey, rank:toolRank.get(item.toolKey) || 0, button:buttons.get(item.id)}));
+    const toolByPaneID = new Map(items.map(item => [item.id, item.toolKey]));
+    const positioned = items.map(item => {
+      const key = item.toolKey || toolByPaneID.get(item.ownerPaneID);
+      return {key, rank:toolRank.get(key) || 0, button:buttons.get(item.id)};
+    });
     for (const {key, button, after} of launchers) {
       if (items.some(item => item.toolKey === key)) continue;
       const rank = toolRank.get(key);
       const partner = after ? positioned.findLastIndex(item => item.key === after) : -1;
-      const next = partner !== -1 ? partner + 1 : positioned.findIndex(item => item.rank > rank);
-      positioned.splice(next === -1 ? positioned.length : next, 0, {key, rank, button});
+      // A later tool can be dragged to the front. Anchor closed tools to their
+      // preceding tool so they do not follow the later tool across the toolbar.
+      const precedingRank = Math.max(-1, ...positioned.filter(item => item.rank < rank).map(item => item.rank));
+      const preceding = positioned.some(item => item.rank > rank)
+        ? positioned.findLastIndex(item => item.rank === precedingRank)
+        : positioned.length - 1;
+      positioned.splice((partner !== -1 ? partner : preceding) + 1, 0, {key, rank, button});
     }
     return positioned.map(item => item.button);
   }

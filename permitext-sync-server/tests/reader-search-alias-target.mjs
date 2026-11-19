@@ -13,4 +13,16 @@ const result={sectionID:'114',title:'1.1. '+paragraph.textContent};
 assert.equal(c.savedReaderTarget(content,result),section,'Whole-section bookmarks keep their heading target');
 assert.equal(c.savedReaderTarget(content,result,{preferPassage:true}),block,'Search reveals the exact numbered item inside Definitions');
 assert.equal(c.savedReaderTarget(content,{...result,title:'1.1. An unrelated source clause that is not in the text'},{preferPassage:true}),section,'Missing exact passage falls back to its owning section');
+assert.equal(c.savedReaderTarget(content,result,{preferPassage:true,wholeSection:true}),block,'A saved alias still selects only its own text');
+const otherPermits = {sectionID:'11761',sectionNumber:'106.6',title:'106.6 Other permits.'};
+const heading = {textContent:otherPermits.title};
+const subsection = {dataset:{},querySelector:()=>heading,querySelectorAll:()=>[block]};
+const plumbing = {querySelector:selector=>selector.includes('block-id') ? block :
+  selector.includes('11761') || selector.includes('106.6') ? subsection : null};
+c.readerSectionTitleNode = node => node?.querySelector('.reader-section-title');
+assert.equal(c.savedReaderTarget(plumbing,otherPermits,{preferPassage:true}),heading);
+assert.equal(c.savedReaderTarget(plumbing,otherPermits,{preferPassage:true,wholeSection:true}),subsection,
+  'Whole Plumbing § 106.6 highlights the heading and all of its paragraphs');
+assert.equal(c.savedReaderTarget(plumbing,{...otherPermits,blockID:'permit-list'},{preferPassage:true}),block,
+  'An individually saved paragraph still highlights only its block');
 console.log('Search alias targeting preserves bookmark behavior and reveals the complete matching passage.');

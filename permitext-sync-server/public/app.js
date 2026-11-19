@@ -1,6 +1,6 @@
 import { normalizeNoteResearch } from "./note-research.js?v=1";
 import {buildProjectWorkspaceURL, createProjectURLCatalog, mergeProjectURLNames, parseProjectWorkspaceURL, projectURLSlug} from './project-urls.js?v=1';
-import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=19";
+import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=20";
 import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, openRecentReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=5";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-evidence-reader-v2557";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-reader-evidence-v2558";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-evidence-reader-v2557";
+} from "./offline-storage.js?v=20261119-reader-evidence-v2558";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -9289,6 +9289,7 @@ function scrollReaderContentToNode(content, target, behavior = "auto") {
   if (!content || !target) return;
   const panel = content.closest(".reader-panel");
   if (panel?.classList.contains("is-workflow-hidden")) { panel._workflowPendingReaderTarget = target; return; }
+  content._readerScrollToTop?.abort();
   const contentRect = content.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
   const anchorRect = panel?.getBoundingClientRect() || contentRect;
@@ -18977,11 +18978,13 @@ function savedReaderTarget(content, item, options = {}) {
   const numberSelector = sectionNumber
     ? `.chapter-section[data-section-number="${CSS.escape(sectionNumber)}"]`
     : "";
-  const sectionTarget = (idSelector ? content.querySelector(idSelector) : null) ||
-    (aliasSelector ? content.querySelector(aliasSelector) : null) ||
-    (numberSelector ? content.querySelector(numberSelector) : null);
-  // Whole-section bookmarks target the heading and all of its content.
-  // Paragraph bookmarks continue through the exact block lookup below.
+  const sectionByID = idSelector ? content.querySelector(idSelector) : null;
+  const sectionByNumber = numberSelector ? content.querySelector(numberSelector) : null;
+  const sectionTarget = sectionByID ||
+    (aliasSelector ? content.querySelector(aliasSelector) : null) || sectionByNumber;
+  // A whole bookmark colors its own section. A catalog alias can point inside
+  // a larger section, where the passage lookup still supplies the exact target.
+  if (!blockID && options.wholeSection && (sectionByID || sectionByNumber)) return sectionByID || sectionByNumber;
   if (!blockID && sectionTarget && !options.preferPassage) return sectionTarget;
   if (blockID) {
     sectionTarget?._readerBlockWindow?.ensure(blockID);
@@ -19340,11 +19343,11 @@ async function openCalculationNotebook(project, card) {
   }
 }
 
-function showNotebookSavedLink(anchor, project, card, { added = false } = {}) {
+function showNotebookSavedLink(anchor, project, card) {
   const container = anchor.closest(".inline-comment, .occupant-load-body") || anchor.parentElement;
   container.querySelector(".passage-notebook-saved")?.remove();
   const message = document.createElement("div"); message.className = "passage-notebook-saved";
-  const status = document.createElement("span"); status.setAttribute("role", "status"); status.textContent = added ? `Added to Note: ${card.title || "Untitled Note"}` : "Saved to Notebook";
+  const status = document.createElement("span"); status.setAttribute("role", "status"); status.textContent = "Saved to Notebook";
   const open = document.createElement("button"); open.type = "button"; open.className = "ghost-button"; open.textContent = "Open in Notebook";
   open.addEventListener("click", () => void openCalculationNotebook(project, card).catch(error => showWebNotice("Note not opened", error.message)));
   open.hidden = !card?.id;
@@ -19674,7 +19677,6 @@ async function addPassageToNotebook(anchor, source, exact, sourceBlocks = null) 
       {evidenceLink:link,blocks:sourceBlocks,comments});
     if (card && current()) {
       rememberWorkingResearchNote(projectID,card,resume);
-      showNotebookSavedLink(anchor,project,card,{added:true});
     }
     return;
   }
@@ -20447,10 +20449,38 @@ function bindReaderScrollIndicator(panel) {
     cancelReaderSectionAlignment(content);
     cancelReaderScrollRestore(content);
     content._readerSourcePosition?.abort();
-    // Progressive hydration adjusts scrollTop as estimates resolve, which
-    // interrupts smooth scrolling through unloaded windows.
-    content.scrollTo({ top: 0, behavior: "instant" });
-    update();
+    content._readerScrollToTop?.abort();
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      content.scrollTo({ top: 0, behavior: "instant" });
+      update();
+      return;
+    }
+    // Native smooth scrolling can be interrupted by chapter hydration.
+    const controller = new AbortController();
+    content._readerScrollToTop = controller;
+    const startTop = content.scrollTop;
+    const renderToken = panel.dataset.readerRenderToken;
+    let startedAt;
+    controller.signal.addEventListener("abort", () => { delete content._readerScrollToTop; });
+    for (const event of ["wheel", "touchstart", "pointerdown", "keydown"]) {
+      panel.addEventListener(event, () => controller.abort(), { signal: controller.signal, passive: true });
+    }
+    const step = (now) => {
+      if (controller.signal.aborted) return;
+      if (!content.isConnected || panel.dataset.readerRenderToken !== renderToken) {
+        controller.abort();
+        return;
+      }
+      startedAt ??= now;
+      const progress = Math.min(1, (now - startedAt) / 340);
+      content.scrollTop = startTop * (1 - progress) ** 3;
+      if (progress < 1) requestAnimationFrame(step);
+      else {
+        controller.abort();
+        update();
+      }
+    };
+    requestAnimationFrame(step);
   });
   requestAnimationFrame(update);
 }
@@ -42474,6 +42504,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, 'notebook');
   }
   const targetOptions = {
+    wholeSection: fromSaved && !detail.blockID && !options.evidenceAnchor?.passages?.length,
     preferPassage: ownedSource || fromResearch || options.sourceSurface === "search-detail",
     researchPassage: fromResearch, searchQuery: options.searchQuery, searchMatchMode: options.searchMatchMode,
     immediate: ownedSource
@@ -47757,6 +47788,7 @@ function readerShortcutItems() {
     const section = reader.sectionNumber ? sectionDisplayTitle(reader.sectionNumber, reader.title, "") : reader.title;
     const tabs = readerTabs(reader);
     return { id, name:readerPositionLabel(reader), label:readerPositionLabel(reader), column:true, iconName:"library-big",
+      ownerPaneID:reader.sourceOwnerPaneID || reader.searchPreviewPaneID,
       theme:code?.theme || "current-consolidation",
       location:[name, `${tabs.length} ${tabs.length === 1 ? 'tab' : 'tabs'}`, ...new Set([chapter, section].filter(value => value && value !== "Reader"))].join(" · ") };
   }).filter(Boolean);
@@ -52134,7 +52166,21 @@ async function resetVisibleColumnWidths() {
   track.querySelectorAll(":scope > .workspace-panel:not(.is-workflow-hidden)").forEach(panel => {
     panel._collapseAnimation?.cancel(); panel._restoreCollapseChildWidths?.();
   });
-  state.paneOrder = orderedWorkspaceColumnIDs(defaultActivePaneIDs());
+  const order = orderedWorkspaceColumnIDs(defaultActivePaneIDs());
+  const active = new Set(order);
+  const readersByParent = new Map();
+  const linkedReaders = new Set();
+  for (const reader of state.readers || []) {
+    const parent = reader.sourceOwnerPaneID || reader.searchPreviewPaneID || "";
+    if (!/^utility:(?:search|saved)(?::|$)/.test(parent) || !active.has(parent)) continue;
+    const id = paneIDForReader(reader);
+    if (!active.has(id)) continue;
+    if (!readersByParent.has(parent)) readersByParent.set(parent, []);
+    readersByParent.get(parent).push(id);
+    linkedReaders.add(id);
+  }
+  state.paneOrder = order.filter(id => !linkedReaders.has(id))
+    .flatMap(id => [id, ...(readersByParent.get(id) || [])]);
   state.pinnedPaneID = "";
   for (const id of paneIDs) if (!isProjectReportDraftPaneID(id)) state.paneWeights[id] = defaultPaneWidthForID(id);
   if (currentColumnWorkflowView() === "research") state.researchColumnWidthsManual = false;

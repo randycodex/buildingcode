@@ -52,10 +52,12 @@ const item=(id,extra={})=>({sectionID:id,codePrefix:'BC',codeVersion:'2022',chap
   const saved=await f.c.openSavedItemInReader(item('saved',{blockID:'exact',evidenceAnchor:anchor}),'utility:saved:list');
   assert.notEqual(saved.id,owned.id);assert.equal(saved.sourceBlockID,'exact');assert.equal(f.readers.length,4);
   assert.equal(f.reveals.at(-1).anchor,anchor);assert.equal(f.reveals.at(-1).options.preferPassage,true);
+  assert.equal(f.reveals.at(-1).options.wholeSection,false);
   const beforeNextSaved=JSON.stringify(f.readers.slice(0,-1));
   const nextSaved=await f.c.openSavedItemInReader(item('saved-next',{codeVersion:'2014'}),'utility:saved:list');
   assert.equal(nextSaved.id,saved.id,'Another Evidence item reuses the same Reader across editions');
   assert.equal(nextSaved.sectionID,'saved-next');assert.equal(nextSaved.codeVersion,'2014');
+  assert.equal(f.reveals.at(-1).options.wholeSection,true);
   assert.equal(JSON.stringify(f.readers.slice(0,-1)),beforeNextSaved,'Evidence navigation preserves other Reader sessions');
   assert.equal(f.readers.length,4);assert.equal(Object.keys(f.details).length,0);
   assert.equal(f.c.state.utilityInstances.length,1);

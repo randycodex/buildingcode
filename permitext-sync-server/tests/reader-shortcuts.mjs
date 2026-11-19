@@ -259,3 +259,33 @@ allContext='A:notebook';navigation.refresh();
 assert.deepEqual(allHost.children,[],'Notebook reuses its Reader launcher instead of adding a duplicate bubble');
 navigation.dispose();
 console.log('Column bubbles passed: synchronized toolbar positions, open-tool styling, per-instance navigation, retained Reader targeting, live pointer/keyboard reordering, cancellation, no native ghost, intact drafts, stale-context guards and launcher restoration.');
+
+{
+  const workspace = doc.createElement('section');
+  const toolbar = doc.createElement('nav');
+  const host = doc.createElement('div');
+  toolbar.append(host);
+  doc.body.append(toolbar, workspace);
+  const tools = ['saved', 'analysis', 'calculator', 'notes', 'report'].map(key => {
+    const button = doc.createElement('button');
+    button.textContent = key;
+    toolbar.append(button);
+    return {key, button};
+  });
+  const evidence = {id:'utility:saved:project', toolKey:'saved', label:'evidence', column:true};
+  const reader = {id:'reader:evidence', ownerPaneID:evidence.id, label:'reader', column:true};
+  const notes = {id:'project:notebook:project', toolKey:'notes', label:'notes', column:true};
+  let items = [evidence, reader, notes];
+  const shortcuts = createReaderShortcuts({host, track:workspace, readers:()=>items,
+    context:()=> 'project:research', tools});
+  const labels = buttons => buttons.map(button => button.textContent);
+  assert.deepEqual(labels(host.children), ['evidence', 'reader', 'analysis', 'calculator', 'notes', 'report']);
+  items = [evidence, notes, reader];
+  shortcuts.previewOrder(items.map(item => item.id));
+  assert.deepEqual(labels([...host.children].sort((a,b) => Number(a.style.order) - Number(b.style.order))),
+    ['evidence', 'notes', 'reader', 'analysis', 'calculator', 'report']);
+  shortcuts.previewOrder([]);
+  shortcuts.refresh();
+  assert.deepEqual(labels(host.children), ['evidence', 'notes', 'reader', 'analysis', 'calculator', 'report']);
+  shortcuts.dispose();
+}

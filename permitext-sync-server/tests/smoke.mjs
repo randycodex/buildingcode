@@ -1359,7 +1359,8 @@ async function main() {
         resetColumnWidthsSource.includes("state.paneWeights[id] = defaultPaneWidthForID(id)") &&
         resetColumnWidthsSource.includes("activePaneIDs().filter(workflowPaneIsVisible)") &&
         resetColumnWidthsSource.includes("resetReportColumnWidths(report, syncReferenceReaderLayout)") &&
-        resetColumnWidthsSource.includes("state.paneOrder = orderedWorkspaceColumnIDs(defaultActivePaneIDs())") &&
+        resetColumnWidthsSource.includes("const order = orderedWorkspaceColumnIDs(defaultActivePaneIDs())") &&
+        resetColumnWidthsSource.includes("readersByParent.get(id)") &&
         resetColumnWidthsSource.includes("animateWorkspaceColumnMotion(before, {resize:true})") &&
         !resetColumnWidthsSource.includes("scrollTo({ left: 0"),
       "Reset must restore default column widths and order and animate the layout."

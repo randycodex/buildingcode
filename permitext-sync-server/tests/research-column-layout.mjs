@@ -207,6 +207,19 @@ for (const available of [2428,1600]) {
   context.syncResearchColumnLayout();
   assert.equal(track.dataset.researchColumnSizing, available === 2428 ? 'fit' : 'overflow', 'Later hydration keeps the reset layout');
 }
+{
+  const order = ['reader:search', 'reader:evidence', 'reader:plain', 'utility:search:one', 'utility:saved:one'];
+  panels = order.map(makePane);
+  context.paneIDForReader = reader => `reader:${reader.id}`;
+  state.readers = [
+    {id:'search', sourceOwnerPaneID:'utility:search:one'},
+    {id:'evidence', sourceOwnerPaneID:'utility:saved:one'},
+    {id:'plain', sourceAnchorPaneID:'utility:search:one'}
+  ];
+  await context.resetVisibleColumnWidths();
+  assert.deepEqual(Array.from(state.paneOrder), ['reader:plain', 'utility:search:one', 'reader:search', 'utility:saved:one', 'reader:evidence']);
+  delete state.readers;
+}
 console.log('Reset layout passed: clears manual widths, fills available space, retains collapsed rails and hidden views, and preserves minimums in overflow.');
 {
   const defaults = ['reader:a','utility:search:a','utility:saved:a','utility:analysis:a','utility:calculator','project:notebook:a','project:report-draft:a'];
