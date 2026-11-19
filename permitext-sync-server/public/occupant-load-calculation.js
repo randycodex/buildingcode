@@ -357,8 +357,14 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   open.addEventListener('click', async () => {try {await onOpenNote?.(savedCard);} catch (error) {status.textContent = error.message;}});
   let staleDraft = false;
   let busy = false, savedCard = savedNote, savedFingerprint = savedInputFingerprint;
+  let calculationChanged = false;
   open.hidden = !savedCard;
   const fingerprint = calculation => JSON.stringify({spaceName: draft.spaceName || '', ...(draft.spaceLocation ? {spaceLocation: draft.spaceLocation} : {}), input: calculation.input});
+  root.refreshNoteDestination = () => {
+    const destination = getDestinationNote?.();
+    save.textContent = savedCard && !calculationChanged ? `Added to ${savedCard.title || 'Notebook'}`
+      : `Add ${calculationChanged ? 'revised ' : ''}calculation to ${destination?.title || 'note'}`;
+  };
   root.markDraftChanged = () => {
     staleDraft = true; reloadDraft.hidden = false;
     Object.values(fields).forEach(field => field.disabled = true);
@@ -451,18 +457,16 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
     formula.hidden = hasResult;
     formula.textContent = hasResult ? ''
       : special ? row.factorText : fixedSeating ? 'Fixed seating uses a separate calculation method.' : calculation.errors[0];
-    const changed = savedCard && fingerprint(calculation) !== savedFingerprint;
+    calculationChanged = Boolean(savedCard && fingerprint(calculation) !== savedFingerprint);
     draftState.hidden = Boolean(projectSyncState && projectSyncState.state !== 'error' && !staleDraft);
     draftState.textContent = staleDraft ? 'Updated in another view · reload to continue. Your edits are preserved.'
       : projectSyncState ? projectSyncState.state === 'error'
         ? `Saved on this device · sync pending. ${projectSyncState.error}`
         : projectSyncState.state === 'saved' ? '' : 'Saving calculation to project…'
-      : savedCard ? (changed ? 'Device draft · changes have not been saved to a new Note' : 'Saved snapshot in Notebook · editable device draft') : 'Device draft · inputs are saved on this device';
+      : savedCard ? (calculationChanged ? 'Device draft · changes have not been saved to a new Note' : 'Saved snapshot in Notebook · editable device draft') : 'Device draft · inputs are saved on this device';
     save.disabled = staleDraft || busy || !calculation.valid || !canSave;
-    const destination = getDestinationNote?.();
-    save.textContent = savedCard && !changed ? `Added to ${savedCard.title || 'Notebook'}`
-      : `Add ${changed ? 'revised ' : ''}calculation to ${destination?.title || 'note'}`;
-    if (savedCard && !changed) save.disabled = true;
+    root.refreshNoteDestination();
+    if (savedCard && !calculationChanged) save.disabled = true;
     return calculation;
   };
   const handleInput = event => {

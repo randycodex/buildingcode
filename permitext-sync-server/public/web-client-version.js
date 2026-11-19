@@ -1,4 +1,4 @@
-export const webAppVersion = "20261118-workspace-sidebar-scroll-v2553";
+export const webAppVersion = "20261118-selected-note-destination-v2554";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

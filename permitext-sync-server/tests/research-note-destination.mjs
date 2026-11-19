@@ -3,23 +3,34 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
-const helpers = source.slice(source.indexOf('async function chooseResearchNoteDestination('),
+const helpers = source.slice(source.indexOf('function selectedResearchNoteColumn('),
   source.indexOf('\nfunction renderResearchNotebookHandoff('));
 const project = { id: 'project' };
 const reference = { referenceKind: 'researchAnswer', referenceID: 'answer', label: 'Research: exact saved answer' };
 const cards = [{ id: 'current', title: 'Corridor analysis' }, { id: 'other', title: 'Occupant load' },
   { id: 'archived', title: 'Archived', archivedAt: '2026-10-24' }];
-let choice = 'note:other', valid = true, target = { id: 'current', title: 'Corridor analysis', identity: 'current-v1' };
-let choiceOptions, onChoice = () => {}, readOnly = false, requests = [], snapshots = [], inserted = [];
+let choice = 'other', valid = true;
+let column = null;
+let target = { id: 'current', title: 'Corridor analysis', identity: 'current-v1' };
+let choiceOptions, onChoice = () => {}, readOnly = false, listReads = 0, requests = [], snapshots = [], inserted = [];
 const original = { id: 'other', title: 'Occupant load', version: 4, cardType: 'finding', evidenceLinks: [],
   document: { schema: 'permitext-notebook-card', format: 'blocknote-json', schemaVersion: 2,
     document: [{ type: 'paragraph', content: [{ type: 'text', text: 'Original analysis.' }] }] } };
-const mount = { insertionTarget: () => target, insertLinkedReference: async (...values) => inserted.push(values) };
+const mount = {
+  panel: { isConnected: true, dataset: { projectId:'project' } },
+  activeCardID: () => target?.id,
+  insertionTarget: () => target,
+  insertLinkedReference: async (...values) => inserted.push(values)
+};
 const c = vm.createContext({ structuredClone, navigator: { onLine: true }, researchProjectID: p => p.id,
-  readableProjectName: () => 'Project', notebookMounts: new Map([['project', mount]]), notebookColumnMounts: new Map(),
+  workspacePrivatePresentationAllowed: () => true, workspaceProject: () => project,
+  selectedNotebookColumn: () => column, notebookColumnPaneID: column => column.id,
+  notebookColumnMounts: new Map([['pane', mount]]),
   captureAccountRequest: () => ({ userID: 'owner' }), requireCurrentAccountRequest: () => assert(valid),
-  loadInitialNotebookCardList: async () => ({ cards, access: { readOnly } }),
-  loadNotebookProjectSnapshot: async () => ({ cards }),
+  loadInitialNotebookCardList: async () => { listReads++; return { cards, access: { readOnly } }; },
+  loadNotebookProjectSnapshot: async () => ({ cardPayload: { cards } }),
+  loadNotebookDraft: async () => null,
+  notebookReferenceBlocks: reference => [{content:[{props:reference}]}], publishSavedNotebookCard() {},
   openWebWarning: async options => { choiceOptions = options; onChoice(); return choice; },
   postResearch: async (path, payload) => {
     requests.push({ path, payload });
@@ -36,7 +47,7 @@ const selected = await c.chooseResearchNoteDestination(project, {}, () => valid)
 assert.equal(selected.kind, 'saved'); assert.equal(selected.card.id, 'other');
 assert(choiceOptions.choices.some(item => item.value === 'current' && item.label.includes('Corridor analysis')));
 assert(choiceOptions.choices.some(item => item.value === 'new'));
-assert(!choiceOptions.choices.some(item => item.value === 'note:archived'));
+assert(!choiceOptions.choices.some(item => item.value === 'archived'));
 assert.equal(requests.length, 0, 'Choosing a destination does not write anything.');
 const updated = await c.appendResearchReferenceToNote(project, selected, reference, 'stable-insertion', {}, () => valid);
 assert.equal(updated.title, 'Occupant load');
@@ -48,12 +59,35 @@ assert.equal(snapshots.length, 1);
 requests = []; choice = null;
 assert.equal(await c.chooseResearchNoteDestination(project, {}, () => valid), null);
 assert.equal(requests.length, 0);
-choice = 'current';
+column = { id:'pane', cardID:'current', title:'Corridor analysis' };
+choiceOptions = null;
+const readsBefore = listReads;
 const open = await c.chooseResearchNoteDestination(project, {}, () => valid);
+assert.equal(open.kind, 'open');
+assert.equal(choiceOptions, null, 'The selected Note bypasses the destination dialog.');
+assert.equal(listReads, readsBefore, 'The mounted Note needs no catalog request.');
 await c.appendResearchReferenceToNote(project, open, reference, 'stable-insertion', {}, () => valid);
 assert.equal(inserted.length, 1); assert.equal(inserted[0][0], 'current'); assert.equal(requests.length, 0);
-onChoice = () => { target = { ...target, identity: 'changed-note' }; };
-await assert.rejects(c.chooseResearchNoteDestination(project, {}, () => valid), /destination Note changed/);
+
+column.cardID = 'other';
+target = { id:'other', title:'Occupant load', identity:'other-v1' };
+await assert.rejects(c.appendResearchReferenceToNote(project, open, reference, 'stable-insertion', {}, () => valid), /destination Note changed/);
+const next = await c.chooseResearchNoteDestination(project, {}, () => valid);
+await c.appendResearchReferenceToNote(project, next, reference, 'stable-insertion', {}, () => valid);
+assert.equal(inserted.at(-1)[0], 'other');
+target = null;
+await assert.rejects(c.chooseResearchNoteDestination(project, {}, () => valid), /selected Note is unavailable/);
+assert.equal(listReads, readsBefore, 'An unavailable selected Note cannot fall back to a different destination.');
+
+column.cardID = '';
+target = { id:'', title:'Untitled', identity:'device-draft' };
+const draft = await c.chooseResearchNoteDestination(project, {}, () => valid);
+column.cardID = 'acknowledged';
+target = { ...target, id:'acknowledged' };
+await c.appendResearchReferenceToNote(project, draft, reference, 'stable-insertion', {}, () => valid);
+assert.equal(inserted.at(-1)[0], 'acknowledged', 'Sync assigning the draft an ID preserves the selected document identity.');
+
+column = null;
 onChoice = () => {}; choice = 'new';
 assert.equal((await c.chooseResearchNoteDestination(project, {}, () => valid)).kind, 'new');
 readOnly = true;
@@ -62,8 +96,9 @@ readOnly = false; onChoice = () => { valid = false; };
 assert.equal(await c.chooseResearchNoteDestination(project, {}, () => valid), null);
 assert.equal(requests.length, 0, 'Cancelled or stale selection cannot mutate a Note.');
 
-valid = true; onChoice = () => {}; choice = 'current'; c.navigator.onLine = false;
+valid = true; onChoice = () => {}; c.navigator.onLine = false;
+column = {id:'pane', cardID:'acknowledged'};
 assert.equal((await c.chooseResearchNoteDestination(project, {}, () => valid)).kind, 'open',
-  'Offline researchers can still choose the open Note using cached metadata.');
+  'Offline researchers can add to the mounted selected Note.');
 await assert.rejects(c.appendResearchReferenceToNote(project, selected, reference, 'stable-insertion', {}, () => valid), /Reconnect/);
-console.log('Research Note destinations passed: named choices, current/new/other, cancellation, stale/readonly guards, CAS append, retained analysis and offline open Note.');
+console.log('Research Note destinations passed: selected Note switches, no catalog read for mounted Notes, draft acknowledgement, explicit fallback, read-only and stale guards, CAS append.');

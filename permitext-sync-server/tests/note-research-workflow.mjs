@@ -25,21 +25,18 @@ assert.equal(document.document.length,1);
 assert.throws(()=>normalizeNotebookQuestions([{id:'q',text:'Unknown',status:'resolved'}]),/resolution explanation/);
 
 const app = await readFile(new URL('../public/app.js',import.meta.url),'utf8');
-const start = app.indexOf('function workingResearchNote(');
+const start = app.indexOf('function selectedResearchNoteColumn(');
 const end = app.indexOf('\nfunction renderResearchNotebookHandoff(',start);
-function fixture({open=false,draft=false,archived=false,pickerChoice='n'}={}) {
+function fixture({open=false,draft=false,archived=false}={}) {
   const calls=[];
   const card={id:'n',title:'Analysis',version:3,document:structuredClone(document),evidenceLinks:[],archivedAt:archived?'today':null};
-  const mount={panel:{dataset:{projectId:'p'}},activeCardID:()=>card.id,insertionTarget:()=>({id:'n',title:'Analysis',identity:'same'}),
+  const mount={panel:{isConnected:true,dataset:{projectId:'p'}},activeCardID:()=>card.id,insertionTarget:()=>({id:'n',title:'Analysis',identity:'same'}),
     insertLinkedReference:async(...args)=>calls.push({live:args})};
   const c=vm.createContext({state:{noteResearch:structuredClone(context)},document:{querySelector:()=>null},saveWorkspaceState(){},
-    workspaceProject:()=>({id:'p'}),researchProjectID:p=>p.id,captureAccountRequest:()=>({userID:'u'}),navigator:{onLine:true},
+    workspacePrivatePresentationAllowed:()=>true,workspaceProject:()=>({id:'p'}),researchProjectID:p=>p.id,
+    selectedNotebookColumn:()=>open?{id:'pane',cardID:'n',title:'Analysis'}:null,notebookColumnPaneID:column=>column.id,captureAccountRequest:()=>({userID:'u'}),navigator:{onLine:true},
     loadInitialNotebookCardList:async()=>({cards:[card]}),notebookMounts:new Map(),notebookColumnMounts:new Map(open?[['pane',mount]]:[]),
-    openProfilePreferenceMenu: options => {
-      calls.push({picker:options});
-      queueMicrotask(() => pickerChoice === null ? options.onDismiss() : options.onSelect(pickerChoice));
-      return {dismiss:options.onDismiss};
-    },
+    openWebWarning: async () => 'n',
     loadNotebookDraft:async()=>draft?{}:null,requireCurrentAccountRequest(){},notebookReferenceBlocks,structuredClone,
     postResearch:async(path,body)=>{
       calls.push({path,body});
@@ -63,18 +60,8 @@ for (const open of [true,false]) {
   }
   assert.equal(card.document.document.length,1);
 }
-for (const choice of ['n','new',null]) {
-  const {c,calls}=fixture({pickerChoice:choice});
-  const trigger={removeAttribute(){}};
-  const container={lastElementChild:trigger};
-  const destination=await c.chooseResearchNoteDestination({id:'p'},container,()=>true,{choose:true,trigger});
-  assert.equal(destination?.kind ?? null,choice === 'n' ? 'saved' : choice === 'new' ? 'new' : null);
-  const {picker}=calls[0];
-  assert.equal(picker.anchor,container);
-  assert.equal(picker.value,'n','The Research note picker marks the retained destination.');
-  assert.equal(picker.options.at(-1).value,'new','Creating a note remains available from the picker.');
-  assert.equal(trigger._researchNotePicker,undefined,'Selecting or dismissing releases the active picker.');
-}
+const closed=fixture();
+assert.equal(closed.c.workingResearchNote(),null,'A legacy picker preference cannot override the Notes column.');
 const pending=fixture({draft:true});
 await assert.rejects(pending.c.appendResearchReferenceToNote({id:'p'},{kind:'saved',card:pending.card},reference,'mutation',{userID:'u'},()=>true),/device draft/);
 assert.equal(pending.calls.length,0);
@@ -83,7 +70,7 @@ assert.equal(await stale.c.appendResearchReferenceToNote({id:'p'},{kind:'saved',
 assert.equal(stale.calls.length,0);
 const archived=fixture({archived:true});
 await assert.rejects(archived.c.appendResearchReferenceToNote({id:'p'},{kind:'saved',card:archived.card},reference,'mutation',{userID:'u'},()=>true),/archived/);
-console.log('Note Research workflow passed: retained destinations, source positions, live insertion, CAS append, device draft and stale context guards, and selected Report items.');
+console.log('Note Research workflow passed: selected Note, retained source positions, live insertion, CAS append, device draft and stale context guards, and selected Report items.');
 
 // Exercise the actual browser draft synchronizer, including its receipt input.
 const syncStart=app.indexOf('async function synchronizeNotebookDraft(');

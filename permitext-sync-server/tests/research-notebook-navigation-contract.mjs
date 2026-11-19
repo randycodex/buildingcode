@@ -21,7 +21,7 @@ for (const delay of ['confirmation','save','ready','refresh','none']) {
     };
     let activeCard = '';
     const c = vm.createContext({window:{requestAnimationFrame:()=>{}},
-      workingResearchNote:()=>null,rememberWorkingResearchNote(){},state:{workflowNavigationGeneration:0},activeWorkspaceID:'w',
+      workingResearchNote:()=>null,setResearchNoteActionLabel(button){button.textContent='Add to note…';},rememberWorkingResearchNote(){},state:{workflowNavigationGeneration:0},activeWorkspaceID:'w',
       document:{createElement:element},hasCapability:()=>true,researchAnswerHasVerificationRecovery:()=>false,researchProjects:()=>[project],
       researchProjectID:p=>p.id,readableProjectName:p=>p.name,crypto:{randomUUID:()=> 'test-id'},
       captureAccountRequest:()=>({userID:'local'}),isCurrentAccountRequest:()=>true,

@@ -431,13 +431,14 @@ async function main() {
     const workflowSource = webRoot.text.slice(workflowStart, webRoot.text.indexOf("</nav>", workflowStart));
     const workflowOrder = ['data-workflow-tools="research"', 'id="add-reader"', 'id="toggle-search"', 'id="toggle-saved"',
       'id="toggle-analysis"', 'id="toggle-calculator"', 'data-workflow-tools="notebook"',
-      'id="toggle-notebook"', 'class="note-picker-host"', 'data-workflow-tools="report"',
+      'id="toggle-notebook"', 'data-workflow-tools="report"',
       'id="toggle-report"']
       .map(marker => workflowSource.indexOf(marker));
     assert(
       workflowStart >= 0 && workflowOrder.every((index, position) => index >= 0 && (position === 0 || index > workflowOrder[position - 1])),
       "The shared toolbar must retain Research, Notebook, and Report controls."
     );
+    assert(!workflowSource.includes('note-picker-host'), "The Notes column controls the active save destination.");
     for (const [id, label] of [["add-reader", "New reader"], ["toggle-search", "Search"], ["toggle-analysis", "Assistant"],
       ["toggle-notebook", "Notes"], ["toggle-report", "Report"], ["toggle-saved", "Evidence"]]) {
       const tag = tagWithID(workflowSource, id);

@@ -7,19 +7,25 @@ import {notebookReferenceBlocks} from '../public/notebook-passage-blocks.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const start=source.indexOf('async function addPassageToNotebook(');
 const code=source.slice(start,source.indexOf('\nfunction renderInlineCommentBox(',start));
+const destinationsStart=source.indexOf('function selectedResearchNoteColumn(');
+const destinationCode=source.slice(destinationsStart,source.indexOf('\nfunction renderResearchNotebookHandoff(',destinationsStart));
 for(const mode of ['current','unsaved','new','cancel','changed','account','detached','other-project','include','omit','comment-cancel']) {
  const calls=[]; let complete;
  const pending=new Promise(resolve=>complete=resolve);
  const hasOpenNote=['current','unsaved','account','detached','include','omit','comment-cancel'].includes(mode);
- const mount={insertionTarget:()=>({id:mode==='unsaved'?'':'note',title:'Existing writing'}),insertLinkedReference:async(...args)=>calls.push(['insert',...args])};
+ const target={id:mode==='unsaved'?'':'note',title:'Existing writing'};
+ const mount={panel:{isConnected:true},insertionTarget:()=>target,insertLinkedReference:async(...args)=>calls.push(['insert',...args])};
  const context=vm.createContext({evidenceComments,detailNoteValueForTarget:()=>['include','omit','comment-cancel'].includes(mode)?serializeEvidenceComments(['First comment','Second comment']):'',window:{requestAnimationFrame:()=>{}},workspaceProject:()=>({id:'p'}),captureAccountRequest:()=>({userID:'u'}),
  isCurrentAccountRequest:()=>mode!=='account',requireCurrentAccountRequest(){},activeWorkspaceID:'w',state:{workflowNavigationGeneration:0},
- researchProjectID:p=>p.id,notebookMounts:new Map(hasOpenNote?[['p',mount]]:mode==='other-project'?[['other',mount]]:[]),
+ researchProjectID:p=>p.id,workspacePrivatePresentationAllowed:()=>true,
+ selectedNotebookColumn:()=>hasOpenNote?{id:'editor',cardID:target.id,title:target.title}:null,
+ notebookColumnPaneID:column=>column.id,notebookColumnMounts:new Map(hasOpenNote?[['editor',mount]]:mode==='other-project'?[['other',mount]]:[]),
+ loadInitialNotebookCardList:async()=>({cards:[]}),publishSavedNotebookCard(){},saveWorkspaceState(){},
  openWebWarning:options=>{calls.push(['choose',options]);return pending;},
  crypto:{randomUUID:()=> 'link'},Date,researchCodeEdition:()=> '2014',navigator:{onLine:true},
- notebookReferenceBlocks,emptyNotebookDocument:()=>({document:[]}),postResearch:async(path,payload)=>{calls.push(['save',payload]);return {card:{id:'created'}};},
+ notebookReferenceBlocks,generatedNoteTitle:title=>title,emptyNotebookDocument:()=>({document:[]}),postResearch:async(path,payload)=>{calls.push(['save',payload]);return {card:{id:'created'}};},
  saveNotebookCardSnapshot:async()=>{},showNotebookSavedLink:(...args)=>calls.push(['saved',...args])});
- vm.runInContext(code,context);
+ vm.runInContext(destinationCode+code,context);
  const action=context.addPassageToNotebook({isConnected:mode!=='detached',closest:()=>({dataset:{paneId:'reader'}})},
  {sectionID:'123',sectionNumber:'1020.4',title:'Dead ends',codePrefix:'BC',codeVersion:'historical/2014'},'Exact paragraph including its exception.');
  if(mode==='changed')context.activeWorkspaceID='different';
@@ -51,26 +57,30 @@ for(const changed of ['none','card','disposed','readonly','conflict','loading'])
 }
 console.log('Direct Note handoff: open saved/unsaved Note without dialog, exact edition/passage, same-Project destination, new Note fallback and editor guards passed.');
 const handoffStart=source.indexOf('function renderResearchNotebookHandoff(');
-const handoffCode=source.slice(source.indexOf('async function chooseResearchNoteDestination('),source.indexOf('\nfunction renderResearchMessageCapture(',handoffStart));
+const handoffCode=source.slice(handoffStart,source.indexOf('\nfunction renderResearchMessageCapture(',handoffStart));
 for(const changed of [false,true]){
  const nodes=[],insertions=[];let finish;
  const inserted=new Promise(resolve=>finish=resolve);
- const element=tag=>{const e={tag,children:[],isConnected:true,value:'',append(...children){this.children.push(...children);if(tag==='select')this.value=children[0].value;},setAttribute(){},addEventListener(type,fn){this[type]=fn;},closest:()=>({dataset:{paneId:'assistant'}})};nodes.push(e);return e;};
+ const element=tag=>{const e={tag,dataset:{},children:[],isConnected:true,value:'',append(...children){this.children.push(...children);if(tag==='select')this.value=children[0].value;},setAttribute(){},addEventListener(type,fn){this[type]=fn;},closest:()=>({dataset:{paneId:'assistant'}})};nodes.push(e);return e;};
+ const target={id:'existing',title:'My writing'};
+ const mount={panel:{isConnected:true},insertionTarget:()=>target,insertLinkedReference:async(...args)=>{insertions.push(args);await inserted;}};
  const c=vm.createContext({window:{requestAnimationFrame:()=>{}},document:{createElement:element},hasCapability:()=>true,researchAnswerHasVerificationRecovery:()=>false,researchProjects:()=>[{id:'p'}],
  researchProjectID:p=>p.id,readableProjectName:()=> 'Project',crypto:{randomUUID:()=> 'mutation'},
  captureAccountRequest:()=>({userID:'u'}),isCurrentAccountRequest:()=>true,state:{workflowNavigationGeneration:0},activeWorkspaceID:'w',researchAnswerQuestion:()=> 'Question',
- notebookMounts:new Map([['p',{insertionTarget:()=>({id:'existing',title:'My writing'}),insertLinkedReference:async(...args)=>{insertions.push(args);await inserted;}}]]),
- navigator:{onLine:true},loadInitialNotebookCardList:async()=>({cards:[{id:'existing',title:'My writing'}]}),
+ workspaceProject:()=>({id:'p'}),workspacePrivatePresentationAllowed:()=>true,
+ selectedNotebookColumn:()=>({id:'editor',cardID:target.id,title:target.title}),notebookColumnPaneID:column=>column.id,
+ notebookColumnMounts:new Map([['editor',mount]]),generatedNoteTitle:text=>text,saveWorkspaceState(){},
+ navigator:{onLine:true},loadInitialNotebookCardList:()=>assert.fail('The current Note needs no list request'),
  pendingNotebookCardByProject:new Map(),
- openWebWarning:async options=>{assert.equal(options.choiceLabel,'Destination Note');assert(options.choices.some(choice=>choice.label==='Current Note: My writing'));return 'current';},
+ openWebWarning:()=>assert.fail('The selected Note needs no confirmation'),
  showWebNotice:async()=>assert.fail('Unexpected notice')});
- vm.runInContext(handoffCode,c);c.renderResearchNotebookHandoff({primaryProjectID:'p'},{id:'answer',answer:{}});
- const pending=nodes.find(e=>e.textContent==='Add to note…').click();
+ vm.runInContext(destinationCode+handoffCode,c);c.renderResearchNotebookHandoff({primaryProjectID:'p'},{id:'answer',answer:{}});
+ const pending=nodes.find(e=>e.textContent==='Add to My writing').click();
  await new Promise(resolve=>setImmediate(resolve));
  if(changed)c.state.workflowNavigationGeneration++;
  finish();await pending;
  assert.equal(insertions.length,1);
  assert.equal(insertions[0][0],'existing');assert.equal(insertions[0][1].referenceID,'answer');
- assert.equal(nodes.find(e=>e.tag==='button').textContent,changed?'Add to note…':'Open Note: My writing','A stale completion must not update the new view.');
+ assert.equal(nodes.find(e=>e.tag==='button').textContent,changed?'Add to My writing':'Open Note: My writing','A stale completion must not update the new view.');
 }
 console.log('Research insertion names and confirms the selected Note, and ignores stale completion UI.');

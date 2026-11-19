@@ -85,6 +85,8 @@ const activeDraft={blocks:[{id:'existing',kind:'paragraph',text:'Keep Report edi
 let dirtyChanges=0,renders=0;
 const paletteContext=vm.createContext({document:{createElement:element},panel:{querySelector:()=>null},
  sources:paletteSources,activeDraft,reportsContainingSource,crypto:{randomUUID:()=>`block-${dirtyChanges}`},
+ generatingReport:false,deletingReport:false,disposed:false,requestIdentity:{},isCurrentAccountRequest:()=>true,
+ requestWorkspaceID:'workspace',activeWorkspaceID:'workspace',CSS:{escape:String},
  reportSectionExpanded:()=>true,wireProjectSectionMotion(){},persistReportSectionExpanded(){},
  mountState:{async addSources(_draftID,sources){
    activeDraft.blocks.push(...sources.map(source=>({id:`block-${source.id}`,kind:source.kind,sourceID:source.id})));
@@ -100,8 +102,7 @@ let sourceButtons=evidenceSourceButtons();
 assert.equal(sourceButtons.length,2);
 await sourceButtons[0].click();
 sourceButtons=evidenceSourceButtons();
-assert.equal(sourceButtons[0].disabled,true,'An included passage cannot be added twice from Sources.');
-assert.equal(sourceButtons[0].textContent,'Added');
+assert.equal(sourceButtons[0].textContent,'Remove','An included passage offers removal instead of a duplicate add.');
 assert.equal(sourceButtons[1].disabled,false,'The other edition remains separately available.');
 await sourceButtons[1].click();
 assert.deepEqual(activeDraft.blocks.map(block=>block.sourceID||block.id),['existing','passage-2022','passage-2014']);

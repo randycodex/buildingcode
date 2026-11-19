@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261118-workspace-sidebar-scroll-v2553";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261118-selected-note-destination-v2554";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -32,7 +32,7 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=37";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=38";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js?v=2";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261118-sync-refresh-v1386";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261118-workspace-sidebar-scroll-v2553";
+} from "./offline-storage.js?v=20261118-selected-note-destination-v2554";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3628,6 +3628,7 @@ function publishNotebookColumn(projectID, paneID, card, cards) {
 
 function syncNotebookNoteTabs() {
   if (!notebookTabs) return;
+  syncResearchNoteControls();
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const projectID = project ? projectDetailKey(project) : '';
   const catalog = notebookCatalogs.get(projectID) || [];
@@ -6895,7 +6896,6 @@ function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
 }
 
 function syncTopbarProjectToolStates() {
-  syncResearchNoteControls();
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const identity = project ? projectIdentity(project) : null;
   const requiresProject = workspaceColumnsRequireProject();
@@ -19577,6 +19577,8 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       const actionCurrent = () => current() && generation === (state.workflowNavigationGeneration || 0);
       const requireAction = () => {if (!actionCurrent()) throw new Error("The view changed. Reopen this calculation before saving.");};
       if (!project) throw new Error("Create a Project before saving a calculation.");
+      const destination = await chooseResearchNoteDestination(project,card,actionCurrent);
+      if (!destination || !actionCurrent()) return null;
       const {resolved, section} = await loadSource(actionCurrent);
       requireAction();
       const table = occupantLoadTable(section.blocks, resolved);
@@ -19601,8 +19603,6 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       notebookDocument.document = calculationNoteBlocks(calculation, [link], answerID, draft.spaceLocation);
       if (spaceName) notebookDocument.document.unshift({type: "paragraph", content: [{type: "text", text: `Space / room: ${spaceName}`, styles: {}}]});
       const fingerprint = JSON.stringify({spaceName, ...(draft.spaceLocation ? {spaceLocation: draft.spaceLocation} : {}), input: calculation.input});
-      const destination = await chooseResearchNoteDestination(project,card,actionCurrent);
-      if (!destination || !actionCurrent()) return null;
       if (destination.kind !== 'new') {
         const savedCard = await appendResearchReferenceToNote(project,destination,
           {referenceKind:'selectedPassage',referenceID:link.id,label:link.label}, `calculation-note:${crypto.randomUUID()}`,identity,actionCurrent,
@@ -29683,121 +29683,75 @@ function researchAnswerQuestion(conversation, message) {
   return String(question?.question || message.question || conversation.starterQuestion || researchConversationTitle(conversation)).trim();
 }
 
+function selectedResearchNoteColumn(projectID) {
+  const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
+  return project && researchProjectID(project) === projectID ? selectedNotebookColumn(project) : null;
+}
+
 function workingResearchNote(projectID = researchProjectID(workspaceProject() || {})) {
-  return state.noteResearch?.[projectID]?.selected || null;
+  const column = selectedResearchNoteColumn(projectID);
+  if (!column || (!column.cardID && !column.newNote && !notebookColumnMounts.get(notebookColumnPaneID(column))?.summary?.())) return null;
+  return {id:column.cardID, title:column.title || 'Untitled Note'};
 }
 
 function rememberWorkingResearchNote(projectID, card, resume = null) {
   if (!card?.id) return;
+  // Keep this stored metadata compatible with earlier clients.
   state.noteResearch ||= {};
   const context = state.noteResearch[projectID] ||= { selected: null, resumes: {} };
   context.selected = { id: card.id, title: card.title || "Untitled Note" };
   if (resume) context.resumes[card.id] = resume;
   saveWorkspaceState();
-  syncResearchNoteControls();
+}
+
+function setResearchNoteActionLabel(button, note) {
+  const label = note ? `Add to ${note.title}` : 'Add to note';
+  button.setAttribute('aria-label', label);
+  button.title = label;
+  if (button.dataset.noteDestination === 'text') button.textContent = note ? label : 'Add to note…';
 }
 
 function syncResearchNoteControls() {
-  const host = document.querySelector('.note-picker-host');
-  if (!host) return;
-  let control = host.querySelector('.research-note-destination');
-  if (!control) {
-    control = document.createElement('div'); control.className = 'research-note-destination';
-    const choose = document.createElement('button'); choose.type = 'button'; choose.className = 'toolbar-button research-note-picker-trigger';
-    const label = document.createElement('span'); label.className = 'research-note-picker-label';
-    const chevron = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    chevron.setAttribute('viewBox', '0 0 24 24'); chevron.setAttribute('aria-hidden', 'true'); chevron.setAttribute('focusable', 'false');
-    chevron.innerHTML = '<path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
-    choose.append(label, chevron);
-    choose.setAttribute('aria-haspopup', 'listbox');
-    choose.setAttribute('aria-expanded', 'false');
-    choose.addEventListener('click', async () => {
-      if (choose._researchNotePicker) {
-        choose._researchNotePicker.dismiss({restoreFocus:true});
-        return;
-      }
-      if (choose.getAttribute('aria-busy') === 'true') return;
-      const project = workspaceProject(), identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
-      const generation = state.workflowNavigationGeneration || 0;
-      const current = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID && control.isConnected &&
-        generation === (state.workflowNavigationGeneration || 0);
-      if (!project) return;
-      choose.setAttribute('aria-busy', 'true');
-      try {
-        const destination = await chooseResearchNoteDestination(project, control, current, {choose:true, trigger:choose});
-        if (!destination || !current()) return;
-        if (destination.kind === 'new') {
-          const payload = await postResearch('/notebook/cards/save', {projectID:researchProjectID(project), expectedVersion:0,
-            clientMutationID:crypto.randomUUID(), cardType:'finding', title:'Untitled', document:emptyNotebookDocument(), evidenceLinks:[]});
-          if (!current()) return;
-          publishSavedNotebookCard(researchProjectID(project), payload.card);
-          rememberWorkingResearchNote(researchProjectID(project), payload.card);
-        }
-      } catch (error) { if (current()) await showWebNotice('Note not selected', error.message); }
-      finally { choose.removeAttribute('aria-busy'); }
-    });
-    control.append(choose); host.append(control);
-  }
-  const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
-  const note = project ? workingResearchNote(researchProjectID(project)) : null;
-  control.hidden = !project || !hasCapability('notebook');
-  const choose = control.firstElementChild;
-  choose.querySelector('.research-note-picker-label').textContent = note ? note.title : 'Choose Research note';
-  choose.setAttribute('aria-label', note ? `Choose Research note · ${note.title}` : 'Choose Research note');
-  choose.title = 'Choose the note to collect this research';
+  const projectID = researchProjectID(workspaceProject() || {});
+  const note = workingResearchNote(projectID);
   document.querySelectorAll('[data-note-destination]').forEach(button => {
-    button.setAttribute('aria-label', note ? `Add to ${note.title}` : 'Add to note');
-    button.title = button.getAttribute('aria-label');
-    if (button.dataset.noteDestination === 'text') button.textContent = button.title;
+    setResearchNoteActionLabel(button, !button.dataset.noteDestinationProject ||
+      button.dataset.noteDestinationProject === projectID ? note : null);
   });
+  for (const view of calculationDraftViews) {
+    if (view.card.isConnected) view.card.refreshNoteDestination?.();
+  }
 }
 
-async function chooseResearchNoteDestination(project, container, current, {choose = false, trigger = null} = {}) {
+async function chooseResearchNoteDestination(project, container, current) {
+  if (!current()) return null;
   const projectID = researchProjectID(project);
+  if (project.sharedRole === 'viewer') throw new Error("This Project's Notes are read-only.");
+  const column = selectedResearchNoteColumn(projectID);
+  if (column) {
+    const paneID = notebookColumnPaneID(column);
+    const mount = notebookColumnMounts.get(paneID);
+    const target = mount?.insertionTarget?.();
+    if (mount?.panel?.isConnected && target && target.id === column.cardID) return {kind:'open', paneID, mount, target};
+    if (column.cardID || column.newNote || mount?.summary?.()) {
+      throw new Error('The selected Note is unavailable. Check the Notes column and try again.');
+    }
+  }
+
   const payload = navigator.onLine === false
     ? (await loadNotebookProjectSnapshot(captureAccountRequest().userID, projectID))?.cardPayload || {cards:[]}
     : await loadInitialNotebookCardList(project);
   if (!current()) return null;
   if (payload.access?.readOnly) throw new Error("This Project's Notes are read-only.");
   const cards = (payload.cards || []).filter(card => !card.deletedAt && !card.archivedAt);
-  const selected = workingResearchNote(projectID);
-  const selectedCard = cards.find(card => card.id === selected?.id);
-  const mounted = notebookMounts.get(projectID)?.insertionTarget?.();
-  const preferred = selectedCard || cards.find(card => card.id === mounted?.id);
-  let card = preferred;
-  if (choose || !selectedCard) {
-    const choices = [...(preferred ? [{value:preferred.id, label:preferred.title || 'Untitled Note'}] : []),
-      ...cards.filter(item => item.id !== preferred?.id).map(item => ({value:item.id,label:item.title || 'Untitled Note'})),
-      {value:'new',label:'New Note'}];
-    const destination = choose
-      ? await new Promise(resolve => {
-        const pickerTrigger = trigger || container.lastElementChild;
-        pickerTrigger.removeAttribute('aria-busy');
-        const finish = value => {
-          delete pickerTrigger._researchNotePicker;
-          resolve(value);
-        };
-        pickerTrigger._researchNotePicker = openProfilePreferenceMenu({
-          trigger:pickerTrigger, anchor:container, label:'Research note', heading:'Research note',
-          className:'research-note-picker', value:preferred?.id || '',
-          options:choices.map(choice => ({...choice,label:choice.value === 'new' ? '+ New note' : choice.label})),
-          onSelect:finish, onDismiss:() => finish(null)
-        });
-      })
-      : await openWebWarning({title:'Add to note', message:'Choose the note for this research.',
-        choiceLabel:'Destination Note', choices, confirmLabel:'Add to note', container});
-    if (!destination || !current()) return null;
-    if (destination === 'new') return {kind:'new'};
-    card = cards.find(item => item.id === destination);
-  }
+  const choices = cards.map(card => ({value:card.id, label:card.title || 'Untitled Note'}));
+  choices.push({value:'new', label:'New Note'});
+  const destination = await openWebWarning({title:'Add to note', message:'Choose the note for this research.',
+    choiceLabel:'Destination Note', choices, confirmLabel:'Add to note', container});
+  if (!destination || !current()) return null;
+  if (destination === 'new') return {kind:'new'};
+  const card = cards.find(item => item.id === destination);
   if (!card) throw new Error('The selected Note is no longer available.');
-  rememberWorkingResearchNote(projectID, card);
-  const mount = [...notebookColumnMounts.values()].find(item => item.panel.dataset.projectId === projectID && item.activeCardID() === card.id);
-  if (mount) {
-    const target = mount.insertionTarget?.();
-    if (!target || target.id !== card.id) throw new Error('The selected Note has a save conflict or is unavailable. Review it before adding material.');
-    return {kind:'open',mount,target};
-  }
   return {kind:'saved',card};
 }
 
@@ -29808,12 +29762,16 @@ async function appendResearchReferenceToNote(project, destination, reference, mu
   if (openMount) {
     const target = openMount.insertionTarget?.();
     const expected = destination.kind === 'open' ? destination.target : destination.card;
-    if (!target || target.id !== expected.id || expected.identity && target.identity !== expected.identity) {
-      throw new Error('The destination Note changed. Choose it again.');
+    const selectedColumn = destination.kind === 'open' ? selectedResearchNoteColumn(projectID) : null;
+    const sameSelection = destination.kind !== 'open' || (openMount.panel.isConnected && selectedColumn &&
+      notebookColumnPaneID(selectedColumn) === destination.paneID && notebookColumnMounts.get(destination.paneID) === openMount);
+    const sameDocument = target && (expected.identity ? target.identity === expected.identity : target.id === expected.id);
+    if (!sameSelection || !sameDocument) {
+      throw new Error('The destination Note changed or is unavailable. Try adding it again.');
     }
     if (!current()) return null;
     await openMount.insertLinkedReference(target.id, reference, evidenceLink, comments, blocks);
-    return {...expected,title:target.title || 'Untitled Note'};
+    return {...target,title:target.title || 'Untitled Note'};
   }
   if (navigator.onLine === false) throw new Error('Reconnect to update this Note.');
   if (await loadNotebookDraft(identity.userID, projectID, destination.card.id)) {
@@ -29854,7 +29812,13 @@ function renderResearchNotebookHandoff(conversation, message) {
   button.type = "button";
   button.className = "ghost-button";
   button.dataset.noteDestination = 'text';
-  button.textContent = workingResearchNote(projectID)?.title ? `Add to ${workingResearchNote(projectID).title}` : 'Add to note…';
+  const updateDestinationLabel = () => {
+    if (!button.dataset.noteDestination) return;
+    button.dataset.noteDestinationProject = select.value || projectID;
+    setResearchNoteActionLabel(button, workingResearchNote(button.dataset.noteDestinationProject));
+  };
+  select.addEventListener('change', updateDestinationLabel);
+  updateDestinationLabel();
   let selectedExcerpt = '';
   button.addEventListener('pointerdown', () => {
     selectedExcerpt = '';
@@ -29931,7 +29895,8 @@ function renderResearchNotebookHandoff(conversation, message) {
       }
       requireCurrentAccountRequest(requestIdentity);
       if (!originIsCurrent()) return;
-      if (savedDestinationMount?.panel?.isConnected) {
+      if (savedDestinationMount?.panel?.isConnected &&
+          savedDestinationMount.insertionTarget?.()?.identity === savedCard.identity) {
         scrollPaneIntoView(savedDestinationMount.panel.dataset.paneId);
         return;
       }
@@ -32141,7 +32106,6 @@ async function renderProjectNotebook(project, options = {}) {
       onTitleChange(value) {
         if (disposed || notebookReadOnly || !isCurrentAccountRequest(requestIdentity) || !activeCard) return;
         activeCard.title = value;
-        if (workingResearchNote(projectID)?.id === activeCard.id) rememberWorkingResearchNote(projectID, activeCard);
         publishNotebookColumn(projectID, paneID, activeCard);
         const summary = cards.find((card) => card.id && card.id === activeCard.id);
         if (summary) summary.title = value;
@@ -52475,7 +52439,6 @@ function bindImmediateUtilityControls() {
     tools: [{button:toggleSearchButton,key:'search'}, {button:toggleSavedButton,key:'saved'},
       {button:toggleAnalysisButton,key:'analysis'}, {button:toggleCalculatorButton,key:'calculator'},
       {button:toggleNotebookButton,key:'notes'},
-      {button:document.querySelector('.note-picker-host'),key:'note-picker',after:'notes'},
       {button:toggleReportButton,key:'report'}]
   });
   const updateBadge = document.querySelector("#project-update-badge");
