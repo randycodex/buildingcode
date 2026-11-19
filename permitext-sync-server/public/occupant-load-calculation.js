@@ -352,7 +352,8 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   root.addEventListener('calculation-context-changed',()=>{invalidatedAnswerID=(getAssessment?.()||assessment)?.answerID||'';assessment=null;update();});
   root.addEventListener('calculation-assessment-refreshed',()=>update());
   const actions = document.createElement('div'); actions.className = 'calculation-actions';
-  const save = document.createElement('button'); save.type = 'submit'; save.className = 'ghost-button'; save.textContent = 'Add calculation to note';
+  const save = document.createElement('button'); save.type = 'submit'; save.className = 'ghost-button';
+  const choose = document.createElement('button'); choose.type = 'submit'; choose.className = 'ghost-button'; choose.textContent = 'Choose Note…';
   const open = document.createElement('button'); open.type = 'button'; open.className = 'ghost-button'; open.textContent = 'Open in Notebook'; open.hidden = true;
   open.addEventListener('click', async () => {try {await onOpenNote?.(savedCard);} catch (error) {status.textContent = error.message;}});
   let staleDraft = false;
@@ -362,8 +363,8 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   const fingerprint = calculation => JSON.stringify({spaceName: draft.spaceName || '', ...(draft.spaceLocation ? {spaceLocation: draft.spaceLocation} : {}), input: calculation.input});
   root.refreshNoteDestination = () => {
     const destination = getDestinationNote?.();
-    save.textContent = savedCard && !calculationChanged ? `Added to ${savedCard.title || 'Notebook'}`
-      : `Add ${calculationChanged ? 'revised ' : ''}calculation to ${destination?.title || 'note'}`;
+    save.textContent = `Add ${calculationChanged ? 'revised ' : ''}calculation to ${destination?.title || 'note…'}`;
+    choose.hidden = !destination;
   };
   root.markDraftChanged = () => {
     staleDraft = true; reloadDraft.hidden = false;
@@ -464,10 +465,9 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
       : projectSyncState ? projectSyncState.state === 'error'
         ? `Saved on this device · sync pending. ${projectSyncState.error}`
         : projectSyncState.state === 'saved' ? '' : 'Saving calculation to project…'
-      : savedCard ? (calculationChanged ? 'Device draft · changes have not been saved to a new Note' : 'Saved snapshot in Notebook · editable device draft') : 'Device draft · inputs are saved on this device';
-    save.disabled = staleDraft || busy || !calculation.valid || !canSave;
+      : 'Device draft · inputs are saved on this device';
+    save.disabled = choose.disabled = staleDraft || busy || !calculation.valid || !canSave;
     root.refreshNoteDestination();
-    if (savedCard && !calculationChanged) save.disabled = true;
     return calculation;
   };
   const handleInput = event => {
@@ -502,7 +502,7 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
     // Lock inputs during the save so a delayed response cannot label newer inputs saved.
     Object.values(fields).forEach(field => field.disabled = true);
     try {
-      const card = await onSave(calculation);
+      const card = await onSave(calculation, {chooseNote: event.submitter === choose});
       status.textContent = card && !column ? 'Saved to Notebook · needs review. The Assistant answer is unchanged.' : '';
       if (!card) return;
       savedCard = card; savedFingerprint = fingerprint(calculation); open.hidden = false;
@@ -533,7 +533,7 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
     } catch (error) {table = null; status.textContent = error.message;}
     finally {loading = false;}
   });
-  actions.append(save, open); form.append(result, formula, footnotes, actions);
+  actions.append(save, choose, open); form.append(result, formula, footnotes, actions);
   if (!column) body.append(source);
   body.append(draftTools, form, status);
   if (column) body.append(draftState);

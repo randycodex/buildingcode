@@ -17,12 +17,12 @@ const calculation=calculateOccupantLoad(occupantLoadTableInput({area:'1200',seat
 for(const stale of [false,true]) {
  const storageValues=new Map();
  const localStorage={getItem:key=>storageValues.get(key)??null,setItem:(key,value)=>storageValues.set(key,value)};
- let options,resolve; const gate=new Promise(r=>resolve=r); const calls=[];
+ let options,resolve,serial=0; const gate=new Promise(r=>resolve=r); const calls=[];
  const context=vm.createContext({occupantLoadSource,occupantLoadPrefill,occupantLoadTable:readTable,occupantLoadTableInput,calculateOccupantLoad,calculationNoteBlocks,calculationDraftStore,generatedNoteTitle,localStorage,privateWorkspaceKeys:()=>({baseWorkspaceKey:"private-owner"}),calculationDraftViews:new Set(),
   chooseResearchNoteDestination:async()=>({kind:'new'}),rememberWorkingResearchNote(){},calculatorFootnoteAssessmentFor:()=>null,calculatorConversationForPane:()=>null,supplementalResearchConversations:new Map(),activeResearchConversation:null,
   state:{workflowNavigationGeneration:0},activeWorkspaceID:'workspace',captureAccountRequest:()=>({userID:'owner'}),
   isCurrentAccountRequest:()=>true,hasCapability:()=>true,workspaceProject:()=>({id:'project'}),researchProjectID:()=> 'project',researchCodeEdition:()=> '2022',
-  crypto:{randomUUID:()=> 'synthetic-id'},document:{createElement:()=>({blocks:[],append(block){this.blocks.push(block);}})},
+  crypto:{randomUUID:()=> `synthetic-id-${++serial}`},document:{createElement:()=>({blocks:[],append(block){this.blocks.push(block);}})},
   projectCalculationStore:()=>calculationDraftStore(localStorage,'private-owner:calculator-drafts:v1'), syncedProjectCalculations:()=>null,
   createOccupantLoadCard:o=>{options=o;return {isConnected:true,addEventListener(){},closest:()=>({dataset:{paneId:'reader'}})};},
   resolveReaderSource:async()=>source,api:async()=>{await gate;return {section:{...source,blocks}};},
@@ -70,16 +70,40 @@ for(const stale of [false,true]) {
   await assert.rejects(options.onSave({...custom,input:{...custom.input,factor:'0'}}),/positive factor/);
   await assert.rejects(options.onSave({...custom,input:{...custom.input,factorBasis:'Changed notes'}}),/BC table changed/);
   assert.equal(calls.length,2,'Invalid overrides cannot write a Note.');
-  let appendOptions;
-  context.chooseResearchNoteDestination=async()=>({kind:'saved',card:{id:'existing-note'}});
-  context.appendResearchReferenceToNote=async(_project,_destination,_reference,_mutation,_identity,_current,material)=>{
-    appendOptions=material;return {id:'existing-note',title:'Analysis'};
+  const appends=[];
+  context.chooseResearchNoteDestination=async(_project,_container,_current,{chooseNote})=>({
+    kind:'saved',card:{id:chooseNote?'other-note':'existing-note'}
+  });
+  context.appendResearchReferenceToNote=async(_project,destination,reference,mutationID,_identity,_current,material)=>{
+    appends.push({reference,mutationID,...material});return destination.card;
   };
   assert.equal((await options.onSave(calculation)).id,'existing-note');
-  assert.match(JSON.stringify(appendOptions.blocks),/12 people/);
-  assert.equal(appendOptions.blocks.flatMap(block=>block.content || []).filter(node=>node.props?.referenceID===appendOptions.evidenceLink.id).length,0,
-    'The common handoff inserts the calculation source reference once');
-  assert.equal(calls.length,2,'Appending to the chosen Note does not create a new Note');
+  assert.equal((await options.onSave(calculation)).id,'existing-note');
+  assert.equal((await options.onSave(calculation,{chooseNote:true})).id,'other-note');
+  assert.equal(new Set(appends.map(item=>item.mutationID)).size,3);
+  assert.equal(new Set(appends.map(item=>item.evidenceLink.id)).size,3);
+  for (const added of appends) {
+    assert.match(JSON.stringify(added.blocks),/12 people/);
+    assert.equal(added.reference.referenceID,added.evidenceLink.id);
+    assert.equal(added.blocks.flatMap(block=>block.content || []).some(node=>node.props?.referenceID===added.evidenceLink.id),false,
+      'The common handoff inserts the calculation source reference once');
+  }
+  assert.equal(calls.length,2,'Appending to the chosen Notes does not create a new Note');
+
+  context.chooseResearchNoteDestination=async()=>({kind:'new'});
+  const createAttempts=[];
+  context.postResearch=async(_path,submission)=>{
+    createAttempts.push(submission);
+    if(createAttempts.length===1)throw new Error('Response unavailable');
+    return {card:{id:submission.clientMutationID}};
+  };
+  await assert.rejects(options.onSave(calculation),/Response unavailable/);
+  const retried=await options.onSave(calculation);
+  const addedAgain=await options.onSave(calculation);
+  assert.equal(createAttempts[0].clientMutationID,createAttempts[1].clientMutationID,'Retry reuses the pending mutation');
+  assert.equal(createAttempts[0].evidenceLinks[0].id,createAttempts[1].evidenceLinks[0].id);
+  assert.notEqual(addedAgain.id,retried.id,'Another add after success creates its own Note');
+  assert.notEqual(createAttempts[2].clientMutationID,calls[0].clientMutationID);
  }
 }
 console.log('Actual client save handler captures canonical evidence, saves the arithmetic snapshot, and cancels after a view change.');

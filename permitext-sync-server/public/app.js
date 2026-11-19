@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-calculator-sources-v2559";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-repeat-calculation-note-v2560";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -32,7 +32,7 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=39";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=40";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js?v=2";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261118-sync-refresh-v1386";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-calculator-sources-v2559";
+} from "./offline-storage.js?v=20261119-repeat-calculation-note-v2560";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -19572,14 +19572,16 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       await openSourceInReader({...source, codePrefix: source.codePrefix || source.codeBook},
         card.closest(".workspace-panel")?.dataset.paneId, {projectID: project ? researchProjectID(project) : "",...(exact?{evidenceAnchor:{passages:[{exact}]}}:{})});
     },
-    onSave: async calculation => {
+    onSave: async (calculation, {chooseNote = false} = {}) => {
       assertCurrent();
       const spaceName = String(draft.spaceName || "").trim();
       const generation = state.workflowNavigationGeneration || 0;
       const actionCurrent = () => current() && generation === (state.workflowNavigationGeneration || 0);
       const requireAction = () => {if (!actionCurrent()) throw new Error("The view changed. Reopen this calculation before saving.");};
       if (!project) throw new Error("Create a Project before saving a calculation.");
-      const destination = await chooseResearchNoteDestination(project,card,actionCurrent);
+      const destination = await chooseResearchNoteDestination(project, card, actionCurrent, {
+        chooseNote, message: "Choose a Note for this calculation."
+      });
       if (!destination || !actionCurrent()) return null;
       const {resolved, section} = await loadSource(actionCurrent);
       requireAction();
@@ -19621,6 +19623,8 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
         openQuestions: []};
       savePayloads.set(fingerprint, submission);
       const saved = await postResearch("/notebook/cards/save", submission);
+      // Keep the mutation ID for a retry until the server confirms the write.
+      savePayloads.delete(fingerprint);
       requireCurrentAccountRequest(identity);
       await saveNotebookCardSnapshot(identity.userID, researchProjectID(project), saved.card);
       requireCurrentAccountRequest(identity);
@@ -29757,11 +29761,11 @@ function syncResearchNoteControls() {
   }
 }
 
-async function chooseResearchNoteDestination(project, container, current) {
+async function chooseResearchNoteDestination(project, container, current, {chooseNote = false, message = 'Choose the note for this research.'} = {}) {
   if (!current()) return null;
   const projectID = researchProjectID(project);
   if (project.sharedRole === 'viewer') throw new Error("This Project's Notes are read-only.");
-  const column = selectedResearchNoteColumn(projectID);
+  const column = chooseNote ? null : selectedResearchNoteColumn(projectID);
   if (column) {
     const paneID = notebookColumnPaneID(column);
     const mount = notebookColumnMounts.get(paneID);
@@ -29780,7 +29784,7 @@ async function chooseResearchNoteDestination(project, container, current) {
   const cards = (payload.cards || []).filter(card => !card.deletedAt && !card.archivedAt);
   const choices = cards.map(card => ({value:card.id, label:card.title || 'Untitled Note'}));
   choices.push({value:'new', label:'New Note'});
-  const destination = await openWebWarning({title:'Add to note', message:'Choose the note for this research.',
+  const destination = await openWebWarning({title:'Add to note', message,
     choiceLabel:'Destination Note', choices, confirmLabel:'Add to note', container});
   if (!destination || !current()) return null;
   if (destination === 'new') return {kind:'new'};
