@@ -449,6 +449,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let facts = app.buttons["project-section-structured-facts"]
         reveal(facts, in: app)
         facts.tap()
+        app.navigationBars["Facts"].buttons["Edit"].tap()
         let value = app.textFields["project-fact-value-occupancy"]
         XCTAssertTrue(value.waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts["project-fact-number-occupancy"].label, "1.")
@@ -461,18 +462,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         reveal(bottomSave, in: app)
         XCTAssertTrue(app.buttons["project-inline-bottom-cancel"].exists)
         bottomSave.tap()
-        XCTAssertTrue(facts.waitForExistence(timeout: 5))
-        facts.tap()
+        app.navigationBars["Facts"].buttons["Edit"].tap()
         XCTAssertTrue(value.waitForExistence(timeout: 5))
         XCTAssertTrue((value.value as? String ?? "").contains("phone edit"))
         keepScreenshot(named: "Facts edited inline on iPhone", from: app)
         app.buttons["project-inline-cancel"].tap()
+        app.navigationBars["Facts"].buttons["Close"].tap()
         for (section, title) in [("notebook", "Notebook"), ("evidence", "Evidence"), ("reports", "Reports")] {
             let card = app.buttons["project-section-\(section)"]
             reveal(card, in: app)
             card.tap()
             XCTAssertTrue(app.navigationBars[title].waitForExistence(timeout: 10))
-            app.buttons["main-tab-saved"].tap()
+            app.navigationBars[title].buttons["Close"].tap()
             XCTAssertTrue(root.waitForExistence(timeout: 10))
             XCTAssertTrue(app.buttons["project-section-notebook"].label.contains("0 notes"), "Loaded previews survive the delayed refresh")
             XCTAssertTrue(app.buttons["project-section-reports"].label.contains("0 reports"))
@@ -518,7 +519,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         questionText.typeText(" Discard")
         app.buttons["project-workflow-cancel"].tap()
         XCTAssertFalse(app.staticTexts["Is the survey current? Discard"].exists)
-        app.buttons["main-tab-saved"].tap()
+        app.navigationBars["Questions"].buttons["Close"].tap()
         XCTAssertTrue(root.waitForExistence(timeout: 5))
         let checklistCard = app.buttons["project-section-checklist"]
         reveal(checklistCard, in: app)
@@ -611,7 +612,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Project overview accessibility size collections", from: app)
         app.buttons["project-section-reports"].tap()
         XCTAssertTrue(app.navigationBars["Reports"].waitForExistence(timeout: 10))
-        app.buttons["main-tab-saved"].tap()
+        app.navigationBars["Reports"].buttons["Close"].tap()
         XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
         app.buttons["main-tab-saved"].tap()
         XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
@@ -667,7 +668,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Structured Facts (")).firstMatch.exists)
         for (identifier, title) in [
             ("project-section-context", "Project Context"),
-            ("project-section-structured-facts", "Structured Facts"),
+            ("project-section-structured-facts", "Facts"),
             ("project-section-notebook", "Notebook"),
             ("project-section-research-history", "Research History")
         ] {

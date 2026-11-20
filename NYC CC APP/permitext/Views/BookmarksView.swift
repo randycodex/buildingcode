@@ -1353,10 +1353,6 @@ struct ProjectView: View {
                                 projectHeader
                                 projectContextOverview
                                     .id(ProjectOverviewSection.context)
-                                if inlineEditingSection == .structuredFacts {
-                                    projectFactsOverview
-                                        .id(ProjectOverviewSection.structuredFacts)
-                                }
                                 projectSectionCards
                             }
                             .frame(minHeight: max(0, geometry.size.height - CodeScreenMetrics.topTitlePadding - 16),
@@ -1392,13 +1388,15 @@ struct ProjectView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $sheetSection) { section in
             NavigationStack {
-                if section == .checklist {
+                if section == .checklist || section == .questions {
                     ProjectWorkflowView(folderID: folderID, section: section, closeSheet: { sheetSection = nil })
                 } else {
                     projectSectionDestination(section)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
-                                Button("Close") { sheetSection = nil }
+                                if section != .structuredFacts || inlineEditingSection != .structuredFacts {
+                                    Button("Close") { sheetSection = nil }
+                                }
                             }
                         }
                 }
@@ -1421,15 +1419,6 @@ struct ProjectView: View {
                     .accessibilityIdentifier("project-edit")
                     .disabled(inlineEditingSection != nil)
                 }
-                if inlineEditingSection == .structuredFacts {
-                    ToolbarItemGroup(placement: .keyboard) {
-                        Button("Cancel", action: finishInlineEditing)
-                            .accessibilityIdentifier("project-inline-keyboard-cancel")
-                        Spacer()
-                        Button("Save", action: saveInlineEditing).fontWeight(.semibold)
-                            .accessibilityIdentifier("project-inline-keyboard-save")
-                    }
-                }
             }
         }
         .sheet(item: $folderEditorTarget) { target in
@@ -1449,27 +1438,7 @@ struct ProjectView: View {
                 }
             )
         }
-        .sheet(item: $pendingExport) { request in
-            BookmarkExportPreviewSheet(request: request) {
-                pendingExport = nil
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    library.startBookmarkExport(bookmarks: request.bookmarks, contextLabel: request.contextLabel)
-                }
-            }
-        }
-        .fullScreenCover(
-            isPresented: Binding(
-                get: { projectReportPreviewURL != nil },
-                set: { if !$0 { projectReportPreviewURL = nil } }
-            )
-        ) {
-            if let projectReportPreviewURL {
-                ProjectReportPDFPreviewSheet(fileURL: projectReportPreviewURL) {
-                    self.projectReportPreviewURL = nil
-                }
-            }
-        }
-        .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
+
         .onChange(of: library.privateSessionID) { _, _ in
             sheetSection = nil
             finishInlineEditing()
@@ -1922,7 +1891,7 @@ struct ProjectView: View {
                 factsEditorFooter
                 inlineEditorError
             } else {
-                Button { beginInlineEditing(.structuredFacts) } label: {
+                Button { openProjectSheet(.structuredFacts) } label: {
                     HStack {
                         Text("Facts").font(.headline).foregroundStyle(.primary)
                         Spacer(minLength: 12)
@@ -2084,10 +2053,22 @@ struct ProjectView: View {
         projectHubSnapshot?.reports.max { $0.createdAt < $1.createdAt }
     }
 
+    private func openProjectSheet(_ section: ProjectOverviewSection) {
+        let large: Bool
+        switch section {
+        case .reports, .evidence: large = true
+        case .questions: large = (folder?.openQuestions?.count ?? 0) > 5
+        case .checklist: large = (folder?.recordsChecklist?.count ?? 0) > 5
+        default: large = false
+        }
+        sheetDetent = large || dynamicTypeSize.isAccessibilitySize ? .large : .medium
+        sheetSection = section
+    }
+
     private var projectSectionCards: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .topLeading),
                                  count: dynamicTypeSize.isAccessibilitySize ? 1 : 2), spacing: 12) {
-            Button { beginInlineEditing(.structuredFacts) } label: {
+            Button { openProjectSheet(.structuredFacts) } label: {
                 let facts = folder?.structuredFacts ?? []
                 projectSectionCard("Facts", systemImage: "building.2",
                     count: "\(facts.count) \(facts.count == 1 ? "fact" : "facts")",
@@ -2096,7 +2077,7 @@ struct ProjectView: View {
             .disabled(inlineEditingSection != nil)
             .accessibilityIdentifier("project-section-structured-facts")
 
-            NavigationLink(value: ProjectOverviewSection.questions) {
+            Button { openProjectSheet(.questions) } label: {
                 let questions = folder?.openQuestions ?? []
                 projectSectionCard("Questions", systemImage: "questionmark.bubble",
                     count: folder?.openQuestions.map { "\($0.count) \($0.count == 1 ? "question" : "questions")" },
@@ -2105,10 +2086,7 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-questions")
 
-            Button {
-                sheetDetent = (folder?.recordsChecklist?.count ?? 0) > 5 || dynamicTypeSize.isAccessibilitySize ? .large : .medium
-                sheetSection = .checklist
-            } label: {
+            Button { openProjectSheet(.checklist) } label: {
                 let records = folder?.recordsChecklist ?? []
                 projectSectionCard("Checklist", systemImage: "checklist",
                     count: folder?.recordsChecklist.map { "\($0.filter { $0.status == .reviewed }.count)/\($0.count) reviewed" },
@@ -2117,10 +2095,7 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-checklist")
 
-            Button {
-                sheetDetent = dynamicTypeSize.isAccessibilitySize ? .large : .medium
-                sheetSection = .notebook
-            } label: {
+            Button { openProjectSheet(.notebook) } label: {
                 projectSectionCard("Notes", systemImage: "note.text",
                     count: projectHubSnapshot.map { "\($0.notebookCards.count) \($0.notebookCards.count == 1 ? "note" : "notes")" },
                     preview: latestProjectNote.map { $0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled note" : $0.title }
@@ -2128,7 +2103,7 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-notebook")
 
-            NavigationLink(value: ProjectOverviewSection.evidence) {
+            Button { openProjectSheet(.evidence) } label: {
                 projectSectionCard("Evidence", systemImage: "bookmark",
                     count: "\(library.bookmarkCount(inFolder: folderID)) saved",
                     preview: projectBookmarks.first.map { "\($0.sectionNumber) · \($0.displayTitle)" }
@@ -2136,7 +2111,7 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-evidence")
 
-            NavigationLink(value: ProjectOverviewSection.reports) {
+            Button { openProjectSheet(.reports) } label: {
                 projectSectionCard("Reports", systemImage: "doc.richtext",
                     count: projectHubSnapshot.map { "\($0.reports.count) \($0.reports.count == 1 ? "report" : "reports")" },
                     preview: latestProjectReport.map { "\($0.title) · V\($0.reportVersion)" }
@@ -2156,18 +2131,42 @@ struct ProjectView: View {
         case .context:
             ProjectContextView(folderID: folderID, accentColor: accentColor)
         case .structuredFacts:
-            projectSectionScreen(title: "Structured Facts") {
-                let facts = folder?.structuredFacts ?? []
-                if facts.isEmpty {
-                    projectHubEmpty("No Structured facts yet.")
+            projectSectionScreen(title: "Facts") {
+                if inlineEditingSection == .structuredFacts {
+                    projectFactsOverview
                 } else {
-                    VStack(alignment: .leading, spacing: 0) {
-                        ForEach(facts) { fact in
-                            ProjectStructuredFactRow(fact: fact)
-                            if fact.id != facts.last?.id { Divider() }
+                    let facts = folder?.structuredFacts ?? []
+                    if facts.isEmpty {
+                        projectHubEmpty("No Structured facts yet.")
+                    } else {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(facts) { fact in
+                                ProjectStructuredFactRow(fact: fact)
+                                if fact.id != facts.last?.id { Divider() }
+                            }
+                            ProjectStructuredFactsSources(facts: facts)
+                                .padding(.top, 16)
                         }
-                        ProjectStructuredFactsSources(facts: facts)
-                            .padding(.top, 16)
+                    }
+                }
+            }
+            .interactiveDismissDisabled(inlineEditingSection == .structuredFacts)
+            .toolbar {
+                if inlineEditingSection == .structuredFacts {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Button("Cancel", action: finishInlineEditing)
+                            .accessibilityIdentifier("project-inline-keyboard-cancel")
+                        Spacer()
+                        Button("Save", action: saveInlineEditing).fontWeight(.semibold)
+                            .accessibilityIdentifier("project-inline-keyboard-save")
+                    }
+                }
+                if inlineEditingSection == nil {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Edit") {
+                            sheetDetent = .large
+                            beginInlineEditing(.structuredFacts)
+                        }
                     }
                 }
             }
@@ -2187,6 +2186,18 @@ struct ProjectView: View {
                 if projectHubSnapshot != nil || (!isProjectHubLoading && projectHubError == nil) {
                     projectReportSummary
                     if !projectCodeQuestions.isEmpty { projectCodeQuestionSummary }
+                }
+            }
+            .fullScreenCover(
+                isPresented: Binding(
+                    get: { projectReportPreviewURL != nil },
+                    set: { if !$0 { projectReportPreviewURL = nil } }
+                )
+            ) {
+                if let projectReportPreviewURL {
+                    ProjectReportPDFPreviewSheet(fileURL: projectReportPreviewURL) {
+                        self.projectReportPreviewURL = nil
+                    }
                 }
             }
             .refreshable { await loadProjectHub() }
@@ -2240,6 +2251,15 @@ struct ProjectView: View {
             ToolbarItemGroup(placement: .topBarTrailing) { sortMenu; exportButton }
         }
         .safeAreaInset(edge: .bottom) { projectEvidenceUndo }
+        .sheet(item: $pendingExport) { request in
+            BookmarkExportPreviewSheet(request: request) {
+                pendingExport = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    library.startBookmarkExport(bookmarks: request.bookmarks, contextLabel: request.contextLabel)
+                }
+            }
+        }
+        .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         .refreshable { library.refreshBookmarks() }
     }
 
