@@ -10,7 +10,11 @@ const actual = name => {
 };
 let focused = null;
 class Element {
-  constructor() { this.children = []; this.dataset = {}; this.listeners = {}; this.className = ""; this.classList = { remove() {} }; }
+  constructor() {
+    this.children = []; this.dataset = {}; this.listeners = {}; this.className = "";
+    this.classList = { remove() {}, contains: name => this.className.split(" ").includes(name) };
+  }
+  getBoundingClientRect() { return this.bounds; }
   setAttribute(key, value) { this[key] = value; }
   addEventListener(key, callback) { this.listeners[key] = callback; }
   append(...children) { for (const child of children) { child.remove(); child.parent = this; this.children.push(child); } }
@@ -45,7 +49,7 @@ const make = () => {
     api: async (path, options) => { requests.push({ url: new URL(path, "http://local"), signal: options.signal }); return responder(); }
   });
   c.fetchCodeSearch=c.api;
-  vm.runInContext(["searchResultPositionKey", "searchPositionState", "appendSearchGroupLoadMore"].map(actual).join("\n"), c);
+  vm.runInContext(["searchResultPositionKey", "searchPositionState", "loadMoreSearchGroupNearEnd", "appendSearchGroupLoadMore"].map(actual).join("\n"), c);
   c.searchPositionState(instance).groupPages = {};
   const options = { query: "concrete", searchInstance: instance, panel: {}, sourceScope: { querySuffix: "&sourceScope=enabled-only" },
     controller: new AbortController(), isCurrent: () => current };
@@ -83,6 +87,49 @@ const make = () => {
   assert.equal(await current.loadMore(), false, "A mixed-edition response cannot mutate the selected group.");
   assert.equal(current.nextOffset, 6); assert.equal(current.loadedPages, 2);
   assert.equal(historical.group.querySelectorAll(".result-row").length, 0);
+}
+{
+  const f = make(), current = f.add("BC", "2022"), historical = f.add("BC", "2014");
+  const footer = page => page.group.querySelector(".search-load-more");
+  const scroll = () => f.c.loadMoreSearchGroupNearEnd(f.results);
+  f.results.bounds = { top: 100, bottom: 900 };
+  footer(current).bounds = { top: 1350, bottom: 1400 };
+  footer(historical).bounds = { top: 950, bottom: 1000 };
+  current.group.className += " is-open";
+  scroll();
+  assert.equal(f.requests.length, 0, "Scrolling ignores a distant footer or a collapsed edition");
+  footer(current).bounds = { top: 950, bottom: 1000 };
+  f.results.dataset.restoringSearch = "true";
+  scroll();
+  assert.equal(f.requests.length, 0, "Restoring scroll position does not start another page");
+  f.results.dataset.restoringSearch = "false";
+  focused = current.group.querySelector(".search-load-more-button");
+  scroll();
+  assert.equal(f.requests.length, 0, "Leave a focused manual control available to keyboard users");
+  focused = null;
+  let resolve;
+  f.respond(() => new Promise(done => { resolve = done; }));
+  scroll();
+  scroll();
+  assert.equal(f.requests.length, 1, "Scrolling starts one request for the nearby expanded edition");
+  assert.deepEqual(JSON.parse(f.requests[0].url.searchParams.get("resultSource")), { codePrefix: "BC", codeVersion: "2022" });
+  resolve({ results: [{ id: 6, codePrefix: "BC", codeVersion: "2022" }], hasMore: true, nextOffset: 6, nextCandidateOffset: 10, cursorKind: "candidate" });
+  await new Promise(setImmediate);
+  assert.equal(current.loadedPages, 2);
+  assert.equal(historical.loadedPages, 1);
+  assert.equal(f.requests.length, 1, "Appending a batch does not schedule another fetch by itself");
+  footer(current).bounds = { top: 950, bottom: 1000 };
+  f.respond(async () => { throw new Error("Offline"); });
+  scroll();
+  await new Promise(setImmediate);
+  scroll();
+  assert.equal(f.requests.length, 2, "A failed request waits for a manual retry");
+  assert.equal(current.group.querySelector(".search-load-more-button").textContent, "Try again");
+  f.respond(async () => ({ results: [{ id: 7, codePrefix: "BC", codeVersion: "2022" }], hasMore: false }));
+  await current.loadMore();
+  assert.equal(current.loadedPages, 3);
+  assert.equal(current.loadMoreOnScroll, null);
+  assert.equal(footer(current), null);
 }
 {
   const f = make(), page = f.add("BC", "2022", "offset");

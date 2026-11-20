@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-update-notice-v2564";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-search-auto-page-v2565";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-update-notice-v2564";
+} from "./offline-storage.js?v=20261119-search-auto-page-v2565";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -22381,11 +22381,18 @@ async function renderSearch(instance, options = {}) {
     if (event.target.matches?.(".search-jump-list")) {
       searchInstance.historyScrollTop = event.target.scrollTop;
     } else if (event.target === resultsScroller && String(searchInstance.query || "").trim()) {
-      searchPositionState(searchInstance).scrollTop = resultsScroller.scrollTop;
+      const position = searchPositionState(searchInstance);
+      const scrollingDown = resultsScroller.scrollTop > position.scrollTop;
+      position.scrollTop = resultsScroller.scrollTop;
+      if (scrollingDown) loadMoreSearchGroupNearEnd(resultsScroller);
     } else return;
     clearTimeout(scrollSaveTimer);
     scrollSaveTimer = setTimeout(() => saveWorkspaceState(), 150);
   }, { passive: true, capture: true });
+  resultsScroller.addEventListener("wheel", (event) => {
+    // The scroll position may not change, or a fast gesture can skip past a footer.
+    if (event.deltaY > 0 && !event.ctrlKey) loadMoreSearchGroupNearEnd(resultsScroller);
+  }, { passive: true });
   updateSearchDock(panel, searchInstance);
   renderSearchRecentPopover(panel, searchInstance);
 
@@ -23044,12 +23051,21 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
   refreshSearchGroupCounts(results);
 }
 
+function loadMoreSearchGroupNearEnd(results) {
+  if (results.dataset.restoringSearch === "true" || !results.searchGroupPages?.size) return;
+  const viewport = results.getBoundingClientRect();
+  for (const page of results.searchGroupPages.values()) {
+    if (page.loadMoreOnScroll?.(viewport)) break;
+  }
+}
+
 function appendSearchGroupLoadMore(results, page, options) {
   const group = page.group;
   const body = group.querySelector(".search-result-group-body");
   body.querySelector(".search-load-more")?.remove();
   group.dataset.searchHasMore = page.hasMore ? "true" : "false";
   page.loadMore = null;
+  page.loadMoreOnScroll = null;
   if (!page.hasMore) return;
   const footer = document.createElement("section");
   footer.className = "search-load-more";
@@ -23114,6 +23130,14 @@ function appendSearchGroupLoadMore(results, page, options) {
       status.textContent = "More matches could not be loaded for this edition.";
       return false;
     }
+  };
+  page.loadMoreOnScroll = (viewport) => {
+    if (!options.isCurrent() || !group.classList.contains("is-open") || !status.hidden ||
+        button.disabled || footer.contains(document.activeElement)) return false;
+    const bounds = footer.getBoundingClientRect();
+    if (bounds.bottom <= viewport.top || bounds.top > viewport.bottom + 180) return false;
+    void page.loadMore();
+    return true;
   };
   button.addEventListener("click", () => { void page.loadMore(); });
   footer.append(status, button);
