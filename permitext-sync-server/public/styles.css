@@ -22115,3 +22115,35 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   min-width: 24px;
   padding: 5px;
 }
+
+/* Tool colors follow the column type as columns move or collapse. */
+#panel-track { --notes-column-surface: light-dark(#f8f1e8, #241d17); }
+#panel-track > .reader-panel {
+  --column-surface: light-dark(#fafafa, #111111);
+  --reader-controls-surface: var(--column-surface);
+}
+#panel-track > .search-panel { --column-surface: light-dark(#edf3fa, #151d28); }
+#panel-track > .saved-panel { --column-surface: light-dark(#eef5ef, #17211b); }
+#panel-track > .analysis-panel { --column-surface: light-dark(#f4eef8, #211a29); }
+#panel-track > .calculator-panel { --column-surface: light-dark(#eaf4f4, #162223); }
+#panel-track > :is(.notebook-index-panel, .notebook-panel) { --column-surface: var(--notes-column-surface); }
+#panel-track > .shared-report-column { --column-surface: light-dark(#f0f1f4, #1c1e22); }
+
+#panel-track > :is(.reader-panel, .search-panel, .saved-panel, .analysis-panel, .calculator-panel,
+  .notebook-index-panel, .notebook-panel, .shared-report-column) {
+  --surface: var(--column-surface);
+  --surface-raised: var(--column-surface);
+  background-color: var(--column-surface);
+}
+
+/* Assistant's sidebars expand into space reserved after the panel. */
+#panel-track > .research-v2-panel {
+  box-shadow: calc(var(--rv2-history-space, 0px) + var(--rv2-sources-space, 0px)) 0 var(--column-surface);
+  transition: margin-inline-end var(--workspace-sidebar-motion), box-shadow var(--workspace-sidebar-motion);
+}
+
+#panel-track > .calculator-panel .occupant-load-card { background-color: var(--column-surface); }
+
+#panel-track > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"] {
+  background-color: var(--notes-column-surface);
+}
