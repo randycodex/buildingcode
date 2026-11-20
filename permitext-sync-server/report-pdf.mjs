@@ -72,25 +72,7 @@ const colors = Object.freeze({
   muted: "#626262",
   rule: "#d8d3cd",
   accent: "#a65318",
-  publishedCode: "#f4e9dc",
-  userAuthored: "#f0edf7",
-  aiAssisted: "#e9eef9",
-  projectMaterial: "#edf2ee",
   paper: "#ffffff"
-});
-
-const classificationLabels = Object.freeze({
-  "published-code": "Published code",
-  "user-authored": "User-authored",
-  "ai-assisted": "AI-assisted Research",
-  "project-material": "Project material"
-});
-
-const classificationColors = Object.freeze({
-  "published-code": colors.publishedCode,
-  "user-authored": colors.userAuthored,
-  "ai-assisted": colors.aiAssisted,
-  "project-material": colors.projectMaterial
 });
 
 function reportDate(value) {
@@ -172,11 +154,6 @@ function drawCalculation(document, item, startX, width) {
   drawTextSection(document, 'Source', calculation.source);
   ensureVerticalSpace(document, 38);
   document.font('Report-Regular').fontSize(8.5).fillColor(colors.muted).text(calculation.review, {width, lineGap: 2});
-}
-
-function drawClassification(document, classification) {
-  document.font("Report-Regular").fontSize(7.5).fillColor(colors.muted)
-    .text((classificationLabels[classification] || "Project material").toUpperCase(), {paragraphGap:6});
 }
 
 function drawList(document, title, values) {
@@ -404,18 +381,6 @@ function drawCover(document, manifest, unversioned) {
     .font("Report-Regular")
     .fontSize(10)
     .text(metadata.join("  /  "), { lineGap: 3 });
-  document.moveDown(3);
-  Object.keys(classificationLabels).forEach((classification) => {
-    drawClassification(document, classification);
-  });
-  document.moveDown(2);
-  document
-    .fillColor(colors.muted)
-    .font("Report-Regular")
-    .fontSize(8)
-    .text(`Manifest ${manifest.id}\nSHA-256 ${manifest.contentHash}`, {
-      lineGap: 3
-    });
 }
 
 // Lay out authored runs explicitly so marks, links and printed highlights stay
