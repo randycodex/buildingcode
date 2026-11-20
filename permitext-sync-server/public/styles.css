@@ -1681,8 +1681,9 @@ body .workspace-panel :has(> .column-loading-indicator) {
   --panel-title-row-height: max(calc(var(--chrome-font-size) * var(--code-title-scale) * 1.2), 28px);
   --panel-title-control-size: var(--panel-title-row-height);
   --panel-title-icon-size: 18px;
-  --panel-close-icon-gutter: calc((var(--panel-title-control-size) - var(--panel-title-icon-size)) / 2 + 1px);
-  --panel-content-end-inset: calc(var(--panel-padding) + var(--panel-close-icon-gutter));
+  /* The circle's stroke ends one unit inside its 24-unit viewBox. */
+  --panel-close-icon-offset: calc((var(--panel-title-control-size) - var(--panel-title-icon-size)) / 2 + var(--panel-title-icon-size) / 24);
+  --panel-content-end-inset: var(--panel-padding);
   --panel-title-row-bottom: calc(var(--panel-padding) + var(--panel-title-row-height));
   /* Reader chapter, tab, and first section guides for the workspace columns. */
   --panel-control-row-top: calc(var(--panel-title-row-bottom) + var(--space-2));
@@ -2529,6 +2530,13 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 .pane-drag-handle svg {
   width: var(--panel-title-icon-size);
   height: var(--panel-title-icon-size);
+}
+
+:is(.panel-track > .workspace-panel > header, .panel-track > .shared-report-column .report-draft-header)
+  :is(.reader-close, .utility-close, .section-detail-close) > svg {
+  position: relative;
+  inset-inline-start: var(--panel-close-icon-offset);
+  stroke-width: 2;
 }
 
 .projects-panel .projects-archive-button,
@@ -4970,11 +4978,9 @@ select option:checked {
 }
 
 .search-panel > :is(.search-dock, .search-results-viewport) {
-  box-sizing: border-box;
   width: 100%;
-  max-width: calc(var(--workspace-content-max-width) + var(--panel-close-icon-gutter));
+  max-width: var(--workspace-content-max-width);
   margin-inline: auto;
-  padding-inline-end: var(--panel-close-icon-gutter);
 }
 
 .search-results-viewport {
