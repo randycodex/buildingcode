@@ -284,7 +284,7 @@ const reopenState = {
     'utility:analysis:owned-research': { kind:'utility', value:{id:'owned-research',key:'analysis',conversationID:'conversation'},width:700 }
   }}]
 };
-const reopenContext = vm.createContext({state:reopenState, isProAccount:()=>true, CSS:{escape:x=>x}, captureColumnGroupContents(){},
+const reopenContext = vm.createContext({state:reopenState, isProAccount:()=>true, readerColumnLimitReached:()=>false, CSS:{escape:x=>x}, captureColumnGroupContents(){},
   defaultActivePaneIDs:()=>[...reopenState.readers.map(r=>'reader:'+r.id),...reopenState.utilityInstances.map(i=>'utility:'+i.key+':'+i.id)],
   track:{querySelector:()=>null}, pendingGroupReaderPositions:new Map(), researchNewChatDrafts:new Map(), researchDraftPaneIDs:new Set(),
   paneIDForUtilityInstance:i=>'utility:'+i.key+':'+i.id, defaultPaneWidthForID:()=>600, saveWorkspaceState(){}, async transitionWorkspace(){}, showWebNotice(){throw Error('Unexpected missing snapshot');}

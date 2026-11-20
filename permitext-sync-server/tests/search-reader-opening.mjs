@@ -14,7 +14,7 @@ const c=vm.createContext({columnExpansionController:()=>({reveal:node=>visibleRe
   workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=> 'research',workingResearchNote:()=>null,captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
   workflowPaneIsVisible:()=>true,resolveReaderSource:item=>new Promise(resolve=>requests.push(()=>resolve(item))),
   searchResultDetail:item=>item,readerFieldsForSectionDetail:(item,options)=>({...item,...options}),normalizeAnnotationBlockID:id=>id||'',
-  readerMatchesSource:()=>false,readerIsClearlyAvailable:()=>false,isProAccount:()=>true,newReaderState:item=>({id:`new-${++readerID}`,...item}),
+  readerMatchesSource:()=>false,readerIsClearlyAvailable:()=>false,isProAccount:()=>true,notifyReaderColumnLimit:()=>false,newReaderState:item=>({id:`new-${++readerID}`,...item}),
   paneIDForReader:reader=>reader.id,defaultPaneWidthForID:()=>480,placePaneAfter:(anchor,pane)=>placements.push([anchor,pane]),appendPaneIfMissing(){},
   updateBrowserSectionURL(){},scheduleContinuitySync(){},saveWorkspaceState(){},
   transitionWorkspace:async(_type,options)=>{

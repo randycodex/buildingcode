@@ -87,6 +87,7 @@ assert.equal(readerTabs(full).length, 6, 'Closing a tab makes one slot available
 // Exercise the actual column transfer functions, including independent copies
 // and moving the last tab out of a column without leaving an empty pane.
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+const readerLimit = source.slice(source.indexOf('const maximumReaderColumns'), source.indexOf('function newReaderState('));
 const actual = name => { const start = source.search(new RegExp(`(?:async )?function ${name}\\(`)); assert(start >= 0, name); return source.slice(start, source.indexOf('\n}', start) + 2); };
 const layoutContext = vm.createContext({ Event, syncReferenceReaderLayout() {}, track: {dispatchEvent(event) {
   assert.equal(event.type, 'permitext:workspace-layout-change');
@@ -100,8 +101,8 @@ const context = vm.createContext({workingResearchNote:()=>null,state, readerTabs
   isProAccount: () => true, rememberReaderTabPosition() {}, retainReaderColumn() {},
   newReaderState: fields => ({id: `column-${++serial}`, ...fields}),
   linkPaneToView: value => value, currentColumnWorkflowView: () => 'research', paneIDForReader: reader => `reader:${reader.id}`,
-  placePaneAfter() {}, saveWorkspaceState() {}, transitionWorkspace: async () => {renders++;}, scrollPaneIntoView() {}});
-vm.runInContext(actual('transferReaderTab'), context);
+  placePaneAfter() {}, saveWorkspaceState() {}, transitionWorkspace: async () => {renders++;}, scrollPaneIntoView() {}, showWebNotice() {}});
+vm.runInContext(readerLimit + actual('transferReaderTab'), context);
 await context.transferReaderTab(a, 'pc', {duplicate: true});
 const b = state.readers[1]; assert.equal(state.readers.length, 2); assert.equal(readerTabs(a).length, 2);
 assert.equal(b.sectionID, '403'); assert.notEqual(b.id, a.id);
@@ -155,6 +156,15 @@ assert.notEqual(overflowReader.id, full.id); assert.equal(state.readers.length, 
 assert.equal(readerTabs(overflowReader).length, 1); assert.equal(overflowReader.sectionID, 'new-101');
 assert.equal(JSON.stringify(full), fullBeforeNavigation, 'Overflow navigation preserves all six sessions and the selected tab.');
 assert.equal(readerTabs(full).length, 6);
+const atColumnLimit = JSON.stringify(state.readers);
+let limitNotices = 0;
+context.showWebNotice = () => limitNotices++;
+await context.transferReaderTab(a, a.activeTabID, {duplicate:true});
+await context.transferReaderTab(a, a.activeTabID);
+assert.equal(await context.openSourceInReader({codePrefix:'NEW2',codeVersion:'2022',sectionID:'at-limit'}, 'new-source', {forceNewReader:true}),null);
+assert.equal(context.prepareReaderSourceTab(full, {codePrefix:'NEW2',codeVersion:'2022',sectionID:'at-limit'}),null);
+assert.equal(limitNotices,4);
+assert.equal(JSON.stringify(state.readers),atColumnLimit,'No creation path removes existing sessions when the workspace is full.');
 const existingID = readerTabs(full)[0].id;
 const existingCode = readerTabs(full)[0];
 const reopened = context.prepareReaderSourceTab(full, {...existingCode, sectionID: 'another-section'});

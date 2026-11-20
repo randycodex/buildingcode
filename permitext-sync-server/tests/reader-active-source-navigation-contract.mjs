@@ -17,7 +17,7 @@ function setup() {
     confirmWebWarning:async()=>false,captureAccountRequest:()=> 'a',isCurrentAccountRequest:value=>value==='a',activeWorkspaceID:'w',
     state:{readers:[reader]},closeActiveCustomSelect(){},beginReaderNavigation(){began++;return 'nav';},
     readerCodeSelectionKey:()=> 'BC68',saveWorkspaceState(){},scheduleContinuitySync(){},refreshReaderContent:async()=>true,
-    showWebNotice:async()=>{notices++;},console};
+    notifyReaderColumnLimit:()=>false,showWebNotice:async()=>{notices++;},console};
   vm.createContext(c);
   vm.runInContext(text.slice(text.indexOf("function captureReferenceFocusRestoration("), text.indexOf("async function openInlineCodeReference(")), c);
   vm.runInContext(extract('guardReaderChapterSource','async function selectReaderNavigation(')+extract('selectReaderNavigation','function bindReaderNavigationKeyboard('),c);

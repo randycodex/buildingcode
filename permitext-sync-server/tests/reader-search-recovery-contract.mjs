@@ -280,7 +280,7 @@ function savedHarness() {
     isProAccount:()=>true,newReaderState:fields=>({id:`reader-${++nextID}`,...fields}),
     paneIDForReader:reader=>reader.id,defaultPaneWidthForID:()=>630,placePaneAfter(){},appendPaneIfMissing(){},
     updateBrowserSectionURL(){},scheduleContinuitySync(){},saveWorkspaceState(){saves++;},
-    showWebNotice:async(title,message)=>notices.push({title,message}),
+    notifyReaderColumnLimit:()=>false,showWebNotice:async(title,message)=>notices.push({title,message}),
     normalizeAnnotationBlockID:value=>value||"",transitionWorkspace:async()=>{},whenWorkspacePaneReady:async()=>true,
     resolvedReaderSourceNavigations:new WeakMap(),track:{querySelector:()=>null},CSS:{escape:value=>value},
     retainReaderForSource:()=>null,

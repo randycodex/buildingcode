@@ -6,7 +6,8 @@ import {readerTabs,initializeReaderTabs,addReaderTab,openRecentReaderTab,canAddR
 import {linkPaneToView} from '../public/workflow-views.js';
 const source=readFileSync(new URL('../public/app.js', import.meta.url),'utf8');
 const actual=name=>{const start=source.indexOf(`function ${name}(`);return source.slice(start,source.indexOf('\n}',start)+2);};
-const code=actual('activateNotebookReference')+'\n'+source.slice(source.indexOf('function reusableSearchReader('),source.indexOf('\nfunction removeSectionDetail(',source.indexOf('function reusableSearchReader(')));
+const readerLimit=source.slice(source.indexOf('const maximumReaderColumns'), source.indexOf('function newReaderState('));
+const code=readerLimit+actual('activateNotebookReference')+'\n'+source.slice(source.indexOf('function reusableSearchReader('),source.indexOf('\nfunction removeSectionDetail(',source.indexOf('function reusableSearchReader(')));
 let serial=0;
 const state={readers:[{id:'manual',sectionID:'1'}],paneWeights:{}};
 const hidden=new Set();
@@ -33,6 +34,9 @@ hidden.add(notebook.id);
 const independent = await context.openSourceInReader({sectionID:'9'},'notebook');
 assert.notEqual(independent.id,notebook.id,'A link cannot move a hidden Reader in another view');
 assert.equal(notebook.sectionID,'8');
+assert.equal(state.readers.length,6);
+assert.equal((await open('still-available')).id,third.id,'An owned Reader remains available at the column limit');
+state.readers.pop(); // Leave a slot for the delayed creation cases below.
 
 // A delayed source cannot open in a different view, or reveal after switching
 // away and back while its column is hydrating.

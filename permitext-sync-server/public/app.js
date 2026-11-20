@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-compact-toolbar-v2615";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-reader-column-limit-v2616";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261120-compact-toolbar-v2615";
+} from "./offline-storage.js?v=20261120-reader-column-limit-v2616";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4818,6 +4818,18 @@ function changeSavedTextSize(delta) {
   saveWorkspaceState();
 }
 
+const maximumReaderColumns = 6;
+
+function readerColumnLimitReached() {
+  return state.readers.length >= maximumReaderColumns;
+}
+
+function notifyReaderColumnLimit() {
+  if (!readerColumnLimitReached()) return false;
+  void showWebNotice("Reader limit reached", `A workspace can have up to ${maximumReaderColumns} Reader columns. Close existing Readers to make room.`);
+  return true;
+}
+
 function newReaderState(overrides = {}) {
   const codePrefix = overrides.codePrefix || "BC";
   return {
@@ -4925,6 +4937,7 @@ function prepareReaderSourceTab(reader, fields, { allowNewColumn = true } = {}) 
       retainReaderColumn(reader);
       return reader;
     }
+    if (notifyReaderColumnLimit()) return null;
     // Keep every existing session when a link needs a seventh code.
     const destination = newReaderState(fields);
     initializeReaderTabs(destination);
@@ -4996,6 +5009,7 @@ async function transferReaderTab(reader, tabID, { duplicate = false, destination
   if (!isProAccount() || !state.readers.includes(reader) || destination === reader ||
       (!destination && currentColumnWorkflowView() === 'notebook') ||
       (destination && (!state.readers.includes(destination) || !canAddReaderTab(destination)))) return;
+  if (!destination && notifyReaderColumnLimit()) return;
   rememberReaderTabPosition(reader);
   const tab = readerTabs(reader).find(item => item.id === tabID);
   if (!tab || (!duplicate && !destination && readerTabs(reader).length === 1)) return;
@@ -5043,8 +5057,10 @@ function openReaderTabMenu(reader, tabID, anchor) {
     menu.append(button);
   };
   if (isProAccount() && currentColumnWorkflowView() !== 'notebook') {
-    add('Move to new column', () => transferReaderTab(reader, tabID), readerTabs(reader).length < 2);
-    add('Duplicate in new column', () => transferReaderTab(reader, tabID, { duplicate: true }));
+    const atLimit = readerColumnLimitReached();
+    const limit = atLimit ? ` (maximum ${maximumReaderColumns} Readers open)` : '';
+    add(`Move to new column${limit}`, () => transferReaderTab(reader, tabID), atLimit || readerTabs(reader).length < 2);
+    add(`Duplicate in new column${limit}`, () => transferReaderTab(reader, tabID, { duplicate: true }), atLimit);
     for (const destination of state.readers.filter(item => item !== reader && workflowPaneIsVisible(paneIDForReader(item)))) {
       add(`Move to ${readerPositionLabel(destination)}${canAddReaderTab(destination) ? '' : ` (full · ${maximumReaderTabs} codes)`}`,
         () => transferReaderTab(reader, tabID, { destination }), !canAddReaderTab(destination));
@@ -6779,6 +6795,7 @@ async function openOrUpdateLinkedReaderForSearch(searchID, detail, overrides = {
     placeLinkedReaderAfterSectionDetail(searchID, reader.id);
     return reader;
   }
+  if (notifyReaderColumnLimit()) return null;
   const reader = newReaderState(readerFieldsForSectionDetail(detail, overrides));
   state.readers.push(reader);
   searchLinkedReadersBySearch()[searchID] = reader.id;
@@ -10872,15 +10889,18 @@ function syncReaderToolbarButton(button) {
   const newReaderButton = button.id === 'add-reader';
   const readerLabel = newReaderButton ? "New reader" : "Reader";
   const notebookButton = button.id === 'add-notebook-reader';
-  const notebookOpen = notebookButton && pro && !state.notebookReaderHidden && state.readers.some(reader => state.workflowMembership?.[`reader:${reader.id}`]?.includes('notebook'));
+  const notebookReader = notebookButton && pro && state.readers.some(reader => state.workflowMembership?.[`reader:${reader.id}`]?.includes('notebook'));
+  const notebookOpen = notebookReader && !state.notebookReaderHidden;
+  const atLimit = pro && !requiresProject && !notebookReader && readerColumnLimitReached();
   button.querySelector("span").textContent = pro && !notebookButton && !newReaderButton ? `${readerLabel} +` : readerLabel;
   if (notebookButton) button.setAttribute('aria-pressed', String(Boolean(notebookOpen)));
   button.dataset.mobileLabel = readerLabel;
   button.hidden = button.id === "free-reader" ? pro || state.readers.length === 0 : !pro;
-  button.disabled = false;
-  button.title = requiresProject ? "Choose a workspace first to open Reader" : notebookButton ? notebookOpen ? 'Close Notebook Reader' : 'Open Notebook Reader' : replacesReader ? "Choose another code for this Reader" : isProAccount() ? "Open a Reader as the first column" : "Choose a code for Reader";
+  button.disabled = atLimit;
+  const limitLabel = `Maximum ${maximumReaderColumns} Reader columns`;
+  button.title = atLimit ? `${limitLabel}. Close existing Readers to make room.` : requiresProject ? "Choose a workspace first to open Reader" : notebookButton ? notebookOpen ? 'Close Notebook Reader' : 'Open Notebook Reader' : replacesReader ? "Choose another code for this Reader" : pro ? "Open a Reader as the first column" : "Choose a code for Reader";
   button.classList.toggle("has-open-reader", !newReaderButton && (notebookButton ? Boolean(notebookOpen) : state.readers.length > 0));
-  button.setAttribute("aria-label", readerLabel);
+  button.setAttribute("aria-label", atLimit ? `${readerLabel} · ${limitLabel}` : readerLabel);
 }
 
 function updateReaderPlanControls() {
@@ -10965,6 +10985,7 @@ async function openReaderFromToolbar(button) {
   if (notebookReader) {
     return setNotebookReaderHidden(notebookReader, !state.notebookReaderHidden);
   }
+  if (isProAccount() && notifyReaderColumnLimit()) return false;
   openReaderCodePicker(button, async code => {
     if (!isCurrent() || workspaceColumnsRequireProject()) return;
     // Recheck at selection time: another picker may have created the Reader.
@@ -10981,8 +11002,10 @@ async function openReaderFromToolbar(button) {
       return;
     }
     // Replace the free Reader synchronously, including overlapping picker clicks.
-    if (!isProAccount()) enforceReaderPlanLimit();
-    const previous = !isProAccount() ? state.readers[0] : null;
+    const pro = isProAccount();
+    if (pro && notifyReaderColumnLimit()) return;
+    if (!pro) enforceReaderPlanLimit();
+    const previous = !pro ? state.readers[0] : null;
     const reader = newReaderState({
       codePrefix: code.prefix, codeVersion: codeOptionVersion(code),
       ...(previous ? { id: previous.id } : {})
@@ -20780,6 +20803,7 @@ async function openReferenceInAdjacentReader(sourceReader, detail) {
   }
   const canAddReader = isProAccount() || state.readers.length < 1;
   if (!targetReader && canAddReader) {
+    if (notifyReaderColumnLimit()) return;
     targetReader = newReaderState({
       ...readerFieldsForSectionDetail(detail),
       referenceSourceReaderID: sourceReader.id
@@ -42157,6 +42181,7 @@ async function openDeepLinkedSectionInReader(item) {
     || (!isProAccount() ? state.readers[0] : null);
   if (!reader && isProAccount()) reader = state.readers.find(candidate => Array.isArray(candidate.tabs) && workflowPaneIsVisible(paneIDForReader(candidate)));
   if (!reader) {
+    if (notifyReaderColumnLimit()) return;
     reader = newReaderState(readerFieldsForSectionDetail(detail, {
       shouldSmoothScrollToSection: false
     }));
@@ -42519,6 +42544,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   }
   if (!reader) {
     if (isProAccount() || state.readers.length < 1) {
+      if (notifyReaderColumnLimit()) return null;
       reader = newReaderState(sourceFields);
       state.readers.push(reader);
       createdReader = true;
@@ -46230,6 +46256,7 @@ async function restoreSavedColumnGroup(groupID) {
     let id = oldID;
     if (!isProAccount() && (column.kind !== 'reader' || state.readers.length >= 1)) continue;
     if (column.kind === 'reader') {
+      if (readerColumnLimitReached()) continue;
       state.readers.push(column.value);
       if (column.position) pendingGroupReaderPositions.set(column.value.id, column.position);
     } else if (column.kind === 'utility' || column.kind === 'research') {
@@ -52463,7 +52490,7 @@ function workspaceCommandDefinitions() {
     { label: "Open Search", hint: "Find sections across all codes", run: () => openNewSearchColumn() },
     { label: "Open Research", hint: "Ask a cited building-code question", run: () => focusUtility("analysis", ".research-question-input") },
     { label: "Open Calculator", hint: "Calculate occupant load from the BC table", run: () => openCalculatorColumn() },
-    ...(isProAccount() || state.readers.length < 1
+    ...(!readerColumnLimitReached()
       ? [{ label: "New Reader", hint: "Open another code column", run: () => readerToolbarButtonForCurrentView().click() }]
       : []),
     { label: "Open Evidence and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },

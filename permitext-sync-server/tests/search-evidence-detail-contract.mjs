@@ -27,7 +27,7 @@ function fixture() {
     whenWorkspacePaneReady:async()=>true,retainReaderForSource:()=>null,resolvedReaderSourceNavigations:new WeakMap(),
     track:{querySelector:()=>null},CSS:{escape:v=>v},paneIsCollapsed:()=>false,columnExpansionController:()=>({reveal(){}}),
     revealReaderSourceTarget:(reader,item,anchor,options)=>reveals.push({reader,item,anchor,options}),scrollPaneIntoView(){},
-    showWebNotice:async()=>{},sectionDetailsBySearch:()=>details,sectionDetailAnchorsBySearch:()=>anchors,
+    notifyReaderColumnLimit:()=>false,showWebNotice:async()=>{},sectionDetailsBySearch:()=>details,sectionDetailAnchorsBySearch:()=>anchors,
     searchWords,searchWordPattern
   });
   vm.runInContext(['prepareReaderSourceTab','reusableSearchReader','openSourceInReader','openSearchResultDetail','openSavedItemInReader',

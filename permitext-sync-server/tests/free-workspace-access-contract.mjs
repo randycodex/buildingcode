@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+const readerLimit = source.slice(source.indexOf('const maximumReaderColumns'), source.indexOf('function newReaderState('));
 const actual = name => {
   const match = source.match(new RegExp(`^(?:async )?function ${name}\\([^\\n]*\\) \\{[\\s\\S]*?^}`, 'm'));
   assert.ok(match, name);
@@ -15,7 +16,7 @@ const c = vm.createContext({ state, isProAccount:()=>pro,
   paneIDForReader:r=>`reader:${r.id}`, searchLinkedReadersBySearch:()=>state.searchLinkedReaders });
 const blocked = ['createGeneralWorkspace', 'duplicateNamedWorkspace', 'openCalculatorColumn',
   'openNewSearchColumn', 'openNewResearchColumn', 'toggleGenericWorkboard'];
-vm.runInContext([...blocked, 'toggleUtilityPane', 'focusUtility', 'focusRecentUtilityColumn',
+vm.runInContext(readerLimit + [...blocked, 'toggleUtilityPane', 'focusUtility', 'focusRecentUtilityColumn',
   'switchWorkflowView', 'enforceReaderPlanLimit', 'defaultActivePaneIDs', 'workflowPaneIsVisible',
   'syncReaderToolbarButton', 'paneCanCollapse', 'paneIsCollapsed'].map(actual).join('\n'), c);
 // Denied actions must return before touching storage, prompts, or tool loaders.
@@ -84,6 +85,13 @@ button.id = 'add-reader';
 c.syncReaderToolbarButton(button);
 assert.equal(button.hidden, false);
 assert.equal(label.textContent, 'New reader');
+state.readers.push({id:'fourth'}, {id:'fifth'}, {id:'sixth'});
+c.syncReaderToolbarButton(button);
+assert.equal(button.disabled,true);
+assert.match(button.title,/Maximum 6 Reader columns/);
+state.readers.pop();
+c.syncReaderToolbarButton(button);
+assert.equal(button.disabled,false);
 const welcome = vm.createContext({
   state: {readers: []}, firstUseWelcomeActive: false, detachedProjectWindow: false,
   isProAccount: () => false, entryHasExternalIntent: () => false,
@@ -108,7 +116,9 @@ console.log('Free access passed: blocked tools and workspace actions, restored p
 {
  pro=true;const attrs={},classes=new Map(),readerLabel={};
  const notebookButton={id:'add-notebook-reader',dataset:{},querySelector:()=>readerLabel,classList:{toggle:(name,on)=>classes.set(name,on)},setAttribute:(name,value)=>attrs[name]=value};
+ state.readers.push({id:'sixth'});
  state.workflowMembership={};c.syncReaderToolbarButton(notebookButton);assert.equal(attrs['aria-pressed'],'false');assert.equal(classes.get('has-open-reader'),false);assert.equal(readerLabel.textContent,'Reader');
  state.workflowMembership={'reader:first':['notebook']};c.syncReaderToolbarButton(notebookButton);assert.equal(attrs['aria-pressed'],'true');assert.equal(classes.get('has-open-reader'),true);assert.equal(readerLabel.textContent,'Reader');assert.equal(notebookButton.title,'Close Notebook Reader');
  state.notebookReaderHidden=true;c.syncReaderToolbarButton(notebookButton);assert.equal(attrs['aria-pressed'],'false');assert.equal(classes.get('has-open-reader'),false);assert.equal(notebookButton.title,'Open Notebook Reader');
+ assert.equal(notebookButton.disabled,false,'An existing Notebook Reader can reopen at the limit');
 }

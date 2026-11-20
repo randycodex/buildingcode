@@ -25,7 +25,7 @@ const context=vm.createContext({state,document,track,isProAccount:()=>pro,reader
  codeQuestionWorkspaceState:()=>({}),closeCodeDecisionContext:value=>value,setCodeQuestionWorkspaceState(){},
  workspacePrivatePresentationAllowed:()=>true,visibleWorkspaceRecords:()=>projects.filter(p=>!p.deletedAt&&!p.archivedAt),
  openWorkspaceContextMenu:async()=>{choices++;},createNewWorkspace:async()=>{creates++;},
- openReaderCodePicker:()=>{opens++;},currentColumnWorkflowView:()=>"research",captureAccountRequest:()=>({}),
+ openReaderCodePicker:()=>{opens++;},notifyReaderColumnLimit:()=>false,currentColumnWorkflowView:()=>"research",captureAccountRequest:()=>({}),
  paneIDForReader:reader=>`reader:${reader.id}`,
  restoreAssistantConversationOwners:()=>assert.fail('Unselected workspace must not restore Assistant owners'),
  toggleAccountDialog:()=>{settings++;},releaseSurfaceVisibility:{workboard:true},

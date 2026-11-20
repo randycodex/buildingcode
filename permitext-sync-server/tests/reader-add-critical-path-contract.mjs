@@ -7,6 +7,7 @@ import * as syncIdentity from '../public/sync-identity.js';
 import {linkPaneToView} from '../public/workflow-views.js';
 import {orderColumnGroups} from '../public/workspace-state.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+const readerLimit = source.slice(source.indexOf('const maximumReaderColumns'), source.indexOf('function newReaderState('));
 function actual(name) {
   const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));
   assert.ok(start>=0,name);
@@ -38,7 +39,7 @@ function fixture({pro=true,view='notebook',paneIDs=[],groups=[],hidden=[]}={}) {
     readerShortcuts:{activePaneID:()=>c.activeColumn || ''},
     transitionWorkspace:()=>rendering,scrollPaneIntoView:id=>scrolled.push(id)
   });
-  vm.runInContext(['newReaderState','requestLinkedPanePlacement','placePaneAfter','placePaneBefore','applyLinkedPanePlacements','activateNotebookReference','setNotebookReaderHidden','openReaderFromToolbar'].map(actual).join('\n'),c);
+  vm.runInContext(readerLimit + ['newReaderState','requestLinkedPanePlacement','placePaneAfter','placePaneBefore','applyLinkedPanePlacements','activateNotebookReference','setNotebookReaderHidden','openReaderFromToolbar'].map(actual).join('\n'),c);
   return {c,pickers,scrolled,finishRender};
 }
 const code={prefix:'PC',version:'2022'};
@@ -63,12 +64,30 @@ for (const change of [c=>{c.view='report';},c=>{c.activeWorkspaceID='project-b';
 // Reserve slots synchronously so overlapping menu selections respect plan limits.
 for (const pro of [false,true]) {
   const f=fixture({pro,view:'research'});
-  await Promise.all([f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({})]);
+  await Promise.all(Array.from({length:8}, () => f.c.openReaderFromToolbar({})));
   const pending=f.pickers.map(pick=>pick(code));
-  assert.equal(f.c.state.readers.length,pro?3:1);
+  assert.equal(f.c.state.readers.length,pro?6:1);
   assert.equal(new Set(f.c.state.readers.map(r=>r.id)).size,f.c.state.readers.length);
   f.c.view='report';f.finishRender();await Promise.all(pending);
   assert.equal(f.scrolled.length,0,'Late rendering must not reveal a pane over another selected view');
+}
+{
+  const f=fixture({view:'research'});
+  f.c.state.readers=Array.from({length:7}, (_,i) => ({id:`legacy-${i}`}));
+  const saved=JSON.stringify(f.c.state.readers);
+  assert.equal(await f.c.openReaderFromToolbar({}),false);
+  assert.equal(JSON.stringify(f.c.state.readers),saved,'Existing Reader sessions above the limit are preserved');
+  f.c.state.readers.pop();
+  assert.equal(await f.c.openReaderFromToolbar({}),false,'Six columns still fill the available slots');
+  f.c.state.readers.pop();
+  assert.equal(await f.c.openReaderFromToolbar({}),true,'Closing a Reader makes space for another');
+  f.finishRender();await f.pickers[0](code);
+  assert.equal(f.c.state.readers.length,6);
+  for (const reader of f.c.state.readers) {
+    for (let i=1; i<6; i++) addReaderTab(reader,{codePrefix:code.prefix,codeVersion:code.version},`tab-${i}`);
+    assert.equal(addReaderTab(reader,code,'seventh'),null);
+  }
+  assert.equal(f.c.state.readers.reduce((total,reader)=>total+readerTabs(reader).length,0),36);
 }
 const guarded=fixture();guarded.c.needsProject=true;
 assert.equal(await guarded.c.openReaderFromToolbar({}),false);assert.equal(guarded.pickers.length,0);
