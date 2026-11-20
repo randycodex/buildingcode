@@ -380,7 +380,7 @@ function drawCover(document, manifest, unversioned) {
     .fillColor(colors.muted)
     .font("Report-Regular")
     .fontSize(10)
-    .text(metadata.join("  /  "), { lineGap: 3 });
+    .text(metadata.join("\n"), { lineGap: 3 });
 }
 
 // Lay out authored runs explicitly so marks, links and printed highlights stay

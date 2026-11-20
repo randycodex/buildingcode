@@ -41,7 +41,9 @@ async function layout(bytes, format) {
   await pdf.destroy(); return pages;
 }
 function assertCleanCover(firstPage) {
-  const text = firstPage.map(([value]) => value).join('\n');
+  const text = firstPage.map(([value]) => value).filter(Boolean).join('\n');
+  assert.match(text, /^100 Synthetic Street\n[^\n]+ UTC\nPage layout test\n(?:Report version \d+\n)?Project default: /m,
+    'Cover details appear on separate lines in reading order.');
   assert.doesNotMatch(text, /Professional-use notice|unofficial reference tool|AI-assisted Research is limited/);
   assert.doesNotMatch(text, /^(PUBLISHED CODE|USER-AUTHORED|AI-ASSISTED RESEARCH|PROJECT MATERIAL)$/mi);
   assert.doesNotMatch(text, /^(Manifest|SHA-256)\b/mi);
