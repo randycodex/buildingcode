@@ -862,6 +862,7 @@ private struct PassageCommentEditor: View {
     @State private var addedProject: CodeFolder?
     @State private var addedSession: UUID?
     @State private var previousComment = ""
+    @State private var fieldGeneration = 0
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -870,6 +871,7 @@ private struct PassageCommentEditor: View {
             TextField("Add a comment", text: $bodyText, axis: .vertical)
                 .lineLimit(1...)
                 .focused($focused)
+                .id(fieldGeneration)
                 .padding(14)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .background(Color(uiColor: .systemBackground), in: RoundedRectangle(cornerRadius: 16))
@@ -902,7 +904,10 @@ private struct PassageCommentEditor: View {
                     case .failed(_, let message):
                         failure = message
                     case .saved:
+                        // Replace the native editing buffer, including any marked text.
                         bodyText = previousComment
+                        fieldGeneration += 1
+                        failure = nil
                         library.removeSection(sectionID, fromFolder: project.id)
                         if !library.isSavedToReaderDestination(sectionID: sectionID) { addedProject = nil }
                         else { failure = library.statusMessage }
