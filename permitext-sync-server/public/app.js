@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-grayscale-theme-v2580";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-reader-header-v2581";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-grayscale-theme-v2580";
+} from "./offline-storage.js?v=20261119-reader-header-v2581";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -5074,9 +5074,12 @@ function openReaderTabMenu(reader, tabID, anchor) {
 
 function renderReaderTabs(panel, reader) {
   initializeReaderTabs(reader);
-  const actions = panel.querySelector('.panel-actions');
   let strip = panel.querySelector('.reader-column-tabs');
-  if (!strip) { strip = document.createElement('div'); strip.className = 'reader-column-tabs'; panel.prepend(strip); }
+  if (!strip) {
+    strip = document.createElement('div');
+    strip.className = 'reader-column-tabs';
+    panel.querySelector('.reader-internal-search').before(strip);
+  }
   strip.replaceChildren();
   panel.classList.add('has-reader-tabs');
   panel.dataset.readerTabId = reader.activeTabID;
@@ -5117,10 +5120,6 @@ function renderReaderTabs(panel, reader) {
     add.title = add.disabled ? `Maximum ${maximumReaderTabs} codes per column` : currentColumnWorkflowView() === 'notebook' ? 'Open a code · Keeps the 6 most recent tabs' : 'Add code tab';
     add.setAttribute('aria-label', add.disabled ? `${readerPositionLabel(reader)} is full · Maximum ${maximumReaderTabs} codes per column` : `Add code tab to ${readerPositionLabel(reader)}`);
     add.addEventListener('click', () => openReaderTabPicker(reader, add)); strip.append(add);
-  }
-  if (actions) {
-    actions.inert = Boolean(panel.dataset.readerTabPending);
-    strip.append(actions);
   }
   const content = panel.querySelector('.reader-body');
   content.id = `reader-tabpanel-${reader.id}`; content.setAttribute('role', 'tabpanel');
@@ -44245,10 +44244,29 @@ function positionWebAppUpdateNotice(notice, button) {
   notice.style.top = `${top}px`;
 }
 
+function syncThemePreviewColors(settings = document.querySelector(".settings-floating-panel[open]")) {
+  if (!settings?.isConnected) return;
+  const overlay = settings.closest("#workspace-menu-panel") || settings;
+  if (typeof overlay.showPopover !== "function") return;
+  const showColor = settings.open && settings.dataset.settingsTab === "appearance" &&
+    track.dataset.workspaceTheme === "grayscale";
+  if (showColor ? overlay.matches(":popover-open") : !overlay.hasAttribute("popover")) return;
+  const focused = document.activeElement;
+  if (showColor) {
+    // The top layer paints above the document's grayscale filter.
+    overlay.setAttribute("popover", "manual");
+    overlay.showPopover();
+  } else {
+    overlay.removeAttribute("popover");
+  }
+  if (overlay.contains(focused)) focused.focus({ preventScroll: true });
+}
+
 function applyWorkspaceTheme(value) {
   const theme = ["original", "tinted", "header-colors", "warm", "grayscale", "cool-slate"].includes(value) ? value : "tinted";
   track.dataset.workspaceTheme = theme;
   document.querySelectorAll(".settings-theme-radio").forEach(input => { input.checked = input.value === theme; });
+  syncThemePreviewColors();
 }
 
 function renderWorkspaceThemePicker() {
@@ -44345,7 +44363,12 @@ function mountAccountScreenContent(dialog, panel) {
   const floating = dialog.classList.contains("settings-floating-panel");
   dialog._disposeSettingsColumns = upgrade ? null : organizeAccountSettings(panel, {
     floating, selected: dialog.dataset.settingsTab || selectedSettingsTab,
-    onSelect: key => { panel._disposeInlineProfileEditor?.(); dialog.dataset.settingsTab = key; selectedSettingsTab = key; }
+    onSelect: key => {
+      panel._disposeInlineProfileEditor?.();
+      dialog.dataset.settingsTab = key;
+      selectedSettingsTab = key;
+      if (floating) syncThemePreviewColors(dialog);
+    }
   });
   const header = document.createElement("header");
   header.className = "account-screen-header";
@@ -44418,6 +44441,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false, mount = null } =
     if (dialog.querySelector(".web-warning-backdrop")) activeWebWarningClose?.(false);
     if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
     dialog.open = false;
+    if (floating) syncThemePreviewColors(dialog);
     dialog._disposeSettingsColumns?.();
     dialog._floatingControls?.dispose();
     dialog._disposeLibraryDownloadProgress?.();
@@ -44456,6 +44480,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false, mount = null } =
     manageAnchor: true, topGap: 25,
     alignmentReference: workspaceFloatingPanelReference
   });
+  if (floating) syncThemePreviewColors(dialog);
   if (!floating) state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
   syncWorkflowNavigation();
   if (!mount) (dialog.querySelector('[role="tab"][aria-selected="true"]') || dialog).focus({ preventScroll: true });
@@ -47089,7 +47114,6 @@ function focusColumnGroupControl(group) {
 }
 
 function prepareColumnGroupControls(panel, header, group) {
-  header = panel.querySelector('.reader-column-tabs .panel-actions') || header;
   if (panel.classList.contains('notebook-panel') || panel.classList.contains('notebook-index-panel')) {
     header.querySelector('.column-group-menu-button')?.remove();
     panel.querySelector('.column-group-collapsed-menu')?.remove();
@@ -47670,8 +47694,7 @@ function preparePaneCollapse(panel) {
     });
     panel.append(rail);
   }
-  const closeControls = panel.querySelector('.reader-column-tabs .panel-actions') || header;
-  const headerClose = closeControls.querySelector("button[class*='close']");
+  const headerClose = header.querySelector("button[class*='close']");
   let collapsedClose = panel.querySelector(":scope > .pane-collapsed-close");
   if (headerClose) {
     if (!collapsedClose) {
@@ -47680,7 +47703,7 @@ function preparePaneCollapse(panel) {
       collapsedClose.className = "icon-button pane-collapsed-close";
       collapsedClose.addEventListener("click", (event) => {
         event.stopPropagation();
-        closeControls.querySelector("button[class*='close']")?.click();
+        header.querySelector("button[class*='close']")?.click();
       });
       panel.append(collapsedClose);
     }

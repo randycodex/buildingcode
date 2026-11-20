@@ -2150,7 +2150,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 .reader-panel .panel-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
+  align-items: center;
   gap: var(--space-2);
   position: absolute;
   top: var(--panel-padding);
@@ -19574,7 +19574,7 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
   background: transparent;
   border: 0;
   padding: 0;
-  min-height: 32px;
+  min-height: var(--panel-title-row-height);
   text-align: left;
   font: inherit;
   font-size: 14px;
@@ -19587,7 +19587,7 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
   cursor: pointer;
 }
 /* Plain Notebook labels share the Research button's centered title row. */
-span.reader-collapse-title { cursor: default; line-height: 32px; }
+span.reader-collapse-title { cursor: default; line-height: var(--panel-title-row-height); }
 .reader-open-code-menu {
   position: fixed;
   z-index: 1100;
@@ -22138,7 +22138,8 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 
 /* Apply Grayscale to the workspace document, including menus and native dialogs. */
 html:has(#panel-track[data-workspace-theme="grayscale"]),
-html:has(#panel-track[data-workspace-theme="grayscale"]) :is(:modal, :popover-open) {
+html:has(#panel-track[data-workspace-theme="grayscale"])
+  :is(:modal, :popover-open):not(.workspace-menu-panel, .settings-floating-panel) {
   filter: grayscale(1);
 }
 
@@ -22193,7 +22194,7 @@ html:has(#panel-track[data-workspace-theme="grayscale"]) :is(:modal, :popover-op
   border-radius: 4px;
 }
 
-#panel-track[data-workspace-theme="header-colors"] > .reader-panel > .panel-header .reader-collapse-title {
+#panel-track[data-workspace-theme="header-colors"] > .reader-panel > .panel-header :is(.reader-collapse-title, .panel-actions) {
   background-color: transparent;
 }
 
