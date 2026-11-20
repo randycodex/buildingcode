@@ -17,3 +17,18 @@ html[data-read-only="true"] .notebook-format-toolbar { display: none; }
 .permitext-notebook-editor :is(.bn-editor, .bn-block, .bn-block-content) { min-width: 0; max-width: 100%; }
 .permitext-notebook-editor .bn-block-content > .bn-inline-content { flex: 1 1 0%; overflow-wrap: anywhere; }
 .permitext-notebook-editor .notebook-reference-chip { white-space: normal; overflow-wrap: anywhere; }
+
+.notebook-reference-chip:is([data-reference-kind="canonicalSection"], [data-reference-kind="selectedPassage"]) {
+  display: inline-block;
+  box-sizing: border-box;
+  margin-block: 0.25em;
+  vertical-align: middle;
+}
+.permitext-notebook-editor td .notebook-reference-chip:is([data-reference-kind="canonicalSection"], [data-reference-kind="selectedPassage"]) {
+  display: block;
+}
+.notebook-reference-chip:is([data-reference-kind="canonicalSection"], [data-reference-kind="selectedPassage"]) .notebook-reference-meta {
+  display: block;
+  font-size: 0.85em;
+  color: inherit;
+}
