@@ -2695,7 +2695,8 @@ async function main() {
         workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-x: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
         workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-4\);/) &&
         workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?border: 0;[\s\S]*?border-radius: 8px;[\s\S]*?background: transparent;/) &&
-        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: var\(--space-1\);[\s\S]*?padding: 12px;/) &&
+        workspaceStyles.text.includes("--workspace-list-item-padding: 12px;") &&
+        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: var\(--space-1\);[\s\S]*?padding: var\(--workspace-list-item-padding\);/) &&
         workspaceScript.text.includes('code.className = "search-jump-code"') &&
         workspaceScript.text.includes("isNestedListParagraph = !rawPreview && Boolean(titleWithoutNumber)") &&
         workspaceScript.text.includes('String(entry.sectionNumber || "Paragraph").trim()') &&

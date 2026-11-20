@@ -233,7 +233,7 @@ assert.match(
 const openSavedItemSource = functionSource(appSource, "openSavedItemInReader");
 assert.match(
   openSavedItemSource,
-  /openSourceInReader\(item, savedPaneID, \{ sourceSurface: "saved", isCurrent, forceNewReader: currentColumnWorkflowView\(\) !== 'notebook',[\s\S]*?evidenceAnchor: item\.evidenceAnchor/,
+  /openSourceInReader\(item, savedPaneID, \{ sourceSurface: "saved", isCurrent,\s*forceNewReader: !fromEvidence && currentColumnWorkflowView\(\) !== 'notebook',[\s\S]*?evidenceAnchor: item\.evidenceAnchor/,
   "A saved passage opens its exact source directly in Reader."
 );
 assert.doesNotMatch(openSavedItemSource, /openOrUpdateLinkedReaderForSearch/,
@@ -870,7 +870,7 @@ assert.match(appSource, /let savedSearchContentMinHeight = 0;[\s\S]*?const prese
 assert.match(stylesSource, /\.saved-project-structured-group \{[\s\S]*?gap: 0;[\s\S]*?\.saved-project-structured-group\.project-section-motion\.is-open > \.saved-project-structured-group-body \{[\s\S]*?padding-top: 2px;/);
 assert.match(stylesSource, /\.saved-project-structured-facts-list \{[^}]*width: calc\(100% \+ \(2 \* var\(--space-3\)\)\);[^}]*margin-inline: calc\(-1 \* var\(--space-3\)\);/);
 assert.match(stylesSource, /\.saved-project-structured-fact \{[^}]*padding: var\(--space-2\) var\(--space-3\);/);
-assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-evidence-body \.saved-code-group \.saved-row \{[^}]*width: calc\(100% \+ \(2 \* var\(--space-3\)\)\);[^}]*margin-inline: calc\(-1 \* var\(--space-3\)\);[^}]*border-bottom: 0;/);
+assert.match(stylesSource, /\.saved-panel \.saved-folder-context\.is-project \.saved-project-evidence-body \.saved-code-group \.saved-row \{[^}]*width: calc\(100% - 2 \* var\(--panel-padding\)\);[^}]*padding: var\(--workspace-list-item-padding\);/, "Evidence highlights use the same panel gutters and row padding as Search.");
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-auto-flow: column;[\s\S]*?grid-auto-columns: minmax\(0, 1fr\);[\s\S]*?width: 100%;/);
@@ -901,7 +901,8 @@ assert.match(stylesSource, /\.saved-section-row:hover \.saved-row-actions button
 assert.match(stylesSource, /\.saved-row-actions button:hover,[\s\S]*?\.saved-row-actions button:focus-visible \{[\s\S]*?background: color-mix/, "Saved Evidence pill fills must appear only on direct action hover or focus.");
 assert.match(stylesSource, /\.search-results \{[\s\S]*?width: calc\(100% \+ \(2 \* var\(--panel-padding\)\)\);[\s\S]*?margin-inline: calc\(-1 \* var\(--panel-padding\)\);[\s\S]*?overflow-x: hidden;/, "Search rows must span the column without horizontal overflow.");
 assert.match(stylesSource, /\.result-row \{[\s\S]*?padding: var\(--space-4\) var\(--panel-padding\);/, "Search result dividers must retain a full-width row with an inner text gutter.");
-assert.match(stylesSource, /\.search-jump-open \{[^}]*padding: 12px;/, "Recently Viewed rows must retain consistent spacing around their content.");
+assert.match(stylesSource, /--workspace-list-item-padding: 12px;/);
+assert.match(stylesSource, /\.search-jump-open \{[^}]*padding: var\(--workspace-list-item-padding\);/, "Recently Viewed rows share their padding with Evidence.");
 assert.match(stylesSource, /\.notebook-reference-chip \{[\s\S]*?display: inline-grid;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/, "Notebook links must read as compact evidence previews rather than pills.");
 assert.match(stylesSource, /\.notebook-card-row\.is-active-title \{[^}]*grid-template-columns: minmax\(0, 1fr\) auto;[^}]*align-items: center;[\s\S]*?\.notebook-card-list-title-editor \{[^}]*width: 100%;[^}]*background: transparent;[^}]*font-weight: 400;/, "The selected Notebook Note title must remain editable in the Notes list.");
 assert.match(stylesSource, /\.notebook-reference-meta \{[\s\S]*?color: var\(--text-tertiary\);[\s\S]*?\.notebook-reference-title \{[\s\S]*?font-weight: 700;[\s\S]*?\.notebook-reference-preview \{[\s\S]*?-webkit-line-clamp: 2;/, "Notebook references must expose a compact source, title, and preview hierarchy.");
