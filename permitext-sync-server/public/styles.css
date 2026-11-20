@@ -20057,7 +20057,7 @@ dialog.report-screen {
 .report-outline .report-outline-section-items { margin: 0 0 4px 24px; }
 .report-outline :is(.report-outline-section-items, .report-outline-section-space, .report-outline-section-toggle)[hidden] { display: none; }
 .report-outline-item { position: relative; gap: 4px; padding: 4px 0; border-radius: var(--radius-control); }
-.report-outline-item:hover { background: var(--menu-surface); }
+.report-outline-item:is(:hover, :has(:focus-visible)) { background: var(--menu-highlight); }
 .report-outline .report-outline-drag { display: grid; place-items: center; width: 20px; min-width: 20px; padding: 5px 0; cursor: grab; touch-action: none; opacity: 0.45; }
 .report-outline-drag svg { width: 12px; height: 12px; }
 .report-outline-item:hover .report-outline-drag, .report-outline-drag:focus-visible { opacity: 1; }
