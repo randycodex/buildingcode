@@ -1680,10 +1680,6 @@ body .workspace-panel :has(> .column-loading-indicator) {
   --panel-title-control-size: var(--panel-title-row-height);
   --panel-title-icon-size: 18px;
   --panel-control-row-top: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-2));
-  --panel-third-row-top: calc(var(--panel-control-row-top) + max(30px, var(--chrome-font-size) * 1.8));
-  --panel-third-row-height: 28px;
-  --panel-controls-bottom: calc(var(--panel-third-row-top) + var(--panel-third-row-height) + var(--space-4));
-  --panel-content-top: calc(var(--panel-controls-bottom) + var(--panel-padding) + var(--space-5));
   container-type: inline-size;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -1701,10 +1697,6 @@ body .workspace-panel :has(> .column-loading-indicator) {
   background: var(--surface-raised);
   box-shadow: none;
   transition: transform 260ms cubic-bezier(0.2, 0, 0, 1), opacity 180ms ease;
-}
-
-@media (pointer: coarse) {
-  .workspace-panel { --panel-third-row-height: 44px; }
 }
 
 .panel-track > .workspace-panel {
@@ -4948,9 +4940,6 @@ select option:checked {
 }
 
 .search-panel {
-  --search-field-height: calc(var(--panel-third-row-top) - var(--panel-control-row-top) - var(--space-1));
-  --search-field-offset: calc(var(--panel-control-row-top) - var(--panel-padding) - var(--panel-title-row-height));
-  --search-content-top: var(--panel-content-top);
   position: relative;
   grid-template-rows: auto auto minmax(0, 1fr);
   min-width: 300px;
@@ -4959,14 +4948,6 @@ select option:checked {
 
 .workspace-panel.search-panel {
   padding-bottom: 0;
-}
-
-.search-panel:has(> .search-results-viewport > .search-results.is-history) {
-  --search-content-top: var(--panel-third-row-top);
-}
-
-@media (pointer: coarse) {
-  .search-panel { --search-field-height: 48px; }
 }
 
 .search-panel > :is(.search-dock, .search-results-viewport) {
@@ -4995,6 +4976,10 @@ select option:checked {
   background: linear-gradient(to bottom, var(--surface), transparent);
 }
 
+.search-panel > .search-dock {
+  padding-inline: 0;
+}
+
 .search-panel::before {
   content: none;
 }
@@ -5002,7 +4987,6 @@ select option:checked {
 .search-panel .panel-header {
   position: relative;
   z-index: 2;
-  margin-bottom: 0;
 }
 
 .search-box {
@@ -5022,9 +5006,8 @@ select option:checked {
 }
 
 .search-panel .search-box {
-  grid-template-rows: minmax(0, 1fr);
-  height: var(--search-field-height);
-  min-height: var(--search-field-height);
+  height: 48px;
+  min-height: 48px;
   border: 0;
   border-radius: var(--radius-pill);
 }
@@ -5061,11 +5044,6 @@ select option:checked {
   font-weight: 500;
   outline: 0;
   box-shadow: none;
-}
-
-.search-panel .search-input {
-  height: 100%;
-  min-height: 0;
 }
 
 .search-input::-webkit-search-cancel-button {
@@ -5348,7 +5326,7 @@ select option:checked {
   margin: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0;
+  padding: 4px 0 0;
   font-family: var(--ui-font-family);
   font-size: var(--chrome-font-size) !important;
   line-height: 1.45;
@@ -5363,10 +5341,7 @@ select option:checked {
   display: grid;
   gap: var(--space-2);
   margin: 0 calc(-1 * var(--panel-padding));
-  box-sizing: border-box;
-  min-height: calc(var(--search-content-top) - var(--panel-padding) - var(--panel-title-row-height));
-  align-content: start;
-  padding: var(--search-field-offset) 0 var(--space-1);
+  padding: var(--space-2) var(--panel-padding) var(--space-3);
   background: color-mix(in srgb, var(--surface) 94%, var(--background));
 }
 
@@ -5738,12 +5713,13 @@ select option:checked {
   max-height: none;
   min-height: 0;
   overflow-y: auto;
+  padding-top: 48px;
 }
 
 .search-recent-popover {
   position: absolute;
   z-index: 12;
-  top: calc(var(--search-field-offset) + var(--search-field-height) + var(--space-1));
+  top: calc(var(--space-2) + 42px + var(--space-2));
   right: var(--panel-padding);
   left: var(--panel-padding);
   max-height: min(632px, calc(100vh - 180px));
@@ -17571,11 +17547,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
   max-height: none;
 }
 
-/* Default gap for columns without their own content alignment. */
+/* Keep non-Reader content on the Saved project-tool baseline. */
 .workspace-panel {
   --column-content-top-gap: calc(var(--space-2) + var(--space-3));
 }
-.workspace-panel:not(.reader-panel, .search-panel):not(.saved-panel):not(.notebook-panel):not(.report-draft-panel):not(.settings-panel):not(.assistant-workspace) > header + :not([hidden]) {
+.workspace-panel:not(.reader-panel):not(.saved-panel):not(.notebook-panel):not(.report-draft-panel):not(.settings-panel):not(.assistant-workspace) > header + :not([hidden]) {
   padding-top: var(--column-content-top-gap);
 }
 .notebook-panel > .notebook-shell,
@@ -18361,6 +18337,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: var(--menu-surface);
   border: 0;
   box-shadow: none;
+}
+
+.search-panel .search-results.is-history {
+  padding: 0;
 }
 
 .notebook-panel > .notebook-draft-status { display: none; }

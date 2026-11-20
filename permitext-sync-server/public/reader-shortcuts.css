@@ -21,10 +21,12 @@
 
 .workflow-toolbar .reader-column-shortcut{--code-accent:var(--text-primary)}
 .reader-panel.has-reader-tabs{
-  --reader-header-overlay-height:var(--panel-controls-bottom);
+  --reader-tab-row-height:28px;
+  --reader-tab-row-top:calc(var(--panel-control-row-top) + max(30px, 1.8em));
+  --reader-header-overlay-height:calc(var(--reader-tab-row-top) + var(--reader-tab-row-height) + 18px);
 }
 .reader-panel.has-reader-tabs .pane-drag-handle{display:none}
-.reader-column-tabs{position:absolute;top:var(--panel-third-row-top);left:var(--panel-padding);right:var(--panel-padding);z-index:9;display:flex;align-items:center;gap:var(--space-2);min-width:0;height:var(--panel-third-row-height);font-family:var(--ui-font-family);cursor:grab;user-select:none;-webkit-user-select:none}
+.reader-column-tabs{position:absolute;top:var(--reader-tab-row-top);left:var(--panel-padding);right:var(--panel-padding);z-index:9;display:flex;align-items:center;gap:var(--space-2);min-width:0;height:var(--reader-tab-row-height);font-family:var(--ui-font-family);cursor:grab;user-select:none;-webkit-user-select:none}
 .reader-panel.is-dragging>.reader-column-tabs{cursor:grabbing}
 .reader-code-tabs{display:flex;align-items:center;gap:6px;min-width:0;overflow-x:auto;scrollbar-width:none}
 .reader-code-tabs::-webkit-scrollbar{display:none}
@@ -35,4 +37,4 @@
 .reader-column-tabs>.icon-button{flex:0 0 28px;width:28px;height:28px;min-height:28px;padding:0;font:500 18px/1 var(--ui-font-family);color:var(--text-secondary)}
 .reader-column-tabs>.reader-tab-add:disabled{opacity:.35;cursor:default}
 .reader-panel:is(.is-collapsed,.is-column-strip)>.reader-column-tabs{display:none}
-@media(pointer:coarse){.reader-code-tab,.reader-column-tabs>.icon-button{min-height:44px;min-width:44px}.reader-column-tabs>.icon-button{flex-basis:44px}}
+@media(pointer:coarse){.reader-panel.has-reader-tabs{--reader-tab-row-height:44px}.reader-code-tab,.reader-column-tabs>.icon-button{min-height:44px;min-width:44px}.reader-column-tabs>.icon-button{flex-basis:44px}}
