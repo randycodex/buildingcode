@@ -18270,7 +18270,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: color-mix(in srgb, var(--text-primary) 10%, transparent);
 }
 .saved-panel .saved-project-evidence-body :is(.saved-code-label, .saved-chapter-header) {
-  padding-inline: var(--saved-evidence-start-inset) var(--saved-evidence-end-inset);
+  padding-inline: calc(var(--saved-evidence-start-inset) + var(--workspace-list-item-padding)) var(--saved-evidence-end-inset);
 }
 .saved-panel .saved-project-evidence-body .saved-code-label {
   font-weight: 700;
@@ -18283,7 +18283,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   margin: 0;
   margin-inline: var(--saved-evidence-start-inset) var(--panel-content-end-inset);
   padding: var(--workspace-list-item-padding);
-  padding-inline-start: 0;
   border-radius: 8px;
   background: transparent;
 }

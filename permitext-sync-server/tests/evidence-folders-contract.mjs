@@ -866,7 +866,10 @@ assert.match(appSource, /let savedSearchContentMinHeight = 0;[\s\S]*?const prese
 assert.match(stylesSource, /\.saved-project-structured-group \{[\s\S]*?gap: 0;[\s\S]*?\.saved-project-structured-group\.project-section-motion\.is-open > \.saved-project-structured-group-body \{[\s\S]*?padding-top: 2px;/);
 assert.match(stylesSource, /\.saved-project-structured-facts-list \{[^}]*width: calc\(100% \+ \(2 \* var\(--space-3\)\)\);[^}]*margin-inline: calc\(-1 \* var\(--space-3\)\);/);
 assert.match(stylesSource, /\.saved-project-structured-fact \{[^}]*padding: var\(--space-2\) var\(--space-3\);/);
-assert.match(stylesSource, /\.saved-panel \.saved-folder-context\.is-project \.saved-project-evidence-body \.saved-code-group \.saved-row \{[^}]*width: calc\(100% - 2 \* var\(--panel-padding\)\);[^}]*padding: var\(--workspace-list-item-padding\);/, "Evidence highlights use the same panel gutters and row padding as Search.");
+const evidenceRowStyle = stylesSource.match(/\.saved-panel \.saved-folder-context\.is-project \.saved-project-evidence-body \.saved-code-group \.saved-row \{([^}]+)\}/)?.[1] || "";
+assert.match(evidenceRowStyle, /margin-inline: var\(--saved-evidence-start-inset\) var\(--panel-content-end-inset\);/);
+assert.match(evidenceRowStyle, /padding: var\(--workspace-list-item-padding\);/, "Evidence highlights share Search's row padding.");
+assert.doesNotMatch(evidenceRowStyle, /padding-inline(?:-start|-end)?:/, "Both sides use the shared padding.");
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-auto-flow: column;[\s\S]*?grid-auto-columns: minmax\(0, 1fr\);[\s\S]*?width: 100%;/);
