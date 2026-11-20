@@ -20335,6 +20335,7 @@ dialog.report-export-review {
   min-height: var(--header-height);
   box-sizing: border-box;
   padding: 0 clamp(12px, 2vw, 24px);
+  background-color: var(--workspace-topbar-surface);
   border-top: 0;
   border-bottom: 1px solid var(--border);
 }
@@ -22243,7 +22244,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 }
 
 /* Share the palette between the workspace and the Settings previews. */
-:where(#panel-track, .settings-theme-picker) {
+:where(.workspace-shell, .settings-theme-picker) {
   --reader-column-surface: light-dark(#fafafa, #111111);
   --search-column-surface: light-dark(#edf3fa, #151d28);
   --evidence-column-surface: light-dark(#eef5ef, #17211b);
@@ -22264,12 +22265,24 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
   color: light-dark(#222222, #e8e8e8);
 }
 
-:where(#panel-track[data-workspace-theme="warm"], .settings-theme-preview[data-preview-theme="warm"]) {
+:where(.workspace-shell, .settings-theme-preview) {
+  --workspace-topbar-surface: var(--shared-workspace-muted, var(--surface-raised));
+}
+
+:where(.workspace-shell:has(> #panel-track[data-workspace-theme="tinted"]), .settings-theme-preview[data-preview-theme="tinted"]) {
+  --workspace-topbar-surface: color-mix(in srgb, var(--search-column-surface), var(--assistant-column-surface));
+}
+
+:where(.workspace-shell:has(> #panel-track[data-workspace-theme="header-colors"]), .settings-theme-preview[data-preview-theme="header-colors"]) {
+  --workspace-topbar-surface: var(--report-column-surface);
+}
+
+:where(.workspace-shell:has(> #panel-track[data-workspace-theme="warm"]), .settings-theme-preview[data-preview-theme="warm"]) {
   --shared-workspace-surface: light-dark(#f7f3ea, #211e1a);
   --shared-workspace-muted: light-dark(#f3efe5, #191714);
 }
 
-:where(#panel-track[data-workspace-theme="cool-slate"], .settings-theme-preview[data-preview-theme="cool-slate"]) {
+:where(.workspace-shell:has(> #panel-track[data-workspace-theme="cool-slate"]), .settings-theme-preview[data-preview-theme="cool-slate"]) {
   --shared-workspace-surface: light-dark(#edf2f8, #17202b);
   --shared-workspace-muted: light-dark(#e9eef4, #121923);
 }
@@ -22356,7 +22369,7 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
   grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
   height: 76px;
   overflow: hidden;
-  border-block-start: 10px solid var(--surface);
+  border-block-start: 10px solid var(--workspace-topbar-surface);
   border-radius: 7px;
 }
 .settings-theme-preview > span { min-width: 0; padding: 10px 6px; background: var(--surface); }
@@ -22375,7 +22388,6 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
 .settings-theme-preview[data-preview-theme="header-colors"] > span {
   background-image: linear-gradient(var(--preview-column-tint) 0 18px, transparent 18px);
 }
-.settings-theme-preview:is([data-preview-theme="warm"], [data-preview-theme="cool-slate"]) { border-block-start-color: var(--shared-workspace-muted); }
 .settings-theme-preview:is([data-preview-theme="warm"], [data-preview-theme="cool-slate"]) > span { background-color: var(--shared-workspace-surface); }
 .settings-theme-name {
   display: flex;
