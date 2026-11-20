@@ -55,7 +55,7 @@ try{
  const pdf=await getDocument({data:bytes,useSystemFonts:true}).promise;let actual=0;
  for(let n=1;n<=pdf.numPages;n++){const page=await pdf.getPage(n),ops=await page.getOperatorList();actual+=ops.fnArray.filter(op=>op===OPS.paintImageXObject).length;}
  assert.equal(actual,count+5,'Every source figure and all five HTTPS Note embeds reach the actual issued PDF');
- const firstText=(await(await pdf.getPage(1)).getTextContent()).items.map(i=>i.str).join(' ');assert.match(firstText,/Professional-use notice/);
+ const firstText=(await(await pdf.getPage(1)).getTextContent()).items.map(i=>i.str).join(' ');assert.doesNotMatch(firstText,/Professional-use notice/);
  console.log(`Image HTTP workflows passed: five illustrated passages, ${count} source figures, five HTTPS Notes, ${actual} PDF images, ${pdf.numPages} pages and hashed immutable image snapshots.`);
  await pdf.destroy();
 }finally{if(server)await new Promise(resolve=>server.close(resolve));await rm(directory,{recursive:true,force:true});globalThis.fetch=nativeFetch;}

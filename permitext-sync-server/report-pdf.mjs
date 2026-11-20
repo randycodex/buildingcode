@@ -702,7 +702,7 @@ function drawPageFooters(document, manifest) {
   }
 }
 
-export async function renderReportPDF(manifest, { projectMaterialBySourceID = new Map(), onLayout, emptyPreview = false, unversioned = false } = {}) {
+export async function renderReportPDF(manifest, { projectMaterialBySourceID = new Map(), onLayout, emptyPreview = false, unversioned = false, showProfessionalNotice = true } = {}) {
   const pageLayout = reportDocumentLayout(manifest.pageFormat || 'letter');
   const document = new PDFDocument({
     size: [pageLayout.width, pageLayout.height],
@@ -733,7 +733,7 @@ export async function renderReportPDF(manifest, { projectMaterialBySourceID = ne
   });
 
   drawCover(document, manifest, unversioned);
-  drawProfessionalNotice(document, manifest);
+  if (showProfessionalNotice) drawProfessionalNotice(document, manifest);
   drawBody(document, manifest, projectMaterialBySourceID);
   if (readLayout) onLayout(readLayout());
   drawPageFooters(document, manifest);

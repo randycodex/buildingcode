@@ -17960,6 +17960,7 @@ async function handleReportGenerate(request, response, {preview = false} = {}) {
     const generatedReportID = randomUUID();
     let editingLayout;
     const pdfBody = await renderReportPDFOnDemand(manifest, { projectMaterialBySourceID, emptyPreview, unversioned,
+      showProfessionalNotice: Boolean(reportConfiguration.organization),
       ...(preview && context.body.editingLayout === true ? {onLayout:value => {editingLayout=value;}} : {}) });
     if (!pdfBody.length || pdfBody.length > maxReportFileBytes) {
       throw new Error("The generated Report PDF exceeds the supported file size.");

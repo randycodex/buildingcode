@@ -42,7 +42,7 @@ async function layout(bytes, format) {
 }
 function assertCleanCover(firstPage) {
   const text = firstPage.map(([value]) => value).join('\n');
-  assert.match(text, /Professional-use notice/);
+  assert.doesNotMatch(text, /Professional-use notice|unofficial reference tool|AI-assisted Research is limited/);
   assert.doesNotMatch(text, /^(PUBLISHED CODE|USER-AUTHORED|AI-ASSISTED RESEARCH|PROJECT MATERIAL)$/mi);
   assert.doesNotMatch(text, /^(Manifest|SHA-256)\b/mi);
 }
