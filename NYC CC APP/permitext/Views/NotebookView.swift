@@ -23,7 +23,7 @@ struct ResearchNotebookHandoff: Identifiable {
     let projectID: String?
 }
 
-/// Review the destination before creating a Note. The immutable answer stays a
+/// Review the destination before linking an answer to a Note. The immutable answer stays a
 /// linked source; it is never copied into the user's professional conclusion.
 struct ResearchNotebookHandoffSheet: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
@@ -35,6 +35,12 @@ struct ResearchNotebookHandoffSheet: View {
     @State private var errorMessage: String?
     @State private var savedCardID: String?
     @State private var mutationID = UUID().uuidString.lowercased()
+    @State private var destinations: [ProjectNotebookCardSummary] = []
+    @State private var selectedNoteID = ""
+    @State private var loadedProject: String?
+    @State private var loadAttempt = 0
+    @State private var readOnly = false
+    private var preferenceKey: String { "research.destination.\(owner?.accountID ?? "").\(projectID)" }
     @State private var pendingDocument: NotebookDocument
 
     init(handoff: ResearchNotebookHandoff, owner: NativePrivateRequestIdentity?) {
@@ -76,10 +82,26 @@ struct ResearchNotebookHandoffSheet: View {
                                 }
                             }
                             .disabled(isSaving)
+                            if hasProject {
+                                if loadedProject == projectID {
+                                    Picker("Note", selection: $selectedNoteID) {
+                                        Text("Create new note").tag("")
+                                        ForEach(destinations) { note in
+                                            Text(note.title.isEmpty ? "Untitled" : note.title).tag(note.id)
+                                        }
+                                    }
+                                    .disabled(isSaving || readOnly)
+                                    if readOnly { Text("This project’s notes are read-only.") }
+                                } else if errorMessage != nil {
+                                    Button("Retry loading notes") { loadAttempt += 1 }
+                                } else {
+                                    ProgressView("Loading notes")
+                                }
+                            }
                         }
                         Section("Research reference") {
                             Text(handoff.question)
-                            Text("A new Note will link to this answer and its evidence. Add your own conclusion in the Note after reviewing the cited provisions.")
+                            Text("The note will link to this answer and its evidence.")
                                 .font(.footnote).foregroundStyle(.secondary)
                         }
                         if let errorMessage {
@@ -94,7 +116,7 @@ struct ResearchNotebookHandoffSheet: View {
                                     if isSaving { ProgressView() }
                                 }
                             }
-                            .disabled(!isCurrentOwner || !hasProject || isSaving)
+                            .disabled(!isCurrentOwner || !hasProject || isSaving || loadedProject != projectID || readOnly)
                             .accessibilityIdentifier("research-add-to-notebook-confirm")
                         }
                     }
@@ -109,6 +131,27 @@ struct ResearchNotebookHandoffSheet: View {
                 }
             }
             .interactiveDismissDisabled(isSaving)
+            .task(id: "\(projectID):\(loadAttempt)") {
+                let target = projectID
+                loadedProject = nil
+                selectedNoteID = ""
+                errorMessage = nil
+                guard hasProject, isCurrentOwner else { return }
+                do {
+                    let response = try await library.notebookCards(projectID: target)
+                    guard !Task.isCancelled, isCurrentOwner, projectID == target else { return }
+                    destinations = PermitextReleaseSurfaceVisibility.visibleNotebookCards(response.cards)
+                    if let last = UserDefaults.standard.string(forKey: preferenceKey),
+                       destinations.contains(where: { $0.id == last }) { selectedNoteID = last }
+                    readOnly = response.access?.readOnly == true
+                    loadedProject = target
+                } catch {
+                    if !Task.isCancelled, isCurrentOwner { errorMessage = error.localizedDescription }
+                }
+            }
+            .onChange(of: selectedNoteID) { _, _ in
+                mutationID = UUID().uuidString.lowercased()
+            }
             .onChange(of: projectID) { _, _ in
                 // A retry for the same payload retains its mutation identity.
                 mutationID = UUID().uuidString.lowercased()
@@ -123,12 +166,23 @@ struct ResearchNotebookHandoffSheet: View {
         isSaving = true
         defer { if isCurrentOwner { isSaving = false } }
         do {
+            let existing = selectedNoteID.isEmpty ? nil : try await library.notebookCard(projectID: projectID, cardID: selectedNoteID)
+            guard isCurrentOwner, !Task.isCancelled else { return }
+            var document = existing?.document ?? pendingDocument
+            if let existing {
+                if document.document.contains(where: { $0.id == pendingDocument.document[0].id }) {
+                    savedCardID = existing.id
+                    return
+                }
+                document.document.append(contentsOf: pendingDocument.document)
+            }
             let card = try await library.saveNotebookCard(
-                projectID: projectID, cardID: nil, expectedVersion: 0,
-                title: ResearchNotebookHandoffPresentation.boundedText(handoff.question, maximumUTF16Count: 160), document: pendingDocument,
-                evidenceLinks: [], clientMutationID: mutationID
+                projectID: projectID, cardID: existing?.id, expectedVersion: existing?.version ?? 0,
+                title: existing?.title ?? ResearchNotebookHandoffPresentation.boundedText(handoff.question, maximumUTF16Count: 160), document: document,
+                evidenceLinks: existing?.evidenceLinks ?? [], clientMutationID: mutationID
             )
             guard isCurrentOwner, !Task.isCancelled else { return }
+            UserDefaults.standard.set(card.id, forKey: preferenceKey)
             savedCardID = card.id
             errorMessage = nil
         } catch {
