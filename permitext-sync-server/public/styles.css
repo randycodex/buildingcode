@@ -22185,7 +22185,8 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
   background-color: var(--surface);
 }
 
-#panel-track:not([data-workspace-theme="original"]) > .reader-panel:not(.is-collapsed, .is-column-strip) > .panel-header,
+#panel-track:not([data-workspace-theme="original"], [data-workspace-theme="grayscale"]) >
+  .reader-panel:not(.is-collapsed, .is-column-strip) > .panel-header,
 #panel-track[data-workspace-theme="header-colors"] > :is(.search-panel, .saved-panel, .analysis-panel,
   .calculator-panel, .notebook-index-panel, .notebook-panel) > .panel-header,
 #panel-track[data-workspace-theme="header-colors"] > .shared-report-column .report-draft-header {
