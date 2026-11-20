@@ -2262,10 +2262,6 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   z-index: 2;
 }
 
-.reader-panel :is(.reader-collapse-title, .reader-trust > summary, .panel-actions) {
-  background: var(--reader-controls-surface);
-}
-
 .reader-panel.is-recently-viewed-linked-reader {
   --reader-controls-surface: var(--recently-viewed-reader-background);
   background: var(--recently-viewed-reader-background);
@@ -22157,7 +22153,10 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
   --shared-workspace-muted: light-dark(#e9eef4, #121923);
 }
 
-#panel-track > .reader-panel { --column-tint: var(--reader-column-surface); }
+#panel-track > .reader-panel {
+  --column-tint: var(--reader-column-surface);
+  --column-header-surface: color-mix(in srgb, var(--code-accent) 10%, var(--reader-controls-surface));
+}
 #panel-track > .search-panel { --column-tint: var(--search-column-surface); }
 #panel-track > .saved-panel { --column-tint: var(--evidence-column-surface); }
 #panel-track > .analysis-panel { --column-tint: var(--assistant-column-surface); }
@@ -22186,16 +22185,13 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
   background-color: var(--surface);
 }
 
-#panel-track[data-workspace-theme="header-colors"] > :is(.reader-panel, .search-panel, .saved-panel, .analysis-panel,
+#panel-track > .reader-panel:not(.is-collapsed, .is-column-strip) > .panel-header,
+#panel-track[data-workspace-theme="header-colors"] > :is(.search-panel, .saved-panel, .analysis-panel,
   .calculator-panel, .notebook-index-panel, .notebook-panel) > .panel-header,
 #panel-track[data-workspace-theme="header-colors"] > .shared-report-column .report-draft-header {
-  background-color: var(--column-tint);
-  box-shadow: 0 0 0 var(--space-1) var(--column-tint);
+  background-color: var(--column-header-surface, var(--column-tint));
+  box-shadow: 0 0 0 var(--space-1) var(--column-header-surface, var(--column-tint));
   border-radius: 4px;
-}
-
-#panel-track[data-workspace-theme="header-colors"] > .reader-panel > .panel-header :is(.reader-collapse-title, .panel-actions) {
-  background-color: transparent;
 }
 
 /* Assistant's sidebars expand into space reserved after the panel. */
