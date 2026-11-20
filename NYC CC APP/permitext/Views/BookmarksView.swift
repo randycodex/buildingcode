@@ -1144,6 +1144,52 @@ enum ProjectOverviewSection: Hashable, Identifiable {
     case context, structuredFacts, questions, checklist, notebook, evidence, reports
 }
 
+private enum FactPresentation {
+    // Matches projectFactPresentationGroups in the web Facts sheet.
+    static let sections: [(title: String, keys: [String])] = [
+        ("Property", [
+            "address", "bbl", "borough",
+            "block", "tax-lots", "zip-code",
+            "tax-lot-area", "land-use-code", "community-district"
+        ]),
+        ("Building", [
+            "occupancy", "construction-type", "stories-above-grade",
+            "levels-below-grade", "building-height", "sprinkler-protection",
+            "building-area", "building-count", "residential-units",
+            "total-units", "year-built", "years-altered",
+            "building-class"
+        ]),
+        ("Work & code basis", [
+            "project-status", "work-filing-type", "code-basis"
+        ]),
+        ("Zoning", [
+            "zoning-lot-composition", "zoning-districts", "commercial-overlays",
+            "zoning-map", "zoning-lot-area", "lot-width",
+            "lot-depth", "lot-type", "street-frontages",
+            "transit-zone"
+        ]),
+        ("Special designations", [
+            "special-purpose-district", "special-purpose-subdistrict", "mih-area-options",
+            "affordable-housing-zoning-status", "greater-transit-zone", "parking-geography",
+            "appendix-i-transit-zone", "zoning-for-accessibility", "limited-height-district",
+            "landmark-status", "historic-district", "flood-zone-effective-2007",
+            "flood-zone-preliminary-2015", "environmental-designations", "coastal-zone",
+            "waterfront-status", "lower-density-growth-management-area", "fresh-program-area",
+            "appendix-j-designated-m-district", "adopted-zoning-map-amendments", "pending-zoning-map-amendments"
+        ]),
+        ("Other facts", [])
+    ]
+
+    static func position(_ key: String?) -> (Int, Int) {
+        let aliases = ["stories": "stories-above-grade", "sprinkler-status": "sprinkler-protection", "work-type": "work-filing-type"]
+        let canonical = key.flatMap { aliases[$0] ?? $0 }
+        for (section, entry) in sections.enumerated() {
+            if let canonical, let index = entry.keys.firstIndex(of: canonical) { return (section, index) }
+        }
+        return (sections.count - 1, 0)
+    }
+}
+
 private struct ProjectFactDraft: Identifiable {
     let id: String
     var label: String
@@ -1868,17 +1914,33 @@ struct ProjectView: View {
         }.prefix(4))
     }
 
+    private func factHeading(_ section: Int) -> some View {
+        Text(FactPresentation.sections[section].title)
+            .font(.headline)
+            .padding(.top, 12)
+            .padding(.bottom, 4)
+            .accessibilityAddTraits(.isHeader)
+    }
+
     private var projectFactsOverview: some View {
         VStack(alignment: .leading, spacing: 12) {
             if inlineEditingSection == .structuredFacts {
-                ForEach($factsDraft) { $draft in
+                let ordered = $factsDraft.sorted {
+                    FactPresentation.position($0.wrappedValue.original?.key) < FactPresentation.position($1.wrappedValue.original?.key)
+                }
+                ForEach(Array(ordered.enumerated()), id: \.element.wrappedValue.id) { index, binding in
+                    let draft = binding.wrappedValue
+                    let section = FactPresentation.position(draft.original?.key).0
+                    if index == 0 || FactPresentation.position(ordered[index - 1].wrappedValue.original?.key).0 != section {
+                        factHeading(section)
+                    }
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
-                            Text("\((factsDraft.firstIndex { $0.id == draft.id } ?? 0) + 1).")
+                            Text("\(index + 1).")
                                 .monospacedDigit()
                                 .accessibilityIdentifier("project-fact-number-\(draft.id)")
                             if draft.original == nil {
-                                TextField("Fact name", text: $draft.label)
+                                TextField("Fact name", text: binding.label)
                                     .accessibilityIdentifier("project-fact-label-\(draft.id)")
                             } else {
                                 Text(draft.label)
@@ -1887,7 +1949,7 @@ struct ProjectView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         HStack(alignment: .center, spacing: 12) {
-                            TextField("Value", text: $draft.value, axis: .vertical)
+                            TextField("Value", text: binding.value, axis: .vertical)
                                 .font(.subheadline)
                                 .lineLimit(1...4)
                                 .textFieldStyle(.plain)
@@ -2118,9 +2180,14 @@ struct ProjectView: View {
                         projectHubEmpty("No Structured facts yet.")
                     } else {
                         VStack(alignment: .leading, spacing: 0) {
-                            ForEach(facts) { fact in
+                            let ordered = facts.sorted { FactPresentation.position($0.key) < FactPresentation.position($1.key) }
+                            ForEach(Array(ordered.enumerated()), id: \.element.id) { index, fact in
+                                let section = FactPresentation.position(fact.key).0
+                                if index == 0 || FactPresentation.position(ordered[index - 1].key).0 != section {
+                                    factHeading(section)
+                                }
                                 ProjectStructuredFactRow(fact: fact)
-                                if fact.id != facts.last?.id { Divider() }
+                                if index + 1 < ordered.count { Divider() }
                             }
                             ProjectStructuredFactsSources(facts: facts)
                                 .padding(.top, 16)
