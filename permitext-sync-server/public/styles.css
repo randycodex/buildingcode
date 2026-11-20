@@ -22379,7 +22379,10 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
 }
 
 .workspace-menu-panel[data-tab="settings"]:has(.settings-floating-panel[data-settings-tab="appearance"]),
-.account-dialog.account-screen.settings-floating-panel[data-settings-tab="appearance"] { bottom: auto; }
+.workspace-shell > .account-dialog.account-screen.settings-floating-panel[data-settings-tab="appearance"] {
+  bottom: auto;
+  background-color: light-dark(#ffffff, #121212);
+}
 
 .settings-theme-picker {
   min-inline-size: 0;
