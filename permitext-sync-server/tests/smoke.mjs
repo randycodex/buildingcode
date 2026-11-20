@@ -2685,9 +2685,9 @@ async function main() {
       "Search still styles the retired All Codes button."
     );
     assert(
-      workspaceStyles.text.match(/\.search-panel \.search-box \{[\s\S]*?border-radius: var\(--radius-pill\);/) &&
-        workspaceStyles.text.match(/\.search-dock \{[\s\S]*?padding: var\(--space-2\) var\(--panel-padding\) var\(--space-3\);/),
-      "The Search field should align with the Saved Projects pill and retain fully rounded sides."
+      workspaceStyles.text.match(/\.search-panel \.search-box \{[^}]*height: var\(--search-field-height\);[^}]*border-radius: var\(--radius-pill\);/) &&
+        workspaceStyles.text.match(/\.search-dock \{[^}]*--search-field-height: 48px;[^}]*min-height: calc\(var\(--panel-content-top\) - var\(--panel-third-row-top\)\);[^}]*padding: 0;/),
+      "The Search field should be 48px tall, follow the workspace guides, and retain fully rounded sides."
     );
     assert(
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
