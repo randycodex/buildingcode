@@ -21000,14 +21000,14 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 .report-screen .report-document-columns > .report-comparison-divider { grid-column: 5; }
 .report-screen .report-document-columns > .report-pdf-preview-panel { grid-column: 6; }
 .report-screen .report-rail-header {
-  display: flex; align-items: center; flex: 0 0 auto; gap: 8px; box-sizing: border-box;
+  display: flex; align-items: start; flex: 0 0 auto; gap: 8px; box-sizing: border-box;
   height: calc(var(--report-format-row-height) - 1px);
   min-height: calc(var(--report-format-row-height) - 1px);
   padding: 0 var(--panel-padding);
 }
-.report-screen .report-rail-header h2 { margin: 0; line-height: 1; }
+.report-screen .report-rail-header h2 { display: flex; margin: 0; line-height: 1; }
 .report-screen .report-draft-panel .report-draft-shell .report-rail-title {
-  display: inline-flex; align-items: center; min-height: 28px;
+  display: inline-flex; align-items: start; min-height: 28px;
   padding: 0; border: 0; background: transparent; color: var(--text-secondary);
   font: var(--workspace-sidebar-title-weight) var(--workspace-sidebar-title-size) var(--ui-font-family); white-space: nowrap; cursor: pointer;
 }
@@ -22057,13 +22057,22 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 
 .notebook-index-list { overflow: hidden; }
 .notebook-index-panel > .panel-header,
-.notebook-panel > .notebook-shared-header { margin-bottom: var(--space-2); }
-.notebook-index-panel .notebook-list-toggle { min-height: var(--panel-secondary-row-height); }
+.notebook-panel > .notebook-shared-header {
+  margin-bottom: calc(var(--panel-third-row-top) - var(--panel-title-row-bottom));
+}
+.notebook-index-panel .notebook-list-toggle {
+  align-items: start;
+  min-height: var(--panel-secondary-row-height);
+}
 .notebook-index-panel .notebook-index-actions { margin-top: var(--space-1); }
 .notebook-panel > .notebook-shared-header + .notebook-shell { margin-top: 0; }
 .notebook-panel .notebook-title-control {
   min-height: var(--panel-secondary-row-height);
   margin-bottom: var(--space-1);
+}
+.notebook-panel > .notebook-shell > .notebook-title-control :is(.notebook-title-text, .notebook-title-editor) {
+  align-self: start;
+  line-height: normal;
 }
 .notebook-panel .notebook-focus { padding-top: 0; }
 .notebook-panel .notebook-editor-surface .notebook-format-toolbar {
@@ -22076,7 +22085,8 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 }
 .notebook-panel .notebook-format-save-status:has(> .notebook-draft-status:empty) { display: none; }
 .notebook-panel .notebook-editor-surface .bn-editor {
-  padding-top: calc(var(--panel-content-top) - var(--panel-third-row-top) - var(--panel-third-row-height));
+  padding-top: calc(var(--panel-content-top) - var(--panel-third-row-top)
+    - var(--panel-secondary-row-height) - var(--space-1) - var(--panel-third-row-height));
 }
 .panel-track:not([data-notebook-column-sizing]) :is(.notebook-index-actions, .notebook-index-body) {
   min-inline-size: calc(300px - 2 * var(--panel-padding));
