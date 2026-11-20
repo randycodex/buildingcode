@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261119-column-tints-v2572">
+    <link rel="stylesheet" href="/web/styles.css?v=20261119-appearance-v2574">
     <link rel="stylesheet" href="/web/document-layout.css?v=20">
     <link rel="stylesheet" href="/web/research-v2.css?v=68">
     <link rel="stylesheet" href="/web/reader-shortcuts.css?v=25">
@@ -113,7 +113,7 @@
       <section class="workspace-add-empty" aria-label="Add a workspace" hidden>
         <button class="workspace-add-button" type="button">add workspace</button>
       </section>
-      <section class="panel-track" id="panel-track" aria-label="per codes web workspace"></section>
+      <section class="panel-track" id="panel-track" data-workspace-theme="tinted" aria-label="per codes web workspace"></section>
     </main>
 
     <template id="reader-template">
@@ -425,6 +425,22 @@
       </article>
     </template>
 
+    <template id="workspace-theme-template">
+      <fieldset class="settings-theme-picker">
+        <legend>Theme</legend>
+        <div class="settings-theme-options">
+          <label class="settings-theme-option">
+            <span class="settings-theme-preview" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            <span class="settings-theme-name"><input class="settings-theme-radio" type="radio" name="workspace-theme" value="original"> Original</span>
+          </label>
+          <label class="settings-theme-option">
+            <span class="settings-theme-preview is-tinted" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            <span class="settings-theme-name"><input class="settings-theme-radio" type="radio" name="workspace-theme" value="tinted"> Tinted</span>
+          </label>
+        </div>
+      </fieldset>
+    </template>
+
     <template id="settings-template">
       <article class="workspace-panel utility-panel settings-panel">
         <header class="panel-header">
@@ -585,6 +601,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261119-column-tints-v2572" type="module"></script>
+    <script src="/web/app.js?v=20261119-appearance-v2574" type="module"></script>
   </body>
 </html>

@@ -22116,20 +22116,29 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   padding: 5px;
 }
 
-/* Tool colors follow the column type as columns move or collapse. */
-#panel-track { --notes-column-surface: light-dark(#f8f1e8, #241d17); }
-#panel-track > .reader-panel {
-  --column-surface: light-dark(#fafafa, #111111);
+/* Share the palette between the workspace and the Settings previews. */
+:where(#panel-track, .settings-theme-picker) {
+  --reader-column-surface: light-dark(#fafafa, #111111);
+  --search-column-surface: light-dark(#edf3fa, #151d28);
+  --evidence-column-surface: light-dark(#eef5ef, #17211b);
+  --assistant-column-surface: light-dark(#f4eef8, #211a29);
+  --calculator-column-surface: light-dark(#eaf4f4, #162223);
+  --notes-column-surface: light-dark(#f8f1e8, #241d17);
+  --report-column-surface: light-dark(#f0f1f4, #1c1e22);
+}
+
+#panel-track[data-workspace-theme="tinted"] > .reader-panel {
+  --column-surface: var(--reader-column-surface);
   --reader-controls-surface: var(--column-surface);
 }
-#panel-track > .search-panel { --column-surface: light-dark(#edf3fa, #151d28); }
-#panel-track > .saved-panel { --column-surface: light-dark(#eef5ef, #17211b); }
-#panel-track > .analysis-panel { --column-surface: light-dark(#f4eef8, #211a29); }
-#panel-track > .calculator-panel { --column-surface: light-dark(#eaf4f4, #162223); }
-#panel-track > :is(.notebook-index-panel, .notebook-panel) { --column-surface: var(--notes-column-surface); }
-#panel-track > .shared-report-column { --column-surface: light-dark(#f0f1f4, #1c1e22); }
+#panel-track[data-workspace-theme="tinted"] > .search-panel { --column-surface: var(--search-column-surface); }
+#panel-track[data-workspace-theme="tinted"] > .saved-panel { --column-surface: var(--evidence-column-surface); }
+#panel-track[data-workspace-theme="tinted"] > .analysis-panel { --column-surface: var(--assistant-column-surface); }
+#panel-track[data-workspace-theme="tinted"] > .calculator-panel { --column-surface: var(--calculator-column-surface); }
+#panel-track[data-workspace-theme="tinted"] > :is(.notebook-index-panel, .notebook-panel) { --column-surface: var(--notes-column-surface); }
+#panel-track[data-workspace-theme="tinted"] > .shared-report-column { --column-surface: var(--report-column-surface); }
 
-#panel-track > :is(.reader-panel, .search-panel, .saved-panel, .analysis-panel, .calculator-panel,
+#panel-track[data-workspace-theme="tinted"] > :is(.reader-panel, .search-panel, .saved-panel, .analysis-panel, .calculator-panel,
   .notebook-index-panel, .notebook-panel, .shared-report-column) {
   --surface: var(--column-surface);
   --surface-raised: var(--column-surface);
@@ -22137,13 +22146,62 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 }
 
 /* Assistant's sidebars expand into space reserved after the panel. */
-#panel-track > .research-v2-panel {
+#panel-track[data-workspace-theme="tinted"] > .research-v2-panel {
   box-shadow: calc(var(--rv2-history-space, 0px) + var(--rv2-sources-space, 0px)) 0 var(--column-surface);
   transition: margin-inline-end var(--workspace-sidebar-motion), box-shadow var(--workspace-sidebar-motion);
 }
 
-#panel-track > .calculator-panel .occupant-load-card { background-color: var(--column-surface); }
+#panel-track[data-workspace-theme="tinted"] > .calculator-panel .occupant-load-card { background-color: var(--column-surface); }
 
-#panel-track > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"] {
+#panel-track[data-workspace-theme="tinted"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"] {
   background-color: var(--notes-column-surface);
 }
+
+.workspace-menu-panel[data-tab="settings"]:has(.settings-floating-panel[data-settings-tab="appearance"]),
+.account-dialog.account-screen.settings-floating-panel[data-settings-tab="appearance"] { bottom: auto; }
+
+.settings-theme-picker {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0 var(--account-category-gutter) 8px;
+  border: 0;
+}
+.settings-theme-picker > legend {
+  padding: 0;
+  margin-block-end: 12px;
+  font-size: var(--settings-type-body);
+  font-weight: var(--settings-weight-heading);
+}
+.settings-theme-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.settings-theme-option { display: grid; gap: 10px; padding: 8px; border-radius: var(--radius-control); cursor: pointer; }
+.settings-theme-option:has(.settings-theme-radio:checked) { background: var(--menu-highlight); }
+.settings-theme-option:is(:hover, :has(.settings-theme-radio:focus-visible)) { background: var(--select-highlight); }
+.settings-theme-preview {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
+  height: 76px;
+  overflow: hidden;
+  border-block-start: 10px solid var(--surface);
+  border-radius: 7px;
+}
+.settings-theme-preview > span { min-width: 0; padding: 10px 6px; background: var(--surface); }
+.settings-theme-preview > span + span { border-inline-start: 1px solid var(--border); }
+.settings-theme-preview > span::before,
+.settings-theme-preview > span::after { content: ""; display: block; height: 2px; border-radius: 1px; }
+.settings-theme-preview > span::before { width: 54%; background: var(--text-secondary); margin-block-end: 9px; opacity: .65; }
+.settings-theme-preview > span::after { width: 90%; background: var(--text-secondary); box-shadow: 0 6px var(--text-secondary), 0 12px var(--text-secondary); opacity: .32; }
+.settings-theme-preview.is-tinted > span:nth-child(1) { background: var(--reader-column-surface); }
+.settings-theme-preview.is-tinted > span:nth-child(2) { background: var(--search-column-surface); }
+.settings-theme-preview.is-tinted > span:nth-child(3) { background: var(--evidence-column-surface); }
+.settings-theme-preview.is-tinted > span:nth-child(4) { background: var(--assistant-column-surface); }
+.settings-theme-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-primary);
+  font-size: var(--settings-type-body);
+  font-weight: var(--settings-weight-medium);
+  text-transform: none;
+  letter-spacing: normal;
+}
+.settings-theme-radio { width: 14px; height: 14px; margin: 0; accent-color: var(--text-link); cursor: inherit; }

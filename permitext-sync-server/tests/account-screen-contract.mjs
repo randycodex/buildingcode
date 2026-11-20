@@ -75,7 +75,8 @@ function harness(signedIn, pro = signedIn) {
     return result;
   }
   const toolbar = { inert: false };
-  const track = { inert: false, scrollLeft: 0, scrollWidth: 1500, clientWidth: 500, querySelector: () => null };
+  const track = { dataset: { workspaceTheme: "tinted" }, inert: false, scrollLeft: 0, scrollWidth: 1500, clientWidth: 500, querySelector: () => null };
+  const preferences = new Map();
   const context = vm.createContext({
     document: {
       querySelector: selector => {
@@ -85,6 +86,7 @@ function harness(signedIn, pro = signedIn) {
         if (selector === '.account-workspace-view[open]') return currentDialog?.classList.contains('account-workspace-view') ? currentDialog : null;
         return selector === ".account-dialog" || selector === ".account-screen[open]" ? currentDialog : null;
       },
+      querySelectorAll: selector => currentDialog?.querySelectorAll(selector) || [],
       createElement: element,
       body: { append(dialog) { currentDialog = dialog; } }
     },
@@ -92,6 +94,16 @@ function harness(signedIn, pro = signedIn) {
       focus: () => { focusReturns++; }, blur() {} },
     settingsButton: { setAttribute: (name,value) => { toggleAttributes[name] = value; }, focus: () => { focusReturns++; } },
     selectedSettingsTab: 'account',
+    workspaceThemeStorageKey: "permitext:workspace-theme",
+    workspaceThemeTemplate: {},
+    localStorage: { setItem: (key, value) => preferences.set(key, value) },
+    renderTemplate() {
+      const picker = Object.assign(element(), { className: "settings-theme-picker" });
+      for (const value of ["original", "tinted"]) {
+        picker.append(Object.assign(element(), { className: "settings-theme-radio", value }));
+      }
+      return picker;
+    },
     detachedProjectWindow: true,
     projectDetailsScreen: null,
     createFloatingWorkspaceTabs({entries,selected,onSelect}) {
@@ -122,8 +134,8 @@ function harness(signedIn, pro = signedIn) {
     activePaneIDs: () => ["reader:one", "utility:settings", "utility:saved"],
     transitionWorkspace: async (kind, options) => transitions.push({ kind, options }), track
   });
-  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "workspaceFloatingPanelReference", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
-  return { context, track, panels, transitions, toggleAttributes, signInStarts, checkoutStarts, warningClosures,
+  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "workspaceFloatingPanelReference", "applyWorkspaceTheme", "renderWorkspaceThemePicker", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
+  return { context, track, panels, preferences, transitions, toggleAttributes, signInStarts, checkoutStarts, warningClosures,
     toolbar, revokeAccount() { accountCurrent = false; contextCheck(); },
     dialog: () => currentDialog, focusReturns: () => focusReturns, focusTraps: () => focusTraps };
 }
@@ -140,15 +152,29 @@ for (const signedIn of [false, true]) {
   assert.equal(panel.headerRemoved, true);
   assert.deepEqual(panel.removedStyles, ["flex"], "Column size must not become the screen height.");
   if (signedIn) {
-    const [account, recovery] = panel.scroll.children;
-    assert.equal(panel.scroll.children.length, 2);
+    const [account, appearance, recovery] = panel.scroll.children;
+    assert.equal(panel.scroll.children.length, 3);
     assert.deepEqual(account.children.slice(1, 3), [panel.profile, panel.plan]);
     assert.equal(recovery.children[0].textContent, "Data & recovery");
     assert.deepEqual(recovery.children.slice(1), [panel.data]);
     assert.deepEqual(account.children.slice(1, 5), [panel.profile, panel.plan, panel.offline, panel.conflicts], "Account keeps device-wide Offline and sync controls.");
     assert.deepEqual(panel.data.children, [panel.saved, panel.trash], "Data & Recovery contains only workspace data.");
     assert(!panel.data.children.includes(panel.projects), "Workspace management moves to the workspace menu.");
-    assert.deepEqual(Array.from(panel.__settingsTabs.element.labels),["Account","Data & Recovery"],"Offline has no separate tab");
+    assert.deepEqual(Array.from(panel.__settingsTabs.element.labels), ["Account", "Appearance", "Data & Recovery"]);
+    panel.__settingsTabs.select("appearance");
+    assert.equal(appearance.hidden, false);
+    assert.equal(account.hidden, true);
+    assert.equal(recovery.hidden, true);
+    const [original, tinted] = appearance.querySelectorAll(".settings-theme-radio");
+    assert.equal(tinted.checked, true, "The existing tint stays selected by default.");
+    original.checked = true;
+    original.listeners.change();
+    assert.equal(h.track.dataset.workspaceTheme, "original");
+    assert.equal(h.preferences.get("permitext:workspace-theme"), "original");
+    assert.equal(tinted.checked, false);
+    h.context.applyWorkspaceTheme("tinted");
+    assert.equal(original.checked, false);
+    assert.equal(tinted.checked, true);
     assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");
     assert.equal(account.children.at(-1).children[1], panel.deleteAccount, "One direct action keeps the original deletion confirmation handler.");
   }
@@ -176,7 +202,7 @@ embeddedSettings.context.toggleAccountDialog({ mount: { append(panel) { embedded
 assert.equal(embeddedDialog.open, true);
 assert.equal(embeddedDialog.getAttribute('role'), null, 'The shared workspace menu owns the dialog role.');
 assert.equal(embeddedDialog._floatingControls, undefined, 'The workspace menu positions the embedded settings.');
-assert.deepEqual(Array.from(embeddedSettings.panels[0].__settingsTabs.element.labels), ['Account', 'Data & Recovery']);
+assert.deepEqual(Array.from(embeddedSettings.panels[0].__settingsTabs.element.labels), ['Account', 'Appearance', 'Data & Recovery']);
 embeddedDialog.close();
 assert.equal(embeddedDialog.open, false);
 

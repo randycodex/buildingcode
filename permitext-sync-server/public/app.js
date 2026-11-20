@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-column-tints-v2572";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-appearance-v2574";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-column-tints-v2572";
+} from "./offline-storage.js?v=20261119-appearance-v2574";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -395,6 +395,9 @@ let workspaceKey = detachedProjectWindow
   ? `${baseWorkspaceKey}:detached:${detachedProjectSessionID}`
   : baseWorkspaceKey;
 const track = document.querySelector("#panel-track");
+const workspaceThemeStorageKey = "permitext:workspace-theme";
+try { applyWorkspaceTheme(localStorage.getItem(workspaceThemeStorageKey)); }
+catch { /* Use the default theme when storage is unavailable. */ }
 const topbarActions = document.querySelector(".topbar-actions");
 const addReaderButton = document.querySelector("#add-reader");
 let readerShortcuts;
@@ -446,6 +449,7 @@ const searchTemplate = document.querySelector("#search-template");
 const savedTemplate = document.querySelector("#saved-template");
 const analysisTemplate = document.querySelector("#analysis-template");
 const settingsTemplate = document.querySelector("#settings-template");
+const workspaceThemeTemplate = document.querySelector("#workspace-theme-template");
 
 const codeOptions = [
   { prefix: "BC", label: "Building Code", theme: "building", group: "2022 Construction Codes" },
@@ -44241,6 +44245,26 @@ function positionWebAppUpdateNotice(notice, button) {
   notice.style.top = `${top}px`;
 }
 
+function applyWorkspaceTheme(value) {
+  const theme = value === "original" ? "original" : "tinted";
+  track.dataset.workspaceTheme = theme;
+  document.querySelectorAll(".settings-theme-radio").forEach(input => { input.checked = input.value === theme; });
+}
+
+function renderWorkspaceThemePicker() {
+  const picker = renderTemplate(workspaceThemeTemplate);
+  picker.querySelectorAll(".settings-theme-radio").forEach(input => {
+    input.checked = input.value === track.dataset.workspaceTheme;
+    input.addEventListener("change", () => {
+      if (!input.checked) return;
+      applyWorkspaceTheme(input.value);
+      try { localStorage.setItem(workspaceThemeStorageKey, track.dataset.workspaceTheme); }
+      catch { /* Keep the chosen theme for this session. */ }
+    });
+  });
+  return picker;
+}
+
 function organizeAccountSettings(panel, { floating = false, selected = "account", onSelect = () => {} } = {}) {
   const scroll = panel.querySelector(".settings-scroll");
   if (!scroll || scroll.querySelector(".settings-account-column")) return;
@@ -44279,12 +44303,14 @@ function organizeAccountSettings(panel, { floating = false, selected = "account"
   const deleteContent = data?.querySelector(".settings-delete-content");
   projects?.remove();
   data?.append(...[deleteContent, trash].filter(Boolean));
-  scroll.replaceChildren(account, recovery);
   if (floating) {
+    const appearance = column("appearance", "Appearance", [renderWorkspaceThemePicker()]);
+    scroll.replaceChildren(account, appearance, recovery);
     const tabs = createFloatingWorkspaceTabs({
       id: "settings", label: "Settings categories", selected: selected === "library" ? "account" : selected, onSelect,
       entries: [
         { id: "account", label: "Account", panel: account },
+        { id: "appearance", label: "Appearance", panel: appearance },
         { id: "recovery", label: "Data & Recovery", panel: recovery }
       ]
     });
@@ -44292,6 +44318,7 @@ function organizeAccountSettings(panel, { floating = false, selected = "account"
     scroll.before(tabs.element);
     return tabs.dispose;
   }
+  scroll.replaceChildren(account, recovery);
   const columnResizers = createSettingsColumnResizers(scroll, [account, recovery], state.settingsColumnWidths, (widths) => {
     state.settingsColumnWidths = widths;
     saveWorkspaceState();
@@ -52714,6 +52741,7 @@ async function start() {
   track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates);
   bindWorkspaceKeyboardNavigation();
   window.addEventListener("storage", (event) => {
+    if (event.key === workspaceThemeStorageKey || event.key === null) applyWorkspaceTheme(event.newValue);
     if (event.key === null) {
       activeCodeSourcesController.reload();
     }
