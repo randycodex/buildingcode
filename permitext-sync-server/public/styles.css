@@ -22276,10 +22276,6 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
   --workspace-topbar-surface: color-mix(in srgb, var(--search-column-surface), var(--assistant-column-surface));
 }
 
-:where(.workspace-shell:has(> #panel-track[data-workspace-theme="header-colors"]), .settings-theme-preview[data-preview-theme="header-colors"]) {
-  --workspace-topbar-surface: var(--report-column-surface);
-}
-
 :where(.workspace-shell:has(> #panel-track[data-workspace-theme="warm"]), .settings-theme-preview[data-preview-theme="warm"]) {
   --shared-workspace-surface: light-dark(#f7f3ea, #211e1a);
   --shared-workspace-muted: light-dark(#f3efe5, #191714);
