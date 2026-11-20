@@ -113,7 +113,7 @@ const toolButtons=['search','analysis','calculator'].map(key=>({key,button:doc.c
 const actualFunction=name=>{const first=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(first>=0,name);return source.slice(first,source.indexOf('\n}',first)+2);};
 let saves=0, allContext='A:research', previewOrder=[];
 const allState={readers:[{id:'a',codePrefix:'BC',codeVersion:'2022',title:'Reader'},{id:'b',codePrefix:'PC',codeVersion:'2022',title:'Reader'}],paneOrder:[...allIDs]};
-const appContext=vm.createContext({currentColumnWorkflowView:()=>allContext.endsWith(':notebook')?'notebook':'research',state:allState,track:allTrack,isProAccount:()=>true,workflowPaneIsVisible:()=>true,
+const appContext=vm.createContext({readerShortcutLabel,currentColumnWorkflowView:()=>allContext.endsWith(':notebook')?'notebook':'research',state:allState,track:allTrack,isProAccount:()=>true,workflowPaneIsVisible:()=>true,
   paneIDForReader:r=>`reader:${r.id}`,syncCodeVersion:value=>value,syncCodeVersionForPrefix:()=> '2022',codeOptions:[],
   readerTabs:()=>[{}],readerPositionLabel:r=>`Reader ${allState.readers.indexOf(r)+1}`,columnPaneLabel:()=> 'Evidence',
   activePaneIDs:()=>allState.paneOrder,paneGroupForMove:id=>[id],pinCriticalWorkflowPanesToLeft:ids=>ids,
@@ -136,7 +136,7 @@ const navigation=createReaderShortcuts({host:allHost,track:allTrack,readers:()=>
 appContext.readerShortcuts=navigation;
 const order=()=>allHost.children.map(button=>button.dataset.readerPaneId);
 assert.deepEqual(order(),allIDs);
-assert.deepEqual(allHost.children.map(button=>button.textContent),['Reader 1','Search','Reader 2','Assistant','Calculator']);
+assert.deepEqual(allHost.children.map(button=>button.textContent),['BC’22','Search results','PC’22','Assistant','Calculator']);
 assert(toolButtons.every(({button})=>button.classList.contains('has-open-column')),'Open tools use bubbles instead of duplicate launchers.');
 assert.deepEqual(allHost.children.map(button=>button.querySelector('svg')?.dataset.lucideIcon),['library-big','search','library-big','astroid','calculator'],'Open bubbles retain the existing Reader and tool icons.');
 assert(allHost.children.every(button=>button.querySelector('svg').getAttribute('aria-hidden')==='true'),'Decorative icons keep the existing accessible labels.');
@@ -203,7 +203,7 @@ first.dispatch('keydown',{altKey:true,shiftKey:true,key:'ArrowRight',preventDefa
 assert.equal(saves,2,'Keyboard reordering cannot use bubbles retained from a previous Project.');
 const duplicate=doc.createElement('article');duplicate.className='workspace-panel';duplicate.dataset.paneId='utility:search:second';allTrack.append(duplicate);
 navigation.refresh();
-assert.deepEqual(allHost.children.filter(button=>button.textContent.startsWith('Search')).map(button=>button.textContent),['Search 1','Search 2']);
+assert.deepEqual(allHost.children.filter(button=>button.textContent.startsWith('Search')).map(button=>button.textContent),['Search results 1','Search results 2']);
 allPanels[1].remove();duplicate.remove();navigation.refresh();
 assert.equal(toolButtons[0].button.classList.contains('has-open-column'),false,'Closing the last Search restores its launcher.');
 allContext='A:notebook';navigation.refresh();

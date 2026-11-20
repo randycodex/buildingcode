@@ -17383,6 +17383,16 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
     width: min(100%, 28rem);
   }
 
+  .mobile-web-message button,
+  .mobile-web-message a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin: 12px 6px;
+    color: inherit;
+    font: inherit;
+  }
+
   .mobile-web-message h1 {
     margin: 22px 0 10px;
     font: 650 1.65rem/1.18 var(--ui-font-family);

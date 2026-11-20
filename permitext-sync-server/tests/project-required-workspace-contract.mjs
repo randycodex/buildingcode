@@ -24,7 +24,7 @@ const context=vm.createContext({state,document,track,isProAccount:()=>pro,reader
  openCodeQuestionPaneIDs:()=>[],supplementalResearchConversationIDs:[],
  codeQuestionWorkspaceState:()=>({}),closeCodeDecisionContext:value=>value,setCodeQuestionWorkspaceState(){},
  workspacePrivatePresentationAllowed:()=>true,visibleWorkspaceRecords:()=>projects.filter(p=>!p.deletedAt&&!p.archivedAt),
- openWorkspaceContextMenu:async()=>{choices++;},createNewWorkspace:async()=>{creates++;},
+ switchWorkspace:async id=>assert.equal(id,"p"),openWorkspaceContextMenu:async()=>{choices++;},createNewWorkspace:async()=>{creates++;},
  openReaderCodePicker:()=>{opens++;},currentColumnWorkflowView:()=>"research",captureAccountRequest:()=>({}),
  paneIDForReader:reader=>`reader:${reader.id}`,
  restoreAssistantConversationOwners:()=>assert.fail('Unselected workspace must not restore Assistant owners'),
@@ -65,9 +65,12 @@ assert.equal(state.readers[0].id,'legacy-reader','Blocked entry points do not al
 assert.equal(state.utilityInstances.length,1);
 await context.focusUtility('settings');assert.equal(settings,1,'Settings remains available to manage workspaces');
 let prompt=context.renderProjectRequiredWorkspace();
-assert.equal(prompt.querySelector('button').textContent,'Choose workspace');
+const [direct,chooser]=prompt.querySelectorAll('button');
+assert.equal(direct.textContent,'Existing workspace');
+direct.dispatch('click',{});
+assert.equal(chooser.textContent,'All workspaces');
 let stopped=false;
-prompt.querySelector('button').dispatch('click',{stopPropagation(){stopped=true;}});assert.equal(choices,1);
+chooser.dispatch('click',{stopPropagation(){stopped=true;}});assert.equal(choices,1);
 assert.equal(stopped,true,'The opening click cannot immediately dismiss the workspace chooser');
 projects=[];prompt=context.renderProjectRequiredWorkspace();
 assert.equal(prompt.querySelector('button').textContent,'add workspace');

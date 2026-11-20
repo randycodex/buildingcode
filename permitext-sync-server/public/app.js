@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-search-performance-v1924";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-workspace-ux-v1925";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=12";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261120-search-performance-v1924";
+} from "./offline-storage.js?v=20261120-workspace-ux-v1925";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -21908,6 +21908,9 @@ async function renderSearchHistory(panel, instance, options = {}) {
       preview.className = "search-jump-preview";
       preview.textContent = entry.previewText || "";
       if (entry.previewText) markResearchSelectable(preview, entry);
+      preview.id = `recent-preview-${crypto.randomUUID()}`;
+      openButton.setAttribute("aria-label", `${title.textContent}, ${code.textContent}`);
+      openButton.setAttribute("aria-describedby", preview.id);
       openButton.append(code, title, preview);
       openButton.addEventListener("click", () => {
         if (window.getSelection && String(window.getSelection()).trim()) return;
@@ -46514,11 +46517,23 @@ function syncResearchStart() {
   track.append(start);
 }
 
+document.querySelector("#copy-workspace-link")?.addEventListener("click", async () => {
+  const status = document.querySelector("#workspace-link-status");
+  const url = new URL("/workspace", location.origin).href;
+  try {
+    await navigator.clipboard.writeText(url);
+    status.textContent = "Workspace link copied.";
+  } catch {
+    status.textContent = url;
+  }
+});
+
 function renderProjectRequiredWorkspace() {
   const welcome = document.createElement("section");
   welcome.className = "workspace-empty-state workspace-empty-guidance";
   welcome.setAttribute("aria-label", "Workspace required");
-  const canChoose = workspacePrivatePresentationAllowed() && visibleWorkspaceRecords().length > 0;
+  const workspaces = workspacePrivatePresentationAllowed() ? visibleWorkspaceRecords() : [];
+  const canChoose = workspaces.length > 0;
   const content = document.createElement("div");
   const actions = document.createElement("div");
   actions.className = "workspace-empty-actions";
@@ -46531,6 +46546,19 @@ function renderProjectRequiredWorkspace() {
     if (canChoose) void openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
     else void createNewWorkspace();
   });
+  if (canChoose) {
+    for (const workspace of workspaces.sort((a, b) => (b.updatedAt || "").localeCompare(a.updatedAt || "")).slice(0, 3)) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = workspace.name;
+      button.addEventListener("click", () => void switchWorkspace(workspace.id));
+      actions.append(button);
+    }
+    create.textContent = "All workspaces";
+  }
+  const guidance = document.createElement("p");
+  guidance.textContent = "Open a workspace to use Reader, Search, Assistant, and Calculator.";
+  content.append(guidance);
   actions.append(create);
   const message = document.createElement("p");
   message.className = "workspace-project-required-message";
@@ -47244,8 +47272,7 @@ function preparePaneCollapse(panel) {
     header.dataset.collapseBound = "true";
 
   }
-  header.querySelectorAll(".panel-kind, .panel-title, h2").forEach((titleNode) => {
-    if (titleNode.closest("button, a, summary") || titleNode.querySelector("button, a, input, select, textarea, summary, [contenteditable]")) return;
+  [...header.querySelectorAll(".panel-kind, .panel-title, h2")].filter(node => !node.closest("button, a, summary") && !node.querySelector("button, a, input, select, textarea, summary, [contenteditable]")).slice(0, 1).forEach((titleNode) => {
     if (!paneCanCollapse(panel.dataset.paneId)) {
       for (const [name, value] of titleNode._collapseTitleAttributes || []) {
         if (value === null) titleNode.removeAttribute(name);
@@ -47474,7 +47501,7 @@ function readerShortcutItems() {
       const toolKey = /^utility:search(?::|$)/.test(id) ? 'search'
         : /^(?:utility:analysis(?::|$)|research:conversation:)/.test(id) ? 'analysis'
         : id === 'utility:calculator' ? 'calculator' : '';
-      const label = {search:'Search', analysis:'Assistant', calculator:'Calculator'}[toolKey] || columnPaneLabel(panel);
+      const label = {search:'Search results', analysis:'Assistant', calculator:'Calculator'}[toolKey] || columnPaneLabel(panel);
       const query = toolKey === 'search' ? panel.querySelector('.search-input')?.value?.trim() : '';
       return {id, name:label, label, location:query || '', column:true, theme:'current-consolidation', toolKey,
         iconName:{search:'search', analysis:'astroid', calculator:'calculator'}[toolKey] || ''};
@@ -47486,7 +47513,7 @@ function readerShortcutItems() {
     const chapter = panel.querySelector(".chapter-select")?.selectedOptions?.[0]?.textContent || "";
     const section = reader.sectionNumber ? sectionDisplayTitle(reader.sectionNumber, reader.title, "") : reader.title;
     const tabs = readerTabs(reader);
-    return { id, name:readerPositionLabel(reader), label:readerPositionLabel(reader), column:true, iconName:"library-big",
+    return { id, name:readerPositionLabel(reader), label:readerPositionLabel(reader).startsWith("Search Reader") ? "Result reader" : readerShortcutLabel({prefix, edition: String(code?.edition || version)}), column:true, iconName:"library-big",
       theme:code?.theme || "current-consolidation",
       location:[name, `${tabs.length} ${tabs.length === 1 ? 'tab' : 'tabs'}`, ...new Set([chapter, section].filter(value => value && value !== "Reader"))].join(" · ") };
   });

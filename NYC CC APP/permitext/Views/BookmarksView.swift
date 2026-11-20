@@ -391,14 +391,14 @@ struct BookmarksView: View {
                 if library.hasProjectAccess { folderEditorTarget = .new }
                 else { library.requireProjectAccess() }
             } label: {
-                Image(systemName: "plus")
-                    .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                Label(library.hasProjectAccess ? "New project" : "New project · Pro", systemImage: "plus")
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.appChrome)
-                    .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                    .padding(.horizontal, 6)
+                    .frame(minHeight: CodeScreenMetrics.toolbarButtonSize)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("New project")
             accountButton
         }
         .padding(.horizontal, 4)
