@@ -227,7 +227,7 @@ autosave.dispose();
     {id:'section',kind:'heading',text:'Section'},
     {id:'source',kind:'evidence',sourceID:'saved-evidence',excludedCommentKeys:['private']},
     {id:'writing',kind:'paragraph',text:'Keep this report-specific wording'}]};
-  const original=structuredClone(data),history=createReportUndo(),saved=[],focus=[],announcements=[];
+  const original=structuredClone(data),history=createReportUndo(),saved=[],focus=[],announcements=[],pageUpdates=[];
   history.bind(data);
   const saving=createReportAutosave({read:()=>data,isCurrent:()=>true,retain:async()=>({}),acknowledge:async()=>{},
     write:async snapshot=>{saved.push(snapshot);return{...snapshot,version:snapshot.version+1};},
@@ -235,11 +235,13 @@ autosave.dispose();
   const c=vm.createContext({activeDraft:data,disposed:false,generatingReport:false,deletingReport:false,
     requestIdentity:'account',requestWorkspaceID:'workspace',activeWorkspaceID:'workspace',isCurrentAccountRequest:()=>true,
     CSS:{escape:value=>value},reportBlockTitle:block=>block.id,outlineController:{reveal(){},announce:text=>announcements.push(text)},
-    shell:{querySelector:selector=>({focus:options=>focus.push({selector,options})})},renderWorkspaceContent(){},
-    setDirty(){history.record(data);saving.change();}});
+    shell:{querySelector:selector=>({focus:options=>focus.push({selector,options})})},
+    renderWorkspaceContent(options){pageUpdates.push(options?.showUpdating);},
+    setDirty(group, options){pageUpdates.push(options?.showUpdating);history.record(data);saving.change();}});
   const start=app.indexOf('  function removeDraftBlock(');
   vm.runInContext(app.slice(start,app.indexOf('  function reorderDraftBlock(',start)),c);
   const section=data.blocks[0];assert.equal(c.removeDraftBlock(section,'outline'),true);
+  assert.deepEqual(pageUpdates,[false,false],'Both invalidations from an Outline removal refresh quietly.');
   assert.deepEqual(data.blocks.map(block=>block.id),['source','writing'],'Removing a heading retains its child items.');
   assert.match(focus.at(-1).selector,/data-block-id="source"/);assert.equal(focus.at(-1).options.preventScroll,true);
   assert.equal(announcements[0],'section removed from Report.');

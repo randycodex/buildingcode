@@ -17,6 +17,7 @@ globalThis.document = {createElement: () => new Element()};
 const tick = () => new Promise(resolve => setImmediate(resolve));
 const pending = [], rendering = [], disposed = [];
 let owner = true;
+let scheduled;
 const host = new Element();
 const controller = createReportPageLayout({host, isCurrent: () => owner,
   prepare: () => new Promise((resolve, reject) => pending.push({resolve, reject})),
@@ -24,7 +25,7 @@ const controller = createReportPageLayout({host, isCurrent: () => owner,
     assert.equal(options.eagerFirstPage, true);
     const page = new Element(); page.className = 'report-pdf-page'; page.textContent = blob; staging.append(page);
     rendering.push({current, reject, finish: () => resolve(() => disposed.push(blob))});
-  }), setTimer: () => 1, clearTimer() {}});
+  }), setTimer: callback => {scheduled = callback; return 1;}, clearTimer() {scheduled = null;}});
 controller.invalidate(); assert.equal(pending.length, 0, 'Editing mode does not prepare PDFs.');
 controller.setActive(true); assert.equal(pending.length, 1);
 const newer = controller.refresh(); pending[1].resolve('Newer pages'); await tick(); rendering[0].finish();
@@ -35,17 +36,22 @@ assert.equal(host.children[0].textContent, '', 'The preview status clears when p
 pending[0].resolve('Late old pages'); await tick();
 assert.equal(pages()[0].textContent, 'Newer pages', 'A slower preview cannot replace newer content.');
 
-const update = controller.refresh();
+controller.invalidate({showUpdating: false});
+assert.equal(host.children[0].textContent, '', 'An Outline removal leaves the progress message empty.');
+scheduled();
+assert.equal(host.children[0].textContent, '', 'The scheduled preview stays quiet when it starts.');
 assert.equal(pages()[0].textContent, 'Newer pages', 'Keep complete pages visible during preparation.');
 pending[2].resolve('Updated pages'); await tick();
 assert.equal(pages()[0].textContent, 'Newer pages', 'Keep complete pages visible during replacement rendering.');
-rendering[1].finish(); assert.equal(await update, true);
+rendering[1].finish(); await tick();
 assert.equal(pages().length, 1); assert.equal(pages()[0].textContent, 'Updated pages');
 assert.deepEqual(disposed, ['Newer pages']);
 controller.restorePosition(731);
 assert.equal(controller.capturePosition(),731,'Structural editing can retain the page scroll when its toolbar/model is rebuilt');
 
-const failed = controller.refresh(); pending[3].reject(new Error('Offline')); assert.equal(await failed, false);
+const failed = controller.refresh();
+assert.equal(host.children[0].textContent, 'Updating pages…', 'Ordinary refreshes still show progress.');
+pending[3].reject(new Error('Offline')); assert.equal(await failed, false);
 assert.equal(pages()[0].textContent, 'Updated pages');
 assert.match(host.children[0].textContent, /Pages need updating.*Offline/);
 assert.equal(host.children[1].hidden, false);

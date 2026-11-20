@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-report-sources-label-v2605";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-report-outline-quiet-delete-v2606";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -46,7 +46,7 @@ import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, createReportInsertion, reportInsertionIndex, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261115-outline-insert-v14";
 import { applyLetterDocumentLayout, applyDocumentLayout, reportPageFormats } from "./document-layout.js?v=3";
-import { createReportPageLayout } from './report-page-layout.js?v=8';
+import { createReportPageLayout } from './report-page-layout.js?v=9';
 import { createReportPageEditor } from './report-page-editor.js?v=3';
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportSwitch, createReportSourcePreviews, retainReportChildren } from "./report-presentation.js?v=1";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-report-sources-label-v2605";
+} from "./offline-storage.js?v=20261119-report-outline-quiet-delete-v2606";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -34038,12 +34038,12 @@ async function renderProjectReportDraft(project, resume = null) {
       renderProjectUpdateBadge();
     }
   });
-  const setDirty = (editGroup = null) => {
+  const setDirty = (editGroup = null, pageUpdate) => {
     reportUndo.record(activeDraft, editGroup);
     dirty = true;
     activeDraft.clientDraftID ||= crypto.randomUUID();
     autosave.change();
-    pageLayout.invalidate();
+    pageLayout.invalidate(pageUpdate);
     reportFormatting?.refreshHistory();
     void refreshProjectReportMembership(projectID);
   };
@@ -34938,8 +34938,9 @@ async function renderProjectReportDraft(project, resume = null) {
     const title = reportBlockTitle(block);
     const next = activeDraft.blocks[index + 1] || activeDraft.blocks[index - 1];
     activeDraft.blocks.splice(index, 1);
-    setDirty();
-    renderWorkspaceContent();
+    const pageUpdate = {showUpdating: focusArea !== 'outline'};
+    setDirty(null, pageUpdate);
+    renderWorkspaceContent(pageUpdate);
     if (focusArea === 'outline') {
       outlineController.announce(`${title} removed from Report.`);
       if (next) outlineController.reveal(next);
@@ -35013,13 +35014,13 @@ async function renderProjectReportDraft(project, resume = null) {
     onError: error => showStatusError(error.message)
   });
 
-  function renderWorkspaceContent() {
+  function renderWorkspaceContent(pageUpdate) {
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
     reportUndo.bind(activeDraft);
     outlineNavigationGeneration += 1;
     const presentation = ++reportPresentationGeneration;
     applyDocumentLayout(panel, activeDraft.pageFormat || 'letter');
-    pageLayout.invalidate();
+    pageLayout.invalidate(pageUpdate);
     const draftKey = activeDraft.id || activeDraft.clientDraftID;
     const keepPosition = renderedDraftKey === draftKey;
     const pagesScroll=keepPosition?pageLayout.capturePosition():0;

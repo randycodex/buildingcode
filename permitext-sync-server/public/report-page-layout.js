@@ -12,13 +12,16 @@ export function createReportPageLayout({host, prepare, isCurrent, onPages = () =
   let committed = null, disposeCommitted = () => {};
   const current = revision => !stopped && active && isCurrent() && revision === generation;
   const cancelTimer = () => {clearTimer(timer); timer = null;};
-  const refresh = async () => {
+  const showProgress = showUpdating => {
+    status.textContent = !committed ? 'Preparing pages…' : showUpdating ? 'Updating pages…' : '';
+    status.setAttribute('role', 'status'); retry.hidden = true;
+  };
+  const refresh = async ({showUpdating = true} = {}) => {
     cancelTimer();
     if (!active || stopped || !isCurrent()) return false;
     const revision = ++generation;
     let staging, disposeStaging;
-    status.textContent = committed ? 'Updating pages…' : 'Preparing pages…';
-    status.setAttribute('role', 'status'); retry.hidden = true;
+    showProgress(showUpdating);
     try {
       const prepared = await prepare();
       if (!current(revision)) return false;
@@ -61,12 +64,11 @@ export function createReportPageLayout({host, prepare, isCurrent, onPages = () =
       if (active && stale) void refresh();
       if (!active) {cancelTimer(); generation += 1; stale = true;}
     },
-    invalidate() {
+    invalidate({showUpdating = true} = {}) {
       stale = true; generation += 1; cancelTimer();
       if (active && !stopped) {
-        status.textContent = committed ? 'Updating pages…' : 'Preparing pages…';
-        status.setAttribute('role', 'status'); retry.hidden = true;
-        timer = setTimer(() => {void refresh();}, 400);
+        showProgress(showUpdating);
+        timer = setTimer(() => {void refresh({showUpdating});}, 400);
       }
     },
     dispose() {stopped = true; generation += 1; cancelTimer(); disposeCommitted(); host.replaceChildren();}
