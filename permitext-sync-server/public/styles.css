@@ -12218,9 +12218,11 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   max-width: calc(100vw - 16px);
   max-height: calc(100vh - 16px);
   overflow-y: auto;
+  font-size: 14px;
 }
 
 .saved-evidence-menu[hidden] { display: none; }
+.saved-evidence-menu :is(button, .report-membership-status) { font-size: inherit; }
 .saved-evidence-menu .report-membership-status { margin: 0; line-height: normal; }
 .saved-evidence-menu .saved-remove-evidence { color: var(--destructive); }
 
