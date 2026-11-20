@@ -7,6 +7,97 @@ export function readerShortcutLabel({ prefix = '', edition = '' }) {
     : `${abbreviation} · ${edition || 'Current'}`;
 }
 
+function compactToolbarLabel(label) {
+  return label.replace(/^Reader (\d+)$/, 'R$1')
+    .replace(/\bReader(?=\s\d+$|$)/, 'R.')
+    .replace(/^(Assistant|Calculator)(?=\s\d+$|$)/, word => word === 'Assistant' ? 'Asst.' : 'Calc.');
+}
+
+function createToolbarOverflow(toolbar, hideTooltip) {
+  const more = toolbar?.querySelector('.workspace-tools-more');
+  if (!more) return;
+  const menu = toolbar.querySelector('.workspace-tools-overflow');
+  const doc = toolbar.ownerDocument;
+  const win = doc.defaultView;
+  const events = new win.AbortController();
+  let overflow = [];
+
+  function positionMenu() {
+    const bounds = more.getBoundingClientRect();
+    const left = Math.max(8, Math.min(bounds.left, win.innerWidth - menu.offsetWidth - 8));
+    menu.style.left = `${left}px`;
+    menu.style.top = `${toolbar.getBoundingClientRect().bottom + 6}px`;
+  }
+
+  more.addEventListener('click', hideTooltip, {signal:events.signal});
+  menu.addEventListener('beforetoggle', event => {
+    if (event.newState !== 'open') return;
+    const entries = overflow.map(button => {
+      const entry = doc.createElement('button');
+      entry.type = 'button';
+      entry.textContent = button.querySelector('span').textContent;
+      entry.disabled = button.disabled;
+      if (button.dataset.readerPaneId) entry.dataset.readerPaneId = button.dataset.readerPaneId;
+      entry.addEventListener('click', () => {
+        menu.hidePopover();
+        button.click();
+      });
+      return entry;
+    });
+    entries.find(entry => !entry.disabled)?.setAttribute('autofocus', '');
+    menu.replaceChildren(...entries);
+    positionMenu();
+  }, {signal:events.signal});
+  menu.addEventListener('toggle', positionMenu, {signal:events.signal});
+
+  function fit() {
+    if (events.signal.aborted || !toolbar.clientWidth) return;
+    const focused = doc.activeElement;
+    const bounds = toolbar.getBoundingClientRect();
+    const fits = button => button.getBoundingClientRect().right <= bounds.right + 0.01;
+    const buttons = [...toolbar.querySelectorAll('#add-reader, .reader-shortcut, [data-toolbar-tool]')];
+    for (const button of buttons) button.removeAttribute('data-toolbar-overflow');
+    toolbar.classList.remove('is-compact');
+    const visible = buttons.filter(button => button.getClientRects().length);
+    const last = visible.at(-1);
+    const nextOverflow = [];
+    if (last && !fits(last)) {
+      toolbar.classList.add('is-compact');
+      if (!fits(last)) {
+        more.hidden = false;
+        while (visible.length && !fits(more)) {
+          const button = visible.pop();
+          button.setAttribute('data-toolbar-overflow', '');
+          nextOverflow.unshift(button);
+        }
+      }
+    }
+    const membershipChanged = nextOverflow.length !== overflow.length || nextOverflow.some((button, index) => button !== overflow[index]);
+    if (membershipChanged) {
+      hideTooltip();
+      if (menu.matches(':popover-open')) menu.hidePopover();
+    }
+    const firstRestored = overflow[0];
+    overflow = nextOverflow;
+    more.hidden = !overflow.length;
+    if (overflow.includes(focused)) more.focus({preventScroll:true});
+    else if (more.hidden && focused === more) firstRestored?.focus({preventScroll:true});
+    else if (menu.matches(':popover-open')) positionMenu();
+  }
+
+  const resizeObserver = new win.ResizeObserver(fit);
+  resizeObserver.observe(toolbar);
+  doc.fonts?.ready.then(fit);
+  return {fit, dispose() {
+    resizeObserver.disconnect();
+    events.abort();
+    if (menu.matches(':popover-open')) menu.hidePopover();
+    for (const button of overflow) button.removeAttribute('data-toolbar-overflow');
+    toolbar.classList.remove('is-compact');
+    more.hidden = true;
+  }};
+}
+
 // The toolbar navigates columns. Code tabs and their reading sessions live in
 // the Reader header rather than becoming additional toolbar shortcuts.
 export function createReaderShortcuts({ host, track, readers, context, reveal, move, preview, cancelPreview, renderIcon, columnOrder, tools = [] }) {
@@ -42,15 +133,15 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     if (gesture?.active) return;
     hideTooltip();
     tooltipButton = button;
-    tooltip.textContent = button.dataset.description;
+    tooltip.textContent = button.dataset.description || button.getAttribute('aria-label');
     tooltip.hidden = false;
     button.setAttribute('aria-describedby', tooltip.id);
     const bounds = button.getBoundingClientRect();
     tooltip.style.left = `${Math.max(8, Math.min(bounds.left, win.innerWidth - tooltip.offsetWidth - 8))}px`;
     tooltip.style.top = `${bounds.bottom + 7}px`;
   }
-  function bindTooltip(button) {
-    const show = () => showTooltip(button);
+  function bindTooltip(button, compactOnly = false) {
+    const show = () => { if (!compactOnly || toolbar.classList.contains('is-compact')) showTooltip(button); };
     const hide = () => { if (tooltipButton === button) hideTooltip(); };
     const listeners = [
       ['pointerenter', show],
@@ -65,7 +156,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
   }
   const unbindLayoutTooltips = Array.from(
     doc.body.querySelector('.workflow-layout-actions')?.querySelectorAll('button') || [],
-    bindTooltip
+    button => bindTooltip(button)
   );
   function activate(id) {
     if (!buttons.has(id)) return;
@@ -127,7 +218,8 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
       gesture.button.setPointerCapture?.(gesture.pointerId);
       gesture.button.classList.add('is-dragging');
       host.classList.add('is-reordering');
-      gesture.slots = new Map([...buttons].map(([id, button]) => [id, layoutBounds(button)]));
+      gesture.slots = new Map([...buttons].filter(([, button]) => button.dataset.toolbarOverflow === undefined)
+        .map(([id, button]) => [id, layoutBounds(button)]));
     }
     event.preventDefault();
     followPointer(event);
@@ -283,7 +375,12 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
       const description = [name, item.location || (item.column ? '' : 'Code contents'), duplicate].filter(Boolean).join(' · ');
       button.className = `reader-shortcut code-theme-${item.theme}${item.column ? ' reader-column-shortcut' : ''}`;
       if (gesture?.active && gesture.id === item.id) button.classList.add('is-dragging');
-      button.textContent = label;
+      if (toolbarOverflow) {
+        const text = doc.createElement('span');
+        text.textContent = label;
+        button.replaceChildren(text);
+        setCompactLabel(button, label);
+      } else button.textContent = label;
       if (item.iconName) renderIcon?.(button, item.iconName);
       button.dataset.description = description;
       button.setAttribute('aria-label', `Show ${name}${item.column ? '' : ' Reader'}${item.location ? ` · ${item.location}` : ''}${duplicate ? ` · ${duplicate}` : ''}`);
@@ -298,6 +395,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
     if (added) activeID = added.id;
     if (!wanted.has(activeID)) activeID = items[0]?.id || '';
     if (activeID) activate(activeID);
+    if (!gesture?.active) toolbarOverflow?.fit();
     observe();
   }
   function schedule() {
@@ -313,11 +411,33 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
   function observe() {
     observer.disconnect();
     observer.observe(track, { childList: true });
+    if (toolbarOverflow) {
+      for (const element of toolbar.querySelectorAll('#add-reader, [data-toolbar-tool], [data-workflow-tools]')) {
+        observer.observe(element, { attributes: true, attributeFilter: ['hidden'] });
+      }
+    }
     // Observe small column headers and visibility, never passage/editor DOM.
     for (const panel of track.querySelectorAll(':scope > :is(.workspace-panel, .shared-report-column)')) {
       observer.observe(panel, { attributes: true, attributeFilter: ['class'] });
       const header = panel.querySelector(':scope > header');
       if (header) observer.observe(header, { childList: true, characterData: true, subtree: true });
+    }
+  }
+  function setCompactLabel(button, label) {
+    const compact = compactToolbarLabel(label);
+    if (compact !== label) button.dataset.shortLabel = compact;
+    else delete button.dataset.shortLabel;
+  }
+  const toolbarOverflow = createToolbarOverflow(toolbar, hideTooltip);
+  const unbindCompactTooltips = [];
+  if (toolbarOverflow) {
+    const addReader = toolbar.querySelector('#add-reader');
+    addReader.dataset.shortLabel = '';
+    unbindCompactTooltips.push(bindTooltip(addReader, true));
+    for (const {button} of launchers) {
+      button.dataset.toolbarTool = '';
+      setCompactLabel(button, button.textContent.trim());
+      if (button.dataset.shortLabel) unbindCompactTooltips.push(bindTooltip(button, true));
     }
   }
   const observer = new win.MutationObserver(schedule);
@@ -340,6 +460,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
       finishPointer();
       disposed = true;
       observer.disconnect();
+      toolbarOverflow?.dispose();
       track.removeEventListener('permitext:workspace-layout-change', schedule);
       track.removeEventListener('pointerdown', remember);
       track.removeEventListener('focusin', remember);
@@ -353,6 +474,7 @@ export function createReaderShortcuts({ host, track, readers, context, reveal, m
       doc.removeEventListener('keydown', dismiss);
       hideTooltip();
       unbindLayoutTooltips.forEach(unbind => unbind());
+      unbindCompactTooltips.forEach(unbind => unbind());
       tooltip.remove();
       restoreLaunchers();
       launchers.forEach(({home}) => home.remove());

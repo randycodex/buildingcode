@@ -1,5 +1,5 @@
 /* Column shortcuts share the workspace navigation's active and hover states. */
-.reader-toolbar-tools,.reader-shortcuts{display:flex;align-items:center;gap:6px}
+.reader-toolbar-tools,.reader-shortcuts{display:flex;align-items:center;gap:var(--workspace-menu-gap,6px)}
 .reader-shortcuts[hidden]{display:none}
 .workflow-toolbar #add-reader{--workspace-menu-weight:300;flex:0 0 auto;color:var(--text-secondary)}
 .workflow-toolbar #add-reader:not(:disabled):hover{color:light-dark(var(--text-primary),#fff)}
@@ -15,6 +15,49 @@
 .workflow-toolbar .reader-shortcut:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .reader-shortcut-tooltip{position:fixed;z-index:1500;box-sizing:border-box;max-width:min(360px,calc(100vw - 16px));padding:8px 10px;border-radius:10px;background:var(--menu-surface);color:var(--text-primary);box-shadow:var(--shadow-panel);font:12px/1.5 var(--ui-font-family);overflow-wrap:anywhere;pointer-events:none}
 .reader-shortcut-tooltip[hidden]{display:none}
+
+.workflow-toolbar :is([data-toolbar-overflow], .workspace-tools-more[hidden], .workspace-tools-overflow:not(:popover-open)) {
+  display: none !important;
+}
+.workflow-toolbar.is-compact {
+  --workspace-menu-gap: 4px;
+  --workspace-tool-inline-padding: 6px;
+  --workspace-tool-icon-gap: 5px;
+}
+.workflow-toolbar.is-compact [data-short-label] > span { display: none; }
+.workflow-toolbar.is-compact [data-short-label]:not(#add-reader)::after { content: attr(data-short-label); }
+.workflow-toolbar .workspace-tools-more { flex: 0 0 auto; }
+.workflow-toolbar .workspace-tools-overflow:popover-open {
+  position: fixed;
+  inset: auto;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - var(--header-height) - 16px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--menu-surface);
+  box-shadow: var(--shadow-panel);
+}
+.workflow-toolbar .workspace-tools-overflow button {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary);
+  font: 500 14px/1.4 var(--ui-font-family);
+  text-align: start;
+  cursor: pointer;
+}
+.workflow-toolbar .workspace-tools-overflow button[data-reader-pane-id] { color: var(--workspace-menu-active); }
+.workflow-toolbar .workspace-tools-overflow button:not(:disabled):hover { background: var(--workspace-menu-highlight); }
+.workflow-toolbar .workspace-tools-overflow button:disabled { opacity: .45; cursor: default; }
 
 @media(pointer:coarse){.workflow-toolbar .reader-shortcut{min-height:44px;min-width:44px}}
 @media(prefers-reduced-motion:reduce){.workflow-toolbar .reader-shortcut{transition:none}}

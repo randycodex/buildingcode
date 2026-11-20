@@ -1,4 +1,4 @@
-export const webAppVersion = "20261119-workspace-release-v2613";
+export const webAppVersion = "20261120-compact-toolbar-v2615";
 export const webSyncProtocol = "manual-sync-v1";
 export const webSyncProtocolHeader = "X-Permitext-Web-Sync";
 export const webUpdateRequiredCode = "WEB_APP_UPDATE_REQUIRED";

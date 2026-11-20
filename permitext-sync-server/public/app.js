@@ -1,6 +1,6 @@
 import { normalizeNoteResearch } from "./note-research.js?v=1";
 import {buildProjectWorkspaceURL, createProjectURLCatalog, mergeProjectURLNames, parseProjectWorkspaceURL, projectURLSlug} from './project-urls.js?v=1';
-import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=20";
+import { createReaderShortcuts, readerShortcutLabel } from "./reader-shortcuts.js?v=22";
 import { readerTabs, initializeReaderTabs, activateReaderTab, addReaderTab, openRecentReaderTab, removeReaderTab, retainedReaderTab, canAddReaderTab, maximumReaderTabs } from "./reader-tabs.js?v=5";
 import { generatedNoteTitle } from "./notebook-titles.js?v=1";
 import { notebookContentText, notebookBlocksFromSourceElement, tableDisplayCells } from "./notebook-content.js?v=8";
@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-workspace-release-v2613";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-compact-toolbar-v2615";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-workspace-release-v2613";
+} from "./offline-storage.js?v=20261120-compact-toolbar-v2615";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
