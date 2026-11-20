@@ -45,11 +45,13 @@ try {
   await card.locator('select[aria-label="Function of space"]:not([disabled])').waitFor({state:'attached'});
   assert.equal(await draftOptions.count(),1);
   await startCalculation();
-  await startCalculation();
+  const newCalculationShortcut=card.getByRole('button',{name:'New calculation',exact:true});
+  await newCalculationShortcut.click();
   assert.equal(await draftOptions.count(),1);
   await card.locator('select[aria-label="Function of space"]:not([disabled])').waitFor({state:'attached'});
   await card.getByRole('textbox',{name:'Floor area · ft²',exact:true}).fill('450');
-  await startCalculation();
+  await newCalculationShortcut.click();
+  assert.equal(await card.getByRole('textbox',{name:'Floor area · ft²',exact:true}).inputValue(),'');
   assert.equal(await draftOptions.count(),2);
   const previous=await recent.locator('option').filter({hasText:'450 ft²'}).getAttribute('value');
   await recent.selectOption(previous,{force:true});

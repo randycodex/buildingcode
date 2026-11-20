@@ -300,8 +300,21 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   const reloadDraft = document.createElement('button'); reloadDraft.type = 'button'; reloadDraft.className = 'ghost-button'; reloadDraft.textContent = 'Reload calculation'; reloadDraft.hidden = true;
   reloadDraft.addEventListener('click', () => onReloadDraft?.());
   recentLabel.append(recent);
+  const draftPicker = document.createElement('div');
+  draftPicker.className = 'calculation-draft-picker';
+  draftPicker.append(recentLabel);
+  const newDraft = column && onNewDraft ? document.createElement('button') : null;
+  if (newDraft) {
+    newDraft.type = 'button';
+    newDraft.className = 'icon-button calculation-new-draft';
+    newDraft.textContent = '+';
+    newDraft.title = 'New calculation';
+    newDraft.setAttribute('aria-label', newDraft.title);
+    newDraft.addEventListener('click', () => onNewDraft({focusShortcut: true}));
+    draftPicker.append(newDraft);
+  }
   if (!column) draftTools.append(draftState);
-  draftTools.append(recentLabel, reloadDraft);
+  draftTools.append(draftPicker, reloadDraft);
   const fields = {};
   for (const [key, label, options] of [
     ['factorMode', 'Factor source', [['table', 'BC table (default)'], ['custom', 'Custom factor']]],
@@ -497,6 +510,7 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   form.addEventListener('submit', async event => {
     event.preventDefault(); const calculation = update(); if (!calculation.valid || save.disabled) return;
     busy = true; root.setAttribute('aria-busy', 'true'); recent.disabled = true; update(); status.textContent = 'Saving calculation and source snapshot…';
+    if (newDraft) newDraft.disabled = true;
     // Lock inputs during the save so a delayed response cannot label newer inputs saved.
     Object.values(fields).forEach(field => field.disabled = true);
     try {
@@ -505,7 +519,12 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
       if (!card) return;
       savedFingerprint = fingerprint(calculation);
     } catch (error) {status.textContent = error.message;}
-    finally {busy = false; root.removeAttribute('aria-busy'); recent.disabled = false; Object.values(fields).forEach(field => field.disabled = staleDraft); fields.spaceFunction.disabled = staleDraft || !table; update();}
+    finally {
+      busy = false; root.removeAttribute('aria-busy'); recent.disabled = false;
+      if (newDraft) newDraft.disabled = false;
+      Object.values(fields).forEach(field => field.disabled = staleDraft);
+      fields.spaceFunction.disabled = staleDraft || !table; update();
+    }
   });
   root.addEventListener('toggle', async () => {
     if (!root.open || table || loading) return;

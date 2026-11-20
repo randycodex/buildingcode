@@ -21598,6 +21598,36 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .search-scope-choices label > span { min-width: 0; font: inherit; text-align: left; text-transform: none; }
 .calculation-draft-tools { display: grid; gap: 10px; margin: 12px 0; }
 .calculation-draft-tools label { display: grid; gap: 6px; font-size: 12px; text-transform: none; letter-spacing: normal; }
+.calculation-draft-picker {
+  --calculation-draft-control-size: 38px;
+  display: flex;
+  align-items: end;
+  gap: var(--space-2);
+}
+.calculation-draft-picker > label { flex: 1 1 auto; min-width: 0; }
+.calculator-panel .occupant-load-body .calculation-draft-picker :is(.custom-select-trigger, select:not(.native-select-hidden)) {
+  min-height: var(--calculation-draft-control-size);
+  border-radius: var(--radius-pill);
+}
+.calculation-draft-picker > .calculation-new-draft {
+  box-sizing: border-box;
+  flex: 0 0 var(--calculation-draft-control-size);
+  width: var(--calculation-draft-control-size);
+  height: var(--calculation-draft-control-size);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-primary);
+  font-weight: 400;
+  cursor: pointer;
+}
+.calculation-new-draft:not(:disabled):hover { background: var(--menu-highlight); }
+.calculation-new-draft:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.calculation-new-draft:disabled { cursor: default; opacity: .45; }
+@media (pointer: coarse) {
+  .calculation-draft-picker { --calculation-draft-control-size: 44px; }
+}
 .occupant-load-body :is(.custom-select-trigger, select:not(.native-select-hidden)) {
   position: relative; width: 100%; min-width: 0; min-height: 36px; padding: 8px 34px 8px 12px;
   border: 1px solid var(--border); border-radius: var(--calculation-field-radius); background: transparent;
