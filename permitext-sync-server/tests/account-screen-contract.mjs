@@ -99,7 +99,7 @@ function harness(signedIn, pro = signedIn) {
     localStorage: { setItem: (key, value) => preferences.set(key, value) },
     renderTemplate() {
       const picker = Object.assign(element(), { className: "settings-theme-picker" });
-      for (const value of ["original", "tinted"]) {
+      for (const value of ["original", "tinted", "header-colors", "warm"]) {
         picker.append(Object.assign(element(), { className: "settings-theme-radio", value }));
       }
       return picker;
@@ -165,14 +165,21 @@ for (const signedIn of [false, true]) {
     assert.equal(appearance.hidden, false);
     assert.equal(account.hidden, true);
     assert.equal(recovery.hidden, true);
-    const [original, tinted] = appearance.querySelectorAll(".settings-theme-radio");
+    const [original, tinted, headerColors, warm] = appearance.querySelectorAll(".settings-theme-radio");
     assert.equal(tinted.checked, true, "The existing tint stays selected by default.");
     original.checked = true;
     original.listeners.change();
     assert.equal(h.track.dataset.workspaceTheme, "original");
     assert.equal(h.preferences.get("permitext:workspace-theme"), "original");
     assert.equal(tinted.checked, false);
-    h.context.applyWorkspaceTheme("tinted");
+    for (const choice of [headerColors, warm]) {
+      choice.checked = true;
+      choice.listeners.change();
+      assert.equal(h.track.dataset.workspaceTheme, choice.value);
+      assert.equal(h.preferences.get("permitext:workspace-theme"), choice.value);
+      assert.equal(appearance.querySelectorAll(".settings-theme-radio").filter(input => input.checked).length, 1);
+    }
+    h.context.applyWorkspaceTheme("invalid-theme");
     assert.equal(original.checked, false);
     assert.equal(tinted.checked, true);
     assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");

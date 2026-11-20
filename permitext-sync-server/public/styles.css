@@ -22125,33 +22125,57 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   --calculator-column-surface: light-dark(#eaf4f4, #162223);
   --notes-column-surface: light-dark(#f8f1e8, #241d17);
   --report-column-surface: light-dark(#f0f1f4, #1c1e22);
+  --warm-workspace-surface: light-dark(#f7f3ea, #211e1a);
+  --warm-workspace-muted: light-dark(#f3efe5, #191714);
 }
 
-#panel-track[data-workspace-theme="tinted"] > .reader-panel {
-  --column-surface: var(--reader-column-surface);
-  --reader-controls-surface: var(--column-surface);
-}
-#panel-track[data-workspace-theme="tinted"] > .search-panel { --column-surface: var(--search-column-surface); }
-#panel-track[data-workspace-theme="tinted"] > .saved-panel { --column-surface: var(--evidence-column-surface); }
-#panel-track[data-workspace-theme="tinted"] > .analysis-panel { --column-surface: var(--assistant-column-surface); }
-#panel-track[data-workspace-theme="tinted"] > .calculator-panel { --column-surface: var(--calculator-column-surface); }
-#panel-track[data-workspace-theme="tinted"] > :is(.notebook-index-panel, .notebook-panel) { --column-surface: var(--notes-column-surface); }
-#panel-track[data-workspace-theme="tinted"] > .shared-report-column { --column-surface: var(--report-column-surface); }
+#panel-track > .reader-panel { --column-tint: var(--reader-column-surface); }
+#panel-track > .search-panel { --column-tint: var(--search-column-surface); }
+#panel-track > .saved-panel { --column-tint: var(--evidence-column-surface); }
+#panel-track > .analysis-panel { --column-tint: var(--assistant-column-surface); }
+#panel-track > .calculator-panel { --column-tint: var(--calculator-column-surface); }
+#panel-track > :is(.notebook-index-panel, .notebook-panel) { --column-tint: var(--notes-column-surface); }
+#panel-track > .shared-report-column { --column-tint: var(--report-column-surface); }
 
 #panel-track[data-workspace-theme="tinted"] > :is(.reader-panel, .search-panel, .saved-panel, .analysis-panel, .calculator-panel,
   .notebook-index-panel, .notebook-panel, .shared-report-column) {
-  --surface: var(--column-surface);
-  --surface-raised: var(--column-surface);
-  background-color: var(--column-surface);
+  --surface: var(--column-tint);
+  --surface-raised: var(--column-tint);
+  background-color: var(--column-tint);
+}
+
+#panel-track[data-workspace-theme="warm"] {
+  --background: var(--warm-workspace-muted);
+  --surface: var(--warm-workspace-surface);
+  --surface-raised: var(--warm-workspace-surface);
+  --surface-muted: var(--warm-workspace-muted);
+  background-color: var(--background);
+}
+
+#panel-track:not([data-workspace-theme="original"]) > .reader-panel {
+  --reader-controls-surface: var(--surface);
+  background-color: var(--surface);
+}
+
+#panel-track[data-workspace-theme="header-colors"] > :is(.reader-panel, .search-panel, .saved-panel, .analysis-panel,
+  .calculator-panel, .notebook-index-panel, .notebook-panel) > .panel-header,
+#panel-track[data-workspace-theme="header-colors"] > .shared-report-column .report-draft-header {
+  background-color: var(--column-tint);
+  box-shadow: 0 0 0 var(--space-1) var(--column-tint);
+  border-radius: 4px;
+}
+
+#panel-track[data-workspace-theme="header-colors"] > .reader-panel > .panel-header .reader-collapse-title {
+  background-color: transparent;
 }
 
 /* Assistant's sidebars expand into space reserved after the panel. */
-#panel-track[data-workspace-theme="tinted"] > .research-v2-panel {
-  box-shadow: calc(var(--rv2-history-space, 0px) + var(--rv2-sources-space, 0px)) 0 var(--column-surface);
+#panel-track:is([data-workspace-theme="tinted"], [data-workspace-theme="warm"]) > .research-v2-panel {
+  box-shadow: calc(var(--rv2-history-space, 0px) + var(--rv2-sources-space, 0px)) 0 var(--surface);
   transition: margin-inline-end var(--workspace-sidebar-motion), box-shadow var(--workspace-sidebar-motion);
 }
 
-#panel-track[data-workspace-theme="tinted"] > .calculator-panel .occupant-load-card { background-color: var(--column-surface); }
+#panel-track[data-workspace-theme="tinted"] > .calculator-panel .occupant-load-card { background-color: var(--column-tint); }
 
 #panel-track[data-workspace-theme="tinted"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"] {
   background-color: var(--notes-column-surface);
@@ -22190,10 +22214,16 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .settings-theme-preview > span::after { content: ""; display: block; height: 2px; border-radius: 1px; }
 .settings-theme-preview > span::before { width: 54%; background: var(--text-secondary); margin-block-end: 9px; opacity: .65; }
 .settings-theme-preview > span::after { width: 90%; background: var(--text-secondary); box-shadow: 0 6px var(--text-secondary), 0 12px var(--text-secondary); opacity: .32; }
-.settings-theme-preview.is-tinted > span:nth-child(1) { background: var(--reader-column-surface); }
-.settings-theme-preview.is-tinted > span:nth-child(2) { background: var(--search-column-surface); }
-.settings-theme-preview.is-tinted > span:nth-child(3) { background: var(--evidence-column-surface); }
-.settings-theme-preview.is-tinted > span:nth-child(4) { background: var(--assistant-column-surface); }
+.settings-theme-preview > span:nth-child(1) { --preview-column-tint: var(--reader-column-surface); }
+.settings-theme-preview > span:nth-child(2) { --preview-column-tint: var(--search-column-surface); }
+.settings-theme-preview > span:nth-child(3) { --preview-column-tint: var(--evidence-column-surface); }
+.settings-theme-preview > span:nth-child(4) { --preview-column-tint: var(--assistant-column-surface); }
+.settings-theme-preview[data-preview-theme="tinted"] > span { background-color: var(--preview-column-tint); }
+.settings-theme-preview[data-preview-theme="header-colors"] > span {
+  background-image: linear-gradient(var(--preview-column-tint) 0 18px, transparent 18px);
+}
+.settings-theme-preview[data-preview-theme="warm"] { border-block-start-color: var(--warm-workspace-muted); }
+.settings-theme-preview[data-preview-theme="warm"] > span { background-color: var(--warm-workspace-surface); }
 .settings-theme-name {
   display: flex;
   align-items: center;

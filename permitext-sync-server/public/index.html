@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261018-definition-theme-v90">
-    <link rel="stylesheet" href="/web/styles.css?v=20261119-appearance-v2574">
+    <link rel="stylesheet" href="/web/styles.css?v=20261119-workspace-themes-v2576">
     <link rel="stylesheet" href="/web/document-layout.css?v=20">
     <link rel="stylesheet" href="/web/research-v2.css?v=68">
     <link rel="stylesheet" href="/web/reader-shortcuts.css?v=25">
@@ -434,8 +434,16 @@
             <span class="settings-theme-name"><input class="settings-theme-radio" type="radio" name="workspace-theme" value="original"> Original</span>
           </label>
           <label class="settings-theme-option">
-            <span class="settings-theme-preview is-tinted" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            <span class="settings-theme-preview" data-preview-theme="tinted" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
             <span class="settings-theme-name"><input class="settings-theme-radio" type="radio" name="workspace-theme" value="tinted"> Tinted</span>
+          </label>
+          <label class="settings-theme-option">
+            <span class="settings-theme-preview" data-preview-theme="header-colors" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            <span class="settings-theme-name"><input class="settings-theme-radio" type="radio" name="workspace-theme" value="header-colors"> Header Colors</span>
+          </label>
+          <label class="settings-theme-option">
+            <span class="settings-theme-preview" data-preview-theme="warm" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            <span class="settings-theme-name"><input class="settings-theme-radio" type="radio" name="workspace-theme" value="warm"> Warm</span>
           </label>
         </div>
       </fieldset>
@@ -601,6 +609,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261119-appearance-v2574" type="module"></script>
+    <script src="/web/app.js?v=20261119-workspace-themes-v2576" type="module"></script>
   </body>
 </html>
