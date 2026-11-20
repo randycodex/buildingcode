@@ -22264,6 +22264,10 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
   filter: grayscale(1);
 }
 
+.workspace-shell:has(> #panel-track[data-workspace-theme="grayscale"]) > .topbar > .workflow-toolbar {
+  --workspace-menu-active: light-dark(var(--text-primary), #fff);
+}
+
 #panel-track[data-workspace-theme="grayscale"] .reader-panel .reader-collapse-title {
   color: light-dark(#222222, #e8e8e8);
 }
