@@ -13,7 +13,7 @@
 .rv2-rail-header{display:flex;align-items:center;flex:0 0 auto;min-height:28px}
 .rv2-history-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
 .rv2-rail-title{flex:0 0 auto;margin:0;line-height:1}
-.research-v2 :is(.rv2-history-toggle,.rv2-sources-toggle){display:inline-flex;align-items:center;min-height:28px;padding:0;border-radius:0;background:transparent;color:var(--text-secondary);font:700 var(--workspace-sidebar-title-size) var(--ui-font-family);white-space:nowrap;cursor:pointer}
+.research-v2 :is(.rv2-history-toggle,.rv2-sources-toggle){display:inline-flex;align-items:center;min-height:28px;padding:0;border-radius:0;background:transparent;color:var(--text-secondary);font:var(--workspace-sidebar-title-weight) var(--workspace-sidebar-title-size) var(--ui-font-family);white-space:nowrap;cursor:pointer}
 .research-v2 :is(.rv2-history-toggle,.rv2-sources-toggle):is(:hover,:focus-visible){background:transparent;color:var(--text-primary)}
 .research-v2 :is(.rv2-history-toggle,.rv2-sources-toggle):focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .rv2-rail-divider{position:relative;min-height:0;background:transparent;pointer-events:none;z-index:2}

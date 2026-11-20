@@ -97,6 +97,7 @@
   --workspace-content-max-width: 800px;
   --workspace-list-item-padding: 12px;
   --workspace-sidebar-title-size: 14px;
+  --workspace-sidebar-title-weight: 400;
   --card-stack-gap: var(--space-4);
   --header-height: 55px;
   --divider-width: 1px;
@@ -1341,7 +1342,7 @@ textarea:focus-visible {
 .notebook-index-panel .notebook-list-toggle {
   display: inline-flex; align-items: center; min-height: 28px; padding: 0;
   border: 0; background: transparent; color: var(--text-secondary);
-  font: 700 var(--workspace-sidebar-title-size) var(--ui-font-family); cursor: pointer;
+  font: var(--workspace-sidebar-title-weight) var(--workspace-sidebar-title-size) var(--ui-font-family); cursor: pointer;
 }
 .notebook-index-panel .notebook-list-toggle:is(:hover, :focus-visible) { color: var(--text-primary); }
 .notebook-index-actions {
@@ -20135,6 +20136,7 @@ dialog.report-screen {
 .report-screen .report-source-palette .report-source-group-toggle {
   --chrome-font-size: var(--workspace-sidebar-title-size);
   height: auto; min-height: 0; padding: 0;
+  font-weight: var(--workspace-sidebar-title-weight);
 }
 .report-screen .report-source-picker-help { line-height: 1.5; }
 .report-screen .report-history-entry { padding: 18px 0; }
@@ -21007,7 +21009,7 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 .report-screen .report-draft-panel .report-draft-shell .report-rail-title {
   display: inline-flex; align-items: center; min-height: 28px;
   padding: 0; border: 0; background: transparent; color: var(--text-secondary);
-  font: 700 var(--workspace-sidebar-title-size) var(--ui-font-family); white-space: nowrap; cursor: pointer;
+  font: var(--workspace-sidebar-title-weight) var(--workspace-sidebar-title-size) var(--ui-font-family); white-space: nowrap; cursor: pointer;
 }
 .report-screen .report-draft-panel .report-draft-shell .report-rail-title:is(:hover, :focus-visible) { color: var(--text-primary); }
 .report-screen .report-rail-title:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
