@@ -37,14 +37,13 @@ try {
   await page.getByRole('button',{name:'Calculator',exact:true}).click();
   const card=page.locator('.occupant-load-card:visible');
   const recent=card.locator('select[aria-label="Recent calculations"]');
-  const draftOptions=recent.locator('option:not([value="new-calculation"])');
-  const startCalculation=async()=>{
-    await card.getByRole('button',{name:/^Recent calculations:/}).click();
-    await page.getByRole('option',{name:'New calculation',exact:true}).click();
-  };
+  const draftOptions=recent.locator('option');
+  const recentTrigger=card.getByRole('button',{name:/^Recent calculations:/});
   await card.locator('select[aria-label="Function of space"]:not([disabled])').waitFor({state:'attached'});
   assert.equal(await draftOptions.count(),1);
-  await startCalculation();
+  await recentTrigger.click();
+  assert.equal(await page.getByRole('option',{name:'New calculation',exact:true}).count(),0);
+  await page.keyboard.press('Escape');
   const newCalculationShortcut=card.getByRole('button',{name:'New calculation',exact:true});
   await newCalculationShortcut.click();
   assert.equal(await draftOptions.count(),1);

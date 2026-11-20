@@ -277,7 +277,7 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   const newDraftValue = 'new-calculation';
   root.refreshDraftChoices = items => {
     recent.replaceChildren();
-    if (onNewDraft) {
+    if (!column && onNewDraft) {
       const option = document.createElement('option'); option.value = newDraftValue;
       option.textContent = 'New calculation';
       recent.append(option);
