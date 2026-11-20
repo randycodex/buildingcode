@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-outline-highlight-v2569";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-pause-column-grouping-v2570";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-outline-highlight-v2569";
+} from "./offline-storage.js?v=20261119-pause-column-grouping-v2570";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -537,6 +537,8 @@ const recentSearchPopoverLimit = 15;
 const researchChatPlaceholder = "Ask a Research question…";
 const repeatableUtilityKeys = new Set(["search", "saved"]);
 const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title"]);
+// Retain saved definitions while custom column grouping is paused.
+const columnGroupingEnabled = false;
 // Workspace restoration normalizes Project identities before the rest of the module runs.
 const projectColorOptions = [
   "#6674c8", "#5aaea4", "#f27a4f", "#a14fc0", "#879a6d", "#9b7d6f", "#d75f7a",
@@ -1853,10 +1855,11 @@ function reconcileSharedWorkspaceCatalog() {
     workspaceRegistry.workspaces = [...shared, ...linked];
     persistWorkspaceRegistry();
   } finally { applyingWorkspaceCatalog = false; }
-  const groups = reconcileSharedGroups(now);
-  if (JSON.stringify(merged) !== JSON.stringify(remote) || groups.changed) {
+  const groups = columnGroupingEnabled ? reconcileSharedGroups(now) : null;
+  if (JSON.stringify(merged) !== JSON.stringify(remote) || groups?.changed) {
     enqueueSyncMutation({ continuity: { userID: account.userID, codeVersion: defaultSyncCodeVersion,
-      values: { ...continuityValuesForReader(state.readers[0] || {}, { promoteReader: false }), workspaceCatalogJSON: JSON.stringify(merged), workspaceGroupsJSON: JSON.stringify(groups.merged) }, updatedAt: now } }, account);
+      values: { ...continuityValuesForReader(state.readers[0] || {}, { promoteReader: false }), workspaceCatalogJSON: JSON.stringify(merged),
+        ...(groups ? { workspaceGroupsJSON: JSON.stringify(groups.merged) } : {}) }, updatedAt: now } }, account);
     void flushSyncOutbox({ refresh: true }).catch(() => {});
   }
 }
@@ -2890,7 +2893,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor, {actionLabel = "", 
   layoutActions.className = "workspace-view-options";
   layoutActions.setAttribute("role", "group");
   layoutActions.setAttribute("aria-label", "View options");
-  if (projectsAvailable && state.columnGroups?.length && !["notebook", "report"].includes(currentColumnWorkflowView())) appendMenuAction(layoutActions, {
+  if (columnGroupingEnabled && projectsAvailable && state.columnGroups?.length && !["notebook", "report"].includes(currentColumnWorkflowView())) appendMenuAction(layoutActions, {
     label: "Saved groups…", run: () => openSavedColumnGroupsMenu(workspaceActionsButton)
   });
   if (projectsAvailable && ['research', 'notebook'].includes(currentColumnWorkflowView())) {
@@ -6478,11 +6481,11 @@ function pairSavedEvidenceDetails(paneIDs) {
 }
 
 function canGroupWorkspaceColumn(paneID) {
-  return canGroupColumn(paneID) && !savedEvidenceColumnGroup(paneID, state.paneOrder || []).length;
+  return columnGroupingEnabled && canGroupColumn(paneID) && !savedEvidenceColumnGroup(paneID, state.paneOrder || []).length;
 }
 
 function pinCriticalWorkflowPanesToLeft(paneIDs) {
-  const settingsIsGrouped = (state.columnGroups || []).some((group) => group.paneIDs.includes("utility:settings"));
+  const settingsIsGrouped = Boolean(columnGroupForPane("utility:settings"));
   const settingsPaneID = state.utilities.settings && !settingsIsGrouped ? "utility:settings" : "";
   // Project columns retain their independently chosen positions.
   return [
@@ -6581,8 +6584,10 @@ function activePaneIDs() {
       paired.splice(anchorIndex + 1, 0, detailID);
     }
   });
-  reconcileColumnGroups(paired);
-  paired.splice(0, paired.length, ...orderColumnGroups(paired, state.columnGroups));
+  if (columnGroupingEnabled) {
+    reconcileColumnGroups(paired);
+    paired.splice(0, paired.length, ...orderColumnGroups(paired, state.columnGroups));
+  }
   paired.splice(0, paired.length, ...pairSavedEvidenceDetails(paired));
   const criticalWorkflowFirst = applyLinkedPanePlacements(pinCriticalWorkflowPanesToLeft(paired));
   state.paneOrder = criticalWorkflowFirst;
@@ -46101,7 +46106,7 @@ function resetDividerPanes(previousPaneID, nextPaneID) {
 }
 
 function captureColumnGroupContents() {
-  if (!(state.columnGroups || []).length) return;
+  if (!columnGroupingEnabled || !(state.columnGroups || []).length) return;
   const active = new Set(defaultActivePaneIDs());
   const positions = captureReaderScrollPositions();
   const projectTypes = [
@@ -46222,6 +46227,7 @@ function openSavedColumnGroupsMenu(anchor = workspaceActionsButton) {
 }
 
 function columnGroupForPane(paneID) {
+  if (!columnGroupingEnabled) return null;
   return (state.columnGroups || []).find((group) => group.paneIDs.includes(paneID)) || null;
 }
 
@@ -47421,7 +47427,7 @@ function paneCanCollapse(paneID) {
 }
 
 function columnGroupCanCollapse(group) {
-  return currentColumnWorkflowView() !== "notebook";
+  return columnGroupingEnabled && currentColumnWorkflowView() !== "notebook";
 }
 
 function columnGroupIsCollapsed(group) {
@@ -52203,8 +52209,10 @@ async function resetVisibleColumnWidths() {
     return;
   }
   workspaceColumnExpansion?.restore();
-  for (const group of state.columnGroups || []) {
-    for (const [id, column] of Object.entries(group.columns || {})) if (paneIDs.has(id)) column.width = defaultPaneWidthForID(id);
+  if (columnGroupingEnabled) {
+    for (const group of state.columnGroups || []) {
+      for (const [id, column] of Object.entries(group.columns || {})) if (paneIDs.has(id)) column.width = defaultPaneWidthForID(id);
+    }
   }
   track.querySelectorAll(":scope > .workspace-panel:not(.is-workflow-hidden)").forEach(panel => {
     panel._collapseAnimation?.cancel(); panel._restoreCollapseChildWidths?.();

@@ -32,6 +32,7 @@ const state = { collapsedPaneIDs: [], paneWeights: { 'utility:search:1': 720 }, 
 let reducedMotion = false;
 let saves = 0;
 const context = vm.createContext({
+  columnGroupingEnabled: true,
   state, Set, Map, Array, Object, workspaceColumnExpansion: null, workspaceColumnMotion:{duration:280}, isProAccount:()=>false,
   currentColumnWorkflowView:()=> 'research', workflowPaneIsVisible:()=>true,
   columnGroupForPane: id => state.columnGroups?.find(group => group.paneIDs.includes(id)),
@@ -150,6 +151,7 @@ const savedID = 'utility:saved:one', notebookID = 'project:notebook:p', reportID
 const detailID = 'section:detail:evidence';
 const orderState = { utilities: {}, utilityInstances: [], paneOrder: ['reader:one', notebookID, savedID, reportID], collapsedPaneIDs: [notebookID] };
 const orderContext = vm.createContext({
+  columnGroupingEnabled: true,
   applyLinkedPanePlacements: ids => ids, requestLinkedPanePlacement() {}, workspaceProject:()=>null,
   state: orderState, currentColumnWorkflowView:()=> 'research', Set, normalizeColumnGroups, orderColumnGroups, canGroupColumn,
   defaultActivePaneIDs: () => [savedID, notebookID, reportID, 'reader:one'],
@@ -244,9 +246,21 @@ assert.deepEqual(normalizeWorkspaceLayout(orderState).columnGroups, JSON.parse(J
 assert.deepEqual(orderColumnGroups(['a','b','c','d'], [{paneIDs:['a','c']}]), ['a','c','b','d']);
 console.log('Saved, Notebook and Report are excluded from active and persisted custom groups; remaining columns are preserved.');
 
+orderContext.columnGroupingEnabled = false;
+orderState.columnGroups = [{ id: 'saved', paneIDs: ['reader:one', savedID], collapsed: true }];
+orderState.paneOrder = ['reader:one', notebookID, savedID, reportID];
+const savedGroups = JSON.stringify(orderState.columnGroups);
+assert.equal(orderContext.canGroupWorkspaceColumn('reader:one'), false);
+assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', notebookID, savedID, reportID]);
+assert.deepEqual(Array.from(orderContext.paneGroupForMove('reader:one')), ['reader:one']);
+assert.equal(JSON.stringify(orderState.columnGroups), savedGroups);
+orderState.columnGroups = [];
+orderContext.columnGroupingEnabled = true;
+
 // Reset updates the future expanded widths without changing visibility or group membership.
 const resetState = { paneWeights: { a: 950, b: 820 }, collapsedPaneIDs: ['a'], columnGroups: [{ id: 'g', paneIDs: ['b'], collapsed: true }] };
 const resetContext = vm.createContext({
+  columnGroupingEnabled: true,
   state: resetState, track: { scrollLeft: 0, scrollWidth: 1200, clientWidth: 1000, querySelector: () => null, querySelectorAll: () => [] },
   reportScreen: null, workflowPaneIsVisible:()=>true, currentColumnWorkflowView:()=> 'research', workspaceColumnExpansion: null, syncResearchColumnLayout() {},
   activePaneIDs: () => ['a', 'b'], defaultActivePaneIDs: () => ['a', 'b'], defaultPaneWidthForID: () => 600,
@@ -332,7 +346,7 @@ const peerPanel={dataset:{paneId:'reader:two'}};
 let menuOrder=['reader:one','reader:two'], menuPro=false;
 const menuState={paneOrder:menuOrder,columnGroups:[],readers:[]};
 const menuItems = () => menu.children.filter(item => item.tag === 'button');
-const menuContext=vm.createContext({state:menuState,primarySavedPaneID:()=>'',AbortController,isProAccount:()=>menuPro,currentColumnWorkflowView:()=> 'research',workflowPaneIsVisible:()=>true,
+const menuContext=vm.createContext({state:menuState,columnGroupingEnabled:true,primarySavedPaneID:()=>'',AbortController,isProAccount:()=>menuPro,currentColumnWorkflowView:()=> 'research',workflowPaneIsVisible:()=>true,
   document:{querySelector:()=>null,createElement:tag=>menuNode(tag),body:{append:n=>{menu=n;}},addEventListener(){},get activeElement(){return focused;}},
   window:{innerWidth:1200,innerHeight:800},
   track:{querySelectorAll:()=>[menuPanel,peerPanel]},

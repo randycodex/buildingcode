@@ -31,6 +31,7 @@ try {
   await page.addScriptTag({ content: `
     ${workflowSource.replace(/^export /gm, '')}
     const track = document.querySelector('#panel-track');
+    const columnGroupingEnabled = true;
     let state = { paneOrder: ['reader:one','reader:two','reader:three','utility:analysis','research:conversation:b'], paneWeights: {}, collapsedPaneIDs: [], pinnedPaneID: '', utilities: {analysis:true}, utilityInstances: [], researchConversationID: 'a', columnGroups: [{id:'group',name:'Sources',paneIDs:['reader:one','reader:two','reader:three'],collapsed:false}] };
     let activeWorkspaceID = 'workspace', identity = 'account', localWelcomePreviewPending = false, firstUseWelcomeActive = false, detachedProjectWindow = false, pinnedPaneResizeObserver = null, pendingWorkspacePaneRevealID = '', researchConversationPaneOpened = true;
     let activeResearchConversation = {id:'a',title:'Setbacks',primaryProjectID:'',messages:[],sources:[]};

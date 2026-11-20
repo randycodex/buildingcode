@@ -162,6 +162,7 @@ const reportPanel = {querySelector: () => reportReady ? {} : null};
 const layoutTrack = {scrollLeft:220,scrollWidth:1000,clientWidth:700,querySelector:()=>reportReady ? reportPanel : null,querySelectorAll:()=>[]};
 const layoutState = {paneWeights:{'reader:one':900},columnGroups:[]};
 const layoutContext=vm.createContext({
+  columnGroupingEnabled:false,
   isProAccount:()=>true,currentColumnWorkflowView:()=> 'research',fitColumnsButton:fit,
   reportScreen:{resetWidth(){widthResets++;}},
   document:{querySelector:()=>reportReady?reportPanel:null,querySelectorAll:()=>actions},

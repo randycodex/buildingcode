@@ -532,15 +532,11 @@ const pinnedWorkflowSource = functionSource(appSource, "pinCriticalWorkflowPanes
 assert.doesNotMatch(pinnedWorkflowSource, /savedPaneIDs|openProjectDetails/, "Saved and project tools must not be pinned as a group.");
 const pinCriticalWorkflowPanesToLeft = new Function(
   "state",
-  "savedPaneIDs",
-  "openProjectDetails",
-  "projectWorkspacePaneIDs",
+  "columnGroupForPane",
   `${pinnedWorkflowSource}; return pinCriticalWorkflowPanesToLeft;`
 )(
   { utilities: { settings: true, analysis: true } },
-  () => ["utility:saved:projects"],
-  () => [{ id: "project-1" }],
-  () => ["project:notebook:project-1"]
+  () => null
 );
 assert.deepEqual(
   pinCriticalWorkflowPanesToLeft([

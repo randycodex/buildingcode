@@ -19,8 +19,8 @@ const panels=ids.map(id=>{
 });
 let view='notebook',pro=true,saves=0,pinnedPaneID='';
 const hidden=new Set();
-const context=vm.createContext({state,isProAccount:()=>pro,currentColumnWorkflowView:()=>view,
-  activePinnedPaneID:()=>pinnedPaneID,columnGroupForPane:id=>state.columnGroups.find(group=>group.paneIDs.includes(id)),workspaceColumnExpansion:null,
+const context=vm.createContext({state,columnGroupingEnabled:true,isProAccount:()=>pro,currentColumnWorkflowView:()=>view,
+  activePinnedPaneID:()=>pinnedPaneID,workspaceColumnExpansion:null,
   workflowPaneIsVisible:id=>!hidden.has(id),
   track:{querySelectorAll:selector=>selector.includes('.pane-divider') ? [] : panels.filter(panel=>
     !hidden.has(panel.dataset.paneId) && (panel.dataset.paneId!==reportID || selector.includes('.shared-report-column')))},
@@ -29,7 +29,7 @@ const context=vm.createContext({state,isProAccount:()=>pro,currentColumnWorkflow
   applyPaneWeight(){},closeActiveCustomSelect(){},updateCollapsedPaneDividers(){},
   getComputedStyle:()=>({paddingInline:'0px'}),window:{matchMedia:()=>({matches:true})},
   saveWorkspaceState(){saves++;},notifyWorkspaceLayoutChange(){}});
-vm.runInContext(['paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','paneIsCollapsed',
+vm.runInContext(['paneCanCollapse','columnGroupForPane','columnGroupCanCollapse','columnGroupIsCollapsed','paneIsCollapsed',
   'applyPaneCollapsedState','setPaneCollapsed','refreshColumnGroupPresentation','setColumnGroupCollapsed',
   'setAllColumnsCollapsed'].map(actual).join('\n'),context);
 for (const panel of panels) {
@@ -97,6 +97,19 @@ assert.equal(group.collapsed,false);
 assert.equal(panels[4].classList.contains('is-collapsed'),false);
 assert.equal(context.paneIsCollapsed(reportID),false);
 pinnedPaneID='';
+context.setAllColumnsCollapsed(true);
+state.collapsedPaneIDs=[];
+const savedGroup=JSON.stringify(group);
+context.columnGroupingEnabled=false;
+context.refreshColumnGroupPresentation();
+assert.equal(panels[0].classList.contains('is-collapsed'),false,'A paused group leaves its first column expanded.');
+assert.equal(panels[4].classList.contains('is-group-hidden'),false,'A paused group reveals its other open columns.');
+context.setAllColumnsCollapsed(true);
+assert.ok(group.paneIDs.every(id=>state.collapsedPaneIDs.includes(id)),'Each column gets its own collapsed rail.');
+context.setPaneCollapsed(panels[4],false);
+assert.equal(context.paneIsCollapsed(ids[4]),false,'Search opens on its own.');
+assert.equal(context.paneIsCollapsed(ids[0]),true,'Reader stays individually collapsed.');
+assert.equal(JSON.stringify(group),savedGroup,'Pausing leaves the stored group definition intact.');
 state.columnGroups=[];
 pro=false;
 assert.equal(context.paneCanCollapse(ids[0]),false);
