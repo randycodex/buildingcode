@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-notes-report-guide-v2599";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-column-content-bounds-v2602";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-notes-report-guide-v2599";
+} from "./offline-storage.js?v=20261119-column-content-bounds-v2602";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -35038,7 +35038,9 @@ async function renderProjectReportDraft(project, resume = null) {
       [row.dataset.blockId, [...row.querySelectorAll("details")].map(detail => detail.open)]) : []);
     for (const [key, selector] of [["sources", ".report-source-picker"], ["reports", ".report-list-items"]]) {
       const body = shell.querySelector(selector);
-      if ((keepPosition || key === 'reports') && body && !body.hidden) reportLibraryScroll[key] = body.scrollTop;
+      if ((keepPosition || key === 'reports') && body && !body.hidden && !body.inert) {
+        reportLibraryScroll[key] = body.scrollTop;
+      }
     }
     renderedDraftKey = draftKey;
     reportFormatting?.dispose();
@@ -35121,11 +35123,15 @@ async function renderProjectReportDraft(project, resume = null) {
     if (panel.dataset.reportsHidden === undefined) panel.dataset.reportsHidden = String(!reportSectionExpanded('Reports column',true));
     const reportOptions = document.createElement('div'); reportOptions.className = 'report-list-items';
     reportOptions.setAttribute('role','group'); reportOptions.setAttribute('aria-label','Available reports');
-    reportOptions.addEventListener('scroll', () => {reportLibraryScroll.reports = reportOptions.scrollTop;},{passive:true});
+    reportOptions.addEventListener('scroll', () => {
+      if (!reportOptions.inert) reportLibraryScroll.reports = reportOptions.scrollTop;
+    }, {passive: true});
     const paintReportsToggle = () => {
       const shown = panel.dataset.reportsHidden !== 'true';
+      const reopening = shown && reportOptions.inert;
       reportsRail.classList.toggle('is-reports-collapsed',!shown);
       reportActions.inert = reportOptions.inert = !shown;
+      if (reopening) reportOptions.scrollTop = reportLibraryScroll.reports;
       reportsToggle.setAttribute('aria-expanded',String(shown));
     };
     reportsToggle.addEventListener('click', () => {
