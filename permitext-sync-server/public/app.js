@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261115-numbered-answer-sources-v1923";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-search-performance-v1924";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261110-per-codes-v3";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=12";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -25,7 +25,7 @@ import { automaticContentUpdatesEnabled, projectUpdateApplyBlocker } from "./pro
 import {bindReturnSyncChecks, observeReturnRevision, returnRevisionIsNewer, acknowledgeReturnRevision, hasNewReturnContent} from "./return-sync.js?v=1";
 import { reportNoteSourceChanged, reviewReportNoteSnapshot, createReportNoteComparison } from "./report-note-review.js?v=3";
 import { readProjectUpdateNotices, observeProjectUpdate, projectUpdateNotice, acknowledgeProjectUpdates, requireProjectUpdateReview } from "./project-update-notices.js?v=8";
-import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=16';
+import {downloadLocalLibrary, readDownloadedLibrary, useDownloadedLibrary, usesDownloadedLibrary, checkDownloadedLibraryUpdate} from './downloaded-library.js?v=17';
 import { evidenceComments, evidenceCommentsText, createEvidenceCommentsEditor } from "./evidence-comments.js?v=6";
 import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=8";
 import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.js?v=1";
@@ -69,7 +69,7 @@ import { bindPublicCodeRevisionChecks, createPublicCodeRevisionController, isPub
 import { createPublicContentCache } from "./public-content-cache.js?v=1";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
-import { searchReaderTextSections, rankReaderSearchResults } from "./reader-search-match.js?v=20261026-exact-section-v4";
+import { searchReaderTextSections, rankReaderSearchResults } from "./reader-search-match.js?v=20261120-matching-v5";
 import { searchWords, searchWordPattern } from "./search-words.js?v=20261025-workspace-chrome-v1379";
 import { buildReaderChapterContents, readerContentsLabel, readerContentsChapterKey, readerContentsNodeCanExpand } from "./reader-navigation-tree.js?v=20261112-label-case-v3";
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261114-reader-tab-anchor-v4";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261115-numbered-answer-sources-v1923";
+} from "./offline-storage.js?v=20261120-search-performance-v1924";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,

@@ -13,9 +13,10 @@ import {
   prepareSearchRelevance,
 } from "./search-relevance.js?v=20261110-general-provisions-v2";
 import {
+  createOfflineSectionMetadataReader,
   offlineSourceScope,
   offlineSectionMetadata,
-} from "./offline-code-metadata.js?v=1";
+} from "./offline-code-metadata.js?v=2";
 export { searchWords, searchWordForms, offlineSectionMetadata };
 export function intersect(lists) {
   if (!lists.length) return [];
@@ -88,6 +89,7 @@ export function prepareLocalSearch(url, metadata) {
     resultSource,
     prepared,
     phrase,
+    sectionMetadata: createOfflineSectionMetadataReader(metadata),
   };
 }
 export function localSearchPermits(record, context) {
@@ -104,7 +106,7 @@ export function localSearchPermits(record, context) {
         record.codeVersion !== resultSource.codeVersion))
   );
 }
-export function matchLocalSearch(record, context, metadata) {
+export function matchLocalSearch(record, context) {
   const { matchQuery: query, mode, prepared, phrase } = context;
   if (!localSearchPermits(record, context)) return null;
   const text = [
@@ -121,7 +123,7 @@ export function matchLocalSearch(record, context, metadata) {
       : !phrase.test(text.replace(/\s+/g, " "))
   )
     return null;
-  const meta = offlineSectionMetadata(record, metadata);
+  const meta = context.sectionMetadata(record);
   const result = {
     ...meta,
     sourceChapterID: record.sourceChapterID || record.chapterID,
@@ -147,25 +149,23 @@ export function matchLocalSearch(record, context, metadata) {
     result,
   };
 }
+const resultCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+
 export function finishLocalSearch(matches, url, context) {
-  const { query, resultSource } = context;
   matches.sort(
     (a, b) =>
       a.rank - b.rank ||
-      String(a.result.chapterNumber).localeCompare(
-        String(b.result.chapterNumber),
-        undefined,
-        { numeric: true, sensitivity: "base" },
-      ) ||
-      String(a.result.sectionNumber).localeCompare(
-        String(b.result.sectionNumber),
-        undefined,
-        { numeric: true, sensitivity: "base" },
-      ) ||
+      resultCollator.compare(String(a.result.chapterNumber), String(b.result.chapterNumber)) ||
+      resultCollator.compare(String(a.result.sectionNumber), String(b.result.sectionNumber)) ||
       Number(a.result.codeSectionID || 0) -
         Number(b.result.codeSectionID || 0) ||
       a.result.id - b.result.id,
   );
+  return localSearchPage(matches, url, context);
+}
+
+export function localSearchPage(matches, url, context) {
+  const { query, resultSource } = context;
   const limit = Math.min(
       250,
       Math.max(1, Number(url.searchParams.get("limit")) || 25),

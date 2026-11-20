@@ -6,7 +6,7 @@ import { researchV2Configuration, researchV2Availability, createResearchV2Applic
 import { answerRequest as fastResearchRequest, fastResearchInterpretation } from "./research-fast-stream.mjs";
 import {applyWebSyncSafeguard} from "./web-sync-guard.mjs";
 import {webAppVersion} from "./public/web-client-version.js";
-import {loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
+import {loadPreparedConstructionChapters, loadPreparedSearchCatalog} from "./prepared-search-catalog.mjs";
 import { findRelatedProvisions, assertRelatedProvisionContext, validateRelatedProvisionSelections } from "./research-related-provisions.mjs";
 import { discoverResearchSources, researchDiscoveryOptions } from "./research-source-discovery.mjs";
 import {preparedSearchText} from "./prepared-search-text.mjs";
@@ -596,7 +596,6 @@ const databaseURL =
 
 let cachedStoreAdapter = null;
 let cachedStoreAdapterPromise = null;
-let cachedChapterManifest = null;
 let cachedCanonicalSectionIDs = null;
 const cachedCanonicalBlockIDsBySectionID = new Map();
 let cachedSectionCatalog = null;
@@ -8247,24 +8246,15 @@ function compareChapterNumbers(left, right, collator = null) {
     : leftNumber.localeCompare(rightNumber, undefined, { numeric: true, sensitivity: "base" });
 }
 
-async function chapterManifest() {
-  if (cachedChapterManifest) {
-    return cachedChapterManifest;
-  }
-
+const chapterManifest = createRetryableLazyLoader(async () => {
   try {
     const manifest = await readJSONFile(chapterManifestPath);
-    cachedChapterManifest = new Map(
-      (manifest.chapters || []).map((chapter) => [String(chapter.chapterID), chapter])
-    );
+    return new Map((manifest.chapters || []).map(chapter => [String(chapter.chapterID), chapter]));
   } catch (error) {
-    if (error.code !== "ENOENT") {
-      throw error;
-    }
-    cachedChapterManifest = new Map();
+    if (error.code !== "ENOENT") throw error;
+    return new Map();
   }
-  return cachedChapterManifest;
-}
+});
 
 async function canonicalSectionIDs() {
   if (cachedCanonicalSectionIDs) {
@@ -8445,7 +8435,7 @@ function fullTitleForChapter(chapter, displayTitle, codePrefix = "") {
   return heading || displayTitle;
 }
 
-const chapterIndex = createRetryableLazyLoader(async () => {
+const sourceChapterIndex = createRetryableLazyLoader(async () => {
   const files = await readdir(chapterContentPath);
   const manifest = await chapterManifest();
   const chaptersByKey = new Map();
@@ -8504,6 +8494,10 @@ const chapterIndex = createRetryableLazyLoader(async () => {
   return chapters;
 });
 
+export const publicConstructionChapters = createRetryableLazyLoader(() =>
+  loadPreparedConstructionChapters(sourceChapterIndex)
+);
+
 function flattenChapterSections(chapter) {
   return (chapter.groups || []).flatMap((group) =>
     (group.sections || []).map((section) => ({
@@ -8533,7 +8527,7 @@ async function sectionCatalog() {
 }
 
 async function buildSectionCatalog() {
-  const chapters = await chapterIndex();
+  const chapters = await sourceChapterIndex();
   const navigationChapters = canonicalConstructionNavigationChapters(chapters);
   const sectionSummaries = [];
   for (const chapterSummary of chapters) {
@@ -9046,7 +9040,7 @@ async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
   const evidence = [];
   const charactersPerSection = Math.min(12_000, Math.floor(60_000 / sectionIDs.length));
   const registry = await currentResearchCorpusRegistry();
-  const constructionChapterSummaries = await chapterIndex();
+  const constructionChapterSummaries = await publicConstructionChapters();
   for (const requestedID of sectionIDs) {
     let summary;
     let corpus;
@@ -24045,7 +24039,7 @@ async function codeNavigationChapters(codePrefix, requestedVersion) {
     ? (await historicalConstructionChapterIndex()).map(withNavigationHierarchy)
     : [
         ...([zoningCodePrefix, existingBuildingCodePrefix].includes(codePrefix) ||
-          enactedCodePrefixes.has(codePrefix) ? [] : await chapterIndex()),
+          enactedCodePrefixes.has(codePrefix) ? [] : await publicConstructionChapters()),
         ...(codePrefix && codePrefix !== zoningCodePrefix ? [] : await zoningChapterIndex()),
         ...(codePrefix && codePrefix !== existingBuildingCodePrefix ? [] : await existingBuildingChapterIndex()),
         ...(codePrefix && !enactedCodePrefixes.has(codePrefix) ? [] : await enactedNavigationChapterIndex())
@@ -24358,7 +24352,7 @@ async function codeChapterPayload(request, chapterID) {
     };
   }
   const constructionNavigationSummary = canonicalConstructionNavigationChapters(
-    await chapterIndex()
+    await publicConstructionChapters()
   ).find((chapter) =>
     String(chapter.id) === chapterID && (chapter.sourceChapterIDs || []).length > 1
   );

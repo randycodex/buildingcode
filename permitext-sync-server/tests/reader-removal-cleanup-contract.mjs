@@ -53,12 +53,12 @@ console.log('Reader removal passed: immediate navigation/search/progressive abor
 
 // Execute the actual close handler: cleanup and removal precede persistence or
 // pane reconciliation, and closing cannot construct another loading chapter.
-const closeStart=source.indexOf('  closeButton.addEventListener("click", () => {\n    // Closing');
+const closeStart=source.indexOf('  closeButton.addEventListener("click", () => {', source.indexOf('  internalSearchClearButton.addEventListener('));
 assert.ok(closeStart>=0);
 const closeBody=source.slice(closeStart,source.indexOf('\n  chapterSelect.addEventListener',closeStart));
 const order=[];
 const closed={id:'closed',referenceSourceReaderID:''},neighbor={id:'neighbor',referenceSourceReaderID:'closed'};
-const closing=vm.createContext({closeButton:{addEventListener(_event,handler){this.close=handler;}},
+const closing=vm.createContext({currentColumnWorkflowView:()=>'research',closeButton:{addEventListener(_event,handler){this.close=handler;}},
  panel:{remove(){order.push('remove');}},reader:closed,options:{},
  state:{readers:[closed,neighbor],searchLinkedReaders:{search:'closed'}},
  cancelReaderPanelRequests(){order.push('cancel');},searchLinkedReadersBySearch(){return closing.state.searchLinkedReaders;},

@@ -421,10 +421,21 @@ final class PublishedHTMLContentStore {
         return anchors.first { normalizedSectionKey($0.sectionNumber) == number }
     }
 
+    private enum HeadingPattern {
+        static let appendix = try! NSRegularExpression(pattern: #"^Appendix\s+([A-Z0-9]+):?\s*(.*)$"#, options: [.caseInsensitive])
+        static let markedAppendix = try! NSRegularExpression(pattern: #"^#-\s*Appendix\s+([A-Z0-9]+):?\s*(.*)$"#, options: [.caseInsensitive])
+        static let chapter = try! NSRegularExpression(pattern: #"^Chapter\s+([A-Z0-9]+):\s*(.+)$"#, options: [.caseInsensitive])
+        static let section = try! NSRegularExpression(pattern: #"^Section\s+(BC|MC|PC|FGC)\s+([A-Z0-9.-]+):\s*(.+)$"#, options: [.caseInsensitive])
+        static let markedSection = try! NSRegularExpression(pattern: #"^#--\s*Section\s+(BC|MC|PC|FGC)\s+([A-Z0-9.-]+):\s*(.+)$"#, options: [.caseInsensitive])
+        static let article = try! NSRegularExpression(pattern: #"^(?:#--\s*)?Article\s+([A-Z0-9.-]+):\s*(.+)$"#, options: [.caseInsensitive])
+        static let title = try! NSRegularExpression(pattern: #"^(?:§\s*)?([A-Z0-9]+(?:[-.][A-Z0-9]+)*)\s+(.+)$"#, options: [.caseInsensitive])
+        static let markedTitle = try! NSRegularExpression(pattern: #"^(#-{3,})\s*(?:§\s*)?([A-Z0-9]+(?:[-.][A-Z0-9]+)*)\s+(.+)$"#, options: [.caseInsensitive])
+    }
+
     private static func parseHeading(_ heading: String) -> (sectionNumber: String, title: String, level: Int)? {
         if let appendixMatch = firstMatch(
             in: heading,
-            pattern: #"^Appendix\s+([A-Z0-9]+):?\s*(.*)$"#
+            expression: HeadingPattern.appendix
         ) {
             let title = appendixMatch[2].isEmpty ? "Appendix \(appendixMatch[1])" : appendixMatch[2]
             return (
@@ -436,7 +447,7 @@ final class PublishedHTMLContentStore {
 
         if let appendixMatch = firstMatch(
             in: heading,
-            pattern: #"^#-\s*Appendix\s+([A-Z0-9]+):?\s*(.*)$"#
+            expression: HeadingPattern.markedAppendix
         ) {
             let title = appendixMatch[2].isEmpty ? "Appendix \(appendixMatch[1])" : appendixMatch[2]
             return (
@@ -448,7 +459,7 @@ final class PublishedHTMLContentStore {
 
         if let chapterMatch = firstMatch(
             in: heading,
-            pattern: #"^Chapter\s+([A-Z0-9]+):\s*(.+)$"#
+            expression: HeadingPattern.chapter
         ) {
             return (
                 sectionNumber: chapterMatch[1],
@@ -459,7 +470,7 @@ final class PublishedHTMLContentStore {
 
         if let sectionMatch = firstMatch(
             in: heading,
-            pattern: #"^Section\s+(BC|MC|PC|FGC)\s+([A-Z0-9.-]+):\s*(.+)$"#
+            expression: HeadingPattern.section
         ) {
             return (
                 sectionNumber: sectionMatch[2],
@@ -470,7 +481,7 @@ final class PublishedHTMLContentStore {
 
         if let sectionMatch = firstMatch(
             in: heading,
-            pattern: #"^#--\s*Section\s+(BC|MC|PC|FGC)\s+([A-Z0-9.-]+):\s*(.+)$"#
+            expression: HeadingPattern.markedSection
         ) {
             return (
                 sectionNumber: sectionMatch[2],
@@ -481,7 +492,7 @@ final class PublishedHTMLContentStore {
 
         if let articleMatch = firstMatch(
             in: heading,
-            pattern: #"^(?:#--\s*)?Article\s+([A-Z0-9.-]+):\s*(.+)$"#
+            expression: HeadingPattern.article
         ) {
             return (
                 sectionNumber: articleMatch[1],
@@ -492,7 +503,7 @@ final class PublishedHTMLContentStore {
 
         if let titleMatch = firstMatch(
             in: heading,
-            pattern: #"^(?:§\s*)?([A-Z0-9]+(?:[-.][A-Z0-9]+)*)\s+(.+)$"#
+            expression: HeadingPattern.title
         ) {
             return (
                 sectionNumber: titleMatch[1],
@@ -503,7 +514,7 @@ final class PublishedHTMLContentStore {
 
         guard let titleMatch = firstMatch(
             in: heading,
-            pattern: #"^(#-{3,})\s*(?:§\s*)?([A-Z0-9]+(?:[-.][A-Z0-9]+)*)\s+(.+)$"#
+            expression: HeadingPattern.markedTitle
         ) else {
             return nil
         }
@@ -542,10 +553,7 @@ final class PublishedHTMLContentStore {
         }
     }
 
-    private static func firstMatch(in value: String, pattern: String) -> [String]? {
-        guard let expression = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else {
-            return nil
-        }
+    private static func firstMatch(in value: String, expression: NSRegularExpression) -> [String]? {
         let nsValue = value as NSString
         guard let match = expression.firstMatch(in: value, range: NSRange(location: 0, length: nsValue.length)) else {
             return nil

@@ -3,7 +3,7 @@ import {mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {loadPreparedSearchCatalog} from '../prepared-search-catalog.mjs';
+import {loadPreparedConstructionChapters, loadPreparedSearchCatalog} from '../prepared-search-catalog.mjs';
 import {createPreparedSearchTextReader, searchSectionTextKey} from '../prepared-search-text.mjs';
 import {prepareSearchText} from '../scripts/prepare-search-text.mjs';
 
@@ -21,7 +21,10 @@ process.env.PERMITEXT_SYNC_DATA_PATH = join(temporary, 'sync.json');
 process.env.PERMITEXT_BUILD_SEARCH_CATALOGS = '1';
 for (const name of ['DATABASE_URL', 'PERMITEXT_SYNC_DATABASE_URL', 'POSTGRES_URL', 'NEON_DATABASE_URL', 'STORAGE_URL']) delete process.env[name];
 try {
-  const {publicSearchCatalogs, publicSearchSectionText} = await import('../app.mjs');
+  const {publicConstructionChapters, publicSearchCatalogs, publicSearchSectionText} = await import('../app.mjs');
+  const chapters = await publicConstructionChapters();
+  const preparedChapters = await loadPreparedConstructionChapters(() => assert.fail('Reader opened source chapters'), {sourceOnly:false});
+  assert.deepEqual(preparedChapters, chapters, 'Every construction chapter field, title, identity and position survives preparation');
   const source = await publicSearchCatalogs();
   const readText = createPreparedSearchTextReader({sourceOnly:()=>false});
   let count = 0;
@@ -37,6 +40,13 @@ try {
     count += sections.length;
   }
   const directory = pathToFileURL(`${temporary}/`);
+  assert.equal(await loadPreparedConstructionChapters(() => chapters, {directory, sourceOnly:false}), chapters);
+  await writeFile(join(temporary, 'construction-chapters.json'), JSON.stringify({schemaVersion:1, buildCommit:'wrong', chapters}));
+  await assert.rejects(loadPreparedConstructionChapters(() => chapters, {directory, sourceOnly:false}), /Invalid prepared/);
+  await writeFile(join(temporary, 'construction-chapters.json'), JSON.stringify({
+    schemaVersion:1, buildCommit:process.env.VERCEL_GIT_COMMIT_SHA || null, corpusRevision:'old', chapters
+  }));
+  assert.equal(await loadPreparedConstructionChapters(() => chapters, {directory, sourceOnly:false}), chapters);
   const fallback = [{id:1, codePrefix:'BC'}];
   assert.equal(await loadPreparedSearchCatalog('missing', async () => fallback, {directory, sourceOnly:false}), fallback);
   await writeFile(join(temporary, 'invalid.json'), JSON.stringify({schemaVersion:0, family:'invalid', sections:fallback}));

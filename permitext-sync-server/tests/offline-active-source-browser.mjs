@@ -14,7 +14,7 @@ async function browserRun(sources) {
   const check=(ok,label)=>{if(!ok)throw Error(label);};
   const request=r=>new Promise((resolve,reject)=>{r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
   await offlineLibraryStatus(); // Production creates the real schema.
-  const db=await request(indexedDB.open('permitext-offline',5));
+  const db=await request(indexedDB.open('permitext-offline'));
   const installID='synthetic-perf18';
   const ids=[1,41000001,15000001];
   const rows=sources.map((s,i)=>({key:`${installID}:${ids[i]}`,installID,id:ids[i],sectionID:ids[i],identities:[`${installID}:${ids[i]}`],chapterID:i+10,codePrefix:s.codePrefix,codeVersion:s.canonicalEdition,codeSectionID:s.categoryID,chapterNumber:'1',sectionNumber:'101.1',title:'Synthetic concrete',plainText:'Synthetic concrete enacted fixture',searchText:'101.1 synthetic concrete enacted fixture',blocks:[{plainText:'Synthetic concrete enacted fixture'}]}));
@@ -44,10 +44,10 @@ async function browserRun(sources) {
 }
 let finish;const result=new Promise(resolve=>finish=resolve);
 const publicRoot=new URL('../public/',import.meta.url);
-const server=createServer(async(req,res)=>{const path=new URL(req.url,'http://fixture').pathname;try{
+const server=createServer(async(req,res)=>{const path=new URL(req.url,'http://fixture').pathname.replace(/^\/web\//,'/');try{
  if(path==='/result'&&req.method==='POST'){let text='';for await(const chunk of req)text+=chunk;finish(JSON.parse(text));res.end('ok');return;}
  if(path==='/'){res.setHeader('Content-Type','text/html');res.end('<script type="module" src="/runner.js"></script>');return;}
- if(path==='/runner.js'){res.setHeader('Content-Type','text/javascript');res.end(`(${browserRun.toString()})(${JSON.stringify(sources)}).then(result=>fetch('/result',{method:'POST',body:JSON.stringify(result)})).catch(error=>fetch('/result',{method:'POST',body:JSON.stringify({passed:false,error:error.stack})}));`);return;}
+ if(path==='/runner.js'){res.setHeader('Content-Type','text/javascript');res.end(`(${browserRun.toString()})(${JSON.stringify(sources)}).then(result=>fetch('/result',{method:'POST',body:JSON.stringify(result)})).catch(error=>fetch('/result',{method:'POST',body:JSON.stringify({passed:false,error:error.stack||String(error)})}));`);return;}
  if(!/^\/[a-z0-9-]+\.js$/.test(path)){res.writeHead(404).end();return;}
  res.setHeader('Content-Type','text/javascript');res.end(await readFile(new URL('.'+path,publicRoot)));
  }catch(error){res.writeHead(500).end(String(error));}});

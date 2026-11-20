@@ -29,7 +29,7 @@ struct ResearchConversationSummary: Codable, Hashable, Sendable { let id: String
 ${declaration('ResearchConversationListResponse')}
 ${declaration('NativeResearchHistory')}
 ${declaration('ResearchNotebookHandoffPresentation')}
-struct ResearchConversation: Codable, Sendable { var id = "conversation"; var updatedAt: String; var contextRevision: Int? = 0; var messages: [String] }
+struct ResearchConversation: Codable, Sendable { var id = "conversation"; var primaryProjectID: String?; var updatedAt: String; var contextRevision: Int? = 0; var messages: [String] }
 struct Envelope<T> { let value: T }
 struct ResearchQuestionAttempt: Codable { static let cacheScope = "attempt"; func shouldRetainOnServer(_ c: ResearchConversation) -> Bool { false } }
 final class Cache {
@@ -50,7 +50,7 @@ enum NativePrivateCachePolicy {
 }
 @MainActor final class Library {
  var activeResearchConversationID: String? = "conversation"
- var researchHistoryProjectFilter = "all"
+ var researchHistoryProjectFilter = "all"; var researchHistoryIsPresented = false
  var reads: [CheckedContinuation<ResearchConversation, Error>] = []
  var historyReads: [CheckedContinuation<ResearchConversationListResponse, Error>] = []
  var historyRequests: [(limit: Int, cursor: String?, query: String, projectID: String?)] = []
@@ -65,6 +65,9 @@ enum NativePrivateCachePolicy {
  let library = Library(); let cache = Cache()
  var identity = NativeResearchRequestIdentity(); var isCurrentOwner = true; var owner: Account? = Account()
  var conversation: ResearchConversation?
+ var projectFolderID: Int64?; var scopedProjectID: String?
+ ${method('acceptsConversation(_ value:')}
+ ${method('returnToProjectHistory()')}
  var historyLoadID: UUID?; var summaries: [ResearchConversationSummary] = []; var historyPreviews: [String: String] = [:]
  var conversationLoadID: UUID?; var conversationPublicationID = UUID()
  var historyPreviewRevisions: [String: String] = [:]

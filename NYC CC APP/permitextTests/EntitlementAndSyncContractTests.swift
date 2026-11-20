@@ -3718,7 +3718,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     @MainActor
     func testAllEditionSearchTiming() async throws {
         let library = CodeLibraryViewModel(preferencesDefaults: isolatedEntitlementDefaults(),
-            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: true)
         for _ in 0..<600 {
             if library.isInitialContentLoaded { break }
             try await Task.sleep(for: .milliseconds(100))
@@ -3751,7 +3751,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     func testAllEditionSearchFindsHistoricalTextWithoutChangingMainReader() async throws {
         let defaults = isolatedEntitlementDefaults()
         let library = CodeLibraryViewModel(preferencesDefaults: defaults,
-            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: true)
         for _ in 0..<600 {
             if library.isInitialContentLoaded { break }
             try await Task.sleep(for: .milliseconds(100))

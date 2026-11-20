@@ -1,8 +1,8 @@
 import { searchCitationQuery } from "./search-citation-query.js?v=1";
-import { offlineAssetNamesForChapter, validatedOfflineCodeSources, offlineSourceIdentity, offlineSourceScope, offlineSectionMetadata, resolveOfflineSectionMetadata } from "./offline-code-metadata.js?v=1";
+import { offlineAssetNamesForChapter, validatedOfflineCodeSources, offlineSourceIdentity, offlineSourceScope, offlineSectionMetadata, resolveOfflineSectionMetadata } from "./offline-code-metadata.js?v=2";
 import {codeReferenceRequest, resolveCodeReference} from "./code-reference-resolution.js?v=2";
 export { offlineAssetNamesForChapter, validatedOfflineCodeSources, offlineSourceIdentity, offlineSourceScope, offlineSectionMetadata, resolveOfflineSectionMetadata };
-import {downloadedLibraryStatus, readDownloadedLibrary, removeDownloadedLibrary} from './downloaded-library.js?v=16';
+import {downloadedLibraryStatus, readDownloadedLibrary, removeDownloadedLibrary} from './downloaded-library.js?v=17';
 import { searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./search-relevance.js?v=20261110-general-provisions-v2";
 import { searchWords, matchesSearchWords, searchWordsSnippet } from "./search-words.js?v=20261025-workspace-chrome-v1379";
 import { withCodeAssetRevision } from "./code-asset-identity.js?v=20260923-asset-identity-v1";
@@ -25,7 +25,7 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v2495";
+const shellCacheName = "permitext-pro-shell-v2496";
 const shellAssetVersion = "20261025-workspace-chrome-v1379";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
@@ -46,11 +46,11 @@ const shellURLs = [
   "/web/notebook-reference-transition.js?v=2",
   "/web/workflow-views.js?v=16",
   "/web/active-code-sources.js",
-  "/web/offline-code-metadata.js?v=1",
+  "/web/offline-code-metadata.js?v=2",
   "/web/code-reference-resolution.js?v=2",
-  "/web/downloaded-library.js?v=16",
-  "/web/downloaded-library-worker.js?v=16",
-  "/web/downloaded-library-core.js?v=14",
+  "/web/downloaded-library.js?v=17",
+  "/web/downloaded-library-worker.js?v=17",
+  "/web/downloaded-library-core.js?v=15",
   "/web/search-citation-query.js?v=1",
   "/web/settings-columns.js?v=3",
   "/web/project-details-columns.js?v=20261021-project-columns-v3",
@@ -75,7 +75,7 @@ const shellURLs = [
   "/web/public-code-revision.js?v=20261027-reference-metadata-v5",
   "/web/workspace-access-gate.js?v=20260923-public-panes-v1",
   "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
-  "/web/reader-search-match.js?v=20261026-exact-section-v4",
+  "/web/reader-search-match.js?v=20261120-matching-v5",
   "/web/report-autosave.js?v=1",
   "/web/report-presentation.js?v=1",
   "/web/workspace-view-presentation.js?v=5",
@@ -106,7 +106,7 @@ const shellURLs = [
   "/web/project-update-notices.js?v=8",
   "/web/return-sync.js?v=1",
   "/web/project-update-policy.js?v=2",
-  "/web/web-client-version.js?v=20261115-numbered-answer-sources-v1923",
+  "/web/web-client-version.js?v=20261120-search-performance-v1924",
   "/web/web-app-update.js?v=20261110-per-codes-v3",
   "/web/research-delete-controls.js?v=12",
   "/web/assistant-composer-hint.js?v=1",
@@ -133,18 +133,18 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261115-numbered-answer-sources-v1923",
+  "/web/styles.css?v=20261120-search-performance-v1924",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261115-numbered-answer-sources-v1923",
+  "/web/app.js?v=20261120-search-performance-v1924",
   "/web/settings-copy.js?v=20261109-plan-actions-v8",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261115-numbered-answer-sources-v1923",
+  "/web/offline-storage.js?v=20261120-search-performance-v1924",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=20261111-selective-menus-v3",

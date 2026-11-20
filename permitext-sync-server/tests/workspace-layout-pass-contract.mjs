@@ -38,6 +38,8 @@ const c = vm.createContext({
   refreshPinnedPaneDivider() {events.push('pin');},
   document: {querySelectorAll: () => []}, notifyWorkspaceLayoutChange() {events.push('notify');}
 });
+const reconcile = source.indexOf('function reconcileNotebookReferences(');
+vm.runInContext(source.slice(reconcile, source.indexOf('\n}', reconcile) + 2), c);
 vm.runInContext(actual, c);
 c.appendPaneSequence([pane]);
 assert.deepEqual(events, ['prepare', 'insert', 'insert', 'insert', 'groups', 'navigation', 'measure', 'pin', 'notify']);
