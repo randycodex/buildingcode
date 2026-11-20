@@ -58,10 +58,10 @@ struct ProjectWorkflowView: View {
             if editing { sheetDetent?.wrappedValue = .large }
         }
         .toolbar {
-            if let closeSheet {
+            if closeSheet != nil || isEditing {
                 ToolbarItem(placement: .cancellationAction) {
                     if isEditing { Button("Cancel", action: cancel) }
-                    else { Button("Close", action: closeSheet) }
+                    else if let closeSheet { Button("Close", action: closeSheet) }
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
@@ -74,13 +74,7 @@ struct ProjectWorkflowView: View {
                         .accessibilityIdentifier("project-workflow-edit")
                 }
             }
-            if isEditing {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Button("Cancel", action: cancel)
-                    Spacer()
-                    Button("Save", action: save).fontWeight(.semibold)
-                }
-            }
+
         }
         .onChange(of: library.privateSessionID) { _, _ in cancel() }
         .onChange(of: folderID) { _, _ in cancel() }
@@ -204,14 +198,7 @@ struct ProjectWorkflowView: View {
                 .disabled(folder == nil || needsInitialSync)
                 .accessibilityIdentifier("project-checklist-suggested")
             }
-            if isEditing {
-                HStack {
-                    Button("Cancel", action: cancel).accessibilityIdentifier("project-workflow-cancel")
-                    Spacer()
-                    Button("Save", action: save).fontWeight(.semibold)
-                        .accessibilityIdentifier("project-workflow-bottom-save")
-                }
-            }
+
         }
         .buttonStyle(.plain)
         .frame(minHeight: 44)

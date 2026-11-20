@@ -435,8 +435,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Context editing on the project overview", from: app)
         func save() {
             let header = app.buttons["project-inline-save"]
-            if header.isHittable { header.tap() }
-            else { app.buttons["project-inline-keyboard-save"].tap() }
+            header.tap()
         }
         save()
         XCTAssertTrue(app.buttons["project-section-context"].waitForExistence(timeout: 5))
@@ -458,15 +457,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(app.navigationBars["Structured Facts"].exists)
         value.tap()
         value.typeText(" phone edit")
-        let bottomSave = app.buttons["project-inline-bottom-save"]
-        reveal(bottomSave, in: app)
-        XCTAssertTrue(app.buttons["project-inline-bottom-cancel"].exists)
-        bottomSave.tap()
+        let factsBar = app.navigationBars["Facts"]
+        XCTAssertTrue(factsBar.buttons["Cancel"].isHittable)
+        factsBar.buttons["Save"].tap()
         app.navigationBars["Facts"].buttons["Edit"].tap()
         XCTAssertTrue(value.waitForExistence(timeout: 5))
         XCTAssertTrue((value.value as? String ?? "").contains("phone edit"))
-        keepScreenshot(named: "Facts edited inline on iPhone", from: app)
-        app.buttons["project-inline-cancel"].tap()
+        keepScreenshot(named: "Facts sheet editor on iPhone", from: app)
+        factsBar.buttons["Cancel"].tap()
         app.navigationBars["Facts"].buttons["Close"].tap()
         for (section, title) in [("notebook", "Notebook"), ("evidence", "Evidence"), ("reports", "Reports")] {
             let card = app.buttons["project-section-\(section)"]
@@ -517,7 +515,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["project-workflow-edit"].tap()
         questionText.tap()
         questionText.typeText(" Discard")
-        app.buttons["project-workflow-cancel"].tap()
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Cancel")).count, 1)
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Save")).count, 1)
+        app.navigationBars["Questions"].buttons["Cancel"].tap()
         XCTAssertFalse(app.staticTexts["Is the survey current? Discard"].exists)
         app.navigationBars["Questions"].buttons["Close"].tap()
         XCTAssertTrue(root.waitForExistence(timeout: 5))
@@ -569,8 +569,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
         editor.typeText(String(repeating: "Long context line for scrolling.\n", count: 18))
         let save = app.buttons["project-inline-save"]
-        if save.isHittable { save.tap() }
-        else { app.buttons["project-inline-keyboard-save"].tap() }
+        save.tap()
         XCTAssertTrue(readMore.waitForExistence(timeout: 5))
         reveal(readMore, in: app, swipingDown: true)
         readMore.tap()

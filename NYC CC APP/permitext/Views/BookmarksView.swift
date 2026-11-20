@@ -1154,9 +1154,6 @@ private struct ProjectFactDraft: Identifiable {
 private struct ProjectInlineContextEditor: UIViewRepresentable {
     @Binding var text: String
     let requestsFocus: Bool
-    let onCancel: () -> Void
-    let onSave: () -> Void
-
     func makeUIView(context: Context) -> UITextView {
         let view = UITextView()
         view.backgroundColor = .clear
@@ -1171,17 +1168,6 @@ private struct ProjectInlineContextEditor: UIViewRepresentable {
         view.text = text
         view.selectedRange = NSRange(location: 0, length: 0)
         view.delegate = context.coordinator
-        let toolbar = UIToolbar()
-        toolbar.sizeToFit()
-        toolbar.autoresizingMask = .flexibleWidth
-        let cancel = UIBarButtonItem(title: "Cancel", style: .plain,
-                                     target: context.coordinator, action: #selector(Coordinator.cancel))
-        cancel.accessibilityIdentifier = "project-inline-keyboard-cancel"
-        let save = UIBarButtonItem(title: "Save", style: .done,
-                                   target: context.coordinator, action: #selector(Coordinator.save))
-        save.accessibilityIdentifier = "project-inline-keyboard-save"
-        toolbar.items = [cancel, UIBarButtonItem(systemItem: .flexibleSpace), save]
-        view.inputAccessoryView = toolbar
         view.accessibilityIdentifier = "project-context-editor"
         view.accessibilityLabel = "Project context"
         view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
@@ -1222,9 +1208,6 @@ private struct ProjectInlineContextEditor: UIViewRepresentable {
         var didRequestFocus = false
 
         init(parent: ProjectInlineContextEditor) { self.parent = parent }
-
-        @objc func cancel() { parent.onCancel() }
-        @objc func save() { parent.onSave() }
 
         func textViewDidChange(_ textView: UITextView) {
             parent.text = textView.text
@@ -1394,8 +1377,10 @@ struct ProjectView: View {
                     projectSectionDestination(section)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
-                                if section != .structuredFacts || inlineEditingSection != .structuredFacts {
-                                    Button("Close") { sheetSection = nil }
+                                let editingFacts = section == .structuredFacts && inlineEditingSection == .structuredFacts
+                                Button(editingFacts ? "Cancel" : "Close") {
+                                    if editingFacts { finishInlineEditing() }
+                                    else { sheetSection = nil }
                                 }
                             }
                         }
@@ -1409,7 +1394,14 @@ struct ProjectView: View {
             projectSectionDestination(section)
         }
         .toolbar {
-            if isProjectFolder {
+            if inlineEditingSection == .context {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel", action: finishInlineEditing).accessibilityIdentifier("project-inline-cancel")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save", action: saveInlineEditing).accessibilityIdentifier("project-inline-save")
+                }
+            } else if isProjectFolder {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Edit project", systemImage: "pencil") {
                         if let folder { folderEditorTarget = .edit(folder) }
@@ -1807,9 +1799,8 @@ struct ProjectView: View {
     private var projectContextOverview: some View {
         VStack(alignment: .leading, spacing: 10) {
             if inlineEditingSection == .context {
-                inlineEditorHeader("Context")
-                ProjectInlineContextEditor(text: $contextDraft, requestsFocus: isContextEditorFocused,
-                                           onCancel: finishInlineEditing, onSave: saveInlineEditing)
+                Text("Context").font(.headline).accessibilityIdentifier("project-inline-editor-title")
+                ProjectInlineContextEditor(text: $contextDraft, requestsFocus: isContextEditorFocused)
                     .frame(maxWidth: .infinity)
                     .transition(.opacity)
                 inlineEditorError
@@ -1851,7 +1842,6 @@ struct ProjectView: View {
     private var projectFactsOverview: some View {
         VStack(alignment: .leading, spacing: 12) {
             if inlineEditingSection == .structuredFacts {
-                inlineEditorHeader("Facts")
                 ForEach($factsDraft) { $draft in
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
@@ -1888,7 +1878,7 @@ struct ProjectView: View {
                     }
                     .transition(.opacity)
                 }
-                factsEditorFooter
+                addFactButton.font(.subheadline).buttonStyle(.plain)
                 inlineEditorError
             } else {
                 Button { openProjectSheet(.structuredFacts) } label: {
@@ -1930,22 +1920,6 @@ struct ProjectView: View {
         .padding(.bottom, 4)
     }
 
-    private func inlineEditorHeader(_ title: String) -> some View {
-        HStack {
-            Text(title).font(.headline)
-                .accessibilityIdentifier("project-inline-editor-title")
-            Spacer(minLength: 12)
-            Button("Cancel", action: finishInlineEditing)
-                .accessibilityIdentifier("project-inline-cancel")
-            Button("Save", action: saveInlineEditing)
-                .fontWeight(.semibold)
-                .accessibilityIdentifier("project-inline-save")
-        }
-        .font(.subheadline)
-        .buttonStyle(.plain)
-        .frame(minHeight: 44)
-    }
-
     private var inlineExpansionAnimation: Animation? {
         reduceMotion ? nil : .easeInOut(duration: 0.55)
     }
@@ -1958,31 +1932,6 @@ struct ProjectView: View {
         } label: { Label("Add fact", systemImage: "plus") }
         .frame(minHeight: 44)
         .accessibilityIdentifier("project-fact-add")
-    }
-
-    private var factsEditorFooter: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if dynamicTypeSize.isAccessibilitySize {
-                addFactButton
-                HStack { Spacer(); factsBottomSaveControls }
-            } else {
-                HStack(spacing: 16) { addFactButton; Spacer(); factsBottomSaveControls }
-            }
-        }
-        .font(.subheadline)
-        .buttonStyle(.plain)
-    }
-
-    private var factsBottomSaveControls: some View {
-        HStack(spacing: 16) {
-            Button("Cancel", action: finishInlineEditing)
-                .frame(minHeight: 44)
-                .accessibilityIdentifier("project-inline-bottom-cancel")
-            Button("Save", action: saveInlineEditing)
-                .fontWeight(.semibold)
-                .frame(minHeight: 44)
-                .accessibilityIdentifier("project-inline-bottom-save")
-        }
     }
 
     @ViewBuilder
@@ -2152,22 +2101,16 @@ struct ProjectView: View {
             }
             .interactiveDismissDisabled(inlineEditingSection == .structuredFacts)
             .toolbar {
-                if inlineEditingSection == .structuredFacts {
-                    ToolbarItemGroup(placement: .keyboard) {
-                        Button("Cancel", action: finishInlineEditing)
-                            .accessibilityIdentifier("project-inline-keyboard-cancel")
-                        Spacer()
-                        Button("Save", action: saveInlineEditing).fontWeight(.semibold)
-                            .accessibilityIdentifier("project-inline-keyboard-save")
-                    }
-                }
-                if inlineEditingSection == nil {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Edit") {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(inlineEditingSection == .structuredFacts ? "Save" : "Edit") {
+                        if inlineEditingSection == .structuredFacts {
+                            saveInlineEditing()
+                        } else {
                             sheetDetent = .large
                             beginInlineEditing(.structuredFacts)
                         }
                     }
+                    .disabled(inlineEditingSection != nil && inlineEditingSection != .structuredFacts)
                 }
             }
         case .notebook:
