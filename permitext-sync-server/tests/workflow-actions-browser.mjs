@@ -37,15 +37,20 @@ try {
   await page.getByRole('button',{name:'Calculator',exact:true}).click();
   const card=page.locator('.occupant-load-card:visible');
   const recent=card.locator('select[aria-label="Recent calculations"]');
+  const draftOptions=recent.locator('option:not([value="new-calculation"])');
+  const startCalculation=async()=>{
+    await card.getByRole('button',{name:/^Recent calculations:/}).click();
+    await page.getByRole('option',{name:'New calculation',exact:true}).click();
+  };
   await card.locator('select[aria-label="Function of space"]:not([disabled])').waitFor({state:'attached'});
-  assert.equal(await recent.locator('option').count(),1);
-  await card.getByRole('button',{name:'New calculation',exact:true}).click();
-  await card.getByRole('button',{name:'New calculation',exact:true}).click();
-  assert.equal(await recent.locator('option').count(),1);
+  assert.equal(await draftOptions.count(),1);
+  await startCalculation();
+  await startCalculation();
+  assert.equal(await draftOptions.count(),1);
   await card.locator('select[aria-label="Function of space"]:not([disabled])').waitFor({state:'attached'});
   await card.getByRole('textbox',{name:'Floor area · ft²',exact:true}).fill('450');
-  await card.getByRole('button',{name:'New calculation',exact:true}).click();
-  assert.equal(await recent.locator('option').count(),2);
+  await startCalculation();
+  assert.equal(await draftOptions.count(),2);
   const previous=await recent.locator('option').filter({hasText:'450 ft²'}).getAttribute('value');
   await recent.selectOption(previous,{force:true});
   assert.equal(await card.getByRole('textbox',{name:'Floor area · ft²',exact:true}).inputValue(),'450');

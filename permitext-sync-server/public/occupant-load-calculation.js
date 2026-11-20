@@ -252,7 +252,7 @@ export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '',
 function calculationDraftLabel(item) {
   const input = item.input;
   const description = [input.spaceFunction, input.area ? `${input.area} ft²` : ''].filter(Boolean).join(' · ');
-  return `${input.spaceName || description || 'New calculation'} · ${item.serverVersion ? 'Project calculation' : 'Device draft'}`;
+  return `${input.spaceName || description || 'Untitled calculation'} · ${item.serverVersion ? 'Project calculation' : 'Device draft'}`;
 }
 
 export function createOccupantLoadCard({draft = {}, column = false, projectSyncState = null, onDraftChange, getDestinationNote, savedInputFingerprint = null, recentDrafts = [], activeDraftID = "", onChooseDraft, onNewDraft, onReloadDraft, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes}) {
@@ -274,20 +274,34 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   draftState.textContent = 'Device draft · inputs are saved on this device';
   const recentLabel = document.createElement('label'); recentLabel.textContent = 'Recent calculations';
   const recent = document.createElement('select'); recent.setAttribute('aria-label', 'Recent calculations');
-  for (const item of recentDrafts) {
-    const option = document.createElement('option'); option.value = item.id;
-    option.textContent = calculationDraftLabel(item);
-    recent.append(option);
-  }
-  recent.value = activeDraftID;
-  recent.addEventListener('change', () => onChooseDraft?.(recent.value));
-  const newDraft = document.createElement('button'); newDraft.type = 'button'; newDraft.className = 'ghost-button calculation-new-draft'; newDraft.textContent = 'New calculation';
-  newDraft.addEventListener('click', () => onNewDraft?.());
+  const newDraftValue = 'new-calculation';
+  root.refreshDraftChoices = items => {
+    recent.replaceChildren();
+    if (onNewDraft) {
+      const option = document.createElement('option'); option.value = newDraftValue;
+      option.textContent = 'New calculation';
+      recent.append(option);
+    }
+    for (const item of items) {
+      const option = document.createElement('option'); option.value = item.id;
+      option.textContent = calculationDraftLabel(item);
+      recent.append(option);
+    }
+    recent.value = activeDraftID;
+    recent._syncCustomSelect?.();
+  };
+  root.refreshDraftChoices(recentDrafts);
+  recent.addEventListener('change', () => {
+    const choice = recent.value;
+    recent.value = activeDraftID;
+    if (choice === newDraftValue) onNewDraft?.();
+    else onChooseDraft?.(choice);
+  });
   const reloadDraft = document.createElement('button'); reloadDraft.type = 'button'; reloadDraft.className = 'ghost-button'; reloadDraft.textContent = 'Reload calculation'; reloadDraft.hidden = true;
   reloadDraft.addEventListener('click', () => onReloadDraft?.());
   recentLabel.append(recent);
   if (!column) draftTools.append(draftState);
-  draftTools.append(reloadDraft, newDraft, recentLabel);
+  draftTools.append(recentLabel, reloadDraft);
   const fields = {};
   for (const [key, label, options] of [
     ['factorMode', 'Factor source', [['table', 'BC table (default)'], ['custom', 'Custom factor']]],
@@ -338,17 +352,6 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
     finally {update();}
   });
   let invalidatedAnswerID='';
-  root.refreshDraftChoices = items => {
-    const currentID = recent.value;
-    recent.replaceChildren();
-    for (const item of items) {
-      const option = document.createElement('option'); option.value = item.id;
-      option.textContent = calculationDraftLabel(item);
-      recent.append(option);
-    }
-    recent.value = currentID;
-    recent._syncCustomSelect?.();
-  };
   root.addEventListener('calculation-context-changed',()=>{invalidatedAnswerID=(getAssessment?.()||assessment)?.answerID||'';assessment=null;update();});
   root.addEventListener('calculation-assessment-refreshed',()=>update());
   const actions = document.createElement('div'); actions.className = 'calculation-actions';
@@ -493,7 +496,7 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   form.addEventListener('change', handleInput);
   form.addEventListener('submit', async event => {
     event.preventDefault(); const calculation = update(); if (!calculation.valid || save.disabled) return;
-    busy = true; root.setAttribute('aria-busy', 'true'); recent.disabled = true; newDraft.disabled = true; update(); status.textContent = 'Saving calculation and source snapshot…';
+    busy = true; root.setAttribute('aria-busy', 'true'); recent.disabled = true; update(); status.textContent = 'Saving calculation and source snapshot…';
     // Lock inputs during the save so a delayed response cannot label newer inputs saved.
     Object.values(fields).forEach(field => field.disabled = true);
     try {
@@ -502,7 +505,7 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
       if (!card) return;
       savedFingerprint = fingerprint(calculation);
     } catch (error) {status.textContent = error.message;}
-    finally {busy = false; root.removeAttribute('aria-busy'); recent.disabled = false; newDraft.disabled = false; Object.values(fields).forEach(field => field.disabled = staleDraft); fields.spaceFunction.disabled = staleDraft || !table; update();}
+    finally {busy = false; root.removeAttribute('aria-busy'); recent.disabled = false; Object.values(fields).forEach(field => field.disabled = staleDraft); fields.spaceFunction.disabled = staleDraft || !table; update();}
   });
   root.addEventListener('toggle', async () => {
     if (!root.open || table || loading) return;

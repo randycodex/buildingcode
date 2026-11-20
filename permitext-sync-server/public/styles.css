@@ -21231,12 +21231,11 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
 .calculator-column-content .occupant-load-body { display: flex; flex-direction: column; min-height: 100%; box-sizing: border-box; }
 .calculator-column-content .calculation-draft-tools {
   align-content: start;
+  box-sizing: border-box;
   gap: var(--space-1);
   min-height: calc(var(--panel-content-top) - var(--panel-control-row-top));
   margin: 0;
-}
-.calculator-column-content .calculation-new-draft {
-  min-height: var(--panel-secondary-row-height);
+  padding-block-start: calc(var(--panel-third-row-top) - var(--panel-control-row-top));
 }
 .calculator-column-content .occupant-load-form { margin-top: 0; }
 .calculator-column-content .occupant-load-body > .calculation-draft-state { margin: auto 0 0; padding-top: 24px; text-align: center; }
@@ -21592,7 +21591,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .search-scope-choices label > span { min-width: 0; font: inherit; text-align: left; text-transform: none; }
 .calculation-draft-tools { display: grid; gap: 10px; margin: 12px 0; }
 .calculation-draft-tools label { display: grid; gap: 6px; font-size: 12px; text-transform: none; letter-spacing: normal; }
-.calculation-draft-tools .calculation-new-draft { justify-self: center; text-align: center; }
 .occupant-load-body :is(.custom-select-trigger, select:not(.native-select-hidden)) {
   position: relative; width: 100%; min-width: 0; min-height: 36px; padding: 8px 34px 8px 12px;
   border: 1px solid var(--border); border-radius: var(--calculation-field-radius); background: transparent;
