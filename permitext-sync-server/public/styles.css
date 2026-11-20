@@ -18171,6 +18171,9 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 @media (prefers-reduced-motion: reduce) { .bookmark-undo-notice { animation: none; } }
 
 /* Keep Saved tools fixed; evidence owns the remaining scrollable space. */
+.saved-panel:not(.saved-inbox-panel) > .panel-header {
+  padding-inline-start: calc(max(0px, (100% - var(--workspace-content-max-width)) / 2) + var(--workspace-list-item-padding));
+}
 .saved-panel > .saved-column-scroll { display: flex; flex-direction: column; overflow: hidden; }
 .saved-panel > .saved-column-scroll > * {
   flex-shrink: 0;
@@ -18179,7 +18182,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   margin-inline: auto;
 }
 .saved-panel > .saved-column-scroll > .saved-folder-context.is-project {
-  --saved-evidence-content-gutter: max(var(--panel-padding), calc((100% - var(--workspace-content-max-width)) / 2 + var(--panel-padding)));
+  --saved-evidence-content-gutter: calc(max(var(--panel-padding), (100% - var(--workspace-content-max-width)) / 2) + var(--workspace-list-item-padding));
   display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; max-width: none; padding-bottom: 0;
 }
 .saved-panel .saved-folder-context.is-project > :not(.saved-project-evidence-section) {
