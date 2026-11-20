@@ -22136,14 +22136,14 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   --report-column-surface: light-dark(#f0f1f4, #1c1e22);
 }
 
-:where(#panel-track[data-workspace-theme="grayscale"], .settings-theme-preview[data-preview-theme="grayscale"]) {
-  --reader-column-surface: light-dark(#fefefe, #111111);
-  --search-column-surface: light-dark(#ededed, #242424);
-  --evidence-column-surface: light-dark(#f7f7f7, #1a1a1a);
-  --assistant-column-surface: light-dark(#f3f3f3, #2b2b2b);
-  --calculator-column-surface: light-dark(#f0f0f0, #202020);
-  --notes-column-surface: light-dark(#fbfbfb, #313131);
-  --report-column-surface: light-dark(#f9f9f9, #151515);
+/* Apply Grayscale to the workspace document, including menus and native dialogs. */
+html:has(#panel-track[data-workspace-theme="grayscale"]),
+html:has(#panel-track[data-workspace-theme="grayscale"]) :is(:modal, :popover-open) {
+  filter: grayscale(1);
+}
+
+#panel-track[data-workspace-theme="grayscale"] .reader-panel .reader-collapse-title {
+  color: light-dark(#222222, #e8e8e8);
 }
 
 :where(#panel-track[data-workspace-theme="warm"], .settings-theme-preview[data-preview-theme="warm"]) {
@@ -22164,7 +22164,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 #panel-track > :is(.notebook-index-panel, .notebook-panel) { --column-tint: var(--notes-column-surface); }
 #panel-track > .shared-report-column { --column-tint: var(--report-column-surface); }
 
-#panel-track:is([data-workspace-theme="tinted"], [data-workspace-theme="grayscale"]) >
+#panel-track[data-workspace-theme="tinted"] >
   :is(.reader-panel, .search-panel, .saved-panel, .analysis-panel, .calculator-panel,
   .notebook-index-panel, .notebook-panel, .shared-report-column) {
   --surface: var(--column-tint);
@@ -22180,7 +22180,7 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   background-color: var(--background);
 }
 
-#panel-track:not([data-workspace-theme="original"]) > .reader-panel {
+#panel-track:not([data-workspace-theme="original"], [data-workspace-theme="grayscale"]) > .reader-panel {
   --reader-controls-surface: var(--surface);
   background-color: var(--surface);
 }
@@ -22199,16 +22199,16 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 
 /* Assistant's sidebars expand into space reserved after the panel. */
 #panel-track:is([data-workspace-theme="tinted"], [data-workspace-theme="warm"],
-  [data-workspace-theme="grayscale"], [data-workspace-theme="cool-slate"]) > .research-v2-panel {
+  [data-workspace-theme="cool-slate"]) > .research-v2-panel {
   box-shadow: calc(var(--rv2-history-space, 0px) + var(--rv2-sources-space, 0px)) 0 var(--surface);
   transition: margin-inline-end var(--workspace-sidebar-motion), box-shadow var(--workspace-sidebar-motion);
 }
 
-#panel-track:is([data-workspace-theme="tinted"], [data-workspace-theme="grayscale"]) > .calculator-panel .occupant-load-card {
+#panel-track[data-workspace-theme="tinted"] > .calculator-panel .occupant-load-card {
   background-color: var(--column-tint);
 }
 
-#panel-track:is([data-workspace-theme="tinted"], [data-workspace-theme="grayscale"]) >
+#panel-track[data-workspace-theme="tinted"] >
   .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"] {
   background-color: var(--notes-column-surface);
 }
@@ -22250,7 +22250,9 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
 .settings-theme-preview > span:nth-child(2) { --preview-column-tint: var(--search-column-surface); }
 .settings-theme-preview > span:nth-child(3) { --preview-column-tint: var(--evidence-column-surface); }
 .settings-theme-preview > span:nth-child(4) { --preview-column-tint: var(--assistant-column-surface); }
-.settings-theme-preview:is([data-preview-theme="tinted"], [data-preview-theme="grayscale"]) > span { background-color: var(--preview-column-tint); }
+.settings-theme-preview[data-preview-theme="original"] > span:first-child::before { background: var(--ios-accent-building); }
+.settings-theme-preview[data-preview-theme="original"] > span:nth-child(3)::before { background: var(--ios-accent-administrative); }
+.settings-theme-preview[data-preview-theme="tinted"] > span { background-color: var(--preview-column-tint); }
 .settings-theme-preview[data-preview-theme="header-colors"] > span {
   background-image: linear-gradient(var(--preview-column-tint) 0 18px, transparent 18px);
 }
