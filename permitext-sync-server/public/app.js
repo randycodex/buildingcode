@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-calculator-draft-menu-v2607";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-blank-report-v2608";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -47,7 +47,7 @@ import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQ
 import { createReportOutline, createReportInsertion, reportInsertionIndex, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261115-outline-insert-v14";
 import { applyLetterDocumentLayout, applyDocumentLayout, reportPageFormats } from "./document-layout.js?v=3";
 import { createReportPageLayout } from './report-page-layout.js?v=9';
-import { createReportPageEditor } from './report-page-editor.js?v=3';
+import { createReportPageEditor } from './report-page-editor.js?v=4';
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportSwitch, createReportSourcePreviews, retainReportChildren } from "./report-presentation.js?v=1";
 import { createWorkspaceViewPresentation } from "./workspace-view-presentation.js?v=5";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-calculator-draft-menu-v2607";
+} from "./offline-storage.js?v=20261119-blank-report-v2608";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -33775,7 +33775,9 @@ async function renderProjectReportDraft(project, resume = null) {
     pageLayoutHost.classList.toggle('is-dark-pages',darkReportPages);
     for (const child of body.children) child.hidden = child.classList.contains('report-editing-model');
     pageLayout.setActive(true); pageEditor.observe();
-    if(reportPageSelection!==undefined) pageEditor.select(reportPageSelection,{reveal:false});
+    if (reportPageSelection !== undefined && (reportPageSelection !== '__introduction' || activeDraft.introduction)) {
+      pageEditor.select(reportPageSelection, {reveal: false});
+    }
   };
   const reportUndo = createReportUndo();
   let dirty = false;
@@ -34060,6 +34062,7 @@ async function renderProjectReportDraft(project, resume = null) {
     setDirty(); renderWorkspaceContent();
     const block = activeDraft.blocks.find(block=>block.id === blockID);
     if (introductionFocused) {
+      pageEditor.select('__introduction', {focus: true, reveal: false});
       const field = shell.querySelector('[aria-label="Report introduction"]');
       field.focus({preventScroll:true});
       field.setSelectionRange(Math.min(introductionPosition,field.value.length),Math.min(introductionPosition,field.value.length));
@@ -35051,22 +35054,19 @@ async function renderProjectReportDraft(project, resume = null) {
 
     const draftPicker = document.createElement("div");
     draftPicker.className = "report-draft-picker";
-    const titleControl = document.createElement("div");
-    titleControl.className = "report-title-control";
     const titleButton = document.createElement("button");
     titleButton.type = "button";
-    titleButton.className = "report-title-text";
-    titleButton.textContent = activeDraft.title || "Untitled Report";
-    titleButton.setAttribute("aria-label", "Edit Report title");
+    titleButton.className = "report-list-rename workflow-action-icon";
+    titleButton.title = "Rename Report";
+    titleButton.setAttribute("aria-label", titleButton.title);
+    titleButton.innerHTML = pencilIconSVG();
     const titleEditor = document.createElement("input");
     titleEditor.type = "text";
     titleEditor.className = "report-title-editor";
     titleEditor.value = activeDraft.title || "";
+    titleEditor.maxLength = 300;
     titleEditor.setAttribute("aria-label", "Edit Report title");
     titleEditor.hidden = true;
-    const revisionLabel = document.createElement("span");
-    revisionLabel.className = "report-title-revision";
-    revisionLabel.textContent = `Draft revision ${activeDraft.version || 1}`;
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "report-title-delete workflow-action-icon";
@@ -35077,7 +35077,6 @@ async function renderProjectReportDraft(project, resume = null) {
     deleteButton.addEventListener("click", () => void deleteReport(deleteButton));
     const beginTitleEditing = () => {
       titleEditor.value = activeDraft.title || "";
-      titleButton.hidden = true;
       titleEditor.hidden = false;
       titleEditor.focus();
       titleEditor.select();
@@ -35088,11 +35087,11 @@ async function renderProjectReportDraft(project, resume = null) {
       const nextTitle = cancel ? previousTitle : titleEditor.value.trim() || previousTitle;
       if (!cancel && nextTitle !== activeDraft.title) {
         activeDraft.title = nextTitle;
-        setDirty();
+        pageTitleEditor.value = nextTitle;
+        setDirty('title');
+        refreshReportList();
       }
-      titleButton.textContent = activeDraft.title || "Untitled Report";
       titleEditor.hidden = true;
-      titleButton.hidden = false;
       if (restoreFocus) titleButton.focus();
     };
     titleButton.addEventListener("click", beginTitleEditing);
@@ -35131,7 +35130,7 @@ async function renderProjectReportDraft(project, resume = null) {
       const shown = panel.dataset.reportsHidden !== 'true';
       const reopening = shown && reportOptions.inert;
       reportsRail.classList.toggle('is-reports-collapsed',!shown);
-      reportActions.inert = reportOptions.inert = !shown;
+      reportActions.inert = titleEditor.inert = reportOptions.inert = !shown;
       if (reopening) reportOptions.scrollTop = reportLibraryScroll.reports;
       reportsToggle.setAttribute('aria-expanded',String(shown));
     };
@@ -35142,8 +35141,8 @@ async function renderProjectReportDraft(project, resume = null) {
       transitionReportSidebars(expanded, {alignEndWhenOversized:true});
     });
     reportsHeader.append(reportsTitle);
-    reportActions.append(createNew,deleteButton);
-    reportsRail.append(reportsHeader,reportActions,reportOptions);
+    reportActions.append(createNew,titleButton,deleteButton);
+    reportsRail.append(reportsHeader,reportActions,titleEditor,reportOptions);
     refreshReportList = () => {
       reportOptions.replaceChildren();
       const available = activeDraft.id ? drafts : [activeDraft,...drafts];
@@ -35183,8 +35182,6 @@ async function renderProjectReportDraft(project, resume = null) {
     };
     refreshReportList(); paintReportsToggle();
     if (recoveredDrafts.length) panel.dataset.reportsHidden = 'false';
-    titleControl.append(titleButton, titleEditor, revisionLabel);
-    draftPicker.append(titleControl);
 
     const metadata = document.createElement("div");
     metadata.className = "report-draft-metadata";

@@ -39,6 +39,11 @@ editor.pages({container:pages(),layout});
 assert.equal(field.parentNode,focusedParent,'Refreshing PDF pages keeps the same live editor, selection and unsubmitted text');
 assert.equal(field.value,'Unsubmitted text');
 editor.finish();assert.equal(field.parentNode,row);assert.equal(row.parentNode,legacy);assert.equal(completed,1);
+const bodyPages=pages(), continuation=new Element();
+continuation.dataset.page='2';continuation.offsetTop=820;bodyPages.append(continuation);
+editor.pages({container:bodyPages,layout:{bodyStartPage:1,pages:[layout.pages[0],{...layout.pages[0],page:2}],regions:[]}});
+editor.select('paragraph',{focus:true});
+assert.equal(bodyPages.scroll.top,14,'An unpainted paragraph starts editing on the first body page.');
 editor.dispose();delete globalThis.document;delete globalThis.ResizeObserver;
 
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');

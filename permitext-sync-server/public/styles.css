@@ -20988,14 +20988,15 @@ html[data-workflow-presenting]::view-transition-new(root) { mix-blend-mode: norm
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   flex: 0 0 auto; padding-inline: var(--panel-padding);
 }
-.report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-create { display: flex; align-items: center; min-width: 0; height: 28px; min-height: 28px; padding: 0; border: 0; background: transparent; color: var(--text-secondary); text-align: left; font: 13px var(--ui-font-family); cursor: pointer; white-space: nowrap; }
+.report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-create { display: flex; align-items: center; min-width: 0; height: 28px; min-height: 28px; margin-inline-end: auto; padding: 0; border: 0; background: transparent; color: var(--text-secondary); text-align: left; font: 13px var(--ui-font-family); cursor: pointer; white-space: nowrap; }
 .report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-create:hover { color: var(--text-primary); }
-.report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-actions .report-title-delete {
+.report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-actions :is(.report-list-rename, .report-title-delete) {
   display: inline-flex; align-items: center; justify-content: center;
   flex: 0 0 28px; width: 28px; min-width: 28px; height: 28px; min-height: 28px;
   margin: 0; padding: 5px; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-secondary); cursor: pointer;
 }
-.report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-actions .report-title-delete:is(:hover, :active) { color: var(--text-primary); background: transparent; }
+.report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-actions :is(.report-list-rename, .report-title-delete):is(:hover, :active) { color: var(--text-primary); background: transparent; }
+.report-screen .report-list-rail > .report-title-editor { flex: 0 0 auto; margin: 8px var(--panel-padding) 0; font-size: 14px; background: var(--menu-highlight); }
 .report-screen .report-list-rail :focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 .report-list-items { flex: 1; min-height: 0; overflow: auto; padding: 12px var(--panel-padding) var(--panel-padding); scrollbar-gutter: stable; }
 .report-screen .workspace-panel.report-draft-panel .report-draft-shell .report-list-choice {

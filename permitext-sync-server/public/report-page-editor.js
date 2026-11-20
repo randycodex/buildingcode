@@ -29,14 +29,12 @@ export function createReportPageEditor({host, isCurrent, describe, field, action
   const regionFor = id => layout?.regions.find(region => region.id === id || region.id.startsWith(`${id}-`));
   const locate = id => {
     let region = regionFor(id);
-    if(!region && id==='__introduction' && layout?.pages[1]) {
-      const page=layout.pages[1];return {id,page:2,x:page.margin,y:page.margin,width:page.width-page.margin*2,height:24};
-    }
     if (!region && layout?.pages.length && id !== '__title') {
-      const previous=preceding(id);
-      const last = layout.regions.filter(item=>item.page > 1 && item.id!=='__empty' &&
+      const firstBodyPage = layout.pages[layout.bodyStartPage - 1] || layout.pages[1] || layout.pages[0];
+      const previous = id === '__introduction' ? null : preceding(id);
+      const last = layout.regions.filter(item=>item.page >= firstBodyPage.page && item.id!=='__empty' &&
         (previous===undefined || item.id===previous || item.id.startsWith(`${previous}-`))).at(-1);
-      const page = last ? layout.pages[last.page-1] : layout.pages[1] || layout.pages.at(-1);
+      const page = last ? layout.pages[last.page-1] : firstBodyPage;
       region = {id,page:page.page,x:page.margin,y:Math.min(page.height-page.margin-24,last ? last.y+last.height+12 : page.margin),
         width:page.width-page.margin*2,height:24};
     }

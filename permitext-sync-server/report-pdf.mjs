@@ -530,7 +530,6 @@ export function drawReportRichTable(document, table, startX, contentWidth, {head
 
 function drawBody(document, manifest, projectMaterialBySourceID) {
   const presentation = reportPresentation(manifest);
-  document.addPage();
   let previousSourceClassification = null;
   (manifest.items || []).forEach((item, index, items) => {
     document._reportBegin?.(item.id, item.kind);
@@ -702,7 +701,9 @@ function drawPageFooters(document, manifest) {
   }
 }
 
-export async function renderReportPDF(manifest, { projectMaterialBySourceID = new Map(), onLayout, emptyPreview = false, unversioned = false, showProfessionalNotice = true } = {}) {
+export async function renderReportPDF(manifest, {
+  projectMaterialBySourceID = new Map(), onLayout, emptyPreview = false, unversioned = false, showCover = true
+} = {}) {
   const pageLayout = reportDocumentLayout(manifest.pageFormat || 'letter');
   const document = new PDFDocument({
     size: [pageLayout.width, pageLayout.height],
@@ -732,11 +733,17 @@ export async function renderReportPDF(manifest, { projectMaterialBySourceID = ne
     document.once("error", reject);
   });
 
-  drawCover(document, manifest, unversioned);
-  if (showProfessionalNotice) drawProfessionalNotice(document, manifest);
+  if (showCover) {
+    drawCover(document, manifest, unversioned);
+    drawProfessionalNotice(document, manifest);
+    document.addPage();
+  } else {
+    document.font("Report-Regular").fontSize(10);
+  }
+  const bodyStartPage = document.bufferedPageRange().count;
   drawBody(document, manifest, projectMaterialBySourceID);
-  if (readLayout) onLayout(readLayout());
-  drawPageFooters(document, manifest);
+  if (readLayout) onLayout({...readLayout(), bodyStartPage});
+  if (showCover || !emptyPreview) drawPageFooters(document, manifest);
   document.end();
   return completed;
 }

@@ -40,13 +40,11 @@ async function layout(bytes, format) {
   }
   await pdf.destroy(); return pages;
 }
-function assertCleanCover(firstPage) {
-  const text = firstPage.map(([value]) => value).filter(Boolean).join('\n');
-  assert.match(text, /^100 Synthetic Street\n[^\n]+ UTC\nPage layout test\n(?:Report version \d+\n)?Project default: /m,
-    'Cover details appear on separate lines in reading order.');
-  assert.doesNotMatch(text, /Professional-use notice|unofficial reference tool|AI-assisted Research is limited/);
-  assert.doesNotMatch(text, /^(PUBLISHED CODE|USER-AUTHORED|AI-ASSISTED RESEARCH|PROJECT MATERIAL)$/mi);
-  assert.doesNotMatch(text, /^(Manifest|SHA-256)\b/mi);
+function assertFirstReportPage(firstPage) {
+  const text = firstPage.map(([value]) => value).join(' ').replace(/\s+/g, ' ').trim();
+  assert(text.startsWith('Previewed without issuing a version. Paragraph 0.'),
+    'The first page begins with the authored introduction and first paragraph.');
+  assert.doesNotMatch(text, /Paper format preview test|100 Synthetic Street|Page layout test|Report version|Project default|Professional-use notice/);
 }
 try {
   const {handleRequest} = await import('../app.mjs');
@@ -71,21 +69,23 @@ try {
     assert.match(response.headers.get('cache-control'), /no-store/);
     const preview = Buffer.from(await response.arrayBuffer());
     const pages = await layout(preview, format);
-    assertCleanCover(pages[0]);
+    assertFirstReportPage(pages[0]);
     const editResponse = await request('/reports/drafts/preview',{projectID,draftID:draft.id,expectedVersion:draft.version,editingLayout:true});
     assert.equal(editResponse.status,200);
     const edit = await editResponse.json();
     assert.equal(edit.layout.pages.length,pages.length);
-    assert(edit.layout.regions.some(region=>region.id==='__title' && region.page===1));
+    assert.equal(edit.layout.bodyStartPage, 1);
+    assert(!edit.layout.regions.some(region=>region.id==='__title'));
+    assert(edit.layout.regions.some(region=>region.id==='paragraph-0' && region.page===1));
     for(const n of Array.from({length:16},(_,n)=>n)) assert(edit.layout.regions.some(region=>region.id===`paragraph-${n}`));
     for(const region of edit.layout.regions) {
       assert(region.page>=1 && region.page<=pages.length);
       assert(region.x>=0 && region.y>=0 && region.width>=0 && region.height>=0);
       assert(region.y+region.height<=format.height+1,'Editable bounds come from real painted PDF content');
     }
-    assert.deepEqual((await layout(Buffer.from(edit.pdf,'base64'),format)).slice(1),pages.slice(1),
+    assert.deepEqual(await layout(Buffer.from(edit.pdf,'base64'),format),pages,
       'Measuring edit regions never changes printable content or page boundaries');
-    assert(pages.length > 2);
+    assert(pages.length > 1);
     assert.deepEqual((await post('/reports/history/list', {projectID})).reports, historyBefore, 'Preview does not create versions.');
     assert.equal((await post('/reports/drafts/get', {projectID, draftID: draft.id})).draft.version, draft.version, 'Preview does not save or mutate the draft.');
     const issued = await post('/reports/generate', {projectID, draftID: draft.id, expectedVersion: draft.version}, 201);
@@ -93,9 +93,9 @@ try {
     const download = await request('/reports/files/read', {projectID, generatedReportID: issued.generatedReport.file.generatedReportID});
     const exported = Buffer.from(await download.arrayBuffer());
     const exportedPages = await layout(exported, format);
-    assertCleanCover(exportedPages[0]);
+    assertFirstReportPage(exportedPages[0]);
     assert.equal(exportedPages.length, pages.length);
-    assert.deepEqual(exportedPages.slice(1), pages.slice(1), 'Preview/export body content and exact positions have identical pagination.');
+    assert.deepEqual(exportedPages, pages, 'Preview/export content and exact positions have identical pagination.');
     if (process.env.PERMITEXT_REPORT_PAGE_QA_DIR) await writeFile(join(process.env.PERMITEXT_REPORT_PAGE_QA_DIR, `report-pages-${pageFormat}.pdf`), preview);
   }
   const historyBeforeDownload = (await post('/reports/history/list', {projectID})).reports;
@@ -107,11 +107,9 @@ try {
   const downloadedPages = await layout(Buffer.from(await directDownload.arrayBuffer()), reportPageFormats.tabloid);
   const editPacket = await post('/reports/drafts/preview', {...unversionedRequest,editingLayout:true});
   const editPages = await layout(Buffer.from(editPacket.pdf,'base64'), reportPageFormats.tabloid);
-  assertCleanCover(downloadedPages[0]);
-  assertCleanCover(editPages[0]);
+  assertFirstReportPage(downloadedPages[0]);
   assert.equal(downloadedPages.length, editPages.length);
-  assert.deepEqual(downloadedPages.slice(1), editPages.slice(1), 'Direct download matches the editor pagination.');
-  assert(!downloadedPages[0].some(([text]) => /Report version/.test(text)), 'Direct PDF downloads omit the version label.');
+  assert.deepEqual(downloadedPages, editPages, 'Direct download matches the editor pagination.');
   assert.deepEqual((await post('/reports/history/list', {projectID})).reports, historyBeforeDownload,
     'Direct download preserves all prior versions and does not create another.');
   const current = {...body, draftID: draft.id, expectedVersion: draft.version};
@@ -119,8 +117,11 @@ try {
   const blankResponse=await request('/reports/drafts/preview',{projectID,draftID:blank.id,expectedVersion:blank.version,editingLayout:true});
   assert.equal(blankResponse.status,200);
   const blankPacket=await blankResponse.json();
-  assert.equal(blankPacket.layout.pages.length,2,'An empty report has a real cover and blank writing page');
-  assertCleanCover((await layout(Buffer.from(blankPacket.pdf, 'base64'), reportPageFormats.letter))[0]);
+  assert.equal(blankPacket.layout.pages.length,1,'An empty report opens on one writing page.');
+  assert.equal(blankPacket.layout.bodyStartPage,1);
+  const blankPages = await layout(Buffer.from(blankPacket.pdf, 'base64'), reportPageFormats.letter);
+  assert.deepEqual(blankPages, [[]], 'The blank page contains no generated text or footer.');
+  if (process.env.PERMITEXT_REPORT_PAGE_QA_DIR) await writeFile(join(process.env.PERMITEXT_REPORT_PAGE_QA_DIR, 'report-pages-blank.pdf'), Buffer.from(blankPacket.pdf, 'base64'));
   await post('/reports/drafts/save', {...current, pageFormat: 'a3'}, 400);
   const legacy = await post('/reports/drafts/save', current);
   assert.equal(legacy.draft.pageFormat, 'tabloid', 'A client without the new field preserves the chosen 11 × 17 format.');

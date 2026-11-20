@@ -969,10 +969,9 @@ async function main() {
         workspaceScript.text.includes("choice.setAttribute('aria-current','true')") &&
         workspaceScript.text.includes("createNew.textContent = 'New report +'") &&
         workspaceScript.text.includes('else void reportSwitch.select(draft.id)') &&
-        workspaceScript.text.includes('titleControl.className = "report-title-control"') &&
-        workspaceScript.text.includes('titleButton.className = "report-title-text"') &&
+        workspaceScript.text.includes('titleButton.title = "Rename Report"') &&
+        workspaceScript.text.includes('reportActions.append(createNew,titleButton,deleteButton)') &&
         workspaceScript.text.includes('titleEditor.setAttribute("aria-label", "Edit Report title")') &&
-        workspaceScript.text.includes('revisionLabel.textContent = `Draft revision ${activeDraft.version || 1}`') &&
         !workspaceScript.text.includes('titleInput.setAttribute("aria-label", "Report title")') &&
         !workspaceScript.text.includes('select.className = "report-draft-select"') &&
         !workspaceScript.text.includes('templateSelect.className = "report-template-select"') &&

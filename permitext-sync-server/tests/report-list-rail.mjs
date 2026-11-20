@@ -16,14 +16,14 @@ const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const titleStart=app.indexOf('function createReportRailTitle(');
 const titleEnd=app.indexOf('\n}',titleStart);
 const start=app.indexOf("    const reportsRail = document.createElement('aside');");
-const end=app.indexOf('    titleControl.append(',start);
+const end=app.indexOf('    const metadata = document.createElement(',start);
 assert(titleStart>0&&titleEnd>titleStart&&start>0&&end>start);
 const selections=[],preferences=[];
 let resizes=0,cancels=0;
 const current={id:'one',title:'First report'},other={id:'two',title:'Second report'};
 const c=vm.createContext({document:{createElement:()=>new Element()},panel:{dataset:{}},
   activeDraft:current,drafts:[current,other],recoveredDrafts:[],reportLibraryScroll:{reports:0},
-  deleteButton:new Element(),refreshReportList:null,
+  titleButton:new Element(),titleEditor:new Element(),deleteButton:new Element(),refreshReportList:null,
   reportSectionExpanded:()=>true,persistReportSectionExpanded:(key,value)=>preferences.push([key,value]),
   expandableReportRails:()=>false,
   reportSwitch:{select:async id=>selections.push(id),cancel:()=>cancels++},
@@ -38,8 +38,10 @@ assert.equal(list.rail.children[0],list.header);
 assert.equal(list.header.children.length,1,'Reports is the only control on the heading row.');
 assert.equal(list.rail.children[1],list.actions);
 assert.equal(list.actions.children[0],list.create);
-assert.equal(list.actions.children[1],c.deleteButton);
-assert.equal(list.rail.children[2],list.options);
+assert.equal(list.actions.children[1],c.titleButton);
+assert.equal(list.actions.children[2],c.deleteButton);
+assert.equal(list.rail.children[2],c.titleEditor);
+assert.equal(list.rail.children[3],list.options);
 assert.equal(list.options.children.length,2);
 assert.equal(list.options.children[0].attributes['aria-current'],'true');
 list.options.children[0].events.click();assert.equal(cancels,1);
@@ -50,6 +52,7 @@ assert.equal(c.panel.dataset.reportsHidden,'true');assert.equal(list.options.ine
 assert.equal(list.toggle.textContent,'Reports');
 assert.equal(list.toggle.attributes['aria-expanded'],'false');
 assert.equal(list.actions.inert,true);
+assert.equal(c.titleEditor.inert,true);
 assert.equal(list.header.hidden,false);
 list.toggle.events.click();
 assert.equal(c.panel.dataset.reportsHidden,'false');assert.equal(list.options.inert,false);
