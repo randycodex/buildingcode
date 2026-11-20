@@ -134,7 +134,7 @@ function harness(signedIn, pro = signedIn) {
     activePaneIDs: () => ["reader:one", "utility:settings", "utility:saved"],
     transitionWorkspace: async (kind, options) => transitions.push({ kind, options }), track
   });
-  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "workspaceFloatingPanelReference", "syncThemePreviewColors", "applyWorkspaceTheme", "renderWorkspaceThemePicker", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
+  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "workspaceFloatingPanelReference", "syncFloatingMenuColors", "applyWorkspaceTheme", "renderWorkspaceThemePicker", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
   return { context, track, panels, preferences, transitions, toggleAttributes, signInStarts, checkoutStarts, warningClosures,
     toolbar, revokeAccount() { accountCurrent = false; contextCheck(); },
     dialog: () => currentDialog, focusReturns: () => focusReturns, focusTraps: () => focusTraps };

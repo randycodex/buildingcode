@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-workspace-menu-dismiss-v2623";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-grayscale-project-swatches-v2624";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261120-workspace-menu-dismiss-v2623";
+} from "./offline-storage.js?v=20261120-grayscale-project-swatches-v2624";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2645,6 +2645,7 @@ function showWorkspaceMenuTab(menu, tab, options) {
   if (menu.tab === "settings" && tab !== "settings") menu.panels.settings.querySelector(".settings-floating-panel[open]")?.close();
   menu.tab = tab;
   menu.element.dataset.tab = tab;
+  syncFloatingMenuColors();
   selectedWorkspaceMenuTab = tab;
   const mount = menu.panels[tab];
   if (tab === "workspaces") {
@@ -5527,7 +5528,13 @@ async function openProjectDetailsScreen(section = null, options = {}) {
     screenTitle: "Project", screenClass: "project-details-screen workspace-floating-panel", projectName: identity.name,
     mount: options.mount || document.querySelector(".workspace-shell"),
     coveredElements: [], dismissOnEscape: false,
-    onOpen: () => { openProjectEditor(); floatingControls?.position(); webAppUpdates.positionNotice(); syncWorkflowNavigation(); },
+    onOpen: () => {
+      openProjectEditor();
+      if (options.mount) syncFloatingMenuColors();
+      floatingControls?.position();
+      webAppUpdates.positionNotice();
+      syncWorkflowNavigation();
+    },
     backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
       projectDetailMatches(workspaceProject(), identity) && hasCapability("projects") && (!applyingUpdate || options.shouldApply()),
@@ -5607,7 +5614,11 @@ async function openProjectDetailsScreen(section = null, options = {}) {
       panelTabs = createFloatingWorkspaceTabs({
         id: "project-details", label: "Project context categories", selected: section || selectedSection,
         entries: sections.map(([id, label]) => ({ id, label, panel: panels.get(id) })),
-        onSelect: key => { selectedSection = key; }
+        onSelect: key => {
+          selectedSection = key;
+          screen.element.dataset.projectDetailsSection = key;
+          if (options.mount) syncFloatingMenuColors();
+        }
       });
       header.replaceChildren(panelTabs.element);
       selectSection(section || "context");
@@ -44290,12 +44301,14 @@ function positionWebAppUpdateNotice(notice, button) {
   notice.style.top = `${top}px`;
 }
 
-function syncThemePreviewColors(settings = document.querySelector(".settings-floating-panel[open]")) {
-  if (!settings?.isConnected) return;
-  const overlay = settings.closest("#workspace-menu-panel") || settings;
-  if (typeof overlay.showPopover !== "function") return;
-  const showColor = settings.open && settings.dataset.settingsTab === "appearance" &&
-    track.dataset.workspaceTheme === "grayscale";
+function syncFloatingMenuColors(settings = document.querySelector(".settings-floating-panel[open]")) {
+  const overlay = settings?.isConnected ? settings.closest("#workspace-menu-panel") || settings
+    : document.querySelector("#workspace-menu-panel");
+  if (!overlay?.isConnected || typeof overlay.showPopover !== "function") return;
+  const showsThemePreviews = settings?.open && settings.dataset.settingsTab === "appearance";
+  const showsProjectSwatches = overlay.dataset.tab === "project" &&
+    overlay.querySelector('#project-context-floating-panel[data-project-details-section="context"]:not([hidden])');
+  const showColor = track.dataset.workspaceTheme === "grayscale" && (showsThemePreviews || showsProjectSwatches);
   if (showColor ? overlay.matches(":popover-open") : !overlay.hasAttribute("popover")) return;
   const focused = document.activeElement;
   if (showColor) {
@@ -44312,7 +44325,7 @@ function applyWorkspaceTheme(value) {
   const theme = ["original", "tinted", "header-colors", "warm", "grayscale", "cool-slate"].includes(value) ? value : "tinted";
   track.dataset.workspaceTheme = theme;
   document.querySelectorAll(".settings-theme-radio").forEach(input => { input.checked = input.value === theme; });
-  syncThemePreviewColors();
+  syncFloatingMenuColors();
 }
 
 function renderWorkspaceThemePicker() {
@@ -44413,7 +44426,7 @@ function mountAccountScreenContent(dialog, panel) {
       panel._disposeInlineProfileEditor?.();
       dialog.dataset.settingsTab = key;
       selectedSettingsTab = key;
-      if (floating) syncThemePreviewColors(dialog);
+      if (floating) syncFloatingMenuColors(dialog);
     }
   });
   const header = document.createElement("header");
@@ -44487,7 +44500,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false, mount = null } =
     if (dialog.querySelector(".web-warning-backdrop")) activeWebWarningClose?.(false);
     if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
     dialog.open = false;
-    if (floating) syncThemePreviewColors(dialog);
+    if (floating) syncFloatingMenuColors(dialog);
     dialog._disposeSettingsColumns?.();
     dialog._floatingControls?.dispose();
     dialog._disposeLibraryDownloadProgress?.();
@@ -44526,7 +44539,7 @@ function toggleAccountDialog({ upgrade = false, signIn = false, mount = null } =
     manageAnchor: true, topGap: 25,
     alignmentReference: workspaceFloatingPanelReference
   });
-  if (floating) syncThemePreviewColors(dialog);
+  if (floating) syncFloatingMenuColors(dialog);
   if (!floating) state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
   syncWorkflowNavigation();
   if (!mount) (dialog.querySelector('[role="tab"][aria-selected="true"]') || dialog).focus({ preventScroll: true });
