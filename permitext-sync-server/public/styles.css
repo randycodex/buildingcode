@@ -22193,6 +22193,8 @@ body .project-details-screen.workspace-floating-panel .project-information-panel
   z-index: 2;
   overflow: visible;
 }
+/* The adjacent sticky Outline header must sit below the full Sources label. */
+.shared-report-column .report-workspace-columns > .report-library.is-sources-collapsed { z-index: 3; }
 .shared-report-column .report-workspace-columns:not(.is-sidebar-toggling)
   .report-list-rail.is-reports-collapsed > :is(.report-list-actions, .report-list-items) {
   display: none;
