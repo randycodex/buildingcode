@@ -2138,6 +2138,15 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   overflow: hidden;
 }
 
+/* Center standalone tool titles on the same row as Notes and its controls. */
+.panel-track > .workspace-panel:not(.reader-panel) > .panel-header {
+  align-items: center;
+}
+
+.panel-track > .workspace-panel:not(.reader-panel) > .panel-header .panel-kind {
+  margin-block-end: 0;
+}
+
 .reader-panel .panel-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
