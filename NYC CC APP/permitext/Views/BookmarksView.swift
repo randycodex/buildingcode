@@ -1134,7 +1134,13 @@ private struct BookmarkExportPreviewSheet: View {
     }
 }
 
-enum ProjectOverviewSection: Hashable {
+extension EnvironmentValues {
+    @Entry var projectSheetDetent: Binding<PresentationDetent>? = nil
+}
+
+enum ProjectOverviewSection: Hashable, Identifiable {
+    var id: Self { self }
+
     case context, structuredFacts, questions, checklist, notebook, evidence, reports
 }
 
@@ -1255,6 +1261,8 @@ struct ProjectView: View {
     @State private var collapsedEvidenceGroupIDs: Set<String> = []
     @State private var evidenceSearchQuery = ""
     @State private var isEvidenceSearchPresented = false
+    @State private var sheetSection: ProjectOverviewSection?
+    @State private var sheetDetent: PresentationDetent = .medium
     @State private var inlineEditingSection: ProjectOverviewSection?
     @State private var inlineEditingFolder: CodeFolder?
     @State private var inlineEditingSessionID: UUID?
@@ -1382,6 +1390,23 @@ struct ProjectView: View {
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $sheetSection) { section in
+            NavigationStack {
+                if section == .checklist {
+                    ProjectWorkflowView(folderID: folderID, section: section, closeSheet: { sheetSection = nil })
+                } else {
+                    projectSectionDestination(section)
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Close") { sheetSection = nil }
+                            }
+                        }
+                }
+            }
+            .environment(\.projectSheetDetent, $sheetDetent)
+            .presentationDetents([.medium, .large], selection: $sheetDetent)
+            .presentationDragIndicator(.visible)
+        }
         .navigationDestination(for: ProjectOverviewSection.self) { section in
             projectSectionDestination(section)
         }
@@ -1446,6 +1471,7 @@ struct ProjectView: View {
         }
         .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         .onChange(of: library.privateSessionID) { _, _ in
+            sheetSection = nil
             finishInlineEditing()
             contextDraft = ""
             factsDraft = []
@@ -1456,6 +1482,7 @@ struct ProjectView: View {
             lastProjectHubLoadAt = nil
         }
         .onChange(of: folderID) { _, _ in
+            sheetSection = nil
             finishInlineEditing()
             contextDraft = ""
             factsDraft = []
@@ -2078,7 +2105,10 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-questions")
 
-            NavigationLink(value: ProjectOverviewSection.checklist) {
+            Button {
+                sheetDetent = (folder?.recordsChecklist?.count ?? 0) > 5 || dynamicTypeSize.isAccessibilitySize ? .large : .medium
+                sheetSection = .checklist
+            } label: {
                 let records = folder?.recordsChecklist ?? []
                 projectSectionCard("Checklist", systemImage: "checklist",
                     count: folder?.recordsChecklist.map { "\($0.filter { $0.status == .reviewed }.count)/\($0.count) reviewed" },
@@ -2087,7 +2117,10 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-checklist")
 
-            NavigationLink(value: ProjectOverviewSection.notebook) {
+            Button {
+                sheetDetent = dynamicTypeSize.isAccessibilitySize ? .large : .medium
+                sheetSection = .notebook
+            } label: {
                 projectSectionCard("Notes", systemImage: "note.text",
                     count: projectHubSnapshot.map { "\($0.notebookCards.count) \($0.notebookCards.count == 1 ? "note" : "notes")" },
                     preview: latestProjectNote.map { $0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled note" : $0.title }

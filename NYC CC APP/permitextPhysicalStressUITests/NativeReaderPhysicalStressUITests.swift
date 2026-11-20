@@ -532,9 +532,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["project-workflow-save"].tap()
         XCTAssertTrue(app.staticTexts["Reviewed"].waitForExistence(timeout: 5))
         keepScreenshot(named: "Project record checklist on iPhone", from: app)
-        app.buttons["main-tab-saved"].tap()
+        app.navigationBars["Checklist"].buttons["Close"].tap()
         XCTAssertTrue(root.waitForExistence(timeout: 5))
         XCTAssertTrue(checklistCard.label.contains("1/5 reviewed"))
+        let notesCard = app.buttons["project-section-notebook"]
+        reveal(notesCard, in: app)
+        notesCard.tap()
+        let closeNotes = app.navigationBars["Notebook"].buttons["Close"]
+        XCTAssertTrue(closeNotes.waitForExistence(timeout: 10))
+        closeNotes.tap()
+        XCTAssertTrue(checklistCard.waitForExistence(timeout: 5))
         reveal(questionCard, in: app)
         XCTAssertTrue(questionCard.label.contains("1 question"))
         app.buttons["main-tab-saved"].tap()

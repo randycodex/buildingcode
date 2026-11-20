@@ -636,6 +636,7 @@ private struct NotebookLinkEditor: Identifiable {
 }
 
 private struct NotebookCardEditorView: View {
+    @Environment(\.projectSheetDetent) private var sheetDetent
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -790,6 +791,8 @@ private struct NotebookCardEditorView: View {
         .navigationTitle(projectName)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .interactiveDismissDisabled(sheetDetent != nil)
+        .onAppear { sheetDetent?.wrappedValue = .large }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button { Task { await leaveEditor() } } label: { Label("Back", systemImage: "chevron.left") }

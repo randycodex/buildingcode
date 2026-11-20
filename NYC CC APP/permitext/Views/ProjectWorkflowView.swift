@@ -3,6 +3,8 @@ import SwiftUI
 struct ProjectWorkflowView: View {
     let folderID: Int64
     let section: ProjectOverviewSection
+    var closeSheet: (() -> Void)? = nil
+    @Environment(\.projectSheetDetent) private var sheetDetent
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var editingFolder: CodeFolder?
@@ -51,7 +53,17 @@ struct ProjectWorkflowView: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .tint(Color.appChrome)
+        .interactiveDismissDisabled(closeSheet != nil && isEditing)
+        .onChange(of: isEditing) { _, editing in
+            if editing { sheetDetent?.wrappedValue = .large }
+        }
         .toolbar {
+            if let closeSheet {
+                ToolbarItem(placement: .cancellationAction) {
+                    if isEditing { Button("Cancel", action: cancel) }
+                    else { Button("Close", action: closeSheet) }
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 if isEditing {
                     Button("Save", action: save).fontWeight(.semibold)
