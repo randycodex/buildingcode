@@ -1671,14 +1671,17 @@ body .workspace-panel :has(> .column-loading-indicator) {
   transition: none;
 }
 
+:where(.workspace-panel, .pane-divider) {
+  --panel-padding: clamp(16px, 1.8vw, 24px);
+  --panel-title-row-height: max(calc(var(--chrome-font-size) * var(--code-title-scale) * 1.2), 28px);
+}
+
 .workspace-panel {
   --code-accent: #c96410;
   --code-accent-soft: rgba(201, 100, 16, 0.105);
   --pane-min-width: clamp(260px, 22vw, 420px);
   --pane-resized-min-width: var(--pane-min-width);
   --pane-default-min-width: 0px;
-  --panel-padding: clamp(16px, 1.8vw, 24px);
-  --panel-title-row-height: max(calc(var(--chrome-font-size) * var(--code-title-scale) * 1.2), 28px);
   --panel-title-control-size: var(--panel-title-row-height);
   --panel-title-icon-size: 18px;
   /* The circle's stroke ends one unit inside its 24-unit viewBox. */
@@ -22322,11 +22325,45 @@ html:has(#panel-track[data-workspace-theme="grayscale"])
 #panel-track:not([data-workspace-theme="original"], [data-workspace-theme="grayscale"]) >
   .reader-panel:not(.is-collapsed, .is-column-strip) > .panel-header,
 #panel-track[data-workspace-theme="header-colors"] > :is(.search-panel, .saved-panel, .analysis-panel,
-  .calculator-panel, .notebook-index-panel, .notebook-panel) > .panel-header,
+  .calculator-panel) > .panel-header,
 #panel-track[data-workspace-theme="header-colors"] > .shared-report-column .report-draft-header {
   background-color: var(--column-header-surface, var(--column-tint));
   box-shadow: 0 0 0 var(--space-1) var(--column-header-surface, var(--column-tint));
   border-radius: 4px;
+}
+
+/* Notes shares a title row across two panes and their non-interactive divider. */
+#panel-track[data-workspace-theme="header-colors"] > :is(.notebook-index-panel, .notebook-panel) > .notebook-shared-header {
+  position: relative;
+  z-index: 1;
+}
+#panel-track[data-workspace-theme="header-colors"] > :is(.notebook-index-panel, .notebook-panel):not(.is-collapsed, .is-column-strip)::before,
+#panel-track[data-workspace-theme="header-colors"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::before {
+  content: "";
+  display: block;
+  position: absolute;
+  inset-block: calc(var(--panel-padding) - var(--space-1)) auto;
+  inset-inline: calc(var(--panel-padding) - var(--space-1));
+  width: auto;
+  height: calc(var(--panel-title-row-height) + 2 * var(--space-1));
+  border-radius: calc(4px + var(--space-1));
+  background: var(--notes-column-surface);
+  pointer-events: none;
+}
+#panel-track[data-workspace-theme="header-colors"] > .notebook-index-panel:has(+ .pane-divider + .notebook-panel:not(.is-collapsed, .is-column-strip))::before {
+  inset-inline-end: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+#panel-track[data-workspace-theme="header-colors"] > .notebook-index-panel:not(.is-workflow-hidden, .is-group-hidden, .is-column-tab-hidden)
+  + .pane-divider + .notebook-panel:not(.is-collapsed, .is-column-strip)::before {
+  inset-inline-start: 0;
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+#panel-track[data-workspace-theme="header-colors"] > .pane-divider[data-previous-pane-id^="project:notes-index:"][data-next-pane-id^="project:notebook:"]::before {
+  inset-inline: 0;
+  border-radius: 0;
 }
 
 /* Assistant's sidebars expand into space reserved after the panel. */
