@@ -1,7 +1,7 @@
 /* Research v2 uses the existing workspace colors and Reader typography. */
 @property --rv2-rail-width{syntax:"<length>";inherits:true;initial-value:300px}
 @property --rv2-sources-width{syntax:"<length>";inherits:true;initial-value:72px}
-.research-v2-panel{--rv2-expanded-rail-width:300px;--rv2-collapsed-rail-width:72px;min-width:min(760px,95vw);flex-basis:960px}
+.research-v2-panel{--rv2-expanded-rail-width:300px;--rv2-collapsed-rail-width:72px;--rv2-history-action-height:28px;min-width:min(760px,95vw);flex-basis:960px}
 .research-v2-panel>.analysis-content{padding:0;overflow:hidden;display:flex;min-height:0}
 /* The list slides into reserved workspace space beside a stable chat width. */
 .research-v2{position:relative;display:grid;width:100%;height:100%;min-height:420px;color:var(--text-primary);font:14px/1.6 var(--ui-font-family)}
@@ -44,7 +44,7 @@
 .research-v2 .assistant-history-row-menu:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .research-v2 .rv2-question-link[aria-current=page]{font-weight:700}
 .rv2-empty-history{font-size:12px;margin:0}
-.research-v2 .rv2-new-chat{box-sizing:border-box;display:flex;align-items:center;min-width:0;height:28px;min-height:28px;padding:0;border-radius:0;color:var(--text-secondary);font-size:14px;white-space:nowrap;cursor:pointer}
+.research-v2 .rv2-new-chat{box-sizing:border-box;display:flex;align-items:center;min-width:0;height:var(--rv2-history-action-height,28px);min-height:var(--rv2-history-action-height,28px);padding:0;border-radius:0;color:var(--text-secondary);font-size:14px;white-space:nowrap;cursor:pointer}
 .research-v2 .rv2-new-chat:not(:disabled):hover{background:transparent;color:var(--text-primary)}
 .rv2-question-row.is-renaming{display:block}
 .rv2-rename-form{display:grid;grid-column:1/-1;grid-template-columns:1fr 1fr;gap:6px;padding:12px 0}
@@ -114,9 +114,15 @@ ul.rv2-answer-list{list-style-type:disc}ol.rv2-answer-list{list-style-type:decim
   .research-v2-panel .rv2-rail{padding-block-start:0}
   .research-v2-panel .rv2-rail-header,
   .research-v2-panel :is(.rv2-history-toggle,.rv2-sources-toggle){align-items:start;min-height:var(--panel-third-row-height)}
-  .research-v2-panel .rv2-history-actions{margin-bottom:calc(var(--rv2-content-offset) - var(--panel-third-row-height) - 28px)}
+  .research-v2-panel .rv2-history-actions{margin-bottom:calc(var(--rv2-content-offset) - var(--panel-third-row-height) - var(--rv2-history-action-height))}
   .research-v2-panel .rv2-sources-header{min-height:var(--rv2-content-offset);padding-block:0}
-  .research-v2-panel :is(.rv2-thread,.rv2-detail){margin-block-start:var(--rv2-content-offset);padding-block-start:0}
+  .research-v2-panel .rv2-detail{margin-block-start:var(--rv2-content-offset);padding-block-start:0}
+  /* The scrolling edge starts at the New Chat label. The first message keeps its inset. */
+  .research-v2-panel .rv2-thread{
+    --rv2-thread-top:calc(var(--panel-third-row-height) + var(--rv2-history-action-height) - var(--space-1));
+    margin-block-start:var(--rv2-thread-top);
+    padding-block-start:calc(var(--rv2-content-offset) - var(--rv2-thread-top));
+  }
   .research-v2-panel .rv2-welcome,
   .research-v2-panel .rv2-sources-body>.rv2-detail-caption:first-child{margin-block-start:0}
   #panel-track .research-v2-panel.has-history-rail:not(.is-collapsed){--rv2-history-space:var(--rv2-rail-expansion)}
