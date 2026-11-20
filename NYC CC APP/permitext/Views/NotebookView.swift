@@ -17,6 +17,10 @@ struct NativeNotebookReferenceCandidate: Identifiable, Hashable, Sendable {
     var id: String { "\(kind):\(referenceID)" }
 }
 
+private extension EnvironmentValues {
+    @Entry var returnToResearch: (() -> Void)? = nil
+}
+
 struct ResearchNotebookHandoff: Identifiable {
     let id: String
     let question: String
@@ -70,6 +74,7 @@ struct ResearchNotebookHandoffSheet: View {
                             label: ResearchNotebookHandoffPresentation.referenceLabel(question: handoff.question), detail: "Linked Research answer"
                         )], initialCardID: savedCardID
                     )
+                    .environment(\.returnToResearch, { dismiss() })
                 } else {
                     Form {
                         Section("Destination") {
@@ -126,8 +131,7 @@ struct ResearchNotebookHandoffSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(savedCardID == nil ? "Cancel" : "Done") { dismiss() }
-                        .disabled(isSaving)
+                    if savedCardID == nil { Button("Cancel") { dismiss() }.disabled(isSaving) }
                 }
             }
             .interactiveDismissDisabled(isSaving)
@@ -690,6 +694,7 @@ private struct NotebookLinkEditor: Identifiable {
 }
 
 private struct NotebookCardEditorView: View {
+    @Environment(\.returnToResearch) private var returnToResearch
     @Environment(\.projectSheetDetent) private var sheetDetent
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
@@ -849,11 +854,13 @@ private struct NotebookCardEditorView: View {
         .onAppear { sheetDetent?.wrappedValue = .large }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button { Task { await leaveEditor() } } label: { Label("Back", systemImage: "chevron.left") }
-                    .disabled(isLeaving || isUploadingImage)
+                if returnToResearch == nil { Button { Task { await leaveEditor() } } label: { Label("Back", systemImage: "chevron.left") }
+                    .disabled(isLeaving || isUploadingImage) }
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
-                if hasLoaded && !editingReadOnly {
+                if let returnToResearch, editingReadOnly {
+                    Button("Done", action: returnToResearch)
+                } else if hasLoaded && !editingReadOnly {
                     Button("Done") { Task { await finishEditing() } }
                         .disabled(isSaving || isUploadingImage)
                         .accessibilityIdentifier("native-notebook-done")
@@ -1099,7 +1106,7 @@ private struct NotebookCardEditorView: View {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         await saveNow()
         if isCurrentOwner && hasLoaded && !isSaving && pendingSave == nil && editableContent == lastSyncedContent && !requiresConflictReview && errorMessage == nil {
-            dismiss()
+            if let returnToResearch { returnToResearch() } else { dismiss() }
         }
     }
 
