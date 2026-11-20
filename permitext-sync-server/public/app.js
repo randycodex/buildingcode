@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-grayscale-active-tabs-v2622";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-workspace-menu-dismiss-v2623";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261120-grayscale-active-tabs-v2622";
+} from "./offline-storage.js?v=20261120-workspace-menu-dismiss-v2623";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2688,8 +2688,7 @@ function openWorkspaceMenu(tab, options = {}) {
   workspaceMenu = menu;
   menu.binding = bindFloatingWorkspacePanel(element, {
     anchor: workspaceActionsButton, alignmentReference: workspaceFloatingPanelReference, topGap: workspaceFloatingPanelTopGap,
-    dismiss: closeWorkspaceMenu, manageAnchor: true,
-    isPinned: () => menu.tab !== "workspaces"
+    dismiss: closeWorkspaceMenu, manageAnchor: true
   });
   menu.tabs = createFloatingWorkspaceTabs({
     id: "workspace-menu", label: "Workspace menu sections", entries, selected: tab,
