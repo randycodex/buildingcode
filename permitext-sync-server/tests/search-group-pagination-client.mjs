@@ -44,7 +44,7 @@ const make = () => {
       const main = new Element(); main.className = "result-row-main"; main.dataset.searchResultKey = c.searchResultPositionKey(result);
       row.append(main); page.group.querySelector(".search-result-group-body").append(row);
     } },
-    updateSearchDock: (_panel, _instance, count, state) => statuses.push({ count, ...state }), refreshSearchGroupCounts() {},
+    updateSearchDock: (_panel, _instance, count, state) => statuses.push({ count, ...state }), refreshSearchChapterCounts() {},
     saveWorkspaceState: () => saves.push(JSON.stringify(instance)),
     api: async (path, options) => { requests.push({ url: new URL(path, "http://local"), signal: options.signal }); return responder(); }
   });

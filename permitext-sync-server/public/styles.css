@@ -5417,16 +5417,6 @@ select option:checked {
   box-shadow: none;
 }
 
-.search-result-group-meta {
-  display: none;
-}
-
-.search-result-group-count {
-  font-size: 10px;
-  font-weight: 500;
-  opacity: 0.72;
-}
-
 .search-result-group.project-section-motion.is-open > .search-result-group-body {
   padding-top: 0;
 }
@@ -19454,14 +19444,6 @@ body.is-account-redirect-loading > :not(.account-redirect-loading) { visibility:
 }
 .search-panel .search-family-card > .search-result-group:last-child > .search-group-label[aria-expanded="false"] {
   border-bottom: 0;
-}
-.search-family-card .search-result-group-meta {
-  display: inline-flex;
-  color: var(--text-secondary);
-}
-.search-family-card .search-result-group-count {
-  font-size: calc(var(--chrome-font-size) * 0.9);
-  font-variant-numeric: tabular-nums;
 }
 .search-family-card .result-row {
   row-gap: 0;

@@ -71,7 +71,7 @@ const c = vm.createContext({
 });
 const subscriptionLifecycle = source.slice(source.indexOf("const workspaceNodeAccessRecords"), source.indexOf("function readerPrivateContentAllowed"));
 vm.runInContext(subscriptionLifecycle + ["workspaceAccessGateForRender", "normalizeAnnotationBlockID", "savedEvidenceKey", "projectSectionBelongsToProject", "workspaceSavedEvidenceKeys", "isSectionSaved",
-  "searchResultDetail", "searchResultPositionKey", "searchResultChapter", "ensureSearchResultChapter", "searchGroupCountText", "createSearchResultSaveButton", "appendSearchResultGroups", "refreshSearchGroupCounts"].map(actual).join("\n"), c);
+  "searchResultDetail", "searchResultPositionKey", "searchResultChapter", "ensureSearchResultChapter", "searchGroupCountText", "createSearchResultSaveButton", "appendSearchResultGroups", "refreshSearchChapterCounts"].map(actual).join("\n"), c);
 const gate = c.workspaceAccessGateForRender();
 await gate.ready;
 panel.__workspaceAccessGate = gate;
@@ -90,6 +90,8 @@ const start = performance.now();
 c.appendSearchResultGroups(results, matches, "means of egress", instance);
 const duration = performance.now() - start;
 assertRows(matches);
+assert.equal(results.querySelectorAll(".search-result-group-toggle").length, 2);
+assert.equal(results.querySelectorAll(".search-result-group-count").length, 0, "Edition headers display their edition label alone");
 assert.equal(reads, 1, "80 results across current/historical editions share one summary with a real eagerly notifying settled gate");
 assert.equal(paints, 80, "The eager callback and explicit initialization do not paint each button twice");
 const chapters = results.querySelectorAll('.search-chapter-group');
@@ -107,7 +109,7 @@ assert.equal(reads, 1, "Each new page uses fresh state and skips already-rendere
 assert.equal(paints, 85);
 assert.equal(chapters[0].open, true, 'Loading another page respects manually expanded chapters');
 assert.equal(chapters[0].querySelector('.search-chapter-count').textContent, '16', 'Counts include later pages exactly once');
-results.dataset.searchHasMore = 'true'; c.refreshSearchGroupCounts(results);
+results.dataset.searchHasMore = 'true'; c.refreshSearchChapterCounts(results);
 assert.equal(chapters[0].querySelector('.search-chapter-count').textContent, '16 loaded', 'Partial pagination counts never claim to be totals');
 results.dataset.searchHasMore = 'false';
 const restoredChapters = new Node('div'); panel.append(restoredChapters);

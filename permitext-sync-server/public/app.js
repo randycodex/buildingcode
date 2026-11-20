@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-search-auto-page-v2565";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-search-edition-labels-v2566";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-search-auto-page-v2565";
+} from "./offline-storage.js?v=20261119-search-edition-labels-v2566";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -21788,17 +21788,10 @@ function searchGroupCountText(count, hasMore) {
   return hasMore ? `${loadedLabel} loaded` : loadedLabel;
 }
 
-function refreshSearchGroupCounts(results) {
+function refreshSearchChapterCounts(results) {
   if (!results) return;
   results.querySelectorAll(".search-result-group").forEach((group) => {
     const hasMore = (group.dataset.searchHasMore ?? results.dataset.searchHasMore) === "true";
-    const count = group.querySelector(".search-result-group-count");
-    if (!count) return;
-    const loaded = group.querySelectorAll(".result-row").length;
-    count.textContent = searchGroupCountText(loaded, hasMore);
-    count.title = hasMore
-      ? `${loaded.toLocaleString()} loaded. More results may be in this edition.`
-      : `${loaded.toLocaleString()} ${loaded === 1 ? "result" : "results"}`;
     group.querySelectorAll(".search-chapter-group").forEach((chapter) => {
       const chapterCount = chapter.querySelector(".search-chapter-count");
       const matches = chapter.querySelectorAll(".result-row").length;
@@ -22760,7 +22753,7 @@ async function renderSearchResults(panel, instance) {
       position.groupPages[key] = desiredPages;
       appendSearchGroupLoadMore(results, page, options);
     }
-    refreshSearchGroupCounts(results);
+    refreshSearchChapterCounts(results);
     for (const page of results.searchGroupPages.values()) {
       const desiredPages = position.groupPages[page.key];
       let failed = false;
@@ -22924,12 +22917,6 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         label.type = "button";
         label.classList.add("search-result-group-toggle");
         label.setAttribute("aria-controls", groupBody.id);
-        const meta = document.createElement("span");
-        meta.className = "search-result-group-meta";
-        const count = document.createElement("span");
-        count.className = "search-result-group-count";
-        meta.append(count);
-        label.append(meta);
         const initiallyCollapsed = !normalizeSearchResultSources(searchInstance.expandedResultSources).includes(sourceKey) &&
           searchInstance.defaultExpandedResultSource !== sourceKey;
         const syncToggleLabel = (expanded) => {
@@ -23032,11 +23019,6 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       const chapter = ensureSearchResultChapter(groupBody, result, searchInstance, sourceKey);
       chapter.querySelector(".search-chapter-body").append(row);
     });
-    const count = group.querySelector(".search-result-group-count");
-    if (count) {
-      const loadedGroupCount = groupBody.querySelectorAll(".result-row").length;
-      count.textContent = searchGroupCountText(loadedGroupCount, results.dataset.searchHasMore === "true");
-    }
   });
   // Keep the usual family/edition order as later pages arrive.
   const familyOrder = ["BC", "EBC", "FGC", "MC", "PC", "ECC", "EC", "FC", "ZR", "HMC", "AC", "T24", "T25", "T26", "T28", "LL"];
@@ -23048,7 +23030,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         .forEach((group) => family.append(group));
       results.append(family);
     });
-  refreshSearchGroupCounts(results);
+  refreshSearchChapterCounts(results);
 }
 
 function loadMoreSearchGroupNearEnd(results) {
@@ -23108,7 +23090,7 @@ function appendSearchGroupLoadMore(results, page, options) {
       results.dataset.searchHasMore = hasMore ? "true" : "false";
       const loaded = results.querySelectorAll(".result-row").length;
       updateSearchDock(options.panel, options.searchInstance, loaded, { hasMore });
-      refreshSearchGroupCounts(results);
+      refreshSearchChapterCounts(results);
       if (results.dataset.restoringSearch !== "true") {
         searchPositionState(options.searchInstance).groupPages[page.key] = page.loadedPages;
         saveWorkspaceState();
