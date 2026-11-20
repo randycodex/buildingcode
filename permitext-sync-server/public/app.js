@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-workspace-themes-v2576";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261119-workspace-themes-v2577";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261119-workspace-themes-v2576";
+} from "./offline-storage.js?v=20261119-workspace-themes-v2577";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -44246,7 +44246,7 @@ function positionWebAppUpdateNotice(notice, button) {
 }
 
 function applyWorkspaceTheme(value) {
-  const theme = ["original", "tinted", "header-colors", "warm"].includes(value) ? value : "tinted";
+  const theme = ["original", "tinted", "header-colors", "warm", "grayscale", "cool-slate"].includes(value) ? value : "tinted";
   track.dataset.workspaceTheme = theme;
   document.querySelectorAll(".settings-theme-radio").forEach(input => { input.checked = input.value === theme; });
 }
