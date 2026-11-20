@@ -20307,7 +20307,7 @@ dialog.report-export-review {
 
 /* Keep the workspace tools between the brand and account controls. */
 :root {
-  --header-height: 45px;
+  --header-height: 35px;
   --workspace-secondary-bar-height: 35px;
   --workspace-sidebar-motion: 280ms cubic-bezier(.2, 0, 0, 1);
   --workspace-menu-height: 30px;
@@ -20318,7 +20318,7 @@ dialog.report-export-review {
 .workspace-shell { grid-template-rows: auto minmax(0, 1fr); }
 .workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: auto auto minmax(0, 1fr); }
 .workspace-shell > .topbar {
-  --workspace-menu-height: 44px;
+  --workspace-menu-height: calc(var(--header-height) - 1px);
   --workspace-menu-font-size: 14px;
   --workspace-menu-weight: 500;
   --workspace-menu-icon-size: 15px;
@@ -20329,7 +20329,7 @@ dialog.report-export-review {
   grid-row: 1;
   grid-template-columns: max-content minmax(0, 1fr) max-content;
   grid-template-rows: auto;
-  align-items: start;
+  align-items: center;
   gap: 0 12px;
   min-width: 0;
   min-height: var(--header-height);

@@ -653,7 +653,9 @@ async function main() {
         workspaceStyles.text.includes('.workspace-actions-button .workspace-current-name') &&
         workspaceStyles.text.includes('.workspace-context-switch[aria-checked="true"]') &&
         workspaceStyles.text.match(/\.topbar-brand\s*\{[^}]*grid-column:\s*1;[^}]*justify-self:\s*start;/) &&
-        workspaceStyles.text.match(/\.workflow-toolbar\s*\{[^}]*grid-column:\s*2;[^}]*flex-wrap:\s*nowrap;[^}]*height:\s*calc\(var\(--header-height\) - 1px\);[^}]*overflow-x:\s*auto;[^}]*scrollbar-width:\s*none;/) &&
+        workspaceStyles.text.includes("--header-height: 35px;") &&
+        workspaceStyles.text.match(/\.workspace-shell > \.topbar\s*\{[^}]*align-items:\s*center;/) &&
+        workspaceStyles.text.match(/\.workflow-toolbar\s*\{[^}]*flex-wrap:\s*nowrap;[^}]*align-items:\s*center;[^}]*height:\s*calc\(var\(--header-height\) - 1px\);[^}]*overflow:\s*clip;/) &&
         workspaceStyles.text.match(/button:focus-visible,[\s\S]*?outline:\s*[23]px solid[^;]+;/) &&
         workspaceStyles.text.includes(".workspace-empty-state {") &&
         workspaceStyles.text.includes(".pane-edge-resizer {") &&

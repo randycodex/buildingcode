@@ -59,7 +59,7 @@
 .workflow-toolbar .workspace-tools-overflow button:not(:disabled):hover { background: var(--workspace-menu-highlight); }
 .workflow-toolbar .workspace-tools-overflow button:disabled { opacity: .45; cursor: default; }
 
-@media(pointer:coarse){.workflow-toolbar .reader-shortcut{min-height:44px;min-width:44px}}
+@media(pointer:coarse){.workflow-toolbar .reader-shortcut{min-width:44px}}
 @media(prefers-reduced-motion:reduce){.workflow-toolbar .reader-shortcut{transition:none}}
 
 .workflow-toolbar .reader-column-shortcut{--code-accent:var(--text-primary)}
