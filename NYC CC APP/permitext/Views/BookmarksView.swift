@@ -1433,6 +1433,7 @@ struct ProjectView: View {
 
         .onChange(of: library.privateSessionID) { _, _ in
             sheetSection = nil
+            isProjectDescriptionExpanded = false
             finishInlineEditing()
             contextDraft = ""
             factsDraft = []
@@ -1444,6 +1445,7 @@ struct ProjectView: View {
         }
         .onChange(of: folderID) { _, _ in
             sheetSection = nil
+            isProjectDescriptionExpanded = false
             finishInlineEditing()
             contextDraft = ""
             factsDraft = []
@@ -1574,7 +1576,7 @@ struct ProjectView: View {
         let reports = projectHubSnapshot?.reports ?? []
         VStack(alignment: .leading, spacing: 8) {
             if reports.isEmpty {
-                projectHubEmpty("No immutable Project Reports have been generated yet.")
+                projectHubEmpty("No reports yet. Create a report in the web workspace to see it here.")
             } else {
                 ForEach(reports) { report in
                     VStack(alignment: .leading, spacing: 7) {
@@ -1796,6 +1798,20 @@ struct ProjectView: View {
         }
     }
 
+    private func formattedProjectContext(_ source: String) -> AttributedString {
+        var result = AttributedString()
+        for (index, line) in source.components(separatedBy: .newlines).enumerated() {
+            if index > 0 { result += AttributedString("\n") }
+            let hashes = line.prefix { $0 == "#" }.count
+            let heading = (1...6).contains(hashes) && line.dropFirst(hashes).first == " "
+            let content = heading ? String(line.dropFirst(hashes + 1)) : line
+            var text = (try? AttributedString(markdown: content, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(content)
+            if heading { text.font = .headline }
+            result += text
+        }
+        return result
+    }
+
     private var projectContextOverview: some View {
         VStack(alignment: .leading, spacing: 10) {
             if inlineEditingSection == .context {
@@ -1805,16 +1821,28 @@ struct ProjectView: View {
                     .transition(.opacity)
                 inlineEditorError
             } else {
-                Button { beginInlineEditing(.context) } label: {
+                let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                if isProjectDescriptionExpanded && !description.isEmpty {
+                    HStack {
+                        Text("Context").font(.headline)
+                        Spacer()
+                        Button("Edit") { beginInlineEditing(.context) }
+                            .accessibilityLabel("Edit context")
+                            .accessibilityIdentifier("project-edit-context")
+                    }
+                }
+                Button {
+                    if description.isEmpty { beginInlineEditing(.context) }
+                    else { isProjectDescriptionExpanded.toggle() }
+                } label: {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Context").font(.headline).foregroundStyle(.primary)
-                        let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                        Text(description.isEmpty ? "No context yet." : description)
+                        if !isProjectDescriptionExpanded { Text("Context").font(.headline).foregroundStyle(.primary) }
+                        Text(description.isEmpty ? AttributedString("No context yet.") : formattedProjectContext(description))
                             .font(.body).foregroundStyle(.secondary)
-                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? 5 : 3)
+                            .lineLimit(isProjectDescriptionExpanded ? nil : (dynamicTypeSize.isAccessibilitySize ? 5 : 3))
                             .fixedSize(horizontal: false, vertical: true)
                             .accessibilityIdentifier("project-overview-context")
-                        Text(description.isEmpty ? "Add context" : "Read more")
+                        Text(description.isEmpty ? "Add context" : (isProjectDescriptionExpanded ? "Show less" : "Read more"))
                             .font(.caption).foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -1823,6 +1851,7 @@ struct ProjectView: View {
                 .buttonStyle(.plain)
                 .disabled(inlineEditingSection != nil)
                 .accessibilityIdentifier("project-section-context")
+
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -2048,7 +2077,7 @@ struct ProjectView: View {
                 projectSectionCard("Notes", systemImage: "note.text",
                     count: projectHubSnapshot.map { "\($0.notebookCards.count) \($0.notebookCards.count == 1 ? "note" : "notes")" },
                     preview: latestProjectNote.map { $0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled note" : $0.title }
-                        ?? (projectHubSnapshot == nil ? "Open Notebook" : "No notes yet."))
+                        ?? (projectHubSnapshot == nil ? "Open Notes" : "No notes yet."))
             }
             .accessibilityIdentifier("project-section-notebook")
 
@@ -2117,7 +2146,7 @@ struct ProjectView: View {
             if let projectID = library.backendProjectID(for: folderID) {
                 projectNotebookDestination(projectID: projectID)
             } else {
-                projectSectionScreen(title: "Notebook") {
+                projectSectionScreen(title: "Notes") {
                     projectHubEmpty("Connect to sync this Project’s Notebook.")
                 }
             }
@@ -2297,18 +2326,11 @@ struct ProjectView: View {
 
     private var savedEvidenceHeader: some View {
         HStack(spacing: 4) {
-            Spacer(minLength: 12)
-            Button {
-                isEvidenceSearchPresented = true
-            } label: {
-                Image(systemName: "magnifyingglass")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(accentColor)
-                    .frame(width: 36, height: 36)
+            if isSelecting {
+                selectedEvidenceActions
+                    .disabled(selectedBookmarkRowIDs.isEmpty)
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Search saved evidence")
-
+            Spacer(minLength: 12)
             savedEvidenceSelectionButton
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -2405,22 +2427,25 @@ struct ProjectView: View {
     }
 
     @ViewBuilder
-    private var projectExportMenuContent: some View {
-        if isSelecting && !selectedBookmarkRowIDs.isEmpty {
-            Button("Export selected (\(selectedBookmarkRowIDs.count))") {
+    private var selectedEvidenceActions: some View {
+        Group {
+            Button("Export (\(selectedBookmarkRowIDs.count))") {
                 pendingExport = BookmarkExportRequest(
                     bookmarks: selectedBookmarks,
                     contextLabel: folder?.name,
                     scopeLabel: "Selected in \(folder?.name ?? "Project")"
                 )
             }
-            Button("Remove selected from project", role: .destructive) {
+            Button("Remove from project", role: .destructive) {
                 removeProjectEvidence(selectedBookmarks)
                 selectedBookmarkRowIDs.removeAll()
                 isSelecting = false
             }
         }
 
+    }
+
+    private var projectExportMenuContent: some View {
         Button("Export project (\(projectBookmarks.count))") {
             pendingExport = BookmarkExportRequest(
                 bookmarks: projectBookmarks,

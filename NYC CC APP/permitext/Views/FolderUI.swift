@@ -110,7 +110,7 @@ struct FolderEditorSheet: View {
                 }
 
                 if folderType == .project {
-                    Section("Project address") {
+                    Section("Project address (required)") {
                         TextField("Address", text: $address, axis: .vertical)
                             .accessibilityIdentifier("project-editor-address")
                             .textInputAutocapitalization(.words)

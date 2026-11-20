@@ -397,7 +397,7 @@ private struct ProjectNotebookSessionView: View {
                 }
             }
         }
-        .navigationTitle("Notebook")
+        .navigationTitle("Notes")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if !access.readOnly || permitsLocalDraftEditing {
@@ -788,7 +788,7 @@ private struct NotebookCardEditorView: View {
                 }
             }
         }
-        .navigationTitle(projectName)
+        .navigationTitle("Note")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .interactiveDismissDisabled(sheetDetent != nil)
@@ -801,6 +801,7 @@ private struct NotebookCardEditorView: View {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 if hasLoaded && !editingReadOnly {
                     Button("Done") { Task { await finishEditing() } }
+                        .disabled(isSaving || isUploadingImage)
                         .accessibilityIdentifier("native-notebook-done")
                 }
                 if canPerformNetworkWrites && hasLoaded && currentCardID != nil {
@@ -1043,6 +1044,9 @@ private struct NotebookCardEditorView: View {
         guard await flushEditorDraft(finalizeEditing: true) else { return }
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         await saveNow()
+        if isCurrentOwner && hasLoaded && !isSaving && pendingSave == nil && editableContent == lastSyncedContent && !requiresConflictReview && errorMessage == nil {
+            dismiss()
+        }
     }
 
     @MainActor

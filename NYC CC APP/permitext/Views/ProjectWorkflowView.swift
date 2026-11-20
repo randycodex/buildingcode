@@ -11,6 +11,8 @@ struct ProjectWorkflowView: View {
     @State private var editingSessionID: UUID?
     @State private var questions: [ProjectOpenQuestion] = []
     @State private var records: [ProjectChecklistRecord] = []
+    @FocusState private var focusedRowID: String?
+    @State private var newRowID: String?
     @State private var saveError: String?
     @State private var initialSyncFinished = false
 
@@ -94,6 +96,13 @@ struct ProjectWorkflowView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             TextField("What needs to be answered?", text: $question.question, axis: .vertical)
                                 .font(.headline)
+                                .focused($focusedRowID, equals: question.id)
+                                .onAppear {
+                                    if newRowID == question.id {
+                                        focusedRowID = question.id
+                                        newRowID = nil
+                                    }
+                                }
                                 .accessibilityLabel("Question \(index + 1)")
                                 .accessibilityIdentifier("project-question-text-\(index)")
                             TextField("Add an answer", text: $question.answer, axis: .vertical)
@@ -136,6 +145,13 @@ struct ProjectWorkflowView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             TextField("Record name", text: $record.label, axis: .vertical)
                                 .font(.headline)
+                                .focused($focusedRowID, equals: record.id)
+                                .onAppear {
+                                    if newRowID == record.id {
+                                        focusedRowID = record.id
+                                        newRowID = nil
+                                    }
+                                }
                                 .accessibilityLabel("Record \(index + 1)")
                                 .accessibilityIdentifier("project-record-label-\(index)")
                             Picker("Status", selection: $record.status) {
@@ -182,8 +198,15 @@ struct ProjectWorkflowView: View {
             Button {
                 if !isEditing { beginEditing() }
                 guard isEditing else { return }
-                if isQuestions { questions.append(ProjectOpenQuestion()) }
-                else { records.append(ProjectChecklistRecord()) }
+                if isQuestions {
+                    let question = ProjectOpenQuestion()
+                    newRowID = question.id
+                    questions.append(question)
+                } else {
+                    let record = ProjectChecklistRecord()
+                    newRowID = record.id
+                    records.append(record)
+                }
             } label: { Label(isQuestions ? "Add question" : "Add record", systemImage: "plus") }
                 .disabled(folder == nil || needsInitialSync || (isQuestions ? (isEditing ? questions.count : savedQuestions.count) >= 100 : (isEditing ? records.count : savedRecords.count) >= 50))
                 .accessibilityIdentifier("project-workflow-add")

@@ -425,6 +425,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }, object: nil)], timeout: 10), .completed)
         keepScreenshot(named: "Project overview without card chevrons", from: app)
         app.buttons["project-section-context"].tap()
+        XCTAssertFalse(app.keyboards.firstMatch.exists)
+        app.buttons["project-edit-context"].tap()
         let editor = app.textViews["project-context-editor"]
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
@@ -440,7 +442,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         save()
         XCTAssertTrue(app.buttons["project-section-context"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["project-section-context"].label.contains("Inline phone edit."))
-        app.buttons["project-section-context"].tap()
+        app.buttons["project-edit-context"].tap()
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         editor.typeText(" Discard this draft.")
         app.buttons["project-inline-cancel"].tap()
@@ -466,7 +468,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Facts sheet editor on iPhone", from: app)
         factsBar.buttons["Cancel"].tap()
         app.navigationBars["Facts"].buttons["Close"].tap()
-        for (section, title) in [("notebook", "Notebook"), ("evidence", "Evidence"), ("reports", "Reports")] {
+        for (section, title) in [("notebook", "Notes"), ("evidence", "Evidence"), ("reports", "Reports")] {
             let card = app.buttons["project-section-\(section)"]
             reveal(card, in: app)
             card.tap()
@@ -503,8 +505,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let question = app.textFields["project-question-text-0"]
         let questionText = question.exists ? question : app.textViews["project-question-text-0"]
         XCTAssertTrue(questionText.waitForExistence(timeout: 5))
-        questionText.tap()
-        questionText.typeText("Is the survey current?")
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        app.typeText("Is the survey current?")
         let answer = app.textFields["project-question-answer-0"]
         let answerText = answer.exists ? answer : app.textViews["project-question-answer-0"]
         answerText.tap()
@@ -539,7 +541,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let notesCard = app.buttons["project-section-notebook"]
         reveal(notesCard, in: app)
         notesCard.tap()
-        let closeNotes = app.navigationBars["Notebook"].buttons["Close"]
+        let closeNotes = app.navigationBars["Notes"].buttons["Close"]
         XCTAssertTrue(closeNotes.waitForExistence(timeout: 10))
         closeNotes.tap()
         XCTAssertTrue(checklistCard.waitForExistence(timeout: 5))
@@ -564,6 +566,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let readMore = app.buttons["project-section-context"]
         XCTAssertTrue(readMore.waitForExistence(timeout: 10))
         readMore.tap()
+        app.buttons["project-edit-context"].tap()
         let editor = app.textViews["project-context-editor"]
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
@@ -572,7 +575,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         save.tap()
         XCTAssertTrue(readMore.waitForExistence(timeout: 5))
         reveal(readMore, in: app, swipingDown: true)
-        readMore.tap()
+        app.buttons["project-edit-context"].tap()
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["project-inline-editor-title"].isHittable,
@@ -668,7 +671,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         for (identifier, title) in [
             ("project-section-context", "Project Context"),
             ("project-section-structured-facts", "Facts"),
-            ("project-section-notebook", "Notebook"),
+            ("project-section-notebook", "Notes"),
             ("project-section-research-history", "Research History")
         ] {
             let section = element(in: app, identifier: identifier)

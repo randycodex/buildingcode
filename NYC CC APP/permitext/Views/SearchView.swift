@@ -439,6 +439,7 @@ struct SearchView: View {
                 }
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
+                .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea(edges: .top))
             }
             .accessibilityIdentifier("search-results-scroll")
             .scrollPosition(id: scrollPositionBinding, anchor: .top)
