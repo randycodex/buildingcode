@@ -1245,7 +1245,7 @@ private struct SourceProblemReportSheet: View {
     private var emailURL: URL? {
         var components = URLComponents()
         components.scheme = "mailto"
-        components.path = "permitext@gmail.com"
+        components.path = "support@per.codes"
         components.queryItems = [URLQueryItem(name: "subject", value: "permitext source problem"), URLQueryItem(name: "body", value: report)]
         return components.url
     }
@@ -1270,7 +1270,7 @@ private struct SourceProblemReportSheet: View {
                         copied = true
                     }
                     if emailUnavailable {
-                        Text("Email is not available on this device. Copy the report and send it to permitext@gmail.com.")
+                        Text("Email is not available on this device. Copy the report and send it to support@per.codes.")
                             .font(.footnote).foregroundStyle(.secondary)
                     }
                 } footer: {

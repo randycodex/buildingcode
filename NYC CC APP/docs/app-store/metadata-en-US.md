@@ -91,7 +91,7 @@ per codes Pro Monthly:
 - Trial: none
 - Auto-renewal: monthly until canceled
 
-Support: `permitext@gmail.com`
+Support: `support@per.codes`
 
 ## Subscription group localization
 

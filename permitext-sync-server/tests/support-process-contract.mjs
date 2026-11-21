@@ -11,6 +11,10 @@ const [operations, incident, tabletop, support, master] = await Promise.all([
 
 for (const document of [operations, incident, tabletop, support]) {
   assert.match(document, /Higinio Jimenez Manzano/);
+}
+assert.match(operations, /Public support inbox: `support@per\.codes`/);
+assert.match(support, /mailto:support@per\.codes/);
+for (const document of [operations, incident, tabletop]) {
   assert.match(document, /permitext@gmail\.com/);
 }
 

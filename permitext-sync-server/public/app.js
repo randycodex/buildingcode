@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261120-grayscale-project-swatches-v2624";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261121-support-email-v2625";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261120-grayscale-project-swatches-v2624";
+} from "./offline-storage.js?v=20261121-support-email-v2625";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -8221,7 +8221,7 @@ function feedbackURL(releaseID = "unknown") {
       `per codes release: ${releaseID}`
     ].join("\n")
   });
-  return `mailto:permitext@gmail.com?${parameters.toString()}`;
+  return `mailto:support@per.codes?${parameters.toString()}`;
 }
 
 function wireOperationalSupport(panel) {
@@ -8962,7 +8962,7 @@ function openAccountDeletionProgress() {
     }
     const support = document.createElement("a");
     support.className = "web-warning-button web-warning-cancel account-deletion-support";
-    support.href = "mailto:permitext@gmail.com?subject=Account%20deletion%20cleanup";
+    support.href = "mailto:support@per.codes?subject=Account%20deletion%20cleanup";
     support.textContent = "Contact Support";
     const close = document.createElement("button");
     close.type = "button";

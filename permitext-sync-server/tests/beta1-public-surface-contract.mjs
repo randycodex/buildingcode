@@ -79,7 +79,7 @@ assert(iosPolicyAcceptance >= 0 && iosPurchase > iosPolicyAcceptance, "iOS polic
 
 for (const [name, document] of [["Terms", terms], ["Refund policy", refunds]]) {
   assert.doesNotMatch(document, /legal review remains pending|working draft/i);
-  assert.match(document, /permitext@gmail\.com/);
+  assert.match(document, /mailto:support@per\.codes/);
   assert.match(document, /United States|web subscription|Web subscription/i);
   assert.match(document, /\/privacy/);
   assert(document.length > 2_000, `${name} is unexpectedly incomplete.`);

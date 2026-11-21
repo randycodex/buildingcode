@@ -391,7 +391,7 @@ async function main() {
     );
     assert(
         privacyPolicy.text.includes("Higinio Jimenez Manzano") &&
-        privacyPolicy.text.includes("permitext@gmail.com") &&
+        privacyPolicy.text.includes("support@per.codes") &&
         !privacyPolicy.text.includes("Return to Permitext") &&
         !privacyPolicy.text.includes('class="back-link"') &&
         webRoot.text.includes('href="/privacy"') &&

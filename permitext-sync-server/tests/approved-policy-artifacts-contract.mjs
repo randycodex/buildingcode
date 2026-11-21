@@ -15,7 +15,7 @@ for (const [key, artifact] of Object.entries(approvedPolicyArtifacts)) {
   assert.equal(
     digest,
     artifact.sha256,
-    `${artifact.sourcePath} changed without a new owner-approved version and hash.`
+    `${artifact.sourcePath} changed without an updated owner-approved publication hash.`
   );
   assert.match(artifact.version, /^[a-z0-9][a-z0-9._-]{0,79}$/i, `${key} version must be stable.`);
   assert.match(artifact.publicPath, /^\/[a-z0-9-]+$/i, `${key} public path must be canonical.`);

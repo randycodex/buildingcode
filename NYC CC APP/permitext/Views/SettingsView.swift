@@ -300,7 +300,7 @@ struct SettingsView: View {
     private var feedbackURL: URL {
         var components = URLComponents()
         components.scheme = "mailto"
-        components.path = "permitext@gmail.com"
+        components.path = "support@per.codes"
         components.queryItems = [
             URLQueryItem(name: "subject", value: "per codes feedback — \(appVersionLabel)"),
             URLQueryItem(
@@ -308,7 +308,7 @@ struct SettingsView: View {
                 value: "What happened?\n\nWhat did you expect?\n\n\(appVersionLabel)"
             )
         ]
-        return components.url ?? URL(string: "mailto:permitext@gmail.com")!
+        return components.url ?? URL(string: "mailto:support@per.codes")!
     }
 
     private var collapseProgress: CGFloat {
@@ -1358,7 +1358,7 @@ struct SettingsView: View {
                 .disabled(library.isAccountBusy || accountDeletionOperationInProgress)
             }
 
-            Link("Contact Support", destination: URL(string: "mailto:permitext@gmail.com?subject=Account%20deletion%20cleanup")!)
+            Link("Contact Support", destination: URL(string: "mailto:support@per.codes?subject=Account%20deletion%20cleanup")!)
                 .font(.subheadline.weight(.medium))
 
             Button("Done") {

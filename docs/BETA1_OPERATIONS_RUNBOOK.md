@@ -6,6 +6,7 @@ This runbook defines the minimum operating loop for a public Beta 1. It separate
 
 ## User-visible diagnostics and support
 
+- Public support inbox: `support@per.codes`.
 - Named support and alert owner: Higinio Jimenez Manzano (`permitext@gmail.com`).
 - Web Settings exposes **Send feedback / Report a problem** and inserts the serving release ID into the email.
 - iOS Settings exposes the same path and inserts the app version and build.
