@@ -412,34 +412,46 @@ extension CodeFolder {
 }
 
 
+func formattedProjectContext(_ source: String) -> AttributedString {
+    var result = AttributedString()
+    for (index, line) in source.components(separatedBy: .newlines).enumerated() {
+        if index > 0 { result += AttributedString("\n") }
+        let hashes = line.prefix { $0 == "#" }.count
+        let heading = (1...6).contains(hashes) && line.dropFirst(hashes).first == " "
+        let content = heading ? String(line.dropFirst(hashes + 1)) : line
+        var text = (try? AttributedString(markdown: content, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(content)
+        if heading { text.font = .headline }
+        result += text
+    }
+    return result
+}
+
 /// Edits the Project's context without replacing its other saved fields.
 struct ProjectContextView: View {
     let folderID: Int64
-    let accentColor: Color
+    @Binding var isEditing: Bool
 
     @EnvironmentObject private var library: CodeLibraryViewModel
-    @Environment(\.dismiss) private var dismiss
     @State private var editingFolder: CodeFolder?
     @State private var editingSessionID: UUID?
     @State private var draft = ""
     @State private var saveError: String?
 
     private var folder: CodeFolder? { library.folder(id: folderID) }
-    private var isEditing: Bool { editingFolder != nil }
+    private var savedContext: String { folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? "" }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ZStack(alignment: .topLeading) {
-                ProjectContextTextView(
-                    text: isEditing ? draft : folder?.description ?? "",
-                    isEditing: isEditing,
-                    onTextChange: { draft = $0 }
-                )
-                if !isEditing && (folder?.description.isEmpty ?? true) {
-                    Text("Use Edit to add Project context.")
-                        .font(.subheadline)
+            if isEditing {
+                ProjectContextEditor(text: $draft)
+            } else {
+                ScrollView {
+                    Text(savedContext.isEmpty ? AttributedString("No context yet.") : formattedProjectContext(savedContext))
+                        .font(.body)
                         .foregroundStyle(.secondary)
-                        .allowsHitTesting(false)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityIdentifier("project-context-text")
                 }
             }
             if let saveError {
@@ -451,11 +463,6 @@ struct ProjectContextView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
         .padding(.top, CodeScreenMetrics.topTitlePadding)
-        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-        .navigationTitle("Project Context")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(isEditing)
-        .tint(Color.appChrome)
         .toolbar {
             if isEditing {
                 ToolbarItem(placement: .topBarLeading) {
@@ -468,28 +475,22 @@ struct ProjectContextView: View {
                 }
             } else {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Edit", systemImage: "pencil") { _ = beginEditing() }
+                    Button("Edit", action: beginEditing)
                         .accessibilityIdentifier("project-context-edit")
                 }
             }
         }
-        .onChange(of: library.privateSessionID) { _, _ in
-            finishEditing()
-            dismiss()
-        }
-        .onChange(of: folder?.clientID) { _, _ in
-            finishEditing()
-            dismiss()
-        }
+        .onChange(of: library.privateSessionID) { _, _ in finishEditing() }
+        .onChange(of: folder?.clientID) { _, _ in finishEditing() }
     }
 
-    private func beginEditing() -> Bool {
-        guard let folder, library.requireProjectAccess() else { return false }
+    private func beginEditing() {
+        guard let folder, library.requireProjectAccess() else { return }
         draft = folder.description
         editingFolder = folder
         editingSessionID = library.privateSessionID
         saveError = nil
-        return true
+        isEditing = true
     }
 
     private func save() {
@@ -507,6 +508,7 @@ struct ProjectContextView: View {
     }
 
     private func finishEditing() {
+        isEditing = false
         editingFolder = nil
         editingSessionID = nil
         draft = ""
@@ -514,36 +516,33 @@ struct ProjectContextView: View {
     }
 }
 
-/// Reading never enables the keyboard; the Edit action controls editability.
-private struct ProjectContextTextView: UIViewRepresentable {
-    let text: String
-    let isEditing: Bool
-    let onTextChange: (String) -> Void
+private struct ProjectContextEditor: UIViewRepresentable {
+    @Binding var text: String
 
     func makeUIView(context: Context) -> UITextView {
         let view = UITextView()
         view.backgroundColor = .clear
-        view.font = .preferredFont(forTextStyle: .subheadline)
+        view.font = .preferredFont(forTextStyle: .body)
         view.adjustsFontForContentSizeCategory = true
-        view.textColor = .secondaryLabel
+        view.textColor = .label
         view.tintColor = UIColor(Color.appChrome)
         view.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)
         view.textContainer.lineFragmentPadding = 0
         view.contentInsetAdjustmentBehavior = .never
         view.keyboardDismissMode = .interactive
-        view.isEditable = false
-        view.isSelectable = true
+        view.text = text
+        view.selectedRange = NSRange(location: 0, length: 0)
+        view.accessibilityLabel = "Project context"
+        view.accessibilityIdentifier = "project-context-editor"
         view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         view.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         view.delegate = context.coordinator
+        Task { @MainActor [weak view] in view?.becomeFirstResponder() }
         return view
     }
 
     func updateUIView(_ view: UITextView, context: Context) {
         context.coordinator.parent = self
-        let beginsEditing = isEditing && !view.isEditable
-        view.isEditable = isEditing
-        if !isEditing && view.isFirstResponder { view.resignFirstResponder() }
         // Reassigning text on every SwiftUI update would reset native selection
         // and scroll position as the keyboard appears or the user types.
         if view.text != text {
@@ -553,25 +552,17 @@ private struct ProjectContextTextView: UIViewRepresentable {
             let location = min(selection.location, length)
             view.selectedRange = NSRange(location: location, length: min(selection.length, length - location))
         }
-        view.accessibilityLabel = "Project context"
-        view.accessibilityHint = isEditing ? "Edit Project context" : "Read Project context. Use Edit to make changes."
-        view.accessibilityIdentifier = isEditing ? "project-context-editor" : "project-context-text"
-        if beginsEditing { view.becomeFirstResponder() }
     }
 
     func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
 
     final class Coordinator: NSObject, UITextViewDelegate {
-        var parent: ProjectContextTextView
+        var parent: ProjectContextEditor
 
-        init(parent: ProjectContextTextView) { self.parent = parent }
-
-        func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-            parent.isEditing
-        }
+        init(parent: ProjectContextEditor) { self.parent = parent }
 
         func textViewDidChange(_ textView: UITextView) {
-            parent.onTextChange(textView.text)
+            parent.text = textView.text
         }
     }
 }

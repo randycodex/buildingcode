@@ -513,7 +513,13 @@ final class CodeLibraryViewModel: ObservableObject {
     private var researchTurnStoreKitUpdatesTask: Task<Void, Never>?
     private let networkMonitor = NWPathMonitor()
     private let networkMonitorQueue = DispatchQueue(label: "com.permitext.foreground-sync-network")
-    private var isNetworkAvailable = false
+    private(set) var isNetworkAvailable = false
+    @Published private(set) var networkConnectionGeneration: UInt = 0
+    @Published private(set) var notebookReconnectRevision: UInt = 0
+    private var notebookDraftEditors: [ObjectIdentifier: NotebookDraftEditorRegistration] = [:]
+    private var notebookReconnectTask: Task<Void, Never>?
+    private var notebookReconnectRequested = false
+    private var replayingNotebookDraft: NotebookDraftAddress?
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
     private var accountAuthorizedStoreKitPlan: AppPlan = .free
@@ -625,6 +631,10 @@ final class CodeLibraryViewModel: ObservableObject {
                 guard let self else { return }
                 let becameAvailable = !self.isNetworkAvailable && path.status == .satisfied
                 self.isNetworkAvailable = path.status == .satisfied
+                if becameAvailable {
+                    self.networkConnectionGeneration &+= 1
+                    self.scheduleNotebookReconnect()
+                }
                 if becameAvailable,
                    self.isInitialContentLoaded,
                    self.signedInAccount != nil,
@@ -652,6 +662,7 @@ final class CodeLibraryViewModel: ObservableObject {
         savedPresentationRefreshTask?.cancel()
         projectPresentationRefreshTask?.cancel()
         foregroundAutomaticSyncTask?.cancel()
+        notebookReconnectTask?.cancel()
         storeKitUpdatesTask?.cancel()
         researchTurnStoreKitUpdatesTask?.cancel()
         startupWarmupTask?.cancel()
@@ -3984,13 +3995,14 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func deleteNotebookCard(projectID: String, cardID: String, expectedVersion: Int) async throws {
+    func deleteNotebookCard(projectID: String, cardID: String, expectedVersion: Int, recoverable: Bool? = nil) async throws {
         try await performPrivateAccountRequest { account in
             try await accountBackendClient.deleteNotebookCard(
                 account: account,
                 projectID: projectID,
                 cardID: cardID,
-                expectedVersion: expectedVersion
+                expectedVersion: expectedVersion,
+                recoverable: recoverable
             )
         }
     }
@@ -5397,6 +5409,7 @@ final class CodeLibraryViewModel: ObservableObject {
             stopForegroundAutomaticSync()
             return
         }
+        scheduleNotebookReconnect()
         guard foregroundAutomaticSyncTask == nil else { return }
         foregroundAutomaticSyncTask = Task { [weak self] in
             while !Task.isCancelled {
@@ -8265,6 +8278,148 @@ private enum AccountSessionTokenStore {
             kSecAttrService as String: service,
             kSecAttrAccount as String: accountUserID
         ]
+    }
+}
+
+private struct NotebookDraftAddress {
+    let owner: NativePrivateRequestIdentity
+    let projectID: String
+    let scope: String
+    let cardID: String?
+
+    func matches(_ other: Self) -> Bool {
+        owner == other.owner && projectID == other.projectID &&
+            (scope == other.scope || (cardID != nil && cardID == other.cardID))
+    }
+}
+
+private struct NotebookDraftEditorRegistration {
+    weak var editor: NotebookDocumentEditorController?
+    let address: NotebookDraftAddress
+}
+
+extension CodeLibraryViewModel {
+    func claimNotebookDraftEditor(
+        _ editor: NotebookDocumentEditorController, owner: NativePrivateRequestIdentity,
+        projectID: String, routeID: String, cardID: String?
+    ) async {
+        guard owner == privateRequestIdentity else { return }
+        let address = NotebookDraftAddress(owner: owner, projectID: projectID,
+                                           scope: "native-notebook-draft:\(routeID)", cardID: cardID)
+        notebookDraftEditors[ObjectIdentifier(editor)] = .init(editor: editor, address: address)
+        if replayingNotebookDraft?.matches(address) == true { await notebookReconnectTask?.value }
+    }
+
+    func releaseNotebookDraftEditor(_ editor: NotebookDocumentEditorController, retry: Bool) {
+        guard notebookDraftEditors.removeValue(forKey: ObjectIdentifier(editor)) != nil else { return }
+        if retry { scheduleNotebookReconnect() }
+    }
+
+    private func scheduleNotebookReconnect() {
+        guard ownsAccountSync, isInitialContentLoaded, isNetworkAvailable, let owner = privateRequestIdentity else { return }
+        notebookReconnectRequested = true
+        guard notebookReconnectTask == nil else { return }
+        notebookReconnectTask = Task { [weak self] in
+            guard let self else { return }
+            defer {
+                self.notebookReconnectTask = nil
+                if self.notebookReconnectRequested { self.scheduleNotebookReconnect() }
+            }
+            while !Task.isCancelled, self.notebookReconnectRequested,
+                  self.isNetworkAvailable, owner == self.privateRequestIdentity {
+                self.notebookReconnectRequested = false
+                await self.replayClosedNotebookDrafts(owner: owner)
+            }
+        }
+    }
+
+    private func replayClosedNotebookDrafts(owner: NativePrivateRequestIdentity) async {
+        let knownProjectIDs = Set(folders.compactMap { backendProjectID(for: $0.id) })
+        let cache = projectHubOfflineCache
+        let queued = await Task.detached(priority: .utility) {
+            (try? cache.notebookDraftEntries(NativeNotebookDraft.self, accountID: owner.accountID,
+                                            knownProjectIDs: knownProjectIDs)) ?? []
+        }.value
+        for entry in queued where entry.value.retryAfterReconnect == true && entry.value.hasUnsynchronizedChanges {
+            guard owner == privateRequestIdentity, isNetworkAvailable, !Task.isCancelled else { return }
+            let address = NotebookDraftAddress(owner: owner, projectID: entry.projectID, scope: entry.scope,
+                                               cardID: entry.value.cardID)
+            notebookDraftEditors = notebookDraftEditors.filter { $0.value.editor != nil && $0.value.address.owner == owner }
+            guard !notebookDraftEditors.values.contains(where: { $0.address.matches(address) }) else { continue }
+            await replayClosedNotebookDraft(at: address)
+        }
+    }
+
+    private func replayClosedNotebookDraft(at address: NotebookDraftAddress) async {
+        let accountID = address.owner.accountID
+        let projectID = address.projectID
+        let scope = address.scope
+        let cache = projectHubOfflineCache
+        guard var draft = try? cache.load(NativeNotebookDraft.self, accountID: accountID,
+                                          projectID: projectID, scope: scope)?.value,
+              draft.retryAfterReconnect == true, draft.hasUnsynchronizedChanges else { return }
+        replayingNotebookDraft = address
+        defer { replayingNotebookDraft = nil }
+        do {
+            if let cardID = draft.cardID {
+                let type: String
+                if let cachedType = nativeNotebookCachedCardType(cache: cache, accountID: accountID,
+                                                                  projectID: projectID, cardID: cardID) {
+                    type = cachedType
+                } else {
+                    type = try await notebookCard(projectID: projectID, cardID: cardID).cardType
+                }
+                guard PermitextReleaseSurfaceVisibility.notebookCardIsVisible(type) else { return }
+            }
+            // Resolve a previously sent receipt first. If the user edited again
+            // while it was pending, save that text against its acknowledged version.
+            for _ in 0..<2 {
+                guard address.owner == privateRequestIdentity, isNetworkAvailable, !Task.isCancelled else { return }
+                let content = draft.editableContent
+                let attempt = draft.pendingSave ?? NativeNotebookSaveAttempt(
+                    clientMutationID: draft.clientMutationID ?? UUID().uuidString.lowercased(),
+                    cardID: draft.cardID, expectedVersion: draft.version, content: content, preservesServerQuestions: true)
+                draft.pendingSave = attempt
+                try cache.store(draft, accountID: accountID, projectID: projectID, scope: scope)
+                let title = attempt.content.title.trimmingCharacters(in: .whitespacesAndNewlines)
+                let saved = try await saveNotebookCard(
+                    projectID: projectID, cardID: attempt.cardID, expectedVersion: attempt.expectedVersion,
+                    title: title.isEmpty ? "Untitled Note" : title, document: attempt.content.document,
+                    evidenceLinks: attempt.content.evidenceLinks, clientMutationID: attempt.clientMutationID,
+                    openQuestions: attempt.preservesServerQuestions == true ? nil : attempt.content.openQuestions)
+                guard address.owner == privateRequestIdentity, !Task.isCancelled,
+                      try cache.load(NativeNotebookDraft.self, accountID: accountID, projectID: projectID, scope: scope)?.value == draft
+                else { return }
+                try cache.store(saved, accountID: accountID, projectID: projectID, scope: "native-notebook-card:\(saved.id)")
+                if content == attempt.content {
+                    try cache.remove(accountID: accountID, projectID: projectID, scope: scope)
+                    notebookReconnectRevision &+= 1
+                    return
+                }
+                draft.cardID = saved.id
+                draft.version = saved.version
+                draft.baseContent = .savedCard(saved)
+                draft.pendingSave = nil
+                if draft.clientMutationID == attempt.clientMutationID { draft.clientMutationID = nil }
+                try cache.store(draft, accountID: accountID, projectID: projectID, scope: scope)
+            }
+        } catch {
+            guard address.owner == privateRequestIdentity, !Task.isCancelled else { return }
+            if let status = (error as? PermitextBackendHTTPError)?.statusCode, (400..<500).contains(status) {
+                // Preserve rejected text and stop automatic replay. An existing
+                // note's conflict is handled by the normal review on reopen.
+                draft.retryAfterReconnect = nil
+                if status == 409, draft.pendingSave?.cardID != nil {
+                    draft.pendingSave = nil
+                    draft.clientMutationID = nil
+                }
+                try? cache.store(draft, accountID: accountID, projectID: projectID, scope: scope)
+                if NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                    try? cache.removeProject(accountID: accountID, projectID: projectID)
+                }
+                notebookReconnectRevision &+= 1
+            }
+        }
     }
 }
 

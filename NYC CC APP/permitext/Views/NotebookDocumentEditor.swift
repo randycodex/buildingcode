@@ -28,9 +28,12 @@ final class NotebookDocumentEditorController: ObservableObject {
         try await coordinator.performMutation(type: "image", payload: ["block": try Self.json(block)])
     }
 
+    fileprivate var referenceReturnPosition: [String: Any]?
+
     func focus() async throws {
         guard let coordinator else { throw NotebookDocumentEditorError.unavailable }
-        _ = try await coordinator.command(type: "focus")
+        _ = try await coordinator.command(type: "focus", payload: referenceReturnPosition.map { ["position": $0] } ?? [:])
+        referenceReturnPosition = nil
     }
 
     func captureSelection() async throws {
@@ -51,6 +54,20 @@ final class NotebookDocumentEditorController: ObservableObject {
     func setBlockType(_ type: String, level: Int = 2) async throws {
         guard let coordinator else { throw NotebookDocumentEditorError.unavailable }
         try await coordinator.performMutation(type: "blockType", payload: ["blockType": type, "level": level])
+    }
+
+    enum FormatCommand: String {
+        case fontSize, lineSpacing, table
+    }
+
+    func applyFormat(_ command: FormatCommand, value: String) async throws {
+        guard let coordinator else { throw NotebookDocumentEditorError.unavailable }
+        try await coordinator.performMutation(type: command.rawValue, payload: ["value": value])
+    }
+
+    func insertFindingTemplate() async throws {
+        guard let coordinator else { throw NotebookDocumentEditorError.unavailable }
+        try await coordinator.performMutation(type: "findingTemplate", payload: [:])
     }
 
     func createLink(url: String, text: String? = nil) async throws {
@@ -80,15 +97,27 @@ struct NotebookDocumentFormatting: Decodable, Equatable {
     var blockType = "paragraph"
     var selectedText = ""
     var linkURL = ""
+    var canUndo = false
+    var canRedo = false
+    var tableActions: [NotebookTableAction] = []
+}
+
+struct NotebookTableAction: Decodable, Equatable, Identifiable {
+    let label: String
+    let value: String
+    let disabled: Bool
+    var id: String { value }
 }
 
 enum NotebookDocumentEditorError: LocalizedError {
     case unavailable, invalidDocument, assetUnavailable
+    case commandFailed(String)
     var errorDescription: String? {
         switch self {
         case .unavailable: return "The note editor is still loading. Please try again."
         case .invalidDocument: return "The note could not be read safely. Your saved version has not been changed."
         case .assetUnavailable: return "This image is unavailable. Try again when connected."
+        case let .commandFailed(message): return message
         }
     }
 }
@@ -294,10 +323,19 @@ struct NotebookDocumentEditor: UIViewRepresentable {
             input["type"] = type
             input["session"] = mountedSession
             let result = try await webView.callAsyncJavaScript(
-                "return await window.PermitextNativeNotebook.dispatch(command);",
+                """
+                try {
+                    return await window.PermitextNativeNotebook.dispatch(command);
+                } catch (error) {
+                    return { commandError: error?.message || "The note editor could not complete this action." };
+                }
+                """,
                 arguments: ["command": input], in: nil, contentWorld: .page
             )
             guard !detached, parent.sessionID == mountedSession else { throw CancellationError() }
+            if let message = (result as? [String: Any])?["commandError"] as? String {
+                throw NotebookDocumentEditorError.commandFailed(message)
+            }
             return result ?? NSNull()
         }
 
@@ -373,6 +411,7 @@ struct NotebookDocumentEditor: UIViewRepresentable {
                 if let object = body["reference"], JSONSerialization.isValidJSONObject(object),
                    let data = try? JSONSerialization.data(withJSONObject: object),
                    let reference = try? JSONDecoder().decode(NotebookReferenceProps.self, from: data) {
+                    parent.controller.referenceReturnPosition = body["position"] as? [String: Any]
                     parent.onOpenReference(reference)
                 }
             case "insert":

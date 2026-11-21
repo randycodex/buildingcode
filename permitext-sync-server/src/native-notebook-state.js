@@ -1,14 +1,19 @@
-// The server includes these inert table defaults in its saved document, while
-// BlockNote's table schema exposes only textColor. Restore missing defaults at
-// the native boundary so an acknowledgement cannot manufacture another edit.
+// Match BlockNote's presentation defaults to the server's saved document so
+// acknowledging a save preserves the live selection and undo history.
 export function nativeNotebookDocumentSnapshot(document) {
-  const blocks = values => values.map(block => ({
-    ...block,
-    ...(block.type === "table" ? { props: {
-      backgroundColor: "default", textColor: "default", textAlignment: "left",
-      ...block.props
-    } } : {}),
-    ...(Array.isArray(block.children) ? { children: blocks(block.children) } : {})
-  }));
+  const blocks = values => values.map(block => {
+    const result = { ...block };
+    if (block.props?.lineSpacing === "normal") {
+      const { lineSpacing, ...props } = block.props;
+      result.props = props;
+    }
+    if (block.type === "table") {
+      result.props = {
+        backgroundColor: "default", textColor: "default", textAlignment: "left", ...block.props
+      };
+    }
+    if (Array.isArray(block.children)) result.children = blocks(block.children);
+    return result;
+  });
   return { ...document, document: blocks(document.document || []) };
 }

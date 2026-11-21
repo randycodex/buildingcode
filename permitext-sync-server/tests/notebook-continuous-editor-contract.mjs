@@ -49,7 +49,7 @@ for(const render of ['render','toExternalHTML']) {
   assert.equal(inheritedRenderContext,renderContext);
   assert.deepEqual(output.dom.style.applied,['line-height','2','important']);
 }
-const toolbarSource = editorSource.slice(editorSource.indexOf('function PermitextFormattingToolbar('),editorSource.indexOf('function normalizedReference('));
+const toolbarSource = editorSource.slice(editorSource.indexOf('export function notebookTableActions('),editorSource.indexOf('function normalizedReference(')).replace(/^export /gm,'');
 const selected = structuredClone(fixture.document);
 const updates = []; let focusCount = 0, transactions = 0;
 const styleState = {};
@@ -61,7 +61,7 @@ const editor = {
   getActiveStyles:()=>({...styleState}), getSelectedText:()=>selectedText, getSelectedLinkUrl:()=>'',
   toggleStyles:value=>{for(const style of Object.keys(value)) styleState[style]=!styleState[style];},
   createLink:(url,text)=>createdLinks.push({url,text}),
-  isEditable:true, getSelection:()=>({blocks:selected}), getExtension:()=>null,
+  isEditable:true, getSelection:()=>({blocks:selected}), getTextCursorPosition:()=>({block:selected[0]}), getExtension:()=>null,
   focus:()=>{focusCount++;}, transact:callback=>{transactions++;callback();},
   updateBlock:(block,update)=>{updates.push({id:block.id,...update});}
 };
@@ -142,15 +142,17 @@ assert.ok(updates.slice(beforeSpacing).every(update=>update.props.lineSpacing===
 
 context.TableHandlesExtension='tableHandles';
 const tableCalls=[];
+for (const command of ['addRowAfter','addColumnAfter','deleteRow','deleteColumn']) {
+  context[command] = () => { tableCalls.push(command); return true; };
+}
+editor.exec=command=>command();
 editor.getExtension=key=>key==='tableHandles'?{
- getCellSelection:()=>({from:{row:1,col:2},to:{row:1,col:2},cells:[{row:1,col:2}]}),
- addRowOrColumn:(index,direction)=>tableCalls.push({index,direction}),
- removeRowOrColumn:(index,direction)=>tableCalls.push({index,direction})
+  getCellSelection:()=>({from:{row:1,col:2},to:{row:1,col:2},cells:[{row:1,col:2}]})
 }:null;
 selected.splice(0,selected.length,{id:'table',type:'table',content:{rows:Array.from({length:3},()=>({cells:[[],[],[]]})),headerRows:1}});
 choose('Table','Add row below');choose('Table','Add column right');choose('Table','Delete row');choose('Table','Delete column');
-assert.deepEqual(tableCalls.map(call=>call.index),[1,2,1,2],'Table commands address the actual selected row and column.');
-assert.equal(tableCalls[0].direction.side,'below');assert.equal(tableCalls[1].direction.side,'right');
+assert.deepEqual(tableCalls,['addRowAfter','addColumnAfter','deleteRow','deleteColumn'],
+  'Table commands use the live selection without requiring a hovered cell.');
 choose('Table','Remove header row');assert.equal(updates.at(-1).content.headerRows,0);
 const blank={id:'blank',type:'paragraph',content:[],children:[]};selected.splice(0,selected.length,blank);
 const inserted=[];let cursorTarget;

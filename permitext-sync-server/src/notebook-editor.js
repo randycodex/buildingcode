@@ -15,6 +15,8 @@ import "./notebook.css";
 import { notebookReferenceBlocks } from "../public/notebook-passage-blocks.js";
 import { normalizeNotebookDocumentStyles, notebookFontSize, notebookFontSizes, notebookLineSpacings } from "../public/notebook-styles.js";
 import { TableHandlesExtension } from '@blocknote/core/extensions';
+import { TextSelection } from "@tiptap/pm/state";
+import { addColumnAfter, addRowAfter, deleteColumn, deleteRow, selectedRect } from "@tiptap/pm/tables";
 import { notebookTablePasteHTML } from "../public/notebook-html-paste.js";
 export { createReportFormatting } from "./report-text-editor.js";
 import { en } from "@blocknote/core/locales";
@@ -209,6 +211,73 @@ export const permitextNotebookSchema = BlockNoteSchema.create({
   }
 });
 
+export function notebookTableActions(editor) {
+  const actions = [2, 3, 4].map(size => ({value: `insert-${size}`, label: `Insert ${size} × ${size} table`}));
+  const table = editor.getTextCursorPosition().block;
+  if (table.type !== "table") return actions;
+
+  const hasCell = Boolean(editor.getExtension(TableHandlesExtension)?.getCellSelection());
+  const rowCount = table.content.rows.length;
+  const columnCount = table.content.rows[0].cells.length;
+  actions.push(
+    {value: "row", label: "Add row below", disabled: !hasCell || rowCount >= 500},
+    {value: "column", label: "Add column right", disabled: !hasCell || columnCount >= 100},
+    {value: "header", label: table.content.headerRows ? "Remove header row" : "Use first row as header"},
+    {value: "remove-row", label: "Delete row", disabled: !hasCell || rowCount <= 1},
+    {value: "remove-column", label: "Delete column", disabled: !hasCell || columnCount <= 1},
+    {value: "remove-table", label: "Delete table"}
+  );
+  return actions;
+}
+
+export function applyNotebookTableAction(editor, action) {
+  const choice = notebookTableActions(editor).find(item => item.value === action);
+  if (!choice || choice.disabled) return false;
+  const block = editor.getTextCursorPosition().block;
+  if (action.startsWith("insert-")) {
+    const size = Number(action.slice(7));
+    const content = {
+      type: "tableContent",
+      headerRows: 1,
+      rows: Array.from({length: size}, () => ({cells: Array.from({length: size}, () => [])}))
+    };
+    let inserted;
+    editor.transact(() => {
+      if (block.type === "paragraph" && !block.content?.length && !block.children?.length) {
+        inserted = editor.updateBlock(block, {type: "table", content});
+      } else {
+        [inserted] = editor.insertBlocks([{type: "table", content}], block, "after");
+      }
+      editor.insertBlocks([{type: "paragraph", content: []}], inserted, "after");
+    });
+    editor.setTextCursorPosition(inserted, "start");
+    return true;
+  }
+
+  // Table handles track hover. Toolbar operations follow the selected cell
+  // and affect one row or column even if the selection spans several cells.
+  const command = { row: addRowAfter, column: addColumnAfter, "remove-row": deleteRow, "remove-column": deleteColumn }[action];
+  if (command) {
+    const cellSelection = editor.getExtension(TableHandlesExtension).getCellSelection();
+    if (cellSelection.cells.length === 1) return editor.exec(command);
+    return editor.exec((state, dispatch, view) => {
+      const { map, tableStart, left, top } = selectedRect(state);
+      const firstCell = tableStart + map.map[top * map.width + left];
+      const firstCellState = state.apply(state.tr.setSelection(TextSelection.create(state.doc, firstCell + 2)));
+      return command(firstCellState, dispatch, view);
+    });
+  }
+  switch (action) {
+    case "header":
+      editor.updateBlock(block, {content: {...block.content, headerRows: block.content.headerRows ? 0 : 1}});
+      break;
+    case "remove-table":
+      editor.removeBlocks([block]);
+      break;
+  }
+  return true;
+}
+
 function PermitextFormattingToolbar({ editor, options }) {
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkURL, setLinkURL] = useState("");
@@ -259,9 +328,6 @@ function PermitextFormattingToolbar({ editor, options }) {
   const textBlocks = state.blocks.filter(block => ["paragraph", "heading", "bulletListItem", "numberedListItem"].includes(block.type));
   const inlineSelection = state.blocks.some(block => ["paragraph", "heading", "bulletListItem", "numberedListItem", "table"].includes(block.type));
   const first = textBlocks[0];
-  const table = state.blocks.find(block=>block.type==='table');
-  const tableHandles = table ? editor.getExtension(TableHandlesExtension) : null;
-  const cellSelection = tableHandles?.getCellSelection();
   const type = first?.type === "heading" ? `heading-${first.props.level}` : "paragraph";
   const setBlockType = (type, props = {}) => {
     editor.focus();
@@ -320,34 +386,8 @@ function PermitextFormattingToolbar({ editor, options }) {
   const spacingMenu = formatMenu('Line spacing',spacing==='normal'?'Spacing':`${spacing}×`,
     notebookLineSpacings.map(value=>({value,label:value==='normal'?'Default':value==='1'?'1 · Single':value==='2'?'2 · Double':value,selected:spacing===value})),
     value=>editor.transact(()=>textBlocks.forEach(block=>editor.updateBlock(block,{props:{lineSpacing:value}}))),!textBlocks.length);
-  const tableChoices = [2,3,4].map(size=>({value:`insert-${size}`,label:`Insert ${size} × ${size} table`}));
-  if(table) tableChoices.push(
-    {value:'row',label:'Add row below',disabled:!cellSelection || table.content.rows.length>=500},
-    {value:'column',label:'Add column right',disabled:!cellSelection || table.content.rows[0].cells.length>=100},
-    {value:'header',label:table.content.headerRows?'Remove header row':'Use first row as header'},
-    {value:'remove-row',label:'Delete row',disabled:!cellSelection || table.content.rows.length<=1},
-    {value:'remove-column',label:'Delete column',disabled:!cellSelection || table.content.rows[0].cells.length<=1},
-    {value:'remove-table',label:'Delete table'});
-  const tableMenu = formatMenu('Table','Table',tableChoices,value=>{
-    if(value.startsWith('insert-')){
-      const size=Number(value.slice(7)),cursor=editor.getTextCursorPosition().block;
-      const content={type:'tableContent',headerRows:1,rows:Array.from({length:size},()=>({cells:Array.from({length:size},()=>[])}))};
-      let inserted;
-      editor.transact(()=>{
-        if(cursor.type==='paragraph' && !cursor.content?.length && !cursor.children?.length)inserted=editor.updateBlock(cursor,{type:'table',content});
-        else [inserted]=editor.insertBlocks([{type:'table',content}],cursor,'after');
-        editor.insertBlocks([{type:'paragraph',content:[]}],inserted,'after');
-      });
-      editor.setTextCursorPosition(inserted,'start');
-    } else if(table){
-      if(value==='header')editor.updateBlock(table,{content:{...table.content,headerRows:table.content.headerRows?0:1}});
-      if(value==='row')tableHandles?.addRowOrColumn(cellSelection.from.row,{orientation:'row',side:'below'});
-      if(value==='column')tableHandles?.addRowOrColumn(cellSelection.from.col,{orientation:'column',side:'right'});
-      if(value==='remove-row')tableHandles?.removeRowOrColumn(cellSelection.from.row,'row');
-      if(value==='remove-column')tableHandles?.removeRowOrColumn(cellSelection.from.col,'column');
-      if(value==='remove-table')editor.removeBlocks([table]);
-    }
-  });
+  const tableMenu = formatMenu("Table", "Table", notebookTableActions(editor),
+    value => applyNotebookTableAction(editor, value));
   const textStyleMenu = React.createElement(Menu, {position: "bottom-start", offset: 8, withinPortal: false, width: 180, loop: true, returnFocus: false},
     React.createElement(Menu.Target, null,
       React.createElement("button", {
@@ -579,7 +619,10 @@ export function mountPermitextNotebookEditor(element, options = {}) {
       if (position.document !== positionDocument(editor)) return false;
       const limit = editor.state.doc.content.size;
       if (position.from < 0 || position.to > limit || position.from > position.to) return false;
-      editor.commands.setTextSelection({ from: position.from, to: position.to });
+      const current = editor.state.selection;
+      if (current.from !== position.from || current.to !== position.to) {
+        editor.commands.setTextSelection({ from: position.from, to: position.to });
+      }
       editor.commands.focus(undefined, { scrollIntoView: false });
       return true;
     },

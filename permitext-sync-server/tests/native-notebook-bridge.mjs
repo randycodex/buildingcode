@@ -11,6 +11,7 @@ const source = (await readFile(new URL("../src/native-notebook.js", import.meta.
   .replace(/^import .*;\n/gm, "");
 const messages = [];
 const events = new Map();
+const mountEvents = new Map();
 const cssVariables = new Map();
 let options;
 let note;
@@ -29,6 +30,7 @@ const createdLinks = [];
 const instance = {
   isEditable: true,
   onSelectionChange(callback) { selectionListener = callback; },
+  getExtension: () => undefined,
   getActiveStyles: () => activeStyles,
   getTextCursorPosition: () => ({ block: note.document[0] }),
   getSelectedText: () => selectedText,
@@ -61,6 +63,7 @@ const controller = {
 };
 const environment = {
   nativeNotebookDocumentSnapshot,
+  notebookTableActions: () => [],
   window: {
     webkit: { messageHandlers: { permitextNotebook: { postMessage: (message) => messages.push(structuredClone(message)) } } },
     addEventListener: (name, callback) => events.set(name, callback),
@@ -68,7 +71,15 @@ const environment = {
   },
   document: {
     documentElement: { dataset: {}, style: { setProperty: (name, value) => cssVariables.set(name, value) } },
-    getElementById: () => ({ getBoundingClientRect: () => ({ height: 300 }), addEventListener: (name, callback) => events.set(name, callback) }),
+    getElementById: () => ({
+      getBoundingClientRect: () => ({ height: 300 }),
+      addEventListener(name, callback, options) {
+        const handlers = mountEvents.get(name) ?? [];
+        handlers.push({ callback, capture: options === true || options?.capture === true });
+        mountEvents.set(name, handlers);
+        events.set(name, callback);
+      }
+    }),
     addEventListener: (name, callback) => events.set(name, callback)
   },
   ResizeObserver: class { observe() {} },
@@ -96,13 +107,72 @@ const document = {
 assert.equal(messages[0].type, "loaded");
 const configured = await dispatch({ type: "configure", readOnly: false, bodyFontSize: 17, availableWidth: 366, document });
 assert.deepEqual(structuredClone(configured.document), document, "mount must retain rich runs, nesting, references and images");
+
+// WebKit can report a character in the tapped cell even when ProseMirror's
+// coordinate mapper normalizes that same point to the start of the note.
+const cellText = { textContent: "Y42" };
+const cell = { contains: node => node === cellText };
+const tappedText = { closest: selector => ({
+  "td, th": cell,
+  "a, button, [data-permitext-reference], td, th": cell,
+  ".ProseMirror": instance.prosemirrorView.dom
+})[selector] ?? null };
+const cellPoint = { clientX: 300, clientY: 834 };
+const tablePosition = 27;
+let firstTapSelection;
+const initialDOMSelection = environment.window.getSelection;
+const nativeSelection = {
+  isCollapsed: true,
+  focusNode: { textContent: "Opening paragraph" },
+  focusOffset: 0,
+  collapse(node, offset) {
+    this.focusNode = node;
+    this.focusOffset = offset;
+  }
+};
+environment.window.getSelection = () => nativeSelection;
+environment.document.caretRangeFromPoint = () => ({ startContainer: cellText, startOffset: 2 });
+instance.prosemirrorView = {
+  state: { selection: { head: tablePosition }, doc: {
+    content: { size: 32 },
+    resolve: position => ({ parent: {
+      inlineContent: true, type: { name: position === tablePosition ? "tableParagraph" : "paragraph" }
+    } })
+  } },
+  posAtCoords: () => ({ pos: 3 }),
+  posAtDOM: (node, offset) => node === cellText && offset === 2 ? tablePosition : 3,
+  dom: { contains: node => node === cell || node === cellText },
+  hasFocus: () => true
+};
+instance._tiptapEditor = { commands: { setTextSelection: position => { firstTapSelection = position; } } };
+function fireMountEvent(type, properties) {
+  for (const { callback } of [...mountEvents.get(type)].sort((a, b) => Number(b.capture) - Number(a.capture))) {
+    callback({ target: tappedText, ...properties });
+  }
+}
+fireMountEvent("pointerdown", { isPrimary: true, button: 0, timeStamp: 90, ...cellPoint });
+fireMountEvent("touchstart", { touches: [cellPoint], timeStamp: 100 });
+fireMountEvent("touchend", { touches: [], changedTouches: [cellPoint], timeStamp: 120 });
+// No synthesized click is fired on the device for this first focus.
+fireMountEvent("focusin", { target: instance.prosemirrorView.dom, timeStamp: 130 });
+assert.equal(firstTapSelection, tablePosition, "the first tap selects the character in the cell");
+// WebKit then resets its DOM selection even with the correct model selection.
+events.get("selectionchange")({ timeStamp: 170 });
+assert.equal(nativeSelection.focusNode, cellText, "the delayed WebKit reset cannot move the caret out of the cell");
+assert.equal(nativeSelection.focusOffset, 2, "the DOM caret preserves the tapped character before typing");
+environment.window.getSelection = initialDOMSelection;
+delete instance.prosemirrorView;
+delete instance._tiptapEditor;
+
 const renderedTable = {
   ...document,
   document: [{id:"table-1",type:"table",props:{textColor:"default"},children:[],content:{
     type:"tableContent",columnWidths:[null],headerRows:1,
     rows:[{cells:[{type:"tableCell",props:{colspan:1,rowspan:1,backgroundColor:"default",textColor:"default",textAlignment:"left"},
       content:[{type:"text",text:"Rich table",styles:{bold:true,underline:true}}]}]}]
-  }}]
+  }}, {id:"after-table",type:"paragraph",props:{
+    textColor:"default",backgroundColor:"default",textAlignment:"left",lineSpacing:"normal"
+  },content:[],children:[]}]
 };
 const savedTable = JSON.parse(JSON.stringify(validateNotebookDocument(renderedTable).document));
 note = structuredClone(renderedTable);

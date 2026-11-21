@@ -7410,7 +7410,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
               {"type":"link","href":"https://per.codes/support","content":[{"type":"text","text":"Support","styles":{"italic":true}}]}
             ]},[{"type":"text","text":"Plain cell","styles":{}}]]}]
           }},
-          {"id":"paragraph-1","type":"paragraph","props":{},"children":[],"content":[{"type":"text","text":"Rich paragraph","styles":{"underline":true,"code":true,"textColor":"blue","backgroundColor":"yellow"}}]}
+          {"id":"paragraph-1","type":"paragraph","props":{"lineSpacing":"2"},"children":[],"content":[{"type":"text","text":"Rich paragraph","styles":{"underline":true,"code":true,"textColor":"blue","backgroundColor":"yellow","fontSize":"24"}}]}
         ]}
         """#.utf8)
         let decoded = try JSONDecoder().decode(NotebookDocument.self, from: data)

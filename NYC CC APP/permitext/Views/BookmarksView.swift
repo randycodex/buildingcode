@@ -385,8 +385,8 @@ struct BookmarksView: View {
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
-    private var savedHeaderActionButtons: some View {
-        HStack(spacing: 0) {
+    private var savedHeaderActions: some View {
+        HStack(spacing: 8) {
             Button {
                 if library.hasProjectAccess { folderEditorTarget = .new }
                 else { library.requireProjectAccess() }
@@ -394,22 +394,15 @@ struct BookmarksView: View {
                 Label(library.hasProjectAccess ? "New project" : "New project · Pro", systemImage: "plus")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.appChrome)
-                    .padding(.horizontal, 6)
+                    .padding(.horizontal, 12)
                     .frame(minHeight: CodeScreenMetrics.toolbarButtonSize)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            accountButton
-        }
-        .padding(.horizontal, 4)
-    }
+            .codeLiquidGlassCapsule()
 
-    @ViewBuilder
-    private var savedHeaderActions: some View {
-        if #available(iOS 26.0, *) {
-            savedHeaderActionButtons.glassEffect(.regular, in: Capsule())
-        } else {
-            savedHeaderActionButtons.background(.regularMaterial, in: Capsule())
+            accountButton
+                .codeLiquidGlassCircle()
         }
     }
 
@@ -1134,14 +1127,8 @@ private struct BookmarkExportPreviewSheet: View {
     }
 }
 
-extension EnvironmentValues {
-    @Entry var projectSheetDetent: Binding<PresentationDetent>? = nil
-}
-
-enum ProjectOverviewSection: Hashable, Identifiable {
-    var id: Self { self }
-
-    case context, structuredFacts, questions, checklist, notebook, evidence, reports
+enum ProjectOverviewSection: Hashable {
+    case overview, questions, checklist, notebook, evidence, reports
 }
 
 private enum FactPresentation {
@@ -1197,67 +1184,241 @@ private struct ProjectFactDraft: Identifiable {
     let original: ProjectStructuredFact?
 }
 
-private struct ProjectInlineContextEditor: UIViewRepresentable {
-    @Binding var text: String
-    let requestsFocus: Bool
-    func makeUIView(context: Context) -> UITextView {
-        let view = UITextView()
-        view.backgroundColor = .clear
-        view.font = .preferredFont(forTextStyle: .body)
-        view.adjustsFontForContentSizeCategory = true
-        view.textColor = .label
-        view.tintColor = UIColor(Color.appChrome)
-        view.textContainerInset = UIEdgeInsets(top: 8, left: 0, bottom: 12, right: 0)
-        view.textContainer.lineFragmentPadding = 0
-        view.isScrollEnabled = false
-        view.isEditable = false
-        view.text = text
-        view.selectedRange = NSRange(location: 0, length: 0)
-        view.delegate = context.coordinator
-        view.accessibilityIdentifier = "project-context-editor"
-        view.accessibilityLabel = "Project context"
-        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        return view
+private struct ProjectSectionScreen<Content: View>: View {
+    let title: String
+    let accentColor: Color
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12, content: content)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                .padding(.top, CodeScreenMetrics.topTitlePadding)
+                .padding(.bottom, CodeScreenMetrics.tabBarClearance)
+        }
+        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+        .tint(Color.appChrome)
+    }
+}
+
+private struct ProjectOverviewView: View {
+    let folderID: Int64
+    let accentColor: Color
+
+    private enum Tab: Hashable { case context, facts }
+    @State private var tab: Tab = .context
+    @State private var isEditing = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Picker("Overview section", selection: $tab) {
+                Text("Context").tag(Tab.context)
+                Text("Zoning").tag(Tab.facts)
+            }
+            .pickerStyle(.segmented)
+            .disabled(isEditing)
+            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+            .padding(.top, 8)
+
+            switch tab {
+            case .context:
+                ProjectContextView(folderID: folderID, isEditing: $isEditing)
+            case .facts:
+                ProjectFactsView(folderID: folderID, isEditing: $isEditing)
+            }
+        }
+        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .navigationTitle("Overview")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(isEditing)
+        .tint(Color.appChrome)
+    }
+}
+
+private struct ProjectFactsView: View {
+    let folderID: Int64
+    @Binding var isEditing: Bool
+
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var editingFolder: CodeFolder?
+    @State private var editingSessionID: UUID?
+    @State private var factsDraft: [ProjectFactDraft] = []
+    @State private var saveError: String?
+
+    private var folder: CodeFolder? { library.folder(id: folderID) }
+    private var editAnimation: Animation? { reduceMotion ? nil : .easeInOut(duration: 0.2) }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if isEditing { factsEditor }
+                else { savedFacts }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+            .padding(.top, CodeScreenMetrics.topTitlePadding)
+            .padding(.bottom, CodeScreenMetrics.tabBarClearance)
+        }
+        .scrollDismissesKeyboard(.interactively)
+        .toolbar {
+            if isEditing {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel", action: cancel)
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                if isEditing {
+                    Button("Save", action: save).fontWeight(.semibold)
+                } else {
+                    Button("Edit", action: beginEditing).disabled(folder == nil)
+                }
+            }
+        }
+        .onChange(of: library.privateSessionID) { _, _ in cancel() }
+        .onChange(of: folder?.clientID) { _, _ in cancel() }
     }
 
-    func updateUIView(_ view: UITextView, context: Context) {
-        context.coordinator.parent = self
-        view.font = .preferredFont(forTextStyle: .body)
-        if view.text != text {
-            let selection = view.selectedRange
-            view.text = text
-            let length = (text as NSString).length
-            view.selectedRange = NSRange(location: min(selection.location, length), length: 0)
-        }
-        view.isEditable = requestsFocus
-        if requestsFocus && !context.coordinator.didRequestFocus {
-            context.coordinator.didRequestFocus = true
-            // The first insertion point stays at the beginning of the expanded
-            // text, so keyboard avoidance does not take the page to its end.
-            view.selectedRange = NSRange(location: 0, length: 0)
-            view.becomeFirstResponder()
-        } else if !requestsFocus && view.isFirstResponder {
-            view.resignFirstResponder()
+    @ViewBuilder
+    private var savedFacts: some View {
+        let facts = folder?.structuredFacts ?? []
+        if facts.isEmpty {
+            Text("No facts yet.").font(.subheadline).foregroundStyle(.secondary)
+        } else {
+            VStack(alignment: .leading, spacing: 0) {
+                let ordered = facts.sorted { FactPresentation.position($0.key) < FactPresentation.position($1.key) }
+                ForEach(Array(ordered.enumerated()), id: \.element.id) { index, fact in
+                    let section = FactPresentation.position(fact.key).0
+                    if index == 0 || FactPresentation.position(ordered[index - 1].key).0 != section {
+                        factHeading(section)
+                    }
+                    ProjectStructuredFactRow(fact: fact)
+                    if index + 1 < ordered.count { Divider() }
+                }
+                ProjectStructuredFactsSources(facts: facts)
+            }
         }
     }
 
-    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextView, context: Context) -> CGSize? {
-        guard let width = proposal.width, width > 0 else { return nil }
-        let fitted = uiView.sizeThatFits(CGSize(width: width, height: .greatestFiniteMagnitude))
-        return CGSize(width: width, height: max(180, fitted.height))
+    private func factHeading(_ section: Int) -> some View {
+        Text(FactPresentation.sections[section].title)
+            .font(.headline)
+            .padding(.top, 12)
+            .padding(.bottom, 4)
+            .accessibilityAddTraits(.isHeader)
     }
 
-    func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
-
-    final class Coordinator: NSObject, UITextViewDelegate {
-        var parent: ProjectInlineContextEditor
-        var didRequestFocus = false
-
-        init(parent: ProjectInlineContextEditor) { self.parent = parent }
-
-        func textViewDidChange(_ textView: UITextView) {
-            parent.text = textView.text
+    @ViewBuilder
+    private var factsEditor: some View {
+        let ordered = $factsDraft.sorted {
+            FactPresentation.position($0.wrappedValue.original?.key) < FactPresentation.position($1.wrappedValue.original?.key)
         }
+        ForEach(Array(ordered.enumerated()), id: \.element.wrappedValue.id) { index, binding in
+            let draft = binding.wrappedValue
+            let section = FactPresentation.position(draft.original?.key).0
+            if index == 0 || FactPresentation.position(ordered[index - 1].wrappedValue.original?.key).0 != section {
+                factHeading(section)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text("\(index + 1).")
+                        .monospacedDigit()
+                        .accessibilityIdentifier("project-fact-number-\(draft.id)")
+                    if draft.original == nil {
+                        TextField("Fact name", text: binding.label)
+                            .accessibilityIdentifier("project-fact-label-\(draft.id)")
+                    } else {
+                        Text(draft.label)
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                HStack(alignment: .center, spacing: 12) {
+                    TextField("Value", text: binding.value, axis: .vertical)
+                        .font(.subheadline)
+                        .lineLimit(1...4)
+                        .textFieldStyle(.plain)
+                        .frame(minHeight: 44)
+                        .accessibilityLabel(draft.label.isEmpty ? "Fact value" : draft.label)
+                        .accessibilityIdentifier("project-fact-value-\(draft.id)")
+                    Button(role: .destructive) {
+                        withAnimation(editAnimation) {
+                            factsDraft.removeAll { $0.id == draft.id }
+                        }
+                    } label: {
+                        Image(systemName: "minus.circle").frame(width: 44, height: 44)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Remove \(draft.label.isEmpty ? "fact" : draft.label)")
+                }
+            }
+            .transition(.opacity)
+        }
+        addFactButton
+        if let saveError {
+            Text(saveError).font(.footnote).foregroundStyle(.secondary)
+        }
+    }
+
+    private var addFactButton: some View {
+        Button {
+            withAnimation(editAnimation) {
+                factsDraft.append(ProjectFactDraft(id: UUID().uuidString, label: "", value: "", original: nil))
+            }
+        } label: { Label("Add fact", systemImage: "plus") }
+        .font(.subheadline)
+        .buttonStyle(.plain)
+        .frame(minHeight: 44)
+        .accessibilityIdentifier("project-fact-add")
+    }
+
+    private func beginEditing() {
+        guard let folder, library.requireProjectAccess() else { return }
+        editingFolder = folder
+        editingSessionID = library.privateSessionID
+        saveError = nil
+        factsDraft = folder.structuredFacts.map {
+            ProjectFactDraft(id: $0.id, label: $0.label, value: $0.value, original: $0)
+        }
+        isEditing = true
+    }
+
+    private func save() {
+        guard let original = editingFolder, let session = editingSessionID else { return }
+        var facts: [ProjectStructuredFact] = []
+        for draft in factsDraft {
+            let label = draft.label.trimmingCharacters(in: .whitespacesAndNewlines)
+            let value = draft.value.trimmingCharacters(in: .whitespacesAndNewlines)
+            if draft.original == nil && label.isEmpty && value.isEmpty { continue }
+            guard !label.isEmpty else {
+                saveError = "Give each fact a name."
+                return
+            }
+            if let fact = draft.original, label == fact.label, value == fact.value {
+                facts.append(fact)
+            } else {
+                facts.append(ProjectStructuredFact(id: draft.id, key: draft.original?.key ?? "manual-\(draft.id)",
+                    label: label, value: value, status: value.isEmpty ? "unknown" : "stated", source: "manual",
+                    sourceText: draft.original == nil ? "Entered on iPhone." : "Edited on iPhone.", updatedAt: Date()))
+            }
+        }
+        if library.updateProjectFacts(folderID: folderID, facts: facts,
+            expectedClientID: original.clientID, expectedFacts: original.structuredFacts, sessionID: session) {
+            cancel()
+        } else {
+            saveError = library.statusMessage ?? "Your changes could not be saved. Try again."
+        }
+    }
+
+    private func cancel() {
+        isEditing = false
+        editingFolder = nil
+        editingSessionID = nil
+        factsDraft = []
+        saveError = nil
     }
 }
 
@@ -1268,7 +1429,6 @@ struct ProjectView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var sortMode: BookmarkSortMode = .codeOrder
     @State private var removedProjectSections: [BookmarkedSection] = []
     @State private var removalSessionID: UUID?
@@ -1279,7 +1439,7 @@ struct ProjectView: View {
     @State private var folderEditorTarget: ProjectFolderEditorTarget?
     @State private var pendingExport: BookmarkExportRequest?
     @State private var projectHubSnapshot: ProjectHubSnapshot?
-    @State private var isProjectHubLoading = false
+    @State private var projectHubLoadTask: Task<Void, Never>?
     @State private var projectHubError: String?
     @State private var isProjectHubVisible = false
     @State private var isProjectDescriptionExpanded = false
@@ -1290,18 +1450,10 @@ struct ProjectView: View {
     @State private var collapsedEvidenceGroupIDs: Set<String> = []
     @State private var evidenceSearchQuery = ""
     @State private var isEvidenceSearchPresented = false
-    @State private var sheetSection: ProjectOverviewSection?
-    @State private var sheetDetent: PresentationDetent = .medium
-    @State private var inlineEditingSection: ProjectOverviewSection?
-    @State private var inlineEditingFolder: CodeFolder?
-    @State private var inlineEditingSessionID: UUID?
-    @State private var contextDraft = ""
-    @State private var factsDraft: [ProjectFactDraft] = []
-    @State private var inlineSaveError: String?
-    @State private var isContextEditorFocused = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let automaticProjectHubRefreshInterval: TimeInterval = 30
+    private var isProjectHubLoading: Bool { projectHubLoadTask != nil }
 
     private var folder: CodeFolder? {
         library.folder(id: folderID)
@@ -1376,35 +1528,18 @@ struct ProjectView: View {
         Group {
             if isProjectFolder {
                 GeometryReader { geometry in
-                    ScrollViewReader { scroll in
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 20) {
-                                projectHeader
-                                projectContextOverview
-                                    .id(ProjectOverviewSection.context)
-                                projectSectionCards
-                            }
-                            .frame(minHeight: max(0, geometry.size.height - CodeScreenMetrics.topTitlePadding - 16),
-                                   alignment: .top)
-                            .padding(.horizontal, contentHorizontalInset)
-                            .padding(.top, CodeScreenMetrics.topTitlePadding)
-                            .padding(.bottom, 16)
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 20) {
+                            projectHeader
+                            projectSectionCards
                         }
-                        .scrollBounceBehavior(.basedOnSize)
-                        .scrollDismissesKeyboard(.interactively)
-                        .task(id: inlineEditingSection) {
-                            guard let section = inlineEditingSection else { return }
-                            withAnimation(inlineExpansionAnimation) {
-                                scroll.scrollTo(section, anchor: .top)
-                            }
-                            guard section == .context else { return }
-                            do {
-                                try await Task.sleep(nanoseconds: reduceMotion ? 100_000_000 : 650_000_000)
-                            } catch { return }
-                            guard !Task.isCancelled, inlineEditingSection == .context else { return }
-                            isContextEditorFocused = true
-                        }
+                        .frame(minHeight: max(0, geometry.size.height - CodeScreenMetrics.topTitlePadding - 16),
+                               alignment: .top)
+                        .padding(.horizontal, contentHorizontalInset)
+                        .padding(.top, CodeScreenMetrics.topTitlePadding)
+                        .padding(.bottom, 16)
                     }
+                    .scrollBounceBehavior(.basedOnSize)
                 }
             } else {
                 projectEvidenceDestination
@@ -1415,39 +1550,11 @@ struct ProjectView: View {
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(item: $sheetSection) { section in
-            NavigationStack {
-                if section == .checklist || section == .questions {
-                    ProjectWorkflowView(folderID: folderID, section: section, closeSheet: { sheetSection = nil })
-                } else {
-                    projectSectionDestination(section)
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                let editingFacts = section == .structuredFacts && inlineEditingSection == .structuredFacts
-                                Button(editingFacts ? "Cancel" : "Close") {
-                                    if editingFacts { finishInlineEditing() }
-                                    else { sheetSection = nil }
-                                }
-                            }
-                        }
-                }
-            }
-            .environment(\.projectSheetDetent, $sheetDetent)
-            .presentationDetents([.medium, .large], selection: $sheetDetent)
-            .presentationDragIndicator(.visible)
-        }
         .navigationDestination(for: ProjectOverviewSection.self) { section in
             projectSectionDestination(section)
         }
         .toolbar {
-            if inlineEditingSection == .context {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel", action: finishInlineEditing).accessibilityIdentifier("project-inline-cancel")
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save", action: saveInlineEditing).accessibilityIdentifier("project-inline-save")
-                }
-            } else if isProjectFolder {
+            if isProjectFolder {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Edit project", systemImage: "pencil") {
                         if let folder { folderEditorTarget = .edit(folder) }
@@ -1455,7 +1562,6 @@ struct ProjectView: View {
                     .labelStyle(.iconOnly)
                     .tint(Color.appChrome)
                     .accessibilityIdentifier("project-edit")
-                    .disabled(inlineEditingSection != nil)
                 }
             }
         }
@@ -1478,27 +1584,10 @@ struct ProjectView: View {
         }
 
         .onChange(of: library.privateSessionID) { _, _ in
-            sheetSection = nil
-            isProjectDescriptionExpanded = false
-            finishInlineEditing()
-            contextDraft = ""
-            factsDraft = []
-            removedProjectSections = []
-            projectReportPreviewURL = nil
-            projectHubSnapshot = nil
-            projectHubError = nil
-            lastProjectHubLoadAt = nil
+            resetProjectHub()
         }
         .onChange(of: folderID) { _, _ in
-            sheetSection = nil
-            isProjectDescriptionExpanded = false
-            finishInlineEditing()
-            contextDraft = ""
-            factsDraft = []
-            removedProjectSections = []
-            projectHubSnapshot = nil
-            projectHubError = nil
-            lastProjectHubLoadAt = nil
+            resetProjectHub()
         }
         .refreshable {
             library.refreshBookmarks()
@@ -1771,26 +1860,44 @@ struct ProjectView: View {
             projectHubError = nil
             return
         }
-        guard !isProjectHubLoading else { return }
-        lastProjectHubLoadAt = Date()
-        isProjectHubLoading = true
-        defer { isProjectHubLoading = false }
-        do {
-#if DEBUG
-            if ProcessInfo.processInfo.arguments.contains("--native-project-overview-fixture"),
-               ProcessInfo.processInfo.arguments.contains("--native-project-overview-delayed-load") {
-                try await Task.sleep(nanoseconds: 2_000_000_000)
-            }
-#endif
-            let snapshot = try await library.projectHubSnapshot(folderID: folderID)
-            guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
-            projectHubSnapshot = snapshot
-            projectHubError = nil
-        } catch {
-            guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
-            if NativePrivateCachePolicy.requiresInvalidation(after: error) { projectHubSnapshot = nil }
-            projectHubError = error.localizedDescription
+        if let projectHubLoadTask {
+            await projectHubLoadTask.value
+            return
         }
+        lastProjectHubLoadAt = Date()
+        // Keep the in-flight load available to a section pushed from the overview.
+        let task = Task {
+            defer { if !Task.isCancelled { projectHubLoadTask = nil } }
+            do {
+#if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("--native-project-overview-fixture"),
+                   ProcessInfo.processInfo.arguments.contains("--native-project-overview-delayed-load") {
+                    try await Task.sleep(nanoseconds: 2_000_000_000)
+                }
+#endif
+                let snapshot = try await library.projectHubSnapshot(folderID: folderID)
+                guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
+                projectHubSnapshot = snapshot
+                projectHubError = nil
+            } catch {
+                guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
+                if NativePrivateCachePolicy.requiresInvalidation(after: error) { projectHubSnapshot = nil }
+                projectHubError = error.localizedDescription
+            }
+        }
+        projectHubLoadTask = task
+        await task.value
+    }
+
+    private func resetProjectHub() {
+        projectHubLoadTask?.cancel()
+        projectHubLoadTask = nil
+        isProjectDescriptionExpanded = false
+        removedProjectSections = []
+        projectReportPreviewURL = nil
+        projectHubSnapshot = nil
+        projectHubError = nil
+        lastProjectHubLoadAt = nil
     }
 
     @MainActor
@@ -1844,247 +1951,6 @@ struct ProjectView: View {
         }
     }
 
-    private func formattedProjectContext(_ source: String) -> AttributedString {
-        var result = AttributedString()
-        for (index, line) in source.components(separatedBy: .newlines).enumerated() {
-            if index > 0 { result += AttributedString("\n") }
-            let hashes = line.prefix { $0 == "#" }.count
-            let heading = (1...6).contains(hashes) && line.dropFirst(hashes).first == " "
-            let content = heading ? String(line.dropFirst(hashes + 1)) : line
-            var text = (try? AttributedString(markdown: content, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(content)
-            if heading { text.font = .headline }
-            result += text
-        }
-        return result
-    }
-
-    private var projectContextOverview: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            if inlineEditingSection == .context {
-                Text("Context").font(.headline).accessibilityIdentifier("project-inline-editor-title")
-                ProjectInlineContextEditor(text: $contextDraft, requestsFocus: isContextEditorFocused)
-                    .frame(maxWidth: .infinity)
-                    .transition(.opacity)
-                inlineEditorError
-            } else {
-                let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                if isProjectDescriptionExpanded && !description.isEmpty {
-                    HStack {
-                        Text("Context").font(.headline)
-                        Spacer()
-                        Button("Edit") { beginInlineEditing(.context) }
-                            .accessibilityLabel("Edit context")
-                            .accessibilityIdentifier("project-edit-context")
-                    }
-                }
-                Button {
-                    if description.isEmpty { beginInlineEditing(.context) }
-                    else { isProjectDescriptionExpanded.toggle() }
-                } label: {
-                    VStack(alignment: .leading, spacing: 10) {
-                        if !isProjectDescriptionExpanded { Text("Context").font(.headline).foregroundStyle(.primary) }
-                        Text(description.isEmpty ? AttributedString("No context yet.") : formattedProjectContext(description))
-                            .font(.body).foregroundStyle(.secondary)
-                            .lineLimit(isProjectDescriptionExpanded ? nil : (dynamicTypeSize.isAccessibilitySize ? 5 : 3))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .accessibilityIdentifier("project-overview-context")
-                        Text(description.isEmpty ? "Add context" : (isProjectDescriptionExpanded ? "Show less" : "Read more"))
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .disabled(inlineEditingSection != nil)
-                .accessibilityIdentifier("project-section-context")
-
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.bottom, 20)
-        .overlay(alignment: .bottom) {
-            Rectangle().fill(Color.primary.opacity(0.15)).frame(height: 0.5)
-        }
-    }
-
-    private var overviewFacts: [ProjectStructuredFact] {
-        Array((folder?.structuredFacts ?? []).filter {
-            !$0.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-            $0.status.lowercased() != "rejected"
-        }.prefix(4))
-    }
-
-    private func factHeading(_ section: Int) -> some View {
-        Text(FactPresentation.sections[section].title)
-            .font(.headline)
-            .padding(.top, 12)
-            .padding(.bottom, 4)
-            .accessibilityAddTraits(.isHeader)
-    }
-
-    private var projectFactsOverview: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if inlineEditingSection == .structuredFacts {
-                let ordered = $factsDraft.sorted {
-                    FactPresentation.position($0.wrappedValue.original?.key) < FactPresentation.position($1.wrappedValue.original?.key)
-                }
-                ForEach(Array(ordered.enumerated()), id: \.element.wrappedValue.id) { index, binding in
-                    let draft = binding.wrappedValue
-                    let section = FactPresentation.position(draft.original?.key).0
-                    if index == 0 || FactPresentation.position(ordered[index - 1].wrappedValue.original?.key).0 != section {
-                        factHeading(section)
-                    }
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack(alignment: .firstTextBaseline, spacing: 6) {
-                            Text("\(index + 1).")
-                                .monospacedDigit()
-                                .accessibilityIdentifier("project-fact-number-\(draft.id)")
-                            if draft.original == nil {
-                                TextField("Fact name", text: binding.label)
-                                    .accessibilityIdentifier("project-fact-label-\(draft.id)")
-                            } else {
-                                Text(draft.label)
-                            }
-                        }
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        HStack(alignment: .center, spacing: 12) {
-                            TextField("Value", text: binding.value, axis: .vertical)
-                                .font(.subheadline)
-                                .lineLimit(1...4)
-                                .textFieldStyle(.plain)
-                                .frame(minHeight: 44)
-                                .accessibilityLabel(draft.label.isEmpty ? "Fact value" : draft.label)
-                                .accessibilityIdentifier("project-fact-value-\(draft.id)")
-                            Button(role: .destructive) {
-                                withAnimation(inlineExpansionAnimation) {
-                                    factsDraft.removeAll { $0.id == draft.id }
-                                }
-                            } label: {
-                                Image(systemName: "minus.circle").frame(width: 44, height: 44)
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("Remove \(draft.label.isEmpty ? "fact" : draft.label)")
-                        }
-                    }
-                    .transition(.opacity)
-                }
-                addFactButton.font(.subheadline).buttonStyle(.plain)
-                inlineEditorError
-            } else {
-                Button { openProjectSheet(.structuredFacts) } label: {
-                    HStack {
-                        Text("Facts").font(.headline).foregroundStyle(.primary)
-                        Spacer(minLength: 12)
-                        Text(overviewFacts.isEmpty ? "Add facts" : "See all")
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
-                    .frame(minHeight: 44)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .disabled(inlineEditingSection != nil)
-                .accessibilityIdentifier("project-section-structured-facts")
-                if overviewFacts.isEmpty {
-                    Text("No facts yet.").font(.subheadline).foregroundStyle(.secondary)
-                } else {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .topLeading),
-                                             count: dynamicTypeSize.isAccessibilitySize ? 1 : 2),
-                              alignment: .leading, spacing: 14) {
-                        ForEach(overviewFacts) { fact in
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(fact.label).font(.caption).foregroundStyle(.secondary).lineLimit(2)
-                                Text(fact.value).font(.subheadline.weight(.medium)).foregroundStyle(.primary).lineLimit(2)
-                                if !["sourced", "confirmed"].contains(fact.status.lowercased()) {
-                                    Text(fact.status.lowercased() == "stated" ? "Stated" : "Unknown")
-                                        .font(.caption2).foregroundStyle(.secondary)
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .accessibilityElement(children: .combine)
-                        }
-                    }
-                    .accessibilityIdentifier("project-overview-facts")
-                }
-            }
-        }
-        .padding(.bottom, 4)
-    }
-
-    private var inlineExpansionAnimation: Animation? {
-        reduceMotion ? nil : .easeInOut(duration: 0.55)
-    }
-
-    private var addFactButton: some View {
-        Button {
-            withAnimation(inlineExpansionAnimation) {
-                factsDraft.append(ProjectFactDraft(id: UUID().uuidString, label: "", value: "", original: nil))
-            }
-        } label: { Label("Add fact", systemImage: "plus") }
-        .frame(minHeight: 44)
-        .accessibilityIdentifier("project-fact-add")
-    }
-
-    @ViewBuilder
-    private var inlineEditorError: some View {
-        if let inlineSaveError {
-            Text(inlineSaveError).font(.footnote).foregroundStyle(.secondary)
-        }
-    }
-
-    private func beginInlineEditing(_ section: ProjectOverviewSection) {
-        guard inlineEditingSection == nil, let folder, library.requireProjectAccess() else { return }
-        inlineEditingFolder = folder
-        inlineEditingSessionID = library.privateSessionID
-        inlineSaveError = nil
-        contextDraft = folder.description
-        factsDraft = folder.structuredFacts.map {
-            ProjectFactDraft(id: $0.id, label: $0.label, value: $0.value, original: $0)
-        }
-        withAnimation(inlineExpansionAnimation) { inlineEditingSection = section }
-    }
-
-    private func saveInlineEditing() {
-        guard let original = inlineEditingFolder, let session = inlineEditingSessionID else { return }
-        let saved: Bool
-        if inlineEditingSection == .context {
-            saved = library.updateProjectContext(folderID: folderID, description: contextDraft,
-                expectedClientID: original.clientID, expectedDescription: original.description, sessionID: session)
-        } else if inlineEditingSection == .structuredFacts {
-            var facts: [ProjectStructuredFact] = []
-            for draft in factsDraft {
-                let label = draft.label.trimmingCharacters(in: .whitespacesAndNewlines)
-                let value = draft.value.trimmingCharacters(in: .whitespacesAndNewlines)
-                if draft.original == nil && label.isEmpty && value.isEmpty { continue }
-                guard !label.isEmpty else {
-                    inlineSaveError = "Give each fact a name."
-                    return
-                }
-                if let fact = draft.original, label == fact.label, value == fact.value {
-                    facts.append(fact)
-                } else {
-                    facts.append(ProjectStructuredFact(id: draft.id, key: draft.original?.key ?? "manual-\(draft.id)",
-                        label: label, value: value, status: value.isEmpty ? "unknown" : "stated", source: "manual",
-                        sourceText: draft.original == nil ? "Entered on iPhone." : "Edited on iPhone.", updatedAt: Date()))
-                }
-            }
-            saved = library.updateProjectFacts(folderID: folderID, facts: facts,
-                expectedClientID: original.clientID, expectedFacts: original.structuredFacts, sessionID: session)
-        } else {
-            return
-        }
-        if saved { finishInlineEditing() }
-        else { inlineSaveError = library.statusMessage ?? "Your changes could not be saved. Try again." }
-    }
-
-    private func finishInlineEditing() {
-        isContextEditorFocused = false
-        withAnimation(inlineExpansionAnimation) { inlineEditingSection = nil }
-        inlineEditingFolder = nil
-        inlineEditingSessionID = nil
-        inlineSaveError = nil
-    }
-
     private var latestProjectNote: ProjectNotebookCardSummary? {
         projectHubSnapshot?.notebookCards.max { $0.updatedAt < $1.updatedAt }
     }
@@ -2093,31 +1959,23 @@ struct ProjectView: View {
         projectHubSnapshot?.reports.max { $0.createdAt < $1.createdAt }
     }
 
-    private func openProjectSheet(_ section: ProjectOverviewSection) {
-        let large: Bool
-        switch section {
-        case .reports, .evidence: large = true
-        case .questions: large = (folder?.openQuestions?.count ?? 0) > 5
-        case .checklist: large = (folder?.recordsChecklist?.count ?? 0) > 5
-        default: large = false
-        }
-        sheetDetent = large || dynamicTypeSize.isAccessibilitySize ? .large : .medium
-        sheetSection = section
-    }
-
     private var projectSectionCards: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .topLeading),
                                  count: dynamicTypeSize.isAccessibilitySize ? 1 : 2), spacing: 12) {
-            Button { openProjectSheet(.structuredFacts) } label: {
+            NavigationLink(value: ProjectOverviewSection.overview) {
+                let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                let summary = String(formattedProjectContext(description).characters)
+                    .split(whereSeparator: \.isWhitespace).joined(separator: " ")
                 let facts = folder?.structuredFacts ?? []
-                projectSectionCard("Facts", systemImage: "building.2",
+                let firstFact = facts.first.map { "\($0.label): \($0.value)" }
+                projectSectionCard("Overview", systemImage: "list.bullet.rectangle",
                     count: "\(facts.count) \(facts.count == 1 ? "fact" : "facts")",
-                    preview: facts.first.map { "\($0.label): \($0.value)" } ?? "No facts yet.")
+                    preview: summary.isEmpty ? (firstFact ?? "Add context") : summary,
+                    previewLineLimit: 2)
             }
-            .disabled(inlineEditingSection != nil)
-            .accessibilityIdentifier("project-section-structured-facts")
+            .accessibilityIdentifier("project-section-overview")
 
-            Button { openProjectSheet(.questions) } label: {
+            NavigationLink(value: ProjectOverviewSection.questions) {
                 let questions = folder?.openQuestions ?? []
                 projectSectionCard("Questions", systemImage: "questionmark.bubble",
                     count: folder?.openQuestions.map { "\($0.count) \($0.count == 1 ? "question" : "questions")" },
@@ -2126,7 +1984,7 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-questions")
 
-            Button { openProjectSheet(.checklist) } label: {
+            NavigationLink(value: ProjectOverviewSection.checklist) {
                 let records = folder?.recordsChecklist ?? []
                 projectSectionCard("Checklist", systemImage: "checklist",
                     count: folder?.recordsChecklist.map { "\($0.filter { $0.status == .reviewed }.count)/\($0.count) reviewed" },
@@ -2135,7 +1993,7 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-checklist")
 
-            Button { openProjectSheet(.notebook) } label: {
+            NavigationLink(value: ProjectOverviewSection.notebook) {
                 projectSectionCard("Notes", systemImage: "note.text",
                     count: projectHubSnapshot.map { "\($0.notebookCards.count) \($0.notebookCards.count == 1 ? "note" : "notes")" },
                     preview: latestProjectNote.map { $0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled note" : $0.title }
@@ -2143,7 +2001,7 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-notebook")
 
-            Button { openProjectSheet(.evidence) } label: {
+            NavigationLink(value: ProjectOverviewSection.evidence) {
                 projectSectionCard("Evidence", systemImage: "bookmark",
                     count: "\(library.bookmarkCount(inFolder: folderID)) saved",
                     preview: projectBookmarks.first.map { "\($0.sectionNumber) · \($0.displayTitle)" }
@@ -2151,7 +2009,7 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-evidence")
 
-            Button { openProjectSheet(.reports) } label: {
+            NavigationLink(value: ProjectOverviewSection.reports) {
                 projectSectionCard("Reports", systemImage: "doc.richtext",
                     count: projectHubSnapshot.map { "\($0.reports.count) \($0.reports.count == 1 ? "report" : "reports")" },
                     preview: latestProjectReport.map { "\($0.title) · V\($0.reportVersion)" }
@@ -2168,59 +2026,21 @@ struct ProjectView: View {
         switch section {
         case .questions, .checklist:
             ProjectWorkflowView(folderID: folderID, section: section)
-        case .context:
-            ProjectContextView(folderID: folderID, accentColor: accentColor)
-        case .structuredFacts:
-            projectSectionScreen(title: "Facts") {
-                if inlineEditingSection == .structuredFacts {
-                    projectFactsOverview
-                } else {
-                    let facts = folder?.structuredFacts ?? []
-                    if facts.isEmpty {
-                        projectHubEmpty("No Structured facts yet.")
-                    } else {
-                        VStack(alignment: .leading, spacing: 0) {
-                            let ordered = facts.sorted { FactPresentation.position($0.key) < FactPresentation.position($1.key) }
-                            ForEach(Array(ordered.enumerated()), id: \.element.id) { index, fact in
-                                let section = FactPresentation.position(fact.key).0
-                                if index == 0 || FactPresentation.position(ordered[index - 1].key).0 != section {
-                                    factHeading(section)
-                                }
-                                ProjectStructuredFactRow(fact: fact)
-                                if index + 1 < ordered.count { Divider() }
-                            }
-                            ProjectStructuredFactsSources(facts: facts)
-                                .padding(.top, 16)
-                        }
-                    }
-                }
-            }
-            .interactiveDismissDisabled(inlineEditingSection == .structuredFacts)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(inlineEditingSection == .structuredFacts ? "Save" : "Edit") {
-                        if inlineEditingSection == .structuredFacts {
-                            saveInlineEditing()
-                        } else {
-                            sheetDetent = .large
-                            beginInlineEditing(.structuredFacts)
-                        }
-                    }
-                    .disabled(inlineEditingSection != nil && inlineEditingSection != .structuredFacts)
-                }
-            }
+        case .overview:
+            ProjectOverviewView(folderID: folderID, accentColor: accentColor)
         case .notebook:
             if let projectID = library.backendProjectID(for: folderID) {
                 projectNotebookDestination(projectID: projectID)
+                    .task { if projectHubSnapshot == nil { await loadProjectHub() } }
             } else {
-                projectSectionScreen(title: "Notes") {
+                ProjectSectionScreen(title: "Notes", accentColor: accentColor) {
                     projectHubEmpty("Connect to sync this Project’s Notebook.")
                 }
             }
         case .evidence:
             projectEvidenceDestination
         case .reports:
-            projectSectionScreen(title: "Reports") {
+            ProjectSectionScreen(title: "Reports", accentColor: accentColor) {
                 projectHubStatus
                 if projectHubSnapshot != nil || (!isProjectHubLoading && projectHubError == nil) {
                     projectReportSummary
@@ -2239,12 +2059,13 @@ struct ProjectView: View {
                     }
                 }
             }
+            .task { if projectHubSnapshot == nil { await loadProjectHub() } }
             .refreshable { await loadProjectHub() }
         }
     }
 
     private func projectSectionCard(_ title: String, systemImage: String,
-                                    count: String?, preview: String) -> some View {
+                                    count: String?, preview: String, previewLineLimit: Int? = nil) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: systemImage)
@@ -2256,7 +2077,7 @@ struct ProjectView: View {
             Text(preview)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                .lineLimit(previewLineLimit ?? (dynamicTypeSize.isAccessibilitySize ? nil : 2))
             if let count { Text(count).font(.caption).foregroundStyle(.secondary) }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -2270,7 +2091,7 @@ struct ProjectView: View {
     }
 
     private var projectEvidenceDestination: some View {
-        projectSectionScreen(title: isProjectFolder ? "Evidence" : folder?.name ?? "Reference") {
+        ProjectSectionScreen(title: isProjectFolder ? "Evidence" : folder?.name ?? "Reference", accentColor: accentColor) {
             if !isProjectFolder { projectHeader }
             savedEvidenceHeader
             if projectBookmarks.isEmpty {
@@ -2325,23 +2146,6 @@ struct ProjectView: View {
             .padding(.horizontal)
             .background(.regularMaterial)
         }
-    }
-
-    private func projectSectionScreen<Content: View>(
-        title: String,
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12, content: content)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, CodeScreenMetrics.topTitlePadding)
-                .padding(.bottom, CodeScreenMetrics.tabBarClearance)
-        }
-        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-        .navigationTitle(title)
-        .navigationBarTitleDisplayMode(.inline)
-        .tint(Color.appChrome)
     }
 
     private var sortMenu: some View {
