@@ -520,6 +520,13 @@ private struct ResearchSessionView: View {
     @State private var isLoadingMoreHistory = false
     @State private var historyLoadedFilterKey: String?
     @State private var conversation: ResearchConversation?
+    private struct FactReply: Identifiable {
+        let id = UUID()
+        let fact: String
+        let originalQuestion: String
+    }
+    @State private var factReply: FactReply?
+    @State private var factResponse = ""
     @State private var question = ""
     @State private var isLoadingHistory = true
     @State private var isLoadingConversation = false
@@ -658,6 +665,32 @@ private struct ResearchSessionView: View {
                 PermitextAccountEntryView(initialSection: recoverySettingsSection)
                     .environmentObject(library)
             }
+            .sheet(item: $factReply) { reply in
+                let response = factResponse.trimmingCharacters(in: .whitespacesAndNewlines)
+                let context = reply.originalQuestion.isEmpty ? "" : "Regarding the earlier question: \(reply.originalQuestion)"
+                let addition = [context, "Requested fact: \(reply.fact)", "My response: \(response)"]
+                    .filter { !$0.isEmpty }.joined(separator: "\n")
+                let draft = [question, addition].filter { !$0.isEmpty }.joined(separator: "\n\n")
+                NavigationStack {
+                    Form {
+                        Section("Requested fact") { Text(reply.fact) }
+                        Section("Your reply") { TextField("What do you know?", text: $factResponse, axis: .vertical) }
+                        if draft.utf16.count > 2000 { Text("Shorten the reply or message to fit 2,000 characters.") }
+                    }
+                    .navigationTitle("Reply to fact")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) { Button("Cancel") { factReply = nil } }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Add to draft") {
+                                question = draft
+                                persistComposerDraft(draft)
+                                factReply = nil
+                            }.disabled(response.isEmpty || draft.utf16.count > 2000 || researchSendIsBlocked || isSending)
+                        }
+                    }
+                }
+            }
             .sheet(item: $pendingNotebookHandoff) { handoff in
                 ResearchNotebookHandoffSheet(handoff: handoff, owner: owner)
                     .environmentObject(library)
@@ -764,6 +797,7 @@ private struct ResearchSessionView: View {
                 pendingDisclosureAttempt = nil
                 failedQuestionAttempt = nil
                 pendingFeedbackReport = nil
+                factReply = nil
                 pendingNotebookHandoff = nil
                 pendingVisualReview = nil
                 pendingDeletion = nil
@@ -1687,7 +1721,12 @@ private struct ResearchSessionView: View {
                 onHelpful: { Task { await saveFeedback(messageID: message.id, category: "helpful", comment: nil) } },
                 onReportProblem: { pendingFeedbackReport = PendingResearchFeedbackReport(messageID: message.id) },
                 detailsScrollID: "answer-details:\(message.id)",
-                onDetailsExpanded: onDetailsExpanded
+                onDetailsExpanded: onDetailsExpanded,
+                onReply: { fact in
+                    guard let conversation, let index = conversation.messages.firstIndex(where: { $0.id == message.id }) else { return }
+                    factResponse = ""
+                    factReply = FactReply(fact: fact, originalQuestion: conversation.messages[..<index].last(where: { $0.role == "user" })?.question ?? "")
+                }
             ) { citation in
                 openCitation(citation, sources: sources)
             }
@@ -3107,6 +3146,7 @@ private struct ResearchAnswerView: View {
     let onReportProblem: () -> Void
     let detailsScrollID: String
     let onDetailsExpanded: () -> Void
+    let onReply: (String) -> Void
     let onOpenCitation: (ResearchCitation) -> Void
     @State private var didCopy = false
     @State private var showsSourcesAndDetails = false
@@ -3128,6 +3168,15 @@ private struct ResearchAnswerView: View {
             ResearchFormattedNarrative(text: primaryNarrative)
                 .font(.body)
                 .textSelection(.enabled)
+            if !answer.missingFacts.isEmpty {
+                Text("Project facts still needed").font(.headline)
+                ForEach(Array(answer.missingFacts.enumerated()), id: \.offset) { _, fact in
+                    VStack(alignment: .leading) {
+                        Text(fact)
+                        Button("Reply") { onReply(fact) }.accessibilityLabel("Reply to \(fact)")
+                    }
+                }
+            }
             if let nextQuestion = answer.followUpQuestions.first,
                !nextQuestion.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                !primaryNarrative.contains(nextQuestion) {
@@ -3246,7 +3295,6 @@ private struct ResearchAnswerView: View {
                     .accessibilityIdentifier("research-answer-source-boundary")
                 supportedPointsSection(answer.supportedPoints)
                 answerSection("Assumptions used", items: answer.assumptions)
-                answerSection("Project details that may affect the answer", items: answer.missingFacts)
                 answerSection("Limits of this answer", items: answer.evidenceLimitations)
                 answerSection("Questions that would materially advance this answer", items: answer.followUpQuestions)
                 answerSection("Related evidence to add", items: answer.additionalEvidenceNeeded)

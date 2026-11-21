@@ -13,12 +13,17 @@ function actual(name) {
   return source.slice(start, end + 2);
 }
 class Element {
-  constructor() {
+  constructor(tagName) {
+    this.tagName = tagName;
     this.children = [];
     this.dataset = {};
     this.classList = { add() {}, toggle() {} };
   }
   append(...children) { this.children.push(...children); }
+  querySelectorAll(tag) {
+    return this.children.flatMap(child => child instanceof Element
+      ? [...(child.tagName === tag ? [child] : []), ...child.querySelectorAll(tag)] : []);
+  }
   setAttribute() {}
   addEventListener() {}
 }
@@ -28,7 +33,7 @@ const context = vm.createContext({
   state, defaultSyncCodeVersion, syncCodeVersion, bulkClearTimestamp, indexBulkClears, evidenceCommentsText,
   currentContentSummary() { summaryReads++; return { annotations }; },
   currentBulkClearRecords: () => clears,
-  document: { createElement: () => new Element() },
+  document: { createElement: tag => new Element(tag) },
   crypto: { randomUUID: () => "synthetic" },
   savedCodeGroupKey: item => item.codeVersion,
   codeTheme: () => "bc", codeDisplayLabel: () => "Building Code",

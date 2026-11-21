@@ -678,14 +678,16 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         account: SignedInAccount,
         projectID: String,
         cardID: String,
-        expectedVersion: Int
+        expectedVersion: Int,
+        recoverable: Bool? = nil
     ) async throws {
         _ = try await transport.notebookCardDelete(
             NotebookCardDeleteRequest(
                 auth: authContext(for: account),
                 projectID: projectID,
                 cardID: cardID,
-                expectedVersion: expectedVersion
+                expectedVersion: expectedVersion,
+                recoverable: recoverable
             )
         )
     }

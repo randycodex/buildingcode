@@ -59,7 +59,7 @@ const context = vm.createContext({
   annotationTargetForBlock: (value, block) => ({ sectionID: value.id, codeVersion: reader.codeVersion, blockID: block.id }),
   renderCodeBlock(block) { const node = new Node("p"); node.textContent = block.plainText; return node; },
   renderOccupantLoadCalculation() { return null; }, readerPassagePayload() { return {}; },
-  linkInlineCodeReferences() {}, decorateReaderDefinitions() {}, hasCapability: () => true,
+  linkInlineCodeReferences() {}, decorateReaderDefinitions() {}, hasCapability: () => true, workingResearchNote: () => null,
   bookmarkIconSVG: saved => saved ? "saved" : "save", bookmarkActionLabel: saved => saved ? "Remove passage" : "Save passage",
   noteAddIconSVG: () => "note",
 });

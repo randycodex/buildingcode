@@ -48,7 +48,8 @@ export function validatedOfflineCodeSources(value) {
 
 export function offlineSourceIdentity(record, sources) {
   if (!record || typeof record.codeVersion !== "string" || !record.codeVersion || record.codeSectionID == null) return null;
-  const matches = sources.filter(source => source.canonicalEdition === syncCodeVersion(record.codeVersion) &&
+  const edition = syncCodeVersion(record.codeVersion);
+  const matches = sources.filter(source => source.canonicalEdition === edition &&
     source.categoryID === record.codeSectionID && source.codePrefix === record.codePrefix);
   return matches.length === 1 ? codeSourceIdentity(matches[0]) : null;
 }
@@ -74,15 +75,25 @@ export function offlineSourceScope(metadata, url) {
 }
 
 export function offlineSectionMetadata(record, metadata, requestedVersions = []) {
-  if (requestedVersions.length > 1 || (requestedVersions.length && !requestedVersions[0].trim())) throw new Error("Provide one nonempty code edition.");
-  const identity = offlineSourceIdentity(record, validatedOfflineCodeSources(metadata.codeSources));
-  if (!identity) throw new Error("Exact offline code source identity is unavailable. Update the offline download when connected.");
-  if (requestedVersions.length && requestedVersions[0] !== identity.canonicalEdition) throw new Error("This section does not belong to the requested code edition.");
-  return { id: Number(record.id), sectionID: Number(record.id), webSectionID: record.webSectionID || null,
-    chapterID: record.chapterID, codePrefix: record.codePrefix,
-    codeVersion: identity.canonicalEdition, codeSectionID: identity.categoryID,
-    chapterNumber: record.chapterNumber, sectionNumber: record.sectionNumber, title: record.title,
-    codeSource: identity };
+  return createOfflineSectionMetadataReader(metadata)(record, requestedVersions);
+}
+
+// Validation is lazy so an empty search on an older download can still finish.
+// Each reader belongs to one manifest and keeps its own validated source list.
+export function createOfflineSectionMetadataReader(metadata) {
+  let sources;
+  return (record, requestedVersions = []) => {
+    if (requestedVersions.length > 1 || (requestedVersions.length && !requestedVersions[0].trim())) throw new Error("Provide one nonempty code edition.");
+    sources ??= validatedOfflineCodeSources(metadata.codeSources);
+    const identity = offlineSourceIdentity(record, sources);
+    if (!identity) throw new Error("Exact offline code source identity is unavailable. Update the offline download when connected.");
+    if (requestedVersions.length && requestedVersions[0] !== identity.canonicalEdition) throw new Error("This section does not belong to the requested code edition.");
+    return { id: Number(record.id), sectionID: Number(record.id), webSectionID: record.webSectionID || null,
+      chapterID: record.chapterID, codePrefix: record.codePrefix,
+      codeVersion: identity.canonicalEdition, codeSectionID: identity.categoryID,
+      chapterNumber: record.chapterNumber, sectionNumber: record.sectionNumber, title: record.title,
+      codeSource: identity };
+  };
 }
 
 export function resolveOfflineSectionMetadata(records, metadata, { code, sectionNumber, version }) {

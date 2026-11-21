@@ -812,6 +812,7 @@ struct NotebookCardDeleteRequest: Codable, Hashable, Sendable {
     let projectID: String
     let cardID: String
     let expectedVersion: Int
+    var recoverable: Bool? = nil
 }
 
 struct NotebookCardListResponse: Codable, Hashable, Sendable {
@@ -1096,6 +1097,7 @@ struct NotebookBlockProps: Codable, Hashable, Sendable {
     var caption: String? = nil
     var showPreview: Bool? = nil
     var previewWidth: Int? = nil
+    var lineSpacing: String? = nil
 
     static var text: NotebookBlockProps { NotebookBlockProps() }
 }
@@ -1126,6 +1128,7 @@ struct NotebookTextStyles: Codable, Hashable, Sendable {
     var textColor: String? = nil
     var backgroundColor: String? = nil
     var superscript: Bool? = nil
+    var fontSize: String? = nil
 }
 
 struct NotebookReferenceProps: Codable, Hashable, Sendable {

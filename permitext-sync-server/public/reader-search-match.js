@@ -31,33 +31,60 @@ export function readerSearchTokenDistanceLimit(token) {
   return 0;
 }
 
-export function readerSearchMatch(value, query) {
-  const text = String(value || "");
+// A chapter contains many repetitions of the same words. Share typo checks
+// within this query and discard the bounded cache when the search finishes.
+function prepareReaderMatch(query) {
   const needle = String(query || "").trim().toLowerCase();
-  if (!needle) return null;
-  const exactIndex = text.toLowerCase().indexOf(needle);
-  if (exactIndex >= 0) {
-    return { index: exactIndex, length: needle.length, text: text.slice(exactIndex, exactIndex + needle.length), exact: true };
+  let tokens;
+  let cachedWords = 0;
+  function matchesToken(token, raw) {
+    const word = raw.toLowerCase();
+    if (word === token.word) return true;
+    if (!token.limit || Math.abs(token.word.length - word.length) > token.limit) return false;
+    const cached = token.distances.get(word);
+    if (cached !== undefined) return cached;
+    const matches = readerSearchEditDistance(token.word, word, token.limit) <= token.limit;
+    if (cachedWords < 2048) {
+      token.distances.set(word, matches);
+      cachedWords++;
+    }
+    return matches;
   }
-  const queryTokens = needle.match(/[\p{L}\p{N}]+/gu) || [];
-  if (!queryTokens.length) return null;
-  const textTokens = Array.from(text.matchAll(/[\p{L}\p{N}]+/gu)).map((match) => ({
-    value: match[0].toLowerCase(),
-    index: match.index,
-    length: match[0].length
-  }));
-  for (let start = 0; start <= textTokens.length - queryTokens.length; start += 1) {
-    const matched = queryTokens.every((token, offset) => {
-      const limit = readerSearchTokenDistanceLimit(token);
-      return readerSearchEditDistance(token, textTokens[start + offset].value, limit) <= limit;
-    });
-    if (!matched) continue;
-    const first = textTokens[start];
-    const last = textTokens[start + queryTokens.length - 1];
-    const end = last.index + last.length;
-    return { index: first.index, length: end - first.index, text: text.slice(first.index, end), exact: false };
-  }
-  return null;
+
+  return function match(value) {
+    const text = String(value || "");
+    if (!needle) return null;
+    const index = text.toLowerCase().indexOf(needle);
+    if (index >= 0) {
+      return { index, length: needle.length, text: text.slice(index, index + needle.length), exact: true };
+    }
+    tokens ??= (needle.match(/[\p{L}\p{N}]+/gu) || []).map(word => ({
+      word, limit: readerSearchTokenDistanceLimit(word), distances: new Map()
+    }));
+    if (!tokens.length) return null;
+    const words = /[\p{L}\p{N}]+/gu;
+    let first;
+    while ((first = words.exec(text))) {
+      if (!matchesToken(tokens[0], first[0])) continue;
+      const firstEnd = words.lastIndex;
+      let offset = 1;
+      for (; offset < tokens.length; offset++) {
+        const next = words.exec(text);
+        if (!next || !matchesToken(tokens[offset], next[0])) break;
+      }
+      if (offset === tokens.length) {
+        const end = words.lastIndex;
+        return { index: first.index, length: end - first.index, text: text.slice(first.index, end), exact: false };
+      }
+      // A later phrase may overlap this partial match.
+      words.lastIndex = firstEnd;
+    }
+    return null;
+  };
+}
+
+export function readerSearchMatch(value, query) {
+  return prepareReaderMatch(query)(value);
 }
 
 export function snippetForMatch(value, match, heading = "") {
@@ -100,14 +127,15 @@ export function searchReaderTextSections(sections, query) {
   const needle = String(query || "").trim().toLowerCase();
   if (needle.length < 2) return [];
   const sectionQuery = readerSectionNumber(needle);
+  const matchQuery = prepareReaderMatch(needle);
   const results = [];
   for (const section of sections || []) {
     const title = section.displayTitle;
     const exactSection = Boolean(sectionQuery) && readerSectionNumber(section.sectionNumber) === sectionQuery;
-    const titleMatch = readerSearchMatch(title, exactSection ? section.sectionNumber : needle);
+    const titleMatch = exactSection ? readerSearchMatch(title, section.sectionNumber) : matchQuery(title);
     const blockMatches = (section.blocks || []).flatMap((block, index) => {
       const text = String(block.text || "").replace(/\s+/g, " ").trim();
-      const match = readerSearchMatch(text, needle);
+      const match = matchQuery(text);
       if (!match) return [];
       const leadingText = text.slice(0, match.index).replace(/^[\s§:;,.()\-–—]+/, "");
       return [{ blockID: block.blockID, text, match, startsWithMatch: leadingText.length === 0, index }];

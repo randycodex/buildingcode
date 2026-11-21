@@ -40,11 +40,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertEqual(app.staticTexts["project-workspace-name"].label, name)
         }
         openProject("Acceptance Project")
-        for card in ["context", "structured-facts", "notebook", "evidence", "reports"] {
+        for card in ["overview", "questions", "checklist", "notebook", "evidence", "reports"] {
             XCTAssertTrue(app.buttons["project-section-\(card)"].isHittable)
         }
         XCTAssertFalse(app.buttons["project-section-research"].exists)
-        keepScreenshot(named: "Five Project sections and four tabs", from: app)
+        keepScreenshot(named: "Six project cards and four tabs", from: app)
         app.buttons["main-tab-research"].tap()
         XCTAssertFalse(app.staticTexts["Loading Research…"].exists)
         let newResearch = app.buttons["New Research"]
@@ -408,6 +408,32 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         try verifySavedProjectNavigation(largeText: false)
     }
 
+    func testProjectsHeaderHasSeparateNewProjectAndAccountButtons() throws {
+#if !DEBUG
+        throw XCTSkip("Projects toolbar uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+
+        let newProject = app.buttons["New project"]
+        let account = app.buttons["Open Account"]
+        XCTAssertTrue(newProject.isHittable)
+        XCTAssertTrue(account.isHittable)
+        XCTAssertGreaterThan(account.frame.minX, newProject.frame.maxX)
+        keepScreenshot(named: "Separate Projects toolbar buttons", from: app)
+
+        newProject.tap()
+        let editor = app.navigationBars["New project"]
+        XCTAssertTrue(app.textFields["e.g. Bronx R-2 Passive House"].waitForExistence(timeout: 10))
+        editor.buttons["Cancel"].tap()
+
+        account.tap()
+        XCTAssertTrue(app.buttons["account-close"].waitForExistence(timeout: 10))
+#endif
+    }
+
     func testProjectSectionsOpenWithBackNavigation() throws {
 #if !DEBUG
         throw XCTSkip("Project overview acceptance uses the isolated Debug fixture.")
@@ -423,56 +449,100 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             app.buttons["project-section-notebook"].label.contains("0 notes")
         }, object: nil)], timeout: 10), .completed)
-        keepScreenshot(named: "Project overview without card chevrons", from: app)
-        app.buttons["project-section-context"].tap()
+        let cards = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-section-"))
+        XCTAssertEqual(cards.count, 6)
+        for (left, right) in [("overview", "questions"), ("checklist", "notebook"), ("evidence", "reports")] {
+            let leading = app.buttons["project-section-\(left)"]
+            let trailing = app.buttons["project-section-\(right)"]
+            XCTAssertEqual(leading.frame.minY, trailing.frame.minY, accuracy: 1)
+            XCTAssertEqual(leading.frame.width, trailing.frame.width, accuracy: 1)
+            XCTAssertEqual(leading.frame.height, trailing.frame.height, accuracy: 1)
+        }
+        keepScreenshot(named: "Six project cards with Overview", from: app)
+
+        let overviewCard = app.buttons["project-section-overview"]
+        overviewCard.tap()
+        let overviewBar = app.navigationBars["Overview"]
+        XCTAssertTrue(overviewBar.waitForExistence(timeout: 5))
+        let contextTab = app.buttons["Context"]
+        let factsTab = app.buttons["Zoning"]
+        XCTAssertTrue(contextTab.isHittable)
+        XCTAssertTrue(factsTab.isHittable)
+        XCTAssertTrue(app.staticTexts["project-context-text"].isHittable)
+        XCTAssertEqual(app.tabBars.buttons.count, 4)
+        XCTAssertFalse(app.keyboards.firstMatch.exists)
+        app.buttons["project-context-edit"].tap()
         let editor = app.textViews["project-context-editor"]
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["project-inline-editor-title"].isHittable,
-                      "The expanded Context stays at its beginning when the keyboard appears")
-        XCTAssertFalse(app.navigationBars["Project Context"].exists)
-        editor.typeText(" Inline phone edit.")
-        keepScreenshot(named: "Context editing on the project overview", from: app)
-        func save() {
-            let header = app.buttons["project-inline-save"]
-            if header.isHittable { header.tap() }
-            else { app.buttons["project-inline-keyboard-save"].tap() }
-        }
-        save()
-        XCTAssertTrue(app.buttons["project-section-context"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["project-section-context"].label.contains("Inline phone edit."))
-        app.buttons["project-section-context"].tap()
+        XCTAssertFalse(factsTab.isEnabled, "Save or cancel Context before switching tabs.")
+        editor.typeText("Phone edit. ")
+        app.buttons["project-context-save"].tap()
+        let savedContext = app.staticTexts["project-context-text"]
+        XCTAssertTrue(savedContext.waitForExistence(timeout: 5))
+        XCTAssertTrue(savedContext.label.hasPrefix("Phone edit."))
+        app.buttons["project-context-edit"].tap()
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
-        editor.typeText(" Discard this draft.")
-        app.buttons["project-inline-cancel"].tap()
-        XCTAssertFalse(app.buttons["project-section-context"].label.contains("Discard this draft."))
-        let facts = app.buttons["project-section-structured-facts"]
-        reveal(facts, in: app)
-        facts.tap()
+        editor.typeText("Discard this draft. ")
+        overviewBar.buttons["Cancel"].tap()
+        XCTAssertTrue(savedContext.label.hasPrefix("Phone edit."))
+        keepScreenshot(named: "Overview Context tab", from: app)
+        factsTab.tap()
+        XCTAssertTrue(app.staticTexts["Building"].waitForExistence(timeout: 5))
+        XCTAssertFalse(savedContext.isHittable)
+        overviewBar.buttons["Edit"].tap()
         let value = app.textFields["project-fact-value-occupancy"]
         XCTAssertTrue(value.waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts["project-fact-number-occupancy"].label, "1.")
         XCTAssertEqual(app.buttons["Remove Occupancy"].frame.midY, value.frame.midY, accuracy: 2,
                        "Delete aligns to the value rather than the label")
-        XCTAssertFalse(app.navigationBars["Structured Facts"].exists)
+        XCTAssertFalse(contextTab.isEnabled, "Save or cancel Facts before switching tabs.")
         value.tap()
         value.typeText(" phone edit")
-        let bottomSave = app.buttons["project-inline-bottom-save"]
-        reveal(bottomSave, in: app)
-        XCTAssertTrue(app.buttons["project-inline-bottom-cancel"].exists)
-        bottomSave.tap()
-        XCTAssertTrue(facts.waitForExistence(timeout: 5))
-        facts.tap()
+        XCTAssertTrue(overviewBar.buttons["Cancel"].isHittable)
+        overviewBar.buttons["Save"].tap()
+        overviewBar.buttons["Edit"].tap()
         XCTAssertTrue(value.waitForExistence(timeout: 5))
         XCTAssertTrue((value.value as? String ?? "").contains("phone edit"))
-        keepScreenshot(named: "Facts edited inline on iPhone", from: app)
-        app.buttons["project-inline-cancel"].tap()
-        for (section, title) in [("notebook", "Notebook"), ("evidence", "Evidence"), ("reports", "Reports")] {
+        app.buttons["main-tab-research"].tap()
+        XCTAssertTrue(app.buttons["New Research"].waitForExistence(timeout: 15))
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(overviewBar.buttons["Cancel"].waitForExistence(timeout: 5),
+                      "Returning to Project should restore Facts and its edit mode.")
+        value.tap()
+        value.typeText(" discard this")
+        overviewBar.buttons["Cancel"].tap()
+        XCTAssertTrue(app.staticTexts["Building"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "discard this")).firstMatch.exists)
+        keepScreenshot(named: "Overview Zoning tab", from: app)
+        contextTab.tap()
+        XCTAssertTrue(savedContext.waitForExistence(timeout: 5))
+        XCTAssertTrue(savedContext.label.hasPrefix("Phone edit."))
+        overviewBar.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(overviewCard.waitForExistence(timeout: 5))
+        XCTAssertTrue(overviewCard.label.contains("Phone edit."))
+        for (section, title) in [("notebook", "Notes"), ("evidence", "Evidence"), ("reports", "Reports")] {
             let card = app.buttons["project-section-\(section)"]
             reveal(card, in: app)
             card.tap()
-            XCTAssertTrue(app.navigationBars[title].waitForExistence(timeout: 10))
-            app.buttons["main-tab-saved"].tap()
+            let bar = app.navigationBars[title]
+            XCTAssertTrue(bar.waitForExistence(timeout: 10))
+            XCTAssertTrue(app.buttons["main-tab-reader"].isHittable)
+            XCTAssertTrue(app.buttons["main-tab-research"].isHittable)
+            XCTAssertTrue(app.buttons["main-tab-search"].isHittable)
+            XCTAssertFalse(root.isHittable)
+            if section == "notebook" {
+                keepScreenshot(named: "Notes page with project tabs", from: app)
+                app.buttons["main-tab-reader"].tap()
+                XCTAssertTrue(app.buttons["reader-session-primary"].waitForExistence(timeout: 15))
+                app.buttons["main-tab-saved"].tap()
+                XCTAssertTrue(bar.waitForExistence(timeout: 5))
+                app.buttons["main-tab-search"].tap()
+                XCTAssertTrue(app.textFields["Search codes"].waitForExistence(timeout: 15))
+                app.buttons["main-tab-saved"].tap()
+                XCTAssertTrue(bar.waitForExistence(timeout: 5))
+            }
+            bar.buttons.element(boundBy: 0).tap()
             XCTAssertTrue(root.waitForExistence(timeout: 10))
             XCTAssertTrue(app.buttons["project-section-notebook"].label.contains("0 notes"), "Loaded previews survive the delayed refresh")
             XCTAssertTrue(app.buttons["project-section-reports"].label.contains("0 reports"))
@@ -495,17 +565,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(root.waitForExistence(timeout: 10))
         let questionCard = app.buttons["project-section-questions"]
         reveal(questionCard, in: app)
-        XCTAssertEqual(questionCard.frame.minY, app.buttons["project-section-structured-facts"].frame.minY, accuracy: 2)
+        XCTAssertEqual(questionCard.frame.minY, app.buttons["project-section-overview"].frame.minY, accuracy: 2)
         keepScreenshot(named: "Project overview with six cards", from: app)
         questionCard.tap()
         XCTAssertTrue(app.navigationBars["Questions"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.keyboards.firstMatch.exists)
+        XCTAssertEqual(app.tabBars.buttons.count, 4)
         app.buttons["project-workflow-add"].tap()
         let question = app.textFields["project-question-text-0"]
         let questionText = question.exists ? question : app.textViews["project-question-text-0"]
         XCTAssertTrue(questionText.waitForExistence(timeout: 5))
-        questionText.tap()
-        questionText.typeText("Is the survey current?")
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        app.typeText("Is the survey current?")
         let answer = app.textFields["project-question-answer-0"]
         let answerText = answer.exists ? answer : app.textViews["project-question-answer-0"]
         answerText.tap()
@@ -516,14 +587,17 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["project-workflow-edit"].tap()
         questionText.tap()
         questionText.typeText(" Discard")
-        app.buttons["project-workflow-cancel"].tap()
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Cancel")).count, 1)
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Save")).count, 1)
+        app.navigationBars["Questions"].buttons["Cancel"].tap()
         XCTAssertFalse(app.staticTexts["Is the survey current? Discard"].exists)
-        app.buttons["main-tab-saved"].tap()
+        app.navigationBars["Questions"].buttons.element(boundBy: 0).tap()
         XCTAssertTrue(root.waitForExistence(timeout: 5))
         let checklistCard = app.buttons["project-section-checklist"]
         reveal(checklistCard, in: app)
         checklistCard.tap()
         XCTAssertTrue(app.navigationBars["Checklist"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.tabBars.buttons.count, 4)
         app.buttons["project-checklist-suggested"].tap()
         let status = app.buttons["project-record-status-0"]
         XCTAssertTrue(status.waitForExistence(timeout: 5))
@@ -532,9 +606,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["project-workflow-save"].tap()
         XCTAssertTrue(app.staticTexts["Reviewed"].waitForExistence(timeout: 5))
         keepScreenshot(named: "Project record checklist on iPhone", from: app)
-        app.buttons["main-tab-saved"].tap()
+        app.navigationBars["Checklist"].buttons.element(boundBy: 0).tap()
         XCTAssertTrue(root.waitForExistence(timeout: 5))
         XCTAssertTrue(checklistCard.label.contains("1/5 reviewed"))
+        let notesCard = app.buttons["project-section-notebook"]
+        reveal(notesCard, in: app)
+        notesCard.tap()
+        let notesPage = app.navigationBars["Notes"]
+        XCTAssertTrue(notesPage.waitForExistence(timeout: 10))
+        notesPage.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(checklistCard.waitForExistence(timeout: 5))
         reveal(questionCard, in: app)
         XCTAssertTrue(questionCard.label.contains("1 question"))
         app.buttons["main-tab-saved"].tap()
@@ -542,7 +623,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
-    func testLongContextExpansionKeepsBeginningVisible() throws {
+    func testLongContextEditorStartsAtBeginning() throws {
 #if !DEBUG
         throw XCTSkip("Project overview acceptance uses the isolated Debug fixture.")
 #else
@@ -553,27 +634,27 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
         app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
                                         "saved-folder-", "Acceptance Project")).firstMatch.tap()
-        let readMore = app.buttons["project-section-context"]
-        XCTAssertTrue(readMore.waitForExistence(timeout: 10))
-        readMore.tap()
+        let contextCard = app.buttons["project-section-overview"]
+        XCTAssertTrue(contextCard.waitForExistence(timeout: 10))
+        contextCard.tap()
+        app.buttons["project-context-edit"].tap()
         let editor = app.textViews["project-context-editor"]
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
         editor.typeText(String(repeating: "Long context line for scrolling.\n", count: 18))
-        let save = app.buttons["project-inline-save"]
-        if save.isHittable { save.tap() }
-        else { app.buttons["project-inline-keyboard-save"].tap() }
-        XCTAssertTrue(readMore.waitForExistence(timeout: 5))
-        reveal(readMore, in: app, swipingDown: true)
-        readMore.tap()
+        app.buttons["project-context-save"].tap()
+        XCTAssertTrue(app.staticTexts["project-context-text"].waitForExistence(timeout: 5))
+
+        app.buttons["project-context-edit"].tap()
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["project-inline-editor-title"].isHittable,
-                      "Opening a long Context must keep the start visible rather than jump to its end")
         XCTAssertGreaterThan((editor.value as? String ?? "").count, 500,
                              "The full saved Context remains available for editing")
-        keepScreenshot(named: "Long Context expands at the beginning before editing", from: app)
-        app.buttons["project-inline-cancel"].tap()
+        editor.typeText("Beginning. ")
+        XCTAssertTrue((editor.value as? String ?? "").hasPrefix("Beginning. "))
+        keepScreenshot(named: "Long Context starts at the beginning in edit mode", from: app)
+        app.navigationBars["Overview"].buttons["Cancel"].tap()
+
 #endif
     }
 
@@ -594,7 +675,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
                                         "saved-folder-", "Acceptance Project")).firstMatch.tap()
         XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
-        XCTAssertTrue(app.buttons["project-section-context"].isHittable)
+        XCTAssertTrue(app.buttons["project-section-overview"].isHittable)
         keepScreenshot(named: "Project overview accessibility size top", from: app)
         for section in ["notebook", "evidence", "reports"] {
             let card = app.buttons["project-section-\(section)"]
@@ -604,7 +685,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Project overview accessibility size collections", from: app)
         app.buttons["project-section-reports"].tap()
         XCTAssertTrue(app.navigationBars["Reports"].waitForExistence(timeout: 10))
-        app.buttons["main-tab-saved"].tap()
+        app.navigationBars["Reports"].buttons.element(boundBy: 0).tap()
         XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
         app.buttons["main-tab-saved"].tap()
         XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
@@ -659,9 +740,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label ==[c] %@", "Project Hub")).firstMatch.exists)
         XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Structured Facts (")).firstMatch.exists)
         for (identifier, title) in [
-            ("project-section-context", "Project Context"),
-            ("project-section-structured-facts", "Structured Facts"),
-            ("project-section-notebook", "Notebook"),
+            ("project-section-overview", "Overview"),
+            ("project-section-notebook", "Notes"),
             ("project-section-research-history", "Research History")
         ] {
             let section = element(in: app, identifier: identifier)
@@ -671,39 +751,37 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertTrue(app.navigationBars[title].waitForExistence(timeout: 10),
                           "\(title) should push a titled destination onto the navigation stack.")
             XCTAssertFalse(projectRoot.isHittable, "The Project page must be behind the destination.")
-            if title == "Project Context" {
-                let context = app.textViews["project-context-text"]
+            if title == "Overview" {
+                let context = app.staticTexts["project-context-text"]
                 XCTAssertTrue(context.exists)
-                XCTAssertEqual(context.value as? String, "Phase 3 entitled Research acceptance")
-                context.coordinate(withNormalizedOffset: .zero)
-                    .withOffset(CGVector(dx: 12, dy: 12)).tap()
+                XCTAssertEqual(context.label, "Phase 3 entitled Research acceptance")
+                app.buttons["project-context-edit"].tap()
                 let editor = app.textViews["project-context-editor"]
                 XCTAssertTrue(editor.waitForExistence(timeout: 5))
-                editor.typeText(" Updated on iPhone.")
+                editor.typeText("Updated on iPhone. ")
                 app.buttons["project-context-save"].tap()
                 XCTAssertTrue(context.waitForExistence(timeout: 5))
-                let savedContext = context.value as? String ?? ""
-                XCTAssertTrue(savedContext.contains("Updated on iPhone."))
-                XCTAssertFalse(savedContext.hasSuffix(" Updated on iPhone."),
-                               "Editing must begin at the tapped text, rather than at the end.")
-                context.tap()
+                let savedContext = context.label
+                XCTAssertTrue(savedContext.hasPrefix("Updated on iPhone."),
+                              "Editing must begin at the start of the Context.")
+                app.buttons["project-context-edit"].tap()
                 XCTAssertTrue(editor.waitForExistence(timeout: 5))
-                editor.typeText(" Discard this draft.")
+                editor.typeText("Discard this draft. ")
                 app.navigationBars[title].buttons["Cancel"].tap()
-                XCTAssertEqual(context.value as? String, savedContext)
+                XCTAssertEqual(context.label, savedContext)
             }
             keepScreenshot(named: "Project section: \(title)", from: app)
             app.navigationBars[title].buttons.element(boundBy: 0).tap()
             XCTAssertTrue(projectRoot.waitForExistence(timeout: 10))
         }
-        let contextLink = element(in: app, identifier: "project-section-context")
+        let contextLink = element(in: app, identifier: "project-section-overview")
         reveal(contextLink, in: app)
         contextLink.tap()
-        let reopenedContext = app.textViews["project-context-text"]
+        let reopenedContext = app.staticTexts["project-context-text"]
         XCTAssertTrue(reopenedContext.waitForExistence(timeout: 5))
-        XCTAssertTrue((reopenedContext.value as? String ?? "").contains("Updated on iPhone."),
+        XCTAssertTrue(reopenedContext.label.contains("Updated on iPhone."),
                       "Saved context must survive leaving and reopening the screen.")
-        app.navigationBars["Project Context"].buttons.element(boundBy: 0).tap()
+        app.navigationBars["Overview"].buttons.element(boundBy: 0).tap()
         app.navigationBars.buttons.element(boundBy: 0).tap()
         let allSaved = element(in: app, identifier: "all-saved-link")
         reveal(allSaved, in: app)
@@ -1147,13 +1225,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         retry.tap()
         XCTAssertTrue(app.buttons["native-notebook-retry"].waitForExistence(timeout: 15))
         XCTAssertFalse(title.exists)
-        XCTAssertFalse(app.staticTexts["Synced"].exists)
+        XCTAssertFalse(app.buttons["native-notebook-done"].exists)
         keepScreenshot(named: "Fresh authorization revocation hides offline draft editor", from: app)
     }
 
     func testNativeNotebookColdOfflineEditorKeepsDraftUntilFreshAccessReturns() {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-cold-offline-fixture"]
+        app.launchArguments.append("--native-notebook-save-diagnostics")
         app.launch()
         let title = app.textFields["Note title"]
         XCTAssertTrue(title.waitForExistence(timeout: 30))
@@ -1170,7 +1249,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(insertImage.isEnabled, "Image upload requires fresh server authorization.")
         keepScreenshot(named: "Cold offline cached editor local draft", from: app)
         retry.tap()
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 15))
         XCTAssertEqual(title.value as? String, editedTitle)
         XCTAssertFalse(app.buttons["Save"].exists)
         XCTAssertTrue(insertImage.isEnabled, "Fresh editor authorization must restore image upload.")
@@ -1200,6 +1279,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture"]
         if largeText { app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityM"] }
+        app.launchArguments.append("--native-notebook-save-diagnostics")
         app.launch()
         func captureInputTrace() {
             let diagnostics = app.descendants(matching: .any).matching(identifier: "native-notebook-input-diagnostics").firstMatch
@@ -1243,7 +1323,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(reference.exists, app.debugDescription)
         reveal(reference, in: app)
         XCTAssertTrue(reference.isHittable)
-        // Deliberately do not wait for Synced: pushing a source must retain the
+        // Deliberately do not wait for autosave: pushing a source must retain the
         // final keystroke even before the autosave debounce completes.
         app.typeText(" LAST KEY")
         reference.tap()
@@ -1269,13 +1349,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(resumedResult, .completed,
                        "Typing after Back must continue at the exact source caret; got \(nativeNotebookBodyValue(editor) ?? "missing").")
         XCTAssertEqual(app.textFields["Note title"].value as? String, "Original reference note")
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 10))
         keepScreenshot(named: "Linked Note returns to exact continuous editing caret and syncs", from: app)
     }
 
     func testNativeNotebookContinuousPageSupportsHeadingAndReturn() {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture"]
+        app.launchArguments.append("--native-notebook-save-diagnostics")
         app.launch()
         let body = nativeNotebookBody(in: app)
         XCTAssertTrue(body.waitForExistence(timeout: 30), app.debugDescription)
@@ -1309,7 +1390,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(app.buttons["Add text"].exists)
         XCTAssertFalse(app.buttons["Remove block"].exists)
         app.buttons["native-notebook-done"].tap()
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 10))
         keepScreenshot(named: "Single continuous native page with heading and paragraph", from: app)
     }
 
@@ -1344,6 +1425,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     func testNativeNotebookListsLinksAndUndoRemainInOneDocument() {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture"]
+        app.launchArguments.append("--native-notebook-save-diagnostics")
         app.launch()
         let body = nativeNotebookBody(in: app)
         XCTAssertTrue(body.waitForExistence(timeout: 30), app.debugDescription)
@@ -1353,7 +1435,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["Lists"].tap()
         app.buttons["Bulleted list"].tap()
         XCTAssertTrue(waitForValue("bulletListItem", on: app.buttons["Text formatting"]))
-        app.buttons["Insert link"].tap()
+        app.buttons["Insert"].tap()
         app.buttons["Web link"].tap()
         let label = app.textFields["native-notebook-link-label"]
         XCTAssertTrue(label.waitForExistence(timeout: 5))
@@ -1369,45 +1451,48 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [inserted], timeout: 5), .completed, app.debugDescription)
         let withLink = nativeNotebookBodyValue(body)
         XCTAssertTrue(withLink?.contains("Tools check") == true)
-        app.buttons["Undo and redo"].tap()
         app.buttons["Undo"].tap()
         let undone = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             let value = self.nativeNotebookBodyValue(body) ?? ""
             return !value.contains("Reference link") && value.contains("Tools check")
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [undone], timeout: 5), .completed, app.debugDescription)
-        app.buttons["Undo and redo"].tap()
         app.buttons["Redo"].tap()
         let restored = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             self.nativeNotebookBodyValue(body) == withLink
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [restored], timeout: 5), .completed, app.debugDescription)
         app.buttons["native-notebook-done"].tap()
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 10))
         keepScreenshot(named: "Native continuous list and link with undo redo", from: app)
     }
 
-    func testNativeNotebookCachedRefreshPreservesTypingAndAutosaves() {
+    func testNativeNotebookDraftRefreshPreservesTypingAndAutosaves() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture", "--native-notebook-delayed-refresh-fixture"]
+        app.launchArguments.append("--native-notebook-refresh-unsaved-draft")
+        app.launchArguments.append("--native-notebook-save-diagnostics")
         app.launch()
         let title = app.textFields["Note title"]
         let diagnostics = app.staticTexts["native-notebook-refresh-diagnostics"]
         XCTAssertTrue(title.waitForExistence(timeout: 30))
         XCTAssertTrue(diagnostics.waitForExistence(timeout: 5))
         XCTAssertTrue(diagnostics.label.contains("refresh=pending"))
+        let originalTitle = title.value as? String
         title.tap()
         keepScreenshot(named: "Cached Note title focused before typing", from: app)
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
-        title.typeText(" typed during refresh")
-        let expected = "Original reference note typed during refresh"
+        let insertion = " typed during refresh"
+        title.typeText(insertion)
+        let expected = title.value as? String
         keepScreenshot(named: "Cached Note immediately after typing", from: app)
-        XCTAssertEqual(title.value as? String, expected)
+        XCTAssertTrue(expected?.contains(insertion) == true)
+        XCTAssertEqual(expected?.replacingOccurrences(of: insertion, with: ""), originalTitle)
         XCTAssertTrue(diagnostics.label.contains("refresh=pending"), "Typing must happen before the delayed GET completes.")
         keepScreenshot(named: "Cached Note edited while refresh is pending", from: app)
         let completion = NSPredicate { _, _ in diagnostics.label.contains("settled=true") && diagnostics.label.contains("saves=1;") }
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: completion, object: nil)], timeout: 25), .completed)
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 5))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 5))
         XCTAssertEqual(title.value as? String, expected)
         XCTAssertFalse(app.buttons["native-notebook-retry-save"].exists)
         XCTAssertFalse(app.buttons["Save"].exists)
@@ -1419,6 +1504,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     func testNativeNotebookCachedPendingRefreshRequiresExplicitRetry() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture", "--native-notebook-delayed-refresh-fixture", "--native-notebook-refresh-pending-draft"]
+        app.launchArguments.append("--native-notebook-save-diagnostics")
         app.launch()
         let title = app.textFields["Note title"]
         let diagnostics = app.staticTexts["native-notebook-refresh-diagnostics"]
@@ -1432,7 +1518,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(retry.waitForExistence(timeout: 5))
         keepScreenshot(named: "Cached pending Note waits for explicit retry after successful refresh", from: app)
         retry.tap()
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 15))
         XCTAssertTrue(diagnostics.label.contains("saves=1;"))
         XCTAssertTrue(diagnostics.label.contains("mutation=native-refresh-original-mutation"))
         XCTAssertEqual(title.value as? String, "Pending original mutation")
@@ -1440,10 +1526,51 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Cached pending Note retries original mutation once", from: app)
     }
 
+    func testNativeNotebookTypingDuringAutosaveKeepsTheFirstRequest() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
+            "--native-notebook-reference-fixture", "--native-notebook-slow-save-fixture"]
+        app.launchArguments.append("--native-notebook-save-diagnostics")
+        app.launch()
+        let title = app.textFields["Note title"]
+        let diagnostics = app.staticTexts["native-notebook-refresh-diagnostics"]
+        XCTAssertTrue(title.waitForExistence(timeout: 30))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 10))
+        XCTAssertFalse(app.staticTexts["Synced"].exists)
+        let originalTitle = title.value as? String
+        title.tap()
+        let firstInsertion = " first edit"
+        title.typeText(firstInsertion)
+        let firstTitle = title.value as? String
+        XCTAssertTrue(firstTitle?.contains(firstInsertion) == true)
+        XCTAssertEqual(firstTitle?.replacingOccurrences(of: firstInsertion, with: ""), originalTitle)
+        let saveStarted = NSPredicate { _, _ in diagnostics.label.contains("saves=1;") }
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: saveStarted, object: nil)], timeout: 5), .completed)
+        XCTAssertEqual(app.buttons["native-notebook-done"].value as? String, "saving")
+        XCTAssertFalse(app.staticTexts["Saving…"].exists)
+        let secondInsertion = " second edit"
+        title.typeText(secondInsertion)
+        let latestTitle = title.value as? String
+        XCTAssertTrue(latestTitle?.contains(secondInsertion) == true)
+        XCTAssertEqual(latestTitle?.replacingOccurrences(of: secondInsertion, with: ""), firstTitle)
+        XCTAssertEqual(app.buttons["native-notebook-done"].value as? String, "saving")
+        XCTAssertFalse(app.staticTexts["Saving…"].exists)
+        XCTAssertFalse(app.buttons["native-notebook-retry-save"].exists)
+
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 20))
+        XCTAssertFalse(app.staticTexts["Synced"].exists)
+        XCTAssertFalse(app.staticTexts["Draft kept on this iPhone"].exists)
+        XCTAssertEqual(title.value as? String, latestTitle)
+        XCTAssertTrue(diagnostics.label.contains("saves=2;"), "Each edit should save once. \(diagnostics.label)")
+        XCTAssertFalse(app.buttons["native-notebook-retry-save"].exists)
+        XCTAssertTrue(app.buttons["native-notebook-done"].isEnabled)
+    }
+
     func testNativeNotebookOfflineSaveKeepsDraftAndRetryRecovers() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
             "--native-notebook-reference-fixture", "--native-notebook-save-offline-fixture"]
+        app.launchArguments.append("--native-notebook-save-diagnostics")
         app.launch()
         let title = app.textFields["Note title"]
         XCTAssertTrue(title.waitForExistence(timeout: 30))
@@ -1455,7 +1582,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(title.value as? String, editedTitle)
         keepScreenshot(named: "Offline Note draft with Retry save", from: app)
         retry.tap()
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 15))
         XCTAssertEqual(title.value as? String, editedTitle)
         XCTAssertFalse(retry.exists)
         XCTAssertFalse(app.buttons["Save"].exists, "A healthy editor should not regain a redundant Save button.")
@@ -1478,6 +1605,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-http-fixture"]
         app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_URL"] = base.absoluteString
         app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_TOKEN"] = token
+        app.launchArguments.append("--native-notebook-save-diagnostics")
         app.launch()
         let title = app.textFields["Note title"]
         XCTAssertTrue(title.waitForExistence(timeout: 30))
@@ -1489,7 +1617,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(title.value as? String, editedTitle)
         keepScreenshot(named: "HTTP response lost after Note creation", from: app)
         retry.tap()
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 15))
         XCTAssertEqual(title.value as? String, editedTitle)
         XCTAssertFalse(retry.exists)
         XCTAssertFalse(app.buttons["Save"].exists)
@@ -1531,13 +1659,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-http-fixture"]
         app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_URL"] = base.absoluteString
         app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_TOKEN"] = token
+        app.launchArguments.append("--native-notebook-save-diagnostics")
         app.launch()
         let title = app.textFields["Note title"]
         XCTAssertTrue(title.waitForExistence(timeout: 30))
         title.tap()
         title.typeText(" Synthetic revocation record")
         let originalTitle = try XCTUnwrap(title.value as? String)
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 15))
         _ = try await fixture("fixture/revoke", post: true)
         title.tap()
         title.typeText(" pending after revocation")
@@ -1636,6 +1765,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     func testNativeNotebookConflictRequiresReviewAndDeletionDoesNotRestoreDraft() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-conflict-fixture"]
+        app.launchArguments.append("--native-notebook-save-diagnostics")
         app.launch()
         let cachedDraft = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Local unsynchronized analysis")).firstMatch
         XCTAssertTrue(cachedDraft.waitForExistence(timeout: 30), app.debugDescription)
@@ -1650,7 +1780,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let done = app.buttons["native-notebook-done"]
         XCTAssertTrue(done.exists && done.isHittable)
         done.tap()
-        let noUnreviewedSync = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == true"), object: app.staticTexts["Synced"])
+        let noUnreviewedSync = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", "saved"), object: done)
         noUnreviewedSync.isInverted = true
         XCTAssertEqual(XCTWaiter.wait(for: [noUnreviewedSync], timeout: 2), .completed,
                        "Done must not bypass review and sync a reopened stale draft.")
@@ -1666,7 +1796,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         screenshot.lifetime = .keepAlways
         add(screenshot)
         app.buttons["native-notebook-confirm-conflict"].tap()
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
+        XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 10))
         let noteActions = app.buttons["Note actions"]
         XCTAssertTrue(noteActions.waitForExistence(timeout: 5) && noteActions.isHittable)
         noteActions.tap()

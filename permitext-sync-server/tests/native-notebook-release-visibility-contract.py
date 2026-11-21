@@ -26,9 +26,12 @@ struct NativeNotebookDraft: Codable, Sendable { var cardID: String?; var editedA
 enum ResearchQuestionAttempt { static let cacheScope = "research-question-attempt" }
 struct Owner { let accountID = "A" }
 struct Editor { var isReady = false }
+enum CardReadFailure: Error { case forbidden }
 enum NativePrivateCachePolicy {
- static func requiresInvalidation(after error: Error) -> Bool { false }
- static func permitsOfflineFallback(after error: Error) -> Bool { true }
+ static func requiresInvalidation(after error: Error) -> Bool { error is CardReadFailure }
+ static func permitsOfflineFallback(after error: Error) -> Bool {
+  (error as? URLError)?.code == .notConnectedToInternet
+ }
 }
 enum NativeNotebookOfflineDraftPolicy {
  static func permitsDraftEditing(cachedAccess: NotebookAccess?, after error: Error) -> Bool { false }
@@ -42,12 +45,18 @@ enum NativeNotebookRefreshDecision {
  var rows: [ProjectNotebookCardSummary] = []
  var card: NotebookCard = .init(id: "note", cardType: "finding")
  var offline = false; var cardReads = 0
+ var deniesCardRead = false
+ var delaysCardRead = false
+ var releaseCardRead: CheckedContinuation<Void, Never>?
+ func claimNotebookDraftEditor(_ editor: Editor, owner: Owner, projectID: String, routeID: String, cardID: String?) async {}
  func notebookCards(projectID: String) async throws -> NotebookCardListResponse {
   if offline { throw URLError(.notConnectedToInternet) }
   return .init(cards: rows)
  }
  func notebookCard(projectID: String, cardID: String) async throws -> NotebookCard {
   cardReads += 1
+  if delaysCardRead { await withCheckedContinuation { releaseCardRead = $0 } }
+  if deniesCardRead { throw CardReadFailure.forbidden }
   if offline { throw URLError(.notConnectedToInternet) }
   return card
  }
@@ -57,9 +66,10 @@ enum NativeNotebookRefreshDecision {
  var owner: Owner? = .init(); var isCurrentOwner = true
  let projectID = "P"; var routeID = "note"; var cardID: String? = "note"; var currentCardID: String?
  var isLoading = false; var hasLoaded = false; var needsSave = false; var requiresConflictReview = false
- var saveTask: Task<Void, Never>?; var conflictingCard: NotebookCard?
+ var isSaving = false; var autosaveDebounceTask: Task<Void, Never>?; var conflictingCard: NotebookCard?
+ var retryAfterReconnect = false; var editingReadOnly = false
  var errorMessage: String?; var statusMessage = ""
- var documentEditor = Editor(); var applied: [String] = []; var appliedDraft = false
+ var documentEditor = Editor(); var applied: [String] = []; var appliedVersions: [Int] = []; var appliedDraft = false
  var currentDraft: NativeNotebookDraft { .init(cardID: currentCardID) }
  var cards: [ProjectNotebookCardSummary] = []
  var localDrafts: [(scope: String, value: NativeNotebookDraft)] = []
@@ -68,8 +78,11 @@ enum NativeNotebookRefreshDecision {
  init(_ cache: ProjectHubOfflineCache) { self.cache = cache }
  func flushEditorDraft() async -> Bool { true }
  func saveNow() async {}
+ func retryOfflineSaveIfReady() async {}
  func editableContent(for card: NotebookCard) -> String { card.id }
- func apply(_ card: NotebookCard) { applied.append(card.cardType); hasLoaded = true; currentCardID = card.id }
+ func apply(_ card: NotebookCard) {
+  applied.append(card.cardType); appliedVersions.append(card.version); hasLoaded = true; currentCardID = card.id
+ }
  func apply(_ draft: NativeNotebookDraft) { appliedDraft = true; hasLoaded = true; currentCardID = draft.cardID }
  METHODS
 }
@@ -128,7 +141,27 @@ enum NativeNotebookRefreshDecision {
   let newNote = Harness(cache); newNote.cardID = nil
   await newNote.loadCard()
   precondition(newNote.hasLoaded && newNote.library.cardReads == 0, "New ordinary Notes remain editable offline")
-  print("PASS: actual Notebook cached/network lists and six direct-editor routes hide retained Coordination, preserve disk data, and retain ordinary/new Notes")
+  let savedNote = NotebookCard(id: "note", cardType: "finding", version: 1)
+  try cache.store(savedNote, accountID: "A", projectID: "P", scope: "native-notebook-card:note")
+  let reopened = Harness(cache)
+  reopened.library.card = NotebookCard(id: "note", cardType: "finding", version: 2)
+  reopened.library.delaysCardRead = true
+  let openTask = Task { await reopened.loadCard() }
+  while reopened.library.releaseCardRead == nil { await Task.yield() }
+  precondition(reopened.isLoading && !reopened.hasLoaded && reopened.appliedVersions.isEmpty,
+               "A clean cached revision must never appear while the server fetch is pending")
+  reopened.library.releaseCardRead?.resume()
+  await openTask.value
+  precondition(reopened.hasLoaded && reopened.appliedVersions == [2], "Show the current server revision first")
+  let offline = Harness(cache)
+  offline.library.offline = true
+  await offline.loadCard()
+  precondition(offline.hasLoaded && offline.appliedVersions == [2], "Keep the last saved revision available offline")
+  let revoked = Harness(cache)
+  revoked.library.deniesCardRead = true
+  await revoked.loadCard()
+  precondition(!revoked.hasLoaded && revoked.appliedVersions.isEmpty, "Never show saved content after access is revoked")
+  print("PASS: Notebook release visibility, draft recovery, current-revision opening, offline fallback and revoked access")
  }
 }
 '''.replace(' METHODS', '\n'.join(method(name) for name in ['loadCard(', 'showUnavailableCoordinationCard()', 'loadCards(']))

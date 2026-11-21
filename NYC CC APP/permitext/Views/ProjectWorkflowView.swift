@@ -3,12 +3,13 @@ import SwiftUI
 struct ProjectWorkflowView: View {
     let folderID: Int64
     let section: ProjectOverviewSection
-
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var editingFolder: CodeFolder?
     @State private var editingSessionID: UUID?
     @State private var questions: [ProjectOpenQuestion] = []
     @State private var records: [ProjectChecklistRecord] = []
+    @FocusState private var focusedRowID: String?
+    @State private var newRowID: String?
     @State private var saveError: String?
     @State private var initialSyncFinished = false
 
@@ -51,7 +52,13 @@ struct ProjectWorkflowView: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .tint(Color.appChrome)
+        .navigationBarBackButtonHidden(isEditing)
         .toolbar {
+            if isEditing {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel", action: cancel)
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 if isEditing {
                     Button("Save", action: save).fontWeight(.semibold)
@@ -62,13 +69,7 @@ struct ProjectWorkflowView: View {
                         .accessibilityIdentifier("project-workflow-edit")
                 }
             }
-            if isEditing {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Button("Cancel", action: cancel)
-                    Spacer()
-                    Button("Save", action: save).fontWeight(.semibold)
-                }
-            }
+
         }
         .onChange(of: library.privateSessionID) { _, _ in cancel() }
         .onChange(of: folderID) { _, _ in cancel() }
@@ -88,6 +89,13 @@ struct ProjectWorkflowView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             TextField("What needs to be answered?", text: $question.question, axis: .vertical)
                                 .font(.headline)
+                                .focused($focusedRowID, equals: question.id)
+                                .onAppear {
+                                    if newRowID == question.id {
+                                        focusedRowID = question.id
+                                        newRowID = nil
+                                    }
+                                }
                                 .accessibilityLabel("Question \(index + 1)")
                                 .accessibilityIdentifier("project-question-text-\(index)")
                             TextField("Add an answer", text: $question.answer, axis: .vertical)
@@ -130,6 +138,13 @@ struct ProjectWorkflowView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             TextField("Record name", text: $record.label, axis: .vertical)
                                 .font(.headline)
+                                .focused($focusedRowID, equals: record.id)
+                                .onAppear {
+                                    if newRowID == record.id {
+                                        focusedRowID = record.id
+                                        newRowID = nil
+                                    }
+                                }
                                 .accessibilityLabel("Record \(index + 1)")
                                 .accessibilityIdentifier("project-record-label-\(index)")
                             Picker("Status", selection: $record.status) {
@@ -176,8 +191,15 @@ struct ProjectWorkflowView: View {
             Button {
                 if !isEditing { beginEditing() }
                 guard isEditing else { return }
-                if isQuestions { questions.append(ProjectOpenQuestion()) }
-                else { records.append(ProjectChecklistRecord()) }
+                if isQuestions {
+                    let question = ProjectOpenQuestion()
+                    newRowID = question.id
+                    questions.append(question)
+                } else {
+                    let record = ProjectChecklistRecord()
+                    newRowID = record.id
+                    records.append(record)
+                }
             } label: { Label(isQuestions ? "Add question" : "Add record", systemImage: "plus") }
                 .disabled(folder == nil || needsInitialSync || (isQuestions ? (isEditing ? questions.count : savedQuestions.count) >= 100 : (isEditing ? records.count : savedRecords.count) >= 50))
                 .accessibilityIdentifier("project-workflow-add")
@@ -192,14 +214,7 @@ struct ProjectWorkflowView: View {
                 .disabled(folder == nil || needsInitialSync)
                 .accessibilityIdentifier("project-checklist-suggested")
             }
-            if isEditing {
-                HStack {
-                    Button("Cancel", action: cancel).accessibilityIdentifier("project-workflow-cancel")
-                    Spacer()
-                    Button("Save", action: save).fontWeight(.semibold)
-                        .accessibilityIdentifier("project-workflow-bottom-save")
-                }
-            }
+
         }
         .buttonStyle(.plain)
         .frame(minHeight: 44)

@@ -649,6 +649,11 @@ private struct Phase3EntitledResearchConfiguration {
                     let attempt = NativeNotebookSaveAttempt(clientMutationID: "native-refresh-original-mutation", cardID: card.id, expectedVersion: 1, content: content)
                     let draft = NativeNotebookDraft(cardID: card.id, version: 1, title: content.title, document: content.document, evidenceLinks: [], clientMutationID: attempt.clientMutationID, pendingSave: attempt, baseContent: NativeNotebookEditableContent(title: card.title, document: card.document, evidenceLinks: []))
                     try cache.store(draft, accountID: account.appUserID, projectID: "native-notebook-fixture", scope: "native-notebook-draft:native-reference-card")
+                } else if ProcessInfo.processInfo.arguments.contains("--native-notebook-refresh-unsaved-draft") {
+                    let base = NativeNotebookEditableContent(title: card.title, document: card.document, evidenceLinks: [])
+                    let draft = NativeNotebookDraft(cardID: card.id, version: card.version, title: "Local reference draft",
+                        document: card.document, evidenceLinks: [], clientMutationID: "native-refresh-local-draft", baseContent: base)
+                    try cache.store(draft, accountID: account.appUserID, projectID: "native-notebook-fixture", scope: "native-notebook-draft:native-reference-card")
                 }
             }
             if ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") {
@@ -1644,10 +1649,7 @@ private struct PermitextTabNavigation: View {
             projectHomePath = NavigationPath()
         }
         .onChange(of: library.openProjectID) { _, _ in projectHomePath = NavigationPath() }
-        .onChange(of: library.selectedTab) { previous, tab in
-            if tab == .bookmarks, previous != .bookmarks {
-                projectHomePath = NavigationPath()
-            }
+        .onChange(of: library.selectedTab) { _, tab in
             guard showsCodeLibrary, tab == .research else { return }
             library.selectedTab = library.selectedReaderContext == .secondary ? .browseSecondary : .browse
             presentsLibraryAccount = true

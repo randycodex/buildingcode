@@ -1,5 +1,7 @@
-import { mountPermitextNotebookEditor } from "./notebook-editor.js";
+import { applyNotebookTableAction, mountPermitextNotebookEditor, notebookTableActions } from "./notebook-editor.js";
 import { nativeNotebookDocumentSnapshot } from "./native-notebook-state.js";
+import { notebookFontSizes, notebookLineSpacings } from "../public/notebook-styles.js";
+import { appendFindingTemplate } from "../public/project-workflow.js";
 import "./native-notebook.css";
 
 // The editor is shipped in the app. Networking, identity and persistence remain
@@ -12,6 +14,7 @@ let ready;
 let replacing = false;
 let readOnly = false;
 let insertionPosition;
+let referencePosition;
 let nextRequest = 0;
 let lastHeight = 0;
 let measureFrame = 0;
@@ -56,13 +59,21 @@ function traceInput(event, details = {}) {
   traceTimer = setTimeout(() => post("inputDiagnostics", { trace: inputTrace }), 150);
 }
 
-function snapshot() {
+function formattingSnapshot() {
   const styles = editor?.getActiveStyles() || {};
-  return { session, revision, document: nativeNotebookDocumentSnapshot(controller.getDocument()), formatting: {
+  const history = editor?.getExtension("yUndo") || editor?.getExtension("history");
+  return {
     bold: !!styles.bold, italic: !!styles.italic, strike: !!styles.strike,
+    canUndo: Boolean(history && editor.canExec(history.undoCommand)),
+    canRedo: Boolean(history && editor.canExec(history.redoCommand)),
+    tableActions: notebookTableActions(editor).map(choice => ({ ...choice, disabled: Boolean(choice.disabled) })),
     blockType: editor?.getTextCursorPosition().block.type || "paragraph",
     selectedText: editor?.getSelectedText() || "", linkURL: editor?.getSelectedLinkUrl() || ""
-  } };
+  };
+}
+
+function snapshot() {
+  return { session, revision, document: nativeNotebookDocumentSnapshot(controller.getDocument()), formatting: formattingSnapshot() };
 }
 
 // DOM blur can commit IME/autocorrect text after the native button tap. In
@@ -211,7 +222,7 @@ async function configure(command) {
         traceInput("mounted");
         editor.onSelectionChange(() => {
           if (!replacing) insertionPosition = controller.getEditingPosition();
-          post("formatting", { formatting: snapshot().formatting });
+          post("formatting", { formatting: formattingSnapshot() });
           measure(true);
         });
         measure();
@@ -302,8 +313,8 @@ window.PermitextNativeNotebook = {
       case "focus":
         traceInput("focus-request");
         if (!readOnly) {
-          if (insertionPosition) controller.restoreEditingPosition(insertionPosition);
           controller.focus();
+          controller.restoreEditingPosition(command.position ?? insertionPosition);
         }
         return snapshot();
       case "captureSelection":
@@ -312,6 +323,10 @@ window.PermitextNativeNotebook = {
         return snapshot();
       case "blur": return finalizeEditing();
       case "format":
+      case "fontSize":
+      case "lineSpacing":
+      case "table":
+      case "findingTemplate":
       case "blockType":
       case "link":
       case "undo":
@@ -328,14 +343,41 @@ window.PermitextNativeNotebook = {
         }
         if (!["undo", "redo"].includes(command.type)) restoreInsertionPosition();
         if (command.type === "format") {
-          if (!["bold", "italic", "strike"].includes(command.style)) throw new Error("Unsupported text style.");
-          editor.toggleStyles({ [command.style]: true });
+          if (command.style === "highlight") {
+            if (editor.getActiveStyles().backgroundColor === "yellow") editor.removeStyles({backgroundColor: "yellow"});
+            else editor.addStyles({backgroundColor: "yellow"});
+          } else {
+            if (!["bold", "italic", "strike", "underline"].includes(command.style)) throw new Error("Unsupported text style.");
+            editor.toggleStyles({ [command.style]: true });
+          }
+        } else if (command.type === "fontSize") {
+          if (command.value === "default") editor.removeStyles({fontSize: editor.getActiveStyles().fontSize || ""});
+          else {
+            if (!notebookFontSizes.includes(command.value)) throw new Error("Unsupported font size.");
+            editor.addStyles({fontSize: command.value});
+          }
+        } else if (command.type === "lineSpacing") {
+          if (!notebookLineSpacings.includes(command.value)) throw new Error("Unsupported line spacing.");
+          const blocks = editor.getSelection()?.blocks || [editor.getTextCursorPosition().block];
+          editor.transact(() => {
+            for (const block of blocks) {
+              if (["paragraph", "heading", "bulletListItem", "numberedListItem"].includes(block.type)) {
+                editor.updateBlock(block, {props: {lineSpacing: command.value}});
+              }
+            }
+          });
+        } else if (command.type === "table") {
+          if (!applyNotebookTableAction(editor, command.value)) throw new Error("Select a table cell to use this action.");
+        } else if (command.type === "findingTemplate") {
+          const template = appendFindingTemplate(undefined, () => undefined).document;
+          const inserted = editor.insertBlocks(template, editor.document.at(-1), "after");
+          editor.setTextCursorPosition(inserted[1], "start");
         } else if (command.type === "blockType") {
           if (!["paragraph", "heading", "bulletListItem", "numberedListItem"].includes(command.blockType)) throw new Error("Unsupported paragraph style.");
           const blocks = editor.getSelection()?.blocks || [editor.getTextCursorPosition().block];
           editor.transact(() => {
             for (const block of blocks) {
-              if (block.type === "image") continue;
+              if (!["paragraph", "heading", "bulletListItem", "numberedListItem"].includes(block.type)) continue;
               editor.updateBlock(block, { type: command.blockType,
                 ...(command.blockType === "heading" ? { props: { level: command.level || 2 } } : {}) });
             }
@@ -354,7 +396,7 @@ window.PermitextNativeNotebook = {
         else controller.redo();
         controller.focus();
         insertionPosition = controller.getEditingPosition();
-        post("formatting", { formatting: snapshot().formatting });
+        post("formatting", { formatting: formattingSnapshot() });
         measure(true);
         return snapshot();
       }
@@ -378,10 +420,13 @@ window.PermitextNativeNotebook = {
 };
 
 for (const eventName of ["beforeinput", "input"]) {
-  mount.addEventListener(eventName, event => traceInput(eventName, {
-    data: event.data ?? null, inputType: event.inputType || "", trusted: event.isTrusted === true,
-    eventComposing: event.isComposing === true, prevented: event.defaultPrevented === true
-  }), true);
+  mount.addEventListener(eventName, event => {
+    if (eventName === "beforeinput") clearFirstCellFocus();
+    traceInput(eventName, {
+      data: event.data ?? null, inputType: event.inputType || "", trusted: event.isTrusted === true,
+      eventComposing: event.isComposing === true, prevented: event.defaultPrevented === true
+    });
+  }, true);
 }
 mount.addEventListener("compositionstart", event => {
   composing = true;
@@ -395,26 +440,133 @@ mount.addEventListener("compositionend", event => {
   traceInput("compositionend", { data: event?.data ?? null, trusted: event?.isTrusted === true });
   for (const resolve of [...compositionWaiters]) resolve();
 });
+const interactiveContent = "a, button, [data-permitext-reference]";
+let firstCellTap = null;
+let firstCellCaret = null;
+function clearFirstCellFocus() {
+  firstCellTap = null;
+  firstCellCaret = null;
+}
 mount.addEventListener("pointerdown", (event) => {
-  if (event.target.closest("[data-permitext-reference]")) {
-    insertionPosition = controller.getEditingPosition();
+  clearFirstCellFocus();
+  const target = event.target;
+  const cell = target.closest("td, th");
+  firstCellTap = cell && event.isPrimary && event.button === 0 && !event.shiftKey && !readOnly &&
+      editor && !editor.isFocused() && !target.closest(interactiveContent)
+    ? { cell, x: event.clientX, y: event.clientY, time: event.timeStamp } : null;
+  if (target.closest("[data-permitext-reference]")) {
+    referencePosition = controller.getEditingPosition();
     // Opening a source is navigation, not moving the text caret to that chip.
     event.preventDefault();
   }
+}, true);
+mount.addEventListener("pointercancel", clearFirstCellFocus, true);
+mount.addEventListener("keydown", clearFirstCellFocus, true);
+mount.addEventListener("focusout", clearFirstCellFocus, true);
+mount.addEventListener("focusin", event => {
+  const tap = firstCellTap;
+  firstCellTap = null;
+  if (!tap || readOnly || composing || event.timeStamp - tap.time > 1000) return;
+  const view = editor.prosemirrorView;
+  if (event.target !== view.dom || !view.dom.contains(tap.cell)) return;
+
+  // On the first tap in a cell WebKit can focus the editor without sending
+  // a click. Adopt the tapped character during focus, before the initial
+  // document selection can overwrite the caret.
+  const hit = document.caretRangeFromPoint(tap.x, tap.y);
+  const selection = window.getSelection();
+  const hitCell = hit && tap.cell.contains(hit.startContainer);
+  const node = hitCell ? hit.startContainer : selection?.focusNode;
+  const offset = hitCell ? hit.startOffset : selection?.focusOffset;
+  if (!node || !tap.cell.contains(node)) return;
+  const position = view.posAtDOM(node, offset);
+  if (view.state.doc.resolve(position).parent.type.name !== "tableParagraph") return;
+  firstCellCaret = { doc: view.state.doc, position, node, offset, until: event.timeStamp + 300 };
+  editor._tiptapEditor.commands.setTextSelection(position);
+}, true);
+// On first focus WebKit can reuse the initial model selection. Resolve a
+// single tap against the rendered text before opening the keyboard.
+let firstTouch = null;
+let firstTap = null;
+mount.addEventListener("touchstart", event => {
+  firstTap = null;
+  const touch = event.touches[0];
+  firstTouch = event.touches.length === 1 && !readOnly && editor && !editor.isFocused()
+    && event.target.closest(".ProseMirror") && !event.target.closest(interactiveContent + ", td, th")
+    ? { x: touch.clientX, y: touch.clientY, time: event.timeStamp } : null;
+}, { passive: true });
+mount.addEventListener("touchcancel", () => { firstTouch = null; firstTap = null; });
+mount.addEventListener("touchend", event => {
+  const start = firstTouch;
+  firstTouch = null;
+  if (!start || event.touches.length || event.timeStamp - start.time > 400) return;
+  const touch = event.changedTouches[0];
+  if (Math.hypot(touch.clientX - start.x, touch.clientY - start.y) > 8) return;
+  const view = editor.prosemirrorView;
+  const hit = view.posAtCoords({ left: touch.clientX, top: touch.clientY });
+  if (!hit || !view.state.doc.resolve(hit.pos).parent.inlineContent) return;
+  firstTap = { position: hit.pos, doc: view.state.doc, time: event.timeStamp };
+}, { capture: true, passive: true });
+mount.addEventListener("click", event => {
+  const tap = firstTap;
+  firstTap = null;
+  if (!tap || readOnly || composing || event.defaultPrevented || event.timeStamp - tap.time > 400 ||
+      event.target.closest(interactiveContent + ", td, th")) return;
+  const view = editor.prosemirrorView;
+  if (view.state.doc !== tap.doc) return;
+  // Restore selection during the trusted click, when WebKit can activate typing.
+  view.dom.blur();
+  view.dom.focus({ preventScroll: true });
+  editor._tiptapEditor.commands.setTextSelection(tap.position);
 });
-mount.addEventListener("click", (event) => {
+function activateReference(event) {
   const reference = event.target.closest("[data-permitext-reference]");
   if (reference) {
     event.preventDefault();
-    post("reference", { reference: {
+    post("reference", { position: referencePosition ?? controller.getEditingPosition(), reference: {
       referenceKind: reference.dataset.referenceKind,
       referenceID: reference.dataset.referenceId,
       label: reference.dataset.referenceLabel
     } });
+    referencePosition = null;
   }
-});
+}
+mount.addEventListener("touchend", activateReference, { capture: true, passive: false });
+mount.addEventListener("click", activateReference, true);
 new ResizeObserver(() => measure()).observe(mount);
-document.addEventListener("selectionchange", () => measure(true));
+document.addEventListener("selectionchange", event => {
+  const selection = window.getSelection();
+  const caret = firstCellCaret;
+  if (caret) {
+    const view = editor.prosemirrorView;
+    if (event.timeStamp > caret.until || readOnly || composing || !view.hasFocus() ||
+        view.state.doc !== caret.doc || !view.dom.contains(caret.node) || !selection?.isCollapsed) {
+      firstCellCaret = null;
+    } else if (selection.focusNode !== caret.node || selection.focusOffset !== caret.offset) {
+      // WebKit can reset the DOM caret after the first focus has painted.
+      // Correct it before ProseMirror reads that transient selection.
+      selection.collapse(caret.node, caret.offset);
+      if (view.state.selection.head !== caret.position) {
+        editor._tiptapEditor.commands.setTextSelection(caret.position);
+      }
+      measure(true);
+      return;
+    }
+  }
+  const node = selection?.focusNode;
+  const element = node?.nodeType === 1 ? node : node?.parentElement;
+  if (!readOnly && !composing && editor?.isFocused() && selection?.isCollapsed && mount.contains(element) && element.closest("td, th")) {
+    // WebKit can draw the caret in an empty cell before ProseMirror has
+    // moved its model selection there. Keep the native table menu and typing
+    // on the cell the user actually selected.
+    const view = editor.prosemirrorView;
+    const position = view.posAtDOM(node, selection.focusOffset);
+    if (view.state.selection.head !== position && view.state.doc.resolve(position).parent.type.name === "tableParagraph") {
+      editor._tiptapEditor.commands.setTextSelection(position);
+    }
+  }
+  measure(true);
+}, true);
 window.addEventListener("error", (event) => post("error", { message: event.message || "The note editor could not load." }));
 window.addEventListener("unhandledrejection", (event) => post("error", { message: event.reason?.message || "The note editor could not complete this action." }));
 post("loaded");

@@ -18,6 +18,7 @@ struct ProjectHubOfflineCache: Sendable {
         let cachedAt: String
         let value: Value
         var scope: String? = nil
+        var projectID: String? = nil
     }
 
     private let directoryURL: URL
@@ -61,7 +62,8 @@ struct ProjectHubOfflineCache: Sendable {
         try? mutableDirectoryURL.setResourceValues(directoryValues)
 
         let cachedAt = ISO8601DateFormatter().string(from: Date())
-        let envelope = Envelope(schemaVersion: 2, cachedAt: cachedAt, value: value, scope: scope)
+        let envelope = Envelope(schemaVersion: 2, cachedAt: cachedAt, value: value, scope: scope,
+                                projectID: scope.hasPrefix("native-notebook-draft:") ? projectID : nil)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         let data = try encoder.encode(envelope)
@@ -102,6 +104,32 @@ struct ProjectHubOfflineCache: Sendable {
             guard let envelope = try? JSONDecoder().decode(Envelope<Value>.self, from: Data(contentsOf: url)),
                   let scope = envelope.scope, scope.hasPrefix(scopePrefix) else { return nil }
             return (scope, envelope.value)
+        }
+    }
+
+    func notebookDraftEntries<Value: Codable & Sendable>(
+        _ type: Value.Type, accountID: String, knownProjectIDs: Set<String>
+    ) throws -> [(projectID: String, scope: String, value: Value)] {
+        Self.accessLock.lock()
+        defer { Self.accessLock.unlock() }
+        guard !isDeleted(accountID) else { return [] }
+        let directory = accountDirectoryURL(accountID: accountID)
+        guard FileManager.default.fileExists(atPath: directory.path) else { return [] }
+        let legacyIDs = Dictionary(knownProjectIDs.map { (digest($0), $0) }, uniquingKeysWith: { first, _ in first })
+        let decoder = JSONDecoder()
+        return try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil).flatMap { project in
+            let files = (try? FileManager.default.contentsOfDirectory(at: project, includingPropertiesForKeys: nil)) ?? []
+            return files.compactMap { file -> (projectID: String, scope: String, value: Value)? in
+                guard file.lastPathComponent.hasPrefix("draft-"),
+                      let data = try? Data(contentsOf: file),
+                      let entry = try? decoder.decode(Envelope<Value>.self, from: data),
+                      [1, 2].contains(entry.schemaVersion),
+                      let scope = entry.scope, scope.hasPrefix("native-notebook-draft:"),
+                      let projectID = entry.projectID ?? legacyIDs[project.lastPathComponent],
+                      digest(projectID) == project.lastPathComponent,
+                      file.lastPathComponent == "draft-\(digest(scope)).json" else { return nil }
+                return (projectID, scope, entry.value)
+            }
         }
     }
 

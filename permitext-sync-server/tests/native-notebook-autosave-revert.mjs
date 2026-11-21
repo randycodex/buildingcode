@@ -8,6 +8,8 @@ import {join} from 'node:path';
 const read = p => readFile(new URL(p, import.meta.url), 'utf8');
 const editor = await read('../../NYC CC APP/permitext/Views/NotebookView.swift');
 const models = await read('../../NYC CC APP/permitext/Models/ResearchNotebookModels.swift');
+const viewModel = await read('../../NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift');
+const cache = await read('../../NYC CC APP/permitext/Data/ProjectHubOfflineCache.swift');
 function block(source, marker, indent = '') {
  const start = source.indexOf(marker);
  assert.ok(start >= 0, `Missing production declaration ${marker}`);
@@ -18,12 +20,16 @@ function block(source, marker, indent = '') {
 const declarations = models.slice(models.indexOf('struct NotebookQuestion:')) + '\n' +
  ['NativeNotebookDraft', 'NativeNotebookSaveAttempt', 'NativeNotebookEditableContent', 'NativeNotebookEditObservation']
  .map(name => block(editor, `struct ${name}`)).join('\n');
-const methods = ['private func scheduleAutosave()', 'private func saveNow()', 'private var currentDraft:',
+const methods = ['private func scheduleAutosave()', 'private func retryOfflineSaveIfReady()', 'private func shouldRetryAfterReconnect(',
+ 'private func saveNow()', 'private var currentDraft:',
  'private func cacheDraft()', 'private var editableContent:', 'private func editableContent(for card:',
  'private func normalizedTitle(', 'private func apply(_ card:', 'private func apply(_ draft:', 'private func editableContent(for draft:', 'private func completeSave(']
  .map(marker => (marker === 'private func cacheDraft()' ? '    @discardableResult\n' : '') + block(editor, `    ${marker}`, '    ')).join('\n');
 const fixture = await read('./fixtures/native-notebook-autosave-revert.swift');
-const source = 'import Foundation\n' + declarations + '\n' + fixture.replace('// PRODUCTION_METHODS', methods);
+const source = cache.slice(0, cache.indexOf('/// Serial disk/serialization work')) + '\n' + declarations + '\n' +
+ block(cache, 'struct NativePrivateRequestIdentity:') + '\n' + block(viewModel, 'private struct NotebookDraftAddress') + '\n' +
+ fixture.replace('// PRODUCTION_METHODS', methods).replace('// CLOSED_REPLAY_METHOD',
+  block(viewModel, '    private func replayClosedNotebookDraft(at address:', '    ').replace('private func', 'fileprivate func'));
 const dir = await mkdtemp(join(tmpdir(), 'permitext-note-revert-'));
 try {
  await writeFile(join(dir, 'verify.swift'), source);
@@ -36,11 +42,11 @@ try {
  await writeFile(join(dir, 'mutant.swift'), mutant);
  execFileSync('xcrun', ['swiftc', '-parse-as-library', join(dir, 'mutant.swift'), '-o', join(dir, 'mutant')], {stdio:'pipe'});
  assert.throws(() => execFileSync(join(dir, 'mutant'), [join(dir, 'mutant.json')], {stdio:'pipe'}),
-  error => error.status === 1 && error.stderr.toString().includes('Reverting before debounce must clear Saving'));
- console.log('PASS: temporary compiled pre-fix mutant fails the status regression.');
+  error => error.status === 1 && error.stderr.toString().includes('Reverting before debounce must cancel the queued save'));
+ console.log('PASS: temporary compiled pre-fix mutant fails the queued-save regression.');
  const omission = 'openQuestions: attempt.preservesServerQuestions == true ? nil : attempt.content.openQuestions';
  assert.ok(source.includes(omission));
- const questionMutant = source.replace(omission, 'openQuestions: attempt.content.openQuestions');
+ const questionMutant = source.replaceAll(omission, 'openQuestions: attempt.content.openQuestions');
  await writeFile(join(dir, 'question-mutant.swift'), questionMutant);
  execFileSync('xcrun', ['swiftc', '-parse-as-library', join(dir, 'question-mutant.swift'), '-o', join(dir, 'question-mutant')], {stdio:'pipe'});
  assert.throws(() => execFileSync(join(dir, 'question-mutant'), [join(dir, 'question-mutant.json')], {stdio:'pipe'}),

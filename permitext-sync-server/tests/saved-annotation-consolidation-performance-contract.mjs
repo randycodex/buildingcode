@@ -41,12 +41,13 @@ const context = vm.createContext({
   activeAccount: () => ({ userID: "synthetic-a" }),
   syncedContent: { userID: "synthetic-a", summary: {} },
   currentContentSummary() { summaryReads++; return { annotations }; },
+  projectUpdateRecords: () => ({}),
   currentBulkClearRecords: () => clears
 });
 vm.runInContext([
   "normalizeAnnotationBlockID", "normalizeAnnotationTags", "annotationRecordsForTarget",
   "annotationForTarget", "annotationEvidenceIsVisible", "consolidatedSavedAnnotations",
-  "savedEvidenceKey", "safeAnnotationIDPart"
+  "savedEvidenceKey", "safeAnnotationIDPart", "projectSummaryWithPendingUpdates"
 ].map(actual).join("\n") + "\n" + previousConsolidation.toString(), context);
 const plain = value => JSON.parse(JSON.stringify(value));
 const base = { sectionID: 101, codeVersion: defaultSyncCodeVersion, updatedAt: "2026-09-01T00:00:00Z" };

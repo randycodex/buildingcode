@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
+import {mergeProjectURLNames, projectURLSlug} from "../public/project-urls.js";
 import { emptyWorkspaceLayout, captureWorkspaceLayout, applyWorkspaceLayout, canGroupColumn } from "../public/workspace-state.js";
 
 const app = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
@@ -348,6 +349,7 @@ const mutations = [], pending = [], settingsNames = [];
 let canonical = copy(alpha), identities = [copy(alpha)];
 const localState = { localProjects: [] };
 const u = vm.createContext({ state: localState,
+  mergeProjectURLNames, projectURLSlug, syncProjectWorkspaceURL() {}, refreshProjectURLCatalog() {},
   hasCapability: () => true, requirePrivateWorkspaceWritable() {}, captureAccountRequest: () => ({}), requireCurrentAccountRequest() {},
   projectRecordID: project => project.id, projectDetailMatches: (a, b) => a.id === b.id,
   currentContentSummary: () => ({ projects: [canonical] }),

@@ -3389,7 +3389,11 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 #if DEBUG
 enum NativeNotebookRefreshFixtureDiagnostics {
     static var defaults: UserDefaults { UserDefaults(suiteName: "com.randycodex.permitext.notebook-refresh-fixture")! }
-    static var enabled: Bool { ProcessInfo.processInfo.arguments.contains("--phase3-entitled-research-fixture") && ProcessInfo.processInfo.arguments.contains("--native-notebook-delayed-refresh-fixture") }
+    static var delaysRefresh: Bool { ProcessInfo.processInfo.arguments.contains("--native-notebook-delayed-refresh-fixture") }
+    static var delaysFirstSave: Bool { ProcessInfo.processInfo.arguments.contains("--native-notebook-slow-save-fixture") }
+    static var enabled: Bool {
+        ProcessInfo.processInfo.arguments.contains("--phase3-entitled-research-fixture") && (delaysRefresh || delaysFirstSave)
+    }
     static var label: String {
         let store = defaults
         let completed = store.double(forKey: "completedAt")
@@ -3417,7 +3421,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     private let researchResponseDelay: Bool
     private var notebookFixtureCard: NotebookCard?
     private var notebookReferenceTarget: NotebookCard?
-    private var notebookRefreshDelayRemaining = NativeNotebookRefreshFixtureDiagnostics.enabled
+    private var notebookRefreshDelayRemaining = NativeNotebookRefreshFixtureDiagnostics.delaysRefresh
 
     init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil, notebookListFailureOnce: Bool = false, researchResponseDelay: Bool = false, notebookConflictFixture: Bool = false, notebookReferenceFixture: Bool = false, notebookSaveFailureOnce: Bool = false, projectPartialLookupFixture: Bool = false) {
         self.projectPartialLookupFixture = projectPartialLookupFixture
@@ -4053,8 +4057,12 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         #if DEBUG
         if NativeNotebookRefreshFixtureDiagnostics.enabled {
             let diagnostics = NativeNotebookRefreshFixtureDiagnostics.defaults
-            diagnostics.set(diagnostics.integer(forKey: "saves") + 1, forKey: "saves")
+            let saveCount = diagnostics.integer(forKey: "saves") + 1
+            diagnostics.set(saveCount, forKey: "saves")
             diagnostics.set(request.clientMutationID ?? "missing", forKey: "mutation")
+            if saveCount == 1 && NativeNotebookRefreshFixtureDiagnostics.delaysFirstSave {
+                try await Task.sleep(for: .seconds(8))
+            }
         }
         if notebookSaveFailureRemaining {
             notebookSaveFailureRemaining = false
@@ -5602,7 +5610,8 @@ protocol AccountBackendClient {
         account: SignedInAccount,
         projectID: String,
         cardID: String,
-        expectedVersion: Int
+        expectedVersion: Int,
+        recoverable: Bool?
     ) async throws
     func uploadNotebookAsset(
         account: SignedInAccount,

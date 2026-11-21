@@ -10,13 +10,14 @@ import {
   matchLocalSearch,
   localSearchPermits,
   finishLocalSearch,
+  localSearchPage,
   offlineSectionMetadata,
-} from "./downloaded-library-core.js?v=14";
+} from "./downloaded-library-core.js?v=15";
 import {
   offlineAssetNamesForChapter,
   resolveOfflineSectionMetadata,
-} from "./offline-code-metadata.js?v=1";
-import { searchReaderTextSections } from "./reader-search-match.js?v=20261026-exact-section-v4";
+} from "./offline-code-metadata.js?v=2";
+import { searchReaderTextSections } from "./reader-search-match.js?v=20261120-matching-v5";
 import {
   defaultSyncCodeVersion,
   historicalConstructionSyncCodeVersion,
@@ -690,7 +691,7 @@ async function search(url, m, signal) {
   if (completedSearches.has(cacheKey)) {
     const matches = await completedSearches.get(cacheKey);
     signal.throwIfAborted();
-    return finishLocalSearch(matches, url, context);
+    return localSearchPage(matches, url, context);
   }
   const words = searchWords(context.matchQuery).filter((word) => word.length >= 2);
   if (context.query.length < 2 || !words.length)
@@ -763,14 +764,14 @@ async function search(url, m, signal) {
       ids.slice(start, start + 64),
     )) {
       if (row) {
-        const match = matchLocalSearch(row.value, context, m.metadata);
+        const match = matchLocalSearch(row.value, context);
         if (match) matches.push(match);
       }
     }
   }
   signal.throwIfAborted();
-  if (matches.length) completedSearches.set(cacheKey, matches);
   const result = finishLocalSearch(matches, url, context);
+  if (matches.length) completedSearches.set(cacheKey, matches);
   if (!matches.length && !context.scope?.isEmpty) {
     const terms = new Set();
     for (const source of m.codeSources) {

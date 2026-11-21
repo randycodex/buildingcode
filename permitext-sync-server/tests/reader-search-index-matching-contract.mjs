@@ -10,6 +10,10 @@ const context=vm.createContext({readerSearchMatch,snippetForMatch,readerSearchRe
  annotationTargetForBlock:(_section,block)=>({blockID:block.id}),
  plainTextForSearchBlock:block=>block.plainText});
 vm.runInContext(source.slice(start,end),context);
+// The second occurrence begins inside the first failed candidate phrase.
+assert.deepEqual(readerSearchMatch("fire fire rated—walss", "fire rated walls"),
+  {index:5, length:16, text:"fire rated—walss", exact:false});
+assert.equal(readerSearchMatch("fire fire rated", "fire rated walls"), null);
 const sections=[
  {id:1,sectionNumber:'202',title:'Definitions',displayTitle:'202 Definitions',blocks:[
   {id:'closed',plainText:'CLOSED SYSTEM. Examples include hazardous materials conveyed through a piping system.'},

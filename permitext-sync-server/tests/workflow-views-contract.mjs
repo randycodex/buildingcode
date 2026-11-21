@@ -133,7 +133,7 @@ const referenceShell={clientWidth:1920,classList:{toggle(name,on){on?referenceCl
 const referencePanel={dataset:{libraryOpen:'true',libraryWidth:'640'}};
 const referenceTrack={};let referenceIDs=['reader:reference'],accountOpen=false;
 const referenceContext=vm.createContext({isProAccount:()=>true,
-  document:{querySelector:selector=>selector==='.workspace-shell'?referenceShell:selector==='.account-screen[open]'?accountOpen?{}:null:referencePanel},
+  document:{querySelector:selector=>selector==='.workspace-shell'?referenceShell:selector==='.account-workspace-view[open]'?accountOpen?{}:null:referencePanel},
   state:{paneWeights:{'reader:reference':972}},track:referenceTrack,
   currentColumnWorkflowView:()=> 'report',defaultActivePaneIDs:()=>referenceIDs,
   workflowPaneIsVisible:()=>true,paneIsCollapsed:()=>false,minimumPaneWidthForID:()=>600,defaultPaneWidthForID:()=>600,

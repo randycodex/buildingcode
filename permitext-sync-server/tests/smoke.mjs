@@ -1106,7 +1106,9 @@ async function main() {
         iosLibraryViewModelSource.includes("func bookmarks(inFolder folderID: Int64)") &&
         iosLibraryViewModelSource.includes("repository.evidenceReferences(inFolder: folder.id)") &&
         iosUserDataStoreSource.includes("func evidenceReferences(inFolder folderID: Int64)") &&
-        iosBookmarksSource.includes('ProjectContextView(folderID: folderID, accentColor: accentColor)') &&
+        iosBookmarksSource.includes('NavigationLink(value: ProjectOverviewSection.overview)') &&
+        iosBookmarksSource.includes('ProjectContextView(folderID: folderID, isEditing: $isEditing)') &&
+        iosBookmarksSource.includes('ProjectFactsView(folderID: folderID, isEditing: $isEditing)') &&
         iosBookmarksSource.includes('projectSectionCard("Notes", systemImage: "note.text",') &&
         iosBookmarksSource.includes("projectNotebookDestination(projectID: projectID)") &&
         iosBookmarksSource.includes("NavigationLink(value: ProjectOverviewSection.evidence)") &&
@@ -1114,7 +1116,7 @@ async function main() {
         iosBookmarksSource.includes("case .evidence:\n            projectEvidenceDestination") &&
         iosBookmarksSource.includes("ProjectWorkflowView(folderID: folderID, section: section)") &&
         !iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&
-        iosBookmarksSource.includes('projectSectionScreen(title: "Reports")') &&
+        iosBookmarksSource.includes('ProjectSectionScreen(title: "Reports", accentColor: accentColor)') &&
         iosExportBuilderSource.includes("struct ProjectReportExportBuilder: Sendable") &&
         iosCodeModelsSource.includes("struct PermitextFirmControls: Codable") &&
         iosCodeModelsSource.includes("struct ProjectReportPresentation: Codable") &&
