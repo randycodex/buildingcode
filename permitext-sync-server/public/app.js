@@ -384,7 +384,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261115-toolbar-groups-v7";
+const notebookClientVersion = "20261121-notebook-dependencies-v8";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 let pendingProjectWorkspaceLink = projectWorkspaceLinkFromLocation();
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
@@ -8427,7 +8427,7 @@ async function deleteCapturedAccount(account, identity) {
 }
 
 function loadAccountVerification() {
-  return import("/web/account-verification-assets/account-verification.js?v=20261110-per-codes-account-v5");
+  return import("/web/account-verification-assets/account-verification.js?v=20261121-account-dependencies-v6");
 }
 
 async function prepareAccountDeletionIdentity(account, identity) {
