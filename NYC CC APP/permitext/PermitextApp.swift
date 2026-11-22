@@ -830,6 +830,7 @@ private struct Phase3EntitledResearchHarness: View {
             ("construction-type", "Construction Type", "Type III-B (assumed) — masonry exterior walls and wood floor joists"),
             ("building-area", "Building Area", "9,600 gross sq ft above grade"),
             ("building-height", "Building Height", "46 ft to main roof"),
+            ("zoning-districts", "Zoning District(s)", "R7-2, R7A"),
             ("work-type", "Work type", "Alteration"),
             ("location", "Location", "New York City"),
             ("edition", "Code edition", "2022")

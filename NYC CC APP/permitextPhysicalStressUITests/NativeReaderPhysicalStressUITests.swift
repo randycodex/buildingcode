@@ -657,12 +657,13 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let expectedSummary = ["address": "100 Acceptance Court, Brooklyn, NY 11215", "tax-lot-area": "5,000 sq ft",
                                "occupancy": "R-2 — 8 permanent dwelling units (assumed)",
                                "construction-type": "Type III-B (assumed) — masonry exterior walls and wood floor joists",
-                               "building-area": "9,600 gross sq ft above grade", "building-height": "46 ft to main roof"]
+                               "building-area": "9,600 gross sq ft above grade", "zoning-districts": "R7-2, R7A"]
         for (field, value) in expectedSummary {
             let item = element(in: app, identifier: "project-summary-\(field)")
             XCTAssertTrue(item.isHittable)
             XCTAssertEqual(item.value as? String, value)
         }
+        XCTAssertFalse(element(in: app, identifier: "project-summary-building-height").exists)
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             app.buttons["project-section-notebook"].label.contains("0 notes")
         }, object: nil)], timeout: 10), .completed)

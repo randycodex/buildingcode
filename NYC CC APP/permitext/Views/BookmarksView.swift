@@ -1976,7 +1976,7 @@ struct ProjectView: View {
             (key: "occupancy", label: "Occupancy"),
             (key: "construction-type", label: "Construction Type"),
             (key: "building-area", label: "Building Area"),
-            (key: "building-height", label: "Building Height")
+            (key: "zoning-districts", label: "Zoning District")
         ]
         let address = folder.address.trimmingCharacters(in: .whitespacesAndNewlines)
 
