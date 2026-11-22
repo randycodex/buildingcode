@@ -101,7 +101,6 @@ struct BrowseView: View {
         }
         .preference(key: ReaderSessionSummaryKey.self, value: [browserContext: ReaderSessionSummary(
             source: selectedCodeSectionName + " · " + selectedVersionName,
-            location: openedChapter?.displayLabel ?? browseHeading.rawValue,
             versionFileName: hasSeededBrowseSection && library.isInitialContentLoaded ? library.selectedVersionFileName : nil,
             codeSectionID: browseCodeSectionID
         )])

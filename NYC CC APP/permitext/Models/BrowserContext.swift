@@ -304,10 +304,9 @@ struct NativeReaderViewportPosition: Codable, Equatable {
     let width: Double
 }
 
-/// Shared labels from each independently mounted reading, including the inactive one.
+/// Code source information from each independently mounted reading, including the inactive one.
 struct ReaderSessionSummary: Equatable {
     var source: String
-    var location: String
     var versionFileName: String? = nil
     var codeSectionID: Int64? = nil
 }

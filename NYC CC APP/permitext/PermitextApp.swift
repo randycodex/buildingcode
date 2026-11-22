@@ -2175,24 +2175,15 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     if context == .secondary { hasOpenedSecondary = true }
                     library.selectedTab = context == .primary ? .browse : .browseSecondary
                 } label: {
-                    HStack(spacing: 6) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(summary?.source ?? remembered?.source ?? (context == .primary ? "Reader 1" : "Reader 2"))
-                                .font(.caption.weight(.semibold))
-                                .lineLimit(2)
-                            Text(summary?.location ?? (remembered == nil ? "Open Reader" : "Open reading"))
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                        }
-                        Spacer(minLength: 0)
-                    }
-                    .padding(.horizontal, 14)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: CodeScreenMetrics.bottomControlHeight)
-                    .background(selected ? Color.primary.opacity(0.12) : Color.clear, in: Capsule())
-                    .codeLiquidGlassCapsule()
-                    .contentShape(Rectangle())
+                    Text(summary?.source ?? remembered?.source ?? (context == .primary ? "Reader 1" : "Reader 2"))
+                        .font(.caption.weight(.semibold))
+                        .lineLimit(2)
+                        .padding(.horizontal, 14)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(height: CodeScreenMetrics.bottomControlHeight)
+                        .background(selected ? Color.primary.opacity(0.12) : Color.clear, in: Capsule())
+                        .codeLiquidGlassCapsule()
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("reader-session-\(context.rawValue)")
