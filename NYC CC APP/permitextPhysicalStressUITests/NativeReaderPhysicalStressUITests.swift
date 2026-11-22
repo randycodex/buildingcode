@@ -1087,6 +1087,54 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue((group.value as? String)?.hasPrefix("Collapsed") == true)
     }
 
+    func testExact2022SearchResultOpensPassageAndReturnsToQuery() throws {
+#if !DEBUG
+        throw XCTSkip("Requires the isolated Debug account fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons["Search"].tap()
+        let field = app.textFields["Search codes"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        let clear = app.buttons["Clear search"]
+        if clear.exists { clear.tap() }
+        let section = "403.2.3.3"
+        field.tap()
+        field.typeText(section + "\n")
+
+        let building2022 = app.buttons.matching(NSPredicate(format:
+            "identifier BEGINSWITH %@ AND label CONTAINS[c] %@ AND label CONTAINS %@",
+            "search-group-", "Building Code", "2022")).firstMatch
+        XCTAssertTrue(building2022.waitForExistence(timeout: 45))
+        if (building2022.value as? String)?.hasPrefix("Expanded") != true { building2022.tap() }
+
+        // A different result can mention this section in its excerpt. Use the
+        // original 2022 source identity for the enacted section itself.
+        let result = app.buttons["search-result-2022 CONSTRUCTION CODES|261"]
+        let actionable = NSPredicate { _, _ in result.exists && result.isHittable }
+        guard XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: actionable, object: nil)], timeout: 15) == .completed else {
+            XCTFail("The exact 2022 Building Code result was not visible. \(app.debugDescription)")
+            return
+        }
+        XCTAssertTrue(result.label.localizedCaseInsensitiveContains("Concrete and masonry walls"))
+        result.tap()
+
+        let close = app.buttons["Close passage"]
+        XCTAssertTrue(close.waitForExistence(timeout: 20))
+        XCTAssertTrue(app.navigationBars[section].waitForExistence(timeout: 15))
+        let edition = app.staticTexts.matching(NSPredicate(format:
+            "label CONTAINS[c] %@ AND label CONTAINS %@", "Building Code", "2022")).firstMatch
+        XCTAssertTrue(edition.waitForExistence(timeout: 10))
+        close.tap()
+        let returned = NSPredicate { _, _ in
+            !close.exists && field.exists && field.isHittable && field.value as? String == section
+        }
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: returned, object: nil)], timeout: 10), .completed)
+#endif
+    }
+
     /// Functional device acceptance only: XCTest interaction latency is not an app benchmark.
     func testConcreteSearchLazyRowsAndPassageReturn() throws {
 #if !DEBUG
@@ -2377,6 +2425,34 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 15), .completed)
         XCTAssertEqual(restored.frame.minY, position, accuracy: 4)
         keepScreenshot(named: "EBC15 exact eager viewport restored after Saved visit", from: app)
+    }
+
+    func testLargeChapterScrollPerformance() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-2014-building-chapter-7"]
+        let options = XCTMeasureOptions()
+        options.iterationCount = 5
+        options.invocationOptions = [.manuallyStart, .manuallyStop]
+        let metrics: [XCTMetric] = [XCTOSSignpostMetric.scrollingAndDecelerationMetric, XCTCPUMetric(application: app)]
+        measure(metrics: metrics, options: options) {
+            app.launch()
+            let firstPassage = app.textViews.matching(NSPredicate(
+                format: "label BEGINSWITH %@", "The provisions of this chapter shall govern"
+            )).firstMatch
+            XCTAssertTrue(firstPassage.wait(for: \.isHittable, toEqual: true, timeout: 30))
+            let originalY = firstPassage.frame.minY
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.68))
+            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
+            startMeasuring()
+            start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .fast, thenHoldForDuration: 0)
+            // XCTest can return before inertial scrolling ends. Give each fling
+            // the same settling interval before stopping metrics and the app.
+            RunLoop.current.run(until: Date(timeIntervalSinceNow: 3))
+            stopMeasuring()
+            XCTAssertTrue(!firstPassage.isHittable || firstPassage.frame.minY < originalY - 40,
+                          "The measured gesture must move the chapter.")
+            app.terminate()
+        }
     }
 
     func testNativeLarge2014ChapterRemainsResponsiveWithLazyLayout() {

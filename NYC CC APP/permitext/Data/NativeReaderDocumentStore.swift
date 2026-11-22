@@ -454,11 +454,70 @@ struct NativeReaderSectionMetadata: Equatable, Sendable {
     }
 }
 
+/// Maps each displayed row, including split provisions, to its original passage.
+/// Built once during document preparation so scrolling only reads the mapping.
+struct NativeReaderNavigationIndex: Equatable, Sendable {
+    struct Location: Equatable, Sendable {
+        let displayIndex: Int
+        let sourceIndex: Int
+        let sectionTargetIndex: Int?
+        let anchorID: String?
+    }
+
+    private let locations: [String: Location]
+    let estimatedMemoryCost: Int
+
+    static let empty = Self(locations: [:], estimatedMemoryCost: 0)
+
+    private init(locations: [String: Location], estimatedMemoryCost: Int) {
+        self.locations = locations
+        self.estimatedMemoryCost = estimatedMemoryCost
+    }
+
+    init(document: NativeReaderRuntimeDocument, displayBlocks: [NativeReaderDisplayBlock],
+         sectionTargets: [NativeReaderSectionTarget]) {
+        let sources = Dictionary(document.blocks.indices.map { (document.blocks[$0].id, $0) },
+                                 uniquingKeysWith: { first, _ in first })
+        let documentAnchors = Dictionary(document.anchors.map { ($0.blockID, $0.id) },
+                                         uniquingKeysWith: { first, _ in first })
+        let inSourceOrder = zip(document.blocks, document.blocks.dropFirst()).allSatisfy {
+            $0.sourceOrder <= $1.sourceOrder
+        }
+        var locations: [String: Location] = [:]
+        locations.reserveCapacity(displayBlocks.count)
+        var memoryCost = 128
+        var nextTarget = 0
+        for (displayIndex, display) in displayBlocks.enumerated() {
+            guard let sourceIndex = sources[display.sourceBlockID] else { continue }
+            let source = document.blocks[sourceIndex]
+            let owner: Int?
+            if inSourceOrder {
+                while nextTarget < sectionTargets.count,
+                      sectionTargets[nextTarget].sourceOrder <= source.sourceOrder {
+                    nextTarget += 1
+                }
+                owner = sectionTargets.isEmpty ? nil : max(0, nextTarget - 1)
+            } else {
+                // Preserve last qualifying target in document order for older packs.
+                owner = sectionTargets.lastIndex { $0.sourceOrder <= source.sourceOrder } ?? sectionTargets.indices.first
+            }
+            let anchor = source.anchorIDs.first ?? source.sectionID ?? documentAnchors[source.id]
+            locations[display.id] = Location(displayIndex: displayIndex, sourceIndex: sourceIndex,
+                                             sectionTargetIndex: owner, anchorID: anchor)
+            memoryCost += 112 + display.id.utf8.count + (anchor?.utf8.count ?? 0)
+        }
+        self.init(locations: locations, estimatedMemoryCost: memoryCost)
+    }
+
+    subscript(_ displayID: String) -> Location? { locations[displayID] }
+}
+
 struct NativeReaderPreparedDocument: Equatable, Sendable {
     let document: NativeReaderRuntimeDocument
     let displayBlocks: [NativeReaderDisplayBlock]
     let sectionTargets: [NativeReaderSectionTarget]
     let sectionMetadata: NativeReaderSectionMetadata
+    let navigationIndex: NativeReaderNavigationIndex
     let estimatedMemoryCost: Int
 }
 
@@ -842,6 +901,9 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
             try Task.checkCancellation()
             let sectionMetadata = NativeReaderSectionMetadata.prepare(document: document)
             try Task.checkCancellation()
+            let navigationIndex = NativeReaderNavigationIndex(document: document, displayBlocks: displayBlocks,
+                                                              sectionTargets: sectionTargets)
+            try Task.checkCancellation()
             let derivedCost = displayBlocks.reduce(0) { partial, block in
                 partial
                     + block.id.utf8.count
@@ -854,7 +916,9 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
                 displayBlocks: displayBlocks,
                 sectionTargets: sectionTargets,
                 sectionMetadata: sectionMetadata,
-                estimatedMemoryCost: max(route.uncompressedByteCount + derivedCost + sectionMetadata.estimatedMemoryCost, 1)
+                navigationIndex: navigationIndex,
+                estimatedMemoryCost: max(route.uncompressedByteCount + derivedCost
+                    + sectionMetadata.estimatedMemoryCost + navigationIndex.estimatedMemoryCost, 1)
             )
         }
         let preparation = Preparation(id: UUID(), generation: cacheGeneration,

@@ -245,6 +245,48 @@ private final class ChapterResearchWebView: WKWebView {
     }
 }
 
+@MainActor
+final class ChapterHTMLScrollCheckpoint {
+    private var timer: Task<Void, Never>?
+    private var pending: (offset: CGFloat, save: (CGFloat) -> Void)?
+    private var lastSavedOffset: CGFloat?
+
+    func record(_ offset: CGFloat, save: @escaping (CGFloat) -> Void) {
+        guard (pending?.offset ?? lastSavedOffset) != offset else { return }
+        pending = (offset, save)
+        guard timer == nil else { return }
+        timer = Task { @MainActor [weak self] in
+            do { try await Task.sleep(for: .milliseconds(250)) } catch { return }
+            self?.flush()
+        }
+    }
+
+    func flush() {
+        let checkpoint = pending
+        discardPending()
+        guard let checkpoint, checkpoint.offset != lastSavedOffset else { return }
+        lastSavedOffset = checkpoint.offset
+        checkpoint.save(checkpoint.offset)
+    }
+
+    func discardPending() {
+        timer?.cancel()
+        timer = nil
+        pending = nil
+    }
+
+    func finishDocument() {
+        flush()
+        lastSavedOffset = nil
+    }
+
+    func acceptJump(rememberAnchor: () -> Void) {
+        discardPending()
+        lastSavedOffset = nil
+        rememberAnchor()
+    }
+}
+
 struct ChapterHTMLWebView: UIViewRepresentable {
     @Environment(\.readerControlsClearance) private var readerControlsClearance
     var definitionContext: ReaderDefinitionContext? = nil
@@ -261,12 +303,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let expandAllTrigger: Int
     let collapseAllTrigger: Int
     let scrollToTopTrigger: Int
-    let scrollProgressSyncTrigger: Int
+    let scrollPositionSyncTrigger: Int
     let reloadTrigger: Int
-    let restoreScrollOffset: Double?
+    let restoreScrollOffset: () -> Double?
+    let scrollCheckpoint: ChapterHTMLScrollCheckpoint
+    let scrollSessionID: UUID
+    let tracksScrollOffset: Bool
     let onLoadStateChange: ((ChapterHTMLLoadState) -> Void)?
     let onVisibleAnchorChange: ((String) -> Void)?
-    let onScrollProgressChange: ((CGFloat) -> Void)?
+    let onJumpAccepted: (String) -> Void
     let onScrollOffsetChange: ((CGFloat) -> Void)?
     let onOpenSectionForAnchor: ((ChapterHTMLSectionTarget) -> Void)?
     let onResearchSelection: ((ChapterHTMLResearchTarget) -> Void)?
@@ -279,7 +324,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.userContentController.add(context.coordinator, name: Coordinator.visibleAnchorMessageName)
-        configuration.userContentController.add(context.coordinator, name: Coordinator.scrollProgressMessageName)
         configuration.userContentController.add(context.coordinator, name: Coordinator.openSectionMessageName)
         configuration.userContentController.add(context.coordinator, name: Coordinator.researchSelectionMessageName)
         configuration.userContentController.addUserScript(
@@ -317,6 +361,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
+        let previous = context.coordinator.parent
+        let documentChanged = context.coordinator.loadedURL != chapterURL || previous?.scrollSessionID != scrollSessionID
+        if documentChanged {
+            previous?.scrollCheckpoint.finishDocument()
+        }
         webView.scrollView.contentInset.bottom = readerControlsClearance
         webView.scrollView.verticalScrollIndicatorInsets.bottom = readerControlsClearance
         context.coordinator.parent = self
@@ -325,11 +374,10 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         webView.backgroundColor = pageBackgroundColor
         webView.scrollView.backgroundColor = pageBackgroundColor
 
-        if context.coordinator.loadedURL != chapterURL {
+        if documentChanged {
             context.coordinator.loadedURL = chapterURL
             context.coordinator.appliedReloadTrigger = reloadTrigger
             context.coordinator.resetLoadRecovery()
-            context.coordinator.resetScrollProgressReporting()
             context.coordinator.pendingAnchorID = targetAnchorID
             context.coordinator.reportLoadState(.loading)
             // Load off the main thread: reading a multi-MB HTML file and
@@ -382,9 +430,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             context.coordinator.appliedScrollToTopTrigger = scrollToTopTrigger
             context.coordinator.scrollToTop(in: webView)
         }
-        if context.coordinator.appliedScrollProgressSyncTrigger != scrollProgressSyncTrigger {
-            context.coordinator.appliedScrollProgressSyncTrigger = scrollProgressSyncTrigger
-            context.coordinator.syncScrollProgress(in: webView)
+        if context.coordinator.appliedScrollPositionSyncTrigger != scrollPositionSyncTrigger {
+            context.coordinator.appliedScrollPositionSyncTrigger = scrollPositionSyncTrigger
+            context.coordinator.syncScrollPosition(in: webView)
         }
     }
 
@@ -394,7 +442,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
     final class Coordinator: NSObject, WKNavigationDelegate, UIScrollViewDelegate, WKScriptMessageHandler {
         static let visibleAnchorMessageName = "nycccVisibleAnchor"
-        static let scrollProgressMessageName = "nycccScrollProgress"
         static let openSectionMessageName = "nycccOpenSection"
         static let researchSelectionMessageName = "nycccResearchSelection"
 
@@ -413,18 +460,24 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedExpandAllTrigger = 0
         var appliedCollapseAllTrigger = 0
         var appliedScrollToTopTrigger = 0
-        var appliedScrollProgressSyncTrigger = 0
+        var appliedScrollPositionSyncTrigger = 0
         private var htmlLoadTask: Task<Void, Never>?
         private var recoveryTask: Task<Void, Never>?
         private var htmlLoadGeneration = 0
+        private var isAwaitingDocument = true
+        private var pendingNavigation: WKNavigation?
         private var automaticRecoveryAttempt = 0
         private var htmlLoadBeganAt: TimeInterval?
-        private var lastReportedScrollProgress: CGFloat = -1
-        private var visibleAnchorReportPending = false
         private var suppressVisibleAnchorReportsUntil: Date?
         private var suppressScrollOffsetReportsUntil: Date?
+        private var scrollCommandID = UUID()
 
         func loadHTMLAsync(chapterURL: URL, readAccessURL: URL, into webView: WKWebView) {
+            parent?.scrollCheckpoint.finishDocument()
+            scrollCommandID = UUID()
+            isAwaitingDocument = true
+            pendingNavigation = nil
+            suppressScrollOffsetReportsUntil = nil
             htmlLoadTask?.cancel()
             htmlLoadGeneration &+= 1
             let loadGeneration = htmlLoadGeneration
@@ -454,7 +507,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                         guard let self, let webView,
                               self.htmlLoadGeneration == loadGeneration,
                               !Task.isCancelled else { return }
-                        webView.loadHTMLString(preparedHTML, baseURL: readAccessURL)
+                        self.pendingNavigation = webView.loadHTMLString(preparedHTML, baseURL: readAccessURL)
                     }
                 } else {
                     guard !Task.isCancelled else { return }
@@ -462,7 +515,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                         guard let self, let webView,
                               self.htmlLoadGeneration == loadGeneration,
                               !Task.isCancelled else { return }
-                        webView.loadFileURL(chapterURL, allowingReadAccessTo: readAccessURL)
+                        self.pendingNavigation = webView.loadFileURL(chapterURL, allowingReadAccessTo: readAccessURL)
                     }
                 }
             }
@@ -522,6 +575,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         }
 
         func teardown(webView: WKWebView) {
+            scrollCommandID = UUID()
+            parent?.scrollCheckpoint.finishDocument()
             htmlLoadTask?.cancel()
             htmlLoadTask = nil
             recoveryTask?.cancel()
@@ -535,7 +590,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             webView.scrollView.delegate = nil
             let contentController = webView.configuration.userContentController
             contentController.removeScriptMessageHandler(forName: Self.visibleAnchorMessageName)
-            contentController.removeScriptMessageHandler(forName: Self.scrollProgressMessageName)
             contentController.removeScriptMessageHandler(forName: Self.openSectionMessageName)
             contentController.removeScriptMessageHandler(forName: Self.researchSelectionMessageName)
             contentController.removeAllUserScripts()
@@ -587,6 +641,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            if isAwaitingDocument {
+                guard let pendingNavigation, pendingNavigation === navigation else { return }
+                self.pendingNavigation = nil
+                isAwaitingDocument = false
+            }
             #if DEBUG
             if let htmlLoadBeganAt {
                 let elapsedMilliseconds = max(
@@ -601,14 +660,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             applyReaderScripts(to: webView)
             applyDefinitionLinks(to: webView)
             applyBookmarkDecorations(to: webView)
-            if let offset = parent?.restoreScrollOffset, offset > 0 {
+            if let parent, hasNewJumpRequest, let anchor = parent.targetAnchorID {
+                scroll(to: anchor, matching: parent.targetSearchText, in: webView)
+            } else if let offset = parent?.restoreScrollOffset(), offset > 0 {
                 scroll(toOffset: CGFloat(offset), in: webView)
             } else {
                 scroll(to: pendingAnchorID ?? parent?.targetAnchorID, matching: parent?.targetSearchText, in: webView)
             }
             pendingAnchorID = nil
-            lastReportedScrollProgress = -1
-            reportScrollProgress(from: webView.scrollView)
+            reportScrollOffset(from: webView.scrollView)
         }
 
         func webView(
@@ -1077,35 +1137,41 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 return namedAnchor.getAttribute('name') || namedAnchor.id || null;
               }
 
+              // The authored headings are fixed once section cards are built. Keep their
+              // source order, but measure their live positions as images and text reflow.
+              var headings = document.querySelectorAll('.Section, .Subsection, section[id] > h1, section[id] > h2, section[id] > h3, section[id] > h4, section[id] > h5, section[id] > h6');
+              var precedingHeadingIndex = -1;
+
+              function renderedHeadingTop(heading) {
+                if (!heading.getClientRects().length) { return null; }
+                var rect = heading.getBoundingClientRect();
+                if (!(rect.width > 0 && rect.height > 0 && Number.isFinite(rect.top))) { return null; }
+                var visibility = window.getComputedStyle(heading).visibility;
+                return visibility === 'hidden' || visibility === 'collapse' ? null : rect.top;
+              }
+
               function visibleAnchorID() {
-                var headings = Array.prototype.slice.call(document.querySelectorAll('.Section, .Subsection, section[id] > h1, section[id] > h2, section[id] > h3, section[id] > h4, section[id] > h5, section[id] > h6'));
                 if (!headings.length || window.innerHeight <= 0) { return null; }
-
                 var baseline = Math.min(window.innerHeight * 0.32, 260);
-                var viewportTop = window.scrollY + baseline;
-                var candidate = null;
-
-                for (var i = 0; i < headings.length; i++) {
-                  var heading = headings[i];
-                  // A collapsed section or unattached WebView has no rendered
-                  // heading box. Its zero rect is not a scroll position. Check
-                  // only until the first upcoming rendered heading, avoiding a
-                  // style/layout read for every remaining chapter heading.
-                  if (!heading.getClientRects().length) { continue; }
-                  var rect = heading.getBoundingClientRect();
-                  if (!(rect.width > 0 && rect.height > 0 && Number.isFinite(rect.top))) { continue; }
-                  var visibility = window.getComputedStyle(heading).visibility;
-                  if (visibility === 'hidden' || visibility === 'collapse') { continue; }
-                  var top = rect.top + window.scrollY;
-                  if (top <= viewportTop) {
-                    candidate = heading;
-                  } else {
-                    if (!candidate || top - viewportTop < 18) { candidate = heading; }
+                // When scrolling back or collapsing a section the old heading may
+                // now be below the reading line, or hidden altogether.
+                while (precedingHeadingIndex >= 0) {
+                  var previousTop = renderedHeadingTop(headings[precedingHeadingIndex]);
+                  if (previousTop !== null && previousTop <= baseline) { break; }
+                  precedingHeadingIndex--;
+                }
+                for (var i = precedingHeadingIndex + 1; i < headings.length; i++) {
+                  var top = renderedHeadingTop(headings[i]);
+                  if (top === null) { continue; }
+                  if (top > baseline) {
+                    if (precedingHeadingIndex < 0 || top - baseline < 18) {
+                      return anchorIDForHeading(headings[i]);
+                    }
                     break;
                   }
+                  precedingHeadingIndex = i;
                 }
-
-                return anchorIDForHeading(candidate);
+                return anchorIDForHeading(headings[precedingHeadingIndex]);
               }
 
               function reportVisibleAnchor() {
@@ -1115,22 +1181,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 window.__nycccLastVisibleAnchorID = anchorID;
                 try {
                   window.webkit.messageHandlers.\(Coordinator.visibleAnchorMessageName).postMessage(anchorID);
-                } catch (error) {}
-              }
-
-              function reportScrollProgress() {
-                var scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
-                var scrollHeight = Math.max(
-                  document.documentElement.scrollHeight || 0,
-                  document.body ? document.body.scrollHeight : 0
-                );
-                var clientHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-                var maxScroll = Math.max(scrollHeight - clientHeight, 1);
-                var progress = Math.min(Math.max(scrollTop / maxScroll, 0), 1);
-                if (window.__nycccLastScrollProgress === progress) { return; }
-                window.__nycccLastScrollProgress = progress;
-                try {
-                  window.webkit.messageHandlers.\(Coordinator.scrollProgressMessageName).postMessage(progress);
                 } catch (error) {}
               }
 
@@ -1180,7 +1230,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 window.requestAnimationFrame(function() {
                   window.__nycccVisibleAnchorFramePending = false;
                   reportVisibleAnchor();
-                  reportScrollProgress();
                 });
               };
               window.addEventListener('scroll', window.__nycccVisibleAnchorListener, { passive: true });
@@ -1189,10 +1238,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 window.requestAnimationFrame(updateResearchSelectionAction);
               };
               document.addEventListener('selectionchange', window.__nycccResearchSelectionListener);
-              setTimeout(function() {
-                reportVisibleAnchor();
-                reportScrollProgress();
-              }, 0);
+              setTimeout(reportVisibleAnchor, 0);
             })();
             """
             webView.evaluateJavaScript(javascript)
@@ -1252,12 +1298,35 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             let requestID: Int
         }
 
+        private var hasNewJumpRequest: Bool {
+            guard let request = parent?.targetSearchRequestID else { return false }
+            return request > 0 && request != lastSearchScrollTarget?.requestID
+        }
+
+        private func beginProgrammaticScroll() -> UUID {
+            scrollCommandID = UUID()
+            let until = Date().addingTimeInterval(0.65)
+            suppressVisibleAnchorReportsUntil = until
+            suppressScrollOffsetReportsUntil = until
+            return scrollCommandID
+        }
+
+        private func captureAfterScroll(_ command: UUID, in webView: WKWebView) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self, weak webView] in
+                guard let self, let webView, self.scrollCommandID == command,
+                      self.parent?.tracksScrollOffset == true else { return }
+                self.suppressScrollOffsetReportsUntil = nil
+                self.finishScrolling(webView.scrollView)
+                self.reportVisibleAnchor(in: webView)
+            }
+        }
+
         func scroll(to anchorID: String?, matching query: String? = nil, in webView: WKWebView) {
-            guard let anchorID, !anchorID.isEmpty else { return }
+            guard !isAwaitingDocument, let parent, let anchorID, !anchorID.isEmpty else { return }
+            let explicitJump = hasNewJumpRequest
+            let command = beginProgrammaticScroll()
             lastScrolledAnchorID = anchorID
-            lastSearchScrollTarget = SearchScrollTarget(anchorID: anchorID, query: query, requestID: parent?.targetSearchRequestID ?? 0)
-            suppressVisibleAnchorReportsUntil = Date().addingTimeInterval(0.65)
-            suppressScrollOffsetReportsUntil = Date().addingTimeInterval(0.65)
+            lastSearchScrollTarget = SearchScrollTarget(anchorID: anchorID, query: query, requestID: parent.targetSearchRequestID)
             let javascript = """
             (function() {
               var query = String(\(Self.javascriptString(query ?? ""))).trim();
@@ -1273,6 +1342,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 }) || null;
               }
               if (!target) { return false; }
+              var resolvedAnchor = target.id || \(Self.javascriptString(anchorID));
               if (window.__nycccRevealAnchor) {
                 target = window.__nycccRevealAnchor(\(Self.javascriptString(anchorID))) || target;
               }
@@ -1350,10 +1420,17 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               if (!matched) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }
-              return true;
+              return resolvedAnchor;
             })();
             """
-            webView.evaluateJavaScript(javascript)
+            webView.evaluateJavaScript(javascript) { [weak self, weak webView] result, _ in
+                guard let self, let webView, self.scrollCommandID == command,
+                      let resolved = result as? String, !resolved.isEmpty else { return }
+                if explicitJump {
+                    parent.scrollCheckpoint.acceptJump { parent.onJumpAccepted(resolved) }
+                }
+                self.captureAfterScroll(command, in: webView)
+            }
         }
 
         func scrollToTop(in webView: WKWebView) {
@@ -1368,8 +1445,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         }
 
         func scroll(toOffset offset: CGFloat, in webView: WKWebView) {
-            suppressVisibleAnchorReportsUntil = Date().addingTimeInterval(0.65)
-            suppressScrollOffsetReportsUntil = Date().addingTimeInterval(0.65)
+            let command = beginProgrammaticScroll()
             let y = max(offset, 0)
             let javascript = """
             (function() {
@@ -1377,12 +1453,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               return true;
             })();
             """
-            webView.evaluateJavaScript(javascript)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self, weak webView] in
-                guard let self, let webView else { return }
-                self.suppressScrollOffsetReportsUntil = nil
-                self.reportScrollProgress(from: webView.scrollView)
-                self.reportVisibleAnchor(in: webView)
+            webView.evaluateJavaScript(javascript) { [weak self, weak webView] _, error in
+                guard let self, let webView, self.scrollCommandID == command, error == nil else { return }
+                self.captureAfterScroll(command, in: webView)
             }
         }
 
@@ -1391,79 +1464,44 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                abs(scrollView.contentOffset.x) > 0.5 {
                 scrollView.contentOffset.x = 0
             }
-            reportScrollProgress(from: scrollView)
-            scheduleVisibleAnchorReport()
+            reportScrollOffset(from: scrollView)
         }
 
-        private func reportScrollProgress(from scrollView: UIScrollView) {
-            let contentHeight = scrollView.contentSize.height
-            let viewportHeight = scrollView.bounds.height
-            guard contentHeight > 0, viewportHeight > 0 else { return }
+        func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+            if !decelerate { finishScrolling(scrollView) }
+        }
 
-            let maxOffset = max(
-                contentHeight - viewportHeight + scrollView.adjustedContentInset.top + scrollView.adjustedContentInset.bottom,
-                1
-            )
-            let offset = scrollView.contentOffset.y + scrollView.adjustedContentInset.top
-            deliverScrollProgress(min(max(offset / maxOffset, 0), 1))
+        func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+            finishScrolling(scrollView)
+        }
+
+        private func finishScrolling(_ scrollView: UIScrollView) {
+            reportScrollOffset(from: scrollView)
+            parent?.scrollCheckpoint.flush()
+        }
+
+        private func reportScrollOffset(from scrollView: UIScrollView) {
+            guard !isAwaitingDocument, let parent, parent.tracksScrollOffset,
+                  let save = parent.onScrollOffsetChange,
+                  scrollView.contentSize.height > 0, scrollView.bounds.height > 0 else { return }
             if let suppressScrollOffsetReportsUntil,
                Date() < suppressScrollOffsetReportsUntil {
                 return
             }
             suppressScrollOffsetReportsUntil = nil
-            let rawOffset = max(scrollView.contentOffset.y, 0)
-            DispatchQueue.main.async { [weak self] in
-                self?.parent?.onScrollOffsetChange?(rawOffset)
-            }
+            parent.scrollCheckpoint.record(max(scrollView.contentOffset.y, 0), save: save)
         }
 
-        func resetScrollProgressReporting() {
-            lastReportedScrollProgress = -1
-        }
-
-        func syncScrollProgress(in webView: WKWebView) {
-            resetScrollProgressReporting()
-            reportScrollProgress(from: webView.scrollView)
+        func syncScrollPosition(in webView: WKWebView) {
+            reportScrollOffset(from: webView.scrollView)
             reportVisibleAnchor(in: webView)
-        }
-
-        private func scheduleVisibleAnchorReport() {
-            guard let webView, !visibleAnchorReportPending else { return }
-            visibleAnchorReportPending = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self, weak webView] in
-                guard let self, let webView else { return }
-                self.visibleAnchorReportPending = false
-                self.reportVisibleAnchor(in: webView)
-            }
         }
 
         private func reportVisibleAnchor(in webView: WKWebView) {
             webView.evaluateJavaScript("window.__nycccReportVisibleAnchor && window.__nycccReportVisibleAnchor();")
         }
 
-        private func deliverScrollProgress(_ progress: CGFloat) {
-            let clamped = min(max(progress, 0), 1)
-            guard abs(clamped - lastReportedScrollProgress) > 0.002 else { return }
-            lastReportedScrollProgress = clamped
-            DispatchQueue.main.async { [weak self] in
-                self?.parent?.onScrollProgressChange?(clamped)
-            }
-        }
-
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            if message.name == Self.scrollProgressMessageName {
-                let progress: CGFloat
-                if let value = message.body as? Double {
-                    progress = CGFloat(value)
-                } else if let value = message.body as? NSNumber {
-                    progress = CGFloat(truncating: value)
-                } else {
-                    return
-                }
-                deliverScrollProgress(progress)
-                return
-            }
-
             if message.name == Self.openSectionMessageName {
                 guard let target = sectionTarget(from: message.body) else { return }
                 DispatchQueue.main.async { [weak self] in
@@ -1480,20 +1518,22 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 return
             }
 
-            guard message.name == Self.visibleAnchorMessageName,
+            guard !isAwaitingDocument, message.name == Self.visibleAnchorMessageName,
                   let anchorID = message.body as? String,
                   !anchorID.isEmpty
             else { return }
 
             if let suppressVisibleAnchorReportsUntil,
-               Date() < suppressVisibleAnchorReportsUntil,
-               anchorID != lastScrolledAnchorID {
-                return
+               Date() < suppressVisibleAnchorReportsUntil {
+                guard anchorID == lastScrolledAnchorID else { return }
+            } else {
+                suppressVisibleAnchorReportsUntil = nil
             }
-            suppressVisibleAnchorReportsUntil = nil
 
+            let command = scrollCommandID
             DispatchQueue.main.async { [weak self] in
-                self?.parent?.onVisibleAnchorChange?(anchorID)
+                guard let self, self.scrollCommandID == command, self.parent?.tracksScrollOffset == true else { return }
+                self.parent?.onVisibleAnchorChange?(anchorID)
             }
         }
 

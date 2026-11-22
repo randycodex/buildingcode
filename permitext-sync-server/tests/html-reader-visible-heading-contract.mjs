@@ -53,4 +53,40 @@ assert.equal(visible([first, second, ...untouchedTail]), '401.1');
 const authored = heading('heading-local', 80);
 authored.parentElement = { tagName: 'SECTION', id: 'nyc-2014-41000958' };
 assert.equal(visible([authored]), 'nyc-2014-41000958');
+
+// Exercise consecutive frames in the same document, including reversal and
+// reflow. Deep in a chapter, only the surrounding headings should be measured.
+let offset = 0;
+let reads = 0;
+let queries = 0;
+const rows = Array.from({ length: 1500 }, (_, i) => ({
+  id: String(i), hidden: false, y: i * 100, parentElement: null,
+  getClientRects() { reads++; return this.hidden ? [] : [{}]; },
+  getBoundingClientRect() { return { top: this.y - offset, width: 300, height: 26 }; },
+}));
+const context = vm.createContext({
+  document: { querySelectorAll() { queries++; return rows; } },
+  window: { innerHeight: 800, getComputedStyle: () => ({ visibility: 'visible' }) },
+});
+vm.runInContext(resolver, context);
+function checkPosition(y) {
+  offset = y;
+  const expected = rows.filter(row => !row.hidden);
+  const next = expected.findIndex(row => row.y - offset > 256);
+  const selected = next < 0 ? expected.at(-1) : next === 0 || expected[next].y - offset < 274
+    ? expected[next] : expected[next - 1];
+  assert.equal(vm.runInContext('visibleAnchorID()', context), selected?.id ?? null);
+}
+checkPosition(120000);
+reads = 0;
+for (const y of [120010, 120020, 120030, 120040, 120030, 120020]) checkPosition(y);
+assert.ok(reads <= 18, `Nearby frames read ${reads} heading geometries`);
+checkPosition(40000);
+rows[402].hidden = true;
+checkPosition(40000);
+for (const row of rows) row.y += 160;
+checkPosition(40000);
+checkPosition(0);
+checkPosition(200000);
+assert.equal(queries, 1);
 console.log('PASS: actual HTML Reader resolver ignores nonrendered/hidden/invalid geometry, preserves scrolling and authored IDs');

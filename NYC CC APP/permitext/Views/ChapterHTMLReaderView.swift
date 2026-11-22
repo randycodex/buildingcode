@@ -75,20 +75,6 @@ private enum ChapterReaderPresentation: String, CaseIterable, Identifiable {
     }
 }
 
-enum ReaderCompactHeaderTransition {
-    /// The HTML fallback cannot expose native block geometry, so use the
-    /// authored chapter heading's measured visual extent as its equivalent.
-    private static let estimatedHTMLChapterHeadingExtent: CGFloat = 96
-
-    static func isCompactHeaderVisible(headerBoundaryMinY: CGFloat) -> Bool {
-        headerBoundaryMinY <= 0
-    }
-
-    static func isCompactHeaderVisible(estimatedHTMLScrollOffset: CGFloat) -> Bool {
-        estimatedHTMLScrollOffset >= estimatedHTMLChapterHeadingExtent
-    }
-}
-
 struct ChapterHTMLReaderView: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
@@ -105,7 +91,10 @@ struct ChapterHTMLReaderView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
+    @Environment(\.scenePhase) private var scenePhase
 
+    @State private var htmlScrollCheckpoint = ChapterHTMLScrollCheckpoint()
+    @State private var readerIsVisible = false
     @State private var targetAnchorID: String?
     // A native fallback destination supersedes the old HTML pixel offset for
     // this chapter instance. The ordinary target remains free to change later.
@@ -120,8 +109,7 @@ struct ChapterHTMLReaderView: View {
     @State private var cachedBookmarkRevision: Int = -1
     @State private var cachedHTMLStoreRootPath: String?
     @State private var cachedHTMLStore: PublishedHTMLContentStore?
-    @State private var scrollProgress: CGFloat = 0
-    @State private var scrollProgressSyncTrigger = 0
+    @State private var scrollPositionSyncTrigger = 0
     @State private var lastRecordedVisibleAnchorID: String?
     @State private var isChapterSearchPresented = false
     @State private var chapterSearchQuery = ""
@@ -136,7 +124,6 @@ struct ChapterHTMLReaderView: View {
     @State private var readerPresentation: ChapterReaderPresentation = .html
     @State private var nativeReaderFallbackMessage: String?
     @State private var rolloutRouteResolved = NativeReaderRolloutPolicy.activeStage == .disabled
-    @State private var showsCompactChapterHeader = false
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -323,21 +310,12 @@ struct ChapterHTMLReaderView: View {
         }
     }
 
-    private var shouldRestoreAtChapterTop: Bool {
-        if opensAtChapterTop { return true }
-
-        guard !nativeFallbackIgnoresSavedOffset,
-              (rememberedScrollOffset.wrappedValue ?? 0) <= 0,
-              let restoredInitialAnchor,
-              let firstContentAnchor else {
-            return false
-        }
-
-        return restoredInitialAnchor.anchorID == firstContentAnchor.anchorID
-    }
-
     private var effectiveTargetAnchorID: String? {
-        shouldRestoreAtChapterTop ? nil : targetAnchorID
+        guard let targetAnchorID else { return nil }
+        if chapterSearchScrollRequestID > 0 || nativeFallbackIgnoresSavedOffset { return targetAnchorID }
+        guard !opensAtChapterTop, (rememberedScrollOffset.wrappedValue ?? 0) <= 0 else { return nil }
+        if rememberedAnchorID.wrappedValue == targetAnchorID { return targetAnchorID }
+        return firstContentAnchor?.anchorID == targetAnchorID ? nil : targetAnchorID
     }
 
     var body: some View {
@@ -359,7 +337,6 @@ struct ChapterHTMLReaderView: View {
                         rememberedNativeBlockID: rememberedNativeBlockID,
                         rememberedNativeViewport: rememberedNativeViewport,
                         rememberedAnchorID: rememberedAnchorID,
-                        onCompactHeaderVisibilityChange: updateCompactChapterHeaderVisibility,
                         onNativeFallbackToHTML: { message, requestedAnchorID in
                             if let requestedAnchorID {
                                 targetAnchorID = requestedAnchorID
@@ -452,20 +429,26 @@ struct ChapterHTMLReaderView: View {
             rolloutRouteResolved = true
         }
         .onAppear {
+            readerIsVisible = true
             ensureHTMLStoreCached()
             library.noteChapterOpened(chapter: chapter)
             if targetAnchorID == nil {
                 let anchor = restoredInitialAnchor
                 selectedAnchor = anchor
-                targetAnchorID = anchor?.anchorID
+                targetAnchorID = opensAtChapterTop ? nil : rememberedAnchorID.wrappedValue ?? anchor?.anchorID
             }
             recomputeSavedDecorations()
-            requestScrollProgressSync()
+            requestScrollPositionSync()
         }
         .onChange(of: isBrowserTabActive) { _, isActive in
             if isActive {
-                requestScrollProgressSync()
+                requestScrollPositionSync()
+            } else {
+                htmlScrollCheckpoint.flush()
             }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { htmlScrollCheckpoint.flush() }
         }
         .onChange(of: library.bookmarkRevision) { _, _ in
             recomputeSavedDecorations()
@@ -475,9 +458,8 @@ struct ChapterHTMLReaderView: View {
         }
         .onChange(of: chapter.id) { _, _ in
             nativeFallbackIgnoresSavedOffset = false
-            scrollProgress = 0
-            showsCompactChapterHeader = false
             lastRecordedVisibleAnchorID = nil
+            chapterSearchScrollRequestID = 0
             chapterSearchQuery = ""
         }
         .task(id: "\(chapter.id)|\(usesNativeRolloutReader)|\(isRolloutRouteResolved)") {
@@ -487,8 +469,7 @@ struct ChapterHTMLReaderView: View {
             if anchors.isEmpty {
                 await loadAnchors()
             }
-            recordRecentlyViewedForVisibleAnchor(targetAnchorID ?? selectedAnchor?.anchorID)
-            requestScrollProgressSync()
+            requestScrollPositionSync()
         }
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet
@@ -504,15 +485,12 @@ struct ChapterHTMLReaderView: View {
                     if let anchorID = entry.anchorID {
                         targetAnchorID = anchorID
                         selectedAnchor = anchors.first(where: { $0.anchorID == anchorID })
-                        rememberedAnchorID.wrappedValue = anchorID
                     } else {
                         let normalized = normalizedSectionNumber(entry.sectionNumber)
                         let anchor = anchors.first { normalizedSectionNumber($0.sectionNumber) == normalized }
                         targetAnchorID = anchor?.anchorID
                         selectedAnchor = anchor
-                        rememberedAnchorID.wrappedValue = anchor?.anchorID
                     }
-                    rememberedNativeSectionID.wrappedValue = entry.sectionID
                 },
                 isInline: true,
                 usesReaderBottomBar: usesReaderBottomBar,
@@ -535,6 +513,8 @@ struct ChapterHTMLReaderView: View {
             }
         }
         .onDisappear {
+            readerIsVisible = false
+            htmlScrollCheckpoint.flush()
             chapterSearchQuery = ""
         }
 #if DEBUG
@@ -632,11 +612,14 @@ struct ChapterHTMLReaderView: View {
             expandAllTrigger: 0,
             collapseAllTrigger: 0,
             scrollToTopTrigger: 0,
-            scrollProgressSyncTrigger: scrollProgressSyncTrigger,
+            scrollPositionSyncTrigger: scrollPositionSyncTrigger,
             reloadTrigger: htmlReloadTrigger,
-            restoreScrollOffset: nativeFallbackIgnoresSavedOffset || opensAtChapterTop
-                ? nil
-                : rememberedScrollOffset.wrappedValue,
+            restoreScrollOffset: {
+                nativeFallbackIgnoresSavedOffset || opensAtChapterTop ? nil : rememberedScrollOffset.wrappedValue
+            },
+            scrollCheckpoint: htmlScrollCheckpoint,
+            scrollSessionID: library.privateSessionID,
+            tracksScrollOffset: readerIsVisible && isBrowserTabActive && scenePhase == .active,
             onLoadStateChange: { state in
                 htmlLoadState = state
             },
@@ -657,16 +640,16 @@ struct ChapterHTMLReaderView: View {
                 }
                 recordRecentlyViewedForVisibleAnchor(anchorID)
             },
-            onScrollProgressChange: { progress in
-                scrollProgress = progress
+            onJumpAccepted: { anchorID in
+                rememberedAnchorID.wrappedValue = anchorID
+                if let sectionID = htmlChapterSearchEntries.first(where: { $0.anchorID == anchorID })?.sectionID
+                    ?? selectedAnchor.flatMap({ library.sectionSummary(sectionNumber: $0.sectionNumber, codeSectionID: chapter.codeSectionID)?.id }) {
+                    rememberedNativeSectionID.wrappedValue = sectionID
+                }
+                rememberedScrollOffset.wrappedValue = nil
             },
             onScrollOffsetChange: { offset in
                 rememberedScrollOffset.wrappedValue = Double(offset)
-                updateCompactChapterHeaderVisibility(
-                    ReaderCompactHeaderTransition.isCompactHeaderVisible(
-                        estimatedHTMLScrollOffset: offset
-                    )
-                )
             },
             onOpenSectionForAnchor: { target in
                 if target.action == "openReference" {
@@ -691,11 +674,6 @@ struct ChapterHTMLReaderView: View {
             chapterLoadOverlay
         }
         .background(pageBackgroundColor.ignoresSafeArea())
-    }
-
-    private func updateCompactChapterHeaderVisibility(_ isVisible: Bool) {
-        guard showsCompactChapterHeader != isVisible else { return }
-        showsCompactChapterHeader = isVisible
     }
 
     @ViewBuilder
@@ -743,6 +721,7 @@ struct ChapterHTMLReaderView: View {
                     accent: accentColor
                 ) {
                     chapterSearchScrollQuery = nil
+                    chapterSearchScrollRequestID &+= 1
                     selectedAnchor = target.publishedAnchor
                     targetAnchorID = target.scrollTarget
                     isJumpPickerPresented = false
@@ -751,8 +730,8 @@ struct ChapterHTMLReaderView: View {
         }
     }
 
-    private func requestScrollProgressSync() {
-        scrollProgressSyncTrigger &+= 1
+    private func requestScrollPositionSync() {
+        scrollPositionSyncTrigger &+= 1
     }
 
     private func recordRecentlyViewedForVisibleAnchor(_ anchorID: String?) {
@@ -809,10 +788,16 @@ struct ChapterHTMLReaderView: View {
             )
         }.value
 
-        if targetAnchorID == nil {
+        if chapterSearchScrollRequestID == 0,
+           targetAnchorID == nil || targetAnchorID == rememberedAnchorID.wrappedValue {
             let anchor = restoredInitialAnchor
             selectedAnchor = anchor
-            targetAnchorID = anchor?.anchorID
+            if !opensAtChapterTop, let saved = rememberedAnchorID.wrappedValue,
+               htmlChapterSearchEntries.contains(where: { $0.anchorID == saved }) {
+                targetAnchorID = saved
+            } else {
+                targetAnchorID = anchor?.anchorID
+            }
         }
     }
     private func normalizedSectionNumber(_ value: String) -> String {

@@ -78,7 +78,6 @@ struct BookmarksView: View {
     @State private var folderEditorTarget: FolderEditorTarget?
     @State private var savedSortMode: BookmarkSortMode = .codeOrder
     @ScaledMetric(relativeTo: .headline) private var preferredProjectTileHeight: CGFloat = 140
-    @State private var scrollOffset: CGFloat = 0
     @State private var cachedFilteredBookmarks: [BookmarkedSection] = []
     @State private var cachedBookmarkCodeGroups: [BookmarkCodeGroup] = []
     @State private var cachedBookmarksByFolderID: [Int64: [BookmarkedSection]] = [:]
@@ -137,10 +136,6 @@ struct BookmarksView: View {
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
-    }
-
-    private var collapseProgress: CGFloat {
-        min(max(-scrollOffset / 64, 0), 1)
     }
 
     private var exportButton: some View {
@@ -260,12 +255,6 @@ struct BookmarksView: View {
 
     private var savedContent: some View {
         ScrollView {
-            GeometryReader { proxy in
-                Color.clear
-                    .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("savedScroll")).minY)
-            }
-            .frame(height: 0)
-
             VStack(alignment: .leading, spacing: 0) {
                 savedScreenHeader
 
@@ -278,7 +267,7 @@ struct BookmarksView: View {
         }
         .accessibilityIdentifier("projects-root")
         .overlay(alignment: .top) {
-            CodeTopContentFade(title: screenTitle, progress: collapseProgress)
+            CodeTopContentFade(title: screenTitle)
         }
         .overlay(alignment: .top) {
             pinnedSavedHeader
@@ -378,8 +367,6 @@ struct BookmarksView: View {
             NavigationStack { SettingsView() }
                 .environmentObject(library)
         }
-        .coordinateSpace(name: "savedScroll")
-        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
     private var savedHeaderActions: some View {

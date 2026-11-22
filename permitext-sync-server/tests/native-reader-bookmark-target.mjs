@@ -13,6 +13,16 @@ function between(start, end) {
  return source.slice(a, b);
 }
 const target = between('struct NativeReaderSectionTarget:', '\nenum NativeReaderSectionNavigator');
+const store = await readFile(new URL('../../NYC CC APP/permitext/Data/NativeReaderDocumentStore.swift', import.meta.url), 'utf8');
+const navigation = store.slice(store.indexOf('struct NativeReaderNavigationIndex:'), store.indexOf('struct NativeReaderPreparedDocument:'));
+const picker = await readFile(new URL('../../NYC CC APP/permitext/Views/ChapterSearchSheet.swift', import.meta.url), 'utf8');
+const depthStart = picker.indexOf('    nonisolated static func depth(');
+const pickerDepth = picker.slice(depthStart, picker.indexOf('\n    }', depthStart) + 6);
+const rows = between('    private func readerBlocks(', '    @ViewBuilder\n    private func openingPassage');
+const destination = rows.match(/let destinationID = [^\n]+/)[0];
+const memberships = rows.match(/let memberships = [^\n]+/)[0];
+const bookmarkState = rows.match(/isBookmarked: ([^\n]+),/)[1];
+assert.ok(rows.indexOf(destination) < rows.indexOf('ForEach(blocks)'), 'resolve the selected project once per group');
 const parser = between('enum NativeReaderSectionNavigator {', '    static func targets(')
  + between('    static func target(\n        forSourceBlockID', '    static func sectionNumber(from heading:')
  + between('    static func sectionNumber(from heading:', '\nstruct NativeReaderSearchMatch:');
@@ -29,12 +39,24 @@ enum NativeReaderLinkResolver {
  static func reference(for url: URL) -> Reference? { nil }
 }
 struct Summary { let id: Int64 }
-struct NativeReaderRuntimeBlock { let id: String; let sourceOrder: Int }
-struct NativeReaderRuntimeDocument { let blocks: [NativeReaderRuntimeBlock] }
+struct NativeReaderRuntimeBlock {
+ let id: String; let sourceOrder: Int; let anchorIDs: [String]; let sectionID: String?
+}
+struct Anchor { let blockID: String?; let id: String }
+struct NativeReaderRuntimeDocument { let blocks: [NativeReaderRuntimeBlock]; let anchors: [Anchor] }
+struct NativeReaderDisplayBlock { let id: String; let sourceBlockID: String }
+struct Project { let id: Int64 }
+struct Library { let readerSaveDestinationProject: Project?; let folderMembership: [Int64: [Int64]] }
+func isSaved(library: Library, bookmarkSectionID: Int64?) -> Bool {
+ DESTINATION
+ MEMBERSHIPS
+ return BOOKMARK_STATE
+}
 struct Remembered { var wrappedValue: Int64? }
 struct Reader {
  var sectionTargets: [NativeReaderSectionTarget]
  var currentSectionTarget: NativeReaderSectionTarget?
+ var currentSectionTargetIndex: Int? { sectionTargets.firstIndex { $0.id == currentSectionTarget?.id } }
  var pendingInitialBlockID: String?
  var rememberedSectionID = Remembered(wrappedValue: 13)
  var initialSectionID: Int64 = 13
@@ -71,8 +93,9 @@ check(count == size, "Actual native chapter must decompress completely")
 let document = try JSONSerialization.jsonObject(with: Data(bytes)) as! [String: Any]
 let sourceBlocks = document["blocks"] as! [[String: Any]]
 let runtime = NativeReaderRuntimeDocument(blocks: sourceBlocks.map {
- NativeReaderRuntimeBlock(id: $0["id"] as! String, sourceOrder: $0["sourceOrder"] as! Int)
-})
+ NativeReaderRuntimeBlock(id: $0["id"] as! String, sourceOrder: $0["sourceOrder"] as! Int,
+  anchorIDs: $0["anchorIDs"] as! [String], sectionID: $0["sectionID"] as? String)
+}, anchors: (document["anchors"] as! [[String: Any]]).map { Anchor(blockID: $0["blockID"] as? String, id: $0["id"] as! String) })
 let metadata = document["metadata"] as! [String: Any]
 check(metadata["codeSectionID"] as? Int == 1, "Fixture must be 2022 Building")
 let targets = (document["blocks"] as! [[String: Any]]).filter { $0["kind"] as? String == "heading" }.map { block in
@@ -82,6 +105,42 @@ let targets = (document["blocks"] as! [[String: Any]]).filter { $0["kind"] as? S
  return NativeReaderSectionTarget(id: id, blockID: id, sourceBlockID: id, sourceOrder: block["sourceOrder"] as! Int,
   sectionNumber: NativeReaderSectionNavigator.sectionNumber(from: title, anchorID: anchor), title: title,
   anchorID: anchor, level: block["headingLevel"] as! Int)
+}
+func verifyNavigation(_ doc: NativeReaderRuntimeDocument, _ headings: [NativeReaderSectionTarget]) {
+ let rows = doc.blocks.flatMap { source in
+  [NativeReaderDisplayBlock(id: source.id, sourceBlockID: source.id),
+   NativeReaderDisplayBlock(id: source.id + "::segment-1", sourceBlockID: source.id)]
+ }
+ let lookup = NativeReaderNavigationIndex(document: doc, displayBlocks: rows, sectionTargets: headings)
+ for (i, row) in rows.enumerated() {
+  let sourceIndex = doc.blocks.firstIndex { $0.id == row.sourceBlockID }!
+  let block = doc.blocks[sourceIndex]
+  let expected = NativeReaderSectionNavigator.target(forSourceBlockID: block.id, in: doc, targets: headings)
+  let location = lookup[row.id]!
+  check(location.displayIndex == i && location.sourceIndex == sourceIndex, "Row and original passage identities")
+  check(location.sectionTargetIndex.map { headings[$0].id } == expected?.id, "Owning heading, including split rows")
+  let anchor = block.anchorIDs.first ?? block.sectionID ?? doc.anchors.first { $0.blockID == block.id }?.id
+  check(location.anchorID == anchor, "Full/segmented rows use the source passage anchor")
+ }
+ check(lookup["missing"] == nil, "Unknown row must not acquire location")
+}
+verifyNavigation(runtime, targets)
+verifyNavigation(NativeReaderRuntimeDocument(blocks: Array(runtime.blocks.reversed()), anchors: runtime.anchors), Array(targets.reversed()))
+verifyNavigation(runtime, [])
+let synthetic = NativeReaderRuntimeDocument(blocks: [
+ NativeReaderRuntimeBlock(id: "first", sourceOrder: 0, anchorIDs: [], sectionID: nil),
+ NativeReaderRuntimeBlock(id: "section", sourceOrder: 1, anchorIDs: [], sectionID: "section"),
+ NativeReaderRuntimeBlock(id: "anchor", sourceOrder: 2, anchorIDs: ["anchor"], sectionID: "section")
+], anchors: [Anchor(blockID: "first", id: "earlier"), Anchor(blockID: "first", id: "later"), Anchor(blockID: nil, id: "unmapped")])
+verifyNavigation(synthetic, [])
+verifyNavigation(NativeReaderRuntimeDocument(blocks: [], anchors: []), [])
+let membershipsBySection: [Int64: [Int64]] = [5: [7, 8], 6: [], 9: [9]]
+for selected: Int64? in [nil, 7, 9, 10] {
+ let library = Library(readerSaveDestinationProject: selected.map(Project.init), folderMembership: membershipsBySection)
+ for section: Int64? in [nil, 5, 6, 9, 10] {
+  let expected = selected.map { project in section.map { membershipsBySection[$0]?.contains(project) == true } ?? false } ?? false
+  check(isSaved(library: library, bookmarkSectionID: section) == expected, "Only current project membership marks a row saved")
+ }
 }
 let prepared = try json(root.appendingPathComponent("2022-construction-codes/prepared/chapters/1.json"))
 let sections = (prepared["groups"] as! [[String: Any]]).flatMap { $0["sections"] as! [[String: Any]] }
@@ -126,11 +185,11 @@ let missing = NativeReaderSectionTarget(id: "missing", blockID: "missing", sourc
  sectionNumber: "10", title: "10 Missing", anchorID: nil, level: 6)
 reader.sectionTargets = [missing, leaf]; reader.currentSectionTarget = missing
 check(reader.bookmark == nil, "Numeric prefix10 must not include unrelated101.1")
-print("PASS: actual2022BCChapter1 chapter/group/leaf identities; same-level headings, sibling/code boundaries, unknown/unloaded targets and pending navigation.")
-`.replace(' PROPERTY', property);
+print("PASS: actual 2022 BC Chapter 1 and split-row navigation/anchors, current project membership, chapter/group/leaf identities; same-level headings, sibling/code boundaries, unknown/unloaded targets and pending navigation.")
+`.replace(' PROPERTY', property).replace(' DESTINATION', destination).replace(' MEMBERSHIPS', memberships).replace(' BOOKMARK_STATE', ' ' + bookmarkState);
 const dir = await mkdtemp(join(tmpdir(), 'permitext-bookmark-target-'));
 try {
- const swift = `import Foundation\nimport Compression\n${target}\n${parser}\n${resolver}\n${fixture}`;
+ const swift = `import Foundation\nimport Compression\n${target}\nenum ChapterSectionPickerRow {\n${pickerDepth}\n}\n${navigation}\n${parser}\n${resolver}\n${fixture}`;
  await writeFile(join(dir, 'main.swift'), swift);
  execFileSync('xcrun', ['swiftc', join(dir, 'main.swift'), '-o', join(dir, 'verify')], {stdio:'inherit'});
  execFileSync(join(dir, 'verify'), [root], {stdio:'inherit'});

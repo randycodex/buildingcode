@@ -8,7 +8,7 @@ import {join} from 'node:path';
 // and resolver fixtures isolate lookup parity; no UIKit/device timing claim.
 const store = await readFile(new URL('../../NYC CC APP/permitext/Data/NativeReaderDocumentStore.swift', import.meta.url), 'utf8');
 const view = await readFile(new URL('../../NYC CC APP/permitext/Views/NativeChapterTextReaderView.swift', import.meta.url), 'utf8');
-const metadata = store.slice(store.indexOf('struct NativeReaderSectionMetadata:'), store.indexOf('struct NativeReaderPreparedDocument:'));
+const metadata = store.slice(store.indexOf('struct NativeReaderSectionMetadata:'), store.indexOf('struct NativeReaderNavigationIndex:'));
 assert.ok(metadata.startsWith('struct NativeReaderSectionMetadata:'));
 const navigator = view.slice(view.indexOf('enum NativeReaderSectionNavigator {'), view.indexOf('\nstruct NativeReaderSearchMatch:'));
 const parser = navigator.slice(0, navigator.indexOf('    static func targets(')) + navigator.slice(navigator.indexOf('    static func sectionNumber('));
@@ -20,7 +20,7 @@ assert.match(view, /_sectionMetadata = State\(initialValue: prepared\.sectionMet
 assert.match(view, /sectionTargets = \[\]\s+sectionMetadata = \.empty/);
 assert.match(view, /sectionTargets = prepared\.sectionTargets\s+sectionMetadata = prepared\.sectionMetadata/);
 assert.match(store, /try Task\.checkCancellation\(\)\s+let sectionMetadata = NativeReaderSectionMetadata\.prepare\(document: document\)\s+try Task\.checkCancellation\(\)/);
-assert.match(store, /estimatedMemoryCost: max\(route\.uncompressedByteCount \+ derivedCost \+ sectionMetadata\.estimatedMemoryCost, 1\)/);
+assert.match(store, /estimatedMemoryCost: max\(route\.uncompressedByteCount \+ derivedCost\s+\+ sectionMetadata\.estimatedMemoryCost \+ navigationIndex\.estimatedMemoryCost, 1\)/);
 const fixture = String.raw`
 enum Kind { case heading, paragraph }
 struct Block { let kind:Kind; let sectionID:String?; let plainText:String; let anchorIDs:[String] }

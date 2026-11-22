@@ -1064,29 +1064,6 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(headerSource.contains("systemImage: \"text.book.closed\""))
     }
 
-    func testCompactReaderHeaderAppearsOnlyAfterChapterHeadingPassesTopEdge() {
-        XCTAssertFalse(
-            ReaderCompactHeaderTransition.isCompactHeaderVisible(
-                headerBoundaryMinY: 0.5
-            )
-        )
-        XCTAssertTrue(
-            ReaderCompactHeaderTransition.isCompactHeaderVisible(
-                headerBoundaryMinY: 0
-            )
-        )
-        XCTAssertFalse(
-            ReaderCompactHeaderTransition.isCompactHeaderVisible(
-                estimatedHTMLScrollOffset: 95
-            )
-        )
-        XCTAssertTrue(
-            ReaderCompactHeaderTransition.isCompactHeaderVisible(
-                estimatedHTMLScrollOffset: 96
-            )
-        )
-    }
-
     func testPhase5FirstUseGateOffersOnlyGenuinelyNewInstallations() {
         let freshDefaults = isolatedEntitlementDefaults()
         XCTAssertTrue(
@@ -1589,6 +1566,49 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 isMainFrame: false
             )
         )
+    }
+
+    @MainActor
+    func testHTMLScrollCheckpointsCoalesceAndFlushToTheOriginalChapter() async throws {
+        let checkpoint = ChapterHTMLScrollCheckpoint()
+        var first: [CGFloat] = []
+        var second: [CGFloat] = []
+        let periodicSave = expectation(description: "latest position during a continuous scroll")
+        for pixel in 1...120 {
+            checkpoint.record(CGFloat(pixel)) { value in
+                first.append(value)
+                periodicSave.fulfill()
+            }
+        }
+        XCTAssertTrue(first.isEmpty)
+        await fulfillment(of: [periodicSave], timeout: 3)
+        XCTAssertEqual(first, [120])
+
+        checkpoint.record(135.5) { first.append($0) }
+        checkpoint.finishDocument()
+        XCTAssertEqual(first, [120, 135.5])
+        checkpoint.record(135.5) { second.append($0) }
+        checkpoint.flush()
+        checkpoint.record(135.5) { second.append($0) }
+        checkpoint.flush()
+        // Leaving before a confirmed jump settles must restore its anchor.
+        var storedPixel: CGFloat? = 135.5
+        var storedAnchor: String?
+        checkpoint.record(160) { second.append($0) }
+        checkpoint.acceptJump {
+            storedAnchor = "402.1"
+            storedPixel = nil
+        }
+        checkpoint.flush()
+        try await Task.sleep(for: .milliseconds(300))
+        XCTAssertEqual(first, [120, 135.5])
+        XCTAssertEqual(second, [135.5])
+        XCTAssertEqual(storedAnchor, "402.1")
+        XCTAssertNil(storedPixel)
+        // An observed arrival can equal the last value saved before the jump.
+        checkpoint.record(135.5) { storedPixel = $0 }
+        checkpoint.flush()
+        XCTAssertEqual(storedPixel, 135.5)
     }
 
     func testChapterHTMLLoadRecoveryPolicyRetriesFailuresButNotCancellation() {
@@ -8045,7 +8065,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertFalse(nativeReaderSource.contains(".scrollPosition($scrollPosition)"))
         XCTAssertTrue(nativeReaderSource.contains(".equatable()"))
         XCTAssertTrue(nativeReaderSource.contains("NativeReaderTextBlockView: View, Equatable"))
-        XCTAssertTrue(nativeReaderSource.contains("attributedText: baseAttributedText"))
+        XCTAssertTrue(nativeReaderSource.contains("attributedText: savedText(baseAttributedText)"))
         XCTAssertTrue(nativeReaderSource.contains("cache.countLimit = 256"))
         XCTAssertTrue(nativeReaderSource.contains("cache.totalCostLimit = 24 * 1024 * 1024"))
         XCTAssertFalse(nativeReaderSource.contains(".onScrollTargetVisibilityChange"))
@@ -8064,7 +8084,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertFalse(attributedTextSource.contains("let id = UUID()"))
         XCTAssertTrue(attributedTextSource.contains("requiresTextUpdate"))
         XCTAssertTrue(attributedTextSource.contains("cachedMeasuredSize"))
-        XCTAssertTrue(attributedTextSource.contains("guard !attachments.isEmpty else { return attributedText }"))
+        XCTAssertTrue(attributedTextSource.contains("guard !replacements.isEmpty else { return ReaderEnactedTextLinkStyle.applying(to: attributedText) }"))
     }
 
     func testNativeReaderVisibleBlockResolutionObservesWithoutReassertingScrollPosition() {

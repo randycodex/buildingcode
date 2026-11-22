@@ -16,7 +16,6 @@ struct NativeChapterTextReaderView: View {
     var rememberedBlockID: Binding<String?> = .constant(nil)
     var rememberedViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
-    var onCompactHeaderVisibilityChange: ((Bool) -> Void)?
     var onFallbackToHTML: ((String, String?) -> Void)?
     var onOpenReference: ((CodeSectionSummary) -> Void)?
 
@@ -29,8 +28,9 @@ struct NativeChapterTextReaderView: View {
     @State private var displayBlocks: [NativeReaderDisplayBlock] = []
     @State private var sectionTargets: [NativeReaderSectionTarget] = []
     @State private var sectionMetadata: NativeReaderSectionMetadata = .empty
+    @State private var navigationIndex = NativeReaderNavigationIndex.empty
     @StateObject private var scrollState = NativeReaderScrollState()
-    @State private var currentSectionTargetID: String?
+    @State private var currentSectionTargetIndex: Int?
     @State private var pendingInitialBlockID: String?
     @State private var explicitNavigation = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -64,7 +64,6 @@ struct NativeChapterTextReaderView: View {
         rememberedBlockID: Binding<String?> = .constant(nil),
         rememberedViewport: Binding<NativeReaderViewportPosition?> = .constant(nil),
         rememberedAnchorID: Binding<String?> = .constant(nil),
-        onCompactHeaderVisibilityChange: ((Bool) -> Void)? = nil,
         onFallbackToHTML: ((String, String?) -> Void)? = nil,
         onOpenReference: ((CodeSectionSummary) -> Void)? = nil
     ) {
@@ -79,7 +78,6 @@ struct NativeChapterTextReaderView: View {
         self.rememberedBlockID = rememberedBlockID
         self.rememberedViewport = rememberedViewport
         self.rememberedAnchorID = rememberedAnchorID
-        self.onCompactHeaderVisibilityChange = onCompactHeaderVisibilityChange
         self.onFallbackToHTML = onFallbackToHTML
         self.onOpenReference = onOpenReference
         if let prepared = preparedNativeOpening?.document(matching: route)
@@ -88,8 +86,10 @@ struct NativeChapterTextReaderView: View {
             _displayBlocks = State(initialValue: prepared.displayBlocks)
             _sectionTargets = State(initialValue: prepared.sectionTargets)
             _sectionMetadata = State(initialValue: prepared.sectionMetadata)
+            _navigationIndex = State(initialValue: prepared.navigationIndex)
             let target = NativeReaderLocationResolver.initialBlockID(
                 in: prepared.document,
+                prepared: prepared,
                 opensAtChapterTop: opensAtChapterTop,
                 rememberedBlockID: rememberedBlockID.wrappedValue,
                 rememberedAnchorID: rememberedAnchorID.wrappedValue,
@@ -143,8 +143,8 @@ struct NativeChapterTextReaderView: View {
             releaseRestorationLease(reason: "inactive-tab")
             settledScrollTask?.cancel()
             settledScrollTask = nil
-            if canPersist, let document, let visibleBlockID = scrollState.visibleBlockID {
-                persistLocation(blockID: visibleBlockID, document: document)
+            if canPersist, let visibleBlockID = scrollState.visibleBlockID {
+                persistLocation(blockID: visibleBlockID)
             }
             nearbyMediaPrefetchTask?.cancel()
             nearbyMediaPrefetchTask = nil
@@ -300,7 +300,6 @@ struct NativeChapterTextReaderView: View {
                 .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
                 .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
                     scrollState.blockOffsets = offsets
-                    updateCompactHeaderVisibility(from: offsets)
                     traceRestoration("offset-preference")
                     guard !correctLateLayout(proxy: proxy) else { return }
                     visibleBlockDidChange(
@@ -334,7 +333,6 @@ struct NativeChapterTextReaderView: View {
                 .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
                 .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
                     scrollState.blockOffsets = offsets
-                    updateCompactHeaderVisibility(from: offsets)
                     traceRestoration("offset-preference")
                     guard !correctLateLayout(proxy: proxy) else { return }
                     visibleBlockDidChange(
@@ -374,21 +372,6 @@ struct NativeChapterTextReaderView: View {
         .accessibilityIdentifier("native-reader-ready")
     }
 
-    private func updateCompactHeaderVisibility(from offsets: [String: CGFloat]) {
-        guard pendingInitialBlockID == nil,
-              let chapterHeadingIndex = displayBlocks.firstIndex(where: { $0.block.kind == .heading }),
-              displayBlocks.indices.contains(chapterHeadingIndex + 1),
-              let boundaryOffset = offsets[displayBlocks[chapterHeadingIndex + 1].id] else {
-            onCompactHeaderVisibilityChange?(false)
-            return
-        }
-        onCompactHeaderVisibilityChange?(
-            ReaderCompactHeaderTransition.isCompactHeaderVisible(
-                headerBoundaryMinY: boundaryOffset
-            )
-        )
-    }
-
     private func readerBlocks(
         _ blocks: [NativeReaderDisplayBlock],
         document: NativeReaderRuntimeDocument,
@@ -398,12 +381,11 @@ struct NativeChapterTextReaderView: View {
         let needsSectionScope = chapter.codeSectionID.map {
             ReaderDefinitionStore.shared.hasSectionScopes(for: ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, chapterID: chapter.id))
         } ?? false
+        let destinationID = library.readerSaveDestinationProject?.id
         return ForEach(blocks) { displayBlock in
-            let bookmarkSectionID = NativeReaderSectionNavigator.target(
-                forSourceBlockID: displayBlock.sourceBlockID,
-                in: document,
-                targets: sectionTargets
-            ).flatMap(sectionSummary(for:))?.id
+            let target = navigationIndex[displayBlock.id]?.sectionTargetIndex.map { sectionTargets[$0] }
+            let bookmarkSectionID = target.flatMap(sectionSummary(for:))?.id
+            let memberships = bookmarkSectionID.flatMap { library.folderMembership[$0] } ?? []
             NativeReaderTextBlockView(
                 block: displayBlock.block,
                 hierarchyIndentation: displayBlock.hierarchyIndentation,
@@ -428,12 +410,11 @@ struct NativeChapterTextReaderView: View {
                 searchMatches: searchMatchesByBlock[displayBlock.id] ?? [],
                 activeSearchMatchID: activeSearchMatchID,
                 bookmarkSectionID: bookmarkSectionID,
-                isBookmarked: bookmarkSectionID.map { library.isSavedToReaderDestination(sectionID: $0) } ?? false,
+                isBookmarked: destinationID.map(memberships.contains) ?? false,
                 onResearchSelection: { selectedText in
                     sendSelectionToResearch(
                         selectedText,
-                        sourceBlockID: displayBlock.sourceBlockID,
-                        document: document
+                        target: target
                     )
                 }
             )
@@ -449,7 +430,7 @@ struct NativeChapterTextReaderView: View {
     @ViewBuilder
     private func openingPassage(document: NativeReaderRuntimeDocument, proxy: ScrollViewProxy) -> some View {
         if let target = pendingInitialBlockID,
-           let index = displayBlocks.firstIndex(where: { $0.id == target }) {
+           let index = navigationIndex[target]?.displayIndex {
             // Render the same validated source blocks while the full lazy list
             // settles. This preview does not participate in scroll geometry or
             // accept interaction, and never changes the destination identity.
@@ -490,8 +471,7 @@ struct NativeChapterTextReaderView: View {
         let previousBlockID = scrollState.visibleBlockID
         scrollState.visibleBlockID = blockID
         updateCurrentSectionPresentation(
-            blockID: blockID,
-            document: document,
+            targetIndex: navigationIndex[blockID]?.sectionTargetIndex,
             updatesRememberedSection: !scrollState.isScrollActive
         )
         if !scrollState.isDecelerating {
@@ -526,11 +506,12 @@ struct NativeChapterTextReaderView: View {
         displayBlocks = []
         sectionTargets = []
         sectionMetadata = .empty
+        navigationIndex = .empty
         pendingInitialBlockID = nil
         scrollState.visibleBlockID = nil
         scrollState.isScrollActive = false
         scrollState.isDecelerating = false
-        currentSectionTargetID = nil
+        currentSectionTargetIndex = nil
         failureMessage = nil
         hasRequestedFallback = false
         expandedMedia = nil
@@ -556,6 +537,7 @@ struct NativeChapterTextReaderView: View {
             let loaded = prepared.document
             let initialBlockID = NativeReaderLocationResolver.initialBlockID(
                 in: loaded,
+                prepared: prepared,
                 opensAtChapterTop: opensAtChapterTop,
                 rememberedBlockID: rememberedBlockID.wrappedValue,
                 rememberedAnchorID: rememberedAnchorID.wrappedValue,
@@ -564,7 +546,7 @@ struct NativeChapterTextReaderView: View {
                 initialSectionTitle: initialSectionTitle
             )
             if let initialBlockID,
-               let initialIndex = prepared.displayBlocks.firstIndex(where: { $0.id == initialBlockID }) {
+               let initialIndex = prepared.navigationIndex[initialBlockID]?.displayIndex {
                 let range = NativeReaderAttributedTextPrefetchPlanner.indexRange(
                     blockCount: prepared.displayBlocks.count,
                     centerIndex: initialIndex,
@@ -585,6 +567,7 @@ struct NativeChapterTextReaderView: View {
             displayBlocks = prepared.displayBlocks
             sectionTargets = prepared.sectionTargets
             sectionMetadata = prepared.sectionMetadata
+            navigationIndex = prepared.navigationIndex
             let requiresInitialRestore = NativeReaderInitialRestorationPolicy.requiresRestoration(
                 opensAtChapterTop: opensAtChapterTop,
                 targetBlockID: initialBlockID,
@@ -594,7 +577,7 @@ struct NativeChapterTextReaderView: View {
             pendingInitialBlockID = requiresInitialRestore ? initialBlockID : nil
             document = loaded
             if !requiresInitialRestore {
-                persistLocation(blockID: initialBlockID, document: loaded)
+                persistLocation(blockID: initialBlockID)
             }
             scheduleNearbyMediaPrefetch(around: initialBlockID, document: loaded)
             os_signpost(
@@ -628,7 +611,7 @@ struct NativeChapterTextReaderView: View {
             guard !Task.isCancelled, isBrowserTabActive,
                   pendingInitialBlockID == nil, !scrollState.isScrollActive,
                   scrollState.visibleBlockID == displayBlockID else { return }
-            persistLocation(blockID: displayBlockID, document: document)
+            persistLocation(blockID: displayBlockID)
             scheduleNearbyMediaPrefetch(around: displayBlockID, document: document)
             settledScrollTask = nil
         }
@@ -642,11 +625,7 @@ struct NativeChapterTextReaderView: View {
         nearbyMediaPrefetchTask?.cancel()
         nearbyMediaPrefetchTask = nil
         guard let displayBlockID,
-              let sourceBlockID = NativeReaderDisplayBlock.sourceBlockID(
-                  for: displayBlockID,
-                  in: document
-              ),
-              let focusedIndex = document.blocks.firstIndex(where: { $0.id == sourceBlockID })
+              let focusedIndex = navigationIndex[displayBlockID]?.sourceIndex
         else { return }
 
         let startIndex = max(document.blocks.startIndex, focusedIndex - 2)
@@ -669,7 +648,7 @@ struct NativeChapterTextReaderView: View {
         around displayBlockID: String,
         previousBlockID: String?
     ) {
-        guard let centerIndex = displayBlocks.firstIndex(where: { $0.id == displayBlockID })
+        guard let centerIndex = navigationIndex[displayBlockID]?.displayIndex
         else { return }
         if let lastCenter = scrollState.lastTextPrefetchCenterIndex,
            abs(centerIndex - lastCenter) < 4 {
@@ -677,7 +656,7 @@ struct NativeChapterTextReaderView: View {
         }
 
         let previousIndex = previousBlockID.flatMap { previousID in
-            displayBlocks.firstIndex(where: { $0.id == previousID })
+            navigationIndex[previousID]?.displayIndex
         }
         let direction = previousIndex.map { centerIndex >= $0 ? 1 : -1 } ?? 1
         let range = NativeReaderAttributedTextPrefetchPlanner.indexRange(
@@ -741,9 +720,7 @@ struct NativeChapterTextReaderView: View {
         hasRequestedFallback = true
         // Carry navigation intent without recording an unobserved arrival.
         let requestedBlockID = pendingInitialBlockID ?? scrollState.restorationLease?.blockID
-        let requestedAnchorID = requestedBlockID.flatMap { blockID in
-            document.flatMap { NativeReaderLocationResolver.anchorID(for: blockID, in: $0) }
-        }
+        let requestedAnchorID = requestedBlockID.flatMap { navigationIndex[$0]?.anchorID }
         traceRestoration("fallback", detail: message)
         releaseRestorationLease(reason: "fallback")
         onFallbackToHTML?(message, requestedAnchorID)
@@ -810,7 +787,7 @@ struct NativeChapterTextReaderView: View {
         pendingInitialBlockID = nil
         traceRestoration("revealed")
         explicitNavigation = false
-        persistLocation(blockID: targetBlockID, document: document)
+        persistLocation(blockID: targetBlockID)
     }
 
     @MainActor
@@ -984,30 +961,24 @@ struct NativeChapterTextReaderView: View {
         scheduleSettledScrollWork(around: visibleBlockID, document: document)
     }
 
-    private func persistLocation(blockID: String?, document: NativeReaderRuntimeDocument) {
-        guard let blockID,
-              NativeReaderDisplayBlock.sourceBlockID(for: blockID, in: document) != nil
-        else {
-            return
-        }
+    private func persistLocation(blockID: String?) {
+        guard let blockID, let location = navigationIndex[blockID] else { return }
         if pendingInitialBlockID == nil,
            let minY = scrollState.blockOffsets[blockID],
            let width = scrollState.scrollView?.bounds.width, width > 0 {
             rememberedViewport.wrappedValue = NativeReaderViewportPosition(routeID: route.id, theme: library.readerTheme, blockID: blockID, minY: Double(minY), width: Double(width))
         }
-        rememberLocation(blockID: blockID, document: document)
-        recordCurrentSection(blockID: blockID, document: document)
-    }
-
-    private func rememberLocation(blockID: String, document: NativeReaderRuntimeDocument) {
         if rememberedBlockID.wrappedValue != blockID {
             rememberedBlockID.wrappedValue = blockID
         }
-        if let anchorID = NativeReaderLocationResolver.anchorID(for: blockID, in: document),
+        if let anchorID = location.anchorID,
            rememberedAnchorID.wrappedValue != anchorID {
             rememberedAnchorID.wrappedValue = anchorID
         }
-        updateCurrentSectionPresentation(blockID: blockID, document: document)
+        updateCurrentSectionPresentation(targetIndex: location.sectionTargetIndex)
+        if let index = location.sectionTargetIndex {
+            recordCurrentSection(sectionTargets[index])
+        }
     }
 
     private func handleLink(
@@ -1030,13 +1001,13 @@ struct NativeChapterTextReaderView: View {
     }
 
     private var currentSectionTarget: NativeReaderSectionTarget? {
-        sectionTargets.first(where: { $0.id == currentSectionTargetID }) ?? sectionTargets.first
+        currentSectionTargetIndex.map { sectionTargets[$0] } ?? sectionTargets.first
     }
 
     private var currentBookmarkSectionID: Int64? {
         guard pendingInitialBlockID == nil else { return nil }
         return NativeReaderBookmarkTargetResolver.sectionID(
-            for: currentSectionTarget,
+            at: currentSectionTargetIndex ?? sectionTargets.indices.first,
             targets: sectionTargets,
             resolve: { sectionSummary(for: $0)?.id }
         )
@@ -1051,7 +1022,7 @@ struct NativeChapterTextReaderView: View {
                 ChapterSectionPickerRow(
                     title: target.menuLabel,
                     depth: target.pickerDepth,
-                    isCurrent: target.id == currentSectionTargetID,
+                    isCurrent: currentSectionTargetIndex.map { sectionTargets[$0].id == target.id } ?? false,
                     accent: accentColor
                 ) {
                     isJumpPickerPresented = false
@@ -1091,17 +1062,13 @@ struct NativeChapterTextReaderView: View {
     }
 
     private func updateCurrentSectionPresentation(
-        blockID: String,
-        document: NativeReaderRuntimeDocument,
+        targetIndex: Int?,
         updatesRememberedSection: Bool = true
     ) {
-        guard let target = NativeReaderSectionNavigator.target(
-            forDisplayBlockID: blockID,
-            in: document,
-            targets: sectionTargets
-        ) else { return }
-        if currentSectionTargetID != target.id {
-            currentSectionTargetID = target.id
+        guard let targetIndex else { return }
+        let target = sectionTargets[targetIndex]
+        if currentSectionTargetIndex != targetIndex {
+            currentSectionTargetIndex = targetIndex
         }
 
         if updatesRememberedSection,
@@ -1111,15 +1078,7 @@ struct NativeChapterTextReaderView: View {
         }
     }
 
-    private func recordCurrentSection(
-        blockID: String,
-        document: NativeReaderRuntimeDocument
-    ) {
-        guard let target = NativeReaderSectionNavigator.target(
-            forDisplayBlockID: blockID,
-            in: document,
-            targets: sectionTargets
-        ) else { return }
+    private func recordCurrentSection(_ target: NativeReaderSectionTarget) {
         guard lastRecordedSectionTargetID != target.id else { return }
         lastRecordedSectionTargetID = target.id
         if let sectionNumber = target.sectionNumber, !sectionNumber.isEmpty {
@@ -1137,16 +1096,10 @@ struct NativeChapterTextReaderView: View {
 
     private func sendSelectionToResearch(
         _ selectedText: String,
-        sourceBlockID: String,
-        document: NativeReaderRuntimeDocument
+        target: NativeReaderSectionTarget?
     ) {
         let normalized = selectedText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalized.isEmpty else { return }
-        let target = NativeReaderSectionNavigator.target(
-            forSourceBlockID: sourceBlockID,
-            in: document,
-            targets: sectionTargets
-        )
         let sectionID = target.flatMap(sectionSummary(for:))?.id
             ?? rememberedSectionID.wrappedValue
             ?? initialSectionID
@@ -1240,12 +1193,16 @@ enum NativeReaderVisibleBlockResolver {
         from offsets: [String: CGFloat],
         threshold: CGFloat
     ) -> String? {
-        guard !offsets.isEmpty else { return nil }
-        let aboveOrAt = offsets.filter { $0.value <= threshold }
-        if let closestAbove = aboveOrAt.max(by: { $0.value < $1.value })?.key {
-            return closestAbove
+        var above: (id: String, y: CGFloat)?
+        var below: (id: String, y: CGFloat)?
+        for (id, y) in offsets {
+            if y <= threshold {
+                if y >= (above?.y ?? -.infinity) { above = (id, y) }
+            } else if below.map({ y < $0.y }) ?? true {
+                below = (id, y)
+            }
         }
-        return offsets.min(by: { $0.value < $1.value })?.key
+        return above?.id ?? below?.id
     }
 }
 
@@ -1554,11 +1511,12 @@ struct NativeReaderSearchMatch: Identifiable, Hashable, Sendable {
 /// Resolve within that heading's descendants, never through a remembered location.
 enum NativeReaderBookmarkTargetResolver {
     static func sectionID(
-        for target: NativeReaderSectionTarget?,
+        at index: Int?,
         targets: [NativeReaderSectionTarget],
         resolve: (NativeReaderSectionTarget) -> Int64?
     ) -> Int64? {
-        guard let target, let index = targets.firstIndex(where: { $0.id == target.id }) else { return nil }
+        guard let index, targets.indices.contains(index) else { return nil }
+        let target = targets[index]
         if let sectionID = resolve(target) { return sectionID }
         let number = target.sectionNumber?.uppercased()
         let title = target.title.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
@@ -1990,6 +1948,7 @@ enum NativeReaderInitialRestorationPolicy {
 enum NativeReaderLocationResolver {
     static func initialBlockID(
         in document: NativeReaderRuntimeDocument,
+        prepared: NativeReaderPreparedDocument? = nil,
         opensAtChapterTop: Bool = false,
         rememberedBlockID: String?,
         rememberedAnchorID: String?,
@@ -2001,10 +1960,10 @@ enum NativeReaderLocationResolver {
             return document.blocks.first?.id
         }
 
-        if let rememberedBlockID,
-           NativeReaderDisplayBlock.blocks(from: document.blocks)
-               .contains(where: { $0.id == rememberedBlockID }) {
-            return rememberedBlockID
+        if let rememberedBlockID {
+            let hasBlock = prepared.map { $0.navigationIndex[rememberedBlockID] != nil }
+                ?? NativeReaderDisplayBlock.blocks(from: document.blocks).contains { $0.id == rememberedBlockID }
+            if hasBlock { return rememberedBlockID }
         }
         for anchorID in [rememberedAnchorID, initialAnchorID].compactMap({ $0 }) {
             if let blockID = blockID(forAnchorID: anchorID, in: document) {
@@ -2015,7 +1974,8 @@ enum NativeReaderLocationResolver {
         let normalizedSection = normalizedSectionNumber(initialSectionNumber)
         let normalizedTitle = normalizedSectionNumber(initialSectionTitle)
         if !normalizedSection.isEmpty, !normalizedTitle.isEmpty {
-            let matches = NativeReaderDisplayBlock.blocks(from: document.blocks).filter { display in
+            let rows = prepared?.displayBlocks ?? NativeReaderDisplayBlock.blocks(from: document.blocks)
+            let matches = rows.filter { display in
                 let text = normalizedSectionNumber(display.block.plainText)
                 guard text.hasPrefix(normalizedSection) else { return false }
                 let suffix = String(text.dropFirst(normalizedSection.count))
@@ -2051,22 +2011,6 @@ enum NativeReaderLocationResolver {
         return document.blocks.first(where: {
             $0.sectionID == normalizedAnchor || $0.anchorIDs.contains(normalizedAnchor)
         })?.id
-    }
-
-    static func anchorID(
-        for blockID: String,
-        in document: NativeReaderRuntimeDocument
-    ) -> String? {
-        let sourceBlockID = NativeReaderDisplayBlock.sourceBlockID(for: blockID, in: document)
-        if let block = document.blocks.first(where: { $0.id == sourceBlockID }) {
-            if let anchorID = block.anchorIDs.first {
-                return anchorID
-            }
-            if let sectionID = block.sectionID {
-                return sectionID
-            }
-        }
-        return document.anchors.first(where: { $0.blockID == sourceBlockID })?.id
     }
 
     private static func normalizedSectionNumber(_ value: String) -> String {

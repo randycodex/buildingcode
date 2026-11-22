@@ -36,16 +36,18 @@ struct NativeReaderRuntimeDocument { let id: String }
     var textPrefetches = 0
     var releasedLeases = 0
     var rememberedSectionUpdates: [Bool] = []
+    struct Location { let sectionTargetIndex: Int? }
+    let navigationIndex = ["late-layout-block": Location(sectionTargetIndex: 1)]
     func traceRestoration(_ event: String, phase: String) {}
     func releaseRestorationLease(reason: String) { releasedLeases += 1 }
-    func persistLocation(blockID: String?, document: NativeReaderRuntimeDocument) {
-        persisted.append("\\(document.id):\\(blockID ?? "nil")")
+    func persistLocation(blockID: String?) {
+        persisted.append(blockID ?? "nil")
     }
     func scheduleNearbyMediaPrefetch(around blockID: String?, document: NativeReaderRuntimeDocument) {
         media.append("\\(document.id):\\(blockID ?? "nil")")
     }
     func scheduleNearbyTextPrefetch(around blockID: String, previousBlockID: String?) { textPrefetches += 1 }
-    func updateCurrentSectionPresentation(blockID: String, document: NativeReaderRuntimeDocument, updatesRememberedSection: Bool = true) {
+    func updateCurrentSectionPresentation(targetIndex: Int?, updatesRememberedSection: Bool = true) {
         rememberedSectionUpdates.append(updatesRememberedSection)
     }
     ${method('visibleBlockDidChange')}
@@ -90,13 +92,13 @@ func check(_ value: @autoclosure () -> Bool, _ message: String) {
               "Late geometry during tracking must not cause delayed persistence or media prefetch")
         tracking.scrollPhaseDidChange(.idle, document: document)
         await tracking.settledScrollTask!.value
-        check(tracking.persisted == ["chapter-a:late-layout-block"] && tracking.media == tracking.persisted,
+        check(tracking.persisted == ["late-layout-block"] && tracking.media == ["chapter-a:late-layout-block"],
               "After touch ends, the final observed block persists once")
         let idle = ReaderHarness()
         idle.scrollPhaseDidChange(.idle, document: document)
         check(idle.persisted.isEmpty && idle.media.isEmpty, "Settled work remains deferred")
         await idle.settledScrollTask!.value
-        check(idle.persisted == ["chapter-a:long-paragraph"] && idle.media == idle.persisted,
+        check(idle.persisted == ["long-paragraph"] && idle.media == ["chapter-a:long-paragraph"],
               "Uninterrupted idle persists the exact passage and prefetches once")
         check(idle.settledScrollTask == nil && idle.textPrefetches == 1,
               "Successful settled work clears its task and retains idle text prefetch")

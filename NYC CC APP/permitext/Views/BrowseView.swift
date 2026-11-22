@@ -54,7 +54,6 @@ struct BrowseView: View {
     @State private var rememberedSectionIDs: [Int64: Int64] = [:]
     @State private var rememberedNativeBlockIDs: [Int64: String] = [:]
     @State private var rememberedAnchorIDs: [Int64: String] = [:]
-    @State private var rememberedScrollOffsets: [Int64: Double] = [:]
     private let tabBarClearance: CGFloat = 104
 
     private var accentColor: Color {
@@ -773,17 +772,12 @@ struct BrowseView: View {
     private func rememberedScrollOffsetBinding(for chapterID: Int64) -> Binding<Double?> {
         Binding(
             get: {
-                rememberedScrollOffsets[chapterID] ?? BrowserContextID.storedScrollOffset(
+                BrowserContextID.storedScrollOffset(
                     for: chapterID,
                     context: browserContext
                 )
             },
             set: { newValue in
-                if let newValue, newValue >= 0 {
-                    rememberedScrollOffsets[chapterID] = newValue
-                } else {
-                    rememberedScrollOffsets.removeValue(forKey: chapterID)
-                }
                 BrowserContextID.persistScrollOffset(
                     newValue,
                     for: chapterID,
@@ -1453,14 +1447,6 @@ extension View {
         } else {
             background(.regularMaterial, in: Circle())
         }
-    }
-}
-
-struct CodeScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
     }
 }
 

@@ -145,7 +145,6 @@ struct SettingsView: View {
     @State private var sourceOptionsRetry = UUID()
     @State private var sourceOptionsRequestID: String?
     @State private var sourceOptionsLoadedCatalog: String?
-    @State private var scrollOffset: CGFloat = 0
     @State private var showsContentTrash = false
     @State private var pendingClearAction: ClearSettingsAction?
     @State private var selectedProjectIDs = Set<Int64>()
@@ -305,10 +304,6 @@ struct SettingsView: View {
         return components.url ?? URL(string: "mailto:support@per.codes")!
     }
 
-    private var collapseProgress: CGFloat {
-        min(max(-scrollOffset / 64, 0), 1)
-    }
-
     private var accountSettingsSections: some View {
         Group {
             CodeSurface(accent: settingsChromeColor, showsBorder: false) {
@@ -379,12 +374,6 @@ struct SettingsView: View {
         NavigationStack {
             ScrollViewReader { scrollProxy in
             ScrollView {
-                GeometryReader { proxy in
-                    Color.clear
-                        .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("settingsScroll")).minY)
-                }
-                .frame(height: 0)
-
                 VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                     if isSourcesScreen {
                         CodeSurface(accent: settingsChromeColor, showsBorder: false) {
@@ -437,8 +426,6 @@ struct SettingsView: View {
             guard isSourcesScreen else { return }
             await loadSourceOptions()
         }
-        .coordinateSpace(name: "settingsScroll")
-        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
         .onChange(of: library.folders.map(\.id)) { _, folderIDs in
             selectedProjectIDs.formIntersection(folderIDs)
         }

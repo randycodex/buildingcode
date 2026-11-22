@@ -433,7 +433,6 @@ private struct AttributedTextContainer: UIViewRepresentable {
             guard let attachment = value as? NSTextAttachment else { return }
             attachments.append((range, attachment))
         }
-        let rendered = NSMutableAttributedString(attributedString: attributedText)
         var replacements: [(NSRange, NSAttributedString)] = []
         for (range, attachment) in attachments {
             guard let sourceImage = image(from: attachment) else { continue }
@@ -458,6 +457,8 @@ private struct AttributedTextContainer: UIViewRepresentable {
             replacements.append((range, replacement))
         }
 
+        guard !replacements.isEmpty else { return ReaderEnactedTextLinkStyle.applying(to: attributedText) }
+        let rendered = NSMutableAttributedString(attributedString: attributedText)
         for (range, replacement) in replacements.reversed() {
             rendered.replaceCharacters(in: range, with: replacement)
         }

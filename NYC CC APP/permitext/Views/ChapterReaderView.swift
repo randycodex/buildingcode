@@ -15,7 +15,6 @@ struct ChapterReaderView: View {
     var rememberedNativeBlockID: Binding<String?> = .constant(nil)
     var rememberedNativeViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
-    var onCompactHeaderVisibilityChange: ((Bool) -> Void)? = nil
     var onNativeFallbackToHTML: ((String, String?) -> Void)? = nil
     var onNativeOpenReference: ((CodeSectionSummary) -> Void)? = nil
 
@@ -33,12 +32,9 @@ struct ChapterReaderView: View {
     @State private var scrollPositionSectionID: Int64?
     @State private var focusedSectionUpdateTask: Task<Void, Never>?
     @State private var backgroundPrefetchTask: Task<Void, Never>?
-    @State private var scrollProgress: CGFloat = 0
-    @State private var lastBlockOffsets: [Int64: CGFloat] = [:]
     @State private var loadedBlocksChapterID: Int64?
     @State private var isChapterSearchPresented = false
     @State private var chapterSearchQuery = ""
-    @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @StateObject private var expandedMediaTracker = ExpandedMediaTracker()
     private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
     private let chapterReaderScrollTopThreshold: CGFloat = 140
@@ -98,7 +94,6 @@ struct ChapterReaderView: View {
                     rememberedBlockID: rememberedNativeBlockID,
                     rememberedViewport: rememberedNativeViewport,
                     rememberedAnchorID: rememberedAnchorID,
-                    onCompactHeaderVisibilityChange: onCompactHeaderVisibilityChange,
                     onFallbackToHTML: onNativeFallbackToHTML,
                     onOpenReference: onNativeOpenReference
                 )
@@ -130,9 +125,6 @@ struct ChapterReaderView: View {
         .environmentObject(expandedMediaTracker)
         .onPreferenceChange(ChapterReaderBlockOffsetPreferenceKey.self) { offsets in
             DispatchQueue.main.async {
-                lastBlockOffsets = offsets
-                updateScrollProgress(from: offsets)
-                updateCompactHeaderVisibility(from: offsets)
                 updateFocusedSection(from: offsets)
             }
         }
@@ -211,14 +203,6 @@ struct ChapterReaderView: View {
             library.noteChapterOpened(chapter: chapter)
             chapterSearchQuery = ""
             await loadBlocks(with: proxy)
-        }
-        .onAppear {
-            updateScrollProgress(from: lastBlockOffsets)
-        }
-        .onChange(of: isBrowserTabActive) { _, isActive in
-            if isActive {
-                updateScrollProgress(from: lastBlockOffsets)
-            }
         }
         .onDisappear {
             focusedSectionUpdateTask?.cancel()
@@ -387,7 +371,6 @@ struct ChapterReaderView: View {
 
     private func loadBlocks(with proxy: ScrollViewProxy) async {
         if loadedBlocksChapterID == chapter.id, !blocks.isEmpty {
-            updateScrollProgress(from: lastBlockOffsets)
             return
         }
 
@@ -397,7 +380,6 @@ struct ChapterReaderView: View {
 
         loadedBlocksChapterID = chapter.id
         blocks = []
-        scrollProgress = 0
         pendingFocusedSectionID = nil
         expandedMediaTracker.reset()
         focusedSectionUpdateTask?.cancel()
@@ -471,32 +453,6 @@ struct ChapterReaderView: View {
         rememberedSectionID.wrappedValue = id
         pendingScrollSectionID = id
         scrollIfNeeded(with: proxy, animated: true)
-    }
-
-    private func updateScrollProgress(from offsets: [Int64: CGFloat]) {
-        let visibleBlocks = visibleJumpBlocks
-        guard !visibleBlocks.isEmpty else {
-            scrollProgress = 0
-            return
-        }
-        guard let topID = topVisibleSectionID(from: offsets),
-              let index = visibleBlocks.firstIndex(where: { $0.id == topID })
-        else { return }
-        let denominator = max(visibleBlocks.count - 1, 1)
-        scrollProgress = CGFloat(index) / CGFloat(denominator)
-    }
-
-    private func updateCompactHeaderVisibility(from offsets: [Int64: CGFloat]) {
-        guard let firstBlockID = visibleJumpBlocks.first?.id,
-              let firstBlockOffset = offsets[firstBlockID] else {
-            onCompactHeaderVisibilityChange?(false)
-            return
-        }
-        onCompactHeaderVisibilityChange?(
-            ReaderCompactHeaderTransition.isCompactHeaderVisible(
-                headerBoundaryMinY: firstBlockOffset
-            )
-        )
     }
 
     private func updateFocusedSection(from offsets: [Int64: CGFloat]) {

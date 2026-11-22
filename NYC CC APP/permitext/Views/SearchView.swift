@@ -186,10 +186,10 @@ struct PreparedSearchReaderDestination: Identifiable {
             // HTML fallback. Never substitute a different edition or source.
             if let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: nativeRoute) {
                 nativeOpening = NativeReaderPreparedOpening(route: nativeRoute, prepared: prepared)
-                if let target = NativeReaderLocationResolver.initialBlockID(in: prepared.document,
+                if let target = NativeReaderLocationResolver.initialBlockID(in: prepared.document, prepared: prepared,
                     rememberedBlockID: nil, rememberedAnchorID: nil, initialAnchorID: nil,
                     initialSectionNumber: section.sectionNumber, initialSectionTitle: section.displayTitle),
-                   let index = prepared.displayBlocks.firstIndex(where: { $0.id == target }) {
+                   let index = prepared.navigationIndex[target]?.displayIndex {
                     let range = NativeReaderAttributedTextPrefetchPlanner.indexRange(
                         blockCount: prepared.displayBlocks.count, centerIndex: index, direction: 1)
                     await NativeReaderAttributedTextCache.shared.prewarm(
@@ -256,7 +256,6 @@ struct SearchView: View {
     @State private var openingError: String?
     @State private var failedOpeningRoute: SearchReaderRoute?
     @State private var showsGlobalOpeningProgress = false
-    @State private var scrollOffset: CGFloat = 0
     @State private var cachedFilteredResults: [CodeSearchResult] = []
     @State private var cachedGroupedResults: [SearchResultGroup] = []
     @State private var cachedRecentEntries: [RecentlyViewedEntry] = []
@@ -285,10 +284,6 @@ struct SearchView: View {
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
-    }
-
-    private var collapseProgress: CGFloat {
-        min(max(-scrollOffset / 64, 0), 1)
     }
 
     private var activeSearchFilterCodeSectionIDs: Set<Int64> {
@@ -423,8 +418,6 @@ struct SearchView: View {
                 }
             }
         }
-        .coordinateSpace(name: "searchScroll")
-        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
     private var searchWorkspace: some View {
@@ -501,12 +494,6 @@ struct SearchView: View {
 
     private var searchResultsScroll: some View {
         ScrollView {
-            GeometryReader { proxy in
-                Color.clear
-                    .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("searchScroll")).minY)
-            }
-            .frame(height: 0)
-
             VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
 
                 if showsGlobalOpeningProgress, let openingRoute {
@@ -793,8 +780,7 @@ struct SearchView: View {
     }
 
     /// Rebuilds the filtered + grouped search caches. Called only when the
-    /// underlying results or the filter set change, so SwiftUI body renders
-    /// driven by scroll offset don't re-run Dictionary(grouping:) + sort.
+    /// underlying results or the filter set change.
     private func rebuildSearchCaches() {
         let filtered = library.searchResults.filter { searchFilterCodeSectionIDs.isEmpty || $0.searchFilterID.map { searchFilterCodeSectionIDs.contains($0) } == true }
         cachedFilteredResults = filtered
