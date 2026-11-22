@@ -72,8 +72,15 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(deletion.staticTexts["This cannot be undone."].exists)
         deletion.buttons["Cancel"].tap()
         back.tap()
-        XCTAssertTrue(app.buttons.matching(identifier: "research-history-row").firstMatch.waitForExistence(timeout: 15))
+        let conversationRow = app.buttons.matching(identifier: "research-history-row").firstMatch
+        XCTAssertTrue(conversationRow.waitForExistence(timeout: 15))
         keepScreenshot(named: "Research belongs to Acceptance Project", from: app)
+        conversationRow.tap()
+        XCTAssertTrue(element(in: app, identifier: "research-composer").waitForExistence(timeout: 15))
+        XCTAssertFalse(historySearch.isHittable)
+        back.tap()
+        XCTAssertTrue(conversationRow.isHittable)
+        XCTAssertTrue(historySearch.isHittable)
 
         XCTAssertFalse(app.buttons["project-close"].exists)
         app.buttons["main-tab-saved"].tap()

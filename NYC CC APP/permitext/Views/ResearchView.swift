@@ -506,7 +506,9 @@ struct ResearchView: View {
 
 private struct ResearchSessionView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
+    @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.purchase) private var purchase
     @Environment(\.scenePhase) private var scenePhase
     @State private var summaries: [ResearchConversationSummary] = []
@@ -585,46 +587,18 @@ private struct ResearchSessionView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 0) {
-                Group {
-                    if library.defersEntitlementPresentation {
-                        NativeEntitlementStatusView()
-                            .padding(24)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else if library.signedInAccount == nil {
-                        researchAccessRecovery(
-                            title: "Research requires Pro",
-                            description: pendingSelectionRecoveryDescription(
-                                fallback: "Sign in and upgrade to Pro for cited Research. Code reading and search remain free."
-                            ),
-                            buttonTitle: "Open Account",
-                            section: .account
-                        )
-                    } else if !library.hasResearchAccess {
-                        researchAccessRecovery(
-                            title: "Research requires Pro",
-                            description: pendingSelectionRecoveryDescription(
-                                fallback: "Upgrade to Pro for personal Research. Code reading and search remain free."
-                            ),
-                            buttonTitle: "View Plans",
-                            section: .plan
-                        )
-                    } else if !library.researchHistoryIsPresented, let conversation,
-                              conversation.id == library.activeResearchConversationID, acceptsConversation(conversation) {
-                        conversationView(conversation)
-                    } else {
-                        historyView
-                    }
+            Group {
+                if !library.defersEntitlementPresentation, library.signedInAccount != nil, library.hasResearchAccess {
+                    researchWorkspace
+                } else {
+                    researchAccessScreen
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .overlay(alignment: .top) { researchScreenHeader() }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
             .background(CodeAppBackdrop(accent: Color.appChrome).ignoresSafeArea())
-            .overlay(alignment: .top) {
-                if library.researchHistoryIsPresented || conversation == nil || conversation?.id != library.activeResearchConversationID {
-                    researchScreenHeader
-                }
-            }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
@@ -830,6 +804,64 @@ private struct ResearchSessionView: View {
         }
     }
 
+    @ViewBuilder
+    private var researchAccessScreen: some View {
+        if library.defersEntitlementPresentation {
+            NativeEntitlementStatusView().padding(24)
+        } else if library.signedInAccount == nil {
+            researchAccessRecovery(
+                title: "Research requires Pro",
+                description: pendingSelectionRecoveryDescription(
+                    fallback: "Sign in and upgrade to Pro for cited Research. Code reading and search remain free."
+                ),
+                buttonTitle: "Open Account",
+                section: .account
+            )
+        } else {
+            researchAccessRecovery(
+                title: "Research requires Pro",
+                description: pendingSelectionRecoveryDescription(
+                    fallback: "Upgrade to Pro for personal Research. Code reading and search remain free."
+                ),
+                buttonTitle: "View Plans",
+                section: .plan
+            )
+        }
+    }
+
+    private var presentedConversation: ResearchConversation? {
+        guard !library.researchHistoryIsPresented, let conversation,
+              conversation.id == library.activeResearchConversationID,
+              acceptsConversation(conversation) else { return nil }
+        return conversation
+    }
+
+    private var researchWorkspace: some View {
+        let presented = presentedConversation
+        let showingConversation = presented != nil
+        let trailing: CGFloat = layoutDirection == .rightToLeft ? -1 : 1
+
+        return ZStack {
+            // Keep the list mounted so Back restores the same scroll position and search.
+            historyView
+                .overlay(alignment: .top) { researchScreenHeader() }
+                .offset(x: showingConversation && !reduceMotion ? -18 * trailing : 0)
+                .opacity(showingConversation ? 0 : 1)
+                .allowsHitTesting(!showingConversation)
+                .accessibilityHidden(showingConversation)
+
+            if let presented {
+                conversationView(presented)
+                    .transition(reduceMotion ? .identity : .offset(x: 36 * trailing).combined(with: .opacity))
+                    .zIndex(1)
+            }
+        }
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: showingConversation)
+        .onChange(of: showingConversation) { _, isPresented in
+            if isPresented { isHistorySearchFocused = false }
+        }
+    }
+
     private func researchAccessRecovery(
         title: String,
         description: String,
@@ -877,9 +909,9 @@ private struct ResearchSessionView: View {
         return "Your selected Reader passage is kept. \(fallback)"
     }
 
-    private var researchHeaderButtons: some View {
+    private func researchHeaderButtons(conversation: ResearchConversation?) -> some View {
         HStack(spacing: 0) {
-            if conversation == nil || library.researchHistoryIsPresented, !summaries.isEmpty {
+            if conversation == nil, library.hasResearchAccess, !summaries.isEmpty {
                 if isSelectingHistory {
                     Button("Cancel") { isSelectingHistory = false; selectedHistoryIDs = [] }
                         .disabled(isDeletingHistoryBatch)
@@ -901,7 +933,7 @@ private struct ResearchSessionView: View {
                 }
             }
 
-            if conversation == nil || library.researchHistoryIsPresented,
+            if conversation == nil,
                library.signedInAccount != nil,
                library.hasResearchAccess, !isSelectingHistory {
                 Button {
@@ -917,7 +949,7 @@ private struct ResearchSessionView: View {
                 .accessibilityLabel("New Research")
             }
 
-            if let conversation, !library.researchHistoryIsPresented {
+            if let conversation {
                 Menu {
                     if projectFolderID == nil {
                         Menu {
@@ -985,19 +1017,19 @@ private struct ResearchSessionView: View {
     }
 
     @ViewBuilder
-    private var researchScreenHeader: some View {
-        if conversation != nil && !library.researchHistoryIsPresented {
+    private func researchScreenHeader(conversation: ResearchConversation? = nil) -> some View {
+        if let conversation {
             HStack {
                 researchHistoryBackButton
                 Spacer(minLength: 0)
-                researchHeaderButtons.codeLiquidGlassCircle()
+                researchHeaderButtons(conversation: conversation).codeLiquidGlassCircle()
             }
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
             .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
         } else {
             CodeScreenTitleRow(title: "Research", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
-                researchHeaderButtons
+                researchHeaderButtons(conversation: nil)
                     .frame(width: isSelectingHistory ? 164 : (summaries.isEmpty ? 44 : 88), height: CodeScreenMetrics.toolbarButtonSize)
                     .codeLiquidGlassCapsule()
             }
@@ -1109,6 +1141,7 @@ private struct ResearchSessionView: View {
                             if selectedHistoryIDs.contains(item.id) { selectedHistoryIDs.remove(item.id) }
                             else { selectedHistoryIDs.insert(item.id) }
                         } else {
+                            isHistorySearchFocused = false
                             library.researchHistoryIsPresented = false
                             library.activeResearchConversationID = item.id
                         }
@@ -1323,7 +1356,7 @@ private struct ResearchSessionView: View {
                     .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
                 }
 
-                researchScreenHeader
+                researchScreenHeader(conversation: conversation)
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 researchComposer
