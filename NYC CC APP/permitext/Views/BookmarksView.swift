@@ -1139,7 +1139,7 @@ private struct BookmarkExportPreviewSheet: View {
     }
 }
 
-enum ProjectOverviewSection: Hashable {
+enum ProjectOverviewSection: CaseIterable, Hashable {
     case overview, questions, checklist, notebook, evidence, reports
 }
 
@@ -1931,11 +1931,11 @@ struct ProjectView: View {
     private var projectDashboard: some View {
         ViewThatFits(in: .vertical) {
             if !dynamicTypeSize.isAccessibilitySize {
-                projectDashboardContent(compact: false)
-                projectDashboardContent(compact: true)
+                projectDashboardContent(compact: false, expandsCards: true)
+                projectDashboardContent(compact: true, expandsCards: true)
             }
             ScrollView {
-                projectDashboardContent(compact: !dynamicTypeSize.isAccessibilitySize)
+                projectDashboardContent(compact: !dynamicTypeSize.isAccessibilitySize, expandsCards: false)
             }
             .scrollIndicators(.hidden)
             .scrollBounceBehavior(.basedOnSize)
@@ -1950,10 +1950,11 @@ struct ProjectView: View {
         return 0
     }
 
-    private func projectDashboardContent(compact: Bool) -> some View {
+    private func projectDashboardContent(compact: Bool, expandsCards: Bool) -> some View {
         VStack(alignment: .leading, spacing: compact ? 8 : CodeScreenMetrics.contentSpacingBelowTitle) {
             projectHeader
-            projectSectionCards(compact: compact)
+                .fixedSize(horizontal: false, vertical: true)
+            projectSectionCards(compact: compact, expandsCards: expandsCards)
         }
         .padding(.horizontal, contentHorizontalInset)
         .padding(.top, compact ? 6 : 12)
@@ -2049,9 +2050,27 @@ struct ProjectView: View {
         projectHubSnapshot?.reports.max { $0.createdAt < $1.createdAt }
     }
 
-    private func projectSectionCards(compact: Bool) -> some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .topLeading),
-                                 count: dynamicTypeSize.isAccessibilitySize ? 1 : 2), spacing: compact ? 8 : 10) {
+    private func projectSectionCards(compact: Bool, expandsCards: Bool) -> some View {
+        let sections = ProjectOverviewSection.allCases
+        let columns = dynamicTypeSize.isAccessibilitySize ? 1 : 2
+        let rowStarts = Array(stride(from: 0, to: sections.count, by: columns))
+        return VStack(spacing: compact ? 8 : 10) {
+            ForEach(rowStarts, id: \.self) { start in
+                HStack(alignment: .top, spacing: 8) {
+                    ForEach(sections[start..<min(start + columns, sections.count)], id: \.self) { section in
+                        projectSectionLink(section, compact: compact, expands: expandsCards)
+                    }
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .tint(Color.appChrome)
+    }
+
+    @ViewBuilder
+    private func projectSectionLink(_ section: ProjectOverviewSection, compact: Bool, expands: Bool) -> some View {
+        switch section {
+        case .overview:
             NavigationLink(value: ProjectOverviewSection.overview) {
                 let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                 let summary = String(formattedProjectContext(description).characters)
@@ -2061,59 +2080,62 @@ struct ProjectView: View {
                 projectSectionCard("Overview", systemImage: "list.bullet.rectangle",
                     count: "\(facts.count) \(facts.count == 1 ? "fact" : "facts")",
                     preview: summary.isEmpty ? (firstFact ?? "Add context") : summary,
-                    compact: compact, previewLineLimit: 2)
+                    compact: compact, expands: expands, previewLineLimit: 2)
             }
             .accessibilityIdentifier("project-section-overview")
 
+        case .questions:
             NavigationLink(value: ProjectOverviewSection.questions) {
                 let questions = folder?.openQuestions ?? []
                 projectSectionCard("Questions", systemImage: "questionmark.bubble",
                     count: folder?.openQuestions.map { "\($0.count) \($0.count == 1 ? "question" : "questions")" },
                     preview: questions.first(where: { !$0.question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })?.question
                         ?? (folder?.openQuestions == nil ? "" : "No questions yet."),
-                    compact: compact)
+                    compact: compact, expands: expands)
             }
             .accessibilityIdentifier("project-section-questions")
 
+        case .checklist:
             NavigationLink(value: ProjectOverviewSection.checklist) {
                 let records = folder?.recordsChecklist ?? []
                 projectSectionCard("Checklist", systemImage: "checklist",
                     count: folder?.recordsChecklist.map { "\($0.filter { $0.status == .reviewed }.count)/\($0.count) reviewed" },
                     preview: records.first(where: { $0.status != .reviewed && $0.status != .notApplicable })?.label
                         ?? (folder?.recordsChecklist == nil ? "" : records.isEmpty ? "No records yet." : "All records reviewed or not applicable."),
-                    compact: compact)
+                    compact: compact, expands: expands)
             }
             .accessibilityIdentifier("project-section-checklist")
 
+        case .notebook:
             NavigationLink(value: ProjectOverviewSection.notebook) {
                 projectSectionCard("Notes", systemImage: "note.text",
                     count: projectHubSnapshot.map { "\($0.notebookCards.count) \($0.notebookCards.count == 1 ? "note" : "notes")" },
                     preview: latestProjectNote.map { $0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled note" : $0.title }
                         ?? (projectHubSnapshot == nil ? "Open Notes" : "No notes yet."),
-                    compact: compact)
+                    compact: compact, expands: expands)
             }
             .accessibilityIdentifier("project-section-notebook")
 
+        case .evidence:
             NavigationLink(value: ProjectOverviewSection.evidence) {
                 projectSectionCard("Evidence", systemImage: "bookmark",
                     count: "\(library.bookmarkCount(inFolder: folderID)) saved",
                     preview: projectBookmarks.first.map { "\($0.sectionNumber) · \($0.displayTitle)" }
                         ?? "No saved evidence yet.",
-                    compact: compact)
+                    compact: compact, expands: expands)
             }
             .accessibilityIdentifier("project-section-evidence")
 
+        case .reports:
             NavigationLink(value: ProjectOverviewSection.reports) {
                 projectSectionCard("Reports", systemImage: "doc.richtext",
                     count: projectHubSnapshot.map { "\($0.reports.count) \($0.reports.count == 1 ? "report" : "reports")" },
                     preview: latestProjectReport.map { "\($0.title) · V\($0.reportVersion)" }
                         ?? (projectHubSnapshot == nil ? "Open Reports" : "No reports yet."),
-                    compact: compact)
+                    compact: compact, expands: expands)
             }
             .accessibilityIdentifier("project-section-reports")
         }
-        .buttonStyle(.plain)
-        .tint(Color.appChrome)
     }
 
     @ViewBuilder
@@ -2160,7 +2182,7 @@ struct ProjectView: View {
     }
 
     private func projectSectionCard(_ title: String, systemImage: String, count: String?,
-                                    preview: String, compact: Bool, previewLineLimit: Int? = nil) -> some View {
+                                    preview: String, compact: Bool, expands: Bool, previewLineLimit: Int? = nil) -> some View {
         let minimumHeight: CGFloat = dynamicTypeSize.isAccessibilitySize ? 140 : (compact ? 74 : 116)
         return VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {
@@ -2183,7 +2205,7 @@ struct ProjectView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundStyle(.primary)
         .padding(compact ? 8 : 14)
-        .frame(maxWidth: .infinity, minHeight: minimumHeight, alignment: .topLeading)
+        .frame(maxWidth: .infinity, minHeight: minimumHeight, maxHeight: expands ? .infinity : nil, alignment: .topLeading)
         .background(projectTileBackgroundColor(for: folder?.colorHex ?? CodeFolder.defaultColorHex),
                     in: RoundedRectangle(cornerRadius: 28, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))

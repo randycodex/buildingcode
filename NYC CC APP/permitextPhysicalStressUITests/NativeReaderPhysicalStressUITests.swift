@@ -697,8 +697,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertEqual(leading.frame.height, trailing.frame.height, accuracy: 1)
         }
         let reportsCard = app.buttons["project-section-reports"]
-        XCTAssertLessThanOrEqual(reportsCard.frame.maxY, app.tabBars.firstMatch.frame.minY,
+        let tabBarY = app.tabBars.firstMatch.frame.minY
+        XCTAssertLessThanOrEqual(reportsCard.frame.maxY, tabBarY,
                                  "The last row must clear the tab bar.")
+        XCTAssertLessThanOrEqual(tabBarY - reportsCard.frame.maxY, 36,
+                                 "The cards must use the available height.")
         let bottomRowY = reportsCard.frame.minY
         root.swipeUp()
         XCTAssertEqual(reportsCard.frame.minY, bottomRowY, accuracy: 1,
