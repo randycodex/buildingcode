@@ -728,7 +728,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["project-context-text"].isHittable)
         XCTAssertEqual(app.tabBars.buttons.count, 4)
         XCTAssertFalse(app.keyboards.firstMatch.exists)
-        app.buttons["project-context-edit"].tap()
+        let editContext = overviewBar.buttons["project-context-edit"]
+        XCTAssertEqual(editContext.frame.width, editContext.frame.height, accuracy: 1)
+        editContext.tap()
         let editor = app.textViews["project-context-editor"]
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
@@ -747,7 +749,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         factsTab.tap()
         XCTAssertTrue(app.staticTexts["Building"].waitForExistence(timeout: 5))
         XCTAssertFalse(savedContext.isHittable)
-        overviewBar.buttons["Edit"].tap()
+        let editZoning = overviewBar.buttons["project-zoning-edit"]
+        XCTAssertEqual(editZoning.frame.width, editZoning.frame.height, accuracy: 1)
+        editZoning.tap()
         let value = app.textFields["project-fact-value-occupancy"]
         XCTAssertTrue(value.waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts["project-fact-number-occupancy"].label, "2.")
@@ -758,7 +762,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         value.typeText(" phone edit")
         XCTAssertTrue(overviewBar.buttons["Cancel"].isHittable)
         overviewBar.buttons["Save"].tap()
-        overviewBar.buttons["Edit"].tap()
+        editZoning.tap()
         XCTAssertTrue(value.waitForExistence(timeout: 5))
         XCTAssertTrue((value.value as? String ?? "").contains("phone edit"))
         app.buttons["main-tab-research"].tap()
@@ -852,7 +856,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["project-workflow-save"].tap()
         XCTAssertTrue(app.staticTexts["Is the survey current?"].waitForExistence(timeout: 5))
         keepScreenshot(named: "Project questions on iPhone", from: app)
-        app.buttons["project-workflow-edit"].tap()
+        let editWorkflow = app.buttons["project-workflow-edit"]
+        XCTAssertEqual(editWorkflow.frame.width, editWorkflow.frame.height, accuracy: 1)
+        editWorkflow.tap()
         questionText.tap()
         questionText.typeText(" Discard")
         XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Cancel")).count, 1)
@@ -874,6 +880,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["project-workflow-save"].tap()
         XCTAssertTrue(app.staticTexts["Reviewed"].waitForExistence(timeout: 5))
         keepScreenshot(named: "Project record checklist on iPhone", from: app)
+        XCTAssertEqual(editWorkflow.frame.width, editWorkflow.frame.height, accuracy: 1)
+        editWorkflow.tap()
+        XCTAssertTrue(app.buttons["project-workflow-save"].waitForExistence(timeout: 5))
+        app.navigationBars["Checklist"].buttons["Cancel"].tap()
         app.navigationBars["Checklist"].buttons.element(boundBy: 0).tap()
         XCTAssertTrue(root.waitForExistence(timeout: 5))
         XCTAssertTrue(checklistCard.label.contains("1/5 reviewed"))

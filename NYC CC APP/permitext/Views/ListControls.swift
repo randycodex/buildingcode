@@ -20,6 +20,36 @@ struct ToolbarActionIcon: View {
     }
 }
 
+struct EditToolbarItem: ToolbarContent {
+    let label: String
+    let identifier: String
+    var isDisabled = false
+    let action: () -> Void
+
+    @ToolbarContentBuilder
+    var body: some ToolbarContent {
+        if #available(iOS 26.0, *) {
+            item.sharedBackgroundVisibility(.hidden)
+        } else {
+            item
+        }
+    }
+
+    private var item: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button(action: action) {
+                ToolbarActionIcon(systemImage: "pencil")
+                    .foregroundStyle(Color.appChrome)
+            }
+            .buttonStyle(.plain)
+            .codeLiquidGlassCircle()
+            .disabled(isDisabled)
+            .accessibilityLabel(label)
+            .accessibilityIdentifier(identifier)
+        }
+    }
+}
+
 struct IconToolbarGroup<Actions: View>: ToolbarContent {
     @ViewBuilder let actions: () -> Actions
 

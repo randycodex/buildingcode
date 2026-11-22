@@ -474,10 +474,7 @@ struct ProjectContextView: View {
                         .accessibilityIdentifier("project-context-save")
                 }
             } else {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Edit", action: beginEditing)
-                        .accessibilityIdentifier("project-context-edit")
-                }
+                EditToolbarItem(label: "Edit context", identifier: "project-context-edit", action: beginEditing)
             }
         }
         .onChange(of: library.privateSessionID) { _, _ in finishEditing() }

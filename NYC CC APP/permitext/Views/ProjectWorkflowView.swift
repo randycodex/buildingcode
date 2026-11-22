@@ -58,18 +58,18 @@ struct ProjectWorkflowView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel", action: cancel)
                 }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                if isEditing {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Save", action: save).fontWeight(.semibold)
                         .accessibilityIdentifier("project-workflow-save")
-                } else {
-                    Button("Edit", action: beginEditing)
-                        .disabled(folder == nil || (isQuestions ? savedQuestions.isEmpty : savedRecords.isEmpty))
-                        .accessibilityIdentifier("project-workflow-edit")
                 }
+            } else {
+                EditToolbarItem(
+                    label: isQuestions ? "Edit questions" : "Edit checklist",
+                    identifier: "project-workflow-edit",
+                    isDisabled: folder == nil || (isQuestions ? savedQuestions.isEmpty : savedRecords.isEmpty),
+                    action: beginEditing
+                )
             }
-
         }
         .onChange(of: library.privateSessionID) { _, _ in cancel() }
         .onChange(of: folderID) { _, _ in cancel() }

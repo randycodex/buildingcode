@@ -1295,13 +1295,12 @@ private struct ProjectFactsView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel", action: cancel)
                 }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                if isEditing {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Save", action: save).fontWeight(.semibold)
-                } else {
-                    Button("Edit", action: beginEditing).disabled(folder == nil)
                 }
+            } else {
+                EditToolbarItem(label: "Edit zoning", identifier: "project-zoning-edit",
+                                isDisabled: folder == nil, action: beginEditing)
             }
         }
         .onChange(of: library.privateSessionID) { _, _ in cancel() }
@@ -1566,10 +1565,8 @@ struct ProjectView: View {
         }
         .toolbar {
             if isProjectFolder {
-                if #available(iOS 26.0, *) {
-                    projectEditToolbarItem.sharedBackgroundVisibility(.hidden)
-                } else {
-                    projectEditToolbarItem
+                EditToolbarItem(label: "Edit project", identifier: "project-edit") {
+                    if let folder { folderEditorTarget = .edit(folder) }
                 }
             }
         }
@@ -1638,21 +1635,6 @@ struct ProjectView: View {
             } else {
                 dismiss()
             }
-        }
-    }
-
-    private var projectEditToolbarItem: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
-            Button {
-                if let folder { folderEditorTarget = .edit(folder) }
-            } label: {
-                ToolbarActionIcon(systemImage: "pencil")
-                    .foregroundStyle(Color.appChrome)
-            }
-            .buttonStyle(.plain)
-            .codeLiquidGlassCircle()
-            .accessibilityLabel("Edit project")
-            .accessibilityIdentifier("project-edit")
         }
     }
 
