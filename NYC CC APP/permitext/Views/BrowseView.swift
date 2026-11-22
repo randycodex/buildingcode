@@ -36,8 +36,6 @@ struct BrowseView: View {
     @State private var showsCodeSources = false
     @State private var showsReaderCodeLibrary = false
     @State private var showsPickerCodeSources = false
-    @State private var scrollOffset: CGFloat = 0
-    @State private var scrollRestingOffset: CGFloat?
     @State private var browseHeading: ReaderBrowseHeading = .chapters
     @State private var openedChapter: CodeChapter?
     @State private var handoffInitialSection: CodeSectionSummary?
@@ -61,10 +59,6 @@ struct BrowseView: View {
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: activeCodeSectionID))
-    }
-
-    private var collapseProgress: CGFloat {
-        min(max(-scrollOffset / 64, 0), 1)
     }
 
     var body: some View {
@@ -114,16 +108,6 @@ struct BrowseView: View {
         .onPreferenceChange(ReaderBrowseHeadingPreferenceKey.self) { boundaries in
             let heading = ReaderBrowseHeaderSelection.heading(at: boundaries)
             if heading != browseHeading { browseHeading = heading }
-        }
-        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
-            DispatchQueue.main.async {
-                guard let restingOffset = scrollRestingOffset else {
-                    scrollRestingOffset = newOffset
-                    scrollOffset = 0
-                    return
-                }
-                scrollOffset = min(0, newOffset - restingOffset)
-            }
         }
         .sheet(isPresented: $showsCodeSources) {
             SettingsView(initialSection: .sources)
@@ -282,20 +266,12 @@ struct BrowseView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
-            .background {
-                GeometryReader { proxy in
-                    Color.clear.preference(key: CodeScrollOffsetPreferenceKey.self,
-                        value: proxy.frame(in: .named("browseScroll")).minY)
-                }
-            }
         }
         .coordinateSpace(name: "browseScroll")
         .contentMargins(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow, for: .scrollContent)
         .contentMargins(.bottom, tabBarClearance, for: .scrollContent)
         .scrollIndicators(.hidden)
-        .overlay(alignment: .top) {
-            CodeTopContentFade(title: selectedCodeSectionName, progress: collapseProgress)
-        }
+        .transparentTopScrollEdge()
         .background(
             CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
                 .ignoresSafeArea()
