@@ -219,7 +219,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(historicalBuilding.isHittable)
         historicalBuilding.tap()
         let selected = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            picker.staticTexts.firstMatch.label.localizedCaseInsensitiveContains("2014")
+            picker.label.localizedCaseInsensitiveContains("2014")
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [selected], timeout: 15), .completed)
         picker.tap()
@@ -251,7 +251,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Building Code")).count, 2)
         historicalBuilding.tap()
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            picker.staticTexts.firstMatch.label.localizedCaseInsensitiveContains("2014")
+            picker.label.localizedCaseInsensitiveContains("2014")
         }, object: nil)], timeout: 15), .completed)
         app.buttons["main-tab-saved"].tap()
         XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
@@ -280,7 +280,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }
         func assertSource(_ source: String, in capsule: XCUIElement) {
             XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-                capsule.staticTexts.firstMatch.label.contains(source)
+                capsule.label.contains(source)
             }, object: nil)], timeout: 20), .completed)
         }
         XCTAssertTrue(browser.waitForExistence(timeout: 15))
