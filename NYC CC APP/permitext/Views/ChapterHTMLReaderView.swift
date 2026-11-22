@@ -130,7 +130,7 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var pageBackgroundColor: Color {
-        colorScheme == .dark ? .black : Color(uiColor: .systemGroupedBackground)
+        Color(uiColor: ChapterHTMLWebView.pageBackgroundUIColor(for: colorScheme))
     }
 
     private var chapterSearchToolbarButton: some View {

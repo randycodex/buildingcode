@@ -108,7 +108,7 @@ private enum HTMLAssetPathResolver {
         colorScheme: ColorScheme
     ) -> String {
         let isDark = colorScheme == .dark
-        let backgroundColor = isDark ? "#000000" : "#f2f2f7"
+        let backgroundColor = ChapterHTMLWebView.pageBackgroundHex(for: colorScheme)
         let textColor = isDark ? "#f5f5f7" : "#111111"
         let bootstrapStyle = """
         <style id="nyccc-initial-reader-style">
@@ -288,6 +288,14 @@ final class ChapterHTMLScrollCheckpoint {
 }
 
 struct ChapterHTMLWebView: UIViewRepresentable {
+    static func pageBackgroundUIColor(for colorScheme: ColorScheme) -> UIColor {
+        colorScheme == .dark ? .black : .white
+    }
+
+    nonisolated fileprivate static func pageBackgroundHex(for colorScheme: ColorScheme) -> String {
+        colorScheme == .dark ? "#000000" : "#ffffff"
+    }
+
     @Environment(\.readerControlsClearance) private var readerControlsClearance
     var definitionContext: ReaderDefinitionContext? = nil
     let chapterURL: URL
@@ -337,7 +345,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         let webView = ChapterResearchWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         webView.scrollView.delegate = context.coordinator
-        let pageBackgroundColor = Coordinator.pageBackgroundUIColor(for: colorScheme)
+        let pageBackgroundColor = Self.pageBackgroundUIColor(for: colorScheme)
         webView.backgroundColor = pageBackgroundColor
         webView.scrollView.backgroundColor = pageBackgroundColor
         webView.scrollView.minimumZoomScale = 1
@@ -370,7 +378,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         webView.scrollView.verticalScrollIndicatorInsets.bottom = readerControlsClearance
         context.coordinator.parent = self
         context.coordinator.webView = webView
-        let pageBackgroundColor = Coordinator.pageBackgroundUIColor(for: colorScheme)
+        let pageBackgroundColor = Self.pageBackgroundUIColor(for: colorScheme)
         webView.backgroundColor = pageBackgroundColor
         webView.scrollView.backgroundColor = pageBackgroundColor
 
@@ -1596,7 +1604,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         private static func readerCSS(theme: ReaderTheme, colorScheme: ColorScheme, accentHex: String) -> String {
             let isDark = colorScheme == .dark
             let textColor = isDark ? "#f5f5f7" : "#111111"
-            let backgroundColor = isDark ? "#000000" : "#f2f2f7"
+            let backgroundColor = ChapterHTMLWebView.pageBackgroundHex(for: colorScheme)
             let secondaryColor = isDark ? "#b5b5bc" : "#5d6168"
             let borderColor = isDark ? "#6f6f76" : "#c6c6cc"
             let softBorderColor = isDark ? "#4b4b50" : "#d8d8de"
@@ -2018,13 +2026,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             return encoded
         }
 
-        static func pageBackgroundUIColor(for colorScheme: ColorScheme) -> UIColor {
-            colorScheme == .dark ? .black : .systemGroupedBackground
-        }
-
         static func initialReaderBootstrapScript(for colorScheme: ColorScheme) -> String {
             let isDark = colorScheme == .dark
-            let backgroundColor = isDark ? "#000000" : "#f2f2f7"
+            let backgroundColor = ChapterHTMLWebView.pageBackgroundHex(for: colorScheme)
             let textColor = isDark ? "#f5f5f7" : "#111111"
 
             return """

@@ -76,7 +76,7 @@ struct BrowseView: View {
                 } else if library.availableVersions.isEmpty {
                     // Content is still loading — show nothing rather than flashing
                     // an empty-state card for the ~20 ms the async load takes.
-                    Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
+                    CodeAppBackdrop.color.ignoresSafeArea()
                 } else {
                     browseContent
                         .onAppear {
@@ -1043,7 +1043,7 @@ struct ChapterSectionsView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 140)
         }
-        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
+        .background(CodeAppBackdrop.color.ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -1410,8 +1410,15 @@ private struct ChapterTile: View {
 struct CodeAppBackdrop: View {
     let accent: Color
 
+    static let color = Color(uiColor: UIColor { traits in
+        if traits.userInterfaceStyle == .dark {
+            return UIColor.systemGroupedBackground.resolvedColor(with: traits)
+        }
+        return .white
+    })
+
     var body: some View {
-        Color(uiColor: .systemGroupedBackground)
+        Self.color
     }
 }
 

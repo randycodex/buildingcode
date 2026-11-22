@@ -2380,7 +2380,7 @@ struct NativeReaderPhase9SnapshotHarness: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
+                CodeAppBackdrop.color.ignoresSafeArea()
                 Group {
                     if let route, let preparedDocument {
                         snapshotReader(route: route, preparedDocument: preparedDocument)
