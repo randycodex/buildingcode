@@ -369,13 +369,19 @@ struct BookmarksView: View {
         }
     }
 
+    private var newProjectLabel: String {
+        library.hasProjectAccess ? "New project" : "New project · Pro"
+    }
+
+    private func openNewProject() {
+        if library.hasProjectAccess { folderEditorTarget = .new }
+        else { library.requireProjectAccess() }
+    }
+
     private var savedHeaderActions: some View {
         HStack(spacing: 8) {
-            Button {
-                if library.hasProjectAccess { folderEditorTarget = .new }
-                else { library.requireProjectAccess() }
-            } label: {
-                Label(library.hasProjectAccess ? "New project" : "New project · Pro", systemImage: "plus")
+            Button(action: openNewProject) {
+                Label(newProjectLabel, systemImage: "plus")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.appChrome)
                     .padding(.horizontal, 12)
@@ -418,9 +424,31 @@ struct BookmarksView: View {
         }
     }
 
+    @ViewBuilder
     private var pinnedSavedHeader: some View {
-        CodeScreenTitleRow(title: screenTitle, minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
-            savedHeaderActions
+        if onOpenProject != nil {
+            HStack {
+                Button(action: openNewProject) {
+                    ToolbarActionIcon(systemImage: "plus")
+                        .foregroundStyle(Color.appChrome)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(newProjectLabel)
+                .codeLiquidGlassCircle()
+
+                Spacer(minLength: 0)
+                CodeMainScreenTitleLabel(title: screenTitle, alignment: .center)
+                Spacer(minLength: 0)
+
+                accountButton
+                    .codeLiquidGlassCircle()
+            }
+            .frame(height: CodeScreenMetrics.mainHeaderHeight)
+            .padding(.bottom, 8)
+        } else {
+            CodeScreenTitleRow(title: screenTitle, minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
+                savedHeaderActions
+            }
         }
     }
 

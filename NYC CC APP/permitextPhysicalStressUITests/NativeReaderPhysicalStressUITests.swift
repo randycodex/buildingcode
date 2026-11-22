@@ -585,11 +585,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
 
         let newProject = app.buttons["New project"]
+        let title = app.staticTexts["screen-title-Projects"]
         let account = app.buttons["Open Account"]
         XCTAssertTrue(newProject.isHittable)
+        XCTAssertTrue(title.isHittable)
         XCTAssertTrue(account.isHittable)
-        XCTAssertGreaterThan(account.frame.minX, newProject.frame.maxX)
-        keepScreenshot(named: "Separate Projects toolbar buttons", from: app)
+        XCTAssertEqual(title.frame.midX, app.frame.midX, accuracy: 1)
+        XCTAssertLessThan(newProject.frame.maxX, title.frame.minX)
+        XCTAssertLessThan(title.frame.maxX, account.frame.minX)
+        XCTAssertEqual(newProject.frame.width, newProject.frame.height, accuracy: 1)
+        XCTAssertEqual(newProject.frame.width, account.frame.width, accuracy: 1)
+        XCTAssertEqual(newProject.frame.midY, account.frame.midY, accuracy: 1)
+        keepScreenshot(named: "Centered Projects title with separate toolbar buttons", from: app)
 
         newProject.tap()
         let editor = app.navigationBars["New project"]
