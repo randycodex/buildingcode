@@ -337,11 +337,14 @@ struct ReaderView: View {
                 Text(group).font(.subheadline.weight(.semibold)).foregroundStyle(accentColor)
             }
             ForEach(Array(detail.parentSectionLabels.enumerated()), id: \.offset) { _, label in
-                Text(label).font(.subheadline).foregroundStyle(.secondary)
+                let parentTitle = usesCompactSourceHeader && detail.kind != .textBlock
+                    ? label.split(maxSplits: 1, whereSeparator: \.isWhitespace).dropFirst().joined(separator: "")
+                    : label
+                if !parentTitle.isEmpty {
+                    Text(parentTitle).font(.subheadline).foregroundStyle(.secondary)
+                }
             }
-            if usesCompactSourceHeader {
-                Text(detail.sectionNumber).font(.subheadline.weight(.semibold))
-            } else {
+            if !usesCompactSourceHeader {
                 headerContent(detail: detail, jumpAffordance: false)
             }
         }

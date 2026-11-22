@@ -827,7 +827,11 @@ private struct Phase3EntitledResearchHarness: View {
 
         let overviewFixture = ProcessInfo.processInfo.arguments.contains("--native-project-overview-fixture")
         let overviewFacts: [ProjectStructuredFact] = overviewFixture ? [
+            ("tax-lot-area", "Tax Lot Area", "5,000 sq ft"),
             ("occupancy", "Occupancy", "Residential"),
+            ("construction-type", "Construction Type", "Type III-B — masonry walls and wood joists"),
+            ("building-area", "Building Area", "9,600 sq ft"),
+            ("building-height", "Building Height", "46 ft to main roof"),
             ("work-type", "Work type", "Alteration"),
             ("location", "Location", "New York City"),
             ("edition", "Code edition", "2022")
@@ -1680,7 +1684,10 @@ private struct PermitextTabNavigation: View {
                                 }
                         }
                         .background {
-                            TabBarReselectListener(onReselect: projectFolderReselectAction)
+                            TabBarReselectListener(
+                                selectedIconColor: PlatformColor(hex: project.colorHex),
+                                onReselect: projectFolderReselectAction
+                            )
                         }
                         .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
                     }

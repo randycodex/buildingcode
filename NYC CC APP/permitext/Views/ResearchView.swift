@@ -286,7 +286,6 @@ private struct PendingResearchVisualReview: Identifiable, Equatable {
 
 private struct PendingResearchDeletion: Identifiable, Equatable {
     let conversationIDs: [String]
-    let title: String
     var id: String { conversationIDs.joined(separator: "|") }
     var isMultiple: Bool { conversationIDs.count > 1 }
 }
@@ -557,6 +556,7 @@ private struct ResearchSessionView: View {
     @State private var showingAssignmentConfirmation = false
     @State private var showingProjectCreator = false
     @State private var pendingDeletion: PendingResearchDeletion?
+    @FocusState private var isHistorySearchFocused: Bool
     @State private var isSelectingHistory = false
     @State private var selectedHistoryIDs: Set<String> = []
     @State private var isDeletingHistoryBatch = false
@@ -759,10 +759,8 @@ private struct ResearchSessionView: View {
                 Button("Cancel", role: .cancel) {
                     pendingDeletion = nil
                 }
-            } message: { pending in
-                Text(pending.isMultiple
-                     ? "\(pending.conversationIDs.count) conversations and their answers will be permanently deleted from per codes. This cannot be undone."
-                     : "\u{201c}\(pending.title)\u{201d} will be permanently deleted from per codes. This cannot be undone.")
+            } message: { _ in
+                Text("This cannot be undone.")
             }
             .task(id: "\(library.privateSessionID):\(library.hasResearchAccess)") {
                 guard isCurrentOwner else { return }
@@ -903,22 +901,6 @@ private struct ResearchSessionView: View {
                 }
             }
 
-            if conversation != nil && !library.researchHistoryIsPresented {
-                Button {
-                    library.activeResearchConversationID = nil
-                    self.conversation = nil
-                    failedQuestionAttempt = nil
-                    questionErrorMessage = nil
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Research history")
-            }
-
             if conversation == nil || library.researchHistoryIsPresented,
                library.signedInAccount != nil,
                library.hasResearchAccess, !isSelectingHistory {
@@ -937,59 +919,7 @@ private struct ResearchSessionView: View {
 
             if let conversation, !library.researchHistoryIsPresented {
                 Menu {
-                    Button("Rename", systemImage: "pencil") {
-                        renameConversationID = conversation.id
-                        draftTitle = conversation.title
-                        showingRename = true
-                    }
-                    Button(conversation.isPinned == true ? "Unpin" : "Pin", systemImage: conversation.isPinned == true ? "pin.slash" : "pin") {
-                        Task { await pinConversation(id: conversation.id, isPinned: conversation.isPinned != true) }
-                    }
-                    .disabled(isSending || isUpdatingPin)
-                    Button("Delete", systemImage: "trash", role: .destructive) {
-                        requestDeletion(id: conversation.id, title: conversation.title)
-                    }
-                    .disabled(deletingConversationID != nil)
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                        .contentShape(Rectangle())
-                }
-                .accessibilityLabel("Research actions")
-            }
-        }
-        .foregroundStyle(Color.appChrome)
-        .padding(.horizontal, conversation == nil || library.researchHistoryIsPresented ? 0 : 4)
-    }
-
-    @ViewBuilder
-    private var researchHeaderActions: some View {
-        if conversation == nil || library.researchHistoryIsPresented {
-            researchHeaderButtons
-                .frame(width: isSelectingHistory ? 164 : (summaries.isEmpty ? 44 : 88), height: CodeScreenMetrics.toolbarButtonSize)
-                .codeLiquidGlassCapsule()
-        } else if #available(iOS 26.0, *) {
-            researchHeaderButtons
-                .glassEffect(.regular.interactive(), in: Capsule())
-        } else {
-            researchHeaderButtons
-                .background(.regularMaterial, in: Capsule())
-        }
-    }
-
-    @ViewBuilder
-    private var researchScreenHeader: some View {
-        if let conversation, !library.researchHistoryIsPresented {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .center, spacing: 6) {
-                    if projectFolderID != nil {
-                        Text(projectName(for: scopedProjectID))
-                            .font(CodeTypography.screenTitle)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-                            .frame(height: 44, alignment: .leading)
-                    } else {
+                    if projectFolderID == nil {
                         Menu {
                             Button("Unassigned") { requestAssignment(nil) }
                             ForEach(library.folders.filter { $0.folderType == .project }) { folder in
@@ -1006,33 +936,70 @@ private struct ResearchSessionView: View {
                                 }
                             }
                         } label: {
-                            Text(projectName(for: conversation.primaryProjectID))
-                                .font(CodeTypography.screenTitle)
-                                .foregroundStyle(.primary)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.72)
-                                .frame(height: 44, alignment: .leading)
+                            Label("Project", systemImage: "folder")
                         }
-                        .buttonStyle(.plain)
                         .accessibilityLabel("Project context: \(projectName(for: conversation.primaryProjectID))")
                         .accessibilityIdentifier("research-project-context-menu")
                     }
-
-                    Spacer(minLength: 0)
-                    researchHeaderActions
-                        .frame(height: 44, alignment: .center)
+                    Button("Rename", systemImage: "pencil") {
+                        renameConversationID = conversation.id
+                        draftTitle = conversation.title
+                        showingRename = true
+                    }
+                    Button(conversation.isPinned == true ? "Unpin" : "Pin", systemImage: conversation.isPinned == true ? "pin.slash" : "pin") {
+                        Task { await pinConversation(id: conversation.id, isPinned: conversation.isPinned != true) }
+                    }
+                    .disabled(isSending || isUpdatingPin)
+                    Button("Delete", systemImage: "trash", role: .destructive) {
+                        requestDeletion(id: conversation.id)
+                    }
+                    .disabled(deletingConversationID != nil)
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        .contentShape(Rectangle())
                 }
-                .frame(height: 44, alignment: .leading)
+                .accessibilityLabel("Research actions")
+            }
+        }
+        .foregroundStyle(Color.appChrome)
+    }
 
-                Spacer()
-                    .frame(height: 8)
+    private var researchHistoryBackButton: some View {
+        Button {
+            library.activeResearchConversationID = nil
+            conversation = nil
+            failedQuestionAttempt = nil
+            questionErrorMessage = nil
+        } label: {
+            Image(systemName: "chevron.left")
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                .contentShape(Rectangle())
+        }
+        .foregroundStyle(Color.appChrome)
+        .buttonStyle(.plain)
+        .codeLiquidGlassCircle()
+        .accessibilityLabel("Research history")
+    }
+
+    @ViewBuilder
+    private var researchScreenHeader: some View {
+        if conversation != nil && !library.researchHistoryIsPresented {
+            HStack {
+                researchHistoryBackButton
+                Spacer(minLength: 0)
+                researchHeaderButtons.codeLiquidGlassCircle()
             }
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
             .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
         } else {
             CodeScreenTitleRow(title: "Research", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
-                researchHeaderActions
+                researchHeaderButtons
+                    .frame(width: isSelectingHistory ? 164 : (summaries.isEmpty ? 44 : 88), height: CodeScreenMetrics.toolbarButtonSize)
+                    .codeLiquidGlassCapsule()
             }
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
             .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
@@ -1094,9 +1061,11 @@ private struct ResearchSessionView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
 
-            historyFilters
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
+            if projectFolderID == nil {
+                historyProjectFilter
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+            }
 
             if let message = errorMessage ?? historyErrorMessage {
                 statusMessage(message)
@@ -1172,7 +1141,7 @@ private struct ResearchSessionView: View {
                                 Task { await pinConversation(id: item.id, isPinned: item.isPinned != true) }
                             }
                             Button("Delete", systemImage: "trash", role: .destructive) {
-                                requestDeletion(id: item.id, title: researchTitle(for: item))
+                                requestDeletion(id: item.id)
                             }
                         } label: {
                             Image(systemName: "ellipsis")
@@ -1191,7 +1160,7 @@ private struct ResearchSessionView: View {
                 .listRowSeparator(.visible, edges: .bottom)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
-                        requestDeletion(id: item.id, title: researchTitle(for: item))
+                        requestDeletion(id: item.id)
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
@@ -1214,7 +1183,13 @@ private struct ResearchSessionView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-        .contentMargins(.bottom, floatingNavigationClearance, for: .scrollContent)
+        .scrollDismissesKeyboard(.interactively)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            historySearch
+                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                .padding(.vertical, 6)
+                .padding(.bottom, floatingNavigationClearance)
+        }
         .refreshable { await loadHistory(forceNetwork: true) }
     }
 
@@ -1238,45 +1213,55 @@ private struct ResearchSessionView: View {
         return String(ResearchNotebookHandoffPresentation.boundedText(value, maximumUTF16Count: 201).dropLast())
     }
 
-    private var historyFilters: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                TextField("Find a previous question", text: $historyQuery)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .onChange(of: historyQuery) { _, value in
-                        let bounded = boundedHistoryQuery(value)
-                        if value != bounded { historyQuery = bounded }
-                    }
-                    .submitLabel(.search)
-                    .accessibilityIdentifier("research-history-search")
-                if !historyQuery.isEmpty {
-                    Button { historyQuery = "" } label: { Image(systemName: "xmark.circle.fill") }
-                        .accessibilityLabel("Clear history search")
+    private var historySearch: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+            TextField("Find a previous question", text: $historyQuery)
+                .textFieldStyle(.plain)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .focused($isHistorySearchFocused)
+                .onChange(of: historyQuery) { _, value in
+                    let bounded = boundedHistoryQuery(value)
+                    if value != bounded { historyQuery = bounded }
                 }
-            }
-            .padding(12)
-            .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
-            if projectFolderID == nil {
-                Menu {
-                    Picker("Project", selection: $library.researchHistoryProjectFilter) {
-                        Text("All Projects").tag("all")
-                        Text("Unassigned").tag("unassigned")
-                        ForEach(library.folders.filter { $0.folderType == .project }) { project in
-                            if let id = library.backendProjectID(for: project.id) {
-                                Text(project.name).tag(id)
-                            }
-                        }
-                    }
-                } label: {
-                    Label(historyProjectID == nil ? "All Projects" : historyProjectID == "" ? "Unassigned" : library.folder(forBackendProjectID: historyProjectID ?? "")?.name ?? "Project", systemImage: "line.3.horizontal.decrease")
-                        .font(.subheadline)
-                        .frame(minHeight: 44)
+                .submitLabel(.search)
+                .onSubmit { isHistorySearchFocused = false }
+                .accessibilityIdentifier("research-history-search")
+            if !historyQuery.isEmpty {
+                Button { historyQuery = "" } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
-                .accessibilityIdentifier("research-history-project-filter")
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear history search")
             }
         }
+        .padding(.horizontal, 16)
+        .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
+        .codeLiquidGlassCapsule()
+    }
+
+    private var historyProjectFilter: some View {
+        Menu {
+            Picker("Project", selection: $library.researchHistoryProjectFilter) {
+                Text("All Projects").tag("all")
+                Text("Unassigned").tag("unassigned")
+                ForEach(library.folders.filter { $0.folderType == .project }) { project in
+                    if let id = library.backendProjectID(for: project.id) {
+                        Text(project.name).tag(id)
+                    }
+                }
+            }
+        } label: {
+            Label(historyProjectID == nil ? "All Projects" : historyProjectID == "" ? "Unassigned" : library.folder(forBackendProjectID: historyProjectID ?? "")?.name ?? "Project", systemImage: "line.3.horizontal.decrease")
+                .font(.subheadline)
+                .frame(minHeight: 44)
+        }
+        .accessibilityIdentifier("research-history-project-filter")
     }
 
     private func conversationView(_ conversation: ResearchConversation) -> some View {
@@ -1871,27 +1856,16 @@ private struct ResearchSessionView: View {
         return title.isEmpty ? "Research conversation" : title
     }
 
-    private func requestDeletion(id: String, title: String) {
+    private func requestDeletion(id: String) {
         guard deletingConversationID == nil else { return }
-        let normalizedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        let displayTitle = normalizedTitle.isEmpty ? "Untitled Research" : normalizedTitle
-        let confirmationTitle = displayTitle.count > 80
-            ? "\(displayTitle.prefix(79))…"
-            : displayTitle
-        pendingDeletion = PendingResearchDeletion(
-            conversationIDs: [id],
-            title: confirmationTitle
-        )
+        pendingDeletion = PendingResearchDeletion(conversationIDs: [id])
     }
 
     private func requestSelectedDeletion() {
         guard !isDeletingHistoryBatch, deletingConversationID == nil else { return }
         let ids = summaries.filter { selectedHistoryIDs.contains($0.id) }.map(\.id)
         guard !ids.isEmpty else { return }
-        let title = ids.count == 1
-            ? summaries.first(where: { $0.id == ids[0] }).map { researchTitle(for: $0) } ?? "Research conversation"
-            : "Selected Research"
-        pendingDeletion = PendingResearchDeletion(conversationIDs: ids, title: title)
+        pendingDeletion = PendingResearchDeletion(conversationIDs: ids)
     }
 
     private var isLoading: Bool { isLoadingHistory || isLoadingConversation }

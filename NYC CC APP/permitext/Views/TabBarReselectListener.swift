@@ -3,10 +3,11 @@ import UIKit
 
 /// Observes a repeated tab tap without replacing SwiftUI's navigation delegate.
 struct TabBarReselectListener: UIViewControllerRepresentable {
+    let selectedIconColor: UIColor?
     let onReselect: () -> Void
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onReselect: onReselect)
+        Coordinator(selectedIconColor: selectedIconColor, onReselect: onReselect)
     }
 
     func makeUIViewController(context: Context) -> ListenerViewController {
@@ -17,6 +18,7 @@ struct TabBarReselectListener: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: ListenerViewController, context: Context) {
         context.coordinator.onReselect = onReselect
+        context.coordinator.selectedIconColor = selectedIconColor
         uiViewController.coordinator = context.coordinator
         uiViewController.attachIfNeeded()
     }
@@ -27,14 +29,16 @@ struct TabBarReselectListener: UIViewControllerRepresentable {
 
     final class Coordinator: NSObject, UIGestureRecognizerDelegate {
         var onReselect: () -> Void
+        var selectedIconColor: UIColor?
         private weak var tabBarController: UITabBarController?
         private weak var listenerViewController: UIViewController?
         private var selectionAtTouchDown: UIViewController?
         private var actionAtTouchDown: (() -> Void)?
         private lazy var tap = UITapGestureRecognizer(target: self, action: #selector(didTap))
 
-        init(onReselect: @escaping () -> Void) {
+        init(selectedIconColor: UIColor? = nil, onReselect: @escaping () -> Void) {
             self.onReselect = onReselect
+            self.selectedIconColor = selectedIconColor
             super.init()
             tap.cancelsTouchesInView = false
             tap.delaysTouchesBegan = false
@@ -49,6 +53,25 @@ struct TabBarReselectListener: UIViewControllerRepresentable {
                 controller.tabBar.addGestureRecognizer(tap)
             }
             listenerViewController = listener
+            applySelectedIconColor(to: controller.tabBar)
+        }
+
+        private func applySelectedIconColor(to tabBar: UITabBar) {
+            guard let selectedIconColor else { return }
+            if tabBar.tintColor != selectedIconColor { tabBar.tintColor = selectedIconColor }
+
+            // The app's explicit UITabBarAppearance colors take priority over
+            // SwiftUI tint. Change the appearance of this project's bar only.
+            func updated(_ appearance: UITabBarAppearance) -> UITabBarAppearance? {
+                let layouts = [appearance.stackedLayoutAppearance, appearance.inlineLayoutAppearance,
+                               appearance.compactInlineLayoutAppearance]
+                guard layouts.contains(where: { $0.selected.iconColor != selectedIconColor }) else { return nil }
+                for layout in layouts { layout.selected.iconColor = selectedIconColor }
+                return appearance
+            }
+
+            if let standard = updated(tabBar.standardAppearance) { tabBar.standardAppearance = standard }
+            if let edge = tabBar.scrollEdgeAppearance.flatMap(updated) { tabBar.scrollEdgeAppearance = edge }
         }
 
         func detach() {

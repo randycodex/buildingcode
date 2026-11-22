@@ -710,12 +710,6 @@ struct ReaderCurrentSectionBookmarkButton: View {
                 .font(.body.weight(.semibold))
                 .foregroundStyle(displayedIsBookmarked ? accentColor : Color.secondary)
                 .frame(width: style == .standard ? 44 : 28, height: style == .standard ? 44 : 28)
-                .background(
-                    style == .standard
-                        ? Color(uiColor: .secondarySystemGroupedBackground)
-                        : Color.clear
-                )
-                .clipShape(RoundedRectangle(cornerRadius: style == .standard ? 12 : 6, style: .continuous))
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }

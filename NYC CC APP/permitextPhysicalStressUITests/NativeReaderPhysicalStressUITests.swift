@@ -50,10 +50,28 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let newResearch = app.buttons["New Research"]
         XCTAssertTrue(newResearch.waitForExistence(timeout: 15))
         XCTAssertFalse(app.buttons["research-history-project-filter"].exists)
+        let historySearch = app.textFields["research-history-search"]
+        XCTAssertTrue(historySearch.isHittable)
+        XCTAssertGreaterThan(historySearch.frame.midY, app.frame.midY)
+        historySearch.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        historySearch.typeText("No matching draft")
+        XCTAssertTrue(app.buttons["Clear history search"].isHittable)
+        app.buttons["Clear history search"].tap()
+        app.keyboards.buttons["Search"].tap()
         newResearch.tap()
-        XCTAssertTrue(app.buttons["Research history"].waitForExistence(timeout: 15))
+        let back = app.buttons["Research history"]
+        XCTAssertTrue(back.waitForExistence(timeout: 15))
+        XCTAssertLessThan(back.frame.midX, app.frame.midX)
+        XCTAssertFalse(app.staticTexts["Acceptance Project"].isHittable)
+        keepScreenshot(named: "Research conversation with leading back button", from: app)
         XCTAssertFalse(app.buttons["research-project-context-menu"].exists)
-        app.buttons["Research history"].tap()
+        app.buttons["Research actions"].tap()
+        app.buttons["Delete"].tap()
+        let deletion = app.alerts["Delete Research conversation?"]
+        XCTAssertTrue(deletion.staticTexts["This cannot be undone."].exists)
+        deletion.buttons["Cancel"].tap()
+        back.tap()
         XCTAssertTrue(app.buttons.matching(identifier: "research-history-row").firstMatch.waitForExistence(timeout: 15))
         keepScreenshot(named: "Research belongs to Acceptance Project", from: app)
 
@@ -446,6 +464,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         project.tap()
         let root = element(in: app, identifier: "project-folder-root")
         XCTAssertTrue(root.waitForExistence(timeout: 10))
+        let expectedSummary = ["address": "1 Centre Street", "tax-lot-area": "5,000 sq ft", "occupancy": "Residential",
+                               "construction-type": "Type III-B — masonry walls and wood joists",
+                               "building-area": "9,600 sq ft", "building-height": "46 ft to main roof"]
+        for (field, value) in expectedSummary {
+            let item = element(in: app, identifier: "project-summary-\(field)")
+            XCTAssertTrue(item.isHittable)
+            XCTAssertEqual(item.value as? String, value)
+        }
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             app.buttons["project-section-notebook"].label.contains("0 notes")
         }, object: nil)], timeout: 10), .completed)
@@ -493,7 +519,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         overviewBar.buttons["Edit"].tap()
         let value = app.textFields["project-fact-value-occupancy"]
         XCTAssertTrue(value.waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["project-fact-number-occupancy"].label, "1.")
+        XCTAssertEqual(app.staticTexts["project-fact-number-occupancy"].label, "2.")
         XCTAssertEqual(app.buttons["Remove Occupancy"].frame.midY, value.frame.midY, accuracy: 2,
                        "Delete aligns to the value rather than the label")
         XCTAssertFalse(contextTab.isEnabled, "Save or cancel Facts before switching tabs.")
@@ -3850,12 +3876,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "Research did not preserve the selected enacted passage."
         )
 
+        app.buttons["Research actions"].tap()
         let projectContext = element(in: app, identifier: "research-project-context-menu")
         XCTAssertTrue(projectContext.waitForExistence(timeout: 5), "Active Project context is not visible.")
         XCTAssertTrue(
             projectContext.label.localizedCaseInsensitiveContains("Acceptance Project"),
             "Research did not begin in the active Acceptance Project; label was \(projectContext.label)."
         )
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.05, dy: 0.55)).tap()
 
         composer.tap()
         composer.typeText("What does this enacted provision establish?")

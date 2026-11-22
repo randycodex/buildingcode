@@ -1940,6 +1940,10 @@ struct ProjectView: View {
                 }
             }
 
+            if isProjectFolder, let folder {
+                projectSummary(for: folder)
+            }
+
             if !isProjectFolder,
                let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines),
                !description.isEmpty {
@@ -1947,6 +1951,42 @@ struct ProjectView: View {
                     Text(description).font(.subheadline).foregroundStyle(.secondary)
                 }
                 .tint(.primary)
+            }
+        }
+    }
+
+    private func projectSummary(for folder: CodeFolder) -> some View {
+        let fields = [
+            (key: "address", label: "Address"),
+            (key: "tax-lot-area", label: "Tax Lot Area"),
+            (key: "occupancy", label: "Occupancy"),
+            (key: "construction-type", label: "Construction Type"),
+            (key: "building-area", label: "Building Area"),
+            (key: "building-height", label: "Building Height")
+        ]
+        let address = folder.address.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .topLeading),
+                                        count: dynamicTypeSize.isAccessibilitySize ? 1 : 2),
+                         alignment: .leading, spacing: 10) {
+            ForEach(fields, id: \.key) { field in
+                let fact = folder.structuredFacts.lazy
+                    .filter { $0.key == field.key }
+                    .map { $0.value.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .first { !$0.isEmpty }
+                let value = field.key == "address" && !address.isEmpty ? address : fact
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(field.label)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(value ?? "—")
+                        .font(.subheadline)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(field.label)
+                .accessibilityValue(value ?? "Not provided")
+                .accessibilityIdentifier("project-summary-\(field.key)")
             }
         }
     }

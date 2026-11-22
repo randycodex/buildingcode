@@ -194,12 +194,6 @@ struct SettingsView: View {
 
     private var activeSourcesCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(library.signedInAccount == nil
-                ? "Choose what appears in Search and chapter browsing. Guest choices stay on this device."
-                : "Choose what appears in Search and chapter browsing. These choices apply to this account on this device.")
-                .font(.footnote).foregroundStyle(.secondary)
-            Text("Turning a source off keeps its installed content, saved references, and any passage already open. Sources are enabled by default.")
-                .font(.footnote).foregroundStyle(.secondary)
             if let error = library.activeCodeSourcesError ?? (sourceOptionsRequestID == sourceOptionsTaskID ? sourceOptionsError : nil) {
                 Text(error).font(.callout).foregroundStyle(.secondary)
                 Text("Your existing choices have not been reset.")
@@ -412,7 +406,9 @@ struct SettingsView: View {
             .toolbar(.visible, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                CodeMainScreenToolbarTitle(title: screenTitle)
+                if !isSourcesScreen {
+                    CodeMainScreenToolbarTitle(title: screenTitle)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
