@@ -713,6 +713,15 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
                        "The dashboard should fit without a scrollable area.")
         keepScreenshot(named: "Six project cards fit above the tab bar", from: app)
 
+        let editProject = app.buttons["project-edit"]
+        XCTAssertTrue(editProject.isHittable)
+        XCTAssertEqual(editProject.frame.width, editProject.frame.height, accuracy: 1)
+        editProject.tap()
+        let projectEditor = app.navigationBars["Edit project"]
+        XCTAssertTrue(projectEditor.waitForExistence(timeout: 5))
+        projectEditor.buttons["Cancel"].tap()
+        XCTAssertTrue(root.waitForExistence(timeout: 5))
+
         let overviewCard = app.buttons["project-section-overview"]
         overviewCard.tap()
         let overviewBar = app.navigationBars["Overview"]

@@ -1566,15 +1566,10 @@ struct ProjectView: View {
         }
         .toolbar {
             if isProjectFolder {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        if let folder { folderEditorTarget = .edit(folder) }
-                    } label: {
-                        ToolbarActionIcon(systemImage: "pencil")
-                    }
-                    .accessibilityLabel("Edit project")
-                    .tint(Color.appChrome)
-                    .accessibilityIdentifier("project-edit")
+                if #available(iOS 26.0, *) {
+                    projectEditToolbarItem.sharedBackgroundVisibility(.hidden)
+                } else {
+                    projectEditToolbarItem
                 }
             }
         }
@@ -1643,6 +1638,21 @@ struct ProjectView: View {
             } else {
                 dismiss()
             }
+        }
+    }
+
+    private var projectEditToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                if let folder { folderEditorTarget = .edit(folder) }
+            } label: {
+                ToolbarActionIcon(systemImage: "pencil")
+                    .foregroundStyle(Color.appChrome)
+            }
+            .buttonStyle(.plain)
+            .codeLiquidGlassCircle()
+            .accessibilityLabel("Edit project")
+            .accessibilityIdentifier("project-edit")
         }
     }
 
