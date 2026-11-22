@@ -653,6 +653,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(app.buttons["Export selected passages"].exists)
         XCTAssertTrue(app.buttons["Remove from project"].isEnabled)
         keepScreenshot(named: "Evidence selection with removal action", from: app)
+        app.buttons["Select All"].tap()
+        XCTAssertEqual(app.staticTexts["list-selection-count"].label, "2 selected")
         app.buttons["Deselect All"].tap()
         XCTAssertEqual(app.staticTexts["list-selection-count"].label, "0 selected")
         app.buttons["Cancel"].tap()
