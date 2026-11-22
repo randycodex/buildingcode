@@ -375,6 +375,21 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let browser = app.scrollViews["reader-chapter-browser-primary"]
         XCTAssertTrue(browser.waitForExistence(timeout: 20))
         XCTAssertFalse(app.buttons["reader-code-picker"].exists)
+        let chapters = app.staticTexts["screen-title-Chapters"]
+        let appendix = app.staticTexts["screen-title-Appendix"]
+        XCTAssertTrue(chapters.waitForExistence(timeout: 10))
+        let titleFrame = chapters.frame
+        keepScreenshot(named: "Aligned Chapters title", from: app)
+        for (tab, title) in [("research", "Research"), ("search", "Search")] {
+            app.buttons["main-tab-\(tab)"].tap()
+            let heading = app.staticTexts["screen-title-\(title)"]
+            XCTAssertTrue(heading.waitForExistence(timeout: 10))
+            XCTAssertEqual(heading.frame.minX, titleFrame.minX, accuracy: 1)
+            XCTAssertEqual(heading.frame.minY, titleFrame.minY, accuracy: 1)
+            keepScreenshot(named: "Aligned \(title) title", from: app)
+        }
+        app.buttons["main-tab-reader"].tap()
+        XCTAssertTrue(chapters.waitForExistence(timeout: 10))
         let workspaceFrame = browser.frame
         // Pull both the cards and the heading, which used to dismiss the zoomed workspace.
         for y in [0.3, 0.12] {
@@ -391,8 +406,6 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["reader-session-primary"].tap()
         XCTAssertTrue(app.navigationBars["Code Library"].waitForExistence(timeout: 10))
         app.buttons.matching(NSPredicate(format: "label == %@", "Building Code")).firstMatch.tap()
-        let chapters = browser.staticTexts["reader-heading-chapters"]
-        let appendix = browser.staticTexts["reader-heading-appendix"]
         XCTAssertTrue(chapters.waitForExistence(timeout: 15))
         let headingY = chapters.frame.minY
         func isPinned(_ heading: XCUIElement) -> Bool {

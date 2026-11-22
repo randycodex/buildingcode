@@ -93,7 +93,11 @@ struct BrowseView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar(library.availableVersions.isEmpty ? .hidden : .visible, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbar {
+                CodeMainScreenToolbarTitle(title: browseHeading.rawValue, alignment: .center)
+            }
             .navigationDestination(item: $openedChapter) { chapter in
                 chapterDestination(chapter: chapter,
                     rememberedSectionID: rememberedSectionBinding(for: chapter.id),
@@ -215,7 +219,6 @@ struct BrowseView: View {
                 }
 
                 if chapters.isEmpty {
-                    readerSectionHeader(.chapters, order: 0)
                     CodeEmptyStateCard(
                         title: library.activeCodeSources == nil ? "Code Sources Unavailable" : (selectedBrowseSourceIsDisabled ? "Code Source Turned Off" : "No Chapters"),
                         systemImage: "text.book.closed",
@@ -255,7 +258,7 @@ struct BrowseView: View {
                                 }
                                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                             } header: {
-                                readerSectionHeader(.chapters, order: index * 2)
+                                headingBoundary(.chapters, order: index * 2)
                             }
                         }
 
@@ -272,7 +275,7 @@ struct BrowseView: View {
                                 }
                                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                             } header: {
-                                readerSectionHeader(.appendix, order: index * 2 + 1)
+                                headingBoundary(.appendix, order: index * 2 + 1)
                             }
                         }
                     }
@@ -287,6 +290,7 @@ struct BrowseView: View {
             }
         }
         .coordinateSpace(name: "browseScroll")
+        .contentMargins(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow, for: .scrollContent)
         .contentMargins(.bottom, tabBarClearance, for: .scrollContent)
         .scrollIndicators(.hidden)
         .overlay(alignment: .top) {
@@ -428,19 +432,7 @@ struct BrowseView: View {
                 )]
             )
         }
-    }
-
-    private func readerSectionHeader(_ heading: ReaderBrowseHeading, order: Int) -> some View {
-        Text(heading.rawValue)
-            .font(CodeTypography.screenTitle)
-            .foregroundStyle(.primary)
-            .frame(minHeight: CodeScreenMetrics.mainHeaderHeight, alignment: .leading)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-            .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
-            .background(headingBoundary(heading, order: order))
-            .accessibilityAddTraits(.isHeader)
-            .accessibilityIdentifier("reader-heading-\(heading.rawValue.lowercased())")
+        .frame(height: 1)
     }
 
     @ViewBuilder
