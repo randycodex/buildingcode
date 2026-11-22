@@ -420,6 +420,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons.matching(NSPredicate(format: "label == %@", "Building Code")).firstMatch.tap()
         XCTAssertTrue(chapters.waitForExistence(timeout: 15))
         let headingY = chapters.frame.minY
+        let firstChapter = browser.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 1:")).firstMatch
+        let firstAppendix = browser.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Appendix A:")).firstMatch
+        XCTAssertTrue(firstChapter.waitForExistence(timeout: 10))
+        let restingCardY = firstChapter.frame.minY
         func isPinned(_ heading: XCUIElement) -> Bool {
             heading.exists && heading.isHittable && abs(heading.frame.minY - headingY) < 3
         }
@@ -427,14 +431,33 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(isPinned(chapters), "Chapters stays pinned with a transparent header")
         keepScreenshot(named: "Chapters pinned without a solid background", from: app)
         for _ in 0..<20 {
-            if isPinned(appendix) { break }
+            if firstAppendix.exists && firstAppendix.frame.minY < browser.frame.maxY - 120 { break }
             browser.swipeUp(velocity: .slow)
         }
-        XCTAssertTrue(isPinned(appendix), "Appendix should occupy the original Chapters header position")
+        XCTAssertTrue(firstAppendix.exists)
+        let dragStart = browser.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.55))
+        func moveFirstAppendix(to destinationY: CGFloat) {
+            for _ in 0..<6 {
+                let remaining = firstAppendix.frame.minY - destinationY
+                if abs(remaining) <= 5 { return }
+                // The start of a short drag is consumed by the scroll view's pan recognizer.
+                let distance = min(abs(remaining) + 24, 260) * (remaining > 0 ? -1 : 1)
+                dragStart.press(forDuration: 0.05, thenDragTo: dragStart.withOffset(CGVector(dx: 0, dy: distance)),
+                                withVelocity: .slow, thenHoldForDuration: 0.15)
+            }
+            XCTAssertEqual(firstAppendix.frame.minY, destinationY, accuracy: 5)
+        }
+        moveFirstAppendix(to: restingCardY + 14)
+        XCTAssertTrue(isPinned(chapters), "Chapters should stay until Appendix A reaches the first chapter card's position")
+        moveFirstAppendix(to: restingCardY - 14)
+        XCTAssertTrue(isPinned(appendix), "The title should change as soon as Appendix A passes the first chapter card's position")
         XCTAssertFalse(chapters.exists && chapters.frame.maxY > headingY + 3,
             "Chapters must leave the pinned title area when Appendix replaces it")
         let appendixY = appendix.frame.minY
         keepScreenshot(named: "Appendix replaces Chapters at the pinned heading", from: app)
+        moveFirstAppendix(to: restingCardY + 14)
+        XCTAssertTrue(isPinned(chapters), "Crossing the card boundary in reverse should restore Chapters")
+        moveFirstAppendix(to: restingCardY - 14)
         browser.swipeUp(velocity: .slow)
         XCTAssertEqual(appendix.frame.minY, appendixY, accuracy: 2, "Appendix stays pinned while its cards scroll")
         for _ in 0..<20 {

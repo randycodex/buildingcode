@@ -190,7 +190,7 @@ struct BrowseView: View {
         let chapters = library.browseChapters(for: browseCodeSectionID)
 
         return ScrollView {
-            LazyVStack(alignment: .leading, spacing: 12, pinnedViews: [.sectionHeaders]) {
+            LazyVStack(alignment: .leading, spacing: 12) {
                 if let preparationError {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(preparationError).font(.callout).foregroundStyle(.secondary)
@@ -219,7 +219,6 @@ struct BrowseView: View {
                             .accessibilityIdentifier("browse-manage-code-sources")
                     }
                 } else {
-                    let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
                     let codeSectionName = selectedCodeSectionName
                     let chapterGroups = groupedChapterGroups(
                         from: chapters,
@@ -228,37 +227,13 @@ struct BrowseView: View {
 
                     ForEach(Array(chapterGroups.enumerated()), id: \.element.id) { index, group in
                         if !group.chapterItems.isEmpty {
-                            Section {
-                                if codeSectionName == "All Sections" {
-                                    codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
-                                        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                                }
-                                LazyVGrid(columns: columns, spacing: 12) {
-                                    ForEach(group.chapterItems) { chapter in
-                                        chapterOpeningButton(chapter, kind: .chapter)
-                                    }
-                                }
-                                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                            } header: {
-                                headingBoundary(.chapters, order: index * 2)
-                            }
+                            chapterGrid(group, kind: .chapter, order: index * 2,
+                                        showsGroupHeader: codeSectionName == "All Sections")
                         }
 
                         if !group.appendixItems.isEmpty {
-                            Section {
-                                if group.chapterItems.isEmpty && codeSectionName == "All Sections" {
-                                    codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
-                                        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                                }
-                                LazyVGrid(columns: columns, spacing: 12) {
-                                    ForEach(group.appendixItems) { chapter in
-                                        chapterOpeningButton(chapter, kind: .appendix)
-                                    }
-                                }
-                                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                            } header: {
-                                headingBoundary(.appendix, order: index * 2 + 1)
-                            }
+                            chapterGrid(group, kind: .appendix, order: index * 2 + 1,
+                                        showsGroupHeader: group.chapterItems.isEmpty && codeSectionName == "All Sections")
                         }
                     }
                 }
@@ -266,7 +241,7 @@ struct BrowseView: View {
             .frame(maxWidth: .infinity, alignment: .topLeading)
         }
         .coordinateSpace(name: "browseScroll")
-        .contentMargins(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow, for: .scrollContent)
+        .contentMargins(.top, ReaderBrowseHeaderSelection.cardTopInset, for: .scrollContent)
         .contentMargins(.bottom, tabBarClearance, for: .scrollContent)
         .scrollIndicators(.hidden)
         .transparentTopScrollEdge()
@@ -277,6 +252,26 @@ struct BrowseView: View {
         .accessibilityElement(children: .contain)
         .accessibilityHidden(!isBrowserTabActive)
         .accessibilityIdentifier("reader-chapter-browser-\(browserContext.rawValue)")
+    }
+
+    private func chapterGrid(_ group: BrowseChapterGroup, kind: ChapterTileKind, order: Int,
+                             showsGroupHeader: Bool) -> some View {
+        let isAppendix = kind == .appendix
+        let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+        return VStack(alignment: .leading, spacing: 12) {
+            if showsGroupHeader {
+                codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
+            }
+            LazyVGrid(columns: columns, spacing: 12) {
+                ForEach(isAppendix ? group.appendixItems : group.chapterItems) { chapter in
+                    chapterOpeningButton(chapter, kind: kind)
+                }
+            }
+            .background {
+                headingBoundary(isAppendix ? .appendix : .chapters, order: order)
+            }
+        }
+        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
     }
 
     private var canResumeChapterWarmups: Bool {
@@ -402,11 +397,11 @@ struct BrowseView: View {
                 value: [ReaderBrowseHeadingBoundary(
                     order: order,
                     heading: heading,
-                    minY: proxy.frame(in: .named("browseScroll")).minY
+                    cardTop: proxy.frame(in: .named("browseScroll")).minY
                 )]
             )
         }
-        .frame(height: 1)
+        .accessibilityHidden(true)
     }
 
     @ViewBuilder
@@ -1987,13 +1982,21 @@ enum ReaderBrowseHeading: String {
 struct ReaderBrowseHeadingBoundary: Equatable {
     let order: Int
     let heading: ReaderBrowseHeading
-    let minY: CGFloat
+    let reachedCardTop: Bool
+
+    init(order: Int, heading: ReaderBrowseHeading, cardTop: CGFloat) {
+        self.order = order
+        self.heading = heading
+        self.reachedCardTop = cardTop <= ReaderBrowseHeaderSelection.cardTopInset
+    }
 }
 
 enum ReaderBrowseHeaderSelection {
+    static let cardTopInset = CodeScreenMetrics.sectionSpacingBelowEyebrow
+
     static func heading(at boundaries: [ReaderBrowseHeadingBoundary]) -> ReaderBrowseHeading {
         let ordered = boundaries.sorted { $0.order < $1.order }
-        return ordered.last(where: { $0.minY <= 0 })?.heading
+        return ordered.last(where: \.reachedCardTop)?.heading
             ?? ordered.first?.heading
             ?? .chapters
     }
