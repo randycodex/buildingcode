@@ -2339,7 +2339,7 @@ struct ProjectView: View {
             removeProjectEvidence(selectedBookmarks)
             finishSelectingEvidence()
         } label: {
-            ToolbarActionIcon(systemImage: "minus.circle")
+            ToolbarActionIcon(systemImage: "trash")
                 .foregroundStyle(Color.appChrome)
         }
         .accessibilityLabel("Remove from project")
@@ -2403,7 +2403,7 @@ struct ProjectView: View {
                     Button {
                         removeProjectEvidence([bookmark])
                     } label: {
-                        Label("Remove from project", systemImage: "minus.circle")
+                        Label("Remove from project", systemImage: "trash")
                     }
                     .tint(Color(uiColor: .darkGray))
                 }
