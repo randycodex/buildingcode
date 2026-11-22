@@ -1512,20 +1512,7 @@ struct ProjectView: View {
     var body: some View {
         Group {
             if isProjectFolder {
-                GeometryReader { geometry in
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 20) {
-                            projectHeader
-                            projectSectionCards
-                        }
-                        .frame(minHeight: max(0, geometry.size.height - CodeScreenMetrics.topTitlePadding - 16),
-                               alignment: .top)
-                        .padding(.horizontal, contentHorizontalInset)
-                        .padding(.top, CodeScreenMetrics.topTitlePadding)
-                        .padding(.bottom, 16)
-                    }
-                    .scrollBounceBehavior(.basedOnSize)
-                }
+                projectDashboard
             } else {
                 projectEvidenceDestination
             }
@@ -1892,6 +1879,37 @@ struct ProjectView: View {
         await loadProjectHub()
     }
 
+    private var projectDashboard: some View {
+        ViewThatFits(in: .vertical) {
+            if !dynamicTypeSize.isAccessibilitySize {
+                projectDashboardContent(compact: false)
+                projectDashboardContent(compact: true)
+            }
+            ScrollView {
+                projectDashboardContent(compact: !dynamicTypeSize.isAccessibilitySize)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        // The floating tab bar can cover part of the proposed content area.
+        .safeAreaPadding(.bottom, projectDashboardTabBarInset)
+    }
+
+    private var projectDashboardTabBarInset: CGFloat {
+        if #available(iOS 26.0, *) { return 16 }
+        return 0
+    }
+
+    private func projectDashboardContent(compact: Bool) -> some View {
+        VStack(alignment: .leading, spacing: compact ? 8 : CodeScreenMetrics.contentSpacingBelowTitle) {
+            projectHeader
+            projectSectionCards(compact: compact)
+        }
+        .padding(.horizontal, contentHorizontalInset)
+        .padding(.top, compact ? 6 : 12)
+        .padding(.bottom, compact ? 4 : 12)
+    }
+
     private var projectHeader: some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
             HStack(alignment: .top, spacing: 10) {
@@ -1950,7 +1968,7 @@ struct ProjectView: View {
 
         return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .topLeading),
                                         count: dynamicTypeSize.isAccessibilitySize ? 1 : 2),
-                         alignment: .leading, spacing: 10) {
+                         alignment: .leading, spacing: 8) {
             ForEach(fields, id: \.key) { field in
                 let fact = folder.structuredFacts.lazy
                     .filter { $0.key == field.key }
@@ -1981,9 +1999,9 @@ struct ProjectView: View {
         projectHubSnapshot?.reports.max { $0.createdAt < $1.createdAt }
     }
 
-    private var projectSectionCards: some View {
+    private func projectSectionCards(compact: Bool) -> some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .topLeading),
-                                 count: dynamicTypeSize.isAccessibilitySize ? 1 : 2), spacing: 12) {
+                                 count: dynamicTypeSize.isAccessibilitySize ? 1 : 2), spacing: compact ? 8 : 10) {
             NavigationLink(value: ProjectOverviewSection.overview) {
                 let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                 let summary = String(formattedProjectContext(description).characters)
@@ -1993,7 +2011,7 @@ struct ProjectView: View {
                 projectSectionCard("Overview", systemImage: "list.bullet.rectangle",
                     count: "\(facts.count) \(facts.count == 1 ? "fact" : "facts")",
                     preview: summary.isEmpty ? (firstFact ?? "Add context") : summary,
-                    previewLineLimit: 2)
+                    compact: compact, previewLineLimit: 2)
             }
             .accessibilityIdentifier("project-section-overview")
 
@@ -2002,7 +2020,8 @@ struct ProjectView: View {
                 projectSectionCard("Questions", systemImage: "questionmark.bubble",
                     count: folder?.openQuestions.map { "\($0.count) \($0.count == 1 ? "question" : "questions")" },
                     preview: questions.first(where: { !$0.question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })?.question
-                        ?? (folder?.openQuestions == nil ? "" : "No questions yet."))
+                        ?? (folder?.openQuestions == nil ? "" : "No questions yet."),
+                    compact: compact)
             }
             .accessibilityIdentifier("project-section-questions")
 
@@ -2011,7 +2030,8 @@ struct ProjectView: View {
                 projectSectionCard("Checklist", systemImage: "checklist",
                     count: folder?.recordsChecklist.map { "\($0.filter { $0.status == .reviewed }.count)/\($0.count) reviewed" },
                     preview: records.first(where: { $0.status != .reviewed && $0.status != .notApplicable })?.label
-                        ?? (folder?.recordsChecklist == nil ? "" : records.isEmpty ? "No records yet." : "All records reviewed or not applicable."))
+                        ?? (folder?.recordsChecklist == nil ? "" : records.isEmpty ? "No records yet." : "All records reviewed or not applicable."),
+                    compact: compact)
             }
             .accessibilityIdentifier("project-section-checklist")
 
@@ -2019,7 +2039,8 @@ struct ProjectView: View {
                 projectSectionCard("Notes", systemImage: "note.text",
                     count: projectHubSnapshot.map { "\($0.notebookCards.count) \($0.notebookCards.count == 1 ? "note" : "notes")" },
                     preview: latestProjectNote.map { $0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled note" : $0.title }
-                        ?? (projectHubSnapshot == nil ? "Open Notes" : "No notes yet."))
+                        ?? (projectHubSnapshot == nil ? "Open Notes" : "No notes yet."),
+                    compact: compact)
             }
             .accessibilityIdentifier("project-section-notebook")
 
@@ -2027,7 +2048,8 @@ struct ProjectView: View {
                 projectSectionCard("Evidence", systemImage: "bookmark",
                     count: "\(library.bookmarkCount(inFolder: folderID)) saved",
                     preview: projectBookmarks.first.map { "\($0.sectionNumber) · \($0.displayTitle)" }
-                        ?? "No saved evidence yet.")
+                        ?? "No saved evidence yet.",
+                    compact: compact)
             }
             .accessibilityIdentifier("project-section-evidence")
 
@@ -2035,7 +2057,8 @@ struct ProjectView: View {
                 projectSectionCard("Reports", systemImage: "doc.richtext",
                     count: projectHubSnapshot.map { "\($0.reports.count) \($0.reports.count == 1 ? "report" : "reports")" },
                     preview: latestProjectReport.map { "\($0.title) · V\($0.reportVersion)" }
-                        ?? (projectHubSnapshot == nil ? "Open Reports" : "No reports yet."))
+                        ?? (projectHubSnapshot == nil ? "Open Reports" : "No reports yet."),
+                    compact: compact)
             }
             .accessibilityIdentifier("project-section-reports")
         }
@@ -2086,26 +2109,31 @@ struct ProjectView: View {
         }
     }
 
-    private func projectSectionCard(_ title: String, systemImage: String,
-                                    count: String?, preview: String, previewLineLimit: Int? = nil) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+    private func projectSectionCard(_ title: String, systemImage: String, count: String?,
+                                    preview: String, compact: Bool, previewLineLimit: Int? = nil) -> some View {
+        let minimumHeight: CGFloat = dynamicTypeSize.isAccessibilitySize ? 140 : (compact ? 74 : 116)
+        return VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {
                 Image(systemName: systemImage)
                     .font(.body.weight(.medium))
                     .accessibilityHidden(true)
                 Text(title).font(.headline)
             }
-            Spacer(minLength: 8)
-            Text(preview)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .lineLimit(previewLineLimit ?? (dynamicTypeSize.isAccessibilitySize ? nil : 2))
-            if let count { Text(count).font(.caption).foregroundStyle(.secondary) }
+            Spacer(minLength: compact ? 3 : 8)
+            VStack(alignment: .leading, spacing: compact ? 2 : 4) {
+                if !preview.isEmpty {
+                    Text(preview)
+                        .font(.subheadline)
+                        .lineLimit(compact ? 1 : previewLineLimit ?? (dynamicTypeSize.isAccessibilitySize ? nil : 2))
+                }
+                if let count { Text(count).font(.caption) }
+            }
+            .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundStyle(.primary)
-        .padding(16)
-        .frame(maxWidth: .infinity, minHeight: 140, alignment: .topLeading)
+        .padding(compact ? 8 : 14)
+        .frame(maxWidth: .infinity, minHeight: minimumHeight, alignment: .topLeading)
         .background(projectTileBackgroundColor(for: folder?.colorHex ?? CodeFolder.defaultColorHex),
                     in: RoundedRectangle(cornerRadius: 28, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))

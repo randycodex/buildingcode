@@ -654,9 +654,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         project.tap()
         let root = element(in: app, identifier: "project-folder-root")
         XCTAssertTrue(root.waitForExistence(timeout: 10))
-        let expectedSummary = ["address": "1 Centre Street", "tax-lot-area": "5,000 sq ft", "occupancy": "Residential",
-                               "construction-type": "Type III-B — masonry walls and wood joists",
-                               "building-area": "9,600 sq ft", "building-height": "46 ft to main roof"]
+        let expectedSummary = ["address": "100 Acceptance Court, Brooklyn, NY 11215", "tax-lot-area": "5,000 sq ft",
+                               "occupancy": "R-2 — 8 permanent dwelling units (assumed)",
+                               "construction-type": "Type III-B (assumed) — masonry exterior walls and wood floor joists",
+                               "building-area": "9,600 gross sq ft above grade", "building-height": "46 ft to main roof"]
         for (field, value) in expectedSummary {
             let item = element(in: app, identifier: "project-summary-\(field)")
             XCTAssertTrue(item.isHittable)
@@ -670,11 +671,19 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         for (left, right) in [("overview", "questions"), ("checklist", "notebook"), ("evidence", "reports")] {
             let leading = app.buttons["project-section-\(left)"]
             let trailing = app.buttons["project-section-\(right)"]
+            XCTAssertTrue(leading.isHittable && trailing.isHittable, "Both cards must be visible without scrolling.")
             XCTAssertEqual(leading.frame.minY, trailing.frame.minY, accuracy: 1)
             XCTAssertEqual(leading.frame.width, trailing.frame.width, accuracy: 1)
             XCTAssertEqual(leading.frame.height, trailing.frame.height, accuracy: 1)
         }
-        keepScreenshot(named: "Six project cards with Overview", from: app)
+        let reportsCard = app.buttons["project-section-reports"]
+        XCTAssertLessThanOrEqual(reportsCard.frame.maxY, app.tabBars.firstMatch.frame.minY,
+                                 "The last row must clear the tab bar.")
+        let bottomRowY = reportsCard.frame.minY
+        root.swipeUp()
+        XCTAssertEqual(reportsCard.frame.minY, bottomRowY, accuracy: 1,
+                       "The dashboard should fit without a scrollable area.")
+        keepScreenshot(named: "Six project cards fit above the tab bar", from: app)
 
         let overviewCard = app.buttons["project-section-overview"]
         overviewCard.tap()

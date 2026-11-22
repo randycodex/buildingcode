@@ -826,9 +826,9 @@ private struct Phase3EntitledResearchHarness: View {
         let overviewFixture = ProcessInfo.processInfo.arguments.contains("--native-project-overview-fixture")
         let overviewFacts: [ProjectStructuredFact] = overviewFixture ? [
             ("tax-lot-area", "Tax Lot Area", "5,000 sq ft"),
-            ("occupancy", "Occupancy", "Residential"),
-            ("construction-type", "Construction Type", "Type III-B — masonry walls and wood joists"),
-            ("building-area", "Building Area", "9,600 sq ft"),
+            ("occupancy", "Occupancy", "R-2 — 8 permanent dwelling units (assumed)"),
+            ("construction-type", "Construction Type", "Type III-B (assumed) — masonry exterior walls and wood floor joists"),
+            ("building-area", "Building Area", "9,600 gross sq ft above grade"),
             ("building-height", "Building Height", "46 ft to main roof"),
             ("work-type", "Work type", "Alteration"),
             ("location", "Location", "New York City"),
@@ -839,7 +839,7 @@ private struct Phase3EntitledResearchHarness: View {
         } : []
         guard let acceptanceProject = library.createFolder(
             name: "Acceptance Project",
-            address: "1 Centre Street",
+            address: overviewFixture ? "100 Acceptance Court, Brooklyn, NY 11215" : "1 Centre Street",
             description: overviewFixture
                 ? "Interior renovation to the residence, with updates to the entry and ground-floor layout."
                 : "Phase 3 entitled Research acceptance",
