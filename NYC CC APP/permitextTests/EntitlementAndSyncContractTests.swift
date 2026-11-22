@@ -1468,6 +1468,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(groups.first?.items.map(\.sectionNumber), ["106.2", "106.3"])
         XCTAssertEqual(groups.first?.items.map(\.isBlockAnnotation), [false, false])
         XCTAssertEqual(groups.first?.items.first?.noteBody, "Commenting commenting")
+        let alphabetized = ProjectEvidenceOrganizer.codeGroups(consolidated, alphabetizeCodeBooks: true)
+        XCTAssertEqual(alphabetized.map(\.displayTitle),
+                       groups.map(\.displayTitle).sorted { $0.localizedStandardCompare($1) == .orderedAscending })
+        XCTAssertEqual(alphabetized.first { $0.displayTitle == "Building Code" }?.items.map(\.sectionNumber),
+                       ["106.2", "106.3"])
     }
 
     func testLegacyAuthoredMonolithIsNotShippedInAppResources() {

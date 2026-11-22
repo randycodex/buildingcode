@@ -861,6 +861,13 @@ private struct Phase3EntitledResearchHarness: View {
         if overviewFixture {
             _ = library.saveSection(sectionID: section1011.id, toFolderIDs: [acceptanceProject.id])
         }
+        if ProcessInfo.processInfo.arguments.contains("--native-project-evidence-toolbar-fixture") {
+            guard let scope = library.sections(for: chapterOne).first(where: { $0.sectionNumber == "101.2" }),
+                  library.saveSection(sectionID: scope.id, toFolderIDs: [acceptanceProject.id]) else {
+                failureMessage = "The Evidence sorting fixture could not save Building Code Section 101.2."
+                return
+            }
+        }
         if ProcessInfo.processInfo.arguments.contains("--saved-project-pages-fixture") {
             for number in 3...12 {
                 _ = library.createFolder(

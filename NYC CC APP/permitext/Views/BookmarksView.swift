@@ -1494,6 +1494,7 @@ struct ProjectView: View {
         BookmarkSorter.sorted(
             library.bookmarks(inFolder: folderID),
             mode: sortMode,
+            title: \.evidenceDisplayTitle,
             codeSectionName: { library.codeSectionName(id: $0) }
         )
     }
@@ -1511,10 +1512,6 @@ struct ProjectView: View {
                 bookmark.codeSectionName
             ].contains { $0.lowercased().contains(query) }
         }
-    }
-
-    private var projectEvidenceGroups: [ProjectEvidenceCodeGroup] {
-        ProjectEvidenceOrganizer.codeGroups(visibleProjectBookmarks)
     }
 
     private var accentColor: Color {
@@ -2192,7 +2189,20 @@ struct ProjectView: View {
                     description: Text("Change the search to see saved evidence."))
             } else {
                 LazyVStack(alignment: .leading, spacing: 0) {
-                    ForEach(projectEvidenceGroups) { group in projectEvidenceGroup(group) }
+                    if sortMode == .recentlySaved || sortMode == .title {
+                        ForEach(visibleProjectBookmarks, id: \.rowID) { bookmark in
+                            projectBookmarkRow(bookmark, showsSource: true)
+                            CodeHairline()
+                        }
+                    } else {
+                        let groups = ProjectEvidenceOrganizer.codeGroups(
+                            visibleProjectBookmarks,
+                            alphabetizeCodeBooks: sortMode == .codeBook
+                        )
+                        ForEach(groups) { group in
+                            projectEvidenceGroup(group)
+                        }
+                    }
                 }
             }
         }
@@ -2211,13 +2221,8 @@ struct ProjectView: View {
                     selectedEvidenceActions
                 }
             } else {
-                IconToolbarGroup {
-                    sortMenu
-                    exportButton
-                    ListSelectButton(title: "Select sections") {
-                        ListSelectionMotion.run(reduceMotion: reduceMotion) { isSelecting = true }
-                    }
-                    .disabled(visibleProjectBookmarks.isEmpty)
+                ToolbarItem(placement: .topBarTrailing) {
+                    evidenceActionsMenu
                 }
             }
         }
@@ -2259,35 +2264,37 @@ struct ProjectView: View {
         }
     }
 
-    private var sortMenu: some View {
-        Menu {
-            ForEach(BookmarkSortMode.allCases) { mode in
-                Button {
-                    sortMode = mode
-                } label: {
-                    Label(mode.label, systemImage: mode.systemImage)
+    private var evidenceActionsMenu: some View {
+        let bookmarks = projectBookmarks
+        return Menu {
+            Menu("Sort", systemImage: "arrow.up.arrow.down") {
+                Picker("Sort evidence", selection: $sortMode) {
+                    ForEach(BookmarkSortMode.allCases) { mode in
+                        Label(mode.label, systemImage: mode.systemImage).tag(mode)
+                    }
                 }
+                .pickerStyle(.inline)
             }
+            .disabled(bookmarks.isEmpty)
+            Button("Export project (\(bookmarks.count))", systemImage: "square.and.arrow.up") {
+                pendingExport = BookmarkExportRequest(
+                    bookmarks: bookmarks,
+                    contextLabel: folder?.name,
+                    scopeLabel: folder?.name ?? "Project"
+                )
+            }
+            .disabled(bookmarks.isEmpty)
+            Button("Select sections", systemImage: "checklist") {
+                ListSelectionMotion.run(reduceMotion: reduceMotion) { isSelecting = true }
+            }
+            .disabled(visibleProjectBookmarks.isEmpty)
         } label: {
-            ToolbarActionIcon(systemImage: "arrow.up.arrow.down")
+            ToolbarActionIcon(systemImage: "line.3.horizontal.decrease")
                 .foregroundStyle(Color.appChrome)
         }
         .menuStyle(.button)
         .menuIndicator(.hidden)
-        .accessibilityLabel("Sort project")
-    }
-
-    private var exportButton: some View {
-        Menu {
-            projectExportMenuContent
-        } label: {
-            ToolbarActionIcon(systemImage: "square.and.arrow.up")
-                .foregroundStyle(Color.appChrome)
-        }
-        .menuStyle(.button)
-        .menuIndicator(.hidden)
-        .disabled(projectBookmarks.isEmpty)
-        .accessibilityLabel("Export project")
+        .accessibilityLabel("Evidence actions")
     }
 
     @ViewBuilder
@@ -2402,16 +2409,6 @@ struct ProjectView: View {
         .accessibilityLabel("Remove from project")
     }
 
-    private var projectExportMenuContent: some View {
-        Button("Export project (\(projectBookmarks.count))") {
-            pendingExport = BookmarkExportRequest(
-                bookmarks: projectBookmarks,
-                contextLabel: folder?.name,
-                scopeLabel: folder?.name ?? "Project"
-            )
-        }
-    }
-
     private func removeProjectEvidence(_ sections: [BookmarkedSection]) {
         if removalSessionID != library.privateSessionID || removalFolderID != folderID { removedProjectSections = [] }
         removalSessionID = library.privateSessionID
@@ -2431,14 +2428,14 @@ struct ProjectView: View {
     }
 
     @ViewBuilder
-    private func projectBookmarkRow(_ bookmark: BookmarkedSection) -> some View {
+    private func projectBookmarkRow(_ bookmark: BookmarkedSection, showsSource: Bool = false) -> some View {
         let isSelected = selectedBookmarkRowIDs.contains(bookmark.rowID)
         Group {
             if isSelecting {
                 Button { toggleSelection(bookmark.rowID) } label: {
                     HStack(alignment: .top, spacing: 12) {
                         ListSelectionIndicator(isSelected: isSelected)
-                        projectBookmarkContent(bookmark)
+                        projectBookmarkContent(bookmark, showsSource: showsSource)
                     }
                     .frame(minHeight: 44, alignment: .leading)
                     .contentShape(Rectangle())
@@ -2453,7 +2450,7 @@ struct ProjectView: View {
                         returnsToProjectsAfterRemoval: true
                     )
                 } label: {
-                    projectBookmarkContent(bookmark)
+                    projectBookmarkContent(bookmark, showsSource: showsSource)
                         .contentShape(Rectangle())
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -2471,7 +2468,7 @@ struct ProjectView: View {
         .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
     }
 
-    private func projectBookmarkContent(_ bookmark: BookmarkedSection) -> some View {
+    private func projectBookmarkContent(_ bookmark: BookmarkedSection, showsSource: Bool) -> some View {
         let bookmarkAccent = bookmark.codeSectionName.isEmpty
             ? Color(uiColor: library.accentColor(for: bookmark.codeSectionID))
             : Color(uiColor: CodeSectionThemeProfile(codeSectionName: bookmark.codeSectionName).accentColor)
@@ -2490,6 +2487,16 @@ struct ProjectView: View {
             Text(bookmark.evidenceDisplayTitle)
                 .font(.body.weight(.semibold))
                 .foregroundStyle(.primary)
+            if showsSource {
+                let codeName = bookmark.codeSectionName.isEmpty
+                    ? library.codeSectionName(id: bookmark.codeSectionID)
+                    : bookmark.codeSectionName
+                let source = ProjectEvidenceOrganizer.displayTitle(codeVersion: bookmark.codeVersion, codeSectionName: codeName)
+                let edition = NativeReaderEditionLabel.label(for: bookmark.codeVersion)
+                Text(source.localizedCaseInsensitiveContains(edition) ? source : "\(source) · \(edition)")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(bookmarkAccent)
+            }
             if !bookmark.nonRepeatingPreviewText.isEmpty {
                 Text(bookmark.nonRepeatingPreviewText)
                     .font(.body)

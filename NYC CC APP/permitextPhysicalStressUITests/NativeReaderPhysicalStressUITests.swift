@@ -608,13 +608,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
-    func testEvidenceToolbarKeepsSelectionCountWithThreeActions() throws {
+    func testEvidenceActionsSortExportAndSelect() throws {
 #if !DEBUG
         throw XCTSkip("Evidence toolbar uses the isolated Debug fixture.")
 #else
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
-                               "--native-project-overview-fixture", "--permitext-disable-clerk"]
+                               "--native-project-overview-fixture", "--native-project-evidence-toolbar-fixture",
+                               "--permitext-disable-clerk"]
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
         let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
@@ -626,23 +627,42 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         reveal(evidence, in: app)
         evidence.tap()
         XCTAssertTrue(app.navigationBars["Evidence"].waitForExistence(timeout: 10))
-        let selectSections = app.buttons["Select sections"]
-        let sort = app.buttons["Sort project"]
-        let export = app.buttons["Export project"]
-        for action in [sort, export] {
-            XCTAssertTrue(action.isHittable)
-            XCTAssertEqual(action.frame.width, selectSections.frame.width, accuracy: 2)
-            XCTAssertEqual(action.frame.height, selectSections.frame.height, accuracy: 2)
-        }
-        keepScreenshot(named: "Evidence toolbar with matched icons", from: app)
-        selectSections.tap()
-        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-bookmark-")).firstMatch
-        XCTAssertTrue(row.isHittable)
-        row.tap()
+        let actions = app.buttons["Evidence actions"]
+        XCTAssertTrue(actions.isHittable)
+        XCTAssertFalse(app.buttons["Select sections"].exists)
+        let rows = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-bookmark-"))
+        let title = rows.matching(NSPredicate(format: "label CONTAINS %@", "101.1")).firstMatch
+        let scope = rows.matching(NSPredicate(format: "label CONTAINS %@", "101.2")).firstMatch
+        XCTAssertTrue(title.waitForExistence(timeout: 10))
+        XCTAssertTrue(scope.waitForExistence(timeout: 10))
+        XCTAssertLessThan(title.frame.minY, scope.frame.minY)
+
+        actions.tap()
+        app.buttons["Sort"].tap()
+        app.buttons["Title"].tap()
+        XCTAssertLessThan(scope.frame.minY, title.frame.minY)
+        keepScreenshot(named: "Evidence sorted by title with one actions button", from: app)
+
+        actions.tap()
+        app.buttons["Export project (2)"].tap()
+        let preview = app.navigationBars["Export Preview"]
+        XCTAssertTrue(preview.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["2 sections will be included in the PDF."].exists)
+        preview.buttons["Cancel"].tap()
+
+        actions.tap()
+        app.buttons["Select sections"].tap()
+        XCTAssertTrue(scope.isHittable)
+        scope.tap()
         XCTAssertEqual(app.staticTexts["list-selection-count"].label, "1 selected")
-        XCTAssertTrue(app.buttons["Export selected passages"].isEnabled)
-        XCTAssertFalse(app.buttons["Export project"].exists)
+        XCTAssertFalse(actions.exists)
         keepScreenshot(named: "Evidence selection shows selected export and full contrast", from: app)
+        let selectedExport = app.buttons["Export selected passages"]
+        XCTAssertTrue(selectedExport.isEnabled)
+        selectedExport.tap()
+        XCTAssertTrue(preview.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["1 section will be included in the PDF."].exists)
+        preview.buttons["Cancel"].tap()
         app.buttons["Deselect All"].tap()
         XCTAssertEqual(app.staticTexts["list-selection-count"].label, "0 selected")
         app.buttons["Cancel"].tap()

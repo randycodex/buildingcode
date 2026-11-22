@@ -5133,7 +5133,7 @@ struct ProjectEvidenceCodeGroup: Identifiable, Hashable, Sendable {
 }
 
 enum ProjectEvidenceOrganizer {
-    static func codeGroups(_ items: [BookmarkedSection]) -> [ProjectEvidenceCodeGroup] {
+    static func codeGroups(_ items: [BookmarkedSection], alphabetizeCodeBooks: Bool = false) -> [ProjectEvidenceCodeGroup] {
         var grouped: [String: [BookmarkedSection]] = [:]
         var metadata: [String: (codeVersion: String, codeSectionName: String)] = [:]
 
@@ -5171,7 +5171,13 @@ enum ProjectEvidenceOrganizer {
                 chapters: chapterGroups
             )
         }
-        .sorted(by: compareCodeGroupOrder)
+        .sorted { lhs, rhs in
+            if alphabetizeCodeBooks {
+                let order = lhs.displayTitle.localizedStandardCompare(rhs.displayTitle)
+                if order != .orderedSame { return order == .orderedAscending }
+            }
+            return compareCodeGroupOrder(lhs, rhs)
+        }
     }
 
     static func displayTitle(codeVersion: String, codeSectionName: String) -> String {
@@ -6619,6 +6625,7 @@ enum BookmarkSorter {
     static func sorted(
         _ bookmarks: [BookmarkedSection],
         mode: BookmarkSortMode,
+        title: (BookmarkedSection) -> String = { $0.displayTitle },
         codeSectionName: (Int64?) -> String
     ) -> [BookmarkedSection] {
         bookmarks.sorted { lhs, rhs in
@@ -6638,7 +6645,7 @@ enum BookmarkSorter {
                 }
                 return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
             case .title:
-                let titleCompare = lhs.displayTitle.localizedStandardCompare(rhs.displayTitle)
+                let titleCompare = title(lhs).localizedStandardCompare(title(rhs))
                 if titleCompare != .orderedSame { return titleCompare == .orderedAscending }
                 return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
             }
