@@ -1937,6 +1937,7 @@ struct ProjectView: View {
             ScrollView {
                 projectDashboardContent(compact: !dynamicTypeSize.isAccessibilitySize)
             }
+            .scrollIndicators(.hidden)
             .scrollBounceBehavior(.basedOnSize)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
