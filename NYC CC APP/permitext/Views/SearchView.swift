@@ -616,7 +616,7 @@ struct SearchView: View {
         CodeMainScreenToolbarTitle(title: "Search", alignment: .center)
         IconToolbarGroup {
             Button { showsCodeSources = true } label: {
-                ToolbarActionIcon(systemImage: "line.3.horizontal")
+                ToolbarActionIcon(systemImage: "line.3.horizontal.decrease")
             }
             .accessibilityLabel("Code sources")
             .accessibilityIdentifier("search-manage-code-sources")
