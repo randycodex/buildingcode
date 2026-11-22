@@ -2189,7 +2189,25 @@ struct ProjectView: View {
         .accessibilityElement(children: .combine)
     }
 
+    @ViewBuilder
     private var projectEvidenceDestination: some View {
+        if isProjectFolder {
+            evidenceScreen
+        } else {
+            evidenceScreen
+                .sheet(item: $pendingExport) { request in
+                    BookmarkExportPreviewSheet(request: request) {
+                        pendingExport = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            library.startBookmarkExport(bookmarks: request.bookmarks, contextLabel: request.contextLabel)
+                        }
+                    }
+                }
+                .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
+        }
+    }
+
+    private var evidenceScreen: some View {
         ProjectSectionScreen(title: isProjectFolder ? "Evidence" : folder?.name ?? "Reference", accentColor: accentColor) {
             if !isProjectFolder { projectHeader }
             if projectBookmarks.isEmpty {
@@ -2237,15 +2255,6 @@ struct ProjectView: View {
             }
         }
         .safeAreaInset(edge: .bottom) { projectEvidenceUndo }
-        .sheet(item: $pendingExport) { request in
-            BookmarkExportPreviewSheet(request: request) {
-                pendingExport = nil
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    library.startBookmarkExport(bookmarks: request.bookmarks, contextLabel: request.contextLabel)
-                }
-            }
-        }
-        .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         .refreshable { library.refreshBookmarks() }
     }
 
@@ -2286,14 +2295,16 @@ struct ProjectView: View {
                 .pickerStyle(.inline)
             }
             .disabled(bookmarks.isEmpty)
-            Button("Export project (\(bookmarks.count))", systemImage: "square.and.arrow.up") {
-                pendingExport = BookmarkExportRequest(
-                    bookmarks: bookmarks,
-                    contextLabel: folder?.name,
-                    scopeLabel: folder?.name ?? "Project"
-                )
+            if !isProjectFolder {
+                Button("Export project (\(bookmarks.count))", systemImage: "square.and.arrow.up") {
+                    pendingExport = BookmarkExportRequest(
+                        bookmarks: bookmarks,
+                        contextLabel: folder?.name,
+                        scopeLabel: folder?.name ?? "Project"
+                    )
+                }
+                .disabled(bookmarks.isEmpty)
             }
-            .disabled(bookmarks.isEmpty)
             Button("Select sections", systemImage: "checklist") {
                 ListSelectionMotion.run(reduceMotion: reduceMotion) { isSelecting = true }
             }
@@ -2399,16 +2410,18 @@ struct ProjectView: View {
 
     @ViewBuilder
     private var selectedEvidenceActions: some View {
-        Button {
-            pendingExport = BookmarkExportRequest(
-                bookmarks: selectedBookmarks,
-                contextLabel: folder?.name,
-                scopeLabel: "Selected in \(folder?.name ?? "Project")"
-            )
-        } label: {
-            ToolbarActionIcon(systemImage: "square.and.arrow.up")
+        if !isProjectFolder {
+            Button {
+                pendingExport = BookmarkExportRequest(
+                    bookmarks: selectedBookmarks,
+                    contextLabel: folder?.name,
+                    scopeLabel: "Selected in \(folder?.name ?? "Project")"
+                )
+            } label: {
+                ToolbarActionIcon(systemImage: "square.and.arrow.up")
+            }
+            .accessibilityLabel("Export selected passages")
         }
-        .accessibilityLabel("Export selected passages")
         Button {
             removeProjectEvidence(selectedBookmarks)
             finishSelectingEvidence()

@@ -608,7 +608,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
-    func testEvidenceActionsSortExportAndSelect() throws {
+    func testEvidenceActionsSortAndSelectWithoutExport() throws {
 #if !DEBUG
         throw XCTSkip("Evidence toolbar uses the isolated Debug fixture.")
 #else
@@ -638,17 +638,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertLessThan(title.frame.minY, scope.frame.minY)
 
         actions.tap()
+        XCTAssertFalse(app.buttons["Export project (2)"].exists)
         app.buttons["Sort"].tap()
         app.buttons["Title"].tap()
         XCTAssertLessThan(scope.frame.minY, title.frame.minY)
         keepScreenshot(named: "Evidence sorted by title with one actions button", from: app)
-
-        actions.tap()
-        app.buttons["Export project (2)"].tap()
-        let preview = app.navigationBars["Export Preview"]
-        XCTAssertTrue(preview.waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["2 sections will be included in the PDF."].exists)
-        preview.buttons["Cancel"].tap()
 
         actions.tap()
         app.buttons["Select sections"].tap()
@@ -656,13 +650,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         scope.tap()
         XCTAssertEqual(app.staticTexts["list-selection-count"].label, "1 selected")
         XCTAssertFalse(actions.exists)
-        keepScreenshot(named: "Evidence selection shows selected export and full contrast", from: app)
-        let selectedExport = app.buttons["Export selected passages"]
-        XCTAssertTrue(selectedExport.isEnabled)
-        selectedExport.tap()
-        XCTAssertTrue(preview.waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["1 section will be included in the PDF."].exists)
-        preview.buttons["Cancel"].tap()
+        XCTAssertFalse(app.buttons["Export selected passages"].exists)
+        XCTAssertTrue(app.buttons["Remove from project"].isEnabled)
+        keepScreenshot(named: "Evidence selection with removal action", from: app)
         app.buttons["Deselect All"].tap()
         XCTAssertEqual(app.staticTexts["list-selection-count"].label, "0 selected")
         app.buttons["Cancel"].tap()
