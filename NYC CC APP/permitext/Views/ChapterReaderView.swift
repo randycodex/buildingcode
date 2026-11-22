@@ -369,46 +369,20 @@ struct ChapterReaderView: View {
     }
 
     private func jumpPickerSheet(proxy: ScrollViewProxy) -> some View {
-        NavigationStack {
-            List {
-                ForEach(visibleJumpBlocks) { block in
-                    let depth = jumpSheetDepth(for: block)
-                    Button {
-                        jumpToSection(id: block.id, with: proxy)
-                        isJumpPickerPresented = false
-                    } label: {
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(jumpSheetLabel(for: block))
-                                .font(jumpSheetFont(forDepth: depth))
-                                .foregroundStyle(accentColor.opacity(jumpSheetOpacity(forDepth: depth)))
-                                .lineLimit(2)
-
-                            if selectedJumpSectionID == block.id {
-                                Text("Current")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading, CGFloat(min(depth, 3)) * 14)
-                        .padding(.vertical, 6)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .navigationTitle("Jump within chapter")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
-                        isJumpPickerPresented = false
-                    }
-                    .foregroundStyle(accentColor)
+        ChapterSectionPicker(accent: accentColor, chapter: chapter, onClose: { isJumpPickerPresented = false }) {
+            ForEach(visibleJumpBlocks) { block in
+                let title = jumpSheetLabel(for: block)
+                ChapterSectionPickerRow(
+                    title: title,
+                    depth: ChapterSectionPickerRow.depth(title: title, sectionNumber: block.sectionNumber, fallback: 2),
+                    isCurrent: selectedJumpSectionID == block.id,
+                    accent: accentColor
+                ) {
+                    jumpToSection(id: block.id, with: proxy)
+                    isJumpPickerPresented = false
                 }
             }
         }
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
     }
 
     private func loadBlocks(with proxy: ScrollViewProxy) async {
@@ -604,39 +578,6 @@ struct ChapterReaderView: View {
             return "Section \(normalizedSectionNumber): \(block.displayTitle)"
         }
         return "\(block.sectionNumber) \(block.displayTitle)"
-    }
-
-    private func jumpSheetIndent(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> CGFloat {
-        CGFloat(min(jumpSheetDepth(for: block), 3)) * 14
-    }
-
-    /// Hierarchical depth used to indent and de-emphasize subsection rows in
-    /// the jump sheet. 0 = top-level section heading, 1+ = nested subsection.
-    private func jumpSheetDepth(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> Int {
-        guard block.kind != .textBlock, block.sectionNumber.contains(".") else { return 0 }
-        return max(0, block.sectionNumber.split(separator: ".").count - 1)
-    }
-
-    /// Lighter weight for nested subsections so the parent section heading
-    /// stays the strongest visual anchor in the jump sheet.
-    private func jumpSheetFont(forDepth depth: Int) -> Font {
-        switch depth {
-        case 0: return .body.weight(.semibold)
-        case 1: return .body.weight(.regular)
-        case 2: return .callout.weight(.regular)
-        default: return .subheadline.weight(.regular)
-        }
-    }
-
-    /// Mild opacity falloff per depth so deeper subsections recede without
-    /// losing legibility on a light or dark sheet background.
-    private func jumpSheetOpacity(forDepth depth: Int) -> Double {
-        switch depth {
-        case 0: return 1.0
-        case 1: return 0.80
-        case 2: return 0.68
-        default: return 0.58
-        }
     }
 
     private func dismissTextSelection() {

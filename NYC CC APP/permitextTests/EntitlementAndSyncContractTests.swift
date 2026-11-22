@@ -9037,6 +9037,22 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertTrue(targets.allSatisfy { !$0.menuLabel.isEmpty })
     }
 
+    func testSectionPickerIndentsAdministrationHeadingsByTheirNumbering() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let url = corpusRootURL.appendingPathComponent("2022-construction-codes/code-sections/building-code/chapters/1.html")
+        let resolvedRoute = await store.debugRoute(for: url)
+        let route = try XCTUnwrap(resolvedRoute)
+        let document = try await store.loadDocument(for: route)
+        let targets = NativeReaderSectionNavigator.targets(in: document, displayBlocks: NativeReaderDisplayBlock.blocks(from: document.blocks))
+        let examples = targets.prefix(7)
+
+        XCTAssertEqual(examples.map(\.menuLabel), [
+            "Chapter 1: Administration", "Section BC 101: General", "101.1 Title.", "101.2 Scope.",
+            "101.3 Intent.", "101.4 Referenced codes.", "101.4.1 Electrical."
+        ])
+        XCTAssertEqual(examples.map(\.pickerDepth), [0, 1, 2, 2, 2, 2, 3])
+    }
+
     func testPreparedDocumentImmediateLookupIsMemoryOnlyAndRouteSpecific() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let resolved = await store.debugRoute(for: corpusRootURL.appendingPathComponent("2026-existing-building-code/chapters/1.html"))

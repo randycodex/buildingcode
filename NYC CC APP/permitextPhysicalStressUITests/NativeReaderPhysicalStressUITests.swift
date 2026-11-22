@@ -4293,7 +4293,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let sections = app.buttons["Sections"]
         XCTAssertTrue(sections.waitForExistence(timeout: 10), "Sections is unavailable in the Find bar.")
         sections.tap()
-        XCTAssertTrue(app.navigationBars["Jump within chapter"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["chapter-sections-close"].waitForExistence(timeout: 10))
     }
 
     private func jumpToSection(_ sectionNumber: String, in app: XCUIApplication) {

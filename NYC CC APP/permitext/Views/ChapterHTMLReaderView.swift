@@ -731,37 +731,24 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var jumpPickerSheet: some View {
-        NavigationStack {
-            List {
-                ForEach(jumpTargets) { target in
-                    Button {
-                        chapterSearchScrollQuery = nil
-                        selectedAnchor = target.publishedAnchor
-                        targetAnchorID = target.scrollTarget
-                        isJumpPickerPresented = false
-                    } label: {
-                        ChapterHTMLJumpTargetRow(
-                            target: target,
-                            isCurrent: target.anchorID == selectedAnchor?.anchorID ||
-                                normalizedSectionNumber(target.sectionNumber) == normalizedSectionNumber(selectedAnchor?.sectionNumber ?? ""),
-                            accentColor: accentColor
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .navigationTitle("Jump within chapter")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
-                        isJumpPickerPresented = false
-                    }
+        ChapterSectionPicker(accent: accentColor, chapter: chapter, onClose: { isJumpPickerPresented = false }) {
+            ForEach(jumpTargets) { target in
+                ChapterSectionPickerRow(
+                    title: target.menuLabel,
+                    depth: ChapterSectionPickerRow.depth(title: target.title, sectionNumber: target.sectionNumber, fallback: target.level <= 2 ? 1 : 2),
+                    isCurrent: selectedAnchor.map {
+                        target.anchorID == $0.anchorID ||
+                            normalizedSectionNumber(target.sectionNumber) == normalizedSectionNumber($0.sectionNumber)
+                    } ?? false,
+                    accent: accentColor
+                ) {
+                    chapterSearchScrollQuery = nil
+                    selectedAnchor = target.publishedAnchor
+                    targetAnchorID = target.scrollTarget
+                    isJumpPickerPresented = false
                 }
             }
         }
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
     }
 
     private func requestScrollProgressSync() {
@@ -1040,44 +1027,6 @@ struct ChapterHTMLReaderView: View {
     }
 }
 
-private struct ChapterHTMLJumpTargetRow: View {
-    let target: ChapterHTMLJumpTarget
-    let isCurrent: Bool
-    let accentColor: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: target.isPrimarySection ? 5 : 3) {
-            if target.isPrimarySection {
-                Text(target.menuLabel)
-                    .font(.headline.weight(.bold))
-                    .foregroundStyle(isCurrent ? accentColor : .primary)
-                    .lineLimit(2)
-            } else {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(target.sectionNumber)
-                        .font(target.numberFont)
-                        .foregroundStyle(isCurrent ? accentColor : accentColor.opacity(0.88))
-                        .lineLimit(1)
-
-                    Text(target.cleanTitle)
-                        .font(target.titleFont)
-                        .foregroundStyle(target.titleColor)
-                        .lineLimit(2)
-                }
-            }
-
-            if isCurrent {
-                Text("Current")
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(accentColor)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.leading, target.menuIndent)
-        .padding(.vertical, target.rowVerticalPadding)
-    }
-}
-
 private struct ChapterHTMLJumpTarget: Identifiable, Hashable {
     let sectionNumber: String
     let title: String
@@ -1089,51 +1038,13 @@ private struct ChapterHTMLJumpTarget: Identifiable, Hashable {
     }
 
     var menuLabel: String {
+        if title.hasPrefix("Article \(sectionNumber):") || title.hasPrefix("Chapter \(sectionNumber):") {
+            return title
+        }
         if title.range(of: #"^Section\s+[A-Z]+\s+\#(NSRegularExpression.escapedPattern(for: sectionNumber))\b"#, options: [.regularExpression, .caseInsensitive]) != nil {
             return title
         }
         return "\(sectionNumber) \(title)"
-    }
-
-    var menuIndent: CGFloat {
-        guard sectionNumber.contains(".") else { return 0 }
-        return CGFloat(min(hierarchyDepth, 3)) * 16
-    }
-
-    var hierarchyDepth: Int {
-        guard sectionNumber.contains(".") else { return 0 }
-        return max(0, sectionNumber.split(separator: ".").count - 1)
-    }
-
-    var isPrimarySection: Bool {
-        level <= 2 || title.range(of: #"^Section\s+"#, options: [.regularExpression, .caseInsensitive]) != nil
-    }
-
-    var cleanTitle: String {
-        let escapedSection = NSRegularExpression.escapedPattern(for: sectionNumber)
-        let pattern = #"^\s*(?:Section\s+[A-Z]+\s+)?"# + escapedSection + #"\s*[:.]?\s*"#
-        return title.replacingOccurrences(
-            of: pattern,
-            with: "",
-            options: [.regularExpression, .caseInsensitive]
-        )
-        .trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    var numberFont: Font {
-        hierarchyDepth <= 1 ? .body.weight(.bold) : .callout.weight(.semibold)
-    }
-
-    var titleFont: Font {
-        hierarchyDepth <= 1 ? .body.weight(.semibold) : .callout.weight(.medium)
-    }
-
-    var titleColor: Color {
-        hierarchyDepth <= 1 ? .primary : .secondary
-    }
-
-    var rowVerticalPadding: CGFloat {
-        isPrimarySection ? 8 : 5
     }
 
     var scrollTarget: String {

@@ -1046,38 +1046,19 @@ struct NativeChapterTextReaderView: View {
         proxy: ScrollViewProxy,
         document: NativeReaderRuntimeDocument
     ) -> some View {
-        NavigationStack {
-            List(sectionTargets) { target in
-                Button {
+        ChapterSectionPicker(accent: accentColor, onClose: { isJumpPickerPresented = false }) {
+            ForEach(sectionTargets) { target in
+                ChapterSectionPickerRow(
+                    title: target.menuLabel,
+                    depth: target.pickerDepth,
+                    isCurrent: target.id == currentSectionTargetID,
+                    accent: accentColor
+                ) {
                     isJumpPickerPresented = false
                     scroll(to: target.blockID, proxy: proxy, document: document)
-                } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 10) {
-                        Image(systemName: target.id == currentSectionTargetID ? "checkmark.circle.fill" : "circle")
-                            .foregroundStyle(target.id == currentSectionTargetID ? accentColor : .secondary)
-                            .accessibilityHidden(true)
-                        Text(target.menuLabel)
-                            .font(target.level <= 2 ? .body.weight(.semibold) : .callout.weight(.medium))
-                            .foregroundStyle(.primary)
-                            .multilineTextAlignment(.leading)
-                    }
-                    .padding(.leading, target.menuIndent)
-                    .padding(.vertical, target.level <= 2 ? 6 : 3)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(target.menuLabel)
-                .accessibilityValue(target.id == currentSectionTargetID ? "Current section" : "")
-            }
-            .navigationTitle("Jump within chapter")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { isJumpPickerPresented = false }
                 }
             }
         }
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
     }
 
     private func navigateSearchMatch(offset: Int, proxy: ScrollViewProxy, document: NativeReaderRuntimeDocument) {
@@ -1452,8 +1433,8 @@ struct NativeReaderSectionTarget: Identifiable, Hashable, Sendable {
         title.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    var menuIndent: CGFloat {
-        CGFloat(min(max(level - 2, 0), 3)) * 14
+    var pickerDepth: Int {
+        ChapterSectionPickerRow.depth(title: title, sectionNumber: sectionNumber, fallback: min(level - 1, 2))
     }
 }
 

@@ -510,3 +510,78 @@ struct ChapterFindControls: View {
         .accessibilityLabel(title)
     }
 }
+
+struct ChapterSectionPicker<Rows: View>: View {
+    let accent: Color
+    var chapter: CodeChapter? = nil
+    let onClose: () -> Void
+    @ViewBuilder let rows: () -> Rows
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if let chapter {
+                    Text(chapter.title.isEmpty ? chapter.displayLabel : "\(chapter.displayLabel): \(chapter.title)")
+                        .font(.headline)
+                        .accessibilityAddTraits(.isHeader)
+                }
+                rows()
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done", action: onClose)
+                        .foregroundStyle(accent)
+                        .accessibilityIdentifier("chapter-sections-close")
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+    }
+}
+
+struct ChapterSectionPickerRow: View {
+    let title: String
+    let depth: Int
+    let isCurrent: Bool
+    let accent: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Image(systemName: isCurrent ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(isCurrent ? accent : .secondary)
+                    .accessibilityHidden(true)
+                Text(title)
+                    .font(depth == 0 ? .headline : .subheadline.weight(depth == 1 ? .semibold : .regular))
+                    .foregroundStyle(.primary)
+                    .multilineTextAlignment(.leading)
+            }
+            .padding(.leading, CGFloat(depth) * 16)
+            .padding(.vertical, depth < 2 ? 6 : 3)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityValue(isCurrent ? "Current section" : "")
+    }
+
+    nonisolated static func depth(title: String, sectionNumber: String?, fallback: Int) -> Int {
+        let headingWord = title.split(whereSeparator: \.isWhitespace).first?.uppercased()
+        if headingWord == "CHAPTER" || headingWord == "APPENDIX" { return 0 }
+
+        // Some authored chapters use the same HTML heading level for the
+        // chapter, section groups, provisions and subprovisions.
+        let numberDepth = sectionNumber?.split { $0 == "." || $0 == "(" }.count ?? 0
+        if numberDepth >= 2 { return min(numberDepth, 4) }
+        switch headingWord {
+        case "SECTION", "ARTICLE", "SUBCHAPTER", "SUBARTICLE", "PART", "EBC", "BC", "PC", "MC", "FGC":
+            return 1
+        default:
+            return fallback
+        }
+    }
+}
