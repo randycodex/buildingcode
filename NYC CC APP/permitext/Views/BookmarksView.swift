@@ -2335,11 +2335,12 @@ struct ProjectView: View {
             ToolbarActionIcon(systemImage: "square.and.arrow.up")
         }
         .accessibilityLabel("Export selected passages")
-        Button(role: .destructive) {
+        Button {
             removeProjectEvidence(selectedBookmarks)
             finishSelectingEvidence()
         } label: {
             ToolbarActionIcon(systemImage: "minus.circle")
+                .foregroundStyle(Color.appChrome)
         }
         .accessibilityLabel("Remove from project")
     }
@@ -2399,11 +2400,12 @@ struct ProjectView: View {
                         .contentShape(Rectangle())
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button(role: .destructive) {
+                    Button {
                         removeProjectEvidence([bookmark])
                     } label: {
                         Label("Remove from project", systemImage: "minus.circle")
                     }
+                    .tint(Color(uiColor: .darkGray))
                 }
             }
         }
