@@ -406,17 +406,22 @@ struct SettingsView: View {
             .toolbar(.visible, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                if !isSourcesScreen {
-                    CodeMainScreenToolbarTitle(title: screenTitle)
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { dismiss() } label: {
-                        Image(systemName: "xmark")
-                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                if isSourcesScreen {
+                    ToolbarItem(placement: .topBarLeading) {
+                        SheetCloseButton(title: "Close \(screenTitle)") { dismiss() }
+                            .accessibilityIdentifier("active-sources-close")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Close \(screenTitle)")
-                    .accessibilityIdentifier(isSourcesScreen ? "active-sources-close" : "account-close")
+                } else {
+                    CodeMainScreenToolbarTitle(title: screenTitle)
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button { dismiss() } label: {
+                            Image(systemName: "xmark")
+                                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Close \(screenTitle)")
+                        .accessibilityIdentifier("account-close")
+                    }
                 }
             }
             .contentMargins(.top, CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)

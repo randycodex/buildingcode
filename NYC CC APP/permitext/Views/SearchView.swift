@@ -613,8 +613,9 @@ struct SearchView: View {
                     .navigationTitle(collection.rawValue)
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("Done") { historyCollection = nil }
+                        ToolbarItem(placement: .topBarLeading) {
+                            SheetCloseButton(title: "Close \(collection.rawValue)") { historyCollection = nil }
+                                .accessibilityIdentifier("search-history-close")
                         }
                     }
                     .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
@@ -626,8 +627,7 @@ struct SearchView: View {
                     SearchChapterReaderDestination(prepared: prepared, sharedLibrary: library, showsDetail: true)
                         .toolbar {
                             ToolbarItem(placement: .topBarLeading) {
-                                Button("Close") { passageDetail = nil }
-                                    .accessibilityLabel("Close passage")
+                                SheetCloseButton(title: "Close passage") { passageDetail = nil }
                             }
                                 ToolbarItem(placement: .topBarTrailing) {
                                     Menu {
@@ -1019,21 +1019,14 @@ struct SearchView: View {
                 }
 
             if !query.isEmpty {
-                Button {
+                SearchFieldClearButton(title: "Clear search") {
                     query = ""
                     library.searchAllEditions(query: "")
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.tertiary)
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Clear search")
             }
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
-        .frame(height: CodeScreenMetrics.bottomControlHeight)
+        .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
         .codeLiquidGlassCapsule()
         // The TextField handles focus natively. An extra .onTapGesture here
         // can interfere with cursor-position taps inside the field on iOS 17+.

@@ -96,7 +96,8 @@ final class DraftCache {
 }
 @MainActor final class Editor {
  var isCurrentOwner = true, hasLoaded = true, editingReadOnly = false, isDeleting = false
- var localDraftOnly = false, hasFreshWriteAccess = true, isLoading = false, requiresConflictReview = false
+ var localDraftOnly = false, isLoading = false, requiresConflictReview = false
+ var freshWriteRole: String? = "owner"
  var isSaving = false, needsSave = false, canPerformNetworkWrites = true, hasDeniedWriteAccess = false
  var hasLocalDraft = false, errorMessage: String?
  var retryAfterReconnect = false, isEditorVisible = true, isLeaving = false

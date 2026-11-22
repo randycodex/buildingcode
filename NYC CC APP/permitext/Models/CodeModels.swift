@@ -4093,6 +4093,9 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     func notebookCardDelete(_ request: NotebookCardDeleteRequest) async throws -> NotebookCardDeleteResponse {
         #if DEBUG
         if let card = notebookFixtureCard, request.cardID == card.id, request.expectedVersion == card.version {
+            if ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture"), request.recoverable != true {
+                throw PermitextBackendHTTPError.serverStatus(400, "Expected the project owner to move the note to Trash.")
+            }
             notebookFixtureCard = nil
             return NotebookCardDeleteResponse(cardID: card.id, deletedAt: "2026-09-04T14:00:00Z")
         }

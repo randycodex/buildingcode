@@ -75,6 +75,22 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let conversationRow = app.buttons.matching(identifier: "research-history-row").firstMatch
         XCTAssertTrue(conversationRow.waitForExistence(timeout: 15))
         keepScreenshot(named: "Research belongs to Acceptance Project", from: app)
+        app.buttons["Select conversations"].tap()
+        app.buttons["Select All"].tap()
+        let selectionCount = app.staticTexts["list-selection-count"]
+        XCTAssertEqual(selectionCount.label, "1 selected")
+        historySearch.tap()
+        historySearch.typeText("No matching draft")
+        app.keyboards.buttons["Search"].tap()
+        XCTAssertTrue(app.staticTexts["No matching Research"].waitForExistence(timeout: 5))
+        XCTAssertEqual(selectionCount.label, "0 selected")
+        XCTAssertFalse(app.buttons["Delete selected conversations"].isEnabled)
+        let cancelSelection = app.navigationBars.firstMatch.buttons["Cancel"]
+        XCTAssertTrue(cancelSelection.isHittable)
+        keepScreenshot(named: "Research selection can be canceled after filtering", from: app)
+        cancelSelection.tap()
+        app.buttons["Clear history search"].tap()
+        XCTAssertTrue(conversationRow.waitForExistence(timeout: 10))
         conversationRow.tap()
         XCTAssertTrue(element(in: app, identifier: "research-composer").waitForExistence(timeout: 15))
         XCTAssertFalse(historySearch.isHittable)
@@ -357,13 +373,24 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["main-tab-search"].tap()
         let sources = app.buttons["Code sources"]
         XCTAssertTrue(sources.waitForExistence(timeout: 15))
+        let searchField = app.textFields["Search codes"]
+        let clearSearch = app.buttons["Clear search"]
+        if clearSearch.isHittable { clearSearch.tap() }
+        searchField.tap()
+        searchField.typeText("101.1")
+        XCTAssertGreaterThanOrEqual(clearSearch.frame.width, 43)
+        XCTAssertGreaterThanOrEqual(clearSearch.frame.height, 43)
+        clearSearch.tap()
+        app.keyboards.buttons["Search"].tap()
         XCTAssertTrue(app.staticTexts["Search"].isHittable)
         let searchHeadingY = app.staticTexts["Search"].frame.minY
         XCTAssertFalse(app.staticTexts["Searching enabled code sources"].exists)
         XCTAssertFalse(app.buttons["Manage code sources"].exists)
         sources.tap()
-        XCTAssertTrue(app.buttons["active-sources-close"].waitForExistence(timeout: 10))
-        app.buttons["active-sources-close"].tap()
+        let closeSources = app.buttons["active-sources-close"]
+        XCTAssertTrue(closeSources.waitForExistence(timeout: 10))
+        XCTAssertLessThan(closeSources.frame.midX, app.frame.midX)
+        closeSources.tap()
         let scroll = app.scrollViews["search-results-scroll"]
         let rows = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH %@", "search-recent-passage-"))
         XCTAssertTrue(rows.firstMatch.waitForExistence(timeout: 15))
@@ -395,6 +422,15 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["Search"].frame.minY, searchHeadingY, accuracy: 2,
             "Search stays pinned with a transparent header")
         keepScreenshot(named: "Scrolled recent passage history without gaps", from: app)
+        let visiblePassage = try XCTUnwrap(rows.allElementsBoundByIndex.first {
+            $0.isHittable && $0.frame.minY > scroll.frame.minY + 60 && $0.frame.maxY < scroll.frame.maxY - 80
+        })
+        visiblePassage.tap()
+        let closePassage = app.buttons["Close passage"]
+        XCTAssertTrue(closePassage.waitForExistence(timeout: 15))
+        XCTAssertLessThan(closePassage.frame.midX, app.frame.midX)
+        closePassage.tap()
+        XCTAssertTrue(searchField.waitForExistence(timeout: 10))
         app.buttons["main-tab-saved"].tap()
         app.buttons["main-tab-saved"].tap()
         XCTAssertTrue(app.buttons["Open Account"].waitForExistence(timeout: 10))
@@ -574,6 +610,19 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
                 XCTAssertTrue(app.textFields["Search codes"].waitForExistence(timeout: 15))
                 app.buttons["main-tab-saved"].tap()
                 XCTAssertTrue(bar.waitForExistence(timeout: 5))
+            }
+            if section == "evidence" {
+                app.buttons["Select sections"].tap()
+                let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-bookmark-")).firstMatch
+                XCTAssertTrue(row.isHittable)
+                row.tap()
+                XCTAssertEqual(app.staticTexts["list-selection-count"].label, "1 selected")
+                XCTAssertTrue(app.buttons["Export selected passages"].isEnabled)
+                XCTAssertFalse(app.buttons["Export project"].exists)
+                keepScreenshot(named: "Evidence selection shows selected export and full contrast", from: app)
+                app.buttons["Deselect All"].tap()
+                XCTAssertEqual(app.staticTexts["list-selection-count"].label, "0 selected")
+                app.buttons["Cancel"].tap()
             }
             bar.buttons.element(boundBy: 0).tap()
             XCTAssertTrue(root.waitForExistence(timeout: 10))
@@ -1830,16 +1879,33 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(screenshot)
         app.buttons["native-notebook-confirm-conflict"].tap()
         XCTAssertTrue(waitForValue("saved", on: app.buttons["native-notebook-done"], timeout: 10))
+        done.tap()
+        let selectNotes = app.buttons["Select notes"]
+        XCTAssertTrue(selectNotes.waitForExistence(timeout: 10))
+        let savedNote = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Local unsynchronized analysis")).firstMatch
+        XCTAssertTrue(savedNote.isHittable)
+        selectNotes.tap()
+        savedNote.tap()
+        XCTAssertEqual(app.staticTexts["list-selection-count"].label, "1 selected")
+        XCTAssertTrue(app.buttons["Move selected notes to Trash"].isEnabled)
+        keepScreenshot(named: "Notes displays the shared selection controls", from: app)
+        app.buttons["Move selected notes to Trash"].tap()
+        let selectionTrash = app.alerts["Move this note to Trash?"]
+        XCTAssertTrue(selectionTrash.staticTexts["You can restore this note from Trash for 30 days."].exists)
+        selectionTrash.buttons["Cancel"].tap()
+        app.buttons["Cancel"].tap()
+        savedNote.tap()
         let noteActions = app.buttons["Note actions"]
         XCTAssertTrue(noteActions.waitForExistence(timeout: 5) && noteActions.isHittable)
         noteActions.tap()
         let deleteAction = app.buttons["native-notebook-delete"]
         XCTAssertTrue(deleteAction.waitForExistence(timeout: 5) && deleteAction.isHittable)
         deleteAction.tap()
-        let deletionAlert = app.alerts["Delete this Note?"]
+        let deletionAlert = app.alerts["Move this note to Trash?"]
         XCTAssertTrue(deletionAlert.waitForExistence(timeout: 5),
-                      "Delete Note must present a separate explicit confirmation.\n\(app.debugDescription)")
-        let confirmDelete = deletionAlert.buttons["Delete Note"]
+                      "Move to Trash must present a separate explicit confirmation.\n\(app.debugDescription)")
+        XCTAssertTrue(deletionAlert.staticTexts["You can restore this note from Trash for 30 days."].exists)
+        let confirmDelete = deletionAlert.buttons["Move to Trash"]
         XCTAssertTrue(confirmDelete.isHittable && deletionAlert.buttons["Cancel"].isHittable, app.debugDescription)
         XCTAssertFalse(app.staticTexts["No Notes yet"].exists, "Opening confirmation must not delete the note.")
         keepScreenshot(named: "Native Notebook deletion requires confirmation after reviewed conflict", from: app)

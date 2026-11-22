@@ -343,7 +343,8 @@ private struct ProjectNotebookSessionView: View {
                     NotebookCardEditorView(
                         projectID: projectID, projectName: projectName,
                         routeID: initialCardID ?? directEditorID, cardID: initialCardID,
-                        readOnly: access.readOnly && !permitsLocalDraftEditing, localDraftOnly: permitsLocalDraftEditing, accentColor: accentColor,
+                        readOnly: access.readOnly && !permitsLocalDraftEditing, localDraftOnly: permitsLocalDraftEditing,
+                        notebookRole: access.role, accentColor: accentColor,
                         referenceCandidates: editorReferenceCandidates, owner: owner,
                         onSaved: { onChanged?() }, cache: cache
                     )
@@ -389,6 +390,7 @@ private struct ProjectNotebookSessionView: View {
                     cardID: route.cardID,
                     readOnly: access.readOnly && !permitsLocalDraftEditing,
                     localDraftOnly: permitsLocalDraftEditing,
+                    notebookRole: access.role,
                     accentColor: accentColor,
                     referenceCandidates: editorReferenceCandidates,
                     owner: owner,
@@ -453,9 +455,7 @@ private struct ProjectNotebookSessionView: View {
                             } label: {
                                 HStack(spacing: 12) {
                                     if isSelectingNotes {
-                                        Image(systemName: selectedNoteIDs.contains(card.id) ? "checkmark.circle.fill" : "circle")
-                                            .foregroundStyle(accentColor)
-                                            .accessibilityHidden(true)
+                                        ListSelectionIndicator(isSelected: selectedNoteIDs.contains(card.id))
                                     }
                                     VStack(alignment: .leading, spacing: 7) {
                                         Text(card.title)
@@ -497,44 +497,42 @@ private struct ProjectNotebookSessionView: View {
         .disabled(isMovingNotes)
         .toolbar {
             if isSelectingNotes {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel", action: finishSelectingNotes)
-                }
-            }
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                if !isSelectingNotes && (!access.readOnly || permitsLocalDraftEditing) {
-                    Button("New Note", systemImage: "plus") { editorRoute = NativeNotebookEditorRoute() }
-                }
-                if !selectableNoteIDs.isEmpty {
-                    Menu("Notes options", systemImage: "ellipsis") {
-                        if !isSelectingNotes {
-                            Button("Select notes") { isSelectingNotes = true }
-                        }
-                        let allSelected = selectableNoteIDs == selectedNoteIDs
-                        Button(allSelected ? "Deselect all" : "Select all") {
-                            isSelectingNotes = true
-                            selectedNoteIDs = allSelected ? [] : selectableNoteIDs
-                        }
-                        if isSelectingNotes {
-                            Button("Move selected notes to Trash", systemImage: "trash", role: .destructive) {
-                                showingMoveConfirmation = true
-                            }
-                            .disabled(selectedNoteIDs.isEmpty)
-                        }
+                ListSelectionToolbar(
+                    selectedCount: selectedNoteIDs.intersection(selectableNoteIDs).count,
+                    availableCount: selectableNoteIDs.count,
+                    isBusy: isMovingNotes,
+                    cancel: finishSelectingNotes,
+                    selectAll: { selectedNoteIDs = selectableNoteIDs },
+                    deselectAll: { selectedNoteIDs = [] }
+                ) {
+                    Button("Move selected notes to Trash", systemImage: "trash", role: .destructive) {
+                        showingMoveConfirmation = true
                     }
-                    .disabled(isLoading || isMovingNotes)
+                    .labelStyle(.iconOnly)
+                    .disabled(isLoading)
+                }
+            } else {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    if !selectableNoteIDs.isEmpty {
+                        ListSelectButton(title: "Select notes") { isSelectingNotes = true }
+                            .disabled(isLoading)
+                    }
+                    if !access.readOnly || permitsLocalDraftEditing {
+                        Button("New Note", systemImage: "plus") { editorRoute = NativeNotebookEditorRoute() }
+                    }
                 }
             }
         }
         .onChange(of: selectableNoteIDs) { _, ids in
             selectedNoteIDs.formIntersection(ids)
-            if ids.isEmpty && !isMovingNotes { finishSelectingNotes() }
         }
-        .confirmationDialog("Move \(selectedNoteIDs.count) selected notes to Trash?", isPresented: $showingMoveConfirmation, titleVisibility: .visible) {
+        .alert(selectedNoteIDs.count == 1 ? "Move this note to Trash?" : "Move \(selectedNoteIDs.count) notes to Trash?",
+               isPresented: $showingMoveConfirmation) {
             Button("Move to Trash", role: .destructive) { Task { await moveSelectedNotesToTrash() } }
+                .disabled(selectedNoteIDs.isEmpty)
             Button("Cancel", role: .cancel) { }
         } message: {
-            Text("You can restore notes from Trash for 30 days.")
+            Text("You can restore \(selectedNoteIDs.count == 1 ? "this note" : "these notes") from Trash for 30 days.")
         }
         .alert("Could not move all selected notes", isPresented: Binding(get: { moveError != nil }, set: { if !$0 { moveError = nil } })) {
             Button("OK", role: .cancel) { moveError = nil }
@@ -861,6 +859,7 @@ private struct NotebookCardEditorView: View {
     let cardID: String?
     let readOnly: Bool
     var localDraftOnly: Bool = false
+    var notebookRole: String = "viewer"
     let accentColor: Color
     let referenceCandidates: [NativeNotebookReferenceCandidate]
     let owner: NativePrivateRequestIdentity?
@@ -869,8 +868,9 @@ private struct NotebookCardEditorView: View {
 
     @State private var hasDeniedWriteAccess = false
     private var editingReadOnly: Bool { readOnly || hasDeniedWriteAccess }
-    @State private var hasFreshWriteAccess = false
-    private var canPerformNetworkWrites: Bool { !editingReadOnly && (!localDraftOnly || hasFreshWriteAccess) }
+    @State private var freshWriteRole: String?
+    private var canPerformNetworkWrites: Bool { !editingReadOnly && (!localDraftOnly || freshWriteRole != nil) }
+    private var canMoveNoteToTrash: Bool { (freshWriteRole ?? notebookRole).lowercased() == "owner" }
 
     @State private var currentCardID: String?
     @State private var version = 0
@@ -1003,9 +1003,11 @@ private struct NotebookCardEditorView: View {
                 }
                 if canPerformNetworkWrites && hasLoaded && currentCardID != nil {
                     Menu {
-                        Button("Delete Note", systemImage: "trash", role: .destructive) { showingDeleteConfirmation = true }
-                            .accessibilityIdentifier("native-notebook-delete")
-                            .disabled(isSaving || isDeleting)
+                        Button(canMoveNoteToTrash ? "Move to Trash" : "Delete Permanently", systemImage: "trash", role: .destructive) {
+                            showingDeleteConfirmation = true
+                        }
+                        .accessibilityIdentifier("native-notebook-delete")
+                        .disabled(isSaving || isDeleting)
                     } label: { Image(systemName: "ellipsis") }
                     .accessibilityLabel("Note actions")
                 }
@@ -1155,9 +1157,14 @@ private struct NotebookCardEditorView: View {
                 }
             }
         }
-        .alert("Delete this Note?", isPresented: $showingDeleteConfirmation) {
-            Button("Delete Note", role: .destructive) { Task { await deleteCard() } }
+        .alert(canMoveNoteToTrash ? "Move this note to Trash?" : "Delete this note permanently?", isPresented: $showingDeleteConfirmation) {
+            let recoverable = canMoveNoteToTrash
+            Button(recoverable ? "Move to Trash" : "Delete Permanently", role: .destructive) {
+                Task { await deleteCard(recoverable: recoverable) }
+            }
             Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(canMoveNoteToTrash ? "You can restore this note from Trash for 30 days." : "This cannot be undone.")
         }
         .onDisappear {
             isEditorVisible = false
@@ -1695,7 +1702,7 @@ private struct NotebookCardEditorView: View {
                       ["owner", "editor", "admin"].contains(confirmed.role.lowercased()) else {
                     throw PermitextBackendHTTPError.serverStatus(403, "Your project role does not allow editing this Notebook.")
                 }
-                hasFreshWriteAccess = true
+                freshWriteRole = confirmed.role
                 if let owner {
                     try? cache.store(response, accountID: owner.accountID, projectID: projectID, scope: "native-notebook-list")
                 }
@@ -1703,7 +1710,7 @@ private struct NotebookCardEditorView: View {
                 guard isCurrentOwner else { return }
                 retryAfterReconnect = shouldRetryAfterReconnect(error)
                 guard cacheDraft() else { return }
-                hasFreshWriteAccess = false
+                freshWriteRole = nil
                 if NativePrivateCachePolicy.requiresInvalidation(after: error) {
                     hasDeniedWriteAccess = true
                     // Match the existing read invalidation policy; keep the live
@@ -1755,8 +1762,16 @@ private struct NotebookCardEditorView: View {
         }
     }
 
-    private func deleteCard() async {
+    private func deleteCard(recoverable: Bool) async {
         guard isCurrentOwner, canPerformNetworkWrites, !isSaving, !isDeleting else { return }
+        if recoverable {
+            // Save the current document before creating its recovery copy.
+            guard await flushEditorDraft(), isCurrentOwner, !Task.isCancelled else { return }
+            await saveNow()
+            guard isCurrentOwner, !Task.isCancelled, canPerformNetworkWrites, canMoveNoteToTrash,
+                  !isSaving, !isDeleting, !requiresConflictReview, pendingSave == nil,
+                  editableContent == lastSyncedContent else { return }
+        }
         guard let currentCardID else { return }
         isDeleting = true
         autosaveDebounceTask?.cancel()
@@ -1765,7 +1780,8 @@ private struct NotebookCardEditorView: View {
             try await library.deleteNotebookCard(
                 projectID: projectID,
                 cardID: currentCardID,
-                expectedVersion: version
+                expectedVersion: version,
+                recoverable: recoverable
             )
             guard isCurrentOwner, !Task.isCancelled else { return }
             // Dismissing a deleted editor must not schedule another save or

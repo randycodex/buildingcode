@@ -1617,17 +1617,12 @@ struct ProjectView: View {
         }
         .onChange(of: projectBookmarks) { _, _ in
             selectedBookmarkRowIDs = selectedBookmarkRowIDs.intersection(Set(projectBookmarks.map(\.rowID)))
-            if selectedBookmarkRowIDs.isEmpty {
-                isSelecting = false
-            }
         }
         .onChange(of: visibleProjectBookmarks) { _, visibleBookmarks in
             selectedBookmarkRowIDs = selectedBookmarkRowIDs.intersection(Set(visibleBookmarks.map(\.rowID)))
-            if selectedBookmarkRowIDs.isEmpty {
-                isSelecting = false
-            }
         }
         .onChange(of: folder?.id) { _, newFolderID in
+            finishSelectingEvidence()
             if let newFolderID {
                 if isProjectFolder {
                     library.noteProjectOpened(newFolderID)
@@ -1639,7 +1634,7 @@ struct ProjectView: View {
     }
 
     private var selectedBookmarks: [BookmarkedSection] {
-        projectBookmarks.filter { selectedBookmarkRowIDs.contains($0.rowID) }
+        visibleProjectBookmarks.filter { selectedBookmarkRowIDs.contains($0.rowID) }
     }
 
     @ViewBuilder
@@ -2133,7 +2128,6 @@ struct ProjectView: View {
     private var projectEvidenceDestination: some View {
         ProjectSectionScreen(title: isProjectFolder ? "Evidence" : folder?.name ?? "Reference", accentColor: accentColor) {
             if !isProjectFolder { projectHeader }
-            savedEvidenceHeader
             if projectBookmarks.isEmpty {
                 projectHubEmpty("No Saved Evidence yet.")
             } else if visibleProjectBookmarks.isEmpty {
@@ -2147,8 +2141,26 @@ struct ProjectView: View {
         }
         .searchable(text: $evidenceSearchQuery, isPresented: $isEvidenceSearchPresented,
                     prompt: "Search saved evidence")
+        .navigationBarBackButtonHidden(isSelecting)
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) { sortMenu; exportButton }
+            if isSelecting {
+                ListSelectionToolbar(
+                    selectedCount: selectedBookmarks.count,
+                    availableCount: visibleProjectBookmarks.count,
+                    cancel: finishSelectingEvidence,
+                    selectAll: { selectedBookmarkRowIDs = Set(visibleProjectBookmarks.map(\.rowID)) },
+                    deselectAll: { selectedBookmarkRowIDs = [] }
+                ) {
+                    selectedEvidenceActions
+                }
+            } else {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    sortMenu
+                    exportButton
+                    ListSelectButton(title: "Select sections") { isSelecting = true }
+                        .disabled(visibleProjectBookmarks.isEmpty)
+                }
+            }
         }
         .safeAreaInset(edge: .bottom) { projectEvidenceUndo }
         .sheet(item: $pendingExport) { request in
@@ -2219,32 +2231,6 @@ struct ProjectView: View {
         .buttonStyle(.plain)
         .disabled(projectBookmarks.isEmpty)
         .accessibilityLabel("Export project")
-    }
-
-    private var savedEvidenceSelectionButton: some View {
-        Button {
-            toggleSelectionMode()
-        } label: {
-            Image(systemName: isSelecting ? "checkmark.circle.fill" : "checklist")
-                .font(.body.weight(.semibold))
-                .foregroundStyle(accentColor)
-                .frame(width: 36, height: 36)
-        }
-        .buttonStyle(.plain)
-        .disabled(projectBookmarks.isEmpty)
-        .accessibilityLabel(isSelecting ? "Finish selecting" : "Select sections")
-    }
-
-    private var savedEvidenceHeader: some View {
-        HStack(spacing: 4) {
-            if isSelecting {
-                selectedEvidenceActions
-                    .disabled(selectedBookmarkRowIDs.isEmpty)
-            }
-            Spacer(minLength: 12)
-            savedEvidenceSelectionButton
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
@@ -2339,21 +2325,19 @@ struct ProjectView: View {
 
     @ViewBuilder
     private var selectedEvidenceActions: some View {
-        Group {
-            Button("Export (\(selectedBookmarkRowIDs.count))") {
-                pendingExport = BookmarkExportRequest(
-                    bookmarks: selectedBookmarks,
-                    contextLabel: folder?.name,
-                    scopeLabel: "Selected in \(folder?.name ?? "Project")"
-                )
-            }
-            Button("Remove from project", role: .destructive) {
-                removeProjectEvidence(selectedBookmarks)
-                selectedBookmarkRowIDs.removeAll()
-                isSelecting = false
-            }
+        Button("Export selected passages", systemImage: "square.and.arrow.up") {
+            pendingExport = BookmarkExportRequest(
+                bookmarks: selectedBookmarks,
+                contextLabel: folder?.name,
+                scopeLabel: "Selected in \(folder?.name ?? "Project")"
+            )
         }
-
+        .labelStyle(.iconOnly)
+        Button("Remove from project", systemImage: "minus.circle", role: .destructive) {
+            removeProjectEvidence(selectedBookmarks)
+            finishSelectingEvidence()
+        }
+        .labelStyle(.iconOnly)
     }
 
     private var projectExportMenuContent: some View {
@@ -2376,99 +2360,85 @@ struct ProjectView: View {
         undoFailed = false
     }
 
-    private func toggleSelectionMode() {
-        withAnimation(.easeInOut(duration: 0.18)) {
-            isSelecting.toggle()
-            if !isSelecting {
-                selectedBookmarkRowIDs.removeAll()
-            }
-        }
+    private func finishSelectingEvidence() {
+        isSelecting = false
+        selectedBookmarkRowIDs.removeAll()
     }
 
+    @ViewBuilder
     private func projectBookmarkRow(_ bookmark: BookmarkedSection) -> some View {
+        let isSelected = selectedBookmarkRowIDs.contains(bookmark.rowID)
+        Group {
+            if isSelecting {
+                Button { toggleSelection(bookmark.rowID) } label: {
+                    HStack(alignment: .top, spacing: 12) {
+                        ListSelectionIndicator(isSelected: isSelected)
+                        projectBookmarkContent(bookmark)
+                    }
+                    .frame(minHeight: 44, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
+            } else {
+                NavigationLink {
+                    ReaderView(
+                        sectionID: bookmark.id,
+                        codeVersion: bookmark.codeVersion,
+                        codeSectionID: bookmark.codeSectionID,
+                        returnsToProjectsAfterRemoval: true
+                    )
+                } label: {
+                    projectBookmarkContent(bookmark)
+                        .contentShape(Rectangle())
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        removeProjectEvidence([bookmark])
+                    } label: {
+                        Label("Remove from project", systemImage: "minus.circle")
+                    }
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("project-bookmark-\(bookmark.rowID)")
+        .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
+    }
+
+    private func projectBookmarkContent(_ bookmark: BookmarkedSection) -> some View {
         let bookmarkAccent = bookmark.codeSectionName.isEmpty
             ? Color(uiColor: library.accentColor(for: bookmark.codeSectionID))
             : Color(uiColor: CodeSectionThemeProfile(codeSectionName: bookmark.codeSectionName).accentColor)
-        let isSelected = selectedBookmarkRowIDs.contains(bookmark.rowID)
 
-        return HStack(alignment: .top, spacing: 12) {
-            if isSelecting {
-                Button {
-                    toggleSelection(bookmark.rowID)
-                } label: {
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(isSelected ? accentColor : Color.secondary.opacity(0.6))
-                        .frame(width: 28, height: 28)
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 8) {
+                Text(bookmark.sectionNumber)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                if bookmark.hasNote {
+                    Image(systemName: "note.text")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.secondary)
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel(isSelected ? "Deselect section" : "Select section")
             }
-
-            NavigationLink {
-                ReaderView(
-                    sectionID: bookmark.id,
-                    codeVersion: bookmark.codeVersion,
-                    codeSectionID: bookmark.codeSectionID,
-                    returnsToProjectsAfterRemoval: true
-                )
-            } label: {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 8) {
-                        Text(bookmark.sectionNumber)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.secondary)
-
-                        if bookmark.hasNote {
-                            Image(systemName: "note.text")
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                        }
-
-                    }
-
-                    Text(bookmark.evidenceDisplayTitle)
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.primary)
-                        .multilineTextAlignment(.leading)
-
-                    if !bookmark.nonRepeatingPreviewText.isEmpty {
-                        Text(bookmark.nonRepeatingPreviewText)
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.leading)
-                            .lineLimit(3)
-                    }
-
-                    if bookmark.hasNote {
-                        Text(bookmark.noteBody)
-                            .font(.body)
-                            .foregroundStyle(bookmarkAccent.opacity(0.88))
-                            .multilineTextAlignment(.leading)
-                            .padding(.top, 4)
-                    }
-
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+            Text(bookmark.evidenceDisplayTitle)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.primary)
+            if !bookmark.nonRepeatingPreviewText.isEmpty {
+                Text(bookmark.nonRepeatingPreviewText)
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
             }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("project-bookmark-\(bookmark.rowID)")
-            .disabled(isSelecting)
-        }
-        .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            if isSelecting {
-                toggleSelection(bookmark.rowID)
+            if bookmark.hasNote {
+                Text(bookmark.noteBody)
+                    .font(.body)
+                    .foregroundStyle(bookmarkAccent.opacity(0.88))
+                    .padding(.top, 4)
             }
         }
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button(role: .destructive) {
-                removeProjectEvidence([bookmark])
-            } label: {
-                Label("Remove from project", systemImage: "minus.circle")
-            }
-        }
+        .multilineTextAlignment(.leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func toggleSelection(_ rowID: String) {

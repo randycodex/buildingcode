@@ -601,7 +601,24 @@ private struct ResearchSessionView: View {
             .background(CodeAppBackdrop(accent: Color.appChrome).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(showsHistorySelectionToolbar ? .visible : .hidden, for: .navigationBar)
+            .toolbar {
+                if showsHistorySelectionToolbar {
+                    ListSelectionToolbar(
+                        selectedCount: selectedVisibleHistory.count,
+                        availableCount: visibleHistory.count,
+                        isBusy: isDeletingHistoryBatch,
+                        cancel: finishSelectingHistory,
+                        selectAll: { selectedHistoryIDs = Set(visibleHistory.map(\.id)) },
+                        deselectAll: { selectedHistoryIDs = [] }
+                    ) {
+                        Button(role: .destructive, action: requestSelectedDeletion) {
+                            Label("Delete selected conversations", systemImage: "trash")
+                                .labelStyle(.iconOnly)
+                        }
+                    }
+                }
+            }
             .sheet(item: $pendingVisualReview) { pending in
                 ResearchVisualReviewSheet(
                     review: pending.review,
@@ -759,6 +776,7 @@ private struct ResearchSessionView: View {
             }
             .onChange(of: library.activeResearchConversationID) { previousID, id in
                 guard isCurrentOwner else { return }
+                if id != nil { finishSelectingHistory() }
                 library.researchHistoryIsPresented = false
                 if conversation?.id != id { conversation = nil }
                 conversationLoadID = nil
@@ -791,6 +809,7 @@ private struct ResearchSessionView: View {
                 if deletingConversationID != previousID { deletingConversationID = nil }
                 Task { await openActiveConversationIfNeeded() }
             }
+            .onChange(of: historyFilterKey) { selectedHistoryIDs = [] }
             .onChange(of: library.pendingResearchSelections) { _, selections in
                 guard !selections.isEmpty else { return }
                 Task { await consumePendingSelectionIfNeeded() }
@@ -836,6 +855,19 @@ private struct ResearchSessionView: View {
         return conversation
     }
 
+    private var showsHistorySelectionToolbar: Bool {
+        isSelectingHistory && presentedConversation == nil && !library.defersEntitlementPresentation &&
+            library.signedInAccount != nil && library.hasResearchAccess
+    }
+
+    private var visibleHistory: [ResearchConversationSummary] {
+        NativeResearchHistory.filtered(summaries, query: historyQuery, projectID: historyProjectID)
+    }
+
+    private var selectedVisibleHistory: [ResearchConversationSummary] {
+        visibleHistory.filter { selectedHistoryIDs.contains($0.id) }
+    }
+
     private var researchWorkspace: some View {
         let presented = presentedConversation
         let showingConversation = presented != nil
@@ -844,7 +876,9 @@ private struct ResearchSessionView: View {
         return ZStack {
             // Keep the list mounted so Back restores the same scroll position and search.
             historyView
-                .overlay(alignment: .top) { researchScreenHeader() }
+                .overlay(alignment: .top) {
+                    if !showsHistorySelectionToolbar { researchScreenHeader() }
+                }
                 .offset(x: showingConversation && !reduceMotion ? -18 * trailing : 0)
                 .opacity(showingConversation ? 0 : 1)
                 .allowsHitTesting(!showingConversation)
@@ -911,26 +945,11 @@ private struct ResearchSessionView: View {
 
     private func researchHeaderButtons(conversation: ResearchConversation?) -> some View {
         HStack(spacing: 0) {
-            if conversation == nil, library.hasResearchAccess, !summaries.isEmpty {
-                if isSelectingHistory {
-                    Button("Cancel") { isSelectingHistory = false; selectedHistoryIDs = [] }
-                        .disabled(isDeletingHistoryBatch)
-                    Menu {
-                        Button("Select All", systemImage: "checkmark.circle") { selectedHistoryIDs = Set(summaries.map(\.id)) }
-                        Button("Deselect All", systemImage: "circle") { selectedHistoryIDs = [] }
-                    } label: { Image(systemName: "checklist").frame(width: 44, height: 44) }
-                    .disabled(isDeletingHistoryBatch)
-                    Button(role: .destructive) { requestSelectedDeletion() } label: {
-                        Image(systemName: "trash").frame(width: 44, height: 44)
-                    }
-                    .disabled(selectedHistoryIDs.isEmpty || isDeletingHistoryBatch)
-                    .accessibilityLabel("Delete selected conversations")
-                } else {
-                    Button { isSelectingHistory = true; selectedHistoryIDs = [] } label: {
-                        Image(systemName: "checklist").frame(width: 44, height: 44)
-                    }
-                    .accessibilityLabel("Select conversations")
+            if conversation == nil, library.hasResearchAccess, !visibleHistory.isEmpty {
+                ListSelectButton(title: "Select conversations") {
+                    isSelectingHistory = true
                 }
+                .frame(width: 44, height: 44)
             }
 
             if conversation == nil,
@@ -1030,7 +1049,7 @@ private struct ResearchSessionView: View {
         } else {
             CodeScreenTitleRow(title: "Research", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
                 researchHeaderButtons(conversation: nil)
-                    .frame(width: isSelectingHistory ? 164 : (summaries.isEmpty ? 44 : 88), height: CodeScreenMetrics.toolbarButtonSize)
+                    .frame(width: visibleHistory.isEmpty ? 44 : 88, height: CodeScreenMetrics.toolbarButtonSize)
                     .codeLiquidGlassCapsule()
             }
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
@@ -1085,13 +1104,15 @@ private struct ResearchSessionView: View {
     }
 
     private var historyView: some View {
-        let orderedSummaries = ResearchHistoryPresentation.ordered(NativeResearchHistory.filtered(summaries, query: historyQuery, projectID: historyProjectID))
+        let orderedSummaries = ResearchHistoryPresentation.ordered(visibleHistory)
         return List {
-            Color.clear
-                .frame(height: 76)
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
+            if !showsHistorySelectionToolbar {
+                Color.clear
+                    .frame(height: 76)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+            }
 
             if projectFolderID == nil {
                 historyProjectFilter
@@ -1148,7 +1169,7 @@ private struct ResearchSessionView: View {
                     } label: {
                         HStack(alignment: .top, spacing: 12) {
                             if isSelectingHistory {
-                                Image(systemName: selectedHistoryIDs.contains(item.id) ? "checkmark.circle.fill" : "circle")
+                                ListSelectionIndicator(isSelected: selectedHistoryIDs.contains(item.id))
                             }
                             Text(researchTitle(for: item))
                                 .font(.body)
@@ -1192,10 +1213,12 @@ private struct ResearchSessionView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.visible, edges: .bottom)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button(role: .destructive) {
-                        requestDeletion(id: item.id)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
+                    if !isSelectingHistory {
+                        Button(role: .destructive) {
+                            requestDeletion(id: item.id)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
                     }
                 }
             }
@@ -1264,13 +1287,7 @@ private struct ResearchSessionView: View {
                 .onSubmit { isHistorySearchFocused = false }
                 .accessibilityIdentifier("research-history-search")
             if !historyQuery.isEmpty {
-                Button { historyQuery = "" } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Clear history search")
+                SearchFieldClearButton(title: "Clear history search") { historyQuery = "" }
             }
         }
         .padding(.horizontal, 16)
@@ -1896,9 +1913,14 @@ private struct ResearchSessionView: View {
 
     private func requestSelectedDeletion() {
         guard !isDeletingHistoryBatch, deletingConversationID == nil else { return }
-        let ids = summaries.filter { selectedHistoryIDs.contains($0.id) }.map(\.id)
+        let ids = selectedVisibleHistory.map(\.id)
         guard !ids.isEmpty else { return }
         pendingDeletion = PendingResearchDeletion(conversationIDs: ids)
+    }
+
+    private func finishSelectingHistory() {
+        isSelectingHistory = false
+        selectedHistoryIDs = []
     }
 
     private var isLoading: Bool { isLoadingHistory || isLoadingConversation }
@@ -2612,8 +2634,7 @@ private struct ResearchSessionView: View {
         guard isCurrentOwner else { return }
         selectedHistoryIDs.formIntersection(Set(summaries.map(\.id)))
         if result.failedIDs.isEmpty {
-            isSelectingHistory = false
-            selectedHistoryIDs = []
+            finishSelectingHistory()
         } else {
             errorMessage = "Deleted \(result.deletedIDs.count) of \(ids.count) conversations. \(result.failedIDs.count) couldn’t be deleted and remain selected. Try again."
         }
