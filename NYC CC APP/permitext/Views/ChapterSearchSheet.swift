@@ -138,38 +138,20 @@ struct ChapterSearchSheet: View {
 
     private var searchHeader: some View {
         HStack(spacing: 12) {
-            HStack(spacing: 10) {
-                Image(systemName: "magnifyingglass")
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(.secondary)
-
+            CodeSearchBar(showsClearButton: !query.isEmpty, clearTitle: "Clear chapter search", clear: { query = "" }) {
                 TextField("Search this chapter", text: $query)
-                    .font(.title3)
-                    .foregroundStyle(.primary)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .submitLabel(.search)
                     .focused($isSearchFocused)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
-            .background(Color(uiColor: .secondarySystemBackground))
-            .clipShape(Capsule(style: .continuous))
 
             Button {
                 dismiss()
             } label: {
-                Image(systemName: "xmark")
-                    .font(.title2.weight(.medium))
-                    .foregroundStyle(.primary)
-                    .frame(width: 54, height: 54)
-                    .background(Color(uiColor: .secondarySystemBackground))
-                    .clipShape(Circle())
+                ToolbarActionIcon(systemImage: "xmark").codeLiquidGlassCircle()
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Close search")
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
         .padding(.top, 20)
         .padding(.bottom, 14)
     }
@@ -444,7 +426,7 @@ struct ChapterFindControls: View {
 
     private func findButton(_ title: String, icon: String, disabled: Bool = false, action: @escaping () -> Void) -> some View {
         Button { isFocused = false; action() } label: {
-            Image(systemName: icon).frame(width: 44, height: 44).contentShape(Rectangle())
+            ToolbarActionIcon(systemImage: icon)
         }
         .buttonStyle(.plain)
         .disabled(disabled)

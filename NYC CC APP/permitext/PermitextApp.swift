@@ -79,9 +79,7 @@ private struct PermitextClerkAuthenticationView: View {
             HStack {
                 Spacer()
                 Button { dismiss() } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 17, weight: .semibold))
-                        .frame(width: 44, height: 44)
+                    ToolbarActionIcon(systemImage: "xmark")
                         .codeLiquidGlassCircle()
                 }
                 .buttonStyle(.plain)

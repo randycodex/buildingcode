@@ -53,11 +53,7 @@ struct ChapterReaderView: View {
         Button {
             isChapterSearchPresented = true
         } label: {
-            Image(systemName: "text.page.badge.magnifyingglass")
-                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                .background(Color(uiColor: .systemBackground))
-                .clipShape(Capsule(style: .continuous))
+            ToolbarActionIcon(systemImage: "text.page.badge.magnifyingglass")
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Search this chapter")
@@ -671,15 +667,9 @@ struct ChapterReaderView: View {
     }
 }
 
-enum ReaderBookmarkButtonStyle {
-    case standard
-    case compact
-}
-
 struct ReaderCurrentSectionBookmarkButton: View {
     let sectionID: Int64?
     let accentColor: Color
-    var style: ReaderBookmarkButtonStyle = .standard
     var accessibilityID: String = "reader-current-section-bookmark"
 
     @EnvironmentObject private var library: CodeLibraryViewModel
@@ -706,12 +696,8 @@ struct ReaderCurrentSectionBookmarkButton: View {
                 }
             }
         } label: {
-            Image(systemName: displayedIsBookmarked ? "bookmark.fill" : "bookmark")
-                .font(.body.weight(.semibold))
+            ToolbarActionIcon(systemImage: displayedIsBookmarked ? "bookmark.fill" : "bookmark")
                 .foregroundStyle(displayedIsBookmarked ? accentColor : Color.secondary)
-                .frame(width: style == .standard ? 44 : 28, height: style == .standard ? 44 : 28)
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(sectionID == nil)
@@ -1275,7 +1261,7 @@ private struct SourceProblemReportSheet: View {
             .safeAreaInset(edge: .top, spacing: 0) {
                 CodeScreenTitleRow(title: "Report a problem", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
                     Button { dismiss() } label: {
-                        Image(systemName: "xmark").frame(width: 44, height: 44)
+                        ToolbarActionIcon(systemImage: "xmark")
                     }
                     .buttonStyle(.plain).codeLiquidGlassCircle()
                     .accessibilityLabel("Close report")

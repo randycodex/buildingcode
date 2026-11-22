@@ -147,19 +147,13 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var chapterSearchToolbarButton: some View {
-        Image(systemName: "text.page.badge.magnifyingglass")
-            .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                isChapterSearchPresented = true
-            }
-            .accessibilityElement()
-            .accessibilityLabel("Search this chapter")
-            .accessibilityAddTraits(.isButton)
-            .accessibilityAction {
-                isChapterSearchPresented = true
-            }
+        Button {
+            isChapterSearchPresented = true
+        } label: {
+            ToolbarActionIcon(systemImage: "text.page.badge.magnifyingglass")
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Search this chapter")
     }
 
     private var htmlStore: PublishedHTMLContentStore {

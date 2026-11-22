@@ -102,7 +102,7 @@ assert.match(chapterReader, /library\.readerSaveActionLabel\(sectionID:/);
 assert.match(chapterReader, /displayedIsBookmarked = library\.toggleReaderDestinationSave\(sectionID: sectionID\)/);
 assert.match(library, /saved \? "Remove from Project: /);
 assert.match(library, /return "Choose a Project to save passage"/);
-assert.match(chapterReader, /Image\(systemName: displayedIsBookmarked \? "bookmark.fill" : "bookmark"\)/);
+assert.match(chapterReader, /ToolbarActionIcon\(systemImage: displayedIsBookmarked \? "bookmark.fill" : "bookmark"\)/);
 assert.match(chapterReader, /\.foregroundStyle\(displayedIsBookmarked \? accentColor : Color\.secondary\)/);
 assert.match(chapterReader, /\.accessibilityValue\([^\n]*displayedIsBookmarked[^\n]*readerSaveDestinationName/);
 assert.match(chapterReader, /showBookmarkConfirmation\("Saved to /);

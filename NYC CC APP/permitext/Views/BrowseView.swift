@@ -1533,6 +1533,7 @@ enum CodeScreenMetrics {
     /// tab bar's visible outer edge rather than the wider content grid.
     static let bottomControlHorizontalPadding: CGFloat = 20
     static let bottomControlHeight: CGFloat = 52
+    static let bottomSearchScrollClearance = bottomControlHeight + 24
     /// Detached circular actions beside the floating bottom navigation.
     static let detachedNavigationButtonSize: CGFloat = 60
     static let readerHorizontalPadding: CGFloat = 20
@@ -1970,6 +1971,7 @@ private struct ChapterSectionsPreviewContainer: View {
 struct CodeMainScreenToolbarTitle: ToolbarContent {
     let title: String
     var animatesChanges = false
+    var alignment: Alignment = .bottom
 
     @ToolbarContentBuilder
     var body: some ToolbarContent {
@@ -1982,7 +1984,7 @@ struct CodeMainScreenToolbarTitle: ToolbarContent {
 
     private var titleItem: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            CodeMainScreenTitleLabel(title: title, animatesChanges: animatesChanges)
+            CodeMainScreenTitleLabel(title: title, animatesChanges: animatesChanges, alignment: alignment)
         }
     }
 }
@@ -1992,6 +1994,7 @@ struct CodeMainScreenTitleLabel: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let title: String
     let animatesChanges: Bool
+    var alignment: Alignment = .bottom
 
     var body: some View {
         ZStack(alignment: .leading) {
@@ -2007,7 +2010,7 @@ struct CodeMainScreenTitleLabel: View {
                 ))
         }
         .fixedSize(horizontal: true, vertical: false)
-        .frame(height: CodeScreenMetrics.toolbarButtonSize, alignment: .bottom)
+        .frame(height: CodeScreenMetrics.toolbarButtonSize, alignment: alignment)
         .clipped()
         .animation(animatesChanges && !reduceMotion ? .easeInOut(duration: 0.2) : nil, value: title)
     }

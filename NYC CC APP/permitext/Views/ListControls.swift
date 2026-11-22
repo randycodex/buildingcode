@@ -1,5 +1,45 @@
 import SwiftUI
 
+enum ListSelectionMotion {
+    static func run(reduceMotion: Bool, _ change: () -> Void) {
+        withAnimation(reduceMotion ? nil : .smooth(duration: 0.36), change)
+    }
+}
+
+struct ToolbarActionIcon: View {
+    let systemImage: String
+
+    var body: some View {
+        Image(systemName: systemImage)
+            .resizable()
+            .scaledToFit()
+            .frame(width: CodeScreenMetrics.toolbarIconPointSize, height: CodeScreenMetrics.toolbarIconPointSize)
+            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+            .contentShape(Rectangle())
+            .accessibilityHidden(true)
+    }
+}
+
+struct IconToolbarGroup<Actions: View>: ToolbarContent {
+    @ViewBuilder let actions: () -> Actions
+
+    var body: some ToolbarContent {
+        if #available(iOS 26.0, *) {
+            trailingItem.sharedBackgroundVisibility(.hidden)
+        } else {
+            trailingItem
+        }
+    }
+
+    private var trailingItem: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            HStack(spacing: 0, content: actions)
+                .buttonStyle(.plain)
+                .codeLiquidGlassCapsule()
+        }
+    }
+}
+
 struct ListSelectionToolbar<Actions: View>: ToolbarContent {
     let selectedCount: Int
     let availableCount: Int
@@ -23,12 +63,11 @@ struct ListSelectionToolbar<Actions: View>: ToolbarContent {
                 .lineLimit(1)
                 .accessibilityIdentifier("list-selection-count")
         }
-        ToolbarItemGroup(placement: .topBarTrailing) {
+        IconToolbarGroup {
             Button(action: allSelected ? deselectAll : selectAll) {
-                Label(allSelected ? "Deselect All" : "Select All",
-                      systemImage: allSelected ? "circle" : "checkmark.circle")
-                    .labelStyle(.iconOnly)
+                ToolbarActionIcon(systemImage: allSelected ? "circle" : "checkmark.circle")
             }
+            .accessibilityLabel(allSelected ? "Deselect All" : "Select All")
             .tint(Color.appChrome)
             .disabled(availableCount == 0 || isBusy)
 
@@ -44,9 +83,9 @@ struct ListSelectButton: View {
 
     var body: some View {
         Button(action: action) {
-            Label(title, systemImage: "checklist")
-                .labelStyle(.iconOnly)
+            ToolbarActionIcon(systemImage: "checklist")
         }
+        .accessibilityLabel(title)
         .tint(Color.appChrome)
     }
 }
@@ -59,11 +98,49 @@ struct ListSelectionIndicator: View {
             .font(.body.weight(.semibold))
             .foregroundStyle(isSelected ? Color.appChrome : Color.secondary)
             .frame(width: 24, height: 24)
+            .transition(.opacity)
             .accessibilityHidden(true)
     }
 }
 
-struct SearchFieldClearButton: View {
+struct CodeSearchBar<Field: View>: View {
+    let showsClearButton: Bool
+    let clearTitle: String
+    let clear: () -> Void
+    @ViewBuilder let field: () -> Field
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+            field()
+                .textFieldStyle(.plain)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .submitLabel(.search)
+            if showsClearButton {
+                SearchFieldClearButton(title: clearTitle, action: clear)
+            }
+        }
+        .padding(.horizontal, 16)
+        .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
+        .codeLiquidGlassCapsule()
+        .accessibilityElement(children: .contain)
+    }
+}
+
+extension View {
+    func bottomSearchBarPlacement() -> some View {
+        self
+        .accessibilityIdentifier("bottom-search-bar")
+        .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+        .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+    }
+}
+
+private struct SearchFieldClearButton: View {
     let title: String
     let action: () -> Void
 

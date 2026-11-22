@@ -184,11 +184,8 @@ struct BookmarksView: View {
         Button {
             showingSettings = true
         } label: {
-            Image(systemName: library.signedInAccount == nil ? "person.crop.circle" : "person.crop.circle.fill")
-                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+            ToolbarActionIcon(systemImage: library.signedInAccount == nil ? "person.crop.circle" : "person.crop.circle.fill")
                 .foregroundStyle(Color.appChrome)
-                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Open Account")
@@ -1426,6 +1423,7 @@ struct ProjectView: View {
     let folderID: Int64
 
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
@@ -1556,10 +1554,12 @@ struct ProjectView: View {
         .toolbar {
             if isProjectFolder {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Edit project", systemImage: "pencil") {
+                    Button {
                         if let folder { folderEditorTarget = .edit(folder) }
+                    } label: {
+                        ToolbarActionIcon(systemImage: "pencil")
                     }
-                    .labelStyle(.iconOnly)
+                    .accessibilityLabel("Edit project")
                     .tint(Color.appChrome)
                     .accessibilityIdentifier("project-edit")
                 }
@@ -2154,11 +2154,13 @@ struct ProjectView: View {
                     selectedEvidenceActions
                 }
             } else {
-                ToolbarItemGroup(placement: .topBarTrailing) {
+                IconToolbarGroup {
                     sortMenu
                     exportButton
-                    ListSelectButton(title: "Select sections") { isSelecting = true }
-                        .disabled(visibleProjectBookmarks.isEmpty)
+                    ListSelectButton(title: "Select sections") {
+                        ListSelectionMotion.run(reduceMotion: reduceMotion) { isSelecting = true }
+                    }
+                    .disabled(visibleProjectBookmarks.isEmpty)
                 }
             }
         }
@@ -2210,12 +2212,11 @@ struct ProjectView: View {
                 }
             }
         } label: {
-            Image(systemName: "arrow.up.arrow.down")
-                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+            ToolbarActionIcon(systemImage: "arrow.up.arrow.down")
                 .foregroundStyle(Color.appChrome)
-                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
         }
-        .buttonStyle(.plain)
+        .menuStyle(.button)
+        .menuIndicator(.hidden)
         .accessibilityLabel("Sort project")
     }
 
@@ -2223,12 +2224,11 @@ struct ProjectView: View {
         Menu {
             projectExportMenuContent
         } label: {
-            Image(systemName: "square.and.arrow.up")
-                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+            ToolbarActionIcon(systemImage: "square.and.arrow.up")
                 .foregroundStyle(Color.appChrome)
-                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
         }
-        .buttonStyle(.plain)
+        .menuStyle(.button)
+        .menuIndicator(.hidden)
         .disabled(projectBookmarks.isEmpty)
         .accessibilityLabel("Export project")
     }
@@ -2325,19 +2325,23 @@ struct ProjectView: View {
 
     @ViewBuilder
     private var selectedEvidenceActions: some View {
-        Button("Export selected passages", systemImage: "square.and.arrow.up") {
+        Button {
             pendingExport = BookmarkExportRequest(
                 bookmarks: selectedBookmarks,
                 contextLabel: folder?.name,
                 scopeLabel: "Selected in \(folder?.name ?? "Project")"
             )
+        } label: {
+            ToolbarActionIcon(systemImage: "square.and.arrow.up")
         }
-        .labelStyle(.iconOnly)
-        Button("Remove from project", systemImage: "minus.circle", role: .destructive) {
+        .accessibilityLabel("Export selected passages")
+        Button(role: .destructive) {
             removeProjectEvidence(selectedBookmarks)
             finishSelectingEvidence()
+        } label: {
+            ToolbarActionIcon(systemImage: "minus.circle")
         }
-        .labelStyle(.iconOnly)
+        .accessibilityLabel("Remove from project")
     }
 
     private var projectExportMenuContent: some View {
@@ -2361,8 +2365,11 @@ struct ProjectView: View {
     }
 
     private func finishSelectingEvidence() {
-        isSelecting = false
-        selectedBookmarkRowIDs.removeAll()
+        guard isSelecting else { return }
+        ListSelectionMotion.run(reduceMotion: reduceMotion) {
+            isSelecting = false
+            selectedBookmarkRowIDs.removeAll()
+        }
     }
 
     @ViewBuilder

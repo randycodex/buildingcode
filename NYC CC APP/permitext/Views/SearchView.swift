@@ -428,9 +428,7 @@ struct SearchView: View {
                         .accessibilityIdentifier("search-main-title")
                     Spacer(minLength: 0)
                     Button { showsCodeSources = true } label: {
-                        Image(systemName: "line.3.horizontal")
-                            .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        ToolbarActionIcon(systemImage: "line.3.horizontal")
                             .codeLiquidGlassCircle()
                     }
                     .buttonStyle(.plain)
@@ -459,12 +457,8 @@ struct SearchView: View {
             .onTapGesture {
                 dismissKeyboard()
             }
-            .contentMargins(.bottom, 76, for: .scrollContent)
-            .overlay(alignment: .bottom) {
-                searchField
-                    .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
-                    .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-            }
+            .contentMargins(.bottom, CodeScreenMetrics.bottomSearchScrollClearance, for: .scrollContent)
+            .overlay(alignment: .bottom) { searchField.bottomSearchBarPlacement() }
             .scrollDismissesKeyboard(.immediately)
             .scrollIndicators(.hidden)
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
@@ -634,7 +628,7 @@ struct SearchView: View {
                                         Button(readerDestinationLabel(.primary)) { handoffSearchPreview(prepared, to: .primary) }
                                         Button(readerDestinationLabel(.secondary)) { handoffSearchPreview(prepared, to: .secondary) }
                                     } label: {
-                                        Image(systemName: "book").frame(width: 44, height: 44)
+                                        ToolbarActionIcon(systemImage: "book")
                                     }
                                     .accessibilityLabel("Open passage in a permanent Reader")
                                 }
@@ -1002,35 +996,18 @@ struct SearchView: View {
     }
 
     private var searchField: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "magnifyingglass")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-
+        CodeSearchBar(showsClearButton: !query.isEmpty, clearTitle: "Clear search", clear: {
+            query = ""
+            library.searchAllEditions(query: "")
+        }) {
             TextField("Search codes", text: $query)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .submitLabel(.search)
                 .focused($isSearchFieldFocused)
                 .accessibilityLabel("Search codes")
                 .onSubmit {
                     library.recordRecentSearch(query)
                     isSearchFieldFocused = false
                 }
-
-            if !query.isEmpty {
-                SearchFieldClearButton(title: "Clear search") {
-                    query = ""
-                    library.searchAllEditions(query: "")
-                }
-            }
         }
-        .padding(.horizontal, 14)
-        .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
-        .codeLiquidGlassCapsule()
-        // The TextField handles focus natively. An extra .onTapGesture here
-        // can interfere with cursor-position taps inside the field on iOS 17+.
-        .accessibilityElement(children: .contain)
     }
 
     @ViewBuilder

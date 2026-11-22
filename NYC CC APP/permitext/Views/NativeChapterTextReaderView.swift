@@ -239,10 +239,7 @@ struct NativeChapterTextReaderView: View {
                 Button {
                     isSearchPresented.toggle()
                 } label: {
-                    Image(systemName: "text.page.badge.magnifyingglass")
-                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                        .contentShape(Rectangle())
+                    ToolbarActionIcon(systemImage: "text.page.badge.magnifyingglass")
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Search this chapter")

@@ -415,8 +415,7 @@ struct SettingsView: View {
                     CodeMainScreenToolbarTitle(title: screenTitle)
                     ToolbarItem(placement: .topBarTrailing) {
                         Button { dismiss() } label: {
-                            Image(systemName: "xmark")
-                                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                            ToolbarActionIcon(systemImage: "xmark")
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("Close \(screenTitle)")
@@ -1992,8 +1991,7 @@ struct ProSubscriptionStoreView: View {
                         library.dismissProSubscriptionStore()
                         dismiss()
                     } label: {
-                        Image(systemName: "xmark")
-                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        ToolbarActionIcon(systemImage: "xmark")
                     }
                     .buttonStyle(.plain)
                     .disabled(library.isStoreKitBusy)

@@ -269,6 +269,7 @@ enum NativeNotebookOfflineDraftPolicy {
 
 private struct ProjectNotebookSessionView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
 
     let projectID: String
@@ -505,20 +506,29 @@ private struct ProjectNotebookSessionView: View {
                     selectAll: { selectedNoteIDs = selectableNoteIDs },
                     deselectAll: { selectedNoteIDs = [] }
                 ) {
-                    Button("Move selected notes to Trash", systemImage: "trash", role: .destructive) {
+                    Button(role: .destructive) {
                         showingMoveConfirmation = true
+                    } label: {
+                        ToolbarActionIcon(systemImage: "trash")
                     }
-                    .labelStyle(.iconOnly)
+                    .accessibilityLabel("Move selected notes to Trash")
                     .disabled(isLoading)
                 }
-            } else {
-                ToolbarItemGroup(placement: .topBarTrailing) {
+            } else if !selectableNoteIDs.isEmpty || !access.readOnly || permitsLocalDraftEditing {
+                IconToolbarGroup {
                     if !selectableNoteIDs.isEmpty {
-                        ListSelectButton(title: "Select notes") { isSelectingNotes = true }
-                            .disabled(isLoading)
+                        ListSelectButton(title: "Select notes") {
+                            ListSelectionMotion.run(reduceMotion: reduceMotion) { isSelectingNotes = true }
+                        }
+                        .disabled(isLoading)
                     }
                     if !access.readOnly || permitsLocalDraftEditing {
-                        Button("New Note", systemImage: "plus") { editorRoute = NativeNotebookEditorRoute() }
+                        Button {
+                            editorRoute = NativeNotebookEditorRoute()
+                        } label: {
+                            ToolbarActionIcon(systemImage: "plus")
+                        }
+                        .accessibilityLabel("New Note")
                     }
                 }
             }
@@ -543,8 +553,11 @@ private struct ProjectNotebookSessionView: View {
     }
 
     private func finishSelectingNotes() {
-        isSelectingNotes = false
-        selectedNoteIDs = []
+        guard isSelectingNotes else { return }
+        ListSelectionMotion.run(reduceMotion: reduceMotion) {
+            isSelectingNotes = false
+            selectedNoteIDs = []
+        }
     }
 
     @MainActor
@@ -1008,7 +1021,7 @@ private struct NotebookCardEditorView: View {
                         }
                         .accessibilityIdentifier("native-notebook-delete")
                         .disabled(isSaving || isDeleting)
-                    } label: { Image(systemName: "ellipsis") }
+                    } label: { ToolbarActionIcon(systemImage: "ellipsis") }
                     .accessibilityLabel("Note actions")
                 }
             }

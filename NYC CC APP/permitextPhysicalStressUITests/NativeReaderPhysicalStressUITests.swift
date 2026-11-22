@@ -45,7 +45,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }
         XCTAssertFalse(app.buttons["project-section-research"].exists)
         keepScreenshot(named: "Six project cards and four tabs", from: app)
-        app.buttons["main-tab-research"].tap()
+        let researchTab = app.buttons["main-tab-research"]
+        researchTab.tap()
         XCTAssertFalse(app.staticTexts["Loading Research…"].exists)
         let newResearch = app.buttons["New Research"]
         XCTAssertTrue(newResearch.waitForExistence(timeout: 15))
@@ -53,6 +54,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let historySearch = app.textFields["research-history-search"]
         XCTAssertTrue(historySearch.isHittable)
         XCTAssertGreaterThan(historySearch.frame.midY, app.frame.midY)
+        let bottomSearchBar = element(in: app, identifier: "bottom-search-bar")
+        XCTAssertTrue(bottomSearchBar.exists)
+        let researchSearchFrame = bottomSearchBar.frame
+        XCTAssertEqual(researchSearchFrame.height, 52, accuracy: 2)
         historySearch.tap()
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
         historySearch.typeText("No matching draft")
@@ -71,11 +76,21 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let deletion = app.alerts["Delete Research conversation?"]
         XCTAssertTrue(deletion.staticTexts["This cannot be undone."].exists)
         deletion.buttons["Cancel"].tap()
+        let composer = element(in: app, identifier: "research-composer")
+        let draft = "Draft retained when returning to Research"
+        composer.tap()
+        composer.typeText(draft)
         back.tap()
         let conversationRow = app.buttons.matching(identifier: "research-history-row").firstMatch
         XCTAssertTrue(conversationRow.waitForExistence(timeout: 15))
         keepScreenshot(named: "Research belongs to Acceptance Project", from: app)
-        app.buttons["Select conversations"].tap()
+        let historyRowY = conversationRow.frame.minY
+        let selectConversations = app.buttons["Select conversations"]
+        XCTAssertEqual(selectConversations.frame.width, newResearch.frame.width, accuracy: 2)
+        XCTAssertEqual(selectConversations.frame.height, newResearch.frame.height, accuracy: 2)
+        selectConversations.tap()
+        XCTAssertEqual(conversationRow.frame.minY, historyRowY, accuracy: 2,
+                       "The conversation list stays in place when the toolbar enters selection mode.")
         app.buttons["Select All"].tap()
         let selectionCount = app.staticTexts["list-selection-count"]
         XCTAssertEqual(selectionCount.label, "1 selected")
@@ -92,8 +107,26 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["Clear history search"].tap()
         XCTAssertTrue(conversationRow.waitForExistence(timeout: 10))
         conversationRow.tap()
-        XCTAssertTrue(element(in: app, identifier: "research-composer").waitForExistence(timeout: 15))
+        XCTAssertTrue(composer.waitForExistence(timeout: 15))
+        XCTAssertEqual(composer.value as? String, draft)
         XCTAssertFalse(historySearch.isHittable)
+        researchTab.tap()
+        XCTAssertTrue(conversationRow.waitForExistence(timeout: 10))
+        XCTAssertTrue(historySearch.isHittable)
+        researchTab.tap()
+        XCTAssertTrue(composer.waitForExistence(timeout: 10))
+        XCTAssertEqual(composer.value as? String, draft)
+        app.buttons["main-tab-search"].tap()
+        XCTAssertTrue(app.textFields["Search codes"].waitForExistence(timeout: 10))
+        let codeSearchFrame = bottomSearchBar.frame
+        XCTAssertEqual(codeSearchFrame.minX, researchSearchFrame.minX, accuracy: 2)
+        XCTAssertEqual(codeSearchFrame.minY, researchSearchFrame.minY, accuracy: 2)
+        XCTAssertEqual(codeSearchFrame.width, researchSearchFrame.width, accuracy: 2)
+        XCTAssertEqual(codeSearchFrame.height, researchSearchFrame.height, accuracy: 2)
+        keepScreenshot(named: "Search bottom bar matched to Research", from: app)
+        researchTab.tap()
+        XCTAssertTrue(composer.waitForExistence(timeout: 10))
+        XCTAssertEqual(composer.value as? String, draft)
         back.tap()
         XCTAssertTrue(conversationRow.isHittable)
         XCTAssertTrue(historySearch.isHittable)
@@ -108,6 +141,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["main-tab-research"].tap()
         XCTAssertTrue(app.buttons["New Research"].waitForExistence(timeout: 15))
         XCTAssertTrue(app.staticTexts["No Research yet"].waitForExistence(timeout: 15))
+        researchTab.tap()
+        XCTAssertTrue(app.staticTexts["No Research yet"].isHittable)
         XCTAssertFalse(app.buttons.matching(identifier: "research-history-row").firstMatch.exists)
         keepScreenshot(named: "Correction Project has separate Research", from: app)
         XCTAssertFalse(app.buttons["project-close"].exists)
@@ -495,6 +530,47 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testEvidenceToolbarKeepsSelectionCountWithThreeActions() throws {
+#if !DEBUG
+        throw XCTSkip("Evidence toolbar uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
+                               "--native-project-overview-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+                                                       "saved-folder-", "Acceptance Project")).firstMatch
+        XCTAssertTrue(project.waitForExistence(timeout: 10))
+        project.tap()
+        let evidence = app.buttons["project-section-evidence"]
+        XCTAssertTrue(evidence.waitForExistence(timeout: 10))
+        reveal(evidence, in: app)
+        evidence.tap()
+        XCTAssertTrue(app.navigationBars["Evidence"].waitForExistence(timeout: 10))
+        let selectSections = app.buttons["Select sections"]
+        let sort = app.buttons["Sort project"]
+        let export = app.buttons["Export project"]
+        for action in [sort, export] {
+            XCTAssertTrue(action.isHittable)
+            XCTAssertEqual(action.frame.width, selectSections.frame.width, accuracy: 2)
+            XCTAssertEqual(action.frame.height, selectSections.frame.height, accuracy: 2)
+        }
+        keepScreenshot(named: "Evidence toolbar with matched icons", from: app)
+        selectSections.tap()
+        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-bookmark-")).firstMatch
+        XCTAssertTrue(row.isHittable)
+        row.tap()
+        XCTAssertEqual(app.staticTexts["list-selection-count"].label, "1 selected")
+        XCTAssertTrue(app.buttons["Export selected passages"].isEnabled)
+        XCTAssertFalse(app.buttons["Export project"].exists)
+        keepScreenshot(named: "Evidence selection shows selected export and full contrast", from: app)
+        app.buttons["Deselect All"].tap()
+        XCTAssertEqual(app.staticTexts["list-selection-count"].label, "0 selected")
+        app.buttons["Cancel"].tap()
+#endif
+    }
+
     func testProjectSectionsOpenWithBackNavigation() throws {
 #if !DEBUG
         throw XCTSkip("Project overview acceptance uses the isolated Debug fixture.")
@@ -610,19 +686,6 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
                 XCTAssertTrue(app.textFields["Search codes"].waitForExistence(timeout: 15))
                 app.buttons["main-tab-saved"].tap()
                 XCTAssertTrue(bar.waitForExistence(timeout: 5))
-            }
-            if section == "evidence" {
-                app.buttons["Select sections"].tap()
-                let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-bookmark-")).firstMatch
-                XCTAssertTrue(row.isHittable)
-                row.tap()
-                XCTAssertEqual(app.staticTexts["list-selection-count"].label, "1 selected")
-                XCTAssertTrue(app.buttons["Export selected passages"].isEnabled)
-                XCTAssertFalse(app.buttons["Export project"].exists)
-                keepScreenshot(named: "Evidence selection shows selected export and full contrast", from: app)
-                app.buttons["Deselect All"].tap()
-                XCTAssertEqual(app.staticTexts["list-selection-count"].label, "0 selected")
-                app.buttons["Cancel"].tap()
             }
             bar.buttons.element(boundBy: 0).tap()
             XCTAssertTrue(root.waitForExistence(timeout: 10))
@@ -3905,7 +3968,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
         let failure = app.staticTexts.matching(NSPredicate(
             format: "label == %@",
-            "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here."
+            "per codes could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here."
         )).firstMatch
         XCTAssertTrue(failure.waitForExistence(timeout: 10), app.debugDescription)
         app.buttons["Research history"].tap()
