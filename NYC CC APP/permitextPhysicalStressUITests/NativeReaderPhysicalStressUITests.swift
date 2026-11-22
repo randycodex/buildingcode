@@ -3681,17 +3681,17 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45),
             launchFailureDescription(in: app)
         )
-        let sourceHeading = app.staticTexts
-            .matching(NSPredicate(format: "label CONTAINS[c] %@", "102.2.1 Existing buildings"))
+        let sourceParagraph = app.textViews
+            .matching(NSPredicate(format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
+                                  "Chapter 1 of Title 28", "Chapter 1 of Title 28"))
             .firstMatch
         XCTAssertTrue(
-            sourceHeading.waitForExistence(timeout: 10),
-            "Fuel Gas 102.2.1 did not settle at the deterministic link-test viewport."
+            sourceParagraph.waitForExistence(timeout: 10) && sourceParagraph.isHittable,
+            "The Fuel Gas paragraph containing the Title 28 link was unavailable."
         )
 
-        // UITextView attributed links are not exposed as XCUI descendants on
-        // this layout. Tap the visible, underlined "Chapter 1 of" run itself.
-        app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.185)).tap()
+        // The attributed link is on the third line of this fixture paragraph.
+        sourceParagraph.coordinate(withNormalizedOffset: CGVector(dx: 0.47, dy: 0.42)).tap()
 
         XCTAssertTrue(
             passageHeading(for: "28-101.1", in: app).waitForExistence(timeout: 10),
