@@ -1236,6 +1236,8 @@ private struct ResearchSessionView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .transparentTopScrollEdge()
+        .accessibilityIdentifier("research-history-list")
         .contentMargins(.top, CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)
         .scrollDismissesKeyboard(.interactively)
         .contentMargins(.bottom, CodeScreenMetrics.bottomSearchScrollClearance + floatingNavigationClearance, for: .scrollContent)

@@ -132,6 +132,15 @@ struct CodeSearchBar<Field: View>: View {
 }
 
 extension View {
+    @ViewBuilder
+    func transparentTopScrollEdge() -> some View {
+        if #available(iOS 26.0, *) {
+            scrollEdgeEffectHidden(true, for: .top)
+        } else {
+            self
+        }
+    }
+
     func bottomSearchBarPlacement() -> some View {
         self
         .accessibilityIdentifier("bottom-search-bar")

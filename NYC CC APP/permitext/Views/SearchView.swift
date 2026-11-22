@@ -620,6 +620,7 @@ struct SearchView: View {
         .overlay(alignment: .bottom) { searchField.bottomSearchBarPlacement() }
         .scrollDismissesKeyboard(.immediately)
         .scrollIndicators(.hidden)
+        .transparentTopScrollEdge()
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
     }
 

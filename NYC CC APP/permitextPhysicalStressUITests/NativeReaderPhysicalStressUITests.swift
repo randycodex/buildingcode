@@ -450,7 +450,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         throw XCTSkip("Search layout uses the isolated Debug fixture.")
 #else
         let app = XCUIApplication()
-        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--search-history-layout-fixture", "--permitext-disable-clerk"]
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--history-layout-fixture", "--permitext-disable-clerk"]
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
         app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch.tap()
@@ -515,6 +515,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertLessThan(closePassage.frame.midX, app.frame.midX)
         closePassage.tap()
         XCTAssertTrue(searchField.waitForExistence(timeout: 10))
+        app.buttons["main-tab-research"].tap()
+        let researchHeading = app.staticTexts["screen-title-Research"]
+        let researchList = element(in: app, identifier: "research-history-list")
+        let researchRow = app.buttons.matching(identifier: "research-history-row").firstMatch
+        XCTAssertTrue(researchRow.waitForExistence(timeout: 15))
+        let researchHeadingFrame = researchHeading.frame
+        researchList.swipeUp()
+        XCTAssertEqual(researchHeading.frame.minY, researchHeadingFrame.minY, accuracy: 1)
+        XCTAssertTrue(app.buttons["New Research"].isHittable)
+        keepScreenshot(named: "Scrolled Research with a transparent header", from: app)
         app.buttons["main-tab-saved"].tap()
         app.buttons["main-tab-saved"].tap()
         XCTAssertTrue(app.buttons["Open Account"].waitForExistence(timeout: 10))

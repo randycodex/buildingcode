@@ -888,7 +888,7 @@ private struct Phase3EntitledResearchHarness: View {
                 }
             }
         }
-        if ProcessInfo.processInfo.arguments.contains("--search-history-layout-fixture") {
+        if ProcessInfo.processInfo.arguments.contains("--history-layout-fixture") {
             for (index, section) in library.sections(for: chapterOne).prefix(24).enumerated() {
                 library.recordRecentlyViewed(RecentlyViewedEntry(
                     sectionID: section.id, sectionNumber: section.sectionNumber,
@@ -897,6 +897,11 @@ private struct Phase3EntitledResearchHarness: View {
                     previewText: String(repeating: "Preview text for this recently opened code provision. ", count: index % 3 + 1),
                     viewedAt: Date()
                 ))
+            }
+            if let projectID = library.backendProjectID(for: acceptanceProject.id) {
+                for _ in 0..<18 {
+                    _ = try? await library.createResearchConversation(selections: [], projectID: projectID)
+                }
             }
         }
         library.noteProjectOpened(acceptanceProject.id)
