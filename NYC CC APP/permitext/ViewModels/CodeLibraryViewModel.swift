@@ -3669,6 +3669,24 @@ final class CodeLibraryViewModel: ObservableObject {
         return folder(id: activeProjectID)
     }
 
+    func projectOverviewTab(for folderID: Int64) -> ProjectOverviewTab {
+        guard let key = projectOverviewTabDefaultsKey(for: folderID),
+              let value = preferencesDefaults.string(forKey: key) else { return .context }
+        return ProjectOverviewTab(rawValue: value) ?? .context
+    }
+
+    func setProjectOverviewTab(_ tab: ProjectOverviewTab, for folderID: Int64) {
+        guard let key = projectOverviewTabDefaultsKey(for: folderID) else { return }
+        preferencesDefaults.set(tab.rawValue, forKey: key)
+    }
+
+    private func projectOverviewTabDefaultsKey(for folderID: Int64) -> String? {
+        guard let project = folder(id: folderID), project.folderType == .project else { return nil }
+        let accountID = signedInAccount?.appUserID
+        let projectID = UserContentProjectIdentity.stable(project.clientID, userID: accountID) ?? project.clientID
+        return "ProjectOverview.selectedTab.\(accountID ?? "local").\(projectID)"
+    }
+
     func backendProjectID(for folderID: Int64) -> String? {
         guard let folder = folder(id: folderID),
               folder.folderType == .project,

@@ -1115,6 +1115,10 @@ enum ProjectOverviewSection: Hashable {
     case overview, questions, checklist, notebook, evidence, reports
 }
 
+enum ProjectOverviewTab: String, Hashable {
+    case context, zoning
+}
+
 private enum FactPresentation {
     // Matches projectFactPresentationGroups in the web Facts sheet.
     static let sections: [(title: String, keys: [String])] = [
@@ -1191,16 +1195,23 @@ private struct ProjectSectionScreen<Content: View>: View {
 private struct ProjectOverviewView: View {
     let folderID: Int64
     let accentColor: Color
+    private let library: CodeLibraryViewModel
 
-    private enum Tab: Hashable { case context, facts }
-    @State private var tab: Tab = .context
+    @State private var tab: ProjectOverviewTab
     @State private var isEditing = false
+
+    init(folderID: Int64, accentColor: Color, library: CodeLibraryViewModel) {
+        self.folderID = folderID
+        self.accentColor = accentColor
+        self.library = library
+        _tab = State(initialValue: library.projectOverviewTab(for: folderID))
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             Picker("Overview section", selection: $tab) {
-                Text("Context").tag(Tab.context)
-                Text("Zoning").tag(Tab.facts)
+                Text("Context").tag(ProjectOverviewTab.context)
+                Text("Zoning").tag(ProjectOverviewTab.zoning)
             }
             .pickerStyle(.segmented)
             .disabled(isEditing)
@@ -1210,7 +1221,7 @@ private struct ProjectOverviewView: View {
             switch tab {
             case .context:
                 ProjectContextView(folderID: folderID, isEditing: $isEditing)
-            case .facts:
+            case .zoning:
                 ProjectFactsView(folderID: folderID, isEditing: $isEditing)
             }
         }
@@ -1219,6 +1230,9 @@ private struct ProjectOverviewView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(isEditing)
         .tint(Color.appChrome)
+        .onChange(of: tab) { _, selection in
+            library.setProjectOverviewTab(selection, for: folderID)
+        }
     }
 }
 
@@ -2072,7 +2086,7 @@ struct ProjectView: View {
         case .questions, .checklist:
             ProjectWorkflowView(folderID: folderID, section: section)
         case .overview:
-            ProjectOverviewView(folderID: folderID, accentColor: accentColor)
+            ProjectOverviewView(folderID: folderID, accentColor: accentColor, library: library)
         case .notebook:
             if let projectID = library.backendProjectID(for: folderID) {
                 projectNotebookDestination(projectID: projectID)

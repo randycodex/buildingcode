@@ -740,12 +740,23 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Building"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "discard this")).firstMatch.exists)
         keepScreenshot(named: "Overview Zoning tab", from: app)
+        overviewBar.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(overviewCard.waitForExistence(timeout: 5))
+        overviewCard.tap()
+        XCTAssertTrue(overviewBar.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Building"].waitForExistence(timeout: 5),
+                      "Reopening Overview should restore Zoning.")
         contextTab.tap()
         XCTAssertTrue(savedContext.waitForExistence(timeout: 5))
         XCTAssertTrue(savedContext.label.hasPrefix("Phone edit."))
         overviewBar.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(overviewCard.waitForExistence(timeout: 5))
         XCTAssertTrue(overviewCard.label.contains("Phone edit."))
+        overviewCard.tap()
+        XCTAssertTrue(savedContext.waitForExistence(timeout: 5),
+                      "Reopening Overview should restore Context after switching back.")
+        overviewBar.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(root.waitForExistence(timeout: 5))
         for (section, title) in [("notebook", "Notes"), ("evidence", "Evidence"), ("reports", "Reports")] {
             let card = app.buttons["project-section-\(section)"]
             reveal(card, in: app)
