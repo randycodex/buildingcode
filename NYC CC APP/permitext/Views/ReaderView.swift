@@ -345,51 +345,25 @@ struct ReaderView: View {
                 }
             }
             if !usesCompactSourceHeader {
-                headerContent(detail: detail, jumpAffordance: false)
-            }
-        }
-        .accessibilityIdentifier("passage-section-context")
-    }
-
-    @ViewBuilder
-    private func headerContent(detail: ReaderSectionDetail, jumpAffordance: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if detail.kind == .textBlock {
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(detail.displayTitle)
-                        .font(CodeTypography.codeSectionTitle)
-                        .foregroundStyle(.primary)
-                        .multilineTextAlignment(.leading)
-                    if jumpAffordance {
-                        Image(systemName: "arrow.up.right.square")
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(.tertiary)
-                    }
-                }
-            } else {
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
-                    Text(detail.sectionNumber)
-                        .font(CodeTypography.codeSectionTitle)
-                        .foregroundStyle(accentColor)
+                    if detail.kind != .textBlock {
+                        Text(detail.sectionNumber)
+                            .foregroundStyle(accentColor)
+                    }
                     Text(detail.displayTitle)
-                        .font(CodeTypography.codeSectionTitle)
                         .foregroundStyle(.primary)
                         .multilineTextAlignment(.leading)
-                    if jumpAffordance {
-                        Image(systemName: "arrow.up.right.square")
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(.tertiary)
-                    }
                 }
-            }
-            if !usesCompactSourceHeader, detail.kind != .textBlock {
-                Text(detail.chapterTitle)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                .font(CodeTypography.codeSectionTitle)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+                .accessibilityElement(children: .combine)
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityIdentifier("passage-section-title")
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .contentShape(Rectangle())
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("passage-section-context")
     }
 
     private func sourceContextLabel(for detail: ReaderSectionDetail) -> String {
@@ -425,6 +399,7 @@ struct ReaderView: View {
     }
 
     private var navigationTitle: String {
+        guard usesCompactSourceHeader else { return "" }
         guard let detail else { return "Reader" }
         return detail.kind == .textBlock ? detail.displayTitle : detail.sectionNumber
     }

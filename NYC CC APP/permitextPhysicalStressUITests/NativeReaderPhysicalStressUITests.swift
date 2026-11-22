@@ -3693,11 +3693,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         // this layout. Tap the visible, underlined "Chapter 1 of" run itself.
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.185)).tap()
 
-        let title28NavigationBar = app.navigationBars["28-101.1"]
         XCTAssertTrue(
-            title28NavigationBar.waitForExistence(timeout: 10),
+            passageHeading(for: "28-101.1", in: app).waitForExistence(timeout: 10),
             "Tapping Chapter 1 of Title 28 did not navigate to 28-101.1."
         )
+        XCTAssertFalse(app.navigationBars["28-101.1"].exists)
 
         let attachment = XCTAttachment(screenshot: app.screenshot(), quality: .medium)
         attachment.name = "Fuel Gas Chapter 1 link opened Title 28"
@@ -4274,9 +4274,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         Thread.sleep(forTimeInterval: 0.5)
         app.coordinate(withNormalizedOffset: tapOffset).tap()
 
-        let destinationNavigationBar = app.navigationBars[expectedDestination]
         XCTAssertTrue(
-            destinationNavigationBar.waitForExistence(timeout: 10),
+            passageHeading(for: expectedDestination, in: app).waitForExistence(timeout: 10),
             "Tapping the visible \(name) link did not navigate to \(expectedDestination)."
         )
 
@@ -4339,6 +4338,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     private func element(in app: XCUIApplication, identifier: String) -> XCUIElement {
         app.descendants(matching: .any)
             .matching(NSPredicate(format: "identifier == %@", identifier))
+            .firstMatch
+    }
+
+    private func passageHeading(for sectionNumber: String, in app: XCUIApplication) -> XCUIElement {
+        app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == %@ AND label BEGINSWITH %@", "passage-section-title", sectionNumber))
             .firstMatch
     }
 
