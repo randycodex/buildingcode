@@ -292,6 +292,35 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         chapter.tap()
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
         keepScreenshot(named: "Reader provision spacing", from: app)
+
+        let selectorFrame = primary.frame
+        let chapterSearch = app.buttons["Search this chapter"]
+        chapterSearch.tap()
+        let findField = app.textFields["Find in this chapter"]
+        let findControls = element(in: app, identifier: "chapter-find-controls")
+        XCTAssertTrue(findField.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertFalse(primary.exists)
+        XCTAssertFalse(secondary.exists)
+        XCTAssertGreaterThan(findControls.frame.midY, app.frame.midY)
+        keepScreenshot(named: "Find in Chapter replaces the Reader selectors above the keyboard", from: app)
+        // The iOS keyboard accessibility frame may omit the suggestion strip.
+        let distanceToKeys = app.keyboards.firstMatch.frame.minY - findControls.frame.maxY
+        XCTAssertGreaterThanOrEqual(distanceToKeys, 0)
+        XCTAssertLessThanOrEqual(distanceToKeys, 60)
+        findField.typeText("this code")
+        let nextMatch = app.buttons["Next match"]
+        let hasMatches = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: nextMatch)
+        XCTAssertEqual(XCTWaiter.wait(for: [hasMatches], timeout: 10), .completed)
+        app.keyboards.buttons["Search"].tap()
+        XCTAssertTrue(waitForNonexistence(app.keyboards.firstMatch))
+        XCTAssertEqual(findControls.frame.minY, selectorFrame.minY, accuracy: 4)
+        nextMatch.tap()
+        app.buttons["Close chapter find"].tap()
+        XCTAssertTrue(primary.waitForExistence(timeout: 10))
+        XCTAssertTrue(secondary.isHittable)
+        XCTAssertFalse(findField.exists)
+
         primary.tap()
         XCTAssertTrue(browser.waitForExistence(timeout: 10))
         XCTAssertTrue(chapter.isHittable)
@@ -313,6 +342,13 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         chapter.tap()
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
         keepScreenshot(named: "Mechanical Reader section spacing", from: app)
+        chapterSearch.tap()
+        XCTAssertTrue(findField.waitForExistence(timeout: 10))
+        XCTAssertFalse(primary.exists)
+        XCTAssertFalse(secondary.exists)
+        chapterSearch.tap()
+        XCTAssertTrue(secondary.waitForExistence(timeout: 10))
+        XCTAssertFalse(findField.exists)
         secondary.tap()
         XCTAssertTrue(browser.waitForExistence(timeout: 10))
         secondary.tap()

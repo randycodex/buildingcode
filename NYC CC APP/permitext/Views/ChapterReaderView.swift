@@ -198,20 +198,19 @@ struct ChapterReaderView: View {
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet(proxy: proxy)
         }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            if isChapterSearchPresented {
-                ChapterSearchSheet(
-                    title: chapter.displayLabel,
-                    entries: chapterSearchEntries,
-                    query: $chapterSearchQuery,
-                    onSelect: { entry in
-                        jumpToSection(id: entry.sectionID, with: proxy)
-                    },
-                    isInline: true,
-                    onClose: { isChapterSearchPresented = false }
-                )
-                .environmentObject(library)
-            }
+        .chapterFindBar(isPresented: isChapterSearchPresented) { usesReaderBottomBar in
+            ChapterSearchSheet(
+                title: chapter.displayLabel,
+                entries: chapterSearchEntries,
+                query: $chapterSearchQuery,
+                onSelect: { entry in
+                    jumpToSection(id: entry.sectionID, with: proxy)
+                },
+                isInline: true,
+                usesReaderBottomBar: usesReaderBottomBar,
+                onClose: { isChapterSearchPresented = false }
+            )
+            .environmentObject(library)
         }
         .task(id: chapter.id) {
             library.noteChapterOpened(chapter: chapter)

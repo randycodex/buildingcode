@@ -2061,6 +2061,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     @Environment(\.openPermitextSearch) private var openSearch
     @State private var hasOpenedSecondary = false
     @State private var summaries: [BrowserContextID: ReaderSessionSummary] = [:]
+    @State private var chapterFindOwners: [BrowserContextID: UUID] = [:]
     @State private var rememberedSources = BrowserContextID.rememberedSources()
     let saved: Saved
     let primary: Primary
@@ -2116,19 +2117,21 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
         ZStack(alignment: .bottom) {
             ZStack {
                 primary
+                    .environment(\.readerChapterFindOwner, chapterFindOwner(for: .primary))
                     .accessibilityElement(children: .contain)
                     .opacity(library.selectedReaderContext == .primary ? 1 : 0)
                     .allowsHitTesting(library.selectedReaderContext == .primary)
                     .accessibilityHidden(library.selectedReaderContext != .primary)
                 if hasOpenedSecondary {
                     secondary
+                        .environment(\.readerChapterFindOwner, chapterFindOwner(for: .secondary))
                         .accessibilityElement(children: .contain)
                         .opacity(library.selectedReaderContext == .secondary ? 1 : 0)
                         .allowsHitTesting(library.selectedReaderContext == .secondary)
                         .accessibilityHidden(library.selectedReaderContext != .secondary)
                 }
             }
-            .environment(\.readerControlsClearance, CodeScreenMetrics.bottomControlHeight + 12)
+            .environment(\.readerControlsClearance, CodeScreenMetrics.bottomControlHeight + 2 * CodeScreenMetrics.readerControlsVerticalPadding)
             .onPreferenceChange(ReaderSessionSummaryKey.self) { updated in
                 summaries = updated
                 for (context, summary) in updated {
@@ -2141,8 +2144,14 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     }
                 }
             }
-            readingSwitcher
+            if chapterFindOwners[library.selectedReaderContext] == nil {
+                readingSwitcher
+            }
         }
+    }
+
+    private func chapterFindOwner(for context: BrowserContextID) -> Binding<UUID?> {
+        Binding(get: { chapterFindOwners[context] }, set: { chapterFindOwners[context] = $0 })
     }
 
     private var readingSwitcher: some View {
@@ -2186,9 +2195,8 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
-        .padding(.horizontal, 21)
-        .padding(.top, 6)
-        .padding(.bottom, 6)
+        .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+        .padding(.vertical, CodeScreenMetrics.readerControlsVerticalPadding)
     }
 
     @available(iOS 18.0, *)

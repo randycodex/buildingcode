@@ -5,6 +5,7 @@ import {execFileSync} from 'node:child_process';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 const source = await readFile(new URL('../../NYC CC APP/permitext/Views/NativeChapterTextReaderView.swift',import.meta.url),'utf8');
+const findControls = await readFile(new URL('../../NYC CC APP/permitext/Views/ChapterSearchSheet.swift',import.meta.url),'utf8');
 const baseline = await readFile(new URL('./fixtures/native-chapter-search-before-smooth.swift',import.meta.url),'utf8');
 const current = source.slice(source.indexOf('enum NativeReaderSearchIndex {'),source.indexOf('\nenum NativeReaderReferenceKind:'));
 const matchStart = source.indexOf('struct NativeReaderSearchMatch:');
@@ -14,7 +15,8 @@ const updateStart = source.indexOf('    private func updateChapterSearch(');
 assert.ok(updateStart >= 0);
 const updateMethod = source.slice(updateStart, source.indexOf('\n    }', updateStart) + 6).replace('private func', 'func');
 assert.match(source, /\.task\(id: "[^"\n]*route.id[^"\n]*searchQuery[^"\n]*isBrowserTabActive[^"\n]*"\) \{\s*await updateChapterSearch\(\)/, 'Visible Reader owns cancellable query work');
-assert.match(source, /\.safeAreaInset\(edge: \.top, spacing: 0\) \{\s*if isSearchPresented \{\s*ChapterFindControls/, 'Find controls sit near passage header');
+assert.match(source, /\.chapterFindBar\(isPresented: isSearchPresented\) \{ usesReaderBottomBar in\s*ChapterFindControls/, 'Find uses the chapter search placement');
+assert.match(findControls, /if let readerOwner \{\s*content\.overlay\(alignment: \.bottom\)/, 'Find fills the bottom Reader controls area when hosted in the Reader tab');
 assert.doesNotMatch(source, /NativeReaderSearchSheet|presentedInSearchSheet/, 'Find must not depend on a covered Reader task');
 const fixture = `import Foundation
 struct NativeReaderRuntimeListItem: Sendable { var plainText: String; var children: [Self] = [] }

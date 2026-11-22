@@ -57,6 +57,7 @@ struct ChapterSearchSheet: View {
     @Binding var query: String
     let onSelect: (ChapterSearchSourceEntry) -> Void
     var isInline = false
+    var usesReaderBottomBar = false
     var onClose: (() -> Void)? = nil
     @State private var activeResultID: String?
 
@@ -110,7 +111,8 @@ struct ChapterSearchSheet: View {
                     onPrevious: { navigateResult(offset: -1) },
                     onNext: { navigateResult(offset: activeResultID == nil ? 0 : 1) },
                     onSubmit: { navigateResult(offset: 0) },
-                    onClose: { query = ""; onClose?() }
+                    onClose: { query = ""; onClose?() },
+                    usesReaderBottomBar: usesReaderBottomBar
                 )
             } else {
                 VStack(spacing: 0) {
@@ -377,8 +379,50 @@ struct ChapterSearchSheet: View {
     }
 }
 
-/// Chapter-scoped find stays beside the passage; the permanent Reader switches
-/// and main navigation remain in their existing bottom positions.
+private struct ReaderChapterFindOwnerKey: EnvironmentKey {
+    static let defaultValue: Binding<UUID?>? = nil
+}
+
+extension EnvironmentValues {
+    var readerChapterFindOwner: Binding<UUID?>? {
+        get { self[ReaderChapterFindOwnerKey.self] }
+        set { self[ReaderChapterFindOwnerKey.self] = newValue }
+    }
+}
+
+extension View {
+    func chapterFindBar<Bar: View>(isPresented: Bool, @ViewBuilder bar: @escaping (Bool) -> Bar) -> some View {
+        modifier(ChapterFindPlacement(isPresented: isPresented, bar: bar))
+    }
+}
+
+private struct ChapterFindPlacement<Bar: View>: ViewModifier {
+    @Environment(\.readerChapterFindOwner) private var readerOwner
+    @State private var owner = UUID()
+    let isPresented: Bool
+    let bar: (Bool) -> Bar
+
+    func body(content: Content) -> some View {
+        if let readerOwner {
+            content.overlay(alignment: .bottom) {
+                if isPresented {
+                    bar(true)
+                        .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+                        .padding(.vertical, CodeScreenMetrics.readerControlsVerticalPadding)
+                        .onAppear { readerOwner.wrappedValue = owner }
+                        .onDisappear {
+                            if readerOwner.wrappedValue == owner { readerOwner.wrappedValue = nil }
+                        }
+                }
+            }
+        } else {
+            content.safeAreaInset(edge: .top, spacing: 0) {
+                if isPresented { bar(false) }
+            }
+        }
+    }
+}
+
 struct ChapterFindControls: View {
     @Binding var query: String
     let matchCount: Int
@@ -388,9 +432,30 @@ struct ChapterFindControls: View {
     let onNext: () -> Void
     let onSubmit: () -> Void
     let onClose: () -> Void
+    var usesReaderBottomBar = false
     @FocusState private var isFocused: Bool
 
     var body: some View {
+        Group {
+            if usesReaderBottomBar {
+                controls
+                    .padding(.horizontal, 4)
+                    .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
+                    .codeLiquidGlassCapsule()
+            } else {
+                controls
+                    .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+                    .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+                    .padding(.vertical, 6)
+                    .background(Color(uiColor: .systemBackground))
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("chapter-find-controls")
+        .onAppear { isFocused = true }
+    }
+
+    private var controls: some View {
         HStack(spacing: 0) {
             TextField("Find in chapter", text: $query)
                 .textInputAutocapitalization(.never)
@@ -416,12 +481,6 @@ struct ChapterFindControls: View {
             findButton("Close chapter find", icon: "xmark") { onClose() }
         }
         .font(.subheadline)
-        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
-        .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
-        .padding(.vertical, 6)
-        .background(Color(uiColor: .systemBackground))
-        .accessibilityIdentifier("chapter-find-controls")
-        .onAppear { isFocused = true }
     }
 
     private func findButton(_ title: String, icon: String, disabled: Bool = false, action: @escaping () -> Void) -> some View {

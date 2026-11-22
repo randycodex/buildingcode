@@ -1533,6 +1533,7 @@ enum CodeScreenMetrics {
     /// tab bar's visible outer edge rather than the wider content grid.
     static let bottomControlHorizontalPadding: CGFloat = 20
     static let bottomControlHeight: CGFloat = 52
+    static let readerControlsVerticalPadding: CGFloat = 6
     static let bottomSearchScrollClearance = bottomControlHeight + 24
     /// Detached circular actions beside the floating bottom navigation.
     static let detachedNavigationButtonSize: CGFloat = 60

@@ -211,19 +211,18 @@ struct NativeChapterTextReaderView: View {
             guard isBrowserTabActive else { return }
             await restoreInitialPosition(document: document, proxy: proxy)
         }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            if isSearchPresented {
-                ChapterFindControls(
-                    query: $searchQuery,
-                    matchCount: searchMatches.count,
-                    activeIndex: searchMatches.firstIndex(where: { $0.id == activeSearchMatchID }),
-                    isSearching: isChapterSearchInProgress || appliedSearchQuery != searchQuery,
-                    onPrevious: { navigateSearchMatch(offset: -1, proxy: proxy, document: document) },
-                    onNext: { navigateSearchMatch(offset: activeSearchMatchID == nil ? 0 : 1, proxy: proxy, document: document) },
-                    onSubmit: { navigateSearchMatch(offset: 0, proxy: proxy, document: document) },
-                    onClose: { searchQuery = ""; isSearchPresented = false }
-                )
-            }
+        .chapterFindBar(isPresented: isSearchPresented) { usesReaderBottomBar in
+            ChapterFindControls(
+                query: $searchQuery,
+                matchCount: searchMatches.count,
+                activeIndex: searchMatches.firstIndex(where: { $0.id == activeSearchMatchID }),
+                isSearching: isChapterSearchInProgress || appliedSearchQuery != searchQuery,
+                onPrevious: { navigateSearchMatch(offset: -1, proxy: proxy, document: document) },
+                onNext: { navigateSearchMatch(offset: activeSearchMatchID == nil ? 0 : 1, proxy: proxy, document: document) },
+                onSubmit: { navigateSearchMatch(offset: 0, proxy: proxy, document: document) },
+                onClose: closeChapterSearch,
+                usesReaderBottomBar: usesReaderBottomBar
+            )
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -237,7 +236,8 @@ struct NativeChapterTextReaderView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    isSearchPresented.toggle()
+                    if isSearchPresented { closeChapterSearch() }
+                    else { isSearchPresented = true }
                 } label: {
                     ToolbarActionIcon(systemImage: "text.page.badge.magnifyingglass")
                 }
@@ -251,6 +251,11 @@ struct NativeChapterTextReaderView: View {
         .overlay(alignment: .top) {
             if !isSearchPresented { CodeTopContentFade(alwaysVisible: true) }
         }
+    }
+
+    private func closeChapterSearch() {
+        searchQuery = ""
+        isSearchPresented = false
     }
 
     @MainActor
