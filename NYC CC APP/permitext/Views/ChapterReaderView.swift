@@ -142,9 +142,7 @@ struct ChapterReaderView: View {
                 if selectedJumpSectionID != newValue {
                     selectedJumpSectionID = newValue
                 }
-                // Also drive the bottom jumper's label off this signal so the
-                // text updates immediately when SwiftUI's scrollPosition fires,
-                // not only when the offset-preference handler catches up.
+                // Update the active section while the geometry preferences catch up.
                 if pendingFocusedSectionID != newValue {
                     pendingFocusedSectionID = newValue
                 }
@@ -163,11 +161,7 @@ struct ChapterReaderView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                ReaderChapterJumpHeader(
-                    chapterTitle: chapter.title,
-                    location: currentJumpLabel, accent: accentColor,
-                    isEnabled: !visibleJumpBlocks.isEmpty
-                ) { isJumpPickerPresented = true }
+                ReaderChapterTitle(title: chapter.title, currentSection: currentJumpLabel, accent: accentColor)
                 .sourceProblemReporting(sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id)
             }
             ToolbarItem(placement: .topBarTrailing) {
@@ -208,7 +202,8 @@ struct ChapterReaderView: View {
                 },
                 isInline: true,
                 usesReaderBottomBar: usesReaderBottomBar,
-                onClose: { isChapterSearchPresented = false }
+                onClose: { isChapterSearchPresented = false },
+                onSections: visibleJumpBlocks.isEmpty ? nil : { isJumpPickerPresented = true }
             )
             .environmentObject(library)
         }
@@ -534,9 +529,7 @@ struct ChapterReaderView: View {
         guard let topMost = topVisibleSectionID(from: offsets) else { return }
         // Only gate on `pendingFocusedSectionID` — `selectedJumpSectionID` is
         // also written by SwiftUI's `.scrollPosition` modifier, so checking
-        // it here caused the jump label to freeze at the first section the
-        // user opened. `pendingFocusedSectionID` is the source of truth for
-        // the bottom jumper's displayed label.
+        // it here would skip section updates when the scroll binding fires first.
         if pendingFocusedSectionID == topMost { return }
 
         pendingFocusedSectionID = topMost
@@ -1274,40 +1267,21 @@ private struct SourceProblemReportSheet: View {
     }
 }
 
-/// The code title stays separate from its unfilled chapter/section picker.
-struct ReaderChapterJumpHeader: View {
-    let chapterTitle: String
-    let location: String
+struct ReaderChapterTitle: View {
+    let title: String
+    let currentSection: String
     let accent: Color
-    var isEnabled = true
-    let onJump: () -> Void
 
     var body: some View {
-        VStack(spacing: 2) {
-            Text(chapterTitle)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(accent)
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-                .accessibilityIdentifier("reader-chapter-title")
-            Button(action: onJump) {
-                HStack(spacing: 4) {
-                    Text(location).lineLimit(1)
-                    Image(systemName: "chevron.down").font(.caption2.weight(.semibold))
-                }
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
-                .padding(.horizontal, 10)
-                .frame(minHeight: 28)
-                .contentShape(Capsule())
-            }
-            .buttonStyle(.plain)
-            .disabled(!isEnabled)
-            .accessibilityLabel("Jump within chapter")
-            .accessibilityValue(location)
-            .accessibilityIdentifier("reader-jump-header")
-        }
-        .frame(maxWidth: 250, minHeight: CodeScreenMetrics.toolbarButtonSize)
+        Text(title)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(accent)
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+            .frame(maxWidth: 250, minHeight: CodeScreenMetrics.toolbarButtonSize)
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityValue(currentSection)
+            .accessibilityIdentifier("reader-chapter-title")
     }
 }
 

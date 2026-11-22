@@ -397,16 +397,11 @@ struct ChapterHTMLReaderView: View {
         }
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
-            // The native and legacy text Readers own their own jump controls.
+            // The native and legacy text Readers supply their own toolbars.
             // Only the HTML presentation uses this wrapper's anchor picker.
             if !usesNativeRolloutReader && chapterURL != nil {
                 ToolbarItem(placement: .principal) {
-                    ReaderChapterJumpHeader(
-                        chapterTitle: chapter.title,
-                        location: currentJumpLabel,
-                        accent: accentColor,
-                        isEnabled: !jumpTargets.isEmpty
-                    ) { isJumpPickerPresented = true }
+                    ReaderChapterTitle(title: chapter.title, currentSection: currentJumpLabel, accent: accentColor)
                     .sourceProblemReporting(sectionID: currentBookmarkSectionID)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -521,7 +516,8 @@ struct ChapterHTMLReaderView: View {
                 },
                 isInline: true,
                 usesReaderBottomBar: usesReaderBottomBar,
-                onClose: { isChapterSearchPresented = false }
+                onClose: { isChapterSearchPresented = false },
+                onSections: jumpTargets.isEmpty ? nil : { isJumpPickerPresented = true }
             )
             .environmentObject(library)
         }

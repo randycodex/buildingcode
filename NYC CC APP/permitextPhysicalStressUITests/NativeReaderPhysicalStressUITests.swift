@@ -291,6 +291,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(chapter.waitForExistence(timeout: 20))
         chapter.tap()
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+        let chapterTitle = app.staticTexts["reader-chapter-title"]
+        XCTAssertEqual(chapterTitle.label, "Administration")
         keepScreenshot(named: "Reader provision spacing", from: app)
 
         let selectorFrame = primary.frame
@@ -300,6 +302,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let findControls = element(in: app, identifier: "chapter-find-controls")
         XCTAssertTrue(findField.waitForExistence(timeout: 10))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Sections"].isHittable)
         XCTAssertFalse(primary.exists)
         XCTAssertFalse(secondary.exists)
         XCTAssertGreaterThan(findControls.frame.midY, app.frame.midY)
@@ -309,6 +312,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(distanceToKeys, 0)
         XCTAssertLessThanOrEqual(distanceToKeys, 60)
         findField.typeText("this code")
+        XCTAssertFalse(app.buttons["Sections"].exists)
         let nextMatch = app.buttons["Next match"]
         let hasMatches = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: nextMatch)
         XCTAssertEqual(XCTWaiter.wait(for: [hasMatches], timeout: 10), .completed)
@@ -320,6 +324,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(primary.waitForExistence(timeout: 10))
         XCTAssertTrue(secondary.isHittable)
         XCTAssertFalse(findField.exists)
+
+        openChapterSections(in: app)
+        XCTAssertTrue(waitForNonexistence(app.keyboards.firstMatch))
+        let scope = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "101.2 ")).firstMatch
+        XCTAssertTrue(scope.waitForExistence(timeout: 10))
+        scope.tap()
+        XCTAssertTrue(waitForValueContaining("101.2", on: chapterTitle))
+        XCTAssertTrue(primary.isHittable)
 
         primary.tap()
         XCTAssertTrue(browser.waitForExistence(timeout: 10))
@@ -1319,7 +1331,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         for _ in 0..<5 where !chapter.isHittable { app.swipeUp() }
         XCTAssertTrue(chapter.isHittable, "Building Code Chapter 7 must be reachable.")
         chapter.tap()
-        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
+        XCTAssertTrue(app.staticTexts["reader-chapter-title"].waitForExistence(timeout: 45))
         XCTAssertFalse(app.buttons["Internal reader mode"].exists,
                        "Release captures must not contain the Reader debug control.")
         keepAppStoreScreenshot(named: "02-code-reader", from: app)
@@ -2171,21 +2183,21 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let chapter = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 1:")).firstMatch
         XCTAssertTrue(chapter.waitForExistence(timeout: 15))
         chapter.tap()
-        let jump = app.buttons["Jump within chapter"]
-        XCTAssertTrue(jump.waitForExistence(timeout: 45))
-        XCTAssertLessThan(jump.frame.maxY, app.frame.height * 0.25)
+        let chapterTitle = app.staticTexts["reader-chapter-title"]
+        XCTAssertTrue(chapterTitle.waitForExistence(timeout: 45))
+        XCTAssertLessThan(chapterTitle.frame.maxY, app.frame.height * 0.25)
         XCTAssertLessThan(app.buttons["reader-current-section-bookmark"].frame.maxY, app.frame.height * 0.25)
-        XCTAssertEqual(app.buttons.matching(identifier: "reader-jump-header").count, 1)
-        jump.tap()
+        XCTAssertEqual(app.staticTexts.matching(identifier: "reader-chapter-title").count, 1)
+        openChapterSections(in: app)
         let scope = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "101.2")).firstMatch
         XCTAssertTrue(scope.waitForExistence(timeout: 10))
         scope.tap()
-        XCTAssertTrue(jump.waitForExistence(timeout: 10))
+        XCTAssertTrue(chapterTitle.waitForExistence(timeout: 10))
         let jumped = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            (jump.value as? String)?.contains("101.2") == true
+            (chapterTitle.value as? String)?.contains("101.2") == true
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [jumped], timeout: 10), .completed)
-        keepScreenshot(named: "Bottom reading pills and header jump", from: app)
+        keepScreenshot(named: "Bottom reading pills after selecting a section", from: app)
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
             .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4)))
         let blocks = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-"))
@@ -2211,7 +2223,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(secondary.isSelected)
         keepScreenshot(named: "Unified Reader second source", from: app)
         primary.tap()
-        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["reader-chapter-title"].waitForExistence(timeout: 15))
         XCTAssertTrue(app.textViews[passageID].isHittable)
         XCTAssertEqual(app.textViews[passageID].frame.minY, y, accuracy: 5)
         XCTAssertTrue(primary.label.contains(originalSource.split(separator: "·")[0].trimmingCharacters(in: .whitespaces)))
@@ -2344,9 +2356,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             app.swipeUp()
             keepScreenshot(named: "EBC15 actual scroll \(index)", from: app)
         }
-        let footer = app.buttons["Jump within chapter"]
-        XCTAssertTrue(footer.exists && footer.isHittable)
-        footer.tap()
+        let chapterTitle = app.staticTexts["reader-chapter-title"]
+        XCTAssertTrue(chapterTitle.exists && chapterTitle.isHittable)
+        openChapterSections(in: app)
         keepScreenshot(named: "EBC15 navigation responsive after eight swipes", from: app)
         app.buttons["Done"].tap()
         guard let passage = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-"))
@@ -2374,10 +2386,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 30))
         for _ in 0..<4 { app.swipeUp() }
-        let footer = app.buttons["Jump within chapter"]
-        XCTAssertTrue(footer.exists && footer.isHittable)
+        let chapterTitle = app.staticTexts["reader-chapter-title"]
+        XCTAssertTrue(chapterTitle.exists && chapterTitle.isHittable)
         keepScreenshot(named: "Large 2014 Chapter7 after four actual swipes", from: app)
-        footer.tap()
+        openChapterSections(in: app)
         XCTAssertTrue(app.buttons["Done"].waitForExistence(timeout: 5))
         keepScreenshot(named: "Large lazy chapter jump navigation remains responsive", from: app)
     }
@@ -2612,12 +2624,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition", "--native-reader-housing-harassment", "--native-reader-force-picker-alignment-failure"]
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
-        let footer = app.buttons["Jump within chapter"]
+        let chapterTitle = app.staticTexts["reader-chapter-title"]
         let initial = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            (footer.value as? String)?.contains("27-2120") == true && footer.isHittable
+            (chapterTitle.value as? String)?.contains("27-2120") == true && chapterTitle.isHittable
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [initial], timeout: 15), .completed)
-        footer.tap()
+        openChapterSections(in: app)
         let target = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2115 ")).firstMatch
         for _ in 0..<20 {
             if target.exists && target.isHittable { break }
@@ -2641,7 +2653,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(dump)
         keepScreenshot(named: "HMC failed picker HTML opens requested 2115", from: app)
         XCTAssertTrue(arrived, "HTML fallback must visibly open the requested 2115 heading, not the old 2120 destination.")
-        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2115 ")).firstMatch.isHittable, "HTML footer must identify the requested section.")
+        XCTAssertTrue(waitForValueContaining("27-2115", on: app.staticTexts["reader-chapter-title"]),
+                      "The HTML Reader must identify the requested section.")
     }
 
     func testNativeHousingHarassmentNavigationRetainsInitialAndPickerTarget() {
@@ -2653,21 +2666,21 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let settled = expectation(description: "Observe initial position without gestures")
         DispatchQueue.main.asyncAfter(deadline: .now() + 30) { settled.fulfill() }
         wait(for: [settled], timeout: 32)
-        let footer = app.buttons["Jump within chapter"]
+        let chapterTitle = app.staticTexts["reader-chapter-title"]
         let heading = app.textViews["native-reader-block-fd7e757403c87c3ac0352632161b361cfde526ea10047b7e4a79ed09786dae18"]
         keepScreenshot(named: "HMC initial before accessibility target query", from: app)
-        print("Permitext navigation regression initial footer: \(footer.value ?? "missing")")
+        print("Permitext navigation regression initial section: \(chapterTitle.value ?? "missing")")
         let initialDump = XCTAttachment(string: app.debugDescription)
         initialDump.name = "HMC initial settled navigation AX"
         initialDump.lifetime = .keepAlways
         add(initialDump)
         keepScreenshot(named: "HMC diagnostic initial settled navigation", from: app)
-        XCTAssertTrue((footer.value as? String)?.contains("27-2120") == true, "Initial requested section must survive settled layout.")
+        XCTAssertTrue((chapterTitle.value as? String)?.contains("27-2120") == true, "Initial requested section must survive settled layout.")
         XCTAssertTrue(heading.exists && heading.isHittable, "Initial requested heading must remain visible.")
         guard heading.exists && heading.isHittable else { return }
         let initialY = heading.frame.minY
-        XCTAssertTrue(footer.exists && footer.isHittable)
-        footer.tap()
+        XCTAssertTrue(chapterTitle.exists && chapterTitle.isHittable)
+        openChapterSections(in: app)
         let target = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2120 ")).firstMatch
         for _ in 0..<20 {
             if target.exists && target.isHittable { break }
@@ -2679,13 +2692,13 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let observed = expectation(description: "Observe picker position without gestures")
         DispatchQueue.main.asyncAfter(deadline: .now() + 10) { observed.fulfill() }
         wait(for: [observed], timeout: 12)
-        print("Permitext navigation regression picker footer: \(footer.value ?? "missing")")
+        print("Permitext navigation regression selected section: \(chapterTitle.value ?? "missing")")
         let pickerDump = XCTAttachment(string: app.debugDescription)
         pickerDump.name = "HMC picker settled navigation AX"
         pickerDump.lifetime = .keepAlways
         add(pickerDump)
         keepScreenshot(named: "HMC diagnostic picker settled navigation", from: app)
-        XCTAssertTrue((footer.value as? String)?.contains("27-2120") == true, "Picker target must survive settled layout.")
+        XCTAssertTrue((chapterTitle.value as? String)?.contains("27-2120") == true, "Picker target must survive settled layout.")
         XCTAssertTrue(heading.exists && heading.isHittable)
         XCTAssertEqual(heading.frame.minY, initialY, accuracy: 4, "Initial and picker navigation must align the same heading viewport.")
         let beforeDrag = heading.frame.minY
@@ -2707,7 +2720,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let term = app.links.matching(NSPredicate(format: "label ==[c] %@", "harassment")).firstMatch
         // Do not interfere with initial restoration while its geometry settles.
         let initialReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            (app.buttons["Jump within chapter"].value as? String)?.contains("27-2120") == true && term.exists && term.isHittable
+            (app.staticTexts["reader-chapter-title"].value as? String)?.contains("27-2120") == true && term.exists && term.isHittable
         }, object: nil)
         let initiallyAligned = XCTWaiter.wait(for: [initialReady], timeout: 30) == .completed
         keepScreenshot(named: initiallyAligned ? "Native HMC Harassment initial target aligned" : "Native HMC Harassment initial target not aligned after bounded wait", from: app)
@@ -2929,10 +2942,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let term = app.links.matching(NSPredicate(format: "label ==[c] %@", "class A multiple dwelling")).firstMatch
         let heading = app.textViews.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2033.1 Heat inspections")).firstMatch
         let initialReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            (app.buttons["Jump within chapter"].value as? String)?.contains("27-2033.1") == true && heading.exists && heading.isHittable
+            (app.staticTexts["reader-chapter-title"].value as? String)?.contains("27-2033.1") == true && heading.exists && heading.isHittable
         }, object: nil)
         let initiallyAligned = XCTWaiter.wait(for: [initialReady], timeout: 30) == .completed
-        keepScreenshot(named: "Native HMC Class A initial section heading and footer", from: app)
+        keepScreenshot(named: "Native HMC Class A initial section and chapter title", from: app)
         XCTAssertTrue(initiallyAligned, app.debugDescription)
         guard initiallyAligned else { return }
         // The singular occurrence follows the local definitions and plural uses below the initial viewport.
@@ -2991,7 +3004,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertTrue(chapter.isHittable)
             keepScreenshot(named: "Opening recording \(argument) before first push", from: app)
             chapter.tap()
-            XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
+            XCTAssertTrue(app.staticTexts["reader-chapter-title"].waitForExistence(timeout: 45))
             XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
             keepScreenshot(named: "Opening recording \(argument) first ready", from: app)
             for _ in 0..<3 {
@@ -3078,10 +3091,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let term = app.textViews.matching(NSPredicate(format: "label BEGINSWITH %@", "b.The owner of a class A multiple dwelling")).firstMatch
         let heading = app.textViews.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2045 Duties of owner")).firstMatch
         let initialReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            (app.buttons["Jump within chapter"].value as? String)?.contains("27-2045") == true && heading.exists && heading.isHittable
+            (app.staticTexts["reader-chapter-title"].value as? String)?.contains("27-2045") == true && heading.exists && heading.isHittable
         }, object: nil)
         let initiallyAligned = XCTWaiter.wait(for: [initialReady], timeout: 30) == .completed
-        keepScreenshot(named: "Native HMC local Class A initial section heading and footer", from: app)
+        keepScreenshot(named: "Native HMC local Class A initial section and chapter title", from: app)
         XCTAssertTrue(initiallyAligned, app.debugDescription)
         guard initiallyAligned else { return }
         // Physical iOS may expose the paragraph without individual Link AX
@@ -3244,21 +3257,21 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let chapterOne = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 1:")).firstMatch
         XCTAssertTrue(chapterOne.waitForExistence(timeout: 15))
         chapterOne.tap()
-        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
+        XCTAssertTrue(app.staticTexts["reader-chapter-title"].waitForExistence(timeout: 45))
         let secondarySource = element(in: app, identifier: "reader-source-edition").label
         navigationButton(in: app, title: "First reader").tap()
         XCTAssertTrue(chapterOne.waitForExistence(timeout: 15))
         chapterOne.tap()
-        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
+        XCTAssertTrue(app.staticTexts["reader-chapter-title"].waitForExistence(timeout: 45))
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
         // A prior run can legitimately restore the chapter's final paragraph.
         // Establish a known start through the real jump control before dragging.
-        app.buttons["Jump within chapter"].tap()
+        openChapterSections(in: app)
         let beginning = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "27-101 ")).firstMatch
         XCTAssertTrue(beginning.waitForExistence(timeout: 10))
         beginning.tap()
         let beginningReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            (app.buttons["Jump within chapter"].value as? String)?.contains("27-101") == true
+            (app.staticTexts["reader-chapter-title"].value as? String)?.contains("27-101") == true
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [beginningReady], timeout: 15), .completed)
         // Exercise a genuinely scrolled passage, rather than accepting only
@@ -3280,7 +3293,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let primaryY = passage.frame.minY
         XCTAssertFalse(initialPassages.contains(passageID), "Must verify a passage beyond the opening viewport")
         second.tap()
-        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["reader-chapter-title"].waitForExistence(timeout: 15))
         XCTAssertEqual(element(in: app, identifier: "reader-source-edition").label, secondarySource)
         navigationButton(in: app, title: "First reader").tap()
         let restoredPassage = app.textViews[passageID]
@@ -3344,7 +3357,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
             XCTAssertTrue(element(in: app, identifier: "reader-source-edition").label.contains("2022"))
             let expected = chapter == "K2" ? "K201.1" : "K301.1"
-            app.buttons["Jump within chapter"].tap()
+            openChapterSections(in: app)
             let jump = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", expected + " ")).firstMatch
             for _ in 0..<20 {
                 if jump.exists && jump.isHittable { break }
@@ -3353,7 +3366,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertTrue(jump.exists && jump.isHittable, app.debugDescription)
             jump.tap()
             let destinationReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-                (app.buttons["Jump within chapter"].value as? String)?.contains(expected) == true
+                (app.staticTexts["reader-chapter-title"].value as? String)?.contains(expected) == true
             }, object: nil)
             XCTAssertEqual(XCTWaiter.wait(for: [destinationReady], timeout: 20), .completed)
             keepScreenshot(named: "Normal K picker and Jump \(tab) \(chapter)", from: app)
@@ -3442,7 +3455,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             format: "identifier BEGINSWITH %@ AND (label CONTAINS[c] %@ OR value CONTAINS[c] %@)",
             "native-reader-block-", "27-598 Core tests", "27-598 Core tests"
         )).firstMatch
-        let currentSection = app.buttons["Jump within chapter"]
+        let currentSection = app.staticTexts["reader-chapter-title"]
         let historicalReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             historicalHeading.exists && historicalHeading.isHittable && historicalHeading.frame.minY.isFinite
                 && currentSection.exists && currentSection.isHittable
@@ -3721,7 +3734,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         chapter.tap()
 
         XCTAssertTrue(
-            app.buttons["Jump within chapter"].waitForExistence(timeout: 30),
+            app.staticTexts["reader-chapter-title"].waitForExistence(timeout: 30),
             "The chapter Reader did not open."
         )
 
@@ -4145,7 +4158,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "Opening the Research citation did not return to the installed native Reader.\n\(app.debugDescription)"
         )
         XCTAssertTrue(
-            app.buttons["Jump within chapter"].waitForExistence(timeout: 10),
+            app.staticTexts["reader-chapter-title"].waitForExistence(timeout: 10),
             "The citation destination is not an interactive chapter Reader."
         )
 
@@ -4273,10 +4286,19 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(destinationScreenshot)
     }
 
+    private func openChapterSections(in app: XCUIApplication) {
+        let search = app.buttons["Search this chapter"].firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 10), "Chapter search is unavailable.")
+        search.tap()
+        let sections = app.buttons["Sections"]
+        XCTAssertTrue(sections.waitForExistence(timeout: 10), "Sections is unavailable in the Find bar.")
+        sections.tap()
+        XCTAssertTrue(app.navigationBars["Jump within chapter"].waitForExistence(timeout: 10))
+    }
+
     private func jumpToSection(_ sectionNumber: String, in app: XCUIApplication) {
-        let jumpButton = app.buttons["Jump within chapter"]
-        XCTAssertTrue(jumpButton.waitForExistence(timeout: 10), "The chapter jump control is unavailable.")
-        jumpButton.tap()
+        let chapterTitle = app.staticTexts["reader-chapter-title"]
+        openChapterSections(in: app)
 
         let target = app.buttons
             .matching(NSPredicate(format: "label BEGINSWITH[c] %@", "\(sectionNumber) "))
@@ -4288,7 +4310,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         target.tap()
 
         XCTAssertTrue(
-            waitForValueContaining(sectionNumber, on: jumpButton),
+            waitForValueContaining(sectionNumber, on: chapterTitle),
             "Fuel Gas \(sectionNumber) did not settle after selecting it in the jump picker."
         )
     }

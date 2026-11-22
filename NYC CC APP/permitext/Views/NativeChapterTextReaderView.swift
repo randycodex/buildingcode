@@ -221,17 +221,13 @@ struct NativeChapterTextReaderView: View {
                 onNext: { navigateSearchMatch(offset: activeSearchMatchID == nil ? 0 : 1, proxy: proxy, document: document) },
                 onSubmit: { navigateSearchMatch(offset: 0, proxy: proxy, document: document) },
                 onClose: closeChapterSearch,
+                onSections: sectionTargets.isEmpty ? nil : { isJumpPickerPresented = true },
                 usesReaderBottomBar: usesReaderBottomBar
             )
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
-                ReaderChapterJumpHeader(
-                    chapterTitle: chapter.title,
-                    location: currentSectionTarget?.menuLabel ?? chapter.displayLabel,
-                    accent: accentColor,
-                    isEnabled: !sectionTargets.isEmpty
-                ) { isJumpPickerPresented = true }
+                ReaderChapterTitle(title: chapter.title, currentSection: currentSectionTarget?.menuLabel ?? "", accent: accentColor)
                 .sourceProblemReporting(sectionID: currentBookmarkSectionID)
             }
             ToolbarItem(placement: .topBarTrailing) {

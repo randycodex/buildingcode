@@ -59,6 +59,7 @@ struct ChapterSearchSheet: View {
     var isInline = false
     var usesReaderBottomBar = false
     var onClose: (() -> Void)? = nil
+    var onSections: (() -> Void)? = nil
     @State private var activeResultID: String?
 
     @Environment(\.dismiss) private var dismiss
@@ -112,6 +113,7 @@ struct ChapterSearchSheet: View {
                     onNext: { navigateResult(offset: activeResultID == nil ? 0 : 1) },
                     onSubmit: { navigateResult(offset: 0) },
                     onClose: { query = ""; onClose?() },
+                    onSections: onSections,
                     usesReaderBottomBar: usesReaderBottomBar
                 )
             } else {
@@ -432,6 +434,7 @@ struct ChapterFindControls: View {
     let onNext: () -> Void
     let onSubmit: () -> Void
     let onClose: () -> Void
+    var onSections: (() -> Void)? = nil
     var usesReaderBottomBar = false
     @FocusState private var isFocused: Bool
 
@@ -466,18 +469,37 @@ struct ChapterFindControls: View {
                 .onSubmit { isFocused = false; onSubmit() }
                 .padding(.leading, 12)
                 .frame(minWidth: 60)
-            if isSearching && !query.isEmpty {
-                ProgressView().controlSize(.small).padding(.horizontal, 4)
-                    .accessibilityLabel("Searching this chapter")
-            } else if !query.isEmpty {
-                Text(activeIndex.map { "\($0 + 1) of \(matchCount)" } ?? "\(matchCount) matches")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
-                    .fixedSize()
-                    .padding(.horizontal, 4)
+            if query.isEmpty {
+                if let onSections {
+                    Button {
+                        isFocused = false
+                        onClose()
+                        onSections()
+                    } label: {
+                        Text("Sections")
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.primary)
+                            .padding(.horizontal, 8)
+                            .frame(minHeight: CodeScreenMetrics.toolbarButtonSize)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Open the list of sections in this chapter")
+                }
+            } else {
+                if isSearching {
+                    ProgressView().controlSize(.small).padding(.horizontal, 4)
+                        .accessibilityLabel("Searching this chapter")
+                } else {
+                    Text(activeIndex.map { "\($0 + 1) of \(matchCount)" } ?? "\(matchCount) matches")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
+                        .padding(.horizontal, 4)
+                }
+                findButton("Previous match", icon: "chevron.up", disabled: matchCount == 0 || isSearching) { onPrevious() }
+                findButton("Next match", icon: "chevron.down", disabled: matchCount == 0 || isSearching) { onNext() }
             }
-            findButton("Previous match", icon: "chevron.up", disabled: matchCount == 0 || isSearching) { onPrevious() }
-            findButton("Next match", icon: "chevron.down", disabled: matchCount == 0 || isSearching) { onNext() }
             findButton("Close chapter find", icon: "xmark") { onClose() }
         }
         .font(.subheadline)
