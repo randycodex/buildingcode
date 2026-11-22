@@ -437,7 +437,7 @@ struct BookmarksView: View {
                 .codeLiquidGlassCircle()
 
                 Spacer(minLength: 0)
-                CodeMainScreenTitleLabel(title: screenTitle, alignment: .center)
+                CodeMainScreenTitleLabel(title: screenTitle, animatesChanges: false, alignment: .center)
                 Spacer(minLength: 0)
 
                 accountButton
