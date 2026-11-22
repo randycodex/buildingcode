@@ -476,14 +476,10 @@ struct ChapterFindControls: View {
                         onClose()
                         onSections()
                     } label: {
-                        Text("Sections")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.primary)
-                            .padding(.horizontal, 8)
-                            .frame(minHeight: CodeScreenMetrics.toolbarButtonSize)
-                            .contentShape(Rectangle())
+                        ToolbarActionIcon(systemImage: "line.3.horizontal.decrease")
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Sections")
                     .accessibilityHint("Open the list of sections in this chapter")
                 }
             } else {
