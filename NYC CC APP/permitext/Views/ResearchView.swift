@@ -555,10 +555,7 @@ private struct ResearchSessionView: View {
     @State private var draftTitle = ""
     @State private var isUpdatingPin = false
     @State private var renameConversationID: String?
-    @State private var showingProjectSnapshot = false
-    @State private var projectSnapshot: ResearchProjectSnapshot?
-    @State private var projectSnapshotError: String?
-    @State private var isUpdatingProjectSnapshot = false
+    @State private var isUpdatingProjectContext = false
     @State private var pendingAssignmentProjectID: String?
     @State private var showingAssignmentConfirmation = false
     @State private var showingProjectCreator = false
@@ -661,9 +658,6 @@ private struct ResearchSessionView: View {
             .sheet(item: $pendingNotebookHandoff) { handoff in
                 ResearchNotebookHandoffSheet(handoff: handoff, owner: owner)
                     .environmentObject(library)
-            }
-            .sheet(isPresented: $showingProjectSnapshot) {
-                projectSnapshotSheet
             }
             .sheet(isPresented: $showingProjectCreator) {
                 FolderEditorSheet(
@@ -771,10 +765,7 @@ private struct ResearchSessionView: View {
                 pendingDeletion = nil
                 showingRename = false
                 renameConversationID = nil
-                showingProjectSnapshot = false
-                projectSnapshot = nil
-                projectSnapshotError = nil
-                isUpdatingProjectSnapshot = false
+                isUpdatingProjectContext = false
                 showingAssignmentConfirmation = false
                 question = ""
                 draftTitle = ""
@@ -1015,6 +1006,15 @@ private struct ResearchSessionView: View {
                 .accessibilityLabel("Project context: \(projectName(for: conversation.primaryProjectID))")
                 .accessibilityIdentifier("research-project-context-menu")
             }
+            if conversation.primaryProjectID != nil {
+                Toggle("Include project context and facts", isOn: Binding(
+                    get: { conversation.assistantScope?.projectContextMode != "excluded" },
+                    set: { include in
+                        Task { await setProjectContextIncluded(include, conversationID: conversation.id) }
+                    }
+                ))
+                .disabled(isLoadingConversation || isSending || isUpdatingPin || isRefreshingSources || isConfirmingProjectContext)
+            }
             Button("Rename", systemImage: "pencil") {
                 renameConversationID = conversation.id
                 draftTitle = conversation.title
@@ -1031,6 +1031,7 @@ private struct ResearchSessionView: View {
         } label: {
             ToolbarActionIcon(systemImage: "ellipsis")
         }
+        .disabled(isUpdatingProjectContext)
         .accessibilityLabel("Research actions")
         .foregroundStyle(Color.appChrome)
     }
@@ -1449,21 +1450,6 @@ private struct ResearchSessionView: View {
                 }
                 .padding(.trailing, 8)
                 .padding(.bottom, 8)
-                if conversation?.primaryProjectID != nil {
-                    Button(conversation?.assistantScope?.includeProjectContext == true
-                           ? "Review included Project context and facts"
-                           : "Include Project context and facts…") {
-                        showingProjectSnapshot = true
-                        Task { await loadProjectSnapshot() }
-                    }
-                    .font(.caption)
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, CodeScreenMetrics.cardPadding)
-                    .padding(.bottom, 12)
-                    .disabled(isSending)
-                    .accessibilityIdentifier("research-project-snapshot")
-                }
             }
             .codeLiquidGlassRoundedRectangle(cornerRadius: CodeScreenMetrics.researchComposerCornerRadius)
         }
@@ -1473,7 +1459,7 @@ private struct ResearchSessionView: View {
 
     private var researchSendIsBlocked: Bool {
         retainingInterruptedIdentities.contains(where: { $0 == requestIdentity() }) ||
-        isLoadingConversation || isUpdatingProjectSnapshot || showingProjectSnapshot ||
+        isLoadingConversation || isUpdatingProjectContext ||
         library.researchTurnAllowance?.purchaseRequired == true ||
             conversation?.sourceStatus == "changed" ||
             conversation?.projectContextReviewRequired == true
@@ -1489,78 +1475,27 @@ private struct ResearchSessionView: View {
         return nil
     }
 
-    private var projectSnapshotSheet: some View {
-        NavigationStack {
-            Form {
-                if let snapshot = projectSnapshot {
-                    Section("Project context and facts") {
-                        if let address = snapshot.projectInformation.address, !address.isEmpty { Text(address) }
-                        if let description = snapshot.projectInformation.description, !description.isEmpty { Text(description) }
-                        ForEach(Array((snapshot.projectInformation.facts ?? []).enumerated()), id: \.offset) { _, fact in
-                            Text(fact)
-                        }
-                    }
-                    Section {
-                        Button("Include reviewed snapshot") { Task { await updateProjectSnapshot(include: true) } }
-                            .accessibilityIdentifier("research-include-project-snapshot")
-                        if conversation?.assistantScope?.includeProjectContext == true {
-                            Button("Remove Project snapshot") { Task { await updateProjectSnapshot(include: false) } }
-                        }
-                    } footer: {
-                        Text("This snapshot is used in future answers in this conversation. Existing answers retain their original evidence and context.")
-                    }
-                    .disabled(isUpdatingProjectSnapshot)
-                } else if projectSnapshotError == nil {
-                    ProgressView("Loading Project…")
-                }
-                if let projectSnapshotError {
-                    Section {
-                        Text(projectSnapshotError)
-                        Button("Review again") { Task { await loadProjectSnapshot() } }
-                    }
-                }
-            }
-            .navigationTitle("Review Project context")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showingProjectSnapshot = false }
-                        .disabled(isUpdatingProjectSnapshot)
-                }
-            }
-        }
-    }
-
-    private func loadProjectSnapshot() async {
-        guard let identity = requestIdentity(), let id = identity.conversationID else { return }
-        projectSnapshot = nil
-        projectSnapshotError = nil
+    private func setProjectContextIncluded(_ include: Bool, conversationID: String) async {
+        guard let identity = requestIdentity(), identity.conversationID == conversationID,
+              conversation?.id == conversationID, conversation?.primaryProjectID != nil,
+              !isUpdatingProjectContext, !isLoadingConversation, !isSending,
+              !isUpdatingPin, !isRefreshingSources, !isConfirmingProjectContext else { return }
+        isUpdatingProjectContext = true
+        defer { if isCurrent(identity) { isUpdatingProjectContext = false } }
         do {
-            let snapshot = try await library.researchProjectSnapshot(conversationID: id)
-            guard isCurrent(identity), showingProjectSnapshot else { return }
-            projectSnapshot = snapshot
-        } catch {
-            guard isCurrent(identity), showingProjectSnapshot else { return }
-            projectSnapshotError = error.localizedDescription
-        }
-    }
-
-    private func updateProjectSnapshot(include: Bool) async {
-        guard let identity = requestIdentity(), let id = identity.conversationID,
-              let snapshot = projectSnapshot, !isUpdatingProjectSnapshot else { return }
-        isUpdatingProjectSnapshot = true
-        defer { if isCurrent(identity) { isUpdatingProjectSnapshot = false } }
-        do {
-            let updated = try await library.updateResearchProjectSnapshot(
-                conversationID: id, include: include, snapshotHash: include ? snapshot.contentHash : nil
+            var updated = try await library.updateResearchProjectSnapshot(
+                conversationID: conversationID, include: include, snapshotHash: nil
             )
             guard isCurrent(identity) else { return }
+            if conversation?.sourceStatus == "changed" {
+                updated.sourceStatus = "changed"
+            }
             conversation = updated
             cacheConversation(updated)
-            showingProjectSnapshot = false
+            errorMessage = nil
         } catch {
             guard isCurrent(identity) else { return }
-            projectSnapshotError = error.localizedDescription
+            errorMessage = error.localizedDescription
         }
     }
 

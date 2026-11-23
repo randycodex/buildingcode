@@ -142,6 +142,7 @@ struct ResearchProjectSnapshotUpdateRequest: Codable, Hashable, Sendable {
 struct ResearchAssistantScope: Codable, Hashable, Sendable {
     var includeProjectContext: Bool = false
     var projectContext: ResearchProjectSnapshot? = nil
+    var projectContextMode: String? = nil
 }
 
 struct ResearchFeedbackRequest: Codable, Hashable, Sendable {

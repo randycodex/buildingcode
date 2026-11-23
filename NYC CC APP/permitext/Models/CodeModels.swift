@@ -3756,6 +3756,24 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         throw URLError(.unsupportedURL)
     }
 
+    func updateResearchProjectSnapshot(_ request: ResearchProjectSnapshotUpdateRequest) async throws -> ResearchConversationResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            var conversation = try phase3ResearchConversation(id: request.conversationID)
+            guard conversation.primaryProjectID != nil else { throw URLError(.badServerResponse) }
+            var scope = conversation.assistantScope ?? ResearchAssistantScope()
+            scope.includeProjectContext = request.include
+            scope.projectContextMode = request.include ? "current" : "excluded"
+            conversation.assistantScope = scope
+            conversation.projectContextReviewRequired = false
+            conversation.updatedAt = phase3ResearchTimestamp()
+            phase3ResearchConversations[conversation.id] = conversation
+            return ResearchConversationResponse(conversation: conversation)
+        }
+        #endif
+        throw URLError(.unsupportedURL)
+    }
+
     func researchSelectionReview(_ request: ResearchSelectionReviewRequest) async throws -> ResearchSelectionReviewResponse {
         ResearchSelectionReviewResponse(
             selection: ResearchSelectionRequest(

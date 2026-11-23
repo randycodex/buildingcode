@@ -21,6 +21,53 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         executionTimeAllowance = 7_200
     }
 
+    func testResearchProjectContextToggleLivesInConversationMenu() throws {
+#if !DEBUG
+        throw XCTSkip("Research context uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+                                                       "saved-folder-", "Acceptance Project")).firstMatch
+        XCTAssertTrue(project.waitForExistence(timeout: 10))
+        project.tap()
+        app.buttons["main-tab-research"].tap()
+        let newResearch = app.buttons["New Research"]
+        XCTAssertTrue(newResearch.waitForExistence(timeout: 15))
+        newResearch.tap()
+
+        let actions = app.buttons["Research actions"]
+        let toggle = app.descendants(matching: .any).matching(identifier: "Include project context and facts").firstMatch
+        XCTAssertTrue(element(in: app, identifier: "research-composer").waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["Review included Project context and facts"].exists)
+        XCTAssertFalse(app.buttons["Include Project context and facts…"].exists)
+
+        func openContextMenu() {
+            XCTAssertTrue(actions.waitForExistence(timeout: 10))
+            XCTAssertTrue(actions.wait(for: \.isEnabled, toEqual: true, timeout: 10))
+            actions.tap()
+            XCTAssertTrue(toggle.waitForExistence(timeout: 5))
+            XCTAssertTrue(toggle.wait(for: \.isEnabled, toEqual: true, timeout: 10))
+        }
+
+        openContextMenu()
+        XCTAssertTrue(toggle.isSelected)
+        toggle.tap()
+        XCTAssertTrue(actions.wait(for: \.isEnabled, toEqual: true, timeout: 10))
+        app.buttons["Research history"].tap()
+        let conversation = app.buttons.matching(identifier: "research-history-row").firstMatch
+        XCTAssertTrue(conversation.waitForExistence(timeout: 15))
+        conversation.tap()
+        openContextMenu()
+        XCTAssertFalse(toggle.isSelected)
+        toggle.tap()
+        openContextMenu()
+        XCTAssertTrue(toggle.isSelected)
+#endif
+    }
+
     func testProjectFirstNavigationAndResearchIsolation() throws {
 #if !DEBUG
         throw XCTSkip("Project navigation uses the isolated Debug fixture.")
