@@ -407,7 +407,7 @@ private struct ChapterFindPlacement<Bar: View>: ViewModifier {
             content.overlay(alignment: .bottom) {
                 if isPresented {
                     bar(true)
-                        .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+                        .codeTabAlignedHorizontalPadding()
                         .padding(.vertical, CodeScreenMetrics.readerControlsVerticalPadding)
                         .onAppear { readerOwner.wrappedValue = owner }
                         .onDisappear {

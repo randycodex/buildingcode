@@ -996,7 +996,8 @@ private struct NotebookCardEditorView: View {
 
 
                     }
-                    .padding(18)
+                    .padding(.vertical, 18)
+                    .codeTabAlignedHorizontalPadding()
                 }
                 .codeNavigationTopScrollEdge()
                 .codeTransparentBottomScrollEdge()

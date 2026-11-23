@@ -1732,7 +1732,7 @@ private struct PermitextTabNavigation: View {
                 .lineLimit(1)
                 .accessibilityIdentifier("project-workspace-name")
         }
-        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+        .codeTabAlignedHorizontalPadding()
         .background(.regularMaterial)
     }
 
@@ -2200,7 +2200,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
-        .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+        .codeTabAlignedHorizontalPadding()
         .padding(.vertical, CodeScreenMetrics.readerControlsVerticalPadding)
     }
 
@@ -2209,7 +2209,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
         TabView(selection: selection) {
             if !isCodeLibrary {
                 Tab(value: AppTab.bookmarks.rawValue) {
-                    saved
+                    saved.codeFloatingTabNavigationViewport()
                 } label: {
                     Image(systemName: "folder")
                         .accessibilityLabel(projectScoped ? "Project" : "Saved")
@@ -2217,7 +2217,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 }
             }
             Tab(value: AppTab.browse.rawValue) {
-                readers
+                readers.codeFloatingTabNavigationViewport()
             } label: {
                 Image(systemName: "book")
                     .accessibilityLabel("Reader")
@@ -2225,7 +2225,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
             }
             if !isCodeLibrary {
                 Tab(value: AppTab.research.rawValue) {
-                    research
+                    research.codeFloatingTabNavigationViewport()
                 } label: {
                     Image(systemName: "sparkle")
                         .accessibilityLabel("Assistant")
@@ -2233,7 +2233,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 }
             }
             Tab(value: AppTab.search.rawValue) {
-                SearchView()
+                SearchView().codeFloatingTabNavigationViewport()
             } label: {
                 Image(systemName: "magnifyingglass").accessibilityLabel("Search").accessibilityIdentifier("main-tab-search")
             }

@@ -167,7 +167,7 @@ struct ReaderView: View {
                             projectsEditor
                         }
                     }
-                    .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+                    .codeTabAlignedHorizontalPadding()
                     .padding(.top, CodeScreenMetrics.topTitlePadding)
                     .padding(.bottom, 28)
                     .onAppear {
@@ -329,7 +329,7 @@ struct ReaderView: View {
                 .font(.subheadline)
                 .padding(16)
                 .codeLiquidGlassCapsule()
-                .padding(.horizontal, 16)
+                .codeTabAlignedHorizontalPadding()
                 .padding(.bottom, 12)
                 .accessibilityIdentifier("passage-saved-toast")
             }
@@ -636,7 +636,7 @@ struct ReaderView: View {
                 }
             }
         }
-        .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+        .codeTabAlignedHorizontalPadding()
         .padding(.top, 80)
     }
 

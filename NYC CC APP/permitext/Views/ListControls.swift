@@ -231,8 +231,39 @@ extension View {
     func bottomSearchBarPlacement() -> some View {
         self
         .accessibilityIdentifier("bottom-search-bar")
-        .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+        .codeTabAlignedHorizontalPadding()
         .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+    }
+}
+
+private struct TabNavigationHorizontalInsetKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 0
+}
+
+extension EnvironmentValues {
+    var tabNavigationHorizontalInset: CGFloat {
+        get { self[TabNavigationHorizontalInsetKey.self] }
+        set { self[TabNavigationHorizontalInsetKey.self] = newValue }
+    }
+}
+
+extension View {
+    func codeFloatingTabNavigationViewport() -> some View {
+        let inset = CodeScreenMetrics.floatingTabNavigationInset
+        return padding(.horizontal, inset)
+            .environment(\.tabNavigationHorizontalInset, inset)
+    }
+
+    func codeTabAlignedHorizontalPadding() -> some View {
+        modifier(TabAlignedHorizontalPadding())
+    }
+}
+
+private struct TabAlignedHorizontalPadding: ViewModifier {
+    @Environment(\.tabNavigationHorizontalInset) private var viewportInset
+
+    func body(content: Content) -> some View {
+        content.padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding - viewportInset)
     }
 }
 

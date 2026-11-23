@@ -1495,13 +1495,19 @@ enum CodeScreenMetrics {
     static let screenHorizontalPadding: CGFloat = 16
     /// Floating controls immediately above the system tab bar align to the
     /// tab bar's visible outer edge rather than the wider content grid.
-    static let bottomControlHorizontalPadding: CGFloat = 20
+    static let bottomControlHorizontalPadding: CGFloat = 21
+    static var floatingTabNavigationInset: CGFloat {
+        if #available(iOS 26.0, *), UIDevice.current.userInterfaceIdiom == .phone {
+            return bottomControlHorizontalPadding - screenHorizontalPadding
+        }
+        return 0
+    }
     static let bottomControlHeight: CGFloat = 52
     static let readerControlsVerticalPadding: CGFloat = 6
     static let bottomSearchScrollClearance = bottomControlHeight + 24
     /// Detached circular actions beside the floating bottom navigation.
     static let detachedNavigationButtonSize: CGFloat = 60
-    static let readerHorizontalPadding: CGFloat = 20
+    static let readerHorizontalPadding = bottomControlHorizontalPadding
     static let mainHeaderTopPadding: CGFloat = 8
     static let mainHeaderHeight: CGFloat = 44
     static let topTitlePadding: CGFloat = 18

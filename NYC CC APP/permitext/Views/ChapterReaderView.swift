@@ -104,7 +104,7 @@ struct ChapterReaderView: View {
                     blockSection(for: block)
                 }
             }
-            .padding(.horizontal, 20)
+            .codeTabAlignedHorizontalPadding()
             .padding(.top, 28)
             .padding(.bottom, 8 + readerControlsClearance)
             .scrollTargetLayout()

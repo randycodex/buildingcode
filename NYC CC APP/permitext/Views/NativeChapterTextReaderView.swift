@@ -367,7 +367,7 @@ struct NativeChapterTextReaderView: View {
                     .scrollTargetLayout()
                 }
             }
-            .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+            .codeTabAlignedHorizontalPadding()
             .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, 28 + readerControlsClearance)
             .background(NativeReaderScrollViewProbe { scrollView in
@@ -466,7 +466,7 @@ struct NativeChapterTextReaderView: View {
                     readerBlocks(Array(displayBlocks[index..<min(displayBlocks.count, index + 12)]),
                                  document: document, proxy: proxy, tracksOffsets: false)
                 }
-                .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+                .codeTabAlignedHorizontalPadding()
                 .frame(width: geometry.size.width, alignment: .topLeading)
                 .offset(y: matchesViewport ? CGFloat(saved?.minY ?? 0) : 0)
             }
@@ -2074,6 +2074,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.tabNavigationHorizontalInset) private var tabNavigationHorizontalInset
     @State private var passageSwipe = ReaderPassageSwipeState(revealWidth: CodeScreenMetrics.readerPassageRevealWidth)
 
     static func == (lhs: Self, rhs: Self) -> Bool {
@@ -2144,7 +2145,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
                     .containerRelativeFrame(.horizontal) { viewportWidth, _ in
                         max(
                             viewportWidth
-                                - (CodeScreenMetrics.readerHorizontalPadding * 2)
+                                - ((CodeScreenMetrics.readerHorizontalPadding - tabNavigationHorizontalInset) * 2)
                                 - hierarchyIndentation,
                             0
                         )

@@ -37,6 +37,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(assistantTab.label, "Assistant")
         assistantTab.tap()
         XCTAssertTrue(app.staticTexts["screen-title-Assistant"].waitForExistence(timeout: 10))
+        let historySearch = element(in: app, identifier: "bottom-search-bar")
+        XCTAssertTrue(historySearch.waitForExistence(timeout: 10))
+        assertFloatingMenuWidth(historySearch.frame, in: app)
+        keepScreenshot(named: "Assistant history aligned to the floating menu", from: app)
         let newResearch = app.buttons["New conversation"]
         XCTAssertTrue(newResearch.waitForExistence(timeout: 15))
         newResearch.tap()
@@ -44,6 +48,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let actions = app.buttons["Assistant actions"]
         let toggle = app.descendants(matching: .any).matching(identifier: "Include project context and facts").firstMatch
         XCTAssertTrue(element(in: app, identifier: "research-composer").waitForExistence(timeout: 15))
+        let back = app.buttons["Assistant history"]
+        XCTAssertTrue(back.waitForExistence(timeout: 10))
+        XCTAssertTrue(actions.waitForExistence(timeout: 10))
+        assertFloatingMenuWidth(back.frame.union(actions.frame), in: app)
+        keepScreenshot(named: "Assistant conversation aligned to the floating menu", from: app)
         XCTAssertFalse(app.buttons["Review included Project context and facts"].exists)
         XCTAssertFalse(app.buttons["Include Project context and facts…"].exists)
 
@@ -365,6 +374,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let findControls = element(in: app, identifier: "chapter-find-controls")
         XCTAssertTrue(findField.waitForExistence(timeout: 10))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        assertFloatingMenuWidth(findControls.frame, in: app)
         XCTAssertTrue(sections.isHittable)
         XCTAssertFalse(findControls.buttons["Sections"].exists)
         XCTAssertFalse(primary.exists)
@@ -662,6 +672,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let searchActions = app.buttons["Search actions"]
         let searchField = app.textFields["Search codes"]
         XCTAssertTrue(searchField.waitForExistence(timeout: 15))
+        assertFloatingMenuWidth(element(in: app, identifier: "bottom-search-bar").frame, in: app)
         let clearSearch = app.buttons["Clear search"]
         if clearSearch.isHittable { clearSearch.tap() }
         searchField.tap()
@@ -903,6 +914,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }, object: nil)], timeout: 10), .completed)
         let cards = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-section-"))
         XCTAssertEqual(cards.count, 6)
+        let projectName = app.staticTexts["project-workspace-name"]
+        XCTAssertEqual(projectName.frame.minX, app.buttons["project-section-overview"].frame.minX, accuracy: 1)
+        XCTAssertEqual(element(in: app, identifier: "project-summary-address").frame.minX, projectName.frame.minX, accuracy: 1)
         for (left, right) in [("overview", "review"), ("notebook", "evidence"), ("calculator", "reports")] {
             let leading = app.buttons["project-section-\(left)"]
             let trailing = app.buttons["project-section-\(right)"]
@@ -910,6 +924,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertEqual(leading.frame.minY, trailing.frame.minY, accuracy: 1)
             XCTAssertEqual(leading.frame.width, trailing.frame.width, accuracy: 1)
             XCTAssertEqual(leading.frame.height, trailing.frame.height, accuracy: 1)
+            assertFloatingMenuWidth(leading.frame.union(trailing.frame), in: app)
         }
         let reportsCard = app.buttons["project-section-reports"]
         let tabBarY = app.tabBars.firstMatch.frame.minY
@@ -926,6 +941,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let editProject = app.buttons["project-edit"]
         XCTAssertTrue(editProject.isHittable)
         XCTAssertEqual(editProject.frame.width, editProject.frame.height, accuracy: 1)
+        if #available(iOS 26.0, *), UIDevice.current.userInterfaceIdiom == .phone {
+            // The native back glyph is optically offset inside its glass circle.
+            let back = app.buttons["project-close"]
+            let cardsWidth = app.buttons["project-section-overview"].frame.union(app.buttons["project-section-review"].frame)
+            let toolbarRadius = editProject.frame.width / 2
+            XCTAssertEqual(back.frame.midX, cardsWidth.minX + toolbarRadius, accuracy: 2)
+            XCTAssertEqual(editProject.frame.midX, cardsWidth.maxX - toolbarRadius, accuracy: 1)
+        }
         editProject.tap()
         let projectEditor = app.navigationBars["Edit project"]
         XCTAssertTrue(projectEditor.waitForExistence(timeout: 5))
@@ -1020,8 +1043,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertTrue(app.buttons["main-tab-research"].isHittable)
             XCTAssertTrue(app.buttons["main-tab-search"].isHittable)
             XCTAssertFalse(root.isHittable)
+            keepScreenshot(named: "\(title) with project tabs", from: app)
             if section == "notebook" {
-                keepScreenshot(named: "Notes page with project tabs", from: app)
                 app.buttons["main-tab-reader"].tap()
                 XCTAssertTrue(app.buttons["reader-session-primary"].waitForExistence(timeout: 15))
                 app.buttons["main-tab-saved"].tap()
@@ -5036,6 +5059,13 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             object: element
         )
         return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+    }
+
+    private func assertFloatingMenuWidth(_ frame: CGRect, in app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        guard #available(iOS 26.0, *), UIDevice.current.userInterfaceIdiom == .phone else { return }
+        // The visible edges of the four-button iPhone glass bar are 21 points in.
+        XCTAssertEqual(frame.minX, app.frame.minX + 21, accuracy: 1, file: file, line: line)
+        XCTAssertEqual(frame.maxX, app.frame.maxX - 21, accuracy: 1, file: file, line: line)
     }
 
     private func reveal(

@@ -537,6 +537,7 @@ private struct ResearchSessionView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
+    @Environment(\.tabNavigationHorizontalInset) private var tabNavigationHorizontalInset
     @Environment(\.purchase) private var purchase
     @Environment(\.scenePhase) private var scenePhase
     @Namespace private var conversationZoomNamespace
@@ -1122,6 +1123,7 @@ private struct ResearchSessionView: View {
     private var historyView: some View {
         let orderedSummaries = ResearchHistoryPresentation.ordered(visibleHistory)
         let groups = ResearchHistoryPresentation.GroupLabels()
+        let rowInset = CodeScreenMetrics.bottomControlHorizontalPadding - tabNavigationHorizontalInset
         return List {
             if projectFolderID == nil {
                 historyProjectFilter
@@ -1157,7 +1159,7 @@ private struct ResearchSessionView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .padding(.top, index == 0 ? 0 : 20)
-                        .listRowInsets(EdgeInsets(top: 12, leading: 22, bottom: 8, trailing: 22))
+                        .listRowInsets(EdgeInsets(top: 12, leading: rowInset, bottom: 8, trailing: rowInset))
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                 }
@@ -1213,7 +1215,7 @@ private struct ResearchSessionView: View {
                     }
                 }
                 .disabled(deletingConversationID == item.id || isDeletingHistoryBatch || isSending || isUpdatingPin)
-                .listRowInsets(EdgeInsets(top: 0, leading: 22, bottom: 0, trailing: 10))
+                .listRowInsets(EdgeInsets(top: 0, leading: rowInset, bottom: 0, trailing: rowInset))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.visible, edges: .bottom)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -1364,7 +1366,7 @@ private struct ResearchSessionView: View {
                     }
                 }
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
-                .padding(.horizontal, 16)
+                .codeTabAlignedHorizontalPadding()
                 .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
             }
             .codePinnedTopBar { researchConversationHeader(conversation) }
