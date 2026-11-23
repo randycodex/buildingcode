@@ -706,6 +706,10 @@ final class RichTextView: UITextView {
         drawChapterSelection()
     }
 
+    func containsChapterSelection(at point: CGPoint) -> Bool {
+        chapterSelectionLayer?.path?.contains(point) == true
+    }
+
     private func drawChapterSelection() {
         chapterSelectionSize = bounds.size
         guard let range = chapterSelectionRange,
@@ -764,9 +768,9 @@ final class RichTextView: UITextView {
             queue: .main
         ) { [weak self] _ in
             guard let self, self.selectedRange.length > 0 else { return }
+            self.chapterSelectionTarget?.controller.clearNativeSelection(in: self)
             self.selectedRange = NSRange(location: 0, length: 0)
             self.selectionChangeHandler?(false)
-            self.chapterSelectionTarget?.controller.nativeSelectionDidEnd(in: self)
         }
     }
 
@@ -780,9 +784,9 @@ final class RichTextView: UITextView {
             queue: .main
         ) { [weak self] _ in
             guard let self, self.selectedRange.length > 0 else { return }
+            self.chapterSelectionTarget?.controller.clearNativeSelection(in: self)
             self.selectedRange = NSRange(location: 0, length: 0)
             self.selectionChangeHandler?(false)
-            self.chapterSelectionTarget?.controller.nativeSelectionDidEnd(in: self)
         }
     }
 
@@ -812,9 +816,9 @@ final class RichTextView: UITextView {
 
     @objc private func handleTap(_ recognizer: UITapGestureRecognizer) {
         if selectedRange.length > 0 {
+            chapterSelectionTarget?.controller.clearNativeSelection(in: self)
             selectedRange = NSRange(location: 0, length: 0)
             selectionChangeHandler?(false)
-            chapterSelectionTarget?.controller.nativeSelectionDidEnd(in: self)
             return
         }
 

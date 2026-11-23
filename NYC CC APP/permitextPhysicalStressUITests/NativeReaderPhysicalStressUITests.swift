@@ -4370,12 +4370,34 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let start = element(in: app, identifier: "reader-selection-start-handle")
         let end = element(in: app, identifier: "reader-selection-end-handle")
         XCTAssertTrue(end.wait(for: \.isHittable, toEqual: true, timeout: 8), app.debugDescription)
+
+        func scrollAwayAndBack() {
+            let originalY = first.frame.minY
+            let bottom = app.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.75))
+            let top = app.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.24))
+            bottom.press(forDuration: 0.05, thenDragTo: top, withVelocity: .slow, thenHoldForDuration: 0)
+            XCTAssertTrue(!first.isHittable || first.frame.minY < originalY - 120,
+                          "The scroll must move the selected text out of view.")
+            top.press(forDuration: 0.05, thenDragTo: bottom, withVelocity: .slow, thenHoldForDuration: 0)
+            XCTAssertTrue(start.wait(for: \.isHittable, toEqual: true, timeout: 8), app.debugDescription)
+            XCTAssertTrue(end.isHittable)
+        }
+
+        scrollAwayAndBack()
         let upperLine = second.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.24))
         end.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
             .press(forDuration: 0.05, thenDragTo: upperLine, withVelocity: .slow, thenHoldForDuration: 0)
         XCTAssertTrue(end.wait(for: \.isHittable, toEqual: true, timeout: 8))
+        XCTAssertGreaterThan(end.frame.midY, second.frame.minY)
+        scrollAwayAndBack()
         let newY = end.frame.midY
-        XCTAssertGreaterThan(newY, second.frame.minY)
+        XCTAssertGreaterThan(newY, second.frame.minY, "Scrolling must preserve the end in the second subsection.")
+        let ask = app.menuItems["Ask Assistant"].firstMatch
+        XCTAssertFalse(ask.exists, "Scrolling should dismiss the menu while keeping the selection.")
+        let secondFrame = second.frame
+        screen.withOffset(CGVector(dx: secondFrame.minX + secondFrame.width * 0.18,
+                                   dy: secondFrame.minY + secondFrame.height * 0.08)).tap()
+        XCTAssertTrue(ask.waitForExistence(timeout: 8), app.debugDescription)
 
         let lowerLine = second.coordinate(withNormalizedOffset: CGVector(dx: 0.55, dy: 0.7))
         end.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
@@ -4393,7 +4415,6 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(end.frame.midY, endY, accuracy: 1)
         keepScreenshot(named: "Chapter selection adjusted with both handles", from: app)
 
-        let ask = app.menuItems["Ask Assistant"].firstMatch
         XCTAssertTrue(ask.waitForExistence(timeout: 10), app.debugDescription)
         ask.tap()
         let excerpts = app.buttons["2 selected passages"]

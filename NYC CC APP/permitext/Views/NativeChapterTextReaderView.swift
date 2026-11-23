@@ -156,7 +156,10 @@ struct NativeChapterTextReaderView: View {
         }
         .onChange(of: dynamicTypeSize) { _, _ in releaseRestorationLease(reason: "dynamic-type") }
         .onChange(of: library.readerTheme) { _, _ in releaseRestorationLease(reason: "theme") }
-        .onChange(of: route.id) { _, _ in releaseRestorationLease(reason: "route") }
+        .onChange(of: route.id) { _, _ in
+            scrollState.chapterSelection.clear()
+            releaseRestorationLease(reason: "route")
+        }
         .onDisappear {
             scrollState.chapterSelection.clear()
             releaseRestorationLease(reason: "disappear")
