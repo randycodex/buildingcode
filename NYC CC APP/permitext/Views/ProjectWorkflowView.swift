@@ -63,7 +63,7 @@ struct ProjectWorkflowView: View {
                     Text(tab.title).tag(tab)
                 }
             }
-            .pickerStyle(.segmented)
+            .codeOpaqueSegmentedPicker()
             .disabled(isEditing)
             .accessibilityIdentifier("project-review-tabs")
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)

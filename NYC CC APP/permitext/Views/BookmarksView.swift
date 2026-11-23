@@ -1241,7 +1241,7 @@ private struct ProjectOverviewView: View {
                 Text("Context").tag(ProjectOverviewTab.context)
                 Text("Zoning").tag(ProjectOverviewTab.zoning)
             }
-            .pickerStyle(.segmented)
+            .codeOpaqueSegmentedPicker()
             .disabled(isEditing)
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
             .padding(.top, 8)

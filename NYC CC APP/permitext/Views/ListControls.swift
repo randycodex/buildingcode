@@ -179,6 +179,11 @@ struct CodeSearchBar<Field: View>: View {
 }
 
 extension View {
+    func codeOpaqueSegmentedPicker() -> some View {
+        pickerStyle(.segmented)
+            .background(CodeAppBackdrop.color, in: Capsule())
+    }
+
     @ViewBuilder
     func codeSoftTopScrollEdges() -> some View {
         if #available(iOS 26.0, *) {
