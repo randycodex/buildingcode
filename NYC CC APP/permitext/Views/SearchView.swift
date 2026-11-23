@@ -12,16 +12,23 @@ struct SearchSessionSnapshot: Codable, Equatable, Sendable {
 
     static let cacheScope = "search-session"
 
+    // A fresh process restores the recent passages list position only.
+    private struct HistoryPosition: Codable, Sendable {
+        var historyPositionID: String?
+    }
+
     static func canRestoreQuery(original: String, current: String, originalGeneration: UInt64, currentGeneration: UInt64) -> Bool {
         original == current && originalGeneration == currentGeneration
     }
 
     static func load(cache: ProjectHubOfflineCache, accountID: String, version: String) throws -> Self {
-        try cache.load(Self.self, accountID: accountID, projectID: version, scope: cacheScope)?.value ?? Self()
+        let history = try cache.load(HistoryPosition.self, accountID: accountID, projectID: version, scope: cacheScope)
+        return Self(historyPositionID: history?.value.historyPositionID)
     }
 
     func save(cache: ProjectHubOfflineCache, accountID: String, version: String) throws {
-        try cache.store(self, accountID: accountID, projectID: version, scope: Self.cacheScope)
+        try cache.store(HistoryPosition(historyPositionID: historyPositionID),
+            accountID: accountID, projectID: version, scope: Self.cacheScope)
     }
 }
 
@@ -31,8 +38,9 @@ enum RunningSearchSessions {
     static var nextRevision: UInt64 = 0
     static var deletionGenerations: [String: UInt64] = [:]
 
-    static func save(_ snapshot: SearchSessionSnapshot, accountID: String, scope: String) {
+    static func save(_ snapshot: SearchSessionSnapshot, accountID: String, scope: String, historyPositionChanged: Bool) {
         snapshots[scope] = snapshot
+        guard historyPositionChanged else { return }
         nextRevision &+= 1
         let revision = nextRevision
         Task { await SearchSessionPersistence.shared.save(snapshot, accountID: accountID, revision: revision) }
@@ -65,7 +73,9 @@ actor SearchSessionPersistence {
 
     func load(accountID: String) -> SearchSessionSnapshot {
         guard !cache.isAccountDeleted(accountID: accountID) else { return SearchSessionSnapshot() }
-        if let snapshot = pending[accountID] { return snapshot }
+        if let snapshot = pending[accountID] {
+            return SearchSessionSnapshot(historyPositionID: snapshot.historyPositionID)
+        }
         return (try? SearchSessionSnapshot.load(cache: cache, accountID: accountID, version: Self.version)) ?? SearchSessionSnapshot()
     }
 
@@ -80,7 +90,7 @@ actor SearchSessionPersistence {
         guard revision > (revisions[accountID] ?? 0) else { return }
         revisions[accountID] = revision
         pending[accountID] = snapshot
-        // Coalesce rapid typing/scroll updates; clearing the field is a real save.
+        // Coalesce rapid scroll updates to the recent passages list.
         if !flushImmediately { try? await Task.sleep(for: .milliseconds(100)) }
         guard revisions[accountID] == revision, pending[accountID] != nil else { return }
         defer { pending.removeValue(forKey: accountID) }
@@ -754,8 +764,8 @@ struct SearchView: View {
         }
         guard !Task.isCancelled, sessionScope == requestedScope,
               RunningSearchSessions.deletionGenerations[requestedAccountID, default: 0] == deletionGeneration else { return }
-        // Typing or opening a recent passage while disk restoration is pending
-        // must win over the old query, which would cancel that opening.
+        // Typing or opening a recent passage while history restoration is
+        // pending must take precedence over restoring the list position.
         if !SearchSessionSnapshot.canRestoreQuery(original: originalQuery, current: query,
             originalGeneration: originalQueryGeneration, currentGeneration: queryEditGeneration) ||
             originalOpeningGeneration != openingGeneration {
@@ -790,7 +800,8 @@ struct SearchView: View {
         let snapshot = SearchSessionSnapshot(query: query, codeSectionIDs: searchFilterCodeSectionIDs,
             resultPositionID: resultPositionID, historyPositionID: historyPositionID, selectedResultID: selectedResultID, selectedResultIdentity: selectedResultIdentity)
         guard snapshot != lastSavedSession else { return }
-        RunningSearchSessions.save(snapshot, accountID: sessionAccountID, scope: sessionScope)
+        RunningSearchSessions.save(snapshot, accountID: sessionAccountID, scope: sessionScope,
+            historyPositionChanged: snapshot.historyPositionID != lastSavedSession.historyPositionID)
         lastSavedSession = snapshot
         sessionStorageMessage = nil
     }

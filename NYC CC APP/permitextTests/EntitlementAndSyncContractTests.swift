@@ -6003,21 +6003,24 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
-    func testSearchSessionRestoresQueryAndFiltersByAccountAndEdition() throws {
+    func testSearchSessionRelaunchRestoresOnlyHistoryPositionByAccountAndEdition() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         let cache = ProjectHubOfflineCache(directoryURL: directory)
         let saved = SearchSessionSnapshot(query: "concrete", codeSectionIDs: [1, 3],
             resultPositionID: "result:1454", historyPositionID: "history:25", selectedResultID: 1454)
-        let legacy = try JSONDecoder().decode(SearchSessionSnapshot.self, from: Data(#"{"query":"old","codeSectionIDs":[1]}"#.utf8))
-        XCTAssertEqual(legacy.query, "old")
-        XCTAssertNil(legacy.resultPositionID)
+        try cache.store(saved, accountID: "a", projectID: "2022", scope: SearchSessionSnapshot.cacheScope)
+        let expected = SearchSessionSnapshot(historyPositionID: "history:25")
+        XCTAssertEqual(try SearchSessionSnapshot.load(cache: cache, accountID: "a", version: "2022"), expected)
         try saved.save(cache: cache, accountID: "a", version: "2022")
         let reopened = ProjectHubOfflineCache(directoryURL: directory)
-        XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "2022"), saved)
+        let encoded = try XCTUnwrap(reopened.load([String: String].self, accountID: "a",
+            projectID: "2022", scope: SearchSessionSnapshot.cacheScope))
+        XCTAssertEqual(encoded.value, ["historyPositionID": "history:25"])
+        XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "2022"), expected)
         XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "b", version: "2022"), SearchSessionSnapshot())
         XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "2014"), SearchSessionSnapshot())
-        let other = SearchSessionSnapshot(query: "stairs", codeSectionIDs: [2])
+        let other = SearchSessionSnapshot(historyPositionID: "history:53")
         try other.save(cache: reopened, accountID: "b", version: "2022")
         try SearchSessionSnapshot().save(cache: reopened, accountID: "a", version: "2022")
         XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "2022"), SearchSessionSnapshot())
@@ -6038,9 +6041,9 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             let cacheURL = ProjectHubOfflineCache.defaultDirectoryURL(in: support)
             XCTAssertEqual(cacheURL.deletingLastPathComponent().lastPathComponent, spelling)
             let cache = ProjectHubOfflineCache(directoryURL: cacheURL)
-            try SearchSessionSnapshot(query: "retained").save(cache: cache, accountID: "a", version: "v")
+            try SearchSessionSnapshot(historyPositionID: "history:25").save(cache: cache, accountID: "a", version: "v")
             let reopened = ProjectHubOfflineCache(directoryURL: ProjectHubOfflineCache.defaultDirectoryURL(in: support))
-            XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "v").query, "retained")
+            XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "v").historyPositionID, "history:25")
         }
     }
 

@@ -56,7 +56,7 @@ struct RecentEntry { let historyIdentity: String }
 @MainActor enum RunningSearchSessions {
  static var snapshots: [String: SearchSessionSnapshot] = [:]
  static var deletionGenerations: [String: UInt64] = [:]
- static func save(_ snapshot: SearchSessionSnapshot, accountID: String, scope: String) { snapshots[scope] = snapshot }
+ static func save(_ snapshot: SearchSessionSnapshot, accountID: String, scope: String, historyPositionChanged: Bool) { snapshots[scope] = snapshot }
 }
 actor SearchSessionPersistence {
  static let shared = SearchSessionPersistence()
@@ -223,7 +223,7 @@ actor SearchSessionPersistence {
   while await SearchSessionPersistence.shared.reads == 0 { await Task.yield() }
   let index = PreparedSearchReaderDestination.requests.count
   cold.open(old); await settle()
-  var saved = SearchSessionSnapshot(); saved.query = "old disk query"
+  var saved = SearchSessionSnapshot()
   saved.historyPositionID = "history:stale-disk-position"
   await SearchSessionPersistence.shared.finish(saved)
   await restoring.value
@@ -234,6 +234,7 @@ actor SearchSessionPersistence {
 
   // Normal restoration still retains the query, selected result and return position.
   let restored = SearchProbe(); restored.restoredSessionScope = nil
+  saved.query = "concrete"
   saved.resultPositionID = "result:2022:7"; saved.selectedResultID = 7
   saved.selectedResultIdentity = "2022:7"
   RunningSearchSessions.snapshots[restored.sessionScope] = saved

@@ -598,6 +598,48 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testSearchClearsQueryAfterProcessRelaunch() throws {
+#if !DEBUG
+        throw XCTSkip("Search relaunch uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
+                               "--history-layout-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        let ready = element(in: app, identifier: "phase3-research-fixture-ready")
+        XCTAssertTrue(ready.waitForExistence(timeout: 45))
+        let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+            "saved-folder-", "Acceptance Project")).firstMatch
+        if project.isHittable { project.tap() }
+        let search = app.buttons["main-tab-search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 15))
+        search.tap()
+        let field = app.textFields["Search codes"]
+        XCTAssertTrue(field.waitForExistence(timeout: 15))
+        let clear = app.buttons["Clear search"]
+        if clear.isHittable { clear.tap() }
+        field.tap()
+        field.typeText("concrete")
+        app.keyboards.buttons["Search"].tap()
+        XCTAssertEqual(field.value as? String, "concrete")
+        app.buttons["main-tab-reader"].tap()
+        search.tap()
+        XCTAssertEqual(field.value as? String, "concrete")
+
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(ready.waitForExistence(timeout: 45))
+        if project.isHittable { project.tap() }
+        XCTAssertTrue(search.waitForExistence(timeout: 15))
+        search.tap()
+        let recent = app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "search-recent-passage-")).firstMatch
+        XCTAssertTrue(recent.waitForExistence(timeout: 15))
+        XCTAssertEqual(field.value as? String, "Search codes")
+        XCTAssertFalse(clear.exists)
+#endif
+    }
+
     func testSearchHistoryRowsStayCompactAndSourcesUseIcon() throws {
 #if !DEBUG
         throw XCTSkip("Search layout uses the isolated Debug fixture.")
