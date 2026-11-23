@@ -348,7 +348,7 @@
   "devDependencies": {
     "@vercel/routing-utils": "6.6.1",
     "@vitejs/plugin-react": "^6.1.1",
-    "parse5": "^8.0.0",
+    "parse5": "^8.1.1",
     "vite": "^8.3.1"
   }
 }
