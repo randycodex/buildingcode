@@ -48,7 +48,7 @@ globalThis.fetch=async(url,options)=>{
    assertSelectedFigure(content);
    assert.match(content[1].text,/PASSAGE_ID S1/);
    assert.equal(JSON.parse(content[0].text).attachedPassages[0].id,'S1');
-   output=figureCalls===1?[{type:'function_call',call_id:'figure-source',name:'read_library',arguments:'{"sectionIDs":["S1"]}'}]:text('The selected fire district map accompanies this code passage. [S1]');
+   output=figureCalls===1?[{type:'function_call',call_id:'figure-source',name:'read_library',arguments:'{"sectionIDs":["S1"]}'}]:text('The official chapter figure accompanies this code passage. [S1]');
   }
   else if(body.input.at(-1).type==='function_call_output'){const r=JSON.parse(body.input.at(-1).output);if(r.candidates)output=[{type:'function_call',call_id:'read-1',name:'read_library',arguments:JSON.stringify({sectionIDs:[r.candidates[0].id]})}];else output=text(r.sources?.[0]?.id?.startsWith('S')?'A retrieved rule. [S1]':'The public source says this. [W1]');}
   else if(JSON.parse(body.input[0].content).question==='Find provisions')output=[{type:'function_call',call_id:'library-1',name:'search_library',arguments:JSON.stringify({query:'2022 NYC BC 1007.1.1 403.5.1 remoteness interior exit stairways'})}];
@@ -98,23 +98,47 @@ try{
  const oldClient=await post('/research/conversations/message',{conversationID:conversation.id,question:'Summarize project facts.',requestID:'old-client-no-mode',expectedRevision:conversation.revision,expectedEvidenceSetVersion:conversation.evidenceSetVersion||1});assert.equal(oldClient.conversation.messages.at(-1).answer.researchEngine,'assistant-luna-20261116-v1');
  assert.equal(figureCounts,0,'Text-only Assistant turns do not call image token counting');
 
- const reviewed=await post('/research/selections/review',{sectionID:'6881',
-  selectedText:'Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the "fire district maps" as per Figures D106.1(1) and D106.1(2).'});
+ const mapPassage={sectionID:'6881',
+  selectedText:'Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the "fire district maps" as per Figures D106.1(1) and D106.1(2).'};
+ const reviewed=await post('/research/selections/review',mapPassage);
  assert.equal(reviewed.requiresVisualReview,true);
- assert(reviewed.visualSources.length>1);
- const figure=reviewed.visualSources[0];figureHash=figure.contentHash;
+ assert(reviewed.visualSources.length>reviewed.maximumVisualSelections);
+ const figure=reviewed.visualSources[0];
  const readerSelection={...reviewed.selection,visualSourceIDs:[figure.id],visualReviewConfirmed:true};
  await post('/research/conversations/create',{analysisMode:'conversation_only',originSurface:'ios-reader',selections:[reviewed.selection]},400);
  await post('/research/conversations/create',{analysisMode:'conversation_only',originSurface:'ios-reader',
   selections:[{...readerSelection,visualSourceIDs:['visual-source-client-forgery']}]},400);
- conversation=(await post('/research/conversations/create',{analysisMode:'conversation_only',originSurface:'ios-reader',selections:[readerSelection]},201)).conversation;
- const figureAnswer=(await send('Describe the attached map and cite its source.','experimental','reader-figure')).conversation.messages.at(-1);
+ const manual=(await post('/research/conversations/create',{analysisMode:'conversation_only',originSurface:'ios-reader',selections:[readerSelection]},201)).conversation;
+ assert(manual.sources[0].visualReviewConfirmedAt,'Old clients retain a true manual approval timestamp');
+
+ const maps=await post('/research/selections/review',{...mapPassage,includeOfficialFigures:true});
+ assert.equal(maps.requiresVisualReview,false);
+ const mapConversation=(await post('/research/conversations/create',{analysisMode:'conversation_only',originSurface:'ios-reader',selections:[maps.selection]},201)).conversation;
+ assert.deepEqual(mapConversation.sources[0].visualSources,[],'A large map series is never silently sampled');
+ assert(mapConversation.sources[0].visualEvidenceNotice);
+
+ const official=await post('/research/selections/review',{sectionID:'12339',selectedText:'Suds pressure zone',includeOfficialFigures:true});
+ assert.equal(official.requiresVisualReview,false);
+ assert.equal(official.selection.includeOfficialFigures,true);
+ assert.equal(official.visualSources.length,1);
+ figureHash=official.visualSources[0].contentHash;
+ await post('/research/conversations/create',{originSurface:'ios-reader',selections:[official.selection]},400);
+ await post('/research/conversations/create',{analysisMode:'conversation_only',originSurface:'ios-reader',
+  selections:[{...official.selection,visualSourceIDs:[official.visualSources[0].id],visualReviewConfirmed:true}]},400);
+ const created=(await post('/research/conversations/create',{analysisMode:'conversation_only',originSurface:'ios-reader',selections:[official.selection]},201)).conversation;
+ assert.equal(created.sources[0].attachedFigureCount,1);
+ assert.equal(created.sources[0].visualReviewConfirmedAt,null,'Automatic attachment never claims manual review');
+ assert.equal(created.sources[0].visualSources[0].contentHash,figureHash);
+ conversation=(await post('/research/conversations/evidence',{conversationID:mapConversation.id,selections:[official.selection],originSurface:'ios-reader'})).conversation;
+ assert.equal(conversation.sources.find(source=>source.sectionID==='12339').attachedFigureCount,1);
+ conversation=created;
+ const figureAnswer=(await send('Describe the attached figure and cite its source.','experimental','reader-figure')).conversation.messages.at(-1);
  assert.equal(figureCounts,1,'Repeated model calls in one turn reuse the image token count');
  assert.equal(figureCalls,2,'The figure remains available after a library tool call');
- assert.equal(figureAnswer.answer.citations[0].sectionID,'6881');
+ assert.equal(figureAnswer.answer.citations[0].sectionID,'12339');
  const figureRecord=(await post('/research/answers/get',{answerID:figureAnswer.id})).answer;
  assert.deepEqual(figureRecord.evidence[0].visualSources.map(image=>image.contentHash),[figureHash]);
- await send('Describe the attached map and cite its source.','experimental','reader-figure');
+ await send('Describe the attached figure and cite its source.','experimental','reader-figure');
  assert.deepEqual([figureCounts,figureCalls],[1,2],'Replaying the turn does not count or analyze the figure twice');
  if(production){const usage=await postgres.sql`SELECT count(*)::int AS n FROM permitext_research_usage WHERE user_id=${userID} AND mode='openai'`;assert(Number(usage[0].n)>0,'Hosted Assistant uses durable application accounting');}
  console.log('PASS Assistant HTTP: selected official chapter image reaches the multimodal request, with token counting, citation and replay; default engine and text flows also pass. No paid calls.');

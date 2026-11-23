@@ -495,7 +495,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             ResearchSelectionReviewRequest(
                 auth: authContext(for: account),
                 sectionID: selection.sectionID,
-                selectedText: selection.selectedText
+                selectedText: selection.selectedText,
+                includeOfficialFigures: true
             )
         )
     }

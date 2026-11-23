@@ -82,8 +82,8 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
 }
 
 enum ResearchTrustCopy {
-    static let composerPrivacyDisclosure = "Assistant sends your question, recent conversation, and any Reader passages and chapter figures you select to OpenAI. When enabled, Project context and facts are sent too. Private notes are not included. Do not include confidential, regulated, or sensitive personal information."
-    static let firstUseDisclosure = "per codes sends your question, recent conversation, and any Reader passages and chapter figures you select to OpenAI. When enabled, Project context and facts are sent too. Private notes are not included."
+    static let composerPrivacyDisclosure = "Assistant sends your question, recent conversation, and selected Reader passages with any attached chapter figures to OpenAI. When enabled, Project context and facts are sent too. Private notes are not included. Do not include confidential, regulated, or sensitive personal information."
+    static let firstUseDisclosure = "per codes sends your question, recent conversation, and selected Reader passages with any attached chapter figures to OpenAI. When enabled, Project context and facts are sent too. Private notes are not included."
     static let visualEvidenceDisclosure = "Selected official images are sent to OpenAI for analysis."
     static let copyAnswerAction = "Copy answer"
     static let reportProblemAction = "Report a problem"
@@ -1624,9 +1624,13 @@ private struct ResearchSessionView: View {
     }
 
     private func evidenceSummary(_ sources: [ResearchSource]) -> some View {
-        DisclosureGroup {
+        let selected = sources.filter { $0.kind == "selection" }
+        let figureCount = selected.reduce(0) { $0 + ($1.attachedFigureCount ?? 0) }
+        let passages = "\(selected.count) selected passage\(selected.count == 1 ? "" : "s")"
+        let title = figureCount > 0 ? "\(passages) · \(figureCount) figure\(figureCount == 1 ? "" : "s")" : passages
+        return DisclosureGroup {
             VStack(alignment: .leading, spacing: 12) {
-                ForEach(sources.filter { $0.kind == "selection" }) { source in
+                ForEach(selected) { source in
                     VStack(alignment: .leading, spacing: 4) {
                         Text([source.codePrefix, source.sectionNumber.map { "§ \($0)" }].compactMap { $0 }.joined(separator: " "))
                             .font(.caption.weight(.bold))
@@ -1637,12 +1641,17 @@ private struct ResearchSessionView: View {
                                 .foregroundStyle(.secondary)
                                 .lineLimit(5)
                         }
+                        if let notice = source.visualEvidenceNotice {
+                            Text(notice)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
             .padding(.top, 8)
         } label: {
-            Label("\(sources.filter { $0.kind == "selection" }.count) selected passage\(sources.filter { $0.kind == "selection" }.count == 1 ? "" : "s")", systemImage: "text.quote")
+            Label(title, systemImage: "text.quote")
                 .font(.subheadline.weight(.semibold))
         }
         .padding(12)

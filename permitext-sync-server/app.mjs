@@ -12292,9 +12292,9 @@ function researchSourceFromEvidence(evidence, options = {}) {
     richSourceRowCount: richSource?.rowCount || null,
     richSourceGrids: richSource?.grids || null,
     visualSources,
-    visualReviewConfirmedAt: visualSources.length
-      ? options.visualReviewConfirmedAt || new Date().toISOString()
-      : null,
+    visualReviewConfirmedAt: options.visualReviewConfirmedAt ?? null,
+    ...(visualSources.length ? { attachedFigureCount: visualSources.length } : {}),
+    ...(options.visualEvidenceNotice ? { visualEvidenceNotice: options.visualEvidenceNotice } : {}),
     sectionTextHash: evidence.sectionTextHash,
     jurisdiction: evidence.jurisdiction || "New York City",
     codeVersion: evidence.codeVersion || defaultSyncCodeVersion,
@@ -12442,16 +12442,19 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     }
     return source;
   });
-  const visualSourceIDs = requestedVisualSourceIDs(
-    options.visualSourceIDs,
-    options.visualReviewConfirmed
-  );
+  const automaticFigures = options.includeOfficialFigures === true;
+  const visualSourceIDs = automaticFigures
+    ? automaticResearchFigureIDs(primary.visualSources)
+    : requestedVisualSourceIDs(options.visualSourceIDs, options.visualReviewConfirmed);
+  const visualEvidenceNotice = automaticFigures && primary.visualSources.length && !visualSourceIDs.length
+    ? "This section’s figures could not be attached together. Assistant can use the selected passage text."
+    : null;
   const diagnosticStructuredTextOnly =
     unapprovedZoningDiagnosticEnabled() &&
     primary.codePrefix === "ZR" &&
     options.visualReviewDisposition === "diagnostic-structured-text-only" &&
     requestedRichSources.every((source) => source.kind === "table");
-  if (primary.visualSources.length && !visualSourceIDs.length && !diagnosticStructuredTextOnly) {
+  if (primary.visualSources.length && !visualSourceIDs.length && !automaticFigures && !diagnosticStructuredTextOnly) {
     const error = new Error(
       "per codes detected official visual evidence elsewhere in this enacted section. " +
       "Use Find Relevant Evidence to review and explicitly select any applicable visuals before analysis; " +
@@ -12482,14 +12485,15 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     throw error;
   }
   const related = await relatedResearchEvidence(primary);
-  const visualReviewConfirmedAt = requestedVisualSources.length
+  const visualReviewConfirmedAt = requestedVisualSources.length && !automaticFigures
     ? new Date().toISOString()
     : null;
   const selectionSources = [
     researchSourceFromEvidence(primary, {
       kind: "selection",
       relationship: requestedVisualSources.length
-        ? `${requestedVisualSources.length} official visual ${requestedVisualSources.length === 1 ? "source" : "sources"} reviewed and selected by you`
+        ? (automaticFigures ? "Official figures automatically attached from the selected section"
+          : `${requestedVisualSources.length} official visual ${requestedVisualSources.length === 1 ? "source" : "sources"} reviewed and selected by you`)
         : diagnosticStructuredTextOnly
         ? "Structured official text selected for a bounded Zoning diagnostic; unselected visuals remain excluded"
         : exactRichSource
@@ -12498,7 +12502,8 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
       selectedText: canonicalSelection,
       richSource: exactRichSource,
       visualSources: requestedVisualSources,
-      visualReviewConfirmedAt
+      visualReviewConfirmedAt,
+      visualEvidenceNotice
     })
   ];
   for (const richSource of requestedRichSources) {
@@ -12514,6 +12519,15 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     ...selectionSources,
     ...related.map((evidence) => researchSourceFromEvidence(evidence))
   ];
+}
+
+function automaticResearchFigureIDs(sources) {
+  // Include the complete set from the canonical section. An arbitrary subset
+  // could show the wrong map or leave out pages of a figure.
+  if (sources.length > evidenceDiscoveryMaximumVisualSelections ||
+    sources.some(source => !["image/gif", "image/jpeg", "image/png", "image/webp"].includes(source.mediaType)) ||
+    sources.reduce((total, source) => total + source.byteLength, 0) > maximumResearchVisualEvidenceBytes) return [];
+  return sources.map(source => source.id);
 }
 
 async function researchSourcesForSectionReference(sectionID) {
@@ -12548,6 +12562,7 @@ function requestedResearchSelections(body) {
       selectionMode: selection.selectionMode,
       selectedText: selection.selectedText,
       richSourceIDs: selection.richSourceIDs ?? (body.selections.length === 1 ? body.richSourceIDs : undefined),
+      includeOfficialFigures: selection.includeOfficialFigures,
       visualSourceIDs: selection.visualSourceIDs ?? (body.selections.length === 1 ? body.visualSourceIDs : undefined),
       visualReviewConfirmed: selection.visualReviewConfirmed ??
         (body.selections.length === 1 ? body.visualReviewConfirmed : undefined),
@@ -12563,12 +12578,21 @@ function requestedResearchSelections(body) {
       selectionMode: body.selectionMode,
       selectedText: body.selectedText,
       richSourceIDs: body.richSourceIDs,
+      includeOfficialFigures: body.includeOfficialFigures,
       visualSourceIDs: body.visualSourceIDs,
       visualReviewConfirmed: body.visualReviewConfirmed,
       savedItemID: String(body.savedItemID || "").trim()
     }];
   }
   for (const selection of selections) {
+    if (selection.includeOfficialFigures !== undefined && (
+      typeof selection.includeOfficialFigures !== "boolean" || selection.includeOfficialFigures &&
+        (selection.visualSourceIDs !== undefined || selection.visualReviewConfirmed !== undefined || selection.visualReviewDisposition !== undefined)
+    )) {
+      const error = new Error("Automatic figures and manual visual review cannot be combined.");
+      error.code = "INVALID_RESEARCH_SELECTION";
+      throw error;
+    }
     if (selection.selectionMode !== undefined && selection.selectionMode !== "section_reference" && selection.selectionMode !== "passage") {
       const error = new Error("The Research selection mode is invalid.");
       error.code = "INVALID_RESEARCH_SELECTION";
@@ -12577,7 +12601,8 @@ function requestedResearchSelections(body) {
     if (selection.selectionMode === "section_reference" && (
       selection.selectedText !== undefined && selection.selectedText !== null && selection.selectedText !== "" ||
       selection.richSourceIDs !== undefined || selection.visualSourceIDs !== undefined ||
-      selection.visualReviewConfirmed !== undefined || selection.visualReviewDisposition !== undefined || selection.savedItemID
+      selection.visualReviewConfirmed !== undefined || selection.visualReviewDisposition !== undefined ||
+      selection.includeOfficialFigures === true || selection.savedItemID
     )) {
       const error = new Error("A section reference cannot claim a selected passage, structured source, visual review or saved passage.");
       error.code = "INVALID_RESEARCH_SELECTION";
@@ -12608,9 +12633,14 @@ function requestedResearchSelections(body) {
   return selections;
 }
 
-async function researchSourcesForSelections(selections, existingSources = []) {
+async function researchSourcesForSelections(selections, existingSources = [], { allowAutomaticFigures = false } = {}) {
   const resolvedBatches = [];
   for (const selection of selections) {
+    if (selection.includeOfficialFigures && !allowAutomaticFigures) {
+      const error = new Error("Automatic chapter figures are available when adding a Reader passage to Assistant.");
+      error.code = "INVALID_RESEARCH_SELECTION";
+      throw error;
+    }
     resolvedBatches.push(selection.selectionMode === "section_reference"
       ? await researchSourcesForSectionReference(selection.sectionID)
       : await researchSourcesForSelection(
@@ -12618,6 +12648,7 @@ async function researchSourcesForSelections(selections, existingSources = []) {
       selection.selectedText,
       {
         richSourceIDs: selection.richSourceIDs,
+        includeOfficialFigures: selection.includeOfficialFigures,
         visualSourceIDs: selection.visualSourceIDs,
         visualReviewConfirmed: selection.visualReviewConfirmed,
         visualReviewDisposition: selection.visualReviewDisposition
@@ -12846,6 +12877,7 @@ function selectedResearchEvidence(conversation, currentEvidence) {
         richSourceContentHash: richSource?.contentHash || null,
         richSourceRowCount: richSource?.rowCount || null,
         richSourceGrids: richSource?.grids || null,
+        visualEvidenceNotice: source.visualEvidenceNotice,
         visualSources: (source.visualSources || []).map((visualSource) => ({ ...visualSource }))
       } : null;
     })
@@ -18704,6 +18736,7 @@ async function handleResearchSelectionReview(request, response) {
       reviewed = await researchSelectionReview(context.body.sectionID, context.body.selectedText);
     }
     const { primary, canonicalSelection } = reviewed;
+    const automaticFigures = context.body.includeOfficialFigures === true && context.body.reviewMode !== "whole_section";
     if (context.body.codeVersion && primary.codeVersion !== context.body.codeVersion) {
       sendError(response, 409, "The source edition changed. Reopen the source in Reader."); return;
     }
@@ -18716,9 +18749,10 @@ async function handleResearchSelectionReview(request, response) {
         codePrefix: primary.codePrefix,
         sectionNumber: primary.sectionNumber,
         title: primary.title,
+        ...(automaticFigures ? { includeOfficialFigures: true } : {}),
         ...(context.body.reviewMode === "passage" ? { selectionMode: "passage" } : {})
       },
-      requiresVisualReview: primary.visualSources.length > 0,
+      requiresVisualReview: !automaticFigures && primary.visualSources.length > 0,
       maximumVisualSelections: evidenceDiscoveryMaximumVisualSelections,
       visualSources: primary.visualSources.map((source) => ({
         id: source.id,
@@ -19446,6 +19480,7 @@ function researchConversationCreateFingerprint({ projectID, selections, originSu
         maximumResearchSelectionCharacters
       ),
       richSourceIDs: requestedRichSourceIDs(selection.richSourceIDs).slice().sort(),
+      ...(selection.includeOfficialFigures ? { includeOfficialFigures: true } : {}),
       visualSourceIDs: requestedVisualSourceIDs(
         selection.visualSourceIDs,
         selection.visualReviewConfirmed
@@ -19515,7 +19550,7 @@ async function handleResearchConversationCreate(request, response) {
       }
       await validateResearchSavedSelections(context.userID, selections);
       const resolved = selections.length
-        ? await researchSourcesForSelections(selections)
+        ? await researchSourcesForSelections(selections, [], { allowAutomaticFigures: context.body.analysisMode === assistantScopeMode })
         : { sources: [], addedSelections: [] };
       if (resolved.addedSelections.length > 24) {
         sendError(response, 409, "This conversation would exceed the maximum of 24 selected passages.");
@@ -19659,7 +19694,8 @@ async function handleResearchConversationEvidence(request, response) {
     await validateResearchSavedSelections(context.userID, selections);
     const resolved = await researchSourcesForSelections(
       selections,
-      conversation.sources || []
+      conversation.sources || [],
+      { allowAutomaticFigures: isConversationOnly(conversation) && context.body.action !== "add_related" }
     );
     const existingSelectionCount = (conversation.sources || [])
       .filter((source) => source.kind === "selection").length;
@@ -21259,7 +21295,8 @@ async function handleResearchConversationMessage(request, response) {
         return { id:`S${index+1}`, sectionID:source.sectionID,
           edition:source.codeEdition, ...(requestedV2 ? {codeVersion:source.codeVersion,jurisdiction:source.jurisdiction} : {}),
           authority:"enacted", title:[source.codePrefix,source.sectionNumber,source.title].filter(Boolean).join(" "),
-          text, ...(tables.length ? {tables} : {}) };
+          text, ...(tables.length ? {tables} : {}),
+          ...(source.visualEvidenceNotice ? {visualEvidenceNotice:source.visualEvidenceNotice} : {}) };
       };
       const sources = await Promise.all(evidence.map(bindAnswerSource));
       const webDecision = conversationOnly ? {useWeb:false,reasons:[]} : researchWebSupportTrigger({question,

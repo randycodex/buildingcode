@@ -3778,7 +3778,8 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         ResearchSelectionReviewResponse(
             selection: ResearchSelectionRequest(
                 sectionID: request.sectionID,
-                selectedText: request.selectedText
+                selectedText: request.selectedText,
+                includeOfficialFigures: request.includeOfficialFigures
             ),
             requiresVisualReview: false,
             maximumVisualSelections: 4,

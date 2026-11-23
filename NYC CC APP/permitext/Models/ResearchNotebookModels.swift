@@ -51,12 +51,14 @@ struct ResearchSelectionRequest: Codable, Hashable, Sendable {
     var richSourceIDs: [String]? = nil
     var visualSourceIDs: [String]? = nil
     var visualReviewConfirmed: Bool? = nil
+    var includeOfficialFigures: Bool? = nil
 }
 
 struct ResearchSelectionReviewRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let sectionID: String
     let selectedText: String
+    var includeOfficialFigures: Bool? = nil
 }
 
 struct ResearchVisualSource: Codable, Hashable, Identifiable, Sendable {
@@ -378,6 +380,8 @@ struct ResearchSource: Codable, Hashable, Identifiable, Sendable {
     var title: String? = nil
     var codePrefix: String? = nil
     var selectedText: String? = nil
+    var attachedFigureCount: Int? = nil
+    var visualEvidenceNotice: String? = nil
 }
 
 struct ResearchMessageFailure: Codable, Hashable, Sendable {
