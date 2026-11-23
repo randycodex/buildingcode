@@ -497,10 +497,20 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             }
             XCTAssertEqual(firstAppendix.frame.minY, destinationY, accuracy: 5)
         }
+        moveFirstAppendix(to: browser.frame.midY)
+        let inlineAppendix = browser.staticTexts["reader-appendix-section-heading"]
+        XCTAssertTrue(inlineAppendix.isHittable)
+        XCTAssertEqual(inlineAppendix.label, "Appendix")
+        XCTAssertEqual(inlineAppendix.frame.minX, firstAppendix.frame.minX, accuracy: 2)
+        XCTAssertEqual(firstAppendix.frame.minY - inlineAppendix.frame.maxY, 12, accuracy: 2)
+        XCTAssertTrue(isPinned(chapters))
+        keepScreenshot(named: "Appendix heading directly above the cards", from: app)
+
         moveFirstAppendix(to: restingCardY + 14)
         XCTAssertTrue(isPinned(chapters), "Chapters should stay until Appendix A reaches the first chapter card's position")
         moveFirstAppendix(to: restingCardY - 14)
         XCTAssertTrue(isPinned(appendix), "The title should change as soon as Appendix A passes the first chapter card's position")
+        XCTAssertFalse(inlineAppendix.exists, "Only the pinned Appendix title should appear at the top")
         XCTAssertFalse(chapters.exists && chapters.frame.maxY > headingY + 3,
             "Chapters must leave the pinned title area when Appendix replaces it")
         let appendixY = appendix.frame.minY

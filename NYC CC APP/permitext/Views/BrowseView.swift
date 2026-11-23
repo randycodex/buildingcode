@@ -262,6 +262,9 @@ struct BrowseView: View {
             if showsGroupHeader {
                 codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
             }
+            if isAppendix {
+                ReaderAppendixSectionHeading()
+            }
             LazyVGrid(columns: columns, spacing: 12) {
                 ForEach(isAppendix ? group.appendixItems : group.chapterItems) { chapter in
                     chapterOpeningButton(chapter, kind: kind)
@@ -1976,6 +1979,25 @@ struct CodeMainScreenTitleLabel: View {
 enum ReaderBrowseHeading: String {
     case chapters = "Chapters"
     case appendix = "Appendix"
+}
+
+private struct ReaderAppendixSectionHeading: View {
+    private var title: Text { Text(ReaderBrowseHeading.appendix.rawValue) }
+
+    var body: some View {
+        title.hidden()
+            // Reserve the heading's space when the title scrolls behind the toolbar.
+            .overlay {
+                GeometryReader { proxy in
+                    if proxy.frame(in: .named("browseScroll")).minY >= ReaderBrowseHeaderSelection.cardTopInset {
+                        title
+                            .accessibilityAddTraits(.isHeader)
+                            .accessibilityIdentifier("reader-appendix-section-heading")
+                    }
+                }
+            }
+            .font(.headline)
+    }
 }
 
 
