@@ -9809,15 +9809,13 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
   };
 }
 
-export function researchInputForEvidence(question, evidence, options = {}) {
-  const textInput = researchPrompt(question, evidence, options);
+function researchEvidenceImageInputs(evidence, detail = "original") {
   const visualSources = evidence.flatMap((section) =>
     (section.visualSources || []).map((visualSource) => ({
       section,
       visualSource
     }))
   );
-  if (!visualSources.length) return textInput;
   const totalBytes = visualSources.reduce(
     (sum, item) => sum + Number(item.visualSource.byteLength || 0),
     0
@@ -9830,7 +9828,7 @@ export function researchInputForEvidence(question, evidence, options = {}) {
     error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
     throw error;
   }
-  const content = [{ type: "input_text", text: textInput }];
+  const content = [];
   for (const { section, visualSource } of visualSources) {
     const mediaType = String(visualSource.mediaType || "").toLowerCase();
     const dataBase64 = String(visualSource.dataBase64 || "");
@@ -9853,10 +9851,16 @@ export function researchInputForEvidence(question, evidence, options = {}) {
     }, {
       type: "input_image",
       image_url: `data:${mediaType};base64,${dataBase64}`,
-      detail: "original"
+      detail
     });
   }
-  return [{ role: "user", content }];
+  return content;
+}
+
+export function researchInputForEvidence(question, evidence, options = {}) {
+  const textInput = researchPrompt(question, evidence, options);
+  const images = researchEvidenceImageInputs(evidence);
+  return images.length ? [{ role: "user", content: [{ type: "input_text", text: textInput }, ...images] }] : textInput;
 }
 
 function mockResearchInterpretation(question, evidence, options = {}) {
@@ -21215,12 +21219,13 @@ async function handleResearchConversationMessage(request, response) {
         const configuration = researchV2Configuration(process.env);
         const budget = configuration.spending === "evaluation" ? createResearchV2Budget({ path: configuration.evaluationBudgetPath }) : null;
         v2Call = createResearchV2ApplicationCall({ apiKey: process.env.OPENAI_API_KEY, evaluationBudget:budget,assistant:conversationalAssistant,
-          provider: async (requestBody, signal) => {
+          provider: async (requestBody, signal, imageTokens) => {
             requestBody.safety_identifier = createHash("sha256").update(String(context.userID)).digest("hex");
             const { payload } = await requestResearchProvider({ apiKey:process.env.OPENAI_API_KEY, requestBody,
               signal, timeoutMilliseconds:120000, maximumAttempts:1,
               failureMessage:"The Research v2 answer could not complete.",
-              reserveEvaluationSpend:reserveResearchEvaluationSpend, reserveProviderSpend:reserveResearchProviderSpend,
+              reserveEvaluationSpend:body => reserveResearchEvaluationSpend(body, process.env, imageTokens),
+              reserveProviderSpend:body => reserveResearchProviderSpend(body, process.env, imageTokens),
               settleProviderSpend:settleResearchProviderSpend });
             return payload;
           } });
@@ -21301,7 +21306,18 @@ async function handleResearchConversationMessage(request, response) {
               searchText:[reference.title,reference.url,record.question].join(' '),priorQuestion:record.question,retrievedAt:reference.retrievedAt});
           }
         }
-        assistantResult=await runAssistant({question,history:activeMessages,priorEvidence,
+        // Current attachments come from revalidated Reader selections. Library
+        // searches and conversation recall do not automatically add figures.
+        const seenVisuals = new Set();
+        const attachedImages = researchEvidenceImageInputs(evidence.map((source, index) => ({
+          sourceID: sources[index].id,
+          visualSources: (source.visualSources || []).filter(visual => {
+            if (seenVisuals.has(visual.contentHash)) return false;
+            seenVisuals.add(visual.contentHash);
+            return true;
+          })
+        })), "high");
+        assistantResult=await runAssistant({question,history:activeMessages,priorEvidence,attachedImages,
           projectContext:conversationScope?.includeProjectContext?conversationScope.projectContext:null,
           attachedSources:sources,privateIdentifiers:[projectInformation?.name,projectInformation?.address]}, {
           call:v2Call,signal:progressResponse.signal,

@@ -1,3 +1,4 @@
+import { throws as assertThrows } from "node:assert/strict";
 import {
   beginResearchSpendReservation,
   endResearchSpendReservation,
@@ -178,6 +179,24 @@ const image = reserveResearchProviderSpend({
   input: [{ role: "user", content: [{ type: "input_image", image_url: "data:image/png;base64,fixture", detail: "original" }] }]
 }, toolEnvironment);
 assert(image.maximumRequestUSD >= 0.09, "The documented image-patch ceiling was not reserved.");
+endResearchSpendReservation();
+
+const lunaEnvironment = {
+  ...environment,
+  PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "0.10",
+  PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: "0.01",
+  PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "0.50"
+};
+beginResearchSpendReservation({ id: "measured-luna-image-contract" }, lunaEnvironment);
+const measuredLunaBody = {
+  model: "gpt-6-luna", max_output_tokens: 100,
+  input: [{ role: "user", content: [{ type: "input_image", image_url: `data:image/png;base64,${"A".repeat(800_000)}`, detail: "high" }] }]
+};
+assertThrows(() => reserveResearchProviderSpend(measuredLunaBody, lunaEnvironment), {code:"RESEARCH_SPEND_CAP"});
+const measuredLunaImage = reserveResearchProviderSpend(measuredLunaBody, lunaEnvironment, 3_000);
+assert(measuredLunaImage.maximumRequestUSD > 0 && measuredLunaImage.maximumRequestUSD < 0.05,
+  "Luna image requests must reserve measured tokens without counting base64 as text.");
+assertThrows(() => reserveResearchProviderSpend(measuredLunaBody, lunaEnvironment, 1_000_000), {code:"RESEARCH_SPEND_CAP"});
 endResearchSpendReservation();
 
 // Independent request contexts must not consume or release each other's cap.

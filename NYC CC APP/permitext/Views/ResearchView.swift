@@ -82,9 +82,9 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
 }
 
 enum ResearchTrustCopy {
-    static let composerPrivacyDisclosure = "Assistant sends your question, recent conversation, and selected Reader passages to OpenAI. When enabled, Project context and facts are sent too. Private notes are not included. Do not include confidential, regulated, or sensitive personal information."
-    static let firstUseDisclosure = "per codes sends your question, recent conversation, and selected Reader passages to OpenAI. When enabled, Project context and facts are sent too. Private notes are not included."
-    static let visualEvidenceDisclosure = "Assistant uses passage text and available table data. Selected images are kept with the evidence."
+    static let composerPrivacyDisclosure = "Assistant sends your question, recent conversation, and any Reader passages and chapter figures you select to OpenAI. When enabled, Project context and facts are sent too. Private notes are not included. Do not include confidential, regulated, or sensitive personal information."
+    static let firstUseDisclosure = "per codes sends your question, recent conversation, and any Reader passages and chapter figures you select to OpenAI. When enabled, Project context and facts are sent too. Private notes are not included."
+    static let visualEvidenceDisclosure = "Selected official images are sent to OpenAI for analysis."
     static let copyAnswerAction = "Copy answer"
     static let reportProblemAction = "Report a problem"
     static let nextStepGuidance = "Review the cited provision and Project facts, then record your own conclusion in a Project Note. Build Reports on per codes Web."
@@ -2824,7 +2824,7 @@ private struct ResearchVisualReviewSheet: View {
                     VStack(alignment: .leading, spacing: 7) {
                         Text("Review official visual evidence")
                             .font(.title2.weight(.bold))
-                        Text("This enacted section contains official visual material. Choose which images to keep with this passage.")
+                        Text("Choose the official images Assistant should analyze with this passage.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Text("Select up to \(review.maximumVisualSelections) official images.")

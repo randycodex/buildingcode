@@ -67,7 +67,10 @@ export function smallerAssistantRequest(body,scale=1){
  try{
   const history=body.input.filter(entry=>entry!==first&&entry!==last&&['user','assistant'].includes(entry.role)&&typeof entry.content==='string');
   const recent=fit(history.slice(-6).reverse(),Math.floor(10000*scale)).reverse();
-  return {...body,input:[{role:'user',content:JSON.stringify(pack(JSON.parse(first.content)))},...recent,...(last&&last!==first?[last]:[])]};
+  const [firstPart,...remainingParts]=Array.isArray(first.content)?first.content:[];
+  const text=JSON.stringify(pack(JSON.parse(firstPart?.text ?? first.content)));
+  const content=firstPart?[{...firstPart,text},...remainingParts]:text;
+  return {...body,input:[{role:'user',content},...recent,...(last&&last!==first?[last]:[])]};
  }catch{return body;}
 }
 export async function callWithAssistantContextRecovery(call,body,options,state={}){

@@ -1,5 +1,6 @@
 import {createLunaV2Client,assertLunaV2Request,assertLunaAssistantRequest} from './research-v2-budget.mjs';
 import {researchSpendGuardrails,researchPricing} from './research-config.mjs';
+import {countResearchImageTokens} from './research-provider-client.mjs';
 
 export function researchV2Configuration(env=process.env){
   const hosted=env.NODE_ENV==='production'||env.VERCEL==='1'||Boolean(env.VERCEL_ENV);
@@ -47,11 +48,21 @@ export function researchV2Availability(env,userID){
 export function createResearchV2ApplicationCall({provider,apiKey,evaluationBudget,assistant=false}={}){
   if(typeof provider!=='function')throw new Error('Research v2 requires an accounted application provider.');
   if(assistant){
+    // The same selected figures are reused across tool rounds of this turn.
+    let countedImages = [];
+    let imageTokens;
     return async(body,{phase,signal}={})=>{
       signal?.throwIfAborted();assertLunaAssistantRequest(body);
-      if(!evaluationBudget)return provider(body,signal);
-      const id=await evaluationBudget.reserveExperimental(body,phase);let payload;
-      try{payload=await provider(body,signal);return payload;}finally{await evaluationBudget.settle(id,payload);}
+      const images = Array.isArray(body.input) ? body.input.flatMap(item =>
+        Array.isArray(item.content) ? item.content.filter(part => part.type === 'input_image') : []) : [];
+      if (images.length && (images.length !== countedImages.length || images.some((image, index) => image !== countedImages[index]))) {
+        imageTokens = await countResearchImageTokens(body.model, images, {apiKey, signal});
+        countedImages = images;
+      }
+      const measuredTokens = images.length ? imageTokens : undefined;
+      if(!evaluationBudget)return provider(body,signal,measuredTokens);
+      const id=await evaluationBudget.reserveExperimental(body,phase,measuredTokens);let payload;
+      try{payload=await provider(body,signal,measuredTokens);return payload;}finally{await evaluationBudget.settle(id,payload);}
     };
   }
   if(evaluationBudget)return createLunaV2Client({apiKey,budget:evaluationBudget,transport:provider});

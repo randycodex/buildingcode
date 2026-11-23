@@ -37,6 +37,16 @@ assert.equal(recalls,1);assert.match(result.text,/\[S8\]/);assert(result.trace.s
 let attempts=0;const body={input:JSON.stringify({earlierConversation:history,priorEvidence:sources})};
 const recovered=await callWithAssistantContextRecovery(async next=>{if(++attempts===1)throw Object.assign(new Error('provider context'),{providerCause:'context_length_exceeded'});assert(Buffer.byteLength(JSON.stringify(next))<30000);return 'recovered';},body,{});
 assert.equal(recovered,'recovered');assert.equal(attempts,2);
+const figure={type:'input_image',image_url:'data:image/png;base64,AA==',detail:'high'};
+const figureCaption={type:'input_text',text:'The next image belongs to PASSAGE_ID S1.'};
+const visualRequest={input:[{role:'user',content:[{type:'input_text',text:body.input},figureCaption,figure]}]};
+let visualAttempts=0;
+await callWithAssistantContextRecovery(async next=>{
+ if(++visualAttempts===1)throw Object.assign(new Error('provider context'),{providerCause:'context_length_exceeded'});
+ assert.match(JSON.parse(next.input[0].content[0].text).recoveryNotice,/compacted/);
+ assert.deepEqual(next.input[0].content.slice(1),[figureCaption,figure]);
+},visualRequest,{});
+assert.equal(visualAttempts,2);
 await assert.rejects(callWithAssistantContextRecovery(async()=>{throw {providerCause:'context_length_exceeded'};},body,{}),e=>e.code==='ASSISTANT_CONTEXT_CAPACITY'&&/complete conversation and sources are saved/.test(e.message)&&!/approved Luna/.test(e.message));
 let budgetAttempts=0;await assert.rejects(callWithAssistantContextRecovery(async()=>{budgetAttempts++;throw Object.assign(new Error('budget'),{code:'V2_BUDGET_EXHAUSTED'});},body,{}),{code:'V2_BUDGET_EXHAUSTED'});assert.equal(budgetAttempts,1);
 console.log('Long chat: 2,000 messages/2,000 sources, distant corrections, complete archive retrieval/paging, source recall, latest topic, context recovery and preserved budget checks passed.');

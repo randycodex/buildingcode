@@ -19,21 +19,45 @@ Object.assign(process.env,{NODE_ENV:'test',OPENAI_API_KEY:'offline-project-conte
  PERMITEXT_RESEARCH_USER_DAILY_CAP_USD:'7',PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD:'7',PERMITEXT_RESEARCH_DAILY_CAP_USD:'7',PERMITEXT_RESEARCH_MONTHLY_CAP_USD:'7',
  PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS:'.1',PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS:'.01',PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS:'.5',PERMITEXT_RESEARCH_PRICING_VERSION:'offline-context-test'});
 if(postgres)process.env.PERMITEXT_SYNC_DATABASE_URL=postgres.connectionString;
-const nativeFetch=globalThis.fetch;let server,calls=0;
+const nativeFetch=globalThis.fetch;let server,calls=0,figureCounts=0,figureCalls=0,figureHash;
+function assertSelectedFigure(parts){
+ const images=parts.filter(part=>part.type==='input_image');
+ assert.equal(images.length,1,'Only the selected Reader figure reaches the provider');
+ assert.equal(images[0].detail,'high');
+ const bytes=Buffer.from(images[0].image_url.split(',')[1],'base64');
+ assert.equal(createHash('sha256').update(bytes).digest('hex'),figureHash);
+}
 globalThis.fetch=async(url,options)=>{
+ if(String(url)==='https://api.openai.com/v1/responses/input_tokens'){
+  figureCounts++;
+  const request=JSON.parse(options.body);
+  assert.equal(request.model,'gpt-6-luna');
+  assertSelectedFigure(request.input[0].content);
+  assert.equal(request.input[0].content.length,1,'Token counting only needs the public image');
+  return Response.json({object:'response.input_tokens',input_tokens:950});
+ }
  if(String(url)!=='https://api.openai.com/v1/responses')return nativeFetch(url,options);
  calls++;const body=JSON.parse(options.body);let output;
  const text=t=>[{type:'message',role:'assistant',content:[{type:'output_text',text:t}]}];
  if(body.text?.format?.name==='assistant_conversational_intent'){const c=JSON.parse(body.input);if(c.currentQuestion==='Reconsider earlier evidence')assert(c.priorEvidence.length>0);output=text(JSON.stringify({question:c.currentQuestion,subject:'Current question',reference:'latest exchange',clarification:'',evidenceIDs:c.currentQuestion==='Reconsider earlier evidence'?[c.priorEvidence.find(s=>s.sectionID).id]:[]}));}
  else if(body.tools?.some(t=>t.type==='web_search'))output=[{type:'web_search_call',action:{type:'search'}},{type:'message',role:'assistant',content:[{type:'output_text',text:'Public source finding.',annotations:[{type:'url_citation',url:'https://www.nyc.gov/example',title:'Official example'}]}]}];
  else if(Array.isArray(body.input)){
-  if(body.input.at(-1).type==='function_call_output'){const r=JSON.parse(body.input.at(-1).output);if(r.candidates)output=[{type:'function_call',call_id:'read-1',name:'read_library',arguments:JSON.stringify({sectionIDs:[r.candidates[0].id]})}];else output=text(r.sources?.[0]?.id?.startsWith('S')?'A retrieved rule. [S1]':'The public source says this. [W1]');}
+  if(Array.isArray(body.input[0].content)){
+   figureCalls++;
+   const content=body.input[0].content;
+   assertSelectedFigure(content);
+   assert.match(content[1].text,/PASSAGE_ID S1/);
+   assert.equal(JSON.parse(content[0].text).attachedPassages[0].id,'S1');
+   output=figureCalls===1?[{type:'function_call',call_id:'figure-source',name:'read_library',arguments:'{"sectionIDs":["S1"]}'}]:text('The selected fire district map accompanies this code passage. [S1]');
+  }
+  else if(body.input.at(-1).type==='function_call_output'){const r=JSON.parse(body.input.at(-1).output);if(r.candidates)output=[{type:'function_call',call_id:'read-1',name:'read_library',arguments:JSON.stringify({sectionIDs:[r.candidates[0].id]})}];else output=text(r.sources?.[0]?.id?.startsWith('S')?'A retrieved rule. [S1]':'The public source says this. [W1]');}
   else if(JSON.parse(body.input[0].content).question==='Find provisions')output=[{type:'function_call',call_id:'library-1',name:'search_library',arguments:JSON.stringify({query:'2022 NYC BC 1007.1.1 403.5.1 remoteness interior exit stairways'})}];
   else if(JSON.parse(body.input[0].content).question==='Reconsider earlier evidence'){const recalled=JSON.parse(body.input[0].content).readEvidence;assert(recalled.length>0);output=text(`A recalled rule. [${recalled[0].id}]`);}
   else if(JSON.parse(body.input[0].content).question==='Use web')output=[{type:'function_call',call_id:'web-1',name:'search_web',arguments:JSON.stringify({query:'NYC public code'})}];
   else output=text('Your project context is available.');
  }else output=text(JSON.stringify(body.text.format.name==='permitext_v2_review'?{pass:true,issues:[]}:{answerText:'These are recorded project facts.',claims:[],missingSources:[],missingFacts:[]}));
- return Response.json({model:body.model,status:'completed',service_tier:'default',usage:{input_tokens:200,output_tokens:80},output});
+ const inputTokens=Array.isArray(body.input?.[0]?.content)?1250:200;
+ return Response.json({model:body.model,status:'completed',service_tier:'default',usage:{input_tokens:inputTokens,output_tokens:80},output});
 };
 try{
  const {handleRequest}=await import('../app.mjs');
@@ -72,6 +96,26 @@ try{
  assert(recalledRecord.evidence.length);assert(conversation.messages.at(-1).answer.citations.length);
  process.env.PERMITEXT_ASSISTANT_EXPERIMENTAL='0';await send('Summarize project facts.','current','obsolete-mode');assert.equal(conversation.messages.at(-1).answer.researchEngine,'assistant-luna-20261116-v1');
  const oldClient=await post('/research/conversations/message',{conversationID:conversation.id,question:'Summarize project facts.',requestID:'old-client-no-mode',expectedRevision:conversation.revision,expectedEvidenceSetVersion:conversation.evidenceSetVersion||1});assert.equal(oldClient.conversation.messages.at(-1).answer.researchEngine,'assistant-luna-20261116-v1');
+ assert.equal(figureCounts,0,'Text-only Assistant turns do not call image token counting');
+
+ const reviewed=await post('/research/selections/review',{sectionID:'6881',
+  selectedText:'Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the "fire district maps" as per Figures D106.1(1) and D106.1(2).'});
+ assert.equal(reviewed.requiresVisualReview,true);
+ assert(reviewed.visualSources.length>1);
+ const figure=reviewed.visualSources[0];figureHash=figure.contentHash;
+ const readerSelection={...reviewed.selection,visualSourceIDs:[figure.id],visualReviewConfirmed:true};
+ await post('/research/conversations/create',{analysisMode:'conversation_only',originSurface:'ios-reader',selections:[reviewed.selection]},400);
+ await post('/research/conversations/create',{analysisMode:'conversation_only',originSurface:'ios-reader',
+  selections:[{...readerSelection,visualSourceIDs:['visual-source-client-forgery']}]},400);
+ conversation=(await post('/research/conversations/create',{analysisMode:'conversation_only',originSurface:'ios-reader',selections:[readerSelection]},201)).conversation;
+ const figureAnswer=(await send('Describe the attached map and cite its source.','experimental','reader-figure')).conversation.messages.at(-1);
+ assert.equal(figureCounts,1,'Repeated model calls in one turn reuse the image token count');
+ assert.equal(figureCalls,2,'The figure remains available after a library tool call');
+ assert.equal(figureAnswer.answer.citations[0].sectionID,'6881');
+ const figureRecord=(await post('/research/answers/get',{answerID:figureAnswer.id})).answer;
+ assert.deepEqual(figureRecord.evidence[0].visualSources.map(image=>image.contentHash),[figureHash]);
+ await send('Describe the attached map and cite its source.','experimental','reader-figure');
+ assert.deepEqual([figureCounts,figureCalls],[1,2],'Replaying the turn does not count or analyze the figure twice');
  if(production){const usage=await postgres.sql`SELECT count(*)::int AS n FROM permitext_research_usage WHERE user_id=${userID} AND mode='openai'`;assert(Number(usage[0].n)>0,'Hosted Assistant uses durable application accounting');}
- console.log('PASS Assistant HTTP: single default engine, obsolete-mode compatibility, web/context/source persistence, unreviewed provenance and replay; no paid calls.');
+ console.log('PASS Assistant HTTP: selected official chapter image reaches the multimodal request, with token counting, citation and replay; default engine and text flows also pass. No paid calls.');
 }finally{globalThis.fetch=nativeFetch;server?.closeAllConnections();if(server)await new Promise(resolve=>server.close(resolve));await rm(directory,{recursive:true,force:true});await postgres?.close();}

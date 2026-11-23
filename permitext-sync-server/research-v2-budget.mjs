@@ -1,6 +1,7 @@
 import { mkdir, open, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { boundedProviderInputTokens } from './research-config.mjs';
 import { researchSemanticEmbeddingModel, researchSemanticEmbeddingDimensions, researchSemanticEmbeddingMaximumCharacters,
   researchSemanticEmbeddingReservation, researchSemanticEmbeddingCost,
   researchSemanticEmbeddingPricingVersion } from './research-semantic-passages.mjs';
@@ -99,11 +100,12 @@ export function createResearchV2Budget({ path, limitUSD = researchV2BudgetLimitU
         requestBody.max_output_tokens * lunaV2Pricing.reservationOutput);
       return reserve({phase, model: requestBody.model, pricingVersion: lunaV2Pricing.version}, reservedMicroUSD);
     },
-    async reserveExperimental(body,phase) {
+    async reserveExperimental(body,phase,measuredImageTokens) {
       const bytes=assertLunaAssistantRequest(body);
+      const inputBound=measuredImageTokens === undefined ? bytes : boundedProviderInputTokens(body,measuredImageTokens);
       const web=(body.tools||[]).some(t=>t.type==='web_search');
       return reserve({kind:'experimental',phase,model:body.model,pricingVersion:lunaV2Pricing.version},
-        Math.ceil((bytes+8192+(web?128000*5:0))*lunaV2Pricing.reservationInput+body.max_output_tokens*lunaV2Pricing.reservationOutput+(web?40000:0)));
+        Math.ceil((inputBound+8192+(web?128000*5:0))*lunaV2Pricing.reservationInput+body.max_output_tokens*lunaV2Pricing.reservationOutput+(web?40000:0)));
     },
     // Isolated same-evidence evaluations only; application calls remain Luna-only.
     async reserveComparison(body) {

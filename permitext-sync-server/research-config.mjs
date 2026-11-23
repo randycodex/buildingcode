@@ -182,19 +182,23 @@ function providerToolAllowance(requestBody) {
   return { inputTokens: 128_000 * (calls + 1), costUSD: calls * 0.01 };
 }
 
-function boundedProviderInputTokens(requestBody) {
-  // Remote history/files and multimodal tokenization cannot be bounded by
-  // serialized text bytes. Fail before dispatch until a reviewed bound exists.
+export function boundedProviderInputTokens(requestBody, measuredImageTokens) {
+  // Remote history/files and images need a bound independent of serialized text.
   if (requestBody?.previous_response_id || requestBody?.conversation || requestBody?.prompt ||
       !([undefined, null, "default", "priority", "fast"].includes(requestBody?.service_tier))) {
     throw spendCapError("Research cannot bound this provider input or pricing tier.");
   }
   let imageTokens = 0;
+  let hasLunaImages = false;
   const textBody = JSON.stringify(requestBody, (key, value) => {
     if (["input_file", "input_audio", "item_reference"].includes(value?.type)) {
       throw spendCapError("Research cannot bound this provider input.");
     }
     if (value?.type === "input_image") {
+      if (requestBody.model === "gpt-6-luna" && Number.isSafeInteger(measuredImageTokens) && measuredImageTokens > 0) {
+        hasLunaImages = true;
+        return { type: "input_image", detail: value.detail };
+      }
       if (!/^gpt-5\.6-(?:sol|terra|luna)(?:-\d{4}-\d{2}-\d{2})?$/.test(requestBody.model || "")) {
         throw spendCapError("Research has no reviewed image-token bound for this model.");
       }
@@ -205,11 +209,11 @@ function boundedProviderInputTokens(requestBody) {
     }
     return value;
   });
-  return Buffer.byteLength(textBody, "utf8") + 1_024 + imageTokens;
+  return Buffer.byteLength(textBody, "utf8") + 1_024 + (hasLunaImages ? measuredImageTokens : imageTokens);
 }
 
-function maximumProviderRequestCost(requestBody, environment = process.env) {
-  const inputTokens = boundedProviderInputTokens(requestBody);
+function maximumProviderRequestCost(requestBody, environment = process.env, measuredImageTokens) {
+  const inputTokens = boundedProviderInputTokens(requestBody, measuredImageTokens);
   const pricing = researchPricing(environment, requestBody?.model);
   const maxOutputTokens = nonnegativeNumber(requestBody?.max_output_tokens);
   if (pricing.inputRate === null || pricing.outputRate === null || !pricing.pricingVersion || !maxOutputTokens) {
@@ -277,7 +281,7 @@ export function beginResearchSpendReservation(reservation, environment = process
   return guardrails;
 }
 
-export function reserveResearchProviderSpend(requestBody, environment = process.env) {
+export function reserveResearchProviderSpend(requestBody, environment = process.env, measuredImageTokens) {
   const context = productionSpendContext.getStore();
   if (!context?.active) {
     if (environment.VERCEL === "1" || environment.VERCEL_ENV) {
@@ -285,7 +289,7 @@ export function reserveResearchProviderSpend(requestBody, environment = process.
     }
     return { active: false, reservedUSD: 0, actualUSD: 0, providerRequestCount: 0 };
   }
-  const maximumRequestUSD = maximumProviderRequestCost(requestBody, environment);
+  const maximumRequestUSD = maximumProviderRequestCost(requestBody, environment, measuredImageTokens);
   const nextReservedUSD = Number((context.reservedUSD + maximumRequestUSD).toFixed(6));
   if (nextReservedUSD > context.maximumRequestUSD) {
     throw spendCapError(`Research stopped before another provider call could exceed the cumulative per-turn spending limit. Reserved upper bound: $${context.reservedUSD.toFixed(6)}; next request upper bound: $${maximumRequestUSD.toFixed(6)}; turn limit: $${context.maximumRequestUSD.toFixed(6)}.`);
@@ -301,7 +305,7 @@ export function reserveResearchProviderSpend(requestBody, environment = process.
     model: requestBody?.model || null,
     serviceTier: requestBody?.service_tier || "default",
     pricingCeiling: providerPricingCeiling(requestBody?.model, researchPricing(environment, requestBody?.model), requestBody?.service_tier,
-      boundedProviderInputTokens(requestBody) + providerToolAllowance(requestBody).inputTokens),
+      boundedProviderInputTokens(requestBody, measuredImageTokens) + providerToolAllowance(requestBody).inputTokens),
     toolAllowanceUSD: providerToolAllowance(requestBody).costUSD,
     reservedUSD: context.reservedUSD,
     actualUSD: context.actualUSD,
@@ -572,7 +576,7 @@ export function estimatedResearchCostWithProviderAllowance(usage, environment = 
   };
 }
 
-export function reserveResearchEvaluationSpend(requestBody, environment = process.env) {
+export function reserveResearchEvaluationSpend(requestBody, environment = process.env, measuredImageTokens) {
   const rawCap = String(environment.PERMITEXT_RESEARCH_EVAL_MAX_USD || "").trim();
   if (!rawCap) {
     return {
@@ -611,7 +615,7 @@ export function reserveResearchEvaluationSpend(requestBody, environment = proces
     };
   }
 
-  const maximumRequestUSD = maximumProviderRequestCost(requestBody, environment);
+  const maximumRequestUSD = maximumProviderRequestCost(requestBody, environment, measuredImageTokens);
   const nextReservedUSD = Number((evaluationSpendReservation.reservedUSD + maximumRequestUSD).toFixed(6));
   if (nextReservedUSD > capUSD) {
     const error = new Error(

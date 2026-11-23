@@ -23,7 +23,11 @@ export async function startResearchV2Postgres(){
     const connectionString=`postgresql://permitext_v2@127.0.0.1:${port}/postgres`;
     neonConfig.fetchEndpoint='http://127.0.0.1/permitext-v2-postgres-transport';
     neonConfig.fetchFunction=async(url,options)=>{
-      assert.equal(url,neonConfig.fetchEndpoint);assert.equal(options.headers['Neon-Connection-String'],connectionString);
+      assert.equal(url,neonConfig.fetchEndpoint);
+      const driverConnection=new URL(options.headers['Neon-Connection-String']);
+      // Recent Neon drivers append their application name to the same connection.
+      driverConnection.searchParams.delete('application_name');
+      assert.equal(driverConnection.href,connectionString);
       const body=JSON.parse(options.body),queries=body.queries||[body];
       const client=new pg.Client({connectionString,statement_timeout:15000,types:{getTypeParser:()=>value=>value}});
       try{

@@ -1,6 +1,23 @@
 import { readResearchAnswerStream } from "./research-fast-stream.mjs";
 import { researchProviderCostEntry } from "./research-cost-usage.mjs";
 
+export async function countResearchImageTokens(model, images, { apiKey, signal }) {
+  const timeout = AbortSignal.timeout(15_000);
+  const response = await fetch("https://api.openai.com/v1/responses/input_tokens", {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
+    body: JSON.stringify({ model, input: [{ role: "user", content: images }] }),
+    signal: signal ? AbortSignal.any([signal, timeout]) : timeout
+  });
+  const count = response.ok ? (await response.json()).input_tokens : null;
+  if (!Number.isSafeInteger(count) || count < 1) {
+    throw Object.assign(new Error("Assistant could not prepare the selected chapter images. Try again."), {
+      code: "RESEARCH_PROVIDER_ERROR"
+    });
+  }
+  return count;
+}
+
 const transientProviderStatuses = new Set([408, 409, 425, 429, 500, 502, 503, 504]);
 const transientProviderCauses = new Set([
   "ECONNRESET",

@@ -9438,7 +9438,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertTrue(ResearchTrustCopy.firstUseDisclosure.contains("Private notes are not included."))
         XCTAssertTrue(
             ResearchTrustCopy.visualEvidenceDisclosure.contains(
-                "Assistant uses passage text and available table data."
+                "Selected official images are sent to OpenAI for analysis."
             )
         )
         XCTAssertEqual(ResearchTrustCopy.copyAnswerAction, "Copy answer")
