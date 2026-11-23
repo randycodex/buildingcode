@@ -358,6 +358,7 @@ private struct CalculatorForm: View {
             VStack(alignment: .leading, spacing: 20) {
                 inputs.disabled(isSaving)
                 result
+                sourceButton
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
@@ -367,7 +368,42 @@ private struct CalculatorForm: View {
         .codeNavigationTopScrollEdge()
         .codeTransparentBottomScrollEdge()
         .accessibilityIdentifier("project-calculator-form")
+        .toolbar {
+            if #available(iOS 26.0, *) {
+                newCalculationToolbarItem.sharedBackgroundVisibility(.hidden)
+            } else {
+                newCalculationToolbarItem
+            }
+        }
         .onAppear { storeDrafts() }
+    }
+
+    private var newCalculationToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                switchDraft { try page.engine.create() }
+            } label: {
+                ToolbarActionIcon(systemImage: "plus")
+            }
+            .buttonStyle(.plain)
+            .codeLiquidGlassCircle()
+            .disabled(isSaving)
+            .accessibilityLabel("New calculation")
+            .accessibilityIdentifier("calculator-new-draft")
+        }
+    }
+
+    private var sourceButton: some View {
+        Button(action: onOpenSource) {
+            Label("2022 Building Code · Table 1004.1.3", systemImage: "book")
+                .font(.subheadline)
+                .padding(.horizontal, 14)
+                .frame(minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .codeLiquidGlassCapsule()
+        .disabled(isSaving)
+        .accessibilityIdentifier("calculator-source")
     }
 
     private var row: ProjectCalculatorRow? {
@@ -381,50 +417,28 @@ private struct CalculatorForm: View {
 
     private var inputs: some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.rowVerticalPadding) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Occupant load").font(.headline).accessibilityAddTraits(.isHeader)
-                Button(action: onOpenSource) {
-                    Label("2022 Building Code · Table 1004.1.3", systemImage: "book")
-                        .font(.subheadline)
-                        .padding(.horizontal, 14)
-                        .frame(minHeight: 44)
+            Text("Occupant load").font(.headline).accessibilityAddTraits(.isHeader)
+            field("Recent calculations") {
+                Menu {
+                    Picker("Recent calculations", selection: Binding(
+                        get: { calculation.record.id }, set: { id in switchDraft { try page.engine.open(id) } }
+                    )) {
+                        ForEach(calculation.recent) { draft in Text(draft.title).tag(draft.id) }
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(calculation.record.title).lineLimit(1)
+                        Image(systemName: "chevron.up.chevron.down")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .codeLiquidGlassCapsule()
-                .accessibilityIdentifier("calculator-source")
-            }
-            field("Recent calculations") {
-                HStack(spacing: 12) {
-                    Menu {
-                        Picker("Recent calculations", selection: Binding(
-                            get: { calculation.record.id }, set: { id in switchDraft { try page.engine.open(id) } }
-                        )) {
-                            ForEach(calculation.recent) { draft in Text(draft.title).tag(draft.id) }
-                        }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Text(calculation.record.title).lineLimit(1)
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Recent calculations")
-                    .accessibilityValue(calculation.record.title)
-                    .accessibilityIdentifier("calculator-recent")
-                    Button {
-                        switchDraft { try page.engine.create() }
-                    } label: {
-                        ToolbarActionIcon(systemImage: "plus")
-                    }
-                    .buttonStyle(.plain)
-                    .codeLiquidGlassCircle()
-                    .accessibilityLabel("New calculation")
-                    .accessibilityIdentifier("calculator-new-draft")
-                }
+                .accessibilityLabel("Recent calculations")
+                .accessibilityValue(calculation.record.title)
+                .accessibilityIdentifier("calculator-recent")
             }
 
             field("Factor source") {

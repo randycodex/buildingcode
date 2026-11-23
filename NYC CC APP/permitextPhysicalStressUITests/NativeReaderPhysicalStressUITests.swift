@@ -1182,13 +1182,21 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let calculator = app.buttons["project-section-calculator"]
         reveal(calculator, in: app)
         calculator.tap()
-        XCTAssertTrue(app.navigationBars["Calculator"].waitForExistence(timeout: 5))
+        let calculatorBar = app.navigationBars["Calculator"]
+        XCTAssertTrue(calculatorBar.waitForExistence(timeout: 5))
         let form = app.scrollViews["project-calculator-form"]
         let function = element(in: app, identifier: "calculator-function")
         XCTAssertTrue(function.waitForExistence(timeout: 20), app.debugDescription)
         XCTAssertTrue(form.exists)
         XCTAssertFalse(form.webViews.firstMatch.exists)
-        app.buttons["calculator-new-draft"].tap()
+        let newCalculation = calculatorBar.buttons["calculator-new-draft"]
+        XCTAssertTrue(newCalculation.isHittable)
+        XCTAssertEqual(newCalculation.frame.midY, calculatorBar.buttons.element(boundBy: 0).frame.midY, accuracy: 2)
+        XCTAssertEqual(newCalculation.frame.width, newCalculation.frame.height, accuracy: 1)
+        if #available(iOS 26.0, *), UIDevice.current.userInterfaceIdiom == .phone {
+            XCTAssertEqual(newCalculation.frame.maxX, app.frame.maxX - 21, accuracy: 1)
+        }
+        newCalculation.tap()
         keepScreenshot(named: "Native Calculator at the top", from: app)
         XCTAssertTrue(function.waitForExistence(timeout: 10))
         function.tap()
@@ -1222,8 +1230,13 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(saved.waitForExistence(timeout: 10))
         form.swipeUp()
         XCTAssertLessThanOrEqual(saved.frame.maxY, app.tabBars.firstMatch.frame.minY + 2)
+        let source = app.buttons["calculator-source"]
+        XCTAssertTrue(source.isHittable)
+        XCTAssertGreaterThan(source.frame.minY, saved.frame.maxY)
+        XCTAssertLessThanOrEqual(source.frame.maxY, app.tabBars.firstMatch.frame.minY + 2)
+        XCTAssertEqual(source.frame.minX, save.frame.minX, accuracy: 1)
         keepScreenshot(named: "Native Calculator scrolled to the result and Note", from: app)
-        app.navigationBars["Calculator"].buttons.element(boundBy: 0).tap()
+        calculatorBar.buttons.element(boundBy: 0).tap()
         app.buttons["project-section-notebook"].tap()
         let note = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Occupant load · Educational")).firstMatch
         XCTAssertTrue(note.waitForExistence(timeout: 10))
@@ -1233,6 +1246,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(noteBody.count, 2)
         app.swipeUp()
         keepScreenshot(named: "Note scrolled below the header", from: app)
+
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(calculator.waitForExistence(timeout: 10))
+        calculator.tap()
+        XCTAssertTrue(calculatorBar.waitForExistence(timeout: 5))
+        reveal(source, in: app)
+        source.tap()
+        let passageTitle = element(in: app, identifier: "passage-section-title")
+        XCTAssertTrue(passageTitle.waitForExistence(timeout: 15))
+        XCTAssertTrue(passageTitle.label.contains("1004.1.3"))
 #endif
     }
 
