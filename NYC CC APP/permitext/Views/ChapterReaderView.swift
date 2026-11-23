@@ -45,16 +45,6 @@ struct ChapterReaderView: View {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
     }
 
-    private var chapterSearchToolbarButton: some View {
-        Button {
-            isChapterSearchPresented = true
-        } label: {
-            ToolbarActionIcon(systemImage: "text.page.badge.magnifyingglass")
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Search this chapter")
-    }
-
     private var currentJumpLabel: String {
         let activeSectionID = pendingFocusedSectionID ?? selectedJumpSectionID
         if let activeSectionID,
@@ -162,8 +152,12 @@ struct ChapterReaderView: View {
                     accentColor: accentColor)
             }
 
-            ToolbarItem(placement: .topBarTrailing) {
-                chapterSearchToolbarButton
+            ChapterReaderToolbarActions(canOpenSections: blocks.contains { !duplicateHeadingSectionIDs.contains($0.id) }) {
+                chapterSearchQuery = ""
+                isChapterSearchPresented = false
+                isJumpPickerPresented = true
+            } onSearch: {
+                isChapterSearchPresented = true
             }
         }
         .tint(accentColor)
@@ -194,8 +188,7 @@ struct ChapterReaderView: View {
                 },
                 isInline: true,
                 usesReaderBottomBar: usesReaderBottomBar,
-                onClose: { isChapterSearchPresented = false },
-                onSections: visibleJumpBlocks.isEmpty ? nil : { isJumpPickerPresented = true }
+                onClose: { isChapterSearchPresented = false }
             )
             .environmentObject(library)
         }

@@ -226,7 +226,6 @@ struct NativeChapterTextReaderView: View {
                 onNext: { navigateSearchMatch(offset: activeSearchMatchID == nil ? 0 : 1, proxy: proxy, document: document) },
                 onSubmit: { navigateSearchMatch(offset: 0, proxy: proxy, document: document) },
                 onClose: closeChapterSearch,
-                onSections: sectionTargets.isEmpty ? nil : { isJumpPickerPresented = true },
                 usesReaderBottomBar: usesReaderBottomBar
             )
         }
@@ -235,15 +234,12 @@ struct NativeChapterTextReaderView: View {
                 ReaderChapterTitle(title: chapter.title, currentSection: currentSectionTarget?.menuLabel ?? "", accent: accentColor)
                 .sourceProblemReporting(sectionID: currentBookmarkSectionID)
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    if isSearchPresented { closeChapterSearch() }
-                    else { isSearchPresented = true }
-                } label: {
-                    ToolbarActionIcon(systemImage: "text.page.badge.magnifyingglass")
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Search this chapter")
+            ChapterReaderToolbarActions(canOpenSections: !sectionTargets.isEmpty) {
+                closeChapterSearch()
+                isJumpPickerPresented = true
+            } onSearch: {
+                if isSearchPresented { closeChapterSearch() }
+                else { isSearchPresented = true }
             }
         }
         .sheet(isPresented: $isJumpPickerPresented) {

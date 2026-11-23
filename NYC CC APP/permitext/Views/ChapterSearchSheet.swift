@@ -59,7 +59,6 @@ struct ChapterSearchSheet: View {
     var isInline = false
     var usesReaderBottomBar = false
     var onClose: (() -> Void)? = nil
-    var onSections: (() -> Void)? = nil
     @State private var activeResultID: String?
 
     @Environment(\.dismiss) private var dismiss
@@ -113,7 +112,6 @@ struct ChapterSearchSheet: View {
                     onNext: { navigateResult(offset: activeResultID == nil ? 0 : 1) },
                     onSubmit: { navigateResult(offset: 0) },
                     onClose: { query = ""; onClose?() },
-                    onSections: onSections,
                     usesReaderBottomBar: usesReaderBottomBar
                 )
             } else {
@@ -434,7 +432,6 @@ struct ChapterFindControls: View {
     let onNext: () -> Void
     let onSubmit: () -> Void
     let onClose: () -> Void
-    var onSections: (() -> Void)? = nil
     var usesReaderBottomBar = false
     @FocusState private var isFocused: Bool
 
@@ -469,20 +466,7 @@ struct ChapterFindControls: View {
                 .onSubmit { isFocused = false; onSubmit() }
                 .padding(.leading, 12)
                 .frame(minWidth: 60)
-            if query.isEmpty {
-                if let onSections {
-                    Button {
-                        isFocused = false
-                        onClose()
-                        onSections()
-                    } label: {
-                        ToolbarActionIcon(systemImage: "line.3.horizontal.decrease")
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Sections")
-                    .accessibilityHint("Open the list of sections in this chapter")
-                }
-            } else {
+            if !query.isEmpty {
                 if isSearching {
                     ProgressView().controlSize(.small).padding(.horizontal, 4)
                         .accessibilityLabel("Searching this chapter")
@@ -508,6 +492,29 @@ struct ChapterFindControls: View {
         .buttonStyle(.plain)
         .disabled(disabled)
         .accessibilityLabel(title)
+    }
+}
+
+struct ChapterReaderToolbarActions: ToolbarContent {
+    let canOpenSections: Bool
+    let onSections: () -> Void
+    let onSearch: () -> Void
+
+    var body: some ToolbarContent {
+        IconToolbarGroup {
+            Button(action: onSections) {
+                ToolbarActionIcon(systemImage: "line.3.horizontal.decrease")
+            }
+            .disabled(!canOpenSections)
+            .accessibilityLabel("Sections")
+            .accessibilityHint("Open the list of sections in this chapter")
+            .accessibilityIdentifier("chapter-sections-toolbar")
+
+            Button(action: onSearch) {
+                ToolbarActionIcon(systemImage: "text.page.badge.magnifyingglass")
+            }
+            .accessibilityLabel("Search this chapter")
+        }
     }
 }
 

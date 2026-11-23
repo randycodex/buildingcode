@@ -355,12 +355,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
         let selectorFrame = primary.frame
         let chapterSearch = app.buttons["Search this chapter"]
+        let sections = app.buttons["chapter-sections-toolbar"]
+        XCTAssertTrue(sections.isHittable)
+        XCTAssertLessThan(sections.frame.midX, chapterSearch.frame.midX)
+        XCTAssertEqual(sections.frame.midY, chapterSearch.frame.midY, accuracy: 1)
+        keepScreenshot(named: "Sections and Find share the Reader toolbar", from: app)
         chapterSearch.tap()
         let findField = app.textFields["Find in this chapter"]
         let findControls = element(in: app, identifier: "chapter-find-controls")
         XCTAssertTrue(findField.waitForExistence(timeout: 10))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["Sections"].isHittable)
+        XCTAssertTrue(sections.isHittable)
+        XCTAssertFalse(findControls.buttons["Sections"].exists)
         XCTAssertFalse(primary.exists)
         XCTAssertFalse(secondary.exists)
         XCTAssertGreaterThan(findControls.frame.midY, app.frame.midY)
@@ -370,7 +376,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(distanceToKeys, 0)
         XCTAssertLessThanOrEqual(distanceToKeys, 60)
         findField.typeText("this code")
-        XCTAssertFalse(app.buttons["Sections"].exists)
+        XCTAssertTrue(sections.isHittable)
         let nextMatch = app.buttons["Next match"]
         let hasMatches = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: nextMatch)
         XCTAssertEqual(XCTWaiter.wait(for: [hasMatches], timeout: 10), .completed)
@@ -383,8 +389,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(secondary.isHittable)
         XCTAssertFalse(findField.exists)
 
+        chapterSearch.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
         openChapterSections(in: app)
         XCTAssertTrue(waitForNonexistence(app.keyboards.firstMatch))
+        XCTAssertFalse(findField.exists)
         let scope = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "101.2 ")).firstMatch
         XCTAssertTrue(scope.waitForExistence(timeout: 10))
         scope.tap()
@@ -4929,11 +4938,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     }
 
     private func openChapterSections(in app: XCUIApplication) {
-        let search = app.buttons["Search this chapter"].firstMatch
-        XCTAssertTrue(search.waitForExistence(timeout: 10), "Chapter search is unavailable.")
-        search.tap()
-        let sections = app.buttons["Sections"]
-        XCTAssertTrue(sections.waitForExistence(timeout: 10), "Sections is unavailable in the Find bar.")
+        let sections = app.buttons["chapter-sections-toolbar"]
+        XCTAssertTrue(sections.waitForExistence(timeout: 10), "Sections is unavailable in the Reader toolbar.")
         sections.tap()
         XCTAssertTrue(app.buttons["chapter-sections-close"].waitForExistence(timeout: 10))
     }

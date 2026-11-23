@@ -133,16 +133,6 @@ struct ChapterHTMLReaderView: View {
         Color(uiColor: ChapterHTMLWebView.pageBackgroundUIColor(for: colorScheme))
     }
 
-    private var chapterSearchToolbarButton: some View {
-        Button {
-            isChapterSearchPresented = true
-        } label: {
-            ToolbarActionIcon(systemImage: "text.page.badge.magnifyingglass")
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Search this chapter")
-    }
-
     private var htmlStore: PublishedHTMLContentStore {
         let rootPath = htmlStoreCacheKey
         if let cachedHTMLStore, cachedHTMLStoreRootPath == rootPath {
@@ -178,15 +168,15 @@ struct ChapterHTMLReaderView: View {
         htmlStore.readAccessURL()
     }
 
-    private var currentJumpLabel: String {
+    private func currentJumpLabel(in targets: [ChapterHTMLJumpTarget]) -> String {
         if let selectedAnchor,
-           let selectedTarget = jumpTargets.first(where: { $0.anchorID == selectedAnchor.anchorID || normalizedSectionNumber($0.sectionNumber) == normalizedSectionNumber(selectedAnchor.sectionNumber) }) {
+           let selectedTarget = targets.first(where: { $0.anchorID == selectedAnchor.anchorID || normalizedSectionNumber($0.sectionNumber) == normalizedSectionNumber(selectedAnchor.sectionNumber) }) {
             return selectedTarget.menuLabel
         }
-        if let initialTarget = jumpTargets.first(where: { normalizedSectionNumber($0.sectionNumber) == normalizedSectionNumber(initialSection.sectionNumber) }) {
+        if let initialTarget = targets.first(where: { normalizedSectionNumber($0.sectionNumber) == normalizedSectionNumber(initialSection.sectionNumber) }) {
             return initialTarget.menuLabel
         }
-        return jumpTargets.first?.menuLabel ?? ""
+        return targets.first?.menuLabel ?? ""
     }
 
     private var currentBookmarkSectionID: Int64? {
@@ -375,28 +365,33 @@ struct ChapterHTMLReaderView: View {
         }
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
+#if DEBUG
+            if NativeReaderRolloutPolicy.activeStage != .disabled {
+                ToolbarItem(placement: .topBarTrailing) {
+                    readerDiagnosticSelector
+                }
+            }
+#endif
             // The native and legacy text Readers supply their own toolbars.
             // Only the HTML presentation uses this wrapper's anchor picker.
             if !usesNativeRolloutReader && chapterURL != nil {
+                let targets = jumpTargets
                 ToolbarItem(placement: .principal) {
-                    ReaderChapterTitle(title: chapter.title, currentSection: currentJumpLabel, accent: accentColor)
+                    ReaderChapterTitle(title: chapter.title, currentSection: currentJumpLabel(in: targets), accent: accentColor)
                     .sourceProblemReporting(sectionID: currentBookmarkSectionID)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     ReaderCurrentSectionBookmarkButton(sectionID: currentBookmarkSectionID, accentColor: accentColor)
                 }
+                ChapterReaderToolbarActions(canOpenSections: !targets.isEmpty) {
+                    chapterSearchQuery = ""
+                    isChapterSearchPresented = false
+                    isJumpPickerPresented = true
+                } onSearch: {
+                    isChapterSearchPresented = true
+                }
             }
 
-            ToolbarItemGroup(placement: .topBarTrailing) {
-#if DEBUG
-                if NativeReaderRolloutPolicy.activeStage != .disabled {
-                    readerDiagnosticSelector
-                }
-#endif
-                if !usesNativeRolloutReader {
-                    chapterSearchToolbarButton
-                }
-            }
         }
         .tint(accentColor)
         .task(id: chapterURL?.standardizedFileURL.path) {
@@ -495,8 +490,7 @@ struct ChapterHTMLReaderView: View {
                 },
                 isInline: true,
                 usesReaderBottomBar: usesReaderBottomBar,
-                onClose: { isChapterSearchPresented = false },
-                onSections: jumpTargets.isEmpty ? nil : { isJumpPickerPresented = true }
+                onClose: { isChapterSearchPresented = false }
             )
             .environmentObject(library)
         }
