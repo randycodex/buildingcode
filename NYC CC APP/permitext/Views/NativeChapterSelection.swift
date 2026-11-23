@@ -83,9 +83,21 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
     var askAssistant: (([ResearchSelectionRequest]) -> Void)?
 
     private lazy var press: UILongPressGestureRecognizer = {
-        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(handlePress(_:)))
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(handleDrag(_:)))
         gesture.minimumPressDuration = 0.35
         gesture.allowableMovement = 12
+        gesture.allowedTouchTypes = [UITouch.TouchType.direct, .pencil].map { NSNumber(value: $0.rawValue) }
+        gesture.cancelsTouchesInView = false
+        gesture.delegate = self
+        return gesture
+    }()
+    private lazy var pointerDrag: UIPanGestureRecognizer = {
+        // Mirroring and external trackpads deliver pointer clicks as indirect
+        // touches. A click-drag should start at mouse-down, with no touch hold.
+        let gesture = UIPanGestureRecognizer(target: self, action: #selector(handleDrag(_:)))
+        gesture.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirectPointer.rawValue)]
+        gesture.allowedScrollTypesMask = []
+        gesture.maximumNumberOfTouches = 1
         gesture.cancelsTouchesInView = false
         gesture.delegate = self
         return gesture
@@ -97,10 +109,12 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         if let previous = self.scrollView {
             clear()
             previous.removeGestureRecognizer(press)
+            previous.removeGestureRecognizer(pointerDrag)
             previous.removeInteraction(editMenu)
         }
         self.scrollView = scrollView
         scrollView.addGestureRecognizer(press)
+        scrollView.addGestureRecognizer(pointerDrag)
         scrollView.addInteraction(editMenu)
     }
 
@@ -152,6 +166,15 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         return false
     }
 
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        gestureRecognizer !== pointerDrag || gestureRecognizer.buttonMask.contains(.primary)
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldBeRequiredToFailBy other: UIGestureRecognizer) -> Bool {
+        gestureRecognizer === pointerDrag && other === scrollView?.panGestureRecognizer
+    }
+
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                            shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
         // The enclosing pan should win normal swipes. Let UIKit handle an ordinary
@@ -160,19 +183,23 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         return otherView === origin || otherView.isDescendant(of: origin)
     }
 
-    @objc private func handlePress(_ gesture: UILongPressGestureRecognizer) {
+    @objc private func handleDrag(_ gesture: UIGestureRecognizer) {
         guard let scrollView, let window = scrollView.window else { return }
+        let isPointerDrag = gesture === pointerDrag
         fingerInWindow = gesture.location(in: window)
         switch gesture.state {
         case .began:
             guard let origin, let target = origin.chapterSelectionTarget,
                   let position = origin.closestPosition(to: initialTouch) else { return }
             let offset = origin.offset(from: origin.beginningOfDocument, to: position)
-            let word = origin.tokenizer.rangeEnclosingPosition(position, with: .word, inDirection: .storage(.forward))
-                ?? origin.tokenizer.rangeEnclosingPosition(position, with: .word, inDirection: .storage(.backward))
-            if let word {
-                let location = origin.offset(from: origin.beginningOfDocument, to: word.start)
-                initialWord = NSRange(location: location, length: origin.offset(from: word.start, to: word.end))
+            initialWord = nil
+            if !isPointerDrag {
+                let word = origin.tokenizer.rangeEnclosingPosition(position, with: .word, inDirection: .storage(.forward))
+                    ?? origin.tokenizer.rangeEnclosingPosition(position, with: .word, inDirection: .storage(.backward))
+                if let word {
+                    let location = origin.offset(from: origin.beginningOfDocument, to: word.start)
+                    initialWord = NSRange(location: location, length: origin.offset(from: word.start, to: word.end))
+                }
             }
             initialPosition = NativeChapterSelectionPosition(address: target.address, offset: offset)
             if selection != nil {
@@ -180,11 +207,13 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
                 editMenu.dismissMenu()
                 clearHighlight()
             }
+            if isPointerDrag { extendSelection() }
         case .changed:
             extendSelection()
             if isDragging && edgeSpeed != 0 { startAutoscroll() } else { stopAutoscroll() }
         case .ended:
             defer { finishDrag() }
+            extendSelection()
             guard isDragging, let selection, let content = resolveText?(selection),
                   !content.text.isEmpty else {
                 clearHighlight()
