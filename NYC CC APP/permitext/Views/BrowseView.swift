@@ -257,13 +257,14 @@ struct BrowseView: View {
     private func chapterGrid(_ group: BrowseChapterGroup, kind: ChapterTileKind, order: Int,
                              showsGroupHeader: Bool) -> some View {
         let isAppendix = kind == .appendix
+        let headingSpacing: CGFloat = 12
         let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
-        return VStack(alignment: .leading, spacing: 12) {
+        return VStack(alignment: .leading, spacing: headingSpacing) {
             if showsGroupHeader {
                 codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
             }
             if isAppendix {
-                ReaderAppendixSectionHeading()
+                ReaderAppendixSectionHeading(cardSpacing: headingSpacing)
             }
             LazyVGrid(columns: columns, spacing: 12) {
                 ForEach(isAppendix ? group.appendixItems : group.chapterItems) { chapter in
@@ -1931,6 +1932,7 @@ enum ReaderBrowseHeading: String {
 }
 
 private struct ReaderAppendixSectionHeading: View {
+    let cardSpacing: CGFloat
     private var title: Text { Text(ReaderBrowseHeading.appendix.rawValue) }
 
     var body: some View {
@@ -1938,14 +1940,15 @@ private struct ReaderAppendixSectionHeading: View {
             // Reserve the heading's space when the title scrolls behind the toolbar.
             .overlay {
                 GeometryReader { proxy in
-                    if proxy.frame(in: .named("browseScroll")).minY >= ReaderBrowseHeaderSelection.cardTopInset {
+                    let cardTop = proxy.frame(in: .named("browseScroll")).maxY + cardSpacing
+                    if !ReaderBrowseHeaderSelection.hasReachedCardTop(cardTop) {
                         title
                             .accessibilityAddTraits(.isHeader)
                             .accessibilityIdentifier("reader-appendix-section-heading")
                     }
                 }
             }
-            .font(.headline)
+            .font(CodeTypography.screenTitle)
     }
 }
 
@@ -1958,12 +1961,16 @@ struct ReaderBrowseHeadingBoundary: Equatable {
     init(order: Int, heading: ReaderBrowseHeading, cardTop: CGFloat) {
         self.order = order
         self.heading = heading
-        self.reachedCardTop = cardTop <= ReaderBrowseHeaderSelection.cardTopInset
+        self.reachedCardTop = ReaderBrowseHeaderSelection.hasReachedCardTop(cardTop)
     }
 }
 
 enum ReaderBrowseHeaderSelection {
     static let cardTopInset = CodeScreenMetrics.sectionSpacingBelowEyebrow
+
+    static func hasReachedCardTop(_ cardTop: CGFloat) -> Bool {
+        cardTop <= cardTopInset
+    }
 
     static func heading(at boundaries: [ReaderBrowseHeadingBoundary]) -> ReaderBrowseHeading {
         let ordered = boundaries.sorted { $0.order < $1.order }

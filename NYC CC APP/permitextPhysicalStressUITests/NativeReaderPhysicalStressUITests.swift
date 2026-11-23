@@ -576,6 +576,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
         moveFirstAppendix(to: restingCardY + 14)
         XCTAssertTrue(isPinned(chapters), "Chapters should stay until Appendix A reaches the first chapter card's position")
+        XCTAssertTrue(inlineAppendix.exists, "The inline Appendix heading must remain visible until the pinned title takes over")
+        XCTAssertEqual(firstAppendix.frame.minY - inlineAppendix.frame.maxY, 12, accuracy: 2)
+        keepScreenshot(named: "Appendix heading just before the pinned handoff", from: app)
         moveFirstAppendix(to: restingCardY - 14)
         XCTAssertTrue(isPinned(appendix), "The title should change as soon as Appendix A passes the first chapter card's position")
         XCTAssertFalse(inlineAppendix.exists, "Only the pinned Appendix title should appear at the top")
@@ -585,6 +588,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Appendix replaces Chapters at the pinned heading", from: app)
         moveFirstAppendix(to: restingCardY + 14)
         XCTAssertTrue(isPinned(chapters), "Crossing the card boundary in reverse should restore Chapters")
+        XCTAssertTrue(inlineAppendix.exists, "The inline heading must return as soon as the pinned title changes back")
         moveFirstAppendix(to: restingCardY - 14)
         browser.swipeUp(velocity: .slow)
         XCTAssertEqual(appendix.frame.minY, appendixY, accuracy: 2, "Appendix stays pinned while its cards scroll")
