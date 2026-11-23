@@ -418,7 +418,7 @@ private struct ChapterFindPlacement<Bar: View>: ViewModifier {
                 }
             }
         } else {
-            content.safeAreaInset(edge: .top, spacing: 0) {
+            content.codePinnedTopBar {
                 if isPresented { bar(false) }
             }
         }

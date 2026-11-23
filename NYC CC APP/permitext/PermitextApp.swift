@@ -340,6 +340,7 @@ struct PermitextApp: App {
                 }
 #endif
             }
+            .codeSoftTopScrollEdges()
             .onChange(of: library.isInitialContentLoaded, initial: true) { _, isReady in
                 guard isReady else { return }
                 // The existing loading screen yields directly to navigation.

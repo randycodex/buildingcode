@@ -255,21 +255,14 @@ struct BookmarksView: View {
 
     private var savedContent: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                savedScreenHeader
-
-
-            }
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .padding(.horizontal, contentHorizontalInset)
-            .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
-            .padding(.bottom, tabBarClearance)
+            savedScreenContent
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .padding(.horizontal, contentHorizontalInset)
+                .padding(.top, CodeScreenMetrics.contentSpacingBelowTitle)
+                .padding(.bottom, tabBarClearance)
         }
         .accessibilityIdentifier("projects-root")
-        .overlay(alignment: .top) {
-            CodeTopContentFade(title: screenTitle)
-        }
-        .overlay(alignment: .top) {
+        .codePinnedTopBar {
             pinnedSavedHeader
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
@@ -396,31 +389,26 @@ struct BookmarksView: View {
         }
     }
 
-    private var savedScreenHeader: some View {
-        VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-            pinnedSavedHeader
-                .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
-                .hidden()
-                .accessibilityHidden(true)
-            if showsProjectsSection { projectTilesSection }
-            else if let onOpenLibrary {
-                Button(action: onOpenLibrary) {
-                    CodeSurface(accent: accentColor, showsBorder: false) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Image(systemName: "book")
-                                .font(.title2)
-                            Text("Code Library").font(.title3.weight(.semibold))
-                            Text("Read and search codes")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(8)
+    @ViewBuilder
+    private var savedScreenContent: some View {
+        if showsProjectsSection { projectTilesSection }
+        else if let onOpenLibrary {
+            Button(action: onOpenLibrary) {
+                CodeSurface(accent: accentColor, showsBorder: false) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Image(systemName: "book")
+                            .font(.title2)
+                        Text("Code Library").font(.title3.weight(.semibold))
+                        Text("Read and search codes")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(8)
                 }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("projects-code-library")
             }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("projects-code-library")
         }
     }
 
@@ -1213,6 +1201,7 @@ private struct ProjectSectionScreen<Content: View>: View {
                 .padding(.top, CodeScreenMetrics.topTitlePadding)
                 .padding(.bottom, CodeScreenMetrics.tabBarClearance)
         }
+        .codeNavigationTopScrollEdge()
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
@@ -1236,7 +1225,15 @@ private struct ProjectOverviewView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
+        Group {
+            switch tab {
+            case .context:
+                ProjectContextView(folderID: folderID, isEditing: $isEditing)
+            case .zoning:
+                ProjectFactsView(folderID: folderID, isEditing: $isEditing)
+            }
+        }
+        .codePinnedTopBar {
             Picker("Overview section", selection: $tab) {
                 Text("Context").tag(ProjectOverviewTab.context)
                 Text("Zoning").tag(ProjectOverviewTab.zoning)
@@ -1245,13 +1242,6 @@ private struct ProjectOverviewView: View {
             .disabled(isEditing)
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
             .padding(.top, 8)
-
-            switch tab {
-            case .context:
-                ProjectContextView(folderID: folderID, isEditing: $isEditing)
-            case .zoning:
-                ProjectFactsView(folderID: folderID, isEditing: $isEditing)
-            }
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("Overview")

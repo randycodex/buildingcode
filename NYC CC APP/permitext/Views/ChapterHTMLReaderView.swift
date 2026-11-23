@@ -354,6 +354,7 @@ struct ChapterHTMLReaderView: View {
                     )
                 } else if hasActivatedHTMLReader {
                     htmlReader(chapterURL: chapterURL, readAccessURL: readAccessURL)
+                        .codeNavigationTopScrollEdge()
                 } else {
                     chapterLoadingShell
                 }
@@ -502,15 +503,6 @@ struct ChapterHTMLReaderView: View {
         .navigationDestination(item: $openedSection) { section in
             ReaderView(sectionID: section.id)
                 .environmentObject(library)
-        }
-        .overlay(alignment: .top) {
-            if chapterURL != nil,
-               readAccessURL != nil,
-               isRolloutRouteResolved,
-               hasActivatedHTMLReader,
-               !usesNativeRolloutReader {
-                CodeTopContentFade(alwaysVisible: !isChapterSearchPresented)
-            }
         }
         .onDisappear {
             readerIsVisible = false

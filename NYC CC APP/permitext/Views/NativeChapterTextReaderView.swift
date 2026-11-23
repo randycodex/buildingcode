@@ -249,9 +249,6 @@ struct NativeChapterTextReaderView: View {
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPicker(proxy: proxy, document: document)
         }
-        .overlay(alignment: .top) {
-            if !isSearchPresented { CodeTopContentFade(alwaysVisible: true) }
-        }
     }
 
     private func closeChapterSearch() {
@@ -394,6 +391,7 @@ struct NativeChapterTextReaderView: View {
                 }
             })
         }
+        .codeNavigationTopScrollEdge()
         .accessibilityIdentifier("native-reader-ready")
     }
 

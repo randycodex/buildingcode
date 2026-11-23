@@ -354,6 +354,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         webView.scrollView.alwaysBounceHorizontal = false
         webView.scrollView.showsHorizontalScrollIndicator = false
         webView.scrollView.showsVerticalScrollIndicator = false
+        if #available(iOS 26.0, *) {
+            webView.scrollView.topEdgeEffect.style = .soft
+        }
         webView.scrollView.isDirectionalLockEnabled = true
         webView.isOpaque = true
         webView.allowsBackForwardNavigationGestures = false

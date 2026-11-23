@@ -1985,12 +1985,11 @@ struct ProSubscriptionStoreView: View {
                     .accessibilityLabel("Close Pro")
                 }
             }
-            .safeAreaInset(edge: .top, spacing: 0) {
+            .codePinnedTopBar {
                 CodeScreenTitleRow(title: "Pro", minimumHeight: CodeScreenMetrics.mainHeaderHeight)
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
                 .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
-                .background(Color(uiColor: .systemBackground))
             }
             .interactiveDismissDisabled(library.isStoreKitBusy)
         }

@@ -1234,7 +1234,7 @@ private struct ResearchSessionView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-        .transparentTopScrollEdge()
+        .codeNavigationTopScrollEdge()
         .accessibilityIdentifier("research-history-list")
         .contentMargins(.top, CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)
         .scrollDismissesKeyboard(.interactively)
@@ -1303,65 +1303,62 @@ private struct ResearchSessionView: View {
 
     private func conversationView(_ conversation: ResearchConversation) -> some View {
         ScrollViewReader { proxy in
-            ZStack(alignment: .top) {
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 16) {
-                        if let errorMessage { statusMessage(errorMessage) }
-                        if conversation.sourceStatus == "changed" {
-                            changedSourceWarning(conversation)
-                        }
-                        if conversation.projectContextReviewRequired {
-                            projectContextWarning(conversation)
-                        }
-                        if conversation.sources.contains(where: { $0.kind == "selection" }) {
-                            evidenceSummary(conversation.sources)
-                        }
-                        ForEach(conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }) { message in
-                            messageView(
-                                message,
-                                sources: conversation.sources,
-                                onDetailsExpanded: {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
-                                        withAnimation(.easeInOut(duration: 0.24)) {
-                                            proxy.scrollTo("answer-details:\(message.id)", anchor: .center)
-                                        }
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 16) {
+                    if let errorMessage { statusMessage(errorMessage) }
+                    if conversation.sourceStatus == "changed" {
+                        changedSourceWarning(conversation)
+                    }
+                    if conversation.projectContextReviewRequired {
+                        projectContextWarning(conversation)
+                    }
+                    if conversation.sources.contains(where: { $0.kind == "selection" }) {
+                        evidenceSummary(conversation.sources)
+                    }
+                    ForEach(conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }) { message in
+                        messageView(
+                            message,
+                            sources: conversation.sources,
+                            onDetailsExpanded: {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
+                                    withAnimation(.easeInOut(duration: 0.24)) {
+                                        proxy.scrollTo("answer-details:\(message.id)", anchor: .center)
                                     }
                                 }
-                            )
-                                .id(message.id)
-                        }
-                        if let pendingQuestionAttempt {
-                            pendingQuestionView(pendingQuestionAttempt)
-                                .id("pending:\(pendingQuestionAttempt.id)")
-                        } else if let failedQuestionAttempt, !conversation.messages.contains(where: { $0.requestID == failedQuestionAttempt.id && $0.role == "user" }) {
-                            failedQuestionView(failedQuestionAttempt)
-                                .id("failed:\(failedQuestionAttempt.id)")
-                            if let questionErrorMessage {
-                                statusMessage(questionErrorMessage)
-                                    .id("failed-message:\(failedQuestionAttempt.id)")
                             }
-                            if library.researchTurnAllowance?.purchaseRequired == true {
-                                researchTurnRecoveryView
-                                    .id("research-turn-recovery:\(failedQuestionAttempt.id)")
-                            }
+                        )
+                            .id(message.id)
+                    }
+                    if let pendingQuestionAttempt {
+                        pendingQuestionView(pendingQuestionAttempt)
+                            .id("pending:\(pendingQuestionAttempt.id)")
+                    } else if let failedQuestionAttempt, !conversation.messages.contains(where: { $0.requestID == failedQuestionAttempt.id && $0.role == "user" }) {
+                        failedQuestionView(failedQuestionAttempt)
+                            .id("failed:\(failedQuestionAttempt.id)")
+                        if let questionErrorMessage {
+                            statusMessage(questionErrorMessage)
+                                .id("failed-message:\(failedQuestionAttempt.id)")
                         }
-                        if conversation.messages.isEmpty,
-                           pendingQuestionAttempt == nil,
-                           failedQuestionAttempt == nil {
-                            Text("Ask a question or attach a passage from Reader.")
-                                .font(.body)
-                                .foregroundStyle(.secondary)
-                                .padding(.top, 36)
-                                .frame(maxWidth: .infinity, alignment: .center)
+                        if library.researchTurnAllowance?.purchaseRequired == true {
+                            researchTurnRecoveryView
+                                .id("research-turn-recovery:\(failedQuestionAttempt.id)")
                         }
                     }
-                    .padding(.top, 76)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
+                    if conversation.messages.isEmpty,
+                       pendingQuestionAttempt == nil,
+                       failedQuestionAttempt == nil {
+                        Text("Ask a question or attach a passage from Reader.")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 36)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
                 }
-
-                researchConversationHeader(conversation)
+                .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
+                .padding(.horizontal, 16)
+                .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
             }
+            .codePinnedTopBar { researchConversationHeader(conversation) }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 researchComposer
                     .padding(.bottom, floatingNavigationClearance)

@@ -182,9 +182,7 @@ struct ReaderView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .scrollIndicators(.hidden)
-        }
-        .overlay(alignment: .top) {
-            CodeTopContentFade(alwaysVisible: true)
+            .codeNavigationTopScrollEdge()
         }
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)

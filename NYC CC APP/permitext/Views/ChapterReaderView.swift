@@ -211,9 +211,7 @@ struct ChapterReaderView: View {
             backgroundPrefetchTask = nil
             chapterSearchQuery = ""
         }
-        .overlay(alignment: .top) {
-            CodeTopContentFade(alwaysVisible: !isChapterSearchPresented)
-        }
+        .codeNavigationTopScrollEdge()
     }
 
     @ViewBuilder
@@ -1147,7 +1145,7 @@ private struct SourceProblemReportSheet: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .top, spacing: 0) {
+            .codePinnedTopBar {
                 CodeScreenTitleRow(title: "Report a problem", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
                     Button { dismiss() } label: {
                         ToolbarActionIcon(systemImage: "xmark")
@@ -1158,7 +1156,6 @@ private struct SourceProblemReportSheet: View {
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
                 .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
-                .background(Color(uiColor: .systemBackground))
             }
         }
     }

@@ -432,6 +432,48 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testScrolledConversationHeaderRemainsTappable() throws {
+#if !DEBUG
+        throw XCTSkip("Requires the isolated simulator fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        app.buttons["main-tab-research"].tap()
+        let newConversation = app.buttons["New conversation"]
+        XCTAssertTrue(newConversation.waitForExistence(timeout: 15))
+        newConversation.tap()
+        let composer = element(in: app, identifier: "research-composer")
+        XCTAssertTrue(composer.waitForExistence(timeout: 15))
+        composer.tap()
+        composer.typeText(String(repeating: "Which Building Code provisions apply in this project example? ", count: 9))
+        app.buttons["Send message"].tap()
+        XCTAssertTrue(element(in: app, identifier: "research-answer").waitForExistence(timeout: 20))
+        let userMessage = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Which Building Code")).firstMatch
+        XCTAssertTrue(userMessage.exists)
+        let initialMessageY = userMessage.frame.minY
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.46, dy: 0.63))
+            .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.46, dy: 0.3)),
+                   withVelocity: .slow, thenHoldForDuration: 0)
+        XCTAssertLessThan(userMessage.frame.minY, initialMessageY - 90)
+        keepScreenshot(named: "Soft edge above scrolled conversation", from: app)
+
+        let actions = app.buttons["Assistant actions"]
+        XCTAssertTrue(actions.exists, app.debugDescription)
+        let screen = app.coordinate(withNormalizedOffset: .zero)
+        screen.withOffset(CGVector(dx: actions.frame.midX, dy: actions.frame.midY)).tap()
+        let context = app.buttons["Include project context and facts"]
+        XCTAssertTrue(context.waitForExistence(timeout: 5), app.debugDescription)
+        screen.withOffset(CGVector(dx: 12, dy: 250)).tap()
+        let back = app.buttons["Assistant history"]
+        XCTAssertTrue(back.exists)
+        screen.withOffset(CGVector(dx: back.frame.midX, dy: back.frame.midY)).tap()
+        XCTAssertTrue(newConversation.waitForExistence(timeout: 10), app.debugDescription)
+#endif
+    }
+
     func testReaderAppendixPinsAndWorkspaceRequiresExplicitExit() throws {
 #if !DEBUG
         throw XCTSkip("Project navigation uses the isolated Debug fixture.")

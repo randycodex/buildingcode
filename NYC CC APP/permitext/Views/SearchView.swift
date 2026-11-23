@@ -404,7 +404,6 @@ struct SearchView: View {
                 // A new explicit destination must replace the sheet's
                 // StateObject and loaded passage, even while it is presented.
                 .id(prepared.id)
-                .environment(\.codeTopFadeEnabled, false)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
             }
@@ -614,7 +613,7 @@ struct SearchView: View {
         .overlay(alignment: .bottom) { searchField.bottomSearchBarPlacement() }
         .scrollDismissesKeyboard(.immediately)
         .scrollIndicators(.hidden)
-        .transparentTopScrollEdge()
+        .codeNavigationTopScrollEdge()
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
     }
 

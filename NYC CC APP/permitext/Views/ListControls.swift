@@ -171,11 +171,42 @@ struct CodeSearchBar<Field: View>: View {
 
 extension View {
     @ViewBuilder
-    func transparentTopScrollEdge() -> some View {
+    func codeSoftTopScrollEdges() -> some View {
         if #available(iOS 26.0, *) {
-            scrollEdgeEffectHidden(true, for: .top)
+            scrollEdgeEffectStyle(.soft, for: .top)
         } else {
             self
+        }
+    }
+
+    @ViewBuilder
+    func codePinnedTopBar<Bar: View>(@ViewBuilder content: () -> Bar) -> some View {
+        if #available(iOS 26.0, *) {
+            scrollEdgeEffectStyle(.soft, for: .top)
+                .safeAreaBar(edge: .top, spacing: 0, content: content)
+        } else {
+            safeAreaInset(edge: .top, spacing: 0) {
+                content().background {
+                    CodeTopEdgeMaterial().ignoresSafeArea(.container, edges: .top)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    func codeNavigationTopScrollEdge() -> some View {
+        if #available(iOS 26.0, *) {
+            scrollEdgeEffectStyle(.soft, for: .top)
+        } else {
+            overlay(alignment: .top) {
+                GeometryReader { proxy in
+                    CodeTopEdgeMaterial()
+                        .frame(height: proxy.safeAreaInsets.top)
+                        .ignoresSafeArea(.container, edges: .top)
+                }
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+            }
         }
     }
 
@@ -184,6 +215,24 @@ extension View {
         .accessibilityIdentifier("bottom-search-bar")
         .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
         .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+    }
+}
+
+private struct CodeTopEdgeMaterial: View {
+    var body: some View {
+        Rectangle()
+            .fill(.regularMaterial)
+            .mask {
+                LinearGradient(
+                    stops: [
+                        .init(color: .black, location: 0),
+                        .init(color: .black, location: 0.42),
+                        .init(color: .clear, location: 1)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
     }
 }
 

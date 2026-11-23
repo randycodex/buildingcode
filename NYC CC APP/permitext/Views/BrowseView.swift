@@ -244,7 +244,7 @@ struct BrowseView: View {
         .contentMargins(.top, ReaderBrowseHeaderSelection.cardTopInset, for: .scrollContent)
         .contentMargins(.bottom, tabBarClearance, for: .scrollContent)
         .scrollIndicators(.hidden)
-        .transparentTopScrollEdge()
+        .codeNavigationTopScrollEdge()
         .background(
             CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
                 .ignoresSafeArea()
@@ -1677,68 +1677,6 @@ struct CodeScreenTitleRow<Trailing: View>: View {
 
             Spacer()
                 .frame(height: 8)
-        }
-    }
-}
-
-private struct CodeTopFadeEnabledKey: EnvironmentKey {
-    static let defaultValue = true
-}
-
-extension EnvironmentValues {
-    var codeTopFadeEnabled: Bool {
-        get { self[CodeTopFadeEnabledKey.self] }
-        set { self[CodeTopFadeEnabledKey.self] = newValue }
-    }
-}
-
-struct CodeTopContentFade: View {
-    let title: String?
-    let progress: CGFloat
-    let alwaysVisible: Bool
-    @Environment(\.codeTopFadeEnabled) private var isEnabled
-    @Environment(\.colorScheme) private var colorScheme
-
-    init(title: String? = nil, progress: CGFloat = 0, alwaysVisible: Bool = true) {
-        self.title = title
-        self.progress = progress
-        self.alwaysVisible = alwaysVisible
-    }
-
-    var body: some View {
-        GeometryReader { proxy in
-            let topInset = proxy.safeAreaInsets.top
-            let collapsedOpacity = alwaysVisible
-                ? 1
-                : min(max((progress - 0.08) / 0.22, 0), 1)
-
-            VStack(spacing: 0) {
-                ZStack {
-                    Rectangle()
-                        .fill(.ultraThinMaterial)
-
-                    Rectangle()
-                        .fill(colorScheme == .dark ? Color.black.opacity(0.86) : Color.clear)
-                }
-                    .mask(
-                        LinearGradient(
-                            stops: [
-                                .init(color: .black, location: 0),
-                                .init(color: .black.opacity(0.82), location: 0.48),
-                                .init(color: .black.opacity(0), location: 1)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .frame(height: topInset)
-
-                Spacer(minLength: 0)
-            }
-            .frame(maxWidth: .infinity, alignment: .top)
-            .opacity(isEnabled ? collapsedOpacity : 0)
-            .allowsHitTesting(false)
-            .ignoresSafeArea(.container, edges: .top)
         }
     }
 }
