@@ -330,11 +330,6 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let section: Section
     }
 
-    private struct SearchIndexEntry {
-        let indexed: IndexedSection
-        let searchHaystack: String
-    }
-
     private struct SearchHit {
         let rank: Int
         let indexed: IndexedSection
@@ -368,14 +363,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private let groupsByChapterID: [Int64: [CodeSectionGroup]]
     private let sectionsByChapterID: [Int64: [CodeSectionSummary]]
     private let sectionIndex: [Int64: IndexedSection]
-    private let indexedSections: [IndexedSection]
-    private let indexedSectionsByCodeSectionID: [Int64: [IndexedSection]]
-    private var indexedSearchSections: [SearchIndexEntry]?
-    private var indexedSearchSectionsByCodeSectionID: [Int64: [SearchIndexEntry]] = [:]
-    private var indexedSearchEntryLookup: [Int64: SearchIndexEntry]?
-    private var indexedSearchEntryLookupByCodeSectionID: [Int64: [Int64: SearchIndexEntry]] = [:]
-    private var invertedIndex: [String: Set<Int64>]?
-    private var invertedIndexByCodeSection: [Int64: [String: Set<Int64>]] = [:]
+    // Only legacy bundles need the embedded text to build an index. Prepared
+    // editions already ship their postings and share them across code filters.
+    private let inlineSearchSections: [(categoryID: Int64?, section: Section)]
+    private let searchSectionIDsByCodeSectionID: [Int64: Set<Int64>]
+    private var searchIndex: [String: [Int64]]?
+    private var scopedInlineSearchIndexes: [Int64: [String: [Int64]]] = [:]
     private let searchIndexLock = NSLock()
     private let codeSectionNameByID: [Int64: String]
     private let sectionsByChapterIDIndex: [Int64: [Section]]
@@ -422,8 +415,6 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private let bundleUsesExternalSectionText: Bool
     private let bundleUsesExternalChapterStructure: Bool
     private let preparedChaptersURL: URL
-    private var shippedSearchIndex: [String: Set<Int64>]?
-    private var shippedSearchIndexByCodeSectionID: [Int64: [String: Set<Int64>]] = [:]
     private var synthesizedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
     private var synthesizedChapterKeys: Set<String> = []
     private let synthesizedContentLock = NSLock()
@@ -590,7 +581,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             }
             return true
         }
-        bundleUsesExternalSectionText = (decodedProject.sectionContentSchemaVersion ?? 1) >= 2
+        let usesPreparedText = (decodedProject.sectionContentSchemaVersion ?? 1) >= 2
+        bundleUsesExternalSectionText = usesPreparedText
         bundleUsesExternalChapterStructure = (decodedProject.chapterStructureSchemaVersion ?? 1) >= 2
         self.project = Project(
             schemaVersion: decodedProject.schemaVersion,
@@ -612,8 +604,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         var groupsByChapterID: [Int64: [CodeSectionGroup]] = [:]
         var sectionsByChapterID: [Int64: [CodeSectionSummary]] = [:]
         var sectionIndex: [Int64: IndexedSection] = [:]
-        var indexedSections: [IndexedSection] = []
-        var indexedSectionsByCodeSectionID: [Int64: [IndexedSection]] = [:]
+        var inlineSearchSections: [(categoryID: Int64?, section: Section)] = []
+        var searchSectionIDsByCodeSectionID: [Int64: Set<Int64>] = [:]
         var sectionsByChapterIDIndex: [Int64: [Section]] = [:]
         var sectionNumberIndex: [String: CodeSectionSummary] = [:]
         var sectionNumberByCodeSectionIndex: [String: CodeSectionSummary] = [:]
@@ -696,9 +688,9 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                             section: section
                         )
                         sectionIndex[section.id] = indexed
-                        indexedSections.append(indexed)
+                        if !usesPreparedText { inlineSearchSections.append((chapterModel.codeSectionID, section)) }
                         if let codeSectionID = chapterModel.codeSectionID {
-                            indexedSectionsByCodeSectionID[codeSectionID, default: []].append(indexed)
+                            searchSectionIDsByCodeSectionID[codeSectionID, default: []].insert(section.id)
                         }
                         return summary
                     }
@@ -748,10 +740,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 )
 
                 sectionIndex[entry.id] = indexed
-                indexedSections.append(indexed)
                 let codeSectionID = chapter.codeSectionID ?? entry.codeSectionID
+                if !usesPreparedText { inlineSearchSections.append((codeSectionID, section)) }
                 if let codeSectionID {
-                    indexedSectionsByCodeSectionID[codeSectionID, default: []].append(indexed)
+                    searchSectionIDsByCodeSectionID[codeSectionID, default: []].insert(section.id)
                     sectionNumberByCodeSectionIndex[
                         Self.scopedSectionNumberKey(entry.sectionNumber, codeSectionID: codeSectionID)
                     ] = summary
@@ -765,8 +757,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         self.groupsByChapterID = groupsByChapterID
         self.sectionsByChapterID = sectionsByChapterID
         self.sectionIndex = sectionIndex
-        self.indexedSections = indexedSections
-        self.indexedSectionsByCodeSectionID = indexedSectionsByCodeSectionID
+        self.inlineSearchSections = inlineSearchSections
+        self.searchSectionIDsByCodeSectionID = searchSectionIDsByCodeSectionID
         self.codeSectionNameByID = Dictionary(uniqueKeysWithValues: codeSections.map { ($0.id, $0.name) })
         self.sectionsByChapterIDIndex = sectionsByChapterIDIndex
         self.sectionNumberIndex = sectionNumberIndex
@@ -1430,6 +1422,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         os_signpost(.begin, log: AppSignpost.search, name: "search", signpostID: signpostID)
         defer { os_signpost(.end, log: AppSignpost.search, name: "search", signpostID: signpostID) }
 
+        if let codeSectionID, searchSectionIDsByCodeSectionID[codeSectionID] == nil { return [] }
         let citation = NativeSearchCitation(query)
         let trimmed = citation.query
         guard !trimmed.isEmpty else { return [] }
@@ -1445,12 +1438,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
         guard !Task.isCancelled else { return [] }
         os_signpost(.begin, log: AppSignpost.search, name: "searchCandidateLookup", signpostID: signpostID)
-        let index = invertedIndex(for: codeSectionID)
+        let index = loadSearchIndex(for: codeSectionID)
         if Task.isCancelled {
             os_signpost(.end, log: AppSignpost.search, name: "searchCandidateLookup", signpostID: signpostID)
             return []
         }
-        var candidateIDs = index[queryTokens[0]] ?? []
+        var candidateIDs = Set(index[queryTokens[0]] ?? [])
         for token in queryTokens.dropFirst() {
             candidateIDs.formIntersection(index[token] ?? [])
             if candidateIDs.isEmpty { break }
@@ -1462,6 +1455,9 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             }
         }
 
+        if let codeSectionID {
+            candidateIDs.formIntersection(searchSectionIDsByCodeSectionID[codeSectionID] ?? [])
+        }
         if let allowedCodeSectionIDs {
             candidateIDs = Set(candidateIDs.filter { id in
                 guard let categoryID = sectionIndex[id]?.chapter.codeSectionID else { return false }
@@ -1472,8 +1468,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         os_signpost(.end, log: AppSignpost.search, name: "searchCandidateLookup", signpostID: signpostID)
         os_signpost(.begin, log: AppSignpost.search, name: "searchMatchVerification", signpostID: signpostID)
 
-        // Candidate IDs already come from the scoped inverted index. Resolve
-        // directly instead of allocating another full-corpus search lookup.
+        // Category exclusions are applied before fetching any passage text.
         let matchedHits: [SearchHit] = candidateIDs
             .compactMap { sectionID -> SearchHit? in
                 guard !Task.isCancelled, let indexed = sectionIndex[sectionID] else { return nil }
@@ -1546,113 +1541,6 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         }
     }
 
-    private func searchCandidates(codeSectionID: Int64?) -> [SearchIndexEntry] {
-        if let codeSectionID {
-            searchIndexLock.lock()
-            if let cached = indexedSearchSectionsByCodeSectionID[codeSectionID] {
-                searchIndexLock.unlock()
-                return cached
-            }
-            searchIndexLock.unlock()
-
-            let entries = Self.buildSearchEntries(
-                from: indexedSectionsByCodeSectionID[codeSectionID] ?? [],
-                includeOfficialText: !bundleUsesExternalSectionText
-            )
-
-            searchIndexLock.lock()
-            if indexedSearchSectionsByCodeSectionID[codeSectionID] == nil {
-                indexedSearchSectionsByCodeSectionID[codeSectionID] = entries
-            }
-            let cached = indexedSearchSectionsByCodeSectionID[codeSectionID] ?? entries
-            if indexedSearchEntryLookupByCodeSectionID[codeSectionID] == nil {
-                indexedSearchEntryLookupByCodeSectionID[codeSectionID] = Self.makeSearchEntryLookup(cached)
-            }
-            searchIndexLock.unlock()
-            return cached
-        }
-
-        searchIndexLock.lock()
-        if let cached = indexedSearchSections {
-            searchIndexLock.unlock()
-            return cached
-        }
-        searchIndexLock.unlock()
-
-        let entries = Self.buildSearchEntries(
-            from: indexedSections,
-            includeOfficialText: !bundleUsesExternalSectionText
-        )
-
-        searchIndexLock.lock()
-        if indexedSearchSections == nil {
-            indexedSearchSections = entries
-        }
-        let cached = indexedSearchSections ?? entries
-        if indexedSearchEntryLookup == nil {
-            indexedSearchEntryLookup = Self.makeSearchEntryLookup(cached)
-        }
-        searchIndexLock.unlock()
-        return cached
-    }
-
-    private func searchEntryLookup(codeSectionID: Int64?) -> [Int64: SearchIndexEntry] {
-        if let codeSectionID {
-            searchIndexLock.lock()
-            if let cached = indexedSearchEntryLookupByCodeSectionID[codeSectionID] {
-                searchIndexLock.unlock()
-                return cached
-            }
-            searchIndexLock.unlock()
-
-            let entries = searchCandidates(codeSectionID: codeSectionID)
-            let lookup = Self.makeSearchEntryLookup(entries)
-            searchIndexLock.lock()
-            if indexedSearchEntryLookupByCodeSectionID[codeSectionID] == nil {
-                indexedSearchEntryLookupByCodeSectionID[codeSectionID] = lookup
-            }
-            let cached = indexedSearchEntryLookupByCodeSectionID[codeSectionID] ?? lookup
-            searchIndexLock.unlock()
-            return cached
-        }
-
-        searchIndexLock.lock()
-        if let cached = indexedSearchEntryLookup {
-            searchIndexLock.unlock()
-            return cached
-        }
-        searchIndexLock.unlock()
-
-        let entries = searchCandidates(codeSectionID: nil)
-        let lookup = Self.makeSearchEntryLookup(entries)
-        searchIndexLock.lock()
-        if indexedSearchEntryLookup == nil {
-            indexedSearchEntryLookup = lookup
-        }
-        let cached = indexedSearchEntryLookup ?? lookup
-        searchIndexLock.unlock()
-        return cached
-    }
-
-    private static func makeSearchEntryLookup(_ entries: [SearchIndexEntry]) -> [Int64: SearchIndexEntry] {
-        Dictionary(entries.map { ($0.indexed.section.id, $0) }, uniquingKeysWith: { first, _ in first })
-    }
-
-    private static func buildSearchEntries(
-        from sections: [IndexedSection],
-        includeOfficialText: Bool = true
-    ) -> [SearchIndexEntry] {
-        sections.map { indexed in
-            let haystack: String
-            if includeOfficialText {
-                haystack = "\(indexed.section.sectionNumber) \(indexed.section.title) \(indexed.section.officialText)".lowercased()
-            } else {
-                haystack = "\(indexed.section.sectionNumber) \(indexed.section.title)".lowercased()
-            }
-            return SearchIndexEntry(indexed: indexed, searchHaystack: haystack)
-        }
-    }
-
     private static func tableBlockLookup(_ tableBlocks: [CodeTableBlock]) -> [String: CodeTableBlock] {
         var lookup: [String: CodeTableBlock] = [:]
         for table in tableBlocks {
@@ -1667,51 +1555,6 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             .uppercased()
             .replacingOccurrences(of: #"[^A-Z0-9]+"#, with: "-", options: .regularExpression)
             .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
-    }
-
-    private func invertedIndex(for codeSectionID: Int64?) -> [String: Set<Int64>] {
-        if bundleUsesExternalSectionText {
-            return shippedInvertedIndex(codeSectionID: codeSectionID)
-        }
-
-        if let codeSectionID {
-            searchIndexLock.lock()
-            if let cached = invertedIndexByCodeSection[codeSectionID] {
-                searchIndexLock.unlock()
-                return cached
-            }
-            searchIndexLock.unlock()
-
-            let sections = indexedSectionsByCodeSectionID[codeSectionID] ?? []
-            let entries = Self.buildSearchEntries(from: sections, includeOfficialText: !bundleUsesExternalSectionText)
-            let index = Self.buildInvertedIndex(from: entries)
-
-            searchIndexLock.lock()
-            invertedIndexByCodeSection[codeSectionID] = index
-            if indexedSearchSectionsByCodeSectionID[codeSectionID] == nil {
-                indexedSearchSectionsByCodeSectionID[codeSectionID] = entries
-            }
-            searchIndexLock.unlock()
-            return index
-        }
-
-        searchIndexLock.lock()
-        if let cached = invertedIndex {
-            searchIndexLock.unlock()
-            return cached
-        }
-        searchIndexLock.unlock()
-
-        let entries = Self.buildSearchEntries(from: indexedSections, includeOfficialText: !bundleUsesExternalSectionText)
-        let index = Self.buildInvertedIndex(from: entries)
-
-        searchIndexLock.lock()
-        invertedIndex = index
-        if indexedSearchSections == nil {
-            indexedSearchSections = entries
-        }
-        searchIndexLock.unlock()
-        return index
     }
 
     private static func tokenize(_ text: String) -> [String] {
@@ -1740,76 +1583,46 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         return tokens
     }
 
-    private func shippedInvertedIndex(codeSectionID: Int64?) -> [String: Set<Int64>] {
-        if let codeSectionID {
-            searchIndexLock.lock()
-            if let cached = shippedSearchIndexByCodeSectionID[codeSectionID] {
-                searchIndexLock.unlock()
-                return cached
-            }
-            searchIndexLock.unlock()
+    func warmSearchIndex() {
+        _ = loadSearchIndex()
+    }
 
-            let baseIndex = loadShippedSearchIndex()
-            let sectionIDs = Set((indexedSectionsByCodeSectionID[codeSectionID] ?? []).map(\.section.id))
-            var filtered: [String: Set<Int64>] = [:]
-            filtered.reserveCapacity(baseIndex.count)
-            for (token, ids) in baseIndex {
-                let matches = ids.intersection(sectionIDs)
-                if !matches.isEmpty {
-                    filtered[token] = matches
+    private func loadSearchIndex(for codeSectionID: Int64? = nil) -> [String: [Int64]] {
+        // Warming and the first user search can overlap. Decode once per store.
+        searchIndexLock.lock()
+        defer { searchIndexLock.unlock() }
+        let inlineScope = bundleUsesExternalSectionText ? nil : codeSectionID
+        if let inlineScope {
+            if let cached = scopedInlineSearchIndexes[inlineScope] { return cached }
+        } else if let searchIndex {
+            return searchIndex
+        }
+
+        let postings: [String: [Int64]]
+        if bundleUsesExternalSectionText {
+            let url = preparedSectionsURL.deletingLastPathComponent()
+                .appendingPathComponent("searchIndex.json", isDirectory: false)
+            guard let data = try? Data(contentsOf: url),
+                  let decoded = try? JSONDecoder().decode(ShippedSearchIndexFile.self, from: data) else {
+                return [:]
+            }
+            postings = decoded.tokens
+        } else {
+            var index: [String: [Int64]] = [:]
+            for (categoryID, section) in inlineSearchSections where inlineScope == nil || categoryID == inlineScope {
+                let text = "\(section.sectionNumber) \(section.title) \(section.officialText)"
+                for token in Set(Self.tokenize(text)) {
+                    index[token, default: []].append(section.id)
                 }
             }
-
-            searchIndexLock.lock()
-            shippedSearchIndexByCodeSectionID[codeSectionID] = filtered
-            searchIndexLock.unlock()
-            return filtered
+            postings = index
         }
-
-        return loadShippedSearchIndex()
-    }
-
-    /// Eagerly loads and caches the search index so the first user-initiated
-    /// search finds it already warm. Safe to call from any thread.
-    func warmSearchIndex() {
-        _ = bundleUsesExternalSectionText
-            ? loadShippedSearchIndex()
-            : invertedIndex(for: nil)
-    }
-
-    private func loadShippedSearchIndex() -> [String: Set<Int64>] {
-        searchIndexLock.lock()
-        if let cached = shippedSearchIndex {
-            searchIndexLock.unlock()
-            return cached
+        if let inlineScope {
+            scopedInlineSearchIndexes[inlineScope] = postings
+        } else {
+            searchIndex = postings
         }
-        searchIndexLock.unlock()
-
-        let url = preparedSectionsURL
-            .deletingLastPathComponent()
-            .appendingPathComponent("searchIndex.json", isDirectory: false)
-        guard let data = try? Data(contentsOf: url),
-              let decoded = try? JSONDecoder().decode(ShippedSearchIndexFile.self, from: data) else {
-            return [:]
-        }
-
-        let index = decoded.tokens.mapValues { Set($0) }
-        searchIndexLock.lock()
-        shippedSearchIndex = index
-        searchIndexLock.unlock()
-        return index
-    }
-
-    private static func buildInvertedIndex(from entries: [SearchIndexEntry]) -> [String: Set<Int64>] {
-        var index: [String: Set<Int64>] = [:]
-        for entry in entries {
-            let sectionID = entry.indexed.section.id
-            let tokens = tokenize(entry.searchHaystack)
-            for token in tokens {
-                index[token, default: []].insert(sectionID)
-            }
-        }
-        return index
+        return postings
     }
 
     func savedSections(

@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 const source = await readFile(new URL('../../NYC CC APP/permitext/Views/AttributedTextView.swift', import.meta.url), 'utf8');
 const context = source.slice(source.indexOf('struct ReaderDefinitionContext: Hashable'), source.indexOf('private struct ReaderDefinitionContextKey:'));
 let models = source.slice(source.indexOf('struct ReaderDefinitionEntry:'), source.indexOf('final class ReaderDefinitionMatcher {'));
-models = models.replace('func entries(for context: ReaderDefinitionContext, includeSectionScoped: Bool = false) -> [ReaderDefinitionEntry] {', 'func entries(for context: ReaderDefinitionContext, includeSectionScoped: Bool = false) -> [ReaderDefinitionEntry] { registryReads += 1');
+models = models.replace('func chapterCandidates(for context: ReaderDefinitionContext) -> [ReaderDefinitionEntry] {', 'func chapterCandidates(for context: ReaderDefinitionContext) -> [ReaderDefinitionEntry] { registryReads += 1');
 let store = source.slice(source.indexOf('@MainActor\nfinal class ReaderDefinitionStore'), source.indexOf('private struct ReaderDefinitionPresentation:'));
 // Expose private state and inject the real bundled registry only in the compiled
 // host harness. Production lookup/cache methods are compiled without alteration.

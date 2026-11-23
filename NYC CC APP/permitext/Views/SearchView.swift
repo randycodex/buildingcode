@@ -808,7 +808,9 @@ struct SearchView: View {
     /// Rebuilds the filtered + grouped search caches. Called only when the
     /// underlying results or the filter set change.
     private func rebuildSearchCaches() {
-        let filtered = library.searchResults.filter { searchFilterCodeSectionIDs.isEmpty || $0.searchFilterID.map { searchFilterCodeSectionIDs.contains($0) } == true }
+        let filtered = searchFilterCodeSectionIDs.isEmpty ? library.searchResults : library.searchResults.filter {
+            $0.searchFilterID.map(searchFilterCodeSectionIDs.contains) == true
+        }
         cachedFilteredResults = filtered
         cachedGroupedResults = Self.makeGroupedResults(
             filtered,
@@ -838,7 +840,6 @@ struct SearchView: View {
             }
             return SearchResultGroup(
                 id: id.map(String.init) ?? "other",
-                codeSectionID: id,
                 codeSectionName: name ?? "Other",
                 results: results
             )
@@ -857,14 +858,6 @@ struct SearchView: View {
 
     private func rebuildJumpBackInCache() {
         cachedRecentEntries = recentlyOpenedOrder.ordered(library.recentlyViewedSections)
-    }
-
-    private func recentlyOpenedGroup(_ entry: RecentlyViewedEntry) -> String? {
-        switch recentlyOpenedOrder {
-        case .recent: return viewedDateGroup(entry.viewedAt)
-        case .code: return "\(entry.codeSectionName) · \(NativeReaderEditionLabel.label(for: entry.sourceVersion))"
-        case .title: return nil
-        }
     }
 
     private var searchResultSummary: some View {
@@ -1077,26 +1070,42 @@ struct SearchView: View {
         .padding(.top, 16)
     }
 
-    private func viewedDateGroup(_ date: Date) -> String {
-        let calendar = Calendar.current
-        if calendar.isDateInToday(date) { return "Today" }
-        if calendar.isDateInYesterday(date) { return "Yesterday" }
-        if let boundary = calendar.date(byAdding: .day, value: -30, to: Date()), date >= boundary {
-            return "Previous 30 days"
+    private func recentlyOpenedGroupLabels(_ entries: [RecentlyViewedEntry]) -> [String?] {
+        switch recentlyOpenedOrder {
+        case .title:
+            return Array(repeating: nil, count: entries.count)
+        case .code:
+            return entries.map { "\($0.codeSectionName) · \(NativeReaderEditionLabel.label(for: $0.sourceVersion))" }
+        case .recent:
+            let now = Date()
+            let calendar = Calendar.current
+            let yesterday = calendar.date(byAdding: .day, value: -1, to: now)
+            let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: now)
+            let currentYear = calendar.component(.year, from: now)
+            let month = DateFormatter()
+            month.dateFormat = "MMMM"
+            let monthAndYear = DateFormatter()
+            monthAndYear.dateFormat = "MMMM yyyy"
+            return entries.map { entry in
+                let date = entry.viewedAt
+                if calendar.isDate(date, inSameDayAs: now) { return "Today" }
+                if let yesterday, calendar.isDate(date, inSameDayAs: yesterday) { return "Yesterday" }
+                if let thirtyDaysAgo, date >= thirtyDaysAgo { return "Previous 30 days" }
+                return calendar.component(.year, from: date) == currentYear
+                    ? month.string(from: date) : monthAndYear.string(from: date)
+            }
         }
-        let label = DateFormatter()
-        label.dateFormat = calendar.component(.year, from: date) == calendar.component(.year, from: Date()) ? "MMMM" : "MMMM yyyy"
-        return label.string(from: date)
     }
 
     private func recentlyViewedSection(limit: Int?) -> some View {
         let entries = Array(cachedRecentEntries.prefix(limit ?? cachedRecentEntries.count))
+        let groupLabels = recentlyOpenedGroupLabels(entries)
         // History is capped at 50 entries. Measure these rows together so lazy
         // height estimates cannot leave gaps while restoring the scroll position.
         return VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(entries.enumerated()), id: \.element.historyIdentity) { index, entry in
                 VStack(alignment: .leading, spacing: 0) {
-                    if let group = recentlyOpenedGroup(entry), index == 0 || group != recentlyOpenedGroup(entries[index - 1]) {
+                    if let group = groupLabels[index], index == 0 || group != groupLabels[index - 1] {
                         Text(group)
                             .font(.subheadline.weight(.medium))
                             .foregroundStyle(.secondary)
@@ -1486,23 +1495,36 @@ struct SearchView: View {
 
     private struct SearchResultGroup: Identifiable {
         let id: String
-        let codeSectionID: Int64?
-        let codeSectionName: String
         let results: [CodeSearchResult]
+        let familyName: String
+        let editionLabel: String
+        let editionYear: Int
+        let familyRank: Int
 
-        var familyName: String {
-            var name = results.first?.sourceCodeName ?? codeSectionName
+        init(id: String, codeSectionName: String, results: [CodeSearchResult]) {
+            self.id = id
+            self.results = results
+            let sourceName = results.first?.sourceCodeName ?? codeSectionName
+            familyName = Self.familyName(for: sourceName)
+            let edition = Self.editionLabel(for: sourceName, version: results.first?.sourceVersion)
+            editionLabel = edition
+            editionYear = edition.range(of: #"\d{4}"#, options: .regularExpression)
+                .flatMap { Int(edition[$0]) } ?? 0
+            familyRank = Self.familyRank(for: familyName)
+        }
+
+        private static func familyName(for sourceName: String) -> String {
+            var name = sourceName
             name = name.replacingOccurrences(of: #"^\d{4} "#, with: "", options: .regularExpression)
             if name == name.uppercased() { name = name.capitalized }
             return name
         }
 
-        var editionLabel: String {
-            let name = results.first?.sourceCodeName ?? codeSectionName
+        private static func editionLabel(for name: String, version: String?) -> String {
             if let range = name.range(of: #"^\d{4}"#, options: .regularExpression) {
                 return String(name[range])
             }
-            let edition = NativeReaderEditionLabel.label(for: results.first?.sourceVersion)
+            let edition = NativeReaderEditionLabel.label(for: version)
             if edition.hasPrefix("effective ") {
                 let dateText = String(edition.dropFirst(10))
                 let formatter = DateFormatter()
@@ -1517,12 +1539,7 @@ struct SearchView: View {
             return edition.prefix(1).uppercased() + edition.dropFirst()
         }
 
-        var editionYear: Int {
-            guard let range = editionLabel.range(of: #"\d{4}"#, options: .regularExpression) else { return 0 }
-            return Int(editionLabel[range]) ?? 0
-        }
-
-        var familyRank: Int {
+        private static func familyRank(for familyName: String) -> Int {
             let order = ["building code", "existing building code", "fuel gas", "mechanical",
                          "plumbing", "energy", "electrical", "fire", "zoning", "housing",
                          "general administrative", "administrative", "local laws"]

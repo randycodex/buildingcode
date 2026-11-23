@@ -2655,13 +2655,21 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
     func testLargeChapterScrollPerformance() {
         let app = XCUIApplication()
-        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-2014-building-chapter-7"]
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-2014-building-chapter-7", "--native-reader-browse-opening"]
         let options = XCTMeasureOptions()
         options.iterationCount = 5
         options.invocationOptions = [.manuallyStart, .manuallyStop]
-        let metrics: [XCTMetric] = [XCTOSSignpostMetric.scrollingAndDecelerationMetric, XCTCPUMetric(application: app)]
+        var metrics: [XCTMetric] = [XCTOSSignpostMetric.scrollingAndDecelerationMetric, XCTCPUMetric(application: app)]
+        #if !targetEnvironment(simulator)
+        if #available(iOS 26, *) { metrics.append(XCTHitchMetric(application: app)) }
+        #endif
         measure(metrics: metrics, options: options) {
             app.launch()
+            // Open the chapter from its card, as a reader does. Deep-linking to
+            // a subsection would also exercise position restoration during setup.
+            let chapter = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 7:")).firstMatch
+            XCTAssertTrue(chapter.wait(for: \.isHittable, toEqual: true, timeout: 30))
+            chapter.tap()
             let firstPassage = app.textViews.matching(NSPredicate(
                 format: "label BEGINSWITH %@", "The provisions of this chapter shall govern"
             )).firstMatch
@@ -3889,7 +3897,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "--native-reader-phase9-width",
             "402",
             "--native-reader-phase9-starting-block-id",
-            "4a3b7d7a0dbf982ecaa5d49ef7fee970a187ed14556c16c3bf486eeb299f7e31"
+            "e884c8e96864e64d526e00199d0f9814951d64e7d328438c5e200eba086e6e1c"
         ]
         app.launch()
 
@@ -3899,7 +3907,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
 
         let figure7057 = app.buttons[
-            "native-reader-block-4a3b7d7a0dbf982ecaa5d49ef7fee970a187ed14556c16c3bf486eeb299f7e31"
+            "native-reader-block-e884c8e96864e64d526e00199d0f9814951d64e7d328438c5e200eba086e6e1c"
         ]
         XCTAssertTrue(figure7057.waitForExistence(timeout: 10))
         XCTAssertTrue(figure7057.label.localizedCaseInsensitiveContains("FIGURE 705.7"))
@@ -3913,7 +3921,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "--native-reader-phase9-width",
             "402",
             "--native-reader-phase9-starting-block-id",
-            "d3aee5b764583aff8f6b3713382a571cb588c43e4600cdeff05f8740894dc4b9"
+            "505d0c646726f7da7414b418744a0062d5070f35948db01c4ed780dedc3cf125"
         ]
         app.launch()
 
@@ -3923,7 +3931,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
         let table7058 = element(
             in: app,
-            identifier: "native-reader-block-d3aee5b764583aff8f6b3713382a571cb588c43e4600cdeff05f8740894dc4b9"
+            identifier: "native-reader-block-505d0c646726f7da7414b418744a0062d5070f35948db01c4ed780dedc3cf125"
         )
         XCTAssertTrue(table7058.waitForExistence(timeout: 10))
         XCTAssertTrue(
@@ -3948,7 +3956,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "--native-reader-phase9-width",
             "402",
             "--native-reader-phase9-starting-block-id",
-            "dbdc43066e5bd33db04c83d38806ebcb9bec8b760a50192c33bc7bd1ee5043b0"
+            "417aa6f4aaa2f39f835017361e2971970202ad6c7abbed4e4957913213cedc90"
         ]
         app.launch()
 
@@ -3958,7 +3966,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
         let table100411 = element(
             in: app,
-            identifier: "native-reader-block-dbdc43066e5bd33db04c83d38806ebcb9bec8b760a50192c33bc7bd1ee5043b0"
+            identifier: "native-reader-block-417aa6f4aaa2f39f835017361e2971970202ad6c7abbed4e4957913213cedc90"
         )
         XCTAssertTrue(table100411.waitForExistence(timeout: 10))
         XCTAssertTrue(

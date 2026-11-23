@@ -748,15 +748,26 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    // Take one snapshot of the source settings for an entire grid or warmup pass.
+    private func browseChapterFilter() -> (CodeChapter) -> Bool {
+        guard activeCodeSources != nil else { return { _ in false } }
+        guard selectedVersion?.contentKind == .authored else { return { _ in true } }
+        let enabled = enabledBrowseCodeSections
+        let categoryIDs = Set(enabled.map(\.id))
+        let includesUncategorized = enabled.count == codeSections.count
+        return { chapter in
+            guard let categoryID = chapter.codeSectionID else { return includesUncategorized }
+            return categoryIDs.contains(categoryID)
+        }
+    }
+
     func isChapterEnabledForBrowsing(_ chapter: CodeChapter) -> Bool {
-        guard activeCodeSources != nil else { return false }
-        guard selectedVersion?.contentKind == .authored else { return true }
-        guard let categoryID = chapter.codeSectionID else { return enabledBrowseCodeSections.count == codeSections.count }
-        return enabledBrowseCodeSections.contains { $0.id == categoryID }
+        let isEnabled = browseChapterFilter()
+        return isEnabled(chapter)
     }
 
     func browseChapters(for codeSectionID: Int64?) -> [CodeChapter] {
-        chapters(for: codeSectionID).filter(isChapterEnabledForBrowsing)
+        chapters(for: codeSectionID).filter(browseChapterFilter())
     }
 
     private var browseCategoryMetadata: [String: [CodeSectionCategory]] = [:]
@@ -1318,9 +1329,10 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func prewarmChapterForBrowsing(_ chapter: CodeChapter) {
-        guard isChapterEnabledForBrowsing(chapter), speculativeChapterIDs.contains(chapter.id),
-              warmedChapterIDs.contains(chapter.id) == false,
-              chapterWarmupTasks[chapter.id] == nil
+        guard speculativeChapterIDs.contains(chapter.id),
+              !warmedChapterIDs.contains(chapter.id),
+              chapterWarmupTasks[chapter.id] == nil,
+              isChapterEnabledForBrowsing(chapter)
         else {
             return
         }
@@ -7560,7 +7572,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func prewarmStartupPriorityChapters(_ chapters: [CodeChapter]) async {
         guard !Task.isCancelled else { return }
-        let prioritized = startupPriorityChapters(from: chapters.filter(isChapterEnabledForBrowsing))
+        let prioritized = startupPriorityChapters(from: chapters.filter(browseChapterFilter()))
         speculativeChapterIDs = Set(prioritized.map(\.id))
         guard !prioritized.isEmpty else { return }
 

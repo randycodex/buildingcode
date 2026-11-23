@@ -1118,7 +1118,7 @@ struct ReaderDefinitionRegistry: Decodable {
     let schemaVersion: Int
     let books: [Book]
 
-    func entries(for context: ReaderDefinitionContext, includeSectionScoped: Bool = false) -> [ReaderDefinitionEntry] {
+    fileprivate func chapterCandidates(for context: ReaderDefinitionContext) -> [ReaderDefinitionEntry] {
         guard schemaVersion == 1, !context.bundle.isEmpty else { return [] }
         guard !books.contains(where: {
             $0.excludeWholeChapter != false && $0.bundle == context.bundle && $0.codeSectionID == context.codeSectionID &&
@@ -1126,15 +1126,22 @@ struct ReaderDefinitionRegistry: Decodable {
             ($0.chapterID == nil || context.chapterID == nil || $0.chapterID == context.chapterID)
         }) else { return [] }
         let initial = String(context.chapterNumber.uppercased().prefix(1))
-        let selected = books.filter {
+        return books.filter {
             $0.bundle == context.bundle && $0.codeSectionID == context.codeSectionID &&
             ($0.scope == "general" || $0.scope == initial || $0.scope == "appendix-\(initial)")
         }.flatMap(\.entries).filter {
             $0.applicability == "definition-chapter" &&
             ($0.applicableChapters == nil || $0.applicableChapters!.contains(context.chapterNumber.uppercased())) &&
-            $0.applies(toChapterID: context.chapterID) &&
-            (includeSectionScoped || $0.applies(toSection: context.sectionNumber))
+            $0.applies(toChapterID: context.chapterID)
         }
+    }
+
+    func entries(for context: ReaderDefinitionContext, includeSectionScoped: Bool = false) -> [ReaderDefinitionEntry] {
+        let candidates = chapterCandidates(for: context)
+        return Self.uniqueEntries(in: includeSectionScoped ? candidates : candidates.filter { $0.applies(toSection: context.sectionNumber) })
+    }
+
+    fileprivate static func uniqueEntries(in selected: [ReaderDefinitionEntry]) -> [ReaderDefinitionEntry] {
         struct Identity: Hashable {
             let term: String
             let text: String
@@ -1263,18 +1270,47 @@ final class ReaderDefinitionMatcher {
 final class ReaderDefinitionStore {
     static let shared = ReaderDefinitionStore()
     private let registry: ReaderDefinitionRegistry?
-    private var matchers: [ReaderDefinitionContext: ReaderDefinitionMatcher] = [:]
-    // Section is deliberately absent: includeSectionScoped selection depends only
-    // on these four chapter/source fields. The bundled registry is immutable.
     private struct ChapterKey: Hashable {
         let bundle: String
         let codeSectionID: Int64
         let chapterNumber: String
         let chapterID: Int64?
+
+        init(_ context: ReaderDefinitionContext) {
+            bundle = context.bundle
+            codeSectionID = context.codeSectionID
+            chapterNumber = context.chapterNumber
+            chapterID = context.chapterID
+        }
     }
+    private enum SectionScope: Hashable {
+        case unspecified, ordinary, subtree(String), exact(String)
+    }
+    private struct MatcherKey: Hashable {
+        let chapter: ChapterKey
+        let section: SectionScope
+    }
+    private var matchers: [MatcherKey: ReaderDefinitionMatcher] = [:]
+
     private struct ChapterSelection {
         let entries: [ReaderDefinitionEntry]
         let hasSectionScopes: Bool
+        let exactSections: Set<String>
+        let subtrees: Set<String>
+
+        // Siblings share all inherited rules until a more-specific rule or an exact
+        // exception applies. Missing section identity must still fail closed.
+        func matcherScope(for sectionNumber: String?) -> SectionScope {
+            guard let section = sectionNumber?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(),
+                  !section.isEmpty else { return .unspecified }
+            if exactSections.contains(section) { return .exact(section) }
+            var prefix = section[...]
+            while true {
+                if subtrees.contains(String(prefix)) { return .subtree(String(prefix)) }
+                guard let dot = prefix.lastIndex(of: ".") else { return .ordinary }
+                prefix = prefix[..<dot]
+            }
+        }
     }
     private var chapters: [ChapterKey: ChapterSelection] = [:]
     private var chapterRecency: [ChapterKey] = []
@@ -1296,8 +1332,7 @@ final class ReaderDefinitionStore {
     }
 
     private func chapterSelection(for context: ReaderDefinitionContext) -> ChapterSelection {
-        let key = ChapterKey(bundle: context.bundle, codeSectionID: context.codeSectionID,
-                             chapterNumber: context.chapterNumber, chapterID: context.chapterID)
+        let key = ChapterKey(context)
         if let selection = chapters[key] {
             if chapterRecency.last != key {
                 chapterRecency.removeAll { $0 == key }
@@ -1305,11 +1340,24 @@ final class ReaderDefinitionStore {
             }
             return selection
         }
-        let entries = registry?.entries(for: context, includeSectionScoped: true) ?? []
-        let selection = ChapterSelection(entries: entries, hasSectionScopes: entries.contains {
+        let candidates = registry?.chapterCandidates(for: context) ?? []
+        let scoped = candidates.filter {
             $0.applicableSections != nil || $0.applicableExactSections != nil ||
             $0.excludedSections != nil || $0.excludedExactSections != nil || $0.excludedOccurrences != nil
-        })
+        }
+        var exactSections = Set<String>()
+        var subtrees = Set<String>()
+        for entry in scoped {
+            for scope in (entry.applicableExactSections ?? []) + (entry.excludedExactSections ?? []) {
+                exactSections.insert(scope.trimmingCharacters(in: .whitespacesAndNewlines).uppercased())
+            }
+            for scope in (entry.applicableSections ?? []) + (entry.excludedSections ?? []) {
+                subtrees.insert(scope.trimmingCharacters(in: .whitespacesAndNewlines).uppercased())
+            }
+            for rule in entry.excludedOccurrences ?? [] { subtrees.insert(rule.section.uppercased()) }
+        }
+        let selection = ChapterSelection(entries: ReaderDefinitionRegistry.uniqueEntries(in: candidates),
+                                         hasSectionScopes: !scoped.isEmpty, exactSections: exactSections, subtrees: subtrees)
         if chapterRecency.count >= chapterCapacity {
             chapters.removeValue(forKey: chapterRecency.removeFirst())
         }
@@ -1319,10 +1367,12 @@ final class ReaderDefinitionStore {
     }
 
     func matcher(for context: ReaderDefinitionContext) -> ReaderDefinitionMatcher {
-        if let matcher = matchers[context] { return matcher }
+        let scope = chapterSelection(for: context).matcherScope(for: context.sectionNumber)
+        let key = MatcherKey(chapter: ChapterKey(context), section: scope)
+        if let matcher = matchers[key] { return matcher }
         let matcher = ReaderDefinitionMatcher(entries: registry?.entries(for: context) ?? [], sectionNumber: context.sectionNumber)
         if matchers.count >= 12, let oldest = matchers.keys.first { matchers.removeValue(forKey: oldest) }
-        matchers[context] = matcher
+        matchers[key] = matcher
         return matcher
     }
 }

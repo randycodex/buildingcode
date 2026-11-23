@@ -98,6 +98,35 @@ enum ResearchHistoryPresentation {
             summaries.filter { $0.isPinned != true && $0.messageCount != 0 } +
             summaries.filter { $0.isPinned != true && $0.messageCount == 0 }
     }
+
+    struct GroupLabels {
+        private let calendar = Calendar.current
+        private let sevenDaysAgo: Date?
+        private let thirtyDaysAgo: Date?
+        private let currentYear: Int
+        private let month = DateFormatter()
+        private let monthAndYear = DateFormatter()
+
+        init(now: Date = Date()) {
+            sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: now)
+            thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: now)
+            currentYear = calendar.component(.year, from: now)
+            month.dateFormat = "MMMM"
+            monthAndYear.dateFormat = "MMMM yyyy"
+        }
+
+        func label(for item: ResearchConversationSummary) -> String {
+            if item.isPinned == true { return "Pinned" }
+            if item.messageCount == 0 { return "Drafts" }
+            guard let date = ListTimestamp.date(from: item.createdAt) else {
+                return "Earlier"
+            }
+            if let sevenDaysAgo, date >= sevenDaysAgo { return "7 days" }
+            if let thirtyDaysAgo, date >= thirtyDaysAgo { return "30 days" }
+            let formatter = calendar.component(.year, from: date) == currentYear ? month : monthAndYear
+            return formatter.string(from: date)
+        }
+    }
 }
 
 enum ResearchComposerDraftCache {
@@ -1090,25 +1119,9 @@ private struct ResearchSessionView: View {
         historyPreviewRevisions[summary.id] = summary.updatedAt
     }
 
-    private func historyDateGroup(_ item: ResearchConversationSummary) -> String {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let date = formatter.date(from: item.createdAt) ?? ISO8601DateFormatter().date(from: item.createdAt)
-        guard let date else { return "Earlier" }
-        let calendar = Calendar.current
-        if let boundary = calendar.date(byAdding: .day, value: -7, to: Date()), date >= boundary {
-            return "7 days"
-        }
-        if let boundary = calendar.date(byAdding: .day, value: -30, to: Date()), date >= boundary {
-            return "30 days"
-        }
-        let label = DateFormatter()
-        label.dateFormat = calendar.component(.year, from: date) == calendar.component(.year, from: Date()) ? "MMMM" : "MMMM yyyy"
-        return label.string(from: date)
-    }
-
     private var historyView: some View {
         let orderedSummaries = ResearchHistoryPresentation.ordered(visibleHistory)
+        let groups = ResearchHistoryPresentation.GroupLabels()
         return List {
             if projectFolderID == nil {
                 historyProjectFilter
@@ -1138,13 +1151,9 @@ private struct ResearchSessionView: View {
 
 
             ForEach(Array(orderedSummaries.enumerated()), id: \.element.id) { index, item in
-                let isPinned = item.isPinned == true
-                let isDraft = !isPinned && item.messageCount == 0
-                let previous = index > 0 ? orderedSummaries[index - 1] : nil
-                let startsPinned = isPinned && previous?.isPinned != true
-                let startsDrafts = isDraft && (previous == nil || previous?.isPinned == true || previous?.messageCount != 0)
-                if startsPinned || startsDrafts || (!isPinned && !isDraft && (previous == nil || previous?.isPinned == true || historyDateGroup(item) != historyDateGroup(orderedSummaries[index - 1]))) {
-                    Text(isPinned ? "Pinned" : startsDrafts ? "Drafts" : historyDateGroup(item))
+                let group = groups.label(for: item)
+                if index == 0 || group != groups.label(for: orderedSummaries[index - 1]) {
+                    Text(group)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .padding(.top, index == 0 ? 0 : 20)
@@ -2021,9 +2030,15 @@ private struct ResearchSessionView: View {
         let publicationID = conversationPublicationID
         isLoadingConversation = true
         defer { if isCurrent(identity), conversationLoadID == loadID { isLoadingConversation = false } }
-        if useCache, let cached = try? ResearchConversationCacheLifecycle.load(
-            ResearchConversation.self, cache: cache, accountID: identity.account.accountID, conversationID: id
-        ), acceptsConversation(cached.value) { conversation = cached.value }
+        if useCache {
+            let cached = try? await ProjectHubOfflineCacheWorker.shared.load(
+                ResearchConversation.self, from: cache, accountID: identity.account.accountID,
+                projectID: id, scope: ResearchConversationCacheLifecycle.conversationScope
+            )
+            guard isCurrent(identity), !Task.isCancelled,
+                  conversationLoadID == loadID, conversationPublicationID == publicationID else { return }
+            if let cached, acceptsConversation(cached.value) { conversation = cached.value }
+        }
         // Restore local edits before publishing a cached conversation's composer.
         // A slow refresh must not expose an empty, editable field over a saved draft.
         if question.isEmpty, let saved = try? ResearchComposerDraftCache.load(

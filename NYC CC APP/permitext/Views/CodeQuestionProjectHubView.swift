@@ -436,9 +436,7 @@ private struct CodeQuestionProjectHubDetail: View {
     }
 
     private func formattedDate(_ value: String) -> String {
-        let fractional = ISO8601DateFormatter()
-        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let date = fractional.date(from: value) ?? ISO8601DateFormatter().date(from: value)
+        let date = ListTimestamp.date(from: value)
         return date?.formatted(date: .abbreviated, time: .shortened) ?? value
     }
 }

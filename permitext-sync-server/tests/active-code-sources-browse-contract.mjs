@@ -54,6 +54,7 @@ struct NativeReaderPreparedOpening { let route: Int; let prepared: Int }
  func authoredHTMLWarmupTarget(for chapter: CodeChapter) -> (chapterURL: URL, readAccessURL: URL)? { nil }
  func suspendReaderWarmups() { codeSectionWarmupTask?.cancel(); chapterWarmupTasks.values.forEach { $0.cancel() }; speculativeChapterIDs = [] }
  ${method("    var enabledBrowseCodeSections:")}
+ ${method("    private func browseChapterFilter(")}
  ${method("    func isChapterEnabledForBrowsing(")}
  ${method("    func browseChapters(")}
  ${method("    func chapters(for")}

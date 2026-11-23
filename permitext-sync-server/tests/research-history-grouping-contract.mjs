@@ -46,16 +46,18 @@ const render=web.slice(web.indexOf('  researchConversationHistoryGroups(visibleH
 assert.match(render,/document.createElement\(historyGroup.collapsible === false \? "span" : "button"\)/);
 assert.match(render,/if \(historyGroup.collapsible !== false\) \{[\s\S]*?wireProjectSectionMotion/);
 assert.match(render,/groupBody.append\(row\)/);
-assert.match(native,/Text\(isPinned \? "Pinned" : startsDrafts \? "Drafts" : historyDateGroup\(item\)\)/);
+assert.match(native,/if index == 0 \|\| group != groups\.label\(for: orderedSummaries\[index - 1\]\) \{\s+Text\(group\)/);
 assert.match(native,/ForEach\(Array\(orderedSummaries.enumerated\(\)\)/);
 assert.doesNotMatch(native,/"Empty draft"/);
 const helper=native.slice(native.indexOf('enum ResearchHistoryPresentation {'),native.indexOf('enum ResearchComposerDraftCache {'));
+const controls=await readFile(new URL('../../NYC CC APP/permitext/Views/ListControls.swift',import.meta.url),'utf8');
+const timestamp=controls.slice(controls.indexOf('enum ListTimestamp {'),controls.indexOf('enum ListSelectionMotion {'));
 const model=models.slice(models.indexOf('struct ResearchHistoryContentFacts:'),models.indexOf('struct ResearchConversation:'));
 const titleStart=native.indexOf('    private func researchTitle(for summary:');
 const title=native.slice(titleStart,native.indexOf('\n    }',titleStart)+6).replace('private func','static func');
 const dir=await mkdtemp(join(tmpdir(),'permitext-history-grouping-'));
 await writeFile(join(dir,'rows.json'),JSON.stringify(rows.map(row=>({...row,updatedAt:date,sourceCount:row.sourceCount||0,sourceSectionIDs:[],projectContextReviewRequired:false,sourceStatus:'current'}))));
-await writeFile(join(dir,'main.swift'),`import Foundation\n${model}\n${helper}\nenum Titles {\n${title}\n}\n
+await writeFile(join(dir,'main.swift'),`import Foundation\n${model}\n${timestamp}\n${helper}\nenum Titles {\n${title}\n}\n
 let data=try Data(contentsOf:URL(fileURLWithPath:CommandLine.arguments[1]))
 let input=try JSONDecoder().decode([ResearchConversationSummary].self,from:data)
 let ordered=ResearchHistoryPresentation.ordered(input)
@@ -63,6 +65,22 @@ precondition(ordered.map(\\.id)==["answered","negative","old-question","evidence
 precondition(Set(ordered.map(\\.id))==Set(input.map(\\.id)))
 var pinned=input[0];pinned.isPinned=true
 precondition(ResearchHistoryPresentation.ordered([input[1],pinned,input[4]]).map(\\.id)==["evidence","answered","pending-draft"])
+let groups = ResearchHistoryPresentation.GroupLabels(now: ISO8601DateFormatter().date(from: "2026-09-28T12:00:00Z")!)
+func localMonth(_ timestamp: String, format: String) -> String {
+ let formatter = DateFormatter(); formatter.dateFormat = format
+ return formatter.string(from: ISO8601DateFormatter().date(from: timestamp)!)
+}
+let older = localMonth("2020-01-01T00:00:00Z", format: "MMMM yyyy")
+precondition(ordered.map(groups.label) == ["7 days","7 days",older,"Drafts","Drafts","Drafts"])
+precondition(groups.label(for: pinned) == "Pinned")
+func dated(_ stamp: String) -> ResearchConversationSummary {
+ ResearchConversationSummary(id: stamp, title: "", createdAt: stamp, updatedAt: stamp, messageCount: 2)
+}
+for (stamp, label) in [("2026-09-21T12:00:00.000Z","7 days"), ("2026-09-21T11:59:59.999Z","30 days"),
+                       ("2026-09-21T08:00:00.123456-04:00","7 days"),
+                       ("2026-08-29T12:00:00Z","30 days"), ("2026-08-29T11:59:59Z",localMonth("2026-08-29T11:59:59Z", format: "MMMM")), ("bad","Earlier")] {
+ precondition(groups.label(for: dated(stamp)) == label)
+}
 precondition(ResearchHistoryPresentation.ordered([]).isEmpty)
 precondition(Titles.researchTitle(for:input[0])=="Draft with selected evidence")
 precondition(Titles.researchTitle(for:input[2])=="Authored title")

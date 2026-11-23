@@ -38,7 +38,16 @@ final class Cache {
  func store<T>(_ value: T, accountID: String, projectID: String, scope: String) throws { if scope == "research-history", let typed = value as? [ResearchConversationSummary] { history = typed; historyWrites += 1 } }
  func remove(accountID: String, projectID: String, scope: String) throws { removals += 1; if scope == "research-history" { history = nil } }
 }
+@MainActor final class ProjectHubOfflineCacheWorker {
+ static let shared = ProjectHubOfflineCacheWorker()
+ var reads: [CheckedContinuation<Envelope<ResearchConversation>?, Never>] = []
+ func load(_ type: ResearchConversation.Type, from cache: Cache, accountID: String, projectID: String, scope: String) async throws -> Envelope<ResearchConversation>? {
+  precondition(accountID == "fixture" && projectID == "conversation" && scope == "research-conversation")
+  return await withCheckedContinuation { reads.append($0) }
+ }
+}
 enum ResearchConversationCacheLifecycle {
+ static let conversationScope = "research-conversation"
  static func load<T>(_ type: T.Type, cache: Cache, accountID: String, conversationID: String) throws -> Envelope<T>? { nil }
  static func store(_ value: ResearchConversation, cache: Cache, accountID: String, conversationID: String) throws { cache.value = value }
 }
@@ -262,6 +271,25 @@ enum NativePrivateCachePolicy {
    precondition(h.conversation?.messages == fresh.messages, "Older GET must not roll back a completed answer")
    precondition(h.cache.value?.messages == fresh.messages, "Older GET must not roll back the cache")
    precondition(h.invalidations == 0, "Obsolete errors must not erase a newer publication")
+  }
+  let worker = ProjectHubOfflineCacheWorker.shared
+  for outcome in ["cached", "newer answer", "switch account", "cancel"] {
+   let h = Harness()
+   let opening = Task { await h.loadConversation(id: "conversation", identity: h.identity, useCache: true) }
+   while worker.reads.isEmpty { await Task.yield() }
+   if outcome == "newer answer" { h.publish(fresh) }
+   if outcome == "switch account" { h.isCurrentOwner = false }
+   if outcome == "cancel" { opening.cancel() }
+   worker.reads.removeFirst().resume(returning: Envelope(value: old))
+   if outcome == "cached" {
+    while h.library.reads.isEmpty { await Task.yield() }
+    precondition(h.conversation?.messages == old.messages)
+    h.library.reads[0].resume(returning: fresh)
+   }
+   await opening.value
+   if outcome != "cached" { precondition(h.library.reads.isEmpty) }
+   let expected = ["cached", "newer answer"].contains(outcome) ? fresh.messages : nil
+   precondition(h.conversation?.messages == expected, "Late disk reads must respect newer publications, cancellation and ownership")
   }
   for historyFinishesFirst in [true, false] {
    let h = Harness()

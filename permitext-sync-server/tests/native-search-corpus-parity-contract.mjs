@@ -61,7 +61,7 @@ func require(_ condition: @autoclosure () -> Bool, _ message: @autoclosure () ->
  }
 }
 extension String { ${titleExtension} }
-struct Section: Decodable { let id: Int64; let sectionNumber: String; let title: String; let kind: String; let chapterNumber: String; let codeSectionID: Int64?; let text: String }
+struct Section: Decodable { let id: Int64; let sectionNumber: String; let title: String; let kind: String; let chapterNumber: String; let codeSectionID: Int64?; let text: String; var officialText: String { text } }
 struct Edition: Decodable { let name: String; let path: String; let sections: [Section] }
 struct Chapter { let chapterNumber: String; let codeSectionID: Int64? }
 struct IndexedSection { let section: Section; let chapter: Chapter }
@@ -70,6 +70,16 @@ struct CodeSearchResult: Equatable { let id: Int64; let codeSectionID: Int64?; l
 final class Harness: @unchecked Sendable {
  let sectionIndex: [Int64: IndexedSection]
  let tokens: [String: Set<Int64>]
+ ${extract(source, '    private struct ShippedSearchIndexFile:')}
+ let bundleUsesExternalSectionText = true
+ let searchIndexLock = NSLock()
+ let preparedSectionsURL: URL
+ let inlineSearchSections: [(Int64?, Section)] = []
+ var searchIndex: [String: [Int64]]?
+ var scopedInlineSearchIndexes: [Int64: [String: [Int64]]] = [:]
+ let searchSectionIDsByCodeSectionID: [Int64: Set<Int64>]
+ let codeSectionNameByID: [Int64: String]
+ ${extract(source, '    private func loadSearchIndex(')}
  var scopedTokens: [Int64: [String: Set<Int64>]] = [:]
  let searchTextStore: SearchTextStore
  init(_ edition: Edition) throws {
@@ -77,6 +87,13 @@ final class Harness: @unchecked Sendable {
   let url = URL(fileURLWithPath: edition.path).appendingPathComponent("prepared/searchIndex.json")
   let data = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as! [String: Any]
   tokens = (data["tokens"] as! [String: [Int64]]).mapValues { Set($0) }
+  preparedSectionsURL = url.deletingLastPathComponent().appendingPathComponent("sections")
+  searchSectionIDsByCodeSectionID = Dictionary(grouping: edition.sections.compactMap { s in s.codeSectionID.map { ($0, s.id) } }, by: { $0.0 }).mapValues { Set($0.map { $0.1 }) }
+  struct Category: Decodable { let id: Int64; let name: String }
+  struct BundleMetadata: Decodable { let codeSections: [Category] }
+  let bundle = URL(fileURLWithPath: edition.path).appendingPathComponent("bundle.json")
+  let metadata = try JSONDecoder().decode(BundleMetadata.self, from: Data(contentsOf: bundle))
+  codeSectionNameByID = Dictionary(uniqueKeysWithValues: metadata.codeSections.map { ($0.id, $0.name) })
   self.searchTextStore = SearchTextStore(preparedURL: URL(fileURLWithPath: edition.path).appendingPathComponent("prepared"))
  }
  func invertedIndex(for scope: Int64?) -> [String: Set<Int64>] {
@@ -152,7 +169,7 @@ final class Harness: @unchecked Sendable {
 }
 `;
  await writeFile(join(dir, 'check.swift'), swift + '\n' + textStoreSource);
- execFileSync('xcrun', ['swiftc', '-O', '-parse-as-library', join(dir, 'check.swift'), '-o', join(dir, 'check')], {stdio: 'pipe'});
+ execFileSync('xcrun', ['swiftc', '-O', '-parse-as-library', join(dir, 'check.swift'), join(root, 'NYC CC APP/permitext/Models/NativeSearchResultPresentation.swift'), '-o', join(dir, 'check')], {stdio: 'pipe'});
  console.log(execFileSync(join(dir, 'check'), [fixturePath], {encoding: 'utf8', timeout: 600000}));
  passed = true;
 } finally {

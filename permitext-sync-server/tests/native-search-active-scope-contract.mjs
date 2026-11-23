@@ -33,6 +33,13 @@ struct CodeSearchResult: Equatable { let id: Int64; let codeSectionID: Int64?; l
 final class Harness: @unchecked Sendable {
  let sectionIndex: [Int64: IndexedSection]
  let tokens: [String: Set<Int64>]
+ let postings: [String: [Int64]]
+ let searchSectionIDsByCodeSectionID: [Int64: Set<Int64>]
+ let codeSectionNameByID: [Int64: String] = [10: "Building Code", 20: "Plumbing Code", 30: "Mechanical Code"]
+ func loadSearchIndex(for scope: Int64?) -> [String: [Int64]] {
+  if let scope { precondition(searchSectionIDsByCodeSectionID[scope] != nil) }
+  return postings
+ }
  var reads: [Int64] = []
  init() {
   let rows: [(Int64, Int64, String, String, String)] = [
@@ -53,6 +60,8 @@ final class Harness: @unchecked Sendable {
   // A false-positive token candidate exercises exact verification, not just filtering.
   index["concrete", default: []].insert(6)
   tokens = index
+  postings = index.mapValues(Array.init)
+  searchSectionIDsByCodeSectionID = Dictionary(grouping: rows, by: { $0.1 }).mapValues { Set($0.map { $0.0 }) }
  }
  func invertedIndex(for scope: Int64?) -> [String: Set<Int64>] {
   guard let scope else { return tokens }
@@ -65,9 +74,34 @@ final class Harness: @unchecked Sendable {
  ${extract(source, "    private static func tokenize(")}
  ${extract(source, "    private static func snippet(")}
 }
+// Legacy inline editions construct their index in-process. Reused IDs in
+// different categories must keep the original per-category token membership.
+final class InlineIndex {
+ struct Section { let id: Int64; let sectionNumber: String; let title: String; let officialText: String }
+ ${extract(source, "    private struct ShippedSearchIndexFile:")}
+ let bundleUsesExternalSectionText = false
+ let searchIndexLock = NSLock()
+ let preparedSectionsURL = URL(fileURLWithPath: "/")
+ var searchIndex: [String: [Int64]]?
+ var scopedInlineSearchIndexes: [Int64: [String: [Int64]]] = [:]
+ let inlineSearchSections: [(Int64?, Section)] = [
+  (10, Section(id: 7, sectionNumber: "1.1", title: "Roof", officialText: "roof")),
+  (20, Section(id: 7, sectionNumber: "1.1", title: "Boiler", officialText: "boiler"))
+ ]
+ ${extract(source, "    private func loadSearchIndex(")}
+ ${extract(source, "    private static func tokenize(")}
+ func check() {
+  precondition(loadSearchIndex()["roof"] == [7])
+  precondition(loadSearchIndex(for: 20)["roof"] == nil)
+  precondition(loadSearchIndex(for: 10)["boiler"] == nil)
+  precondition(loadSearchIndex(for: 20)["boiler"] == [7])
+ }
+}
 @main struct Run {
  static func main() {
+  InlineIndex().check()
   let h = Harness()
+  precondition(h.search(query: "concrete", codeSectionID: 999).isEmpty)
   for query in ["concrete", "concrete floors", "2.1", "missing", " "] {
    for snippets in [false, true] {
     let old = h.referenceSearch(query: query, includeSnippets: snippets, resultLimit: nil)
@@ -75,6 +109,8 @@ final class Harness: @unchecked Sendable {
     precondition(h.search(query: query, includeSnippets: snippets, resultLimit: nil, allowedCodeSectionIDs: [10, 20, 30]) == old)
    }
   }
+  precondition(h.search(query: "PC 2.1").map(\\.id) == [3])
+  precondition(h.search(query: "BC 2.1").isEmpty)
   let baseline = h.referenceSearch(query: "concrete", resultLimit: nil)
   precondition(baseline.map(\\.id) == [1, 2, 3, 5, 4])
   h.reads = []
@@ -102,7 +138,7 @@ final class Harness: @unchecked Sendable {
   const main = join(temporary, "Harness.swift");
   const binary = join(temporary, "search-scope");
   await writeFile(main, swift);
-  execFileSync("swiftc", ["-parse-as-library", main, "-o", binary], { stdio: "inherit" });
+  execFileSync("swiftc", ["-parse-as-library", main, join(root, "NYC CC APP/permitext/Models/NativeSearchResultPresentation.swift"), "-o", binary], { stdio: "inherit" });
   process.stdout.write(execFileSync(binary, [], { encoding: "utf8" }));
 } finally {
   await rm(temporary, { recursive: true, force: true });

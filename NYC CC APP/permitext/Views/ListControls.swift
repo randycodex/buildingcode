@@ -1,5 +1,14 @@
 import SwiftUI
 
+enum ListTimestamp {
+    private static let fractionalSeconds = Date.ISO8601FormatStyle(includingFractionalSeconds: true)
+    private static let wholeSeconds = Date.ISO8601FormatStyle()
+
+    static func date(from value: String) -> Date? {
+        (try? fractionalSeconds.parse(value)) ?? (try? wholeSeconds.parse(value))
+    }
+}
+
 enum ListSelectionMotion {
     static func run(reduceMotion: Bool, _ change: () -> Void) {
         withAnimation(reduceMotion ? nil : .smooth(duration: 0.36), change)

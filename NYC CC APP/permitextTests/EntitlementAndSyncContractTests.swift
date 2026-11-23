@@ -2287,6 +2287,28 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testOpeningUserStoreOnlyBackfillsMissingBookmarkTimestamps() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("bookmarks.sqlite")
+        _ = try UserDataStore(databaseURL: url)
+        let connection = try SQLiteConnection(path: url.path, readOnly: false)
+        try connection.execute("""
+            INSERT INTO bookmarks (section_id, code_version, client_id, created_at, updated_at) VALUES
+                (1, 'test', 'current', '2026-01-01', '2026-01-03'),
+                (2, 'test', 'legacy', '2026-01-02', '');
+            CREATE TABLE timestamp_updates (section_id INTEGER);
+            CREATE TRIGGER record_timestamp_update AFTER UPDATE OF updated_at ON bookmarks
+                BEGIN INSERT INTO timestamp_updates VALUES (new.section_id); END;
+            """)
+        _ = try UserDataStore(databaseURL: url)
+        _ = try UserDataStore(databaseURL: url)
+        XCTAssertEqual(try scalarInt("SELECT count(*) FROM timestamp_updates", connection: connection), 1)
+        XCTAssertEqual(try scalarString("SELECT updated_at FROM bookmarks WHERE section_id = 1", connection: connection), "2026-01-03")
+        XCTAssertEqual(try scalarString("SELECT updated_at FROM bookmarks WHERE section_id = 2", connection: connection), "2026-01-02")
+    }
+
     func testLegacyFoldersMigrateAsProjects() throws {
         let databaseURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-folder-type-migration-\(UUID().uuidString).sqlite")
@@ -9971,6 +9993,38 @@ final class TabBarReselectNavigationTests: XCTestCase {
 }
 
 final class ReaderDefinitionContractTests: XCTestCase {
+    @MainActor
+    func testMatcherReuseRespectsSectionScopes() {
+        func matcher(_ section: String?, bundle: String = "2022-construction-codes", code: Int64 = 1,
+                     chapter: String = "4", chapterID: Int64? = nil) -> ReaderDefinitionMatcher {
+            ReaderDefinitionStore.shared.matcher(for: ReaderDefinitionContext(
+                versionFileName: "/new-york-city/\(bundle)/bundle.json", codeSectionID: code,
+                chapterNumber: chapter, chapterID: chapterID, sectionNumber: section))
+        }
+
+        let ordinary = matcher("402.1")
+        XCTAssertTrue(ordinary === matcher("409.5"))
+        let scoped = matcher("410.1")
+        XCTAssertTrue(scoped === matcher("410.4.1"))
+        XCTAssertTrue(ordinary.entries.contains { $0.term == "PLATFORM" })
+        XCTAssertFalse(scoped.entries.contains { $0.term == "PLATFORM" })
+        XCTAssertTrue(scoped.entries.contains { $0.term == "PLATFORM (SPECIAL USE)" })
+        XCTAssertFalse(matcher(nil).entries.contains { $0.term == "PLATFORM" })
+
+        let code1968 = "2026-enacted-administrative-code"
+        let phrase = NSAttributedString(string: "same grade of oil")
+        let offset = ("same " as NSString).length
+        XCTAssertNotNil(matcher("27-829", bundle: code1968, code: 4, chapter: "14")
+            .decorating(phrase).attribute(.link, at: offset, effectiveRange: nil))
+        XCTAssertNil(matcher("27-830.1", bundle: code1968, code: 4, chapter: "14")
+            .decorating(phrase).attribute(.link, at: offset, effectiveRange: nil))
+
+        let exact = matcher("26-2403", bundle: code1968, code: 3, chapter: "24", chapterID: 30_000_042)
+        let child = matcher("26-2403.1", bundle: code1968, code: 3, chapter: "24", chapterID: 30_000_042)
+        XCTAssertTrue(exact.entries.contains { $0.term == "Buyout agreement" })
+        XCTAssertFalse(child.entries.contains { $0.term == "Buyout agreement" })
+    }
+
     private func registry() throws -> ReaderDefinitionRegistry {
         let url = try XCTUnwrap(Bundle.main.url(forResource: "reader-definition-registry", withExtension: "json", subdirectory: "CodeContent"))
         return try JSONDecoder().decode(ReaderDefinitionRegistry.self, from: Data(contentsOf: url))
@@ -11000,7 +11054,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         let missing = ["Person", "Class A multiple dwelling", "Fireproof", "Nonfireproof", "Rear yard", "Side yard", "Curb level", "This code", "Harassment", "Self-closing door", "Unoccupied dwelling unit"]
         for term in missing {
             let entry = try XCTUnwrap(general.first { $0.term == term }, term)
-            XCTAssertEqual(entry.applicability, ["Person", "Self-closing door", "Unoccupied dwelling unit", "Fireproof", "Nonfireproof", "This code", "Harassment"].contains(term) ? "definition-chapter" : "review-required", term)
+            XCTAssertEqual(entry.applicability, ["Person", "Class A multiple dwelling", "Self-closing door", "Unoccupied dwelling unit", "Fireproof", "Nonfireproof", "This code", "Harassment"].contains(term) ? "definition-chapter" : "review-required", term)
             XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
             XCTAssertEqual(entry.source.anchor, "section-31001849")
             XCTAssertFalse(entry.text.contains("(Am. L.L."))
