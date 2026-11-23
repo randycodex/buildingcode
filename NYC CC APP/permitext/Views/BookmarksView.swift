@@ -1279,6 +1279,8 @@ private struct ProjectFactsView: View {
             .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, CodeScreenMetrics.tabBarClearance)
         }
+        .codeSoftTopScrollEdges()
+        .codeTransparentBottomScrollEdge()
         .scrollDismissesKeyboard(.interactively)
         .toolbar {
             if isEditing {

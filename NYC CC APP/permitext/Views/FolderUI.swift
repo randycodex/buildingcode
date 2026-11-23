@@ -444,6 +444,8 @@ struct ProjectContextView: View {
         VStack(alignment: .leading, spacing: 12) {
             if isEditing {
                 ProjectContextEditor(text: $draft)
+                    .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                    .padding(.top, CodeScreenMetrics.topTitlePadding)
             } else {
                 ScrollView {
                     Text(savedContext.isEmpty ? AttributedString("No context yet.") : formattedProjectContext(savedContext))
@@ -451,18 +453,21 @@ struct ProjectContextView: View {
                         .foregroundStyle(.secondary)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                        .padding(.top, CodeScreenMetrics.topTitlePadding)
                         .accessibilityIdentifier("project-context-text")
                 }
+                .codeSoftTopScrollEdges()
+                .codeTransparentBottomScrollEdge()
             }
             if let saveError {
                 Text(saveError)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+                    .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-        .padding(.top, CodeScreenMetrics.topTitlePadding)
         .toolbar {
             if isEditing {
                 ToolbarItem(placement: .topBarLeading) {
@@ -527,6 +532,10 @@ private struct ProjectContextEditor: UIViewRepresentable {
         view.textContainer.lineFragmentPadding = 0
         view.contentInsetAdjustmentBehavior = .never
         view.keyboardDismissMode = .interactive
+        if #available(iOS 26.0, *) {
+            view.topEdgeEffect.style = .soft
+            view.bottomEdgeEffect.isHidden = true
+        }
         view.text = text
         view.selectedRange = NSRange(location: 0, length: 0)
         view.accessibilityLabel = "Project context"

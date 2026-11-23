@@ -12132,14 +12132,35 @@ final class ProjectWorkflowSyncTests: XCTestCase {
         XCTAssertTrue(source.excerpt.contains("permanent fixtures and amenities"))
 
         let id = try XCTUnwrap(UUID(uuidString: "4D625B79-2D75-49F6-A2EC-E45417ACB82A"))
-        let linkID = id.uuidString.lowercased()
+        let oldDraftStore = #"""
+        {"version":1,"records":[{"id":"prior-calculation","context":"[\"project\",\"2152\",\"\#(ProjectOccupantLoadSource.codeVersion)\",\"manual\"]","input":{"spaceName":"Classroom","tableRowID":"bc-1004.1.3:Educational — Classroom area","area":"101","seating":"without-fixed-seating","areaMeasurementBasis":"net"},"revision":1,"updatedAt":"2026-11-23T16:48:00Z"}],"active":{"[\"project\",\"2152\",\"\#(ProjectOccupantLoadSource.codeVersion)\",\"manual\"]":"prior-calculation"}}
+        """#
+        let engine = try ProjectCalculatorEngine(source: source, projectID: "project", drafts: oldDraftStore)
+        XCTAssertEqual(engine.rows.count, 52)
+        XCTAssertTrue(engine.rows.contains { $0.method == .fixed })
+        XCTAssertTrue(engine.rows.contains { $0.method == .special })
+        let draft = try engine.open()
+        XCTAssertEqual(draft.record.id, "prior-calculation")
+        XCTAssertEqual(draft.record.input["spaceName"], "Classroom")
+        XCTAssertTrue(draft.result.valid)
+        XCTAssertEqual(draft.result.previewPeople, 6)
+
+        let custom = try engine.update(draft.record, input: draft.record.input.merging([
+            "factorMode": "custom", "factor": "48", "customReason": "User-entered reference"
+        ], uniquingKeysWith: { _, next in next }))
+        XCTAssertTrue(custom.result.valid)
+        XCTAssertEqual(custom.result.previewPeople, 3)
+        XCTAssertEqual(custom.record.input["tableFactor"], "20")
+        let restoredEngine = try ProjectCalculatorEngine(source: source, projectID: "project", drafts: custom.raw)
+        XCTAssertEqual(try restoredEngine.open().result.previewPeople, 3)
+        XCTAssertFalse(try engine.create().result.valid)
+        XCTAssertEqual(try engine.open(draft.record.id).result.previewPeople, 3)
+
         let original = NotebookBlock.paragraph("Keep the existing Note.")
         let existing = NotebookCard(id: "existing-note", version: 2, createdAt: "", updatedAt: "",
             projectIDs: ["project"], title: "Site visit", document: NotebookDocument(document: [original]))
-        let request = ProjectCalculatorNote(id: id, createdAt: "2026-11-23T16:48:00Z", title: "Occupant load",
-            label: "BC § 1004.1.3 · 2022", exact: source.excerpt,
-            blocks: [.paragraph("101 ft² (net) ÷ 20 ft²/person = 6 people."),
-                     .reference(kind: "selectedPassage", id: linkID, label: "BC § 1004.1.3 · 2022")])
+        let request = try engine.note(input: draft.record.input, id: id, createdAt: "2026-11-23T16:48:00Z")
+        XCTAssertTrue(request.blocks.flatMap { $0.content ?? [] }.contains { $0.text?.contains("6 people") == true })
         let saved = try request.adding(to: existing, projectID: "project", source: source)
         XCTAssertEqual(saved.document.document, [original] + request.blocks)
         XCTAssertEqual(saved.links.first?.source, source.source)

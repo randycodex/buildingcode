@@ -982,6 +982,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Building"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "discard this")).firstMatch.exists)
         keepScreenshot(named: "Overview Zoning tab", from: app)
+        app.swipeUp()
+        keepScreenshot(named: "Overview Zoning scrolled below the header", from: app)
         overviewBar.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(overviewCard.waitForExistence(timeout: 5))
         overviewCard.tap()
@@ -1135,9 +1137,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let editor = app.textViews["project-context-editor"]
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
-        editor.typeText(String(repeating: "Long context line for scrolling.\n", count: 18))
+        editor.typeText(String(repeating: "Long context line for scrolling.\n", count: 48))
         app.buttons["project-context-save"].tap()
         XCTAssertTrue(app.staticTexts["project-context-text"].waitForExistence(timeout: 5))
+        app.swipeUp()
+        keepScreenshot(named: "Overview Context scrolled below the header", from: app)
 
         app.buttons["project-context-edit"].tap()
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
@@ -1167,31 +1171,34 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         reveal(calculator, in: app)
         calculator.tap()
         XCTAssertTrue(app.navigationBars["Calculator"].waitForExistence(timeout: 5))
-        let form = app.webViews.firstMatch
-        let function = form.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Function of space")).firstMatch
+        let form = app.scrollViews["project-calculator-form"]
+        let function = element(in: app, identifier: "calculator-function")
         XCTAssertTrue(function.waitForExistence(timeout: 20), app.debugDescription)
-        form.buttons["New calculation"].tap()
+        XCTAssertTrue(form.exists)
+        XCTAssertFalse(form.webViews.firstMatch.exists)
+        app.buttons["calculator-new-draft"].tap()
+        keepScreenshot(named: "Native Calculator at the top", from: app)
         XCTAssertTrue(function.waitForExistence(timeout: 10))
         function.tap()
-        let classroom = app.buttons["Educational — Classroom area"]
+        let classroom = app.buttons.matching(NSPredicate(format: "label == %@", "Educational — Classroom area")).firstMatch
         reveal(classroom, in: app)
         classroom.tap()
-        let area = form.textFields["Floor area · ft²"]
+        let area = app.textFields["calculator-area"]
         reveal(area, in: app)
         area.tap()
         area.typeText("101")
-        let seating = form.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Seating")).firstMatch
+        let seating = element(in: app, identifier: "calculator-seating")
         reveal(seating, in: app)
         seating.tap()
         app.buttons["Without fixed seating"].tap()
-        let save = form.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Add calculation to")).firstMatch
+        let save = app.buttons["calculator-save"]
         reveal(save, in: app)
         XCTAssertTrue(save.isEnabled)
-        XCTAssertTrue(form.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "6 people")).firstMatch.exists)
+        XCTAssertEqual(app.staticTexts["calculator-result"].label, "6 people")
         save.tap()
         XCTAssertTrue(app.buttons["calculator-new-note"].waitForExistence(timeout: 10))
         app.buttons["calculator-new-note"].tap()
-        let saved = form.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Saved to Occupant load")).firstMatch
+        let saved = app.staticTexts["calculator-saved-note"]
         XCTAssertTrue(saved.waitForExistence(timeout: 10))
 
         reveal(save, in: app)
@@ -1201,7 +1208,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         existing.tap()
         XCTAssertTrue(existing.wait(for: \.exists, toEqual: false, timeout: 10))
         XCTAssertTrue(saved.waitForExistence(timeout: 10))
-        keepScreenshot(named: "Web calculator result and saved note on iPhone", from: app)
+        form.swipeUp()
+        XCTAssertLessThanOrEqual(saved.frame.maxY, app.tabBars.firstMatch.frame.minY + 2)
+        keepScreenshot(named: "Native Calculator scrolled to the result and Note", from: app)
         app.navigationBars["Calculator"].buttons.element(boundBy: 0).tap()
         app.buttons["project-section-notebook"].tap()
         let note = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Occupant load · Educational")).firstMatch
@@ -1210,6 +1219,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let noteBody = app.webViews.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "6 people"))
         XCTAssertTrue(noteBody.firstMatch.waitForExistence(timeout: 10))
         XCTAssertGreaterThanOrEqual(noteBody.count, 2)
+        app.swipeUp()
+        keepScreenshot(named: "Note scrolled below the header", from: app)
 #endif
     }
 

@@ -488,6 +488,8 @@ private struct ProjectNotebookSessionView: View {
                         }
                     }
                     .listStyle(.plain)
+                    .codeNavigationTopScrollEdge()
+                    .codeTransparentBottomScrollEdge()
                     .refreshable { await loadCards(forceNetwork: true) }
                 }
             }
@@ -996,6 +998,8 @@ private struct NotebookCardEditorView: View {
                     }
                     .padding(18)
                 }
+                .codeNavigationTopScrollEdge()
+                .codeTransparentBottomScrollEdge()
             }
         }
         .navigationTitle("Note")

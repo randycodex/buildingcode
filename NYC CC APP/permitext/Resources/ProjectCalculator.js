@@ -1,79 +1,47 @@
-// The calculator and draft list come from the same modules as the web workspace.
-globalThis.startProjectCalculator = configuration => {
-  const bridge = window.webkit.messageHandlers.projectCalculator;
-  const root = document.querySelector('#calculator');
-  const savedNote = document.querySelector('#saved-note');
-  const send = message => bridge.postMessage(message);
-  const source = configuration.source;
+// The SwiftUI form uses the same table, calculation, Note and draft rules as the web.
+globalThis.makeProjectCalculator = (configuration, parseHTML) => {
+  const {source, blocks, excerpt, projectID, drafts} = JSON.parse(configuration);
+  const table = occupantLoadTable(blocks, source, html => JSON.parse(parseHTML(html)));
   const sourceLabel = `BC § ${source.sectionNumber} · ${source.codeEdition}`;
-  const context = JSON.stringify([configuration.projectID, source.sectionID, source.codeVersion, 'manual']);
+  const context = JSON.stringify([projectID, source.sectionID, source.codeVersion, 'manual']);
+  let raw = drafts;
   const store = calculationDraftStore({
-    getItem: () => configuration.drafts,
-    setItem: (_, value) => {
-      if (value === configuration.drafts) return;
-      configuration.drafts = value;
-      void send({type: 'drafts', value}).catch(error => { savedNote.textContent = String(error); });
-    }
+    getItem: () => raw,
+    setItem: (_, value) => { raw = value; }
   }, 'drafts');
-  const table = occupantLoadTable(configuration.blocks, source);
-  const tableExcerpt = configuration.excerpt;
-  let pendingSave;
-
-  document.querySelector('#governing-source').addEventListener('click', () => {
-    void send({type: 'source'}).catch(error => { savedNote.textContent = String(error); });
+  const resolve = input => occupantLoadTableInput({...input, customFactor: input.factor}, table);
+  const calculate = input => {
+    const result = calculateOccupantLoad(resolve(input));
+    const spaceName = (input.spaceName || '').trim();
+    const spaceLocation = input.spaceLocation || '';
+    return {...result, fingerprint: JSON.stringify({
+      spaceName, ...(spaceLocation ? {spaceLocation} : {}), input: result.input
+    })};
+  };
+  const snapshot = record => ({
+    record, recent: store.list(context), raw, result: calculate(record.input)
   });
-
-  function show(initial) {
-    let record = initial;
-    const card = createOccupantLoadCard({
-      draft: record.input,
-      column: true,
-      sourceLabel,
-      canSave: configuration.canSave,
-      recentDrafts: store.list(context),
-      activeDraftID: record.id,
-      savedInputFingerprint: record.savedNote ? record.savedFingerprint : null,
-      onChooseDraft: id => show(store.open(context, {}, id)),
-      onNewDraft: () => show(store.create(context)),
-      onLoadTable: () => table,
-      onDraftChange: input => {
-        record = store.update(record, input);
-        card.refreshDraftChoices(store.list(context));
-        savedNote.textContent = '';
-      },
-      onSave: async calculation => {
-        const checked = calculateOccupantLoad(occupantLoadTableInput(calculation.input, table));
-        if (!checked.valid) throw new Error(checked.errors[0]);
-        const spaceName = String(record.input.spaceName || '').trim();
-        const spaceLocation = record.input.spaceLocation || '';
-        const fingerprint = JSON.stringify({spaceName, ...(spaceLocation ? {spaceLocation} : {}), input: checked.input});
-        if (pendingSave?.fingerprint !== fingerprint) {
-          pendingSave = {fingerprint, id: crypto.randomUUID(), createdAt: new Date().toISOString()};
-        }
-        const {id, createdAt} = pendingSave;
-        const body = calculationNoteBlocks(checked, [{id, label: sourceLabel}], '', spaceLocation);
-        if (spaceName) body.unshift({
-          type: 'paragraph',
-          content: [{type: 'text', text: `Space / room: ${spaceName}`, styles: {}}]
-        });
-        const title = `Occupant load · ${spaceName || checked.input.spaceFunction}${checked.input.factorMode === 'custom' ? ' · Custom factor' : ''}`;
-        const note = await send({type: 'note', value: {
-          id, createdAt, title, label: sourceLabel, exact: tableExcerpt,
-          blocks: body.map((block, index) => ({
-            ...block, id: `${id}-${index}`, props: block.props || {}, children: []
-          }))
-        }});
-        if (!note) return null;
-        pendingSave = null;
-        record = store.markSaved(record, note, fingerprint);
-        card.refreshDraftChoices(store.list(context));
-        savedNote.textContent = `Saved to ${note.title}`;
-        return note;
-      }
-    });
-    savedNote.textContent = '';
-    root.replaceChildren(card);
-    card.open = true;
-  }
-  show(store.open(context));
+  const actions = {
+    rows: () => table.rows,
+    open: ({id}) => snapshot(store.open(context, {}, id || null)),
+    create: () => snapshot(store.create(context)),
+    update: ({record, input}) => snapshot(store.update(record, resolve(input))),
+    saved: ({record, note, fingerprint}) => snapshot(store.markSaved(record, note, fingerprint)),
+    note: ({input, id, createdAt}) => {
+      const calculation = calculate(input);
+      const spaceName = (input.spaceName || '').trim();
+      const body = calculationNoteBlocks(calculation, [{id, label: sourceLabel}], '', input.spaceLocation);
+      if (spaceName) body.unshift({
+        type: 'paragraph',
+        content: [{type: 'text', text: `Space / room: ${spaceName}`, styles: {}}]
+      });
+      const result = calculation.input;
+      const title = `Occupant load · ${spaceName || result.spaceFunction}${result.factorMode === 'custom' ? ' · Custom factor' : ''}`;
+      return {id, createdAt, title, label: sourceLabel, exact: excerpt,
+        blocks: body.map((block, index) => ({
+          ...block, id: `${id}-${index}`, props: block.props || {}, children: []
+        }))};
+    }
+  };
+  return (action, payload) => JSON.stringify(actions[action](JSON.parse(payload)));
 };

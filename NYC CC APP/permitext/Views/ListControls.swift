@@ -219,6 +219,15 @@ extension View {
         }
     }
 
+    @ViewBuilder
+    func codeTransparentBottomScrollEdge() -> some View {
+        if #available(iOS 26.0, *) {
+            scrollEdgeEffectHidden(true, for: .bottom)
+        } else {
+            self
+        }
+    }
+
     func bottomSearchBarPlacement() -> some View {
         self
         .accessibilityIdentifier("bottom-search-bar")

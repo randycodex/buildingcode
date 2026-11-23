@@ -1,5 +1,4 @@
 import SwiftUI
-import WebKit
 
 struct ProjectOccupantLoadSource: Encodable, Sendable {
     static let sectionID: Int64 = 2152
@@ -30,8 +29,9 @@ struct ProjectOccupantLoadSource: Encodable, Sendable {
     }
 }
 
-private enum ProjectCalculatorError: LocalizedError {
+enum ProjectCalculatorError: LocalizedError {
     case sourceUnavailable, invalidRequest, noteUnavailable, readOnly
+    case engine(String)
 
     var errorDescription: String? {
         switch self {
@@ -39,6 +39,7 @@ private enum ProjectCalculatorError: LocalizedError {
         case .invalidRequest: "This calculation could not be saved. Reopen Calculator and try again."
         case .noteUnavailable: "This Note is no longer available in the project."
         case .readOnly: "This project’s Notes are read-only."
+        case .engine(let message): message
         }
     }
 }
@@ -82,7 +83,7 @@ struct ProjectCalculatorView: View {
     @State private var retry = 0
     @State private var showsSource = false
     @State private var noteRequest: ProjectCalculatorNote?
-    @State private var noteReply: CheckedContinuation<CalculatorSavedNote?, Error>?
+    @State private var noteReply: CheckedContinuation<ProjectCalculatorDraft.SavedNote?, Error>?
 
     private static let draftScope = "native-occupant-load-drafts"
     private let cache = ProjectHubOfflineCache()
@@ -90,19 +91,15 @@ struct ProjectCalculatorView: View {
     var body: some View {
         Group {
             if let page {
-                CalculatorWebForm(page: page, onDrafts: { raw in
+                CalculatorForm(page: page, onDrafts: { raw in
                     guard isCurrent(page) else { throw CancellationError() }
                     try cache.store(raw, accountID: page.accountID, projectID: page.projectID, scope: Self.draftScope)
                 }, onOpenSource: {
-                    guard isCurrent(page) else { throw CancellationError() }
-                    showsSource = true
+                    if isCurrent(page) { showsSource = true }
                 }, onSave: { request in
                     try await chooseNote(for: request, page: page)
-                }, onError: { message in
-                    if isCurrent(page) { loadError = message }
                 })
                 .id(page.id)
-                .safeAreaPadding(.bottom, CodeScreenMetrics.tabBarClearance)
             } else if loadError == nil {
                 ProgressView("Loading calculator…")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -174,14 +171,17 @@ struct ProjectCalculatorView: View {
             }.value
             guard !Task.isCancelled, library.privateSessionID == sessionID,
                   library.folder(id: folderID)?.clientID == folder.clientID else { return }
+            let engine = try ProjectCalculatorEngine(source: source, projectID: projectKey, drafts: drafts)
+            let initialState = try engine.open()
             page = CalculatorPage(sessionID: sessionID, accountID: accountID, projectID: projectKey,
-                folderID: folder.clientID, source: source, drafts: drafts, canSave: canSave)
+                folderID: folder.clientID, source: source, engine: engine, initialState: initialState,
+                storedDrafts: drafts, canSave: canSave)
         } catch {
             if !Task.isCancelled { loadError = error.localizedDescription }
         }
     }
 
-    private func chooseNote(for request: ProjectCalculatorNote, page: CalculatorPage) async throws -> CalculatorSavedNote? {
+    private func chooseNote(for request: ProjectCalculatorNote, page: CalculatorPage) async throws -> ProjectCalculatorDraft.SavedNote? {
         guard isCurrent(page), page.canSave, noteReply == nil else { throw ProjectCalculatorError.invalidRequest }
         return try await withCheckedThrowingContinuation { continuation in
             noteReply = continuation
@@ -189,7 +189,7 @@ struct ProjectCalculatorView: View {
         }
     }
 
-    private func finishNote(_ saved: CalculatorSavedNote?) {
+    private func finishNote(_ saved: ProjectCalculatorDraft.SavedNote?) {
         let reply = noteReply
         noteReply = nil
         noteRequest = nil
@@ -197,32 +197,17 @@ struct ProjectCalculatorView: View {
     }
 }
 
-private struct CalculatorPage: Encodable {
-    var id = UUID()
+private struct CalculatorPage {
+    let id = UUID()
     let sessionID: UUID
     let accountID: String
     let projectID: String
     let folderID: String
     let source: ProjectOccupantLoadSource
-    let drafts: String?
+    let engine: ProjectCalculatorEngine
+    let initialState: ProjectCalculatorSnapshot
+    let storedDrafts: String?
     let canSave: Bool
-
-    private enum CodingKeys: String, CodingKey { case projectID, source, blocks, excerpt, drafts, canSave }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(projectID, forKey: .projectID)
-        try container.encode(source.source, forKey: .source)
-        try container.encode(source.blocks, forKey: .blocks)
-        try container.encode(source.excerpt, forKey: .excerpt)
-        try container.encode(drafts, forKey: .drafts)
-        try container.encode(canSave, forKey: .canSave)
-    }
-}
-
-private struct CalculatorSavedNote: Sendable {
-    let id: String
-    let title: String
 }
 
 private struct CalculatorNotePicker: View {
@@ -230,7 +215,7 @@ private struct CalculatorNotePicker: View {
     let source: ProjectOccupantLoadSource
     let request: ProjectCalculatorNote
     let isCurrent: () -> Bool
-    let onFinish: (CalculatorSavedNote?) -> Void
+    let onFinish: (ProjectCalculatorDraft.SavedNote?) -> Void
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var cards: [ProjectNotebookCardSummary]?
     @State private var isSaving = false
@@ -314,7 +299,7 @@ private struct CalculatorNotePicker: View {
             guard isCurrent(), !Task.isCancelled else { return }
             let referenceID = request.id.uuidString.lowercased()
             if let existing, existing.evidenceLinks.contains(where: { $0.id == referenceID }) {
-                onFinish(CalculatorSavedNote(id: existing.id, title: existing.title))
+                onFinish(ProjectCalculatorDraft.SavedNote(id: existing.id, title: existing.title))
                 return
             }
             let content = try request.adding(to: existing, projectID: projectID, source: source)
@@ -326,7 +311,7 @@ private struct CalculatorNotePicker: View {
                 evidenceLinks: content.links, clientMutationID: "occupant-load:\(referenceID):\(cardID ?? "new")",
                 openQuestions: existing?.openQuestions)
             if isCurrent(), !Task.isCancelled {
-                onFinish(CalculatorSavedNote(id: saved.id, title: saved.title))
+                onFinish(ProjectCalculatorDraft.SavedNote(id: saved.id, title: saved.title))
             }
         } catch is CancellationError {
         } catch {
@@ -335,112 +320,343 @@ private struct CalculatorNotePicker: View {
     }
 }
 
-private struct CalculatorWebForm: UIViewRepresentable {
+private struct CalculatorForm: View {
     let page: CalculatorPage
     let onDrafts: (String) throws -> Void
-    let onOpenSource: () throws -> Void
-    let onSave: (ProjectCalculatorNote) async throws -> CalculatorSavedNote?
-    let onError: (String) -> Void
+    let onOpenSource: () -> Void
+    let onSave: (ProjectCalculatorNote) async throws -> ProjectCalculatorDraft.SavedNote?
 
-    func makeCoordinator() -> Coordinator { Coordinator(form: self) }
+    @State private var calculation: ProjectCalculatorSnapshot
+    @State private var input: [String: String]
+    @State private var storedDrafts: String?
+    @State private var error: String?
+    @State private var savedTitle: String?
+    @State private var isSaving = false
+    @State private var pendingSave: (fingerprint: String, id: UUID, timestamp: String)?
+    @FocusState private var focus: Field?
 
-    func makeUIView(context: Context) -> WKWebView {
-        let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = .nonPersistent()
-        let controller = configuration.userContentController
-        let view = WKWebView(frame: .zero, configuration: configuration)
-        view.isOpaque = false
-        view.backgroundColor = .clear
-        view.scrollView.keyboardDismissMode = .interactive
-        view.navigationDelegate = context.coordinator
+    private enum Field: String {
+        case spaceName, spaceLocation, tableRowID, area, areaMeasurementBasis, userMeasurementBasis
+        case factorMode, factor, customReason, seating
+    }
+
+    init(page: CalculatorPage, onDrafts: @escaping (String) throws -> Void,
+         onOpenSource: @escaping () -> Void,
+         onSave: @escaping (ProjectCalculatorNote) async throws -> ProjectCalculatorDraft.SavedNote?) {
+        self.page = page
+        self.onDrafts = onDrafts
+        self.onOpenSource = onOpenSource
+        self.onSave = onSave
+        _calculation = State(initialValue: page.initialState)
+        _input = State(initialValue: page.initialState.record.input)
+        _storedDrafts = State(initialValue: page.storedDrafts)
+        _savedTitle = State(initialValue: page.initialState.savedTitle)
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                inputs.disabled(isSaving)
+                result
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+            .padding(.vertical, CodeScreenMetrics.topTitlePadding)
+        }
+        .scrollDismissesKeyboard(.interactively)
+        .codeNavigationTopScrollEdge()
+        .codeTransparentBottomScrollEdge()
+        .accessibilityIdentifier("project-calculator-form")
+        .onAppear { storeDrafts() }
+    }
+
+    private var row: ProjectCalculatorRow? {
+        page.engine.rows.first { $0.id == value(.tableRowID) }
+    }
+
+    private var custom: Bool { value(.factorMode) == "custom" && row?.method == .area }
+    private var separateMethod: Bool {
+        value(.seating) == "fixed-seating" || (row.map { $0.method != .area } ?? false)
+    }
+
+    private var inputs: some View {
+        VStack(alignment: .leading, spacing: CodeScreenMetrics.rowVerticalPadding) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Occupant load").font(.headline).accessibilityAddTraits(.isHeader)
+                Button(action: onOpenSource) {
+                    Label("2022 Building Code · Table 1004.1.3", systemImage: "book")
+                        .font(.subheadline)
+                        .padding(.horizontal, 14)
+                        .frame(minHeight: 44)
+                }
+                .buttonStyle(.plain)
+                .codeLiquidGlassCapsule()
+                .accessibilityIdentifier("calculator-source")
+            }
+            field("Recent calculations") {
+                HStack(spacing: 12) {
+                    Menu {
+                        Picker("Recent calculations", selection: Binding(
+                            get: { calculation.record.id }, set: { id in switchDraft { try page.engine.open(id) } }
+                        )) {
+                            ForEach(calculation.recent) { draft in Text(draft.title).tag(draft.id) }
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Text(calculation.record.title).lineLimit(1)
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Recent calculations")
+                    .accessibilityValue(calculation.record.title)
+                    .accessibilityIdentifier("calculator-recent")
+                    Button {
+                        switchDraft { try page.engine.create() }
+                    } label: {
+                        ToolbarActionIcon(systemImage: "plus")
+                    }
+                    .buttonStyle(.plain)
+                    .codeLiquidGlassCircle()
+                    .accessibilityLabel("New calculation")
+                    .accessibilityIdentifier("calculator-new-draft")
+                }
+            }
+
+            field("Factor source") {
+                Picker("Factor source", selection: Binding(get: { custom ? "custom" : "table" }, set: changeFactorMode)) {
+                    Text("BC table (default)").tag("table")
+                    Text("Custom factor").tag("custom")
+                }
+                .labelsHidden().pickerStyle(.menu)
+                .disabled(row?.method != .area)
+                .accessibilityIdentifier("calculator-factor-source")
+            }
+            field("Space / room name (optional)") {
+                TextField("Space / room name", text: binding(.spaceName))
+                    .focused($focus, equals: .spaceName)
+                    .accessibilityIdentifier("calculator-space-name")
+            }
+            field("Space location (for footnotes)") {
+                Picker("Space location", selection: binding(.spaceLocation)) {
+                    Text("Not stated").tag("")
+                    Text("Interior only — no rooftop or terrace").tag("interior")
+                    Text("Rooftop").tag("rooftop")
+                    Text("Terrace").tag("terrace")
+                    Text("Mixed / other").tag("mixed")
+                }
+                .labelsHidden().pickerStyle(.menu)
+                .accessibilityIdentifier("calculator-space-location")
+            }
+            field("Function of space") {
+                Picker("Function of space", selection: Binding(get: { row?.id ?? "" }, set: selectRow)) {
+                    Text("Select a BC table function").tag("")
+                    ForEach(page.engine.rows) { row in Text(row.label).tag(row.id) }
+                }
+                .labelsHidden().pickerStyle(.menu)
+                .accessibilityIdentifier("calculator-function")
+            }
+            field(row?.areaBasis.isEmpty == false ? "Floor area · \(row?.areaBasis ?? "") ft²" : "Floor area · ft²") {
+                TextField("Floor area", text: Binding(get: { value(.area) }, set: changeArea))
+                    .keyboardType(.decimalPad)
+                    .focused($focus, equals: .area)
+                    .accessibilityIdentifier("calculator-area")
+            }
+            if let row, row.method == .area {
+                field("Area basis") { Text(row.areaBasis.capitalized) }.accessibilityElement(children: .combine)
+                    .accessibilityLabel("Area basis, \(row.areaBasis)")
+                if custom {
+                    field("Custom factor · ft²/person") {
+                        TextField("Custom factor", text: binding(.factor))
+                            .keyboardType(.decimalPad)
+                            .focused($focus, equals: .factor)
+                            .accessibilityIdentifier("calculator-custom-factor")
+                    }
+                    Text("BC table: \(row.factor) \(row.areaBasis) ft²/person")
+                        .font(.subheadline).foregroundStyle(.secondary)
+                    field("Reason / reference (required)") {
+                        TextField("Reason / reference", text: binding(.customReason), axis: .vertical)
+                            .focused($focus, equals: .customReason)
+                            .accessibilityIdentifier("calculator-custom-reason")
+                    }
+                } else {
+                    field("Occupant-load factor · ft²/person") { Text(row.factor) }.accessibilityElement(children: .combine)
+                        .accessibilityLabel("Occupant-load factor, \(row.factor) square feet per person")
+                }
+            }
+            field("Seating") {
+                Picker("Seating", selection: binding(.seating)) {
+                    Text("Confirm seating").tag("")
+                    Text("Without fixed seating").tag("without-fixed-seating")
+                    Text("Fixed seating — separate method required").tag("fixed-seating")
+                }
+                .labelsHidden().pickerStyle(.menu)
+                .disabled(row?.method == .fixed)
+                .accessibilityIdentifier("calculator-seating")
+            }
+        }
+    }
+
+    private var result: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if let row {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Table row and footnotes").font(.headline).accessibilityAddTraits(.isHeader)
+                    Text(row.description).font(.subheadline)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(.fill.tertiary, in: .rect(cornerRadius: 12))
+            }
+            if let people = calculation.result.previewPeople {
+                Text(people == 1 ? "1 person" : "\(people.formatted()) people")
+                    .font(.title2.weight(.semibold))
+                    .accessibilityIdentifier("calculator-result")
+            }
+            if separateMethod {
+                Text("Separate method required").font(.headline)
+                if let row, row.method != .area {
+                    Text(row.factorText).foregroundStyle(.secondary)
+                } else {
+                    Text("Fixed seating uses a separate calculation method.").foregroundStyle(.secondary)
+                }
+            } else if !calculation.result.valid, let message = calculation.result.errors.first {
+                Text(message).font(.subheadline).foregroundStyle(.secondary)
+            }
+            Button {
+                focus = nil
+                Task { await save() }
+            } label: {
+                Label(saveTitle, systemImage: "square.and.pencil")
+                    .font(.body.weight(.medium))
+                    .padding(.horizontal, 14)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.plain)
+            .codeLiquidGlassCapsule()
+            .disabled(!calculation.result.valid || !page.canSave || isSaving)
+            .accessibilityIdentifier("calculator-save")
+            if let savedTitle {
+                Text("Saved to \(savedTitle)").font(.subheadline).foregroundStyle(.secondary)
+                    .accessibilityIdentifier("calculator-saved-note")
+            }
+            if let error {
+                Text(error).font(.subheadline).foregroundStyle(.red)
+            }
+        }
+    }
+
+    private var saveTitle: String {
+        if isSaving { return "Saving…" }
+        if let prior = calculation.record.savedFingerprint, prior != calculation.result.fingerprint {
+            return "Add revised calculation to Note…"
+        }
+        return "Add calculation to Note…"
+    }
+
+    private func field<Control: View>(_ title: String, @ViewBuilder content: () -> Control) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(title).font(.subheadline).foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+            content()
+                .textFieldStyle(.plain)
+                .frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
+            Divider()
+        }
+    }
+
+    private func value(_ field: Field) -> String { input[field.rawValue, default: ""] }
+
+    private func binding(_ field: Field) -> Binding<String> {
+        Binding(get: { value(field) }, set: { next in edit { $0[field.rawValue] = next } })
+    }
+
+    private func changeArea(_ area: String) {
+        edit { input in
+            input[Field.area.rawValue] = area
+            input[Field.areaMeasurementBasis.rawValue] = row?.areaBasis ?? ""
+            input[Field.userMeasurementBasis.rawValue] = row?.areaBasis ?? ""
+        }
+    }
+
+    private func changeFactorMode(_ mode: String) {
+        edit { input in
+            input[Field.factorMode.rawValue] = mode
+            input[Field.factor.rawValue] = mode == "custom" ? row?.factor : nil
+            input[Field.customReason.rawValue] = nil
+        }
+    }
+
+    private func selectRow(_ id: String) {
+        guard id != value(.tableRowID) else { return }
+        let next = page.engine.rows.first { $0.id == id }
+        edit { input in
+            input[Field.tableRowID.rawValue] = id
+            input[Field.factorMode.rawValue] = nil
+            input[Field.factor.rawValue] = nil
+            input[Field.customReason.rawValue] = nil
+            if let basis = next?.areaBasis, !basis.isEmpty {
+                let priorBasis = value(.areaMeasurementBasis)
+                if !priorBasis.isEmpty && priorBasis != basis { input[Field.area.rawValue] = "" }
+                input[Field.areaMeasurementBasis.rawValue] = basis
+            }
+            if next?.method == .fixed { input[Field.seating.rawValue] = "fixed-seating" }
+        }
+    }
+
+    private func edit(_ change: (inout [String: String]) -> Void) {
+        var next = input
+        change(&next)
         do {
-            let scripts = try ["occupant-load-calculation", "calculation-drafts", "ProjectCalculator"].map { name in
-                guard let url = Bundle.main.url(forResource: name, withExtension: "js") else {
-                    throw ProjectCalculatorError.sourceUnavailable
-                }
-                return try String(contentsOf: url, encoding: .utf8)
-                    .replacingOccurrences(of: #"(?m)^export "#, with: "", options: .regularExpression)
-            }
-            guard let html = Bundle.main.url(forResource: "ProjectCalculator", withExtension: "html") else {
-                throw ProjectCalculatorError.sourceUnavailable
-            }
-            let source = "(() => {\n" + scripts.joined(separator: "\n") + "\n})();"
-            let script = WKUserScript(source: source, injectionTime: .atDocumentEnd,
-                forMainFrameOnly: true, in: .defaultClient)
-            controller.addUserScript(script)
-            controller.addScriptMessageHandler(context.coordinator, contentWorld: .defaultClient, name: "projectCalculator")
-            context.coordinator.documentURL = html
-            view.loadFileURL(html, allowingReadAccessTo: html)
-        } catch {
-            Task { @MainActor in onError(error.localizedDescription) }
-        }
-        return view
+            calculation = try page.engine.update(calculation.record, input: next)
+            // Keep the exact spelling being typed. The shared engine handles calculation and Note normalization.
+            input = next
+            savedTitle = nil
+            storeDrafts()
+        } catch { self.error = error.localizedDescription }
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {
-        context.coordinator.form = self
+    private func switchDraft(_ load: () throws -> ProjectCalculatorSnapshot) {
+        focus = nil
+        do {
+            calculation = try load()
+            input = calculation.record.input
+            savedTitle = calculation.savedTitle
+            pendingSave = nil
+            storeDrafts()
+        } catch { self.error = error.localizedDescription }
     }
 
-    static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
-        uiView.configuration.userContentController.removeScriptMessageHandler(forName: "projectCalculator", contentWorld: .defaultClient)
-        uiView.navigationDelegate = nil
-        uiView.stopLoading()
+    private func storeDrafts() {
+        do {
+            if calculation.raw != storedDrafts {
+                try onDrafts(calculation.raw)
+                storedDrafts = calculation.raw
+            }
+            error = nil
+        } catch { self.error = error.localizedDescription }
     }
 
-    @MainActor
-    final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandlerWithReply {
-        var form: CalculatorWebForm
-        var documentURL: URL?
-
-        init(form: CalculatorWebForm) { self.form = form }
-
-        func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction) async -> WKNavigationActionPolicy {
-            action.request.url == documentURL ? .allow : .cancel
-        }
-
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            Task {
-                do {
-                    let json = try JSONEncoder().encode(form.page)
-                    _ = try await webView.callAsyncJavaScript("startProjectCalculator(JSON.parse(configuration))",
-                        arguments: ["configuration": String(decoding: json, as: UTF8.self)],
-                        in: nil, contentWorld: .defaultClient)
-                } catch { form.onError(error.localizedDescription) }
+    private func save() async {
+        guard !isSaving, calculation.result.valid, page.canSave else { return }
+        isSaving = true
+        defer { isSaving = false }
+        do {
+            let fingerprint = calculation.result.fingerprint
+            if pendingSave?.fingerprint != fingerprint {
+                pendingSave = (fingerprint, UUID(), Date().formatted(.iso8601))
             }
-        }
-
-        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            form.onError(error.localizedDescription)
-        }
-
-        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            form.onError(error.localizedDescription)
-        }
-
-        func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
-            do {
-                guard message.frameInfo.isMainFrame, let data = message.body as? [String: Any],
-                      let type = data["type"] as? String else { throw ProjectCalculatorError.invalidRequest }
-                switch type {
-                case "source":
-                    try form.onOpenSource()
-                    return (NSNull(), nil)
-                case "drafts":
-                    guard let raw = data["value"] as? String else { throw ProjectCalculatorError.invalidRequest }
-                    try form.onDrafts(raw)
-                    return (NSNull(), nil)
-                case "note":
-                    guard let payload = data["value"] as? [String: Any] else { throw ProjectCalculatorError.invalidRequest }
-                    let request = try JSONDecoder().decode(ProjectCalculatorNote.self,
-                        from: JSONSerialization.data(withJSONObject: payload))
-                    if let note = try await form.onSave(request) { return (["id": note.id, "title": note.title], nil) }
-                    return (NSNull(), nil)
-                default:
-                    throw ProjectCalculatorError.invalidRequest
-                }
-            } catch {
-                return (nil, error.localizedDescription)
-            }
-        }
+            guard let pendingSave else { return }
+            let request = try page.engine.note(input: input, id: pendingSave.id, createdAt: pendingSave.timestamp)
+            guard let saved = try await onSave(request) else { return }
+            self.pendingSave = nil
+            savedTitle = saved.title
+            calculation = try page.engine.markSaved(calculation.record, note: saved, fingerprint: fingerprint)
+            storeDrafts()
+        } catch { self.error = error.localizedDescription }
     }
 }
