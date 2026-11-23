@@ -2822,6 +2822,52 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(ReaderCodeMenuSectionTitle.landUseAndZoning, "Land Use and Zoning")
     }
 
+    func testSavingSelectionsPreservesExactExcerptsPerProjectAndSyncsThem() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = try UserDataStore(databaseURL: directory.appendingPathComponent("local.sqlite"))
+        let version = UserContentSyncCodeVersion.localNYC2022
+        func project(_ name: String) throws -> Int64 {
+            try store.createFolder(name: name, address: "", description: "", colorHex: CodeFolder.defaultColorHex,
+                                   folderType: .project, codeVersion: version)
+        }
+        let first = try project("First")
+        let second = try project("Second")
+        let clientID = try XCTUnwrap(store.allFolders().first(where: { $0.id == first })).clientID
+        try store.saveSection(101, toFolderIDs: [second], codeVersion: version)
+        let excerpts: [Int64: [String]] = [101: ["end of the first paragraph."], 102: ["101.2 Scope.\nStart of the second"]]
+        XCTAssertThrowsError(try store.saveSelection(excerpts, toProject: first, clientID: "stale", codeVersion: version))
+        XCTAssertFalse(try store.isBookmarked(sectionID: 102, codeVersion: version))
+        try store.saveSelection(excerpts, toProject: first, clientID: clientID, codeVersion: version)
+        try store.saveSelection(excerpts, toProject: first, clientID: clientID, codeVersion: version)
+        let saved = try store.evidenceReferences(inFolder: first)
+        XCTAssertEqual(Dictionary(uniqueKeysWithValues: saved.map { ($0.sectionID, $0.selectedExcerpts) }), excerpts)
+        XCTAssertEqual(try store.evidenceReferences(inFolder: second).first?.selectedExcerpts, [])
+        XCTAssertTrue(try store.isBookmarked(sectionID: 102, codeVersion: version))
+
+        let account = SignedInAccount(appUserID: "apple:evidence-selection", appleUserID: "evidence-selection",
+                                      displayName: "Evidence Selection", signedInAt: Date())
+        let remote = try UserDataStore(databaseURL: directory.appendingPathComponent("remote.sqlite"))
+        var selectionMutations = 0
+        for item in try store.pendingSyncQueueItems(limit: 50) {
+            let mutation = try ServerUserContentMutation(syncQueueItem: item, account: account)
+            if case .projectSection(let section) = mutation, let selection = section.selectedExcerpts {
+                XCTAssertEqual(selection, excerpts[section.sectionID])
+                selectionMutations += 1
+            }
+            try remote.applyServerUserContentMutation(mutation)
+        }
+        XCTAssertEqual(selectionMutations, 2)
+        let remoteFolder = try XCTUnwrap(remote.allFolders().first(where: { $0.name == "First" }))
+        let downloaded = try remote.evidenceReferences(inFolder: remoteFolder.id)
+        XCTAssertEqual(Dictionary(uniqueKeysWithValues: downloaded.map { ($0.sectionID, $0.selectedExcerpts) }), excerpts)
+
+        try store.removeSection(101, fromFolder: first, codeVersion: version)
+        try store.addSection(101, toFolder: first, codeVersion: version, selectedExcerpts: excerpts[101] ?? [])
+        XCTAssertEqual(try store.evidenceReferences(inFolder: first).first(where: { $0.sectionID == 101 })?.selectedExcerpts, excerpts[101])
+    }
+
     func testSavingEvidenceRequiresDestinationAndAtomicallyCreatesOneBookmarkWithManyMemberships() throws {
         let databaseURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-folder-save-\(UUID().uuidString).sqlite")

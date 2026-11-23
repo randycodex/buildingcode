@@ -904,9 +904,15 @@ struct ServerProjectSectionRecord: Codable, Hashable, Sendable {
     let updatedAt: Date
     let deletedAt: Date?
     var serverEventID: Int64? = nil
+    var selectedExcerpts: [String]? = nil
 
     var resolvedFolderType: CodeFolderType {
         folderType ?? .project
+    }
+
+    static func decodeExcerpts(_ json: String?) -> [String]? {
+        guard let json else { return nil }
+        return try? JSONDecoder().decode([String].self, from: Data(json.utf8))
     }
 }
 
@@ -1135,7 +1141,8 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     sectionID: sectionID,
                     scope: payload.values["scope"],
                     updatedAt: item.mutationUpdatedAt,
-                    deletedAt: deletedAt
+                    deletedAt: deletedAt,
+                    selectedExcerpts: ServerProjectSectionRecord.decodeExcerpts(payload.values["selectedExcerpts"])
                 )
             )
         case .continuity:
@@ -4974,6 +4981,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let noteBody: String
     let tags: [String]
     let bookmarkedAt: Date?
+    var selectedExcerpts: [String] = []
 
     init(
         id: Int64,

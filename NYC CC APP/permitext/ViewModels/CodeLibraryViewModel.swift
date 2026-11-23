@@ -209,6 +209,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let sectionID: Int64?
         let blockID: String
         let noteBody: String?
+        var selectedExcerpts: [Int64: [String]] = [:]
     }
     @Published private(set) var projectSaveRequest: ProjectSaveRequest?
     @Published private(set) var currentPlan: AppPlan {
@@ -6461,7 +6462,8 @@ final class CodeLibraryViewModel: ObservableObject {
         var failed: [BookmarkedSection] = []
         for section in sections {
             do {
-                try userContentRepository.addSection(section.id, toFolder: folderID, codeVersion: section.codeVersion)
+                try userContentRepository.addSection(section.id, toFolder: folderID, codeVersion: section.codeVersion,
+                                                     selectedExcerpts: section.selectedExcerpts)
             } catch {
                 failed.append(section)
                 statusMessage = error.localizedDescription
@@ -6659,6 +6661,44 @@ final class CodeLibraryViewModel: ObservableObject {
         owner.projectSaveRequest = nil
     }
 
+    func saveReaderSelectionToEvidence(_ passages: [ResearchSelectionRequest]) -> Bool {
+        let owner = sharedAccountLibrary ?? self
+        guard owner.requireSavedWorkAccess(), owner.requireProjectAccess(),
+              let codeVersion = selectedVersion?.codeVersion else { return false }
+        var excerpts: [Int64: [String]] = [:]
+        for passage in passages {
+            guard let sectionID = Int64(passage.sectionID), !passage.selectedText.isEmpty else { continue }
+            excerpts[sectionID, default: []].append(passage.selectedText)
+        }
+        guard !excerpts.isEmpty else { return false }
+        guard let project = readerSaveDestinationProject else {
+            owner.projectSaveRequest = ProjectSaveRequest(accountID: owner.signedInAccount?.appUserID,
+                codeVersion: codeVersion, sectionID: nil, blockID: "", noteBody: nil, selectedExcerpts: excerpts)
+            return true
+        }
+        return owner.storeReaderSelection(excerpts, in: project, codeVersion: codeVersion)
+    }
+
+    private func storeReaderSelection(_ excerpts: [Int64: [String]], in project: CodeFolder, codeVersion: String) -> Bool {
+        guard requireSavedWorkAccess(), requireProjectAccess(), let userContentRepository else { return false }
+        do {
+            try userContentRepository.saveSelection(excerpts, toProject: project.id, clientID: project.clientID,
+                                                    codeVersion: codeVersion)
+            refreshBookmarks()
+            scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+            let message = "Saved to \(project.name)"
+            statusMessage = message
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            UIAccessibility.post(notification: .announcement, argument: message)
+            return true
+        } catch {
+            statusMessage = error.localizedDescription
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            return false
+        }
+    }
+
     @discardableResult
     func completeProjectSelection(_ project: CodeFolder) async -> Bool {
         let owner = sharedAccountLibrary ?? self
@@ -6667,6 +6707,11 @@ final class CodeLibraryViewModel: ObservableObject {
               owner.readerSaveDestinationProjects.contains(where: { $0.clientID == project.clientID }) else { return false }
         let identity = owner.privateRequestIdentity
         owner.selectReaderSaveDestination(.project(project.clientID))
+        if !request.selectedExcerpts.isEmpty, let version = request.codeVersion {
+            guard owner.storeReaderSelection(request.selectedExcerpts, in: project, codeVersion: version) else { return false }
+            owner.projectSaveRequest = nil
+            return true
+        }
         guard let sectionID = request.sectionID, let version = request.codeVersion else {
             owner.projectSaveRequest = nil
             return true
@@ -7906,6 +7951,7 @@ struct ProjectEvidenceVersionSnapshot: Sendable {
     let tagsBySectionID: [Int64: [String]]
     let annotationEntries: [UserAnnotationEntry]
     let bookmarkCreatedAtBySectionID: [Int64: Date]
+    var selectedExcerptsByFolderID: [Int64: [Int64: [String]]] = [:]
 }
 
 struct ProjectPresentationSnapshot: Sendable {
@@ -7926,6 +7972,7 @@ private enum ProjectPresentationSnapshotAssembler {
         catalog: [BundledCodeVersion]
     ) throws -> ProjectPresentationSnapshot {
         var sectionIDsByFolderAndVersion: [Int64: [String: [Int64]]] = [:]
+        var excerptsByVersionAndFolder: [String: [Int64: [Int64: [String]]]] = [:]
         var requiredCodeVersions = Set(try repository.savedCodeVersions())
         for folder in folders {
             try Task.checkCancellation()
@@ -7933,6 +7980,10 @@ private enum ProjectPresentationSnapshotAssembler {
             for reference in references {
                 sectionIDsByFolderAndVersion[folder.id, default: [:]][reference.codeVersion, default: []]
                     .append(reference.sectionID)
+                if !reference.selectedExcerpts.isEmpty {
+                    excerptsByVersionAndFolder[reference.codeVersion, default: [:]][folder.id, default: [:]][reference.sectionID] =
+                        reference.selectedExcerpts
+                }
                 requiredCodeVersions.insert(reference.codeVersion)
             }
         }
@@ -7951,7 +8002,8 @@ private enum ProjectPresentationSnapshotAssembler {
                 notesBySectionID: try repository.noteEntries(codeVersion: codeVersion),
                 tagsBySectionID: try repository.tagsBySectionID(codeVersion: codeVersion),
                 annotationEntries: try repository.annotationEntries(codeVersion: codeVersion),
-                bookmarkCreatedAtBySectionID: try repository.bookmarkCreatedAtBySectionID(codeVersion: codeVersion)
+                bookmarkCreatedAtBySectionID: try repository.bookmarkCreatedAtBySectionID(codeVersion: codeVersion),
+                selectedExcerptsByFolderID: excerptsByVersionAndFolder[codeVersion] ?? [:]
             )
         }
 
@@ -8198,7 +8250,11 @@ actor ProjectPresentationBuilder {
             var seenRowIDs = Set<String>()
             let evidenceRecords = resolved.filter { seenRowIDs.insert($0.rowID).inserted }
             recordCountByFolderID[folder.id] = evidenceRecords.count
-            rowsByFolderID[folder.id] = ProjectEvidenceConsolidator.consolidated(evidenceRecords)
+            rowsByFolderID[folder.id] = ProjectEvidenceConsolidator.consolidated(evidenceRecords).map { row in
+                var row = row
+                row.selectedExcerpts = snapshot.versions[row.codeVersion]?.selectedExcerptsByFolderID[folder.id]?[row.id] ?? []
+                return row
+            }
         }
 
         return ProjectPresentationResult(

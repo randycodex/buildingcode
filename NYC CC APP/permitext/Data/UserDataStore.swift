@@ -10,6 +10,7 @@ protocol UserContentRepository {
     func isBookmarked(sectionID: Int64, codeVersion: String) throws -> Bool
     func toggleBookmark(sectionID: Int64, codeVersion: String) throws
     func saveSection(_ sectionID: Int64, toFolderIDs folderIDs: Set<Int64>, codeVersion: String) throws
+    func saveSelection(_ excerptsBySectionID: [Int64: [String]], toProject projectID: Int64, clientID: String, codeVersion: String) throws
     func noteBody(sectionID: Int64, codeVersion: String) throws -> String
     func noteBody(sectionID: Int64, blockID: String, codeVersion: String) throws -> String
     func noteBlockIDs(sectionID: Int64, codeVersion: String) throws -> [String]
@@ -37,13 +38,13 @@ protocol UserContentRepository {
     func totalFolderCount() throws -> Int
     func folderMembership(codeVersion: String) throws -> [Int64: [Int64]]
     func sections(inFolder folderID: Int64, codeVersion: String) throws -> [Int64]
-    func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String)]
+    func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String, selectedExcerpts: [String])]
     func createFolder(name: String, address: String, description: String, structuredFacts: [ProjectStructuredFact], colorHex: String, folderType: CodeFolderType, codeVersion: String) throws -> Int64
     func updateFolder(id: Int64, name: String, address: String, description: String, structuredFacts: [ProjectStructuredFact], colorHex: String, folderType: CodeFolderType, codeVersion: String) throws
     func updateProjectWorkflow(id: Int64, openQuestions: [ProjectOpenQuestion]?, recordsChecklist: [ProjectChecklistRecord]?, codeVersion: String) throws
     func reorderProjects(ids: [Int64]) throws
     func deleteFolder(id: Int64, codeVersion: String) throws
-    func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String) throws
+    func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, selectedExcerpts: [String]) throws
     func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws
     func removeSectionFromAllFolders(sectionID: Int64, codeVersion: String) throws
     func clearAllFolders(codeVersion: String) throws
@@ -78,7 +79,7 @@ struct SavedPassageRemoval: Equatable {
         }
         let existingFolderIDs = Set(try repository.allFolders().map(\.id))
         for folderID in folderIDs.intersection(existingFolderIDs).sorted() {
-            try repository.addSection(sectionID, toFolder: folderID, codeVersion: codeVersion)
+            try repository.addSection(sectionID, toFolder: folderID, codeVersion: codeVersion, selectedExcerpts: [])
         }
     }
 }
@@ -539,41 +540,7 @@ final class UserDataStore: UserContentRepository {
         let alreadyBookmarked = try isBookmarked(sectionID: sectionID, codeVersion: codeVersion)
 
         try performTransaction {
-            if !alreadyBookmarked {
-                let bookmark = try connection.prepare(
-                    """
-                    INSERT INTO bookmarks (
-                        code_version, section_id, created_at, updated_at, client_id,
-                        owner_id, visibility, sync_state, deleted_at
-                    )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)
-                    ON CONFLICT(code_version, section_id) DO UPDATE SET
-                        created_at = excluded.created_at,
-                        updated_at = excluded.updated_at,
-                        client_id = excluded.client_id,
-                        owner_id = excluded.owner_id,
-                        visibility = excluded.visibility,
-                        sync_state = excluded.sync_state,
-                        deleted_at = NULL;
-                    """
-                )
-                defer { connection.finalize(bookmark) }
-                let now = isoFormatter.string(from: Date())
-                try connection.bind(text: codeVersion, index: 1, to: bookmark)
-                sqlite3_bind_int64(bookmark, 2, sectionID)
-                try connection.bind(text: now, index: 3, to: bookmark)
-                try connection.bind(text: now, index: 4, to: bookmark)
-                try connection.bind(text: UUID().uuidString, index: 5, to: bookmark)
-                try connection.bind(text: localOwnerID, index: 6, to: bookmark)
-                try connection.bind(text: personalVisibility, index: 7, to: bookmark)
-                try connection.bind(text: pendingSyncState, index: 8, to: bookmark)
-                _ = try connection.step(bookmark)
-                try enqueueSyncOperation(
-                    entityType: .bookmark,
-                    operationType: .upsert,
-                    payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID)
-                )
-            }
+            if !alreadyBookmarked { try insertBookmark(sectionID: sectionID, codeVersion: codeVersion) }
 
             for target in existingTargets where destinationByID[target.folderID] == nil {
                 do {
@@ -602,52 +569,71 @@ final class UserDataStore: UserContentRepository {
             }
 
             for target in destinations where existingByID[target.folderID] == nil {
-                do {
-                    let membership = try connection.prepare(
-                        """
-                        INSERT INTO folder_sections (
-                            client_id, owner_id, visibility, sync_state, folder_id,
-                            code_version, section_id, added_at, updated_at, deleted_at
-                        )
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
-                        ON CONFLICT(folder_id, code_version, section_id) DO UPDATE SET
-                            client_id = excluded.client_id,
-                            owner_id = excluded.owner_id,
-                            visibility = excluded.visibility,
-                            sync_state = excluded.sync_state,
-                            added_at = excluded.added_at,
-                            updated_at = excluded.updated_at,
-                            deleted_at = NULL;
-                        """
-                    )
-                    defer { connection.finalize(membership) }
-                    let now = isoFormatter.string(from: Date())
-                    try connection.bind(text: UUID().uuidString, index: 1, to: membership)
-                    try connection.bind(text: localOwnerID, index: 2, to: membership)
-                    try connection.bind(text: personalVisibility, index: 3, to: membership)
-                    try connection.bind(text: pendingSyncState, index: 4, to: membership)
-                    sqlite3_bind_int64(membership, 5, target.folderID)
-                    try connection.bind(text: codeVersion, index: 6, to: membership)
-                    sqlite3_bind_int64(membership, 7, sectionID)
-                    try connection.bind(text: now, index: 8, to: membership)
-                    try connection.bind(text: now, index: 9, to: membership)
-                    _ = try connection.step(membership)
-                }
-                try enqueueSyncOperation(
-                    entityType: .folderSection,
-                    operationType: .upsert,
-                    payload: SyncQueuePayload(
-                        codeVersion: codeVersion,
-                        sectionID: sectionID,
-                        folderID: target.folderID,
-                        values: [
-                            "folderClientID": target.folderClientID,
-                            "folderType": target.folderType.rawValue
-                        ]
-                    )
-                )
+                try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, selectedExcerpts: [])
             }
         }
+    }
+
+    func saveSelection(
+        _ excerptsBySectionID: [Int64: [String]], toProject projectID: Int64, clientID: String, codeVersion: String
+    ) throws {
+        try performTransaction {
+            guard try allFolders().contains(where: {
+                $0.id == projectID && $0.clientID == clientID &&
+                    CodeFolderType(serverValue: $0.folderType) == .project && $0.deletedAt == nil
+            }) else {
+                throw NSError(domain: "UserDataStore", code: 3, userInfo: [
+                    NSLocalizedDescriptionKey: "The selected project is no longer available."
+                ])
+            }
+            let target = FolderSectionSyncTarget(folderID: projectID, folderClientID: clientID, folderType: .project)
+            for (sectionID, excerpts) in excerptsBySectionID.sorted(by: { $0.key < $1.key }) {
+                if try !isBookmarked(sectionID: sectionID, codeVersion: codeVersion) {
+                    try insertBookmark(sectionID: sectionID, codeVersion: codeVersion)
+                }
+                let existing = try folderSectionExcerpts(sectionID: sectionID, folderID: target.folderID, codeVersion: codeVersion)
+                let combined = mergeFolderSectionExcerpts(existing, excerpts)
+                if existing != combined {
+                    try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, selectedExcerpts: combined)
+                }
+            }
+        }
+    }
+
+    private func insertBookmark(sectionID: Int64, codeVersion: String) throws {
+        let bookmark = try connection.prepare(
+            """
+            INSERT INTO bookmarks (
+                code_version, section_id, created_at, updated_at, client_id,
+                owner_id, visibility, sync_state, deleted_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)
+            ON CONFLICT(code_version, section_id) DO UPDATE SET
+                created_at = excluded.created_at,
+                updated_at = excluded.updated_at,
+                client_id = excluded.client_id,
+                owner_id = excluded.owner_id,
+                visibility = excluded.visibility,
+                sync_state = excluded.sync_state,
+                deleted_at = NULL;
+            """
+        )
+        defer { connection.finalize(bookmark) }
+        let now = isoFormatter.string(from: Date())
+        try connection.bind(text: codeVersion, index: 1, to: bookmark)
+        sqlite3_bind_int64(bookmark, 2, sectionID)
+        try connection.bind(text: now, index: 3, to: bookmark)
+        try connection.bind(text: now, index: 4, to: bookmark)
+        try connection.bind(text: UUID().uuidString, index: 5, to: bookmark)
+        try connection.bind(text: localOwnerID, index: 6, to: bookmark)
+        try connection.bind(text: personalVisibility, index: 7, to: bookmark)
+        try connection.bind(text: pendingSyncState, index: 8, to: bookmark)
+        _ = try connection.step(bookmark)
+        try enqueueSyncOperation(
+            entityType: .bookmark,
+            operationType: .upsert,
+            payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID)
+        )
     }
 
     func noteBody(sectionID: Int64, codeVersion: String) throws -> String {
@@ -1047,6 +1033,7 @@ final class UserDataStore: UserContentRepository {
         try addColumnIfMissing(table: "folder_sections", column: "updated_at", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folder_sections", column: "deleted_at", definition: "TEXT")
         try migrateFolderSectionsCodeVersionConstraintIfNeeded()
+        try addColumnIfMissing(table: "folder_sections", column: "selected_excerpts_json", definition: "TEXT")
         try addColumnIfMissing(table: "sync_queue", column: "mutation_updated_at", definition: "TEXT NOT NULL DEFAULT ''")
         try backfillSyncColumns()
     }
@@ -2637,10 +2624,10 @@ final class UserDataStore: UserContentRepository {
         }
     }
 
-    func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String)] {
+    func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String, selectedExcerpts: [String])] {
         let statement = try connection.prepare(
             """
-            SELECT section_id, code_version
+            SELECT section_id, code_version, selected_excerpts_json
             FROM folder_sections
             WHERE folder_id = ?;
             """
@@ -2648,11 +2635,12 @@ final class UserDataStore: UserContentRepository {
         defer { connection.finalize(statement) }
         sqlite3_bind_int64(statement, 1, folderID)
 
-        var references: [(sectionID: Int64, codeVersion: String)] = []
+        var references: [(sectionID: Int64, codeVersion: String, selectedExcerpts: [String])] = []
         while try connection.step(statement) == SQLITE_ROW {
             references.append((
                 sectionID: connection.int64(at: 0, in: statement),
-                codeVersion: connection.string(at: 1, in: statement)
+                codeVersion: connection.string(at: 1, in: statement),
+                selectedExcerpts: ServerProjectSectionRecord.decodeExcerpts(connection.stringOrNil(at: 2, in: statement)) ?? []
             ))
         }
         return references
@@ -2722,16 +2710,46 @@ final class UserDataStore: UserContentRepository {
         try localFolderIDs(clientID: clientID, codeVersion: codeVersion).first
     }
 
-    func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String) throws {
-        let folderClientID = try folderClientID(id: folderID, codeVersion: codeVersion)
-        let folderType = try folderType(id: folderID, codeVersion: codeVersion)
+    func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String, selectedExcerpts: [String] = []) throws {
+        try performTransaction {
+            let target = FolderSectionSyncTarget(
+                folderID: folderID,
+                folderClientID: try folderClientID(id: folderID, codeVersion: codeVersion),
+                folderType: try folderType(id: folderID, codeVersion: codeVersion)
+            )
+            let existing = try folderSectionExcerpts(sectionID: sectionID, folderID: folderID, codeVersion: codeVersion)
+            let combined = mergeFolderSectionExcerpts(existing, selectedExcerpts)
+            try upsertFolderSection(sectionID, target: target, codeVersion: codeVersion, selectedExcerpts: combined)
+        }
+    }
+
+    private func folderSectionExcerpts(sectionID: Int64, folderID: Int64, codeVersion: String) throws -> [String]? {
+        let statement = try connection.prepare(
+            "SELECT selected_excerpts_json FROM folder_sections WHERE folder_id = ? AND code_version = ? AND section_id = ?;"
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, folderID)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        sqlite3_bind_int64(statement, 3, sectionID)
+        guard try connection.step(statement) == SQLITE_ROW else { return nil }
+        return ServerProjectSectionRecord.decodeExcerpts(connection.stringOrNil(at: 0, in: statement)) ?? []
+    }
+
+    private func mergeFolderSectionExcerpts(_ existing: [String]?, _ added: [String]) -> [String] {
+        var seen = Set<String>()
+        return ((existing ?? []) + added).filter { !$0.isEmpty && seen.insert($0).inserted }
+    }
+
+    private func upsertFolderSection(
+        _ sectionID: Int64, target: FolderSectionSyncTarget, codeVersion: String, selectedExcerpts: [String]
+    ) throws {
         let statement = try connection.prepare(
             """
             INSERT INTO folder_sections (
                 client_id, owner_id, visibility, sync_state, folder_id,
-                code_version, section_id, added_at, updated_at, deleted_at
+                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)
             ON CONFLICT(folder_id, code_version, section_id) DO UPDATE SET
                 client_id = excluded.client_id,
                 owner_id = excluded.owner_id,
@@ -2739,7 +2757,8 @@ final class UserDataStore: UserContentRepository {
                 sync_state = excluded.sync_state,
                 added_at = excluded.added_at,
                 updated_at = excluded.updated_at,
-                deleted_at = NULL;
+                deleted_at = NULL,
+                selected_excerpts_json = COALESCE(excluded.selected_excerpts_json, folder_sections.selected_excerpts_json);
             """
         )
         defer { connection.finalize(statement) }
@@ -2748,24 +2767,22 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: localOwnerID, index: 2, to: statement)
         try connection.bind(text: personalVisibility, index: 3, to: statement)
         try connection.bind(text: pendingSyncState, index: 4, to: statement)
-        sqlite3_bind_int64(statement, 5, folderID)
+        sqlite3_bind_int64(statement, 5, target.folderID)
         try connection.bind(text: codeVersion, index: 6, to: statement)
         sqlite3_bind_int64(statement, 7, sectionID)
         try connection.bind(text: now, index: 8, to: statement)
         try connection.bind(text: now, index: 9, to: statement)
+        var values = ["folderClientID": target.folderClientID, "folderType": target.folderType.rawValue]
+        if !selectedExcerpts.isEmpty {
+            let json = String(decoding: try JSONEncoder().encode(selectedExcerpts), as: UTF8.self)
+            try connection.bind(text: json, index: 10, to: statement)
+            values["selectedExcerpts"] = json
+        }
         _ = try connection.step(statement)
-        enqueueSyncOperationIfPossible(
+        try enqueueSyncOperation(
             entityType: .folderSection,
             operationType: .upsert,
-            payload: SyncQueuePayload(
-                codeVersion: codeVersion,
-                sectionID: sectionID,
-                folderID: folderID,
-                values: [
-                    "folderClientID": folderClientID,
-                    "folderType": folderType.rawValue
-                ]
-            )
+            payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID, folderID: target.folderID, values: values)
         )
     }
 
@@ -3367,7 +3384,8 @@ final class UserDataStore: UserContentRepository {
                 scope: record.scope,
                 updatedAt: record.updatedAt,
                 deletedAt: record.deletedAt,
-                serverEventID: record.serverEventID
+                serverEventID: record.serverEventID,
+                selectedExcerpts: record.selectedExcerpts
             ))
         case .workboard:
             return mutation
@@ -3609,11 +3627,11 @@ final class UserDataStore: UserContentRepository {
             """
             INSERT OR IGNORE INTO folder_sections (
                 client_id, owner_id, visibility, sync_state, folder_id,
-                code_version, section_id, added_at, updated_at, deleted_at
+                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json
             )
             SELECT
                 client_id, owner_id, visibility, sync_state, ?,
-                code_version, section_id, added_at, updated_at, deleted_at
+                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json
             FROM folder_sections
             WHERE folder_id = ? AND code_version = ?;
             """
@@ -3728,14 +3746,16 @@ final class UserDataStore: UserContentRepository {
         ) else {
             return
         }
+        let existing = try folderSectionExcerpts(sectionID: record.sectionID, folderID: folderID, codeVersion: record.codeVersion)
+        let excerpts = mergeFolderSectionExcerpts(existing, record.selectedExcerpts ?? [])
         let timestamp = isoFormatter.string(from: record.updatedAt)
         let statement = try connection.prepare(
             """
             INSERT OR REPLACE INTO folder_sections (
                 client_id, owner_id, visibility, sync_state, folder_id,
-                code_version, section_id, added_at, updated_at, deleted_at
+                code_version, section_id, added_at, updated_at, deleted_at, selected_excerpts_json
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?);
             """
         )
         defer { connection.finalize(statement) }
@@ -3748,6 +3768,10 @@ final class UserDataStore: UserContentRepository {
         sqlite3_bind_int64(statement, 7, record.sectionID)
         try connection.bind(text: timestamp, index: 8, to: statement)
         try connection.bind(text: timestamp, index: 9, to: statement)
+        if !excerpts.isEmpty {
+            let json = String(decoding: try JSONEncoder().encode(excerpts), as: UTF8.self)
+            try connection.bind(text: json, index: 10, to: statement)
+        }
         _ = try connection.step(statement)
     }
 

@@ -28,19 +28,22 @@ struct ReaderView: View {
     let codeSectionID: Int64?
     let returnsToProjectsAfterRemoval: Bool
     let usesCompactSourceHeader: Bool
+    let selectedExcerpts: [String]
 
     init(
         sectionID: Int64,
         codeVersion: String? = nil,
         codeSectionID: Int64? = nil,
         returnsToProjectsAfterRemoval: Bool = false,
-        usesCompactSourceHeader: Bool = false
+        usesCompactSourceHeader: Bool = false,
+        selectedExcerpts: [String] = []
     ) {
         self.sectionID = sectionID
         self.codeVersion = codeVersion
         self.codeSectionID = codeSectionID
         self.returnsToProjectsAfterRemoval = returnsToProjectsAfterRemoval
         self.usesCompactSourceHeader = usesCompactSourceHeader
+        self.selectedExcerpts = selectedExcerpts
     }
 
     @Environment(\.dismiss) private var dismiss
@@ -108,6 +111,18 @@ struct ReaderView: View {
 
                         header(detail: detail)
                             .sourceProblemReporting(sectionID: sectionID)
+
+                        if !selectedExcerpts.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Saved selection").font(.headline)
+                                ForEach(selectedExcerpts, id: \.self) { excerpt in
+                                    Text(excerpt)
+                                        .foregroundStyle(.secondary)
+                                        .textSelection(.enabled)
+                                }
+                                CodeHairline()
+                            }
+                        }
 
                         ContentBlockListView(
                             detail: detail,

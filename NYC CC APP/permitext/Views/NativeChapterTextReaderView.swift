@@ -389,6 +389,9 @@ struct NativeChapterTextReaderView: View {
                     }
                 }
                 selection.askAssistant = { [weak library] in library?.sendToResearch($0) }
+                selection.saveToEvidence = { [weak library] passages in
+                    library?.saveReaderSelectionToEvidence(passages) ?? false
+                }
             })
         }
         .accessibilityIdentifier("native-reader-ready")

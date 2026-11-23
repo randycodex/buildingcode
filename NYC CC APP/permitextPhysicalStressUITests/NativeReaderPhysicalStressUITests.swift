@@ -4347,6 +4347,67 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testChapterSelectionSavesBothCitedExcerptsToProjectEvidence() throws {
+#if !DEBUG
+        throw XCTSkip("Chapter selection uses the isolated project fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+                                                       "saved-folder-", "Acceptance Project")).firstMatch
+        XCTAssertTrue(project.waitForExistence(timeout: 10))
+        project.tap()
+        XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
+        app.buttons["main-tab-reader"].tap()
+        let browser = app.scrollViews["reader-chapter-browser-primary"]
+        let chapter = browser.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 1:")).firstMatch
+        XCTAssertTrue(chapter.waitForExistence(timeout: 15))
+        chapter.tap()
+
+        func paragraph(containing text: String) -> XCUIElement {
+            app.textViews.matching(NSPredicate(format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@", text, text)).firstMatch
+        }
+        let first = paragraph(containing: "This code shall be known")
+        let second = paragraph(containing: "The provisions of this code shall apply")
+        XCTAssertTrue(first.wait(for: \.isHittable, toEqual: true, timeout: 20))
+        if !second.isHittable {
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.70))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.54)),
+                       withVelocity: .slow, thenHoldForDuration: 0)
+        }
+        XCTAssertTrue(first.isHittable && second.isHittable)
+        let start = first.coordinate(withNormalizedOffset: CGVector(dx: 0.27, dy: 0.5))
+        let end = second.coordinate(withNormalizedOffset: CGVector(dx: 0.58, dy: 0.22))
+        start.press(forDuration: 0.6, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.1)
+
+        let save = app.menuItems["Save to Evidence"].firstMatch
+        XCTAssertTrue(save.waitForExistence(timeout: 8), app.debugDescription)
+        XCTAssertTrue(app.menuItems["Copy"].exists)
+        XCTAssertTrue(app.menuItems["Ask Assistant"].exists)
+        save.tap()
+
+        app.buttons["main-tab-saved"].tap()
+        let evidence = app.buttons["project-section-evidence"]
+        XCTAssertTrue(evidence.waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertTrue(evidence.label.contains("2 saved"), evidence.label)
+        reveal(evidence, in: app)
+        evidence.tap()
+        XCTAssertTrue(app.navigationBars["Evidence"].waitForExistence(timeout: 10))
+
+        let rows = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-bookmark-"))
+        let title = rows.matching(NSPredicate(format: "label CONTAINS %@", "101.1")).firstMatch
+        let scope = rows.matching(NSPredicate(format: "label CONTAINS %@", "101.2")).firstMatch
+        XCTAssertTrue(title.waitForExistence(timeout: 10) && scope.exists, app.debugDescription)
+        XCTAssertFalse(title.label.contains("This code shall be known"), title.label)
+        XCTAssertTrue(title.label.contains("designation \"BC\"."), title.label)
+        XCTAssertTrue(scope.label.contains("101.2 Scope.") && scope.label.contains("The provisions"), scope.label)
+        title.tap()
+        XCTAssertTrue(app.staticTexts["Saved selection"].waitForExistence(timeout: 10), app.debugDescription)
+#endif
+    }
+
     func testChapterSelectionHandlesCrossSubsectionsAndCanBeAdjustedAgain() throws {
 #if !DEBUG
         throw XCTSkip("Chapter selection uses the isolated Assistant fixture.")

@@ -93,6 +93,7 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
 
     var resolveText: ((NativeChapterSelectionRange) -> NativeChapterSelectedText)?
     var askAssistant: (([ResearchSelectionRequest]) -> Void)?
+    var saveToEvidence: (([ResearchSelectionRequest]) -> Bool)?
 
     private lazy var press: UILongPressGestureRecognizer = {
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(handleDrag(_:)))
@@ -166,6 +167,23 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         nativeRange = nil
         nativeSelection?.selectedTextRange = nil
         clearHighlight()
+    }
+
+    func evidenceAction(in range: NSRange, at address: NativeChapterSelectionAddress) -> UIAction? {
+        let selection = NativeChapterSelectionRange(
+            .init(address: address, offset: range.location),
+            .init(address: address, offset: NSMaxRange(range))
+        )
+        guard let passages = resolveText?(selection).citations else { return nil }
+        return evidenceAction(for: passages)
+    }
+
+    private func evidenceAction(for passages: [ResearchSelectionRequest]) -> UIAction? {
+        guard saveToEvidence != nil, !passages.isEmpty else { return nil }
+        return UIAction(title: "Save to Evidence", image: UIImage(systemName: "bookmark")) { [weak self] _ in
+            guard let self, self.saveToEvidence?(passages) == true else { return }
+            self.clear()
+        }
     }
 
     private func clearHighlight() {
@@ -594,7 +612,9 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
             self?.clear()
         }
         guard !finalText.citations.isEmpty else { return UIMenu(children: [copy]) }
-        return ReaderSelectionMenuBuilder.menu(selectedText: finalText.text, suggestedActions: [copy]) { [weak self] _ in
+        var actions: [UIMenuElement] = [copy]
+        if let save = evidenceAction(for: finalText.citations) { actions.append(save) }
+        return ReaderSelectionMenuBuilder.menu(selectedText: finalText.text, suggestedActions: actions) { [weak self] _ in
             let send = self?.askAssistant
             self?.clear()
             send?(finalText.citations)

@@ -2484,7 +2484,8 @@ struct ProjectView: View {
                         sectionID: bookmark.id,
                         codeVersion: bookmark.codeVersion,
                         codeSectionID: bookmark.codeSectionID,
-                        returnsToProjectsAfterRemoval: true
+                        returnsToProjectsAfterRemoval: true,
+                        selectedExcerpts: bookmark.selectedExcerpts
                     )
                 } label: {
                     projectBookmarkContent(bookmark, showsSource: showsSource)
@@ -2534,8 +2535,9 @@ struct ProjectView: View {
                     .font(.caption.weight(.medium))
                     .foregroundStyle(bookmarkAccent)
             }
-            if !bookmark.nonRepeatingPreviewText.isEmpty {
-                Text(bookmark.nonRepeatingPreviewText)
+            let preview = bookmark.selectedExcerpts.last ?? bookmark.nonRepeatingPreviewText
+            if !preview.isEmpty {
+                Text(preview)
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .lineLimit(3)

@@ -631,9 +631,14 @@ private struct AttributedTextContainer: UIViewRepresentable {
             }
 
             let selectedText = String(textView.text[selectedRange])
+            var actions = suggestedActions
+            if let target = (textView as? RichTextView)?.chapterSelectionTarget,
+               let save = target.controller.evidenceAction(in: range, at: target.address) {
+                actions.append(save)
+            }
             return ReaderSelectionMenuBuilder.menu(
                 selectedText: selectedText,
-                suggestedActions: suggestedActions,
+                suggestedActions: actions,
                 onResearchSelection: onResearchSelection
             )
         }
