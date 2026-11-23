@@ -2253,6 +2253,13 @@ struct ProjectView: View {
                 ) {
                     selectedEvidenceActions
                 }
+            } else if isProjectFolder {
+                IconToolbarGroup {
+                    if !visibleProjectBookmarks.isEmpty {
+                        ListSelectButton(title: "Select sections", action: startSelectingEvidence)
+                    }
+                    evidenceActionsMenu
+                }
             } else {
                 ToolbarItem(placement: .topBarTrailing) {
                     evidenceActionsMenu
@@ -2309,11 +2316,9 @@ struct ProjectView: View {
                     )
                 }
                 .disabled(bookmarks.isEmpty)
+                Button("Select sections", systemImage: "checklist", action: startSelectingEvidence)
+                    .disabled(visibleProjectBookmarks.isEmpty)
             }
-            Button("Select sections", systemImage: "checklist") {
-                ListSelectionMotion.run(reduceMotion: reduceMotion) { isSelecting = true }
-            }
-            .disabled(visibleProjectBookmarks.isEmpty)
         } label: {
             ToolbarActionIcon(systemImage: "line.3.horizontal.decrease")
                 .foregroundStyle(Color.appChrome)
@@ -2445,6 +2450,10 @@ struct ProjectView: View {
         let existing = Set(removedProjectSections.map(\.rowID))
         removedProjectSections.append(contentsOf: removed.filter { !existing.contains($0.rowID) })
         undoFailed = false
+    }
+
+    private func startSelectingEvidence() {
+        ListSelectionMotion.run(reduceMotion: reduceMotion) { isSelecting = true }
     }
 
     private func finishSelectingEvidence() {

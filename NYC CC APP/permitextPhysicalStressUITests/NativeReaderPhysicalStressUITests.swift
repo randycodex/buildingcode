@@ -729,8 +729,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         evidence.tap()
         XCTAssertTrue(app.navigationBars["Evidence"].waitForExistence(timeout: 10))
         let actions = app.buttons["Evidence actions"]
+        let selectSections = app.buttons["Select sections"]
         XCTAssertTrue(actions.isHittable)
-        XCTAssertFalse(app.buttons["Select sections"].exists)
+        XCTAssertTrue(selectSections.isHittable)
+        XCTAssertLessThan(selectSections.frame.midX, actions.frame.midX)
+        XCTAssertEqual(selectSections.frame.width, actions.frame.width, accuracy: 2)
+        XCTAssertEqual(selectSections.frame.height, actions.frame.height, accuracy: 2)
         let rows = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-bookmark-"))
         let title = rows.matching(NSPredicate(format: "label CONTAINS %@", "101.1")).firstMatch
         let scope = rows.matching(NSPredicate(format: "label CONTAINS %@", "101.2")).firstMatch
@@ -744,10 +748,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(app.buttons["Code Book"].exists)
         app.buttons["Title"].tap()
         XCTAssertLessThan(scope.frame.minY, title.frame.minY)
-        keepScreenshot(named: "Evidence sorted by title with one actions button", from: app)
+        keepScreenshot(named: "Evidence sorted by title with a visible selection button", from: app)
 
-        actions.tap()
-        app.buttons["Select sections"].tap()
+        selectSections.tap()
         XCTAssertTrue(scope.isHittable)
         scope.tap()
         XCTAssertEqual(app.staticTexts["list-selection-count"].label, "1 selected")
@@ -760,6 +763,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["Deselect All"].tap()
         XCTAssertEqual(app.staticTexts["list-selection-count"].label, "0 selected")
         app.buttons["Cancel"].tap()
+        XCTAssertTrue(selectSections.isHittable)
 #endif
     }
 
