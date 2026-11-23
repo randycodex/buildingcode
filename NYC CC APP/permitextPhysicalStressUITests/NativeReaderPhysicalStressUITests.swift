@@ -4315,6 +4315,38 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(screenshot)
     }
 
+    func testChapterSelectionCrossesSubsectionsAndReachesAssistant() throws {
+#if !DEBUG
+        throw XCTSkip("Chapter selection uses the isolated Assistant fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+
+        func paragraph(containing text: String) -> XCUIElement {
+            app.textViews.matching(NSPredicate(format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@", text, text)).firstMatch
+        }
+        let first = paragraph(containing: "This code shall be known")
+        let second = paragraph(containing: "The provisions of this code shall apply")
+        XCTAssertTrue(first.waitForExistence(timeout: 20) && first.isHittable)
+        XCTAssertTrue(second.isHittable)
+        let start = first.coordinate(withNormalizedOffset: CGVector(dx: 0.27, dy: 0.5))
+        let end = second.coordinate(withNormalizedOffset: CGVector(dx: 0.58, dy: 0.22))
+        start.press(forDuration: 0.6, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.1)
+        keepScreenshot(named: "One selection across Building Code 101.1 and 101.2", from: app)
+
+        let ask = app.menuItems["Ask Assistant"].firstMatch
+        XCTAssertTrue(ask.waitForExistence(timeout: 10), app.debugDescription)
+        ask.tap()
+        let excerpts = app.buttons["2 selected passages"]
+        XCTAssertTrue(excerpts.waitForExistence(timeout: 15), app.debugDescription)
+        excerpts.tap()
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "101.2 Scope")).firstMatch.exists)
+        keepScreenshot(named: "Two selected passages in Assistant", from: app)
+#endif
+    }
+
     func testPhase3EntitledReaderResearchJourney() {
         let app = XCUIApplication()
         // Xcode 26.6 cannot drive the system-owned edit menu on the iOS 27

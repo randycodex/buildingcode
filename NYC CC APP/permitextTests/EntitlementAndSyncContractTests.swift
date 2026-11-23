@@ -8092,6 +8092,31 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertTrue(attributedTextSource.contains("guard !replacements.isEmpty else { return ReaderEnactedTextLinkStyle.applying(to: attributedText) }"))
     }
 
+    func testChapterSelectionClipsEndpointsAndKeepsSubsectionCitationsInDocumentOrder() {
+        let source: [(NativeReaderRuntimeBlockKind, String)] = [
+            (.paragraph, "Read first excerpt."),
+            (.heading, "101.2 Scope."),
+            (.paragraph, "Second excerpt. Leave this out.")
+        ]
+        let blocks = NativeReaderDisplayBlock.blocks(from: source.enumerated().map { index, item in
+            NativeReaderRuntimeBlock(id: String(index), kind: item.0, sourceOrder: index,
+                sectionID: nil, anchorIDs: [], plainText: item.1, runs: [],
+                headingLevel: item.0 == .heading ? 3 : nil, listItems: [])
+        })
+        let start = NativeChapterSelectionPosition(address: .init(block: 0), offset: "Read ".utf16.count)
+        let end = NativeChapterSelectionPosition(address: .init(block: 2), offset: "Second excerpt.".utf16.count)
+
+        // Selecting backwards still copies and cites in source order.
+        let result = NativeReaderChapterSelectionText.resolve(.init(end, start), in: blocks) { blockID in
+            blockID == "0" ? 1011 : 1012
+        }
+        XCTAssertEqual(result.text, "first excerpt.\n101.2 Scope.\nSecond excerpt.")
+        XCTAssertEqual(result.citations, [
+            ResearchSelectionRequest(sectionID: "1011", selectedText: "first excerpt."),
+            ResearchSelectionRequest(sectionID: "1012", selectedText: "101.2 Scope.\nSecond excerpt.")
+        ])
+    }
+
     func testNativeReaderVisibleBlockResolutionObservesWithoutReassertingScrollPosition() {
         XCTAssertEqual(
             NativeReaderVisibleBlockResolver.topBlockID(

@@ -65,6 +65,7 @@
 		A10000000000000000000031 /* NotebookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000031 /* NotebookView.swift */; };
 		A10000000000000000000032 /* NativeReaderDocumentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000032 /* NativeReaderDocumentStore.swift */; };
 		A10000000000000000000033 /* NativeChapterTextReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000033 /* NativeChapterTextReaderView.swift */; };
+		B18D6182F44246B19CC82F20 /* NativeChapterSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CA6F82E50F48D8A7FA4DD6 /* NativeChapterSelection.swift */; };
 		A10000000000000000000034 /* SourceSerif4Variable-Roman.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000034 /* SourceSerif4Variable-Roman.ttf */; };
 		A10000000000000000000035 /* SourceSerif4Variable-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000035 /* SourceSerif4Variable-Italic.ttf */; };
 		A10000000000000000000036 /* Source-Serif-4-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000036 /* Source-Serif-4-OFL.txt */; };
@@ -159,6 +160,7 @@
 		A20000000000000000000031 /* NotebookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookView.swift; sourceTree = "<group>"; };
 		A20000000000000000000032 /* NativeReaderDocumentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeReaderDocumentStore.swift; sourceTree = "<group>"; };
 		A20000000000000000000033 /* NativeChapterTextReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeChapterTextReaderView.swift; sourceTree = "<group>"; };
+		79CA6F82E50F48D8A7FA4DD6 /* NativeChapterSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeChapterSelection.swift; sourceTree = "<group>"; };
 		A20000000000000000000034 /* SourceSerif4Variable-Roman.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSerif4Variable-Roman.ttf"; sourceTree = "<group>"; };
 		A20000000000000000000035 /* SourceSerif4Variable-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSerif4Variable-Italic.ttf"; sourceTree = "<group>"; };
 		A20000000000000000000036 /* Source-Serif-4-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Source-Serif-4-OFL.txt"; sourceTree = "<group>"; };
@@ -288,6 +290,7 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000033 /* NativeChapterTextReaderView.swift */,
+				79CA6F82E50F48D8A7FA4DD6 /* NativeChapterSelection.swift */,
 				A2000000000000000000000A /* BrowseView.swift */,
 				A2000000000000000000000B /* SearchView.swift */,
 				A2000000000000000000000C /* BookmarksView.swift */,
@@ -555,6 +558,7 @@
 				AF1212000000000000000001 /* NotebookDocumentEditor.swift in Sources */,
 				A10000000000000000000032 /* NativeReaderDocumentStore.swift in Sources */,
 				A10000000000000000000033 /* NativeChapterTextReaderView.swift in Sources */,
+				B18D6182F44246B19CC82F20 /* NativeChapterSelection.swift in Sources */,
 				A1000000000000000000002B /* OrganizationProjectHubView.swift in Sources */,
 				A1000000000000000000002E /* CodeQuestionProjectHubView.swift in Sources */,
 				A1000000000000000000000E /* ReaderView.swift in Sources */,

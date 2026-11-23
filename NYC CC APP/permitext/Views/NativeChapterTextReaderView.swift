@@ -138,6 +138,7 @@ struct NativeChapterTextReaderView: View {
         }
         .onChange(of: isBrowserTabActive) { _, isActive in
             guard !isActive else { return }
+            scrollState.chapterSelection.clear()
             let canPersist = pendingInitialBlockID == nil
                 && (scrollState.restorationLease.map(restorationHasArrived) ?? true)
             releaseRestorationLease(reason: "inactive-tab")
@@ -157,6 +158,7 @@ struct NativeChapterTextReaderView: View {
         .onChange(of: library.readerTheme) { _, _ in releaseRestorationLease(reason: "theme") }
         .onChange(of: route.id) { _, _ in releaseRestorationLease(reason: "route") }
         .onDisappear {
+            scrollState.chapterSelection.clear()
             releaseRestorationLease(reason: "disappear")
             settledScrollTask?.cancel()
             settledScrollTask = nil
@@ -350,6 +352,11 @@ struct NativeChapterTextReaderView: View {
         document: NativeReaderRuntimeDocument,
         proxy: ScrollViewProxy
     ) -> some View {
+        let blocks = displayBlocks
+        let targets = sectionTargets
+        let index = navigationIndex
+        let codeSectionID = chapter.codeSectionID
+        let library = library
         return ScrollView {
             Group {
                 if NativeReaderStackPolicy.usesEagerStack(displayBlocks) {
@@ -367,7 +374,19 @@ struct NativeChapterTextReaderView: View {
             .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
             .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, 28 + readerControlsClearance)
-            .background(NativeReaderScrollViewProbe { scrollState.scrollView = $0 })
+            .background(NativeReaderScrollViewProbe { scrollView in
+                scrollState.scrollView = scrollView
+                let selection = scrollState.chapterSelection
+                selection.attach(to: scrollView)
+                selection.resolveText = { [weak library] range in
+                    NativeReaderChapterSelectionText.resolve(range, in: blocks) { blockID in
+                        guard let targetIndex = index[blockID]?.sectionTargetIndex,
+                              let number = targets[targetIndex].sectionNumber else { return nil }
+                        return library?.sectionSummary(sectionNumber: number, codeSectionID: codeSectionID)?.id
+                    }
+                }
+                selection.askAssistant = { [weak library] in library?.sendToResearch($0) }
+            })
         }
         .accessibilityIdentifier("native-reader-ready")
     }
@@ -383,7 +402,8 @@ struct NativeChapterTextReaderView: View {
         } ?? false
         let destinationID = library.readerSaveDestinationProject?.id
         return ForEach(blocks) { displayBlock in
-            let target = navigationIndex[displayBlock.id]?.sectionTargetIndex.map { sectionTargets[$0] }
+            let location = navigationIndex[displayBlock.id]
+            let target = location?.sectionTargetIndex.map { sectionTargets[$0] }
             let bookmarkSectionID = target.flatMap(sectionSummary(for:))?.id
             let memberships = bookmarkSectionID.flatMap { library.folderMembership[$0] } ?? []
             NativeReaderTextBlockView(
@@ -411,6 +431,9 @@ struct NativeChapterTextReaderView: View {
                 activeSearchMatchID: activeSearchMatchID,
                 bookmarkSectionID: bookmarkSectionID,
                 isBookmarked: destinationID.map(memberships.contains) ?? false,
+                chapterSelectionTarget: tracksOffsets ? location.map {
+                    NativeChapterSelectionTarget(controller: scrollState.chapterSelection, address: .init(block: $0.displayIndex))
+                } : nil,
                 onResearchSelection: { selectedText in
                     sendSelectionToResearch(
                         selectedText,
@@ -1159,6 +1182,7 @@ private final class NativeReaderScrollState: ObservableObject {
     var restorationExpiryTask: Task<Void, Never>?
     var restorationGeometryTask: Task<Void, Never>?
     weak var scrollView: UIScrollView?
+    let chapterSelection = NativeChapterSelectionController()
     var blockOffsets: [String: CGFloat] = [:]
     var visibleBlockID: String?
     var isScrollActive = false
@@ -2037,6 +2061,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
     let activeSearchMatchID: String?
     let bookmarkSectionID: Int64?
     let isBookmarked: Bool
+    var chapterSelectionTarget: NativeChapterSelectionTarget? = nil
     let onResearchSelection: (String) -> Void
 
     @EnvironmentObject private var library: CodeLibraryViewModel
@@ -2055,6 +2080,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
             && lhs.activeSearchMatchID == rhs.activeSearchMatchID
             && lhs.bookmarkSectionID == rhs.bookmarkSectionID
             && lhs.isBookmarked == rhs.isBookmarked
+            && lhs.chapterSelectionTarget == rhs.chapterSelectionTarget
     }
 
     var body: some View {
@@ -2075,7 +2101,8 @@ private struct NativeReaderTextBlockView: View, Equatable {
                     onOpenLink: onOpenLink,
                     searchQuery: searchQuery,
                     onResearchSelection: onResearchSelection,
-                    isBookmarked: isBookmarked
+                    isBookmarked: isBookmarked,
+                    chapterSelectionTarget: chapterSelectionTarget
                 )
             case .caption:
                 selectableText(role: .caption)
@@ -2271,7 +2298,8 @@ private struct NativeReaderTextBlockView: View, Equatable {
             onResearchSelection: onResearchSelection,
             onPassageSwipe: onPassageSwipe,
             onSelectionChange: onSelectionChange,
-            isBookmarked: isBookmarked
+            isBookmarked: isBookmarked,
+            chapterSelectionTarget: chapterSelectionTarget
         )
     }
 
@@ -2613,6 +2641,7 @@ private struct NativeReaderListBlockView: View {
     let searchQuery: String
     let onResearchSelection: (String) -> Void
     var isBookmarked = false
+    var chapterSelectionTarget: NativeChapterSelectionTarget? = nil
 
     private var rows: [NativeReaderListRow] {
         items.flatMap { NativeReaderListRow.flatten($0) }
@@ -2620,7 +2649,7 @@ private struct NativeReaderListBlockView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
-            ForEach(rows) { row in
+            ForEach(Array(rows.enumerated()), id: \.element.id) { rowIndex, row in
                 VStack(alignment: .leading, spacing: 8) {
                     if row.segments.isEmpty {
                         textRow(
@@ -2630,7 +2659,8 @@ private struct NativeReaderListBlockView: View {
                                 rowID: row.id
                             ),
                             runs: row.runs,
-                            plainText: row.plainText
+                            plainText: row.plainText,
+                            selectionTarget: chapterSelectionTarget?.listText(row: rowIndex)
                         )
                     } else {
                         ForEach(Array(row.segments.enumerated()), id: \.element.id) { index, segment in
@@ -2643,7 +2673,8 @@ private struct NativeReaderListBlockView: View {
                                         rowID: segment.id
                                     ),
                                     runs: segment.runs,
-                                    plainText: segment.plainText
+                                    plainText: segment.plainText,
+                                    selectionTarget: chapterSelectionTarget?.listText(row: rowIndex, segment: index)
                                 )
                             case .table:
                                 if let table = segment.table {
@@ -2677,7 +2708,8 @@ private struct NativeReaderListBlockView: View {
         marker: String,
         cacheID: String,
         runs: [NativeReaderRuntimeTextRun],
-        plainText: String
+        plainText: String,
+        selectionTarget: NativeChapterSelectionTarget?
     ) -> some View {
         HStack(alignment: .top, spacing: 8) {
             Text(marker)
@@ -2697,7 +2729,8 @@ private struct NativeReaderListBlockView: View {
                 ),
                 onOpenLink: onOpenLink,
                 onResearchSelection: onResearchSelection,
-                isBookmarked: isBookmarked
+                isBookmarked: isBookmarked,
+                chapterSelectionTarget: selectionTarget
             )
         }
     }
@@ -2729,6 +2762,59 @@ private struct NativeReaderListRow: Identifiable {
                 segments: item.segments
             )
         ] + item.children.flatMap(flatten)
+    }
+}
+
+enum NativeReaderChapterSelectionText {
+    static func resolve(_ selection: NativeChapterSelectionRange, in blocks: [NativeReaderDisplayBlock],
+                        sectionID: (String) -> Int64?) -> NativeChapterSelectedText {
+        guard blocks.indices.contains(selection.start.address.block),
+              blocks.indices.contains(selection.end.address.block) else {
+            return NativeChapterSelectedText(text: "", citations: [])
+        }
+        var selectedBlocks: [String] = []
+        var excerpts: [(sectionID: Int64, paragraphs: [String])] = []
+        for blockIndex in selection.start.address.block...selection.end.address.block {
+            let display = blocks[blockIndex]
+            let block = display.block
+            var paragraphs: [String] = []
+            func append(_ runs: [NativeReaderRuntimeTextRun], fallback: String,
+                        row: Int = 0, segment: Int = 0) {
+                let text = (runs.isEmpty ? fallback : runs.map(\.text).joined()) as NSString
+                let address = NativeChapterSelectionAddress(block: blockIndex, row: row, segment: segment)
+                guard let range = selection.range(in: address, length: text.length) else { return }
+                let excerpt = text.substring(with: text.rangeOfComposedCharacterSequences(for: range))
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                if !excerpt.isEmpty { paragraphs.append(excerpt) }
+            }
+            switch block.kind {
+            case .heading, .paragraph, .caption, .footnote, .sourceNote, .editorNote:
+                append(block.runs, fallback: block.plainText)
+            case .orderedList, .unorderedList:
+                for (rowIndex, row) in block.listItems.flatMap(NativeReaderListRow.flatten).enumerated() {
+                    if row.segments.isEmpty {
+                        append(row.runs, fallback: row.plainText, row: rowIndex)
+                    } else {
+                        for (index, segment) in row.segments.enumerated() where segment.kind == .text {
+                            append(segment.runs, fallback: segment.plainText, row: rowIndex, segment: index)
+                        }
+                    }
+                }
+            case .table, .figure, .image, .divider, .unsupportedHTML:
+                break
+            }
+            guard !paragraphs.isEmpty else { continue }
+            selectedBlocks.append(contentsOf: paragraphs)
+            guard let id = sectionID(display.id) else { continue }
+            if let last = excerpts.indices.last, excerpts[last].sectionID == id {
+                excerpts[last].paragraphs.append(contentsOf: paragraphs)
+            } else {
+                excerpts.append((id, paragraphs))
+            }
+        }
+        return NativeChapterSelectedText(text: selectedBlocks.joined(separator: "\n"), citations: excerpts.map {
+            ResearchSelectionRequest(sectionID: String($0.sectionID), selectedText: $0.paragraphs.joined(separator: "\n"))
+        })
     }
 }
 
@@ -3015,6 +3101,7 @@ private struct NativeReaderPreparedAttributedTextView: View {
     var onSelectionChange: ((Bool) -> Void)? = nil
 
     var isBookmarked = false
+    var chapterSelectionTarget: NativeChapterSelectionTarget? = nil
 
     @Environment(\.readerDefinitionContext) private var definitionContext
     @State private var attributedText: NSAttributedString?
@@ -3027,7 +3114,8 @@ private struct NativeReaderPreparedAttributedTextView: View {
                     onSelectionChange: onSelectionChange,
                     onOpenLink: onOpenLink,
                     onResearchSelection: onResearchSelection,
-                    onPassageSwipe: onPassageSwipe
+                    onPassageSwipe: onPassageSwipe,
+                    chapterSelectionTarget: chapterSelectionTarget
                 )
             } else {
                 AttributedTextView(
@@ -3035,7 +3123,8 @@ private struct NativeReaderPreparedAttributedTextView: View {
                     onSelectionChange: onSelectionChange,
                     onOpenLink: onOpenLink,
                     onResearchSelection: onResearchSelection,
-                    onPassageSwipe: onPassageSwipe
+                    onPassageSwipe: onPassageSwipe,
+                    chapterSelectionTarget: chapterSelectionTarget
                 )
             }
         }

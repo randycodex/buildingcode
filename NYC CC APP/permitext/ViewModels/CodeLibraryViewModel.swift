@@ -3711,14 +3711,21 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func sendToResearch(_ selection: ResearchSelectionRequest) {
+        sendToResearch([selection])
+    }
+
+    func sendToResearch(_ selections: [ResearchSelectionRequest]) {
+        guard !selections.isEmpty else { return }
         // A secondary or Search Reader must route through the account owner,
         // whose open conversation is authoritative, rather than its own tab state.
         if let owner = sharedAccountLibrary, owner !== self {
-            owner.sendToResearch(selection)
+            owner.sendToResearch(selections)
             return
         }
-        if !pendingResearchSelections.contains(selection) {
-            pendingResearchSelections.append(selection)
+        var pending = Set(pendingResearchSelections)
+        let newSelections = selections.filter { pending.insert($0).inserted }
+        if !newSelections.isEmpty {
+            pendingResearchSelections.append(contentsOf: newSelections)
         }
         if activeResearchConversationID == nil {
             selectedTab = .research

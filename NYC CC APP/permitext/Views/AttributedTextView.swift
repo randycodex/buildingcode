@@ -97,6 +97,7 @@ struct AttributedTextView: View {
     var onOpenLink: ((URL) -> Void)? = nil
     var onResearchSelection: ((String) -> Void)? = nil
     var onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil
+    var chapterSelectionTarget: NativeChapterSelectionTarget?
     @Environment(\.readerDefinitionContext) private var definitionContext
     @Environment(\.openURL) private var openExternalURL
     @State private var definitionPresentation: ReaderDefinitionPresentation?
@@ -125,7 +126,8 @@ struct AttributedTextView: View {
         onSelectionChange: ((Bool) -> Void)? = nil,
         onOpenLink: ((URL) -> Void)? = nil,
         onResearchSelection: ((String) -> Void)? = nil,
-        onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil
+        onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil,
+        chapterSelectionTarget: NativeChapterSelectionTarget? = nil
     ) {
         self.attributedText = attributedText
         self.onOpenImage = onOpenImage
@@ -134,6 +136,7 @@ struct AttributedTextView: View {
         self.onOpenLink = onOpenLink
         self.onResearchSelection = onResearchSelection
         self.onPassageSwipe = onPassageSwipe
+        self.chapterSelectionTarget = chapterSelectionTarget
     }
 
     var body: some View {
@@ -150,7 +153,8 @@ struct AttributedTextView: View {
                         onSelectionChange: onSelectionChange,
                         onOpenLink: definitionContext == nil ? onOpenLink : openReaderLink,
                         onResearchSelection: onResearchSelection,
-                        onPassageSwipe: onPassageSwipe
+                        onPassageSwipe: onPassageSwipe,
+                        chapterSelectionTarget: chapterSelectionTarget
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -313,6 +317,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
     var onOpenLink: ((URL) -> Void)?
     var onResearchSelection: ((String) -> Void)?
     var onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil
+    var chapterSelectionTarget: NativeChapterSelectionTarget? = nil
 
     func makeCoordinator() -> Coordinator {
         Coordinator(
@@ -347,6 +352,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
         }
         textView.isAuxiliaryTapHandlingEnabled = onOpenImage != nil || onContentTap != nil
         textView.passageSwipeHandler = onPassageSwipe
+        textView.chapterSelectionTarget = chapterSelectionTarget
         return textView
     }
 
@@ -388,6 +394,11 @@ private struct AttributedTextContainer: UIViewRepresentable {
                 contentSizeCategory: contentSizeCategory
             )
         }
+        uiView.chapterSelectionTarget = chapterSelectionTarget
+    }
+
+    static func dismantleUIView(_ uiView: RichTextView, coordinator: Coordinator) {
+        uiView.chapterSelectionTarget = nil
     }
 
     private func updateAccessibility(for textView: RichTextView) {
@@ -641,10 +652,66 @@ private final class ReaderImageAttachment: NSTextAttachment {
     var sourceImage: UIImage?
 }
 
-private final class RichTextView: UITextView {
+final class RichTextView: UITextView {
     var attachmentTapHandler: ((UIImage) -> Void)?
     var contentTapHandler: (() -> Void)?
     var selectionChangeHandler: ((Bool) -> Void)?
+    var chapterSelectionTarget: NativeChapterSelectionTarget? {
+        didSet {
+            guard chapterSelectionTarget != oldValue, window != nil else { return }
+            if let oldValue { oldValue.controller.unregister(self, address: oldValue.address) }
+            if let target = chapterSelectionTarget { target.controller.register(self, address: target.address) }
+        }
+    }
+    private var chapterSelectionLayer: CAShapeLayer?
+    private var chapterSelectionRange: NSRange?
+    private var chapterSelectionSize = CGSize.zero
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard let target = chapterSelectionTarget else { return }
+        if window == nil {
+            target.controller.unregister(self, address: target.address)
+        } else {
+            target.controller.register(self, address: target.address)
+        }
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if chapterSelectionRange != nil && chapterSelectionSize != bounds.size { drawChapterSelection() }
+    }
+
+    func showChapterSelection(_ range: NSRange?) {
+        guard chapterSelectionRange != range else { return }
+        chapterSelectionRange = range
+        drawChapterSelection()
+    }
+
+    private func drawChapterSelection() {
+        chapterSelectionSize = bounds.size
+        guard let range = chapterSelectionRange,
+              let start = position(from: beginningOfDocument, offset: range.location),
+              let end = position(from: start, offset: range.length), let selection = textRange(from: start, to: end) else {
+            chapterSelectionLayer?.removeFromSuperlayer()
+            chapterSelectionLayer = nil
+            return
+        }
+        let path = UIBezierPath()
+        for item in selectionRects(for: selection) where !item.rect.isEmpty && !item.rect.isNull {
+            path.append(UIBezierPath(rect: item.rect))
+        }
+        let highlight = chapterSelectionLayer ?? CAShapeLayer()
+        if chapterSelectionLayer == nil {
+            layer.addSublayer(highlight)
+            chapterSelectionLayer = highlight
+        }
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        highlight.fillColor = tintColor.withAlphaComponent(0.28).cgColor
+        highlight.path = path.cgPath
+        CATransaction.commit()
+    }
     var passageSwipeHandler: ((ReaderPassageSwipeEvent) -> Void)? {
         didSet {
             passagePanRecognizer.isEnabled = passageSwipeHandler != nil
