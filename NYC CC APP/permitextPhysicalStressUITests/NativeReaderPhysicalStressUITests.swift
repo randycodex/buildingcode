@@ -482,6 +482,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let firstAppendix = browser.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Appendix A:")).firstMatch
         XCTAssertTrue(firstChapter.waitForExistence(timeout: 10))
         let restingCardY = firstChapter.frame.minY
+        let cardSize = firstChapter.frame.size
+        let longChapter = browser.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 4:")).firstMatch
+        XCTAssertTrue(longChapter.isHittable)
+        XCTAssertEqual(longChapter.frame.width, cardSize.width, accuracy: 1)
+        XCTAssertEqual(longChapter.frame.height, cardSize.height, accuracy: 1)
+        keepScreenshot(named: "Equal chapter cards with short and long titles", from: app)
         func isPinned(_ heading: XCUIElement) -> Bool {
             heading.exists && heading.isHittable && abs(heading.frame.minY - headingY) < 3
         }
@@ -493,6 +499,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             browser.swipeUp(velocity: .slow)
         }
         XCTAssertTrue(firstAppendix.exists)
+        XCTAssertEqual(firstAppendix.frame.width, cardSize.width, accuracy: 1)
+        XCTAssertEqual(firstAppendix.frame.height, cardSize.height, accuracy: 1)
         let dragStart = browser.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.55))
         func moveFirstAppendix(to destinationY: CGFloat) {
             for _ in 0..<6 {

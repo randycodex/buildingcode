@@ -1344,35 +1344,41 @@ private struct ChapterTile: View {
     let kind: ChapterTileKind
     @ScaledMetric(relativeTo: .title2) private var chapterNumberSize: CGFloat = 28
     @ScaledMetric(relativeTo: .subheadline) private var chapterTitleSize: CGFloat = 14
+    private let cardPadding: CGFloat = 14
+    private let numberTitleSpacing: CGFloat = 8
+    private let titleLineLimit = 5
+
+    private var cardHeight: CGFloat {
+        let numberLineHeight = UIFont.systemFont(ofSize: chapterNumberSize, weight: .bold).lineHeight
+        let titleLineHeight = UIFont.systemFont(ofSize: chapterTitleSize, weight: .medium).lineHeight
+        return cardPadding * 2 + ceil(numberLineHeight) + numberTitleSpacing
+            + ceil(titleLineHeight) * CGFloat(titleLineLimit)
+    }
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(tileFill)
+        let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
+        VStack(alignment: .leading, spacing: 0) {
+            Text(chapter.chapterNumber)
+                .font(.system(size: chapterNumberSize, weight: .bold))
+                .foregroundStyle(tileNumberColor)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.bottom, numberTitleSpacing)
+                .layoutPriority(1)
 
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .top) {
-                    Spacer()
-                    Text("\(chapter.chapterNumber)")
-                        .font(.system(size: chapterNumberSize, weight: .bold))
-                        .foregroundStyle(tileNumberColor)
-                        .lineLimit(1)
-                }
+            Spacer(minLength: 0)
 
-                Spacer(minLength: 0)
-
-                Text(chapter.title)
-                    .font(.system(size: chapterTitleSize, weight: .medium))
-                    .foregroundStyle(tileTitleColor)
-                    .lineLimit(nil)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            Text(chapter.title)
+                .font(.system(size: chapterTitleSize, weight: .medium))
+                .foregroundStyle(tileTitleColor)
+                .lineLimit(titleLineLimit)
+                .multilineTextAlignment(.leading)
         }
-        .frame(minHeight: 110)
-        .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .padding(cardPadding)
+        .frame(maxWidth: .infinity)
+        .frame(height: cardHeight)
+        .background(tileFill, in: shape)
+        .contentShape(shape)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("\(chapter.displayLabel): \(chapter.title)"))
     }
