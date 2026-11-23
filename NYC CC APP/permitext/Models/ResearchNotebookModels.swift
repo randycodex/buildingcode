@@ -472,6 +472,58 @@ struct ResearchCorpusBasis: Codable, Hashable, Sendable {
     var codePrefixes: [String]? = nil
 }
 
+enum ResearchSourcePresentation {
+    static func disclosureNotes(_ basis: ResearchCodeBasis) -> String? {
+        guard let disclosure = basis.disclosure else { return nil }
+        let separator = " · "
+        var notes = separator + disclosure + separator
+        let sourceLists = [
+            ("Sources searched", basis.searchedCorpora ?? []),
+            ("Explicit evidence reviewed", basis.pinnedCorpora ?? [])
+        ]
+        for (label, corpora) in sourceLists {
+            let names = corpora.compactMap { $0.label ?? $0.codeEdition }.joined(separator: separator)
+            if !names.isEmpty {
+                notes = notes.replacingOccurrences(of: "\(separator)\(label): \(names)\(separator)", with: separator)
+            }
+        }
+        let trimmed = notes.trimmingCharacters(in: CharacterSet(charactersIn: " ·"))
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    static func editionDetail(_ edition: String?, after name: String?, applicability: String? = nil) -> String? {
+        guard let edition = edition?.trimmingCharacters(in: .whitespacesAndNewlines), !edition.isEmpty else { return nil }
+        guard let name, !name.isEmpty else { return edition }
+        let normalizedName = normalized(name)
+        let normalizedEdition = normalized(edition)
+        if normalizedEdition == normalizedName ||
+            (normalizedEdition.range(of: #"^[0-9]{4}$"#, options: .regularExpression) != nil &&
+             normalizedName.split(separator: " ").first == Substring(normalizedEdition)) {
+            return nil
+        }
+
+        guard let divider = edition.range(of: #" [—–-] "#, options: .regularExpression) else { return edition }
+        let heading = String(edition[..<divider.lowerBound])
+        let nameDivider = name.range(of: #" [—–-] "#, options: .regularExpression)
+        let nameHeading = nameDivider.map { String(name[..<$0.lowerBound]) } ?? name
+        guard normalized(heading) == normalized(nameHeading) else { return edition }
+        let detail = String(edition[divider.upperBound...])
+        let normalizedDetail = normalized(detail)
+        if normalizedDetail == applicability.map(normalized) ||
+            (normalizedDetail == "current consolidated text" && applicability.map(normalized) == "current consolidation") {
+            return nil
+        }
+        return detail.isEmpty ? nil : detail
+    }
+
+    private static func normalized(_ value: String) -> String {
+        value.lowercased()
+            .replacingOccurrences(of: #"\bnyc\b"#, with: "new york city", options: .regularExpression)
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
 struct ResearchSourceSummary: Codable, Hashable, Sendable {
     var projectFactCount: Int? = nil
     var sourcedProjectFactCount: Int? = nil
@@ -551,9 +603,9 @@ extension ResearchAnswer {
         }
     }
 
-    func researchMetadataText(sourceStatus: String) -> String {
+    func researchMetadataText(sourceStatus: String, includeEdition: Bool = true) -> String {
         var parts: [String] = []
-        if let edition = codeEdition?.trimmingCharacters(in: .whitespacesAndNewlines), !edition.isEmpty {
+        if includeEdition, let edition = codeEdition?.trimmingCharacters(in: .whitespacesAndNewlines), !edition.isEmpty {
             parts.append("Edition: \(edition)")
         }
         let normalizedStatus = sourceStatus.trimmingCharacters(in: .whitespacesAndNewlines)

@@ -394,28 +394,8 @@ struct SearchView: View {
                 historySheet(collection)
             }
             .sheet(item: $passageDetail) { prepared in
-                NavigationStack {
-                    SearchChapterReaderDestination(prepared: prepared, sharedLibrary: library, showsDetail: true)
-                        .toolbar {
-                            ToolbarItem(placement: .topBarLeading) {
-                                SheetCloseButton(title: "Close passage") { passageDetail = nil }
-                            }
-                                ToolbarItem(placement: .topBarTrailing) {
-                                    Menu {
-                                        Button(readerDestinationLabel(.primary)) { handoffSearchPreview(prepared, to: .primary) }
-                                        Button(readerDestinationLabel(.secondary)) { handoffSearchPreview(prepared, to: .secondary) }
-                                    } label: {
-                                        ToolbarActionIcon(systemImage: "book")
-                                    }
-                                    .accessibilityLabel("Open passage in a permanent Reader")
-                                }
-                        }
-                }
-                // A new explicit destination must replace the sheet's
-                // StateObject and loaded passage, even while it is presented.
-                .id(prepared.id)
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
+                PreparedPassagePreview(prepared: prepared, library: library,
+                    onClose: { passageDetail = nil }, onHandoff: { pendingPassageDetail = nil })
             }
             .navigationDestination(for: SearchReaderRoute.self) { route in
                 if let prepared = preparedDestinations[route] {
@@ -687,20 +667,6 @@ struct SearchView: View {
 
     private var showsGroupedSearchResults: Bool {
         true
-    }
-
-    private func readerDestinationLabel(_ destination: BrowserContextID) -> String {
-        let reader = destination == .primary ? "Reader 1" : "Reader 2"
-        let source = BrowserContextID.rememberedSources()[destination]?.source ?? "Empty"
-        return "Open in \(reader) · \(source)"
-    }
-
-    private func handoffSearchPreview(_ prepared: PreparedSearchReaderDestination, to destination: BrowserContextID) {
-        guard let source = prepared.library.selectedVersion?.codeVersion else { return }
-        let route = SearchReaderRoute(sectionID: prepared.section.id, sourceVersion: source)
-        passageDetail = nil
-        pendingPassageDetail = nil
-        NativeReaderHandoff.shared.open(route, in: destination, library: library)
     }
 
     private func scheduleSearch() {
@@ -1680,6 +1646,51 @@ struct SearchView: View {
     private func dismissKeyboard() {
         isSearchFieldFocused = false
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+
+struct PreparedPassagePreview: View {
+    let prepared: PreparedSearchReaderDestination
+    let library: CodeLibraryViewModel
+    let onClose: () -> Void
+    var onHandoff: () -> Void = {}
+
+    var body: some View {
+        NavigationStack {
+            SearchChapterReaderDestination(prepared: prepared, sharedLibrary: library, showsDetail: true)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        SheetCloseButton(title: "Close passage", action: onClose)
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            Button(readerDestinationLabel(.primary)) { handoff(to: .primary) }
+                            Button(readerDestinationLabel(.secondary)) { handoff(to: .secondary) }
+                        } label: {
+                            ToolbarActionIcon(systemImage: "book")
+                        }
+                        .accessibilityLabel("Open passage in a permanent Reader")
+                    }
+                }
+        }
+        // Replace the independent library when a different passage is presented.
+        .id(prepared.id)
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func readerDestinationLabel(_ destination: BrowserContextID) -> String {
+        let reader = destination == .primary ? "Reader 1" : "Reader 2"
+        let source = BrowserContextID.rememberedSources()[destination]?.source ?? "Empty"
+        return "Open in \(reader) · \(source)"
+    }
+
+    private func handoff(to destination: BrowserContextID) {
+        guard let source = prepared.library.selectedVersion?.codeVersion else { return }
+        let route = SearchReaderRoute(sectionID: prepared.section.id, sourceVersion: source)
+        onClose()
+        onHandoff()
+        NativeReaderHandoff.shared.open(route, in: destination, library: library)
     }
 }
 

@@ -599,6 +599,9 @@ private struct ResearchSessionView: View {
     @State private var isConfirmingProjectContext = false
     @State private var pendingFeedbackReport: PendingResearchFeedbackReport?
     @State private var pendingNotebookHandoff: ResearchNotebookHandoff?
+    @State private var citationRequest: CitationRequest?
+    @State private var citationPreview: PreparedSearchReaderDestination?
+    @State private var citationSourcePrompt: CitationSourcePrompt?
     @State private var feedbackMessageID: String?
     @State private var isVisible = false
     private let cache: ProjectHubOfflineCache
@@ -606,6 +609,17 @@ private struct ResearchSessionView: View {
     private let projectFolderID: Int64?
     private let scopedProjectID: String?
     private let projectSessionID: UUID
+
+    private struct CitationRequest: Identifiable {
+        let id = UUID()
+        let route: SearchReaderRoute
+    }
+
+    private struct CitationSourcePrompt {
+        let route: SearchReaderRoute
+        let target: ActiveCodeSourceNavigationTarget
+        let context: CodeLibraryViewModel.CodeSourceNavigationContext
+    }
 
     init(owner: NativePrivateRequestIdentity?, projectFolderID: Int64?, scopedProjectID: String?, projectSessionID: UUID, cacheDirectoryURL: URL? = nil) {
         self.owner = owner
@@ -619,6 +633,25 @@ private struct ResearchSessionView: View {
         researchNavigation
             .background {
                 TabBarReselectListener(selectedIconColor: nil, onReselect: researchTabReselectAction)
+            }
+            .sheet(item: $citationPreview) { prepared in
+                PreparedPassagePreview(prepared: prepared, library: library, onClose: { citationPreview = nil })
+            }
+            .alert("Enable this code source?", isPresented: Binding(
+                get: { citationSourcePrompt != nil },
+                set: { if !$0 { citationSourcePrompt = nil } }
+            ), presenting: citationSourcePrompt) { prompt in
+                Button("Enable and open") {
+                    guard isCurrentOwner,
+                          library.enableCodeSourceForNavigation(source: prompt.target.source, context: prompt.context) else { return }
+                    citationRequest = CitationRequest(route: prompt.route)
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: { prompt in
+                Text("This passage belongs to a code source you turned off (\(NativeReaderEditionLabel.label(for: prompt.target.source.canonicalEdition))). Enable it to open the cited edition.")
+            }
+            .task(id: citationRequest?.id) {
+                if let citationRequest { await prepareCitationPreview(citationRequest) }
             }
             .sheet(item: $pendingVisualReview) { pending in
                 ResearchVisualReviewSheet(
@@ -770,6 +803,7 @@ private struct ResearchSessionView: View {
             }
             .onChange(of: library.activeResearchConversationID) { previousID, id in
                 guard isCurrentOwner else { return }
+                clearCitationPreview()
                 if id != nil {
                     finishSelectingHistory()
                     library.researchHistoryIsPresented = false
@@ -813,6 +847,12 @@ private struct ResearchSessionView: View {
             }
             .onAppear { isVisible = true }
             .onDisappear { isVisible = false }
+            .onChange(of: library.selectedTab) { _, tab in
+                if tab != .research { clearCitationPreview() }
+            }
+            .onChange(of: library.researchHistoryIsPresented) { _, presented in
+                if presented { clearCitationPreview() }
+            }
     }
 
     private var researchNavigation: some View {
@@ -1562,30 +1602,53 @@ private struct ResearchSessionView: View {
 
     private func openCitation(_ citation: ResearchCitation, sources: [ResearchSource]) {
         let citedSourceIDs = Set(([citation.sourceID].compactMap { $0 }) + (citation.sourceIDs ?? []))
-        let matchedSource = sources.first { source in
-            citedSourceIDs.contains(source.id) || source.sectionID == citation.sectionID
-        }
+        let matchedSource = sources.first { citedSourceIDs.contains($0.id) }
+            ?? citation.sectionID.flatMap { id in sources.first { $0.sectionID == id } }
         let resolvedSectionID = [citation.sectionID, matchedSource?.sectionID]
             .compactMap { $0 }
             .compactMap(Int64.init)
             .first
         if let resolvedSectionID {
-            library.openResearchCitation(
-                sectionID: resolvedSectionID,
-                codeVersion: citation.codeVersion
-            )
+            citationRequest = CitationRequest(route: SearchReaderRoute(sectionID: resolvedSectionID, sourceVersion: citation.codeVersion))
             return
         }
         let sectionNumber = citation.sectionNumber ?? matchedSource?.sectionNumber
-        if let sectionNumber,
+        if citation.codeVersion == nil || citation.codeVersion.map(UserContentSyncCodeVersion.server) == library.selectedVersion.map({ UserContentSyncCodeVersion.server($0.codeVersion) }),
+           let sectionNumber,
            let summary = library.sectionSummary(sectionNumber: sectionNumber) {
-            library.openResearchCitation(
-                sectionID: summary.id,
-                codeVersion: citation.codeVersion
-            )
+            citationRequest = CitationRequest(route: SearchReaderRoute(sectionID: summary.id, sourceVersion: citation.codeVersion))
             return
         }
         errorMessage = "The cited provision is not available in the installed code library."
+    }
+
+    private func prepareCitationPreview(_ request: CitationRequest) async {
+        defer {
+            if citationRequest?.id == request.id { citationRequest = nil }
+        }
+        guard isCurrentOwner, let context = library.captureCodeSourceNavigationContext() else { return }
+        func isCurrentRequest() -> Bool {
+            !Task.isCancelled && isCurrentOwner && citationRequest?.id == request.id &&
+                library.captureCodeSourceNavigationContext() == context
+        }
+        do {
+            let preview = try await library.prepareResearchCitation(request.route)
+            guard isCurrentRequest() else { return }
+            preview.library.synchronizeIndependentReaderSession(from: library)
+            citationPreview = preview
+        } catch PreparedSearchReaderDestination.PreparationError.requiresEnable(let target) {
+            guard isCurrentRequest() else { return }
+            citationSourcePrompt = CitationSourcePrompt(route: request.route, target: target, context: context)
+        } catch is CancellationError {
+        } catch {
+            if isCurrentRequest() { errorMessage = error.localizedDescription }
+        }
+    }
+
+    private func clearCitationPreview() {
+        citationRequest = nil
+        citationSourcePrompt = nil
+        citationPreview = nil
     }
 
     private func evidenceSummary(_ sources: [ResearchSource]) -> some View {
@@ -1653,6 +1716,16 @@ private struct ResearchSessionView: View {
                 isSavingFeedback: feedbackMessageID == message.id,
                 onHelpful: { Task { await saveFeedback(messageID: message.id, category: "helpful", comment: nil) } },
                 onReportProblem: { pendingFeedbackReport = PendingResearchFeedbackReport(messageID: message.id) },
+                onAddToNotebook: {
+                    guard isCurrentOwner, let current = conversation,
+                          let index = current.messages.firstIndex(where: { $0.id == message.id }) else { return }
+                    let question = current.messages[..<index].last(where: { $0.role == "user" })?.question
+                        ?? current.title
+                    pendingNotebookHandoff = ResearchNotebookHandoff(
+                        id: message.id, question: question, projectID: current.primaryProjectID
+                    )
+                },
+                notebookActionID: "research-add-to-notebook-\(message.id)",
                 detailsScrollID: "answer-details:\(message.id)",
                 onDetailsExpanded: onDetailsExpanded,
                 onReply: { fact in
@@ -1663,19 +1736,6 @@ private struct ResearchSessionView: View {
             ) { citation in
                 openCitation(citation, sources: sources)
             }
-            Button {
-                guard isCurrentOwner, let current = conversation,
-                      let index = current.messages.firstIndex(where: { $0.id == message.id }) else { return }
-                let question = current.messages[..<index].last(where: { $0.role == "user" })?.question
-                    ?? current.title
-                pendingNotebookHandoff = ResearchNotebookHandoff(
-                    id: message.id, question: question, projectID: current.primaryProjectID
-                )
-            } label: {
-                Label("Add to Notebook", systemImage: "note.text.badge.plus")
-                    .font(.subheadline)
-            }
-            .accessibilityIdentifier("research-add-to-notebook-\(message.id)")
         }
     }
 
@@ -3133,6 +3193,8 @@ private struct ResearchAnswerView: View {
     let isSavingFeedback: Bool
     let onHelpful: () -> Void
     let onReportProblem: () -> Void
+    let onAddToNotebook: () -> Void
+    let notebookActionID: String
     let detailsScrollID: String
     let onDetailsExpanded: () -> Void
     let onReply: (String) -> Void
@@ -3183,8 +3245,8 @@ private struct ResearchAnswerView: View {
                     .foregroundStyle(.secondary)
                     .accessibilityIdentifier("research-review-status")
             }
-            HStack(spacing: 14) {
-                Button {
+            HStack(spacing: 6) {
+                answerAction("Sources & details", systemImage: "doc.text") {
                     let willExpand = !showsSourcesAndDetails
                     withAnimation(.easeInOut(duration: 0.2)) {
                         showsSourcesAndDetails.toggle()
@@ -3192,40 +3254,29 @@ private struct ResearchAnswerView: View {
                     if willExpand {
                         onDetailsExpanded()
                     }
-                } label: {
-                    Image(systemName: "doc.text")
-                        .font(.body)
-                        .frame(width: 32, height: 32)
                 }
-                .accessibilityLabel("Sources & details")
                 .accessibilityValue(showsSourcesAndDetails ? "Expanded" : "Collapsed")
                 .accessibilityIdentifier("research-answer-details-toggle")
-                Button(didCopy ? "Copied" : ResearchTrustCopy.copyAnswerAction, systemImage: didCopy ? "checkmark" : "doc.on.doc") {
+                answerAction(didCopy ? "Copied" : ResearchTrustCopy.copyAnswerAction, systemImage: didCopy ? "checkmark" : "doc.on.doc") {
                     UIPasteboard.general.string = primaryNarrative
                     didCopy = true
                 }
-                Button("Helpful", systemImage: feedback?.category == "helpful" ? "hand.thumbsup.fill" : "hand.thumbsup") {
-                    onHelpful()
-                }
-                Button(ResearchTrustCopy.reportProblemAction, systemImage: "exclamationmark.bubble") {
-                    onReportProblem()
-                }
+                answerAction("Helpful", systemImage: feedback?.category == "helpful" ? "hand.thumbsup.fill" : "hand.thumbsup", action: onHelpful)
+                    .accessibilityAddTraits(feedback?.category == "helpful" ? .isSelected : [])
+                    .disabled(isSavingFeedback)
+                answerAction(ResearchTrustCopy.reportProblemAction, systemImage: "exclamationmark.bubble", action: onReportProblem)
+                    .disabled(isSavingFeedback)
+                answerAction("Add to Notebook", systemImage: "note.text.badge.plus", action: onAddToNotebook)
+                    .accessibilityIdentifier(notebookActionID)
             }
-            .font(.caption.weight(.semibold))
             .foregroundStyle(.secondary)
             .buttonStyle(.plain)
-            .disabled(isSavingFeedback)
+            .accessibilityElement(children: .contain)
             .accessibilityIdentifier("research-answer-actions")
             if showsSourcesAndDetails {
                 sourcesAndDetails
                     .id(detailsScrollID)
                     .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-            if let feedback {
-                Text("Feedback: \(feedback.displayStatus)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .accessibilityIdentifier("research-answer-feedback-status")
             }
         }
         .padding(.vertical, 4)
@@ -3238,6 +3289,13 @@ private struct ResearchAnswerView: View {
                 .accessibilityIdentifier("research-answer")
                 .allowsHitTesting(false)
         }
+    }
+
+    private func answerAction(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            ToolbarActionIcon(systemImage: systemImage)
+        }
+        .accessibilityLabel(title)
     }
 
     private var sourcesAndDetails: some View {
@@ -3425,19 +3483,17 @@ private struct ResearchAnswerView: View {
 
     @ViewBuilder
     private var sourceInformation: some View {
-        let metadata = answer.researchMetadataText(sourceStatus: sourceStatus)
         let basis = answer.codeBasis
         let searched = basis?.searchedCorpora ?? []
         let pinned = basis?.pinnedCorpora ?? []
+        let repeatsEdition = answer.codeEdition != nil && (searched + pinned).contains { corpus in
+            ResearchSourcePresentation.editionDetail(answer.codeEdition, after: corpus.codeEdition ?? corpus.label) == nil
+        }
+        let metadata = answer.researchMetadataText(sourceStatus: sourceStatus, includeEdition: !repeatsEdition)
         if !metadata.isEmpty || !searched.isEmpty || !pinned.isEmpty || basis?.disclosure != nil || basis?.limitation != nil {
             detailsDisclosure("Source editions & scope") {
                 if !metadata.isEmpty { Text(metadata) }
-                if let disclosure = basis?.disclosure {
-                    let labels = searched.compactMap { $0.label ?? $0.codeEdition }.joined(separator: " · ")
-                    let summary = "Sources searched: \(labels)"
-                    let notes = disclosure == summary ? "" : disclosure.replacingOccurrences(of: summary + " · ", with: "")
-                    if !notes.isEmpty { Text(notes) }
-                }
+                if let notes = basis.flatMap(ResearchSourcePresentation.disclosureNotes) { Text(notes) }
                 if let limitation = basis?.limitation, !limitation.isEmpty { Text(limitation) }
                 corpusRows("Sources searched", corpora: searched)
                 corpusRows("Explicit evidence reviewed", corpora: pinned)
@@ -3455,12 +3511,13 @@ private struct ResearchAnswerView: View {
                 Text(title).fontWeight(.semibold).foregroundStyle(.primary)
                 ForEach(corpora.indices, id: \.self) { index in
                     let corpus = corpora[index]
-                    let name = corpus.label ?? corpus.id ?? "Code library"
-                    let edition = corpus.codeEdition ?? "Edition not provided"
+                    let name = corpus.label ?? corpus.codeEdition ?? corpus.id ?? "Code library"
+                    let applicability = answer.researchApplicabilityStatusLabel(corpus.applicabilityStatus)
+                    let edition = ResearchSourcePresentation.editionDetail(corpus.codeEdition, after: name, applicability: applicability)
                     VStack(alignment: .leading, spacing: 3) {
                         Text(name).foregroundStyle(.primary)
-                        if name != edition { Text(edition) }
-                        Text(answer.researchApplicabilityStatusLabel(corpus.applicabilityStatus))
+                        if let edition { Text(edition) }
+                        Text(applicability)
                     }
                 }
             }
@@ -3548,9 +3605,8 @@ private struct ResearchAnswerView: View {
 
     private func citationMetadata(_ citation: ResearchCitation) -> String {
         let corpus = citation.corpusLabel
-        let edition = citation.codeEdition ?? citation.codeVersion
-        let redundantCorpus = corpus?.replacingOccurrences(of: "NYC", with: "New York City") == edition
-        return [evidenceRoleLabel(citation.evidenceRole), redundantCorpus ? nil : corpus, edition]
+        let edition = ResearchSourcePresentation.editionDetail(citation.codeEdition ?? citation.codeVersion, after: corpus)
+        return [evidenceRoleLabel(citation.evidenceRole), corpus, edition]
             .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · ")
     }
 

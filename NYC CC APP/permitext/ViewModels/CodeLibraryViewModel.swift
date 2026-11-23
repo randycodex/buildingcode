@@ -2702,16 +2702,39 @@ final class CodeLibraryViewModel: ObservableObject {
             return
         }
         guard let sectionID = Self.deepLinkedSectionID(from: url) else { return }
-        queueExplicitCitation(sectionID: sectionID, codeVersion: nil)
+        queueExplicitCitation(sectionID: sectionID)
     }
 
-    func openResearchCitation(sectionID: Int64, codeVersion: String?) {
-        queueExplicitCitation(sectionID: sectionID, codeVersion: codeVersion)
+    func prepareResearchCitation(_ route: SearchReaderRoute) async throws -> PreparedSearchReaderDestination {
+        let context = captureCodeSourceNavigationContext()
+        await versionLoadTask?.value
+        await contentLoadTask?.value
+        try Task.checkCancellation()
+        guard captureCodeSourceNavigationContext() == context else { throw CancellationError() }
+        let edition: String
+        if let sourceVersion = route.sourceVersion {
+            edition = sourceVersion
+        } else if let resolved = await citationEdition(for: route.sectionID) {
+            edition = resolved
+        } else {
+            throw PreparedSearchReaderDestination.PreparationError.unavailable
+        }
+        return try await PreparedSearchReaderDestination.prepare(
+            route: SearchReaderRoute(sectionID: route.sectionID, sourceVersion: edition),
+            sharedLibrary: self, prepareChapter: false
+        )
+    }
+
+    private func citationEdition(for sectionID: Int64) async -> String? {
+        switch await authoredSourceNavigationAccess(sectionID: sectionID) {
+        case .allowed(let target), .requiresEnable(let target): return target.source.canonicalEdition
+        case .unavailable: return nil
+        }
     }
 
     /// Preserve the current Reader while resolving a new destination. Search
     /// owns the explicit enable prompt and prepares an independent Reader.
-    private func queueExplicitCitation(sectionID: Int64, codeVersion: String?) {
+    private func queueExplicitCitation(sectionID: Int64) {
         citationNavigationTask?.cancel()
         let pendingVersionLoad = versionLoadTask
         let session = privateSessionID
@@ -2728,16 +2751,7 @@ final class CodeLibraryViewModel: ObservableObject {
             guard !Task.isCancelled, pendingContent?.isCancelled != true,
                   self.isInitialContentLoaded,
                   self.captureCodeSourceNavigationContext() == context else { return }
-            var resolvedVersion = codeVersion.map(UserContentSyncCodeVersion.server)
-            var resolutionError: String?
-            if resolvedVersion == nil {
-                switch await self.authoredSourceNavigationAccess(sectionID: sectionID) {
-                case .allowed(let target), .requiresEnable(let target):
-                    resolvedVersion = target.source.canonicalEdition
-                case .unavailable:
-                    resolutionError = "The exact source for this link could not be identified. Open the passage from its code edition or Saved item."
-                }
-            }
+            let resolvedVersion = await self.citationEdition(for: sectionID)
             guard !Task.isCancelled, self.privateSessionID == session,
                   self.activeCodeSourceRevision == sourceRevision,
                   self.captureCodeSourceNavigationContext() == context else { return }
@@ -2745,7 +2759,9 @@ final class CodeLibraryViewModel: ObservableObject {
             self.pendingDeepLinkedSessionID = session
             self.pendingDeepLinkedContext = context
             self.pendingDeepLinkedCodeVersion = resolvedVersion
-            self.pendingDeepLinkedError = resolutionError
+            self.pendingDeepLinkedError = resolvedVersion == nil
+                ? "The exact source for this link could not be identified. Open the passage from its code edition or Saved item."
+                : nil
             self.pendingDeepLinkedSectionID = sectionID
             self.selectedTab = .search
         }

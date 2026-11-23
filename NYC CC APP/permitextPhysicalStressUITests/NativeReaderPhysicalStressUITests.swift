@@ -2545,6 +2545,19 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let details = app.buttons["Sources & details"]
         revealAboveComposer(details)
         XCTAssertTrue(details.isHittable)
+        for title in ["Copy answer", "Helpful", "Report a problem", "Add to Notebook"] {
+            let action = app.buttons[title]
+            XCTAssertTrue(action.isHittable)
+            XCTAssertEqual(action.frame.midY, details.frame.midY, accuracy: 1)
+        }
+        app.buttons["Helpful"].tap()
+        XCTAssertTrue(app.buttons["Helpful"].wait(for: \.isSelected, toEqual: true, timeout: 5))
+        XCTAssertFalse(app.staticTexts["Feedback: Received"].exists)
+        app.buttons["Add to Notebook"].tap()
+        let notebook = app.navigationBars["Add to Notebook"]
+        XCTAssertTrue(notebook.waitForExistence(timeout: 10))
+        notebook.buttons["Cancel"].tap()
+        keepScreenshot(named: "Five Assistant answer actions on one row", from: app)
         details.tap()
         let facts = app.buttons["Facts used in this answer"]
         XCTAssertTrue(facts.waitForExistence(timeout: 10))
@@ -2585,6 +2598,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         editions.tap()
         XCTAssertTrue(app.staticTexts["Current enacted edition"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Project default applied"].exists)
+        XCTAssertEqual(app.staticTexts.matching(identifier: "2022 NYC Construction Codes").count, 1)
+        XCTAssertFalse(app.staticTexts["2022 New York City Construction Codes"].exists)
         editions.tap()
 
         let guidance = element(in: app, identifier: "research-next-step-guidance")
@@ -2599,6 +2614,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["101.1"].waitForExistence(timeout: 15))
         XCTAssertTrue(app.buttons["Close passage"].exists)
         XCTAssertTrue(app.staticTexts["Building Code · 2022"].exists)
+        app.buttons["Close passage"].tap()
+        XCTAssertTrue(citation.waitForExistence(timeout: 5))
+        XCTAssertTrue(composer.isHittable)
+        XCTAssertFalse(app.textFields["Search codes"].exists)
+        XCTAssertEqual(details.value as? String, "Expanded")
     }
 
     func testOneHundredReaderBookmarkProjectsCycles() {

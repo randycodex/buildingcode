@@ -7410,45 +7410,48 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(conversation.projectContextReviewRequired)
     }
 
-    @MainActor
-    func testResearchCitationNavigationSelectsVersionSectionAndSearch() async {
-        let model = CodeLibraryViewModel.preview()
-
-        model.openResearchCitation(sectionID: 101, codeVersion: "2022 Construction Codes")
-        await model.debugWaitForCitationNavigation()
-
-        XCTAssertEqual(model.selectedVersion?.codeVersion, "2022 Construction Codes")
-        XCTAssertEqual(model.pendingDeepLinkedSectionID, 101)
-        XCTAssertEqual(model.selectedTab, .search)
+    func testResearchSourcePresentationCollapsesRepeatedEditionNames() {
+        XCTAssertNil(ResearchSourcePresentation.editionDetail(
+            "2022 New York City Construction Codes", after: "2022 NYC Construction Codes"))
+        XCTAssertNil(ResearchSourcePresentation.editionDetail(
+            "2022 NYC Fire Code — current consolidated text", after: "2022 NYC Fire Code",
+            applicability: "Current Consolidation"))
+        XCTAssertNil(ResearchSourcePresentation.editionDetail("2022", after: "2022 NYC Construction Codes"))
+        XCTAssertEqual(ResearchSourcePresentation.editionDetail(
+            "2025 NYC Energy Conservation Code — integrated NYC publication", after: "2025 NYC Energy Conservation Code"),
+            "integrated NYC publication")
+        XCTAssertEqual(ResearchSourcePresentation.editionDetail(
+            "2025 NYC Electrical Code — NYC amendments to 2020 NEC; base NEC absent",
+            after: "2025 NYC Electrical Code — local amendments"), "NYC amendments to 2020 NEC; base NEC absent")
+        XCTAssertEqual(ResearchSourcePresentation.editionDetail(
+            "NYC Zoning Resolution — text through 2026-11-12", after: "NYC Zoning Resolution"),
+            "text through 2026-11-12")
+        XCTAssertEqual(ResearchSourcePresentation.editionDetail(
+            "2014 New York City Construction Codes", after: "2022 NYC Construction Codes"),
+            "2014 New York City Construction Codes")
+        let basis = ResearchCodeBasis(
+            disclosure: "Sources searched: Construction Codes · Fire Code · Explicit evidence reviewed: Fire Code · Project default applied",
+            searchedCorpora: [ResearchCorpusBasis(label: "Construction Codes"), ResearchCorpusBasis(label: "Fire Code")],
+            pinnedCorpora: [ResearchCorpusBasis(label: "Fire Code")]
+        )
+        XCTAssertEqual(ResearchSourcePresentation.disclosureNotes(basis), "Project default applied")
     }
 
     @MainActor
-    func testResearchCitationNavigationSelectsExact2014VersionSectionAndSearch() async throws {
-        let model = CodeLibraryViewModel(preferencesDefaults: isolatedEntitlementDefaults(), loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+    func testResearchCitationPreparesExactHistoricalEditionWithoutSwitchingTabs() async throws {
+        let model = CodeLibraryViewModel(preferencesDefaults: isolatedEntitlementDefaults(), loadsInitialContent: true,
+                                         loadsPersistedAccount: false, ownsAccountSync: true)
         await model.debugWaitForContentLoad()
         let originalVersion = model.selectedVersionFileName
-        let historical = try XCTUnwrap(model.availableVersions.first {
-            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2014
-        })
-        XCTAssertNotEqual(originalVersion, historical.fileName)
-        var release: CheckedContinuation<Void, Never>?
-        let blocked = expectation(description: "Historical content ready but not published")
-        model.debugBeforeContentPublication = { version in
-            if version == historical.fileName {
-                await withCheckedContinuation { release = $0; blocked.fulfill() }
-            }
-        }
-        model.openResearchCitation(sectionID: 41_002_646, codeVersion: UserContentSyncCodeVersion.canonicalNYC2014)
-        await fulfillment(of: [blocked], timeout: 20)
-        XCTAssertTrue(model.isInitialContentLoaded, "Old content remains readable while the replacement loads")
+        model.selectedTab = .research
+        let route = SearchReaderRoute(sectionID: 41_002_646, sourceVersion: UserContentSyncCodeVersion.canonicalNYC2014)
+        let prepared = try await model.prepareResearchCitation(route)
+        XCTAssertEqual(prepared.section.id, route.sectionID)
+        XCTAssertEqual(prepared.library.selectedVersion.map { UserContentSyncCodeVersion.server($0.codeVersion) },
+                       UserContentSyncCodeVersion.canonicalNYC2014)
         XCTAssertEqual(model.selectedVersionFileName, originalVersion)
-        XCTAssertNil(model.pendingDeepLinkedSectionID, "Reader must not consume the citation against the old edition")
-        release?.resume()
-        await model.debugWaitForCitationNavigation()
-        XCTAssertEqual(model.selectedVersionFileName, historical.fileName)
-        XCTAssertEqual(model.pendingDeepLinkedSectionID, 41_002_646)
-        XCTAssertEqual(model.selectedTab, .search)
-        model.debugBeforeContentPublication = nil
+        XCTAssertNil(model.pendingDeepLinkedSectionID)
+        XCTAssertEqual(model.selectedTab, .research)
     }
 
     func testNativeNotebookSimpleDocumentRoundTripsWithoutLosingReferencesOrImages() throws {
