@@ -550,9 +550,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
         app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch.tap()
         app.buttons["main-tab-search"].tap()
-        let sources = app.buttons["Code sources"]
-        XCTAssertTrue(sources.waitForExistence(timeout: 15))
+        let searchActions = app.buttons["Search actions"]
         let searchField = app.textFields["Search codes"]
+        XCTAssertTrue(searchField.waitForExistence(timeout: 15))
         let clearSearch = app.buttons["Clear search"]
         if clearSearch.isHittable { clearSearch.tap() }
         searchField.tap()
@@ -565,7 +565,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let searchHeadingY = app.staticTexts["Search"].frame.minY
         XCTAssertFalse(app.staticTexts["Searching enabled code sources"].exists)
         XCTAssertFalse(app.buttons["Manage code sources"].exists)
-        sources.tap()
+        XCTAssertTrue(searchActions.waitForExistence(timeout: 10))
+        searchActions.tap()
+        app.buttons["Code sources"].tap()
         let closeSources = app.buttons["active-sources-close"]
         XCTAssertTrue(closeSources.waitForExistence(timeout: 10))
         XCTAssertLessThan(closeSources.frame.midX, app.frame.midX)
@@ -573,6 +575,22 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let scroll = app.scrollViews["search-results-scroll"]
         let rows = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH %@", "search-recent-passage-"))
         XCTAssertTrue(rows.firstMatch.waitForExistence(timeout: 15))
+        let title = app.staticTexts["101.1 Title."]
+        let scope = app.staticTexts["101.2 Scope."]
+        func sortHistory(by order: String) {
+            searchActions.tap()
+            app.buttons["Sort"].tap()
+            app.buttons[order].tap()
+        }
+        sortHistory(by: "Code Order")
+        XCTAssertTrue(title.isHittable)
+        XCTAssertTrue(scope.isHittable)
+        XCTAssertLessThan(title.frame.minY, scope.frame.minY)
+        keepScreenshot(named: "Search history in code order", from: app)
+        sortHistory(by: "Title")
+        XCTAssertLessThan(scope.frame.minY, title.frame.minY)
+        sortHistory(by: "Recent")
+        XCTAssertTrue(app.staticTexts["Today"].isHittable)
         func assertCompactRows() {
             var unique: [String: XCUIElement] = [:]
             for row in rows.allElementsBoundByIndex where row.isHittable {
@@ -594,7 +612,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         scroll.swipeUp()
         scroll.swipeUp()
         assertCompactRows()
-        XCTAssertTrue(sources.isHittable)
+        XCTAssertTrue(searchActions.isHittable)
         // The transparent title lets result rows receive taps underneath it.
         // Verify its visible position rather than treating static text as a control.
         XCTAssertTrue(app.staticTexts["Search"].exists)
@@ -723,6 +741,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         actions.tap()
         XCTAssertFalse(app.buttons["Export project (2)"].exists)
         app.buttons["Sort"].tap()
+        XCTAssertFalse(app.buttons["Code Book"].exists)
         app.buttons["Title"].tap()
         XCTAssertLessThan(scope.frame.minY, title.frame.minY)
         keepScreenshot(named: "Evidence sorted by title with one actions button", from: app)

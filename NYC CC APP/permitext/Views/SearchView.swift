@@ -249,7 +249,7 @@ struct SearchView: View {
         let globalProgress: Bool
     }
     @State private var showsCodeSources = false
-    @AppStorage("SearchView.recentlyOpenedOrder") private var recentlyOpenedOrderRaw = RecentlyOpenedOrder.date.rawValue
+    @AppStorage("SearchView.recentlyOpenedOrder") private var recentlyOpenedOrder = RecentlyOpenedOrder.recent
     @State private var allInstalledSourcesDisabled: Bool?
     @State private var sourceEnablePrompt: SourceEnablePrompt?
     @State private var deepLinkError: String?
@@ -462,7 +462,14 @@ struct SearchView: View {
         .onChange(of: library.allEditionSearchSections) { _, _ in
             rebuildSearchCaches()
         }
-        .onChange(of: recentlyOpenedOrderRaw) { _, _ in rebuildJumpBackInCache() }
+        .onChange(of: recentlyOpenedOrder) { _, _ in
+            rebuildJumpBackInCache()
+            if isHistoryVisible, let first = cachedRecentEntries.first {
+                historyPositionID = "history:\(first.historyIdentity)"
+                needsPositionReset = true
+                persistSearchSession()
+            }
+        }
         .onChange(of: library.recentlyViewedSections) { _, _ in
             rebuildJumpBackInCache()
         }
@@ -615,11 +622,31 @@ struct SearchView: View {
     private var searchToolbar: some ToolbarContent {
         CodeMainScreenToolbarTitle(title: "Search", alignment: .center)
         IconToolbarGroup {
-            Button { showsCodeSources = true } label: {
-                ToolbarActionIcon(systemImage: "line.3.horizontal.decrease")
+            if isHistoryVisible && !cachedRecentEntries.isEmpty {
+                Menu {
+                    Menu("Sort", systemImage: "arrow.up.arrow.down") {
+                        Picker("Sort recently opened passages", selection: $recentlyOpenedOrder) {
+                            ForEach(RecentlyOpenedOrder.allCases) { order in
+                                Label(order.label, systemImage: order.systemImage).tag(order)
+                            }
+                        }
+                        .pickerStyle(.inline)
+                    }
+                    Button("Code sources", systemImage: "books.vertical") { showsCodeSources = true }
+                } label: {
+                    ToolbarActionIcon(systemImage: "line.3.horizontal.decrease")
+                }
+                .menuStyle(.button)
+                .menuIndicator(.hidden)
+                .accessibilityLabel("Search actions")
+                .accessibilityIdentifier("search-actions")
+            } else {
+                Button { showsCodeSources = true } label: {
+                    ToolbarActionIcon(systemImage: "line.3.horizontal.decrease")
+                }
+                .accessibilityLabel("Code sources")
+                .accessibilityIdentifier("search-manage-code-sources")
             }
-            .accessibilityLabel("Code sources")
-            .accessibilityIdentifier("search-manage-code-sources")
         }
     }
 
@@ -833,15 +860,11 @@ struct SearchView: View {
         cachedRecentEntries = recentlyOpenedOrder.ordered(library.recentlyViewedSections)
     }
 
-    private var recentlyOpenedOrder: RecentlyOpenedOrder {
-        RecentlyOpenedOrder(rawValue: recentlyOpenedOrderRaw) ?? .date
-    }
-
     private func recentlyOpenedGroup(_ entry: RecentlyViewedEntry) -> String? {
         switch recentlyOpenedOrder {
-        case .recent: return nil
-        case .date: return viewedDateGroup(entry.viewedAt)
+        case .recent: return viewedDateGroup(entry.viewedAt)
         case .code: return "\(entry.codeSectionName) · \(NativeReaderEditionLabel.label(for: entry.sourceVersion))"
+        case .title: return nil
         }
     }
 
@@ -1073,28 +1096,30 @@ struct SearchView: View {
         // height estimates cannot leave gaps while restoring the scroll position.
         return VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(entries.enumerated()), id: \.element.historyIdentity) { index, entry in
-                if let group = recentlyOpenedGroup(entry), index == 0 || group != recentlyOpenedGroup(entries[index - 1]) {
-                    Text(group)
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.secondary)
-                        .padding(.top, index == 0 ? 8 : 28)
-                        .padding(.bottom, 12)
-                }
-                VStack(alignment: .leading, spacing: 4) {
-                    Button {
-                        historyCollection = nil
-                        openReader(SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
-                    } label: {
-                        recentlyViewedTile(entry)
+                VStack(alignment: .leading, spacing: 0) {
+                    if let group = recentlyOpenedGroup(entry), index == 0 || group != recentlyOpenedGroup(entries[index - 1]) {
+                        Text(group)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.secondary)
+                            .padding(.top, index == 0 ? 8 : 28)
+                            .padding(.bottom, 12)
                     }
-                    .buttonStyle(.plain)
-                    readerOpeningProgress(for: SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Button {
+                            historyCollection = nil
+                            openReader(SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
+                        } label: {
+                            recentlyViewedTile(entry)
+                        }
+                        .buttonStyle(.plain)
+                        readerOpeningProgress(for: SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
+                    }
+                    .padding(.vertical, 16)
+                    .accessibilityElement(children: .contain)
+                    .accessibilityIdentifier("search-recent-passage-\(entry.sectionID)")
+                    Divider()
                 }
-                .padding(.vertical, 16)
                 .id("history:\(entry.historyIdentity)")
-                .accessibilityElement(children: .contain)
-                .accessibilityIdentifier("search-recent-passage-\(entry.sectionID)")
-                Divider()
             }
         }
         .scrollTargetLayout()

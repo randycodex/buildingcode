@@ -4558,13 +4558,21 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
 }
 
 enum RecentlyOpenedOrder: String, CaseIterable, Identifiable {
-    case recent, date, code
+    case recent, code, title
     var id: String { rawValue }
     var label: String {
         switch self {
-        case .recent: return "Recent first"
-        case .date: return "By date"
-        case .code: return "By code"
+        case .recent: return "Recent"
+        case .code: return "Code Order"
+        case .title: return "Title"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .recent: return "clock"
+        case .code: return "list.number"
+        case .title: return "textformat"
         }
     }
 
@@ -4573,6 +4581,13 @@ enum RecentlyOpenedOrder: String, CaseIterable, Identifiable {
             if self == .code {
                 let left = Self.codeGroupID(lhs), right = Self.codeGroupID(rhs)
                 if left != right { return left.localizedStandardCompare(right) == .orderedAscending }
+                let sectionOrder = lhs.sectionNumber.compare(rhs.sectionNumber, options: [.numeric, .caseInsensitive])
+                if sectionOrder != .orderedSame { return sectionOrder == .orderedAscending }
+            } else if self == .title {
+                let left = lhs.title.displayTitle(for: lhs.sectionNumber)
+                let right = rhs.title.displayTitle(for: rhs.sectionNumber)
+                let titleOrder = left.localizedStandardCompare(right)
+                if titleOrder != .orderedSame { return titleOrder == .orderedAscending }
             }
             if lhs.viewedAt != rhs.viewedAt { return lhs.viewedAt > rhs.viewedAt }
             return lhs.historyIdentity < rhs.historyIdentity

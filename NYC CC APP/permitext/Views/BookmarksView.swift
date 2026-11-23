@@ -2293,7 +2293,7 @@ struct ProjectView: View {
         return Menu {
             Menu("Sort", systemImage: "arrow.up.arrow.down") {
                 Picker("Sort evidence", selection: $sortMode) {
-                    ForEach(BookmarkSortMode.allCases) { mode in
+                    ForEach(BookmarkSortMode.allCases.filter { !isProjectFolder || $0 != .codeBook }) { mode in
                         Label(mode.label, systemImage: mode.systemImage).tag(mode)
                     }
                 }
