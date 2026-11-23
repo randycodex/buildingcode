@@ -3894,6 +3894,26 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 answerText: "The selected enacted provision controls the code title under the stated Project facts.",
                 conclusion: "The selected enacted provision controls, subject to the stated Project facts.",
                 explanation: "The answer is limited to the enacted passage selected in Reader and does not replace an official determination.",
+                codeEdition: "2022 New York City Construction Codes",
+                codeBasis: ResearchCodeBasis(
+                    disclosure: "Sources searched: 2022 NYC Construction Codes · Project default applied",
+                    searchedCorpora: [
+                        ResearchCorpusBasis(label: "2022 NYC Construction Codes",
+                                            codeEdition: "2022 New York City Construction Codes",
+                                            applicabilityStatus: "current-enacted-edition")
+                    ]
+                ),
+                factUsage: ResearchFactUsage(
+                    projectContext: [
+                        "Building / Code Fact — Occupancy: R-2 (assumed) (user-stated; not independently verified).",
+                        "Building / Code Fact — Sprinkler Protection: Storage room only (user-stated; not independently verified; preserve the stated negation, scope and uncertainty). Original user/source wording: Only the storage room has sprinklers.",
+                        "Zoning Fact — Zoning District: R6B (user-confirmed; not independently verified).",
+                        "Unknown: Custom Fact — Travel Distance: Unknown (unknown; not established).",
+                        "Additional Project facts (user wording; not independently verified): ## Scope of work\n\nThe existing corridor serves eight apartments."
+                    ],
+                    conversation: ["The upper floors will remain occupied."],
+                    other: ["Existing window openings are outside the proposed work."]
+                ),
                 supportedPoints: [
                     ResearchSupportedPoint(
                         heading: "The selected provision is controlling enacted text",

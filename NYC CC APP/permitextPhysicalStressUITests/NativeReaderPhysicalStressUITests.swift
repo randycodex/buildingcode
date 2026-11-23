@@ -2498,18 +2498,84 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launch()
         let composer = element(in: app, identifier: "research-composer")
         XCTAssertTrue(composer.waitForExistence(timeout: 45))
+        func revealAboveComposer(_ target: XCUIElement, swipingDown: Bool = false) {
+            for _ in 0..<8 {
+                let frame = target.exists ? target.frame : .null
+                let contentTop = app.frame.minY + 100
+                if !frame.isEmpty, frame.minY > contentTop,
+                   frame.maxY < composer.frame.minY - 12 { return }
+                let needsDownwardGesture = frame.isEmpty ? swipingDown : frame.minY <= contentTop
+                let upper = app.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.30))
+                let lower = app.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.68))
+                (needsDownwardGesture ? upper : lower).press(
+                    forDuration: 0.05, thenDragTo: needsDownwardGesture ? lower : upper
+                )
+            }
+            XCTFail("Could not reveal \(target) above the Assistant composer.")
+        }
         composer.tap()
         composer.typeText("Synthetic next-step guidance question")
         app.buttons["Send message"].tap()
         let disclosure = app.buttons["Continue to Assistant"]
         if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
         XCTAssertTrue(element(in: app, identifier: "research-answer").waitForExistence(timeout: 15))
+        let details = app.buttons["Sources & details"]
+        revealAboveComposer(details)
+        XCTAssertTrue(details.isHittable)
+        details.tap()
+        let facts = app.buttons["Facts used in this answer"]
+        XCTAssertTrue(facts.waitForExistence(timeout: 10))
+        revealAboveComposer(facts)
+        keepScreenshot(named: "Assistant answer details collapsed", from: app)
+        facts.tap()
+        XCTAssertTrue(app.staticTexts["Occupancy"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["R-2 (assumed)"].exists)
+        XCTAssertTrue(app.staticTexts["user-stated; not independently verified"].exists)
+        XCTAssertTrue(app.staticTexts["Only the storage room has sprinklers."].exists)
+        XCTAssertTrue(app.staticTexts["Zoning District"].exists)
+        XCTAssertTrue(app.staticTexts["unknown; not established"].exists)
+        XCTAssertTrue(app.staticTexts["The upper floors will remain occupied."].exists)
+        XCTAssertTrue(app.staticTexts["Existing window openings are outside the proposed work."].exists)
+        XCTAssertFalse(app.staticTexts["The existing corridor serves eight apartments."].exists)
+        keepScreenshot(named: "Assistant facts grouped by topic", from: app)
+        let narrative = app.buttons["Project narrative"]
+        revealAboveComposer(narrative)
+        XCTAssertTrue(narrative.isHittable)
+        narrative.tap()
+        XCTAssertTrue(app.staticTexts["The existing corridor serves eight apartments."].waitForExistence(timeout: 5))
+        revealAboveComposer(facts, swipingDown: true)
+        facts.tap()
+
+        let citedSources = app.buttons["Cited sources"]
+        revealAboveComposer(citedSources)
+        XCTAssertTrue(citedSources.isHittable)
+        citedSources.tap()
+        let citation = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "research-citation-")).firstMatch
+        XCTAssertTrue(citation.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "research-citation-")).count, 1)
+        XCTAssertTrue(citation.label.contains("§ 101.1"))
+        keepScreenshot(named: "Assistant citations as a single list", from: app)
+
+        let editions = app.buttons["Source editions & scope"]
+        revealAboveComposer(editions)
+        XCTAssertTrue(editions.isHittable)
+        editions.tap()
+        XCTAssertTrue(app.staticTexts["Current enacted edition"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Project default applied"].exists)
+        editions.tap()
+
         let guidance = element(in: app, identifier: "research-next-step-guidance")
-        reveal(guidance, in: app)
+        revealAboveComposer(guidance)
         XCTAssertTrue(guidance.isHittable)
         XCTAssertTrue(guidance.label.contains("your own conclusion in a Project Note"))
-        XCTAssertTrue(guidance.label.contains("Build Reports on Permitext Web"))
+        XCTAssertTrue(guidance.label.contains("Build Reports on per codes Web"))
         keepScreenshot(named: "Research review to Notebook and Web Report guidance", from: app)
+
+        revealAboveComposer(citation, swipingDown: true)
+        citation.tap()
+        XCTAssertTrue(app.navigationBars["101.1"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["Close passage"].exists)
+        XCTAssertTrue(app.staticTexts["Building Code · 2022"].exists)
     }
 
     func testOneHundredReaderBookmarkProjectsCycles() {
@@ -4804,17 +4870,26 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let citation = app.descendants(matching: .any)
             .matching(NSPredicate(format: "identifier BEGINSWITH %@", "research-citation-"))
             .firstMatch
+        if sourcesAndDetails.value as? String == "Collapsed" {
+            reveal(sourcesAndDetails, in: app)
+            sourcesAndDetails.tap()
+        }
+        if !citation.exists {
+            let citedSources = app.buttons["Cited sources"]
+            reveal(citedSources, in: app)
+            citedSources.tap()
+        }
         reveal(citation, in: app)
         XCTAssertTrue(citation.isHittable, "The answer citation could not be reached.")
         citation.tap()
 
         XCTAssertTrue(
-            element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 30),
-            "Opening the Research citation did not return to the installed native Reader.\n\(app.debugDescription)"
+            app.navigationBars["101.1"].waitForExistence(timeout: 30),
+            "Opening the Research citation did not show the exact cited passage.\n\(app.debugDescription)"
         )
         XCTAssertTrue(
-            app.staticTexts["reader-chapter-title"].waitForExistence(timeout: 10),
-            "The citation destination is not an interactive chapter Reader."
+            app.buttons["Open passage in a permanent Reader"].exists,
+            "The citation preview cannot be opened in Reader."
         )
 
         let attachment = XCTAttachment(screenshot: app.screenshot(), quality: .original)
@@ -5063,14 +5138,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     }
 
     private func assertResearchTrustDetails(in app: XCUIApplication) {
+        XCTAssertTrue(app.staticTexts["Limits of this answer"].exists)
+        let reviewDetails = app.buttons["Review details"]
+        reveal(reviewDetails, in: app)
+        XCTAssertTrue(reviewDetails.isHittable)
+        reviewDetails.tap()
         let expectedHeadings = [
             "What the cited evidence establishes",
             "Assumptions used",
-            "Project facts to verify",
-            "Limits of this answer",
             "Questions that would materially advance this answer",
-            "Related evidence to add",
-            "Cited sources"
+            "Related evidence to add"
         ]
         let supportedPointsHeading = app.staticTexts[expectedHeadings[0]]
         reveal(supportedPointsHeading, in: app)

@@ -663,7 +663,7 @@ extension ResearchAnswer {
         }
     }
 
-    private func researchApplicabilityStatusLabel(_ value: String?) -> String {
+    func researchApplicabilityStatusLabel(_ value: String?) -> String {
         let status = value?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
         switch status {
         case "current-enacted-edition": return "Current enacted edition"

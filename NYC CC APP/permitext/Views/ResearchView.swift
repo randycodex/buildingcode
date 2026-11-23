@@ -3075,6 +3075,57 @@ private struct ResearchFormattedNarrative: View {
     }
 }
 
+private struct ResearchAnswerFactRow {
+    enum Group: String, CaseIterable {
+        case building = "Building & code"
+        case zoning = "Zoning"
+        case custom = "Custom facts"
+        case projectContext = "Project context"
+    }
+
+    var group: Group = .projectContext
+    var title: String?
+    var value: String
+    var qualification: String?
+    var originalWording: String?
+    var isProjectNarrative = false
+
+    init(_ text: String, parseProjectFact: Bool = true) {
+        value = text
+        guard parseProjectFact else { return }
+
+        let narrativePrefix = "Additional Project facts (user wording; not independently verified): "
+        if text.hasPrefix(narrativePrefix) {
+            value = String(text.dropFirst(narrativePrefix.count))
+            qualification = "User wording; not independently verified"
+            isProjectNarrative = true
+            return
+        }
+
+        let projection = text.hasPrefix("Unknown: ") ? String(text.dropFirst("Unknown: ".count)) : text
+        let prefixes: [(String, Group)] = [
+            ("Building / Code Fact — ", .building), ("Zoning Fact — ", .zoning), ("Custom Fact — ", .custom)
+        ]
+        guard let (prefix, group) = prefixes.first(where: { projection.hasPrefix($0.0) }) else { return }
+        let content = projection.dropFirst(prefix.count)
+        let source = content.range(of: " Original user/source wording: ")
+        let fact = source.map { content[..<$0.lowerBound] } ?? content
+        guard let separator = fact.range(of: ": "),
+              let status = fact.range(of: " (", options: .backwards),
+              separator.upperBound < status.lowerBound,
+              fact.hasSuffix(").") else { return }
+        let qualification = fact[status.upperBound...].dropLast(2)
+        let knownStatuses = ["user-stated;", "user-confirmed;", "sourced data;", "unknown;", "rejected;"]
+        guard knownStatuses.contains(where: { qualification.hasPrefix($0) }) else { return }
+
+        self.group = group
+        title = String(fact[..<separator.lowerBound])
+        value = String(fact[separator.upperBound..<status.lowerBound])
+        self.qualification = String(qualification)
+        originalWording = source.map { String(content[$0.upperBound...]) }
+    }
+}
+
 private struct ResearchAnswerView: View {
     let answer: ResearchAnswer
     let sourceStatus: String
@@ -3190,84 +3241,34 @@ private struct ResearchAnswerView: View {
     }
 
     private var sourcesAndDetails: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            if let basisText {
-                Text(basisText)
-                    .textSelection(.enabled)
-            }
-            if !answer.researchCorpusMetadataLines.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
-                    ForEach(Array(answer.researchCorpusMetadataLines.enumerated()), id: \.offset) { _, line in
-                        Text(line)
-                    }
-                }
-                .textSelection(.enabled)
-                .accessibilityElement(children: .contain)
-                .accessibilityLabel("Code library editions and applicability")
-                .accessibilityIdentifier("research-answer-corpus-metadata")
-            }
-            projectFactsDisclosure
-            if !answer.citations.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(answer.citations) { citation in
-                            Button {
-                                onOpenCitation(citation)
-                            } label: {
-                                Text(citationLabel(citation))
-                                    .font(.caption.weight(.semibold))
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 6)
-                                    .background(Color.appChrome.opacity(0.14), in: Capsule())
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("Open \(citationAccessibilityLabel(citation)) in Reader")
-                            .accessibilityIdentifier(citationAccessibilityIdentifier(citation))
-                        }
-                    }
-                }
-            }
+        VStack(alignment: .leading, spacing: 12) {
             if hasEvidenceDetails {
                 Text(answer.researchSourceBoundaryText)
                     .textSelection(.enabled)
                     .accessibilityIdentifier("research-answer-source-boundary")
-                supportedPointsSection(answer.supportedPoints)
-                answerSection("Assumptions used", items: answer.assumptions)
-                answerSection("Limits of this answer", items: answer.evidenceLimitations)
-                answerSection("Questions that would materially advance this answer", items: answer.followUpQuestions)
-                answerSection("Related evidence to add", items: answer.additionalEvidenceNeeded)
-                supportingSourcesSection
-                if !answer.citations.isEmpty {
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text("Cited sources")
-                            .fontWeight(.bold)
-                            .foregroundStyle(.primary)
-                        ForEach(answer.citations) { citation in
-                            Button {
-                                onOpenCitation(citation)
-                            } label: {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(citationAccessibilityLabel(citation))
-                                    if let relevance = citation.relevance, !relevance.isEmpty {
-                                        Text(relevance)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
+            }
+            answerSection("Limits of this answer", items: answer.evidenceLimitations)
+            projectFactsDisclosure
+            citedSourcesDisclosure
+            if hasReviewDetails {
+                detailsDisclosure("Review details") {
+                    supportedPointsSection(answer.supportedPoints)
+                    answerSection("Assumptions used", items: answer.assumptions)
+                    answerSection("Questions that would materially advance this answer", items: answer.followUpQuestions)
+                    answerSection("Related evidence to add", items: answer.additionalEvidenceNeeded)
+                    supportingSourcesSection
                 }
             }
+            sourceInformation
+            Divider()
             Text(answer.disclaimer ?? "AI-generated research assistance, not an official code determination.")
-                .font(.caption2)
             Text(ResearchTrustCopy.nextStepGuidance)
                 .font(.footnote)
                 .accessibilityIdentifier("research-next-step-guidance")
         }
         .font(.caption)
         .foregroundStyle(.secondary)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
@@ -3276,29 +3277,18 @@ private struct ResearchAnswerView: View {
         answer.narrativeText
     }
 
-    private var basisText: String? {
-        let captured = answer.researchSourceDateLabel
-        let disclosedBasis = answer.codeBasis?.disclosure?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let basisLimitation = answer.codeBasis?.limitation?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let parts = [
-            answer.researchMetadataText(sourceStatus: sourceStatus),
-            disclosedBasis?.isEmpty == false ? disclosedBasis : answer.codeEdition,
-            basisLimitation?.isEmpty == false ? basisLimitation : nil,
-            captured.map { "Evidence basis captured \($0)" }
-        ]
-            .compactMap { $0 }
-            .filter { !$0.isEmpty }
-        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    private var hasReviewDetails: Bool {
+        !answer.supportedPoints.isEmpty ||
+            !answer.assumptions.isEmpty ||
+            !answer.followUpQuestions.isEmpty ||
+            !answer.additionalEvidenceNeeded.isEmpty ||
+            !(answer.supportingSources ?? []).isEmpty
     }
 
     private var hasEvidenceDetails: Bool {
-        !answer.supportedPoints.isEmpty ||
-            !answer.assumptions.isEmpty ||
+        hasReviewDetails ||
             !answer.missingFacts.isEmpty ||
             !answer.evidenceLimitations.isEmpty ||
-            !answer.followUpQuestions.isEmpty ||
-            !answer.additionalEvidenceNeeded.isEmpty ||
-            !(answer.supportingSources ?? []).isEmpty ||
             hasFactUsage ||
             !answer.citations.isEmpty
     }
@@ -3310,21 +3300,170 @@ private struct ResearchAnswerView: View {
             !(usage?.other ?? []).isEmpty
     }
 
+    private func detailsDisclosure<Content: View>(
+        _ title: String, @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        DisclosureGroup {
+            VStack(alignment: .leading, spacing: 12, content: content)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 8)
+        } label: {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .tint(.secondary)
+    }
+
     @ViewBuilder
     private var projectFactsDisclosure: some View {
-        if hasFactUsage {
-            DisclosureGroup("Facts used in this answer") {
-                VStack(alignment: .leading, spacing: 7) {
-                    answerInlineGroup("Project context", items: answer.factUsage?.projectContext ?? [])
-                    answerInlineGroup("Assistant conversation", items: answer.factUsage?.conversation ?? [])
-                    answerInlineGroup("Other supplied facts", items: answer.factUsage?.other ?? [])
+        if let usage = answer.factUsage, hasFactUsage {
+            detailsDisclosure("Facts used in this answer") {
+                let projectFacts = (usage.projectContext ?? []).map { ResearchAnswerFactRow($0) }
+                ForEach(ResearchAnswerFactRow.Group.allCases, id: \.self) { group in
+                    factRows(group.rawValue, rows: projectFacts.filter { $0.group == group })
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.top, 8)
+                factRows("Assistant conversation", rows: (usage.conversation ?? []).map { ResearchAnswerFactRow($0, parseProjectFact: false) })
+                factRows("Other supplied facts", rows: (usage.other ?? []).map { ResearchAnswerFactRow($0, parseProjectFact: false) })
             }
-            .font(.subheadline.weight(.semibold))
+            .accessibilityElement(children: .contain)
             .accessibilityIdentifier("research-answer-facts-used")
+        }
+    }
+
+    @ViewBuilder
+    private func factRows(_ heading: String, rows: [ResearchAnswerFactRow]) -> some View {
+        if !rows.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(heading)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.bottom, 2)
+                ForEach(rows.indices, id: \.self) { index in
+                    let row = rows[index]
+                    if index > 0 { Divider() }
+                    VStack(alignment: .leading, spacing: 3) {
+                        if row.isProjectNarrative {
+                            detailsDisclosure("Project narrative") {
+                                if let qualification = row.qualification { Text(qualification) }
+                                ResearchFormattedNarrative(text: row.value)
+                                    .foregroundStyle(.primary)
+                            }
+                        } else {
+                            if let title = row.title {
+                                Text(title).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
+                            }
+                            Text(row.value).font(.subheadline).foregroundStyle(.primary)
+                            if let qualification = row.qualification {
+                                Text(qualification)
+                            }
+                            if let originalWording = row.originalWording {
+                                Text("Original user/source wording").fontWeight(.semibold).padding(.top, 3)
+                                Text(originalWording)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 6)
+                }
+            }
+            .textSelection(.enabled)
+        }
+    }
+
+    @ViewBuilder
+    private var citedSourcesDisclosure: some View {
+        if !answer.citations.isEmpty {
+            let firstRelevance = answer.citations.first?.relevance
+            let sharedRelevance = answer.citations.count > 1 && answer.citations.allSatisfy { $0.relevance == firstRelevance }
+                ? firstRelevance : nil
+            detailsDisclosure("Cited sources") {
+                if let sharedRelevance, !sharedRelevance.isEmpty {
+                    Text(sharedRelevance)
+                }
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(answer.citations.indices, id: \.self) { index in
+                        if index > 0 { Divider() }
+                        let citation = answer.citations[index]
+                        Button {
+                            onOpenCitation(citation)
+                        } label: {
+                            HStack(alignment: .center, spacing: 10) {
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(citationLabel(citation))
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(.primary)
+                                    if let title = citationTitle(citation) {
+                                        Text(title).font(.subheadline).foregroundStyle(.primary)
+                                    }
+                                    Text(citationMetadata(citation))
+                                    if sharedRelevance == nil, let relevance = citation.relevance, !relevance.isEmpty {
+                                        Text(relevance)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                Image(systemName: "chevron.right")
+                                    .font(.caption.weight(.semibold))
+                                    .accessibilityHidden(true)
+                            }
+                            .padding(.vertical, 8)
+                            .frame(minHeight: 44)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityHint("Opens in Reader")
+                        .accessibilityIdentifier(citationAccessibilityIdentifier(citation))
+                    }
+                }
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("research-answer-cited-sources")
+        }
+    }
+
+    @ViewBuilder
+    private var sourceInformation: some View {
+        let metadata = answer.researchMetadataText(sourceStatus: sourceStatus)
+        let basis = answer.codeBasis
+        let searched = basis?.searchedCorpora ?? []
+        let pinned = basis?.pinnedCorpora ?? []
+        if !metadata.isEmpty || !searched.isEmpty || !pinned.isEmpty || basis?.disclosure != nil || basis?.limitation != nil {
+            detailsDisclosure("Source editions & scope") {
+                if !metadata.isEmpty { Text(metadata) }
+                if let disclosure = basis?.disclosure {
+                    let labels = searched.compactMap { $0.label ?? $0.codeEdition }.joined(separator: " · ")
+                    let summary = "Sources searched: \(labels)"
+                    let notes = disclosure == summary ? "" : disclosure.replacingOccurrences(of: summary + " · ", with: "")
+                    if !notes.isEmpty { Text(notes) }
+                }
+                if let limitation = basis?.limitation, !limitation.isEmpty { Text(limitation) }
+                corpusRows("Sources searched", corpora: searched)
+                corpusRows("Explicit evidence reviewed", corpora: pinned)
+            }
+            .textSelection(.enabled)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("research-answer-corpus-metadata")
+        }
+    }
+
+    @ViewBuilder
+    private func corpusRows(_ title: String, corpora: [ResearchCorpusBasis]) -> some View {
+        if !corpora.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title).fontWeight(.semibold).foregroundStyle(.primary)
+                ForEach(corpora.indices, id: \.self) { index in
+                    let corpus = corpora[index]
+                    let name = corpus.label ?? corpus.id ?? "Code library"
+                    let edition = corpus.codeEdition ?? "Edition not provided"
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(name).foregroundStyle(.primary)
+                        if name != edition { Text(edition) }
+                        Text(answer.researchApplicabilityStatusLabel(corpus.applicabilityStatus))
+                    }
+                }
+            }
         }
     }
 
@@ -3389,29 +3528,30 @@ private struct ResearchAnswerView: View {
         }
     }
 
-    @ViewBuilder
-    private func answerInlineGroup(_ title: String, items: [String]) -> some View {
-        if !items.isEmpty {
-            Text("\(title): \(items.joined(separator: " · "))")
-        }
-    }
-
     private func citationLabel(_ citation: ResearchCitation) -> String {
-        [
-            evidenceRoleLabel(citation.evidenceRole),
-            citation.codePrefix,
-            citation.sectionNumber.map { "§ \($0)" } ?? citation.title
-        ]
-        .compactMap { $0 }
-        .filter { !$0.isEmpty }
-        .joined(separator: " ")
+        guard let section = citation.sectionNumber, !section.isEmpty else {
+            return citation.title ?? citation.codePrefix ?? "Source"
+        }
+        return [citation.codePrefix, "§ \(section)"].compactMap { $0 }.joined(separator: " ")
     }
 
-    private func citationAccessibilityLabel(_ citation: ResearchCitation) -> String {
-        [citationLabel(citation), citation.title, citation.corpusLabel, citation.codeEdition]
-            .compactMap { $0 }
-            .filter { !$0.isEmpty }
-            .joined(separator: ", ")
+    private func citationTitle(_ citation: ResearchCitation) -> String? {
+        guard let section = citation.sectionNumber, !section.isEmpty, let title = citation.title else { return nil }
+        let number = NSRegularExpression.escapedPattern(for: section)
+        let prefix = NSRegularExpression.escapedPattern(for: citation.codePrefix ?? "")
+        let deduplicated = title.replacingOccurrences(
+            of: "^\\s*(?:SECTION\\s+)?(?:\(prefix)\\s+)?(?:§\\s*)?\(number)(?=$|[\\s:–—]|\\.(?![0-9]))\\s*[.:–—]?\\s*",
+            with: "", options: [.regularExpression, .caseInsensitive]
+        )
+        return deduplicated.isEmpty ? nil : deduplicated
+    }
+
+    private func citationMetadata(_ citation: ResearchCitation) -> String {
+        let corpus = citation.corpusLabel
+        let edition = citation.codeEdition ?? citation.codeVersion
+        let redundantCorpus = corpus?.replacingOccurrences(of: "NYC", with: "New York City") == edition
+        return [evidenceRoleLabel(citation.evidenceRole), redundantCorpus ? nil : corpus, edition]
+            .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · ")
     }
 
     private func citationAccessibilityIdentifier(_ citation: ResearchCitation) -> String {
