@@ -37,10 +37,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(assistantTab.label, "Assistant")
         assistantTab.tap()
         XCTAssertTrue(app.staticTexts["screen-title-Assistant"].waitForExistence(timeout: 10))
-        let historySearch = element(in: app, identifier: "bottom-search-bar")
-        XCTAssertTrue(historySearch.waitForExistence(timeout: 10))
-        assertFloatingMenuWidth(historySearch.frame, in: app)
-        keepScreenshot(named: "Assistant history aligned to the floating menu", from: app)
+        XCTAssertTrue(element(in: app, identifier: "research-history-list").waitForExistence(timeout: 10))
+        XCTAssertFalse(element(in: app, identifier: "bottom-search-bar").exists)
+        keepScreenshot(named: "Assistant history without a search bar", from: app)
         let newResearch = app.buttons["New conversation"]
         XCTAssertTrue(newResearch.waitForExistence(timeout: 15))
         newResearch.tap()
@@ -99,7 +98,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertEqual(app.staticTexts["project-workspace-name"].label, name)
         }
         openProject("Acceptance Project")
-        for card in ["overview", "questions", "checklist", "notebook", "evidence", "reports"] {
+        for card in ["overview", "review", "notebook", "evidence", "calculator", "reports"] {
             XCTAssertTrue(app.buttons["project-section-\(card)"].isHittable)
         }
         XCTAssertFalse(app.buttons["project-section-research"].exists)
@@ -110,19 +109,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let newResearch = app.buttons["New conversation"]
         XCTAssertTrue(newResearch.waitForExistence(timeout: 15))
         XCTAssertFalse(app.buttons["research-history-project-filter"].exists)
-        let historySearch = app.textFields["research-history-search"]
-        XCTAssertTrue(historySearch.isHittable)
-        XCTAssertGreaterThan(historySearch.frame.midY, app.frame.midY)
+        let history = element(in: app, identifier: "research-history-list")
+        XCTAssertTrue(history.waitForExistence(timeout: 10))
         let bottomSearchBar = element(in: app, identifier: "bottom-search-bar")
-        XCTAssertTrue(bottomSearchBar.exists)
-        let researchSearchFrame = bottomSearchBar.frame
-        XCTAssertEqual(researchSearchFrame.height, 52, accuracy: 2)
-        historySearch.tap()
-        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
-        historySearch.typeText("No matching draft")
-        XCTAssertTrue(app.buttons["Clear history search"].isHittable)
-        app.buttons["Clear history search"].tap()
-        app.keyboards.buttons["Search"].tap()
+        XCTAssertFalse(bottomSearchBar.exists)
         newResearch.tap()
         let back = app.buttons["Assistant history"]
         XCTAssertTrue(back.waitForExistence(timeout: 15))
@@ -161,42 +151,32 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["Select All"].tap()
         let selectionCount = app.staticTexts["list-selection-count"]
         XCTAssertEqual(selectionCount.label, "1 selected")
-        historySearch.tap()
-        historySearch.typeText("No matching draft")
-        app.keyboards.buttons["Search"].tap()
-        XCTAssertTrue(app.staticTexts["No matching conversations"].waitForExistence(timeout: 5))
-        XCTAssertEqual(selectionCount.label, "0 selected")
-        XCTAssertFalse(app.buttons["Delete selected conversations"].isEnabled)
         let cancelSelection = app.navigationBars.firstMatch.buttons["Cancel"]
         XCTAssertTrue(cancelSelection.isHittable)
-        keepScreenshot(named: "Research selection can be canceled after filtering", from: app)
+        keepScreenshot(named: "Assistant history selection", from: app)
         cancelSelection.tap()
-        app.buttons["Clear history search"].tap()
         XCTAssertTrue(conversationRow.waitForExistence(timeout: 10))
         conversationRow.tap()
         XCTAssertTrue(composer.waitForExistence(timeout: 15))
         XCTAssertEqual(composer.value as? String, draft)
-        XCTAssertFalse(historySearch.isHittable)
         researchTab.tap()
         XCTAssertTrue(conversationRow.waitForExistence(timeout: 10))
-        XCTAssertTrue(historySearch.isHittable)
+        XCTAssertFalse(bottomSearchBar.exists)
         researchTab.tap()
         XCTAssertTrue(composer.waitForExistence(timeout: 10))
         XCTAssertEqual(composer.value as? String, draft)
         app.buttons["main-tab-search"].tap()
         XCTAssertTrue(app.textFields["Search codes"].waitForExistence(timeout: 10))
         let codeSearchFrame = bottomSearchBar.frame
-        XCTAssertEqual(codeSearchFrame.minX, researchSearchFrame.minX, accuracy: 2)
-        XCTAssertEqual(codeSearchFrame.minY, researchSearchFrame.minY, accuracy: 2)
-        XCTAssertEqual(codeSearchFrame.width, researchSearchFrame.width, accuracy: 2)
-        XCTAssertEqual(codeSearchFrame.height, researchSearchFrame.height, accuracy: 2)
-        keepScreenshot(named: "Search bottom bar matched to Research", from: app)
+        assertFloatingMenuWidth(codeSearchFrame, in: app)
+        XCTAssertEqual(codeSearchFrame.height, 52, accuracy: 2)
+        keepScreenshot(named: "Code Search keeps its bottom bar", from: app)
         researchTab.tap()
         XCTAssertTrue(composer.waitForExistence(timeout: 10))
         XCTAssertEqual(composer.value as? String, draft)
         back.tap()
         XCTAssertTrue(conversationRow.isHittable)
-        XCTAssertTrue(historySearch.isHittable)
+        XCTAssertFalse(bottomSearchBar.exists)
 
         XCTAssertFalse(app.buttons["project-close"].exists)
         app.buttons["main-tab-saved"].tap()
@@ -5150,7 +5130,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertTrue(research.isHittable)
             research.tap()
             let researchContent = app.descendants(matching: .any).matching(NSPredicate(
-                format: "identifier IN %@", ["research-history-search", "research-composer"])).firstMatch
+                format: "identifier IN %@", ["research-history-list", "research-composer"])).firstMatch
             XCTAssertTrue(researchContent.waitForExistence(timeout: 30), "Real Pro Research history or composer must load without sending a question")
             XCTAssertFalse(element(in: app, identifier: "native-entitlement-status").exists)
             assertNoPaywall("cold start \(launch), Research")

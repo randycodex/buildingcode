@@ -549,7 +549,6 @@ private struct ResearchSessionView: View {
     @State private var summaries: [ResearchConversationSummary] = []
     @State private var historyPreviews: [String: String] = [:]
     @State private var historyPreviewRevisions: [String: String] = [:]
-    @State private var historyQuery = ""
     @State private var historyNextCursor: String?
     @State private var historyHasMore = false
     @State private var historyLegacySummaries: [ResearchConversationSummary]?
@@ -590,7 +589,6 @@ private struct ResearchSessionView: View {
     @State private var showingAssignmentConfirmation = false
     @State private var showingProjectCreator = false
     @State private var pendingDeletion: PendingResearchDeletion?
-    @FocusState private var isHistorySearchFocused: Bool
     @State private var isSelectingHistory = false
     @State private var selectedHistoryIDs: Set<String> = []
     @State private var isDeletingHistoryBatch = false
@@ -767,11 +765,7 @@ private struct ResearchSessionView: View {
                 await consumePendingSelectionIfNeeded()
             }
             .task(id: "\(library.hasResearchAccess):\(historyFilterKey)") {
-                guard isCurrentOwner, library.hasResearchAccess else { return }
-                if !historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    try? await Task.sleep(for: .milliseconds(250))
-                }
-                guard !Task.isCancelled else { return }
+                guard isCurrentOwner, library.hasResearchAccess, !Task.isCancelled else { return }
                 await loadHistory()
             }
             .onChange(of: library.activeResearchConversationID) { previousID, id in
@@ -929,7 +923,6 @@ private struct ResearchSessionView: View {
             // UIKit can pop the navigation stack before delivering the tap callback.
             if !wasShowingConversation {
                 finishSelectingHistory()
-                isHistorySearchFocused = false
             }
             library.researchHistoryIsPresented = wasShowingConversation
         }
@@ -940,7 +933,7 @@ private struct ResearchSessionView: View {
     }
 
     private var visibleHistory: [ResearchConversationSummary] {
-        NativeResearchHistory.filtered(summaries, query: historyQuery, projectID: historyProjectID)
+        NativeResearchHistory.filtered(summaries, query: "", projectID: historyProjectID)
     }
 
     private var selectedVisibleHistory: [ResearchConversationSummary] {
@@ -1142,9 +1135,9 @@ private struct ResearchSessionView: View {
 
             if orderedSummaries.isEmpty && !isLoading && errorMessage == nil && historyErrorMessage == nil {
                 ContentUnavailableView(
-                    historyIsFiltered && (projectFolderID == nil || !historyQuery.isEmpty) ? "No matching conversations" : "No conversations yet",
+                    projectFolderID == nil && historyProjectID != nil ? "No matching conversations" : "No conversations yet",
                     image: "Astroid",
-                    description: Text(!historyQuery.isEmpty ? "Try a different question." : "Tap the plus button to start a conversation.")
+                    description: Text("Tap the plus button to start a conversation.")
                 )
                 .padding(.top, 70)
                 .listRowBackground(Color.clear)
@@ -1169,7 +1162,6 @@ private struct ResearchSessionView: View {
                             if selectedHistoryIDs.contains(item.id) { selectedHistoryIDs.remove(item.id) }
                             else { selectedHistoryIDs.insert(item.id) }
                         } else {
-                            isHistorySearchFocused = false
                             newConversationZoomID = nil
                             library.researchHistoryIsPresented = false
                             library.activeResearchConversationID = item.id
@@ -1248,11 +1240,7 @@ private struct ResearchSessionView: View {
         .codeNavigationTopScrollEdge()
         .accessibilityIdentifier("research-history-list")
         .contentMargins(.top, CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)
-        .scrollDismissesKeyboard(.interactively)
-        .contentMargins(.bottom, CodeScreenMetrics.bottomSearchScrollClearance + floatingNavigationClearance, for: .scrollContent)
-        .overlay(alignment: .bottom) {
-            historySearch.bottomSearchBarPlacement().padding(.bottom, floatingNavigationClearance)
-        }
+        .contentMargins(.bottom, floatingNavigationClearance, for: .scrollContent)
         .refreshable { await loadHistory(forceNetwork: true) }
     }
 
@@ -1261,36 +1249,8 @@ private struct ResearchSessionView: View {
         return library.researchHistoryProjectFilter == "all" ? nil : library.researchHistoryProjectFilter == "unassigned" ? "" : library.researchHistoryProjectFilter
     }
 
-    private var historyIsFiltered: Bool {
-        historyProjectID != nil || !historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
     private var historyFilterKey: String {
-        "\(historyProjectID?.utf8.count ?? 0):\(historyProjectID ?? "all"):\(historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
-    }
-
-    private func boundedHistoryQuery(_ value: String) -> String {
-        guard value.utf16.count > 200 else { return value }
-        // Keep the API's UTF-16 bound and whole graphemes. The presentation
-        // helper's trailing ellipsis is not part of a literal search query.
-        return String(ResearchNotebookHandoffPresentation.boundedText(value, maximumUTF16Count: 201).dropLast())
-    }
-
-    private var historySearch: some View {
-        CodeSearchBar(showsClearButton: !historyQuery.isEmpty, clearTitle: "Clear history search", clear: {
-            historyQuery = ""
-        }, whiteForegroundInDarkMode: true) { foreground in
-            TextField("Find a previous question", text: $historyQuery, prompt: foreground.map {
-                Text("Find a previous question").foregroundColor($0)
-            })
-                .focused($isHistorySearchFocused)
-                .onChange(of: historyQuery) { _, value in
-                    let bounded = boundedHistoryQuery(value)
-                    if value != bounded { historyQuery = bounded }
-                }
-                .onSubmit { isHistorySearchFocused = false }
-                .accessibilityIdentifier("research-history-search")
-        }
+        "\(historyProjectID?.utf8.count ?? 0):\(historyProjectID ?? "all")"
     }
 
     private var historyProjectFilter: some View {
@@ -1933,16 +1893,16 @@ private struct ResearchSessionView: View {
             [ResearchConversationSummary].self, accountID: owner.accountID,
             projectID: "all-research", scope: "research-history"
         ) {
-            let cachedMatches = NativeResearchHistory.filtered(cached.value, query: historyQuery, projectID: historyProjectID)
+            let cachedMatches = NativeResearchHistory.filtered(cached.value, query: "", projectID: historyProjectID)
             summaries = Array(cachedMatches.prefix(NativeResearchHistory.pageSize))
             historyLegacySummaries = cachedMatches
             historyHasMore = cachedMatches.count > summaries.count
             historyLoadedFilterKey = filterKey
         }
         do {
-            let page = try await library.researchConversationPage(limit: NativeResearchHistory.pageSize, cursor: nil, query: historyQuery, projectID: historyProjectID)
+            let page = try await library.researchConversationPage(limit: NativeResearchHistory.pageSize, cursor: nil, query: "", projectID: historyProjectID)
             guard isCurrentOwner, historyLoadID == loadID, historyFilterKey == filterKey, !Task.isCancelled else { return }
-            let loaded = NativeResearchHistory.filtered(page.conversations, query: historyQuery, projectID: historyProjectID)
+            let loaded = NativeResearchHistory.filtered(page.conversations, query: "", projectID: historyProjectID)
             if page.hasMore == nil {
                 // Older servers return the full list; keep filtering and paging
                 // useful locally until the matching backend is deployed.
@@ -1988,7 +1948,7 @@ private struct ResearchSessionView: View {
         isLoadingMoreHistory = true
         defer { if historyLoadID == loadID { isLoadingMoreHistory = false } }
         do {
-            let page = try await library.researchConversationPage(limit: NativeResearchHistory.pageSize, cursor: cursor, query: historyQuery, projectID: historyProjectID)
+            let page = try await library.researchConversationPage(limit: NativeResearchHistory.pageSize, cursor: cursor, query: "", projectID: historyProjectID)
             guard isCurrentOwner, historyLoadID == loadID, historyFilterKey == filterKey, !Task.isCancelled else { return }
             summaries = NativeResearchHistory.appending(page.conversations, to: summaries)
             historyNextCursor = page.nextCursor
@@ -2219,7 +2179,6 @@ private struct ResearchSessionView: View {
                 returnToProjectHistory()
                 return false
             }
-            isHistorySearchFocused = false
             newConversationZoomID = selections.isEmpty ? created.id : nil
             conversation = created
             library.researchHistoryIsPresented = false
@@ -2593,7 +2552,7 @@ private struct ResearchSessionView: View {
 
     private func cacheHistory(_ history: [ResearchConversationSummary], accountID: String, replacingAll: Bool = false) {
         guard isCurrentOwner, owner?.accountID == accountID,
-              !historyIsFiltered || projectFolderID != nil else { return }
+              historyProjectID == nil || projectFolderID != nil else { return }
         let existing = (try? cache.load(
             [ResearchConversationSummary].self, accountID: accountID,
             projectID: "all-research", scope: "research-history"
@@ -2604,7 +2563,7 @@ private struct ResearchSessionView: View {
         if let scopedProjectID {
             retained = NativeResearchHistory.mergingProjectPage(history, into: existing,
                 projectID: scopedProjectID,
-                replacingProject: replacingAll && historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                replacingProject: replacingAll)
         } else {
             retained = replacingAll ? history : NativeResearchHistory.appending(existing, to: history)
         }
