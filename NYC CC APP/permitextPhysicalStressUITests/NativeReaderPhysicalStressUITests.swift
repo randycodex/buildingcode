@@ -2553,6 +2553,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let disclosure = app.buttons["Continue to Assistant"]
         if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
         XCTAssertTrue(element(in: app, identifier: "research-answer").waitForExistence(timeout: 15))
+        XCTAssertFalse(app.staticTexts["research-answer-authority-status"].exists)
         let details = app.buttons["Sources & details"]
         revealAboveComposer(details)
         XCTAssertTrue(details.isHittable)

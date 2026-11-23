@@ -3894,6 +3894,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 answerText: "The selected enacted provision controls the code title under the stated Project facts.",
                 conclusion: "The selected enacted provision controls, subject to the stated Project facts.",
                 explanation: "The answer is limited to the enacted passage selected in Reader and does not replace an official determination.",
+                authorityLabel: "Assistant",
                 codeEdition: "2022 New York City Construction Codes",
                 codeBasis: ResearchCodeBasis(
                     disclosure: "Sources searched: 2022 NYC Construction Codes · Project default applied",

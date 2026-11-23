@@ -3177,7 +3177,7 @@ private struct ResearchAnswerView: View {
             if answer.researchEngine?.hasPrefix("research-v2") != true,
                answer.authorityStatus != "supported_by_enacted_text",
                let authorityLabel = answer.researchAuthorityLabel,
-               !authorityLabel.isEmpty {
+               authorityLabel != "Assistant" {
                 Text(authorityLabel)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
