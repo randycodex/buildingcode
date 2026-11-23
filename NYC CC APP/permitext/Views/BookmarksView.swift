@@ -651,6 +651,9 @@ private var filteredSavedEmptyState: some View {
                         .accessibilityHint("Open Project. Touch and hold, then drag to reorder.")
                         .accessibilityAction(named: "Move earlier") { moveProject(folder, offset: -1) }
                         .accessibilityAction(named: "Move later") { moveProject(folder, offset: 1) }
+                        .task(id: library.privateSessionID) {
+                            await library.prepareProjectDashboardPreview(folderID: folder.id)
+                        }
                 } else {
                     projectTileSlot(folder)
                 }
@@ -1859,6 +1862,8 @@ struct ProjectView: View {
         let task = Task {
             defer { if !Task.isCancelled { projectHubLoadTask = nil } }
             do {
+                await library.prepareProjectDashboardPreview(folderID: folderID)
+                try Task.checkCancellation()
 #if DEBUG
                 if ProcessInfo.processInfo.arguments.contains("--native-project-overview-fixture"),
                    ProcessInfo.processInfo.arguments.contains("--native-project-overview-delayed-load") {
@@ -2014,14 +2019,6 @@ struct ProjectView: View {
         }
     }
 
-    private var latestProjectNote: ProjectNotebookCardSummary? {
-        projectHubSnapshot?.notebookCards.max { $0.updatedAt < $1.updatedAt }
-    }
-
-    private var latestProjectReport: ProjectReportSummary? {
-        projectHubSnapshot?.reports.max { $0.createdAt < $1.createdAt }
-    }
-
     private func projectSectionCards(compact: Bool, expandsCards: Bool) -> some View {
         let sections = ProjectOverviewSection.allCases
         let columns = dynamicTypeSize.isAccessibilitySize ? 1 : 2
@@ -2072,20 +2069,21 @@ struct ProjectView: View {
 
         case .notebook:
             NavigationLink(value: ProjectOverviewSection.notebook) {
+                let preview = library.projectDashboardPreview(folderID: folderID)
                 projectSectionCard("Notes", systemImage: "note.text",
-                    count: projectHubSnapshot.map { "\($0.notebookCards.count) \($0.notebookCards.count == 1 ? "note" : "notes")" },
-                    preview: latestProjectNote.map { $0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled note" : $0.title }
-                        ?? (projectHubSnapshot == nil ? "Open Notes" : "No notes yet."),
+                    count: preview.map { "\($0.noteCount) \($0.noteCount == 1 ? "note" : "notes")" },
+                    preview: preview?.latestNoteTitle ?? (preview == nil ? "Open Notes" : "No notes yet."),
                     compact: compact, expands: expands)
             }
             .accessibilityIdentifier("project-section-notebook")
 
         case .evidence:
             NavigationLink(value: ProjectOverviewSection.evidence) {
+                let count = library.projectEvidenceRecordCountByFolderID[folderID]
                 projectSectionCard("Evidence", systemImage: "bookmark",
-                    count: "\(library.bookmarkCount(inFolder: folderID)) saved",
+                    count: count.map { "\($0) saved" },
                     preview: projectBookmarks.first.map { "\($0.sectionNumber) · \($0.displayTitle)" }
-                        ?? "No saved evidence yet.",
+                        ?? (count == nil ? "Open Evidence" : "No saved evidence yet."),
                     compact: compact, expands: expands)
             }
             .accessibilityIdentifier("project-section-evidence")
@@ -2100,10 +2098,10 @@ struct ProjectView: View {
 
         case .reports:
             NavigationLink(value: ProjectOverviewSection.reports) {
+                let preview = library.projectDashboardPreview(folderID: folderID)
                 projectSectionCard("Reports", systemImage: "doc.richtext",
-                    count: projectHubSnapshot.map { "\($0.reports.count) \($0.reports.count == 1 ? "report" : "reports")" },
-                    preview: latestProjectReport.map { "\($0.title) · V\($0.reportVersion)" }
-                        ?? (projectHubSnapshot == nil ? "Open Reports" : "No reports yet."),
+                    count: preview.map { "\($0.reportCount) \($0.reportCount == 1 ? "report" : "reports")" },
+                    preview: preview?.latestReportTitle ?? (preview == nil ? "Open Reports" : "No reports yet."),
                     compact: compact, expands: expands)
             }
             .accessibilityIdentifier("project-section-reports")

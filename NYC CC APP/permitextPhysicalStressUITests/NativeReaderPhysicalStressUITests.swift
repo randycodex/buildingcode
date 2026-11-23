@@ -891,7 +891,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let root = element(in: app, identifier: "project-folder-root")
         XCTAssertTrue(root.waitForExistence(timeout: 10))
         let notesCard = app.buttons["project-section-notebook"]
-        XCTAssertTrue(notesCard.label.contains("Open Notes"), "The dashboard must open while its synced previews are still loading.")
+        let reportsCard = app.buttons["project-section-reports"]
+        XCTAssertTrue(notesCard.label.contains("Cached project note") && notesCard.label.contains("1 note"))
+        XCTAssertTrue(reportsCard.label.contains("Cached project report") && reportsCard.label.contains("1 report"),
+                      "Dashboard cards must show their local previews before the delayed refresh completes.")
         let expectedSummary = ["address": "100 Acceptance Court, Brooklyn, NY 11215", "tax-lot-area": "5,000 sq ft",
                                "occupancy": "R-2 — 8 permanent dwelling units (assumed)",
                                "construction-type": "Type III-B (assumed) — masonry exterior walls and wood floor joists",
@@ -903,7 +906,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }
         XCTAssertFalse(element(in: app, identifier: "project-summary-building-height").exists)
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            notesCard.label.contains("0 notes")
+            notesCard.label.contains("0 notes") && reportsCard.label.contains("0 reports")
         }, object: nil)], timeout: 10), .completed)
         let cards = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-section-"))
         XCTAssertEqual(cards.count, 6)
@@ -919,7 +922,6 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertEqual(leading.frame.height, trailing.frame.height, accuracy: 1)
             assertFloatingMenuWidth(leading.frame.union(trailing.frame), in: app)
         }
-        let reportsCard = app.buttons["project-section-reports"]
         let tabBarY = app.tabBars.firstMatch.frame.minY
         XCTAssertLessThanOrEqual(reportsCard.frame.maxY, tabBarY,
                                  "The last row must clear the tab bar.")

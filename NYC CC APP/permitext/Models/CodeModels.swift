@@ -2130,6 +2130,8 @@ struct BackendProjectReportFileUploadResponse: Codable, Hashable, Sendable {
 }
 
 struct ProjectHubSnapshot: Codable, Hashable, Sendable {
+    static let personalCacheScope = "personal"
+
     let projectID: String
     let notebookCards: [ProjectNotebookCardSummary]
     let researchConversations: [ProjectResearchConversationSummary]
@@ -2157,6 +2159,24 @@ struct ProjectHubSnapshot: Codable, Hashable, Sendable {
         copy.loadedFromCache = true
         copy.cachedAt = timestamp
         return copy
+    }
+}
+
+struct ProjectDashboardPreview: Equatable {
+    let noteCount: Int
+    let latestNoteTitle: String?
+    let reportCount: Int
+    let latestReportTitle: String?
+
+    init(snapshot: ProjectHubSnapshot) {
+        let notes = PermitextReleaseSurfaceVisibility.visibleNotebookCards(snapshot.notebookCards)
+        noteCount = notes.count
+        latestNoteTitle = notes.max { $0.updatedAt < $1.updatedAt }.map { note in
+            let title = note.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            return title.isEmpty ? "Untitled note" : title
+        }
+        reportCount = snapshot.reports.count
+        latestReportTitle = snapshot.reports.max { $0.createdAt < $1.createdAt }.map { "\($0.title) · V\($0.reportVersion)" }
     }
 }
 
