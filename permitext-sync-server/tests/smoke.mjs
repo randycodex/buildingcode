@@ -1114,7 +1114,7 @@ async function main() {
         iosBookmarksSource.includes("NavigationLink(value: ProjectOverviewSection.evidence)") &&
         iosBookmarksSource.includes(".navigationDestination(for: ProjectOverviewSection.self)") &&
         iosBookmarksSource.includes("case .evidence:\n            projectEvidenceDestination") &&
-        iosBookmarksSource.includes("ProjectWorkflowView(folderID: folderID, section: section)") &&
+        iosBookmarksSource.includes("ProjectWorkflowView(folderID: folderID, initialTab: library.projectReviewTab(for: folderID))") &&
         !iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&
         iosBookmarksSource.includes('ProjectSectionScreen(title: "Reports", accentColor: accentColor)') &&
         iosExportBuilderSource.includes("struct ProjectReportExportBuilder: Sendable") &&

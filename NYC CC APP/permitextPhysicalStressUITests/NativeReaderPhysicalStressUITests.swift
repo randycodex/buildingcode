@@ -894,7 +894,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }, object: nil)], timeout: 10), .completed)
         let cards = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-section-"))
         XCTAssertEqual(cards.count, 6)
-        for (left, right) in [("overview", "questions"), ("checklist", "notebook"), ("evidence", "reports")] {
+        for (left, right) in [("overview", "review"), ("notebook", "evidence"), ("calculator", "reports")] {
             let leading = app.buttons["project-section-\(left)"]
             let trailing = app.buttons["project-section-\(right)"]
             XCTAssertTrue(leading.isHittable && trailing.isHittable, "Both cards must be visible without scrolling.")
@@ -1041,12 +1041,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch.tap()
         let root = element(in: app, identifier: "project-folder-root")
         XCTAssertTrue(root.waitForExistence(timeout: 10))
-        let questionCard = app.buttons["project-section-questions"]
-        reveal(questionCard, in: app)
-        XCTAssertEqual(questionCard.frame.minY, app.buttons["project-section-overview"].frame.minY, accuracy: 2)
+        let reviewCard = app.buttons["project-section-review"]
+        reveal(reviewCard, in: app)
+        XCTAssertEqual(reviewCard.frame.minY, app.buttons["project-section-overview"].frame.minY, accuracy: 2)
         keepScreenshot(named: "Project overview with six cards", from: app)
-        questionCard.tap()
-        XCTAssertTrue(app.navigationBars["Questions"].waitForExistence(timeout: 5))
+        reviewCard.tap()
+        let review = app.navigationBars["Review"]
+        XCTAssertTrue(review.waitForExistence(timeout: 5))
+        let tabs = app.segmentedControls["project-review-tabs"]
+        XCTAssertTrue(tabs.waitForExistence(timeout: 5))
+        tabs.buttons["Questions"].tap()
         XCTAssertFalse(app.keyboards.firstMatch.exists)
         XCTAssertEqual(app.tabBars.buttons.count, 4)
         app.buttons["project-workflow-add"].tap()
@@ -1069,14 +1073,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         questionText.typeText(" Discard")
         XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Cancel")).count, 1)
         XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Save")).count, 1)
-        app.navigationBars["Questions"].buttons["Cancel"].tap()
+        review.buttons["Cancel"].tap()
         XCTAssertFalse(app.staticTexts["Is the survey current? Discard"].exists)
-        app.navigationBars["Questions"].buttons.element(boundBy: 0).tap()
-        XCTAssertTrue(root.waitForExistence(timeout: 5))
-        let checklistCard = app.buttons["project-section-checklist"]
-        reveal(checklistCard, in: app)
-        checklistCard.tap()
-        XCTAssertTrue(app.navigationBars["Checklist"].waitForExistence(timeout: 5))
+        tabs.buttons["Checklist"].tap()
         XCTAssertEqual(app.tabBars.buttons.count, 4)
         app.buttons["project-checklist-suggested"].tap()
         let status = app.buttons["project-record-status-0"]
@@ -1089,19 +1088,30 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(editWorkflow.frame.width, editWorkflow.frame.height, accuracy: 1)
         editWorkflow.tap()
         XCTAssertTrue(app.buttons["project-workflow-save"].waitForExistence(timeout: 5))
-        app.navigationBars["Checklist"].buttons["Cancel"].tap()
-        app.navigationBars["Checklist"].buttons.element(boundBy: 0).tap()
+        let recordNoteField = app.textFields["project-record-note-0"]
+        let recordNote = recordNoteField.exists ? recordNoteField : app.textViews["project-record-note-0"]
+        recordNote.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        recordNote.typeText("Discard this record note.")
+        review.buttons["Cancel"].tap()
+        XCTAssertFalse(app.staticTexts["Discard this record note."].exists)
+        XCTAssertTrue(app.staticTexts["Reviewed"].exists)
+        review.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(root.waitForExistence(timeout: 5))
-        XCTAssertTrue(checklistCard.label.contains("1/5 reviewed"))
+        XCTAssertTrue(reviewCard.label.contains("1/5 records reviewed"))
         let notesCard = app.buttons["project-section-notebook"]
         reveal(notesCard, in: app)
         notesCard.tap()
         let notesPage = app.navigationBars["Notes"]
         XCTAssertTrue(notesPage.waitForExistence(timeout: 10))
         notesPage.buttons.element(boundBy: 0).tap()
-        XCTAssertTrue(checklistCard.waitForExistence(timeout: 5))
-        reveal(questionCard, in: app)
-        XCTAssertTrue(questionCard.label.contains("1 question"))
+        XCTAssertTrue(reviewCard.waitForExistence(timeout: 5))
+        reveal(reviewCard, in: app)
+        reviewCard.tap()
+        XCTAssertTrue(tabs.buttons["Checklist"].isSelected)
+        XCTAssertTrue(app.staticTexts["Reviewed"].exists)
+        tabs.buttons["Questions"].tap()
+        XCTAssertTrue(app.staticTexts["Is the survey current?"].exists)
         app.buttons["main-tab-saved"].tap()
         XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 5))
 #endif
@@ -1139,6 +1149,67 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Long Context starts at the beginning in edit mode", from: app)
         app.navigationBars["Overview"].buttons["Cancel"].tap()
 
+#endif
+    }
+
+    func testProjectCalculatorSavesCitedResultToNewAndExistingNotes() throws {
+#if !DEBUG
+        throw XCTSkip("Calculator acceptance uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
+                               "--native-project-calculator-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+            "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        let calculator = app.buttons["project-section-calculator"]
+        reveal(calculator, in: app)
+        calculator.tap()
+        XCTAssertTrue(app.navigationBars["Calculator"].waitForExistence(timeout: 5))
+        let form = app.webViews.firstMatch
+        let function = form.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Function of space")).firstMatch
+        XCTAssertTrue(function.waitForExistence(timeout: 20), app.debugDescription)
+        form.buttons["New calculation"].tap()
+        XCTAssertTrue(function.waitForExistence(timeout: 10))
+        function.tap()
+        let classroom = app.buttons["Educational — Classroom area"]
+        reveal(classroom, in: app)
+        classroom.tap()
+        let area = form.textFields["Floor area · ft²"]
+        reveal(area, in: app)
+        area.tap()
+        area.typeText("101")
+        let seating = form.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Seating")).firstMatch
+        reveal(seating, in: app)
+        seating.tap()
+        app.buttons["Without fixed seating"].tap()
+        let save = form.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Add calculation to")).firstMatch
+        reveal(save, in: app)
+        XCTAssertTrue(save.isEnabled)
+        XCTAssertTrue(form.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "6 people")).firstMatch.exists)
+        save.tap()
+        XCTAssertTrue(app.buttons["calculator-new-note"].waitForExistence(timeout: 10))
+        app.buttons["calculator-new-note"].tap()
+        let saved = form.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Saved to Occupant load")).firstMatch
+        XCTAssertTrue(saved.waitForExistence(timeout: 10))
+
+        reveal(save, in: app)
+        save.tap()
+        let existing = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "calculator-existing-note-")).firstMatch
+        XCTAssertTrue(existing.waitForExistence(timeout: 10))
+        existing.tap()
+        XCTAssertTrue(existing.wait(for: \.exists, toEqual: false, timeout: 10))
+        XCTAssertTrue(saved.waitForExistence(timeout: 10))
+        keepScreenshot(named: "Web calculator result and saved note on iPhone", from: app)
+        app.navigationBars["Calculator"].buttons.element(boundBy: 0).tap()
+        app.buttons["project-section-notebook"].tap()
+        let note = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Occupant load · Educational")).firstMatch
+        XCTAssertTrue(note.waitForExistence(timeout: 10))
+        note.tap()
+        let noteBody = app.webViews.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "6 people"))
+        XCTAssertTrue(noteBody.firstMatch.waitForExistence(timeout: 10))
+        XCTAssertGreaterThanOrEqual(noteBody.count, 2)
 #endif
     }
 

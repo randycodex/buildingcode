@@ -1,9 +1,15 @@
 import SwiftUI
 
+enum ProjectReviewTab: String, CaseIterable {
+    case questions, checklist
+
+    var title: String { self == .questions ? "Questions" : "Checklist" }
+}
+
 struct ProjectWorkflowView: View {
     let folderID: Int64
-    let section: ProjectOverviewSection
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var tab: ProjectReviewTab
     @State private var editingFolder: CodeFolder?
     @State private var editingSessionID: UUID?
     @State private var questions: [ProjectOpenQuestion] = []
@@ -13,8 +19,12 @@ struct ProjectWorkflowView: View {
     @State private var saveError: String?
     @State private var initialSyncFinished = false
 
-    private var isQuestions: Bool { section == .questions }
-    private var title: String { isQuestions ? "Questions" : "Checklist" }
+    init(folderID: Int64, initialTab: ProjectReviewTab) {
+        self.folderID = folderID
+        _tab = State(initialValue: initialTab)
+    }
+
+    private var isQuestions: Bool { tab == .questions }
     private var isEditing: Bool { editingFolder != nil }
     private var folder: CodeFolder? { library.folder(id: folderID) }
     private var savedQuestions: [ProjectOpenQuestion] { folder?.openQuestions ?? [] }
@@ -31,7 +41,7 @@ struct ProjectWorkflowView: View {
             VStack(alignment: .leading, spacing: 24) {
                 if needsInitialSync {
                     if initialSyncFinished {
-                        Text("Connect to load this Project’s \(title.lowercased()) before editing.")
+                        Text("Connect to load this Project’s \(tab.title.lowercased()) before editing.")
                             .foregroundStyle(.secondary)
                         Button("Try again") { Task { await library.syncNow() } }
                     }
@@ -47,9 +57,21 @@ struct ProjectWorkflowView: View {
             .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, CodeScreenMetrics.tabBarClearance)
         }
+        .codePinnedTopBar {
+            Picker("Review section", selection: $tab) {
+                ForEach(ProjectReviewTab.allCases, id: \.self) { tab in
+                    Text(tab.title).tag(tab)
+                }
+            }
+            .pickerStyle(.segmented)
+            .disabled(isEditing)
+            .accessibilityIdentifier("project-review-tabs")
+            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+            .padding(.top, 8)
+        }
         .scrollDismissesKeyboard(.interactively)
         .background(CodeAppBackdrop(accent: accent).ignoresSafeArea())
-        .navigationTitle(title)
+        .navigationTitle("Review")
         .navigationBarTitleDisplayMode(.inline)
         .tint(Color.appChrome)
         .navigationBarBackButtonHidden(isEditing)
@@ -73,21 +95,26 @@ struct ProjectWorkflowView: View {
         }
         .onChange(of: library.privateSessionID) { _, _ in cancel() }
         .onChange(of: folderID) { _, _ in cancel() }
-        .task(id: folderID) {
+        .onChange(of: tab) { _, selection in
+            library.setProjectReviewTab(selection, for: folderID)
+        }
+        .task(id: tab) {
+            initialSyncFinished = false
             if needsInitialSync { await library.syncNow() }
+            guard !Task.isCancelled else { return }
             initialSyncFinished = true
         }
     }
 
     @ViewBuilder private var questionList: some View {
         if isEditing {
-            ForEach($questions) { $question in
-                let index = questions.firstIndex { $0.id == question.id } ?? 0
+            ForEach(Array(questions.enumerated()), id: \.element.id) { index, question in
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(alignment: .top, spacing: 12) {
                         Text("\(index + 1).").foregroundStyle(.secondary).monospacedDigit()
                         VStack(alignment: .leading, spacing: 12) {
-                            TextField("What needs to be answered?", text: $question.question, axis: .vertical)
+                            TextField("What needs to be answered?",
+                                      text: draftValue(for: question, in: $questions, field: \.question), axis: .vertical)
                                 .font(.headline)
                                 .focused($focusedRowID, equals: question.id)
                                 .onAppear {
@@ -98,7 +125,8 @@ struct ProjectWorkflowView: View {
                                 }
                                 .accessibilityLabel("Question \(index + 1)")
                                 .accessibilityIdentifier("project-question-text-\(index)")
-                            TextField("Add an answer", text: $question.answer, axis: .vertical)
+                            TextField("Add an answer",
+                                      text: draftValue(for: question, in: $questions, field: \.answer), axis: .vertical)
                                 .accessibilityLabel("Answer \(index + 1)")
                                 .accessibilityIdentifier("project-question-answer-\(index)")
                         }
@@ -130,13 +158,13 @@ struct ProjectWorkflowView: View {
 
     @ViewBuilder private var checklist: some View {
         if isEditing {
-            ForEach($records) { $record in
-                let index = records.firstIndex { $0.id == record.id } ?? 0
+            ForEach(Array(records.enumerated()), id: \.element.id) { index, record in
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(alignment: .top, spacing: 12) {
                         Text("\(index + 1).").foregroundStyle(.secondary).monospacedDigit()
                         VStack(alignment: .leading, spacing: 12) {
-                            TextField("Record name", text: $record.label, axis: .vertical)
+                            TextField("Record name",
+                                      text: draftValue(for: record, in: $records, field: \.label), axis: .vertical)
                                 .font(.headline)
                                 .focused($focusedRowID, equals: record.id)
                                 .onAppear {
@@ -147,14 +175,15 @@ struct ProjectWorkflowView: View {
                                 }
                                 .accessibilityLabel("Record \(index + 1)")
                                 .accessibilityIdentifier("project-record-label-\(index)")
-                            Picker("Status", selection: $record.status) {
+                            Picker("Status", selection: draftValue(for: record, in: $records, field: \.status)) {
                                 ForEach(ProjectRecordStatus.allCases) { status in
                                     Text(status.title).tag(status)
                                 }
                             }
                             .pickerStyle(.menu)
                             .accessibilityIdentifier("project-record-status-\(index)")
-                            TextField("Source, date, or follow-up", text: $record.note, axis: .vertical)
+                            TextField("Source, date, or follow-up",
+                                      text: draftValue(for: record, in: $records, field: \.note), axis: .vertical)
                                 .accessibilityLabel("Record notes \(index + 1)")
                                 .accessibilityIdentifier("project-record-note-\(index)")
                         }
@@ -183,6 +212,20 @@ struct ProjectWorkflowView: View {
                 .textSelection(.enabled)
                 Divider()
             }
+        }
+    }
+
+    private func draftValue<Row: Identifiable, Value>(
+        for row: Row, in rows: Binding<[Row]>, field: WritableKeyPath<Row, Value>
+    ) -> Binding<Value> {
+        let sessionID = editingSessionID
+        // A text field can read its binding once more while being removed or resigning focus.
+        return Binding {
+            rows.wrappedValue.first { $0.id == row.id }?[keyPath: field] ?? row[keyPath: field]
+        } set: { value in
+            guard isEditing, editingSessionID == sessionID,
+                  let index = rows.wrappedValue.firstIndex(where: { $0.id == row.id }) else { return }
+            rows.wrappedValue[index][keyPath: field] = value
         }
     }
 
@@ -232,6 +275,8 @@ struct ProjectWorkflowView: View {
     private func cancel() {
         editingFolder = nil
         editingSessionID = nil
+        focusedRowID = nil
+        newRowID = nil
         questions = []
         records = []
         saveError = nil

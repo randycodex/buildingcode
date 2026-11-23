@@ -1128,7 +1128,7 @@ private struct BookmarkExportPreviewSheet: View {
 }
 
 enum ProjectOverviewSection: CaseIterable, Hashable {
-    case overview, questions, checklist, notebook, evidence, reports
+    case overview, review, notebook, evidence, calculator, reports
 }
 
 enum ProjectOverviewTab: String, Hashable {
@@ -2054,27 +2054,19 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-overview")
 
-        case .questions:
-            NavigationLink(value: ProjectOverviewSection.questions) {
-                let questions = folder?.openQuestions ?? []
-                projectSectionCard("Questions", systemImage: "questionmark.bubble",
-                    count: folder?.openQuestions.map { "\($0.count) \($0.count == 1 ? "question" : "questions")" },
-                    preview: questions.first(where: { !$0.question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })?.question
-                        ?? (folder?.openQuestions == nil ? "" : "No questions yet."),
+        case .review:
+            NavigationLink(value: ProjectOverviewSection.review) {
+                let unanswered = folder?.openQuestions?.count { question in
+                    !question.question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+                        question.answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                }
+                let records = folder?.recordsChecklist?.filter { $0.status != .notApplicable }
+                projectSectionCard("Review", systemImage: "checklist",
+                    count: records.map { "\($0.count { $0.status == .reviewed })/\($0.count) records reviewed" },
+                    preview: unanswered.map { "\($0) unanswered" } ?? "Questions and checklist",
                     compact: compact, expands: expands)
             }
-            .accessibilityIdentifier("project-section-questions")
-
-        case .checklist:
-            NavigationLink(value: ProjectOverviewSection.checklist) {
-                let records = folder?.recordsChecklist ?? []
-                projectSectionCard("Checklist", systemImage: "checklist",
-                    count: folder?.recordsChecklist.map { "\($0.filter { $0.status == .reviewed }.count)/\($0.count) reviewed" },
-                    preview: records.first(where: { $0.status != .reviewed && $0.status != .notApplicable })?.label
-                        ?? (folder?.recordsChecklist == nil ? "" : records.isEmpty ? "No records yet." : "All records reviewed or not applicable."),
-                    compact: compact, expands: expands)
-            }
-            .accessibilityIdentifier("project-section-checklist")
+            .accessibilityIdentifier("project-section-review")
 
         case .notebook:
             NavigationLink(value: ProjectOverviewSection.notebook) {
@@ -2096,6 +2088,14 @@ struct ProjectView: View {
             }
             .accessibilityIdentifier("project-section-evidence")
 
+        case .calculator:
+            NavigationLink(value: ProjectOverviewSection.calculator) {
+                projectSectionCard("Calculator", systemImage: "plus.forwardslash.minus",
+                    count: nil, preview: "Occupant load",
+                    compact: compact, expands: expands)
+            }
+            .accessibilityIdentifier("project-section-calculator")
+
         case .reports:
             NavigationLink(value: ProjectOverviewSection.reports) {
                 projectSectionCard("Reports", systemImage: "doc.richtext",
@@ -2111,8 +2111,8 @@ struct ProjectView: View {
     @ViewBuilder
     private func projectSectionDestination(_ section: ProjectOverviewSection) -> some View {
         switch section {
-        case .questions, .checklist:
-            ProjectWorkflowView(folderID: folderID, section: section)
+        case .review:
+            ProjectWorkflowView(folderID: folderID, initialTab: library.projectReviewTab(for: folderID))
         case .overview:
             ProjectOverviewView(folderID: folderID, accentColor: accentColor, library: library)
         case .notebook:
@@ -2126,6 +2126,8 @@ struct ProjectView: View {
             }
         case .evidence:
             projectEvidenceDestination
+        case .calculator:
+            ProjectCalculatorView(folderID: folderID, accentColor: accentColor)
         case .reports:
             ProjectSectionScreen(title: "Reports", accentColor: accentColor) {
                 projectHubStatus

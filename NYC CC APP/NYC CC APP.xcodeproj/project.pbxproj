@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF2610000000000000000009 /* calculation-drafts.js in Resources */ = {isa = PBXBuildFile; fileRef = AF2610000000000000000008 /* calculation-drafts.js */; };
+		AF2610000000000000000007 /* occupant-load-calculation.js in Resources */ = {isa = PBXBuildFile; fileRef = AF2610000000000000000006 /* occupant-load-calculation.js */; };
+		AF2610000000000000000005 /* ProjectCalculator.js in Resources */ = {isa = PBXBuildFile; fileRef = AF2610000000000000000004 /* ProjectCalculator.js */; };
+		AF2610000000000000000003 /* ProjectCalculator.html in Resources */ = {isa = PBXBuildFile; fileRef = AF2610000000000000000002 /* ProjectCalculator.html */; };
+		AF2610000000000000000001 /* ProjectCalculatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF2610000000000000000000 /* ProjectCalculatorView.swift */; };
 		AF1212000000000000000007 /* NotebookKeyboardToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1212000000000000000008 /* NotebookKeyboardToolbar.swift */; };
 		AF1212000000000000000005 /* NotebookEditor in Resources */ = {isa = PBXBuildFile; fileRef = AF1212000000000000000006 /* NotebookEditor */; };
 		AF1212000000000000000003 /* NativeNotebookReferenceDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1212000000000000000004 /* NativeNotebookReferenceDestination.swift */; };
@@ -94,6 +99,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AF2610000000000000000008 /* calculation-drafts.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = calculation-drafts.js; path = "../permitext-sync-server/public/calculation-drafts.js"; sourceTree = SOURCE_ROOT; };
+		AF2610000000000000000006 /* occupant-load-calculation.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = occupant-load-calculation.js; path = "../permitext-sync-server/public/occupant-load-calculation.js"; sourceTree = SOURCE_ROOT; };
+		AF2610000000000000000004 /* ProjectCalculator.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "ProjectCalculator.js"; sourceTree = "<group>"; };
+		AF2610000000000000000002 /* ProjectCalculator.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "ProjectCalculator.html"; sourceTree = "<group>"; };
+		AF2610000000000000000000 /* ProjectCalculatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectCalculatorView.swift"; sourceTree = "<group>"; };
 		AF1212000000000000000008 /* NotebookKeyboardToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookKeyboardToolbar.swift; sourceTree = "<group>"; };
 		AF1212000000000000000006 /* NotebookEditor */ = {isa = PBXFileReference; lastKnownFileType = folder; path = NotebookEditor; sourceTree = "<group>"; };
 		AF1212000000000000000004 /* NativeNotebookReferenceDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeNotebookReferenceDestination.swift; sourceTree = "<group>"; };
@@ -295,6 +305,7 @@
 				A2000000000000000000000B /* SearchView.swift */,
 				A2000000000000000000000C /* BookmarksView.swift */,
 				AF1313000000000000000002 /* ProjectWorkflowView.swift */,
+				AF2610000000000000000000 /* ProjectCalculatorView.swift */,
 				AF1320000000000000000002 /* ListControls.swift */,
 				A2000000000000000000000D /* SettingsView.swift */,
 				A2D311000000000000000001 /* AccountDeletionVerification.swift */,
@@ -331,6 +342,10 @@
 				A20000000000000000000017 /* nyc_code_authored.json */,
 				A2000000000000000000001D /* CodeContent */,
 				AF1212000000000000000006 /* NotebookEditor */,
+				AF2610000000000000000008 /* calculation-drafts.js */,
+				AF2610000000000000000006 /* occupant-load-calculation.js */,
+				AF2610000000000000000004 /* ProjectCalculator.js */,
+				AF2610000000000000000002 /* ProjectCalculator.html */,
 				A20000000000000000000029 /* Permitext.storekit */,
 				A20000000000000000000010 /* Figures */,
 				A20000000000000000000011 /* README.md */,
@@ -489,6 +504,10 @@
 				A10000000000000000000027 /* Assets.xcassets in Resources */,
 				A1000000000000000000001D /* CodeContent in Resources */,
 				AF1212000000000000000005 /* NotebookEditor in Resources */,
+				AF2610000000000000000009 /* calculation-drafts.js in Resources */,
+				AF2610000000000000000007 /* occupant-load-calculation.js in Resources */,
+				AF2610000000000000000005 /* ProjectCalculator.js in Resources */,
+				AF2610000000000000000003 /* ProjectCalculator.html in Resources */,
 				A1000000000000000000002C /* PrivacyInfo.xcprivacy in Resources */,
 				A10000000000000000000034 /* SourceSerif4Variable-Roman.ttf in Resources */,
 				A10000000000000000000035 /* SourceSerif4Variable-Italic.ttf in Resources */,
@@ -548,6 +567,7 @@
 				A1000000000000000000000B /* SearchView.swift in Sources */,
 				A1000000000000000000000C /* BookmarksView.swift in Sources */,
 				AF1313000000000000000001 /* ProjectWorkflowView.swift in Sources */,
+				AF2610000000000000000001 /* ProjectCalculatorView.swift in Sources */,
 				AF1320000000000000000001 /* ListControls.swift in Sources */,
 				A1000000000000000000000D /* SettingsView.swift in Sources */,
 				A1D311000000000000000001 /* AccountDeletionVerification.swift in Sources */,

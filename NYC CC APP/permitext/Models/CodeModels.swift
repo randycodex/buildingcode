@@ -4094,7 +4094,8 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             notebookSaveFailureRemaining = false
             throw URLError(.notConnectedToInternet)
         }
-        if ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture"), request.cardID == nil {
+        if request.cardID == nil && (ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture")
+                                    || ProcessInfo.processInfo.arguments.contains("--native-project-calculator-fixture")) {
             guard notebookColdOfflineListFailures == 0 else { throw URLError(.notConnectedToInternet) }
             let card = NotebookCard(id: "native-cold-created", version: 1, createdAt: "2026-09-16T12:00:00Z", updatedAt: "2026-09-16T12:00:00Z", projectIDs: [request.projectID], title: request.title, document: request.document, evidenceLinks: request.evidenceLinks)
             notebookFixtureCard = card

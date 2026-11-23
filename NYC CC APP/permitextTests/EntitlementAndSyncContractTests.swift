@@ -12124,6 +12124,31 @@ final class ProjectReorderingTests: XCTestCase {
 
 
 final class ProjectWorkflowSyncTests: XCTestCase {
+    func testCalculatorUsesBundledSourceAndAppendsToAnExistingCitedNote() throws {
+        let source = try ProjectOccupantLoadSource.load()
+        XCTAssertEqual(source.source.sectionID, "2152")
+        XCTAssertEqual(source.source.codeVersion, UserContentSyncCodeVersion.server(UserContentSyncCodeVersion.localNYC2022))
+        XCTAssertTrue(source.blocks.contains { $0.html?.contains("Function of Space") == true })
+        XCTAssertTrue(source.excerpt.contains("permanent fixtures and amenities"))
+
+        let id = try XCTUnwrap(UUID(uuidString: "4D625B79-2D75-49F6-A2EC-E45417ACB82A"))
+        let linkID = id.uuidString.lowercased()
+        let original = NotebookBlock.paragraph("Keep the existing Note.")
+        let existing = NotebookCard(id: "existing-note", version: 2, createdAt: "", updatedAt: "",
+            projectIDs: ["project"], title: "Site visit", document: NotebookDocument(document: [original]))
+        let request = ProjectCalculatorNote(id: id, createdAt: "2026-11-23T16:48:00Z", title: "Occupant load",
+            label: "BC § 1004.1.3 · 2022", exact: source.excerpt,
+            blocks: [.paragraph("101 ft² (net) ÷ 20 ft²/person = 6 people."),
+                     .reference(kind: "selectedPassage", id: linkID, label: "BC § 1004.1.3 · 2022")])
+        let saved = try request.adding(to: existing, projectID: "project", source: source)
+        XCTAssertEqual(saved.document.document, [original] + request.blocks)
+        XCTAssertEqual(saved.links.first?.source, source.source)
+        XCTAssertEqual(saved.links.first?.notebookCardID, existing.id)
+        XCTAssertEqual(saved.links.first?.passages.first?.exact, source.excerpt)
+        XCTAssertEqual(try request.adding(to: existing, projectID: "project", source: source).links, saved.links,
+            "Retrying a Note save must preserve the evidence payload.")
+    }
+
     func testWorkflowQueueFailureRollsBackSavedFields() throws {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("workflow-rollback-\(UUID().uuidString).sqlite")
         defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) } }
