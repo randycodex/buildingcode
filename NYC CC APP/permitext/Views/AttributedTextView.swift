@@ -73,7 +73,7 @@ enum ReaderSelectionMenuBuilder {
         let normalized = selectedText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalized.isEmpty else { return UIMenu(children: suggestedActions) }
         let research = UIAction(
-            title: "Research",
+            title: "Ask Assistant",
             image: UIImage(systemName: researchSystemImageName)
         ) { _ in
             os_signpost(

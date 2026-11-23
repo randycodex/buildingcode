@@ -71,7 +71,7 @@ struct ResearchNotebookHandoffSheet: View {
                         projectID: projectID, projectName: projectName, accentColor: .appChrome,
                         referenceCandidates: [NativeNotebookReferenceCandidate(
                             kind: "researchAnswer", referenceID: handoff.id,
-                            label: ResearchNotebookHandoffPresentation.referenceLabel(question: handoff.question), detail: "Linked Research answer"
+                            label: ResearchNotebookHandoffPresentation.referenceLabel(question: handoff.question), detail: "Linked Assistant answer"
                         )], initialCardID: savedCardID
                     )
                     .environment(\.returnToResearch, { dismiss() })
@@ -104,7 +104,7 @@ struct ResearchNotebookHandoffSheet: View {
                                 }
                             }
                         }
-                        Section("Research reference") {
+                        Section("Assistant reference") {
                             Text(handoff.question)
                             Text("The note will link to this answer and its evidence.")
                                 .font(.footnote).foregroundStyle(.secondary)
@@ -420,7 +420,7 @@ private struct ProjectNotebookSessionView: View {
                     ContentUnavailableView(
                         "No Notes yet",
                         systemImage: "note.text",
-                        description: Text(access.readOnly ? "This Project’s Notebook is read-only." : "Create a Note for analysis, evidence, and Research.")
+                        description: Text(access.readOnly ? "This Project’s Notebook is read-only." : "Create a Note for analysis, evidence, and code research.")
                     )
                 } else {
                     List {

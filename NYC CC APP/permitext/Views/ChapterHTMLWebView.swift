@@ -231,7 +231,7 @@ private final class ChapterResearchWebView: WKWebView {
         guard builder.system == .context else { return }
 
         let researchAction = UIAction(
-            title: "Research",
+            title: "Ask Assistant",
             image: UIImage(systemName: "sparkle")
         ) { [weak self] _ in
             self?.onResearchSelectionMenuAction?()

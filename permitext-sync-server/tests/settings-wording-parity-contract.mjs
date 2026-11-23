@@ -119,7 +119,8 @@ for (const copy of [
   settingsCopy.freePlanDetails,
   settingsCopy.signedOutAccountSummary
 ]) {
-  assert(iosSettings.includes(copy), `iOS Settings no longer contains shared Account copy: ${copy}`);
+  const iosCopy = copy.replace(/(?:AI-assisted )?Research/g, "Assistant");
+  assert(iosSettings.includes(iosCopy), `iOS Settings no longer contains shared Account copy: ${iosCopy}`);
 }
 assert(iosSettings.includes('SharedAccountProfileView()'), 'Signed-in identity uses the shared name/email profile.');
 assert(!iosSettings.includes(settingsCopy.signedInAccountSuffix), 'The retired signed-in plan disclaimer stays out of the identity presentation.');
@@ -136,12 +137,13 @@ assert(!iosSettings.includes('CodeEyebrow(text: "Offline Access"'));
 assert(webIndex.includes('id="settings-offline-title"'));
 
 const additionalTurnCopy = "Need more Research? Additional turns do not expire and are used after the monthly included turns.";
-assert(iosSettings.includes(additionalTurnCopy));
-assert(iosResearch.includes(additionalTurnCopy));
+const iosAdditionalTurnCopy = additionalTurnCopy.replace("Research?", "Assistant turns?");
+assert(iosSettings.includes(iosAdditionalTurnCopy));
+assert(iosResearch.includes(iosAdditionalTurnCopy));
 assert(webIndex.includes(additionalTurnCopy));
 assert(iosSettings.includes("if !library.availableResearchTurnPacks.isEmpty"));
 assert(iosResearch.includes("if library.availableResearchTurnPacks.isEmpty"));
-assert(iosResearch.includes("Additional Research turns are temporarily unavailable. Your question is still here. Try again later."));
+assert(iosResearch.includes("Additional Assistant turns are temporarily unavailable. Your question is still here. Try again later."));
 assert(iosViewModel.includes("included turns remain this month."));
 assert(iosViewModel.includes("included + \\(purchased) additional"));
 assert(iosViewModel.includes("Continued access is available."));

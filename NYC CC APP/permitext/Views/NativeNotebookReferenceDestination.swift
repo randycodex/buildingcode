@@ -125,7 +125,7 @@ struct NativeNotebookReferenceDestination: View {
                 ProgressView("Opening reference…")
             }
         }
-        .navigationTitle(route.referenceKind == "researchAnswer" ? "Linked Research" : "Linked source")
+        .navigationTitle(route.referenceKind == "researchAnswer" ? "Linked Assistant answer" : "Linked source")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(item: $nestedRoute) { next in
             NativeNotebookReferenceDestination(route: next, projectID: projectID, sharedLibrary: sharedLibrary)
@@ -192,7 +192,7 @@ struct NativeNotebookReferenceDestination: View {
                         return
                     }
                 }
-                errorMessage = "Could not open this saved Research answer. Your Note is unchanged. \(error.localizedDescription)"
+                errorMessage = "Could not open this saved Assistant answer. Your Note is unchanged. \(error.localizedDescription)"
             }
             return
         }

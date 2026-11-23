@@ -224,7 +224,7 @@ assert.match(nativeResearch, /research-answer-source-boundary/);
 assert.match(nativeResearch, /research-answer-facts-used/);
 assert.match(nativeResearch, /research-answer-supporting-context/);
 assert.match(nativeResearch, /research-answer-corpus-metadata/);
-assert.match(nativeResearch, /Research corpus editions and applicability/);
+assert.match(nativeResearch, /Code library editions and applicability/);
 assert.match(nativeModels, /authorityStatus == "official_supporting_guidance"/);
 assert.match(nativeModels, /No enacted provision cited/);
 assert.match(nativeModels, /resolved\.scheme\?\.lowercased\(\) == "https"/);

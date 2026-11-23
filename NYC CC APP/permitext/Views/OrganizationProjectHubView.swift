@@ -72,7 +72,7 @@ struct OrganizationProjectHubView: View {
                 kind: "researchAnswer",
                 referenceID: answer.id,
                 label: answer.question,
-                detail: "per codes Research",
+                detail: "per codes Assistant",
                 conversationID: answer.conversationID
             )
         }
@@ -224,7 +224,7 @@ struct OrganizationProjectHubView: View {
             metric(value: "\(projectNotes.count)", label: "Project notes")
             metric(value: "\(codeQuestions.count)", label: "Code Questions")
             metric(value: "\(notebookCards.count)", label: "Notebook cards")
-            metric(value: "\(foundation?.researchAnswers.count ?? 0)", label: "Research answers")
+            metric(value: "\(foundation?.researchAnswers.count ?? 0)", label: "Assistant answers")
             metric(
                 value: "\(reviewThreads.filter { ["open", "waiting"].contains($0.payload.status ?? "") }.count)",
                 label: "Active coordination"
@@ -377,10 +377,10 @@ struct OrganizationProjectHubView: View {
 
     @ViewBuilder
     private var researchSection: some View {
-        projectSection(title: "Research history", systemImage: "text.magnifyingglass") {
+        projectSection(title: "Assistant history", systemImage: "text.magnifyingglass") {
             let answers = foundation?.researchAnswers ?? []
             if answers.isEmpty {
-                emptyText("No immutable Research answers are linked to this Project.")
+                emptyText("No immutable Assistant answers are linked to this Project.")
             } else {
                 ForEach(answers.prefix(8)) { answer in
                     VStack(alignment: .leading, spacing: 5) {
@@ -631,7 +631,7 @@ struct OrganizationProjectHubView: View {
         case "item.unlinked": return "Project item removed"
         case "notebook-card.created": return "Notebook card created"
         case "notebook-card.revision.saved": return "Notebook revision saved"
-        case "research.answer.generated": return "Research answer generated"
+        case "research.answer.generated": return "Assistant answer generated"
         case "review-status.changed": return "Evidence review changed"
         case "project-note.created": return "Project note created"
         case "project-note.revision.saved": return "Project note revised"

@@ -76,7 +76,7 @@ enum ProjectHubLoadError: LocalizedError {
         case .projectUnavailable:
             return "This Project is no longer available."
         case .signInRequired:
-            return "Sign in from Settings to load the synced Notebook and Research history."
+            return "Sign in from Settings to load the synced Notebook and Assistant history."
         }
     }
 }
@@ -85,7 +85,7 @@ enum ResearchProjectSyncError: LocalizedError {
     case projectNotSynced
 
     var errorDescription: String? {
-        "per codes could not sync this Project before starting Research. Check your connection and try again."
+        "per codes could not sync this Project before opening Assistant. Check your connection and try again."
     }
 }
 
@@ -4767,14 +4767,14 @@ final class CodeLibraryViewModel: ObservableObject {
                 isProSubscriptionStorePresented = false
                 if isStoreKitTestTransaction {
                     if isStoreKitTestBackendLinked {
-                        statusMessage = "Pro (Test), including Research, was linked to this per codes staging account. No real charge was made."
+                        statusMessage = "Pro (Test), including Assistant, was linked to this per codes staging account. No real charge was made."
                         storeKitOperationMessage = "Apple restored and linked Pro (Test) in isolated staging."
                     } else {
-                        statusMessage = "Pro (Test), including Research, was restored on this device. Test purchases cannot activate production web access."
+                        statusMessage = "Pro (Test), including Assistant, was restored on this device. Test purchases cannot activate production web access."
                         storeKitOperationMessage = "Apple restored Pro (Test) on this device."
                     }
                 } else {
-                    statusMessage = "Pro, including Research, was restored."
+                    statusMessage = "Pro, including Assistant, was restored."
                     storeKitOperationMessage = "Your Pro access has been restored. You can continue where you left off."
                 }
             } else if snapshot.plan != .pro {
@@ -4880,7 +4880,7 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             guard identity == privateRequestIdentity, !Task.isCancelled else { return }
             if showsErrors {
-                researchTurnPurchaseMessage = "per codes could not load Research turns: \(error.localizedDescription)"
+                researchTurnPurchaseMessage = "per codes could not load Assistant turns: \(error.localizedDescription)"
             }
         }
     }
@@ -4890,15 +4890,15 @@ final class CodeLibraryViewModel: ObservableObject {
         using purchaseAction: PurchaseAction
     ) async {
         guard let account = signedInAccount else {
-            researchTurnPurchaseMessage = "Sign in to buy additional Research turns."
+            researchTurnPurchaseMessage = "Sign in to buy additional Assistant turns."
             return
         }
         guard currentPlan == .pro, hasResearchAccess else {
-            researchTurnPurchaseMessage = "Research turn packs require an active Pro plan."
+            researchTurnPurchaseMessage = "Assistant turn packs require an active Pro plan."
             return
         }
         guard let productID = pack.appleProductID, !productID.isEmpty else {
-            researchTurnPurchaseMessage = "This Research turn pack is not available from Apple yet."
+            researchTurnPurchaseMessage = "This Assistant turn pack is not available from Apple yet."
             return
         }
         guard !isResearchTurnPurchaseBusy else { return }
@@ -4959,7 +4959,7 @@ final class CodeLibraryViewModel: ObservableObject {
             researchTurnAllowance = usage
             await storeKitResearchTurnService.finish(purchase)
             researchTurnPurchaseMessage = response.credited == true
-                ? "\(source) added Research turns to your per codes account."
+                ? "\(source) added Assistant turns to your per codes account."
                 : "\(source) was already added to your per codes account."
         } catch is CancellationError {
             return

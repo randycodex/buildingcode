@@ -525,7 +525,7 @@ async function main() {
         iosSettingsSource.includes('Label(currentPlanTitle, systemImage: "checkmark.circle.fill")') &&
         iosSettingsSource.includes('Text(planSummaryText)') &&
         iosSettingsSource.includes('return "Lifetime Pro"') &&
-        iosSettingsSource.includes("100 AI-assisted Research turns each month"))) &&
+        iosSettingsSource.includes("100 Assistant turns each month"))) &&
         !settingsTemplateSource.includes('class="settings-billing-line"'),
       "Settings lost the single $20 Pro plan with included Research or restored a separate Research add-on."
     );

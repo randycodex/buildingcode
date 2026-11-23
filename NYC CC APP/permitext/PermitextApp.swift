@@ -2107,7 +2107,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     }
                     readers.tabItem { Label("Reader", systemImage: "book") }.tag(AppTab.browse.rawValue)
                     if !isCodeLibrary {
-                        research.tabItem { Label("Research", systemImage: "sparkle") }.tag(AppTab.research.rawValue)
+                        research.tabItem { Label("Assistant", systemImage: "sparkle") }.tag(AppTab.research.rawValue)
                     }
                     SearchView().tabItem { Image(systemName: "magnifyingglass").accessibilityLabel("Search").accessibilityIdentifier("main-tab-search") }.tag(AppTab.search.rawValue)
                 }
@@ -2227,7 +2227,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     research
                 } label: {
                     Image(systemName: "sparkle")
-                        .accessibilityLabel("Research")
+                        .accessibilityLabel("Assistant")
                         .accessibilityIdentifier("main-tab-research")
                 }
             }

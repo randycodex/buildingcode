@@ -66,7 +66,11 @@ precondition(ResearchHistoryPresentation.ordered([input[1],pinned,input[4]]).map
 precondition(ResearchHistoryPresentation.ordered([]).isEmpty)
 precondition(Titles.researchTitle(for:input[0])=="Draft with selected evidence")
 precondition(Titles.researchTitle(for:input[2])=="Authored title")
-precondition(Titles.researchTitle(for:input[4])=="Research draft")
+precondition(Titles.researchTitle(for:input[4])=="Assistant draft")
+var legacyDraft=ResearchConversationSummary(id:"legacy",title:"New Research",createdAt:input[4].createdAt,updatedAt:input[4].updatedAt,titleSource:"default")
+precondition(Titles.researchTitle(for:legacyDraft)=="Assistant draft")
+legacyDraft.titleSource="manual"
+precondition(Titles.researchTitle(for:legacyDraft)=="New Research")
 // Native messageCount is a required Int in actual Codable synthesis. Omission
 // and invalid types must not quietly become a zero-count draft.
 var object=(try JSONSerialization.jsonObject(with:data) as! [[String:Any]])[0]

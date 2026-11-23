@@ -563,7 +563,7 @@ extension ResearchAnswer {
     }
 
     func structuredCopyText(sourceStatus: String) -> String {
-        var sections: [String] = ["per codes Research"]
+        var sections: [String] = ["per codes Assistant"]
         if let label = researchAuthorityLabel { sections.append(label) }
 
         let narrative = narrativeText
@@ -643,7 +643,7 @@ extension ResearchAnswer {
         return entries.map { kind, corpus in
             let identity = [corpus.label, corpus.id]
                 .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .first(where: { !$0.isEmpty }) ?? "Research corpus"
+                .first(where: { !$0.isEmpty }) ?? "Code library"
             let edition = corpus.codeEdition?.trimmingCharacters(in: .whitespacesAndNewlines)
             let editionLabel = if let edition, !edition.isEmpty {
                 "Edition: \(edition)"
@@ -728,7 +728,7 @@ extension ResearchAnswer {
                 parts.append("\(crossReferences) cross-references reviewed")
             }
         } else {
-            parts.append("Grounded in the cited Research sources")
+            parts.append("Grounded in the cited sources")
         }
 
         if contextual > 0, cited == 0, authorityStatus != "official_supporting_guidance" {
@@ -931,7 +931,7 @@ enum ResearchNotebookHandoffPresentation {
     }
 
     static func referenceLabel(question: String) -> String {
-        boundedText("Research: \(question)", maximumUTF16Count: 500)
+        boundedText("Assistant: \(question)", maximumUTF16Count: 500)
     }
 }
 

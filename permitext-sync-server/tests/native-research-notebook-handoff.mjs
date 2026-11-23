@@ -19,13 +19,13 @@ let questions = ["Short question", String(repeating: "a", count: 2000), String(r
 for question in questions {
     let label = ResearchNotebookHandoffPresentation.referenceLabel(question: question)
     precondition(label.utf16.count <= 500)
-    precondition(label.hasPrefix("Research: "))
+    precondition(label.hasPrefix("Assistant: "))
     precondition(!label.contains("\\u{FFFD}"))
     let title = ResearchNotebookHandoffPresentation.boundedText(question, maximumUTF16Count: 160)
     precondition(title.utf16.count <= 160)
     precondition(!title.contains("\\u{FFFD}"))
 }
-precondition(ResearchNotebookHandoffPresentation.referenceLabel(question: "Short question") == "Research: Short question")
+precondition(ResearchNotebookHandoffPresentation.referenceLabel(question: "Short question") == "Assistant: Short question")
 let exact = String(repeating: "x", count: 500)
 precondition(ResearchNotebookHandoffPresentation.boundedText(exact, maximumUTF16Count: 500) == exact)
 print("Native Notebook handoff labels preserve graphemes and meet backend UTF-16 limits.")

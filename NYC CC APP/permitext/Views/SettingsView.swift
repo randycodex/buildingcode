@@ -44,7 +44,7 @@ struct PermitextAccountEntryView: View {
             Text("Your account, your workspace.")
                 .font(.title2.weight(.semibold))
                 .multilineTextAlignment(.center)
-            Text("Read and search for free. Saving, Projects, and Research require Pro.")
+            Text("Read and search for free. Saving, Projects, and Assistant require Pro.")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.top, 12)
@@ -485,7 +485,7 @@ struct SettingsView: View {
                 .disabled(library.isStoreKitBusy)
                 .opacity(library.isStoreKitBusy ? 0.55 : 1)
 
-                Text("Pro has no trial and renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.")
+                Text("Pro has no trial and renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 Assistant turns each month. Code reading and search remain free.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -628,7 +628,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 10) {
             Divider()
 
-            Text("Research turns")
+            Text("Assistant turns")
                 .font(.subheadline.weight(.semibold))
 
             Text(library.researchTurnAllowanceSummary)
@@ -636,7 +636,7 @@ struct SettingsView: View {
                 .foregroundStyle(.primary)
 
             if !library.availableResearchTurnPacks.isEmpty {
-                Text("Need more Research? Additional turns do not expire and are used after the monthly included turns.")
+                Text("Need more Assistant turns? Additional turns do not expire and are used after the monthly included turns.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -879,11 +879,11 @@ struct SettingsView: View {
                 return "Pro (Test) is active only on this device. Use an account grant to test Pro across iOS and web."
             }
             if library.currentEntitlementSource == .lifetimeGrant {
-                return "Lifetime Pro is active, including Research. This gifted account does not need an App Store subscription."
+                return "Lifetime Pro is active, including Assistant. This gifted account does not need an App Store subscription."
             }
-            return "Pro is active. Projects, Notebook, Report, professional exports, offline access, and AI-assisted Research are unlocked."
+            return "Pro is active. Projects, Notebook, Report, professional exports, offline access, and Assistant are unlocked."
         }
-        return "Browse enacted codes, read the text, follow code references, and search. Saving, Projects, Research, Notebook, and Reports require Pro."
+        return "Browse enacted codes, read the text, follow code references, and search. Saving, Projects, Assistant, Notebook, and Reports require Pro."
     }
 
     private var currentPlanTitle: String {
@@ -1209,9 +1209,9 @@ struct SettingsView: View {
             "Your per codes account and sign-in sessions",
             "Saved passages and notes",
             "Projects and their stored content",
-            "Research history and reports",
+            "Assistant history and reports",
             "Private images and synchronized data",
-            "Unused additional Research turns (they are forfeited and are not automatically refunded)",
+            "Unused additional Assistant turns (they are forfeited and are not automatically refunded)",
             "Entitlements and organizations you own",
             "per codes data stored on this device"
         ])
@@ -1869,7 +1869,7 @@ struct ProSubscriptionStoreView: View {
                     Text("Pro")
                         .font(.title2.weight(.bold))
 
-                    Text("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month.")
+                    Text("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 Assistant turns each month.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -1886,7 +1886,7 @@ struct ProSubscriptionStoreView: View {
                                 .font(.headline)
                             Text("\(library.proProductDisplayPrice ?? "$20.00")/month")
                                 .font(.title3.weight(.semibold))
-                            Text("Pro: unlimited saves, notes, Projects, Notebook, Report, exports, continuity, sync, and 100 AI-assisted Research turns each month.")
+                            Text("Pro: unlimited saves, notes, Projects, Notebook, Report, exports, continuity, sync, and 100 Assistant turns each month.")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)

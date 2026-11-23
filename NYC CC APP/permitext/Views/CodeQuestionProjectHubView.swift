@@ -213,7 +213,7 @@ private struct CodeQuestionProjectHubDetail: View {
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
                 } else {
-                    muted("The immutable analysis descriptor is available, but its Research answer is not present in this snapshot.")
+                    muted("The immutable analysis descriptor is available, but its Assistant answer is not present in this snapshot.")
                 }
                 labeledValue("Citation validation", analysis.payload.citationValidation)
                 labeledValue("Analysis policy", analysis.payload.analysisPolicyID)

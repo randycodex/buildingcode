@@ -2166,7 +2166,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
             .accessibilityAction(named: "Show passage actions") {
                 withAnimation(reduceMotion ? nil : .smooth(duration: 0.24)) { passageSwipe.open() }
             }
-            .accessibilityAction(named: "Research this passage") {
+            .accessibilityAction(named: "Ask Assistant about this passage") {
                 onResearchSelection(block.plainText)
             }
         } else {
@@ -2196,7 +2196,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
             }
             .buttonStyle(.plain)
             .background(Color(uiColor: accentColor).opacity(0.18), in: RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius))
-            .accessibilityLabel("Research this passage")
+            .accessibilityLabel("Ask Assistant about this passage")
             .accessibilityIdentifier("reader-passage-research-\(sectionID)")
         }
         .frame(width: CodeScreenMetrics.readerPassageActionTrayWidth)

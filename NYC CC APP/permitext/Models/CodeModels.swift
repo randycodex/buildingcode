@@ -3702,7 +3702,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             let existing = conversation.messages.contains { $0.requestID == request.requestID }
             if !existing {
                 conversation.messages.append(ResearchMessage(id: "phase3-question-\(request.requestID)", role: "user", question: request.question, requestID: request.requestID,
-                    failure: ResearchMessageFailure(code: "RESEARCH_INTERRUPTED", status: "failed", failedAt: phase3ResearchTimestamp(), message: "Research was interrupted before an answer was saved."),
+                    failure: ResearchMessageFailure(code: "RESEARCH_INTERRUPTED", status: "failed", failedAt: phase3ResearchTimestamp(), message: "Assistant was interrupted before an answer was saved."),
                     createdAt: request.startedAt ?? phase3ResearchTimestamp()))
                 phase3ResearchConversations[conversation.id] = conversation
             }
@@ -5940,13 +5940,13 @@ enum StoreKitResearchTurnServiceError: LocalizedError {
         case .paymentsUnavailable:
             return "Apple purchases are disabled for this device or App Store account."
         case .productUnavailable:
-            return "This Research turn pack is not available from the App Store yet."
+            return "This Assistant turn pack is not available from the App Store yet."
         case .unverifiedTransaction:
-            return "The Research turn purchase could not be verified."
+            return "The Assistant turn purchase could not be verified."
         case .pendingApproval:
-            return "The Research turn purchase is pending approval."
+            return "The Assistant turn purchase is pending approval."
         case .unknownPurchaseResult:
-            return "The Research turn purchase did not complete."
+            return "The Assistant turn purchase did not complete."
         }
     }
 }

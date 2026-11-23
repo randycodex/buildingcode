@@ -619,7 +619,7 @@ private var filteredSavedEmptyState: some View {
             CodeEmptyStateCard(
                 title: "Create your first Project",
                 systemImage: "folder.badge.plus",
-                description: "Use + to create a Project for your notes, evidence, and Research.",
+                description: "Use + to create a Project for your notes, evidence, and Assistant conversations.",
                 accent: accentColor
             )
         }
@@ -1540,7 +1540,7 @@ struct ProjectView: View {
                 kind: "researchAnswer",
                 referenceID: answer.id,
                 label: answer.question,
-                detail: "per codes Research",
+                detail: "per codes Assistant",
                 conversationID: answer.conversationID
             )
         }

@@ -6400,7 +6400,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(attempt.question, "Original question")
         XCTAssertEqual(attempt.retryAttempt.id, attempt.id)
         XCTAssertNil(attempt.retryAttempt.failure)
-        XCTAssertEqual(attempt.recoveryMessage, "Research could not finish generating a complete answer. Your question is still here.")
+        XCTAssertEqual(attempt.recoveryMessage, "Assistant could not finish generating a complete answer. Your question is still here.")
         XCTAssertEqual(ResearchQuestionAttempt.recover(messages: [message], cached: attempt), attempt)
         var completedQuestion = message
         completedQuestion.failure = nil
@@ -6412,11 +6412,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         cancelled.failure = ResearchMessageFailure(code: "CANCELLED", status: "cancelled", failedAt: "before", message: "unsafe")
         XCTAssertNotNil(ResearchQuestionAttempt.serverFailure(cancelled, messages: [cancelled, message]))
         XCTAssertEqual(ResearchQuestionAttempt.recover(messages: [cancelled, message], cached: nil)?.id, attempt.id)
-        XCTAssertEqual(ResearchQuestionAttempt.serverFailure(cancelled, messages: [cancelled])?.recoveryMessage, "Research was cancelled. Your question is still here.")
+        XCTAssertEqual(ResearchQuestionAttempt.serverFailure(cancelled, messages: [cancelled])?.recoveryMessage, "Assistant was cancelled. Your question is still here.")
         var migrated = message
         migrated.failure = ResearchMessageFailure(code: "RESEARCH_INTERRUPTED", status: "failed", failedAt: "now", message: "Client recovery")
         let restoredMigration = try XCTUnwrap(ResearchQuestionAttempt.serverFailure(migrated, messages: [migrated]))
-        XCTAssertEqual(restoredMigration.recoveryMessage, "Research was interrupted before an answer was saved. Your question is still here.")
+        XCTAssertEqual(restoredMigration.recoveryMessage, "Assistant was interrupted before an answer was saved. Your question is still here.")
         XCTAssertEqual(restoredMigration.startedAt, message.createdAt)
         XCTAssertEqual(restoredMigration.retryAttempt.startedAt, message.createdAt)
         var legacy = message
@@ -6425,7 +6425,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     func testResearchGenerationAndEvidenceCheckFailuresUseDistinctCopy() {
-        XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "INVALID_RESEARCH_RESPONSE")).message, "Research could not finish generating a complete answer. Your question is still here.")
+        XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "INVALID_RESEARCH_RESPONSE")).message, "Assistant could not finish generating a complete answer. Your question is still here.")
         XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "INVALID_RESEARCH_VERIFICATION")).message, "Research could not complete its evidence check. Your question is still here.")
         XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "RESEARCH_VERIFICATION_FAILED")).message, "per codes could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here.")
     }
@@ -7021,11 +7021,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(providerError).message,
-            "The Research service is temporarily unavailable. Your question is still here."
+            "Assistant is temporarily unavailable. Your question is still here."
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(verifierProviderError).message,
-            "The Research service is temporarily unavailable. Your question is still here."
+            "Assistant is temporarily unavailable. Your question is still here."
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(officialGuidanceError).message,
@@ -7036,11 +7036,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     func testResearchFailurePreservesQuestionAfterNetworkTimeout() {
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(URLError(.timedOut)).message,
-            "Research is taking longer than expected. per codes checked for a completed answer but did not find one yet. Your question is still here."
+            "Assistant is taking longer than expected. per codes checked for a completed answer but did not find one yet. Your question is still here."
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(URLError(.cancelled)).message,
-            "Research was cancelled. Your question is still here."
+            "Assistant was cancelled. Your question is still here."
         )
     }
 
@@ -7090,7 +7090,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
 
         XCTAssertTrue(researchSource.contains("@State private var activeResearchRequestTask: Task<Void, Never>?"))
-        XCTAssertTrue(researchSource.contains(".accessibilityLabel(\"Cancel Research request\")"))
+        XCTAssertTrue(researchSource.contains(".accessibilityLabel(\"Cancel Assistant request\")"))
         XCTAssertTrue(researchSource.contains(".accessibilityIdentifier(\"research-cancel-request\")"))
         XCTAssertTrue(researchSource.contains("activeResearchRequestTask?.cancel()"))
         XCTAssertTrue(researchSource.contains("try Task.checkCancellation()"))
@@ -7569,12 +7569,12 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(processingSource.contains("backendError.statusCode == 409 {"))
         XCTAssertTrue(processingSource.contains("This Apple purchase is already linked to another per codes account."))
 
-        XCTAssertTrue(settingsSource.contains("Research turns"))
-        XCTAssertTrue(settingsSource.contains("Need more Research? Additional turns do not expire and are used after the monthly included turns."))
+        XCTAssertTrue(settingsSource.contains("Assistant turns"))
+        XCTAssertTrue(settingsSource.contains("Need more Assistant turns? Additional turns do not expire and are used after the monthly included turns."))
         XCTAssertTrue(settingsSource.contains("if !library.availableResearchTurnPacks.isEmpty"))
-        XCTAssertTrue(settingsSource.contains("Unused additional Research turns (they are forfeited and are not automatically refunded)"))
-        XCTAssertTrue(researchSource.contains("You have used this month's included Research turns. Buy more turns to continue; your question is still here."))
-        XCTAssertTrue(researchSource.contains("Additional Research turns are temporarily unavailable. Your question is still here. Try again later."))
+        XCTAssertTrue(settingsSource.contains("Unused additional Assistant turns (they are forfeited and are not automatically refunded)"))
+        XCTAssertTrue(researchSource.contains("You have used this month's included Assistant turns. Buy more turns to continue; your question is still here."))
+        XCTAssertTrue(researchSource.contains("Additional Assistant turns are temporarily unavailable. Your question is still here. Try again later."))
     }
 }
 
@@ -8727,7 +8727,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         )
         let actions = menu.children.compactMap { $0 as? UIAction }
 
-        XCTAssertEqual(actions.map(\.title), ["Copy", "Share", "Research"])
+        XCTAssertEqual(actions.map(\.title), ["Copy", "Share", "Ask Assistant"])
         XCTAssertEqual(ReaderSelectionMenuBuilder.researchSystemImageName, "sparkle")
         XCTAssertEqual(
             ReaderSelectionMenuBuilder.selectableTextAccessibilityIdentifier,
@@ -9438,7 +9438,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertTrue(ResearchTrustCopy.firstUseDisclosure.contains("Private notes are not included."))
         XCTAssertTrue(
             ResearchTrustCopy.visualEvidenceDisclosure.contains(
-                "Selected official images are sent to OpenAI for analysis."
+                "Assistant uses passage text and available table data."
             )
         )
         XCTAssertEqual(ResearchTrustCopy.copyAnswerAction, "Copy answer")

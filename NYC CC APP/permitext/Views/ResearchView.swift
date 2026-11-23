@@ -40,7 +40,7 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
     var startedAt: String? = nil
 
     var recoveryMessage: String {
-        failure?.message ?? "Research was interrupted before an answer was saved. Retry to recover the same request. Your question is still here."
+        failure?.message ?? "Assistant was interrupted before an answer was saved. Retry to recover the same request. Your question is still here."
     }
 
     func recordingFailure(_ error: Error) -> ResearchQuestionAttempt {
@@ -82,9 +82,9 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
 }
 
 enum ResearchTrustCopy {
-    static let composerPrivacyDisclosure = "Research sends your question, recent chat, selected Reader passages, and any Project snapshot you explicitly review and include to OpenAI. Private notes are not included. Do not include confidential, regulated, or sensitive personal information. Only the material you include is used."
-    static let firstUseDisclosure = "per codes sends your question, recent chat, selected Reader passages, and any Project snapshot you explicitly review and include to OpenAI. Private notes are not included."
-    static let visualEvidenceDisclosure = "Selected official images are sent to OpenAI for analysis. Private notes are not included."
+    static let composerPrivacyDisclosure = "Assistant sends your question, recent conversation, and selected Reader passages to OpenAI. When enabled, Project context and facts are sent too. Private notes are not included. Do not include confidential, regulated, or sensitive personal information."
+    static let firstUseDisclosure = "per codes sends your question, recent conversation, and selected Reader passages to OpenAI. When enabled, Project context and facts are sent too. Private notes are not included."
+    static let visualEvidenceDisclosure = "Assistant uses passage text and available table data. Selected images are kept with the evidence."
     static let copyAnswerAction = "Copy answer"
     static let reportProblemAction = "Report a problem"
     static let nextStepGuidance = "Review the cited provision and Project facts, then record your own conclusion in a Project Note. Build Reports on per codes Web."
@@ -380,18 +380,18 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
             switch urlError.code {
             case .timedOut:
                 return retainedQuestion(
-                    "Research is taking longer than expected. per codes checked for a completed answer but did not find one yet."
+                    "Assistant is taking longer than expected. per codes checked for a completed answer but did not find one yet."
                 )
             case .notConnectedToInternet, .networkConnectionLost:
-                return retainedQuestion("Research could not connect to the internet.")
+                return retainedQuestion("Assistant could not connect to the internet.")
             case .cancelled:
-                return retainedQuestion("Research was cancelled.")
+                return retainedQuestion("Assistant was cancelled.")
             default:
-                return retainedQuestion("per codes could not reach the Research service.")
+                return retainedQuestion("per codes could not reach Assistant.")
             }
         }
 
-        return retainedQuestion("per codes could not reach the Research service.")
+        return retainedQuestion("per codes could not reach Assistant.")
     }
 
     private static func resolve(
@@ -419,13 +419,13 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
 
         switch code {
         case "RESEARCH_INTERRUPTED":
-            return retainedQuestion("Research was interrupted before an answer was saved.")
+            return retainedQuestion("Assistant was interrupted before an answer was saved.")
         case "INVALID_RESEARCH_RESPONSE":
-            return retainedQuestion("Research could not finish generating a complete answer.")
+            return retainedQuestion("Assistant could not finish generating a complete answer.")
         case "INVALID_RESEARCH_VERIFICATION":
-            return retainedQuestion("Research could not complete its evidence check.")
+            return retainedQuestion("Assistant could not complete its evidence check.")
         case "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP":
-            return retainedQuestion("Research stopped before another model call could exceed its spending limit.")
+            return retainedQuestion("Assistant stopped before another model call could exceed its spending limit.")
         case "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE":
             return retainedQuestion(
                 "per codes could not retrieve attributable official guidance from the approved sources."
@@ -435,27 +435,27 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
                 serverMessage ?? "per codes could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation."
             )
         case "RESEARCH_EVIDENCE_REQUIRED", "RESEARCH_SOURCE_CHANGED", "RESEARCH_REFUSAL":
-            return retainedQuestion(serverMessage ?? "Research needs updated enacted evidence before it can answer.")
+            return retainedQuestion(serverMessage ?? "Assistant needs updated enacted evidence before it can answer.")
         case "RESEARCH_CAPACITY_REVIEW":
-            return retainedQuestion(serverMessage ?? "Research is temporarily unavailable while account capacity is reviewed.")
+            return retainedQuestion(serverMessage ?? "Assistant is temporarily unavailable while account capacity is reviewed.")
         case "RESEARCH_TURNS_REQUIRED":
             return ResearchRequestFailurePresentation(
-                message: "You have used this month's included Research turns. Buy more turns to continue; your question is still here."
+                message: "You have used this month's included Assistant turns. Buy more turns to continue; your question is still here."
             )
         case "RESEARCH_CANCELLED":
-            return retainedQuestion("Research was cancelled.")
+            return retainedQuestion("Assistant was cancelled.")
         case let value? where verificationCodes.contains(value):
             return retainedQuestion(
                 "per codes could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there."
             )
         case let value? where providerCodes.contains(value):
-            return retainedQuestion("The Research service is temporarily unavailable.")
+            return retainedQuestion("Assistant is temporarily unavailable.")
         default:
             break
         }
 
         if error.isAuthenticationFailure {
-            return retainedQuestion("Your per codes session no longer has access to Research. Sign in again and retry.")
+            return retainedQuestion("Your per codes session no longer has access to Assistant. Sign in again and retry.")
         }
 
         if error.statusCode == 502,
@@ -466,14 +466,14 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
         }
 
         if let statusCode = error.statusCode, statusCode >= 500 {
-            return retainedQuestion("The Research service is temporarily unavailable.")
+            return retainedQuestion("Assistant is temporarily unavailable.")
         }
 
         if let serverMessage, !serverMessage.isEmpty {
             return retainedQuestion(serverMessage)
         }
 
-        return retainedQuestion("per codes could not reach the Research service.")
+        return retainedQuestion("per codes could not reach Assistant.")
     }
 
     private static func retainedQuestion(_ explanation: String) -> ResearchRequestFailurePresentation {
@@ -682,13 +682,13 @@ private struct ResearchSessionView: View {
                 )
                 .environmentObject(library)
             }
-            .alert("Rename Research", isPresented: $showingRename) {
-                TextField("Research title", text: $draftTitle)
+            .alert("Rename conversation", isPresented: $showingRename) {
+                TextField("Conversation title", text: $draftTitle)
                 Button("Cancel", role: .cancel) {}
                 Button("Save") { Task { await renameConversation() } }
             }
             .confirmationDialog(
-                "Move this Research conversation?",
+                "Move this conversation?",
                 isPresented: $showingAssignmentConfirmation,
                 titleVisibility: .visible
             ) {
@@ -697,10 +697,10 @@ private struct ResearchSessionView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("per codes Research will use the destination Project’s current facts for future answers. Existing answers keep their original evidence and context.")
+                Text("Assistant will use the destination Project’s current facts for future answers. Existing answers keep their original evidence and context.")
             }
             .alert(
-                pendingDeletion?.isMultiple == true ? "Delete selected Research conversations?" : "Delete Research conversation?",
+                pendingDeletion?.isMultiple == true ? "Delete selected conversations?" : "Delete conversation?",
                 isPresented: Binding(
                     get: { pendingDeletion != nil },
                     set: { if !$0 { pendingDeletion = nil } }
@@ -823,7 +823,7 @@ private struct ResearchSessionView: View {
                         .accessibilityLabel("Delete selected conversations")
                     }
                 } else {
-                    CodeMainScreenToolbarTitle(title: "Research", alignment: .center)
+                    CodeMainScreenToolbarTitle(title: "Assistant", alignment: .center)
                     if canPresentResearch {
                         IconToolbarGroup { researchHistoryActions }
                     }
@@ -852,18 +852,18 @@ private struct ResearchSessionView: View {
             NativeEntitlementStatusView().padding(24)
         } else if library.signedInAccount == nil {
             researchAccessRecovery(
-                title: "Research requires Pro",
+                title: "Assistant requires Pro",
                 description: pendingSelectionRecoveryDescription(
-                    fallback: "Sign in and upgrade to Pro for cited Research. Code reading and search remain free."
+                    fallback: "Sign in and upgrade to Pro to use Assistant. Code reading and search remain free."
                 ),
                 buttonTitle: "Open Account",
                 section: .account
             )
         } else {
             researchAccessRecovery(
-                title: "Research requires Pro",
+                title: "Assistant requires Pro",
                 description: pendingSelectionRecoveryDescription(
-                    fallback: "Upgrade to Pro for personal Research. Code reading and search remain free."
+                    fallback: "Upgrade to Pro to use Assistant. Code reading and search remain free."
                 ),
                 buttonTitle: "View Plans",
                 section: .plan
@@ -976,7 +976,7 @@ private struct ResearchSessionView: View {
         } label: {
             ToolbarActionIcon(systemImage: "plus")
         }
-        .accessibilityLabel("New Research")
+        .accessibilityLabel("New conversation")
         .tint(Color.appChrome)
         .disabled(isCreatingConversation)
         .cardZoomSource(id: ConversationZoomSource.new, in: conversationZoomNamespace, reduceMotion: reduceMotion)
@@ -1032,7 +1032,7 @@ private struct ResearchSessionView: View {
             ToolbarActionIcon(systemImage: "ellipsis")
         }
         .disabled(isUpdatingProjectContext)
-        .accessibilityLabel("Research actions")
+        .accessibilityLabel("Assistant actions")
         .foregroundStyle(Color.appChrome)
     }
 
@@ -1048,7 +1048,7 @@ private struct ResearchSessionView: View {
         .foregroundStyle(Color.appChrome)
         .buttonStyle(.plain)
         .codeLiquidGlassCircle()
-        .accessibilityLabel("Research history")
+        .accessibilityLabel("Assistant history")
     }
 
     private func researchConversationHeader(_ conversation: ResearchConversation) -> some View {
@@ -1127,9 +1127,9 @@ private struct ResearchSessionView: View {
 
             if orderedSummaries.isEmpty && !isLoading && errorMessage == nil && historyErrorMessage == nil {
                 ContentUnavailableView(
-                    historyIsFiltered && (projectFolderID == nil || !historyQuery.isEmpty) ? "No matching Research" : "No Research yet",
+                    historyIsFiltered && (projectFolderID == nil || !historyQuery.isEmpty) ? "No matching conversations" : "No conversations yet",
                     image: "Astroid",
-                    description: Text(!historyQuery.isEmpty ? "Try a different question." : "Tap the plus button to start Research.")
+                    description: Text(!historyQuery.isEmpty ? "Try a different question." : "Tap the plus button to start a conversation.")
                 )
                 .padding(.top, 70)
                 .listRowBackground(Color.clear)
@@ -1225,7 +1225,7 @@ private struct ResearchSessionView: View {
                     Task { await loadMoreHistory() }
                 } label: {
                     HStack {
-                        Text("Load older Research")
+                        Text("Load older conversations")
                         if isLoadingMoreHistory { ProgressView() }
                     }
                     .frame(maxWidth: .infinity, minHeight: 44)
@@ -1425,7 +1425,7 @@ private struct ResearchSessionView: View {
                                 .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel("Cancel Research request")
+                        .accessibilityLabel("Cancel Assistant request")
                         .accessibilityIdentifier("research-cancel-request")
                     } else {
                         Button {
@@ -1445,7 +1445,7 @@ private struct ResearchSessionView: View {
                             question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
                             researchSendIsBlocked
                         )
-                        .accessibilityLabel("Send Research question")
+                        .accessibilityLabel("Send message")
                     }
                 }
                 .padding(.trailing, 8)
@@ -1467,7 +1467,7 @@ private struct ResearchSessionView: View {
 
     private var composerBlockMessage: String? {
         if library.researchTurnAllowance?.purchaseRequired == true {
-            return "Buy additional Research turns above to continue."
+            return "Buy additional Assistant turns above to continue."
         }
         if conversation?.projectContextReviewRequired == true {
             return "Review the active Project above before asking another question."
@@ -1741,13 +1741,13 @@ private struct ResearchSessionView: View {
 
     private var researchTurnRecoveryView: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Research turns")
+            Text("Assistant turns")
                 .font(.subheadline.weight(.semibold))
             Text(library.researchTurnAllowanceSummary)
                 .font(.headline)
 
             if library.availableResearchTurnPacks.isEmpty {
-                Text("Additional Research turns are temporarily unavailable. Your question is still here. Try again later.")
+                Text("Additional Assistant turns are temporarily unavailable. Your question is still here. Try again later.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -1760,7 +1760,7 @@ private struct ResearchSessionView: View {
                 .font(.caption.weight(.semibold))
                 .buttonStyle(.plain)
             } else {
-                Text("Need more Research? Additional turns do not expire and are used after the monthly included turns.")
+                Text("Need more Assistant turns? Additional turns do not expire and are used after the monthly included turns.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -1821,11 +1821,13 @@ private struct ResearchSessionView: View {
     private func researchTitle(for summary: ResearchConversationSummary) -> String {
         let title = summary.title.trimmingCharacters(in: .whitespacesAndNewlines)
         if ["manual", "summary"].contains(summary.titleSource ?? ""), !title.isEmpty { return title }
-        let automaticTitle = title.isEmpty || title.range(of: #"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·"#, options: .regularExpression) != nil
+        let legacyPlaceholder = summary.titleSource == "default" && title == "New Research"
+        let automaticTitle = title.isEmpty || legacyPlaceholder
+            || title.range(of: #"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·"#, options: .regularExpression) != nil
         if !automaticTitle { return title }
         if let question = summary.starterQuestion?.trimmingCharacters(in: .whitespacesAndNewlines), !question.isEmpty { return question }
-        if summary.messageCount == 0 { return summary.sourceCount > 0 ? "Draft with selected evidence" : "Research draft" }
-        return title.isEmpty ? "Research conversation" : title
+        if summary.messageCount == 0 { return summary.sourceCount > 0 ? "Draft with selected evidence" : "Assistant draft" }
+        return title.isEmpty || legacyPlaceholder ? "Assistant conversation" : title
     }
 
     private func requestDeletion(id: String) {
@@ -1951,7 +1953,7 @@ private struct ResearchSessionView: View {
             if NativePrivateCachePolicy.requiresInvalidation(after: error) {
                 invalidateHistoryCache(accountID: owner.accountID)
             }
-            historyErrorMessage = summaries.isEmpty ? error.localizedDescription : "Showing saved Research history. Could not refresh: \(error.localizedDescription)"
+            historyErrorMessage = summaries.isEmpty ? error.localizedDescription : "Showing saved Assistant history. Could not refresh: \(error.localizedDescription)"
         }
     }
 
@@ -1983,7 +1985,7 @@ private struct ResearchSessionView: View {
                 invalidateHistoryCache(accountID: owner.accountID)
             }
             historyErrorMessage = summaries.isEmpty ? error.localizedDescription
-                : "Could not load older Research. Your current results are still here. \(error.localizedDescription)"
+                : "Could not load older conversations. Your current results are still here. \(error.localizedDescription)"
         }
     }
 
@@ -2532,7 +2534,7 @@ private struct ResearchSessionView: View {
             guard isCurrentOwner else { return }
             await loadHistory(forceNetwork: true)
             guard isCurrentOwner else { return }
-            errorMessage = "Couldn’t delete that Research conversation. Try again."
+            errorMessage = "Couldn’t delete that conversation. Try again."
         }
     }
 
@@ -2657,7 +2659,7 @@ private struct ResearchSessionView: View {
     private func persistComposerDraft(_ text: String) {
         guard isCurrentOwner, let owner, let id = conversation?.id,
               id == library.activeResearchConversationID else { return }
-        let failureMessage = "This draft could not be saved on this device. Keep Research open and try editing again."
+        let failureMessage = "This draft could not be saved on this device. Keep Assistant open and try editing again."
         do {
             try ResearchComposerDraftCache.save(text, cache: cache, accountID: owner.accountID, conversationID: id)
             if questionErrorMessage == failureMessage { questionErrorMessage = nil }
@@ -2710,7 +2712,7 @@ private struct ResearchDisclosureAcknowledgementSheet: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 18) {
-                Text("Before you use Research")
+                Text("Before you use Assistant")
                     .font(.title2.weight(.bold))
                 Label("What is sent", systemImage: "arrow.up.doc")
                     .font(.headline)
@@ -2722,7 +2724,7 @@ private struct ResearchDisclosureAcknowledgementSheet: View {
                     .foregroundStyle(.secondary)
                 Link("Read the Privacy Policy", destination: URL(string: "https://per.codes/privacy")!)
                 Spacer()
-                Button("Continue to Research", action: onContinue)
+                Button("Continue to Assistant", action: onContinue)
                     .buttonStyle(.borderedProminent)
                     .tint(.blue)
                     .foregroundStyle(.white)
@@ -2731,7 +2733,7 @@ private struct ResearchDisclosureAcknowledgementSheet: View {
                     .frame(maxWidth: .infinity)
             }
             .padding(20)
-            .navigationTitle("Research Notice")
+            .navigationTitle("Assistant Notice")
             .navigationBarTitleDisplayMode(.inline)
             .interactiveDismissDisabled()
         }
@@ -2790,11 +2792,11 @@ private struct ResearchFeedbackSheet: View {
                 TextField("Supporting section or official source (optional)", text: $supportingReference)
                 TextField("Optional details", text: $comment, axis: .vertical)
                     .lineLimit(3...8)
-                Text("Reports help per codes investigate and correct Research quality. Internal review notes are never shown here.")
+                Text("Reports help per codes investigate and improve Assistant answers. Internal review notes are never shown here.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            .navigationTitle("Research feedback")
+            .navigationTitle("Assistant feedback")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel", action: onCancel) }
@@ -2822,7 +2824,7 @@ private struct ResearchVisualReviewSheet: View {
                     VStack(alignment: .leading, spacing: 7) {
                         Text("Review official visual evidence")
                             .font(.title2.weight(.bold))
-                        Text("This enacted section contains official visual material. Select only the images per codes should analyze with your passage.")
+                        Text("This enacted section contains official visual material. Choose which images to keep with this passage.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Text("Select up to \(review.maximumVisualSelections) official images.")
@@ -2834,7 +2836,7 @@ private struct ResearchVisualReviewSheet: View {
                         visualSourceButton(source)
                     }
 
-                    Text("per codes will preserve the exact selected image bytes and their integrity identity with the Research record.")
+                    Text("per codes will preserve the exact selected image bytes and their integrity identity with the evidence record.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Text(ResearchTrustCopy.visualEvidenceDisclosure)
@@ -2876,7 +2878,7 @@ private struct ResearchVisualReviewSheet: View {
     private var confirmButtonTitle: String {
         let count = selectedSourceIDs.count
         guard count > 0 else { return "Select an image" }
-        return "Attach \(count) image\(count == 1 ? "" : "s") and add to Research"
+        return "Add passage with \(count) image\(count == 1 ? "" : "s")"
     }
 
     private func visualSourceButton(_ source: ResearchVisualSource) -> some View {
@@ -3029,7 +3031,7 @@ private struct ResearchFormattedNarrative: View {
             }
         }
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("Research answer comparison table")
+        .accessibilityLabel("Assistant answer comparison table")
     }
 
     private static func blocks(in value: String) -> [Block] {
@@ -3200,7 +3202,7 @@ private struct ResearchAnswerView: View {
             Color.clear
                 .frame(width: 1, height: 1)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Research answer ready")
+                .accessibilityLabel("Assistant answer ready")
                 .accessibilityIdentifier("research-answer")
                 .allowsHitTesting(false)
         }
@@ -3220,7 +3222,7 @@ private struct ResearchAnswerView: View {
                 }
                 .textSelection(.enabled)
                 .accessibilityElement(children: .contain)
-                .accessibilityLabel("Research corpus editions and applicability")
+                .accessibilityLabel("Code library editions and applicability")
                 .accessibilityIdentifier("research-answer-corpus-metadata")
             }
             projectFactsDisclosure
@@ -3301,7 +3303,7 @@ private struct ResearchAnswerView: View {
             answer.researchMetadataText(sourceStatus: sourceStatus),
             disclosedBasis?.isEmpty == false ? disclosedBasis : answer.codeEdition,
             basisLimitation?.isEmpty == false ? basisLimitation : nil,
-            captured.map { "Research basis captured \($0)" }
+            captured.map { "Evidence basis captured \($0)" }
         ]
             .compactMap { $0 }
             .filter { !$0.isEmpty }
@@ -3333,7 +3335,7 @@ private struct ResearchAnswerView: View {
             DisclosureGroup("Facts used in this answer") {
                 VStack(alignment: .leading, spacing: 7) {
                     answerInlineGroup("Project context", items: answer.factUsage?.projectContext ?? [])
-                    answerInlineGroup("Research conversation", items: answer.factUsage?.conversation ?? [])
+                    answerInlineGroup("Assistant conversation", items: answer.factUsage?.conversation ?? [])
                     answerInlineGroup("Other supplied facts", items: answer.factUsage?.other ?? [])
                 }
                 .font(.caption)

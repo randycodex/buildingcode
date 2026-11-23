@@ -12,7 +12,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             return reading
         }
         let ids = ["Saved": "main-tab-saved", "First reader": "main-tab-reader-1",
-                   "Second reader": "main-tab-reader-2", "Research": "main-tab-research"]
+                   "Second reader": "main-tab-reader-2", "Assistant": "main-tab-research"]
         return app.buttons.matching(NSPredicate(format: "identifier == %@ OR label == %@", ids[title] ?? title, title)).firstMatch
     }
 
@@ -33,12 +33,15 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
                                                        "saved-folder-", "Acceptance Project")).firstMatch
         XCTAssertTrue(project.waitForExistence(timeout: 10))
         project.tap()
-        app.buttons["main-tab-research"].tap()
-        let newResearch = app.buttons["New Research"]
+        let assistantTab = app.buttons["main-tab-research"]
+        XCTAssertEqual(assistantTab.label, "Assistant")
+        assistantTab.tap()
+        XCTAssertTrue(app.staticTexts["screen-title-Assistant"].waitForExistence(timeout: 10))
+        let newResearch = app.buttons["New conversation"]
         XCTAssertTrue(newResearch.waitForExistence(timeout: 15))
         newResearch.tap()
 
-        let actions = app.buttons["Research actions"]
+        let actions = app.buttons["Assistant actions"]
         let toggle = app.descendants(matching: .any).matching(identifier: "Include project context and facts").firstMatch
         XCTAssertTrue(element(in: app, identifier: "research-composer").waitForExistence(timeout: 15))
         XCTAssertFalse(app.buttons["Review included Project context and facts"].exists)
@@ -56,7 +59,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(toggle.isSelected)
         toggle.tap()
         XCTAssertTrue(actions.wait(for: \.isEnabled, toEqual: true, timeout: 10))
-        app.buttons["Research history"].tap()
+        app.buttons["Assistant history"].tap()
         let conversation = app.buttons.matching(identifier: "research-history-row").firstMatch
         XCTAssertTrue(conversation.waitForExistence(timeout: 15))
         conversation.tap()
@@ -94,8 +97,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Six project cards and four tabs", from: app)
         let researchTab = app.buttons["main-tab-research"]
         researchTab.tap()
-        XCTAssertFalse(app.staticTexts["Loading Research…"].exists)
-        let newResearch = app.buttons["New Research"]
+        XCTAssertFalse(app.staticTexts["Loading Assistant…"].exists)
+        let newResearch = app.buttons["New conversation"]
         XCTAssertTrue(newResearch.waitForExistence(timeout: 15))
         XCTAssertFalse(app.buttons["research-history-project-filter"].exists)
         let historySearch = app.textFields["research-history-search"]
@@ -112,15 +115,15 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["Clear history search"].tap()
         app.keyboards.buttons["Search"].tap()
         newResearch.tap()
-        let back = app.buttons["Research history"]
+        let back = app.buttons["Assistant history"]
         XCTAssertTrue(back.waitForExistence(timeout: 15))
         XCTAssertLessThan(back.frame.midX, app.frame.midX)
         XCTAssertFalse(app.staticTexts["Acceptance Project"].isHittable)
         keepScreenshot(named: "Research conversation with leading back button", from: app)
         XCTAssertFalse(app.buttons["research-project-context-menu"].exists)
-        app.buttons["Research actions"].tap()
+        app.buttons["Assistant actions"].tap()
         app.buttons["Delete"].tap()
-        let deletion = app.alerts["Delete Research conversation?"]
+        let deletion = app.alerts["Delete conversation?"]
         XCTAssertTrue(deletion.staticTexts["This cannot be undone."].exists)
         deletion.buttons["Cancel"].tap()
         let composer = element(in: app, identifier: "research-composer")
@@ -144,7 +147,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         historySearch.tap()
         historySearch.typeText("No matching draft")
         app.keyboards.buttons["Search"].tap()
-        XCTAssertTrue(app.staticTexts["No matching Research"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["No matching conversations"].waitForExistence(timeout: 5))
         XCTAssertEqual(selectionCount.label, "0 selected")
         XCTAssertFalse(app.buttons["Delete selected conversations"].isEnabled)
         let cancelSelection = app.navigationBars.firstMatch.buttons["Cancel"]
@@ -186,10 +189,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(app.tabBars.count, 0)
         openProject("Correction Project")
         app.buttons["main-tab-research"].tap()
-        XCTAssertTrue(app.buttons["New Research"].waitForExistence(timeout: 15))
-        XCTAssertTrue(app.staticTexts["No Research yet"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["New conversation"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["No conversations yet"].waitForExistence(timeout: 15))
         researchTab.tap()
-        XCTAssertTrue(app.staticTexts["No Research yet"].isHittable)
+        XCTAssertTrue(app.staticTexts["No conversations yet"].isHittable)
         XCTAssertFalse(app.buttons.matching(identifier: "research-history-row").firstMatch.exists)
         keepScreenshot(named: "Correction Project has separate Research", from: app)
         XCTAssertFalse(app.buttons["project-close"].exists)
@@ -439,7 +442,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(chapters.waitForExistence(timeout: 10))
         let titleFrame = chapters.frame
         keepScreenshot(named: "Aligned Chapters title", from: app)
-        for (tab, title) in [("research", "Research"), ("search", "Search")] {
+        for (tab, title) in [("research", "Assistant"), ("search", "Search")] {
             app.buttons["main-tab-\(tab)"].tap()
             let heading = app.staticTexts["screen-title-\(title)"]
             XCTAssertTrue(heading.waitForExistence(timeout: 10))
@@ -514,8 +517,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(isPinned(chapters), "Scrolling back restores Chapters")
         keepScreenshot(named: "Chapters restored after scrolling back", from: app)
         app.buttons["main-tab-research"].tap()
-        XCTAssertTrue(app.buttons["New Research"].waitForExistence(timeout: 15))
-        XCTAssertFalse(app.staticTexts["Loading Research…"].exists)
+        XCTAssertTrue(app.buttons["New conversation"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.staticTexts["Loading Assistant…"].exists)
         app.buttons["main-tab-saved"].tap()
         XCTAssertTrue(element(in: app, identifier: "project-folder-root").waitForExistence(timeout: 10))
         app.buttons["project-close"].tap()
@@ -598,14 +601,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         closePassage.tap()
         XCTAssertTrue(searchField.waitForExistence(timeout: 10))
         app.buttons["main-tab-research"].tap()
-        let researchHeading = app.staticTexts["screen-title-Research"]
+        let researchHeading = app.staticTexts["screen-title-Assistant"]
         let researchList = element(in: app, identifier: "research-history-list")
         let researchRow = app.buttons.matching(identifier: "research-history-row").firstMatch
         XCTAssertTrue(researchRow.waitForExistence(timeout: 15))
         let researchHeadingFrame = researchHeading.frame
         researchList.swipeUp()
         XCTAssertEqual(researchHeading.frame.minY, researchHeadingFrame.minY, accuracy: 1)
-        XCTAssertTrue(app.buttons["New Research"].isHittable)
+        XCTAssertTrue(app.buttons["New conversation"].isHittable)
         keepScreenshot(named: "Scrolled Research with a transparent header", from: app)
         app.buttons["main-tab-saved"].tap()
         app.buttons["main-tab-saved"].tap()
@@ -836,7 +839,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(value.waitForExistence(timeout: 5))
         XCTAssertTrue((value.value as? String ?? "").contains("phone edit"))
         app.buttons["main-tab-research"].tap()
-        XCTAssertTrue(app.buttons["New Research"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["New conversation"].waitForExistence(timeout: 15))
         app.buttons["main-tab-saved"].tap()
         XCTAssertTrue(overviewBar.buttons["Cancel"].waitForExistence(timeout: 5),
                       "Returning to Project should restore Facts and its edit mode.")
@@ -1485,7 +1488,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
         let savedTab = navigationButton(in: app, title: "Saved")
         XCTAssertTrue(savedTab.waitForExistence(timeout: 45))
-        for label in ["First reader", "Second reader", "Search", "Research"] {
+        for label in ["First reader", "Second reader", "Search", "Assistant"] {
             XCTAssertTrue(navigationButton(in: app, title: label).exists, "The tab must expose its destination name: \(label).")
         }
         savedTab.tap()
@@ -1555,7 +1558,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         if app.buttons["Close search"].exists {
             XCTAssertTrue(app.buttons["Close search"].isHittable)
         } else {
-            for label in ["Saved", "First reader", "Second reader", "Research"] {
+            for label in ["Saved", "First reader", "Second reader", "Assistant"] {
                 XCTAssertTrue(navigationButton(in: app, title: label).isHittable)
             }
         }
@@ -2247,12 +2250,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(composer.waitForExistence(timeout: 45), phase3LaunchFailureDescription(in: app))
         composer.tap()
         composer.typeText("Synthetic delayed private question")
-        app.buttons["Send Research question"].tap()
-        let disclosure = app.buttons["Continue to Research"]
+        app.buttons["Send message"].tap()
+        let disclosure = app.buttons["Continue to Assistant"]
         if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
         XCTAssertTrue(app.buttons["research-cancel-request"].waitForExistence(timeout: 3))
-        app.buttons["Research history"].tap()
-        app.buttons["New Research"].tap()
+        app.buttons["Assistant history"].tap()
+        app.buttons["New conversation"].tap()
         XCTAssertTrue(composer.waitForExistence(timeout: 5))
         let oldAnswer = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "The selected enacted provision controls")).firstMatch
         let noStaleAnswer = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == true"), object: oldAnswer)
@@ -2270,8 +2273,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(composer.waitForExistence(timeout: 45))
         composer.tap()
         composer.typeText("Synthetic next-step guidance question")
-        app.buttons["Send Research question"].tap()
-        let disclosure = app.buttons["Continue to Research"]
+        app.buttons["Send message"].tap()
+        let disclosure = app.buttons["Continue to Assistant"]
         if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
         XCTAssertTrue(element(in: app, identifier: "research-answer").waitForExistence(timeout: 15))
         let guidance = element(in: app, identifier: "research-next-step-guidance")
@@ -2315,7 +2318,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
         var positions: [CGFloat] = []
         var controlPositions: [CGFloat] = []
-        for (tab, title) in [("main-tab-saved", "Saved"), ("main-tab-research", "Research"),
+        for (tab, title) in [("main-tab-saved", "Saved"), ("main-tab-research", "Assistant"),
                              ("main-tab-reader-1", "reader-main-title"), ("main-tab-reader-2", "reader-main-title")] {
             app.buttons[tab].tap()
             let heading = title == "reader-main-title"
@@ -2324,7 +2327,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             XCTAssertTrue(heading.waitForExistence(timeout: 15), app.debugDescription)
             positions.append(heading.frame.midY)
             let controlLabel = title == "reader-main-title" ? "reader-code-picker"
-                : title == "Saved" ? "New project" : "New Research"
+                : title == "Saved" ? "New project" : "New conversation"
             let control = app.buttons[controlLabel].firstMatch
             XCTAssertTrue(control.isHittable, app.debugDescription)
             controlPositions.append(control.frame.midY)
@@ -4085,7 +4088,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }
         close.tap()
         app.buttons["main-tab-research"].tap()
-        XCTAssertTrue(app.staticTexts["Research requires Pro"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Assistant requires Pro"].waitForExistence(timeout: 10))
         keepScreenshot(named: guest ? "Guest Research" : "Free Research", from: app)
         app.buttons["research-recovery-action"].tap()
         XCTAssertTrue(close.waitForExistence(timeout: 10))
@@ -4213,7 +4216,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(failures.count, 1)
         let diagnostics = element(in: app, identifier: "research-server-failure-diagnostics")
         XCTAssertEqual(diagnostics.value as? String, "requests:0:none")
-        app.buttons["Research history"].tap()
+        app.buttons["Assistant history"].tap()
         let history = app.buttons.matching(identifier: "research-history-row").firstMatch
         XCTAssertTrue(history.waitForExistence(timeout: 5))
         history.tap()
@@ -4222,7 +4225,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(diagnostics.value as? String, "requests:0:none")
         keepScreenshot(named: "Server-only Research failure restored once without request", from: app)
         app.buttons["Try again"].tap()
-        let disclosure = app.buttons["Continue to Research"]
+        let disclosure = app.buttons["Continue to Assistant"]
         if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
         let completed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             (diagnostics.value as? String) == "requests:1:server-original-request" && failures.count == 0 && questions.count == 1
@@ -4243,15 +4246,15 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(composer.waitForExistence(timeout: 45), app.debugDescription)
         composer.tap()
         composer.typeText("Accessible ramp requirements?")
-        app.buttons["Send Research question"].tap()
-        let disclosure = app.buttons["Continue to Research"]
+        app.buttons["Send message"].tap()
+        let disclosure = app.buttons["Continue to Assistant"]
         if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
         let failure = app.staticTexts.matching(NSPredicate(
             format: "label == %@",
             "per codes could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here."
         )).firstMatch
         XCTAssertTrue(failure.waitForExistence(timeout: 10), app.debugDescription)
-        app.buttons["Research history"].tap()
+        app.buttons["Assistant history"].tap()
         let history = app.buttons.matching(identifier: "research-history-row").firstMatch
         XCTAssertTrue(history.waitForExistence(timeout: 5), app.debugDescription)
         history.tap()
@@ -4292,7 +4295,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "Research did not preserve the selected enacted passage."
         )
 
-        app.buttons["Research actions"].tap()
+        app.buttons["Assistant actions"].tap()
         let projectContext = element(in: app, identifier: "research-project-context-menu")
         XCTAssertTrue(projectContext.waitForExistence(timeout: 5), "Active Project context is not visible.")
         XCTAssertTrue(
@@ -4303,7 +4306,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
         composer.tap()
         composer.typeText("What does this enacted provision establish?")
-        let send = app.buttons["Send Research question"]
+        let send = app.buttons["Send message"]
         XCTAssertTrue(send.isEnabled, "The deterministic Research question was not sendable.")
         send.tap()
 
@@ -4650,7 +4653,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         // entitlement, authentication bypass, purchases, or content writes.
         app.launchArguments = []
         app.launchEnvironment = [:]
-        let deniedLabels = ["Saved work requires Pro", "Research requires Pro", "View Plans", "Account type: Free"]
+        let deniedLabels = ["Saved work requires Pro", "Assistant requires Pro", "View Plans", "Account type: Free"]
         func assertNoPaywall(_ stage: String) {
             let denied = app.descendants(matching: .any).matching(NSPredicate(format: "label IN %@", deniedLabels)).firstMatch
             XCTAssertFalse(denied.exists, "Real Pro account unexpectedly showed a lock or Free plan during \(stage)")
@@ -4722,7 +4725,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
         app.buttons["main-tab-research"].tap()
         XCTAssertTrue(pending.waitForExistence(timeout: 10))
-        XCTAssertFalse(app.staticTexts["Research requires Pro"].exists)
+        XCTAssertFalse(app.staticTexts["Assistant requires Pro"].exists)
         keepScreenshot(named: "Entitlement pending Research", from: app)
 
         app.buttons["native-entitlement-fixture-plan"].tap()
@@ -4737,7 +4740,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
         app.buttons["native-entitlement-fixture-release"].tap()
         XCTAssertTrue(waitForNonexistence(pending, timeout: 15))
-        XCTAssertFalse(app.staticTexts["Research requires Pro"].exists)
+        XCTAssertFalse(app.staticTexts["Assistant requires Pro"].exists)
         saved.tap()
         XCTAssertFalse(pending.exists)
         XCTAssertFalse(app.staticTexts["Saved work requires Pro"].exists)
