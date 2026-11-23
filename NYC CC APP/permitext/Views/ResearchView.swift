@@ -1389,7 +1389,7 @@ private struct ResearchSessionView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            VStack(alignment: .trailing, spacing: CodeScreenMetrics.researchComposerRowSpacing) {
+            HStack(alignment: .bottom, spacing: 4) {
                 TextField("Message", text: Binding(
                     get: { question },
                     set: { text in
@@ -1400,68 +1400,38 @@ private struct ResearchSessionView: View {
                     .textFieldStyle(.plain)
                     .font(.body)
                     .lineLimit(1...6)
-                    .padding(.horizontal, CodeScreenMetrics.cardPadding)
-                    .padding(.top, CodeScreenMetrics.rowVerticalPadding)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 4)
+                    .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.toolbarButtonSize, alignment: .leading)
                     .disabled(isSending || researchSendIsBlocked)
                     .accessibilityIdentifier("research-composer")
-                HStack(spacing: 0) {
-                    Button {
-                        persistComposerDraft(question)
-                        library.selectedTab = .browse
-                    } label: {
-                        Image(systemName: "plus")
-                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(isSending)
-                    .accessibilityLabel("Attach passage from Reader")
-                    .accessibilityIdentifier("research-attach-passage")
-                    Spacer(minLength: 0)
+                Button {
                     if isSending {
-                        Button {
-                            cancelActiveResearchRequest()
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.title3.weight(.semibold))
-                                .frame(
-                                    width: CodeScreenMetrics.toolbarButtonSize,
-                                    height: CodeScreenMetrics.toolbarButtonSize
-                                )
-                                .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Cancel Assistant request")
-                        .accessibilityIdentifier("research-cancel-request")
+                        cancelActiveResearchRequest()
                     } else {
-                        Button {
-                            startQuestionRequest()
-                        } label: {
-                            Image(systemName: "arrow.up")
-                                .font(.title3.weight(.bold))
-                                .foregroundStyle(.primary)
-                                .frame(
-                                    width: CodeScreenMetrics.toolbarButtonSize,
-                                    height: CodeScreenMetrics.toolbarButtonSize
-                                )
-                                .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(
-                            question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
-                            researchSendIsBlocked
-                        )
-                        .accessibilityLabel("Send message")
+                        startQuestionRequest()
                     }
+                } label: {
+                    Image(systemName: isSending ? "xmark" : "arrow.up")
+                        .font(.title3.weight(isSending ? .semibold : .bold))
+                        .foregroundStyle(.primary)
+                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        .contentShape(Rectangle())
                 }
-                .padding(.trailing, 8)
-                .padding(.bottom, 8)
+                .buttonStyle(.plain)
+                .disabled(!isSending && (question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 || researchSendIsBlocked))
+                .accessibilityLabel(isSending ? "Cancel Assistant request" : "Send message")
+                .accessibilityIdentifier(isSending ? "research-cancel-request" : "research-send-message")
             }
+            .padding(.leading, CodeScreenMetrics.cardPadding)
+            .padding(.trailing, 4)
+            .padding(.vertical, 4)
+            .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
             .codeLiquidGlassRoundedRectangle(cornerRadius: CodeScreenMetrics.researchComposerCornerRadius)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("research-composer-bar")
         }
-        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-        .padding(.bottom, 8)
+        .codeTabAlignedHorizontalPadding()
+        .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
     }
 
     private var researchSendIsBlocked: Bool {

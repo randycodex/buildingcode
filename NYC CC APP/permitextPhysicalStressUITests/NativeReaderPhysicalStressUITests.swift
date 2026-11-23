@@ -126,9 +126,17 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(deletion.staticTexts["This cannot be undone."].exists)
         deletion.buttons["Cancel"].tap()
         let composer = element(in: app, identifier: "research-composer")
-        let draft = "Draft retained when returning to Research"
+        let composerBar = element(in: app, identifier: "research-composer-bar")
+        XCTAssertTrue(composerBar.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["research-attach-passage"].exists)
+        let compactComposer = composerBar.frame
+        XCTAssertEqual(composer.frame.midY, app.buttons["Send message"].frame.midY, accuracy: 1)
+        keepScreenshot(named: "Compact Assistant composer without the plus button", from: app)
+        let draft = "Draft retained when returning to Research. This second sentence wraps in the Assistant message field."
         composer.tap()
         composer.typeText(draft)
+        XCTAssertGreaterThan(composerBar.frame.height, compactComposer.height)
+        keepScreenshot(named: "Assistant composer expands for wrapped text", from: app)
         back.tap()
         let conversationRow = app.buttons.matching(identifier: "research-history-row").firstMatch
         XCTAssertTrue(conversationRow.waitForExistence(timeout: 15))
@@ -170,6 +178,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let codeSearchFrame = bottomSearchBar.frame
         assertFloatingMenuWidth(codeSearchFrame, in: app)
         XCTAssertEqual(codeSearchFrame.height, 52, accuracy: 2)
+        XCTAssertEqual(compactComposer.height, codeSearchFrame.height, accuracy: 1)
+        XCTAssertEqual(compactComposer.minX, codeSearchFrame.minX, accuracy: 1)
+        XCTAssertEqual(compactComposer.maxX, codeSearchFrame.maxX, accuracy: 1)
         keepScreenshot(named: "Code Search keeps its bottom bar", from: app)
         researchTab.tap()
         XCTAssertTrue(composer.waitForExistence(timeout: 10))

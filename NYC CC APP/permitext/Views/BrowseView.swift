@@ -1484,7 +1484,6 @@ extension EnvironmentValues {
 enum CodeScreenMetrics {
     static let searchFieldHorizontalPadding: CGFloat = 14
     static let researchComposerCornerRadius: CGFloat = 24
-    static let researchComposerRowSpacing: CGFloat = 4
     static let bottomSearchContentClearance: CGFloat = bottomControlHeight + (rowVerticalPadding * 2)
     static let projectEvidenceHeadingHeight: CGFloat = 36
     static let readerPassageActionSpacing: CGFloat = 8
