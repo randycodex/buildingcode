@@ -64,9 +64,16 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         weak var view: RichTextView?
     }
 
+    private struct HandleAdjustment {
+        let originalRange: NativeChapterSelectionRange
+        let movesStart: Bool
+        let fingerOffset: CGPoint
+    }
+
     private weak var scrollView: UIScrollView?
     private weak var origin: RichTextView?
     private weak var nativeSelectionView: RichTextView?
+    private weak var nativeHandleOrigin: RichTextView?
     private var mountedText: [NativeChapterSelectionAddress: MountedText] = [:]
     private var initialPosition: NativeChapterSelectionPosition?
     private var initialWord: NSRange?
@@ -78,6 +85,9 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
     private var displayLink: CADisplayLink?
     private var isDragging = false
     private var menuID: UUID?
+    private var handleAdjustment: HandleAdjustment?
+    private lazy var startHandle = makeHandle(movesStart: true)
+    private lazy var endHandle = makeHandle(movesStart: false)
 
     var resolveText: ((NativeChapterSelectionRange) -> NativeChapterSelectedText)?
     var askAssistant: (([ResearchSelectionRequest]) -> Void)?
@@ -108,6 +118,8 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         guard self.scrollView !== scrollView else { return }
         if let previous = self.scrollView {
             clear()
+            startHandle.removeFromSuperview()
+            endHandle.removeFromSuperview()
             previous.removeGestureRecognizer(press)
             previous.removeGestureRecognizer(pointerDrag)
             previous.removeInteraction(editMenu)
@@ -121,18 +133,28 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
     func register(_ view: RichTextView, address: NativeChapterSelectionAddress) {
         mountedText[address] = MountedText(view: view)
         if let selection { highlight(view, address: address, selection: selection) }
+        layoutSelectionHandles(for: view)
     }
 
     func unregister(_ view: RichTextView, address: NativeChapterSelectionAddress) {
-        if mountedText[address]?.view === view { mountedText.removeValue(forKey: address) }
+        let removed = mountedText[address]?.view === view
+        if removed { mountedText.removeValue(forKey: address) }
         if highlighted[address]?.view === view { highlighted.removeValue(forKey: address) }
         view.showChapterSelection(nil)
+        if nativeHandleOrigin === view {
+            nativeSelectionDidEnd(in: view)
+        } else if removed, let selection, address == selection.start.address || address == selection.end.address {
+            layoutSelectionHandles()
+        }
     }
 
     func clear() {
         menuID = nil
         editMenu.dismissMenu()
         finishDrag()
+        let nativeSelection = nativeHandleOrigin
+        nativeHandleOrigin = nil
+        nativeSelection?.selectedTextRange = nil
         clearHighlight()
     }
 
@@ -141,12 +163,14 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         highlighted.removeAll()
         selection = nil
         finalText = nil
+        layoutSelectionHandles()
     }
 
     private func finishDrag() {
         stopAutoscroll()
         nativeSelectionView?.isSelectable = true
         nativeSelectionView = nil
+        handleAdjustment = nil
         isDragging = false
         initialPosition = nil
         initialWord = nil
@@ -154,6 +178,7 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
     }
 
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if gestureRecognizer.view is NativeChapterSelectionHandle { return adjustableRange != nil }
         var candidate = touch.view
         while let view = candidate, view !== scrollView {
             if let text = view as? RichTextView, text.chapterSelectionTarget?.controller === self {
@@ -172,7 +197,8 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
 
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                            shouldBeRequiredToFailBy other: UIGestureRecognizer) -> Bool {
-        gestureRecognizer === pointerDrag && other === scrollView?.panGestureRecognizer
+        (gestureRecognizer === pointerDrag || gestureRecognizer.view is NativeChapterSelectionHandle)
+            && other === scrollView?.panGestureRecognizer
     }
 
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
@@ -183,14 +209,138 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         return otherView === origin || otherView.isDescendant(of: origin)
     }
 
+    func nativeSelectionDidChange(in view: RichTextView) {
+        guard !isDragging else { return }
+        guard view.selectedRange.length > 0 else {
+            nativeSelectionDidEnd(in: view)
+            return
+        }
+        nativeHandleOrigin = view
+        if selection != nil {
+            menuID = nil
+            editMenu.dismissMenu()
+            clearHighlight()
+        } else {
+            layoutSelectionHandles()
+        }
+    }
+
+    func nativeSelectionDidEnd(in view: RichTextView) {
+        guard nativeHandleOrigin === view else { return }
+        nativeHandleOrigin = nil
+        layoutSelectionHandles()
+    }
+
+    func nativeEditMenuDidAppear(in view: RichTextView) {
+        guard selection == nil, !isDragging, let scrollView else { return }
+        nativeSelectionDidChange(in: view)
+        for handle in [startHandle, endHandle] where handle.superview === scrollView {
+            scrollView.bringSubviewToFront(handle)
+        }
+    }
+
+    private var adjustableRange: NativeChapterSelectionRange? {
+        if let selection { return selection }
+        guard let view = nativeHandleOrigin, let address = view.chapterSelectionTarget?.address,
+              view.selectedRange.length > 0 else { return nil }
+        return NativeChapterSelectionRange(
+            .init(address: address, offset: view.selectedRange.location),
+            .init(address: address, offset: NSMaxRange(view.selectedRange))
+        )
+    }
+
+    private func makeHandle(movesStart: Bool) -> NativeChapterSelectionHandle {
+        let handle = NativeChapterSelectionHandle(movesStart: movesStart)
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(adjustHandle(_:)))
+        pan.maximumNumberOfTouches = 1
+        pan.delegate = self
+        handle.addGestureRecognizer(pan)
+        return handle
+    }
+
+    func layoutSelectionHandles(for view: RichTextView) {
+        guard let range = adjustableRange, let address = view.chapterSelectionTarget?.address,
+              address == range.start.address || address == range.end.address else { return }
+        layoutSelectionHandles()
+    }
+
+    private func layoutSelectionHandles() {
+        // Let a continuous hold-and-drag finish before installing overlays over UIKit's handles.
+        guard let scrollView, let range = adjustableRange, initialPosition == nil else {
+            startHandle.isHidden = true
+            endHandle.isHidden = true
+            return
+        }
+        layout(startHandle, at: range.start, in: scrollView)
+        layout(endHandle, at: range.end, in: scrollView)
+    }
+
+    private func layout(_ handle: NativeChapterSelectionHandle, at endpoint: NativeChapterSelectionPosition,
+                        in scrollView: UIScrollView) {
+        guard let geometry = caretGeometry(at: endpoint, in: scrollView) else {
+            handle.isHidden = handle !== activeHandle
+            return
+        }
+        if handle.superview !== scrollView { scrollView.addSubview(handle) }
+        handle.place(at: geometry.rect, color: geometry.color, drawsHandle: selection != nil)
+        handle.isHidden = false
+    }
+
+    private func caretGeometry(at endpoint: NativeChapterSelectionPosition,
+                               in scrollView: UIScrollView) -> (rect: CGRect, color: UIColor)? {
+        guard let view = mountedText[endpoint.address]?.view, view.window === scrollView.window,
+              view.convert(view.bounds, to: scrollView).intersects(scrollView.bounds),
+              let position = view.position(from: view.beginningOfDocument, offset: endpoint.offset) else { return nil }
+        let caret = view.convert(view.caretRect(for: position), to: scrollView)
+        guard !caret.isNull, caret.height > 0, caret.midX.isFinite, caret.midY.isFinite,
+              scrollView.bounds.minY...scrollView.bounds.maxY ~= caret.midY else { return nil }
+        return (caret, view.tintColor)
+    }
+
+    private var activeHandle: NativeChapterSelectionHandle? {
+        handleAdjustment.map { $0.movesStart ? startHandle : endHandle }
+    }
+
+    @objc private func adjustHandle(_ gesture: UIPanGestureRecognizer) {
+        guard let scrollView, let window = scrollView.window,
+              let handle = gesture.view as? NativeChapterSelectionHandle else { return }
+        fingerInWindow = gesture.location(in: window)
+        switch gesture.state {
+        case .began:
+            guard let range = adjustableRange else { return }
+            // Preserve where the user grabbed the handle, relative to its text position.
+            let touch = gesture.location(in: scrollView)
+            let translation = gesture.translation(in: scrollView)
+            let caret = handle.caretCenter
+            handleAdjustment = HandleAdjustment(originalRange: range, movesStart: handle.movesStart,
+                fingerOffset: CGPoint(x: touch.x - translation.x - caret.x, y: touch.y - translation.y - caret.y))
+            menuID = nil
+            editMenu.dismissMenu()
+            beginChapterSelection(in: nativeHandleOrigin)
+            applySelection(range)
+            updateDrag()
+        case .changed:
+            updateDrag()
+        case .ended, .cancelled:
+            guard let adjustment = handleAdjustment else { return }
+            if gesture.state == .cancelled { applySelection(adjustment.originalRange) } else { extendSelection() }
+            presentSelectionMenu()
+            finishDrag()
+            layoutSelectionHandles()
+        default:
+            break
+        }
+    }
+
     @objc private func handleDrag(_ gesture: UIGestureRecognizer) {
         guard let scrollView, let window = scrollView.window else { return }
         let isPointerDrag = gesture === pointerDrag
         fingerInWindow = gesture.location(in: window)
         switch gesture.state {
         case .began:
-            guard let origin, let target = origin.chapterSelectionTarget,
-                  let position = origin.closestPosition(to: initialTouch) else { return }
+            guard let origin, let target = origin.chapterSelectionTarget else { return }
+            if !isPointerDrag { initialTouch = gesture.location(in: origin) }
+            guard let position = origin.closestPosition(to: initialTouch) else { return }
             let offset = origin.offset(from: origin.beginningOfDocument, to: position)
             initialWord = nil
             if !isPointerDrag {
@@ -209,21 +359,13 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
             }
             if isPointerDrag { extendSelection() }
         case .changed:
-            extendSelection()
-            if isDragging && edgeSpeed != 0 { startAutoscroll() } else { stopAutoscroll() }
+            updateDrag()
         case .ended:
-            defer { finishDrag() }
             extendSelection()
-            guard isDragging, let selection, let content = resolveText?(selection),
-                  !content.text.isEmpty else {
-                clearHighlight()
-                return
-            }
-            finalText = content
-            let id = UUID()
-            menuID = id
-            let point = scrollView.convert(fingerInWindow, from: window)
-            editMenu.presentEditMenu(with: UIEditMenuConfiguration(identifier: id as NSUUID, sourcePoint: point))
+            let crossedBlocks = isDragging
+            if crossedBlocks { presentSelectionMenu() }
+            finishDrag()
+            if crossedBlocks { layoutSelectionHandles() } else { clearHighlight() }
         case .failed, .cancelled:
             finishDrag()
             clearHighlight()
@@ -231,43 +373,80 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         }
     }
 
+    private func updateDrag() {
+        extendSelection()
+        if isDragging && edgeSpeed != 0 { startAutoscroll() } else { stopAutoscroll() }
+    }
+
+    private func presentSelectionMenu() {
+        guard let scrollView, let window = scrollView.window, let selection,
+              let content = resolveText?(selection), !content.text.isEmpty else {
+            clearHighlight()
+            return
+        }
+        finalText = content
+        let id = UUID()
+        menuID = id
+        let point = scrollView.convert(fingerInWindow, from: window)
+        editMenu.presentEditMenu(with: UIEditMenuConfiguration(identifier: id as NSUUID, sourcePoint: point))
+    }
+
+    private func beginChapterSelection(in view: RichTextView?) {
+        isDragging = true
+        nativeHandleOrigin = nil
+        nativeSelectionView = view
+        view?.isSelectable = false
+        view?.resignFirstResponder()
+        view?.interactions.compactMap { $0 as? UIEditMenuInteraction }.forEach { $0.dismissMenu() }
+    }
+
     private func extendSelection() {
-        guard let initialPosition, let scrollView, let window = scrollView.window,
-              let endpoint = position(at: scrollView.convert(fingerInWindow, from: window)) else { return }
+        guard let scrollView, let window = scrollView.window else { return }
+        let finger = scrollView.convert(fingerInWindow, from: window)
+        if let adjustment = handleAdjustment {
+            let point = CGPoint(x: finger.x - adjustment.fingerOffset.x, y: finger.y - adjustment.fingerOffset.y)
+            guard let endpoint = position(at: point) else { return }
+            let fixed = adjustment.movesStart ? adjustment.originalRange.end : adjustment.originalRange.start
+            guard adjustment.movesStart ? endpoint < fixed : endpoint > fixed else { return }
+            applySelection(NativeChapterSelectionRange(fixed, endpoint))
+            return
+        }
+        guard let initialPosition, let endpoint = position(at: finger) else { return }
         if !isDragging {
             // Do not replace the native menu until the user drags beyond the first text view.
             let movedToScrollEdge = origin.map {
                 abs($0.convert(fingerInWindow, from: window).y - initialTouch.y) > 12 && edgeSpeed != 0
             } ?? false
             guard endpoint.address != initialPosition.address || movedToScrollEdge else { return }
-            isDragging = true
-            nativeSelectionView = origin
-            origin?.isSelectable = false
-            origin?.resignFirstResponder()
-            origin?.interactions.compactMap { $0 as? UIEditMenuInteraction }.forEach { $0.dismissMenu() }
+            beginChapterSelection(in: origin)
         }
         let anchorOffset = initialWord.map { endpoint < initialPosition ? NSMaxRange($0) : $0.location }
             ?? initialPosition.offset
         let anchor = NativeChapterSelectionPosition(address: initialPosition.address, offset: anchorOffset)
-        let range = NativeChapterSelectionRange(anchor, endpoint)
+        applySelection(NativeChapterSelectionRange(anchor, endpoint))
+    }
+
+    private func applySelection(_ range: NativeChapterSelectionRange) {
         guard selection != range else { return }
         selection = range
         for (address, entry) in mountedText {
             if let view = entry.view { highlight(view, address: address, selection: range) }
         }
+        layoutSelectionHandles()
     }
 
     private func position(at point: CGPoint) -> NativeChapterSelectionPosition? {
         guard let scrollView else { return nil }
-        var nearest: (address: NativeChapterSelectionAddress, view: RichTextView, distance: CGFloat)?
+        var nearest: (address: NativeChapterSelectionAddress, view: RichTextView, vertical: CGFloat, horizontal: CGFloat)?
         let viewport = scrollView.bounds
         for (address, entry) in mountedText {
             guard let view = entry.view, view.window === scrollView.window, !view.bounds.isEmpty else { continue }
             let bounds = view.convert(view.bounds, to: scrollView)
             guard bounds.intersects(viewport) else { continue }
-            let distance = max(bounds.minY - point.y, point.y - bounds.maxY, 0)
-            if distance < (nearest?.distance ?? .infinity) {
-                nearest = (address, view, distance)
+            let vertical = max(bounds.minY - point.y, point.y - bounds.maxY, 0)
+            let horizontal = max(bounds.minX - point.x, point.x - bounds.maxX, 0)
+            if nearest.map({ (vertical, horizontal, address) < ($0.vertical, $0.horizontal, $0.address) }) ?? true {
+                nearest = (address, view, vertical, horizontal)
             }
         }
         guard let nearest else { return nil }
@@ -340,6 +519,16 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
         }
     }
 
+    func editMenuInteraction(_ interaction: UIEditMenuInteraction,
+                             targetRectFor configuration: UIEditMenuConfiguration) -> CGRect {
+        guard let scrollView, let selection else { return .null }
+        // Keep the menu outside the visible grabbers so either end can be picked up again.
+        let rects = [selection.start, selection.end].compactMap { endpoint in
+            caretGeometry(at: endpoint, in: scrollView)?.rect.insetBy(dx: -8, dy: -28)
+        }
+        return rects.reduce(.null) { $0.union($1) }
+    }
+
     func editMenuInteraction(_ interaction: UIEditMenuInteraction, willDismissMenuFor configuration: UIEditMenuConfiguration,
                              animator: UIEditMenuInteractionAnimating) {
         guard let menuID, configuration.identifier as? NSUUID == menuID as NSUUID else { return }
@@ -348,5 +537,59 @@ final class NativeChapterSelectionController: NSObject, UIGestureRecognizerDeleg
             self.menuID = nil
             self.clearHighlight()
         }
+    }
+}
+
+/// Sits over the system handle until the drag takes ownership of the chapter range.
+/// The overlay has a touch target larger than the visible grabber.
+private final class NativeChapterSelectionHandle: UIView {
+    let movesStart: Bool
+    private let grip = CAShapeLayer()
+    private(set) var caretCenter = CGPoint.zero
+    private var drawnStemHeight: CGFloat = 0
+
+    init(movesStart: Bool) {
+        self.movesStart = movesStart
+        super.init(frame: .zero)
+        backgroundColor = .clear
+        layer.addSublayer(grip)
+        isAccessibilityElement = true
+        accessibilityLabel = movesStart ? "Start selection handle" : "End selection handle"
+        accessibilityIdentifier = movesStart ? "reader-selection-start-handle" : "reader-selection-end-handle"
+        accessibilityHint = "Drag to adjust the selected text."
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError("init(coder:) is unavailable") }
+
+    func place(at caret: CGRect, color: UIColor, drawsHandle: Bool) {
+        let stemWidth: CGFloat = 2.5
+        let radius: CGFloat = 8
+        let tip = CGPoint(x: caret.midX, y: movesStart ? caret.minY : caret.maxY)
+        let dot = CGPoint(x: tip.x, y: tip.y + (movesStart ? -radius : radius))
+        caretCenter = CGPoint(x: caret.midX, y: caret.midY)
+        let touchSize: CGFloat = 44
+        let newFrame = CGRect(x: dot.x - touchSize / 2, y: dot.y - touchSize / 2,
+                             width: touchSize, height: touchSize)
+        if frame != newFrame { frame = newFrame }
+        let fillColor = color.resolvedColor(with: traitCollection).cgColor
+        guard grip.isHidden == drawsHandle ||
+            (drawsHandle && (drawnStemHeight != caret.height || grip.fillColor != fillColor)) else { return }
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        grip.isHidden = !drawsHandle
+        if drawsHandle {
+            let center = CGPoint(x: bounds.midX, y: bounds.midY)
+            let stemY = movesStart ? center.y + radius : center.y - radius - caret.height
+            let path = UIBezierPath(ovalIn: CGRect(x: center.x - radius, y: center.y - radius,
+                                                  width: radius * 2, height: radius * 2))
+            path.append(UIBezierPath(roundedRect: CGRect(x: center.x - stemWidth / 2, y: stemY,
+                                                        width: stemWidth, height: caret.height),
+                                     cornerRadius: stemWidth / 2))
+            grip.path = path.cgPath
+            grip.fillColor = fillColor
+            drawnStemHeight = caret.height
+        }
+        CATransaction.commit()
     }
 }

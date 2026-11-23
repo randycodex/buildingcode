@@ -4347,6 +4347,101 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testChapterSelectionHandlesCrossSubsectionsAndCanBeAdjustedAgain() throws {
+#if !DEBUG
+        throw XCTSkip("Chapter selection uses the isolated Assistant fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+
+        func paragraph(containing text: String) -> XCUIElement {
+            app.textViews.matching(NSPredicate(format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@", text, text)).firstMatch
+        }
+        let first = paragraph(containing: "This code shall be known")
+        let second = paragraph(containing: "The provisions of this code shall apply")
+        XCTAssertTrue(first.wait(for: \.isHittable, toEqual: true, timeout: 20) && second.isHittable)
+        let firstFrame = first.frame
+        let screen = app.coordinate(withNormalizedOffset: .zero)
+        screen.withOffset(CGVector(dx: firstFrame.minX + firstFrame.width * 0.28,
+                                   dy: firstFrame.minY + firstFrame.height * 0.42)).doubleTap()
+
+        let start = element(in: app, identifier: "reader-selection-start-handle")
+        let end = element(in: app, identifier: "reader-selection-end-handle")
+        XCTAssertTrue(end.wait(for: \.isHittable, toEqual: true, timeout: 8), app.debugDescription)
+        let upperLine = second.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.24))
+        end.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.05, thenDragTo: upperLine, withVelocity: .slow, thenHoldForDuration: 0)
+        XCTAssertTrue(end.wait(for: \.isHittable, toEqual: true, timeout: 8))
+        let newY = end.frame.midY
+        XCTAssertGreaterThan(newY, second.frame.minY)
+
+        let lowerLine = second.coordinate(withNormalizedOffset: CGVector(dx: 0.55, dy: 0.7))
+        end.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.05, thenDragTo: lowerLine, withVelocity: .slow, thenHoldForDuration: 0)
+        XCTAssertTrue(end.wait(for: \.isHittable, toEqual: true, timeout: 8))
+        XCTAssertGreaterThan(end.frame.midY, newY + 8)
+        XCTAssertTrue(start.isHittable)
+        let startY = start.frame.midY
+        let endY = end.frame.midY
+        let earlierLine = first.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.12))
+        start.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.05, thenDragTo: earlierLine, withVelocity: .slow, thenHoldForDuration: 0)
+        XCTAssertTrue(start.wait(for: \.isHittable, toEqual: true, timeout: 8))
+        XCTAssertLessThan(start.frame.midY, startY - 8)
+        XCTAssertEqual(end.frame.midY, endY, accuracy: 1)
+        keepScreenshot(named: "Chapter selection adjusted with both handles", from: app)
+
+        let ask = app.menuItems["Ask Assistant"].firstMatch
+        XCTAssertTrue(ask.waitForExistence(timeout: 10), app.debugDescription)
+        ask.tap()
+        let excerpts = app.buttons["2 selected passages"]
+        XCTAssertTrue(excerpts.waitForExistence(timeout: 15), app.debugDescription)
+        // The isolated backend uses a fixed citation label. Test its separate excerpts here,
+        // with the distinct source IDs covered by the chapter selection resolver test.
+        let firstExcerpt = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "designation \"BC\".")).firstMatch
+        if !firstExcerpt.exists { excerpts.tap() }
+        XCTAssertTrue(firstExcerpt.waitForExistence(timeout: 5), app.debugDescription)
+        let secondExcerpt = app.staticTexts.containing(NSPredicate(format: "label BEGINSWITH %@", "101.2 Scope.\nThe provisions")).firstMatch
+        XCTAssertTrue(secondExcerpt.waitForExistence(timeout: 5), app.debugDescription)
+        keepScreenshot(named: "Both excerpts after adjusting the selection handles", from: app)
+#endif
+    }
+
+    func testChapterSelectionHandleScrollsBeyondTheViewport() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-2014-building-chapter-7"]
+        app.launch()
+        let firstPassage = app.textViews.matching(NSPredicate(
+            format: "label BEGINSWITH %@", "The provisions of this chapter shall govern"
+        )).firstMatch
+        XCTAssertTrue(firstPassage.wait(for: \.isHittable, toEqual: true, timeout: 30))
+        let passageFrame = firstPassage.frame
+        let nextPassage = app.textViews.matching(NSPredicate(
+            format: "label BEGINSWITH %@", "The following words and terms shall"
+        )).firstMatch
+        XCTAssertTrue(nextPassage.isHittable)
+        let nextFrame = nextPassage.frame
+        let screen = app.coordinate(withNormalizedOffset: .zero)
+        let first = screen.withOffset(CGVector(dx: passageFrame.midX, dy: passageFrame.midY))
+        let next = screen.withOffset(CGVector(dx: nextFrame.midX, dy: nextFrame.midY))
+        // Once the selection spans two blocks, re-grab the handle and extend it past the viewport.
+        first.press(forDuration: 0.65, thenDragTo: next, withVelocity: .slow, thenHoldForDuration: 0)
+
+        let end = element(in: app, identifier: "reader-selection-end-handle")
+        XCTAssertTrue(end.wait(for: \.isHittable, toEqual: true, timeout: 8))
+        XCTAssertGreaterThan(end.frame.midY, nextFrame.minY)
+        let edge = app.coordinate(withNormalizedOffset: CGVector(dx: 0.51, dy: 0.96))
+        end.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.05, thenDragTo: edge, withVelocity: .slow, thenHoldForDuration: 1.4)
+
+        XCTAssertTrue(app.menuItems["Copy"].firstMatch.waitForExistence(timeout: 8), app.debugDescription)
+        XCTAssertTrue(!firstPassage.isHittable || firstPassage.frame.minY < passageFrame.minY - 120,
+                      "Holding a selection handle near the edge must continue scrolling the chapter.")
+        keepScreenshot(named: "Chapter 7 selection extends through edge scrolling", from: app)
+    }
+
     func testPhase3EntitledReaderResearchJourney() {
         let app = XCUIApplication()
         // Xcode 26.6 cannot drive the system-owned edit menu on the iOS 27

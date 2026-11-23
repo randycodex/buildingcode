@@ -614,6 +614,9 @@ private struct AttributedTextContainer: UIViewRepresentable {
             }
             hadSelection = hasSelection
             onSelectionChange?(hasSelection)
+            if let view = textView as? RichTextView {
+                view.chapterSelectionTarget?.controller.nativeSelectionDidChange(in: view)
+            }
         }
 
         func textView(
@@ -633,6 +636,14 @@ private struct AttributedTextContainer: UIViewRepresentable {
                 suggestedActions: suggestedActions,
                 onResearchSelection: onResearchSelection
             )
+        }
+
+        func textView(_ textView: UITextView, willPresentEditMenuWith animator: any UIEditMenuInteractionAnimating) {
+            guard let view = textView as? RichTextView, view.chapterSelectionTarget != nil else { return }
+            animator.addCompletion { [weak view] in
+                guard let view else { return }
+                view.chapterSelectionTarget?.controller.nativeEditMenuDidAppear(in: view)
+            }
         }
 
         func textView(
@@ -680,6 +691,13 @@ final class RichTextView: UITextView {
     override func layoutSubviews() {
         super.layoutSubviews()
         if chapterSelectionRange != nil && chapterSelectionSize != bounds.size { drawChapterSelection() }
+        chapterSelectionTarget?.controller.layoutSelectionHandles(for: self)
+    }
+
+    override func resignFirstResponder() -> Bool {
+        let resigned = super.resignFirstResponder()
+        if resigned { chapterSelectionTarget?.controller.nativeSelectionDidEnd(in: self) }
+        return resigned
     }
 
     func showChapterSelection(_ range: NSRange?) {
@@ -748,6 +766,7 @@ final class RichTextView: UITextView {
             guard let self, self.selectedRange.length > 0 else { return }
             self.selectedRange = NSRange(location: 0, length: 0)
             self.selectionChangeHandler?(false)
+            self.chapterSelectionTarget?.controller.nativeSelectionDidEnd(in: self)
         }
     }
 
@@ -763,6 +782,7 @@ final class RichTextView: UITextView {
             guard let self, self.selectedRange.length > 0 else { return }
             self.selectedRange = NSRange(location: 0, length: 0)
             self.selectionChangeHandler?(false)
+            self.chapterSelectionTarget?.controller.nativeSelectionDidEnd(in: self)
         }
     }
 
@@ -794,6 +814,7 @@ final class RichTextView: UITextView {
         if selectedRange.length > 0 {
             selectedRange = NSRange(location: 0, length: 0)
             selectionChangeHandler?(false)
+            chapterSelectionTarget?.controller.nativeSelectionDidEnd(in: self)
             return
         }
 
