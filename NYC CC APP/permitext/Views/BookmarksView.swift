@@ -1862,7 +1862,7 @@ struct ProjectView: View {
 #if DEBUG
                 if ProcessInfo.processInfo.arguments.contains("--native-project-overview-fixture"),
                    ProcessInfo.processInfo.arguments.contains("--native-project-overview-delayed-load") {
-                    try await Task.sleep(nanoseconds: 2_000_000_000)
+                    try await Task.sleep(for: .seconds(5))
                 }
 #endif
                 let snapshot = try await library.projectHubSnapshot(folderID: folderID)

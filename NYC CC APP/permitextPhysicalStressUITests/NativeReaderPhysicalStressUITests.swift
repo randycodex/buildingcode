@@ -890,6 +890,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         project.tap()
         let root = element(in: app, identifier: "project-folder-root")
         XCTAssertTrue(root.waitForExistence(timeout: 10))
+        let notesCard = app.buttons["project-section-notebook"]
+        XCTAssertTrue(notesCard.label.contains("Open Notes"), "The dashboard must open while its synced previews are still loading.")
         let expectedSummary = ["address": "100 Acceptance Court, Brooklyn, NY 11215", "tax-lot-area": "5,000 sq ft",
                                "occupancy": "R-2 — 8 permanent dwelling units (assumed)",
                                "construction-type": "Type III-B (assumed) — masonry exterior walls and wood floor joists",
@@ -901,7 +903,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }
         XCTAssertFalse(element(in: app, identifier: "project-summary-building-height").exists)
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            app.buttons["project-section-notebook"].label.contains("0 notes")
+            notesCard.label.contains("0 notes")
         }, object: nil)], timeout: 10), .completed)
         let cards = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-section-"))
         XCTAssertEqual(cards.count, 6)

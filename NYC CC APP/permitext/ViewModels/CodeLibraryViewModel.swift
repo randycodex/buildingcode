@@ -245,6 +245,8 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var signedInAccount: SignedInAccount? {
         didSet {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
+            deferredContinuitySyncTask?.cancel()
+            deferredContinuitySyncTask = nil
             readerSaveDestinationChoice = NativeReaderSaveDestination.load(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
             activeProjectID = nil
             openProjectID = nil
@@ -506,6 +508,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
     private var activeExportTask: Task<Void, Never>?
     private var userContentAutoSyncTask: Task<Void, Never>?
+    private var deferredContinuitySyncTask: Task<Void, Never>?
     private var savedPresentationRefreshTask: Task<Void, Never>?
     private var projectPresentationRefreshTask: Task<Void, Never>?
     private var projectPresentationRefreshGeneration: UInt64 = 0
@@ -660,6 +663,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     deinit {
         userContentAutoSyncTask?.cancel()
+        deferredContinuitySyncTask?.cancel()
         savedPresentationRefreshTask?.cancel()
         projectPresentationRefreshTask?.cancel()
         foregroundAutomaticSyncTask?.cancel()
@@ -1085,29 +1089,36 @@ final class CodeLibraryViewModel: ObservableObject {
             openProjectWorkspace(folderID)
             return
         }
-        readerSaveDestinationChoice = .project(project.clientID)
-        readerSaveDestinationChoice.store(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
-        guard activeProjectID != folderID else { return }
-        activeProjectID = folderID
-        persistContinuityContext()
+        activateProject(project)
     }
 
     func openProjectWorkspace(_ folderID: Int64) {
         let owner = sharedAccountLibrary ?? self
         if owner !== self { owner.openProjectWorkspace(folderID); return }
         guard hasProjectAccess,
-              folders.contains(where: { $0.id == folderID && $0.folderType == .project && $0.deletedAt == nil })
+              let project = folders.first(where: { $0.id == folderID && $0.folderType == .project && $0.deletedAt == nil })
         else { return }
         if openProjectID != folderID {
             projectWorkspaceSessionID = UUID()
-            activeResearchConversationID = nil
-            pendingResearchSelections = []
+            if activeResearchConversationID != nil { activeResearchConversationID = nil }
+            if !pendingResearchSelections.isEmpty { pendingResearchSelections = [] }
         }
         openProjectID = folderID
-        noteProjectOpened(folderID)
+        activateProject(project, deferSyncQueue: true)
         researchHistoryProjectFilter = backendProjectID(for: folderID) ?? "unassigned"
         researchHistoryIsPresented = true
-        selectedTab = .bookmarks
+        if selectedTab != .bookmarks { selectedTab = .bookmarks }
+    }
+
+    private func activateProject(_ project: CodeFolder, deferSyncQueue: Bool = false) {
+        let saveDestination = NativeReaderSaveDestination.project(project.clientID)
+        if readerSaveDestinationChoice != saveDestination {
+            readerSaveDestinationChoice = saveDestination
+            saveDestination.store(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
+        }
+        guard activeProjectID != project.id else { return }
+        activeProjectID = project.id
+        persistContinuityContext(deferSyncQueue: deferSyncQueue)
     }
 
     func closeProjectWorkspace() {
@@ -1163,7 +1174,7 @@ final class CodeLibraryViewModel: ObservableObject {
         persistContinuityContext()
     }
 
-    private func persistContinuityContext(lastOpenedChapterID: Int64? = nil) {
+    private func persistContinuityContext(lastOpenedChapterID: Int64? = nil, deferSyncQueue: Bool = false) {
         continuityStore.update { context in
             context.selectedJurisdictionKey = selectedJurisdictionKey
             context.selectedVersionFileName = selectedVersionFileName
@@ -1177,17 +1188,31 @@ final class CodeLibraryViewModel: ObservableObject {
             context.comparisonModeEnabled = true
             context.recentlyViewedSections = recentlyViewedSections
         }
-        queueContinuityContextForSync()
+        if deferSyncQueue {
+            // Queue maintenance scans pending work. Leave that off the project
+            // presentation path while saving the selection locally above.
+            deferredContinuitySyncTask?.cancel()
+            let session = privateSessionID
+            deferredContinuitySyncTask = Task(priority: .utility) { [weak self] in
+                try? await Task.sleep(for: .milliseconds(500))
+                guard !Task.isCancelled, let self, self.privateSessionID == session else { return }
+                self.queueContinuityContextForSync()
+            }
+        } else {
+            queueContinuityContextForSync()
+        }
     }
 
-    private func queueContinuityContextForSync() {
+    private func queueContinuityContextForSync(scheduleAutomaticSync: Bool = true) {
+        deferredContinuitySyncTask?.cancel()
+        deferredContinuitySyncTask = nil
         let context = continuityStore.load()
         do {
             try userContentRepository?.queueContinuityContext(
                 codeVersion: context.selectedVersionFileName,
                 values: continuitySyncValues(from: context)
             )
-            scheduleUserContentAutoSync()
+            if scheduleAutomaticSync { scheduleUserContentAutoSync() }
         } catch {
             #if DEBUG
             print("permitext diagnostics: continuity sync queue failed: \(error.localizedDescription)")
@@ -5376,6 +5401,9 @@ final class CodeLibraryViewModel: ObservableObject {
     @discardableResult
     func syncPendingUserContentIfPossible() async -> Int {
         guard !isAccountBusy else { return 0 }
+        if deferredContinuitySyncTask != nil {
+            queueContinuityContextForSync(scheduleAutomaticSync: false)
+        }
         let identity = privateRequestIdentity
         isAccountBusy = true
         defer { isAccountBusy = false }
@@ -5490,6 +5518,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func stopForegroundAutomaticSync() {
+        if deferredContinuitySyncTask != nil { queueContinuityContextForSync() }
         foregroundAutomaticSyncTask?.cancel()
         foregroundAutomaticSyncTask = nil
     }

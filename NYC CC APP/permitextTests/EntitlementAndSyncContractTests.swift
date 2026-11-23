@@ -6133,6 +6133,13 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(library.readerSaveDestinationProject?.id, first.id)
         XCTAssertEqual(library.researchHistoryProjectFilter, library.backendProjectID(for: first.id))
         XCTAssertEqual(library.selectedTab, .bookmarks)
+        XCTAssertEqual(ContinuityStore(defaults: defaults).load().activeProjectID, first.id)
+        func queuedActiveProjectID() throws -> String? {
+            try store.pendingSyncQueueItems(limit: 100).first { $0.entityType == .continuity }?.payload.values["activeProjectID"]
+        }
+        XCTAssertNil(try queuedActiveProjectID(), "Opening a Project must not write to the sync queue during the tap.")
+        library.stopForegroundAutomaticSync()
+        XCTAssertEqual(try queuedActiveProjectID(), String(first.id), "Backgrounding flushes the deferred continuity update.")
         library.activeResearchConversationID = "first-project-conversation"
         library.sendToResearch(ResearchSelectionRequest(sectionID: "101", selectedText: "First Project evidence"))
         let firstRequest = try XCTUnwrap(library.researchRequestIdentity)
@@ -6155,6 +6162,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertNil(library.activeProjectID)
         XCTAssertNil(library.activeResearchConversationID)
         XCTAssertEqual(library.selectedTab, .bookmarks)
+        XCTAssertNil(try queuedActiveProjectID(), "Closing the Project overrides its pending open update.")
         library.openProjectWorkspace(-1)
         XCTAssertNil(library.openProjectID, "A missing Project cannot expose the workspace tabs")
         library.openProjectWorkspace(first.id)
