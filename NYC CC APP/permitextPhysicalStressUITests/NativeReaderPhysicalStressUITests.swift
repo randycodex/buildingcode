@@ -134,6 +134,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let conversationRow = app.buttons.matching(identifier: "research-history-row").firstMatch
         XCTAssertTrue(conversationRow.waitForExistence(timeout: 15))
         keepScreenshot(named: "Research belongs to Acceptance Project", from: app)
+        let historyOptions = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "research-history-options-")).firstMatch
+        historyOptions.tap()
+        let rename = app.buttons["Rename"]
+        XCTAssertTrue(rename.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Pin"].exists)
+        XCTAssertFalse(app.buttons["Delete"].exists)
+        rename.tap()
+        app.alerts["Rename conversation"].buttons["Cancel"].tap()
         let historyRowY = conversationRow.frame.minY
         let selectConversations = app.buttons["Select conversations"]
         XCTAssertEqual(selectConversations.frame.width, newResearch.frame.width, accuracy: 2)

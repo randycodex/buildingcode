@@ -1192,9 +1192,6 @@ private struct ResearchSessionView: View {
                             Button(item.isPinned == true ? "Unpin" : "Pin", systemImage: item.isPinned == true ? "pin.slash" : "pin") {
                                 Task { await pinConversation(id: item.id, isPinned: item.isPinned != true) }
                             }
-                            Button("Delete", systemImage: "trash", role: .destructive) {
-                                requestDeletion(id: item.id)
-                            }
                         } label: {
                             Image(systemName: "ellipsis")
                                 .font(.body)
