@@ -134,18 +134,26 @@ struct ListSelectionIndicator: View {
 }
 
 struct CodeSearchBar<Field: View>: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let showsClearButton: Bool
     let clearTitle: String
     let clear: () -> Void
-    @ViewBuilder let field: () -> Field
+    var whiteForegroundInDarkMode = false
+    @ViewBuilder let field: (Color?) -> Field
+
+    private var foreground: Color? {
+        whiteForegroundInDarkMode && colorScheme == .dark ? .white : nil
+    }
 
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .foregroundColor(foreground ?? .secondary)
                 .accessibilityHidden(true)
-            field()
+            field(foreground)
+                .foregroundColor(foreground)
                 .textFieldStyle(.plain)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()

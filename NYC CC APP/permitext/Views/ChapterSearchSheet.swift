@@ -142,7 +142,7 @@ struct ChapterSearchSheet: View {
 
     private var searchHeader: some View {
         HStack(spacing: 12) {
-            CodeSearchBar(showsClearButton: !query.isEmpty, clearTitle: "Clear chapter search", clear: { query = "" }) {
+            CodeSearchBar(showsClearButton: !query.isEmpty, clearTitle: "Clear chapter search", clear: { query = "" }) { _ in
                 TextField("Search this chapter", text: $query)
                     .focused($isSearchFocused)
             }

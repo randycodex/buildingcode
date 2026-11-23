@@ -992,8 +992,10 @@ struct SearchView: View {
         CodeSearchBar(showsClearButton: !query.isEmpty, clearTitle: "Clear search", clear: {
             query = ""
             library.searchAllEditions(query: "")
-        }) {
-            TextField("Search codes", text: $query)
+        }, whiteForegroundInDarkMode: true) { foreground in
+            TextField("Search codes", text: $query, prompt: foreground.map {
+                Text("Search codes").foregroundColor($0)
+            })
                 .focused($isSearchFieldFocused)
                 .accessibilityLabel("Search codes")
                 .onSubmit {

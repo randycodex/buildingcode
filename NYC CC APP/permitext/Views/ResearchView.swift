@@ -1271,8 +1271,10 @@ private struct ResearchSessionView: View {
     private var historySearch: some View {
         CodeSearchBar(showsClearButton: !historyQuery.isEmpty, clearTitle: "Clear history search", clear: {
             historyQuery = ""
-        }) {
-            TextField("Find a previous question", text: $historyQuery)
+        }, whiteForegroundInDarkMode: true) { foreground in
+            TextField("Find a previous question", text: $historyQuery, prompt: foreground.map {
+                Text("Find a previous question").foregroundColor($0)
+            })
                 .focused($isHistorySearchFocused)
                 .onChange(of: historyQuery) { _, value in
                     let bounded = boundedHistoryQuery(value)
