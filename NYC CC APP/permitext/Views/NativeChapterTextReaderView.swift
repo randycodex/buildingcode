@@ -2001,10 +2001,17 @@ enum NativeReaderLocationResolver {
 
         let normalizedSection = normalizedSectionNumber(initialSectionNumber)
         let normalizedTitle = normalizedSectionNumber(initialSectionTitle)
+        let numericPrefix = normalizedSection.prefix { $0.isASCII && ($0.isNumber || $0 == ".") }
         if !normalizedSection.isEmpty, !normalizedTitle.isEmpty {
             let rows = prepared?.displayBlocks ?? NativeReaderDisplayBlock.blocks(from: document.blocks)
             let matches = rows.filter { display in
-                let text = normalizedSectionNumber(display.block.plainText)
+                let raw = display.block.plainText
+                // Ordinary ASCII letters and digits survive the leading trim. Reject
+                // these mismatches before running a whitespace regex over a full passage.
+                if !numericPrefix.isEmpty, let first = raw.first,
+                   first.isASCII && (first.isLetter || first.isNumber),
+                   !raw.utf8.starts(with: numericPrefix.utf8) { return false }
+                let text = normalizedSectionNumber(raw)
                 guard text.hasPrefix(normalizedSection) else { return false }
                 let suffix = String(text.dropFirst(normalizedSection.count))
                 guard let first = suffix.first, first.isWhitespace || ".:;".contains(first) else { return false }
@@ -2016,6 +2023,7 @@ enum NativeReaderLocationResolver {
         if !normalizedSection.isEmpty,
            let heading = document.blocks.first(where: { block in
                guard block.kind == .heading else { return false }
+               if !numericPrefix.isEmpty, !block.plainText.contains(numericPrefix) { return false }
                let normalizedHeading = normalizedSectionNumber(block.plainText)
                return normalizedHeading == normalizedSection
                    || normalizedHeading.hasPrefix(normalizedSection + " ")
