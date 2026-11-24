@@ -81,7 +81,6 @@ struct ProjectCalculatorView: View {
     @State private var page: CalculatorPage?
     @State private var loadError: String?
     @State private var retry = 0
-    @State private var showsSource = false
     @State private var noteRequest: ProjectCalculatorNote?
     @State private var noteReply: CheckedContinuation<ProjectCalculatorDraft.SavedNote?, Error>?
 
@@ -94,8 +93,6 @@ struct ProjectCalculatorView: View {
                 CalculatorForm(page: page, onDrafts: { raw in
                     guard isCurrent(page) else { throw CancellationError() }
                     try cache.store(raw, accountID: page.accountID, projectID: page.projectID, scope: Self.draftScope)
-                }, onOpenSource: {
-                    if isCurrent(page) { showsSource = true }
                 }, onSave: { request in
                     try await chooseNote(for: request, page: page)
                 })
@@ -122,13 +119,6 @@ struct ProjectCalculatorView: View {
         .navigationBarTitleDisplayMode(.inline)
         .tint(Color.appChrome)
         .task(id: "\(library.privateSessionID)|\(folderID)|\(retry)") { await prepare() }
-        .sheet(isPresented: $showsSource) {
-            NavigationStack {
-                ReaderView(sectionID: ProjectOccupantLoadSource.sectionID,
-                    codeVersion: ProjectOccupantLoadSource.codeVersion, codeSectionID: ProjectOccupantLoadSource.codeSectionID)
-            }
-            .environmentObject(library)
-        }
         .sheet(item: $noteRequest, onDismiss: { finishNote(nil) }) { request in
             if let page {
                 CalculatorNotePicker(
@@ -140,7 +130,6 @@ struct ProjectCalculatorView: View {
         }
         .onChange(of: library.privateSessionID) {
             finishNote(nil)
-            showsSource = false
         }
     }
 
@@ -323,7 +312,6 @@ private struct CalculatorNotePicker: View {
 private struct CalculatorForm: View {
     let page: CalculatorPage
     let onDrafts: (String) throws -> Void
-    let onOpenSource: () -> Void
     let onSave: (ProjectCalculatorNote) async throws -> ProjectCalculatorDraft.SavedNote?
 
     @State private var calculation: ProjectCalculatorSnapshot
@@ -341,11 +329,9 @@ private struct CalculatorForm: View {
     }
 
     init(page: CalculatorPage, onDrafts: @escaping (String) throws -> Void,
-         onOpenSource: @escaping () -> Void,
          onSave: @escaping (ProjectCalculatorNote) async throws -> ProjectCalculatorDraft.SavedNote?) {
         self.page = page
         self.onDrafts = onDrafts
-        self.onOpenSource = onOpenSource
         self.onSave = onSave
         _calculation = State(initialValue: page.initialState)
         _input = State(initialValue: page.initialState.record.input)
@@ -358,7 +344,6 @@ private struct CalculatorForm: View {
             VStack(alignment: .leading, spacing: 20) {
                 inputs.disabled(isSaving)
                 result
-                sourceButton
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
@@ -392,19 +377,6 @@ private struct CalculatorForm: View {
             .accessibilityLabel("New calculation")
             .accessibilityIdentifier("calculator-new-draft")
         }
-    }
-
-    private var sourceButton: some View {
-        Button(action: onOpenSource) {
-            Label("2022 Building Code · Table 1004.1.3", systemImage: "book")
-                .font(.subheadline)
-                .padding(.horizontal, 14)
-                .frame(minHeight: 44)
-        }
-        .buttonStyle(.plain)
-        .codeLiquidGlassCapsule()
-        .disabled(isSaving)
-        .accessibilityIdentifier("calculator-source")
     }
 
     private var row: ProjectCalculatorRow? {

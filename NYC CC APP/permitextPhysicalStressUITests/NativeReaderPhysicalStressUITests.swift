@@ -1298,11 +1298,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(saved.waitForExistence(timeout: 10))
         form.swipeUp()
         XCTAssertLessThanOrEqual(saved.frame.maxY, app.tabBars.firstMatch.frame.minY + 2)
-        let source = app.buttons["calculator-source"]
-        XCTAssertTrue(source.isHittable)
-        XCTAssertGreaterThan(source.frame.minY, saved.frame.maxY)
-        XCTAssertLessThanOrEqual(source.frame.maxY, app.tabBars.firstMatch.frame.minY + 2)
-        XCTAssertEqual(source.frame.minX, save.frame.minX, accuracy: 1)
+        XCTAssertFalse(app.buttons["calculator-source"].exists)
         keepScreenshot(named: "Native Calculator scrolled to the result and Note", from: app)
         calculatorBar.buttons.element(boundBy: 0).tap()
         app.buttons["project-section-notebook"].tap()
@@ -1314,16 +1310,6 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(noteBody.count, 2)
         app.swipeUp()
         keepScreenshot(named: "Note scrolled below the header", from: app)
-
-        app.buttons["main-tab-saved"].tap()
-        XCTAssertTrue(calculator.waitForExistence(timeout: 10))
-        calculator.tap()
-        XCTAssertTrue(calculatorBar.waitForExistence(timeout: 5))
-        reveal(source, in: app)
-        source.tap()
-        let passageTitle = element(in: app, identifier: "passage-section-title")
-        XCTAssertTrue(passageTitle.waitForExistence(timeout: 15))
-        XCTAssertTrue(passageTitle.label.contains("1004.1.3"))
 #endif
     }
 
