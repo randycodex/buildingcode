@@ -375,6 +375,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }
         XCTAssertTrue(browser.waitForExistence(timeout: 15))
         XCTAssertFalse(app.buttons["reader-code-picker"].exists)
+        let tabBar = app.tabBars.firstMatch
+        let readerGap = tabBar.frame.minY - primary.frame.maxY
+        app.buttons["main-tab-search"].tap()
+        let searchBar = element(in: app, identifier: "bottom-search-bar")
+        XCTAssertTrue(searchBar.waitForExistence(timeout: 10))
+        XCTAssertEqual(tabBar.frame.minY - searchBar.frame.maxY, readerGap, accuracy: 1)
+        app.buttons["main-tab-reader"].tap()
+        XCTAssertTrue(browser.waitForExistence(timeout: 10))
         primary.tap()
         XCTAssertTrue(app.navigationBars["Code Library"].waitForExistence(timeout: 10))
         app.buttons.matching(NSPredicate(format: "label == %@", "Building Code")).firstMatch.tap()

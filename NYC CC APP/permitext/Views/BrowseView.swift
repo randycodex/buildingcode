@@ -1503,7 +1503,8 @@ enum CodeScreenMetrics {
         return 0
     }
     static let bottomControlHeight: CGFloat = 52
-    static let readerControlsVerticalPadding: CGFloat = 6
+    static let bottomControlTabBarGap: CGFloat = 8
+    static let readerControlsTopPadding: CGFloat = 6
     static let bottomSearchScrollClearance = bottomControlHeight + 24
     /// Detached circular actions beside the floating bottom navigation.
     static let detachedNavigationButtonSize: CGFloat = 60

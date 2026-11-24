@@ -600,7 +600,11 @@ struct SearchView: View {
             dismissKeyboard()
         }
         .contentMargins(.bottom, CodeScreenMetrics.bottomSearchScrollClearance, for: .scrollContent)
-        .overlay(alignment: .bottom) { searchField.bottomSearchBarPlacement() }
+        .overlay(alignment: .bottom) {
+            searchField
+                .accessibilityIdentifier("bottom-search-bar")
+                .codePlacementAboveTabBar()
+        }
         .scrollDismissesKeyboard(.immediately)
         .scrollIndicators(.hidden)
         .codeNavigationTopScrollEdge()

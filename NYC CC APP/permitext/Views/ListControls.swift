@@ -233,11 +233,9 @@ extension View {
         }
     }
 
-    func bottomSearchBarPlacement() -> some View {
-        self
-        .accessibilityIdentifier("bottom-search-bar")
-        .codeTabAlignedHorizontalPadding()
-        .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+    func codePlacementAboveTabBar() -> some View {
+        codeTabAlignedHorizontalPadding()
+            .padding(.bottom, CodeScreenMetrics.bottomControlTabBarGap)
     }
 }
 

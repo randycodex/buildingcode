@@ -2174,7 +2174,8 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                         .accessibilityHidden(visibleReaderContext != .secondary)
                 }
             }
-            .environment(\.readerControlsClearance, CodeScreenMetrics.bottomControlHeight + 2 * CodeScreenMetrics.readerControlsVerticalPadding)
+            .environment(\.readerControlsClearance, CodeScreenMetrics.bottomControlHeight +
+                CodeScreenMetrics.readerControlsTopPadding + CodeScreenMetrics.bottomControlTabBarGap)
             .onPreferenceChange(SecondaryReaderReadyKey.self) { ready in
                 isSecondaryReaderReady = ready
                 guard ready, isOpeningSecondaryReader, library.selectedTab == .browse else { return }
@@ -2266,8 +2267,8 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
             .accessibilityHidden(true)
         }
         .codeLiquidGlassCapsule()
-        .codeTabAlignedHorizontalPadding()
-        .padding(.vertical, CodeScreenMetrics.readerControlsVerticalPadding)
+        .padding(.top, CodeScreenMetrics.readerControlsTopPadding)
+        .codePlacementAboveTabBar()
     }
 
     @available(iOS 18.0, *)
