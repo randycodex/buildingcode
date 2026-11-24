@@ -1729,7 +1729,8 @@ private struct PermitextTabNavigation: View {
                 research: ResearchView(projectFolderID: project?.id, cacheDirectoryURL: researchCacheDirectoryURL)
                     .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() },
                 projectScoped: project != nil,
-                isCodeLibrary: project == nil
+                isCodeLibrary: project == nil,
+                waitsForSecondaryReader: true
             )
         }
     }
@@ -1891,8 +1892,7 @@ struct FirstUseResearchExample: Sendable {
 /// Gives the second permanent Reader its own content loader, search work,
 /// selected version, and navigation model. Saved work still uses the shared
 /// on-device repository and is reconciled through `permitextSavedWorkDidChange`.
-/// The model is created lazily so users who never open Reader 2 do not pay for
-/// a second corpus load at launch.
+/// The model is created when the second Reader is requested.
 private struct IndependentReaderHost: View {
     let browserContext: BrowserContextID
 
@@ -1908,15 +1908,17 @@ private struct IndependentReaderHost: View {
                     sharedLibrary: sharedLibrary
                 )
             } else {
-                AppLaunchLoadingView(
-                    progress: 0,
-                    message: "Preparing second Reader..."
-                )
-                .task {
-                    let model = makeReaderLibrary()
-                    model.synchronizeIndependentReaderSession(from: sharedLibrary)
-                    readerLibrary = model
-                }
+                Color.clear
+                    .task {
+                        let model = makeReaderLibrary()
+                        #if DEBUG
+                        if ProcessInfo.processInfo.arguments.contains("--native-secondary-reader-loading-fixture") {
+                            model.debugBeforeContentPublication = { _ in try? await Task.sleep(for: .seconds(7)) }
+                        }
+                        #endif
+                        model.prepareIndependentReader(from: sharedLibrary, context: browserContext)
+                        readerLibrary = model
+                    }
             }
         }
     }
@@ -1931,9 +1933,17 @@ private struct IndependentReaderHost: View {
             readerThemeStore: ReaderThemeStore(defaults: .standard),
             preferencesDefaults: .standard,
             entitlementService: LocalEntitlementService(defaults: .standard),
+            loadsInitialContent: false,
             loadsPersistedAccount: false,
             ownsAccountSync: false
         )
+    }
+}
+
+private struct SecondaryReaderReadyKey: PreferenceKey {
+    static let defaultValue = false
+    static func reduce(value: inout Bool, nextValue: () -> Bool) {
+        value = value || nextValue()
     }
 }
 
@@ -1941,29 +1951,16 @@ private struct IndependentReaderContent: View {
     let browserContext: BrowserContextID
     @ObservedObject var readerLibrary: CodeLibraryViewModel
     @ObservedObject var sharedLibrary: CodeLibraryViewModel
-    @State private var hasLoadedContent = false
-
     var body: some View {
         Group {
-            if readerLibrary.isInitialContentLoaded || hasLoadedContent {
+            if readerLibrary.isInitialContentLoaded {
                 BrowseView(browserContext: browserContext)
                     .environment(\.isBrowserTabActive, sharedLibrary.selectedTab == .browseSecondary)
-                    .onAppear { hasLoadedContent = true }
-                    .overlay {
-                        if !readerLibrary.isInitialContentLoaded {
-                            AppLaunchLoadingView(
-                                progress: readerLibrary.initialLoadProgress,
-                                message: readerLibrary.statusMessage ?? "Preparing second Reader..."
-                            )
-                        }
-                    }
             } else {
-                AppLaunchLoadingView(
-                    progress: readerLibrary.initialLoadProgress,
-                    message: readerLibrary.statusMessage ?? "Preparing second Reader..."
-                )
+                Color.clear
             }
         }
+        .preference(key: SecondaryReaderReadyKey.self, value: readerLibrary.isInitialContentLoaded)
         .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
         .environmentObject(readerLibrary)
         .onReceive(NotificationCenter.default.publisher(for: .permitextSavedWorkDidChange)) { notification in
@@ -2094,6 +2091,8 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.layoutDirection) private var layoutDirection
     @State private var hasOpenedSecondary = false
+    @State private var isSecondaryReaderReady = false
+    @State private var isOpeningSecondaryReader = false
     @State private var summaries: [BrowserContextID: ReaderSessionSummary] = [:]
     @State private var chapterFindOwners: [BrowserContextID: UUID] = [:]
     @State private var rememberedSources = BrowserContextID.rememberedSources()
@@ -2103,6 +2102,13 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     let research: Research
     var projectScoped = false
     var isCodeLibrary = false
+    var waitsForSecondaryReader = false
+
+    private var secondaryIsReady: Bool { !waitsForSecondaryReader || isSecondaryReaderReady }
+
+    private var visibleReaderContext: BrowserContextID {
+        secondaryIsReady ? library.selectedReaderContext : .primary
+    }
 
     private var selection: Binding<String> {
         Binding(
@@ -2140,6 +2146,9 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
         .environment(\.floatingNavigationClearance, 0)
         .onAppear { activateSelectedReading() }
         .onChange(of: library.selectedReaderContext) { _, _ in activateSelectedReading() }
+        .onChange(of: library.selectedTab) { _, tab in
+            if tab != .browse { isOpeningSecondaryReader = false }
+        }
     }
 
     private func activateSelectedReading() {
@@ -2153,19 +2162,25 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 primary
                     .environment(\.readerChapterFindOwner, chapterFindOwner(for: .primary))
                     .accessibilityElement(children: .contain)
-                    .opacity(library.selectedReaderContext == .primary ? 1 : 0)
+                    .opacity(visibleReaderContext == .primary ? 1 : 0)
                     .allowsHitTesting(library.selectedReaderContext == .primary)
-                    .accessibilityHidden(library.selectedReaderContext != .primary)
+                    .accessibilityHidden(visibleReaderContext != .primary)
                 if hasOpenedSecondary {
                     secondary
                         .environment(\.readerChapterFindOwner, chapterFindOwner(for: .secondary))
                         .accessibilityElement(children: .contain)
-                        .opacity(library.selectedReaderContext == .secondary ? 1 : 0)
-                        .allowsHitTesting(library.selectedReaderContext == .secondary)
-                        .accessibilityHidden(library.selectedReaderContext != .secondary)
+                        .opacity(visibleReaderContext == .secondary ? 1 : 0)
+                        .allowsHitTesting(visibleReaderContext == .secondary)
+                        .accessibilityHidden(visibleReaderContext != .secondary)
                 }
             }
             .environment(\.readerControlsClearance, CodeScreenMetrics.bottomControlHeight + 2 * CodeScreenMetrics.readerControlsVerticalPadding)
+            .onPreferenceChange(SecondaryReaderReadyKey.self) { ready in
+                isSecondaryReaderReady = ready
+                guard ready, isOpeningSecondaryReader, library.selectedTab == .browse else { return }
+                isOpeningSecondaryReader = false
+                library.selectedTab = .browseSecondary
+            }
             .onPreferenceChange(ReaderSessionSummaryKey.self) { updated in
                 summaries = updated
                 for (context, summary) in updated {
@@ -2178,7 +2193,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     }
                 }
             }
-            if chapterFindOwners[library.selectedReaderContext] == nil {
+            if chapterFindOwners[visibleReaderContext] == nil {
                 readingSwitcher
             }
         }
@@ -2191,18 +2206,25 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     private var readingSwitcher: some View {
         HStack(spacing: 0) {
             ForEach(BrowserContextID.allCases) { context in
-                let selected = library.selectedReaderContext == context
+                let selected = visibleReaderContext == context
+                let preparing = context == .secondary && !secondaryIsReady &&
+                    (isOpeningSecondaryReader || library.selectedReaderContext == .secondary)
                 let summary = summaries[context]
                 let remembered = rememberedSources[context].flatMap { source in
                     library.availableVersions.contains(where: { $0.fileName == source.versionFileName }) ? source : nil
                 }
                 Button {
-                    if selected {
+                    if context == .primary, isOpeningSecondaryReader {
+                        isOpeningSecondaryReader = false
+                    } else if context == .secondary, !secondaryIsReady {
+                        hasOpenedSecondary = true
+                        isOpeningSecondaryReader = library.selectedTab == .browse
+                    } else if library.selectedReaderContext == context {
                         NativeReaderHandoff.shared.reselect(context)
-                        return
+                    } else {
+                        if context == .secondary { hasOpenedSecondary = true }
+                        library.selectedTab = context == .primary ? .browse : .browseSecondary
                     }
-                    if context == .secondary { hasOpenedSecondary = true }
-                    library.selectedTab = context == .primary ? .browse : .browseSecondary
                 } label: {
                     Text(summary?.source ?? remembered?.source ?? (context == .primary ? "Reader 1" : "Reader 2"))
                         .font(.caption.weight(.semibold))
@@ -2211,10 +2233,19 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                         .padding(.horizontal, 14)
                         .frame(maxWidth: .infinity)
                         .frame(height: CodeScreenMetrics.bottomControlHeight)
+                        .overlay(alignment: .trailing) {
+                            if preparing {
+                                ProgressView()
+                                    .controlSize(.mini)
+                                    .padding(.trailing, 8)
+                                    .accessibilityHidden(true)
+                            }
+                        }
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("reader-session-\(context.rawValue)")
+                .accessibilityValue(preparing ? "Preparing" : "")
                 .accessibilityHint(selected ? "Return to Chapters, then choose a code on the next tap" : "Switch to this Reader")
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
@@ -2222,14 +2253,14 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
         .background {
             GeometryReader { geometry in
                 let segmentWidth = geometry.size.width / 2
-                let isPrimary = library.selectedReaderContext == .primary
+                let isPrimary = visibleReaderContext == .primary
                 let isLeft = isPrimary == (layoutDirection == .leftToRight)
                 Capsule()
                     .fill(Color.primary.opacity(0.15))
                     .padding(3)
                     .frame(width: segmentWidth, height: geometry.size.height)
                     .position(x: segmentWidth * (isLeft ? 0.5 : 1.5), y: geometry.size.height / 2)
-                    .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: library.selectedReaderContext)
+                    .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: visibleReaderContext)
             }
             .allowsHitTesting(false)
             .accessibilityHidden(true)

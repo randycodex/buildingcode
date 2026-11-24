@@ -939,6 +939,11 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func reload() {
+        reload(availableVersions: nil)
+    }
+
+    private func reload(availableVersions installedVersions: [BundledCodeVersion]?,
+                        preferredVersionFileName: String? = nil, preferredCodeSectionID: Int64? = nil) {
         versionLoadTask?.cancel()
         contentLoadTask?.cancel()
         statusMessage = "Loading code library..."
@@ -946,9 +951,14 @@ final class CodeLibraryViewModel: ObservableObject {
         initialLoadProgress = 0
 
         versionLoadTask = Task {
-            let availableVersions = await Task.detached(priority: .userInitiated) {
-                BundleDatabaseLocator().availableCodeVersions()
-            }.value
+            let availableVersions: [BundledCodeVersion]
+            if let installedVersions, !installedVersions.isEmpty {
+                availableVersions = installedVersions
+            } else {
+                availableVersions = await Task.detached(priority: .userInitiated) {
+                    BundleDatabaseLocator().availableCodeVersions()
+                }.value
+            }
 
             guard !Task.isCancelled else { return }
 
@@ -962,7 +972,8 @@ final class CodeLibraryViewModel: ObservableObject {
                     UserContentSyncCodeVersion.server($0.codeVersion) ==
                     UserContentSyncCodeVersion.canonicalNYC2022
             })?.fileName ?? availableVersions.first(where: { $0.contentKind == .authored })?.fileName
-            let defaultJurisdictionKey = storedJurisdiction
+            let preferredVersion = availableVersions.first { $0.fileName == preferredVersionFileName }
+            let defaultJurisdictionKey = preferredVersion.map { self.jurisdictionKey(for: $0) } ?? storedJurisdiction
                 .flatMap { stored in
                     self.availableJurisdictions.first(where: { $0.id == stored })?.id
                 }
@@ -985,7 +996,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 storedResolvedSelection = nil
             }
 
-            let resolvedSelection = storedResolvedSelection
+            let resolvedSelection = preferredVersion?.fileName ?? storedResolvedSelection
                 ?? authoredResolvedSelection
                 ?? candidateVersions.first?.fileName
                 ?? availableVersions.first?.fileName
@@ -993,7 +1004,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
             self.selectedVersionFileName = resolvedSelection
             self.persistContinuityContext()
-            self.openSelectedContent()
+            self.openSelectedContent(codeSectionID: preferredCodeSectionID)
         }
     }
 
@@ -1910,6 +1921,21 @@ final class CodeLibraryViewModel: ObservableObject {
         updateReaderTheme(sharedLibrary.readerTheme)
     }
 
+    func prepareIndependentReader(from owner: CodeLibraryViewModel, context: BrowserContextID) {
+        synchronizeIndependentReaderSession(from: owner)
+        let handoff = NativeReaderHandoff.shared.requests[context].flatMap {
+            $0.permits(owner.captureCodeSourceNavigationContext()) ? $0 : nil
+        }
+        let handoffEdition = handoff?.route.sourceVersion.flatMap { source in
+            owner.availableVersions.first {
+                UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.server(source)
+            }?.fileName
+        }
+        reload(availableVersions: owner.availableVersions,
+               preferredVersionFileName: handoffEdition ?? BrowserContextID.storedVersionFileName(for: context),
+               preferredCodeSectionID: handoff?.route.codeSectionID ?? BrowserContextID.storedCodeSectionID(for: context))
+    }
+
     /// Reconciles a mutation written by another Reader session. The main app
     /// model owns the single account-sync pipeline; corpus-only sessions only
     /// refresh their local presentation.
@@ -2257,8 +2283,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let canonical = UserContentSyncCodeVersion.server(sourceVersion ?? selectedVersion?.codeVersion ?? "")
         if let version = availableVersions.first(where: {
             UserContentSyncCodeVersion.server($0.codeVersion) == canonical
-        }), let store = (version.fileName == selectedVersionFileName && isInitialContentLoaded
-            ? authoredCodeStore : nil) ?? allEditionSearchStores[version.fileName] {
+        }), let store = reusableAuthoredStore(for: version) {
             model.selectedVersionFileName = version.fileName
             model.selectedJurisdictionKey = jurisdictionKey(for: version)
             model.authoredCodeStore = store
@@ -2272,6 +2297,12 @@ final class CodeLibraryViewModel: ObservableObject {
             model.refreshSearchReaderSavedControls()
         }
         return model
+    }
+
+    private func reusableAuthoredStore(for version: BundledCodeVersion) -> AuthoredCodeStore? {
+        guard availableVersions.contains(version) else { return nil }
+        if isInitialContentLoaded, selectedVersion == version, let authoredCodeStore { return authoredCodeStore }
+        return allEditionSearchStores[version.fileName]
     }
 
     func searchReaderTarget(sectionID: Int64) -> (chapter: CodeChapter, section: CodeSectionSummary)? {
@@ -7125,7 +7156,7 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch { statusMessage = error.localizedDescription }
     }
 
-    private func openSelectedContent(versionFileName: String? = nil) {
+    private func openSelectedContent(versionFileName: String? = nil, codeSectionID: Int64? = nil) {
         contentLoadTask?.cancel()
         startupWarmupTask?.cancel()
         let hasLoadedContent = isInitialContentLoaded && (authoredCodeStore != nil || codeDatabase != nil)
@@ -7206,15 +7237,17 @@ final class CodeLibraryViewModel: ObservableObject {
                 }
             }
         case .authored:
-            let selectedCodeSectionID = self.selectedCodeSectionID
+            let selectedCodeSectionID = codeSectionID ?? self.selectedCodeSectionID
                 ?? storedCodeSectionID()
+            let reusableStore = sharedAccountLibrary?.reusableAuthoredStore(for: selectedVersion)
             contentLoadTask = Task { [weak self] in
                 guard let self else { return }
                 do {
                     let snapshot = try await Task.detached(priority: .userInitiated) {
                         try Self.loadAuthoredContentSnapshot(
                             version: selectedVersion,
-                            selectedCodeSectionID: selectedCodeSectionID
+                            selectedCodeSectionID: selectedCodeSectionID,
+                            reusableStore: reusableStore
                         )
                     }.value
                     #if DEBUG
@@ -7280,9 +7313,10 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private nonisolated static func loadAuthoredContentSnapshot(
         version: BundledCodeVersion,
-        selectedCodeSectionID: Int64?
+        selectedCodeSectionID: Int64?,
+        reusableStore: AuthoredCodeStore? = nil
     ) throws -> AuthoredContentSnapshot {
-        let store = try AuthoredCodeStore(
+        let store = try reusableStore ?? AuthoredCodeStore(
             jsonURL: version.fileURL,
             codeID: version.authoredCodeID,
             jurisdictionID: version.jurisdictionID

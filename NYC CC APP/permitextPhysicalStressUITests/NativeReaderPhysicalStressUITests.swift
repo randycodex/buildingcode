@@ -318,6 +318,38 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testSecondaryReaderKeepsCurrentChaptersVisibleUntilReady() throws {
+#if !DEBUG
+        throw XCTSkip("Requires the isolated Reader loading fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--native-project-navigation-fixture",
+                               "--permitext-disable-clerk", "--native-secondary-reader-loading-fixture"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch.tap()
+        app.buttons["main-tab-reader"].tap()
+        let primary = app.buttons["reader-session-primary"]
+        let secondary = app.buttons["reader-session-secondary"]
+        let primaryChapters = app.scrollViews["reader-chapter-browser-primary"]
+        let secondaryChapters = app.scrollViews["reader-chapter-browser-secondary"]
+        XCTAssertTrue(primaryChapters.waitForExistence(timeout: 15))
+        secondary.tap()
+        XCTAssertTrue(waitForValue("Preparing", on: secondary, timeout: 4))
+        XCTAssertTrue(primary.isSelected)
+        XCTAssertTrue(primaryChapters.isHittable)
+        XCTAssertFalse(app.staticTexts["0%"].exists)
+        XCTAssertFalse(app.staticTexts["Preparing second Reader..."].exists)
+        XCTAssertTrue(secondaryChapters.waitForExistence(timeout: 15))
+        XCTAssertTrue(secondary.isSelected)
+        primary.tap()
+        XCTAssertTrue(primaryChapters.isHittable)
+        secondary.tap()
+        XCTAssertTrue(secondaryChapters.isHittable)
+        XCTAssertNotEqual(secondary.value as? String, "Preparing")
+#endif
+    }
+
     func testReaderCapsulesReturnToChaptersThenChooseCodesIndependently() throws {
 #if !DEBUG
         throw XCTSkip("Reader navigation uses the isolated Debug fixture.")
