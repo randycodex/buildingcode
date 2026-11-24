@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261123-web-audit-fixes-v2630";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261123-web-audit-fixes-v2631";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -177,7 +177,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261123-web-audit-fixes-v2630";
+} from "./offline-storage.js?v=20261123-web-audit-fixes-v2631";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -52905,8 +52905,8 @@ function loadStartupCatalogs() {
   return request;
 }
 
-async function restoreInitialProWorkspace({ publicSection = false } = {}) {
-  if (detachedProjectWindow || publicSection || !activeAccount() || !isProAccount()) return;
+async function restoreInitialProWorkspace() {
+  if (detachedProjectWindow || !activeAccount() || !isProAccount()) return;
   const identity = captureAccountRequest();
   const deferredEntries = new Set();
   try {
@@ -53156,7 +53156,9 @@ async function start() {
   document.querySelector("#collapse-all-columns").addEventListener("click", () => setAllColumnsCollapsed(true));
   document.querySelector("#expand-all-columns").addEventListener("click", () => setAllColumnsCollapsed(false));
   const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
-  await restoreInitialProWorkspace({ publicSection: Boolean(deepLinkedSectionID) });
+  // A shared section also needs the restored Project in a signed-in Pro tab.
+  // Opening before access settles can discard the citation during startup.
+  await restoreInitialProWorkspace();
   if (!deepLinkedSectionID && pendingProjectWorkspaceLink) await applyProjectWorkspaceURL({initial:true});
   projectURLStartupReady = true;
   if (!pendingProjectWorkspaceLink) void refreshProjectURLCatalog();

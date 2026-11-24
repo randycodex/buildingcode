@@ -60,6 +60,8 @@ console.log("Reader target readiness passed: source and deep-link navigation wai
   assert.equal(state.readers.length,0);
 }
 assert.ok(!source.includes('api(`/code/sections/${deepLinkedSectionID}`)'), 'Startup must not fetch rich content before source preflight');
+assert.match(source,/const deepLinkedSectionID = deepLinkedSectionIDFromLocation\(\);[\s\S]*?await restoreInitialProWorkspace\(\);[\s\S]*?await openDeepLinkedSectionInReader\(\{sectionID: deepLinkedSectionID\}\)/,
+  'A citation opened in a new Pro tab waits for its workspace restoration.');
 console.log('Deep-link cancellation and stale workspace guards passed.');
 
 // The detail heading must reveal the linked Reader horizontally after its own
