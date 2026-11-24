@@ -451,6 +451,7 @@ private struct ProjectNotebookSessionView: View {
             }
         }
         .listStyle(.plain)
+        .scrollIndicators(.hidden, axes: .vertical)
         .codeNavigationTopScrollEdge()
         .codeTransparentBottomScrollEdge()
         .refreshable { await loadCards(forceNetwork: true) }
@@ -1009,6 +1010,7 @@ private struct NotebookCardEditorView: View {
                     .padding(.vertical, 18)
                     .codeTabAlignedHorizontalPadding()
                 }
+                .scrollIndicators(.hidden, axes: .vertical)
                 .codeNavigationTopScrollEdge()
                 .codeTransparentBottomScrollEdge()
             }

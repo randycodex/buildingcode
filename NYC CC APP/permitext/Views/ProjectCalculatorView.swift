@@ -364,6 +364,7 @@ private struct CalculatorForm: View {
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
             .padding(.vertical, CodeScreenMetrics.topTitlePadding)
         }
+        .scrollIndicators(.hidden, axes: .vertical)
         .scrollDismissesKeyboard(.interactively)
         .codeNavigationTopScrollEdge()
         .codeTransparentBottomScrollEdge()

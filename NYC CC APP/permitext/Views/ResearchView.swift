@@ -1369,6 +1369,7 @@ private struct ResearchSessionView: View {
                 .codeTabAlignedHorizontalPadding()
                 .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
             }
+            .scrollIndicators(.hidden, axes: .vertical)
             .codePinnedTopBar { researchConversationHeader(conversation) }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 researchComposer

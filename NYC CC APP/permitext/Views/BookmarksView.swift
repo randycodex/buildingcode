@@ -2123,6 +2123,7 @@ struct ProjectView: View {
                 ProjectSectionScreen(title: "Notes", accentColor: accentColor) {
                     projectHubEmpty("Connect to sync this Project’s Notebook.")
                 }
+                .scrollIndicators(.hidden, axes: .vertical)
             }
         case .evidence:
             projectEvidenceDestination
@@ -2229,6 +2230,7 @@ struct ProjectView: View {
                 }
             }
         }
+        .scrollIndicators(isProjectFolder ? .hidden : .automatic, axes: .vertical)
         .searchable(text: $evidenceSearchQuery, isPresented: $isEvidenceSearchPresented,
                     prompt: "Search saved evidence")
         .navigationBarBackButtonHidden(isSelecting)
