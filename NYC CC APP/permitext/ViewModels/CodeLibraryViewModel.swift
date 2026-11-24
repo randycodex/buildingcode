@@ -528,6 +528,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var notebookDraftEditors: [ObjectIdentifier: NotebookDraftEditorRegistration] = [:]
     private var notebookReconnectTask: Task<Void, Never>?
     private var notebookReconnectRequested = false
+    private var notebookReconnectNeedsRetry = false
     private var replayingNotebookDraft: NotebookDraftAddress?
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
@@ -5559,6 +5560,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 try? await Task.sleep(nanoseconds: delay)
                 guard !Task.isCancelled, self.signedInAccount != nil else { return }
                 guard self.isNetworkAvailable, !self.isAccountBusy else { continue }
+                if self.notebookReconnectNeedsRetry { self.scheduleNotebookReconnect() }
                 self.lastForegroundAccountSyncAt = Date()
                 await self.performAutomaticUserContentSync()
             }
@@ -8525,6 +8527,7 @@ extension CodeLibraryViewModel {
             while !Task.isCancelled, self.notebookReconnectRequested,
                   self.isNetworkAvailable, owner == self.privateRequestIdentity {
                 self.notebookReconnectRequested = false
+                self.notebookReconnectNeedsRetry = false
                 await self.replayClosedNotebookDrafts(owner: owner)
             }
         }
@@ -8602,7 +8605,9 @@ extension CodeLibraryViewModel {
             }
         } catch {
             guard address.owner == privateRequestIdentity, !Task.isCancelled else { return }
-            if let status = (error as? PermitextBackendHTTPError)?.statusCode, (400..<500).contains(status) {
+            if NativeNotebookSaveRetryPolicy.isTransient(error) {
+                notebookReconnectNeedsRetry = true
+            } else if let status = (error as? PermitextBackendHTTPError)?.statusCode, (400..<500).contains(status) {
                 // Preserve rejected text and stop automatic replay. An existing
                 // note's conflict is handled by the normal review on reopen.
                 draft.retryAfterReconnect = nil

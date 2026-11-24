@@ -814,6 +814,13 @@ enum NativeNotebookRefreshDecision: Equatable {
     }
 }
 
+enum NativeNotebookSaveRetryPolicy {
+    static func isTransient(_ error: Error) -> Bool {
+        if let status = (error as? PermitextBackendHTTPError)?.statusCode, [408, 425, 429].contains(status) { return true }
+        return NativePrivateCachePolicy.permitsOfflineFallback(after: error)
+    }
+}
+
 /// SwiftUI can deliver title/document onChange after a cached or server apply.
 /// Track that programmatic baseline separately from the last synced revision.
 struct NativeNotebookEditObservation {
@@ -902,10 +909,16 @@ private struct NotebookCardEditorView: View {
     @State private var editObservation = NativeNotebookEditObservation()
     @State private var pendingSave: NativeNotebookSaveAttempt?
     @State private var retryAfterReconnect = false
+    @State private var automaticSaveRetryTask: Task<Void, Never>?
+    @State private var saveRetryCount = 0
     @State private var hasLocalDraft = false
     @State private var requiresConflictReview = false
     @State private var conflictingCard: NotebookCard?
     @State private var showingConflictReview = false
+    @State private var showingTableSize = false
+    @State private var tableRows = 5
+    @State private var tableColumns = 5
+    @State private var pendingTableSize: String?
     let cache: ProjectHubOfflineCache
 
     var body: some View {
@@ -927,11 +940,6 @@ private struct NotebookCardEditorView: View {
                             Text(errorMessage)
                                 .font(.footnote)
                                 .foregroundStyle(.red)
-                            if (pendingSave != nil || hasLocalDraft) && !editingReadOnly && !requiresConflictReview {
-                                Button("Retry save") { Task { await saveNow() } }
-                                    .disabled(isSaving || isDeleting)
-                                    .accessibilityIdentifier("native-notebook-retry-save")
-                            }
                         }
                         if requiresConflictReview {
                             Button("Review latest version") { Task { await reviewLatestVersion() } }
@@ -1044,6 +1052,28 @@ private struct NotebookCardEditorView: View {
             NativeNotebookReferenceDestination(route: route, projectID: projectID, sharedLibrary: library)
         }
         .photosPicker(isPresented: $showingPhotoPicker, selection: $selectedPhoto, matching: .images)
+        .sheet(isPresented: $showingTableSize, onDismiss: insertCustomTable) {
+            NavigationStack {
+                Form {
+                    Stepper("Rows: \(tableRows)", value: $tableRows, in: 1...50)
+                    Stepper("Columns: \(tableColumns)", value: $tableColumns, in: 1...20)
+                }
+                .navigationTitle("Table Size")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { showingTableSize = false }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Insert Table") {
+                            pendingTableSize = "insert-\(tableRows)x\(tableColumns)"
+                            showingTableSize = false
+                        }
+                    }
+                }
+            }
+            .presentationDetents([.medium])
+        }
         .onChange(of: library.networkConnectionGeneration) {
             Task { await retryOfflineSaveIfReady() }
         }
@@ -1181,6 +1211,8 @@ private struct NotebookCardEditorView: View {
         .onDisappear {
             isEditorVisible = false
             autosaveDebounceTask?.cancel()
+            automaticSaveRetryTask?.cancel()
+            automaticSaveRetryTask = nil
             if !isLeaving && hasLoaded && !editingReadOnly {
                 cacheDraft()
                 Task { await saveNow() }
@@ -1250,6 +1282,12 @@ private struct NotebookCardEditorView: View {
             } label: { formattingItem(Image(systemName: "plus")) }
             .accessibilityLabel("Insert")
             Menu {
+                Button("Custom size…") {
+                    Task {
+                        await captureEditorSelection()
+                        showingTableSize = true
+                    }
+                }
                 ForEach(documentEditor.formatting.tableActions) { action in
                     formatButton(action.label, command: .table, value: action.value,
                         role: action.value.hasPrefix("remove-") ? .destructive : nil)
@@ -1281,6 +1319,12 @@ private struct NotebookCardEditorView: View {
     private func formattingItem(_ label: some View) -> some View {
         label.frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.toolbarButtonSize)
             .contentShape(Rectangle())
+    }
+
+    private func insertCustomTable() {
+        guard let size = pendingTableSize else { return }
+        pendingTableSize = nil
+        Task { await performEditorCommand { try await documentEditor.applyFormat(.table, value: size) } }
     }
 
     private func formatButton(_ title: String, command: NotebookDocumentEditorController.FormatCommand,
@@ -1461,12 +1505,11 @@ private struct NotebookCardEditorView: View {
         var deferredDraft: NativeNotebookDraft?
         defer {
             isLoading = false
-            // saveNow rejects an active load. Resume only after the load flag is
-            // cleared, and do not turn an offline failure into an automatic retry.
-            if !isLeaving, refreshSucceeded, isCurrentOwner, !Task.isCancelled, needsSave, !requiresConflictReview {
+            // Resume autosave after the active load clears.
+            if !isLeaving, retryAfterReconnect, !Task.isCancelled {
+                scheduleAutomaticSaveRetry()
+            } else if !isLeaving, refreshSucceeded, isCurrentOwner, !Task.isCancelled, needsSave, !requiresConflictReview {
                 Task { await saveNow() }
-            } else if !isLeaving, retryAfterReconnect, !Task.isCancelled {
-                Task { await retryOfflineSaveIfReady() }
             }
         }
 
@@ -1525,10 +1568,13 @@ private struct NotebookCardEditorView: View {
                 serverContent: editableContent(for: card))
             switch decision {
             case .preservePending:
-                errorMessage = "Your draft is on this iPhone. Retry save to confirm the previous save."
+                retryAfterReconnect = true
+                _ = cacheDraft()
             case .reviewConflict:
                 conflictingCard = card
                 requiresConflictReview = true
+                retryAfterReconnect = false
+                _ = cacheDraft()
                 errorMessage = "This Note changed elsewhere. Your draft and its original version are preserved. Review the latest Note before saving."
             case .preserveDraft:
                 break
@@ -1565,6 +1611,11 @@ private struct NotebookCardEditorView: View {
                 apply(cachedCard)
             }
             guard !isLeaving else { return }
+            if hasLoaded, NativeNotebookSaveRetryPolicy.isTransient(error), pendingSave != nil || retryAfterReconnect {
+                retryAfterReconnect = true
+                _ = cacheDraft()
+                return
+            }
             let detail = nativeNotebookRequestErrorMessage(error)
             errorMessage = hasLoaded ? "Could not refresh this Note. \(detail)" : detail
         }
@@ -1646,6 +1697,10 @@ private struct NotebookCardEditorView: View {
             needsSave = true
             return
         }
+        if retryAfterReconnect {
+            scheduleAutomaticSaveRetry()
+            return
+        }
         autosaveDebounceTask?.cancel()
         autosaveDebounceTask = Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(650))
@@ -1662,12 +1717,22 @@ private struct NotebookCardEditorView: View {
         guard retryAfterReconnect, library.isNetworkAvailable, isCurrentOwner, isEditorVisible,
               hasLoaded, !editingReadOnly, !isLoading, !isSaving, !isLeaving, !isDeleting,
               !requiresConflictReview else { return }
+        automaticSaveRetryTask?.cancel()
+        automaticSaveRetryTask = nil
         guard await flushEditorDraft(), retryAfterReconnect, library.isNetworkAvailable else { return }
         await saveNow()
     }
 
-    private func shouldRetryAfterReconnect(_ error: Error) -> Bool {
-        error is URLError && NativePrivateCachePolicy.permitsOfflineFallback(after: error)
+    private func scheduleAutomaticSaveRetry() {
+        guard automaticSaveRetryTask == nil, retryAfterReconnect, isCurrentOwner, isEditorVisible,
+              library.isNetworkAvailable, !isLeaving, !requiresConflictReview else { return }
+        let delay = min(30, 1 << saveRetryCount)
+        saveRetryCount = min(saveRetryCount + 1, 5)
+        automaticSaveRetryTask = Task { @MainActor in
+            do { try await Task.sleep(for: .seconds(delay)) } catch { return }
+            automaticSaveRetryTask = nil
+            await retryOfflineSaveIfReady()
+        }
     }
 
     @MainActor
@@ -1679,16 +1744,13 @@ private struct NotebookCardEditorView: View {
         autosaveDebounceTask = nil
         isSaving = true
         needsSave = false
-        let connectionAtStart = library.networkConnectionGeneration
         defer {
             isSaving = false
-            if isCurrentOwner, needsSave, !requiresConflictReview, (!isLeaving || !retryAfterReconnect) {
+            if isLeaving, retryAfterReconnect { releaseClosedDraft() }
+            else if retryAfterReconnect { scheduleAutomaticSaveRetry() }
+            else if isCurrentOwner, needsSave, !requiresConflictReview {
                 Task { await saveNow() }
-            }
-            else if isLeaving { releaseClosedDraft() }
-            else if retryAfterReconnect, library.networkConnectionGeneration != connectionAtStart {
-                Task { await retryOfflineSaveIfReady() }
-            }
+            } else if isLeaving { releaseClosedDraft() }
         }
         guard cacheDraft() else { return }
         errorMessage = nil
@@ -1706,7 +1768,7 @@ private struct NotebookCardEditorView: View {
                 }
             } catch {
                 guard isCurrentOwner else { return }
-                retryAfterReconnect = shouldRetryAfterReconnect(error)
+                retryAfterReconnect = NativeNotebookSaveRetryPolicy.isTransient(error)
                 guard cacheDraft() else { return }
                 freshWriteRole = nil
                 if NativePrivateCachePolicy.requiresInvalidation(after: error) {
@@ -1717,8 +1779,7 @@ private struct NotebookCardEditorView: View {
                     if let owner { try? cache.removeProject(accountID: owner.accountID, projectID: projectID) }
                     hasLoaded = false
                 }
-                let detail = nativeNotebookRequestErrorMessage(error)
-                errorMessage = hasLoaded && !(error is CancellationError) ? "Your draft is on this iPhone. \(detail)" : detail
+                if !retryAfterReconnect { errorMessage = nativeNotebookRequestErrorMessage(error) }
                 return
             }
         }
@@ -1754,10 +1815,9 @@ private struct NotebookCardEditorView: View {
             needsSave = true
         } catch {
             guard isCurrentOwner else { return }
-            retryAfterReconnect = shouldRetryAfterReconnect(error)
+            retryAfterReconnect = NativeNotebookSaveRetryPolicy.isTransient(error)
             guard cacheDraft() else { return }
-            let detail = nativeNotebookRequestErrorMessage(error)
-            errorMessage = error is CancellationError ? detail : "Your draft is on this iPhone. \(detail)"
+            if !retryAfterReconnect { errorMessage = nativeNotebookRequestErrorMessage(error) }
         }
     }
 
@@ -1886,6 +1946,7 @@ private struct NotebookCardEditorView: View {
         contentAtStart: NativeNotebookEditableContent
     ) {
         retryAfterReconnect = false
+        saveRetryCount = 0
         let changedDuringSave = editableContent != contentAtStart
         if changedDuringSave {
             currentCardID = saved.id

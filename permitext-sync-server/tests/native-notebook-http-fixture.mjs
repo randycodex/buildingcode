@@ -42,7 +42,7 @@ async function verifyRevocation() {
 }
 async function verify() {
   assert.equal(droppedResponses, 1, "Exactly one committed response must be lost.");
-  assert.equal(attempts.length, 2, "The failed save and explicit retry must be the only save attempts.");
+  assert.equal(attempts.length, 2, "The failed save and automatic retry must be the only save attempts.");
   assert.deepEqual(attempts[1], attempts[0], "Retry must preserve the original mutation ID and complete request.");
   assert.ok(attempts[0].clientMutationID);
   assert.equal(attempts[0].expectedVersion, 0);

@@ -18,6 +18,28 @@ html[data-read-only="true"] .notebook-format-toolbar { display: none; }
 .permitext-notebook-editor .bn-block-content > .bn-inline-content { flex: 1 1 0%; overflow-wrap: anywhere; }
 .permitext-notebook-editor .notebook-reference-chip { white-space: normal; overflow-wrap: anywhere; }
 
+.permitext-notebook-editor .bn-editor [data-content-type=table] .tableWrapper {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  padding-inline: 0;
+  overflow-x: auto;
+}
+html[data-read-only="false"] .permitext-notebook-editor .bn-editor [data-content-type=table] .tableWrapper {
+  max-width: calc(100% - 40px);
+}
+#notebook-add-column {
+  position: absolute;
+  z-index: 1;
+  width: 40px;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  color: CanvasText;
+  background: color-mix(in srgb, CanvasText 10%, Canvas);
+  font: 500 22px -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
 .notebook-reference-chip:is([data-reference-kind="canonicalSection"], [data-reference-kind="selectedPassage"]) {
   display: inline-block;
   box-sizing: border-box;

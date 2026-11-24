@@ -231,15 +231,31 @@ export function notebookTableActions(editor) {
 }
 
 export function applyNotebookTableAction(editor, action) {
+  if (action === "append-column") {
+    const choice = notebookTableActions(editor).find(item => item.value === "column");
+    if (!choice || choice.disabled) return false;
+    return editor.exec((state, dispatch, view) => {
+      const { map, tableStart, top } = selectedRect(state);
+      const lastCell = tableStart + map.map[top * map.width + map.width - 1];
+      const lastCellState = state.apply(state.tr.setSelection(TextSelection.create(state.doc, lastCell + 2)));
+      return addColumnAfter(lastCellState, dispatch && (transaction => {
+        transaction.setSelection(state.selection.map(transaction.doc, transaction.mapping));
+        dispatch(transaction);
+      }), view);
+    });
+  }
+  const custom = /^insert-([1-9][0-9]?)x([1-9][0-9]?)$/.exec(action);
+  if (custom && (Number(custom[1]) > 50 || Number(custom[2]) > 20)) return false;
   const choice = notebookTableActions(editor).find(item => item.value === action);
-  if (!choice || choice.disabled) return false;
+  if (!custom && (!choice || choice.disabled)) return false;
   const block = editor.getTextCursorPosition().block;
   if (action.startsWith("insert-")) {
-    const size = Number(action.slice(7));
+    const rows = Number(custom?.[1] ?? action.slice(7));
+    const columns = Number(custom?.[2] ?? action.slice(7));
     const content = {
       type: "tableContent",
       headerRows: 1,
-      rows: Array.from({length: size}, () => ({cells: Array.from({length: size}, () => [])}))
+      rows: Array.from({length: rows}, () => ({cells: Array.from({length: columns}, () => [])}))
     };
     let inserted;
     editor.transact(() => {
@@ -568,8 +584,9 @@ function PermitextNotebookEditor({ options, controllerRef }) {
       formattingToolbar: false,
       sideMenu: false,
       slashMenu: false,
+      tableHandles: options.tableHandles !== false,
       renderEditor: false,
-      onChange: () => options.onChange?.(wrappedDocument(editor.document)),
+      onChange: () => options.onChange?.(options.native ? undefined : wrappedDocument(editor.document)),
       "aria-label": options.ariaLabel || "Notebook card"
     },
     options.toolbar !== false && options.editable !== false && React.createElement(PermitextFormattingToolbar, {editor, options}),

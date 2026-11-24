@@ -19,8 +19,8 @@ function block(source, marker, indent = '') {
 }
 const declarations = models.slice(models.indexOf('struct NotebookQuestion:')) + '\n' +
  ['NativeNotebookDraft', 'NativeNotebookSaveAttempt', 'NativeNotebookEditableContent', 'NativeNotebookEditObservation']
- .map(name => block(editor, `struct ${name}`)).join('\n');
-const methods = ['private func scheduleAutosave()', 'private func retryOfflineSaveIfReady()', 'private func shouldRetryAfterReconnect(',
+ .map(name => block(editor, `struct ${name}`)).join('\n') + '\n' + block(editor, 'enum NativeNotebookSaveRetryPolicy');
+const methods = ['private func scheduleAutosave()', 'private func retryOfflineSaveIfReady()', 'private func scheduleAutomaticSaveRetry()',
  'private func saveNow()', 'private var currentDraft:',
  'private func cacheDraft()', 'private var editableContent:', 'private func editableContent(for card:',
  'private func normalizedTitle(', 'private func apply(_ card:', 'private func apply(_ draft:', 'private func editableContent(for draft:', 'private func completeSave(']

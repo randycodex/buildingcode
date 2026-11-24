@@ -11,6 +11,8 @@ cache = (ROOT / 'NYC CC APP/permitext/Data/ProjectHubOfflineCache.swift').read_t
 cache = cache[:cache.index('/// A new session invalidates')]
 policy = model[model.index('enum PermitextReleaseSurfaceVisibility {'):model.index('\n}', model.index('enum PermitextReleaseSurfaceVisibility {'))+2]
 helper = source[source.index('func nativeNotebookCachedCardType('):source.index('\nenum NativeNotebookOfflineDraftPolicy')]
+retry_start = source.index('enum NativeNotebookSaveRetryPolicy {')
+retry_policy = source[retry_start:source.index('\n}', retry_start)+2]
 def method(signature):
     start = source.index('    private func ' + signature)
     return source[start:source.index('\n    }', start)+6].replace('    private func', '    func', 1)
@@ -27,6 +29,7 @@ enum ResearchQuestionAttempt { static let cacheScope = "research-question-attemp
 struct Owner { let accountID = "A" }
 struct Editor { var isReady = false }
 enum CardReadFailure: Error { case forbidden }
+struct PermitextBackendHTTPError: Error { let statusCode: Int? }
 enum NativePrivateCachePolicy {
  static func requiresInvalidation(after error: Error) -> Bool { error is CardReadFailure }
  static func permitsOfflineFallback(after error: Error) -> Bool {
@@ -48,6 +51,7 @@ enum NativeNotebookRefreshDecision {
  var deniesCardRead = false
  var delaysCardRead = false
  var releaseCardRead: CheckedContinuation<Void, Never>?
+ func invalidateProjectDashboardPreview(projectID: String) {}
  func claimNotebookDraftEditor(_ editor: Editor, owner: Owner, projectID: String, routeID: String, cardID: String?) async {}
  func notebookCards(projectID: String) async throws -> NotebookCardListResponse {
   if offline { throw URLError(.notConnectedToInternet) }
@@ -67,7 +71,7 @@ enum NativeNotebookRefreshDecision {
  let projectID = "P"; var routeID = "note"; var cardID: String? = "note"; var currentCardID: String?
  var isLoading = false; var hasLoaded = false; var needsSave = false; var requiresConflictReview = false
  var isSaving = false; var autosaveDebounceTask: Task<Void, Never>?; var conflictingCard: NotebookCard?
- var retryAfterReconnect = false; var editingReadOnly = false
+ var retryAfterReconnect = false; var editingReadOnly = false; var isLeaving = false; var pendingSave: Bool?
  var errorMessage: String?; var statusMessage = ""
  var documentEditor = Editor(); var applied: [String] = []; var appliedVersions: [Int] = []; var appliedDraft = false
  var currentDraft: NativeNotebookDraft { .init(cardID: currentCardID) }
@@ -77,8 +81,9 @@ enum NativeNotebookRefreshDecision {
  var permitsLocalDraftEditing = false; var cachedAt: String?; var loadID: UUID?; var editorRoute: String?
  init(_ cache: ProjectHubOfflineCache) { self.cache = cache }
  func flushEditorDraft() async -> Bool { true }
+ func cacheDraft() -> Bool { true }
  func saveNow() async {}
- func retryOfflineSaveIfReady() async {}
+ func scheduleAutomaticSaveRetry() {}
  func editableContent(for card: NotebookCard) -> String { card.id }
  func apply(_ card: NotebookCard) {
   applied.append(card.cardType); appliedVersions.append(card.version); hasLoaded = true; currentCardID = card.id
@@ -168,6 +173,6 @@ enum NativeNotebookRefreshDecision {
 with tempfile.TemporaryDirectory(prefix='permitext-notebook-visibility-') as temporary:
     path = Path(temporary)
     swift = path / 'contract.swift'
-    swift.write_text(cache + '\n' + policy + '\n' + helper + '\n' + harness)
+    swift.write_text(cache + '\n' + policy + '\n' + helper + '\n' + retry_policy + '\n' + harness)
     subprocess.run(['xcrun', 'swiftc', '-parse-as-library', '-swift-version', '6', str(swift), '-o', str(path / 'contract')], check=True)
     subprocess.run([str(path / 'contract')], check=True)

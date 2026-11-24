@@ -1888,9 +1888,6 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(title.waitForExistence(timeout: 30))
         title.tap()
         title.typeText(" retained draft")
-        let retry = app.buttons["native-notebook-retry-save"]
-        XCTAssertTrue(retry.waitForExistence(timeout: 15))
-        retry.tap()
         XCTAssertTrue(app.buttons["native-notebook-retry"].waitForExistence(timeout: 15))
         XCTAssertFalse(title.exists)
         XCTAssertTrue(app.buttons["native-notebook-back"].exists)
@@ -1906,19 +1903,15 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(title.waitForExistence(timeout: 30))
         XCTAssertTrue(title.isEnabled)
         XCTAssertFalse(app.buttons["Note actions"].exists, "A cold offline draft cannot expose server deletion before fresh write access.")
+        let insertImage = app.buttons["Insert image"]
+        XCTAssertTrue(insertImage.waitForExistence(timeout: 10))
+        XCTAssertFalse(insertImage.isEnabled, "Image upload requires fresh server authorization.")
         title.tap()
         title.typeText(" cold offline draft")
         let editedTitle = title.value as? String
-        let retry = app.buttons["native-notebook-retry-save"]
-        XCTAssertTrue(retry.waitForExistence(timeout: 15))
-        XCTAssertEqual(title.value as? String, editedTitle)
-        let insertImage = app.buttons["Insert image"]
-        XCTAssertTrue(insertImage.waitForExistence(timeout: 10), "The document toolbar must be present; an absent control does not prove access gating.")
-        XCTAssertFalse(insertImage.isEnabled, "Image upload requires fresh server authorization.")
-        keepScreenshot(named: "Cold offline cached editor local draft", from: app)
-        retry.tap()
         XCTAssertTrue(waitForValue("saved", on: element(in: app, identifier: "native-notebook-save-status"), timeout: 15))
         XCTAssertEqual(title.value as? String, editedTitle)
+        XCTAssertFalse(app.buttons["Retry save"].exists)
         XCTAssertFalse(app.buttons["Save"].exists)
         XCTAssertTrue(insertImage.isEnabled, "Fresh editor authorization must restore image upload.")
         keepScreenshot(named: "Cold offline draft freshly authorized and synced", from: app)
@@ -2089,6 +2082,46 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertLessThanOrEqual(body.frame.maxX, app.frame.maxX - 17, "Body must fit the inset writing canvas: \(diagnostics.value as? String ?? "missing")")
     }
 
+    func testNativeNotebookCustomTableAndRightColumnButton() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture",
+                               "--native-notebook-layout-diagnostics", "--native-notebook-save-diagnostics"]
+        app.launch()
+        let body = nativeNotebookBody(in: app)
+        XCTAssertTrue(body.waitForExistence(timeout: 30))
+        body.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.04)).tap()
+        let tableTools = app.buttons["Table"]
+        XCTAssertTrue(tableTools.isHittable)
+        tableTools.tap()
+        app.buttons["Custom size…"].tap()
+        XCTAssertTrue(app.navigationBars["Table Size"].waitForExistence(timeout: 5))
+        app.buttons["Insert Table"].tap()
+        let layout = app.staticTexts["native-notebook-layout-diagnostics"]
+        func assertTable(columns: Int) {
+            let hasSize = NSPredicate { _, _ in
+                let json = Data(((layout.value as? String) ?? "").utf8)
+                let metrics = (try? JSONSerialization.jsonObject(with: json)) as? [String: Any]
+                return (metrics?["tables"] as? [[String: Int]])?.contains(["rows": 5, "columns": columns]) == true
+            }
+            XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: hasSize, object: nil)], timeout: 8), .completed)
+        }
+        assertTable(columns: 5)
+        let addColumn = app.webViews.buttons["Add column at end"]
+        XCTAssertTrue(addColumn.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(addColumn.isHittable)
+        XCTAssertLessThanOrEqual(addColumn.frame.maxX, app.frame.maxX - 16)
+        keepScreenshot(named: "Custom Note table with visible right-side add button", from: app)
+        let secondRow = app.coordinate(withNormalizedOffset: .zero).withOffset(
+            CGVector(dx: body.frame.minX + 18, dy: addColumn.frame.midY + 33))
+        addColumn.tap()
+        assertTable(columns: 6)
+        secondRow.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        app.typeText("Table cell draft survives autosave")
+        XCTAssertTrue(waitForValue("saved", on: element(in: app, identifier: "native-notebook-save-status"), timeout: 12))
+        XCTAssertTrue(nativeNotebookBodyValue(body)?.contains("Table cell draft survives autosave") == true)
+    }
+
     func testNativeNotebookListsLinksAndUndoRemainInOneDocument() {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture"]
@@ -2177,7 +2210,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         // has no parent Note list. Real-project Done/reopen is a separate check.
     }
 
-    func testNativeNotebookCachedPendingRefreshRequiresExplicitRetry() {
+    func testNativeNotebookCachedPendingRefreshRetriesOriginalMutationSilently() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture", "--native-notebook-delayed-refresh-fixture", "--native-notebook-refresh-pending-draft"]
         app.launchArguments.append("--native-notebook-save-diagnostics")
@@ -2188,17 +2221,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(title.value as? String, "Pending original mutation")
         let settled = NSPredicate { _, _ in diagnostics.label.contains("settled=true") }
         XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: settled, object: nil)], timeout: 25), .completed)
-        XCTAssertTrue(diagnostics.label.contains("saves=0;"), "Refreshing a cached pending mutation must not retry it automatically.")
-        XCTAssertEqual(title.value as? String, "Pending original mutation")
-        let retry = app.buttons["native-notebook-retry-save"]
-        XCTAssertTrue(retry.waitForExistence(timeout: 5))
-        keepScreenshot(named: "Cached pending Note waits for explicit retry after successful refresh", from: app)
-        retry.tap()
         XCTAssertTrue(waitForValue("saved", on: element(in: app, identifier: "native-notebook-save-status"), timeout: 15))
         XCTAssertTrue(diagnostics.label.contains("saves=1;"))
         XCTAssertTrue(diagnostics.label.contains("mutation=native-refresh-original-mutation"))
         XCTAssertEqual(title.value as? String, "Pending original mutation")
-        XCTAssertFalse(retry.exists)
+        XCTAssertFalse(app.buttons["Retry save"].exists)
+        XCTAssertFalse(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "confirm the previous save")).firstMatch.exists)
         keepScreenshot(named: "Cached pending Note retries original mutation once", from: app)
     }
 
@@ -2242,7 +2270,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.buttons["native-notebook-back"].isEnabled)
     }
 
-    func testNativeNotebookOfflineSaveKeepsDraftAndRetryRecovers() {
+    func testNativeNotebookOfflineSaveKeepsDraftAndRecoversAutomatically() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
             "--native-notebook-reference-fixture", "--native-notebook-save-offline-fixture"]
@@ -2253,14 +2281,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         title.tap()
         title.typeText(" offline edit")
         let editedTitle = title.value as? String
-        let retry = app.buttons["native-notebook-retry-save"]
-        XCTAssertTrue(retry.waitForExistence(timeout: 15), "A failed autosave must offer an explicit retry.")
-        XCTAssertEqual(title.value as? String, editedTitle)
-        keepScreenshot(named: "Offline Note draft with Retry save", from: app)
-        retry.tap()
         XCTAssertTrue(waitForValue("saved", on: element(in: app, identifier: "native-notebook-save-status"), timeout: 15))
         XCTAssertEqual(title.value as? String, editedTitle)
-        XCTAssertFalse(retry.exists)
+        XCTAssertFalse(app.buttons["Retry save"].exists)
         XCTAssertFalse(app.buttons["Save"].exists, "A healthy editor should not regain a redundant Save button.")
         keepScreenshot(named: "Recovered Note autosave", from: app)
     }
@@ -2288,14 +2311,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         title.tap()
         title.typeText(" HTTP lost response")
         let editedTitle = try XCTUnwrap(title.value as? String)
-        let retry = app.buttons["native-notebook-retry-save"]
-        XCTAssertTrue(retry.waitForExistence(timeout: 15), "A real lost HTTP acknowledgement must leave an explicit recoverable draft.")
-        XCTAssertEqual(title.value as? String, editedTitle)
-        keepScreenshot(named: "HTTP response lost after Note creation", from: app)
-        retry.tap()
         XCTAssertTrue(waitForValue("saved", on: element(in: app, identifier: "native-notebook-save-status"), timeout: 15))
         XCTAssertEqual(title.value as? String, editedTitle)
-        XCTAssertFalse(retry.exists)
+        XCTAssertFalse(app.buttons["Retry save"].exists)
         XCTAssertFalse(app.buttons["Save"].exists)
         keepScreenshot(named: "Native Note recovered through real HTTP replay", from: app)
         var verification = URLRequest(url: base.appendingPathComponent("fixture/verify"))
@@ -2347,14 +2365,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         title.tap()
         title.typeText(" pending after revocation")
         let pendingTitle = try XCTUnwrap(title.value as? String)
-        let retrySave = app.buttons["native-notebook-retry-save"]
-        XCTAssertTrue(retrySave.waitForExistence(timeout: 15))
+        let saveStatus = element(in: app, identifier: "native-notebook-save-status")
+        XCTAssertTrue(waitForValue("unsaved", on: saveStatus, timeout: 15))
         XCTAssertEqual(title.value as? String, pendingTitle)
         XCTAssertFalse(app.buttons["Save"].exists)
+        XCTAssertFalse(app.buttons["Retry save"].exists)
         keepScreenshot(named: "Revoked synthetic HTTP session preserves unsaved Note draft", from: app)
-        retrySave.tap()
-        XCTAssertTrue(retrySave.waitForExistence(timeout: 15))
-        XCTAssertEqual(title.value as? String, pendingTitle)
 
         // A fresh isolated harness has no cached list to disguise a denied read.
         // The draft assertion above concerns the live editor, not cross-login persistence.

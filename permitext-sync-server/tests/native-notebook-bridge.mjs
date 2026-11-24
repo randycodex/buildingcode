@@ -71,7 +71,7 @@ const environment = {
   },
   document: {
     documentElement: { dataset: {}, style: { setProperty: (name, value) => cssVariables.set(name, value) } },
-    getElementById: () => ({
+    getElementById: id => id === "notebook" ? ({
       getBoundingClientRect: () => ({ height: 300 }),
       addEventListener(name, callback, options) {
         const handlers = mountEvents.get(name) ?? [];
@@ -79,7 +79,7 @@ const environment = {
         mountEvents.set(name, handlers);
         events.set(name, callback);
       }
-    }),
+    }) : null,
     addEventListener: (name, callback) => events.set(name, callback)
   },
   ResizeObserver: class { observe() {} },

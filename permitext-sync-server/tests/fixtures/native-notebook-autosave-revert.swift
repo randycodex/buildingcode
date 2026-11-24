@@ -41,8 +41,10 @@ final class DraftCache {
  var isNetworkAvailable = true
  var networkConnectionGeneration: UInt = 0
  var rejectsWithConflict = false
+ var rejectionStatus: Int?
  var rejectInvalidQuestions = true
  var storedQuestions: [NotebookQuestion]? = nil
+ func invalidateProjectDashboardPreview(projectID: String) {}
  func notebookCards(projectID: String) async throws -> ListResponse { ListResponse() }
  func saveNotebookCard(projectID: String, cardID: String?, expectedVersion: Int, title: String,
   document: NotebookDocument, evidenceLinks: [NotebookEvidenceLink], clientMutationID: String, openQuestions: [NotebookQuestion]? = nil) async throws -> NotebookCard {
@@ -50,6 +52,7 @@ final class DraftCache {
    expectedVersion: expectedVersion, content: .init(title: title, document: document, evidenceLinks: evidenceLinks, openQuestions: openQuestions))
   attempts.append(attempt)
   if !isNetworkAvailable { throw URLError(.notConnectedToInternet) }
+  if let rejectionStatus { throw PermitextBackendHTTPError.serverStatus(rejectionStatus, "Temporary failure") }
   if rejectsWithConflict { throw PermitextBackendHTTPError.serverStatus(409, "Newer version") }
   if rejectInvalidQuestions, NotebookQuestion.validationMessage(in: openQuestions ?? []) != nil {
    throw PermitextBackendHTTPError.serverStatus(400, "Invalid question")
@@ -82,8 +85,10 @@ final class DraftCache {
  let library = Network()
  var isNetworkAvailable: Bool { library.isNetworkAvailable }
  var notebookReconnectRevision = 0
+ var notebookReconnectNeedsRetry = false
  private var replayingNotebookDraft: NotebookDraftAddress?
  init(_ directory: URL) { projectHubOfflineCache = ProjectHubOfflineCache(directoryURL: directory) }
+ func invalidateProjectDashboardPreview(projectID: String) {}
  func notebookCard(projectID: String, cardID: String) async throws -> NotebookCard {
   throw URLError(.fileDoesNotExist)
  }
@@ -101,6 +106,7 @@ final class DraftCache {
  var isSaving = false, needsSave = false, canPerformNetworkWrites = true, hasDeniedWriteAccess = false
  var hasLocalDraft = false, errorMessage: String?
  var retryAfterReconnect = false, isEditorVisible = true, isLeaving = false
+ var automaticSaveRetryTask: Task<Void, Never>?, saveRetryCount = 0
  var saved: Bool { !hasLocalDraft && !isSaving && pendingSave == nil && editableContent == lastSyncedContent && errorMessage == nil }
  var autosaveDebounceTask: Task<Void, Never>?, lastLocalEditAt: Date?, pendingSave: NativeNotebookSaveAttempt?
  var currentCardID: String? = "note", version = 1, draftMutationID = "original"
@@ -199,7 +205,19 @@ func check(_ condition: @autoclosure () -> Bool, _ message: String) {
   let ambiguous = Editor(path)
   ambiguous.restore(recovered)
   await ambiguous.networkRecovered()
-  check(ambiguous.library.attempts.isEmpty, "A pending save without an offline failure must retain explicit retry")
+  check(ambiguous.library.attempts.isEmpty, "An unvalidated cached receipt waits for the Note refresh before replay")
+
+  let throttled = Editor(path)
+  throttled.library.rejectionStatus = 429
+  throttled.edit("Temporarily throttled")
+  await throttled.retry()
+  check(throttled.errorMessage == nil && throttled.retryAfterReconnect && throttled.pendingSave != nil,
+        "A temporary server rejection must keep the receipt without a banner")
+  throttled.library.rejectionStatus = nil
+  try await Task.sleep(for: .milliseconds(1200))
+  check(throttled.saved && throttled.library.attempts.count == 2 &&
+        throttled.library.attempts[0] == throttled.library.attempts[1],
+        "Automatic retry must repeat the same request without a connection change")
 
   let crossing = Editor(path)
   crossing.library.hold = true
@@ -208,7 +226,7 @@ func check(_ condition: @autoclosure () -> Bool, _ message: String) {
   while crossing.library.suspended == nil { await Task.yield() }
   crossing.library.failOnReconnect()
   await initialSave.value
-  try await Task.sleep(for: .milliseconds(50))
+  try await Task.sleep(for: .milliseconds(1200))
   check(crossing.saved && crossing.library.attempts.count == 2 &&
         crossing.library.attempts[0] == crossing.library.attempts[1],
         "A reconnect during a failing save must not be missed")
@@ -226,12 +244,19 @@ func check(_ condition: @autoclosure () -> Bool, _ message: String) {
   let queued = try cache.notebookDraftEntries(NativeNotebookDraft.self, accountID: address.owner.accountID, knownProjectIDs: [])
   check(queued.count == 1 && queued[0].projectID == address.projectID && queued[0].value == latestOffline,
         "A closed draft must be discoverable in its owning account without opening its project")
+  worker.library.rejectionStatus = 429
+  await worker.replayClosedNotebookDraft(at: address)
+  let deferred = try cache.load(NativeNotebookDraft.self, accountID: address.owner.accountID, projectID: address.projectID, scope: address.scope)?.value
+  check(worker.notebookReconnectNeedsRetry && deferred == latestOffline,
+        "A temporary failure must keep a closed draft queued for the next background retry")
+  worker.library.rejectionStatus = nil
   await worker.replayClosedNotebookDraft(at: address)
   let replayed = try cache.load(NotebookCard.self, accountID: address.owner.accountID, projectID: address.projectID,
                                 scope: "native-notebook-card:note")?.value
   let retired = try cache.load(NativeNotebookDraft.self, accountID: address.owner.accountID, projectID: address.projectID, scope: address.scope)
   check(worker.library.attempts.first?.clientMutationID == offlineDraft.pendingSave?.clientMutationID &&
-        worker.library.attempts.count == 2 && worker.library.attempts.last?.expectedVersion == 2 &&
+        worker.library.attempts.count == 3 && worker.library.attempts[0] == worker.library.attempts[1] &&
+        worker.library.attempts.last?.expectedVersion == 2 &&
         replayed?.title == "Later offline text" && retired == nil && worker.notebookReconnectRevision == 1,
         "The closed replay must resolve the old receipt and save the latest draft before retiring it")
   try cache.store(latestOffline, accountID: address.owner.accountID, projectID: address.projectID, scope: address.scope)

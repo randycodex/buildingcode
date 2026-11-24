@@ -30,6 +30,7 @@ let settlingInput = 0;
 const compositionWaiters = new Set();
 const pendingRequests = new Map();
 const mount = document.getElementById("notebook");
+const addColumnButton = document.getElementById("notebook-add-column");
 
 function post(type, payload = {}) {
   window.webkit?.messageHandlers?.permitextNotebook?.postMessage({
@@ -140,6 +141,9 @@ function layoutDiagnostics() {
     viewportWidth: window.visualViewport?.width ?? null, viewportScale: window.visualViewport?.scale ?? null,
     nativeWidthCSS: getComputedStyle(document.documentElement).getPropertyValue("--native-note-width"),
     bodyFontCSS: getComputedStyle(document.documentElement).getPropertyValue("--native-note-body-size"),
+    tables: [...mount.querySelectorAll("table")].map(table => ({
+      rows: table.rows.length, columns: table.rows[0]?.cells.length ?? 0
+    })),
     elements: elements.map(element => {
       const rect = element.getBoundingClientRect();
       const css = getComputedStyle(element);
@@ -172,6 +176,7 @@ function measure(revealCaret = false) {
       lastHeight = height;
       post("height", { height });
     }
+    positionAddColumnButton();
     if (shouldRevealCaret && editor?.isFocused()) {
       const range = window.getSelection()?.rangeCount ? window.getSelection().getRangeAt(0) : null;
       const rect = range?.getBoundingClientRect();
@@ -179,6 +184,33 @@ function measure(revealCaret = false) {
     }
   });
 }
+
+function positionAddColumnButton() {
+  if (!addColumnButton) return;
+  const focus = window.getSelection()?.focusNode;
+  const cell = (focus?.nodeType === 1 ? focus : focus?.parentElement)?.closest("td, th");
+  const wrapper = cell?.closest(".tableWrapper");
+  addColumnButton.hidden = readOnly || !wrapper || !mount.contains(wrapper);
+  if (addColumnButton.hidden) return;
+  const edge = wrapper.getBoundingClientRect();
+  const row = cell.parentElement.getBoundingClientRect();
+  addColumnButton.style.left = `${edge.right + window.scrollX}px`;
+  addColumnButton.style.top = `${Math.max(edge.top, Math.min(row.top, edge.bottom - 44)) + window.scrollY}px`;
+}
+
+addColumnButton?.addEventListener("pointerdown", event => event.preventDefault());
+addColumnButton?.addEventListener("click", () => {
+  if (!readOnly && !composing && editor) {
+    try {
+      if (applyNotebookTableAction(editor, "append-column")) {
+        editor.prosemirrorView.focus();
+        measure(true);
+      }
+    } catch (error) {
+      post("error", { message: error.message });
+    }
+  }
+});
 
 function requestNative(type, payload) {
   const requestID = String(++nextRequest);
@@ -212,13 +244,15 @@ async function configure(command) {
       editable: !readOnly,
       ariaLabel: "Note body",
       toolbar: false,
+      native: true,
+      tableHandles: false,
       sideMenu: false,
       slashMenu: false,
       insertItems: ["evidence", "research", "image"],
       onInsert: (kind) => chooseInsert(kind === "image" ? "image" : "reference"),
       onReady(instance) {
         editor = instance;
-        previousTransactionText = fixtureDocumentText(controller.getDocument());
+        if (inputTracingEnabled) previousTransactionText = fixtureDocumentText(controller.getDocument());
         traceInput("mounted");
         editor.onSelectionChange(() => {
           if (!replacing) insertionPosition = controller.getEditingPosition();
@@ -232,8 +266,10 @@ async function configure(command) {
         if (!controller || !editor) return;
         if (replacing) { traceInput("replacement-transaction-suppressed"); return; }
         revision += 1;
-        traceInput("transaction", { beforeText: previousTransactionText });
-        previousTransactionText = fixtureDocumentText(controller.getDocument());
+        if (inputTracingEnabled) {
+          traceInput("transaction", { beforeText: previousTransactionText });
+          previousTransactionText = fixtureDocumentText(controller.getDocument());
+        }
         post("change", snapshot());
         measure(true);
       },
@@ -429,6 +465,7 @@ for (const eventName of ["beforeinput", "input"]) {
   }, true);
 }
 mount.addEventListener("compositionstart", event => {
+  clearFirstCellFocus();
   composing = true;
   traceInput("compositionstart", { data: event?.data ?? null, trusted: event?.isTrusted === true });
 });
@@ -443,17 +480,22 @@ mount.addEventListener("compositionend", event => {
 const interactiveContent = "a, button, [data-permitext-reference]";
 let firstCellTap = null;
 let firstCellCaret = null;
+let cellSelectionTap = null;
 function clearFirstCellFocus() {
   firstCellTap = null;
   firstCellCaret = null;
+  cellSelectionTap = null;
 }
 mount.addEventListener("pointerdown", (event) => {
   clearFirstCellFocus();
   const target = event.target;
   const cell = target.closest("td, th");
-  firstCellTap = cell && event.isPrimary && event.button === 0 && !event.shiftKey && !readOnly &&
-      editor && !editor.isFocused() && !target.closest(interactiveContent)
-    ? { cell, x: event.clientX, y: event.clientY, time: event.timeStamp } : null;
+  if (cell && event.isPrimary && event.button === 0 && !event.shiftKey && !readOnly && editor &&
+      !target.closest(interactiveContent)) {
+    const tap = { cell, x: event.clientX, y: event.clientY, time: event.timeStamp };
+    if (!editor.isFocused()) firstCellTap = tap;
+    else cellSelectionTap = tap;
+  }
   if (target.closest("[data-permitext-reference]")) {
     referencePosition = controller.getEditingPosition();
     // Opening a source is navigation, not moving the text caret to that chip.
@@ -545,6 +587,7 @@ document.addEventListener("selectionchange", event => {
     } else if (selection.focusNode !== caret.node || selection.focusOffset !== caret.offset) {
       // WebKit can reset the DOM caret after the first focus has painted.
       // Correct it before ProseMirror reads that transient selection.
+      firstCellCaret = null;
       selection.collapse(caret.node, caret.offset);
       if (view.state.selection.head !== caret.position) {
         editor._tiptapEditor.commands.setTextSelection(caret.position);
@@ -554,14 +597,16 @@ document.addEventListener("selectionchange", event => {
     }
   }
   const node = selection?.focusNode;
-  const element = node?.nodeType === 1 ? node : node?.parentElement;
-  if (!readOnly && !composing && editor?.isFocused() && selection?.isCollapsed && mount.contains(element) && element.closest("td, th")) {
+  const tap = cellSelectionTap;
+  if (tap && event.timeStamp - tap.time > 300) cellSelectionTap = null;
+  if (cellSelectionTap && !readOnly && !composing && editor?.isFocused() && selection?.isCollapsed && tap.cell.contains(node)) {
     // WebKit can draw the caret in an empty cell before ProseMirror has
     // moved its model selection there. Keep the native table menu and typing
     // on the cell the user actually selected.
     const view = editor.prosemirrorView;
     const position = view.posAtDOM(node, selection.focusOffset);
     if (view.state.selection.head !== position && view.state.doc.resolve(position).parent.type.name === "tableParagraph") {
+      cellSelectionTap = null;
       editor._tiptapEditor.commands.setTextSelection(position);
     }
   }
