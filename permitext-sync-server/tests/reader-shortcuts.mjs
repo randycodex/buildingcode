@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {createReaderShortcuts, readerShortcutLabel} from '../public/reader-shortcuts.js';
+import {defaultSyncCodeVersion, historicalConstructionSyncCodeVersion, syncCodeVersion, syncCodeVersionForPrefix} from '../public/sync-identity.js';
 import {documentFixture} from './helpers/workflow-dom.mjs';
 
 for (const [prefix,edition,expected] of [
@@ -163,9 +164,9 @@ const toolButtons=['search','analysis','calculator'].map(key=>({key,button:doc.c
 const evidenceLauncher=doc.createElement('button');
 const actualFunction=name=>{const first=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert(first>=0,name);return source.slice(first,source.indexOf('\n}',first)+2);};
 let saves=0, allContext='A:research', previewOrder=[];
-const allState={readers:[{id:'a',codePrefix:'BC',codeVersion:'2022',title:'Reader'},{id:'b',codePrefix:'PC',codeVersion:'2022',title:'Reader'}],paneOrder:[...allIDs]};
+const allState={readers:[{id:'a',codePrefix:'BC',codeVersion:defaultSyncCodeVersion,title:'Reader'},{id:'b',codePrefix:'PC',codeVersion:historicalConstructionSyncCodeVersion,title:'Reader'}],paneOrder:[...allIDs]};
 const appContext=vm.createContext({readerShortcutLabel,currentColumnWorkflowView:()=>allContext.endsWith(':notebook')?'notebook':'research',state:allState,track:allTrack,isProAccount:()=>true,workflowPaneIsVisible:()=>true,
-  paneIDForReader:r=>`reader:${r.id}`,syncCodeVersion:value=>value,syncCodeVersionForPrefix:()=> '2022',codeOptions:[],
+  paneIDForReader:r=>`reader:${r.id}`,syncCodeVersion,syncCodeVersionForPrefix,defaultSyncCodeVersion,historicalConstructionSyncCodeVersion,
   readerTabs:()=>[{}],readerPositionLabel:r=>`Reader ${allState.readers.indexOf(r)+1}`,columnPaneLabel:()=> 'Evidence',
   activePaneIDs:()=>allState.paneOrder,capturePaneResizeWidths(){},captureWorkspaceColumnMotion:()=>null,animateWorkspaceColumnMotion(){},paneGroupForMove:id=>[id],pinCriticalWorkflowPanesToLeft:ids=>ids,
   get dragPreviewOrder(){return previewOrder;},
@@ -175,7 +176,8 @@ const appContext=vm.createContext({readerShortcutLabel,currentColumnWorkflowView
     const byID=new Map(nodes.map(node=>[node.dataset.paneId,node]));
     for(const id of allState.paneOrder)allTrack.append(byID.get(id));
   }});
-vm.runInContext(['isProjectNotebookPaneID','isProjectReportDraftPaneID','workspaceColumnRank','orderedWorkspaceColumnIDs','readerShortcutItems','orderWithPaneMoved','previewWorkspaceColumnShortcut','moveWorkspaceColumnShortcut','commitWorkspaceColumnOrder'].map(actualFunction).join('\n'),appContext);
+const codeOptionsSource=source.slice(source.indexOf('const codeOptions = ['),source.indexOf('function researchCodeEdition('));
+vm.runInContext(codeOptionsSource+['codeOptionVersion','codeOptionFor','readerCodeOptionLabel','researchCodeEdition','isProjectNotebookPaneID','isProjectReportDraftPaneID','workspaceColumnRank','orderedWorkspaceColumnIDs','readerShortcutItems','orderWithPaneMoved','previewWorkspaceColumnShortcut','moveWorkspaceColumnShortcut','commitWorkspaceColumnOrder'].map(actualFunction).join('\n'),appContext);
 const allReveals=[];
 const navigation=createReaderShortcuts({host:allHost,track:allTrack,readers:()=>appContext.readerShortcutItems(),context:()=>allContext,
   reveal:id=>allReveals.push(id),columnOrder:()=>allState.paneOrder,move:(...args)=>appContext.moveWorkspaceColumnShortcut(...args),
@@ -187,7 +189,9 @@ const navigation=createReaderShortcuts({host:allHost,track:allTrack,readers:()=>
 appContext.readerShortcuts=navigation;
 const order=()=>allHost.children.map(button=>button.dataset.readerPaneId);
 assert.deepEqual(order(),allIDs);
-assert.deepEqual(allHost.children.map(button=>button.textContent),['BC’22','Search results','PC’22','Assistant','Calculator']);
+assert.deepEqual(allHost.children.map(button=>button.textContent),['BC’22','Search results','PC’14','Assistant','Calculator'],'Restored Readers show code editions without the internal source keys.');
+assert.match(allHost.children[0].getAttribute('aria-label'),/Building Code \(2022\)/);
+assert.match(allHost.children[2].getAttribute('aria-label'),/Plumbing Code \(2014\)/);
 assert(toolButtons.every(({button})=>button.classList.contains('has-open-column')),'Open tools use bubbles instead of duplicate launchers.');
 assert.deepEqual(allHost.children.map(button=>button.querySelector('svg')?.dataset.lucideIcon),['library-big','search','library-big','astroid','calculator'],'Open bubbles retain the existing Reader and tool icons.');
 assert(allHost.children.every(button=>button.querySelector('svg').getAttribute('aria-hidden')==='true'),'Decorative icons keep the existing accessible labels.');

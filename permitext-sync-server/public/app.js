@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261121-workspace-notes-v2626";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261123-reader-shortcut-label-v2627";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -176,7 +176,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261121-workspace-notes-v2626";
+} from "./offline-storage.js?v=20261123-reader-shortcut-label-v2627";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -47970,10 +47970,12 @@ function readerShortcutItems() {
     const version = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(prefix));
     const code = codeOptions.find(option => option.prefix === prefix && codeOptionVersion(option) === version);
     const name = code ? readerCodeOptionLabel(code) : reader.codeName || prefix;
+    const edition = researchCodeEdition({ codePrefix: prefix, codeVersion: version });
     const chapter = panel.querySelector(".chapter-select")?.selectedOptions?.[0]?.textContent || "";
     const section = reader.sectionNumber ? sectionDisplayTitle(reader.sectionNumber, reader.title, "") : reader.title;
     const tabs = readerTabs(reader);
-    return { id, name:readerPositionLabel(reader), label:readerPositionLabel(reader).startsWith("Search Reader") ? "Result reader" : readerShortcutLabel({prefix, edition: String(code?.edition || version)}), column:true, iconName:"library-big",
+    const position = readerPositionLabel(reader);
+    return { id, name:position, label:position.startsWith("Search Reader") ? "Result reader" : readerShortcutLabel({prefix, edition}), column:true, iconName:"library-big",
       ownerPaneID:reader.sourceOwnerPaneID || reader.searchPreviewPaneID,
       theme:code?.theme || "current-consolidation",
       location:[name, `${tabs.length} ${tabs.length === 1 ? 'tab' : 'tabs'}`, ...new Set([chapter, section].filter(value => value && value !== "Reader"))].join(" · ") };
