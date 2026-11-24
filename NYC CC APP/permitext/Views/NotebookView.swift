@@ -994,15 +994,9 @@ private struct NotebookCardEditorView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                if returnToResearch == nil { Button { Task { await leaveEditor() } } label: { Label("Back", systemImage: "chevron.left") }
-                    .disabled(isLeaving || isUploadingImage) }
+                backButton
             }
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                if let returnToResearch, editingReadOnly {
-                    Button("Done", action: returnToResearch)
-                } else if hasLoaded && !editingReadOnly {
-                    doneButton
-                }
+            ToolbarItem(placement: .topBarTrailing) {
                 if canPerformNetworkWrites && hasLoaded && currentCardID != nil {
                     Menu {
                         Button(canMoveNoteToTrash ? "Move to Trash" : "Delete Permanently", systemImage: "trash", role: .destructive) {
@@ -1018,6 +1012,21 @@ private struct NotebookCardEditorView: View {
         .modifier(NotebookKeyboardToolbar(isVisible: hasLoaded && !editingReadOnly) {
             formattingBar.tint(accentColor)
         })
+        #if DEBUG
+        .overlay(alignment: .topLeading) {
+            if hasLoaded && !editingReadOnly && ProcessInfo.processInfo.arguments.contains("--native-notebook-save-diagnostics") {
+                let saveFinished = isCurrentOwner && !isSaving && pendingSave == nil &&
+                    editableContent == lastSyncedContent && !requiresConflictReview && errorMessage == nil
+                Color.clear
+                    .frame(width: 1, height: 1)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Note save status")
+                    .accessibilityValue(saveFinished ? "saved" : isSaving ? "saving" : "unsaved")
+                    .accessibilityIdentifier("native-notebook-save-status")
+                    .allowsHitTesting(false)
+            }
+        }
+        #endif
         .tint(accentColor)
         .navigationDestination(item: $linkedNoteRoute) { route in
             Group {
@@ -1028,6 +1037,7 @@ private struct NotebookCardEditorView: View {
                     owner: owner, onSaved: {}, cache: cache
                 )
                 .environmentObject(library)
+                .environment(\.returnToResearch, nil)
             }
         }
         .navigationDestination(item: $referenceRoute) { route in
@@ -1180,29 +1190,14 @@ private struct NotebookCardEditorView: View {
 
     private var editorSessionID: String { "\(owner?.accountID ?? ""):\(projectID):\(routeID)" }
 
-    private var saveFinished: Bool {
-        isCurrentOwner && hasLoaded && !isSaving && pendingSave == nil &&
-            editableContent == lastSyncedContent && !requiresConflictReview && errorMessage == nil
-    }
-
-    @ViewBuilder
-    private var doneButton: some View {
-        let button = Button("Done") { Task { await finishEditing() } }
-            .disabled(isSaving || isUploadingImage)
-            .accessibilityIdentifier("native-notebook-done")
-        #if DEBUG
-        if ProcessInfo.processInfo.arguments.contains("--native-notebook-save-diagnostics") {
-            button.accessibilityValue(saveFinished ? "saved" : isSaving ? "saving" : "unsaved")
-        } else {
-            button
-        }
-        #else
-        button
-        #endif
+    private var backButton: some View {
+        Button { Task { await leaveEditor() } } label: { Label("Back", systemImage: "chevron.left") }
+            .disabled(isLeaving || isUploadingImage || isDeleting)
+            .accessibilityIdentifier("native-notebook-back")
     }
 
     private var formattingBar: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 0) {
             Menu {
                 Button("Bold", systemImage: "bold") { Task { await performEditorCommand { try await documentEditor.toggleStyle("bold") } } }
                 Button("Italic", systemImage: "italic") { Task { await performEditorCommand { try await documentEditor.toggleStyle("italic") } } }
@@ -1227,20 +1222,20 @@ private struct NotebookCardEditorView: View {
                     formatButton("1.5", command: .lineSpacing, value: "1.5")
                     formatButton("Double", command: .lineSpacing, value: "2")
                 }
-            } label: { Text("Aa").font(.system(size: 19, weight: .medium)) }
+            } label: { formattingItem(Text("Aa").font(.system(size: 19, weight: .medium))) }
             .accessibilityLabel("Text formatting")
             .accessibilityValue(documentEditor.formatting.blockType)
             Menu {
                 Button("Bulleted list", systemImage: "list.bullet") { Task { await performEditorCommand { try await documentEditor.setBlockType("bulletListItem") } } }
                 Button("Numbered list", systemImage: "list.number") { Task { await performEditorCommand { try await documentEditor.setBlockType("numberedListItem") } } }
-            } label: { Image(systemName: "list.bullet") }
+            } label: { formattingItem(Image(systemName: "list.bullet")) }
             .accessibilityLabel("Lists")
             Button {
                 Task {
                     await captureEditorSelection()
                     showingPhotoPicker = true
                 }
-            } label: { Image(systemName: isUploadingImage ? "arrow.up.circle" : "photo") }
+            } label: { formattingItem(Image(systemName: isUploadingImage ? "arrow.up.circle" : "photo")) }
             .accessibilityLabel(isUploadingImage ? "Uploading image" : "Insert image")
             .disabled(isUploadingImage || !canPerformNetworkWrites)
             Menu {
@@ -1252,7 +1247,7 @@ private struct NotebookCardEditorView: View {
                 Button("Finding template", systemImage: "doc.text") {
                     Task { await performEditorCommand { try await documentEditor.insertFindingTemplate() } }
                 }
-            } label: { Image(systemName: "plus") }
+            } label: { formattingItem(Image(systemName: "plus")) }
             .accessibilityLabel("Insert")
             Menu {
                 ForEach(documentEditor.formatting.tableActions) { action in
@@ -1260,21 +1255,32 @@ private struct NotebookCardEditorView: View {
                         role: action.value.hasPrefix("remove-") ? .destructive : nil)
                         .disabled(action.disabled)
                 }
-            } label: { Image(systemName: "tablecells") }
+            } label: { formattingItem(Image(systemName: "tablecells")) }
             .accessibilityLabel("Table")
-            Spacer(minLength: 0)
-            Button("Undo", systemImage: "arrow.uturn.backward") { Task { await performEditorCommand { try await documentEditor.undo() } } }
-                .labelStyle(.iconOnly)
-                .disabled(!documentEditor.formatting.canUndo)
-            Button("Redo", systemImage: "arrow.uturn.forward") { Task { await performEditorCommand { try await documentEditor.redo() } } }
-                .labelStyle(.iconOnly)
-                .disabled(!documentEditor.formatting.canRedo)
+            Button { Task { await performEditorCommand { try await documentEditor.undo() } } } label: {
+                formattingItem(Image(systemName: "arrow.uturn.backward"))
+            }
+            .accessibilityLabel("Undo")
+            .disabled(!documentEditor.formatting.canUndo)
+            Button { Task { await performEditorCommand { try await documentEditor.redo() } } } label: {
+                formattingItem(Image(systemName: "arrow.uturn.forward"))
+            }
+            .accessibilityLabel("Redo")
+            .disabled(!documentEditor.formatting.canRedo)
         }
         .font(.system(size: 18))
-        .padding(.horizontal, 16).padding(.vertical, 12)
-        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 4)
+        .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.bottomControlHeight)
+        .codeLiquidGlassCapsule()
+        .codeTabAlignedHorizontalPadding()
+        .padding(.vertical, 4)
         .disabled(!documentEditor.isReady || isLeaving || !isCurrentOwner)
         .accessibilityIdentifier("native-notebook-formatting-toolbar")
+    }
+
+    private func formattingItem(_ label: some View) -> some View {
+        label.frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.toolbarButtonSize)
+            .contentShape(Rectangle())
     }
 
     private func formatButton(_ title: String, command: NotebookDocumentEditorController.FormatCommand,
@@ -1313,28 +1319,16 @@ private struct NotebookCardEditorView: View {
     }
 
     @MainActor
-    private func finishEditing() async {
-        guard await flushEditorDraft(finalizeEditing: true) else { return }
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        await saveNow()
-        if saveFinished {
-            isLeaving = true
-            library.releaseNotebookDraftEditor(documentEditor, retry: false)
-            if let returnToResearch { returnToResearch() } else { dismiss() }
-        }
-    }
-
-    @MainActor
     private func leaveEditor() async {
         guard !isLeaving else { return }
         isLeaving = true
         guard await flushEditorDraft(finalizeEditing: true) else { isLeaving = false; return }
         autosaveDebounceTask?.cancel()
-        if hasLocalDraft && !requiresConflictReview && !library.isNetworkAvailable {
+        if hasLocalDraft && !requiresConflictReview && (!library.isNetworkAvailable || isLoading) {
             retryAfterReconnect = true
             guard cacheDraft() else { isLeaving = false; return }
         }
-        dismiss()
+        if let returnToResearch { returnToResearch() } else { dismiss() }
         // An active write retains the editor's claim until its final acknowledgement.
         guard !isSaving else { return }
         if !retryAfterReconnect { await saveNow() }
@@ -1459,9 +1453,9 @@ private struct NotebookCardEditorView: View {
     }
 
     private func loadCard(forceNetwork: Bool = false) async {
-        guard isCurrentOwner, !isLoading, !isSaving else { return }
+        guard isCurrentOwner, !isLoading, !isSaving, !isLeaving else { return }
         if hasLoaded && documentEditor.isReady { guard await flushEditorDraft() else { return } }
-        guard isCurrentOwner, !isLoading, !isSaving, let accountID = owner?.accountID else { return }
+        guard isCurrentOwner, !isLoading, !isSaving, !isLeaving, let accountID = owner?.accountID else { return }
         isLoading = true
         var refreshSucceeded = false
         var deferredDraft: NativeNotebookDraft?
@@ -1469,9 +1463,9 @@ private struct NotebookCardEditorView: View {
             isLoading = false
             // saveNow rejects an active load. Resume only after the load flag is
             // cleared, and do not turn an offline failure into an automatic retry.
-            if refreshSucceeded, isCurrentOwner, !Task.isCancelled, needsSave, !requiresConflictReview {
+            if !isLeaving, refreshSucceeded, isCurrentOwner, !Task.isCancelled, needsSave, !requiresConflictReview {
                 Task { await saveNow() }
-            } else if retryAfterReconnect, !Task.isCancelled {
+            } else if !isLeaving, retryAfterReconnect, !Task.isCancelled {
                 Task { await retryOfflineSaveIfReady() }
             }
         }
@@ -1479,7 +1473,7 @@ private struct NotebookCardEditorView: View {
         if let owner, !editingReadOnly {
             await library.claimNotebookDraftEditor(documentEditor, owner: owner, projectID: projectID,
                                                    routeID: routeID, cardID: currentCardID ?? cardID)
-            guard isCurrentOwner, !Task.isCancelled else { return }
+            guard isCurrentOwner, !Task.isCancelled, !isLeaving else { return }
         }
 
         if !hasLoaded {
@@ -1520,7 +1514,7 @@ private struct NotebookCardEditorView: View {
         }
         do {
             let card = try await library.notebookCard(projectID: projectID, cardID: cardID)
-            guard isCurrentOwner, !Task.isCancelled else { return }
+            guard isCurrentOwner, !Task.isCancelled, !isLeaving else { return }
             guard PermitextReleaseSurfaceVisibility.notebookCardIsVisible(card.cardType) else {
                 showUnavailableCoordinationCard()
                 return
@@ -1556,7 +1550,7 @@ private struct NotebookCardEditorView: View {
                 library.invalidateProjectDashboardPreview(projectID: projectID)
                 try? cache.removeProject(accountID: accountID, projectID: projectID)
                 hasLoaded = false
-            } else if !hasLoaded, deferredDraft == nil, !forceNetwork,
+            } else if !isLeaving, !hasLoaded, deferredDraft == nil, !forceNetwork,
                       NativePrivateCachePolicy.permitsOfflineFallback(after: error),
                       let cachedCard = try? cache.load(
                         NotebookCard.self,
@@ -1570,6 +1564,7 @@ private struct NotebookCardEditorView: View {
                 }
                 apply(cachedCard)
             }
+            guard !isLeaving else { return }
             let detail = nativeNotebookRequestErrorMessage(error)
             errorMessage = hasLoaded ? "Could not refresh this Note. \(detail)" : detail
         }
