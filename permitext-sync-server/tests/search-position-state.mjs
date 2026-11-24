@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
+import { searchCitationQuery } from '../public/search-citation-query.js';
 import vm from 'node:vm';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const extract=name=>{const start=source.indexOf(`function ${name}(`);assert.ok(start>=0);return source.slice(start,source.indexOf('\n}',start)+2);};
@@ -47,7 +48,7 @@ console.log('Search position survives application normalization and resets on qu
   const requestContext = {edition:'all',sourceScope:{querySuffix:''},controller:new AbortController(),isCurrent:()=>current};
   const results={dataset:{searchRenderToken:'current',loadedSearchPages:'1',restoringSearch:'true'},querySelector:()=>null,querySelectorAll:()=>[{},{}],append(){}};
   const instance={query:'concrete',codeFilters:[],searchPosition:{key:JSON.stringify(['concrete',[]]),loadedPages:3,scrollTop:250,selectedResult:''}};
-  const pageContext=vm.createContext({
+  const pageContext=vm.createContext({searchCitationQuery,
     defaultSyncCodeVersion:"2022",
     document:{createElement:()=>({append(){},addEventListener(){},remove(){},disabled:false})},
     api:async()=>{requests++;duringRequest();if(fail)throw new Error('Offline');return {results:[{id:'next'}],hasMore:false};},
@@ -55,7 +56,7 @@ console.log('Search position survives application normalization and resets on qu
     searchResultMatchesExactQuery:()=>true,appendSearchResultGroups(){},updateSearchDock(){},saveWorkspaceState(){},
   });
   pageContext.fetchCodeSearch=pageContext.api;
-  vm.runInContext(['normalizeSearchResultSources','applyInitialSearchGroupExpansion','searchPositionState','appendSearchLoadMore'].map(extract).join('\n'),pageContext);
+  vm.runInContext(['normalizeSearchResultSources','searchResultSourceKey','bestExactSearchResult','applyInitialSearchGroupExpansion','searchPositionState','appendSearchLoadMore'].map(extract).join('\n'),pageContext);
   pageContext.appendSearchLoadMore(results,{...requestContext,query:'concrete',selectedPrefixes:[],searchInstance:instance,renderToken:'current',nextOffset:25,candidateOffset:25,totalResults:50,hasMore:true,panel:{}});
   const retry=results.searchLoadMore;
   assert.equal(await retry(),false);assert.equal(instance.searchPosition.loadedPages,3);

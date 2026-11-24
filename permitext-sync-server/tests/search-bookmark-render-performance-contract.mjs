@@ -71,7 +71,7 @@ const c = vm.createContext({
 });
 const subscriptionLifecycle = source.slice(source.indexOf("const workspaceNodeAccessRecords"), source.indexOf("function readerPrivateContentAllowed"));
 vm.runInContext(subscriptionLifecycle + ["workspaceAccessGateForRender", "normalizeAnnotationBlockID", "savedEvidenceKey", "projectSectionBelongsToProject", "workspaceSavedEvidenceKeys", "isSectionSaved",
-  "searchResultDetail", "searchResultPositionKey", "searchResultChapter", "ensureSearchResultChapter", "searchGroupCountText", "createSearchResultSaveButton", "appendSearchResultGroups", "refreshSearchChapterCounts"].map(actual).join("\n"), c);
+  "searchResultDetail", "searchResultPositionKey", "searchResultSourceKey", "searchResultChapter", "ensureSearchResultChapter", "searchGroupCountText", "createSearchResultSaveButton", "appendSearchResultGroups", "refreshSearchChapterCounts"].map(actual).join("\n"), c);
 const gate = c.workspaceAccessGateForRender();
 await gate.ready;
 panel.__workspaceAccessGate = gate;

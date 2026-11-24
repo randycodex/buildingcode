@@ -14,7 +14,7 @@ function fixture() {
   const readers=[{id:'first',sectionID:'old',codeVersion:'2022'},{id:'active',sectionID:'other',codeVersion:'2022'}];
   const reveals=[],details={},anchors={}; let account=1,serial=0;
   const c=vm.createContext({initializeReaderTabs,addReaderTab,openRecentReaderTab,readerTabs,canAddReaderTab,maximumReaderTabs,rememberReaderTabPosition(){},retainReaderColumn(){},linkPaneToView,state:{readers,utilityInstances:[search],paneWeights:{},paneOrder:[]},activeWorkspaceID:'workspace',
-    searchReaderOpeningAttempts:new Map(),savedItemOpeningAttempts:new Map(),sectionDetailOpeningAttempts:new Map(),
+    searchReaderOpeningAttempts:new Map(),searchReaderFocusOrigins:new WeakMap(),savedItemOpeningAttempts:new Map(),sectionDetailOpeningAttempts:new Map(),
     captureAccountRequest:()=>account,isCurrentAccountRequest:value=>value===account,
     currentColumnWorkflowView:()=> 'research',activateNotebookReference(){},workingResearchNote:()=>null,workflowPaneIsVisible:()=>true,workspaceColumnsRequireProject:()=>false,
     readerShortcuts:{activeReaderPaneID:()=> 'reader:active'},
@@ -28,9 +28,9 @@ function fixture() {
     track:{querySelector:()=>null},CSS:{escape:v=>v},paneIsCollapsed:()=>false,columnExpansionController:()=>({reveal(){}}),
     revealReaderSourceTarget:(reader,item,anchor,options)=>reveals.push({reader,item,anchor,options}),scrollPaneIntoView(){},
     notifyReaderColumnLimit:()=>false,showWebNotice:async()=>{},sectionDetailsBySearch:()=>details,sectionDetailAnchorsBySearch:()=>anchors,
-    searchWords,searchWordPattern
+    searchWords,searchWordPattern,normalizeSearchCodeFilters:value=>value || []
   });
-  vm.runInContext(['prepareReaderSourceTab','reusableSearchReader','openSourceInReader','openSearchResultDetail','openSavedItemInReader',
+  vm.runInContext(['prepareReaderSourceTab','reusableSearchReader','openSourceInReader','openSearchResultDetail','openSavedItemInReader','searchPositionState',
     'retireEvidenceDetailLayout','searchDetailPassageBlock','openProjectSavedSection','readerPositionLabel'].map(actual).join('\n'),c);
   return {c,search,readers,reveals,details,anchors,changeAccount(){account++;}};
 }

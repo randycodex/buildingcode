@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { searchCitationQuery } from '../public/search-citation-query.js';
 import vm from "node:vm";
 
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
@@ -151,7 +152,7 @@ const make = () => {
   position.groupScope = "&sourceScope=enabled-only";
   position.groupPages = { "BC|2022": 3, "BC|2014": 2 };
   position.scrollTop = 420;
-  Object.assign(f.c, { defaultSyncCodeVersion: "2022", AbortController, CSS: { escape: value => value },
+  Object.assign(f.c, { searchCitationQuery, defaultSyncCodeVersion: "2022", AbortController, CSS: { escape: value => value },
     crypto: { randomUUID: () => "current" }, activeWorkspaceID: "workspace", captureAccountRequest: () => "account",
     isCurrentAccountRequest: () => true, isCurrentActiveCodeSourceContext: () => true, normalizeSearchInstance: value => value,
     prepareSearchPanelScope: async () => ({ token: {}, querySuffix: "&sourceScope=enabled-only", enabledSourceCount: 2 }),
@@ -182,7 +183,7 @@ const make = () => {
     return { results: [{ id, codePrefix: "BC", codeVersion }], nextOffset: id, nextCandidateOffset: id + 3,
       cursorKind: "candidate", hasMore: codeVersion === "2022" && id < 7 };
   });
-  vm.runInContext(["normalizeSearchResultSources", "applyInitialSearchGroupExpansion", "cancelSearchPanelRequest", "renderSearchResults"].map(actual).join("\n"), f.c);
+  vm.runInContext(["normalizeSearchResultSources", "searchResultSourceKey", "bestExactSearchResult", "applyInitialSearchGroupExpansion", "cancelSearchPanelRequest", "renderSearchResults"].map(actual).join("\n"), f.c);
   await f.c.renderSearchResults(panel, f.instance);
   assert.equal(f.requests.length, 4, "Reload restores each group's own number of pages, rather than global batches.");
   assert.equal(position.groupPages["BC|2022"], 3); assert.equal(position.groupPages["BC|2014"], 2);

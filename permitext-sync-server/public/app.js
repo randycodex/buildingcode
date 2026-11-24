@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261123-reader-shortcut-label-v2627";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261123-search-result-focus-v2628";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -71,6 +71,7 @@ import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections, rankReaderSearchResults } from "./reader-search-match.js?v=20261120-matching-v5";
 import { searchWords, searchWordPattern } from "./search-words.js?v=20261025-workspace-chrome-v1379";
+import { searchCitationQuery } from "./search-citation-query.js?v=1";
 import { buildReaderChapterContents, readerContentsLabel, readerContentsChapterKey, readerContentsNodeCanExpand } from "./reader-navigation-tree.js?v=20261112-label-case-v3";
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261118-reader-chapter-start-v5";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
@@ -176,7 +177,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261123-reader-shortcut-label-v2627";
+} from "./offline-storage.js?v=20261123-search-result-focus-v2628";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -9507,7 +9508,9 @@ function recentlyViewedPreviewHasEnactedText(entry) {
 }
 
 function searchResultMatchesExactQuery(result, query) {
-  const needle = String(query || "").trim().replace(/\s+/g, " ");
+  const citation = searchCitationQuery(query);
+  if (citation.codePrefix && citation.codePrefix !== result?.codePrefix) return false;
+  const needle = citation.query.replace(/\s+/g, " ");
   if (!needle) return false;
   const searchableText = [result?.sectionNumber, result?.title, result?.headingLine, result?.snippet]
     .filter(Boolean)
@@ -21665,11 +21668,15 @@ async function renderReader(reader, options = {}) {
     internalSearchInput.focus();
   });
 
-  closeButton.addEventListener("click", () => {
+  closeButton.addEventListener("click", async () => {
     if (currentColumnWorkflowView() === 'notebook' && state.workflowMembership?.[paneIDForReader(reader)]?.includes('notebook')) {
       void setNotebookReaderHidden(reader, true);
       return;
     }
+    const returnFocus = panel.contains(document.activeElement) ? searchReaderFocusOrigins.get(reader) : null;
+    const identity = returnFocus && captureAccountRequest();
+    const workspaceID = activeWorkspaceID;
+    const generation = state.workflowNavigationGeneration || 0;
     // Closing has no next chapter to render. Stop pending work and detach the
     // source immediately instead of clearing it into a loading placeholder.
     cancelReaderPanelRequests(panel);
@@ -21687,7 +21694,11 @@ async function renderReader(reader, options = {}) {
         if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
       });
     }
-    void transitionWorkspace("utility", { deferStateSave: true });
+    await transitionWorkspace("utility", { deferStateSave: true });
+    if (returnFocus && document.activeElement === document.body && isCurrentAccountRequest(identity) &&
+        activeWorkspaceID === workspaceID && (state.workflowNavigationGeneration || 0) === generation) {
+      restoreSearchReaderFocus(returnFocus);
+    }
   });
 
   chapterSelect.addEventListener("change", async () => {
@@ -22654,6 +22665,7 @@ async function renderSearchResults(panel, instance) {
   results.dataset.restoringSearch = "true";
   results.searchLoadMore = null;
   results.searchGroupPages = null;
+  results.preferredExactMatch = null;
   results.classList.remove("is-history");
   if (query.length < 2) {
     results.dataset.searchHasMore = "false";
@@ -22781,7 +22793,8 @@ async function renderSearchResults(panel, instance) {
     hasMore: Boolean(payload.hasMore),
     totalResults
   });
-  if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope)) saveWorkspaceState();
+  results.preferredExactMatch = bestExactSearchResult(filteredResults, query);
+  if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope, results.preferredExactMatch)) saveWorkspaceState();
   appendSearchResultGroups(results, filteredResults, query, searchInstance);
   if (Array.isArray(payload.groups)) {
     const options = { query, matchMode, searchInstance, panel, edition, controller, isCurrent, sourceScope };
@@ -22845,15 +22858,27 @@ async function renderSearchResults(panel, instance) {
   });
 }
 
-// Expose the first ranked source for a new query, then respect manual choices
+function searchResultSourceKey(result) {
+  return `${result.codePrefix || "BC"}|${result.codeVersion || defaultSyncCodeVersion}`;
+}
+
+function bestExactSearchResult(matches, query) {
+  const citation = searchCitationQuery(query);
+  const sectionNumber = citation.query.replace(/^(?:section\s+|§+\s*)/i, "").replace(/\.$/, "").toLowerCase();
+  if (!sectionNumber) return null;
+  return matches.find((result) => (!citation.codePrefix || result.codePrefix === citation.codePrefix) &&
+    String(result.sectionNumber || "").trim().replace(/\.$/, "").toLowerCase() === sectionNumber) || null;
+}
+
+// Expose the preferred source for a new query, then respect manual choices
 // through pagination and reload. Chapter choices belong to this query/scope.
-function applyInitialSearchGroupExpansion(instance, matches, sourceScope) {
+function applyInitialSearchGroupExpansion(instance, matches, sourceScope, exactMatch = null) {
   const decisionKey = JSON.stringify(["chapter-groups-v5", String(instance.query || "").trim(),
     normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all",
     sourceScope?.querySuffix || "", instance.matchMode || "words"]);
   if (!matches.length || instance.searchExpansionDecisionKey === decisionKey) return false;
   instance.searchExpansionDecisionKey = decisionKey;
-  instance.defaultExpandedResultSource = `${matches[0].codePrefix || "BC"}|${matches[0].codeVersion || defaultSyncCodeVersion}`;
+  instance.defaultExpandedResultSource = searchResultSourceKey(exactMatch || matches[0]);
   const position = searchPositionState(instance);
   position.chapterExpansion = {};
   return true;
@@ -22873,7 +22898,7 @@ function searchResultChapter(result) {
   return { key: encodeURIComponent(identity), label };
 }
 
-function ensureSearchResultChapter(body, result, instance, sourceKey) {
+function ensureSearchResultChapter(body, result, instance, sourceKey, exactChapterKey) {
   const presentation = searchResultChapter(result);
   let chapter = body.querySelector(`.search-chapter-group[data-chapter-key="${CSS.escape(presentation.key)}"]`);
   if (chapter) return chapter;
@@ -22885,7 +22910,8 @@ function ensureSearchResultChapter(body, result, instance, sourceKey) {
   const position = searchPositionState(instance);
   const choiceKey = `${sourceKey}|${presentation.key}`;
   const savedChoice = position.chapterExpansion?.[choiceKey];
-  chapter.open = savedChoice === true;
+  const preferred = presentation.key === exactChapterKey;
+  chapter.open = savedChoice ?? preferred;
   const summary = document.createElement("summary");
   summary.className = "search-chapter-summary";
   const title = document.createElement("span");
@@ -22906,7 +22932,8 @@ function ensureSearchResultChapter(body, result, instance, sourceKey) {
     choices[choiceKey] = chapter.open;
     saveWorkspaceState();
   });
-  body.append(chapter);
+  if (preferred) body.prepend(chapter);
+  else body.append(chapter);
   return chapter;
 }
 
@@ -22918,9 +22945,12 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
   const savedKeys = privateContentAllowed ? workspaceSavedEvidenceKeys() : null;
   const groups = new Map();
   const resultGroupsAreCollapsible = true;
+  const exactMatch = results.preferredExactMatch;
+  const exactSourceKey = exactMatch ? searchResultSourceKey(exactMatch) : "";
+  const exactChapterKey = exactMatch ? searchResultChapter(exactMatch).key : "";
+  const exactFamilyKey = exactMatch?.codePrefix === "BC68" ? "BC" : exactMatch?.codePrefix || "BC";
   searchResults.forEach((result) => {
-    const prefix = result.codePrefix || "BC";
-    const key = `${prefix}|${result.codeVersion || defaultSyncCodeVersion}`;
+    const key = searchResultSourceKey(result);
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(result);
   });
@@ -23028,14 +23058,16 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       }
       mainButton.append(heading);
       if (snippetText) mainButton.append(snippet);
-      mainButton.addEventListener("click", () => {
+      mainButton.addEventListener("click", (event) => {
         if (window.getSelection && String(window.getSelection()).trim()) return;
         searchPositionState(searchInstance).selectedResult = positionKey;
         results.querySelectorAll(".result-row-main[aria-current]").forEach((button) => button.removeAttribute("aria-current"));
         mainButton.setAttribute("aria-current", "true");
         saveWorkspaceState();
         recordRecentSearch(query);
-        void openSearchResultDetail(detail, searchInstance);
+        void openSearchResultDetail(detail, searchInstance, {
+          trigger: mainButton, resultKey: positionKey, keyboard: event.detail === 0
+        });
       });
 
       const saveButton = createSearchResultSaveButton(panel, detail, {
@@ -23049,10 +23081,10 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       openNewButton.setAttribute("aria-label", "Open in new Reader");
       prependWorkspaceButtonIcon(openNewButton, "library-big");
       openNewButton.title = "Open this source in an additional Reader beside Search";
-      openNewButton.addEventListener("click", () => {
+      openNewButton.addEventListener("click", (event) => {
         recordRecentSearch(query);
-        void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance), {
-          sourceSurface: "search", forceNewReader: true
+        void openSearchResultDetail(detail, searchInstance, {
+          trigger: openNewButton, resultKey: positionKey, keyboard: event.detail === 0, forceNewReader: true
         });
       });
       const actions = document.createElement("div");
@@ -23062,17 +23094,23 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       header.className = "result-row-header";
       header.append(citation, actions);
       row.append(header, mainButton);
-      const chapter = ensureSearchResultChapter(groupBody, result, searchInstance, sourceKey);
-      chapter.querySelector(".search-chapter-body").append(row);
+      const chapter = ensureSearchResultChapter(groupBody, result, searchInstance, sourceKey,
+        sourceKey === exactSourceKey ? exactChapterKey : "");
+      const chapterBody = chapter.querySelector(".search-chapter-body");
+      if (result === exactMatch) chapterBody.prepend(row);
+      else chapterBody.append(row);
     });
   });
-  // Keep the usual family/edition order as later pages arrive.
+  // Keep the preferred exact source first as later pages arrive, then use the
+  // usual family and edition order.
   const familyOrder = ["BC", "EBC", "FGC", "MC", "PC", "ECC", "EC", "FC", "ZR", "HMC", "AC", "T24", "T25", "T26", "T28", "LL"];
   Array.from(results.querySelectorAll(".search-family-card"))
-    .sort((a, b) => familyOrder.indexOf(a.dataset.family) - familyOrder.indexOf(b.dataset.family))
+    .sort((a, b) => (exactMatch ? Number(b.dataset.family === exactFamilyKey) - Number(a.dataset.family === exactFamilyKey) : 0) ||
+      familyOrder.indexOf(a.dataset.family) - familyOrder.indexOf(b.dataset.family))
     .forEach((family) => {
       Array.from(family.querySelectorAll(".search-result-group"))
-        .sort((a, b) => Number.parseInt(researchCodeEdition({codePrefix:b.dataset.codePrefix, codeVersion:b.dataset.sourceVersion}), 10) - Number.parseInt(researchCodeEdition({codePrefix:a.dataset.codePrefix, codeVersion:a.dataset.sourceVersion}), 10))
+        .sort((a, b) => Number(b.dataset.sourceKey === exactSourceKey) - Number(a.dataset.sourceKey === exactSourceKey) ||
+          Number.parseInt(researchCodeEdition({codePrefix:b.dataset.codePrefix, codeVersion:b.dataset.sourceVersion}), 10) - Number.parseInt(researchCodeEdition({codePrefix:a.dataset.codePrefix, codeVersion:a.dataset.sourceVersion}), 10))
         .forEach((group) => family.append(group));
       results.append(family);
     });
@@ -23209,7 +23247,8 @@ function appendSearchLoadMore(results, options) {
       searchPositionState(options.searchInstance).loadedPages = loadedPages;
       footer.remove();
       results.dataset.searchHasMore = payload.hasMore ? "true" : "false";
-      if (applyInitialSearchGroupExpansion(options.searchInstance, nextResults, options.sourceScope)) saveWorkspaceState();
+      if (!results.querySelector(".result-row")) results.preferredExactMatch = bestExactSearchResult(nextResults, options.query);
+      if (applyInitialSearchGroupExpansion(options.searchInstance, nextResults, options.sourceScope, results.preferredExactMatch)) saveWorkspaceState();
       appendSearchResultGroups(results, nextResults, options.query, options.searchInstance);
       const nextVisibleCount = results.querySelectorAll(".result-row").length;
       const pageTotal = Number(payload.totalResults);
@@ -23251,17 +23290,48 @@ function appendSearchLoadMore(results, options) {
 
 const sectionDetailOpeningAttempts = new Map();
 const sectionDetailSearchContexts = new WeakMap();
+const searchReaderFocusOrigins = new WeakMap();
 
-async function openSearchResultDetail(item, searchInstance) {
+async function openSearchResultDetail(item, searchInstance, { trigger, resultKey, keyboard, forceNewReader = false } = {}) {
   if (workspaceColumnsRequireProject() || searchInstance?.key !== "search") return null;
   const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
   const generation = state.workflowNavigationGeneration || 0;
   const query = String(searchInstance.query || ""), paneID = paneIDForUtilityInstance(searchInstance);
+  const searchKey = searchPositionState(searchInstance).key;
+  const sourceKeys = JSON.stringify(searchInstance.querySourceKeys);
   const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
     generation === (state.workflowNavigationGeneration || 0) && state.utilityInstances.includes(searchInstance) &&
-    workflowPaneIsVisible(paneID) && String(searchInstance.query || "") === query;
-  return openSourceInReader(item, paneID, { sourceSurface: "search", isCurrent,
+    workflowPaneIsVisible(paneID) && searchPositionState(searchInstance).key === searchKey &&
+    JSON.stringify(searchInstance.querySourceKeys) === sourceKeys;
+  const reader = await openSourceInReader(item, paneID, { sourceSurface: "search", isCurrent, forceNewReader,
     evidenceAnchor: item.evidenceAnchor || null, searchQuery: query, searchMatchMode: searchInstance.matchMode });
+  if (!reader || !isCurrent()) return reader;
+  if (trigger) searchReaderFocusOrigins.set(reader, { paneID, searchInstance, searchKey, resultKey, forceNewReader });
+  else searchReaderFocusOrigins.delete(reader);
+  if (keyboard && document.activeElement === trigger) {
+    const content = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"] .reader-content`);
+    const target = readerSectionTitleNode(content?.querySelector(".is-source-target")) || content;
+    if (target) {
+      target.tabIndex = -1;
+      target.setAttribute("data-search-reader-focus", "");
+      target.focus({ preventScroll: true });
+    }
+  }
+  return reader;
+}
+
+function restoreSearchReaderFocus({ paneID, searchInstance, searchKey, resultKey, forceNewReader }) {
+  if (!workflowPaneIsVisible(paneID)) return;
+  const panel = track.querySelector(`.search-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (!panel) return;
+  columnExpansionController().reveal(panel);
+  scrollPaneIntoView(paneID, "auto");
+  const result = searchPositionState(searchInstance).key === searchKey
+    ? panel.querySelector(`.result-row-main[data-search-result-key="${CSS.escape(resultKey)}"]`)
+    : null;
+  const trigger = forceNewReader ? result?.closest(".result-row")?.querySelector(".search-open-new-reader") : result;
+  if (trigger?.getClientRects().length && !trigger.closest("details:not([open]), [hidden], [inert]")) trigger.focus();
+  else panel.querySelector(".search-input")?.focus({ preventScroll: true });
 }
 
 async function openSectionDetail(searchID, section, options = {}) {

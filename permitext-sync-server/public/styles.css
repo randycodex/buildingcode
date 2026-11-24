@@ -4696,6 +4696,11 @@ select option:checked {
   box-shadow: none;
 }
 
+.reader-panel [data-search-reader-focus]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 .section-block {
   grid-column: 1;
   margin: 0 0 var(--space-4);

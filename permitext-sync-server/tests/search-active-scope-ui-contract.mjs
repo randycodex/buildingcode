@@ -2,6 +2,7 @@ import {defaultSyncCodeVersion, syncCodeVersion} from '../public/sync-identity.j
 import { createPublicCodeRevisionController, isPublicCodePath } from "../public/public-code-revision.js";
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
+import { searchCitationQuery } from '../public/search-citation-query.js';
 import vm from "node:vm";
 const source=await readFile(new URL("../public/app.js",import.meta.url),"utf8");
 function actual(name){const a=source.search(new RegExp(`(?:async )?function ${name}\\(`));const b=source.indexOf("\n}",a);assert.ok(a>=0&&b>a);return source.slice(a,b+2);}
@@ -12,7 +13,7 @@ function fixture(){
  const element=()=>({dataset:{},classList:{remove(){}},append(){},remove(){},addEventListener(){},querySelector(){return null;},querySelectorAll(){return[];}});
  const results=element(),panel={isConnected:true,querySelector:()=>results};
  const instance={id:"search",query:"concrete",codeFilters:[],searchEdition:"all",position:{loadedPages:1}};
- const c=vm.createContext({defaultSyncCodeVersion:"2022",AbortController,Promise,Date,encodeURIComponent,crypto:{randomUUID:()=>String(Math.random())},activeWorkspaceID:"a",
+ const c=vm.createContext({searchCitationQuery,defaultSyncCodeVersion:"2022",AbortController,Promise,Date,encodeURIComponent,crypto:{randomUUID:()=>String(Math.random())},activeWorkspaceID:"a",
  prepareSearchPanelScope:async()=>{if(scopeError)throw scopeError;return {token:scopeToken,querySuffix:"&sourceScope=scope"+scopeToken};},isCurrentActiveCodeSourceContext:token=>token===scopeToken,
  captureAccountRequest:()=>generation,isCurrentAccountRequest:g=>g===generation,
  normalizeSearchInstance:i=>i,normalizeSearchCodeFilters:f=>f,searchPositionState:i=>i.position,searchResultPageSize:25,
@@ -22,7 +23,7 @@ function fixture(){
  api(path,options){const d=defer();requests.push({...d,path,signal:options.signal});return d.promise;}
  });
  c.fetchCodeSearch=c.api;
- vm.runInContext(["normalizeSearchResultSources","applyInitialSearchGroupExpansion","cancelSearchPanelRequest","renderSearchResults","appendSearchLoadMore"].map(actual).join("\n"),c);
+ vm.runInContext(["normalizeSearchResultSources","searchResultSourceKey","bestExactSearchResult","applyInitialSearchGroupExpansion","cancelSearchPanelRequest","renderSearchResults","appendSearchLoadMore"].map(actual).join("\n"),c);
  return{c,requests,paints,statuses,panel,results,instance,switchAccount(){generation++;},changeScope(){scopeToken++;},failScope(){scopeError=new Error("Repair code source preferences");}};
 }
 
@@ -72,7 +73,7 @@ function realFixture() {
   const loads = [];
   const controller = createActiveCodeSourceController({ storage, respectSourcePreferences:false, loadCatalog() { const gate = defer(); loads.push(gate); return gate.promise; } });
   controller.setContext({ accountID: null, sessionID: "one" });
-  const context = vm.createContext({ defaultSyncCodeVersion,syncCodeVersion,workspacePrivatePresentationAllowed:()=>false,activeCodeSourcesController: controller, encodeURIComponent, codeSourceKey, codeSourceIdentity,
+  const context = vm.createContext({searchCitationQuery, defaultSyncCodeVersion,syncCodeVersion,workspacePrivatePresentationAllowed:()=>false,activeCodeSourcesController: controller, encodeURIComponent, codeSourceKey, codeSourceIdentity,
     accountContextChangedError: () => new Error("Account context changed") });
   vm.runInContext(["prepareActiveCodeSearchScope", "searchPanelSources", "prepareSearchPanelScope", "isCurrentActiveCodeSourceContext"].map(actual).join("\n"), context);
   return { context, controller, values, storage, loads };

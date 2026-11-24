@@ -1,6 +1,7 @@
 import { createPublicCodeRevisionController, isPublicCodePath } from "../public/public-code-revision.js";
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
+import { searchCitationQuery } from '../public/search-citation-query.js';
 import vm from "node:vm";
 const source=await readFile(new URL("../public/app.js",import.meta.url),"utf8");
 function actual(name){const a=source.search(new RegExp(`(?:async )?function ${name}\\(`));const b=source.indexOf("\n}",a);assert.ok(a>=0&&b>a);return source.slice(a,b+2);}
@@ -11,7 +12,7 @@ function fixture(){
  const element=()=>({dataset:{},classList:{remove(){}},append(){},remove(){},addEventListener(){},querySelector(){return null;},querySelectorAll(){return[];}});
  const results=element(),panel={isConnected:true,querySelector:()=>results};
  const instance={id:"search",query:"concrete",codeFilters:[],searchEdition:"all",position:{loadedPages:1}};
- const c=vm.createContext({defaultSyncCodeVersion:"2022",AbortController,Promise,Date,encodeURIComponent,crypto:{randomUUID:()=>String(Math.random())},activeWorkspaceID:"a",
+ const c=vm.createContext({searchCitationQuery,defaultSyncCodeVersion:"2022",AbortController,Promise,Date,encodeURIComponent,crypto:{randomUUID:()=>String(Math.random())},activeWorkspaceID:"a",
  captureAccountRequest:()=>generation,isCurrentAccountRequest:g=>g===generation,
  normalizeSearchInstance:i=>i,normalizeSearchCodeFilters:f=>f,searchPositionState:i=>i.position,searchResultPageSize:25,
  prepareSearchPanelScope:async()=>({token:{},querySuffix:""}),isCurrentActiveCodeSourceContext:()=>true,
@@ -21,7 +22,7 @@ function fixture(){
  api(path,options){const d=defer();requests.push({...d,path,signal:options.signal});return d.promise;}
  });
  c.fetchCodeSearch=c.api;
- vm.runInContext(["normalizeSearchResultSources","applyInitialSearchGroupExpansion","cancelSearchPanelRequest","renderSearchResults","appendSearchLoadMore"].map(actual).join("\n"),c);
+ vm.runInContext(["normalizeSearchResultSources","searchResultSourceKey","bestExactSearchResult","applyInitialSearchGroupExpansion","cancelSearchPanelRequest","renderSearchResults","appendSearchLoadMore"].map(actual).join("\n"),c);
  return{c,requests,paints,statuses,panel,results,instance,switchAccount(){generation++;}};
 }
 for(const change of ["query","edition","prefix","account","workspace","closed","cancel"]){
@@ -53,7 +54,7 @@ for(const change of ["query","edition","prefix","account","workspace","closed","
 // Real api cancellation must never enter offline fallback or update connection state.
 for(const phase of ["fetch","json","fallback"]){
  const gate=defer();let offlineCalls=0,updates=0;const controller=new AbortController();
- const c=vm.createContext({isPublicCodePath,publicCodeRevision:createPublicCodeRevisionController({fetchRevision:async()=>{throw Error("offline");},onInvalidate(){}}),serverReachable:true,fetch:()=>phase==="fetch"?gate.promise:Promise.resolve({ok:phase==="json",status:503,json:()=>gate.promise}),
+ const c=vm.createContext({searchCitationQuery,isPublicCodePath,publicCodeRevision:createPublicCodeRevisionController({fetchRevision:async()=>{throw Error("offline");},onInvalidate(){}}),serverReachable:true,fetch:()=>phase==="fetch"?gate.promise:Promise.resolve({ok:phase==="json",status:503,json:()=>gate.promise}),
  readDownloadedLibrary:async()=>null,hasCapability:()=>true,shouldUseOfflineFallback:()=>true,offlineAPI:()=>{offlineCalls++;return gate.promise;},updateConnectionStatus(){updates++;}});
  vm.runInContext(actual("api"),c);const pending=c.api("/code/search",{signal:controller.signal});await tick();controller.abort();gate.resolve(phase==="fetch"?{ok:true,json:async()=>({})}:{});
  await assert.rejects(pending,{name:"AbortError"});assert.equal(updates,0);assert.equal(c.serverReachable,true);assert.equal(offlineCalls,phase==="fallback"?1:0);

@@ -42,7 +42,8 @@ assert.match(searchSaveControl, /saveButton\.className = "search-result-save"/);
 assert.match(searchSaveControl, /persistSectionBookmark\(detail, !shouldRemove/);
 assert.match(searchSaveControl, /showReaderSaveConfirmation\(panel, detail/);
 assert.doesNotMatch(searchResults, /confirmSectionBookmarkRemoval\(results\.closest\("\.search-panel"\)\)/);
-assert.match(searchResults, /sourceSurface: "search"/);
+assert.match(searchResults, /openSearchResultDetail\(detail, searchInstance/);
+assert.match(sourceBetween("async function openSearchResultDetail(", "\nfunction restoreSearchReaderFocus"), /sourceSurface: "search"/);
 
 const sectionDetail = sourceBetween(
   "async function renderSectionDetail(searchID, detail)",

@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
+import {searchCitationQuery} from '../public/search-citation-query.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const extract=name=>{const start=source.indexOf(`function ${name}(`);assert.ok(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
 const c=vm.createContext({defaultSyncCodeVersion:'2022',repeatableUtilityKeys:new Set(['search']),
-  normalizeSearchCodeFilters:value=>Array.isArray(value)?value:[],normalizeSearchHistorySplitRatio:value=>value});
+  normalizeSearchCodeFilters:value=>Array.isArray(value)?value:[],normalizeSearchHistorySplitRatio:value=>value,searchCitationQuery});
 vm.runInContext(['normalizeSearchResultSources','newUtilityInstance','normalizeUtilityInstances','normalizeSearchInstance',
-  'searchPositionState','applyInitialSearchGroupExpansion','searchResultChapter'].map(extract).join('\n'),c);
+  'searchPositionState','searchResultSourceKey','bestExactSearchResult','applyInitialSearchGroupExpansion','searchResultChapter',
+  'escapeRegExp','searchResultMatchesExactQuery'].map(extract).join('\n'),c);
 const all={querySuffix:''};
 const matches=[{codePrefix:'MC',codeVersion:'2022'},{codePrefix:'BC',codeVersion:'2014'},{codePrefix:'BC',codeVersion:'2022'}];
 const make=()=>c.newUtilityInstance('search',{id:'test',query:'concrete',expandedResultSources:['BC|2014']});
@@ -32,6 +34,22 @@ assert.deepEqual(Object.keys(restored.searchPosition.chapterExpansion),[],'Sourc
 assert.equal(JSON.stringify(matches),before,'Presentation never changes result ranking or source records');
 const empty=make();assert.equal(c.applyInitialSearchGroupExpansion(empty,[],all),false);
 assert.equal(c.applyInitialSearchGroupExpansion(empty,matches,all),true);
+const exact = {codePrefix:'PC', codeVersion:'2022', sectionNumber:'403.1'};
+const exactMatches = [
+  {codePrefix:'BC', codeVersion:'2022', sectionNumber:'403.1.1', snippet:'See section 403.1.'},
+  exact,
+  {...exact, codeVersion:'2014'}
+];
+assert.equal(c.bestExactSearchResult(exactMatches,'403.1'),exact);
+assert.equal(c.bestExactSearchResult(exactMatches,'PC § 403.1.'),exact);
+assert.equal(c.bestExactSearchResult(exactMatches,'§ 403.1'),exact);
+assert.equal(c.bestExactSearchResult(exactMatches,'BC 403.1'),null);
+assert.equal(c.bestExactSearchResult(exactMatches,'see 403.1'),null);
+assert.equal(c.searchResultMatchesExactQuery(exact,'PC 403.1'),true);
+assert.equal(c.searchResultMatchesExactQuery(exact,'BC 403.1'),false);
+const direct = c.newUtilityInstance('search',{id:'direct',query:'403.1'});
+assert.equal(c.applyInitialSearchGroupExpansion(direct,exactMatches,all,exact),true);
+assert.equal(direct.defaultExpandedResultSource,'PC|2022');
 const chapter=result=>JSON.parse(JSON.stringify(c.searchResultChapter(result)));
 assert.deepEqual(chapter({chapterID:7,chapterNumber:'7',chapterTitle:'Fire and Smoke Protection Features'}),{key:'7',label:'Chapter 7: Fire and Smoke Protection Features'});
 assert.equal(chapter({navigationChapterID:'k',chapterID:'k2',navigationChapterNumber:'K',chapterNumber:'K2',chapterTitle:'Appendix K: Modified Industry Standards'}).label,'Appendix K: Modified Industry Standards');
