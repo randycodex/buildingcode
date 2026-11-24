@@ -17232,10 +17232,10 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
         sectionID: selection.sectionID,
         selectionBlockID: selection.blockID || "",
         chapterNumber: evidence.chapter === "unknown" ? "" : evidence.chapter,
-        selectionKind: selection.blockID ? "paragraph" : "section",
+        selectionKind: evidence.selectionKind === "passage" ? "paragraph" : evidence.selectionKind,
         previewText: evidence.passageText.replace(/\s+/g, " ").trim().slice(0, 240),
         notes: selection.notes.map(note => ({ blockID: note.blockID, label: note.label, body: note.body })),
-        label: `${evidence.codeBook} ${evidence.sectionNumber} · ${evidence.codeEdition}: ${evidence.title}`,
+        label: `${evidence.sectionNumber.startsWith(`${evidence.codeBook} `) ? "" : `${evidence.codeBook} `}${evidence.sectionNumber} · ${evidence.codeEdition}: ${evidence.title}`,
         summary: reportEvidenceDisplayText(evidence.passageText).slice(0, 500),
         sourceClassification: "published-code", manifestItem: evidence,
         manifestItems: prepared.items, sourceSnapshot: prepared.sources[0]
@@ -25081,6 +25081,12 @@ async function codeSearchResults(hits, query, matchMode = "exact") {
         new Map(chapters.map(chapter => [String(chapter.id), chapter]))).catch(() => new Map()));
     const chapter = (await chapterMaps.get(sourceKey)).get(String(section.navigationChapterID || section.chapterID));
     const plainText = matchedPlainText ?? await searchableSectionPlainText(section);
+    // Fire Code stores numbered subsections inside its parent section body.
+    // An exact reference in another section's prose is not a subsection heading.
+    const parentNumber = /^FC\s+(\d+)$/i.exec(section.sectionNumber || "")?.[1];
+    const subsection = section.codePrefix === "FC" && parentNumber && /^\d+(?:\.\d+)+$/.test(query) &&
+      query.startsWith(`${parentNumber}.`) && plainText.split(/\r?\n/).find(line =>
+        line.trim().startsWith(`${query} `) && /[A-Z]/.test(line.trim().charAt(query.length + 1)));
     const codeSource = await findActiveCodeSource({ canonicalEdition: codeSearchSectionVersion(section),
       categoryID: section.codeSectionID, codePrefix: section.codePrefix }).catch(() => null);
     return {
@@ -25098,6 +25104,7 @@ async function codeSearchResults(hits, query, matchMode = "exact") {
       title: section.title,
       headerLine: section.headerLine,
       headingLine: section.headingLine,
+      ...(subsection ? {matchedSubsection: {number: query, heading: subsection.trim()}} : {}),
       definitionTerm: matchingSearchDefinition(section, query, plainText) || undefined,
       matchKind: searchTextMatchesExactQuery([section.sectionNumber, section.title, plainText], query) ? "exact" : "words",
       snippet: (matchMode === "words" ? searchWordsSnippet : searchSnippet)(plainText || section.title || "", query)

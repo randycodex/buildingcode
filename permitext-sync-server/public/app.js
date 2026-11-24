@@ -17,7 +17,7 @@ import { openProfilePreferenceMenu } from "./profile-preference-menu.js?v=4";
 import { bindSettingsDisclosureState } from "./settings-disclosure-state.js?v=1";
 import { settingsSavedContentSnapshot, createSettingsSavedContent } from "./settings-saved-content.js?v=5";
 import { bindAssistantComposerHint } from "./assistant-composer-hint.js?v=1";
-import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261123-search-result-focus-v2628";
+import {webAppVersion, webSyncProtocol, webSyncProtocolHeader, webUpdateRequiredCode} from "./web-client-version.js?v=20261123-web-audit-fixes-v2629";
 import {createWebAppUpdatePrompt} from "./web-app-update.js?v=20261119-update-notice-v4";
 import {createResearchHistoryManagement} from "./research-delete-controls.js?v=14";
 import {createRelatedProvisionReview} from "./research-related-provisions.js?v=3";
@@ -32,7 +32,7 @@ import { createNotebookPassageDisclosure } from "./notebook-passage-disclosure.j
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=20261111-selective-menus-v3";
-import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=45";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=46";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js?v=2";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261118-sync-refresh-v1386";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden } from "./minimal-workflow.js";
@@ -177,7 +177,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261123-search-result-focus-v2628";
+} from "./offline-storage.js?v=20261123-web-audit-fixes-v2629";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2641,7 +2641,9 @@ function closeWorkspaceMenu() {
   webAppUpdates.positionNotice();
 }
 
-function showWorkspaceMenuTab(menu, tab, options) {
+async function showWorkspaceMenuTab(menu, tab, options) {
+  const selection = menu.selection = {};
+  menu.pendingProject = null;
   if (menu.tab === "project" && tab !== "project") projectDetailsScreen?.close();
   if (menu.tab === "settings" && tab !== "settings") menu.panels.settings.querySelector(".settings-floating-panel[open]")?.close();
   menu.tab = tab;
@@ -2654,10 +2656,22 @@ function showWorkspaceMenuTab(menu, tab, options) {
     return menu.workspacesReady;
   }
   if (tab === "settings") return toggleAccountDialog({ mount });
+  const gate = workspaceAccessGateForRender();
+  if (gate.phase === "pending") {
+    const loading = document.createElement("p");
+    loading.setAttribute("role", "status");
+    loading.textContent = "Loading project details…";
+    mount.replaceChildren(loading);
+    await gate.ready;
+    if (workspaceMenu !== menu || menu.selection !== selection) return false;
+  }
   if (!workspacePrivatePresentationAllowed() || !workspaceProject() || !hasCapability("projects")) {
-    mount.textContent = "Choose a workspace to open project details.";
+    const selected = activeWorkspaceRecord()?.projectID;
+    if (selected && hasCapability("projects")) menu.pendingProject = options;
+    mount.textContent = selected ? "Project details are temporarily unavailable." : "Choose a workspace to open project details.";
     return false;
   }
+  if (!mount.contains(projectDetailsScreen?.element || null)) mount.replaceChildren();
   return openProjectDetailsScreen(options.section, { ...options, mount });
 }
 
@@ -6869,7 +6883,7 @@ function searchResultDetail(result) {
     codeSource: result.codeSource,
     navigationChapterID: result.navigationChapterID || result.chapterID || "",
     chapterID: result.navigationChapterID || result.chapterID || "",
-    chapterNumber: result.chapterNumber || "",
+    chapterNumber: result.navigationChapterNumber || result.chapterNumber || "",
     sectionID: result.id || result.sectionID,
     sectionNumber: result.sectionNumber || "",
     title: result.title || result.headingLine || "Section",
@@ -6877,7 +6891,8 @@ function searchResultDetail(result) {
     blockLabel: result.blockLabel || "",
     definitionTerm: result.definitionTerm || "",
     headerLine: result.headerLine || "",
-    headingLine: result.headingLine || ""
+    headingLine: result.headingLine || "",
+    ...(result.matchedSubsection ? {evidenceAnchor: {passages: [{exact: result.matchedSubsection.heading}]}} : {})
   };
 }
 
@@ -9461,10 +9476,11 @@ function snippetWithoutDuplicateTitle(result) {
 
 function searchResultPresentation(result, query = "") {
   const clean = (value) => String(value || "").replace(/\s+/g, " ").trim();
-  const number = clean(result.sectionNumber);
-  const parent = clean(result.headerLine).replace(/^SECTION\s+/i, "");
-  const title = clean(stripLeadingSectionNumber(result.title || "", number));
-  const parentTitle = clean(result.headingLine);
+  const subsection = result.matchedSubsection;
+  const number = clean(subsection?.number || result.sectionNumber);
+  const parent = clean(subsection ? result.sectionNumber : result.headerLine).replace(/^SECTION\s+/i, "");
+  const title = clean(stripLeadingSectionNumber(subsection?.heading || result.title || "", number));
+  const parentTitle = clean(subsection ? result.title : result.headingLine);
   // Numbered list items sometimes contain an entire paragraph as their title.
   // Keep the supplied parent citation; never manufacture a subsection number.
   const heading = result.definitionTerm ? `Definition: ${result.definitionTerm.toLocaleLowerCase()}`
@@ -19480,7 +19496,7 @@ function calculatorFootnoteAssessmentFor(source, conversation, answerID = "") {
   return assessment && JSON.stringify(assessment.workFacts)===JSON.stringify(conversation.projectContext?.facts||[]) ? {...assessment,answerID:latest.id} : null;
 }
 
-async function askCalculatorFootnotes(source, draft, {conversationID="", anchorPaneID="", reply=false}={}) {
+async function askCalculatorFootnotes(source, draft, {conversationID="", anchorPaneID="", reply=false, onProgress}={}) {
   const identity=captureAccountRequest(),workspaceID=activeWorkspaceID,project=workspaceProject();
   const generation = state.workflowNavigationGeneration || 0;
   const current=()=>isCurrentAccountRequest(identity) && activeWorkspaceID===workspaceID &&
@@ -19525,6 +19541,7 @@ async function askCalculatorFootnotes(source, draft, {conversationID="", anchorP
     review.append(label, inputs, notes, question, full);
     if (!await confirmWebWarning("Review before asking", "Include this table section and its footnotes, together with the calculation inputs shown below. Review the prepared question before sending.",
       { content: review, confirmLabel: "Include and prepare question", container: track.querySelector(`[data-pane-id="${CSS.escape(anchorPaneID)}"]`) }) || !current()) return;
+    onProgress?.("Preparing Assistant question…");
     const selection = { sectionID: resolved.sectionID || resolved.id, selectedText,
       projectID: researchProjectID(project), originSurface: "reader", originPaneID: anchorPaneID };
     if(!conversation || conversation.primaryProjectID!==researchProjectID(project) || conversation.codeVersion!==(source.codeVersion||source.sourceLibraryVersion)) {
@@ -19615,7 +19632,7 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       projectSync?.schedule();
     },
     getAssessment: () => calculatorFootnoteAssessmentFor(source,currentConversation(),answerID),
-    onCheckFootnotes: draft => askCalculatorFootnotes(source,draft,{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId}),
+    onCheckFootnotes: (draft, onProgress) => askCalculatorFootnotes(source,draft,{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId,onProgress}),
     onReplyFootnotes: () => askCalculatorFootnotes(source,draft,{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId,reply:true}),
     onLoadTable: async () => {const {resolved, section} = await loadSource(); return occupantLoadTable(section.blocks, resolved);},
     onControlsReady: controls => controls.querySelectorAll("select").forEach(enhanceSelect),
@@ -22864,16 +22881,21 @@ function searchResultSourceKey(result) {
 
 function bestExactSearchResult(matches, query) {
   const citation = searchCitationQuery(query);
-  const sectionNumber = citation.query.replace(/^(?:section\s+|§+\s*)/i, "").replace(/\.$/, "").toLowerCase();
+  const number = value => String(value || "").trim().replace(/^FC\s+/i, "").replace(/\.$/, "").toLowerCase();
+  const sectionNumber = number(citation.query.replace(/^(?:section\s+|§+\s*)/i, ""));
   if (!sectionNumber) return null;
-  return matches.find((result) => (!citation.codePrefix || result.codePrefix === citation.codePrefix) &&
-    String(result.sectionNumber || "").trim().replace(/\.$/, "").toLowerCase() === sectionNumber) || null;
+  const exact = matches.filter(result => (!citation.codePrefix || result.codePrefix === citation.codePrefix) &&
+    [result.sectionNumber, result.matchedSubsection?.number].some(value => number(value) === sectionNumber));
+  const family = exact[0]?.codePrefix;
+  return exact.filter(result => result.codePrefix === family).sort((left, right) =>
+    (Number.parseInt(researchCodeEdition(right), 10) || 0) - (Number.parseInt(researchCodeEdition(left), 10) || 0)
+  )[0] || null;
 }
 
 // Expose the preferred source for a new query, then respect manual choices
 // through pagination and reload. Chapter choices belong to this query/scope.
 function applyInitialSearchGroupExpansion(instance, matches, sourceScope, exactMatch = null) {
-  const decisionKey = JSON.stringify(["chapter-groups-v5", String(instance.query || "").trim(),
+  const decisionKey = JSON.stringify(["chapter-groups-v6", String(instance.query || "").trim(),
     normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all",
     sourceScope?.querySuffix || "", instance.matchMode || "words"]);
   if (!matches.length || instance.searchExpansionDecisionKey === decisionKey) return false;
@@ -23433,7 +23455,7 @@ async function resolveSectionDetail(detail) {
           detail.chapterID = resolvedSection.navigationChapterID || resolvedSection.chapterID || detail.chapterID || "";
           detail.navigationChapterID = resolvedSection.navigationChapterID || detail.chapterID || "";
           detail.codePrefix = resolvedSection.codePrefix || detail.codePrefix || "BC";
-          detail.chapterNumber = resolvedSection.chapterNumber || detail.chapterNumber || "";
+          detail.chapterNumber = resolvedSection.navigationChapterNumber || resolvedSection.chapterNumber || detail.chapterNumber || "";
           detail.sectionNumber = resolvedSection.sectionNumber || detail.sectionNumber || "";
           detail.title = resolvedSection.title || detail.title || "Section";
           if (detail.chapterID) {
@@ -33855,8 +33877,18 @@ async function renderProjectReportDraft(project, resume = null) {
   let darkReportPages = false;
   try {darkReportPages=localStorage.getItem('permitext:report:dark-pages')==='true';} catch {}
   const pageLayoutHost = document.createElement('section'); pageLayoutHost.className = 'report-page-layout'; pageLayoutHost.hidden = true;
+  const tableNotice = document.createElement('p');
+  tableNotice.className = 'report-page-layout-status';
+  tableNotice.setAttribute('role', 'status');
+  tableNotice.hidden = true;
   const pageLayout = createReportPageLayout({host: pageLayoutHost,
-    onPages: result => pageEditor?.pages(result),
+    onPages: result => {
+      const repeats = result.layout?.duplicateTables || 0;
+      tableNotice.hidden = !repeats;
+      tableNotice.textContent = repeats === 1 ? 'One repeated table is shown once in the PDF.'
+        : repeats ? `${repeats} repeated tables are shown once each in the PDF.` : '';
+      pageEditor?.pages(result);
+    },
     isCurrent: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
     async prepare() {
       const draft = activeDraft;
@@ -35501,7 +35533,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const editingModel=document.createElement('div'); editingModel.className='report-editing-model'; editingModel.hidden=true;
     editingModel.append(draftPicker,metadata,blocks);
     const pageToolbar=document.createElement('div'); pageToolbar.className='report-paged-toolbar';
-    pageToolbar.append(editorControls,pageEditor.inspector);
+    pageToolbar.append(editorControls,pageEditor.inspector,tableNotice);
     documentBody.replaceChildren(editingModel,pageToolbar,pageLayoutHost);
     outlineController = createReportOutline({
       blocks: activeDraft.blocks, introduction: metadata,
@@ -35513,7 +35545,8 @@ async function renderProjectReportDraft(project, resume = null) {
         const source = sources.find(item => item.kind === block.kind && item.id === block.sourceID);
         if (block.kind === "evidence" && source) return {
           title: [source.sectionNumber, stripLeadingSectionNumber(source.title || "", source.sectionNumber)].filter(Boolean).join(" "),
-          detail: [source.codePrefix || "Code", savedEvidenceEdition(source), source.selectionBlockID ? "Passage" : "Section"].filter(Boolean).join(" · ")
+          detail: [source.codePrefix || "Code", savedEvidenceEdition(source),
+            ({table:"Table",figure:"Figure",section:"Whole section"})[source.selectionKind] || (source.selectionBlockID ? "Passage" : "Whole section")].filter(Boolean).join(" · ")
         };
         return { title: block.kind === 'calculation' && source ? source.label : reportBlockTitle(block), detail: ({ heading: "Heading", paragraph: block.derivedFrom?.kind === "notebookCard" ? "Notebook note" : "Paragraph", list: "List", notebookCard: "Notebook note", calculation: "Calculation", researchAnswer: "Assistant answer", projectFacts: block.sourceID?.endsWith(":context") ? "Project Context" : "Project facts" })[block.kind] || "Source" };
       },
@@ -41512,8 +41545,10 @@ async function hydrateSavedColumnItems(items = []) {
       const rawPreview = block?.plainText || block?.text || sectionPlainText(section) || item.previewText || "";
       const codePrefix = detail.codePrefix || chapter?.codePrefix || item.codePrefix || "BC";
       const chapterID = detail.chapterID || chapter?.id || item.chapterID || "";
-      const chapterNumber = detail.chapterNumber || chapter?.chapterNumber || item.chapterNumber || "";
+      const chapterNumber = chapter?.chapterNumber || detail.chapterNumber || item.chapterNumber || "";
       const savedContentComparisonText = String(rawPreview).replace(/\s+/g, " ").trim();
+      const evidenceScope = !blockID ? "Whole section" : block?.kind === "table" || /<table\b/i.test(block?.html || "")
+        ? "Table" : block?.kind === "image" || /<img\b/i.test(block?.html || "") ? "Figure" : "Passage";
       return {
         ...item,
         blockID,
@@ -41521,6 +41556,7 @@ async function hydrateSavedColumnItems(items = []) {
         chapterID,
         chapterNumber,
         chapterTitle: chapter?.fullTitle || chapter?.displayTitle || chapter?.title || item.chapterTitle || "",
+        evidenceScope,
         sectionNumber: section?.sectionNumber || detail.sectionNumber || item.sectionNumber || "",
         title: section?.title || detail.title || item.title || "Section",
         isNestedListParagraph: savedSectionIsNestedListParagraph(chapter, section),
@@ -41906,11 +41942,8 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
   heading.className = "saved-section-heading";
   const meta = document.createElement("span");
   meta.className = "saved-section-meta";
-  meta.textContent = normalizeAnnotationBlockID(item.blockID) || item.isNestedListParagraph
-    ? ["Paragraph", sectionNumber].filter(Boolean).join(" · ")
-    : item.kind === "textBlock"
-      ? ["Text Block", sectionNumber].filter(Boolean).join(" · ")
-    : ["Section", sectionNumber].filter(Boolean).join(" · ");
+  const scope = item.evidenceScope || (normalizeAnnotationBlockID(item.blockID) ? "Passage" : "Whole section");
+  meta.textContent = [scope, sectionNumber].filter(Boolean).join(" · ");
   meta.textContent += ` · ${savedEvidenceEdition(item)}`;
   if (options.inbox) meta.textContent = `${item.codePrefix || item.code || "BC"} · ${savedEvidenceEdition(item)} · § ${sectionNumber}`;
   const annotation = annotationForTarget(item, "", "", annotationSnapshot);
@@ -43943,6 +43976,10 @@ function settingsPanelScrollTop(panel) {
 }
 
 function refreshOpenSettingsWorkspace() {
+  const menu = workspaceMenu;
+  if (menu?.tab === "project" && menu.pendingProject && workspacePrivatePresentationAllowed() && workspaceProject()) {
+    menu.ready = showWorkspaceMenuTab(menu, "project", menu.pendingProject);
+  }
   document.querySelectorAll(".account-screen[open] .settings-panel, #panel-track .settings-panel")
     .forEach(panel => panel.__refreshSettingsWorkspace?.());
 }

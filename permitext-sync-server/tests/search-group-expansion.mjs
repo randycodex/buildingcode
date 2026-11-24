@@ -5,7 +5,8 @@ import {searchCitationQuery} from '../public/search-citation-query.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const extract=name=>{const start=source.indexOf(`function ${name}(`);assert.ok(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
 const c=vm.createContext({defaultSyncCodeVersion:'2022',repeatableUtilityKeys:new Set(['search']),
-  normalizeSearchCodeFilters:value=>Array.isArray(value)?value:[],normalizeSearchHistorySplitRatio:value=>value,searchCitationQuery});
+  normalizeSearchCodeFilters:value=>Array.isArray(value)?value:[],normalizeSearchHistorySplitRatio:value=>value,searchCitationQuery,
+  researchCodeEdition:result=>result.codeVersion});
 vm.runInContext(['normalizeSearchResultSources','newUtilityInstance','normalizeUtilityInstances','normalizeSearchInstance',
   'searchPositionState','searchResultSourceKey','bestExactSearchResult','applyInitialSearchGroupExpansion','searchResultChapter',
   'escapeRegExp','searchResultMatchesExactQuery'].map(extract).join('\n'),c);
@@ -45,6 +46,9 @@ assert.equal(c.bestExactSearchResult(exactMatches,'PC § 403.1.'),exact);
 assert.equal(c.bestExactSearchResult(exactMatches,'§ 403.1'),exact);
 assert.equal(c.bestExactSearchResult(exactMatches,'BC 403.1'),null);
 assert.equal(c.bestExactSearchResult(exactMatches,'see 403.1'),null);
+assert.equal(c.bestExactSearchResult([...exactMatches].reverse(),'PC 403.1'),exact,'2022 wins even when the historical edition arrives first');
+const fire = {codePrefix:'FC',codeVersion:'2022',sectionNumber:'FC 403',matchedSubsection:{number:'403.1',heading:'403.1 General.'}};
+assert.equal(c.bestExactSearchResult([{codePrefix:'FC',sectionNumber:'FC 407',snippet:'See FC 403.1.'},fire],'FC 403.1'),fire);
 assert.equal(c.searchResultMatchesExactQuery(exact,'PC 403.1'),true);
 assert.equal(c.searchResultMatchesExactQuery(exact,'BC 403.1'),false);
 const direct = c.newUtilityInstance('search',{id:'direct',query:'403.1'});
@@ -63,4 +67,5 @@ const paragraph={codePrefix:'BC',sectionNumber:'2.1.',headerLine:'SECTION BC 403
 const compact=presentation.searchResultPresentation(paragraph,'stairs');
 assert.equal(compact.heading,'Code passage','A full legal paragraph never becomes a giant result heading');
 assert.equal(compact.scope,'');assert.equal(compact.number,'2.1.');assert.match(compact.excerpt,/Stairs/);
+assert.equal(presentation.searchResultPresentation(fire,'FC 403.1').number,'403.1');
 console.log('Search expansion passed: strongest source preview, manual closure/reload, query/scope changes, ranked-result preservation, canonical chapter labels and missing-metadata fallbacks.');

@@ -50,4 +50,35 @@ for (const [pageFormat, format] of Object.entries(reportPageFormats)) {
   await pdf.destroy();
   if (process.env.PERMITEXT_REPORT_PAGE_QA_DIR) await writeFile(join(process.env.PERMITEXT_REPORT_PAGE_QA_DIR, `report-content-${pageFormat}.pdf`), bytes);
 }
+const rows = [
+  ['Number', 'Classification', 'Description', 'Occ.', 'Water Closets', 'Lavatories', 'Bathtubs', 'Drinking Fountains', 'Other'],
+  ['1', 'Assembly', 'Theaters and other buildings for the performing arts and motion pictures', 'A-1',
+    '1 per 70 for the first 210 and 1 per 125 for the remainder', '1 per 200', '–', '1 per 500', '1 service sink']
+];
+const tableText = rows.map(row=>row.join(' | ')).join('\n');
+let layout;
+const auditBytes = await renderReportPDF({
+  title:'Fixture table check',createdAt:'2026-11-23T12:00:00Z',items:[
+    {id:'source',kind:'evidence',sectionID:'11909',sectionNumber:'403.1',codeBook:'PC',codeEdition:'2022',
+      title:'Minimum number of fixtures',selectionKind:'table',passageText:tableText,
+      tables:[{text:tableText,rows,headerRowCount:1}]},
+    {id:'note',kind:'notebookCard',title:'Source review',document:{document:[{type:'table',content:{
+      headerRows:1,rows:rows.map(row=>({cells:row.map(runs)}))
+    }}]}},
+    {id:'answer',kind:'researchAnswer',question:'Which provision has the fixture table?',conclusion:'See the cited provision.',
+      citations:[{sectionID:'11909',codePrefix:'PC',sectionNumber:'403.1'}]}
+  ]
+},{showCover:false,onLayout:value=>{layout=value;}});
+assert.equal(layout.duplicateTables,1);
+const auditPdf = await getDocument({data:new Uint8Array(auditBytes),disableFontFace:true,useSystemFonts:false}).promise;
+const auditText = [], auditLinks = [];
+for (let pageNumber=1;pageNumber<=auditPdf.numPages;pageNumber++) {
+  const page = await auditPdf.getPage(pageNumber);
+  auditText.push(...(await page.getTextContent()).items.map(item=>item.str));
+  auditLinks.push(...(await page.getAnnotations()).filter(item=>item.url));
+}
+assert.equal(auditText.filter(value=>value==='Classification').length,1,'Keep the heading as one word and render the table once');
+assert.match(auditText.join(' ').replace(/\s+/g,' '),/Identical table shown on page 1/);
+assert(auditLinks.some(item=>item.url==='https://per.codes/open/section/11909'));
+await auditPdf.destroy();
 console.log('Report pagination content passed for Letter/A4/Legal/Tabloid: whole images within margins, small tables together, large tables between complete rows with repeated headers and no content loss.');

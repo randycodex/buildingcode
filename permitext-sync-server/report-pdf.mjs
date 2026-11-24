@@ -41,7 +41,7 @@ function drawNotebookContent(document, notebookDocument, material) {
     } else if (block.type === 'table') {
       const table = notebookTableDisplayData(block.content, {preserveInlineContent:true,preserveCellSpans:true});
       table.rows = table.rows.map(row => row.map(noteRuns));
-      drawReportRichTable(document, table, left, width, {headerBold:true});
+      drawReportTableOnce(document, table, left, width, {headerBold:true, published:false});
       document.x = left; document.moveDown(0.7);
     } else {
       const size=block.type === 'heading' ? documentLayout.headingSizes[block.props?.level || 1] : documentLayout.bodySize;
@@ -63,7 +63,7 @@ function drawNotebookContent(document, notebookDocument, material) {
   document.x = left;
 }
 import { fileURLToPath } from "node:url";
-import { reportEvidenceDisplayText, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation, reportItemPreview, reportCalculationPresentation } from "./report-presentation.mjs";
+import { reportEvidenceDisplayText, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation, reportItemPreview, reportCalculationPresentation, reportSectionURL } from "./report-presentation.mjs";
 import { reportBlockRuns, reportRunsLines } from "./public/report-rich-text.js";
 import { sourceFormattingRuns, sourceTextStyles } from "./public/report-source-formatting.js";
 
@@ -121,11 +121,12 @@ function reserveHeading(document, title, body = "", { size = 9, gap = 4, bodySiz
   ensureVerticalSpace(document, heading + gap + Math.min(80, Math.max(55, first)));
 }
 
-function drawTextSection(document, title, body) {
+function drawTextSection(document, title, body, runs) {
   if (!String(body || "").trim()) return;
   reserveHeading(document, title, body);
   document.fillColor(colors.ink).font("Report-Bold").fontSize(9).text(title, { paragraphGap: 4 });
-  document.font("Report-Regular").fontSize(9.5).text(body, { lineGap: 2, paragraphGap: 8 });
+  if (runs) drawReportRichText(document, runs, {size:9.5,paragraphGap:8});
+  else document.font("Report-Regular").fontSize(9.5).text(body, { lineGap: 2, paragraphGap: 8 });
 }
 
 function drawCalculation(document, item, startX, width) {
@@ -176,48 +177,26 @@ function drawList(document, title, values) {
   document.moveDown(0.25);
 }
 
-// Paginate complete rows explicitly: PDFKit's automatic table breaks do not
-// repeat headers. Measure using the same font, width and padding as rendering.
 export function drawReportTable(document, table, startX, contentWidth) {
-  const rows = table.rows || [];
-  if (!rows.length) return;
-  if (table.cellSpans?.length || table.cellSuperscripts?.length) {
-    drawFormattedSourceTable(document,table,[],startX,contentWidth);
-    return;
-  }
-  const columns = Math.max(...rows.map(row => row.length));
-  const width = contentWidth / columns;
-  const headers = rows.slice(0, table.headerRowCount || 0);
-  const measure = row => Math.max(...row.map(value =>
-    document.heightOfString(value, {width: width - 10, lineGap: 0}))) + 12;
-  const heights = rows.map(measure);
-  const completeHeight = heights.reduce((sum, height) => sum + height, 0);
-  const printableHeight = document.page.height - document.page.margins.top - document.page.margins.bottom - 2;
-  if (completeHeight <= printableHeight) ensureVerticalSpace(document, completeHeight + 2);
-  const headerHeight = heights.slice(0,headers.length).reduce((sum,height) => sum + height,0);
-  let position = headers.length;
-  while (position < rows.length || position === headers.length && position === rows.length) {
-    const bottom = document.page.height - document.page.margins.bottom - 2;
-    if (document.y + headerHeight + (heights[position] || 0) > bottom) document.addPage();
-    let height = headerHeight;
-    const pageRows = [...headers];
-    const pageHeights = heights.slice(0,headers.length);
-    while (position < rows.length) {
-      const next = heights[position];
-      if (document.y + height + next > bottom) {
-        if (pageRows.length === headers.length) throw new Error("A Report table row is too tall for a PDF page. Narrow the selection before exporting.");
-        break;
-      }
-      pageRows.push(rows[position]); pageHeights.push(next); height += next; position++;
-    }
-    document.table({position:{x:startX},maxWidth:contentWidth,
-      defaultStyle:{border:0.5,borderColor:colors.rule,padding:5,textOptions:{lineGap:0}},
-      rowStyles:index => ({height:pageHeights[index], ...(index < headers.length ? {backgroundColor:'#f0f0f0'} : {})}),
-      data:pageRows});
-    document.x = startX;
-    if (position >= rows.length) break;
-    document.addPage();
-  }
+  if (!table.rows?.length) return;
+  if (!document._reportTables) registerReportFonts(document);
+  drawFormattedSourceTable(document,table,[],startX,contentWidth);
+}
+
+function reportSourceTitle(item) {
+  const number = item.sectionNumber.startsWith(item.codeBook + " ")
+    ? item.sectionNumber : [item.codeBook, item.sectionNumber].join(" ");
+  const title = item.title.startsWith(number + ':')
+    ? item.title.slice(number.length + 1).trim() : item.title;
+  return `${number}: ${title}`;
+}
+
+function drawEvidenceTitle(document, item) {
+  drawReportRichText(document, [{text:reportSourceTitle(item),href:reportSectionURL(item.sectionID)}],
+    {size:12,bold:true,paragraphGap:5});
+  const scope = {section:'Whole section',table:'Table',passage:'Passage',figure:'Figure'}[item.selectionKind];
+  document.font('Report-Regular').fontSize(9).fillColor(colors.muted)
+    .text([`Edition: ${reportEvidenceEdition(item)}`,scope].filter(Boolean).join(' · '),{paragraphGap:8});
 }
 
 function drawSourceItem(document, item, projectMaterialBySourceID, presentation, showClassification = true) {
@@ -237,11 +216,9 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
   const formatted = annotatedSourceParts(item);
   if (hasSourceMarks(formatted)) {
     const question = formatted.find(part=>part.label === 'Question');
-    const title = item.kind === 'evidence' ? `${item.codeBook} ${item.sectionNumber}: ${item.title}` : sourceTitle;
-    const questionIsTitle = title === item.question;
-    drawReportRichText(document,questionIsTitle && question ? question.runs : [{text:title}],{size:12,bold:true,paragraphGap:7});
-    if (item.kind === 'evidence') document.font('Report-Regular').fontSize(9).fillColor(colors.muted)
-      .text(`Edition: ${reportEvidenceEdition(item)}`,{paragraphGap:8});
+    const questionIsTitle = sourceTitle === item.question;
+    if (item.kind === 'evidence') drawEvidenceTitle(document, item);
+    else drawReportRichText(document,questionIsTitle && question ? question.runs : [{text:sourceTitle}],{size:12,bold:true,paragraphGap:7});
     for (const part of formatted) {
       if (part === question && questionIsTitle) continue;
       if (part.kind === 'image') {
@@ -258,13 +235,7 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
       }
     }
   } else if (item.kind === "evidence") {
-    document
-      .fillColor(colors.ink)
-      .font("Report-Bold")
-      .fontSize(12)
-      .text(`${item.codeBook} ${item.sectionNumber}: ${item.title}`, { paragraphGap: 4 });
-    document.font("Report-Regular").fontSize(9).fillColor(colors.muted)
-      .text(`Edition: ${reportEvidenceEdition(item)}`, { paragraphGap: 8 });
+    drawEvidenceTitle(document, item);
     document.font("Report-Regular").fontSize(9.5).fillColor(colors.ink);
     for (const part of reportItemPreview(item)) {
       if (part.kind === 'image') drawReportImage(document,part.url,part.caption,projectMaterialBySourceID);
@@ -293,7 +264,7 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
     const title = item.reportTitle || (item.question.length > 96 ? `${item.question.slice(0, 95).trimEnd()}…` : item.question);
     reserveHeading(document, title, item.conclusion, { size: 12, gap: 7 });
     document.fillColor(colors.ink).font("Report-Bold").fontSize(12).text(title, { paragraphGap: 7 });
-    for (const part of reportItemPreview(item)) drawTextSection(document, part.label, part.text);
+    for (const part of reportItemPreview(item)) drawTextSection(document, part.label, part.text, part.citationRuns);
 
   } else {
     document
@@ -398,7 +369,14 @@ export function drawReportRichText(document, runs, {size = documentLayout.bodySi
     if (paginate) ensureVerticalSpace(document, height + 2);
     const top = document.y;
     let x = left;
+    const segments = [];
     for (const run of line) {
+      const last = segments.at(-1);
+      if (last && ['bold','italic','strike','underline','highlight','superscript','fontSize','href'].every(key => last[key] === run[key])) {
+        last.text += run.text;
+      } else segments.push({...run});
+    }
+    for (const run of segments) {
       const runWidth = measure(run);
       if (run.highlight) document.save().fillColor("#f4d35e").fillOpacity(0.5).rect(x, top + 1, runWidth, runSize(run) * 1.25).fill().restore();
       document.fillColor(colors.ink).font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(runSize(run))
@@ -435,7 +413,8 @@ export function drawReportRichText(document, runs, {size = documentLayout.bodySi
 
 function annotatedSourceParts(item) {
   if (!item.sourceFormatting?.length) return [];
-  return reportItemPreview(item).map(part => part.kind === 'text' ? {...part,runs:sourceFormattingRuns(part,item.sourceFormatting)} : {...part,formatting:item.sourceFormatting});
+  return reportItemPreview(item).map(part => part.kind === 'text'
+    ? {...part,runs:part.citationRuns || sourceFormattingRuns(part,item.sourceFormatting)} : {...part,formatting:item.sourceFormatting});
 }
 const hasInlineStyle = run => sourceTextStyles.some(style=>run[style]);
 function hasSourceMarks(parts) {
@@ -445,20 +424,78 @@ function hasSourceMarks(parts) {
 function drawFormattedSourceTable(document,part,formatting,startX,contentWidth) {
   const rows = part.rows.map((row,r)=>row.map((text,c)=>sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text,
     superscriptRanges:part.cellSuperscripts?.find(mark=>mark.row===r&&mark.column===c)?.ranges},formatting)));
-  drawReportRichTable(document, {rows,headerRowCount:part.headerRowCount || 0,cellSpans:part.cellSpans}, startX, contentWidth,{headerBold:true});
+  drawReportTableOnce(document, {rows,headerRowCount:part.headerRowCount || 0,cellSpans:part.cellSpans},
+    startX, contentWidth, {headerBold:true,published:true});
+}
+
+function drawReportTableOnce(document, table, startX, contentWidth, {headerBold, published}) {
+  const tracker = document._reportTables;
+  const cells = tableDisplayCells(table.rows, table.cellSpans || []);
+  const plain = cells.map(row => row.map(cell => cell && [cell.rowSpan,cell.colSpan,
+    (cell.content || []).map(run => run.text).join('').normalize('NFKC').replace(/\s+/g,' ').trim()]));
+  // Retain distinctly formatted or linked tables even when the text matches.
+  const marked = table.rows.some(row => row.some(cell => cell.some(run =>
+    run.highlight || run.href || published && hasInlineStyle(run))));
+  const key = !marked && JSON.stringify(plain);
+  const prior = key && tracker?.seen.get(key);
+  if (prior && (prior.published || published)) {
+    tracker.duplicates++;
+    drawReportRichText(document,[{text:`Identical table shown on page ${prior.page}.`,italic:true}],
+      {size:9,left:startX,width:contentWidth,paragraphGap:3});
+    return;
+  }
+  const page = drawReportRichTable(document, table, startX, contentWidth, {headerBold});
+  if (key && page) tracker?.seen.set(key,{page,published});
+}
+
+function reportTableColumnWidths(document, cells, columns, contentWidth, headerRows, headerBold, size, padding) {
+  const minimum = Array(columns).fill(padding * 2 + 8);
+  const preferred = minimum.slice();
+  const measurements = [];
+  for (const cell of cells.flat().filter(Boolean)) {
+    const plain = (cell.content || []).map(run => run.text).join('');
+    document.font(headerBold && cell.row < headerRows ? 'Report-Bold' : 'Report-Regular').fontSize(size);
+    const word = Math.max(0,...plain.split(/\s+/).map(value => document.widthOfString(value)));
+    const width = document.widthOfString(plain);
+    measurements.push({cell,minimum:word+padding*2,preferred:Math.max(word,Math.min(width,Math.sqrt(width*38)))+padding*2});
+  }
+  // Fit individual words before assigning extra room to long descriptions.
+  for (const entry of measurements.sort((a,b) => a.cell.colSpan-b.cell.colSpan)) {
+    const {column,colSpan} = entry.cell;
+    const covered = minimum.slice(column,column+colSpan).reduce((sum,value)=>sum+value,0);
+    const added = Math.max(0,entry.minimum-covered)/colSpan;
+    for(let i=column;i<column+colSpan;i++) {
+      minimum[i]+=added;
+      preferred[i]=Math.max(preferred[i],minimum[i],entry.preferred/colSpan);
+    }
+  }
+  const total = minimum.reduce((sum,value)=>sum+value,0);
+  if (total >= contentWidth) return {fits:false, widths:minimum.map(value=>value/total*contentWidth)};
+  const weights=preferred.map((value,i)=>value-minimum[i]);
+  const weight=weights.reduce((sum,value)=>sum+value,0);
+  return {fits:true, widths:minimum.map((value,i)=>value+(contentWidth-total)*(weight ? weights[i]/weight : 1/columns))};
 }
 
 // Measure and paint the same runs so cell marks and links survive wrapping,
 // repeated headers and page breaks in both Notes and formatted code tables.
 export function drawReportRichTable(document, table, startX, contentWidth, {headerBold = false} = {}) {
   if (!table.rows?.length) return;
-  const columns = Math.max(...table.rows.map(row=>row.length)), width = contentWidth / columns;
-  if (width <= 10) throw new Error('This Report table has too many columns for the PDF page. Split it into smaller tables before exporting.');
-  const size = documentLayout.tableSize, lineHeight = size * documentLayout.tableLineSpacing;
+  const columns = Math.max(...table.rows.map(row=>row.length)), padding = columns >= 7 ? 3 : 5;
+  if (contentWidth / columns <= padding*2+4) throw new Error('This Report table has too many columns for the PDF page. Split it into smaller tables before exporting.');
   const runs = table.rows;
   const headers = table.headerRowCount || 0;
   const cells=tableDisplayCells(runs,table.cellSpans || []);
-  const measure=cell=>drawReportRichText(document,cell.content || [],{size,bold:headerBold && cell.row<headers,width:width*cell.colSpan-10,lineHeight,paragraphGap:0,measureOnly:true})+12;
+  let size = documentLayout.tableSize;
+  let sizing = reportTableColumnWidths(document,cells,columns,contentWidth,headers,headerBold,size,padding);
+  if (!sizing.fits && size > 7) {
+    size = 7;
+    sizing = reportTableColumnWidths(document,cells,columns,contentWidth,headers,headerBold,size,padding);
+  }
+  const offsets = [0];
+  for (const width of sizing.widths) offsets.push(offsets.at(-1)+width);
+  const cellWidth = cell => offsets[cell.column+cell.colSpan]-offsets[cell.column];
+  const lineHeight = size * documentLayout.tableLineSpacing;
+  const measure=cell=>drawReportRichText(document,cell.content || [],{size,bold:headerBold && cell.row<headers,width:Math.max(1,cellWidth(cell)-padding*2),lineHeight,paragraphGap:0,measureOnly:true})+12;
   const heights=cells.map(row=>Math.max(lineHeight+12,...row.filter(cell=>cell && cell.rowSpan===1).map(measure)));
   for(const cell of cells.flat().filter(cell=>cell && cell.rowSpan>1)){
     if(cell.row<headers && cell.row+cell.rowSpan>headers)throw new Error('A Report table cell crosses the header boundary. Review its header rows before exporting.');
@@ -497,12 +534,13 @@ export function drawReportRichTable(document, table, startX, contentWidth, {head
   }
   const completeHeight = sum(0, runs.length);
   if (completeHeight <= pageHeight) ensureVerticalSpace(document, completeHeight + 2);
-  let position = headers;
+  let position = headers, firstPage;
   while (position < runs.length || position === headers && position === runs.length) {
     const bottom = document.page.height-document.page.margins.bottom-2;
     const headerHeight = sum(0,headers), nextEnd=position<runs.length?groupEnd(position):position;
     if(headerHeight+sum(position,nextEnd)>bottom-document.page.margins.top)throw new Error('A Report table row group is too tall for a PDF page. Split it into a smaller table before exporting.');
     if (document.y+headerHeight+sum(position,nextEnd)>bottom) document.addPage();
+    firstPage ??= document.bufferedPageRange().count;
     const indices = Array.from({length:headers},(_,i)=>i); let height = headerHeight;
     while(position<runs.length){
       const end=groupEnd(position),groupHeight=sum(position,end);
@@ -514,18 +552,19 @@ export function drawReportRichTable(document, table, startX, contentWidth, {head
     for (const r of indices) {
       const top = document.y;
       for (const cell of cells[r].filter(Boolean)) {
-        const x = startX+cell.column*width,cellWidth=width*cell.colSpan,cellHeight=sum(r,r+cell.rowSpan);
+        const x = startX+offsets[cell.column],width=cellWidth(cell),cellHeight=sum(r,r+cell.rowSpan);
         document.save().lineWidth(0.5).strokeColor(colors.rule);
-        if (r < headers) document.rect(x,top,cellWidth,cellHeight).fillAndStroke('#f0f0f0',colors.rule);
-        else document.rect(x,top,cellWidth,cellHeight).stroke();
+        if (r < headers) document.rect(x,top,width,cellHeight).fillAndStroke('#f0f0f0',colors.rule);
+        else document.rect(x,top,width,cellHeight).stroke();
         document.restore(); document.y=top+5;
-        drawReportRichText(document,cell.content || [],{size,bold:headerBold && r < headers,left:x+5,width:cellWidth-10,lineHeight,paragraphGap:0,paginate:false});
+        drawReportRichText(document,cell.content || [],{size,bold:headerBold && r < headers,left:x+padding,width:Math.max(1,width-padding*2),lineHeight,paragraphGap:0,paginate:false});
       }
       document.x=startX; document.y=top+heights[r];
     }
     if (position>=runs.length) break;
     document.addPage();
   }
+  return firstPage;
 }
 
 function drawBody(document, manifest, projectMaterialBySourceID) {
@@ -579,11 +618,8 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
             link.source?.sectionNumber
           ].filter(Boolean).join(" § ");
           if (!citation) return;
-          document
-            .fillColor(colors.muted)
-            .font("Report-Regular")
-            .fontSize(8)
-            .text(`- ${citation}`, { indent: 8, paragraphGap: 2 });
+          drawReportRichText(document,[{text:citation,href:reportSectionURL(link.source?.sectionID)}],
+            {size:8,indent:8,prefix:'- ',paragraphGap:2});
         });
         document.moveDown(0.5);
       }
@@ -701,6 +737,11 @@ function drawPageFooters(document, manifest) {
   }
 }
 
+function registerReportFonts(document) {
+  document.registerFont("Report-Regular", fileURLToPath(new URL("./fonts/DejaVuSans.ttf", import.meta.url)));
+  document.registerFont("Report-Bold", fileURLToPath(new URL("./fonts/DejaVuSans-Bold.ttf", import.meta.url)));
+}
+
 export async function renderReportPDF(manifest, {
   projectMaterialBySourceID = new Map(), onLayout, emptyPreview = false, unversioned = false, showCover = true
 } = {}) {
@@ -722,9 +763,9 @@ export async function renderReportPDF(manifest, {
       ModDate: new Date(manifest.createdAt)
     }
   });
-  document.registerFont("Report-Regular", fileURLToPath(new URL("./fonts/DejaVuSans.ttf", import.meta.url)));
-  document.registerFont("Report-Bold", fileURLToPath(new URL("./fonts/DejaVuSans-Bold.ttf", import.meta.url)));
+  registerReportFonts(document);
   const readLayout = onLayout ? captureReportEditLayout(document) : null;
+  document._reportTables = {seen:new Map(),duplicates:0};
   document._reportEmptyPreview = emptyPreview;
   const chunks = [];
   document.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
@@ -742,7 +783,7 @@ export async function renderReportPDF(manifest, {
   }
   const bodyStartPage = document.bufferedPageRange().count;
   drawBody(document, manifest, projectMaterialBySourceID);
-  if (readLayout) onLayout({...readLayout(), bodyStartPage});
+  if (readLayout) onLayout({...readLayout(), bodyStartPage, duplicateTables:document._reportTables.duplicates});
   if (showCover || !emptyPreview) drawPageFooters(document, manifest);
   document.end();
   return completed;

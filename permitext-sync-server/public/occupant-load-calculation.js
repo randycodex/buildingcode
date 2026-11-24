@@ -358,11 +358,19 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
   const formula = document.createElement('p'); formula.className = 'calculation-formula';
   const footnotes = document.createElement('section'); footnotes.className='calculation-footnote-checks';
   const checkNotes = document.createElement('button'); checkNotes.type='button';checkNotes.className='ghost-button';
+  let checkingFootnotes = false;
   checkNotes.textContent='Ask Assistant about footnotes';
   checkNotes.addEventListener('click',async()=>{
+    if (checkingFootnotes) return;
+    checkingFootnotes = true;
     checkNotes.disabled=true;
-    try {await onCheckFootnotes?.({...draft});} catch(error){status.textContent=error.message;}
-    finally {update();}
+    const setProgress = message => {checkNotes.textContent = message; status.textContent = message;};
+    setProgress('Loading table and footnotes…');
+    try {
+      await onCheckFootnotes?.({...draft}, setProgress);
+      status.textContent = '';
+    } catch(error){status.textContent=error.message;}
+    finally {checkingFootnotes = false; update();}
   });
   let invalidatedAnswerID='';
   root.addEventListener('calculation-context-changed',()=>{invalidatedAnswerID=(getAssessment?.()||assessment)?.answerID||'';assessment=null;update();});
@@ -461,8 +469,8 @@ export function createOccupantLoadCard({draft = {}, column = false, projectSyncS
       }
     }
     checkNotes.hidden=!onCheckFootnotes || !row || special;
-    checkNotes.disabled=staleDraft || busy || !table;
-    checkNotes.textContent=checks?'Ask Assistant to recheck footnotes':'Ask Assistant about footnotes';
+    checkNotes.disabled=checkingFootnotes || staleDraft || busy || !table;
+    if (!checkingFootnotes) checkNotes.textContent=checks?'Ask Assistant to recheck footnotes':'Ask Assistant about footnotes';
     if(!checkNotes.hidden) footnotes.append(checkNotes);
     result.classList.toggle('is-pending', !hasResult);
     result.textContent = hasResult ? `${calculation.previewPeople.toLocaleString()} ${calculation.previewPeople === 1 ? 'person' : 'people'}${custom ? ' · Custom factor' : ''}`

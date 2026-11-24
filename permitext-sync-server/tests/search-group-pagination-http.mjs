@@ -50,6 +50,11 @@ try {
   assert.equal(disabled.results.length, 0);
   const invalid = await fetch(`${base}/code/search?${new URLSearchParams({ q: "concrete", resultSource: "null" })}`);
   assert.equal(invalid.status, 400);
+  const fire = await get({q:"403.1",code:"FC",version:"all",match:"words",grouped:"true",limit:"12"});
+  const parent = fire.results.find(row => row.sectionNumber === "FC 403");
+  assert.deepEqual(parent?.matchedSubsection,{number:"403.1",heading:"403.1 General."});
+  assert.equal(parent.navigationChapterNumber,"4");
+  assert(fire.results.every(row => row === parent || !row.matchedSubsection), "Cross-references are not exact subsections.");
   console.log(`Grouped Search HTTP passed: ${initial.groups.length} editions / ${initial.results.length} initial matches in ${initialMS.toFixed(0)} ms; scoped pages, ranking, edition isolation, offline cursor handoff and disabled-source guard.`);
 } finally {
   server.closeAllConnections();

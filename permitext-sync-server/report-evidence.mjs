@@ -264,20 +264,24 @@ export async function prepareSavedEvidenceItems({ selections, resolveSource }) {
       throw new Error("The selected source does not match its saved code edition. Reopen the source and try again.");
     }
     const passageText = savedExportSourceText(body, selection.blockID);
+    const hasTables = selectedSourceHasTables(body, selection.blockID);
+    const figureNodes = selectedFigureNodes(body,selection.blockID);
+    const selectionKind = !selection.blockID ? "section" : hasTables ? "table" : figureNodes.length ? "figure" : "passage";
+    const codeEdition = section.codePrefix === "FC" && source.family === "enacted"
+      ? source.editionLabel.replace("NYC Enacted Administrative Code", "2022 NYC Fire Code") : source.editionLabel;
     characterCount += passageText.length + selection.notes.reduce((total, note) => total + note.body.length, 0);
     if (characterCount > 1_000_000) throw new Error("This export is too large. Select fewer items and try again.");
     const sourceIndex = sources.length;
     sources.push({
       sectionID: String(section.id), blockID: selection.blockID,
       codeVersion: selection.codeVersion, codePrefix: section.codePrefix,
-      codeEdition: source.editionLabel, categoryLabel: source.categoryLabel,
+      codeEdition, categoryLabel: source.categoryLabel,
       sectionNumber: section.sectionNumber, title: section.title,
-      hasTables: selectedSourceHasTables(body, selection.blockID),
+      hasTables, selectionKind,
       passageTextHash: createHash("sha256").update(passageText).digest("hex")
     });
     const chunks = fullTextChunks(passageText);
     const tables = selectedTables(body, selection.blockID);
-    const figureNodes = selectedFigureNodes(body,selection.blockID);
     const assets = figureNodes.length ? await loadCodeAssetManifest() : null;
     const figures = figureNodes.map(node => {
       const name = codeFigureName(attributes(node).src || ''), entry = assets.assets[name];
@@ -291,9 +295,9 @@ export async function prepareSavedEvidenceItems({ selections, resolveSource }) {
     chunks.forEach((chunk, index) => items.push({
       id: `evidence-${sourceIndex}-${index}`, kind: "evidence",
       sectionID: String(section.id), sectionNumber: section.sectionNumber,
-      codeBook: section.codePrefix, codeEdition: source.editionLabel,
-      chapter: String(section.chapterNumber || "unknown"),
-      title: `${title}${selection.blockID ? " · Selected paragraph" : ""}${chunks.length > 1 ? ` · Part ${index + 1} of ${chunks.length}` : ""}`,
+      codeBook: section.codePrefix, codeEdition,
+      chapter: String(section.navigationChapterNumber || section.chapterNumber || "unknown"), selectionKind,
+      title: `${title}${selection.blockID ? ` · Selected ${selectionKind}` : ""}${chunks.length > 1 ? ` · Part ${index + 1} of ${chunks.length}` : ""}`,
       passageText: chunk, tables: tables.filter(table => chunk.includes(table.text)), passageTextHash: createHash("sha256").update(chunk).digest("hex"),
       ...(figures.length ? {figures:figures.filter(figure=>chunk.includes(figure.text))} : {}),
       sourceLibraryVersion: selection.codeVersion

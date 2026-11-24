@@ -397,6 +397,7 @@ function normalizeEvidenceManifestItem(item, base) {
     codeBook: requiredText(item.codeBook, "Report evidence code book", 256),
     codeEdition: optionalText(item.codeEdition, 256),
     chapter: requiredText(item.chapter || "unknown", "Report evidence chapter", 256),
+    ...(["section", "passage", "table", "figure"].includes(item.selectionKind) ? { selectionKind: item.selectionKind } : {}),
     title: requiredText(item.title, "Report evidence title", 1_000),
     passageText: requiredText(item.passageText, "Report evidence passage", 50_000),
     ...(item.figures?.length ? {figures:item.figures.map(figure => {

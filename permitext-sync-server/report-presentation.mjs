@@ -29,7 +29,16 @@ export function reportResearchDisplayText(value) {
     .trim();
 }
 
+export function reportSectionURL(sectionID) {
+  const id = text(sectionID);
+  return /^\d+$/.test(id) ? `https://per.codes/open/section/${id}` : '';
+}
+
 export function reportCitationLabel(citation, evidence = [], answerEdition = '') {
+  return reportCitation(citation, evidence, answerEdition).label;
+}
+
+function reportCitation(citation, evidence, answerEdition) {
   const matching = evidence.filter((source) =>
     Boolean(text(citation.sectionID)) && text(source.sectionID) === text(citation.sectionID) &&
     (!(citation.sourceIDs || []).length || (citation.sourceIDs || []).some((id) =>
@@ -38,13 +47,15 @@ export function reportCitationLabel(citation, evidence = [], answerEdition = '')
   );
   const source = matching[0] || {};
   const sectionNumber = text(citation.sectionNumber || source.sectionNumber);
-  if (!sectionNumber) return 'Citation details unavailable in this saved Report; review the original Research evidence.';
+  if (!sectionNumber) return {label:'Citation details unavailable in this saved Report; review the original Research evidence.',href:''};
   const code = text(citation.codePrefix || source.codeBook || source.codePrefix);
   const edition = text(citation.codeEdition || source.codeEdition || answerEdition);
-  return [
+  const label = [
     [code, `§ ${sectionNumber}`, text(citation.title || source.title)].filter(Boolean).join(' · '),
     edition || 'Edition not recorded'
   ].join(' — ');
+  const external = text(citation.sourceURL || source.sourceURL || citation.url || source.url);
+  return {label, href:reportSectionURL(citation.sectionID || source.sectionID) || (/^https:\/\/[^\s]+$/i.test(external) ? external : '')};
 }
 
 export function reportCodeBasisLines(manifest) {
@@ -138,7 +149,17 @@ export function reportItemPreview(item) {
     add('Project facts to verify',item.missingFacts);
     add('Limits of this answer',item.limitations);
     add('Additional evidence needed',item.additionalEvidenceNeeded);
-    add('Citations',[...new Set((item.citations || []).map(citation=>reportCitationLabel(citation,item.evidence || [],item.codeEdition)))]);
+    const citations = new Map();
+    for (const citation of item.citations || []) {
+      const {label, href} = reportCitation(citation, item.evidence || [], item.codeEdition);
+      if (!citations.get(label) || href) citations.set(label, href);
+    }
+    if (citations.size) {
+      const runs = [...citations].flatMap(([label, href], index) => [
+        ...(index ? [{text:'\n\n'}] : []), {text:reportResearchDisplayText(label), ...(href ? {href} : {})}
+      ]);
+      parts.push({kind:'text',label:'Citations',text:runs.map(run => run.text).join(''),citationRuns:runs});
+    }
     add('Professional-use notice',item.disclaimer);
   } else if (item.kind === 'calculation') {
     add('', item.plainText);
