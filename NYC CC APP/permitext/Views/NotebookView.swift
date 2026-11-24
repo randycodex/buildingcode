@@ -436,11 +436,7 @@ private struct ProjectNotebookSessionView: View {
                                     Button {
                                         editorRoute = NativeNotebookEditorRoute(cardID: entry.value.cardID, draftID: String(entry.scope.dropFirst("native-notebook-draft:".count)))
                                     } label: {
-                                        VStack(alignment: .leading, spacing: 5) {
-                                            Text(entry.value.title.isEmpty ? "Untitled Note" : entry.value.title)
-                                            Text(entry.value.pendingSave == nil ? "Unsynchronized draft" : "Save confirmation pending")
-                                                .font(.caption).foregroundStyle(.secondary)
-                                        }
+                                        noteListLabel(title: entry.value.title, date: entry.value.editedAt)
                                     }
                                     .disabled(isSelectingNotes)
                                 }
@@ -458,27 +454,7 @@ private struct ProjectNotebookSessionView: View {
                                     if isSelectingNotes {
                                         ListSelectionIndicator(isSelected: selectedNoteIDs.contains(card.id))
                                     }
-                                    VStack(alignment: .leading, spacing: 7) {
-                                        Text(card.title)
-                                            .font(.body.weight(.semibold))
-                                            .foregroundStyle(.primary)
-                                        if !card.plainText.isEmpty {
-                                            Text(card.plainText)
-                                                .font(.subheadline)
-                                                .foregroundStyle(.secondary)
-                                                .lineLimit(3)
-                                        }
-                                        HStack(spacing: 8) {
-                                            if card.referenceCount > 0 {
-                                                Label("\(card.referenceCount) linked", systemImage: "link")
-                                            }
-                                            Spacer()
-                                            Text(notebookDate(card.updatedAt))
-                                        }
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                    }
-                                    .padding(.vertical, 6)
+                                    noteListLabel(title: card.title, date: ListTimestamp.date(from: card.updatedAt))
                                 }
                                 .contentShape(Rectangle())
                             }
@@ -675,11 +651,20 @@ private struct ProjectNotebookSessionView: View {
         }
     }
 
-    private func notebookDate(_ value: String) -> String {
-        guard let date = ListTimestamp.date(from: value) else {
-            return "Date unavailable"
+    private func noteListLabel(title: String, date: Date?) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled Note" : title)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.primary)
+            if let date {
+                Text(date.formatted(date: .abbreviated, time: .omitted))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
         }
-        return date.formatted(date: .abbreviated, time: .omitted)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 6)
     }
 }
 

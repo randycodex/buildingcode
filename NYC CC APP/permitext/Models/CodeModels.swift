@@ -3458,7 +3458,8 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         self.notebookFixtureCard = notebookConflictFixture ? NotebookCard(
             id: "native-conflict-card", version: 2, createdAt: "2026-09-04T12:00:00Z", updatedAt: "2026-09-04T13:00:00Z",
             projectIDs: ["native-notebook-fixture"], title: "Latest saved analysis",
-            document: NotebookDocument(document: [.paragraph("Another device saved this analysis.")])
+            document: NotebookDocument(document: [.paragraph("Another device saved this analysis.")]),
+            plainText: "Another device saved this analysis."
         ) : nil
         if notebookReferenceFixture {
             var mixedReference = NotebookBlock.reference(kind: "notebookCard", id: "native-reference-target", label: "Linked sample note")

@@ -2430,7 +2430,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.buttons["New Note"].exists, "Successful retry must restore server-authorized editing.")
     }
 
-    func testNativeNotebookConflictRequiresReviewAndDeletionDoesNotRestoreDraft() {
+    func testNativeNotebookConflictRequiresReviewAndDeletionDoesNotRestoreDraft() throws {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-conflict-fixture"]
         app.launchArguments.append("--native-notebook-save-diagnostics")
@@ -2439,6 +2439,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(cachedDraft.waitForExistence(timeout: 30), app.debugDescription)
         XCTAssertTrue(app.buttons["New Note"].exists, "Conflict acceptance must begin in the real Notebook list.")
         XCTAssertTrue(app.staticTexts["Latest saved analysis"].exists, "The list must retain the separately saved server revision.")
+        let savedRow = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Latest saved analysis")).firstMatch
+        let savedDate = try XCTUnwrap(ISO8601DateFormatter().date(from: "2026-09-04T13:00:00Z"))
+        XCTAssertTrue(savedRow.label.contains(savedDate.formatted(date: .abbreviated, time: .omitted)))
+        XCTAssertFalse(savedRow.label.contains("Another device saved this analysis."))
+        XCTAssertFalse(cachedDraft.label.contains("Unsynchronized draft"))
         XCTAssertTrue(cachedDraft.isHittable)
         keepScreenshot(named: "Notebook list retains local draft and newer saved revision", from: app)
         cachedDraft.tap()
