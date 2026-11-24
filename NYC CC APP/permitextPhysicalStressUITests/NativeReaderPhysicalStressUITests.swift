@@ -1590,7 +1590,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(field.waitForExistence(timeout: 10))
         if app.buttons["Clear search"].exists { app.buttons["Clear search"].tap() }
         field.tap()
-        field.typeText("concrete")
+        field.typeText("concrete\n")
         let scroll = app.scrollViews["search-results-scroll"]
         func group(_ year: String) -> XCUIElement {
             app.buttons.matching(NSPredicate(format:

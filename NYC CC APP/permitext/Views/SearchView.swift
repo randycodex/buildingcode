@@ -137,6 +137,7 @@ struct PreparedSearchReaderDestination: Identifiable {
     let chapter: CodeChapter
     let section: CodeSectionSummary
     let nativeOpening: NativeReaderPreparedOpening?
+    let passage: ReaderView.PreparedPassage?
 
     nonisolated var id: ObjectIdentifier { ObjectIdentifier(library) }
 
@@ -149,6 +150,7 @@ struct PreparedSearchReaderDestination: Identifiable {
               let version = sharedLibrary.availableVersions.first(where: {
                   UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.server(sourceVersion)
               }) else { throw PreparationError.unavailable }
+        var verifiedSource: ActiveCodeSourceIdentity?
         if version.contentKind == .authored {
             guard context != nil else { throw PreparationError.unavailable }
             let access = await sharedLibrary.authoredSourceNavigationAccess(sectionID: route.sectionID,
@@ -156,13 +158,14 @@ struct PreparedSearchReaderDestination: Identifiable {
             try Task.checkCancellation()
             guard sharedLibrary.captureCodeSourceNavigationContext() == context else { throw CancellationError() }
             switch access {
-            case .allowed: break
+            case .allowed(let target): verifiedSource = target.source
             case .requiresEnable(let target): throw PreparationError.requiresEnable(target)
             case .unavailable: throw PreparationError.unavailable
             }
         }
         let library = sharedLibrary.makeSearchReaderLibrary(sourceVersion: sourceVersion)
-        guard await library.prepareCodeVersionForEvidence(sourceVersion) else {
+        guard await library.prepareCodeVersionForEvidence(sourceVersion),
+              library.selectedVersionFileName == version.fileName else {
             throw PreparationError.unavailable
         }
         try Task.checkCancellation()
@@ -189,6 +192,20 @@ struct PreparedSearchReaderDestination: Identifiable {
                 sectionNumber: detail.sectionNumber, title: detail.title, kind: detail.kind)
         }
         try Task.checkCancellation()
+        var passage: ReaderView.PreparedPassage?
+        if !prepareChapter, let readerContext = library.captureCodeSourceNavigationContext(),
+           let detail = await library.loadSectionDetailAsync(sectionID: section.id) {
+            if let verifiedSource {
+                guard let category = library.codeSections.first(where: { $0.id == detail.codeSectionID }),
+                      CodeLibraryViewModel.activeSourceIdentity(version: version, category: category) == verifiedSource
+                else { throw PreparationError.unavailable }
+            }
+            passage = ReaderView.PreparedPassage(detail: detail, versionFileName: version.fileName, context: readerContext)
+            #if PERMITEXT_LOCAL_PERFORMANCE
+            LocalPerformanceRecorder.record(.passageDataReady)
+            #endif
+            os_signpost(.event, log: AppSignpost.reader, name: "passageDataReady")
+        }
         var nativeOpening: NativeReaderPreparedOpening?
         if prepareChapter, let sourceURL = library.authoredHTMLStore(for: chapter).chapterURL(chapterNumber: chapter.chapterNumber),
            let nativeRoute = await NativeReaderDocumentStore.shared.rolloutRoute(for: sourceURL) {
@@ -211,7 +228,7 @@ struct PreparedSearchReaderDestination: Identifiable {
         try Task.checkCancellation()
         guard sharedLibrary.activeCodeSourceRevision == revision,
               sharedLibrary.captureCodeSourceNavigationContext() == context else { throw CancellationError() }
-        return Self(library: library, chapter: chapter, section: section, nativeOpening: nativeOpening)
+        return Self(library: library, chapter: chapter, section: section, nativeOpening: nativeOpening, passage: passage)
     }
 
     enum PreparationError: LocalizedError {
@@ -1265,7 +1282,6 @@ struct SearchView: View {
             Button {
                 selectedResultID = result.id
                 selectedResultIdentity = result.searchIdentity
-                persistSearchSession()
                 library.recordRecentSearch(query)
                 openReader(SearchReaderRoute(result: result))
             } label: {
@@ -1705,6 +1721,7 @@ private struct SearchChapterReaderDestination: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
     let nativeOpening: NativeReaderPreparedOpening?
+    let passage: ReaderView.PreparedPassage?
     let showsDetail: Bool
 
     init(prepared: PreparedSearchReaderDestination, sharedLibrary: CodeLibraryViewModel, showsDetail: Bool = false) {
@@ -1713,16 +1730,22 @@ private struct SearchChapterReaderDestination: View {
         self.chapter = prepared.chapter
         self.initialSection = prepared.section
         self.nativeOpening = prepared.nativeOpening
+        self.passage = prepared.passage
         _library = StateObject(wrappedValue: prepared.library)
     }
 
     var body: some View {
         Group {
             if showsDetail {
+                let verifiedPassage = passage.flatMap { prepared in
+                    prepared.context == library.captureCodeSourceNavigationContext() &&
+                    prepared.versionFileName == library.selectedVersionFileName ? prepared : nil
+                }
                 ReaderView(
                     sectionID: initialSection.id,
                     codeVersion: library.selectedVersion?.codeVersion,
-                    usesCompactSourceHeader: true
+                    usesCompactSourceHeader: true,
+                    preparedPassage: verifiedPassage
                 )
             } else {
                 ChapterHTMLReaderView(chapter: chapter, initialSection: initialSection, preparedNativeOpening: nativeOpening)

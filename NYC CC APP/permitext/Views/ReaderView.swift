@@ -23,6 +23,12 @@ struct ReaderReferenceLoadState {
 }
 
 struct ReaderView: View {
+    struct PreparedPassage {
+        let detail: ReaderSectionDetail
+        let versionFileName: String
+        let context: CodeLibraryViewModel.CodeSourceNavigationContext
+    }
+
     let sectionID: Int64
     let codeVersion: String?
     let codeSectionID: Int64?
@@ -36,7 +42,8 @@ struct ReaderView: View {
         codeSectionID: Int64? = nil,
         returnsToProjectsAfterRemoval: Bool = false,
         usesCompactSourceHeader: Bool = false,
-        selectedExcerpts: [String] = []
+        selectedExcerpts: [String] = [],
+        preparedPassage: PreparedPassage? = nil
     ) {
         self.sectionID = sectionID
         self.codeVersion = codeVersion
@@ -44,6 +51,10 @@ struct ReaderView: View {
         self.returnsToProjectsAfterRemoval = returnsToProjectsAfterRemoval
         self.usesCompactSourceHeader = usesCompactSourceHeader
         self.selectedExcerpts = selectedExcerpts
+        let passage = preparedPassage.flatMap { $0.detail.id == sectionID ? $0 : nil }
+        _detail = State(initialValue: passage?.detail)
+        _loadState = State(initialValue: passage == nil ? .loading : .loaded)
+        _loadedVersionFileName = State(initialValue: passage?.versionFileName)
     }
 
     @Environment(\.dismiss) private var dismiss
@@ -57,6 +68,7 @@ struct ReaderView: View {
     @State private var references: [ResolvedCodeReference] = []
     @State private var referenceLoadState = ReaderReferenceLoadState()
     @State private var loadedVersionFileName: String?
+    @State private var hasRecordedOpening = false
     @State private var isBookmarked = false
     @State private var expandedInlineImage: UIImage?
     @State private var isFolderPickerOpen: Bool = false
@@ -209,6 +221,7 @@ struct ReaderView: View {
             // Source preference changes govern new destinations, never blank an
             // already-open passage or change its edition/viewport.
             if let detail, let loadedVersionFileName {
+                recordOpeningIfNeeded(detail)
                 await resumeReferences(for: detail, expectedVersionFileName: loadedVersionFileName)
                 return
             }
@@ -535,15 +548,21 @@ struct ReaderView: View {
             os_signpost(.event, log: AppSignpost.reader, name: "passageDataReady")
             detail = loadedDetail
             loadState = .loaded
-            library.noteSectionOpened(loadedDetail)
             loadedVersionFileName = expectedVersionFileName
-            syncUserContentState()
+            recordOpeningIfNeeded(loadedDetail)
             await resumeReferences(for: loadedDetail, expectedVersionFileName: expectedVersionFileName)
         case .missing:
             loadState = .missing
         case .failed(let message):
             loadState = .failed(message)
         }
+        syncUserContentState()
+    }
+
+    private func recordOpeningIfNeeded(_ detail: ReaderSectionDetail) {
+        guard !hasRecordedOpening else { return }
+        hasRecordedOpening = true
+        library.noteSectionOpened(detail)
         syncUserContentState()
     }
 
