@@ -228,8 +228,9 @@ html body .report-page-edit-overlay :is(textarea,input,[contenteditable]) {box-s
 html body .report-screen .report-page-edit-overlay .tiptap,
 html body .report-screen .report-page-edit-overlay .tiptap :is(p,span,strong,em,u,s,h1,h2,h3,th,td) {color:var(--report-page-ink) !important;}
 .report-page-edit-overlay .report-rich-editor .tiptap p {margin:0 0 10pt;}
-.report-page-edit-overlay .report-rich-editor[data-kind="list"] .tiptap p {padding-left:8pt;}
-.report-page-edit-overlay .report-rich-editor[data-kind="list"] .tiptap p::before {content:'• ';}
+.report-page-edit-overlay .report-rich-editor[data-kind="list"] .tiptap p {position:relative;list-style:none;padding-inline-start:12pt;}
+.report-page-edit-overlay .report-rich-editor[data-kind="list"] .tiptap p::before {position:absolute;inset-inline:0 auto;content:'•';}
+.report-page-edit-overlay .report-rich-editor[data-kind="list"][data-list-style="ordered"] .tiptap p::before {content:counter(report-item) '.';}
 .report-page-edit-overlay .bn-container,.report-page-edit-overlay .bn-editor {background:transparent;color:var(--report-page-ink);}
 .report-page-edit-overlay .bn-editor :is(p,span,strong,em,h1,h2,h3,td,th) {color:inherit !important;}
 .report-workspace-view .workspace-panel.report-draft-panel .report-draft-shell .report-draft-primary-actions > .report-page-theme-toggle {

@@ -432,7 +432,7 @@ function drawReportTableOnce(document, table, startX, contentWidth, {headerBold,
   const tracker = document._reportTables;
   const cells = tableDisplayCells(table.rows, table.cellSpans || []);
   const plain = cells.map(row => row.map(cell => cell && [cell.rowSpan,cell.colSpan,
-    (cell.content || []).map(run => run.text).join('').normalize('NFKC').replace(/\s+/g,' ').trim()]));
+    (cell.content || []).map(run => run.text).join('').normalize('NFKC').replace(/[\s\u00ad\u200b-\u200d\ufeff]+/g,'')]));
   // Retain distinctly formatted or linked tables even when the text matches.
   const marked = table.rows.some(row => row.some(cell => cell.some(run =>
     run.highlight || run.href || published && hasInlineStyle(run))));

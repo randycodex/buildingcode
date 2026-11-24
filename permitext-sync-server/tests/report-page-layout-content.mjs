@@ -63,7 +63,7 @@ const auditBytes = await renderReportPDF({
       title:'Minimum number of fixtures',selectionKind:'table',passageText:tableText,
       tables:[{text:tableText,rows,headerRowCount:1}]},
     {id:'note',kind:'notebookCard',title:'Source review',document:{document:[{type:'table',content:{
-      headerRows:1,rows:rows.map(row=>({cells:row.map(runs)}))
+      headerRows:1,rows:rows.map(row=>({cells:row.map(value=>runs(value.replace(' performing arts','\nperforming arts').replace('Drinking Fountains','DrinkingFountains')))}))
     }}]}},
     {id:'answer',kind:'researchAnswer',question:'Which provision has the fixture table?',conclusion:'See the cited provision.',
       citations:[{sectionID:'11909',codePrefix:'PC',sectionNumber:'403.1'}]}
