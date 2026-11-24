@@ -347,7 +347,7 @@ private struct ProjectNotebookSessionView: View {
                         readOnly: access.readOnly && !permitsLocalDraftEditing, localDraftOnly: permitsLocalDraftEditing,
                         notebookRole: access.role, accentColor: accentColor,
                         referenceCandidates: editorReferenceCandidates, owner: owner,
-                        onSaved: { onChanged?() }, cache: cache
+                        onSaved: { onChanged?() }, onDeleted: { removeDeletedNotes([$0]) }, cache: cache
                     )
                 } else if let errorMessage {
                     ContentUnavailableView("Note unavailable", systemImage: "note.text",
@@ -400,6 +400,7 @@ private struct ProjectNotebookSessionView: View {
                         Task { await loadCards(forceNetwork: true) }
                         onChanged?()
                     },
+                    onDeleted: { removeDeletedNotes([$0]) },
                     cache: cache
                 )
                 .environmentObject(library)
@@ -408,66 +409,69 @@ private struct ProjectNotebookSessionView: View {
     }
 
     private var notebookList: some View {
-        VStack(spacing: 0) {
-            Group {
-                if isLoading && cards.isEmpty && localDrafts.isEmpty {
-                    ProgressView("Loading Notebook…")
-                } else if cards.isEmpty && localDrafts.isEmpty, let errorMessage {
-                    NativeNotebookLoadFailureView(message: errorMessage) {
-                        Task { await loadCards(forceNetwork: true) }
-                    }
-                } else if cards.isEmpty && localDrafts.isEmpty {
-                    ContentUnavailableView(
-                        "No Notes yet",
-                        systemImage: "note.text",
-                        description: Text(access.readOnly ? "This Project’s Notebook is read-only." : "Create a Note for analysis, evidence, and code research.")
-                    )
-                } else {
-                    List {
-                        if let errorMessage {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(errorMessage).font(.footnote).foregroundStyle(.secondary)
-                                Button("Retry") { Task { await loadCards(forceNetwork: true) } }
-                            }
-                        }
-                        if !localDrafts.isEmpty {
-                            Section("Drafts on this iPhone") {
-                                ForEach(localDrafts, id: \.scope) { entry in
-                                    Button {
-                                        editorRoute = NativeNotebookEditorRoute(cardID: entry.value.cardID, draftID: String(entry.scope.dropFirst("native-notebook-draft:".count)))
-                                    } label: {
-                                        noteListLabel(title: entry.value.title, date: entry.value.editedAt)
-                                    }
-                                    .disabled(isSelectingNotes)
-                                }
-                            }
-                        }
-                        ForEach(cards) { card in
-                            Button {
-                                if isSelectingNotes {
-                                    if !selectedNoteIDs.insert(card.id).inserted { selectedNoteIDs.remove(card.id) }
-                                } else {
-                                    editorRoute = NativeNotebookEditorRoute(cardID: card.id)
-                                }
-                            } label: {
-                                HStack(spacing: 12) {
-                                    if isSelectingNotes {
-                                        ListSelectionIndicator(isSelected: selectedNoteIDs.contains(card.id))
-                                    }
-                                    noteListLabel(title: card.title, date: ListTimestamp.date(from: card.updatedAt))
-                                }
-                                .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(isSelectingNotes && !selectableNoteIDs.contains(card.id))
-                            .accessibilityAddTraits(isSelectingNotes && selectedNoteIDs.contains(card.id) ? .isSelected : [])
-                        }
-                    }
-                    .listStyle(.plain)
-                    .codeNavigationTopScrollEdge()
-                    .codeTransparentBottomScrollEdge()
-                    .refreshable { await loadCards(forceNetwork: true) }
+        let isEmpty = cards.isEmpty && localDrafts.isEmpty
+        return List {
+            if !isEmpty, let errorMessage {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(errorMessage).font(.footnote).foregroundStyle(.secondary)
+                    Button("Retry") { Task { await loadCards(forceNetwork: true) } }
                 }
+            }
+            if !localDrafts.isEmpty {
+                Section("Drafts on this iPhone") {
+                    ForEach(localDrafts, id: \.scope) { entry in
+                        Button {
+                            editorRoute = NativeNotebookEditorRoute(cardID: entry.value.cardID, draftID: String(entry.scope.dropFirst("native-notebook-draft:".count)))
+                        } label: {
+                            noteListLabel(title: entry.value.title, date: entry.value.editedAt)
+                        }
+                        .disabled(isSelectingNotes)
+                    }
+                }
+            }
+            ForEach(cards) { card in
+                Button {
+                    if isSelectingNotes {
+                        if !selectedNoteIDs.insert(card.id).inserted { selectedNoteIDs.remove(card.id) }
+                    } else {
+                        editorRoute = NativeNotebookEditorRoute(cardID: card.id)
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        if isSelectingNotes {
+                            ListSelectionIndicator(isSelected: selectedNoteIDs.contains(card.id))
+                        }
+                        noteListLabel(title: card.title, date: ListTimestamp.date(from: card.updatedAt))
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isSelectingNotes && !selectableNoteIDs.contains(card.id))
+                .accessibilityAddTraits(isSelectingNotes && selectedNoteIDs.contains(card.id) ? .isSelected : [])
+            }
+        }
+        .listStyle(.plain)
+        .codeNavigationTopScrollEdge()
+        .codeTransparentBottomScrollEdge()
+        .refreshable { await loadCards(forceNetwork: true) }
+        .overlay {
+            if isEmpty {
+                Group {
+                    if isLoading {
+                        ProgressView("Loading Notebook…")
+                    } else if let errorMessage {
+                        NativeNotebookLoadFailureView(message: errorMessage) {
+                            Task { await loadCards(forceNetwork: true) }
+                        }
+                    } else {
+                        ContentUnavailableView(
+                            "No Notes yet",
+                            systemImage: "note.text",
+                            description: Text(access.readOnly ? "This Project’s Notebook is read-only." : "Create a Note for analysis, evidence, and code research.")
+                        )
+                    }
+                }
+                .transition(.opacity)
             }
         }
         .navigationTitle("Notes")
@@ -538,6 +542,28 @@ private struct ProjectNotebookSessionView: View {
         }
     }
 
+    private func removeDeletedNotes(_ ids: Set<String>) {
+        guard !ids.isEmpty, isCurrentOwner, let owner else { return }
+        // Discard any list response started before the deletion was confirmed.
+        loadID = nil
+        ListSelectionMotion.run(reduceMotion: reduceMotion) {
+            isLoading = false
+            cards.removeAll { ids.contains($0.id) }
+            localDrafts.removeAll { entry in
+                entry.value.cardID.map(ids.contains) == true
+            }
+            selectedNoteIDs.subtract(ids)
+        }
+        if let cached = try? cache.load(NotebookCardListResponse.self, accountID: owner.accountID,
+            projectID: projectID, scope: "native-notebook-list")?.value {
+            let remaining = cached.cards.filter { !ids.contains($0.id) }
+            try? cache.store(NotebookCardListResponse(schemaVersion: cached.schemaVersion,
+                projectID: cached.projectID, cards: remaining, access: cached.access),
+                accountID: owner.accountID, projectID: projectID, scope: "native-notebook-list")
+        }
+        onChanged?()
+    }
+
     @MainActor
     private func moveSelectedNotesToTrash() async {
         guard isCurrentOwner, let owner, !isMovingNotes, !isLoading else { return }
@@ -559,29 +585,18 @@ private struct ProjectNotebookSessionView: View {
                     expectedVersion: card.version, recoverable: true)
                 guard isCurrentOwner else { return }
                 movedIDs.insert(card.id)
-                cards.removeAll { $0.id == card.id }
-                selectedNoteIDs.remove(card.id)
                 try? cache.remove(accountID: owner.accountID, projectID: projectID, scope: "native-notebook-card:\(card.id)")
             }
+            removeDeletedNotes(movedIDs)
             finishSelectingNotes()
         } catch {
             guard isCurrentOwner else { return }
+            removeDeletedNotes(movedIDs)
             let detail = nativeNotebookRequestErrorMessage(error)
             moveError = movedIDs.isEmpty ? detail : "\(movedIDs.count) moved to Trash. \(detail)"
+            await loadCards(forceNetwork: true)
+            if selectableNoteIDs.isEmpty { finishSelectingNotes() }
         }
-        guard isCurrentOwner else { return }
-        if !movedIDs.isEmpty {
-            if let cached = try? cache.load(NotebookCardListResponse.self, accountID: owner.accountID,
-                projectID: projectID, scope: "native-notebook-list")?.value {
-                let remaining = cached.cards.filter { !movedIDs.contains($0.id) }
-                try? cache.store(NotebookCardListResponse(schemaVersion: cached.schemaVersion,
-                    projectID: cached.projectID, cards: remaining, access: cached.access),
-                    accountID: owner.accountID, projectID: projectID, scope: "native-notebook-list")
-            }
-            onChanged?()
-        }
-        await loadCards(forceNetwork: true)
-        if selectableNoteIDs.isEmpty { finishSelectingNotes() }
     }
 
     private enum NotebookTrashError: LocalizedError {
@@ -871,6 +886,7 @@ private struct NotebookCardEditorView: View {
     let owner: NativePrivateRequestIdentity?
     private var isCurrentOwner: Bool { owner != nil && owner == library.privateRequestIdentity }
     let onSaved: () -> Void
+    var onDeleted: (String) -> Void = { _ in }
 
     @State private var hasDeniedWriteAccess = false
     private var editingReadOnly: Bool { readOnly || hasDeniedWriteAccess }
@@ -1822,19 +1838,19 @@ private struct NotebookCardEditorView: View {
     }
 
     private func deleteCard(recoverable: Bool) async {
-        guard isCurrentOwner, canPerformNetworkWrites, !isSaving, !isDeleting else { return }
+        guard isCurrentOwner, canPerformNetworkWrites, !isSaving, !isDeleting, !isLeaving else { return }
         if recoverable {
             // Save the current document before creating its recovery copy.
             guard await flushEditorDraft(), isCurrentOwner, !Task.isCancelled else { return }
             await saveNow()
             guard isCurrentOwner, !Task.isCancelled, canPerformNetworkWrites, canMoveNoteToTrash,
-                  !isSaving, !isDeleting, !requiresConflictReview, pendingSave == nil,
+                  !isSaving, !isDeleting, !isLeaving, !requiresConflictReview, pendingSave == nil,
                   editableContent == lastSyncedContent else { return }
         }
         guard let currentCardID else { return }
         isDeleting = true
         autosaveDebounceTask?.cancel()
-        defer { isDeleting = false }
+        defer { if !isLeaving { isDeleting = false } }
         do {
             try await library.deleteNotebookCard(
                 projectID: projectID,
@@ -1843,17 +1859,15 @@ private struct NotebookCardEditorView: View {
                 recoverable: recoverable
             )
             guard isCurrentOwner, !Task.isCancelled else { return }
-            // Dismissing a deleted editor must not schedule another save or
-            // recreate the removed local draft in onDisappear.
-            hasLoaded = false
-            needsSave = false
-            pendingSave = nil
-            autosaveDebounceTask?.cancel()
+            // Keep the editor rendered through the navigation pop and suppress
+            // onDisappear autosave so it cannot recreate the deleted draft.
+            isLeaving = true
+            library.releaseNotebookDraftEditor(documentEditor, retry: false)
             if let owner {
                 try? cache.remove(accountID: owner.accountID, projectID: projectID, scope: "native-notebook-card:\(currentCardID)")
                 try? cache.remove(accountID: owner.accountID, projectID: projectID, scope: "native-notebook-draft:\(routeID)")
             }
-            onSaved()
+            onDeleted(currentCardID)
             dismiss()
         } catch {
             guard isCurrentOwner else { return }

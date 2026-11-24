@@ -2455,6 +2455,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     }
 
     func testNativeNotebookConflictRequiresReviewAndDeletionDoesNotRestoreDraft() throws {
+        try verifyNotebookDeletionAfterConflict(fromEditor: true)
+    }
+
+    func testNativeNotebookSelectionDeletionReturnsToEmptyList() throws {
+        try verifyNotebookDeletionAfterConflict(fromEditor: false)
+    }
+
+    private func verifyNotebookDeletionAfterConflict(fromEditor: Bool) throws {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-conflict-fixture"]
         app.launchArguments.append("--native-notebook-save-diagnostics")
@@ -2510,27 +2518,34 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["Move selected notes to Trash"].tap()
         let selectionTrash = app.alerts["Move this note to Trash?"]
         XCTAssertTrue(selectionTrash.staticTexts["You can restore this note from Trash for 30 days."].exists)
-        selectionTrash.buttons["Cancel"].tap()
-        app.buttons["Cancel"].tap()
-        savedNote.tap()
-        XCTAssertTrue(title.waitForExistence(timeout: 10))
-        XCTAssertEqual(title.value as? String, editedTitle)
-        let noteActions = app.buttons["Note actions"]
-        XCTAssertTrue(noteActions.waitForExistence(timeout: 5) && noteActions.isHittable)
-        noteActions.tap()
-        let deleteAction = app.buttons["native-notebook-delete"]
-        XCTAssertTrue(deleteAction.waitForExistence(timeout: 5) && deleteAction.isHittable)
-        deleteAction.tap()
-        let deletionAlert = app.alerts["Move this note to Trash?"]
-        XCTAssertTrue(deletionAlert.waitForExistence(timeout: 5),
-                      "Move to Trash must present a separate explicit confirmation.\n\(app.debugDescription)")
-        XCTAssertTrue(deletionAlert.staticTexts["You can restore this note from Trash for 30 days."].exists)
-        let confirmDelete = deletionAlert.buttons["Move to Trash"]
-        XCTAssertTrue(confirmDelete.isHittable && deletionAlert.buttons["Cancel"].isHittable, app.debugDescription)
-        XCTAssertFalse(app.staticTexts["No Notes yet"].exists, "Opening confirmation must not delete the note.")
-        keepScreenshot(named: "Native Notebook deletion requires confirmation after reviewed conflict", from: app)
-        confirmDelete.tap()
+        if fromEditor {
+            selectionTrash.buttons["Cancel"].tap()
+            app.buttons["Cancel"].tap()
+            savedNote.tap()
+            XCTAssertTrue(title.waitForExistence(timeout: 10))
+            XCTAssertEqual(title.value as? String, editedTitle)
+            let noteActions = app.buttons["Note actions"]
+            XCTAssertTrue(noteActions.waitForExistence(timeout: 5) && noteActions.isHittable)
+            noteActions.tap()
+            let deleteAction = app.buttons["native-notebook-delete"]
+            XCTAssertTrue(deleteAction.waitForExistence(timeout: 5) && deleteAction.isHittable)
+            deleteAction.tap()
+            let deletionAlert = app.alerts["Move this note to Trash?"]
+            XCTAssertTrue(deletionAlert.waitForExistence(timeout: 5),
+                          "Move to Trash must present a separate explicit confirmation.\n\(app.debugDescription)")
+            XCTAssertTrue(deletionAlert.staticTexts["You can restore this note from Trash for 30 days."].exists)
+            let confirmDelete = deletionAlert.buttons["Move to Trash"]
+            XCTAssertTrue(confirmDelete.isHittable && deletionAlert.buttons["Cancel"].isHittable, app.debugDescription)
+            XCTAssertFalse(app.staticTexts["No Notes yet"].exists, "Opening confirmation must not delete the note.")
+            keepScreenshot(named: "Native Notebook deletion requires confirmation after reviewed conflict", from: app)
+            confirmDelete.tap()
+        } else {
+            selectionTrash.buttons["Move to Trash"].tap()
+        }
         XCTAssertTrue(app.staticTexts["No Notes yet"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Loading Notebook…"].exists)
+        XCTAssertFalse(app.staticTexts["list-selection-count"].exists)
+        XCTAssertFalse(savedNote.exists)
         XCTAssertFalse(app.staticTexts["Drafts on this iPhone"].exists)
         XCTAssertFalse(cachedDraft.exists)
         XCTAssertFalse(app.textFields["Note title"].exists, "Deletion must dismiss the editor to its parent list.")
