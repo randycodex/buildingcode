@@ -80,14 +80,12 @@ enum NativePrivateCachePolicy {
  var historyLoadID: UUID?; var summaries: [ResearchConversationSummary] = []; var historyPreviews: [String: String] = [:]
  var conversationLoadID: UUID?; var conversationPublicationID = UUID()
  var historyPreviewRevisions: [String: String] = [:]
- var historyQuery = ""; var historyProjectFilter: String { get { library.researchHistoryProjectFilter } set { library.researchHistoryProjectFilter = newValue } }; var historyNextCursor: String?
+ var historyNextCursor: String?
  var selectedHistoryIDs: Set<String> = []; var isDeletingHistoryBatch = false
  var historyHasMore = false; var historyLegacySummaries: [ResearchConversationSummary]?
  var isLoadingMoreHistory = false; var historyLoadedFilterKey: String?
  ${property('historyProjectID')}
- ${property('historyIsFiltered')}
  ${property('historyFilterKey')}
- ${method('boundedHistoryQuery(_ value:')}
  var isLoadingHistory = false; var isLoadingConversation = false
  ${source.match(/    private var isLoading: Bool \{[^\n]+/)[0].replace("private ", "")}
  var question = ""; var errorMessage: String?; var historyErrorMessage: String?
@@ -110,12 +108,6 @@ enum NativePrivateCachePolicy {
  static func page(_ values: [ResearchConversationSummary], next: String? = nil, more: Bool? = false) -> ResearchConversationListResponse { ResearchConversationListResponse(conversations: values, nextCursor: next, hasMore: more) }
  static func row(_ id: String, _ question: String = "Ramp question", project: String? = nil) -> ResearchConversationSummary { ResearchConversationSummary(id: id, title: "Title " + id, primaryProjectID: project, starterQuestion: question) }
  @MainActor static func verifyHistory() async {
-  let queryHarness = Harness()
-  for query in ["ordinary question", String(repeating: "x", count: 201), String(repeating: "😀", count: 101), String(repeating: "👩‍👩‍👧‍👦", count: 21)] {
-   let bounded = queryHarness.boundedHistoryQuery(query)
-   precondition(bounded.utf16.count <= 200 && query.hasPrefix(bounded) && !bounded.hasSuffix("…"), "Search limits must use API units without appending a nonliteral ellipsis")
-   if query.utf16.count <= 200 { precondition(bounded == query) }
-  }
   let mixed = [row("a", "Door width", project: "project-a"), row("b", "Ramp slope"), row("c", "Ramp slope", project: "")]
   precondition(NativeResearchHistory.filtered(mixed, query: "  rAMP  ", projectID: nil).map(\\.id) == ["b", "c"])
   precondition(NativeResearchHistory.filtered(mixed, query: "", projectID: "").map(\\.id) == ["b", "c"])
@@ -134,12 +126,12 @@ enum NativePrivateCachePolicy {
    await h.loadMoreHistory(); precondition(h.summaries.count == 65 && !h.historyHasMore)
    precondition(h.library.historyReads.count == 1, "Legacy full-list fallback pages locally without repeat network reads")
    let cachedIDs = h.cache.history?.map(\\.id)
-   h.historyProjectFilter = "unassigned"; h.historyQuery = "door"
+   h.library.researchHistoryProjectFilter = "unassigned"
    let filtered = Task { await h.loadHistory(forceNetwork: true) }
    while h.library.historyReads.count < 2 { await Task.yield() }
-   precondition(h.library.historyRequests[1].projectID == "" && h.library.historyRequests[1].query == "door")
+   precondition(h.library.historyRequests[1].projectID == "" && h.library.historyRequests[1].query.isEmpty)
    h.library.historyReads[1].resume(returning: page(mixed + [row("unassigned-door", "Door width")], more: nil)); await filtered.value
-   precondition(h.summaries.map(\\.id) == ["unassigned-door"], "Old-server results must respect query and explicit unassigned filter locally")
+   precondition(h.summaries.map(\\.id) == ["b", "c", "unassigned-door"], "Old-server results must respect the explicit unassigned filter locally")
    precondition(h.cache.history?.map(\\.id) == cachedIDs, "Filtered results must not replace the all-history cache")
   }
   do {
@@ -179,7 +171,7 @@ enum NativePrivateCachePolicy {
    h.library.historyReads[0].resume(returning: page([row("base")], next: "more", more: true)); await initial.value
    let next = Task { await h.loadMoreHistory() }
    while h.library.historyReads.count < 2 { await Task.yield() }
-   h.historyQuery = "Door"; h.historyProjectFilter = "project-a"
+   h.library.researchHistoryProjectFilter = "project-a"
    let replacement = Task { await h.loadHistory(forceNetwork: true) }
    while h.library.historyReads.count < 3 { await Task.yield() }
    precondition(h.library.historyRequests[2].cursor == nil && h.library.historyRequests[2].projectID == "project-a", "Changing a filter must start from the first page")
@@ -194,7 +186,7 @@ enum NativePrivateCachePolicy {
    let h = Harness()
    let read = Task { await h.loadHistory(forceNetwork: true) }
    while h.library.historyReads.isEmpty { await Task.yield() }
-   if outcome == "filter" { h.historyQuery = "new filter" }
+   if outcome == "filter" { h.library.researchHistoryProjectFilter = "project-a" }
    if outcome == "owner" { h.isCurrentOwner = false }
    if outcome == "cancel" { read.cancel() }
    h.library.historyReads[0].resume(returning: page([row("must-not-publish")])); await read.value
@@ -202,7 +194,7 @@ enum NativePrivateCachePolicy {
   }
   do {
    let h = Harness(); h.cache.history = mixed
-   h.historyQuery = "ramp"; h.historyProjectFilter = "unassigned"
+   h.library.researchHistoryProjectFilter = "unassigned"
    let read = Task { await h.loadHistory() }
    while h.library.historyReads.isEmpty { await Task.yield() }
    precondition(h.summaries.map(\\.id) == ["b", "c"], "Cached first paint must respect current filters")
@@ -229,7 +221,7 @@ enum NativePrivateCachePolicy {
    precondition(h.cache.history?.count == 31, "A complete unfiltered scan replaces stale rows absent from the authoritative list")
   }
   do {
-   let h = Harness(); h.cache.history = mixed; h.historyProjectFilter = "unassigned"
+   let h = Harness(); h.cache.history = mixed; h.library.researchHistoryProjectFilter = "unassigned"
    h.historyLegacySummaries = [mixed[1], mixed[2]]; h.summaries = [mixed[1]]
    h.historyLoadID = UUID(); h.historyLoadedFilterKey = h.historyFilterKey; h.historyHasMore = true
    h.selectedHistoryIDs = ["b", "c"]
