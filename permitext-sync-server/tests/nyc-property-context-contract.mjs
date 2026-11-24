@@ -121,6 +121,7 @@ assert.equal(result.structuredFacts.some((fact) => fact.key === "zoning-lot-area
   "MapPLUTO tax-lot area must not be presented as legal zoning-lot area");
 assert.match(result.structuredFacts.find((fact) => fact.key === "mih-area-options")?.value || "", /Option 1 and Option 3/);
 assert.match(result.warnings.join(" "), /tax lot is not proof of zoning-lot composition/i);
+assert.equal(result.hasPartialCoverage, false, "General guidance must not mark a complete import as partial.");
 assert.equal(fetchCalls.length, 23);
 assert.equal(result.structuredFacts.find(fact => fact.key === "parking-geography").value, "Outer Transit Zone");
 assert.match(result.structuredFacts.find(fact => fact.key === "mih-area-options").value, /partial tax-lot/);
@@ -157,6 +158,7 @@ assert.equal(fallbackResult.structuredFacts.find((fact) => fact.key === "mih-are
   "Unavailable mapped facts must remain unknown instead of asserting a false negative.");
 assert.deepEqual(fallbackResult.source.datasets, ["NYC Planning address search", "NYC Open Data PLUTO"]);
 assert.match(fallbackResult.warnings.join(" "), /layers unavailable/i);
+assert.equal(fallbackResult.hasPartialCoverage, true, "Unavailable map layers make an import partial.");
 assert.equal(fallbackCalls.find(url => url.hostname === "data.cityofnewyork.us").searchParams.get("bbl"), "2028500003");
 
 const [serverSource, clientSource] = await Promise.all([

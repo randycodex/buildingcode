@@ -1821,6 +1821,13 @@ struct BackendProjectPropertyContext: Codable, Hashable, Sendable {
     let source: BackendProjectPropertyLookupSource
     let structuredFacts: [ProjectStructuredFact]
     let warnings: [String]
+    var hasPartialCoverage: Bool? = nil
+
+    var isPartialImport: Bool {
+        hasPartialCoverage ?? warnings.contains { warning in
+            warning.hasPrefix("NYC Planning layers unavailable:")
+        }
+    }
 }
 
 struct BackendProjectPropertyLookupResponse: Codable, Hashable, Sendable {
@@ -3688,7 +3695,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 bbl: "synthetic-fixture", zolaURL: "", retrievedAt: Date(timeIntervalSince1970: 1_789_430_400),
                 source: BackendProjectPropertyLookupSource(agency: "Synthetic fixture", datasets: ["Synthetic partial response"]),
                 structuredFacts: [ProjectStructuredFact(id: "synthetic-stories", key: "stories", label: "Stories", value: "3", status: "sourced", source: "fixture", sourceText: "Synthetic display verification only.", updatedAt: nil)],
-                warnings: ["Mapped-area facts were unavailable."]
+                warnings: ["Mapped-area facts were unavailable."], hasPartialCoverage: true
             ))
         }
 #endif

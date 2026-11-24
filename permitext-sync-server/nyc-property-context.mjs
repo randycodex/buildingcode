@@ -376,6 +376,7 @@ export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now
     },
     structuredFacts,
     taxLot,
+    hasPartialCoverage: mapped.unavailable.length > 0,
     warnings: [
       ...(mapped.unavailable.length ? [`NYC Planning layers unavailable: ${mapped.unavailable.join(", ")}. Unverified facts remain unknown.`] : []),
       "Mapped intersections can cover part of a tax lot. Verify boundaries and project applicability in official records.",

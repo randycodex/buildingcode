@@ -280,10 +280,10 @@ struct FolderEditorSheet: View {
             propertyWarnings = result.warnings.filter { !$0.isEmpty && seenWarnings.insert($0).inserted }
             let count = result.structuredFacts.filter { $0.status == "sourced" }.count
             let facts = count == 1 ? "1 sourced fact" : "\(count) sourced facts"
-            propertyLookupStatus = propertyWarnings.isEmpty
-                ? "Imported \(facts) from NYC Planning."
-                : "Partial import. Imported \(facts) from NYC Planning."
-            propertyLookupSucceeded = propertyWarnings.isEmpty
+            propertyLookupStatus = result.isPartialImport
+                ? "Partial import. Imported \(facts) from NYC Planning."
+                : "Imported \(facts) from NYC Planning."
+            propertyLookupSucceeded = !result.isPartialImport
             return result
         case .failure:
             propertyContext = nil
@@ -299,10 +299,10 @@ struct FolderEditorSheet: View {
         isSaving = true
         defer { isSaving = false }
         let enteredAddress = address.trimmingCharacters(in: .whitespacesAndNewlines)
-        let warningsWereVisible = propertyLookupAddress == enteredAddress && !propertyWarnings.isEmpty
+        let partialResultWasVisible = propertyLookupAddress == enteredAddress && propertyContext?.isPartialImport == true
         let property = await lookupPropertyContext()
-        // Give users who submit directly a chance to read a newly returned warning.
-        if !warningsWereVisible && !propertyWarnings.isEmpty { return }
+        // Let people read an incomplete import before committing it.
+        if !partialResultWasVisible && property?.isPartialImport == true { return }
         let addressChanged = enteredAddress != (existing?.address.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
         let existingFacts = existing?.structuredFacts ?? []
         let retainedFacts = addressChanged ? existingFacts.filter { $0.source != "nyc-planning" } : existingFacts
